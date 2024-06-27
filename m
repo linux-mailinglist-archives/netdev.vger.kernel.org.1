@@ -1,124 +1,239 @@
-Return-Path: <netdev+bounces-107250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6987591A6C8
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9475091A6C6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25C8228596F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 12:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0E4282B2B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 12:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA952161900;
-	Thu, 27 Jun 2024 12:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="GtnRWrDW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5E116DC39;
+	Thu, 27 Jun 2024 12:43:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC41161314;
-	Thu, 27 Jun 2024 12:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7176C16DC1A
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 12:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719492237; cv=none; b=P7UlGjks6jwblu4kCMyTEJIhpRP4MCCA/WqwIgtjZunV3WxO02Ztpxzz8z50F7eEBD3aXEjbXl4ixd7tRhBvofaOLQNZFPk/n6J4HoCjreuSuh9qvMOQot3VqT7A61rdrEHLH+I+e7BJGXg//0E0b2LtyVHn799W4hsMIOLfbek=
+	t=1719492232; cv=none; b=FzZte4JxMdFX6HyzLX7vpWv5Vk6/pP6rEe5Pr1+lv9Ar+ar6N5ArNr9yrhGU8NSgQ5sdZlnDzFWDw7ld1c9CX1HZbuTlvv3yIZAlujHjqCiB9cQhAMeUXR7AKLBt2Z+1kSOpXnIV7oors90hsXrEMHaIeg7W7mohlTUViB4kC4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719492237; c=relaxed/simple;
-	bh=ozMDR0fkbEQta+UOJZ1FFXQo1ZGGSn1y5K98kho/9pc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=trQ8JFkZzGWdIFCz08fQuZD3hr9BfmyZPjGomfVXgKf5UD7OPUi1hgsugZOBIkqB+mNYVsEqXuSwi79UxWp3r8WP3HALpl2A9VUlT6LpXNjk/o/8P63nYV1bWDZUbdn73wytdEMaP3QB05SomzUukd7PlenHWVG6IubuUFO5KZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=GtnRWrDW; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R9ZMS3011277;
-	Thu, 27 Jun 2024 14:43:29 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	bvWJeEz7wgq1kb1F+RfxA0OnfFRUKW1rLsdX1vbv/18=; b=GtnRWrDW7l/RHIL3
-	DNyn7KxrcBxc+AE0eh8g9Tir7OKU7onm/JuFafJfnVWMSLZEEXPpi5viIs99qWxB
-	oLwrYWA8Xf1BrgOz9XgTjPoWC+VAkuEYjDv5RMt9Li5YsD6Oykr/vISr2F0gQlSD
-	Z4rdTmi+pMBlys61FRXBVeq63HcQRxNO5QrPONw4aLWLD6QnLQuempMZiplRSPUJ
-	rXKiMGO3wt5Q+9sf/HD3vFmkh5XBAuxSFvWwu3XjYz3owu4Nj3DCf1CnbrjrfHUJ
-	fAcK7mXSxCmyC0yGFiLFFRSerA9/9Ja3gjMkkVmQ3i8oYKrYwrjPAtKsn6zp9vI9
-	PSV+oA==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yx860uenb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 14:43:29 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 5AD794002D;
-	Thu, 27 Jun 2024 14:43:24 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A32C721A900;
-	Thu, 27 Jun 2024 14:42:12 +0200 (CEST)
-Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 27 Jun
- 2024 14:42:11 +0200
-Message-ID: <1a13b19b-cf16-4a49-8d80-21579dc1da94@foss.st.com>
-Date: Thu, 27 Jun 2024 14:42:11 +0200
+	s=arc-20240116; t=1719492232; c=relaxed/simple;
+	bh=1dQLQ+ARUlLzvvMV+YhsLgq6x7BFBSZJi2jpscurXuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u98VOqzmgItuY+1m9vDNCf0UnvkBKA3Dr2YEXl0HjndPYFyBl3QuOxKbWqYbDtg6B63Zriq6yu2Dcq3IOUGYMRGFnLMxsY58qgFh7gf3bzz28QVXhXfGKgQCOjC4K4uVm+pcRC0upfekggRwz+kBeKIcBzMYxkaSe+L8iPdkcHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMoTS-00026e-48; Thu, 27 Jun 2024 14:43:38 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMoTR-005MyL-MU; Thu, 27 Jun 2024 14:43:37 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sMoTR-000Sq6-1u;
+	Thu, 27 Jun 2024 14:43:37 +0200
+Date: Thu, 27 Jun 2024 14:43:37 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: add regmap_range
+ for KSZ9563 chip
+Message-ID: <Zn1eeYwYgU2ocWHz@pengutronix.de>
+References: <20240627123911.227480-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/1] Add MCP23S08 pinctrl support
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Marek Vasut
-	<marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240611084206.734367-1-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20240611084206.734367-1-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_08,2024-06-27_03,2024-05-17_01
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240627123911.227480-1-o.rempel@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Please ignore this patch, it was send by accident.
 
+On Thu, Jun 27, 2024 at 02:39:08PM +0200, Oleksij Rempel wrote:
+> Add register validation for KSZ9563.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 121 +++++++++++++++++++++++++
+>  1 file changed, 121 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 030b167764b39..2308be3bdc9d8 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -666,6 +666,125 @@ static const struct regmap_access_table ksz8563_register_set = {
+>  	.n_yes_ranges = ARRAY_SIZE(ksz8563_valid_regs),
+>  };
+>  
+> +static const struct regmap_range ksz9563_valid_regs[] = {
+> +	regmap_reg_range(0x0000, 0x0003),
+> +	regmap_reg_range(0x0006, 0x0006),
+> +	regmap_reg_range(0x000f, 0x000f),
+> +	regmap_reg_range(0x0010, 0x001f),
+> +	regmap_reg_range(0x0100, 0x0100),
+> +	regmap_reg_range(0x0104, 0x0107),
+> +	regmap_reg_range(0x010d, 0x010d),
+> +	regmap_reg_range(0x0110, 0x0113),
+> +	regmap_reg_range(0x0120, 0x012b),
+> +	regmap_reg_range(0x0201, 0x0201),
+> +	regmap_reg_range(0x0210, 0x0213),
+> +	regmap_reg_range(0x0300, 0x0300),
+> +	regmap_reg_range(0x0302, 0x030b),
+> +	regmap_reg_range(0x030e, 0x031b),
+> +	regmap_reg_range(0x0320, 0x032b),
+> +	regmap_reg_range(0x0330, 0x0336),
+> +	regmap_reg_range(0x0338, 0x033b),
+> +	regmap_reg_range(0x033e, 0x033e),
+> +	regmap_reg_range(0x0340, 0x035f),
+> +	regmap_reg_range(0x0370, 0x0370),
+> +	regmap_reg_range(0x0378, 0x0378),
+> +	regmap_reg_range(0x037c, 0x037d),
+> +	regmap_reg_range(0x0390, 0x0393),
+> +	regmap_reg_range(0x0400, 0x040e),
+> +	regmap_reg_range(0x0410, 0x042f),
+> +	regmap_reg_range(0x0500, 0x0519),
+> +	regmap_reg_range(0x0520, 0x054b),
+> +	regmap_reg_range(0x0550, 0x05b3),
+> +
+> +	/* port 1 */
+> +	regmap_reg_range(0x1000, 0x1001),
+> +	regmap_reg_range(0x1004, 0x100b),
+> +	regmap_reg_range(0x1013, 0x1013),
+> +	regmap_reg_range(0x1017, 0x1017),
+> +	regmap_reg_range(0x101b, 0x101b),
+> +	regmap_reg_range(0x101f, 0x1021),
+> +	regmap_reg_range(0x1030, 0x1030),
+> +	regmap_reg_range(0x1100, 0x1115),
+> +	regmap_reg_range(0x111a, 0x111f),
+> +	regmap_reg_range(0x1120, 0x112b),
+> +	regmap_reg_range(0x1134, 0x113b),
+> +	regmap_reg_range(0x113c, 0x113f),
+> +	regmap_reg_range(0x1400, 0x1401),
+> +	regmap_reg_range(0x1403, 0x1403),
+> +	regmap_reg_range(0x1410, 0x1417),
+> +	regmap_reg_range(0x1420, 0x1423),
+> +	regmap_reg_range(0x1500, 0x1507),
+> +	regmap_reg_range(0x1600, 0x1612),
+> +	regmap_reg_range(0x1800, 0x180f),
+> +	regmap_reg_range(0x1900, 0x1907),
+> +	regmap_reg_range(0x1914, 0x191b),
+> +	regmap_reg_range(0x1a00, 0x1a03),
+> +	regmap_reg_range(0x1a04, 0x1a07),
+> +	regmap_reg_range(0x1b00, 0x1b01),
+> +	regmap_reg_range(0x1b04, 0x1b04),
+> +	regmap_reg_range(0x1c00, 0x1c05),
+> +	regmap_reg_range(0x1c08, 0x1c1b),
+> +
+> +	/* port 2 */
+> +	regmap_reg_range(0x2000, 0x2001),
+> +	regmap_reg_range(0x2004, 0x200b),
+> +	regmap_reg_range(0x2013, 0x2013),
+> +	regmap_reg_range(0x2017, 0x2017),
+> +	regmap_reg_range(0x201b, 0x201b),
+> +	regmap_reg_range(0x201f, 0x2021),
+> +	regmap_reg_range(0x2030, 0x2030),
+> +	regmap_reg_range(0x2100, 0x2115),
+> +	regmap_reg_range(0x211a, 0x211f),
+> +	regmap_reg_range(0x2120, 0x212b),
+> +	regmap_reg_range(0x2134, 0x213b),
+> +	regmap_reg_range(0x213c, 0x213f),
+> +	regmap_reg_range(0x2400, 0x2401),
+> +	regmap_reg_range(0x2403, 0x2403),
+> +	regmap_reg_range(0x2410, 0x2417),
+> +	regmap_reg_range(0x2420, 0x2423),
+> +	regmap_reg_range(0x2500, 0x2507),
+> +	regmap_reg_range(0x2600, 0x2612),
+> +	regmap_reg_range(0x2800, 0x280f),
+> +	regmap_reg_range(0x2900, 0x2907),
+> +	regmap_reg_range(0x2914, 0x291b),
+> +	regmap_reg_range(0x2a00, 0x2a03),
+> +	regmap_reg_range(0x2a04, 0x2a07),
+> +	regmap_reg_range(0x2b00, 0x2b01),
+> +	regmap_reg_range(0x2b04, 0x2b04),
+> +	regmap_reg_range(0x2c00, 0x2c05),
+> +	regmap_reg_range(0x2c08, 0x2c1b),
+> +
+> +	/* port 3 */
+> +	regmap_reg_range(0x3000, 0x3001),
+> +	regmap_reg_range(0x3013, 0x3013),
+> +	regmap_reg_range(0x3017, 0x3017),
+> +	regmap_reg_range(0x301b, 0x301b),
+> +	regmap_reg_range(0x301f, 0x3020),
+> +	regmap_reg_range(0x3030, 0x3030),
+> +	regmap_reg_range(0x3300, 0x3301),
+> +	regmap_reg_range(0x3303, 0x3303),
+> +	regmap_reg_range(0x3400, 0x3401),
+> +	regmap_reg_range(0x3403, 0x3403),
+> +	regmap_reg_range(0x3410, 0x3417),
+> +	regmap_reg_range(0x3420, 0x3423),
+> +	regmap_reg_range(0x3500, 0x3507),
+> +	regmap_reg_range(0x3600, 0x3612),
+> +	regmap_reg_range(0x3800, 0x380f),
+> +	regmap_reg_range(0x3900, 0x3907),
+> +	regmap_reg_range(0x3914, 0x391b),
+> +	regmap_reg_range(0x3a00, 0x3a03),
+> +	regmap_reg_range(0x3a04, 0x3a07),
+> +	regmap_reg_range(0x3b00, 0x3b01),
+> +	regmap_reg_range(0x3b04, 0x3b04),
+> +	regmap_reg_range(0x3c00, 0x3c05),
+> +	regmap_reg_range(0x3c08, 0x3c1b),
+> +};
+> +
+> +static const struct regmap_access_table ksz9563_register_set = {
+> +	.yes_ranges = ksz9563_valid_regs,
+> +	.n_yes_ranges = ARRAY_SIZE(ksz9563_valid_regs),
+> +};
+> +
+>  static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x0000, 0x0003),
+>  	regmap_reg_range(0x0006, 0x0006),
+> @@ -1475,6 +1594,8 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+>  		.supports_rgmii = {false, false, true},
+>  		.internal_phy = {true, true, false},
+>  		.gbit_capable = {true, true, true},
+> +		.wr_table = &ksz9563_register_set,
+> +		.rd_table = &ksz9563_register_set,
+>  	},
+>  
+>  	[KSZ8567] = {
+> -- 
+> 2.39.2
+> 
+> 
+> 
 
-On 6/11/24 10:42, Christophe Roullier wrote:
-> Enable MCP23S08 pinctrl support
-> 
-> V2: - Remark from Krzysztof (Change built-in to module)
-> 
-> Christophe Roullier (1):
->    ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
-> 
->   arch/arm/configs/multi_v7_defconfig | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> 
-> base-commit: bb678f01804ccaa861b012b2b9426d69673d8a84
-
-Applied on stm32-next.
-
-Thanks
-Alex
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
