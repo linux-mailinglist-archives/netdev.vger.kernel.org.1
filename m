@@ -1,85 +1,74 @@
-Return-Path: <netdev+bounces-107443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 726CD91AFF6
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:58:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5222D91B006
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 22:01:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2DBDB20F5E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C26F285D61
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 20:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D73019AD7D;
-	Thu, 27 Jun 2024 19:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AuvNfyC2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3956F099;
+	Thu, 27 Jun 2024 20:01:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F6F22F1C;
-	Thu, 27 Jun 2024 19:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D53460EC4;
+	Thu, 27 Jun 2024 20:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719518315; cv=none; b=OMhqPV9qY0/vWGOufkWKNIh1Wu0lundo/IGjZFQrxR77cUs31EgNQViZy7LDosf9np+ZK+6B4NC1VBN9Ca53oywt5BNUxoLGRjngeUZfaad3MpAaP6oZp2Am5ZswbyTDKjLpUfDm5MvQG1RIEAsRA7jTfvePPuuijkGKxqHHVJQ=
+	t=1719518460; cv=none; b=DWhdR6d3GqkdSvTjzLUlnyaTATSzJ4XNQhjDqJtR39rgwYuOSDE5KQ9HMu4d/PZ4qMKkN1dALeOAsF8QEMNP1WFTDSB3+J0kiLAs1Oii9ihaz20tI5Yum7qxzUW+n5CnhDpHoiqfgGPD1Ur3SnTlDGN++qbOJapwqyU0kEoaOjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719518315; c=relaxed/simple;
-	bh=S4yuJH7snXMiR4H/OcoIVrpDAluEUXsb8UuS8mgZbNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bqq+JO9OQTGcHqr+XKeZ4DIkiwB25mdZxg/R1xy7utf7EhmDZ4auHEPIU/0oQXS42YWId2WmsWF9cQbOc4IFxEeLNr5VnLKJh5ssUUetIh3VqTm7+ZKE8PrIvj72i7BwHeb1uGVgSdTlQygeUPZ30YLLzqxOIl5hg9t9Gk3hXYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AuvNfyC2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EA1EC2BD10;
-	Thu, 27 Jun 2024 19:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719518315;
-	bh=S4yuJH7snXMiR4H/OcoIVrpDAluEUXsb8UuS8mgZbNo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AuvNfyC27xGCkLMmOnO0yt9tJuiixh4rKugekJ+ThS6gcDQNfPcQRzhmp0F9BK1F0
-	 rqj/6KRf6AS8VV3xBsOVApfvH75zl3vTkJOY6j6CkLSSWet95WhHAPM1bxoyU4u9Je
-	 8ARUNDWR/yLx4LkCq0rp2htOfOrUc9JNKo58FK6Jq2KozjWgpJtkjiTT3eOkxR8exd
-	 WPfrhddRAX5A6FIV7udHiXBsjY/ctUlOHGU2/Sml8EgcBWcgJgykaUgpZnqXmGPDhN
-	 +nTNHezL7DnzdHFaQOWZFOLh0eZPtGkRNBgiPfMtUqTO1gTwDd6D8mGTBTroX43mq/
-	 i1p17HNpqZEjA==
-Date: Thu, 27 Jun 2024 12:58:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Alexander Duyck
- <alexander.duyck@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>,
- <linux-mediatek@lists.infradead.org>
-Subject: Re: [PATCH net-next v9 00/13] First try to replace page_frag with
- page_frag_cache
-Message-ID: <20240627125834.3007120c@kernel.org>
-In-Reply-To: <a051a277-a901-2cdb-72d0-716002593019@huawei.com>
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
-	<d2601a34-7519-41b6-89c6-b4aad483602b@lunn.ch>
-	<a051a277-a901-2cdb-72d0-716002593019@huawei.com>
+	s=arc-20240116; t=1719518460; c=relaxed/simple;
+	bh=evboQ7WIE6MM6hHChdF4SsKYOQlEdGGWnOmmziYT1Ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eUJYMBQcMHaQx+2oHIV6suDCuVfrqcP0o055hmTkd0rEbQG+AJxnns8RAH1VBkNGeqDQrAbYR6QNU2P7z3pM44h9cTA8/RViyo/Okiv5gOzfnZo7ggXeuQc+dDq7qguIZlZGn+jRFvXZYeW7z5X0DVVfjyF+G7SeI63Lz+C7Pjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sMvIX-0004ym-MI; Thu, 27 Jun 2024 22:00:49 +0200
+Date: Thu, 27 Jun 2024 22:00:49 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	fw@strlen.de
+Subject: Re: [PATCH nf-next 00/19] Netfilter/IPVS updates for net-next
+Message-ID: <20240627200049.GA18997@breakpoint.cc>
+References: <20240627112713.4846-1-pablo@netfilter.org>
+ <Zn1M890ZdC1WRekQ@calendula>
+ <20240627113202.72569175@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240627113202.72569175@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 27 Jun 2024 19:16:22 +0800 Yunsheng Lin wrote:
-> On 2024/6/27 1:12, Andrew Lunn wrote:
-> > Silly nitpick, but maybe for the next version you change the Subject:
-> > to Tenth try to replace page_frag with page_frag.... :-)  
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 27 Jun 2024 13:28:51 +0200 Pablo Neira Ayuso wrote:
+> > Note for netdev maintainer: This PR is actually targeted at *net-next*.
+> > 
+> > Please, let me know if you prefer I resubmit.
 > 
-> Yes, it is somewhat confusing for the 'First try' part.
-> I guess I can change it to highlight the effort and commitment behind
-> the trying:-)
+> Not a big deal, but since you offered I have another ask - looks like
+> this series makes the nf_queue test time out in our infra.
+> 
+> https://netdev.bots.linux.dev/contest.html?test=nft-queue-sh
+> 
+> Could you take a look before you respin? It used to take 24 sec,
+> not it times out after 224 sec..
 
-Sorry to ruin the slightly whimsical mood but if you do change it -
-please don't include the version at all. Some automation matches
-versions of patch sets together based on the title of the cover letter.
+Looks like its the sctp selftests that got added, I can have a look
+tomorrow.
 
