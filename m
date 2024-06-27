@@ -1,92 +1,131 @@
-Return-Path: <netdev+bounces-107366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA1391AAED
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 17:16:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8688E91AB3B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 17:28:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E23281A80
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:16:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29E5528C252
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 15:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81BB198E71;
-	Thu, 27 Jun 2024 15:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF53198A34;
+	Thu, 27 Jun 2024 15:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mwVfIhDw"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="HDkrenRc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63658197555;
-	Thu, 27 Jun 2024 15:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D92198A31
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 15:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719501367; cv=none; b=ofHyOdxwnV+sro/qkr9XvyGGR8UdNfYQKXoLtzN8LMlK4sDzefA+AJ0OAbul7GZPFt5/futpmUTWiZoXLkwn4sAoqAmxqVMkF6D1Drv/sizkRJ07j3aGuiTUEGye6hRcWvJ/jtlX5TV+cSBRP1MQcP7v7GABlRHctzYmuNLc4VY=
+	t=1719502069; cv=none; b=SOllvXswVTYJ5fxxTCYXr/R3D396H41EBjnW7QELmaWxGO4RYX72aYBYz3u05GqJZrk09xQrPfYqFkqyYtZQcT7xE9o2abguZuBxOqvckx2eM7kbXCKiVQzfoEiBZ9bWA8oxE+5qW9XB8htw3EFCOyXp5+MNByV2u6pDn4K/+Xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719501367; c=relaxed/simple;
-	bh=Edgf2el7vfsPa7gk4PEhJ0JF9QtzPXpxY3Pe1JoTo1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nieM4XEAW0yG5d4gizqHxavt/7/YXUeWRfNh9/at3VufoCiwYi9UDBT7tHfM2VPfG9hDrAvDLm99ERF4JLRl+bhcVYYv46b0eWKlCduFzMctT5kr73IAiL+2KzeHZn/ul2DsZiKRNOCFjxCKGQNfiOiI8habuwm1SUXS0rhziJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mwVfIhDw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QKCRMBwJDf5cHZ/yhnI+yJCQsyATUHSXjQblCJTVe3Q=; b=mwVfIhDwHKSNaCMinHIFYrWYcy
-	Ci9uGmNuK4rVfOiVYAZMTz/6tGc3ues7nW9mgqDHbTB1fyiH9cA2zIlsHK5lvCir/7Iz8Bc4EOWZE
-	aH0ve4E8mbx+pN38lkhktjYZQZD3YVaeZAVu8OpGm+7rT0RiHFRnBfq1EWbmcwLjXFyg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sMqqo-001B7c-Q2; Thu, 27 Jun 2024 17:15:54 +0200
-Date: Thu, 27 Jun 2024 17:15:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Lucas Stach <l.stach@pengutronix.de>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 2/3] net: dsa: microchip: lan937x: force
- RGMII interface into PHY mode
-Message-ID: <f610effb-34af-4150-a320-c8882117b632@lunn.ch>
-References: <20240627123911.227480-1-o.rempel@pengutronix.de>
- <20240627123911.227480-3-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1719502069; c=relaxed/simple;
+	bh=MCcKh+Te3MluMt/hBoNCtQN0lNaNkAplmbKTwZRlgkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZDo67Wure3U7jje+LfEotG76bkEhHc1y9SVakUfSffB6XqYxwcSjTVi3csvPxoSYe+BLq0tkS6idFponComkJUS3xNCLFU393L2tztcpd6pmz8yOp+DjpSoQfyQ2hs0/S7+O/3BPK2+vJ+LjjME0ndkPPnA4rZDECvrFLEf60C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=HDkrenRc; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2c5362c7c0bso5906106a91.1
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 08:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1719502067; x=1720106867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9itoRg4hkzQHK7gOStndwazEBaHhxM4RVlJuAwijkSU=;
+        b=HDkrenRcNPZMhMx/GWFDcT9rfC+ph9jmU+aHI4xpM8nRwtfPCtdgqn0MsVCeakEKkn
+         uBEJnTUfM/dTbSFnHUdS8Bh6Tf4ItTabqBESpTUeIuH0TdvmMhXn34GhPHZXYJMjjCk2
+         LMJp/IKxnWtUCOx1ks1lUq+4390u7vUigOuZfq6/GTlQxKJWzU+UgGXiV3GXXCz1gYDm
+         uHLsSLXwmV8g5fNlWPc0QzFV5VdepDTlQK9YWEwo1D6X0Pei61AmsmCZofRczf7RUUdC
+         ixXVydiX40J0mTz40edcK4jWlhpQIT0nBp1CedsPb6E46m3NpEcj3FXDQAsQlQ5KBYg0
+         svjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719502067; x=1720106867;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9itoRg4hkzQHK7gOStndwazEBaHhxM4RVlJuAwijkSU=;
+        b=wPD9cJsy7WgDHh/yHpJihkhim0Mx6SywBYXGSlSG5mzgAeB8Q68CwS+W4n9pJn9noL
+         xexG4W/VPByg+rDjylXJFgvCBPsOkz9p0R4nkQ8uE3HgG9BhBd7176ZLTGh7FMdFIDxl
+         AEw7YJWCDeKC6ca9FJc5VOTgap0Cvy3iYG3lDGh/RmGBNQAdnQ9D0PCE/ny/WbXOC7hz
+         VXHsUGKs4qG1NVCguctkBaN+bCHawZdO9Pl32hCjXeBSNKqxWimBK6CX7ssozeRQoQZ+
+         jeM677+faJUyF7fu9Q0UFJANIDn38rFxGh7xzM1fv5DY0GjXyq4nprj4m0xO8xBb8FP2
+         uEQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGHDzjFYoP/NIoJur83kWqtXcVuVn+FUINQzbiU6XJAVfec97ND4gLmMB6OjfQwbcBPw5dLfipeeJdPeo17sJAspFuxLvU
+X-Gm-Message-State: AOJu0YzGbpRfODnLAluze1jQNLDKMJgAOflUUH3J74+yUO0gqp226UAk
+	j5J5ozm5DAr2ghtJWPcDBWN6JcWpZDHWJU/6JtzsTxiBi96fDSmv8rnCZno8zf8=
+X-Google-Smtp-Source: AGHT+IEke9+TTjnHY0SqzOq3H8948zV45u3a0yDIPz5OgX6h8hhkaHXP8IkjUcvJX+T+68y/MGmHww==
+X-Received: by 2002:a17:90a:d084:b0:2c7:35f6:87e5 with SMTP id 98e67ed59e1d1-2c8612c6c27mr12214771a91.5.1719502067064;
+        Thu, 27 Jun 2024 08:27:47 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c906f38b11sm1344533a91.28.2024.06.27.08.27.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 08:27:46 -0700 (PDT)
+Date: Thu, 27 Jun 2024 08:27:36 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Konstantin Taranov <kotaranov@microsoft.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Haiyang Zhang
+ <haiyangz@microsoft.com>, Konstantin Taranov
+ <kotaranov@linux.microsoft.com>, Wei Hu <weh@microsoft.com>,
+ "sharmaajay@microsoft.com" <sharmaajay@microsoft.com>, Long Li
+ <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, linux-netdev
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH rdma-next 1/1] RDMA/mana_ib: Set correct device into ib
+Message-ID: <20240627082736.34ded856@hermes.local>
+In-Reply-To: <PAXPR83MB05596705E21C2869A4FA6919B4D72@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+References: <1719311307-7920-1-git-send-email-kotaranov@linux.microsoft.com>
+	<20240626054748.GN29266@unreal>
+	<PAXPR83MB0559F4678E73B0091A8ADFBBB4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+	<20240626121118.GP29266@unreal>
+	<20240626082731.70d064bb@hermes.local>
+	<20240626153354.GQ29266@unreal>
+	<20240626091028.1948b223@hermes.local>
+	<PAXPR83MB05592AE537E11C9026E268F7B4D62@PAXPR83MB0559.EURPRD83.prod.outlook.com>
+	<DM6PR21MB14819FB76960139B7027D1EECAD62@DM6PR21MB1481.namprd21.prod.outlook.com>
+	<20240627095705.GS29266@unreal>
+	<PAXPR83MB05596705E21C2869A4FA6919B4D72@PAXPR83MB0559.EURPRD83.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240627123911.227480-3-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 27, 2024 at 02:39:10PM +0200, Oleksij Rempel wrote:
-> From: Lucas Stach <l.stach@pengutronix.de>
+On Thu, 27 Jun 2024 10:44:02 +0000
+Konstantin Taranov <kotaranov@microsoft.com> wrote:
+
+> > 
+> > I don't want to be first and only one driver that uses this flag outside of
+> > netdev. So please add new function to netdev part of mana driver to return
+> > right ndev.
+> > 
+> > Something like that:
+> > struct net_device *mana__get_netdev(struct mana_context *mc) {
+> > 	struct net_device *ndev;
+> > 
+> > 	if (mana_ndev_is_slave(mc->ports[0]))
+> > 		ndev = netdev_master_upper_dev_get_rcu(mc->ports[0]);
+> > 	else
+> > 		ndev = mc->ports[0];
+> > 
+> > 	return ndev;
+> > }
+> > 
+> > And get Acks from netdev maintainers (Jakub, David, Eric, Paolo).  
 > 
-> The register manual and datasheet documentation for the LAN937x series
-> disagree about the polarity of the MII mode strap. As a consequence
-> there are hardware designs that have the RGMII interface strapped into
-> MAC mode, which is a invalid configuration and will prevent the internal
-> clock from being fed into the port TX interface.
+> Ok. Makes sense.
+> I will just call it more exact:
+> mana_get_not_slave_netdev_rcu()
 
-What i think is missing from this is that you are talking about the
-CPU port. For a normal user point, RGMII MAC mode would make sense, if
-there is an external RGMII PHY attached. And the code only does this
-if the port is a CPU port.
-
-So maybe:
-
-... that have the CPU port RGMII interface ...
-
-	Andrew
+Please don't introduce more usages of the term "slave".
+Better to stick to VF.
 
