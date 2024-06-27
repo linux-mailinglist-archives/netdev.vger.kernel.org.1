@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-107089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B6F919BE3
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:42:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1971919BE6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 02:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97BFE282CDC
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:42:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E68CC1C21C15
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 00:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB70F2139CB;
-	Thu, 27 Jun 2024 00:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6726617FE;
+	Thu, 27 Jun 2024 00:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCoyUAnG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3IboVkk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E850E6FC2;
-	Thu, 27 Jun 2024 00:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C348FC18;
+	Thu, 27 Jun 2024 00:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719448922; cv=none; b=L18EGxZ8y40euXVcixaMoQpt9fWhSCBew3XOM3z94QCElEqeetXam4s8nir5A+b7jOnHdMCadxyVqe+XtU+3n7RNRuOxHVGqKVnYSVW3GpdMmS9elyx2iQdbbxZ8HWMZSeei0g/MgBPmCT2TK+KOcxTJVVw6Gk/p1a5ia2gLeBc=
+	t=1719448925; cv=none; b=s3qSLHnuqdZHEvLVBbM9pK4r8uD21YIDrJDoqAnz4BnWfsjoNLbOlFmyq+W3aEwa+bdRN+dkZCgOe3GMAPqSHgT9ohR2vD4Gq3VNORoeSUz6BNPK/eCFAhVlk/j8MXaUzAAuw40ApWorcZ2nCE0Dd1qxMBeHrSu+LetmLXaPjcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719448922; c=relaxed/simple;
-	bh=pkJ7+HFghe8xVV2bDKTNlz9IEgLjoMzukY7F8ROLww4=;
+	s=arc-20240116; t=1719448925; c=relaxed/simple;
+	bh=942HWtrrwMZHj8NhKUHjxOd6FxhubpGj857au8oAFIQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cQNrgWZ4uq0UtsPknDsNqQGF5jta92BdM6JryrcWbJCcfUZqOF/rCO4YmPv2eI6ocTZilzdUo/dgZvkeq79bn85qLIZjGUyanWPrUlGH3ZlH6+zrcfqfvogOIn0jWFkg5+M/bxynIBfm7OvZv6rIO0uyAxECkr6SZNqHWOfX6JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCoyUAnG; arc=none smtp.client-ip=209.85.208.169
+	 MIME-Version; b=vDaV7auNKN2SK1c5/lzeaetwW2JoL3It5T5acuSeEmV4zkjt2TnHjLFkd263DRTLziaT+Ci38pui0SL2sB1/bp9s7keTBumPHZKaqCI3TkzCnvw5VPMrtLpqJcK4NCE1+qh+L9fvWpB/Ympsjso5URbhdGQM+OdeFL2rLHsm8XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J3IboVkk; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so113325741fa.0;
-        Wed, 26 Jun 2024 17:42:00 -0700 (PDT)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ec3f875e68so81365821fa.0;
+        Wed, 26 Jun 2024 17:42:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719448919; x=1720053719; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719448922; x=1720053722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hNtSE/Sz58dIQftFvxUpsZScMic73JvgAp5RjxHCtMo=;
-        b=gCoyUAnGZ89fXv6UdxAiUx4Fh+/2Wjyykv8fR0Tp+1DmfFOmAnSaffQFwg5ukJb1s3
-         zKPbpArFZ2p+fHW9sSCmCvBzVfb8vLHrARNcNiGyEMal4AhxIqgzj9gi1RJKBJWnmx0a
-         N/P2tvaHTja3UPUiJUPd5pxZ9ysR9mIkND9R/nZgCj8UM+otEqxEMGgSzyA3J9mq+ORI
-         MZsxLFW22XltKbLYMb1VXrDuxSy/lxyh8mTT0zAnfOiDOFw9Rur5S7zU77jJxGbu9bxb
-         bZ+16wXzcBNIwS5Hc2tIUZRFCNQHLWMAuraDmnEHAGX8d75Smj9bTAv0AjfTPT9l+vki
-         x76Q==
+        bh=l1aUmiEcMZ+VAXZ9+5FXW90knS868BRwEpAdgXfPTGM=;
+        b=J3IboVkkI/2VG4XVxOuW/+IuR0oi43g7Jxy1M4zyV2mdCgkj0xn0uT9giS5FpV9+Oe
+         Q1pBfp5/rtm6xu34NizI285K4kgm0m9uNRlyYiUwnqaRirO/CPrIL1TJn/uNQk3FzMQg
+         5OwPRwLEAaepk5l7Iy8SGZAYU5f4D1N0Lg9Sy59+nZm4KtctCgNXqAospquzvPxkcPig
+         KMs2F+KEWysl0QqFbdworViIc4Ecvc3rC8F1NfFiOVIdc9yIhJ9PT4QLh8lC+R6W5t6Y
+         LWbmRJzaQw44imZ7JvfEFITvihlefPFnCuPsuoOS3PoACmOKhjw2cihXmok37EWJ0tvv
+         4DQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719448919; x=1720053719;
+        d=1e100.net; s=20230601; t=1719448922; x=1720053722;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hNtSE/Sz58dIQftFvxUpsZScMic73JvgAp5RjxHCtMo=;
-        b=BKMWpXbdrcXtAHnDs9YupaPxyL07lOQB0E3I3v0y09OkQ1tCaa0+DoEH7ylt6O4Rei
-         uDD+R5NBc9TNvxQvwPg3UMNT1UKjlNARQGNOZ5CpUen9n7IWpQ0S7V+W6lO5pS8QM/So
-         gdTvQPb+gv09QBPYu75HoDKMv3aqI8JbmFE4nWwi2oWZtj5kljn8tVGh1KDdyd/0OHxd
-         +l+x4EMO25ry28S0maNW6+c/O2sKP/+U+RGNdYb3MVoN0s1vzVNvauiYGqwn+QyE3A2X
-         18cOKW4QiBbDgYDpc+tl2pfKyhxdFRS3g+37flMRUrRAyr4Eo12T0otvLuL4CsX2mHQf
-         ueGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUL4EiuXluAT6JSxqh8Y+Hdc8mE+z+xnc6mIrUQkwpllr/JoUZlYjeDLmWbw8qpZJ6AFOMxbYzhhVriPorF+rQc42NmFb4dKlWea8us2EG000vAiIhRxV6DeR+7Eli7zOFtFK7/tH2lYWiFpQwYxnKizY90rhs8yEIJGuBHA74prg==
-X-Gm-Message-State: AOJu0YyYmd2Fm5EC5Z4YR/gO235+TAH5fv8B7h9Jwo9UsJYxCZmkzktk
-	qfXO1Uz3N/ngt+KuOk4hmbMjphSgrAuwLX8BAiGaLPNVSypZD8lY
-X-Google-Smtp-Source: AGHT+IGAhcT2eDUDZ74rH2P1sJ+J3V9c645Xhl4Ny+tSWQtCeAge7CY5C26plvvwf483sutA61JRHw==
-X-Received: by 2002:a2e:b687:0:b0:2ec:57c7:c735 with SMTP id 38308e7fff4ca-2ec5b31d5fbmr85897281fa.35.1719448918966;
-        Wed, 26 Jun 2024 17:41:58 -0700 (PDT)
+        bh=l1aUmiEcMZ+VAXZ9+5FXW90knS868BRwEpAdgXfPTGM=;
+        b=hpwkW2NRH8WC64ts+E3KmW9INWRElEyH+fNMW1HDPKnpJa7xeD0VG14Ln6Es8mgBQ8
+         nzoGTDp7CkLp4LuAaiynzut0AaXNznUaayKgNSDSRL1tJy3wsyXTCok3SUfQ88eUMy+g
+         yRBzi9JLGcQZorre2M8c9DOLgM0Z17jxK7zDsh+UIRYDff18CeF6i0D68NZzfLR1R7c3
+         imoeuEyqDJb/S5SfCE9IU6df8SAC8cUI7I094vF+StwCrf2zIVbjbZkbe3pNAzZNfNHF
+         PqrK3helBWXILMUCs00mt0+byzYkwFHpaMeuqRC1H0UEDu2t0mdKw3QRJfhsXs5oUmw6
+         ew0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXZWAEsz5E7PgmcxymLmoVcPdb3ZtantYVHMGiRoYYiKPYM7E4m4FkYXRwBWu1/0QgncExz9+HBlwqxfA+PCXHnXbOy97bATPfjpv4LVPSnVIq5nOSiZrhrcRnon4uPi7LSBVRkhi6AByTLxPvLRer5nviaSbH71ms9qNv/ODqgFw==
+X-Gm-Message-State: AOJu0Yw0xc/GRLq8zezw1PJD10ZKtrOvL0qDQTcJ3UUFocbNY38ALdMe
+	stkZzgqm3AUZ1pe4oLOxR4ngN9gieMdiwNz/Y3voYxFkEaQ+oI1j
+X-Google-Smtp-Source: AGHT+IFmjRGW10WUGPT7cZAYEVgU7kOFgeFWXkk/1Ljf051iR+iI2oXN70rlPpaeq6HVJuBIApnqgA==
+X-Received: by 2002:a05:651c:220e:b0:2ec:5e2e:39a8 with SMTP id 38308e7fff4ca-2ec5e2e3aaamr82947591fa.3.1719448921454;
+        Wed, 26 Jun 2024 17:42:01 -0700 (PDT)
 Received: from localhost ([89.113.147.248])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee4a4bee20sm453591fa.104.2024.06.26.17.41.58
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee4a4a8ecasm474761fa.88.2024.06.26.17.42.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 17:41:58 -0700 (PDT)
+        Wed, 26 Jun 2024 17:42:01 -0700 (PDT)
 From: Serge Semin <fancer.lancer@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -95,9 +95,9 @@ Cc: Serge Semin <fancer.lancer@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 02/10] net: pcs: xpcs: Split up xpcs_create() body to sub-functions
-Date: Thu, 27 Jun 2024 03:41:22 +0300
-Message-ID: <20240627004142.8106-3-fancer.lancer@gmail.com>
+Subject: [PATCH net-next v3 03/10] net: pcs: xpcs: Convert xpcs_id to dw_xpcs_desc
+Date: Thu, 27 Jun 2024 03:41:23 +0300
+Message-ID: <20240627004142.8106-4-fancer.lancer@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240627004142.8106-1-fancer.lancer@gmail.com>
 References: <20240627004142.8106-1-fancer.lancer@gmail.com>
@@ -109,193 +109,156 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As an initial preparation before adding the fwnode-based DW XPCS device
-support let's split the xpcs_create() function code up to a set of the
-small sub-functions. Thus the xpcs_create() implementation will get to
-look simpler and turn to be more coherent. Further updates will just touch
-the new sub-functions a bit: add platform-specific device info, add the
-reference clock getting and enabling.
-
-The xpcs_create() method will now contain the next static methods calls:
-
-xpcs_create_data() - create the DW XPCS device descriptor, pre-initialize
-it' fields and increase the mdio device refcount-er;
-
-xpcs_init_id() - find XPCS ID instance and save it in the device
-descriptor;
-
-xpcs_init_iface() - find MAC/PCS interface descriptor and perform
-basic initialization specific to it: soft-reset, disable polling.
-
-The update doesn't imply any semantic change but merely makes the code
-looking simpler and more ready for adding new features support.
-
-Note the xpcs_destroy() has been moved to being defined below the
-xpcs_create_mdiodev() function as the driver now implies having the
-protagonist-then-antagonist functions definition order.
+A structure with the PCS/PMA MMD IDs data is being introduced in one of
+the next commits. In order to prevent the names ambiguity let's convert
+the xpcs_id structure name to dw_xpcs_desc. The later version is more
+suitable since the structure content is indeed the device descriptor
+containing the data and callbacks required for the driver to correctly set
+the device up.
 
 Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 
 ---
 
 Changelog v2:
-- Preserve the strict refcount-ing pattern. (@Russell)
+- This is a new patch introduced on v2 stage of the review.
 ---
- drivers/net/pcs/pcs-xpcs.c | 102 +++++++++++++++++++++++++------------
- 1 file changed, 69 insertions(+), 33 deletions(-)
+ drivers/net/pcs/pcs-xpcs.c   | 30 +++++++++++++++---------------
+ include/linux/pcs/pcs-xpcs.h |  4 ++--
+ 2 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 99adbf15ab36..2dcfd0ff069a 100644
+index 2dcfd0ff069a..48c61975db22 100644
 --- a/drivers/net/pcs/pcs-xpcs.c
 +++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -1365,12 +1365,9 @@ static const struct phylink_pcs_ops xpcs_phylink_ops = {
- 	.pcs_link_up = xpcs_link_up,
+@@ -151,19 +151,19 @@ struct xpcs_compat {
+ 	int (*pma_config)(struct dw_xpcs *xpcs);
  };
  
--static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
--				   phy_interface_t interface)
-+static struct dw_xpcs *xpcs_create_data(struct mdio_device *mdiodev)
+-struct xpcs_id {
++struct dw_xpcs_desc {
+ 	u32 id;
+ 	u32 mask;
+ 	const struct xpcs_compat *compat;
+ };
+ 
+-static const struct xpcs_compat *xpcs_find_compat(const struct xpcs_id *id,
+-						  phy_interface_t interface)
++static const struct xpcs_compat *
++xpcs_find_compat(const struct dw_xpcs_desc *desc, phy_interface_t interface)
  {
- 	struct dw_xpcs *xpcs;
--	u32 xpcs_id;
--	int i, ret;
+ 	int i, j;
  
- 	xpcs = kzalloc(sizeof(*xpcs), GFP_KERNEL);
- 	if (!xpcs)
-@@ -1378,59 +1375,89 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+ 	for (i = 0; i < DW_XPCS_INTERFACE_MAX; i++) {
+-		const struct xpcs_compat *compat = &id->compat[i];
++		const struct xpcs_compat *compat = &desc->compat[i];
  
- 	mdio_device_get(mdiodev);
- 	xpcs->mdiodev = mdiodev;
-+	xpcs->pcs.ops = &xpcs_phylink_ops;
-+	xpcs->pcs.neg_mode = true;
-+	xpcs->pcs.poll = true;
-+
-+	return xpcs;
-+}
-+
-+static void xpcs_free_data(struct dw_xpcs *xpcs)
-+{
-+	mdio_device_put(xpcs->mdiodev);
-+	kfree(xpcs);
-+}
-+
-+static int xpcs_init_id(struct dw_xpcs *xpcs)
-+{
-+	u32 xpcs_id;
-+	int i, ret;
+ 		for (j = 0; j < compat->num_interfaces; j++)
+ 			if (compat->interface[j] == interface)
+@@ -177,7 +177,7 @@ int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface)
+ {
+ 	const struct xpcs_compat *compat;
+ 
+-	compat = xpcs_find_compat(xpcs->id, interface);
++	compat = xpcs_find_compat(xpcs->desc, interface);
+ 	if (!compat)
+ 		return -ENODEV;
+ 
+@@ -612,7 +612,7 @@ static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
+ 	int i;
+ 
+ 	xpcs = phylink_pcs_to_xpcs(pcs);
+-	compat = xpcs_find_compat(xpcs->id, state->interface);
++	compat = xpcs_find_compat(xpcs->desc, state->interface);
+ 	if (!compat)
+ 		return -EINVAL;
+ 
+@@ -633,7 +633,7 @@ void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces)
+ 	int i, j;
+ 
+ 	for (i = 0; i < DW_XPCS_INTERFACE_MAX; i++) {
+-		const struct xpcs_compat *compat = &xpcs->id->compat[i];
++		const struct xpcs_compat *compat = &xpcs->desc->compat[i];
+ 
+ 		for (j = 0; j < compat->num_interfaces; j++)
+ 			__set_bit(compat->interface[j], interfaces);
+@@ -853,7 +853,7 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 	const struct xpcs_compat *compat;
+ 	int ret;
+ 
+-	compat = xpcs_find_compat(xpcs->id, interface);
++	compat = xpcs_find_compat(xpcs->desc, interface);
+ 	if (!compat)
+ 		return -ENODEV;
+ 
+@@ -1118,7 +1118,7 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
+ 	const struct xpcs_compat *compat;
+ 	int ret;
+ 
+-	compat = xpcs_find_compat(xpcs->id, state->interface);
++	compat = xpcs_find_compat(xpcs->desc, state->interface);
+ 	if (!compat)
+ 		return;
+ 
+@@ -1341,7 +1341,7 @@ static const struct xpcs_compat nxp_sja1110_xpcs_compat[DW_XPCS_INTERFACE_MAX] =
+ 	},
+ };
+ 
+-static const struct xpcs_id xpcs_id_list[] = {
++static const struct dw_xpcs_desc xpcs_desc_list[] = {
+ 	{
+ 		.id = DW_XPCS_ID,
+ 		.mask = DW_XPCS_ID_MASK,
+@@ -1395,18 +1395,18 @@ static int xpcs_init_id(struct dw_xpcs *xpcs)
  
  	xpcs_id = xpcs_get_id(xpcs);
  
- 	for (i = 0; i < ARRAY_SIZE(xpcs_id_list); i++) {
- 		const struct xpcs_id *entry = &xpcs_id_list[i];
--		const struct xpcs_compat *compat;
+-	for (i = 0; i < ARRAY_SIZE(xpcs_id_list); i++) {
+-		const struct xpcs_id *entry = &xpcs_id_list[i];
++	for (i = 0; i < ARRAY_SIZE(xpcs_desc_list); i++) {
++		const struct dw_xpcs_desc *entry = &xpcs_desc_list[i];
  
  		if ((xpcs_id & entry->mask) != entry->id)
  			continue;
  
- 		xpcs->id = entry;
+-		xpcs->id = entry;
++		xpcs->desc = entry;
  
--		compat = xpcs_find_compat(entry, interface);
--		if (!compat) {
--			ret = -ENODEV;
--			goto out;
--		}
-+		break;
-+	}
- 
--		ret = xpcs_dev_flag(xpcs);
--		if (ret)
--			goto out;
-+	if (!xpcs->id)
-+		return -ENODEV;
- 
--		xpcs->pcs.ops = &xpcs_phylink_ops;
--		xpcs->pcs.neg_mode = true;
-+	ret = xpcs_dev_flag(xpcs);
-+	if (ret < 0)
-+		return ret;
- 
--		if (xpcs->dev_flag != DW_DEV_TXGBE) {
--			xpcs->pcs.poll = true;
-+	return 0;
-+}
- 
--			ret = xpcs_soft_reset(xpcs, compat);
--			if (ret)
--				goto out;
--		}
-+static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
-+{
-+	const struct xpcs_compat *compat;
- 
--		return xpcs;
-+	compat = xpcs_find_compat(xpcs->id, interface);
-+	if (!compat)
-+		return -EINVAL;
-+
-+	if (xpcs->dev_flag == DW_DEV_TXGBE) {
-+		xpcs->pcs.poll = false;
-+		return 0;
+ 		break;
  	}
  
--	ret = -ENODEV;
-+	return xpcs_soft_reset(xpcs, compat);
-+}
-+
-+static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
-+				   phy_interface_t interface)
-+{
-+	struct dw_xpcs *xpcs;
-+	int ret;
-+
-+	xpcs = xpcs_create_data(mdiodev);
-+	if (IS_ERR(xpcs))
-+		return xpcs;
-+
-+	ret = xpcs_init_id(xpcs);
-+	if (ret)
-+		goto out;
-+
-+	ret = xpcs_init_iface(xpcs, interface);
-+	if (ret)
-+		goto out;
-+
-+	return xpcs;
+-	if (!xpcs->id)
++	if (!xpcs->desc)
+ 		return -ENODEV;
  
- out:
--	mdio_device_put(mdiodev);
--	kfree(xpcs);
-+	xpcs_free_data(xpcs);
- 
- 	return ERR_PTR(ret);
- }
- 
--void xpcs_destroy(struct dw_xpcs *xpcs)
--{
--	if (xpcs)
--		mdio_device_put(xpcs->mdiodev);
--	kfree(xpcs);
--}
--EXPORT_SYMBOL_GPL(xpcs_destroy);
--
- struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
- 				    phy_interface_t interface)
+ 	ret = xpcs_dev_flag(xpcs);
+@@ -1420,7 +1420,7 @@ static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
  {
-@@ -1455,5 +1482,14 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
- }
- EXPORT_SYMBOL_GPL(xpcs_create_mdiodev);
+ 	const struct xpcs_compat *compat;
  
-+void xpcs_destroy(struct dw_xpcs *xpcs)
-+{
-+	if (!xpcs)
-+		return;
-+
-+	xpcs_free_data(xpcs);
-+}
-+EXPORT_SYMBOL_GPL(xpcs_destroy);
-+
- MODULE_DESCRIPTION("Synopsys DesignWare XPCS library");
- MODULE_LICENSE("GPL v2");
+-	compat = xpcs_find_compat(xpcs->id, interface);
++	compat = xpcs_find_compat(xpcs->desc, interface);
+ 	if (!compat)
+ 		return -EINVAL;
+ 
+diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+index 8dfe90295f12..e706bd16b986 100644
+--- a/include/linux/pcs/pcs-xpcs.h
++++ b/include/linux/pcs/pcs-xpcs.h
+@@ -28,11 +28,11 @@
+ /* dev_flag */
+ #define DW_DEV_TXGBE			BIT(0)
+ 
+-struct xpcs_id;
++struct dw_xpcs_desc;
+ 
+ struct dw_xpcs {
++	const struct dw_xpcs_desc *desc;
+ 	struct mdio_device *mdiodev;
+-	const struct xpcs_id *id;
+ 	struct phylink_pcs pcs;
+ 	phy_interface_t interface;
+ 	int dev_flag;
 -- 
 2.43.0
 
