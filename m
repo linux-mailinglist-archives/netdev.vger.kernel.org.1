@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-107349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF1891A9F1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:54:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8D791A9EB
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 16:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB731C21451
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:54:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8928B23AEF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 14:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA5A197A8A;
-	Thu, 27 Jun 2024 14:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E95E197549;
+	Thu, 27 Jun 2024 14:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VpxKlDmx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W5iQA8RJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98206197556
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83152195803
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 14:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719500077; cv=none; b=HFT7DayDc5aQyw6Zc2ia1fMSOu1EWG10WjZC5HpgikA3NodSV5Z5/J3hnE+2gGZ2YGF4W7aIpdOJiCQzoKNRQbD9p4KK5/Rh+GR8H67uyqRnxtdA0EJ6TBlHusP6IaKcV2NhCvE/c3kVXxleZGGMba31heVZEPaZZEROxSKP01c=
+	t=1719500075; cv=none; b=TW3Df5AePNyheSC/EU+3jAoc2KBPMZwWMw4pceYeJGGKWKBNOKJYJk5BUP3tJmCcAjgvfqIVwmEtMaMmndSdl5J1+dJ7IHp16frClyG44z37N0AtD1uUJOPeR7IMXYb68m9uGFJRjXj83pyhqTCX0aZ+7BWKDHRryLHKzGVh/m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719500077; c=relaxed/simple;
-	bh=00WpGcsEMIsU9URS7/+Rk5iXtCeARQolpArF+UPgl5w=;
+	s=arc-20240116; t=1719500075; c=relaxed/simple;
+	bh=rZfZ8LRS4yetc2xWtSvNng1weoxkVzK97MXMga9e7+k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pHEiqBtGsDVOtF5OuEFaqt6j750gYhANNzyfAN/VS8F9DLorl9Xpj+LDI0LTuTAM8LwDZhgFv53qzCG9IYzDF0pz+O5AsxM2TENDRR0PCiTy/R2QHme+vNFAxybOXGdDdku7qJXIqSvHKIydO9v4OTwY5CXjFJ0ZoVdSawdIJMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VpxKlDmx; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=hyvVlp3igJs+c//+RtXgqs8ffTcoDFvbdDp6ygGRuLQU0CGAlJFkA9yCPc+ta1X58X1WLyGhAAZtVfwSvvsy67TDDuIrFUtdC88Tg7a5I4zlMN3UaVypLP4gD9FzwJ9tXaotMRO1b3WQmSuQpD2x5avw1EAkRRP4sMrzbBXIfVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W5iQA8RJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719500075; x=1751036075;
+  t=1719500073; x=1751036073;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=00WpGcsEMIsU9URS7/+Rk5iXtCeARQolpArF+UPgl5w=;
-  b=VpxKlDmxvZYidkf1xW2FtstieWGiIYFnoTyDYOBPNOTWu2GgTAA9oxSP
-   x0sKa2V7ddThxRgnR+y1YzV94wGE5lZBuNlSgWJi0zesfvSMk1QkC9Agn
-   FbgH/QJcvicPxqEMyz9RJdDTCJOTEONtgUWJxS/S7Zx7eIK9JtiArTXAI
-   PagmEz/FtqZpOBoiPnJIUU6daq42qohp4XTMsOz4K4B43U0UdVgY/bx0a
-   sWF/9AmRMq/ptLTCniGXkmZ+iuHB8GgfksYzSaGi5OixLNKdxLT6JOHDn
-   bxyQ37tBrq7piq9TFqX2P1gZD+FJ2UcAtPdfzO31x1fbdLB6baRU44YaH
-   g==;
-X-CSE-ConnectionGUID: 74y7ISitQFW/S4cSZEukwg==
-X-CSE-MsgGUID: bKBYBM8mRJWBnfEEjrZhVQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="20514964"
+  bh=rZfZ8LRS4yetc2xWtSvNng1weoxkVzK97MXMga9e7+k=;
+  b=W5iQA8RJy0MdCmXT8KlpDu/d7syu3n7OhfF9zbY2disfdo4TUxg6BYNN
+   2yMEtXU//e1j2IRLG60r2p7YUewl9Xuin6bHfUUClRPqkchBbyF3fXMrQ
+   oP52Jzz2m97Bbfr2DLhBK4B+Yb3FvN+u6ECVYwjHFWsUM/VFU7x4USw9p
+   m2u8nhoU+rwDDUWftzp0Lz0G9Jk742FsfXB5twdzQdKJ+Bo5RNjL7R985
+   UOOEKTdE1CNEptb4FoREAKWjCV1FUPKAliDP9ZWXrVO+t0tmzFiSpz+q5
+   Mr5FBDtjc8a4EPxd1swy9ywYwHrwbX2kXXzn2sIM6CaHJ4Gy4mqIILipf
+   A==;
+X-CSE-ConnectionGUID: MxygHwbnS8SN/SL7MZydLA==
+X-CSE-MsgGUID: kP9HXxfHS6Sfx0bqD4NMRw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="20514961"
 X-IronPort-AV: E=Sophos;i="6.09,166,1716274800"; 
-   d="scan'208";a="20514964"
+   d="scan'208";a="20514961"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 07:54:27 -0700
-X-CSE-ConnectionGUID: ooTJe8jxTAudB/vZ6Ue4mQ==
-X-CSE-MsgGUID: aNqdOLZmTi6nQ5ICOw5I5Q==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 07:54:26 -0700
+X-CSE-ConnectionGUID: OGbVbCBjSmWfD3qxv2U12A==
+X-CSE-MsgGUID: TSeuMoj2Tv+ZbfCY+Beh2A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,166,1716274800"; 
-   d="scan'208";a="67616389"
+   d="scan'208";a="67616382"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Jun 2024 07:54:26 -0700
+  by fmviesa002.fm.intel.com with ESMTP; 27 Jun 2024 07:54:25 -0700
 Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4659D27BBC;
-	Thu, 27 Jun 2024 15:54:11 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id B8A6927BBD;
+	Thu, 27 Jun 2024 15:54:12 +0100 (IST)
 From: Marcin Szycik <marcin.szycik@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: netdev@vger.kernel.org,
 	aleksander.lobakin@intel.com,
 	pmenzel@molgen.mpg.de,
 	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH iwl-next v3 1/7] ice: Remove unused struct ice_prot_lkup_ext members
-Date: Thu, 27 Jun 2024 16:55:41 +0200
-Message-ID: <20240627145547.32621-2-marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next v3 2/7] ice: Remove reading all recipes before adding a new one
+Date: Thu, 27 Jun 2024 16:55:42 +0200
+Message-ID: <20240627145547.32621-3-marcin.szycik@linux.intel.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240627145547.32621-1-marcin.szycik@linux.intel.com>
 References: <20240627145547.32621-1-marcin.szycik@linux.intel.com>
@@ -83,94 +83,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove field_off as it's never used.
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Remove done bitmap, as its value is only checked and never assigned.
-Reusing sub-recipes while creating new root recipes is currently not
-supported in the driver.
+The content of the first read recipe is used as a template when adding a
+recipe. It isn't needed - only prune index is directly set from there. Set
+it in the code instead. Also, now there's no need to set rid and lookup
+indexes to 0, as the whole recipe buffer is initialized to 0.
 
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 ---
- .../ethernet/intel/ice/ice_protocol_type.h    |  4 --
- drivers/net/ethernet/intel/ice/ice_switch.c   | 44 ++++++++-----------
- 2 files changed, 19 insertions(+), 29 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_switch.c | 29 ++-------------------
+ 1 file changed, 2 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_protocol_type.h b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-index 755a9c55267c..c396dabacef4 100644
---- a/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-@@ -452,13 +452,9 @@ struct ice_prot_lkup_ext {
- 	u16 prot_type;
- 	u8 n_val_words;
- 	/* create a buffer to hold max words per recipe */
--	u16 field_off[ICE_MAX_CHAIN_WORDS];
- 	u16 field_mask[ICE_MAX_CHAIN_WORDS];
- 
- 	struct ice_fv_word fv_words[ICE_MAX_CHAIN_WORDS];
--
--	/* Indicate field offsets that have field vector indices assigned */
--	DECLARE_BITMAP(done, ICE_MAX_CHAIN_WORDS);
- };
- 
- struct ice_pref_recipe_group {
 diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 1191031b2a43..0d58cf185698 100644
+index 0d58cf185698..da065512889d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_switch.c
 +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -4918,33 +4918,27 @@ ice_create_first_fit_recp_def(struct ice_hw *hw,
+@@ -5079,11 +5079,9 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
+ {
+ 	DECLARE_BITMAP(result_idx_bm, ICE_MAX_FV_WORDS);
+ 	struct ice_aqc_recipe_content *content;
+-	struct ice_aqc_recipe_data_elem *tmp;
+ 	struct ice_aqc_recipe_data_elem *buf;
+ 	struct ice_recp_grp_entry *entry;
+ 	u16 free_res_idx;
+-	u16 recipe_count;
+ 	u8 chain_idx;
+ 	u8 recps = 0;
+ 	int status;
+@@ -5110,10 +5108,6 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
+ 	if (rm->n_grp_count > ICE_MAX_CHAIN_RECIPE)
+ 		return -ENOSPC;
  
- 	*recp_cnt = 0;
+-	tmp = kcalloc(ICE_MAX_NUM_RECIPES, sizeof(*tmp), GFP_KERNEL);
+-	if (!tmp)
+-		return -ENOMEM;
+-
+ 	buf = devm_kcalloc(ice_hw_to_dev(hw), rm->n_grp_count, sizeof(*buf),
+ 			   GFP_KERNEL);
+ 	if (!buf) {
+@@ -5122,11 +5116,6 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
+ 	}
  
--	/* Walk through every word in the rule to check if it is not done. If so
--	 * then this word needs to be part of a new recipe.
--	 */
--	for (j = 0; j < lkup_exts->n_val_words; j++)
--		if (!test_bit(j, lkup_exts->done)) {
--			if (!grp ||
--			    grp->n_val_pairs == ICE_NUM_WORDS_RECIPE) {
--				struct ice_recp_grp_entry *entry;
+ 	bitmap_zero(rm->r_bitmap, ICE_MAX_NUM_RECIPES);
+-	recipe_count = ICE_MAX_NUM_RECIPES;
+-	status = ice_aq_get_recipe(hw, tmp, &recipe_count, ICE_SW_LKUP_MAC,
+-				   NULL);
+-	if (status || recipe_count == 0)
+-		goto err_unroll;
+ 
+ 	/* Allocate the recipe resources, and configure them according to the
+ 	 * match fields from protocol headers and extracted field vectors.
+@@ -5141,19 +5130,9 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
+ 
+ 		content = &buf[recps].content;
+ 
+-		/* Clear the result index of the located recipe, as this will be
+-		 * updated, if needed, later in the recipe creation process.
+-		 */
+-		tmp[0].content.result_indx = 0;
 -
--				entry = devm_kzalloc(ice_hw_to_dev(hw),
--						     sizeof(*entry),
--						     GFP_KERNEL);
--				if (!entry)
--					return -ENOMEM;
--				list_add(&entry->l_entry, rg_list);
--				grp = &entry->r_group;
--				(*recp_cnt)++;
--			}
--
--			grp->pairs[grp->n_val_pairs].prot_id =
--				lkup_exts->fv_words[j].prot_id;
--			grp->pairs[grp->n_val_pairs].off =
--				lkup_exts->fv_words[j].off;
--			grp->mask[grp->n_val_pairs] = lkup_exts->field_mask[j];
--			grp->n_val_pairs++;
-+	for (j = 0; j < lkup_exts->n_val_words; j++) {
-+		if (!grp || grp->n_val_pairs == ICE_NUM_WORDS_RECIPE) {
-+			struct ice_recp_grp_entry *entry;
+-		buf[recps] = tmp[0];
+ 		buf[recps].recipe_indx = (u8)entry->rid;
+-		/* if the recipe is a non-root recipe RID should be programmed
+-		 * as 0 for the rules to be applied correctly.
+-		 */
+-		content->rid = 0;
+-		memset(&content->lkup_indx, 0,
+-		       sizeof(content->lkup_indx));
 +
-+			entry = devm_kzalloc(ice_hw_to_dev(hw), sizeof(*entry),
-+					     GFP_KERNEL);
-+			if (!entry)
-+				return -ENOMEM;
-+
-+			list_add(&entry->l_entry, rg_list);
-+			grp = &entry->r_group;
-+			(*recp_cnt)++;
++		buf[recps].content.act_ctrl |= ICE_AQ_RECIPE_ACT_PRUNE_INDX_M;
+ 
+ 		/* All recipes use look-up index 0 to match switch ID. */
+ 		content->lkup_indx[0] = ICE_AQ_SW_ID_LKUP_IDX;
+@@ -5192,8 +5171,6 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
  		}
  
-+		grp->pairs[grp->n_val_pairs].prot_id =
-+			lkup_exts->fv_words[j].prot_id;
-+		grp->pairs[grp->n_val_pairs].off = lkup_exts->fv_words[j].off;
-+		grp->mask[grp->n_val_pairs] = lkup_exts->field_mask[j];
-+		grp->n_val_pairs++;
-+	}
-+
- 	return 0;
- }
+ 		/* fill recipe dependencies */
+-		bitmap_zero((unsigned long *)buf[recps].recipe_bitmap,
+-			    ICE_MAX_NUM_RECIPES);
+ 		set_bit(buf[recps].recipe_indx,
+ 			(unsigned long *)buf[recps].recipe_bitmap);
+ 		content->act_ctrl_fwd_priority = rm->priority;
+@@ -5357,12 +5334,10 @@ ice_add_sw_recipe(struct ice_hw *hw, struct ice_sw_recipe *rm,
+ 		recp->recp_created = true;
+ 	}
+ 	rm->root_buf = buf;
+-	kfree(tmp);
+ 	return status;
  
+ err_unroll:
+ err_mem:
+-	kfree(tmp);
+ 	devm_kfree(ice_hw_to_dev(hw), buf);
+ 	return status;
+ }
 -- 
 2.45.0
 
