@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-107435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0E591AF76
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:10:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94BDD91AF97
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9C8A1F21A80
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C63BD1C22392
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63BE19AD6D;
-	Thu, 27 Jun 2024 19:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A2719ADA3;
+	Thu, 27 Jun 2024 19:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMPmD6Jo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jqZY+usY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7C01E4A4;
-	Thu, 27 Jun 2024 19:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEBF200DE;
+	Thu, 27 Jun 2024 19:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719515428; cv=none; b=XVU6QEsWFH+K+Ya6xkCZ+wXhIBerbyoMUUzPP1Y1C4HKUtL7JcV1g6kjvILh4ksrCqnTpnulZObpQcy4hGEtSSqA2heeNImKe3hkklQJPZuCk3EHkps+xurFkGdfKJtDP125YTdnqVj29hfJbBum3tc3ldVRsrvJeuKYq99oaVw=
+	t=1719516278; cv=none; b=Cfc9C6a+M70G4BBKVlv2c//+OvM+sEbxB2GB2DF9/9lEbxaNqJaYanEAB7Lb/sF48yBPg53wlaAiu9XW8LlYku/gQZOU9e2ZJRICHpxi3GFxuqB+NAGlxNXXs2rlNaN/SzRrFklIWQT8VNozcj4QRp3GrdVQ8QRM8tKlJkHGWa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719515428; c=relaxed/simple;
-	bh=qfy8lFyoB/C/R/LH7+ilh1HZPWWF34bCY9PBCEOT/VQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cU6jrhcP6D0sGa89MIeiU+jeaHGm30LWfEMptRuxvIlGrQuO0BWGO6WBoOUVG6jdzN16B+v4PkMr9jolFjQg6wegB4NqCpxDnGYXjSx4k6ImW+GRLvaJrTN2fYkQfY08I45XA+WwsYMRY9mQCYhvEWKnGfFzt3k+AgWCBYYvHLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMPmD6Jo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 14579C2BD10;
-	Thu, 27 Jun 2024 19:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719515428;
-	bh=qfy8lFyoB/C/R/LH7+ilh1HZPWWF34bCY9PBCEOT/VQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LMPmD6JopuNdbwvV31kqy+kkJIer4z3XoW5DEgtz8U/eDlaANTE+aXIMYZbMwmTqb
-	 rlda8Db8ymw/fy4pPPpzxfsUgAf3IUE0DyOFpAXGe3VimQbNfiruL/xePi+8w/sU4f
-	 f5F8RA8ljANttCPX7Eay3AfMzr91/ANBHfQwuZAQM7J25YCEmOAChUNsHThw2p0rEy
-	 C9yiwlZauPIENS4Mzgh0vdGglrrwP0PzlxFea5HOG7d5pu1ElLZblhdKtkwmO0rHi6
-	 bEwI10Eb29z/kxMZ6ECLjVkjgE8oDvkEwqdlc1h9VWExHEmv4Z2iL969zXgGBeeZRv
-	 XXX055ivFNC3Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 049BFC43335;
-	Thu, 27 Jun 2024 19:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719516278; c=relaxed/simple;
+	bh=ByWy07f9rUggWN9DLwEaBmr1GuYoIk8YDAPbU9bHcps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WzXdQCxF3Dphn0II1YU8VJOevIF9QtANQHG8TPQ5QEI9SssSOFMfEPJxhat87y+7SPDeW5ckLQmCMDwLUglZsZqp6AG6KdBRR5CtmDkK5waQoebjXrT0anfVJ9+JeVymBLQNX1LW/Da8w2VsgTTR1th7gQ52E34xW818Y+V1OQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jqZY+usY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MIJerN91KOAahfx//F9cleyCTP+2uS5vcbZ0p363Ojc=; b=jqZY+usY9iPuJpXu55zsW+kvaJ
+	ikF+PmQHCkXwNKbFueAJfrQ/SJ/gbKnlDTRECR6vCQevb2rChvhqfEJ3mUgspq5VOpBsPjCEJx0T2
+	jdin0vKrxJ5BxL1twXhIqC6OwVgALQbDDiE7ts5FUZa31S9yAx9bs+FM8B6VKp9GdKGk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sMujE-001CdD-L2; Thu, 27 Jun 2024 21:24:20 +0200
+Date: Thu, 27 Jun 2024 21:24:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Vinod Koul <vkoul@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v2 net-next 2/2] net: stmmac: qcom-ethqos: add a
+ DMA-reset quirk for sa8775p-ride
+Message-ID: <4f642463-3a8c-4412-a007-42fb65c4276e@lunn.ch>
+References: <20240627113948.25358-1-brgl@bgdev.pl>
+ <20240627113948.25358-3-brgl@bgdev.pl>
+ <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2024-06-27
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171951542801.5140.13903874476521335100.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Jun 2024 19:10:28 +0000
-References: <20240627083627.15312-3-johannes@sipsolutions.net>
-In-Reply-To: <20240627083627.15312-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <td5jbseo7gtu6d4xai6q2zkfmxw4ijimyiromrf52he5hze3w3@fd3kayixf4lw>
 
-Hello:
+> Its not clear to me though if the "2500basex" mentioned here supports
+> any in-band signalling from a Qualcomm SoC POV (not just the Aquantia
+> phy its attached to, but in general). So maybe in that case its not a
+> concern?
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+True 2500BaseX does have inband signalling, for the results of pause
+negotiation.
 
-On Thu, 27 Jun 2024 10:31:50 +0200 you wrote:
-> Hi,
-> 
-> So you probably heard Larry Finger passed away, he will
-> be missed. Others have written more about him elsewhere,
-> Kalle has updated the MAINTAINERS/CREDITS files for him.
-> 
-> Other than that, just a few small fixes, really the only
-> one likely to matter in practice is the fix from Russell,
-> for those who use the TI chip in AP mode.
-> 
-> [...]
+However, in this case, this is not true 2500BaseX, but a hacked SGMII
+overclocked to 2.5GHz. There is no inband signalling, because SGMII
+signalling makes no sense when over clocked. So out of band signalling
+will be used.
 
-Here is the summary with links:
-  - pull-request: wireless-2024-06-27
-    https://git.kernel.org/netdev/net/c/ffb7aa9fedad
+My understanding is that both ends of this link are not using true
+2500BaseX, and this Qualcomm SoC is incapable of true 2500BaseX. So we
+don't need to worry about it in the Qualcomm glue code.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+However, what these patches should not block is some other vendors SoC
+with true 2500BaseX from working correctly.
 
+     Andrew
 
 
