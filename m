@@ -1,77 +1,74 @@
-Return-Path: <netdev+bounces-107117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7710919E7E
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:08:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E905919E8B
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 07:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948F82832F1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:08:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D7B21C21ED6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 05:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613CD1BF24;
-	Thu, 27 Jun 2024 05:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C481C687;
+	Thu, 27 Jun 2024 05:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DKE8m8HR"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LwqoMyqp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B670E1A702;
-	Thu, 27 Jun 2024 05:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D1E7484;
+	Thu, 27 Jun 2024 05:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719464913; cv=none; b=ENIs6PZDgMYjsOVCY9Fb2tY7KC0cO0VStyMcGl1EdLMyTXXw4lMXCWFYJlglYz+vJtbGIHjmEFQJqQk39tyEdWnjjiyo/RnqDwQykfkDswHwHexYO1q+t2oud4nP62ACCQ2J5gKUcCWZZ3DS4fpfboKlm/VZvLd4nFT3ageBhd4=
+	t=1719465637; cv=none; b=UHHxd3bnIgo0l2vLCSnr3tE9NIQuMouOJb9wmP2yo4/CsEy+vNYGgPmq8kMlSZn+HpM2guBQjtuQP71438vyPjwn+IkayhVRwDqt/BkQ71o+103peB7CWJaJ5atc7j3YU9KhDpYiNW4jKVMzUkBxYDaPrK5klw0oNHDtjvscWDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719464913; c=relaxed/simple;
-	bh=MnxzPmERAtu+n6Ig3xdw80LnPjSGEE5nsAYiBqjVZYM=;
+	s=arc-20240116; t=1719465637; c=relaxed/simple;
+	bh=D/X5YwfUNyF7H8xkH0w9pwN7YRo+9twFtmwa8F4Hhg0=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jul2eofvfL2ElmbcxeQThqo9VGRmwo8wIWdRzEZGP5nwWr/Tfh09cDq+okUbjDS51dWmPdN1J6xYUJSdSFwu9adJE992RMtdUmIrzT0cT6O00VU68Yr29D7XsxY9ofA0mmeifbJIrJEg0O9IYVeSSuIfpojpSW8UNS0xka0XI44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DKE8m8HR; arc=none smtp.client-ip=67.231.156.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ub7FgNPsKjGtj8BYIUS+HSdkubunIWkd/vJwqkQZ4T+6Mmvy8qKzMZRL/E9gINYkaqTHOI9Hjyq2bxDBd9vZSvTlLJWBKa71T5s1SNr1fMcDZ45EpI2R/ku+J9sDK9oDsgsXh5lbzrK+J4oninqi3IuPX0QpZgL38votSiUiK3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LwqoMyqp; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QImo8V002400;
-	Wed, 26 Jun 2024 22:07:55 -0700
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R2vmk8001296;
+	Wed, 26 Jun 2024 22:20:29 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=Y2Zt/MQEYRuDjKW8UGc2Kvr4B
-	O3jU7bpmwKvqLDFRIU=; b=DKE8m8HRzs8hdvGUquTcVaPB1Ojr0dN+GybLTzNU4
-	kdEIkD/QROPSJLAqRiccWKZnWR/7hp09xIvkSlF29PN+ut1bOOGjJIp7Y1xl7LzU
-	vAznEVLeKioqImz5wrSMxYM4I1ZJ3eUO6dxV78OWnCJ/GBrhjpWrvi5LPsOD9eZ4
-	gponk0wAG2hGc0KLM5OxjRtOHwxiBC8rZDxyuD04iabrvRrfH2wpJi5FXpJijEqI
-	nhZ2BgSkdZAQrg1AESqUAO2VCMKESaLgsb8PDzxuXkR5PcQFlhm0oYO/eKvkJQQI
-	UNfh6ocouaeHeWaQXwCO/YMRCDMtOqxYFdZAHJ3bHNWDQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 400rkg1ge0-1
+	:references:subject:to; s=pfpt0220; bh=LujTv9Un+e7Gfkpm+Ek8qW0Qp
+	TfwdpmhopdaziKnrX4=; b=LwqoMyqpYtgfnDf7zErvT3WqglLHvvKIVDUxuD05U
+	iov1Jh7X49TpRS3S30Ped/OmV8Sg6JjjjkTEA5zQwywqhXWf0UCyZ1juo2XPegTQ
+	HYlmrLf5vcEGaEg7NeybRqJ3X/iyJDaIDmxCFAgxtdQseZXpzmaEwTNdkg+ovv1b
+	UFl5oU7kHyKeVKbOUvKNv6pOPpt+7xutOmNwpMIGseM2Y1gbWF+mKtn3J7Mjm8VC
+	vleyOTrodoEa178u50pQaKp0iQKjMtFLm+i/4dNMGPSVkc5WNKQ1bdxa65hQy+qz
+	Aay8org0vIhte2i4Xs2VJ+gxFQ77bMFp2JzKn3ItiwqSw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 400yrt0bxm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 22:07:55 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Wed, 26 Jun 2024 22:20:28 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 26 Jun 2024 22:07:55 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 26 Jun 2024 22:07:55 -0700
+ 15.2.1544.4; Wed, 26 Jun 2024 22:20:28 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 26 Jun 2024 22:20:28 -0700
 Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 3B0283F7071;
-	Wed, 26 Jun 2024 22:07:50 -0700 (PDT)
-Date: Thu, 27 Jun 2024 10:37:50 +0530
+	by maili.marvell.com (Postfix) with SMTP id 700623F7071;
+	Wed, 26 Jun 2024 22:20:24 -0700 (PDT)
+Date: Thu, 27 Jun 2024 10:50:23 +0530
 From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-CC: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-        Pablo
- Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <lvs-devel@vger.kernel.org>, <netfilter-devel@vger.kernel.org>
-Subject: Re: [PATCH net-next] ipvs: properly dereference pe in
- ip_vs_add_service
-Message-ID: <20240627050750.GA1743080@maili.marvell.com>
-References: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
+To: Ma Ke <make24@iscas.ac.cn>
+CC: <wintera@linux.ibm.com>, <twinkler@linux.ibm.com>, <hca@linux.ibm.com>,
+        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
+        <bhelgaas@google.com>, <linux-s390@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] s390/ism: Add check for dma_set_max_seg_size in
+ ism_probe()
+Message-ID: <20240627052023.GB1743080@maili.marvell.com>
+References: <20240627021314.2976443-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,28 +77,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240626081159.1405-1-chenhx.fnst@fujitsu.com>
-X-Proofpoint-GUID: wSXmmk9mMDWUa9I_0MY3ReWkEoncJWSr
-X-Proofpoint-ORIG-GUID: wSXmmk9mMDWUa9I_0MY3ReWkEoncJWSr
+In-Reply-To: <20240627021314.2976443-1-make24@iscas.ac.cn>
+X-Proofpoint-GUID: 1RgVgEIe1BgXqTi3lr5xIeuaM-kYjrZ3
+X-Proofpoint-ORIG-GUID: 1RgVgEIe1BgXqTi3lr5xIeuaM-kYjrZ3
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_01,2024-06-25_01,2024-05-17_01
+ definitions=2024-06-27_02,2024-06-25_01,2024-05-17_01
 
-On 2024-06-26 at 13:41:59, Chen Hanxiao (chenhx.fnst@fujitsu.com) wrote:
+On 2024-06-27 at 07:43:14, Ma Ke (make24@iscas.ac.cn) wrote:
+> As the possible failure of the dma_set_max_seg_size(), we should better
+Could you expand on the scenario of failure ?
+> check the return value of the dma_set_max_seg_size().
+
+> +++ b/drivers/s390/net/ism_drv.c
+> @@ -620,7 +620,10 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  		goto err_resource;
 >
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index b6d0dcf3a5c3..925e2143ba15 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
-> @@ -1369,7 +1369,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
->  {
->  	int ret = 0;
->  	struct ip_vs_scheduler *sched = NULL;
-> -	struct ip_vs_pe *pe = NULL;
-> +	struct ip_vs_pe *pe = NULL, *tmp_pe = NULL;
-Reverse xmas tree.
->  	struct ip_vs_service *svc = NULL;
->  	int ret_hooks = -1;
->
+>  	dma_set_seg_boundary(&pdev->dev, SZ_1M - 1);
+> -	dma_set_max_seg_size(&pdev->dev, SZ_1M);
+> +	ret = dma_set_max_seg_size(&pdev->dev, SZ_1M);
+Same error check is not valid for dma_set_seg_boundary() ?
+
 >
 
