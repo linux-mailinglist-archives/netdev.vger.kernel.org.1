@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-107480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D9991B274
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 01:04:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54FE91B292
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 01:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C2271C22060
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:04:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D61284788
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 23:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EB419DF8C;
-	Thu, 27 Jun 2024 23:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFE819A2AE;
+	Thu, 27 Jun 2024 23:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qooV9Slk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyCbt2eE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA4F13A3E8;
-	Thu, 27 Jun 2024 23:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A38B1C6A7
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 23:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719529453; cv=none; b=PLTxJsKexN2Q76DPrgqmLlLfWdPVX7dkkTyJn/C9HFNvnrXMJqcMSFqRVXvrBC32fGhEzobT+WLf8D1o5n0tLF4j3gRP9Dr31Bhor6CuzCLYlqcPqsyIlwwHVJfxemhuuL5yPte+G1JiXWQFZPOAzu25szk31C+o4evfktyw44Y=
+	t=1719530149; cv=none; b=LsiHLDh25Di8+7BrZs+vq46caJEZqj/KSRHXKwGUamph1bov3SBrS83jLRP3OW/rG1Tc3N7AY5D2nHus/PRW/vDzQY0pSxTOk3MeRgCHKZoZy4KC65OJ43rzXRQ02FlBDwB622byVcyWY69fdJ/PedpqjNG5TSqRvV9xr9cWQ0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719529453; c=relaxed/simple;
-	bh=kDgdG01n/KgfB08cdFfx+JcATSEd5pCxiHkkQqnciD4=;
+	s=arc-20240116; t=1719530149; c=relaxed/simple;
+	bh=w2/u9bxkTV3i8fsHrD20bwbvBiDa5x0YQpEfJne60cU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CMjKHyx7c2peleDAtP1SU3X9xJrcseh18JA94t67aDL7FgxbNX8Dgv62b9DhUn0X3Y1ROyqkjMVNKMiv/3mIZYR290oTN3xriuMeNVpBR77MFelWupIx+l8Eb3J3AqwTRGC3Ce1t9tKVlY7lHvNxZGP9+R8XV3SzXpxY6E1yywM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qooV9Slk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1E6CC2BBFC;
-	Thu, 27 Jun 2024 23:04:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qEZjhELyXry5OUgbZFMGG76/9F9Qxl7UaPYxFkobBdFL4Egs8CUAp7lVZO7karngSKrQljkRJE3KuXw2JJ6SUeUIDOdgXUniTom3Rr/csOoJgADMw8lXjq2pNUfJYPY+h90hzz18I9y5tGw4hK9KbP19HMLiOT7nekbp0XuWtFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyCbt2eE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D91FC2BBFC;
+	Thu, 27 Jun 2024 23:15:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719529453;
-	bh=kDgdG01n/KgfB08cdFfx+JcATSEd5pCxiHkkQqnciD4=;
+	s=k20201202; t=1719530149;
+	bh=w2/u9bxkTV3i8fsHrD20bwbvBiDa5x0YQpEfJne60cU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qooV9SlkuCvBmNmYAJMYYZ2KQaLVDWalOi651PbCI1tSU6Nb6/OoG0pgUumr5RrT/
-	 fwjao0bl5eCYa2rwm0PY6bLfrNKe2vbcg2Hg0t5gly7LK8NEDhurZVNMGOpRTJ2nR7
-	 12s3/I/NbcNICGFWeMPdpTB8w8Zi2qAqyeFiM11KuWHCMiWYYWpQEC8R0YD75r9LDf
-	 uiEpXRfp7Th8czvLKqW/6ubxm4aUmRAOE1Mn2/ONbcwYnZqhg2xy3J+/U89gz7DE81
-	 UEcRKqY0WiYkMq9eZMPalurrhYVR2p3i+KK+VmQGrPhhlZvO+fqgFeYB9+Vz715EwA
-	 KBqjAHWQ/nqvg==
-Date: Thu, 27 Jun 2024 16:04:11 -0700
+	b=PyCbt2eEUrIZwryeyrXbRWXPeZBB/CQVyXcO6L4WlcDUqWubFWPaip1fty5LmoBt9
+	 INZjXJ4kvqUMVK/TZkl8hE8DH256hoJzX1Fh4nxqVgvT71GHwltyjNAvUmfoSIcF8G
+	 Z/hYYTjmDFIeMJ0UqIcLQTj2Iz8JVRrPZ1akGSmXYl7fyRV1U1E00pto066AsVGIGA
+	 Xqu5Yl7zf8RuOYct8UnshHQ1pT/a7F8AGeojpR7HNG/FOplyNwR023CdirDLtaevBu
+	 P8+/FeixjwyRxiIz0D3whpjOczwP4oA2GoaDnN79kSkQ4ztPqWn0dNJIA94PPgJkdC
+	 ts/1Hb2/HxMTA==
+Date: Thu, 27 Jun 2024 16:15:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
- <sgoutham@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: Re: [net-next PATCH v6 00/10] Introduce RVU representors
-Message-ID: <20240627160411.3d7cdbe6@kernel.org>
-In-Reply-To: <20240625142503.3293-1-gakula@marvell.com>
-References: <20240625142503.3293-1-gakula@marvell.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, Milena Olech <milena.olech@intel.com>,
+ richardcochran@gmail.com, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Karol Kolacinski
+ <karol.kolacinski@intel.com>, Simon Horman <horms@kernel.org>, Pucha
+ Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net 1/4] ice: Fix improper extts handling
+Message-ID: <20240627161547.757f806d@kernel.org>
+In-Reply-To: <20240625170248.199162-2-anthony.l.nguyen@intel.com>
+References: <20240625170248.199162-1-anthony.l.nguyen@intel.com>
+	<20240625170248.199162-2-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,18 +64,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 25 Jun 2024 19:54:53 +0530 Geetha sowjanya wrote:
-> This series adds representor support for each rvu devices.
-> When switchdev mode is enabled, representor netdev is registered
-> for each rvu device. In implementation of representor model, 
-> one NIX HW LF with multiple SQ and RQ is reserved, where each
-> RQ and SQ of the LF are mapped to a representor. A loopback channel
-> is reserved to support packet path between representors and VFs.
-> CN10K silicon supports 2 types of MACs, RPM and SDP. This
-> patch set adds representor support for both RPM and SDP MAC
-> interfaces.
+On Tue, 25 Jun 2024 10:02:44 -0700 Tony Nguyen wrote:
+>  		/* set event level to requested edge */
+> -		if (extts_flags & PTP_FALLING_EDGE)
+> +		if (config->flags  & PTP_FALLING_EDGE)
+>  			aux_reg |= GLTSYN_AUX_IN_0_EVNTLVL_FALLING_EDGE;
+> -		if (extts_flags & PTP_RISING_EDGE)
+> +		if (config->flags  & PTP_RISING_EDGE)
 
-Does not apply please rebase.
--- 
-pw-bot: cr
+nit: double space here
 
