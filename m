@@ -1,363 +1,265 @@
-Return-Path: <netdev+bounces-107146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B4B91A19F
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 10:37:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E010891A1C6
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 10:40:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E45481F25E3D
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 08:36:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB2F1C20923
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 08:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C7A7C097;
-	Thu, 27 Jun 2024 08:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751BA80031;
+	Thu, 27 Jun 2024 08:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hr6WHAkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C28D41A94
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 08:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719477413; cv=none; b=dg37uSlpfktQ6WINN5VpK6+3Ew0z8gM8pYWbv1+i1EtPWZEUUBKaCV0orwaEpQ0elI9jAuyVwegz5A7G+vyolmIfetwfYuWB2OGNrJ9EOjlUoMqBaRNzUu2V+8IlTfSyzZzIeOw72SBBCpp+g4mZp2SvfMzP3Dsq9+qZtcTHYP0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719477413; c=relaxed/simple;
-	bh=NKFxB2eOGk3lpEcU+HoBGayup5pqBLcvRimNJ1YgP9U=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EbMwlnQgbprlp/mY+kxJC33LOy+/1YdD0WTst1PKN9bavDD6SlKOTQb5GrqoXKTyN2OIDwjJWb+xPDFFbT6aej02dBgQsW+HxtazFW5bRGym87XMdrmIwA1+mlJrrqgGZhwabOT8dQJosiizCjGeZ71XSfBRvrKHVxTojBPZ+vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CEE0B40006;
-	Thu, 27 Jun 2024 08:36:39 +0000 (UTC)
-Message-ID: <617f9ff3-822e-4467-894c-f247fd9029ec@ovn.org>
-Date: Thu, 27 Jun 2024 10:36:38 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6148D7C097
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 08:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719477644; cv=fail; b=d4Kcd8/vGbEHtu3cud8nKli/i2yyMymwUPMSI2CiOyG62neiwCIVeS90ZabYAgmMbT5TnJCQ5InngWAzs4gJOrxaIzKsSjyxvA0tUzFYnLxge8fSwyn6uLrYEf5itiJiS9n4OO7Ggi4i8Ha91zaHgYnOrgur0eDClbg1F8rAvMw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719477644; c=relaxed/simple;
+	bh=ZCYVRhWJeyrnGw8d9G562YHDsVtZLgc2fp45tokjDVI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=u+HJ+wSmsDajoEi71QsLPL4SjbKwuK3FxOyL0oBF/IxBraMPGJThEk/vYmcBd0Wy6H9OIs5fd6yyOS/sXlbkRKlvceaISpBd+2o24MuSk2isI88y4iT48gu6SdXctS12OiaSCMq7KSTGFnFpwpS5GEELNyp/KlQArJ9sCtLnVUA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hr6WHAkp; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719477642; x=1751013642;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZCYVRhWJeyrnGw8d9G562YHDsVtZLgc2fp45tokjDVI=;
+  b=hr6WHAkp0ZiQWcPJwLNp1SS/mUQwtDKLiB/zlZw13YhRJQNxwiT4pLAJ
+   Yo9oFzZsGa1en5E4H/TIQVVDTBEYagjx+c6B2RrS3D0ooUrSV+6YW1Uxo
+   lNCuWpeEXhQ2CAwmMONQ0p88fqjAajNQl29T5A/xSmKlr8x8joAIOWBh7
+   UC3+L/KbdxebkhGkfTGvRbb+Z34RtTYGpPdQi+MA2+EqBUi5H83jh6nfU
+   zKnFbNe9sWYt214te/RMQsbCwFVuYrKnQ5LFVzpv+OBPJIHuXt9vuP33X
+   mtIOUWSqBsl2x6APt/b46PSWn85BOllx4xRdi/xYBtXdjRzK88UUYfLZs
+   g==;
+X-CSE-ConnectionGUID: 14R5BT+wQX26N9xKiF/dgQ==
+X-CSE-MsgGUID: ZmZgljJsRHqtfY5St1BbkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11115"; a="34125386"
+X-IronPort-AV: E=Sophos;i="6.08,269,1712646000"; 
+   d="scan'208";a="34125386"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 01:40:41 -0700
+X-CSE-ConnectionGUID: bjjk28jLQ0WjuRMmWM9RUg==
+X-CSE-MsgGUID: Emr89IuQS+6wnKTj8aiN7w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,269,1712646000"; 
+   d="scan'208";a="44427710"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Jun 2024 01:40:41 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 27 Jun 2024 01:40:40 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 27 Jun 2024 01:40:40 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 27 Jun 2024 01:40:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O/Uu+yn1nbdid/sKWq5WckVSgDavACQZAGkjwqmt1S9GlAkEvAe/yY8mIyNEhPWsBGYJ0+SND8r/VC0LTHln2z4GBzgwoh5n6s7ywtOIAxQsiI6q20t2Ts8WxEZJxmrSDncMB4GWOMfZh5hmr4WtbjKuYNrCxHYTBkq1IxCnGZzj1cWOGIQEVNudl3o8lfco0F3mkWJPIwAl70UGL+c5j4LjT6aY12c5+PHidpuHT2IjwAzJm7oidDPqwKu5UfVKHIumvXNiRqRrooEEeYr2AnrP+KWO2zJJ8gj5N3l1INyVFNjkKdnfQysnv9MAm9LsNnKfnpsiIBoE+5mDerDkZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p2aImgv1efxXZ0WDmf/lfjPcJFbsf2v9evFlqB8brgo=;
+ b=fUqLSIK2DxsrgAjUX0vy1zPOvURod8c8Twze0Ho1Ig6LDCqom4Xrd0BDY+iE7vMKKxeqbb9vNE6iCSLXKNWDsKNOqMT4HUxAfgoPG4TQXIFi5aOQea9cD/cothUwaAMmmWP7iwwiuREOi5B2lUwbt848vO8PwB642TXoH6mTad7sZ/7xqadfQssMDJpoKgnF7X8/9ccbBf9hKCDLljJ4Ks+962BgnE2cjFjHUkfKYwn018jA24x4WFGdyoZRtmcsbuYI2HCycxTH9T4Fj/i2HLqvuDfZtupbs6yn8Kuf6v5dZaZaxAwXXUOK5YbhaTwkjDV9uZVjs4zWHG/Tu9acDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CY8PR11MB7873.namprd11.prod.outlook.com (2603:10b6:930:79::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.32; Thu, 27 Jun
+ 2024 08:40:38 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7698.025; Thu, 27 Jun 2024
+ 08:40:38 +0000
+Message-ID: <49fcfb78-32ac-49de-8e83-2e12bc04fff2@intel.com>
+Date: Thu, 27 Jun 2024 10:40:31 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 1/2] selftests: drv-net: add ability to schedule
+ cleanup with defer()
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<willemdebruijn.kernel@gmail.com>, <leitao@debian.org>, <petrm@nvidia.com>,
+	<davem@davemloft.net>
+References: <20240626013611.2330979-1-kuba@kernel.org>
+ <20240626013611.2330979-2-kuba@kernel.org>
+ <d7a8b57d-0dea-4160-8aa3-24e18cf2490e@intel.com>
+ <20240626094932.1495471b@kernel.org>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240626094932.1495471b@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0502CA0003.eurprd05.prod.outlook.com
+ (2603:10a6:803:1::16) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org, aconole@redhat.com,
- horms@kernel.org, dev@openvswitch.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Pravin B Shelar <pshelar@ovn.org>
-Subject: Re: [PATCH net-next v5 05/10] net: openvswitch: add emit_sample
- action
-To: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>,
- Eelco Chaudron <echaudro@redhat.com>
-References: <20240625205204.3199050-1-amorenoz@redhat.com>
- <20240625205204.3199050-6-amorenoz@redhat.com>
- <EBFCD83F-D2AA-4D0E-A144-AC0975D22315@redhat.com>
- <CAG=2xmOnDZP3QtBbShoAqptY0uSywhFCGAwUYO+UuXfLkMXE7A@mail.gmail.com>
- <04D55CAD-0BFC-4B62-9827-C3D1A9B7792A@redhat.com>
- <CAG=2xmMThQvNaS30PRCFMjt1atODZQdyZ9jyVuWbeeXThs5UCg@mail.gmail.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <CAG=2xmMThQvNaS30PRCFMjt1atODZQdyZ9jyVuWbeeXThs5UCg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: i.maximets@ovn.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CY8PR11MB7873:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6191b933-fd5d-4311-100f-08dc9684d22e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?eTRXWUFBMUc5RGd5V1BVenpzR3pha3VPamlrd2VFeHVtOUZwRzlWZGROa0FF?=
+ =?utf-8?B?dUJkbzNIVmxyd0NSeDBTQUNyWmtqeHRLbmtCWEJWR2ZCSmQyaHlBSm5WbGUv?=
+ =?utf-8?B?KzVMZWYzdEhzRWE5TllBN2FqQTNOZDk0a2hIc21BRXdEWmVocjdSWGRyUUpM?=
+ =?utf-8?B?Ung2TXZvQjBHQmoxTTgvcjByL0xQYWkyUDBVSkhmOXNUMklnMDAzNmtLZ1NV?=
+ =?utf-8?B?a3k2d0UzeXJaS1RDOEVJRzBFOUZ2bmJtYkFpd2xxOFZoSE9IaHVkcGRYTUJz?=
+ =?utf-8?B?V3RJNG1FdXFRRndiRFVBZjFGMXd6a0NzN3pIS1BScTA5TG9ybUlwMXpsbnVr?=
+ =?utf-8?B?NGswdWtPYyswM2YwY2d0enRsTWdiK01NQXV1QjN5V3I0QnJJaHc1eDJoOEtF?=
+ =?utf-8?B?bEV2Q2RLa1lLb0hHREJiSDUvb01DVEVVdTZpSERRamJhZGpxRExoZEs0MFdS?=
+ =?utf-8?B?RnhwSUFaL0NqWkJGRlVJZ0Fwcncrb0JmaDVyeTk0WXZSYmZ3NHM1VWxrUEdw?=
+ =?utf-8?B?M0tTdlpjdVJNdTViRUoxL0QxcVZueGdPbVl5ZUx1cjJPNGVXT0YrTmxPR2wx?=
+ =?utf-8?B?R3JwNG1jc290d00vTU5YTUNGN1Qrb0dEMklteXdvQnJ6cTRrSkIvK1JiUGFp?=
+ =?utf-8?B?WVRra1NkdWV6d0YzMEpvSmc4M3RJZnhEcjRPK2ljNTBiQzZ4WkVwNUVDV0JE?=
+ =?utf-8?B?NlFwQ2Y1ZDYvcnM2TDBSK1d2NXdielNlZjhlTm5BZjVwZDRNNjMxTS9QODZW?=
+ =?utf-8?B?ejkwZ3lJbmhhcUZSNktZM2NCQUdnNkgzSjlBY1Q1NnZheVhYSFgvMWlMcHFn?=
+ =?utf-8?B?Tkp1cXord3ExZEIrL013NHF1L2oza3BLVmRSMDNwUFZsZ0g1K0pFZzhCNzJo?=
+ =?utf-8?B?bThTeUl2bkVTWTZxMjJKTWMzQmc4RkxxcXU3TGlFN2w5dldaUmRGT2p5QmZD?=
+ =?utf-8?B?bWxTRTIvSnlGR215eWxUdElZUTdMbUcyN1o3OGFhcDRjNlNkSUJjazQ0b0x4?=
+ =?utf-8?B?S3l3ZjIxY252V1B3QXEzS0FBS0tCZWx0T3d6REVQQ2NneWZmYmtqUnFJNy85?=
+ =?utf-8?B?QUdXUnNBTlVmYkZLdU4rQ2I4VTNjNC9OWDlCNHJQNHFDc1NDUW1mZWJPVlkw?=
+ =?utf-8?B?SmVOdEYxRHZ3Y0JlMDVtd0Q0aTdYRFM1bjQxdGxudlYrWk9TUm0rUUQxWjEx?=
+ =?utf-8?B?NEd1OXI1amNkMGlnVTJDTXJ2dTlQZEE1Z213N2VsMDNoZ0J6Z0wxVkljaVBw?=
+ =?utf-8?B?cC92RERVb0lvdythM09JTm9Ed2xsdkZOWWRuTzhoV09aeDRQd1lOdzlYVUdq?=
+ =?utf-8?B?MW4yaTEwa1lMcU9rSUtNd1kzbGZHQWRucU1jS3V3MTJLRzRnaEVWaVlCbVBD?=
+ =?utf-8?B?WjRDcGRyblJYQ2p0Nlg4c2pVMVM5aFpJaU11YVJmYmVMbHJudHZyOVhzSjR0?=
+ =?utf-8?B?bU9ycTR1U2dxMkpRc0tmVHk3NnMzd200YjhDRTU2V0pFV2RIYUE3cE1KaTFT?=
+ =?utf-8?B?Um1LVllBOE5jZzZnT3AyQitoWGR4ZWpva1dvVWJpc1lveGxtQk9jTXFGYUEx?=
+ =?utf-8?B?VSsySUpwV2IwTHBrUm9rQkNqUUpEc3BSZHNCM1drdnlKaHB5czFQaEtFMEp1?=
+ =?utf-8?B?VmlZVmZBSCs2a1M4WkY2ZEZ3VlhPWnNCVXp6WFk5Vyt3YVh5TEo4UzJmbnlE?=
+ =?utf-8?B?dFYrczFHTjRMUDhPQjdxZXRJWG1xQmJLVjB0YmNSclptTk00Mm5JT0lMbnBX?=
+ =?utf-8?B?ektVK1dUR0xsNVl4MENXTGg2MThub3I1Wk42RldGeDUvbTl0TG1ubDMrdk12?=
+ =?utf-8?B?VUUrZkx1VEZIV3VoOUZBUT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dHJQVTgzRFBJTVNZdE96NTNlZmlvVHE3eE5ubllUVXhnVkJaUnRmVS9KVms4?=
+ =?utf-8?B?dU5uVGxuL25DWkxQdDZIZDVmRVlJNDlXdHoyOEFHRHdVSTR5UE5xa2VNQWlv?=
+ =?utf-8?B?RExzMHc2N2lJbUZ2RXZRNnhPSlM5TUozVFN4OTVRTUVYb1pzSTdxNzQzL0Vi?=
+ =?utf-8?B?RG1teFAzREM1RU1TZEc2NFIzQnhQMFQyTUZMb21sNGJ6a1pzTCtSL3FydVV6?=
+ =?utf-8?B?OVFxL3lPYnhOS0krV2thL3ZRdzh0bDMyUkNwK0dhKy92RmFvVjJuS01qTG5v?=
+ =?utf-8?B?Nk53SGRkd0tpL25lc0VOOGFYdi8wdW9wbUo3NzEvUUxwalY2NjhDSWlUTUh3?=
+ =?utf-8?B?cWRSVFZieVNmbGZFSmE2bzJwTVlWL0g0UnMxNHcrbUVCWGlqMGFVb002QkYr?=
+ =?utf-8?B?MGt6aDJpc1dQMGczaEZSc09RZGsyZHNSaFRKbTBGUlBNK1JUanBUUmZCbVg3?=
+ =?utf-8?B?b2x4TkFTdG5FSkhUaExTS3BZM053YkttWVR2RjQ5Q3VEOUxNWG51QnNodTBZ?=
+ =?utf-8?B?NG1BSE4vREJLY0NXSkl6bTNQSGJBWkdLMy9aMDcwWi9zOGFwRmhoaTk4Rzhr?=
+ =?utf-8?B?VW1iYktDc1BLWE1uQlNScjBsTkNDdkZyZEVUdlNuM3NnOWE4bXBERzVKK3Nl?=
+ =?utf-8?B?ZmlDM3RlQUlDQUU0SG5iZTJZeWdWYmdKNUtFSG5yVFZyNEZEK0xZMFIySm84?=
+ =?utf-8?B?NEsxQzlXNm8xVkhqdmFQZ1FhMnloMVpwRnVMV25URnpVbmJ4NjFMR296WVdU?=
+ =?utf-8?B?cjhtS2Z4dVczN1JwckZSZXFDbm5HOVY2b3IzM3lmSzVhQWlhZ1N1Q1lwSHlF?=
+ =?utf-8?B?WDl3NGxRZktGUGRYQWUwbnhIejdtQi9rTnQ2VUk4VldDcTZEdDd6YjJJTFRz?=
+ =?utf-8?B?YmVRSkt5aWFSeDZkYm8wWGFZSGRGc3hvT1lRZHhNM3NVTlBVVFdzM3FjZVpY?=
+ =?utf-8?B?TWE4NWQ2WFZSbDBPVTVraHpzWHcvc1JGYVUrWmNUUFBDVlFyOXVQYVMrV2th?=
+ =?utf-8?B?a2NkK3VpeHFweDF0TGNMUkpZVUIxMTZpTmdxcktpQTJlS2xlQ2xCRjZpZ05x?=
+ =?utf-8?B?TEpBaFlvV042Z2FqR2NGV0xQRUttd0YvNFA5dVJTdEQxNUJ2c0JtSE1MRFRR?=
+ =?utf-8?B?c0pZQ0RITUhjMHVFVHRIQkRPWEZIYVBvUlJSNHFTZEJsZ1V1bThsZlFuNjY1?=
+ =?utf-8?B?cDM5OVkzMTU5Ym5hekVoeG1ZekVzRmI4b3JrNGUwQ0MvYkV6RVVROHdIdElo?=
+ =?utf-8?B?RFdsMXdGMTZkMWZjNEd4OE1RdkpUcWFGMy9ra0ZoZkQ4QUZ5VHdzak9HMVVD?=
+ =?utf-8?B?SjJnaGh1NXd3anhTTnIzZ2RML3M0L1doRHZuZkRYdWIzOUpFcVlneWVnUVBw?=
+ =?utf-8?B?b094MFJyL25KREVja1ZFMjdrTUZOZ0t0NnZDL3JZTzFuUG9tWjgvWnZ6MXFT?=
+ =?utf-8?B?ZTZWUk1VVCtrbDkrS0xxVVRHNmJQOUUrbUhqRWw5WjlPV216QVdZd0VTQUpC?=
+ =?utf-8?B?NTRxZVozNG5LYWc1bFdkazJGN212bXhUVWNRNlh4dGtPYW5NQ3hmVU9QTWZr?=
+ =?utf-8?B?SE81R2UrS3UzSGh0WnNDMitPZytzczJtWTFMcmFiSGd1ZFdpVllnd0lwOE5M?=
+ =?utf-8?B?Sk5CYk9ackdIbGV5YVhpZ2xMb2lqRGRKb1pNYTdaQ0tDVmpnN1Fxc1lNM2pZ?=
+ =?utf-8?B?MW5iQXdSSHFmNmtLYStkOWZYbG1mOEptdlRxSndvSmhWbVJMakVBMjRQSzVp?=
+ =?utf-8?B?R3BTdWJXQUh2Mmxqd3RBbTVEaXhPZmVvNmF0K1VRblNFektGNk1qUnlJek5L?=
+ =?utf-8?B?MHlVT3V3KzhIdE1pVThBSVZvZzl3a2Nac0RNOWZSQy9WM0ExQ2VPbC9CeVk0?=
+ =?utf-8?B?M2NoSHYzRzZwVE5kMDV5V29tNnp4Q0hLVWU0cE5Ua01yMU03cWxjaFUzYk5i?=
+ =?utf-8?B?MFcyL2NNQ3dROFNqZTMxQTI5UTZHUDA4NFAwM21ta05ER2tKVEtTc3RYQlpz?=
+ =?utf-8?B?dFdIaFJERFRnTXZpUzZ4Wm9BOXJTNjdOVGNGTVRjYSt6WjJIZjZJTndoVkVO?=
+ =?utf-8?B?MFBGY3NQQ3N5Y3p3QTU0QXlRYmw0VDluYVVWT2ZNSENoUFRFYjVWSWdzUm5L?=
+ =?utf-8?B?WUc3UTQ0TjhXZzVtZm90TTJPZmk2VDluZ05aSkw0VEEvVWRnOUljT2UyNFd1?=
+ =?utf-8?B?QXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6191b933-fd5d-4311-100f-08dc9684d22e
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 08:40:38.6711
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rsy63roNOIRXeW2ATZPlnuA+XvoziD+7psRhgD/x9/R/m7MV0apxXmD1QarDImnVfS8vxiwxqnge2K0ICMl9p5t8VeHKEcQeT047mju9rv8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7873
+X-OriginatorOrg: intel.com
 
-On 6/27/24 09:52, Adrián Moreno wrote:
-> On Thu, Jun 27, 2024 at 09:06:46AM GMT, Eelco Chaudron wrote:
+On 6/26/24 18:49, Jakub Kicinski wrote:
+> On Wed, 26 Jun 2024 09:43:54 +0200 Przemek Kitszel wrote:
+>>> As a nice safety all exceptions from defer()ed calls are captured,
+>>> printed, and ignored (they do make the test fail, however).
+>>> This addresses the common problem of exceptions in cleanup paths
+>>> often being unhandled, leading to potential leaks.
 >>
->>
->> On 26 Jun 2024, at 22:34, Adrián Moreno wrote:
->>
->>> On Wed, Jun 26, 2024 at 04:28:17PM GMT, Eelco Chaudron wrote:
->>>>
->>>>
->>>> On 25 Jun 2024, at 22:51, Adrian Moreno wrote:
->>>>
->>>>> Add support for a new action: emit_sample.
->>>>>
->>>>> This action accepts a u32 group id and a variable-length cookie and uses
->>>>> the psample multicast group to make the packet available for
->>>>> observability.
->>>>>
->>>>> The maximum length of the user-defined cookie is set to 16, same as
->>>>> tc_cookie, to discourage using cookies that will not be offloadable.
->>>>
->>>> I’ll add the same comment as I had in the user space part, and that
->>>> is that I feel from an OVS perspective this action should be called
->>>> emit_local() instead of emit_sample() to make it Datapath independent.
->>>> Or quoting the earlier comment:
->>>>
->>>>
->>>> “I’ll start the discussion again on the naming. The name "emit_sample()"
->>>> does not seem appropriate. This function's primary role is to copy the
->>>> packet and send it to a local collector, which varies depending on the
->>>> datapath. For the kernel datapath, this collector is psample, while for
->>>> userspace, it will likely be some kind of probe. This action is distinct
->>>> from the sample() action by design; it is a standalone action that can
->>>> be combined with others.
->>>>
->>>> Furthermore, the action itself does not involve taking a sample; it
->>>> consistently pushes the packet to the local collector. Therefore, I
->>>> suggest renaming "emit_sample()" to "emit_local()". This same goes for
->>>> all the derivative ATTR naming.”
->>>>
->>>
->>> This is a blurry semantic area.
->>> IMO, "sample" is the act of extracting (potentially a piece of)
->>> someting, in this case, a packet. It is common to only take some packets
->>> as samples, so this action usually comes with some kind of "rate", but
->>> even if the rate is 1, it's still sampling in this context.
->>>
->>> OTOH, OVS kernel design tries to be super-modular and define small
->>> combinable actions, so the rate or probability generation is done with
->>> another action which is (IMHO unfortunately) named "sample".
->>>
->>> With that interpretation of the term it would actually make more sense
->>> to rename "sample" to something like "random" (of course I'm not
->>> suggestion we do it). "sample" without any nested action that actually
->>> sends the packet somewhere is not sampling, it's just doing something or
->>> not based on a probability. Where as "emit_sample" is sampling even if
->>> it's not nested inside a "sample".
->>
->> You're assuming we are extracting a packet for sampling, but this function
->> can be used for various other purposes. For instance, it could handle the
->> packet outside of the OVS pipeline through an eBPF program (so we are not
->> taking a sample, but continue packet processing outside of the OVS
->> pipeline). Calling it emit_sampling() in such cases could be very
->> confusing.
-
-We can't change the implementation of the action once it is part of uAPI.
-We have to document where users can find these packets and we can't just
-change the destination later.
-
->>
+>> Nice! Please only make it so that cleanup-failure does not overwrite
+>> happy-test-path-failure (IOW "ret = ret ? ret : cleanup_ret")
 > 
-> Well, I guess that would be clearly abusing the action. You could say
-> that of anything really. You could hook into skb_consume and continue
-> processing the skb but that doesn't change the intended behavior of the
-> drop action.
+> That should be what we end up doing. The ret is a boolean (pass / fail)
+> so we have:
 > 
-> The intended behavior of the action is sampling, as is the intended
-> behavior of "psample".
+> 	pass &= cleanup_pass
+> 
+> effectively.
+> 
+>>> +            ksft_pr("Exception while handling defer / cleanup!")
+>>
+>> please print current queue size, if only for convenience of test
+>> developer to be able tell if they are moving forward in
+>> fix-rerun-observe cycle
+> 
+> Hm... not a bad point, defer() cycles are possible.
+> But then again, we don't guard against infinite loops
+> in  tests either, and kselftest runner (the general one,
+> outside our Python) has a timeout, so it will kill the script.
 
-The original OVS_ACTION_ATTR_SAMPLE "Probabilitically executes actions",
-that is it takes some packets from the whole packet stream and executes
-actions of them.  Without tying this to observability purposes the name
-makes sense as the first definition of the word is "to take a representative
-part or a single item from a larger whole or group".
+I mean the flow:
+$EDITOR mytest.py
+./mytest.py
+# output: Exception while handling defer / cleanup (at 4 out of 13 cleanups)
 
-Now, our new action doesn't have this particular semantic in a way that
-it doesn't take a part of a whole packet stream but rather using the
-part already taken.  However, it is directly tied to the parent
-OVS_ACTION_ATTR_SAMPLE action, since it reports probability of that parent
-action.  If there is no parent, then probability is assumed to be 100%,
-but that's just a corner case.  The name of a psample module has the
-same semantics in its name, it doesn't sample on it's own, but it is
-assuming that sampling was performed as it relays the rate of it.
+then repeat with the hope that fix to cleanup procedure will move us
+forward, say:
+$EDITOR mytest.py; ./mytest.py
+#output: ... (at 7 of 13 cleanups)
 
-And since we're directly tied here with both OVS_ACTION_ATTR_SAMPLE and
-the psample module, the emit_sample() name makes sense to me.
+just name of failed cleanup method is not enough as those could be
+added via loop
 
 > 
->>> Having said that, I don't have a super strong favor for "emit_sample". I'm
->>> OK with "emit_local" or "emit_packet" or even just "emit".
-
-The 'local' or 'packet' variants are not descriptive enough on what we're
-trying to achieve and do not explain why the probability is attached to
-the action, i.e. do not explain the link between this action and the
-OVS_ACTION_ATTR_SAMPLE.
-
-emit_Psample() would be overly specific, I agree, but making the name too
-generic will also make it hard to add new actions.  If we use some overly
-broad term for this one, we may have to deal with overlapping semantics in
-the future.
-
->>> I don't think any term will fully satisfy everyone so I hope we can find
->>> a reasonable compromise.
+>>> +            tb = traceback.format_exc()
+>>> +            for line in tb.strip().split('\n'):
+>>> +                ksft_pr("Defer Exception|", line)
+>>> +            KSFT_RESULT = False
 >>
->> My preference would be emit_local() as we hand it off to some local
->> datapath entity.
-
-What is "local datapath entity" ?  psample module is not part of OVS datapath.
-And what is "local" ?  OpenFlow has the OFPP_LOCAL port that is represented
-by a bridge port on a datapath level, that will be another source of confusion
-as it can be interpreted as sending a packet via a local bridge port.
-
->>
+>> I have no idea if this could be other error than just False, if so,
+>> don't overwrite
 > 
-> I'm OK removing the controversial term. Let's see what others think.
+> Yup, just True / False. The other types (skip, xfail) are a pass
+> (True) plus a comment, per KTAP spec.
 > 
->>>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->>>>> ---
->>>>>  Documentation/netlink/specs/ovs_flow.yaml | 17 +++++++++
->>>>>  include/uapi/linux/openvswitch.h          | 28 ++++++++++++++
->>>>>  net/openvswitch/Kconfig                   |  1 +
->>>>>  net/openvswitch/actions.c                 | 45 +++++++++++++++++++++++
->>>>>  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++++-
->>>>>  5 files changed, 123 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
->>>>> index 4fdfc6b5cae9..a7ab5593a24f 100644
->>>>> --- a/Documentation/netlink/specs/ovs_flow.yaml
->>>>> +++ b/Documentation/netlink/specs/ovs_flow.yaml
->>>>> @@ -727,6 +727,12 @@ attribute-sets:
->>>>>          name: dec-ttl
->>>>>          type: nest
->>>>>          nested-attributes: dec-ttl-attrs
->>>>> +      -
->>>>> +        name: emit-sample
->>>>> +        type: nest
->>>>> +        nested-attributes: emit-sample-attrs
->>>>> +        doc: |
->>>>> +          Sends a packet sample to psample for external observation.
->>>>>    -
->>>>>      name: tunnel-key-attrs
->>>>>      enum-name: ovs-tunnel-key-attr
->>>>> @@ -938,6 +944,17 @@ attribute-sets:
->>>>>        -
->>>>>          name: gbp
->>>>>          type: u32
->>>>> +  -
->>>>> +    name: emit-sample-attrs
->>>>> +    enum-name: ovs-emit-sample-attr
->>>>> +    name-prefix: ovs-emit-sample-attr-
->>>>> +    attributes:
->>>>> +      -
->>>>> +        name: group
->>>>> +        type: u32
->>>>> +      -
->>>>> +        name: cookie
->>>>> +        type: binary
->>>>>
->>>>>  operations:
->>>>>    name-prefix: ovs-flow-cmd-
->>>>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
->>>>> index efc82c318fa2..8cfa1b3f6b06 100644
->>>>> --- a/include/uapi/linux/openvswitch.h
->>>>> +++ b/include/uapi/linux/openvswitch.h
->>>>> @@ -914,6 +914,31 @@ struct check_pkt_len_arg {
->>>>>  };
->>>>>  #endif
->>>>>
->>>>> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
->>>>> +/**
->>>>> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
->>>>> + * action.
->>>>> + *
->>>>> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
->>>>> + * sample.
->>>>> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
->>>>> + * user-defined metadata. The maximum length is OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
->>>>> + * bytes.
->>>>> + *
->>>>> + * Sends the packet to the psample multicast group with the specified group and
->>>>> + * cookie. It is possible to combine this action with the
->>>>> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
->>>>
->>>> Although this include file is kernel-related, it will probably be re-used for
->>>> other datapaths, so should we be more general here?
->>>>
->>>
->>> The uAPI header documentation will be used for other datapaths? How so?
->>> At some point we should document what the action does from the kernel
->>> pov, right? Where should we do that if not here?
->>
->> Well you know how OVS works, all the data paths use the same netlink messages. Not sure how to solve this, but we could change the text a bit to be more general?
->>
->>  * For the Linux kernel it sends the packet to the psample multicast group
->>  * with the specified group and cookie. It is possible to combine this
->>  * action with the %OVS_ACTION_ATTR_TRUNC action to limit the size of the
->>  * packet being emitted.
->>
-> 
-> I know we reuse the kernel attributes I don't think the uAPI
-> documentation should be less expressive just because some userspace
-> application decides to reuse parts of it.
-> 
-> There are many kernel-specific terms all over the uAPI ("netdev",
-> "netlink pid", "skb", even the action "userspace") that do not make
-> sense in a non-kernel datapath.
 
-+1
 
-This is a kernel uAPI header it describes the behavior of the kernel.
-Having parts like "For the Linux kernel" in here is awkward.
-
-> 
-> Maybe we can add such a comment in the copy of the header we store in
-> the ovs tree?
-
-Makes sense to me.
-
-If we'll want to implement a similar action in userspace datapath,
-we'll have to have a separate documentation for it anyway, since
-the packets will end up in a different place for users to collect.
-
-> 
-> 
->>>>> + */
->>>>> +enum ovs_emit_sample_attr {
->>>>> +	OVS_EMIT_SAMPLE_ATTR_GROUP = 1,	/* u32 number. */
->>>>> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
->>>>
->>>> As we start a new set of attributes maybe it would be good starting it off in
->>>> alphabetical order?
->>>>
->>>
->>> Having an optional attribute before a mandatory one seems strange to me,
->>> wouldn't you agree?
->>
->> I don't mind, but I don't have a strong opinion on it. If others don't mind,
->> I would leave it as is.
->>
-> 
-> I think I prefer to put mandatory attributes first.
-
-That's my thought as well.  Though that might be broken if we ever need
-more attributes.  But we do not extend individual actions that often.
-
-Best regards, Ilya Maximets.
+Thanks!
 
