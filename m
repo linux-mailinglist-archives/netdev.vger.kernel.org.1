@@ -1,340 +1,235 @@
-Return-Path: <netdev+bounces-107440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61FD791AFE1
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:55:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E0F91AFEF
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 21:56:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839951C220AE
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:55:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5E4E1F24105
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 19:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC3B19A28C;
-	Thu, 27 Jun 2024 19:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D90719D8BD;
+	Thu, 27 Jun 2024 19:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M9l76w6d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKZGc8sT"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5164DA08
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719518096; cv=fail; b=PAwjgOFTZ1Bbdvl26tZ/Ev4MDUJpWaRi9MkmxVBdWPsFqAxo9wk9Swdej47aRJga8WCjeuPn12eUksc3iUZwpz5qPU0xrZyDGIlsnVvdmHGckObTFJS1Wa9H45pb8NFKhNWvPKkwJforCBGCKZ9+LxNrS12Z+IX2oZIl4eSwlcQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719518096; c=relaxed/simple;
-	bh=k28m25uIPOm8q2SgZYgPYwlRNg1N5raOFaealqwqO40=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=mza+aPK58C/5QCLGbI6G8VGQ1eN6xri5M5qnHe+4UaGifVIY+/M3mm0hzIqtk1lkOkbWq1V7lhOW3Gda9QaXZ7PEzgWYI8GH2FlksrqR7jShnYhWh0HShmgcwramoQgIxGZlotiG+Vy8Y/y54ETz+dZFHgp8kz/RwgaEG4DRhUc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M9l76w6d; arc=fail smtp.client-ip=40.107.243.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n0Z4uKxFgeJxEw6YVvPlBiIvVlEo9JKJnQJgeT9BXL53U58m9iKQf35Ua/6EsUwQlQ/errbQ3N3bEHvGo31vNC5GjcdqIiDhwnPQKcvNzuZXP+uXZ64q5PaAgJmrhJ3Fs/QhPB/jZJlclxkEQBT2dnOzcqgvldM56Tlwc0Cwqn8LpuWOl8LfhE4CFBqJxMLfGXEXLwxFLnBmPWjbmqEmw/9/RtqHragyKieWt5wn7lKQuVgz5/xZ7nyeTmRlvuYNJc5CZ9+BM4jS7dFLGaBvhEdLxC03/n7VyimZ2pImMWkwFKbyRzfJvUxZBJRb03fnl4aYb6eT3EzsEEbtSszSsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FuxiSX+E2Zb5/DquQSPZkrf7xThEKlp3+aHQvI8CSfQ=;
- b=NmOfvYaIvXdaqGPa6f0OOG3ujtMiq2Buvsve5I5mctWdNJLOl8sCEFrvulH52ClbXnx9BOiYdw6/bDdXZgSmZEDGAdyL03n3Tg587An1BvTk0vwFHB9+T6jiDAeeGjx/wpLPoSIXmMN4aojRrnWi0PkvXxikRvq8gNm6Lkm2C1lWXJMkbxeglJo3PezO7hjmxv1jVtKxTOCFfaz7ZfnWhjmqA3iZtcrycX81yQ6E+RnveBJy3GHlp2RQ/LZ2g7P33NuKrQh5jsuWII3/erbbcg2og0EdiJAzQEBIlVFKgyDUrbuTkcWrfybuGMQQhUVO4JOPJ9LKOeXW9t47pnzFDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FuxiSX+E2Zb5/DquQSPZkrf7xThEKlp3+aHQvI8CSfQ=;
- b=M9l76w6dngOFTu54Z88pPdKS6orzh+5xK8udzuvHJOfnNmns0plMJE1vgtS10J0Fm6OExR70iPetJf5v956UfuaQz9r2x4kSFrzpM8bMfWx5Xi3ES3GXjAufSdfTOf3UogI5PgLLpRfuXJ6umanzYnfTCKSEfO0M1mFGKjxretNLdbwZZV2V05LI6MQSx/yB7o17/xE1jzF2uR7d/qUiUzTZi1V08X21iQiMMEjKIyVg6V61QVf/kF83k1NAmnkamGVXo0uOzqBIpno6bjJSVFEPTcwkzGqBdrt5HHZ2gGYQU2vgDnFge5WceBFETcpEqvDzURdVE52bpzSywqSQQw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by CH3PR12MB8076.namprd12.prod.outlook.com (2603:10b6:610:127::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.31; Thu, 27 Jun
- 2024 19:54:47 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::9ec8:2099:689a:b41f]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::9ec8:2099:689a:b41f%5]) with mapi id 15.20.7698.025; Thu, 27 Jun 2024
- 19:54:47 +0000
-Date: Thu, 27 Jun 2024 22:54:29 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Matching on DSCP with IPv4 FIB rules
-Message-ID: <Zn3DdfGZIVBxN0DR@shredder.lan>
-References: <ZnwCWejSuOTqriJc@shredder.mtl.com>
- <ZnypieBfn3CxCGDq@debian>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnypieBfn3CxCGDq@debian>
-X-ClientProxiedBy: LO4P265CA0242.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:350::16) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B203219B3CC
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719518158; cv=none; b=GRULYnX7n67QFuGZ6/CZVaFOIUStIoMzbX0NX2Zwo2ziiX2V1QtuuYTEKRb2l6IYEthiEewXBVwysD61jjAwrluEd+oPBfFO1TSMAJP4HCaz4lyVm2Sw317lDr/4sn7WPFOTcVHdHZB19HcBQk5gfVUW4EtzeeGQiGksKx9HWLI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719518158; c=relaxed/simple;
+	bh=36GxoZjliAZT52Uum3hkhku+z1zWUxDL4YWuJDbCmCU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MnoGMlATuxoi51E501IujEXhauAlYBoTlgQPRdkExtN5GSnN44onaW84inK8AFzylXMENujfEnvfzcVjBjq2DkOFd97qRHyhOSkCIGKTBT2y8sBoeWjNKMDxc0h2LjZJKKCMLe86Jl6QRQu1Xh2dYVDKI7+mXikuq7Wg00O5X3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKZGc8sT; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cdea1387eso6106405e87.0
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 12:55:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719518153; x=1720122953; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HwbPl7/RVFpU7jHcXTQEjahrmwW8PQdQrA+IV3FhN4w=;
+        b=pKZGc8sTJiPK8evW+kyTJom27vWLLcaatgTP+pqNNLik3mw1pmxqfY8BC6C2Oa9+oI
+         o0sCCeMv+WZal6hDaWgzmHoncPuHmkHoAWo/Ck/6FuDrAQdLlfhkR9KmZsxGc443vkjr
+         5ujWzSTQNw9wjOOwbnW3XPU61Dca2ugh48ywLYRU+VcRpd7i3tp/cfEjewfSyXRILNvv
+         sJgKRnx3yzI5aWIHj3tc6qE6MNwWNocuDjwigxiw7d7HiOc30Xdd29sJqDUtaTNLWPyr
+         RN1F5aOe5ICn2RmnfOTaJ1d72Wl+yAJWGgOJhh7wOYjxwW+dPqi2218Mw9ed924jYzNQ
+         0M7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719518153; x=1720122953;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HwbPl7/RVFpU7jHcXTQEjahrmwW8PQdQrA+IV3FhN4w=;
+        b=Tx5vgqABscccwdoOz9X+Z3ciiwRqiQsAAqZbLV3+TRDhauCYrVAp4oSBbOjMub1tl1
+         tfJj2XDCAheFMj9wHgBhKBQQHC9GyhyQYJtKLRaRipLCnDF9cZhdYFCh+td/c9+T6zOa
+         YCDroabWOhHp4BbkXlPyc+ocbhRDg3/+aGE+mGpgUOpY4AONNd0eR68VUj7TcBq9czC1
+         oCgHkouh+BgFn+MYQZQT5GFPGyQVtsVfitHatJCPrBBdoB+vBCgZEOTnjcIgrd4tvcOd
+         623bSnK9814p/8vzb1Fpv1zOTuEuol++s6O3pXuJuUSnvm8l8CGHiSc25zT5zDdySw9i
+         vgnA==
+X-Gm-Message-State: AOJu0YxSKwu3rwd5qTJithY/MBZi1v1HntWKJ5FYJZQoEHzR2RBNR8VS
+	N0KAJ8RKubEVGTGOEC/WRvfrE0TjhKT/+Ec2YcQkRwK7G7lTR+zlNOI8gezuf0A1AF0EtQ8QuLA
+	bhWxT3WAFXKiEx7yimJgshCQR2CAQ3o9KpBXP
+X-Google-Smtp-Source: AGHT+IHrIkqcjhj0KSGiy7gblVxOce/ysoGeptTitOpdzuEly5ueVJ0/ZUmc2dX4a/lyh+Q8t0Uj2uTJuS+Tj9wzWDM=
+X-Received: by 2002:a05:6512:2004:b0:516:d692:5e0b with SMTP id
+ 2adb3069b0e04-52ce185f9d6mr8027892e87.54.1719518152535; Thu, 27 Jun 2024
+ 12:55:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|CH3PR12MB8076:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7633b38-bf79-4773-3240-08dc96e2ff43
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oU3HtIqCHxWsejoPgwjlzy8iwW9ry4VETJhqg3S9dh/e28zdSUwHqsQdI5/u?=
- =?us-ascii?Q?eG7p/LYneanf2yPEEGazdYnXIlnrzuyWQvHnGrkh7abYtwNZIKgQBC2v5F2Q?=
- =?us-ascii?Q?CEGBJRPsJj31bBTc09ZVuJ5LBcfNjOO8WgDtmwvXoR8tduKRS7hkoDdptgg3?=
- =?us-ascii?Q?uES/seJ1aoMY6yunGLBvo9dhx+LaHaBOJ5SCWfmj4/xbxAcJyq2WVO7UMIFY?=
- =?us-ascii?Q?dyJ0XP2qdMZMP6tXQUQ2KEQs/zrSzAn/CF9uXv02BRrKHUstgo1C8HWeHYG0?=
- =?us-ascii?Q?Pr5Bk1XbLuuwB6DY73wpospExpY0D+1QklY+GNmBlFDHOunAFiG1y5WPqykM?=
- =?us-ascii?Q?CiCGeQ58MbFWGUGRNzPJ1nYk+UGBdN5gazWN4vnt2z/bP3/tgg380maQQcou?=
- =?us-ascii?Q?RM154IOjPz5/ocPjayFtyexx6j/nnoC3DX7Dwtz4PYyg5tZynCPwc8dVVZdI?=
- =?us-ascii?Q?OyBZ8Is6Qr4DIu3+GiFwzKY2uPi3VN85g7CR4RVD/WNu3Ynzs4xhSlmiY21G?=
- =?us-ascii?Q?TxwtnsIZGaD6q+/ykyB2rZ9Y/lYCsj7TlZEoT1qzLSRIFoGV8uzxY9vSvpK7?=
- =?us-ascii?Q?afUr7FCWKzjl0MGL+AD6Y1tQg60rsUC7HNHrQniwb0xPg4LTrSlE5i9VP/i6?=
- =?us-ascii?Q?RBQHoAIeTYwkJw95xhJA3D+25jRRqsV2Zh8ibFBXy94vUMBjRzk7JwWsREjQ?=
- =?us-ascii?Q?oM2g4Nuo9lftat0flgBfghcD9dPx+XDAsUTSdxS/ttBduEnyZ9MF4Emjz2SF?=
- =?us-ascii?Q?Fglg2qR1hPz95wn5oH8qvinCUqNlqlOyJ+A9Oasw8N5RFvjTkG5neYUf9Wt1?=
- =?us-ascii?Q?4NvR5803IUwnzbmAg02JR9l98CAy1NrNZmUvWMtVILRxQ+zErVDtiVFhvJbp?=
- =?us-ascii?Q?89INiWnEO3owH59aKwM2ynVi88pWkEg7WrA/pmCRJvXlBohUrJrJuCtw7ste?=
- =?us-ascii?Q?UhbwB3pQfdXKu+81on71PGTrf2ZXAKRaEALa3OmPX8zb85exbkiDWmy994ar?=
- =?us-ascii?Q?vx5cz8+ilQGzR1W3TjEnGkoyZ7PhHkHdqtIPRJza5U3sNmksscL56enkOviv?=
- =?us-ascii?Q?/YUMqVxeSZQVnqcuAuUhRKySs4kwGpRbkfLyksqQVuqhPlBfNCigdwecs6jM?=
- =?us-ascii?Q?4kUJ58MEGHVT/9uf+oG3fgP8LgA0VMozQ2kYmXXxRW7qFDzBm7TjMMR3dg7r?=
- =?us-ascii?Q?tCRYD3tYsdMaVmFsXQofXYF4wiTE0guehRIBXfNVomnYtc+Go0JQI9AVHp+H?=
- =?us-ascii?Q?z/gnRjVuz6iD329H44JfO58h4yt0OwLJyMkD7pOPpCQ3ZIdwSssXy/y+1K0y?=
- =?us-ascii?Q?likN3FZ8RIalsbZX9dnZcHV2z3n3wWQG/ebsqRKR4Lybjg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WZpCNK5IPGR1r2Dm8E+q47KhbJH4S8Y22/chSkpMORMeP7eWLHxQXCRBYnYR?=
- =?us-ascii?Q?rVCTMG7AgM1Bm5zZfthMwcW9bM1OAdY4d4Hd52cCAknayuxCmrvF2UI7Keiv?=
- =?us-ascii?Q?I/899CaH0WmfwrwgJKI7/kKL/PDno76U//VYLLKdzYD4wuoPndSIfkRDxtJS?=
- =?us-ascii?Q?ah/xZ0TqlI7VLQAqNBJyijG3g5WHUO22e1QHoH5gcJBwjIjZ37APE8ad27y1?=
- =?us-ascii?Q?QWulQtyZuWR+wOw7iLW5eXiY7MstuqfZAj7I0iSiYbpZHdQDsZUQkLh5D7al?=
- =?us-ascii?Q?UepYunxvNZNrABxCwz/XYvFOfvAe0gdrUXT7XYexIUURapmRO4s7Yll3HngG?=
- =?us-ascii?Q?Oyvlj89FQ9jgAYIIgHaWMOOmdgAH/j9zWlkqY1NNvgb5gUAQyeoeDYeBAxAN?=
- =?us-ascii?Q?nThg+Tnyg9yeO5VOBJsypDcLxOdxqVF2crQu+tUJSNO1KHDpe0trOEGGV8WS?=
- =?us-ascii?Q?fheGXW+36xvAgUsY9hYYu26c3voP1ZpTKMBowHqZ/hfrS60hkMgGRTBCFMEZ?=
- =?us-ascii?Q?4xtde7/FCv+I6bHYkzippQ4WlwSiEsGZwX6FsY76RKJCATrnI5GxE2pED19f?=
- =?us-ascii?Q?vLKw/O88ulFBMh28wh9KsfGmRDGZTLDkxLPoRnTkYnrGpan/XRC/8aiwYQAN?=
- =?us-ascii?Q?1UDB149UrIWDqEVFwQnSZkNJVmAp0Dy3K+cctuENrrg02DhnzvhnOIOWK48H?=
- =?us-ascii?Q?pWVn1c62JsMMkryCnqerSvj4XYEoPziU4qm5FwESiHf4Hci4mQK7F/tVAg/x?=
- =?us-ascii?Q?FnXt3Md9BQ23ogsOyS3wQU7iVMxSzkafiqYRFcNDlsv/mvjsrUMAlsHThvO1?=
- =?us-ascii?Q?Shud2nZHlBBOnySzJgHG6VfGfftjTYTldNVEzc4Hf9C+I9zcY6H6UuibuNBe?=
- =?us-ascii?Q?/GIf2EOhvF78KWaLNuw1GKCaU5JoLUINdlfqMqRaW9tQo7vLE3ECs0l2YbsG?=
- =?us-ascii?Q?4nEBUWamTchHFX31UBttfhyaRyXrHL3bZ3cL0CF7YGUjAtoW2eR1n3PM4WV0?=
- =?us-ascii?Q?voWOC4PNoK+N0Wti+QmpAlhCHKBe2a6l+ZWt1cmDUHZ7HIA0RTqJhdeRGnuL?=
- =?us-ascii?Q?k3csx2fJ6PQsQopuucycm4Kb82GzbCVabxzqUHMgvsmMHlWjYyAkB9JS3THK?=
- =?us-ascii?Q?y2j5ukSfgaGzF0pyRFxqS12it5Sx+Pd9ZyXaCZ/LZew/EOoYHTbtSFf76Nqu?=
- =?us-ascii?Q?IGhWE7GnzBxM0SV/jTa5LT3zox9JyWxapj/XMaUyhW0rLMKsn379g5UN2N6x?=
- =?us-ascii?Q?xU7mdnSGfjJ/MRlBxdhOSM9n8Ikgp2zPUa4k3kq1yK9ZzdSNWcRDLWoGZMD9?=
- =?us-ascii?Q?PUvqBh5Lh/lKacBPWXyOppYuO1ijo/uZO53bveFRtxWTOaf9rggdKwqVLy/g?=
- =?us-ascii?Q?+4ocMivmWWurUVoDPvXGo41mOuLt56phzNlVjGTeKX1JDwJE/G8rBIJSPWu2?=
- =?us-ascii?Q?2nBYq+SZsa2WgicciGsk+vjSHqvD9San/CVopx0hG90+Uoh8sRi/iPW2DHgV?=
- =?us-ascii?Q?0KNUXu0rvLjp2qHiekNAA4YspbHvM/S2M+jFIL+lcctlU7FmZ4HSjN+Jansp?=
- =?us-ascii?Q?05ekLYitddq7dGmGX78IpwjrDO3ZYxZryTxyx987?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7633b38-bf79-4773-3240-08dc96e2ff43
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 19:54:47.0951
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B19dslxz7loAXVrMSszlnAN19xxFGQ/+wo/2kHDZgwZgZpHPyxjiBhmO68Nm1sF+eNpUJhfxCl/4qKJqQxcN7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8076
+References: <20240625195407.1922912-1-almasrymina@google.com>
+ <20240625195407.1922912-14-almasrymina@google.com> <20240626150822.742eaf6a@kernel.org>
+ <20240626174634.2adec19d@kernel.org>
+In-Reply-To: <20240626174634.2adec19d@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 27 Jun 2024 12:55:38 -0700
+Message-ID: <CAHS8izOd_yYNJ6+xv35XoCvF7MzqachPVrkQJbic8-h=T1Vg_A@mail.gmail.com>
+Subject: Re: [PATCH net-next v14 13/13] selftests: add ncdevmem, netcat for
+ devmem TCP
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Guillaume, thanks for the detailed response!
+On Wed, Jun 26, 2024 at 5:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 26 Jun 2024 15:08:22 -0700 Jakub Kicinski wrote:
+> > On Tue, 25 Jun 2024 19:54:01 +0000 Mina Almasry wrote:
+> > > +CFLAGS +=3D -I../../../net/ynl/generated/
+> > > +CFLAGS +=3D -I../../../net/ynl/lib/
+> > > +
+> > > +LDLIBS +=3D ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/pr=
+otos.a
+> >
+> > Not as easy as this.. Please add this commit to your series:
+> > https://github.com/kuba-moo/linux/commit/c130e8cc7208be544ec4f6f3627f1d=
+36875d8c47
+> >
+> > And here's an example of how you then use ynl.mk to code gen and build
+> > for desired families (note the ordering of variables vs includes,
+> > I remember that part was quite inflexible..):
+> > https://github.com/kuba-moo/linux/commit/5d357f97ccd0248ca6136c5e11ca3e=
+adf5091bb3
+>
+> Investigating this further my patches will not work for O=3Dxyz builds
+> either. Please squash this into the relevant changes:
+>
 
-On Thu, Jun 27, 2024 at 01:51:37AM +0200, Guillaume Nault wrote:
-> On Wed, Jun 26, 2024 at 02:58:17PM +0300, Ido Schimmel wrote:
-> > Hi Guillaume, everyone,
-> 
-> Hi Ido, thanks for reaching out,
-> 
-> > We have users that would like to direct traffic to a routing table based
-> > on the DSCP value in the IP header. While this can be done using IPv6
-> > FIB rules, it cannot be done using IPv4 FIB rules as the kernel only
-> > allows such rules to match on the three TOS bits from RFC 791 (lower
-> > three DSCP bits). See more info in Guillaume's excellent presentation
-> > here [1].
-> > 
-> > Extending IPv4 FIB rules to match on DSCP is not easy because of how
-> > inconsistently the TOS field in the IPv4 flow information structure
-> > (i.e., 'struct flowi4::flowi4_tos') is initialized and handled
-> > throughout the networking stack.
-> > 
-> > Redefining the field using 'dscp_t' and removing the masking of the
-> > upper three DSCP bits is not an option as it will change existing
-> > behavior. For example, an incoming IPv4 packet with a DS field of 0xfc
-> > will no longer match a FIB rule that matches on 'tos 0x1c'.
-> 
-> Could removing the high order bits mask actually _be_ an option? I was
-> worried about behaviour change when I started looking into this. But,
-> with time, I'm more and more thinking about just removing the mask.
-> 
-> Here are the reasons why:
-> 
->   * DSCP deprecated the Precedence/TOS bits separation more than
->     25 years ago. I've never heard of anyone trying to use the high
->     order bits as Preference, while we've had several reports of people
->     using (or trying to use) the full DSCP bit range.
->     Also, I far as I know, Linux never offered any way to interpret the
->     high order bits as Precedence (apart from parsing these bits
->     manually with u32 or BPF, but these use cases wouldn't be affected
->     if we decided to use the full DSCP bit range in core IPv4 code).
-> 
->   * Ignoring the high order bits creates useless inconsistencies
->     between the IPv4 and IPv6 code, while current RFCs make no such
->     distinction.
-> 
->   * Even the IPv4 implementation isn't self consistent. While most
->     route lookups are done with the high order bits cleared, some parts
->     of the code explicitly use the full DSCP bit range.
-> 
->   * In the past, people have sent patches to mask the high order DSCP
->     bits and created regressions because of that. People seem to use
+Thanks! I cherry-picked commit 15dbefa97fb98 ("tools: net: package
+libynl for use in selftests"), and then applied the diff below to the
+series [1].
 
-By "patches" you mean IPv6 patches?
+Now:
 
->     the RT_TOS() macro on whatever "tos" variable they see, without
->     really understanding the consequences. I think we'd be better off
->     without RT_TOS() and the various IPTOS_* variants, so people
->     wouldn't be tempted to copy/pasting such code.
-> 
->   * It would indeed be a behaviour change to make "tos 0x1c" exactly
->     match "0x1c". But I'd be surprised if people really expected "0x1c"
->     to actually match "0xfc". Also currently one can set "tos 0x1f" in
->     routes, but no packet will ever match. That's probably not
->     something anyone would expect. Making "0x1c" mean "0x1c" and "0x1f"
->     mean "0x1f" would simplify everyone's life I believe.
+`git clean -fdx && make  headers_install && make -C
+./tools/testing/selftests/net` works
 
-Did you mean "0xfc" instead of "0x1f"? The kernel rejects routes with
-"tos 0x1f" due to ECN bits being set.
+`git clean -fdx && make  headers_install && make -C
+./tools/testing/selftests/net ncdevmem` doesn't work with this error:
 
-I agree with everything you wrote except the assumption about users'
-expectations. I honestly do not know if some users are relying on "tos
-0x1c" to also match "0xfc", but I am not really interested in finding
-out especially when undoing the change is not that easy. However, I have
-another suggestion that might work which seems like a middle ground
-between both approaches:
+make: Entering directory
+'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/net'
+gcc -Wall -Wl,--no-as-needed -O2 -g -I../../../../usr/include/
+-isystem /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selfte=
+sts/../../../usr/include
+-I../     ncdevmem.c  -lmnl -o ncdevmem
+ncdevmem.c:34:10: fatal error: netdev-user.h: No such file or directory
+   34 | #include "netdev-user.h"
+      |          ^~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [<builtin>: ncdevmem] Error 1
 
-1. Extending the IPv4 flow information structure with a new 'dscp_t'
-field (e.g., 'struct flowi4::dscp') and initializing it with the full
-DSCP value throughout the stack. Already did this for all the places
-where 'flowi4_tos' initialized other than flowi4_init_output() which is
-next on my list.
+It seems specifying the target doesn't trigger the libynl.a to be
+built. Isn't this a bug, or is that expected? I took a bit of a look
+into it but couldn't figure it out immediately. If it is a bug, any
+pointers would be appreciated (but I'm digging into it anyway).
 
-2. Keeping the existing semantics of the "tos" keyword in ip-rule and
-ip-route to match on the three lower DSCP bits, but changing the IPv4
-functions that match on 'flowi4_tos' (fib_select_default,
-fib4_rule_match, fib_table_lookup) to instead match on the new DSCP
-field with a mask. For example, in fib4_rule_match(), instead of:
+[1] The diff on top of the series-with-cherry-pick that I'm testing with:
 
-if (r->dscp && r->dscp != inet_dsfield_to_dscp(fl4->flowi4_tos))
+diff --git a/tools/testing/selftests/net/Makefile
+b/tools/testing/selftests/net/Makefile
+index 7ba1505dc2eb4..1d3b99e9c12e8 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -5,10 +5,6 @@ CFLAGS +=3D  -Wall -Wl,--no-as-needed -O2 -g
+ CFLAGS +=3D -I../../../../usr/include/ $(KHDR_INCLUDES)
+ # Additional include paths needed by kselftest.h
+ CFLAGS +=3D -I../
+-CFLAGS +=3D -I../../../net/ynl/generated/
+-CFLAGS +=3D -I../../../net/ynl/lib/
+-
+-LDLIBS +=3D ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/protos.a
 
-We will have:
+ LDLIBS +=3D -lmnl
 
-if (r->dscp && r->dscp != (fl4->dscp & IPTOS_RT_MASK))
+@@ -100,7 +96,11 @@ TEST_PROGS +=3D fdb_flush.sh
+ TEST_PROGS +=3D fq_band_pktlimit.sh
+ TEST_PROGS +=3D vlan_hw_filter.sh
+ TEST_PROGS +=3D bpf_offload.py
+-TEST_GEN_FILES +=3D ncdevmem
++
++# YNL files, must be before "include ..lib.mk"
++EXTRA_CLEAN +=3D $(OUTPUT)/libynl.a
++YNL_GEN_FILES :=3D ncdevmem
++TEST_GEN_FILES +=3D $(YNL_GEN_FILES)
 
-I was only able to find two call paths that can reach these functions
-with a TOS value that does not have its three upper DSCP bits masked:
+ TEST_FILES :=3D settings
+ TEST_FILES +=3D in_netns.sh lib.sh net_helper.sh setup_loopback.sh setup_v=
+eth.sh
+@@ -111,6 +111,10 @@ TEST_INCLUDES :=3D forwarding/lib.sh
 
-nl_fib_input()
-	nl_fib_lookup()
-		flowi4_tos = frn->fl_tos	// Directly from user space
-		fib_table_lookup()
+ include ../lib.mk
 
-nft_fib4_eval()
-	flowi4_tos = iph->tos & DSCP_BITS
-	fib_lookup()
++# YNL build
++YNL_GENS :=3D netdev
++include ynl.mk
++
+ $(OUTPUT)/epoll_busy_poll: LDLIBS +=3D -lcap
+ $(OUTPUT)/reuseport_bpf_numa: LDLIBS +=3D -lnuma
+ $(OUTPUT)/tcp_mmap: LDLIBS +=3D -lpthread -lcrypto
+diff --git a/tools/testing/selftests/net/ynl.mk
+b/tools/testing/selftests/net/ynl.mk
+index 0e01ad12b30ec..59cb26cf3f738 100644
+--- a/tools/testing/selftests/net/ynl.mk
++++ b/tools/testing/selftests/net/ynl.mk
+@@ -18,6 +18,4 @@ $(YNL_OUTPUTS): CFLAGS +=3D \
 
-The first belongs to an ancient "NETLINK_FIB_LOOKUP" family which I am
-quite certain nobody is using and the second belongs to netfilter's fib
-expression.
+ $(OUTPUT)/libynl.a:
+        $(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS=3D"$(YNL_GENS)" lib=
+ynl.a
+-       $(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a ./
+-
+-EXTRA_CLEAN +=3D libynl.a
++       $(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
 
-If regressions are reported for any of them (unlikely, IMO), we can add
-a new flow information flag (e.g., 'FLOWI_FLAG_DSCP_NO_MASK') which will
-tell the core routing functions to not apply the 'IPTOS_RT_MASK' mask.
 
-3. Removing 'struct flowi4::flowi4_tos'.
 
-4. Adding a new DSCP FIB rule attribute (e.g., 'FRA_DSCP') with a
-matching "dscp" keyword in iproute2 that accepts values in the range of
-[0, 63] which both address families will support. IPv4 will support it
-via the new DSCP field ('struct flowi4::dscp') and IPv6 will support it
-using the existing flow label field ('struct flowi6::flowlabel').
 
-The kernel will reject rules that are configured with both "tos" and
-"dscp".
 
-I do not want to add a similar keyword to ip-route because I have no use
-case for it and if we add it now we will never be able to remove it. It
-can always be added later without too much effort.
-
-> 
-> > Instead, I was thinking of extending the IPv4 flow information structure
-> > with a new 'dscp_t' field (e.g., 'struct flowi4::dscp') and adding a new
-> > DSCP FIB rule attribute (e.g., 'FRA_DSCP') that accepts values in the
-> > range of [0, 63] which both address families will support. This will
-> > allow user space to get a consistent behavior between IPv4 and IPv6 with
-> > regards to DSCP matching, without affecting existing use cases.
-> 
-> If removing the high order bits mask really isn't feasible, then yes,
-> that'd probably be our best option. But this would make both the code
-> and the UAPI more complex. Also we'd have to take care of corner cases
-> (when both TOS and DSCP are set) and make the same changes to IPv4
-> routes, to keep TOS/DSCP consistent between ip-rule and ip-route.
-> 
-> Dropping the high order bits mask, on the other hand, would make
-> everything consistent and would simplifies both the code and the user
-> experience. The only drawback is that "tos 0x1c" would only match "0x1c"
-> (and not "0x1f" anymore). But, as I said earlier, I doubt if such a use
-> case really exist.
-
-Whether use cases like that exist or not is the main issue I have with
-the removal of the high order bits mask. The advantage of this approach
-is that no new uAPI is required, but the disadvantage is that there is a
-potential for regressions without an easy mitigation.
-
-I believe that with the approach I outlined above the potential for
-regressions is lower and we should have a way to mitigate them if/when
-reported. The disadvantage is that we need to introduce a new "dscp"
-keyword and a new netlink attribute.
-
-> 
-> > Adding the new field and initializing it correctly throughout the stack
-> > is not a small undertaking so I was wondering a) Are you OK with the
-> > suggested approach? b) If not, what else would you suggest?
-> 
-> Sorry for the long text, but I think you have my opinion now.
-> And yes, whatever the option, this is going to be a long task.
-
-Yes :(
-
-> 
-> Side note: I'm actually working on a series to start converting
-> flowi4_tos to dscp_t. I should have a first patch set ready soon
-> (converting only a few places). But, I'm keeping the old behaviour of
-> clearing the 3 high order bits for now (these are just two separate
-> topics).
-
-I will be happy to review, but I'm not sure what you mean by "converting
-only a few places". How does it work?
-
-> 
-> I can allocate more time on the dscp_t conversion and work/help with
-> removing the high order bits mask if there's interest in this option.
-> 
-> > Thanks
-> > 
-> > [1] https://lpc.events/event/11/contributions/943/attachments/901/1780/inet_tos_lpc2021.pdf
-> > 
-> 
+--=20
+Thanks,
+Mina
 
