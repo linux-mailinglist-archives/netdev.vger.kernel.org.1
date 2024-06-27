@@ -1,54 +1,52 @@
-Return-Path: <netdev+bounces-107112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1791919E29
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:29:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D251919E23
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 06:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00E111C23218
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:29:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CC5E1C22263
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 04:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC7B18E06;
-	Thu, 27 Jun 2024 04:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB0117C6A;
+	Thu, 27 Jun 2024 04:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="CiuzSJaQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xq/ZSuCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C86DDA0;
-	Thu, 27 Jun 2024 04:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438191864C;
+	Thu, 27 Jun 2024 04:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719462580; cv=none; b=rjVB7gjXa9oMLOWY+Zkq3AOtmd0RlgXB6tMinElgMpeRiglF44hqunDul3cSyhvThFXVZBT99yXvHO6KkITQRSyXXQ5L2RkeY5tERIRBkeYKLh90vBg/Q74+uZQ3uyz9s0RjOH4WKd5KQ4cghJ1UJ/I4ZSolLtuxZ6FYTGnHnuU=
+	t=1719462311; cv=none; b=cDUjoognnfY0JBrGh1PVxr8GBWvGRt7byKBhCYaTmuUpjHw2YZvZVacSocDoBBsbpkE4sLVAfZuHa3Sgm/C2CdqlP+6ra4HvZx/ejdIVQKtcZc4NUrq308ruLAmXOCkSmCKhgDwu0FtySrwA7DkCmQynPeM0JB23RDDU8sGbDQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719462580; c=relaxed/simple;
-	bh=KtcWo65waXRGSPn0iqCOjDZmJvKqRvvSIQ3mV+65De4=;
+	s=arc-20240116; t=1719462311; c=relaxed/simple;
+	bh=juCSA/JEQdCInY0INwcmkXUwA1/C8FVRgHJ6wrrJoWQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L4fKYUDUAQvIMiiJl8m4zT5Zf4j9FuyvuUWAKWV3q+oPEyI3GHTvS+qq69RMYQVMeM1ajq96wl+YedJSYFGeXC+5/84ocDKlTrBxByIBbNyCwSXm/86HhTIplf3I6KDkUSeMAQ8nv+WxdMeAjlj0WkRxcqeRvTwJnjuqn4agh2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=CiuzSJaQ; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 057C588027;
-	Thu, 27 Jun 2024 06:29:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1719462576;
-	bh=hLwf+KWvZOIT/6XX6OUmEpBoC6+4FW5Mca6/c3/zNwM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CiuzSJaQ3ScejEUYdbVfyF/PgSdfOWVqB0VGVCJliM7PWME+a0x7vrP+4+6bwhMp8
-	 GEjryXy4vmaoj7KYFMUG+0UbAUO910mlbZcLzigRPie3/Z5QT0krTIGanJQZymWSaF
-	 CmnPHZhw+M3TVKJlTZeLCR8zqgNt0Ragnt1LAHhuycDLjx8ovqxXL71Vbqb65i1HSa
-	 b0cDzjC2pa3n/ZSAduLJ4PjVOxqROP6yp2p3cKWaZdsRDFT4Mcun0+9yq3XnBYna5u
-	 pCXMAuBgfmxS+9Od9a0qfd3q/57TLJKC/53EGphJiPS0vxn3QEmxHgIjkibFwm7iat
-	 ArqQaA0DtXrEg==
-Message-ID: <36f46cea-0811-47dc-8741-042d9b88df88@denx.de>
-Date: Wed, 26 Jun 2024 21:47:38 +0200
+	 In-Reply-To:Content-Type; b=IDHrGjzizdbK9bUEshMtTTHTzylrcaZRzFZXlf0+6u6Ojj1xj7YLoeLtgZevMDyt9u5n1QaXxnkgGt3l50nkh29wKuT7oqtcylYA+Dl3QJQc1QHAyJ2iV6ysdwoesnYDy5nmOu/GlyGOBRT4Fmq7YY3HCjzzCZF4ldEsTGrA7hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=xq/ZSuCj; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=Eq/tnOV8FvjvD57ahIklGr8d03YiQ6JNh+uUQrkfJcM=; b=xq/ZSuCj+0LVtZcWuz1W+dB0r2
+	tSwrzg8WI39OjOWKrOOdQXRSS+Nt6FX6Jqc3KOXiWER7wBrADyiwG2+ABhMmlbiG3j7ESpzBFLIh3
+	T8QvHpdbk+F1J02stpJgAO5F1ZJmQMfT9sEhP1olQM0QZ/botfsTKche+Olhup/hR1TWm6OiMwIXv
+	eo95VF2QnFB9TELQh805/xIHMZvXQWu0IfenZrah99iY67SfvJYyQW2pfywdHAFj0MM3LKnNNe3TB
+	K+tOrBfhATgn2/I1N1PobStdOBU7yw88DLpR7xN4Bj2TAOW52EkH9n2F1ke6K+2q8EI/MLESUum+1
+	5J206szg==;
+Received: from [50.53.4.147] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sMggr-00000009Aec-38lI;
+	Thu, 27 Jun 2024 04:25:03 +0000
+Message-ID: <4090f208-766d-40b2-b64e-f0f700845258@infradead.org>
+Date: Wed, 26 Jun 2024 21:24:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,38 +54,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: phy_device: Fix PHY LED blinking code comment
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, kernel@dh-electronics.com,
- linux-kernel@vger.kernel.org
-References: <20240626030638.512069-1-marex@denx.de>
- <9656eb1a-921b-4f2e-b01f-7df7d890254e@lunn.ch>
+Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
+ trailers
+To: Thorsten Leemhuis <linux@leemhuis.info>, Jonathan Corbet
+ <corbet@lwn.net>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+ Kees Cook <kees@kernel.org>
+Cc: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, ksummit@lists.linux.dev
+References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+ <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
+ <202406211355.4AF91C2@keescook>
+ <20240621-amorphous-topaz-cormorant-cc2ddb@lemur>
+ <87cyo3fgcb.fsf@trenco.lwn.net>
+ <4709c2fa-081f-4307-bc9e-eef928255c08@infradead.org>
+ <62647fab-b3d4-48ac-af4c-78c655dcff26@leemhuis.info>
 Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <9656eb1a-921b-4f2e-b01f-7df7d890254e@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <62647fab-b3d4-48ac-af4c-78c655dcff26@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-On 6/26/24 7:32 PM, Andrew Lunn wrote:
-> On Wed, Jun 26, 2024 at 05:06:17AM +0200, Marek Vasut wrote:
->> Fix copy-paste error in the code comment. The code refers to
->> LED blinking configuration, not brightness configuration. It
->> was likely copied from comment above this one which does
->> refer to brightness configuration.
+
+
+On 6/26/24 8:51 PM, Thorsten Leemhuis wrote:
+> On 27.06.24 01:17, Randy Dunlap wrote:
+>> On 6/26/24 4:13 PM, Jonathan Corbet wrote:
+>>> Konstantin Ryabitsev <konstantin@linuxfoundation.org> writes:
+>>>> On Fri, Jun 21, 2024 at 02:07:44PM GMT, Kees Cook wrote:
+>>>>> On Wed, Jun 19, 2024 at 02:24:07PM -0400, Konstantin Ryabitsev wrote:
+>>>>>> +   This URL should be used when referring to relevant mailing list
+>>>>>> +   topics, related patch sets, or other notable discussion threads.
+>>>>>> +   A convenient way to associate ``Link:`` trailers with the commit
+>>>>>> +   message is to use markdown-like bracketed notation, for example::
+>>>>>> ...
+>>>>>> +     Link: https://lore.kernel.org/some-msgid@here # [1]
+>>>>>> +     Link: https://bugzilla.example.org/bug/12345  # [2]
+>>>>>
+>>>>> Why are we adding the extra "# " characters? The vast majority of
+>>>>> existing Link tags don't do this:
+>>>>
+>>>> That's just convention. In general, the hash separates the trailer from the
+>>>> comment:
+>>>>
+>>>>     Trailer-name: actual-trailer-body # comment
+>>>
+>>> Did we ever come to a conclusion on this?  This one character seems to
+>>> be the main source of disagreement in this series, I'm wondering if I
+>>> should just apply it and let the painting continue thereafter...?
 >>
->> Fixes: 4e901018432e ("net: phy: phy_device: Call into the PHY driver to set LED blinking")
->> Signed-off-by: Marek Vasut <marex@denx.de>
+>> We have used '#' for ages for adding comments to by: tags.
+>> I'm surprised that it's not documented.
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> I thought it was documented, but either I was wrong or can't find it.
+> But I found process/5.Posting.rst, which provides this example:
 > 
-> There is a lot of context in this patch. Do you have some odd git diff
-> settings?
+>         Link: https://example.com/somewhere.html  optional-other-stuff
+> 
+> So no "# " there. So to avoid inconsistencies I guess this should not be
+> applied, unless that document is changed as well.
 
-I did use git format-patch -U10 this time, to make sure that context is 
-visible. With regular git format-patch, the diff contained only part of 
-the comment and it wasn't clear from the diff that it does modify 
-comment above (*led_blink_set)() and not e.g. (*led_brightness_set)() .
+In my use cases, other-optional-stuff begins with '#'.
+
+
+-- 
+~Randy
 
