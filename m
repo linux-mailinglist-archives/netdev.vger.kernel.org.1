@@ -1,345 +1,283 @@
-Return-Path: <netdev+bounces-107201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F1D991A4C5
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:14:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED5B91A4D7
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1BF11C2179D
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:14:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C399E283338
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3061487DF;
-	Thu, 27 Jun 2024 11:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5F71487FF;
+	Thu, 27 Jun 2024 11:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JGYqBQyw"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="vpXdhc+i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A897F1494CA
-	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 11:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719486841; cv=fail; b=BCWgztSKFTPLWh4GcdT15ESeeMnS2Uf/n0z/0MCRuujhr4Lqq9fKqkeTEou2YTfHNoZPOdiJdpM1X0TDpO405WhLTAz6wROq/uuYTjQvHo6Fl7RqJL3ulYYy8hdvuQ2Y9uRXDomOTDK8tedd70Z2vY6H8X1nCr9FswgIq+wl36M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719486841; c=relaxed/simple;
-	bh=wfDs+pf/qhBodCyTFEnByW1ZWTm6/atSIpF9TjL54I0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RaBgnqq/qK221RGYXBXOJUAaoQFgQlMy+abaIZx/RThgynFZzgqR7paPUyJ3gDQeHo3QwhgkHo8k5dZ7hTajEEqJc2nj18TNkOO1me7uW7ymrtLYpU+uWDc26eRWTKhrklin296XXawijw0nuiNzGF2EJGCfoYI2rF1Jq+8E+5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JGYqBQyw; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719486839; x=1751022839;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=wfDs+pf/qhBodCyTFEnByW1ZWTm6/atSIpF9TjL54I0=;
-  b=JGYqBQywf8JiX+iTRhmu7I2Bx7/hBFn5p7t9f3Mv3iA2w4JvENE+v5Go
-   RJ0AF2wqLQRpXWUkN112dK+enUafz/fp8PV/vaVF5GtWMjrqIcF7hQH7y
-   eS9Eov5j+oRxAwh+lXilcizg9ePV8l5p8z4zVqt1909fUKksYoi2Qy0cc
-   c3tLOIFUMb3OjYPMLgUNIGByyLouLHS3/aKK6uCeTx9UbdWUY/67Mz4KU
-   Mwl6mF4V9XnsnvD/wYTEEky6p0p5IdFvhig+iQ5ksLua1Wf40T4z6xQ/M
-   zA8FhYpyowO8Xv1YeC5xKzRyYMB4UMKmXfMs4ba/pK4K473p3PgM3+5U3
-   w==;
-X-CSE-ConnectionGUID: b7Pmm9LJR0exfmb0NPsRJA==
-X-CSE-MsgGUID: JmYwkvCATmqajLxmcBwPkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11115"; a="12279855"
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="12279855"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 04:13:59 -0700
-X-CSE-ConnectionGUID: ZlBA8eH+Ss27AXls2BUnew==
-X-CSE-MsgGUID: CUykKz+tQ96UqqE6xL2aag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="44755721"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Jun 2024 04:13:59 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 27 Jun 2024 04:13:58 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 27 Jun 2024 04:13:58 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 27 Jun 2024 04:13:58 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 27 Jun 2024 04:13:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N3S7CBpPQtVADLQZgnm/bMA0aw3F5bO4Kre10QuTCrK7V07MOS9SnuQwplfNqgiJAoAiwrMjlAMVlxupNK9vlH2DfEf4+MfI8uFOsTn+XzYpxhUlpi48Z6j1j9//iCRR5rezgizrlq4ahfsWlF/S5pfM9t/3tu2IjQPIuXDjRjEi37cnPx/xPd60LDHcj7lNE37Tkmt0qoQ5qWV3mztOJdhcE5F99XOEiXIf7rQPcoaUIsnE12mh0kOOOmVvkk3Z6pahmVjOfaYS8mxI9TfLg8pe9pw8UBnXLYTyVS0Su9cOuXQbYBlH1HquSOMjisFEfEBncsd4GIuxVtSB5EvE6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pf1ss4y25RatFMC9B8gg2LnS1i5ldN4ITMQJe/9tupc=;
- b=k/k4cBiMT06+z19naEKLUvkytnInVBZNtgQG3e6gr2NZ6f1MUSXmxRxDdSinNmL35bUy01ph0E28R+fzyEoO03gFL2SRBa0pk0RdldovPnJfEm/Dtppmm0WhLlzt5Yj2ivrXB/+BM/DE8fGv2JvSmvAPhY6TqMOT3+15GFcu6AWTWECL/9JGiHAYG1VUTxaNUtsiAlLgTOz4Wl9ZjEBMUVbOZxeCEt0ArH9pjDxMnRwYPmFoSOikCf7lUq1tskdRVlbPp1k0efFwYt4Bpdj2CPQu/NQvxZZ+zGf6Nrl50oOxO9MiyZuPyBl13nCTi3zi7mKAw1+UFvCtSR969f9GAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- IA1PR11MB8222.namprd11.prod.outlook.com (2603:10b6:208:44e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.32; Thu, 27 Jun
- 2024 11:13:55 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.7698.025; Thu, 27 Jun 2024
- 11:13:55 +0000
-Date: Thu, 27 Jun 2024 13:13:47 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<jacob.e.keller@intel.com>, <michal.kubiak@intel.com>,
-	<sridhar.samudrala@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<wojciech.drewek@intel.com>, <pio.raczynski@gmail.com>, <jiri@nvidia.com>,
-	<mateusz.polchlopek@intel.com>, <shayd@nvidia.com>,
-	<kalesh-anakkur.purayil@broadcom.com>, <horms@kernel.org>
-Subject: Re: [iwl-next v5 07/15] ice: implement netdev for subfunction
-Message-ID: <Zn1JaxkObIWjkVAZ@boxer>
-References: <20240606112503.1939759-1-michal.swiatkowski@linux.intel.com>
- <20240606112503.1939759-8-michal.swiatkowski@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240606112503.1939759-8-michal.swiatkowski@linux.intel.com>
-X-ClientProxiedBy: VI1PR07CA0241.eurprd07.prod.outlook.com
- (2603:10a6:802:58::44) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FF013D8BC
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 11:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719486930; cv=none; b=AhEnlVmm/3KhlNNIInrMDg/yqnibo+VUNogzv6OleMPW6egpp49+L1TygtAF13ZvnamB2b+U/OUVwCwhlsbWI+z9gUgLoWQdNw+uDl903G+QGDHNjEHi2Nr52jt23PGAOfHwAcZFWnt+7Cs4M/X8JZ7yhfftA+WKORglLjzVLOs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719486930; c=relaxed/simple;
+	bh=IuBacV5X+fbodylYX5iaFeHHTDI6O5S1jgN0f2LCWNE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jLSKwqy4pN3uynytqvatr1Yo/teCDZXSb0ZIluQGvusRGTyUMoVQCNFvXfHm2zcU9cPPliBZPYQkCGR672KKuf58GVh6hJG/Qn8lzdKkmm3Tpgu3L9DMuFnNitkdY7QbUZ+FTvOqyJnwhnRj/VwOkQgH/kbfP1JzzcgUoma5VqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=vpXdhc+i; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com [209.85.167.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 1A7633F733
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 11:15:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1719486926;
+	bh=J+yPw8z58QxETfEvEDc5Ds99wVZU+Ow1RMLrRPKuiyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=vpXdhc+iNqY5aYRUeu3SrqaMZXHG/eJG8y52cf6Im+rDEBg9ZWLYUGXSA+kzQIvnG
+	 ef9N0RZSWaGP4V499y7WGZLyrYwIcjhTcbhMxJrCp4V/diOV6afHny54JbRt6vXR/4
+	 iZ8us09Ib/yM25XyHLInFtd9idFgzL5iPABnYi+DOSQL3PRcBm8l3GgSxxg0tG5PwZ
+	 ntQQHJrrmQChGe2ZYgoyWq12YpMFP7vABYcrfH89emOkliweJMetBFvrCROD06A+kd
+	 WpgZiXpc/pyzTI+i/QMK3ZXUeHfs8s+ecm3SE2cWKPfWCNSpKfBPH96PRzO6A5eNMA
+	 d9mYMGYWzTYkA==
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52ce007cdd4so3999468e87.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:15:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719486924; x=1720091724;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J+yPw8z58QxETfEvEDc5Ds99wVZU+Ow1RMLrRPKuiyY=;
+        b=HSGVtjFswvxZl21WsJQ6wpDfkOdmJHjHcDrxXSigYihhRDhJlOJIGeE14ozpYDYxUB
+         DGr3WJS7Q+kUo661PJxuVFK/TX09ZN/mc5t7pfLjuwO0UYeMFh1FVLHLBjGdyFiEJkBH
+         2MgX/YGqac9bTa4EayiPZH+2npoV0vYBkwH9OuCFb9hyu36M9oZkuWr0Ts9ianGlkX0q
+         QEv5ft+Xz3D0K86o5FqpheQMdLbMSJF4puSwwTOTtfJRxhzeaQXSwi2Q0osI/qbDyB5L
+         x0MOaJTj5sb38vVAmSBJdSGQeF1Php11AP/SGAN97I09+XKBllNZZQS2cC98OxYp2km9
+         kHHA==
+X-Gm-Message-State: AOJu0YwuUK05kiyJqQNxksJO/PmEEyYiwER4acQ3JcdZfRiXmYLpFmH3
+	1vSwdi4B1PoZh6s+yQXRMFblxBStAHVX6czEexGP0y6KIjN7LDx9j6DOnKpGabQpXFN+teNw5/1
+	M4WrhiNFksKuB3Vm6/mJJSCt0LyVhgbnOifyys4ALkMSXFfdqDcFdeteP+XYRTMQCk4oOcnB3n+
+	kMDHqvksk=
+X-Received: by 2002:a05:6512:3b25:b0:52c:881b:73c0 with SMTP id 2adb3069b0e04-52ce1835195mr10665574e87.17.1719486924443;
+        Thu, 27 Jun 2024 04:15:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVFnW1xAN6raSN2NzhOnYNCG8OB9oq/JMCEu+8SvdJt3gDQ+duXZQLKwqo/ZRfLCK7QSO82Q==
+X-Received: by 2002:a05:6512:3b25:b0:52c:881b:73c0 with SMTP id 2adb3069b0e04-52ce1835195mr10665561e87.17.1719486923928;
+        Thu, 27 Jun 2024 04:15:23 -0700 (PDT)
+Received: from XPS-17-9720.han-hoki.ts.net ([213.204.117.183])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42564b633fcsm20873705e9.11.2024.06.27.04.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 04:15:23 -0700 (PDT)
+From: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+To: netdev@vger.kernel.org
+Cc: jay.vosburgh@canonical.com,
+	Ghadi Elie Rahme <ghadi.rahme@canonical.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v3 net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
+Date: Thu, 27 Jun 2024 14:14:05 +0300
+Message-ID: <20240627111405.1037812-1-ghadi.rahme@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA1PR11MB8222:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66963406-1334-4317-e0fd-08dc969a3bd7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?zXZbXF1zdxfXS/ntdtBanlDkqLZQ1VqFc1sCW4R6ZekP+EnNA6Bneoca3YOZ?=
- =?us-ascii?Q?i5tv27s//8esbAQcszVjLAyvzqBoAUgf/ZF1j2Pc9/wCWBFeC9LBPJZmQoBx?=
- =?us-ascii?Q?IHUmWHMEWj/22ZN2J3BMo2LIwDFoOP5tAsdJPHHAIdYh6b21Az0VqB5zhAq0?=
- =?us-ascii?Q?ZXZPzGBLSctj2sV0QFXhbqM9UavDxCshG95pr78eBhlATUTcNqu7CAOPSTcW?=
- =?us-ascii?Q?lalCH1FQoJ3OHdTa+nZzUwD9Wf/ONOFiAyoGcu2h7LsXUUgkIINfZX4igKQe?=
- =?us-ascii?Q?oa6QXDrUu4QQL5Jo3krQhXGt9lAS+pqORjY92146x1Tn6bZ7I5VOvdcZZCvi?=
- =?us-ascii?Q?jVXV1N+/527fI541qMmQgIKTQOacgZI9o9Okn00/kGrCTkJOWFD4KzswcmgX?=
- =?us-ascii?Q?82KqwIh32V8k//Qe9SrUNZL7+q0duwSWpRLP+QBZnmzE8/dFPogfms046hyf?=
- =?us-ascii?Q?Qiiqu235y5iKqokVXJHfXNHrORLDsb486zlsDFWOMh6GgtINxp27ZjRFpfW4?=
- =?us-ascii?Q?jxgY2BK3joC+i0emdsI6AYYjJqVuDjF6+hHVG7Lc0e5fFRWdJK29ARsFq42F?=
- =?us-ascii?Q?cpU1gyHJ8wVlDO4wH35vPyx/fhQl4X14MReEGotnK4SCgUhHsPS3EIrSdU6S?=
- =?us-ascii?Q?sMcgG4KDhjDMVE8V/xYQz5tRLRBBlp7DlDg+mOvIcV+BbqoXhATOO2H5Q9wx?=
- =?us-ascii?Q?JBSnmJrZhOqc0iVX8sIxEg5GfGtafa5FbAL5thlbgJokGPbq7/UHMNtpXU2S?=
- =?us-ascii?Q?LvtfUYTfzH89TxzP+B7idIOaSKrHwy0UwXlSD1DfHpcKka+lYH9i/99PtKZ7?=
- =?us-ascii?Q?Lr7MyswzQRd55BAhLKF5nKwuvNaPEFT+dbCSiPmIXqECdOLuDShrJN4NMIxq?=
- =?us-ascii?Q?aid8RvHVcX9Vjd3tbTjDHGoopvBKsE3aSY5M4/ZWcPK64JeFsxyRwWK/P5/7?=
- =?us-ascii?Q?Xc1rVTaFBltXNe1bPUTQgNyTQe7GQBf+zH2IZyGf8sXM6QwFSEvivs5Xl/g1?=
- =?us-ascii?Q?wUxQpxwCeW+Oh58mITLtk5UfuxM4z/C9+0X2JY2RYj9vcUSwYHiGfAUiSaCj?=
- =?us-ascii?Q?pE2F+lL9W1uSa5UUjX4Zg1zY0I0eNbTUqqaC8XVgFnJVxFnMg20/15GkmEyt?=
- =?us-ascii?Q?TErHSuuqKXsKSgfOcO+GwJWv7VCdNofJjcrWjdSeXkEUvaDze9Maoyga/vJJ?=
- =?us-ascii?Q?D5miTZW9YIrjmRbPj8+B7V/t49/zibYz0SGTJSdbvPYog0mGpy9DEaa0T5TU?=
- =?us-ascii?Q?OcNYaCRoKvnyohhlnubzKBBnsMZFYp0p53Zvwc03nn+OOtgUEsFq4ANfWS9U?=
- =?us-ascii?Q?X4f4EmvC6VM1VrmTOr8xRwUWxynxB5ngLDiRIO+PgF94Gw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?llU1odh/Bc0t+eeJkEoEVQ5Ffb5S4b4SQB7wcWViMmmbYTQZCnos24DM+MeR?=
- =?us-ascii?Q?dm4aUaaQrznWgdw85Yu3rsTUJAcjbrqAW9II4ggXyvTXQW25C7dEk7VDLZph?=
- =?us-ascii?Q?Nez3xykpstDDlxl3YoZaq0J3dQH5HlJYFfFUGmmIOmACnJc46ANjMtIojrDO?=
- =?us-ascii?Q?h0hY0RM0LFVxFyJiImB1caIgUfISPLAoB5zx6lhKvGom2ljaIatNwIlKALX+?=
- =?us-ascii?Q?xAQd6whsG63pyxLRAHTeXUq9iVFpySLjydRDrsBh29Xe4Yl9ARRwchU4LQ8+?=
- =?us-ascii?Q?8jQnpILJgcDU56Sm0JjMRW2U8gCyGGRk4yQPmUUJjnsq/cgqJbKACJC9/SLl?=
- =?us-ascii?Q?jxIvOmNlHPPmxB9E/UChxlpPIX1Fx+g7ICWwK7dSKpUzmgWZ59NvKGK/DOJi?=
- =?us-ascii?Q?Vpnk1IOEGwlrFyawrWjHc/kdRxxr67Hv+5ir40n42gKYoYhqQMrekulmGUoD?=
- =?us-ascii?Q?US6rGavR7vhZjrQcBo8pQUhCwo61FTnzJ6gV8SZonOeLBpLhJ5Pj1yEl7ixE?=
- =?us-ascii?Q?4JKwZqM7zXJ9xIf73eWsx38SNDdUTLKr4TA6bJKOsiEss/Ak1etb3WdEcTs8?=
- =?us-ascii?Q?wNpvotQDO5Lz/QXW5thXl9HegxMUvT93HgJmycyPtt+Hw4a8c4knXhyBQS20?=
- =?us-ascii?Q?wjpLvx2UQBwairl4+vwxRnkmv+ZPbhf1ZZrY59TrmeUu1jSmOui9+wtR79gt?=
- =?us-ascii?Q?ikT/7Low7GWJo/RlesFD/9ctXQIkwr/tHUb80RVBvw1Znxjn2Y34zUDQ+pI1?=
- =?us-ascii?Q?HVy9Jea9NZiUNE5NRTX71QONxf+6KCLZKgyvidRmtCycdItxIJL5YobEkt8S?=
- =?us-ascii?Q?uEpDfC2ROZ6dgGSEgLmpB49gmSRMa+7yv8e4FKqCQcSw88VFV6x+Zhf9ewjf?=
- =?us-ascii?Q?kHflGzx5dWr1JKUObRANu0DflGSfFuIv7ZpxfTVhJhPMlmpuwxilByqXne4c?=
- =?us-ascii?Q?onK0P+pm1uWApqN1VTpZlQvq/xo80q0naXL22ow12rb2nsOhLAhRKseEC8e5?=
- =?us-ascii?Q?YswlUCYpm7nCiiJ1M2AjczY5wJc1uhxqJwh4RoitDYrlDAZirvgTPa9i9cKe?=
- =?us-ascii?Q?CGXyoI2SN5djkvKCe3uHGIVGcOogmGfCuFISOjve3B+Tk3qbWk8A8heH2GfU?=
- =?us-ascii?Q?62xnK9ymoZdTi3nFfRO1Rus0eUPq71PzjCVL/M/iG5S41to7c9ZYgjQuI0zS?=
- =?us-ascii?Q?H24r+kY4v7Te7mLp0ugnuf5RnwQCKlgOVweIHf62GXqK/SDQNcYjAyqwQImD?=
- =?us-ascii?Q?y/QVdPoGrXcwwTGpU/632mMn0DkBFFY1U8fvnKfmplZ7XWC59SN7ESkhQg5l?=
- =?us-ascii?Q?jK8JopDbt79PhkKYhHLYEELZ0BMQu06xqq9ZVrj5YcIvIFGHcqWaNkF8job9?=
- =?us-ascii?Q?2uIDQrJ++7LM2RdeySwmtOUmcSCUHAAZuJ+rWlrpmtJ2hqmqWa673UHel8W1?=
- =?us-ascii?Q?O0IahJqXRWpINqS8QCAFkpXAq7DrQe7tpSMSxv7t89yb8FeYGDXed318+Avw?=
- =?us-ascii?Q?DnR9Scl8L5VrrmtSmOcPQpFMLduxSe1xOXFh927rMPITTZC5PztpHVu2KpWv?=
- =?us-ascii?Q?Cf98meMv0zPtFSooc+JppVgC71fay6tjnZ61ukz37mHqNzgx1AOiZO6Yp3nH?=
- =?us-ascii?Q?6A=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66963406-1334-4317-e0fd-08dc969a3bd7
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2024 11:13:55.3992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TAW5Hc9enM9m4gYQCa31nSpCjfmo6C4nk0L6Q2BpG6L+HRra9OSCea970zLnJPz30s5kr46ZSLgvc3OuFtxKm8laQpHxOKhp/peJ3HOlkf0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8222
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 06, 2024 at 01:24:55PM +0200, Michal Swiatkowski wrote:
-> From: Piotr Raczynski <piotr.raczynski@intel.com>
-> 
-> Configure netdevice for subfunction usecase. Mostly it is reusing ops
-> from the PF netdevice.
-> 
-> SF netdev is linked to devlink port registered after SF activation.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_sf_eth.c | 85 ++++++++++++++++++++-
->  1 file changed, 84 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> index abe495c2d033..3a540a2638d1 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> @@ -2,11 +2,85 @@
->  /* Copyright (c) 2024, Intel Corporation. */
->  #include "ice.h"
->  #include "ice_lib.h"
-> +#include "ice_txrx.h"
->  #include "ice_fltr.h"
->  #include "ice_sf_eth.h"
->  #include "devlink/devlink_port.h"
->  #include "devlink/devlink.h"
->  
-> +static const struct net_device_ops ice_sf_netdev_ops = {
-> +	.ndo_open = ice_open,
-> +	.ndo_stop = ice_stop,
-> +	.ndo_start_xmit = ice_start_xmit,
-> +	.ndo_vlan_rx_add_vid = ice_vlan_rx_add_vid,
-> +	.ndo_vlan_rx_kill_vid = ice_vlan_rx_kill_vid,
-> +	.ndo_change_mtu = ice_change_mtu,
-> +	.ndo_get_stats64 = ice_get_stats64,
-> +	.ndo_tx_timeout = ice_tx_timeout,
-> +	.ndo_bpf = ice_xdp,
-> +	.ndo_xdp_xmit = ice_xdp_xmit,
-> +	.ndo_xsk_wakeup = ice_xsk_wakeup,
-> +};
-> +
-> +/**
-> + * ice_sf_cfg_netdev - Allocate, configure and register a netdev
-> + * @dyn_port: subfunction associated with configured netdev
-> + * @devlink_port: subfunction devlink port to be linked with netdev
-> + *
-> + * Return: 0 on success, negative value on failure
-> + */
-> +static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
-> +			     struct devlink_port *devlink_port)
-> +{
-> +	struct ice_vsi *vsi = dyn_port->vsi;
-> +	struct ice_netdev_priv *np;
-> +	struct net_device *netdev;
-> +	int err;
-> +
-> +	netdev = alloc_etherdev_mqs(sizeof(*np), vsi->alloc_txq,
-> +				    vsi->alloc_rxq);
-> +	if (!netdev)
-> +		return -ENOMEM;
-> +
-> +	SET_NETDEV_DEV(netdev, &vsi->back->pdev->dev);
-> +	set_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
-> +	vsi->netdev = netdev;
-> +	np = netdev_priv(netdev);
-> +	np->vsi = vsi;
-> +
-> +	ice_set_netdev_features(netdev);
-> +
-> +	netdev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
-> +			       NETDEV_XDP_ACT_XSK_ZEROCOPY |
-> +			       NETDEV_XDP_ACT_RX_SG;
+Fix UBSAN warnings that occur when using a system with 32 physical
+cpu cores or more, or when the user defines a number of Ethernet
+queues greater than or equal to FP_SB_MAX_E1x using the num_queues
+module parameter.
 
-please include:
+Currently there is a read/write out of bounds that occurs on the array
+"struct stats_query_entry query" present inside the "bnx2x_fw_stats_req"
+struct in "drivers/net/ethernet/broadcom/bnx2x/bnx2x.h".
+Looking at the definition of the "struct stats_query_entry query" array:
 
-	netdev->xdp_zc_max_segs = ICE_MAX_BUF_TXD;
+struct stats_query_entry query[FP_SB_MAX_E1x+
+         BNX2X_FIRST_QUEUE_QUERY_IDX];
 
-so that xsk ZC multi-buffer is also supported on SF netdevs.
+FP_SB_MAX_E1x is defined as the maximum number of fast path interrupts and
+has a value of 16, while BNX2X_FIRST_QUEUE_QUERY_IDX has a value of 3
+meaning the array has a total size of 19.
+Since accesses to "struct stats_query_entry query" are offset-ted by
+BNX2X_FIRST_QUEUE_QUERY_IDX, that means that the total number of Ethernet
+queues should not exceed FP_SB_MAX_E1x (16). However one of these queues
+is reserved for FCOE and thus the number of Ethernet queues should be set
+to [FP_SB_MAX_E1x -1] (15) if FCOE is enabled or [FP_SB_MAX_E1x] (16) if
+it is not.
 
-> +
-> +	eth_hw_addr_set(netdev, dyn_port->hw_addr);
-> +	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
-> +	netdev->netdev_ops = &ice_sf_netdev_ops;
-> +	SET_NETDEV_DEVLINK_PORT(netdev, devlink_port);
-> +
-> +	err = register_netdev(netdev);
-> +	if (err) {
-> +		free_netdev(netdev);
-> +		vsi->netdev = NULL;
-> +		return -ENOMEM;
-> +	}
-> +	set_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
-> +	netif_carrier_off(netdev);
-> +	netif_tx_stop_all_queues(netdev);
-> +
-> +	return 0;
-> +}
-> +
-> +static void ice_sf_decfg_netdev(struct ice_vsi *vsi)
-> +{
-> +	unregister_netdev(vsi->netdev);
-> +	clear_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
-> +	free_netdev(vsi->netdev);
-> +	vsi->netdev = NULL;
-> +	clear_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
-> +}
-> +
->  /**
->   * ice_sf_dev_probe - subfunction driver probe function
->   * @adev: pointer to the auxiliary device
-> @@ -57,10 +131,16 @@ static int ice_sf_dev_probe(struct auxiliary_device *adev,
->  		goto err_vsi_decfg;
->  	}
->  
-> +	err = ice_sf_cfg_netdev(dyn_port, &sf_dev->priv->devlink_port);
-> +	if (err) {
-> +		dev_err(dev, "Subfunction netdev config failed");
-> +		goto err_devlink_destroy;
-> +	}
-> +
->  	err = devl_port_fn_devlink_set(&dyn_port->devlink_port, devlink);
->  	if (err) {
->  		dev_err(dev, "Can't link devlink instance to SF devlink port");
-> -		goto err_devlink_destroy;
-> +		goto err_netdev_decfg;
->  	}
->  
->  	ice_napi_add(vsi);
-> @@ -70,6 +150,8 @@ static int ice_sf_dev_probe(struct auxiliary_device *adev,
->  
->  	return 0;
->  
-> +err_netdev_decfg:
-> +	ice_sf_decfg_netdev(vsi);
->  err_devlink_destroy:
->  	ice_devlink_destroy_sf_dev_port(sf_dev);
->  err_vsi_decfg:
-> @@ -98,6 +180,7 @@ static void ice_sf_dev_remove(struct auxiliary_device *adev)
->  
->  	ice_vsi_close(vsi);
->  
-> +	ice_sf_decfg_netdev(vsi);
->  	ice_devlink_destroy_sf_dev_port(sf_dev);
->  	devl_unregister(devlink);
->  	devl_unlock(devlink);
-> -- 
-> 2.42.0
-> 
+This is also described in a comment in the source code in
+drivers/net/ethernet/broadcom/bnx2x/bnx2x.h just above the Macro definition
+of FP_SB_MAX_E1x. Below is the part of this explanation that it important
+for this patch
+
+/*
+  * The total number of L2 queues, MSIX vectors and HW contexts (CIDs) is
+  * control by the number of fast-path status blocks supported by the
+  * device (HW/FW). Each fast-path status block (FP-SB) aka non-default
+  * status block represents an independent interrupts context that can
+  * serve a regular L2 networking queue. However special L2 queues such
+  * as the FCoE queue do not require a FP-SB and other components like
+  * the CNIC may consume FP-SB reducing the number of possible L2 queues
+  *
+  * If the maximum number of FP-SB available is X then:
+  * a. If CNIC is supported it consumes 1 FP-SB thus the max number of
+  *    regular L2 queues is Y=X-1
+  * b. In MF mode the actual number of L2 queues is Y= (X-1/MF_factor)
+  * c. If the FCoE L2 queue is supported the actual number of L2 queues
+  *    is Y+1
+  * d. The number of irqs (MSIX vectors) is either Y+1 (one extra for
+  *    slow-path interrupts) or Y+2 if CNIC is supported (one additional
+  *    FP interrupt context for the CNIC).
+  * e. The number of HW context (CID count) is always X or X+1 if FCoE
+  *    L2 queue is supported. The cid for the FCoE L2 queue is always X.
+  */
+
+However this driver also supports NICs that use the E2 controller which can
+handle more queues due to having more FP-SB represented by FP_SB_MAX_E2.
+Looking at the commits when the E2 support was added, it was originally
+using the E1x parameters: commit f2e0899f0f27 ("bnx2x: Add 57712 support").
+Back then FP_SB_MAX_E2 was set to 16 the same as E1x. However the driver
+was later updated to take full advantage of the E2 instead of having it be
+limited to the capabilities of the E1x. But as far as we can tell, the
+array "stats_query_entry query" was still limited to using the FP-SB
+available to the E1x cards as part of an oversignt when the driver was
+updated to take full advantage of the E2, and now with the driver being
+aware of the greater queue size supported by E2 NICs, it causes the UBSAN
+warnings seen in the stack traces below.
+
+This patch increases the size of the "stats_query_entry query" array by
+replacing FP_SB_MAX_E1x with FP_SB_MAX_E2 to be large enough to handle
+both types of NICs.
+
+Stack traces:
+
+UBSAN: array-index-out-of-bounds in
+       drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1529:11
+index 20 is out of range for type 'stats_query_entry [19]'
+CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic
+	     #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9,
+	       BIOS P89 10/21/2019
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x76/0xa0
+ dump_stack+0x10/0x20
+ __ubsan_handle_out_of_bounds+0xcb/0x110
+ bnx2x_prep_fw_stats_req+0x2e1/0x310 [bnx2x]
+ bnx2x_stats_init+0x156/0x320 [bnx2x]
+ bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+ bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+ bnx2x_open+0x16b/0x290 [bnx2x]
+ __dev_open+0x10e/0x1d0
+RIP: 0033:0x736223927a0a
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca
+      64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00
+      f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
+RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
+RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
+R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
+</TASK>
+---[ end trace ]---
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in
+       drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1546:11
+index 28 is out of range for type 'stats_query_entry [19]'
+CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic
+	     #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9,
+	       BIOS P89 10/21/2019
+Call Trace:
+<TASK>
+dump_stack_lvl+0x76/0xa0
+dump_stack+0x10/0x20
+__ubsan_handle_out_of_bounds+0xcb/0x110
+bnx2x_prep_fw_stats_req+0x2fd/0x310 [bnx2x]
+bnx2x_stats_init+0x156/0x320 [bnx2x]
+bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
+bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
+bnx2x_open+0x16b/0x290 [bnx2x]
+__dev_open+0x10e/0x1d0
+RIP: 0033:0x736223927a0a
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca
+      64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00
+      f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
+RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
+RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
+R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
+ </TASK>
+---[ end trace ]---
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in
+       drivers/net/ethernet/broadcom/bnx2x/bnx2x_sriov.c:1895:8
+index 29 is out of range for type 'stats_query_entry [19]'
+CPU: 13 PID: 163 Comm: kworker/u96:1 Not tainted 6.9.0-060900rc7-generic
+	     #202405052133
+Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9,
+	       BIOS P89 10/21/2019
+Workqueue: bnx2x bnx2x_sp_task [bnx2x]
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x76/0xa0
+ dump_stack+0x10/0x20
+ __ubsan_handle_out_of_bounds+0xcb/0x110
+ bnx2x_iov_adjust_stats_req+0x3c4/0x3d0 [bnx2x]
+ bnx2x_storm_stats_post.part.0+0x4a/0x330 [bnx2x]
+ ? bnx2x_hw_stats_post+0x231/0x250 [bnx2x]
+ bnx2x_stats_start+0x44/0x70 [bnx2x]
+ bnx2x_stats_handle+0x149/0x350 [bnx2x]
+ bnx2x_attn_int_asserted+0x998/0x9b0 [bnx2x]
+ bnx2x_sp_task+0x491/0x5c0 [bnx2x]
+ process_one_work+0x18d/0x3f0
+ </TASK>
+---[ end trace ]---
+
+Fixes: 50f0a562f8cc ("bnx2x: add fcoe statistics")
+Signed-off-by: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+Cc: stable@vger.kernel.org
+---
+changes since v2:
+ * Undid all changes
+   - moved away from changing queue limit to comply with E1x and increased
+   statistics array queue to fit E2 devices instead.
+ * Updated Fixes section
+ * More explanatory commit message
+
+Changes since v1:
+ * Fix checkpatch complaints:
+   - Wrapped commit message to comply with 75 character limit
+   - Added space before ( in if condition
+
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x.h
+index e2a4e1088b7f..13c6a5eb9c15 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x.h
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x.h
+@@ -1262,7 +1262,7 @@ enum {
+ 
+ struct bnx2x_fw_stats_req {
+ 	struct stats_query_header hdr;
+-	struct stats_query_entry query[FP_SB_MAX_E1x+
++	struct stats_query_entry query[FP_SB_MAX_E2 +
+ 		BNX2X_FIRST_QUEUE_QUERY_IDX];
+ };
+ 
+-- 
+2.43.0
+
 
