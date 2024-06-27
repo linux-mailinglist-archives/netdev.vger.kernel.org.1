@@ -1,176 +1,116 @@
-Return-Path: <netdev+bounces-107224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 757AD91A542
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:30:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9319B91A54D
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 13:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 990971C22863
-	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:30:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D04BB23E16
+	for <lists+netdev@lfdr.de>; Thu, 27 Jun 2024 11:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4AF15216F;
-	Thu, 27 Jun 2024 11:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968D114EC7D;
+	Thu, 27 Jun 2024 11:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="lr1Eq6lI"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86556145A1F;
-	Thu, 27 Jun 2024 11:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC2C13E41F
+	for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 11:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719487739; cv=none; b=iryPlPsShP2PTvZ848nBV301pfIvBx4xqk+3BG092YgZcMmae4OnFIkz3nGBAYQ5HRuvTJPOdpYrIX68P7yudEroTirquiSVvzPTyO6ICLF89h7bv1bh/wtuhUzxchyhGYtX6B3mqu4F2fTACCLlRjM+1htYQfQicI3bWVvcCis=
+	t=1719487830; cv=none; b=s7jk5LXicJiSJnAYkH5SZ+1e39zqdcJ3rpxKxDz/kuj+Oq+2IXHZ7//o/M+32dCxgrEa0FmCqq0WcRKgfcpsUcKTdrY6Wmi1HNgSRmlvTKkufhbmIAWlAzLUGut2NdZXTJ7YZ8KYKTKOcNkrEkMJALwkdu3JjAzw8gqvQZdWDno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719487739; c=relaxed/simple;
-	bh=DxxuywpAijUqea/EY+mDV8FLeBQMkZhzKz6bn8siyzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B2yZHxwpl9oKgGI/IVwNAxRRlWvqr9zglwcX0bNxhCqhOFFmEDI5g4v1WxNfTwkUPhtk9hRdgcSmp+YlMucwJXj6ndnr14d+W6TYAC6V/rQ59t68HSCtHMS8cQHSRuGZRvPPE4lDBWOoAGdKlgwi9Sf8o4JwdTgr8JjBnA2ZYPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=34044 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sMnJ6-009Zhj-R4; Thu, 27 Jun 2024 13:28:54 +0200
-Date: Thu, 27 Jun 2024 13:28:51 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH nf-next 00/19] Netfilter/IPVS updates for net-next
-Message-ID: <Zn1M890ZdC1WRekQ@calendula>
-References: <20240627112713.4846-1-pablo@netfilter.org>
+	s=arc-20240116; t=1719487830; c=relaxed/simple;
+	bh=V7r2h21rFTkzap9aygRNENNVZJFQU3oVk0zUaTf6w7Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l90MT70b0F4/PjTc9ODjyJ/FMNlx427PBQ9B1KS47j8wpn1nnU/toB/eyoI7GUwAFdFAL7QodnH5oKKwAwkQPWXB/EJwDStLWWyv5dViJffZNHfe7wMV7aaGKHxDUIACxUTctlq8HHLv549W3Ui0LuJLpdhvGbJuXiLieFvnRhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=lr1Eq6lI; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3645e9839b3so5852927f8f.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 04:30:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719487827; x=1720092627; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=19tyJfMUE4DVOIgXmup8kim9fX5UU6ImAnNUuH8s+bE=;
+        b=lr1Eq6lIphuTmEDaWXHvfdxxkCzm4V50A0T5G1cyI3niLKSvTvcyKkw+PfdvOZIgy5
+         bULn7We22ZVC7gewAtkESbmUrlj6g1nxDvBrR3Hb8yar4SisT6dKoSQ6suIVhzM4CRCi
+         LF5qoUC9yyXX2JAXA5X7PUIBytohD9B/wQf6B/y7X8zNIULmIfQoMu9WvExofQvigr3H
+         kHfZlhM2RyivtQmKDsOI4XUWo511LEzC1dvhrOuQJNqYu2Qmb+5PuYRdtuWVnFyzVwag
+         ZptaSUlIgYqVcuc9Ykrd8+sI848VXc0NYBN8gO93HcW5JR/AICvaKmcjs3WAnp1XNgXH
+         7hTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719487827; x=1720092627;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=19tyJfMUE4DVOIgXmup8kim9fX5UU6ImAnNUuH8s+bE=;
+        b=W8X50+pZd0PVZkYb0UGfGiLeIgBN5PjqG4goCT1lvYWOMstiZk6HIDyeTg83ZSh480
+         PwEgGXUrLpjLPkXQ69/soKfz3fHg2+noNj5ZDagZkVV3OzTHRLaURDISBX6RP5zBN/0a
+         G9Kr0BLzYgwticzwYa+iRpmoAt26lDBOh/i/pZg1EJg8cpfXRVYFlpYsdVmHyZLObyYi
+         83NnG62RC/1G+qk3yWdnjJo0frpYw6ibOnl/2U6et3tU6qZ1Thixcf2gzPTcieIKiAK5
+         PDsmzJjHvwVzWpXoL7Uj2rsIFw1YR/5afR65j05+tVldnrhUK0icq9thaQzz8i0j88od
+         uLKg==
+X-Gm-Message-State: AOJu0YzIvhEwa6J9VqInOD0qq6dnPuaMThf/Ivs2GwLHU9ahNaUb4hOz
+	xQhfQbkVF4Zug45NZvlknk7M04P6ix38RwhRVHd1jHSe7RD1g65BQf+KA51fVjQ=
+X-Google-Smtp-Source: AGHT+IHSUpz5bBPpRgQwtkfsRytpc7pZaY3huimeERHs0j+GwTVHATRTX1rTfcNxT4paSJOr0EG8Gw==
+X-Received: by 2002:a05:6000:231:b0:35e:6472:4390 with SMTP id ffacd0b85a97d-366e79fe9eamr7560475f8f.27.1719487827268;
+        Thu, 27 Jun 2024 04:30:27 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:7fe5:47e9:28c5:7f25])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36743699ae0sm1504111f8f.66.2024.06.27.04.30.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 04:30:27 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v2 net-next 0/3] net: phy: aquantia: enable support for aqr115c
+Date: Thu, 27 Jun 2024 13:30:14 +0200
+Message-ID: <20240627113018.25083-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240627112713.4846-1-pablo@netfilter.org>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
 
-Note for netdev maintainer: This PR is actually targeted at *net-next*.
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Please, let me know if you prefer I resubmit.
+This is a smaller chunk of the bigger series that enables support for
+aqr115c and fixes a firmware boot issue preventing it from working on
+sa8775p-ride.
 
-On Thu, Jun 27, 2024 at 01:26:54PM +0200, Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> The following patchset contains Netfilter/IPVS updates for net-next:
-> 
-> Patch #1 to #11 to shrink memory consumption for transaction objects:
-> 
->   struct nft_trans_chain { /* size: 120 (-32), cachelines: 2, members: 10 */
->   struct nft_trans_elem { /* size: 72 (-40), cachelines: 2, members: 4 */
->   struct nft_trans_flowtable { /* size: 80 (-48), cachelines: 2, members: 5 */
->   struct nft_trans_obj { /* size: 72 (-40), cachelines: 2, members: 4 */
->   struct nft_trans_rule { /* size: 80 (-32), cachelines: 2, members: 6 */
->   struct nft_trans_set { /* size: 96 (-24), cachelines: 2, members: 8 */
->   struct nft_trans_table { /* size: 56 (-40), cachelines: 1, members: 2 */
-> 
->   struct nft_trans_elem can now be allocated from kmalloc-96 instead of
->   kmalloc-128 slab.
-> 
->   Series from Florian Westphal. For the record, I have mangled patch #1
->   to add nft_trans_container_*() and use if for every transaction object.
->    I have also added BUILD_BUG_ON to ensure struct nft_trans always comes
->   at the beginning of the container transaction object. And few minor
->   cleanups, any new bugs are of my own.
-> 
-> Patch #12 simplify check for SCTP GSO in IPVS, from Ismael Luceno.
-> 
-> Patch #13 nf_conncount key length remains in the u32 bound, from Yunjian Wang.
-> 
-> Patch #14 removes unnecessary check for CTA_TIMEOUT_L3PROTO when setting
-> 	  default conntrack timeouts via nfnetlink_cttimeout API, from
-> 	  Lin Ma.
-> 
-> Patch #15 updates NFT_SECMARK_CTX_MAXLEN to 4096, SELinux could use
-> 	  larger secctx names than the existing 256 bytes length.
-> 
-> Patch #16 fixes nfnetlink_queue with SCTP traffic, from Antonio Ojea.
-> 
-> Patch #17 adds a selftest for SCTP traffic under nfnetlink_queue,
-> 	  also from Antonio.
-> 
-> Patch #18 adds a selftest to exercise nfnetlink_queue listeners leaving
-> 	  nfnetlink_queue, from Florian Westphal.
-> 
-> Patch #19 increases hitcount from 255 to 65535 in xt_recent, from Phil Sutter.
-> 
-> Please, pull these changes from:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-06-27
-> 
-> Thanks.
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit c4532232fa2a4f8d9b9a88135a666545157f3d13:
-> 
->   selftests: net: remove unneeded IP_GRE config (2024-06-25 08:37:55 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-06-27
-> 
-> for you to fetch changes up to 8871d1e4dceb6692ea8217b1fc835c4bf2e93d97:
-> 
->   netfilter: xt_recent: Lift restrictions on max hitcount value (2024-06-27 01:55:57 +0200)
-> 
-> ----------------------------------------------------------------
-> netfilter pull request 24-06-27
-> 
-> ----------------------------------------------------------------
-> Antonio Ojea (2):
->       netfilter: nfnetlink_queue: unbreak SCTP traffic
->       selftests: netfilter: nft_queue.sh: sctp coverage
-> 
-> Florian Westphal (12):
->       netfilter: nf_tables: make struct nft_trans first member of derived subtypes
->       netfilter: nf_tables: move bind list_head into relevant subtypes
->       netfilter: nf_tables: compact chain+ft transaction objects
->       netfilter: nf_tables: reduce trans->ctx.table references
->       netfilter: nf_tables: pass nft_chain to destroy function, not nft_ctx
->       netfilter: nf_tables: pass more specific nft_trans_chain where possible
->       netfilter: nf_tables: avoid usage of embedded nft_ctx
->       netfilter: nf_tables: store chain pointer in rule transaction
->       netfilter: nf_tables: reduce trans->ctx.chain references
->       netfilter: nf_tables: pass nft_table to destroy function
->       netfilter: nf_tables: do not store nft_ctx in transaction objects
->       selftests: netfilter: nft_queue.sh: add test for disappearing listener
-> 
-> Ismael Luceno (1):
->       ipvs: Avoid unnecessary calls to skb_is_gso_sctp
-> 
-> Lin Ma (1):
->       netfilter: cttimeout: remove 'l3num' attr check
-> 
-> Pablo Neira Ayuso (1):
->       netfilter: nf_tables: rise cap on SELinux secmark context
-> 
-> Phil Sutter (1):
->       netfilter: xt_recent: Lift restrictions on max hitcount value
-> 
-> Yunjian Wang (1):
->       netfilter: nf_conncount: fix wrong variable type
-> 
->  include/net/netfilter/nf_tables.h                  | 222 +++++++----
->  include/uapi/linux/netfilter/nf_tables.h           |   2 +-
->  net/core/dev.c                                     |   1 +
->  net/netfilter/ipvs/ip_vs_proto_sctp.c              |   4 +-
->  net/netfilter/nf_conncount.c                       |   8 +-
->  net/netfilter/nf_tables_api.c                      | 411 ++++++++++++---------
->  net/netfilter/nf_tables_offload.c                  |  40 +-
->  net/netfilter/nfnetlink_cttimeout.c                |   3 +-
->  net/netfilter/nfnetlink_queue.c                    |  12 +-
->  net/netfilter/nft_immediate.c                      |   2 +-
->  net/netfilter/xt_recent.c                          |   8 +-
->  tools/testing/selftests/net/netfilter/nft_queue.sh | 113 ++++++
->  12 files changed, 546 insertions(+), 280 deletions(-)
-> 
+Changes since v1:
+- split out the PHY patches into their own series
+- don't introduce new mode (OCSGMII) but use existing 2500BASEX instead
+- split the wait-for-FW patch into two: one renaming and exporting the
+  relevant function and the second using it before checking the FW ID
+Link to v1: https://lore.kernel.org/linux-arm-kernel/20240619184550.34524-1-brgl@bgdev.pl/T/
+
+Bartosz Golaszewski (3):
+  net: phy: aquantia: rename and export aqr107_wait_reset_complete()
+  net: phy: aquantia: wait for FW reset before checking the vendor ID
+  net: phy: aquantia: add support for aqr115c
+
+ drivers/net/phy/aquantia/aquantia.h          |  1 +
+ drivers/net/phy/aquantia/aquantia_firmware.c |  4 ++
+ drivers/net/phy/aquantia/aquantia_main.c     | 45 ++++++++++++++++++--
+ 3 files changed, 46 insertions(+), 4 deletions(-)
+
+-- 
+2.43.0
+
 
