@@ -1,189 +1,132 @@
-Return-Path: <netdev+bounces-107701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CEB691BFBB
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:39:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D8091BFEF
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C961DB2056C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:39:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1DB1C20C41
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2DC1E529;
-	Fri, 28 Jun 2024 13:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0949E15B98D;
+	Fri, 28 Jun 2024 13:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CBBhvc1/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZWVSCkG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADBB1E4A1
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 13:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2108155CAE
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 13:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719581977; cv=none; b=T6vu4aTGyFXHDaUtrUkgXX3CrA0pBQ7AsPj1gCJnM9KbdJ543sctVY1Hh+Crz9Gb6HFpfZwNXQoJWc0p8opxi1ei65hCt6tl7q/TwA8qV8O6EUbivIXbF61rlzXuQ6QTTd0dH6EZxPwDvEEXKP+pqJun6bdGoodoZKti4+43IcQ=
+	t=1719582553; cv=none; b=WCKvczZ9+64HiJRx33wymMBIMfLjN/vQ2FLQHHEEt8LErWKIFgspN0wn1M2P1EW7cKesheGHKTpD003OzFTSu1XG3R6hb3vZzi2l37YIsDq7cFoMnO8wFvfYGJFrpdcPl/zpv/dd0P0hTs1sxYEDQ7KQ5Omh856dM+iG21XeBzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719581977; c=relaxed/simple;
-	bh=faYMoe80vaKC3QXdB853GMfAvH8zjYHBxZAuLm8qo0o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D9TJBvd3EtTBVk+LN+bn0X0WFCr2j4zbCBRjeCMIgyVPofdix5cJ86JpWCL4ZImPDltMl5WYYx0KCxV5nMOHLDgPUHgHAXZYG1LhhGbpQOycETUcuVkRRQW3GPehbS6CirSqFoh6sGTT/AcnTiHYWeIp8S6uXvSGK3TjvUUNsyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CBBhvc1/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719581976; x=1751117976;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=faYMoe80vaKC3QXdB853GMfAvH8zjYHBxZAuLm8qo0o=;
-  b=CBBhvc1/PVyTm6q9vuv/tuDxcN3w2NRcH+JrLetF27fXsUiNw80muxRb
-   o9HXbeYz5wiNwKjY45CjKka70tZsU0u3TjBsT8HbDRbST04zkD4cZWojh
-   Zgdw9hWgI9rqAsuRRlgFcfgMpFBY26qKklboOnKlhQf7yZJNCpE1MaaxL
-   T+hqjGl6SRwQ7gWfj09TbK8pG2of/wVEADWIjhPlux7pbaSB2+WIN8qQI
-   0KhfACe4Pj61uc4ZUmIl95eINSgAkALPrifZ4gz8fPnb0gK0zU8qrh/PF
-   aVrYiQaix8eqcMSfMPTjHKY2bG03takfWurRyd3ujo4U3QNM6I7m/4xPY
-   w==;
-X-CSE-ConnectionGUID: gUaaEHQCRAC2KETQV7PuWw==
-X-CSE-MsgGUID: BcwoWcjgQtuOVa4XHcc6IA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11117"; a="16503419"
-X-IronPort-AV: E=Sophos;i="6.09,169,1716274800"; 
-   d="scan'208";a="16503419"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 06:39:35 -0700
-X-CSE-ConnectionGUID: J+pl2M/eQFyiRAJKeWbYMQ==
-X-CSE-MsgGUID: 5oCMnSywSvW5oGRBOKWoPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,169,1716274800"; 
-   d="scan'208";a="82293240"
-Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.26.245]) ([10.246.26.245])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 06:39:33 -0700
-Message-ID: <96df3ad4-dd4b-409d-98ed-aa5c6173b579@linux.intel.com>
-Date: Fri, 28 Jun 2024 15:39:27 +0200
+	s=arc-20240116; t=1719582553; c=relaxed/simple;
+	bh=FK71NqbAWSH2AAmcWOWt/E0/+ASk2QsRfQOo0BiuHbY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WolBNWYN6w8m4dZJfUdKToLirZz0SrX9dUdCTSdNqXNsUMaW0sn2url3qBBDSej/cshbcDofs1Y++XDWCUybsq35AOBPHywFQ+qlXlDA9WpAdI2eBK5bEoYc0FalG5PyQ5/tyOIaAf0JdRRRcKp2/Qx5LnNgpyrP9WjsWJQJimk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CZWVSCkG; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-706638d392cso27629b3a.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 06:49:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719582552; x=1720187352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8YA5RqSQLCvr6hDzMBQtvwJ4PZ6M98OsInhZdtLy+VY=;
+        b=CZWVSCkGNz15Rtxfuk+MR5l88qLGgXMVs+tOMemo8yMIxzXuVCdAVGP1S8VZjmpEfg
+         M7WBdtuWq1FTnoyT9S4/72VOtchREWmGncbCtpsmhq873AEV+VQnFXYt3scVOJfBBHyK
+         CZiiDnDnteVunYBMeGYfvRxPF2o2m9a8XZxtWL6W6y9+9DN8iXqqPowRFSqAC7It9fXy
+         yNOtVIFh/OqlQEf2VubCXR5T4CctJnwWOaTFUYIN9B4lozbvmzToZAM7uABqGFJS/O5F
+         qcarsHFlKP7kAtxCzHj7hqAIMgh+pLRUhUe+juG73pO+aCPpDxNlg4yi1gDqh2qz7jn8
+         9fzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719582552; x=1720187352;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8YA5RqSQLCvr6hDzMBQtvwJ4PZ6M98OsInhZdtLy+VY=;
+        b=kU935HSk/kOwOnt1m22YTE5t8vA7ejTOfgxeyJ+P5NPOKGJdRU5l3bKY4QoX5KC6yP
+         KUJo7Wd6PxhBf+YRXzRo2Os+AenZEm80Fli4TyGmVqD0KoaWgqPuM4pRG8AVZTRASLGA
+         vt4dgGNZ/TJqggWzEJDCZ/erMGnw13iInjiVgI8n6JaVSeAvLb4A2JiOm1cjX8WPuShF
+         LMIpLSjp5cEZ08qaj3m+VCZRlzKGjVoi/+QWPC+RoeUQ4oov4MD9POwqltj2dcXGTkOl
+         /a30Tupte/71WGK9S2CP/MGDZnu4t2fPylNbVpJQhkzh0rqU3+v1Xjl0xaS+zOmI6CFG
+         wq9A==
+X-Gm-Message-State: AOJu0YxMkdD/sV+0SW/KqOmEK5WY21oZpXNoExNwy8vUr8x0A1FSdqvw
+	a33z0YXty821v6oL1vsexAIcvLWWiP4SOG8YZanBP8rVyjU8foF+8NoNKnXi
+X-Google-Smtp-Source: AGHT+IGT07931c2HORKXtvuiVjr+hXA3oClaICFSvIWFV8xh1uqQLwDQrW8R1OLHdWvt9GP2fNGrwA==
+X-Received: by 2002:a05:6a20:9188:b0:1be:4c5a:eef4 with SMTP id adf61e73a8af0-1be4c5af607mr9340824637.3.1719582551715;
+        Fri, 28 Jun 2024 06:49:11 -0700 (PDT)
+Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70803ecf8e4sm1593547b3a.133.2024.06.28.06.49.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 06:49:11 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	linux@armlinux.org.uk
+Subject: [PATCH net-next] net: tn40xx: add initial ethtool_ops support
+Date: Fri, 28 Jun 2024 22:41:16 +0900
+Message-Id: <20240628134116.120209-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 5/6] ice: Optimize switch
- recipe creation
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- przemyslaw.kitszel@intel.com, michal.swiatkowski@linux.intel.com
-References: <20240618141157.1881093-1-marcin.szycik@linux.intel.com>
- <20240618141157.1881093-6-marcin.szycik@linux.intel.com>
- <20240628124409.GD783093@kernel.org>
-Content-Language: en-US
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-In-Reply-To: <20240628124409.GD783093@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Call phylink_ethtool_ksettings_get() for get_link_ksettings method and
+ethtool_op_get_link() for get_link method.
 
+Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+---
+ drivers/net/ethernet/tehuti/tn40.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-On 28.06.2024 14:44, Simon Horman wrote:
-> On Tue, Jun 18, 2024 at 04:11:56PM +0200, Marcin Szycik wrote:
->> Currently when creating switch recipes, switch ID is always added as the
->> first word in every recipe. There are only 5 words in a recipe, so one
->> word is always wasted. This is also true for the last recipe, which stores
->> result indexes (in case of chain recipes). Therefore the maximum usable
->> length of a chain recipe is 4 * 4 = 16 words. 4 words in a recipe, 4
->> recipes that can be chained (using a 5th one for result indexes).
->>
->> Current max size chained recipe:
->> 0: smmmm
->> 1: smmmm
->> 2: smmmm
->> 3: smmmm
->> 4: srrrr
->>
->> Where:
->> s - switch ID
->> m - regular match (e.g. ipv4 src addr, udp dst port, etc.)
->> r - result index
->>
->> Switch ID does not actually need to be present in every recipe, only in one
->> of them (in case of chained recipe). This frees up to 8 extra words:
->> 3 from recipes in the middle (because first recipe still needs to have
->> switch ID), and 5 from one extra recipe (because now the last recipe also
->> does not have switch ID, so it can chain 1 more recipe).
->>
->> Max size chained recipe after changes:
->> 0: smmmm
->> 1: Mmmmm
->> 2: Mmmmm
->> 3: Mmmmm
->> 4: MMMMM
->> 5: Rrrrr
->>
->> Extra usable words available after this change are highlighted with capital
->> letters.
->>
->> Changing how switch ID is added is not straightforward, because it's not a
->> regular lookup. Its FV index and mask can't be determined based on protocol
->> + offset pair read from package and instead need to be added manually.
->>
->> Additionally, change how result indexes are added. Currently they are
->> always inserted in a new recipe at the end. Example for 13 words, (with
->> above optimization, switch ID being one of the words):
->> 0: smmmm
->> 1: mmmmm
->> 2: mmmxx
->> 3: rrrxx
->>
->> Where:
->> x - unused word
->>
->> In this and some other cases, the result indexes can be moved just after
->> last matches because there are unused words, saving one recipe. Example
->> for 13 words after both optimizations:
->> 0: smmmm
->> 1: mmmmm
->> 2: mmmrr
->>
->> Note how one less result index is needed in this case, because the last
->> recipe does not need to "link" to itself.
->>
->> There are cases when adding an additional recipe for result indexes cannot
->> be avoided. In that cases result indexes are all put in the last recipe.
->> Example for 14 words after both optimizations:
->> 0: smmmm
->> 1: mmmmm
->> 2: mmmmx
->> 3: rrrxx
->>
->> With these two changes, recipes/rules are more space efficient, allowing
->> more to be created in total.
->>
->> Co-developed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> 
-> I appreciate the detailed description above, it is very helpful.
-> After a number of readings of this patch - it is complex -
-> I was unable to find anything wrong. And I do like both the simplification
-> and better hw utilisation that this patch (set) brings.
-> 
-> So from that perspective:
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> I would say, however, that it might have been easier to review
-> if somehow this patch was broken up into smaller pieces.
-> I appreciate that, in a sense, that is what the other patches
-> of this series do. But nonetheless... it is complex.
+diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
+index 11db9fde11fe..565b72537efa 100644
+--- a/drivers/net/ethernet/tehuti/tn40.c
++++ b/drivers/net/ethernet/tehuti/tn40.c
+@@ -1571,6 +1571,19 @@ static const struct net_device_ops tn40_netdev_ops = {
+ 	.ndo_vlan_rx_kill_vid = tn40_vlan_rx_kill_vid,
+ };
+ 
++static int tn40_ethtool_get_link_ksettings(struct net_device *ndev,
++					   struct ethtool_link_ksettings *cmd)
++{
++	struct tn40_priv *priv = netdev_priv(ndev);
++
++	return phylink_ethtool_ksettings_get(priv->phylink, cmd);
++}
++
++static const struct ethtool_ops tn40_ethtool_ops = {
++	.get_link		= ethtool_op_get_link,
++	.get_link_ksettings	= tn40_ethtool_get_link_ksettings,
++};
++
+ static int tn40_priv_init(struct tn40_priv *priv)
+ {
+ 	int ret;
+@@ -1599,6 +1612,7 @@ static struct net_device *tn40_netdev_alloc(struct pci_dev *pdev)
+ 	if (!ndev)
+ 		return NULL;
+ 	ndev->netdev_ops = &tn40_netdev_ops;
++	ndev->ethtool_ops = &tn40_ethtool_ops;
+ 	ndev->tx_queue_len = TN40_NDEV_TXQ_LEN;
+ 	ndev->mem_start = pci_resource_start(pdev, 0);
+ 	ndev->mem_end = pci_resource_end(pdev, 0);
 
-Yeah... it is a bit of a revolution, and unfortunately I don't think much of
-if could be separated into other patches. Maybe functions like
-fill_recipe_template() and bookkeep_recipe() would be good candidates.
-If there will be another version, I'll try to separate some of it.
+base-commit: 94833addfaba89d12e5dbd82e350a692c00648ab
+-- 
+2.34.1
 
-Thank you for reviewing!
-Marcin
-
-> 
-> ...
 
