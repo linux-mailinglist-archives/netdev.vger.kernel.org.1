@@ -1,149 +1,309 @@
-Return-Path: <netdev+bounces-107659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8B991BD2D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:11:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC2BB91BD33
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434F71C21ADF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C80282C5F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D28C155C96;
-	Fri, 28 Jun 2024 11:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F4814B975;
+	Fri, 28 Jun 2024 11:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rnKAtHc7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvgDbvC4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72258152526;
-	Fri, 28 Jun 2024 11:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05B123D0
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 11:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719573112; cv=none; b=OoqNKahwlIMSYunH2/lOsIgIPVx/X1yR3hPE8O0wQ04T/5KMeBuNkhESs65r2i3ptZB6TycQwgRNfqhGvXcq3a5TTuIjGaugdVBtMXqZTfQdknFidCaqkDY5LOT3DkdLA/whYcgjkCwC55dUXo3Fsf7hp0pmBCzjGMpXECqj5b0=
+	t=1719573398; cv=none; b=sHZ81r5XDNqwT5JYJhQU2Cy8EbL6D8flt+xHh7Lp9fLpG4fui01ANlkqb/WCiBcPRBghssCTSxdfAJ/9gatUb3VO0WUxQTS+lvXPOkExMhpkzaubEFxmmm/ZZ9mgiMXLO9EvP8ZfdV4o5HkFPIicToVtkf97Gwn3E88ydd6wO3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719573112; c=relaxed/simple;
-	bh=IhCJ8q0wQv2Uqdfm8DAp0L2pfQSawU2VAK6mGUolM8k=;
+	s=arc-20240116; t=1719573398; c=relaxed/simple;
+	bh=cB2Lot4axGNas2OU5FTaj1NgaR3at77/54FACPAlKc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3cU8xYQ1XlC6f1pjS8VD4F4Ntvy1HH/OFlwXewbHf6cfprPAAZVMMo9cZ3m3Tn6TbBdqn90i0RdAFZ36y1QU+wm7+L2C1405Rpl2FCvyJcB2b0m0vLcikOGBQvRZ1t2bJkX4lApWXhgtwoEs1HcW61BP9udxSXlvwegRZGEH5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rnKAtHc7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC7BC116B1;
-	Fri, 28 Jun 2024 11:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719573111;
-	bh=IhCJ8q0wQv2Uqdfm8DAp0L2pfQSawU2VAK6mGUolM8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rnKAtHc7PkDH8sTRhTTHhdadT8c30XblnQHJjzE+Rdg7OA9O3N4+nYdV53ffPxMJ7
-	 u1JYkVOpauzsxKUX1lBzIKSNwXr26WnzJRgIxoN2BonG+6LIeRwpQiqyKHq5ck/V14
-	 JU6fb5gdser9V849G5GLRza4GAaUttzRHgM8uWcZsAk+1/PioyD8xB2laahi+gF4iP
-	 Yr1F0PFiPoa7YRd/6jD+GanvaPKBY8z4pvAD6YD359xvG/xBRkSiFSO49bVT/6MQLp
-	 8KUmW/8W5xyyoTtcl2RzHDb2VDHihIeiBPKE2mFdapa0ApX4JDElmQmFYhGyXApOd7
-	 dEQUxcVHjn9gQ==
-Date: Fri, 28 Jun 2024 13:11:48 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Benjamin Larsson <benjamin.larsson@genexis.eu>, netdev@vger.kernel.org,
-	nbd@nbd.name, lorenzo.bianconi83@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	conor@kernel.org, linux-arm-kernel@lists.infradead.org,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, devicetree@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com, rkannoth@marvell.com,
-	sgoutham@marvell.com
-Subject: Re: [PATCH v3 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <Zn6adEvjBBxAoQNK@lore-desk>
-References: <cover.1719159076.git.lorenzo@kernel.org>
- <89c9c226ddb31d9ff3d31231e8f532a3e983363a.1719159076.git.lorenzo@kernel.org>
- <2752c453-cabd-4ca0-833f-262b221de240@lunn.ch>
- <b023dfb3-ca8e-4045-b0b1-d6e498961e9c@genexis.eu>
- <4a39fa50-cffc-4f0c-a442-b666b024ba34@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mBnZvvnhibFct4tB8BuhSmOmYxJN4cFd8In0aVVA8ETcdAvACeKjF3BjbEBYffpTyRRgt7NR7HOZyPVmXK+BzDfci1VipNCWv6TDNyGCWaoo0GVCTr7ZhtvjeoUhJmRN6XAGS6GH9ZoCFBpLpHnGZ7NlcxDi8NSWR7HNJU0wmGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FvgDbvC4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719573395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
+	b=FvgDbvC4C/woUSCEx+yanSrez8gh5wWphFXnesczqEccoFXcB1JFv0iXxNa2UU1zpSa/Rh
+	h8rjAcH5uikTE4YHBF8VQ95ovk8Vv82i0ns7g+wVQQJvQ8lDr2hQd9dKKoqIuGataPGQ23
+	JZ3cSYgZMiXkBmUKT+hnqM8VNZwhFi4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-x7soqW4ZPzWuT5GdSL_GBA-1; Fri, 28 Jun 2024 07:16:34 -0400
+X-MC-Unique: x7soqW4ZPzWuT5GdSL_GBA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4248fa5daacso4538375e9.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 04:16:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719573392; x=1720178192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
+        b=saNlumQz6c4+CmJT/Ktvi9eNxkMliZDf3zESTsrg9+Guie2GsG0sBCTmgXYYwZCR7o
+         E1ao1BcIQiF2FsJC+lLmc3qRaxXTDVYTSqsEaSrL9l3xTkR4HlKFTBGIco9TeoWhZKKk
+         sEjElgKCLctYCArp1DZ0MF5qLWOS0FL5FTMgyRO8gWNJDjgySyzwkp8zGfjJ2TpxJRRV
+         eT0O1vavM520DKwNKlfP4cBKFtKDu2B3xDh+qsKUjpumTG8aY5z7f2LHLE+li/7dsf8f
+         UmupuJFIgo5Z96GMk6h9Ly3rg2MM7DH21do7lxQ8K5uz4JfGfmcVH7vjoxPYoRQFQBXo
+         hg3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUVHQEh2yNyPCaftDzMrf/qH87Dzbr6dj9V2hCFn52GFEGOmAaLppM8cYTrxN6pvLEhJ1sNw5+C4oSym/QjDLB25dSUok8h
+X-Gm-Message-State: AOJu0YxT4ugLAgmqX1WLpukBWsJTH+ZPszEMVZNhQHFJla2FCMVkcuCG
+	apmYR4RKieJ4DyAaj2DnStIa3Xp0jy2HOTSnPs2y2iMIIOpLhc8NcCn5Zd0N8RyPIsU7Z7Fx4Cs
+	NnxmqEkH1zoz9RfbrwyRA/1E5aTxRdBCcFixHGrMZNv9K1sBeLTf3Cw==
+X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49513945e9.28.1719573391984;
+        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyPwfEwM5GqciNJwTRavZB5JFhzJ9CBQ2fFV7Dql3t6q6MFOInK4WYOf9EpanV+QVZr8fUGw==
+X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49513745e9.28.1719573391339;
+        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.134.173])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b063485sm30356325e9.21.2024.06.28.04.16.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 04:16:30 -0700 (PDT)
+Date: Fri, 28 Jun 2024 13:16:24 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: luigi.leonardi@outlook.com
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] vsock/virtio: add SIOCOUTQ support for
+ all virtio based transports
+Message-ID: <7ejdsieevuooprdaprn2ymqqv5ssd2fntlp6tsodeu6pvnuvue@chzg6ww45bni>
+References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
+ <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lAs16Qv/8RWOgpBa"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <4a39fa50-cffc-4f0c-a442-b666b024ba34@lunn.ch>
+In-Reply-To: <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
 
+On Wed, Jun 26, 2024 at 02:08:36PM GMT, Luigi Leonardi via B4 Relay wrote:
+>From: Luigi Leonardi <luigi.leonardi@outlook.com>
+>
+>Introduce support for stream_bytes_unsent and seqpacket_bytes_unsent
+>ioctl for virtio_transport, vhost_vsock and vsock_loopback.
+>
+>For all transports the unsent bytes counter is incremented
+>in virtio_transport_get_credit.
+>
+>In the virtio_transport (G2H) the counter is decremented each
+>time the host notifies the guest that it consumed the skbuffs.
+>In vhost-vsock (H2G) the counter is decremented after the skbuff
+>is queued in the virtqueue.
+>In vsock_loopback the counter is decremented after the skbuff is
+>dequeued.
+>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> drivers/vhost/vsock.c                   |  4 +++-
+> include/linux/virtio_vsock.h            |  7 +++++++
+> net/vmw_vsock/virtio_transport.c        |  4 +++-
+> net/vmw_vsock/virtio_transport_common.c | 35 +++++++++++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  7 +++++++
+> 5 files changed, 55 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index ec20ecff85c7..dba8b3ea37bf 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 					restart_tx = true;
+> 			}
+>
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 		}
+> 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+> 	if (added)
+>@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
 
---lAs16Qv/8RWOgpBa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The callback is named `unsent_bytes`, I'd use something similar also
+in the function name, so `virtio_transport_unsent_bytes`, or the
+opposite renaming the callback, as you prefer, but I'd use the same
+for both.
 
-> On Mon, Jun 24, 2024 at 01:01:44AM +0200, Benjamin Larsson wrote:
-> > Hi,
-> > > Code like this is making me wounder about the split between MAC
-> > > driver, DSA driver and DSA tag driver. Or if it should actually be a
-> > > pure switchdev driver?
-> > >=20
-> > > If there some open architecture documentation for this device?
-> > >=20
-> > > What are these ports about?
-> > >=20
-> > > > +static int airoha_dev_open(struct net_device *dev)
-> > > > +{
-> > > > +	struct airoha_eth *eth =3D netdev_priv(dev);
-> > > > +	int err;
-> > > > +
-> > > > +	if (netdev_uses_dsa(dev))
-> > > > +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > > > +	else
-> > > > +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > > Does that imply both instances of the GMAC are not connected to the
-> > > switch? Can one be used with a PHY?
-> > >=20
-> > > 	Andrew
-> >=20
-> > https://mirror2.openwrt.org/docs/MT7981B_Wi-Fi6_Platform_Datasheet_Open=
-_V1.0.pdf
-> >=20
-> > page 107 (text for 9.1.1 is relevant but not a complete match). In the
-> > EN7581 case there is a 5 port switch in the place of GMAC1 (one switch =
-port
-> > is connected to GDM1).
->=20
-> The typical DSA architecture is that the SoC MAC is connected to a
-> switch MAC port. You say here, the switch is directly connected to the
-> GGM1. So there is no GMAC involved? If there is no MAC, you don't need
-> a MAC driver.
->=20
-> It seems more likely there is a GMAC, and the SGMII interface, or
-> something similar is connected to the switch?
->=20
-> 	Andrew
->=20
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index c82089dee0c8..e74c12878213 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -134,6 +134,8 @@ struct virtio_vsock_sock {
+> 	u32 peer_fwd_cnt;
+> 	u32 peer_buf_alloc;
+>
 
-The EN7581 architecture is similar to MT7988a one. There is a MAC port (GDM=
-1)=20
-connected to a MT7530 DSA switch. With 'directly connected', I think Benjam=
-in
-means we rely on the switch internal PHYs for GDM1. Moreover the SoC suppor=
-ts
-other MAC ports (GDM2, GDM3, GDM4) that can be connected to extanl PHYs.
-In v4 I will rework the driver adding the capability to plug even GDM{2,3,4=
-}.
+Can you remove this extra empty line, so it's clear that it is
+protected by tx_lock?
 
-Regards,
-Lorenzo
+>+	size_t bytes_unsent;
+>+
+> 	/* Protected by rx_lock */
+> 	u32 fwd_cnt;
+> 	u32 last_fwd_cnt;
+>@@ -193,6 +195,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+> u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
+>
+>+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk);
+>+
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb,
+>+				       bool consume);
+>+
+> int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+> 				 struct vsock_sock *psk);
+> int
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 43d405298857..fc62d2818c2c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -311,7 +311,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
+>
+> 		virtqueue_disable_cb(vq);
+> 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 			added = true;
+> 		}
+> 	} while (!virtqueue_enable_cb(vq));
+>@@ -540,6 +540,8 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 16ff976a86e3..3a7fa36f306b 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -463,6 +463,26 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
+>
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
+>+{
+>+	struct sock *s = skb->sk;
+>+
+>+	if (s && skb->len) {
+>+		struct vsock_sock *vs = vsock_sk(s);
+>+		struct virtio_vsock_sock *vvs;
+>+
+>+		vvs = vs->trans;
+>+
+>+		spin_lock_bh(&vvs->tx_lock);
+>+		vvs->bytes_unsent -= skb->len;
+>+		spin_unlock_bh(&vvs->tx_lock);
+>+	}
+>+
+>+	if (consume)
+>+		consume_skb(skb);
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>+
+> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> {
+> 	u32 ret;
+>@@ -475,6 +495,7 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> 	if (ret > credit)
+> 		ret = credit;
+> 	vvs->tx_cnt += ret;
+>+	vvs->bytes_unsent += ret;
+> 	spin_unlock_bh(&vvs->tx_lock);
+>
+> 	return ret;
+>@@ -488,6 +509,7 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
+>
+> 	spin_lock_bh(&vvs->tx_lock);
+> 	vvs->tx_cnt -= credit;
+>+	vvs->bytes_unsent -= credit;
+> 	spin_unlock_bh(&vvs->tx_lock);
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_put_credit);
+>@@ -1090,6 +1112,19 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_destruct);
+>
+>+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	size_t ret;
+>+
+>+	spin_lock_bh(&vvs->tx_lock);
+>+	ret = vvs->bytes_unsent;
+>+	spin_unlock_bh(&vvs->tx_lock);
+>+
+>+	return ret;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_bytes_unsent);
+>+
+> static int virtio_transport_reset(struct vsock_sock *vsk,
+> 				  struct sk_buff *skb)
+> {
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 6dea6119f5b2..9098613561e3 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>@@ -123,6 +125,11 @@ static void vsock_loopback_work(struct work_struct *work)
+> 	spin_unlock_bh(&vsock->pkt_queue.lock);
+>
+> 	while ((skb = __skb_dequeue(&pkts))) {
+>+		/* Decrement the bytes_sent counter without deallocating skb
+                                  ^
+Should be `bytes_unsent` ?
 
---lAs16Qv/8RWOgpBa
-Content-Type: application/pgp-signature; name="signature.asc"
+>+		 * It is freed by the receiver.
+>+		 */
+>+		virtio_transport_consume_skb_sent(skb, false);
+>+
 
------BEGIN PGP SIGNATURE-----
+nit: no need for this new empty line.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZn6acwAKCRA6cBh0uS2t
-rCurAP4kKGx5QikXbXkc5wjqVKJmLfGMozX75vBvP6wutMTtygEAgmG8JBldpnqx
-25QBff23NcdLFIuKepT+GxfjszfhAQ0=
-=fIws
------END PGP SIGNATURE-----
+> 		virtio_transport_deliver_tap_pkt(skb);
+> 		virtio_transport_recv_pkt(&loopback_transport, skb);
+> 	}
+>
+>-- 
+>2.45.2
+>
+>
+>
 
---lAs16Qv/8RWOgpBa--
 
