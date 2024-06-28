@@ -1,305 +1,219 @@
-Return-Path: <netdev+bounces-107558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B18E91B685
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:49:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9334E91B678
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 507002833B9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:49:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49973285EBD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35ED4500C;
-	Fri, 28 Jun 2024 05:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F9141A87;
+	Fri, 28 Jun 2024 05:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fPojHIyj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efgOpX/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD08E249F5;
-	Fri, 28 Jun 2024 05:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7081F249F5;
+	Fri, 28 Jun 2024 05:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719553738; cv=none; b=TqLvAsWRoDCL9CXHXjFfOk+k8/G4+Bo/N4I5d7JEgKnZvl+HznwyLmCtEOSS7EC9Vc/ovYK3BqPfrrtl8R21Jl+/c9LZHmH2qgz0JC1NfWaSqqhCO/27c1mHunO2Rmazy7Yv3owGcqhBSRcwhUunR5PxzkTxbtcl76cw6Au1afk=
+	t=1719553631; cv=none; b=I4iNC0Q/e9E2GxIefc0CXOHXir/fNCh6p/c0SsU/XqcJ3goQrU8DaqxaPsciIRID4QSZ9tcTg1jKIB/qSCUtAGzlT4hrnRqnp3dUqKQU9eT6ETM7KVtk78tc6b05U92pmcbVQRmaEbo/lyhlq8RNW5t5+CH6XwEnHf8BsdnR/O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719553738; c=relaxed/simple;
-	bh=PtCasXHAOvOMRVdKF/jW/oHN2QvRGkd1J0RH+6x7KJI=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=u1NvicS0WyRlVaGG/CAPzWhqMAKMYI8juCmPenVeV9jWUd+M/ASm39sNuQK4bqWQCxp7weHBxIy5Ra0U9cnId+aLmAVCj0IV2A+Optj3YC7tLSLan5aMBtHFLDQJVhdQF/SWLHnJCTb3UWX2JCUYQ4OBJp0grMmfV0ZFBvqsJ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fPojHIyj; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1719553728; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=VAHDm7tteOsh7ipE/Q1oWmZbyzYSsMR/7oUjqzklIwQ=;
-	b=fPojHIyj3cow5iEGOb21prP3PK79lXl+T9UwDRRrRa5L9kjAi7Sg5PF3SNhxLYHzJbAAZGjQyZvxLr+rfmCRMqieyh0o0RYgit8VL65OlHUVeoKXLhMJNy2HMzDNi6rFdreOWiR6b4DKdUuga6W+XzmVpm7SC06nyKbud29Y3YY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R791e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W9PEpy1_1719553727;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W9PEpy1_1719553727)
-          by smtp.aliyun-inc.com;
-          Fri, 28 Jun 2024 13:48:47 +0800
-Message-ID: <1719553452.932589-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 08/10] virtio_net: xsk: rx: support recv small mode
-Date: Fri, 28 Jun 2024 13:44:12 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
- <20240618075643.24867-9-xuanzhuo@linux.alibaba.com>
- <CACGkMEuPB=We-pnj8QH9Oiv4F=XHTcrRsHVVmOnUn9H7+Nrihw@mail.gmail.com>
-In-Reply-To: <CACGkMEuPB=We-pnj8QH9Oiv4F=XHTcrRsHVVmOnUn9H7+Nrihw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1719553631; c=relaxed/simple;
+	bh=wVc5/CD0hpSYSQu7Zo9aWM0/k7r2uzZkd7u/JbTNpNI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bToYSt52oyJKit/4Emw8/AD/ggi2zNgu3weIyJsl8OVAMg8cl3dJHmJGHL4st2enm8AR6j9sM9ibMODGod9zco3FzhXhv8zE0IdKg0DtYDt1Z/jy9BHsZlU/CaV+kNNnDutYyJ/kxvhzDD3h+vqW+SKTGGe88P+KK5WlCNdOowQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efgOpX/7; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a724598cfe3so25904066b.1;
+        Thu, 27 Jun 2024 22:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719553628; x=1720158428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J82aso9srCTwQ13NgHA3QiH1Y/m1v0Plo0MRWgzcEWw=;
+        b=efgOpX/7puElIcpH1O2JvrXMTXMUZES0vOVz6EOebIXrkWfNpxG6gtipHR9EnHxubC
+         KavY5Oh+KF1fsj5j4VvbAKUygLSIZkE8fQ8gzQYn5zthseJ5hxJ9WDqmF25MXOKv1qLt
+         CFyhmglMe1EoGMEw+Yhi+oVh8h3Ct0sY8AplRRedWmFMuLT+0+Td/nM1+GaQYWzYxTRU
+         dMVarrnTR1O7fAmgQaLtrAGW9sKld7HJEfr9Ao1StGyy8yFmq23cJ5yCck4evMcDodhT
+         WMkzLJfQ+uA/cfFtxh/VfvVz10VW4AT97Md+jMY8YZHKTWIBztVZhhkgoRY/wVS8+ha4
+         zvag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719553628; x=1720158428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J82aso9srCTwQ13NgHA3QiH1Y/m1v0Plo0MRWgzcEWw=;
+        b=Js+NV97scMJypnWcJW3PjO4Kbs1ALf1DT7O0Zu22VAQTJMxWBLepckd7/BJXOJwi4X
+         lB6KIEHFrJilMSjmUgcvRHXfGrn3gizXOgqGxU/akSUACKgOh/JRZC6RZ3eINTU+IFFh
+         npDwjCE7zHlOVYe+sJ2zkkvDyIC0OEyLN9RW+9Sx6FVJbZpWnx6nr5hIdAPf8PiabNkh
+         uR3/EAd3dLiDpWp0bmErSmfcWI44tSQyrpKVARyos9/MOcoGKyVH4pXUKYcgDIVDtllq
+         Bwj9Q2XXtWstFq8T/gHF9eyVLPhCMxE9zA+1XO+UpFdQZ4XvDzjctCJOHOqO80ByDJj+
+         YNQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUi/iHReRJzA9MajTE2PoGebQHP99yVIMsBWZkhWpRmaKnswMsYn5ga6XtSYvBC8HcyaFpaMjSpXOfWpKnnc4VD3GRjvJ9aNjmM9OAALLZ3jnQGOghh9k8j4nUx3p0GEC+ygFKy45ch1mp8KLm3BgdcWsDu2rFKqybSfNyfIvKiWDeErA==
+X-Gm-Message-State: AOJu0Yxu11WX7llfmBXj5kWapzjmaPFbjDFc6zU7IBERZzfGPqWFjuSN
+	JpC1FnyNgMVVcbrbUG8FxZaiazeSfiDpsHvSf+3i63h6rAX+MaQ+
+X-Google-Smtp-Source: AGHT+IESZihvr0VfgF8QpueLxCMpYeBNN0yaK4ft/bU3+rHkwKNn0h5UqOyBqhd7yd/NxLcWzXzC+Q==
+X-Received: by 2002:a17:906:a847:b0:a6f:6721:b065 with SMTP id a640c23a62f3a-a7245bb25e6mr1136984566b.32.1719553627433;
+        Thu, 27 Jun 2024 22:47:07 -0700 (PDT)
+Received: from localhost.lan (031011218106.poznan.vectranet.pl. [31.11.218.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab0651a8sm41665766b.128.2024.06.27.22.47.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 22:47:06 -0700 (PDT)
+From: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
+Subject: [PATCH V2] dt-bindings: net: bluetooth: convert MT7622 Bluetooth to the json-schema
+Date: Fri, 28 Jun 2024 07:46:35 +0200
+Message-Id: <20240628054635.3154-1-zajec5@gmail.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 28 Jun 2024 10:19:41 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Jun 18, 2024 at 3:57=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > In the process:
-> > 1. We may need to copy data to create skb for XDP_PASS.
-> > 2. We may need to call xsk_buff_free() to release the buffer.
-> > 3. The handle for xdp_buff is difference from the buffer.
-> >
-> > If we pushed this logic into existing receive handle(merge and small),
-> > we would have to maintain code scattered inside merge and small (and bi=
-g).
-> > So I think it is a good choice for us to put the xsk code into an
-> > independent function.
->
-> I think it's better to try to reuse the existing functions.
->
-> More below:
->
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 135 ++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 133 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 2ac5668a94ce..06608d696e2e 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -500,6 +500,10 @@ struct virtio_net_common_hdr {
-> >  };
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf=
-);
-> > +static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_b=
-uff *xdp,
-> > +                              struct net_device *dev,
-> > +                              unsigned int *xdp_xmit,
-> > +                              struct virtnet_rq_stats *stats);
-> >
-> >  static bool is_xdp_frame(void *ptr)
-> >  {
-> > @@ -1040,6 +1044,120 @@ static void sg_fill_dma(struct scatterlist *sg,=
- dma_addr_t addr, u32 len)
-> >         sg->length =3D len;
-> >  }
-> >
-> > +static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
-> > +                                  struct receive_queue *rq, void *buf,=
- u32 len)
-> > +{
-> > +       struct xdp_buff *xdp;
-> > +       u32 bufsize;
-> > +
-> > +       xdp =3D (struct xdp_buff *)buf;
-> > +
-> > +       bufsize =3D xsk_pool_get_rx_frame_size(rq->xsk.pool) + vi->hdr_=
-len;
-> > +
-> > +       if (unlikely(len > bufsize)) {
-> > +               pr_debug("%s: rx error: len %u exceeds truesize %u\n",
-> > +                        vi->dev->name, len, bufsize);
-> > +               DEV_STATS_INC(vi->dev, rx_length_errors);
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       xsk_buff_set_size(xdp, len);
-> > +       xsk_buff_dma_sync_for_cpu(xdp);
-> > +
-> > +       return xdp;
-> > +}
-> > +
-> > +static struct sk_buff *xdp_construct_skb(struct receive_queue *rq,
-> > +                                        struct xdp_buff *xdp)
-> > +{
->
-> So we have a similar caller which is receive_small_build_skb(). Any
-> chance to reuse that?
+From: Rafał Miłecki <rafal@milecki.pl>
 
-receive_small_build_skb works with build_skb.
+This helps validating DTS files. Introduced changes:
+1. Dropped serial details from example
+2. Added required example include
 
-Here we need to copy the packet from the xsk buffer to the skb buffer.
-So I do not think we can reuse it.
+Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+---
+V2: Simplify example
 
+ .../bluetooth/mediatek,mt7622-bluetooth.yaml  | 51 +++++++++++++++++++
+ .../bindings/net/mediatek-bluetooth.txt       | 36 -------------
+ 2 files changed, 51 insertions(+), 36 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
 
->
-> > +       unsigned int metasize =3D xdp->data - xdp->data_meta;
-> > +       struct sk_buff *skb;
-> > +       unsigned int size;
-> > +
-> > +       size =3D xdp->data_end - xdp->data_hard_start;
-> > +       skb =3D napi_alloc_skb(&rq->napi, size);
-> > +       if (unlikely(!skb)) {
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
-> > +
-> > +       size =3D xdp->data_end - xdp->data_meta;
-> > +       memcpy(__skb_put(skb, size), xdp->data_meta, size);
-> > +
-> > +       if (metasize) {
-> > +               __skb_pull(skb, metasize);
-> > +               skb_metadata_set(skb, metasize);
-> > +       }
-> > +
-> > +       xsk_buff_free(xdp);
-> > +
-> > +       return skb;
-> > +}
-> > +
-> > +static struct sk_buff *virtnet_receive_xsk_small(struct net_device *de=
-v, struct virtnet_info *vi,
-> > +                                                struct receive_queue *=
-rq, struct xdp_buff *xdp,
-> > +                                                unsigned int *xdp_xmit,
-> > +                                                struct virtnet_rq_stat=
-s *stats)
-> > +{
-> > +       struct bpf_prog *prog;
-> > +       u32 ret;
-> > +
-> > +       ret =3D XDP_PASS;
-> > +       rcu_read_lock();
-> > +       prog =3D rcu_dereference(rq->xdp_prog);
-> > +       if (prog)
-> > +               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, s=
-tats);
-> > +       rcu_read_unlock();
-> > +
-> > +       switch (ret) {
-> > +       case XDP_PASS:
-> > +               return xdp_construct_skb(rq, xdp);
-> > +
-> > +       case XDP_TX:
-> > +       case XDP_REDIRECT:
-> > +               return NULL;
-> > +
-> > +       default:
-> > +               /* drop packet */
-> > +               xsk_buff_free(xdp);
-> > +               u64_stats_inc(&stats->drops);
-> > +               return NULL;
-> > +       }
-> > +}
-> > +
-> > +static struct sk_buff *virtnet_receive_xsk_buf(struct virtnet_info *vi=
-, struct receive_queue *rq,
-> > +                                              void *buf, u32 len,
-> > +                                              unsigned int *xdp_xmit,
-> > +                                              struct virtnet_rq_stats =
-*stats)
-> > +{
-> > +       struct net_device *dev =3D vi->dev;
-> > +       struct sk_buff *skb =3D NULL;
-> > +       struct xdp_buff *xdp;
-> > +
-> > +       len -=3D vi->hdr_len;
-> > +
-> > +       u64_stats_add(&stats->bytes, len);
-> > +
-> > +       xdp =3D buf_to_xdp(vi, rq, buf, len);
-> > +       if (!xdp)
-> > +               return NULL;
-> > +
-> > +       if (unlikely(len < ETH_HLEN)) {
-> > +               pr_debug("%s: short packet %i\n", dev->name, len);
-> > +               DEV_STATS_INC(dev, rx_length_errors);
-> > +               xsk_buff_free(xdp);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       if (!vi->mergeable_rx_bufs)
-> > +               skb =3D virtnet_receive_xsk_small(dev, vi, rq, xdp, xdp=
-_xmit, stats);
-> > +
-> > +       return skb;
-> > +}
-> > +
-> >  static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct rec=
-eive_queue *rq,
-> >                                    struct xsk_buff_pool *pool, gfp_t gf=
-p)
-> >  {
-> > @@ -2363,9 +2481,22 @@ static int virtnet_receive(struct receive_queue =
-*rq, int budget,
-> >         void *buf;
-> >         int i;
-> >
-> > -       if (!vi->big_packets || vi->mergeable_rx_bufs) {
-> > -               void *ctx;
-> > +       if (rq->xsk.pool) {
-> > +               struct sk_buff *skb;
-> > +
-> > +               while (packets < budget) {
-> > +                       buf =3D virtqueue_get_buf(rq->vq, &len);
-> > +                       if (!buf)
-> > +                               break;
-> >
-> > +                       skb =3D virtnet_receive_xsk_buf(vi, rq, buf, le=
-n, xdp_xmit, &stats);
-> > +                       if (skb)
-> > +                               virtnet_receive_done(vi, rq, skb);
-> > +
-> > +                       packets++;
-> > +               }
->
-> If reusing turns out to be hard, I'd rather add new paths in receive_smal=
-l().
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+new file mode 100644
+index 000000000000..3f9e69208127
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+@@ -0,0 +1,51 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7622-bluetooth.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MediaTek SoC built-in Bluetooth
++
++description:
++  This device is a serial attached device to BTIF device and thus it must be a
++  child node of the serial node with BTIF. The dt-bindings details for BTIF
++  device can be known via Documentation/devicetree/bindings/serial/8250.yaml.
++
++maintainers:
++  - Sean Wang <sean.wang@mediatek.com>
++
++allOf:
++  - $ref: bluetooth-controller.yaml#
++
++properties:
++  compatible:
++    const: mediatek,mt7622-bluetooth
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    const: ref
++
++  power-domains:
++    maxItems: 1
++
++required:
++  - clocks
++  - clock-names
++  - power-domains
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/power/mt7622-power.h>
++
++    serial {
++        bluetooth {
++            compatible = "mediatek,mt7622-bluetooth";
++            power-domains = <&scpsys MT7622_POWER_DOMAIN_WB>;
++            clocks = <&clk25m>;
++            clock-names = "ref";
++        };
++    };
+diff --git a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+index 9ef5bacda8c1..988c72685cbf 100644
+--- a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
++++ b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+@@ -1,39 +1,3 @@
+-MediaTek SoC built-in Bluetooth Devices
+-==================================
+-
+-This device is a serial attached device to BTIF device and thus it must be a
+-child node of the serial node with BTIF. The dt-bindings details for BTIF
+-device can be known via Documentation/devicetree/bindings/serial/8250.yaml.
+-
+-Required properties:
+-
+-- compatible:	Must be
+-		  "mediatek,mt7622-bluetooth": for MT7622 SoC
+-- clocks:	Should be the clock specifiers corresponding to the entry in
+-		clock-names property.
+-- clock-names:	Should contain "ref" entries.
+-- power-domains: Phandle to the power domain that the device is part of
+-
+-Example:
+-
+-	btif: serial@1100c000 {
+-		compatible = "mediatek,mt7622-btif",
+-			     "mediatek,mtk-btif";
+-		reg = <0 0x1100c000 0 0x1000>;
+-		interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_LOW>;
+-		clocks = <&pericfg CLK_PERI_BTIF_PD>;
+-		clock-names = "main";
+-		reg-shift = <2>;
+-		reg-io-width = <4>;
+-
+-		bluetooth {
+-			compatible = "mediatek,mt7622-bluetooth";
+-			power-domains = <&scpsys MT7622_POWER_DOMAIN_WB>;
+-			clocks = <&clk25m>;
+-			clock-names = "ref";
+-		};
+-	};
+-
+ MediaTek UART based Bluetooth Devices
+ ==================================
+ 
+-- 
+2.35.3
 
-The exist function is called after virtnet_rq_get_buf(), that will do dma u=
-nmap.
-But for xsk, the dma unmap is not need. So xsk receive handle should use
-virtqueue_get_buf directly.
-
-Thanks.
-
->
-> > +       } else if (!vi->big_packets || vi->mergeable_rx_bufs) {
-> > +               void *ctx;
-> >                 while (packets < budget &&
-> >                        (buf =3D virtnet_rq_get_buf(rq, &len, &ctx))) {
-> >                         receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &s=
-tats);
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
-> Thanks
->
 
