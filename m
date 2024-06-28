@@ -1,46 +1,71 @@
-Return-Path: <netdev+bounces-107749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F417E91C33F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B38B91C389
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:15:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B32D1F23C2E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:06:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA72E1F21CB0
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A581CD5DB;
-	Fri, 28 Jun 2024 16:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FD41C9EC0;
+	Fri, 28 Jun 2024 16:15:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0081CCCA9;
-	Fri, 28 Jun 2024 16:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D426153561;
+	Fri, 28 Jun 2024 16:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719590729; cv=none; b=qIvVZcGHLZhdcC6XPr+FoAcyh7y+wgPgzZ3tIoyhwgEjjyDzoOwbBeZRj5SkJdNj1ZnKCwqEPpEXf6w8AwKJkTnWhd/2IP1Nrm0zmRYF3Z2mVEiM9OeVknFiYnROhB8HmB0pIyvG81emdxN8D3Ggx+7rtWSCQny4UQ2v6W5vjdE=
+	t=1719591306; cv=none; b=XoA0Inj0e8sIHh/lORc+v3GGzbI9xDJSK4pNTXaSRdzAK7F4W7S1N0OrdI+5Zrod10VxKchVLwjJ8JQfwhQmBFaTnLR/azqxNHF+lVwRpf0fGkYv89XVZ+dRE+ezudtk2Z9KNR9/ksr4wBg5k7cB1TCMOdiI8i0OOkNNipeXhCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719590729; c=relaxed/simple;
-	bh=QWdoxRnGLtzRglYYajDEVC9t/Eue0WSK/jHpEOqzg0w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HTUTRfj+WtrYWY9D+C1ITSs03fjgGb7D7xwNl3HT4P6pzzKMEc9Z8r0aWpjGgvxa5J4fKWOZoOBEQBz51kmd9/07gdn7p/nO6rVQmxFOum0E2HzxD4gJOlGjYDVb07CDDw3JL3nvqfZOt0eqvmV7b4LWQ9WFfRYGzpd3+xji1Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1719591306; c=relaxed/simple;
+	bh=a1x9W1spyksKdWXtlAZQSfWEw/MHcs4YPBx796W16tA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R+l3D3l2lS9P51C8BCDW/LGlfpWspI24dT05UFUz5OJZ/Y28l2MkOWccSr0fzZQ2PKOuOf4kB2I3qLhoypw30zm4+rf/mNMbI+DCp9BeNnDd1XkmwK6ces0Aatrhb604krIvdx/2Z431xiNXu8QyVWYPCrF68Pq97tfYmjGt5VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cf8880f95so1083586a12.3;
+        Fri, 28 Jun 2024 09:15:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719591303; x=1720196103;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tZc3nLBFY+UI37vMSq6JBYuPNwzayvpRvMkZC4pHqGg=;
+        b=D8x2M5kj8iNCa5Dot5BCjCkE9SqziYne1G0u8A9mQcSMNGvvJncNXAguxj1wTAVjed
+         ULbNE0aECNRdjndp9zE4dI14yXpZxYUT7VMrHKsBbVCaKEJ9xsBop6GC1IbCtq/0JUYh
+         qkXp2SwYB4a28W7WjEeTvmZzfFrOPieus4Pze5pZlBxEza4lfqnFyMbVHysRpNvVhGaA
+         x0VLBfngI/scjSqsLlb/pqHFmZeKr6zh7+4CG8yHcK+9lqH212DkBmE5brozNvYCq0wH
+         DRpe/RD+A4N4a9tsqxXa3peWG40oTX770MQTHWX+GzlivBRCQJVxR/dr6OYu3+J1DDkE
+         pEsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUo4SeSPS5+XCKL1ItgwAmBM/XvxjPbASfCQluw9fUtAYUJ2eIJpN33t2qKMFZvpSIHJy6PeRAdKDLSNc6LRmxddMvo9RPR+3b+H/MR/T/j2iu7OpAIwGFlm0X0S6R25fWnOLXgrQ5RF1HYLcgEiCcZH4l2GokRE5zwsFqf9LBBa4QY
+X-Gm-Message-State: AOJu0Yxr8Udmt8JjRqsu3oJF4Mm94/4ivI+GQUSQGq9UzHT/bKej4P1j
+	1EGJOEb//Q4aJJyYhFQb48owVjSwtXqlBtDjXX6XrHYgmS9RZDpu
+X-Google-Smtp-Source: AGHT+IHTcB3dvO6kE88T15CIWzxuuAJCSpiYNG6q/oWmBqFy8vZUyEbVC1cIFTLS08U/yDcoRYuETw==
+X-Received: by 2002:a05:6402:13d1:b0:586:1518:799d with SMTP id 4fb4d7f45d1cf-586151879c7mr2465853a12.17.1719591302698;
+        Fri, 28 Jun 2024 09:15:02 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58614d50e1asm1212136a12.78.2024.06.28.09.15.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 09:15:02 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	linux-crypto@vger.kernel.org
+Cc: horms@kernel.org,
 	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 17/17] netfilter: xt_recent: Lift restrictions on max hitcount value
-Date: Fri, 28 Jun 2024 18:05:05 +0200
-Message-Id: <20240628160505.161283-18-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240628160505.161283-1-pablo@netfilter.org>
-References: <20240628160505.161283-1-pablo@netfilter.org>
+	herbert@gondor.apana.org.au,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/3] crypto: caam: Unembed net_dev
+Date: Fri, 28 Jun 2024 09:14:45 -0700
+Message-ID: <20240628161450.2541367-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,62 +74,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Phil Sutter <phil@nwl.cc>
+This will un-embed the net_device struct from inside other struct, so we
+can add flexible array into net_device.
 
-Support tracking of up to 65535 packets per table entry instead of just
-255 to better facilitate longer term tracking or higher throughput
-scenarios.
+This also enable COMPILE test for FSL_CAAM, as any config option that
+depends on ARCH_LAYERSCAPE.
 
-Note how this aligns sizes of struct recent_entry's 'nstamps' and
-'index' fields when 'nstamps' was larger before. This is unnecessary as
-the value of 'nstamps' grows along with that of 'index' after being
-initialized to 1 (see recent_entry_update()). Its value will thus never
-exceed that of 'index' and therefore does not need to provide space for
-larger values.
+Changelog:
+v2:
+	* added a cover letter (Jakub)
+	* dropped the patch that makes FSL_DPAA dependent of
+	  COMPILE_TEST, since it exposes other problems.
+v1:
+	* https://lore.kernel.org/all/20240624162128.1665620-1-leitao@debian.org/
 
-Requested-by: Fabio <pedretti.fabio@gmail.com>
-Link: https://bugzilla.netfilter.org/show_bug.cgi?id=1745
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/xt_recent.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/netfilter/xt_recent.c b/net/netfilter/xt_recent.c
-index ef93e0d3bee0..588a5e6ad899 100644
---- a/net/netfilter/xt_recent.c
-+++ b/net/netfilter/xt_recent.c
-@@ -59,9 +59,9 @@ MODULE_PARM_DESC(ip_list_gid, "default owning group of /proc/net/xt_recent/* fil
- /* retained for backwards compatibility */
- static unsigned int ip_pkt_list_tot __read_mostly;
- module_param(ip_pkt_list_tot, uint, 0400);
--MODULE_PARM_DESC(ip_pkt_list_tot, "number of packets per IP address to remember (max. 255)");
-+MODULE_PARM_DESC(ip_pkt_list_tot, "number of packets per IP address to remember (max. 65535)");
- 
--#define XT_RECENT_MAX_NSTAMPS	256
-+#define XT_RECENT_MAX_NSTAMPS	65536
- 
- struct recent_entry {
- 	struct list_head	list;
-@@ -69,7 +69,7 @@ struct recent_entry {
- 	union nf_inet_addr	addr;
- 	u_int16_t		family;
- 	u_int8_t		ttl;
--	u_int8_t		index;
-+	u_int16_t		index;
- 	u_int16_t		nstamps;
- 	unsigned long		stamps[];
- };
-@@ -80,7 +80,7 @@ struct recent_table {
- 	union nf_inet_addr	mask;
- 	unsigned int		refcnt;
- 	unsigned int		entries;
--	u8			nstamps_max_mask;
-+	u_int16_t		nstamps_max_mask;
- 	struct list_head	lru_list;
- 	struct list_head	iphash[];
- };
+Breno Leitao (3):
+  crypto: caam: Make CRYPTO_DEV_FSL_CAAM dependent of COMPILE_TEST
+  crypto: caam: Unembed net_dev structure from qi
+  crypto: caam: Unembed net_dev structure in dpaa2
+
+ drivers/crypto/caam/Kconfig       |  2 +-
+ drivers/crypto/caam/caamalg_qi2.c | 28 +++++++++++++++++---
+ drivers/crypto/caam/caamalg_qi2.h |  2 +-
+ drivers/crypto/caam/qi.c          | 43 +++++++++++++++++++++++++------
+ 4 files changed, 62 insertions(+), 13 deletions(-)
+
 -- 
-2.30.2
+2.43.0
 
 
