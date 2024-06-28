@@ -1,176 +1,109 @@
-Return-Path: <netdev+bounces-107574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E6291B925
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:58:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4802F91B932
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6418283004
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:58:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0172B2134E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2CE14375A;
-	Fri, 28 Jun 2024 07:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2AB47F59;
+	Fri, 28 Jun 2024 08:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v+on2P6b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uipkXCMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398B6143745
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 07:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118DB79F2;
+	Fri, 28 Jun 2024 08:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719561484; cv=none; b=By/Df48uwadqCqiNeHH5P/QTfRHaNfmkhsKzxFpUg792DRXK+odnsMlIfjE3sF8qjkfQS/Eeia/KvzjDBKfIhv1vx2bAWirmTNPr11d5laR99QBY1TB38ZKffRovtuZzMfcpov51asVLVRVya0WHLAiBTd51GyiNJ/VMcRHzGtE=
+	t=1719561629; cv=none; b=TM0iaTzsb5nenxLLCyuX6R50ofaGu63KXbku+doAFHKHvg4TpA45Re946gsc2tbU8aiE6YoZ+kSJ+PqaiGomH95lenFW7LAQplPMnTK3GdqZrmQtiBi47jgwbcStoy4B9dIDiO5xpVHwqDXryaV8QtCKAOMvivCc8BJKoX9We9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719561484; c=relaxed/simple;
-	bh=w1+N5w9tuw9P2bWefrIa1jOUi6yMbsWDcntSow2e86o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=exDxQm+V8ylmm5KscghUybzc9pAk3iHkjmSBhmCuv72YkluBb4cvOQ7nqviv/NsDJRAzNSX7EDtSnON17KdX2n5gw72Of2dVOe6FJhbkUXZmc9Ou1ZmQaoH7f+gOG81CYK/G9l8WXtvSr42MuMJIMc0XUSbRZdniNEwxv221lC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v+on2P6b; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: anand.a.khoje@oracle.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719561479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ow9DZSi3OdvJbzDq/MxF59b5LtvOqbCNC3S2td/yhJ4=;
-	b=v+on2P6bYSunCDPl++eZqGgiiOrbrQqUYZhnwVwT3gOtoRbYLBFy4HGLPvy8LfiGUpP1p8
-	JEw2zNHNYx85CmtggEdetACuoVRBdaLP6HTWexh0kWEOf0TdRyTP/WKMjsbdhUWKIUJgeK
-	EIH0+fTp3THyoUM3ok9oGWlJatVpFEo=
-X-Envelope-To: linux-rdma@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: saeedm@mellanox.com
-X-Envelope-To: leon@kernel.org
-X-Envelope-To: tariqt@nvidia.com
-X-Envelope-To: edumazet@google.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: rama.nichanamatlu@oracle.com
-X-Envelope-To: manjunath.b.patil@oracle.com
-Message-ID: <1e60b5ae-8015-41c5-a60d-e2a5b0d7c01b@linux.dev>
-Date: Fri, 28 Jun 2024 15:57:53 +0800
+	s=arc-20240116; t=1719561629; c=relaxed/simple;
+	bh=XhNNQC6yWru73k0KmPtS/LA0y6wVM9NuF8Rpi2oA4e0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=czq4cUiVAZMo7qZi05sTiuz8tP/QwOvicHlOUHfU2zqQtlNZnoLWCSLfSZxFHZSIDiynfde4EXTRvQsCKpEGQIBleJv0b7RzJfvGM24bczNelpAZ5I8DiyDGFWW0Z/JBKkaypDN0XwNztMbt3BhtAkdayIPEalEqT5of8YCQCXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uipkXCMK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9288DC32789;
+	Fri, 28 Jun 2024 08:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719561628;
+	bh=XhNNQC6yWru73k0KmPtS/LA0y6wVM9NuF8Rpi2oA4e0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uipkXCMKZN1khEQwc/Ztxz5SIcYSzJq+yWz5gOIYvA0R1f2WnFCfFuZJA5ZEdJWnN
+	 2yHX+kZVbip0AEhtKBHPwRsqaZAf++OiJQTHOv3XVhfY4B1tVJwqUB9BYIy/O3IDdw
+	 L7vSdXsTiUBPKZ/dzJRx5AcOPSPL4LqnEECVem5dp2xuJsx/f0nAkCbVUkBYtChhJA
+	 /3vbxhrrXn+uT4G/kR1ouXISdzXx9ZXHqSLFsJhGBUq1l4v3k+DzTup1J7XxJ5OqCO
+	 p+SP67g+XpTm0Re0TH4G4/w0veTV+7g0c/YWoPrjBE4/jDVAEMhSVklvIjVilPEHzP
+	 p129y/7xmALeQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7C50DC43335;
+	Fri, 28 Jun 2024 08:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6] net/mlx5: Reclaim max 50K pages at once
-To: Anand Khoje <anand.a.khoje@oracle.com>, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: saeedm@mellanox.com, leon@kernel.org, tariqt@nvidia.com,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, rama.nichanamatlu@oracle.com,
- manjunath.b.patil@oracle.com
-References: <20240627182443.19254-1-anand.a.khoje@oracle.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240627182443.19254-1-anand.a.khoje@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [net-next,PATCH v2] dt-bindings: net: realtek,rtl82xx: Document known
+ PHY IDs as compatible strings
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171956162850.13450.13594375026580373967.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jun 2024 08:00:28 +0000
+References: <20240625184359.153423-1-marex@denx.de>
+In-Reply-To: <20240625184359.153423-1-marex@denx.de>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, conor+dt@kernel.org,
+ davem@davemloft.net, edumazet@google.com, f.fainelli@gmail.com,
+ hkallweit1@gmail.com, kuba@kernel.org, qiangqing.zhang@nxp.com,
+ krzk+dt@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ devicetree@vger.kernel.org, kernel@dh-electronics.com
 
-在 2024/6/28 2:24, Anand Khoje 写道:
-> In non FLR context, at times CX-5 requests release of ~8 million FW pages.
-> This needs humongous number of cmd mailboxes, which to be released once
-> the pages are reclaimed. Release of humongous number of cmd mailboxes is
-> consuming cpu time running into many seconds. Which with non preemptible
-> kernels is leading to critical process starving on that cpu’s RQ.
-> To alleviate this, this change restricts the total number of pages
-> a worker will try to reclaim maximum 50K pages in one go.
-> The limit 50K is aligned with the current firmware capacity/limit of
-> releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + MLX5_PAGES_TAKE
-> device command.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 25 Jun 2024 20:42:28 +0200 you wrote:
+> Extract known PHY IDs from Linux kernel realtek PHY driver
+> and convert them into supported compatible string list for
+> this DT binding document.
 > 
-> Our tests have shown significant benefit of this change in terms of
-> time consumed by dma_pool_free().
-> During a test where an event was raised by HCA
-> to release 1.3 Million pages, following observations were made:
-> 
-> - Without this change:
-> Number of mailbox messages allocated was around 20K, to accommodate
-> the DMA addresses of 1.3 million pages.
-> The average time spent by dma_pool_free() to free the DMA pool is between
-> 16 usec to 32 usec.
->             value  ------------- Distribution ------------- count
->               256 |                                         0
->               512 |@                                        287
->              1024 |@@@                                      1332
->              2048 |@                                        656
->              4096 |@@@@@                                    2599
->              8192 |@@@@@@@@@@                               4755
->             16384 |@@@@@@@@@@@@@@@                          7545
->             32768 |@@@@@                                    2501
->             65536 |                                         0
-> 
-> - With this change:
-> Number of mailbox messages allocated was around 800; this was to
-> accommodate DMA addresses of only 50K pages.
-> The average time spent by dma_pool_free() to free the DMA pool in this case
-> lies between 1 usec to 2 usec.
->             value  ------------- Distribution ------------- count
->               256 |                                         0
->               512 |@@@@@@@@@@@@@@@@@@                       346
->              1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
->              2048 |                                         0
->              4096 |                                         0
->              8192 |                                         1
->             16384 |                                         0
-> 
-> Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
+> Signed-off-by: Marek Vasut <marex@denx.de>
 > ---
-> Changes in v6
->   - Added comments to explain usage os negative MAX_RECLAIM_NPAGES
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 16 +++++++++++++++-
->   1 file changed, 15 insertions(+), 1 deletion(-)
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Joakim Zhang <qiangqing.zhang@nxp.com>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: devicetree@vger.kernel.org
+> Cc: kernel@dh-electronics.com
+> Cc: netdev@vger.kernel.org
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> index d894a88..972e8e9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-> @@ -608,6 +608,11 @@ enum {
->   	RELEASE_ALL_PAGES_MASK = 0x4000,
->   };
->   
-> +/* This limit is based on the capability of the firmware as it cannot release
-> + * more than 50000 back to the host in one go.
-> + */
-> +#define MAX_RECLAIM_NPAGES (-50000)
-> +
->   static int req_pages_handler(struct notifier_block *nb,
->   			     unsigned long type, void *data)
->   {
-> @@ -639,7 +644,16 @@ static int req_pages_handler(struct notifier_block *nb,
->   
->   	req->dev = dev;
->   	req->func_id = func_id;
-> -	req->npages = npages;
-> +
-> +	/* npages > 0 means HCA asking host to allocate/give pages,
-> +	 * npages < 0 means HCA asking host to reclaim back the pages allocated.
-> +	 * Here we are restricting the maximum number of pages that can be
-> +	 * reclaimed to be MAX_RECLAIM_NPAGES. Note that MAX_RECLAIM_NPAGES is
-> +	 * a negative value.
-> +	 * Since MAX_RECLAIM is negative, we are using max() to restrict
-> +	 * req->npages (and not min ()).
-> +	 */
+> [...]
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Here is the summary with links:
+  - [net-next,v2] dt-bindings: net: realtek,rtl82xx: Document known PHY IDs as compatible strings
+    https://git.kernel.org/netdev/net-next/c/8fda53719a59
 
-Thanks,
-Zhu Yanjun
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +	req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
->   	req->ec_function = ec_function;
->   	req->release_all = release_all;
->   	INIT_WORK(&req->work, pages_work_handler);
 
 
