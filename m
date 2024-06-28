@@ -1,156 +1,141 @@
-Return-Path: <netdev+bounces-107726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A4691C286
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:23:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3A991C2B9
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62ABB1F21E1F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:23:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8721A1C22385
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31301CD2D;
-	Fri, 28 Jun 2024 15:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FC91C688A;
+	Fri, 28 Jun 2024 15:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mapxl0Rq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErYawyqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BD0B645;
-	Fri, 28 Jun 2024 15:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277511C2308
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 15:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719588202; cv=none; b=pDA7V7zhFXK5YB2G+WECkjP09tHHqSRLPtbE3n+JeVZp0HFyFOdFEhst6+LCWe8LVT6ucTQD2sgFVTSrHGqQ9SCyZmBSKW65JmXMubZA4JDhEp+pOj8EwYkKMVLL9SicykKdkZLLLIlhpxfYjEuKkt/+K8wo//5hLnDnmWHMv00=
+	t=1719589019; cv=none; b=VUP8r5JPPPs5OYyKz/R28KdZspe2Kg+7qzcTZLIfhq7SQZX7eh5rkQ5OzQIju2Tr/8ANaFgfcS2NK9Jt/zEvET1mEo+epB/PfkyvSvDQ1nWAdEyBaBjWOesNtAe5RyRLYBvcc3fkBCtbAFMutaycXUk8NQd6lryKLi+2eKcMVjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719588202; c=relaxed/simple;
-	bh=BR2tHTmy+fHEV9yIh4M/cf4SZ2OcHQDH7CpErqksoLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gESsWUGJpjQLi4BAJrj0HeFNJ0hqDlbEzz6TjyQTLThqIdGKN33I65CLM5BTVTXxNavgErFhI3vNaeaMMZm739lo4Kn/GkD+xysi93Q9RPKmFjB/1fpE5GfYePqVxxiq6W8RzROBCKaGyVtqU58+K27AHaaBovT9En/2oNtDM80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mapxl0Rq; arc=none smtp.client-ip=209.85.167.44
+	s=arc-20240116; t=1719589019; c=relaxed/simple;
+	bh=vVe+4jTOm8nlo+0LfhR7fN86XbPqgypTTTNch3DTBwo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=geq1ETrL4xXxFkCojsd5ZRiFUubQSYX63/44osw6dN58l8fYzPl0jmAb7COygmlV7sPIUnVLPTZ1ehtya6L0R1U4qqayaMFezhFkTweh6HVn54fgmRQKp20XMnbuuYoO1bMBPvp1FqnKWhZ1Q3d2ROspm0WYxhriiRjBkh2PKvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ErYawyqE; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52ce9ba0cedso1292758e87.2;
-        Fri, 28 Jun 2024 08:23:20 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4256eec963eso4959345e9.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 08:36:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719588199; x=1720192999; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jL/M2DhfYKttVaFn04K/Ozv5calB4SUJe5t8RdpTJN8=;
-        b=Mapxl0Rq4bfoTU4Pr2hWWAGtrf7fvf088X33TA3OZKvpBwV+WL3RnIqmtFF94DO3AB
-         EYIoGPNGiStDKH8NjpfHi1yo7g1QrwM5rEtVl53NJiI8SrIYG1qWG/dKhwq8hMz7xgfb
-         oXLRu5Twt8yppnOmMKr407CwtORjh/ShbPmJlvm30TYRbA+a+tJOobMlWtpwlFecwYLU
-         +Tcs8XF50VJmYZX9CSpcZcFlULXhv2GYpN3TZ3lvJWtG8B8akEZTW6UWOSEJSUW0ktHp
-         0030hpVPujVUSc3xijG7g2racrNRs1rdlvvwIqLp33PNzH5XB5qEKdUutokDyHUM54qN
-         ZRsQ==
+        d=gmail.com; s=20230601; t=1719589016; x=1720193816; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tknJFnUHG3joxntL6RdRtT/oRy/rOVZFUIMBHQpvxhs=;
+        b=ErYawyqEquPcFsxSJfEMBT9lAOXXyTda1PycW2qAvy8f5TjS0otsS64DB8a0E53DBg
+         HO38aYAmtSRc68KAyIURjnU6llX5Ro0/6TP3nFOkl8RzL2cPekNl4ZcVzcAFGFYquX/P
+         KQCNkENQddYT9TpVnddphjrQWcSxk4ZXEQZr+DZQB1kCnH0CKqLqw7vUVkGKW8ABfJ+A
+         8NYVRGiBU/8ybphtnagNkB2IbQ90AJzdzKG32eM6B8wLkeqZ3DuSZ1l2w1Nktqbb68AW
+         TjR704vboUw9njVG5y7llzVe2AHeh0u0TrLHjCuh6I4hBD4S1dYnDd+4Ui5dtCRpUHhJ
+         VYfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719588199; x=1720192999;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jL/M2DhfYKttVaFn04K/Ozv5calB4SUJe5t8RdpTJN8=;
-        b=O0a0fx3r4G3yu0D6VQ+atEi5KWs9BIyJaY/mYWngZ3jGuH9Lf2YPID+5GsbUCjrx+F
-         dpvLIIS8WnUvFCGijufoVJ7RltCpj2queTQoehCBW4jtA5+DY1Nof/mjCb5EfG1Zn+WP
-         bLK1xtGSVF6AToV9vg26oOc2KdLXuNYLN/uncfES+qN2HXwNZQpKJZoQ+GRq7i5wULR5
-         o4K1R8ccRkeukLfV725G8nTRezJUfeu+fzWGd1AQI5s9/gPouT75Ir9vwRv1Q9ehxMLy
-         6TQR94BJ7V7XQ6hQ0VANvgGUc8jURZ8CtI6znt3XASr/Y4AyJHQYJx4BFkBUrd4npeNF
-         3XVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFNAxzBcZmUjNl1elqsqugwipjJIbFXENoqSsf5xEKzN1CvPDespD5dhN3S1LE1T6O3TJ9uAa8v4dvkbIZCF8CX2FZmGML5k/NhgT07Lgpm/I1D1+5ckb45UVigdnrov9ir/IfTEOFa/uj808HVRnpL7sjA4aVXVLx+NAeJF7dVqkdb++E
-X-Gm-Message-State: AOJu0YxRDdjTp474C5laeDKm4tT2u5PLcxP5qiFvdqLl33I5jaNpH2II
-	KdmubJUhyinc1NDS2LTAvUmMqIVsWGpkw67KQZM+iJTBeqeP0nnt
-X-Google-Smtp-Source: AGHT+IGg5kcqMly3Comvqhc88Qjsv4Vew155hATIGzgcomShCMIVMWAiMMp6EA68DvlRzN+VxwZ1BQ==
-X-Received: by 2002:a05:6512:78e:b0:52c:a20e:4da4 with SMTP id 2adb3069b0e04-52ce185ca1amr12557484e87.57.1719588198875;
-        Fri, 28 Jun 2024 08:23:18 -0700 (PDT)
-Received: from [192.168.178.20] (dh207-41-166.xnet.hr. [88.207.41.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72aaf633bdsm87877066b.74.2024.06.28.08.23.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jun 2024 08:23:18 -0700 (PDT)
-Message-ID: <8cb43e8d-cb88-47c4-9fed-9de3b1be1e9e@gmail.com>
-Date: Fri, 28 Jun 2024 17:23:16 +0200
+        d=1e100.net; s=20230601; t=1719589016; x=1720193816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tknJFnUHG3joxntL6RdRtT/oRy/rOVZFUIMBHQpvxhs=;
+        b=q7j6rBL/UBso1uUCk8bSlIba8ms6mpB4jmZdE85RUbdH1NqaOZK7GUTz8s3vYOc55m
+         +lGW331hWSy6xgX9yysRTGM2qbnEG9OWtzDQ8yui0FVMYSr4lGijxNPw9vmVqv8v+X/L
+         OQbdBRnasRNmI6oPJt4cS54UENxqjUWhJZCQcEzCbJgVqDUs56EFbr5/IAlgRHp3KlZO
+         XefnNoU+bDyHoW3Hw06ZKcGW6hpWvWbvQ0IZaNpFfCJRUpY7M/mxLKfxC+Oe3QjAjRva
+         FkOjaL+I9YqkIRKzk6L3dcBZICTMzM9CMRPHtJ9ZDDsJCaeCjsnCYnG2U2a2o9XUCFSU
+         hebA==
+X-Gm-Message-State: AOJu0Yyk1YARtuPCY3wg1e/oXZlsIliIRWddbNbLq8+c0TGDO2VsJoSI
+	W4Q+Ze2dwpMtqjG4eYHVGOO4rrbU0C84gkjNMovp1fpcbdoKjvI7+pgglt2u3RBFteq1U67uiGe
+	aj+iu6JRE4mvm/XsJtO9/rPpGPOhdNQ==
+X-Google-Smtp-Source: AGHT+IF6Wre7qDXAxrSg6RE/z2buzDo6w6ZZb4VEVOIBII8JTKlmwFo9jvuyv6RJiBWAYOaItqXd+7ju0FklJto9Sr0=
+X-Received: by 2002:a05:600c:4c96:b0:424:addc:c79a with SMTP id
+ 5b1f17b1804b1-424addcc882mr52865175e9.7.1719589016242; Fri, 28 Jun 2024
+ 08:36:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PROBLEM] make randconfig: net/netfilter/core.c:830: undefined
- reference to `netfilter_lwtunnel_fini'
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Linux Kernel Build System <linux-kbuild@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org
-References: <7a472130-d9c4-4fda-840b-093308f73d3d@gmail.com>
- <Znc4931wlIgvqrfP@calendula> <6cdb1346-75ca-472e-8d96-d58a1eaab172@gmail.com>
- <b50bb0bf-4d35-4334-a721-2a092210aecc@gmail.com> <Znw78PpYwAgFZiaB@calendula>
- <3d7b5916-c462-49cb-af32-e43f6d6ebfec@gmail.com>
- <d3f8254f-0f53-47ee-a363-b14e9991a6e9@gmail.com> <Zn3PNGFkg6jqU9wc@calendula>
-Content-Language: en-US
-From: Mirsad Todorovac <mtodorovac69@gmail.com>
-In-Reply-To: <Zn3PNGFkg6jqU9wc@calendula>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <171932574765.3072535.12103787411698322191.stgit@ahduyck-xeon-server.home.arpa>
+ <171932617073.3072535.8918778399126638637.stgit@ahduyck-xeon-server.home.arpa>
+ <20240628151452.GI783093@kernel.org>
+In-Reply-To: <20240628151452.GI783093@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Fri, 28 Jun 2024 08:36:19 -0700
+Message-ID: <CAKgT0UcRSmYWzdv9HHbo5rha8Ey+VavtcHqpEanQpBHMSVO74A@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 09/15] eth: fbnic: Implement Rx queue alloc/start/stop/free
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jun 28, 2024 at 8:14=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Tue, Jun 25, 2024 at 07:36:10AM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > Implement control path parts of Rx queue handling.
+> >
+> > The NIC consumes memory in pages. It takes a full page and places
+> > packets into it in a configurable manner (with the ability to define
+> > headroom / tailroom as well as head alignment requirements).
+> > As mentioned in prior patches there are two page submissions queues
+> > one for packet headers and second (optional) for packet payloads.
+> > For now feed both queues from a single page pool.
+> >
+> > Use the page pool "fragment" API, as we can't predict upfront
+> > how the page will be sliced.
+> >
+> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> > ---
+> >  drivers/net/ethernet/meta/fbnic/fbnic_csr.h    |  103 +++++
+> >  drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |    3
+> >  drivers/net/ethernet/meta/fbnic/fbnic_netdev.h |    3
+> >  drivers/net/ethernet/meta/fbnic/fbnic_pci.c    |    2
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c   |  480 ++++++++++++++++=
+++++++++
+> >  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h   |   33 ++
+> >  6 files changed, 615 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/=
+ethernet/meta/fbnic/fbnic_csr.h
+> > index db423b3424ab..853fb01f8f70 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+> > @@ -16,6 +16,37 @@
+> >
+> >  #define FBNIC_CLOCK_FREQ     (600 * (1000 * 1000))
+> >
+> > +/* Rx Buffer Descriptor Format
+> > + *
+> > + * The layout of this can vary depending on the page size of the syste=
+m.
+> > + *
+> > + * If the page size is 4K then the layout will simply consist of ID fo=
+r
+> > + * the 16 most signficant bits, and the lower 46 are essentially the p=
+age
+>
+> nit: significant
+>
 
+Thanks. Will be fixed for v3.
 
-On 6/27/24 22:44, Pablo Neira Ayuso wrote:
-> On Thu, Jun 27, 2024 at 10:30:24PM +0200, Mirsad Todorovac wrote:
->> On 6/26/24 20:34, Mirsad Todorovac wrote:
->>>
->>>
->>> On 6/26/24 18:04, Pablo Neira Ayuso wrote:
->>>> On Sun, Jun 23, 2024 at 12:51:49AM +0200, Mirsad Todorovac wrote:
->>>>> On 6/23/24 00:48, Mirsad Todorovac wrote:
->>>>>> On 6/22/24 22:49, Pablo Neira Ayuso wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> There is a fix on the table address this, I will submit is in the next
->>>>>>> pull request.
->>>>>>
->>>>>> Thank you very much.
->>>>>>
->>>>>> Please consider adding Reported-by: Mirsad Todorovac <mtodorovac69@gmail.com>
->>>>>>  
->>>>>>> Thanks for reporting
->>>>>>
->>>>>> No big deal. Anytime :-)
->>>>>
->>>>> P.S.
->>>>>
->>>>> Please notify when I could test the same .config with your fix.
->>>>
->>>> Patch is here:
->>>>
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git/commit/?id=aef5daa2c49d510436b733827d4f0bab79fcc4a0
->>>
->>> Build error has gone, tested in the same environment. Please find the build output attached.
->>>
->>> Tested-by: Mirsad Todorovac <mtodorov@69@gmail.com>
->>
->> Apology, please, the right email is this:
->>
->> Tested-by: Mirsad Todorovac <mtodorovac69@gmail.com>
-> 
-> Thanks a lot for testing.
-
-Not at all - I think that testing whether the patch fixed the problem in the
-initial environment adds to QA.
-
-> Patch is already flying upstream, I missed adding this tag. But I
-> could include your Reported-by: tag.
-
-In the Internet space-time contiuum, you actually did not miss a thing,
-because my testing is a logical consequence of your patch, and could not have
-preceded it, so that the Tested-by would be in the original patch ;-)
-
-As Lord Merovingi said, "cause and effect" ;-)
-
-Best regards,
-Mirsad Todorovac
+- Alex
 
