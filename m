@@ -1,76 +1,64 @@
-Return-Path: <netdev+bounces-107825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E9791C73E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 22:18:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5451191C766
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 22:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF751F269CA
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:18:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAACCB279B4
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0D274061;
-	Fri, 28 Jun 2024 20:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B32D78C8F;
+	Fri, 28 Jun 2024 20:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FDsX4eGD"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JlqIbXpW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF48E58AD0
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 20:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D10D78274;
+	Fri, 28 Jun 2024 20:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719605881; cv=none; b=dCP7tY2AzinEWTSS9bFGf3Qtq//eMzAqzIWOUikLFsBMzy1SR5CC8JKhwNxIYTTv1/5PCXV3F6V6Ii/ckQ5QEU4SqBia7/8OVvDv0QEc1AcqXzSQMfRCdZRpmLPofLFzL/qM7OsfRFryhaAg2HYVafcm5oSwU6/RKk5AVLfdyNw=
+	t=1719606938; cv=none; b=Xc7W/REw+8HAKM/cC79HZ2r2F9mznbaKlTezVlBFDL+LvZgBYr5+7JMoFFKrYlLcKgw05cYTdhLKS4qMgbYKPxGF3E3t72QgyY6ocWXn99KzViwyMsoG2I5u0DBxNOb3VObfx6jsOUktVraW4/ny6/2mXRAWvjR6GvEaWKoPzis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719605881; c=relaxed/simple;
-	bh=e8PiW+scgr5Mkdj5iE+pRbAQrE/T+r2hkSbd+2ez/kw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZknwzyXuO//qfiZ4rs3riCJ0IZqW8JMT/meA+gbHTmDwTHZgYNcxffA13zQ8RLnmwZNnUU0NAs1V7hKEX27hbbBKb2v3Tg6eTKrNeCEMJfJFCXicNkwSYZqryf7Cb0dfk/rBKwF9kExE+yjQeo7fnoWuNrlEwamSc4kddMO4ivE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FDsX4eGD; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719605880; x=1751141880;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=e8PiW+scgr5Mkdj5iE+pRbAQrE/T+r2hkSbd+2ez/kw=;
-  b=FDsX4eGDkYQy+MYK3YIhGy8xknUd3uriDMXleyu+rcT/K4+apBgqp/wt
-   xMnFIn6WZlX0iVgRXOzERgQ1p0OaBswt25Pt9anjTnVxZTDWkObFX5l5F
-   Fn3BuFhH90i02iS+o2zHwTMgQpOaOaQ6iiTnbzXSMo5vfshKmpPEE5CkE
-   7PG7R8tb2pIM3l9X15337AvYR3BfY8RnIz9Jg4i8X5RWrUhqUTQD3SLqE
-   ou6hIBhsUYTLgd1TwPc2c9BLdyQIIVK/ebfmO3qjjgk17yQUzbSM54jxx
-   vHm/HYzwbod8CbgQCfgJCQZOogl4ZUx8M2J8CwvYcvJxerqZMgN2AljIx
-   Q==;
-X-CSE-ConnectionGUID: 4OCgqOKlQjmv4Y3t7pC7xA==
-X-CSE-MsgGUID: i2r5nUMuRJ2yK7BELW/A/A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11117"; a="16623452"
-X-IronPort-AV: E=Sophos;i="6.09,170,1716274800"; 
-   d="scan'208";a="16623452"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 13:18:00 -0700
-X-CSE-ConnectionGUID: KjepFoErRB62DZ5ddrnAjQ==
-X-CSE-MsgGUID: Sa0jD7ZESOOnsXO+eeovYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,170,1716274800"; 
-   d="scan'208";a="44676046"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 28 Jun 2024 13:17:59 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Dima Ruinskiy <dima.ruinskiy@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>
-Subject: [PATCH net] e1000e: Fix S0ix residency on corporate systems
-Date: Fri, 28 Jun 2024 13:17:53 -0700
-Message-ID: <20240628201754.2744221-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1719606938; c=relaxed/simple;
+	bh=Z+z8IqF9p2OuVi283o4CfF1bk3TE4Li6a22iqTpCbd8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QWYeh5xU5lnOP6q1AN4G+cOTBaIFqKeBMRoxPlwbz0MvlcUXeUjs824MukKjSBLJLA5aI5ykRrRoUP/2TBFDh1EgwsI10NK0Nsq3RvN5a1JWTmTiemkZ6Kkx8q1NBMD3bdBJa9KjEsRb+o0kRT2krmmeybkelmkeRIxGQVGlUa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JlqIbXpW; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=7+iquzvX4RJb1J5IQ5AgA+Y0XDzL+plsSrlY+5cXPF4=; b=JlqIbXpWswI/6kp6yHi0rZgeFd
+	2NCBU0422V+udILjAsCPx/yehPOK+YW3pJWQ0FYOqXp+8YS16EgvQuXVey8k5RP4KwZAZj4pxIuxl
+	3Sh/PS7a4qZdx0ChaXNsWFLYUKRfgccGLfPJzIrngSfp2FxzDv22rzSBiTNJUmEQTefsrSu/Vo3Sr
+	+jKpyllzAIc15nJ6ywGMZ8H8DqudtsMO1nPw4zfb2krFvGPo1gSon49HvaSTToVrVW7u0f7aIO0xY
+	KM56jMy50E6j/5uf/h6k4o2yIZ6NVCK595ssGKGrz4G08AZ5OdZVSgqSdPsx4GSmWIhy9GmBLsvYh
+	RGWj3lXQ==;
+Received: from 38.249.197.178.dynamic.cust.swisscom.net ([178.197.249.38] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sNIJd-000Ego-9n; Fri, 28 Jun 2024 22:35:29 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lex Siegel <usiegl00@gmail.com>,
+	Neil Brown <neilb@suse.de>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>
+Subject: [PATCH net v3] net, sunrpc: Remap EPERM in case of connection failure in xs_tcp_setup_socket
+Date: Fri, 28 Jun 2024 22:35:25 +0200
+Message-Id: <2e62f0fc284b2f27156cd497fbb733b55a5ade43.1719592013.git.daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,205 +66,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27320/Fri Jun 28 10:37:18 2024)
 
-From: Dima Ruinskiy <dima.ruinskiy@intel.com>
+When using a BPF program on kernel_connect(), the call can return -EPERM. This
+causes xs_tcp_setup_socket() to loop forever, filling up the syslog and causing
+the kernel to potentially freeze up.
 
-On vPro systems, the configuration of the I219-LM to achieve power
-gating and S0ix residency is split between the driver and the CSME FW.
-It was discovered that in some scenarios, where the network cable is
-connected and then disconnected, S0ix residency is not always reached.
-This was root-caused to a subset of I219-LM register writes that are not
-performed by the CSME FW. Therefore, the driver should perform these
-register writes on corporate setups, regardless of the CSME FW state.
+Neil suggested:
 
-This was discovered on Meteor Lake systems; however it is likely to
-appear on other platforms as well.
+  This will propagate -EPERM up into other layers which might not be ready
+  to handle it. It might be safer to map EPERM to an error we would be more
+  likely to expect from the network system - such as ECONNREFUSED or ENETDOWN.
 
-Fixes: cc23f4f0b6b9 ("e1000e: Add support for Meteor Lake")
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=218589
-Signed-off-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+ECONNREFUSED as error seems reasonable. For programs setting a different error
+can be out of reach (see handling in 4fbac77d2d09) in particular on kernels
+which do not have f10d05966196 ("bpf: Make BPF_PROG_RUN_ARRAY return -err
+instead of allow boolean"), thus given that it is better to simply remap for
+consistent behavior. UDP does handle EPERM in xs_udp_send_request().
+
+Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
+Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
+Co-developed-by: Lex Siegel <usiegl00@gmail.com>
+Signed-off-by: Lex Siegel <usiegl00@gmail.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Neil Brown <neilb@suse.de>
+Cc: Trond Myklebust <trondmy@kernel.org>
+Cc: Anna Schumaker <anna@kernel.org>
+Link: https://github.com/cilium/cilium/issues/33395
+Link: https://lore.kernel.org/bpf/171374175513.12877.8993642908082014881@noble.neil.brown.name
 ---
- drivers/net/ethernet/intel/e1000e/netdev.c | 132 ++++++++++-----------
- 1 file changed, 66 insertions(+), 66 deletions(-)
+ [ Fixes tags are set to the orig connect commit so that stable team
+   can pick this up. ]
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index da5c59daf8ba..3cd161c6672b 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6363,49 +6363,49 @@ static void e1000e_s0ix_entry_flow(struct e1000_adapter *adapter)
- 		mac_data |= E1000_EXTCNF_CTRL_GATE_PHY_CFG;
- 		ew32(EXTCNF_CTRL, mac_data);
- 
--		/* Enable the Dynamic Power Gating in the MAC */
--		mac_data = er32(FEXTNVM7);
--		mac_data |= BIT(22);
--		ew32(FEXTNVM7, mac_data);
--
- 		/* Disable disconnected cable conditioning for Power Gating */
- 		mac_data = er32(DPGFR);
- 		mac_data |= BIT(2);
- 		ew32(DPGFR, mac_data);
- 
--		/* Don't wake from dynamic Power Gating with clock request */
--		mac_data = er32(FEXTNVM12);
--		mac_data |= BIT(12);
--		ew32(FEXTNVM12, mac_data);
--
--		/* Ungate PGCB clock */
--		mac_data = er32(FEXTNVM9);
--		mac_data &= ~BIT(28);
--		ew32(FEXTNVM9, mac_data);
--
--		/* Enable K1 off to enable mPHY Power Gating */
--		mac_data = er32(FEXTNVM6);
--		mac_data |= BIT(31);
--		ew32(FEXTNVM6, mac_data);
--
--		/* Enable mPHY power gating for any link and speed */
--		mac_data = er32(FEXTNVM8);
--		mac_data |= BIT(9);
--		ew32(FEXTNVM8, mac_data);
--
- 		/* Enable the Dynamic Clock Gating in the DMA and MAC */
- 		mac_data = er32(CTRL_EXT);
- 		mac_data |= E1000_CTRL_EXT_DMA_DYN_CLK_EN;
- 		ew32(CTRL_EXT, mac_data);
--
--		/* No MAC DPG gating SLP_S0 in modern standby
--		 * Switch the logic of the lanphypc to use PMC counter
--		 */
--		mac_data = er32(FEXTNVM5);
--		mac_data |= BIT(7);
--		ew32(FEXTNVM5, mac_data);
- 	}
- 
-+	/* Enable the Dynamic Power Gating in the MAC */
-+	mac_data = er32(FEXTNVM7);
-+	mac_data |= BIT(22);
-+	ew32(FEXTNVM7, mac_data);
-+
-+	/* Don't wake from dynamic Power Gating with clock request */
-+	mac_data = er32(FEXTNVM12);
-+	mac_data |= BIT(12);
-+	ew32(FEXTNVM12, mac_data);
-+
-+	/* Ungate PGCB clock */
-+	mac_data = er32(FEXTNVM9);
-+	mac_data &= ~BIT(28);
-+	ew32(FEXTNVM9, mac_data);
-+
-+	/* Enable K1 off to enable mPHY Power Gating */
-+	mac_data = er32(FEXTNVM6);
-+	mac_data |= BIT(31);
-+	ew32(FEXTNVM6, mac_data);
-+
-+	/* Enable mPHY power gating for any link and speed */
-+	mac_data = er32(FEXTNVM8);
-+	mac_data |= BIT(9);
-+	ew32(FEXTNVM8, mac_data);
-+
-+	/* No MAC DPG gating SLP_S0 in modern standby
-+	 * Switch the logic of the lanphypc to use PMC counter
-+	 */
-+	mac_data = er32(FEXTNVM5);
-+	mac_data |= BIT(7);
-+	ew32(FEXTNVM5, mac_data);
-+
- 	/* Disable the time synchronization clock */
- 	mac_data = er32(FEXTNVM7);
- 	mac_data |= BIT(31);
-@@ -6498,33 +6498,6 @@ static void e1000e_s0ix_exit_flow(struct e1000_adapter *adapter)
- 	} else {
- 		/* Request driver unconfigure the device from S0ix */
- 
--		/* Disable the Dynamic Power Gating in the MAC */
--		mac_data = er32(FEXTNVM7);
--		mac_data &= 0xFFBFFFFF;
--		ew32(FEXTNVM7, mac_data);
--
--		/* Disable mPHY power gating for any link and speed */
--		mac_data = er32(FEXTNVM8);
--		mac_data &= ~BIT(9);
--		ew32(FEXTNVM8, mac_data);
--
--		/* Disable K1 off */
--		mac_data = er32(FEXTNVM6);
--		mac_data &= ~BIT(31);
--		ew32(FEXTNVM6, mac_data);
--
--		/* Disable Ungate PGCB clock */
--		mac_data = er32(FEXTNVM9);
--		mac_data |= BIT(28);
--		ew32(FEXTNVM9, mac_data);
--
--		/* Cancel not waking from dynamic
--		 * Power Gating with clock request
--		 */
--		mac_data = er32(FEXTNVM12);
--		mac_data &= ~BIT(12);
--		ew32(FEXTNVM12, mac_data);
--
- 		/* Cancel disable disconnected cable conditioning
- 		 * for Power Gating
- 		 */
-@@ -6537,13 +6510,6 @@ static void e1000e_s0ix_exit_flow(struct e1000_adapter *adapter)
- 		mac_data &= 0xFFF7FFFF;
- 		ew32(CTRL_EXT, mac_data);
- 
--		/* Revert the lanphypc logic to use the internal Gbe counter
--		 * and not the PMC counter
--		 */
--		mac_data = er32(FEXTNVM5);
--		mac_data &= 0xFFFFFF7F;
--		ew32(FEXTNVM5, mac_data);
--
- 		/* Enable the periodic inband message,
- 		 * Request PCIe clock in K1 page770_17[10:9] =01b
- 		 */
-@@ -6581,6 +6547,40 @@ static void e1000e_s0ix_exit_flow(struct e1000_adapter *adapter)
- 	mac_data &= ~BIT(31);
- 	mac_data |= BIT(0);
- 	ew32(FEXTNVM7, mac_data);
-+
-+	/* Disable the Dynamic Power Gating in the MAC */
-+	mac_data = er32(FEXTNVM7);
-+	mac_data &= 0xFFBFFFFF;
-+	ew32(FEXTNVM7, mac_data);
-+
-+	/* Disable mPHY power gating for any link and speed */
-+	mac_data = er32(FEXTNVM8);
-+	mac_data &= ~BIT(9);
-+	ew32(FEXTNVM8, mac_data);
-+
-+	/* Disable K1 off */
-+	mac_data = er32(FEXTNVM6);
-+	mac_data &= ~BIT(31);
-+	ew32(FEXTNVM6, mac_data);
-+
-+	/* Disable Ungate PGCB clock */
-+	mac_data = er32(FEXTNVM9);
-+	mac_data |= BIT(28);
-+	ew32(FEXTNVM9, mac_data);
-+
-+	/* Cancel not waking from dynamic
-+	 * Power Gating with clock request
-+	 */
-+	mac_data = er32(FEXTNVM12);
-+	mac_data &= ~BIT(12);
-+	ew32(FEXTNVM12, mac_data);
-+
-+	/* Revert the lanphypc logic to use the internal Gbe counter
-+	 * and not the PMC counter
-+	 */
-+	mac_data = er32(FEXTNVM5);
-+	mac_data &= 0xFFFFFF7F;
-+	ew32(FEXTNVM5, mac_data);
- }
- 
- static int e1000e_pm_freeze(struct device *dev)
+ v1 -> v2 -> v3:
+   - Plain resend, adding correct sunrpc folks to Cc
+     https://lore.kernel.org/bpf/Zn7wtStV+iafWRXj@tissot.1015granger.net/
+
+ net/sunrpc/xprtsock.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index dfc353eea8ed..0e1691316f42 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -2441,6 +2441,13 @@ static void xs_tcp_setup_socket(struct work_struct *work)
+ 		transport->srcport = 0;
+ 		status = -EAGAIN;
+ 		break;
++	case -EPERM:
++		/* Happens, for instance, if a BPF program is preventing
++		 * the connect. Remap the error so upper layers can better
++		 * deal with it.
++		 */
++		status = -ECONNREFUSED;
++		fallthrough;
+ 	case -EINVAL:
+ 		/* Happens, for instance, if the user specified a link
+ 		 * local IPv6 address without a scope-id.
 -- 
-2.41.0
+2.21.0
 
 
