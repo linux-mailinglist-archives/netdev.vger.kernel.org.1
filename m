@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-107530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B69491B54F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:11:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4DF91B551
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B01B3281FF3
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 03:11:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 604901C20920
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 03:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A431BF37;
-	Fri, 28 Jun 2024 03:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1994C1BF50;
+	Fri, 28 Jun 2024 03:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIY9rU7q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PNH2svvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0814F1B7FD
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 03:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2625017556
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 03:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719544235; cv=none; b=CureIL/9y8Ljm5J64+oz+l0kQndQ/l7VW2xli6n+R0o+A/NubfJgtiIJoUjwb7k32/ZrXi2n+4CZmZyuyAAuw3EQPW2YruEj9XCKPAiRsKBFUO9KGbghtEXY4Kp5JLZ/FxGxok9ZCHiRYiqzI5JqfekERq4ghW2s63bgj0FrMVc=
+	t=1719544365; cv=none; b=D1HKtn2BL2i40UbaG5SnS0favxnWqGAPV+MFaLKocQQgmZSdxdCzsqAt0c8jkE7GqkLafROpd1o/5Cm0Vs9aG8onWqjSzAEZ0TDJTTtbmnya4iDEgNc055TVACTMKgygFszwSMK9BCcunzcIG2W3jX+LE6ci07ObSiSqSiU+XXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719544235; c=relaxed/simple;
-	bh=ayUtdj0jbmYyhKV/itKphkG4lSGfodZRBtWNtlUBvGA=;
+	s=arc-20240116; t=1719544365; c=relaxed/simple;
+	bh=KpKvoNe31q1ir/EC3qbB097EM0L4TCKV56PaZiAfSFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sBWhpFuRVSQQ5o01HQJHuRRagjdJM3Q0+4+2g5w5qCOkAtCOcjnStapZPdfNQYjYO4NQ+npofrXsDteXujF/xKNGBOcGlB74FbruKs+EhhBuN5mGgFzcWtbXaXvyUh/+akpCpd1bBslU1WgCyt90U1R2mU3FiqGZF8O5mP9SW5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIY9rU7q; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-701b0b0be38so145029b3a.0
-        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 20:10:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719544233; x=1720149033; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GRAqCzJrRfu6LeRpymGALBIDW+CZkSunC+6/vOx3XWI=;
-        b=bIY9rU7qcJdoJlF07Od0J4ZpPxti2akNM3K4iaKVwp8eXgE6sPC+Ve8oVYbN/QJvrY
-         PWPnivN67W/uf0wmxV+BcoOwg/WYylL2xpF6KgBzLSYAVoEWjRxGpqChIdh87T/rXUKJ
-         Tl89LpZQunlkIoSYa8Im3DZj9q3W453bJsImGIHMi4qmLehrY0fNxLpJK42AwPEFdT8D
-         l+wSueP6rNZOoVsWbCC3PtP1W3zmJ2jvWW+pS1aXgu5rbc27mhWJBMh/Bvj627E3oZDU
-         WAjqgSLOKo4TTzV6etbm740m1eI5mzCv8sUI3cngMa8mrCZXlB/5Z8oxkzdvkPAOb6Hv
-         Vryw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719544233; x=1720149033;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GRAqCzJrRfu6LeRpymGALBIDW+CZkSunC+6/vOx3XWI=;
-        b=X8VEjz6713miRkdUuuoMO3FbYuunhOhaukcPzg6kRrVqjf6oW5aq9qobixzby9HCoI
-         2sfqIL+aV3VQWnzsAHihH3GZOl/mijClJEHvyV4Ge1k1p6Fo8gnVKeZuDSsoyGwdsz7i
-         LvVeAfT0l1lbDekUtEe37FyWKQ+5ZOm6xtSBClJ30mxW4C63Mc2uDxKR800cAcWHgf3R
-         pMnl09qn8aDSY69GkSjB7jWBlAAWiVWS3tizeEAbtw0qtfxsmBB/xvDqGFGownuZXZX9
-         pUJ4k62tkbHnGefvE39T5lAMZzH26/eSN1y1/xVjHcOT3esigiaZr+fKwoSfpyN+lbv/
-         ikKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1N4ooIhOXdZD8lbtNQH5LbfXtiXLRy23M2+8MAnCHWyy08jftebOAcbi23pykhe2pSSQwRIbU6OAFfuaR/lOZnN7PwZ7t
-X-Gm-Message-State: AOJu0Yy/pqowd7SmOKz9k3bGbii0J+VUVTpEiwS8i7t8nTo3B6PVY+32
-	H+cW7bb4ZNFDC2euag6NFx+twPgryyEiOSyXK2wK0XKhHsIkcDMR
-X-Google-Smtp-Source: AGHT+IFTjEgNdisyE5vhQgaRG/9dAuawYzNheYQw7LkuCImTPgPGhoHUgbuw8O2tmVYvSlnsCtsC1A==
-X-Received: by 2002:a05:6a20:841c:b0:1b7:733c:d11 with SMTP id adf61e73a8af0-1bcf7fcdbeamr20312501637.41.1719544233163;
-        Thu, 27 Jun 2024 20:10:33 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:7825:fd0:4f66:6e77:859a:643d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac1569192sm4817645ad.214.2024.06.27.20.10.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 20:10:32 -0700 (PDT)
-Date: Fri, 28 Jun 2024 11:10:27 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
-	Amit Cohen <amcohen@nvidia.com>
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-Message-ID: <Zn4po-wJoFat3CUd@Laptop-X1>
-References: <20240626075156.2565966-1-liuhangbin@gmail.com>
- <20240626145355.5db060ad@kernel.org>
- <1429621.1719446760@famine>
- <Zn0iI3SPdRkmfnS1@Laptop-X1>
- <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
- <Zn05dMVVlUmeypas@Laptop-X1>
- <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
- <Zn1mXRRINDQDrIKw@Laptop-X1>
- <1467748.1719498250@famine>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nb3c5uEOpgPHkW/OLSBPb3k/VfTgdTA44ug9z5WALsiFAc3wqSUMHIda5fvDQRv9S4I5EvYv7fLO2mtrzqOw0g1BNYFUsOGzkzoJgOeEhz0uqO089w92Y/CYIwrD7oNSH5Ph6CU+lDtHCdxCZeF2nvu4MSQxFB3nRwindbfJkBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PNH2svvH; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719544363; x=1751080363;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KpKvoNe31q1ir/EC3qbB097EM0L4TCKV56PaZiAfSFw=;
+  b=PNH2svvHjccalso4i9ZCOjaBHq/eIM3yLZiGYJkD31/o5Bm+S9b5BtFf
+   6sVkv63x1Gu4VaQ3HQCirTdFykb8qf9/0PHVKfHmcT12mq0sJT5u1I7+J
+   UnWy5QsmyAHeuszo9Mwma/uEibni5+Z56k5uBAX1tLUCJWIIr6jJak1mT
+   z6iHhcs+svksK1e4NEfFVl2Zh5ZRoRV0HC0zysC/3YCF76k5MRjKR3JEW
+   sEgm1x4SlY++rEk5pb5eKBGktW922WrxO3ZtcA8D9zGAiLAV0900NzJok
+   dXxqYlGXKAe3yK/PCbkliBsNo4fBHWF9qb/9JJ5vg/0nE7AAgykj1eCfQ
+   g==;
+X-CSE-ConnectionGUID: NH6OO0U0Tt2VXgpV4j1DlA==
+X-CSE-MsgGUID: l1AIysjITl6FMPa2HaVW8Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="20586079"
+X-IronPort-AV: E=Sophos;i="6.09,167,1716274800"; 
+   d="scan'208";a="20586079"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 20:12:42 -0700
+X-CSE-ConnectionGUID: Jsd8QtN4TXia8baFcb1tSw==
+X-CSE-MsgGUID: jz6j91dmSHWQE3tOo9P3Iw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,167,1716274800"; 
+   d="scan'208";a="44510188"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2024 20:12:41 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sN22P-000Gko-1U;
+	Fri, 28 Jun 2024 03:12:37 +0000
+Date: Fri, 28 Jun 2024 11:11:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: zijianzhang@bytedance.com, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com, Zijian Zhang <zijianzhang@bytedance.com>
+Subject: Re: [PATCH net-next v6 2/4] sock: support copy cmsg to userspace in
+ TX path
+Message-ID: <202406281051.NAiS477l-lkp@intel.com>
+References: <20240626193403.3854451-3-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,60 +80,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1467748.1719498250@famine>
+In-Reply-To: <20240626193403.3854451-3-zijianzhang@bytedance.com>
 
-On Thu, Jun 27, 2024 at 07:24:10AM -0700, Jay Vosburgh wrote:
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> >Ah.. Yes, that's a sad fact :(
-> 
-> 	There are basically two paths that will change the LACP state
-> that's passed up via netlink (the aggregator ID, and actor and partner
-> oper port states): bond_3ad_state_machine_handler(), or incoming
-> LACPDUs, which call into ad_rx_machine().  Administrative changes to the
+Hi,
 
-Ah, thanks, I didn't notice this. I will also enable lacp notify
-in ad_rx_machine().
+kernel test robot noticed the following build warnings:
 
-> bond will do it too, like adding or removing interfaces, but those
-> originate in user space and aren't happening asynchronously.
-> 
-> 	If you want (almost) absolute reliability in communicating every
-> state change for the state machine and LACPDU processing, I think you'd
-> have to (a) create an object with the changed state, (b) queue it
-> somewhere, then (c) call a workqueue event to process that queue out of
-> line.
+[auto build test WARNING on net-next/main]
 
-Hmm... This looks too complex. If we store all the states. A frequent flashing
-may consume the memory. If we made a limit for the queue, we may still loosing
-some state changes.
+url:    https://github.com/intel-lab-lkp/linux/commits/zijianzhang-bytedance-com/selftests-fix-OOM-problem-in-msg_zerocopy-selftest/20240627-150801
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240626193403.3854451-3-zijianzhang%40bytedance.com
+patch subject: [PATCH net-next v6 2/4] sock: support copy cmsg to userspace in TX path
+config: i386-randconfig-062-20240628 (https://download.01.org/0day-ci/archive/20240628/202406281051.NAiS477l-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240628/202406281051.NAiS477l-lkp@intel.com/reproduce)
 
-I'm not sure which way is better.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406281051.NAiS477l-lkp@intel.com/
 
-> 
-> >> It all depends on what are the requirements.
-> >> 
-> >> An uglier but lockless alternative would be to poll the slave's sysfs oper state,
-> >> that doesn't require any locks and would be up-to-date.
-> >
-> >Hmm, that's a workaround, but the admin need to poll the state frequently as
-> >they don't know when the state will change.
-> >
-> >Hi Jay, are you OK to add this sysfs in bonding?
-> 
-> 	I think what Nik is proposing is for your userspace to poll the
-> /sys/class/net/${DEV}/operstate.
+sparse warnings: (new ones prefixed by >>)
+>> net/socket.c:2635:30: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *msg_control @@     got void [noderef] __user *[noderef] __user msg_control @@
+   net/socket.c:2635:30: sparse:     expected void *msg_control
+   net/socket.c:2635:30: sparse:     got void [noderef] __user *[noderef] __user msg_control
+>> net/socket.c:2629:49: sparse: sparse: dereference of noderef expression
 
-OK. There are 2 scenarios I got.
+vim +2635 net/socket.c
 
-1) the local user want to get the local/partner state and make sure not
-send pkts before they are in DISTRIBUTING state to avoid pkts drop, Or vice
-versa. Only checking link operstate or up/down status is not enough.
+  2623	
+  2624	static int sendmsg_copy_cmsg_to_user(struct msghdr *msg_sys,
+  2625					     struct user_msghdr __user *umsg)
+  2626	{
+  2627		struct compat_msghdr __user *umsg_compat =
+  2628					(struct compat_msghdr __user *)umsg;
+> 2629		unsigned long cmsg_ptr = (unsigned long)umsg->msg_control;
+  2630		unsigned int flags = msg_sys->msg_flags;
+  2631		struct msghdr msg_user = *msg_sys;
+  2632		struct cmsghdr *cmsg;
+  2633		int err;
+  2634	
+> 2635		msg_user.msg_control = umsg->msg_control;
+  2636		msg_user.msg_control_is_user = true;
+  2637		for_each_cmsghdr(cmsg, msg_sys) {
+  2638			if (!CMSG_OK(msg_sys, cmsg))
+  2639				break;
+  2640			if (cmsg_copy_to_user(cmsg))
+  2641				put_cmsg(&msg_user, cmsg->cmsg_level, cmsg->cmsg_type,
+  2642					 cmsg->cmsg_len - sizeof(*cmsg), CMSG_DATA(cmsg));
+  2643		}
+  2644	
+  2645		err = __put_user((msg_sys->msg_flags & ~MSG_CMSG_COMPAT), COMPAT_FLAGS(umsg));
+  2646		if (err)
+  2647			return err;
+  2648		if (MSG_CMSG_COMPAT & flags)
+  2649			err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+  2650					 &umsg_compat->msg_controllen);
+  2651		else
+  2652			err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+  2653					 &umsg->msg_controllen);
+  2654		return err;
+  2655	}
+  2656	
 
-2) the admin want to get the switch/partner status via LACP status incase
-the switch is crashed.
-
-Do you have any suggestion for the implementation?
-
-Thanks
-Hangbin
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
