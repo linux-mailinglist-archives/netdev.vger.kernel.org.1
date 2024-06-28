@@ -1,95 +1,104 @@
-Return-Path: <netdev+bounces-107499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DCFF91B330
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:10:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E41591B342
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13FF71F23CCF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:10:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C4AB282DF0
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D98196;
-	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADABA15CE;
+	Fri, 28 Jun 2024 00:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiDnM8FG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ox1cTSR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5AB191;
-	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA80037B;
+	Fri, 28 Jun 2024 00:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719533429; cv=none; b=HQf6+yu9iDSJqwvi03QHdsR5kEMtmTcd2V8T4SHXknkI4ZLV8QkqPRysCC0lV3XeUz/Wsq6SRFDwBnRikU2D8CqHEM2EBx3eTe/qoFKzWVDZ5F5kQ+bpk8LN2TjQjSIEinzkIFYBeRRpJSD7Fg9NubOHbD7IZDZkVj3rUkbrv4Y=
+	t=1719533942; cv=none; b=Uw3XpssERQwOgj63kZEA7CF2gtChaxCiLb2MUwpLrfGtY+KK4o/pA0w3Mmo1g8S1dhDrqLXJHSaV+pdxW3F7/Gezf4vl+mxTTcE1QsYUFjqvpdlcwndtH4hixzRUmenmU6VdcCO31+wo2hXbur6+XGUbzO3MP12SxxZh4aanmtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719533429; c=relaxed/simple;
-	bh=3GHMMp2TTP4bxQLBDw4fiztif1SW1cL0IEHns4AvqOo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t8S8AXcI4Xcx1cWe575kKxEDsuX664Xk4vGsgdqHiPf5a1JrNiv6tAB5B51a0VjsSDuaWW1DJuUbbbkrs4vOwdUgicYwNTuhRmxgGizoSvEhgYuakqiZzS/UF0t+IUOWsaaI80PEgp7EDJNo40Lub9qEBE11RsykuUgdiOk9LKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiDnM8FG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 27EBBC32789;
-	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719533429;
-	bh=3GHMMp2TTP4bxQLBDw4fiztif1SW1cL0IEHns4AvqOo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RiDnM8FG2yKnOg3/0pOpMBb/HS8t1Wc685A2zYiXT3EpV6fJfincqYrnGSwkZpUOh
-	 0Bd19t2K0iJO4etdEmLJrMIguWmPfSxM1FJRMhzmOu3iK0UHZPvODQpKlB/sofaITu
-	 R1WYocvzroD5OHS3veoNFG7xVMcHcQ3egPC9UO+b4tpnIi5YT7KWY2o41Pghl4EEhQ
-	 3HL+G6UGXNevV5kMnU50YaB9R9PvZFs4VVJ66Q80stjRvv+yikYvYB9TmmDaaZnbtB
-	 QZJlV7wtzGO8MppSSzfMCODV5I52hcKutxCnTmCZtPhDPCwwGPqKRCaJCMG6RKCjMN
-	 6IqW3CItcxokg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14981C43336;
-	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719533942; c=relaxed/simple;
+	bh=rPX38+Ity8fK7DN4OSCz8/N8q21zqUJ/qt3eFGqWfGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EyMbeH2JSyDg927yRKo5qmVFYMVWlYbpUiHj/frZIl8ncjGNT+qExHdEjWhu/gntiGL4t40FuBh0Dex9ajtGpd2f61q/oXf4/mi3fuHnP7XNKM2h3u0Ebg1NH9tbOyJPg3ePFOdSGptb5q7qP9/oJs2Sl62NrHVyGCWxKBsur/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ox1cTSR9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NOars6xQgRS8s48rhpVjllpjJ7HsZP9qcOz0PZGctM8=; b=ox1cTSR9gvsqJuHYlZucsoHSsB
+	UAk+BOne8++Jpzfis4oAiqm/JIgEH44KP/p/svBijrZAoTYEL25XNuQiYwL2itgcRYx0Uftv4AJEG
+	PaWc6ny4avEdHb8yDXOVe8ELsVFC0j8kaQUmCm+5AGYPUyrFUgpolvfASyfonKxTCaP4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sMzK9-001Dw2-5k; Fri, 28 Jun 2024 02:18:45 +0200
+Date: Fri, 28 Jun 2024 02:18:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v2 net-next 3/3] net: phy: aquantia: add support for
+ aqr115c
+Message-ID: <d227011a-b4bf-427f-85c2-5db61ad0086c@lunn.ch>
+References: <20240627113018.25083-1-brgl@bgdev.pl>
+ <20240627113018.25083-4-brgl@bgdev.pl>
+ <Zn3q5f5yWznMjAXd@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: thunderx: Unembed netdev structure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171953342907.1107.6780824030224917954.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Jun 2024 00:10:29 +0000
-References: <20240626173503.87636-1-leitao@debian.org>
-In-Reply-To: <20240626173503.87636-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, sgoutham@marvell.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zn3q5f5yWznMjAXd@makrotopia.org>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 26 Jun 2024 10:35:02 -0700 you wrote:
-> Embedding net_device into structures prohibits the usage of flexible
-> arrays in the net_device structure. For more details, see the discussion
-> at [1].
+On Thu, Jun 27, 2024 at 11:42:45PM +0100, Daniel Golle wrote:
+> Hi Bartosz,
 > 
-> Un-embed the net_devices from struct lmac by converting them
-> into pointers, and allocating them dynamically. Use the leverage
-> alloc_netdev() to allocate the net_device object at
-> bgx_lmac_enable().
+> On Thu, Jun 27, 2024 at 01:30:17PM +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > 
+> > Add support for a new model to the Aquantia driver. This PHY supports
+> > Overlocked SGMII mode with 2.5G speeds.
 > 
-> [...]
+> I don't think that there is such a thing as "Overclocked SGMII mode with
+> 2.5G speed".
 
-Here is the summary with links:
-  - [net-next,v2] net: thunderx: Unembed netdev structure
-    https://git.kernel.org/netdev/net-next/c/94833addfaba
+Unfortunately, there is. A number of vendors say they do this, without
+saying quite what they actually do.  As you point out, symbol
+replication does not work, and in-band signalling also makes no
+sense. So they throw all that away. Leaving just the higher clock
+rate, single speed, and no in-band signalling.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+In the end, that looks very similar to 2500BaseX with broken inband
+signalling.
 
+> Hence I assume that what you meant to say here is that the PHY uses
+> 2500Base-X as interface mode and performs rate-adaptation for speeds
+> less than 2500M (or half-duplex) using pause frames.
 
+Not all systems assume rate adaptation. Some are known to use SGMII
+for 10/100/1G with inband signalling, and then swap to 2500BaseX
+without inband-signalling for 2.5G operation!
+
+2.5G is a mess.
+
+    Andrew
 
