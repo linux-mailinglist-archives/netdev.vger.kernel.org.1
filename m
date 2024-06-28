@@ -1,240 +1,125 @@
-Return-Path: <netdev+bounces-107854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D282091C99E
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:36:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F48391C99F
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020601C21DFC
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 23:36:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE50C1F230BF
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 23:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A6578286;
-	Fri, 28 Jun 2024 23:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A85F81AC7;
+	Fri, 28 Jun 2024 23:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="HHglxMDg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k0oFgDG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BD6BA53
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 23:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1696BA53;
+	Fri, 28 Jun 2024 23:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719617790; cv=none; b=s8Vfe9B2jNmF40chQ4fAlZ3txUNPH4Uri91f7Z8qcr3dWIt/4JIa1tQS5uTWG5msbMrUF/PP1y4KDR0f5WRMQv+iGgUnpn+Z4RFZwvH2nyVXCXWz8UlPvrnkrIzrgjjMplaM/U2oAGFG8HQzQktilR3furdzUxRzvmApxGPInng=
+	t=1719617856; cv=none; b=iPt1Vv6uqeIT2bzRQk4E05A1tQPKfdh7cA0nsz4YzO6chMpt/73t1wwzDHlXCfL3GZa30iL9pBzAXMADukVA+mil93BOj2lGqOZ4rzfuFazwBeeGEiEyhcqwDR8bHY+SDKgylN9BR0wRM2PSrhPzzmZQ3GDMwWyv3KiFAC5Bcq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719617790; c=relaxed/simple;
-	bh=MUI0Z1qvWCy79CRxccjUPCl7hsRG+73jN/5v4m60dMY=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=pFV7A6mDXuuD+OMU7ZWCEM971AvG3VjmiI7vleaaK4T/n4PSO1opgOIwuafCj9epMLV0raVPATJzHkHeeUEoTku8fJJZtqSIiJOSTid0OblarL05SNf50VMkacWTrfRU27X2M0R9p3cunKAV7pF1sX91g8wyRqkNXXwNsZcis3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=HHglxMDg; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 8861C3F8DE
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 23:36:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1719617780;
-	bh=PdRDEddoUupXP2xLQBakrELnh8voZdp1wksDEeMmmbQ=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=HHglxMDgS+Y7TvLNQnLa9Y7+cww8L7pcX13aXvXf8w1K+/lAB2k4hG8q8JszYPcai
-	 jZN0dvJe60Jaes/gpTwGP3bXlvaMAchQ5G4seh6z6j3bprvkhrE5OMqtWJTrN6zOlk
-	 IKn1NVlp9ASjXp5b9CrVwC1GdoJKphUQP5J84hAI/zZzIraEY5j8OxEJngtk4y4CGj
-	 rMmJS+5T2+XdIYNQW5VncZ2cYvNhrqyIz7bUABUmCNRd637Ry9i+ICXPpkR4Fg/S3q
-	 vcu/fXwuNf13ODNMApLdj4GfgSfku4jlU9NsFfHhZ3opVTcc194kc15Y4uIgWZkaQq
-	 8vnETD0WidnGQ==
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5ba793ceccaso942501eaf.2
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 16:36:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719617779; x=1720222579;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PdRDEddoUupXP2xLQBakrELnh8voZdp1wksDEeMmmbQ=;
-        b=tPQVlXI13D1FwaT/ujW4YpL8l1RUhBQlVGwNhCMgiyp0IF3wLW9yX1qEGQNVO2dRyM
-         fHJPTYJeo7ERIAqW9cY7g15hCpBBbc0yIncTXc+bPUABi40aoomV0YhgNPdqe+lz3vMB
-         TerCWVQCXy8CV16SK2jz/WtmJeoNQdrv78TUwiLvUQ5Y37efCI2whB0fKSelBo85+E0M
-         3CsO+9CY9mVH9P36ZYFOPoT2Btay+1wTiX6fy9YSRDUW0WCMryPPjp5wsGSTIc/QsK49
-         WwQBnVjC2CvQbtNYvF3v7mRWJePzBZTexr4eEJXeHPe4qbi+pDLStDz99RdiXAZhcCgK
-         HPtw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtvGj06E08lYrTLW7xNR0hXxaW25p9LNO/2U2FU1vbOQP4VkSJ/0NRD3fDu6pYecB4CBXKEb5ixZFLo8x0IPsXu2zAndf0
-X-Gm-Message-State: AOJu0YwFrdE2cKEWD6Fq16hOTdHnaCnpAHTmtmu24l4jLFb4G+ADiOU4
-	ucQ5jttXIXOfYyo+iRIpGvYM7/svVhaR6N6OmwOaJqpe0qGDjTlLOYJbCt33hIYnY2Ls80NZchY
-	lcbU6LyHhYfUOqZ1ye1sOVNVwT7lj3RRDIaCnl+uJ1fUC/ygz+UMprfugGPcH9Ux6M9VZww==
-X-Received: by 2002:a05:6359:5fa6:b0:1a6:7e01:e4e9 with SMTP id e5c5f4694b2df-1a67e01edfamr581556755d.25.1719617779094;
-        Fri, 28 Jun 2024 16:36:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGHKL/Jes7h3SRTQekWmAI0mKeLwtIaI35DopzkOkrZlKqxA3nxEz5RU8SW15DHJTBCYx4s2Q==
-X-Received: by 2002:a05:6359:5fa6:b0:1a6:7e01:e4e9 with SMTP id e5c5f4694b2df-1a67e01edfamr581554055d.25.1719617778557;
-        Fri, 28 Jun 2024 16:36:18 -0700 (PDT)
-Received: from famine.localdomain ([50.35.97.145])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c91ce1683csm2220731a91.8.2024.06.28.16.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 16:36:18 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 667EB9FBA2; Fri, 28 Jun 2024 16:36:17 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 638C29FB9F;
-	Fri, 28 Jun 2024 16:36:17 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: Nikolay Aleksandrov <razor@blackwall.org>,
-    Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-    Andy Gospodarek <andy@greyhouse.net>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
-    Amit Cohen <amcohen@nvidia.com>
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-In-reply-to: <Zn6Ily5OnRnQvcNo@Laptop-X1>
-References: <1429621.1719446760@famine> <Zn0iI3SPdRkmfnS1@Laptop-X1>
- <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
- <Zn05dMVVlUmeypas@Laptop-X1>
- <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
- <Zn1mXRRINDQDrIKw@Laptop-X1> <1467748.1719498250@famine>
- <Zn4po-wJoFat3CUd@Laptop-X1>
- <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
- <8e978679-4145-445c-88ad-f98ffec6facb@blackwall.org>
- <Zn6Ily5OnRnQvcNo@Laptop-X1>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 28 Jun 2024 17:55:35 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1719617856; c=relaxed/simple;
+	bh=ka4qv5fSLX3tQEYbDwggV9HujoAfjXbpNQOaFpCPECo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nj8biq7Kib5gHy+DqdV8Bk84CJkcrucvI1JGGJ0RwSqvo1slMg1G7M0uUNYVRu3OvksyM1S6q8jOsZ2/uWoYfk0cwZ9Y41QlNhaLSsUay/FYQsmErj6sbhIssGwTaSphQDW2pQBeyZUnVeBSO3A5UAekk3lYXATMOIDpMMqBhvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k0oFgDG9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E2AC116B1;
+	Fri, 28 Jun 2024 23:37:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719617855;
+	bh=ka4qv5fSLX3tQEYbDwggV9HujoAfjXbpNQOaFpCPECo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k0oFgDG9PKaaq9/wANCyXCMDwZ+ICzZdRmfEoFgfF+4nASNyYPGFm1l9DIAuJ0ljs
+	 SUGMjQjClDN6P/mH3WCnt94IAJq6vQvX35Q6J7H77WX66F3E9MajKKyGvN8HX6sptF
+	 xfztLrilYfG4/2VnfS4V2uMSK4DsnqfpcWGJx7ZRxKjLnxj/Xa9ilbmJ4q3IQw7Qn5
+	 PV+VfMU7x9b+id9XUwnKhGs3/Mni3yvO/te2apIEdS0N0GSGER4xWgSTBbenNCCbrF
+	 SMT03PaOgc/JmINaYpZ7ghvzqvM4LmTkw++La5CmtYs4kozY19xC0N4KqyHqodW88D
+	 5A/EeDE67CiZA==
+Date: Fri, 28 Jun 2024 16:37:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Pravin B
+ Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, =?UTF-8?B?QWRy?=
+ =?UTF-8?B?acOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v3 0/7] selftests: net: Switch pmtu.sh to use
+ the internal ovs script.
+Message-ID: <20240628163733.08077094@kernel.org>
+In-Reply-To: <f7th6ddx7ty.fsf@redhat.com>
+References: <20240625172245.233874-1-aconole@redhat.com>
+	<20240628081526.66a6b5c6@kernel.org>
+	<f7th6ddx7ty.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1518278.1719617777.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Jun 2024 16:36:17 -0700
-Message-ID: <1518279.1719617777@famine>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Fri, 28 Jun 2024 14:04:09 -0400 Aaron Conole wrote:
+> > I also added the OvS tests themselves, and those are not passing, yet:
+> > https://netdev.bots.linux.dev/contest.html?test=openvswitch-sh
+> > Could you take a look and LMK if these are likely env issues or
+> > something bad in the test itself?  
+> 
+> I saw that.  I was looking for a place in the nipa repository where I
+> could submit a small fix, because I noticed in the stdout:
+> 
+>   make -C tools/testing/selftests TARGETS="net/openvswitch"
+>   TEST_PROGS=openvvswitch.sh TEST_GEN_PROGS="" run_tests
+>   
+> and I think the TEST_PROGS=openvvswitch.sh is misspelled (but it seems
+> to not matter too much for the run_test target).
 
->Hi Nikolay,
->On Fri, Jun 28, 2024 at 10:22:25AM +0300, Nikolay Aleksandrov wrote:
->> > Actually I was talking about:
->> >  /sys/class/net/<bond port>/bonding_slave/ad_actor_oper_port_state
->> >  /sys/class/net/<bond port>/bonding_slave/ad_partner_oper_port_state
->> > etc
->> > =
+:o that's a weird bug, whatever is echoing back the input from the VMs
+stdin to stdout is duplicating 74th character?! but as you say looks
+like the VM gets the right input, it's just the echo.
 
->> > Wouldn't these work for you?
->> > =
+> From what I understand, there are two things causing it to be flaky.
+> First, the module detection is a bit flaky (and that's why it results is
+> some 'skip' reports).  Additionally, the connection oriented tests
+> include negative cases and those hit timeouts.  The default is to
+> declare failure after 45s.  That can be seen in:
+> 
+>   https://netdev-3.bots.linux.dev/vmksft-net/results/659601/91-openvswitch-sh/stdout
+>   ...
+>   # timeout set to 45
+>   ...
+>   # TEST: nat_connect_v4                                                [START]
+>   # Terminated
+>   # Terminated
+> 
+> This is showing that the timeout is too short.
+> 
+> I have patches ready for these issues, but I didn't know if you would
+> like me to submit config 
 
->> =
+config meaning make OvS built in? We have a number of tests using
+module auto-loading, I don't think there were major issues with it.
+(well, the rebuilding of modules is a bit questionable with vng,
+but we do 'make mrproper' between each build to work around that).
 
->> But it gets much more complicated, I guess it will be easier to read th=
-e
->> proc bond file with all the LACP information. That is under RCU only as
->> well.
->
->Good question. The monitor application want a more elegant/general way
->to deal with the LACP state and do other network reconfigurations.
->Here is the requirement I got from customer.
->
->1) As a server administrator, I want ip monitor to show state change even=
-ts
->   related to LACP bonds so that I can react quickly to network reconfigu=
-rations.
->2) As a network monitoring application developer, I want my application t=
-o be
->   notified about LACP bond operational state changes without having to
->   poll /proc/net/bonding/<bond> and parse its output so that it can trig=
-ger
->   predefined failover remediation policies.
->3) As a server administrator, I want my LACP bond monitoring application =
-to
->   receive a Netlink-based notification whenever the number of member
->   interfaces is reduced so that the operations support system can provis=
-ion
->   a member interface replacement.
+> and settings files to go under net/openvswitch,
+> or if you would prefer to see the openvswitch.sh script, and
+> ovs-dpctl.py utilities move out of their net/openvswitch/ directory.  If
+> the latter, I can submit patches quickly with config and settings (and a
+> small change to the script itself) that addresses these.  If you'd
+> prefer the former (moving around the files), I'll need to spend some
+> additional time modifying pmtu and doing a larger test.  I don't have a
+> strong opinion on either approach.
 
-	What notifications are they not getting that they want?  Or is
-it that events happen but lack some information they want?
-
-	Currently, the end of bond_3ad_state_machine_handler() will send
-notifications via bond_slave_state_notify() if the state of any member
-of the bond has changed (via the struct slave.should_notify field).
-
-	The notifications here come from bond_lower_state_changed(),
-which propagates link up/down and tx_enabled (active-ness), but not any
-LACP specifics.  These are sent as NETDEV_CHANGELOWERSTATE events, which
-rtnetlink_event() handles, so they should be visible to ip monitor.
-
->What I understand is the user/admin need to know the latest stable state =
-so
->they can do some other network configuration based on the status. Losing
->a middle state notification during fast changes is acceptable.
-
-	This is a much simpler problem to solve.
-
->> Well, you mentioned administrators want to see the state changes, pleas=
-e
->> better clarify the exact end goal. Note that technically may even not b=
-e
->> the last state as the state change itself happens in parallel (differen=
-t
->> locks) and any update could be delayed depending on rtnl availability
->> and workqueue re-scheduling. But sure, they will get some update at som=
-e point. :)
->
->Would you please help explain why we may not get the latest state? From w=
-hat
->I understand:
->
->1) State A -> B, queue notify
->       rtnl_trylock, fail, queue again
->2) State B -> C, queue notify
->      rtnl_trylock, success, post current state C
->3) State C -> D, queue notify
->      rtnl_trylock, fail, queue again
->4) State D -> A, queue notify
->      rtnl_trylock, fail, queue again
->      rtnl_trylock, fail, queue again
->      rtnl_trylock, success, post current state A
->
->So how could the step 3) state send but step 4) state not send?
-
-	I'm going to speculate here that the scenario envisioned would
-be something like CPU A is in the midst of generating an event at the
-end of the state machine, but CPU B could be processing a LACPDU
-simultaneously-ish.  The CPU A event is sent, but the CPU B event is
-delayed due to RTNL contention.  In this scenario, the last event seen
-in user space is CPU A, but the actual state has moved on to that set by
-CPU B, whose notification will be received eventually.
-
->BTW, in my code, I should set the should_notify_lacp =3D 0 first before s=
-ending
->ifinfo message. So that even the should_notify_lacp =3D 1 in ad_mux_machi=
-ne()
->is over written here, it still send the latest status.
->
->> +
->> +             if (slave->should_notify_lacp) {
->> +                     slave->should_notify_lacp =3D 0;
->> +                     rtmsg_ifinfo(RTM_NEWLINK, slave->dev, 0, GFP_KERN=
-EL, 0, NULL);
->> +             }
->
->The side effect is that we may send 2 same latest lacp status(the
->should_notify_lacp is over written to 1 and queue again), which should
->be OK.
-
-	Looking at the current notifications in bonding, I wonder if it
-would be sufficient to add the desired information to what
-bond_lower_state_changed() sends, rather than trying to shoehorn in
-another rtnl_trylock() gizmo.
-
-	-J
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+Since we talked about it a while back I gave in and implemented support
+for combining multiple targets in a single runner. So it doesn't matter
+any more (barring bugs in NIPA), up to you.
 
