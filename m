@@ -1,123 +1,158 @@
-Return-Path: <netdev+bounces-107792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3222591C5E8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:38:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CBB191C60A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1E47B2271F
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EB851C23A40
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CBC1CE083;
-	Fri, 28 Jun 2024 18:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51A652F9E;
+	Fri, 28 Jun 2024 18:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnY7mQwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833621C8FAB
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 18:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401F3BBC5;
+	Fri, 28 Jun 2024 18:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719599904; cv=none; b=irQs6e+DCMSnuwMXYSWFvkYx2t230t7IxhGjrdu1DYQCX7z1sXk1q6HakWrrzTpXuLSK2JqCbCb/RH4e2/+pFAdATpkQF3H3v2f94Qn7vnACOjZUoOAGrJoJKp4W8/mY8zbvoR+B/IYd6GJmqGZoGgqNcfeIykxzhhrlDvOFdjU=
+	t=1719600418; cv=none; b=pzwQshA2f+LOmFjx8ufPjDgIB6obnrkJxN2GM6j1BIvc7z8W9iJpwwbL/rwDcOYUoLULLlNnnReZ/sorlPd1+UIAXE5+vZYd7cWc0nbhDxP6ezlG4AZFwVIVaJ9WAmAGVcZ+3RrADozN6nSTAOcIyUS2z/Ed7X2FXxeJALU6FTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719599904; c=relaxed/simple;
-	bh=WAgvqGSSMUhPpGWuEaYRvYoyRrVFQyKjhyHF8lm3m3s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qR6lpwVwc1ky59dKCHu2fm3HB/oRi2F5Wb2j6/jJcYKA5YjuVVtNJbP8auK2BY4RE1rb5slMuGcZx2Sm5SyVZrD7Sr0TbvKNBhOU/Nx9lqAmGijcGU8Ax6/fB4X7vOvYUJFamtkhtjOvJYjGVA+n6L9PgS+N8DRYe2OBZXEVZ1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-375e4d55457so10467405ab.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 11:38:22 -0700 (PDT)
+	s=arc-20240116; t=1719600418; c=relaxed/simple;
+	bh=hunj8a+Tp+D5s1II1M+FHGnR1Kh/janCLfAz5w//S74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pU6BRA/Hlc8RY5oA7D+H2pHsePVyz8Ea51vk2sdCUKm4yHdqZEbftUfQ98e9jpg8iInTqXVSrMhYN6i/pgiVTgxOdvsmMwR3S6D5ddImrj1GQ60xhlbdl/KV5Bt4/g6nfZSyn6Ah1xqhh+mfSKxPN+Wsdce6ZmvMKUJtHhVYLJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnY7mQwa; arc=none smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-80fe3073421so196522241.1;
+        Fri, 28 Jun 2024 11:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719600416; x=1720205216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
+        b=NnY7mQwaBKOuJgbvBiwinW9UDZk5nJNQ5uGztguS19sZ70wKqC3RLiH409PGk8royd
+         xjXi4O7BtQGNkOOUa/zFxGfm/3uXr7Cxeo9GvKril5AKU1WijEZyicFBNPlqTQ4BetLH
+         wFIKbbfOFaMVjTW19iCoIzGZqoV7RarWug7PkgKZHkv6RTq4xi4C8oqMYqVmBHYXTfma
+         eJkxar0VSD6JfDU6ae1QE0Rw11B4QKnnjgFtjCKaJoIgoHxNz0TPEOADS15frrUCupru
+         0F8NTJw44O1T8Yn8jpktjDYK4F4l65jHBNJY2mHb4oOX5DUb8g71AuQl+Ky4sLBbAn0P
+         8Xww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719599902; x=1720204702;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uAQwFq9UPZbXFZDZdCFdcQuDs/7IHMkcXpTnMEOHaSI=;
-        b=Tv+J2jiMesm5XJWrpdMpKzrLcxCIjsJtZdhj4kHjmg/x+Ku/STT0T3rfQYI+ZZvGo7
-         69GrJCoRW5lzqctDAYs5rY4/8QA3y20a1Nnl7IR0gvYWllMBX+6UwEdCel/LWslgfi4y
-         6PaXRv1qFBqQsQBB3fVUqFF+dw5369IA4CHuG5U0xcuPlVYVzua59lYM6WDvYgBR9rAu
-         rVJ/0oHHxcg1JzVQBIIvS7rbeaJHtVCed++2OYsJDNRIfK1dNIxWbdb8S9qiJ+YPpF6C
-         /W6mU5EfnB5Q7nwejFiTyhRx5CpTWB+8hRE9tGbGiEKXYVsmm1TLYppIjJZjlJs+RnNd
-         ma4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6O9k6lNAoZTaMcK4u8TFYdv/eC1iF3pbzUaxO4wp2NKJ+Q3rTr4bSVoKMY8OfyoEBocL7vxWvnM0yVBhHjsx60FUa7PTD
-X-Gm-Message-State: AOJu0YxlAhNsq/2TazdGPkwdjR/lM9tsntOhdNDHWe7KCc+B7sqoN8MG
-	w6PlVhAVSk0wTFajEN2Gw3YzWmCZ6V4c4O0Y2vmPbXeFrUX/E9TfU6plvVp0ySxHRAySVdzSHi5
-	4glkAodnKIA9s9OuHe1tcg/RkHhk5J+tAQeO0yXZPDkunAEwlGPcqFPs=
-X-Google-Smtp-Source: AGHT+IFyojeDoOQfAz+WpFDP13ym2ekViaAZ2Ap6ROc1rvqVHqXy6e4NW0dc11phb0kwVSPqpMSaRAWLrRTi/u2q8ChreueD8oNh
+        d=1e100.net; s=20230601; t=1719600416; x=1720205216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
+        b=YdoSOkLyyagHBlc5gEBQ3H59x75p4b/VbOojSEZRKaBT3mAd5mqe7B8a54HfFnlpQX
+         2PcnRHNR5ER226bu57bH+Oj9kBhjBQjP8vrmrkOb/YpuXzOyxrxEzcYmzEW47Ymr9nCq
+         aff076XNHCesWzHtlU0Vdi14GsAv3hqk7FcnDKBL9/sSVHAJgZvdiB1s4IW09yPWkZVn
+         AF/ieiIcUJCu3oJnuo5Z+cZU5f9nT11EowJIlcIIELAOFsyOl4H4rPA7POBRZ+PWUOOr
+         4fUlCAJ8Lxh39WP0iyXlBofDWo4httXJKgdAB9h/08wR9O3l57Ip1G87rIzJgAB/pO6M
+         sJoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUVFQ/5TmGlDTT51lL2jN7PV+sPpNS0q3OnELpHiq5+ZZpRv970iKb7UMJgOXxIi6MYXgVJHxG9mCwEal/cjk6ggNzXH/C
+X-Gm-Message-State: AOJu0YxrHmfbsOBm6S0wRks1tZcFNh7br9iqJKoyu7bl0MqS+IApEMJV
+	KWBOJByNZFQrKKZJAvv6tMimllzIc/6sTFuJJE++6LLDywkKVaiZ
+X-Google-Smtp-Source: AGHT+IHPotUct+drIjj4jp0GaXPTWdoP01uaTwNGdhE/JJRz1xCmlxIOHB6NIWAd9M+Suejw0LQ9cA==
+X-Received: by 2002:a05:6122:46a3:b0:4ec:f402:a849 with SMTP id 71dfb90a1353d-4ef6643904emr19831953e0c.16.1719600415782;
+        Fri, 28 Jun 2024 11:46:55 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f29e6a6fe7sm75947e0c.17.2024.06.28.11.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 11:46:54 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-06-28
+Date: Fri, 28 Jun 2024 14:46:53 -0400
+Message-ID: <20240628184653.699252-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:168a:b0:375:ae47:ba62 with SMTP id
- e9e14a558f8ab-3763f5c900emr15343485ab.1.1719599901745; Fri, 28 Jun 2024
- 11:38:21 -0700 (PDT)
-Date: Fri, 28 Jun 2024 11:38:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004cb7a6061bf78daf@google.com>
-Subject: [syzbot] [netfilter?] bpf test error: WARNING: suspicious RCU usage
- in corrupted
-From: syzbot <syzbot+784a3db26e5409459be4@syzkaller.appspotmail.com>
-To: ast@kernel.org, coreteam@netfilter.org, daniel@iogearbox.net, 
-	davem@davemloft.net, edumazet@google.com, kadlec@netfilter.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The following changes since commit dc6be0b73f4f55ab6d49fa55dbce299cf9fa2788:
 
-syzbot found the following issue on:
+  Merge tag 'ieee802154-for-net-2024-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan into main (2024-06-28 13:10:12 +0100)
 
-HEAD commit:    7e9f79428372 xdp: Remove WARN() from __xdp_reg_mem_model()
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=16956dea980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1437ab35b9d90e65
-dashboard link: https://syzkaller.appspot.com/bug?extid=784a3db26e5409459be4
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+are available in the Git repository at:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ca96920a98d8/disk-7e9f7942.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/24f81a5f5d0b/vmlinux-7e9f7942.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/31b888945299/bzImage-7e9f7942.xz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-28
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+784a3db26e5409459be4@syzkaller.appspotmail.com
+for you to fetch changes up to f1a8f402f13f94263cf349216c257b2985100927:
 
-=============================
-WARNING: suspicious RCU usage
-6.10.0-rc3-syzkaller-00138-g7e9f79428372 #0 Not tainted
------------------------------
-net/netfilter/ipset/ip_set_core.c:1200 suspicious rcu_dereference_protected() usage!
+  Bluetooth: L2CAP: Fix deadlock (2024-06-28 14:32:02 -0400)
 
-other info that might help us debug this:
+----------------------------------------------------------------
+bluetooth pull request for net:
 
+ - Ignore too large handle values in BIG
+ - L2CAP: sync sock recv cb and release
+ - hci_bcm4377: Fix msgid release
+ - ISO: Check socket flag instead of hcon
+ - hci_event: Fix setting of unicast qos interval
+ - hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
+ - Add quirk to ignore reserved PHY bits in LE Extended Adv Report
+ - hci_core: cancel all works upon hci_unregister_dev
+ - btintel_pcie: Fix REVERSE_INULL issue reported by coverity
+ - qca: Fix BT enable failure again for QCA6390 after warm reboot
 
-rcu_scheduler
+----------------------------------------------------------------
+Edward Adam Davis (2):
+      Bluetooth: Ignore too large handle values in BIG
+      bluetooth/l2cap: sync sock recv cb and release
 
+Hector Martin (1):
+      Bluetooth: hci_bcm4377: Fix msgid release
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Iulia Tanasescu (1):
+      Bluetooth: ISO: Check socket flag instead of hcon
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_event: Fix setting of unicast qos interval
+      Bluetooth: L2CAP: Fix deadlock
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Neeraj Sanjay Kale (1):
+      Bluetooth: btnxpuart: Enable Power Save feature on startup
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Pavel Skripkin (1):
+      bluetooth/hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Sven Peter (1):
+      Bluetooth: Add quirk to ignore reserved PHY bits in LE Extended Adv Report
 
-If you want to undo deduplication, reply with:
-#syz undup
+Tetsuo Handa (1):
+      Bluetooth: hci_core: cancel all works upon hci_unregister_dev()
+
+Vijay Satija (1):
+      Bluetooth: btintel_pcie: Fix REVERSE_INULL issue reported by coverity
+
+Zijun Hu (1):
+      Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
+
+ drivers/bluetooth/btintel_pcie.c |  2 +-
+ drivers/bluetooth/btnxpuart.c    |  2 +-
+ drivers/bluetooth/hci_bcm4377.c  | 10 +++++-
+ drivers/bluetooth/hci_qca.c      | 18 ++++++++--
+ include/net/bluetooth/hci.h      | 11 ++++++
+ include/net/bluetooth/hci_sync.h |  2 ++
+ net/bluetooth/hci_conn.c         | 15 ++++++--
+ net/bluetooth/hci_core.c         | 76 ++++++++++++----------------------------
+ net/bluetooth/hci_event.c        | 33 +++++++++++++++--
+ net/bluetooth/hci_sync.c         | 13 +++++++
+ net/bluetooth/iso.c              |  3 +-
+ net/bluetooth/l2cap_core.c       |  3 ++
+ net/bluetooth/l2cap_sock.c       | 14 ++++++--
+ 13 files changed, 131 insertions(+), 71 deletions(-)
 
