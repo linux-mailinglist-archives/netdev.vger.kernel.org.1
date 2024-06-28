@@ -1,214 +1,85 @@
-Return-Path: <netdev+bounces-107561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BF991B691
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:57:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9360991B68B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BA4F1C214FF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:57:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AB441F24175
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8718A4645B;
-	Fri, 28 Jun 2024 05:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C90D47A48;
+	Fri, 28 Jun 2024 05:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Huuz1dj+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rdUwTOa6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A496A224CC;
-	Fri, 28 Jun 2024 05:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBEE224CC;
+	Fri, 28 Jun 2024 05:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554217; cv=none; b=WZsO7ie/ZUYzn37lYB+VPAIm651i7JmVThzhQgkeSJfjtKsV8yVcJJ8KvCIf4qAVlXQszAP7+taW5DoN7/ojFbgRaWzny7rmqJU723fUrVNe8q47szUISDaljwbaKkfaalGSHLNu1lfQexxrRPj6JEFvaduVq7mnd15MUfWXnnY=
+	t=1719553857; cv=none; b=LVJ6BHts80LPxNJSe+bbV9VofaTLSiIpxSlNivfVwyQm2+vHAgLcMAURZNV6wxoOsE6cFGmYXoyXbQLRqDYyWecwCkJfmMXcDYfnDI+F/807iaMygB/3xAGhwU8jvF1Wi0ANRb3o7S1tytkej/lFd0NSphVJev0x+qHBMlC8d00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554217; c=relaxed/simple;
-	bh=fkytftQRg0MPng/xdsZTO+uBpv+DqMDkoS1rQFKQ4nU=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=h5vIOzhD61YuAk1ERHYsVzo+FcseE/a7h50jQcKaaU12DGNx9c3t9z1xSvJU9MnzcVODfrpIZdNpAw/glgMtwbfj9tpt/cn1w1bY8ZUtd2bdGYxn/CTUfRUjLHD7oXqIfs+gYMTdtY2JLPvklVgTbkZY4bpsbGNlff4k0tKVBh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Huuz1dj+; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1719554212; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=AsUqcmaS2dSprY/+StPit0DpgtIPpt2EVmTvYBB5Qg8=;
-	b=Huuz1dj+yPKBbQZyXrgY4AvMDVSJ3VQ1n4rWwlEM/debU45jwLPvNMTxYE8ltI7lXiyRlr5e1kQLZ37nMtxm2vVx5wf831wUcvNVyKmWT/FUoBv+cvY6n19p4jE+twgHK1Xb4o5fj0OB885voz+1rxqwy2/jInWEz0pEKy4NMGE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W9PBCvW_1719554211;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W9PBCvW_1719554211)
-          by smtp.aliyun-inc.com;
-          Fri, 28 Jun 2024 13:56:51 +0800
-Message-ID: <1719553837.6841416-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 09/10] virtio_net: xsk: rx: support recv merge mode
-Date: Fri, 28 Jun 2024 13:50:37 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
- <20240618075643.24867-10-xuanzhuo@linux.alibaba.com>
- <CACGkMEsqBeV9mSVV0yO_sZ=hB==PFoHvtPyma1pctc_+HMEFrA@mail.gmail.com>
-In-Reply-To: <CACGkMEsqBeV9mSVV0yO_sZ=hB==PFoHvtPyma1pctc_+HMEFrA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1719553857; c=relaxed/simple;
+	bh=+2ls3ugjUjVk0S9jGlw9ITT5uQcjiG6uVmAAY04diqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTgxgNFx/Gy2HK+gQl50A04OFoo5/Wap11COJdr3uHGV1i0JSdEi0xJgfQV2aY6nAWQPewxixhOreNss9EN+Ua6MekUyKWvYgBJOSKMU9glSY9kxthSZu/LQV9XSPgzZ1U/Oak4XsKYL8v6479kxI5zaGxFPNFwg0wwoA742TcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rdUwTOa6; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=VvUsrQOsamYudQc0HKFkKTKBGBKa/qA2+34N2aoqyGE=; b=rdUwTOa67wU9N59zz37rsh/+o1
+	GA75HAY+5cNOjzkV4XQ3Nmvbg0g62+p7fNhBELnC/cfw91duH4rRyA6dxORlyijxHNTw5EN3yossl
+	mfaW0RpOqtsSjAD73v5xwoXGVafAVER/jrTQxNk0rIGWARX8WpNR+rGygBVWDyK8Rgk48pcs1EH3i
+	6yhUPCZFgxnatmhdkCcaAq7mEx5sKfqtfwKO4hwy6SexJAnpJYj1yXU8Lkldvt0ShSViC5g71Pivs
+	tGu9GFnI2IQM2sp1JpWKQcSMjIUx7bM4E2/miGTuFOIrlAj5jRPm262Dsz2GPPLmzuyadiMWStMI5
+	P6Seta7g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sN4VW-0000000CfVS-3Aeb;
+	Fri, 28 Jun 2024 05:50:50 +0000
+Date: Thu, 27 Jun 2024 22:50:50 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Ma Ke <make24@iscas.ac.cn>, wintera@linux.ibm.com,
+	twinkler@linux.ibm.com, Niklas Schnelle <schnelle@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+	borntraeger@linux.ibm.com, svens@linux.ibm.com, davem@davemloft.net,
+	Stefan Raspl <raspl@linux.ibm.com>
+Subject: Re: [PATCH] s390/ism: Add check for dma_set_max_seg_size in
+ ism_probe()
+Message-ID: <Zn5POphJ8pckZ3hY@infradead.org>
+References: <20240626081215.2824627-1-make24@iscas.ac.cn>
+ <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ab328297c12d1c286c56dbc01d611b77ea2da03.camel@linux.ibm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, 28 Jun 2024 10:19:44 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Jun 18, 2024 at 3:57=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > Support AF-XDP for merge mode.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 139 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 139 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 06608d696e2e..cfa106aa8039 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -504,6 +504,10 @@ static int virtnet_xdp_handler(struct bpf_prog *xd=
-p_prog, struct xdp_buff *xdp,
-> >                                struct net_device *dev,
-> >                                unsigned int *xdp_xmit,
-> >                                struct virtnet_rq_stats *stats);
-> > +static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_sk=
-b,
-> > +                                              struct sk_buff *curr_skb,
-> > +                                              struct page *page, void =
-*buf,
-> > +                                              int len, int truesize);
-> >
-> >  static bool is_xdp_frame(void *ptr)
-> >  {
-> > @@ -1128,6 +1132,139 @@ static struct sk_buff *virtnet_receive_xsk_smal=
-l(struct net_device *dev, struct
-> >         }
-> >  }
-> >
-> > +static void xsk_drop_follow_bufs(struct net_device *dev,
-> > +                                struct receive_queue *rq,
-> > +                                u32 num_buf,
-> > +                                struct virtnet_rq_stats *stats)
-> > +{
-> > +       struct xdp_buff *xdp;
-> > +       u32 len;
-> > +
-> > +       while (num_buf-- > 1) {
-> > +               xdp =3D virtqueue_get_buf(rq->vq, &len);
-> > +               if (unlikely(!xdp)) {
-> > +                       pr_debug("%s: rx error: %d buffers missing\n",
-> > +                                dev->name, num_buf);
-> > +                       DEV_STATS_INC(dev, rx_length_errors);
-> > +                       break;
-> > +               }
-> > +               u64_stats_add(&stats->bytes, len);
-> > +               xsk_buff_free(xdp);
-> > +       }
-> > +}
-> > +
-> > +static int xsk_append_merge_buffer(struct virtnet_info *vi,
-> > +                                  struct receive_queue *rq,
-> > +                                  struct sk_buff *head_skb,
-> > +                                  u32 num_buf,
-> > +                                  struct virtio_net_hdr_mrg_rxbuf *hdr,
-> > +                                  struct virtnet_rq_stats *stats)
-> > +{
-> > +       struct sk_buff *curr_skb;
-> > +       struct xdp_buff *xdp;
-> > +       u32 len, truesize;
-> > +       struct page *page;
-> > +       void *buf;
-> > +
-> > +       curr_skb =3D head_skb;
-> > +
-> > +       while (--num_buf) {
-> > +               buf =3D virtqueue_get_buf(rq->vq, &len);
-> > +               if (unlikely(!buf)) {
-> > +                       pr_debug("%s: rx error: %d buffers out of %d mi=
-ssing\n",
-> > +                                vi->dev->name, num_buf,
-> > +                                virtio16_to_cpu(vi->vdev,
-> > +                                                hdr->num_buffers));
-> > +                       DEV_STATS_INC(vi->dev, rx_length_errors);
-> > +                       return -EINVAL;
-> > +               }
-> > +
-> > +               u64_stats_add(&stats->bytes, len);
-> > +
-> > +               xdp =3D buf_to_xdp(vi, rq, buf, len);
-> > +               if (!xdp)
-> > +                       goto err;
-> > +
-> > +               buf =3D napi_alloc_frag(len);
->
-> So we don't do this for non xsk paths. Any reason we can't reuse the
-> existing codes?
+On Wed, Jun 26, 2024 at 02:48:30PM +0200, Gerd Bayer wrote:
+> 
+> However, since ISM devices are PCI attached (and will remain PCI
+> attached I believe) we can take the existance of dev->dma_parms for
+> granted since pci_device_add() (in drivers/pci/probe.c) will make that
+> point to the pci_dev's dma_parms for every PCI device.
+> 
+> So I'm not sure how important this fix is.
 
-Do you mean this code:
+It's not just important, it is stupid and I told them to stop sending
+these kinds of crap patches.
 
-	while (--num_buf) {
-		int num_skb_frags;
-
-->		buf =3D virtnet_rq_get_buf(rq, &len, &ctx);
-		if (unlikely(!buf)) {
-			pr_debug("%s: rx error: %d buffers out of %d missing\n",
-				 dev->name, num_buf,
-				 virtio16_to_cpu(vi->vdev,
-						 hdr->num_buffers));
-			DEV_STATS_INC(dev, rx_length_errors);
-			goto err_buf;
-		}
-
-		u64_stats_add(&stats->bytes, len);
-		page =3D virt_to_head_page(buf);
-
-->		truesize =3D mergeable_ctx_to_truesize(ctx);
-->		headroom =3D mergeable_ctx_to_headroom(ctx);
-->		tailroom =3D headroom ? sizeof(struct skb_shared_info) : 0;
-->		room =3D SKB_DATA_ALIGN(headroom + tailroom);
-->		if (unlikely(len > truesize - room)) {
-->			pr_debug("%s: rx error: len %u exceeds truesize %lu\n",
-->				 dev->name, len, (unsigned long)(truesize - room));
-->			DEV_STATS_INC(dev, rx_length_errors);
-->			goto err_skb;
-->		}
-
-		curr_skb  =3D virtnet_skb_append_frag(head_skb, curr_skb, page,
-						    buf, len, truesize);
-		if (!curr_skb)
-			goto err_skb;
-	}
-
-The code lines that are marked are differ.
-
-The same logic is separated to function virtnet_skb_append_frag().
-
-So the code is similitude, but we can not merge them.
-
-Thanks.
-
-
-
->
-> Thanks
->
 
