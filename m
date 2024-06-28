@@ -1,186 +1,161 @@
-Return-Path: <netdev+bounces-107721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEAA091C216
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:08:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7707091C250
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 785DF1F22BA5
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:08:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 217281F21F0E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401D51C2315;
-	Fri, 28 Jun 2024 15:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="grvZHTLM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCB21C68B5;
+	Fri, 28 Jun 2024 15:14:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B23715884B;
-	Fri, 28 Jun 2024 15:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E471CD5BF
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 15:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719587288; cv=none; b=PFO4cxQka4sQMLMjCnjHIFQIRexN2y0ugs1hnScC1txhU3lEdRQkWsZ6tUrhY026FzoxJYK0jelZ0tJ/0Qxn+W4/o+/vrsMHtqo10EAqgt4+lwYvF954721+1SEVIh5eqY1WtJ/U40Pxz6sd+VIOEh6yzKfWB81TRYY8dxb7Pek=
+	t=1719587671; cv=none; b=BgTm8qqLimTjxEssTdbUAvoOqfEl9H8ZkifljFIDEw4EzmKf4MDnMtkd4SoJLk9zJiDmTvsHVV2OiLTHtAB0YXwXlwBSfS9Pd4cqTWjLitNz8h4pWXF/vBOHsa0pGJHhKRAaLYe2hVyVWqUgyAD3NCABlax17f6tLjBNF4F1JGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719587288; c=relaxed/simple;
-	bh=1hgI+rCZQWIqOF+m5AgAV+Lg3Mb2So8JWjgU+Urw7PI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYSV3FL+afKoTgFc7Q5KDwt1uNEQuyHQFCERIeLSQE1Rmts2Rl5SBE9kOudXlJAj/nqcM9Rk2Z+O3JF0/CuOhCZBjsqX1v3TAZoRHZd4ELbjXHPJzL4nkrAd6FZBbwS0lJGGRZ8yuy1s5wJy6b9Vj+uQejNK+AtfIgxdeYjI3TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=grvZHTLM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YKeNupwsPSrvE04qYcLHS5Qf0hnRaatid61rEYfWQaA=; b=grvZHTLMNbz8IGpB8IsDq8tVaB
-	O8Kdrj1Wm5knEHgfNK5PVm7zmHg5aOBb0W2yALLnd9JAxHZPlVV7+SWSG7goEQeSLhA8eCZ6PluMG
-	p+pgQxnqsxpUITKYfbPoZYOXhddo1ADVfTU+tHn2B939ipP/pM1cM7dX5/SdhBIKJnPVLg1EmDgAh
-	OKJumBhYWd2F94Veoeyfo2mWJDTJ9nXeyL7OUm69tRKjXtTBGAgbPzaIZKO6TuWsYTBHhq/nAerhD
-	qM4VHUw6Ex4bmKX4n29ir43HdS8MGMOKFsyRxTCY37pVyD6NEd1f91hGv4gLQiISeZo7Zx2zT3JGd
-	wIoqSNfw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54812)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sNDCT-0006oN-1m;
-	Fri, 28 Jun 2024 16:07:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sNDCV-0006as-1Z; Fri, 28 Jun 2024 16:07:47 +0100
-Date: Fri, 28 Jun 2024 16:07:46 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v2 14/17] net: stmmac: Move internal PCS
- PHYLINK ops to stmmac_pcs.c
-Message-ID: <Zn7Rwt9KNac2mMah@shell.armlinux.org.uk>
-References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
- <20240624132802.14238-6-fancer.lancer@gmail.com>
+	s=arc-20240116; t=1719587671; c=relaxed/simple;
+	bh=Ys4VPchMhWKVdEXPg8bUnES5/7FLn984fnOf3f288VU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=WfdWG3eVWiUOr8v4qGB/9Xsclpxwn8S8rwKq2fz+cmRNrAfbvm9qTve/HIBCfxwPcQ1k10SO4ZPkktaFrgHLNab9VYY7CYT9yj10uPxelRq19fQb0eYv6Nvt7kCrKQa+XXGPBAatO0Fpkdg810dFL7vPGP6/QGZ2Ien4guD+Mfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-178-4IonzigxN0uJZF0T4V44hQ-1; Fri, 28 Jun 2024 16:14:22 +0100
+X-MC-Unique: 4IonzigxN0uJZF0T4V44hQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 28 Jun
+ 2024 16:13:45 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 28 Jun 2024 16:13:45 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Leon Romanovsky' <leon@kernel.org>, Anand Khoje
+	<anand.a.khoje@oracle.com>
+CC: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "saeedm@mellanox.com"
+	<saeedm@mellanox.com>, "tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCH v4] net/mlx5: Reclaim max 50K pages at once
+Thread-Topic: [PATCH v4] net/mlx5: Reclaim max 50K pages at once
+Thread-Index: AQHaxhzvGGuhtyfXHkeZpMTT2X9CjbHdTe4Q
+Date: Fri, 28 Jun 2024 15:13:45 +0000
+Message-ID: <3d5b16d332914d4f810bc0ce48fd8772@AcuMS.aculab.com>
+References: <20240619132827.51306-1-anand.a.khoje@oracle.com>
+ <20240624095757.GD29266@unreal>
+In-Reply-To: <20240624095757.GD29266@unreal>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240624132802.14238-6-fancer.lancer@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Mon, Jun 24, 2024 at 04:26:31PM +0300, Serge Semin wrote:
-> @@ -621,7 +548,6 @@ int dwmac1000_setup(struct stmmac_priv *priv)
->  	mac->mii.clk_csr_shift = 2;
->  	mac->mii.clk_csr_mask = GENMASK(5, 2);
->  
-> -	mac->mac_pcs.ops = &dwmac1000_mii_pcs_ops;
->  	mac->mac_pcs.neg_mode = true;
+RnJvbTogTGVvbiBSb21hbm92c2t5DQo+IFNlbnQ6IDI0IEp1bmUgMjAyNCAxMDo1OA0KPiANCj4g
+T24gV2VkLCBKdW4gMTksIDIwMjQgYXQgMDY6NTg6MjdQTSArMDUzMCwgQW5hbmQgS2hvamUgd3Jv
+dGU6DQo+ID4gSW4gbm9uIEZMUiBjb250ZXh0LCBhdCB0aW1lcyBDWC01IHJlcXVlc3RzIHJlbGVh
+c2Ugb2YgfjggbWlsbGlvbiBGVyBwYWdlcy4NCj4gPiBUaGlzIG5lZWRzIGh1bW9uZ291cyBudW1i
+ZXIgb2YgY21kIG1haWxib3hlcywgd2hpY2ggdG8gYmUgcmVsZWFzZWQgb25jZQ0KPiA+IHRoZSBw
+YWdlcyBhcmUgcmVjbGFpbWVkLiBSZWxlYXNlIG9mIGh1bW9uZ291cyBudW1iZXIgb2YgY21kIG1h
+aWxib3hlcyBpcw0KPiA+IGNvbnN1bWluZyBjcHUgdGltZSBydW5uaW5nIGludG8gbWFueSBzZWNv
+bmRzLiBXaGljaCB3aXRoIG5vbiBwcmVlbXB0aWJsZQ0KPiA+IGtlcm5lbHMgaXMgbGVhZGluZyB0
+byBjcml0aWNhbCBwcm9jZXNzIHN0YXJ2aW5nIG9uIHRoYXQgY3B14oCZcyBSUS4NCj4gPiBUbyBh
+bGxldmlhdGUgdGhpcywgdGhpcyBjaGFuZ2UgcmVzdHJpY3RzIHRoZSB0b3RhbCBudW1iZXIgb2Yg
+cGFnZXMNCj4gPiBhIHdvcmtlciB3aWxsIHRyeSB0byByZWNsYWltIG1heGltdW0gNTBLIHBhZ2Vz
+IGluIG9uZSBnby4NCj4gPiBUaGUgbGltaXQgNTBLIGlzIGFsaWduZWQgd2l0aCB0aGUgY3VycmVu
+dCBmaXJtd2FyZSBjYXBhY2l0eS9saW1pdCBvZg0KPiA+IHJlbGVhc2luZyA1MEsgcGFnZXMgYXQg
+b25jZSBwZXIgTUxYNV9DTURfT1BfTUFOQUdFX1BBR0VTICsgTUxYNV9QQUdFU19UQUtFDQo+ID4g
+ZGV2aWNlIGNvbW1hbmQuDQo+ID4NCj4gPiBPdXIgdGVzdHMgaGF2ZSBzaG93biBzaWduaWZpY2Fu
+dCBiZW5lZml0IG9mIHRoaXMgY2hhbmdlIGluIHRlcm1zIG9mDQo+ID4gdGltZSBjb25zdW1lZCBi
+eSBkbWFfcG9vbF9mcmVlKCkuDQo+ID4gRHVyaW5nIGEgdGVzdCB3aGVyZSBhbiBldmVudCB3YXMg
+cmFpc2VkIGJ5IEhDQQ0KPiA+IHRvIHJlbGVhc2UgMS4zIE1pbGxpb24gcGFnZXMsIGZvbGxvd2lu
+ZyBvYnNlcnZhdGlvbnMgd2VyZSBtYWRlOg0KPiA+DQo+ID4gLSBXaXRob3V0IHRoaXMgY2hhbmdl
+Og0KPiA+IE51bWJlciBvZiBtYWlsYm94IG1lc3NhZ2VzIGFsbG9jYXRlZCB3YXMgYXJvdW5kIDIw
+SywgdG8gYWNjb21tb2RhdGUNCj4gPiB0aGUgRE1BIGFkZHJlc3NlcyBvZiAxLjMgbWlsbGlvbiBw
+YWdlcy4NCj4gPiBUaGUgYXZlcmFnZSB0aW1lIHNwZW50IGJ5IGRtYV9wb29sX2ZyZWUoKSB0byBm
+cmVlIHRoZSBETUEgcG9vbCBpcyBiZXR3ZWVuDQo+ID4gMTYgdXNlYyB0byAzMiB1c2VjLg0KPiA+
+ICAgICAgICAgICAgdmFsdWUgIC0tLS0tLS0tLS0tLS0gRGlzdHJpYnV0aW9uIC0tLS0tLS0tLS0t
+LS0gY291bnQNCj4gPiAgICAgICAgICAgICAgMjU2IHwgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIDANCj4gPiAgICAgICAgICAgICAgNTEyIHxAICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIDI4Nw0KPiA+ICAgICAgICAgICAgIDEwMjQgfEBAQCAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMTMzMg0KPiA+ICAgICAgICAgICAg
+IDIwNDggfEAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgNjU2DQo+ID4g
+ICAgICAgICAgICAgNDA5NiB8QEBAQEAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAyNTk5DQo+ID4gICAgICAgICAgICAgODE5MiB8QEBAQEBAQEBAQCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICA0NzU1DQo+ID4gICAgICAgICAgICAxNjM4NCB8QEBAQEBAQEBAQEBAQEBA
+ICAgICAgICAgICAgICAgICAgICAgICAgICA3NTQ1DQo+ID4gICAgICAgICAgICAzMjc2OCB8QEBA
+QEAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAyNTAxDQo+ID4gICAgICAgICAg
+ICA2NTUzNiB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAwDQo+ID4N
+Cj4gPiAtIFdpdGggdGhpcyBjaGFuZ2U6DQo+ID4gTnVtYmVyIG9mIG1haWxib3ggbWVzc2FnZXMg
+YWxsb2NhdGVkIHdhcyBhcm91bmQgODAwOyB0aGlzIHdhcyB0bw0KPiA+IGFjY29tbW9kYXRlIERN
+QSBhZGRyZXNzZXMgb2Ygb25seSA1MEsgcGFnZXMuDQo+ID4gVGhlIGF2ZXJhZ2UgdGltZSBzcGVu
+dCBieSBkbWFfcG9vbF9mcmVlKCkgdG8gZnJlZSB0aGUgRE1BIHBvb2wgaW4gdGhpcyBjYXNlDQo+
+ID4gbGllcyBiZXR3ZWVuIDEgdXNlYyB0byAyIHVzZWMuDQo+ID4gICAgICAgICAgICB2YWx1ZSAg
+LS0tLS0tLS0tLS0tLSBEaXN0cmlidXRpb24gLS0tLS0tLS0tLS0tLSBjb3VudA0KPiA+ICAgICAg
+ICAgICAgICAyNTYgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMA0K
+PiA+ICAgICAgICAgICAgICA1MTIgfEBAQEBAQEBAQEBAQEBAQEBAQCAgICAgICAgICAgICAgICAg
+ICAgICAgMzQ2DQo+ID4gICAgICAgICAgICAgMTAyNCB8QEBAQEBAQEBAQEBAQEBAQEBAQEBAQCAg
+ICAgICAgICAgICAgICAgICA0MzUNCj4gPiAgICAgICAgICAgICAyMDQ4IHwgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIDANCj4gPiAgICAgICAgICAgICA0MDk2IHwgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDANCj4gPiAgICAgICAgICAgICA4
+MTkyIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDENCj4gPiAgICAg
+ICAgICAgIDE2Mzg0IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDAN
+Cj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEFuYW5kIEtob2plIDxhbmFuZC5hLmtob2plQG9yYWNs
+ZS5jb20+DQo+ID4gUmV2aWV3ZWQtYnk6IExlb24gUm9tYW5vdnNreSA8bGVvbnJvQG52aWRpYS5j
+b20+DQo+ID4gLS0tDQo+ID4gQ2hhbmdlcyBpbiB2NDoNCj4gPiAgIC0gRml4ZWQgYSBuaXQgaW4g
+cGF0Y2ggc3ViamVjdC4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFu
+b3gvbWx4NS9jb3JlL3BhZ2VhbGxvYy5jIHwgNyArKysrKystDQo+ID4gIDEgZmlsZSBjaGFuZ2Vk
+LCA2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvcGFnZWFsbG9jLmMNCj4gYi9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvcGFnZWFsbG9jLmMNCj4gPiBp
+bmRleCBkY2Y1OGVmLi4wNmVlZTNhIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVy
+bmV0L21lbGxhbm94L21seDUvY29yZS9wYWdlYWxsb2MuYw0KPiA+ICsrKyBiL2RyaXZlcnMvbmV0
+L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9wYWdlYWxsb2MuYw0KPiA+IEBAIC02MDgsNiAr
+NjA4LDcgQEAgZW51bSB7DQo+ID4gIAlSRUxFQVNFX0FMTF9QQUdFU19NQVNLID0gMHg0MDAwLA0K
+PiA+ICB9Ow0KPiA+DQo+ID4gKyNkZWZpbmUgTUFYX1JFQ0xBSU1fTlBBR0VTIC01MDAwMA0KDQpJ
+dCB3b3VsZCBiZSB0cmFkaXRpb25hbCB0byBlbmNsb3NlIGEgbmVnYXRpdmUgdmFsdWUgaW4gKCku
+DQooQWx0aG91Z2ggb25seSAzMCsgeWVhciBvbGQgY29tcGlsZXJzIHdvdWxkIGdlbmVyYXRlIHVu
+ZXhwZWN0ZWQgY29kZSBmb3INCglmb28tTUFYX1JFQ0xBSU1fTlBBR0VTDQphbmQgeW91IGhhdmUg
+dG8gZ28gYmFjayBpbnRvIHRoZSAxOTcwcyBmb3INCglmb289TUFYX1JFQ0xBSU1fTlBBR0VTDQp0
+byBiZSBhIHByb2JsZW0uKQ0KDQo+ID4gIHN0YXRpYyBpbnQgcmVxX3BhZ2VzX2hhbmRsZXIoc3Ry
+dWN0IG5vdGlmaWVyX2Jsb2NrICpuYiwNCj4gPiAgCQkJICAgICB1bnNpZ25lZCBsb25nIHR5cGUs
+IHZvaWQgKmRhdGEpDQo+ID4gIHsNCj4gPiBAQCAtNjM5LDkgKzY0MCwxMyBAQCBzdGF0aWMgaW50
+IHJlcV9wYWdlc19oYW5kbGVyKHN0cnVjdCBub3RpZmllcl9ibG9jayAqbmIsDQo+ID4NCj4gPiAg
+CXJlcS0+ZGV2ID0gZGV2Ow0KPiA+ICAJcmVxLT5mdW5jX2lkID0gZnVuY19pZDsNCj4gPiAtCXJl
+cS0+bnBhZ2VzID0gbnBhZ2VzOw0KPiA+ICAJcmVxLT5lY19mdW5jdGlvbiA9IGVjX2Z1bmN0aW9u
+Ow0KPiA+ICAJcmVxLT5yZWxlYXNlX2FsbCA9IHJlbGVhc2VfYWxsOw0KPiA+ICsJaWYgKG5wYWdl
+cyA8IE1BWF9SRUNMQUlNX05QQUdFUykNCj4gPiArCQlyZXEtPm5wYWdlcyA9IE1BWF9SRUNMQUlN
+X05QQUdFUzsNCj4gPiArCWVsc2UNCj4gPiArCQlyZXEtPm5wYWdlcyA9IG5wYWdlczsNCj4gPiAr
+DQo+IA0KPiBCVFcsIHRoaXMgY2FuIGJlIHdyaXR0ZW4gYXM6DQo+IAlyZXEtPm5wYWdlcyA9IG1h
+eF90KHMzMiwgbnBhZ2VzLCBNQVhfUkVDTEFJTV9OUEFHRVMpOw0KDQpUaGF0IHNob3VsZG4ndCBu
+ZWVkIGFsbCB0aGUgKHMzMikgY2FzdHMuDQooSSBkb24ndCB0aGluayBpdCBldmVuIG5lZWRlZCB0
+aGVtIGJlZm9yZSBJIHJlbGF4ZWQgdGhlIHR5cGUgY2hlY2suKQ0KDQoJRGF2aWQNCg0KPiANCj4g
+VGhhbmtzDQo+IA0KPiA+ICAJSU5JVF9XT1JLKCZyZXEtPndvcmssIHBhZ2VzX3dvcmtfaGFuZGxl
+cik7DQo+ID4gIAlxdWV1ZV93b3JrKGRldi0+cHJpdi5wZ193cSwgJnJlcS0+d29yayk7DQo+ID4g
+IAlyZXR1cm4gTk9USUZZX09LOw0KPiA+IC0tDQo+ID4gMS44LjMuMQ0KPiA+DQoNCi0NClJlZ2lz
+dGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24g
+S2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
-"mac->mac_pcs.neg_mode = true;" is a property of the "ops" so should
-move with it.
-
-> @@ -1475,7 +1396,6 @@ int dwmac4_setup(struct stmmac_priv *priv)
->  	mac->mii.clk_csr_mask = GENMASK(11, 8);
->  	mac->num_vlan = dwmac4_get_num_vlan(priv->ioaddr);
->  
-> -	mac->mac_pcs.ops = &dwmac4_mii_pcs_ops;
->  	mac->mac_pcs.neg_mode = true;
-
-Also applies here.
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> index 3666893acb69..c42fb2437948 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> @@ -363,6 +363,7 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
->  		mac->tc = mac->tc ? : entry->tc;
->  		mac->mmc = mac->mmc ? : entry->mmc;
->  		mac->est = mac->est ? : entry->est;
-> +		mac->mac_pcs.ops = mac->mac_pcs.ops ?: entry->pcs;
-
-Removing both of the above means that mac->mac_pcs.ops won't ever be set
-prior to this, so this whole thing should just be:
-
-		mac->mac_pcs.ops = entry->pcs;
-		mac->mac_pcs.neg_mode = true;
-
-> +static void dwmac_pcs_get_state(struct phylink_pcs *pcs,
-> +				struct phylink_link_state *state)
->  {
-> +	struct mac_device_info *hw = phylink_pcs_to_mac_dev_info(pcs);
->  	struct stmmac_priv *priv = hw->priv;
->  	u32 val;
->  
-> +	val = stmmac_pcs_get_config_reg(priv, hw);
-> +
-> +	/* TODO The next is SGMII/RGMII/SMII-specific */
-> +	state->link = !!(val & PCS_CFG_LNKSTS);
-> +	if (!state->link)
-> +		return;
-> +
-> +	switch (FIELD_GET(PCS_CFG_LNKSPEED, val)) {
-> +	case PCS_CFG_LNKSPEED_2_5:
-> +		state->speed = SPEED_10;
-> +		break;
-> +	case PCS_CFG_LNKSPEED_25:
-> +		state->speed = SPEED_100;
-> +		break;
-> +	case PCS_CFG_LNKSPEED_250:
-> +		state->speed = SPEED_1000;
-> +		break;
-> +	default:
-> +		netdev_err(priv->dev, "Unknown speed detected\n");
-> +		break;
-> +	}
-> +
-> +	state->duplex = val & PCS_CFG_LNKMOD ? DUPLEX_FULL : DUPLEX_HALF;
-> +
-> +	/* TODO Check the PCS_AN_STATUS.Link status here?.. Note the flag is latched-low */
-> +
-> +	/* TODO The next is the TBI/RTBI-specific and seems to be valid if PCS_AN_STATUS.ANC */
->  	val = readl(priv->pcsaddr + PCS_ANE_LPA);
-
-I thought these registers only existed of dma_cap.pcs is true ? If we
-start checking PCS_AN_STATUS.Link here, and this register reads as
-zeros, doesn't it mean that RMGII inband mode won't ever signal link
-up?
-
->  
-> -	/* TODO Make sure that STMMAC_PCS_PAUSE STMMAC_PCS_ASYM_PAUSE usage is legitimate */
-> +	/* TODO The databook says the encoding is defined in IEEE 802.3z,
-> +	 * Section 37.2.1.4. Do we need the STMMAC_PCS_PAUSE and
-> +	 * STMMAC_PCS_ASYM_PAUSE mask here?
-> +	 */
->  	linkmode_mod_bit(ETHTOOL_LINK_MODE_Pause_BIT,
->  			 state->lp_advertising,
->  			 FIELD_GET(PCS_ANE_PSE, val) & STMMAC_PCS_PAUSE);
-
-If it's 802.3z aka 1000base-X format, then yes, we should be using
-these bits if we are getting state from this register.
-
-If TBI/RTBI is ever used, rather than trying to shoe-horn it all into
-these functions, please consider splitting them into separate PCSes,
-and sharing code between them e.g. using common functions called from
-the method functions or shared method functions where appropriate.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
