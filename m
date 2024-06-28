@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-107589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA58991BA09
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:33:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8103E91BA0F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ECBAB21311
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:33:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337EB281CF6
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD7F1514CC;
-	Fri, 28 Jun 2024 08:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF08F15350D;
+	Fri, 28 Jun 2024 08:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G9Gb9Wo2"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HXwWTEZe"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD8C14E2E6;
-	Fri, 28 Jun 2024 08:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A570114F117;
+	Fri, 28 Jun 2024 08:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719563548; cv=none; b=qM9HWMkm1UtEVPmO7so7uN7NBMbBPTYPRB1OgjazVfkwl/VRHSqpVFHUYjikJePRoTR+6RZdaZybZffApGx5FkjLk0nlSyV/tJvE9CiNZIFDJ3+Hy8FchlmEE2YbiM9RitaqvMD4b6V2+q3OWscB23yA2JWg/6xVcvnUFhreNTQ=
+	t=1719563549; cv=none; b=ULACed4WL6OwR9UUxfbYzGseYLkFcKht4bQr6GxXUyK5H6CUcSpccNwkMdP9cC9GFtTG7blzseBuBIxXgjeRwa8LN5hC6N3p/xSXnQyebfIjiteUfitSCk/11q8qAJefw8spdXEgMPDV4yGQmxc0+PKYk1zfyOwgjbdWM01aBw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719563548; c=relaxed/simple;
-	bh=aL5K60kyLaYT4Dy60EU0ucdDsNgnwxZmlu7fj1i/ycc=;
+	s=arc-20240116; t=1719563549; c=relaxed/simple;
+	bh=f7TPPmvx1V//ZV2NXyrwcJUloBvrSPAUat5+8WOXts0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ayxMxeSyv/OYT03vyw1xK68tkQSQBwgFYctChEQ110bPrhUbYPSkLChtWj/vnLf6ooJwo3pYCNFKb/WSehzvZB6AZ0gtU15iq3JdbhUY+0Y1M5srEIWOStlH6WWb9aYzGlwRRiZmlOK3unhticbu7+yOLqWc4Ad5NzrprPGFsBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G9Gb9Wo2; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=JzuoQEJC015L0BVeIEcfZaH1nGV6C0cG/++P3ieUuPxaH5FMdrhpe/LNOhSKzF7/7f0oiUxKaE1HRgoXimcgoQVF3T7nUtVXWZNF43+9VIRWl2ADK8y5eA02pZjA6eFT9FxvAXTICsj36+/47FORGwqzjRuTfHVsEWgQxMDviy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HXwWTEZe; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A94714000D;
-	Fri, 28 Jun 2024 08:32:23 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5E00B40011;
+	Fri, 28 Jun 2024 08:32:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1719563544;
+	t=1719563545;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8tG0Gf3/ayOMX1nsiE8dmm2OLilLLfJ1kVbKcOdcWgc=;
-	b=G9Gb9Wo2kxHls5K4sjfzF7LUQNIXai66n39n6ZKlePLrkKmZJtZBSm8mDSP0hRSQ8c2G0Y
-	2CyMoezTd01BdT3Iv/lLR2Ty0fhrDnE4gEquJkTnfkW0NLMBYMR1G9rmOo9XrJGYzh21q8
-	LS5LWZ4T8FFhqK+jwfkXY8Fg1jAkZefQSTYDK3K03UM4cD1o2zTgWO9t9doPstVCQ365GB
-	XY5+rauXzdSF4CM4SDxIZKFpzFaMnV1kYF1+kQ/PrHlL8/Zc+S5j/Oy9To3px1syXsHC6X
-	a6krfOSlNnsX9MBzBduIuvF7LmKkLtfVNuT2HD+cBYc11x0+/PUs6VoegCAyGA==
+	bh=2IhfkXtwujsthIH+q4a+RJK4oijTnCgBLop0up3GzN0=;
+	b=HXwWTEZe181euao6yA2ScbRWmj7iJBmDLEe+MmfnrKIHGj0SOujlxQDJZ4uZmujbmPvkM6
+	ONP22Dg5mjJ/T1UvpM0EmwCqGlMKQLIwqaSoRVkBK3O+uFrJ8IkksLtY5cZGIIUwV39RBU
+	QC58PKZI4ivNCxetG9FOtdUekNcDjqhJzouNjz+1eQeA0QO+g6bRxb2IT7qHFhqvHLCug8
+	3y080UHnjD10+YqczYGr4JAR+sHoZdCF7NsjVrNz3o0aOOQeHjHKm8W/NhrYXKMAxW37CP
+	aQqM4xr9Ca0yA79C6SHkGoEWHzIx+xXxGlSQJBFKG9cEjweeIg5vxEXVK7LOvA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 28 Jun 2024 10:31:59 +0200
-Subject: [PATCH net-next v5 6/7] netlink: specs: Expand the PSE netlink
- command with C33 pw-limit attributes
+Date: Fri, 28 Jun 2024 10:32:00 +0200
+Subject: [PATCH net-next v5 7/7] net: pse-pd: pd692x0: Enhance with new
+ current limit and voltage read callbacks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240628-feature_poe_power_cap-v5-6-5e1375d3817a@bootlin.com>
+Message-Id: <20240628-feature_poe_power_cap-v5-7-5e1375d3817a@bootlin.com>
 References: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
 In-Reply-To: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -73,90 +73,306 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Expand the c33 PSE attributes with power limit to be able to set and get
-the PSE Power Interface power limit.
-
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
-             --json '{"header":{"dev-name":"eth1"}}'
-{'c33-pse-actual-pw': 1700,
- 'c33-pse-admin-state': 3,
- 'c33-pse-avail-pw-limit': 97500,
- 'c33-pse-pw-class': 4,
- 'c33-pse-pw-d-status': 4,
- 'c33-pse-pw-limit-ranges': [{'max': 18100, 'min': 15000},
-                             {'max': 38000, 'min': 30000},
-                             {'max': 65000, 'min': 60000},
-                             {'max': 97500, 'min': 90000}],
- 'header': {'dev-index': 5, 'dev-name': 'eth1'}}
-
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-set
-             --json '{"header":{"dev-name":"eth1"},
-                      "c33-pse-avail-pw-limit":19000}'
-None
+This patch expands PSE callbacks with newly introduced
+pi_get/set_current_limit() and pi_get_voltage() callback.
+It also add the power limit ranges description in the status returned.
+The only way to set ps692x0 port power limit is by configure the power
+class plus a small power supplement which maximum depends on each class.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
+Change in v2:
+- Use uA and uV instead of mA and mV to have more precision in the power
+  calculation. Need to use 64bit variables for the calculation.
+- Modify the behavior in case of setting the current out of the available
+  ranges. Report an error now.
+
 Change in v4:
 - Add support for c33 pse power limit ranges.
 ---
- Documentation/netlink/specs/ethtool.yaml | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/net/pse-pd/pd692x0.c | 218 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 216 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 820cff47722d..411458d97911 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -935,6 +935,15 @@ attribute-sets:
-       -
-         name: power-mode
-         type: u8
-+  -
-+    name: c33-pse-pw-limit
-+    attributes:
-+      -
-+        name: min
-+        type: u32
-+      -
-+        name: max
-+        type: u32
-   -
-     name: pse
-     attributes:
-@@ -983,6 +992,16 @@ attribute-sets:
-         name: c33-pse-ext-substate
-         type: u32
-         name-prefix: ethtool-a-
-+      -
-+        name: c33-pse-avail-pw-limit
-+        type: u32
-+        name-prefix: ethtool-a-
-+      -
-+        name: c33-pse-pw-limit-ranges
-+        name-prefix: ethtool-a-
-+        type: nest
-+        multi-attr: true
-+        nested-attributes: c33-pse-pw-limit
-   -
-     name: rss
-     attributes:
-@@ -1678,6 +1697,8 @@ operations:
-             - c33-pse-actual-pw
-             - c33-pse-ext-state
-             - c33-pse-ext-substate
-+            - c33-pse-avail-pw-limit
-+            - c33-pse-pw-limit-ranges
-       dump: *pse-get-op
-     -
-       name: pse-set
-@@ -1691,6 +1712,7 @@ operations:
-             - header
-             - podl-pse-admin-control
-             - c33-pse-admin-control
-+            - c33-pse-avail-pw-limit
-     -
-       name: rss-get
-       doc: Get RSS params.
+diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
+index cce1b7ce044b..29cc76a66c13 100644
+--- a/drivers/net/pse-pd/pd692x0.c
++++ b/drivers/net/pse-pd/pd692x0.c
+@@ -74,6 +74,8 @@ enum {
+ 	PD692X0_MSG_GET_PORT_STATUS,
+ 	PD692X0_MSG_DOWNLOAD_CMD,
+ 	PD692X0_MSG_GET_PORT_CLASS,
++	PD692X0_MSG_GET_PORT_MEAS,
++	PD692X0_MSG_GET_PORT_PARAM,
+ 
+ 	/* add new message above here */
+ 	PD692X0_MSG_CNT
+@@ -135,7 +137,7 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
+ 	[PD692X0_MSG_SET_PORT_PARAM] = {
+ 		.key = PD692X0_KEY_CMD,
+ 		.sub = {0x05, 0xc0},
+-		.data = {   0, 0xff, 0xff, 0xff,
++		.data = { 0xf, 0xff, 0xff, 0xff,
+ 			 0x4e, 0x4e, 0x4e, 0x4e},
+ 	},
+ 	[PD692X0_MSG_GET_PORT_STATUS] = {
+@@ -156,6 +158,18 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
+ 		.data = {0x4e, 0x4e, 0x4e, 0x4e,
+ 			 0x4e, 0x4e, 0x4e, 0x4e},
+ 	},
++	[PD692X0_MSG_GET_PORT_MEAS] = {
++		.key = PD692X0_KEY_REQ,
++		.sub = {0x05, 0xc5},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
++	[PD692X0_MSG_GET_PORT_PARAM] = {
++		.key = PD692X0_KEY_REQ,
++		.sub = {0x05, 0xc0},
++		.data = {0x4e, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
+ };
+ 
+ static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
+@@ -520,6 +534,106 @@ pd692x0_get_ext_state(struct ethtool_c33_pse_ext_state_info *c33_ext_state_info,
+ 	}
+ }
+ 
++struct pd692x0_class_pw {
++	int class;
++	int class_cfg_value;
++	int class_pw;
++	int max_added_class_pw;
++};
++
++#define PD692X0_CLASS_PW_TABLE_SIZE 4
++/* 4/2 pairs class configuration power table in compliance mode.
++ * Need to be arranged in ascending order of power support.
++ */
++static const struct pd692x0_class_pw
++pd692x0_class_pw_table[PD692X0_CLASS_PW_TABLE_SIZE] = {
++	{.class = 3, .class_cfg_value = 0x3, .class_pw = 15000, .max_added_class_pw = 3100},
++	{.class = 4, .class_cfg_value = 0x2, .class_pw = 30000, .max_added_class_pw = 8000},
++	{.class = 6, .class_cfg_value = 0x1, .class_pw = 60000, .max_added_class_pw = 5000},
++	{.class = 8, .class_cfg_value = 0x0, .class_pw = 90000, .max_added_class_pw = 7500},
++};
++
++static int pd692x0_pi_get_pw_from_table(int op_mode, int added_pw)
++{
++	const struct pd692x0_class_pw *pw_table;
++	int i;
++
++	pw_table = pd692x0_class_pw_table;
++	for (i = 0; i < PD692X0_CLASS_PW_TABLE_SIZE; i++, pw_table++) {
++		if (pw_table->class_cfg_value == op_mode)
++			return pw_table->class_pw + added_pw * 100;
++	}
++
++	return -ERANGE;
++}
++
++static int pd692x0_pi_set_pw_from_table(struct device *dev,
++					struct pd692x0_msg *msg, int pw)
++{
++	const struct pd692x0_class_pw *pw_table;
++	int i;
++
++	pw_table = pd692x0_class_pw_table;
++	if (pw < pw_table->class_pw) {
++		dev_err(dev,
++			"Power limit %dmW not supported. Ranges minimal available: [%d-%d]\n",
++			pw,
++			pw_table->class_pw,
++			pw_table->class_pw + pw_table->max_added_class_pw);
++		return -ERANGE;
++	}
++
++	for (i = 0; i < PD692X0_CLASS_PW_TABLE_SIZE; i++, pw_table++) {
++		if (pw > (pw_table->class_pw + pw_table->max_added_class_pw))
++			continue;
++
++		if (pw < pw_table->class_pw) {
++			dev_err(dev,
++				"Power limit %dmW not supported. Ranges availables: [%d-%d] or [%d-%d]\n",
++				pw,
++				(pw_table - 1)->class_pw,
++				(pw_table - 1)->class_pw + (pw_table - 1)->max_added_class_pw,
++				pw_table->class_pw,
++				pw_table->class_pw + pw_table->max_added_class_pw);
++			return -ERANGE;
++		}
++
++		msg->data[2] = pw_table->class_cfg_value;
++		msg->data[3] = (pw - pw_table->class_pw) / 100;
++		return 0;
++	}
++
++	pw_table--;
++	dev_warn(dev,
++		 "Power limit %dmW not supported. Set to highest power limit %dmW\n",
++		 pw, pw_table->class_pw + pw_table->max_added_class_pw);
++	msg->data[2] = pw_table->class_cfg_value;
++	msg->data[3] = pw_table->max_added_class_pw / 100;
++	return 0;
++}
++
++static int
++pd692x0_pi_get_pw_ranges(struct pse_control_status *st)
++{
++	const struct pd692x0_class_pw *pw_table;
++	int i;
++
++	pw_table = pd692x0_class_pw_table;
++	st->c33_pw_limit_ranges = kcalloc(PD692X0_CLASS_PW_TABLE_SIZE,
++					  sizeof(struct ethtool_c33_pse_pw_limit_range),
++					  GFP_KERNEL);
++	if (!st->c33_pw_limit_ranges)
++		return -ENOMEM;
++
++	for (i = 0; i < PD692X0_CLASS_PW_TABLE_SIZE; i++, pw_table++) {
++		st->c33_pw_limit_ranges[i].min = pw_table->class_pw;
++		st->c33_pw_limit_ranges[i].max = pw_table->class_pw + pw_table->max_added_class_pw;
++	}
++
++	st->c33_pw_limit_nb_ranges = i;
++	return 0;
++}
++
+ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 				      unsigned long id,
+ 				      struct netlink_ext_ack *extack,
+@@ -558,9 +672,20 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 	priv->admin_state[id] = status->c33_admin_state;
+ 
+ 	pd692x0_get_ext_state(&status->c33_ext_state_info, buf.sub[0]);
+-
+ 	status->c33_actual_pw = (buf.data[0] << 4 | buf.data[1]) * 100;
+ 
++	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
++	msg.sub[2] = id;
++	memset(&buf, 0, sizeof(buf));
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret < 0)
++		return ret;
++
++	ret = pd692x0_pi_get_pw_from_table(buf.data[0], buf.data[1]);
++	if (ret < 0)
++		return ret;
++	status->c33_avail_pw_limit = ret;
++
+ 	memset(&buf, 0, sizeof(buf));
+ 	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_CLASS];
+ 	msg.sub[2] = id;
+@@ -572,6 +697,10 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 	if (class <= 8)
+ 		status->c33_pw_class = class;
+ 
++	ret = pd692x0_pi_get_pw_ranges(status);
++	if (ret < 0)
++		return ret;
++
+ 	return 0;
+ }
+ 
+@@ -850,12 +979,97 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 	return ret;
+ }
+ 
++static int pd692x0_pi_get_voltage(struct pse_controller_dev *pcdev, int id)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
++
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		return ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_MEAS];
++	msg.sub[2] = id;
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret < 0)
++		return ret;
++
++	/* Convert 0.1V unit to uV */
++	return (buf.sub[0] << 8 | buf.sub[1]) * 100000;
++}
++
++static int pd692x0_pi_get_current_limit(struct pse_controller_dev *pcdev,
++					int id)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct pd692x0_msg msg, buf = {0};
++	int mW, uV, uA, ret;
++	s64 tmp_64;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
++	msg.sub[2] = id;
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret < 0)
++		return ret;
++
++	ret = pd692x0_pi_get_pw_from_table(buf.data[2], buf.data[3]);
++	if (ret < 0)
++		return ret;
++	mW = ret;
++
++	ret = pd692x0_pi_get_voltage(pcdev, id);
++	if (ret < 0)
++		return ret;
++	uV = ret;
++
++	tmp_64 = mW;
++	tmp_64 *= 1000000000ull;
++	/* uA = mW * 1000000000 / uV */
++	uA = DIV_ROUND_CLOSEST_ULL(tmp_64, uV);
++	return uA;
++}
++
++static int pd692x0_pi_set_current_limit(struct pse_controller_dev *pcdev,
++					int id, int max_uA)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct device *dev = &priv->client->dev;
++	struct pd692x0_msg msg, buf = {0};
++	int uV, ret, mW;
++	s64 tmp_64;
++
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		return ret;
++
++	ret = pd692x0_pi_get_voltage(pcdev, id);
++	if (ret < 0)
++		return ret;
++	uV = ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
++	msg.sub[2] = id;
++	tmp_64 = uV;
++	tmp_64 *= max_uA;
++	/* mW = uV * uA / 1000000000 */
++	mW = DIV_ROUND_CLOSEST_ULL(tmp_64, 1000000000);
++	ret = pd692x0_pi_set_pw_from_table(dev, &msg, mW);
++	if (ret)
++		return ret;
++
++	return pd692x0_sendrecv_msg(priv, &msg, &buf);
++}
++
+ static const struct pse_controller_ops pd692x0_ops = {
+ 	.setup_pi_matrix = pd692x0_setup_pi_matrix,
+ 	.ethtool_get_status = pd692x0_ethtool_get_status,
+ 	.pi_enable = pd692x0_pi_enable,
+ 	.pi_disable = pd692x0_pi_disable,
+ 	.pi_is_enabled = pd692x0_pi_is_enabled,
++	.pi_get_voltage = pd692x0_pi_get_voltage,
++	.pi_get_current_limit = pd692x0_pi_get_current_limit,
++	.pi_set_current_limit = pd692x0_pi_set_current_limit,
+ };
+ 
+ #define PD692X0_FW_LINE_MAX_SZ 0xff
 
 -- 
 2.34.1
