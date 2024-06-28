@@ -1,190 +1,109 @@
-Return-Path: <netdev+bounces-107772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B86091C46E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:06:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9378291C476
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 162751F22445
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C7121F22737
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A641A1CCCB0;
-	Fri, 28 Jun 2024 17:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E54D1CCCD5;
+	Fri, 28 Jun 2024 17:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nB+XTLJT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ETkypuZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092861CB327;
-	Fri, 28 Jun 2024 17:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB041CCCBA;
+	Fri, 28 Jun 2024 17:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719594388; cv=none; b=Sv9HvxVpOFsItIMITxbj5wob6E7E3m1fnCzoMxHu1BApkTs2K3YN9lyeJy+4hy9cid/BMq1JtKHzXFYwA+Mxl2stCRL9UBKpZdCasgiv2ddSl8mYP845ekKSdvUbaQchYQPB1X1G6cZbc2O/nmAGFNsxvJzDWVyIx/3TUWVRzeM=
+	t=1719594418; cv=none; b=iO/p2WaB1TyqBJnbGDmu1UnVb9jolNm1N7jmrUFynnctnB+hiQvFlioYzctvglP5TMB59tScYb23OsqFSrziCSyr4dVpbnUF0eRxi9/8QSpUTzLbjQjJM/FrJ9lTRrFkEh2Gso4Uxv/Btf7MWq2Yz1pWkcwMeq5XBb4ZzCKrJic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719594388; c=relaxed/simple;
-	bh=d23WOmuV/HnTicuDlGwo3blk56kDlmCf4wCMAL9gDbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eZ99IExvnnhY80fUDoxUYDIBDU+Cp2amUAd4RAyyXS/hb2pYl77hD7QDwbqPjrsQG3alLi453rHJ5uE2ARMsqBim2cI94MIJf6/9m7+7HzOQJw8i6Xj9M+cVR397LLPO8KgBYti8lTNPwR+U0BFwFwN38QVgYeEM4NbzQYQ2qZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nB+XTLJT; arc=none smtp.client-ip=209.85.208.175
+	s=arc-20240116; t=1719594418; c=relaxed/simple;
+	bh=4Zr+nd3J+yxoza8a1PYlgqPSpsXgUDmKkU5O+po44bk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=QQmcs7SC4kKk41VvtJJfmFMFIzL08Eadolvj5fNNLYBAhCW9IvGzs3PaZjdtvijYJYhOeqyxMawE2Z35csbjWqwjsfNP3Zp30K4TZJXgLIurYr2HpvWy9v4Cs2JajRt3GQ5NW++L6bqbRbsK8IdbOEZKIujVJy+lfQuZ2kEM8Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ETkypuZA; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ec17eb4493so12273181fa.2;
-        Fri, 28 Jun 2024 10:06:26 -0700 (PDT)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79c0b1eb94dso51407585a.1;
+        Fri, 28 Jun 2024 10:06:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719594385; x=1720199185; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwOwymiTFXK5bpxKsm90XNAEfYuUZk1CldR/MN3iO+A=;
-        b=nB+XTLJTgzCYcT7Rsm9BYA3uYYj0pMP1xjdJdRaLZqDSwvleI36DBSaOUvuI1gsssy
-         VNqgrM6YP5Yvt4BS/b2s3wfbB+zFRih50vaAapMlA9BXz/Ya82jV33KngNjwovL4TRED
-         oExcslu8FKydrggxK2Xld0NLesv30yfVTkHV9IgnNSp8V6/1uQJHZJWJF2LrLEoI4HIA
-         b2OG7ps9+XNDF+TjQmU8Wa7X4l2LhYObP5OILFpcvDt7hhp4mZKBxiXmlH91kg0+fhCx
-         yiLAB9iJluDbW+Y2uMT2BdOwHayOqxunsVckSKK5bVGTjc2AmS8o3BcgkybqGdrHTaOG
-         ERTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719594385; x=1720199185;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1719594415; x=1720199215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZwOwymiTFXK5bpxKsm90XNAEfYuUZk1CldR/MN3iO+A=;
-        b=G7xjqIBwjQCe5ygQwWVv8E31QtyiWyjnvkgQKsT783LU/N8nvZN/MDLxQS30mbyNiV
-         N1RxNlDVSYgZ+fQLXmkOE+JFE9GobOm2tUVIjq2Eup8zkPquW44DZN1Cm6ARRQv5Of9k
-         kCJh79Obt5uYu3IG3rBcMX5E5QU1t+vIJwXe6E/nfXdHRN3+Hd5m22JTMxw4oS1ZT5ne
-         Vt57ajVLtD2syahtnqpS6WdWgZaC6ujQvffjEtlYzKmTM7z5P7rfE//7OVkGGH2siPCz
-         iTULD7vYFh/TbaE6BEnFgOeY2chiqglAOsJVsbCXvJSoWC3Gt5jYu7UWuw5Opz+72fXj
-         jM0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXSqpcNZHokui5AXDcc/QZHd0MNlrsxpzH1Z69R2lpdkGwPsWd5v7is/66vFF0YwvwUptBPzkj8YM1/tmFZaUZUhqS2pF22iBAWLjLFYeVzxKnoWEn0egRrGXGyR0P8CETyBkXBbDv2+IfyXda5Y22P00JZJmLyYY3yaSA4opqVnA==
-X-Gm-Message-State: AOJu0YzkR2nakW5O6B0uf416fzaK2BEPnttBT+kOVwgpdKvf98tXSKAE
-	fiF1ZXW/BJ39RbZhrY8k69z3Rzl/JJ/WxBjYqjo7kz7rgDy/TLv0
-X-Google-Smtp-Source: AGHT+IHZHBnsfVjk3W/G/V45o0piL4CHZadYb28IWJPLziXyOpgdnn/L+zGnCB+cQ2zlzrmqkvnoiA==
-X-Received: by 2002:a2e:7211:0:b0:2ea:e74c:40a2 with SMTP id 38308e7fff4ca-2ec5b2d5b95mr125913701fa.20.1719594384850;
-        Fri, 28 Jun 2024 10:06:24 -0700 (PDT)
-Received: from mobilestation ([213.79.110.82])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee5168cf89sm3362251fa.115.2024.06.28.10.06.23
+        bh=F49/bFlGo5lDwPRdmzFXCo73h73jegYIC4d1yF75uX8=;
+        b=ETkypuZAH00F3G88grVle6pIwbPqne26cn91PVrAR7RO0Qxj31LzAw1gQ1FdgaTM/W
+         UbbgSz5gqGSkfnJ9GJqAJDwbZEJWYMwqxamiB9+nEhd0s6/jz5m9jY+mIAhuDGbmgMpL
+         sLovTsU3sZV7SEdaHLkJZtSAgkOagUwS/x/x0RHp0cD8Kql0HGUOvwJHgnC45meGaHsl
+         c3Y162WBHIhnX14i/bcuP6nX8vWMjzrZP/v7LabxLUmFAARrWhAuJgYU2lB6zXadJ/pX
+         V9xNjv5Leu28eI6FBOThr/x8VlzawHQZIQczBBf8BtrjkFZ+4e5As+DV3wiF1hEEOxvj
+         FW5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719594415; x=1720199215;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=F49/bFlGo5lDwPRdmzFXCo73h73jegYIC4d1yF75uX8=;
+        b=YYH8+FNEtyqyZeMkA/WDkDb7CfC27dWtk4VkTrj9ggok0SsSnoUNyAzd3nZIB5miCy
+         T2ktqulKTrcVBIryfobanpVSK8XyFsSyyQBMc+k1k7ho8MEihnwh0/rfE5NiR32ZMgSe
+         3o25hZL2xf45Dtn30uTlwj0pK6/v2ipIp9JYJJBPWN2eTSr66nmWRo/ogzE9h40DD6yO
+         spblvvUdDeHuky4UY7XLhmY54rnFerUFxgH0L2OHespCvbHh9k033GxZNswjcFcNEt6S
+         K2s+DyslRSQvWTyedQVT7v4JM8a/fz+ASu5wShn8F2CN183EkL2JGUQPP2AFGaOvF0xm
+         oJ1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWEWpYeWaX+Sbw0484bMLFtQuNo5v6SWeVWjntBiyiOXJcxqHJ4xKkcg7geVwdwzTV4t9nB40ZXZqL3tCP56B0sULp99PfYr2DLQpVeQQq0t48bQgi0ofo9xomO0EViRIQ=
+X-Gm-Message-State: AOJu0YzF7ZcCAFEOqbwU2DzFibMBZ+AKZd0o6jbWYMQNasEQCYn0RQVm
+	qQdKBHajE80ESVin57xzVPlFWwoimFFUrJYM0bMlvqdoXM+sV+bM
+X-Google-Smtp-Source: AGHT+IFnaFbpMfndZjxwChsjzI0JcCDDjvuqFdZSQ9ffBjSa0sh9+sNFL8uT0vWL1GGjOTonSrG79g==
+X-Received: by 2002:a05:6214:2468:b0:6b0:7fa6:c004 with SMTP id 6a1803df08f44-6b59f136c91mr37829016d6.59.1719594415144;
+        Fri, 28 Jun 2024 10:06:55 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e573914sm9383576d6.49.2024.06.28.10.06.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 10:06:24 -0700 (PDT)
-Date: Fri, 28 Jun 2024 20:06:21 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
-	Abhishek Chauhan <quic_abchauha@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 06/10] dt-bindings: net: Add Synopsys DW xPCS
- bindings
-Message-ID: <a234uiz4gtjpgq3uphe2dh42nihkg6bzlspslhhfuv32f53yli@fypobrcl3wyp>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627004142.8106-7-fancer.lancer@gmail.com>
- <20240627-hurry-gills-19a2496797f3@spud>
- <e5mqaztxz62b7jktr47mojjrz7ht5m4ou4mqsxtozpp3xba7e4@uh7v5zn2pbn2>
- <20240628-ovary-bucket-3d23c67c82ed@spud>
+        Fri, 28 Jun 2024 10:06:54 -0700 (PDT)
+Date: Fri, 28 Jun 2024 13:06:54 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ io-uring@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, 
+ asml.silence@gmail.com, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Message-ID: <667eedae8096e_2185b2948@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1e55ad85b726d50a45bdd35fc04e1565d3ba7896.1719190216.git.asml.silence@gmail.com>
+References: <cover.1719190216.git.asml.silence@gmail.com>
+ <1e55ad85b726d50a45bdd35fc04e1565d3ba7896.1719190216.git.asml.silence@gmail.com>
+Subject: Re: [PATCH net-next 4/5] io_uring/net: move charging socket out of zc
+ io_uring
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240628-ovary-bucket-3d23c67c82ed@spud>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 28, 2024 at 05:42:58PM +0100, Conor Dooley wrote:
-> On Thu, Jun 27, 2024 at 08:10:48PM +0300, Serge Semin wrote:
-> > On Thu, Jun 27, 2024 at 04:51:22PM +0100, Conor Dooley wrote:
-> > > On Thu, Jun 27, 2024 at 03:41:26AM +0300, Serge Semin wrote:
-> > > > +  clocks:
-> > > > +    description:
-> > > > +      Both MCI and APB3 interfaces are supposed to be equipped with a clock
-> > > > +      source connected via the clk_csr_i line.
-> > > > +
-> > > > +      PCS/PMA layer can be clocked by an internal reference clock source
-> > > > +      (phyN_core_refclk) or by an externally connected (phyN_pad_refclk) clock
-> > > > +      generator. Both clocks can be supplied at a time.
-> > > > +    minItems: 1
-> > > > +    maxItems: 3
-> > > > +
-> > > > +  clock-names:
-> > > > +    oneOf:
-> > > > +      - minItems: 1
-> > > > +        items:
-> > > > +          - enum: [core, pad]
-> > > > +          - const: pad
-> > > > +      - minItems: 1
-> > > > +        items:
-> > > > +          - const: pclk
-> > > > +          - enum: [core, pad]
-> > > > +          - const: pad
-> > > 
-> > 
-> > > While reading this, I'm kinda struggling to map "clk_csr_i" to a clock
-> > > name. Is that pclk? And why pclk if it is connected to "clk_csr_i"?
-> > 
-> > Right. It's "pclk". The reason of using the "pclk" name is that it has
-> > turned to be a de-facto standard name in the DT-bindings for the
-> > peripheral bus clock sources utilized for the CSR-space IO buses.
-> > Moreover the STMMAC driver responsible for the parental DW *MAC
-> > devices handling also has the "pclk" name utilized for the clk_csr_i
-> > signal. So using the "pclk" name in the tightly coupled devices (MAC
-> > and PCS) for the same signal seemed a good idea.
-> > 
-> > > If two interfaces are meant to be "equipped" with that clock, how come
-> > > it is optional? I'm probably missing something...
-> > 
-> > MCI and APB3 interfaces are basically the same from the bindings
-> > pointer of view. Both of them can be utilized for the DW XPCS
-> > installed on the SoC system bus, so the device could be accessed using
-> > the simple MMIO ops.
-> > 
-> > The first "clock-names" schema is meant to be applied on the DW XPCS
-> > accessible over an _MDIO_ bus, which obviously doesn't have any
-> > special CSR IO bus. In that case the DW XPCS device is supposed to be
-> > defined as a subnode of the MDIO-bus DT-node.
-> > 
-> > The second "clock-names" constraint is supposed to be applied to the
-> > DW XPCS synthesized with the MCI/APB3 CSRs IO interface. The device in
-> > that case should be defined in the DT source file as a normal memory
-> > mapped device.
-> > 
-> > > 
-> > > Otherwise this binding looks fine to me.
-> > 
-> > Shall I add a note to the clock description that the "clk_csr_i"
-> > signal is named as "pclk"? I'll need to resubmit the series anyway.
->
- 
-> Better yet, could you mention MDIO? It wasn't clear to me (but I'm just
-> reviewing bindings not a dwmac-ist) that MCI and APB3 were only two of
-> the options and that the first clock-names was for MDIO. Maybe something
-> like:
+Pavel Begunkov wrote:
+> Currently, io_uring's io_sg_from_iter() duplicates the part of
+> __zerocopy_sg_from_iter() charging pages to the socket. It'd be too easy
+> to miss while changing it in net/, the chunk is not the most
+> straightforward for outside users and full of internal implementation
+> details. io_uring is not a good place to keep it, deduplicate it by
+> moving out of the callback into __zerocopy_sg_from_iter().
 > 
->   clock-names:
->     oneOf:
->       - minItems: 1
->         items: # MDIO
->           - enum: [core, pad]
->           - const: pad
->       - minItems: 1
->         items: # MCI or APB
->           - const: pclk
->           - enum: [core, pad]
->           - const: pad
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Agreed. I'll add the comments to the oneOf-subschemas as you
-suggested.
-
-Thanks,
--Serge(y)
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
