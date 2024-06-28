@@ -1,181 +1,244 @@
-Return-Path: <netdev+bounces-107623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91AA291BB8D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:34:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B290091BB94
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4858C283AD9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:34:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 150DB1F2179E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A0215278D;
-	Fri, 28 Jun 2024 09:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36276152E03;
+	Fri, 28 Jun 2024 09:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0jEGxzm9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HmD3ApQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF6915253D
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A0315278D;
+	Fri, 28 Jun 2024 09:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719567291; cv=none; b=s8QR3Pd84RocKERnL+imACY/NaoO9d5T2zUQpQvlh41ZSmbyCIfctFraJVM1pnn6dhvVEvSsnfoVSsyE/hTOZiO4kzlSkJdeG8LAEiDvvvnnbsfo8t1d2ep+asZWSskwuQXpjNO9B8NOMfAHAATPEM37UCXMox+YVgGkADREt6w=
+	t=1719567430; cv=none; b=pZW3cdxdKf8N69b0Bhq4RAq28q7gm9J9Z1wtu1MVaakxHWzpf9lHgxuepPTKR/fas3ZGfSzwdL2K+JGil0Z3thpSFd8l5qx6GaG9UmAtyQQdYGOJII5JU2Q4+ktsTwkuOzGMA7UEpcDjEo/ldBChwivCrZw/fTMiPXi2RG7nXEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719567291; c=relaxed/simple;
-	bh=mVgpkGZeEUIJG9UJ4SJVmxmneMeKnT/4EHHpcMGGZ2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=er6TGkSZuh+w3u5cV2QK3lBB/ullegXhFW1ErygpWpymrmrZpd8v0Dc/wsTNJ+1Tsj88OHgWdi7cNGN8AXiK6+alYNnDvb7Rsa2fWJwXdH6u/QaPvMv2AZvCWjWtGQXR6pzuUdmqNx2910KZKpMvvOFuyePQ0YmOALbBKU+RXao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0jEGxzm9; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42565cdf99cso4266945e9.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:34:49 -0700 (PDT)
+	s=arc-20240116; t=1719567430; c=relaxed/simple;
+	bh=VDmEj/cwUJjAJeEoNi4alm75+sGyk2YjqZ0y5PfkbPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EXHbJbO7pyhHeb+PJZLO5QVzkLk34mnSFPhYqDx40gS+6aXg8y4OEYCxlzObAjdqk5K0ACmXDwbyGETlO5j/E8+fJ/38/6HBdRlxhdgjjHYnv2gvO1fBl5q4jCRhRRnAqiTPIZXrmGD3Paog/vQlVSTl5EDKlmviDFYOikl5KdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HmD3ApQL; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d55ec570a7so225538b6e.1;
+        Fri, 28 Jun 2024 02:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719567288; x=1720172088; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R5Gyzd0KEYojFlORA9Zt8V98aCcTYQ8VgOMnEXwuyS0=;
-        b=0jEGxzm9bjV7qzwpsbLi/sY/bku21UXzhP846PPiz3H7hFYF4Q/cErPNFDbeJmGcbW
-         RzeySL5v8Q/vBMEAB8IQe6Oy7Wm7K6hwHewCnUBeRVbxQwEGzK8rE76ztohLnOmlQYqc
-         g5dY7JdMaZsMrJESPO+MhLQ8HDr9C4DSani1tsHd2PSxsvzgnXEPKcb1EwSCuDco6qmH
-         HWT/R2Yjn+fTIK47svur0u+p1G8xgJq8y0YroZVtrNGLYukVoX9Wi+uQKV0OomaVDM6u
-         yb98FQP9rZ54aoRIv0tn1YFWp1dDQhEZba1Gry3Wss1f6oBNJUOeck4JiuhZbP2KRzKU
-         wUQw==
+        d=gmail.com; s=20230601; t=1719567428; x=1720172228; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k3Rd7uvuD4w7EE2WK1HzrikRlBWrM23sNJsR+VublGE=;
+        b=HmD3ApQLb0cf6nic/L1NKrS5unXVpyJlZW3SkQEBMXQyRqLc40ynAWmdHBnZBZ01Ln
+         lbIEJZmaqW8BfzT18m9pZYnal7BR1KIF97EF470/aehUkeMh6HPWl/z7iTPgOsNzZbmY
+         DGvEHHzjV90AfYpii80MniEaEnSaRy2qE3OrNqwJeVM2lCsYFCEHjgfDXC69ROsCsRMI
+         L2kU88R+Ik898zQ3CYFsVCDfjfCt/CJbJh1NvNWp+og9iQbNOWinonsSgU9YFzayE+Iv
+         irO9Y4L2yqFGfdx+jcOV0tKKOAsPPbym02TJZmx//w7EdAwcpYpjfP+AYBsYBkjsTp+q
+         luPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719567288; x=1720172088;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R5Gyzd0KEYojFlORA9Zt8V98aCcTYQ8VgOMnEXwuyS0=;
-        b=EBBxQSKaHdnKX9/IrHZp+AYKR0QlHNEQJgSiQNBTpkzxqSOIq4lqGL/6b5nYWK6zUx
-         +colZ3d31DZpm/H7lM+GUZ0z3dKPnMTnKHnrA38tmgcgjtBI/pYa2xpEfQIS2OAVaPnf
-         GKBUXLHRrW7EHGc0rX+jQnMc6jZpod4eqjMtemgAasYDk6bujoBHofo4Y1q5K2As1fQw
-         L9P3G8NfdVkD5FfBIpiPDiKLJGxAuD+lU7BvbsQDYYlmBPkNPoJ0+OV/bfSb+5y5wb5d
-         rGfmVdJ4/w1sVOC4L7Qj44XtJ5qwgNhN9H0kjkMfMA1otDbHpHuIIGSkpQu0XmjWXUX4
-         WfHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtQuVBBcFMzjXxF3Iw7SB9MwJGApTuw182wFgH0QLojtIewhDkYZXM9GPaTAs6jNdRESY8fxX2i+DsFtWv4eCRta4a+d/t
-X-Gm-Message-State: AOJu0YwCtVB9bSLQTlFOIOpq24AYGjxcNy84cJYJQaWrra5f2wt7e+VJ
-	GaTg4pmCBKcBaz7Fsqv2wJ3b5TNbgADzxa8zzx0aMDPhUgqZ2R78F8VKWAq8ndFI2xJNx+PQXbd
-	OooFRgBWPcZXeEbzGSlMyl8haIddgL+SsTbyo
-X-Google-Smtp-Source: AGHT+IHkMX5345OLYcmRT3XnelwwzbNOLPwlwqhS2DVYP+oCW1ISdTPYj99BI+fmIoO/MdYp0rp3L25a15KF4hw0UuA=
-X-Received: by 2002:a05:600c:1c1e:b0:425:692d:c72d with SMTP id
- 5b1f17b1804b1-425692dd443mr23095585e9.32.1719567287924; Fri, 28 Jun 2024
- 02:34:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719567428; x=1720172228;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k3Rd7uvuD4w7EE2WK1HzrikRlBWrM23sNJsR+VublGE=;
+        b=bRkI2aNqQ5F6/Wd7z3fjL8tAaELDw+tGfYKvTMv7jMITmSQxxNru/TEkR9kvOglLjT
+         ZSvzQXQgPaGooGAR2tSJ6kNtR4lS+sgNKS33S/Zl+wPpsfjekSSX7RA+xrejIFKK+hsD
+         GMJ1XPSsAmPEB2yy1qzBPI2BdkaCWpm/wPIA8ddjmOkgl+MyrGg11r9rwuZkr1nsDnYL
+         zNqLcZStxgVXQtGAqCDIkpwRwsF/UyRlHQbn9PXKdx9ZS+kM3DwC8gIB52NktLSLkIaZ
+         BoG1UPoFkQUjKxG38N8jyDJrTesoJrS+G3HnqrqJAO83NyqMTQrOyfLZucgDds8YQsLT
+         QPbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDdnUZRIlQhwuk6FF3Jmpfl5GZpB8hC860ypx4PwnxUU/h9e/2WTFwlkr9k6jX02yPvB4o/fTnwDJCs9QPxMEyT5fepFUh8y0YbGrdoP9YYqgbW11eqj1R+Py4xc9TPIXyuaBU
+X-Gm-Message-State: AOJu0YxngOt8N57/gwDTnRMnBpdYsh67ZGs1jZ2f3Nj9ltISmghkeQHK
+	bjeFgiBWWRHgaTqquiDJRlII43wCH/8lFm11in1mdY0PjMilZu03
+X-Google-Smtp-Source: AGHT+IFNYcP8yn20V50FXenqjQ7bbisnvWrp+nnWjYMaN4UWEq1txFuUga5dMa6gTj8C9XtepCEMlA==
+X-Received: by 2002:a05:6808:2217:b0:3d6:32c9:cc87 with SMTP id 5614622812f47-3d632c9ce60mr500198b6e.1.1719567426048;
+        Fri, 28 Jun 2024 02:37:06 -0700 (PDT)
+Received: from [192.168.3.22] (89-145-235-100.xdsl.murphx.net. [89.145.235.100])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6c7f72a7sm951125a12.63.2024.06.28.02.37.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jun 2024 02:37:05 -0700 (PDT)
+Message-ID: <99ac96ff-df39-4446-9ee7-752f4bf18a3e@gmail.com>
+Date: Fri, 28 Jun 2024 10:37:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619192131.do.115-kees@kernel.org> <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz> <202406201147.8152CECFF@keescook>
- <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz> <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
- <c5934f76-3ce8-466e-80d1-c56ebb5a158e@suse.cz> <CAH5fLggjrbdUuT-H-5vbQfMazjRDpp2+k3=YhPyS17ezEqxwcw@mail.gmail.com>
- <c45eb0c9-21b9-4e29-a9d8-f3044c77822e@suse.cz>
-In-Reply-To: <c45eb0c9-21b9-4e29-a9d8-f3044c77822e@suse.cz>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Fri, 28 Jun 2024 11:34:35 +0200
-Message-ID: <CAH5fLghsZRemYUwVvhk77o6y1foqnCeDzW4WZv6ScEWna2+_jw@mail.gmail.com>
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and family
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Kees Cook <kees@kernel.org>, 
-	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>, Christoph Lameter <cl@linux.com>, 
-	Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, 
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>, jvoisin <julien.voisin@dustri.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>, 
-	Suren Baghdasaryan <surenb@google.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
-	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: phy_device: fix PHY WOL enabled, PM failed to
+ suspend
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Youwan Wang <youwan@nfschina.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240628060318.458925-1-youwan@nfschina.com>
+ <Zn5xmMpTLK/fRoYh@shell.armlinux.org.uk>
+ <249879ad-aa97-452c-a173-65255818d2d4@gmail.com>
+ <Zn6BZ4b4h8YJ3Z0u@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <Zn6BZ4b4h8YJ3Z0u@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 28, 2024 at 11:17=E2=80=AFAM Vlastimil Babka <vbabka@suse.cz> w=
-rote:
->
-> On 6/28/24 11:06 AM, Alice Ryhl wrote:
-> >> >>
-> >> >
-> >> > I took a quick look as what kmem_buckets is, and seems to me that al=
-ign
-> >> > doesn't make sense here (and probably not useful in Rust as well)
-> >> > because a kmem_buckets is a set of kmem_caches, each has its own obj=
-ect
-> >> > size, making them share the same alignment is probably not what you
-> >> > want. But I could be missing something.
-> >>
-> >> How flexible do you need those alignments to be? Besides the power-of-=
-two
-> >> guarantees, we currently have only two odd sizes with 96 and 192. If t=
-hose
-> >> were guaranteed to be aligned 32 bytes, would that be sufficient? Also=
- do
-> >> you ever allocate anything smaller than 32 bytes then?
-> >>
-> >> To summarize, if Rust's requirements can be summarized by some rules a=
-nd
-> >> it's not completely ad-hoc per-allocation alignment requirement (or if=
- it
-> >> is, does it have an upper bound?) we could perhaps figure out the crea=
-tion
-> >> of rust-specific kmem_buckets to give it what's needed?
-> >
-> > Rust's allocator API can take any size and alignment as long as:
-> >
-> > 1. The alignment is a power of two.
-> > 2. The size is non-zero.
-> > 3. When you round up the size to the next multiple of the alignment,
-> > then it must not overflow the signed type isize / ssize_t.
-> >
-> > What happens right now is that when Rust wants an allocation with a
-> > higher alignment than ARCH_SLAB_MINALIGN, then it will increase size
-> > until it becomes a power of two so that the power-of-two guarantee
-> > gives a properly aligned allocation.
->
-> So am I correct thinking that, if the cache of size 96 bytes guaranteed a
-> 32byte alignment, and 192 bytes guaranteed 64byte alignment, and the rest=
- of
-> sizes with the already guaranteed power-of-two alignment, then on rust si=
-de
-> you would only have to round up sizes to the next multiples of the aligne=
-mnt
-> (rule 3 above) and that would be sufficient?
->  Abstracting from the specific sizes of 96 and 192, the guarantee on kmal=
-loc
-> side would have to be - guarantee alignment to the largest power-of-two
-> divisor of the size. Does that sound right?
->
-> Then I think we could have some flag for kmem_buckets creation that would=
- do
-> the right thing.
 
-If kmalloc/krealloc guarantee that an allocation is aligned according
-to the largest power-of-two divisor of the size, then the Rust
-allocator would definitely be simplified as we would not longer need
-this part:
 
-if layout.align() > bindings::ARCH_SLAB_MINALIGN {
-    // The alignment requirement exceeds the slab guarantee, thus try
-to enlarge the size
-    // to use the "power-of-two" size/alignment guarantee (see
-comments in `kmalloc()` for
-    // more information).
-    //
-    // Note that `layout.size()` (after padding) is guaranteed to be a
-multiple of
-    // `layout.align()`, so `next_power_of_two` gives enough alignment
-guarantee.
-    size =3D size.next_power_of_two();
-}
+On 6/28/2024 10:24 AM, Russell King (Oracle) wrote:
+> On Fri, Jun 28, 2024 at 09:25:54AM +0100, Florian Fainelli wrote:
+>> Would not the situation described here be solved by having the Motorcomm PHY
+>> driver set PHY_ALWAYS_CALL_SUSPEND since it deals with checking whether WoL
+>> is enabled or not and will just return then.
+> 
+> Let's also look at PHY_ALWAYS_CALL_SUSPEND. There are currently two
+> drivers that make use of it - realtek and broadcom.
+> 
+> Looking at realtek, it is used with driver instances that call
+> 	rtl821x_suspend
+> 	rtl821x_resume
+> 
+> rtl821x_suspend() does nothing if phydev->wol_enabled is true.
+> rtl821x_resume() only re-enabled the clock if phydev->wol_enabled
+> was false (in other words, rtl821x has disabled the clock.) However,
+> it always calls genphy_resume() - presumably this is the reason for
+> the flag.
+> 
+> The realtek driver instances do not populate .set_wol nor .get_wol,
+> so the PHY itself does not support WoL configuration. This means
+> that the phy_ethtool_get_wol() call in phy_suspend() will also fail,
+> and since wol.wolopts is initialised to zero, phydev->wol_enabled
+> will only be true if netdev->wol_enabled is true.
+> 
+> Thus, for phydev->wol_enabled to be true, netdev->wol_enabled must
+> be true, and we won't get here via mdio_bus_phy_suspend() as
+> mdio_bus_phy_may_suspend() will return false in this case.
+> 
+> 
+> Looking at broadcom, it's used with only one driver instance for
+> BCM54210E which calls:
+> 	bcm54xx_suspend
+> 	bcm54xx_resume
+> 
+> Other driver instances also call these two functions but do not
+> set this flag - BCM54612E, BCM54810, BCM54811, BCM50610, and
+> BCM50610M. Moreover, none of these implement the .get_wol and
+> .set_wol methods which means the behaviour is as I describe for
+> Realtek above that also doesn't implement these methods.
+> 
+> The only case where this is different is BCM54210E which does
+> populate these methods.
+> 
+> bcm54xx_suspend() stops ptp, and if WoL is enabled, configures the
+> wakeup IRQ. bcm54xx_resume() deconfigures the wakeup IRQ.
+> 
+> This could lead us into a case where the PHY has WoL enabled, the
+> phy_ethtool_get_wol() call returns that, causing phydev->wol_enabled
+> to be set, and netdev->wol_enabled is not set.
+> 
+> However, in this case, it would not be a problem because the driver
+> has set PHY_ALWAYS_CALL_SUSPEND, so we won't return -EBUSY.
+> 
+> 
+> Now, looking again at motorcomm, yt8521_resume() disables auto-sleep
+> before checking whether WoL is enabled. So, the driver is probably
+> missing PHY_ALWAYS_CALL_SUSPEND if auto-sleep needs to be disabled
+> each and every resume whether WoL is enabled or not.
+> 
+> However, if we look at yt8521_config_init(), this will also disable
+> auto sleep. This will be called from phy_init_hw(), and in the
+> mdio_bus_phy_resume() path, immediately before phy_resume(). Likewise
+> when we attach the PHY.
+> 
+> Then we have some net drivers that call phy_resume() directly...
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> 	(we already have a workaround merged for
+> 	PHY-not-providing-clock)
+> 
+> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> 	A suspend/resume cycle of the PHY is done when entering loopback mode.
+> 
+> drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
+> 	No idea on this one - it resumes the PHY before enabling
+> 	loopback mode, and enters suspend when disabling loopback
+> 	mode!
+> 
+> drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> 	bcmgenet_resume() calls phy_init_hw() before phy_resume().
 
-We would only need to keep the part that rounds up the size to a
-multiple of the alignment.
+Yes, there was a reason for that, that had to do with a finicky PHY 
+IIRC, should be documented properly in the commit message since this 
+came from my colleague Doug.
 
-Alice
+> 
+> drivers/net/ethernet/broadcom/bcmsysport.c
+> 	bcm_sysport_resume() *doesn't* appear to call phy_init_hw()
+> 	before phy_resume(), so I wonder whether the config is
+> 	properly restored on resume?
+
+This driver is using the fixed PHY emulation so it does not really 
+matter, it also sets mac_managed_pm to true.
+
+> 
+> drivers/net/ethernet/realtek/r8169_main.c
+> 	rtl8169_up() calls phy_init_hw() before phy_resume().
+> 
+> drivers/net/usb/ax88172a.c
+> 	This doesn't actually call phy_resume(), but calls
+> 	genphy_resume() directly from ax88172a_reset() immediately
+> 	after phy_connect(). However, connecting to a PHY will
+> 	call phy_resume()... confused here.
+> 
+> So I'm left wondering whether yt8521_resume() should be fiddling with
+> this auto-sleep mode, especially as yt8521_config_init() will do that
+> if the appropriate DT property is set... and whether this should be
+> done unconditionally.
+> 
+
+-- 
+Florian
 
