@@ -1,108 +1,123 @@
-Return-Path: <netdev+bounces-107791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3653E91C5E3
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:36:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3222591C5E8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3F6D281C61
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:36:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1E47B2271F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538421CCCD7;
-	Fri, 28 Jun 2024 18:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wjged7CM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CBC1CE083;
+	Fri, 28 Jun 2024 18:38:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016125634
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 18:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833621C8FAB
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 18:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719599805; cv=none; b=JLHNsT/aEHxDUSC/JOp8pVEvxpuCn8pOVfHtVobVLcVE0T6/Nd90FGpjsTzpsdcgPia5dChXDAeUnByYPzIG6ZU7GICb1328cfENdiSeLGUygeAPphEi2oMZ4MqyIR5nzMyHv30EgjmyNeXy2saDkBzCyplQIc/kryZ6T7bW7po=
+	t=1719599904; cv=none; b=irQs6e+DCMSnuwMXYSWFvkYx2t230t7IxhGjrdu1DYQCX7z1sXk1q6HakWrrzTpXuLSK2JqCbCb/RH4e2/+pFAdATpkQF3H3v2f94Qn7vnACOjZUoOAGrJoJKp4W8/mY8zbvoR+B/IYd6GJmqGZoGgqNcfeIykxzhhrlDvOFdjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719599805; c=relaxed/simple;
-	bh=Vu4DMeYFylySur1lZ4EtGg+jOO6nbzB22102RW+KNOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S/xLhS6vtU1y9WeMV5OqOjfaW2qIpb9L6grsHfOsYcEcs6pl6EU86U/3pnXhPh1pplAuO+byQPvVKu83fD4NVTtm/8SrQfIuhvWHvukBY93MNyrjeuJjwbHci9UA5hC3uHF4ak4SVbIE3ezMKcmKYyTzBcB7HaOx5+mcX18/wMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wjged7CM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D205C116B1;
-	Fri, 28 Jun 2024 18:36:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719599804;
-	bh=Vu4DMeYFylySur1lZ4EtGg+jOO6nbzB22102RW+KNOs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wjged7CM6F7FluzMhLSH8QUM3VRBeUwE1K9i7VgI4f2vSWHu2iihV2p3tq2qSFWD1
-	 gyr7UlilP+EFBS2Ie3Ly1U8NbpLseZDomKPz+GHUb1pnZ3usAlMVKMdhMJC7zrjXxL
-	 g5DyFaSSI1tiDfAp/qhk/RcNpLBNGrhOECaNaD0mM/lNlf6RyyqXo4EUdM3mA6iIcD
-	 5sxSDPQIsncDftfewK76bd4El3uX7XnPnLRuCUJ6H2s55nbvKlsioL+pcn6DZ/s6l+
-	 g39Q+4cF1a+paUCqInhwth1UWiEmx1K2mtNifPyPY3vNuLg+PO4jslg7svoat3Ab2V
-	 +iBkfgEDwxPYQ==
-Date: Fri, 28 Jun 2024 19:36:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marcin Szycik <marcin.szycik@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	michal.swiatkowski@linux.intel.com, przemyslaw.kitszel@intel.com,
-	aleksander.lobakin@intel.com, pmenzel@molgen.mpg.de
-Subject: Re: [PATCH iwl-next v3 7/7] ice: Add tracepoint for adding and
- removing switch rules
-Message-ID: <20240628183641.GG837606@kernel.org>
-References: <20240627145547.32621-1-marcin.szycik@linux.intel.com>
- <20240627145547.32621-8-marcin.szycik@linux.intel.com>
+	s=arc-20240116; t=1719599904; c=relaxed/simple;
+	bh=WAgvqGSSMUhPpGWuEaYRvYoyRrVFQyKjhyHF8lm3m3s=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qR6lpwVwc1ky59dKCHu2fm3HB/oRi2F5Wb2j6/jJcYKA5YjuVVtNJbP8auK2BY4RE1rb5slMuGcZx2Sm5SyVZrD7Sr0TbvKNBhOU/Nx9lqAmGijcGU8Ax6/fB4X7vOvYUJFamtkhtjOvJYjGVA+n6L9PgS+N8DRYe2OBZXEVZ1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-375e4d55457so10467405ab.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 11:38:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719599902; x=1720204702;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uAQwFq9UPZbXFZDZdCFdcQuDs/7IHMkcXpTnMEOHaSI=;
+        b=Tv+J2jiMesm5XJWrpdMpKzrLcxCIjsJtZdhj4kHjmg/x+Ku/STT0T3rfQYI+ZZvGo7
+         69GrJCoRW5lzqctDAYs5rY4/8QA3y20a1Nnl7IR0gvYWllMBX+6UwEdCel/LWslgfi4y
+         6PaXRv1qFBqQsQBB3fVUqFF+dw5369IA4CHuG5U0xcuPlVYVzua59lYM6WDvYgBR9rAu
+         rVJ/0oHHxcg1JzVQBIIvS7rbeaJHtVCed++2OYsJDNRIfK1dNIxWbdb8S9qiJ+YPpF6C
+         /W6mU5EfnB5Q7nwejFiTyhRx5CpTWB+8hRE9tGbGiEKXYVsmm1TLYppIjJZjlJs+RnNd
+         ma4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU6O9k6lNAoZTaMcK4u8TFYdv/eC1iF3pbzUaxO4wp2NKJ+Q3rTr4bSVoKMY8OfyoEBocL7vxWvnM0yVBhHjsx60FUa7PTD
+X-Gm-Message-State: AOJu0YxlAhNsq/2TazdGPkwdjR/lM9tsntOhdNDHWe7KCc+B7sqoN8MG
+	w6PlVhAVSk0wTFajEN2Gw3YzWmCZ6V4c4O0Y2vmPbXeFrUX/E9TfU6plvVp0ySxHRAySVdzSHi5
+	4glkAodnKIA9s9OuHe1tcg/RkHhk5J+tAQeO0yXZPDkunAEwlGPcqFPs=
+X-Google-Smtp-Source: AGHT+IFyojeDoOQfAz+WpFDP13ym2ekViaAZ2Ap6ROc1rvqVHqXy6e4NW0dc11phb0kwVSPqpMSaRAWLrRTi/u2q8ChreueD8oNh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240627145547.32621-8-marcin.szycik@linux.intel.com>
+X-Received: by 2002:a05:6e02:168a:b0:375:ae47:ba62 with SMTP id
+ e9e14a558f8ab-3763f5c900emr15343485ab.1.1719599901745; Fri, 28 Jun 2024
+ 11:38:21 -0700 (PDT)
+Date: Fri, 28 Jun 2024 11:38:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004cb7a6061bf78daf@google.com>
+Subject: [syzbot] [netfilter?] bpf test error: WARNING: suspicious RCU usage
+ in corrupted
+From: syzbot <syzbot+784a3db26e5409459be4@syzkaller.appspotmail.com>
+To: ast@kernel.org, coreteam@netfilter.org, daniel@iogearbox.net, 
+	davem@davemloft.net, edumazet@google.com, kadlec@netfilter.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 27, 2024 at 04:55:47PM +0200, Marcin Szycik wrote:
-> Track the number of rules and recipes added to switch. Add a tracepoint to
-> ice_aq_sw_rules(), which shows both rule and recipe count. This information
-> can be helpful when designing a set of rules to program to the hardware, as
-> it shows where the practical limit is. Actual limits are known (64 recipes,
-> 32k rules), but it's hard to translate these values to how many rules the
-> *user* can actually create, because of extra metadata being implicitly
-> added, and recipe/rule chaining. Chaining combines several recipes/rules to
-> create a larger recipe/rule, so one large rule added by the user might
-> actually consume multiple rules from hardware perspective.
-> 
-> Rule counter is simply incremented/decremented in ice_aq_sw_rules(), since
-> all rules are added or removed via it.
-> 
-> Counting recipes is harder, as recipes can't be removed (only overwritten).
-> Recipes added via ice_aq_add_recipe() could end up being unused, when
-> there is an error in later stages of rule creation. Instead, track the
-> allocation and freeing of recipes, which should reflect the actual usage of
-> recipes (if something fails after recipe(s) were created, caller should
-> free them). Also, a number of recipes are loaded from NVM by default -
-> initialize the recipe counter with the number of these recipes on switch
-> initialization.
-> 
-> Example configuration:
->   cd /sys/kernel/tracing
->   echo function > current_tracer
->   echo ice_aq_sw_rules > set_ftrace_filter
->   echo ice_aq_sw_rules > set_event
->   echo 1 > tracing_on
->   cat trace
-> 
-> Example output:
->   tc-4097    [069] ...1.   787.595536: ice_aq_sw_rules <-ice_rem_adv_rule
->   tc-4097    [069] .....   787.595705: ice_aq_sw_rules: rules=9 recipes=15
->   tc-4098    [057] ...1.   787.652033: ice_aq_sw_rules <-ice_add_adv_rule
->   tc-4098    [057] .....   787.652201: ice_aq_sw_rules: rules=10 recipes=16
-> 
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Hello,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+syzbot found the following issue on:
 
+HEAD commit:    7e9f79428372 xdp: Remove WARN() from __xdp_reg_mem_model()
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=16956dea980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1437ab35b9d90e65
+dashboard link: https://syzkaller.appspot.com/bug?extid=784a3db26e5409459be4
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ca96920a98d8/disk-7e9f7942.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/24f81a5f5d0b/vmlinux-7e9f7942.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/31b888945299/bzImage-7e9f7942.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+784a3db26e5409459be4@syzkaller.appspotmail.com
+
+=============================
+WARNING: suspicious RCU usage
+6.10.0-rc3-syzkaller-00138-g7e9f79428372 #0 Not tainted
+-----------------------------
+net/netfilter/ipset/ip_set_core.c:1200 suspicious rcu_dereference_protected() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
