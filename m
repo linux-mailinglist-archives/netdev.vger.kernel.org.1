@@ -1,158 +1,415 @@
-Return-Path: <netdev+bounces-107793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBB191C60A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:47:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D34B91C620
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 20:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EB851C23A40
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:47:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9477D1F216AA
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 18:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51A652F9E;
-	Fri, 28 Jun 2024 18:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902BE612EB;
+	Fri, 28 Jun 2024 18:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnY7mQwa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nq5jUftC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401F3BBC5;
-	Fri, 28 Jun 2024 18:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4E658210
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 18:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719600418; cv=none; b=pzwQshA2f+LOmFjx8ufPjDgIB6obnrkJxN2GM6j1BIvc7z8W9iJpwwbL/rwDcOYUoLULLlNnnReZ/sorlPd1+UIAXE5+vZYd7cWc0nbhDxP6ezlG4AZFwVIVaJ9WAmAGVcZ+3RrADozN6nSTAOcIyUS2z/Ed7X2FXxeJALU6FTk=
+	t=1719600893; cv=none; b=V7M/HpIQS/55AlRkJp00gSctybdC5Pm948W64u2QNMgHkopay0aJJ5zn+18a4+LWmljzUQFzqWmqckJsAsirfIC+rsD4G2VytRRSc59y2Bme0oIq03SZimbGd4c1O166m6Aof3hmaR4I+ZJ68arrNNNx8W4nrGeJk4Mh1Y5TyBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719600418; c=relaxed/simple;
-	bh=hunj8a+Tp+D5s1II1M+FHGnR1Kh/janCLfAz5w//S74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pU6BRA/Hlc8RY5oA7D+H2pHsePVyz8Ea51vk2sdCUKm4yHdqZEbftUfQ98e9jpg8iInTqXVSrMhYN6i/pgiVTgxOdvsmMwR3S6D5ddImrj1GQ60xhlbdl/KV5Bt4/g6nfZSyn6Ah1xqhh+mfSKxPN+Wsdce6ZmvMKUJtHhVYLJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnY7mQwa; arc=none smtp.client-ip=209.85.222.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-80fe3073421so196522241.1;
-        Fri, 28 Jun 2024 11:46:56 -0700 (PDT)
+	s=arc-20240116; t=1719600893; c=relaxed/simple;
+	bh=yvlJGpmkq6SE8rHhOxbZvQucvTD6lmIKy9O9tlCptCs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZV7rTu1hZgtYbgB4zE6aXaNlJF85LXDk9hqAWiO5pjNuQdAf6ZlnkShvb11RtXVMREuD7D/Wd3bL3B+MZSz4JLZ+nLgBPMQVTKDcsPHSRkGbLPg2LVryQsPjuTNVZFtZKlYwDwWDbBvGhktUDpk51tkUBAftdQlpEsSYwjGQtU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rushilg.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nq5jUftC; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rushilg.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6435ed81ca2so17843757b3.3
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 11:54:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719600416; x=1720205216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
-        b=NnY7mQwaBKOuJgbvBiwinW9UDZk5nJNQ5uGztguS19sZ70wKqC3RLiH409PGk8royd
-         xjXi4O7BtQGNkOOUa/zFxGfm/3uXr7Cxeo9GvKril5AKU1WijEZyicFBNPlqTQ4BetLH
-         wFIKbbfOFaMVjTW19iCoIzGZqoV7RarWug7PkgKZHkv6RTq4xi4C8oqMYqVmBHYXTfma
-         eJkxar0VSD6JfDU6ae1QE0Rw11B4QKnnjgFtjCKaJoIgoHxNz0TPEOADS15frrUCupru
-         0F8NTJw44O1T8Yn8jpktjDYK4F4l65jHBNJY2mHb4oOX5DUb8g71AuQl+Ky4sLBbAn0P
-         8Xww==
+        d=google.com; s=20230601; t=1719600890; x=1720205690; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LE+4sjNDuMNsmkssn4vFOgLQCz5GqU0MfzEqsLC7zjc=;
+        b=nq5jUftCadhl/QLvy7C9L9Qj2kWAzmohxuZKhYnu0N9awXXmsI0bvtcaTx6zzJgvs+
+         eGnvvhCXr8/n+K62HS4al8IbU/r51jY4FEpiSqf1ZOVA8qBgNN60fDWRon8Zg+zQEwv8
+         1u8zx0bqXgiJBoyaLpVkL0AeH2tYadqhG/CykATa/HcqFwKRKvL+TrXs8KO9J/voBirm
+         dHccPIwD890aoDmKrj4TR7m4x4bJVaDJ15mUKqkqalzhhjjcTbRP97bbwh9Uh4hsY+m4
+         afB5vCys13K2XvBVtz7hYK1Nwttj1AlgjtKY+oyMUFkkqOYeIoWEnfhYP1l/9xDpHy/B
+         o8tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719600416; x=1720205216;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
-        b=YdoSOkLyyagHBlc5gEBQ3H59x75p4b/VbOojSEZRKaBT3mAd5mqe7B8a54HfFnlpQX
-         2PcnRHNR5ER226bu57bH+Oj9kBhjBQjP8vrmrkOb/YpuXzOyxrxEzcYmzEW47Ymr9nCq
-         aff076XNHCesWzHtlU0Vdi14GsAv3hqk7FcnDKBL9/sSVHAJgZvdiB1s4IW09yPWkZVn
-         AF/ieiIcUJCu3oJnuo5Z+cZU5f9nT11EowJIlcIIELAOFsyOl4H4rPA7POBRZ+PWUOOr
-         4fUlCAJ8Lxh39WP0iyXlBofDWo4httXJKgdAB9h/08wR9O3l57Ip1G87rIzJgAB/pO6M
-         sJoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUVFQ/5TmGlDTT51lL2jN7PV+sPpNS0q3OnELpHiq5+ZZpRv970iKb7UMJgOXxIi6MYXgVJHxG9mCwEal/cjk6ggNzXH/C
-X-Gm-Message-State: AOJu0YxrHmfbsOBm6S0wRks1tZcFNh7br9iqJKoyu7bl0MqS+IApEMJV
-	KWBOJByNZFQrKKZJAvv6tMimllzIc/6sTFuJJE++6LLDywkKVaiZ
-X-Google-Smtp-Source: AGHT+IHPotUct+drIjj4jp0GaXPTWdoP01uaTwNGdhE/JJRz1xCmlxIOHB6NIWAd9M+Suejw0LQ9cA==
-X-Received: by 2002:a05:6122:46a3:b0:4ec:f402:a849 with SMTP id 71dfb90a1353d-4ef6643904emr19831953e0c.16.1719600415782;
-        Fri, 28 Jun 2024 11:46:55 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f29e6a6fe7sm75947e0c.17.2024.06.28.11.46.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 11:46:54 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-06-28
-Date: Fri, 28 Jun 2024 14:46:53 -0400
-Message-ID: <20240628184653.699252-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1719600890; x=1720205690;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LE+4sjNDuMNsmkssn4vFOgLQCz5GqU0MfzEqsLC7zjc=;
+        b=N7dejBbrG4XvCiQjHfOTOaDwT6BR+oEotEpLXpFaT8AXtI7aCSKbRmeqAj+BGQjZ+H
+         T1AT9HDJA3EPE2tNfeBO84qEGQLEU5dZ8kU8a80xTaY3gzjSQ0zxu9o2ye+7Ce/2yzEL
+         utJswX0vY++rNKmIbpZuiI1mfRiKQ/tzFNFZXnnosKZuy1eDAyX4mWwwXwsUK8t+W4Cq
+         qCi69r4pdhMtB2r13RyzxOgALZYy5fvMtCsWtOV3SbQ6xq8lY1w9XDGKxjMgzcXaY+Ea
+         lA+AcxtkBZPsKEle/dkiDjzQiagL5M3VDuADBdphVCOKSTngfRqKpj24g/9bKuZ8O472
+         0pqw==
+X-Gm-Message-State: AOJu0YzVtVGPrsMXB/4t2jNJ4AmNy8DnZETFKK7mC6rBi75BlezK7q9j
+	zoBCpwRH25FEmaPp28z7mRXlWsPuw1PYNuwDuakhbRAawXow8P3bRARsbmJE5fYys852HHYameZ
+	w29goqLGdqmLDCGdBaaYFedBm7cYCzJMoMufpe02JBfbW6V/t0GM8vAcfkIK1to3TPSWxhttEZ2
+	HCHJ7izoluhT1rfeUjBh6KKCTLOP4ETgvbWGOGIg==
+X-Google-Smtp-Source: AGHT+IEEExJJq1GGzlpANqH5s/PL3hr+d3tbTYomeitYjNGXFWOL54qwZsWRM7OSDJ3UjYKwSceQASJ4Lz7C
+X-Received: from wrushilg.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2168])
+ (user=rushilg job=sendgmr) by 2002:a05:6902:1101:b0:e03:4d2d:b0df with SMTP
+ id 3f1490d57ef6-e034d2db295mr290368276.6.1719600890528; Fri, 28 Jun 2024
+ 11:54:50 -0700 (PDT)
+Date: Fri, 28 Jun 2024 18:54:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.803.g4e1b14247a-goog
+Message-ID: <20240628185446.262191-1-rushilg@google.com>
+Subject: [PATCH] gve: Add retry logic for recoverable adminq errors
+From: Rushil Gupta <rushilg@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, pkaligineedi@google.com, davem@davemloft.net, 
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, willemb@google.com, 
+	hramamurthy@google.com, Rushil Gupta <rushilg@google.com>, 
+	Shailend Chand <shailend@google.com>, Ziwei Xiao <ziweixiao@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The following changes since commit dc6be0b73f4f55ab6d49fa55dbce299cf9fa2788:
+From: Jeroen de Borst <jeroendb@google.com>
 
-  Merge tag 'ieee802154-for-net-2024-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan into main (2024-06-28 13:10:12 +0100)
+An adminq command is retried if it fails with an ETIME error code
+which translates to the deadline exceeded error for the device.
+The create and destroy adminq commands are now managed via a common
+method. This method keeps track of return codes for each queue and retries
+the commands for the queues that failed with ETIME.
+Other adminq commands that do not require queue level granularity are
+simply retried in gve_adminq_execute_cmd.
 
-are available in the Git repository at:
+Signed-off-by: Rushil Gupta <rushilg@google.com>
+Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+Reviewed-by: Shailend Chand <shailend@google.com>
+Reviewed-by: Ziwei Xiao <ziweixiao@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_adminq.c | 197 ++++++++++++-------
+ drivers/net/ethernet/google/gve/gve_adminq.h |   5 +
+ 2 files changed, 129 insertions(+), 73 deletions(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-28
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+index c5bbc1b7524e..74c61b90ea45 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.c
++++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+@@ -12,7 +12,7 @@
+ 
+ #define GVE_MAX_ADMINQ_RELEASE_CHECK	500
+ #define GVE_ADMINQ_SLEEP_LEN		20
+-#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK	100
++#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK	1000
+ 
+ #define GVE_DEVICE_OPTION_ERROR_FMT "%s option error:\n" \
+ "Expected: length=%d, feature_mask=%x.\n" \
+@@ -415,14 +415,17 @@ static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
+ /* Flushes all AQ commands currently queued and waits for them to complete.
+  * If there are failures, it will return the first error.
+  */
+-static int gve_adminq_kick_and_wait(struct gve_priv *priv)
++static int gve_adminq_kick_and_wait(struct gve_priv *priv, int ret_cnt, int *ret_codes)
+ {
+ 	int tail, head;
+-	int i;
++	int i, j;
+ 
+ 	tail = ioread32be(&priv->reg_bar0->adminq_event_counter);
+ 	head = priv->adminq_prod_cnt;
+ 
++	if ((head - tail) > ret_cnt)
++		return -EINVAL;
++
+ 	gve_adminq_kick_cmd(priv, head);
+ 	if (!gve_adminq_wait_for_cmd(priv, head)) {
+ 		dev_err(&priv->pdev->dev, "AQ commands timed out, need to reset AQ\n");
+@@ -430,16 +433,13 @@ static int gve_adminq_kick_and_wait(struct gve_priv *priv)
+ 		return -ENOTRECOVERABLE;
+ 	}
+ 
+-	for (i = tail; i < head; i++) {
++	for (i = tail, j = 0; i < head; i++, j++) {
+ 		union gve_adminq_command *cmd;
+-		u32 status, err;
++		u32 status;
+ 
+ 		cmd = &priv->adminq[i & priv->adminq_mask];
+ 		status = be32_to_cpu(READ_ONCE(cmd->status));
+-		err = gve_adminq_parse_err(priv, status);
+-		if (err)
+-			// Return the first error if we failed.
+-			return err;
++		ret_codes[j] = gve_adminq_parse_err(priv, status);
+ 	}
+ 
+ 	return 0;
+@@ -458,24 +458,8 @@ static int gve_adminq_issue_cmd(struct gve_priv *priv,
+ 	tail = ioread32be(&priv->reg_bar0->adminq_event_counter);
+ 
+ 	// Check if next command will overflow the buffer.
+-	if (((priv->adminq_prod_cnt + 1) & priv->adminq_mask) ==
+-	    (tail & priv->adminq_mask)) {
+-		int err;
+-
+-		// Flush existing commands to make room.
+-		err = gve_adminq_kick_and_wait(priv);
+-		if (err)
+-			return err;
+-
+-		// Retry.
+-		tail = ioread32be(&priv->reg_bar0->adminq_event_counter);
+-		if (((priv->adminq_prod_cnt + 1) & priv->adminq_mask) ==
+-		    (tail & priv->adminq_mask)) {
+-			// This should never happen. We just flushed the
+-			// command queue so there should be enough space.
+-			return -ENOMEM;
+-		}
+-	}
++	if ((priv->adminq_prod_cnt - tail) > priv->adminq_mask)
++		return -ENOMEM;
+ 
+ 	cmd = &priv->adminq[priv->adminq_prod_cnt & priv->adminq_mask];
+ 	priv->adminq_prod_cnt++;
+@@ -544,8 +528,9 @@ static int gve_adminq_issue_cmd(struct gve_priv *priv,
+ static int gve_adminq_execute_cmd(struct gve_priv *priv,
+ 				  union gve_adminq_command *cmd_orig)
+ {
++	int retry_cnt = 0;
+ 	u32 tail, head;
+-	int err;
++	int err, ret;
+ 
+ 	mutex_lock(&priv->adminq_lock);
+ 	tail = ioread32be(&priv->reg_bar0->adminq_event_counter);
+@@ -555,15 +540,21 @@ static int gve_adminq_execute_cmd(struct gve_priv *priv,
+ 		goto out;
+ 	}
+ 
+-	err = gve_adminq_issue_cmd(priv, cmd_orig);
+-	if (err)
+-		goto out;
++	do {
++		err = gve_adminq_issue_cmd(priv, cmd_orig);
++		if (err)
++			goto out;
+ 
+-	err = gve_adminq_kick_and_wait(priv);
++		err = gve_adminq_kick_and_wait(priv, 1, &ret);
++		if (err)
++			goto out;
++	} while (ret == -ETIME && ++retry_cnt < GVE_ADMINQ_RETRY_COUNT);
+ 
+ out:
+ 	mutex_unlock(&priv->adminq_lock);
+-	return err;
++	if (err)
++		return err;
++	return ret;
+ }
+ 
+ static int gve_adminq_execute_extended_cmd(struct gve_priv *priv, u32 opcode,
+@@ -638,6 +629,98 @@ int gve_adminq_deconfigure_device_resources(struct gve_priv *priv)
+ 	return gve_adminq_execute_cmd(priv, &cmd);
+ }
+ 
++typedef int (gve_adminq_queue_cmd) (struct gve_priv *priv, u32 queue_index);
++
++static int gve_adminq_manage_queues(struct gve_priv *priv,
++				    gve_adminq_queue_cmd *cmd,
++				    u32 start_id, u32 num_queues)
++{
++	u32 cmd_idx, queue_idx, ret_code_idx;
++	int queue_done = -1;
++	int *queues_waiting;
++	int retry_cnt = 0;
++	int retry_needed;
++	int *ret_codes;
++	int *commands;
++	int err;
++	int ret;
++
++	queues_waiting = kvcalloc(num_queues, sizeof(int), GFP_KERNEL);
++	if (!queues_waiting)
++		return -ENOMEM;
++	ret_codes = kvcalloc(num_queues, sizeof(int), GFP_KERNEL);
++	if (!ret_codes) {
++		err = -ENOMEM;
++		goto free_with_queues_waiting;
++	}
++	commands = kvcalloc(num_queues, sizeof(int), GFP_KERNEL);
++	if (!commands) {
++		err = -ENOMEM;
++		goto free_with_ret_codes;
++	}
++
++	for (queue_idx = 0; queue_idx < num_queues; queue_idx++)
++		queues_waiting[queue_idx] = start_id + queue_idx;
++	do {
++		retry_needed = 0;
++		queue_idx = 0;
++		while (queue_idx < num_queues) {
++			cmd_idx = 0;
++			while (queue_idx < num_queues) {
++				if (queues_waiting[queue_idx] != queue_done) {
++					err = cmd(priv, queues_waiting[queue_idx]);
++					if (err == -ENOMEM)
++						break;
++					if (err)
++						goto free_with_commands;
++					commands[cmd_idx++] = queue_idx;
++				}
++				queue_idx++;
++			}
++
++			if (queue_idx < num_queues)
++				dev_dbg(&priv->pdev->dev,
++					"Issued %d of %d batched commands\n",
++					queue_idx, num_queues);
++
++			err = gve_adminq_kick_and_wait(priv, cmd_idx, ret_codes);
++			if (err)
++				goto free_with_commands;
++
++			for (ret_code_idx = 0; ret_code_idx < cmd_idx; ret_code_idx++) {
++				if (ret_codes[ret_code_idx] == 0) {
++					queues_waiting[commands[ret_code_idx]] = queue_done;
++				} else if (ret_codes[ret_code_idx] != -ETIME) {
++					ret = ret_codes[ret_code_idx];
++					goto free_with_commands;
++				} else {
++					retry_needed++;
++				}
++			}
++
++			if (retry_needed)
++				dev_dbg(&priv->pdev->dev,
++					"Issued %d batched commands, %d needed a retry\n",
++					cmd_idx, retry_needed);
++		}
++	} while (retry_needed && ++retry_cnt < GVE_ADMINQ_RETRY_COUNT);
++
++	ret = retry_needed ? -ETIME : 0;
++
++free_with_commands:
++	kvfree(commands);
++	commands = NULL;
++free_with_ret_codes:
++	kvfree(ret_codes);
++	ret_codes = NULL;
++free_with_queues_waiting:
++	kvfree(queues_waiting);
++	queues_waiting = NULL;
++	if (err)
++		return err;
++	return ret;
++}
++
+ static int gve_adminq_create_tx_queue(struct gve_priv *priv, u32 queue_index)
+ {
+ 	struct gve_tx_ring *tx = &priv->tx[queue_index];
+@@ -678,16 +761,8 @@ static int gve_adminq_create_tx_queue(struct gve_priv *priv, u32 queue_index)
+ 
+ int gve_adminq_create_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_queues)
+ {
+-	int err;
+-	int i;
+-
+-	for (i = start_id; i < start_id + num_queues; i++) {
+-		err = gve_adminq_create_tx_queue(priv, i);
+-		if (err)
+-			return err;
+-	}
+-
+-	return gve_adminq_kick_and_wait(priv);
++	return gve_adminq_manage_queues(priv, &gve_adminq_create_tx_queue,
++					start_id, num_queues);
+ }
+ 
+ static void gve_adminq_get_create_rx_queue_cmd(struct gve_priv *priv,
+@@ -759,16 +834,8 @@ int gve_adminq_create_single_rx_queue(struct gve_priv *priv, u32 queue_index)
+ 
+ int gve_adminq_create_rx_queues(struct gve_priv *priv, u32 num_queues)
+ {
+-	int err;
+-	int i;
+-
+-	for (i = 0; i < num_queues; i++) {
+-		err = gve_adminq_create_rx_queue(priv, i);
+-		if (err)
+-			return err;
+-	}
+-
+-	return gve_adminq_kick_and_wait(priv);
++	return gve_adminq_manage_queues(priv, &gve_adminq_create_rx_queue,
++					0, num_queues);
+ }
+ 
+ static int gve_adminq_destroy_tx_queue(struct gve_priv *priv, u32 queue_index)
+@@ -791,16 +858,8 @@ static int gve_adminq_destroy_tx_queue(struct gve_priv *priv, u32 queue_index)
+ 
+ int gve_adminq_destroy_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_queues)
+ {
+-	int err;
+-	int i;
+-
+-	for (i = start_id; i < start_id + num_queues; i++) {
+-		err = gve_adminq_destroy_tx_queue(priv, i);
+-		if (err)
+-			return err;
+-	}
+-
+-	return gve_adminq_kick_and_wait(priv);
++	return gve_adminq_manage_queues(priv, &gve_adminq_destroy_tx_queue,
++					start_id, num_queues);
+ }
+ 
+ static void gve_adminq_make_destroy_rx_queue_cmd(union gve_adminq_command *cmd,
+@@ -832,16 +891,8 @@ int gve_adminq_destroy_single_rx_queue(struct gve_priv *priv, u32 queue_index)
+ 
+ int gve_adminq_destroy_rx_queues(struct gve_priv *priv, u32 num_queues)
+ {
+-	int err;
+-	int i;
+-
+-	for (i = 0; i < num_queues; i++) {
+-		err = gve_adminq_destroy_rx_queue(priv, i);
+-		if (err)
+-			return err;
+-	}
+-
+-	return gve_adminq_kick_and_wait(priv);
++	return gve_adminq_manage_queues(priv, &gve_adminq_destroy_rx_queue,
++					0, num_queues);
+ }
+ 
+ static void gve_set_default_desc_cnt(struct gve_priv *priv,
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
+index ed1370c9b197..96e98f65273c 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.h
++++ b/drivers/net/ethernet/google/gve/gve_adminq.h
+@@ -62,6 +62,11 @@ enum gve_adminq_statuses {
+ 	GVE_ADMINQ_COMMAND_ERROR_UNKNOWN_ERROR		= 0xFFFFFFFF,
+ };
+ 
++/* AdminQ commands (that aren't batched) will be retried if they encounter
++ * an recoverable error.
++ */
++#define GVE_ADMINQ_RETRY_COUNT 3
++
+ #define GVE_ADMINQ_DEVICE_DESCRIPTOR_VERSION 1
+ 
+ /* All AdminQ command structs should be naturally packed. The static_assert
+-- 
+2.45.2.803.g4e1b14247a-goog
 
-for you to fetch changes up to f1a8f402f13f94263cf349216c257b2985100927:
-
-  Bluetooth: L2CAP: Fix deadlock (2024-06-28 14:32:02 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Ignore too large handle values in BIG
- - L2CAP: sync sock recv cb and release
- - hci_bcm4377: Fix msgid release
- - ISO: Check socket flag instead of hcon
- - hci_event: Fix setting of unicast qos interval
- - hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
- - Add quirk to ignore reserved PHY bits in LE Extended Adv Report
- - hci_core: cancel all works upon hci_unregister_dev
- - btintel_pcie: Fix REVERSE_INULL issue reported by coverity
- - qca: Fix BT enable failure again for QCA6390 after warm reboot
-
-----------------------------------------------------------------
-Edward Adam Davis (2):
-      Bluetooth: Ignore too large handle values in BIG
-      bluetooth/l2cap: sync sock recv cb and release
-
-Hector Martin (1):
-      Bluetooth: hci_bcm4377: Fix msgid release
-
-Iulia Tanasescu (1):
-      Bluetooth: ISO: Check socket flag instead of hcon
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_event: Fix setting of unicast qos interval
-      Bluetooth: L2CAP: Fix deadlock
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Enable Power Save feature on startup
-
-Pavel Skripkin (1):
-      bluetooth/hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
-
-Sven Peter (1):
-      Bluetooth: Add quirk to ignore reserved PHY bits in LE Extended Adv Report
-
-Tetsuo Handa (1):
-      Bluetooth: hci_core: cancel all works upon hci_unregister_dev()
-
-Vijay Satija (1):
-      Bluetooth: btintel_pcie: Fix REVERSE_INULL issue reported by coverity
-
-Zijun Hu (1):
-      Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
-
- drivers/bluetooth/btintel_pcie.c |  2 +-
- drivers/bluetooth/btnxpuart.c    |  2 +-
- drivers/bluetooth/hci_bcm4377.c  | 10 +++++-
- drivers/bluetooth/hci_qca.c      | 18 ++++++++--
- include/net/bluetooth/hci.h      | 11 ++++++
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_conn.c         | 15 ++++++--
- net/bluetooth/hci_core.c         | 76 ++++++++++++----------------------------
- net/bluetooth/hci_event.c        | 33 +++++++++++++++--
- net/bluetooth/hci_sync.c         | 13 +++++++
- net/bluetooth/iso.c              |  3 +-
- net/bluetooth/l2cap_core.c       |  3 ++
- net/bluetooth/l2cap_sock.c       | 14 ++++++--
- 13 files changed, 131 insertions(+), 71 deletions(-)
 
