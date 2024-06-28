@@ -1,181 +1,111 @@
-Return-Path: <netdev+bounces-107550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5F491B65E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:44:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A28291B5BD
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 06:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7810BB23B78
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:44:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C436E1F22A1F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 04:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C54078C6D;
-	Fri, 28 Jun 2024 05:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106A1224CC;
+	Fri, 28 Jun 2024 04:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vRKf7xtV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.priv.miraclelinux.com (202x210x215x66.ap202.ftth.ucom.ne.jp [202.210.215.66])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2FC5381A;
-	Fri, 28 Jun 2024 05:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.210.215.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B6822339
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 04:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719553276; cv=none; b=FzcJpfPUtS3FM5DBZZqwBpvxe/himiQj41/pw6pcvyOT/E50RmfHyZxo16SWawc9KyyqsF+u2r4xlX9VaBkzvLCtZBWeRhj0o0r8aGRr2DbWYvbCJQSwvo/Yk3fYT7FsNPAN2z1poUeif5+ykmvrKqc0KvK9t5a0EVhf5kNySBc=
+	t=1719549624; cv=none; b=QoBNmSE0BqeLHEqQQdp9TgTPlDvd46+PQqAnqK/4nCKhNL+zGTkVylZAQMJ+/n9iisN9fGxuodeTvv6MYYcRWZ8uSScMDyTUiaQnoVaF0WXzwofi739js5VzRpLGkG2s0iKh4zH1TC3xkETaIywVq6jrtoyEYIJSZWVc4qnlsbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719553276; c=relaxed/simple;
-	bh=nE/ahYicu+soLj105oY080IJ/4x7ZIh8LDeXBhJqLrE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=mDyXJtHWvh0GVX/R/DPS9R3uyvcgaHHAGW4FvjQN6Y1GUq/rSZrW2jF5N9FZZmPdZz+nVjA/dxQ53+KEvesfIELXPstE+4gnOpk6cyw8K5ZZXvT/Bjc3LyDGShJvtFiEyA2m7gsJ0r7xOPazwsQcw6zE50vFcuSTULe6jwGHODw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=miraclelinux.com; spf=pass smtp.mailfrom=miraclelinux.com; arc=none smtp.client-ip=202.210.215.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=miraclelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraclelinux.com
-Received: from cip-lava-a.miraclelinux.com (cip-lava-a.miraclelinux.com [10.2.1.116])
-	by smtp.priv.miraclelinux.com (Postfix) with ESMTP id 42DA61400F0;
-	Fri, 28 Jun 2024 14:41:13 +0900 (JST)
-From: Kazunori Kobayashi <kazunori.kobayashi@miraclelinux.com>
+	s=arc-20240116; t=1719549624; c=relaxed/simple;
+	bh=OQm1lQsLxgD/2WMMUztScoEwsMvA0CpYZa4MWPM2SdA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWORIi8d+uoPOuAASkpiB847PJ5K4+EkE5lmTSlVD9+4WMkV3M7YfVQwWWkJNfgxvn+1wRp3b8fQOHcyhCuu52dVgfVnHz/biPyy8JCft+3IEith5lgJjWs6nbxQrY2KLx+CHPC/6T8teqeOeGG7sUrfdoz5Km9vFdNwbKAh5wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vRKf7xtV; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1719549619; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=bBzfghZdoues1oIVA9d4rstypECEb4Xh2DfyhJIUWCA=;
+	b=vRKf7xtVTTTH4L0XHYPlSYePc5MImj6eJhhVKLgg2MuTsbYQ4wgRx73gAVY7u4ojcnyHeh6kRBUGIg0iFtaVHvLMVvBKPvCrXXZ3oEoP1BLE+81deYUVHQPNbtoIUY+1BRjrpXyGV4N4pHD5TSk7+D+kKg5BGyg8Zog/2Gz+lw4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W9P4Y28_1719549618;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W9P4Y28_1719549618)
+          by smtp.aliyun-inc.com;
+          Fri, 28 Jun 2024 12:40:19 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
 To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hiraku.toyooka@miraclelinux.com,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kazunori Kobayashi <kazunori.kobayashi@miraclelinux.com>
-Subject: [PATCH 4.19 3/3] tcp: Fix data races around icsk->icsk_af_ops.
-Date: Mon, 17 Apr 2023 16:54:28 +0000
-Message-Id: <20230417165428.26284-4-kazunori.kobayashi@miraclelinux.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230417165428.26284-1-kazunori.kobayashi@miraclelinux.com>
-References: <20230417165428.26284-1-kazunori.kobayashi@miraclelinux.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>,
+	syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
+Subject: [PATCH RESEND net-next] net: ethtool: Fix the panic caused by dev being null when dumping coalesce
+Date: Fri, 28 Jun 2024 12:40:18 +0800
+Message-Id: <20240628044018.73885-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+syzbot reported a general protection fault caused by a null pointer
+dereference in coalesce_fill_reply(). The issue occurs when req_base->dev
+is null, leading to an invalid memory access.
 
-commit f49cd2f4d6170d27a2c61f1fecb03d8a70c91f57 upstream.
+This panic occurs if dumping coalesce when no device name is specified.
 
-setsockopt(IPV6_ADDRFORM) and tcp_v6_connect() change icsk->icsk_af_ops
-under lock_sock(), but tcp_(get|set)sockopt() read it locklessly.  To
-avoid load/store tearing, we need to add READ_ONCE() and WRITE_ONCE()
-for the reads and writes.
-
-Thanks to Eric Dumazet for providing the syzbot report:
-
-BUG: KCSAN: data-race in tcp_setsockopt / tcp_v6_connect
-
-write to 0xffff88813c624518 of 8 bytes by task 23936 on cpu 0:
-tcp_v6_connect+0x5b3/0xce0 net/ipv6/tcp_ipv6.c:240
-__inet_stream_connect+0x159/0x6d0 net/ipv4/af_inet.c:660
-inet_stream_connect+0x44/0x70 net/ipv4/af_inet.c:724
-__sys_connect_file net/socket.c:1976 [inline]
-__sys_connect+0x197/0x1b0 net/socket.c:1993
-__do_sys_connect net/socket.c:2003 [inline]
-__se_sys_connect net/socket.c:2000 [inline]
-__x64_sys_connect+0x3d/0x50 net/socket.c:2000
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-read to 0xffff88813c624518 of 8 bytes by task 23937 on cpu 1:
-tcp_setsockopt+0x147/0x1c80 net/ipv4/tcp.c:3789
-sock_common_setsockopt+0x5d/0x70 net/core/sock.c:3585
-__sys_setsockopt+0x212/0x2b0 net/socket.c:2252
-__do_sys_setsockopt net/socket.c:2263 [inline]
-__se_sys_setsockopt net/socket.c:2260 [inline]
-__x64_sys_setsockopt+0x62/0x70 net/socket.c:2260
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x2b/0x70 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-value changed: 0xffffffff8539af68 -> 0xffffffff8539aff8
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 23937 Comm: syz-executor.5 Not tainted
-6.0.0-rc4-syzkaller-00331-g4ed9c1e971b1-dirty #0
-
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 08/26/2022
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Reported-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Kazunori Kobayashi <kazunori.kobayashi@miraclelinux.com>
+Fixes: f750dfe825b9 ("ethtool: provide customized dim profile management")
+Reported-by: syzbot+e77327e34cdc8c36b7d3@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e77327e34cdc8c36b7d3
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 ---
- net/ipv4/tcp.c           | 10 ++++++----
- net/ipv6/ipv6_sockglue.c |  3 ++-
- net/ipv6/tcp_ipv6.c      |  6 ++++--
- 3 files changed, 12 insertions(+), 7 deletions(-)
+This fix patch is re-sent to next branch instead of net branch
+because the target commit is in the next branch.
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e3475f833f8fe..c863be23ac4db 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3126,8 +3126,9 @@ int tcp_setsockopt(struct sock *sk, int level, int optname, char __user *optval,
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
+ net/ethtool/coalesce.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/ethtool/coalesce.c b/net/ethtool/coalesce.c
+index 759b16e3d134..3e18ca1ccc5e 100644
+--- a/net/ethtool/coalesce.c
++++ b/net/ethtool/coalesce.c
+@@ -211,9 +211,9 @@ static int coalesce_fill_reply(struct sk_buff *skb,
+ {
+ 	const struct coalesce_reply_data *data = COALESCE_REPDATA(reply_base);
+ 	const struct kernel_ethtool_coalesce *kcoal = &data->kernel_coalesce;
+-	struct dim_irq_moder *moder = req_base->dev->irq_moder;
+ 	const struct ethtool_coalesce *coal = &data->coalesce;
+ 	u32 supported = data->supported_params;
++	struct dim_irq_moder *moder;
+ 	int ret = 0;
  
- 	if (level != SOL_TCP)
--		return icsk->icsk_af_ops->setsockopt(sk, level, optname,
--						     optval, optlen);
-+		/* Paired with WRITE_ONCE() in do_ipv6_setsockopt() and tcp_v6_connect() */
-+		return READ_ONCE(icsk->icsk_af_ops)->setsockopt(sk, level, optname,
-+								optval, optlen);
- 	return do_tcp_setsockopt(sk, level, optname, optval, optlen);
- }
- EXPORT_SYMBOL(tcp_setsockopt);
-@@ -3649,8 +3650,9 @@ int tcp_getsockopt(struct sock *sk, int level, int optname, char __user *optval,
- 	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	if (coalesce_put_u32(skb, ETHTOOL_A_COALESCE_RX_USECS,
+@@ -272,9 +272,10 @@ static int coalesce_fill_reply(struct sk_buff *skb,
+ 			     kcoal->tx_aggr_time_usecs, supported))
+ 		return -EMSGSIZE;
  
- 	if (level != SOL_TCP)
--		return icsk->icsk_af_ops->getsockopt(sk, level, optname,
--						     optval, optlen);
-+		/* Paired with WRITE_ONCE() in do_ipv6_setsockopt() and tcp_v6_connect() */
-+		return READ_ONCE(icsk->icsk_af_ops)->getsockopt(sk, level, optname,
-+								optval, optlen);
- 	return do_tcp_getsockopt(sk, level, optname, optval, optlen);
- }
- EXPORT_SYMBOL(tcp_getsockopt);
-diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index 625cece87c122..caa7b59c819ee 100644
---- a/net/ipv6/ipv6_sockglue.c
-+++ b/net/ipv6/ipv6_sockglue.c
-@@ -226,7 +226,8 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 				local_bh_enable();
- 				/* Paired with READ_ONCE(sk->sk_prot) in inet6_stream_ops */
- 				WRITE_ONCE(sk->sk_prot, &tcp_prot);
--				icsk->icsk_af_ops = &ipv4_specific;
-+				/* Paired with READ_ONCE() in tcp_(get|set)sockopt() */
-+				WRITE_ONCE(icsk->icsk_af_ops, &ipv4_specific);
- 				sk->sk_socket->ops = &inet_stream_ops;
- 				sk->sk_family = PF_INET;
- 				tcp_sync_mss(sk, icsk->icsk_pmtu_cookie);
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 033cf81f34837..78eaaf59c15e2 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -229,7 +229,8 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
- 		sin.sin_port = usin->sin6_port;
- 		sin.sin_addr.s_addr = usin->sin6_addr.s6_addr32[3];
+-	if (!moder)
++	if (!req_base->dev || !req_base->dev->irq_moder)
+ 		return 0;
  
--		icsk->icsk_af_ops = &ipv6_mapped;
-+		/* Paired with READ_ONCE() in tcp_(get|set)sockopt() */
-+		WRITE_ONCE(icsk->icsk_af_ops, &ipv6_mapped);
- 		sk->sk_backlog_rcv = tcp_v4_do_rcv;
- #ifdef CONFIG_TCP_MD5SIG
- 		tp->af_specific = &tcp_sock_ipv6_mapped_specific;
-@@ -239,7 +240,8 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
- 
- 		if (err) {
- 			icsk->icsk_ext_hdr_len = exthdrlen;
--			icsk->icsk_af_ops = &ipv6_specific;
-+			/* Paired with READ_ONCE() in tcp_(get|set)sockopt() */
-+			WRITE_ONCE(icsk->icsk_af_ops, &ipv6_specific);
- 			sk->sk_backlog_rcv = tcp_v6_do_rcv;
- #ifdef CONFIG_TCP_MD5SIG
- 			tp->af_specific = &tcp_sock_ipv6_specific;
++	moder = req_base->dev->irq_moder;
+ 	rcu_read_lock();
+ 	if (moder->profile_flags & DIM_PROFILE_RX) {
+ 		ret = coalesce_put_profile(skb, ETHTOOL_A_COALESCE_RX_PROFILE,
 -- 
-2.39.2
+2.32.0.3.g01195cf9f
 
 
