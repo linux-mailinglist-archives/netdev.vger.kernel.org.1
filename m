@@ -1,133 +1,95 @@
-Return-Path: <netdev+bounces-107718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D59691C156
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:43:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B797B91C1AE
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE5DA284629
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:43:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6280F1F26DF8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C191C0DC5;
-	Fri, 28 Jun 2024 14:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7556D1C0072;
+	Fri, 28 Jun 2024 14:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="clXunHBc"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LkkUJSL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E3D1BE87D;
-	Fri, 28 Jun 2024 14:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4A71DDE9;
+	Fri, 28 Jun 2024 14:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719585783; cv=none; b=O+XxV6eakSSuCFQHeY4OsYJfZT+lmLYvyAKCCic7MsOnauZO6bOZCYymqvsl6IsvZVUyBr9f2MqbtJYovnGOIokSaeyw0d4ECYR0nfDNDfRl1kT5uIEv6mTxYxqlFGho21KkqLX21RGHOMJc4d0aTsuTg0Y8kWJVfhzKdCEG1BY=
+	t=1719586361; cv=none; b=RQSIr/Wcq872lT0bQIJ+ER3BTDifu8dbohfD4UBXCQ7+N+Ggtyag2amQ/6w/bCnYzI5LxYe71CI8od6v0W+NUz/88BuSGeuPJozFNzUa1UQE/cvATguRp2Px/JZNBRREoZwSmgzizd4L3xieHLTs4+D3QqVNlTssiNhinsuMTVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719585783; c=relaxed/simple;
-	bh=JbF7tzwmlh0t0lhrfxljmQKu4lTVaCQqMHn/ZaGKJ04=;
+	s=arc-20240116; t=1719586361; c=relaxed/simple;
+	bh=vZ0Gd1cDcY3qQgSgEEFxAnyHcWcTbNetGH8Pbn/F+Co=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dk1WNtVqrIiQMcsRTcI2aDxNJZklmKuksCJr7vvQ3l/PU3zEXcgswywQkhkSyoOhCHyaAMrRRU3ihwBISIhc7Yze4o9iq7CBBtK5wIsxAtkRGvoQFF1EQdflnV5iN+z+6zWlVtGoAC/GlLyeswKI7wrtIxRZllOV9EGywRmKi70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=clXunHBc; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1i0qVfn2CH6qX3ZUJgQpekfAmjqv9PBkrjgn7uqTOKk=; b=clXunHBcYa9YTyHafTQarFujMc
-	lzhL7CNhuRniN/1QOI0XxCVEADk5A5U63dhB7rhDKyfUY7RXNDRewcaAb3nHi/QMvHKuBztJ8dOiK
-	RFwCxxNZgubc1Djq8JPLWgnIqVUbQuzSwrt/IVF9AcpPnwSJLSDkNDX7LEOBhbKCo2Qzqqp8R9hpt
-	NJSIVYDCwLbKU93aZynrN/2oSidE8CsWRke9vKwAkjUGqh6U0m/qpTEEjkrchXz1dQ2QrwgETId4d
-	w0FcH4FKdzwplCmj+fddpP2dojT0Du0mamuEP6+PSi059RkrSrfrNPUrWeznXfnGwl4pYVMscN9x1
-	LIL/XyoA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49280)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sNCoC-0006lH-2O;
-	Fri, 28 Jun 2024 15:42:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sNCoD-0006aZ-4r; Fri, 28 Jun 2024 15:42:41 +0100
-Date: Fri, 28 Jun 2024 15:42:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v2 17/17] net: stmmac: pcs: Drop the _SHIFT
- macros
-Message-ID: <Zn7L4cP62MsNN61J@shell.armlinux.org.uk>
-References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
- <20240624132802.14238-9-fancer.lancer@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kCzDa2gk/8rKr8+Dk52Htx8XpqjtTIFn+BD/RWnr0pgY4XSDBwVODb83uRRo4BAvy+GW39JK/A8dmN1V8lKzE0DIYaeSFWsUyhO0L+Ur757G1/fUm0U3hDywJ9SMkx7mV099m20YHHkr/p9VsCG91M5UjSPx0aelutS5oD6F+Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LkkUJSL4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7062C116B1;
+	Fri, 28 Jun 2024 14:52:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1719586360;
+	bh=vZ0Gd1cDcY3qQgSgEEFxAnyHcWcTbNetGH8Pbn/F+Co=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LkkUJSL4BYMLJYkIhLyd0kRePbat2G4F7GxYVmxfA6CpmlVPnXrmEp21xnmJyz+I7
+	 GcPeeji+WGmtHkazMOImbWzGoofNsaFFpu/9CFrkfoWi2KIr3Ve//wvAhGjW6IKE08
+	 8V+2Gy/lGfpOIxShWqc7cdUgnzYm1YQ/ldEO4onA=
+Date: Fri, 28 Jun 2024 10:52:37 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Thorsten Leemhuis <linux@leemhuis.info>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Kees Cook <kees@kernel.org>, Carlos Bilbao <carlos.bilbao.osdev@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, workflows@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	ksummit@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] Documentation: best practices for using Link
+ trailers
+Message-ID: <20240628-mindful-jackal-of-education-95059f@lemur>
+References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+ <20240619-docs-patch-msgid-link-v2-2-72dd272bfe37@linuxfoundation.org>
+ <202406211355.4AF91C2@keescook>
+ <20240621-amorphous-topaz-cormorant-cc2ddb@lemur>
+ <87cyo3fgcb.fsf@trenco.lwn.net>
+ <4709c2fa-081f-4307-bc9e-eef928255c08@infradead.org>
+ <62647fab-b3d4-48ac-af4c-78c655dcff26@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240624132802.14238-9-fancer.lancer@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <62647fab-b3d4-48ac-af4c-78c655dcff26@leemhuis.info>
 
-On Mon, Jun 24, 2024 at 04:26:34PM +0300, Serge Semin wrote:
-> The PCS_ANE_PSE_SHIFT and PCS_ANE_RFE_SHIFT are unused anyway. Moreover
-> PCS_ANE_PSE and PCS_ANE_RFE are the respective field masks. So the
-> FIELD_GET()/FIELD_SET() macro-functions can be used to get/set the fields
-> content. Drop the _SHIFT macros for good then.
+On Thu, Jun 27, 2024 at 05:51:47AM GMT, Thorsten Leemhuis wrote:
+> I thought it was documented, but either I was wrong or can't find it.
+> But I found process/5.Posting.rst, which provides this example:
 > 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h | 2 --
->  1 file changed, 2 deletions(-)
+>         Link: https://example.com/somewhere.html  optional-other-stuff
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> index a17e5b37c411..0f15c9898788 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-> @@ -43,9 +43,7 @@
->  #define PCS_ANE_FD		BIT(5)		/* AN Full-duplex flag */
->  #define PCS_ANE_HD		BIT(6)		/* AN Half-duplex flag */
->  #define PCS_ANE_PSE		GENMASK(8, 7)	/* AN Pause Encoding */
-> -#define PCS_ANE_PSE_SHIFT	7
->  #define PCS_ANE_RFE		GENMASK(13, 12)	/* AN Remote Fault Encoding */
-> -#define PCS_ANE_RFE_SHIFT	12
->  #define PCS_ANE_ACK		BIT(14)		/* AN Base-page acknowledge */
+> So no "# " there. So to avoid inconsistencies I guess this should not be
+> applied, unless that document is changed as well.
 
-I would actually like to see all these go away.
+This is inconsistent with every other trailer that includes comments.
+Currently, there are two mechanisms to provide comments with trailers:
 
-PCS_ANE_FD == LPA_1000XFULL
-PCS_ANE_HD == LPA_1000XHALF
-PCS_ANE_PSE == LPA_1000XPAUSE and LPA_1000XPAUSE_ASYM
-PCS_ANE_RFE == LPA_RESV and LPA_RFAULT
-PCS_ANE_ACK == LPA_LPACK
+1:
 
-Isn't it rather weird that the field layout matches 802.3z aka
-1000base-X and not SGMII? This layout would not make sense for Cisco
-SGMII as it loses the speed information conveyed by the Cisco SGMII
-control word.
+    | Trailer-name: trailer-content # trailer-comment
 
-This isn't a case of the manufacturer using "SGMII" to mean a serial
-gigabit media independent interface that supports 1000base-X
-(PHY_INTERFACE_MODE_1000BASEX) rather than Cisco SGMII
-(PHY_INTERFACE_MODE_SGMII) ?
+2:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    | Trailer-name: trailer-content
+    | [trailer-comment]
+
+For the sake of consistency, all trailers, including Link, should use one of
+these two mechanisms for "optional-other-stuff".
+
+-K
 
