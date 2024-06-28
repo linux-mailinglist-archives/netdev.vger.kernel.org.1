@@ -1,217 +1,115 @@
-Return-Path: <netdev+bounces-107598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A466591BA5B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:48:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 153CC91BA73
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59B19284580
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:48:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65FCEB22837
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D880914AD35;
-	Fri, 28 Jun 2024 08:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0anQbRd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8573214D719;
+	Fri, 28 Jun 2024 08:53:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439262139D4;
-	Fri, 28 Jun 2024 08:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21415374C2
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 08:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719564521; cv=none; b=X9JsLWq0H6mygTjMk5R8BCm1AGz7yhqnYjcZtF7isoAbDnW5Iyj1Y4Ihiq3Taw/Yc1YF3GrXlKgb7lFzxygniy+XNgJzisLuYE0T9AykxhJCFJpWF6KClx/UeKnsruHbFr9l+sAwdId6/nDxAB+hKCAXYvhXNsxiDdbKLm43t+4=
+	t=1719564827; cv=none; b=qmT3mfbN3TirfbChtHIxBGTV02KCXnUQ/AEAJGq5Mkog4gt4dP4p2RWj5HMAMpByh51iG0LrY2FJTsD0ZLFHTET1jZNShogsBBbAhoQ++2HRH9XW0RALVbYH24iKx5/Bq20CzigmbrRZHsrpm6GMGGvgT3fThMuVoZEs32zRzU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719564521; c=relaxed/simple;
-	bh=A6px550VytGofjT3+jVBAMJXX1t+sC2mLVSUSTZRS8I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OYOT393kH1bq/Evv0EykwhdimXLSKLsyRs6jCLx9k6rQbDbNZW2TiqYnB/jTlLkQohwJLkjC3Ha2qaBhY72XqX07ekpceOT7JCeizZodSompeycBFaOWYycTRv55oZ8HhIt9ICbC2PQ4I0OwmOFTudGZfmSLNiNzTfWYwxx10YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0anQbRd; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-79c084adaf4so25003085a.0;
-        Fri, 28 Jun 2024 01:48:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719564519; x=1720169319; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FC5inub+a2gTo101EG65k6awbFwbIe494mAOJlTq0k8=;
-        b=B0anQbRdRuKLHGpScAOK621qdSaw+cF017tNcw1wjVQyvsf1A5LDfX5BLXooaOXS3S
-         XOYhzdfgkwofRsjjI3ZDtia2k9iYU3bWIDcIRT/GT//3YNcDllhDqaOm2qs7VM6TTmYW
-         m62RYMAe8xV6xm71+WW/oJbVqXncfFIJS6YzMt1dTCFS80TKdZPW4xQznLRw7uOU6LnO
-         eUSEJMMADKLTQCRgZ/Jj5UZjEy5X5tEVAFA9W1lhvWXA4ClrRxPd/4fO3u8RvvyYU12e
-         e2mdbWT+O9dArDuFPNehQu6iXicuJMgBV20WqRkwy32aH/V7WnSRtDlJkAOyaNWMdYof
-         /dVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719564519; x=1720169319;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FC5inub+a2gTo101EG65k6awbFwbIe494mAOJlTq0k8=;
-        b=XrY44ih4yo7lbZy/PHjznh5GxBxRJeVU8W+9/m2DfMoYWbugAWGT2Pp04V3NEW4u4G
-         RWAMgkksleQjvYaoeTuS2qsp5AHOmwDFBiHhfX8sgMH3r52tQVYvB3NLhP1TQA4yj6H0
-         TMc1z+cReQvD7/1KF7wTa3CD5+t8hmMgPWvWYTMyVZM/DWDNi7aKa74+ydKnpXDAnbO1
-         S0PA6jsIUCj9/Be1N04HdXj0pvbi2RCt1KQTnnaG8Fni40lMF0CmuDeZ5YlcHlFMB19W
-         6DBShs58jLRmnwmfL0EIT9tI+KLSIZvsT7G+K+8WJIJ88XRqTbSArHuKzl+90J2UlXaX
-         PwQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWQJn+hxiuuXPp/sscZBfkaKwuCpYcH4Ms0BTP/UyHwN12ycXgxQKH3rux5+TExQmmAUeS75z64FdIEBrJPrPjc8Yvc95LAFbGfYIZghQ17gTg76sgz9lvYj7uCtTjOiIo5G/at
-X-Gm-Message-State: AOJu0YxX7sA6CYf9okUG7Es+RRChDsNcdHAiH4Z9a29c87+rZ5F4otLq
-	c7Gvvfpn8LXY9HfQ/sfDFeIgWO4mqyVgCdeDvug3FisH57WKTnR3
-X-Google-Smtp-Source: AGHT+IEPNxHOG1Ol9emvU7ROgWNd/bp8LmGHMbFRD0zXeZVqdhJ8tRao5DUAIa+tpnrPb0FVhQxDpw==
-X-Received: by 2002:a05:6214:d63:b0:6b2:b060:c7d3 with SMTP id 6a1803df08f44-6b540aaa499mr246008546d6.52.1719564518914;
-        Fri, 28 Jun 2024 01:48:38 -0700 (PDT)
-Received: from [192.168.3.22] (89-145-235-100.xdsl.murphx.net. [89.145.235.100])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f3693sm6137886d6.96.2024.06.28.01.48.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jun 2024 01:48:38 -0700 (PDT)
-Message-ID: <76b863f1-1e5f-4d7c-9f39-aabb35865f69@gmail.com>
-Date: Fri, 28 Jun 2024 09:48:34 +0100
+	s=arc-20240116; t=1719564827; c=relaxed/simple;
+	bh=OIT17qLKWGJWizrdyplsr8lba2jbjmLexGyFkIyw9L0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GzZMCcBOZV0QmhxDluPysRMZWn5YzMm5EIFxmfeqFasZvaxl23roYz4/6mroBmA4MjKdugVQMMPljzSNeiTPZonukLh6MtfYuGAjg8p5C5mVk1i+OB6QnJAYbZyfORMZp4anKwA4mbD2lB8mGU1XHjo+86hk4RvMQkrGtJy5KCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7MO-000220-SY; Fri, 28 Jun 2024 10:53:36 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7MN-005Z8k-5m; Fri, 28 Jun 2024 10:53:35 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7MN-002PCC-0F;
+	Fri, 28 Jun 2024 10:53:35 +0200
+Date: Fri, 28 Jun 2024 10:53:35 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de, linux-doc@vger.kernel.org,
+	Sai Krishna <saikrishnag@marvell.com>
+Subject: Re: [PATCH net-next v5 4/7] net: pse-pd: Add new power limit get and
+ set c33 features
+Message-ID: <Zn56D_6QYqHH-ziO@pengutronix.de>
+References: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
+ <20240628-feature_poe_power_cap-v5-4-5e1375d3817a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: phy_device: fix PHY WOL enabled, PM failed to
- suspend
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Youwan Wang <youwan@nfschina.com>, andrew@lunn.ch, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240628060318.458925-1-youwan@nfschina.com>
- <Zn5xmMpTLK/fRoYh@shell.armlinux.org.uk>
- <249879ad-aa97-452c-a173-65255818d2d4@gmail.com>
- <Zn52fU7FbTwj67dq@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <Zn52fU7FbTwj67dq@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240628-feature_poe_power_cap-v5-4-5e1375d3817a@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
-
-On 6/28/2024 9:38 AM, Russell King (Oracle) wrote:
-> On Fri, Jun 28, 2024 at 09:25:54AM +0100, Florian Fainelli wrote:
->>
->>
->> On 6/28/2024 9:17 AM, Russell King (Oracle) wrote:
->>> On Fri, Jun 28, 2024 at 02:03:18PM +0800, Youwan Wang wrote:
->>>> If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
->>>> we cannot suspend the PHY. Although the WOL status has been
->>>> checked in phy_suspend(), returning -EBUSY(-16) would cause
->>>> the Power Management (PM) to fail to suspend. Since
->>>> phy_suspend() is an exported symbol (EXPORT_SYMBOL),
->>>> timely error reporting is needed. Therefore, an additional
->>>> check is performed here. If the PHY of the mido bus is enabled
->>>> with WOL, we skip calling phy_suspend() to avoid PM failure.
->>>>
->>>> log:
->>>> [  322.631362] OOM killer disabled.
->>>> [  322.631364] Freezing remaining freezable tasks
->>>> [  322.632536] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
->>>> [  322.632540] printk: Suspending console(s) (use no_console_suspend to debug)
->>>> [  322.633052] YT8521 Gigabit Ethernet stmmac-0:01:
->>>> PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x110 [libphy] returns -16
->>>> [  322.633071] YT8521 Gigabit Ethernet stmmac-0:01:
->>>> PM: failed to suspend: error -16
->>>> [  322.669699] PM: Some devices failed to suspend, or early wake event detected
->>>> [  322.669949] OOM killer enabled.
->>>> [  322.669951] Restarting tasks ... done.
->>>> [  322.671008] random: crng reseeded on system resumption
->>>> [  322.671014] PM: suspend exit
->>>>
->>>> If the YT8521 driver adds phydrv->flags, ask the YT8521 driver to process
->>>> WOL at suspend and resume time, the phydev->suspended_by_mdio_bus=1
->>>> flag would cause the resume failure.
->>
->> Did you mean to write that if the YT8521 PHY driver entry set the
->> PHY_ALWAYS_CALL_SUSPEND flag, then it would cause an error during resume? If
->> so, why is that?
+On Fri, Jun 28, 2024 at 10:31:57AM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> It doesn't appear to do that - at least not in net-next, and not in
-> mainline.
+> This patch add a way to get and set the power limit of a PSE PI.
+> For that it uses regulator API callbacks wrapper like get_voltage() and
+> get/set_current_limit() as power is simply V * I.
+> We used mW unit as defined by the IEEE 802.3-2022 standards.
 > 
->>> I think the reason this is happening is because the PHY has WoL enabled
->>> on it without the kernel/netdev driver being aware that WoL is enabled.
->>> Thus, mdio_bus_phy_may_suspend() returns true, allowing the suspend to
->>> happen, but then we find unexpectedly that WoL is enabled on the PHY.
->>>
->>> However, whenever a user configures WoL, netdev->wol_enabled will be
->>> set when _any_ WoL mode is enabled and cleared only if all WoL modes
->>> are disabled.
->>>
->>> Thus, what we have is a de-sync between the kernel state and hardware
->>> state, leading to the suspend failing.
->>>
->>> I don't see anything in the motorcomm driver that requires suspend
->>> if WoL is enabled - yt8521_suspend() first checks to see whether WoL
->>> is enabled, and exits if it is.
->>>
->>> Andrew - how do you feel about reading the WoL state from the PHY and
->>> setting netdev->wol_enabled if any WoL is enabled on the PHY? That
->>> would mean that the netdev's WoL state is consistent with the PHY
->>> whether or not the user has configured WoL.
->>
->> Would not the situation described here be solved by having the Motorcomm PHY
->> driver set PHY_ALWAYS_CALL_SUSPEND since it deals with checking whether WoL
->> is enabled or not and will just return then.
+> set_current_limit() uses the voltage return by get_voltage() and the
+> desired power limit to calculate the current limit. get_voltage() callback
+> is then mandatory to set the power limit.
 > 
-> Is there a reason that netdev->wol_enabled shouldn't reflect the
-> hardware configuration?
+> get_current_limit() callback is by default looking at a driver callback
+> and fallback to extracting the current limit from _pse_ethtool_get_status()
+> if the driver does not set its callback. We prefer let the user the choice
+> because ethtool_get_status return much more information than the current
+> limit.
+> 
+> expand pse status with c33_pw_limit_ranges to return the ranges available
+> to configure the power limit.
+> 
+> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Unless there is some sort of Ethernet MAC driver bug that we are not 
-being made aware of, the only thing that I can of is happening here, is 
-that a SW/FW agent other than Linux would have enabled the PHY for 
-Wake-on-LAN, and there was no configuration done by the user via the 
-Ethernet MAC driver that attempted to enable Wake-on-LAN. In that case 
-only can I think of a disconnect between the HW and SW states?
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-> 
-> If netdev->wol_enabled is appropriately set, then it seems to me
-> that there's little reason for motorcomm to be checking whether
-> WoL is enabled in its suspend function - which means less driver
-> specific code and driver specific behaviour.
-> 
+Thank you!
 
-That should work, too.
 -- 
-Florian
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
