@@ -1,218 +1,161 @@
-Return-Path: <netdev+bounces-107526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C1F91B518
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 04:31:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E1E91B51F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 04:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 884211F2223E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:31:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FF791F22916
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5270312B72;
-	Fri, 28 Jun 2024 02:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA7F17BDC;
+	Fri, 28 Jun 2024 02:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="IzX5LRLH";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="etUnPb7O"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="uOubbM6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C2F1862C;
-	Fri, 28 Jun 2024 02:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719541905; cv=fail; b=ew0yATf/mrs2VIUH0wKebixvnGBIFSU/8UmwEm0LobWhVz34TMADGyUjz0zqylPSYawZy3QUZ2Hs4GpKMHI02r4KPmmXh7TfcBwuXm91TYZAFgEEm+NvG3rvKbCjc6KdxwzXlRpB7medqDGjOJ37hnKmAg9SErGJskeK5UEGVAo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719541905; c=relaxed/simple;
-	bh=Tu/ddnp37qDA7r03AofrAB5mYxC+SSY6Z4j6S0l+HEg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gdsZrVzTFIzCQTgQZljGNU8L+UERdc6tSGW8tNxAgRXBwAQnHCoYLDkLZqRJdt9kqDFGNDLAb9icvCzUk9ue3kzbrlaR2hI8EiC415NJJ0adm8C1LanoV1SNUhZY6FAsWMUnIN4afqUZbOSficq/i5ozoYs04nVOploVnqrau+s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=IzX5LRLH; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=etUnPb7O; arc=fail smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1719541902; x=1751077902;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=Tu/ddnp37qDA7r03AofrAB5mYxC+SSY6Z4j6S0l+HEg=;
-  b=IzX5LRLHPPMHShNknWml80a1xobZY2eSlBz4SNWwj4y7ltU8/eEjdol8
-   m+D8L3s+haGvtVtdpBrPUx0ZQsZ2erZg5d3Eh9IE4f1JgfBYw4WPSp0Iq
-   6KYxMje8j4TWb4sN+Y3UwVy9rVSWxHqvQovTqCpm4257C5tdwcHDLe8BZ
-   bp6EpKMfIOAQ0ni83OE6oNH9dpY4zpkUzCoqIR13O3T/amUdCzQZ/Qace
-   GeKiFW6RNF8Nx2TldhelIR495m3vUgdfNlCz2ABBPqviOTduP8RBUzfb7
-   CW7lvm14r2japQSRh9ADGPBo56aYQlR1evHcOnq5RNEuuVBcJkKzbZKJY
-   g==;
-X-CSE-ConnectionGUID: ys2ocuATS1aTmHL8QuJnqA==
-X-CSE-MsgGUID: TIRuwz6zSUqNeSE0t+rpBQ==
-X-IronPort-AV: E=Sophos;i="6.09,167,1716274800"; 
-   d="scan'208";a="29246956"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jun 2024 19:31:40 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 27 Jun 2024 19:31:30 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 27 Jun 2024 19:31:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lQt6oe+IsyBXIAy4uxtbv3HfN2JBfgYfuQPlvr18tHe8iKsIMc2Aln8xzsikOL1IpVsew0Org5aoOB0jcWG3OU1/6X/JhQdw1bfqr4q4k/aTe7GBJmRsE3snJqSpYRbi5QIQ93CNVxh1js7jtbcHxLWQZdE+DI9gMc7xd+eKA8h6T4vZ49lPdL/cJx1P+T0dryP5m3aH6RNPMJeHouui8Ssjs7eoPnA+SCkrwVlxN5EV320oCRb0vjLR3shxSAiKXU6xecQjs4EGZfYLtTc9KzPPAX5WehL3lTNaj5W45ugMaYsNoxMKCAHV+D4pd8OPSUe6kfYdZswOaDfp6YBeOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Tu/ddnp37qDA7r03AofrAB5mYxC+SSY6Z4j6S0l+HEg=;
- b=mWn10vBweWYKow9FUcg1R/DpatdJ3uINMldl4vAmRb4m+RL4jPHzzavgKGpIPMRFYWcIkhNPoOEGuPE4yWNF5Q/39Mb/QeStPqjtmgHx45kJPl9t0gZteLQdVh0xWEBuX3NLio1IOhYbTC+/1sA0H4PTidHRaYoMYqxFvM8sayYbg6NukfZyT+pkiQbTDu/zdc/7wlLo98hpFsWzHMrsQqCx8UR1DzrrhwfDlMUjYgrCmMpdWKMuxWVUtRe96eygS2IVxZIAUZssjFfIwlIq4kWqdfTwAgjVP/KmwNBTZVz37bAIpHhP0TkKqWEYCa5ZuidsIVPrptsd/sAvr01DGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tu/ddnp37qDA7r03AofrAB5mYxC+SSY6Z4j6S0l+HEg=;
- b=etUnPb7OMCJizAf7Qmsp4Qhk5Y2fIQetkuGSkyBJR4kdvorFcItm4pSha1Wz1ocqIsH3584md35yrFO9srXzA/+4u+kLxCnRa/8ghXtZDXy97vRv1B7uxKH+0oKZMkHe/+FMlIjavOyFmXUHrlQhU5apBuPsSQiq7UgtovkJWjQ3CMo/4ssUJgV5glbskHrHd9teaeSxrdrK1Yj1Lb+fUHXjaI+0mlvFplby20bJBkIEf/MDvhe0+PesykynrVRKTMqrofu37Olo/vpdk/lh3I2YTBXt8d09KWQRIEgGTtScVErw3XQFmUh/OGCGcUy9u8gPewodAdzOGNbSSjpNjw==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by IA0PR11MB7331.namprd11.prod.outlook.com (2603:10b6:208:435::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.26; Fri, 28 Jun
- 2024 02:31:25 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::22a1:16dd:eea9:330c%3]) with mapi id 15.20.7698.033; Fri, 28 Jun 2024
- 02:31:25 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <l.stach@pengutronix.de>, <kernel@pengutronix.de>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v1 1/3] net: dsa: microchip: lan9372: add
- 100BaseTX PHY support
-Thread-Topic: [PATCH net-next v1 1/3] net: dsa: microchip: lan9372: add
- 100BaseTX PHY support
-Thread-Index: AQHayI8WYyLFR5L4FE63BWKWAC4lcLHcdgyA
-Date: Fri, 28 Jun 2024 02:31:25 +0000
-Message-ID: <bbdde2f70747c9f9c973d46e1d744537dc5969ee.camel@microchip.com>
-References: <20240627123911.227480-1-o.rempel@pengutronix.de>
-	 <20240627123911.227480-2-o.rempel@pengutronix.de>
-In-Reply-To: <20240627123911.227480-2-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|IA0PR11MB7331:EE_
-x-ms-office365-filtering-correlation-id: 7dd795b5-e823-4a62-097b-08dc971a6827
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?c0tpR1ZDNHJmN2RBa3JBS3MwYXNTaXlVRCtQSzJGZVpkZWpLWVd0TUxZR3VY?=
- =?utf-8?B?dE5xMFU1eDNqdWR4blF2dDE3NEZmb0FvdGFrNFh0NDdkZlN3OWxwcU80RjZR?=
- =?utf-8?B?N2tKZ3RkcldOQXU3V1dwY3dUQnJtSHNpUkgxcEVHUmJOYzc2N3hPQ0RjeVov?=
- =?utf-8?B?Mm1BWlZ2SGdkWmtGNllyYjBSV1pWOVBHU2dlVm1JUlFYR3JVZzVqWnl0R0Nj?=
- =?utf-8?B?UldRR3pRL09wTUwvUGdFKytBVXpXNUN5VnBoQXdFcWcwd1pVNmdTUm1ab0lj?=
- =?utf-8?B?ajhnc2tUSGgvUVBMMnkwcWtndjVuUE1aeEk5TmlCTWpvYlRWQlZQVmI3Sk16?=
- =?utf-8?B?NEQ3QWpteldHR3BLdzhsQ0hKUlJNRm16Z2p1T3M5Snl5dzdaa0cxWTU2QzZl?=
- =?utf-8?B?a25DaFdoM3lxOGtnQVVvZUNkQUthK1FIayt0c2pJU1dIdm5vdDlENzVZSGpF?=
- =?utf-8?B?N1I3bFhWZkNmbTRNTTRqbHVsU3lMQkN3N1l1WnUxazJYVENoZzdtNUNxNUFT?=
- =?utf-8?B?SW1VUlNKYW11RFhtcTBxTmNCeUVsYWF3RFpWZ1gzcjZ5aWVTU2lzNkt4UG83?=
- =?utf-8?B?TkN2NS9UMG1iOERhcHBBZzFxVVRvWEU2QURlVnE4TkNScVVrZldEeHBpNmo3?=
- =?utf-8?B?Vlo4SGtaOGl6bCs3YWVsRUFmWE1GRjlwK3kzbGNFTG5ad3liQktzMUtvZ2hE?=
- =?utf-8?B?QWVheVBpaVFib1k2aWtCemE3MU5rNWdGOGRkd0FoblhBSURTSllqUFJxS0lK?=
- =?utf-8?B?RW9KZzVKZzI1Sko1MHhFNGNFdnhxYmNlclZES2Q1VWwvN0s0a05VaXNrYTZ1?=
- =?utf-8?B?OE5ueXVXV1E0VWZsdkVKc2dVYkg4TnpxNWMwOXlMUi82V2dacW9nRVRLTFFm?=
- =?utf-8?B?MVNZYUx3L0FJTmwxVFJMZmNpWWY0MVhXN0t2NTcycXVxTnpCRytjeGZXQmlY?=
- =?utf-8?B?RFNsSGhxU3VURFdhTlRvdGtNMkNxNkRlbU9GU0hFZ25kd0tnSEN5MVZLRW4w?=
- =?utf-8?B?U3VQVUxKSmhnelAyR1c3aVAzZkowTlVUWFpEOURBdkJMaUZxRUdXd3l6Mngr?=
- =?utf-8?B?YjJIZDA5Kys2VVdWZDN6MGpkSGxvSW05WnpONTk1ZmNVbzZYTjV5ZEtwZm5a?=
- =?utf-8?B?b2FlVE1wTU5GOFV4Y3VkS1pRd2FncU1OS216QUVJc1hkY2VKbmRJVWc1elVh?=
- =?utf-8?B?ZDBMekw3dlYySElqWmI2SEw0MmNtbmdDNEJDZG9JcW4rem1nMUhYMVpBL0V3?=
- =?utf-8?B?U3JTU0hWd1AwNnJiaVdqUHdHa1RPNjZKVFNVT05SKys4ZVIrd0JVR09rOGRE?=
- =?utf-8?B?OUREUzdzRENPakxYL1RiS0VScjJkQW9YN09OSHh0Q0NURVZKUllwUDhTNUZB?=
- =?utf-8?B?QmdaV3BiSWRuSm5INndGYVp1cTFCcFZ4VlFDcTk5YXRieGJCaHhuZy8zZWhj?=
- =?utf-8?B?MDhQVGZ6VmNoNTdONnpWREZCSlF5ZHd6RVdIbzZmNE5RZHZacWl4d1ZtTzlh?=
- =?utf-8?B?aVhIYzJjeHo3WHU3a2I3Q0RESllDVkp6QUhDNW9Kd3h4blNXUk1naTVaajl4?=
- =?utf-8?B?VUh3UldDTlVHREhGNVczT2V6NmZ1VVRZRncxZnBIckhPN29FSEJPQTN0Rmh0?=
- =?utf-8?B?UzdhbHZpaDYwS0FhcDhLTWgwZjVsNDFqZk9kRHA3UzMyVlRPT0lSVmtVbnJk?=
- =?utf-8?B?QkRSdDlqMlVsaUdid3Y4dWc5THhMT1lZV0pOQjVJV2JuRXRLTkpwZXZ4R3d3?=
- =?utf-8?B?aWlWKzIvNXlvRjBUTnlETkUyaDdZQ3FtR0ozVTdqRFBIVjNjcm9vejJoQ1pO?=
- =?utf-8?B?VXB5THJQSU5SQ1N2ZHRuY1hZQzNrcmI2WHVVV3FVYWVjQUZMTHRVeVdUR0E1?=
- =?utf-8?B?V0V2cERDSllvb1VpY25tS3VFdFF2anRWNC9lb24ybzZsd3c9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V0dCWFczOFJSQWN3LzEzQVYzQTNuR0VhNlpKRG14NHRJQ21lWUx6K1BhRFdE?=
- =?utf-8?B?dlkveElUNWxCN3V3S0luK3R1T2RsUWRHRTZnOGNhSnBlVjk1ZGIzZDVuaFBT?=
- =?utf-8?B?ZHFvcTFNS0tWbE9rai9LRkZJS0ZwVVBZa012djhsNml2TlU3ZWR2aWVFd1lJ?=
- =?utf-8?B?S1BPWWcrSjRHQVluU2x2aEl6U1NPV2xsZFlkcGsrcEFzeU1iOHRqYXBsUzZR?=
- =?utf-8?B?RlFqVGlYV3VraU1kT3NWSENwWk4zZmRzUE5nLzBQOXNtekpiWUZSWm00Mm5R?=
- =?utf-8?B?dTRhd2wxZTkwUXgwejZ1bWJORmN6TnFFT3RPV3RKdTc1dmdlRGtTTkkxVUUv?=
- =?utf-8?B?WXplQWxYRHN0T3V3UXBTa0FnQzNUeXdPcjg4Z3ZBb011d0QyWXo3T2VwTkxN?=
- =?utf-8?B?RlAwYjJOWk1yd25qMjVoTXJOVHlPYVBSb2pkT3hKWUp4R0R0SjhyM3g4UXZN?=
- =?utf-8?B?ZUhkRXNEcjJ5YVhrNnNPcTN3eEdreFZxWWNvTTZvcHREang2WUtzYzZrUHUv?=
- =?utf-8?B?Q2UzRkFUNkhZSjUxUmFGL0dBUlVJWjVtSDBHc0Z1TExlb2x0Z3F0MmtLS21v?=
- =?utf-8?B?K3k2TFhnSFUwQjg5bTNTNEZjZTVYSEsxc0lBVk4wTkVtUTR1ZFVmb1VPZXQ5?=
- =?utf-8?B?U1ozcG42Z0tsTmhkNVM0WE1jd0VJbTkxUHk0OVRkTnBXUlJmN05KZHZVYUVH?=
- =?utf-8?B?bzlBL1dna2RwOS9SVjVoaTJzeFpqY05oOVJ6d3NyUmVDVXBqTFR6TXpvSkox?=
- =?utf-8?B?U2RXVUVKNzZOQ1dGQTl6ZkRMdWZGWHFLMEhXSEtzTC9oclhzc0ZuU01VRE05?=
- =?utf-8?B?RElYbGRnamN4V3NWVTBxRFVMWHFJQ2NnTVBreUhQdFQ3b3kvT1BOQTM2Slg4?=
- =?utf-8?B?RVk4Z2xEaG4vOE5HVEVHY2Y0UjFXbmU3eUYwaE9SaXFINHdLaWlUSzhpQ0FT?=
- =?utf-8?B?dVFrN0FhVnlOVng3cUFnZG9QNnVKVm82NDQvOWtVU2dJQ3lrUlVndzRUSVlF?=
- =?utf-8?B?Y1JuTkZyU01TZzZXTHJZT0pkY3pRc3dHZURTSEZVLzY2U0JFc2RwVU9MTGxZ?=
- =?utf-8?B?Q1I2VFc2QnE1M0FCUXM0cCtVZjlkNHhMMFJ5VWREem5oZjh6SWJaTkpGbGhO?=
- =?utf-8?B?Si9MNXFYbWZyTDFMUnUwL0pXeE44VldMcC84TUdNWGVuV1dqU0kwVW5LcEZl?=
- =?utf-8?B?SXhzRDRqUzJQODQxK1NHK2pwNTdVZlpwdytoV05NV1BoY0NsR3RjTWgycktH?=
- =?utf-8?B?OVJZbmRkUnJ2K0pSSHJQTVhtQ2Q0dTVHSWc5VUJKZkhvSVI2Y2RPQXdCMVRi?=
- =?utf-8?B?bitoTFZlb0RSV3hYMmpHRmhHSkk1VUJPZG1reDdNV09xVGxoejV0cHdYN3V6?=
- =?utf-8?B?b0NBWm50V3NaMXZFdTVvM2l1S21WakwycU1rbnhXelQzbkhvbnJWcXBKQ3Zl?=
- =?utf-8?B?b210N2xQbmM0bWhUcU5tOVgxYjBLK1ZESnFSU25aN0Rnb1gra0JPcWxFVnFD?=
- =?utf-8?B?OFZWd2J3VXhCeFVhNExWc05oaitEancxcmRDZmhSbWtyc0sycXVFbE9LVlQ0?=
- =?utf-8?B?UzJZZTBkWnhNODJZTWcwVHRmZ0RtM3ZudFlybTdzZVZQRm5uRThBbnpwNWZC?=
- =?utf-8?B?L1FCOGd6TFdQeXBMc0tISEdqYXg4NGsxelB4S2k1T3pqNW5ZdHl1RStoZ1BV?=
- =?utf-8?B?QUJUMXhnVGcrMFZHTEgxOVJCRitnSWpRRjQ3S0FJdkRGdUxSaTJjdEFtWlhS?=
- =?utf-8?B?QzQvaEEvcDk1TmRKVnpZdi95Nm1vK3I2UWFheDBoOGlQV3NHM1R3dHE4RmVI?=
- =?utf-8?B?Z0dxQW1OVkQrcnlwbFVRWXBVWmgySGY4SWNMVEhPTWhmcWJqd1lyaVU5Y253?=
- =?utf-8?B?aERmdUtCNFM4ZFRRRE5KbXBsRVNqUm1udkVvUTNjL20wUzh1eUZJOVpTeExn?=
- =?utf-8?B?YW13QjA5d2MvTTFZYXlsL3plL2RydDllVlh5a0tSdW42bmt3UGRkODdnckcr?=
- =?utf-8?B?OXhBN2FnVFI4ZkVQN1ZXdkFORVltOCtuNkhuMFdtUjZLc2VrdVNLc1RUbkRB?=
- =?utf-8?B?bE0xeEJiOHhYTFk4bXRzWU9QWFlIR2JlQTVrdDlUOW1XcU9BbURRbGM4eCtO?=
- =?utf-8?B?eUlBQWI0ZDNrS2l3VDNFaGdZTndjUEM1UDcrSlQzTGpaRWV1SmRXWjZXWFBL?=
- =?utf-8?B?dUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <47B7B8286067594989E90210753A2871@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A48D20DE8
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719542198; cv=none; b=L9dPyHjaEoyM2JBJf7EKOeiz4/vLt1NsEXV2VkuW/o1q7i5mQfYIviPKBQrw8wemwaLXV70zfQtYOn7c0qT73LVpYJhMTZuI/28skeZQ9wRBYLBeT9pK+sw1sZ4RWspBbWg02INundMamQxiUok00ed0tvvfvlrKZASihmXKO4U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719542198; c=relaxed/simple;
+	bh=58LpqfTaSwJ+sjn5jWzll+3BWIc7gGuPI8kw+6IUkKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C0j+tITaEGGiiNQCThdYsQOFAhWdIf1PeyVvqLSzNDd4uEjF/rKFNpSXEa0yS6FU+qxrvPv22vR/t0xAU3CgtAB8cJje2MprIyHA0tY+Jd6oCOiZzwdwxRm3SEzMMh0WOU35JnuBGhaUvgbVe8T9WR3OxqK0+FnkGT/45QvFzts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=uOubbM6g; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-706738c209bso104591b3a.3
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 19:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1719542195; x=1720146995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HVHT3z6620PlYWUwD85yO22cfHovi4vQP2i8lkzAtk4=;
+        b=uOubbM6gXdRcPFRZOs0mHDFg652QVrjgz+2qoQlA8fVcaE6mr50mzTA8ucdV2s/9El
+         r6ApY9rEH8QVVpgc0x1pmo1mW1nONKwc5Z2LDnQbU6yiC4f79dz4oryseoVp7BHvInRa
+         MidnnjH317qtEchEa8KbOoWcwWTEGIP1KHN4yMxMTTv8fdBtriBwzTo+vWP33cgyistz
+         q8EVXKzng9FdKqLZGSCB02rlXPeG4mtWV4NEgzUbVDnDPx77CEyIWBGvGhN2JcWJAi7b
+         toD2IXW78YT1jMMa5I4K5M55eQBTqUukw7pEAPeo5VjB7T6pccguofZ4PcuzXUdqxThV
+         uW2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719542195; x=1720146995;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HVHT3z6620PlYWUwD85yO22cfHovi4vQP2i8lkzAtk4=;
+        b=PW0BzBhMAYP5KSX0rUcnsQbS31m+7hsCRjL9LK5NYIL4v4jaUmHS14NVuu+Mvb0NHJ
+         qNok24MGPPByvVc1SnHt7c4o7eK5Pgb6HoIqrVc0+5w1b/BDOtwpcoa6EGhXkIBRlkt+
+         VcOr8MgowVqgDUBUWbp1dxEPfHS4Ji19pNBQPB8GDXaUYNH86PwBi8yMLO13HNj2Sd4w
+         ILlbB9mG59LB00u/jRVKwwHoJFxss6ZMqTtNXNCp0EwQF3OqLCy4G40LrsVpiYEPVoKX
+         y7EHPaOJ8g/M87RFyL+M/MdbP76m8/7L11U2GhSjGUt5fnq3Nu0U4yO5u3sRADPkOsl7
+         DQsw==
+X-Gm-Message-State: AOJu0Yy2jLJeH+R2etfLBmAcOjrj/n6l9/4n93vS6kx2DIygsIeu9LQR
+	OPJRv04B9O30ajIhZsW+RjPgyg7RBTecj7s9asA65tqtFMdRe1Pd4oHCt38thI0=
+X-Google-Smtp-Source: AGHT+IEcfx/ST+GeuTeYBfN2ERcalZsvRzJ1sGIjKdGcDtSetsB5p9q8jJyC4aa7BZV/5OeaaL4NoQ==
+X-Received: by 2002:a05:6a00:138b:b0:706:747c:76b6 with SMTP id d2e1a72fcca58-706747c7759mr20549648b3a.22.1719542195315;
+        Thu, 27 Jun 2024 19:36:35 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6a31b463sm370416a12.21.2024.06.27.19.36.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 19:36:35 -0700 (PDT)
+Date: Thu, 27 Jun 2024 19:36:32 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: "Muggeridge, Matt" <matt.muggeridge2@hpe.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: "ip route show dev enp0s9" does not show all routes for enp0s9
+Message-ID: <20240627193632.5ea88216@hermes.local>
+In-Reply-To: <SJ0PR84MB2088DCBDCCCD49FFB9DFFBAAD8D02@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
+References: <SJ0PR84MB2088DCBDCCCD49FFB9DFFBAAD8D02@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7dd795b5-e823-4a62-097b-08dc971a6827
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2024 02:31:25.1830
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 51Lzouj3rnd8RLYTcbG5Utsg/KjjU/glPrJAz+KxxY8GxX12J4sSNsWYYeJTpojrxPRdeWTr+u7PG9BOZgbTGeNQsH/qllldMTsCcZ5DMjw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7331
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-SGkgT2xla3NpaiwNCg0KT24gVGh1LCAyMDI0LTA2LTI3IGF0IDE0OjM5ICswMjAwLCBPbGVrc2lq
-IFJlbXBlbCB3cm90ZToNCj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBv
-cGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+
-IA0KPiBGcm9tOiBMdWNhcyBTdGFjaCA8bC5zdGFjaEBwZW5ndXRyb25peC5kZT4NCj4gDQo+IE9u
-IHRoZSBMQU45MzcyIHRoZSA0dGggaW50ZXJuYWwgUEhZIGlzIGEgMTAwQmFzZVRYIFBIWSBpbnN0
-ZWFkIG9mIGENCj4gMTAwQmFzZVQxDQo+IFBIWS4gVGhlIDEwMEJhc2VUWCBQSFlzIGhhdmUgYSBk
-aWZmZXJlbnQgYmFzZSByZWdpc3RlciBvZmZzZXQuDQoNCkxBTjkzNzEgYWxzbyBoYXMgNHRoIGlu
-dGVybmFsIHBoeSBhcyAxMDBCYXNlVFggUGh5LiBDYW4geW91IGFsc28gYWRkIGl0DQppbiB0aGlz
-IHBhdGNoLiANCg0K
+On Fri, 28 Jun 2024 00:01:47 +0000
+"Muggeridge, Matt" <matt.muggeridge2@hpe.com> wrote:
+
+> Hi,
+> 
+> This looks like a problem in "iproute2".  This was observed on a fresh install of Ubuntu 24.04, with Linux 6.8.0-36-generic.
+> 
+> NOTE: I first raised this in https://bugs.launchpad.net/ubuntu/+source/iproute2/+bug/2070412, then later found https://github.com/iproute2/iproute2/blob/main/README.devel.
+> 
+> * PROBLEM
+> Compare the outputs:
+> 
+> $ ip -6 route show dev enp0s9
+> 2001:2:0:1000::/64 proto ra metric 1024 expires 65518sec pref medium
+> fe80::/64 proto kernel metric 256 pref medium
+> 
+> $ ip -6 route
+> 2001:2:0:1000::/64 dev enp0s9 proto ra metric 1024 expires 65525sec pref medium
+> fe80::/64 dev enp0s3 proto kernel metric 256 pref medium
+> fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
+> default proto ra metric 1024 expires 589sec pref medium
+>  nexthop via fe80::200:10ff:fe10:1060 dev enp0s9 weight 1
+>  nexthop via fe80::200:10ff:fe10:1061 dev enp0s9 weight 1
+> 
+> The default route is associated with enp0s9, yet the first command above does not show it.
+> 
+> FWIW, the two default route entries were created by two separate routers on the network, each sending their RA.
+> 
+> * REPRODUCER
+> Statically Configure systemd-networkd with two route entries, similar to the following:
+> 
+> $ networkctl cat 10-enp0s9.network
+> # /etc/systemd/network/10-enp0s9.network
+> [Match]
+> Name=enp0s9
+> 
+> [Link]
+> RequiredForOnline=no
+> 
+> [Network]
+> Description="Internal Network: Private VM-to-VM IPv6 interface"
+> DHCP=no
+> LLDP=no
+> EmitLLDP=no
+> 
+> 
+> # /etc/systemd/network/10-enp0s9.network.d/address.conf
+> [Network]
+> Address=2001:2:0:1000:a00:27ff:fe5f:f72d/64
+> 
+> 
+> # /etc/systemd/network/10-enp0s9.network.d/route-1060.conf
+> [Route]
+> Gateway=fe80::200:10ff:fe10:1060
+> GatewayOnLink=true
+> 
+> 
+> # /etc/systemd/network/10-enp0s9.network.d/route-1061.conf
+> [Route]
+> Gateway=fe80::200:10ff:fe10:1061
+> GatewayOnLink=true
+> 
+> 
+> 
+> Now reload and reconfigure the interface and you will see two routes.
+> 
+> $ networkctl reload
+> $ networkctl reconfigure enp0s9
+> $ ip -6 r
+> $ ip -6 r show dev enp0s9 # the routes are not shown
+> 
+
+"Don't blame the messenger", the ip command only reports what the kernel
+sends. So it is likely a route semantics issue in the kernel.
+
 
