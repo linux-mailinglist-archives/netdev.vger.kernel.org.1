@@ -1,164 +1,147 @@
-Return-Path: <netdev+bounces-107563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D21091B6D9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:16:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E10591B74B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:45:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F0CFB23C54
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 06:16:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D70ED2878F8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 06:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609334D8A4;
-	Fri, 28 Jun 2024 06:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B4F132132;
+	Fri, 28 Jun 2024 06:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fKO05Pcs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wXCQVvtF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D87554278;
-	Fri, 28 Jun 2024 06:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADDF12BE91
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 06:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719555378; cv=none; b=m3JdQqozjplqsj19z7vIkzW8MwfBwUE9lh6FFXbRuk77lmk3T06Mb3S0hOCz3jXuMPLap/hqQCURiYeb+4FAUZ8DIRSp11ACqKJgSEAW+ZjedsHOWAE9sh2adwAT1IghHJiaiFNRv0wNwRXYpyL4CDBAv41gqK4Z0Zko64c/P9Q=
+	t=1719557123; cv=none; b=jaNPtZ1s7o8pWViCqsoPKmq5x7do1uEijfkPeG4R8RgsWkXJXp58WuhDEPPAhtm1x2r7C6Rct/tH/OwqVGGo/jQucS/9ZD9nbGd5jsKyRzQ7Jr/UOZCsip4qX++2UxYcn97O6B7IY+W49qITQRGXCouPhTfkq3nzwTXo+iu/1r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719555378; c=relaxed/simple;
-	bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QONk+iqQ1nihFFXC/VauK26iNxKin1B7Q2vDtA0groFwsy4w0DDXE/zvvABz30RCDUeGTVVMsWmH5lAD9JSSBZ5kGRXPux+YWi1QCriHLJw9QZtZsVOsCKhEOER3zi0Z67Po4IYPxCeVvbepUP42EvfFUu9XOlh3F3jzdqRg/Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fKO05Pcs; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719555377; x=1751091377;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
-  b=fKO05Pcs/ho9TK8Zlhv4JaJKS72QKEnVRBJXXQDY03MpnChX5xQxa5v5
-   OBRqy9y3npWi+/3SgfCIHFjIKSUZw64m9F/vUHjkmFAGNmi6KCs1KHSgM
-   qFbtgpZehF0umLMIVrthQoq2/2CB0WkGzChq3TsSWgJxgRXtv7LSklcbn
-   NF7CKuyIXFkBSsDVCRMYtmw9/O3msPQv6/prrJ/U2sphJhmn79U2T1Q7j
-   fAZ3Xc7T4lbL5hWqszd6c59+6ZVWqbjh16w8T6YSo4sL0CKPiwFYBC8AB
-   CJXmMYUYL94IL75jxKMkYvIWCtcROwZWGoCzl182V8xO7HnV4vrtZv3t0
-   g==;
-X-CSE-ConnectionGUID: WGG2NTRHRySHc3rhQMS4Cw==
-X-CSE-MsgGUID: 4JAUWHoUTnaRMTCXH1Q38g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="28118913"
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="28118913"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 23:16:15 -0700
-X-CSE-ConnectionGUID: 1Db3jF/gRaSXKeo8tyf+bA==
-X-CSE-MsgGUID: LPQGGceOT/GqBxTXASLnug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="44548736"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2024 23:16:08 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sN4ty-000Gs2-0m;
-	Fri, 28 Jun 2024 06:16:06 +0000
-Date: Fri, 28 Jun 2024 14:15:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Luigi Leonardi <luigi.leonardi@outlook.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
- for all vsock socket types.
-Message-ID: <202406281355.d1jNVGBc-lkp@intel.com>
-References: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+	s=arc-20240116; t=1719557123; c=relaxed/simple;
+	bh=1LIMHyLJHkU5Pdd3kNxkaT+1GkvFT9KTRc7qGcJF3Ec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XwFL+XLS0M8Ddy/SKbmH+xuRGNL6oHgYQR3q2y+weCmagdi6U7lrfQMc5OmVYUb/TMAVzpWGajqOAgE6k9hCSmEuzELfUZNmik1kfEMfpzY+PLhjadqNe/JTrMBk4oCVt67foqWxEfM8l7ieCWI3j+URHwimuEM2H1ZRFAAsW6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wXCQVvtF; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52ce9ba0cedso382903e87.2
+        for <netdev@vger.kernel.org>; Thu, 27 Jun 2024 23:45:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719557118; x=1720161918; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1LIMHyLJHkU5Pdd3kNxkaT+1GkvFT9KTRc7qGcJF3Ec=;
+        b=wXCQVvtFPqUR7I1RyjWA2St1Wunfyj27FdS5BVtZFjlnAlE+KoAdctvKLiIdii5qvd
+         3pPPH8pKbi5UeZACOrdFUPFGuKu94nfvmtAHbvUFDFKC7m6QhMHkeaqIM0MsampeIEjg
+         DrIOSNB3IpUyKScyhyWhDVhN3BgCWNRDPUyI3ErfsvBnLmJLa/1jwPQp1O5/DDEJREu8
+         I+eAWDaQsZfeYnd9KSxFhFrQH4ZFegrdKAWOj0kd5PM7wu1YdKhrmsFTDXBd9npvxFxW
+         35KAIsB5OloY7G2vdTBKIYDfbEaLfRKtB8bPq54f5EEkgAFdPoqD7zCU0WvSrzxLC4xP
+         A16Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719557118; x=1720161918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1LIMHyLJHkU5Pdd3kNxkaT+1GkvFT9KTRc7qGcJF3Ec=;
+        b=LBZ/kKOuWkaWkWRh9P/FdAXIrJaq0L/LSgYTv06WzfsJJtPU9PPfRrSPuVjVfGyDB6
+         mjeyCICqr9oX1w9kvo+koMeqICGgvUN7GBqZ6N5SWoC1NkVrTalug8tyYoPe4S7X6LxG
+         SksBPFJpGvYgeFZC+oilruuvTgD4CFSlUGyuds+l7bZdSUOvB7lZE0lzSEIihcoxh1EW
+         ubnhK90I+k1lW6b7fm8E0SYdp9TGhUUcdIfpCs8+XjhV7s1iYe77sz6OO9zTE5tzvLKl
+         NI4PaQPpzjnbKkSsoBFE+ZzgJ8Ux0CAAJVvKZawtzshURmsAvANE8wfA4f9OP8/ebgmV
+         zZEQ==
+X-Gm-Message-State: AOJu0YzOFs2jT/SjE7Txvwqfl/lUbpM210c0AOKYtPM14Z4XlK7c1vJg
+	y0dzDcp7bRYfyKC87vNTEidjBW8TCt50BW+CufZGQC5S99H4AU36fu7y8tpZeaiJ4Oxq9GI5WBn
+	IkX7EPAKNcaurJG1ezh09K5j8tnhewu2HwBwrMrrKAWGrHVJf+hFDBl2sOQ==
+X-Google-Smtp-Source: AGHT+IFzoWsdn3M+XFfrkT8kZLzSfZp/lZeDCR97JMMrDEnf+uiFKANkVEhRvPu3Ts+wC5+Q+DppqxOk60nnma26g80=
+X-Received: by 2002:a05:6512:110f:b0:52c:df8e:a367 with SMTP id
+ 2adb3069b0e04-52cf4dafc54mr7327684e87.53.1719557117907; Thu, 27 Jun 2024
+ 23:45:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+References: <20240628003253.1694510-1-almasrymina@google.com>
+In-Reply-To: <20240628003253.1694510-1-almasrymina@google.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 27 Jun 2024 23:45:03 -0700
+Message-ID: <CAHS8izNTLc1NP13Y5irKOS47ZLOOjwfAjmRFY5pFATfZGZ30yg@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 00/14] Device Memory TCP
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Pavel Begunkov <asml.silence@gmail.com>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, daniel@ffwll.ch
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luigi,
+On Thu, Jun 27, 2024 at 5:32=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> v15: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D865481=
+&state=3D*
+> =3D=3D=3D=3D
+>
+> No material changes in this version, only a fix to linking against
+> libynl.a from the last version. Per Jakub's instructions I've pulled one
+> of his patches into this series, and now use the new libynl.a correctly,
+> I hope.
+>
 
-kernel test robot noticed the following build warnings:
+Gah, I forgot to carry a couple of Reviewed-by's from v14.
 
-[auto build test WARNING on 50b70845fc5c22cf7e7d25b57d57b3dca1725aa5]
+Pavel Reviewed-by "net: add SO_DEVMEM_DONTNEED setsockopt to release RX fra=
+gs":
+https://lore.kernel.org/netdev/09bdd7e5-75ca-42d5-8e59-a8ec05da89c7@gmail.c=
+om/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Luigi-Leonardi-via-B4-Relay/vsock-add-support-for-SIOCOUTQ-ioctl-for-all-vsock-socket-types/20240627-023902
-base:   50b70845fc5c22cf7e7d25b57d57b3dca1725aa5
-patch link:    https://lore.kernel.org/r/20240626-ioctl_next-v3-1-63be5bf19a40%40outlook.com
-patch subject: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
-config: i386-randconfig-141-20240628 (https://download.01.org/0day-ci/archive/20240628/202406281355.d1jNVGBc-lkp@intel.com/config)
-compiler: gcc-8 (Ubuntu 8.4.0-3ubuntu2) 8.4.0
+Pavel Reviewed-by "tcp: RX path for devmem TCP":
+https://lore.kernel.org/netdev/6524676c-fbc0-4ea0-b320-f605d34da007@gmail.c=
+om/
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406281355.d1jNVGBc-lkp@intel.com/
+Nikolay Reviewed-by "net: add SO_DEVMEM_DONTNEED setsockopt to release
+RX frags":
+https://lore.kernel.org/netdev/1d0483b9-13bc-426e-a57a-69044d5098c1@blackwa=
+ll.org/
 
-smatch warnings:
-net/vmw_vsock/af_vsock.c:1321 vsock_do_ioctl() warn: unsigned 'n_bytes' is never less than zero.
+Daniel Acked-by "netdev: support binding dma-buf to netdevice":
+https://lore.kernel.org/netdev/ZnvM_gtscO7q9P2Y@phenom.ffwll.local/
 
-vim +/n_bytes +1321 net/vmw_vsock/af_vsock.c
-
-  1295	
-  1296	static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
-  1297				  int __user *arg)
-  1298	{
-  1299		struct sock *sk = sock->sk;
-  1300		struct vsock_sock *vsk;
-  1301		int retval;
-  1302	
-  1303		vsk = vsock_sk(sk);
-  1304	
-  1305		switch (cmd) {
-  1306		case SIOCOUTQ: {
-  1307			size_t n_bytes;
-  1308	
-  1309			if (!vsk->transport || !vsk->transport->unsent_bytes) {
-  1310				retval = -EOPNOTSUPP;
-  1311				break;
-  1312			}
-  1313	
-  1314			if (vsk->transport->unsent_bytes) {
-  1315				if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
-  1316					retval = -EINVAL;
-  1317					break;
-  1318				}
-  1319	
-  1320				n_bytes = vsk->transport->unsent_bytes(vsk);
-> 1321				if (n_bytes < 0) {
-  1322					retval = n_bytes;
-  1323					break;
-  1324				}
-  1325	
-  1326				retval = put_user(n_bytes, arg);
-  1327			}
-  1328			break;
-  1329		}
-  1330		default:
-  1331			retval = -ENOIOCTLCMD;
-  1332		}
-  1333	
-  1334		return retval;
-  1335	}
-  1336	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+None of these patches changed much since v14, I just forgot to add the
+tags. Thank you very much for the reviews.
 
