@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-107586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 611C491B9FF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:32:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8219B91BA04
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8346F1C236AF
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:32:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5CDB1C214FB
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273AB14EC4B;
-	Fri, 28 Jun 2024 08:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653FF14F9FE;
+	Fri, 28 Jun 2024 08:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HxvnXPtl"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YTNdO4O5"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFF613E037;
-	Fri, 28 Jun 2024 08:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9304B14B96E;
+	Fri, 28 Jun 2024 08:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719563546; cv=none; b=V6H5rMQ4BMO1KHuLnfaupHQFum8JFFm0652wf4XA38KH6G4Hom5RZnW5WuvQsbGn1m+HK12/m3deSYmskxl4l4BvLurMG4gA+nbk2nbrQfavSOJcy4TaI2nSy/j6S3QliXJWReybUgKHjkbGfbyhmVQMf75+0jQE1Gw2z2krTAI=
+	t=1719563547; cv=none; b=Ze3tuz4XSZyYkHxjemuTxi71XA3KUeBPHYMqMPPqqdCy06cdY2mNhxdVwHHCKapIhaexh3oxrn16Co915Mofu28DK+s1X9qFuJx12kMeYE/W8vxqR4KAJ222Ybg0pfH+3D+LDtklVZTE6md0BAq+AOYrkNdCB3AUNGlPdW2Dyrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719563546; c=relaxed/simple;
-	bh=w4J3dK4vyUbJl8pe7mmVdfYvBpcLNvVCMPtB0m5KLkU=;
+	s=arc-20240116; t=1719563547; c=relaxed/simple;
+	bh=NpIYItzLzhoOO77WG00FL5TMtmXxz7RCPXcYVdFcizw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oWr0A7ds9TO7aVtXuJMWBP3VRjL15viERWW4jEyi865AZt9H10zEYi0dPvDBHgxDJC4pXvmwe3OzEcNWJbwbff3+yg8v/KQ6SxzHd+FcfiP9ITBLJkbZeFviCghUXoQdt6CMuvAXFMMWEaJ/E0RNDaejrYU6y4snX7IaBG2yyX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HxvnXPtl; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=gOR8u2d7FQpUXiln6fpJpHHk2lnPWfNiWbQ2P6kr+bw/s5Korpzik3mUaYryCWZjXlyxSdPFh3sd6vqOX7S2ssedN7gvQO00SkklXNFymdXuvTQhAYnZF8W4lI7msYnJejnPuAHvYjKxM+z8qXxz/XBEmP6DaPsUwwSOYLFvRyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YTNdO4O5; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 872C54000F;
-	Fri, 28 Jun 2024 08:32:21 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 372A64000C;
+	Fri, 28 Jun 2024 08:32:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
 	t=1719563542;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nMApgIZGzzvnKsX6wN4n7PQ/Noea6QXOOsHpQxnBcjE=;
-	b=HxvnXPtltcp6HiCysdWx9Qe7fMNQK3q82nPIEbeYeOcilnd/VwZi7x5dZxjx3Yi936rIi0
-	vASQ64XwAvjx/ot1VN+6OgKejWmbjqX52IQDadbDoGQhfVr2JcYsvmqRC/3HBBFwdHBoVh
-	qjzV2BY4dvzObznOKX50zma9pSEIy507Q6cmGUpQ5Dp8tpIRHSh8Fv1Zrwxq2nzdXOQT1w
-	ZhX67d9CSejU5f1QXWY8/lGtLn7U20qWQv4sjPxuFV3rw5QwHUmLLA1JpI0M8j0AnNm7ht
-	EZvRmUQ75MpVqeQ6UMFtulPOPoWrYi75xpWn5IjfrZMYoedFHAsbcCF2U3wHaw==
+	bh=JV2kfywzsAb3ytPgYnKO7i3AwRkS51rgVMyDKLtIusc=;
+	b=YTNdO4O5v9zf4lt8yVQpU4F3x60IBQfTDQF8Cf4veUYF84V2Mt1Yloqti6nYR7bjgN7OFE
+	FFZGUR+rjGW/0/BgdKzOi6nMLx6dyhpbcjqNGKwAcL3c1nmV5kyL059g3axMKPDA67KZ8M
+	TkgP35ZMxkUDaz/MLbxsKoo+4xV0T5GaB6kBAj3EQjNSzBTEO3QETvlj4OxwdZwFs9KVay
+	izdxosIt0UiLpD7+PxOmmrPOE0UDiHS+V+YO2JWl4sA9nz8EGUUtHM/jQjuhbcKbKYTLD9
+	ZOxT1lHF8AwjX/ZgXEYeWwI1UCxaUMZHaHTvxNJnF8GTIvq1htroSY1uJWmP7g==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 28 Jun 2024 10:31:56 +0200
-Subject: [PATCH net-next v5 3/7] net: pse-pd: pd692x0: Expand ethtool
- status message
+Date: Fri, 28 Jun 2024 10:31:57 +0200
+Subject: [PATCH net-next v5 4/7] net: pse-pd: Add new power limit get and
+ set c33 features
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240628-feature_poe_power_cap-v5-3-5e1375d3817a@bootlin.com>
+Message-Id: <20240628-feature_poe_power_cap-v5-4-5e1375d3817a@bootlin.com>
 References: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
 In-Reply-To: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -67,171 +67,364 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
- linux-doc@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
+ linux-doc@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>, 
+ Sai Krishna <saikrishnag@marvell.com>
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This update expands pd692x0_ethtool_get_status() callback with newly
-introduced details such as the detected class, current power delivered,
-and extended state information.
+This patch add a way to get and set the power limit of a PSE PI.
+For that it uses regulator API callbacks wrapper like get_voltage() and
+get/set_current_limit() as power is simply V * I.
+We used mW unit as defined by the IEEE 802.3-2022 standards.
 
+set_current_limit() uses the voltage return by get_voltage() and the
+desired power limit to calculate the current limit. get_voltage() callback
+is then mandatory to set the power limit.
+
+get_current_limit() callback is by default looking at a driver callback
+and fallback to extracting the current limit from _pse_ethtool_get_status()
+if the driver does not set its callback. We prefer let the user the choice
+because ethtool_get_status return much more information than the current
+limit.
+
+expand pse status with c33_pw_limit_ranges to return the ranges available
+to configure the power limit.
+
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
 Change in v2:
-- Move in from string status message to c33_pse_ext_state_info.
-
-Change in v3:
-- Update extended state and substate list.
+- Use uA and uV instead of mA and mV to have more precision in the power
+  calculation. Need to use 64bit variables for the calculation.
 
 Change in v4:
-- Update extended state and substate list.
----
- drivers/net/pse-pd/pd692x0.c | 101 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+- Rename the power limit value to c33_avail_pw_limit.
+- Add support for c33_pw_limit_ranges
 
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 820358b71f0f..cce1b7ce044b 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -73,6 +73,7 @@ enum {
- 	PD692X0_MSG_SET_PORT_PARAM,
- 	PD692X0_MSG_GET_PORT_STATUS,
- 	PD692X0_MSG_DOWNLOAD_CMD,
-+	PD692X0_MSG_GET_PORT_CLASS,
- 
- 	/* add new message above here */
- 	PD692X0_MSG_CNT
-@@ -149,6 +150,12 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
- 		.data = {0x16, 0x16, 0x99, 0x4e,
- 			 0x4e, 0x4e, 0x4e, 0x4e},
- 	},
-+	[PD692X0_MSG_GET_PORT_CLASS] = {
-+		.key = PD692X0_KEY_REQ,
-+		.sub = {0x05, 0xc4},
-+		.data = {0x4e, 0x4e, 0x4e, 0x4e,
-+			 0x4e, 0x4e, 0x4e, 0x4e},
-+	},
- };
- 
- static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
-@@ -435,6 +442,84 @@ static int pd692x0_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
- 	}
+Change in v5:
+- Update an error message and a return value.
+---
+ drivers/net/pse-pd/pse_core.c | 172 +++++++++++++++++++++++++++++++++++++++---
+ include/linux/pse-pd/pse.h    |  43 +++++++++++
+ 2 files changed, 204 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 795ab264eaf2..16f364b3473b 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -265,10 +265,113 @@ static int pse_pi_disable(struct regulator_dev *rdev)
+ 	return ret;
  }
  
-+struct pd692x0_pse_ext_state_mapping {
-+	u32 status_code;
-+	enum ethtool_c33_pse_ext_state pse_ext_state;
-+	u32 pse_ext_substate;
-+};
-+
-+static const struct pd692x0_pse_ext_state_mapping
-+pd692x0_pse_ext_state_map[] = {
-+	{0x06, ETHTOOL_C33_PSE_EXT_STATE_OPTION_VPORT_LIM,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OPTION_VPORT_LIM_HIGH_VOLTAGE},
-+	{0x07, ETHTOOL_C33_PSE_EXT_STATE_OPTION_VPORT_LIM,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OPTION_VPORT_LIM_LOW_VOLTAGE},
-+	{0x08, ETHTOOL_C33_PSE_EXT_STATE_MR_PSE_ENABLE,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_MR_PSE_ENABLE_DISABLE_PIN_ACTIVE},
-+	{0x0C, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_NON_EXISTING_PORT},
-+	{0x11, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNDEFINED_PORT},
-+	{0x12, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_INTERNAL_HW_FAULT},
-+	{0x1B, ETHTOOL_C33_PSE_EXT_STATE_OPTION_DETECT_TED,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OPTION_DETECT_TED_DET_IN_PROCESS},
-+	{0x1C, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNKNOWN_PORT_STATUS},
-+	{0x1E, ETHTOOL_C33_PSE_EXT_STATE_MR_MPS_VALID,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_MR_MPS_VALID_DETECTED_UNDERLOAD},
-+	{0x1F, ETHTOOL_C33_PSE_EXT_STATE_OVLD_DETECTED,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OVLD_DETECTED_OVERLOAD},
-+	{0x20, ETHTOOL_C33_PSE_EXT_STATE_POWER_NOT_AVAILABLE,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_POWER_NOT_AVAILABLE_BUDGET_EXCEEDED},
-+	{0x21, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_INTERNAL_HW_FAULT},
-+	{0x22, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_CONFIG_CHANGE},
-+	{0x24, ETHTOOL_C33_PSE_EXT_STATE_OPTION_VPORT_LIM,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OPTION_VPORT_LIM_VOLTAGE_INJECTION},
-+	{0x25, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNKNOWN_PORT_STATUS},
-+	{0x34, ETHTOOL_C33_PSE_EXT_STATE_SHORT_DETECTED,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_SHORT_DETECTED_SHORT_CONDITION},
-+	{0x35, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_DETECTED_OVER_TEMP},
-+	{0x36, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_DETECTED_OVER_TEMP},
-+	{0x37, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNKNOWN_PORT_STATUS},
-+	{0x3C, ETHTOOL_C33_PSE_EXT_STATE_POWER_NOT_AVAILABLE,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_POWER_NOT_AVAILABLE_PORT_PW_LIMIT_EXCEEDS_CONTROLLER_BUDGET},
-+	{0x3D, ETHTOOL_C33_PSE_EXT_STATE_POWER_NOT_AVAILABLE,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_POWER_NOT_AVAILABLE_PD_REQUEST_EXCEEDS_PORT_LIMIT},
-+	{0x41, ETHTOOL_C33_PSE_EXT_STATE_POWER_NOT_AVAILABLE,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_POWER_NOT_AVAILABLE_HW_PW_LIMIT},
-+	{0x43, ETHTOOL_C33_PSE_EXT_STATE_ERROR_CONDITION,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_ERROR_CONDITION_UNKNOWN_PORT_STATUS},
-+	{0xA7, ETHTOOL_C33_PSE_EXT_STATE_OPTION_DETECT_TED,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_OPTION_DETECT_TED_CONNECTION_CHECK_ERROR},
-+	{0xA8, ETHTOOL_C33_PSE_EXT_STATE_MR_MPS_VALID,
-+		ETHTOOL_C33_PSE_EXT_SUBSTATE_MR_MPS_VALID_CONNECTION_OPEN},
-+	{ /* sentinel */ }
-+};
-+
-+static void
-+pd692x0_get_ext_state(struct ethtool_c33_pse_ext_state_info *c33_ext_state_info,
-+		      u32 status_code)
++static int _pse_pi_get_voltage(struct regulator_dev *rdev)
 +{
-+	const struct pd692x0_pse_ext_state_mapping *ext_state_map;
++	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
++	const struct pse_controller_ops *ops;
++	int id;
 +
-+	ext_state_map = pd692x0_pse_ext_state_map;
-+	while (ext_state_map->status_code) {
-+		if (ext_state_map->status_code == status_code) {
-+			c33_ext_state_info->c33_pse_ext_state = ext_state_map->pse_ext_state;
-+			c33_ext_state_info->__c33_pse_ext_substate = ext_state_map->pse_ext_substate;
-+			return;
-+		}
-+		ext_state_map++;
-+	}
++	ops = pcdev->ops;
++	if (!ops->pi_get_voltage)
++		return -EOPNOTSUPP;
++
++	id = rdev_get_id(rdev);
++	return ops->pi_get_voltage(pcdev, id);
 +}
 +
- static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
- 				      unsigned long id,
- 				      struct netlink_ext_ack *extack,
-@@ -442,6 +527,7 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
- {
- 	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
- 	struct pd692x0_msg msg, buf = {0};
-+	u32 class;
- 	int ret;
- 
- 	ret = pd692x0_fw_unavailable(priv);
-@@ -471,6 +557,21 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
- 
- 	priv->admin_state[id] = status->c33_admin_state;
- 
-+	pd692x0_get_ext_state(&status->c33_ext_state_info, buf.sub[0]);
++static int pse_pi_get_voltage(struct regulator_dev *rdev)
++{
++	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
++	int ret;
 +
-+	status->c33_actual_pw = (buf.data[0] << 4 | buf.data[1]) * 100;
++	mutex_lock(&pcdev->lock);
++	ret = _pse_pi_get_voltage(rdev);
++	mutex_unlock(&pcdev->lock);
 +
-+	memset(&buf, 0, sizeof(buf));
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_CLASS];
-+	msg.sub[2] = id;
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	return ret;
++}
++
++static int _pse_ethtool_get_status(struct pse_controller_dev *pcdev,
++				   int id,
++				   struct netlink_ext_ack *extack,
++				   struct pse_control_status *status);
++
++static int pse_pi_get_current_limit(struct regulator_dev *rdev)
++{
++	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
++	const struct pse_controller_ops *ops;
++	struct netlink_ext_ack extack = {};
++	struct pse_control_status st = {};
++	int id, uV, ret;
++	s64 tmp_64;
++
++	ops = pcdev->ops;
++	id = rdev_get_id(rdev);
++	mutex_lock(&pcdev->lock);
++	if (ops->pi_get_current_limit) {
++		ret = ops->pi_get_current_limit(pcdev, id);
++		goto out;
++	}
++
++	/* If pi_get_current_limit() callback not populated get voltage
++	 * from pi_get_voltage() and power limit from ethtool_get_status()
++	 *  to calculate current limit.
++	 */
++	ret = _pse_pi_get_voltage(rdev);
++	if (!ret) {
++		dev_err(pcdev->dev, "Voltage null\n");
++		ret = -ERANGE;
++		goto out;
++	}
 +	if (ret < 0)
++		goto out;
++	uV = ret;
++
++	ret = _pse_ethtool_get_status(pcdev, id, &extack, &st);
++	if (ret)
++		goto out;
++
++	if (!st.c33_avail_pw_limit) {
++		ret = -ENODATA;
++		goto out;
++	}
++
++	tmp_64 = st.c33_avail_pw_limit;
++	tmp_64 *= 1000000000ull;
++	/* uA = mW * 1000000000 / uV */
++	ret = DIV_ROUND_CLOSEST_ULL(tmp_64, uV);
++
++out:
++	mutex_unlock(&pcdev->lock);
++	return ret;
++}
++
++static int pse_pi_set_current_limit(struct regulator_dev *rdev, int min_uA,
++				    int max_uA)
++{
++	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
++	const struct pse_controller_ops *ops;
++	int id, ret;
++
++	ops = pcdev->ops;
++	if (!ops->pi_set_current_limit)
++		return -EOPNOTSUPP;
++
++	id = rdev_get_id(rdev);
++	mutex_lock(&pcdev->lock);
++	ret = ops->pi_set_current_limit(pcdev, id, max_uA);
++	mutex_unlock(&pcdev->lock);
++
++	return ret;
++}
++
+ static const struct regulator_ops pse_pi_ops = {
+ 	.is_enabled = pse_pi_is_enabled,
+ 	.enable = pse_pi_enable,
+ 	.disable = pse_pi_disable,
++	.get_voltage = pse_pi_get_voltage,
++	.get_current_limit = pse_pi_get_current_limit,
++	.set_current_limit = pse_pi_set_current_limit,
+ };
+ 
+ static int
+@@ -298,7 +401,9 @@ devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
+ 	rdesc->ops = &pse_pi_ops;
+ 	rdesc->owner = pcdev->owner;
+ 
+-	rinit_data->constraints.valid_ops_mask = REGULATOR_CHANGE_STATUS;
++	rinit_data->constraints.valid_ops_mask = REGULATOR_CHANGE_STATUS |
++						 REGULATOR_CHANGE_CURRENT;
++	rinit_data->constraints.max_uA = MAX_PI_CURRENT;
+ 	rinit_data->supply_regulator = "vpwr";
+ 
+ 	rconfig.dev = pcdev->dev;
+@@ -626,6 +731,23 @@ struct pse_control *of_pse_control_get(struct device_node *node)
+ }
+ EXPORT_SYMBOL_GPL(of_pse_control_get);
+ 
++static int _pse_ethtool_get_status(struct pse_controller_dev *pcdev,
++				   int id,
++				   struct netlink_ext_ack *extack,
++				   struct pse_control_status *status)
++{
++	const struct pse_controller_ops *ops;
++
++	ops = pcdev->ops;
++	if (!ops->ethtool_get_status) {
++		NL_SET_ERR_MSG(extack,
++			       "PSE driver does not support status report");
++		return -EOPNOTSUPP;
++	}
++
++	return ops->ethtool_get_status(pcdev, id, extack, status);
++}
++
+ /**
+  * pse_ethtool_get_status - get status of PSE control
+  * @psec: PSE control pointer
+@@ -638,19 +760,10 @@ int pse_ethtool_get_status(struct pse_control *psec,
+ 			   struct netlink_ext_ack *extack,
+ 			   struct pse_control_status *status)
+ {
+-	const struct pse_controller_ops *ops;
+ 	int err;
+ 
+-	ops = psec->pcdev->ops;
+-
+-	if (!ops->ethtool_get_status) {
+-		NL_SET_ERR_MSG(extack,
+-			       "PSE driver does not support status report");
+-		return -EOPNOTSUPP;
+-	}
+-
+ 	mutex_lock(&psec->pcdev->lock);
+-	err = ops->ethtool_get_status(psec->pcdev, psec->id, extack, status);
++	err = _pse_ethtool_get_status(psec->pcdev, psec->id, extack, status);
+ 	mutex_unlock(&psec->pcdev->lock);
+ 
+ 	return err;
+@@ -732,6 +845,43 @@ int pse_ethtool_set_config(struct pse_control *psec,
+ }
+ EXPORT_SYMBOL_GPL(pse_ethtool_set_config);
+ 
++/**
++ * pse_ethtool_set_pw_limit - set PSE control power limit
++ * @psec: PSE control pointer
++ * @extack: extack for reporting useful error messages
++ * @pw_limit: power limit value in mW
++ *
++ * Return: 0 on success and failure value on error
++ */
++int pse_ethtool_set_pw_limit(struct pse_control *psec,
++			     struct netlink_ext_ack *extack,
++			     const unsigned int pw_limit)
++{
++	int uV, uA, ret;
++	s64 tmp_64;
++
++	ret = regulator_get_voltage(psec->ps);
++	if (!ret) {
++		NL_SET_ERR_MSG(extack,
++			       "Can't calculate the current, PSE voltage read is 0");
++		return -ERANGE;
++	}
++	if (ret < 0) {
++		NL_SET_ERR_MSG(extack,
++			       "Error reading PSE voltage");
 +		return ret;
++	}
++	uV = ret;
 +
-+	class = buf.data[3] >> 4;
-+	if (class <= 8)
-+		status->c33_pw_class = class;
++	tmp_64 = pw_limit;
++	tmp_64 *= 1000000000ull;
++	/* uA = mW * 1000000000 / uV */
++	uA = DIV_ROUND_CLOSEST_ULL(tmp_64, uV);
 +
- 	return 0;
++	return regulator_set_current_limit(psec->ps, 0, uA);
++}
++EXPORT_SYMBOL_GPL(pse_ethtool_set_pw_limit);
++
+ bool pse_has_podl(struct pse_control *psec)
+ {
+ 	return psec->pcdev->types & ETHTOOL_PSE_PODL;
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 38b9308e5e7a..591a53e082e6 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -9,6 +9,9 @@
+ #include <linux/list.h>
+ #include <uapi/linux/ethtool.h>
+ 
++/* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
++#define MAX_PI_CURRENT 1920000
++
+ struct phy_device;
+ struct pse_controller_dev;
+ 
+@@ -41,6 +44,12 @@ struct pse_control_config {
+  * @c33_actual_pw: power currently delivered by the PSE in mW
+  *	IEEE 802.3-2022 30.9.1.1.23 aPSEActualPower
+  * @c33_ext_state_info: extended state information of the PSE
++ * @c33_avail_pw_limit: available power limit of the PSE in mW
++ *	IEEE 802.3-2022 145.2.5.4 pse_avail_pwr
++ * @c33_pw_limit_ranges: supported power limit configuration range. The driver
++ *	is in charge of the memory allocation.
++ * @c33_pw_limit_nb_ranges: number of supported power limit configuration
++ *	ranges
+  */
+ struct pse_control_status {
+ 	enum ethtool_podl_pse_admin_state podl_admin_state;
+@@ -50,6 +59,9 @@ struct pse_control_status {
+ 	u32 c33_pw_class;
+ 	u32 c33_actual_pw;
+ 	struct ethtool_c33_pse_ext_state_info c33_ext_state_info;
++	u32 c33_avail_pw_limit;
++	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
++	u32 c33_pw_limit_nb_ranges;
+ };
+ 
+ /**
+@@ -61,6 +73,14 @@ struct pse_control_status {
+  *		   May also return negative errno.
+  * @pi_enable: Configure the PSE PI as enabled.
+  * @pi_disable: Configure the PSE PI as disabled.
++ * @pi_get_voltage: Return voltage similarly to get_voltage regulator
++ *		    callback.
++ * @pi_get_current_limit: Get the configured current limit similarly to
++ *			  get_current_limit regulator callback.
++ * @pi_set_current_limit: Configure the current limit similarly to
++ *			  set_current_limit regulator callback.
++ *			  Should not return an error in case of MAX_PI_CURRENT
++ *			  current value set.
+  */
+ struct pse_controller_ops {
+ 	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
+@@ -70,6 +90,11 @@ struct pse_controller_ops {
+ 	int (*pi_is_enabled)(struct pse_controller_dev *pcdev, int id);
+ 	int (*pi_enable)(struct pse_controller_dev *pcdev, int id);
+ 	int (*pi_disable)(struct pse_controller_dev *pcdev, int id);
++	int (*pi_get_voltage)(struct pse_controller_dev *pcdev, int id);
++	int (*pi_get_current_limit)(struct pse_controller_dev *pcdev,
++				    int id);
++	int (*pi_set_current_limit)(struct pse_controller_dev *pcdev,
++				    int id, int max_uA);
+ };
+ 
+ struct module;
+@@ -156,6 +181,11 @@ int pse_ethtool_get_status(struct pse_control *psec,
+ int pse_ethtool_set_config(struct pse_control *psec,
+ 			   struct netlink_ext_ack *extack,
+ 			   const struct pse_control_config *config);
++int pse_ethtool_set_pw_limit(struct pse_control *psec,
++			     struct netlink_ext_ack *extack,
++			     const unsigned int pw_limit);
++int pse_ethtool_get_pw_limit(struct pse_control *psec,
++			     struct netlink_ext_ack *extack);
+ 
+ bool pse_has_podl(struct pse_control *psec);
+ bool pse_has_c33(struct pse_control *psec);
+@@ -185,6 +215,19 @@ static inline int pse_ethtool_set_config(struct pse_control *psec,
+ 	return -EOPNOTSUPP;
  }
  
++static inline int pse_ethtool_set_pw_limit(struct pse_control *psec,
++					   struct netlink_ext_ack *extack,
++					   const unsigned int pw_limit)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline int pse_ethtool_get_pw_limit(struct pse_control *psec,
++					   struct netlink_ext_ack *extack)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline bool pse_has_podl(struct pse_control *psec)
+ {
+ 	return false;
 
 -- 
 2.34.1
