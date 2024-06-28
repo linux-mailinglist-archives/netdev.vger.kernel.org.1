@@ -1,139 +1,105 @@
-Return-Path: <netdev+bounces-107665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC3991BDB0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:45:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B6991BE01
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:01:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E879A284B87
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:45:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 301F4B234BF
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 12:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2061D156C65;
-	Fri, 28 Jun 2024 11:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E872A15689A;
+	Fri, 28 Jun 2024 12:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXJC3Gdg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TR2VJyfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5FD156241
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 11:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49E1155C98
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719575103; cv=none; b=soabfGtTxJy28t7V6dsOCixDohntfa9GDwLSCJYPdnwiT9qF0+KyLg1BidOlLG/3xC4JQycwEei+tzffQpWwhMn4k8uQfS2JQoxPwLfSzNc+pxzDvp4AROmXbhI6aJPNJPYGeqHGqe+Yu/49ShpERNnFlk4L1smSCsoWZ1g+x10=
+	t=1719576031; cv=none; b=fQeCorgbKLfZPjgDtDgO/tRB4EYGOKFtQmW28YHe+q5RpmkM6rKBSf6Zxh1kjSFJz+m56dswNjQO5gtMXu0u8DunlNQqYbG2xQjE25d44HRHZr+QsTfxYKfFYSXKm87YdSpg8YmSRd6MuedNRDfvNjsdJDAlRYHuTM+QUVR4m+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719575103; c=relaxed/simple;
-	bh=tCbwvqL2j8l+v/7DM8z0RLMLYqxbX6isQPdQ5BDuw2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mFmfO5D2an6I/AvMcgFXfnoX2t9UvliUG8ElIekXf8c12bN+hhwkKFNc+yAbx+u+1qGTzqah4QqSHEQAvcEFWlmQT/vDBV1hPCu+QkWuUJUgFDG38agPjffSIh43cvK7M4Gskm6+H/sIXmSoYrxs+qD9qX84ffd/6ZI/EAUVN8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dXJC3Gdg; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-48f43c388f5so132467137.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 04:45:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719575100; x=1720179900; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vairtunRTij7/0Vlw0E0dL9DdjrxaP4kLZmLM1W/7Lk=;
-        b=dXJC3GdgF75uSayigFQzh4HgMzWoAN6kG0o4aElv5CDot25LP4hLuE+66IitmK79uS
-         eT2yjV/UY9aiJk47eG3ZILGORatEtMTN629B3EvohFW8Dw+pQzhxLrRSPcuUOJRn1Lyw
-         EiucQq9cn5m1kJSE/qXTz6XBzKBKspJDT25d1wI7tD9jSmE2kZYVBw4xYDjGZ/cgXh2I
-         /QPcf+5FZxI29fufLyblsraKTRTOPTWqCuVOyYQniUY7+ZPoi7pP0f83VxM2/m/qg3K/
-         k8jH+4lR6LnWWtPpI2X+txZA9ww+7j6Ng/Fh8ezbzec0OB38IGbcygtwSpJav9+KjmcN
-         ETaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719575100; x=1720179900;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vairtunRTij7/0Vlw0E0dL9DdjrxaP4kLZmLM1W/7Lk=;
-        b=BqhsEyCEPpERAa6SZAQ6/spe4GaB2cmIGSKW737DOxp6jtLXlL5BjZSb17pxrxb0yY
-         1o/Chs24cfAqO+bFiSeUMYxgQqH+EqNgXn6amlGgJ/4Q7nF8I3IR7VpRQhuX5yLUZSVY
-         EuB4FAjzGjK3Hw28YZMVMSORtrhFn23n/yYf0Zt+eSNacxFAAxpPJ5n78AcdntpJijyt
-         sZNQYrhJWisv8mIYZRlndbtyUZrwWDbEakX0XH9DSe8IFbdsgZ75Yb7PlBwBEfAQL4RH
-         xlOGjDZerqj49wlu6xe22sqcXtGA+lXZf3aHVfe+Y0gghiU+2TBOwwjJiHgLfmwRQ3kX
-         CBvw==
-X-Gm-Message-State: AOJu0YxlSHzzv2qu/lfdT0XXIDtajEWDrC7Xsv0shx/QlfXj2nYGoG1g
-	uJOYrqgkI2/aJCZ9jH3QvcIxdGk1fAL8KOmy4b5Ec7+ZUtCOaLxBoogu9ncpv+T4qxhkzxriN3o
-	jLPC8RyjiGRRuKndwKExYLG4A88Q=
-X-Google-Smtp-Source: AGHT+IG71eeFzXYQ5hyuYGneHARn3ep2RQKhwMBaLsk50SsnDDJ9gys3RYtZ7AJha83RK+iRatsKdx9dhcEGTJO9sf0=
-X-Received: by 2002:a05:6102:6cb:b0:48d:d206:74b0 with SMTP id
- ada2fe7eead31-48f52bb3ba9mr19141109137.33.1719575100287; Fri, 28 Jun 2024
- 04:45:00 -0700 (PDT)
+	s=arc-20240116; t=1719576031; c=relaxed/simple;
+	bh=PvIxufEEVp4tVXn8c5hetzfM8PvGnNhte2EAyBAXXgk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jFvONsLhcbY2ixbUcnkyFs7QCzZk+5oDeqnoB9SDAoIHfnt3KZXAc+TuS/b8t7y1eYI4uOKx0K1xFkNiLNvSw0kQCmGV9rEXgfzCvITwul1AokL0XOGkwV2IWpmlYatmnscxCJ/vCiAP2Wt/ZAtHelJdxAv1XTlTu77ZnPZ+420=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TR2VJyfO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3E0FAC116B1;
+	Fri, 28 Jun 2024 12:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719576031;
+	bh=PvIxufEEVp4tVXn8c5hetzfM8PvGnNhte2EAyBAXXgk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TR2VJyfOxzyFX+9RYg2kOAR8RJEPyTkgdDqF0ISqvVmGpHOWrA73fSQMxRqrFPnYq
+	 drI136kMgdgDYUUXvh3wp+0cm2FJsGeu7iQjlyxG55SezFA3TAkGCiDfaegDLErtUA
+	 e/RYIPWSi8kFUG9E2kRzH5GY1V6u6IDeUMGv6iy3CFoW0jJW4oDegapehyFVnCSLOh
+	 Y9cBZlWN5h1m4ekTqYxus/5UvtJGbwIQtvS2r/IzFtXv1yiGcX43HoHtUCXy+m39z6
+	 /Tco8oXLt8iKfcWMIYJs+aUGMfKp4Bhq54gQJv5CSiVgamlxTAgs2ZEGJnyVSXZj/6
+	 VlJeWEEeW8b3Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2716BC43336;
+	Fri, 28 Jun 2024 12:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZuGQGM+mNOtD+B=GQJjH3UaoqUkZkoeiKZ+ZD+7FR5ucQ@mail.gmail.com>
- <20240628105343.GA14296@breakpoint.cc> <CAA85sZvo54saR-wrVhQ=LLz7P28tzA-sO3Bg=YuBANZTcY0PpQ@mail.gmail.com>
- <CAA85sZt8V=vL3BUJM3b9KEkK9gNaZ=dU_YZPj6m-CJD4fVQvwg@mail.gmail.com>
-In-Reply-To: <CAA85sZt8V=vL3BUJM3b9KEkK9gNaZ=dU_YZPj6m-CJD4fVQvwg@mail.gmail.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Fri, 28 Jun 2024 13:44:49 +0200
-Message-ID: <CAA85sZt1kX6RdmCsEiUabpV0-y_O3a0yku6H7QyCZCOs=7VBQg@mail.gmail.com>
-Subject: Re: IP oversized ip oacket from - header size should be skipped?
-To: Florian Westphal <fw@strlen.de>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net V2 0/7] mlx5 fixes 2024-06-27
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171957603115.1526.3340270114816004864.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jun 2024 12:00:31 +0000
+References: <20240627180240.1224975-1-tariqt@nvidia.com>
+In-Reply-To: <20240627180240.1224975-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
-On Fri, Jun 28, 2024 at 1:28=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com>=
- wrote:
-> On Fri, Jun 28, 2024 at 12:55=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.c=
-om> wrote:
-> > On Fri, Jun 28, 2024 at 12:53=E2=80=AFPM Florian Westphal <fw@strlen.de=
-> wrote:
-> > > Ian Kumlien <ian.kumlien@gmail.com> wrote:
-> > > > Hi,
-> > > >
-> > > > In net/ipv4/ip_fragment.c line 412:
-> > > > static int ip_frag_reasm(struct ipq *qp, struct sk_buff *skb,
-> > > >                          struct sk_buff *prev_tail, struct net_devi=
-ce *dev)
-> > > > {
-> > > > ...
-> > > >         len =3D ip_hdrlen(skb) + qp->q.len;
-> > > >         err =3D -E2BIG;
-> > > >         if (len > 65535)
-> > > >                 goto out_oversize;
-> > > > ....
-> > > >
-> > > > We can expand the expression to:
-> > > > len =3D (ip_hdr(skb)->ihl * 4) + qp->q.len;
-> > > >
-> > > > But it's still weird since the definition of q->len is: "total leng=
-th
-> > > > of the original datagram"
-> > >
-> > > AFAICS datagram =3D=3D l4 payload, so adding ihl is correct.
-> >
-> > But then it should be added and multiplied by the count of fragments?
-> > which doesn't make sense to me...
-> >
-> > I have a security scanner that generates big packets (looking for
-> > overflows using nmap nasl) that causes this to happen on send....
->
-> So my thinking is that the packet is 65535 or thereabouts which would
-> mean 44 segments, 43 would be 1500 bytes while the last one would be
-> 1035
->
-> To me it seems extremely unlikely that we would hit the limit in the
-> case of all packets being l4 - but I'll do some more testing
+Hello:
 
-So, I realize that i'm not the best at this but I can't get this to fit.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-The 65535 comes from the 16 bit ip total length field, which includes
-header and data.
-The minimum length is 20 which would be just the IP header.
+On Thu, 27 Jun 2024 21:02:33 +0300 you wrote:
+> Hi,
+> 
+> This patchset provides fixes from the team to the mlx5 core and EN
+> drivers.
+> 
+> The first 3 patches by Daniel replace a buggy cap field with a newly
+> introduced one.
+> 
+> [...]
 
-Now, IF we are comparing to 65535 then it HAS to be the full packet (ie l3)
+Here is the summary with links:
+  - [net,V2,1/7] net/mlx5: IFC updates for changing max EQs
+    https://git.kernel.org/netdev/net/c/048a403648fc
+  - [net,V2,2/7] net/mlx5: Use max_num_eqs_24b capability if set
+    https://git.kernel.org/netdev/net/c/29c6a562bf53
+  - [net,V2,3/7] net/mlx5: Use max_num_eqs_24b when setting max_io_eqs
+    https://git.kernel.org/netdev/net/c/5dbf647367e8
+  - [net,V2,4/7] net/mlx5: E-switch, Create ingress ACL when needed
+    https://git.kernel.org/netdev/net/c/b20c2fb45470
+  - [net,V2,5/7] net/mlx5e: Add mqprio_rl cleanup and free in mlx5e_priv_cleanup()
+    https://git.kernel.org/netdev/net/c/1da839eab6db
+  - [net,V2,6/7] net/mlx5e: Present succeeded IPsec SA bytes and packet
+    https://git.kernel.org/netdev/net/c/2d9dac5559f8
+  - [net,V2,7/7] net/mlx5e: Approximate IPsec per-SA payload data bytes count
+    https://git.kernel.org/netdev/net/c/e562f2d46d27
 
-If we are making this comparison with l4 data, then we are not RFC
-compliant IMHO
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
