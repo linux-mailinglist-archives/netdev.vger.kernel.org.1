@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-107685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4376191BF1A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:59:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E535391BF1E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:03:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 764C81C21F56
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 12:59:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68974B23209
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 13:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A580D1957EA;
-	Fri, 28 Jun 2024 12:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2C4158DD2;
+	Fri, 28 Jun 2024 13:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDwFXP0J"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mZ4atJA2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B704C3BE
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FD7155C88;
+	Fri, 28 Jun 2024 13:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719579557; cv=none; b=TxMeD4WeiJYehRBcANu39uiDUxovAo5KRWe3MtgAjYiNq033ZKsb7jpuVWdGiGFuCCwq3vP4Cu/rDuRsCR0LsIIU349PjkfaosHQymk82jY1WGfzVwHkECR91H7tzrohCeit+rCqMNLtUleRw3RQbdzh9UkjY/+YvaGl86oaF6w=
+	t=1719579819; cv=none; b=sJHCcyV475ksbxanfCs9hjC9xV2JDVC5Upk2XtXACuTCK+9iAmXzASjvwrrBOakuFUM6YDSBTJmsuX6ioi03TB9bqtvs7ol7MGkfkTPDWWc17HU8D7+TPWgNDKX+cWT9FgC3Pb3HCl0s/6R7ix+VPypXrCZTeKo/Fk4fhQkuUZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719579557; c=relaxed/simple;
-	bh=AALzB7Je+dbwh9aqhaMZgSkeBrDEJ4ks1mzPpaq1yQU=;
+	s=arc-20240116; t=1719579819; c=relaxed/simple;
+	bh=WxBr0rSr2Oj5lFd/V5f2z2g/Y1b3owlQaVz68AcreBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q4aJt9JvGwBQBEtA8uBRsnIW2ZSgshSUc8tu/oGriVsFdxsfTpj+uWzJORMbIiDf+pMsx0y+JEt/Cf7ev/Ah2geoWNQLpuhFtjTpKHki1oDZ2qcMD/ieoA0LvnoxzkaZl7WWoW9OCsp2VzW4SSeG3ve0Dn15dzVdWSLUU5nX1W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDwFXP0J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A098EC116B1;
-	Fri, 28 Jun 2024 12:59:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719579557;
-	bh=AALzB7Je+dbwh9aqhaMZgSkeBrDEJ4ks1mzPpaq1yQU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DDwFXP0Jezjh6HwRwWyN4HiJxGhb1hSRwHt/ZYzmyzmOCyrPwU/rNrckD4px3ywZd
-	 E8odmGUnqgblI3gL/sdST1uqbx785TAEVx98PMpcJIwajUWnwnNy5io8K4FjqaZzh3
-	 q7N3prYya54Qn95j3rXkErV9SKsVK1a23VS1VV9JXms5ID3YTy5TvnsEBu+bdVWdGY
-	 xhQCOLU+Cd1I2HZ1HUlg7ZE/g/4OVyLO7tuNZogKO7k4wF3fEDY/wALEmkRoctDL9H
-	 SidVEi+c01SgPB7yBsR0uqmON+sGOUc6WFtEY0lXT2QeKRNh6ewq+bznFm8KTCk2Pb
-	 uI5N+xPfkNc5w==
-Date: Fri, 28 Jun 2024 13:59:12 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2] igc: Get rid of spurious interrupts
-Message-ID: <20240628125912.GF783093@kernel.org>
-References: <20240611-igc_irq-v2-1-c63e413c45c4@linutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZX0HRmKYc4aLlnAHha3cx4ANL43cbzCcIFMAEWorZh9BrbzAwQyPGSr8dpawbRzj4YFJ9592jbdkAwcRwMJYSAVKlLRrqHL5u7f+ARpIMKNqApIRgelDSdzqcIK44wrtjUAMSlmuAFUWfXm2Ys4hWZwXnkF3MuuijeOEcSE5RyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mZ4atJA2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9otMkeMdAgkNNBSByYFZ3WjG0J5NuzixzkYCbswttpA=; b=mZ4atJA2zwGWgI4BmHXCCpePhf
+	I9cdzxkqOpvLZmEDU/QtUSmnRw0WBgks7oeYFlCgpo5CmKdgK+8lLsmoxC5mW6GxaaInm2K0/xSPk
+	VkHUFFeIGy3nEd0GjYjiuwumaRfW41EQwcehO4NNuZZUD47V0s+7AYQthkxhJxZ7Zitk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sNBGB-001HWK-IB; Fri, 28 Jun 2024 15:03:27 +0200
+Date: Fri, 28 Jun 2024 15:03:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rengarajan.S@microchip.com
+Cc: linux-usb@vger.kernel.org, davem@davemloft.net,
+	Woojung.Huh@microchip.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	UNGLinuxDriver@microchip.com, edumazet@google.com, kuba@kernel.org
+Subject: Re: [PATCH net-next v1] lan78xx: lan7801 MAC support with lan8841
+Message-ID: <2aa4fba0-c5bd-47e9-97a7-3f73048282cb@lunn.ch>
+References: <20240611094233.865234-1-rengarajan.s@microchip.com>
+ <6eec7a37-13d0-4451-9b32-4b031c942aa1@lunn.ch>
+ <06a180e5c21761c53c18dd208c9ea756570dd142.camel@microchip.com>
+ <d72dd190-39d1-49ca-aeb2-9c0bc1357b68@lunn.ch>
+ <369cd82f60db7a9d6fd67a467e3c45b68348155b.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,33 +64,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240611-igc_irq-v2-1-c63e413c45c4@linutronix.de>
+In-Reply-To: <369cd82f60db7a9d6fd67a467e3c45b68348155b.camel@microchip.com>
 
-On Fri, Jun 21, 2024 at 08:56:30AM +0200, Kurt Kanzenbach wrote:
-> When running the igc with XDP/ZC in busy polling mode with deferral of hard
-> interrupts, interrupts still happen from time to time. That is caused by
-> the igc task watchdog which triggers Rx interrupts periodically.
-> 
-> That mechanism has been introduced to overcome skb/memory allocation
-> failures [1]. So the Rx clean functions stop processing the Rx ring in case
-> of such failure. The task watchdog triggers Rx interrupts periodically in
-> the hope that memory became available in the mean time.
-> 
-> The current behavior is undesirable for real time applications, because the
-> driver induced Rx interrupts trigger also the softirq processing. However,
-> all real time packets should be processed by the application which uses the
-> busy polling method.
-> 
-> Therefore, only trigger the Rx interrupts in case of real allocation
-> failures. Introduce a new flag for signaling that condition.
-> 
-> [1] - https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=3be507547e6177e5c808544bd6a2efa2c7f1d436
-> 
-> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Although, there is no specific errata available for adding fixup
+> specific to lan78xx USB dongle, we have added the fixup for handing
+> specific configurations to ensure the PHY operates correctly with the
+> MAC. In this case while transmitting from MAC to PHY the device does
+> not add the delay locally at its TX input pins. It expects the TXC
+> delay to be provided by on-chip MAC. Since the delay calculated in this
+> case is specific to the lan78xx USB dongle it is not possible to use
+> this fixup for interfacing with generic MAC.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Have you tried PHY_INTERFACE_MODE_RGMII_TXID when connecting to the
+PHY? The four PHY_INTERFACE_MODE_RGMII_* values are the official way
+to ask the PHY to insert delays, or not. If that is all you are doing,
+i don't think you need these fixups at all.
 
+> > Please give me a details explanation why this fixup will not be
+> > applied to other instances of this PHY in the system.
+> 
+> As stated above, the TXC delay calculated for the PHY is specific to
+> the lan78xx on-chip MAC. This delay ensures that both the phy and MAC
+> clock delay timing is met. Any other MACs connected will need a
+> different delay values to be synchronized with MAC and hence these
+> instances will get failed.
+
+You did not answer my question. Show me the code path which prevents
+this being applied to other PHYs. Is there a comparison to netdev
+somewhere when applying the fixup? Give me the file:line number.
+
+	  Andrew
 
