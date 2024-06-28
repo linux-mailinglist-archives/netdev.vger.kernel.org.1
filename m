@@ -1,155 +1,133 @@
-Return-Path: <netdev+bounces-107717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0684291C139
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:39:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D59691C156
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 16:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F129B22A9D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE5DA284629
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 14:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB281C0072;
-	Fri, 28 Jun 2024 14:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C191C0DC5;
+	Fri, 28 Jun 2024 14:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="iJ6VPt1t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="clXunHBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806471E53A;
-	Fri, 28 Jun 2024 14:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E3D1BE87D;
+	Fri, 28 Jun 2024 14:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719585554; cv=none; b=u4YlkDS++upZP+CLlUrGLS8rrieRFt8vZngZOzdHsPl+k7tlR0UIRfkfVo51zCup8bp7mdmgKquiNXCAdHkUE1UOyBL8BAujH50bwzB76oeJGJg66o/noncGi+4tcm4/VKmD+Ls3j3FmrMuavkI8O+SSFhCBDY4Et26PSnUAhVo=
+	t=1719585783; cv=none; b=O+XxV6eakSSuCFQHeY4OsYJfZT+lmLYvyAKCCic7MsOnauZO6bOZCYymqvsl6IsvZVUyBr9f2MqbtJYovnGOIokSaeyw0d4ECYR0nfDNDfRl1kT5uIEv6mTxYxqlFGho21KkqLX21RGHOMJc4d0aTsuTg0Y8kWJVfhzKdCEG1BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719585554; c=relaxed/simple;
-	bh=fbKwqXlvo36CXSMeJryZJPdETSPPD5sl/c0WBnH8V4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BdYPu1yGHwHcDFWdfXoUgS6RefbocjsmeP4mgjhc8dhqM0JIpUzStIRy2IArRgfvmEK6CL9zCY7uwKKY1FDCLAKNUw61pIWcXlh/o1mawSk4d2XBpZ0fIDuD2e8YdVs6NeNZ1XzOSKbVqC3Kd+1v3/2xEtMyV4XqT2gKk5C8upk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=iJ6VPt1t; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45S8d61C012603;
-	Fri, 28 Jun 2024 14:38:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	vmsoo87nXpQIGp4+dpf035YqcbLL73mjN+51Tgx2Oh0=; b=iJ6VPt1toWRAphns
-	KeLg7V6++K2120XDsnNO3gzxAy2lpfHZOOmTLf0jGdA8aHEgx179wDkIo38uRD6w
-	Ol0Fx/eYsZTNPuWv0T4t1X9BTA5Sdhhelb94INMU2hn31qDiwYVUqml25fPJwneg
-	XpbgDtCfXBCs3v9Ic4jTEGeMZQqkt3PKi4OZbPnnwx7kkkapswtSzUmSm0Xo1vHl
-	UXfW30IO/4sDeQp1lO9/Q9ItwEFtacNykPWFDI59Nc8a2OOJ3pQckfsaqMdZeCtp
-	2/fOcrmT5DYfTbQpEwXOyCHRSO0BORydFz4HeejmgA7d6VT99SSUeBE/gpP5RU/u
-	UbQKMQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 401njr9tke-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 14:38:59 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45SEcwfI027146
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 14:38:58 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 28 Jun
- 2024 07:38:58 -0700
-Message-ID: <cde35f69-4d6e-d46d-88ca-9c5d6d5e757f@quicinc.com>
-Date: Fri, 28 Jun 2024 08:38:57 -0600
+	s=arc-20240116; t=1719585783; c=relaxed/simple;
+	bh=JbF7tzwmlh0t0lhrfxljmQKu4lTVaCQqMHn/ZaGKJ04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dk1WNtVqrIiQMcsRTcI2aDxNJZklmKuksCJr7vvQ3l/PU3zEXcgswywQkhkSyoOhCHyaAMrRRU3ihwBISIhc7Yze4o9iq7CBBtK5wIsxAtkRGvoQFF1EQdflnV5iN+z+6zWlVtGoAC/GlLyeswKI7wrtIxRZllOV9EGywRmKi70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=clXunHBc; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1i0qVfn2CH6qX3ZUJgQpekfAmjqv9PBkrjgn7uqTOKk=; b=clXunHBcYa9YTyHafTQarFujMc
+	lzhL7CNhuRniN/1QOI0XxCVEADk5A5U63dhB7rhDKyfUY7RXNDRewcaAb3nHi/QMvHKuBztJ8dOiK
+	RFwCxxNZgubc1Djq8JPLWgnIqVUbQuzSwrt/IVF9AcpPnwSJLSDkNDX7LEOBhbKCo2Qzqqp8R9hpt
+	NJSIVYDCwLbKU93aZynrN/2oSidE8CsWRke9vKwAkjUGqh6U0m/qpTEEjkrchXz1dQ2QrwgETId4d
+	w0FcH4FKdzwplCmj+fddpP2dojT0Du0mamuEP6+PSi059RkrSrfrNPUrWeznXfnGwl4pYVMscN9x1
+	LIL/XyoA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49280)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sNCoC-0006lH-2O;
+	Fri, 28 Jun 2024 15:42:40 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sNCoD-0006aZ-4r; Fri, 28 Jun 2024 15:42:41 +0100
+Date: Fri, 28 Jun 2024 15:42:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Halaney <ahalaney@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v2 17/17] net: stmmac: pcs: Drop the _SHIFT
+ macros
+Message-ID: <Zn7L4cP62MsNN61J@shell.armlinux.org.uk>
+References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
+ <20240624132802.14238-9-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH v3 2/3] bus: mhi: host: Add name for mhi_controller
-Content-Language: en-US
-To: Slark Xiao <slark_xiao@163.com>, <manivannan.sadhasivam@linaro.org>,
-        <loic.poulain@linaro.org>, <ryazanov.s.a@gmail.com>,
-        <johannes@sipsolutions.net>
-CC: <netdev@vger.kernel.org>, <mhi@lists.linux.dev>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240628073626.1447288-1-slark_xiao@163.com>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <20240628073626.1447288-1-slark_xiao@163.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: jEkA4FUUieoR8WaoPVsF-2cM8dNthUvb
-X-Proofpoint-ORIG-GUID: jEkA4FUUieoR8WaoPVsF-2cM8dNthUvb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-28_10,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- malwarescore=0 bulkscore=0 adultscore=0 suspectscore=0 priorityscore=1501
- clxscore=1011 phishscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406280109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240624132802.14238-9-fancer.lancer@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 6/28/2024 1:36 AM, Slark Xiao wrote:
->   For SDX72 MBIM mode, it starts data mux id from 112 instead of 0.
->   This would lead to device can't ping outside successfully.
->   Also MBIM side would report "bad packet session (112)".
-
-Weird indentation
-
->   In oder to fix this issue, we decide to use the modem name
-
-"order"
-
-> to do a match in client driver side. Then client driver could
-> set a corresponding mux_id value for this modem product.
+On Mon, Jun 24, 2024 at 04:26:34PM +0300, Serge Semin wrote:
+> The PCS_ANE_PSE_SHIFT and PCS_ANE_RFE_SHIFT are unused anyway. Moreover
+> PCS_ANE_PSE and PCS_ANE_RFE are the respective field masks. So the
+> FIELD_GET()/FIELD_SET() macro-functions can be used to get/set the fields
+> content. Drop the _SHIFT macros for good then.
 > 
-> Signed-off-by: Slark Xiao <slark_xiao@163.com>
+> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 > ---
->   drivers/bus/mhi/host/pci_generic.c | 1 +
->   include/linux/mhi.h                | 2 ++
->   2 files changed, 3 insertions(+)
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-> index 1fb1c2f2fe12..14a11880bcea 100644
-> --- a/drivers/bus/mhi/host/pci_generic.c
-> +++ b/drivers/bus/mhi/host/pci_generic.c
-> @@ -1086,6 +1086,7 @@ static int mhi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   	mhi_cntrl->runtime_get = mhi_pci_runtime_get;
->   	mhi_cntrl->runtime_put = mhi_pci_runtime_put;
->   	mhi_cntrl->mru = info->mru_default;
-> +	mhi_cntrl->name = info->name;
->   
->   	if (info->edl_trigger)
->   		mhi_cntrl->edl_trigger = mhi_pci_generic_edl_trigger;
-> diff --git a/include/linux/mhi.h b/include/linux/mhi.h
-> index b573f15762f8..86aa4f52842c 100644
-> --- a/include/linux/mhi.h
-> +++ b/include/linux/mhi.h
-> @@ -361,6 +361,7 @@ struct mhi_controller_config {
->    * @wake_set: Device wakeup set flag
->    * @irq_flags: irq flags passed to request_irq (optional)
->    * @mru: the default MRU for the MHI device
-> + * @name: name of the modem
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> index a17e5b37c411..0f15c9898788 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> @@ -43,9 +43,7 @@
+>  #define PCS_ANE_FD		BIT(5)		/* AN Full-duplex flag */
+>  #define PCS_ANE_HD		BIT(6)		/* AN Half-duplex flag */
+>  #define PCS_ANE_PSE		GENMASK(8, 7)	/* AN Pause Encoding */
+> -#define PCS_ANE_PSE_SHIFT	7
+>  #define PCS_ANE_RFE		GENMASK(13, 12)	/* AN Remote Fault Encoding */
+> -#define PCS_ANE_RFE_SHIFT	12
+>  #define PCS_ANE_ACK		BIT(14)		/* AN Base-page acknowledge */
 
-Why restrict this to modems?  There are plenty of other MHI devices
+I would actually like to see all these go away.
 
->    *
->    * Fields marked as (required) need to be populated by the controller driver
->    * before calling mhi_register_controller(). For the fields marked as (optional)
-> @@ -445,6 +446,7 @@ struct mhi_controller {
->   	bool wake_set;
->   	unsigned long irq_flags;
->   	u32 mru;
-> +	const char *name;
+PCS_ANE_FD == LPA_1000XFULL
+PCS_ANE_HD == LPA_1000XHALF
+PCS_ANE_PSE == LPA_1000XPAUSE and LPA_1000XPAUSE_ASYM
+PCS_ANE_RFE == LPA_RESV and LPA_RFAULT
+PCS_ANE_ACK == LPA_LPACK
 
-Please run pahole
+Isn't it rather weird that the field layout matches 802.3z aka
+1000base-X and not SGMII? This layout would not make sense for Cisco
+SGMII as it loses the speed information conveyed by the Cisco SGMII
+control word.
 
->   };
->   
->   /**
+This isn't a case of the manufacturer using "SGMII" to mean a serial
+gigabit media independent interface that supports 1000base-X
+(PHY_INTERFACE_MODE_1000BASEX) rather than Cisco SGMII
+(PHY_INTERFACE_MODE_SGMII) ?
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
