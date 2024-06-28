@@ -1,89 +1,137 @@
-Return-Path: <netdev+bounces-107582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0947091B9F2
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:32:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F296791B9F7
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3B01C235B5
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:32:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F5F71C2369C
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E02147C89;
-	Fri, 28 Jun 2024 08:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B43D149C76;
+	Fri, 28 Jun 2024 08:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="j8MBJLZI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="F997nCRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3330B14386F;
-	Fri, 28 Jun 2024 08:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFCA149C7C;
+	Fri, 28 Jun 2024 08:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719563521; cv=none; b=H+G5luw5b1z+KGWVI1Vt0d0GZ3bevJ0ys/LWqbRObJcPR4bUZnPeN8ScFAtadYIl8dbOt3KbdvqSF0CV2v8uzii8VLCTELhJaJGNejRdrGYmXaOIBvFpfoftF5762DVenPoy7WlX6J8DvwE2A4tp6YdsTTjWKjW47pTZfe4Ul60=
+	t=1719563544; cv=none; b=VZ6H5hkjQE5ne60hSzGiMxrYw+YAhCr/6aBkkXjtykvZVrOjqOW12uGC07GMk3Pfg3uom3gLphP8pK3h7MSvc/txdwtaf2DNtZZ9DhPJTrDBTIog+pEwZTx3qQtKCQvTTpaqIGhPmwSy5Bd0qfgHYlnAjEOI3G/GfLkm/lPHD9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719563521; c=relaxed/simple;
-	bh=qRY2BttLFavGC0/FEKgRQmh0bDCXs9H3mYiv5W7T9/Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=F047Eh/3pmIIdUpw6NF0Vv68bGqphFR3JLKLMRZxlVgKiv5xhQKo70UavDZOGSJNl3tLZta/LdGgEOOcjVrit0vY7vx4ORnEQ5DojqEXmiIcoH+6c3eEmXAXfkCdVgItkLA5s7eOt8n65QeEeHtr7f+tl+WS24TU53CLtDUQzqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=j8MBJLZI reason="signature verification failed"; arc=none smtp.client-ip=45.254.50.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=8dm2yPnUBy+Zwic0JqYYPGSYk9HXlXSy6pvyaLYdubE=; b=j
-	8MBJLZI1RSp3f9pNMxxk9Mv4PjPyFCdx4UyqdjX5TU9bo1qsKgsoZvmx2DYc7dAd
-	PrWw41rsG+hLJdDsawkB8k8FjnEpf1HTFLAyEUtDbXwamoebx0H3aN3XOOX62yGt
-	iv5dujTTvdCqT5q0WlhH0GKBGh0de4dlwGiM3h98pM=
-Received: from slark_xiao$163.com ( [112.97.61.84] ) by
- ajax-webmail-wmsvr-40-137 (Coremail) ; Fri, 28 Jun 2024 16:31:40 +0800
- (CST)
-Date: Fri, 28 Jun 2024 16:31:40 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Dmitry Baryshkov" <dmitry.baryshkov@linaro.org>
-Cc: manivannan.sadhasivam@linaro.org, loic.poulain@linaro.org, 
-	ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
-	quic_jhugo@quicinc.com, netdev@vger.kernel.org, mhi@lists.linux.dev, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH v3 1/3] bus: mhi: host: Add Foxconn SDX72 related
- support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-In-Reply-To: <2xbnsvtzh23al43njugtqpihocyo5gtyuzu4wbd5gmizhs2utf@d2x2gxust3w5>
-References: <20240628073605.1447218-1-slark_xiao@163.com>
- <2xbnsvtzh23al43njugtqpihocyo5gtyuzu4wbd5gmizhs2utf@d2x2gxust3w5>
-X-NTES-SC: AL_Qu2aC/mdvE0r5iSdZ+kfmk8Sg+84W8K3v/0v1YVQOpF8jBLo0w4rRVxgI2Hp/cKNLi6tlzu0ViZu0OhWXqpzZ7ooSYwDKdnixOFe4YYADrnHLg==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1719563544; c=relaxed/simple;
+	bh=vl26mRC3di+UCbJtKug1halZlylXNm19OTQsSGdfuOo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TPhYwWpPdBpBWiI4b8ZshKXxbGJ64cHX1z8AUSwH969IG3jptjlvhUqpdxLHODdj09z0w6x0ikjSDq5DqEmXfhLfo/TC2pwf+s2libmIL/Yy9ZDoXbUpj/uLc8wx1iVILJxfL/vJuME/8jCaUR4ykw9FU2IYLpN77FfSWvpoAmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=F997nCRi; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 08B9D40003;
+	Fri, 28 Jun 2024 08:32:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719563540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7yLiDevD/Nc8XFJFThpg8VP1XNSiEOrZXCh6SdDmkqM=;
+	b=F997nCRiiE/hvYqQmgl/+s5WXL0lyveQQPd1FZeiIU+eupPjuq6avjD6NJkwKlV5TyGTdK
+	pYETOCavooKnROh6ns0fHSgB1j6AeJMg1QiuQJBYTqGvWcd/i5YzElB+s3jqGuutK/XHXP
+	A8myQRavjxeAaLb8RPPXPSrHavQNzk2FnQ9S1qeJ+5X7Fl/ZqeM9NwDXpBexvnfAwk3huv
+	JwjCyxIiDwS+rdSSSi0S3umq2n5DPix4U21TNSJ+uB6zeVSy2A0p8J7O8Z2jyteVVptFNR
+	z+wgGkWoVCgdLF1pYc5rwHeLTrvbX9dJSP8ld8tQnaFytVVgc8YO4ZQ2dnabXQ==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v5 0/7] net: pse-pd: Add new PSE c33 features
+Date: Fri, 28 Jun 2024 10:31:53 +0200
+Message-Id: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <455cd5ee.86ad.1905df8bbab.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wD333DsdH5mXmkTAA--.29661W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbioxsMZGVOEH3Z8wACs+
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAPl0fmYC/3XQz2oDIRAG8FcJnmvRUaPbU9+jhOCfSSO0urjWp
+ IR991ovTQl7mMPHx/wG5kYWLBEX8rK7kYItLjGnHtTTjvizTe9IY+iZAAPJJCh6Qlu/Ch7n/Ds
+ XLEdvZ8oNTsxZDZN0pO/OBU/xOtw3krDShNdKDr05x6Xm8j0ONj76YSuYNuzGKaPMS8eDmpRw5
+ tXlXD9ievb5c5gN/pw901sOdMcz4SGgM8K6R0fcOVxuOaI7FvbaSNRGcP7oyDtn82dNdscxw4W
+ 1Qemg/jvruv4AJ8Ziop4BAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, Jonathan Corbet <corbet@lwn.net>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
+ linux-doc@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>, 
+ Sai Krishna <saikrishnag@marvell.com>
+X-Mailer: b4 0.15-dev-8cb71
+X-GND-Sasl: kory.maincent@bootlin.com
 
-CkF0IDIwMjQtMDYtMjggMTU6NTE6NTQsICJEbWl0cnkgQmFyeXNoa292IiA8ZG1pdHJ5LmJhcnlz
-aGtvdkBsaW5hcm8ub3JnPiB3cm90ZToKPk9uIEZyaSwgSnVuIDI4LCAyMDI0IGF0IDAzOjM2OjA1
-UE0gR01ULCBTbGFyayBYaWFvIHdyb3RlOgo+PiBBbGlnbiB3aXRoIFFjb20gU0RYNzIsIGFkZCBy
-ZWFkeSB0aW1lb3V0IGl0ZW0gZm9yIEZveGNvbm4gU0RYNzIuCj4+IEFuZCBhbHNvLCBhZGQgZmly
-ZWhvc2Ugc3VwcG9ydCBzaW5jZSBTRFg3Mi4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IFNsYXJrIFhp
-YW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPj4gLS0tCj4+IHYyOiAoMSkuIFVwZGF0ZSB0aGUgZWRs
-IGZpbGUgcGF0aCBhbmQgbmFtZSAoMikuIFNldCBTRFg3MiBzdXBwb3J0Cj4+IHRyaWdnZXIgZWRs
-IG1vZGUgYnkgZGVmYXVsdAo+PiB2MzogRGl2aWRlIGludG8gMiBwYXJ0cyBmb3IgRm94Y29ubiBz
-ZHg3MiBwbGF0Zm9ybQo+Cj5HZW5lcmljIGNvbW1lbnQ6IHBsZWFzZSBzZW5kIGFsbCB0aGUgcGF0
-Y2hlcyB1c2luZyBhIHNpbmdsZQo+Z2l0LXNlbmQtZW1haWwgY29tbWFuZC4gVGhpcyB3YXkgaXQg
-d2lsbCB0aHJlYWQgdGhlbSBwcm9wZXJseSwgc28gdGhhdAo+dGhleSBmb3JtIGEgc2luZ2xlIHBh
-dGNoc2VyaWVzIGluIGRldmVsb3BlcnMncyBtYWlsIGNsaWVudHMuIE9yIHlvdSBjYW4KPmp1c3Qg
-dXNlICdiNCcgdG9vbCB0byBtYW5hZ2UgYW5kIHNlbmQgdGhlIHBhdGNoc2V0Lgo+CgpTZW5kIGFn
-YWluIHdpdGggY29tbWFuZCAiZ2l0IHNlbmQtZW1haWwgdjMtKi5wYXRjaCAuLi4iLiBQbGVhc2Ug
-dGFrZSBhIHZpZXcgb24gdGhhdC4KVGhhbmtzLgoKPj4gLS0tCj4+ICBkcml2ZXJzL2J1cy9taGkv
-aG9zdC9wY2lfZ2VuZXJpYy5jIHwgNDMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+
-ICAxIGZpbGUgY2hhbmdlZCwgNDMgaW5zZXJ0aW9ucygrKQo+PiAKPgo+Cj4tLSAKPldpdGggYmVz
-dCB3aXNoZXMKPkRtaXRyeQo=
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+
+This patch series adds new c33 features to the PSE API.
+- Expand the PSE PI informations status with power, class and failure
+  reason
+- Add the possibility to get and set the PSE PIs power limit
+
+Changes in v5:
+- Fix few nitpick.
+- Link to v4: https://lore.kernel.org/r/20240625-feature_poe_power_cap-v4-0-b0813aad57d5@bootlin.com
+
+Changes in v4:
+- Made few update in PSE extended state an substate.
+- Add support for c33 pse power limit ranges.
+- Few changes in the specs and the documentation.
+- Link to v3: https://lore.kernel.org/r/20240614-feature_poe_power_cap-v3-0-a26784e78311@bootlin.com
+
+Changes in v3:
+- Use u32 instead of u8 size for c33 pse extended state and substate.
+- Reformat the state and substate enumeration to follow Oleksij proposal which
+  is more IEEE 802.3 standard compliant
+- Sent the first patch standalone in net.
+- Link to v2: https://lore.kernel.org/r/20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com
+
+Changes in v2:
+- Use uA and uV instead of mA and mV to have more precision in the power
+  calculation. Need to use 64bit variables for the calculation.
+- Modify the pd-92x0behavior in case of setting the current out of the
+  available ranges. Report an error now.
+- Link to v1: https://lore.kernel.org/r/20240529-feature_poe_power_cap-v1-0-0c4b1d5953b8@bootlin.com
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Kory Maincent (7):
+      net: ethtool: pse-pd: Expand C33 PSE status with class, power and extended state
+      netlink: specs: Expand the PSE netlink command with C33 new features
+      net: pse-pd: pd692x0: Expand ethtool status message
+      net: pse-pd: Add new power limit get and set c33 features
+      net: ethtool: Add new power limit get and set features
+      netlink: specs: Expand the PSE netlink command with C33 pw-limit attributes
+      net: pse-pd: pd692x0: Enhance with new current limit and voltage read callbacks
+
+ Documentation/netlink/specs/ethtool.yaml     |  58 +++++
+ Documentation/networking/ethtool-netlink.rst |  87 +++++++-
+ drivers/net/pse-pd/pd692x0.c                 | 317 ++++++++++++++++++++++++++-
+ drivers/net/pse-pd/pse_core.c                | 172 ++++++++++++++-
+ include/linux/ethtool.h                      |  20 ++
+ include/linux/pse-pd/pse.h                   |  51 +++++
+ include/uapi/linux/ethtool.h                 | 191 ++++++++++++++++
+ include/uapi/linux/ethtool_netlink.h         |  12 +
+ net/ethtool/pse-pd.c                         | 119 +++++++++-
+ 9 files changed, 997 insertions(+), 30 deletions(-)
+---
+base-commit: f203f9086d3b3718bc63782a56218c7122f07db3
+change-id: 20240425-feature_poe_power_cap-18e90ba7294b
+
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
+
 
