@@ -1,253 +1,143 @@
-Return-Path: <netdev+bounces-107615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3990691BB25
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:10:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 551FC91BB3F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:15:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B587D1F21FE8
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:10:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 846E91C2083F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9ABC15351C;
-	Fri, 28 Jun 2024 09:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2FD14F114;
+	Fri, 28 Jun 2024 09:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsifPcFn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIhbSLeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7041B152E00
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D9814F98
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719565763; cv=none; b=RYAitwyl40amM80gvVMm/+pdG17KhDzjpb4pWIMjEv99rQ88zpDBrEyPwRU9AzS+NjsYXxw+1R+9D200Si9UoDizTbKD4VdP1zaVLpQKoacxUgFJm3+FmlPWe2EqD7sEtlROe1Y7NCwlS7M/HGVPu7w2OvURKpszdlX8ppmMD60=
+	t=1719566097; cv=none; b=j+SqhLaIOtUwVleoNRcYjaO9SIFAy+BG8vnst+K/L0iyb7IQgdWf79K6uJ2kcQSB8gqynQUgXpEck3Krm3TTjeT/w0pyQ1G0l9jZDyhjMHwXdVLbo5WINze6mq5sPJbtUl7/6CIvjz543RlLW0ithjsfOluOd2aHqpzwHRyNzYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719565763; c=relaxed/simple;
-	bh=SIySpQCkV++Gn01uCQqrsxns8iu5uDxRGSSIfvZ6WqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0L4GImobdvQdFPryWt78Re2Yz1/9RLMxvTO0uK76WC2nYtzdhhq1JbybyzDvVenyEdrmo/jSVsznuqs2hFPgjfIsKWDswQeF4YDpeuS0a38DwYadgJXp5Rs+ZRjpuClkcLfToVUflPTie1SlCcMdsAZADzYcKDVOvx32alQBJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VsifPcFn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719565760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9yWBbb3piCGdDy7HD6ZzfPnqrZTOJPMpN0iR2xh32w0=;
-	b=VsifPcFn+H7KiB6cunIidud6ZM5LD3s9BL2pUWT0e/r3QTn313+FFmsZfqXmxkXltHOwgN
-	/SYQN0RKsO0aLTRGLBSQvyNVkXLr8vosuMCVI4l27fTYmZTtaAqlEffmgT6Q1XJxWsaFO1
-	zPimsbMmTsTPHqV7NiLEP/y7PAiIg6E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-VV5NTFziNfCAU9YHQ1KeFw-1; Fri, 28 Jun 2024 05:09:19 -0400
-X-MC-Unique: VV5NTFziNfCAU9YHQ1KeFw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-421179fd82bso3733795e9.1
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:09:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719565758; x=1720170558;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1719566097; c=relaxed/simple;
+	bh=C/2QRqwi6yPC5Kwibxzd52DRl+/5cLtI9gDRNvI30Wc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GADExXlq8q+jzk/dy0ch9ybaYWSAhjNBRPAIHI178cj4wRPtXR3ij+FJz8sko/XgzT/J2rQx+hT0cFEeRwnaW0TSjg/vpCu/sf/Q7miqjySVAtXJuVRAVbWBTh61SaeA3chex18OsyZQ8AC692fTdDemFCEWAHfnkxUqyKTkXKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIhbSLeH; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-64b29539d87so2179087b3.0
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:14:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719566094; x=1720170894; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9yWBbb3piCGdDy7HD6ZzfPnqrZTOJPMpN0iR2xh32w0=;
-        b=mMyWtLbFvjruoSNq6+1YTXh400bWflWYPIk7734zviW1Zw1QIFbNoFpN8tFfEESuw9
-         ZclK/EST0M21D7pGJg1Guv6aFdp0pEqvxyC/Si0E3OU25SMd+FeU4gguKjlfk1NZ+JgH
-         ORNjjH1Q6tpFxtap7ssee3W8vvLX1p1uk0u3aL3775DOuJLtSZZ3STopPhHzG3d9GPNY
-         ztgaQCtLCoo3qfq6kae7tGcFXFbaCfHVqoCcGmjg8z2F1nmu1hZGRbrJRvQIjmsm+D9A
-         HgH9ozi10d8ah3XVisSpwOtOpC7YF7L4KHcKoWA6d4YUccJPSH4mNh0rh78pji4hbITM
-         VOlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVTcFPJqxwAczqKHytakEmpmt5qhh4ZaFuaQW6i6WKulpyFIn2n5qMrQt8VwRFG6Qzz3u2lM/MSUU9aKUkinigRsOK8j4oN
-X-Gm-Message-State: AOJu0Yzs9SH/Q12apwF7/pO1BFEAAvj99EXxbHF39H0KzRfTXhnUxYwO
-	lx4JzajTIjXq8yDy75gcZIt++D2jrxtAifzuPcGkj8EmGL0+Hv5y/jmSfsxqDPAvYyUzQCCsPga
-	2Ac7DJ+X3RSyie/zOXWTsno/1JH6rgLBI+Fehg5ioVFcFPHqSBU5kaQ==
-X-Received: by 2002:a05:600c:2e16:b0:425:5f25:c926 with SMTP id 5b1f17b1804b1-4255f25ca11mr49899755e9.19.1719565757850;
-        Fri, 28 Jun 2024 02:09:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFLU+57BTTkzFmhEgyrNonqIAqaUPJ6LrIcPsHkgfDROh96pQSfJWSfs9ZVKQcYxxBa29DKHg==
-X-Received: by 2002:a05:600c:2e16:b0:425:5f25:c926 with SMTP id 5b1f17b1804b1-4255f25ca11mr49899415e9.19.1719565757149;
-        Fri, 28 Jun 2024 02:09:17 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.132.11])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b0c0fb3sm25546245e9.40.2024.06.28.02.09.14
+        bh=eve8hRnvlFIFTLl2HC2yyhEdHM+l18Igp3uvedaWtOM=;
+        b=UIhbSLeH1PIZV78zjx9Jd+rF/KvTspuGP1beTVdAhdCfk/LGIjcLGpqR3qERm2BeqI
+         ZMM6uJ82oJROrzHUZ1w0aDDOJsgfvJtPuYW2YAuaZwpBXhiiMj6ILUsAsLG88yCODJ/P
+         HoRF11XzKXN+jLdvQlBSUluYH1Nd/V9aZ2sqZriWZrO4J5xnbH9xCk0Hon0/xn3vOtzs
+         Rqre+WbxC//oVLQlGe5JcLxTys+fEMfuk+6OduL8WKexDaKEvXSiN9OW/QtzWHAkLnDp
+         oi7wnbgBSZdjB1N6cVGkyLGy89ugsC6nFvnsMmA9DBJ2dzGsZFeRT3gpCtAzkPTvHRgZ
+         LyRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719566094; x=1720170894;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eve8hRnvlFIFTLl2HC2yyhEdHM+l18Igp3uvedaWtOM=;
+        b=WTXGyriErqQqcd8kHhdiqIMAV6vz53eIbLmDbVaNfABjzMzG1VwF5cgZY2dU+Tq15I
+         pXQ7Rk+NsVabqx6nLgh+TNH/Fb3fR3wyyeI4aObDwpc2aKgcLbrv9yjY1QQFUNrlGNpe
+         atA3Vg0vO+lUFfqFW5iEVJ01dBYlM+bt0Z68gnZ+OVGC345s2ebt5ZCVZCQgQRwW8+w3
+         vmPhw/xR/qV/Sv9qTlp5gPikmcfIWFVHX9imRqklw+hrNpYEqYewa0sJjjUK3y7Ci4wN
+         RfPjptu8Ew4SKedFXt+5DA6VDN1wbdjYNRqOmuCcsbMvw/cAPyE0CKOymjAAY6OEtNaX
+         NpaA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7WLi/xcXJ0lHbgrduAaR6WGm1aB9Flqv37r/7JOBgotczSuDEJR7x8vLzYYad8YlmgFP6KVZC792OGnImlGGTjlYAnj4R
+X-Gm-Message-State: AOJu0Ywp0ZQo5Iwsf+BPmg7gmOXmPsgK19ytYu4JR7YluihhYhQRqDh9
+	QjBTaiCP9AX7kg2ZCVrWydsC1tSfytcPF5OEXEqznhil/bCcNhh3ldh4E5hc
+X-Google-Smtp-Source: AGHT+IHwUSE+ogOwEcMUGFKV0ibow9WPA905RigCDt1XlvuewKIm7/iJs7jEzl8qWVqL4GZllDHRbg==
+X-Received: by 2002:a05:690c:f0a:b0:63b:d711:f06d with SMTP id 00721157ae682-643ac81cdfbmr193146467b3.33.1719566094471;
+        Fri, 28 Jun 2024 02:14:54 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f5b12sm6243746d6.94.2024.06.28.02.14.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 02:09:16 -0700 (PDT)
-Date: Fri, 28 Jun 2024 11:09:09 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com
+        Fri, 28 Jun 2024 02:14:53 -0700 (PDT)
+Date: Fri, 28 Jun 2024 05:14:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Daan De Meyer <daan.j.demeyer@gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
- for all vsock socket types.
-Message-ID: <nasvwizxcxeu64dux7yop3bwxdpbneu2bts6ob6ahwwietoxh6@wtffmxmiq5g3>
-References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
- <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ kernel-team@cloudflare.com
+Message-ID: <667e7f0d78f39_2185b294c5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240626-linux-udpgso-v2-1-422dfcbd6b48@cloudflare.com>
+References: <20240626-linux-udpgso-v2-0-422dfcbd6b48@cloudflare.com>
+ <20240626-linux-udpgso-v2-1-422dfcbd6b48@cloudflare.com>
+Subject: Re: [PATCH net-next v2 1/2] udp: Allow GSO transmit from devices with
+ no checksum offload
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-nit: in theory in this patch we don't support it for any of the 
-transports, so I wouldn't confuse and take that part out of the title.
+Jakub Sitnicki wrote:
+> Today sending a UDP GSO packet from a TUN device results in an EIO error:
+> 
+>   import fcntl, os, struct
+>   from socket import *
+> 
+>   TUNSETIFF = 0x400454CA
+>   IFF_TUN = 0x0001
+>   IFF_NO_PI = 0x1000
+>   UDP_SEGMENT = 103
+> 
+>   tun_fd = os.open("/dev/net/tun", os.O_RDWR)
+>   ifr = struct.pack("16sH", b"tun0", IFF_TUN | IFF_NO_PI)
+>   fcntl.ioctl(tun_fd, TUNSETIFF, ifr)
+> 
+>   os.system("ip addr add 192.0.2.1/24 dev tun0")
+>   os.system("ip link set dev tun0 up")
+> 
+>   s = socket(AF_INET, SOCK_DGRAM)
+>   s.setsockopt(SOL_UDP, UDP_SEGMENT, 1200)
+>   s.sendto(b"x" * 3000, ("192.0.2.2", 9)) # EIO
+> 
+> This is due to a check in the udp stack if the egress device offers
+> checksum offload. While TUN/TAP devices, by default, don't advertise this
+> capability because it requires support from the TUN/TAP reader.
+> 
+> However, the GSO stack has a software fallback for checksum calculation,
+> which we can use. This way we don't force UDP_SEGMENT users to handle the
+> EIO error and implement a segmentation fallback.
+> 
+> Lift the restriction so that UDP_SEGMENT can be used with any egress
+> device. We also need to adjust the UDP GSO code to match the GSO stack
+> expectation about ip_summed field, as set in commit 8d63bee643f1 ("net:
+> avoid skb_warn_bad_offload false positives on UFO"). Otherwise we will hit
+> the bad offload check.
+> 
+> Users should, however, expect a potential performance impact when
+> batch-sending packets with UDP_SEGMENT without checksum offload on the
+> egress device. In such case the packet payload is read twice: first during
+> the sendmsg syscall when copying data from user memory, and then in the GSO
+> stack for checksum computation. This double memory read can be less
+> efficient than a regular sendmsg where the checksum is calculated during
+> the initial data copy from user memory.
+> 
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-WDYT with someting like:
-
-     vsock: add support for SIOCOUTQ ioctl
-
-On Wed, Jun 26, 2024 at 02:08:35PM GMT, Luigi Leonardi via B4 Relay 
-wrote:
->From: Luigi Leonardi <luigi.leonardi@outlook.com>
->
->Add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
->in AF_VSOCK.
->The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
->of unsent bytes in the socket. This information is transport-specific
->and is delegated to them using a callback.
->
->Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> include/net/af_vsock.h   |  3 +++
-> net/vmw_vsock/af_vsock.c | 60 +++++++++++++++++++++++++++++++++++++++++++++---
-> 2 files changed, 60 insertions(+), 3 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 535701efc1e5..7b5375ae7827 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -169,6 +169,9 @@ struct vsock_transport {
-> 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
-> 	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->
->+	/* SIOCOUTQ ioctl */
->+	size_t (*unsent_bytes)(struct vsock_sock *vsk);
-
-If you want to return also errors, maybe better returning ssize_t.
-This should fix one of the error reported by kernel bots.
-
->+
-> 	/* Shutdown. */
-> 	int (*shutdown)(struct vsock_sock *, int);
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 4b040285aa78..d6140d73d122 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -112,6 +112,7 @@
-> #include <net/sock.h>
-> #include <net/af_vsock.h>
-> #include <uapi/linux/vm_sockets.h>
->+#include <uapi/asm-generic/ioctls.h>
->
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
->@@ -1292,6 +1293,59 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
-> }
-> EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
->
->+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
->+			  int __user *arg)
->+{
->+	struct sock *sk = sock->sk;
->+	struct vsock_sock *vsk;
->+	int retval;
->+
->+	vsk = vsock_sk(sk);
->+
->+	switch (cmd) {
->+	case SIOCOUTQ: {
->+		size_t n_bytes;
->+
->+		if (!vsk->transport || !vsk->transport->unsent_bytes) {
->+			retval = -EOPNOTSUPP;
->+			break;
->+		}
->+
->+		if (vsk->transport->unsent_bytes) {
-
-This if is not necessary after the check we did earlier, right?
-
-Removing it should fix the other issue reported by the bot.
-
->+			if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
->+				retval = -EINVAL;
->+				break;
->+			}
->+
->+			n_bytes = vsk->transport->unsent_bytes(vsk);
->+			if (n_bytes < 0) {
->+				retval = n_bytes;
->+				break;
->+			}
->+
->+			retval = put_user(n_bytes, arg);
->+		}
->+		break;
->+	}
->+	default:
->+		retval = -ENOIOCTLCMD;
->+	}
->+
->+	return retval;
->+}
->+
->+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
->+		       unsigned long arg)
->+{
->+	int ret;
->+
->+	lock_sock(sock->sk);
->+	ret = vsock_do_ioctl(sock, cmd, (int __user *)arg);
->+	release_sock(sock->sk);
->+
->+	return ret;
->+}
->+
-> static const struct proto_ops vsock_dgram_ops = {
-> 	.family = PF_VSOCK,
-> 	.owner = THIS_MODULE,
->@@ -1302,7 +1356,7 @@ static const struct proto_ops vsock_dgram_ops = {
-> 	.accept = sock_no_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = sock_no_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.sendmsg = vsock_dgram_sendmsg,
->@@ -2286,7 +2340,7 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.accept = vsock_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = vsock_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.setsockopt = vsock_connectible_setsockopt,
->@@ -2308,7 +2362,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
-> 	.accept = vsock_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = vsock_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.setsockopt = vsock_connectible_setsockopt,
->
->-- 
->2.45.2
->
->
->
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
