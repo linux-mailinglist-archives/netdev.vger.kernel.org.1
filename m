@@ -1,152 +1,101 @@
-Return-Path: <netdev+bounces-107612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8659891BB0D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:08:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E35A91BB11
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E71285F65
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:08:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59649286516
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18D7152792;
-	Fri, 28 Jun 2024 09:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XXPZhHWP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030AE152DE0;
+	Fri, 28 Jun 2024 09:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6616914E2E3;
-	Fri, 28 Jun 2024 09:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F288F1509A9
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719565598; cv=none; b=S4Vpm5hZQGboXCkSmbF1OG+DqlmybGP3f8Knf4DNlCT0XbA8YgnNj9LNs+fYzGlAm36smi2tJ2dSYfK0nL95ICExdZuKDU5aj1BLwsMyIgC+8oGYhgTcKEaQxU+kO92GmatbAb4bbUxDUcQInQpWa96UAFRVlWvt5sqbYa02EPU=
+	t=1719565604; cv=none; b=lXs3BmnYR33CA29TyemGn6NHCq0xBd7O+2NacxZH1QZJACYSmXxrT0Hzps572ZaHa+HViar6XL9yjlMiz064a0QM6AXHSZXDE4vP5jQ9weBYljjTyNS+FJwcThlTXDKv9pLo8LGjVJaUa5C2HkbY7UxMndp7TdQf0ObK+wOtVys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719565598; c=relaxed/simple;
-	bh=KFR6O5apdaE005aia/eSIy/aDnoPWMXgYn13tfLkB8g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EKRfcSsidmOIy6o9QYj676pssnQcSPNpF+5xmJwnzFXvVN+YMaqyW0kLXLczpjC9cC8N7nLiRyE6yeK9NZX79A68wRJ2iZL0UW4T4AM1fqgqFtcOVnAxSgWtMLWONuraGXsdgszA4M+Q/t/T+C62eOfOJgEmfBY9o63CWtaHCn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XXPZhHWP; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1faad409ca7so10102195ad.1;
-        Fri, 28 Jun 2024 02:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719565596; x=1720170396; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uws88M38Us6mZwthahlWUK7fM6+CMa7f0lHdNpc5/ec=;
-        b=XXPZhHWP5QwN57uWYOpdmk6Gaux3myKKOf3nc9dvHIPRKclvO1+9Bv6SRs4YWb7fXo
-         99EJL8IXsa2NhD6TX9su8uf2+VXgFECijWlmsYBqEkQC3V4qk7sBRah3P9K0lQoY08qR
-         FRMkgJn677sRYGlrGnajHFdUnES0aNh7IShdXt+EBd4d0AwJD5dWIzi8spLy7SHjZPPz
-         lhSQpPjRJhRh2XdMNQ/ZOfUt4MQ0JdHtyreGG9HPT3aPYcg+sakQ0VUlPj3twOvSiPKb
-         H+rhtadKLFnNIPb/r34KiYaHYtwn0ErFhTd8mAQ4vOZUnL43BJ9s79G3bQ6hKgtbK6dV
-         OZnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719565596; x=1720170396;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uws88M38Us6mZwthahlWUK7fM6+CMa7f0lHdNpc5/ec=;
-        b=U70QX8udI8MELd5FeBLkaMmLRTUDQwJ+HGSVw2w3rOVeL4gxykvXAG636bi6XK/ipy
-         Uz5iyzCRcllVrDNRVtBQEXfhBLeauvOnyl5SQKf6LCXK+z84MH6KH8yz6tiL5zZPuQ+W
-         vUKO1HiLe6ODqTrsYY2cLpdUmFryN+iTOKqHa+QU/h4QNA+MU5GVlsg+aRdBO4WVl/XR
-         GduIoGC0Cnn3owemaG36ZRFLDu/Lbcb8r1KWertNPtbdR2TDQcb2IF2DH5LZukJqNR4e
-         0l7zdJuj/p61WztsnkYijsXdrTz6x9tldcTiSpBljfut1FTPdY9VqL/uOCihrJujhWS0
-         7k4w==
-X-Forwarded-Encrypted: i=1; AJvYcCV1GP4aohZ1kgG3orBrbhNMaf6kI3Cx4ta4OQT20zzEXOk40ls63sluWp1QE0mm4VHCbnWuuByiiHmsSxSW7kTP/GwzpaLPmWzFLluOYxsW6XgtnGsAFf+cGPsSP7G79VE5eB5x0+AI4mQJHD51cfgWteCOw1n2m4NzN2ruqdC23WcqHok4hMvYdihEMFnKSYMo7lP2CHrWQ8bU5XuquYi6mGNMZSDTXKgI8vC0+0Uz2RtCctXOhxM4eC/WnmsSg849BVYoVLhggiea6YOcnQnx9BsPGmuoArKSnQBMoIBFswo1BBWO+NNUNnmUNvqgdN5s/q+7+g==
-X-Gm-Message-State: AOJu0YyujdauGEAtCS0+BhclUwfeWFn0NvbDEs6EV7KY3SXwmWSpyL29
-	deWd3CozyCvRoYLBFZHiha0cGmHJNWl7wL9LtyMN2/yXZezq6+wObRpE8D1kBLg=
-X-Google-Smtp-Source: AGHT+IFavdIVLnysCQZL38ewD7/CaBekji3/EpakpMEZSkmUhyVQ9iiqTWsp/YgBhmvk5fMqdYz2hg==
-X-Received: by 2002:a17:903:244a:b0:1f9:e3fa:d932 with SMTP id d9443c01a7336-1fac7e975ffmr17035345ad.9.1719565596545;
-        Fri, 28 Jun 2024 02:06:36 -0700 (PDT)
-Received: from localhost.localdomain ([39.144.106.153])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10e3a1dsm10473085ad.68.2024.06.28.02.06.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Jun 2024 02:06:36 -0700 (PDT)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: torvalds@linux-foundation.org,
-	laoar.shao@gmail.com
-Cc: akpm@linux-foundation.org,
-	alexei.starovoitov@gmail.com,
-	audit@vger.kernel.org,
-	bpf@vger.kernel.org,
-	catalin.marinas@arm.com,
-	dri-devel@lists.freedesktop.org,
-	ebiederm@xmission.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-security-module@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	penguin-kernel@i-love.sakura.ne.jp,
-	rostedt@goodmis.org,
-	selinux@vger.kernel.org,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>
-Subject: [PATCH v4 11/11] drm: Replace strcpy() with __get_task_comm()
-Date: Fri, 28 Jun 2024 17:05:17 +0800
-Message-Id: <20240628090517.17994-11-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
-In-Reply-To: <20240628090517.17994-1-laoar.shao@gmail.com>
-References: <20240628085750.17367-1-laoar.shao@gmail.com>
- <20240628090517.17994-1-laoar.shao@gmail.com>
+	s=arc-20240116; t=1719565604; c=relaxed/simple;
+	bh=x2ZqB4B9q5gkwgBjNmpKXr1taQ80Dqf0dI+xalcZrIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jbxZ8G4BOsqxSZALiOdU+goUsJ+uvVKDhlG2st1MQhw8YHFqSa7z1g6paVqvMibJbjoQqPStGsYGasxpD7r1iNnEHAQ/G3nEdyCTJSnSOg1pYRbSqvX7akYtO2xsd724YcxfMxO1NhVr9MX7/qr/TK/WlKsBVDydadhn5an0WLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7Yu-00059T-UW; Fri, 28 Jun 2024 11:06:32 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7Yu-005ZR1-Aj; Fri, 28 Jun 2024 11:06:32 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sN7Yu-002PLU-0l;
+	Fri, 28 Jun 2024 11:06:32 +0200
+Date: Fri, 28 Jun 2024 11:06:32 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 7/7] net: pse-pd: pd692x0: Enhance with new
+ current limit and voltage read callbacks
+Message-ID: <Zn59GOf9Avc49qGP@pengutronix.de>
+References: <20240628-feature_poe_power_cap-v5-0-5e1375d3817a@bootlin.com>
+ <20240628-feature_poe_power_cap-v5-7-5e1375d3817a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240628-feature_poe_power_cap-v5-7-5e1375d3817a@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-To prevent erros from occurring when the src string is longer than the
-dst string in strcpy(), we should use __get_task_comm() instead. This
-approach also facilitates future extensions to the task comm.
+On Fri, Jun 28, 2024 at 10:32:00AM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> This patch expands PSE callbacks with newly introduced
+> pi_get/set_current_limit() and pi_get_voltage() callback.
+> It also add the power limit ranges description in the status returned.
+> The only way to set ps692x0 port power limit is by configure the power
+> class plus a small power supplement which maximum depends on each class.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: David Airlie <airlied@gmail.com>
----
- drivers/gpu/drm/drm_framebuffer.c     | 2 +-
- drivers/gpu/drm/i915/i915_gpu_error.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/drm_framebuffer.c b/drivers/gpu/drm/drm_framebuffer.c
-index 888aadb6a4ac..25262b07ffaf 100644
---- a/drivers/gpu/drm/drm_framebuffer.c
-+++ b/drivers/gpu/drm/drm_framebuffer.c
-@@ -868,7 +868,7 @@ int drm_framebuffer_init(struct drm_device *dev, struct drm_framebuffer *fb,
- 	INIT_LIST_HEAD(&fb->filp_head);
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
  
- 	fb->funcs = funcs;
--	strcpy(fb->comm, current->comm);
-+	__get_task_comm(fb->comm, sizeof(fb->comm), current);
- 
- 	ret = __drm_mode_object_add(dev, &fb->base, DRM_MODE_OBJECT_FB,
- 				    false, drm_framebuffer_free);
-diff --git a/drivers/gpu/drm/i915/i915_gpu_error.c b/drivers/gpu/drm/i915/i915_gpu_error.c
-index 625b3c024540..b2c16a53bd24 100644
---- a/drivers/gpu/drm/i915/i915_gpu_error.c
-+++ b/drivers/gpu/drm/i915/i915_gpu_error.c
-@@ -1411,7 +1411,7 @@ static bool record_context(struct i915_gem_context_coredump *e,
- 	rcu_read_lock();
- 	task = pid_task(ctx->pid, PIDTYPE_PID);
- 	if (task) {
--		strcpy(e->comm, task->comm);
-+		__get_task_comm(e->comm, sizeof(e->comm), task);
- 		e->pid = task->pid;
- 	}
- 	rcu_read_unlock();
+Thank you!
+
 -- 
-2.43.5
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
