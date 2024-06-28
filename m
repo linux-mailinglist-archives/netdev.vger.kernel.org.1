@@ -1,183 +1,253 @@
-Return-Path: <netdev+bounces-107614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6751091BB18
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:09:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3990691BB25
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC45C1F2128E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:09:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B587D1F21FE8
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB0815382C;
-	Fri, 28 Jun 2024 09:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9ABC15351C;
+	Fri, 28 Jun 2024 09:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3tt+TQqm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsifPcFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14973153810
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7041B152E00
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 09:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719565622; cv=none; b=ShVRNTk5qSWa4LSaF6QTdTLJIUcv3pYi9ZcCIQZqD0aUhToBKTQFqn90somqoZ2Ao6GgOMdsFz3FB+7WbvlH4WB5J9oJhemRDrqGEL6O7GryZu+9xhYDMdtsg3DGIf6FTpDZN33d/FL3AeIkKJDXIS6AOf1DV45e1NYlelSA9u8=
+	t=1719565763; cv=none; b=RYAitwyl40amM80gvVMm/+pdG17KhDzjpb4pWIMjEv99rQ88zpDBrEyPwRU9AzS+NjsYXxw+1R+9D200Si9UoDizTbKD4VdP1zaVLpQKoacxUgFJm3+FmlPWe2EqD7sEtlROe1Y7NCwlS7M/HGVPu7w2OvURKpszdlX8ppmMD60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719565622; c=relaxed/simple;
-	bh=6lILPXsSnuRcIB/1aRICDr7E5gU8xTfXClxW1Kv+tcQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BEuFOVcDK40/A+UH08zCEOs0TCyCfj7ps1DXxE4kJyWsxduYu4C6Iek1B3zQCnhtmyi4YLnipI+Q7U2SB/Y8hjLTdAP3vXk1PuZtItqIJef2DpvlKawo8Fx4sKK4SwLYnt4UaR83C0inNdCp+Kr40f0ULRA7F/VAVfCtlDMs+3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3tt+TQqm; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42562a984d3so3143155e9.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:06:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719565618; x=1720170418; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E9XuEmOGKQmnl44REDZJmwUjYzwybPJMiDqkTMARv5k=;
-        b=3tt+TQqm9H+hvHvRw7ccI2Oo6nQXQQE9yu9wC+Q+iSLf5Zc0iE2Bl912zkjMiBJnqk
-         VWRSr3ymgsntgvf3zCENLNYs5XAdQq5SmQ6v7mRQ7CAUVxS5mrVLxD1OQj66s5JP9XLu
-         UoHlmpyacSOr+/mwdjricc6g5hm+F6B0Iink9vuz9c6ThNtwiJ3Hs//S2uSrYveRAQv9
-         QnkrYMAyav1DT0mnEWhc8Coj1ULXG9D/ioYzCtxZgTADvJ3C08NHX+KozSURWF3i6AZN
-         K7x0EgCE7OeiRmDcV2vv01fOp8F64tP9WkdX19MnAi5U++lBU/8x6POmbHubaOrveG4G
-         aShg==
+	s=arc-20240116; t=1719565763; c=relaxed/simple;
+	bh=SIySpQCkV++Gn01uCQqrsxns8iu5uDxRGSSIfvZ6WqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0L4GImobdvQdFPryWt78Re2Yz1/9RLMxvTO0uK76WC2nYtzdhhq1JbybyzDvVenyEdrmo/jSVsznuqs2hFPgjfIsKWDswQeF4YDpeuS0a38DwYadgJXp5Rs+ZRjpuClkcLfToVUflPTie1SlCcMdsAZADzYcKDVOvx32alQBJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VsifPcFn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719565760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9yWBbb3piCGdDy7HD6ZzfPnqrZTOJPMpN0iR2xh32w0=;
+	b=VsifPcFn+H7KiB6cunIidud6ZM5LD3s9BL2pUWT0e/r3QTn313+FFmsZfqXmxkXltHOwgN
+	/SYQN0RKsO0aLTRGLBSQvyNVkXLr8vosuMCVI4l27fTYmZTtaAqlEffmgT6Q1XJxWsaFO1
+	zPimsbMmTsTPHqV7NiLEP/y7PAiIg6E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-556-VV5NTFziNfCAU9YHQ1KeFw-1; Fri, 28 Jun 2024 05:09:19 -0400
+X-MC-Unique: VV5NTFziNfCAU9YHQ1KeFw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-421179fd82bso3733795e9.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 02:09:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719565618; x=1720170418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E9XuEmOGKQmnl44REDZJmwUjYzwybPJMiDqkTMARv5k=;
-        b=EmbOjcuXYsOJcQEhW6JrRoRQ1r2/DfcjJKYLIK4tr7JXCXaldEEYsRTq3YvtyKCIDj
-         VaFHOnjvVZewAzol8+ECDA2qU30sFKYPtrrmp4m0yIXYQssS9ChFw2OCwc+ANIIkU1P4
-         3/rOPVJ/lJ1bELPb9u3ChOWRUEGLEbmwcIjoMTT0KRTl1jI9BsreBzIU+CBswoXZXEMj
-         yqzT+a/OofzjohaiVN17onAiDs8qCo4jOKlNUwUvuIHFigswW2k/hh42/Vr/eG8TpGLl
-         20efIiRUj4qeMWrFhY5b7IPL9uzB/fegeN2oI7+CGAsp1Qby7jczxJuXPqUBb49aVvzm
-         lIvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmdKBRndCfMHv3HzNGbc88g/vG7ZbTGzwIa1dlZ7DiMlORD/AU0nSyKYKFQWngQCGTuYxywQ3FCIjsyKTKzm8wCvwNYA/B
-X-Gm-Message-State: AOJu0Yxhd+f/8PmvPhKsexxee9mFsovJWLWbHfRS7ayGzbKP8wKrrso7
-	k6fdNNv+Ei5/GSnKOfNR4roLLNqJLCLESLVdYfSrpQgBc8AG0TL/Fx4LM6KXLHu0LwUw7KXkOqh
-	fkRlcfcA66TYSovfYMpBkcUsB6Q6slu7IRIKi
-X-Google-Smtp-Source: AGHT+IH7t15ZxEn2LETHAyDOXDZSewj9x0ofxPVWbHBdCjBgMBIveOKBhoflOM22vJXoMJ9CySG9QwFCPP9ol/FJosc=
-X-Received: by 2002:a05:6000:dcd:b0:35f:1c34:adfc with SMTP id
- ffacd0b85a97d-366e96bf06bmr10949760f8f.67.1719565618293; Fri, 28 Jun 2024
- 02:06:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719565758; x=1720170558;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9yWBbb3piCGdDy7HD6ZzfPnqrZTOJPMpN0iR2xh32w0=;
+        b=mMyWtLbFvjruoSNq6+1YTXh400bWflWYPIk7734zviW1Zw1QIFbNoFpN8tFfEESuw9
+         ZclK/EST0M21D7pGJg1Guv6aFdp0pEqvxyC/Si0E3OU25SMd+FeU4gguKjlfk1NZ+JgH
+         ORNjjH1Q6tpFxtap7ssee3W8vvLX1p1uk0u3aL3775DOuJLtSZZ3STopPhHzG3d9GPNY
+         ztgaQCtLCoo3qfq6kae7tGcFXFbaCfHVqoCcGmjg8z2F1nmu1hZGRbrJRvQIjmsm+D9A
+         HgH9ozi10d8ah3XVisSpwOtOpC7YF7L4KHcKoWA6d4YUccJPSH4mNh0rh78pji4hbITM
+         VOlg==
+X-Forwarded-Encrypted: i=1; AJvYcCVTcFPJqxwAczqKHytakEmpmt5qhh4ZaFuaQW6i6WKulpyFIn2n5qMrQt8VwRFG6Qzz3u2lM/MSUU9aKUkinigRsOK8j4oN
+X-Gm-Message-State: AOJu0Yzs9SH/Q12apwF7/pO1BFEAAvj99EXxbHF39H0KzRfTXhnUxYwO
+	lx4JzajTIjXq8yDy75gcZIt++D2jrxtAifzuPcGkj8EmGL0+Hv5y/jmSfsxqDPAvYyUzQCCsPga
+	2Ac7DJ+X3RSyie/zOXWTsno/1JH6rgLBI+Fehg5ioVFcFPHqSBU5kaQ==
+X-Received: by 2002:a05:600c:2e16:b0:425:5f25:c926 with SMTP id 5b1f17b1804b1-4255f25ca11mr49899755e9.19.1719565757850;
+        Fri, 28 Jun 2024 02:09:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLU+57BTTkzFmhEgyrNonqIAqaUPJ6LrIcPsHkgfDROh96pQSfJWSfs9ZVKQcYxxBa29DKHg==
+X-Received: by 2002:a05:600c:2e16:b0:425:5f25:c926 with SMTP id 5b1f17b1804b1-4255f25ca11mr49899415e9.19.1719565757149;
+        Fri, 28 Jun 2024 02:09:17 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.132.11])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b0c0fb3sm25546245e9.40.2024.06.28.02.09.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 02:09:16 -0700 (PDT)
+Date: Fri, 28 Jun 2024 11:09:09 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: luigi.leonardi@outlook.com
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
+ for all vsock socket types.
+Message-ID: <nasvwizxcxeu64dux7yop3bwxdpbneu2bts6ob6ahwwietoxh6@wtffmxmiq5g3>
+References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
+ <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619192131.do.115-kees@kernel.org> <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz> <202406201147.8152CECFF@keescook>
- <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz> <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
- <c5934f76-3ce8-466e-80d1-c56ebb5a158e@suse.cz>
-In-Reply-To: <c5934f76-3ce8-466e-80d1-c56ebb5a158e@suse.cz>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Fri, 28 Jun 2024 11:06:45 +0200
-Message-ID: <CAH5fLggjrbdUuT-H-5vbQfMazjRDpp2+k3=YhPyS17ezEqxwcw@mail.gmail.com>
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and family
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Kees Cook <kees@kernel.org>, 
-	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>, Christoph Lameter <cl@linux.com>, 
-	Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, 
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>, jvoisin <julien.voisin@dustri.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>, 
-	Suren Baghdasaryan <surenb@google.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
-	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 
-On Fri, Jun 28, 2024 at 10:40=E2=80=AFAM Vlastimil Babka <vbabka@suse.cz> w=
-rote:
->
-> On 6/28/24 7:35 AM, Boqun Feng wrote:
-> > On Thu, Jun 20, 2024 at 10:43:39PM +0200, Vlastimil Babka wrote:
-> >> On 6/20/24 8:54 PM, Kees Cook wrote:
-> >> > On Thu, Jun 20, 2024 at 03:56:27PM +0200, Vlastimil Babka wrote:
-> >> >> > @@ -549,6 +549,11 @@ void *kmem_cache_alloc_lru_noprof(struct kme=
-m_cache *s, struct list_lru *lru,
-> >> >> >
-> >> >> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
-> >> >> >
-> >> >> > +kmem_buckets *kmem_buckets_create(const char *name, unsigned int=
- align,
-> >> >> > +                                 slab_flags_t flags,
-> >> >> > +                                 unsigned int useroffset, unsign=
-ed int usersize,
-> >> >> > +                                 void (*ctor)(void *));
-> >> >>
-> >> >> I'd drop the ctor, I can't imagine how it would be used with variab=
-le-sized
-> >> >> allocations.
-> >> >
-> >> > I've kept it because for "kmalloc wrapper" APIs, e.g. devm_kmalloc()=
-,
-> >> > there is some "housekeeping" that gets done explicitly right now tha=
-t I
-> >> > think would be better served by using a ctor in the future. These AP=
-Is
-> >> > are variable-sized, but have a fixed size header, so they have a
-> >> > "minimum size" that the ctor can still operate on, etc.
-> >> >
-> >> >> Probably also "align" doesn't make much sense since we're just
-> >> >> copying the kmalloc cache sizes and its implicit alignment of any
-> >> >> power-of-two allocations.
-> >> >
-> >> > Yeah, that's probably true. I kept it since I wanted to mirror
-> >> > kmem_cache_create() to make this API more familiar looking.
-> >>
-> >> Rust people were asking about kmalloc alignment (but I forgot the deta=
-ils)
-> >
-> > It was me! The ask is whether we can specify the alignment for the
-> > allocation API, for example, requesting a size=3D96 and align=3D32 memo=
-ry,
-> > or the allocation API could do a "best alignment", for example,
-> > allocating a size=3D96 will give a align=3D32 memory. As far as I
-> > understand, kmalloc() doesn't support this.
->
-> Hm yeah we only have guarantees for power-or-2 allocations.
->
-> >> so maybe this could be useful for them? CC rust-for-linux.
-> >>
-> >
-> > I took a quick look as what kmem_buckets is, and seems to me that align
-> > doesn't make sense here (and probably not useful in Rust as well)
-> > because a kmem_buckets is a set of kmem_caches, each has its own object
-> > size, making them share the same alignment is probably not what you
-> > want. But I could be missing something.
->
-> How flexible do you need those alignments to be? Besides the power-of-two
-> guarantees, we currently have only two odd sizes with 96 and 192. If thos=
-e
-> were guaranteed to be aligned 32 bytes, would that be sufficient? Also do
-> you ever allocate anything smaller than 32 bytes then?
->
-> To summarize, if Rust's requirements can be summarized by some rules and
-> it's not completely ad-hoc per-allocation alignment requirement (or if it
-> is, does it have an upper bound?) we could perhaps figure out the creatio=
-n
-> of rust-specific kmem_buckets to give it what's needed?
+nit: in theory in this patch we don't support it for any of the 
+transports, so I wouldn't confuse and take that part out of the title.
 
-Rust's allocator API can take any size and alignment as long as:
+WDYT with someting like:
 
-1. The alignment is a power of two.
-2. The size is non-zero.
-3. When you round up the size to the next multiple of the alignment,
-then it must not overflow the signed type isize / ssize_t.
+     vsock: add support for SIOCOUTQ ioctl
 
-What happens right now is that when Rust wants an allocation with a
-higher alignment than ARCH_SLAB_MINALIGN, then it will increase size
-until it becomes a power of two so that the power-of-two guarantee
-gives a properly aligned allocation.
+On Wed, Jun 26, 2024 at 02:08:35PM GMT, Luigi Leonardi via B4 Relay 
+wrote:
+>From: Luigi Leonardi <luigi.leonardi@outlook.com>
+>
+>Add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
+>in AF_VSOCK.
+>The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
+>of unsent bytes in the socket. This information is transport-specific
+>and is delegated to them using a callback.
+>
+>Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> include/net/af_vsock.h   |  3 +++
+> net/vmw_vsock/af_vsock.c | 60 +++++++++++++++++++++++++++++++++++++++++++++---
+> 2 files changed, 60 insertions(+), 3 deletions(-)
+>
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index 535701efc1e5..7b5375ae7827 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -169,6 +169,9 @@ struct vsock_transport {
+> 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
+> 	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
+>
+>+	/* SIOCOUTQ ioctl */
+>+	size_t (*unsent_bytes)(struct vsock_sock *vsk);
 
-Alice
+If you want to return also errors, maybe better returning ssize_t.
+This should fix one of the error reported by kernel bots.
+
+>+
+> 	/* Shutdown. */
+> 	int (*shutdown)(struct vsock_sock *, int);
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 4b040285aa78..d6140d73d122 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -112,6 +112,7 @@
+> #include <net/sock.h>
+> #include <net/af_vsock.h>
+> #include <uapi/linux/vm_sockets.h>
+>+#include <uapi/asm-generic/ioctls.h>
+>
+> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> static void vsock_sk_destruct(struct sock *sk);
+>@@ -1292,6 +1293,59 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> }
+> EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+>
+>+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+>+			  int __user *arg)
+>+{
+>+	struct sock *sk = sock->sk;
+>+	struct vsock_sock *vsk;
+>+	int retval;
+>+
+>+	vsk = vsock_sk(sk);
+>+
+>+	switch (cmd) {
+>+	case SIOCOUTQ: {
+>+		size_t n_bytes;
+>+
+>+		if (!vsk->transport || !vsk->transport->unsent_bytes) {
+>+			retval = -EOPNOTSUPP;
+>+			break;
+>+		}
+>+
+>+		if (vsk->transport->unsent_bytes) {
+
+This if is not necessary after the check we did earlier, right?
+
+Removing it should fix the other issue reported by the bot.
+
+>+			if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
+>+				retval = -EINVAL;
+>+				break;
+>+			}
+>+
+>+			n_bytes = vsk->transport->unsent_bytes(vsk);
+>+			if (n_bytes < 0) {
+>+				retval = n_bytes;
+>+				break;
+>+			}
+>+
+>+			retval = put_user(n_bytes, arg);
+>+		}
+>+		break;
+>+	}
+>+	default:
+>+		retval = -ENOIOCTLCMD;
+>+	}
+>+
+>+	return retval;
+>+}
+>+
+>+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
+>+		       unsigned long arg)
+>+{
+>+	int ret;
+>+
+>+	lock_sock(sock->sk);
+>+	ret = vsock_do_ioctl(sock, cmd, (int __user *)arg);
+>+	release_sock(sock->sk);
+>+
+>+	return ret;
+>+}
+>+
+> static const struct proto_ops vsock_dgram_ops = {
+> 	.family = PF_VSOCK,
+> 	.owner = THIS_MODULE,
+>@@ -1302,7 +1356,7 @@ static const struct proto_ops vsock_dgram_ops = {
+> 	.accept = sock_no_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = sock_no_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.sendmsg = vsock_dgram_sendmsg,
+>@@ -2286,7 +2340,7 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>@@ -2308,7 +2362,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>
+>-- 
+>2.45.2
+>
+>
+>
+
 
