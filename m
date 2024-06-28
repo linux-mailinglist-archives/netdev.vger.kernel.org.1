@@ -1,173 +1,150 @@
-Return-Path: <netdev+bounces-107814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F48A91C6FA
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:56:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB13691C6FE
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 802A91C20F56
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:56:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1AD31C22602
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EA3770F0;
-	Fri, 28 Jun 2024 19:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0847770F3;
+	Fri, 28 Jun 2024 19:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1QRP4qY"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="POcrKtHK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836FB757ED;
-	Fri, 28 Jun 2024 19:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CC3757ED;
+	Fri, 28 Jun 2024 19:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719604590; cv=none; b=ouypSpzH/jUax3m/wmk11IsBz4r3P5FKl6PW3xjLvyky8CMt37d6vwT64WTql/Ek0hyDrrXNStRLMPPVVW3Ta8Ci+p5td+H5bBvuCvcfOmc45N+Go3GiSiWc5HvVLqPMCh+Mp57+HGK8L5UMJGAlK3SV5rmytjycSLv7L9AoerI=
+	t=1719604698; cv=none; b=CtR0aHEnnAvDUwWN2B33jQDzjz1s9uJ1R7fixmQnxL25oqgkc3kWjJPmee3RVgtVKwgmFWC9JgeppjfpzG07u8KhyHp9mha0g7U+zsg0lyU8Y5MFyVMd+pCnqpS1AY0ErpDKNPmC54jIuGGxvYQR8wn7lkqZBQUfrYSy4wl7CKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719604590; c=relaxed/simple;
-	bh=WNUsqrf9kKLdBDbBg1Et4QrK1ya69jP1HTBag2z+Xpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WA0sUMzcva4Dd2o8gkWnPuCnrQvrLk7nRfqpOTYU7DHSanHwxcMtVzd5zOw+F6E6fuAyVhAPaGO470PRbAU/N9ql2VnpkFkEbzcbGtjfBx9mBfe5Mu8G5GO3aUxrKDiKD63TaovQd7kA0hwrcli2GKepwIq629/Alt4ob32Gw98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1QRP4qY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B9BEC116B1;
-	Fri, 28 Jun 2024 19:56:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719604590;
-	bh=WNUsqrf9kKLdBDbBg1Et4QrK1ya69jP1HTBag2z+Xpo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1QRP4qYd1WbW1tuV0xygCBDeoKHICeiHRCMdM28f1vu8owfw4ukbdo3ouUNhcgm9
-	 UEBM2ChkN3tEKn/Mc3AdaLQRmF5HY+4OK1XfCBqk8LelXIOvniF0Vi+abqrGPgDO8S
-	 Pj64lWVTJm47/VXfYVZOBSL7avAB49ZGUYh0dtn+nDmJrW3u7v1lZfR+Dy2AgrywJ9
-	 A90M+/hEKBFDtDQkGe3e31VqEOWDIJgTEKRa6RfJ+RxXG3eZQUsAV6niPMTRZRvloM
-	 6nYTcpgpWbPNbuZXkPAqTwvwcnzo08nsT6C3L8MfFEhkjuv/OpFrmFKsm8NyZ11OiS
-	 S2Rx3966PrX+g==
-Date: Fri, 28 Jun 2024 21:56:26 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: bpf@vger.kernel.org
-Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com,
-	lorenzo.bianconi@redhat.com, toke@redhat.com, fw@strlen.de,
-	hawk@kernel.org, horms@kernel.org, donhunte@redhat.com,
-	memxor@gmail.com
-Subject: Re: [PATCH v5 bpf-next 0/3] netfilter: Add the capability to offload
- flowtable in XDP layer
-Message-ID: <Zn8VauqdzVbiw8mn@lore-desk>
-References: <cover.1718379122.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1719604698; c=relaxed/simple;
+	bh=HC7XejqTSDq8JmmZQR6kTmlT6s38ElC7/BJdCkeCDoE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pd+eMU6yI2kMyGN1wq/X/REyUhONtdlgr+Q1QLa6UrXejTKPvxKrvyK9r5yNNkT9v2vB4XfQ7JGVNO3Rt9WpDJaqp45jC/4FuTJS5mE64UXB8I5a6crM0y6MtPTRMxZcA4xG16I4L/30n6kX70CShKIrgeQDDkUa7xezb+ouybs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=POcrKtHK; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Sh9NkNmBlbDEM3+46XPxqidE2npRUNTYyIv5P3xGwTA=; b=POcrKtHKpHJ4edH2e1sV8hKbbq
+	DFFK9Tc5qH8t5Vug4hNLTYNByL6I6H4sR8txYjlsImlhj9w8tSsyN4jaDTLEv5y3pS8PWgt8octaw
+	Ho2ZSINdacuPDxgHF0yIjiwzc8Lun46GcCVC7TSb38WRmicfUzf4IsO+BDZxj3BSrabo=;
+Received: from p4ff13dca.dip0.t-ipconnect.de ([79.241.61.202] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1sNHj6-000Pxz-2M;
+	Fri, 28 Jun 2024 21:57:44 +0200
+Message-ID: <6c9f98de-4090-4fe2-8fa3-446c1907f50b@nbd.name>
+Date: Fri, 28 Jun 2024 21:57:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rhKzGA7qyMpLbX45"
-Content-Disposition: inline
-In-Reply-To: <cover.1718379122.git.lorenzo@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 2/2] net: airoha: Introduce ethernet support
+ for EN7581 SoC
+To: Arnd Bergmann <arnd@arndb.de>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Netdev <netdev@vger.kernel.org>, lorenzo.bianconi83@gmail.com,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Rob Herring <robh+dt@kernel.org>,
+ krzysztof.kozlowski+dt@linaro.org, Conor Dooley <conor+dt@kernel.org>,
+ devicetree@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, upstream@airoha.com,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ benjamin.larsson@genexis.eu, linux-clk@vger.kernel.org,
+ Ratheesh Kannoth <rkannoth@marvell.com>, Sunil Goutham
+ <sgoutham@marvell.com>, Andrew Lunn <andrew@lunn.ch>
+References: <cover.1718696209.git.lorenzo@kernel.org>
+ <f146a6f58492394a77f7d159f3c650a268fbe489.1718696209.git.lorenzo@kernel.org>
+ <2d74f9c1-2b46-4544-a9c2-aa470ce36f80@app.fastmail.com>
+ <Zn7ykZeBWXN3cObh@lore-desk>
+ <6b234ecb-e870-4e5b-b942-bee98e139590@app.fastmail.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <6b234ecb-e870-4e5b-b942-bee98e139590@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 28.06.24 21:34, Arnd Bergmann wrote:
+>>> > +static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
+>>> > +{
+>>> > +	struct airoha_eth *eth = dev_instance;
+>>> > +	u32 intr[ARRAY_SIZE(eth->irqmask)];
+>>> > +	int i;
+>>> > +
+>>> > +	for (i = 0; i < ARRAY_SIZE(eth->irqmask); i++) {
+>>> > +		intr[i] = airoha_qdma_rr(eth, REG_INT_STATUS(i));
+>>> > +		intr[i] &= eth->irqmask[i];
+>>> > +		airoha_qdma_wr(eth, REG_INT_STATUS(i), intr[i]);
+>>> > +	}
+>>> 
+>>> This looks like you send an interrupt Ack to each
+>>> interrupt in order to re-arm it, but then you disable
+>>> it again. Would it be possible to leave the interrupt enabled
+>>> but defer the Ack until the napi poll function is completed?
+>>
+>> I guess doing so we are not using NAPIs as expected since they are
+>> supposed to run with interrupt disabled. Agree?
+> 
+> The idea of NAPI is that you don't get the same interrupt
+> again until all remaining events have been processed.
+> 
+> How this is achieved is device dependent, and it can either
+> be done by masking the interrupt as you do here, or by
+> not rearming the interrupt if it gets turned off automatically
+> by the hardware. My guess is that writing to REG_INT_STATUS(i)
+> is the rearming here, but the device documentation should
+> clarify that. It's also possible that this is an Ack that
+> is required so you don't immediately get another interrupt.
 
---rhKzGA7qyMpLbX45
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The interrupt handling of this hardware is pretty much the same as what 
+many other devices do: the interrupt status is not automatically cleared 
+by the hardware, so the write at the beginning of the interrupt handler 
+does that explicitly.
+Within the same handler, the interrupt is then masked to ensure that it 
+does not fire again until the NAPI poll has completed.
 
-> Introduce bpf_xdp_flow_lookup kfunc in order to perform the lookup of
-> a given flowtable entry based on the fib tuple of incoming traffic.
-> bpf_xdp_flow_lookup can be used as building block to offload in XDP
-> the sw flowtable processing when the hw support is not available.
->=20
-> This series has been tested running the xdp_flowtable_offload eBPF program
-> on an ixgbe 10Gbps NIC (eno2) in order to XDP_REDIRECT the TCP traffic to
-> a veth pair (veth0-veth1) based on the content of the nf_flowtable as soon
-> as the TCP connection is in the established state:
->=20
-> [tcp client] (eno1) =3D=3D LAN =3D=3D (eno2) xdp_flowtable_offload [XDP_R=
-EDIRECT] --> veth0 =3D=3D veth1 [tcp server]
->=20
-> table inet filter {
-> 	flowtable ft {
-> 		hook ingress priority filter
-> 		devices =3D { eno2, veth0 }
-> 	}
-> 	chain forward {
-> 		type filter hook forward priority filter
-> 		meta l4proto { tcp, udp } flow add @ft
-> 	}
-> }
->=20
-> -  sw flowtable [1 TCP stream, T =3D 300s]: ~ 6.2 Gbps
-> - xdp flowtable [1 TCP stream, T =3D 300s]: ~ 7.6 Gbps
->=20
-> -  sw flowtable [3 TCP stream, T =3D 300s]: ~ 7.7 Gbps
-> - xdp flowtable [3 TCP stream, T =3D 300s]: ~ 8.8 Gbps
->=20
-> Changes since v4:
-> - add missing BPF_NO_KFUNC_PROTOTYPES macro to selftest
-> Changes since v3:
-> - move flowtable map utilities in nf_flow_table_xdp.c
-> Changes since v2:
-> - introduce bpf_flowtable_opts struct in bpf_xdp_flow_lookup signature
-> - get rid of xdp_flowtable_offload bpf sample
-> - get rid of test_xdp_flowtable.sh for selftest and rely on prog_tests in=
-stead
-> - rename bpf_xdp_flow_offload_lookup in bpf_xdp_flow_lookup
-> Changes since v1:
-> - return NULL in bpf_xdp_flow_offload_lookup kfunc in case of error
-> - take into account kfunc registration possible failures
-> Changes since RFC:
-> - fix compilation error if BTF is not enabled
+Performing the status write after the poll has completed would be wrong, 
+since that leaves open a small race window where events might be missed.
 
-Hi all,
-
-Looking at patchwork this series is marked as 'Archived' even if the eBPF b=
-its
-have been acked by Alexei while netfilter ones have been acked by Pablo.
-Am I missing something? Do I need to repost?
-
-Regards,
-Lorenzo
-
->=20
-> Akced-by: Pablo Neira Ayuso <pablo@netfilter.org>
->=20
-> Florian Westphal (1):
->   netfilter: nf_tables: add flowtable map for xdp offload
->=20
-> Lorenzo Bianconi (2):
->   netfilter: add bpf_xdp_flow_lookup kfunc
->   selftests/bpf: Add selftest for bpf_xdp_flow_lookup kfunc
->=20
->  include/net/netfilter/nf_flow_table.h         |  18 ++
->  net/netfilter/Makefile                        |   7 +-
->  net/netfilter/nf_flow_table_bpf.c             | 117 ++++++++++++
->  net/netfilter/nf_flow_table_inet.c            |   2 +-
->  net/netfilter/nf_flow_table_offload.c         |   6 +-
->  net/netfilter/nf_flow_table_xdp.c             | 163 +++++++++++++++++
->  tools/testing/selftests/bpf/config            |  13 ++
->  .../selftests/bpf/prog_tests/xdp_flowtable.c  | 168 ++++++++++++++++++
->  .../selftests/bpf/progs/xdp_flowtable.c       | 146 +++++++++++++++
->  9 files changed, 636 insertions(+), 4 deletions(-)
->  create mode 100644 net/netfilter/nf_flow_table_bpf.c
->  create mode 100644 net/netfilter/nf_flow_table_xdp.c
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_flowtable.c
->  create mode 100644 tools/testing/selftests/bpf/progs/xdp_flowtable.c
->=20
-> --=20
-> 2.45.1
->=20
-
---rhKzGA7qyMpLbX45
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZn8VagAKCRA6cBh0uS2t
-rKjVAP9T8l8M3R0UyvBSMH+HJsOO9xHw1NoSjC7aVM6BaR2gDQEAyfg4KFUMWnwH
-YiM/VNHLGewcnfDIO7SHVodd75CAMg4=
-=0igS
------END PGP SIGNATURE-----
-
---rhKzGA7qyMpLbX45--
+- Felix
 
