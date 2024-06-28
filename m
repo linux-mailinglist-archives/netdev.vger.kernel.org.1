@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-107804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC7991C69E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:31:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6360691C69F
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41845284C6B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:31:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D82DC1F25750
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2A478C6B;
-	Fri, 28 Jun 2024 19:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09E78B60;
+	Fri, 28 Jun 2024 19:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cAAXi+z2"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EdofCHxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998CC78B60
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 19:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB296762D2
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 19:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719603040; cv=none; b=XyqIiBN/2kXjiSaiURYxjWBsSUTiQSeIWiJoUiaW+yIw8EmHvKIIZH2dRioWR/gIywPbupfGW14AMRPx9Crgu7O0vroa7RFHB7xRBTUwpZ7BX8tnKmkgygfsVTNWRqR68H0V5gs5JK/lk+Zz9Ow7Cuix42zC/BpzY4eNW7fkYoo=
+	t=1719603041; cv=none; b=R30OW1mAeLQIEcP63uBEG/P/Vc8bC2t2/eLKAlcsFKqRdygYS0LenV0DBsNRimfdhw13aCIPR0QgU2canvMFFfXD/Jq86oUscgrv4tMiMwfybb+Y5TvnBkkwhjf7UbbiMzZh9TP+0NrmeruGj6DYDA3N8rf5eMh1/fIEFn2XPJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719603040; c=relaxed/simple;
-	bh=sFFLF0EpM3YF0tLpyVfZCvB4795HuB1kbHomE52blMw=;
+	s=arc-20240116; t=1719603041; c=relaxed/simple;
+	bh=xjv8WqsLurkTApHtAtrISsaD4Iey8mqMNIinFjVRfzk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KW2pA+hklEvbpjEXZmhgG7NcZFHnRFm3i8xLEQzyEbNAVTRaIyrobZpbsT0NyQRdBF+29EQsiwPVkiKzT+ddAmqxaMf8X/molfTod46AmbkF1sCFigKBYDwZjCSXO6U4U3UqirhKUKZoTHuYuzkiWdv1H3kL64VpN+d1lbVOqGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cAAXi+z2; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version:Content-Type; b=mXPDuF3TsihSkAy4bMG6u1quWZdpPZkz8Foor2RVGtt+HR/Zylp6OYdGCFRuRx2Z17nlX0UueMqQF3S5sjYaNbdDxNpQfZy+PWdvda9QcLem+WFS8jng8Ro/h7y6hGxONigrP7eNYkZ9O4fmEUreIz5PdU7lpmy9p8o7YooU/qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EdofCHxf; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fab03d2eecso6932975ad.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:30:38 -0700 (PDT)
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-71871d5e087so625912a12.1
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719603038; x=1720207838; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1719603039; x=1720207839; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HLNTQ1zAdXd/4l6XKz9YfcIIVzES0Ft4acrZvn8+rrw=;
-        b=cAAXi+z2bjNErpD9C+UM6lfPtNZqbkDTQjwNzk83M5vMlqwxPaXH2y56jOejlYhxnq
-         q8OnH724n1o7wJ8DZZgK4Ul7LVKKL6wKajPaHGLluIqwOdlmpOQd2CR1wBvmt6JVTBB4
-         RdtDy9msojhjae1AvaodOiKSiR1Jbn2GDbnTA=
+        bh=zvTVR9v4L6sSS0ncZ93rbwMU4d0T8t+SocvwTKDypO4=;
+        b=EdofCHxf6O10LGhFmcMoSqAQkonI1Oa9lyay/qyMGzQ9iM1ufj7GBDQJfsq5e9wPwK
+         knwLHmIr2w35e3FqCr3YRCp2/hbFqirqVsw57uThBmFy0R7VFpMKL0908I3Mn+HLAUug
+         F6ysuOFsTB+Y724mGovDJQNQ3t/+Vk6MCFtwY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719603038; x=1720207838;
+        d=1e100.net; s=20230601; t=1719603039; x=1720207839;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HLNTQ1zAdXd/4l6XKz9YfcIIVzES0Ft4acrZvn8+rrw=;
-        b=A/N09PqDv5ehHgtzUT7OfPD+IK3Tsh2NZ4+fY9ZELLENdEDwlumARxSoB2LKPGZGa9
-         0F5YamJ7VPsuC7wNYM3MaEat/IOtOFwVgs8CwK7JmT2eBoEk565IcG8Az9pDAZbGShrf
-         uvO10BZtwec2SpTeIXqOck7nze/1VIMZ9Awv5LKuIH3/EHZLKLqB5YxzN9x1Q6uS5479
-         f8Ob7VJlFOwB2NzmjBqOBGAlNdrI0zMq4byyu4rxWZIaOWUNigKRvCy7C4MjQVuOYq8d
-         HFuDgSaQSgfIKvwV5BBI++AtJ7g+TbgAg65kbmlTaDkQDfojb0dbiFe66t194zGy0ymg
-         aVTQ==
-X-Gm-Message-State: AOJu0YwCP7FGYvsKSMzj6fBDknkkwvmaDjHHOZ+i+qup6OhFNiz843uc
-	9Ul318H7cE0mm1aBwrbwlQuRn94Kh4sEA8NLnnTOG/P1eAZH4JXjqUVuqpVcAyGlvCRMKkH133o
-	=
-X-Google-Smtp-Source: AGHT+IFPW/OThhX0rBeawhC9PpGKFSEct85RhQcAVS9L6OrHs7Jrz84NNsS3ekXJYTcHhRVROmMU4A==
-X-Received: by 2002:a17:90b:350d:b0:2c7:b34b:12c4 with SMTP id 98e67ed59e1d1-2c858275ademr17070986a91.31.1719603037488;
-        Fri, 28 Jun 2024 12:30:37 -0700 (PDT)
+        bh=zvTVR9v4L6sSS0ncZ93rbwMU4d0T8t+SocvwTKDypO4=;
+        b=FvrQ7SHSboYvrX6OUuob1MwrrDhMEY6VKcnYGJsI5ZMnWIUf1g+0uQtdI6TLfKvP/I
+         WrbC+d60gjgRisuAuvVxju0AnXUdnpq9if7iovPdc90KFcC1DAXuvyyzFMPzoq8CLSqb
+         k/DEQiDx+UMdPxqyZ4zpVy4cQtWB45p1KViQZ7PBBx+DHlCuyzIw/r5SiPLaDRB1YHUo
+         pKX+/aTzC7hN+DGKBmjNvp0pco5NBUHnXosb7ldj1Z+Cp79epFfb/UU/famkQXxkwG8V
+         YSUAtMOX2UQgD/4pZnf3vXea3PzZFKXXgumkkyb4JCbL2djEZTUfYQH2oOHsJIlut5lp
+         /Lpw==
+X-Gm-Message-State: AOJu0Yw9JFul1Ktj2auz05ppaywhaTc9iTtnABWEs4BwBl4gwXW4Y3q+
+	lCBwaX9hAKHlFqAoy8XkEIXUVkWio/ABRBJ8sjQuc0pSVPtEGsg031DIliA3Ow==
+X-Google-Smtp-Source: AGHT+IHYEEdqgoHRNa+LKpEcaapA3+wK/RW8jSuY8wdYGIT0IOrLA3Ii0XAjstWhb6l9HmB2kUFqXw==
+X-Received: by 2002:a05:6a20:a820:b0:1bd:d5ba:e163 with SMTP id adf61e73a8af0-1bdd5bae1b7mr9536330637.26.1719603038789;
+        Fri, 28 Jun 2024 12:30:38 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c939cc9b04sm46707a91.0.2024.06.28.12.30.35
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c939cc9b04sm46707a91.0.2024.06.28.12.30.37
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Jun 2024 12:30:36 -0700 (PDT)
+        Fri, 28 Jun 2024 12:30:38 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -73,9 +72,9 @@ Cc: netdev@vger.kernel.org,
 	richardcochran@gmail.com,
 	horms@kernel.org,
 	przemyslaw.kitszel@intel.com
-Subject: [PATCH net-next v2 07/10] bnxt_en: Remove an impossible condition check for PTP TX pending SKB
-Date: Fri, 28 Jun 2024 12:30:02 -0700
-Message-ID: <20240628193006.225906-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 08/10] bnxt_en: Let bnxt_stamp_tx_skb() return error code
+Date: Fri, 28 Jun 2024 12:30:03 -0700
+Message-ID: <20240628193006.225906-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240628193006.225906-1-michael.chan@broadcom.com>
 References: <20240628193006.225906-1-michael.chan@broadcom.com>
@@ -86,87 +85,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003e827e061bf84826"
+	boundary="0000000000005307db061bf84807"
 
---0000000000003e827e061bf84826
+--0000000000005307db061bf84807
 Content-Transfer-Encoding: 8bit
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-In the current 5750X PTP code paths, there is always at most one TX
-SKB requested for timestamp and we won't accept another one until we
-have retrieved the timestamp or it has timed out.  Remove the
-unnecessary check in bnxt_get_tx_ts_p5() for a pending SKB and change
-the function to void.
+Change the function bnxt_stamp_tx_skb() to return 0 for suceess
+or -EAGAIN if the timestamp is still pending in firmware.  The
+calling PTP aux worker will reschedule based on the return code.
 
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 8 ++------
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 7 +------
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h | 2 +-
- 3 files changed, 4 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index a9741faa960c..78ccfac0644e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -837,12 +837,8 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		if (unlikely(is_ts_pkt)) {
- 			if (BNXT_CHIP_P5(bp)) {
- 				/* PTP worker takes ownership of the skb */
--				if (!bnxt_get_tx_ts_p5(bp, skb)) {
--					skb = NULL;
--				} else {
--					atomic64_inc(&bp->ptp_cfg->stats.ts_err);
--					atomic_inc(&bp->ptp_cfg->tx_avail);
--				}
-+				bnxt_get_tx_ts_p5(bp, skb);
-+				skb = NULL;
- 			}
- 		}
- 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 8431cd0ed9e9..baf191959b13 100644
+index baf191959b13..bd1e270307ec 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -750,17 +750,12 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
- 	return HZ;
+@@ -683,7 +683,7 @@ static u64 bnxt_cc_read(const struct cyclecounter *cc)
+ 	return ns;
  }
  
--int bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb)
-+void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb)
+-static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
++static int bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
  {
  	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 
--	if (ptp->txts_req.tx_skb) {
--		netdev_err(bp->dev, "deferring skb:one SKB is still outstanding\n");
--		return -EBUSY;
--	}
- 	ptp->txts_req.tx_skb = skb;
- 	ptp_schedule_worker(ptp->ptp_clock, 0);
--	return 0;
+ 	struct skb_shared_hwtstamps timestamp;
+@@ -711,7 +711,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+ 	} else {
+ 		if (!time_after_eq(jiffies, txts_req->abs_txts_tmo)) {
+ 			txts_req->txts_pending = true;
+-			return;
++			return -EAGAIN;
+ 		}
+ 		ptp->stats.ts_lost++;
+ 		netdev_warn_once(bp->dev,
+@@ -722,6 +722,8 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+ 	txts_req->tx_skb = NULL;
+ 	atomic_inc(&ptp->tx_avail);
+ 	txts_req->txts_pending = false;
++
++	return 0;
  }
  
- int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index 90f1418211e9..ee1709cda47e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -159,7 +159,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
- void bnxt_ptp_reapply_pps(struct bnxt *bp);
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
- int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
--int bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb);
-+void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb);
- int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
- void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		    struct tx_ts_cmp *tscmp);
+ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+@@ -730,12 +732,16 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+ 						ptp_info);
+ 	unsigned long now = jiffies;
+ 	struct bnxt *bp = ptp->bp;
++	int rc = 0;
+ 
+ 	if (ptp->txts_req.tx_skb)
+-		bnxt_stamp_tx_skb(bp, ptp->txts_req.tx_skb);
++		rc = bnxt_stamp_tx_skb(bp, ptp->txts_req.tx_skb);
+ 
+-	if (!time_after_eq(now, ptp->next_period))
++	if (!time_after_eq(now, ptp->next_period)) {
++		if (rc == -EAGAIN)
++			return 0;
+ 		return ptp->next_period - now;
++	}
+ 
+ 	bnxt_ptp_get_current_time(bp);
+ 	ptp->next_period = now + HZ;
+@@ -745,7 +751,7 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+ 		spin_unlock_bh(&ptp->ptp_lock);
+ 		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
+ 	}
+-	if (ptp->txts_req.txts_pending)
++	if (rc == -EAGAIN)
+ 		return 0;
+ 	return HZ;
+ }
 -- 
 2.30.1
 
 
---0000000000003e827e061bf84826
+--0000000000005307db061bf84807
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -237,14 +236,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMqf7eVaFp7aUFQTmn9zxuOMFS/l5b0p
-gNWP5muBAtzIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
-ODE5MzAzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMmhT8ONFDqdL8jH7eVJ3xbmWMUkf7bD
+EmB0LfxkkVjcMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
+ODE5MzAzOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCkEFbp+S98u4kBhXMVt0oEH999gTMqoHokAdB48r2QYeNlV27y
-TZC5bi1fSTTjaGlqZ4h7dX6xShjaKZdQb9s9GDqhGlJkxilUKKBA46NGplqAdmfTe9dTPYDLhHhf
-I8RZ0YcWNAE6ALBstQ2rCj3sPD1dNs+oLuaDl9UyK1rCLcAN/4qG1FOw3graK9dUdgKBKOfCujTW
-a/BWSXK1W9QgtKxAGueX3JpSwo52Ps7+53irnDCKObaPbSDOIEAxaeyMy/+amOEk5BfrlKYMHqwR
-tE5AC1EFBOv10JHlsuulFRUdip04XKTgSjhapeP22UGMW68S1SUBPx8PDYXg2Mi0
---0000000000003e827e061bf84826--
+ATANBgkqhkiG9w0BAQEFAASCAQCYOz8gQOa3ChenRaf9xKmOIy70uFVF8tjpmwnqwQRMM97avZza
+Pq6PajiJlgvkFOLMFgK6El6HkIbnpXgQs4J9mBfmfEfAU9sAOMemNGEQS6AunER9vCpfFEn+PWCS
+oYKidpLKJYaLsynv1GyRAPOa5tKDuGWqwRhB7/iOJVbjZ1+4jwRjVYScAN6hjQk8dITW66yk4qSs
+NpZSa7T929b2xbPp01Pw1Oed81uPhPEqAp4QqXU7V6+/F+uNSTzAUyZbOGEwzMsj0hS9Dp0WqSZ8
+nuUT6CVCqBqi1dKMmzIcm5c+9bBhDvapfP46/Gc2ZfSGcOAmw5YaeBcB/36OZRxK
+--0000000000005307db061bf84807--
 
