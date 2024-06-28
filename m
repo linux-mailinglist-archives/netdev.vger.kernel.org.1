@@ -1,127 +1,115 @@
-Return-Path: <netdev+bounces-107572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5AE91B90E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:55:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C061D91B920
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E8F91C2144D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:55:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C94DB21821
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B44D14373A;
-	Fri, 28 Jun 2024 07:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C854714373A;
+	Fri, 28 Jun 2024 07:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="eYCTCnEW"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="jH9ffnN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B802113AA40
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 07:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F197514375A
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 07:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719561309; cv=none; b=Nxv7Cdlk141+6c06DQa5TU99HwfN/jSBsatX3Waio4QLdGAEGs5rC+kFktHHF33pm2xBv3sZ64xqSypB+dVPMT/ogh4p9tDg5G77zE7NdY42wWW4hivJRP3aoCfvNpQ6fYkK3fEkiXb68SB2glr4HIPV+sZ8cZFdEqF8W5RxW0U=
+	t=1719561405; cv=none; b=BgQ8fsMKHZQfO17klQ9Sq96ryRhXx7yeNtO/jjS2n4JR4/NqeNUYrYBBE4Jd9kxjNhzQx4dS5mKH/mdGBbWLEoqlkTqh0U00KTnxiXqVwmSVoRlq0TT8ywOb7HcOGv2zMCygQX/sO42zKvuRtzMARc+5f8r8Smwudza2MTtjtH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719561309; c=relaxed/simple;
-	bh=Shw1Th3WUaSnOFjbNI7at32oQOt0mlvfcwXzXPPaV4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/vtiJLzzEF4qFK/Cl8NESe1rOjaK8xcq7y1mbaHJ7jC62Lg294v49gzm7OQ0J8KHdH3q9juKi90tPGWllCol9/rkL1+azOt8UQWcbJ5FeEuMJpKooXJtPD7Pip/a2C87hpp1Yezky8n4lJ0dOKRlAW8+v4oSg+jhjg9horFOkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=eYCTCnEW; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1719561405; c=relaxed/simple;
+	bh=pLdRKPad+qH/Af82g0rGTcCOO2LFZ7H6w8wLhBUk47Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zn4ijmfTXShVeYvVrtcs9dJgyXHWdXW1kioIcY0zIJuz6SYkntAR6JlCRtCmZNUJAiCNR/oeJhxt8xzICO7erLfRhAIzRoUqs8TkP3Eq20Vq+5MDagDp+0xf9KqYHDyiY3SkWoslNn8vq5tDF9wPe/IIyLBT27ZImZe7BEapq50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=jH9ffnN8; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42564a0d3ceso2557985e9.0
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 00:55:07 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so3900141fa.2
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 00:56:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719561306; x=1720166106; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b45V0iviWplF75Nx/Ur6UmqLyJXiIut90SMCIP5elJ0=;
-        b=eYCTCnEW9krb5wwOB49xOqR70pINeYP8nForsejSWndxMk1O6a8RZU4piolXLK5jfd
-         GDx6VtwFTDSXSArEqzVAmZ64K3HLhmBfAU905ndu0fVNjqzbozc3+lZbml+Ts5Mio/51
-         PYVDVYAk3FkR1nFIcGKrmqikub0CAIoFaygvjf8Lcxv1/vz3chUTLznd6jVbHcOZBT2O
-         2JlirM1AZXsatCosZWCNfyiMkDEyrHqK3pW/zx9ieFkQsBOmoXfoh8qsdc0FSSkMXGUV
-         UbEqTRor0nteBH6ZgLbE3R80BFF9H8HZiktwTnPscrInKanxWmc6QXdjYZ4urYlu+/Wq
-         5mCQ==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719561402; x=1720166202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pLdRKPad+qH/Af82g0rGTcCOO2LFZ7H6w8wLhBUk47Y=;
+        b=jH9ffnN8bA6i3PVEa5JFw90tu4vKUaUWX31ki9FRZ5VDa7v2cYO1LyBvTscoTlj+cG
+         BWWeiRYRbHTsdKKKrQ7uvrsBZwaW37ECrDbvpmpc3FRAYqLeNO1PLqJrnNUDmdYeL6om
+         B/Dn74GRdjMdPTiYIeaLQgpw/f9Vpfuy+asYx7RVxgK64olgbDLte4BLyZC7WSmKhVc/
+         3VAS8H4M+d6/T541TBY5SYNMnSE0GxFFx7N9C7q/ADSNIjRcsK2g9ipM35uolJfiw9Em
+         aKu1H076ZJLLiBH68OMeWWSVL5hng2Em8LI1Dzn7wjpmvHqptMR+QoeibJYO0Nq9t2E8
+         eI3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719561306; x=1720166106;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b45V0iviWplF75Nx/Ur6UmqLyJXiIut90SMCIP5elJ0=;
-        b=q72qHrpN/4NcFHtW9LKs1odd7+sdOT90bmbnsmAx/GxtLae/vrRRwkP1H5QWfdgqix
-         Kt+OMAK8wu7nyMmg8JiiR7yHGI/ogL9fyMTY4yigWJI2xxy3iu0nuQrPSvK6tv9cb2E0
-         WPyESD3rrRPhQZvnwpTGt5V9XRSGa97t3NIAhWKvHCga3UI3oUO7m1MF9UhRVCZMEtjX
-         8mKPJCWZ4kII6Eum0guN2AC3JPV6QjxeXmqURu1YJE8fEQ6s6qzyzs60yuV/o96MJbCT
-         s3PRXtrX0o6aMIIrFEsHNhtJK0tuT8QU8GA2oblzC6vr+dc+5SWCp4q6MspaK4Rm0waF
-         BEgg==
-X-Gm-Message-State: AOJu0YwFsV0it2e3fqgt5eNtIQUFcFJCDfHXqmOkm/mXmkUDhoSNhYSb
-	vy2xsV2jeKxapiND1h9GSH4XHmZrz5pdQJgC33SPAXrQPRa7Xl6OpHyHHpuWL6Q=
-X-Google-Smtp-Source: AGHT+IGiifCBBUGGMqQmM14rawGqq2VVjYx/n1+aIjV9UA+xWr/8uLSHD6yzpx9zOlGgXbQYK2R+4A==
-X-Received: by 2002:a05:600c:4fd2:b0:424:a7e7:e443 with SMTP id 5b1f17b1804b1-424a7e7e493mr65717695e9.12.1719561305874;
-        Fri, 28 Jun 2024 00:55:05 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:cb0e:590a:642a:e1f9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b068e93sm23041705e9.24.2024.06.28.00.55.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 00:55:05 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v2] net: phy: aquantia: add missing include guards
-Date: Fri, 28 Jun 2024 09:55:01 +0200
-Message-ID: <20240628075501.19090-1-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1719561402; x=1720166202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pLdRKPad+qH/Af82g0rGTcCOO2LFZ7H6w8wLhBUk47Y=;
+        b=ErtT+t9c8+zPmpIMT573nBCNVDLR7ZU3nfQT1Aai8Vqk45Xe5r+eSVJYZrHrlW+cb4
+         Br+pPnzh4lKmCAxDYXF7ix4WBFVYNBHKgHoIOqJ9ML0CFIMpMqIERVul4h0HdEymM//r
+         cnwr0i29/2wVXi32jtJApCrhzagq81ksM9Nsv/U095Bi2hk58P83JcrsdCmX3l3cvPmQ
+         Q2HeIdGd/gK5kzTZ+x6pPiJ2rO4QSS3E4isbzbf2QLMywwzW+UkPPEc6A14ZaV4dIhGa
+         oNwQOCcrzxuqfk7FQj6wKnkg1BCmEoWD44q7nUIoMO/o4XSNnNmz1quzxYUXH6N08et+
+         E0FQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrBZQJGf73Lcfpsd0/H9Z6zPHXI3N4PXloWFQsi+uyX9R2FAEq/3GFwqXILbR4cbCobon3+8GYNEf59vrRVvn5GGMeT+Lg
+X-Gm-Message-State: AOJu0YygTOpoaJvPwvb0XlwwyTzLZjsr2MZeJLoFPtGrqdKvIsx4SuXo
+	844usFwylLhTUTJV7RcU05SWJO5GJOZMWFifSFVbJn8uNQUFfLbUaSPP0XXmxkBojKBhZ7Br6Pj
+	Qq7GNRyvmQqbuQHVVv1qpBdR1Kgu3btBQ9Qq48Q==
+X-Google-Smtp-Source: AGHT+IEi/rjt/tzx5uveY9ZwgtWvUEmQ5C2WIaWtTQQNIKzh7YcTed2emx/1O+64wThFP6b9cP45dhqOdy9b5l+trV8=
+X-Received: by 2002:a2e:9684:0:b0:2ec:507f:7319 with SMTP id
+ 38308e7fff4ca-2ec5b36a98amr123270921fa.43.1719561402304; Fri, 28 Jun 2024
+ 00:56:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240627105846.22951-1-brgl@bgdev.pl> <20240627145931.480ad134@kernel.org>
+In-Reply-To: <20240627145931.480ad134@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 28 Jun 2024 09:56:31 +0200
+Message-ID: <CAMRc=MdmDezxbug461brRRq-zc=ubnyDya3dQzsmuH_6X5Pb8g@mail.gmail.com>
+Subject: Re: [RESEND PATCH net] net: phy: aquantia: add missing include guards
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Thu, Jun 27, 2024 at 11:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 27 Jun 2024 12:58:45 +0200 Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > The header is missing the include guards so add them.
+> >
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > Fixes: fb470f70fea7 ("net: phy: aquantia: add hwmon support")
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> You say net but it doesn't apply:
+>
+> Applying: net: phy: aquantia: add missing include guards
+> error: patch failed: drivers/net/phy/aquantia/aquantia.h:198
+> error: drivers/net/phy/aquantia/aquantia.h: patch does not apply
+> Patch failed at 0001 net: phy: aquantia: add missing include guards
+> --
+> pw-bot: cr
 
-The header is missing the include guards so add them.
+I resent a rebased version. However I noticed I forgot the 'net'
+prefix as I split it out of the previous series. Sorry, I hope it can
+still be applied without resending again.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Fixes: fb470f70fea7 ("net: phy: aquantia: add hwmon support")
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
-Changes since v1:
-- rebased on top of net/main
-
- drivers/net/phy/aquantia/aquantia.h | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index 1c19ae74ad2b..4830b25e6c7d 100644
---- a/drivers/net/phy/aquantia/aquantia.h
-+++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -6,6 +6,9 @@
-  * Author: Heiner Kallweit <hkallweit1@gmail.com>
-  */
- 
-+#ifndef AQUANTIA_H
-+#define AQUANTIA_H
-+
- #include <linux/device.h>
- #include <linux/phy.h>
- 
-@@ -120,3 +123,5 @@ static inline int aqr_hwmon_probe(struct phy_device *phydev) { return 0; }
- #endif
- 
- int aqr_firmware_load(struct phy_device *phydev);
-+
-+#endif /* AQUANTIA_H */
--- 
-2.43.0
-
+Bart
 
