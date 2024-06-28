@@ -1,85 +1,92 @@
-Return-Path: <netdev+bounces-107724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC2391C25A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3886691C273
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 17:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2FFF1F21E9C
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:17:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E18881F25499
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 15:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7141C9EBA;
-	Fri, 28 Jun 2024 15:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3vG/TLa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EC61C231A;
+	Fri, 28 Jun 2024 15:18:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ED015539F;
-	Fri, 28 Jun 2024 15:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118E51514E1;
+	Fri, 28 Jun 2024 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719587727; cv=none; b=Yk7+mq2jEa8w/qzoiNn4n2KbVcBMTotVL8p3IyAeAl8TAgY6eMqFEL+HkmueC6ukAxp261Q0aV7LZz+kNLXEkRZgR17XruGHTC5g2wp7Fui7dl344yvn9PugtOrESGmDt3ZfXNlOWVevPGouLHZYG1pgsQ6G7RDhZJ00IZ7BeZ0=
+	t=1719587891; cv=none; b=ONa0T2vMLZ8Jg6wA2ta2eZvXfNENgSrUdUDs0gmYMOQCVvaPL2fQuks1NH1BuQ8XztJ9ItV4X20BDMfF6GdfgF/qNm7yIzAxevbdkhgtC4R+Y10nag+Vulq7qpoXrt71Zo1z0dSyiEB3QzFAVvcry4YiVRALlYOe1rdoXbD391c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719587727; c=relaxed/simple;
-	bh=DDENOZzeHl+kBVs4BKNGyc6D6XpemEBqKAxdWnYJtOA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A2qW5k98AVJKNDmbJzEi5NSU0GgcgW+oo81LsiHHQGGHhqHjA5Z2uiHbF5PFceZJqv5gTeXS7lVun3y23nt0o4RNTL25vRjLJ61tA5wcxrCkk3Ttd7LQ3PPiEu67J0sfMf26AtNDvE0O2rE/cPuAt20QyhyVUxpV+tvh13wH2ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3vG/TLa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02DD4C116B1;
-	Fri, 28 Jun 2024 15:15:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719587727;
-	bh=DDENOZzeHl+kBVs4BKNGyc6D6XpemEBqKAxdWnYJtOA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X3vG/TLar+MiwX17rkYmtJ3PgB1s+uJ+Y/6i873DtsmGpfz5ZmgzlT5nV5yRNkskI
-	 58zMGhdPnuL5NL0ZSKvuK0G63iIlSkdH/vRHCl1Dnx9DihsiOV9uuu5eWh3gfHxcUe
-	 B3XSzq1OMLkLm4AcZ2X50gtBihEIaNtItvtfRv5aV3Yz3Zo2Nl53YnMRlYlTS4uVTD
-	 MfF5UQGgWY0AB32+mwiCqPLnXW/CnUcMtg1BN1xJfAZvDrx3JuDUVEquTkOglYnmn0
-	 74xE+uQDmHBqZJVZhCmt1EQSS1sGenazgAeudPyIPEcBQa+DaDvd7TE0y2FFZR15dj
-	 ZBPLPoEjyr9Zg==
-Date: Fri, 28 Jun 2024 08:15:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Pravin B
- Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Stefano Brivio <sbrivio@redhat.com>, =?UTF-8?B?QWRy?=
- =?UTF-8?B?acOhbg==?= Moreno <amorenoz@redhat.com>, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net-next v3 0/7] selftests: net: Switch pmtu.sh to use
- the internal ovs script.
-Message-ID: <20240628081526.66a6b5c6@kernel.org>
-In-Reply-To: <20240625172245.233874-1-aconole@redhat.com>
-References: <20240625172245.233874-1-aconole@redhat.com>
+	s=arc-20240116; t=1719587891; c=relaxed/simple;
+	bh=tWQ0zloMRzChKTql1BmkoRPH3i/mMpZLrEYoyTAh7xE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lRiHoBpRIkNko9ysm/vd25SpAore1N38tSXvtUEf9CXZahLYFJUfW8hvUigdOzEAxnWTX6III7m9X/4Rz0sElOe1CgwljRrrw79VrBaEQBdFOcVU6oGO6XxPOtxZFS2Fz5W8Qu8XDnGD4f1KMVqPRpmQPEScTZlMKPRM5tHLckg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sNDME-0005JK-Qx; Fri, 28 Jun 2024 17:17:50 +0200
+Date: Fri, 28 Jun 2024 17:17:50 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	fw@strlen.de
+Subject: Re: [PATCH nf-next 00/19] Netfilter/IPVS updates for net-next
+Message-ID: <20240628151750.GE15488@breakpoint.cc>
+References: <20240627112713.4846-1-pablo@netfilter.org>
+ <Zn1M890ZdC1WRekQ@calendula>
+ <20240627113202.72569175@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240627113202.72569175@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, 25 Jun 2024 13:22:38 -0400 Aaron Conole wrote:
-> Currently, if a user wants to run pmtu.sh and cover all the provided test
-> cases, they need to install the Open vSwitch userspace utilities.  This
-> dependency is difficult for users as well as CI environments, because the
-> userspace build and setup may require lots of support and devel packages
-> to be installed, system setup to be correct, and things like permissions
-> and selinux policies to be properly configured.
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 27 Jun 2024 13:28:51 +0200 Pablo Neira Ayuso wrote:
+> > Note for netdev maintainer: This PR is actually targeted at *net-next*.
+> > 
+> > Please, let me know if you prefer I resubmit.
+> 
+> Not a big deal, but since you offered I have another ask - looks like
+> this series makes the nf_queue test time out in our infra.
+> 
+> https://netdev.bots.linux.dev/contest.html?test=nft-queue-sh
+> 
+> Could you take a look before you respin? It used to take 24 sec,
+> not it times out after 224 sec..
 
-Hi Aaron!
+FTR, its missing update to config file:
+diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
+index 63ef80ef47a4..b2dd4db45215 100644
+--- a/tools/testing/selftests/net/netfilter/config
++++ b/tools/testing/selftests/net/netfilter/config
+@@ -87,3 +87,5 @@ CONFIG_XFRM_USER=m
+ CONFIG_XFRM_STATISTICS=y
+ CONFIG_NET_PKTGEN=m
+ CONFIG_TUN=m
++CONFIG_INET_DIAG=m
++CONFIG_SCTP_DIAG=m
 
-I merged this yesterday (with slight alphabetical reshuffling of
-the config options). The pmtu.sh test is solid now, which is great!
+so the 'wait for sctp listener to appear' takes 1m, after that the
+nfqueue listener has timed out aeons ago and sctp connect hangs until
+timeout.
 
-I also added the OvS tests themselves, and those are not passing, yet:
-https://netdev.bots.linux.dev/contest.html?test=openvswitch-sh
-Could you take a look and LMK if these are likely env issues or
-something bad in the test itself?
+But fixing the config shows the tests are very very flaky, this needs more
+work, will look into it on monday.
+
+Sorry for this.
 
