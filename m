@@ -1,198 +1,217 @@
-Return-Path: <netdev+bounces-107535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4662191B629
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:35:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B063791B665
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EF27B2261A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:35:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CB3B285B15
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 05:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9473BB21;
-	Fri, 28 Jun 2024 05:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0104A4C630;
+	Fri, 28 Jun 2024 05:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJqSI7u9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lae1uSWn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E462249F5;
-	Fri, 28 Jun 2024 05:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC663C08A;
+	Fri, 28 Jun 2024 05:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719552945; cv=none; b=urvDHG9w8mXkyXNQhblNKpa6dWHT5DXbk3grQxPtxNnko/t2QbUcMC+dLjTmZ/bX0hTjUKMijDHZ2R/giUtUufoARtIwp//jq3X0xJZsxRDO9dMTMth0rSigYC/M0kzoJgLf2J/fcBOnlBpFW60aCUKNngFBsvQnQ+/0/03VOmI=
+	t=1719553357; cv=none; b=CObl7Xg8HXf1O3iAGL6rw97GtP+diFXWQ76S1M9ci+tYnwlzlRARJN/vwIr8LM4CKaPZsnnNySAjcoX9lgu51CHQfRjQwUX7EE8MLIPZBJDAGt6U28IORqi9/mcqjdpIgbxikvQGHhNTObI+t4ZTBgWw/cH8wR95C5omKxqHN28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719552945; c=relaxed/simple;
-	bh=IlQ4xRDR9vSYKjMYL2WxDtkD3cu6REFBuu+GLyGSAG4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=orfF7QYy/lDaBT6SxP+TqkEXLng2ITZNs83uPaMuk/8+ltECjMd6U5VWTTkd5R+TSfe0DFrQ69tdF8Uw6s7oAsO+uXh8j86lgSQNGaPy5Vk7kp+JGTJ/xVlz0nnjXuaF4Fobd2nRrhS67ulOFkxHFoSSSOSGz1ZzXNmil54/kEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJqSI7u9; arc=none smtp.client-ip=209.85.217.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-48f5b8cde8cso70213137.2;
-        Thu, 27 Jun 2024 22:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719552943; x=1720157743; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BD+z54TW9IfkYnjMzOI9a5At2j/hB/YpkVnnQF4DGJY=;
-        b=XJqSI7u9OcCdxdkubtMM7TnEjllGxVVhHvmNdzPOYgOW5Y29YjWKDG/4MJmjYaCHUE
-         z0/SdtiW1srpWZb/v1sw0JP55ddjKJq24H4hAxS2X/ieOCKZpnkrj2I8QS/4SsG41Ik8
-         WhA1e6fbFjV/eBYcohw+tuHWOs6AfJM1/XVWcoAJZaiqcplD7TeujO1fRAdF3Bki961i
-         XTx+3nq9+dpMtxYH9QBgdRjGUNjueor8+GK5y9vnkNBON+kjeOskN8BoT4aKk/jeAEMr
-         L7UK+3isCIjMjt04Vs84DJual1kJgwhfHwH8VqbkotHU7VfI+Jv11dgdwVp7mcMIV6d4
-         AEuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719552943; x=1720157743;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BD+z54TW9IfkYnjMzOI9a5At2j/hB/YpkVnnQF4DGJY=;
-        b=a1G1rsPewqRvMy7pshRuLnD4FYG7hKBulFrh4nWX+zeszIfUUoem6MA52z6WOuM7Fd
-         qw11BHivSPuHeaUtp6VlIwchnPU8Gs8k15nz8vdUHPDSYgwigaktcUZY7eyXPZQpvboK
-         QovTBJ+VpmJMLdZdNr6kVUAMdXAu9PpggfYEkEuKoU7b2PfUoMQAuCwaCgU4sJec+PYB
-         dsf29utnvOy7TeoMr5v2RMcwN349xxAVzCy9dk0fk/aY6QafYNJhG2OtXIpNPDAr4nld
-         dHGo/xj5nj4CHyJerG8uVtznMGWxi6DRm567V16qPkY6f5u+oFMurVS1IUMyFEQ5kJyC
-         /5Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUgXEqsBal73R7/HlNWLOksAfBxsapEoQJqSuJSQlci85WvkRkA3KXhdvL9OjYB5bfLKG9KkWQKE4i0KjrRLFWFUb0Ra7vsgvKZBz+hz3vDpsK0iI2Xd5Wio9HDuo7FvR0xyONIeYPk4LQFVwEM/JOeUW0KAXDEX0iDJlbBvlq4A358I62wyomcodieen8+NxIXm/GRGHk0edXM+LlK06CP8sBx44=
-X-Gm-Message-State: AOJu0YyUDsxyD6Yl1M6e743kUi8lnt//iR62aEk00T5V53wEQqgdgOYA
-	YrtVdCfw0Etx1q/IQ3QjnfIyDEu2yhD/EAQ8jORKyD0D9nWv67ZB
-X-Google-Smtp-Source: AGHT+IGghsZyTtJONCT4wuQZ86eZ7o7Mbz4W7tvHc+RnW+oKueDx7rXUJ8zzubnuKDPNXOVbgLb+UQ==
-X-Received: by 2002:a05:6102:3585:b0:48f:6581:c16c with SMTP id ada2fe7eead31-48f6581c945mr15269960137.6.1719552942915;
-        Thu, 27 Jun 2024 22:35:42 -0700 (PDT)
-Received: from fauth1-smtp.messagingengine.com (fauth1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69302057sm44472385a.100.2024.06.27.22.35.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 22:35:39 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfauth.nyi.internal (Postfix) with ESMTP id EA24F1200068;
-	Fri, 28 Jun 2024 01:35:37 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Fri, 28 Jun 2024 01:35:37 -0400
-X-ME-Sender: <xms:qUt-ZmqaHNsCY2ddke710YaM0kHbtOeTvROhMLDkFljAY8kJyWCFgA>
-    <xme:qUt-ZkoXl4v7y-i9DgBt5BfK6akRpGb3_Swe22ybFRdURUKgep28o3nfuG-UazxU3
-    z7vMHdb8DN4R7SdYg>
-X-ME-Received: <xmr:qUt-ZrO-2clO789RFIEUsgbABcBZgAoBl_e63DaPSacY6BZILQ1fKGoy3g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrtdehgddutddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
-    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleeivedtgeeuhfegueeviedu
-    ffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
-    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
-    igmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:qUt-Zl5w8t43AsFIWsJa-NUmwY_FS7MDCGZSCItXjjLnbYwgUg_6CQ>
-    <xmx:qUt-Zl4QGhUHpmK463Dj9yiRePg2XjDSDMSDQX4xhmCSO_dy8GLfEA>
-    <xmx:qUt-ZlgIXIJvZSu1xj0PWO77UyYnlYyLj2zoZUqVO_WHNMsViaPdMA>
-    <xmx:qUt-Zv4ubKSy75dLhfdDogpBhQQGP5NOZzCsb0cYkQKaGTDfvbUSLw>
-    <xmx:qUt-ZgIDIdN3blAFpx8Bn6eNZrsWDKn09NV2o4P90W4cLiaFbST6-E1U>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 28 Jun 2024 01:35:37 -0400 (EDT)
-Date: Thu, 27 Jun 2024 22:35:36 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Kees Cook <kees@kernel.org>, "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
-	Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	jvoisin <julien.voisin@dustri.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>,
-	Thomas Graf <tgraf@suug.ch>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and
- family
-Message-ID: <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
-References: <20240619192131.do.115-kees@kernel.org>
- <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz>
- <202406201147.8152CECFF@keescook>
- <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz>
+	s=arc-20240116; t=1719553357; c=relaxed/simple;
+	bh=gYXXaIbnJMeu2Y5i7gFbuBfABlLzFqp1ojWyFwutkqQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=jBzjy2kRBZGN2FhOzk8GZHMyAWul6MR4GHuqNzo1iK+ZJTwAbpMmR3B4CnoC4bNb2f2BxxgWApGaACDJQ8voMZwJ0wEgL4otDtDn5MIZIs1U2b9+rFPPYQnhIpFfnF1e2oRHYq+4QFOlx98oCPNk7edqJgOzeptWTTWF/nvyn1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lae1uSWn; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1719553353; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=/jDrd4tsoE8pGQfoa2aLNAfsKwzQ0HaPA+FLDXmgUqw=;
+	b=lae1uSWnmC7+RA5WDvCpQTM994icFbobhyhD7Q9oDnIBYMhedoEjMd9WiGHuc6KHMG3SSABK6gx3zfsIn2t3LxEKOy7R9j/bh/u/e37TyiYNbAyQi0i0gBtqnmkakW92vDthj+QdnqqQ/RxO1erLt4c+kZ5gVSKSjdIMXmPoYmk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W9PB5Pu_1719553351;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W9PB5Pu_1719553351)
+          by smtp.aliyun-inc.com;
+          Fri, 28 Jun 2024 13:42:32 +0800
+Message-ID: <1719553327.3107169-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v6 05/10] virtio_net: xsk: bind/unbind xsk for rx
+Date: Fri, 28 Jun 2024 13:42:07 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
+ <20240618075643.24867-6-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtPwA2EN3xEH_T67cOQAWyZfYESso8LzeFDocJKYoXmTw@mail.gmail.com>
+In-Reply-To: <CACGkMEtPwA2EN3xEH_T67cOQAWyZfYESso8LzeFDocJKYoXmTw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz>
 
-On Thu, Jun 20, 2024 at 10:43:39PM +0200, Vlastimil Babka wrote:
-> On 6/20/24 8:54 PM, Kees Cook wrote:
-> > On Thu, Jun 20, 2024 at 03:56:27PM +0200, Vlastimil Babka wrote:
-> >> > @@ -549,6 +549,11 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
-> >> >  
-> >> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
-> >> >  
-> >> > +kmem_buckets *kmem_buckets_create(const char *name, unsigned int align,
-> >> > +				  slab_flags_t flags,
-> >> > +				  unsigned int useroffset, unsigned int usersize,
-> >> > +				  void (*ctor)(void *));
-> >> 
-> >> I'd drop the ctor, I can't imagine how it would be used with variable-sized
-> >> allocations.
-> > 
-> > I've kept it because for "kmalloc wrapper" APIs, e.g. devm_kmalloc(),
-> > there is some "housekeeping" that gets done explicitly right now that I
-> > think would be better served by using a ctor in the future. These APIs
-> > are variable-sized, but have a fixed size header, so they have a
-> > "minimum size" that the ctor can still operate on, etc.
-> > 
-> >> Probably also "align" doesn't make much sense since we're just
-> >> copying the kmalloc cache sizes and its implicit alignment of any
-> >> power-of-two allocations.
-> > 
-> > Yeah, that's probably true. I kept it since I wanted to mirror
-> > kmem_cache_create() to make this API more familiar looking.
-> 
-> Rust people were asking about kmalloc alignment (but I forgot the details)
+On Fri, 28 Jun 2024 10:19:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Jun 18, 2024 at 3:57=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > This patch implement the logic of bind/unbind xsk pool to rq.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 133 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 133 insertions(+)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index df885cdbe658..d8cce143be26 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -25,6 +25,7 @@
+> >  #include <net/net_failover.h>
+> >  #include <net/netdev_rx_queue.h>
+> >  #include <net/netdev_queues.h>
+> > +#include <net/xdp_sock_drv.h>
+> >
+> >  static int napi_weight =3D NAPI_POLL_WEIGHT;
+> >  module_param(napi_weight, int, 0444);
+> > @@ -348,6 +349,13 @@ struct receive_queue {
+> >
+> >         /* Record the last dma info to free after new pages is allocate=
+d. */
+> >         struct virtnet_rq_dma *last_dma;
+> > +
+> > +       struct {
+> > +               struct xsk_buff_pool *pool;
+> > +
+> > +               /* xdp rxq used by xsk */
+> > +               struct xdp_rxq_info xdp_rxq;
+> > +       } xsk;
+>
+> I don't see a special reason for having a container struct here.
 
-It was me! The ask is whether we can specify the alignment for the
-allocation API, for example, requesting a size=96 and align=32 memory,
-or the allocation API could do a "best alignment", for example,
-allocating a size=96 will give a align=32 memory. As far as I
-understand, kmalloc() doesn't support this.
 
-> so maybe this could be useful for them? CC rust-for-linux.
-> 
+Will fix.
 
-I took a quick look as what kmem_buckets is, and seems to me that align
-doesn't make sense here (and probably not useful in Rust as well)
-because a kmem_buckets is a set of kmem_caches, each has its own object
-size, making them share the same alignment is probably not what you
-want. But I could be missing something.
+>
+>
+> >  };
+> >
+> >  /* This structure can contain rss message with maximum settings for in=
+direction table and keysize
+> > @@ -4970,6 +4978,129 @@ static int virtnet_restore_guest_offloads(struc=
+t virtnet_info *vi)
+> >         return virtnet_set_guest_offloads(vi, offloads);
+> >  }
+> >
+> > +static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct re=
+ceive_queue *rq,
+> > +                                   struct xsk_buff_pool *pool)
+> > +{
+> > +       int err, qindex;
+> > +
+> > +       qindex =3D rq - vi->rq;
+> > +
+> > +       if (pool) {
+> > +               err =3D xdp_rxq_info_reg(&rq->xsk.xdp_rxq, vi->dev, qin=
+dex, rq->napi.napi_id);
+> > +               if (err < 0)
+> > +                       return err;
+> > +
+> > +               err =3D xdp_rxq_info_reg_mem_model(&rq->xsk.xdp_rxq,
+> > +                                                MEM_TYPE_XSK_BUFF_POOL=
+, NULL);
+> > +               if (err < 0)
+> > +                       goto unreg;
+> > +
+> > +               xsk_pool_set_rxq_info(pool, &rq->xsk.xdp_rxq);
+> > +       }
+> > +
+> > +       virtnet_rx_pause(vi, rq);
+> > +
+> > +       err =3D virtqueue_reset(rq->vq, virtnet_rq_unmap_free_buf);
+> > +       if (err) {
+> > +               netdev_err(vi->dev, "reset rx fail: rx queue index: %d =
+err: %d\n", qindex, err);
+> > +
+> > +               pool =3D NULL;
+> > +       }
+> > +
+> > +       rq->xsk.pool =3D pool;
+> > +
+> > +       virtnet_rx_resume(vi, rq);
+> > +
+> > +       if (pool)
+> > +               return 0;
+> > +
+> > +unreg:
+> > +       xdp_rxq_info_unreg(&rq->xsk.xdp_rxq);
+> > +       return err;
+> > +}
+> > +
+> > +static int virtnet_xsk_pool_enable(struct net_device *dev,
+> > +                                  struct xsk_buff_pool *pool,
+> > +                                  u16 qid)
+> > +{
+> > +       struct virtnet_info *vi =3D netdev_priv(dev);
+> > +       struct receive_queue *rq;
+> > +       struct device *dma_dev;
+> > +       struct send_queue *sq;
+> > +       int err;
+> > +
+> > +       /* In big_packets mode, xdp cannot work, so there is no need to
+> > +        * initialize xsk of rq.
+> > +        */
+> > +       if (vi->big_packets && !vi->mergeable_rx_bufs)
+> > +               return -ENOENT;
+> > +
+> > +       if (qid >=3D vi->curr_queue_pairs)
+> > +               return -EINVAL;
+> > +
+> > +       sq =3D &vi->sq[qid];
+> > +       rq =3D &vi->rq[qid];
+> > +
+> > +       /* For the xsk, the tx and rx should have the same device. The =
+af-xdp
+> > +        * may use one buffer to receive from the rx and reuse this buf=
+fer to
+> > +        * send by the tx. So the dma dev of sq and rq should be the sa=
+me one.
+> > +        *
+> > +        * But vq->dma_dev allows every vq has the respective dma dev. =
+So I
+> > +        * check the dma dev of vq and sq is the same dev.
+>
+> Not a native speaker, but it might be better to say "xsk assumes ....
+> to be the same device". And it might be better to replace "should"
+> with "must".
 
-Regards,
-Boqun
+Will fix.
 
-> >> I don't think any current kmalloc user would
-> >> suddenly need either of those as you convert it to buckets, and definitely
-> >> not any user converted automatically by the code tagging.
-> > 
-> > Right, it's not needed for either the explicit users nor the future
-> > automatic users. But since these arguments are available internally,
-> > there seems to be future utility,  it's not fast path, and it made things
-> > feel like the existing API, I'd kind of like to keep it.
-> > 
-> > But all that said, if you really don't want it, then sure I can drop
-> > those arguments. Adding them back in the future shouldn't be too
-> > much churn.
-> 
-> I guess we can keep it then.
-> 
+Thanks.
+
+
+>
+> Others look good.
+>
+> Thanks
+>
 
