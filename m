@@ -1,174 +1,159 @@
-Return-Path: <netdev+bounces-107567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CC791B836
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:23:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0AE91B889
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B0A1C212A2
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:23:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B9401F22647
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 07:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A631013E3FD;
-	Fri, 28 Jun 2024 07:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB09013FD9D;
+	Fri, 28 Jun 2024 07:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="FOQErfZa"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MxypDuw4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BB614372B
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 07:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F393B29D;
+	Fri, 28 Jun 2024 07:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719559350; cv=none; b=am0XSueQRCuwGCB96tUA3SdEb3jFSCLQYT9QV36X5wI9eoMdrSVT6KyBHHhnWZLmuTayaFLWMGb2+MQkHPpMsWHWZOrGwEkDCqrlf7YNHTgMpS3LfbPR0o2F0oIZmIp9wHCeH31NPdT+yNb+LQAw03WUk1RRXTeb8T+wXQyVz6g=
+	t=1719560221; cv=none; b=dGOvB3oBHcOQF36FjJK2S8bEv1VoNQXZmsS45gQPtU0bCB+CULze3fMjFcyZF/Ot1YL/3uaqeHc/lFyzRURWCgdWvam7De+2hNKlMMW/aqvf7Wl1qMNLusPgq6Upwn7pzAsmU+J+U3lq8j9LDRO79YO8knv/0tLKnKBhenSDzFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719559350; c=relaxed/simple;
-	bh=a8cCohTKWTSk+klZedjaNxkZe8pRILhJIqkF6oomqmM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hFh6aQRG9HFBvQj7hlK7JVo2OtWjwoAtVnF3aUDstF91k2M+z+OPDIOxzxsCneun+MPYLmdECe4oKJEadGG6S8Ek6NSRbUxMhtI9212OBSlwfRKZwDoSNJooXK9M64JRPJ/P/RwOE3ExxJX7mqEVBAX5FjF4DTpAXS2lQxFslnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=FOQErfZa; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a727d9dd367so30887666b.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 00:22:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719559347; x=1720164147; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mnYsCeVsFxB9gW97f97uREWVYGGY9Zu5LkLH7hxYVE8=;
-        b=FOQErfZaziRkiVhNpKBANTKPdm76sT9R1h+chCZTXYjoTYgfY+Jv9HmIrSvdbjMNhJ
-         v0OQVdhALDBSmyMRXkjjKNPPHQnNpFwQ8H7akM/X0cO7plAU2CgbqcbXxxTieySZRgXS
-         sbpZJxqV5kP7FUeLXnWg3kNrk2UGOo+LW7cvVloZn+G6ZmICI5Qj7GzVYFJzwBkfJ34d
-         7/50eoUPV0tS8oUeo5a7tIKpvEAqnlu2ldvZcW1pD01ryBtnDyNIot8vrS4BJeREEt0c
-         +yaSEpObVFNMFlXL+JSnT+E3+XNLH0+g+sEALiGHRSa5aC1t/A6ra0bh6zPpkVVjWXUR
-         H06g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719559347; x=1720164147;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mnYsCeVsFxB9gW97f97uREWVYGGY9Zu5LkLH7hxYVE8=;
-        b=ElZeQPrjzIJPGTByw4ydFMuJbP4gOTwafRX+sfgP9/+k1nvFYQFAUY+WjYv5e6QF8g
-         cA7Bx0dlbfuqlIviYSlQWRO4JfNRUgM81cw1R0r6LK+Gwd/8W0z2OZhybYGgo7QfiLjA
-         jy3+weuRmcCiwa4izMXoHqLoJYXoACPSW+L0VipOZUXa01WpWdUQNM7dqcBmjqXPnFZt
-         mI5E2At//Cpwwj9m9oWJ//dO/0yOrcQ446p5cYCV383n4c5m63XvGpZSCLjtRjD4a2Wo
-         bOspfkEp7b3XKtSRccGgDlIk5/ipEyVQAutkuW4P2dFufJixLte/E1Jfc5fQfnMqP5Hy
-         GAiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEvr+6cBO7u77k436AmK6/lm4rpaJeanmD7SCujbzKgVWKNqDCg5MRQMWLorkwa+xe5DjL8ShNbaxZZ7GUZsq+9PmOPsMo
-X-Gm-Message-State: AOJu0YzhEKUvkf4gZ+YrsWPrY4Hkw9rblKVFhW0KUNv8fDlNsV36lELy
-	/vI0lUK1GVfvJNhf44SUF/kZ+xiYI4jaapuGIgMtq56S7/gh8nPAmjC1KVrFk0E=
-X-Google-Smtp-Source: AGHT+IE3TJL3OMrzex7yJ6C9J0G308h/Ih0UGZde2vdvleZeu7e8Jj1fkZIDSYrI6Vflek25XytTpA==
-X-Received: by 2002:a17:907:a649:b0:a72:8135:2d4f with SMTP id a640c23a62f3a-a7281352e3cmr730983366b.48.1719559346964;
-        Fri, 28 Jun 2024 00:22:26 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab0b3475sm47959366b.195.2024.06.28.00.22.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jun 2024 00:22:26 -0700 (PDT)
-Message-ID: <8e978679-4145-445c-88ad-f98ffec6facb@blackwall.org>
-Date: Fri, 28 Jun 2024 10:22:25 +0300
+	s=arc-20240116; t=1719560221; c=relaxed/simple;
+	bh=92AGGsrcbotljDKeMUOW1yDTBBo1NNwetVgmd8RhVRo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HY0VrTMA7JNK9l3uhw4ToOGZOz6vB7ZuGZRC0aO91gRjNl9cAEwblpAPKcaFJAwq00Of8wuH9MJmHj+6qRHd2Wm3BJE++yeFjtk5/4Vr5aW/wPpHyrwGg9j/Eji40ndcf2ikFxA25JwmwpZayAP4bwmEVr+lG7Dbz+o2oGQQPJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=MxypDuw4; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=qOVWR
+	6aXQqry3nItjJ+e8OBR8po78qC5/g5g+JfJjCI=; b=MxypDuw48EkSGFXIK/dnP
+	LsAsEAto02A5B4vqM23ACVUX7OuUa9pXMH/cL+UEc/AW6edPk/ZESoff5aBzZrvv
+	TlNusJkKPkjOLmjO72xfQTGNeUkt+tV6QyR5WAw22z5DDTsoUZPmg/ha8pu/ncjM
+	EauPW59a9sI7ybgdSB5aHE=
+Received: from localhost.localdomain (unknown [112.97.61.84])
+	by gzga-smtp-mta-g2-3 (Coremail) with SMTP id _____wD3X37sZ35mLRo3Ag--.8195S2;
+	Fri, 28 Jun 2024 15:36:14 +0800 (CST)
+From: Slark Xiao <slark_xiao@163.com>
+To: manivannan.sadhasivam@linaro.org,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	quic_jhugo@quicinc.com
+Cc: netdev@vger.kernel.org,
+	mhi@lists.linux.dev,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Slark Xiao <slark_xiao@163.com>
+Subject: [PATCH v3 1/3] bus: mhi: host: Add Foxconn SDX72 related support
+Date: Fri, 28 Jun 2024 15:36:05 +0800
+Message-Id: <20240628073605.1447218-1-slark_xiao@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Hangbin Liu <liuhangbin@gmail.com>,
- Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
- Jiri Pirko <jiri@resnulli.us>, Amit Cohen <amcohen@nvidia.com>
-References: <20240626075156.2565966-1-liuhangbin@gmail.com>
- <20240626145355.5db060ad@kernel.org> <1429621.1719446760@famine>
- <Zn0iI3SPdRkmfnS1@Laptop-X1>
- <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
- <Zn05dMVVlUmeypas@Laptop-X1>
- <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
- <Zn1mXRRINDQDrIKw@Laptop-X1> <1467748.1719498250@famine>
- <Zn4po-wJoFat3CUd@Laptop-X1>
- <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
-Content-Language: en-US
-In-Reply-To: <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3X37sZ35mLRo3Ag--.8195S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxur15Kry7Zw47JF4rKw4UArb_yoW5KrykpF
+	s3Z3yUta1kJFWrKFW8A34DG3Z5GrsxCr93KFnrKw1Igw1Yy3yYqFZ7K342kryYy3sFqryS
+	yF95WFy293ZrJF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRu6wZUUUUU=
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiNQ8MZGV4IU3ZaQAAsT
 
-On 28/06/2024 10:04, Nikolay Aleksandrov wrote:
-> On 28/06/2024 06:10, Hangbin Liu wrote:
->> On Thu, Jun 27, 2024 at 07:24:10AM -0700, Jay Vosburgh wrote:
->>> Hangbin Liu <liuhangbin@gmail.com> wrote:
->>>> Ah.. Yes, that's a sad fact :(
->>>
->>> 	There are basically two paths that will change the LACP state
->>> that's passed up via netlink (the aggregator ID, and actor and partner
->>> oper port states): bond_3ad_state_machine_handler(), or incoming
->>> LACPDUs, which call into ad_rx_machine().  Administrative changes to the
->>
->> Ah, thanks, I didn't notice this. I will also enable lacp notify
->> in ad_rx_machine().
->>
->>> bond will do it too, like adding or removing interfaces, but those
->>> originate in user space and aren't happening asynchronously.
->>>
->>> 	If you want (almost) absolute reliability in communicating every
->>> state change for the state machine and LACPDU processing, I think you'd
->>> have to (a) create an object with the changed state, (b) queue it
->>> somewhere, then (c) call a workqueue event to process that queue out of
->>> line.
->>
->> Hmm... This looks too complex. If we store all the states. A frequent flashing
->> may consume the memory. If we made a limit for the queue, we may still loosing
->> some state changes.
->>
->> I'm not sure which way is better.
->>
->>>
->>>>> It all depends on what are the requirements.
->>>>>
->>>>> An uglier but lockless alternative would be to poll the slave's sysfs oper state,
->>>>> that doesn't require any locks and would be up-to-date.
->>>>
->>>> Hmm, that's a workaround, but the admin need to poll the state frequently as
->>>> they don't know when the state will change.
->>>>
->>>> Hi Jay, are you OK to add this sysfs in bonding?
->>>
->>> 	I think what Nik is proposing is for your userspace to poll the
->>> /sys/class/net/${DEV}/operstate.
->>
-> 
-> Actually I was talking about:
->  /sys/class/net/<bond port>/bonding_slave/ad_actor_oper_port_state
->  /sys/class/net/<bond port>/bonding_slave/ad_partner_oper_port_state
-> etc
-> 
-> Wouldn't these work for you?
-> 
+Align with Qcom SDX72, add ready timeout item for Foxconn SDX72.
+And also, add firehose support since SDX72.
 
-But it gets much more complicated, I guess it will be easier to read the
-proc bond file with all the LACP information. That is under RCU only as
-well.
+Signed-off-by: Slark Xiao <slark_xiao@163.com>
+---
+v2: (1). Update the edl file path and name (2). Set SDX72 support
+trigger edl mode by default
+v3: Divide into 2 parts for Foxconn sdx72 platform
+---
+ drivers/bus/mhi/host/pci_generic.c | 43 ++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
->> OK. There are 2 scenarios I got.
->>
->> 1) the local user want to get the local/partner state and make sure not
->> send pkts before they are in DISTRIBUTING state to avoid pkts drop, Or vice
->> versa. Only checking link operstate or up/down status is not enough.
->>
->> 2) the admin want to get the switch/partner status via LACP status incase
->> the switch is crashed.
->>
->> Do you have any suggestion for the implementation?
->>
->> Thanks
->> Hangbin
-> 
+diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
+index 35ae7cd0711f..1fb1c2f2fe12 100644
+--- a/drivers/bus/mhi/host/pci_generic.c
++++ b/drivers/bus/mhi/host/pci_generic.c
+@@ -399,6 +399,8 @@ static const struct mhi_channel_config mhi_foxconn_sdx55_channels[] = {
+ 	MHI_CHANNEL_CONFIG_DL(13, "MBIM", 32, 0),
+ 	MHI_CHANNEL_CONFIG_UL(32, "DUN", 32, 0),
+ 	MHI_CHANNEL_CONFIG_DL(33, "DUN", 32, 0),
++	MHI_CHANNEL_CONFIG_UL_FP(34, "FIREHOSE", 32, 0),
++	MHI_CHANNEL_CONFIG_DL_FP(35, "FIREHOSE", 32, 0),
+ 	MHI_CHANNEL_CONFIG_HW_UL(100, "IP_HW0_MBIM", 128, 2),
+ 	MHI_CHANNEL_CONFIG_HW_DL(101, "IP_HW0_MBIM", 128, 3),
+ };
+@@ -419,6 +421,16 @@ static const struct mhi_controller_config modem_foxconn_sdx55_config = {
+ 	.event_cfg = mhi_foxconn_sdx55_events,
+ };
+ 
++static const struct mhi_controller_config modem_foxconn_sdx72_config = {
++	.max_channels = 128,
++	.timeout_ms = 20000,
++	.ready_timeout_ms = 50000,
++	.num_channels = ARRAY_SIZE(mhi_foxconn_sdx55_channels),
++	.ch_cfg = mhi_foxconn_sdx55_channels,
++	.num_events = ARRAY_SIZE(mhi_foxconn_sdx55_events),
++	.event_cfg = mhi_foxconn_sdx55_events,
++};
++
+ static const struct mhi_pci_dev_info mhi_foxconn_sdx55_info = {
+ 	.name = "foxconn-sdx55",
+ 	.fw = "qcom/sdx55m/sbl1.mbn",
+@@ -488,6 +500,28 @@ static const struct mhi_pci_dev_info mhi_foxconn_dw5932e_info = {
+ 	.sideband_wake = false,
+ };
+ 
++static const struct mhi_pci_dev_info mhi_foxconn_t99w515_info = {
++	.name = "foxconn-t99w515",
++	.edl = "fox/sdx72m/edl.mbn",
++	.edl_trigger = true,
++	.config = &modem_foxconn_sdx72_config,
++	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
++	.dma_data_width = 32,
++	.mru_default = 32768,
++	.sideband_wake = false,
++};
++
++static const struct mhi_pci_dev_info mhi_foxconn_dw5934e_info = {
++	.name = "foxconn-dw5934e",
++	.edl = "fox/sdx72m/edl.mbn",
++	.edl_trigger = true,
++	.config = &modem_foxconn_sdx72_config,
++	.bar_num = MHI_PCI_DEFAULT_BAR_NUM,
++	.dma_data_width = 32,
++	.mru_default = 32768,
++	.sideband_wake = false,
++};
++
+ static const struct mhi_channel_config mhi_mv3x_channels[] = {
+ 	MHI_CHANNEL_CONFIG_UL(0, "LOOPBACK", 64, 0),
+ 	MHI_CHANNEL_CONFIG_DL(1, "LOOPBACK", 64, 0),
+@@ -720,6 +754,15 @@ static const struct pci_device_id mhi_pci_id_table[] = {
+ 	/* DW5932e (sdx62), Non-eSIM */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe0f9),
+ 		.driver_data = (kernel_ulong_t) &mhi_foxconn_dw5932e_info },
++	/* T99W515 (sdx72) */
++	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe118),
++		.driver_data = (kernel_ulong_t) &mhi_foxconn_t99w515_info },
++	/* DW5934e(sdx72), With eSIM */
++	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe11d),
++		.driver_data = (kernel_ulong_t) &mhi_foxconn_dw5934e_info },
++	/* DW5934e(sdx72), Non-eSIM */
++	{ PCI_DEVICE(PCI_VENDOR_ID_FOXCONN, 0xe11e),
++		.driver_data = (kernel_ulong_t) &mhi_foxconn_dw5934e_info },
+ 	/* MV31-W (Cinterion) */
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_THALES, 0x00b3),
+ 		.driver_data = (kernel_ulong_t) &mhi_mv31_info },
+-- 
+2.25.1
 
 
