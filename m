@@ -1,189 +1,151 @@
-Return-Path: <netdev+bounces-107631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C2791BC4D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 12:11:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DDE91BC2A
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 12:06:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 482D2B230C0
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:11:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCC871C22328
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67805155359;
-	Fri, 28 Jun 2024 10:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NF0XEaJw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DF415382F;
+	Fri, 28 Jun 2024 10:06:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837101103;
-	Fri, 28 Jun 2024 10:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1453C1103;
+	Fri, 28 Jun 2024 10:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719569436; cv=none; b=PqDxy7K5mAAjmMVF4z5i3rOB/g0ZxH4d4tV/JA0gkBrcsZhtjyABvRzAVL2UT3Hdm+JR0BAQ+J52Bh3TQXRHy/vLpzNM4mDFv1I0jqQE4Dbo26Y/FVZoYqbywxmu41FI977NyDUJr8ymWg+8HVUNsclThSa/3in5p3tTxBV8d8s=
+	t=1719569174; cv=none; b=qMPbJex4apzcvK4YAf5VTryzzeCGnWusP3/dZa2Uv8h+7m469jVRkejVnqo28JYFp63tHKYyPcoXVkP4B0q4K3U2kwcNFal4i0KWUZJDwlvMZpZjBbSz1E3qYdV3Fp8xVYSsOtnWRmF745hIV1QcaCOvdJV4Wc4tIWXkpQ07BSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719569436; c=relaxed/simple;
-	bh=K94KMvBSXhAu/31lsvMQcNpt1QEBEngszk5FchDEdAc=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=YCrAZxJUUqHs6vpJTUz2hkkoHCr85KYHn3Syw8cRJnSIs77iKDh9ZZO2FIk8ZVlAQMhrC7j7ziyhiffU1+o98X1q0AZKBPcorODTgHWRqbBMqkY+8HlL2cwdjZHfkHrVyVdk73IKK4OCPWCehbqzI4kvZXNNrlD2nZUSLaHRr84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NF0XEaJw; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52cdb0d8107so497269e87.1;
-        Fri, 28 Jun 2024 03:10:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719569433; x=1720174233; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JoVOae80H1zl51jGISvif7zbZc8/4VB5Y/Zsc6sy8rw=;
-        b=NF0XEaJwdNBW2CijSK+FTHzcdgGW5jiu15I0WTIo4DMWAb1LDlVL65PWuStIn8u79a
-         Vg6BGYT9IRcKDIE/StfqWPehO7HpxAoSS4+rW8NkpqwuWcDUb8msZLCDfzjJt8kP82KT
-         8lF6LbT1ku47IDcuLuWxRAEu89Jy0uFEnQKvxcKy9sv5Iu/AZl+k1ZE0e6cXt0WkCGNd
-         ytj7E0zTQAVGs7VksqVwv1jVeH950/BmhXvaWbrteuFRuv6pOavaD/GXvAAQ6zBuDhtB
-         KAAhCuoFpO/IwXF1FFf9InOovznqu2KJrvkQjGIsn1uCGFHI5fXoENtgNeY8NSPk8P5p
-         yY8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719569433; x=1720174233;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JoVOae80H1zl51jGISvif7zbZc8/4VB5Y/Zsc6sy8rw=;
-        b=T3N4PKN3y3wv/fHBdMzq9V8wDPSQYBjnQhXfyM8jVy/swXmXpDmzAj7zfyklLAsYgo
-         ZN9geXv06upcsepjYtwpVk0BlBV9zXte2yYyM09JyczuimR7MN999XuVXGoihdxNSo6T
-         Y5HMlEWuQB2GJBcnnici5q368w5TVf5rkgpLeAlpmFjpkhcR2nw0j9k80uhPcjto2Lhj
-         vBRI3d6yVo6t8ZDubmXnlRDUCA9XVeULUQ9+WvA5U7jYIUi1MgAJ2GYCq86qAhFHXfPs
-         LsksqVxeHvDmgr+xNzIuvKudbPAHxnOUIcraJgny5PlPYzexYp7JojtcrgJB6MSdv6p2
-         gMjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpZkMAU5Qy8anWhV9QYpekgAu/Oagv+PFboR5RiELyZJcu9RAlrj1WAQZsW+EHxc8fGElYSqJ+kK4Pr3mbs+bEai5TTH0aqpdokC+qmfRvA3DVg6jP9nPEGAJXp8ZiH5pij40OUAASD7UmRzIn5uLdz1csjJedSkMal6UUUwvIa2NtftP/URAT/74wr9nNO+jQ3HZKFEGoypPfTadWs1vSxFjTOAwBe0d6DRMWjT8BO3+3Cczj3DfVpeh5XqqrEed4sezPz8A2kgpHB/W1IAe9D+ATpVQGipYll38K/cVewL8UlHoqIjmlsk9VXd7vHmnN0MshF9vu5PadDRsbpJI3BNd6l/0aYTRAQwhn94DLpFQ308YvgaBzB+c7vilAWRJBBHxCFMtJUErmFG0Fh/wwb4+n4Z3mHEuVoj9LAFSmxohDVa4RFylZrYIl35/Ot9fE7JX3avT5RhNOe6snTii9yMQLzZNv4qwFHK4oNw==
-X-Gm-Message-State: AOJu0YyhVZ2+evcwbtHVjqXEvxtDfrES3nj8s7xQzyWaKI+bQu6rOUYI
-	CxuQE61ET/AdRe2IqvbXg618tn7uQkc0kZ97awCTiBBMWQSVmrHq
-X-Google-Smtp-Source: AGHT+IFKCvR38XvVqm5Um9a+klNoommoEfbRwaz/Xc5lSqRtlPbKvQJbMiSu5WsIA9vNHRnXI96lzA==
-X-Received: by 2002:a19:f012:0:b0:52c:8024:1db with SMTP id 2adb3069b0e04-52cdf82671amr9494131e87.63.1719569432448;
-        Fri, 28 Jun 2024 03:10:32 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:49ff:2a2d:712c:9944])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256af5b66csm27439095e9.18.2024.06.28.03.10.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 03:10:31 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-doc@vger.kernel.org,  linux-alpha@vger.kernel.org,
-  linux-mips@vger.kernel.org,  linux-parisc@vger.kernel.org,
-  sparclinux@vger.kernel.org,  linux-trace-kernel@vger.kernel.org,
-  linux-arch@vger.kernel.org,  bpf@vger.kernel.org,
-  linux-kselftest@vger.kernel.org,  linux-media@vger.kernel.org,
-  dri-devel@lists.freedesktop.org,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  Richard Henderson
- <richard.henderson@linaro.org>,  Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>,  Matt Turner <mattst88@gmail.com>,  Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>,  "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>,  Helge Deller <deller@gmx.de>,
-  Andreas Larsson <andreas@gaisler.com>,  Jesper Dangaard Brouer
- <hawk@kernel.org>,  Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-  Steven Rostedt <rostedt@goodmis.org>,  Masami Hiramatsu
- <mhiramat@kernel.org>,  Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>,  Arnd Bergmann <arnd@arndb.de>,  Alexei
- Starovoitov <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,
-  Andrii Nakryiko <andrii@kernel.org>,  Martin KaFai Lau
- <martin.lau@linux.dev>,  Eduard Zingerman <eddyz87@gmail.com>,  Song Liu
- <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  John
- Fastabend <john.fastabend@gmail.com>,  KP Singh <kpsingh@kernel.org>,
-  Stanislav Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri
- Olsa <jolsa@kernel.org>,  Steffen Klassert <steffen.klassert@secunet.com>,
-  Herbert Xu <herbert@gondor.apana.org.au>,  David Ahern
- <dsahern@kernel.org>,  Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-  Shuah Khan <shuah@kernel.org>,  Sumit Semwal <sumit.semwal@linaro.org>,
-  =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,  Bagas
- Sanjaya
- <bagasdotme@gmail.com>,  Christoph Hellwig <hch@infradead.org>,  Nikolay
- Aleksandrov <razor@blackwall.org>,  Pavel Begunkov
- <asml.silence@gmail.com>,  David Wei <dw@davidwei.uk>,  Jason Gunthorpe
- <jgg@ziepe.ca>,  Yunsheng Lin <linyunsheng@huawei.com>,  Shailend Chand
- <shailend@google.com>,  Harshitha Ramamurthy <hramamurthy@google.com>,
-  Shakeel Butt <shakeel.butt@linux.dev>,  Jeroen de Borst
- <jeroendb@google.com>,  Praveen Kaligineedi <pkaligineedi@google.com>,
-  Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCH net-next v15 02/14] net: netdev netlink api to bind
- dma-buf to a net device
-In-Reply-To: <20240628003253.1694510-3-almasrymina@google.com> (Mina Almasry's
-	message of "Fri, 28 Jun 2024 00:32:39 +0000")
-Date: Fri, 28 Jun 2024 11:04:27 +0100
-Message-ID: <m27ce9cris.fsf@gmail.com>
-References: <20240628003253.1694510-1-almasrymina@google.com>
-	<20240628003253.1694510-3-almasrymina@google.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1719569174; c=relaxed/simple;
+	bh=PNSoFvOSJj+NqpkoD1kr4B6BNyIZCnBE5tZ8DQc88ko=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EcEFfETJMvznYci2il5+nzGlqvLHw2uIQU79hLcL9Ti0PQRCBUPHnqRfWEkYBpy7wOOybIxAYa42T0cInX2LvsQ+OnlAzDu4YXSqGlRVuJhm+m1BZyz38q0aK4XT9PtaMCWqQhimLUhFZaMgEp+nDT0qssMgnxB4RD6S72ekL58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45SA5U3m8241953, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 45SA5U3m8241953
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Jun 2024 18:05:30 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 28 Jun 2024 18:05:31 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 28 Jun 2024 18:05:30 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Fri, 28 Jun 2024 18:05:30 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Joe Damato <jdamato@fastly.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v21 02/13] rtase: Implement the .ndo_open function
+Thread-Topic: [PATCH net-next v21 02/13] rtase: Implement the .ndo_open
+ function
+Thread-Index: AQHaxf/sEAgcLIB15E2ANY/J/AeALbHbT6EAgAGo9ZA=
+Date: Fri, 28 Jun 2024 10:05:30 +0000
+Message-ID: <874d99a1ed984ef09a332855bafaedb5@realtek.com>
+References: <20240624062821.6840-1-justinlai0215@realtek.com>
+ <20240624062821.6840-3-justinlai0215@realtek.com>
+ <Zn2WPhHOgBZFEvPE@LQ3V64L9R2>
+In-Reply-To: <Zn2WPhHOgBZFEvPE@LQ3V64L9R2>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 
-Mina Almasry <almasrymina@google.com> writes:
-> +  -
-> +    name: bind-dmabuf
-> +    attributes:
-> +      -
-> +        name: ifindex
-> +        doc: netdev ifindex to bind the dma-buf to.
+>=20
+> On Mon, Jun 24, 2024 at 02:28:10PM +0800, Justin Lai wrote:
+>=20
+> [...]
+>=20
+> > +static int rtase_open(struct net_device *dev) {
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     const struct pci_dev *pdev =3D tp->pdev;
+> > +     struct rtase_int_vector *ivec;
+> > +     u16 i =3D 0, j;
+> > +     int ret;
+> > +
+> > +     ivec =3D &tp->int_vector[0];
+> > +     tp->rx_buf_sz =3D RTASE_RX_BUF_SIZE;
+> > +
+> > +     ret =3D rtase_alloc_desc(tp);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     ret =3D rtase_init_ring(dev);
+> > +     if (ret)
+> > +             goto err_free_all_allocated_mem;
+> > +
+> > +     rtase_hw_config(dev);
+> > +
+> > +     if (tp->sw_flag & RTASE_SWF_MSIX_ENABLED) {
+> > +             ret =3D request_irq(ivec->irq, rtase_interrupt, 0,
+> > +                               dev->name, ivec);
+> > +             if (ret)
+> > +                     goto err_free_all_allocated_irq;
+> > +
+> > +             /* request other interrupts to handle multiqueue */
+> > +             for (i =3D 1; i < tp->int_nums; i++) {
+> > +                     ivec =3D &tp->int_vector[i];
+> > +                     snprintf(ivec->name, sizeof(ivec->name),
+> "%s_int%i",
+> > +                              tp->dev->name, i);
+> > +                     ret =3D request_irq(ivec->irq, rtase_q_interrupt,=
+ 0,
+> > +                                       ivec->name, ivec);
+> > +                     if (ret)
+> > +                             goto err_free_all_allocated_irq;
+> > +             }
+> > +     } else {
+> > +             ret =3D request_irq(pdev->irq, rtase_interrupt, 0, dev->n=
+ame,
+> > +                               ivec);
+> > +             if (ret)
+> > +                     goto err_free_all_allocated_mem;
+> > +     }
+> > +
+> > +     rtase_hw_start(dev);
+> > +
+> > +     for (i =3D 0; i < tp->int_nums; i++) {
+> > +             ivec =3D &tp->int_vector[i];
+> > +             napi_enable(&ivec->napi);
+>=20
+> nit / suggestion for the future (not to hold this back): it'd be nice to =
+add support
+> for netif_napi_set_irq and netif_queue_set_napi so that userland can use
+> netdev-genl to get queue/irq/napi mappings.
 
-Minor nit:
-
-The series uses a mix of dmabuf and dma-buf but the doc additions
-(devmem.rst) consistently uses dmabuf. I think it would be helpful to be
-consistent here and say 'devmem dmabuf' in the docstring to highlight
-whos dmabuf it is and keep the generated netdev docs in alignment.
-
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +      -
-> +        name: queues
-> +        doc: receive queues to bind the dma-buf to.
-
-And here.
-
-> +        type: nest
-> +        nested-attributes: queue-dmabuf
-> +        multi-attr: true
-> +      -
-> +        name: dmabuf-fd
-> +        doc: dmabuf file descriptor to bind.
-> +        type: u32
-> +      -
-> +        name: dmabuf-id
-> +        doc: id of the dmabuf binding
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +
->  
->    -
->      name: qstats
-> @@ -579,6 +618,20 @@ operations:
->            attributes:
->              - ifindex
->          reply: *queue-get-op
-> +    -
-> +      name: bind-rx
-> +      doc: Bind dmabuf to netdev
-
-And here.
-
-> +      attribute-set: bind-dmabuf
-> +      flags: [ admin-perm ]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - dmabuf-fd
-> +            - queues
-> +        reply:
-> +          attributes:
-> +            - dmabuf-id
+Thank you for your suggestion, I will consider adding this feature in futur=
+e versions.
 
