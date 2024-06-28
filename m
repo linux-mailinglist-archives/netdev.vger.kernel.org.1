@@ -1,126 +1,164 @@
-Return-Path: <netdev+bounces-107562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007DF91B6A9
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:04:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D21091B6D9
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:16:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F319B23B42
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 06:04:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F0CFB23C54
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 06:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5AD3FB88;
-	Fri, 28 Jun 2024 06:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609334D8A4;
+	Fri, 28 Jun 2024 06:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fKO05Pcs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 529A752F7A;
-	Fri, 28 Jun 2024 06:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D87554278;
+	Fri, 28 Jun 2024 06:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554646; cv=none; b=tpZBEv/J0rIH9Xp1f80PstMy5tKwTpGyNzqWxxze3Oiv9F81yXYNI1CKQxkJxSHdFKtU0tMv131T44FlLZn0FrjCb8jPy2NTkWio9igIHNj51ZlMuW3bA2wp/PzWbfeGqkQWeNFWz6qs8netm3uuctk3AnUtvq+tAlGwqHCMPEw=
+	t=1719555378; cv=none; b=m3JdQqozjplqsj19z7vIkzW8MwfBwUE9lh6FFXbRuk77lmk3T06Mb3S0hOCz3jXuMPLap/hqQCURiYeb+4FAUZ8DIRSp11ACqKJgSEAW+ZjedsHOWAE9sh2adwAT1IghHJiaiFNRv0wNwRXYpyL4CDBAv41gqK4Z0Zko64c/P9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554646; c=relaxed/simple;
-	bh=c//nUK97LhQ4i/gqtAJZzEghbJ3QsRwBqd/pKLM7OAI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=me5c+KWPnx0PASd04coC4vebyfmByb5WujLDvAy92+VkyAlElFNzv8nbSXcByC+egO9QSbZIh8GEDp0dJeC69Nbo0txsU2+rNdWEcUZ44Ig+cSkgm9ttihy0xGIfgjrLLcfIFOfzccveR8PS+E+i/Oo73VBIzeol8Ka6WhAAsfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from localhost.localdomain (unknown [103.163.180.2])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPA id 6725D612A4BD4;
-	Fri, 28 Jun 2024 14:03:28 +0800 (CST)
-X-MD-Sfrom: youwan@nfschina.com
-X-MD-SrcIP: 103.163.180.2
-From: Youwan Wang <youwan@nfschina.com>
-To: andrew@lunn.ch
-Cc: hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Youwan Wang <youwan@nfschina.com>
-Subject: [PATCH] net: phy: phy_device: fix PHY WOL enabled, PM failed to suspend
-Date: Fri, 28 Jun 2024 14:03:18 +0800
-Message-Id: <20240628060318.458925-1-youwan@nfschina.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719555378; c=relaxed/simple;
+	bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QONk+iqQ1nihFFXC/VauK26iNxKin1B7Q2vDtA0groFwsy4w0DDXE/zvvABz30RCDUeGTVVMsWmH5lAD9JSSBZ5kGRXPux+YWi1QCriHLJw9QZtZsVOsCKhEOER3zi0Z67Po4IYPxCeVvbepUP42EvfFUu9XOlh3F3jzdqRg/Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fKO05Pcs; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719555377; x=1751091377;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
+  b=fKO05Pcs/ho9TK8Zlhv4JaJKS72QKEnVRBJXXQDY03MpnChX5xQxa5v5
+   OBRqy9y3npWi+/3SgfCIHFjIKSUZw64m9F/vUHjkmFAGNmi6KCs1KHSgM
+   qFbtgpZehF0umLMIVrthQoq2/2CB0WkGzChq3TsSWgJxgRXtv7LSklcbn
+   NF7CKuyIXFkBSsDVCRMYtmw9/O3msPQv6/prrJ/U2sphJhmn79U2T1Q7j
+   fAZ3Xc7T4lbL5hWqszd6c59+6ZVWqbjh16w8T6YSo4sL0CKPiwFYBC8AB
+   CJXmMYUYL94IL75jxKMkYvIWCtcROwZWGoCzl182V8xO7HnV4vrtZv3t0
+   g==;
+X-CSE-ConnectionGUID: WGG2NTRHRySHc3rhQMS4Cw==
+X-CSE-MsgGUID: 4JAUWHoUTnaRMTCXH1Q38g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="28118913"
+X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
+   d="scan'208";a="28118913"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 23:16:15 -0700
+X-CSE-ConnectionGUID: 1Db3jF/gRaSXKeo8tyf+bA==
+X-CSE-MsgGUID: LPQGGceOT/GqBxTXASLnug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
+   d="scan'208";a="44548736"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2024 23:16:08 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sN4ty-000Gs2-0m;
+	Fri, 28 Jun 2024 06:16:06 +0000
+Date: Fri, 28 Jun 2024 14:15:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Luigi Leonardi <luigi.leonardi@outlook.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
+ for all vsock socket types.
+Message-ID: <202406281355.d1jNVGBc-lkp@intel.com>
+References: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 
-If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
-we cannot suspend the PHY. Although the WOL status has been
-checked in phy_suspend(), returning -EBUSY(-16) would cause
-the Power Management (PM) to fail to suspend. Since
-phy_suspend() is an exported symbol (EXPORT_SYMBOL),
-timely error reporting is needed. Therefore, an additional
-check is performed here. If the PHY of the mido bus is enabled
-with WOL, we skip calling phy_suspend() to avoid PM failure.
+Hi Luigi,
 
-log:
-[  322.631362] OOM killer disabled.
-[  322.631364] Freezing remaining freezable tasks
-[  322.632536] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
-[  322.632540] printk: Suspending console(s) (use no_console_suspend to debug)
-[  322.633052] YT8521 Gigabit Ethernet stmmac-0:01:
-PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x110 [libphy] returns -16
-[  322.633071] YT8521 Gigabit Ethernet stmmac-0:01:
-PM: failed to suspend: error -16
-[  322.669699] PM: Some devices failed to suspend, or early wake event detected
-[  322.669949] OOM killer enabled.
-[  322.669951] Restarting tasks ... done.
-[  322.671008] random: crng reseeded on system resumption
-[  322.671014] PM: suspend exit
+kernel test robot noticed the following build warnings:
 
-If the YT8521 driver adds phydrv->flags, ask the YT8521 driver to process
-WOL at suspend and resume time, the phydev->suspended_by_mdio_bus=1
-flag would cause the resume failure.
+[auto build test WARNING on 50b70845fc5c22cf7e7d25b57d57b3dca1725aa5]
 
-log:
-[  260.814763] YT8521 Gigabit Ethernet stmmac-0:01:
-PM: dpm_run_callback():mdio_bus_phy_resume+0x0/0x160 [libphy] returns -95
-[  260.814782] YT8521 Gigabit Ethernet stmmac-0:01:
-PM: failed to resume: error -95
+url:    https://github.com/intel-lab-lkp/linux/commits/Luigi-Leonardi-via-B4-Relay/vsock-add-support-for-SIOCOUTQ-ioctl-for-all-vsock-socket-types/20240627-023902
+base:   50b70845fc5c22cf7e7d25b57d57b3dca1725aa5
+patch link:    https://lore.kernel.org/r/20240626-ioctl_next-v3-1-63be5bf19a40%40outlook.com
+patch subject: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
+config: i386-randconfig-141-20240628 (https://download.01.org/0day-ci/archive/20240628/202406281355.d1jNVGBc-lkp@intel.com/config)
+compiler: gcc-8 (Ubuntu 8.4.0-3ubuntu2) 8.4.0
 
-Signed-off-by: Youwan Wang <youwan@nfschina.com>
----
- drivers/net/phy/phy_device.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406281355.d1jNVGBc-lkp@intel.com/
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 2ce74593d6e4..c766130e2c41 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -270,6 +270,7 @@ static DEFINE_MUTEX(phy_fixup_lock);
- 
- static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- {
-+	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
- 	struct device_driver *drv = phydev->mdio.dev.driver;
- 	struct phy_driver *phydrv = to_phy_driver(drv);
- 	struct net_device *netdev = phydev->attached_dev;
-@@ -277,6 +278,14 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- 	if (!drv || !phydrv->suspend)
- 		return false;
- 
-+	/* If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
-+	 * we cannot suspend the PHY.
-+	 */
-+	phy_ethtool_get_wol(phydev, &wol);
-+	phydev->wol_enabled = !!(wol.wolopts);
-+	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-+		return false;
-+
- 	/* PHY not attached? May suspend if the PHY has not already been
- 	 * suspended as part of a prior call to phy_disconnect() ->
- 	 * phy_detach() -> phy_suspend() because the parent netdev might be the
+smatch warnings:
+net/vmw_vsock/af_vsock.c:1321 vsock_do_ioctl() warn: unsigned 'n_bytes' is never less than zero.
+
+vim +/n_bytes +1321 net/vmw_vsock/af_vsock.c
+
+  1295	
+  1296	static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+  1297				  int __user *arg)
+  1298	{
+  1299		struct sock *sk = sock->sk;
+  1300		struct vsock_sock *vsk;
+  1301		int retval;
+  1302	
+  1303		vsk = vsock_sk(sk);
+  1304	
+  1305		switch (cmd) {
+  1306		case SIOCOUTQ: {
+  1307			size_t n_bytes;
+  1308	
+  1309			if (!vsk->transport || !vsk->transport->unsent_bytes) {
+  1310				retval = -EOPNOTSUPP;
+  1311				break;
+  1312			}
+  1313	
+  1314			if (vsk->transport->unsent_bytes) {
+  1315				if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
+  1316					retval = -EINVAL;
+  1317					break;
+  1318				}
+  1319	
+  1320				n_bytes = vsk->transport->unsent_bytes(vsk);
+> 1321				if (n_bytes < 0) {
+  1322					retval = n_bytes;
+  1323					break;
+  1324				}
+  1325	
+  1326				retval = put_user(n_bytes, arg);
+  1327			}
+  1328			break;
+  1329		}
+  1330		default:
+  1331			retval = -ENOIOCTLCMD;
+  1332		}
+  1333	
+  1334		return retval;
+  1335	}
+  1336	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
