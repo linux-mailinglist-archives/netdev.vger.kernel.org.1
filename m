@@ -1,278 +1,222 @@
-Return-Path: <netdev+bounces-107594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC46591BA3B
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:40:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9A091BA3E
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 10:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CC651F21166
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:40:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64BB01F21401
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 08:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CCD1487EB;
-	Fri, 28 Jun 2024 08:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512441487EB;
+	Fri, 28 Jun 2024 08:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dPIsx+oM";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hMYv8r8A";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dPIsx+oM";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hMYv8r8A"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Zn4VGU5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E76E14F98;
-	Fri, 28 Jun 2024 08:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7707814F98;
+	Fri, 28 Jun 2024 08:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719564014; cv=none; b=PDiAAUfhj+zlk+yIj/+p/uZvatwd+idn+RZFRvFM7KQ8yWc39WUdrnGV/i7DAPA6U/t5QFkS6IBNeI4/qkYfSl6LDEzaK/dollufN6sp4kRHnxlnRwyTXxr+IhmcfvfLDy8GbGHHJFOHbOOURLpd02iEDAARgMHbpp/pL7u3QNA=
+	t=1719564115; cv=none; b=SI8Za1aV6QWEcBrJt6d6l1Q53KGwGJth8P7xB+i9M38vQGnhC6uxHPuZiEnISWMXiLG87CKbUbCLn5Mh4xHwSUWax6bVxKVE74NqR49bs/AdbQeuUssR8zmRAno0n1DaRkZUxqLx2ctMed8qXyR3iOwX4JtxW/46dAr3w1txVi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719564014; c=relaxed/simple;
-	bh=oD2TUcIQ5qkCHK0l1VWrBaoyqsFf9pVwQjTQh3qp+PY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQz0Ucq3aBWeSQrwNftQW+Mxqu65Uh2B52CEGG5iTHTWzLgfSUxhFfYAdJN+lE5es2odJ1AAPIXgVQ41f/jDQ3T1T/0aoF3RQhwVCBb+d1nXo1VdU+YUW5bokuDBxQnu5tRixz4/ieQ8mi5J94/XKZD8fxeZlvd9mg+g6HO4Nso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dPIsx+oM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hMYv8r8A; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dPIsx+oM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hMYv8r8A; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 27B461F747;
-	Fri, 28 Jun 2024 08:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719564010; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9qpm7trLYBBpBHSkVBmWJQl68Vu8zybpSC4P6Dcg0Mg=;
-	b=dPIsx+oMObbOuS/AH3Ykciepy5Bkxc8nw0XqAG+vA+6XkVHxr7/sy1Y/IHMAwIYaAPR9ND
-	MBFj6NyjGWAiL4vo+mPJ75XRNPiAqN7Ouu/2YzXMLzPifT5dKEPn6WI2VRjKDgpnx74N64
-	2dEhEQ4UGlei0xRzDDanpUg5rQf5q2U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719564010;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9qpm7trLYBBpBHSkVBmWJQl68Vu8zybpSC4P6Dcg0Mg=;
-	b=hMYv8r8AhICyXXWVwuk9+cXayKQgvDisIhldBF71YiIp986veSMWQTvOFEDFuuiI7a94Li
-	CGPU0lCTkIIF8PCw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=dPIsx+oM;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=hMYv8r8A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719564010; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9qpm7trLYBBpBHSkVBmWJQl68Vu8zybpSC4P6Dcg0Mg=;
-	b=dPIsx+oMObbOuS/AH3Ykciepy5Bkxc8nw0XqAG+vA+6XkVHxr7/sy1Y/IHMAwIYaAPR9ND
-	MBFj6NyjGWAiL4vo+mPJ75XRNPiAqN7Ouu/2YzXMLzPifT5dKEPn6WI2VRjKDgpnx74N64
-	2dEhEQ4UGlei0xRzDDanpUg5rQf5q2U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719564010;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9qpm7trLYBBpBHSkVBmWJQl68Vu8zybpSC4P6Dcg0Mg=;
-	b=hMYv8r8AhICyXXWVwuk9+cXayKQgvDisIhldBF71YiIp986veSMWQTvOFEDFuuiI7a94Li
-	CGPU0lCTkIIF8PCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E87C31373E;
-	Fri, 28 Jun 2024 08:40:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id SDIrOOl2fmY3JQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Fri, 28 Jun 2024 08:40:09 +0000
-Message-ID: <c5934f76-3ce8-466e-80d1-c56ebb5a158e@suse.cz>
-Date: Fri, 28 Jun 2024 10:40:09 +0200
+	s=arc-20240116; t=1719564115; c=relaxed/simple;
+	bh=2Xe0aLbQ2LrCer/OeKWWTU4ranJM3BT33XQ+WbJGUdk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=i3kkkYyKxcxPsFK3BGFJln4+22MDcD5UCIXRES09TbrLeJaQuGRZtjAcSQ112eVuT8STVOa3SVVQJYBBOE9ZDOML9CqaGIVij+r2eBNik8iFlKLBxl2iEZF0ieuH/xQ7uwJZQB2QA6jHhgZ6G8bBs57Jf7QaRN6PfinulqdP61c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Zn4VGU5V; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 271832013B;
+	Fri, 28 Jun 2024 16:41:42 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1719564103;
+	bh=2Xe0aLbQ2LrCer/OeKWWTU4ranJM3BT33XQ+WbJGUdk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Zn4VGU5V/PHbouhzbDrtNE+Tc3dEmSYE7GC0C2+7god7AzOghM81Hy7Pa1grqiSK9
+	 jfbuRxhGYNWXkIumDsG04emzGuhbhhRsIjrI/vjObhUr20F0co85eM6yqR6yJNK6h1
+	 x85IzRxPsPC5tFkk/Y1+KvtlvoefL2LNMh0/wLLxelAEMRtwySdk3vFOqh3Lnik5oU
+	 udRxd/rrA4MK8l04dm9HvxonkxDseohyEZWU/c5lS4n7gJ8i8PJG3QHX/V6EsfTzAh
+	 fYCKjBBKmy6YdI/K4rdgZdDVFXf16jU7NWJ2mXcyBy8zv40wNHsfKjOJs0fpOqWsDj
+	 qQIN5+aOuCXgA==
+Message-ID: <13e122213157b0f8cae1d90de3f558279a6ca068.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v3 3/3] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: admiyo@os.amperecomputing.com, Matt Johnston
+ <matt@codeconstruct.com.au>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 28 Jun 2024 16:41:42 +0800
+In-Reply-To: <20240625185333.23211-4-admiyo@os.amperecomputing.com>
+References: <20240625185333.23211-1-admiyo@os.amperecomputing.com>
+	 <20240625185333.23211-4-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and
- family
-Content-Language: en-US
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Kees Cook <kees@kernel.org>, "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
- Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
- David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
- jvoisin <julien.voisin@dustri.org>, Andrew Morton
- <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>,
- Suren Baghdasaryan <surenb@google.com>,
- Kent Overstreet <kent.overstreet@linux.dev>, Jann Horn <jannh@google.com>,
- Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org
-References: <20240619192131.do.115-kees@kernel.org>
- <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz>
- <202406201147.8152CECFF@keescook>
- <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz>
- <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 27B461F747
-X-Spam-Score: -3.00
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.00 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	ARC_NA(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,huaweicloud.com,linux.com,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,gmail.com,huawei.com,suug.ch,gondor.apana.org.au,vger.kernel.org,kvack.org];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-On 6/28/24 7:35 AM, Boqun Feng wrote:
-> On Thu, Jun 20, 2024 at 10:43:39PM +0200, Vlastimil Babka wrote:
->> On 6/20/24 8:54 PM, Kees Cook wrote:
->> > On Thu, Jun 20, 2024 at 03:56:27PM +0200, Vlastimil Babka wrote:
->> >> > @@ -549,6 +549,11 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
->> >> >  
->> >> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
->> >> >  
->> >> > +kmem_buckets *kmem_buckets_create(const char *name, unsigned int align,
->> >> > +				  slab_flags_t flags,
->> >> > +				  unsigned int useroffset, unsigned int usersize,
->> >> > +				  void (*ctor)(void *));
->> >> 
->> >> I'd drop the ctor, I can't imagine how it would be used with variable-sized
->> >> allocations.
->> > 
->> > I've kept it because for "kmalloc wrapper" APIs, e.g. devm_kmalloc(),
->> > there is some "housekeeping" that gets done explicitly right now that I
->> > think would be better served by using a ctor in the future. These APIs
->> > are variable-sized, but have a fixed size header, so they have a
->> > "minimum size" that the ctor can still operate on, etc.
->> > 
->> >> Probably also "align" doesn't make much sense since we're just
->> >> copying the kmalloc cache sizes and its implicit alignment of any
->> >> power-of-two allocations.
->> > 
->> > Yeah, that's probably true. I kept it since I wanted to mirror
->> > kmem_cache_create() to make this API more familiar looking.
->> 
->> Rust people were asking about kmalloc alignment (but I forgot the details)
-> 
-> It was me! The ask is whether we can specify the alignment for the
-> allocation API, for example, requesting a size=96 and align=32 memory,
-> or the allocation API could do a "best alignment", for example,
-> allocating a size=96 will give a align=32 memory. As far as I
-> understand, kmalloc() doesn't support this.
-
-Hm yeah we only have guarantees for power-or-2 allocations.
-
->> so maybe this could be useful for them? CC rust-for-linux.
->> 
-> 
-> I took a quick look as what kmem_buckets is, and seems to me that align
-> doesn't make sense here (and probably not useful in Rust as well)
-> because a kmem_buckets is a set of kmem_caches, each has its own object
-> size, making them share the same alignment is probably not what you
-> want. But I could be missing something.
-
-How flexible do you need those alignments to be? Besides the power-of-two
-guarantees, we currently have only two odd sizes with 96 and 192. If those
-were guaranteed to be aligned 32 bytes, would that be sufficient? Also do
-you ever allocate anything smaller than 32 bytes then?
-
-To summarize, if Rust's requirements can be summarized by some rules and
-it's not completely ad-hoc per-allocation alignment requirement (or if it
-is, does it have an upper bound?) we could perhaps figure out the creation
-of rust-specific kmem_buckets to give it what's needed?
-
-> Regards,
-> Boqun
-> 
->> >> I don't think any current kmalloc user would
->> >> suddenly need either of those as you convert it to buckets, and definitely
->> >> not any user converted automatically by the code tagging.
->> > 
->> > Right, it's not needed for either the explicit users nor the future
->> > automatic users. But since these arguments are available internally,
->> > there seems to be future utility,  it's not fast path, and it made things
->> > feel like the existing API, I'd kind of like to keep it.
->> > 
->> > But all that said, if you really don't want it, then sure I can drop
->> > those arguments. Adding them back in the future shouldn't be too
->> > much churn.
->> 
->> I guess we can keep it then.
->> 
+SGkgQWRhbSwKCkxvb2tpbmcgZ29vZCwganVzdCBhIGNvdXBsZSBvZiBtaW5vciB0aGluZ3MgaW5s
+aW5lLCBhbmQgYSBxdWVyeSBvbiB0aGUKbmV3IF9yZW1vdmUoKSBpbXBsZW1lbnRhdGlvbi4KCj4g
+KyNkZWZpbmUgU1BETV9WRVJTSU9OX09GRlNFVMKgwqDCoMKgMQo+ICsjZGVmaW5lIFNQRE1fUkVR
+X1JFU1BfT0ZGU0VUwqDCoMKgMgoKVGhlc2Ugc2VlbSB1bnJlbGF0ZWQsIGFuZCBhcmUgdW51c2Vk
+PwoKPiArI2RlZmluZSBNQ1RQX1BBWUxPQURfTEVOR1RIwqDCoMKgwqAyNTYKPiArI2RlZmluZSBN
+Q1RQX0NNRF9MRU5HVEjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoDQKPiArI2RlZmlu
+ZSBNQ1RQX1BDQ19WRVJTSU9OwqDCoMKgwqDCoMKgwqAweDEgLyogRFNQMDI1MyBkZWZpbmVzIGEg
+c2luZ2xlIHZlcnNpb246IDEgKi8KPiArI2RlZmluZSBNQ1RQX1NJR05BVFVSRcKgwqDCoMKgwqDC
+oMKgwqDCoCJNQ1RQIgo+ICsjZGVmaW5lIFNJR05BVFVSRV9MRU5HVEjCoMKgwqDCoMKgwqDCoDQK
+PiArI2RlZmluZSBNQ1RQX0hFQURFUl9MRU5HVEjCoMKgwqDCoMKgMTIKPiArI2RlZmluZSBNQ1RQ
+X01JTl9NVFXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgNjgKPiArI2RlZmluZSBQQ0NfTUFHSUPCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgMHg1MDQzNDMwMAo+ICsjZGVmaW5lIFBDQ19IRUFERVJf
+RkxBR19SRVFfSU5UwqDCoMKgwqDCoMKgwqDCoDB4MQo+ICsjZGVmaW5lIFBDQ19IRUFERVJfRkxB
+R1PCoMKgwqDCoMKgwqDCoFBDQ19IRUFERVJfRkxBR19SRVFfSU5UCj4gKyNkZWZpbmUgUENDX0RX
+T1JEX1RZUEXCoMKgwqDCoMKgwqDCoMKgwqAweDBjCj4gKyNkZWZpbmUgUENDX0FDS19GTEFHX01B
+U0vCoMKgwqDCoMKgwqAweDEKPiArCj4gK3N0cnVjdCBtY3RwX3BjY19oZHIgewo+ICvCoMKgwqDC
+oMKgwqDCoHUzMiBzaWduYXR1cmU7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGZsYWdzOwo+ICvCoMKg
+wqDCoMKgwqDCoHUzMiBsZW5ndGg7Cj4gK8KgwqDCoMKgwqDCoMKgY2hhciBtY3RwX3NpZ25hdHVy
+ZVs0XTsKPiArfTsKCkknZCByZWNvbW1lbmQgdGhlIGVuZGlhbi1hbm5vdGF0ZWQgdHlwZXMgZm9y
+IHNpZ25hdHVyZSwgZmxhZ3MgJiBsZW5ndGgKaGVyZSwgYW5kIGNvbnZlcnRpbmcgb24gYWNjZXNz
+LgoKKHllcywgbWF5YmUgdGhpcyB3aWxsIG9ubHkgZXZlciBiZSBpbnRlbmRlZCBmb3IgbGl0dGxl
+LWVuZGlhbiwgYnV0CnRoZXJlJ3MgYWxtb3N0IGFsd2F5cyBjYXNlcyB3aGVyZSBjb2RlIGdldHMg
+bW92ZWQgYXJvdW5kLCBjb3BpZWQgaW50bwpuZXcgZHJpdmVycywgZXRjKQoKPiArc3RydWN0IG1j
+dHBfcGNjX2h3X2FkZHIgewo+ICvCoMKgwqDCoMKgwqDCoHUzMiBpbmJveF9pbmRleDsKPiArwqDC
+oMKgwqDCoMKgwqB1MzIgb3V0Ym94X2luZGV4Owo+ICt9Owo+ICsKPiArLyogVGhlIG5ldGRldiBz
+dHJ1Y3R1cmUuIE9uZSBvZiB0aGVzZSBwZXIgUENDIGFkYXB0ZXIuICovCj4gK3N0cnVjdCBtY3Rw
+X3BjY19uZGV2IHsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbGlzdF9oZWFkIG5leHQ7Cj4gK8Kg
+wqDCoMKgwqDCoMKgLyogc3BpbmxvY2sgdG8gc2VyaWFsaXplIGFjY2VzcyB0byBwY2MgYnVmZmVy
+IGFuZCByZWdpc3RlcnMqLwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5sb2NrX3QgbG9jazsKPiArwqDC
+oMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9kZXYgbWRldjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
+YWNwaV9kZXZpY2UgKmFjcGlfZGV2aWNlOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBwY2NfbWJv
+eF9jaGFuICppbl9jaGFuOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBwY2NfbWJveF9jaGFuICpv
+dXRfY2hhbjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWJveF9jbGllbnQgb3V0Ym94X2NsaWVu
+dDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWJveF9jbGllbnQgaW5ib3hfY2xpZW50Owo+ICvC
+oMKgwqDCoMKgwqDCoHZvaWQgX19pb21lbSAqcGNjX2NvbW1faW5ib3hfYWRkcjsKPiArwqDCoMKg
+wqDCoMKgwqB2b2lkIF9faW9tZW0gKnBjY19jb21tX291dGJveF9hZGRyOwo+ICvCoMKgwqDCoMKg
+wqDCoHN0cnVjdCBtY3RwX3BjY19od19hZGRyIGh3X2FkZHI7Cj4gK307Cj4gKwo+ICtzdGF0aWMg
+c3RydWN0IGxpc3RfaGVhZCBtY3RwX3BjY19uZGV2cyA9IExJU1RfSEVBRF9JTklUKG1jdHBfcGNj
+X25kZXZzKTsKClNhdyB5b3VyIGNoYW5nZWxvZyBlbnRyeSBhYm91dCBuZWVkaW5nIHRoaXMsIG1h
+a2VzIHNlbnNlIGlmIHRoYXQncyB3aGF0CnRoZSBhY3BpIGNvcmUgcmVxdWlyZXMuCgpJbiB3aGlj
+aCBjYXNlLCB5b3UgY2FuIG1ha2UgdGhpcyBhIGxpdHRsZSBtb3JlIGJyaWVmIHdpdGg6CgpzdGF0
+aWMgTElTVF9IRUFEKG1jdHBfcGNjX25kZXZzKTsKCihidXQgbW9yZSBvbiB0aGF0IGJlbG93KQoK
+PiArc3RhdGljIHZvaWQgbWN0cF9wY2NfY2xpZW50X3J4X2NhbGxiYWNrKHN0cnVjdCBtYm94X2Ns
+aWVudCAqYywgdm9pZCAqYnVmZmVyKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBf
+cGNjX25kZXYgKm1jdHBfcGNjX2RldjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2Nf
+aGRyIG1jdHBfcGNjX2hkcjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9za2JfY2IgKmNi
+Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBza19idWZmICpza2I7Cj4gK8KgwqDCoMKgwqDCoMKg
+dm9pZCAqc2tiX2J1ZjsKPiArwqDCoMKgwqDCoMKgwqB1MzIgZGF0YV9sZW47Cj4gK8KgwqDCoMKg
+wqDCoMKgdTMyIGZsYWdzOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19kZXYgPSBjb250
+YWluZXJfb2YoYywgc3RydWN0IG1jdHBfcGNjX25kZXYsIGluYm94X2NsaWVudCk7Cj4gK8KgwqDC
+oMKgwqDCoMKgbWVtY3B5X2Zyb21pbygmbWN0cF9wY2NfaGRyLCBtY3RwX3BjY19kZXYtPnBjY19j
+b21tX2luYm94X2FkZHIsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgc2l6ZW9mKHN0cnVjdCBtY3RwX3BjY19oZHIpKTsKPiArwqDCoMKgwqDCoMKgwqBkYXRhX2xl
+biA9IG1jdHBfcGNjX2hkci5sZW5ndGggKyBNQ1RQX0hFQURFUl9MRU5HVEg7Cj4gKwo+ICvCoMKg
+wqDCoMKgwqDCoGlmIChkYXRhX2xlbiA+IG1jdHBfcGNjX2Rldi0+bWRldi5kZXYtPm1heF9tdHUp
+IHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbWN0cF9wY2NfZGV2LT5tZGV2LmRl
+di0+c3RhdHMucnhfZHJvcHBlZCsrOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBy
+ZXR1cm47Cj4gK8KgwqDCoMKgwqDCoMKgfQo+ICsKPiArwqDCoMKgwqDCoMKgwqBza2IgPSBuZXRk
+ZXZfYWxsb2Nfc2tiKG1jdHBfcGNjX2Rldi0+bWRldi5kZXYsIGRhdGFfbGVuKTsKPiArwqDCoMKg
+wqDCoMKgwqBpZiAoIXNrYikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBtY3Rw
+X3BjY19kZXYtPm1kZXYuZGV2LT5zdGF0cy5yeF9kcm9wcGVkKys7Cj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDC
+oMKgbWN0cF9wY2NfZGV2LT5tZGV2LmRldi0+c3RhdHMucnhfcGFja2V0cysrOwo+ICvCoMKgwqDC
+oMKgwqDCoG1jdHBfcGNjX2Rldi0+bWRldi5kZXYtPnN0YXRzLnJ4X2J5dGVzICs9IGRhdGFfbGVu
+Owo+ICvCoMKgwqDCoMKgwqDCoHNrYi0+cHJvdG9jb2wgPSBodG9ucyhFVEhfUF9NQ1RQKTsKPiAr
+wqDCoMKgwqDCoMKgwqBza2JfYnVmID0gc2tiX3B1dChza2IsIGRhdGFfbGVuKTsKPiArwqDCoMKg
+wqDCoMKgwqBtZW1jcHlfZnJvbWlvKHNrYl9idWYsIG1jdHBfcGNjX2Rldi0+cGNjX2NvbW1faW5i
+b3hfYWRkciwgZGF0YV9sZW4pOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9yZXNldF9tYWNfaGVhZGVy
+KHNrYik7Cj4gK8KgwqDCoMKgwqDCoMKgc2tiX3B1bGwoc2tiLCBzaXplb2Yoc3RydWN0IG1jdHBf
+cGNjX2hkcikpOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9yZXNldF9uZXR3b3JrX2hlYWRlcihza2Ip
+Owo+ICvCoMKgwqDCoMKgwqDCoGNiID0gX19tY3RwX2NiKHNrYik7Cj4gK8KgwqDCoMKgwqDCoMKg
+Y2ItPmhhbGVuID0gMDsKPiArwqDCoMKgwqDCoMKgwqBuZXRpZl9yeChza2IpOwo+ICsKPiArwqDC
+oMKgwqDCoMKgwqBmbGFncyA9IG1jdHBfcGNjX2hkci5mbGFnczsKPiArwqDCoMKgwqDCoMKgwqBt
+Y3RwX3BjY19kZXYtPmluX2NoYW4tPmFja19yeCA9IChmbGFncyAmIFBDQ19BQ0tfRkxBR19NQVNL
+KSA+IDA7CgpUaGUgJz4nIGNvbXBhcmlzb24gdG8gYSBiaXQgZmllbGQgaXMgYSBiaXQgb2RkLCB5
+b3UgY291bGQganVzdDoKCsKgwqDCoMKgwqDCoMKgbWN0cF9wY2NfZGV2LT5pbl9jaGFuLT5hY2tf
+cnggPSAhIShmbGFncyAmIFBDQ19BQ0tfRkxBR19NQVNLKTsKCj4gK3N0YXRpYyB2b2lkCj4gK21j
+dHBfcGNjX25ldF9zdGF0cyhzdHJ1Y3QgbmV0X2RldmljZSAqbmV0X2RldiwKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgcnRubF9saW5rX3N0YXRzNjQgKnN0YXRz
+KQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1wbmQ7Cj4gKwo+
+ICvCoMKgwqDCoMKgwqDCoG1wbmQgPSAoc3RydWN0IG1jdHBfcGNjX25kZXYgKiluZXRkZXZfcHJp
+dihuZXRfZGV2KTsKCk5vIG5lZWQgdG8gY2FzdCBmcm9tIHZvaWQgKi4KCj4gK3N0YXRpYyBpbnQg
+bWN0cF9wY2NfZHJpdmVyX2FkZChzdHJ1Y3QgYWNwaV9kZXZpY2UgKmFjcGlfZGV2KQo+ICt7Cj4g
+K8KgwqDCoMKgwqDCoMKgc3RydWN0IGxvb2t1cF9jb250ZXh0IGNvbnRleHQgPSB7MCwgMCwgMH07
+Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1jdHBfcGNjX2RldjsKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbmV0X2RldmljZSAqbmRldjsKPiArwqDCoMKgwqDCoMKgwqBh
+Y3BpX2hhbmRsZSBkZXZfaGFuZGxlOwo+ICvCoMKgwqDCoMKgwqDCoGFjcGlfc3RhdHVzIHN0YXR1
+czsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgZGV2aWNlICpkZXY7Cj4gK8KgwqDCoMKgwqDCoMKg
+aW50IG1jdHBfcGNjX210dTsKPiArwqDCoMKgwqDCoMKgwqBpbnQgb3V0Ym94X2luZGV4Owo+ICvC
+oMKgwqDCoMKgwqDCoGludCBpbmJveF9pbmRleDsKPiArwqDCoMKgwqDCoMKgwqBjaGFyIG5hbWVb
+MzJdOwo+ICvCoMKgwqDCoMKgwqDCoGludCByYzsKPiArCj4gK8KgwqDCoMKgwqDCoMKgZGV2X2Ri
+ZygmYWNwaV9kZXYtPmRldiwgIkFkZGluZyBtY3RwX3BjYyBkZXZpY2UgZm9yIEhJRMKgICVzXG4i
+LAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhY3BpX2RldmljZV9oaWQoYWNwaV9k
+ZXYpKTsKPiArwqDCoMKgwqDCoMKgwqBkZXZfaGFuZGxlID0gYWNwaV9kZXZpY2VfaGFuZGxlKGFj
+cGlfZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBzdGF0dXMgPSBhY3BpX3dhbGtfcmVzb3VyY2VzKGRl
+dl9oYW5kbGUsICJfQ1JTIiwgbG9va3VwX3BjY3RfaW5kaWNlcywKPiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAm
+Y29udGV4dCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKCFBQ1BJX1NVQ0NFU1Moc3RhdHVzKSkgewo+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZfZXJyKCZhY3BpX2Rldi0+ZGV2LCAi
+RkFJTFVSRSB0byBsb29rdXAgUENDIGluZGV4ZXMgZnJvbSBDUlMiKTsKPiArwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FSU5WQUw7Cj4gK8KgwqDCoMKgwqDCoMKgfQo+ICvC
+oMKgwqDCoMKgwqDCoGluYm94X2luZGV4ID0gY29udGV4dC5pbmJveF9pbmRleDsKPiArwqDCoMKg
+wqDCoMKgwqBvdXRib3hfaW5kZXggPSBjb250ZXh0Lm91dGJveF9pbmRleDsKPiArwqDCoMKgwqDC
+oMKgwqBkZXYgPSAmYWNwaV9kZXYtPmRldjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgc25wcmludGYo
+bmFtZSwgc2l6ZW9mKG5hbWUpLCAibWN0cGlwY2MlZCIsIGluYm94X2luZGV4KTsKPiArwqDCoMKg
+wqDCoMKgwqBuZGV2ID0gYWxsb2NfbmV0ZGV2KHNpemVvZihzdHJ1Y3QgbWN0cF9wY2NfbmRldiks
+IG5hbWUsIE5FVF9OQU1FX0VOVU0sCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgbWN0cF9wY2Nfc2V0dXApOwo+ICvCoMKgwqDCoMKgwqDCoGlm
+ICghbmRldikKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FTk9NRU07
+Cj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfZGV2ID0gKHN0cnVjdCBtY3RwX3BjY19uZGV2ICop
+bmV0ZGV2X3ByaXYobmRldik7CgpObyBuZWVkIGZvciB0aGUgY2FzdCBmcm9tIHZvaWQgKi4KCj4g
+K3N0YXRpYyB2b2lkIG1jdHBfcGNjX2RyaXZlcl9yZW1vdmUoc3RydWN0IGFjcGlfZGV2aWNlICph
+ZGV2KQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IGxpc3RfaGVhZCAqcHRyOwo+ICvCoMKg
+wqDCoMKgwqDCoHN0cnVjdCBsaXN0X2hlYWQgKnRtcDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbGlz
+dF9mb3JfZWFjaF9zYWZlKHB0ciwgdG1wLCAmbWN0cF9wY2NfbmRldnMpIHsKCllvdSBjYW4gc2F2
+ZSB0aGUgbGlzdF9lbnRyeSgpIGJlbG93IGJ5IHVzaW5nIGxpc3RfZm9yX2VhY2hfZW50cnlfc2Fm
+ZSgpCmhlcmUuCgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbmV0X2Rl
+dmljZSAqbmRldjsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBf
+cGNjX25kZXYgKm1jdHBfcGNjX2RldjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoG1jdHBfcGNjX2RldiA9IGxpc3RfZW50cnkocHRyLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwg
+bmV4dCk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChtY3RwX3BjY19kZXYt
+PmFjcGlfZGV2aWNlICE9IGFkZXYpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqBjb250aW51ZTsKCldhaXQsIHlvdSByZW1vdmVkIHRoZSBjYXNlIHdoZXJl
+IHlvdSBjbGVhbiB1cCB0aGUgd2hvbGUgbGlzdCBpZiBhZGV2IGlzCk5VTEw/CgpOb3cgdGhpcyBj
+b250cmFkaWN0cyB5b3VyIHNlY3Rpb24gb2YgdGhlIGNoYW5nZWxvZzoKCi0gRGlkIG5vdCBjaGFu
+Z2UgdGhlIG1vZHVsZSBpbml0IHVubG9hZCBmdW5jdGlvbiB0byB1c2UgdGhlCiAgQUNQSSBlcXVp
+dmFsZW50IGFzIHRoZXkgZG8gbm90IHJlbW92ZSBhbGwgZGV2aWNlcyBwcmlvcgogIHRvIHVubG9h
+ZCwgbGVhZGluZyB0byBkYW5nbGluZyByZWZlcmVuY2VzIGFuZCBzZWcgZmF1bHRzLgoKRG9lcyB0
+aGlzIG1lYW4geW91IG5vIGxvbmdlciBuZWVkIHRvIGZyZWUgYWxsIGluc3RhbmNlcyBvbiB1bmxv
+YWQ/IEluCndoaWNoIGNhc2UsIHRoYXQgc291bmRzIGdyZWF0ISB0aGF0IHByb2JhYmx5IGFsc28g
+bWVhbnM6CgogLSBhbGwgdGhlIGxpc3QgaXMgZG9pbmcgaXMgYWxsb3dpbmcgeW91IHRvIGZpbmQg
+dGhlIG1jdHBfcGNjX2RldiBmcm9tCiAgIHRoZSBhY3BpX2RldmljZQoKIC0gYnV0OiB5b3UgY2Fu
+IHR1cm4gYW4gYWNwaV9kZXZpY2UgaW50byBhIG1jdHBfcGNjX2RldiBmcm9tCiAgIGFkZXYtPmRy
+aXZlcl9kYXRhICh3aGljaCB5b3UncmUgYWxyZWFkeSBzZXR0aW5nKSwgc28geW91IGRvbid0IG5l
+ZWQKICAgdGhlIGxpc3QKCiAtIHRoZW4sIF9yZW1vdmUganVzdCBiZWNvbWVzIHNvbWV0aGluZyBs
+aWtlOgoKICAgIHN0YXRpYyB2b2lkIG1jdHBfcGNjX2RyaXZlcl9yZW1vdmUoc3RydWN0IGFjcGlf
+ZGV2aWNlICphZGV2KQogICAgewogICAgICAgICAgICBzdHJ1Y3QgbWN0cF9wY2NfZGV2ICpkZXYg
+PSBhY3BpX2RyaXZlcl9kYXRhKGFkZXYpOwoKICAgICAgICAgICAgcGNjX21ib3hfZnJlZV9jaGFu
+bmVsKGRldi0+b3V0X2NoYW4pOwogICAgICAgICAgICBwY2NfbWJveF9mcmVlX2NoYW5uZWwoZGV2
+LT5pbl9jaGFuKTsKICAgICAgICAgICAgaWYgKGRldi0+bWRldi5kZXYpCiAgICAgICAgICAgIMKg
+wqDCoMKgwqDCoMKgwqBtY3RwX3VucmVnaXN0ZXJfbmV0ZGV2KGRldi0+bWRldi5kZXYpOwogICAg
+fQoKICAgIChidXQgSSBjYW4ndCBzZWUgaG93IGRldi0+bWRldi5kZXYgY2FuIGJlIG51bGwsIHNv
+IHlvdSBtYXkgYmUgYWJsZQogICAgdG8gcmVtb3ZlIHRoZSBjb25kaXRpb24gdG9vKQoKPiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcGNjX21ib3hfZnJlZV9jaGFubmVsKG1jdHBfcGNj
+X2Rldi0+b3V0X2NoYW4pOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwY2NfbWJv
+eF9mcmVlX2NoYW5uZWwobWN0cF9wY2NfZGV2LT5pbl9jaGFuKTsKPiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgbmRldiA9IG1jdHBfcGNjX2Rldi0+bWRldi5kZXY7Cj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChuZGV2KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbWN0cF91bnJlZ2lzdGVyX25ldGRldihuZGV2KTsKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbGlzdF9kZWwocHRyKTsKPiArwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFrOwoKVW51c3VhbCBpbmRl
+bnQgaGVyZS4KCkNoZWVycywKCgpKZXJlbXkK
 
 
