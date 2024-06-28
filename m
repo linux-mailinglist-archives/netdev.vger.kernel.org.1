@@ -1,250 +1,182 @@
-Return-Path: <netdev+bounces-107618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D2C91BB4A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:17:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A8491BB61
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 11:25:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96DCDB20F20
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:17:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA8F828130B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 09:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBBA1465A1;
-	Fri, 28 Jun 2024 09:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B0F14F9DC;
+	Fri, 28 Jun 2024 09:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="BBIXEal4";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="O9bOmpwC";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="BBIXEal4";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="O9bOmpwC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XJ+al+3X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3754221105;
-	Fri, 28 Jun 2024 09:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21181465A1;
+	Fri, 28 Jun 2024 09:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719566240; cv=none; b=Xgnc8crXrRALcNrAOjv8VUtyaLaMPOnjRdN9/wG6d+O8uelHQCMDj1BLVy5DXCHcbBEe0oH66P3eSkEJ9ILbn+j6LEeN4AXOl3dGXE6SNwI4FBUozVo1v+T2ZztlMuHbxBxeN5HS/fy42EgsuDsoF5IOvnTbPmiouUH2NSosf8g=
+	t=1719566710; cv=none; b=bi/5CG5rAK3n0XmPH8ETtKFUjusyUQoAPVLWmLxPtNJkyfuMK1fgcXw+tqYnd4TwhuCN/zpamhEAMdTtt486O7/VXNCm/AkMxC3KUEdfieVX//Lw3i1ZEc06Xyrx+uyQLZAo6hofVDwoFR77K0UXojjrnHJAXIpiCmsXSmbfTEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719566240; c=relaxed/simple;
-	bh=fhOLmWc0SDC85qQYdG8vAEP1SqcKTgRIoLj4V2w5MY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pr2muL0GOvfNS/VzXYw//K8plEmkjagTPZIw5CjoNmLzk2oxHOMDh3PqltyEK9mc3xXrvcH+YBlo5dSfGUx2fOu0QcrYdDvhE8Wu5etg1Sew4wGRRO7aAUlRrGHkGZgA3trPStc0IdzVH1Za2qnpjZNYva3qTG5mNFKp6JHWCWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=BBIXEal4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=O9bOmpwC; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=BBIXEal4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=O9bOmpwC; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 586771FCF3;
-	Fri, 28 Jun 2024 09:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719566236; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HPSHi62iPTx8+bcpaYNNSvFsA8tFGLe7dcFFpmR9SXg=;
-	b=BBIXEal4J/XIOdojlnmLuvCWSPm05vaBiEdlESdarzm5XHO5Z4VzjBNtlMRZz4Iaafv25r
-	ytmROKqhfyHYNE6cwy6gfnnH1LzZtix9A5PlS4rXczVmWLrPL4lVgk+usBhbbw3e4GbCr2
-	lsLsrgeIn9n83utj7c4Q4k/G8ZU4N6Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719566236;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HPSHi62iPTx8+bcpaYNNSvFsA8tFGLe7dcFFpmR9SXg=;
-	b=O9bOmpwCE5KW3Un9+gNnNcrn5EtdNWnQ1ZmlPIzwdDacoyav/pE14AI95LHbxr1vghCqsS
-	4aRp5sZ1pj0INTAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=BBIXEal4;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=O9bOmpwC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719566236; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HPSHi62iPTx8+bcpaYNNSvFsA8tFGLe7dcFFpmR9SXg=;
-	b=BBIXEal4J/XIOdojlnmLuvCWSPm05vaBiEdlESdarzm5XHO5Z4VzjBNtlMRZz4Iaafv25r
-	ytmROKqhfyHYNE6cwy6gfnnH1LzZtix9A5PlS4rXczVmWLrPL4lVgk+usBhbbw3e4GbCr2
-	lsLsrgeIn9n83utj7c4Q4k/G8ZU4N6Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719566236;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HPSHi62iPTx8+bcpaYNNSvFsA8tFGLe7dcFFpmR9SXg=;
-	b=O9bOmpwCE5KW3Un9+gNnNcrn5EtdNWnQ1ZmlPIzwdDacoyav/pE14AI95LHbxr1vghCqsS
-	4aRp5sZ1pj0INTAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 26F2F13A9A;
-	Fri, 28 Jun 2024 09:17:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5kYmCZx/fmYYMQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Fri, 28 Jun 2024 09:17:16 +0000
-Message-ID: <c45eb0c9-21b9-4e29-a9d8-f3044c77822e@suse.cz>
-Date: Fri, 28 Jun 2024 11:17:15 +0200
+	s=arc-20240116; t=1719566710; c=relaxed/simple;
+	bh=18TYaRN/VD3M+NTbtvZRXFNKYo91KOmQHfGyYOcXug8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Me6eM4lKjlrtQfaxytUbx8vbQZYVDJHT+YSRrSFRFQbpKueOjcHyv081dxezkCVE3XrQkngJdmMvas6Uvb3Eh0Jaz8nNeSawHjAJgSuj5qIHxVLCib779b2obnp9hepHG7AW2trDYkHF0yrrMBMJvtc+JWWBht9O4RbwNh79cf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XJ+al+3X; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RDssPQKk0DP2H8FGxxbB4dIquMeh6O1Th4YqfuxP+0A=; b=XJ+al+3XFwWBfIWgZTF2PDhXDc
+	bgv+0ZPIRzl1UnHlQ8aQd8VaCQqAIW1LxcTU4qBw2/47Qj5AtTu7oWmOcgm3IkfaQO0Yglg634sDv
+	V+hkuZ13Sb8wfF0jejchiM/Q2ewqyAnwHcdYKIVdqqCU9Zq7k+jWgNCnu5aprqeWhJ3CEnRm6DTLm
+	JbhOuGwbDYRMBnE+Uz7DoCJLukT73IKEuXDyY+95QZguOTDCq665ZBrj1DdWbb6ari8FnUxMylo2y
+	MekWai7Bd0UOjMwM3j4U4L2XPmOhsFDPvoYhz0wA3yfg1FOQaKVoSAg+06YXNjLQUYGOS9I2GKa6q
+	3NfvYYLw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52960)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sN7qh-0006FT-06;
+	Fri, 28 Jun 2024 10:24:55 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sN7qi-0006PK-0M; Fri, 28 Jun 2024 10:24:56 +0100
+Date: Fri, 28 Jun 2024 10:24:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Youwan Wang <youwan@nfschina.com>, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: phy_device: fix PHY WOL enabled, PM failed to
+ suspend
+Message-ID: <Zn6BZ4b4h8YJ3Z0u@shell.armlinux.org.uk>
+References: <20240628060318.458925-1-youwan@nfschina.com>
+ <Zn5xmMpTLK/fRoYh@shell.armlinux.org.uk>
+ <249879ad-aa97-452c-a173-65255818d2d4@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/6] mm/slab: Introduce kmem_buckets_create() and
- family
-Content-Language: en-US
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Kees Cook <kees@kernel.org>,
- "GONG, Ruiqi" <gongruiqi@huaweicloud.com>, Christoph Lameter <cl@linux.com>,
- Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>,
- Joonsoo Kim <iamjoonsoo.kim@lge.com>, jvoisin <julien.voisin@dustri.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>,
- Suren Baghdasaryan <surenb@google.com>,
- Kent Overstreet <kent.overstreet@linux.dev>, Jann Horn <jannh@google.com>,
- Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org
-References: <20240619192131.do.115-kees@kernel.org>
- <20240619193357.1333772-4-kees@kernel.org>
- <cc301463-da43-4991-b001-d92521384253@suse.cz>
- <202406201147.8152CECFF@keescook>
- <1917c5a5-62af-4017-8cd0-80446d9f35d3@suse.cz>
- <Zn5LqMlnbuSMx7H3@Boquns-Mac-mini.home>
- <c5934f76-3ce8-466e-80d1-c56ebb5a158e@suse.cz>
- <CAH5fLggjrbdUuT-H-5vbQfMazjRDpp2+k3=YhPyS17ezEqxwcw@mail.gmail.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <CAH5fLggjrbdUuT-H-5vbQfMazjRDpp2+k3=YhPyS17ezEqxwcw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 586771FCF3
-X-Spam-Score: -3.00
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.00 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	XM_UA_NO_VERSION(0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,huaweicloud.com,linux.com,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,huawei.com,suug.ch,gondor.apana.org.au,vger.kernel.org,kvack.org];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TAGGED_RCPT(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <249879ad-aa97-452c-a173-65255818d2d4@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 6/28/24 11:06 AM, Alice Ryhl wrote:
->> >>
->> >
->> > I took a quick look as what kmem_buckets is, and seems to me that align
->> > doesn't make sense here (and probably not useful in Rust as well)
->> > because a kmem_buckets is a set of kmem_caches, each has its own object
->> > size, making them share the same alignment is probably not what you
->> > want. But I could be missing something.
->>
->> How flexible do you need those alignments to be? Besides the power-of-two
->> guarantees, we currently have only two odd sizes with 96 and 192. If those
->> were guaranteed to be aligned 32 bytes, would that be sufficient? Also do
->> you ever allocate anything smaller than 32 bytes then?
->>
->> To summarize, if Rust's requirements can be summarized by some rules and
->> it's not completely ad-hoc per-allocation alignment requirement (or if it
->> is, does it have an upper bound?) we could perhaps figure out the creation
->> of rust-specific kmem_buckets to give it what's needed?
-> 
-> Rust's allocator API can take any size and alignment as long as:
-> 
-> 1. The alignment is a power of two.
-> 2. The size is non-zero.
-> 3. When you round up the size to the next multiple of the alignment,
-> then it must not overflow the signed type isize / ssize_t.
-> 
-> What happens right now is that when Rust wants an allocation with a
-> higher alignment than ARCH_SLAB_MINALIGN, then it will increase size
-> until it becomes a power of two so that the power-of-two guarantee
-> gives a properly aligned allocation.
+On Fri, Jun 28, 2024 at 09:25:54AM +0100, Florian Fainelli wrote:
+> Would not the situation described here be solved by having the Motorcomm PHY
+> driver set PHY_ALWAYS_CALL_SUSPEND since it deals with checking whether WoL
+> is enabled or not and will just return then.
 
-So am I correct thinking that, if the cache of size 96 bytes guaranteed a
-32byte alignment, and 192 bytes guaranteed 64byte alignment, and the rest of
-sizes with the already guaranteed power-of-two alignment, then on rust side
-you would only have to round up sizes to the next multiples of the alignemnt
-(rule 3 above) and that would be sufficient?
- Abstracting from the specific sizes of 96 and 192, the guarantee on kmalloc
-side would have to be - guarantee alignment to the largest power-of-two
-divisor of the size. Does that sound right?
+Let's also look at PHY_ALWAYS_CALL_SUSPEND. There are currently two
+drivers that make use of it - realtek and broadcom.
 
-Then I think we could have some flag for kmem_buckets creation that would do
-the right thing.
+Looking at realtek, it is used with driver instances that call
+	rtl821x_suspend
+	rtl821x_resume
 
-> Alice
+rtl821x_suspend() does nothing if phydev->wol_enabled is true.
+rtl821x_resume() only re-enabled the clock if phydev->wol_enabled
+was false (in other words, rtl821x has disabled the clock.) However,
+it always calls genphy_resume() - presumably this is the reason for
+the flag.
 
+The realtek driver instances do not populate .set_wol nor .get_wol,
+so the PHY itself does not support WoL configuration. This means
+that the phy_ethtool_get_wol() call in phy_suspend() will also fail,
+and since wol.wolopts is initialised to zero, phydev->wol_enabled
+will only be true if netdev->wol_enabled is true.
+
+Thus, for phydev->wol_enabled to be true, netdev->wol_enabled must
+be true, and we won't get here via mdio_bus_phy_suspend() as 
+mdio_bus_phy_may_suspend() will return false in this case.
+
+
+Looking at broadcom, it's used with only one driver instance for
+BCM54210E which calls:
+	bcm54xx_suspend
+	bcm54xx_resume
+
+Other driver instances also call these two functions but do not
+set this flag - BCM54612E, BCM54810, BCM54811, BCM50610, and
+BCM50610M. Moreover, none of these implement the .get_wol and
+.set_wol methods which means the behaviour is as I describe for
+Realtek above that also doesn't implement these methods.
+
+The only case where this is different is BCM54210E which does
+populate these methods.
+
+bcm54xx_suspend() stops ptp, and if WoL is enabled, configures the
+wakeup IRQ. bcm54xx_resume() deconfigures the wakeup IRQ.
+
+This could lead us into a case where the PHY has WoL enabled, the
+phy_ethtool_get_wol() call returns that, causing phydev->wol_enabled
+to be set, and netdev->wol_enabled is not set.
+
+However, in this case, it would not be a problem because the driver
+has set PHY_ALWAYS_CALL_SUSPEND, so we won't return -EBUSY.
+
+
+Now, looking again at motorcomm, yt8521_resume() disables auto-sleep
+before checking whether WoL is enabled. So, the driver is probably
+missing PHY_ALWAYS_CALL_SUSPEND if auto-sleep needs to be disabled
+each and every resume whether WoL is enabled or not.
+
+However, if we look at yt8521_config_init(), this will also disable
+auto sleep. This will be called from phy_init_hw(), and in the
+mdio_bus_phy_resume() path, immediately before phy_resume(). Likewise
+when we attach the PHY.
+
+Then we have some net drivers that call phy_resume() directly...
+
+drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+	(we already have a workaround merged for
+	PHY-not-providing-clock)
+
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+	A suspend/resume cycle of the PHY is done when entering loopback mode.
+
+drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
+	No idea on this one - it resumes the PHY before enabling
+	loopback mode, and enters suspend when disabling loopback
+	mode!
+
+drivers/net/ethernet/broadcom/genet/bcmgenet.c
+	bcmgenet_resume() calls phy_init_hw() before phy_resume().
+
+drivers/net/ethernet/broadcom/bcmsysport.c
+	bcm_sysport_resume() *doesn't* appear to call phy_init_hw()
+	before phy_resume(), so I wonder whether the config is
+	properly restored on resume?
+
+drivers/net/ethernet/realtek/r8169_main.c
+	rtl8169_up() calls phy_init_hw() before phy_resume().
+
+drivers/net/usb/ax88172a.c
+	This doesn't actually call phy_resume(), but calls
+	genphy_resume() directly from ax88172a_reset() immediately
+	after phy_connect(). However, connecting to a PHY will
+	call phy_resume()... confused here.
+
+So I'm left wondering whether yt8521_resume() should be fiddling with
+this auto-sleep mode, especially as yt8521_config_init() will do that
+if the appropriate DT property is set... and whether this should be
+done unconditionally.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
