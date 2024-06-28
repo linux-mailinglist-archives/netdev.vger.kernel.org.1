@@ -1,102 +1,95 @@
-Return-Path: <netdev+bounces-107497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10D591B32D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:08:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCFF91B330
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 02:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C05AD1C20B1E
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:08:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13FF71F23CCF
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 00:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEFC193;
-	Fri, 28 Jun 2024 00:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D98196;
+	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoNSK5dY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiDnM8FG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16055191
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 00:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5AB191;
+	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719533289; cv=none; b=cO8qgponWLARz5wn6Lzws/15ykozpffK8TgKN9iF7GzaSYeErrXM2i6GVZ41xlxyYjbtpymgASCoKPQbGtMru6b9yKmt4956YG8wQtX2FhV1yv4ORGIFvZifwCKB70KJTyYzcuB+NMeC5oAKYo6LxqV5dSJvOUm+tNxo4USchGE=
+	t=1719533429; cv=none; b=HQf6+yu9iDSJqwvi03QHdsR5kEMtmTcd2V8T4SHXknkI4ZLV8QkqPRysCC0lV3XeUz/Wsq6SRFDwBnRikU2D8CqHEM2EBx3eTe/qoFKzWVDZ5F5kQ+bpk8LN2TjQjSIEinzkIFYBeRRpJSD7Fg9NubOHbD7IZDZkVj3rUkbrv4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719533289; c=relaxed/simple;
-	bh=3NvVf161WS9Pxdpu0zztLkF5R/2K0FGNw/kjSCvxIX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oh4drLTGKdhB8x73TW+OF1p1ZmtK/IZBgC25hrxNaClsQCRBETaCkuvve97SqxBI43Vdi20pJTQebCQe7w8qTwg+N4J1/8dN9g+8s+k3Ssw2fuLl2Ytg7kf5gBORjrhtUw3Kv28nBPOYC3rJSYYaDit+ujJDo3ceI6023qpweg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoNSK5dY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572F8C2BBFC;
-	Fri, 28 Jun 2024 00:08:08 +0000 (UTC)
+	s=arc-20240116; t=1719533429; c=relaxed/simple;
+	bh=3GHMMp2TTP4bxQLBDw4fiztif1SW1cL0IEHns4AvqOo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=t8S8AXcI4Xcx1cWe575kKxEDsuX664Xk4vGsgdqHiPf5a1JrNiv6tAB5B51a0VjsSDuaWW1DJuUbbbkrs4vOwdUgicYwNTuhRmxgGizoSvEhgYuakqiZzS/UF0t+IUOWsaaI80PEgp7EDJNo40Lub9qEBE11RsykuUgdiOk9LKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiDnM8FG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 27EBBC32789;
+	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719533288;
-	bh=3NvVf161WS9Pxdpu0zztLkF5R/2K0FGNw/kjSCvxIX8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YoNSK5dYlyx6M6jjyxlKibV0zSddHvVoKuIMbNhhf+8GwCpkgVOP8EOjKiwKnQD4b
-	 F6nxMSjgjo2LRnHyR1dTeSbD/mGmE2SmPWMOUYJEF1+HHrgPVFqxX9uGJNr50al9m4
-	 3sCeRRfBMCqi05Eey5gHCGBEiQXEd2oK3zv5zIcxYxemxmUv58GCiz88PO3rTQDWgI
-	 /e/uNm4/yWxkOJ44PbvcyES4zw2+xxEjLgAoW0sTDWRCBhoQZkrqWqpxUsTADu/0tq
-	 81nk9tw5Yyon56r3rdyT/lN+oUw24DU9/BNtlTGjczUC2q+12vNwEoa2dL5zSRNh+0
-	 BuHDQx/PjqAag==
-Date: Thu, 27 Jun 2024 17:08:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, richardcochran@gmail.com
-Subject: Re: [PATCH net-next 02/10] bnxt_en: Add is_ts_pkt field to struct
- bnxt_sw_tx_bd
-Message-ID: <20240627170807.1a68c8ce@kernel.org>
-In-Reply-To: <20240626164307.219568-3-michael.chan@broadcom.com>
-References: <20240626164307.219568-1-michael.chan@broadcom.com>
-	<20240626164307.219568-3-michael.chan@broadcom.com>
+	s=k20201202; t=1719533429;
+	bh=3GHMMp2TTP4bxQLBDw4fiztif1SW1cL0IEHns4AvqOo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RiDnM8FG2yKnOg3/0pOpMBb/HS8t1Wc685A2zYiXT3EpV6fJfincqYrnGSwkZpUOh
+	 0Bd19t2K0iJO4etdEmLJrMIguWmPfSxM1FJRMhzmOu3iK0UHZPvODQpKlB/sofaITu
+	 R1WYocvzroD5OHS3veoNFG7xVMcHcQ3egPC9UO+b4tpnIi5YT7KWY2o41Pghl4EEhQ
+	 3HL+G6UGXNevV5kMnU50YaB9R9PvZFs4VVJ66Q80stjRvv+yikYvYB9TmmDaaZnbtB
+	 QZJlV7wtzGO8MppSSzfMCODV5I52hcKutxCnTmCZtPhDPCwwGPqKRCaJCMG6RKCjMN
+	 6IqW3CItcxokg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14981C43336;
+	Fri, 28 Jun 2024 00:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: thunderx: Unembed netdev structure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171953342907.1107.6780824030224917954.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jun 2024 00:10:29 +0000
+References: <20240626173503.87636-1-leitao@debian.org>
+In-Reply-To: <20240626173503.87636-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, sgoutham@marvell.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Wed, 26 Jun 2024 09:42:59 -0700 Michael Chan wrote:
-> @@ -612,9 +613,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
->  normal_tx:
->  	if (length < BNXT_MIN_PKT_SIZE) {
->  		pad = BNXT_MIN_PKT_SIZE - length;
-> -		if (skb_pad(skb, pad))
-> +		if (skb_pad(skb, pad)) {
->  			/* SKB already freed. */
-> +			tx_buf->is_ts_pkt = 0;
->  			goto tx_kick_pending;
-> +		}
->  		length = BNXT_MIN_PKT_SIZE;
->  	}
+Hello:
 
-There is a jump to tx_free in between these two, when DMA mapping
-head fails. It appears not to clear is_ts_pkt.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Why not add the clearing above the line on the error patch which 
-clears the skb pointer?
+On Wed, 26 Jun 2024 10:35:02 -0700 you wrote:
+> Embedding net_device into structures prohibits the usage of flexible
+> arrays in the net_device structure. For more details, see the discussion
+> at [1].
+> 
+> Un-embed the net_devices from struct lmac by converting them
+> into pointers, and allocating them dynamically. Use the leverage
+> alloc_netdev() to allocate the net_device object at
+> bgx_lmac_enable().
+> 
+> [...]
 
-@@ -771,6 +770,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
-        if (txr->kick_pending)
-                bnxt_txr_db_kick(bp, txr, txr->tx_prod);
-        txr->tx_buf_ring[txr->tx_prod].skb = NULL;
-+       txr->tx_buf_ring[txr->tx_prod].is_ts_pkt = 0;
-        dev_core_stats_tx_dropped_inc(dev);
-        return NETDEV_TX_OK;
- }
+Here is the summary with links:
+  - [net-next,v2] net: thunderx: Unembed netdev structure
+    https://git.kernel.org/netdev/net-next/c/94833addfaba
 
-> @@ -741,6 +744,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
->  	/* start back at beginning and unmap skb */
->  	prod = txr->tx_prod;
->  	tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-> +	tx_buf->is_ts_pkt = 0;
->  	dma_unmap_single(&pdev->dev, dma_unmap_addr(tx_buf, mapping),
->  			 skb_headlen(skb), DMA_TO_DEVICE);
->  	prod = NEXT_TX(prod);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
