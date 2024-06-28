@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-107800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 486CE91C69A
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:31:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079AD91C69B
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 21:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A01B1C23C25
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:31:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13492867E7
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 19:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7F6770E2;
-	Fri, 28 Jun 2024 19:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D35877114;
+	Fri, 28 Jun 2024 19:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CzokP0O9"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JL2wsxl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDD5770F6
-	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 19:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FBE77103
+	for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 19:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719603033; cv=none; b=kIV0hYAGAU2f172RS++kvm+cDwaFW5rOs1ulCQT6GM/WGgHxoWlzoJrv973Z9ih0cwdSsrt/HPLPpyeyRff7U8u97bhQDkhHE9gwSN9F4hsYYkGEtj6pKDXUR1XMcd9Fd++FhDdET7gkkLIpbWG4he2toKGudhk+puZmm+Bn/ag=
+	t=1719603035; cv=none; b=o7Z48cVVzR5613nfBst27+1nw+ZbJTleh5HpUakk3OXsLC5h3V6cD4N3bERZKA6VnIt2sUnx1I2q91Kj5W73CboFuD/zepx7i9CzYq91O/Hc0tjSNGfQ+NmeZETnRxcj+FANAaErXs6L4Z9B5MGG2TkhDABcWhMSFIRFqElXX38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719603033; c=relaxed/simple;
-	bh=N/5Gsur6PTzMHZisiFrWeWGentk+QujSTBMfv/sWYhY=;
+	s=arc-20240116; t=1719603035; c=relaxed/simple;
+	bh=3pBPw7kSW2YGnec6tS90paux9ZG4UrzKPhiFok9Z4KI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZLBkpEjn51MuQCdnvIAaDpWsRWNRFDLHx8Jh0AhOoJFVaQe5a9xteeYsBUcJo3GTDt9wtJSxHrNPYoBBJfPzYqwJjHSiD0/aFJh8SoPKn9r1AwjHlSsdfIEx9gXUGEMa2GTPLfWsJ+NivJ13HGnN0SjZSthPHEdeFIfHasMwkUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CzokP0O9; arc=none smtp.client-ip=209.85.216.49
+	 MIME-Version:Content-Type; b=g6APLro0gHmCM6gbK5xLfO+LoaFuymBfBL7qDHgHA0ANF4ViS+X9snb4chukXpLRcQYeGpOXRzQQGRT3iUNz4RGhVrVvgHNcgzyX0hrJEoQpshER0XMzw0ne4NT+FlP6qnwONBzK4LB/UWy+5bbxkGTX/8N0BDXd/UVUP8M0bAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JL2wsxl1; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2c92d00059eso652527a91.3
-        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:30:31 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2c8911c84daso666393a91.3
+        for <netdev@vger.kernel.org>; Fri, 28 Jun 2024 12:30:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719603031; x=1720207831; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1719603033; x=1720207833; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCMiLBJbI9HaV5+s0ye4QXxe3LciKfqehuLbq0KWIms=;
-        b=CzokP0O9AzVuUdDPWBX5sJTKJtGSigb7FPQ5Q8jD07T1EHbX10WV1VwHAlSVd7k4xI
-         qxQ0wnrxaqbcok+12l7n5FsaxVMy3bPGtjidvcUP6JadD0DbEczdYjP3MaSyG1t3eFTa
-         TO98TgPHlTum55xP/05io24FWTk45E6IEar7g=
+        bh=xoIsNX3SPk7ePFv5AF2VLijXD8U0xdbatuMqrqeMTjQ=;
+        b=JL2wsxl1ntaFp4DcJXJX7wt3FxvmAL3fkc893jkJ6jLRYxR+iVYlYDGOcKtGjttPX9
+         w7CE1b0z3tLnTCSmzBESTd6FECPRiZp8L7iJHrSV9UxkMS5TZAPnHL1t+gR1sLqRLEB9
+         xj2hFxUy9HRUgbvu/AHU7keT03NTFvKAHB0T4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719603031; x=1720207831;
+        d=1e100.net; s=20230601; t=1719603033; x=1720207833;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCMiLBJbI9HaV5+s0ye4QXxe3LciKfqehuLbq0KWIms=;
-        b=SRMLTgLzJEeVk9eDdp3o1+S87oHYy7fX3f+8u0j+ThwXVpW2WsRlx6jXUXBhPN6uF6
-         q/S+ALnLypxiseSr40pySBysxSbQn9LVZI3urqqQDMYApxi3DubyH3magWQkm8MlzjgU
-         QliCHF5XhbrcvYnos2N3FCfDzTsTqKt0fdX5ToctVM9NTgcBOj6bFw1f+nv6oIK+baJx
-         3L0819Kd9oH5AzZCNw0ytx5qJTDi3FZknVBQ21mvbEXWlumOqbabw4zZAEV4timAgGHE
-         azUAqgBVMzFiV30kTtOApzUAPKB/cn89lIFy9aDOpXk4KotO23KZsBTsXUnoC2ZDKbzK
-         12eA==
-X-Gm-Message-State: AOJu0YylSEJKJapU1Si/XMXV7wSHzoL2ZGM1Z9k3eWCI/muoh+wctARC
-	e++rkoWYHsJyb8LPs1ltilkFv6tddI4zB5/gUHushviqKzLhbyE+ax3epRt4AQ==
-X-Google-Smtp-Source: AGHT+IEtc4bHdFbqfl4KL/IMNHIDHZmTVUBQQIodIJrg4yJvgf/aNU+yAd39CmLhUs7pQrSQSz5MIg==
-X-Received: by 2002:a17:90b:1643:b0:2c2:f81f:f97f with SMTP id 98e67ed59e1d1-2c861485fcemr14175137a91.48.1719603030401;
-        Fri, 28 Jun 2024 12:30:30 -0700 (PDT)
+        bh=xoIsNX3SPk7ePFv5AF2VLijXD8U0xdbatuMqrqeMTjQ=;
+        b=Ml+IE8gKsQRtfvesu4n+RlmKvlIfdc9PtwGX0DtraiSYFUAAEciz0fJmAa8/nkU6Cp
+         QJVioZohjaXojttC5iijjtaoKtFeWJDSJekM9iMvG9bWAlzvJfJ3+DLtk/4y+Esi9rzO
+         Wx25HjUzul6hlqAbaZZuNX6xPqnm0aeWY/9n3h8La0Sr1iibHA/LI7ISy1x6g9bPJyP/
+         JqdK1jyS75nIhKIffVf2yMOPLJPBxsNQJLM+eme+sKqbqa+ZTBelhHAd1ZaHMrBrJmLL
+         dPQ2edvflcwj034VQ0+c5XPKTeNf+ZTI639QqoeCSAkBOIvRC+dy8NF+K1fcN5TP+yL1
+         QAfw==
+X-Gm-Message-State: AOJu0Yzgq0j8adsa/9RdmUtLXtuGrskgd4MQ+R2JYuJwk3YkTsAMv4/D
+	XeDNpdi7hR0APpqspH2pZxz/yRnfyKUdDG5LzfkCq1PLlRah/RHH1tV1XytYWg==
+X-Google-Smtp-Source: AGHT+IHWscV5ejme4DwWEegpwuLXM/hRJI2fALgIv8AqF5KDK8E3K4eiCUPzVc5KF5elwOFaKa+u6A==
+X-Received: by 2002:a17:90a:dd42:b0:2c8:143d:f22b with SMTP id 98e67ed59e1d1-2c8614a269amr15526973a91.42.1719603032613;
+        Fri, 28 Jun 2024 12:30:32 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c939cc9b04sm46707a91.0.2024.06.28.12.30.28
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c939cc9b04sm46707a91.0.2024.06.28.12.30.30
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Jun 2024 12:30:29 -0700 (PDT)
+        Fri, 28 Jun 2024 12:30:31 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: netdev@vger.kernel.org,
 	richardcochran@gmail.com,
 	horms@kernel.org,
 	przemyslaw.kitszel@intel.com
-Subject: [PATCH net-next v2 03/10] bnxt_en: Allow some TX packets to be unprocessed in NAPI
-Date: Fri, 28 Jun 2024 12:29:58 -0700
-Message-ID: <20240628193006.225906-4-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 04/10] bnxt_en: Add TX timestamp completion logic
+Date: Fri, 28 Jun 2024 12:29:59 -0700
+Message-ID: <20240628193006.225906-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240628193006.225906-1-michael.chan@broadcom.com>
 References: <20240628193006.225906-1-michael.chan@broadcom.com>
@@ -85,122 +85,227 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d70ec8061bf8473e"
+	boundary="000000000000f58489061bf8476e"
 
---000000000000d70ec8061bf8473e
+--000000000000f58489061bf8476e
 Content-Transfer-Encoding: 8bit
 
-The driver's current logic will always free all the TX SKBs up to
-txr->tx_hw_cons within NAPI.  In the next patches, we'll be adding
-logic to handle TX timestamp completion and we may need to hold
-some remaining TX SKBs if we don't have the timestamp completions
-yet.
-
-Modify __bnxt_poll_work_done() to clear each event bit separately to
-allow bnapi->tx_int() to decide whether to clear BNXT_TX_CMP_EVENT or
-not.  bnapi->tx_int() will not clear BNXT_TX_CMP_EVENT if some TX
-SKBs are held waiting for TX timestamps.  Note that legacy chips will
-never hold any SKBs this way.  The SKB is always deferred to the PTP
-worker slow path to retrieve the timestamp from firmware.  On the new
-P7 chips, the timestamp is returned by the hardware directly and we
-can retrieve it directly from NAPI.
+The new BCM5760X chips will return the timestamp of TX packets in a
+new completion.  Add logic in __bnxt_poll_work() to handle this
+completion type to retrieve the timestamp.  This feature eliminates
+the limit on the number of in-flight PTP TX packets.
 
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+v2: Set the SKBTX_IN_PROGRESS flag for timestamp packets.
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 40 ++++++++++++++-----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 32 +++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  2 +
+ 4 files changed, 64 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index af064dcc6142..9dbf2967df1c 100644
+index 9dbf2967df1c..e6b0a937d9b1 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -770,7 +770,8 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- }
+@@ -456,6 +456,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	dma_addr_t mapping;
+ 	unsigned int length, pad = 0;
+ 	u32 len, free_size, vlan_tag_flags, cfa_action, flags;
++	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+ 	u16 prod, last_frag;
+ 	struct pci_dev *pdev = bp->pdev;
+ 	struct bnxt_tx_ring_info *txr;
+@@ -509,10 +510,13 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			vlan_tag_flags |= 1 << TX_BD_CFA_META_TPID_SHIFT;
+ 	}
  
--static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+/* Returns true if some remaining TX packets not processed. */
-+static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 			  int budget)
- {
- 	struct netdev_queue *txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
-@@ -793,7 +794,7 @@ static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+-	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+-		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+-
+-		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb)) {
++	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) && ptp &&
++	    ptp->tx_tstamp_en) {
++		if (bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP) {
++			lflags |= cpu_to_le32(TX_BD_FLAGS_STAMP);
++			tx_buf->is_ts_pkt = 1;
++			skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
++		} else if (!skb_is_gso(skb)) {
+ 			if (atomic_dec_if_positive(&ptp->tx_avail) < 0) {
+ 				atomic64_inc(&ptp->stats.ts_err);
+ 				goto tx_no_ts;
+@@ -780,6 +784,7 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 	unsigned int tx_bytes = 0;
+ 	u16 cons = txr->tx_cons;
+ 	int tx_pkts = 0;
++	bool rc = false;
+ 
+ 	while (RING_TX(bp, cons) != hw_cons) {
+ 		struct bnxt_sw_tx_bd *tx_buf;
+@@ -788,24 +793,29 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 		int j, last;
+ 
+ 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, cons)];
+-		cons = NEXT_TX(cons);
+ 		skb = tx_buf->skb;
+-		tx_buf->skb = NULL;
  
  		if (unlikely(!skb)) {
  			bnxt_sched_reset_txr(bp, txr, cons);
--			return;
-+			return false;
+-			return false;
++			return rc;
++		}
++
++		is_ts_pkt = tx_buf->is_ts_pkt;
++		if (is_ts_pkt && (bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP)) {
++			rc = true;
++			break;
  		}
  
++		cons = NEXT_TX(cons);
  		tx_pkts++;
-@@ -842,18 +843,22 @@ static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	__netif_txq_completed_wake(txq, tx_pkts, tx_bytes,
+ 		tx_bytes += skb->len;
++		tx_buf->skb = NULL;
++		tx_buf->is_ts_pkt = 0;
+ 
+ 		if (tx_buf->is_push) {
+ 			tx_buf->is_push = 0;
+ 			goto next_tx_int;
+ 		}
+-		is_ts_pkt = tx_buf->is_ts_pkt;
+-		tx_buf->is_ts_pkt = 0;
+ 
+ 		dma_unmap_single(&pdev->dev, dma_unmap_addr(tx_buf, mapping),
+ 				 skb_headlen(skb), DMA_TO_DEVICE);
+@@ -844,7 +854,7 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
  				   bnxt_tx_avail(bp, txr), bp->tx_wake_thresh,
  				   READ_ONCE(txr->dev_state) == BNXT_DEV_STATE_CLOSING);
-+
-+	return false;
+ 
+-	return false;
++	return rc;
  }
  
  static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- {
- 	struct bnxt_tx_ring_info *txr;
-+	bool more = false;
- 	int i;
+@@ -2924,6 +2934,8 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 					cpr->has_more_work = 1;
+ 				break;
+ 			}
++		} else if (cmp_type == CMP_TYPE_TX_L2_PKT_TS_CMP) {
++			bnxt_tx_ts_cmp(bp, bnapi, (struct tx_ts_cmp *)txcmp);
+ 		} else if (cmp_type >= CMP_TYPE_RX_L2_CMP &&
+ 			   cmp_type <= CMP_TYPE_RX_L2_TPA_START_V3_CMP) {
+ 			if (likely(budget))
+@@ -6802,6 +6814,7 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
+ 	switch (ring_type) {
+ 	case HWRM_RING_ALLOC_TX: {
+ 		struct bnxt_tx_ring_info *txr;
++		u16 flags = 0;
  
- 	bnxt_for_each_napi_tx(i, bnapi, txr) {
- 		if (txr->tx_hw_cons != RING_TX(bp, txr->tx_cons))
--			__bnxt_tx_int(bp, txr, budget);
-+			more |= __bnxt_tx_int(bp, txr, budget);
+ 		txr = container_of(ring, struct bnxt_tx_ring_info,
+ 				   tx_ring_struct);
+@@ -6815,6 +6828,9 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
+ 		if (bp->flags & BNXT_FLAG_TX_COAL_CMPL)
+ 			req->cmpl_coal_cnt =
+ 				RING_ALLOC_REQ_CMPL_COAL_CNT_COAL_64;
++		if ((bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP) && bp->ptp_cfg)
++			flags |= RING_ALLOC_REQ_FLAGS_TX_PKT_TS_CMPL_ENABLE;
++		req->flags = cpu_to_le16(flags);
+ 		break;
  	}
--	bnapi->events &= ~BNXT_TX_CMP_EVENT;
-+	if (!more)
-+		bnapi->events &= ~BNXT_TX_CMP_EVENT;
+ 	case HWRM_RING_ALLOC_RX:
+@@ -9109,6 +9125,8 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ 		bp->fw_cap |= BNXT_FW_CAP_RX_ALL_PKT_TS;
+ 	if (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_UDP_GSO_SUPPORTED)
+ 		bp->flags |= BNXT_FLAG_UDP_GSO_CAP;
++	if (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_TX_PKT_TS_CMPL_SUPPORTED)
++		bp->fw_cap |= BNXT_FW_CAP_TX_TS_CMP;
+ 
+ 	bp->tx_push_thresh = 0;
+ 	if ((flags & FUNC_QCAPS_RESP_FLAGS_PUSH_MODE_SUPPORTED) &&
+@@ -12150,7 +12168,7 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 	/* VF-reps may need to be re-opened after the PF is re-opened */
+ 	if (BNXT_PF(bp))
+ 		bnxt_vf_reps_open(bp);
+-	if (bp->ptp_cfg)
++	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
+ 		atomic_set(&bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
+ 	bnxt_ptp_init_rtc(bp, true);
+ 	bnxt_ptp_cfg_tstamp_filters(bp);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 00976e8a1e6a..12d6d17936a9 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2410,6 +2410,7 @@ struct bnxt {
+ 	#define BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V2	BIT_ULL(16)
+ 	#define BNXT_FW_CAP_PCIE_STATS_SUPPORTED	BIT_ULL(17)
+ 	#define BNXT_FW_CAP_EXT_STATS_SUPPORTED		BIT_ULL(18)
++	#define BNXT_FW_CAP_TX_TS_CMP			BIT_ULL(19)
+ 	#define BNXT_FW_CAP_ERR_RECOVER_RELOAD		BIT_ULL(20)
+ 	#define BNXT_FW_CAP_HOT_RESET			BIT_ULL(21)
+ 	#define BNXT_FW_CAP_PTP_RTC			BIT_ULL(22)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index a14d46b9bfdf..0ca7bc75616b 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -768,6 +768,38 @@ int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts)
+ 	return 0;
  }
  
- static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
-@@ -2950,8 +2955,10 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		}
- 	}
- 
--	if (event & BNXT_REDIRECT_EVENT)
-+	if (event & BNXT_REDIRECT_EVENT) {
- 		xdp_do_flush();
-+		event &= ~BNXT_REDIRECT_EVENT;
++void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
++		    struct tx_ts_cmp *tscmp)
++{
++	struct skb_shared_hwtstamps timestamp = {};
++	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++	u32 opaque = tscmp->tx_ts_cmp_opaque;
++	struct bnxt_tx_ring_info *txr;
++	struct bnxt_sw_tx_bd *tx_buf;
++	u64 ts, ns;
++	u16 cons;
++
++	txr = bnapi->tx_ring[TX_OPAQUE_RING(opaque)];
++	ts = BNXT_GET_TX_TS_48B_NS(tscmp);
++	cons = TX_OPAQUE_IDX(opaque);
++	tx_buf = &txr->tx_buf_ring[RING_TX(bp, cons)];
++	if (tx_buf->is_ts_pkt) {
++		if (BNXT_TX_TS_ERR(tscmp)) {
++			netdev_err(bp->dev,
++				   "timestamp completion error 0x%x 0x%x\n",
++				   le32_to_cpu(tscmp->tx_ts_cmp_flags_type),
++				   le32_to_cpu(tscmp->tx_ts_cmp_errors_v));
++		} else {
++			spin_lock_bh(&ptp->ptp_lock);
++			ns = timecounter_cyc2time(&ptp->tc, ts);
++			spin_unlock_bh(&ptp->ptp_lock);
++			timestamp.hwtstamp = ns_to_ktime(ns);
++			skb_tstamp_tx(tx_buf->skb, &timestamp);
++		}
++		tx_buf->is_ts_pkt = 0;
 +	}
- 
- 	if (event & BNXT_TX_EVENT) {
- 		struct bnxt_tx_ring_info *txr = bnapi->tx_ring[0];
-@@ -2961,6 +2968,7 @@ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 		wmb();
- 
- 		bnxt_db_write_relaxed(bp, &txr->tx_db, prod);
-+		event &= ~BNXT_TX_EVENT;
- 	}
- 
- 	cpr->cp_raw_cons = raw_cons;
-@@ -2978,13 +2986,14 @@ static void __bnxt_poll_work_done(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		struct bnxt_rx_ring_info *rxr = bnapi->rx_ring;
- 
- 		bnxt_db_write(bp, &rxr->rx_db, rxr->rx_prod);
-+		bnapi->events &= ~BNXT_RX_EVENT;
- 	}
- 	if (bnapi->events & BNXT_AGG_EVENT) {
- 		struct bnxt_rx_ring_info *rxr = bnapi->rx_ring;
- 
- 		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
-+		bnapi->events &= ~BNXT_AGG_EVENT;
- 	}
--	bnapi->events &= BNXT_TX_CMP_EVENT;
- }
- 
- static int bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
++}
++
+ static const struct ptp_clock_info bnxt_ptp_caps = {
+ 	.owner		= THIS_MODULE,
+ 	.name		= "bnxt clock",
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index 8c30b428a428..d38c3500827f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -156,6 +156,8 @@ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
+ int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
+ int bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb);
+ int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
++void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
++		    struct tx_ts_cmp *tscmp);
+ void bnxt_ptp_rtc_timecounter_init(struct bnxt_ptp_cfg *ptp, u64 ns);
+ int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg);
+ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg);
 -- 
 2.30.1
 
 
---000000000000d70ec8061bf8473e
+--000000000000f58489061bf8476e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -271,14 +376,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP1lEhF6QvrHPjy/TgJwlJcBiscaYTks
-lkzPYTkSzo6mMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
-ODE5MzAzMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP8PsSAL4aU/aMHg4CgmGGsyBoa2oYgb
+10uawAauVAUbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYy
+ODE5MzAzM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA25oR7LvWVGdpfCoqgqA/spYUk+QodrV4nJd50qReSvOtifXAS
-5AsL6g2uajqBd1QffkHKP8GuVh+LFAcSSOMldLShUEJg7Mvcy3IjAKhs1YuoZ4b2LcYKCkonSscb
-eXvVKC1HnGOhNMZzQepkfjf16g/J3lW8FUOQYBFoTMR3gtYWU7j8Xr7EtQGEC0NkGYLcNXpUiX/W
-JoAlHTznRQTYKr1ned9mI8vBZvdQNA+KS4Xp1mMJKMJGWCWsBgQX8NPXSHizYPi/5raQ530wKom1
-THKBEv5xMUC2HCQmX4TaZwZX5UNPu6rv0wtp9sO6ZQo2yyuuWUtfj+2IuoS0vvSk
---000000000000d70ec8061bf8473e--
+ATANBgkqhkiG9w0BAQEFAASCAQAjRQB+fHViZcptYrWhfbh7GiS8Gyt7yWqPhgGcPfdbt5qzqrdR
+DdNZ1fSIPt5nuFoHKEZU3D9EnF9/dq7b3SXTW1EH/tS+jFnnpi2VcGrTUrXFPL8p5wFj7b3NpqSF
+wQosSSdA13wW3pCeVM5NjHBhTZpyYOiw888rX4KX57HEYf3v+KMZsCnenWROwVUftlQROuKqvAxd
+v0DnTs8WFbnQbrHt7akZ9KAmI6TumkqJFcz5/Q9gVXWWQerQBfc4NIJ84Hw27fMyuR6361D3cJbp
+7p98Up138Y8SeyenijtX2++DgCnRvzoDm80DaO0F5IAjEMU2tnuXlibGC1iJBNcn
+--000000000000f58489061bf8476e--
 
