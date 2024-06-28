@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-107848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D73E91C8F5
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 00:12:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B27791C902
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 00:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B95361F2762D
-	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 22:12:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 175912822EB
+	for <lists+netdev@lfdr.de>; Fri, 28 Jun 2024 22:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBEC80BF7;
-	Fri, 28 Jun 2024 22:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4F478C8B;
+	Fri, 28 Jun 2024 22:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URvGmxRW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hsjFH66D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800AC7E57F;
-	Fri, 28 Jun 2024 22:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3894DA08;
+	Fri, 28 Jun 2024 22:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719612769; cv=none; b=CFGBauCGQN1APatE88kI20VwDrysil6JFQva9JjFQ0Gj65Qd6TVWAhJEi0JmAlB1rUoSmXRrV6kyujRhSrDwnzEtcHCSYNmRBG92oqwP6Bq3zsTUNMjPA2H5sA0BM13TIynZq5zmLlRZCn1WgEVXIOlWGh2dqdyq7kVk8ip5UyM=
+	t=1719613039; cv=none; b=rD79NEOVJpDsK3smm6dXL76TvuJWooqhH78RmAa3EhngFn4mivUtpPY4Oi+hJufNfBs0C5YoYpQFgLpARFOZM5P2CE5/AoC5ovvDrUl2wHulRMZMECJJvraVJcZhZi1WEaDiflftpL569oRugWU7xuq6XpFFPJ5512pf0MUp6wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719612769; c=relaxed/simple;
-	bh=AyisUTH6Ol1mb1jrlE0aMiW6gf83ZXx6hkss3LG5i/A=;
+	s=arc-20240116; t=1719613039; c=relaxed/simple;
+	bh=tibdrRxKr+OmLNEUJ2Q1gCRl35J7obhxCvYtTb6dd/0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sEF9rOIqAFH7t7mcUabqrPGVLFp5wIgIi2zZbol7qWG/UdSafhNP5i/ldVBjlfK5Wk4mAYwegnjLAMSyBlVCOeEOdkMoBg7zOXzGRLNmb/4n5YMV6cWdReM9L6TY7e/MhynONSstqvXA0JUJcPB+/NzOcwUcIh7HwlboIXdx0N0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URvGmxRW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1BD8C116B1;
-	Fri, 28 Jun 2024 22:12:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719612769;
-	bh=AyisUTH6Ol1mb1jrlE0aMiW6gf83ZXx6hkss3LG5i/A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=URvGmxRWPzOuC2Z1GL011/xd9Zr8GFj7+4PjTus12MhMkaPcgoJabZK7FKyAtvnxL
-	 knElPOgi15X4njF8T++B5ljJJkzH/FUiaXUyOGYCVOIS0gY8U9KOKIv9Qm1y225JNZ
-	 35htzufXm7da+xXZcroUOpkdfOnvreY5oSJZjRoPjutvre9KLXxdVPN5bP1IKQaubV
-	 v9Cr3yPokQR0zo5ycCb9f+yfH4CuHcqSQo/Tlxq5tlJ6icsDB+h/5hk62f5SYDc8X7
-	 7SHStzB2rcJKwemgvPqWoNSUZ/P618druhC0UK04RTJ6+JBQU6T5EDaez33cQt7Hcl
-	 j7SGDlML3bk8g==
-Date: Fri, 28 Jun 2024 16:12:46 -0600
-From: Rob Herring <robh@kernel.org>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Conor Dooley <conor@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bl1cR2/oh7/wEBCoweUIPkgYo0qz6T98nYZSH/OAANY6OcdoC3RTX3KFauDiWyMWWkyR7AdqOr3vqEXD9BIhkiJKMfi46zoz54WRdF8jtSxMTyD8shB47KypPQ2mOHm82qrMT5zbD8+weQiZvNcLAgtwgNPoNteY54pHsHBqtYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hsjFH66D; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FkeOeWfmA8N6WfXP0KBtOcijRi04NyPUZ7Dnot/6j3o=; b=hsjFH66D8g9+9dSOKNWklH9uAF
+	YHXMKCxnAGWqimirw253jOOwZbhGZXu4SAPG1j2GtfIL4VYas6eNgesM7eayLd5ByzrFcpar7cCm/
+	SO9HxlYCH2wwr22sMmdQ57Vy7pbmrtjnm8aBQGrGyAyvD4dlfxmYXdSl7mSE36TNOlGZuPaZfyBJc
+	IbKx8njf8xWafxyFQpLbJwEO2MzbKK/jTiCi6cNiRb5y6MHOnKQcFoKRrPDQhLAzTVbdYOKGHvtUD
+	JaR+QF3Km+/aElUekrbXOkSB70v0tV3ji2Svk0JGWK/rIVCdkzCOFq89rzLd1wCHGgTM9MyN44lWv
+	zy2KYpDQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43110)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sNJtl-0007Yz-2e;
+	Fri, 28 Jun 2024 23:16:53 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sNJtl-0006qf-Rf; Fri, 28 Jun 2024 23:16:53 +0100
+Date: Fri, 28 Jun 2024 23:16:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 06/10] dt-bindings: net: Add Synopsys DW xPCS
- bindings
-Message-ID: <20240628221246.GA296233-robh@kernel.org>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627004142.8106-7-fancer.lancer@gmail.com>
- <20240627-hurry-gills-19a2496797f3@spud>
- <e5mqaztxz62b7jktr47mojjrz7ht5m4ou4mqsxtozpp3xba7e4@uh7v5zn2pbn2>
+	Conor Dooley <conor+dt@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
+	Andrew Halaney <ahalaney@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] net: stmmac: Bring down the clocks to lower
+ frequencies when mac link goes down
+Message-ID: <Zn82VaTQBe0LkhSa@shell.armlinux.org.uk>
+References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
+ <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,49 +84,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e5mqaztxz62b7jktr47mojjrz7ht5m4ou4mqsxtozpp3xba7e4@uh7v5zn2pbn2>
+In-Reply-To: <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Jun 27, 2024 at 08:10:48PM +0300, Serge Semin wrote:
-> On Thu, Jun 27, 2024 at 04:51:22PM +0100, Conor Dooley wrote:
-> > On Thu, Jun 27, 2024 at 03:41:26AM +0300, Serge Semin wrote:
-> > > +  clocks:
-> > > +    description:
-> > > +      Both MCI and APB3 interfaces are supposed to be equipped with a clock
-> > > +      source connected via the clk_csr_i line.
-> > > +
-> > > +      PCS/PMA layer can be clocked by an internal reference clock source
-> > > +      (phyN_core_refclk) or by an externally connected (phyN_pad_refclk) clock
-> > > +      generator. Both clocks can be supplied at a time.
-> > > +    minItems: 1
-> > > +    maxItems: 3
-> > > +
-> > > +  clock-names:
-> > > +    oneOf:
-> > > +      - minItems: 1
-> > > +        items:
-> > > +          - enum: [core, pad]
-> > > +          - const: pad
-> > > +      - minItems: 1
-> > > +        items:
-> > > +          - const: pclk
-> > > +          - enum: [core, pad]
-> > > +          - const: pad
-> > 
-> 
-> > While reading this, I'm kinda struggling to map "clk_csr_i" to a clock
-> > name. Is that pclk? And why pclk if it is connected to "clk_csr_i"?
-> 
-> Right. It's "pclk". The reason of using the "pclk" name is that it has
-> turned to be a de-facto standard name in the DT-bindings for the
-> peripheral bus clock sources utilized for the CSR-space IO buses.
-> Moreover the STMMAC driver responsible for the parental DW *MAC
-> devices handling also has the "pclk" name utilized for the clk_csr_i
-> signal. So using the "pclk" name in the tightly coupled devices (MAC
-> and PCS) for the same signal seemed a good idea.
+On Tue, Jun 25, 2024 at 04:49:30PM -0700, Sagar Cheluvegowda wrote:
+> When mac link goes down we don't need to mainitain the clocks to operate
+> at higher frequencies, as an optimized solution to save power when
+> the link goes down we are trying to bring down the clocks to the
+> frequencies corresponding to the lowest speed possible.
 
-It is? That's really just the name of the bus clock for APB (Arm 
-Peripheral Bus). If there's a name that matches the docs, use that. 
-Though I'd drop 'clk_' part.
+I thought I had already commented on a similar patch, but I can't find
+anything in my mailboxes to suggest I had.
 
-Rob
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index ec7c61ee44d4..f0166f0bc25f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -996,6 +996,9 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+>  
+> +	if (priv->plat->fix_mac_speed)
+> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
+> +
+>  	stmmac_mac_set(priv, priv->ioaddr, false);
+>  	priv->eee_active = false;
+>  	priv->tx_lpi_enabled = false;
+> @@ -1004,6 +1007,11 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+>  
+>  	if (priv->dma_cap.fpesel)
+>  		stmmac_fpe_link_state_handle(priv, false);
+> +
+> +	stmmac_set_icc_bw(priv, SPEED_10);
+> +
+> +	if (priv->plat->fix_mac_speed)
+> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
+
+Two things here:
+
+1) Why do we need to call fix_mac_speed() at the start and end of this
+   stmmac_mac_link_down()?
+
+2) What if the MAC doesn't support 10M operation? For example, dwxgmac2
+   and dwxlgmac2 do not support anything below 1G. It feels that this
+   is storing up a problem for the future, where a platform that uses
+   e.g. xlgmac2 also implements fix_mac_speed() and then gets a
+   surprise when it's called with SPEED_10.
+
+Personally, I don't like "fix_mac_speed", and I don't like it even more
+with this change. I would prefer to see link_up/link_down style
+operations so that platforms can do whatever they need to on those
+events, rather than being told what to do by a single call that may
+look identical irrespective of whether the link came up or went down.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
