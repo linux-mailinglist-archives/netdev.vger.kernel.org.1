@@ -1,295 +1,160 @@
-Return-Path: <netdev+bounces-107904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004E191CE4F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 19:38:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 003DD91CE70
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 19:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C776B21579
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 17:38:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57C921F21D34
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 17:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB4C81720;
-	Sat, 29 Jun 2024 17:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6890D12FF86;
+	Sat, 29 Jun 2024 17:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVB4FFGY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nOCeGXjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320A9132101;
-	Sat, 29 Jun 2024 17:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908421E4AF
+	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 17:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719682704; cv=none; b=cXFlOogWhjLmj9OJT+7VGqLgxXQSXF/dCO/8cz43S/qntac4s0A70eWAG+b8FqbHlRoL1r+x8hcfNv3gXNT+op9lQSqWtbU5m4AvrnoXlU5GZRsQxtv6nO5m4Vr6rXrLqj3NuBUMp7oFIfjW2THJffyXlP84IQGxvcTXugZLSvY=
+	t=1719683802; cv=none; b=fOsZjaQ/BdPO1C3LZ//iu5kYWEqB9EsWVyIoeRSIgYhuH9K1qno6NBXkJTIzNdp7fk9RTlSRkKAt+8+0rdeFrtIK4P5MBYJrSOWKmQL5DVUUClboRfjmh/x8N79BgHJBuIk/wNn1mpMyRoJw9F+9W9IHGjtS7mPZeURyRXjT0fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719682704; c=relaxed/simple;
-	bh=o94cM3T/cGcDU6sUbN+h7zzTJ/Cs9FyldfXPbQXrvbg=;
+	s=arc-20240116; t=1719683802; c=relaxed/simple;
+	bh=ZOHwuvsXQ6IecSL1eeVt0k69uFaXHhtC4yimAo7Y+F4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hoANLiiL2PwRveUYnOJdOjyi8WTIYGLQ9fBIli7STfVktwZYF/vokNLtJhDNCGxZcpZrkLpEbNR6eN0l2Am7r3ZJIsJ3lHfcRmHGxYmoVQnvCpy9gaYhttHYn1g3fLPqQqSiwNONeb6fcu/8SP968b1WThMFxK/tSMbV15n5ZIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVB4FFGY; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42564316479so10789625e9.2;
-        Sat, 29 Jun 2024 10:38:21 -0700 (PDT)
+	 To:Cc:Content-Type; b=WXO2IcvqsK7F91P1tmE729AD7W8IUFEJsPpP+OZ/Hw0XA2un+U5cfTA/N0ojoNeqabW/qMLaCZWDDNXHcoh6bqEaMd6QH29jptDNnR5zVjV2xfEwF47LTqq3pEPv7wUYnZ3+Nfv4FvcdYjIcQgBDEx2McDQIJITlckLEz7h96UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nOCeGXjS; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cd717ec07so2058359e87.0
+        for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 10:56:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719682700; x=1720287500; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719683799; x=1720288599; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9zhHRLj3j1cSIdzwblrg0PYdMtiKz5IrX7f7JfITYcc=;
-        b=TVB4FFGY86l2WMe/dVO9ZDzX2MKQ6P9e4MzP+mSol5VbpV5n4gcSxqjPlKWBdoeGWA
-         xGJu7uCO7KlLgDZVWYepMuJmyOxuxSGCsxGzxxtEfRZ87w0hjomS7QALkUhmqut8+bsQ
-         /wA1DNjhF7PXvacObmrP20Ii0T5AR56sHkHjZHd1Fg3byiiJ/NXomhI27Xt/PcUqUsyD
-         BvZcILn0LdjiveNOaDmZbmOZYJ/chWfnN0cG8DRJPfRo9jHz7iMcy0hsOK6vESddymGM
-         eJrEYDgUVSyrO6gIJCiIrTPvtFnfGzm8BzdkJ5xjGoSgGg1SrmR6JVafvRZ8NwJLcR2A
-         WPvg==
+        bh=jilKPrDVzoZgv2NzOfscMz8grOc1TduetD4V2qLBOFc=;
+        b=nOCeGXjSFPLrMf9P9z+vYNOyTsrXBEq7fCBGmoaepHOZbuVeIwwTnksSecKX+trrAa
+         aqZZElzfI8y0QDLbIXvx3HwsQ/PeLyJk1vRMKC3bl+5kM5s8eQUVnH4UYitCigjDdsba
+         ZIDnQ4Kbij36ZamUMxKFfBI3XZUVeciavIRwKvBm4dDpHeeZyt6/oEK3DBqe8UoGniyo
+         HKZ0z2PquscLJVJoynmMN3D3VqqTpatJ+2RUuMaVYPl6J6lKJtSJg6q7mBQsjXEADFnB
+         cFAnE/8xTKNv2Kb153z2jDGI1nUIfWflk3r9dGNnr9XoEn5dHdIW5D3P0WimaIPB1Hw7
+         N+iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719682700; x=1720287500;
+        d=1e100.net; s=20230601; t=1719683799; x=1720288599;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9zhHRLj3j1cSIdzwblrg0PYdMtiKz5IrX7f7JfITYcc=;
-        b=fhZ1O3CJ8ETEQgs/VPevbKf3nxuthRm367JrDi85IcuO6ZchfnpSqi6mC2eovVBKXf
-         wS4lEgFwA87Lq3MNNuX9BRbbI6QM2bQhL/onyRceHxC/AReePoGqTmYKq2VPdz8N0Y28
-         CgdDmWWr22z2tQAdR8RC0sbU2S2cRX1eHIc2l9wtYKkWpd8i+dYnDts8kAreNf8eJjBG
-         yoD45XSTpOBvuN2bNI7F3qoIJCQhxpzmjo774+76nT+voLNBDYghXKe9wx1126on5v7m
-         Pn2GN4Kc2iHRI3dzpKSFWSpVUoWgOjHZA5BKHu77n0jgYt/rdT7LW5u5SM9BmrawwN10
-         2bPA==
-X-Forwarded-Encrypted: i=1; AJvYcCWFsGtnsAWotZz3BS+n63CIjBHZASh7f/JzZSxmzSWLaCYIC+xxb95BMj7BjJtSg/oRdluwTt/zC5cJyQVUhiCfOt5QPQw1+A7UQZ1ck6BiC2ChBmBhA7H22PcUWLmyyARRXFIl
-X-Gm-Message-State: AOJu0YxmIscN+K0e6bGiJZAOX+xJsdFBlTnW4gOObCHqdguHWf4o6bzo
-	varZCPRB5ZknnNfBwnRZPbF0RjSKYtMh/QhEqzTCGJD13puqcAvCtmEJ/z42Nm1lvogDIIAUgs6
-	4pXkyXF2SP61FC0/BNZ3S7j37uU8=
-X-Google-Smtp-Source: AGHT+IH6MwOruFrrnck6lTQwGix6wuCeMGq8hKMDdGXoRm6SbfYwGwoBAjleU8Ocbjki/4mRJRJ5uLFqDctz4OWAwms=
-X-Received: by 2002:a5d:4905:0:b0:367:3417:a4bb with SMTP id
- ffacd0b85a97d-367757297d0mr778616f8f.63.1719682700237; Sat, 29 Jun 2024
- 10:38:20 -0700 (PDT)
+        bh=jilKPrDVzoZgv2NzOfscMz8grOc1TduetD4V2qLBOFc=;
+        b=ZKwDtQgtH6FIKR2ORIhvDU7rQzdFJqHlySth7N53y7Z9gwJ7zaSD/ekZjpy1rdoIHx
+         zfevNnOF1JxtFmHq0mkzQpI4WMHOVvzi+lz8lPsJG2H+1Z/iywFsM9S8BXJVUfXLrJRZ
+         CnYcFK8ch7slcqu5C8XY8M+c6vUj9WMbWriYQ48B2zr42DXQyCrgNtB0+f221ELOB+/z
+         0vDwFKERaLqqJPC9Nm1fK5U5wzb4PXf+BGQqbyOFOIp6wSuJ7mIAfqBp7VsVi3iPsdqr
+         zcAm04k7RKZ+XeMkYUlK3pSVtmc0gJ4ST6tSxNBNNW7UQSwDoMyMPAUzAFWL2kRjiVdI
+         /grA==
+X-Gm-Message-State: AOJu0YzNaqNFh1oT/BImaJZy3A1ZAPaJypJz85U5xf0jUHkFMJ/cAO7f
+	+3wHZIFC5Op4zh+NE+0wKgBzuz/2S6ii3N3jW87GGdbwa+0lpPLapnJEW7E2yOHD5JifFVaS5Rz
+	KSDYE0/GdWcMu41PHFxApK0528b7oL9ui0HzV
+X-Google-Smtp-Source: AGHT+IGVySmblyxgPd44QBgx/PKNc0hV6M77n5jilQw+/7NpFTAKrval08hCP8D+UysMOGM5VHKpbPxWA0W19kasfLc=
+X-Received: by 2002:ac2:4e0a:0:b0:52c:df86:68c6 with SMTP id
+ 2adb3069b0e04-52e826787cbmr1416586e87.16.1719683798417; Sat, 29 Jun 2024
+ 10:56:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
- <20240625135216.47007-11-linyunsheng@huawei.com> <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
- <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
-In-Reply-To: <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sat, 29 Jun 2024 10:37:43 -0700
-Message-ID: <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
- prepare/probe/commit API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+References: <20240628204139.458075-1-rushilg@google.com> <20240628180206.07c0a1b2@kernel.org>
+In-Reply-To: <20240628180206.07c0a1b2@kernel.org>
+From: Rushil Gupta <rushilg@google.com>
+Date: Sat, 29 Jun 2024 10:56:27 -0700
+Message-ID: <CANzqiF7TQW2yUM14XS68CxM35yJpq8DCRJRonMcyfTpfatBtMQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] gve: Add retry logic for recoverable adminq errors
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	willemb@google.com, hramamurthy@google.com, 
+	Shailend Chand <shailend@google.com>, Ziwei Xiao <ziweixiao@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 29, 2024 at 4:15=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
+On Fri, Jun 28, 2024 at 6:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> On 2024/6/29 6:35, Alexander H Duyck wrote:
-> > On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
-> >> There are many use cases that need minimum memory in order
-> >> for forward progress, but more performant if more memory is
-> >> available or need to probe the cache info to use any memory
-> >> available for frag caoleasing reason.
-> >>
-> >> Currently skb_page_frag_refill() API is used to solve the
-> >> above use cases, but caller needs to know about the internal
-> >> detail and access the data field of 'struct page_frag' to
-> >> meet the requirement of the above use cases and its
-> >> implementation is similar to the one in mm subsystem.
-> >>
-> >> To unify those two page_frag implementations, introduce a
-> >> prepare API to ensure minimum memory is satisfied and return
-> >> how much the actual memory is available to the caller and a
-> >> probe API to report the current available memory to caller
-> >> without doing cache refilling. The caller needs to either call
-> >> the commit API to report how much memory it actually uses, or
-> >> not do so if deciding to not use any memory.
-> >>
-> >> As next patch is about to replace 'struct page_frag' with
-> >> 'struct page_frag_cache' in linux/sched.h, which is included
-> >> by the asm-offsets.s, using the virt_to_page() in the inline
-> >> helper of page_frag_cache.h cause a "'vmemmap' undeclared"
-> >> compiling error for asm-offsets.s, use a macro for probe API
-> >> to avoid that compiling error.
-> >>
-> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >> ---
-> >>  include/linux/page_frag_cache.h |  82 +++++++++++++++++++++++
-> >>  mm/page_frag_cache.c            | 114 +++++++++++++++++++++++++++++++=
-+
-> >>  2 files changed, 196 insertions(+)
-> >>
-> >> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag=
-_cache.h
-> >> index b33904d4494f..e95d44a36ec9 100644
-> >> --- a/include/linux/page_frag_cache.h
-> >> +++ b/include/linux/page_frag_cache.h
-> >> @@ -4,6 +4,7 @@
-> >>  #define _LINUX_PAGE_FRAG_CACHE_H
-> >>
-> >>  #include <linux/gfp_types.h>
-> >> +#include <linux/mmdebug.h>
-> >>
-> >>  #define PAGE_FRAG_CACHE_MAX_SIZE    __ALIGN_MASK(32768, ~PAGE_MASK)
-> >>  #define PAGE_FRAG_CACHE_MAX_ORDER   get_order(PAGE_FRAG_CACHE_MAX_SIZ=
-E)
-> >> @@ -87,6 +88,9 @@ static inline unsigned int page_frag_cache_page_size=
-(struct encoded_va *encoded_
-> >>
-> >>  void page_frag_cache_drain(struct page_frag_cache *nc);
-> >>  void __page_frag_cache_drain(struct page *page, unsigned int count);
-> >> +struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-> >> +                            unsigned int *offset, unsigned int fragsz=
-,
-> >> +                            gfp_t gfp);
-> >>  void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-> >>                               unsigned int fragsz, gfp_t gfp_mask,
-> >>                               unsigned int align_mask);
-> >> @@ -99,12 +103,90 @@ static inline void *page_frag_alloc_va_align(stru=
-ct page_frag_cache *nc,
-> >>      return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, -align);
-> >>  }
-> >>
-> >> +static inline unsigned int page_frag_cache_page_offset(const struct p=
-age_frag_cache *nc)
-> >> +{
-> >> +    return page_frag_cache_page_size(nc->encoded_va) - nc->remaining;
-> >> +}
-> >> +
-> >>  static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
-> >>                                     unsigned int fragsz, gfp_t gfp_mas=
-k)
-> >>  {
-> >>      return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, ~0u);
-> >>  }
-> >>
-> >> +void *page_frag_alloc_va_prepare(struct page_frag_cache *nc, unsigned=
- int *fragsz,
-> >> +                             gfp_t gfp);
-> >> +
-> >> +static inline void *page_frag_alloc_va_prepare_align(struct page_frag=
-_cache *nc,
-> >> +                                                 unsigned int *fragsz=
-,
-> >> +                                                 gfp_t gfp,
-> >> +                                                 unsigned int align)
-> >> +{
-> >> +    WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
-> >> +    nc->remaining =3D nc->remaining & -align;
-> >> +    return page_frag_alloc_va_prepare(nc, fragsz, gfp);
-> >> +}
-> >> +
-> >> +struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
-> >> +                                    unsigned int *offset,
-> >> +                                    unsigned int *fragsz, gfp_t gfp);
-> >> +
-> >> +struct page *page_frag_alloc_prepare(struct page_frag_cache *nc,
-> >> +                                 unsigned int *offset,
-> >> +                                 unsigned int *fragsz,
-> >> +                                 void **va, gfp_t gfp);
-> >> +
-> >> +static inline struct encoded_va *__page_frag_alloc_probe(struct page_=
-frag_cache *nc,
-> >> +                                                     unsigned int *of=
-fset,
-> >> +                                                     unsigned int *fr=
-agsz,
-> >> +                                                     void **va)
-> >> +{
-> >> +    struct encoded_va *encoded_va;
-> >> +
-> >> +    *fragsz =3D nc->remaining;
-> >> +    encoded_va =3D nc->encoded_va;
-> >> +    *offset =3D page_frag_cache_page_size(encoded_va) - *fragsz;
-> >> +    *va =3D encoded_page_address(encoded_va) + *offset;
-> >> +
-> >> +    return encoded_va;
-> >> +}
-> >> +
-> >> +#define page_frag_alloc_probe(nc, offset, fragsz, va)                =
-       \
-> >> +({                                                                  \
-> >> +    struct page *__page =3D NULL;                                    =
- \
-> >> +                                                                    \
-> >> +    VM_BUG_ON(!*(fragsz));                                          \
-> >> +    if (likely((nc)->remaining >=3D *(fragsz)))                      =
- \
-> >> +            __page =3D virt_to_page(__page_frag_alloc_probe(nc,      =
- \
-> >> +                                                          offset,   \
-> >> +                                                          fragsz,   \
-> >> +                                                          va));     \
-> >> +                                                                    \
-> >> +    __page;                                                         \
-> >> +})
-> >> +
+> On Fri, 28 Jun 2024 20:41:39 +0000 Rushil Gupta wrote:
+> > An adminq command is retried if it fails with an ETIME error code
+> > which translates to the deadline exceeded error for the device.
+> > The create and destroy adminq commands are now managed via a common
+> > method. This method keeps track of return codes for each queue and retr=
+ies
+> > the commands for the queues that failed with ETIME.
+> > Other adminq commands that do not require queue level granularity are
+> > simply retried in gve_adminq_execute_cmd.
 > >
-> > Why is this a macro instead of just being an inline? Are you trying to
-> > avoid having to include a header due to the virt_to_page?
+> > Signed-off-by: Rushil Gupta <rushilg@google.com>
+> > Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+> > Reviewed-by: Shailend Chand <shailend@google.com>
+> > Reviewed-by: Ziwei Xiao <ziweixiao@google.com>
 >
-> Yes, you are right.
-> I tried including different headers for virt_to_page(), and it did not
-> work for arch/x86/kernel/asm-offsets.s, which has included linux/sched.h,
-> and linux/sched.h need 'struct page_frag_cache' for 'struct task_struct'
-> after this patchset, including page_frag_cache.h for sched.h causes the
-> below compiler error:
+> I told you once already that you're not allowed to repost patches
+> within 24h. You should also include a change long when you repost.
+I am sorry about the email mix-up. I will be careful about that in the futu=
+re.
 >
->   CC      arch/x86/kernel/asm-offsets.s
-> In file included from ./arch/x86/include/asm/page.h:89,
->                  from ./arch/x86/include/asm/thread_info.h:12,
->                  from ./include/linux/thread_info.h:60,
->                  from ./include/linux/spinlock.h:60,
->                  from ./include/linux/swait.h:7,
->                  from ./include/linux/completion.h:12,
->                  from ./include/linux/crypto.h:15,
->                  from arch/x86/kernel/asm-offsets.c:9:
-> ./include/linux/page_frag_cache.h: In function =E2=80=98page_frag_alloc_a=
-lign=E2=80=99:
-> ./include/asm-generic/memory_model.h:37:34: error: =E2=80=98vmemmap=E2=80=
-=99 undeclared (first use in this function); did you mean =E2=80=98mem_map=
-=E2=80=99?
->    37 | #define __pfn_to_page(pfn)      (vmemmap + (pfn))
->       |                                  ^~~~~~~
-> ./include/asm-generic/memory_model.h:65:21: note: in expansion of macro =
-=E2=80=98__pfn_to_page=E2=80=99
->    65 | #define pfn_to_page __pfn_to_page
->       |                     ^~~~~~~~~~~~~
-> ./arch/x86/include/asm/page.h:68:33: note: in expansion of macro =E2=80=
-=98pfn_to_page=E2=80=99
->    68 | #define virt_to_page(kaddr)     pfn_to_page(__pa(kaddr) >> PAGE_S=
-HIFT)
->       |                                 ^~~~~~~~~~~
-> ./include/linux/page_frag_cache.h:151:16: note: in expansion of macro =E2=
-=80=98virt_to_page=E2=80=99
->   151 |         return virt_to_page(va);
->       |                ^~~~~~~~~~~~
-> ./include/asm-generic/memory_model.h:37:34: note: each undeclared identif=
-ier is reported only once for each function it appears in
->    37 | #define __pfn_to_page(pfn)      (vmemmap + (pfn))
->       |                                  ^~~~~~~
-> ./include/asm-generic/memory_model.h:65:21: note: in expansion of macro =
-=E2=80=98__pfn_to_page=E2=80=99
->    65 | #define pfn_to_page __pfn_to_page
->       |                     ^~~~~~~~~~~~~
-> ./arch/x86/include/asm/page.h:68:33: note: in expansion of macro =E2=80=
-=98pfn_to_page=E2=80=99
->    68 | #define virt_to_page(kaddr)     pfn_to_page(__pa(kaddr) >> PAGE_S=
-HIFT)
->       |                                 ^~~~~~~~~~~
-> ./include/linux/page_frag_cache.h:151:16: note: in expansion of macro =E2=
-=80=98virt_to_page=E2=80=99
->   151 |         return virt_to_page(va);
+> Since Jeroen is a maintainer of this driver, and you are not listed
+> in the MAINTAINERS file I don't understand why you're the one sending
+> this. We can't teach everyone at google the upstream process one by
+> one so I'd like to request that only the listed maintainers post pure
+> GVE patches (or the folks who are heavily involved upstream).
+I could not find one single documentation that says only listed
+maintainers can post pure patches.
+Authors of some of the recently accepted patches were in fact not in
+the MAINTAINERS file.
+I am sending this patch as I was involved in getting this code to the
+upstream-ready state and testing it internally.
+However, if other GVE maintainers wish to follow this rule; I am ok
+with your suggestion.
 >
+> > diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net=
+/ethernet/google/gve/gve_adminq.c
+> > index c5bbc1b7524e..74c61b90ea45 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_adminq.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+> > @@ -12,7 +12,7 @@
+> >
+> >  #define GVE_MAX_ADMINQ_RELEASE_CHECK 500
+> >  #define GVE_ADMINQ_SLEEP_LEN         20
+> > -#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK   100
+> > +#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK   1000
+> >
+> >  #define GVE_DEVICE_OPTION_ERROR_FMT "%s option error:\n" \
+> >  "Expected: length=3D%d, feature_mask=3D%x.\n" \
+> > @@ -415,14 +415,17 @@ static int gve_adminq_parse_err(struct gve_priv *=
+priv, u32 status)
+> >  /* Flushes all AQ commands currently queued and waits for them to comp=
+lete.
+> >   * If there are failures, it will return the first error.
+> >   */
+> > -static int gve_adminq_kick_and_wait(struct gve_priv *priv)
+> > +static int gve_adminq_kick_and_wait(struct gve_priv *priv, int ret_cnt=
+, int *ret_codes)
+> >  {
+> >       int tail, head;
+> > -     int i;
+> > +     int i, j;
+> >
+> >       tail =3D ioread32be(&priv->reg_bar0->adminq_event_counter);
+> >       head =3D priv->adminq_prod_cnt;
+> >
+> > +     if ((head - tail) > ret_cnt)
 >
-
-I am pretty sure you just need to add:
-#include <asm/page.h>
+> please delete all the pointless parenthesis in + lines of this patch.
+> --
+> pw-bot: cr
 
