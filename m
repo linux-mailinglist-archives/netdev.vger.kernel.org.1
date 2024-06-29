@@ -1,83 +1,93 @@
-Return-Path: <netdev+bounces-107860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B1591C9DD
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:07:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 750A391CA08
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E5161C213BF
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:07:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB391F21E20
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C32EC7;
-	Sat, 29 Jun 2024 01:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A279628;
+	Sat, 29 Jun 2024 01:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz1mZdub"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3Q5AzE0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D977963C;
-	Sat, 29 Jun 2024 01:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28BDA2A;
+	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719623246; cv=none; b=F97vjQ/JT8oFTen10nLLc4U4TY6uP4DFKofRyw5eO/wcBOUrCB8EmRH5++Z3idwLf28IxEiYUfgq/JTJRGi5pwqRzH9+sB3HikF3SaAuFrAObm1OGcpJEUUM+BcI3aIFFdvF81cJUoPpuLI6/NHMqtfPK3LfBfzTOzynL7SMSkM=
+	t=1719624629; cv=none; b=tf6IW5wyul7+MH6zpsqhXCC9UbTU6gv2PO6sQH9vy4W4w9OlGCCKG+4BhptwauRXmf4uwWJ19CUstO2m4BA7aO6jh90UmLZFhyhFn7xpiAeM7mLSd0NQhuA1UpHBqvN0YTNs+J/rYtiICCBOMOWFFSsyRYR/y+3Yiek+UXYpVXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719623246; c=relaxed/simple;
-	bh=qDqhXvUXMIc+AFhmq41Sha8+fu2VdXeYid3XXG5bgqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aNkUr9ozZO/6Tng1EWWwKQmo3rRnDYBhuGbYDRpwD/9jlnOyaWbCeWFn4fUDFh4rj0w6slrMoxI1erIw9DI83j578GoH6Iluna5GTLDIAnbn9YnFu8zCvWP4/NXCGpYKZx7gw82cY56IpB+VQSvLVZEicwbfjjuuLzdAi6OtAEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz1mZdub; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D498C116B1;
-	Sat, 29 Jun 2024 01:07:24 +0000 (UTC)
+	s=arc-20240116; t=1719624629; c=relaxed/simple;
+	bh=DuI1y+QYSLwyknaKdlKPTUA7NjfbBMDJsMGJmhHMSNQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fCEbSxytzNuPkEBfig6CC/otFd575/MX4VGtGqkEz4229088T9QtxUGpHeHweEmC3nmjhDX0RltVAaKQYIoH6AwEHJ3xenf7DBotwQO+F8ctwWrYeeaWk/pC0EcQX2gncvA4H7Sd78c6PjQ97GAQzeW7TX2sj+AS+raUS1OPXcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3Q5AzE0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E814C116B1;
+	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719623245;
-	bh=qDqhXvUXMIc+AFhmq41Sha8+fu2VdXeYid3XXG5bgqg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oz1mZdubLqYAWGU5eS97jQnCATX4YuAf2g0Dp5jd/GugskOoC91GY72M7aOK59jA/
-	 cfu2nyYLDGgij4TpNPn8fiFwh3uKTbVu535k8JYyF568/nyXaSKwE4DUTH4dEISaCZ
-	 zoFvylTrD0v2BSBVd5SN8Rk6a2lGLmQaf7vxI9cIOC5p6HLqeitXwF6LZ2r6LhJ87H
-	 afAE6zC3U3wqofNgeaM5v9iwo1CDT/S5PmOdza2jEwN1pcuuPlJBjAenLhrzpyICmt
-	 HOEDUuvfXAF9nKesaD6U/gmMQ6xWX+M0kbav0nDYEdYeNXo2Wh0U2DaJKsOAQ/NnS9
-	 /sUBf1xp1ozrg==
-Date: Fri, 28 Jun 2024 18:07:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFQ=?=
- =?UTF-8?B?w7ZwZWw=?= <bjorn@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
- <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Eduard
- Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo
- <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa
- <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jonathan
- Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>, Paolo
- Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
- <sdf@fomichev.me>, Thomas Gleixner <tglx@linutronix.de>, Yonghong Song
- <yonghong.song@linux.dev>
-Subject: Re: [PATCH net-next 0/3] net: bpf_net_context cleanups.
-Message-ID: <20240628180723.53980170@kernel.org>
-In-Reply-To: <20240628103020.1766241-1-bigeasy@linutronix.de>
-References: <20240628103020.1766241-1-bigeasy@linutronix.de>
+	s=k20201202; t=1719624628;
+	bh=DuI1y+QYSLwyknaKdlKPTUA7NjfbBMDJsMGJmhHMSNQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=O3Q5AzE0/K3naZYaJonykY/RxvhWJldSVyR2Z93TwdUwLqgE7zUJAjYDlC2PZYcdq
+	 5YPHzRLSuTTY4hDxDZEt3aOHE+aT3PgZFKJCHntjWF+CSky0Ghz7UIbSyus3g3Hqqb
+	 TFdda6jEuaXMnyWv3E8TGIu0USMCfqeU4y9aY9ZEyOT8/7vEOhBtlkpL4fBavOZmKv
+	 GPPfFuRX/3Z18hAs8qYzx4mDMBkkyht+bAR2F38oNrJvCja1ot4M6e+tjq2h+n0IWB
+	 Uv5kGYZmrBwRh9kWjMTAWNzETtA4aDTVn1wQYS4vQQjuymtjDCV+9IIXJ01DgaWPeb
+	 gWsOWmbzV0L6w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AF31C433E9;
+	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171962462836.4840.5947953346740333097.git-patchwork-notify@kernel.org>
+Date: Sat, 29 Jun 2024 01:30:28 +0000
+References: <20240627111405.1037812-1-ghadi.rahme@canonical.com>
+In-Reply-To: <20240627111405.1037812-1-ghadi.rahme@canonical.com>
+To: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
+Cc: netdev@vger.kernel.org, jay.vosburgh@canonical.com, stable@vger.kernel.org
 
-On Fri, 28 Jun 2024 12:18:53 +0200 Sebastian Andrzej Siewior wrote:
-> a small series with bpf_net_context cleanups/ improvements.
-> Jakub asked for #1 and #2 
+Hello:
 
-I thought you'd just add flags check in xdp_do_flush(), but I guess
-this is even faster :)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+On Thu, 27 Jun 2024 14:14:05 +0300 you wrote:
+> Fix UBSAN warnings that occur when using a system with 32 physical
+> cpu cores or more, or when the user defines a number of Ethernet
+> queues greater than or equal to FP_SB_MAX_E1x using the num_queues
+> module parameter.
+> 
+> Currently there is a read/write out of bounds that occurs on the array
+> "struct stats_query_entry query" present inside the "bnx2x_fw_stats_req"
+> struct in "drivers/net/ethernet/broadcom/bnx2x/bnx2x.h".
+> Looking at the definition of the "struct stats_query_entry query" array:
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [v3,net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
+    https://git.kernel.org/netdev/net/c/134061163ee5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
