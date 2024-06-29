@@ -1,160 +1,186 @@
-Return-Path: <netdev+bounces-107905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 003DD91CE70
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 19:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD5791CEE9
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 21:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57C921F21D34
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 17:56:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CF781F21A4A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 19:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6890D12FF86;
-	Sat, 29 Jun 2024 17:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3A913A89A;
+	Sat, 29 Jun 2024 19:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nOCeGXjS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iYoekVsf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908421E4AF
-	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 17:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554EE80046;
+	Sat, 29 Jun 2024 19:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719683802; cv=none; b=fOsZjaQ/BdPO1C3LZ//iu5kYWEqB9EsWVyIoeRSIgYhuH9K1qno6NBXkJTIzNdp7fk9RTlSRkKAt+8+0rdeFrtIK4P5MBYJrSOWKmQL5DVUUClboRfjmh/x8N79BgHJBuIk/wNn1mpMyRoJw9F+9W9IHGjtS7mPZeURyRXjT0fo=
+	t=1719691077; cv=none; b=fE1WoRhLfkBewxZ2V7z8yjTtchpDFjr0CkaseGd6XrgOJTgljYLIGQ4s6GIyi10/3wCwqonGyztWqeLK6ychtcA/JR8oqSIyfhTgYs3Fy+TNYVxniGpgyNv+xHtmFwE3kNTB/xvpGFxU7BHPTFBeEWjknNgfby6G79JTbWbPdLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719683802; c=relaxed/simple;
-	bh=ZOHwuvsXQ6IecSL1eeVt0k69uFaXHhtC4yimAo7Y+F4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WXO2IcvqsK7F91P1tmE729AD7W8IUFEJsPpP+OZ/Hw0XA2un+U5cfTA/N0ojoNeqabW/qMLaCZWDDNXHcoh6bqEaMd6QH29jptDNnR5zVjV2xfEwF47LTqq3pEPv7wUYnZ3+Nfv4FvcdYjIcQgBDEx2McDQIJITlckLEz7h96UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nOCeGXjS; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cd717ec07so2058359e87.0
-        for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 10:56:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719683799; x=1720288599; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jilKPrDVzoZgv2NzOfscMz8grOc1TduetD4V2qLBOFc=;
-        b=nOCeGXjSFPLrMf9P9z+vYNOyTsrXBEq7fCBGmoaepHOZbuVeIwwTnksSecKX+trrAa
-         aqZZElzfI8y0QDLbIXvx3HwsQ/PeLyJk1vRMKC3bl+5kM5s8eQUVnH4UYitCigjDdsba
-         ZIDnQ4Kbij36ZamUMxKFfBI3XZUVeciavIRwKvBm4dDpHeeZyt6/oEK3DBqe8UoGniyo
-         HKZ0z2PquscLJVJoynmMN3D3VqqTpatJ+2RUuMaVYPl6J6lKJtSJg6q7mBQsjXEADFnB
-         cFAnE/8xTKNv2Kb153z2jDGI1nUIfWflk3r9dGNnr9XoEn5dHdIW5D3P0WimaIPB1Hw7
-         N+iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719683799; x=1720288599;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jilKPrDVzoZgv2NzOfscMz8grOc1TduetD4V2qLBOFc=;
-        b=ZKwDtQgtH6FIKR2ORIhvDU7rQzdFJqHlySth7N53y7Z9gwJ7zaSD/ekZjpy1rdoIHx
-         zfevNnOF1JxtFmHq0mkzQpI4WMHOVvzi+lz8lPsJG2H+1Z/iywFsM9S8BXJVUfXLrJRZ
-         CnYcFK8ch7slcqu5C8XY8M+c6vUj9WMbWriYQ48B2zr42DXQyCrgNtB0+f221ELOB+/z
-         0vDwFKERaLqqJPC9Nm1fK5U5wzb4PXf+BGQqbyOFOIp6wSuJ7mIAfqBp7VsVi3iPsdqr
-         zcAm04k7RKZ+XeMkYUlK3pSVtmc0gJ4ST6tSxNBNNW7UQSwDoMyMPAUzAFWL2kRjiVdI
-         /grA==
-X-Gm-Message-State: AOJu0YzNaqNFh1oT/BImaJZy3A1ZAPaJypJz85U5xf0jUHkFMJ/cAO7f
-	+3wHZIFC5Op4zh+NE+0wKgBzuz/2S6ii3N3jW87GGdbwa+0lpPLapnJEW7E2yOHD5JifFVaS5Rz
-	KSDYE0/GdWcMu41PHFxApK0528b7oL9ui0HzV
-X-Google-Smtp-Source: AGHT+IGVySmblyxgPd44QBgx/PKNc0hV6M77n5jilQw+/7NpFTAKrval08hCP8D+UysMOGM5VHKpbPxWA0W19kasfLc=
-X-Received: by 2002:ac2:4e0a:0:b0:52c:df86:68c6 with SMTP id
- 2adb3069b0e04-52e826787cbmr1416586e87.16.1719683798417; Sat, 29 Jun 2024
- 10:56:38 -0700 (PDT)
+	s=arc-20240116; t=1719691077; c=relaxed/simple;
+	bh=tk6AQGUGO2A5I3v/1p0THsa0yZeeDkzV2SH2rgDD4nY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qE7h7b/cC5n9g3xj2DpKznxMmbX6mQqkc1XVWqUeUdNww0plIxnszBkLJrKwrIltA8sJKMbPCeN38eZCN9dCWY0vILiZfUSEOcWffDigfOYP+nzQmetzOt2D/1EbnEsoMkhUYDbfhRtYV2IwqbsmaFUQoisiA9YEqfeFHlFfL8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iYoekVsf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814B4C2BBFC;
+	Sat, 29 Jun 2024 19:57:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719691076;
+	bh=tk6AQGUGO2A5I3v/1p0THsa0yZeeDkzV2SH2rgDD4nY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iYoekVsfsZ3S+Rk0Ky3YuMFfW9bB27gHuaTHUzMGkMzthr032H5shRuUrIqNu5kfO
+	 trG4NGAZYHNB1v7o4jLNtnY4xSkRiAVO0x+XUkeq/ohNwEAAmie74123z2hvG7+2y+
+	 wEl6CDMlnhI2UZATcJNXkZALjoCCcujZ1eE/n45/E4+K4qTY5QHrweumZQn2ePOZ9D
+	 3az3hX9U/J6WXy+m70E8eWJhZuYHjYlP4LsbNtb636Msna/YneY692kufKcfET13Yw
+	 wvQ30B3bM9CxsZ9w1r0G9BYnPVoRj0GW8yJFOHr/vflCkhFDcub2jcHPm3gR/Uosfu
+	 91oS6NALR1yNA==
+Date: Sat, 29 Jun 2024 21:57:53 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com,
+	lorenzo.bianconi@redhat.com, toke@redhat.com, fw@strlen.de,
+	hawk@kernel.org, horms@kernel.org, donhunte@redhat.com,
+	memxor@gmail.com
+Subject: Re: [PATCH v5 bpf-next 2/3] netfilter: add bpf_xdp_flow_lookup kfunc
+Message-ID: <ZoBnQZPfyCuyn1tG@lore-desk>
+References: <cover.1718379122.git.lorenzo@kernel.org>
+ <101e390e62edf8199db8f7cc4df79817b6741f59.1718379122.git.lorenzo@kernel.org>
+ <48b18dc0-19bd-441e-5054-4bd545cd1561@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628204139.458075-1-rushilg@google.com> <20240628180206.07c0a1b2@kernel.org>
-In-Reply-To: <20240628180206.07c0a1b2@kernel.org>
-From: Rushil Gupta <rushilg@google.com>
-Date: Sat, 29 Jun 2024 10:56:27 -0700
-Message-ID: <CANzqiF7TQW2yUM14XS68CxM35yJpq8DCRJRonMcyfTpfatBtMQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] gve: Add retry logic for recoverable adminq errors
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	willemb@google.com, hramamurthy@google.com, 
-	Shailend Chand <shailend@google.com>, Ziwei Xiao <ziweixiao@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="d8t7omf+zI8JIQ7G"
+Content-Disposition: inline
+In-Reply-To: <48b18dc0-19bd-441e-5054-4bd545cd1561@iogearbox.net>
+
+
+--d8t7omf+zI8JIQ7G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 28, 2024 at 6:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 28 Jun 2024 20:41:39 +0000 Rushil Gupta wrote:
-> > An adminq command is retried if it fails with an ETIME error code
-> > which translates to the deadline exceeded error for the device.
-> > The create and destroy adminq commands are now managed via a common
-> > method. This method keeps track of return codes for each queue and retr=
-ies
-> > the commands for the queues that failed with ETIME.
-> > Other adminq commands that do not require queue level granularity are
-> > simply retried in gve_adminq_execute_cmd.
-> >
-> > Signed-off-by: Rushil Gupta <rushilg@google.com>
-> > Signed-off-by: Jeroen de Borst <jeroendb@google.com>
-> > Reviewed-by: Shailend Chand <shailend@google.com>
-> > Reviewed-by: Ziwei Xiao <ziweixiao@google.com>
->
-> I told you once already that you're not allowed to repost patches
-> within 24h. You should also include a change long when you repost.
-I am sorry about the email mix-up. I will be careful about that in the futu=
-re.
->
-> Since Jeroen is a maintainer of this driver, and you are not listed
-> in the MAINTAINERS file I don't understand why you're the one sending
-> this. We can't teach everyone at google the upstream process one by
-> one so I'd like to request that only the listed maintainers post pure
-> GVE patches (or the folks who are heavily involved upstream).
-I could not find one single documentation that says only listed
-maintainers can post pure patches.
-Authors of some of the recently accepted patches were in fact not in
-the MAINTAINERS file.
-I am sending this patch as I was involved in getting this code to the
-upstream-ready state and testing it internally.
-However, if other GVE maintainers wish to follow this rule; I am ok
-with your suggestion.
->
-> > diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net=
-/ethernet/google/gve/gve_adminq.c
-> > index c5bbc1b7524e..74c61b90ea45 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> > @@ -12,7 +12,7 @@
-> >
-> >  #define GVE_MAX_ADMINQ_RELEASE_CHECK 500
-> >  #define GVE_ADMINQ_SLEEP_LEN         20
-> > -#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK   100
-> > +#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK   1000
-> >
-> >  #define GVE_DEVICE_OPTION_ERROR_FMT "%s option error:\n" \
-> >  "Expected: length=3D%d, feature_mask=3D%x.\n" \
-> > @@ -415,14 +415,17 @@ static int gve_adminq_parse_err(struct gve_priv *=
-priv, u32 status)
-> >  /* Flushes all AQ commands currently queued and waits for them to comp=
-lete.
-> >   * If there are failures, it will return the first error.
-> >   */
-> > -static int gve_adminq_kick_and_wait(struct gve_priv *priv)
-> > +static int gve_adminq_kick_and_wait(struct gve_priv *priv, int ret_cnt=
-, int *ret_codes)
-> >  {
-> >       int tail, head;
-> > -     int i;
-> > +     int i, j;
-> >
-> >       tail =3D ioread32be(&priv->reg_bar0->adminq_event_counter);
-> >       head =3D priv->adminq_prod_cnt;
-> >
-> > +     if ((head - tail) > ret_cnt)
->
-> please delete all the pointless parenthesis in + lines of this patch.
-> --
-> pw-bot: cr
+> On 6/14/24 5:40 PM, Lorenzo Bianconi wrote:
+> [...]
+> > +enum {
+> > +	NF_BPF_FLOWTABLE_OPTS_SZ =3D 4,
+> > +};
+> > +
+> > +__diag_push();
+> > +__diag_ignore_all("-Wmissing-prototypes",
+> > +		  "Global functions as their definitions will be in nf_flow_table BT=
+F");
+>=20
+> nit: __bpf_kfunc_start_defs();
+
+ack, I will fix it in v6.
+
+>=20
+> > +static struct flow_offload_tuple_rhash *
+> > +bpf_xdp_flow_tuple_lookup(struct net_device *dev,
+> > +			  struct flow_offload_tuple *tuple, __be16 proto)
+> > +{
+> > +	struct flow_offload_tuple_rhash *tuplehash;
+> > +	struct nf_flowtable *nf_flow_table;
+> > +	struct flow_offload *nf_flow;
+> > +
+> > +	nf_flow_table =3D nf_flowtable_by_dev(dev);
+> > +	if (!nf_flow_table)
+> > +		return ERR_PTR(-ENOENT);
+> > +
+> > +	tuplehash =3D flow_offload_lookup(nf_flow_table, tuple);
+> > +	if (!tuplehash)
+> > +		return ERR_PTR(-ENOENT);
+> > +
+> > +	nf_flow =3D container_of(tuplehash, struct flow_offload,
+> > +			       tuplehash[tuplehash->tuple.dir]);
+> > +	flow_offload_refresh(nf_flow_table, nf_flow, false);
+> > +
+> > +	return tuplehash;
+> > +}
+> > +
+> > +__bpf_kfunc struct flow_offload_tuple_rhash *
+> > +bpf_xdp_flow_lookup(struct xdp_md *ctx, struct bpf_fib_lookup *fib_tup=
+le,
+> > +		    struct bpf_flowtable_opts *opts, u32 opts_len)
+> > +{
+> > +	struct xdp_buff *xdp =3D (struct xdp_buff *)ctx;
+> > +	struct flow_offload_tuple tuple =3D {
+> > +		.iifidx =3D fib_tuple->ifindex,
+> > +		.l3proto =3D fib_tuple->family,
+> > +		.l4proto =3D fib_tuple->l4_protocol,
+> > +		.src_port =3D fib_tuple->sport,
+> > +		.dst_port =3D fib_tuple->dport,
+> > +	};
+> > +	struct flow_offload_tuple_rhash *tuplehash;
+> > +	__be16 proto;
+> > +
+> > +	if (opts_len !=3D NF_BPF_FLOWTABLE_OPTS_SZ) {
+> > +		opts->error =3D -EINVAL;
+> > +		return NULL;
+> > +	}
+> > +
+> > +	switch (fib_tuple->family) {
+> > +	case AF_INET:
+> > +		tuple.src_v4.s_addr =3D fib_tuple->ipv4_src;
+> > +		tuple.dst_v4.s_addr =3D fib_tuple->ipv4_dst;
+> > +		proto =3D htons(ETH_P_IP);
+> > +		break;
+> > +	case AF_INET6:
+> > +		tuple.src_v6 =3D *(struct in6_addr *)&fib_tuple->ipv6_src;
+> > +		tuple.dst_v6 =3D *(struct in6_addr *)&fib_tuple->ipv6_dst;
+> > +		proto =3D htons(ETH_P_IPV6);
+> > +		break;
+> > +	default:
+> > +		opts->error =3D -EAFNOSUPPORT;
+> > +		return NULL;
+> > +	}
+> > +
+> > +	tuplehash =3D bpf_xdp_flow_tuple_lookup(xdp->rxq->dev, &tuple, proto);
+> > +	if (IS_ERR(tuplehash)) {
+> > +		opts->error =3D PTR_ERR(tuplehash);
+> > +		return NULL;
+> > +	}
+> > +
+> > +	return tuplehash;
+> > +}
+> > +
+> > +__diag_pop()
+>=20
+> __bpf_kfunc_end_defs();
+
+ack, I will fix it in v6.
+
+Regards,
+Lorenzo
+
+>=20
+> Otherwise LGTM!
+
+--d8t7omf+zI8JIQ7G
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZoBnQQAKCRA6cBh0uS2t
+rA02AQD8HNziBYwq2G8qQrHmhgRF4NAWUrRSQzqdKBYjdMsXHgD/UBDEQacX5kwR
+NkPYcgEnZHcZacv0TwROec79cRTXbgU=
+=Wn5k
+-----END PGP SIGNATURE-----
+
+--d8t7omf+zI8JIQ7G--
 
