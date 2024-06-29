@@ -1,93 +1,71 @@
-Return-Path: <netdev+bounces-107861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750A391CA08
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66AB191CA0F
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB391F21E20
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 047281F229A4
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A279628;
-	Sat, 29 Jun 2024 01:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEF51859;
+	Sat, 29 Jun 2024 01:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3Q5AzE0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8Kg2vc4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28BDA2A;
-	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618274C8C;
+	Sat, 29 Jun 2024 01:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719624629; cv=none; b=tf6IW5wyul7+MH6zpsqhXCC9UbTU6gv2PO6sQH9vy4W4w9OlGCCKG+4BhptwauRXmf4uwWJ19CUstO2m4BA7aO6jh90UmLZFhyhFn7xpiAeM7mLSd0NQhuA1UpHBqvN0YTNs+J/rYtiICCBOMOWFFSsyRYR/y+3Yiek+UXYpVXw=
+	t=1719625146; cv=none; b=pYeoA3Hu9QzhxGLONdCPmn0iySkKg9cTA+7wecpbsEI+u/w4uwOoOINQlgC1/XV8AO6fyo68xWkQRpbM7HIqhkwjvXcvx26G3Zcj2oZyY9oOx04fksaEsacyjfrzsQC7hLQpUwBPl3JMSBccQWQgFQTjZLRcDzKQ8hfAmPeCTFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719624629; c=relaxed/simple;
-	bh=DuI1y+QYSLwyknaKdlKPTUA7NjfbBMDJsMGJmhHMSNQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fCEbSxytzNuPkEBfig6CC/otFd575/MX4VGtGqkEz4229088T9QtxUGpHeHweEmC3nmjhDX0RltVAaKQYIoH6AwEHJ3xenf7DBotwQO+F8ctwWrYeeaWk/pC0EcQX2gncvA4H7Sd78c6PjQ97GAQzeW7TX2sj+AS+raUS1OPXcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3Q5AzE0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E814C116B1;
-	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
+	s=arc-20240116; t=1719625146; c=relaxed/simple;
+	bh=54/5eeFJKqYDjuIPMCPEq3P1jJiZ4bNph2rKPD5V46A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sa0qFxl90/Y+md3d7K7q/c8Y9ZsNQG6M8hqonlfFspmC6w4ATIwv1OL6E0Nr+2CdxGdQwWCdKLkB5/N5Ab8w0LP2iXE434dcaXqShQd57gm+UUwn/3ZoEkrc3MPJUpMDVgL600oesQKBltKAQ1RMiUy7uTrwAkVrmU+OXMz1k4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8Kg2vc4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DABEC116B1;
+	Sat, 29 Jun 2024 01:39:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719624628;
-	bh=DuI1y+QYSLwyknaKdlKPTUA7NjfbBMDJsMGJmhHMSNQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O3Q5AzE0/K3naZYaJonykY/RxvhWJldSVyR2Z93TwdUwLqgE7zUJAjYDlC2PZYcdq
-	 5YPHzRLSuTTY4hDxDZEt3aOHE+aT3PgZFKJCHntjWF+CSky0Ghz7UIbSyus3g3Hqqb
-	 TFdda6jEuaXMnyWv3E8TGIu0USMCfqeU4y9aY9ZEyOT8/7vEOhBtlkpL4fBavOZmKv
-	 GPPfFuRX/3Z18hAs8qYzx4mDMBkkyht+bAR2F38oNrJvCja1ot4M6e+tjq2h+n0IWB
-	 Uv5kGYZmrBwRh9kWjMTAWNzETtA4aDTVn1wQYS4vQQjuymtjDCV+9IIXJ01DgaWPeb
-	 gWsOWmbzV0L6w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5AF31C433E9;
-	Sat, 29 Jun 2024 01:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719625145;
+	bh=54/5eeFJKqYDjuIPMCPEq3P1jJiZ4bNph2rKPD5V46A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S8Kg2vc49Y9HKCB64JccAl8eV0lNxYKNp3yi0uI9wG7EMdNNsydqWnXIbn2JmrJon
+	 M37+nyA5R2yD+MDRvV6k5wYKlEeBHgsHRgimYqwzX9bdoRKVmQEeo4sGsRsavhVvO8
+	 05H5rPOYj7HJ+gOzWd8EFnSuWHsdsJD20vSoN+NxbUOdreWXzt6NbUa+Zfs+GzF5Sy
+	 LuEWZkn1YfLlV+YZxJCbFBypjkr1457COQh/4EklccXQuiWtiB4P/ox6ujkytOBUdh
+	 drcz5YtIrlxE9CadOYUMgsz1Jb53wJ/2sep0pZnbjRiOGb2HXexwEpmCc9Fmoe2gzD
+	 4TV7ggXloT/kA==
+Date: Fri, 28 Jun 2024 18:39:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2024-06-27
+Message-ID: <20240628183904.4717d073@kernel.org>
+In-Reply-To: <20240627181912.2359683-1-stefan@datenfreihafen.org>
+References: <20240627181912.2359683-1-stefan@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171962462836.4840.5947953346740333097.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Jun 2024 01:30:28 +0000
-References: <20240627111405.1037812-1-ghadi.rahme@canonical.com>
-In-Reply-To: <20240627111405.1037812-1-ghadi.rahme@canonical.com>
-To: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
-Cc: netdev@vger.kernel.org, jay.vosburgh@canonical.com, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 27 Jun 2024 14:14:05 +0300 you wrote:
-> Fix UBSAN warnings that occur when using a system with 32 physical
-> cpu cores or more, or when the user defines a number of Ethernet
-> queues greater than or equal to FP_SB_MAX_E1x using the num_queues
-> module parameter.
+On Thu, 27 Jun 2024 20:19:12 +0200 Stefan Schmidt wrote:
+> Dmitry Antipov corrected the time calculations for the lifs and sifs
+> periods in mac802154.
 > 
-> Currently there is a read/write out of bounds that occurs on the array
-> "struct stats_query_entry query" present inside the "bnx2x_fw_stats_req"
-> struct in "drivers/net/ethernet/broadcom/bnx2x/bnx2x.h".
-> Looking at the definition of the "struct stats_query_entry query" array:
-> 
-> [...]
+> Yunshui Jiang introduced the safer use of DEV_STATS_* macros for
+> atomic updates. A good addition, even if not strictly necessary in
+> our code.
 
-Here is the summary with links:
-  - [v3,net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
-    https://git.kernel.org/netdev/net/c/134061163ee5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+FTR looks like this got merged by DaveM, thank you!
 
