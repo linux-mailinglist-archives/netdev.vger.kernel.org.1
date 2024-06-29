@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-107887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C441C91CC7A
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 13:40:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516CD91CC74
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 13:40:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7756B1F2206F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 11:40:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 829B41C21369
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 11:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137356BB58;
-	Sat, 29 Jun 2024 11:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A342558AD;
+	Sat, 29 Jun 2024 11:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D084EB2B
-	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 11:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB124F5F9
+	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 11:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719661228; cv=none; b=I6Ym+ySBK2rlorK3IQPnyipV3V9pjBXTVhcxGVGFmgWZb5KkJmEEB57q8xPFeII/zKmfUqrdrcZ/mN7AZtXqFDvcL0fPyFf4phFL99D/oGhEfKd2TG235gM+KJfkxAbhjW2xOjs9rLww4xaBJmVkc+be5J5AkA74EvVoP3I00Tg=
+	t=1719661226; cv=none; b=MUmJ7EdlwgVgtSmLTquxVX5PrpJI4Kp4p6qLKxeAcskkhw9AGRgaDbxtWGETjRh9aYWDcNDn6+F72jPmvhUaAyFC0/pADhlpjnkeaiwUxqupcpxvqakemhDyipnm1ae/W4hl8IeeJkLHniAj/9sQwOMyTDUTX3S2HZexJe23IUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719661228; c=relaxed/simple;
-	bh=g9DYHA9n/mS/01ocSc8ZuYgyvsNrXlDHFOkXI35SmPk=;
+	s=arc-20240116; t=1719661226; c=relaxed/simple;
+	bh=oBBlr7ERRB9202oJRjIMSwxETvMGBc2tG9r8pMzwMek=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MBYo922HtN1nBTUlIxpSG/KWyb630Yll7iDhwpf8ev1q2TQHNu8/peVG0sQkZxzaQ4FK45lCQwbdtJ/jRXfeu0ZbaJhMB466AAs56Kye6CV5DdD66Waj+HdSBzg593R+3NX5yKop47l1jgQcSR2H3TnLLnlMijA7apSOSKGxAjc=
+	 MIME-Version; b=ht5lbOi133TOADtDVQNxWvo8sou0mW0WjsK2TW3wEpkWH+hWrQdNMY33ikAa6J5fNTz+Oh2xAGM6EHbeDwiUyIK1+ZEeacLQrXT73tJ233xmw758/plJSOHdQ4b8DjtHjhp0drvzg8zRc+lA0BkatLe79cL/5zCKnU2A0XVw86c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,25 +33,25 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sNWRK-00035A-Ry
-	for netdev@vger.kernel.org; Sat, 29 Jun 2024 13:40:22 +0200
+	id 1sNWRL-00035T-8J
+	for netdev@vger.kernel.org; Sat, 29 Jun 2024 13:40:23 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sNWRJ-005pY2-PN
-	for netdev@vger.kernel.org; Sat, 29 Jun 2024 13:40:21 +0200
+	id 1sNWRK-005pYM-0Y
+	for netdev@vger.kernel.org; Sat, 29 Jun 2024 13:40:22 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 759802F645B
+	by bjornoya.blackshift.org (Postfix) with SMTP id AB4F12F6461
 	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 11:40:21 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 5BEDB2F642F;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 9FB3B2F6431;
 	Sat, 29 Jun 2024 11:40:19 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id a8328be3;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 802fc0a9;
 	Sat, 29 Jun 2024 11:40:18 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -60,12 +60,12 @@ Cc: davem@davemloft.net,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Wolfram Sang <wsa@kernel.org>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 01/14] can: rcar_canfd: Simplify clock handling
-Date: Sat, 29 Jun 2024 13:36:15 +0200
-Message-ID: <20240629114017.1080160-2-mkl@pengutronix.de>
+Subject: [PATCH net-next 02/14] can: rcar_canfd: Improve printing of global operational state
+Date: Sat, 29 Jun 2024 13:36:16 +0200
+Message-ID: <20240629114017.1080160-3-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240629114017.1080160-1-mkl@pengutronix.de>
 References: <20240629114017.1080160-1-mkl@pengutronix.de>
@@ -83,87 +83,34 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-The main CAN clock is either the internal CANFD clock, or the external
-CAN clock.  Hence replace the two-valued enum by a simple boolean flag.
-Consolidate all CANFD clock handling inside a single branch.
+Replace the printing of internal numerical values by the printing of
+strings reflecting their meaning, to make the message self-explanatory.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Reviewed-by: Wolfram Sang <wsa@kernel.org>
 Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Link: https://lore.kernel.org/all/2cf38c10b83c8e5c04d68b17a930b6d9dbf66f40.1716973640.git.geert+renesas@glider.be
+Link: https://lore.kernel.org/all/14c8c5ce026e9fec128404706d1c73c8ffa11ced.1716973640.git.geert+renesas@glider.be
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/rcar/rcar_canfd.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+ drivers/net/can/rcar/rcar_canfd.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rcar_canfd.c
-index b82842718735..474840b58e8f 100644
+index 474840b58e8f..c2c1c47bcc7a 100644
 --- a/drivers/net/can/rcar/rcar_canfd.c
 +++ b/drivers/net/can/rcar/rcar_canfd.c
-@@ -508,12 +508,6 @@
-  */
- #define RCANFD_CFFIFO_IDX		0
- 
--/* fCAN clock select register settings */
--enum rcar_canfd_fcanclk {
--	RCANFD_CANFDCLK = 0,		/* CANFD clock */
--	RCANFD_EXTCLK,			/* Externally input clock */
--};
--
- struct rcar_canfd_global;
- 
- struct rcar_canfd_hw_info {
-@@ -545,8 +539,8 @@ struct rcar_canfd_global {
- 	struct platform_device *pdev;	/* Respective platform device */
- 	struct clk *clkp;		/* Peripheral clock */
- 	struct clk *can_clk;		/* fCAN clock */
--	enum rcar_canfd_fcanclk fcan;	/* CANFD or Ext clock */
- 	unsigned long channels_mask;	/* Enabled channels mask */
-+	bool extclk;			/* CANFD or Ext clock */
- 	bool fdmode;			/* CAN FD or Classical CAN only mode */
- 	struct reset_control *rstc1;
- 	struct reset_control *rstc2;
-@@ -777,7 +771,7 @@ static void rcar_canfd_configure_controller(struct rcar_canfd_global *gpriv)
- 		cfg |= RCANFD_GCFG_CMPOC;
- 
- 	/* Set External Clock if selected */
--	if (gpriv->fcan != RCANFD_CANFDCLK)
-+	if (gpriv->extclk)
- 		cfg |= RCANFD_GCFG_DCS;
- 
- 	rcar_canfd_set_bit(gpriv->base, RCANFD_GCFG, cfg);
-@@ -1941,16 +1935,12 @@ static int rcar_canfd_probe(struct platform_device *pdev)
- 			return dev_err_probe(dev, PTR_ERR(gpriv->can_clk),
- 					     "cannot get canfd clock\n");
- 
--		gpriv->fcan = RCANFD_CANFDCLK;
--
-+		/* CANFD clock may be further divided within the IP */
-+		fcan_freq = clk_get_rate(gpriv->can_clk) / info->postdiv;
- 	} else {
--		gpriv->fcan = RCANFD_EXTCLK;
-+		fcan_freq = clk_get_rate(gpriv->can_clk);
-+		gpriv->extclk = true;
+@@ -2049,8 +2049,9 @@ static int rcar_canfd_probe(struct platform_device *pdev)
  	}
--	fcan_freq = clk_get_rate(gpriv->can_clk);
--
--	if (gpriv->fcan == RCANFD_CANFDCLK)
--		/* CANFD clock is further divided by (1/2) within the IP */
--		fcan_freq /= info->postdiv;
- 
- 	addr = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(addr)) {
-@@ -2060,7 +2050,7 @@ static int rcar_canfd_probe(struct platform_device *pdev)
  
  	platform_set_drvdata(pdev, gpriv);
- 	dev_info(dev, "global operational state (clk %d, fdmode %d)\n",
--		 gpriv->fcan, gpriv->fdmode);
-+		 gpriv->extclk, gpriv->fdmode);
+-	dev_info(dev, "global operational state (clk %d, fdmode %d)\n",
+-		 gpriv->extclk, gpriv->fdmode);
++	dev_info(dev, "global operational state (%s clk, %s mode)\n",
++		 gpriv->extclk ? "ext" : "canfd",
++		 gpriv->fdmode ? "fd" : "classical");
  	return 0;
  
  fail_channel:
-
-base-commit: 94833addfaba89d12e5dbd82e350a692c00648ab
 -- 
 2.43.0
 
