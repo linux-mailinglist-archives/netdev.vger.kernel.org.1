@@ -1,71 +1,96 @@
-Return-Path: <netdev+bounces-107862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66AB191CA0F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:39:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7CAA91CA1A
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 047281F229A4
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:39:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9100828314D
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEF51859;
-	Sat, 29 Jun 2024 01:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C905661;
+	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8Kg2vc4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRQNKcdO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618274C8C;
-	Sat, 29 Jun 2024 01:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8834C8D
+	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719625146; cv=none; b=pYeoA3Hu9QzhxGLONdCPmn0iySkKg9cTA+7wecpbsEI+u/w4uwOoOINQlgC1/XV8AO6fyo68xWkQRpbM7HIqhkwjvXcvx26G3Zcj2oZyY9oOx04fksaEsacyjfrzsQC7hLQpUwBPl3JMSBccQWQgFQTjZLRcDzKQ8hfAmPeCTFU=
+	t=1719625857; cv=none; b=A6HUwtAPkUSaxhu8blGb2PA//hIn/QJDbksmBWPpOse9vrcvKtwII0mhhZuoedxHoTL0UB4lpzPQeXDnZOfaT4eNb+G99eVo+ZF1fyVtT472ow63hbXlIZlWnGCjD7gYcwF9YDlrNpOTpzDQLEt/xCOMBoe7lxIDUmqRCRTNsRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719625146; c=relaxed/simple;
-	bh=54/5eeFJKqYDjuIPMCPEq3P1jJiZ4bNph2rKPD5V46A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sa0qFxl90/Y+md3d7K7q/c8Y9ZsNQG6M8hqonlfFspmC6w4ATIwv1OL6E0Nr+2CdxGdQwWCdKLkB5/N5Ab8w0LP2iXE434dcaXqShQd57gm+UUwn/3ZoEkrc3MPJUpMDVgL600oesQKBltKAQ1RMiUy7uTrwAkVrmU+OXMz1k4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8Kg2vc4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DABEC116B1;
-	Sat, 29 Jun 2024 01:39:05 +0000 (UTC)
+	s=arc-20240116; t=1719625857; c=relaxed/simple;
+	bh=P7Qet0Yr4Q8bBBQpN3DVspkm+inp6akobqpB30LFG48=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UWUQYVzQV/05F9txBJq46o6/6ItNysevbzL4o+FSgVsSj2KtgMcklzxt7u3KAcYi8FzAuBB4Xkuupi+feJzzrIeqhVD94qjfkTlZ4zpRVlmrNqT2ToBJRk8o0esWAfR0F2dvpgUez9FZqkm4ZbSMdYzdkudcRh9fGBYzLrc7Z00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRQNKcdO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2BD47C32781;
+	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719625145;
-	bh=54/5eeFJKqYDjuIPMCPEq3P1jJiZ4bNph2rKPD5V46A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S8Kg2vc49Y9HKCB64JccAl8eV0lNxYKNp3yi0uI9wG7EMdNNsydqWnXIbn2JmrJon
-	 M37+nyA5R2yD+MDRvV6k5wYKlEeBHgsHRgimYqwzX9bdoRKVmQEeo4sGsRsavhVvO8
-	 05H5rPOYj7HJ+gOzWd8EFnSuWHsdsJD20vSoN+NxbUOdreWXzt6NbUa+Zfs+GzF5Sy
-	 LuEWZkn1YfLlV+YZxJCbFBypjkr1457COQh/4EklccXQuiWtiB4P/ox6ujkytOBUdh
-	 drcz5YtIrlxE9CadOYUMgsz1Jb53wJ/2sep0pZnbjRiOGb2HXexwEpmCc9Fmoe2gzD
-	 4TV7ggXloT/kA==
-Date: Fri, 28 Jun 2024 18:39:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net 2024-06-27
-Message-ID: <20240628183904.4717d073@kernel.org>
-In-Reply-To: <20240627181912.2359683-1-stefan@datenfreihafen.org>
-References: <20240627181912.2359683-1-stefan@datenfreihafen.org>
+	s=k20201202; t=1719625857;
+	bh=P7Qet0Yr4Q8bBBQpN3DVspkm+inp6akobqpB30LFG48=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VRQNKcdObgpEXHpLiQUQMy47hsXAKpQkE9Inrm0g6oAWTYGwHk+v3IKP+IUUUNj/6
+	 rF2fmiw6K0MMFmsupYDz/xY4D00HO9tEMfHME0sYhIFqpCR0/rcqRYZxqJpy0P9Av0
+	 Um31lYzPZ00T9JL3HC8yS9H1r81TXoCbhNveEODugbRA33jEqxibDunJQkdM0GW206
+	 i8MVTQyqFIKIrIjUe5uZn/gqAyJpbBjDvFG5SzuCGnhFNuYl4pJLmBt0M0xBVfrZKe
+	 7Pcm6EiTTbOa2Ed5AucvOLZ1JS9ufxQXUAK09IPeQYkB3yj3tc5Jvl0fHbBoBVywMT
+	 woC5QNSt6af6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1A5BFC43443;
+	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/2] Lift UDP_SEGMENT restriction for egress
+ via device w/o csum offload
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171962585710.15618.2691302964178977119.git-patchwork-notify@kernel.org>
+Date: Sat, 29 Jun 2024 01:50:57 +0000
+References: <20240626-linux-udpgso-v2-0-422dfcbd6b48@cloudflare.com>
+In-Reply-To: <20240626-linux-udpgso-v2-0-422dfcbd6b48@cloudflare.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
+ kernel-team@cloudflare.com
 
-On Thu, 27 Jun 2024 20:19:12 +0200 Stefan Schmidt wrote:
-> Dmitry Antipov corrected the time calculations for the lifs and sifs
-> periods in mac802154.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 26 Jun 2024 19:51:25 +0200 you wrote:
+> This is a follow-up to an earlier question [1] if we can make UDP GSO work with
+> any egress device, even those with no checksum offload capability. That's the
+> default setup for TUN/TAP.
 > 
-> Yunshui Jiang introduced the safer use of DEV_STATS_* macros for
-> atomic updates. A good addition, even if not strictly necessary in
-> our code.
+> Because there is a change in behavior - sendmsg() does no longer return EIO
+> error - I'm submitting through net-next tree, rather than net, as per Willem's
+> advice.
+> 
+> [...]
 
-FTR looks like this got merged by DaveM, thank you!
+Here is the summary with links:
+  - [net-next,v2,1/2] udp: Allow GSO transmit from devices with no checksum offload
+    https://git.kernel.org/netdev/net-next/c/10154dbded6d
+  - [net-next,v2,2/2] selftests/net: Add test coverage for UDP GSO software fallback
+    https://git.kernel.org/netdev/net-next/c/3e400219c04d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
