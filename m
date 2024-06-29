@@ -1,58 +1,66 @@
-Return-Path: <netdev+bounces-107859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A7E91C9DC
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B1591C9DD
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E371C2154F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:02:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E5161C213BF
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACD463C;
-	Sat, 29 Jun 2024 01:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C32EC7;
+	Sat, 29 Jun 2024 01:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UdE/4GEp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz1mZdub"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C9C19B
-	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 01:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D977963C;
+	Sat, 29 Jun 2024 01:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719622928; cv=none; b=GEfLsXMdWdvVNkO25S+dPk2qcBQWIDNKWKRdvh8BNWlyz/kuKwN3Kq5tf3OGPNmLS8p06HWGviPHTwVVgYq2HICUyoXrEnclVgYjftSiAFR3jxjZMibY3IyWRL6kXLiMyEdwvleAjyhM0XxmN1JFuhJDYqctUPJ9EiirtNiIoeA=
+	t=1719623246; cv=none; b=F97vjQ/JT8oFTen10nLLc4U4TY6uP4DFKofRyw5eO/wcBOUrCB8EmRH5++Z3idwLf28IxEiYUfgq/JTJRGi5pwqRzH9+sB3HikF3SaAuFrAObm1OGcpJEUUM+BcI3aIFFdvF81cJUoPpuLI6/NHMqtfPK3LfBfzTOzynL7SMSkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719622928; c=relaxed/simple;
-	bh=Wf0EyOjLYkG6TOLQhaW3FeDmesUYq/9Ol+OSmkcnWYk=;
+	s=arc-20240116; t=1719623246; c=relaxed/simple;
+	bh=qDqhXvUXMIc+AFhmq41Sha8+fu2VdXeYid3XXG5bgqg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RtrFHQVeej8l44D3H4Sgxr8AyzbXDWrj0Pl4CytkiDeo+aHTGGPLCvwE527gQn0Sd4MmYCT/uXavWBAjdyy5nkjT9YHJC1KTQ/N4aNt6D1EujJ2AbUyLh1G/FUwXJWQv/bDYoaj9Pr8fep3tYUdaNG2zbWMNYONvFRowMsKZ98c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UdE/4GEp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1714DC116B1;
-	Sat, 29 Jun 2024 01:02:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=aNkUr9ozZO/6Tng1EWWwKQmo3rRnDYBhuGbYDRpwD/9jlnOyaWbCeWFn4fUDFh4rj0w6slrMoxI1erIw9DI83j578GoH6Iluna5GTLDIAnbn9YnFu8zCvWP4/NXCGpYKZx7gw82cY56IpB+VQSvLVZEicwbfjjuuLzdAi6OtAEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz1mZdub; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D498C116B1;
+	Sat, 29 Jun 2024 01:07:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719622927;
-	bh=Wf0EyOjLYkG6TOLQhaW3FeDmesUYq/9Ol+OSmkcnWYk=;
+	s=k20201202; t=1719623245;
+	bh=qDqhXvUXMIc+AFhmq41Sha8+fu2VdXeYid3XXG5bgqg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UdE/4GEpzd3173xSn6LqhXQeqrVua0AmzMlfSG4boy8vg4jMDAuZYkIHRXC0NT4zA
-	 DjlW3ixdCchKce8UnTmYT0SMHtBHnbEtZaq003rokZxHR2l274cGgo3VrVlV07ckOF
-	 neyXqpFqHa3UHIGW+bgke29FaAa7y3LcHTCAbgyc5JRgD2caBS0wcI2eWBT0jJgLA7
-	 w6v09svj4csRUJ6OHvfvBuSoyNLP9TfQeuq7uNhK6rWQkBRB2wcjg3RxZ5raRP6inW
-	 TnWlGk4cyLSjsm9fufGPHU3H8t9gzhWhWbsGOuaqwHoly41pjm199tt2txEA2F+5h4
-	 q5iSfXbLvIBKA==
-Date: Fri, 28 Jun 2024 18:02:06 -0700
+	b=oz1mZdubLqYAWGU5eS97jQnCATX4YuAf2g0Dp5jd/GugskOoC91GY72M7aOK59jA/
+	 cfu2nyYLDGgij4TpNPn8fiFwh3uKTbVu535k8JYyF568/nyXaSKwE4DUTH4dEISaCZ
+	 zoFvylTrD0v2BSBVd5SN8Rk6a2lGLmQaf7vxI9cIOC5p6HLqeitXwF6LZ2r6LhJ87H
+	 afAE6zC3U3wqofNgeaM5v9iwo1CDT/S5PmOdza2jEwN1pcuuPlJBjAenLhrzpyICmt
+	 HOEDUuvfXAF9nKesaD6U/gmMQ6xWX+M0kbav0nDYEdYeNXo2Wh0U2DaJKsOAQ/NnS9
+	 /sUBf1xp1ozrg==
+Date: Fri, 28 Jun 2024 18:07:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Rushil Gupta <rushilg@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- willemb@google.com, hramamurthy@google.com, Shailend Chand
- <shailend@google.com>, Ziwei Xiao <ziweixiao@google.com>
-Subject: Re: [PATCH net-next] gve: Add retry logic for recoverable adminq
- errors
-Message-ID: <20240628180206.07c0a1b2@kernel.org>
-In-Reply-To: <20240628204139.458075-1-rushilg@google.com>
-References: <20240628204139.458075-1-rushilg@google.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFQ=?=
+ =?UTF-8?B?w7ZwZWw=?= <bjorn@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Eduard
+ Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo
+ <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa
+ <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jonathan
+ Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>, Paolo
+ Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
+ <sdf@fomichev.me>, Thomas Gleixner <tglx@linutronix.de>, Yonghong Song
+ <yonghong.song@linux.dev>
+Subject: Re: [PATCH net-next 0/3] net: bpf_net_context cleanups.
+Message-ID: <20240628180723.53980170@kernel.org>
+In-Reply-To: <20240628103020.1766241-1-bigeasy@linutronix.de>
+References: <20240628103020.1766241-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,59 +70,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 28 Jun 2024 20:41:39 +0000 Rushil Gupta wrote:
-> An adminq command is retried if it fails with an ETIME error code
-> which translates to the deadline exceeded error for the device.
-> The create and destroy adminq commands are now managed via a common
-> method. This method keeps track of return codes for each queue and retries
-> the commands for the queues that failed with ETIME.
-> Other adminq commands that do not require queue level granularity are
-> simply retried in gve_adminq_execute_cmd.
-> 
-> Signed-off-by: Rushil Gupta <rushilg@google.com>
-> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
-> Reviewed-by: Shailend Chand <shailend@google.com>
-> Reviewed-by: Ziwei Xiao <ziweixiao@google.com>
+On Fri, 28 Jun 2024 12:18:53 +0200 Sebastian Andrzej Siewior wrote:
+> a small series with bpf_net_context cleanups/ improvements.
+> Jakub asked for #1 and #2 
 
-I told you once already that you're not allowed to repost patches
-within 24h. You should also include a change long when you repost.
+I thought you'd just add flags check in xdp_do_flush(), but I guess
+this is even faster :)
 
-Since Jeroen is a maintainer of this driver, and you are not listed
-in the MAINTAINERS file I don't understand why you're the one sending
-this. We can't teach everyone at google the upstream process one by
-one so I'd like to request that only the listed maintainers post pure
-GVE patches (or the folks who are heavily involved upstream).
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-> index c5bbc1b7524e..74c61b90ea45 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -12,7 +12,7 @@
->  
->  #define GVE_MAX_ADMINQ_RELEASE_CHECK	500
->  #define GVE_ADMINQ_SLEEP_LEN		20
-> -#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK	100
-> +#define GVE_MAX_ADMINQ_EVENT_COUNTER_CHECK	1000
->  
->  #define GVE_DEVICE_OPTION_ERROR_FMT "%s option error:\n" \
->  "Expected: length=%d, feature_mask=%x.\n" \
-> @@ -415,14 +415,17 @@ static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
->  /* Flushes all AQ commands currently queued and waits for them to complete.
->   * If there are failures, it will return the first error.
->   */
-> -static int gve_adminq_kick_and_wait(struct gve_priv *priv)
-> +static int gve_adminq_kick_and_wait(struct gve_priv *priv, int ret_cnt, int *ret_codes)
->  {
->  	int tail, head;
-> -	int i;
-> +	int i, j;
->  
->  	tail = ioread32be(&priv->reg_bar0->adminq_event_counter);
->  	head = priv->adminq_prod_cnt;
->  
-> +	if ((head - tail) > ret_cnt)
-
-please delete all the pointless parenthesis in + lines of this patch.
--- 
-pw-bot: cr
+Thank you!
 
