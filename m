@@ -1,98 +1,86 @@
-Return-Path: <netdev+bounces-107863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A6491CA19
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:51:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA5991CA65
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 03:59:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02DCF1C20B7F
-	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:51:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 066E31F2276B
+	for <lists+netdev@lfdr.de>; Sat, 29 Jun 2024 01:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F247538A;
-	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB5D4C9B;
+	Sat, 29 Jun 2024 01:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9eav4Io"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzkLHxDp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0554C8C
-	for <netdev@vger.kernel.org>; Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BF33C0C;
+	Sat, 29 Jun 2024 01:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719625857; cv=none; b=IwRDntPw6M1aesTUehyfbLS3DeGqp2Gk54MaIpDrJFkk3sQIrZlGhXHbSd0m5//o9V009UDrXsfAmw2f71IWlY+yuafbH1sQpI20+kSCyChIR5xzayophFQl/QsSkSGZXpaCjIhNSe0Nl5hTw3r3JwKAVxF6hXSaL0p7ScNTFEM=
+	t=1719626389; cv=none; b=VuIFb0ULdpDlC+jNWEOoHxcrXmD12fm/hl45zQ4eP9PiTA6sbHr6RbewBT0hGA3JjD3kJ0PYp3j7qA/I6DCdeGDZVmYCW0V6Fmvh0WGJVVEsFBzd+w/ut2W/UpMHQzq05CrqHjXZJyUAgCMHvoxfyNTudkaklXX/jOK1yh2TKqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719625857; c=relaxed/simple;
-	bh=cO8cXlRTAArbWMUzevM066x8NJyocsu1AiHsFix1o7E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u002lZkmUUHRyVTmlcfP8co6Jg7c9plL7QDp3Jl84KkCwbu4mak4bQw4jnnmrUh4dbhZbbeTZ2Egd2xLG/p7RdlHSdS1wA8CfkiGEYogs381JnOlS5jaKoihIJmgchBU8CclmgUc4IDQjsW5muyxg9e6ZwweHFnq0c+FsiU1baA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9eav4Io; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B1D2C32786;
-	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
+	s=arc-20240116; t=1719626389; c=relaxed/simple;
+	bh=dxNiEUCiVeI5V98ExqslHQUXuZLzcJJesPgtYyYGyjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rabLsXQbWCn0T69wW9yrPDOtkWXUNR64CPeVow5viJDE2osG6PkPpnGUaXm0dmaJl2a+Z7IKZhlwxa7OP22xx8ptiYV24RHRbm5DBJbF5/bxPysEEUKOGqWq69NKkIFW1l2+L/2VyzzRMpULc0LgGUYmbxg7rKxGxm18VTxaM7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzkLHxDp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76BABC116B1;
+	Sat, 29 Jun 2024 01:59:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719625857;
-	bh=cO8cXlRTAArbWMUzevM066x8NJyocsu1AiHsFix1o7E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H9eav4IoogLtJiOO29aSbmOqQn+2jxDVKjrJY7v3jiZjyHx050uY3cDgBlqPlNagX
-	 wCr7/snaWZw1rvra+3ToT9LCb9lt5xbMKc6imag4ZQJk8caMXcCJFCVAZfZEDf7nJ0
-	 l7oKlN9s3/lbc5Ewg0bWMmPf2j4dhq4QsnducngTJGJpZ9TO5z47V5S8bvEgkU2cpa
-	 wuF7YPW8E7yw9GbO4bnbnu48iEEx1qk/bliGnB8rXIkraUgBOtlgSoJ6swYoQgZKqs
-	 X19wqtyISfTg87IFMXHiOTwxkmJbK3B8K6cNer0bqbn47SWd3IxLvMkH2GvH5/AIPU
-	 XPxbI81wHNS2Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1FC86C433E9;
-	Sat, 29 Jun 2024 01:50:57 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719626389;
+	bh=dxNiEUCiVeI5V98ExqslHQUXuZLzcJJesPgtYyYGyjQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jzkLHxDpFHNnEr4T8Z2KXPJ7qAnVR3MP6YjXJyCCl6JWsqkGbmAiYAlyJF2uChmfi
+	 +U8Mx7vu8dyiaN39Lgpros1rSrxgy+jTxlnOdEwBzrKPy9rWcmDsxRaPXKtUdfNEbh
+	 AiI3Zp0eiDikY49K/sPVZ8s5XZtcRBQTs8vrfgehvkalUF/+Hpc3wXMEXmY9kAmyYM
+	 99KrSQxWW6gxQ2VQ3cCMs3FiUNBKNQioYw5hOZudYlzlmWSmbluZ0fJDa/Epho/jSc
+	 IslaajSqdjjzdWkpkO494Q0L5ew1gUzNdXFRPq3+TD9WgLVB9V/9A+aAtYpFCinIWq
+	 WwDsBURovvidw==
+Date: Fri, 28 Jun 2024 18:59:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew@lunn.ch>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] netdevice: convert private flags > BIT(31)
+ to bitfields
+Message-ID: <20240628185947.4e8cec02@kernel.org>
+In-Reply-To: <c561738f-e28f-9231-af04-10937fac61da@gmail.com>
+References: <20240625114432.1398320-1-aleksander.lobakin@intel.com>
+	<20240625114432.1398320-2-aleksander.lobakin@intel.com>
+	<20240626075117.6a250653@kernel.org>
+	<e0b66a74-b32b-4e77-a7f7-8fd9c28cb88b@intel.com>
+	<20240627125541.3de68e1f@kernel.org>
+	<c561738f-e28f-9231-af04-10937fac61da@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] selftests: drv-net: add ability to schedule
- cleanup with defer()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171962585712.15618.4313372064257850043.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Jun 2024 01:50:57 +0000
-References: <20240627185502.3069139-1-kuba@kernel.org>
-In-Reply-To: <20240627185502.3069139-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, przemyslaw.kitszel@intel.com, petrm@nvidia.com,
- willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 27 Jun 2024 11:54:59 -0700 you wrote:
-> Introduce a defer / cleanup mechanism for driver selftests.
-> More detailed info in the second patch.
+On Fri, 28 Jun 2024 17:03:10 +0100 Edward Cree wrote:
+> >> It generates sizeof(bitfield) which the compilers don't like and don't
+> >> want to compile ._.  
+> > 
+> > Mm. Okay, I have no better ideas then.
+> > 
+> > Do consider moving the cold flags next to wol_enabled, tho?  
 > 
-> Jakub Kicinski (3):
->   selftests: net: ksft: avoid continue when handling results
->   selftests: drv-net: add ability to schedule cleanup with defer()
->   selftests: drv-net: rss_ctx: convert to defer()
-> 
-> [...]
+> My RSS series moves wol_enabled out to struct ethtool_netdev_state [1] so
+>  this may not be worthwhile?
 
-Here is the summary with links:
-  - [net-next,v2,1/3] selftests: net: ksft: avoid continue when handling results
-    https://git.kernel.org/netdev/net-next/c/147997afaad0
-  - [net-next,v2,2/3] selftests: drv-net: add ability to schedule cleanup with defer()
-    https://git.kernel.org/netdev/net-next/c/8510801a9dbd
-  - [net-next,v2,3/3] selftests: drv-net: rss_ctx: convert to defer()
-    https://git.kernel.org/netdev/net-next/c/0759356bf5fa
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Speaking of which a new bit just appeared there, for the SFP module
+flashing. I'm gonna merge your series because it technically doesn't
+impact it, but could you follow up and move that bit to ethtool state?
 
