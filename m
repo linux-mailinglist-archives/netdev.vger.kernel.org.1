@@ -1,155 +1,142 @@
-Return-Path: <netdev+bounces-107941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1BC91D1C4
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 15:21:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8ABE91D1C7
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 15:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ADDA1C20A1F
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 13:21:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 842731F2142E
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 13:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BFA13C8F0;
-	Sun, 30 Jun 2024 13:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A79D13DDAA;
+	Sun, 30 Jun 2024 13:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOJP36jo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifzeGgc1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821BD200C1
-	for <netdev@vger.kernel.org>; Sun, 30 Jun 2024 13:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9E01E49F;
+	Sun, 30 Jun 2024 13:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719753665; cv=none; b=O2Jt+64SYSaNQaVuXoAPaA3FpIaoUVPXpyU5L8MBO9OaOFSQN9lZfdQ+iKvO8qYxniA37vqLqUkB0eqD7or446fOClLGx1imJA9uPQDOAGpgdSU6+Nn1oTK6spfrqLBIdcV9mnRxWTclltwHzn7SsmGhKAY2lQ/hPfiUglk1o9M=
+	t=1719754146; cv=none; b=TPhjj/Rehe5RxjBbhD9AXOnfcZYDD4WQ5azbiQK1rxOYphx6yYV929kq6xLCCPmM5tXt/t+O+m/z8TV1eRTbPG/F4g9vf2wJrCbA75V5y+I18HmFiFXy6vRUhbkXsuvdJrx6zn4B06l3zaH/sfKXH3O6guAbAjOUweLSIE1jS6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719753665; c=relaxed/simple;
-	bh=5rKmZ+I9JT5zii3iRgPVbUSuu8M7cXcPUlO2S7cC0qU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=M+NGp+ksBXON7gxlGX3YKt/8rUO9tU0KffhHdLr2dB74jBxwWRdXICulOI8lGH14bMOVRnRnuGOS/t1L/ztTAND6Sm7RRbhXInnmxLo9pGapktbYwg/l4gB3EZzXvO07v7ZjYwFm/b3UtmnFfuKxJGUGLqhfLYhkk7N3GX0Vj70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOJP36jo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1924DC2BD10;
-	Sun, 30 Jun 2024 13:21:02 +0000 (UTC)
+	s=arc-20240116; t=1719754146; c=relaxed/simple;
+	bh=ChFb8w15BttkA8Gd38P/acg2lX8jxg3AeR6dCf7FnUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QBvUGr4HB3JJrmeO7qrycIYDKzXD9JjqPomNMxSxkdcpfmRTfn3M7jjo6HdVgi89xAYeO0T20VePjJxLyTdIeRv9w9jJWHqAvpX09hIeVsk5Yc6QL9145JPW6XDSfrG4mV7qzKslHGDpGJnOUOFETZ9qAAfzsV8I55dmwJD1Ojc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifzeGgc1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DADC2BD10;
+	Sun, 30 Jun 2024 13:29:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719753665;
-	bh=5rKmZ+I9JT5zii3iRgPVbUSuu8M7cXcPUlO2S7cC0qU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=AOJP36joVM9wcLNIhTmkQIjTtmkpxyCSR1ugHLRY961/L73Nq7q5QZZTCfj4EkPFL
-	 vTcd9IO4cDGipdyhhgQSST1plFQmrXisdHdWmwiWoPrMhO/t0f40v2ZBVBmQmV7IeN
-	 oF7qPrJZcK3AFsZv9lUuR5lO+zaGRA0TnkLBWyIIBYstKK03GVGQJSgxHQ8kmJpnK8
-	 FLr+ZKMEc0zSoTjzk9t2XVjwKONwa8ZDnajzBGHanKG+N7/RYqDl0iO5PWLc8tY/vv
-	 DIPVZWVleKTR8rwL0jE3fEh9yGQ3/Dr8flnJOsM+f19m4hhQPVkPSugE5r6SX6Wnr3
-	 UlY9IAqWVLkSw==
-From: 'Simon Horman' <horms@kernel.org>
-Date: Sun, 30 Jun 2024 14:20:55 +0100
-Subject: [PATCH net v5] bonding: Fix out-of-bounds read in
- bond_option_arp_ip_targets_set()
+	s=k20201202; t=1719754146;
+	bh=ChFb8w15BttkA8Gd38P/acg2lX8jxg3AeR6dCf7FnUk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ifzeGgc1XPqx+MtSb9wIhYQKdSYS+/J+fwqGorROaN67YFRM/STdky6UuWpNhVyLw
+	 z8GC43AJg4Im2K/Ryq0gJG2Pyu32+fx49gEeQnQRCPPCWA+7b0HvR367HICrhYrdbu
+	 hs2MwLJhopRfIyNColSNZ5x5W1OjkUQ1Kzxc7XD5/14Z1Bgi3tUB18SX48HBLS6TrN
+	 tuyw5sk9l5P13hiWKilWIwQekNuQJ8c0tGUD3VF5ajg94CmRe1EU6qjYYdAROTsarG
+	 695L5QuZsPICkubKeh5Wl45ajosLI9iRdkXL1Keg2/r5NegBHWHpJZfAOpj/ue7OxN
+	 QulWDHuDUXqoA==
+Date: Sun, 30 Jun 2024 14:28:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
+	"Luu, Ryan" <rluu@amazon.com>,
+	"Christopher S. Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Kees Cook <kees@kernel.org>, linux-hardening@vger.kernel.org
+Subject: Re: [RFC PATCH v2] ptp: Add vDSO-style vmclock support
+Message-ID: <20240630132859.GC17134@kernel.org>
+References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
+ <684eac07834699889fdb67be4cee09319c994a42.camel@infradead.org>
+ <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com>
+ <db594efd5a5774748a9ef07cc86741f5a677bdbf.camel@infradead.org>
+ <c0ae63fc88365c93d5401972683a41112c094704.camel@infradead.org>
+ <4a0a240dffc21dde4d69179288547b945142259f.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240630-bond-oob-v5-1-7d7996e0a077@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALZbgWYC/2WMQQ7CIBBFr9LMWgwQSsSV9zBdFGZsiQbM0BBNw
- 90l3bp8/7+8HQpxpALXYQemGkvMqcN4GiCsc1pIROwMWmojjXLC54QiZy+UuQTp3WglBuj6m+k
- RP0fqDok2mPq4xrJl/h75ao7rv1SNUMI6RDVbi17L25M40euceYGptfYD1druNKYAAAA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>, 
- Andy Gospodarek <andy@greyhouse.net>, 
- Ding Tianhong <dingtianhong@huawei.com>, Hangbin Liu <liuhangbin@gmail.com>, 
- Sam Sun <samsun1006219@gmail.com>, netdev@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4a0a240dffc21dde4d69179288547b945142259f.camel@infradead.org>
 
-From: Sam Sun <samsun1006219@gmail.com>
++ Kees Cook, linux-hardening
 
-In function bond_option_arp_ip_targets_set(), if newval->string is an
-empty string, newval->string+1 will point to the byte after the
-string, causing an out-of-bound read.
+On Tue, Jun 25, 2024 at 08:01:56PM +0100, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The vmclock "device" provides a shared memory region with precision clock
+> information. By using shared memory, it is safe across Live Migration.
+> 
+> Like the KVM PTP clock, this can convert TSC-based cross timestamps into
+> KVM clock values. Unlike the KVM PTP clock, it does so only when such is
+> actually helpful.
+> 
+> The memory region of the device is also exposed to userspace so it can be
+> read or memory mapped by application which need reliable notification of
+> clock disruptions.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 
-BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
-Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
-CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0xc1/0x5e0 mm/kasan/report.c:475
- kasan_report+0xbe/0xf0 mm/kasan/report.c:588
- strlen+0x7d/0xa0 lib/string.c:418
- __fortify_strlen include/linux/fortify-string.h:210 [inline]
- in4_pton+0xa3/0x3f0 net/core/utils.c:130
- bond_option_arp_ip_targets_set+0xc2/0x910
-drivers/net/bonding/bond_options.c:1201
- __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
- __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
- bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
- bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
- dev_attr_store+0x54/0x80 drivers/base/core.c:2366
- sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
- kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
- call_write_iter include/linux/fs.h:2020 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x96a/0xd80 fs/read_write.c:584
- ksys_write+0x122/0x250 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
----[ end trace ]---
+...
 
-Fix it by adding a check of string length before using it.
+> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
 
-Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
-Signed-off-by: Yue Sun <samsun1006219@gmail.com>
-Signed-off-by: Simon Horman <horms@kernel.org>
----
-Changes in v5 (Simon):
-- Remove stray 'I4' from netdev_err() string. Thanks to Hangbin Liu.
-- Sorry for the long delay between v4 and v5, this completely slipped my
-  mind.
-- Link to v4: https://lore.kernel.org/r/20240419-bond-oob-v4-1-69dd1a66db20@kernel.org
+...
 
-Changes in v4 (Simon):
-- Correct  whitespace mangled patch; posting as requested by Sam Sun
-- Link to v3: https://lore.kernel.org/r/CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com
+> +static int vmclock_probe(struct platform_device *pdev)
+> +{
 
-Changes in v3 (Sam Sun):
-- According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
-  ("bonding: convert arp_ip_target to use the new option API") to
-  f9de11a16594 ("bonding: add ip checks when store ip target").
-- Link to v2: https://lore.kernel.org/r/CAEkJfYMdDQKY1C-wBZLiaJ=dCqfM9r=rykwwf+J-XHsFp7D9Ag@mail.gmail.com/
+...
 
-Changes in v2 (Sam Sun):
-- According to Jay and Hangbin's opinion, remove target address in
-  netdev_err message since target is not initialized in error path and
-  will not provide useful information.
-- Link to v1: https://lore.kernel.org/r/CAEkJfYPYF-nNB2oiXfXwjPG0VVB2Bd8Q8kAq+74J=R+4HkngWw@mail.gmail.com/
----
- drivers/net/bonding/bond_options.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> +	/* If there is valid clock information, register a PTP clock */
+> +	if (st->cs_id) {
+> +		st->ptp_clock_info = ptp_vmclock_info;
+> +		strncpy(st->ptp_clock_info.name, st->name, sizeof(st->ptp_clock_info.name));
 
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index 0cacd7027e35..228128e727c2 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -1214,9 +1214,9 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
- 	__be32 target;
- 
- 	if (newval->string) {
--		if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
--			netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
--				   &target);
-+		if (!(strlen(newval->string)) ||
-+		    !in4_pton(newval->string + 1, -1, (u8 *)&target, -1, NULL)) {
-+			netdev_err(bond->dev, "invalid ARP target specified\n");
- 			return ret;
- 		}
- 		if (newval->string[0] == '+')
+Hi David,
 
+W=1 allmodconfig builds with gcc-13 flag the following.
+Reading the documentation of strncpy() in fortify-string.h,
+I wonder if strscpy() would be more appropriate in this case.
+
+In file included from ./include/linux/string.h:374,
+                 from ./include/linux/bitmap.h:13,
+                 from ./include/linux/cpumask.h:13,
+                 from ./arch/x86/include/asm/paravirt.h:21,
+                 from ./arch/x86/include/asm/cpuid.h:62,
+                 from ./arch/x86/include/asm/processor.h:19,
+                 from ./include/linux/sched.h:13,
+                 from ./include/linux/ratelimit.h:6,
+                 from ./include/linux/dev_printk.h:16,
+                 from ./include/linux/device.h:15,
+                 from drivers/ptp/ptp_vmclock.c:8:
+In function 'strncpy',
+    inlined from 'vmclock_probe' at drivers/ptp/ptp_vmclock.c:480:3:
+./include/linux/fortify-string.h:125:33: warning: '__builtin_strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
+  125 | #define __underlying_strncpy    __builtin_strncpy
+      |                                 ^
+./include/linux/fortify-string.h:205:16: note: in expansion of macro '__underlying_strncpy'
+  205 |         return __underlying_strncpy(p, q, size);
+
+...
 
