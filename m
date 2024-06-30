@@ -1,145 +1,234 @@
-Return-Path: <netdev+bounces-107943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F324C91D1CC
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 15:29:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0D891D1D9
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 15:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91B16B21610
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 13:29:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BC1C1F214F1
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 13:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25F613DDAA;
-	Sun, 30 Jun 2024 13:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A188013DBB3;
+	Sun, 30 Jun 2024 13:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TbFOIQfd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvcHmVGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65A71E49F;
-	Sun, 30 Jun 2024 13:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAA412DD90;
+	Sun, 30 Jun 2024 13:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719754156; cv=none; b=Tu6IWNhiAk6j4NHooLT38sLctJHKMeMh9E3Jy+VZvCr6p9CLv/pduGSSInsPXxDLpZ0aujncVhAEWyFV5VDiX/gnUkKg+iUHa/V2RSFS/mvKCNyxOFTQLB0gUXJU+06dXP0Zn1kH9fbBxsIEGMgt4U4JSPOsi2HCiHDvtv78/M8=
+	t=1719754821; cv=none; b=rLQ5b7+DfJUsVz73valtz0JpByZKsOOSnEjdm/ptp6qvRZ6U8BD8KQUwMfu+hF+HkHBU3Z5fJSz0WSj+t16OmXa4ljEMMYE9IEGbVALV/TQ17fP0VXpywMHt8At26lKOoo1LGjkJj8XCLbNqkPs++KMy7nyc0FX924ifu3ITEV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719754156; c=relaxed/simple;
-	bh=lIzbh1ZHThwD7UWEVr5MpAgM+TIV3ozHD9CvdT9jSzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KoPRNkPf/MKPq8ahykAlowFmN+o5EITly7h98yLqQr3LLXebwD2FJdWy36tLc2GXRMcmooQvKoiQl58pgBcgImw9gD7vnW9D0qYTgK10i1sowloAbWsMMelpbOOWlwFiUpUZ0V7owx/BvMvbjVHlqk6T6L9h6vmHDiQLxSI/lgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TbFOIQfd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6349C2BD10;
-	Sun, 30 Jun 2024 13:29:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719754156;
-	bh=lIzbh1ZHThwD7UWEVr5MpAgM+TIV3ozHD9CvdT9jSzM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TbFOIQfdIWI4aU3SAc6UWs5lsOSM6tdhrQsUSxd0XgYqvwSFCS2JHcSczgSEdpUa8
-	 Shw635BaWX4HQLhpiqX0+vBHJQGw/lNveW8lXdSuFrqj0uLs66G0OUMXNeMz078G27
-	 MPXnEU3+DB+j0nOcd0Vc3KYI/FamslmH8ZP73+8tnh2YmSfBukNH8G7p5N1NadHQPp
-	 VdH6HpVL4tFgeR0Wa53IoX+bx0Yfew4uTS8rX4/m3ZjT8VVb0brFPdqWXoj15uzzIB
-	 C+IXbe2HJaVTkuFVjud/30D9KfoopC7cf2EYCcXfM+HwSZ1ez1DfOwRAKFwmqul+w9
-	 nRU7sb1iko7kA==
-Date: Sun, 30 Jun 2024 16:29:11 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Omer Shpigelman <oshpigelman@habana.ai>
-Cc: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	Zvika Yehudai <zyehudai@habana.ai>
-Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
-Message-ID: <20240630132911.GB176465@unreal>
-References: <20240613082208.1439968-1-oshpigelman@habana.ai>
- <20240613082208.1439968-12-oshpigelman@habana.ai>
- <20240613191828.GJ4966@unreal>
- <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
- <20240617190429.GB4025@unreal>
- <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
- <20240618125842.GG4025@unreal>
- <b4bda963-7026-4037-83e6-de74728569bd@habana.ai>
- <20240619105219.GO4025@unreal>
- <a5554266-55b7-4e96-b226-b686b8a6af89@habana.ai>
+	s=arc-20240116; t=1719754821; c=relaxed/simple;
+	bh=K1iSFLq5ePba2KehTDuSb8d5VR75RXpx8jz4H5SWxu4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=DTeWNcWehiaFWy6n66I7CzTpKP95KtTFf9N+umimVTxH71HehTPplD0mgZdiRv17u2zIfMpgNexBHidwrajmzaaBL0W7YiEquh2aLdOcLMVa80T3Eqt09YNowWQK3NnI+UI0QvBdtkXhXt2uBaeDESjhn1LEWWuqloSyLWSBDi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FvcHmVGb; arc=none smtp.client-ip=209.85.161.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5c444e7d18fso197425eaf.3;
+        Sun, 30 Jun 2024 06:40:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719754819; x=1720359619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MQcDa+wDXNNN/mQ/HwttTTXR+alCmusd4OT/lRAH1tA=;
+        b=FvcHmVGb3rk805OkQQGxJ8mgD5V6eoz6JxyN/BPhpW2sri6QaRyKrrQqwoJC0vZlnf
+         3OW4G/EzWNIz1CwNo4FkcnJkTGYVpoda7RAQtVdacNP1iKb6gOXGqB9211ENOM48GHjp
+         331p3xeD62GxDsPGi40+X5Mlnh3TPGIS/XowZCyCwylSMUMsfw+LJl5CsSAHRqArW5K7
+         cS9ijfDyNbAlLJCFX0wSyYzgeUq+tAsn1E35HLk7TgNww04jHG4Q5A4RtBhZ54mpVf5n
+         apnpQ3hBq3FkFPfWbYuV1lN0I4t0pob9j8BiLv0QJfkWDARKMzdxm0Mz/rmT61M2PfoB
+         4H7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719754819; x=1720359619;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MQcDa+wDXNNN/mQ/HwttTTXR+alCmusd4OT/lRAH1tA=;
+        b=IURW4r7ahKz5J1QnraNUGY/kdvj9CQuczmaPN5Jenx80csrHK3myOMV/9xjTOQRFfE
+         IQdHWpqNBSZuN4tjtI5AoL+TifyWf8O0fTQfn5d/oczeQhYKWItgFNMupTPkna5UIve5
+         5d7S1TPcQCtQSqUh0+N9hjpB/JXNYkxww4xaXi2KaHn/rgedLulScg2aBQYCmLsVt/k0
+         FfVbXq42DeB8JMimiM6Mjd0BzvxXGg3wbVYeslUoYXQv7WtbtQMghDVsLfW/IXeKrh5e
+         dlP5vSvMmit3uNZyRf9dChDLrkj2WPni+sDq+H8UY1ucFJ7u2itIlODs5w6sPYvTR0i3
+         vbLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRXrnkntTpz+vEbDyDscIcyi2zZkq+WnMHC7/oVT0ZDfhu5vZdtSqai4oikRCd7nPfxdnOwDIF6G5/iuKto3TJkqZcL7jm5v4oceG/bwgPB+qP2ZQvUZ9TyKwolbLzHNzb
+X-Gm-Message-State: AOJu0Yw9w8D/mLAEhxfVGyleff+40ngxt2zYkMmykbZqHJM4w+wTFxxy
+	EqRmaWqUw81xKa82jWD4OAEVyTh/v1YTW9YyFlOTMuipILHlOPkt
+X-Google-Smtp-Source: AGHT+IEUNMMZuVhVUIWv2yyDj7cheQEwWk3+Vfqb53sl5ZI0k2IxiEwvSe2rRf3iG2EgVF68Zkw1Ig==
+X-Received: by 2002:a05:6358:4327:b0:1a2:11d6:3b26 with SMTP id e5c5f4694b2df-1a6accda99dmr381208555d.2.1719754818361;
+        Sun, 30 Jun 2024 06:40:18 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6929be9esm253760685a.60.2024.06.30.06.40.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Jun 2024 06:40:17 -0700 (PDT)
+Date: Sun, 30 Jun 2024 09:40:17 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Yan Zhai <yan@cloudflare.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Florian Westphal <fw@strlen.de>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ David Howells <dhowells@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Richard Gobert <richardbgobert@gmail.com>, 
+ Antoine Tenart <atenart@kernel.org>, 
+ Felix Fietkau <nbd@nbd.name>, 
+ Soheil Hassas Yeganeh <soheil@google.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ =?UTF-8?B?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org
+Message-ID: <668160415228c_c6202948c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAO3-PbrKRqeA4bCPnv7xkDiUFtuCMfzYZiEur3wM=+x8nc2xpQ@mail.gmail.com>
+References: <cover.1718919473.git.yan@cloudflare.com>
+ <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
+ <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
+ <CAO3-Pbp8frVM-i6NKkmyNOFrqqW=g58rK8m4vfdWbiSHHdQBsg@mail.gmail.com>
+ <6677dc5cb5cca_33522729474@willemb.c.googlers.com.notmuch>
+ <CAO3-PbrKRqeA4bCPnv7xkDiUFtuCMfzYZiEur3wM=+x8nc2xpQ@mail.gmail.com>
+Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a5554266-55b7-4e96-b226-b686b8a6af89@habana.ai>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 28, 2024 at 10:24:32AM +0000, Omer Shpigelman wrote:
-> On 6/19/24 13:52, Leon Romanovsky wrote:
-> > On Wed, Jun 19, 2024 at 09:27:54AM +0000, Omer Shpigelman wrote:
-> >> On 6/18/24 15:58, Leon Romanovsky wrote:
-> >>> On Tue, Jun 18, 2024 at 11:08:34AM +0000, Omer Shpigelman wrote:
-> >>>> On 6/17/24 22:04, Leon Romanovsky wrote:
-> >>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> >>>>>
-> >>>>> On Mon, Jun 17, 2024 at 05:43:49PM +0000, Omer Shpigelman wrote:
-> >>>>>> On 6/13/24 22:18, Leon Romanovsky wrote:
-> >>>>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> >>>>>>>
-> >>>>>>> On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
-> >>>>>>>> Add an RDMA driver of Gaudi ASICs family for AI scaling.
-> >>>>>>>> The driver itself is agnostic to the ASIC in action, it operates according
-> >>>>>>>> to the capabilities that were passed on device initialization.
-> >>>>>>>> The device is initialized by the hbl_cn driver via auxiliary bus.
-> >>>>>>>> The driver also supports QP resource tracking and port/device HW counters.
-> >>>>>>>>
-> >>>>>>>> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
-> >>>>>>>> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
-> >>>>>>>> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
-> >>>>>>>> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
-> >>>>>>>> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
-> >>>>>>>> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
-> >>>>>>>> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
-> >>>>>>>> Co-developed-by: David Meriin <dmeriin@habana.ai>
-> >>>>>>>> Signed-off-by: David Meriin <dmeriin@habana.ai>
-> >>>>>>>> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
-> >>>>>>>> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
-> >>>>>>>> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
-> >>>>>>>> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
-> >>>>>>>
-> 
-> <...>
-> 
-> >> mlx5 IB driver doesn't export any symbol that is used by the core driver,
-> >> that's why the core driver can be loaded without the IB driver (althought
-> >> you'll get circular dependency if you would export).
-> > 
-> > Yes, IB and ETH drivers are "users" of core driver. As RDMA maintainer,
-> > I'm reluctant to accept code that exports symbols from IB drivers to
-> > other subsystems. We have drivers/infiniband/core/ for that.
-> > 
-> 
-> We need the core driver to access the IB driver (and to the ETH driver as
-> well). As you wrote, we can't use exported symbols from our IB driver nor
-> rely on function pointers, but what about providing the core driver an ops
-> structure? meaning exporting a register function from the core driver that
-> should be called by the IB driver during auxiliary device probe.
-> Something like:
-> 
-> int hbl_cn_register_ib_aux_dev(struct auxiliary_device *adev,
-> 			       struct hbl_ib_ops *ops)
-> {
-> ...
-> }
-> EXPORT_SYMBOL(hbl_cn_register_ib_aux_dev);
-> 
-> That's how only the parent driver exports symbols to the son driver so the
-> IB driver is a "user" of the core driver and so we count on the internal
-> module reference counter. But we also get the ability to access the IB
-> driver from the core driver (to report a HW error for example).
+Yan Zhai wrote:
+> On Sun, Jun 23, 2024 at 3:27=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Yan Zhai wrote:
+> > > > > -static inline bool netif_elide_gro(const struct net_device *de=
+v)
+> > > > > +static inline bool netif_elide_gro(const struct sk_buff *skb)
+> > > > >  {
+> > > > > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
+> > > > > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_=
+prog)
+> > > > >               return true;
+> > > > > +
+> > > > > +#ifdef CONFIG_SKB_GRO_CONTROL
+> > > > > +     return skb->gro_disabled;
+> > > > > +#else
+> > > > >       return false;
+> > > > > +#endif
+> > > >
+> > > > Yet more branches in the hot path.
+> > > >
+> > > > Compile time configurability does not help, as that will be
+> > > > enabled by distros.
+> > > >
+> > > > For a fairly niche use case. Where functionality of GRO already
+> > > > works. So just a performance for a very rare case at the cost of =
+a
+> > > > regression in the common case. A small regression perhaps, but de=
+ath
+> > > > by a thousand cuts.
+> > > >
+> > >
+> > > I share your concern on operating on this hotpath. Will a
+> > > static_branch + sysctl make it less aggressive?
+> >
+> > That is always a possibility. But we have to use it judiciously,
+> > cannot add a sysctl for every branch.
+> >
+> > I'm still of the opinion that Paolo shared that this seems a lot of
+> > complexity for a fairly minor performance optimization for a rare
+> > case.
+> >
+> Actually combining the discussion in this thread, I think it would be
+> more than the corner cases that we encounter. Let me elaborate below.
+> =
 
-Before you are talking about solutions, please explain in technical
-terms why you absolutely need to access IB from core driver and any
-other possible way is not possible.
+> > > Speaking of
+> > > performance, I'd hope this can give us more control so we can achie=
+ve
+> > > the best of two worlds: for TCP and some UDP traffic, we can enable=
 
-Thanks
+> > > GRO, while for some other classes that we know GRO does no good or
+> > > even harm, let's disable GRO to save more cycles. The key observati=
+on
+> > > is that developers may already know which traffic is blessed by GRO=
+,
+> > > but lack a way to realize it.
+> >
+> > Following up also on Daniel's point on using BPF as GRO engine. Even
+> > earlier I tried to add an option to selectively enable GRO protocols
+> > without BPF. Definitely worthwhile to be able to disable GRO handlers=
+
+> > to reduce attack surface to bad input.
+> >
+> I was probably staring too hard at my own things, which is indeed a
+> corner case. But reducing the attack surface is indeed a good
+> motivation for this patch. I checked briefly with our DoS team today,
+> the DoS scenario will definitely benefit from skipping GRO, for
+> example on SYN/RST floods. XDP is our main weapon to drop attack
+> traffic today, but it does not always drop 100% of the floods, and
+> time by time it does need to fall back to iptables due to the delay of
+> XDP program assembly or the BPF limitation on analyzing the packet. I
+> did an ad hoc measurement just now on a mostly idle server, with
+> ~1.3Mpps SYN flood concentrated on one CPU and dropped them early in
+> raw-PREROUTING. w/ GRO this would consume about 35-41% of the CPU
+> time, while w/o GRO the time dropped to 9-12%. This seems a pretty
+> significant breath room under heavy attacks.
+
+A GRO opt-out might make sense.
+
+A long time ago I sent a patch that configured GRO protocols using
+syscalls, selectively (un)registering handlers. The interface was not
+very nice, so I did not pursue it further. On the upside, the datapath
+did not introduce any extra code. The intent was to reduce attack
+surface of packet parsing code.
+
+A few concerns with an XDP based opt-out. It is more work to enable:
+requires compiling and load an XDP program. It adds cycles in the
+hot path. And I do not entirely understand when an XDP program will be
+able to detect that a packet should not enter the GRO engine, but
+cannot drop the packet (your netfilter example above).
+
+> But I am not sure I understand "BPF as GRO engine" here, it seems to
+> me that being able to disable GRO by XDP is already good enough. Any
+> more motivations to do more complex work here?
+
+FWIW, we looked into this a few years ago. Analogous to the BPF flow
+dissector: if the BPF program is loaded, use that instead of the C
+code path. But we did not arrive at a practical implementation at the
+time. Things may have changed, but one issue is how to store and
+access the list (or table) of outstanding GRO skbs.
+
+> best
+> Yan
+> =
+
+> >
+> > >
+> > > best
+> > > Yan
+> >
+> >
+
+
 
