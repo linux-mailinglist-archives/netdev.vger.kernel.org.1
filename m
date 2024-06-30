@@ -1,119 +1,178 @@
-Return-Path: <netdev+bounces-107928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFB9691D0C5
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 11:15:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35DD91D0EA
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 11:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 863A91F2145A
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 09:15:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77935281CD2
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 09:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0780212D744;
-	Sun, 30 Jun 2024 09:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D796E12D209;
+	Sun, 30 Jun 2024 09:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="en4uil1K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtZj+OEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62143BBC9;
-	Sun, 30 Jun 2024 09:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EBD12D1E0
+	for <netdev@vger.kernel.org>; Sun, 30 Jun 2024 09:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719738914; cv=none; b=EIkRrn0L6ench/hwgY/ELGdxMfrRl/DbW+lp8/OjeinPnXQZJiHKi+osFq4cvkaS5+j87XGalCnfBnz+SclZcOao9ms1xt9NXMo5LDkoaT77u3ORI8mE8tiJxP8t3aU/kYzAKGJ0JOX2wn4aZwgAItmjrm0Ac4uCveBwZpcCkP0=
+	t=1719741005; cv=none; b=YhPzOURnjt0U0lETHxbztUrmVcKwmjCZr1BDq7x3RZ1x74kJx+1NWwbn0vi3pyppUjDtjZK6BBldjynDKrSjOi1ugysrUHweIHPtpk2FODYUki8FkZ5Q9mnvjNwXUxi3IvDg0sOo+oUjKVpittgFDftknWhEYFBSLTwyKoJJecs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719738914; c=relaxed/simple;
-	bh=tc+Ufg00udHbrhXlW8SdH881js1R768qk0khtQCwXfM=;
+	s=arc-20240116; t=1719741005; c=relaxed/simple;
+	bh=nly1ZJ2z/MkYWYCwjUPMUl3xmvVqlCtdrBnHWiE6mxE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jgnXa9UVacxspO0n9NWLqClYvJLkTJwugyPUfRIMo97jkFf9+xANkinwgm1kDugZc/eHUp8Olht2o3tymcvcImA0OLnBAfiPmp54vAsrTITiGAnl5U6lF8HJJrGoelpmNPk7e6axLEPyyld7qGu9vDhsGzMUfZ1Ot90y8F0ycRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=en4uil1K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EE12C4AF17;
-	Sun, 30 Jun 2024 09:15:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719738914;
-	bh=tc+Ufg00udHbrhXlW8SdH881js1R768qk0khtQCwXfM=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=en4uil1KnZ/7MbdeOWy8vNN5qJWiUXY0l2SbZobfjZ8oplSyoWMu1lOkjeF8flaH3
-	 /HV9bJ7Vv9kKv17jPnFYwEukaevW6iRTUbbr5QDOdTbDZa3n6lDKP1nTClVwZpq8+J
-	 oLaPu6sLyqwDf8E5OWmtJo7s5wiOFHtSqV6PrOxjaurK1T+ap5dnqpfGVBAeURsbSe
-	 TFAgfJQljWDYaCUdX8gxQiYJybypsxpSCGjM1obpaU26PlmwrDoAjm1+7EE7AWAQTh
-	 jcCs2X75RvRjSA5W7N6I/D1JRGNwVEi8P24nBLFrROD6E/ZZHuaJSCEo8rj9dPsIHL
-	 Z81Vj7v43wiTQ==
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ec0f3b9cfeso23743541fa.0;
-        Sun, 30 Jun 2024 02:15:14 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWakp4fEobeJm555EldJIGf93SwgK4DltWYxvEErGotj/jvDoK+D3wwIodLG65l+oThfZBKfhlltKdItd+DE3Fx76cLIgDWRYe4usgkx+9vTZDrFVcwzXZ3631WMAQGLmUHVwmpCU8JXfCMbwg2QzeUcQR0ntaGpntRLQcpRj8t/ZwlvI5n2mR9edoQ1qbffykCX5ervYnO2I8xyckHKYCp
-X-Gm-Message-State: AOJu0YyG6hh/+ijapfwEZc/3LoR/jwV7deq7lbgRrVap+nj+UWuJEiUe
-	hE7T6oBC2yCHHIGNV5HmW144Srt0wWVqIc+2visdmcUD1NzX+cx5tgicTcS4CXk+PeJvHVuW2an
-	i9QKKeL3qmmx0M1viOU7rTX9qfKA=
-X-Google-Smtp-Source: AGHT+IHYW4n5GnYJwHXqY+6mUXvauoz57bZueShtW/YuVL9pXD9MpL3q7Rr5kG0lABD6uVFGXFXO7kcRPrfoJTzNisI=
-X-Received: by 2002:a2e:a179:0:b0:2ec:4fec:8bda with SMTP id
- 38308e7fff4ca-2ee5e6cd6a7mr18022581fa.36.1719738912735; Sun, 30 Jun 2024
- 02:15:12 -0700 (PDT)
+	 To:Cc:Content-Type; b=k7OfmBFOqVwBXQMNSdZI462xZVfU//cnkf2zb5fE8psGckoDXDysE2FIotThX2E/GYnqy1LcmCNu41B/h/UcHNWd2jdz+l1b7598ke1T2YJaWBF9hVYo83YD0XFQS3nVKYvIrk7x9x7e+5/pZvQa7dibVEEdJt7c4937Lb51aNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtZj+OEZ; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-64b29539d86so17522047b3.2
+        for <netdev@vger.kernel.org>; Sun, 30 Jun 2024 02:50:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719741003; x=1720345803; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c6ZVALEE8BLTBOPClplq0lzGx+lM/46UPAaOZVcXLWY=;
+        b=HtZj+OEZCpHY4jqmB0o2P35uVpds05e57lj0tJ5r9OCrHJ7zzYSoVvnvS4B4BsRYN/
+         Baq21ggEDqldIMG+cfFKbYuoTFlUCUche0hDXFlI264JNgYcuHcIGDvMaWHpQe7Fw2jO
+         aDdBSeEkva1RG/84jhkHYsWr5orSZnlBLPrDEgICopdz8dQ0RYZrBGmGoLUov2E4IS7C
+         u7yQZDRKwmYtOkKHOKSYqqcIdLLwbtQi/m6GRxOBno3z8MO4TAMnWM+DvZkTWjA56SFc
+         4Fb0m3MWxozfKZ+oUj6r6QH+ivr3UZAEsNmaSY2hQU5Lqgc18o801mlgONraaWvw4gXX
+         hdvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719741003; x=1720345803;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c6ZVALEE8BLTBOPClplq0lzGx+lM/46UPAaOZVcXLWY=;
+        b=BOOHEjHmW185spTWlbOeT72iM8pAemoB46X8ily6xwO/sOI2oizpae74QW8WHb5Vkd
+         TzboH8/xeB//TeibRgztpoeWkHjqqlTHaxJL0Y48hRTAxbXLPsIPdshCcXhtUrID+1GD
+         GMjPRJ9nTDa2CDJVAcXLPYIxi8jGBMaGQSVHAVHgEI3yOMqofR3sL0Ppv1XlBe/qNC2Q
+         WOyQFfcfRTQApbPJ/aBxcCVdbRgvpwJfjAiUaWC37oVgd+UQoZzH9ANwjZMX4Dd98GMG
+         zY1wL+rE7fa17Uz37T0NhncvgXBEP4zO4km4zjWSGK2phyGYVMznI2J6Mh0hvVQfuo5r
+         Y+mg==
+X-Gm-Message-State: AOJu0YxeBj4H4xjrqetOkbR+UtTTe/9TXipKjfFsL+s0B/3d8bG4JVjT
+	y41DYC2t8WX/kT33Ya8v4Z5BoTLCUzoni9jl0i9TqrB3BxLPr5yHKzPa7oa5UGwOs6yo5XShU6c
+	Kl+oGfKY/r5trnwLhKTSFMFo6SCypayP+wrI=
+X-Google-Smtp-Source: AGHT+IE8Vs8K43ARt7MqOWqeZIM6n8Nx3702w92YwSDo/4rpHrDLicRxwVzEPN/PRxhBrUYLPjb+axHQNIZ3ojqTMnw=
+X-Received: by 2002:a81:7e01:0:b0:627:d92a:bdc0 with SMTP id
+ 00721157ae682-64c72d400d5mr34454537b3.36.1719741003027; Sun, 30 Jun 2024
+ 02:50:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240630073605.2164346-1-jacobe.zang@wesion.com>
- <20240630073605.2164346-5-jacobe.zang@wesion.com> <bd661690-1de8-4030-a209-ef26d3559221@gmx.net>
- <TYZPR03MB7001AC28827A86338BF2B77380D22@TYZPR03MB7001.apcprd03.prod.outlook.com>
-In-Reply-To: <TYZPR03MB7001AC28827A86338BF2B77380D22@TYZPR03MB7001.apcprd03.prod.outlook.com>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Sun, 30 Jun 2024 17:15:00 +0800
-X-Gmail-Original-Message-ID: <CAGb2v66Vk8SMs1TOs+80Jy5fXumuYqCx59Tzd_N7wJAfyysQcw@mail.gmail.com>
-Message-ID: <CAGb2v66Vk8SMs1TOs+80Jy5fXumuYqCx59Tzd_N7wJAfyysQcw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] wifi: brcmfmac: Add optional lpo clock enable support
-To: Jacobe Zang <jacobe.zang@wesion.com>
-Cc: Stefan Wahren <wahrenst@gmx.net>, "robh@kernel.org" <robh@kernel.org>, 
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "heiko@sntech.de" <heiko@sntech.de>, 
-	"kvalo@kernel.org" <kvalo@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "conor+dt@kernel.org" <conor+dt@kernel.org>, 
-	"efectn@protonmail.com" <efectn@protonmail.com>, "dsimic@manjaro.org" <dsimic@manjaro.org>, 
-	"jagan@edgeble.ai" <jagan@edgeble.ai>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-rockchip@lists.infradead.org" <linux-rockchip@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "arend@broadcom.com" <arend@broadcom.com>, 
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "megi@xff.cz" <megi@xff.cz>, 
-	"duoming@zju.edu.cn" <duoming@zju.edu.cn>, "bhelgaas@google.com" <bhelgaas@google.com>, 
-	"minipli@grsecurity.net" <minipli@grsecurity.net>, 
-	"brcm80211@lists.linux.dev" <brcm80211@lists.linux.dev>, 
-	"brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, Nick Xie <nick@khadas.com>
+References: <CAA85sZuGQGM+mNOtD+B=GQJjH3UaoqUkZkoeiKZ+ZD+7FR5ucQ@mail.gmail.com>
+ <20240628105343.GA14296@breakpoint.cc> <CAA85sZvo54saR-wrVhQ=LLz7P28tzA-sO3Bg=YuBANZTcY0PpQ@mail.gmail.com>
+ <CAA85sZt8V=vL3BUJM3b9KEkK9gNaZ=dU_YZPj6m-CJD4fVQvwg@mail.gmail.com>
+ <CAA85sZt1kX6RdmCsEiUabpV0-y_O3a0yku6H7QyCZCOs=7VBQg@mail.gmail.com>
+ <CAA85sZscQ0f1Ew+qugkO6x6cL6OSuPpR1uU2Q6X=cSD2O2yUkA@mail.gmail.com> <CAA85sZu5S1WdJEoDWCEM7dr8CQf32M6S38Gz0TOQ5PpgHbgrig@mail.gmail.com>
+In-Reply-To: <CAA85sZu5S1WdJEoDWCEM7dr8CQf32M6S38Gz0TOQ5PpgHbgrig@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Sun, 30 Jun 2024 11:49:51 +0200
+Message-ID: <CAA85sZsa2wuFAn+Ad3zJR+NaXKcO5zUAx7=0M5KE4dX-3wWgKw@mail.gmail.com>
+Subject: Re: IP oversized ip oacket from - header size should be skipped?
+To: Florian Westphal <fw@strlen.de>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 30, 2024 at 5:10=E2=80=AFPM Jacobe Zang <jacobe.zang@wesion.com=
-> wrote:
+On Sun, Jun 30, 2024 at 1:51=E2=80=AFAM Ian Kumlien <ian.kumlien@gmail.com>=
+ wrote:
 >
-> Hi Stefan,
+> So, yeaj, caffeine induced thinking, been reading RFC:s and yes, it's
+> completely correct that fragment ip headers should be skipped
 >
-> >> WiFi modules often require 32kHz clock to function. Add support to
-> >> enable the clock to PCIe driver.
-> > the low power clock is independent from the host interface like PCIe. S=
-o
-> > the clock handling should move to the common code. Sorry, not i cannot
-> > give a good suggestion, what's the best place for this.
+> completely logical as well, what does confuse me though is that i can
+> get thousands of:
+> [ 1415.631438] IPv4: Oversized IP packet from <local ip>
 >
-> I think the clock is used by the PCIe device so enable it in this file. A=
-lso I checked
-> use of clock which in spi[0] or sdio[0] device was enabled similarly to t=
-his.
+> I did change to get the size, and
+> --- a/net/ipv4/ip_fragment.c
+> +++ b/net/ipv4/ip_fragment.c
+> @@ -474,7 +474,7 @@ static int ip_frag_reasm(struct ipq *qp, struct
+> sk_buff *skb,
+>         err =3D -ENOMEM;
+>         goto out_fail;
+>  out_oversize:
+> -       net_info_ratelimited("Oversized IP packet from %pI4\n",
+> &qp->q.key.v4.saddr);
+> +       net_info_ratelimited("Oversized IP packet from %pI4 %i >
+> 65535\n", &qp->q.key.v4.saddr, len);
+>  out_fail:
+>         __IP_INC_STATS(net, IPSTATS_MIB_REASMFAILS);
+>         return err;
 >
-> [0] https://lore.kernel.org/all/20210806081229.721731-4-claudiu.beznea@mi=
-crochip.com/
+> Yields:  66260 > 65535
+>
+> Which is constantly 725 bytes too large, assumed to be ~16 bytes per pack=
+et
+>
+> Checking the calculation quickly becomes beyond me
+>         /* Determine the position of this fragment. */
+>         end =3D offset + skb->len - skb_network_offset(skb) - ihl;
+>
+> Since skb_network_offset(skb) expands to:
+> (skb->head + skb->network_header) - skb->data
+>
+> And you go, oh... heck ;)
+>
+> I just find it weird that localhost can generate a packet (without raw
+> or xdp) that is oversize, I'll continue checking
+> (once you've started making a fool of yourself, no reason to stop =3D))
+>
 
-You're looking at the wrong driver. For brcmfmac, the lpo clock is toggled
-by the MMC pwrseq code. And for the Bluetooth side (where it really matters=
-)
-for UARTs, it is in drivers/bluetooth/hci_bcm.c. and documented in the
-binding Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+So continued with:
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -474,7 +474,24 @@ static int ip_frag_reasm(struct ipq *qp, struct
+sk_buff *skb,
+        err =3D -ENOMEM;
+        goto out_fail;
+ out_oversize:
+-       net_info_ratelimited("Oversized IP packet from %pI4\n",
+&qp->q.key.v4.saddr);
++       net_info_ratelimited("Oversized IP packet from %pI4 %u >
+65535\n", &qp->q.key.v4.saddr, len);
++       {
++               struct rb_node *p =3D rb_first(&qp->q.rb_fragments);
++               unsigned int frg_cnt =3D 0;
++               int offset, ihl, flags;
++
++               while (p) {
++                       struct sk_buff *skb =3D rb_entry(p, struct
+sk_buff, rbnode);
++
++                       offset =3D ntohs(ip_hdr(skb)->frag_off);
++                       flags =3D offset & ~IP_OFFSET;
++                       offset &=3D IP_OFFSET;
++                       offset <<=3D 3;
++                       ihl =3D ip_hdrlen(skb);
++                       printk("FRAGMENT %u: skb->truesize =3D %u,
+skb->len =3D %u, len - skb_network_offset =3D %u -- end =3D %u final? %s\n"=
+,
+frg_cnt++, skb->truesize, skb->len, skb->len -
+skb_network_offset(skb), offset + skb->len - skb_network_offset(skb) -
+ihl, ((flags & IP_MF) =3D=3D 0) ? "yes" : "no");
++                       p =3D rb_next(p);
++               }
++       }
+ out_fail:
+        __IP_INC_STATS(net, IPSTATS_MIB_REASMFAILS);
+        return err;
 
+And the result is:
+[ 1764.949410] FRAGMENT 0: skb->truesize =3D 2304, skb->len =3D 1472, len
+- skb_network_offset =3D 1492 -- end =3D 1472 final? no
 
-ChenYu
+I never seem to get more than one fragment so now this feels more like
+an uninitialized variable?
 
