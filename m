@@ -1,234 +1,236 @@
-Return-Path: <netdev+bounces-107944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0D891D1D9
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 15:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CA5F91D1F2
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 16:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BC1C1F214F1
-	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 13:40:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF64281BE5
+	for <lists+netdev@lfdr.de>; Sun, 30 Jun 2024 14:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A188013DBB3;
-	Sun, 30 Jun 2024 13:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E744A14532C;
+	Sun, 30 Jun 2024 14:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvcHmVGb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="COhNXR4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAA412DD90;
-	Sun, 30 Jun 2024 13:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464147E572;
+	Sun, 30 Jun 2024 14:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719754821; cv=none; b=rLQ5b7+DfJUsVz73valtz0JpByZKsOOSnEjdm/ptp6qvRZ6U8BD8KQUwMfu+hF+HkHBU3Z5fJSz0WSj+t16OmXa4ljEMMYE9IEGbVALV/TQ17fP0VXpywMHt8At26lKOoo1LGjkJj8XCLbNqkPs++KMy7nyc0FX924ifu3ITEV4=
+	t=1719756311; cv=none; b=D+NsXsG1N72zA9L99qmzhB5ReG6Nmkdwhl/Ybq21mjyIPfXLcwvVgB8lqaYRil8YYfdxxrDnuwcHUdbzUnMtc0a3Q+gqvPfjot0frH0PmPamaxO2/U3nbtvjkaikb8WGME1qfz7N5QlLttM3xB5udNMfsggayRGvf0n7XKMJ934=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719754821; c=relaxed/simple;
-	bh=K1iSFLq5ePba2KehTDuSb8d5VR75RXpx8jz4H5SWxu4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DTeWNcWehiaFWy6n66I7CzTpKP95KtTFf9N+umimVTxH71HehTPplD0mgZdiRv17u2zIfMpgNexBHidwrajmzaaBL0W7YiEquh2aLdOcLMVa80T3Eqt09YNowWQK3NnI+UI0QvBdtkXhXt2uBaeDESjhn1LEWWuqloSyLWSBDi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FvcHmVGb; arc=none smtp.client-ip=209.85.161.45
+	s=arc-20240116; t=1719756311; c=relaxed/simple;
+	bh=JCX9RfkKcMe+viiahsmPNFHNBoULkMPfhabNd7u8+bc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MFCiPZHOPRut6FbmIZZ7ezZGGN4tC5dTqSYAVEQvfHwEZGZaUs8Jc4v51eYZlQ2ictX5gbEkoqeb++aHpT2rrlZwZCIM00cwVNSVW0IzNf2NzBmaQFNUJMI6w9ReHkNCQ/r3/dI1lO7ouqholtUIfVvpQNLjVQTi/yaV1RNWiWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=COhNXR4s; arc=none smtp.client-ip=209.85.210.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5c444e7d18fso197425eaf.3;
-        Sun, 30 Jun 2024 06:40:19 -0700 (PDT)
+Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-7066463c841so1202943b3a.1;
+        Sun, 30 Jun 2024 07:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719754819; x=1720359619; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1719756308; x=1720361108; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MQcDa+wDXNNN/mQ/HwttTTXR+alCmusd4OT/lRAH1tA=;
-        b=FvcHmVGb3rk805OkQQGxJ8mgD5V6eoz6JxyN/BPhpW2sri6QaRyKrrQqwoJC0vZlnf
-         3OW4G/EzWNIz1CwNo4FkcnJkTGYVpoda7RAQtVdacNP1iKb6gOXGqB9211ENOM48GHjp
-         331p3xeD62GxDsPGi40+X5Mlnh3TPGIS/XowZCyCwylSMUMsfw+LJl5CsSAHRqArW5K7
-         cS9ijfDyNbAlLJCFX0wSyYzgeUq+tAsn1E35HLk7TgNww04jHG4Q5A4RtBhZ54mpVf5n
-         apnpQ3hBq3FkFPfWbYuV1lN0I4t0pob9j8BiLv0QJfkWDARKMzdxm0Mz/rmT61M2PfoB
-         4H7g==
+        bh=3DMYWxVOVrbNinxcGttYFC0mIp7rbZQcJJC99krmUaA=;
+        b=COhNXR4sv+RgWoYqZSuZl+uXM+UHLNASbgDtXbkskijNi0vnEOWvOGA5lTERShg70n
+         NqdjfeGtNzTmmro/pome+0X0fZBe2+ibvGJHcxw81PuUvkeKZAvCzC1WStuc7gunA4tZ
+         AK5qx4of+LNBnLNV/hafVPPF4z/DTf2vA8+yMFHqaU/giurnlMtxxROA+9dhnrb3hxed
+         a+krIuz0A/rGn96iSPcQX/lkyEwRZJCgc34iDG2MivzDik5WIIAo3A3PDLj5T+XqVZsO
+         MlRmQUAOshWT7uk0AYYJ46NywBkIpX4dCnUrwh5DHPcqvzgQ8b+RAl0RL/SPeUkbR3FK
+         vfKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719754819; x=1720359619;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+        d=1e100.net; s=20230601; t=1719756308; x=1720361108;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=MQcDa+wDXNNN/mQ/HwttTTXR+alCmusd4OT/lRAH1tA=;
-        b=IURW4r7ahKz5J1QnraNUGY/kdvj9CQuczmaPN5Jenx80csrHK3myOMV/9xjTOQRFfE
-         IQdHWpqNBSZuN4tjtI5AoL+TifyWf8O0fTQfn5d/oczeQhYKWItgFNMupTPkna5UIve5
-         5d7S1TPcQCtQSqUh0+N9hjpB/JXNYkxww4xaXi2KaHn/rgedLulScg2aBQYCmLsVt/k0
-         FfVbXq42DeB8JMimiM6Mjd0BzvxXGg3wbVYeslUoYXQv7WtbtQMghDVsLfW/IXeKrh5e
-         dlP5vSvMmit3uNZyRf9dChDLrkj2WPni+sDq+H8UY1ucFJ7u2itIlODs5w6sPYvTR0i3
-         vbLA==
-X-Forwarded-Encrypted: i=1; AJvYcCXRXrnkntTpz+vEbDyDscIcyi2zZkq+WnMHC7/oVT0ZDfhu5vZdtSqai4oikRCd7nPfxdnOwDIF6G5/iuKto3TJkqZcL7jm5v4oceG/bwgPB+qP2ZQvUZ9TyKwolbLzHNzb
-X-Gm-Message-State: AOJu0Yw9w8D/mLAEhxfVGyleff+40ngxt2zYkMmykbZqHJM4w+wTFxxy
-	EqRmaWqUw81xKa82jWD4OAEVyTh/v1YTW9YyFlOTMuipILHlOPkt
-X-Google-Smtp-Source: AGHT+IEUNMMZuVhVUIWv2yyDj7cheQEwWk3+Vfqb53sl5ZI0k2IxiEwvSe2rRf3iG2EgVF68Zkw1Ig==
-X-Received: by 2002:a05:6358:4327:b0:1a2:11d6:3b26 with SMTP id e5c5f4694b2df-1a6accda99dmr381208555d.2.1719754818361;
-        Sun, 30 Jun 2024 06:40:18 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6929be9esm253760685a.60.2024.06.30.06.40.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jun 2024 06:40:17 -0700 (PDT)
-Date: Sun, 30 Jun 2024 09:40:17 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Yan Zhai <yan@cloudflare.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Simon Horman <horms@kernel.org>, 
- Florian Westphal <fw@strlen.de>, 
- Mina Almasry <almasrymina@google.com>, 
- Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- David Howells <dhowells@redhat.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- David Ahern <dsahern@kernel.org>, 
- Richard Gobert <richardbgobert@gmail.com>, 
- Antoine Tenart <atenart@kernel.org>, 
- Felix Fietkau <nbd@nbd.name>, 
- Soheil Hassas Yeganeh <soheil@google.com>, 
- Pavel Begunkov <asml.silence@gmail.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- =?UTF-8?B?VGhvbWFzIFdlacOfc2NodWg=?= <linux@weissschuh.net>, 
- linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org
-Message-ID: <668160415228c_c6202948c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAO3-PbrKRqeA4bCPnv7xkDiUFtuCMfzYZiEur3wM=+x8nc2xpQ@mail.gmail.com>
-References: <cover.1718919473.git.yan@cloudflare.com>
- <b8c183a24285c2ab30c51622f4f9eff8f7a4752f.1718919473.git.yan@cloudflare.com>
- <66756ed3f2192_2e64f929491@willemb.c.googlers.com.notmuch>
- <CAO3-Pbp8frVM-i6NKkmyNOFrqqW=g58rK8m4vfdWbiSHHdQBsg@mail.gmail.com>
- <6677dc5cb5cca_33522729474@willemb.c.googlers.com.notmuch>
- <CAO3-PbrKRqeA4bCPnv7xkDiUFtuCMfzYZiEur3wM=+x8nc2xpQ@mail.gmail.com>
-Subject: Re: [RFC net-next 1/9] skb: introduce gro_disabled bit
+        bh=3DMYWxVOVrbNinxcGttYFC0mIp7rbZQcJJC99krmUaA=;
+        b=N+JM2jU47SHUlOjb9BZMSkmSkOXJayHJZABqt/dvdtCNL3/5B8ltQKAY/4eWLgBokS
+         pLgjZSQJsvsRV9MwNayFFQNu0s9r48ZBUkJMN03+Svlkqc8/lN0Ve8qkAgYP6WL1N+wu
+         Ux0miRYcLde4eCE1FLMRl+1sOyVkPvyufPguQiQQafgLzb1ytvvcIrH7fn5VVpuvVsnm
+         HRVtqC/gBdvl5PymkyOPC3LmpEEHmny7K1hqZlBu2YWurFtiL2QS15fb0LZRKGbO37Ri
+         X3bZAFVjJ4AagFELnf0XWjjxyX0U6P45aLckpw6eEVYJdBsZTuE7QCLyEDuxCZ1eYnx7
+         s+wg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpdl3VB9oh96s/36RdpT5HxByicXlI3EmXFjEYzr0w166sc2BXW+e4I8gcxDSpj4XebScPVHfbIcpfI0yozjbFynoFyS/OFCV7UsxlGvYypXK799Hr4GvR1Xy/d7asmQCKBrVd
+X-Gm-Message-State: AOJu0YwbJhwhlCwWV/xJGV/6W9O84/PkyIk8GFokU6VMeb83YiHWWYMU
+	YWkAozveWlpNiiUwZ41X/G7mH3fPvHeXgMbXdrqbd6kZ22lWMP/t
+X-Google-Smtp-Source: AGHT+IErdZVHdJ/n/+BICGWyxIK1iehPhM3FHCl6vnJuEVkPFljF68IEBchgBhk61MJ9O5d8qzA4Ig==
+X-Received: by 2002:a05:6a20:748a:b0:1be:cf09:4f0 with SMTP id adf61e73a8af0-1bef61ff386mr2330753637.44.1719756308256;
+        Sun, 30 Jun 2024 07:05:08 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:19b7:87b2:860d:6c8d? ([2409:8a55:301b:e120:19b7:87b2:860d:6c8d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac1598cfbsm46583435ad.250.2024.06.30.07.05.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Jun 2024 07:05:07 -0700 (PDT)
+Message-ID: <0a80e362-1eb7-40b0-b1b9-07ec5a6506ea@gmail.com>
+Date: Sun, 30 Jun 2024 22:05:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
+ prepare/probe/commit API
+To: Alexander Duyck <alexander.duyck@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-11-linyunsheng@huawei.com>
+ <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
+ <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
+ <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Yan Zhai wrote:
-> On Sun, Jun 23, 2024 at 3:27=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Yan Zhai wrote:
-> > > > > -static inline bool netif_elide_gro(const struct net_device *de=
-v)
-> > > > > +static inline bool netif_elide_gro(const struct sk_buff *skb)
-> > > > >  {
-> > > > > -     if (!(dev->features & NETIF_F_GRO) || dev->xdp_prog)
-> > > > > +     if (!(skb->dev->features & NETIF_F_GRO) || skb->dev->xdp_=
-prog)
-> > > > >               return true;
-> > > > > +
-> > > > > +#ifdef CONFIG_SKB_GRO_CONTROL
-> > > > > +     return skb->gro_disabled;
-> > > > > +#else
-> > > > >       return false;
-> > > > > +#endif
-> > > >
-> > > > Yet more branches in the hot path.
-> > > >
-> > > > Compile time configurability does not help, as that will be
-> > > > enabled by distros.
-> > > >
-> > > > For a fairly niche use case. Where functionality of GRO already
-> > > > works. So just a performance for a very rare case at the cost of =
-a
-> > > > regression in the common case. A small regression perhaps, but de=
-ath
-> > > > by a thousand cuts.
-> > > >
-> > >
-> > > I share your concern on operating on this hotpath. Will a
-> > > static_branch + sysctl make it less aggressive?
-> >
-> > That is always a possibility. But we have to use it judiciously,
-> > cannot add a sysctl for every branch.
-> >
-> > I'm still of the opinion that Paolo shared that this seems a lot of
-> > complexity for a fairly minor performance optimization for a rare
-> > case.
-> >
-> Actually combining the discussion in this thread, I think it would be
-> more than the corner cases that we encounter. Let me elaborate below.
-> =
+On 6/30/2024 1:37 AM, Alexander Duyck wrote:
+> On Sat, Jun 29, 2024 at 4:15 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-> > > Speaking of
-> > > performance, I'd hope this can give us more control so we can achie=
-ve
-> > > the best of two worlds: for TCP and some UDP traffic, we can enable=
+...
 
-> > > GRO, while for some other classes that we know GRO does no good or
-> > > even harm, let's disable GRO to save more cycles. The key observati=
-on
-> > > is that developers may already know which traffic is blessed by GRO=
-,
-> > > but lack a way to realize it.
-> >
-> > Following up also on Daniel's point on using BPF as GRO engine. Even
-> > earlier I tried to add an option to selectively enable GRO protocols
-> > without BPF. Definitely worthwhile to be able to disable GRO handlers=
+>>>
+>>> Why is this a macro instead of just being an inline? Are you trying to
+>>> avoid having to include a header due to the virt_to_page?
+>>
+>> Yes, you are right.
+>> I tried including different headers for virt_to_page(), and it did not
+>> work for arch/x86/kernel/asm-offsets.s, which has included linux/sched.h,
+>> and linux/sched.h need 'struct page_frag_cache' for 'struct task_struct'
+>> after this patchset, including page_frag_cache.h for sched.h causes the
+>> below compiler error:
+>>
+>>    CC      arch/x86/kernel/asm-offsets.s
+>> In file included from ./arch/x86/include/asm/page.h:89,
+>>                   from ./arch/x86/include/asm/thread_info.h:12,
+>>                   from ./include/linux/thread_info.h:60,
+>>                   from ./include/linux/spinlock.h:60,
+>>                   from ./include/linux/swait.h:7,
+>>                   from ./include/linux/completion.h:12,
+>>                   from ./include/linux/crypto.h:15,
+>>                   from arch/x86/kernel/asm-offsets.c:9:
+>> ./include/linux/page_frag_cache.h: In function ‘page_frag_alloc_align’:
+>> ./include/asm-generic/memory_model.h:37:34: error: ‘vmemmap’ undeclared (first use in this function); did you mean ‘mem_map’?
+>>     37 | #define __pfn_to_page(pfn)      (vmemmap + (pfn))
+>>        |                                  ^~~~~~~
+>> ./include/asm-generic/memory_model.h:65:21: note: in expansion of macro ‘__pfn_to_page’
+>>     65 | #define pfn_to_page __pfn_to_page
+>>        |                     ^~~~~~~~~~~~~
+>> ./arch/x86/include/asm/page.h:68:33: note: in expansion of macro ‘pfn_to_page’
+>>     68 | #define virt_to_page(kaddr)     pfn_to_page(__pa(kaddr) >> PAGE_SHIFT)
+>>        |                                 ^~~~~~~~~~~
+>> ./include/linux/page_frag_cache.h:151:16: note: in expansion of macro ‘virt_to_page’
+>>    151 |         return virt_to_page(va);
+>>        |                ^~~~~~~~~~~~
+>> ./include/asm-generic/memory_model.h:37:34: note: each undeclared identifier is reported only once for each function it appears in
+>>     37 | #define __pfn_to_page(pfn)      (vmemmap + (pfn))
+>>        |                                  ^~~~~~~
+>> ./include/asm-generic/memory_model.h:65:21: note: in expansion of macro ‘__pfn_to_page’
+>>     65 | #define pfn_to_page __pfn_to_page
+>>        |                     ^~~~~~~~~~~~~
+>> ./arch/x86/include/asm/page.h:68:33: note: in expansion of macro ‘pfn_to_page’
+>>     68 | #define virt_to_page(kaddr)     pfn_to_page(__pa(kaddr) >> PAGE_SHIFT)
+>>        |                                 ^~~~~~~~~~~
+>> ./include/linux/page_frag_cache.h:151:16: note: in expansion of macro ‘virt_to_page’
+>>    151 |         return virt_to_page(va);
+>>
+>>
+> 
+> I am pretty sure you just need to add:
+> #include <asm/page.h>
 
-> > to reduce attack surface to bad input.
-> >
-> I was probably staring too hard at my own things, which is indeed a
-> corner case. But reducing the attack surface is indeed a good
-> motivation for this patch. I checked briefly with our DoS team today,
-> the DoS scenario will definitely benefit from skipping GRO, for
-> example on SYN/RST floods. XDP is our main weapon to drop attack
-> traffic today, but it does not always drop 100% of the floods, and
-> time by time it does need to fall back to iptables due to the delay of
-> XDP program assembly or the BPF limitation on analyzing the packet. I
-> did an ad hoc measurement just now on a mostly idle server, with
-> ~1.3Mpps SYN flood concentrated on one CPU and dropped them early in
-> raw-PREROUTING. w/ GRO this would consume about 35-41% of the CPU
-> time, while w/o GRO the time dropped to 9-12%. This seems a pretty
-> significant breath room under heavy attacks.
+I am supposing you mean adding the above to page_frag_cache.h, right?
 
-A GRO opt-out might make sense.
+It seems thing is more complicated for SPARSEMEM_VMEMMAP case, as it 
+needs the declaration of 'vmemmap'(some arch defines it as a pointer 
+variable while some arch defines it as a macro) and the definition of 
+'struct page' for '(vmemmap + (pfn))' operation.
 
-A long time ago I sent a patch that configured GRO protocols using
-syscalls, selectively (un)registering handlers. The interface was not
-very nice, so I did not pursue it further. On the upside, the datapath
-did not introduce any extra code. The intent was to reduce attack
-surface of packet parsing code.
+Adding below for 'vmemmap' and 'struct page' seems to have some compiler 
+error caused by interdependence between linux/mm_types.h and asm/pgtable.h:
+#include <asm/pgtable.h>
+#include <linux/mm_types.h>
 
-A few concerns with an XDP based opt-out. It is more work to enable:
-requires compiling and load an XDP program. It adds cycles in the
-hot path. And I do not entirely understand when an XDP program will be
-able to detect that a packet should not enter the GRO engine, but
-cannot drop the packet (your netfilter example above).
+As below, asm/pgtable.h obviously need the definition of 'struct 
+mm_struct' from linux/mm_types.h, and linux/mm_types.h has some
+a long dependency of asm/pgtable.h starting from linux/uprobes.h
+if we add '#include <asm/pgtable.h>' in linux/page_frag_cache.h:
 
-> But I am not sure I understand "BPF as GRO engine" here, it seems to
-> me that being able to disable GRO by XDP is already good enough. Any
-> more motivations to do more complex work here?
+In file included from ./include/linux/page_frag_cache.h:8,
+                  from ./include/linux/sched.h:49,
+                  from ./include/linux/percpu.h:13,
+                  from ./arch/x86/include/asm/msr.h:15,
+                  from ./arch/x86/include/asm/tsc.h:10,
+                  from ./arch/x86/include/asm/timex.h:6,
+                  from ./include/linux/timex.h:67,
+                  from ./include/linux/time32.h:13,
+                  from ./include/linux/time.h:60,
+                  from ./include/linux/jiffies.h:10,
+                  from ./include/linux/ktime.h:25,
+                  from ./include/linux/timer.h:6,
+                  from ./include/linux/workqueue.h:9,
+                  from ./include/linux/srcu.h:21,
+                  from ./include/linux/notifier.h:16,
+                  from ./arch/x86/include/asm/uprobes.h:13,
+                  from ./include/linux/uprobes.h:49,
+                  from ./include/linux/mm_types.h:16,
+                  from ./include/linux/mmzone.h:22,
+                  from ./include/linux/gfp.h:7,
+                  from ./include/linux/slab.h:16,
+                  from ./include/linux/crypto.h:17,
+                  from arch/x86/kernel/asm-offsets.c:9:
+./arch/x86/include/asm/pgtable.h: In function ‘pte_accessible’:
+./arch/x86/include/asm/pgtable.h:970:40: error: invalid use of undefined 
+type ‘struct mm_struct’
+   970 |                         atomic_read(&mm->tlb_flush_pending))
+       |                                        ^~
+./arch/x86/include/asm/pgtable.h: In function ‘pmdp_establish’:
+./arch/x86/include/asm/pgtable.h:1370:37: error: invalid use of 
+undefined type ‘struct vm_area_struct’
+  1370 |         page_table_check_pmd_set(vma->vm_mm, pmdp, pmd);
+       |                                     ^~
+./arch/x86/include/asm/pgtable.h: At top level:
+./arch/x86/include/asm/pgtable.h:1495:50: error: ‘struct vm_fault’ 
+declared inside parameter list will not be visible outside of this 
+definition or declaration [-Werror]
+  1495 | static inline void update_mmu_cache_range(struct vm_fault *vmf,
+       |                                                  ^~~~~~~~
+In file included from ./arch/x86/include/asm/page.h:89,
+                  from ./arch/x86/include/asm/thread_info.h:12,
+                  from ./include/linux/thread_info.h:60,
+                  from ./include/linux/spinlock.h:60,
+                  from ./include/linux/swait.h:7,
+                  from ./include/linux/completion.h:12,
+                  from ./include/linux/crypto.h:15,
+                  from arch/x86/kernel/asm-offsets.c:9:
+./include/linux/page_frag_cache.h: In function ‘page_frag_alloc_probe’:
+./include/asm-generic/memory_model.h:37:42: error: invalid use of 
+undefined type ‘struct page’
+    37 | #define __pfn_to_page(pfn)      (vmemmap + (pfn))
+       |                                          ^
+./include/asm-generic/memory_model.h:65:21: note: in expansion of macro 
+‘__pfn_to_page’
+    65 | #define pfn_to_page __pfn_to_page
+       |                     ^~~~~~~~~~~~~
+./arch/x86/include/asm/page.h:68:33: note: in expansion of macro 
+‘pfn_to_page’
+    68 | #define virt_to_page(kaddr)     pfn_to_page(__pa(kaddr) >> 
+PAGE_SHIFT)
+       |                                 ^~~~~~~~~~~
+./include/linux/page_frag_cache.h:225:16: note: in expansion of macro 
+‘virt_to_page’
+   225 |         return virt_to_page(encoded_va);
+       |                ^~~~~~~~~~~~
+cc1: all warnings being treated as errors
 
-FWIW, we looked into this a few years ago. Analogous to the BPF flow
-dissector: if the BPF program is loaded, use that instead of the C
-code path. But we did not arrive at a practical implementation at the
-time. Things may have changed, but one issue is how to store and
-access the list (or table) of outstanding GRO skbs.
-
-> best
-> Yan
-> =
-
-> >
-> > >
-> > > best
-> > > Yan
-> >
-> >
-
-
+> 
 
