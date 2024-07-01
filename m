@@ -1,219 +1,121 @@
-Return-Path: <netdev+bounces-108174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD89A91E25C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:26:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897F291E265
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:28:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66E3328872E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:26:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3BE8B2496C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2933161337;
-	Mon,  1 Jul 2024 14:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC09F1662F3;
+	Mon,  1 Jul 2024 14:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0V5ujIl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMHZp7Ao"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2198C1D;
-	Mon,  1 Jul 2024 14:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07DE15FA94;
+	Mon,  1 Jul 2024 14:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719843974; cv=none; b=gdw98QHieSPBLHwlXVNDaMsG1wRNoJN1aI771z9Lg69mCgBO6h1u4xVbf7dGRCeAKRBtOv4ZcgPOo5uKwG4FDJ3uUWTE00HhhBaFDdSyR5Ojl6H3cjboF/e64Xpr8l1Ny24xKV5WFoNEuwFsJUxUM9BghYsecitb9EzHoXU9JTo=
+	t=1719844086; cv=none; b=MlRoggHvesiR6CkG6dL1sJIyu0kLIaZZhnn7poA3ARW/xs0t0ccdc/rBgyMmZ34wiLGjwvlNp0UNOYk4j6Gzku/qekQLokCCXTql/Cs3YHM5foGDqHfehT6xgrzc90ub2KKq0TPH7xe2I/mmtWjRzRIj13WJJZC9xVLaoZL9ZGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719843974; c=relaxed/simple;
-	bh=fmwZXCjuj0NA9DjirjyOyzJHTKDit436XbZ/klfs5Ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOXDDNbnGv0O0olvizSBJ7r2djpE+BTFmprNkftlJE4rEZaqYaQeeM3r503yrlcUyWMyz+q+QZLrKbAn5i9MSQvLEPMNM65bihYs9N0pgLa6mqu1a2rgLTVP2B8mp936DQtvg7sLIaCw+HW8qaA9MhlDjtlfoqSjzhoi88OvSRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0V5ujIl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA2F4C116B1;
-	Mon,  1 Jul 2024 14:26:13 +0000 (UTC)
+	s=arc-20240116; t=1719844086; c=relaxed/simple;
+	bh=U2qxBsfXII2keV16dyH70ENv6wOvqN2WYE0+zRxOMF0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qPa6OA+v9mXLzw1o3ssHZ5/CSOwX3BPkmbWhWpaUhjLed3hej66b/rKkjKOunr6kPlu7O/g/5CEmQ1Q0Ey9jmrjMbi18V/8WEuadSqMhoYj4P66Ao9Qqh7hhBij4dKIbQM/AT/C/zfAyUzujUxNFN5q134cvtQYFlr8o7SgMKag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMHZp7Ao; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C519C2BD10;
+	Mon,  1 Jul 2024 14:28:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719843974;
-	bh=fmwZXCjuj0NA9DjirjyOyzJHTKDit436XbZ/klfs5Ao=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o0V5ujIl+UMTHnRS1kJvkxxqL0rD8NWDHljKyif1AUcIwSWRI/MqGHgmXTJ1t/DKN
-	 Q/SeUBn0/RaCHwSRTfaB40Jen7lERYj0HblLXB5jCLeelpabsZhz5UMshA7VKl5uqo
-	 LOsFTgmMiPAqhAkkE/Zm6kyMvHMhmxjUEz0sgi7lcEN3jeetfx69pOKAuHkzMTuiWq
-	 MNF70XIbh6hhKvojZX0IX9ziSAFYrtY/TPa6j2r9mSetaA88gMR1a8Nl1yriS5HVcU
-	 VihZW4auNsWJHVCfyFRUcUmkM7Pp8KqADO93+M8fQOI3AGOs5CqtWebDIlw9JpPBEF
-	 UGMjJOSvNGifg==
-Date: Mon, 1 Jul 2024 16:26:10 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com, andrew@lunn.ch, arnd@arndb.de
-Subject: Re: [PATCH v4 2/2] net: airoha: Introduce ethernet support for
- EN7581 SoC
-Message-ID: <ZoK8glSv-mtNPOLX@lore-desk>
-References: <cover.1719672695.git.lorenzo@kernel.org>
- <56f57f37b80796e9706555503e5b4cf194f69479.1719672695.git.lorenzo@kernel.org>
- <20240701135319.GE17134@kernel.org>
+	s=k20201202; t=1719844086;
+	bh=U2qxBsfXII2keV16dyH70ENv6wOvqN2WYE0+zRxOMF0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=jMHZp7AomwtWebSdCVJuYyC8YLCsKVlMo1trczl3QyvZssdw7/zMTa53c99pYiTH4
+	 D0fCSZuwAgGhbjKFIEyNmKniRjKcIzCqesrwaJ5gXMTNGNHTb7BIgE9PNSm1GSLj7U
+	 nl5Z8Xlje1GOTcjvBqeT+EEqtk0x73CZwJ+85/duFbQnh9myeAs1NBTutczXajhBeU
+	 qK1pdtly+UEAmUi0iM135jd1nXwCMqXllcJuJupI4pAHY86wdcPYBsD9YbY4VgInWc
+	 x0KDiYawitZl/MgSJEaMsSqYd8ZTCnrh13gKRn3hFjlkpTrcK4RuyZQxfQJNV/vmSO
+	 2nQq3XfoHJZVg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 216AFC2BD09;
+	Mon,  1 Jul 2024 14:28:06 +0000 (UTC)
+From: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>
+Subject: [PATCH net-next v2 0/2] vsock: avoid queuing on workqueue if
+ possible
+Date: Mon, 01 Jul 2024 16:28:01 +0200
+Message-Id: <20240701-pinna-v2-0-ac396d181f59@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yfGzRyLDChOcgYkO"
-Content-Disposition: inline
-In-Reply-To: <20240701135319.GE17134@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPG8gmYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyjHQUlJIzE
+ vPSU3UzU4B8JSMDIxMDcwND3YLMvLxEXTNDw1SLJLPklJREAyWg2oKi1LTMCrA50UoBjiHOHgp
+ 5qSW6eakVJUqxtbUAcKrvi2cAAAA=
+To: Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luigi Leonardi <luigi.leonardi@outlook.com>, 
+ Marco Pinna <marco.pinn95@gmail.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1719844084; l=1421;
+ i=luigi.leonardi@outlook.com; s=20240626; h=from:subject:message-id;
+ bh=U2qxBsfXII2keV16dyH70ENv6wOvqN2WYE0+zRxOMF0=;
+ b=esDzwhcl7yJuEVfUWxslORjydGrepc2F2GuDVExEB8Nakxvmi/MOSRBrVWHlWsGJIu8pPkZ/n
+ w4JKJyQ4CbFApgzN4ddfo9bd/Qa4DXkDUPY6EnpQUF4z6hZ1mm30WMt
+X-Developer-Key: i=luigi.leonardi@outlook.com; a=ed25519;
+ pk=RYXD8JyCxGnx/izNc/6b3g3pgpohJMAI0LJ7ynxXzi8=
+X-Endpoint-Received: by B4 Relay for luigi.leonardi@outlook.com/20240626
+ with auth_id=177
+X-Original-From: Luigi Leonardi <luigi.leonardi@outlook.com>
+Reply-To: luigi.leonardi@outlook.com
+
+This series introduces an optimization for vsock/virtio to reduce latency:
+When the guest sends a packet to the host, and the workqueue is empty,
+if there is enough space, the packet is put directly in the virtqueue.
+
+In this v2 I replaced a mutex_lock with a mutex_trylock because it was inside
+a RCU critical section. I also added a check on tx_run, so if the
+module is being removed the packet is not queued. I'd like to thank Stefano
+for reporting the tx_run issue.
+
+v1->v2
+Applied all Stefano's suggestions:
+    - Minor code style changes
+    - Minor commit text rewrite
+Performed more experiments:
+     - Check if all the packets go directly to the vq (Matias' suggestion)
+     - Used iperf3 to see if there is any improvement in overall throughput
+      from guest to host
+     - Pinned the vhost process to a pCPU.
+     - Run fio using 512B payload
+Rebased on latest net-next
+
+Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+---
+Marco Pinna (2):
+      vsock/virtio: refactor virtio_transport_send_pkt_work
+      vsock/virtio: avoid enqueue packets when work queue is empty
+
+ net/vmw_vsock/virtio_transport.c | 171 +++++++++++++++++++++++++--------------
+ 1 file changed, 109 insertions(+), 62 deletions(-)
+---
+base-commit: 2e7b471121b09e7fa8ffb437bfa0e59d13f96053
+change-id: 20240701-pinna-611e8b6cdda0
+
+Best regards,
+-- 
+Luigi Leonardi <luigi.leonardi@outlook.com>
 
 
---yfGzRyLDChOcgYkO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> On Sat, Jun 29, 2024 at 05:01:38PM +0200, Lorenzo Bianconi wrote:
-> > Add airoha_eth driver in order to introduce ethernet support for
-> > Airoha EN7581 SoC available on EN7581 development board (en7581-evb).
-> > en7581-evb networking architecture is composed by airoha_eth as mac
-> > controller (cpu port) and a mt7530 dsa based switch.
-> > EN7581 mac controller is mainly composed by Frame Engine (FE) and
-> > QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
-> > functionalities are supported now) while QDMA is used for DMA operation
-> > and QOS functionalities between mac layer and the dsa switch (hw QoS is
-> > not available yet and it will be added in the future).
-> > Currently only hw lan features are available, hw wan will be added with
-> > subsequent patches.
-> >=20
-> > Tested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> Hi Lorenzo,
->=20
-> Some minor feedback from my side.
-
-Hi Simon,
-
->=20
-> > +static void airoha_qdma_set_irqmask(struct airoha_eth *eth, int index,
-> > +				    u32 clear, u32 set)
-> > +{
-> > +	unsigned long flags;
-> > +
-> > +	if (WARN_ON_ONCE(index >=3D ARRAY_SIZE(eth->irqmask)))
-> > +		return;
-> > +
-> > +	spin_lock_irqsave(&eth->irq_lock, flags);
-> > +
-> > +	eth->irqmask[index] &=3D ~clear;
-> > +	eth->irqmask[index] |=3D set;
-> > +	airoha_qdma_wr(eth, REG_INT_ENABLE(index), eth->irqmask[index]);
-> > +	/* Read irq_enable register in order to guarantee the update above
-> > +	 * completes in the spinlock critical section.
-> > +	 */
-> > +	airoha_rr(eth, REG_INT_ENABLE(index));
->=20
-> airoha_rr() expects an __iomem pointer as it's first argument,
-> but the type of eth is struct airoha_eth *eth.
->=20
-> Should this be using airoha_qdma_rr() instead?
-
-ack, right. Thx for pointing this out. I will fix it in v5.
-
->=20
-> Flagged by Sparse.
->=20
-> > +
-> > +	spin_unlock_irqrestore(&eth->irq_lock, flags);
-> > +}
->=20
-> ...
->=20
-> > +static void airoha_ethtool_get_strings(struct net_device *dev, u32 sse=
-t,
-> > +				       u8 *data)
-> > +{
-> > +	int i;
-> > +
-> > +	if (sset !=3D ETH_SS_STATS)
-> > +		return;
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_stats_name); i++) {
-> > +		memcpy(data + i * ETH_GSTRING_LEN,
-> > +		       airoha_ethtool_stats_name[i], ETH_GSTRING_LEN);
-> > +	}
-> > +
-> > +	data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(airoha_ethtool_stats_name);
-> > +	page_pool_ethtool_stats_get_strings(data);
-> > +}
->=20
-> W=3D1 allmodconfig builds on x86_64 with gcc-13 complain about the use
-> of memcpy above because the source is (often?) less than ETH_GSTRING_LEN
-> bytes long.
->=20
-> I think the preferred solution is to use ethtool_puts(),
-> something like this (compile tested only!):
->=20
-> @@ -2291,12 +2291,9 @@ static void airoha_ethtool_get_strings(struct net_=
-device *dev, u32 sset,
->  	if (sset !=3D ETH_SS_STATS)
->  		return;
-> =20
-> -	for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_stats_name); i++) {
-> -		memcpy(data + i * ETH_GSTRING_LEN,
-> -		       airoha_ethtool_stats_name[i], ETH_GSTRING_LEN);
-> -	}
-> +	for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_stats_name); i++)
-> +		ethtool_puts(&data, airoha_ethtool_stats_name[i]);
-> =20
-> -	data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(airoha_ethtool_stats_name);
->  	page_pool_ethtool_stats_get_strings(data);
->  }
-> =20
-
-ack, I will fix it in v5.
-
->=20
-> ...
->=20
-> > +static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device=
-_node *np)
-> > +{
-> > +	const __be32 *id_ptr =3D of_get_property(np, "reg", NULL);
-> > +	struct net_device *dev;
-> > +	struct airoha_gdm_port *port;
->=20
-> nit: reverse xmas tree
-
-ack, I will fix it in v5.
-
-Regards,
-Lorenzo
-
->=20
-> > +	int err, index;
-> > +	u32 id;
->=20
-> ...
->=20
-> --=20
-> pw-bot: changes-requested
-
---yfGzRyLDChOcgYkO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZoK8ggAKCRA6cBh0uS2t
-rDBPAQDur3zFnkAytxa5yij4hb3hCBJQ819Y+tMsR1PMD6423gEAlutApyx/5x3N
-LWRCKbrEtI16dofZ1jDxo7xNHCU21Ac=
-=HRGl
------END PGP SIGNATURE-----
-
---yfGzRyLDChOcgYkO--
 
