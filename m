@@ -1,91 +1,157 @@
-Return-Path: <netdev+bounces-108222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F3B91E6FB
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:54:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8A491E71B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:06:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08CF5B22050
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 17:54:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 225841F24F25
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A1D16EB71;
-	Mon,  1 Jul 2024 17:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B7C15F40A;
+	Mon,  1 Jul 2024 18:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pwy/Cwe5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Izp3WqN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCA616D4F0;
-	Mon,  1 Jul 2024 17:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E013516EC06
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 18:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719856468; cv=none; b=qNiWJ7hg6ts4cN00rbeE41y06xliRSibw3e4gx3wHoXRzOp8Sz8KOfIlgHTuJnCaJGhdXTHMI3vmBnU1ZHRbmDU0PFYUvVF7hfsc4f+f8uuzDFfWeffdes2YsP1PaO5lIsfyPvN75V50OrCLqwm3UtebZSf5zO1uqz0XnGU5HSU=
+	t=1719857166; cv=none; b=EuV761kw7dlWD3E7Ap2WPfpB8m016xnw3aiFk0Qcz+qMnSOQbdSU2qe797hdZPggseOgUnRA1o8FTfz2cYqwrScn+Eh6zyhNq90UOS0lwiHsO7Em1OPxTX0VyMKuRR8+gbQ8LqmPEwLk6E88Bm4gRPzyk9OtBokqN/Ivfrom4dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719856468; c=relaxed/simple;
-	bh=2M79EKuCi3pO/TN3rGqmddy5hzrxk2H0nREOY8R3wis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ifiiC+1l1DIqv1VtjGBBSF+xEw1boMO+pzJyEyilJOwEdosBAsjCoztkk4nb6Zmv6RmsYY8rcxl4HPDL4tIsADvHl1LWO0DTrAW1C44HirmNhW8ynKR/9pMG0oK679GsDso8tlKGeMDlpkxD7S1zbOcTpl83ccQ75HpVVXDoDko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pwy/Cwe5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D6F7C32781;
-	Mon,  1 Jul 2024 17:54:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719856468;
-	bh=2M79EKuCi3pO/TN3rGqmddy5hzrxk2H0nREOY8R3wis=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pwy/Cwe5KbiPM9h1yGqBlTc2YpppR7qVimWVUnxV3WmFk1DNjr20g0uvIj5pC7ggC
-	 OQh2bbvJ7gOU2+CeZa9soDbc46Tb4F1v1koNxz44dMGHMLC+GmxNHypm0PD1nZNbwY
-	 ec8vV5qgFP06jGv11FlsXlt9q5NNZF/uEXUzljA1HMYfsSxS+47knqLQK0q00Ej8pr
-	 SNujCT/lxPqsRsC4Jtih4PJxqoCfZDyLC4hJLt17V0KYwe9Wchw6B/FJvJ+Qs7p4Gm
-	 e4/o3362FO6TjIIGqgVvMgU4sULmuqztP3lacmDHK2NomsM5NqPr3y//MgQdqxDDk/
-	 +5r8BO8fV8aVA==
-Date: Mon, 1 Jul 2024 11:54:27 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, linux-can@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>, imx@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] dt-bindings: can: fsl,flexcan: add common
- 'can-transceiver' for fsl,flexcan
-Message-ID: <171985646700.176465.4816542361707440956.robh@kernel.org>
-References: <20240629021754.3583641-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1719857166; c=relaxed/simple;
+	bh=/YyyPjhyPNu6/AYBPG4UFOqIDfskQ2W3tkiRGD3RunE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=X8Umuj/d6oNVEFWXzGsRehCU23CimxoxfMwKIO9Hs73/6yNGXZyJBpx9IbHV34A9rpIJnX3Brh3kElu8qLy/Pm2DL78UURgH54yyahuKY4jwx4xj3rxKbx+X+c0AzHdRTqgPwK559IkqAPNm52bWe0V+C0NUF0eO8exH0x1Uok0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Izp3WqN4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719857159;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7Wg0B6nxqEqPEWP3i9c7k0Iho5XVlEGFjVPJtv0Lhp8=;
+	b=Izp3WqN4P/rZ0osqyVGlU/zI+ULXS70b8M5ZkHw7tAUDqpThcicXSpM2YWYRmFex1i3rT7
+	dpO7HbXuR527YsK91NBxEI7q+iHV6W8vDO9KcWn4U/6Rbg1kzE/7l/8FV+LnBkjnlfZyKq
+	kqPJm+uc2p3uriaq/xi6R8ET8GVnNQo=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-Tr9m5Y-9MiOFIoy79NmdGQ-1; Mon,
+ 01 Jul 2024 14:05:54 -0400
+X-MC-Unique: Tr9m5Y-9MiOFIoy79NmdGQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 964ED194510E;
+	Mon,  1 Jul 2024 18:05:52 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.184])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0ECD23000229;
+	Mon,  1 Jul 2024 18:05:48 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
+  i.maximets@ovn.org,  dev@openvswitch.org,  Ido Schimmel
+ <idosch@nvidia.com>,  Yotam Gigi <yotam.gi@gmail.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 01/10] net: psample: add user cookie
+In-Reply-To: <20240630195740.1469727-2-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Sun, 30 Jun 2024 21:57:22 +0200")
+References: <20240630195740.1469727-1-amorenoz@redhat.com>
+	<20240630195740.1469727-2-amorenoz@redhat.com>
+Date: Mon, 01 Jul 2024 14:05:46 -0400
+Message-ID: <f7t34otxa11.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240629021754.3583641-1-Frank.Li@nxp.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-On Fri, 28 Jun 2024 22:17:54 -0400, Frank Li wrote:
-> Add common 'can-transceiver' children node for fsl,flexcan.
-> 
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/fsl-ls1028a-rdb.dtb: can@2180000: 'can-transceiver' does not match any of the regexes: 'pinctrl-[0-9]+'
->         from schema $id: http://devicetree.org/schemas/net/can/fsl,flexcan.yaml#
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> Add a user cookie to the sample metadata so that sample emitters can
+> provide more contextual information to samples.
+>
+> If present, send the user cookie in a new attribute:
+> PSAMPLE_ATTR_USER_COOKIE.
+>
+> Acked-by: Eelco Chaudron <echaudro@redhat.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 > ---
-> Change from v1 to v2
-> - rework commit message and add fix CHECK_DTBS warning
-> - Add unevaluatedProperties: false
-> ---
->  Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Aaron Conole <aconole@redhat.com>
+
+>  include/net/psample.h        | 2 ++
+>  include/uapi/linux/psample.h | 1 +
+>  net/psample/psample.c        | 9 ++++++++-
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/net/psample.h b/include/net/psample.h
+> index 0509d2d6be67..2ac71260a546 100644
+> --- a/include/net/psample.h
+> +++ b/include/net/psample.h
+> @@ -25,6 +25,8 @@ struct psample_metadata {
+>  	   out_tc_occ_valid:1,
+>  	   latency_valid:1,
+>  	   unused:5;
+> +	const u8 *user_cookie;
+> +	u32 user_cookie_len;
+>  };
+>  
+>  struct psample_group *psample_group_get(struct net *net, u32 group_num);
+> diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
+> index e585db5bf2d2..e80637e1d97b 100644
+> --- a/include/uapi/linux/psample.h
+> +++ b/include/uapi/linux/psample.h
+> @@ -19,6 +19,7 @@ enum {
+>  	PSAMPLE_ATTR_LATENCY,		/* u64, nanoseconds */
+>  	PSAMPLE_ATTR_TIMESTAMP,		/* u64, nanoseconds */
+>  	PSAMPLE_ATTR_PROTO,		/* u16 */
+> +	PSAMPLE_ATTR_USER_COOKIE,	/* binary, user provided data */
+>  
+>  	__PSAMPLE_ATTR_MAX
+>  };
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index a5d9b8446f77..b37488f426bc 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -386,7 +386,9 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>  		   nla_total_size(sizeof(u32)) +	/* group_num */
+>  		   nla_total_size(sizeof(u32)) +	/* seq */
+>  		   nla_total_size_64bit(sizeof(u64)) +	/* timestamp */
+> -		   nla_total_size(sizeof(u16));		/* protocol */
+> +		   nla_total_size(sizeof(u16)) +	/* protocol */
+> +		   (md->user_cookie_len ?
+> +		    nla_total_size(md->user_cookie_len) : 0); /* user cookie */
+>  
+>  #ifdef CONFIG_INET
+>  	tun_info = skb_tunnel_info(skb);
+> @@ -486,6 +488,11 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>  	}
+>  #endif
+>  
+> +	if (md->user_cookie && md->user_cookie_len &&
+> +	    nla_put(nl_skb, PSAMPLE_ATTR_USER_COOKIE, md->user_cookie_len,
+> +		    md->user_cookie))
+> +		goto error;
+> +
+>  	genlmsg_end(nl_skb, data);
+>  	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+>  				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
 
 
