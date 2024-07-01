@@ -1,134 +1,370 @@
-Return-Path: <netdev+bounces-108033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 974C091D9D0
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:20:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D2391DA03
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:34:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F83281CBF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:20:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE0A12820EF
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8E07E76F;
-	Mon,  1 Jul 2024 08:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F8179B96;
+	Mon,  1 Jul 2024 08:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+FK+zgM"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Re9Nxr3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9B61804A;
-	Mon,  1 Jul 2024 08:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8D52C6BB;
+	Mon,  1 Jul 2024 08:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719822035; cv=none; b=hMTf3Rnzilv1YWd9Flw+31SvLRiZ9ePEiHvbtzOZ2BcseMfqrhztappmcrh+ZjTSM2PAXfRjgAkqu537ej2q1eq4cfTdMlPBW3RCybskTVK/XrqhuHheXgO07epLGwZgegG2ydM/0Lng+v/bRZbpJN8kKrJlwZNRXeG08Ykl5Tk=
+	t=1719822853; cv=none; b=sw+mF4YYwNH3KmGxe4/v+gf1F2QD/fuPlipF12F5n2Tmx+iR7thnDMDkr552ktAtBPFY+nQ6CznPRO6PsT0558eXsochFuvh/alHF6dY1Ddzu56X9TxL4sdIe2JhF5Bl/qCqQUMe+W62iPS+zha79mASdDgC3JvqMqkjdLVVf5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719822035; c=relaxed/simple;
-	bh=05S15/+/BVoyjLmU/P7ALenx2HXbOvfGSTf3w8E5qNY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CqTdHa09+H4/dOiAfN8KuAVG4P4zA8CQ64UF//yvXaeY+U50uiNPrssaPeDtHfoBplvt3VCKgkVjny9O68xLtHl+S79hQ5fnDL03R5iBSqKKXPxTPRwRXzLOywaVNTbx8Xkjgdr0pDkIJvKPu+n5BySxqo3Ba3EWUQunvFtR46c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+FK+zgM; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7067435d376so1873493b3a.0;
-        Mon, 01 Jul 2024 01:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719822033; x=1720426833; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MC5/1uIy6r+d6wkfwo0SgQbace/5QXNKCEPCP25Y26U=;
-        b=W+FK+zgMelMenL9vILvlRCSzzpvfx6o1jpJsF7fQuxoIFLjF35rSS2sxdh+auGh6oF
-         BJ8XXVSpYzWlVQbooQURcP5pfyiya3BKFuz0kLM8OVcjoGHx9J0qrOq0FFrTua9xRoLJ
-         lTB0yzU6JI5tdH5lA1ByBE4VCdlThrMRwbkFeVEiXBRblFFRTvHYM0oh7kMi0677XHPd
-         jVEo3Ig8UOlOJjxUloHcEfDZjo+Rw5/jHGwzFd1HLA+PTNV7gJ00DHnacx+8EN6O8Fvh
-         4Mh5rNYpjIkWD9XU7ebT7iW/TXeXJZrFXBrfhEsXkBcIDLJwKpuF8lUCRqtv2O25GN47
-         Okdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719822033; x=1720426833;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MC5/1uIy6r+d6wkfwo0SgQbace/5QXNKCEPCP25Y26U=;
-        b=fbZX+bGLKdeH/oj3jDhKNQWeA+1hJ2vTJ5NcQgqN9cPvoJqjwwe/pjylgPdRaQgdiv
-         culMMcb6cCnCe7/G0c+fyKQICuPWo/+RJmOHxBbYfh4lLqh9Ovx7kVf9k68bM0upr/4/
-         hYPSbReF+D6WrNJXSUdBtbV8vEg3gFRrU8rMVMKSuwxktfbLPFw9M3+jBYibqoyztXgn
-         YvGNICVi/it093JXlzP9exLEjCGTRSiPXchU+n+zXxEBezTOWPlBWzeBUdewRFoSk/8+
-         F9bQKynTXytQhvcZn3qBY7ypCLchEOQJFm02kDEFaqZi5S70J8n1B63Mcj7nMFCJKyfE
-         nQkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXRSkKTLrDq+LjGo+GhzUN3ugSpHwEk3RBtV07YuvQ5jsTOcsZWsmlwj0AF7owSZ6RBE1/eFnOyBgYf1+1e2kqeVnbbnOurLk7w4BXZ
-X-Gm-Message-State: AOJu0YxiEvrqf1ScpgM1OAH8CbvaXH7YifaZHhPHTcR1b+jeEo+BWFvY
-	Vq9uyPetHZPstjs+dXZwxHbMDsJLrWyzxzYrHVRdVHiZtDOeoVwO
-X-Google-Smtp-Source: AGHT+IHwmPMU7oYRhiuqelGxgEX+rgaw/YH4bqX/NunRhcIN6nUMudhE6o8PIx3RNMLJoj1enQ/H9g==
-X-Received: by 2002:a05:6a00:4b13:b0:705:cc7d:ab7d with SMTP id d2e1a72fcca58-70851875908mr16008127b3a.5.1719822033063;
-        Mon, 01 Jul 2024 01:20:33 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-708044ac424sm5864836b3a.161.2024.07.01.01.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 01:20:32 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
+	s=arc-20240116; t=1719822853; c=relaxed/simple;
+	bh=SmGnTvi342t5TCdhjNotrThgx8/jX4Rp7taYTTQ1w6o=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=FCKYZNuUtnWv82BbtrUBMpf4hYrJa9s+QuEpeV0dAxlycJ6MXIXlI0gHF3SwdhRCBFSEok3BMJN+KoAhnvLSQ4JubtAvQfW6CBtvbg3twEHVt0yW3jSM5tm2ZgElAo9PqQIyrdzWTIVUuS85HVA36VVBtjn/kO3AYjOi1t5g6F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Re9Nxr3K; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1719822847; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=MsAbrXcJVgnrPuf5AVodtEAEdIJ5iFRLnptm0WXC8VA=;
+	b=Re9Nxr3KH6KgDU605KuQBKGZ0tmiDF7HosGVQ5gBs1XQVM94Igal94H9WHkgw8Ha6vG9VFO+ToKtORImFvLbuAqVnaE6IjJ9gVrU6jpl0mvf1EV7Dk2YkqIcZOhng2PQOETmA4uIKJ54NUa6at9AD5uRnekI7f6B5Gnzok0D4/Q=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R791e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W9cLjqx_1719822846;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W9cLjqx_1719822846)
+          by smtp.aliyun-inc.com;
+          Mon, 01 Jul 2024 16:34:06 +0800
+Message-ID: <1719822753.9386358-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v6 08/10] virtio_net: xsk: rx: support recv small mode
+Date: Mon, 1 Jul 2024 16:32:33 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
 Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net v1] net: stmmac: enable HW-accelerated VLAN stripping for gmac4 only
-Date: Mon,  1 Jul 2024 16:19:36 +0800
-Message-Id: <20240701081936.752285-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
+ <20240618075643.24867-9-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuPB=We-pnj8QH9Oiv4F=XHTcrRsHVVmOnUn9H7+Nrihw@mail.gmail.com>
+ <1719553452.932589-3-xuanzhuo@linux.alibaba.com>
+ <CACGkMEv_MOMHz1U48aVPXSj9gVJqA_h-UDt+oNgVgCQww4Jbdg@mail.gmail.com>
+ <CACGkMEu-zmNtueGTNPUZsimf5XSXOWO3oCXgetaBS7g1UjHmuQ@mail.gmail.com>
+In-Reply-To: <CACGkMEu-zmNtueGTNPUZsimf5XSXOWO3oCXgetaBS7g1UjHmuQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Commit 750011e239a5 ("net: stmmac: Add support for HW-accelerated VLAN
-stripping") enables MAC level VLAN tag stripping for all MAC cores, but
-leaves set_hw_vlan_mode() and rx_hw_vlan() un-implemented for both gmac
-and xgmac.
+On Mon, 1 Jul 2024 11:25:37 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Jul 1, 2024 at 11:20=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >
+> > On Fri, Jun 28, 2024 at 1:48=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Fri, 28 Jun 2024 10:19:41 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Tue, Jun 18, 2024 at 3:57=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
+> > > > >
+> > > > > In the process:
+> > > > > 1. We may need to copy data to create skb for XDP_PASS.
+> > > > > 2. We may need to call xsk_buff_free() to release the buffer.
+> > > > > 3. The handle for xdp_buff is difference from the buffer.
+> > > > >
+> > > > > If we pushed this logic into existing receive handle(merge and sm=
+all),
+> > > > > we would have to maintain code scattered inside merge and small (=
+and big).
+> > > > > So I think it is a good choice for us to put the xsk code into an
+> > > > > independent function.
+> > > >
+> > > > I think it's better to try to reuse the existing functions.
+> > > >
+> > > > More below:
+> > > >
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >  drivers/net/virtio_net.c | 135 +++++++++++++++++++++++++++++++++=
++++++-
+> > > > >  1 file changed, 133 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index 2ac5668a94ce..06608d696e2e 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -500,6 +500,10 @@ struct virtio_net_common_hdr {
+> > > > >  };
+> > > > >
+> > > > >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, voi=
+d *buf);
+> > > > > +static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct=
+ xdp_buff *xdp,
+> > > > > +                              struct net_device *dev,
+> > > > > +                              unsigned int *xdp_xmit,
+> > > > > +                              struct virtnet_rq_stats *stats);
+> > > > >
+> > > > >  static bool is_xdp_frame(void *ptr)
+> > > > >  {
+> > > > > @@ -1040,6 +1044,120 @@ static void sg_fill_dma(struct scatterlis=
+t *sg, dma_addr_t addr, u32 len)
+> > > > >         sg->length =3D len;
+> > > > >  }
+> > > > >
+> > > > > +static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> > > > > +                                  struct receive_queue *rq, void=
+ *buf, u32 len)
+> > > > > +{
+> > > > > +       struct xdp_buff *xdp;
+> > > > > +       u32 bufsize;
+> > > > > +
+> > > > > +       xdp =3D (struct xdp_buff *)buf;
+> > > > > +
+> > > > > +       bufsize =3D xsk_pool_get_rx_frame_size(rq->xsk.pool) + vi=
+->hdr_len;
+> > > > > +
+> > > > > +       if (unlikely(len > bufsize)) {
+> > > > > +               pr_debug("%s: rx error: len %u exceeds truesize %=
+u\n",
+> > > > > +                        vi->dev->name, len, bufsize);
+> > > > > +               DEV_STATS_INC(vi->dev, rx_length_errors);
+> > > > > +               xsk_buff_free(xdp);
+> > > > > +               return NULL;
+> > > > > +       }
+> > > > > +
+> > > > > +       xsk_buff_set_size(xdp, len);
+> > > > > +       xsk_buff_dma_sync_for_cpu(xdp);
+> > > > > +
+> > > > > +       return xdp;
+> > > > > +}
+> > > > > +
+> > > > > +static struct sk_buff *xdp_construct_skb(struct receive_queue *r=
+q,
+> > > > > +                                        struct xdp_buff *xdp)
+> > > > > +{
+> > > >
+> > > > So we have a similar caller which is receive_small_build_skb(). Any
+> > > > chance to reuse that?
+> > >
+> > > receive_small_build_skb works with build_skb.
+> >
+> > RIght.
+> >
+> > >
+> > > Here we need to copy the packet from the xsk buffer to the skb buffer.
+> > > So I do not think we can reuse it.
+> > >
+> >
+> > Let's rename this to xsk_construct_skb() ?
+> >
+> > >
+> > > >
+> > > > > +       unsigned int metasize =3D xdp->data - xdp->data_meta;
+> > > > > +       struct sk_buff *skb;
+> > > > > +       unsigned int size;
+> > > > > +
+> > > > > +       size =3D xdp->data_end - xdp->data_hard_start;
+> > > > > +       skb =3D napi_alloc_skb(&rq->napi, size);
+> > > > > +       if (unlikely(!skb)) {
+> > > > > +               xsk_buff_free(xdp);
+> > > > > +               return NULL;
+> > > > > +       }
+> > > > > +
+> > > > > +       skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
+> > > > > +
+> > > > > +       size =3D xdp->data_end - xdp->data_meta;
+> > > > > +       memcpy(__skb_put(skb, size), xdp->data_meta, size);
+> > > > > +
+> > > > > +       if (metasize) {
+> > > > > +               __skb_pull(skb, metasize);
+> > > > > +               skb_metadata_set(skb, metasize);
+> > > > > +       }
+> > > > > +
+> > > > > +       xsk_buff_free(xdp);
+> > > > > +
+> > > > > +       return skb;
+> > > > > +}
+> > > > > +
+> > > > > +static struct sk_buff *virtnet_receive_xsk_small(struct net_devi=
+ce *dev, struct virtnet_info *vi,
+> > > > > +                                                struct receive_q=
+ueue *rq, struct xdp_buff *xdp,
+> > > > > +                                                unsigned int *xd=
+p_xmit,
+> > > > > +                                                struct virtnet_r=
+q_stats *stats)
+> > > > > +{
+> > > > > +       struct bpf_prog *prog;
+> > > > > +       u32 ret;
+> > > > > +
+> > > > > +       ret =3D XDP_PASS;
+> > > > > +       rcu_read_lock();
+> > > > > +       prog =3D rcu_dereference(rq->xdp_prog);
+> > > > > +       if (prog)
+> > > > > +               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_x=
+mit, stats);
+> > > > > +       rcu_read_unlock();
+> > > > > +
+> > > > > +       switch (ret) {
+> > > > > +       case XDP_PASS:
+> > > > > +               return xdp_construct_skb(rq, xdp);
+> > > > > +
+> > > > > +       case XDP_TX:
+> > > > > +       case XDP_REDIRECT:
+> > > > > +               return NULL;
+> > > > > +
+> > > > > +       default:
+> > > > > +               /* drop packet */
+> > > > > +               xsk_buff_free(xdp);
+> > > > > +               u64_stats_inc(&stats->drops);
+> > > > > +               return NULL;
+> > > > > +       }
+> > > > > +}
+> > > > > +
+> > > > > +static struct sk_buff *virtnet_receive_xsk_buf(struct virtnet_in=
+fo *vi, struct receive_queue *rq,
+> > > > > +                                              void *buf, u32 len,
+> > > > > +                                              unsigned int *xdp_=
+xmit,
+> > > > > +                                              struct virtnet_rq_=
+stats *stats)
+> > > > > +{
+> > > > > +       struct net_device *dev =3D vi->dev;
+> > > > > +       struct sk_buff *skb =3D NULL;
+> > > > > +       struct xdp_buff *xdp;
+> > > > > +
+> > > > > +       len -=3D vi->hdr_len;
+> > > > > +
+> > > > > +       u64_stats_add(&stats->bytes, len);
+> > > > > +
+> > > > > +       xdp =3D buf_to_xdp(vi, rq, buf, len);
+> > > > > +       if (!xdp)
+> > > > > +               return NULL;
+> > > > > +
+> > > > > +       if (unlikely(len < ETH_HLEN)) {
+> > > > > +               pr_debug("%s: short packet %i\n", dev->name, len);
+> > > > > +               DEV_STATS_INC(dev, rx_length_errors);
+> > > > > +               xsk_buff_free(xdp);
+> > > > > +               return NULL;
+> > > > > +       }
+> > > > > +
+> > > > > +       if (!vi->mergeable_rx_bufs)
+> > > > > +               skb =3D virtnet_receive_xsk_small(dev, vi, rq, xd=
+p, xdp_xmit, stats);
+> > > > > +
+> > > > > +       return skb;
+> > > > > +}
+> > > > > +
+> > > > >  static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, stru=
+ct receive_queue *rq,
+> > > > >                                    struct xsk_buff_pool *pool, gf=
+p_t gfp)
+> > > > >  {
+> > > > > @@ -2363,9 +2481,22 @@ static int virtnet_receive(struct receive_=
+queue *rq, int budget,
+> > > > >         void *buf;
+> > > > >         int i;
+> > > > >
+> > > > > -       if (!vi->big_packets || vi->mergeable_rx_bufs) {
+> > > > > -               void *ctx;
+> > > > > +       if (rq->xsk.pool) {
+> > > > > +               struct sk_buff *skb;
+> > > > > +
+> > > > > +               while (packets < budget) {
+> > > > > +                       buf =3D virtqueue_get_buf(rq->vq, &len);
+> > > > > +                       if (!buf)
+> > > > > +                               break;
+> > > > >
+> > > > > +                       skb =3D virtnet_receive_xsk_buf(vi, rq, b=
+uf, len, xdp_xmit, &stats);
+> > > > > +                       if (skb)
+> > > > > +                               virtnet_receive_done(vi, rq, skb);
+> > > > > +
+> > > > > +                       packets++;
+> > > > > +               }
+> > > >
+> > > > If reusing turns out to be hard, I'd rather add new paths in receiv=
+e_small().
+> > >
+> > > The exist function is called after virtnet_rq_get_buf(), that will do=
+ dma unmap.
+> > > But for xsk, the dma unmap is not need. So xsk receive handle should =
+use
+> > > virtqueue_get_buf directly.
+> >
+> > Probably but if it's just virtnet_rq_get_buf() we can simply did:
+> >
+> > static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, voi=
+d **ctx)
+> > {
+> >         void *buf;
+> >
+> >         buf =3D virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> >         if (buf && rq->xsk.pool)
+> >                 virtnet_rq_unmap(rq, buf, *len);
+> >
+> >         return buf;
+> > }
+>
+> Or maybe it would be much more clearer if we did:
+>
+> static int virtnet_receive()
+> {
+>
+> if (rq->xsk.pool)
+>         virtnet_receive_xsk()
+> else
+>         virtnet_receive_xxx()
+> ...
+> }
 
-On gmac and xgmac, ethtool reports rx-vlan-offload is on, both MAC and
-driver do nothing about VLAN packets actually, although VLAN works well.
+I like this.
 
-Driver level stripping should be used on gmac and xgmac for now.
+Thanks.
 
-Fixes: 750011e239a5 ("net: stmmac: Add support for HW-accelerated VLAN stripping")
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b3afc7cb7d72..c58782c41417 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7662,9 +7662,10 @@ int stmmac_dvr_probe(struct device *device,
- #ifdef STMMAC_VLAN_TAG_USED
- 	/* Both mac100 and gmac support receive VLAN tag detection */
- 	ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
--	ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
--	priv->hw->hw_vlan_en = true;
--
-+	if (priv->plat->has_gmac4) {
-+		ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
-+		priv->hw->hw_vlan_en = true;
-+	}
- 	if (priv->dma_cap.vlhash) {
- 		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
- 		ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
--- 
-2.34.1
-
+>
+> Thanks
+>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks.
+> > >
+> > > >
+> > > > > +       } else if (!vi->big_packets || vi->mergeable_rx_bufs) {
+> > > > > +               void *ctx;
+> > > > >                 while (packets < budget &&
+> > > > >                        (buf =3D virtnet_rq_get_buf(rq, &len, &ctx=
+))) {
+> > > > >                         receive_buf(vi, rq, buf, len, ctx, xdp_xm=
+it, &stats);
+> > > > > --
+> > > > > 2.32.0.3.g01195cf9f
+> > > > >
+> > > >
+> > > > Thanks
+> > > >
+> > >
+>
 
