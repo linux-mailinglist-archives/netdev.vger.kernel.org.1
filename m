@@ -1,142 +1,150 @@
-Return-Path: <netdev+bounces-108178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210E391E28F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:34:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C399391E2C4
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD5E428CF05
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E1761F22565
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00098169AE7;
-	Mon,  1 Jul 2024 14:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529D816C6A8;
+	Mon,  1 Jul 2024 14:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="0h3UWA4L"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="khIfk+f+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02olkn2109.outbound.protection.outlook.com [40.92.49.109])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AB9168C32
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 14:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719844463; cv=none; b=ZfrjSrbFUy4nK0Tfx0RVOXX4vB5pv/cFP1ldIRz4t+5+9aTtwIXkzk8wUDEVLHlPjAKOoR6MrimuHfVPiLgFFEo7fewPytYKJusrY4qNlUSXe7wiSTTPRWi4w3xmJ+UOBt+99iAsfJEEc6NHf9XRtNOI2Yt+Iy/1asQvUSjZvSQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719844463; c=relaxed/simple;
-	bh=hZLVczWVYkqc2NwpQBQa0JHuez8yTDOyIZgUgtuj9/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WsMuQ0msW435mV4b0Q2yTYI/IZ5hVd469V4lnFX4fcsMTwfa48eibpgxItJUdcqBbtq4Tl+0UFathYZxrOPzZTe+PyKWmuMG6+PuLtKbj0Qsa4dQyho0FKPUexm9oDPDWgQHenzCjMmbDl5psJXI2bYF9LcKtYPPVS2X97MBYTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=0h3UWA4L; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-424acfff613so28122275e9.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 07:34:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1719844460; x=1720449260; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gxm2/286zsrii1K3SQifylk+j5wAvP1Kfw/1i+juyX0=;
-        b=0h3UWA4Lzbf2GRKZFA4ueMIgw4AieAt1eoGbCOiLWGPFKAc9YafLtOCu3hqQXIS7Nh
-         BVfWvvwv6gJFzkuVR2q490u2Yua90h645qnA0fXaIu30sq2JWYPjSY4G+NNnTRMl5mLL
-         Xl+QiABQvOozNIEwoWd6r8qN24JfLwZOmUY2YLuiO0xZnYH/bHwOHFCbIpE5N458JA+l
-         6cGvnnMtI+WGFctbUpOOZjYd2rNfkpQPwXXgHbVgTJDAbFnhi+etcoe9v0hwZp2fUj75
-         Ayb3ef0zStw1KtEPsznFxitwskxSh61ti+rjeK7o4JPcfoq/LYaDsaX1vLFTFF2hMGSN
-         faFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719844460; x=1720449260;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gxm2/286zsrii1K3SQifylk+j5wAvP1Kfw/1i+juyX0=;
-        b=O+ZaikgtusGyVQQ9vLqo1uTl5mTYmUGln+49chY5dyqhkeCwMeVrKy+sslIIrMjVeR
-         y8GZHF0gRZoFGQFkhJwnEEBB5f9G3xThEhR8R5152IVdihXdgMDCaRfr1sKHModQMZm1
-         /3M8t/HeDo5ScIEaOPDA8CFlPtFFoT4vl0/TSrAaAj5wwwEv8mLmKQx0MCgS4QiMMoiR
-         4W4C1EldY4kmOBjShuN2SlNsMwjjDICQIvWum4dD8YWwn++G0qtqTMMelkgvx1m9CyuI
-         zg1HwTBFsCJQKYTJQdxFwvIuVX29+oVNxWAWB4kJJUct8Pyq8HaFOxbgY6oBuNt7o0yv
-         QnTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtKA48i/V6V0cZw4z+QTDI/9u99E3tRqj/NaHX+DQ7UWo+Rg3OeD6pevhcIgtQeDAiPszDIe5MYS1YJnOP/NuCexAzm5il
-X-Gm-Message-State: AOJu0Yw/eBesfKHgpVJ63LJ3ZR7lH9gHCe7axBLmjdgruGHWPmzTQ2Cc
-	Gw6CXKrMWk8Pguc2H07hGVZ3SLldH6yK8Bqbfv75N2wSGsB84slvkpALg3wsLjQ=
-X-Google-Smtp-Source: AGHT+IGVYBgZ9oMxQW7NLdq5XyBXrfpX9j7PfBdVZGzczzJCDXaM89KFp5oFBhxPCvOq5UKcLe0pCw==
-X-Received: by 2002:a05:600c:5129:b0:425:63b9:ae2c with SMTP id 5b1f17b1804b1-4257a02008fmr50852905e9.27.1719844460124;
-        Mon, 01 Jul 2024 07:34:20 -0700 (PDT)
-Received: from blmsp ([2001:4091:a245:8609:c1c4:a4f8:94c8:31f2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b097b82sm159225445e9.34.2024.07.01.07.34.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 07:34:19 -0700 (PDT)
-Date: Mon, 1 Jul 2024 16:34:18 +0200
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Tony Lindgren <tony@atomide.com>, Judith Mendez <jm@ti.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@ew.tq-group.com
-Subject: Re: Kernel hang caused by commit "can: m_can: Start/Cancel polling
- timer together with interrupts"
-Message-ID: <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
-References: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
- <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A282316B750;
+	Mon,  1 Jul 2024 14:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.49.109
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719845417; cv=fail; b=dXOq0xEg5cEegmSLR+TYnKhQFehNiqyRNqb1iONL/7CQaptkhOgCnAKCp0tX+Z7/3S8FwCXi2TfwpfkBd9iEQ3qGTpcxTCHHIwpVM3MpgXK6rM+s827g/z0lPFgO2HAtxJHIUfpELjAJxCqGmH9Q/ZCHWvgBrQVb+pXQz3hwG5s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719845417; c=relaxed/simple;
+	bh=0PybR2F9bNvwIvO/qTyObZYiEfYjs5DeCBIYUxeCqd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Nl0JtTeUAYtOeT/kiVsRGJsCnsVeQXdNo02s9BykjpAJhBimeX5tdt5oPNMxkZaLrsAKKEWXqCD8WIa/BVwKPjrEXjNBZ9S82MFM0TyXo9OMoDuAKU+P6nwwyD0ipcyYh0ZSmi+4TjroqHUYZu0sfl9smhdPt3S6IKnIemao5OA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=khIfk+f+; arc=fail smtp.client-ip=40.92.49.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hf3HOF2maZZShc4BV8PlWpNG/G2Msbr20mwzc3iJVByCasw2DWxZKL+0fqbXhDdYwuMLy7zbxB+s9d9rd7JmHR9HTwSoxEq4cXMCqtFV3TPID5Q5snkTy8KvrQVdLLRNyzB4xb/IjSS5k8ZKAXmv/HFyea/HRweojP/ntEw4vp9JbOJa1ts5ZehoydkZ+ZIHdzHbLykcCOxGsOsBmmaXLVC2Xn0GI5lwNYdG5vYB8IVS111HDoSA3CLSlUD1Cmk43wsvYkNG8FPt4ZOs9vqiIJW8bI4928W66ROLR62R31AIZ+9/06ugnjXzywbGXzFjygqFDeMjFGgaemO5lKadfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cInpAUnfgY+dl/3jdMpt0fwwJPOWp5VFOuhZ613ReaA=;
+ b=nvvgNwv8y3BKIozMr8IJyRuVniRPQj9IiPISYzwnmchiXgiae+ekEBvFkFmsdS0bRuNZp4I321n57Rkftc3yIq+rhjzPrybjTCtNeKmAIuucH2f/Md7kATDNTX3esYahcpuNprwDycdqfjlFiTAHrbep/Un5tu+RrG5cAcswOqwmdtZq3NO8r0dTvL46TvZiAKkw2x0FxNlIe0LyM9iQRJJhGvbzVusRtTfjaDF3Iww0hS4rwCarAPtzwpFaZm+d2vUaPq0do2tTVEY1MxAoh3Y9HQNy5veT8gr0lrRM/dU9VaTEbzInv5gr6Bu4pWPIsdW0biQuwWXb89gV0TQODA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cInpAUnfgY+dl/3jdMpt0fwwJPOWp5VFOuhZ613ReaA=;
+ b=khIfk+f+Td49oyK5ltD1Kxhk8rAXh97dwTIBhbrMK0h3VZx02Kp+Z30CjW8cgIOjni9rdjecK884BD90M7Qz4w4p8h98PbDkaXoalSb0mvC6XiEVm6ce3Sq8z5AiscM7LiizRVpxfHr1WxH2FkusEISOO/6bfjtFtafY75csxhYIooUByvBUDbWKI5xpkaGwO3XlY7e7g5SR6jqcBhIefVCuW0ue3lG1ugqvi4o8YrQTzsR8YFXg323H5M3V+xneACAxRBqEhO66Lw42b+5dlgOW9Dq0tmVKBTBxK3yHAFdxLTmkdkP7JSv1xvKabXY7m1fkJmJLx6jPoNTcf8zRrQ==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by AM8P194MB1673.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:320::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.32; Mon, 1 Jul
+ 2024 14:50:12 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7719.028; Mon, 1 Jul 2024
+ 14:50:12 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: devnull+luigi.leonardi.outlook.com@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luigi.leonardi@outlook.com,
+	marco.pinn95@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH PATCH net-next v2 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
+Date: Mon,  1 Jul 2024 16:49:41 +0200
+Message-ID:
+ <AS2P194MB21701DDDFD9714671737D0E39AD32@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240701-pinna-v2-2-ac396d181f59@outlook.com>
+References: <20240701-pinna-v2-2-ac396d181f59@outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [IifNZn0XtVjad8xnR9zjL0AwBOlrPIrF]
+X-ClientProxiedBy: MI1P293CA0012.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::10) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:20b:642::8)
+X-Microsoft-Original-Message-ID:
+ <20240701144940.13356-2-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AM8P194MB1673:EE_
+X-MS-Office365-Filtering-Correlation-Id: c55ba186-6ca6-47ef-afdd-08dc99dd1c40
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199028|8060799006|3412199025|440099028|56899033|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	ITmXCn5fE80qMaM187/TmGOt3nm1bTMTK9nRiiWnMoBMDH1RrFQlBkazCDYlVBSaIWtguFebTJ5Iany67Ew58+Vp5t3XBHH9ZMQR4R770TgTmt4HkkiKmiR7GjXmnLHH2qlh+rXvcsCKvnjoD+o+Jwk8lNX/I98elGnikuPd6lmvcruqK2EUmArKOLU9B47o3Mv8dlTE3+ZVdgjh54UzdP3BlBwax/+28FvcyLZ9Lq16n5OxjsWu956j4zCIaaoEsYrX9BJWm3hLA2rI0OShHEPY/wv7+U6nDiOR5WJw5xxyExRaJ/TXhlvcbS9u6u2hHK1Zh/loCLC2ZAHrg2VMLVPQF1GLm3C3T1BHRM3VVyuEDLTe/hfwEXgg5QaBjFm+m3h0ZI/NG/nZ7fI4jeTmvq59RYQu+pK9Dqef2dLm3rtkVZ06lh9zZOT3y6FAHfykUzP62nNEk91P3uOju6LDWeCJcq0yYqx2FSktmCmFLz7Mn/v0I0tEPWE9Cs7KyXiez42hOPwWantAePadWio9T0Lx6yFHp2qJ02Op5iliBMR6I3OVXqHPxGRR6djffiGb2mrdTC8MdTYAdoBINCL6IdFTuUPYnMz5An7CXVxY+ePRD2A0+O5HVfF7/d1BD1w7qyuPkjlonM/1UBR4jnGIOw==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LO0xSbYbE5mZ8S+rFlNQ6R6JIjfICrH9lxHHKVcx3giV3i+hJxmVw5qeIf+J?=
+ =?us-ascii?Q?cKA5GRgqi4Jn7GQ/FiNzg6u5zmQRS+mxSt0saV6OR/hEmAP8s1qhMAuU3Vrh?=
+ =?us-ascii?Q?oW4k92M/PYv0Ixpy7DcNdRC6SL69HONjqBec+ztPPZrlNIHqDy7mqbUjpQdZ?=
+ =?us-ascii?Q?SKkYX7P7CTsklNJNWbSpuYZkTrBdIjJsSc8iHdqujHNltuMmnGR0UTZDLN2E?=
+ =?us-ascii?Q?Tv3NlUWy3DKWdjvTGIZw9PnNw7RoCtXbX6W44AmkX1VMXn66XVBBKqpKZfRg?=
+ =?us-ascii?Q?jd2yCaIyH85se9IM8Fel+w64DlHTuUja+3Ek+FyXCalnYeEOr3MNNvc08Fp8?=
+ =?us-ascii?Q?UHV+cT3ajCkZ8MD5KiAZ+QO1N9bQFMSSZ3a/P2bUvbDg3zf9BkpvTwGGcD0c?=
+ =?us-ascii?Q?BmqwVMD9DDzx6r/nErdSuYnQqteCFJ31Pyz7FfrKQndgOUAt9QtAElScdU6r?=
+ =?us-ascii?Q?v6UOxMOue1wt7jTRJUXJrEgibOn4wzOxEG8/NPCmBK/5k3UyqEQwW0YQV6UQ?=
+ =?us-ascii?Q?x1lRQSFO2H+Z8oykkBoCZjkuFEewwGAi/SmtFOf4SwTVGrgbB0AVGV+BMVtX?=
+ =?us-ascii?Q?JdtIydE6x3TbW1j6IwS7jb7mNg6beyPlAC/mVPa+3FPIaDmArF5WcTXnPgzs?=
+ =?us-ascii?Q?OVWcb/A5p472XAKcryiY8Nd/kLetRpI8BLGCl6rGV/QECSnDzRx2qITNb/if?=
+ =?us-ascii?Q?AyqD9EwWwdRrgl2hJIOufaYrYqQrJ8qKRDGGROwJE3HJdNcNnohjJ/VZ44as?=
+ =?us-ascii?Q?4RfDkbHLkGXaSKLK/KNohM0X17X27TFsLnvI/s8a1Y6W5V9qvcjOt78EqmVZ?=
+ =?us-ascii?Q?lGeWvjRaZSW0CmPqADCJ+LMzPjndlOASmKrXHVoHU8S8u+LRCH9y/a6G8zzw?=
+ =?us-ascii?Q?qKMST+O7RE6QsHhy2pex/WmLRO/DYl56SiCpBd5jIgWZwGiTJXl1URrrCumY?=
+ =?us-ascii?Q?3Cfg8FoZEyTkxvw8jhff4ZoN03Rv5WVuNpdX1FT43Hmo23Jp/PkEXYOoV3Yh?=
+ =?us-ascii?Q?OdusZydcQ/tKrsgI2Nm4e6RW4BVkxLRRRFOYXWtS55q6ie3uZdVi+x7cpmw4?=
+ =?us-ascii?Q?lETt637l3/qFLO3uLVt0t+6cyGQdQNeg365JiJNHnIlTjSDJs0adRiYfgq2q?=
+ =?us-ascii?Q?g5rbPQLnc6qSbT7l4EynHtVENHJh/7O+qCL4aG8LbdJZ0Xl8cwRMFFnkfUS2?=
+ =?us-ascii?Q?60WbG2d7TSRhKVHobtpw+lImFcw8l86OtKtNgFzWT8kvzFDZibYD7XfKzOp/?=
+ =?us-ascii?Q?5IaJGdvDOTAPLRJQdKnx?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c55ba186-6ca6-47ef-afdd-08dc99dd1c40
+X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2024 14:50:12.5061
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8P194MB1673
 
-On Mon, Jul 01, 2024 at 02:12:55PM GMT, Linux regression tracking (Thorsten Leemhuis) wrote:
-> [CCing the regression list, as it should be in the loop for regressions:
-> https://docs.kernel.org/admin-guide/reporting-regressions.html]
-> 
-> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-> for once, to make this easily accessible to everyone.
-> 
-> Hmm, looks like there was not even a single reply to below regression
-> report. But also seens Markus hasn't posted anything archived on Lore
-> since about three weeks now, so he might be on vacation.
-> 
-> Marc, do you might have an idea what's wrong with the culprit? Or do we
-> expected Markus to be back in action soon?
+Hi all,
 
-Great, ping here.
+> +		/* Inside RCU, can't sleep! */
+> +		ret = mutex_trylock(&vsock->tx_lock);
+> +		if (unlikely(ret == 0))
+> +			goto out_worker;
 
-@Matthias: Thanks for debugging and sorry for breaking it. If you have a
-fix for this, let me know. I have a lot of work right now, so I am not
-sure when I will have a proper fix ready. But it is on my todo list.
+I just realized that here I don't release the tx_lock and 
+that the email subject is "PATCH PATCH".
+I will fix this in the next version.
+Any feedback is welcome!
 
-Best,
-Markus
-
-> 
-> Ciao, Thorsten
-> 
-> On 18.06.24 18:12, Matthias Schiffer wrote:
-> > Hi Markus,
-> > 
-> > we've found that recent kernels hang on the TI AM62x SoC (where no m_can interrupt is available and
-> > thus the polling timer is used), always a few seconds after the CAN interfaces are set up.
-> > 
-> > I have bisected the issue to commit a163c5761019b ("can: m_can: Start/Cancel polling timer together
-> > with interrupts"). Both master and 6.6 stable (which received a backport of the commit) are
-> > affected. On 6.6 the commit is easy to revert, but on master a lot has happened on top of that
-> > change.
-> > 
-> > As far as I can tell, the reason is that hrtimer_cancel() tries to cancel the timer synchronously,
-> > which will deadlock when called from the hrtimer callback itself (hrtimer_callback -> m_can_isr ->
-> > m_can_disable_all_interrupts -> hrtimer_cancel).
-> > 
-> > I can try to come up with a fix, but I think you are much more familiar with the driver code. Please
-> > let me know if you need any more information.
-> > 
-> > Best regards,
-> > Matthias
-> > 
-> > 
+Thanks,
+Luigi
 
