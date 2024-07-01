@@ -1,130 +1,172 @@
-Return-Path: <netdev+bounces-108059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101A191DB1C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:09:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FDA191DB12
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:08:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE63528549E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:09:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C11DB1F22E71
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6840113D503;
-	Mon,  1 Jul 2024 09:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C27F84D04;
+	Mon,  1 Jul 2024 09:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cdqsiCEQ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HX8xRUjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C715985947;
-	Mon,  1 Jul 2024 09:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C73084A39;
+	Mon,  1 Jul 2024 09:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719824905; cv=none; b=GamWIEEZAlA5y7mp5QgXGhjQi2TpVtkU53hutDy8OodmDc/Oyn7YZVvqbUbeesE8eHhLQ8irVTZQhIcbOreUfduudv93QaJ4eS5jYjT2al8k/xu9U8RCpuI+dEZn5tNPJZfGrgAsJkmbFX4/R0m2TzNIqSEwmywPqGumj3kAGwU=
+	t=1719824891; cv=none; b=OFjbGYcuLPjCfGrsaNVp0B4/lX60XoFjVDY+ZkO8XjHzVbbQobwedSYvkTo6jBs8FODY+D/g+oBP0IqhzVdOed3Rctk+NIq5Gp47l7+u/3RrgF8Yo0sgw03Nt6O8uUnQM3Sr57ZEtne/tJDuuOFt1T31lXP+x49VvabopC+02QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719824905; c=relaxed/simple;
-	bh=23OqGtViRO+FNeourWoZ9oF1aPoZU5Rk4prGQEEejxQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hi1vzwYl6L2KcZO9ZwMIo56b313Gulz8vTTD1tKwadzCtAgfGEyrLPpAaAYm2YYgau7GBtsRQiZhUaHWFgK2sikd2rVaY64XjNgyFgzG5pPo8Totf25OgTnxilYz3UW6uM//CtRb7LLtl7mbKEJXAN1hYOkjF9J+NxTR1zKl62k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cdqsiCEQ; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45UMw892030613;
-	Mon, 1 Jul 2024 02:08:18 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=L
-	fV0iUwMPlR6+YJA4wPhDpZHuZdSVdwXPJvsXWH8CPA=; b=cdqsiCEQxVmyH3tSB
-	XOd1sq7pjjwHpHjD6OVyxlzCrpYKVfya5pyWan01VhWwUekOD9LMPnFQxEJRbsIl
-	WEDErNy+++DepsOmRlz53rxUiIO+pnB8lpPNIOvpwcNVznJkJlHiw0hSu5wxGBjf
-	FlV8AvsrYabxh5N9cdUY1s7SqaaIpHB/E7z9hFZ1eIKm4mbmUCu/zn10xSC7sGgk
-	Hoh5j/xmSYzFuc6tUjYPb8btZQv/otlyJA8ePglf0KrUh1qBERdsxg4Skn5COn0a
-	vGiHI3PMCUWjC+Lv8CymzeIVt2qeZGItEhN3Aj+lTAjIQQYCWrDb761+ByL8B05H
-	N4AGg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 403207k46b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jul 2024 02:08:18 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 1 Jul 2024 02:08:17 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 1 Jul 2024 02:08:17 -0700
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id 81AA73F705A;
-	Mon,  1 Jul 2024 02:08:13 -0700 (PDT)
-From: Srujana Challa <schalla@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
-        <schalla@marvell.com>, Michal Mazur <mmazur2@marvell.com>
-Subject: [PATCH net,6/6] octeontx2-af: fix detection of IP layer
-Date: Mon, 1 Jul 2024 14:37:46 +0530
-Message-ID: <20240701090746.2171565-7-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240701090746.2171565-1-schalla@marvell.com>
-References: <20240701090746.2171565-1-schalla@marvell.com>
+	s=arc-20240116; t=1719824891; c=relaxed/simple;
+	bh=UGbdqgf/9Fvo9l2zX/CGYhdGSnuNCps876YVS1NTX9M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ARe1t+LB1AFopbpbRILY/4t7kvNSrrsKqSbJfhOai5uf8obrb1WjZ2Qt+b5dozataiXF7+x0kwb5QV5cUq7ejSyMJfY5t56ww4j5hijYpdMyUZCQ72xnoXuYc1bH4+x8Q7O7ZM8Th8DpCdoEG8rEAFtnG7Lz4S1IhUqtH6cjwhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HX8xRUjL; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1719824886; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=FRI1Dyi5c7hnorQrmeEYTjeSPUtzZqzzroY7gFiFk8s=;
+	b=HX8xRUjLPs6W4cmJQ1ztNB0NysfB+OSgNgnX/XyyCo94FEas0rdfZwx9lAeGTQ8BEw2dJqMhpqi5mrabPiWDV9OFUurkkcb1YYHzHc8KBo5WjBfpdXvZmkPZ4HNe1MlPvcHWPhts/3JN/SnQwUsoGDOk84aM9IBb82ai6L7jm8Q=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=29;SR=0;TI=SMTPD_---0W9cYRWS_1719824883;
+Received: from 30.221.145.205(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W9cYRWS_1719824883)
+          by smtp.aliyun-inc.com;
+          Mon, 01 Jul 2024 17:08:04 +0800
+Message-ID: <ead4fbea-dfee-4454-b89a-a03166cde0db@linux.alibaba.com>
+Date: Mon, 1 Jul 2024 17:08:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 2eGvdFN0LGZ17lvV4gnLzRQ4e6X2Gm3H
-X-Proofpoint-GUID: 2eGvdFN0LGZ17lvV4gnLzRQ4e6X2Gm3H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-01_07,2024-06-28_01,2024-05-17_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/2] skmsg: prevent empty ingress skb from
+ enqueuing
+To: Geliang Tang <geliang@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: Geliang Tang <tanggeliang@kylinos.cn>, David Ahern <dsahern@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>,
+ Yuran Pereira <yuran.pereira@hotmail.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <cover.1719553101.git.tanggeliang@kylinos.cn>
+ <5b6a55017ab616131f7de1268b60cb34e99941a1.1719553101.git.tanggeliang@kylinos.cn>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <5b6a55017ab616131f7de1268b60cb34e99941a1.1719553101.git.tanggeliang@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Michal Mazur <mmazur2@marvell.com>
 
-Checksum and length checks are not enabled for IPv4 header with
-options and IPv6 with extension headers.
-To fix this a change in enum npc_kpu_lc_ltype is required which will
-allow adjustment of LTYPE_MASK to detect all types of IP headers.
 
-Fixes: 21e6699e5cd6 ("octeontx2-af: Add NPC KPU profile")
-Signed-off-by: Michal Mazur <mmazur2@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/npc.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+On 6/28/24 1:47 PM, Geliang Tang wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+>
+> Run this BPF selftests (./test_progs -t sockmap_basic) on a Loongarch
+> platform, a Kernel panic occurs:
+>
+> '''
+> Oops[#1]:
+> CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE  6.10.0-rc2+ #18
+> Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK2018
+>     ... ...
+>     ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
+>    ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
+>   CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=CC DACM=CC -WE)
+>   PRMD: 0000000c (PPLV0 +PIE +PWE)
+>   EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
+>   ECFG: 00071c1d (LIE=0,2-4,10-12 VS=7)
+> ESTAT: 00010000 [PIL] (IS= ECode=1 EsubCode=0)
+>   BADV: 0000000000000040
+>   PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
+> Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrack
+> Process test_progs (pid: 2824, threadinfo=0000000000863a31, task=...)
+> Stack : ...
+>          ...
+> Call Trace:
+> [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
+> [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
+> [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
+> [<90000000049aae34>] inet_recvmsg+0x54/0x100
+> [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
+> [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
+> [<900000000481e27c>] sys_recvfrom+0x1c/0x40
+> [<9000000004c076ec>] do_syscall+0x8c/0xc0
+> [<9000000003731da4>] handle_syscall+0xc4/0x160
+>
+> Code: ...
+>
+> ---[ end trace 0000000000000000 ]---
+> Kernel panic - not syncing: Fatal exception
+> Kernel relocated by 0x3510000
+>   .text @ 0x9000000003710000
+>   .data @ 0x9000000004d70000
+>   .bss  @ 0x9000000006469400
+> ---[ end Kernel panic - not syncing: Fatal exception ]---
+> '''
+>
+> This crash happens every time when running sockmap_skb_verdict_shutdown
+> subtest in sockmap_basic.
+>
+> This crash is because a NULL pointer is passed to page_address() in
+> sk_msg_recvmsg(). Due to the difference in architecture, page_address(0)
+> will not trigger a panic on the X86 platform but will panic on the
+> Loogarch platform. So this bug was hidden on the x86 platform, but now
+> it is exposed on the Loogarch platform.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index d883157393ea..6c3aca6f278d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -63,8 +63,13 @@ enum npc_kpu_lb_ltype {
- 	NPC_LT_LB_CUSTOM1 = 0xF,
- };
- 
-+/* Don't modify ltypes up to IP6_EXT, otherwise length and checksum of IP
-+ * headers may not be checked correctly. IPv4 ltypes and IPv6 ltypes must
-+ * differ only at bit 0 so mask 0xE can be used to detect extended headers.
-+ */
- enum npc_kpu_lc_ltype {
--	NPC_LT_LC_IP = 1,
-+	NPC_LT_LC_PTP = 1,
-+	NPC_LT_LC_IP,
- 	NPC_LT_LC_IP_OPT,
- 	NPC_LT_LC_IP6,
- 	NPC_LT_LC_IP6_EXT,
-@@ -72,7 +77,6 @@ enum npc_kpu_lc_ltype {
- 	NPC_LT_LC_RARP,
- 	NPC_LT_LC_MPLS,
- 	NPC_LT_LC_NSH,
--	NPC_LT_LC_PTP,
- 	NPC_LT_LC_FCOE,
- 	NPC_LT_LC_NGIO,
- 	NPC_LT_LC_CUSTOM0 = 0xE,
--- 
-2.25.1
+Maybe Loongarch ?  Besides that, LGTM.
+Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+
+>
+> The root cause is an empty skb (skb->len == 0) is put on the queue.
+>
+> In this case, in sk_psock_skb_ingress_enqueue(), num_sge is zero, and no
+> page is put to this sge (see sg_set_page in sg_set_page), but this empty
+> sge is queued into ingress_msg list.
+>
+> And in sk_msg_recvmsg(), this empty sge is used, and a NULL page is
+> got by sg_page(sge). Pass this NULL-page to copy_page_to_iter(), it
+> passed to kmap_local_page() and page_address(), then kernel panics.
+>
+> To solve this, we should prevent empty skb from putting on the queue. So
+> in sk_psock_verdict_recv(), if the skb->len is zero, drop this skb.
+>
+> Fixes: ef5659280eb1 ("bpf, sockmap: Allow skipping sk_skb parser program")
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> ---
+>   net/core/skmsg.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index fd20aae30be2..44952cdd1425 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -1184,7 +1184,7 @@ static int sk_psock_verdict_recv(struct sock *sk, struct sk_buff *skb)
+>   
+>   	rcu_read_lock();
+>   	psock = sk_psock(sk);
+> -	if (unlikely(!psock)) {
+> +	if (unlikely(!psock || !len)) {
+>   		len = 0;
+>   		tcp_eat_skb(sk, skb);
+>   		sock_drop(sk, skb);
 
 
