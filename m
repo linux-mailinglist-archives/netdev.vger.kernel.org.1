@@ -1,210 +1,154 @@
-Return-Path: <netdev+bounces-108231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7D591E763
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB1491E76B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB151C21734
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99DDC1C21A0A
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2715816EC13;
-	Mon,  1 Jul 2024 18:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03E216EC0F;
+	Mon,  1 Jul 2024 18:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OBDZ/PYY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrF80tO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA0516EB67
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 18:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4909616E898;
+	Mon,  1 Jul 2024 18:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719858306; cv=none; b=Y23sv//fwvpgl8A07uqnRPH/yMLx5aChEVOavYgpMl1I8G3yHpnnRR2kwBFWlaVYFnVYt8lXnQpH0POtNygOGdMPYsw4W6QmeGefZnbzD8nAihx6PddICBDo/UlFObJh6ykFLQqgTh0+aVcOnf9g3H3MqTPyT1lUp6KaPlVTddk=
+	t=1719858483; cv=none; b=LnfNtk3H+icgkzmJ0c5gaC2Xj3TEPERrCaQMlZjkwh8SGnTs0MdGSzAMa8bBh/8uTrb6U4ce+XqqRE0w+AevMy1XSDhX6LRhP7hcgD7kyfSG2K/rUEaEQ5kaHa4AKq4nmOUWoKSTuwF6U+9WHbUSfjtHtB4hdAWhR9rSJaFn9jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719858306; c=relaxed/simple;
-	bh=vbfWueNOr9tHAjtPV5+kzwg2VA4il/flgFRHmFX8c1M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=U+RGQIUBUe8nJ6StZdUa9s6HklK6PVBNuST457+Z6cmupofu8I/IB7+DoX2ftgmbHqnsZkxR4jm+Ot76zcvUtSqTSyjuo1zJ+7TRIaGd/KZIL7cQ/xzZmG7XvkCzJiHkpD8eTWBuUzXGHp+4frpqMbO5Xgbx0gfWn3y8JlEELBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OBDZ/PYY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719858303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f9L74R/Nh5UzgxWQDOQ0rotNTE5hRajpeHypxcAqGvM=;
-	b=OBDZ/PYYaQeHTZKdHHTJxn5w4sDcxjsrzDnUkoSdt+uEZePIbkOYNxIpULtiv3UgHg/Lr6
-	Cr7KWMvERKzc0cKSq3n51K8ztufWCSooGU3mioCYjTuaaKB5nbcguAzm+lWYQiL7yV+cbk
-	bw+YT4Yjr2RSc8LcLfuMtYSMelSfv0Q=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-691-sBLwdqhDNsGo0zw3jZamZg-1; Mon,
- 01 Jul 2024 14:24:58 -0400
-X-MC-Unique: sBLwdqhDNsGo0zw3jZamZg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 820A619560B3;
-	Mon,  1 Jul 2024 18:24:56 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.8.184])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54A4B3000218;
-	Mon,  1 Jul 2024 18:24:53 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
-  i.maximets@ovn.org,  dev@openvswitch.org,  Pravin B Shelar
- <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 06/10] net: openvswitch: store sampling
- probability in cb.
-In-Reply-To: <20240630195740.1469727-7-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Sun, 30 Jun 2024 21:57:27 +0200")
-References: <20240630195740.1469727-1-amorenoz@redhat.com>
-	<20240630195740.1469727-7-amorenoz@redhat.com>
-Date: Mon, 01 Jul 2024 14:24:46 -0400
-Message-ID: <f7tjzi5vukx.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1719858483; c=relaxed/simple;
+	bh=wM4Slqs4VxfOf76vbRhq1KoayyAF+k6Lwllcv5RuEFM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=io0GRVoxyXv6pyFgOPrWXHZGyljjLqjvAgCJ7Fb2FCZ9zqcIzW3eSOrR2N9QQ79dp298eX6ntMTW5NZG/ZvtDRQS67LJlNdIIYJOfu3ktGMVGUW7BvPKgkATD3B/GoMtdx9e8h225n+3uHCVJbVShTPp6OHrIpyPtB+B8buI+V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrF80tO+; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-79c076c0e1aso201165485a.2;
+        Mon, 01 Jul 2024 11:28:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719858481; x=1720463281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6oSp3l4wwYQ26AYzu7qjLI3czOigk340zazQ1P36CGo=;
+        b=DrF80tO+rWoBAQ6n6YYysvj7Xh3iO4HyEH75pQahxckZdeuP8nKyEv/la/lC1jQZ3L
+         Qe+TBRwIlevbZ2Rl4JFXRKvLW0NnxjVGXTk/guCKWGZn61EzBWGACgWzplvrmUyrYLrK
+         oUsEzo/WMjKG2NYjUrQBXhfAUksWNMQG36ONQEv5RUos9SRJgF6XXPY++WGbpoH1Foak
+         IThELt09TPLFzKZnSfO9lewuk3Biy//XwpVKtIb3kWjRia87tMDPZKRetW9j2ikzLZnJ
+         7t6QoTZ9XdW+olUEVt5uczBuOFu6kN7onokM/fMwOUSpPCMhaIvW+sIX6gn2mG+vjlFS
+         vMdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719858481; x=1720463281;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6oSp3l4wwYQ26AYzu7qjLI3czOigk340zazQ1P36CGo=;
+        b=FpsJMetEgM+XK+qZkM70i795mlDx3+tjjYGYV7S5YnGHsDMw8iSjuCTUBG1txfDIan
+         C1n6f2bk1oLiS29js9sZqCJSsDil0aUjxTyxSAA27c3MIaYn4t+OMb8iZhVqduUzIYS0
+         mzwM2Dz9cAJsfpZvoPZXaOlTPmcZrexuOwHsI4b5zO5nwWkXKQ9ecB/ZbxPRxX2xB7DT
+         rCO3mnvcF0BWS9MHCKvEVAzClPmMCUoIuIkWhiYZ284CjYi7UFgIS8Ybhd2nqvfE9M3I
+         i/XAxXP1uDiLd7lZTsCg/WSKeYxTg6IVenGrd1KsCyXr/SrmOcDAFNHm4OKqx6KV1DaR
+         UGLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXy/NPoyE5uqQRYC7eCu7fruGEocsjZvYGOY+MvzdrWzn8qzqH+abfRzZXio01M7haalTtgf4WLOhojlT9RvjKACE27Q7Ypl6nhVfM6zPUEEyrR9IQaGeLKMCZnZSboUY0=
+X-Gm-Message-State: AOJu0YzwcfQ8hBvbIhYY1Rml/G9vRp68lccf3bKZMWvUAsfATpMB5ubU
+	eudv6ZPT5woxgLPkC9xnEqFYwzTQ9xRX1U2oN8icklyU875mJH93
+X-Google-Smtp-Source: AGHT+IH0XXpVfAMfbw7Nlxwcrwpa4nXmY/qrHWExNG0IApOFkD4wwXF/vFpWs2GbZv8b3SYg4AtzPQ==
+X-Received: by 2002:a05:620a:e10:b0:79d:5c93:4bd with SMTP id af79cd13be357-79d7bac3fd2mr726497485a.74.1719858480714;
+        Mon, 01 Jul 2024 11:28:00 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6927a828sm372322685a.38.2024.07.01.11.28.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 11:28:00 -0700 (PDT)
+Date: Mon, 01 Jul 2024 14:27:59 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ io-uring@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <6682f52fd5a96_4208e294c8@willemb.c.googlers.com.notmuch>
+In-Reply-To: <330dbf5b-4022-4ceb-a658-a182c16f9f59@gmail.com>
+References: <cover.1719190216.git.asml.silence@gmail.com>
+ <a916f99aa91bc9066411015835cadd5677a454fb.1719190216.git.asml.silence@gmail.com>
+ <667eed8350f89_2185b294e2@willemb.c.googlers.com.notmuch>
+ <330dbf5b-4022-4ceb-a658-a182c16f9f59@gmail.com>
+Subject: Re: [PATCH net-next 3/5] net: batch zerocopy_fill_skb_from_iter
+ accounting
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+Pavel Begunkov wrote:
+> On 6/28/24 18:06, Willem de Bruijn wrote:
+> > Pavel Begunkov wrote:
+> >> Instead of accounting every page range against the socket separately, do
+> >> it in batch based on the change in skb->truesize. It's also moved into
+> >> __zerocopy_sg_from_iter(), so that zerocopy_fill_skb_from_iter() is
+> >> simpler and responsible for setting frags but not the accounting.
+> >>
+> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> > 
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+> 
+> Thanks for reviews!
+> 
+> >> ---
+> >>   net/core/datagram.c | 31 ++++++++++++++++++-------------
+> >>   1 file changed, 18 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/net/core/datagram.c b/net/core/datagram.c
+> >> index 7f7d5da2e406..2b24d69b1e94 100644
+> >> --- a/net/core/datagram.c
+> >> +++ b/net/core/datagram.c
+> >> @@ -610,7 +610,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+> >>   }
+> >>   EXPORT_SYMBOL(skb_copy_datagram_from_iter);
+> >>   
+> >> -static int zerocopy_fill_skb_from_iter(struct sock *sk, struct sk_buff *skb,
+> >> +static int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+> >>   					struct iov_iter *from, size_t length)
+> >>   {
+> >>   	int frag = skb_shinfo(skb)->nr_frags;
+> >> @@ -621,7 +621,6 @@ static int zerocopy_fill_skb_from_iter(struct sock *sk, struct sk_buff *skb,
+> >>   		int refs, order, n = 0;
+> >>   		size_t start;
+> >>   		ssize_t copied;
+> >> -		unsigned long truesize;
+> >>   
+> >>   		if (frag == MAX_SKB_FRAGS)
+> >>   			return -EMSGSIZE;
+> > 
+> > Does the existing code then incorrectly not unwind sk_wmem_queued_add
+> > and sk_mem_charge if returning with error from the second or later
+> > loop..
+> 
+> As long as ->truesize matches what's accounted to the socket,
+> kfree_skb() -> sock_wfree()/->destructor() should take care of it.
+> With sk_mem_charge() I assume __zerocopy_sg_from_iter -> ___pskb_trim()
+> should do it, need to look it up, but if not, it sounds like a temporary
+> over estimation until the skb is put down. I don't see anything
+> concerning. Is that the scenario you're worried about?
 
-> When a packet sample is observed, the sampling rate that was used is
-> important to estimate the real frequency of such event.
->
-> Store the probability of the parent sample action in the skb's cb area
-> and use it in psample action to pass it down to psample module.
->
-> Acked-by: Eelco Chaudron <echaudro@redhat.com>
-> Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
-
-Reviewed-by: Aaron Conole <aconole@redhat.com>
-
->  include/uapi/linux/openvswitch.h |  3 ++-
->  net/openvswitch/actions.c        | 20 +++++++++++++++++---
->  net/openvswitch/datapath.h       |  3 +++
->  net/openvswitch/vport.c          |  1 +
->  4 files changed, 23 insertions(+), 4 deletions(-)
->
-> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> index 3dd653748725..3a701bd1f31b 100644
-> --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -649,7 +649,8 @@ enum ovs_flow_attr {
->   * Actions are passed as nested attributes.
->   *
->   * Executes the specified actions with the given probability on a per-packet
-> - * basis.
-> + * basis. Nested actions will be able to access the probability value of the
-> + * parent @OVS_ACTION_ATTR_SAMPLE.
->   */
->  enum ovs_sample_attr {
->  	OVS_SAMPLE_ATTR_UNSPEC,
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index a035b7e677dd..34af6bce4085 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -1048,12 +1048,15 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->  	struct nlattr *sample_arg;
->  	int rem = nla_len(attr);
->  	const struct sample_arg *arg;
-> +	u32 init_probability;
->  	bool clone_flow_key;
-> +	int err;
->  
->  	/* The first action is always 'OVS_SAMPLE_ATTR_ARG'. */
->  	sample_arg = nla_data(attr);
->  	arg = nla_data(sample_arg);
->  	actions = nla_next(sample_arg, &rem);
-> +	init_probability = OVS_CB(skb)->probability;
->  
->  	if ((arg->probability != U32_MAX) &&
->  	    (!arg->probability || get_random_u32() > arg->probability)) {
-> @@ -1062,9 +1065,16 @@ static int sample(struct datapath *dp, struct sk_buff *skb,
->  		return 0;
->  	}
->  
-> +	OVS_CB(skb)->probability = arg->probability;
-> +
->  	clone_flow_key = !arg->exec;
-> -	return clone_execute(dp, skb, key, 0, actions, rem, last,
-> -			     clone_flow_key);
-> +	err = clone_execute(dp, skb, key, 0, actions, rem, last,
-> +			    clone_flow_key);
-> +
-> +	if (!last)
-> +		OVS_CB(skb)->probability = init_probability;
-> +
-> +	return err;
->  }
->  
->  /* When 'last' is true, clone() should always consume the 'skb'.
-> @@ -1311,6 +1321,7 @@ static void execute_psample(struct datapath *dp, struct sk_buff *skb,
->  	struct psample_group psample_group = {};
->  	struct psample_metadata md = {};
->  	const struct nlattr *a;
-> +	u32 rate;
->  	int rem;
->  
->  	nla_for_each_attr(a, nla_data(attr), nla_len(attr), rem) {
-> @@ -1329,8 +1340,11 @@ static void execute_psample(struct datapath *dp, struct sk_buff *skb,
->  	psample_group.net = ovs_dp_get_net(dp);
->  	md.in_ifindex = OVS_CB(skb)->input_vport->dev->ifindex;
->  	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
-> +	md.rate_as_probability = 1;
-> +
-> +	rate = OVS_CB(skb)->probability ? OVS_CB(skb)->probability : U32_MAX;
->  
-> -	psample_sample_packet(&psample_group, skb, 0, &md);
-> +	psample_sample_packet(&psample_group, skb, rate, &md);
->  }
->  #else
->  static inline void execute_psample(struct datapath *dp, struct sk_buff *skb,
-> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-> index 0cd29971a907..9ca6231ea647 100644
-> --- a/net/openvswitch/datapath.h
-> +++ b/net/openvswitch/datapath.h
-> @@ -115,12 +115,15 @@ struct datapath {
->   * fragmented.
->   * @acts_origlen: The netlink size of the flow actions applied to this skb.
->   * @cutlen: The number of bytes from the packet end to be removed.
-> + * @probability: The sampling probability that was applied to this skb; 0 means
-> + * no sampling has occurred; U32_MAX means 100% probability.
->   */
->  struct ovs_skb_cb {
->  	struct vport		*input_vport;
->  	u16			mru;
->  	u16			acts_origlen;
->  	u32			cutlen;
-> +	u32			probability;
->  };
->  #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
->  
-> diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
-> index 972ae01a70f7..8732f6e51ae5 100644
-> --- a/net/openvswitch/vport.c
-> +++ b/net/openvswitch/vport.c
-> @@ -500,6 +500,7 @@ int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
->  	OVS_CB(skb)->input_vport = vport;
->  	OVS_CB(skb)->mru = 0;
->  	OVS_CB(skb)->cutlen = 0;
-> +	OVS_CB(skb)->probability = 0;
->  	if (unlikely(dev_net(skb->dev) != ovs_dp_get_net(vport->dp))) {
->  		u32 mark;
-
+Oh indeed. Thanks. I don't see ___pskb_trim adjusting except for the
+cases where it calls skb_condese, but neither does it adjust truesize.
+So indeed a temporary over estimation until e.g., tcp_wmem_free_skb.
+Sounds fine.
 
