@@ -1,222 +1,175 @@
-Return-Path: <netdev+bounces-108136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FDCF91DFAC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:45:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904C891DFC8
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:46:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E72F2283322
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47530283DD4
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB99F158D7F;
-	Mon,  1 Jul 2024 12:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3BE15A84B;
+	Mon,  1 Jul 2024 12:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ik5yZTtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C409158D70;
-	Mon,  1 Jul 2024 12:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EA4811;
+	Mon,  1 Jul 2024 12:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719837841; cv=none; b=DQlGZz6SOo5hJg0Q9I2t7faK2LGtRMPdIq7QgBXfLIRTzszQqTzFR+gWQDDnRneb6rQnF7ZTm4mfXRPv5hhG4q4FxSqewTkcQT1LrgUrk1kiC66//4jGHlWCuZ8+ZZNtrg85logRygM1XF5mPlG/X/yjyyiAe8uDMpW/milfsm4=
+	t=1719837981; cv=none; b=cvx0kkvxGKyQwur3E/I+ZlrslsTHcA2Iud1SZNILJWkn07AUmIFUjeF/5Ob4v4WVmF8pUE/BSzAmIfprrSICcGqOnFbubt9XTMVDhY3wXftJCNruWVn/8bKWOXkQeWG1trU92LghqK0zbXF9u2iKuklI3ksQ8COejrkqLKbrusc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719837841; c=relaxed/simple;
-	bh=gziZ/YmkYT8HtuQpa9Hf7+eLTOnqdaOU3fKyu0JLdLg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FSKNSAD1uQ56wdFm1O/pLnOCSCGwY4e7Y5ASAoecoUPO4r2xZn40AxKS3unpL1F4pc/VEXgDC4sh04IF98pPD9bnmzLjGFGhce3i8G0GdxCk5PXYm2g+59CvYeYEgOzwljiwE8SdmPDOdcbJ5TmIXT9lh/Dl2TjyXKwCJ9QOslw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.13.50] (g305.RadioFreeInternet.molgen.mpg.de [141.14.13.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5375661E5FE01;
-	Mon,  1 Jul 2024 14:42:43 +0200 (CEST)
-Message-ID: <e981261e-77be-407b-b601-f7214a4f57dd@molgen.mpg.de>
-Date: Mon, 1 Jul 2024 14:42:42 +0200
+	s=arc-20240116; t=1719837981; c=relaxed/simple;
+	bh=5Go4iu06W4P/5NpWX8+tSflVUT2oZD0yzvVFwiclK2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q56frofzmfYDtK0LtUrukBCf3oFa6SHnDd3l1DJUE67ufKGBj8xsMLQnu9KfcsqmvjjfsdABni16b7C+3+Gt/SNo0WoQFOEVPRc2zpHT/ID719HQJ3448o3b7yw1XirugcWodDDAHvFADmWHu1oHCpWxIl9zuQJVmfEJlYoI8Ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ik5yZTtU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86763C116B1;
+	Mon,  1 Jul 2024 12:46:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719837981;
+	bh=5Go4iu06W4P/5NpWX8+tSflVUT2oZD0yzvVFwiclK2E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ik5yZTtUFrKm7RPJ5OF5iiaFQA81/P+fEes2nK/0yeZS78oK8K3j0gALFCkSSVomt
+	 KFWCMwHf5PmnF0xbQIVIfvixR3vMj/vVIViybWILJ/+57onv9pRCTLc6ECO6eZdjod
+	 0SiuL+mJuJ3nXo8pgeCJdUexpPCH7fsQf9nKOvC/1yI/oRe3lgQoyk3CZXdWd0Kmzt
+	 Y9uKFGBajkZikDzrGVCOI/SjZWw0ooqx5ZQ3jHjNUBNYQJiBUUC4VNKx2y5OCrPhw5
+	 wlMVJa8faqIe5R8lh5e7FWetZg1U9rkZ+m+GZkEx59/rCMDCkIQbf06pKqz7n6neI3
+	 YesKoL0LRAdWg==
+Date: Mon, 1 Jul 2024 15:46:17 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Omer Shpigelman <oshpigelman@habana.ai>
+Cc: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	Zvika Yehudai <zyehudai@habana.ai>
+Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
+Message-ID: <20240701124617.GD13195@unreal>
+References: <20240613191828.GJ4966@unreal>
+ <fbb34afa-8a38-4124-9384-9b858ce2c4e5@habana.ai>
+ <20240617190429.GB4025@unreal>
+ <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
+ <20240618125842.GG4025@unreal>
+ <b4bda963-7026-4037-83e6-de74728569bd@habana.ai>
+ <20240619105219.GO4025@unreal>
+ <a5554266-55b7-4e96-b226-b686b8a6af89@habana.ai>
+ <20240630132911.GB176465@unreal>
+ <a19d80d4-e452-461c-a060-2c94030301a7@habana.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 1/1] igc: Fix packet still tx
- after gate close by reducing i226 MAC retry buffer
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20240701100058.3301229-1-faizal.abdul.rahim@linux.intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240701100058.3301229-1-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a19d80d4-e452-461c-a060-2c94030301a7@habana.ai>
 
-Dear Faizal,
-
-
-Thank you for your patch.
-
-Am 01.07.24 um 12:00 schrieb Faizal Rahim:
-> AVNU testing uncovered that even when the taprio gate is closed,
-> some packets still transmit.
-
-What is AVNU? *some* would fit on the line above.
-
-> A known i225/6 hardware errata states traffic might overflow the planned
-
-Do you have an idea for that errata? Please document it. (I see you 
-added it at the end. Maybe use [1] notation for referencing it.)
-
-> QBV window. This happens because MAC maintains an internal buffer,
-> primarily for supporting half duplex retries. Therefore, when
-> the gate closes, residual MAC data in the buffer may still transmit.
+On Mon, Jul 01, 2024 at 10:46:48AM +0000, Omer Shpigelman wrote:
+> On 6/30/24 16:29, Leon Romanovsky wrote:
+> > On Fri, Jun 28, 2024 at 10:24:32AM +0000, Omer Shpigelman wrote:
+> >> On 6/19/24 13:52, Leon Romanovsky wrote:
+> >>> On Wed, Jun 19, 2024 at 09:27:54AM +0000, Omer Shpigelman wrote:
+> >>>> On 6/18/24 15:58, Leon Romanovsky wrote:
+> >>>>> On Tue, Jun 18, 2024 at 11:08:34AM +0000, Omer Shpigelman wrote:
+> >>>>>> On 6/17/24 22:04, Leon Romanovsky wrote:
+> >>>>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> >>>>>>>
+> >>>>>>> On Mon, Jun 17, 2024 at 05:43:49PM +0000, Omer Shpigelman wrote:
+> >>>>>>>> On 6/13/24 22:18, Leon Romanovsky wrote:
+> >>>>>>>>> [Some people who received this message don't often get email from leon@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> >>>>>>>>>
+> >>>>>>>>> On Thu, Jun 13, 2024 at 11:22:04AM +0300, Omer Shpigelman wrote:
+> >>>>>>>>>> Add an RDMA driver of Gaudi ASICs family for AI scaling.
+> >>>>>>>>>> The driver itself is agnostic to the ASIC in action, it operates according
+> >>>>>>>>>> to the capabilities that were passed on device initialization.
+> >>>>>>>>>> The device is initialized by the hbl_cn driver via auxiliary bus.
+> >>>>>>>>>> The driver also supports QP resource tracking and port/device HW counters.
+> >>>>>>>>>>
+> >>>>>>>>>> Signed-off-by: Omer Shpigelman <oshpigelman@habana.ai>
+> >>>>>>>>>> Co-developed-by: Abhilash K V <kvabhilash@habana.ai>
+> >>>>>>>>>> Signed-off-by: Abhilash K V <kvabhilash@habana.ai>
+> >>>>>>>>>> Co-developed-by: Andrey Agranovich <aagranovich@habana.ai>
+> >>>>>>>>>> Signed-off-by: Andrey Agranovich <aagranovich@habana.ai>
+> >>>>>>>>>> Co-developed-by: Bharat Jauhari <bjauhari@habana.ai>
+> >>>>>>>>>> Signed-off-by: Bharat Jauhari <bjauhari@habana.ai>
+> >>>>>>>>>> Co-developed-by: David Meriin <dmeriin@habana.ai>
+> >>>>>>>>>> Signed-off-by: David Meriin <dmeriin@habana.ai>
+> >>>>>>>>>> Co-developed-by: Sagiv Ozeri <sozeri@habana.ai>
+> >>>>>>>>>> Signed-off-by: Sagiv Ozeri <sozeri@habana.ai>
+> >>>>>>>>>> Co-developed-by: Zvika Yehudai <zyehudai@habana.ai>
+> >>>>>>>>>> Signed-off-by: Zvika Yehudai <zyehudai@habana.ai>
+> >>>>>>>>>
+> >>
+> >> <...>
+> >>
+> >>>> mlx5 IB driver doesn't export any symbol that is used by the core driver,
+> >>>> that's why the core driver can be loaded without the IB driver (althought
+> >>>> you'll get circular dependency if you would export).
+> >>>
+> >>> Yes, IB and ETH drivers are "users" of core driver. As RDMA maintainer,
+> >>> I'm reluctant to accept code that exports symbols from IB drivers to
+> >>> other subsystems. We have drivers/infiniband/core/ for that.
+> >>>
+> >>
+> >> We need the core driver to access the IB driver (and to the ETH driver as
+> >> well). As you wrote, we can't use exported symbols from our IB driver nor
+> >> rely on function pointers, but what about providing the core driver an ops
+> >> structure? meaning exporting a register function from the core driver that
+> >> should be called by the IB driver during auxiliary device probe.
+> >> Something like:
+> >>
+> >> int hbl_cn_register_ib_aux_dev(struct auxiliary_device *adev,
+> >> 			       struct hbl_ib_ops *ops)
+> >> {
+> >> ...
+> >> }
+> >> EXPORT_SYMBOL(hbl_cn_register_ib_aux_dev);
+> >>
+> >> That's how only the parent driver exports symbols to the son driver so the
+> >> IB driver is a "user" of the core driver and so we count on the internal
+> >> module reference counter. But we also get the ability to access the IB
+> >> driver from the core driver (to report a HW error for example).
+> > 
+> > Before you are talking about solutions, please explain in technical
+> > terms why you absolutely need to access IB from core driver and any
+> > other possible way is not possible.
+> > 
+> > Thanks
 > 
-> To mitigate this for i226, reduce the MAC's internal buffer from
-> 192 bytes to 88 bytes by modifying the RETX_CTL register value.
+> First of all, as a general assumption, everything we do today can also be
+> done with unidirectional drivers communication only. If the parent driver
+> cannot access the son driver directly, then we can have a blocking command
+> queue on the parent side that the parent driver will push to it and the
+> son driver will fetch from it, execute the command and unblock the parent.
+> That will work but it adds complexity which I'm not sure that is needed.
+> The second point is not necessarily about the direction of the
+> communication but more about generally using function pointers rather than
+> exported symbols - we have 2 flavors of functions for inter driver
+> communications: common functions and ASIC specific functions. The ASIC
+> specific functions are exposed and initialized per ASIC. If we convert
+> them to EXPORT_SYMBOLs then we expose ASIC specific functions regardless
+> of the ASIC in action.
+> Again, that will work but seems unnecessary. We can check the ASIC type
+> that was passed in each exported function and fail if a wrong ASIC type
+> was used, but it seems to me like an incorrect approach to use exported
+> symbols for ASIC specific communication. EXPORT_SYMBOLs were meant to be
+> used for driver level communication, not for utilizing device specific
+> capabilities. For that, an ops struct seems more appropriate.
+> That's why I'm suggesting to combine both exported symbols and function
+> pointers.
 
-… to the recommended 88 bytes …
+Thanks for the explanation. I understand your concerns, but I don't see
+any technical justification for the need to access IB driver from the
+core.
 
-> This follows guidelines from:
-> 
-> a) Ethernet Controller I225/I22 Spec Update Rev 2.1 Errata Item 9:
->     TSN: Packet Transmission Might Cross Qbv Window
-> b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
-> 
-> Test Steps:
-> 1. Send taprio cmd to board A
-> tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-> num_tc 4 \
-> map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-> queues 1@0 1@1 1@2 1@3 \
-> base-time 0 \
-> sched-entry S 0x07 500000 \
-> sched-entry S 0x0f 500000 \
-> flags 0x2 \
-> txtime-delay 0
-> 
-> - Note that for TC3, gate opens for 500us and close for another 500us
-> 
-> 3. Take tcpdump log on Board B
-> 
-> 4. Send udp packets via UDP tai app from Board A to Board B
-> 
-> 5. Analyze tcpdump log via wireshark log on Board B
-> - Observed that the total time from the first to the last packet
-> received during one cycle for TC3 does not exceed 500us
-
-Indent the list item by four spaces? (Also above?)
-
-> 
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-
-As you Cc’ed stable@vger.kernel.org, add a Fixes: tag?
-
-> ---
->   drivers/net/ethernet/intel/igc/igc_defines.h |  6 ++++
->   drivers/net/ethernet/intel/igc/igc_tsn.c     | 34 ++++++++++++++++++++
->   2 files changed, 40 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 5f92b3c7c3d4..511384f3ec5c 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -404,6 +404,12 @@
->   #define IGC_DTXMXPKTSZ_TSN	0x19 /* 1600 bytes of max TX DMA packet size */
->   #define IGC_DTXMXPKTSZ_DEFAULT	0x98 /* 9728-byte Jumbo frames */
->   
-> +/* Retry Buffer Control */
-> +#define IGC_RETX_CTL			0x041C
-> +#define IGC_RETX_CTL_WATERMARK_MASK	0xF
-> +#define IGC_RETX_CTL_QBVFULLTH_SHIFT	8 /* QBV Retry Buffer Full Threshold */
-> +#define IGC_RETX_CTL_QBVFULLEN	0x1000 /* Enable QBV Retry Buffer Full Threshold */
-> +
->   /* Transmit Scheduling Latency */
->   /* Latency between transmission scheduling (LaunchTime) and the time
->    * the packet is transmitted to the network in nanosecond.
-> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> index 22cefb1eeedf..c97d908cecc5 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> @@ -78,6 +78,15 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
->   	wr32(IGC_GTXOFFSET, txoffset);
->   }
->   
-> +static void igc_tsn_restore_retx_default(struct igc_adapter *adapter)
-> +{
-> +	struct igc_hw *hw = &adapter->hw;
-> +	u32 retxctl;
-> +
-> +	retxctl = rd32(IGC_RETX_CTL) & IGC_RETX_CTL_WATERMARK_MASK;
-> +	wr32(IGC_RETX_CTL, retxctl);
-> +}
-> +
->   /* Returns the TSN specific registers to their default values after
->    * the adapter is reset.
->    */
-> @@ -91,6 +100,9 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
->   	wr32(IGC_TXPBS, I225_TXPBSIZE_DEFAULT);
->   	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_DEFAULT);
->   
-> +	if (igc_is_device_id_i226(hw))
-> +		igc_tsn_restore_retx_default(adapter);
-> +
->   	tqavctrl = rd32(IGC_TQAVCTRL);
->   	tqavctrl &= ~(IGC_TQAVCTRL_TRANSMIT_MODE_TSN |
->   		      IGC_TQAVCTRL_ENHANCED_QAV | IGC_TQAVCTRL_FUTSCDDIS);
-> @@ -111,6 +123,25 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
->   	return 0;
->   }
->   
-> +/* To partially fix i226 HW errata, reduce MAC internal buffering from 192 Bytes
-> + * to 88 Bytes by setting RETX_CTL register using the recommendation from:
-> + * a) Ethernet Controller I225/I22 Specification Update Rev 2.1
-> + *    Item 9: TSN: Packet Transmission Might Cross the Qbv Window
-> + * b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
-> + */
-> +static void igc_tsn_set_retx_qbvfullth(struct igc_adapter *adapter)
-
-It’d put threshold in the name.
-
-> +{
-> +	struct igc_hw *hw = &adapter->hw;
-> +	u32 retxctl, watermark;
-> +
-> +	retxctl = rd32(IGC_RETX_CTL);
-> +	watermark = retxctl & IGC_RETX_CTL_WATERMARK_MASK;
-> +	/* Set QBVFULLTH value using watermark and set QBVFULLEN */
-> +	retxctl |= (watermark << IGC_RETX_CTL_QBVFULLTH_SHIFT) |
-> +		   IGC_RETX_CTL_QBVFULLEN;
-> +	wr32(IGC_RETX_CTL, retxctl);
-> +}
-> +
->   static int igc_tsn_enable_offload(struct igc_adapter *adapter)
->   {
->   	struct igc_hw *hw = &adapter->hw;
-> @@ -123,6 +154,9 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
->   	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
->   	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
->   
-> +	if (igc_is_device_id_i226(hw))
-> +		igc_tsn_set_retx_qbvfullth(adapter);
-> +
->   	for (i = 0; i < adapter->num_tx_queues; i++) {
->   		struct igc_ring *ring = adapter->tx_ring[i];
->   		u32 txqctl = 0;
-
-
-Kind regards,
-
-Paul
+Thanks
 
