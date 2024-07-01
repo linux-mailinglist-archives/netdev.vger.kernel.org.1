@@ -1,167 +1,128 @@
-Return-Path: <netdev+bounces-108053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939C991DAEB
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:02:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD68C91DAEF
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E15A289567
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:02:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79915B26015
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3D182D69;
-	Mon,  1 Jul 2024 09:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364C584A30;
+	Mon,  1 Jul 2024 09:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ra/k4bWf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uwFK+6Nh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15ABA7CF39;
-	Mon,  1 Jul 2024 09:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D90B757E0;
+	Mon,  1 Jul 2024 09:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719824423; cv=none; b=MzHBlFvx8+D2ylogYIs7GnHetrQ9HPSyvX61WH7fNeA8MGiFayDwbzC8Rym7jXuD3eOINW0kv0q4xrxo4zWvlnniGVvKFMksEh3XHj5IJjj7ykVbUnxOWoNhD2RKGVwsFc97hhd44jbhqS7wZxmDvK6O14MNBcGdvslBOdfCjQE=
+	t=1719824431; cv=none; b=lJzDIrqqbfJaA4yRQt2W9DUN+AZG0HbBl2zk/IYh9ud/FyvFMLIBYaF/x+Qc8nioRozY494eUiP5FH3r4Cz9G4t6V6+zupWGkK60GWbhVapy8refqvDM0zMW1OmDWrvQBvw1beUn/hMXnBm23bQQThrYvZ9J3HqJLg0ykP/QC3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719824423; c=relaxed/simple;
-	bh=xUkxAusGk9/Qw6q8jmjJR4Ku+OMgNTKRh5xehrBoSOU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KnRhuGGNzrF4iOIZKcpNRxx3J1GhliW5c2e5+E3bgnK9XO/HEFlgI8198KDAnVqyNu4+hLV9W4zhCnZw5TA6LPIBamehIkjfNsDeWgqHY8cpm2UX/neURB26NZoS1+X3RMklBxYoYlbZBGstGSFcfVRITCueNhZSpVH1Fvl4NFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ra/k4bWf; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1719824418; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=l5lmapBeZhT3E2/y8+mzkM2aHa//cBtzt7v6JkMhiec=;
-	b=Ra/k4bWfoITEwtXbynqR1KXOzhJO99GpKTlC2vM/5bOWiX8w5u7ziPsLnudf/Xo5gZvP+X2lORplhKTqiuBRksdf9P3hKfbqBjLd3Jt+Scn/EqttIx/vaigtF+rQfdNScPgqPTxM6VEOrn/2KyMF/OS409VHvITIUUKVhtrwoXM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=29;SR=0;TI=SMTPD_---0W9c7q0U_1719824406;
-Received: from 30.221.145.205(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W9c7q0U_1719824406)
-          by smtp.aliyun-inc.com;
-          Mon, 01 Jul 2024 17:00:13 +0800
-Message-ID: <70d94a71-2654-4647-97f3-1017adee1fd4@linux.alibaba.com>
-Date: Mon, 1 Jul 2024 17:00:05 +0800
+	s=arc-20240116; t=1719824431; c=relaxed/simple;
+	bh=2lsvwq81FQ+ZKQLJ9E0WAkmayhyWfEr2c81SPuxNFLc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LSnendDrWso2IXg9w7Z8AJnVLWmmpV82Y6E1dXNR9oGRGgc7DLsa+X9OhefsQknfepwM+o/liWo73UrbczhR7WQVONgdhquggUev7JpBE3WPgS3sx/m2qDNkmzoNXPLkvJoICthDLGb88uGlwF40UM2QVqBd4YbvHDGwUZihYGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uwFK+6Nh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CFCC6C4AF0E;
+	Mon,  1 Jul 2024 09:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719824430;
+	bh=2lsvwq81FQ+ZKQLJ9E0WAkmayhyWfEr2c81SPuxNFLc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uwFK+6NhzKBugUg7E2KfvsbSwWbXxFi7Ih+j6fazMk1+VhqnTp8imKreuB6kW0wiP
+	 D7SZfv6vi7BLmFkmXA392ZMWJSkAvkWgiDxTgHJw4VIkT8lV0Gu+zVo5L5Ne/91dGK
+	 uXL/YsT8QHgXEzi/LFiAjyRWn2CHmKBjhgY+SJYsMshO5jX521+s2NwOwurmwvUGKF
+	 Pl2lReqKzN/eeCkg1LdBl87lZVUt3XkhWi5lXbu3nvDi6enwM9dScM9jpfjJ/kjrlO
+	 Pk3l9kTMvfIFj8gAbkbwWXhQ4vsAHunH351o/AASug6S5B1bFxh+7CHILzqbsaCYqw
+	 TiJl0vvR8dv3A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BEC4BDE8E15;
+	Mon,  1 Jul 2024 09:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 2/2] skmsg: bugfix for sk_msg sge iteration
-To: Geliang Tang <geliang@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>, David Ahern <dsahern@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Mykyta Yatsenko <yatsenko@meta.com>, Miao Xu <miaxu@meta.com>,
- Yuran Pereira <yuran.pereira@hotmail.com>,
- Huacai Chen <chenhuacai@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <cover.1719553101.git.tanggeliang@kylinos.cn>
- <56d8ec28df901432e7bde4953795166ce2edd472.1719553101.git.tanggeliang@kylinos.cn>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <56d8ec28df901432e7bde4953795166ce2edd472.1719553101.git.tanggeliang@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 01/17] netfilter: nf_tables: make struct nft_trans
+ first member of derived subtypes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171982443077.24948.16419049555710785067.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Jul 2024 09:00:30 +0000
+References: <20240628160505.161283-2-pablo@netfilter.org>
+In-Reply-To: <20240628160505.161283-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-On 6/28/24 1:47 PM, Geliang Tang wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
->
-> Every time run this BPF selftests (./test_sockmap) on a Loongarch platform,
-> a Kernel panic occurs:
->
-> '''
->   Oops[#1]:
->   CPU: 20 PID: 23245 Comm: test_sockmap Tainted: G     OE 6.10.0-rc2+ #32
->   Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK2018
->   ... ...
->      ra: 90000000043a315c tcp_bpf_sendmsg+0x23c/0x420
->     ERA: 900000000426cd1c sk_msg_memcopy_from_iter+0xbc/0x220
->    CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=CC DACM=CC -WE)
->    PRMD: 0000000c (PPLV0 +PIE +PWE)
->    EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
->    ECFG: 00071c1d (LIE=0,2-4,10-12 VS=7)
->   ESTAT: 00010000 [PIL] (IS= ECode=1 EsubCode=0)
->    BADV: 0000000000000040
->    PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
->   Modules linked in: tls xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT
->   Process test_sockmap (pid: 23245, threadinfo=00000000aeb68043, task=...)
->   Stack : ... ...
->           ...
->   Call Trace:
->   [<900000000426cd1c>] sk_msg_memcopy_from_iter+0xbc/0x220
->   [<90000000043a315c>] tcp_bpf_sendmsg+0x23c/0x420
->   [<90000000041cafc8>] __sock_sendmsg+0x68/0xe0
->   [<90000000041cc4bc>] ____sys_sendmsg+0x2bc/0x360
->   [<90000000041cea18>] ___sys_sendmsg+0xb8/0x120
->   [<90000000041cf1f8>] __sys_sendmsg+0x98/0x100
->   [<90000000045b76ec>] do_syscall+0x8c/0xc0
->   [<90000000030e1da4>] handle_syscall+0xc4/0x160
->
->   Code: ...
->
->   ---[ end trace 0000000000000000 ]---
-> '''
->
-> This crash is because a NULL pointer is passed to page_address() in
-> sk_msg_memcopy_from_iter(). Due to the difference in architecture,
-> page_address(0) will not trigger a panic on the X86 platform but will panic
-> on the Loogarch platform. So this bug was hidden on the x86 platform, but
-> now it is exposed on the Loogarch platform.
->
-> This bug is a logic error indeed. In sk_msg_memcopy_from_iter(), an invalid
-> "sge" is always used:
->
-> 	if (msg->sg.copybreak >= sge->length) {
-> 		msg->sg.copybreak = 0;
-> 		sk_msg_iter_var_next(i);
-> 		if (i == msg->sg.end)
-> 			break;
-> 		sge = sk_msg_elem(msg, i);
-> 	}
->
-> If the value of i is 2, msg->sg.end is also 2 when entering this if block.
-> sk_msg_iter_var_next() increases i by 1, and now i is 3, which is no longer
-> equal to msg->sg.end. The break will not be triggered, and the next sge
-> obtained by sk_msg_elem(3) will be an invalid one.
->
-> The correct approach is to check (i == msg->sg.end) first, and then invoke
-> sk_msg_iter_var_next() if they are not equal.
->
-> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> ---
->   net/core/skmsg.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index 44952cdd1425..1906d0d0eeac 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -378,9 +378,9 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
->   		/* This is possible if a trim operation shrunk the buffer */
->   		if (msg->sg.copybreak >= sge->length) {
->   			msg->sg.copybreak = 0;
-> -			sk_msg_iter_var_next(i);
->   			if (i == msg->sg.end)
->   				break;
-> +			sk_msg_iter_var_next(i);
-Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
->   			sge = sk_msg_elem(msg, i);
->   		}
->   
+On Fri, 28 Jun 2024 18:04:49 +0200 you wrote:
+> From: Florian Westphal <fw@strlen.de>
+> 
+> There is 'struct nft_trans', the basic structure for all transactional
+> objects, and the the various different transactional objects, such as
+> nft_trans_table, chain, set, set_elem and so on.
+> 
+> Right now 'struct nft_trans' uses a flexible member at the tail
+> (data[]), and casting is needed to access the actual type-specific
+> members.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/17] netfilter: nf_tables: make struct nft_trans first member of derived subtypes
+    https://git.kernel.org/netdev/net-next/c/605efd54b504
+  - [net-next,02/17] netfilter: nf_tables: move bind list_head into relevant subtypes
+    https://git.kernel.org/netdev/net-next/c/17d8f3ad36a5
+  - [net-next,03/17] netfilter: nf_tables: compact chain+ft transaction objects
+    https://git.kernel.org/netdev/net-next/c/b3f4c216f7af
+  - [net-next,04/17] netfilter: nf_tables: reduce trans->ctx.table references
+    https://git.kernel.org/netdev/net-next/c/06fcaca2ed1f
+  - [net-next,05/17] netfilter: nf_tables: pass nft_chain to destroy function, not nft_ctx
+    https://git.kernel.org/netdev/net-next/c/8965d42bcf54
+  - [net-next,06/17] netfilter: nf_tables: pass more specific nft_trans_chain where possible
+    https://git.kernel.org/netdev/net-next/c/0c2e0ee861de
+  - [net-next,07/17] netfilter: nf_tables: avoid usage of embedded nft_ctx
+    https://git.kernel.org/netdev/net-next/c/d4f6f3994e13
+  - [net-next,08/17] netfilter: nf_tables: store chain pointer in rule transaction
+    https://git.kernel.org/netdev/net-next/c/13f20bc9ec4f
+  - [net-next,09/17] netfilter: nf_tables: reduce trans->ctx.chain references
+    https://git.kernel.org/netdev/net-next/c/551b3886401c
+  - [net-next,10/17] netfilter: nf_tables: pass nft_table to destroy function
+    https://git.kernel.org/netdev/net-next/c/0be908750162
+  - [net-next,11/17] netfilter: nf_tables: do not store nft_ctx in transaction objects
+    https://git.kernel.org/netdev/net-next/c/e169285f8c56
+  - [net-next,12/17] ipvs: Avoid unnecessary calls to skb_is_gso_sctp
+    https://git.kernel.org/netdev/net-next/c/53796b03295c
+  - [net-next,13/17] netfilter: nf_conncount: fix wrong variable type
+    https://git.kernel.org/netdev/net-next/c/0b88d1654d55
+  - [net-next,14/17] netfilter: cttimeout: remove 'l3num' attr check
+    https://git.kernel.org/netdev/net-next/c/fe87a8deaad4
+  - [net-next,15/17] netfilter: nf_tables: rise cap on SELinux secmark context
+    https://git.kernel.org/netdev/net-next/c/e29630247be2
+  - [net-next,16/17] selftests: netfilter: nft_queue.sh: add test for disappearing listener
+    https://git.kernel.org/netdev/net-next/c/742ad979f500
+  - [net-next,17/17] netfilter: xt_recent: Lift restrictions on max hitcount value
+    https://git.kernel.org/netdev/net-next/c/f4ebd03496f6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
