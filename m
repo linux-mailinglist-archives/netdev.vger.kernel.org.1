@@ -1,184 +1,107 @@
-Return-Path: <netdev+bounces-108035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A0091DA0D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:34:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2915C91DA22
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E69E2834B4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:34:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB5911F21F10
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D147883CD2;
-	Mon,  1 Jul 2024 08:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0788289C;
+	Mon,  1 Jul 2024 08:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WhGL5lSx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toe1Vs5Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B563824AF;
-	Mon,  1 Jul 2024 08:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF80824BD;
+	Mon,  1 Jul 2024 08:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719822880; cv=none; b=ucEUeKFOUZd3dwOWbdX6tTf5ovDQrsAFRMflXsmqpAg1MNRUobhLfl0slGqzAS/BN7jl1jiDKMt6fq1m0mA2eSGZyQ0eP4t6VARAgkLon4m0MhwnH/hAuFwwdmYfKOhpNp85/ZJZG7j4qkexibXkBPX7N/IbEJdCMsBQR9YwkHg=
+	t=1719823231; cv=none; b=AeQvjWoCwegI1DMOEwl4QYBaOsp2fPOz9xj+2aPRZ2MW5n9xNoYyUq+RWZrdq1YZUhJhhipBKg63d5I/I3Qz7vUbL4SzoelbPTHaRXfuWxG5ATjqDxxq4qmgNm8jQ1XeCc2Z4UIizNaClBKhe69GF7aJlAd++K+hzObE1r27GwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719822880; c=relaxed/simple;
-	bh=C/QQObNSrRFu1AlLgCOhHSs6K370gxPgRoUUusgyv9c=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=AQmUaIcbHLYAlfGhkoWZM2lCju/xaCsuuOVjqLlWFAAM5IWDmtUBZA2Y3ZOo8akMHAONVEv43FdHnlgdyTibQW2mg4FlVSsgwxqXXaQJ7e8UjDWGz+TwNjrj67A3qOeRUs/wQf/Z/IpCON1VQ6wrzVTWnm3crIHXnojgmSwaGRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WhGL5lSx; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1719822870; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=cRxQlpP3W38cpYFo3zUi1MSuJXJaetK/a8wQs27sTp0=;
-	b=WhGL5lSx/xpvhOVqaewsxarzrkJP/rIfDDn4fIAuRm8SyAKvXoQOFCRI4aasu8YKHC2+HzePH6Ksv1clZ5f3O/OqI+wqu3aBj/V70LYLYIO2db91fF4keuorbl7tFQa6QaaEuJMR5aYEF16dJ1S4IDbTJQsjglzECrbSt2Ujemg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W9c.kOb_1719822869;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W9c.kOb_1719822869)
-          by smtp.aliyun-inc.com;
-          Mon, 01 Jul 2024 16:34:29 +0800
-Message-ID: <1719822850.714056-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 07/10] virtio_net: xsk: rx: support fill with xsk buffer
-Date: Mon, 1 Jul 2024 16:34:10 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240618075643.24867-1-xuanzhuo@linux.alibaba.com>
- <20240618075643.24867-8-xuanzhuo@linux.alibaba.com>
- <CACGkMEta9o97cqUy+wV=1Xpu8MBoFt4CEtWS35dhTMs0Dm4AKg@mail.gmail.com>
- <1719553356.2373846-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEtMSXumzmziWoMagEf-vA+j84oCJWMGAh0vGtmU_QupyA@mail.gmail.com>
-In-Reply-To: <CACGkMEtMSXumzmziWoMagEf-vA+j84oCJWMGAh0vGtmU_QupyA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1719823231; c=relaxed/simple;
+	bh=Nr/twGdzhXXrzSzFlfX47IKIyf4UBq+m51p5pippI5Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uFdfmKGl7hIrYB2Tzb7JfUlRGA1GA7EVzetIgwVNt7sRfwl5HPHiFY34NZbRhXluPVVygGGFt+cyAwhq38z/6YgL6bDDde5yqQZYIjIjYXXwktdRqz/teKZPOqcSfSseREJ/If9hpdTv0KASKS8h7ZGwXafSMOEhdLrGkN1knfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toe1Vs5Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67775C4AF0E;
+	Mon,  1 Jul 2024 08:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719823231;
+	bh=Nr/twGdzhXXrzSzFlfX47IKIyf4UBq+m51p5pippI5Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=toe1Vs5Q3uZo2G1uEFO1DCxMXbConGUPCiTapQWVZ32tGOUJf4QXMkdJWB5M4o2Ux
+	 +Wq2oiPoEjrnkBXkpAjySbxs2ZNj8im5c6FQCybd6UzqR26uYbWZYcUuhXT/gfc8ZP
+	 tmAVmb21fgjpM9pJzJSVJQZNYJ2htzP0OIWqJll2jMkpXbMRUMgZZ6+iOJSHzRAfhU
+	 N2nx8MW/oTSXVSiopeAXgYPTjtbj7S+stwUEg0ud6yENj0a0znViRYUnTpe/YNqOyc
+	 VnA2mqbnbN6Qnn+irc28UccMtaXzUlli+1GlnM27b9QTWQfwhUSAkI2u82U+/lFdTW
+	 C31BpAM8ESgoA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 59830DE8E15;
+	Mon,  1 Jul 2024 08:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next,PATCH v2] net: phy: realtek: Add support for PHY LEDs on
+ RTL8211F
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171982323136.11370.13410351217992324019.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Jul 2024 08:40:31 +0000
+References: <20240625204221.265139-1-marex@denx.de>
+In-Reply-To: <20240625204221.265139-1-marex@denx.de>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, andrew@lunn.ch,
+ christophe.roullier@foss.st.com, davem@davemloft.net, edumazet@google.com,
+ hkallweit1@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+ linux@armlinux.org.uk, kernel@dh-electronics.com,
+ linux-kernel@vger.kernel.org
 
-On Mon, 1 Jul 2024 11:05:33 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Fri, Jun 28, 2024 at 1:44=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Fri, 28 Jun 2024 10:19:37 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Tue, Jun 18, 2024 at 3:57=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > Implement the logic of filling rq with XSK buffers.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 68 ++++++++++++++++++++++++++++++++++++=
-++--
-> > > >  1 file changed, 66 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 2bbc715f22c6..2ac5668a94ce 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -355,6 +355,8 @@ struct receive_queue {
-> > > >
-> > > >                 /* xdp rxq used by xsk */
-> > > >                 struct xdp_rxq_info xdp_rxq;
-> > > > +
-> > > > +               struct xdp_buff **xsk_buffs;
-> > > >         } xsk;
-> > > >  };
-> > > >
-> > > > @@ -1032,6 +1034,53 @@ static void check_sq_full_and_disable(struct=
- virtnet_info *vi,
-> > > >         }
-> > > >  }
-> > > >
-> > > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u=
-32 len)
-> > > > +{
-> > > > +       sg->dma_address =3D addr;
-> > > > +       sg->length =3D len;
-> > > > +}
-> > > > +
-> > > > +static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct=
- receive_queue *rq,
-> > > > +                                  struct xsk_buff_pool *pool, gfp_=
-t gfp)
-> > > > +{
-> > > > +       struct xdp_buff **xsk_buffs;
-> > > > +       dma_addr_t addr;
-> > > > +       u32 len, i;
-> > > > +       int err =3D 0;
-> > > > +       int num;
-> > > > +
-> > > > +       xsk_buffs =3D rq->xsk.xsk_buffs;
-> > > > +
-> > > > +       num =3D xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_f=
-ree);
-> > > > +       if (!num)
-> > > > +               return -ENOMEM;
-> > > > +
-> > > > +       len =3D xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
-> > > > +
-> > > > +       for (i =3D 0; i < num; ++i) {
-> > > > +               /* use the part of XDP_PACKET_HEADROOM as the virtn=
-et hdr space */
-> > > > +               addr =3D xsk_buff_xdp_get_dma(xsk_buffs[i]) - vi->h=
-dr_len;
-> > >
-> > > We had VIRTIO_XDP_HEADROOM, can we reuse it? Or if it's redundant
-> > > let's send a patch to switch to XDP_PACKET_HEADROOM.
-> >
-> > Do you mean replace it inside the comment?
->
-> I meant a patch to s/VIRTIO_XDP_HEADROOM/XDP_PACKET_HEADROOM/g.
+Hello:
 
-I see.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 25 Jun 2024 22:42:17 +0200 you wrote:
+> Realtek RTL8211F Ethernet PHY supports 3 LED pins which are used to
+> indicate link status and activity. Add minimal LED controller driver
+> supporting the most common uses with the 'netdev' trigger.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
+> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Christophe Roullier <christophe.roullier@foss.st.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: kernel@dh-electronics.com
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2] net: phy: realtek: Add support for PHY LEDs on RTL8211F
+    https://git.kernel.org/netdev/net-next/c/17784801d888
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->
-> >
-> > I want to describe use the headroom of xsk, the size of the headroom is
-> > XDP_PACKET_HEADROOM.
-> >
-> > >
-> > > Btw, the code assumes vi->hdr_len < xsk_pool_get_headroom(). It's
-> > > better to fail if it's not true when enabling xsk.
-> >
-> > It is ok.
->
-> I mean do we need a check to fail xsk binding if vi->hdr_len >
-> xsk_pool_get_headroom() or it has been guaranteed by the code already.
-
-YES.
-
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> >
->
 
