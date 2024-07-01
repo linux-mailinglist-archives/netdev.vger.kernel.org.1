@@ -1,176 +1,251 @@
-Return-Path: <netdev+bounces-108296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A599591EB4C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:19:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A186D91EB55
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 914181C21404
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:19:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B3E31F222EB
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946061448E1;
-	Mon,  1 Jul 2024 23:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402D4171653;
+	Mon,  1 Jul 2024 23:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l27lbFKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E776F80026
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 23:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A005E38DD9;
+	Mon,  1 Jul 2024 23:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719875964; cv=none; b=tGIUc8uViKFe4AcybC86Y0YMABUlxRQKslJMt3WpREAaZ1YlwLYF9xkYd9u3hNpKr6EBrqubWbkiSiK7OePWwh2Ofo23bmKjSbHFNPzdhZNGVXu/Y7f1xGj5WIvzBNrOJSF+lGPDBf2GV+RoIauTxhc9FugFrPbXCVPu8GrEQUI=
+	t=1719876473; cv=none; b=lbc0Lcf84tS3lDWPssdX+vEGofcX1jhbMabbrsO7WK9xgunu1aJHZgBvaYridjNFNeSC+eY/ootuXBMLyjuaTAXOIzfW3sB26bQBInk32RSNZDm5ymx0HzXn7fXQORep4i7O3QS9S3JKuf44MzT8tfrU+hnb5Rbp7WwEVvbRJjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719875964; c=relaxed/simple;
-	bh=Nn4wl21piTV59fKP9uWtPQ4iQsG/oANAJVXF/KxzmT0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=OVuvcpV9ERfMUBsES4jqrg9N3OdQuoCPow0gZitrAroib7FXw49861/9vmggE3fPIuV9wQReaK2LJwiFfHfQcjMUzGlGpb0ErRtvknRF83Pj0lQ+8XBKHolieC8hHQApZ+bC82wdTls2RyXZF7H9TzUMQL0dcIOfUEWJj9+JVzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7f6200ad270so378135639f.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 16:19:22 -0700 (PDT)
+	s=arc-20240116; t=1719876473; c=relaxed/simple;
+	bh=SDGeeG5xkcsfZjbvgbd+7gf77Au1j8CYikgZAZsXgyA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=K1ZghA0n9c1jF+RPWOlLqYq01JaScRYM1PssLMYilgDLGx7dFAUssF5dW3PTeIiEp/e3adisITMlmO8YNzKojcEuYM8L+J+Z7E5ZtKqevC9sQuzbijhR0GFcdLNwgDwZZCofiQ8kUZwO9AXM8RwNobmbBAjGRtis8eFo4meAB7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l27lbFKO; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3d56285aa18so1563062b6e.2;
+        Mon, 01 Jul 2024 16:27:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719876470; x=1720481270; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=76/gZ390qF9o/E7hcl7yvTWNr8WqJpJYNL9n9m4Vg/I=;
+        b=l27lbFKO6vDU/3pM8drzoK3/FV4saTeFNIquYrZXgzoYZoxbXF+GFlIVfiW5UAX7Ij
+         +gy7NoYx+j/oaqEe69F4QhOJiq5Fm/WMOe7jWO/J4jCzQekVcGjBm9uc08i04wusRQ3T
+         vTdY003e30CwO/oH2QaWU5dU2+gARKLhcaWbkz/opTpLqNjluEYwomouhE2sCkErYLio
+         Y/YhF+ZLqY5kUU+kOXVxVCMmyg9061vV6g5aMeYtp8KOuVltsEnf8qrPE/CUvEse7UGK
+         O14ebP5QKCcC2IVwHFkf9Z6QIhLRPSDXLyzy0eWJUjHhqJuayJ6USD3RkrRj+Kew3eiq
+         rntQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719875962; x=1720480762;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HrcRx6Tfxw+w89glV2DY2z2LYuzg69csFaa4GorFmY=;
-        b=MfmqLHHpgVdLb63hHztuPGC9p584YySQqgNw+Cvr40pn6X8Zkoo4vBIhOHEQc9575g
-         PgZ1Yv3PhM9DE7dx6M90HJecnDZZCEIXdiEI+hiG6Xl8Mw9w/taYGPnJjjX72OgrrCSG
-         qgKfKEzMdObJ6OHc2YnsqZRYJreUXlkH7QZtdFtAKKjlLFWbzb43qrZKmXxYQFG3Moj5
-         RJRsmGMc7BQsCqKrZRl4w5PChDmsENkMllLeI/66oI+23NbBzI6XYpPiz5jWZ/fjPpKD
-         aqzpwTFQmc3Ww4W2Cn0rEq2Zl+IlEWvtedLoxRH66V4sprwdPhs4p/VDte6Kk+8vtw8S
-         xh5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXP8DaXbNT+mky0Stp/6f5MD7EPIU9YjA6BBwDvYTuYx49LYrCw6+SxVX8emRnUZ4QstL+5JyO0pQJqgAT8qWT1qp/obhmG
-X-Gm-Message-State: AOJu0YxVLt46DieolW/fNgBrqd0MCJ+iQ/MRAWsWtW36jagediwc8s7b
-	BeeldvY4l09SFY0EN/cTzlLRWUcA1MZDZMjhPGLkjhTCF/FTS572M6fPFt7dDMuii0BjWAfWiHz
-	e8oF+BHMtyNwgF732NKZzFoeE2DCcHkP0xZHjsQPxFthzdNcjBx5cZsM=
-X-Google-Smtp-Source: AGHT+IFMleHcpokVPEguHmLGUq7veZ3YQSKLoTnvViBGu5hzLtbkptK5cnD3JxYOBu0eOk7CgW3QvHliAlCWxumW3aV/+f/0sATZ
+        d=1e100.net; s=20230601; t=1719876470; x=1720481270;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=76/gZ390qF9o/E7hcl7yvTWNr8WqJpJYNL9n9m4Vg/I=;
+        b=qb6njEYlGzUZrpwrQJc5QfJwMxll23TUw26WWEgu6Zvqzu9T10gqECT3p7U8p1JSnP
+         At1RfPr5aMzCc2tCFN8L7mEiy44au0OOW2BAmY+gLd/E+Adj7S3sk+vSiEyf78xd6QRc
+         ZlB9G+Zt5ODYK+vRCqQmkkKi3S4I48aDSaEL7DzQXjVv3H/Fd1Dm3gxzi0xVxXIlW5ir
+         t1IPOYH9u0QUxFTNDUpDSze99kDP43Lpx97ULdkzIfsHVI30zWui2FtPWY9etGTZluLz
+         UbSlwCDth7/xawK5zbxDnkWWgumcYnLYWzhrIQkAmoZQQBn9vqPJU/4AgV9mEVrNQsRA
+         tDDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLdJZU02mNE3ZP7IKeYwgxHsS6Iuyf/+66S6kMdq6CpJfxYVYJJ+bUcbpKnRW4L+4F6EHdykxxGFYBjCf+eN2FeaeYLwuXjwAbGQCc
+X-Gm-Message-State: AOJu0Yz64Ih+1jyhhBiqZIb0jnv90kX4wqh4xiH/S5RQDbHrrIT+Wa6a
+	Qs//P+yva5q68+Df19/tO4cE9J5vqZ5F/juEAQEpTYJ7gpR1Y602
+X-Google-Smtp-Source: AGHT+IFTas9QKVB5IeQv8pE6F/a4Mr2QBk6CLEqmOgnBodeX1KGm0+fpKOchpheX1cTy9E2wDqqg7g==
+X-Received: by 2002:a05:6808:f8d:b0:3d6:32b4:b8fa with SMTP id 5614622812f47-3d6b30f45cemr9299758b6e.13.1719876470469;
+        Mon, 01 Jul 2024 16:27:50 -0700 (PDT)
+Received: from [192.168.0.128] ([98.97.103.43])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-70802567926sm7120203b3a.54.2024.07.01.16.27.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 16:27:49 -0700 (PDT)
+Message-ID: <8e80507c685be94256e0e457ee97622c4487716c.camel@gmail.com>
+Subject: Re: [PATCH net-next v9 03/13] mm: page_frag: use initial zero
+ offset for page_frag_alloc_align()
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Mon, 01 Jul 2024 16:27:48 -0700
+In-Reply-To: <20240625135216.47007-4-linyunsheng@huawei.com>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+	 <20240625135216.47007-4-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:130e:b0:4b0:b123:d9d with SMTP id
- 8926c6da1cb9f-4bbb70abb58mr685984173.5.1719875962131; Mon, 01 Jul 2024
- 16:19:22 -0700 (PDT)
-Date: Mon, 01 Jul 2024 16:19:22 -0700
-In-Reply-To: <0000000000008f77c2061c357383@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c7ee4c061c37d314@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] stack segment fault in bpf_xdp_redirect
-From: syzbot <syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot has found a reproducer for the following issue on:
+On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
+> We are above to use page_frag_alloc_*() API to not just
+"about to use", not "above to use"
 
-HEAD commit:    1c5fc27bc48a Merge tag 'nf-next-24-06-28' of git://git.ker..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14aeab3e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
-dashboard link: https://syzkaller.appspot.com/bug?extid=5ae46b237278e2369cac
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1673738e980000
+> allocate memory for skb->data, but also use them to do
+> the memory allocation for skb frag too. Currently the
+> implementation of page_frag in mm subsystem is running
+> the offset as a countdown rather than count-up value,
+> there may have several advantages to that as mentioned
+> in [1], but it may have some disadvantages, for example,
+> it may disable skb frag coaleasing and more correct cache
+> prefetching
+>=20
+> We have a trade-off to make in order to have a unified
+> implementation and API for page_frag, so use a initial zero
+> offset in this patch, and the following patch will try to
+> make some optimization to aovid the disadvantages as much
+> as possible.
+>=20
+> As offsets is added due to alignment requirement before
+> actually checking if the cache is enough, which might make
+> it exploitable if caller passes a align value bigger than
+> 32K mistakenly. As we are allowing order 3 page allocation
+> to fail easily under low memory condition, align value bigger
+> than PAGE_SIZE is not really allowed, so add a 'align >
+> PAGE_SIZE' checking in page_frag_alloc_va_align() to catch
+> that.
+>=20
+> 1. https://lore.kernel.org/all/f4abe71b3439b39d17a6fb2d410180f367cadf5c.c=
+amel@gmail.com/
+>=20
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/linux/page_frag_cache.h |  2 +-
+>  include/linux/skbuff.h          |  4 ++--
+>  mm/page_frag_cache.c            | 26 +++++++++++---------------
+>  3 files changed, 14 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> index 3a44bfc99750..b9411f0db25a 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -32,7 +32,7 @@ static inline void *page_frag_alloc_align(struct page_f=
+rag_cache *nc,
+>  					  unsigned int fragsz, gfp_t gfp_mask,
+>  					  unsigned int align)
+>  {
+> -	WARN_ON_ONCE(!is_power_of_2(align));
+> +	WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
+>  	return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
+>  }
+> =20
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index eb8ae8292c48..d1fea23ec386 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -3320,7 +3320,7 @@ static inline void *netdev_alloc_frag(unsigned int =
+fragsz)
+>  static inline void *netdev_alloc_frag_align(unsigned int fragsz,
+>  					    unsigned int align)
+>  {
+> -	WARN_ON_ONCE(!is_power_of_2(align));
+> +	WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
+>  	return __netdev_alloc_frag_align(fragsz, -align);
+>  }
+> =20
+> @@ -3391,7 +3391,7 @@ static inline void *napi_alloc_frag(unsigned int fr=
+agsz)
+>  static inline void *napi_alloc_frag_align(unsigned int fragsz,
+>  					  unsigned int align)
+>  {
+> -	WARN_ON_ONCE(!is_power_of_2(align));
+> +	WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
+>  	return __napi_alloc_frag_align(fragsz, -align);
+>  }
+> =20
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index 88f567ef0e29..da244851b8a4 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -72,10 +72,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *=
+nc,
+>  		if (!page)
+>  			return NULL;
+> =20
+> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -		/* if size can vary use size else just use PAGE_SIZE */
+> -		size =3D nc->size;
+> -#endif
+>  		/* Even if we own the page, we do not use atomic_set().
+>  		 * This would break get_page_unless_zero() users.
+>  		 */
+> @@ -84,11 +80,16 @@ void *__page_frag_alloc_align(struct page_frag_cache =
+*nc,
+>  		/* reset page count bias and offset to start of new frag */
+>  		nc->pfmemalloc =3D page_is_pfmemalloc(page);
+>  		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		nc->offset =3D size;
+> +		nc->offset =3D 0;
+>  	}
+> =20
+> -	offset =3D nc->offset - fragsz;
+> -	if (unlikely(offset < 0)) {
+> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> +	/* if size can vary use size else just use PAGE_SIZE */
+> +	size =3D nc->size;
+> +#endif
+> +
+> +	offset =3D __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
+> +	if (unlikely(offset + fragsz > size)) {
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9672225af907/disk-1c5fc27b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0f14d163a914/vmlinux-1c5fc27b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ec6c331e6a6e/bzImage-1c5fc27b.xz
+The fragsz check below could be moved to here.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
+>  		page =3D virt_to_page(nc->va);
+> =20
+>  		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+> @@ -99,17 +100,13 @@ void *__page_frag_alloc_align(struct page_frag_cache=
+ *nc,
+>  			goto refill;
+>  		}
+> =20
+> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -		/* if size can vary use size else just use PAGE_SIZE */
+> -		size =3D nc->size;
+> -#endif
+>  		/* OK, page count is 0, we can safely set it */
+>  		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+> =20
+>  		/* reset page count bias and offset to start of new frag */
+>  		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		offset =3D size - fragsz;
+> -		if (unlikely(offset < 0)) {
+> +		offset =3D 0;
+> +		if (unlikely(fragsz > PAGE_SIZE)) {
 
-Oops: stack segment: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 PID: 14042 Comm: syz.0.2930 Not tainted 6.10.0-rc5-syzkaller-01137-g1c5fc27bc48a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
-RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
-Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
-RSP: 0018:ffffc9000aaf7970 EFLAGS: 00010202
-RAX: 1ffff1100536be41 RBX: 0000000000000000 RCX: ffff888029b5da00
-RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000aaf7af0
-RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
-R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
-R13: dffffc0000000000 R14: ffffc90009f63048 R15: 000000000000a020
-FS:  00007f2c699ff6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa0bea356dd CR3: 000000007a9bc000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_prog_bc55b47b7a2429cd+0x1d/0x1f
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run_xdp include/net/xdp.h:514 [inline]
- tun_build_skb drivers/net/tun.c:1711 [inline]
- tun_get_user+0x3321/0x4560 drivers/net/tun.c:1819
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f2c69f7471f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
-RSP: 002b:00007f2c699ff010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f2c6a103fa0 RCX: 00007f2c69f7471f
-RDX: 0000000000000032 RSI: 0000000020001500 RDI: 00000000000000c8
-RBP: 00007f2c69ff677e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000032 R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f2c6a103fa0 R15: 00007ffd4d9d6998
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
-RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
-Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
-RSP: 0018:ffffc9000aaf7970 EFLAGS: 00010202
-RAX: 1ffff1100536be41 RBX: 0000000000000000 RCX: ffff888029b5da00
-RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000aaf7af0
-RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
-R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
-R13: dffffc0000000000 R14: ffffc90009f63048 R15: 000000000000a020
-FS:  00007f2c699ff6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa0bea356dd CR3: 000000007a9bc000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	81 c3 08 18 00 00    	add    $0x1808,%ebx
-   6:	48 89 d8             	mov    %rbx,%rax
-   9:	48 c1 e8 03          	shr    $0x3,%rax
-   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  12:	74 08                	je     0x1c
-  14:	48 89 df             	mov    %rbx,%rdi
-  17:	e8 55 1a 99 f8       	call   0xf8991a71
-  1c:	48 8b 1b             	mov    (%rbx),%rbx
-  1f:	4c 8d 63 38          	lea    0x38(%rbx),%r12
-  23:	4c 89 e5             	mov    %r12,%rbp
-  26:	48 c1 ed 03          	shr    $0x3,%rbp
-* 2a:	42 0f b6 44 2d 00    	movzbl 0x0(%rbp,%r13,1),%eax <-- trapping instruction
-  30:	84 c0                	test   %al,%al
-  32:	0f 85 d0 00 00 00    	jne    0x108
-  38:	45 8b 34 24          	mov    (%r12),%r14d
-  3c:	44 89 f6             	mov    %r14d,%esi
-  3f:	83                   	.byte 0x83
+Since we aren't taking advantage of the flag that is left after the
+subtraction we might just want to look at moving this piece up to just
+after the offset + fragsz check. That should prevent us from trying to
+refill if we have a request that is larger than a single page. In
+addition we could probably just drop the 3 PAGE_SIZE checks above as
+they would be redundant.
 
+>  			/*
+>  			 * The caller is trying to allocate a fragment
+>  			 * with fragsz > PAGE_SIZE but the cache isn't big
+> @@ -124,8 +121,7 @@ void *__page_frag_alloc_align(struct page_frag_cache =
+*nc,
+>  	}
+> =20
+>  	nc->pagecnt_bias--;
+> -	offset &=3D align_mask;
+> -	nc->offset =3D offset;
+> +	nc->offset =3D offset + fragsz;
+> =20
+>  	return nc->va + offset;
+>  }
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
