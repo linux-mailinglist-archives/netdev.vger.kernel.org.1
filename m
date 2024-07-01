@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-108054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD68C91DAEF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:02:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DB191DB1E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79915B26015
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:02:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D511C2182D
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364C584A30;
-	Mon,  1 Jul 2024 09:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A7513F439;
+	Mon,  1 Jul 2024 09:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uwFK+6Nh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CFPTWS0I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D90B757E0;
-	Mon,  1 Jul 2024 09:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C180A13AD04
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 09:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719824431; cv=none; b=lJzDIrqqbfJaA4yRQt2W9DUN+AZG0HbBl2zk/IYh9ud/FyvFMLIBYaF/x+Qc8nioRozY494eUiP5FH3r4Cz9G4t6V6+zupWGkK60GWbhVapy8refqvDM0zMW1OmDWrvQBvw1beUn/hMXnBm23bQQThrYvZ9J3HqJLg0ykP/QC3k=
+	t=1719824906; cv=none; b=QBy3xCq5NpAiINsBGC5vNxbrMaX6VVLu7E52C5C2rO0TtPJvLJyuP0xfFSNP18cUemdmoU6ClvmhP9V2ON309IkwjjVvTVEWXIUk7n2t269DP9+1DCpNMOpWS6s/KyDxrX2iWqpQx5zepowo9M+35lW9U7QoA+bdexvJhNu2rUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719824431; c=relaxed/simple;
-	bh=2lsvwq81FQ+ZKQLJ9E0WAkmayhyWfEr2c81SPuxNFLc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LSnendDrWso2IXg9w7Z8AJnVLWmmpV82Y6E1dXNR9oGRGgc7DLsa+X9OhefsQknfepwM+o/liWo73UrbczhR7WQVONgdhquggUev7JpBE3WPgS3sx/m2qDNkmzoNXPLkvJoICthDLGb88uGlwF40UM2QVqBd4YbvHDGwUZihYGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uwFK+6Nh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CFCC6C4AF0E;
-	Mon,  1 Jul 2024 09:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719824430;
-	bh=2lsvwq81FQ+ZKQLJ9E0WAkmayhyWfEr2c81SPuxNFLc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uwFK+6NhzKBugUg7E2KfvsbSwWbXxFi7Ih+j6fazMk1+VhqnTp8imKreuB6kW0wiP
-	 D7SZfv6vi7BLmFkmXA392ZMWJSkAvkWgiDxTgHJw4VIkT8lV0Gu+zVo5L5Ne/91dGK
-	 uXL/YsT8QHgXEzi/LFiAjyRWn2CHmKBjhgY+SJYsMshO5jX521+s2NwOwurmwvUGKF
-	 Pl2lReqKzN/eeCkg1LdBl87lZVUt3XkhWi5lXbu3nvDi6enwM9dScM9jpfjJ/kjrlO
-	 Pk3l9kTMvfIFj8gAbkbwWXhQ4vsAHunH351o/AASug6S5B1bFxh+7CHILzqbsaCYqw
-	 TiJl0vvR8dv3A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BEC4BDE8E15;
-	Mon,  1 Jul 2024 09:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719824906; c=relaxed/simple;
+	bh=YzoctkienM/RHSl/MxnQWSeBZnA19kNmBR99veARymE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W5CoNvVPnIcmCXTRoLrGIy0ssKGsBpXp2LpMH0PfJhOGSQlPH8inez30mnlKg1zospsTbXgrl7g71ZWaYHVsqVAXWgf8oT2jnXSJrZt2ba0hTBTLb2xK+xMblASF/xa+NUdN3dV+ahcOzO+0D9fxG8+pg7wJtRecChI8FNEkUpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CFPTWS0I; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719824903; x=1751360903;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YzoctkienM/RHSl/MxnQWSeBZnA19kNmBR99veARymE=;
+  b=CFPTWS0IlB++TgNzxvQQFo330LIewhOXx6K5JwS1FpZiagPO+oDVOFpJ
+   WO168w4TRcDt2+l1FYPdIo89F+sOOB5cN4wdp03A9MPzTgNg0ift8zBMW
+   K3i7SLPFHt2fjfeCCdClxDA35+IX7KIcFN9DhoIYo/hdOZlQE57k+v8q1
+   TeSFIK0W6ZFI/Ijg3wsBcjRC28M3PygQNIjtqUs6hJTIR6NjhVmz1gkpj
+   2wvPRpaNVBm5hTYEqC8TWPziVsQ9dGkhnIQebltUgRf0Ys0rsSwT69qJA
+   LHl4cULaLd6sZbujmTCJA2SPSfBh4grOPZCCSPNlclXW7ERFn6qPXNB97
+   g==;
+X-CSE-ConnectionGUID: EPH9x1FgSWewJmiSMnyu8w==
+X-CSE-MsgGUID: SobOE17gR6q4lq4HO5nyew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11119"; a="27619851"
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="27619851"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 02:08:13 -0700
+X-CSE-ConnectionGUID: a+j0va57ThSCMnb84GNGxg==
+X-CSE-MsgGUID: JgXYfGS6SCuOGaCyI9jnTg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="45281920"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa006.fm.intel.com with ESMTP; 01 Jul 2024 02:08:11 -0700
+Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 512E4125BB;
+	Mon,  1 Jul 2024 10:08:10 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: przemyslaw.kitszel@intel.com,
+	marcin.szycik@linux.intel.com,
+	netdev@vger.kernel.org
+Subject: [PATCH iwl-net] ice: Fix recipe read procedure
+Date: Mon,  1 Jul 2024 11:05:46 +0200
+Message-Id: <20240701090546.31243-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,77 +76,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/17] netfilter: nf_tables: make struct nft_trans
- first member of derived subtypes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171982443077.24948.16419049555710785067.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jul 2024 09:00:30 +0000
-References: <20240628160505.161283-2-pablo@netfilter.org>
-In-Reply-To: <20240628160505.161283-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
 
-Hello:
+When ice driver reads recipes from firmware information about
+need_pass_l2 and allow_pass_l2 flags is not stored correctly.
+Those flags are stored as one bit each in ice_sw_recipe structure.
+Because of that, the result of checking a flag has to be casted to bool.
+Note that the need_pass_l2 flag currently works correctly, because
+it's stored in the first bit.
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Fixes: bccd9bce29e0 ("ice: Add guard rule when creating FDB in switchdev")
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On Fri, 28 Jun 2024 18:04:49 +0200 you wrote:
-> From: Florian Westphal <fw@strlen.de>
-> 
-> There is 'struct nft_trans', the basic structure for all transactional
-> objects, and the the various different transactional objects, such as
-> nft_trans_table, chain, set, set_elem and so on.
-> 
-> Right now 'struct nft_trans' uses a flexible member at the tail
-> (data[]), and casting is needed to access the actual type-specific
-> members.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/17] netfilter: nf_tables: make struct nft_trans first member of derived subtypes
-    https://git.kernel.org/netdev/net-next/c/605efd54b504
-  - [net-next,02/17] netfilter: nf_tables: move bind list_head into relevant subtypes
-    https://git.kernel.org/netdev/net-next/c/17d8f3ad36a5
-  - [net-next,03/17] netfilter: nf_tables: compact chain+ft transaction objects
-    https://git.kernel.org/netdev/net-next/c/b3f4c216f7af
-  - [net-next,04/17] netfilter: nf_tables: reduce trans->ctx.table references
-    https://git.kernel.org/netdev/net-next/c/06fcaca2ed1f
-  - [net-next,05/17] netfilter: nf_tables: pass nft_chain to destroy function, not nft_ctx
-    https://git.kernel.org/netdev/net-next/c/8965d42bcf54
-  - [net-next,06/17] netfilter: nf_tables: pass more specific nft_trans_chain where possible
-    https://git.kernel.org/netdev/net-next/c/0c2e0ee861de
-  - [net-next,07/17] netfilter: nf_tables: avoid usage of embedded nft_ctx
-    https://git.kernel.org/netdev/net-next/c/d4f6f3994e13
-  - [net-next,08/17] netfilter: nf_tables: store chain pointer in rule transaction
-    https://git.kernel.org/netdev/net-next/c/13f20bc9ec4f
-  - [net-next,09/17] netfilter: nf_tables: reduce trans->ctx.chain references
-    https://git.kernel.org/netdev/net-next/c/551b3886401c
-  - [net-next,10/17] netfilter: nf_tables: pass nft_table to destroy function
-    https://git.kernel.org/netdev/net-next/c/0be908750162
-  - [net-next,11/17] netfilter: nf_tables: do not store nft_ctx in transaction objects
-    https://git.kernel.org/netdev/net-next/c/e169285f8c56
-  - [net-next,12/17] ipvs: Avoid unnecessary calls to skb_is_gso_sctp
-    https://git.kernel.org/netdev/net-next/c/53796b03295c
-  - [net-next,13/17] netfilter: nf_conncount: fix wrong variable type
-    https://git.kernel.org/netdev/net-next/c/0b88d1654d55
-  - [net-next,14/17] netfilter: cttimeout: remove 'l3num' attr check
-    https://git.kernel.org/netdev/net-next/c/fe87a8deaad4
-  - [net-next,15/17] netfilter: nf_tables: rise cap on SELinux secmark context
-    https://git.kernel.org/netdev/net-next/c/e29630247be2
-  - [net-next,16/17] selftests: netfilter: nft_queue.sh: add test for disappearing listener
-    https://git.kernel.org/netdev/net-next/c/742ad979f500
-  - [net-next,17/17] netfilter: xt_recent: Lift restrictions on max hitcount value
-    https://git.kernel.org/netdev/net-next/c/f4ebd03496f6
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index 1191031b2a43..ffd6c42bda1e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -2413,10 +2413,10 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
+ 		/* Propagate some data to the recipe database */
+ 		recps[idx].is_root = !!is_root;
+ 		recps[idx].priority = root_bufs.content.act_ctrl_fwd_priority;
+-		recps[idx].need_pass_l2 = root_bufs.content.act_ctrl &
+-					  ICE_AQ_RECIPE_ACT_NEED_PASS_L2;
+-		recps[idx].allow_pass_l2 = root_bufs.content.act_ctrl &
+-					   ICE_AQ_RECIPE_ACT_ALLOW_PASS_L2;
++		recps[idx].need_pass_l2 = !!(root_bufs.content.act_ctrl &
++					     ICE_AQ_RECIPE_ACT_NEED_PASS_L2);
++		recps[idx].allow_pass_l2 = !!(root_bufs.content.act_ctrl &
++					      ICE_AQ_RECIPE_ACT_ALLOW_PASS_L2);
+ 		bitmap_zero(recps[idx].res_idxs, ICE_MAX_FV_WORDS);
+ 		if (root_bufs.content.result_indx & ICE_AQ_RECIPE_RESULT_EN) {
+ 			recps[idx].chain_idx = root_bufs.content.result_indx &
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
