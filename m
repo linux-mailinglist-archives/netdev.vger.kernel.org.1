@@ -1,164 +1,171 @@
-Return-Path: <netdev+bounces-108256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB7D91E857
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:14:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E8691E86E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26CFC1F22588
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:14:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E7F1F24D59
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC49171641;
-	Mon,  1 Jul 2024 19:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9BD16EC06;
+	Mon,  1 Jul 2024 19:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bFl59nSl"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="e0xEJUb3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3D416F8E0;
-	Mon,  1 Jul 2024 19:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4488415DBD6;
+	Mon,  1 Jul 2024 19:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719861185; cv=none; b=NMgIwQ8MXZqObKVJMeFzB42UPITBQt94pr+qS8ofjudzt3JluCE6jN0Kr3Bk4vW+an+KLOMBlp4pu2GTNNejCmqLqlEbaVv+CPfPjKynGQnzaPaE7ib88dxNJLP1AuMybCYbZ0PnbHZaLZhT2tkuviQUNy0TeP1mEU2nHcRN3WE=
+	t=1719861542; cv=none; b=DWi4hb+XdVeDbU4mNwfo3O9JvbKBlUIfrbmu8Kdj0/YuPfIJ3dg4rrpLZ3MPc//u0BI0KYlKhPNv2/hjagGzZikq9gtbaN4YzuwUPmiHjnbXmXIYH7dlgPL6a+mJa4mBcRwhRB8uG6n7Roh3O/x90BHQ/BVO6INO5YQPRUsgvFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719861185; c=relaxed/simple;
-	bh=BZ80Ejo56zseoiz3weNc0AtXfj9+HOXw5S5R0du1E70=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RxGPtB5ST5ZzZFX9JJwQPeFDALcRgpjkAJzdxshp3521tCHkUJUjTZCKuQm1ExgODg7FMGGLzmtLTphIr45LB6KlfEWJjSaf9hQw1pxJ2biLVvkP16o1FTAescI2+tir6EURJ1hH4hREXEBJJ/VlbKuctGGO0pmoP1kYS2ZATJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bFl59nSl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA58C4AF0D;
-	Mon,  1 Jul 2024 19:13:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719861185;
-	bh=BZ80Ejo56zseoiz3weNc0AtXfj9+HOXw5S5R0du1E70=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bFl59nSlnVaSRU4+0HTFQ/YeTaJahbBTt5u256YqqA/IZQs7WUOzBvYKYRUR7Jmb+
-	 wChXJYbVxmTLzNRLpAAdNpOUmpNsdgtdPYaJohsJXrbZU6BCCf7ByLGnDH/BQ216L3
-	 560Mu5RiCeTyUZ/1umQVt9bDpooP1+0DEUxtHU2rZe8fjdKsqR/lSu/h5TyYmL36gl
-	 B+EZzQJtEw/HTSqmuDqIJgLCnr4S7c9/dCzAmRxEeHSGjY5ypxgKwo/Qu6ELpXbvlh
-	 V1yE6QbOqM4goWOm1jibPASL3Mm/dft5RrFbUr9E7X9HNaKn/bgWcHd4IL6jWnK2Nr
-	 qPcQDrAj7jZcw==
-From: Kees Cook <kees@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Kees Cook <kees@kernel.org>,
-	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
-	Christoph Lameter <cl@linux.com>,
-	Pekka Enberg <penberg@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	jvoisin <julien.voisin@dustri.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Jann Horn <jannh@google.com>,
-	Matteo Rizzo <matteorizzo@google.com>,
-	Thomas Graf <tgraf@suug.ch>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-hardening@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v6 6/6] mm/util: Use dedicated slab buckets for memdup_user()
-Date: Mon,  1 Jul 2024 12:13:03 -0700
-Message-Id: <20240701191304.1283894-6-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240701190152.it.631-kees@kernel.org>
-References: <20240701190152.it.631-kees@kernel.org>
+	s=arc-20240116; t=1719861542; c=relaxed/simple;
+	bh=jWZ1CeQ+Pa38AA57KdIwDpbzTnMj3qGPaHVJkcEuG78=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=jMdKrAjEAbNFhFKLMg2VK0lXp0jy+DRizu/q366ZEqw4sd+qV+JPLi6jK2e4qKPFEDWvOKBPbthiom7cY70uEVMSW+1ApdtaEtsQZwdMDeuJUIQPmIxLrRpvD3Lgn9KV1sDe95ovpMzcY7VOi2+1LNT6Wf6wVgzCWMboMXR6en0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=e0xEJUb3; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 461BNd10031186;
+	Mon, 1 Jul 2024 19:18:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	HEOucDbBLsGiHd0h8bxK39k/378s4ze6cCjXgEeaqvw=; b=e0xEJUb3vKj9QKER
+	EMjxyym5noJskbaAYX2LSb0TYrSwXmhph4DlGyEwpocJJTThlcjgIgz139Nu1PwW
+	rJCmj/YM2GFPBpc4JVaQXk7jSgscd7Ezp29tUG9hHKuicp8X/vLI6W+RET3C5yOl
+	YJUM+UNoRB5xPIMdYcOhqQG0zkN/Dn62pi7NUy7X+MLfoCViP+SMYbOMSQrRcXBH
+	CocIKkKsFQjDkFi96LPjRuZAe8RTfKsbUaA+rYNgrTObWKAZNqd4LNir9BFdCUH8
+	110n0lnIoNuPLpyk2rjl3HfYCax+iX3pi5uPkRJ0jneP8CyZv1hcg75DhEuVN2Pw
+	bJDsdg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 402bejmvvs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 19:18:24 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 461JIOT7014247
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 1 Jul 2024 19:18:24 GMT
+Received: from [10.110.54.196] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 1 Jul 2024
+ 12:18:19 -0700
+Message-ID: <eb63b7c2-9485-4b11-bf73-4d38a2365f19@quicinc.com>
+Date: Mon, 1 Jul 2024 12:18:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2796; i=kees@kernel.org; h=from:subject; bh=BZ80Ejo56zseoiz3weNc0AtXfj9+HOXw5S5R0du1E70=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmgv++lHHVc7IaWVXSWcs6s/+88cmgFNyMQ+/tk NfYGR7ScZKJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZoL/vgAKCRCJcvTf3G3A JqpJD/9rs0Nsc8oYdGcPhljjR3Oz9ava6B9ExnvhV2nq0WD+FJVM5EdnZQAwoNyWeBpcuY2PjdX lGeJh61ZCUx/6o593wAWAgLwf2e/Mhg8nSPBCedp2wVFCHCVtzZhrNBAaQlXjO3gqzsR3DB03kj bchxInUC1Jscc86bOfbjVaIQ5IEy5V7YzHU6nQndBY2UIg+uZZmOkFzlZJpnMapIejOc6SpanQA hV6NVDpX2xdgr7MF4aOqxOwTrZz75rZo/5GXBqomoCrJB/fD4y99gSAraNxMJGvzAIKI8sJVGKr nsL6Q/dH6LCFuZlplSg3SIYt9Gos+RIxGQkllf9g7DUjeUG95w+fsoV1avbkZXjgQnI2mfAyjMF LgFIqrfiAFybNMFQqTOyMz5qVVeFFFi/KS+LDgZLc8yQlhZP519x+tJ6F4oVUtqM4dW5u4yP6Vp DG21pqkK6pZGhWARTM64DaxCBk/pN0rgw4Kuu/yLd29xhS7+fvJkksPam8vLip8OXe83i4Euu0m JTpZvCyJaLkwRmeqjgLa8fTykUMXm3m1HS9xyfPOrqmY9zOiJg6hGNR8aS7wdw+z9wjeph7E6pc z2OqisDHlJ0Pad2aMEfBofKXW2BKrBAxRPKjOnkC7biQAMODdjv2mPwU4BWxkHlSZwtHdrCs+GE Lj0ThhUc9z01RFQ==
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] net: stmmac: Bring down the clocks to lower
+ frequencies when mac link goes down
+From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+To: Andrew Halaney <ahalaney@redhat.com>
+CC: Vinod Koul <vkoul@kernel.org>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
+        Andrew Lunn <andrew@lunn.ch>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>
+References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
+ <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
+ <qf4zl7qupkzbrb6ik4v4nkjct7tsh34cmoufy23zozcht5gch6@kvymsd2ue6cd>
+ <fd5c86d8-4243-43d6-a07d-919ceeb12d82@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <fd5c86d8-4243-43d6-a07d-919ceeb12d82@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: kddQ-wpQVuQPjCybJxZd8qn6L8J1iblC
+X-Proofpoint-ORIG-GUID: kddQ-wpQVuQPjCybJxZd8qn6L8J1iblC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-01_19,2024-07-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ impostorscore=0 spamscore=0 clxscore=1015 mlxscore=0 suspectscore=0
+ bulkscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407010144
 
-Both memdup_user() and vmemdup_user() handle allocations that are
-regularly used for exploiting use-after-free type confusion flaws in
-the kernel (e.g. prctl() PR_SET_VMA_ANON_NAME[1] and setxattr[2][3][4]
-respectively).
 
-Since both are designed for contents coming from userspace, it allows
-for userspace-controlled allocation sizes. Use a dedicated set of kmalloc
-buckets so these allocations do not share caches with the global kmalloc
-buckets.
 
-After a fresh boot under Ubuntu 23.10, we can see the caches are already
-in active use:
-
- # grep ^memdup /proc/slabinfo
- memdup_user-8k         4      4   8192    4    8 : ...
- memdup_user-4k         8      8   4096    8    8 : ...
- memdup_user-2k        16     16   2048   16    8 : ...
- memdup_user-1k         0      0   1024   16    4 : ...
- memdup_user-512        0      0    512   16    2 : ...
- memdup_user-256        0      0    256   16    1 : ...
- memdup_user-128        0      0    128   32    1 : ...
- memdup_user-64       256    256     64   64    1 : ...
- memdup_user-32       512    512     32  128    1 : ...
- memdup_user-16      1024   1024     16  256    1 : ...
- memdup_user-8       2048   2048      8  512    1 : ...
- memdup_user-192        0      0    192   21    1 : ...
- memdup_user-96       168    168     96   42    1 : ...
-
-Link: https://starlabs.sg/blog/2023/07-prctl-anon_vma_name-an-amusing-heap-spray/ [1]
-Link: https://duasynt.com/blog/linux-kernel-heap-spray [2]
-Link: https://etenal.me/archives/1336 [3]
-Link: https://github.com/a13xp0p0v/kernel-hack-drill/blob/master/drill_exploit_uaf.c [4]
-Signed-off-by: Kees Cook <kees@kernel.org>
----
- mm/util.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/mm/util.c b/mm/util.c
-index 28c5356b9f1c..29189f48ee04 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -198,6 +198,16 @@ char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
- }
- EXPORT_SYMBOL(kmemdup_nul);
- 
-+static kmem_buckets *user_buckets __ro_after_init;
-+
-+static int __init init_user_buckets(void)
-+{
-+	user_buckets = kmem_buckets_create("memdup_user", 0, 0, INT_MAX, NULL);
-+
-+	return 0;
-+}
-+subsys_initcall(init_user_buckets);
-+
- /**
-  * memdup_user - duplicate memory region from user space
-  *
-@@ -211,7 +221,7 @@ void *memdup_user(const void __user *src, size_t len)
- {
- 	void *p;
- 
--	p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
-+	p = kmem_buckets_alloc_track_caller(user_buckets, len, GFP_USER | __GFP_NOWARN);
- 	if (!p)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -237,7 +247,7 @@ void *vmemdup_user(const void __user *src, size_t len)
- {
- 	void *p;
- 
--	p = kvmalloc(len, GFP_USER);
-+	p = kmem_buckets_valloc(user_buckets, len, GFP_USER);
- 	if (!p)
- 		return ERR_PTR(-ENOMEM);
- 
--- 
-2.34.1
-
+On 6/28/2024 2:50 PM, Sagar Cheluvegowda wrote:
+> 
+> 
+> On 6/26/2024 7:58 AM, Andrew Halaney wrote:
+>> On Tue, Jun 25, 2024 at 04:49:30PM GMT, Sagar Cheluvegowda wrote:
+>>> When mac link goes down we don't need to mainitain the clocks to operate
+>>> at higher frequencies, as an optimized solution to save power when
+>>> the link goes down we are trying to bring down the clocks to the
+>>> frequencies corresponding to the lowest speed possible.
+>>>
+>>> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+>>> ---
+>>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++++++
+>>>  1 file changed, 8 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> index ec7c61ee44d4..f0166f0bc25f 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> @@ -996,6 +996,9 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+>>>  {
+>>>  	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+>>>  
+>>> +	if (priv->plat->fix_mac_speed)
+>>> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
+>>> +
+The above fix_mac_speed needs to be removed, i lately realized this mistake.
+>>>  	stmmac_mac_set(priv, priv->ioaddr, false);
+>>>  	priv->eee_active = false;
+>>>  	priv->tx_lpi_enabled = false;
+>>> @@ -1004,6 +1007,11 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+>>>  
+>>>  	if (priv->dma_cap.fpesel)
+>>>  		stmmac_fpe_link_state_handle(priv, false);
+>>> +
+>>> +	stmmac_set_icc_bw(priv, SPEED_10);
+>>> +
+>>> +	if (priv->plat->fix_mac_speed)
+>>> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
+>>
+>>
+>> I think you're doing this at the beginning and end of
+>> stmmac_mac_link_down(), is that intentional?
+>>
+>>
+> 
+> I realised that bringing down the clock to 10Mbps should be the last operation
+> of the link down process, the reason being if we bring down the clocks first it will
+> deprive essential internal clocks to DMA/MTL modules which are required for
+> Cleanup operations this might cause excessive delays in stopping DMA
+> or flusing MTL queues.
+>  
+>>
 
