@@ -1,127 +1,124 @@
-Return-Path: <netdev+bounces-108227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F292091E73D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:14:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 894A891E744
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78091F23CE8
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:14:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05664B233E1
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB3116EB6D;
-	Mon,  1 Jul 2024 18:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D954415F40A;
+	Mon,  1 Jul 2024 18:15:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA42516D4E6;
-	Mon,  1 Jul 2024 18:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAF416EBEA;
+	Mon,  1 Jul 2024 18:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719857640; cv=none; b=FxlAAw76JEdbhZychRyxBwkmNa96rxlja0bSzwdJlal2Un05myUcyOMLXcJAgzy623KLOQJuaXPE0SX+4vw0vfsMdPP2RgcEHhfnqNu+LghyKD/JSZ1HXFgLJZ5+dUfTTa6Yp8FEljRrgZpgOIz27j8mV7LJGvWba1dxw0jXf5g=
+	t=1719857741; cv=none; b=j6ZQGr8BoLk+K/tU1y+EB2+64KXcMI3k0Kh+OR8aBN0j1YadjREoht62SD6Zvv1JZ0OGfpccr3UxkUOnkwH7CkzwOBOFRsbrDjL/HRp44k3Wv/qIbNzl3O83ftr4Zaf7r2uzqziWnxqTKXAnuDHbTCv6ykwPDQZZ/eKGC4iRAng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719857640; c=relaxed/simple;
-	bh=SJzzdOWtUni41BKj5bL292iqR628aFrzwxBvh2EIk2s=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NBxRQacg0ISOz/Nwg+IIQSh2gFW2sZG7vjMwUVx0bYmhHF35FxRmPYqRGaYgExFsxXfqIfF//IZ7VtH78ZSVo18x/PNxanXOHBymPZF48a46Np7yrRskpQ86WCdnVVOd7nUS6wjZD4GfvvYQGCTmutTK1nxqA9IjtzCvQuflP/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ABEC9FF802;
-	Mon,  1 Jul 2024 18:13:53 +0000 (UTC)
-Message-ID: <8cdb8979-b0e4-4d61-b386-550dc7ee3def@ovn.org>
-Date: Mon, 1 Jul 2024 20:13:52 +0200
+	s=arc-20240116; t=1719857741; c=relaxed/simple;
+	bh=S600UQAxJgzDB/3bWRjamJDTEfzcPwFyBjfO+zT/Tuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a3Jj7wkMElEN4QyhWj6prxd6EyqF1548tn1dPkpv4ZX9lNVniZ49bgzpIdZbrEXkzzrIqr5iR1wi/KEvADFdLlpHFIGXlobQIJaRUGN3P3JV24fB7E+vNzfSa0+Lki9UFTkcsPxD7KuT/iHJ9ImaYHn+Ba/FoDiOKzaaM/61zJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ADB3C116B1;
+	Mon,  1 Jul 2024 18:15:41 +0000 (UTC)
+From: Dave Jiang <dave.jiang@intel.com>
+To: ntb@lists.linux.dev,
+	netdev@vger.kernel.org
+Cc: jdmason@kudzu.us,
+	allenbh@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	abeni@redhat.com,
+	Jerry Dai <jerry.dai@intel.com>
+Subject: [PATCH v2] net: ntb_netdev: Move ntb_netdev_rx_handler() to call netif_rx() from __netif_rx()
+Date: Mon,  1 Jul 2024 11:15:38 -0700
+Message-ID: <20240701181538.3799546-1-dave.jiang@intel.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org, dev@openvswitch.org,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 05/10] net: openvswitch: add psample action
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20240630195740.1469727-1-amorenoz@redhat.com>
- <20240630195740.1469727-6-amorenoz@redhat.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240630195740.1469727-6-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+Content-Transfer-Encoding: 8bit
 
-On 6/30/24 21:57, Adrian Moreno wrote:
-> Add support for a new action: psample.
-> 
-> This action accepts a u32 group id and a variable-length cookie and uses
-> the psample multicast group to make the packet available for
-> observability.
-> 
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie, to discourage using cookies that will not be offloadable.
-> 
-> Acked-by: Eelco Chaudron <echaudro@redhat.com>
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
->  include/uapi/linux/openvswitch.h          | 28 ++++++++++++++
->  net/openvswitch/Kconfig                   |  1 +
->  net/openvswitch/actions.c                 | 47 +++++++++++++++++++++++
->  net/openvswitch/flow_netlink.c            | 32 ++++++++++++++-
->  5 files changed, 124 insertions(+), 1 deletion(-)
+The following is emitted when using idxd (DSA) dmanegine as the data
+mover for ntb_transport that ntb_netdev uses.
 
-Thanks for addressing the comments!  The new name also
-seems reasonable to me.
+[74412.546922] BUG: using smp_processor_id() in preemptible [00000000] code: irq/52-idxd-por/14526
+[74412.556784] caller is netif_rx_internal+0x42/0x130
+[74412.562282] CPU: 6 PID: 14526 Comm: irq/52-idxd-por Not tainted 6.9.5 #5
+[74412.569870] Hardware name: Intel Corporation ArcherCity/ArcherCity, BIOS EGSDCRB1.E9I.1752.P05.2402080856 02/08/2024
+[74412.581699] Call Trace:
+[74412.584514]  <TASK>
+[74412.586933]  dump_stack_lvl+0x55/0x70
+[74412.591129]  check_preemption_disabled+0xc8/0xf0
+[74412.596374]  netif_rx_internal+0x42/0x130
+[74412.600957]  __netif_rx+0x20/0xd0
+[74412.604743]  ntb_netdev_rx_handler+0x66/0x150 [ntb_netdev]
+[74412.610985]  ntb_complete_rxc+0xed/0x140 [ntb_transport]
+[74412.617010]  ntb_rx_copy_callback+0x53/0x80 [ntb_transport]
+[74412.623332]  idxd_dma_complete_txd+0xe3/0x160 [idxd]
+[74412.628963]  idxd_wq_thread+0x1a6/0x2b0 [idxd]
+[74412.634046]  irq_thread_fn+0x21/0x60
+[74412.638134]  ? irq_thread+0xa8/0x290
+[74412.642218]  irq_thread+0x1a0/0x290
+[74412.646212]  ? __pfx_irq_thread_fn+0x10/0x10
+[74412.651071]  ? __pfx_irq_thread_dtor+0x10/0x10
+[74412.656117]  ? __pfx_irq_thread+0x10/0x10
+[74412.660686]  kthread+0x100/0x130
+[74412.664384]  ? __pfx_kthread+0x10/0x10
+[74412.668639]  ret_from_fork+0x31/0x50
+[74412.672716]  ? __pfx_kthread+0x10/0x10
+[74412.676978]  ret_from_fork_asm+0x1a/0x30
+[74412.681457]  </TASK>
 
-Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
+The cause is due to the idxd driver interrupt completion handler uses
+threaded interrupt and the threaded handler is not hard or soft interrupt
+context. However __netif_rx() can only be called from interrupt context.
+Change the call to netif_rx() in order to allow completion via normal
+context for dmaengine drivers that utilize threaded irq handling.
+
+While the following commit changed from netif_rx() to __netif_rx(),
+baebdf48c360 ("net: dev: Makes sure netif_rx() can be invoked in any context."),
+the change should've been a noop instead. However, the code precedes this
+fix should've been using netif_rx_ni() or netif_rx_any_context().
+
+Fixes: 548c237c0a99 ("net: Add support for NTB virtual ethernet device")
+Reported-by: Jerry Dai <jerry.dai@intel.com>
+Tested-by: Jerry Dai <jerry.dai@intel.com>
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+
+---
+v2:
+- Move fixes tag to original issue (Jakub)
+  - I couldn't find the special dependency tag to make note of the situation.
+---
+ drivers/net/ntb_netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ntb_netdev.c b/drivers/net/ntb_netdev.c
+index 536bd6564f8b..dade51cf599c 100644
+--- a/drivers/net/ntb_netdev.c
++++ b/drivers/net/ntb_netdev.c
+@@ -119,7 +119,7 @@ static void ntb_netdev_rx_handler(struct ntb_transport_qp *qp, void *qp_data,
+ 	skb->protocol = eth_type_trans(skb, ndev);
+ 	skb->ip_summed = CHECKSUM_NONE;
+ 
+-	if (__netif_rx(skb) == NET_RX_DROP) {
++	if (netif_rx(skb) == NET_RX_DROP) {
+ 		ndev->stats.rx_errors++;
+ 		ndev->stats.rx_dropped++;
+ 	} else {
+-- 
+2.45.1
+
 
