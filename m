@@ -1,227 +1,232 @@
-Return-Path: <netdev+bounces-108139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C01091DFE8
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:52:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C66791E000
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBED31F21EB8
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:52:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA522B22672
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71656158DAC;
-	Mon,  1 Jul 2024 12:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352A215AD86;
+	Mon,  1 Jul 2024 12:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l0Za7lnF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlDRkMr0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8F5145B09;
-	Mon,  1 Jul 2024 12:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719838353; cv=fail; b=jBq8dxLh+DkPNIarWbE8LaJQDRi722jruj4+EgMr3yxZFyH87hJFIS8R4eMDCZQuSS2/dv4HLkQaxZmqcp5MbsG8Ab4GyNn8w7d1+JYV9mal03Yn+AQr/JPil1Qv5ZlMNZ9Q9K4Xq+ViLLW3H428ZrdSaA6NOM1O/bGmo586lAs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719838353; c=relaxed/simple;
-	bh=UxItILRvNMaEcBt8xSoDcrNBOOdsGBVCT99otAUNXsY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=gXSWdXPwEQk0ORRcGOU3GEDepu3iROilSXMbWXxNduEzUI9n9tYCKRFS4thvMkyECTQsXgi8iJKVIImkp5J9X/i3mfhpy6xKJIB3Z2lv9IK7i9UtLe1KykeB5aQL3Bqb82QqpvCPlg2fmP2/zSkOTGtockODzwd07oRv8za7Xg8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l0Za7lnF; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719838352; x=1751374352;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=UxItILRvNMaEcBt8xSoDcrNBOOdsGBVCT99otAUNXsY=;
-  b=l0Za7lnFiHJzoasR5yWS42A4cQo+D/01v1Uee2EWPb0AnLruDcGYCtdh
-   fDzwSMkhlx5foLne98tjYvoWo4+WUPnA69HLHW50X3vwop2E5lYnTyDGb
-   rPJOnG6ef6iRItl7JAv3wPpimV6VGq//C2Rw6sA+wiPTyqjZCDEWXaKG9
-   WZiBRLvIMvneua46PCB5CPTBoR6XWoyiRFQgzE35vElmhgMD4hHeqSZQM
-   Gv9IHw+aZTJJSVp3JBmyGJhVQxNFhUzeoFLF2+lZuG9Oq89OAJO6Uz/C1
-   y7bnAFecSPc4/pWOekFFFY9shVUB3jg/wof2B/gKKNaZqDZsFENKKPwQR
-   w==;
-X-CSE-ConnectionGUID: UW6KmWeiSt6OP2fRKEIEsw==
-X-CSE-MsgGUID: dZ5Z1BQuRdGojLqneX5I9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="34407781"
-X-IronPort-AV: E=Sophos;i="6.09,176,1716274800"; 
-   d="scan'208";a="34407781"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 05:52:29 -0700
-X-CSE-ConnectionGUID: t30KhTkFQrqTq7nScf8RcA==
-X-CSE-MsgGUID: A5Ay0c4USSu597TKO62PTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,176,1716274800"; 
-   d="scan'208";a="45407201"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Jul 2024 05:52:28 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 1 Jul 2024 05:52:27 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 1 Jul 2024 05:52:27 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 1 Jul 2024 05:52:27 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 1 Jul 2024 05:52:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ji204jTtf3dhC4SrEal2ci/bSZF2dCx88KlQfR5efGUxqUl0xhJb1u2uH4ZZ+4kafkMQIb9SBWR8TDB0vht89CA1hEi8PkSBxfRnRyjrk5YbLw6PO3edMZLEqNHVsjxRC4TU8IFGxjdX8Rj03RkbPokEi4KwJne3sF810ZfENA2U0DvR9cq782b70SxzrBCXLAG9DOGBIEfo/tE9VibvuPqDxv06a5/kGwFJole5ay4L5M9oMcNfryfjiWqsHzL69jAfzN+DFTzHcv9+IgalTY+zgNQefxh+NPlxies13eGI0cMgZ8ONSb5xURqollgA9C2x3Y1oHhTnPDBL6HHzuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GEe2VFjJLKF8x/dm9jX68fgewAo+6ud+3X1tHLtFAIA=;
- b=nng6B7miu7b6abxzlRK0k4BYBNCzyrNqQYdro4IhNK1o5dpMhlREa7FcZDNW8JbdVXstlQjMPaURTncdBYn7JlFZE+nUvdIzCDXvEMM1Mkn/89XT0mYf59r7NDEhGsdrgCW2GKoTxvnSPqihtAP7oySpRIOf5M5HtXklBy1DoFi1Lip8KYB97yzb4r6qSP1dh78KJBTrGrIVmlfVKaDWVDEJBuadZdZ4JNDhd1Qf0nJDB91xdrs5ZRngLiTQ3ONX/KlqE8NgSZHEeaa7VUkzUHr4QOtGvo9GMJ05muRMSP5R9jsE2wwAcCJCrspdsUprdlcpX+cOsAI16ZaWSfUbrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com (2603:10b6:510:147::11)
- by SA0PR11MB4672.namprd11.prod.outlook.com (2603:10b6:806:96::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.32; Mon, 1 Jul
- 2024 12:52:24 +0000
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::9696:a886:f70a:4e01]) by PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::9696:a886:f70a:4e01%7]) with mapi id 15.20.7698.038; Mon, 1 Jul 2024
- 12:52:24 +0000
-Date: Mon, 1 Jul 2024 14:52:12 +0200
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Liu Jing <liujing@cmss.chinamobile.com>
-CC: <edumazet@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net/ulp: remove unnecessary assignment in
- tcp_register_ulp
-Message-ID: <ZoKmdGBqK7pN8vUJ@localhost.localdomain>
-References: <20240701114240.7020-1-liujing@cmss.chinamobile.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240701114240.7020-1-liujing@cmss.chinamobile.com>
-X-ClientProxiedBy: MI1P293CA0001.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:2::8)
- To PH0PR11MB5782.namprd11.prod.outlook.com (2603:10b6:510:147::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805A215A849
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 12:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719838610; cv=none; b=MhF9+mPk4enJcfbU4C39p+Xu3AxO+OQrp1TMDDRFbktdVEs7K6DRi+6KdnUx+8z0S6MkrEOwY1BkcWLb+IpDQggmH+LWFICdPY5UGkFGfNmRQLmft2a4KIjkteROAg2Zke6BmuT9l//0JMTqMneeCLrnDd3SsHg7RFF4xRq/xvE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719838610; c=relaxed/simple;
+	bh=kO+WM5ZQfB3Sr3j7wPI/DBlkW4XzSfrK+wt4u2ye5qw=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H9I1qse8RBI6vVKCULkT/3HlnP+9REbDavaJvNltp/JOxSV5vhkuv+SpzvLsGX7c6sT0PYt5bbQRFZDkiuhDQ4HbkxWg7/agzJqGQhJ+wgqA2TaWXZiWbmjdb5ehEkCN6h5MXp/Dn2xIbpHXaqLeD5aMZ/0wDcwHZCy13jgMfmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OlDRkMr0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719838607;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zt43OVF+seYKp8/P4tWeHcdZ3AJSUDh9yfiJyQfU2oc=;
+	b=OlDRkMr0RCpiYAxqUPVv0qQbmRX/DqSib2QPCyNjw76T0uWZUzfffESz300OwpGm3UP+1R
+	5Iur8oN9dlSkdY0u4LCJv5eEFFYsS5if9j/2t6qxQxPfUrXFTy3cZqx03MS16QWMBrmwLl
+	X6LQfXMM3WhJirKfNuVVDHz9yU8dCz0=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-o9mvGR9pMkuqrb88ugyPLQ-1; Mon, 01 Jul 2024 08:56:45 -0400
+X-MC-Unique: o9mvGR9pMkuqrb88ugyPLQ-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6b50f078c46so42470126d6.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 05:56:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719838605; x=1720443405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
+         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Zt43OVF+seYKp8/P4tWeHcdZ3AJSUDh9yfiJyQfU2oc=;
+        b=Rzx3JZVOmWpHRWQoA/3wRDlt0khZvgRRTJM/ZziFTUfMk90y4QH1a6MxWkd2dJrHZD
+         PJwIAHimHli6Dj7nvM6VaQvUePFL3fhTsa+03JGKJd26hub6h+O9fxaahZPW69kwBp5D
+         bNY1Ubb1MLFhMWnTLH/SSbYYh09P9x+b+xgHeEYXK/aUyVmd9Ua68Ow/m0hZ2YBcSZkA
+         pbCjWDJG2rjgZ0RPJiI3Nw2J/XzZGon1bh7Q56DUs6C0jZ9MSdNlX8I5rAQ3Ox31xj2z
+         TfGqqQzkWEsvkm2+s8hUkz25RvYRVULZ4TyFIuFeo5RSQkODgDMEJWW51YrE3yv05ZNq
+         SPow==
+X-Gm-Message-State: AOJu0YycKhuRP2ZrzgyipkD/bOBpvycDMNN+12llecHKta5uWZzLmZ5g
+	yGBRd8w9AyypQ1AJMeL28H0GMlDV1S3Wioj66Tah+82p6YstaqOLgu4uF2KSTnUI27i6APHXXlS
+	nGBsJTCR7i2q+Oniio2iiNDgySfy6UFakJOMnibAlscndwPYXMkerPH4OBpcGIcvxvqy5oF2XU+
+	km98MkZ8xQvQcjFXiA/te+mmM3Y8JN
+X-Received: by 2002:ad4:5746:0:b0:6b5:613:5acd with SMTP id 6a1803df08f44-6b5b70c2d37mr94774866d6.31.1719838605108;
+        Mon, 01 Jul 2024 05:56:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH3iY1Jl12VKssIf8agLrYEh9ASyagHF2DXcPKx8Of865/H1uEmWA05jSdI6+6/dVfzpADg7B7+93zqaHY4MF0=
+X-Received: by 2002:ad4:5746:0:b0:6b5:613:5acd with SMTP id
+ 6a1803df08f44-6b5b70c2d37mr94774616d6.31.1719838604782; Mon, 01 Jul 2024
+ 05:56:44 -0700 (PDT)
+Received: from 311643009450 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 1 Jul 2024 12:56:43 +0000
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240630195740.1469727-1-amorenoz@redhat.com> <20240630195740.1469727-6-amorenoz@redhat.com>
+ <ZoKVtygkVYfaqjRI@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5782:EE_|SA0PR11MB4672:EE_
-X-MS-Office365-Filtering-Correlation-Id: 074791da-a403-42c8-ff29-08dc99cca7c3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?MMScmigU3g4aUffZU8zq/cbiyuvKqPG6l7WMZBcI6ogNWE5VvXcVxZ8nowrh?=
- =?us-ascii?Q?7/jA2snz2AmGErs0fomNMqTb7QbpmkxMI3akaUQcewXPsWuqY5h34LLtXXwR?=
- =?us-ascii?Q?SbnCzMNsxaBCIOw1Tme25TiO/Ql+hbdJwhMZJeWGc77uS1Lzsl2X8rpxFdSD?=
- =?us-ascii?Q?LGf0thNwz1FqhJKhpaE7pbf6H6sJv4tlzrcGWBK4Y75zwj6wBl1uAi5pihpJ?=
- =?us-ascii?Q?5+VF5YizvZs3J16dvwOwjcvByV0KkpgrLKVQAC4dMVJ/SlA1pn2F+AJWM/Zc?=
- =?us-ascii?Q?FF/pFIhU/SCdM9Dp8gZf55pIxP4pjV8XsbO5CcC4ZKveIEzExrhHJeSK4FgW?=
- =?us-ascii?Q?k8q/ZaE2KHH5Xp2tQMVrFuRxApsl6/zkiQUHjFdHsdP9yIZ3u+YCoNZyFwvg?=
- =?us-ascii?Q?AZmf4sdG5cs7Q+cga+7XpPjMIWGdLp5mn0SeKK6J44bjfmRi2U1DNBMeqigZ?=
- =?us-ascii?Q?+3omwvkwV27Kq2yBTaRi9RiBzlMFXQKT9MHFDd3kNwn1aLmQbZ4Yg1i5bjNi?=
- =?us-ascii?Q?lHEOwJRzHjrr8BzCWf+/6I8jJT60cVyPF05eDCwx7P/+wxW3kGhYFRy+WZNs?=
- =?us-ascii?Q?4NMOd3/atjSHJLr0Ew5PPHO07BCIcCPSgdztEMD9bue89LPWl+GYCS47WAix?=
- =?us-ascii?Q?qjZ8s39AoBQ21JvHEBpi4wsEjUN3YkMLND96sDxtdccTol9OwgE7LzirO734?=
- =?us-ascii?Q?IGbVw/8sjY3GUMblnMEh3GQWZ592rxPOdTW2hcI9pGZqdG6e5DxcnP7+sNlv?=
- =?us-ascii?Q?iQFdP/BWlI9+OllqOOymgxQgL2a3F++oLs/AjVcygFxejvLR/WsiW3QnFMYy?=
- =?us-ascii?Q?/zQhYNbfwuQzc1cMidQC9Xe5is6d96odqYISx1HBL8CoPXEL5nSSIGmoP591?=
- =?us-ascii?Q?awYUjPb0BWtbtv1XsvIwhz6YKh5Z4p/+JROMZmzQHIqWp5EoaHJgFRgR6RDF?=
- =?us-ascii?Q?Nkl1zjExI2wd/o2j+ed4d1WqGcP5yWwRizYv4Frs+X19Qm/ZiWAkGyRSjHWQ?=
- =?us-ascii?Q?MiU17kgCE66TiGQeUnJ23U0qyayTfaXRt0gWlpWTYJtSNj2oYBpY2T0iky8x?=
- =?us-ascii?Q?simNvr0epGgcbvDgYbDRwAlWZUeUG863gQXmhQeVNJYwotjmQFXibQMuYJL1?=
- =?us-ascii?Q?XhQ2gNyKxP42biWFeb/IsZA/f5Pl8/hiLwpcXwer+cWQ2NYK98MB6UB00wAN?=
- =?us-ascii?Q?NBUnTWVrk1qcsvzKsJNjPjwCtXnCZjxof1XIf3QeCdNMN0HuZCYmF/daZRx/?=
- =?us-ascii?Q?M41hH8m6CDSoH2j031XO4CJNQGMiJCCPLam4a0b7A+m0PzQAdgg18A8YXD3S?=
- =?us-ascii?Q?8UVvrXepw4XEaQm7CnYEbig+0+tH26LgaH5rpy1v5BpKwA=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5782.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+ZDDmYPN63QLOAsOf7i/l602WUUkHS3iffWiv7RZqiAYDWFjFKVgOpxDWxFS?=
- =?us-ascii?Q?RQHlWcGKhgaP0fB0akP5krSFUnKqc8YOwNnpqR2Wf8ElDYxLMKu8euVqXjWq?=
- =?us-ascii?Q?tFZFhwjdEJRgmQBX9RZE1/FUk9gnsLSKiwH7x0IO/ONKO1UK3Av8g/OYkRv1?=
- =?us-ascii?Q?HxmqAX5p/fvAE3JS5Y6+ClmOlJdSQ4Vn+pHccr30VhskNrOUYaIa1cPmE76+?=
- =?us-ascii?Q?ZvcOOKvxV7raCtLyC7eAsPTAfFbZxzSf1U4gCztfjfhD17SygnKAASfVBkKR?=
- =?us-ascii?Q?l2MQtjMARRtssySU78/sehluUlmexaEyeGEGJXbVTfTNm6fejBZtdhllRhHU?=
- =?us-ascii?Q?zwbegdObimIrQiG8asq+hlpoIHXCTdphyx3ViwybBc+8CyMM3il8B1xlTE71?=
- =?us-ascii?Q?1/2WrUPJ+2Rkl3c8KJvk7Ti1kCPbvqoYESq+BGShxpu0guGo8k/PwuXhxceU?=
- =?us-ascii?Q?vbEUXlESu+4t+XPGN5n/aTdRn7mdpjKtTnJe44v6GoF/qMQm34eYB5/xdROd?=
- =?us-ascii?Q?qMtqB9GI/l1qxHdNKo2Bpt2nURamjONQa5uI/qo1YU9Li6UPWnrrWVlzCIkt?=
- =?us-ascii?Q?pAYydMLJSm08zSf/mYczYDwZEW5RHL0fP9FiJ7xJHeBydvcKzn86QGfpPOlp?=
- =?us-ascii?Q?YUjuVlxvv30VeWK7KXJx162zkvCo1SemKK02IaQ0YFyuOtYDBRabvk3KgAMH?=
- =?us-ascii?Q?F7lTIVfW8rz2tpe1RUqjKzdpLhoJBLkJ0mN34hq0kSi857N5hsh7EwWGjtaO?=
- =?us-ascii?Q?78tBRxrBAKTJTd3PoYgOCriZ1odh5BkZSwWPZOzMTU89l/eTyWle9DczzR7S?=
- =?us-ascii?Q?BNEJovE1+oEDu2murQlUkVZKo2d/eIr1daoGuvm3LJNwiBg/z4wrZpBMrW6Q?=
- =?us-ascii?Q?FLCVGo5AtGnGurxjgAja1x/tFyAV+p4zCcgQKjjifBbh7mBhlNZN3xJcw0fG?=
- =?us-ascii?Q?VCqrMcx2nn511xNVeDC0/WFb9q+LuCG5+vI4nQWCNxOLY6LzFZ+MeLKmnR9h?=
- =?us-ascii?Q?6rfQqLdYg/HgnM6wQlVdM7sx5K8j8eZ1y/dx1i04IRJKHi1bXwyArvHKWQYd?=
- =?us-ascii?Q?POFmy15UmYqBCQmfEMgrfHbUg+hFiC1kFv1dsbB05tRv+OJro85Dw2bkrrbn?=
- =?us-ascii?Q?yKYF79Npe+QrajRI3zFkbudCrm8QErQn/1dJ+PDd7hyKEgoXkBucZ7IAFz9p?=
- =?us-ascii?Q?J7FxAQqvUClaPVZbpCo6N9yJiIhYB1BZJFtq/5x2jqjuOKfG3RI9FLpoxmFF?=
- =?us-ascii?Q?RxmvqfqTJ0L+OLVib5wAP2MlQXMtNFHJG/Ax+gfgFuZJo53KPuhCxU35bX9q?=
- =?us-ascii?Q?oa7xPFvBl7GU+VcQDEGFfZ6e5MjtA8DEKC2trHAoXHyYv4uC76YzaSlWzCyR?=
- =?us-ascii?Q?5z28Pgf38NwJ21Y5AcqtoFMtrZGbwcnB+K8wvPVzjE3RmD7yVk2/CfQJ7KEq?=
- =?us-ascii?Q?8WQU9oDe+mTP+4uaXqXMW3pMmuEI3hWlhPeWFmaq03JWNlnR+e3XHZDW8eZk?=
- =?us-ascii?Q?9qsppPzi2jcu+O2IzVOL9fP6E/CA8iqoe7g03aB0P8X4+dBfRH/8M5cGrORO?=
- =?us-ascii?Q?XPdtxAsEacnNnhBltiUz7XT6pSQ+jqUfnnJtM6w3CZ+OkMtfpbKDgMSEFS6i?=
- =?us-ascii?Q?FQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 074791da-a403-42c8-ff29-08dc99cca7c3
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5782.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2024 12:52:24.7713
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U0oRaogRGLiewQBHH5rFDXwnuRRw84XkOf8ye8dYGvRm4L/L1+2W/17IHfRaawc/YN6iQRDHg+V4U5BabhC6ww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4672
-X-OriginatorOrg: intel.com
+In-Reply-To: <ZoKVtygkVYfaqjRI@localhost.localdomain>
+Date: Mon, 1 Jul 2024 12:56:43 +0000
+Message-ID: <CAG=2xmMgJcir=mfQuybosg9C8j3Sx1V=Du0ObH1eT_SnBZ7nMg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 05/10] net: openvswitch: add psample action
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com, 
+	horms@kernel.org, i.maximets@ovn.org, dev@openvswitch.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 01, 2024 at 07:42:40PM +0800, Liu Jing wrote:
-> in the tcp_register_ulp function, the initialized value of 'ret' is unused,
-> because it will be assigned a value by the -EEXIST.thus remove it.
-> 
-> Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
-> ---
->  net/ipv4/tcp_ulp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/tcp_ulp.c b/net/ipv4/tcp_ulp.c
-> index 2aa442128630..d11bde357e48 100644
-> --- a/net/ipv4/tcp_ulp.c
-> +++ b/net/ipv4/tcp_ulp.c
-> @@ -58,7 +58,7 @@ static const struct tcp_ulp_ops *__tcp_ulp_find_autoload(const char *name)
->   */
->  int tcp_register_ulp(struct tcp_ulp_ops *ulp)
->  {
-> -	int ret = 0;
-> +	int ret;
->  
->  	spin_lock(&tcp_ulp_list_lock);
->  	if (tcp_ulp_find(ulp->name))
-> -- 
-> 2.33.0
-> 
-> 
+On Mon, Jul 01, 2024 at 01:40:39PM GMT, Michal Kubiak wrote:
+> On Sun, Jun 30, 2024 at 09:57:26PM +0200, Adrian Moreno wrote:
+> > Add support for a new action: psample.
+> >
+> > This action accepts a u32 group id and a variable-length cookie and use=
+s
+> > the psample multicast group to make the packet available for
+> > observability.
+> >
+> > The maximum length of the user-defined cookie is set to 16, same as
+> > tc_cookie, to discourage using cookies that will not be offloadable.
+> >
+> > Acked-by: Eelco Chaudron <echaudro@redhat.com>
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+> >  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
+> >  include/uapi/linux/openvswitch.h          | 28 ++++++++++++++
+> >  net/openvswitch/Kconfig                   |  1 +
+> >  net/openvswitch/actions.c                 | 47 +++++++++++++++++++++++
+> >  net/openvswitch/flow_netlink.c            | 32 ++++++++++++++-
+> >  5 files changed, 124 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/=
+netlink/specs/ovs_flow.yaml
+> > index 4fdfc6b5cae9..46f5d1cd8a5f 100644
+> > --- a/Documentation/netlink/specs/ovs_flow.yaml
+> > +++ b/Documentation/netlink/specs/ovs_flow.yaml
+> > @@ -727,6 +727,12 @@ attribute-sets:
+> >          name: dec-ttl
+> >          type: nest
+> >          nested-attributes: dec-ttl-attrs
+> > +      -
+> > +        name: psample
+> > +        type: nest
+> > +        nested-attributes: psample-attrs
+> > +        doc: |
+> > +          Sends a packet sample to psample for external observation.
+> >    -
+> >      name: tunnel-key-attrs
+> >      enum-name: ovs-tunnel-key-attr
+> > @@ -938,6 +944,17 @@ attribute-sets:
+> >        -
+> >          name: gbp
+> >          type: u32
+> > +  -
+> > +    name: psample-attrs
+> > +    enum-name: ovs-psample-attr
+> > +    name-prefix: ovs-psample-attr-
+> > +    attributes:
+> > +      -
+> > +        name: group
+> > +        type: u32
+> > +      -
+> > +        name: cookie
+> > +        type: binary
+> >
+> >  operations:
+> >    name-prefix: ovs-flow-cmd-
+> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/open=
+vswitch.h
+> > index efc82c318fa2..3dd653748725 100644
+> > --- a/include/uapi/linux/openvswitch.h
+> > +++ b/include/uapi/linux/openvswitch.h
+> > @@ -914,6 +914,31 @@ struct check_pkt_len_arg {
+> >  };
+> >  #endif
+> >
+> > +#define OVS_PSAMPLE_COOKIE_MAX_SIZE 16
+>
+> In your patch #2 you use "TC_COOKIE_MAX_SIZE" as an array size for your
+> cookie. I know that now OVS_PSAMPLE_COOKIE_MAX_SIZE =3D=3D TC_COOKIE_MAX_=
+SIZE,
+> so this size will be validated correctly.
+> But how likely is that those 2 constants will have different values in th=
+e
+> future?
+> Would it be reasonable to create more strict dependency between those
+> macros, e.g.:
+>
+> #define OVS_PSAMPLE_COOKIE_MAX_SIZE TC_COOKIE_MAX_SIZE
+>
+> or, at least, add a comment that the size shouldn't be bigger than
+> TC_COOKIE_MAX_SIZE?
+> I'm just considering the risk of exceeding the array from the patch #2 wh=
+en
+> somebody increases OVS_PSAMPLE_COOKIE_MAX_SIZE in the future.
+>
+> Thanks,
+> Michal
+>
 
-As far as I understand the implementation of 'tcp_register_ulp', the only
-case when -EEXIST value will be assigned to 'ret' is when
-'tcp_ulp_find()' returns true.
-In all other cases the return value should be zero.
+Hi Michal,
 
-According to my understanding, uninitialized return value has been
-introduced in this patch which is not correct.
+Thanks for sharing your thoughts.
 
-Thanks,
-Nacked-by: Michal Kubiak <michal.kubiak@intel.com>
+I tried to keep the dependency between both cookie sizes loose.
+
+I don't want a change in TC_COOKIE_MAX_SIZE to inadvertently modify
+OVS_PSAMPLE_COOKIE_MAX_SIZE because OVS might not need a bigger cookie
+and even if it does, backwards compatibility needs to be guaranteed:
+meaning OVS userspace will have to detect the new size and use it or
+fall back to a smaller cookie for older kernels. All this needs to be
+known and worked on in userspace.
+
+On the other hand, I intentionally made OVS's "psample" action as
+similar as possible to act_psample, including setting the same cookie
+size to begin with. The reason is that I think we should try to implement
+tc-flower offloading of this action using act_sample, plus 16 seemed a
+very reasonable max value.
+
+When we decide to support offloading the "psample" action, this must
+be done entirely in userspace. OVS must create a act_sample action
+(instead of the OVS "psample" one) via netlink. In no circumstances the
+openvswitch kmod interacts with tc directly.
+
+Now, back to your concern. If OVS_PSAMPLE_COOKIE_MAX_SIZE grows and
+TC_COOKIE_MAX_SIZE does not *and* we already support offloading this
+action to tc, the only consequence is that OVS userspace has a
+problem because the tc's netlink interface will reject cookies larger
+than TC_COOKIE_MAX_SIZE [1].
+This guarantees that the array in patch #2 is never overflown.
+
+OVS will have to deal with the different sizes and try to squeeze the
+data into TC_COOKIE_MAX_SIZE or fail to offload the action altogether.
+
+Psample does not have a size limit so different parts of the kernel can
+use psample with different internal max-sizes without any restriction.
+
+I hope this clears your concerns.
+
+[1] https://github.com/torvalds/linux/blob/master/net/sched/act_api.c#L1299
+
+Thanks.
+Adri=C3=A1n
+
 
