@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-108119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD97B91DE74
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 13:56:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F74791DE77
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 13:56:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5870B1F20F3F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:56:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A931C20CEF
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9248147C60;
-	Mon,  1 Jul 2024 11:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC034126F0A;
+	Mon,  1 Jul 2024 11:56:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6D84D02;
-	Mon,  1 Jul 2024 11:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0224C6F077;
+	Mon,  1 Jul 2024 11:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719834957; cv=none; b=Nn4I6jh83TCyt7+0T8ehD7gRyZKsOtILZw3spCd12hkJwla8LZVbAkV6Eg9d6/ud/AxJ03j+WPowGZhp4V2fPBe4eNt10+4ZEH/4Wnc9HrksntGjWKCqq/0BGGF6yFThIt/fILU9fE5QoJEOI6sgk/WwYuX+Azks4igIwJqWDOE=
+	t=1719834982; cv=none; b=luF++ol4Yfur1li6xQvNO1zw6RGo2KVuV5RNYOQeiuHMyeGv4oa8mRDdsCriuz0Pn9LxYF8DPn+0GwQ8OPNy+Cyd4v1SFTkKNwNkcuALmqwWj8yMrS6SGgHWiVBO6FD+8twAzbUBTowRVqTCpP82gAZ/X2bsFdNHZ8psufHRNSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719834957; c=relaxed/simple;
-	bh=ugyVYwkES2Lk5tCgkNgZhFz5K7ZLRJ1gHFobe3Ted98=;
+	s=arc-20240116; t=1719834982; c=relaxed/simple;
+	bh=c/eazRGHNDXqDo1NT5g1rFQOxAx0WoppSOhvrZFCueY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Om3lfuqHD7vw6+bJGLOAkuA4vqUSCNMcOMTUzNET9BAplmDc6Nhl4wjUrwciI3ihJfly1Al/UDtnthYbKPARk/xJs9S98ei8k7Z/wYHNtYpjG0FjtmOi5fwz4JhM+kWF1gSMCBm+p856DdKsIf/cIXM4u/+mtMTm9satZMbnayc=
+	 MIME-Version:Content-Type; b=LyA+E/k62MKy0h9YiQxaq4hn47r6eZLEzeaPd3rQ/d76oi0uI5RY3X4IX2of/FgdqLE+0CDEoGOvulOEDZRoK39+xOGOor7RGvlg7BvgHxnEpW/il6YC2jHzwDdcyDyvrGd8RnOjhUmmQBa3p34dVSGAnhiB0JvuydRs3bNLTKw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 461BtUz753804433, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 461BtvwmF3804807, This message is accepted by code: ctloc85258
 Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 461BtUz753804433
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 461BtvwmF3804807
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Jul 2024 19:55:30 +0800
+	Mon, 1 Jul 2024 19:55:57 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
  RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 1 Jul 2024 19:55:30 +0800
+ 15.1.2507.39; Mon, 1 Jul 2024 19:55:58 +0800
 Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 1 Jul
- 2024 19:55:30 +0800
+ 2024 19:55:57 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -50,9 +50,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
         <larry.chiu@realtek.com>, "Justin
  Lai" <justinlai0215@realtek.com>
-Subject: [PATCH net-next v22 03/13] rtase: Implement the rtase_down function
-Date: Mon, 1 Jul 2024 19:53:53 +0800
-Message-ID: <20240701115403.7087-4-justinlai0215@realtek.com>
+Subject: [PATCH net-next v22 04/13] rtase: Implement the interrupt routine and rtase_poll
+Date: Mon, 1 Jul 2024 19:53:54 +0800
+Message-ID: <20240701115403.7087-5-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240701115403.7087-1-justinlai0215@realtek.com>
 References: <20240701115403.7087-1-justinlai0215@realtek.com>
@@ -64,192 +64,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
  RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Implement the rtase_down function to disable hardware setting
-and interrupt and clear descriptor ring.
+1. Implement rtase_interrupt to handle txQ0/rxQ0, txQ4~txQ7 interrupts,
+and implement rtase_q_interrupt to handle txQ1/rxQ1, txQ2/rxQ2 and
+txQ3/rxQ3 interrupts.
+2. Implement rtase_poll to call ring_handler to process the tx or
+rx packet of each ring. If the returned value is budget,it means that
+there is still work of a certain ring that has not yet been completed.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- .../net/ethernet/realtek/rtase/rtase_main.c   | 150 ++++++++++++++++++
- 1 file changed, 150 insertions(+)
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 88 +++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index ed296d93331f..ef0b4ff5db7c 100755
+index ef0b4ff5db7c..e65f53f01bce 100755
 --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
 +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -192,6 +192,56 @@ static int rtase_alloc_desc(struct rtase_private *tp)
- 	return -ENOMEM;
+@@ -584,6 +584,75 @@ static void rtase_hw_start(const struct net_device *dev)
+ 	rtase_enable_hw_interrupt(tp);
  }
  
-+static void rtase_unmap_tx_skb(struct pci_dev *pdev, u32 len,
-+			       struct rtase_tx_desc *desc)
++/*  the interrupt handler does RXQ0 and TXQ0, TXQ4~7 interrutp status
++ */
++static irqreturn_t rtase_interrupt(int irq, void *dev_instance)
 +{
-+	dma_unmap_single(&pdev->dev, le64_to_cpu(desc->addr), len,
-+			 DMA_TO_DEVICE);
-+	desc->opts1 = cpu_to_le32(RTK_OPTS1_DEBUG_VALUE);
-+	desc->opts2 = 0x00;
-+	desc->addr = cpu_to_le64(RTK_MAGIC_NUMBER);
-+}
-+
-+static void rtase_tx_clear_range(struct rtase_ring *ring, u32 start, u32 n)
-+{
-+	struct rtase_tx_desc *desc_base = ring->desc;
-+	struct rtase_private *tp = ring->ivec->tp;
-+	u32 i;
-+
-+	for (i = 0; i < n; i++) {
-+		u32 entry = (start + i) % RTASE_NUM_DESC;
-+		struct rtase_tx_desc *desc = desc_base + entry;
-+		u32 len = ring->mis.len[entry];
-+		struct sk_buff *skb;
-+
-+		if (len == 0)
-+			continue;
-+
-+		rtase_unmap_tx_skb(tp->pdev, len, desc);
-+		ring->mis.len[entry] = 0;
-+		skb = ring->skbuff[entry];
-+		if (!skb)
-+			continue;
-+
-+		tp->stats.tx_dropped++;
-+		dev_kfree_skb_any(skb);
-+		ring->skbuff[entry] = NULL;
-+	}
-+}
-+
-+static void rtase_tx_clear(struct rtase_private *tp)
-+{
-+	struct rtase_ring *ring;
-+	u16 i;
-+
-+	for (i = 0; i < tp->func_tx_queue_num; i++) {
-+		ring = &tp->tx_ring[i];
-+		rtase_tx_clear_range(ring, ring->dirty_idx, RTASE_NUM_DESC);
-+		ring->cur_idx = 0;
-+		ring->dirty_idx = 0;
-+	}
-+}
-+
- static void rtase_mark_to_asic(union rtase_rx_desc *desc, u32 rx_buf_sz)
- {
- 	u32 eor = le32_to_cpu(desc->desc_cmd.opts1) & RTASE_RING_END;
-@@ -423,6 +473,80 @@ static void rtase_tally_counter_clear(const struct rtase_private *tp)
- 	rtase_w32(tp, RTASE_DTCCR0, cmd | RTASE_COUNTER_RESET);
- }
- 
-+static void rtase_irq_dis_and_clear(const struct rtase_private *tp)
-+{
-+	const struct rtase_int_vector *ivec = &tp->int_vector[0];
-+	u32 val1;
-+	u16 val2;
-+	u8 i;
-+
-+	rtase_w32(tp, ivec->imr_addr, 0);
-+	val1 = rtase_r32(tp, ivec->isr_addr);
-+	rtase_w32(tp, ivec->isr_addr, val1);
-+
-+	for (i = 1; i < tp->int_nums; i++) {
-+		ivec = &tp->int_vector[i];
-+		rtase_w16(tp, ivec->imr_addr, 0);
-+		val2 = rtase_r16(tp, ivec->isr_addr);
-+		rtase_w16(tp, ivec->isr_addr, val2);
-+	}
-+}
-+
-+static void rtase_poll_timeout(const struct rtase_private *tp, u32 cond,
-+			       u32 sleep_us, u64 timeout_us, u16 reg)
-+{
-+	int err;
-+	u8 val;
-+
-+	err = read_poll_timeout(rtase_r8, val, val & cond, sleep_us,
-+				timeout_us, false, tp, reg);
-+
-+	if (err == -ETIMEDOUT)
-+		netdev_err(tp->dev, "poll reg 0x00%x timeout\n", reg);
-+}
-+
-+static void rtase_nic_reset(const struct net_device *dev)
-+{
-+	const struct rtase_private *tp = netdev_priv(dev);
-+	u16 rx_config;
-+	u8 val;
-+
-+	rx_config = rtase_r16(tp, RTASE_RX_CONFIG_0);
-+	rtase_w16(tp, RTASE_RX_CONFIG_0, rx_config & ~RTASE_ACCEPT_MASK);
-+
-+	val = rtase_r8(tp, RTASE_MISC);
-+	rtase_w8(tp, RTASE_MISC, val | RTASE_RX_DV_GATE_EN);
-+
-+	val = rtase_r8(tp, RTASE_CHIP_CMD);
-+	rtase_w8(tp, RTASE_CHIP_CMD, val | RTASE_STOP_REQ);
-+	mdelay(2);
-+
-+	rtase_poll_timeout(tp, RTASE_STOP_REQ_DONE, 100, 150000,
-+			   RTASE_CHIP_CMD);
-+
-+	rtase_poll_timeout(tp, RTASE_TX_FIFO_EMPTY, 100, 100000,
-+			   RTASE_FIFOR);
-+
-+	rtase_poll_timeout(tp, RTASE_RX_FIFO_EMPTY, 100, 100000,
-+			   RTASE_FIFOR);
-+
-+	val = rtase_r8(tp, RTASE_CHIP_CMD);
-+	rtase_w8(tp, RTASE_CHIP_CMD, val & ~(RTASE_TE | RTASE_RE));
-+	val = rtase_r8(tp, RTASE_CHIP_CMD);
-+	rtase_w8(tp, RTASE_CHIP_CMD, val & ~RTASE_STOP_REQ);
-+
-+	rtase_w16(tp, RTASE_RX_CONFIG_0, rx_config);
-+}
-+
-+static void rtase_hw_reset(const struct net_device *dev)
-+{
-+	const struct rtase_private *tp = netdev_priv(dev);
-+
-+	rtase_irq_dis_and_clear(tp);
-+
-+	rtase_nic_reset(dev);
-+}
-+
- static void rtase_nic_enable(const struct net_device *dev)
- {
- 	const struct rtase_private *tp = netdev_priv(dev);
-@@ -526,6 +650,32 @@ static int rtase_open(struct net_device *dev)
- 	return ret;
- }
- 
-+static void rtase_down(struct net_device *dev)
-+{
-+	struct rtase_private *tp = netdev_priv(dev);
++	const struct rtase_private *tp;
 +	struct rtase_int_vector *ivec;
-+	struct rtase_ring *ring, *tmp;
-+	u32 i;
++	u32 status;
 +
-+	for (i = 0; i < tp->int_nums; i++) {
-+		ivec = &tp->int_vector[i];
-+		napi_disable(&ivec->napi);
-+		list_for_each_entry_safe(ring, tmp, &ivec->ring_list,
-+					 ring_entry)
-+			list_del(&ring->ring_entry);
-+	}
++	ivec = dev_instance;
++	tp = ivec->tp;
++	status = rtase_r32(tp, ivec->isr_addr);
 +
-+	netif_tx_disable(dev);
++	rtase_w32(tp, ivec->imr_addr, 0x0);
++	rtase_w32(tp, ivec->isr_addr, status & ~RTASE_FOVW);
 +
-+	netif_carrier_off(dev);
++	if (napi_schedule_prep(&ivec->napi))
++		__napi_schedule(&ivec->napi);
 +
-+	rtase_hw_reset(dev);
-+
-+	rtase_tx_clear(tp);
-+
-+	rtase_rx_clear(tp);
++	return IRQ_HANDLED;
 +}
 +
- static int rtase_close(struct net_device *dev)
++/*  the interrupt handler does RXQ1&TXQ1 or RXQ2&TXQ2 or RXQ3&TXQ3 interrupt
++ *  status according to interrupt vector
++ */
++static irqreturn_t rtase_q_interrupt(int irq, void *dev_instance)
++{
++	const struct rtase_private *tp;
++	struct rtase_int_vector *ivec;
++	u16 status;
++
++	ivec = dev_instance;
++	tp = ivec->tp;
++	status = rtase_r16(tp, ivec->isr_addr);
++
++	rtase_w16(tp, ivec->imr_addr, 0x0);
++	rtase_w16(tp, ivec->isr_addr, status);
++
++	if (napi_schedule_prep(&ivec->napi))
++		__napi_schedule(&ivec->napi);
++
++	return IRQ_HANDLED;
++}
++
++static int rtase_poll(struct napi_struct *napi, int budget)
++{
++	const struct rtase_int_vector *ivec;
++	const struct rtase_private *tp;
++	struct rtase_ring *ring;
++	int total_workdone = 0;
++
++	ivec = container_of(napi, struct rtase_int_vector, napi);
++	tp = ivec->tp;
++
++	list_for_each_entry(ring, &ivec->ring_list, ring_entry)
++		total_workdone += ring->ring_handler(ring, budget);
++
++	if (total_workdone >= budget)
++		return budget;
++
++	if (napi_complete_done(napi, total_workdone)) {
++		if (!ivec->index)
++			rtase_w32(tp, ivec->imr_addr, ivec->imr);
++		else
++			rtase_w16(tp, ivec->imr_addr, ivec->imr);
++	}
++
++	return total_workdone;
++}
++
+ static int rtase_open(struct net_device *dev)
  {
  	struct rtase_private *tp = netdev_priv(dev);
+@@ -729,9 +798,28 @@ static void rtase_rar_set(const struct rtase_private *tp, const u8 *addr)
+ 	rtase_w16(tp, RTASE_LBK_CTRL, RTASE_LBK_ATLD | RTASE_LBK_CLR);
+ }
+ 
++#ifdef CONFIG_NET_POLL_CONTROLLER
++/* Polling 'interrupt' - used by things like netconsole to send skbs
++ * without having to re-enable interrupts. It's not called while
++ * the interrupt routine is executing.
++ */
++static void rtase_netpoll(struct net_device *dev)
++{
++	const struct rtase_private *tp = netdev_priv(dev);
++	const struct pci_dev *pdev = tp->pdev;
++
++	disable_irq(pdev->irq);
++	rtase_interrupt(pdev->irq, dev);
++	enable_irq(pdev->irq);
++}
++#endif
++
+ static const struct net_device_ops rtase_netdev_ops = {
+ 	.ndo_open = rtase_open,
+ 	.ndo_stop = rtase_close,
++#ifdef CONFIG_NET_POLL_CONTROLLER
++	.ndo_poll_controller = rtase_netpoll,
++#endif
+ };
+ 
+ static void rtase_get_mac_address(struct net_device *dev)
 -- 
 2.34.1
 
