@@ -1,155 +1,218 @@
-Return-Path: <netdev+bounces-108064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B6791DBB1
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:47:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A930D91DC03
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:03:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23BBB1C214BF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65EA6283FA2
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B59885923;
-	Mon,  1 Jul 2024 09:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C9A12C479;
+	Mon,  1 Jul 2024 10:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mnlvbcmW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZGITFEOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3328D2C859;
-	Mon,  1 Jul 2024 09:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC2612BF30;
+	Mon,  1 Jul 2024 10:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719827216; cv=none; b=d8lgisSHAlTz0OFqQSo6ZtpKAuuNtRffmHawYYft4B8TCduDIXA5di2CJ3goSpqzv0Ux52uPiR/oracWhAn/7fnNJRDzZZhjGx74DuVtYe7dcksuXBZ0TaSW7cW1w1g/+AFlKVRr9Uy+puIOaLsauXgRlrLyz43EcSgl0++6VUY=
+	t=1719828201; cv=none; b=SWpFByyzpduKCCL8nuKmSKpRUuECYCxm9HYMF7hCyEzbL184slsxy01NdYPXdIFUqJTxDwYtKd77bfSb2K5E1Pxkn5cuCyCffnbfEWVokOM561+LMUK+MykPl7VeoLmqW+qr4qvYrzBn2r77Meclo2Q1yubKuQ2ITAuAClldEvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719827216; c=relaxed/simple;
-	bh=scilYPjhugue+IwrJ02oY8ugBMErZFNzUjkKC21E5ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oHd4Hx98uHv0Nr9D8YyX3Kdvqcddic6H4F0Pb0+7nhvMfUYSTOzXHxOOJCa+6EtOYVx7F5z0qzh85VCDCXjKmCPaMl+iWMetJh6en7+zsAwheh5IOpjuZzKafpMFjHJWRvLkgyc2YyiYVhM0kqkHsKet60+oB57zmXBjp1ffNug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mnlvbcmW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CDB6C116B1;
-	Mon,  1 Jul 2024 09:46:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719827215;
-	bh=scilYPjhugue+IwrJ02oY8ugBMErZFNzUjkKC21E5ok=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mnlvbcmWWykaVA3I6Ag/PsXJ8GXEDQKvKJ42Z7gMCqJPGCQVZepyxwXZHsr/RsjV5
-	 ZJT8AWPinQocyTk5v7m5VZGWplWIqFrYNbuW1MX7GOQdkd2NQ9zC5cfQPb4qoWxHxe
-	 Xrqc7Op+meRUb7V/HmI4jUOwmtYI15kFNBV2+MvS4ApIXsJfsbjd11DQ7MkhXyd4ux
-	 Quh88BlZh8qMs4DEsRFST+MzRQ5kQI67wFhf8t9Znd2pjv3DEcTKCGvTtN2fJ4AeC3
-	 Y/XncOGqb5KwVr13rSx9Pi9kE6BQ8oDiqv/lX0kGurOfJHfaerHsc409RP0NflSfW1
-	 KWK7T0o53d3MA==
-Message-ID: <ab602b9d-dfdf-4d46-9d11-08801c5c52c8@kernel.org>
-Date: Mon, 1 Jul 2024 12:46:49 +0300
+	s=arc-20240116; t=1719828201; c=relaxed/simple;
+	bh=IHzImYBvS+r2Fb9vRJHdboMmTujqYSOlMOmKDtVxjSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NamhzAbIYcGh7AQthBMxsbWt7rTItNq+w1SgCNccOTGrspCVbdBYRuZ36nA2guQ3/ASrqijAxaj4UAnGkYp4EnumP4kjW5a/4cF+17ZOe2Q9wE49YfGKi1hglo8eTvoeCWd/QEU/c3HwaRMWB6kLdtz/6K/NzDZMKGw9haSBDyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZGITFEOq; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719828200; x=1751364200;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IHzImYBvS+r2Fb9vRJHdboMmTujqYSOlMOmKDtVxjSE=;
+  b=ZGITFEOqTMge5BJjpGpnqykS3XJZTGp4Flrp3ROP5drMFANMgddwx4YW
+   aKe0twN7q+waFEbq6xmZ+6nMo0lrzZ1+HwzMpy5Nogz8oICMgVbBsm8Em
+   5ntzAAENdn0eH55RhkiXdd9f+vBPg84Tv8wG/XzP8+vdoSkfWIrOKUBL+
+   qZ8y78F+1+Thlhevjx/YJaobpgINUkP9ylPjUJM6RDxW/zOIBobojxjKI
+   dzamS61VSO46FJ28ge4CnzgbwSuY0oDv3E3Kl7NpgDwnLKRCYp++nmCTV
+   jlaXTBRzB9XZ6WuwwjT5Ze5ovIbJ0iJNTaFPCo/q5JHmS4TIBY7xeqt+b
+   g==;
+X-CSE-ConnectionGUID: tLtvLf/YT2WxkYYqLWGdbw==
+X-CSE-MsgGUID: 6swt6iXURZaRg1CavVdUFQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11119"; a="16783848"
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="16783848"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 03:03:19 -0700
+X-CSE-ConnectionGUID: Anw2rhvOSD6NgytuqK2ETQ==
+X-CSE-MsgGUID: e35sdeIxRzmdQoUVKrLERw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="68696797"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 03:03:18 -0700
+Received: from mohdfai2-iLBPG12-1.png.intel.com (mohdfai2-iLBPG12-1.png.intel.com [10.88.227.73])
+	by linux.intel.com (Postfix) with ESMTP id D0DA720B5702;
+	Mon,  1 Jul 2024 03:03:14 -0700 (PDT)
+From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Subject: [PATCH iwl-net v1 1/1] igc: Fix packet still tx after gate close by reducing i226 MAC retry buffer
+Date: Mon,  1 Jul 2024 06:00:58 -0400
+Message-Id: <20240701100058.3301229-1-faizal.abdul.rahim@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 5/7] net: ethernet: ti: cpsw_ale: add
- policer/classifier helpers
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Julien Panis <jpanis@baylibre.com>, Andrew Lunn <andrew@lunn.ch>,
- srk@ti.com, vigneshr@ti.com, danishanwar@ti.com, pekka Varis
- <p-varis@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org
-References: <20240628-am65-cpsw-multi-rx-v2-0-c399cb77db56@kernel.org>
- <20240628-am65-cpsw-multi-rx-v2-5-c399cb77db56@kernel.org>
- <20240701073550.GK17134@kernel.org>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240701073550.GK17134@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+AVNU testing uncovered that even when the taprio gate is closed,
+some packets still transmit.
 
+A known i225/6 hardware errata states traffic might overflow the planned
+QBV window. This happens because MAC maintains an internal buffer,
+primarily for supporting half duplex retries. Therefore, when
+the gate closes, residual MAC data in the buffer may still transmit.
 
-On 01/07/2024 10:35, Simon Horman wrote:
-> On Fri, Jun 28, 2024 at 03:01:54PM +0300, Roger Quadros wrote:
->> The Policer registers in the ALE register space are just shadow registers
->> and use an index field in the policer table control register to read/write
->> to the actual Polier registers.
->> Add helper functions to Read and Write to Policer registers.
->>
->> Also add a helper function to set the thread value to classifier/policer
->> mapping. Any packet that first matches the classifier will be sent to the
->> thread (flow) that is set in the classifer to thread mapping table.
-> 
-> nit: classifier
-> 
->      Flagged by checkpatch.pl --codespell
+To mitigate this for i226, reduce the MAC's internal buffer from
+192 bytes to 88 bytes by modifying the RETX_CTL register value.
+This follows guidelines from:
 
-will fix.
+a) Ethernet Controller I225/I22 Spec Update Rev 2.1 Errata Item 9:
+   TSN: Packet Transmission Might Cross Qbv Window
+b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
 
-> 
->> If not set then it goes to the default flow.
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  drivers/net/ethernet/ti/cpsw_ale.c | 24 ++++++++++++++++++++++++
->>  1 file changed, 24 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
->> index 7bd0dc20f894..75a17184d34c 100644
->> --- a/drivers/net/ethernet/ti/cpsw_ale.c
->> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
->> @@ -1626,3 +1626,27 @@ u32 cpsw_ale_get_num_entries(struct cpsw_ale *ale)
->>  {
->>  	return ale ? ale->params.ale_entries : 0;
->>  }
->> +
->> +/* Reads the specified policer index into ALE POLICER registers */
->> +static void cpsw_ale_policer_read_idx(struct cpsw_ale *ale, u32 idx)
->> +{
->> +	idx &= ALE_POLICER_TBL_INDEX_MASK;
->> +	writel_relaxed(idx, ale->params.ale_regs + ALE_POLICER_TBL_CTL);
->> +}
->> +
->> +/* Writes the ALE POLICER registers into the specified policer index */
->> +static void cpsw_ale_policer_write_idx(struct cpsw_ale *ale, u32 idx)
->> +{
->> +	idx &= ALE_POLICER_TBL_INDEX_MASK;
->> +	idx |= ALE_POLICER_TBL_WRITE_ENABLE;
->> +	writel_relaxed(idx, ale->params.ale_regs + ALE_POLICER_TBL_CTL);
->> +}
->> +
->> +/* enables/disables the custom thread value for the specified policer index */
->> +static void cpsw_ale_policer_thread_idx_enable(struct cpsw_ale *ale, u32 idx,
->> +					       u32 thread_id, bool enable)
->> +{
->> +	regmap_field_write(ale->fields[ALE_THREAD_CLASS_INDEX], idx);
->> +	regmap_field_write(ale->fields[ALE_THREAD_VALUE], thread_id);
->> +	regmap_field_write(ale->fields[ALE_THREAD_ENABLE], enable ? 1 : 0);
->> +}
->>
-> 
-> I like that this patch-set is broken out into nice discrete patches,
-> including this one. So I'm in two minds about the comment I'm about to
-> make, but here goes.
-> 
-> As these helpers are unused this raises Warnings with W=1 builds on
-> gcc-13 and clang-18, which is generally undesirable for networking patches.
-> 
-> I can think of a few options here;
-> * Ignore the warnings
-> * Squash this patch into the following one
-> * Add some annotations, e.g. __maybe_unused or __always_unused.
->   Likely dropped in the next patch.
-> 
-> I think I lean towards the last option.
-> But I won't push the point any further regardless.
+Test Steps:
+1. Send taprio cmd to board A
+tc qdisc replace dev enp1s0 parent root handle 100 taprio \
+num_tc 4 \
+map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
+queues 1@0 1@1 1@2 1@3 \
+base-time 0 \
+sched-entry S 0x07 500000 \
+sched-entry S 0x0f 500000 \
+flags 0x2 \
+txtime-delay 0
 
-Thanks for the suggestions. I do not like using any of the __unused flags.
-So I'm leaning towards your second solution. Will fix this in next revision.
+- Note that for TC3, gate opens for 500us and close for another 500us
 
+3. Take tcpdump log on Board B
+
+4. Send udp packets via UDP tai app from Board A to Board B
+
+5. Analyze tcpdump log via wireshark log on Board B
+- Observed that the total time from the first to the last packet
+received during one cycle for TC3 does not exceed 500us
+
+Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+---
+ drivers/net/ethernet/intel/igc/igc_defines.h |  6 ++++
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 34 ++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 5f92b3c7c3d4..511384f3ec5c 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -404,6 +404,12 @@
+ #define IGC_DTXMXPKTSZ_TSN	0x19 /* 1600 bytes of max TX DMA packet size */
+ #define IGC_DTXMXPKTSZ_DEFAULT	0x98 /* 9728-byte Jumbo frames */
+ 
++/* Retry Buffer Control */
++#define IGC_RETX_CTL			0x041C
++#define IGC_RETX_CTL_WATERMARK_MASK	0xF
++#define IGC_RETX_CTL_QBVFULLTH_SHIFT	8 /* QBV Retry Buffer Full Threshold */
++#define IGC_RETX_CTL_QBVFULLEN	0x1000 /* Enable QBV Retry Buffer Full Threshold */
++
+ /* Transmit Scheduling Latency */
+ /* Latency between transmission scheduling (LaunchTime) and the time
+  * the packet is transmitted to the network in nanosecond.
+diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+index 22cefb1eeedf..c97d908cecc5 100644
+--- a/drivers/net/ethernet/intel/igc/igc_tsn.c
++++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+@@ -78,6 +78,15 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
+ 	wr32(IGC_GTXOFFSET, txoffset);
+ }
+ 
++static void igc_tsn_restore_retx_default(struct igc_adapter *adapter)
++{
++	struct igc_hw *hw = &adapter->hw;
++	u32 retxctl;
++
++	retxctl = rd32(IGC_RETX_CTL) & IGC_RETX_CTL_WATERMARK_MASK;
++	wr32(IGC_RETX_CTL, retxctl);
++}
++
+ /* Returns the TSN specific registers to their default values after
+  * the adapter is reset.
+  */
+@@ -91,6 +100,9 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_TXPBS, I225_TXPBSIZE_DEFAULT);
+ 	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_DEFAULT);
+ 
++	if (igc_is_device_id_i226(hw))
++		igc_tsn_restore_retx_default(adapter);
++
+ 	tqavctrl = rd32(IGC_TQAVCTRL);
+ 	tqavctrl &= ~(IGC_TQAVCTRL_TRANSMIT_MODE_TSN |
+ 		      IGC_TQAVCTRL_ENHANCED_QAV | IGC_TQAVCTRL_FUTSCDDIS);
+@@ -111,6 +123,25 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	return 0;
+ }
+ 
++/* To partially fix i226 HW errata, reduce MAC internal buffering from 192 Bytes
++ * to 88 Bytes by setting RETX_CTL register using the recommendation from:
++ * a) Ethernet Controller I225/I22 Specification Update Rev 2.1
++ *    Item 9: TSN: Packet Transmission Might Cross the Qbv Window
++ * b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
++ */
++static void igc_tsn_set_retx_qbvfullth(struct igc_adapter *adapter)
++{
++	struct igc_hw *hw = &adapter->hw;
++	u32 retxctl, watermark;
++
++	retxctl = rd32(IGC_RETX_CTL);
++	watermark = retxctl & IGC_RETX_CTL_WATERMARK_MASK;
++	/* Set QBVFULLTH value using watermark and set QBVFULLEN */
++	retxctl |= (watermark << IGC_RETX_CTL_QBVFULLTH_SHIFT) |
++		   IGC_RETX_CTL_QBVFULLEN;
++	wr32(IGC_RETX_CTL, retxctl);
++}
++
+ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ {
+ 	struct igc_hw *hw = &adapter->hw;
+@@ -123,6 +154,9 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
+ 	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
+ 
++	if (igc_is_device_id_i226(hw))
++		igc_tsn_set_retx_qbvfullth(adapter);
++
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
+ 		struct igc_ring *ring = adapter->tx_ring[i];
+ 		u32 txqctl = 0;
 -- 
-cheers,
--roger
+2.25.1
+
 
