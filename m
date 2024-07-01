@@ -1,152 +1,209 @@
-Return-Path: <netdev+bounces-108249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364FE91E82F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:05:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC6491E84E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82430B20C9C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:05:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 642721F22891
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD3816F292;
-	Mon,  1 Jul 2024 19:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4757D16F836;
+	Mon,  1 Jul 2024 19:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MyhNwXk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RtX/vA4r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A0A16D334
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 19:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E35316F0F0;
+	Mon,  1 Jul 2024 19:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719860704; cv=none; b=E+CC/9t+hp/1+g2M3/XdzC/v3VRaV66h4/tucr33iJGOMb7+Ogw5eduTIFjHhMv/9hAwYWrszOLKYZQYisaZWML4HA6Y1uFKuwJr3vyyLwmNqD5kKp7QzpLq9xiSvqZesZhQmvxPFtLkj8qljd5lC6DpQV0GXdObZexu1vTcf9s=
+	t=1719861185; cv=none; b=M9VYUU817PvWd0oi14GMry72HoMWtrlKFDBcKkEQylDQzenkP77Ewr9tJ6aKu/rjTv9LDxyM16em4XYA6rNqcanivsNO2wOJ5Jefz/kAAAQtG+yDD/zbyggILLZJhw8qeehpmhi+GqbIM+TQrlXjZKYDXNx27C36DE2g6x/nQ8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719860704; c=relaxed/simple;
-	bh=8k0AtF9KiolyJWuK8HLhDCv/hmVhr/rBk1ct5cuT9AA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GhD/cofJJWc7rPhk7Gr9OHWiUaQ82XqneFpP+7zMFmj2Y+yjXI5dndT3wqRJOJggzfCiezXfxu0D8K50ANS+9/OiE7/XrC+zP0BHSX/9vYCcgD+JMuqUjxv9BcRLduZwxNkA0KGNVRWtt16QZLiKuV9kBDDqHICT7t/ImPtgHxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MyhNwXk; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79c05313eb5so288509385a.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 12:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719860702; x=1720465502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1iyaJckUfwKLOavZsL0Dti/NvsfMxOg4fM60nbeLb3c=;
-        b=2MyhNwXkCa2AA3Z+FkWBFUSIczECBuY034xv2sUMnsVK1JAGLplHV/guNmfssGc5I1
-         D8a0j2y08JPde7IkGpN8LX30r6ezveA3/hMjlXq8zLe04mWt0qnAaEPrTDd2BA5v2l+6
-         Iv6dLD0aQ4owbIcrPfZLc6za9Tr+2iQ9eqqZvMOtORPI139I+ePbnZT4DFLnSJ0yCTX/
-         I/orwGmbJSNtOjqGr9Dob5WykAAa2DWlpbQrXkaBJxQatFPLN+TjE2bJtG1b6pQdCRRg
-         3423j6YO0fWBhsDvK3mvzQk7JxL7pIv0ng1zlCqmSW/aZyWSkjeH3DBPrQtlyq6xCOFw
-         myxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719860702; x=1720465502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1iyaJckUfwKLOavZsL0Dti/NvsfMxOg4fM60nbeLb3c=;
-        b=B3c0k8LCUW3tF8upnz6uuNDxtIIpmRq6sXGS617RRHKKqYeSJuF4XkFRyuUSV7bfxx
-         O+GAN6OU4hT10hiGN/+c1vVfbYzIhp9IM84WxilK+aAy/M+imtfsRTlB0urLm9schNc6
-         055+UVlJba2ZmajOEUUygpyS2AjE262bqmy+rPJZja/7ilLWrlASWR8Xr4vm4XXYackM
-         4Sc/QJX8ohSciucbCfrsBd0DpkqrPaXRMKwlkomwg+I7CLTJxYjDMWGbjsLzP0Rxfv/3
-         vgpHz9C+jEZsKcn/pWbeIYxiJgpBtT2Y+dayY6iymyKn1naKqTXGorgkMEtfuTdI1bTC
-         /vVg==
-X-Gm-Message-State: AOJu0YzYurAiP+1wKt1n4Rncl/I1n4TAiuGlJkyfBkrXpL3s9YYlWvai
-	9y5KTbLJpgmVAAeqbhHR0julVghq495MTuforVBMInLhmkFQWSlf4mBKmisH237/qJCsVDAU0lS
-	WKSQz8+U9RJcHbF5TpMWXVdN6lOO15wibCyly
-X-Google-Smtp-Source: AGHT+IFMk/Fy8HmApu9Nagm7rkVtZNRgXI7ZtAkmxpMtHuX4P9lSyGrItN72Z9tf2GD9wH/LCrC3alUkG3t3FzAjxFY=
-X-Received: by 2002:ad4:5762:0:b0:6b5:413a:3f96 with SMTP id
- 6a1803df08f44-6b5b704f0e0mr82787156d6.10.1719860701461; Mon, 01 Jul 2024
- 12:05:01 -0700 (PDT)
+	s=arc-20240116; t=1719861185; c=relaxed/simple;
+	bh=iah6vxPmNoMKkFqv8vV3vfr0RI89jVaKOeDiBHmwcP8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vnp2L8lzz9+MJDPqkbF0Xydqs/RRhJ+Io0Yn0/1Jw/SH84kgpbuaa/k4IV2EPIWx9C90f8l1nIOnviy5XdinoEFQgUMnDouxoYxr7Nii2h8uVRsZ04pJYDHBj7Paq6ZuicAfPNSVBXj+jE3D3W8onZ9hG+p0MPMVYBAmMjndSp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RtX/vA4r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9C40C32781;
+	Mon,  1 Jul 2024 19:13:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719861184;
+	bh=iah6vxPmNoMKkFqv8vV3vfr0RI89jVaKOeDiBHmwcP8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RtX/vA4rdiTVl0whr0d++JbtH0iGY0ga1ZXtjuRFI68ourBdJ2PBBACqoLay2JB77
+	 6zyAwNINSJWxpjSA453uQsygrFZ01hZpig0uNGG+Lrb+OThCDO8MFrq9Dpj2NEjRG8
+	 mglHEdoE9oFLqKvMusSHIci5vl11qap/E5VZMHTe5dJ7qwTd7IiTy//AgudMTI+5V6
+	 UJ+6/vmDrrFno6hygTZclInRC2fGeNZXzJaXvmxIA2QpkgyQ7cmOMkSq4tYOxAL2pJ
+	 5RztPVPD1lCNb2lWdBF6ajMbEAOh1/EEB724qqoU1WV5TM5eG1g1P1EKMcSXCdwNb/
+	 +dYbHLIYUp2QA==
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Kees Cook <kees@kernel.org>,
+	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Christoph Lameter <cl@linux.com>,
+	Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>,
+	Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v6 0/6] slab: Introduce dedicated bucket allocator
+Date: Mon,  1 Jul 2024 12:12:57 -0700
+Message-Id: <20240701190152.it.631-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628003253.1694510-1-almasrymina@google.com>
- <20240628003253.1694510-3-almasrymina@google.com> <m27ce9cris.fsf@gmail.com>
-In-Reply-To: <m27ce9cris.fsf@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 1 Jul 2024 12:04:49 -0700
-Message-ID: <CAHS8izNM8TjJ1DU+7gzq-0kH=tVeM6j-QsaKk=2FHNDF6RLwnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 02/14] net: netdev netlink api to bind
- dma-buf to a net device
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6373; i=kees@kernel.org; h=from:subject:message-id; bh=iah6vxPmNoMKkFqv8vV3vfr0RI89jVaKOeDiBHmwcP8=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmgv++wYpdg1QAVso3x/Qnvyba7ZEqjOAyoKi+1 Tp6lxsqfrSJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZoL/vgAKCRCJcvTf3G3A Jl+sEACxg9KQeodWaMSNrbxqxPZiq+SxRmaH66iRDr5+5jG4KmBa1Smye7sCWO3QJCtVmChSp8t 2+Xr3e5iN3EScMAixVYZsFYdLPZ1mmGs2Y1PAIXzM2v3ggK6q62jAWZeIssFGczrm/GqN1qdZtF qKz5x9SVPJgKu7GbWb9Olzp50Kgd4l2ZA7SKKN+Cl8ZvNYBdoYzXALl/naT8Jacow+FnlS18fZt mI6Fq0huDm+I90tgmYWXijvx3Gm2ID1jcrPmP7Fv93HhTKCV6TeAhwbFgPlfMrErODdGZZ61GJC 6Iou3EmCIaDzzAhFMXIhSDfIRYSnfaHjOLnvoT4WZKSG6uz9jZEt9gqeH/xnE30sTXCcFc5y5QV TBgAmd+eskUwBLB460g8h9CyIm4RJxQk36sJdXy1q3OgT9Vp5pZyWFQ9mbvKaU4475j6CZ/1ekZ E7NbaBCtDip9gQWQal+z9a1XzBhxC/fJN/1hapXWVQRsZ1YiQUd0+NWT2G10qPeQ5C+sdw/K0aH AbW43GNJWalOitgzCgjqMC2j4+33bGXKZZSHxDAAv0RaXO65izNqEw/CggNE+oU/cCsx4LKo97P qTTIfrgTt6ZEnUj8yIYORkh6vIuo76QGcKaDO7NmlM1rCAjpPyd7QsnrOsaMU+bQOwEJJ9CtKji ENP5WdKsZHiLY
+ FA==
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 28, 2024 at 3:10=E2=80=AFAM Donald Hunter <donald.hunter@gmail.=
-com> wrote:
->
-> Mina Almasry <almasrymina@google.com> writes:
-> > +  -
-> > +    name: bind-dmabuf
-> > +    attributes:
-> > +      -
-> > +        name: ifindex
-> > +        doc: netdev ifindex to bind the dma-buf to.
->
-> Minor nit:
->
-> The series uses a mix of dmabuf and dma-buf but the doc additions
-> (devmem.rst) consistently uses dmabuf. I think it would be helpful to be
-> consistent here and say 'devmem dmabuf' in the docstring to highlight
-> whos dmabuf it is and keep the generated netdev docs in alignment.
->
+Hi,
 
-To be honest, even the dmabuf docs mixes 'dma-buf' and 'dmabuf', to my eye:
+ v6:
+  - update commit logs:
+    - update description of Kconfig default and API details
+    - call out usage of SLAB_NO_MERGE
+    - improve description of cross-cache attacks
+    - fix typos
+  - add kern-doc parsing of DECL_BUCKET_PARAMS macro
+  - add kern-doc to kmem_buckets_create()
+  - have CONFIG_SLAB_BUCKETS default to CONFIG_SLAB_FREELIST_HARDENED
+  - add CONFIG_SLAB_BUCKETS to hardening.config
+  - drop alignment argument from kmem_buckets_create()
+ v5: https://lore.kernel.org/lkml/20240619192131.do.115-kees@kernel.org
+ v4: https://lore.kernel.org/lkml/20240531191304.it.853-kees@kernel.org/
+ v3: https://lore.kernel.org/lkml/20240424213019.make.366-kees@kernel.org/
+ v2: https://lore.kernel.org/lkml/20240305100933.it.923-kees@kernel.org/
+ v1: https://lore.kernel.org/lkml/20240304184252.work.496-kees@kernel.org/
 
-https://docs.kernel.org/driver-api/dma-buf.html
+For the cover letter, I'm repeating the commit log for patch 4 here,
+which has the more complete rationale:
 
-I can edit these docs I'm adding so these are consistent.
+    Dedicated caches are available for fixed size allocations via
+    kmem_cache_alloc(), but for dynamically sized allocations there is only
+    the global kmalloc API's set of buckets available. This means it isn't
+    possible to separate specific sets of dynamically sized allocations into
+    a separate collection of caches.
 
-But on 'devmem dmabuf', not sure to be honest. Technically all dmabufs
-are supported, even non-devmem ones. I'm not sure non-devmem dmabufs
-are common at all, the only example I can think of is udmabuf whose
-primary user is qemu and testing, so it's somewhat implied that the
-dmabuf is devmem, and even if it isn't, it would be supported. I
-prefer to keep the docs saying just 'dmabuf' as technically all are
-supported. Maybe I should add a note about this somewhere in the
-dedicated docs.
+    This leads to a use-after-free exploitation weakness in the Linux
+    kernel since many heap memory spraying/grooming attacks depend on using
+    userspace-controllable dynamically sized allocations to collide with
+    fixed size allocations that end up in same cache.
 
---=20
-Thanks,
-Mina
+    While CONFIG_RANDOM_KMALLOC_CACHES provides a probabilistic defense
+    against these kinds of "type confusion" attacks, including for fixed
+    same-size heap objects, we can create a complementary deterministic
+    defense for dynamically sized allocations that are directly user
+    controlled. Addressing these cases is limited in scope, so isolating these
+    kinds of interfaces will not become an unbounded game of whack-a-mole. For
+    example, many pass through memdup_user(), making isolation there very
+    effective.
+
+    In order to isolate user-controllable dynamically-sized
+    allocations from the common system kmalloc allocations, introduce
+    kmem_buckets_create(), which behaves like kmem_cache_create(). Introduce
+    kmem_buckets_alloc(), which behaves like kmem_cache_alloc(). Introduce
+    kmem_buckets_alloc_track_caller() for where caller tracking is
+    needed. Introduce kmem_buckets_valloc() for cases where vmalloc fallback
+    is needed. Note that these caches are specifically flagged with
+    SLAB_NO_MERGE, since merging would defeat the entire purpose of the
+    mitigation.
+
+    This can also be used in the future to extend allocation profiling's use
+    of code tagging to implement per-caller allocation cache isolation[1]
+    even for dynamic allocations.
+
+    Memory allocation pinning[2] is still needed to plug the Use-After-Free
+    cross-allocator weakness (where attackers can arrange to free an
+    entire slab page and have it reallocated to a different cache),
+    but that is an existing and separate issue which is complementary
+    to this improvement. Development continues for that feature via the
+    SLAB_VIRTUAL[3] series (which could also provide guard pages -- another
+    complementary improvement).
+
+    Link: https://lore.kernel.org/lkml/202402211449.401382D2AF@keescook [1]
+    Link: https://googleprojectzero.blogspot.com/2021/10/how-simple-linux-kernel-memory.html [2]
+    Link: https://lore.kernel.org/lkml/20230915105933.495735-1-matteorizzo@google.com/ [3]
+
+After the core implementation are 2 patches that cover the most heavily
+abused "repeat offenders" used in exploits. Repeating those details here:
+
+    The msg subsystem is a common target for exploiting[1][2][3][4][5][6]
+    use-after-free type confusion flaws in the kernel for both read and
+    write primitives. Avoid having a user-controlled size cache share the
+    global kmalloc allocator by using a separate set of kmalloc buckets.
+
+    Link: https://blog.hacktivesecurity.com/index.php/2022/06/13/linux-kernel-exploit-development-1day-case-study/ [1]
+    Link: https://hardenedvault.net/blog/2022-11-13-msg_msg-recon-mitigation-ved/ [2]
+    Link: https://www.willsroot.io/2021/08/corctf-2021-fire-of-salvation-writeup.html [3]
+    Link: https://a13xp0p0v.github.io/2021/02/09/CVE-2021-26708.html [4]
+    Link: https://google.github.io/security-research/pocs/linux/cve-2021-22555/writeup.html [5]
+    Link: https://zplin.me/papers/ELOISE.pdf [6]
+    Link: https://syst3mfailure.io/wall-of-perdition/ [7]
+
+    Both memdup_user() and vmemdup_user() handle allocations that are
+    regularly used for exploiting use-after-free type confusion flaws in
+    the kernel (e.g. prctl() PR_SET_VMA_ANON_NAME[1] and setxattr[2][3][4]
+    respectively).
+
+    Since both are designed for contents coming from userspace, it allows
+    for userspace-controlled allocation sizes. Use a dedicated set of kmalloc
+    buckets so these allocations do not share caches with the global kmalloc
+    buckets.
+
+    Link: https://starlabs.sg/blog/2023/07-prctl-anon_vma_name-an-amusing-heap-spray/ [1]
+    Link: https://duasynt.com/blog/linux-kernel-heap-spray [2]
+    Link: https://etenal.me/archives/1336 [3]
+    Link: https://github.com/a13xp0p0v/kernel-hack-drill/blob/master/drill_exploit_uaf.c [4]
+
+Thanks!
+
+-Kees
+
+Kees Cook (6):
+  mm/slab: Introduce kmem_buckets typedef
+  mm/slab: Plumb kmem_buckets into __do_kmalloc_node()
+  mm/slab: Introduce kvmalloc_buckets_node() that can take kmem_buckets
+    argument
+  mm/slab: Introduce kmem_buckets_create() and family
+  ipc, msg: Use dedicated slab buckets for alloc_msg()
+  mm/util: Use dedicated slab buckets for memdup_user()
+
+ include/linux/slab.h            |  48 ++++++++++++---
+ ipc/msgutil.c                   |  13 +++-
+ kernel/configs/hardening.config |   1 +
+ mm/Kconfig                      |  17 ++++++
+ mm/slab.h                       |   6 +-
+ mm/slab_common.c                | 101 +++++++++++++++++++++++++++++++-
+ mm/slub.c                       |  20 +++----
+ mm/util.c                       |  23 ++++++--
+ scripts/kernel-doc              |   1 +
+ 9 files changed, 200 insertions(+), 30 deletions(-)
+
+-- 
+2.34.1
+
 
