@@ -1,75 +1,107 @@
-Return-Path: <netdev+bounces-108280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C30591E9E4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:55:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B815891EA25
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 872171C2331B
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:55:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DED191C2120E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE2B171651;
-	Mon,  1 Jul 2024 20:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696F583CA1;
+	Mon,  1 Jul 2024 21:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ean99Tba"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="QTKOMzqF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D20417108D;
-	Mon,  1 Jul 2024 20:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26CA2BB05
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 21:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719867323; cv=none; b=FX+QZIr5qE5t4THNpExalUkWk4veDTc3rjmGiU2npUSBKM1CwhhitFRb1xbu9heMJjzy02dh6kI8d75tUY6/KLVGLQYiUfSzfW1fgTkk2O1u5ml7vxgjwUN0nwauqEX7EFn4Ona6s40oTsbXbsa9u9Px1mV/2ZLMipMJczrbdqs=
+	t=1719868898; cv=none; b=rVs8Q8kgFz9JqxY9GTcaApHu00DTw9wqZ23/iOOozcZc8ijnji+k+GNHNEIvQPPPpn8LjqdQaYhf4jNT/lzfsWiHvX6GCRVzA6Clyap+hi6u1MUwBLvJkMHQG5eXWcDaSNvm45hzne1sQnIyvq/piJNDgyyumQ4TrkTXPtQT/UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719867323; c=relaxed/simple;
-	bh=ccCNvlPvitLrFUNbB59+klivWsSH/qMEMhKBAz5irNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rpY4CPyo9Z9BFn92lrurHeL8PedSU+G0NNi2v3syRNvhhSyMegttUSGWTDcuZrO8wapQ6VSW6d3t1XSo/SahO+kNamgfxXBfk/nacht9qFuHY9Zgu0qTuBjChcGtKuvNsHadbgZdeQkFJEDby9rX0b6jfoTHXp/4ichlWpLGDIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ean99Tba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E729C116B1;
-	Mon,  1 Jul 2024 20:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719867322;
-	bh=ccCNvlPvitLrFUNbB59+klivWsSH/qMEMhKBAz5irNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ean99TbavhafoA5g+v6yuVoPFhvlW9VhLqHyqdAdTRQYuvr2mavkjCBm++ClDA2+I
-	 RSH+STG1M76y3L519+gNN1oR0SN6VXvAWoTyxGTig4TJsXAKr5Ux+GLdiXwxs4cMfd
-	 t4nPfATGlNRFYY3F1Qd8/UCeftSW6ltuOURZxU4pXQawDVzYfiBS3seyk9Muyx/cBT
-	 v26nCspBpM/5Au6xX4xXkH1hLCVB+eJ9/vlYA6kC9pJOFadwdIN0qF7qFkANm2dAoq
-	 ESjfV6vZl6xc0w3KbiNEPDD89/pql4UbjPUizB0qn0pX0qrVjKZWph1QEUc62Eb1Yv
-	 6K88XHw9uamwg==
-Date: Mon, 1 Jul 2024 13:55:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: kernel test robot <lkp@intel.com>, Breno Leitao <leitao@debian.org>
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, oe-kbuild-all@lists.linux.dev,
- netdev@vger.kernel.org, horms@kernel.org, linux-kernel@vger.kernel.org,
- Nicolas Ferre <nicolas.ferre@microchip.com>
-Subject: Re: [PATCH net-next v2 1/3] crypto: caam: Make CRYPTO_DEV_FSL_CAAM
- dependent of COMPILE_TEST
-Message-ID: <20240701135521.3ba809bb@kernel.org>
-In-Reply-To: <202407011309.cpTuOGdg-lkp@intel.com>
-References: <20240628161450.2541367-2-leitao@debian.org>
-	<202407011309.cpTuOGdg-lkp@intel.com>
+	s=arc-20240116; t=1719868898; c=relaxed/simple;
+	bh=eueKYNlc80y8s1X2BSWQY4ysJZB3OedTGs7iQx8Grmo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YWyXmp42M7RkthxYG+ubPApepw0sC2qh/vX/04mCbyhDW9QnkJoTdCawmZuNOrIH34ymlzDCE2EYEtgcAMZXq+TSzUeoB1/5l49+mX/uSL+MWivZhysFqc0IbYzc4DaCYj6BTUGnWq9ytiCzYdNFdscAebn7BJ41JoZobL1PfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=QTKOMzqF; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 4FAC6206BC;
+	Mon,  1 Jul 2024 23:21:27 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id q4awkn_Jxq23; Mon,  1 Jul 2024 23:21:26 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id E4EEC206B0;
+	Mon,  1 Jul 2024 23:21:25 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E4EEC206B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1719868885;
+	bh=P+M2ddk4BdoE6HDay9x6RaMBPC+33uwbkc94y+hkpIE=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=QTKOMzqFhRah44Qos28Ua1qcwp0MSZUZaaX4ikRJvdcpmoDY2ybttuNp+dN277Dhl
+	 lsbRenvI/0o350y+I2XV8ylWnETLIHWJsVMVYDwxRtPbD1sk1hTJNQ3c+b33kK909p
+	 VK34cJPsJeSMPq1t74/4VjARMuNFkEq3A/dfMCmtmfbsEtFbdLLhCRPSyeKd9Emf5p
+	 7L4Ject+X0WzDE5IrZJ3tVGbysvGbwz586CUnLNzF1ZJ/sH9N4Kx/JthJwKlHzsMsM
+	 1xHlrdhxa3jW/yCBKZaVfp6C1n+AnffENNvAq4/JIWU1NnfxNNYf3aOWwcIrlGg9zz
+	 SuJp/Brj+nEtQ==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout2.secunet.com (Postfix) with ESMTP id D3D9A80004A;
+	Mon,  1 Jul 2024 23:21:25 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 1 Jul 2024 23:21:25 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 1 Jul
+ 2024 23:21:25 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 07FBB31829C2; Mon,  1 Jul 2024 23:21:25 +0200 (CEST)
+Date: Mon, 1 Jul 2024 23:21:24 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: <netdev@vger.kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH ipsec] xfrm: Export symbol xfrm_dev_state_delete.
+Message-ID: <ZoMd1K7r7UICHXWE@gauss3.secunet.de>
+References: <Zn54YVkoA+OOoz+C@gauss3.secunet.de>
+ <20240630104311.GA176465@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240630104311.GA176465@unreal>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Mon, 1 Jul 2024 13:48:21 +0800 kernel test robot wrote:
-> >> drivers/crypto/caam/ctrl.c:83:34: warning: 'imx8m_machine_match' defined but not used [-Wunused-const-variable=]  
->       83 | static const struct of_device_id imx8m_machine_match[] = {
->          |                            
+On Sun, Jun 30, 2024 at 01:43:11PM +0300, Leon Romanovsky wrote:
+> On Fri, Jun 28, 2024 at 10:46:25AM +0200, Steffen Klassert wrote:
+> > This fixes a build failure if xfrm_user is build as a module.
+> > 
+> > Fixes: 07b87f9eea0c ("xfrm: Fix unregister netdevice hang on hardware offload.")
+> > Reported-by: Mark Brown <broonie@kernel.org>
+> > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> > ---
+> >  net/xfrm/xfrm_state.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> 
+> Thanks,
+> Tested-by: Leon Romanovsky <leonro@nvidia.com>
 
-Reading 5762c20593b6b95 it seems like hiding the references in
-intentional. You gotta wrap this array in an ifdef for non-OF 
-builds it seems.
+Now applied to the ipsec tree.
 
