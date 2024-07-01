@@ -1,84 +1,124 @@
-Return-Path: <netdev+bounces-108145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C899591E03C
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 15:07:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E1E91E03F
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 15:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D357283EDC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 13:07:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A452B1F2318E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 13:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E2815DBBA;
-	Mon,  1 Jul 2024 13:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609CC15ADA0;
+	Mon,  1 Jul 2024 13:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkYiSUNf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKcwzeoy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DCD158D94;
-	Mon,  1 Jul 2024 13:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6CD1EB2A;
+	Mon,  1 Jul 2024 13:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719839237; cv=none; b=nYfoKTV+xPXD/2PC9UIylG14+Fxs5JfsnRZkz5OdIDrumVGt+iX+z0xA+ocDAXkkqqyzeGcp+UFzBd2fVZH/i9egBFjQJ2ZDmbHUGFVm0DXzwWcol/GzfaCVWktmpaxHMII91upphjezmTK5ZNKK88B/9/bhdeIokecVZRABTb4=
+	t=1719839338; cv=none; b=Vn9jYUcs3cEWXDKO/cEVsNLSKTv/hzeQxCkgAgbF5YDCX88ZoMsWCNrPFyzBjZWiL2VZccibXnDqgCkBE8LyrN9nqFWq4I/yUcFBEg5++M+V06IezE3kdNJjy8yJs+wCC3KU/nZQRLOayRWfEmabtMbFekkve5s3XbNPCFo+qJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719839237; c=relaxed/simple;
-	bh=qErcNn1bAd+KgYMHdz8WFVSZwXXfkJKGETB1NMYn3+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ov/zeLcPAt3Zh7sz5aj8qNJpzsGjXB5SKKpRK7bWeYZPG+HvuxdMFHfPRgLNJ73yj233QFERn9LQYa/ciYq3sjGrQyHFb33R7KTo7Tof0F2a45eO9hgn0GuSiOyFuA53TjNZzqM5JF+9IESOwwa234GPP2Qs3ZgaZUlXr+splsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkYiSUNf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D4CAC116B1;
-	Mon,  1 Jul 2024 13:07:16 +0000 (UTC)
+	s=arc-20240116; t=1719839338; c=relaxed/simple;
+	bh=zQ+ImIQc2t8TCNnOyNYaiTirZp+wfv9CTG7urjGJv1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SFcsdVfxZ5hYt6JGjuM9FphYjfaHu42yEWcvLEkJvl2S50E77xaJx5kTN2RMzKyPke9EHwK/AdVmvYVgbEUPB2BvCMta60CWRzt3dAp3f9WK3BAfljv3OTmyoaPh71enyT24jKtRaOWwz4MxOx23xj78/lx3olpHsmKVQUcSrJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKcwzeoy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB81BC116B1;
+	Mon,  1 Jul 2024 13:08:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719839237;
-	bh=qErcNn1bAd+KgYMHdz8WFVSZwXXfkJKGETB1NMYn3+M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nkYiSUNfCWjHm+lyBjJWy4l8XdPpnMy3UW2zfdFrVqh92N6IfogZnKbfthsj0u9F5
-	 W+tC/y1v3lwj9M9CP4InJts2/OYcXeTSuq6btM6aDrVfJDh4XmQ+m6qFBmXT6B+XK6
-	 +2jKdbEcnzFIN646kiVBTot3mvvzuTtLJ1dmkpi8a/yaIzGg6ZMPPomvuWbHMo25us
-	 3fut+aW8yvKtL1JeUHIELmdeOUae4lNA75nSpEnPhvGMp0OZE4sdyZiAsFgVgfoxS+
-	 MbOce+3HqFhax2JPG963KB10iUstxrJnK0VtHPcXieYeOt7spcVw81PKjWuW24+hnk
-	 oUigdVSamyPBQ==
-Date: Mon, 1 Jul 2024 16:07:13 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>
-Cc: kotaranov@microsoft.com, pabeni@redhat.com, haiyangz@microsoft.com,
-	kys@microsoft.com, edumazet@google.com, kuba@kernel.org,
-	davem@davemloft.net, decui@microsoft.com, wei.liu@kernel.org,
-	sharmaajay@microsoft.com, longli@microsoft.com, jgg@ziepe.ca,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] RDMA/mana_ib: Set correct device into ib
-Message-ID: <20240701130713.GE13195@unreal>
-References: <1719838736-20338-1-git-send-email-kotaranov@linux.microsoft.com>
- <1719838736-20338-3-git-send-email-kotaranov@linux.microsoft.com>
+	s=k20201202; t=1719839337;
+	bh=zQ+ImIQc2t8TCNnOyNYaiTirZp+wfv9CTG7urjGJv1A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vKcwzeoyQZjzvEIqaJVyvWkp+8XBjjoeiV5vRzm39UZ7avS27jOH0bbyGtPkPez72
+	 bw30fnlWtlhZLduq3gwebeRcygwKCx4UjwrhrAv6KtquIwNEXl7v0vom9BR0dR9zGj
+	 7Esm89DGl4uspf4d2S+C2YjBiHGSLEZkXQgMVDT8XOHl/2/4qyx6P4CnuSF0Pwamis
+	 WsE/s7kttVCBMmXw6fTEmKmBizOV45GAaChvfYyLp73VVgGyO5NJIpolxvWtZ5sczg
+	 202zACgd773eBapbBc2mdqYU8BQSyWJR+ZU00Tv9azhmXW0wIEsMocZS7ZfhO5sYi0
+	 XLu4rv7AMwnAg==
+Message-ID: <1719ff78-dd8f-4dac-9537-83b0577d2e1a@kernel.org>
+Date: Mon, 1 Jul 2024 15:08:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1719838736-20338-3-git-send-email-kotaranov@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] dt-bindings: arm: qcom: add sa8775p-ride Rev 3
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240627114212.25400-1-brgl@bgdev.pl>
+ <20240627114212.25400-2-brgl@bgdev.pl>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240627114212.25400-2-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 01, 2024 at 05:58:56AM -0700, Konstantin Taranov wrote:
-> From: Konstantin Taranov <kotaranov@microsoft.com>
+On 27/06/2024 13:42, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Use the mana_get_master_netdev_rcu() helper to get
-> a master netdevice for querying network states.
-> The helper allows the mana_ib transparently
-> support baremetal and netvsc deployment cases.
+> Document the compatible for revision 3 of the sa8775p-ride board.
 > 
-> Fixes: 8b184e4f1c32 ("RDMA/mana_ib: Enable RoCE on port 1")
-> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-> ---
->  drivers/infiniband/hw/mana/device.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Thanks,
-Acked-by: Leon Romanovsky <leon@kernel.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
+
 
