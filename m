@@ -1,203 +1,186 @@
-Return-Path: <netdev+bounces-108275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E5491E972
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:19:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC4B91E986
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11CCF1F22289
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FF9D281470
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9C6171094;
-	Mon,  1 Jul 2024 20:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3E316F265;
+	Mon,  1 Jul 2024 20:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kAtuiOv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC74916F908
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 20:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851392AD0C
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 20:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719865158; cv=none; b=lTM5QztPmqoYBvC7yUlPAvGT5+XBkkpAn5zsVdyvLEVWybL5memWkePhSVuk2VfWw4SW+6spL7+KSaCFXljKOp3fwaFOhQ0hLGEwQPEVeVmg3YFuwc7QT/rwdRGxHKR8ZvyqwK6B9xEnaL3450g0q+yLhufdVYNNngPOZlx1ZBQ=
+	t=1719865453; cv=none; b=WvpH0Jw1f8bhl1HVkagbNqzfPXfJCkxANdH6XFP/0tJXz9WhD7q6Tbc5kqnYTWRs2VB7KMks1BlTl38QyhriVfsuctgaWhUGjRNNbqecKIBU50zsC/KD1Ntv1j57xV7vfl3MRFlwWSLPnqJ6WfTYHe2JLrJJ5QgmR2k78t8bZqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719865158; c=relaxed/simple;
-	bh=GuGFgUB0wRmpGpvqpqeC4Kel6vtxlu81KkcAp82U6GU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qRJmL9sxj2cJi+Y46pn61NAwKYXOh7qHBlRt0Ykgl5wfC3WqWul+ysGhuxBRmV2tVnRiED8YOwGuHNFLh0QSuxGOowg7+uddV34wFGFr9Uwbt28A9Z/WK78rKPw1kKP4AeivfhKzKKlLLWU/5HWjHqib6F16s+5dDa12nHryKew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7f3c9764edbso344700439f.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 13:19:16 -0700 (PDT)
+	s=arc-20240116; t=1719865453; c=relaxed/simple;
+	bh=o4LY9XVzve7upXm4vCIiLaUZTn/iyI18Z04/Qi8ApiM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WpYMrGgty0tSU4Bdj6poLNeMrsQ1nPunX9VlR+dLryaGULp89XCiuym/q7fyaKFtYgBG0uRLdT4otY+uH2lZwDyjmUJ4EO+WXGabv/mpbs5b+fDlNmaagtHVGCoBK+TRbXpvJUkLhB4qTN8klQLiBghv11mva4r9cGRx+ECznSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=kAtuiOv7; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-79c06c08149so224933285a.3
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 13:24:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1719865449; x=1720470249; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N9Wejji7TjFwP9PceQPtmfCFbVCioSJofpKbf16eBuk=;
+        b=kAtuiOv7eGNhnW5P+B97C2jg7Y0A7XsRCY64ZJsLl1FOGb+5vEjQDNZfzv/PLarxRa
+         YQDw5thiZa1Ov+G94v9Mw9Rt8W1grF+rLSvl+N/Tq/7tlDWTzfmRww6k9QzVxqH00m3m
+         HP8ydrvCrCk/FIEFyf7foPiwPJBwYAGxubGOAcEXT0mhZcrBng6jQzD/EgYZwwj8VOFv
+         Kn8/7od0VoWOtgGsI80iX0iHxAYOA28gAotfoaOLKUaxt/nst5QJa0+yUNzLUnbBGLuR
+         q5gPF13sh2KfTIh5+ZGgYsrNNZS+IGOao9nudKMlUD6Ibcy4gLWJ/yJwZeDOnURc6LfY
+         Q6gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719865156; x=1720469956;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I1UVddZMPvm16kcS2U3h8+V4FuFZxzP61cHTkwZr3EI=;
-        b=GcQHn0s9V5xI3ASgOPkzE86/tLZSfvK9RzTT4sg/gu1QG3R49wMe/N0knpKA7ggZ4A
-         kTdRs+eid6PCIPhHiZsu4wCct/4wDdDGrWMR6VU4qZfq4orQ5vl7ld6Sm4mLX+K8/g0A
-         voJUd5/8VxGJUqumcz44IeQidTjIbU+ykcys+MJ21KlZf7FomyLhEac9rCgQYolpknSs
-         EfgBAZXjuvM3bK5bNr7YTuH2dwvk+DW389NaXHo6jIITB06sIGLwkYSSFbCnubrj72bP
-         PWkzBOUTjoDL976ybwCV/GFCbT7KimmjVxKS/fH+7LldjVQ6KvHzqbc8l0Hd2Fl8VUAs
-         ahvg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5iVSOI/yDxlHShQAZUHVJvJCKu+vnkOuJ72Q/nerUkgcoTA6xUktlmjS/imDSQfdGtBgikD/AcUyjhZFv/7r1kou8jzVD
-X-Gm-Message-State: AOJu0YyEE8tPiYjeuZzjSaj0npf8yETeD0/I9TO9uOviTEqe2Tc7N7W/
-	zQYq0NP6ZKk1gvZXlqAFywm6aNNRywjdXx+4s9v61T0ctNrmKlJnlNs6CAWryte5J4vmuC2l0Ys
-	j14tNPyKDsPuK2ruCc17Nwdq//5VaAL9z+w8UBNg9aZvJfWMd4Tyewns=
-X-Google-Smtp-Source: AGHT+IGsKtqOiSfcC1y9RFrvxEtRYtJ6V84chtBEALgdKHTqgzpas2X36mzFaT7Fzgn7Qvj280JJXW10jNr9lsYr6B/62GtYFyKW
+        d=1e100.net; s=20230601; t=1719865449; x=1720470249;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N9Wejji7TjFwP9PceQPtmfCFbVCioSJofpKbf16eBuk=;
+        b=Ixj5VFmYSYez5RGzs0TgG+YUIjHzJxh4gXckDqmq2P24fhj5uh9qTT/napomDOjmpx
+         BNZX3o/xrk2l3Obps0f/rIyA5/SxkqRknwxVkKnS70NtBJPzfUTroZq1UOvbviqbVJzK
+         OOTaCnIf0pGFQFwNPYJnIgn8OgXbiq1nVE0Q9QJL4YtyJgSy5XfxjTlUELA9uXAnyVyT
+         viwFfZLGCnnfyPifUcLySeyN6vy9IMlSA+I5j4LVtqzJGAGv/WIsstwC/W5m6gPi2OxL
+         S4HFi+10gPE1flG7bDVIY+aF1VPEkT+x4uI4UAatpRBAHOqt1bvllS8tIzXK0s1S2Gbp
+         WbMQ==
+X-Gm-Message-State: AOJu0YynMLDrqnm+4rvOnn0Qs2AcGPOBKE99anPbJ+6X7Q2JVLHJN1Kt
+	Iz6QOuLpnC2IuA+OXhaziVHcXinwAC75j2nlFtCcIIoEJIjV0zQrkshBvB9EGCQ461ykrkmlBGy
+	Y
+X-Google-Smtp-Source: AGHT+IE9N+8VJYjgyLDjdYtW2rZLMr/Oh4MjNu0R9kiLY8IJ2P+KTj/jxpocxEhgCys2pfZhZs8ilg==
+X-Received: by 2002:a05:620a:4008:b0:79d:8ea3:9d1e with SMTP id af79cd13be357-79d8ea3a00amr346360585a.8.1719865449529;
+        Mon, 01 Jul 2024 13:24:09 -0700 (PDT)
+Received: from n191-036-066.byted.org ([130.44.215.254])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69279783sm383800985a.44.2024.07.01.13.24.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 13:24:09 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH] selftests: fix OOM problem in msg_zerocopy selftest
+Date: Mon,  1 Jul 2024 20:23:38 +0000
+Message-Id: <20240701202338.2806388-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3488:b0:4b9:ad20:51ff with SMTP id
- 8926c6da1cb9f-4bbb6e8ec35mr490530173.1.1719865155890; Mon, 01 Jul 2024
- 13:19:15 -0700 (PDT)
-Date: Mon, 01 Jul 2024 13:19:15 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000adb970061c354f06@google.com>
-Subject: [syzbot] [net?] [bpf?] general protection fault in dev_map_redirect
-From: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-syzbot found the following issue on:
+In selftests/net/msg_zerocopy.c, it has a while loop keeps calling sendmsg
+on a socket with MSG_ZEROCOPY flag, and it will recv the notifications
+until the socket is not writable. Typically, it will start the receiving
+process after around 30+ sendmsgs. However, because of the commit
+dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale") the sender is
+always writable and does not get any chance to run recv notifications.
+The selftest always exits with OUT_OF_MEMORY because the memory used by
+opt_skb exceeds the core.sysctl_optmem_max.
 
-HEAD commit:    74564adfd352 Add linux-next specific files for 20240701
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12e5b0e1980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=111e4e0e6fbde8f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=08811615f0e17bc6708b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+We introduce "cfg_notification_limit" to force sender to receive
+notifications after some number of sendmsgs. And, notifications may not
+come in order, because of the reason we present above. We have order
+checking code managed by cfg_verbose.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/04b8d7db78fb/disk-74564adf.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d996f4370003/vmlinux-74564adf.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6e7e630054e7/bzImage-74564adf.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
-CPU: 0 UID: 0 PID: 13476 Comm: syz.2.2696 Not tainted 6.10.0-rc6-next-20240701-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:__bpf_xdp_redirect_map include/linux/filter.h:1672 [inline]
-RIP: 0010:dev_map_redirect+0x65/0x6a0 kernel/bpf/devmap.c:1020
-Code: 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 f3 b2 3d 00 4c 8b 2b 4d 8d 7d 38 4c 89 fb 48 c1 eb 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 03 84 c0 0f 85 6e 04 00 00 41 8b 2f 89 ee 83 e6 02 31 ff
-RSP: 0018:ffffc9000483f088 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000007 RCX: 0000000000040000
-RDX: ffffc90009a9a000 RSI: 00000000000004bc RDI: 00000000000004bd
-RBP: dffffc0000000000 R08: 0000000000000007 R09: ffffffff81b5e80f
-R10: 0000000000000004 R11: ffff888022d49e00 R12: 000000000483f0d8
-R13: 0000000000000000 R14: 0000000000000008 R15: 0000000000000038
-FS:  00007f91a35f06c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2a246b CR3: 0000000023d08000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_prog_ec9efaa32d58ce69+0x56/0x5a
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run_xdp include/net/xdp.h:514 [inline]
- bpf_prog_run_generic_xdp+0x679/0x14c0 net/core/dev.c:4963
- netif_receive_generic_xdp net/core/dev.c:5076 [inline]
- do_xdp_generic+0x673/0xb90 net/core/dev.c:5135
- __netif_receive_skb_core+0x1be6/0x4570 net/core/dev.c:5476
- __netif_receive_skb_one_core net/core/dev.c:5654 [inline]
- __netif_receive_skb+0x12f/0x650 net/core/dev.c:5770
- netif_receive_skb_internal net/core/dev.c:5856 [inline]
- netif_receive_skb+0x1e8/0x890 net/core/dev.c:5916
- tun_rx_batched+0x1b7/0x8f0 drivers/net/tun.c:1549
- tun_get_user+0x2f3b/0x4560 drivers/net/tun.c:2002
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f91a277471f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
-RSP: 002b:00007f91a35f0010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f91a2903fa0 RCX: 00007f91a277471f
-RDX: 000000000000002a RSI: 0000000020000300 RDI: 00000000000000c8
-RBP: 00007f91a27f677e R08: 0000000000000000 R09: 0000000000000000
-R10: 000000000000002a R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f91a2903fa0 R15: 00007ffef99a1428
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:__bpf_xdp_redirect_map include/linux/filter.h:1672 [inline]
-RIP: 0010:dev_map_redirect+0x65/0x6a0 kernel/bpf/devmap.c:1020
-Code: 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 f3 b2 3d 00 4c 8b 2b 4d 8d 7d 38 4c 89 fb 48 c1 eb 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 03 84 c0 0f 85 6e 04 00 00 41 8b 2f 89 ee 83 e6 02 31 ff
-RSP: 0018:ffffc9000483f088 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000007 RCX: 0000000000040000
-RDX: ffffc90009a9a000 RSI: 00000000000004bc RDI: 00000000000004bd
-RBP: dffffc0000000000 R08: 0000000000000007 R09: ffffffff81b5e80f
-R10: 0000000000000004 R11: ffff888022d49e00 R12: 000000000483f0d8
-R13: 0000000000000000 R14: 0000000000000008 R15: 0000000000000038
-FS:  00007f91a35f06c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2a246b CR3: 0000000023d08000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 c1 e8 03          	shr    $0x3,%rax
-   4:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1)
-   8:	74 08                	je     0x12
-   a:	48 89 df             	mov    %rbx,%rdi
-   d:	e8 f3 b2 3d 00       	call   0x3db305
-  12:	4c 8b 2b             	mov    (%rbx),%r13
-  15:	4d 8d 7d 38          	lea    0x38(%r13),%r15
-  19:	4c 89 fb             	mov    %r15,%rbx
-  1c:	48 c1 eb 03          	shr    $0x3,%rbx
-  20:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  27:	fc ff df
-* 2a:	0f b6 04 03          	movzbl (%rbx,%rax,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	0f 85 6e 04 00 00    	jne    0x4a4
-  36:	41 8b 2f             	mov    (%r15),%ebp
-  39:	89 ee                	mov    %ebp,%esi
-  3b:	83 e6 02             	and    $0x2,%esi
-  3e:	31 ff                	xor    %edi,%edi
-
-
+Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ tools/testing/selftests/net/msg_zerocopy.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
+index bdc03a2097e8..7ea5fb28c93d 100644
+--- a/tools/testing/selftests/net/msg_zerocopy.c
++++ b/tools/testing/selftests/net/msg_zerocopy.c
+@@ -85,6 +85,7 @@ static bool cfg_rx;
+ static int  cfg_runtime_ms	= 4200;
+ static int  cfg_verbose;
+ static int  cfg_waittime_ms	= 500;
++static int  cfg_notification_limit = 32;
+ static bool cfg_zerocopy;
+ 
+ static socklen_t cfg_alen;
+@@ -95,6 +96,7 @@ static char payload[IP_MAXPACKET];
+ static long packets, bytes, completions, expected_completions;
+ static int  zerocopied = -1;
+ static uint32_t next_completion;
++static uint32_t sends_since_notify;
+ 
+ static unsigned long gettimeofday_ms(void)
+ {
+@@ -208,6 +210,7 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
+ 		error(1, errno, "send");
+ 	if (cfg_verbose && ret != len)
+ 		fprintf(stderr, "send: ret=%u != %u\n", ret, len);
++	sends_since_notify++;
+ 
+ 	if (len) {
+ 		packets++;
+@@ -435,7 +438,7 @@ static bool do_recv_completion(int fd, int domain)
+ 	/* Detect notification gaps. These should not happen often, if at all.
+ 	 * Gaps can occur due to drops, reordering and retransmissions.
+ 	 */
+-	if (lo != next_completion)
++	if (cfg_verbose && lo != next_completion)
+ 		fprintf(stderr, "gap: %u..%u does not append to %u\n",
+ 			lo, hi, next_completion);
+ 	next_completion = hi + 1;
+@@ -460,6 +463,7 @@ static bool do_recv_completion(int fd, int domain)
+ static void do_recv_completions(int fd, int domain)
+ {
+ 	while (do_recv_completion(fd, domain)) {}
++	sends_since_notify = 0;
+ }
+ 
+ /* Wait for all remaining completions on the errqueue */
+@@ -549,6 +553,9 @@ static void do_tx(int domain, int type, int protocol)
+ 		else
+ 			do_sendmsg(fd, &msg, cfg_zerocopy, domain);
+ 
++		if (cfg_zerocopy && sends_since_notify >= cfg_notification_limit)
++			do_recv_completions(fd, domain);
++
+ 		while (!do_poll(fd, POLLOUT)) {
+ 			if (cfg_zerocopy)
+ 				do_recv_completions(fd, domain);
+@@ -708,7 +715,7 @@ static void parse_opts(int argc, char **argv)
+ 
+ 	cfg_payload_len = max_payload_len;
+ 
+-	while ((c = getopt(argc, argv, "46c:C:D:i:mp:rs:S:t:vz")) != -1) {
++	while ((c = getopt(argc, argv, "46c:C:D:i:l:mp:rs:S:t:vz")) != -1) {
+ 		switch (c) {
+ 		case '4':
+ 			if (cfg_family != PF_UNSPEC)
+@@ -736,6 +743,9 @@ static void parse_opts(int argc, char **argv)
+ 			if (cfg_ifindex == 0)
+ 				error(1, errno, "invalid iface: %s", optarg);
+ 			break;
++		case 'l':
++			cfg_notification_limit = strtoul(optarg, NULL, 0);
++			break;
+ 		case 'm':
+ 			cfg_cork_mixed = true;
+ 			break;
+-- 
+2.20.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
