@@ -1,220 +1,225 @@
-Return-Path: <netdev+bounces-108287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E28291EA7F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:52:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FDEF91EA7E
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75C6CB2162D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:52:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD8628284C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AF9171643;
-	Mon,  1 Jul 2024 21:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4800171086;
+	Mon,  1 Jul 2024 21:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="gqVsMZsF"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="YzrfafVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FF42C1BA
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 21:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.147.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719870722; cv=fail; b=iLSX1cwlm9oW/wgRioHhsCzqNhxPwhm6upCAnBHKpZL3FeQLGduNTpjK91x7cN3vsLT0cdG5haReoLZn2JhJc9ELursr4cZ0E+M30tEqaHX5ufmGRK1mmJp2ZnBS0euR6kOLcQHIVziqvBI1p2Ow/lWElzoZNx3o6UF3lovf1CU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719870722; c=relaxed/simple;
-	bh=eUTlOjXMKLN9n2wR0MQvWoaAKzgBThpZJR2EHpBli0U=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HmeDGBBBLWv7cTl/Bb0LiArtkfqN6hsC9+cKBW7aV7j7ks0LX+htm8rt+E3lp1cQ0gnQ7CARAIdPaR4CvwGCQtybNHUNs6hOLe7a0xFDraSfLlzKAKBctvnLv3EIPUpTSkslsAHKcSTEUIVWwM+9Ny9KjmeB0E30ZUKe1BdLQGw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=gqVsMZsF; arc=fail smtp.client-ip=148.163.147.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
-Received: from pps.filterd (m0150242.ppops.net [127.0.0.1])
-	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 461D3Tlo005345
-	for <netdev@vger.kernel.org>; Mon, 1 Jul 2024 21:51:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from
-	:to:subject:date:message-id:content-type
-	:content-transfer-encoding:mime-version; s=pps0720; bh=n9KfAz0GC
-	y0VZCZ7yyiL8Z0ZFrBP5pNlsLKju+U/76s=; b=gqVsMZsFXD4jZ9wKEKMO4aWGS
-	A3iN1F2lj84cs9dg3o5IoAuZ7djj14w4f3op8yzGdcDHMDCYbe/Kot1QSX/f86+T
-	JjsxzMS+ShECgxeXrkFWIP1FlkUvoia4fhzeraXQCe33TurWgumMOpOzlC80QUFn
-	PAjI2Ob5m4cXi9JeChimW1nfrznpotiEBFyobDZuCaooRX/KmOqPl6nNymecHQ4Z
-	1J54GxVX1GTxCZOJGQD8jtWxaGfDPVGV5KU3tki09bjzZNcIcFnxVV3NbfDZ+/Ca
-	1724KY7B/NlGpe62IKg2RpX/cZLqqODJALfbjQWHn2yJ/Jxy4BC3L7aM3jnzA==
-Received: from p1lg14880.it.hpe.com ([16.230.97.201])
-	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 403w0fun7j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 21:51:50 +0000 (GMT)
-Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by p1lg14880.it.hpe.com (Postfix) with ESMTPS id 58D2980025E
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 21:51:49 +0000 (UTC)
-Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Mon, 1 Jul 2024 09:51:17 -1200
-Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
- p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
- via Frontend Transport; Mon, 1 Jul 2024 09:51:18 -1200
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (192.58.206.38)
- by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Mon, 1 Jul 2024 09:51:09 -1200
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FYxfrxImQjIbU8vqYbqdlPwanG7fX8sQPcpsYXX24Iyt2hgkdVMul51fCeMfoHJ+1CwWK1XbDX+a8R7N4j8getmkyZ44sM0lvg/1lxl77vv4TZU/kFtu2NVm2T+wflTtVh/pYzijlv3eGJjwVAhRvf92F3exlj7wKFj5IDJWzb8WRac/MWahs/HFfm1F2JUlyul1MmnChyn5Wcc+iInuL20zVyC0De/L2jNBIC33JNNqcQaE31NoAAmFVS6RUDSunoYh85AtI0Q5dYM+iDOwkRC6ZyrKYoJzgis+ckiszLmm1B8pBtMORKnKk2d9p7S1ZrhCTDSue1YsG9WXlJ411w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n9KfAz0GCy0VZCZ7yyiL8Z0ZFrBP5pNlsLKju+U/76s=;
- b=nlIEiaBKyCE2Gw17vWl2UR/ac69/MEJIkJ5o7kRfyLp0/qbqywSfOCw1vy8IPbFKE1XcJJIcDFPuxnk/n0QT/DrFRBIv/eMRhh+oCOlMi4xlTq1kYi47J33DPOFATCFQj3ytF59RUMfqFFhsjAfDwPClf4tGbDTvBFfxlYuFrxECqvlBnplghaZF0uVZCBMZZ5i5ttuiR+Hc0VVLBseo/5Lbto0oWAllKb5nuPJ7JtOBz4KOQg1FArwxsfzkWWJ80S2l/gzERLd9pddjz9FDBvrX+/bKhAbqzlKIkmXQm0dxJhtGtTO50fp8fkx3zgjVqKV2JMNLp39Z1XYTZ4EYWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:a03:437::8)
- by SA1PR84MB3869.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:806:3e8::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.35; Mon, 1 Jul
- 2024 21:51:07 +0000
-Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::8cc2:658d:eae8:3d8d]) by SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::8cc2:658d:eae8:3d8d%5]) with mapi id 15.20.7719.028; Mon, 1 Jul 2024
- 21:51:05 +0000
-From: "Muggeridge, Matt" <matt.muggeridge2@hpe.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: ECMP Routes choose an UNREACHABLE nexthop
-Thread-Topic: ECMP Routes choose an UNREACHABLE nexthop
-Thread-Index: AdrL/xI8WlDCx9EcT7OORZD3csqP+A==
-Date: Mon, 1 Jul 2024 21:51:05 +0000
-Message-ID: <SJ0PR84MB2088FC1C098F1CC996545397D8D32@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR84MB2088:EE_|SA1PR84MB3869:EE_
-x-ms-office365-filtering-correlation-id: 99501894-22fc-4ab2-da23-08dc9a17e886
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?7YOkGLkKDfhEkodu09AaSrfvBqox7CSoXM2kbreijMHJYAZ5SSHj7EBkhBmc?=
- =?us-ascii?Q?Voqlqp5Imv18MtpQyvaQLneEakhTWpOwDZ5sl0XBh1M9ckzepSB0KLTZwU3X?=
- =?us-ascii?Q?pmwjBb2tZE5saTg1BfvY2a3ly/rkiow38wZ8zoux/izrY2zBLAK9XECBqiuR?=
- =?us-ascii?Q?4fBpVdfyHV/4OIOiR+QoJAYou0Cto1d9bN1Bc08vwlUK3RedETK8xVXIq9Wn?=
- =?us-ascii?Q?VHRUsWiTSkefr4/CPrKY4gTwVavG8wW/iKhwJ8DDbP3tS3fTqXVo7UrEocjy?=
- =?us-ascii?Q?4nnaCPG5wRrzq/GihH754TlATBVoFDSheA1JHAuujqH1uYoZd8zxk4GITp4c?=
- =?us-ascii?Q?3+E3HWw6TUS767e6qvPL4fEkeji9R6Tfs+q1jg91W5XJaoA4YrG1LbXiSKD2?=
- =?us-ascii?Q?jsjyrBGwx/gg8MIRO810FzjjqsP87at1yckFltAHHlT658dBVpBuVeN5AqVH?=
- =?us-ascii?Q?TUFE9VdoEBIkZt7igjz7eTXmWS8DBRGBAklcX9w24GHBMZziMSWx4ZMGGY6x?=
- =?us-ascii?Q?DIF7nkDywL1J5OyTzVf2ZjqOfzCl8YAvzFt0jc7M8UqJxkS7+2qp0RXMMJAl?=
- =?us-ascii?Q?4bZ+mUbJBVtA5REBKYl/1p8Dys12JNOCWo4VVvi3LCBt31eKVxDR96MRprEB?=
- =?us-ascii?Q?dao0FkSddbH82CTAxZhP0Yb8hmmD+t2NnQr/78tSedOffje444N4Q2qoexT3?=
- =?us-ascii?Q?rzBXmReioMzBGKnsUFBCp8W+ITjE9UrM7LGGT93xUEo96ovDn9fehAc7YUNx?=
- =?us-ascii?Q?UDmY8+bNOiY1QrLb8GGIVb3m886Tall9rrigiNZ+kFNVxlnagNkxSckcZKaN?=
- =?us-ascii?Q?ogoKDtciDPtNn5LUW6vrpl/1qesypqRedGd9yix2URaP6dW+iJbi24BAsrZP?=
- =?us-ascii?Q?r2TKPtSV8mCs4/lcM/tD/lbO3UCyGDjlChaJjAt9+i7DGeta51otu/KQz2H9?=
- =?us-ascii?Q?X35pYUu9ZMF+zfHEKp+6Gx7d/GGoVL9hOOPWc8V9eE2LX7LWY0eMiHjdNhzj?=
- =?us-ascii?Q?9fqMHdUTtLmSgHI34/5hm5RW4H0ngUN+ZVaaSDanFbyfBX77N3tFJTSPsS/W?=
- =?us-ascii?Q?D5OXtmzNiMwcoHqTRxCzkBgiLKmwnXMLkW4i0MKKcdosjmcw1AJ2aVxysHj7?=
- =?us-ascii?Q?lXjtcyr8W2sS/kw52WqSMG5qfT+dsLlsZM8deYgoRLMqybZ3Y8oVb2+JpEr+?=
- =?us-ascii?Q?/HdWRLi5GRKyEcBlKX0Mm61oEcyv/iPklTJQ0Gzbzm+A3g+cSRFuzdUro8/+?=
- =?us-ascii?Q?CayIejGVaQbaCVwfUA1obD4MDwOQk72jPDlHZ8uavfI7AqHHVxFKavWK7XWt?=
- =?us-ascii?Q?Of24wcn3ZkE1/T4f1PUivFf1NH198tFl3FvZxF4IP47Rrk90b1nukANnDfGt?=
- =?us-ascii?Q?CSfAnlYQw76sr6nOfG9uecbqyjPKvhpbUTgx7a4OdTGgJ2W6JQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?C5wOr91m5zrC+qyb20CN5pqNBrSOH+xnRIUfo9kc1VJcDQnOV3DTeW4lfKKW?=
- =?us-ascii?Q?h/tYCECA1ewtYk6ARLMLQtcyY9V5VkdX11xoxm01YWvCbocBmPD+O82UfXuQ?=
- =?us-ascii?Q?VBLrLJ4rgORiUcs+7C/j78jwuEWZQ3yZVxPCeS0zAIAXwXgmMFzemUs/w20p?=
- =?us-ascii?Q?gBxuVqwlp0D8VhH1yBtefShZ5WxjVMcQaYnBRLm/MebZ3zD5LXc9w6Hd7x7G?=
- =?us-ascii?Q?ifRt6lgzYQpbGPI+ZlQnzOoysFIWdnJzLQF2Q2ZmgE/vjywUnP8WlbSRBZtj?=
- =?us-ascii?Q?08edpo791eNnUHNykRRWOHv1aHhEklivJVu8qrFaPAIRkXXjFFDS1GQ10REs?=
- =?us-ascii?Q?pC7UCrTWYC5q3lpiZUkRmo2efPT7Is4zzQeMP247vfOlIDyL0JOL4NnCA3Dg?=
- =?us-ascii?Q?Hy7blEq/w8A/kvhJXTOg2jGo57aH489bBCb9PWkMEdW3lb/2Ci9giddilzMc?=
- =?us-ascii?Q?w9KC4/ekKliI9d027kCa56ct6hwGkma/V3B97IM4Y+qzge0rMGRKSYpzqJLU?=
- =?us-ascii?Q?jgO8DGEeet+o8Izg2GJZWxAGJTbyE/HyBGzqIno6nWzyAKT6+seRV05R7HDs?=
- =?us-ascii?Q?F9kiNavqZUSxxtQOnJhhPbZnKIyEl+X6beUt81JgWwpYHZKXUc1s0mmR40PZ?=
- =?us-ascii?Q?Y2mc0A/utq+dezB7QRU1BFOOVu9yq4mZHaXKU+3C6hHO12SPR5kvh+tqmkFL?=
- =?us-ascii?Q?ciq6k1EeiGdMQh1BeFR6KYe5IZj3iqJvoyEu4bz20ULV1cFU431fD+lhBBeY?=
- =?us-ascii?Q?x0Si+J92yeKF7ZGqT2YeXkm260n2P2SmX/KUjddRooX7p11w8KAOI3oWm5sp?=
- =?us-ascii?Q?joKcfKQYvNt8//QPT+yy/1/JS784n8LR1rdShUbUpi1DXirlYOtTI8ZZVVkH?=
- =?us-ascii?Q?vwJZvCWcsI3BDhOvZQPgKYVm/09OOCBb/wXon/y22RxeEQ316a0yOiz/0vty?=
- =?us-ascii?Q?oX3xTa0rpwhe3PGUF2f9cdHnJsYSPSkP+F1VeQYALwtsYIfKLrBpxKuLkXni?=
- =?us-ascii?Q?Q7FqXmeGrdyjjKg4VOLNLohyj4rU7oKUu6cht0GNiHTklfSmEN4o52LoHyWP?=
- =?us-ascii?Q?wGfbdaoSQWH1KK1btk5oLwvoBoXRA/ZCvRmwMBQQM0E/DCUJUrF6csX0USza?=
- =?us-ascii?Q?Rx8R6Q0cqvgLRqb6kWq0zxEB+r4RMSUh7aKg4pHmnt9cmQHZ/EX5eEawqAwo?=
- =?us-ascii?Q?I56pQ0HRxBPuohNzo1kC2+s4UGiKRMq3Dwk94+80annXiiuc4zCguwQmm9t4?=
- =?us-ascii?Q?dt1RYaF/qcgN8ZFJeXtmeL/QzR4MblmdAq9MJU2zxciHDPDBuqaJZ+jfz2bG?=
- =?us-ascii?Q?1esvS4QCA41oRpz1gZEsedyFZ30Ph/88BH1iy9+5hEm8UOz0mEbURGeuOuaN?=
- =?us-ascii?Q?MpPHwO1BVjfT0B5Ae9Ovu1i9stxCInsuu04wn/TobP7056oaL00EcSL8Wp30?=
- =?us-ascii?Q?RbolCxnpTHm7sGISBup2QRJRwjxmX+MYwIIqJWDGUvuu3b3Y33VP7sdrwQxW?=
- =?us-ascii?Q?jFD37WI1wjpqgCELQcNmTOujwlWhoc7sNJG1KQ/WTcb50HrMZM+Ae5Ldnuxk?=
- =?us-ascii?Q?FC/JtvLKeTY2dOrlbefyQa9XtswNzlkYkg4BKtee?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EB42C1BA
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 21:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719870693; cv=none; b=F8SxHqzvUeSLEVcqD4V2JaUhuliAOq/nqZpS3d7k9eZZQmbVdMZTGDPzcPXVEE/rhBglrEJe9lp+6M8reabctH0USuwhdAc5vmixAxurlMY733PnS1etv1oUSbSa1nixFuKzDFCbzfC3fwtO4FjQZRi7xsoT+ppCSK90t17FY6g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719870693; c=relaxed/simple;
+	bh=vSjW3mtZhDPM8kptVVfxp2YPgOpAuU4U3ynSHEnCf4E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bUkXOXeHv4jBYI2nxs5vwOM9iepRn0K/W7wPZ4o7BXav4XLN29TE7CnrPpJv04OX4YWRM/zBFvrkeIm/qZiK8Am4EXPTjlV3fQMbA01PvTSJ2PclanboAsevnXHD/33hagFv57UcR8wc5wHorRJNA15bcW/LWaRYjujFFD9C6zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=YzrfafVZ; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-25cb3f1765bso1984320fac.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 14:51:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1719870690; x=1720475490; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dhMW3RrqLnyH92qhU9KT4+7B7Gd+dTybrtLwN1aA2+U=;
+        b=YzrfafVZzTjBJIfHr2C+vaLsdFC5yUbvjuURgzSb53WcJe7tbn6GoQY5rr1j5x05LX
+         1dUS03QqVLMQFeAuUupmVh1H74F9j9lpGhU7I9sZ3Xyc66ROnzha/BaD+EiZzT6f8gUI
+         7Aiqpa+z1GVct+rRf+hJMLWhRFlOTLJ9TMyjEvylgaT1lAbYjp1mLU4B69Om1UPX+AXL
+         BPCdHPz9SlqkUsPgUhvtsxEjswRparYqqitgeLryk01wkOoepFk94RuepGDzfLcEnhbc
+         eQGXsTdH7LuMHWyIg1x/sAaryhLsiw4xjHZxQ5zlM7Ip4RjsGHEEYbhj9aKt+KPuf8zg
+         E9Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719870690; x=1720475490;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dhMW3RrqLnyH92qhU9KT4+7B7Gd+dTybrtLwN1aA2+U=;
+        b=EaKrbk+RLlfcqRRbeo4vEdbYNKcofOJA0Z2MG36+3Tm91xchpMndv901hg0eBiGJuA
+         Y0V5wqATFAYHtMteiX5+ovmMHYaYI4BAgyhQgeHr2zqFVSCMIGpp90kmcRs1evY+ge81
+         S5g84X41VFT2XF0gLE4bqR9NHporC20jC+dzP24EcFS9FfbpoONtLC/QDkJY9j8HI40+
+         moQtl2JjpNWOG9xUH2l5MER8GQut2lk/qxaYwizSxAgjxXos7E+7p116EnXpZXXgPFTD
+         VB3nQrBMqrows3yx5AeDuJ2A9lziuDUmPxqFyPaQm9daZFZ7JgspFXxYhRmiDy4vzPkA
+         Ymhw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNbB58wOkDFN8MrvK88JecepWjt7+cNAdSdJplcZsfIDkN1urNR0Tz8ElBmCDOx3IWk/bXkyOltiizTA1wgSbt19RWoeKX
+X-Gm-Message-State: AOJu0YxbFxHHeZGOER7ONH9rKKq07YCG83y5XTg3ISjaO9IGFRXdqukB
+	s92EYwiiP/o8/GYWtihiH9yC7/17J60HViqE3yXcjXXhTvkPGepjov+OipIEv6o=
+X-Google-Smtp-Source: AGHT+IETsdegfI4jOXCoSVehNHfLcl3TeoGVGKVMXgKbtPUxFoqAN8LzG+UWto/rQJUcvkuSo0uzKQ==
+X-Received: by 2002:a05:6870:2195:b0:22a:b358:268 with SMTP id 586e51a60fabf-25db352c199mr6885310fac.25.1719870689840;
+        Mon, 01 Jul 2024 14:51:29 -0700 (PDT)
+Received: from [10.73.215.90] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-25d8e3a05f4sm1911411fac.58.2024.07.01.14.51.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jul 2024 14:51:29 -0700 (PDT)
+Message-ID: <ec536136-9dc1-4f4b-9fa2-ee3b7a3f95ee@bytedance.com>
+Date: Mon, 1 Jul 2024 14:51:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99501894-22fc-4ab2-da23-08dc9a17e886
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2024 21:51:05.5257
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: poO9gOskIx+sDXUH1LH1/rcrUCAg9dBwWA46Er7cFw7bpqE+60gyIzQEVjMXwbyNiOaLiXFN3TvGFMewdvwNQLBK6mtt25yuf1VRUNdtKls=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR84MB3869
-X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: fNyvKTM02E3WYSF2Jy9KXaF1jeUKFhGK
-X-Proofpoint-ORIG-GUID: fNyvKTM02E3WYSF2Jy9KXaF1jeUKFhGK
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-01_21,2024-07-01_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1031
- spamscore=0 impostorscore=0 phishscore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 mlxscore=0 mlxlogscore=814 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407010162
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests: fix OOM problem in msg_zerocopy selftest
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: edumazet@google.com, cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+References: <20240701202338.2806388-1-zijianzhang@bytedance.com>
+ <66831e1c3352a_46fc1294d8@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <66831e1c3352a_46fc1294d8@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
 
-I didn't get any traction on my previous topic, (Wrong nexthop selection wi=
-th two default routers where only one is REACHABLE), so I'll try asking a m=
-ore direct question...
+On 7/1/24 2:22 PM, Willem de Bruijn wrote:
+> zijianzhang@ wrote:
+>> From: Zijian Zhang <zijianzhang@bytedance.com>
+> 
+> 
+> Remember to append to PATCH net or net-next in the subject line.
+> 
+> Since the title has fix in it, I suppose this should go to net.
+> 
+> As this is a test adjustment, I don't think it should go to stable.
+> Still, fixes need a Fixes: tag. The below referenced commit is not the
+> cause. Likely that sysctl could be set to a different value to trigger
+> this on older kernels too.
+> 
+> This has likely been present since the start of the test, so
+> 
+> Fixes: 07b65c5b31ce ("test: add msg_zerocopy test")
+> 
 
-Do you expect ECMP routes to use the Neighbor Cache when choosing the nexth=
-op?
+My ignorance, thanks for pointing this out!
 
-In my case, I have two nexthop routes, where one is REACHABLE and the other=
- is FAILED. The kernel chooses the FAILED route, which breaks communication=
- between endpoints.
+>> In selftests/net/msg_zerocopy.c, it has a while loop keeps calling sendmsg
+>> on a socket with MSG_ZEROCOPY flag, and it will recv the notifications
+>> until the socket is not writable. Typically, it will start the receiving
+>> process after around 30+ sendmsgs. However, because of the commit
+>> dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale") the sender is
+>> always writable and does not get any chance to run recv notifications.
+>> The selftest always exits with OUT_OF_MEMORY because the memory used by
+>> opt_skb exceeds the core.sysctl_optmem_max.
+> 
+> Regardless of how large you set this sysctl, right? It is suggested to
+> increase it to at least 128KB.
+> 
 
-E.g.
+Just retested, even though I set net.core.optmem_max to 128k+, the
+problem still exists.
 
-$ ip -6 r
-2001:2:0:1000::/64 dev enp0s9 proto ra metric 1024 expires 65531sec pref me=
-dium
-fe80::/64 dev enp0s3 proto kernel metric 256 pref medium
-fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
-default proto ra metric 1024 expires 595sec pref medium
-        nexthop via fe80::200:10ff:fe10:1060 dev enp0s9 weight 1
-        nexthop via fe80::200:10ff:fe10:1061 dev enp0s9 weight 1
+>> We introduce "cfg_notification_limit" to force sender to receive
+>> notifications after some number of sendmsgs. And, notifications may not
+>> come in order, because of the reason we present above.
+> 
+> Which reason?
+> 
 
-$ ip -6 n
-fe80::200:10ff:fe10:1060 dev enp0s9 lladdr 00:00:10:10:10:60 router REACHAB=
-LE=20
-fe80::200:10ff:fe10:1061 dev enp0s9 FAILED
+If I open the Lock debugging config, the notifications will be reordered.
 
-When the host receives an echo request via "1060", it responds with a NS fo=
-r 1061. i.e. it's trying to resolve an UNREACHABLE nexthop.
-
-Matt.
-
+>> We have order
+>> checking code managed by cfg_verbose.
+>>
+>> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+>> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
+>> ---
+>>   tools/testing/selftests/net/msg_zerocopy.c | 14 ++++++++++++--
+>>   1 file changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
+>> index bdc03a2097e8..7ea5fb28c93d 100644
+>> --- a/tools/testing/selftests/net/msg_zerocopy.c
+>> +++ b/tools/testing/selftests/net/msg_zerocopy.c
+>> @@ -85,6 +85,7 @@ static bool cfg_rx;
+>>   static int  cfg_runtime_ms	= 4200;
+>>   static int  cfg_verbose;
+>>   static int  cfg_waittime_ms	= 500;
+>> +static int  cfg_notification_limit = 32;
+>>   static bool cfg_zerocopy;
+>>   
+>>   static socklen_t cfg_alen;
+>> @@ -95,6 +96,7 @@ static char payload[IP_MAXPACKET];
+>>   static long packets, bytes, completions, expected_completions;
+>>   static int  zerocopied = -1;
+>>   static uint32_t next_completion;
+>> +static uint32_t sends_since_notify;
+>>   
+>>   static unsigned long gettimeofday_ms(void)
+>>   {
+>> @@ -208,6 +210,7 @@ static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, int domain)
+>>   		error(1, errno, "send");
+>>   	if (cfg_verbose && ret != len)
+>>   		fprintf(stderr, "send: ret=%u != %u\n", ret, len);
+>> +	sends_since_notify++;
+>>   
+>>   	if (len) {
+>>   		packets++;
+>> @@ -435,7 +438,7 @@ static bool do_recv_completion(int fd, int domain)
+>>   	/* Detect notification gaps. These should not happen often, if at all.
+>>   	 * Gaps can occur due to drops, reordering and retransmissions.
+>>   	 */
+>> -	if (lo != next_completion)
+>> +	if (cfg_verbose && lo != next_completion)
+>>   		fprintf(stderr, "gap: %u..%u does not append to %u\n",
+>>   			lo, hi, next_completion);
+>>   	next_completion = hi + 1;
+>> @@ -460,6 +463,7 @@ static bool do_recv_completion(int fd, int domain)
+>>   static void do_recv_completions(int fd, int domain)
+>>   {
+>>   	while (do_recv_completion(fd, domain)) {}
+>> +	sends_since_notify = 0;
+>>   }
+>>   
+>>   /* Wait for all remaining completions on the errqueue */
+>> @@ -549,6 +553,9 @@ static void do_tx(int domain, int type, int protocol)
+>>   		else
+>>   			do_sendmsg(fd, &msg, cfg_zerocopy, domain);
+>>   
+>> +		if (cfg_zerocopy && sends_since_notify >= cfg_notification_limit)
+>> +			do_recv_completions(fd, domain);
+>> +
+>>   		while (!do_poll(fd, POLLOUT)) {
+>>   			if (cfg_zerocopy)
+>>   				do_recv_completions(fd, domain);
+>> @@ -708,7 +715,7 @@ static void parse_opts(int argc, char **argv)
+>>   
+>>   	cfg_payload_len = max_payload_len;
+>>   
+>> -	while ((c = getopt(argc, argv, "46c:C:D:i:mp:rs:S:t:vz")) != -1) {
+>> +	while ((c = getopt(argc, argv, "46c:C:D:i:l:mp:rs:S:t:vz")) != -1) {
+>>   		switch (c) {
+>>   		case '4':
+>>   			if (cfg_family != PF_UNSPEC)
+>> @@ -736,6 +743,9 @@ static void parse_opts(int argc, char **argv)
+>>   			if (cfg_ifindex == 0)
+>>   				error(1, errno, "invalid iface: %s", optarg);
+>>   			break;
+>> +		case 'l':
+>> +			cfg_notification_limit = strtoul(optarg, NULL, 0);
+>> +			break;
+>>   		case 'm':
+>>   			cfg_cork_mixed = true;
+>>   			break;
+>> -- 
+>> 2.20.1
+>>
+> 
+> 
 
