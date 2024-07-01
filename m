@@ -1,114 +1,190 @@
-Return-Path: <netdev+bounces-108077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4441991DCD2
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:36:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7189491DCD3
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2FCE282B3D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:36:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93A341C20D88
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F5C46542;
-	Mon,  1 Jul 2024 10:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532516F077;
+	Mon,  1 Jul 2024 10:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1LZVcdC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s60K45uw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FD73B2BB
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 10:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280786E619;
+	Mon,  1 Jul 2024 10:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719829837; cv=none; b=Avk3Vyc+tN7J0D4ZEuBfYK5NB2ZVQEF0uXfHTQdrnaHorf8IpX1jRXh+2/K7Ay+7qJQaWl3M3jrgkNwb3LzoXAEF+yljAkmyPfBXV/O/C5d6WXSrBEx7PX0e4NPMG9kjnvI3K4XVEkBTw3JU3/yNRyIh2A4fWeQbITuuTTbKHzo=
+	t=1719829934; cv=none; b=sD6WfKzQZ0F0f6K+vCaGQhwKxvTzeixZFycaRrRObcCfmveu/MjFp5ouP7Xa3YojD9vU3bxG5eBuQwMYW9UA29zzHhPtAVjfxm6NnebjnP5wUeLPapxpaMh/Dxlz8mTDw93nBrzqdl9MUWv4Aq1/gZia4Hs+Kbq4tVIyahFbuYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719829837; c=relaxed/simple;
-	bh=g4hrXWHsYggdqVLLKbJW9Azs1oivvLW/glQ60xb09Ts=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CZZbT+K7aZhKyfTzt+SfjZtXAOXHRKzNBMJz6SqCB9A2KNbCoB3P+g1JkFGyORjGPaUk0BOtz7lfEtquTVksbZseb/62dt0a5+aMkQ2sv2i9lPehgqn1vDfR/IPknDBaaEsaaEdbkFJ0QefRiuULplCAUrQ0R7VnDPDx9ZI9nQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1LZVcdC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DE5AC32786;
-	Mon,  1 Jul 2024 10:30:37 +0000 (UTC)
+	s=arc-20240116; t=1719829934; c=relaxed/simple;
+	bh=R7T8YhpIUp1RKvk1/M4DyWRs4IRJJC5D/TCvUBWV3F0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BP1G4/29Qwk9DYEN2CVRSfRBOBgiC0NW/h6gmEyBBrsRCAwmfqnsXeKAvnEVz9EJcvnvvvT8Hr6spQWNxvbc4oJIvuEskRO/TS+5lBF0Akmc6m7gl+stfBPV06gGzs77nRXFfx+O3xgAhbbuxGP4uW8SzeH/Nlp+sr61gOJYJl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s60K45uw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F61EC116B1;
+	Mon,  1 Jul 2024 10:32:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719829837;
-	bh=g4hrXWHsYggdqVLLKbJW9Azs1oivvLW/glQ60xb09Ts=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u1LZVcdCA1uAQakpAoNB4dZI4QPfkqEPS9oyyDUnAl2yu88Ne+dRz1shfhSdnyH0D
-	 OP7AKYNIj8PKg4K+MajnyVg2cjSAS4GkzebRpz+AMCF4kTSJ5agzdzXMzXcSpfMMLq
-	 77TVkALaFy5DLbwsGXGPyDP5nRzzSCjEjDxA+OAYYuoOpbRi5y4qmKD/JLVyfAAnW5
-	 jtz4B5aSS/BBib07XSrZHaidOK8nIQ20JltvZZOKl8d9k0Vy0GHpNRQ4VHGYHcTUT6
-	 h7gXp3mOlYy+tVxJO1e+sjsfirx/hCjpA3gtxxpQU8WRnQ9x1JfJyad8qKPgM6o3tk
-	 kQ/B/tb9xMaLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18489DE8E0D;
-	Mon,  1 Jul 2024 10:30:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719829933;
+	bh=R7T8YhpIUp1RKvk1/M4DyWRs4IRJJC5D/TCvUBWV3F0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s60K45uwntuPFAJ/C/OpPh2FbLXUBRggc7QQcIB/0EaV59AAzy4BDHLRNCwBnXCxv
+	 vLQPrLNuL1HRoJ+cAge9U1xFVrpLb1gcPrF5K9R54PWfziGEf/nebI0paNN+54dOX6
+	 FMmO4eLfnhGgcPEWMMi8u8K48ZbVix9wZ4Hpoov25jxzoOU8qSGGgGm39zS8kM7lR6
+	 6CGC3N1f9WRdLGZyCSB4D85BrS6uzeieuafORPuJr6DdgsX0xhvD0E9+m/+z/lgN+x
+	 2QDcXB4T9vMeUtqYErJ2koLClDfAJlKw8PUGZQ5H8uwkPcDJCFl8tv9ldA1yK6BoJP
+	 00q/72yuPUR3g==
+Message-ID: <4124798a-cda5-47fe-a67b-e84d72f3ecf8@kernel.org>
+Date: Mon, 1 Jul 2024 13:32:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/10] bnxt_en: PTP updates for net-next
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171982983709.14870.6930247684372535647.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Jul 2024 10:30:37 +0000
-References: <20240628193006.225906-1-michael.chan@broadcom.com>
-In-Reply-To: <20240628193006.225906-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, richardcochran@gmail.com, horms@kernel.org,
- przemyslaw.kitszel@intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 6/7] net: ethernet: ti: cpsw_ale: add helper
+ to setup classifier defaults
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Julien Panis <jpanis@baylibre.com>, Andrew Lunn <andrew@lunn.ch>,
+ srk@ti.com, vigneshr@ti.com, danishanwar@ti.com, pekka Varis
+ <p-varis@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org
+References: <20240628-am65-cpsw-multi-rx-v2-0-c399cb77db56@kernel.org>
+ <20240628-am65-cpsw-multi-rx-v2-6-c399cb77db56@kernel.org>
+ <20240701073505.GI17134@kernel.org>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240701073505.GI17134@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 28 Jun 2024 12:29:55 -0700 you wrote:
-> The first 5 patches implement the PTP feature on the new BCM5760X
-> chips.  The main new hardware feature is the new TX timestamp
-> completion which enables the driver to retrieve the TX timestamp
-> in NAPI without deferring to the PTP worker.
+On 01/07/2024 10:35, Simon Horman wrote:
+> On Fri, Jun 28, 2024 at 03:01:55PM +0300, Roger Quadros wrote:
+>> Default behaviour is to have 8 classifiers to map 8 DSCP/PCP
+>> priorities to N receive threads (flows). N depends on number of
+>> RX channels enabled for the port.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  drivers/net/ethernet/ti/cpsw_ale.c | 57 ++++++++++++++++++++++++++++++++++++++
+>>  drivers/net/ethernet/ti/cpsw_ale.h |  1 +
+>>  2 files changed, 58 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+>> index 75a17184d34c..51da527388df 100644
+>> --- a/drivers/net/ethernet/ti/cpsw_ale.c
+>> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
+>> @@ -1650,3 +1650,60 @@ static void cpsw_ale_policer_thread_idx_enable(struct cpsw_ale *ale, u32 idx,
+>>  	regmap_field_write(ale->fields[ALE_THREAD_VALUE], thread_id);
+>>  	regmap_field_write(ale->fields[ALE_THREAD_ENABLE], enable ? 1 : 0);
+>>  }
+>> +
+>> +/* Disable all policer entries and thread mappings */
+>> +static void cpsw_ale_policer_reset(struct cpsw_ale *ale)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < ale->params.num_policers ; i++) {
+>> +		cpsw_ale_policer_read_idx(ale, i);
+>> +		regmap_field_write(ale->fields[POL_PORT_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_PRI_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_OUI_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_DST_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_SRC_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_OVLAN_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_IVLAN_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_ETHERTYPE_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_IPSRC_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_IPDST_MEN], 0);
+>> +		regmap_field_write(ale->fields[POL_EN], 0);
+>> +		regmap_field_write(ale->fields[POL_RED_DROP_EN], 0);
+>> +		regmap_field_write(ale->fields[POL_YELLOW_DROP_EN], 0);
+>> +		regmap_field_write(ale->fields[POL_PRIORITY_THREAD_EN], 0);
+>> +
+>> +		cpsw_ale_policer_thread_idx_enable(ale, i, 0, 0);
+>> +	}
+>> +}
+>> +
+>> +/* Default classifer is to map 8 user priorities to N receive channels */
+>> +void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
+>> +{
+>> +	int pri, idx;
+>> +	int pri_thread_map[8][9] = {	{ 0, 0, 0, 0, 0, 0, 0, 0, },
+>> +					{ 0, 0, 0, 0, 1, 1, 1, 1, },
+>> +					{ 0, 0, 0, 0, 1, 1, 2, 2, },
+>> +					{ 1, 0, 0, 1, 2, 2, 3, 3, },
+>> +					{ 1, 0, 0, 1, 2, 3, 4, 4, },
+>> +					{ 1, 0, 0, 2, 3, 4, 5, 5, },
+>> +					{ 1, 0, 0, 2, 3, 4, 5, 6, },
+>> +					{ 2, 0, 1, 3, 4, 5, 6, 7, } };
 > 
-> The last 5 patches increase the number of TX PTP packets in-flight
-> from 1 to 4 on the older BCM5750X chips.  On these older chips, we
-> need to call firmware in the PTP worker to retrieve the timestamp.
-> We use an arry to keep track of the in-flight TX PTP packets.
+> Hi Roger,
 > 
-> [...]
+> Perhaps it is obvious, but I'm wondering if it is appropriate
+> to add a comment explaining the layout of the table, especially
+> the latter rows where the mapping of priority to receive channel
+> seems somewhat non-trivial.
 
-Here is the summary with links:
-  - [net-next,v2,01/10] bnxt_en: Add new TX timestamp completion definitions
-    https://git.kernel.org/netdev/net-next/c/be6b7ca3c2ae
-  - [net-next,v2,02/10] bnxt_en: Add is_ts_pkt field to struct bnxt_sw_tx_bd
-    https://git.kernel.org/netdev/net-next/c/449da97512f3
-  - [net-next,v2,03/10] bnxt_en: Allow some TX packets to be unprocessed in NAPI
-    https://git.kernel.org/netdev/net-next/c/ba0155f1e9fc
-  - [net-next,v2,04/10] bnxt_en: Add TX timestamp completion logic
-    https://git.kernel.org/netdev/net-next/c/1d294b4f903f
-  - [net-next,v2,05/10] bnxt_en: Add BCM5760X specific PHC registers mapping
-    https://git.kernel.org/netdev/net-next/c/4d588d32b032
-  - [net-next,v2,06/10] bnxt_en: Refactor all PTP TX timestamp fields into a struct
-    https://git.kernel.org/netdev/net-next/c/92595a0c0223
-  - [net-next,v2,07/10] bnxt_en: Remove an impossible condition check for PTP TX pending SKB
-    https://git.kernel.org/netdev/net-next/c/573f2a4bfcd4
-  - [net-next,v2,08/10] bnxt_en: Let bnxt_stamp_tx_skb() return error code
-    https://git.kernel.org/netdev/net-next/c/9bf688d40d66
-  - [net-next,v2,09/10] bnxt_en: Increase the max total outstanding PTP TX packets to 4
-    https://git.kernel.org/netdev/net-next/c/8aa2a79e9b95
-  - [net-next,v2,10/10] bnxt_en: Remove atomic operations on ptp->tx_avail
-    https://git.kernel.org/netdev/net-next/c/060338390787
+Sure. I took the table straight off from the All new switch book. [1]
 
-You are awesome, thank you!
+Priorities 3 to 7 are straight forward. Priorities 0 to 2 are listed like so in
+decreasing order of priority
+
+0 (default)	Best Effort
+2 		Spare (undefined)
+1 (lowest)	Background
+
+[1] Table 13-2 IEEE 802.1p Recommended Priority Mappings to Class of Service.
+
+> 
+>> +
+>> +	cpsw_ale_policer_reset(ale);
+>> +
+>> +	/* use first 8 classifiers to map 8 (DSCP/PCP) priorities to channels */
+>> +	for (pri = 0; pri < 8; pri++) {
+>> +		idx = pri;
+>> +
+>> +		/* Classifier 'idx' match on priority 'pri' */
+>> +		cpsw_ale_policer_read_idx(ale, idx);
+>> +		regmap_field_write(ale->fields[POL_PRI_VAL], pri);
+>> +		regmap_field_write(ale->fields[POL_PRI_MEN], 1);
+>> +		cpsw_ale_policer_write_idx(ale, idx);
+>> +
+>> +		/* Map Classifier 'idx' to thread provided by the map */
+>> +		cpsw_ale_policer_thread_idx_enable(ale, idx,
+>> +						   pri_thread_map[num_rx_ch - 1][pri], 1);
+>> +	}
+>> +}
+>> diff --git a/drivers/net/ethernet/ti/cpsw_ale.h b/drivers/net/ethernet/ti/cpsw_ale.h
+>> index 2cb76acc6d16..1e4e9a3dd234 100644
+>> --- a/drivers/net/ethernet/ti/cpsw_ale.h
+>> +++ b/drivers/net/ethernet/ti/cpsw_ale.h
+>> @@ -193,5 +193,6 @@ int cpsw_ale_vlan_add_modify(struct cpsw_ale *ale, u16 vid, int port_mask,
+>>  int cpsw_ale_vlan_del_modify(struct cpsw_ale *ale, u16 vid, int port_mask);
+>>  void cpsw_ale_set_unreg_mcast(struct cpsw_ale *ale, int unreg_mcast_mask,
+>>  			      bool add);
+>> +void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch);
+>>  
+>>  #endif
+>>
+>> -- 
+>> 2.34.1
+>>
+>>
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+cheers,
+-roger
 
