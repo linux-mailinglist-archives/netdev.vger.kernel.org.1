@@ -1,137 +1,113 @@
-Return-Path: <netdev+bounces-108074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF5891DCC4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:34:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E01791DCC5
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 12:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97AEF281850
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:34:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0F01C20D1C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9091213C3D5;
-	Mon,  1 Jul 2024 10:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="GN5LcITj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3413F13D53A;
+	Mon,  1 Jul 2024 10:28:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10DE12B169
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 10:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98C512C52E
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 10:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719829679; cv=none; b=bzJ+p9NOuW0ql2JeMNWKkfY/sQQTdJSqVUbWooVhHPwYkmC3fDjMU4Aqen5yXdvfbzmltX8XJBZZmeJ54jadaovnGMKhXeDOZcM5FAmSm5umXxDx0+fXfHwFq+JfLv2mxupg65jYgIhZ3jZ0PMdKi381jG/Ld7JXH/S7lTH3R4w=
+	t=1719829703; cv=none; b=eE+b5y/ehG2Y4rDELdtUyjBVwbVUnqocfNN2cMzTGKOQuH+4bxDyB+VPcgaWam5nLMReqxdaVcRG5pVL5mNhwML89l5xxl0SPhmebXT6LdG8o7JqcnpH4Y3Ov0/sDl0q4SoGKq7vzCp+eBJZEXuwAfrIycoeafTpltMJFE0vCvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719829679; c=relaxed/simple;
-	bh=1JxgQGkLSclHyQYAw1ULg+W2FRvg0av+uQnGJX79Z50=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VcMF2ncWcvVFvzks88KFRhpVcZfR+8Oe9hecx5Thmcht+SdF+TFXTr+xkBnEFdnnkHKk4gw+UZ+OlX1Yi7QfYz3Al6ik4vclznylsf0K5EIShJryApzj22s68bofBiiNZywSHZELMEwsxfoFfEn2I5jjFIHr8LkRAr50buPbn6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=GN5LcITj; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57d4ee2aaabso62614a12.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 03:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1719829676; x=1720434476; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3oGs6VWTx/CKsPEiKjuFm3FYUM/k9K/hMgueppu6Ppc=;
-        b=GN5LcITjveRViCST81FJNqfWKLugxfIE9jFz27t+rXhT7lvXVjO0wwFvYWECoy3iO8
-         s+jtc87eaq1VN8zpPohIjYDwq0BDsZjaI1eJEUrCugC9kUXEQl3bGLOWfzjjgZ2jn8FJ
-         VasJ6CiNc39JdV9yXQ+ecc0C8XjJQfooumXkEbd9Fi0eatA5cykZV53H8JS6W2d+ZehC
-         bccRKhl5OyWwaUd35DK18XpLkZ+NcoSn8Ni7axLsCbcwbkUw4QmwcnbGJLKWOpzYBd+S
-         qi6wwbVOgsaMZRA70f0R2cpMx3YIuH5NcYPnz+95Anb1GSRARD1VQr6MjC/SHfJ/FTtE
-         bXXw==
+	s=arc-20240116; t=1719829703; c=relaxed/simple;
+	bh=VHq9lv8P6o5v2IRpcFlshpMbyz0aAjxgyz1N0pgMiw4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ov4XS7fBZ5xdplYj9QJp/1skK9YstaDxA0IBoCYu51pUUrUTqx2qIMBAVX0SZKzQvH4iXxXVvY2uZQCIXwFgFAHFYXW7iGn2Y3+etFg8LEVCbONPhdB1LeFFF3/iH7E/rB5Wk0HTAwDUaKbZOkO3CX1XmlSI5imPa5/E/DdxpHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f4cff1d3d5so271926339f.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 03:28:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719829676; x=1720434476;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3oGs6VWTx/CKsPEiKjuFm3FYUM/k9K/hMgueppu6Ppc=;
-        b=onTmOXg0wAX6Sc8VrYknUCQcqR/bdclvLpE5xwNpHBIsTtB47CNMn4uJclzJDsXq4H
-         eaUBcNoNW6PsvUw628ULHVer8akZAnnKzavVcJ6fBEvxYth8M9DyDfK3ttFOyd2rctPt
-         keGZg8onG3Bs3HbmYH2yOFR1IdmMKotpGjvPGCApKQp5VfCFOrRfe68tDHthR8Fp/23N
-         lrTQjvQVohNHbNi5Jb1Dt5RoF1RTHJURBq7n3RYoJ5AprPDwgW0VsYNhwKAdlGspSODc
-         JVdEA9i+dxRVgPGf0qD8t9c8cqABCThsGAC3H/ZNGVjHAZAZpaeKYufRExZ0OdxQSEuf
-         TkHw==
-X-Gm-Message-State: AOJu0YzTydiNDUXiw7iGTHfjGAUzB5RZbLh3+yKrajdO8lyY6ipANk85
-	k9Sasc7wFy2puxAuiqMrQCz4Enoupba+IQwhRra1M+SmslLChYTeRgZ2zHUE/QQ=
-X-Google-Smtp-Source: AGHT+IFvrHkubZD6k5qIyvp8NRVvbIW7ckppYNznV2QN5jk40Xog2tn6mu2UO34rc7puAXuZuh0SCA==
-X-Received: by 2002:a05:6402:2750:b0:586:6365:b3cf with SMTP id 4fb4d7f45d1cf-5879f59bbd0mr3130589a12.10.1719829675778;
-        Mon, 01 Jul 2024 03:27:55 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58612c835adsm4217982a12.17.2024.07.01.03.27.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jul 2024 03:27:55 -0700 (PDT)
-Message-ID: <ffa1036b-fee0-4e0a-bb5a-791ff95c7142@blackwall.org>
-Date: Mon, 1 Jul 2024 13:27:54 +0300
+        d=1e100.net; s=20230601; t=1719829701; x=1720434501;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cb4kimtksUVNOGi6GY1upSaZRlO3u1Pe+pWruvEzsnc=;
+        b=VgKTDwCNa6E97NjEgTT4/eAyZlMh2LYF6sAY8lsZiJfprHKL0Xu/Unj1LFXCji4ht4
+         2uCfAD/9WT4/UPBCzyMbRVG7fHOZ02t5YM+1aIgCVXdHyrBblkVDPt7GlxvSOQ/s3pWR
+         pb1BL/tnlPt/zvWWfDhUx6HBpokw6/4WJ+MZPRHQ7w7kmofH5KDstyLszuGufXOu2qTR
+         u+NFknks5q5UBsrLKtc5Ldn97ac93Ypb3oZYNfMWcW7F1yBmw8La6G+2zRsz93038ePC
+         sW0g+0TBMwhcWvT4qQdesZewyL8i1HFL3NteULZGMyF0i/Zr5VSmB0CT0vAyoHfSZrSm
+         h59A==
+X-Forwarded-Encrypted: i=1; AJvYcCUKToubpvhW9H9EZttc11RNBDCfoHFWJwvGw7XtW7kCKhQbICdeGLxW+9YisGvYOnrh20guCvXwQwm7y5hsI6RRxGaeKoDx
+X-Gm-Message-State: AOJu0Yx2/8hkI0HvE0DddxT0icJlVhaDuZq4ulvsjQQEGpyLo09qLS9X
+	DXg1ta709O2JKvEQuAavWlFoonO9DbwtibNPi30aIGDFl0K9bspNSiW0uLX5FbbJqokFs9Pu3N8
+	QHwK76mrUALV8/l50HZERFkidwOcTnnYBI/kfbfhtcDtPhtbGTMqhU54=
+X-Google-Smtp-Source: AGHT+IHQBpTKTwhTbtvEMrj8UPMGCIPHavhSSaAzOjTX07vbEeG6atsTrtiT2tVqO5Y00eYmQ+uWxpYqKMxTq3A+Bu2tpafSpa9M
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bonding] Should we support qemu/virtio for 802.3ad mode?
-To: Hangbin Liu <liuhangbin@gmail.com>, Jay Vosburgh <j.vosburgh@gmail.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>
-References: <ZoKAt6ZkoCR2roEx@Laptop-X1>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <ZoKAt6ZkoCR2roEx@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:16cf:b0:4b9:645c:8d7 with SMTP id
+ 8926c6da1cb9f-4bbb6eb8eb1mr330728173.2.1719829700825; Mon, 01 Jul 2024
+ 03:28:20 -0700 (PDT)
+Date: Mon, 01 Jul 2024 03:28:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000064614b061c2d0e69@google.com>
+Subject: [syzbot] Monthly net report (Jul 2024)
+From: syzbot <syzbot+list05e1a6cdae342a145179@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 01/07/2024 13:11, Hangbin Liu wrote:
-> Hi Jay,
-> 
-> Some one propose again[1] if we should support 802.3ad mode for virtio driver.
-> What do you think? Should we treat the SPEED_UNKNOWN as 1 or something else
-> in __get_link_speed()?
-> 
-> [1] https://lore.kernel.org/all/CAJO99TmB3957Wq3Cse7azgBxKeZ2BV6QihoyAsjUjyvzc-V8dQ@mail.gmail.com/
-> 
-> Thanks
-> Hangbin
+Hello net maintainers/developers,
 
-Hi Hangbin,
-Because of 802.3ad we added:
- commit 16032be56c1f
- Author: Nikolay Aleksandrov <razor@blackwall.org>
- Date:   Wed Feb 3 04:04:37 2016 +0100
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-    virtio_net: add ethtool support for set and get of settings
-    
-    This patch allows the user to set and retrieve speed and duplex of the
-    virtio_net device via ethtool. Having this functionality is very helpful
-    for simulating different environments and also enables the virtio_net
-    device to participate in operations where proper speed and duplex are
-    required (e.g. currently bonding lacp mode requires full duplex). Custom
-    speed and duplex are not allowed, the user-supplied settings are validated
-    before applying.
-    
-    Example:
-    $ ethtool eth1
-    Settings for eth1:
-    ...
-            Speed: Unknown!
-            Duplex: Unknown! (255)
-    $ ethtool -s eth1 speed 1000 duplex full
-    $ ethtool eth1
-    Settings for eth1:
-    ...
-            Speed: 1000Mb/s
-            Duplex: Full
-    
-    Based on a patch by Roopa Prabhu.
-    
-    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+During the period, 15 new issues were detected and 17 were fixed.
+In total, 99 issues are still open and 1471 have been fixed so far.
 
-You can set any link parameters and use virtio_net with bond/lacp today.
+Some of the still happening issues:
 
-Cheers,
- Nik
+Ref  Crashes Repro Title
+<1>  61814   Yes   possible deadlock in team_del_slave (3)
+                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+<2>  6379    Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<3>  999     Yes   possible deadlock in __dev_queue_xmit (3)
+                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
+<4>  927     Yes   WARNING in inet_sock_destruct (4)
+                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+<5>  911     Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<6>  670     Yes   general protection fault in skb_release_data (2)
+                   https://syzkaller.appspot.com/bug?extid=ccfa5775bc1bda21ddd1
+<7>  523     Yes   WARNING in kcm_write_msgs
+                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
+<8>  479     Yes   INFO: rcu detected stall in tc_modify_qdisc
+                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+<9>  432     Yes   memory leak in corrupted (2)
+                   https://syzkaller.appspot.com/bug?extid=e1c69cadec0f1a078e3d
+<10> 347     Yes   INFO: task hung in synchronize_rcu (4)
+                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
