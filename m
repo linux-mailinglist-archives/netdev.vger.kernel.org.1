@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-108215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B1C91E693
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:23:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D0291E698
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:26:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEF821F234EB
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 17:23:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFB11B20FB1
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 17:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADCC16E87D;
-	Mon,  1 Jul 2024 17:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFC616E88C;
+	Mon,  1 Jul 2024 17:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfDLNjx6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PQ4cA+tR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2A9126F1E;
-	Mon,  1 Jul 2024 17:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64D9F4ED;
+	Mon,  1 Jul 2024 17:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719854618; cv=none; b=AXLbnvlE4i8WzgmasfvyQIqjR87GFRnxLOKKXDz516bjmZguT2SqT7C4PDluzBPqw90U4gS4U64LKXZMRcT38AfKDQptZZXXcr3Pu9QeeQ/Phgy4ZzHZcDS0ftlPZ8afjvzFZPImYU9GkgSUa+TvdvUtq9WdHw6kJjBAxohzm2s=
+	t=1719854789; cv=none; b=gfdr3lb8y52eIGS3g8S2OHn8u5GD4jg9ZtDcGPqE6u8K9JRWNQr/0B2Enny2rfW8WBdnLKirSMOdfDMIwmhFkENbD84ACGairRhp71R70WeNbrOxw06gT1cN7gs0zfK/ObToEwEokoZfyG9UfOaZboTi19q55VMJdjY+J//xPdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719854618; c=relaxed/simple;
-	bh=OHZLx8pPNgesHGu9A+Up6rEjvpM2KHacrpLcYCQi8Fw=;
+	s=arc-20240116; t=1719854789; c=relaxed/simple;
+	bh=/tGI0wDh0FZOcJPLb7Y56quvwZ87KDaB9YsD6KJsBJo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PH9Ll/aTNlW7aMqcAoNrKW3XAIV7pMFZ/LAhDYOMiSW7Qmm90IPFFQ5kUCQ3J6sq6ZmuQyPUgEeUL+srv7MDbtfVt5U8aAvVrQB9mNM/z183EN0yYxt0xffG7xYXP2qxn4r+qhHopQeTIupXySmlF3buJ7zFSxYfqdrOpBlEOwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfDLNjx6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB83C116B1;
-	Mon,  1 Jul 2024 17:23:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=W1okmCaR+mi2UKefBF/QjcGu9M2b6dN7I3GWhWwaurkGfyCXHqi9zHEDMIP2Ar0qJoZv0IUYxR2oHZUBplnKecz0JDZd9ed3SxD5bruJFh5/Epy3AuqwBi9Fk6tL2p6iRT/GWDCoj8Sh1l/dtQRVDDoOf0/Et7n75gF/xOGU/QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PQ4cA+tR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ABB8C116B1;
+	Mon,  1 Jul 2024 17:26:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719854618;
-	bh=OHZLx8pPNgesHGu9A+Up6rEjvpM2KHacrpLcYCQi8Fw=;
+	s=k20201202; t=1719854788;
+	bh=/tGI0wDh0FZOcJPLb7Y56quvwZ87KDaB9YsD6KJsBJo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NfDLNjx6l2FtHqQy31axlYyHzNMshF+YdnpeoGQ1iZSH2kPIee82B9MbSxGe/WB2d
-	 JvCFcOA6kcB6lD10YLjhVAMOvKtzvYUxpYbPE/zV7yuJeTwKtodWsmUIVd6ZYtLTgd
-	 q8RB8EVy6xne5GL8wBkhmKqDi19qmS3lOAQFqc1CFK14X/0tdl6+3JB0crdZQRv3Jo
-	 0Nrzntqydg287dp/JcgYoN8TnYsLEhYa4lroXwNsKPNVxoLHlVlBicSYMylwFfE66X
-	 k7qSNr7qIxECUaIE7dOpYG4q6K+MHc9T/YW6IPrYkntNDJrH3+C6vD6mVAB4Vxj3xl
-	 2pgvT7v8QIq4g==
-Date: Mon, 1 Jul 2024 11:23:37 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
+	b=PQ4cA+tRy28Qy+mS8NDV3R/k/RPTtjTv0F1HTGXrMq4iEJK4KKHTRd7GoRYgwX5lG
+	 uLaMdo0so/hPvkU6S6sY/5sc9b7ENF50WanUfPN61ywgAl0pq78R48Le2owseps3bK
+	 CpHbNjmCdx3Jw45NAiUKdFugGMl/S2dm/aS3t8qIYx1aeJOsq67lxmxzKW2WJ/Ua0B
+	 UmoobqynglxyVQ6nUigLQKEm9eWIvib/nS46anIph1bAXhWKF2RY7uX9qEXNWKavYe
+	 9Z8oYTWCSZurGIi0/5sXgeLuuPhB9SDmSNLfcPo8sXSnlh8xkDVZq5Mmd0GcC/pBS1
+	 dwbHG0/fSxrUA==
+Date: Mon, 1 Jul 2024 11:26:27 -0600
+From: Rob Herring <robh@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	devicetree@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next] dt-bindings: net: dwmac: Validate PBL for all
- IP-cores
-Message-ID: <171985461601.140520.15616660629845565811.robh@kernel.org>
-References: <20240628154515.8783-1-fancer.lancer@gmail.com>
+	"open list:FREESCALE QORIQ DPAA FMAN DRIVER" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH 1/2] dt-bindings: net: fsl,fman: allow dma-coherence
+ property
+Message-ID: <20240701172627.GA141559-robh@kernel.org>
+References: <20240628213711.3114790-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,39 +66,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240628154515.8783-1-fancer.lancer@gmail.com>
+In-Reply-To: <20240628213711.3114790-1-Frank.Li@nxp.com>
 
+On Fri, Jun 28, 2024 at 05:37:10PM -0400, Frank Li wrote:
+> Add dma-coherence property to fix below warning.
 
-On Fri, 28 Jun 2024 18:45:12 +0300, Serge Semin wrote:
-> Indeed the maximum DMA burst length can be programmed not only for DW
-> xGMACs, Allwinner EMACs and Spear SoC GMAC, but in accordance with
-> [1, 2, 3] for Generic DW *MAC IP-cores. Moreover the STMMAC driver parses
-> the property and then apply the configuration for all supported DW MAC
-> devices. All of that makes the property being available for all IP-cores
-> the bindings supports. Let's make sure the PBL-related properties are
-> validated for all of them by the common DW *MAC DT schema.
+'dma-coherent property' or 'DMA coherence property'.
+
+> arch/arm64/boot/dts/freescale/fsl-ls1028a-kontron-sl28-var1.dtb: dma-controller@8380000: '#dma-cells' is a required property
+
+That doesn't look related...
+
+>         from schema $id: http://devicetree.org/schemas/dma/fsl-qdma.yaml#
 > 
-> [1] DesignWare Cores Ethernet MAC Universal Databook, Revision 3.73a,
->     October 2013, p.378.
-> 
-> [2] DesignWare Cores Ethernet Quality-of-Service Databook, Revision 5.10a,
->     December 2017, p.1223.
-> 
-> [3] DesignWare Cores XGMAC - 10G Ethernet MAC Databook, Revision 2.11a,
->     September 2015, p.469-473.
-> 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-> 
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > ---
+>  Documentation/devicetree/bindings/net/fsl,fman.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> The discussion where we agreed to submit this change:
-> Link: https://lore.kernel.org/netdev/20240625215442.190557-2-robh@kernel.org
+> diff --git a/Documentation/devicetree/bindings/net/fsl,fman.yaml b/Documentation/devicetree/bindings/net/fsl,fman.yaml
+> index 7908f67413dea..f0261861f3cb2 100644
+> --- a/Documentation/devicetree/bindings/net/fsl,fman.yaml
+> +++ b/Documentation/devicetree/bindings/net/fsl,fman.yaml
+> @@ -78,6 +78,8 @@ properties:
+>        - description: The first element is associated with the event interrupts.
+>        - description: the second element is associated with the error interrupts.
+>  
+> +  dma-coherent: true
+> +
+>    fsl,qman-channel-range:
+>      $ref: /schemas/types.yaml#/definitions/uint32-array
+>      description:
+> -- 
+> 2.34.1
 > 
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   | 80 ++++++-------------
->  1 file changed, 26 insertions(+), 54 deletions(-)
-> 
-
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
 
