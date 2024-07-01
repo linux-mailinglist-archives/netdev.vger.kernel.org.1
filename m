@@ -1,119 +1,234 @@
-Return-Path: <netdev+bounces-108292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2937D91EB2F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 00:54:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D5791EB37
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 00:57:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B3121C2158F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:54:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 460381C20C0F
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B082017279F;
-	Mon,  1 Jul 2024 22:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE75171E76;
+	Mon,  1 Jul 2024 22:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="iGeZrQXR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LDBcr8iU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CBE171E7C
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 22:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D924886131
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 22:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719874439; cv=none; b=PRlfL/RasBScr9+qgk3rNxgtX6/PIOllCIL0vCMTNeAcmdMwILscoC+h0k0qSQTx9Kzm1b16AR4SfEt+aJ8DKDuCbZRlQwiRI1ZZ6qOOifOXk2HeFSW7eXNbD73OnPK3bvBi13TWgoc8Iu8RfOAmPQMNcYm7JpkRpQGzeqBmKOs=
+	t=1719874654; cv=none; b=adfpDNQafLFS4invL/oCUADaVYLMLMGIxKPP3QPUASbKTeo+6FgOuSrB5McZJz0lLrdDtqLpJqafL1F7VSqWNmD86jcW74RVgImTkpjD0UsfNQSvEmP52P0HNUIVGN0vTf2wRMJO3mNw3R+P6Dli/CEsubnKAkItFZ3SlNQo1fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719874439; c=relaxed/simple;
-	bh=Smc0aNxUIdjStnIr7RhacknbiF0AXfn+RG4Z4JpIvXE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uRaGUWQFnUmIs813k4CFHGqfbOlZSwRAkLI34Ko8GzVcMTju0Tp+xFmwEYS/EJeCcLFeh0rjug8M42GDSGhLxqxZ1k8w7tSKqLMo6mtblutV1kZBUpk0BZnrtQfYzR4NSC/zdgklepQ1RKng3nt5JnT3JNZEu2QNBK10GXsDCnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=iGeZrQXR; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6b593387daaso35214596d6.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 15:53:57 -0700 (PDT)
+	s=arc-20240116; t=1719874654; c=relaxed/simple;
+	bh=Q1zx2mNj/oo80mYo/y6tVTNqOLL/bTiF6Ai68Sm77/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAecrDsJQNGwCOEHx8mPwjO2k41cwzk3IsbG0VIts67ReQezfFDXWkPqJecH/2T1nu/StokQCA0FbBUo+Rrx0Rg7jyP1yA9ScxJIioPnWcHccXSLC8syEEIDwe1leYvfEjHcZcKWklP0QXjlAjtJdPfRkXUwY05gaFjez+cihFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LDBcr8iU; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52cecba8d11so4308072e87.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 15:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1719874436; x=1720479236; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZGrsZnTVUFPPpF/E8fcstNktKQvTmDHTgX9md/Cj9sI=;
-        b=iGeZrQXRxFURLiuFSW4RGwMm2DiFSxUs7n63jJR6Qs8+6YzhcEOIfygUyhsf2olCyb
-         BAxUPrQXYVulhrAwEtJgiZpSWqXPCDh3JRjTxeRKIXnlzmviuNrAbB6BnuqD47W0W7rM
-         bj7UXE7hz0Fp1hzWDgUjbkTdkFDZ8G3ol3bSK31KHQ5b6fDxGm1eEAZHukxjuymhkqOr
-         Lmz1AzZZ27jaJoTQty0pC3elOKkPsBS7GuMe/8hWMVd2raQ1DCDBAruVPacn0yj9wazY
-         3uQafxcZvlb4Ih2Rc74K/EqbCWFjTYIJH3iIDNeyL9ef22TOeafG4r+xk9orY5Dzsvx2
-         wpag==
+        d=gmail.com; s=20230601; t=1719874651; x=1720479451; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HFlSLn41/+I7sWXNxVEuk+E2wYDq7q/w06gtb/X7pOY=;
+        b=LDBcr8iUYFuZUOpyekw2MHJv/5F+E4l+yS7Twdh+aQziOzNAh8vMDe+HKaZuIqtX0z
+         On+lWWUcPh79jYxias8Rtt5BFjlr2dykvxtgLTm2t/CAhnUfsCWdiHgA4PZGeGeK1ZZD
+         YPoC9u+jZp+NKDem0sojNw8ZorLTBcJQEycshvisWEPa+Lfb9u/4qpDCwYcdVgXbvUVD
+         GGS2LuEtvXEoLRbWQCdMxJZlLa1kRhn1mTEJwn4I0WFyxZz2KqJuKH6pON4PQA8mEjIo
+         tyIRIzLa5AeOkcQj6BEAZNqvhw73N/K6w60A82CO6Ukm1xSKD0Zr8tqFhY/nbAXGTy4W
+         QlrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719874436; x=1720479236;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZGrsZnTVUFPPpF/E8fcstNktKQvTmDHTgX9md/Cj9sI=;
-        b=eIf6v37NwF5XSswKFxguoDj+ZVIy3Ed9OEqiFJJfqt/qcXqQTag8eLxGy/o7J5oP/8
-         Do0m2o22c1TuhbR1EEFru5j1EgsyuPcXmu2wjPxGsDa8Ep1wVJt0HPhTcVG+UR+1E6qv
-         dfVWhxAiyRR+qfwlBxwKBHkxs0xwraCXaP4MAHRJOyAaMnsKR3i9imqyQeUu8Pr3m9vD
-         cI5uYQpcHZgQHIl0JKIaqUauLOetbNqkursy/TxVy72HrfHhkcjcUQhNuBWceRmdvtOi
-         AEkKlMTYp5bFxnYdGsSmK7CpfL+dZKBWbn/O90phqA9QGRY6aEAHFEkyR/X8jzAYQn9X
-         AeSw==
-X-Gm-Message-State: AOJu0Yx0ofUukNpZuXmEsujl8NNkHzdbGjfQ78E+iiPQlQVa4C2vdYTU
-	/THYo3+lo0xMGBFooGpKLq6WEhkHCCxUCkWo0/qFq0GAGWmU0hMXNwsDk1tjnXlDA3hDs4Dh/nl
-	5
-X-Google-Smtp-Source: AGHT+IFMGxWw/WWUSXJJ8Llfjdvh5SvxJrjm7wLTxPwx2Blxw5ir0jidoiY0x1sqbSZTHNJVAm33nw==
-X-Received: by 2002:ad4:5bea:0:b0:6b5:81ac:6b84 with SMTP id 6a1803df08f44-6b5b6e96bc2mr124719586d6.14.1719874436643;
-        Mon, 01 Jul 2024 15:53:56 -0700 (PDT)
-Received: from n191-036-066.byted.org ([130.44.212.111])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f34efsm37706356d6.90.2024.07.01.15.53.56
+        d=1e100.net; s=20230601; t=1719874651; x=1720479451;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HFlSLn41/+I7sWXNxVEuk+E2wYDq7q/w06gtb/X7pOY=;
+        b=Wz9htRrVQDDTCMcNQZUX9TV7Ns7qZ57WqUJKxretX9bqbrTYSvj31mxzuSMan/i/Pg
+         xgnKeYemcq9g7jfiS+lhB1huf/fBi8+S3Q9J2/6WQVQS8Sjr0tIUmJCAc27biONnAwFX
+         ESkn1GfbfFrHgZbZd1Q8PymSoo3x05e/r01YRXGWX+R+oAjysB1EsceGZK6uYouSimxm
+         aWPoCFmN2FGrVu8VKjT29w1I6cgQfEdtQgGLPeu3cVsxjNSsycL//6nnlP4U7w0m6KRv
+         JnG9ZtHCd8u6lJ+0vBmZ5UEF38v0mKj7Y6p5PVGtpx/FqijPO1udwKfidT0MEZoEo6gQ
+         jUAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwVhSa0KNvwln3iSMUhqu+GPFB/hpxUcKmCd0UmhSI8Zm3eyORjGukmD+YQocWQ2MHKaskfhyjzMzg+NBWA3keTVlBhyFK
+X-Gm-Message-State: AOJu0YxnNEgvP9tFrviWsh9bxFZ725V9g8V9UcsFUUTUh/AGxJVYkVkI
+	Whe9ftUI4wqOVMVTETXe7tOImVFQdGaEK7VcYiczDNSu1UKY2A1E
+X-Google-Smtp-Source: AGHT+IGhm30De4VJr41N7NR6rHCefGfZTX9FhAKQKwQ/+bIpBBHGdhMuDtk77jvWvlvDAqDR5EEGFw==
+X-Received: by 2002:a05:6512:2348:b0:52c:df51:20bc with SMTP id 2adb3069b0e04-52e82665d66mr4773749e87.16.1719874650704;
+        Mon, 01 Jul 2024 15:57:30 -0700 (PDT)
+Received: from mobilestation ([176.213.1.81])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7fbef0c1sm1227373e87.127.2024.07.01.15.57.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 15:53:56 -0700 (PDT)
-From: zijianzhang@bytedance.com
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	cong.wang@bytedance.com,
-	xiaochun.lu@bytedance.com,
-	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: [PATCH net 2/2] selftests: make order checking verbose in msg_zerocopy selftest
-Date: Mon,  1 Jul 2024 22:53:49 +0000
-Message-Id: <20240701225349.3395580-3-zijianzhang@bytedance.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240701225349.3395580-1-zijianzhang@bytedance.com>
-References: <20240701225349.3395580-1-zijianzhang@bytedance.com>
+        Mon, 01 Jul 2024 15:57:30 -0700 (PDT)
+Date: Tue, 2 Jul 2024 01:57:28 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+Message-ID: <6ergp6oqrccwzsvdshnapkaukurquouf74x7l7agnmzbhctwma@qw63qlynrred>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
+ <wosihpytgfb6icdw7326xtez45cm6mbfykt4b7nlmg76xpwu4m@6xwvqj7ls7is>
+ <eb305275-6509-4887-ad33-67969a9d5144@loongson.cn>
+ <xafdw4u5nqknn2qehkke5p4mrj4bnfh33pcmkob5gbl7y5apr4@pkwmf6vphxsh>
+ <55193345-f390-4fbb-b4e6-0bcd82cedc9a@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <55193345-f390-4fbb-b4e6-0bcd82cedc9a@loongson.cn>
 
-From: Zijian Zhang <zijianzhang@bytedance.com>
+On Tue, Jun 25, 2024 at 08:31:32PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/6/24 09:47, Serge Semin 写道:
+> > On Mon, Jun 17, 2024 at 06:00:19PM +0800, Yanteng Si wrote:
+> > > Hi Serge,
+> > > 
+> > > 在 2024/6/15 00:19, Serge Semin 写道:
+> > > > On Wed, May 29, 2024 at 06:19:03PM +0800, Yanteng Si wrote:
+> > > > > Loongson delivers two types of the network devices: Loongson GMAC and
+> > > > > Loongson GNET in the framework of four CPU/Chipsets revisions:
+> > > > > 
+> > > > >      Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
+> > > > > LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
+> > > > > LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
+> > > > > LS2K2000 CPU         GNET      0x7a13          v3.73a            8
+> > > > > LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
+> > > > You mentioned in the cover-letter
+> > > > https://lore.kernel.org/netdev/cover.1716973237.git.siyanteng@loongson.cn/
+> > > > that LS2K now have GMAC NICs too:
+> > > > " 1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
+> > > >       channels, so we have to reconsider the initialization of
+> > > >       tx/rx_queues_to_use into probe();"
+> > > > 
+> > > > But I don't see much changes in the series which would indicate that
+> > > > new data. Please clarify what does it mean:
+> > > > 
+> > > > Does it mean LS2K2000 has two types of the DW GMACs, right?
+> > > Yes!
+> > > > Are both of them based on the DW GMAC v3.73a IP-core with AV-feature
+> > > > enabled and 8 DMA-channels?
+> > > Yes!
+> > > > Seeing you called the new device as GMAC it doesn't have an
+> > > > integrated PHY as GNETs do, does it? If so, then neither
+> > > > STMMAC_FLAG_DISABLE_FORCE_1000 nor loongson_gnet_fix_speed() relevant
+> > > > for the new device, right?
+> > > YES!
+> > > > Why haven't you changed the sheet in the commit log? Shall the sheet
+> > > > be updated like this:
+> > > > 
+> > > >       Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
+> > > >    LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
+> > > >    LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
+> > > > +LS2K2000 CPU         GMAC      0x7a13          v3.73a            8
+> > > >    LS2K2000 CPU         GNET      0x7a13          v3.73a            8
+> > > >    LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
+> > > > 
+> > > > ?
+> > > No! PCI Dev ID of GMAC is 0x7a03. So:
+> > > 
+> > >   LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a 1
+> > >   LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a 1
+> > > +LS2K2000 CPU         GMAC      0x7a03          v3.73a 8
+> > >   LS2K2000 CPU         GNET      0x7a13          v3.73a 8
+> > >   LS7A2000 Chipset     GNET      0x7a13          v3.73a 1
+> > > 
+> > > > I'll continue reviewing the series after the questions above are
+> > > > clarified.
+> > > OK, If anything else is unclear, please let me know.
+> > Got it. Thanks for clarifying. I'll get back to reviewing the series
+> > tomorrow. Sorry for the timebreak.
+> 
+> OK. No worries.
 
-We find that when lock debugging is on, notifications may not come in
-order. Thus, we have order checking outputs managed by cfg_verbose, to
-avoid too many outputs in this case.
+Seeing Loongson GMAC can be also found with the 8-channels AV feature 
+enabled, we'll need to reconsider the patches logic and thus the 
+commit logs too. I'll try to thoroughly describe the changes in the
+respective parts of the series. But in general, if what I've come up
+with is implemented, the patchset will turn to look as follows:
 
-Fixes: 07b65c5b31ce ("test: add msg_zerocopy test")
-Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
----
- tools/testing/selftests/net/msg_zerocopy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+[PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
+[PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
+[PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
+[PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+[PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
 
-diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
-index 926556febc83..7ea5fb28c93d 100644
---- a/tools/testing/selftests/net/msg_zerocopy.c
-+++ b/tools/testing/selftests/net/msg_zerocopy.c
-@@ -438,7 +438,7 @@ static bool do_recv_completion(int fd, int domain)
- 	/* Detect notification gaps. These should not happen often, if at all.
- 	 * Gaps can occur due to drops, reordering and retransmissions.
- 	 */
--	if (lo != next_completion)
-+	if (cfg_verbose && lo != next_completion)
- 		fprintf(stderr, "gap: %u..%u does not append to %u\n",
- 			lo, hi, next_completion);
- 	next_completion = hi + 1;
--- 
-2.20.1
+[PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
++-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+    in the loongson_gmac_data() method.
 
+[PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+[PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+
+[PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
++-> Make sure the setup() method is called after the pci_enable_device()
+    invocation.
+
+[PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
++-> Introduce the loongson_dwmac_dt_config() method here instead of
+    doing that in a separate patch.
++-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
+    the pdev->irq field and make sure it is valid.
+
+[PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
++-> ... not sure what to do with this ...
+
+[PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
++-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
+    support" patch, but which adds the support of the Loongson GMAC with the
+    8-channels AV-feature available.
++-> loongson_dwmac_intx_config() shall be dropped due to the
+    loongson_dwmac_acpi_config() method added in the PATCH 11/15.
++-> Make sure loongson_data::loongson_id is initialized before the
+    stmmac_pci_info::setup() is called.
++-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
+    fields initialization to the loongson_gmac_data() method.
++-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
+    Loongson MAC has been detected.
++-> Move everything GNET-specific to the next patch.
+
+[PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
++-> Everything Loonsgson GNET-specific is supposed to be added in the
+    framework of this patch:
+    + PCI_DEVICE_ID_LOONGSON_GNET macro
+    + loongson_gnet_fix_speed() method
+    + loongson_gnet_data() method
+    + loongson_gnet_pci_info data
+    + The GNET-specific part of the loongson_dwmac_setup() method.
+    + ...
+
+[PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
+
+Hopefully I didn't forget anything. I'll give more details in the
+comments to the respective patches.
+
+-Serge(y)
+
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
+> 
+> > 
+> > -Serge(y)
+> 
 
