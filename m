@@ -1,73 +1,193 @@
-Return-Path: <netdev+bounces-108277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41AD091E990
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:27:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3438991E993
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD98F1F21D6F
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:27:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579851C21C2B
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46516171066;
-	Mon,  1 Jul 2024 20:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GE/Tyjt2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C92417108D;
+	Mon,  1 Jul 2024 20:29:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1662AD0C;
-	Mon,  1 Jul 2024 20:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56072AD0C
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 20:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719865649; cv=none; b=O499qMmwPCqrcRz39HhM8HeF2a7BRPydgGDR6j4gNE35jDHw1iljey2Um5ZydUmwu/EcZbL3FRexhR997hdKOXv4c+tUDoQgbKUYxX7RC5klUPX2GZruqK9tEildbLe1Olu8BA7AExTtRtKVREWsYyd96Sg2+yTOcpMvd1OoC6k=
+	t=1719865760; cv=none; b=YaLqeV2UPKgW1/P4ksK/Gwnq6hck+R7UqDmZ5otlky1D41bzH+JfIBJFCObZCtrxo3sKZLJjNnP4VC4ZIP6UZRyw1ICfCp3L7YYTI/dQ7t0iGWtI0EHLV4tAXNVVT0T/iSD3jwhRTfdVD19+pbg7vk4lzlCm8p4oufVfq8EAm1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719865649; c=relaxed/simple;
-	bh=0cnNYPaJOc3XajJvl1vFQngJ3JahUk39aC7HmDUXHOw=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=ISOjRJSs1ej//DSncxYopbUTAVcJw3jxWJjImwuPycCtpaBpL6Ud7Pf8isfmlMl+Jh1So37rpDc8c2m2IrFMmkJYbjOO8L2a0VOCCSUgpc//L6CiD537XWsHHqLZygs0TYgELU66LBCnDxlTyVp3I9V5itCMHgPzyvbxhZ3h4l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GE/Tyjt2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C05A9C116B1;
-	Mon,  1 Jul 2024 20:27:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719865648;
-	bh=0cnNYPaJOc3XajJvl1vFQngJ3JahUk39aC7HmDUXHOw=;
-	h=Date:From:To:Subject:From;
-	b=GE/Tyjt2bzk05yg4s5Mpl6Ie9o3JDoEEXCy14zCn7l21aLUP9SHuR7fB9rpCbNGNe
-	 99G0w3rn5FopG6BvKAfjLNqkmq0pP0o3O9C0rx3Ytss7K59S9DNVEj9OooVJhSReLE
-	 /4t/kH/b+RzGRKtEHSgW13a6YLDdz+ev6FZ1yrl6Uaql0yURwnKvmsydmxeFLgg0V5
-	 oHcV5K2EFPvBYsM2TpwUkmQZCS0/AYd1dks7bvE6Q4Ggv04xcZHU43M6ouRmWswE+b
-	 dD+S7D4rhuvy8BOipse1UBunvlEwX7+hfgvIx+QrOtpbF7yLJaet+VRncvcYEISIMg
-	 Qsk1XE7QoeYoQ==
-Date: Mon, 1 Jul 2024 13:27:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev call - Jul 2nd
-Message-ID: <20240701132727.4e023a1e@kernel.org>
+	s=arc-20240116; t=1719865760; c=relaxed/simple;
+	bh=oQITdv6k40q5TSoehNoxrygADAbUkGKXr5RS1yF57+Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uLYaMyvjRRcPIOIoOm4ID+wb6QWHbiBxRv1gAVOuuymesTY8qxb98dEotdHYkNjkw0xsEuSNYD46WuWDUMHGmEkoPCINGBSZkCeZGH/E5hFnL1/Z5jUyeoTFsYh6SgagLvPeZOAB93sFSghDO5KxHF1KcGV3GgVH/iq9T5pxMAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7f61da4d7beso388180439f.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 13:29:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719865758; x=1720470558;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=45VUjgKyDJbHN9NQFzOoMfLnofpNwCXcTZgDZaJxLls=;
+        b=jFcbbWHFV3ekuyv22QE1/32TygHZsvR5by00/rZAOpkyH2xb+NNsHWg/G0Cgk/YQLh
+         XenJIr9QTyO/M19A9Hkaw5ag6flquXK3j/d9uK7JfDI7d1hbbnpJT2YqmvxupFCXDSgd
+         cx3B2nqbr/aMa9ixDKLbZTlorDKL5v8ObNForkvoaYOeqxS6cMnDzd6wUBAiYoL8VPiL
+         07SnnTlyxXWZv/3KOpHmeFhI3RBJXCQim+YKejTzMzaUi8KQP0AOi1lgznj3KwTJfk96
+         sQOL8syoDyKb7GzO7p1l48pmN/nuHPIaVZPHR5MNZTxphgUzkHTRjfNPgJUmiirwWJtC
+         zm1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXSe+eGAtveV+rxIMGHSIYtvfAo2GF7XVkFq8CzgkNNFSk5a88nt2TYDxBUPup/nh2tYddMlVo88ma/MyOvG6uRB0ABfGt8
+X-Gm-Message-State: AOJu0Yx5JOYM3uPmnOMFHMP5kLsc8ryJ7XwBHY8T0yz9hsSwqbX8CVIb
+	sPqtoFbOzGxfoTUuFfJGSuKwmm2b4X+40i/WksFBNjq6yt4dKgWIp6lXPVPLkgyqbLQ27EUX1h1
+	L2tknkqckur9Ts/MySWHDHd8+lt2OIxnWsGyJxSf+RUe1zq3I5NznAd0=
+X-Google-Smtp-Source: AGHT+IEVwvPqAO53RkQyrGV7S43o0Ayz+T2x8h0oOso1Pw1DV3p6wT7yDYTKBgkzGYkTxpWKLJW0/Xh3SDCbB4xF/KLPiBHqQTBQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:6c0d:b0:7f3:d460:610f with SMTP id
+ ca18e2360f4ac-7f62eeae7d7mr60589339f.4.1719865757885; Mon, 01 Jul 2024
+ 13:29:17 -0700 (PDT)
+Date: Mon, 01 Jul 2024 13:29:17 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008f77c2061c357383@google.com>
+Subject: [syzbot] [bpf?] [net?] stack segment fault in bpf_xdp_redirect
+From: syzbot <syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi!
+Hello,
 
-The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
-5:30 pm (~EU), at https://bbb.lwn.net/b/jak-wkr-seg-hjn
+syzbot found the following issue on:
 
-No agenda, yet.
+HEAD commit:    1c5fc27bc48a Merge tag 'nf-next-24-06-28' of git://git.ker..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11aa6fa6980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
+dashboard link: https://syzkaller.appspot.com/bug?extid=5ae46b237278e2369cac
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-A reminder - both LPC and netconf are open for submissions.
-netconf especially is an amazing opportunity to discuss problems 
-and solutions with some of the best minds, so please take 
-an advantage of it!
+Unfortunately, I don't have any reproducer for this issue yet.
 
-And an early notice - next call (Jul 16th) will most likely be 
-canceled since it will overlap with netdev conference in Santa Clara.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9672225af907/disk-1c5fc27b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0f14d163a914/vmlinux-1c5fc27b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ec6c331e6a6e/bzImage-1c5fc27b.xz
 
-In terms of review rotation - it's an Intel week.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
+
+Oops: stack segment: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 PID: 10179 Comm: syz.0.1527 Not tainted 6.10.0-rc5-syzkaller-01137-g1c5fc27bc48a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
+RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
+Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
+RSP: 0018:ffffc9000d537970 EFLAGS: 00010202
+RAX: 1ffff1100c81ca81 RBX: 0000000000000000 RCX: ffff8880640e3c00
+RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000d537af0
+RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
+R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
+R13: dffffc0000000000 R14: ffffc90012a31048 R15: 000000000000a020
+FS:  00007f04c1ac26c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f04c1aa1d58 CR3: 000000002ccf6000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bpf_prog_bc55b47b7a2429cd+0x1d/0x1f
+ __bpf_prog_run include/linux/filter.h:691 [inline]
+ bpf_prog_run_xdp include/net/xdp.h:514 [inline]
+ tun_build_skb drivers/net/tun.c:1711 [inline]
+ tun_get_user+0x3321/0x4560 drivers/net/tun.c:1819
+ tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f04c0d7471f
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
+RSP: 002b:00007f04c1ac2010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f04c0f04150 RCX: 00007f04c0d7471f
+RDX: 0000000000000032 RSI: 0000000020001500 RDI: 00000000000000c8
+RBP: 00007f04c0df677e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000032 R11: 0000000000000293 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f04c0f04150 R15: 00007ffffb5272c8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
+RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
+Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
+RSP: 0018:ffffc9000d537970 EFLAGS: 00010202
+RAX: 1ffff1100c81ca81 RBX: 0000000000000000 RCX: ffff8880640e3c00
+RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000d537af0
+RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
+R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
+R13: dffffc0000000000 R14: ffffc90012a31048 R15: 000000000000a020
+FS:  00007f04c1ac26c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f04c1aa1d58 CR3: 000000002ccf6000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	81 c3 08 18 00 00    	add    $0x1808,%ebx
+   6:	48 89 d8             	mov    %rbx,%rax
+   9:	48 c1 e8 03          	shr    $0x3,%rax
+   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  12:	74 08                	je     0x1c
+  14:	48 89 df             	mov    %rbx,%rdi
+  17:	e8 55 1a 99 f8       	call   0xf8991a71
+  1c:	48 8b 1b             	mov    (%rbx),%rbx
+  1f:	4c 8d 63 38          	lea    0x38(%rbx),%r12
+  23:	4c 89 e5             	mov    %r12,%rbp
+  26:	48 c1 ed 03          	shr    $0x3,%rbp
+* 2a:	42 0f b6 44 2d 00    	movzbl 0x0(%rbp,%r13,1),%eax <-- trapping instruction
+  30:	84 c0                	test   %al,%al
+  32:	0f 85 d0 00 00 00    	jne    0x108
+  38:	45 8b 34 24          	mov    (%r12),%r14d
+  3c:	44 89 f6             	mov    %r14d,%esi
+  3f:	83                   	.byte 0x83
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
