@@ -1,83 +1,66 @@
-Return-Path: <netdev+bounces-108028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B675F91D998
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:03:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7444691D9A5
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6921B2842DD
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:03:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E959284EEA
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DEC61674;
-	Mon,  1 Jul 2024 08:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="NISqy9QV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FB7823DE;
+	Mon,  1 Jul 2024 08:06:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AD07D08D
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 08:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223C577F1B
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 08:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719821017; cv=none; b=efx563waUu9w38nyg/hZ7ZVJbrjZa20d3/qw1TFVmKXg81QO0+t9q/xW24guHwc+kZhXcvwMa0R50G4p+8ehVAGcHPKUGn14gxGv41STw7MmcH8hvByD1laZIqEPaEXPEki4KS7h55S2LdFcrNd01rV2O2VcduulVIt8q2+hSPY=
+	t=1719821217; cv=none; b=B80DZ7gXY6oVIShnTfouaGzbkKfCZ/tMaCaYWI6ZfbCKPoo2vwhYT0u9G9NGs9SAU0NznCLTWjttyWE6um6tuEY6sm4CKcPg3+0I+NBpP2ZmAWDWHxK4ng/Ky69+9PUG2rLNKnpNbmTh+a/mwglRsQohiqwcybOLlUNwL2gnV6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719821017; c=relaxed/simple;
-	bh=Shw1Th3WUaSnOFjbNI7at32oQOt0mlvfcwXzXPPaV4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WXN/SkOk5+rHmryc8IS/cnpe/UpF1nz+zsZ0m0kavoLc2loObak3Noq9pDBdmqbHM5chOFbIcE8jiiEel4DST2TudBlyDxxCHzfPRmxCTqi1w04ikBcNqYq7rm2jvP6QY7H3KUHLOEWF1uC9Qdj84oDGiIEg547i1EcC6qp0pno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=NISqy9QV; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42565cdf99cso24140845e9.3
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 01:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719821014; x=1720425814; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b45V0iviWplF75Nx/Ur6UmqLyJXiIut90SMCIP5elJ0=;
-        b=NISqy9QVHWhB8aLx/k+DBbYwRo9cFPYh5gMoysMiQoB7icmpCEKwnRFUJf+9GQtKZD
-         K9zhYumI+kFHCwfchVnW1S2RzJ5jV+2C2wb6kfG4nO/X8tfLn/4sgPFmwj8857uicAIb
-         HJsqXAJtTdnlg2ct2QYbOxKuh5MuIwCYAhZhZmzPgKx6OUa0NX2XvweDv626OmukZCQD
-         i2vs4OrbfB7V9K/kcfZb+MI32ZMxzfcwjhmg442qagMXqLhN3Us5IMl7GhBSjJryR7YD
-         HDIb2uogg7iU5pEzIjF05fK/ZoIhF6vukGFeubJhgRXCyijcJPrrQy7IP5Tpa0hCorJz
-         Mixw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719821014; x=1720425814;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b45V0iviWplF75Nx/Ur6UmqLyJXiIut90SMCIP5elJ0=;
-        b=Uw6Zjgcgm7gLHlm7NpgXKOk+N41d56AWdQa3cwjP3DmjhaAgoB4YbWP2rcoypSUf6f
-         t08LGDIlcGmEB+pe2EHok/TXYIs+9ez1kshz+V1y0GusNGnBITEwZW8mTrx17OPbyqSB
-         hFppiEKEx5qTO88Vne+Idvnkf3e+yE+kO8sxn+Xwi8QzB9/Q/rtrVfNaDI1JyeSwwKE1
-         0zl6ktDGBheLag76+RYFodqaak9F715LurROs100hnpH1BGBKSAVcJ7XodT+wcNKhkWZ
-         SyzK4YADkSmD5MoQwJPvHoTVuiXWEDGp+FGHfSuayY8NqC5SGlH2Vzaia38crp0OQnaw
-         hsEw==
-X-Gm-Message-State: AOJu0YxSiPvnCJpIarYD1R/F8apr53bSevPy6YdV8z6doERryR+/ut0t
-	EMG8WpklH0vSRqzQ6xaFrR4O0a8Qavioqb3HCnNzLnV74lSqUfTHTz31IqgzMfo=
-X-Google-Smtp-Source: AGHT+IFfMJT7UhgMv/q10eZW7BhycbYE7gDH2aVKPe6CX2HpFuRwhkf+IuOfRfdxzGiyl5aDicMa3w==
-X-Received: by 2002:adf:f18b:0:b0:361:dd0c:678 with SMTP id ffacd0b85a97d-367756bc471mr3480189f8f.36.1719821014086;
-        Mon, 01 Jul 2024 01:03:34 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:1c2d:13b2:676b:59c2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0fba5asm9310049f8f.71.2024.07.01.01.03.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 01:03:33 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [RESEND PATCH net v2] net: phy: aquantia: add missing include guards
-Date: Mon,  1 Jul 2024 10:03:22 +0200
-Message-ID: <20240701080322.9569-1-brgl@bgdev.pl>
+	s=arc-20240116; t=1719821217; c=relaxed/simple;
+	bh=qHArqbNYlXaBcr5ma4KWcFFp3nH2lHPUG2fCdNxhQoY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iDXE+LKgBmId8XWXifIVEgorM1Qdizcvrxue+BKnP3ZDR5yRi99OXQMrKw8fTd1hsicLY+tkYnocjOVjh4bK4RaDf+pyERawmjviHQseT6eklO3PhyiJadL3/6k9gsToad/E4yppgL+zYcNVCVaj+IbeYPaCWJtlZTE4EnPlh3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sOC3k-0002lX-O3
+	for netdev@vger.kernel.org; Mon, 01 Jul 2024 10:06:48 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sOC3k-006KC8-BC
+	for netdev@vger.kernel.org; Mon, 01 Jul 2024 10:06:48 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 092732F7193
+	for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 08:06:47 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id EB5932F7189;
+	Mon, 01 Jul 2024 08:06:46 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id ef2aa0a2;
+	Mon, 1 Jul 2024 08:06:46 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/1] pull-request: can 2024-07-01
+Date: Mon,  1 Jul 2024 10:03:21 +0200
+Message-ID: <20240701080643.1354022-1-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,42 +69,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Hello netdev-team,
 
-The header is missing the include guards so add them.
+this is a pull request of 1 patch for net/master.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Fixes: fb470f70fea7 ("net: phy: aquantia: add hwmon support")
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Jimmy Assarsson's patch for the kvaser_usb adds a missing explicit
+initialization of the struct kvaser_usb_driver_info::family for the
+kvaser_usb_driver_info_leafimx.
+
+regards,
+Marc
+
 ---
-Changes since v1:
-- rebased on top of net/main
+The following changes since commit 134061163ee5ca4759de5c24ca3bd71608891ba7:
 
- drivers/net/phy/aquantia/aquantia.h | 5 +++++
- 1 file changed, 5 insertions(+)
+  bnx2x: Fix multiple UBSAN array-index-out-of-bounds (2024-06-28 18:19:05 -0700)
 
-diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index 1c19ae74ad2b..4830b25e6c7d 100644
---- a/drivers/net/phy/aquantia/aquantia.h
-+++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -6,6 +6,9 @@
-  * Author: Heiner Kallweit <hkallweit1@gmail.com>
-  */
- 
-+#ifndef AQUANTIA_H
-+#define AQUANTIA_H
-+
- #include <linux/device.h>
- #include <linux/phy.h>
- 
-@@ -120,3 +123,5 @@ static inline int aqr_hwmon_probe(struct phy_device *phydev) { return 0; }
- #endif
- 
- int aqr_firmware_load(struct phy_device *phydev);
-+
-+#endif /* AQUANTIA_H */
--- 
-2.43.0
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.10-20240701
+
+for you to fetch changes up to 19d5b2698c35b2132a355c67b4d429053804f8cc:
+
+  can: kvaser_usb: Explicitly initialize family in leafimx driver_info struct (2024-07-01 08:55:16 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.10-20240701
+
+----------------------------------------------------------------
+Jimmy Assarsson (1):
+      can: kvaser_usb: Explicitly initialize family in leafimx driver_info struct
+
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 
