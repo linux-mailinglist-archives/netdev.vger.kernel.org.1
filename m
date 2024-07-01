@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-108060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DB191DB1E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:09:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4503E91DB67
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 11:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D511C2182D
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:09:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE8F6B212B6
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A7513F439;
-	Mon,  1 Jul 2024 09:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8877584D13;
+	Mon,  1 Jul 2024 09:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CFPTWS0I"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GMOn+323"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C180A13AD04
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 09:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343591F937;
+	Mon,  1 Jul 2024 09:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719824906; cv=none; b=QBy3xCq5NpAiINsBGC5vNxbrMaX6VVLu7E52C5C2rO0TtPJvLJyuP0xfFSNP18cUemdmoU6ClvmhP9V2ON309IkwjjVvTVEWXIUk7n2t269DP9+1DCpNMOpWS6s/KyDxrX2iWqpQx5zepowo9M+35lW9U7QoA+bdexvJhNu2rUQ=
+	t=1719826107; cv=none; b=GmwvWs3R+klYOk0koxvxlZAaSD0ea8NWRcCs2jpbH2dUk+Yii/GRqskYIqymRFkyeTJ9ro7Nf0CRv9gpQtvq/vWB+8p7hecKhH+CaqkV3T8X6PNOLTgvLK+Vh/G33QigChucJ2pEeWKJOgmm4bHtoh7+3JUUVMhsy9gZRNfJSL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719824906; c=relaxed/simple;
-	bh=YzoctkienM/RHSl/MxnQWSeBZnA19kNmBR99veARymE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W5CoNvVPnIcmCXTRoLrGIy0ssKGsBpXp2LpMH0PfJhOGSQlPH8inez30mnlKg1zospsTbXgrl7g71ZWaYHVsqVAXWgf8oT2jnXSJrZt2ba0hTBTLb2xK+xMblASF/xa+NUdN3dV+ahcOzO+0D9fxG8+pg7wJtRecChI8FNEkUpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CFPTWS0I; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719824903; x=1751360903;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YzoctkienM/RHSl/MxnQWSeBZnA19kNmBR99veARymE=;
-  b=CFPTWS0IlB++TgNzxvQQFo330LIewhOXx6K5JwS1FpZiagPO+oDVOFpJ
-   WO168w4TRcDt2+l1FYPdIo89F+sOOB5cN4wdp03A9MPzTgNg0ift8zBMW
-   K3i7SLPFHt2fjfeCCdClxDA35+IX7KIcFN9DhoIYo/hdOZlQE57k+v8q1
-   TeSFIK0W6ZFI/Ijg3wsBcjRC28M3PygQNIjtqUs6hJTIR6NjhVmz1gkpj
-   2wvPRpaNVBm5hTYEqC8TWPziVsQ9dGkhnIQebltUgRf0Ys0rsSwT69qJA
-   LHl4cULaLd6sZbujmTCJA2SPSfBh4grOPZCCSPNlclXW7ERFn6qPXNB97
-   g==;
-X-CSE-ConnectionGUID: EPH9x1FgSWewJmiSMnyu8w==
-X-CSE-MsgGUID: SobOE17gR6q4lq4HO5nyew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11119"; a="27619851"
-X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
-   d="scan'208";a="27619851"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 02:08:13 -0700
-X-CSE-ConnectionGUID: a+j0va57ThSCMnb84GNGxg==
-X-CSE-MsgGUID: JgXYfGS6SCuOGaCyI9jnTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
-   d="scan'208";a="45281920"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa006.fm.intel.com with ESMTP; 01 Jul 2024 02:08:11 -0700
-Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 512E4125BB;
-	Mon,  1 Jul 2024 10:08:10 +0100 (IST)
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: przemyslaw.kitszel@intel.com,
-	marcin.szycik@linux.intel.com,
-	netdev@vger.kernel.org
-Subject: [PATCH iwl-net] ice: Fix recipe read procedure
-Date: Mon,  1 Jul 2024 11:05:46 +0200
-Message-Id: <20240701090546.31243-1-wojciech.drewek@intel.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1719826107; c=relaxed/simple;
+	bh=wAKcEvpgmzYUQv4xBYdWwUr3ERXwzRzT3O3PNKdMLsc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JuF3Q/FDhf9G3fQkfFSFw90p/znjJwXzABYrJgAMAaM+eneR3GUwjOIivRD5Zs8yFHFESgyE03mzORdXgWY1kwrXEzapXBQWZD+F2Vg0Pe8syQYdYzZaBXz+0QbYkj1Nl/IMvxcdAVRVkWRTYmZYtyWGsOp7fe58z/O93Um80Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GMOn+323; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4618vWEV022313;
+	Mon, 1 Jul 2024 02:07:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=MxTte4ZHFHq+OKifMO5kKxA
+	kLudbwO9gv7RxKcZ+UVo=; b=GMOn+323pObtD3pEJeEzwRpsuLLPIOW7xpgPvim
+	5jT0u6NHar5vkYD7LQKjRL5R5NpIxwHVpfJhTIjlSstTGDhsXeEaaL2pdAn9PAMz
+	x3RODRHlUVM0wKogzNt/gBjhw0QaMKpZBvHUFbjQZ5rylBHbX3Ks/nQXmkKb+PpN
+	Jk3bTa697cLBdmDMAjmURB7/sk41bDH4lff8gr4bNI3VcwmoKR89myx1MPl8FBA6
+	XMBueIo+8zk+N+gAE0GVtQX1yB86GcX2dBPKFa9ei9Iw/5vWNWby37ATzSAhrBP5
+	6rtXtn3TcWKy5YyswsXJuhfYVXRK9yBApPrcVqdqnvHWGHA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 403sdcg1my-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 02:07:58 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 1 Jul 2024 02:07:57 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 1 Jul 2024 02:07:57 -0700
+Received: from localhost.localdomain (unknown [10.28.36.175])
+	by maili.marvell.com (Postfix) with ESMTP id 5B2BB3F7048;
+	Mon,  1 Jul 2024 02:07:48 -0700 (PDT)
+From: Srujana Challa <schalla@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <schalla@marvell.com>
+Subject: [PATCH net,0/6] Fixes for CPT and RSS configuration
+Date: Mon, 1 Jul 2024 14:37:40 +0530
+Message-ID: <20240701090746.2171565-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,42 +73,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Wdzqu5yh_sXxaS-oq3rHEc4RaaA-6Iee
+X-Proofpoint-ORIG-GUID: Wdzqu5yh_sXxaS-oq3rHEc4RaaA-6Iee
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-01_07,2024-06-28_01,2024-05-17_01
 
-When ice driver reads recipes from firmware information about
-need_pass_l2 and allow_pass_l2 flags is not stored correctly.
-Those flags are stored as one bit each in ice_sw_recipe structure.
-Because of that, the result of checking a flag has to be casted to bool.
-Note that the need_pass_l2 flag currently works correctly, because
-it's stored in the first bit.
+This series of patches fixes various issues related to CPT
+configuration and RSS configuration.
 
-Fixes: bccd9bce29e0 ("ice: Add guard rule when creating FDB in switchdev")
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_switch.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Kiran Kumar K (1):
+  octeontx2-af: Fix issue with IPv6 ext match for RSS
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 1191031b2a43..ffd6c42bda1e 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -2413,10 +2413,10 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
- 		/* Propagate some data to the recipe database */
- 		recps[idx].is_root = !!is_root;
- 		recps[idx].priority = root_bufs.content.act_ctrl_fwd_priority;
--		recps[idx].need_pass_l2 = root_bufs.content.act_ctrl &
--					  ICE_AQ_RECIPE_ACT_NEED_PASS_L2;
--		recps[idx].allow_pass_l2 = root_bufs.content.act_ctrl &
--					   ICE_AQ_RECIPE_ACT_ALLOW_PASS_L2;
-+		recps[idx].need_pass_l2 = !!(root_bufs.content.act_ctrl &
-+					     ICE_AQ_RECIPE_ACT_NEED_PASS_L2);
-+		recps[idx].allow_pass_l2 = !!(root_bufs.content.act_ctrl &
-+					      ICE_AQ_RECIPE_ACT_ALLOW_PASS_L2);
- 		bitmap_zero(recps[idx].res_idxs, ICE_MAX_FV_WORDS);
- 		if (root_bufs.content.result_indx & ICE_AQ_RECIPE_RESULT_EN) {
- 			recps[idx].chain_idx = root_bufs.content.result_indx &
+Michal Mazur (1):
+  octeontx2-af: fix detection of IP layer
+
+Nithin Dabilpuram (1):
+  octeontx2-af: replace cpt slot with lf id on reg write
+
+Satheesh Paul (1):
+  octeontx2-af: fix issue with IPv4 match for RSS
+
+Srujana Challa (2):
+  octeontx2-af: reduce cpt flt interrupt vectors for cn10kb
+  octeontx2-af: fix a issue with cpt_lf_alloc mailbox
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  7 +-
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  8 +-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   | 78 +++++++++++++++----
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  7 +-
+ .../marvell/octeontx2/af/rvu_struct.h         |  5 +-
+ 5 files changed, 79 insertions(+), 26 deletions(-)
+
 -- 
-2.40.1
+2.25.1
 
 
