@@ -1,193 +1,395 @@
-Return-Path: <netdev+bounces-108278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3438991E993
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:29:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12C2A91E9C8
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 22:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579851C21C2B
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:29:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A1AAB20543
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C92417108D;
-	Mon,  1 Jul 2024 20:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D85D8248C;
+	Mon,  1 Jul 2024 20:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cHeMggS7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56072AD0C
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 20:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719865760; cv=none; b=YaLqeV2UPKgW1/P4ksK/Gwnq6hck+R7UqDmZ5otlky1D41bzH+JfIBJFCObZCtrxo3sKZLJjNnP4VC4ZIP6UZRyw1ICfCp3L7YYTI/dQ7t0iGWtI0EHLV4tAXNVVT0T/iSD3jwhRTfdVD19+pbg7vk4lzlCm8p4oufVfq8EAm1s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719865760; c=relaxed/simple;
-	bh=oQITdv6k40q5TSoehNoxrygADAbUkGKXr5RS1yF57+Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uLYaMyvjRRcPIOIoOm4ID+wb6QWHbiBxRv1gAVOuuymesTY8qxb98dEotdHYkNjkw0xsEuSNYD46WuWDUMHGmEkoPCINGBSZkCeZGH/E5hFnL1/Z5jUyeoTFsYh6SgagLvPeZOAB93sFSghDO5KxHF1KcGV3GgVH/iq9T5pxMAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7f61da4d7beso388180439f.2
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 13:29:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719865758; x=1720470558;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=45VUjgKyDJbHN9NQFzOoMfLnofpNwCXcTZgDZaJxLls=;
-        b=jFcbbWHFV3ekuyv22QE1/32TygHZsvR5by00/rZAOpkyH2xb+NNsHWg/G0Cgk/YQLh
-         XenJIr9QTyO/M19A9Hkaw5ag6flquXK3j/d9uK7JfDI7d1hbbnpJT2YqmvxupFCXDSgd
-         cx3B2nqbr/aMa9ixDKLbZTlorDKL5v8ObNForkvoaYOeqxS6cMnDzd6wUBAiYoL8VPiL
-         07SnnTlyxXWZv/3KOpHmeFhI3RBJXCQim+YKejTzMzaUi8KQP0AOi1lgznj3KwTJfk96
-         sQOL8syoDyKb7GzO7p1l48pmN/nuHPIaVZPHR5MNZTxphgUzkHTRjfNPgJUmiirwWJtC
-         zm1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXSe+eGAtveV+rxIMGHSIYtvfAo2GF7XVkFq8CzgkNNFSk5a88nt2TYDxBUPup/nh2tYddMlVo88ma/MyOvG6uRB0ABfGt8
-X-Gm-Message-State: AOJu0Yx5JOYM3uPmnOMFHMP5kLsc8ryJ7XwBHY8T0yz9hsSwqbX8CVIb
-	sPqtoFbOzGxfoTUuFfJGSuKwmm2b4X+40i/WksFBNjq6yt4dKgWIp6lXPVPLkgyqbLQ27EUX1h1
-	L2tknkqckur9Ts/MySWHDHd8+lt2OIxnWsGyJxSf+RUe1zq3I5NznAd0=
-X-Google-Smtp-Source: AGHT+IEVwvPqAO53RkQyrGV7S43o0Ayz+T2x8h0oOso1Pw1DV3p6wT7yDYTKBgkzGYkTxpWKLJW0/Xh3SDCbB4xF/KLPiBHqQTBQ
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC58F1366
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 20:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719866775; cv=fail; b=QXIGgJmC8CuR4qw/jJSMDryBJNGoIsrlS9kj+lsFEEHlQsfrgNtl5oFR9L5XQC37BoplACMnHg/aGs86EFF391vnN6qvD9yC/PWFDyimyiRwFrQRDGyl1W1v5fuj2sLNZF87CshTwv/VGkgtmjakwinKC548a8UdCe5ziHQEneU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719866775; c=relaxed/simple;
+	bh=46ErzS2rks+pwC+VS0n2nMhGtlkUe9kj4tdMINjx4dg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rrt6m6iZ7z4HKveqC4Gxfk2XvmnkhzrLVRdfSUIcxECiCZs2Ynn41tShJ8FANP1uyXFgq5XK+imK+8HzJ89bF3U+sHo9ECHgYcfo5wRcLZJBvVgcWgO1IKQNt5Q1jnLbEzQlmLZoXuHsCleK1PkAmm0I2U30DpbZ62OxkG0p9+s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cHeMggS7; arc=fail smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 461JA6ux003350;
+	Mon, 1 Jul 2024 20:46:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	4TBDJ6C1Y2rHY6hoBxso75A/TRSrI/T1RlrCFSLKUK8=; b=cHeMggS7m8JIpUx6
+	PbypFRgQO2oLPRnQbqwkER14I8EsS0JIT/lCPo1aV9JZ3bkAQOkXikG2wja1C8gx
+	20Azvj8nSElWovB/07Ed20rQni7UNux3YOcZR/Sr+oQJZdogRvLCs51y8vVh1NKp
+	b8DikGac4MiIbOMUe5m1F3502WiMCYxPmL/40Zp0kullSeOZUMrDcj1BBTNyHuKL
+	Aw5J28Ltd7ymSjsFj61YYeqcpoHyQYxsO6+ou4hCo4YgAzVxp1Ni7r8icp8Uqzua
+	zZATPGDBKcSnBfs7JI5llzkB/UGZnu3vR5+xrW4Vxhs3XJE9pzoXvyglDfqD9qC+
+	rU1Wcg==
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2043.outbound.protection.outlook.com [104.47.66.43])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4029uxd9pm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 20:46:11 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HKlJiOvoR/qz4Vf4ptHT1MdiFRwbWywOzumnzAJXLMvmVf7ILF7rHYf0htVFIQLWpkSgE7N7NlzYNDUE+6McjqrWNrPMpH4IeA+krn3+FFbev49KgTYhvmyYeaHgnxmnYGf2jD0h/fKZUyfibb1VjowHVm7tux4fhqLswhRBVNbxz23YQ34VwgEhoik52Ncv8YNaFQUN6+9+8X7P5m7SgJFz4wFlIXwrhZF3KnG03seRQm31VO92kfbmOuc+mMNhQr3JtohGXa5d3qLbzWnJ2XzTVdBQyQ8qErbW2AR0cMYyBdI8PGZfZsJSk+oFvVYXldGNHbWnZphTsMNCas3Hzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4TBDJ6C1Y2rHY6hoBxso75A/TRSrI/T1RlrCFSLKUK8=;
+ b=CWPt18xyno4kyEe3rdincZWJVVENEn4ZvgCBTm6VGyd8LI/7B89Txj35gsSxGexs/HrbohrIj5i01zQj8Xuop2Hx4/RncqTaxP5HhMx0DnjhqwnV7QrhhsW4GrHqI9eMp+jeJzRLMyxiCFEkCn51ZVqPPuIydaU2JNRP/BBoNsqy9y3t8+IK2ACDVP4Viu3tCirAyKnqArXNpZktNszePnbpbO2qzGeZITiLh1+LqvJ0AoDClK0euQHg4bbkuHjmd3+2Q6jmD3q0a6UMsI3XcxMsMZXvpJvkpVtnMTo7BMYoxSoC6XNpEgGKnFCxqQ9UdH5K/qqhZaTJadG/Lx+zlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+Received: from PH7PR02MB10039.namprd02.prod.outlook.com
+ (2603:10b6:510:2ea::17) by SJ0PR02MB8626.namprd02.prod.outlook.com
+ (2603:10b6:a03:3fb::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.32; Mon, 1 Jul
+ 2024 20:45:50 +0000
+Received: from PH7PR02MB10039.namprd02.prod.outlook.com
+ ([fe80::3b00:7b27:db10:2197]) by PH7PR02MB10039.namprd02.prod.outlook.com
+ ([fe80::3b00:7b27:db10:2197%4]) with mapi id 15.20.7719.028; Mon, 1 Jul 2024
+ 20:45:50 +0000
+From: "Sean Tranchetti (QUIC)" <quic_stranche@quicinc.com>
+To: "jmaloy@redhat.com" <jmaloy@redhat.com>,
+        "ying.xue@windriver.com"
+	<ying.xue@windriver.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "Subash Abhinov Kasiviswanathan (QUIC)" <quic_subashab@quicinc.com>
+Subject: RE: Permanent TIPC Broadcast Failure When a Member Joins
+Thread-Topic: Permanent TIPC Broadcast Failure When a Member Joins
+Thread-Index: AdqRG1Rv02uijSi9SqeRw2mbZG7gMQ6wMuGQ
+Date: Mon, 1 Jul 2024 20:45:50 +0000
+Message-ID: 
+ <PH7PR02MB10039A099EB6D53B3DD2EB9ABCBD32@PH7PR02MB10039.namprd02.prod.outlook.com>
+References: 
+ <PH7PR02MB1003916E9855CB7A11E1B1D6BCB0F2@PH7PR02MB10039.namprd02.prod.outlook.com>
+In-Reply-To: 
+ <PH7PR02MB1003916E9855CB7A11E1B1D6BCB0F2@PH7PR02MB10039.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR02MB10039:EE_|SJ0PR02MB8626:EE_
+x-ms-office365-filtering-correlation-id: 953007ce-ea05-426c-989e-08dc9a0ecaf6
+x-ld-processed: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?nk58/RiQq9xEAiSQmfnmO0L7JnLx1XxQE8Z+tsFx6hpLHBAm1ZNu4Q8GLDBl?=
+ =?us-ascii?Q?3RRHFeTh3oPnjB2Xx0s/4mAcT4XuUavlrINQfPtAgG9Ym1P48v8v8gPtRQ0N?=
+ =?us-ascii?Q?v7MWGT/RPdKryNgMiy1BRFrBOxnlfsx8wQbrI2mMLAbxGxNFikBZhgoJhPsv?=
+ =?us-ascii?Q?nDEFDPr9xZWEiszsikvzDEIaGW4kNR3JlmL75iF3yYgth8tHB5mp4yvJqHIr?=
+ =?us-ascii?Q?/FpgLSKpl6+Ttll+OXtdkV0EaJtbTAyl8Q2s0ZlndkUIE5HbXM3l1k+/NXYb?=
+ =?us-ascii?Q?peyLuZTawT7DWfIsh1Ykcar0aGS5AyYuA/7V8K50bu/IKmcSs/VEDIPUEriC?=
+ =?us-ascii?Q?raGFnLfDmm+t/viQ89sDEEQG0QiZ0c2O1WkZLRyk9SDX7I5tCaUqkG203Unf?=
+ =?us-ascii?Q?j4O7GYN0SsS6pCYMhM2QCAsSVm/GA1MrbwCn7JaU+cYo7jBT5De2586ZcKpC?=
+ =?us-ascii?Q?gDVs7lZKLyb/RGYYSlpmWnbNvQmh4DGtElEkrg54wueltlakNOW8sHm+vSKq?=
+ =?us-ascii?Q?yZ+k/R3jBopdFDQ7eKqS+9zGIQfItVJyZ+tFzztOiJ6r8sUbx7YlC9EDij8P?=
+ =?us-ascii?Q?rmM0CNhjLLZHF9Kiv+8G/dlM+RuuO6LAkmCQmSRl+6kjn4OaH/T14qXoPyIb?=
+ =?us-ascii?Q?lJpiyl2wxqROZV9v1eBIDVNvBRF6PNCteLqyr8cHiYTIQaeSKogWR1pfOK0T?=
+ =?us-ascii?Q?DhZSJmj6OfLRKulihquxe06fsaighzIwpPQgP3M21FPi8+ez4USW9litl+9I?=
+ =?us-ascii?Q?5xq95kmbIJf3eACxpmUYIgnSdAHllHY34Qbg73xfEFABVT7giTjqbX6woXBf?=
+ =?us-ascii?Q?9rIUczRJ0HqsBZcKoAnl25MxnNq99bujwqTNDwZxC5BNXuzsLJMyPHBonjVT?=
+ =?us-ascii?Q?Lr0yBSttGV58ecZhfqe1x8W0OD4LMsbeMVOzoFqKOIWlbMq6FykS99VTlgOu?=
+ =?us-ascii?Q?mbJfdziBkOw5WxcGUoJ/1RpLAE+X8dzTXRAzMv+HxszJhzIASbcvZSTgZ6bv?=
+ =?us-ascii?Q?Ntx8+Yu5ftIWd1WDRGF5JnqjXRr4Vg1+z31nt5xI/HVmb4ZvkVbMedZkTKqd?=
+ =?us-ascii?Q?kce+yPhN2XNYzpBua96IvQILKhlAfj2b5JZ0gKdO0i7l0aFCiKqzr9RGQqsh?=
+ =?us-ascii?Q?O+RRKNsjJjrO/wnYLvlYAy4FTSpGipgqbyj26+fvTCV5eqNoKtZgBoCrBMQS?=
+ =?us-ascii?Q?8pTm7/Hxfk/Hdmy69B//KzxnPpoTrFuJqnlgoDcN5MmmFPHrPvu0CXwIT1SL?=
+ =?us-ascii?Q?P2wapgVkN6wLKW66wOlIw759KHWCSjFggO3rRZ0K8InWA0Do/FHTRolWAZ6d?=
+ =?us-ascii?Q?BmRGeS7/i+nqi7TbjD5OxjO5fKCHxnAGhb4GdUt5iqhFc2jNpFq9KvrD7rU1?=
+ =?us-ascii?Q?oPHl38Pq+jrZyTX0Y2AYsci8A2zQGDa461IIbMoGk0cTtKtuYQ=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR02MB10039.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?S0LLwfTVRFnt3kldqwz1FFIGoWxJqHNf8B+5T6HCSeW2iAzTmh0T0XRX26k6?=
+ =?us-ascii?Q?MK9fsZpvV8p7idUYTfk2DcSI4A8dt4iX+6pYE/jZSB1OOcQLE3it7l6SNY33?=
+ =?us-ascii?Q?gHl8NW0NCw2PgxMGG6ylwn2MorepAu8w5Q+LO6ylouaFCeuAl1i3F7KbIkLq?=
+ =?us-ascii?Q?OJPxY420mHn6GyGJ7Lj6WvUJmLLRme0qvzR7kPNBg4/UW0q4Wfv7g7QznoE3?=
+ =?us-ascii?Q?+SA4IrGMCCpajbtQ6E9oJR55dgpEc1qEX+lKyAIaB8aGLOGoth/qE5vitNcM?=
+ =?us-ascii?Q?OSP/eiG+sLedmW5+LtyYVIGqhYCX46kd3jxviqwEnbkfn+uhu4zoePjUQYPF?=
+ =?us-ascii?Q?I4M2Bjeh24ZNUI/+/qt2qgSoLO+urHsYIOVe6CMHLV0uzzJDdNxWhu5f1IfS?=
+ =?us-ascii?Q?dLbm8quS/aUrEOMxQueNCNJNtLLQaeJVnAiKxSFPgCY0GGg29baLYuDeIIph?=
+ =?us-ascii?Q?w4qqoeppnDRbIkt8AZcJvcuceOvEEtDtbKkFa5adG6A1YYrlryIBgYWB9jK8?=
+ =?us-ascii?Q?nNjLiVWNrmQDcrguonMUIFTrH3zyDBypIuGKuXnFvACiqjpWSjxqWEGaI01B?=
+ =?us-ascii?Q?wTVOnQKUVuxmkjQbPxvJQ3Fof/Uww7va6cEcW9tJtgdB7vJZzC8sAG/j3NRW?=
+ =?us-ascii?Q?NVWLu1osfbLzRsYn5LoppmdXOQO6hb6c9usFVxdvVOmZqluWkdA9n3L5Xcmh?=
+ =?us-ascii?Q?8yxIFRdw5qxM+kYHeQFJ6Hkn6zgKKrKugWOdG4N8LxIuWLuovi2qkSQRSBFU?=
+ =?us-ascii?Q?IE6RVakHLyJWVrQ3blBPPNAXHtmJpTqA0XqOn+Qawll8JQl8F7+Wtt02MC21?=
+ =?us-ascii?Q?HcoQTNPrwzjQG8WTvNcH8F1uaJZFdNly3dTha1UrvTZSxOj3W9kPuLh6PK08?=
+ =?us-ascii?Q?emuy0Wsuk/HJKu9FNp1Ufe69Sz8/2zm8z8X478n4Dj9J72V47fGCuqboqVGa?=
+ =?us-ascii?Q?opR6EbvnkgD+Uz6dVqxB0aCkP+OKDNxntrlfh3ahKbbyX0X221AAQkY0u00+?=
+ =?us-ascii?Q?fSk6v1o1tpox5eI6pL2ngJ2/Xc10+u6a5ZDp3HhXQGxphGC505XfpAS66uHe?=
+ =?us-ascii?Q?bSjGntJQOCVVHuBohjJuDTyzrCdLs/OIU0GceQmNMHwFQM/i1rdg3CkRCKvo?=
+ =?us-ascii?Q?ffOVM6Esq36ts9fNKva5ePTamta0AoDMohOOtI7Lmxzx6xP3idlaABxm+6eR?=
+ =?us-ascii?Q?BnEgNbCv4Vyghzxkjbg6kPzj4w0jgtIJpjYxcmSeXGVYDjaUa/QW82DE8OSS?=
+ =?us-ascii?Q?QUmnnfSaszIZ7ZWTqfJxMpkHaOWSUDJwOLCmG5qesd/Hc0tF2/fERG4RNHHl?=
+ =?us-ascii?Q?YQbFi1Xq++I6GJSRWnaZGSuWJpsx94DchcEx+iqm1zhI4/h7rXUezw+5nvfI?=
+ =?us-ascii?Q?/Nvln1+3aitAQQST6kDGDos10erWH06oT2SMt+IWYl3UITWqyj+jV6W5CE3L?=
+ =?us-ascii?Q?EosaCUhLm8ltk5sc0uarG50dlQ+t+6EHD/R/KIDQyQGTTRodCPtyHpa4r0yS?=
+ =?us-ascii?Q?MNO14jb+ZIC+duwjJsnHMu++8WWrcGqpRsTqA2mSmQSfznxwFFQw+SgqaX0o?=
+ =?us-ascii?Q?oe1cnrVVcQqNPa0fggw=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6c0d:b0:7f3:d460:610f with SMTP id
- ca18e2360f4ac-7f62eeae7d7mr60589339f.4.1719865757885; Mon, 01 Jul 2024
- 13:29:17 -0700 (PDT)
-Date: Mon, 01 Jul 2024 13:29:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008f77c2061c357383@google.com>
-Subject: [syzbot] [bpf?] [net?] stack segment fault in bpf_xdp_redirect
-From: syzbot <syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	t0d+USKHrBIuLdozJ3dH1i+8tTszmYVuH5tya+krQDvQ2yfNOw8kFq95vquHk80Bmo4u2mR3x1BNX332nVJePQBpCtT7ZDLc1dlYrv/3piHHF/GGPTfLCSs6M/naln+9qJZXkaX0Xa5EY01KLVHqhf4ap96HlDPjcJ9mAmAfWWBavdLAdAGf24Uqr8EqyK3Y1VkNHmMvR1k+VzV1icrsz5EQ/opgwd5zgNG8cxbabVwbB+o2Nk3jMreR22xcrRBvVPjGMdYWDc72jBm0hfY+oy2BVm7DSl+aQbG5dQzToWgh3DalW0dtmyagLwUZISP2jYezSnhD3QMLLaUq5VjAflkRyvBiXZVXef7enroAd9cBNGi1scjS+xrrhP5bfWhbv1msrfoxZEcO2x5+OoWyVh4HsHIPn8J3Ph9P6mZFt7PaW9DQlk3QoCh6IQCXrlpUoNjK6PJN+lwQsxQVEbo6xRNVzOMgW/o+zmj6CsWkJOFNd0xZZnNmwTVUpdsPQ1xyaZTvwLN0sh+yE2/1VStAmdN6E1I2KxjOWVk5IdfYmKCe48YMT5hXez9YNYF65Ixpt6Y9bcjzxrkTEsUziMeNQm/JGkBlT4jMZTV+tBru4BHC2Ne8uQDyOUYz2C6LexCI
+X-OriginatorOrg: quicinc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR02MB10039.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 953007ce-ea05-426c-989e-08dc9a0ecaf6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2024 20:45:50.4943
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Aj3Jr30oM/8uY9/Q9+cvXaXEJkZxviOqt07+N/99luzE3ZLCCdZI1gUji/iqFo+LPi2/rkt+WuZQfbS1Ss7kpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB8626
+X-Proofpoint-GUID: hd4QHGXcX35X6Pm5XLoK2hYHxg4_APi4
+X-Proofpoint-ORIG-GUID: hd4QHGXcX35X6Pm5XLoK2hYHxg4_APi4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-01_21,2024-07-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0 mlxscore=0
+ clxscore=1011 phishscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407010154
 
-Hello,
+> Hi everyone,
+>
+> We've been trying to track down the cause of a strange TIPC failure over =
+the last few weeks and have gotten stuck. Hoping that opening this up to a =
+wider audience might help a bit.
+>
+> The scenario is as follows. We have two programs, a sever and a client, t=
+hat use TIPC group communication to exchange messages.
+>	- Server opens a TIPC socket and creates the group via setsockopt()
+>	- Once every second, the server performs a group broadcast via send()
+>	- Client opens a TIPC socket and joins the group via setsockopt()
+>	- Client then waits for messages to arrive via recv()
+>
+> What we see happening is that as soon as the client joins the TIPC group,=
+ the server's broadcast will fail from then on (either blocking on the send=
+() or returning EAGAIN/EWOULDBLOCK if set to non-blocking).
+>
+> After adding several debug messages into the kernel code, we can see that=
+ the server-side send is failing because tipc_group_bc_cong() is always ret=
+urning true, instructing the broadcast code to wait as the group is congest=
+ed.
+> If we compare logs taken on the same machine where these programs work (m=
+ore on that later, though), we see that tipc_group_bc_cong() always returns=
+ false because of the following condition:
+>	if (list_empty(&grp->small_win))
+>		return false;
 
-syzbot found the following issue on:
+I was able to track down the actual race condition that is causing this beh=
+avior. In short, there is a race between TIPC socket binding and the socket=
+ joining a group as a member. Slightly updated scenario with better termino=
+logy and the complete flow which turned out to be VERY important.
+	1) Sender TIPC socket opens with socket(), binds it to a service with bind=
+(), and creates the group via setsockopt()
+	2) Once a second, this sending socket performs a groupcast send() to all m=
+embers
+	3) Receiver TIPC socket opens with socket(), binds it to the service via b=
+ind(), and joins the group via setsockopt()
+	4) Receiver socket then waits for messages to arrive via recv()
 
-HEAD commit:    1c5fc27bc48a Merge tag 'nf-next-24-06-28' of git://git.ker..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11aa6fa6980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
-dashboard link: https://syzkaller.appspot.com/bug?extid=5ae46b237278e2369cac
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+From the kernel side, the race shows up between the bind() call and the set=
+sockopt() call for the receiving socket.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9672225af907/disk-1c5fc27b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0f14d163a914/vmlinux-1c5fc27b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ec6c331e6a6e/bzImage-1c5fc27b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
-
-Oops: stack segment: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 PID: 10179 Comm: syz.0.1527 Not tainted 6.10.0-rc5-syzkaller-01137-g1c5fc27bc48a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
-RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
-Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
-RSP: 0018:ffffc9000d537970 EFLAGS: 00010202
-RAX: 1ffff1100c81ca81 RBX: 0000000000000000 RCX: ffff8880640e3c00
-RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000d537af0
-RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
-R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
-R13: dffffc0000000000 R14: ffffc90012a31048 R15: 000000000000a020
-FS:  00007f04c1ac26c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f04c1aa1d58 CR3: 000000002ccf6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_prog_bc55b47b7a2429cd+0x1d/0x1f
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run_xdp include/net/xdp.h:514 [inline]
- tun_build_skb drivers/net/tun.c:1711 [inline]
- tun_get_user+0x3321/0x4560 drivers/net/tun.c:1819
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f04c0d7471f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
-RSP: 002b:00007f04c1ac2010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f04c0f04150 RCX: 00007f04c0d7471f
-RDX: 0000000000000032 RSI: 0000000020001500 RDI: 00000000000000c8
-RBP: 00007f04c0df677e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000032 R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f04c0f04150 R15: 00007ffffb5272c8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
-RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
-Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
-RSP: 0018:ffffc9000d537970 EFLAGS: 00010202
-RAX: 1ffff1100c81ca81 RBX: 0000000000000000 RCX: ffff8880640e3c00
-RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000d537af0
-RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
-R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
-R13: dffffc0000000000 R14: ffffc90012a31048 R15: 000000000000a020
-FS:  00007f04c1ac26c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f04c1aa1d58 CR3: 000000002ccf6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	81 c3 08 18 00 00    	add    $0x1808,%ebx
-   6:	48 89 d8             	mov    %rbx,%rax
-   9:	48 c1 e8 03          	shr    $0x3,%rax
-   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  12:	74 08                	je     0x1c
-  14:	48 89 df             	mov    %rbx,%rdi
-  17:	e8 55 1a 99 f8       	call   0xf8991a71
-  1c:	48 8b 1b             	mov    (%rbx),%rbx
-  1f:	4c 8d 63 38          	lea    0x38(%rbx),%r12
-  23:	4c 89 e5             	mov    %r12,%rbp
-  26:	48 c1 ed 03          	shr    $0x3,%rbp
-* 2a:	42 0f b6 44 2d 00    	movzbl 0x0(%rbp,%r13,1),%eax <-- trapping instruction
-  30:	84 c0                	test   %al,%al
-  32:	0f 85 d0 00 00 00    	jne    0x108
-  38:	45 8b 34 24          	mov    (%r12),%r14d
-  3c:	44 89 f6             	mov    %r14d,%esi
-  3f:	83                   	.byte 0x83
+As part of the bind() processing, the socket/port combo is added to the TIP=
+C nametable. This addition results in an event being sent out via the TIPC =
+topology server in the kernel. This event message arrives at the sender-sid=
+e socket as a group member event and is processed. The sender-side socket w=
+ill transmit a GRP_JOIN message to the receiver-side socket as a response.
+[ T1382] tipc: tipc_nametbl_publish(): publishing sk [0x46228388 : 0x566000=
+4]
+[ T1382] tipc: tipc_nametbl_insert_publ(): inserting sk [0x46228388 : 0x566=
+0004] into service 0x46228388
+[ T1382] tipc: tipc_service_insert_publ(): publishing report for service ty=
+pe 0x46228388, sub lower 0x0
+[ T1382] tipc: tipc_sub_send_event(): pushing event 0x6286e55c for lower 0x=
+5660004, node 0x0
+[ T1382] tipc: tipc_topsrv_queue_evt(): queuing work for conn 0x6286e3c0, e=
+vt 0x62af5504/0x6286e55c
+[   T21] tipc: tipc_conn_send_work(): handling conn 0x6286e3c0
+[   T21] tipc: tipc_conn_send_to_sock(): passing TOP_SRV event 0x62af5504 f=
+rom conn 0x6286e3c0
+[   T21] tipc: tipc_topsrv_kern_evt(): pushing TOP_SRV message 0x62af94b0 o=
+n skb 0x6305fa00 for port 0x757d95d5 from event 0x62af5504
+[   T21] tipc: tipc_sk_filter_rcv(): processing RCV skb 0x6305fa00
+[   T21] tipc: tipc_sk_filter_rcv(): handling tipc protocol message. sk 0x6=
+23b7680, skb 0x6305fa00
+[   T21] tipc: tipc_sk_proto_rcv(): passing TOP_SRV tipc message 0x62af94b0=
+ from skb 0x6305fa00 for group 0x6286e9c0
+[   T21] tipc: tipc_group_member_evt(): handling group member event 0x62af9=
+4b0 for group type 0x46228388 ptr 0x6286e9c0, port 0xf826a8ad, and instance=
+ 0x5660004
+[   T21] tipc: tipc_group_member_evt(): no member with port 0xf826a8ad, ins=
+tance 0x5660004 yet for group 0x6286e9c0. creating 0x63112680 and posting G=
+RP_JOIN
+[   T21] tipc: tipc_group_update_member(): adding member instance 0x5660004=
+ ptr 0x63112680  to group type 0x46228388 ptr 0x6286e9c0 small_win
+[   T21] tipc: tipc_group_proto_xmit(): handling protocol tx for group type=
+ 0x46228388 ptr 0x6286e9c0, port 0x757d95d5
+[   T21] tipc: tipc_group_proto_xmit(): member instance 0x5660004 adv adjus=
+tment for GRP_JOIN. ADV_IDLE: false, ADV_ACTIVE: false
+[   T21] tipc: tipc_group_proto_xmit(): queuing msg 0x622048b0 on XMIT skb =
+0x6305fe00
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Now the race can occur. In the good scenario, the receiver-side socket join=
+s the TIPC group in the kernel via setsockopt()/tipc_sk_join(), creates its=
+ local group structure, processes the notification from the send-side socke=
+t and all is good. However, if the GRP_JOIN message from the sender-side so=
+cket arrives before this happens, we have a problem.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Because the tsk->group element is in the receive-side socket is still NULL =
+in tipc_sk_proto_rcv(), tipc_group_proto_rcv() will drop this incoming mess=
+age from the send-side socket as the receive-side socket does not yet belon=
+g to any group.
+[   T21] tipc: tipc_sk_filter_rcv(): handling tipc group processing. sk 0x6=
+23b7680, skb 0x6305fa00
+[   T21] tipc: tipc_sk_filter_rcv(): processing RCV skb 0x6305fe00
+[   T21] tipc: tipc_sk_filter_rcv(): handling tipc protocol message. sk 0x6=
+23b6140, skb 0x6305fe00
+[   T21] tipc: tipc_sk_proto_rcv(): passing GROUP_PROTOCOL tipc msg 0x62204=
+8b0 from skb 0x6305fe00
+[   T21] tipc: tipc_group_proto_rcv(): no group for msg 0x622048b0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+static void tipc_sk_proto_rcv(struct sock *sk,
+			      struct sk_buff_head *inputq,
+			      struct sk_buff_head *xmitq)
+{
+	struct sk_buff *skb =3D __skb_dequeue(inputq);
+	struct tipc_sock *tsk =3D tipc_sk(sk);
+	struct tipc_msg *hdr =3D buf_msg(skb);
+	struct tipc_group *grp =3D tsk->group;
+	bool wakeup =3D false;
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+...
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+	case GROUP_PROTOCOL:
+		tipc_group_proto_rcv(grp, &wakeup, hdr, inputq, xmitq);
 
-If you want to undo deduplication, reply with:
-#syz undup
+
+void tipc_group_proto_rcv(struct tipc_group *grp, bool *usr_wakeup,
+			  struct tipc_msg *hdr, struct sk_buff_head *inputq,
+			  struct sk_buff_head *xmitq)
+{
+	u32 node =3D msg_orignode(hdr);
+	u32 port =3D msg_origport(hdr);
+	struct tipc_member *m, *pm;
+	u16 remitted, in_flight;
+
+	if (!grp)
+		return;
+
+
+The receive-side socket will then join the group via setsockopt()/tipc_sk_j=
+oin(). It will broadcast the GRP_JOIN message to the send-side socket which=
+ is processed normally and receive the GRP_ADV response from it. As such, f=
+rom the receive-side socket, everything looks fine.
+[ T1382] tipc: tipc_sk_join(): group 0x6286e000 type 0x46228388 created for=
+ sk 0x623b6140 instance 0x5660004
+[ T1382] tipc: tipc_sk_join(): publishing socket 0x623b6140 instance 0x5660=
+004
+[ T1382] tipc: tipc_sk_join(): joining group 0x6286e000 type 0x46228388 sk =
+0x623b6140 instance 0x5660004
+[ T1382] tipc: tipc_group_proto_xmit(): handling protocol tx for group type=
+ 0x46228388 ptr 0x6286e000, port 0xf826a8ad
+[ T1382] tipc: tipc_group_proto_xmit(): member instance 0x5660004 adv adjus=
+tment for GRP_JOIN. ADV_IDLE: false, ADV_ACTIVE: false
+[ T1382] tipc: tipc_group_proto_xmit(): queuing msg 0x622048b0 on XMIT skb =
+0x6305fe00
+[ T1382] tipc: tipc_group_update_member(): adding member instance 0x5660004=
+ ptr 0x63112f00  to group type 0x46228388 ptr 0x6286e000 small_win
+[ T1382] tipc: tipc_group_proto_xmit(): handling protocol tx for group type=
+ 0x46228388 ptr 0x6286e000, port 0xf826a8ad
+[ T1382] tipc: tipc_group_proto_xmit(): member instance 0x5610004 adv adjus=
+tment for GRP_JOIN. ADV_IDLE: false, ADV_ACTIVE: false
+[ T1382] tipc: tipc_group_proto_xmit(): queuing msg 0x62af94b0 on XMIT skb =
+0x6305fa00
+[ T1382] tipc: tipc_group_update_member(): adding member instance 0x5610004=
+ ptr 0x63112700  to group type 0x46228388 ptr 0x6286e000 small_win
+...
+[ T1382] tipc: tipc_sk_filter_rcv(): handling tipc protocol message. sk 0x6=
+23b7680, skb 0x6305fa00
+[ T1382] tipc: tipc_sk_proto_rcv(): passing GROUP_PROTOCOL tipc msg 0x62af9=
+4b0 from skb 0x6305fa00
+[ T1382] tipc: tipc_group_proto_rcv(): handling group message 0x62af94b0 fo=
+r group type 0x46228388 ptr 0x6286e9c0 and port 0xf826a8ad
+[ T1382] tipc: tipc_group_proto_rcv(): GRP_JOIN event for group type 0x4622=
+8388, port 0xf826a8ad, instance 0x5660004, ptr 0x63112680
+[ T1382] tipc: tipc_group_proto_rcv(): setting member instance 0x5660004 to=
+ state MBR_JOINED
+[ T1382] tipc: tipc_group_open(): removing member instance 0x5660004 ptr 0x=
+63112680 from grp->small_win
+[ T1382] tipc: tipc_group_update_member(): adding member instance 0x5660004=
+ ptr 0x63112680  to group type 0x46228388 ptr 0x6286e9c0 small_win
+[ T1382] tipc: tipc_group_proto_xmit(): handling protocol tx for group type=
+ 0x46228388 ptr 0x6286e9c0, port 0x757d95d5
+[ T1382] tipc: tipc_group_proto_xmit(): member instance 0x5660004 in MBR_JO=
+INED/PENDING state for adv adjustment
+[ T1382] tipc: tipc_group_proto_xmit(): member instance 0x5660004 adv adjus=
+tment for GRP_ADV. ADV_IDLE: true, ADV_ACTIVE: false
+[ T1382] tipc: tipc_group_proto_xmit(): queuing msg 0x628770b0 on XMIT skb =
+0x6305fc00
+...
+[ T1382] tipc: tipc_sk_filter_rcv(): handling tipc protocol message. sk 0x6=
+23b6140, skb 0x6305fc00
+[ T1382] tipc: tipc_sk_proto_rcv(): passing GROUP_PROTOCOL tipc msg 0x62877=
+0b0 from skb 0x6305fc00
+[ T1382] tipc: tipc_group_proto_rcv(): handling group message 0x628770b0 fo=
+r group type 0x46228388 ptr 0x6286e000 and port 0x757d95d5
+[ T1382] tipc: tipc_group_proto_rcv(): GRP_ADV for member instance 0x561000=
+4
+[ T1382] tipc: tipc_group_open(): removing member instance 0x5610004 ptr 0x=
+63112700 from grp->small_win
+
+
+However, the send-side socket is stuck in a bad state. Because it never rec=
+eived a GRP_ADV message from the receive-side socket as its GRP_JOIN messag=
+e was dropped, the sender-side socket still sees the receiver-side socket a=
+s having a small window, and thus is it is still present on the grp->small_=
+win list it maintains. As such, any groupcast messages made by the send soc=
+ket will always fail, despite the receiver-side socket having joined the gr=
+oup properly.
+[ T1380] tipc: tipc_group_bc_cong(): member instance 0x5660004 ptr 0x631126=
+80 is marked as having a small window
+...
+[ T1380] tipc: tipc_group_bc_cong(): member instance 0x5660004 ptr 0x631126=
+80 is marked as having a small window
+
+Thanks,
+Sean
 
