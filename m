@@ -1,150 +1,123 @@
-Return-Path: <netdev+bounces-108179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C399391E2C4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:50:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CA691E2C7
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 16:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E1761F22565
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:50:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20FA2284481
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 14:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529D816C6A8;
-	Mon,  1 Jul 2024 14:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278D316C849;
+	Mon,  1 Jul 2024 14:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="khIfk+f+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdclXzDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02olkn2109.outbound.protection.outlook.com [40.92.49.109])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A282316B750;
-	Mon,  1 Jul 2024 14:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.49.109
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719845417; cv=fail; b=dXOq0xEg5cEegmSLR+TYnKhQFehNiqyRNqb1iONL/7CQaptkhOgCnAKCp0tX+Z7/3S8FwCXi2TfwpfkBd9iEQ3qGTpcxTCHHIwpVM3MpgXK6rM+s827g/z0lPFgO2HAtxJHIUfpELjAJxCqGmH9Q/ZCHWvgBrQVb+pXQz3hwG5s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719845417; c=relaxed/simple;
-	bh=0PybR2F9bNvwIvO/qTyObZYiEfYjs5DeCBIYUxeCqd0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Nl0JtTeUAYtOeT/kiVsRGJsCnsVeQXdNo02s9BykjpAJhBimeX5tdt5oPNMxkZaLrsAKKEWXqCD8WIa/BVwKPjrEXjNBZ9S82MFM0TyXo9OMoDuAKU+P6nwwyD0ipcyYh0ZSmi+4TjroqHUYZu0sfl9smhdPt3S6IKnIemao5OA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=khIfk+f+; arc=fail smtp.client-ip=40.92.49.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hf3HOF2maZZShc4BV8PlWpNG/G2Msbr20mwzc3iJVByCasw2DWxZKL+0fqbXhDdYwuMLy7zbxB+s9d9rd7JmHR9HTwSoxEq4cXMCqtFV3TPID5Q5snkTy8KvrQVdLLRNyzB4xb/IjSS5k8ZKAXmv/HFyea/HRweojP/ntEw4vp9JbOJa1ts5ZehoydkZ+ZIHdzHbLykcCOxGsOsBmmaXLVC2Xn0GI5lwNYdG5vYB8IVS111HDoSA3CLSlUD1Cmk43wsvYkNG8FPt4ZOs9vqiIJW8bI4928W66ROLR62R31AIZ+9/06ugnjXzywbGXzFjygqFDeMjFGgaemO5lKadfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cInpAUnfgY+dl/3jdMpt0fwwJPOWp5VFOuhZ613ReaA=;
- b=nvvgNwv8y3BKIozMr8IJyRuVniRPQj9IiPISYzwnmchiXgiae+ekEBvFkFmsdS0bRuNZp4I321n57Rkftc3yIq+rhjzPrybjTCtNeKmAIuucH2f/Md7kATDNTX3esYahcpuNprwDycdqfjlFiTAHrbep/Un5tu+RrG5cAcswOqwmdtZq3NO8r0dTvL46TvZiAKkw2x0FxNlIe0LyM9iQRJJhGvbzVusRtTfjaDF3Iww0hS4rwCarAPtzwpFaZm+d2vUaPq0do2tTVEY1MxAoh3Y9HQNy5veT8gr0lrRM/dU9VaTEbzInv5gr6Bu4pWPIsdW0biQuwWXb89gV0TQODA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cInpAUnfgY+dl/3jdMpt0fwwJPOWp5VFOuhZ613ReaA=;
- b=khIfk+f+Td49oyK5ltD1Kxhk8rAXh97dwTIBhbrMK0h3VZx02Kp+Z30CjW8cgIOjni9rdjecK884BD90M7Qz4w4p8h98PbDkaXoalSb0mvC6XiEVm6ce3Sq8z5AiscM7LiizRVpxfHr1WxH2FkusEISOO/6bfjtFtafY75csxhYIooUByvBUDbWKI5xpkaGwO3XlY7e7g5SR6jqcBhIefVCuW0ue3lG1ugqvi4o8YrQTzsR8YFXg323H5M3V+xneACAxRBqEhO66Lw42b+5dlgOW9Dq0tmVKBTBxK3yHAFdxLTmkdkP7JSv1xvKabXY7m1fkJmJLx6jPoNTcf8zRrQ==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by AM8P194MB1673.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:320::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.32; Mon, 1 Jul
- 2024 14:50:12 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7719.028; Mon, 1 Jul 2024
- 14:50:12 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: devnull+luigi.leonardi.outlook.com@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luigi.leonardi@outlook.com,
-	marco.pinn95@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH PATCH net-next v2 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
-Date: Mon,  1 Jul 2024 16:49:41 +0200
-Message-ID:
- <AS2P194MB21701DDDFD9714671737D0E39AD32@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240701-pinna-v2-2-ac396d181f59@outlook.com>
-References: <20240701-pinna-v2-2-ac396d181f59@outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [IifNZn0XtVjad8xnR9zjL0AwBOlrPIrF]
-X-ClientProxiedBy: MI1P293CA0012.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:2::10) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240701144940.13356-2-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CBA16C698
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 14:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719845418; cv=none; b=jt94+eo0FNU1BJUYsoCIpD+2XN+lbMOQ2G4FSkiY0irkseQDMDQKqrv+bWcrco/RRIEPhH+wJvJ1GLRjhnJmM1QdbBkEgDPklyN8dZnfFvfAwWZLtjAzOIRhSQJYfgLILZg9rY7A25oRS/A5IxhmQW8k/JZqz2XcOPZ5yCCewjc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719845418; c=relaxed/simple;
+	bh=kmpe57VHLOTy0cJutYIm5BavojzboKw1DVv/szO53Dg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AYi37aqVllv3a+Lwsk4PdGaS8olQtShCfQYbaaqn97qt3g3gCMv+jxYMCclkkn1jGQlGRqVlzLC1S2DzZDamFROkmiloewJEmA6wFyzuHAEaB6SE9qgVtoxDEPzcLJtdR98b8m45pa/iprdJxFpeGDEU0ks9SVE7mtdfxuK2mtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MdclXzDl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719845415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DNibL3UDdxhkZnNmOqGIJ3BkHRH7jJIFwVe/HY6O7HQ=;
+	b=MdclXzDl324kztuQo5UtgS6t1A/MUtaB8opSRpavsBIuw9ZhrdBLi8Gjizwg6+OFDcXbh7
+	EpWTEspfSKin4ii7MPPETHICq5q9Ow8K3F8+S/bpnkapsjZg/oQCO8I71I1l1Dl8wmH2kq
+	LAu8iw2zzG2MF/v6Ykga1qrsR78mRWE=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-212-VtNnI-ZlOvO73zKo5Xwndw-1; Mon, 01 Jul 2024 10:50:13 -0400
+X-MC-Unique: VtNnI-ZlOvO73zKo5Xwndw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2ee6a86f224so311151fa.2
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 07:50:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719845412; x=1720450212;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DNibL3UDdxhkZnNmOqGIJ3BkHRH7jJIFwVe/HY6O7HQ=;
+        b=tgnT4PIk40poLJraLHQHCbAtdBG2InFwPIIzasBik4JfJL5wjqk5YIbk3n17k85Inw
+         ewTUCcNFEVJDTjmSNQzzL+IzO7GmOCnhfnIZRQYiJ+l4oqQBZb/ZniEdg/Jhi0FjeTp2
+         CXOnWDrsuVVinTMQHTT80M+7wX9O3JrbfQc08Lg0hBHtL+bKWi8OKRZYWnP9C2tqbxtp
+         Nl5PCaqCNmJ0q1aV9dUxrkIWhRdVeQY2HbCgnWa41zTq0hv+MX8C+FYdouEhrD+uys6k
+         DLP2o7IGjTH30dsWn1ZINnWrQW32OvNuXyNr8kwzNHkAnNz4fCHKA+qdWs4v0wo11V6H
+         MwPg==
+X-Gm-Message-State: AOJu0YyO2WL15KixvG4qNJwjHf+gNX5IkRZf9RGXNtGfW5wZCBV+oJIM
+	L8IPP3kKX71L8ofI+OAQfRhV+5Efgb9/EItRCw8mjwnNGjJQurbVaPc1Ullp2BtUyLjoSoCd/Pw
+	MrOoTo/c8V9xfqRe3mJeTJysyvczQbTqCmvIHddvTd/cBe8305kG/iQ==
+X-Received: by 2002:a2e:a78b:0:b0:2ec:4ed6:f4a with SMTP id 38308e7fff4ca-2ee5e70ba53mr44440931fa.5.1719845412458;
+        Mon, 01 Jul 2024 07:50:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGETMbdSmIl820QYInVUImEa+cmbA625GQwVP69/ByjtNehA3loot4aQHkQUTh6lormp2dSMA==
+X-Received: by 2002:a2e:a78b:0:b0:2ec:4ed6:f4a with SMTP id 38308e7fff4ca-2ee5e70ba53mr44440711fa.5.1719845412064;
+        Mon, 01 Jul 2024 07:50:12 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:2451:6610::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4257fc934b2sm60496475e9.44.2024.07.01.07.50.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 07:50:11 -0700 (PDT)
+Message-ID: <db537cf129f23b012d09f7067146c4daee31cf4c.camel@redhat.com>
+Subject: Re: [PATCH net-next 1/5] netlink: spec: add shaper YAML spec
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+  Simon Horman <horms@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 01 Jul 2024 16:50:09 +0200
+In-Reply-To: <20240628191230.138c66d7@kernel.org>
+References: <cover.1719518113.git.pabeni@redhat.com>
+	 <75cb77aa91040829e55c5cae73e79349f3988e06.1719518113.git.pabeni@redhat.com>
+	 <20240628191230.138c66d7@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AM8P194MB1673:EE_
-X-MS-Office365-Filtering-Correlation-Id: c55ba186-6ca6-47ef-afdd-08dc99dd1c40
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|8060799006|3412199025|440099028|56899033|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	ITmXCn5fE80qMaM187/TmGOt3nm1bTMTK9nRiiWnMoBMDH1RrFQlBkazCDYlVBSaIWtguFebTJ5Iany67Ew58+Vp5t3XBHH9ZMQR4R770TgTmt4HkkiKmiR7GjXmnLHH2qlh+rXvcsCKvnjoD+o+Jwk8lNX/I98elGnikuPd6lmvcruqK2EUmArKOLU9B47o3Mv8dlTE3+ZVdgjh54UzdP3BlBwax/+28FvcyLZ9Lq16n5OxjsWu956j4zCIaaoEsYrX9BJWm3hLA2rI0OShHEPY/wv7+U6nDiOR5WJw5xxyExRaJ/TXhlvcbS9u6u2hHK1Zh/loCLC2ZAHrg2VMLVPQF1GLm3C3T1BHRM3VVyuEDLTe/hfwEXgg5QaBjFm+m3h0ZI/NG/nZ7fI4jeTmvq59RYQu+pK9Dqef2dLm3rtkVZ06lh9zZOT3y6FAHfykUzP62nNEk91P3uOju6LDWeCJcq0yYqx2FSktmCmFLz7Mn/v0I0tEPWE9Cs7KyXiez42hOPwWantAePadWio9T0Lx6yFHp2qJ02Op5iliBMR6I3OVXqHPxGRR6djffiGb2mrdTC8MdTYAdoBINCL6IdFTuUPYnMz5An7CXVxY+ePRD2A0+O5HVfF7/d1BD1w7qyuPkjlonM/1UBR4jnGIOw==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LO0xSbYbE5mZ8S+rFlNQ6R6JIjfICrH9lxHHKVcx3giV3i+hJxmVw5qeIf+J?=
- =?us-ascii?Q?cKA5GRgqi4Jn7GQ/FiNzg6u5zmQRS+mxSt0saV6OR/hEmAP8s1qhMAuU3Vrh?=
- =?us-ascii?Q?oW4k92M/PYv0Ixpy7DcNdRC6SL69HONjqBec+ztPPZrlNIHqDy7mqbUjpQdZ?=
- =?us-ascii?Q?SKkYX7P7CTsklNJNWbSpuYZkTrBdIjJsSc8iHdqujHNltuMmnGR0UTZDLN2E?=
- =?us-ascii?Q?Tv3NlUWy3DKWdjvTGIZw9PnNw7RoCtXbX6W44AmkX1VMXn66XVBBKqpKZfRg?=
- =?us-ascii?Q?jd2yCaIyH85se9IM8Fel+w64DlHTuUja+3Ek+FyXCalnYeEOr3MNNvc08Fp8?=
- =?us-ascii?Q?UHV+cT3ajCkZ8MD5KiAZ+QO1N9bQFMSSZ3a/P2bUvbDg3zf9BkpvTwGGcD0c?=
- =?us-ascii?Q?BmqwVMD9DDzx6r/nErdSuYnQqteCFJ31Pyz7FfrKQndgOUAt9QtAElScdU6r?=
- =?us-ascii?Q?v6UOxMOue1wt7jTRJUXJrEgibOn4wzOxEG8/NPCmBK/5k3UyqEQwW0YQV6UQ?=
- =?us-ascii?Q?x1lRQSFO2H+Z8oykkBoCZjkuFEewwGAi/SmtFOf4SwTVGrgbB0AVGV+BMVtX?=
- =?us-ascii?Q?JdtIydE6x3TbW1j6IwS7jb7mNg6beyPlAC/mVPa+3FPIaDmArF5WcTXnPgzs?=
- =?us-ascii?Q?OVWcb/A5p472XAKcryiY8Nd/kLetRpI8BLGCl6rGV/QECSnDzRx2qITNb/if?=
- =?us-ascii?Q?AyqD9EwWwdRrgl2hJIOufaYrYqQrJ8qKRDGGROwJE3HJdNcNnohjJ/VZ44as?=
- =?us-ascii?Q?4RfDkbHLkGXaSKLK/KNohM0X17X27TFsLnvI/s8a1Y6W5V9qvcjOt78EqmVZ?=
- =?us-ascii?Q?lGeWvjRaZSW0CmPqADCJ+LMzPjndlOASmKrXHVoHU8S8u+LRCH9y/a6G8zzw?=
- =?us-ascii?Q?qKMST+O7RE6QsHhy2pex/WmLRO/DYl56SiCpBd5jIgWZwGiTJXl1URrrCumY?=
- =?us-ascii?Q?3Cfg8FoZEyTkxvw8jhff4ZoN03Rv5WVuNpdX1FT43Hmo23Jp/PkEXYOoV3Yh?=
- =?us-ascii?Q?OdusZydcQ/tKrsgI2Nm4e6RW4BVkxLRRRFOYXWtS55q6ie3uZdVi+x7cpmw4?=
- =?us-ascii?Q?lETt637l3/qFLO3uLVt0t+6cyGQdQNeg365JiJNHnIlTjSDJs0adRiYfgq2q?=
- =?us-ascii?Q?g5rbPQLnc6qSbT7l4EynHtVENHJh/7O+qCL4aG8LbdJZ0Xl8cwRMFFnkfUS2?=
- =?us-ascii?Q?60WbG2d7TSRhKVHobtpw+lImFcw8l86OtKtNgFzWT8kvzFDZibYD7XfKzOp/?=
- =?us-ascii?Q?5IaJGdvDOTAPLRJQdKnx?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c55ba186-6ca6-47ef-afdd-08dc99dd1c40
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2024 14:50:12.5061
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8P194MB1673
 
-Hi all,
+On Fri, 2024-06-28 at 19:12 -0700, Jakub Kicinski wrote:
+> On Thu, 27 Jun 2024 22:17:18 +0200 Paolo Abeni wrote:
+>=20
+> > +attribute-sets:
+> > +  -
+> > +    name: net_shaper
+>=20
+> s/_/-/ on all names
 
-> +		/* Inside RCU, can't sleep! */
-> +		ret = mutex_trylock(&vsock->tx_lock);
-> +		if (unlikely(ret == 0))
-> +			goto out_worker;
+It looks like the initial
 
-I just realized that here I don't release the tx_lock and 
-that the email subject is "PATCH PATCH".
-I will fix this in the next version.
-Any feedback is welcome!
+name: net_shaper
 
-Thanks,
-Luigi
+would require some patching to ynl-gen-c.py to handle the s/_/-/
+conversion in the generated file names, too.
+
+Cheers,
+
+Paolo
+
 
