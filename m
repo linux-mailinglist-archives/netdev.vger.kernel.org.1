@@ -1,160 +1,125 @@
-Return-Path: <netdev+bounces-107985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-107986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AB691D5D4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 03:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ACE691D5DA
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 03:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B5A1C20EAF
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 01:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EBA42816C4
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 01:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C329A3D62;
-	Mon,  1 Jul 2024 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25585680;
+	Mon,  1 Jul 2024 01:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEtXO8td"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="g3RurggF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0462E847B;
-	Mon,  1 Jul 2024 01:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2638BF7;
+	Mon,  1 Jul 2024 01:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719798031; cv=none; b=QHUrAb3Iw7f/hUIILp89NK0Cfj9jIGURMeZyGv5dxGKzWEdmbs7rnef5K8iui7ah7fNhlnOZl/jfactH8cBowUpghGI9PmoqZeD5wAHMNbk3iK9X1asOtCDYT2QtOpG47KOaWHut3iDKQl1nj7jESdjABC/z8uBsqN5JS7wNWMw=
+	t=1719798511; cv=none; b=Z6cINPw3ABmORDcPQ11cz7PdzS2ttJAzv//fuFMpc5OJXkr0ZKKBIL9zw2uec2pEp2AhkY1llK+6v58oh7uvWfP3sQ5TYTngvls7kjRp8k4SR6pPXI3ClSNSOp3+IcJEgWSyZAfIWuTl/wTlhmSTJMA7GXy6UvUrq8aukus9bMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719798031; c=relaxed/simple;
-	bh=8N1kTPTMUy3OyP8Thfs9SN31LDGnJJ5vniYo0Oy95II=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QBMBwELmacsfsWC93GS3l2Me8aarJHwdh5gmnj06PDOgW3fm9OXP7I2wW0ncc7RBk6MLj+rgUTHRVVVPK6FxU6e1lRxlZKI62nfjFJJh8iKrLRKikbJ4r4owCY5xkmHDx8yKH2aY+OXA8tsvYFwSB7IS7N3dX/hPd+Tv55iu9RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEtXO8td; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52cdfb69724so3041343e87.1;
-        Sun, 30 Jun 2024 18:40:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719798028; x=1720402828; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SwnfzGgZbXchQuvwIi7BwMqkkcPzYDSZ1lkWRl6NvOM=;
-        b=jEtXO8td6vultGKSKEtKfTEeiV3gFQhzZ2CGbBGrsHfPRTceyYnBrF44KCLpx26tyY
-         x4XswVgAaACK5NUptwc7siH15kAyI5MTEvRHgXCAjrz4zoyHFOOK9JjhILk2b7rTmPID
-         UFVLwgspOCtGtdjAhyxiCv50tEASZJPEV+hixeeZ3t4I3hPWEZsk9aA/H2D8eq/V/QPw
-         rt1N3pie2HafW6yVNJMBjocPHxILXmvFV2pv7UbvSLlgcNgbJC42XbkfkstZTWty+fZc
-         gDPhcHBd9fRe/+YrmWvIZk14K5eoLX9kv2D0pMXzPMJJ5ydCtJLmOUqg4WH2k4YN//Bx
-         422A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719798028; x=1720402828;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SwnfzGgZbXchQuvwIi7BwMqkkcPzYDSZ1lkWRl6NvOM=;
-        b=Olo8j6s+BlZ5QXOt4GRqnbEEn4j0erJN/2BUm7uIDWr4XKWF3HcRsEa1dbjv6Aw4Vs
-         Tp34MF1nTNYiJ7XYYeCqLYT7Er9gU8Lvd5Yt3GIUcseKx5DOjjwlLxpMBThOi+T1BHvH
-         TtP894VJ+TQUS2erSm7DzKOGXCYsYEfijZcc451prvSf1jHUiCjM7DhNvW5ihaAO/FzA
-         WNMHrmXm8vQTdIJhcjsaT/of+Wcx98Oy19nNspsPl1Ns4w90rcPy5z6KalhIDFdzOhO2
-         Eurc/bkToe3JSKNFBUPlPZCAgxideB1doKf7OJYcHKy70AiDLgRJlPMb760kh3DqLXcW
-         GCzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVW+/TgaFKp0/o5iIyxLuB4veYPWYsXJCgfriEgsVM3E+WUwF2/uCnfd0ys85n92LTNcNrN+kVxQD1q28ppfffRBXavjqLv6VIYRIr3ADhv25h/187QzyYlzmpO7FbT/+YcAYXZ0p70huBqx8FkH1ozW9O4uCfzZC8lAJxsHkxDmg==
-X-Gm-Message-State: AOJu0YwLqsXDDReP9FnN9f43Xuzxl1hvH3lpTUVegHNQqDQnwhgxDrVT
-	DajdIMbuHQAuRzprGaComodAvbSzJgszn9F9KvUx+yohT2BocmOn
-X-Google-Smtp-Source: AGHT+IE7kAt6EsHOnTzUdCIGnBj2h9mmrLiQhrSexUxPRaRVqV6UHVmgj5fZQR2jnaMRamWK2GFoig==
-X-Received: by 2002:a05:6512:6c3:b0:52c:def3:44b with SMTP id 2adb3069b0e04-52e8268b40amr2615295e87.31.1719798027768;
-        Sun, 30 Jun 2024 18:40:27 -0700 (PDT)
-Received: from mobilestation ([176.213.1.81])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab0fff6sm1173823e87.81.2024.06.30.18.40.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jun 2024 18:40:27 -0700 (PDT)
-Date: Mon, 1 Jul 2024 04:40:24 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Conor Dooley <conor@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Jose Abreu <Jose.Abreu@synopsys.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
-	Abhishek Chauhan <quic_abchauha@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>, 
-	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 06/10] dt-bindings: net: Add Synopsys DW xPCS
- bindings
-Message-ID: <a2quritc5udbpebvymbbhez2e4g5qk774trpzvsmtzgd4bpc4y@ckaqnqyrkszx>
-References: <20240627004142.8106-1-fancer.lancer@gmail.com>
- <20240627004142.8106-7-fancer.lancer@gmail.com>
- <20240627-hurry-gills-19a2496797f3@spud>
- <e5mqaztxz62b7jktr47mojjrz7ht5m4ou4mqsxtozpp3xba7e4@uh7v5zn2pbn2>
- <20240628221246.GA296233-robh@kernel.org>
+	s=arc-20240116; t=1719798511; c=relaxed/simple;
+	bh=LndvduBCTugN+zBgpjFGTFw8L6tV1GxLf4ARV2GO3qI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=X80EnCuPPbwGXD/ibdxvQDTas7yRUc/Nj4DDXqTNh3/9r2hcpyAwO5lBkYJFSbqCVd65w1TkH7jvxT7ARNcC9apwUJyucdk8mrfpIAXM4lBR/6w+BYhosJUfNaY90c5QOT5Ku069Rj6V7WZabUxkBsuP2QArReyuNdHdfb5PGV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=g3RurggF; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45UNeK7L008799;
+	Mon, 1 Jul 2024 01:47:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=WFZ3rpLyvbaEqpM/4Iq05h
+	1u6dg1spWjaj74z8leeGQ=; b=g3RurggF4njQzSpBy00U0kleC4Txb1zGsvbgpJ
+	8Z3yZzkoFQhkdwH3wB/TPbiXeSiaEj0lN190RgNRRCVka9qa+AX0YZ0hId4MutJz
+	EN3gytJyqNQQGe++sxVTmmJiEArr/HCS7Ij3PGveRIakwYIOvP9VYVFc3Xi47DsY
+	aVbnIWaJMxTSWamTUjBhaJSVikyrkzZMgZpWAN5PmGMkhi4jq7ek6eU+NRwwOUF1
+	LiLfsYEKh5K0dnNRnhthJEdF1TxBbwT8QeHoltJ2IRj8NDe42xadLkmR3/IKzEzR
+	vD0vUvnWkEldXkQzGU7GYosUT/IybJu/eED20V18Wgrtk/IA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4027mnk1a8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 01:47:39 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4611lcHI019116
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 1 Jul 2024 01:47:38 GMT
+Received: from yijiyang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 30 Jun 2024 18:47:29 -0700
+From: YijieYang <quic_yijiyang@quicinc.com>
+To: <vkoul@kernel.org>, <alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+        <bartosz.golaszewski@linaro.org>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+CC: <kernel@quicinc.com>, <quic_tengfan@quicinc.com>,
+        <quic_aiquny@quicinc.com>, <quic_jiegan@quicinc.com>,
+        <quic_yijiyang@quicinc.com>, <stable@vger.kernel.org>
+Subject: [PATCH] net: stmmac: dwmac-qcom-ethqos: fix error array size
+Date: Mon, 1 Jul 2024 09:47:20 +0800
+Message-ID: <20240701014720.2547856-1-quic_yijiyang@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240628221246.GA296233-robh@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 2gfIGHlo93uEszPcsCr5YxwpAZcB6C0B
+X-Proofpoint-GUID: 2gfIGHlo93uEszPcsCr5YxwpAZcB6C0B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-01_01,2024-06-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ spamscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 phishscore=0 mlxscore=0 suspectscore=0 clxscore=1011
+ mlxlogscore=979 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407010010
 
-On Fri, Jun 28, 2024 at 04:12:46PM -0600, Rob Herring wrote:
-> On Thu, Jun 27, 2024 at 08:10:48PM +0300, Serge Semin wrote:
-> > On Thu, Jun 27, 2024 at 04:51:22PM +0100, Conor Dooley wrote:
-> > > On Thu, Jun 27, 2024 at 03:41:26AM +0300, Serge Semin wrote:
-> > > > +  clocks:
-> > > > +    description:
-> > > > +      Both MCI and APB3 interfaces are supposed to be equipped with a clock
-> > > > +      source connected via the clk_csr_i line.
-> > > > +
-> > > > +      PCS/PMA layer can be clocked by an internal reference clock source
-> > > > +      (phyN_core_refclk) or by an externally connected (phyN_pad_refclk) clock
-> > > > +      generator. Both clocks can be supplied at a time.
-> > > > +    minItems: 1
-> > > > +    maxItems: 3
-> > > > +
-> > > > +  clock-names:
-> > > > +    oneOf:
-> > > > +      - minItems: 1
-> > > > +        items:
-> > > > +          - enum: [core, pad]
-> > > > +          - const: pad
-> > > > +      - minItems: 1
-> > > > +        items:
-> > > > +          - const: pclk
-> > > > +          - enum: [core, pad]
-> > > > +          - const: pad
-> > > 
-> > 
-> > > While reading this, I'm kinda struggling to map "clk_csr_i" to a clock
-> > > name. Is that pclk? And why pclk if it is connected to "clk_csr_i"?
-> > 
-> > Right. It's "pclk". The reason of using the "pclk" name is that it has
-> > turned to be a de-facto standard name in the DT-bindings for the
-> > peripheral bus clock sources utilized for the CSR-space IO buses.
-> > Moreover the STMMAC driver responsible for the parental DW *MAC
-> > devices handling also has the "pclk" name utilized for the clk_csr_i
-> > signal. So using the "pclk" name in the tightly coupled devices (MAC
-> > and PCS) for the same signal seemed a good idea.
-> 
+From: Yijie Yang <quic_yijiyang@quicinc.com>
 
-> It is? That's really just the name of the bus clock for APB (Arm 
-> Peripheral Bus). If there's a name that matches the docs, use that. 
-> Though I'd drop 'clk_' part.
+Correct member @num_por with size of right array @emac_v4_0_0_por for
+struct ethqos_emac_driver_data @emac_v4_0_0_data.
 
-Yes, it's normally should have been utilized for APB, but as I see it
-the name utilization has gone wider than to just the ARM Peripheral
-bus clock. The DW MAC clock-names DT-property bindings is just one
-example of that.
+Cc: stable@vger.kernel.org
+Fixes: 8c4d92e82d50 ("net: stmmac: dwmac-qcom-ethqos: add support for emac4 on sa8775p platforms")
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Anyway. Ok. I'll convert the name to "csr". (I'll drop the _i suffix
-too since it's obvious that the clock signal is the connected to the
-device input pin.)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 80eb72bc6311..e8a1701cdb7c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -272,7 +272,7 @@ static const struct ethqos_emac_por emac_v4_0_0_por[] = {
+ 
+ static const struct ethqos_emac_driver_data emac_v4_0_0_data = {
+ 	.por = emac_v4_0_0_por,
+-	.num_por = ARRAY_SIZE(emac_v3_0_0_por),
++	.num_por = ARRAY_SIZE(emac_v4_0_0_por),
+ 	.rgmii_config_loopback_en = false,
+ 	.has_emac_ge_3 = true,
+ 	.link_clk_name = "phyaux",
 
--Serge(y)
+base-commit: 0fc4bfab2cd45f9acb86c4f04b5191e114e901ed
+-- 
+2.34.1
 
-> 
-> Rob
 
