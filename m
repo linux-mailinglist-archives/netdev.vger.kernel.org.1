@@ -1,38 +1,54 @@
-Return-Path: <netdev+bounces-108244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F98F91E7B0
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0DB91E806
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B3FA286605
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:34:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07B78283005
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8B016F0CB;
-	Mon,  1 Jul 2024 18:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2829016F0DE;
+	Mon,  1 Jul 2024 18:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="d6Z4tSyT"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBEF16C844;
-	Mon,  1 Jul 2024 18:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FDD10F9;
+	Mon,  1 Jul 2024 18:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719858865; cv=none; b=bLk96bPx9kLqaj24cr9RDpDaXuvzXw2UDWY8aZEazXzMD/W8JoTJFNDlXkixN5SHObVA/oRJsM9gDH35r51Cn/QEJpUXIHJ1npMx5AgYEbRwN+D4glOlnpjxzwZ+O1mlu8H7ggwyDrrh5aG7BkI4CNoYmgEqOBURDKdrsPmhj2o=
+	t=1719860191; cv=none; b=RvGX9EAkxVN2mM07FHmdrKTpVzmCuS8sumvVwQ/c5lXFW6NfJZw2kwku02UA76qFvjDuTRRNRUJnu795b8SIjZgncRNXJxtvivxK6rnl78XsE8VFud25W0p1myIudcNLfmtD3JAEJXL5jXJ8o06rUUyoLN5LvRcsa9BTpaeoMo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719858865; c=relaxed/simple;
-	bh=qnBhsbC4WESNiDDc/d77ys1TcQzeK/0ng/S3oNQv8JA=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NiyzFLUDOQOtrS/GvfEaJmQyjbYWX6AeoEsGap5ltGjRYQihNQlCSAdXUtl8J3fDsvsQgRpHIuvDCCK+DPWpoGxZNEadoLmUzuBHDQk1TScnzXoaovGO0QJ7XVgSn1yfuS7OUNyLE5fiBJ3JQbPf/wuV5sgN10qdhgDB583vT3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 413AEC0005;
-	Mon,  1 Jul 2024 18:34:18 +0000 (UTC)
-Message-ID: <79258c61-9658-4f9b-b564-f2e14440a7c5@ovn.org>
-Date: Mon, 1 Jul 2024 20:34:17 +0200
+	s=arc-20240116; t=1719860191; c=relaxed/simple;
+	bh=FGjF9H72/VjAVssFyu2ost2sDyRH7zc8H/44qyHvy5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XNJWtmQH6yU/vtY4BM6epCaafHYgulF140PLv/V3nWrjjtgJAGgu28ESCeo+RBbbuMs2fo4DnSK44uzJVyHTzJEVCii34RoDt7dke6ayOjRWl93yxboBTbZJhp2pEUCZxyyRIp4JSCOXOjFH+4vt4ZIpcSwQf86wNz7pMnKFQ0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=d6Z4tSyT; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id A2AC1886BF;
+	Mon,  1 Jul 2024 20:56:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1719860180;
+	bh=ftdeQIvicw6mG0MiKB0Aa+ePUHUQrNFHdnNxsWe3Sa4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=d6Z4tSyT9tMbxoio/eIxjq41VHtZbL4iwD1zMfZX8ymQG0LLkwcgt4r/aGw9zb6bh
+	 ZSkFckq+9cF1DjVzSW9YUk2DxTfERXzHpPBaRLOugjf5BgBax1FEWitvH4+As3W4xW
+	 /5PTjxsmsD+I5yRnZdhQvrbU+ujquh7u5FHGZTbDbgUAlQ0SJfCzOPN+TNGxZb6v6y
+	 wVv/oqd2PFItUrDcMDYJyPXnvvFd8ji2y+VxykE/qa2qSB7LWsyijLEuP4Pc01HEyy
+	 /LeW+DIUY/I/yBTAlenKNAaDYqWWLYLVSWSnAU+F2rC/t19qzZD5myvxwwFZbErFI5
+	 E7e7zFUTLUuyA==
+Message-ID: <c1b3dffb-f7e5-4c10-8cda-a4c26ce3c74b@denx.de>
+Date: Mon, 1 Jul 2024 20:35:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,81 +56,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org, dev@openvswitch.org, Pravin B Shelar <pshelar@ovn.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v7 10/10] selftests: openvswitch: add psample
- test
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-References: <20240630195740.1469727-1-amorenoz@redhat.com>
- <20240630195740.1469727-11-amorenoz@redhat.com>
+Subject: Re: [net-next,PATCH v2] dt-bindings: net: realtek,rtl82xx: Document
+ known PHY IDs as compatible strings
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Joakim Zhang <qiangqing.zhang@nxp.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ kernel@dh-electronics.com
+References: <20240625184359.153423-1-marex@denx.de>
+ <CAMuHMdWJmQ-Jhko-0SO6_dKceXPNu8nx++wgWxxLn=6xPcBMPg@mail.gmail.com>
 Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240630195740.1469727-11-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <CAMuHMdWJmQ-Jhko-0SO6_dKceXPNu8nx++wgWxxLn=6xPcBMPg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 6/30/24 21:57, Adrian Moreno wrote:
-> Add a test to verify sampling packets via psample works.
+On 7/1/24 5:06 PM, Geert Uytterhoeven wrote:
+> Hi Marek,
+
+Hi,
+
+> On Tue, Jun 25, 2024 at 8:46 PM Marek Vasut <marex@denx.de> wrote:
+>> Extract known PHY IDs from Linux kernel realtek PHY driver
+>> and convert them into supported compatible string list for
+>> this DT binding document.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
 > 
-> In order to do that, create a subcommand in ovs-dpctl.py to listen to
-> on the psample multicast group and print samples.
+> Thanks for your patch, which is now commit 8fda53719a596fa2
+> ("dt-bindings: net: realtek,rtl82xx: Document known PHY IDs as
+> compatible strings") in net-next/main (next-20240628 and later).
 > 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 115 +++++++++++++++++-
->  .../selftests/net/openvswitch/ovs-dpctl.py    |  73 ++++++++++-
->  2 files changed, 182 insertions(+), 6 deletions(-)
+>> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+>> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+>> @@ -18,6 +18,29 @@ allOf:
+>>     - $ref: ethernet-phy.yaml#
+>>
+>>   properties:
+>> +  compatible:
+>> +    enum:
+>> +      - ethernet-phy-id001c.c800
+>> +      - ethernet-phy-id001c.c816
+>> +      - ethernet-phy-id001c.c838
+>> +      - ethernet-phy-id001c.c840
+>> +      - ethernet-phy-id001c.c848
+>> +      - ethernet-phy-id001c.c849
+>> +      - ethernet-phy-id001c.c84a
+>> +      - ethernet-phy-id001c.c862
+>> +      - ethernet-phy-id001c.c878
+>> +      - ethernet-phy-id001c.c880
+>> +      - ethernet-phy-id001c.c910
+>> +      - ethernet-phy-id001c.c912
+>> +      - ethernet-phy-id001c.c913
+>> +      - ethernet-phy-id001c.c914
+>> +      - ethernet-phy-id001c.c915
+>> +      - ethernet-phy-id001c.c916
+>> +      - ethernet-phy-id001c.c942
+>> +      - ethernet-phy-id001c.c961
+>> +      - ethernet-phy-id001c.cad0
+>> +      - ethernet-phy-id001c.cb00
+> 
+> Can you please elaborate why you didn't add an
+> "ethernet-phy-ieee802.3-c22" fallback?
 
+I'll quote Andrew's comment on
 
-This version seems to work correctly with and without arguments.
+[PATCH 2/2] arm64: dts: renesas: Drop ethernet-phy-ieee802.3-c22 from 
+PHY compatible string on all RZ boards
 
-Tested-by: Ilya Maximets <i.maximets@ovn.org>
+"
+"ethernet-phy-ieee802.3-c22" is pretty much pointless. I don't
+remember seeing a DT description which actually needs it. It is in the
+binding more for completion, since "ethernet-phy-ieee802.3-c45" is
+needed sometimes, and -c22 just completes the list.
+"
+
+But also, statistically, the in-kernel DTs contain both options, the one 
+with "ethernet-phy-ieee802.3-c22" fallback is less common:
+
+$ git grep -ho ethernet-phy-id001c....... | sort | uniq -c
+       1 ethernet-phy-id001c.c816",
+       2 ethernet-phy-id001c.c915",
+       2 ethernet-phy-id001c.c915";
+       5 ethernet-phy-id001c.c916",
+      13 ethernet-phy-id001c.c916";
 
