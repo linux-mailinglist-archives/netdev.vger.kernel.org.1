@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-108214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8658991E641
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:10:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B1C91E693
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7CB71C21C69
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 17:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEF821F234EB
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 17:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB37F16E862;
-	Mon,  1 Jul 2024 17:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADCC16E87D;
+	Mon,  1 Jul 2024 17:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YX1D+n0y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfDLNjx6"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FC516DEDB;
-	Mon,  1 Jul 2024 17:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2A9126F1E;
+	Mon,  1 Jul 2024 17:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719853790; cv=none; b=Mnh8XurJfliXgNWb06EIURPSbdds6nqYPO0eXWvqyiJ1vZM3ESPR4shDf/3cZS2wREcLNVk2C0LxO8j50zQVKDzSA8X7nU26PqqGVCzL2Zb2Tf4FkA5oLpNZNIMAWPcGLOmch+v4vWuCDAvNtDiUy7ik6W9FnWAXlRQ5QENv7w0=
+	t=1719854618; cv=none; b=AXLbnvlE4i8WzgmasfvyQIqjR87GFRnxLOKKXDz516bjmZguT2SqT7C4PDluzBPqw90U4gS4U64LKXZMRcT38AfKDQptZZXXcr3Pu9QeeQ/Phgy4ZzHZcDS0ftlPZ8afjvzFZPImYU9GkgSUa+TvdvUtq9WdHw6kJjBAxohzm2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719853790; c=relaxed/simple;
-	bh=dQkhVsO4fjep5bz5yxh8YYyV7YRAO/BUP/DL0UhJJbM=;
+	s=arc-20240116; t=1719854618; c=relaxed/simple;
+	bh=OHZLx8pPNgesHGu9A+Up6rEjvpM2KHacrpLcYCQi8Fw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OswhJSAflEbgO5ZujrEFBFGcVLkROH5FTs2d1aHn/3C+Fyq9tY6V5PpvxiieZIw0+/p4M+hZkslAay1tB8PLb+bnunBbKtakaccuhS7nT+qlN3fNBH8uPfB6VDkBeLmioSnbrqWOM1TcZvQ5seoYYWe2xJKZ8G9uWBhkIcqOBd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YX1D+n0y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=p/89mPRQ0gX+pUOoSRTlrwC6hJIOaY6TbRnTSm81D10=; b=YX1D+n0yoylmEMjNfwK9WwVmsy
-	HzTJOj09BrXXePwyBmzHL7XPAg148FCKIQZieGdM+hrD8H/OB46FCR8jDVAlLrCARvHX2gmMYKdm1
-	h2UB7TyG4x3KVhE+HkxyrK3JYp0/xyRhd5N8mvlQcFAwPYMy6rUrVAsIGDKHiAXgSm0g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sOKX6-001ZHa-S3; Mon, 01 Jul 2024 19:09:40 +0200
-Date: Mon, 1 Jul 2024 19:09:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 6/6] net: phy: dp83869: Fix link up reporting in
- SGMII bridge mode
-Message-ID: <289c5122-759f-408a-a48a-a3719f0331f9@lunn.ch>
-References: <20240701-b4-dp83869-sfp-v1-0-a71d6d0ad5f8@bootlin.com>
- <20240701-b4-dp83869-sfp-v1-6-a71d6d0ad5f8@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PH9Ll/aTNlW7aMqcAoNrKW3XAIV7pMFZ/LAhDYOMiSW7Qmm90IPFFQ5kUCQ3J6sq6ZmuQyPUgEeUL+srv7MDbtfVt5U8aAvVrQB9mNM/z183EN0yYxt0xffG7xYXP2qxn4r+qhHopQeTIupXySmlF3buJ7zFSxYfqdrOpBlEOwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfDLNjx6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB83C116B1;
+	Mon,  1 Jul 2024 17:23:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719854618;
+	bh=OHZLx8pPNgesHGu9A+Up6rEjvpM2KHacrpLcYCQi8Fw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NfDLNjx6l2FtHqQy31axlYyHzNMshF+YdnpeoGQ1iZSH2kPIee82B9MbSxGe/WB2d
+	 JvCFcOA6kcB6lD10YLjhVAMOvKtzvYUxpYbPE/zV7yuJeTwKtodWsmUIVd6ZYtLTgd
+	 q8RB8EVy6xne5GL8wBkhmKqDi19qmS3lOAQFqc1CFK14X/0tdl6+3JB0crdZQRv3Jo
+	 0Nrzntqydg287dp/JcgYoN8TnYsLEhYa4lroXwNsKPNVxoLHlVlBicSYMylwFfE66X
+	 k7qSNr7qIxECUaIE7dOpYG4q6K+MHc9T/YW6IPrYkntNDJrH3+C6vD6mVAB4Vxj3xl
+	 2pgvT7v8QIq4g==
+Date: Mon, 1 Jul 2024 11:23:37 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	devicetree@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next] dt-bindings: net: dwmac: Validate PBL for all
+ IP-cores
+Message-ID: <171985461601.140520.15616660629845565811.robh@kernel.org>
+References: <20240628154515.8783-1-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,24 +65,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240701-b4-dp83869-sfp-v1-6-a71d6d0ad5f8@bootlin.com>
+In-Reply-To: <20240628154515.8783-1-fancer.lancer@gmail.com>
 
-> +			if (dp83869->mod_phy) {
-> +				ret = phy_read_status(dp83869->mod_phy);
-> +				if (ret)
-> +					return ret;
 
-Locking? When phylib does this in phy_check_link_status(), we have:
+On Fri, 28 Jun 2024 18:45:12 +0300, Serge Semin wrote:
+> Indeed the maximum DMA burst length can be programmed not only for DW
+> xGMACs, Allwinner EMACs and Spear SoC GMAC, but in accordance with
+> [1, 2, 3] for Generic DW *MAC IP-cores. Moreover the STMMAC driver parses
+> the property and then apply the configuration for all supported DW MAC
+> devices. All of that makes the property being available for all IP-cores
+> the bindings supports. Let's make sure the PBL-related properties are
+> validated for all of them by the common DW *MAC DT schema.
+> 
+> [1] DesignWare Cores Ethernet MAC Universal Databook, Revision 3.73a,
+>     October 2013, p.378.
+> 
+> [2] DesignWare Cores Ethernet Quality-of-Service Databook, Revision 5.10a,
+>     December 2017, p.1223.
+> 
+> [3] DesignWare Cores XGMAC - 10G Ethernet MAC Databook, Revision 2.11a,
+>     September 2015, p.469-473.
+> 
+> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+> 
+> ---
+> 
+> The discussion where we agreed to submit this change:
+> Link: https://lore.kernel.org/netdev/20240625215442.190557-2-robh@kernel.org
+> 
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   | 80 ++++++-------------
+>  1 file changed, 26 insertions(+), 54 deletions(-)
+> 
 
-	lockdep_assert_held(&phydev->lock);
-
-I don't see anything which takes the downstreams PHY lock.
-
-Is this also introducing race conditions? What happens if the link
-just went down? phy_check_link_status() takes actions. Will they still
-happen when phylib next talks to the downstream PHY? It is probably
-safer to call phy_check_link_status() than phy_read_status().
-
-   Andrew
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
