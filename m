@@ -1,117 +1,170 @@
-Return-Path: <netdev+bounces-108016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C0E891D8E7
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:28:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B68591D903
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348B0280BE5
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 07:28:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB511C20DA1
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 07:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D2C6EB5B;
-	Mon,  1 Jul 2024 07:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E01944C81;
+	Mon,  1 Jul 2024 07:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="v6+i3bzi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f29dGmZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh3-smtp.messagingengine.com (fhigh3-smtp.messagingengine.com [103.168.172.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2F11B809
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 07:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160EA37142;
+	Mon,  1 Jul 2024 07:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719818921; cv=none; b=DZRmUiTC4DcEtu/oZuCazQUmPwy3TmnZpdAW5Ldb/s8Q1SSvQg+0Je04ezHcwDihhFvVgD14YZOADU+5CNvmdieB8n/UF9motGKO9ugi5lh4rvygvvRwnODCoQbAMmuCRMs1913FpmLA9MXjdfbNRxEQKeDTTpQhfHKEg+dQTgg=
+	t=1719819311; cv=none; b=HWKCQtD2DBagGfqhBjob8Sex2HOjT5J6ya88a6DE3QBHVABlZaiqeauIBno5QMyU2ZbKjfRuOBKvPc1wg95JbGsWRQ4XaF6qdzNNA8e1rEC0yUXzq2kncQvXohhGMXlNAxFv0WBMKXHs53WOdAWC5eNJFuT+tiwUE35TS1xfG8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719818921; c=relaxed/simple;
-	bh=7RJjyJjpMrO6fjXjuoghE6frNsTONiAM7rGDqzTMckc=;
+	s=arc-20240116; t=1719819311; c=relaxed/simple;
+	bh=Bif20sIYf7xrjcP4nu3TdOd59ri0smG6Qu7LpJ9O0l0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EA8bV0ibU/m6+wM3DOyj4phsexGGDDnPs3Z4h+TYrlT3AL8XzSRwMItWXkalhikanei04wE5n0lpzQ527CMzLgfTBg3dnhPvrkOzOVtPeV23pSN5SjfPTeqwcM79+TfGT1730Myl+Hrp9J3cpZHNy4eGaXXZM+WqQCq5qQ8JtMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=v6+i3bzi; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 516C61140211;
-	Mon,  1 Jul 2024 03:28:39 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 01 Jul 2024 03:28:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1719818919; x=
-	1719905319; bh=mTQAGaNhSn5eSAW7EUwcbfn0UJoMQP0fjC3lXf//TE4=; b=v
-	6+i3bziR8c5mJQCjN3uAx1t0WOZbJ13iKYuz02du9XkvjHWxi04pW6NVFhx315w6
-	layiNFINyB4PQVD9UOR4AVET4d/8qCdoHkoZgGzv5J650xsbra+YAkscVE90ibvI
-	wUJOmeeXzb5cChYiEguqpVdJxyOnuylJYE4+w2u9QFpjCMaRUnjiVoLxjb9mqV+R
-	+NrJd37EU8aFKDPeI7MEZrMETP2UwHDvDVnFYGJMYn4jFTudaHwea2zkDD5VFUeX
-	FSXmgs1hmfygogJonqLZLizIM9R1dbDTXeWjS56Ur2ZyUTKtgG0w/EAj9ratRrDI
-	1JzPDeWyj4FiQhegZYI5A==
-X-ME-Sender: <xms:plqCZiO0nzhYaDHaNYKTAMSyVH6epru3Fpy4Fe8OZ2ykPJl8sNOsEw>
-    <xme:plqCZg9BEUryS4NY-Ti2pU4sB96kT5hPAjrEz_ACvOJqpOIMSIhyCVKmPcpEXIseM
-    8LXe1sTCxpadjc>
-X-ME-Received: <xmr:plqCZpSFAP1zAPCFi3MZirhdL1LB2_k4n8f6QM1gjAJ8LSJaTDUg6g4Y3Haq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddvgdduudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeduledvjeejhefgvdetheefheetjeejfeetjeevieejgfeujeffleffgeek
-    ffeuieenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhr
-    gh
-X-ME-Proxy: <xmx:plqCZitEj_LE7skDKgNkkFbD8WYCFoZ-n8tJn8-yoZO2FIVeJ3GjSg>
-    <xmx:plqCZqdsJlyAa3YXp5mpaQKuzBv8i16ATCTj8GZ84LiygO-SXE9xkg>
-    <xmx:plqCZm3p1D6fDGpfF41S3kQ3tqkaCvyAqBW9OAfDzWLMSjTlJd87Rw>
-    <xmx:plqCZu_ieDO5bjII4vzDhbHhy1goeKNKSmbVzOWQ7mWUUfzQOZWO7A>
-    <xmx:p1qCZrrHXegSKA3SaaeGOEA__6_kVVsMw-bW931Oxcw6af3OAyEL02WR>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 1 Jul 2024 03:28:37 -0400 (EDT)
-Date: Mon, 1 Jul 2024 10:28:32 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Dan Merillat <git@dan.merillat.org>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev <netdev@vger.kernel.org>
-Subject: Re: ethtool fails to read some QSFP+ modules.
-Message-ID: <ZoJaoLq3sYQcsbDb@shredder.mtl.com>
-References: <54b537c6-aca4-45be-9df0-53c80a046930@dan.merillat.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qotoPA3jj9Da45AErK/ZX5VEXYZSSRWchUQzN772mTjOYIAdcIqZDNUmcFYaVZfnvDwtI+t+1hY3gwAkmJMHszj/5i3gsoYZZ8X5LjlCZuTPTU+o7bagxD6H6WIkY56RdZNjQFyq5PTNSI3Ck+cXWZA45eZI+zACZKn64f/L9aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f29dGmZA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7DADC116B1;
+	Mon,  1 Jul 2024 07:35:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719819310;
+	bh=Bif20sIYf7xrjcP4nu3TdOd59ri0smG6Qu7LpJ9O0l0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f29dGmZAFJTpEYqr/eq0Au2YnHN/RWzGpGUxouBjLpcMoul4uC8+26+839FZiYB2S
+	 6xlOXFyO5Gu+Li+Umkhnl6RyLjUMhNAVjop+PUWDVS18yBTaxgKzLx8qoVwDWn336n
+	 U4vMHIXj+MV/FtgQMcK040cCh4bCvpblR9Ujjc80ddY527R1/D20vedRdvG1M5fs9p
+	 9cQxNz5xm4NaC0kUEadAU/mnWE5viARnKIUGK/p0ouKAZOQh1X1H2erRCi1gjt/PuX
+	 H7HkKsV4lmhl/seu61kFH+lsJ14T0BSZk+5XYYPvUKZDOL8o2+klbzAMWRXEZ6H7ti
+	 xtjLvwlbF0TxQ==
+Date: Mon, 1 Jul 2024 08:35:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Julien Panis <jpanis@baylibre.com>, Andrew Lunn <andrew@lunn.ch>,
+	srk@ti.com, vigneshr@ti.com, danishanwar@ti.com,
+	pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v2 6/7] net: ethernet: ti: cpsw_ale: add helper
+ to setup classifier defaults
+Message-ID: <20240701073505.GI17134@kernel.org>
+References: <20240628-am65-cpsw-multi-rx-v2-0-c399cb77db56@kernel.org>
+ <20240628-am65-cpsw-multi-rx-v2-6-c399cb77db56@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <54b537c6-aca4-45be-9df0-53c80a046930@dan.merillat.org>
+In-Reply-To: <20240628-am65-cpsw-multi-rx-v2-6-c399cb77db56@kernel.org>
 
-On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
+On Fri, Jun 28, 2024 at 03:01:55PM +0300, Roger Quadros wrote:
+> Default behaviour is to have 8 classifiers to map 8 DSCP/PCP
+> priorities to N receive threads (flows). N depends on number of
+> RX channels enabled for the port.
 > 
-> I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
-> the optional page3 data as a hard failure.
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> ---
+>  drivers/net/ethernet/ti/cpsw_ale.c | 57 ++++++++++++++++++++++++++++++++++++++
+>  drivers/net/ethernet/ti/cpsw_ale.h |  1 +
+>  2 files changed, 58 insertions(+)
 > 
-> This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
+> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+> index 75a17184d34c..51da527388df 100644
+> --- a/drivers/net/ethernet/ti/cpsw_ale.c
+> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
+> @@ -1650,3 +1650,60 @@ static void cpsw_ale_policer_thread_idx_enable(struct cpsw_ale *ale, u32 idx,
+>  	regmap_field_write(ale->fields[ALE_THREAD_VALUE], thread_id);
+>  	regmap_field_write(ale->fields[ALE_THREAD_ENABLE], enable ? 1 : 0);
+>  }
+> +
+> +/* Disable all policer entries and thread mappings */
+> +static void cpsw_ale_policer_reset(struct cpsw_ale *ale)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ale->params.num_policers ; i++) {
+> +		cpsw_ale_policer_read_idx(ale, i);
+> +		regmap_field_write(ale->fields[POL_PORT_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_PRI_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_OUI_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_DST_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_SRC_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_OVLAN_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_IVLAN_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_ETHERTYPE_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_IPSRC_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_IPDST_MEN], 0);
+> +		regmap_field_write(ale->fields[POL_EN], 0);
+> +		regmap_field_write(ale->fields[POL_RED_DROP_EN], 0);
+> +		regmap_field_write(ale->fields[POL_YELLOW_DROP_EN], 0);
+> +		regmap_field_write(ale->fields[POL_PRIORITY_THREAD_EN], 0);
+> +
+> +		cpsw_ale_policer_thread_idx_enable(ale, i, 0, 0);
+> +	}
+> +}
+> +
+> +/* Default classifer is to map 8 user priorities to N receive channels */
+> +void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
+> +{
+> +	int pri, idx;
+> +	int pri_thread_map[8][9] = {	{ 0, 0, 0, 0, 0, 0, 0, 0, },
+> +					{ 0, 0, 0, 0, 1, 1, 1, 1, },
+> +					{ 0, 0, 0, 0, 1, 1, 2, 2, },
+> +					{ 1, 0, 0, 1, 2, 2, 3, 3, },
+> +					{ 1, 0, 0, 1, 2, 3, 4, 4, },
+> +					{ 1, 0, 0, 2, 3, 4, 5, 5, },
+> +					{ 1, 0, 0, 2, 3, 4, 5, 6, },
+> +					{ 2, 0, 1, 3, 4, 5, 6, 7, } };
 
-Thanks for the report and the patch. Krzysztof Olędzki reported the same
-issue earlier this year:
-https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
+Hi Roger,
 
-Krzysztof, are you going to submit the ethtool and mlx4 patches?
+Perhaps it is obvious, but I'm wondering if it is appropriate
+to add a comment explaining the layout of the table, especially
+the latter rows where the mapping of priority to receive channel
+seems somewhat non-trivial.
 
-> From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
-> From: Dan Merillat <git@dan.eginity.com>
-> Date: Sun, 30 Jun 2024 13:11:51 -0400
-> Subject: [PATCH] Some qsfp modules do not support page 3
+> +
+> +	cpsw_ale_policer_reset(ale);
+> +
+> +	/* use first 8 classifiers to map 8 (DSCP/PCP) priorities to channels */
+> +	for (pri = 0; pri < 8; pri++) {
+> +		idx = pri;
+> +
+> +		/* Classifier 'idx' match on priority 'pri' */
+> +		cpsw_ale_policer_read_idx(ale, idx);
+> +		regmap_field_write(ale->fields[POL_PRI_VAL], pri);
+> +		regmap_field_write(ale->fields[POL_PRI_MEN], 1);
+> +		cpsw_ale_policer_write_idx(ale, idx);
+> +
+> +		/* Map Classifier 'idx' to thread provided by the map */
+> +		cpsw_ale_policer_thread_idx_enable(ale, idx,
+> +						   pri_thread_map[num_rx_ch - 1][pri], 1);
+> +	}
+> +}
+> diff --git a/drivers/net/ethernet/ti/cpsw_ale.h b/drivers/net/ethernet/ti/cpsw_ale.h
+> index 2cb76acc6d16..1e4e9a3dd234 100644
+> --- a/drivers/net/ethernet/ti/cpsw_ale.h
+> +++ b/drivers/net/ethernet/ti/cpsw_ale.h
+> @@ -193,5 +193,6 @@ int cpsw_ale_vlan_add_modify(struct cpsw_ale *ale, u16 vid, int port_mask,
+>  int cpsw_ale_vlan_del_modify(struct cpsw_ale *ale, u16 vid, int port_mask);
+>  void cpsw_ale_set_unreg_mcast(struct cpsw_ale *ale, int unreg_mcast_mask,
+>  			      bool add);
+> +void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch);
+>  
+>  #endif
 > 
-> Tested on an older Kaiam XQX2502 40G-LR4 module.
-> ethtool -m aborts with netlink error due to page 3
-> not existing on the module. Ignore the error and
-> leave map->page_03h NULL.
-
-User space only tries to read this page because the module advertised it
-as supported. It is more likely that the NIC driver does not return all
-the pages. Which driver is it?
+> -- 
+> 2.34.1
+> 
+> 
 
