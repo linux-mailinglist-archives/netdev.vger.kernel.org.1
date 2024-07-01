@@ -1,159 +1,95 @@
-Return-Path: <netdev+bounces-108010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9663591D8BC
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:16:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3EB91D8B4
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 09:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436DB1F217E2
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 07:16:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AD5D1F21761
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 07:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF21182488;
-	Mon,  1 Jul 2024 07:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545F5482D8;
+	Mon,  1 Jul 2024 07:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dhaqeEKq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD2682485
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 07:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B818F62
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 07:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719818148; cv=none; b=uV+MH3e7hTjnjoCsznrGp2Ogxwn2VLhwdSQzN9esE/PCQ6FEF3V8LsqbW9Wt4rw99AvccSixqwOrCTPvKAg1VenfcYNCxUTTYtt+lGAL+VFHciKq0GVTBkvu02MR/uIivQ4VzV8OCWMk6bYb2kIe8roXPOrYtAvSGwg1iTXeCds=
+	t=1719818113; cv=none; b=qQC9QufX5VCnrF1nZDAPjxUCwkfdCmRCloeIQy6QhbLkAzGIUvBNlQBoNrEo+qSGh8GQ6qGS5Xs9jSiflYUmX6HBb4X0N5OFyIIUpA6d7v1Lvv3Z5yS/8V84df6w+ZyQdxdpoto9Q7w294c9jEOhtsG3CasCEVqDy4zpmR/yo6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719818148; c=relaxed/simple;
-	bh=I7WwPyvzFqQoTANFxrrVL2Adu9IbPe1umib9lie2EMw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tzQ6gY4CIgKSUqhMbIY5nDcva6A1bQmU5SGnlpkCCeGrierJvfDJ5mu3sbJ5ll+oUFwMsIg7eLtYVmMi/EA9YiEjMGZMs/dYwAKz3j8nuNa0/VQXu7vF9tnByulvziEtUXqkwzlhOgmXInA7/0xqdZ8N5hfDP28w4FnrNBiKu5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp86t1719818074tanjz6pb
-X-QQ-Originating-IP: uocOLv+tPESES/ZHNSvyB9I1ChSvaqRaXZ63yQ7arsc=
-Received: from lap-jiawenwu.trustnetic.com ( [220.184.148.68])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 01 Jul 2024 15:14:33 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9763058144234461500
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net v3 4/4] net: txgbe: free isb resources at the right time
-Date: Mon,  1 Jul 2024 15:14:16 +0800
-Message-Id: <20240701071416.8468-5-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20240701071416.8468-1-jiawenwu@trustnetic.com>
-References: <20240701071416.8468-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1719818113; c=relaxed/simple;
+	bh=nkdyaCnnE2lxXci6pm9KjxbTWn7tU+ZcXRARm8bOYW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V8tA23QJNkszgHJbnL4niZhETnqVM6aqR4yFzOK5WLbvCklYxw0RV4A001sFUKxfiSnz42WAY3Ryo3FM/r8mZYgWRp+17Ezs2dJCa9gaDYDruEeLueXDeBuHLxBpEqGf3gMMozf5CbJhwDfHMUunez5wLAK12Eox04kwi82wS1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dhaqeEKq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF12C116B1;
+	Mon,  1 Jul 2024 07:15:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719818112;
+	bh=nkdyaCnnE2lxXci6pm9KjxbTWn7tU+ZcXRARm8bOYW8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dhaqeEKqq98NgKUAseyC8r5cT5SaAHirG2AnMafzn9m3y5vUpmYva/erfeptRLkvj
+	 v+ES4xXCF/N8KYTgjCI2O9qEWVd8DlnvZ0kSZUKlk1T09E/mfvn916mBwzI3mxdTU6
+	 2ks1Ha8WxNTwNavwwxF+6gvvrcQkKPgbNxvOK4APXkVID4Qg0zUFOI3JOWv/eIWOuN
+	 pe8Wea+DAhpjus0vT2X01hc9GAaLflnh7owm19ltFLw45EKlJRnzqOkMhEkHw5jsPu
+	 BkKX3ZUnU+m3R7nmX4X+UvzsBzUTkdKHeAi6B/O8bOuLWmV6ARtRaAOEO2fUmVQ4fB
+	 Lp+0/xHqhpn5w==
+Date: Mon, 1 Jul 2024 08:15:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"shenjian (K)" <shenjian15@huawei.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v3] igc: Add MQPRIO offload support
+Message-ID: <20240701071508.GD17134@kernel.org>
+References: <20240212-igc_mqprio-v3-1-261f5bb99a2a@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212-igc_mqprio-v3-1-261f5bb99a2a@linutronix.de>
 
-When using MSI/INTx interrupt, the shared interrupts are still being
-handled in the device remove routine, before free IRQs. So isb memory
-is still read after it is freed. Thus move wx_free_isb_resources()
-from txgbe_close() to txgbe_remove(). And fix the improper isb free
-action in txgbe_open() error handling path.
+On Fri, Jun 21, 2024 at 09:25:55AM +0200, Kurt Kanzenbach wrote:
+> Add support for offloading MQPRIO. The hardware has four priorities as well
+> as four queues. Each queue must be a assigned with a unique priority.
+> 
+> However, the priorities are only considered in TSN Tx mode. There are two
+> TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
+> Therefore, use the legacy TSN Tx mode, which performs strict priority
+> arbitration.
+> 
+> Example for mqprio with hardware offload:
+> 
+> |tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
+> |   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
+> |   queues 1@0 1@1 1@2 1@3 \
+> |   hw 1
+> 
+> The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
+> frame preemption is not supported yet.
+> 
+> Tested on Intel i225 and implemented by following data sheet section 7.5.2,
+> Transmit Scheduling.
+> 
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 
-Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c     | 4 +++-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 2 ++
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 7 ++++---
- 3 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index e1f514b21090..81bedc8ee8d4 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -2028,6 +2028,9 @@ int wx_setup_isb_resources(struct wx *wx)
- {
- 	struct pci_dev *pdev = wx->pdev;
- 
-+	if (wx->isb_mem)
-+		return 0;
-+
- 	wx->isb_mem = dma_alloc_coherent(&pdev->dev,
- 					 sizeof(u32) * 4,
- 					 &wx->isb_dma,
-@@ -2387,7 +2390,6 @@ static void wx_free_all_tx_resources(struct wx *wx)
- 
- void wx_free_resources(struct wx *wx)
- {
--	wx_free_isb_resources(wx);
- 	wx_free_all_rx_resources(wx);
- 	wx_free_all_tx_resources(wx);
- }
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index e894e01d030d..af30ca0312b8 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -387,6 +387,7 @@ static int ngbe_open(struct net_device *netdev)
- err_free_irq:
- 	wx_free_irq(wx);
- err_free_resources:
-+	wx_free_isb_resources(wx);
- 	wx_free_resources(wx);
- 	return err;
- }
-@@ -408,6 +409,7 @@ static int ngbe_close(struct net_device *netdev)
- 
- 	ngbe_down(wx);
- 	wx_free_irq(wx);
-+	wx_free_isb_resources(wx);
- 	wx_free_resources(wx);
- 	phylink_disconnect_phy(wx->phylink);
- 	wx_control_hw(wx, false);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 76b5672c0a17..ca74d9422065 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -296,7 +296,7 @@ static int txgbe_open(struct net_device *netdev)
- 
- 	err = txgbe_request_queue_irqs(wx);
- 	if (err)
--		goto err_free_isb;
-+		goto err_free_resources;
- 
- 	/* Notify the stack of the actual queue counts. */
- 	err = netif_set_real_num_tx_queues(netdev, wx->num_tx_queues);
-@@ -313,8 +313,8 @@ static int txgbe_open(struct net_device *netdev)
- 
- err_free_irq:
- 	wx_free_irq(wx);
--err_free_isb:
--	wx_free_isb_resources(wx);
-+err_free_resources:
-+	wx_free_resources(wx);
- err_reset:
- 	txgbe_reset(wx);
- 
-@@ -729,6 +729,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 
- 	txgbe_remove_phy(txgbe);
- 	txgbe_free_misc_irq(txgbe);
-+	wx_free_isb_resources(wx);
- 
- 	pci_release_selected_regions(pdev,
- 				     pci_select_bars(pdev, IORESOURCE_MEM));
--- 
-2.27.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
