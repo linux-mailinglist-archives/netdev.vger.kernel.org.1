@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-108248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7AC91E818
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:01:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 364FE91E82F
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 21:05:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA726283A4E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:01:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82430B20C9C
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 19:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232AF16F282;
-	Mon,  1 Jul 2024 19:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD3816F292;
+	Mon,  1 Jul 2024 19:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUj8CS78"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MyhNwXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28805143885
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 19:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A0A16D334
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 19:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719860462; cv=none; b=tyaBB46zv9sBK81PmoEVEXH/evigdNhubjpcWe1Irp4I1Lxl7/F52Dpr39arR7Ix/O7li+MiW1PeS9QaEnOZJoTofJ5ala0lR8gUSwQpaKEqTCUdDGribudAo1VDg+Aol9ORUGNbYinK+ihYMkmesu6QqUTBunTf9urpTvJN87M=
+	t=1719860704; cv=none; b=E+CC/9t+hp/1+g2M3/XdzC/v3VRaV66h4/tucr33iJGOMb7+Ogw5eduTIFjHhMv/9hAwYWrszOLKYZQYisaZWML4HA6Y1uFKuwJr3vyyLwmNqD5kKp7QzpLq9xiSvqZesZhQmvxPFtLkj8qljd5lC6DpQV0GXdObZexu1vTcf9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719860462; c=relaxed/simple;
-	bh=nBEjUU1jP0cTXpDAibWGkU5XKOL/L/nsa6YcOdFrVXQ=;
+	s=arc-20240116; t=1719860704; c=relaxed/simple;
+	bh=8k0AtF9KiolyJWuK8HLhDCv/hmVhr/rBk1ct5cuT9AA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RmggdHue7V4wJg9vbvaEg5iCusBq7v/IRy9ctcqrotXuGcNOqVlNOLNcxTzMoQMekQ0ep7+yuOD4CfSu9p3nvWgfJQwzHf6rGBubfi4fe8GrqtUpdqWgjXWwzUWuVoN7oBDKj+E1I9iD20pmw1soi01ytPHKH7j5/T5xEh1VYaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUj8CS78; arc=none smtp.client-ip=209.85.219.41
+	 To:Cc:Content-Type; b=GhD/cofJJWc7rPhk7Gr9OHWiUaQ82XqneFpP+7zMFmj2Y+yjXI5dndT3wqRJOJggzfCiezXfxu0D8K50ANS+9/OiE7/XrC+zP0BHSX/9vYCcgD+JMuqUjxv9BcRLduZwxNkA0KGNVRWtt16QZLiKuV9kBDDqHICT7t/ImPtgHxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MyhNwXk; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b4febddfd3so18015026d6.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 12:00:59 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79c05313eb5so288509385a.1
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 12:05:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719860459; x=1720465259; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719860702; x=1720465502; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R4LpFR6VRPZBJqkm7iRXIp87VCy5+OyuBQMHBVpgrKc=;
-        b=VUj8CS785cnwFWXu49a2yynTw9v5uBv7xV7sGzsKtbIvoTNL6XebeeShoCz1c7N9c6
-         QOGHor2VqLzp0K1m3SZv/SBZFaz2CHuoZ8oXsw9KXCDQBvxqwRikiIBLCAwCxlrGz2/X
-         hc5nYlLBRPdmRh7yHptNjyDMOkgHY7SjCvJS28YqP94iKO8zw4Mki7+1k4fCVqn2nprb
-         AiEC6vWgc/hFEkSr2d8vF6MUm+f6Rooj1daMQNmskdu5fEMYG+P6YjIjLh3es+Yqqrz7
-         2lha05Ab6XzuOpNcXnRqBElcdyOWL4r79CX5gf3ok4YE8CL5mfO8kfLJtqzYR8j0qAh1
-         t3Lg==
+        bh=1iyaJckUfwKLOavZsL0Dti/NvsfMxOg4fM60nbeLb3c=;
+        b=2MyhNwXkCa2AA3Z+FkWBFUSIczECBuY034xv2sUMnsVK1JAGLplHV/guNmfssGc5I1
+         D8a0j2y08JPde7IkGpN8LX30r6ezveA3/hMjlXq8zLe04mWt0qnAaEPrTDd2BA5v2l+6
+         Iv6dLD0aQ4owbIcrPfZLc6za9Tr+2iQ9eqqZvMOtORPI139I+ePbnZT4DFLnSJ0yCTX/
+         I/orwGmbJSNtOjqGr9Dob5WykAAa2DWlpbQrXkaBJxQatFPLN+TjE2bJtG1b6pQdCRRg
+         3423j6YO0fWBhsDvK3mvzQk7JxL7pIv0ng1zlCqmSW/aZyWSkjeH3DBPrQtlyq6xCOFw
+         myxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719860459; x=1720465259;
+        d=1e100.net; s=20230601; t=1719860702; x=1720465502;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R4LpFR6VRPZBJqkm7iRXIp87VCy5+OyuBQMHBVpgrKc=;
-        b=NipH9sWDrJ7rbcanJoM499b1+ziKuTftm7Go1AXXvzCaUM8opm/GEisjapKqpdIC5Q
-         f7YtPhMIgViI6A4eaQfPjxmUzWRwUACCEczc2hEO4uSmIxPBybX3oOhQl4EQ8sXCFCj0
-         GIyJH1RGPMY6Dk2AH6JLPbNHrDGTWbuACKMh8K3mZ1nHz01NYsU+Dvo25QmuzmWEBWhL
-         MBbl7eQXPTmlOmDqZ1h5h2HFZ/6GZ9rOhy/CFPFIPkXfg+tIuxSNA5PHKiYmMn4lwRGq
-         cq1y08m6zZQp1giHaJuAI9Rog+bUQ8YnPEui9AVxNMfXmfM65Z685Q7FGBtxxQNUgncf
-         98dg==
-X-Gm-Message-State: AOJu0YwnZCliOHLxIiWKIP1VQwfROU4qHOxpiB23pUtDsoom/P15sLAf
-	0RqdOHBY8GLAOvstMCm7nOGWIcOQe9qYiQZxuAMS/A6RO2jcv80Ut+WUg3JAc3lRC2TChUSxQUx
-	T8/oTu6r4TxxYd8AipcTIpDdTkqjmiQt4Ljbg
-X-Google-Smtp-Source: AGHT+IHqGzU9tZFX9QqaBsD++nA7soWtr02PwwhDHubls3yJUOnaqW81EaDVu4zWNv2Iw9IsPTEVGjOAs2RkVILAwGg=
-X-Received: by 2002:ad4:5c68:0:b0:6b5:4249:7c4 with SMTP id
- 6a1803df08f44-6b5b7057b8emr78735846d6.2.1719860458778; Mon, 01 Jul 2024
- 12:00:58 -0700 (PDT)
+        bh=1iyaJckUfwKLOavZsL0Dti/NvsfMxOg4fM60nbeLb3c=;
+        b=B3c0k8LCUW3tF8upnz6uuNDxtIIpmRq6sXGS617RRHKKqYeSJuF4XkFRyuUSV7bfxx
+         O+GAN6OU4hT10hiGN/+c1vVfbYzIhp9IM84WxilK+aAy/M+imtfsRTlB0urLm9schNc6
+         055+UVlJba2ZmajOEUUygpyS2AjE262bqmy+rPJZja/7ilLWrlASWR8Xr4vm4XXYackM
+         4Sc/QJX8ohSciucbCfrsBd0DpkqrPaXRMKwlkomwg+I7CLTJxYjDMWGbjsLzP0Rxfv/3
+         vgpHz9C+jEZsKcn/pWbeIYxiJgpBtT2Y+dayY6iymyKn1naKqTXGorgkMEtfuTdI1bTC
+         /vVg==
+X-Gm-Message-State: AOJu0YzYurAiP+1wKt1n4Rncl/I1n4TAiuGlJkyfBkrXpL3s9YYlWvai
+	9y5KTbLJpgmVAAeqbhHR0julVghq495MTuforVBMInLhmkFQWSlf4mBKmisH237/qJCsVDAU0lS
+	WKSQz8+U9RJcHbF5TpMWXVdN6lOO15wibCyly
+X-Google-Smtp-Source: AGHT+IFMk/Fy8HmApu9Nagm7rkVtZNRgXI7ZtAkmxpMtHuX4P9lSyGrItN72Z9tf2GD9wH/LCrC3alUkG3t3FzAjxFY=
+X-Received: by 2002:ad4:5762:0:b0:6b5:413a:3f96 with SMTP id
+ 6a1803df08f44-6b5b704f0e0mr82787156d6.10.1719860701461; Mon, 01 Jul 2024
+ 12:05:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,12 +71,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240628003253.1694510-1-almasrymina@google.com>
- <20240628003253.1694510-13-almasrymina@google.com> <m234oxcraf.fsf@gmail.com>
-In-Reply-To: <m234oxcraf.fsf@gmail.com>
+ <20240628003253.1694510-3-almasrymina@google.com> <m27ce9cris.fsf@gmail.com>
+In-Reply-To: <m27ce9cris.fsf@gmail.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 1 Jul 2024 12:00:44 -0700
-Message-ID: <CAHS8izOUJMnCxK0ZfOOOZH0auNF_Kk+WVA=oTEzJe8mYHdonfA@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 12/14] net: add devmem TCP documentation
+Date: Mon, 1 Jul 2024 12:04:49 -0700
+Message-ID: <CAHS8izNM8TjJ1DU+7gzq-0kH=tVeM6j-QsaKk=2FHNDF6RLwnA@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 02/14] net: netdev netlink api to bind
+ dma-buf to a net device
 To: Donald Hunter <donald.hunter@gmail.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
@@ -107,7 +108,7 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
 	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
 	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
+	Praveen Kaligineedi <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -115,42 +116,35 @@ On Fri, Jun 28, 2024 at 3:10=E2=80=AFAM Donald Hunter <donald.hunter@gmail.=
 com> wrote:
 >
 > Mina Almasry <almasrymina@google.com> writes:
-> > +
-> > +The user must bind a dmabuf to any number of RX queues on a given NIC =
-using
-> > +the netlink API::
-> > +
-> > +     /* Bind dmabuf to NIC RX queue 15 */
-> > +     struct netdev_queue *queues;
-> > +     queues =3D malloc(sizeof(*queues) * 1);
-> > +
-> > +     queues[0]._present.type =3D 1;
-> > +     queues[0]._present.idx =3D 1;
-> > +     queues[0].type =3D NETDEV_RX_QUEUE_TYPE_RX;
-> > +     queues[0].idx =3D 15;
-> > +
-> > +     *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
-> > +
-> > +     req =3D netdev_bind_rx_req_alloc();
-> > +     netdev_bind_rx_req_set_ifindex(req, 1 /* ifindex */);
-> > +     netdev_bind_rx_req_set_dmabuf_fd(req, dmabuf_fd);
-> > +     __netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
-> > +
-> > +     rsp =3D netdev_bind_rx(*ys, req);
-> > +
-> > +     dmabuf_id =3D rsp->dmabuf_id;
-> > +
-> > +
-> > +The netlink API returns a dmabuf_id: a unique ID that refers to this d=
-mabuf
-> > +that has been bound.
+> > +  -
+> > +    name: bind-dmabuf
+> > +    attributes:
+> > +      -
+> > +        name: ifindex
+> > +        doc: netdev ifindex to bind the dma-buf to.
 >
-> The docs don't mention the unbinding behaviour. Can you add the text
-> from the commit message for patch 3 ?
+> Minor nit:
+>
+> The series uses a mix of dmabuf and dma-buf but the doc additions
+> (devmem.rst) consistently uses dmabuf. I think it would be helpful to be
+> consistent here and say 'devmem dmabuf' in the docstring to highlight
+> whos dmabuf it is and keep the generated netdev docs in alignment.
+>
 
-Thanks, will do, if I end up sending another version of this with more
-feedback. If this gets merged I'll follow up with a patch updating the
-docs (there seems to be no other feedback at the moment).
+To be honest, even the dmabuf docs mixes 'dma-buf' and 'dmabuf', to my eye:
+
+https://docs.kernel.org/driver-api/dma-buf.html
+
+I can edit these docs I'm adding so these are consistent.
+
+But on 'devmem dmabuf', not sure to be honest. Technically all dmabufs
+are supported, even non-devmem ones. I'm not sure non-devmem dmabufs
+are common at all, the only example I can think of is udmabuf whose
+primary user is qemu and testing, so it's somewhat implied that the
+dmabuf is devmem, and even if it isn't, it would be supported. I
+prefer to keep the docs saying just 'dmabuf' as technically all are
+supported. Maybe I should add a note about this somewhere in the
+dedicated docs.
 
 --=20
 Thanks,
