@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-108241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C885891E791
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:31:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C4791E795
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 20:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBFC81C21AF5
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:31:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6DD2855C6
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 18:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8005C172BA8;
-	Mon,  1 Jul 2024 18:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8710017332C;
+	Mon,  1 Jul 2024 18:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lL+Sm+WA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkpqRLAc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C8E171E7C;
-	Mon,  1 Jul 2024 18:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB25172BCE;
+	Mon,  1 Jul 2024 18:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719858580; cv=none; b=n8kKYlE7mccT1/JQ1mqPVs2T2HfrK+PWH4exHI9X4D2EMMEq2F8sVwIKZ1fqFOQvi9nB1Ad+2xjf8DOq+P5o8D0ZwdHJRGYmddV/Wb3kYXw77YphfwaswUIvsP5JgQwxGlT85GkzYJLMLudo/t+79ahotNWdBXu0Wrkzr3gQB88=
+	t=1719858583; cv=none; b=OjQH7I24wvjKheFIL9AKvqrIcI7KuAPsnyapZo5xFoJ5S2MX/RaFus7isGe2YQEo80ZtO++T5ZLDdiLR0HunmL6557/6o6GFcLNJ8wMht2wsZtWnJq1uuS1RbJTcZY812AgYQa8TrpmZ6KJBJGWqvfRj8gUniFc9ZeGDcRnLKA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719858580; c=relaxed/simple;
-	bh=IP/5AJ+Vufn+/ZKWx1tKfG43F+wE2LV255krT/dD65g=;
+	s=arc-20240116; t=1719858583; c=relaxed/simple;
+	bh=xBXYNDbeyCBawYjGFxzikJYg2wnfDh4mK79QNUmfyHI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XMHna4nUUkaNqS+bRVQeHEOD6LdGIHBZEkFX1z64/ehBuOHTPOoTJfS6GAewXlYBzAO8nyr+eK9/W/dMD6ceFPBkq9Hplu8oxyMf68lqT1Vkt0rPhGz+s9hdK0oKSwCfYDRbf3dAwHBHL1KpoGqOqPP7pw62HGgQCPyMGcOckVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lL+Sm+WA; arc=none smtp.client-ip=209.85.167.54
+	 MIME-Version; b=unMdekJL7Lj3+92mwoBEJ2sSNGZicuolKfc8FrzX17tAtCwxOwgyeNh19pXzS/BlWjjdiTL//v2frLYSlYFhh2i//VwNjbvuNoXFlj9hv163j/4wa0vzQ3dvG+pnHzEbLQjfyNxSIUcjZ0DkTUjpIb72wz7QXAl60Y7GfIMdJcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkpqRLAc; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52e8037f8a5so2963346e87.1;
-        Mon, 01 Jul 2024 11:29:38 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-52e8037f8a5so2963394e87.1;
+        Mon, 01 Jul 2024 11:29:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719858577; x=1720463377; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719858580; x=1720463380; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hm2aYC8yWwZ1MpEgLfzSQGrNN+4dM8SxGRjO92ATLvs=;
-        b=lL+Sm+WAmkVPnF75u866f9NhhN+F7GZWiw2VvrydMsdQysLx6gLor5XQ/br28L6zRY
-         pSXM4J2Zf8C3eodccFIR3n0fyATbZ39zTce1rDgIo1Ze0wtQanLc4Ocrm3JcesZuz+Ac
-         s1owoohkZq8RGyUI7WTHAxUfDB3B0iaALAfmI/kgj2L0SKkAqsBW0ExA3kSw9LNLB58L
-         rVoTsU3+S6T9sv/46KDro+XAgdW26I39VAOu3wuM/DwHsh+LecJhFANRcum03yBrQ1gc
-         4BjFqyGaVPGUSJ2oLKZ27IT+47amT3g+byOei07OPS6TaZO0GEYwzyi5P0WMBRU1qU7+
-         9lHA==
+        bh=xwdWmsxJGte/AlXrge1uNMnv/5k0a7uNzExpSpmyGFM=;
+        b=fkpqRLAc/4GBIE2G3HLJ0c6gUqFU2GhI1WPJxNFT3QCXaew2IdpZltsaIhcRBTlnM2
+         Qv3MzyMNc1bjIf5J+qBRDxWjWbW0e2Umr5IU7UfXgXIClXAYg17LgB1IHNQAXK6Jwjm6
+         KOjapBz8mi/Qi02hzOxA4iFtOUnp5nVALkYNcty0jPKXp2zxgtDRJSOTh91FO1Y69S3f
+         olEpVx3ljlku5p97pxGTGnPfOf7T7EzecXZk/eeRqL7B61Oj9WAZ1FdRH/1v7FyTQiXU
+         fH38IfbF2RjEYcCpkBS89dktzUNqXixn4b649NUitAd/YeMiEa97TsAbIPuOZVPVPRil
+         enLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719858577; x=1720463377;
+        d=1e100.net; s=20230601; t=1719858580; x=1720463380;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hm2aYC8yWwZ1MpEgLfzSQGrNN+4dM8SxGRjO92ATLvs=;
-        b=WzHbDAZTVrab/N8xhJcXW7NyLeW+xJGed/zZpOywBG1QRQexTeV0pF1Sjkqpoco08c
-         GvegvNeVNfq8fq3XZbeZRC+IK1WKO1GSxRu0aOqlHa9UBVc/xw3+eCl4Uspt2PI4sAhc
-         U+rQvGFy+XTkAtxC8OwqvLaFAnh+3bdV3QHY93bfGQbhDbkoFLi6xC/fgRGL4V7z3fmF
-         u+0Kc1KPzk8wgyXr6GB6xZmm7aoMSGXUmMXnlktx6eOkk5KwbFZbf5ExfZ/PLyg+io+W
-         /G7yUlgZo3oD+z686uI9w2THcBwjgyuVmBAnmI7FIpylBhJhaEjkzluqHmNY7RdhC2jk
-         w8LA==
-X-Forwarded-Encrypted: i=1; AJvYcCVb+LbVP9pJQpS0hSmW9P4fsG+qcowfqaxF81OQqvJ7VJ0SCHfsuh5s4vc37Z6J99+gn1KVnICfdBfU2gO4Nf+pHbXfL0NATqgokbBIwukwbXN2JzRB2yiA26xzdaLrM4pc+uuGvCrnMwGNDk31XVEzJurPKwi6ldTtudVratlBUA==
-X-Gm-Message-State: AOJu0YxNAReqWgHz0456fviYS3ADMGd9p0OyEiujF06Q9twOFnL8xbC4
-	sxwq4qw5F7awBVzq83VSGzWJqG/rtNppx/pOnz2ETLWKgrqBYIfF
-X-Google-Smtp-Source: AGHT+IEt5gIUeS1X520wxU/94QsvXwHNTg2JU+U1rzcs6/smAEiwqIqEcxkoEO/CYSKcAoR1W4rKbQ==
-X-Received: by 2002:a05:6512:ad4:b0:52c:5254:b625 with SMTP id 2adb3069b0e04-52e8270a66dmr5353997e87.52.1719858576708;
-        Mon, 01 Jul 2024 11:29:36 -0700 (PDT)
+        bh=xwdWmsxJGte/AlXrge1uNMnv/5k0a7uNzExpSpmyGFM=;
+        b=TlBRGh/iUrt38dFmMDo44V6XcH/BPJ7G7+gsdpDxL0YpWAzFh4tjm96eh7Aew8KYpu
+         kwcudvX2EcjJsZ0PRa2ovOJlZLQumTOiNOKrnkhhZ9Cj60nVK2NAKGDv/x5y9TcRQ3eD
+         KXEPdm3mrKw6s3I9lIBo+pSfCeXIuTmkaCURPnUPZXchjdUxc/CgzKp1QaiM0tpu35Ep
+         0VdxqnZppiZwD9N73pD9XrvO82lud2PJzY8SkVT3SBkJibuVSJRkkjtpc5Ymth+5ddxS
+         3uMVQCsc5NEGHLNcoVbxLA4gNN9l10dtwdRBXhjpzjbe4oTT3mUWuKOiTGeZNTZR+9IN
+         odiA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+jmRHauXcq0JHf4MeXugcyBfGNfr5899UWVEmZrrmki1F8PaRdZ9BRg032W3+NG/c60ZDEJtRekJGpjPa1ToQ0LwV4ml5jDmcQbhdLxDi8bqcejp3OLsdfRbk0z9gbMl28//I6nfmpvt2KtHa5mkE4acZDQ0Fxndlw6Udzu9wnw==
+X-Gm-Message-State: AOJu0YxhrbTlaVnBc1XG/8PCtn+FGHDN26z+lmfGTU1Pj3sJCsQuWShV
+	Ecyu8EHZUngcCWqwZ/2jxvAP+UNQXaggg/9ptYbP2ZVZLZhxOaBs
+X-Google-Smtp-Source: AGHT+IH+usFmi8nGYGVjZyOBQShUQKaabnrIDbcVrIFuwz1DdhjycdrfBHNvunLB3ek66/m3uuGVJQ==
+X-Received: by 2002:a05:6512:1382:b0:52c:9942:b008 with SMTP id 2adb3069b0e04-52e8264deabmr5418718e87.2.1719858579638;
+        Mon, 01 Jul 2024 11:29:39 -0700 (PDT)
 Received: from localhost ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab2ea09sm1514069e87.193.2024.07.01.11.29.35
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab27b14sm1532619e87.125.2024.07.01.11.29.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 11:29:36 -0700 (PDT)
+        Mon, 01 Jul 2024 11:29:38 -0700 (PDT)
 From: Serge Semin <fancer.lancer@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -83,7 +83,8 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
 Cc: Serge Semin <fancer.lancer@gmail.com>,
 	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
 	Abhishek Chauhan <quic_abchauha@quicinc.com>,
@@ -94,10 +95,12 @@ Cc: Serge Semin <fancer.lancer@gmail.com>,
 	openbmc@lists.ozlabs.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 08/10] net: pcs: xpcs: Add fwnode-based descriptor creation method
-Date: Mon,  1 Jul 2024 21:28:39 +0300
-Message-ID: <20240701182900.13402-9-fancer.lancer@gmail.com>
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net-next v4 09/10] net: stmmac: Create DW XPCS device with particular address
+Date: Mon,  1 Jul 2024 21:28:40 +0300
+Message-ID: <20240701182900.13402-10-fancer.lancer@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240701182900.13402-1-fancer.lancer@gmail.com>
 References: <20240701182900.13402-1-fancer.lancer@gmail.com>
@@ -109,135 +112,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's now possible to have the DW XPCS device defined as a standard
-platform device for instance in the platform DT-file. Although that
-functionality is useless unless there is a way to have the device found by
-the client drivers (STMMAC/DW *MAC, NXP SJA1105 Eth Switch, etc). Provide
-such ability by means of the xpcs_create_fwnode() method. It needs to be
-called with the device DW XPCS fwnode instance passed. That node will be
-then used to find the MDIO-device instance in order to create the DW XPCS
-descriptor.
+Currently the only STMMAC platform driver using the DW XPCS code is the
+Intel mGBE device driver. (It can be determined by finding all the drivers
+having the stmmac_mdio_bus_data::has_xpcs flag set.) At the same time the
+low-level platform driver masks out the DW XPCS MDIO-address from being
+auto-detected as PHY by the MDIO subsystem core. Seeing the PCS MDIO ID is
+known the procedure of the DW XPCS device creation can be simplified by
+dropping the loop over all the MDIO IDs. From now the DW XPCS device
+descriptor will be created for the MDIO-bus address pre-defined by the
+platform drivers via the stmmac_mdio_bus_data::pcs_mask field.
 
-Note the method semantics and name is similar to what has been recently
-introduced in the Lynx PCS driver.
+Note besides this shall speed up a bit the Intel mGBE probing.
 
 Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 
 ---
 
 Changelog v2:
-- Use the function name and semantics similar to the Lynx PCS driver.
-- Add kdoc describing the DW XPCS create functions.
+- This is a new patch introduced on v2 stage of the review.
 
 Changelog v3:
-- Add the "@interface" argument kdoc to the xpcs_create_mdiodev()
-  function. (@Simon)
-- Fix the "@fwnode" argument name in the xpcs_create_fwnode() method kdoc.
-  (@Simon)
-- Move the return value descriptions to the "Return:" section of the
-  xpcs_create_mdiodev() and xpcs_create_fwnode() kdoc. (@Simon)
+- Convert the stmmac_mdio_bus_data::has_xpcs and
+  stmmac_mdio_bus_data::xpcs_addr fields to a single
+  stmmac_mdio_bus_data::pcs_mask.
 ---
- drivers/net/pcs/pcs-xpcs.c   | 50 ++++++++++++++++++++++++++++++++++++
- include/linux/pcs/pcs-xpcs.h |  3 +++
- 2 files changed, 53 insertions(+)
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_mdio.c | 19 ++++++-------------
+ include/linux/stmmac.h                        |  2 +-
+ 3 files changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index f4425a7c74d5..82463f9d50c8 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -10,7 +10,9 @@
- #include <linux/delay.h>
- #include <linux/pcs/pcs-xpcs.h>
- #include <linux/mdio.h>
-+#include <linux/phy.h>
- #include <linux/phylink.h>
-+#include <linux/property.h>
- 
- #include "pcs-xpcs.h"
- 
-@@ -1505,6 +1507,16 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
- 	return ERR_PTR(ret);
- }
- 
-+/**
-+ * xpcs_create_mdiodev() - create a DW xPCS instance with the MDIO @addr
-+ * @bus: pointer to the MDIO-bus descriptor for the device to be looked at
-+ * @addr: device MDIO-bus ID
-+ * @interface: requested PHY interface
-+ *
-+ * Return: a pointer to the DW XPCS handle if successful, otherwise -ENODEV if
-+ * the PCS device couldn't be found on the bus and other negative errno related
-+ * to the data allocation and MDIO-bus communications.
-+ */
- struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
- 				    phy_interface_t interface)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 094d34c4193c..2dbfbca606af 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -595,7 +595,7 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	/* Intel mgbe SGMII interface uses pcs-xcps */
+ 	if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
+ 	    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
+-		plat->mdio_bus_data->has_xpcs = true;
++		plat->mdio_bus_data->pcs_mask = BIT(INTEL_MGBE_XPCS_ADDR);
+ 		plat->mdio_bus_data->default_an_inband = true;
+ 		plat->select_pcs = intel_mgbe_select_pcs;
+ 	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+index aa43117134d3..74de6ec00bbf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+@@ -499,8 +499,7 @@ int stmmac_pcs_setup(struct net_device *ndev)
  {
-@@ -1529,6 +1541,44 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
- }
- EXPORT_SYMBOL_GPL(xpcs_create_mdiodev);
+ 	struct dw_xpcs *xpcs = NULL;
+ 	struct stmmac_priv *priv;
+-	int ret = -ENODEV;
+-	int mode, addr;
++	int addr, mode, ret;
  
-+/**
-+ * xpcs_create_fwnode() - Create a DW xPCS instance from @fwnode
-+ * @fwnode: fwnode handle poining to the DW XPCS device
-+ * @interface: requested PHY interface
-+ *
-+ * Return: a pointer to the DW XPCS handle if successful, otherwise -ENODEV if
-+ * the fwnode device is unavailable or the PCS device couldn't be found on the
-+ * bus, -EPROBE_DEFER if the respective MDIO-device instance couldn't be found,
-+ * other negative errno related to the data allocations and MDIO-bus
-+ * communications.
-+ */
-+struct dw_xpcs *xpcs_create_fwnode(struct fwnode_handle *fwnode,
-+				   phy_interface_t interface)
-+{
-+	struct mdio_device *mdiodev;
-+	struct dw_xpcs *xpcs;
-+
-+	if (!fwnode_device_is_available(fwnode))
-+		return ERR_PTR(-ENODEV);
-+
-+	mdiodev = fwnode_mdio_find_device(fwnode);
-+	if (!mdiodev)
-+		return ERR_PTR(-EPROBE_DEFER);
-+
-+	xpcs = xpcs_create(mdiodev, interface);
-+
-+	/* xpcs_create() has taken a refcount on the mdiodev if it was
-+	 * successful. If xpcs_create() fails, this will free the mdio
-+	 * device here. In any case, we don't need to hold our reference
-+	 * anymore, and putting it here will allow mdio_device_put() in
-+	 * xpcs_destroy() to automatically free the mdio device.
-+	 */
-+	mdio_device_put(mdiodev);
-+
-+	return xpcs;
-+}
-+EXPORT_SYMBOL_GPL(xpcs_create_fwnode);
-+
- void xpcs_destroy(struct dw_xpcs *xpcs)
- {
- 	if (!xpcs)
-diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index 813be644647f..b4a4eb6c8866 100644
---- a/include/linux/pcs/pcs-xpcs.h
-+++ b/include/linux/pcs/pcs-xpcs.h
-@@ -8,6 +8,7 @@
- #define __LINUX_PCS_XPCS_H
+ 	priv = netdev_priv(ndev);
+ 	mode = priv->plat->phy_interface;
+@@ -508,16 +507,10 @@ int stmmac_pcs_setup(struct net_device *ndev)
+ 	if (priv->plat->pcs_init) {
+ 		ret = priv->plat->pcs_init(priv);
+ 	} else if (priv->plat->mdio_bus_data &&
+-		   priv->plat->mdio_bus_data->has_xpcs) {
+-		/* Try to probe the XPCS by scanning all addresses */
+-		for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
+-			xpcs = xpcs_create_mdiodev(priv->mii, addr, mode);
+-			if (IS_ERR(xpcs))
+-				continue;
+-
+-			ret = 0;
+-			break;
+-		}
++		   priv->plat->mdio_bus_data->pcs_mask) {
++		addr = ffs(priv->plat->mdio_bus_data->pcs_mask) - 1;
++		xpcs = xpcs_create_mdiodev(priv->mii, addr, mode);
++		ret = PTR_ERR_OR_ZERO(xpcs);
+ 	} else {
+ 		return 0;
+ 	}
+@@ -610,7 +603,7 @@ int stmmac_mdio_register(struct net_device *ndev)
+ 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "%s-%x",
+ 		 new_bus->name, priv->plat->bus_id);
+ 	new_bus->priv = ndev;
+-	new_bus->phy_mask = mdio_bus_data->phy_mask;
++	new_bus->phy_mask = mdio_bus_data->phy_mask | mdio_bus_data->pcs_mask;
+ 	new_bus->parent = priv->device;
  
- #include <linux/clk.h>
-+#include <linux/fwnode.h>
- #include <linux/mdio.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
-@@ -72,6 +73,8 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns,
- 		    int enable);
- struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
- 				    phy_interface_t interface);
-+struct dw_xpcs *xpcs_create_fwnode(struct fwnode_handle *fwnode,
-+				   phy_interface_t interface);
- void xpcs_destroy(struct dw_xpcs *xpcs);
+ 	err = of_mdiobus_register(new_bus, mdio_node);
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 9c54f82901a1..84e13bd5df28 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -82,7 +82,7 @@ struct stmmac_priv;
  
- #endif /* __LINUX_PCS_XPCS_H */
+ struct stmmac_mdio_bus_data {
+ 	unsigned int phy_mask;
+-	unsigned int has_xpcs;
++	unsigned int pcs_mask;
+ 	unsigned int default_an_inband;
+ 	int *irqs;
+ 	int probed_phy_irq;
 -- 
 2.43.0
 
