@@ -1,378 +1,176 @@
-Return-Path: <netdev+bounces-108295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0BE91EB42
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:10:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A599591EB4C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:19:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4137A1F21B0A
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:10:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 914181C21404
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C4117108D;
-	Mon,  1 Jul 2024 23:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNTdoiNB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946061448E1;
+	Mon,  1 Jul 2024 23:19:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DB14779E;
-	Mon,  1 Jul 2024 23:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E776F80026
+	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 23:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719875423; cv=none; b=eSzGtQf9aeXpG2JX029APraWV/IkP8M+jcyEANj4DxB+Px6hBRpSJ4ThO0gSXgt5SYx14QWXOfatjCMYbZiOhV12a5HB9SxwbMcS+YmyXvbD8PwgQDECAaNrK9f9C3tIOgxFHWoKy1rFPpwLJ7d+CVRDioKps0UHd13IXCz2/uQ=
+	t=1719875964; cv=none; b=tGIUc8uViKFe4AcybC86Y0YMABUlxRQKslJMt3WpREAaZ1YlwLYF9xkYd9u3hNpKr6EBrqubWbkiSiK7OePWwh2Ofo23bmKjSbHFNPzdhZNGVXu/Y7f1xGj5WIvzBNrOJSF+lGPDBf2GV+RoIauTxhc9FugFrPbXCVPu8GrEQUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719875423; c=relaxed/simple;
-	bh=vLZGuUyMHYtbqDoUKeu0JwXEeYCGf5mLBM50cvOZ2FU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IMKeZawSPXCI2CyyGkM85V+0IpeqrIkmfidD0fDFcPcWVARyHU5aUVOZWEFVV3hS1clZF7z0n1apdKZ6kVHteSK9Orzv8GklSmpMWGKqyLthx9rDbkWF//IjLwpD4zOVyvHAdAlgokEXsxkWuNZIXteOjv+7qm1nTxEVVtFS/hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNTdoiNB; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1f9aeb96b93so24502285ad.3;
-        Mon, 01 Jul 2024 16:10:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719875421; x=1720480221; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JO3hxaUe4TBhQwaTOXXde5z2rexh9ciEnaN0UMs6Tpk=;
-        b=mNTdoiNBDQMWgb/cjov6wqsCmzgteM8tofvEt3YuPqKHV9YT6IeNS3jz/wjTeDIjn+
-         31UkVa5MWxSG/u1xK72gwiS61/gU988CmUQG1SJBuXlh8HmmG9MVZTYDsIeNbhoIALAU
-         jBxPf1+9tgmEASW+d8OeFRPYatQ771Uhhk7INP1HL/UUT6+ImWYNJzE8F1mXCikL0Amn
-         H1TqN8cJZpTXFCOya8QIpCpOtgxMvnSbRb3izsyVuyR8xjZkoJAdBIOL6JH1lrtWugIH
-         dKXzhJadTxKZmteq3sqj7wi3NEBdcn2+v9Twkc9EsR+K1PHh7X3NvYEXdH3KXN+FCR07
-         Kijg==
+	s=arc-20240116; t=1719875964; c=relaxed/simple;
+	bh=Nn4wl21piTV59fKP9uWtPQ4iQsG/oANAJVXF/KxzmT0=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=OVuvcpV9ERfMUBsES4jqrg9N3OdQuoCPow0gZitrAroib7FXw49861/9vmggE3fPIuV9wQReaK2LJwiFfHfQcjMUzGlGpb0ErRtvknRF83Pj0lQ+8XBKHolieC8hHQApZ+bC82wdTls2RyXZF7H9TzUMQL0dcIOfUEWJj9+JVzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7f6200ad270so378135639f.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 16:19:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719875421; x=1720480221;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JO3hxaUe4TBhQwaTOXXde5z2rexh9ciEnaN0UMs6Tpk=;
-        b=KM+P27q7IiMppAns1byPMCR0NiKyOs3rqsy9p6hztXsM9oCryUMcUPakOwcK7xdZF+
-         GDjgYHEqGAf/iXlAy4V7fxX0Bi0z5CXGyhYXM7NED4iW3jv+kidKYY8dLogcgwS/XOMV
-         9rna+6GkVNFtHie8hrcXRcc3Lq5yUbzUPfCSBXxwcFSTvcw6nyTvkCeirZDLQG8BamQE
-         MMkGgBP+iDGmTrTW8YaUpJZL68uxWokRWBLvHVx2psDJa0z2O/LdJjcLQlgs4iFtiVuj
-         x7tifWWnXzEDXr8xucvPzwgfSN9m3gXophNw4W3yRBk4qIDrvRAofzlomZL5gRF3jvvh
-         KbxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjRPk6JaVNKtN5Qi4NXUkw1CcitVEGWsmu0DZYlyl9fHZAeEDHhzZwDCPQc1sPEEPEhgcQGAHoRpjwDb0kwNLvI5KtTALYZMh++hLK
-X-Gm-Message-State: AOJu0YwNQBaP4zgbaEk+9fm5WtqWf2Kn6eefIpksN8jrRRJHMoqaWhlH
-	jxSVE5fVsk8d4X8NMca8pOrDsT/dhjNHvXjYx3ucmcs3ViPM56jK
-X-Google-Smtp-Source: AGHT+IGmzjdb0aTKtkaW71dZIduU2eZKMunrsnUFRabvXhvxs2FJYST83sKTf5cZlAIX0lRmG0H0QQ==
-X-Received: by 2002:a17:902:eccc:b0:1f7:19b4:c7f5 with SMTP id d9443c01a7336-1fadbc5c25emr62078095ad.12.1719875421309;
-        Mon, 01 Jul 2024 16:10:21 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1fac1569d4bsm71988635ad.201.2024.07.01.16.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 16:10:20 -0700 (PDT)
-Message-ID: <86c56c9a88d07efbfe1e85bec678e86704588a15.camel@gmail.com>
-Subject: Re: [PATCH net-next v9 02/13] mm: move the page fragment allocator
- from page_alloc into its own file
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, David Howells
-	 <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-mm@kvack.org
-Date: Mon, 01 Jul 2024 16:10:19 -0700
-In-Reply-To: <20240625135216.47007-3-linyunsheng@huawei.com>
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
-	 <20240625135216.47007-3-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        d=1e100.net; s=20230601; t=1719875962; x=1720480762;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6HrcRx6Tfxw+w89glV2DY2z2LYuzg69csFaa4GorFmY=;
+        b=MfmqLHHpgVdLb63hHztuPGC9p584YySQqgNw+Cvr40pn6X8Zkoo4vBIhOHEQc9575g
+         PgZ1Yv3PhM9DE7dx6M90HJecnDZZCEIXdiEI+hiG6Xl8Mw9w/taYGPnJjjX72OgrrCSG
+         qgKfKEzMdObJ6OHc2YnsqZRYJreUXlkH7QZtdFtAKKjlLFWbzb43qrZKmXxYQFG3Moj5
+         RJRsmGMc7BQsCqKrZRl4w5PChDmsENkMllLeI/66oI+23NbBzI6XYpPiz5jWZ/fjPpKD
+         aqzpwTFQmc3Ww4W2Cn0rEq2Zl+IlEWvtedLoxRH66V4sprwdPhs4p/VDte6Kk+8vtw8S
+         xh5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXP8DaXbNT+mky0Stp/6f5MD7EPIU9YjA6BBwDvYTuYx49LYrCw6+SxVX8emRnUZ4QstL+5JyO0pQJqgAT8qWT1qp/obhmG
+X-Gm-Message-State: AOJu0YxVLt46DieolW/fNgBrqd0MCJ+iQ/MRAWsWtW36jagediwc8s7b
+	BeeldvY4l09SFY0EN/cTzlLRWUcA1MZDZMjhPGLkjhTCF/FTS572M6fPFt7dDMuii0BjWAfWiHz
+	e8oF+BHMtyNwgF732NKZzFoeE2DCcHkP0xZHjsQPxFthzdNcjBx5cZsM=
+X-Google-Smtp-Source: AGHT+IFMleHcpokVPEguHmLGUq7veZ3YQSKLoTnvViBGu5hzLtbkptK5cnD3JxYOBu0eOk7CgW3QvHliAlCWxumW3aV/+f/0sATZ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6638:130e:b0:4b0:b123:d9d with SMTP id
+ 8926c6da1cb9f-4bbb70abb58mr685984173.5.1719875962131; Mon, 01 Jul 2024
+ 16:19:22 -0700 (PDT)
+Date: Mon, 01 Jul 2024 16:19:22 -0700
+In-Reply-To: <0000000000008f77c2061c357383@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c7ee4c061c37d314@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] stack segment fault in bpf_xdp_redirect
+From: syzbot <syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
-> Inspired by [1], move the page fragment allocator from page_alloc
-> into its own c file and header file, as we are about to make more
-> change for it to replace another page_frag implementation in
-> sock.c
->=20
-> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.c=
-om/
->=20
-> CC: David Howells <dhowells@redhat.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+syzbot has found a reproducer for the following issue on:
 
-So one thing that I think might have been overlooked in the previous
-reviews is the fact that the headers weren't necessarily self
-sufficient. You were introducing dependencies that had to be fulfilled
-by other headers.
+HEAD commit:    1c5fc27bc48a Merge tag 'nf-next-24-06-28' of git://git.ker..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14aeab3e980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
+dashboard link: https://syzkaller.appspot.com/bug?extid=5ae46b237278e2369cac
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1673738e980000
 
-One thing you might try doing as part of your testing would be to add a
-C file that just adds your header and calls your functions to verify
-that there aren't any unincluded dependencies.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9672225af907/disk-1c5fc27b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0f14d163a914/vmlinux-1c5fc27b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ec6c331e6a6e/bzImage-1c5fc27b.xz
 
-> ---
->  include/linux/gfp.h             |  22 -----
->  include/linux/mm_types.h        |  18 ----
->  include/linux/page_frag_cache.h |  47 +++++++++++
->  include/linux/skbuff.h          |   1 +
->  mm/Makefile                     |   1 +
->  mm/page_alloc.c                 | 136 ------------------------------
->  mm/page_frag_cache.c            | 144 ++++++++++++++++++++++++++++++++
->  mm/page_frag_test.c             |   1 +
->  8 files changed, 194 insertions(+), 176 deletions(-)
->  create mode 100644 include/linux/page_frag_cache.h
->  create mode 100644 mm/page_frag_cache.c
->=20
-...
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
 
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> new file mode 100644
-> index 000000000000..3a44bfc99750
-> --- /dev/null
-> +++ b/include/linux/page_frag_cache.h
-> @@ -0,0 +1,47 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#ifndef _LINUX_PAGE_FRAG_CACHE_H
-> +#define _LINUX_PAGE_FRAG_CACHE_H
-> +
-> +#include <linux/gfp_types.h>
-> +
+Oops: stack segment: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 PID: 14042 Comm: syz.0.2930 Not tainted 6.10.0-rc5-syzkaller-01137-g1c5fc27bc48a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
+RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
+Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
+RSP: 0018:ffffc9000aaf7970 EFLAGS: 00010202
+RAX: 1ffff1100536be41 RBX: 0000000000000000 RCX: ffff888029b5da00
+RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000aaf7af0
+RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
+R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
+R13: dffffc0000000000 R14: ffffc90009f63048 R15: 000000000000a020
+FS:  00007f2c699ff6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa0bea356dd CR3: 000000007a9bc000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bpf_prog_bc55b47b7a2429cd+0x1d/0x1f
+ __bpf_prog_run include/linux/filter.h:691 [inline]
+ bpf_prog_run_xdp include/net/xdp.h:514 [inline]
+ tun_build_skb drivers/net/tun.c:1711 [inline]
+ tun_get_user+0x3321/0x4560 drivers/net/tun.c:1819
+ tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f2c69f7471f
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
+RSP: 002b:00007f2c699ff010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f2c6a103fa0 RCX: 00007f2c69f7471f
+RDX: 0000000000000032 RSI: 0000000020001500 RDI: 00000000000000c8
+RBP: 00007f2c69ff677e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000032 R11: 0000000000000293 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f2c6a103fa0 R15: 00007ffd4d9d6998
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:____bpf_xdp_redirect net/core/filter.c:4544 [inline]
+RIP: 0010:bpf_xdp_redirect+0x59/0x1a0 net/core/filter.c:4542
+Code: 81 c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 55 1a 99 f8 48 8b 1b 4c 8d 63 38 4c 89 e5 48 c1 ed 03 <42> 0f b6 44 2d 00 84 c0 0f 85 d0 00 00 00 45 8b 34 24 44 89 f6 83
+RSP: 0018:ffffc9000aaf7970 EFLAGS: 00010202
+RAX: 1ffff1100536be41 RBX: 0000000000000000 RCX: ffff888029b5da00
+RDX: 0000000000000000 RSI: 000000000000a020 RDI: ffffc9000aaf7af0
+RBP: 0000000000000007 R08: ffffffff8665e84f R09: 1ffffffff25f78b0
+R10: dffffc0000000000 R11: fffffbfff25f78b1 R12: 0000000000000038
+R13: dffffc0000000000 R14: ffffc90009f63048 R15: 000000000000a020
+FS:  00007f2c699ff6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa0bea356dd CR3: 000000007a9bc000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	81 c3 08 18 00 00    	add    $0x1808,%ebx
+   6:	48 89 d8             	mov    %rbx,%rax
+   9:	48 c1 e8 03          	shr    $0x3,%rax
+   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  12:	74 08                	je     0x1c
+  14:	48 89 df             	mov    %rbx,%rdi
+  17:	e8 55 1a 99 f8       	call   0xf8991a71
+  1c:	48 8b 1b             	mov    (%rbx),%rbx
+  1f:	4c 8d 63 38          	lea    0x38(%rbx),%r12
+  23:	4c 89 e5             	mov    %r12,%rbp
+  26:	48 c1 ed 03          	shr    $0x3,%rbp
+* 2a:	42 0f b6 44 2d 00    	movzbl 0x0(%rbp,%r13,1),%eax <-- trapping instruction
+  30:	84 c0                	test   %al,%al
+  32:	0f 85 d0 00 00 00    	jne    0x108
+  38:	45 8b 34 24          	mov    (%r12),%r14d
+  3c:	44 89 f6             	mov    %r14d,%esi
+  3f:	83                   	.byte 0x83
 
-The gfp_types.h only really gives you the values you pass to the
-gfp_mask. Did you mean to include linux/types.h to get the gfp_t
-typedef?
 
-> +#define PAGE_FRAG_CACHE_MAX_SIZE	__ALIGN_MASK(32768, ~PAGE_MASK)
-
-You should probably include linux/align.h to pull in the __ALIGN_MASK.
-
-> +#define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
-
-I am pretty sure get_order is from asm/page.h as well.
-
-> +
-> +struct page_frag_cache {
-> +	void *va;
-> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-
-I am pretty sure PAGE_SIZE is included from asm/page.h
-
-> +	__u16 offset;
-> +	__u16 size;
-> +#else
-> +	__u32 offset;
-> +#endif
-> +	/* we maintain a pagecount bias, so that we dont dirty cache line
-> +	 * containing page->_refcount every time we allocate a fragment.
-> +	 */
-> +	unsigned int		pagecnt_bias;
-> +	bool pfmemalloc;
-> +};
-> +
-> +void page_frag_cache_drain(struct page_frag_cache *nc);
-> +void __page_frag_cache_drain(struct page *page, unsigned int count);
-> +void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int f=
-ragsz,
-> +			      gfp_t gfp_mask, unsigned int align_mask);
-> +
-> +static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
-> +					  unsigned int fragsz, gfp_t gfp_mask,
-> +					  unsigned int align)
-> +{
-> +	WARN_ON_ONCE(!is_power_of_2(align));
-
-To get is_power_of_2 you should be including linux/log2.h.
-
-> +	return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
-> +}
-> +
-> +static inline void *page_frag_alloc(struct page_frag_cache *nc,
-> +				    unsigned int fragsz, gfp_t gfp_mask)
-> +{
-> +	return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
-> +}
-> +
-> +void page_frag_free(void *addr);
-> +
-> +#endif
->=20
-
-...
-
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> new file mode 100644
-> index 000000000000..88f567ef0e29
-> --- /dev/null
-> +++ b/mm/page_frag_cache.c
-> @@ -0,0 +1,144 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Page fragment allocator
-> + *
-> + * Page Fragment:
-> + *  An arbitrary-length arbitrary-offset area of memory which resides wi=
-thin a
-> + *  0 or higher order page.  Multiple fragments within that page are
-> + *  individually refcounted, in the page's reference counter.
-> + *
-> + * The page_frag functions provide a simple allocation framework for pag=
-e
-> + * fragments.  This is used by the network stack and network device driv=
-ers to
-> + * provide a backing region of memory for use as either an sk_buff->head=
-, or to
-> + * be used in the "frags" portion of skb_shared_info.
-> + */
-> +
-> +#include <linux/export.h>
-> +#include <linux/init.h>
-> +#include <linux/mm.h>
-> +#include <linux/page_frag_cache.h>
-> +#include "internal.h"
-
-You could probably include gfp_types.h here since this is where you are
-using the GFP_XXX values.
-
-> +
-> +static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
-> +					     gfp_t gfp_mask)
-> +{
-> +	struct page *page =3D NULL;
-> +	gfp_t gfp =3D gfp_mask;
-> +
-> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> +	gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
-> +		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
-> +	page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
-> +				PAGE_FRAG_CACHE_MAX_ORDER);
-> +	nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
-> +#endif
-> +	if (unlikely(!page))
-> +		page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
-> +
-> +	nc->va =3D page ? page_address(page) : NULL;
-> +
-> +	return page;
-> +}
-> +
-> +void page_frag_cache_drain(struct page_frag_cache *nc)
-> +{
-> +	if (!nc->va)
-> +		return;
-> +
-> +	__page_frag_cache_drain(virt_to_head_page(nc->va), nc->pagecnt_bias);
-> +	nc->va =3D NULL;
-> +}
-> +EXPORT_SYMBOL(page_frag_cache_drain);
-> +
-> +void __page_frag_cache_drain(struct page *page, unsigned int count)
-> +{
-> +	VM_BUG_ON_PAGE(page_ref_count(page) =3D=3D 0, page);
-> +
-> +	if (page_ref_sub_and_test(page, count))
-> +		free_unref_page(page, compound_order(page));
-> +}
-> +EXPORT_SYMBOL(__page_frag_cache_drain);
-> +
-> +void *__page_frag_alloc_align(struct page_frag_cache *nc,
-> +			      unsigned int fragsz, gfp_t gfp_mask,
-> +			      unsigned int align_mask)
-> +{
-> +	unsigned int size =3D PAGE_SIZE;
-> +	struct page *page;
-> +	int offset;
-> +
-> +	if (unlikely(!nc->va)) {
-> +refill:
-> +		page =3D __page_frag_cache_refill(nc, gfp_mask);
-> +		if (!page)
-> +			return NULL;
-> +
-> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> +		/* if size can vary use size else just use PAGE_SIZE */
-> +		size =3D nc->size;
-> +#endif
-> +		/* Even if we own the page, we do not use atomic_set().
-> +		 * This would break get_page_unless_zero() users.
-> +		 */
-> +		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
-> +
-> +		/* reset page count bias and offset to start of new frag */
-> +		nc->pfmemalloc =3D page_is_pfmemalloc(page);
-> +		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> +		nc->offset =3D size;
-> +	}
-> +
-> +	offset =3D nc->offset - fragsz;
-> +	if (unlikely(offset < 0)) {
-> +		page =3D virt_to_page(nc->va);
-> +
-> +		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
-> +			goto refill;
-> +
-> +		if (unlikely(nc->pfmemalloc)) {
-> +			free_unref_page(page, compound_order(page));
-> +			goto refill;
-> +		}
-> +
-> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> +		/* if size can vary use size else just use PAGE_SIZE */
-> +		size =3D nc->size;
-> +#endif
-> +		/* OK, page count is 0, we can safely set it */
-> +		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
-> +
-> +		/* reset page count bias and offset to start of new frag */
-> +		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> +		offset =3D size - fragsz;
-> +		if (unlikely(offset < 0)) {
-> +			/*
-> +			 * The caller is trying to allocate a fragment
-> +			 * with fragsz > PAGE_SIZE but the cache isn't big
-> +			 * enough to satisfy the request, this may
-> +			 * happen in low memory conditions.
-> +			 * We don't release the cache page because
-> +			 * it could make memory pressure worse
-> +			 * so we simply return NULL here.
-> +			 */
-> +			return NULL;
-> +		}
-> +	}
-> +
-> +	nc->pagecnt_bias--;
-> +	offset &=3D align_mask;
-> +	nc->offset =3D offset;
-> +
-> +	return nc->va + offset;
-> +}
-> +EXPORT_SYMBOL(__page_frag_alloc_align);
-> +
-> +/*
-> + * Frees a page fragment allocated out of either a compound or order 0 p=
-age.
-> + */
-> +void page_frag_free(void *addr)
-> +{
-> +	struct page *page =3D virt_to_head_page(addr);
-> +
-> +	if (unlikely(put_page_testzero(page)))
-> +		free_unref_page(page, compound_order(page));
-> +}
-> +EXPORT_SYMBOL(page_frag_free);
-> diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-> index 5ee3f33b756d..07748ee0a21f 100644
-> --- a/mm/page_frag_test.c
-> +++ b/mm/page_frag_test.c
-> @@ -16,6 +16,7 @@
->  #include <linux/log2.h>
->  #include <linux/completion.h>
->  #include <linux/kthread.h>
-> +#include <linux/page_frag_cache.h>
-> =20
->  #define OBJPOOL_NR_OBJECT_MAX	BIT(24)
-> =20
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
