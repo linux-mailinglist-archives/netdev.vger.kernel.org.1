@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-108029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B226A91D9A4
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:07:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04F991D9A8
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 10:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A4F9284EC8
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:07:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8498A1F229A9
+	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 08:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1DB37F7DB;
-	Mon,  1 Jul 2024 08:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84B080C15;
+	Mon,  1 Jul 2024 08:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gggtZFLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224897D3F5
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 08:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1BA5C614;
+	Mon,  1 Jul 2024 08:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719821216; cv=none; b=N+VCaSSxNJItfp1PnL2RxSMIFk29LguvnVy8Y6cKPYUafhAycXHlOOyHptydAG8Xk/LVBAZk4fNCQDo3gVd7tUqTBnsJxYAixuHYT5cbl2ZJsjeL0mPGDv+JOV7DNF8ANyhDWb95XN1oaxmAFj54qecL6JJDP8OvWeG29s/5kgE=
+	t=1719821241; cv=none; b=NWdlkrTBVfP50yqvE0MBp3bPtr2L50b5fMrnHpF1MbVrHZTxhbfy5vDTSmZONR/D9NizgjqqAMSEtkvXUcaroL/tHVlboGAtcsF2qY0bGwAFMGv9KAICYetrxVHhcfEwbKdGWDV8tQfuqL4iNN3rN3K1rmTMikm6iecxL8RL5dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719821216; c=relaxed/simple;
-	bh=PCHoJvL6gXoixSfR910tVINMlniYAuUrc3oht8bmS+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EhE5a6AYWqd89Gh1kEnMz6F7FlePOZjTvps9qHH3cCTqUspaHvy1+Bo0F7ccfPHdoowpxznvDmqHPET1DqW6Nw47RWcSDCBTeXKCnpfaNZzEhBToSuFkzsO90AQWi8mqO2osPt7rGFqxiowPPv/kTAvHT/bNpyekOpsZGqAPFno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sOC3l-0002m6-DI
-	for netdev@vger.kernel.org; Mon, 01 Jul 2024 10:06:49 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1719821241; c=relaxed/simple;
+	bh=3Hc856aw6bOsK5L6t5DfLT5e5XmQ/CuZmw2ejIUUYEA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jhKHyWa3JYzVaimD2hTXrIkeDkRYhK/WUt2AlgHZYC5aqbV9n82dKqL7Y7+7Bs4k69biHtwhd+TGfC3GrtuDH9v9nWjsE8mb5kSGfVp9nJ3LeUyQsxSQ1Te3NliwUQ+6DxhMXWuE5OOiPXw9yhNzZESKToCNmJX7cZYEAhkflzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=gggtZFLp; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=oV5oBHh63yqsNcaUQykIzDCbVVZ2xyc88O0Bf7a/ij0=; b=gggtZFLp2+HZPqox1UWEeL2pxr
+	xFpcB+L7OrVbzVQcM+f4/qANPcj0IVJxyBaEk3fAMdufonyr70WCPB/lC4IJ211qgECfGUlqaU4R+
+	7+5zt2OxvMPP100jyD6xMcQP4Qgqs/KVTPItaeyHUfuSUiFQqIvJL3NiI0CIym0WrdjH9faGEuZsn
+	XL8Cgl9uTz3NmykB7fB7ahDOPwPPhnqubUETFh2tuo3LDAPS+4E73I0UzeavH5zQBryLKuNcxEtp6
+	GlXK7RK3M8Qt2FhSVr8U2p7GiqFD94p+SsDrBNZ3kch9ZwL2FrzysIumCnwUyXNVWhwREKh1BsswR
+	vwMK/1YQ==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sOC3k-006KCR-Vr
-	for netdev@vger.kernel.org; Mon, 01 Jul 2024 10:06:49 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id A68912F7196
-	for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 08:06:48 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 02F9B2F718A;
-	Mon, 01 Jul 2024 08:06:47 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 92d5d2e2;
-	Mon, 1 Jul 2024 08:06:46 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Jimmy Assarsson <extja@kvaser.com>,
-	stable@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net] can: kvaser_usb: Explicitly initialize family in leafimx driver_info struct
-Date: Mon,  1 Jul 2024 10:03:22 +0200
-Message-ID: <20240701080643.1354022-2-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240701080643.1354022-1-mkl@pengutronix.de>
-References: <20240701080643.1354022-1-mkl@pengutronix.de>
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sOC45-000ClF-BH; Mon, 01 Jul 2024 10:07:09 +0200
+Received: from [178.197.249.41] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sOC43-000FAQ-3A;
+	Mon, 01 Jul 2024 10:07:08 +0200
+Subject: Re: [PATCH v5 bpf-next 3/3] selftests/bpf: Add selftest for
+ bpf_xdp_flow_lookup kfunc
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: bpf@vger.kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+ lorenzo.bianconi@redhat.com, toke@redhat.com, fw@strlen.de, hawk@kernel.org,
+ horms@kernel.org, donhunte@redhat.com, memxor@gmail.com
+References: <cover.1718379122.git.lorenzo@kernel.org>
+ <6472c7a775f6a329d16352092071fda8676c2809.1718379122.git.lorenzo@kernel.org>
+ <89bd0cd7-ed01-a343-d873-dc0c6d2810f2@iogearbox.net>
+ <ZoBqijOJi2JVcHDB@lore-desk>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <66efa6eb-ed16-57b3-f490-8b3b4e6243f1@iogearbox.net>
+Date: Mon, 1 Jul 2024 10:07:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <ZoBqijOJi2JVcHDB@lore-desk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27322/Sun Jun 30 10:36:30 2024)
 
-From: Jimmy Assarsson <extja@kvaser.com>
+On 6/29/24 10:11 PM, Lorenzo Bianconi wrote:
+>> On 6/14/24 5:40 PM, Lorenzo Bianconi wrote:
+>> [...]
+>>> +void test_xdp_flowtable(void)
+>>> +{
+>>> +	struct xdp_flowtable *skel = NULL;
+>>> +	struct nstoken *tok = NULL;
+>>> +	int iifindex, stats_fd;
+>>> +	__u32 value, key = 0;
+>>> +	struct bpf_link *link;
+>>> +
+>>> +	if (SYS_NOFAIL("nft -v")) {
+>>> +		fprintf(stdout, "Missing required nft tool\n");
+>>> +		test__skip();
+>>> +		return;
+>>
+>> Bit unfortunate that upstream CI skips the test case at the moment:
+> 
+> yep, we are missing nft utility there.
 
-Explicitly set the 'family' driver_info struct member for leafimx.
-Previously, the correct operation relied on KVASER_LEAF being the first
-defined value in enum kvaser_usb_leaf_family.
+Ok, not a blocker imho, but if you could work with Manu to get this
+enabled in the CI, that would be great so that the test can actually
+run.
 
-Fixes: e6c80e601053 ("can: kvaser_usb: kvaser_usb_leaf: fix CAN clock frequency regression")
-Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-Link: https://lore.kernel.org/all/20240628194529.312968-1-extja@kvaser.com
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-index 7292c81fc0cd..024169461cad 100644
---- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-+++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-@@ -125,6 +125,7 @@ static const struct kvaser_usb_driver_info kvaser_usb_driver_info_leaf_err_liste
- 
- static const struct kvaser_usb_driver_info kvaser_usb_driver_info_leafimx = {
- 	.quirks = 0,
-+	.family = KVASER_LEAF,
- 	.ops = &kvaser_usb_leaf_dev_ops,
- };
- 
-
-base-commit: 134061163ee5ca4759de5c24ca3bd71608891ba7
--- 
-2.43.0
-
-
+Thanks,
+Daniel
 
