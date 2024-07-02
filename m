@@ -1,108 +1,207 @@
-Return-Path: <netdev+bounces-108508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E961924082
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:22:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67AF9240AB
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8DD51F22D71
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:22:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 263B71F24C91
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A211516B74B;
-	Tue,  2 Jul 2024 14:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4561BA891;
+	Tue,  2 Jul 2024 14:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YmFU53M8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U0lJZk7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74B6BE7F
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 14:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64781BA874;
+	Tue,  2 Jul 2024 14:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930122; cv=none; b=DqiNurq5Z1tO7asJqIjiOh99x3jdzqztq07AD/1FJ5gCrfefnH1+sGKPTnwDlszcBO+T7nxPlCKKnyNfvpufDIwPECaX2hvBnDGo1Vz0YfXO4gBeM+FU/HADP4CAuvur+vqx63OtlwZKXZlkJYRS9/Nm3HDwhR4dkh8Mwci18mI=
+	t=1719930291; cv=none; b=XYvL//LMPPkvG7hKWSKy7/SwnAcFjlxWUYSdPLuaL/U5GZn4SbAxSn7pCWyxM6VKunL3tq7qAIPbEZiJwJsjC79OsRUWed3AL6aiQ0OmDPIdMV3Xx93p/rkaRYV4Tq9ix8j5h99IXjYQvh8QqzPzCdYRyHu/rB2fsQuSlXeclZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930122; c=relaxed/simple;
-	bh=T+Fae+3X94waDimcwVSB4qnzYUiIOYtl5PdjimKgDFk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LST2SPTe9t/TPoeKgCrAlDleZuTUBl+bv8YzO9cGNsNoUkIPwhg052bAV+Rk06BP0Kl2JVG4baQKSXt/9JZhV2M6h0FJ2nzL2vGdSw3XuyaU76Dt37LyBj+eBO1OD6Kvk0J8BugE0KN/UJxkxQ3cAqirkm7tMWaELiDPYY36W38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YmFU53M8; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-58bac81f419so952600a12.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 07:22:00 -0700 (PDT)
+	s=arc-20240116; t=1719930291; c=relaxed/simple;
+	bh=pQ0VyLEWPbTzv8ueT/SYA25grM78ReWuMdOeMbNrUDg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gkVD1i9mKxP6NVfkL4qYfNThTOWihj1qNyHc/Kgli7RZMErXJEfuMqmW+lWWcRFy6f7Bcqa4EIMsfEPasvSXkNTPJRKNk+KYIsDLmQhKpbY2sEMgEZPa3JycJWmzAjkWpHV9rYpK35EWutyThp95ORM0Qyc4EYW2Uqqb4YydeW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U0lJZk7j; arc=none smtp.client-ip=209.85.128.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-42574064b16so26759465e9.2;
+        Tue, 02 Jul 2024 07:24:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1719930119; x=1720534919; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sh5Y1zlPh20F9HNcI//rLbS3bZ/uF1AQxw5RRlsXpLg=;
-        b=YmFU53M85I+ptyUyx3nwzqlkCGK6sV4smuj+BUs663gnCJmD/cN6blBDjW9iIsAz/j
-         aqewtxlInAcwbIbzQV8FyPgY0FZqNtb5vyR5U7n2MSLeFyBIfjmw7+JzkOkxqka0u3Jo
-         f3UA5NJdfwurG03wbaiYDwKl/LLhRCLIXo/7540wQF8rJ/ZEZ5v2J6lWEuVYv4VgKFnd
-         eCAAWMavEV9NhUg8F33LI3KXBEqxMucrT/n0duDXRXmiHakp84cqkUKlIpWfOoqmuATy
-         kQRRssDGEuMHHxI2JuPq+oSvRceVBbn9j6itaKPIPF3A6BqtqaAqpXg2C/TdJH1Z68b4
-         y2FQ==
+        d=gmail.com; s=20230601; t=1719930288; x=1720535088; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
+        b=U0lJZk7j838j0RN9wVhvEkgwxIIisef+6GnZvYMxQad3c4rA3CGBavY4V78+SFc8wc
+         mXayx2ZTLN+O4Ji2kLGr6tTsDsLM52998xf+1c/xY3mnkji5Wo8EbH38D/jZUjJKstRj
+         uK6UeULrboMTahGdVzPxnrEKW9qjEv6d7hEQvS/pjQQnhZfvY9OxfZTcyGR/frwL43DE
+         ue44YEJ7/B68cktWkenGK7bcFvFGiVHZzFR8yR7AoxgPbbkUcfHHH8bHTIaqAnoyQ+az
+         cziLmLlB73gk1ilOW4qUwNLm/vtug8QD6hvJ9Em0dcEonTfG/1qHwTNEmsu1uEAftP/r
+         cqSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719930119; x=1720534919;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sh5Y1zlPh20F9HNcI//rLbS3bZ/uF1AQxw5RRlsXpLg=;
-        b=U7uWNN/e9OwIYUSOz7tfc78gB/AiqL3hRl2gzlqG1nTNuk8v5VrLN9fEIOPz6w2Iey
-         1WIbdiynhT99jO5xiL4JgaqIg1/bC2VC1bGsfzOUYowgKettX8lhvm637Yk+OIFa/31V
-         QwGsM48LkB557egU4RapuzE4kLGuJRZjFaPDUXidHzc0+dV76ejBMPdvIGwkunYUSIYa
-         FSSBd1l1rDacfAT3NQVqdWu7RfHfnBg4MIwgopfYX3iQnI8JonSMnXiuaRLSjd3XuV6h
-         jmn9miT4cYXHAbzqaOoveI6u5eUWfezOoZLWkRZanJlaqTeiTltXNArYX5OjoSsfZ9fW
-         dQTQ==
-X-Gm-Message-State: AOJu0YwfMtFoTs5pmQw89R3vGtTpeRLxPtLOZdhkkz+y+IjEHEnRzj2V
-	nWxrl856sD+CHldoyTDK6swCHVVwL7fv+G+cBq83EpIicx1iyjrq7UlQpYDbMfc=
-X-Google-Smtp-Source: AGHT+IHXxSgIkS5wouN8GAL8HbfDjWiSaFMDE+52DBgN+3kHTC2UfuMH69aQvKmrac9tIMDMqFHUWg==
-X-Received: by 2002:a05:6402:430b:b0:57c:74ea:8d24 with SMTP id 4fb4d7f45d1cf-5879f59c5b7mr5640005a12.18.1719930118201;
-        Tue, 02 Jul 2024 07:21:58 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:1c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58613815dd7sm5763672a12.43.2024.07.02.07.21.57
+        d=1e100.net; s=20230601; t=1719930288; x=1720535088;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
+        b=NITcHt3HIH54ETvg2uEBZTRRr3pwuWEYs1pYUhNbL/wCPZhmzhxsTV4j17NOrcTYH/
+         gOeBHJz14+prYIFkNvQhmhnZCxPMhfXDvB3B3zRaNsbrANe2kBEaiDGYvNptPO/+vkeE
+         BQ4Kv/i7hcTi8+cGdRYKjDiWvMo29JkRfT7cXbXdszSdScphZroVdWuVlU9GMmEnwqo2
+         75L7+QuZ35BIb4KWLH9wsUv/SxEKSvKzOxdhIDzO7Ruu5jdqY3g80H3p9dmwa01GBhT8
+         +/cvhMHAKtHeidTHUb+a9RdG5NIp+88rkkNJjz2wNAloPyIvAqU0fp78OIZHErYIXAoe
+         +RnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVq2E9+3D1cGYuH5VxsnTdInI/YpgiBkUKR0KP91ZaL3TNzl1QH7jCS9Lj0aJgIi8XocUK6i1AdBDHpxuVgxRGOOCuzXBGgzXUIm6KAdJ6yro8pLl0U8YQU9kW0iv2xdZx6gsLu
+X-Gm-Message-State: AOJu0YwzekyNjDvdgERkI2lefDR62QUidG5EHNaHe2vGUbU9V1P/Nk7J
+	eZeUbZiOv0A1Ovr95bqa0QgY4NiVQH9r/MIP8A+7FnneFN7d8ln4
+X-Google-Smtp-Source: AGHT+IFVs8QCxMuEfkGcfHEIMry2KNCFjt+wxd4AxRq+lltb3dEuh8t1F/BUWxxFZ5jbRr9E3aHOiw==
+X-Received: by 2002:a05:600c:705:b0:424:a4f1:8c3e with SMTP id 5b1f17b1804b1-4257a074b50mr68377395e9.34.1719930287765;
+        Tue, 02 Jul 2024 07:24:47 -0700 (PDT)
+Received: from localhost ([45.130.85.5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256f55c4b5sm186586065e9.43.2024.07.02.07.24.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:21:57 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  kernel-team@cloudflare.com
-Subject: Re: [FYI] Input route ref count underflow since probably 6.6.22
-In-Reply-To: <20240701163826.76558147@kernel.org> (Jakub Kicinski's message of
-	"Mon, 1 Jul 2024 16:38:26 -0700")
-References: <87ikxtfhky.fsf@cloudflare.com>
-	<20240701163826.76558147@kernel.org>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Tue, 02 Jul 2024 16:21:56 +0200
-Message-ID: <87wmm3euwr.fsf@cloudflare.com>
+        Tue, 02 Jul 2024 07:24:47 -0700 (PDT)
+From: Leone Fernando <leone4fernando@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	willemb@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Leone Fernando <leone4fernando@gmail.com>
+Subject: [RESEND PATCH net-next v2 0/4] net: route: improve route hinting
+Date: Tue,  2 Jul 2024 16:24:02 +0200
+Message-Id: <20240702142406.465415-1-leone4fernando@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 01, 2024 at 04:38 PM -07, Jakub Kicinski wrote:
-> On Fri, 28 Jun 2024 13:10:53 +0200 Jakub Sitnicki wrote:
->> We've observed an unbalanced dst_release() on an input route in v6.6.y.
->> First noticed in 6.6.22. Or at least that is how far back our logs go.
->> 
->> We have just started looking into it and don't have much context yet,
->> except that:
->> 
->> 1. the issue is architecture agnostic, seen both on x86_64 and arm64;
->> 2. the backtrace, we realize, doesn't point to the source of problem,
->>    it's just where the ref count underflow manifests itself;
->> 3. while have out-of-tree modules, they are for the crypto subsystem.
->> 
->> We will follow up as we collect more info on this, but we would
->> appreciate any hints or pointers to potential suspects, if anything
->> comes to mind.
->
-> Hi! Luck would have it the same crash landed on my desk.
-> Did you manage to narrow it down?
+In 2017, Paolo Abeni introduced the hinting mechanism [1] to the routing
+sub-system. The hinting optimization improves performance by reusing
+previously found dsts instead of looking them up for each skb.
 
-Nothing yet. Will keep you posted.
+This patch series introduces a generalized version of the hinting mechanism that
+can "remember" a larger number of dsts. This reduces the number of dst
+lookups for frequently encountered daddrs.
+
+Before diving into the code and the benchmarking results, it's important
+to address the deletion of the old route cache [2] and why
+this solution is different. The original cache was complicated,
+vulnerable to DOS attacks and had unstable performance.
+
+The new input dst_cache is much simpler thanks to its lazy approach,
+improving performance without the overhead of the removed cache
+implementation. Instead of using timers and GC, the deletion of invalid
+entries is performed lazily during their lookups.
+The dsts are stored in a simple, lightweight, static hash table. This
+keeps the lookup times fast yet stable, preventing DOS upon cache misses.
+The new input dst_cache implementation is built over the existing
+dst_cache code which supplies a fast lockless percpu behavior.
+
+The measurement setup is comprised of 2 machines with mlx5 100Gbit NIC.
+I sent small UDP packets with 5000 daddrs (10x of cache size) from one
+machine to the other while also varying the saddr and the tos. I set
+an iptables rule to drop the packets after routing. the receiving
+machine's CPU (i9) was saturated. 
+
+Thanks a lot to David Ahern for all the help and guidance!
+
+I measured the rx PPS using ifpps and the per-queue PPS using ethtool -S.
+These are the results:
+
+Total PPS:
+mainline              patched                   delta
+  Kpps                  Kpps                      %
+  6903                  8105                    17.41
+
+Per-Queue PPS:
+Queue          mainline         patched
+  0             345775          411780
+  1             345252          414387
+  2             347724          407501
+  3             346232          413456
+  4             347271          412088
+  5             346808          400910
+  6             346243          406699
+  7             346484          409104
+  8             342731          404612
+  9             344068          407558
+  10            345832          409558
+  11            346296          409935
+  12            346900          399084
+  13            345980          404513
+  14            347244          405136
+  15            346801          408752
+  16            345984          410865
+  17            346632          405752
+  18            346064          407539
+  19            344861          408364
+ total          6921182         8157593
+
+I also verified that the number of packets caught by the iptables rule
+matches the measured PPS.
+
+TCP throughput was not affected by the patch, below is iperf3 output:
+       mainline                                     patched 
+15.4 GBytes 13.2 Gbits/sec                  15.5 GBytes 13.2 Gbits/sec
+
+[1] https://lore.kernel.org/netdev/cover.1574252982.git.pabeni@redhat.com/
+[2] https://lore.kernel.org/netdev/20120720.142502.1144557295933737451.davem@davemloft.net/
+
+v1->v2:
+- fix bitwise cast warning
+- improved measurements setup
+
+v1:
+- fix typo while allocating per-cpu cache
+- while using dst from the dst_cache set IPSKB_DOREDIRECT correctly
+- always compile dst_cache
+
+RFC-v2:
+- remove unnecessary macro
+- move inline to .h file
+
+RFC-v1: https://lore.kernel.org/netdev/d951b371-4138-4bda-a1c5-7606a28c81f0@gmail.com/
+RFC-v2: https://lore.kernel.org/netdev/3a17c86d-08a5-46d2-8622-abc13d4a411e@gmail.com/
+
+Leone Fernando (4):
+  net: route: expire rt if the dst it holds is expired
+  net: dst_cache: add input_dst_cache API
+  net: route: always compile dst_cache
+  net: route: replace route hints with input_dst_cache
+
+ drivers/net/Kconfig        |   1 -
+ include/net/dst_cache.h    |  68 +++++++++++++++++++
+ include/net/dst_metadata.h |   2 -
+ include/net/ip_tunnels.h   |   2 -
+ include/net/route.h        |   6 +-
+ net/Kconfig                |   4 --
+ net/core/Makefile          |   3 +-
+ net/core/dst.c             |   4 --
+ net/core/dst_cache.c       | 132 +++++++++++++++++++++++++++++++++++++
+ net/ipv4/Kconfig           |   1 -
+ net/ipv4/ip_input.c        |  58 ++++++++--------
+ net/ipv4/ip_tunnel_core.c  |   4 --
+ net/ipv4/route.c           |  75 +++++++++++++++------
+ net/ipv4/udp_tunnel_core.c |   4 --
+ net/ipv6/Kconfig           |   4 --
+ net/ipv6/ip6_udp_tunnel.c  |   4 --
+ net/netfilter/nft_tunnel.c |   2 -
+ net/openvswitch/Kconfig    |   1 -
+ net/sched/act_tunnel_key.c |   2 -
+ 19 files changed, 291 insertions(+), 86 deletions(-)
+
+-- 
+2.34.1
+
 
