@@ -1,457 +1,380 @@
-Return-Path: <netdev+bounces-108582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CFB924708
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:07:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8E6924715
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74E101F267FC
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:07:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCB7A1C23412
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAA51C9EA3;
-	Tue,  2 Jul 2024 18:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1B01C8FA2;
+	Tue,  2 Jul 2024 18:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvKm657c"
+	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="xagwIUN6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from repost01.tmes.trendmicro.eu (repost01.tmes.trendmicro.eu [18.185.115.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480A91C688B
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 18:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719943642; cv=none; b=R0XR/P/v5GqgFxqMPGVx8+na5eIz7j18sJeP74ckWq1nNaK/ibz3HTrv/ATy3x9tqFUpJzbcx+uueG881a+ji9kAHZL0mlZ1THjEWidmBO7ktnNvr9qnbvOQ52u/a5NLnSpRQUbbWKUqemYf2TyPgEW9UVKbnaKLPiGcU+9xrr8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719943642; c=relaxed/simple;
-	bh=u8q6Zg1/kOJfxNM/YrQu/ZYNY7ZV9dNmgcJ7TSHaezs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=llGkUxunCgxKsoYOy4luCEpPKNoekIvERdNJi8QEThPUe4UQxuYog86pYtEtl+qA886jEL/A6RizKST/WWWqX83MlCIPtlq3JVnPVgpdlHvuwkUPE7UqiwvOfeovtMEAh8ReLGPh+wbjqoS5k6mojFp5h7GqbN0O0caUpiOtHQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvKm657c; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719943641; x=1751479641;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=u8q6Zg1/kOJfxNM/YrQu/ZYNY7ZV9dNmgcJ7TSHaezs=;
-  b=hvKm657cP9l4oCYsE4PoQRk+tZSUxrujaItcPKVkjUQRCE3fLi8K22un
-   8J/7HWgDLizvX81GMkP6dn7FTKFaitFre7ssiKe/U5MB04V7Qfhl04QVZ
-   My/n4uCyxcQ/y69OaqBRjmLjdO4sX1F++FcJ6EV4GuYHsDIVDLG5+9NtC
-   jh+FRnHPaT5k9hlHO9g6XUzPI3LFaKclJCDMWIfxlQIYVsugwSh29KLnP
-   N780xZZzXD0S3Z/8O3Hu0SYiGCa+2OqaPL1Cbinqpb0viCTbbyfL7QG7s
-   kug9PMvg7xYq7TPQrti/VDSo+h+OhjyxSgjWqO9Sk3SdyOGPMAnnZ9U4I
-   g==;
-X-CSE-ConnectionGUID: VeSrx1AXTuSOwyLYoTyw2Q==
-X-CSE-MsgGUID: ZyLV8uHNQIOi7OGePQlKAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="16964050"
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="16964050"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 11:07:19 -0700
-X-CSE-ConnectionGUID: hAnZPYklQiCccAgZjGJX2w==
-X-CSE-MsgGUID: TMFtooYqQCOkcVuo50Iz/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="50321236"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 02 Jul 2024 11:07:18 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Anil Samal <anil.samal@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 3/3] ice: Implement driver functionality to dump serdes equalizer values
-Date: Tue,  2 Jul 2024 11:07:07 -0700
-Message-ID: <20240702180710.2606969-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240702180710.2606969-1-anthony.l.nguyen@intel.com>
-References: <20240702180710.2606969-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0B11C688B
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 18:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=18.185.115.118
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719943928; cv=fail; b=fPRBZL8VyzhoQiB/raN49Afo0GK8hYmxANIQy35AxWggF+62VVKsoGVGdQKKNI5c6MolrJdsoiCMCdvdVAessYO4Fzvr5/np/RB8EomdEAD3xXUmu2eMSFztvfSOj+/ygkuU6qfun2uFPOVbMqk0UHGzXU08BHAoR0Ovz+nhO9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719943928; c=relaxed/simple;
+	bh=/1RyhdWuhE2h/M6ptVq5HifNqDe2FP6rXIqHX1WQJXk=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FFTHHy+jX4kVsRqAU9F/9Jq5Jr/dgxf1A2GRDvZ4MKtGcTfd1iJZ8/LNIND5m7qG3jkNMDNhSD5gTw2A/pENivvI/lAMwvrnw9hg9IDyecwhzDNAYw8mJ/PqHvbbFV2BUaf57zpxN+2pAU4xLRGc/aY52tKVD5zWqnSpV27LTAo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com; spf=pass smtp.mailfrom=opensynergy.com; dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b=xagwIUN6; arc=fail smtp.client-ip=18.185.115.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
+Received: from 40.93.78.51_.trendmicro.com (unknown [172.21.186.216])
+	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 2AE7810000E24;
+	Tue,  2 Jul 2024 18:12:04 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1719943923.409000
+X-TM-MAIL-UUID: 9b1658d3-0e1c-44c3-976b-68d4b06591e1
+Received: from FR5P281CU006.outbound.protection.outlook.com (unknown [40.93.78.51])
+	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id 6432D10005BDE;
+	Tue,  2 Jul 2024 18:12:03 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CHx+FJodBH+qO25pxM5qiw8ceP7ZJ52l91m4l3N7NItseinwoE6olTK8Ege8vvrXz8xYjxQ0ixSjIZ63iCU24LmMAOm8JtAqGpO+5dVacKEm73p33Vnd+HdlCyVNUkLtX82PIMsUppZS42+oBDcTks3SsqG3l8//7l9NpAM7zbl7W08wPDeahhqZstuBUveAbuPczH44DpznNiQ2/wHBSnoba+rfCHQYuRBqMHllcL5lfLNDq+V8IhsAJMwr38VWKAxO9T//j6o543uznwHnoQwNaxywuftAF/yYyvA0m+LgH+V2FfV3JhZdpxhcxNg6RqWE6v6B1eTN7qk2bxMHqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iuEkj3O24I1/3yz0THjIq4ZazNs8mpYjAk2QQdrPqSk=;
+ b=O2j9XP4JwuQEnyXv+4hdnW0iVi1UIfidIgeX0gAATc+KKl1g6+QC9+vH+XEwN2YCQasnBzh377Efg+6HieuaxQ2zJEDDEgFN1Z6553S+B8erVVyUHe9DfTFpl5RprAN4fu1quMTs3aqQvWR7OsyPtj7fWjvPIM/vffTCygtLltFW14kZe+gP6UJb9sthOetB+tBqlJKe4ZvaG9mahdMBJ2+hI0U95z7sKXZsCe2uH/6Y43e7Jt0itlGCuOfrjOiBiwvMuTLW46fDomOocFShNZsHB+6nOn3/5xM5fgSNPc/2PIpEm72JRREPeF/qUT8wHxiaT14opZylvn/pNERbgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=opensynergy.com; dmarc=pass action=none
+ header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=opensynergy.com;
+Message-ID: <19c75212-bcb6-49e3-964d-ed727da2ba54@opensynergy.com>
+Date: Tue, 2 Jul 2024 20:12:00 +0200
+From: Peter Hilber <peter.hilber@opensynergy.com>
+Subject: Re: [RFC PATCH v2] ptp: Add vDSO-style vmclock support
+To: David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>
+Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>,
+ Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>
+References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
+ <684eac07834699889fdb67be4cee09319c994a42.camel@infradead.org>
+ <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com>
+ <db594efd5a5774748a9ef07cc86741f5a677bdbf.camel@infradead.org>
+ <c0ae63fc88365c93d5401972683a41112c094704.camel@infradead.org>
+ <4a0a240dffc21dde4d69179288547b945142259f.camel@infradead.org>
+ <8d9d7ce2-4dd1-4f54-a468-79ef5970a708@opensynergy.com>
+ <bdcafc76ea44db244b52f8a092287cb33950d5d6.camel@infradead.org>
+ <db1113d5-a427-4eb7-b5d1-8174a71e63b6@opensynergy.com>
+ <c69d7d380575e49bd9cb995e060d205fb41aef8f.camel@infradead.org>
+ <2de9275f-b344-4a76-897b-52d5f4bdca59@opensynergy.com>
+ <BC212953-A043-4D65-ABF3-326DBF7F10F7@infradead.org>
+ <51087cd7149ce576aa166d32d051592b146ce2c4.camel@infradead.org>
+ <cb11ff57-4d58-4d47-824b-761712e12bdc@opensynergy.com>
+ <3707d99d0dfea45d05fd65f669132c2e546f35c6.camel@infradead.org>
+Content-Language: en-US
+In-Reply-To: <3707d99d0dfea45d05fd65f669132c2e546f35c6.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BE1P281CA0321.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:87::18) To BE1P281MB1906.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:3d::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BE1P281MB1906:EE_|BEZP281MB2245:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1324107-f65c-416d-3601-08dc9ac278a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?KzhuNC9WTWJmdmE4STFOOFhKNXd6cE1xaFZ5UWJad3BjMEhrKzhiQmhqaHJZ?=
+ =?utf-8?B?NGpFdlJmdTB3OTJ1VGc1UmtqRlhTSDdSVGNyQndPZ3JGUDJBMmM0Z0JzZE1t?=
+ =?utf-8?B?ZzhXQS9CT3huZ1dWVElVOG1BOE1rR01wWUtHaU54ZTJnOGh2aytVMmU2UlYr?=
+ =?utf-8?B?V0FVcDQzM0NWc1duV0tqTlMrRTQ5WkF1K3k1VStNVkV1WWxhbEgrWEJMd3ZN?=
+ =?utf-8?B?OHF4RHg0K1pFYW9NZ1Axd1Z5RHlMOU1GYlJRd0JVbWxma2tyQWNuOHRYY3ZC?=
+ =?utf-8?B?d2NxcFdLWGJXemI5K2ZuRjVBU1hwWnJIV3pBdThJR3JoejdQTitiMkdsaWtW?=
+ =?utf-8?B?emZ2RkFVa3p2VHZHUkRWNlRmbXJSNDRCREttbTJMZEFWTHRrNDh1ZlVmUVVi?=
+ =?utf-8?B?c3k1WHh3Tmk3VklDa1pFWmZ2NmNrSFR6NkhYSjJwVEhuaW9YQkxzWXdML1VP?=
+ =?utf-8?B?LzhiZC9PNE5qdW1GK0I3UGZIT2pMTjllalR1cFdZTTlLeWxDL3N0a1Z4cHY3?=
+ =?utf-8?B?ZHROUkZEbVhaMVdoSmYzWitrVUhxZDZtZDJnbkF6d3EreHd3cHJEUXZoVVR4?=
+ =?utf-8?B?V01XWk9HZHM0bnlpK2FXZi8wTDVBblZiS2NzcTRuRzk2MERKNnRIY3JHOWp1?=
+ =?utf-8?B?NFF1cU9MQXZqY1lFOGtMSXcrWWVPdyswUzZzQlR1UWVXdXNGaitNQ2dqOWc3?=
+ =?utf-8?B?K1hNTjZNRExBYWtHZDQwWmZBVXU0MDZGNjdpcmVvOWhYYkFtb1FMb2tub0pH?=
+ =?utf-8?B?L3Ivd2pHR0kydnVSay9sT2tkWks0dEFqL0g4OTlDd0llM21NTTg2cHZVL2Z2?=
+ =?utf-8?B?K1QrdTBxektDajMvWUp1TUo0N3Y4S2NHUStLS1N0VHJpd1hRcXVUKzJvTEpZ?=
+ =?utf-8?B?Vk9qVTJ0eVViaG5oQVIvaTdWSDFWZnN2Kytoc0dxVmE0cG9ZNjJMdjV1bEcw?=
+ =?utf-8?B?Nk1uRWQvRGpINk5zVVZSVTQyd1BYNEhzTUQ3d1B6VEFzelMwL1ZjajYzb2Js?=
+ =?utf-8?B?VVN6Z0ZGK0ZnRTJnK0d1OVB0SUszNlYwTGQ1NWdLRXA0MEJBN09waXhVMllC?=
+ =?utf-8?B?QkxuaGRWdDVOV25QalpjNXZYTitnSmdjaEtXYVJjSkZyOHNCbzJoT3VsWXl6?=
+ =?utf-8?B?M0ltbXZqL3YvNGRDYmdyL0MwQ0xIUTJkVlk1M0dqelZJbXlxM0o1cSswV24x?=
+ =?utf-8?B?bFNZbEJsUkJMcElDTWN3ZTY2bS9ZV0R2OCtCUGcrRmFNMmxEYktRaGFINE1n?=
+ =?utf-8?B?ZnpZVzJyeGhJdk1CYytsaUVDYlB1MnRDejZrb0JmVnJmbWpTWk9pR0tBb2tJ?=
+ =?utf-8?B?VnpJQkU1Ym03Q2trZnhtUVYvZVdZWHFqWXNGVlBkczF5WThmQmZ0Mkc2UkdS?=
+ =?utf-8?B?ZjJUZlc3byswU1pjK004bjhlS3dBMkVLdUZKTCtRWldjVjYrbjdWT1RpSFFr?=
+ =?utf-8?B?bWtZMDRaR2R4SStuWlhma1huLytxNndYYlBlM3RaM0NWZHhvTDhhMkNoQXA5?=
+ =?utf-8?B?SGZ5UmMzalBLRUVBbjBaVDN2S2s4aWt4MnZuL0xvUkRSMHdPMkFmUURDUitj?=
+ =?utf-8?B?RGNQMHB5R2wzOG1xSEc0Z3V4OCtVdyt4c3lDdDlQb21JVmJ6RENuWjYzUFkr?=
+ =?utf-8?B?OXh1SmtrSEhFaTVsSFpZc1RCbVlYcU9CUFBQb3RiNU5NeG05a2lyOUhMd05F?=
+ =?utf-8?B?MnVqS0lhWHJhMzljd1lOa3ZGQU5RbDVBWHYrc1BmMXd2cEdoeVE0c0ZvUS9o?=
+ =?utf-8?B?YWdYVEd5OG5OM2FQQmhXTFoycFZFREVSY2w0Y1BxRWlBN250NDBhbEo3WkVM?=
+ =?utf-8?B?MEE0WjF3aUpGWWZmUDM4RHB5OHR1ZFBLQUZOZ1k1MXRWV3dOM2NTK1JrSkU0?=
+ =?utf-8?Q?OssOk3adNHaww?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BE1P281MB1906.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WHp5V1dJTWwzbnY0UWlJeko2dUQvd3dud1JwblErMFhqSmZuWk5WV0NZdlIz?=
+ =?utf-8?B?WDBWOVNvNXU4U1ArVGQvZ3dvQlFuZTBYL3BaRlV1Tm5VQ2lJUkcxN2wxMTV5?=
+ =?utf-8?B?UkQwcUNGV3FiS05oMVJwT2dvQ082NTliYUQwcUpHWTJwdnZmZ1BQQ1NkVmJu?=
+ =?utf-8?B?c21oUmppdUR0anhGdXRlVEtCRlA1bVl6Zm1WQnBPcWZlYVhmVHF6cjNBbnVh?=
+ =?utf-8?B?Q1Nyem1DcG9VR0NXUGx5NWZDTW1HL0J6Vm9Senp1YTZGWUlkUHNueVBQRU9q?=
+ =?utf-8?B?ZEdad0NMbkNJMlV6M005MmhlRmppck1XL3lGZUpUT2dSWkdPRUZDVzRweWRU?=
+ =?utf-8?B?azUyMjdiQnVhK3U2YVZwWUNzWjJaNHU4VVB1STV6UXRXRnByaFdNdW1kTDVW?=
+ =?utf-8?B?dVFjNVVvdDhjcHJCZE1SSUtmOEV0NHB6eSs0Mmt1aDdxSVIxNHlpeFNySXV3?=
+ =?utf-8?B?V3J4YjgwTWtLKzFGWVBLMFJMYW1TNUxHWVNER25HczRzcjVpYUdBcHBlRDhn?=
+ =?utf-8?B?dnBlbUd5OGRpeDVwUDg4eUI4U1gzTkNIbDlhcC9UWEJ3SGhFUndhQ2NULzU0?=
+ =?utf-8?B?MzZISkZpUlJNQSsxaXowUVVQNk1QRUZrQ1hYb2tyMFA4dGlhRDE0MUVXb1RQ?=
+ =?utf-8?B?RkQrNSt1dGRDd0Z1clNjZ0pBdHdHUXBIL0JZQUQ5SEU2QWlzUXEvd1JsQm5j?=
+ =?utf-8?B?VlRWSkNKSEh1UnRVSHFqOGMyMjEvZS85Q3VQMkQ1QTU1RnF0SGpkM1p1OUdn?=
+ =?utf-8?B?RnAyNyszYzhiU0RxbVlaVGozc2J5MVQwbDAvaG94QjJjN0RtSzNXZjVpelpI?=
+ =?utf-8?B?NTZkMFpIcXRkV3VWV290R3B3aS9NNnRVc25rL2tiQmNNWXZ1UUZuRGlaVjho?=
+ =?utf-8?B?ZnZHaitWdmpUc2dYZXBGZXkwMklpcUJXMUx2WE5vOGpTOStPTnkrT1psejF2?=
+ =?utf-8?B?Q3o4WnQxd0N1MHlGTWM1a2Iwd21UVUNUVW5abXFBRjRrUlRScVBXREV1c21G?=
+ =?utf-8?B?WTZHaE1DbVlNZ2hkYTlEMlpwWklSYlp1Mm1tZDU4V2w0NUVZTlBYeENHRGcv?=
+ =?utf-8?B?OVJGSVgxYjN5d2RUOGtubzJmUkxjUEN3Qmt5cGpRbWMxRVRZWThPaDVJWWZH?=
+ =?utf-8?B?dkJFVEVpTGExLzhQNEdPWk5sRXJtMlY0SWVEdFNURVNQbkR1eS82bVk4MTUv?=
+ =?utf-8?B?SzIyRStPZXJ4UElvd01Idzg5Q3lGMGUvNFR3OWEzcTM3cmphM2Fad1V1M1Jz?=
+ =?utf-8?B?SWw5OTYwQU5GN2RtNDNmTTcrU3hhMkUydGtQOHFXRWpBb2dPdW9SVmIyUnhp?=
+ =?utf-8?B?TzVISEZjbzhwWXh2dVlNNjFxNlpOT2RXS0pHNnBNbHlIdHBweWI2ckxMcFc1?=
+ =?utf-8?B?aHdhdlJ0cmNhNlo5cXF6QlpWVlc5d2twaERzR1p3a0laSnI2R04reWtXaWh0?=
+ =?utf-8?B?OWdRbGJvaldnTnhEb0g1QmQwdmZoR2Qyc3d6VVpnV01LVmwzUFREUGRFK0hB?=
+ =?utf-8?B?anNRc0lpblZkMnBlYlRzL3Z3Q2ROK2ROL0pPNmFBbVBCellvcEZtOW95cklY?=
+ =?utf-8?B?WTdjM3U2K2FORER0TERPbm95VVBUQStvL21XRjFPTitOTXV0c0RRaWpsaEU3?=
+ =?utf-8?B?NVBkbHlxUVZLZ3I2RS9maGlaY2hlMFRhak4wZVRjUS9tRFlCRGdOVGFXd0JZ?=
+ =?utf-8?B?YjNseUZiM3M3QnlYMmFEMDFraTZsbmIrakh4OXhmU3hkTFZyL1BrYzdzOVQ2?=
+ =?utf-8?B?TFFTcEpoTG5McU03STRLY21XMk5JM3orWUpyWTExYXJVVndQVnhWS3ViTmFp?=
+ =?utf-8?B?RjRaRHZYSi9UcS9UdHFkYTdkN2o5WnVNTFNtWG9FSW9NRllqTWQ5cmtrcktq?=
+ =?utf-8?B?YlRwRkNQb3p1SGFZQnRzZmIyVzlxWWNiSXdjK3ZYRnovbDQvN0RraTBYR2My?=
+ =?utf-8?B?eVhNQVFMODlxaXY4V3R6YzNBY2oyMm9aQ3FBU0toTTJXY1lJZXVFMjZtMkZX?=
+ =?utf-8?B?N2ROVTVSa3lxWlltZ3ZnbG5ZV0NxbGZLamtQSHR6b2JReWZYem5BenBKMDdl?=
+ =?utf-8?B?RDJ4Z1dtN1RFVVMzWVZDcmVHNE1ZcUx0aFFPaHZEZzcvcUxNcG1kL1ZEVk5l?=
+ =?utf-8?B?U24va09aSDZvSitZck96aDg5eHZ6M1N1Ri9oVmpMMWc2djEranN2QXNKTE5T?=
+ =?utf-8?Q?VRBZ6OIJ2Tc2XTLKtfg0tSV7tJ0DdUEW+BQ4HZ5X8BAg?=
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1324107-f65c-416d-3601-08dc9ac278a8
+X-MS-Exchange-CrossTenant-AuthSource: BE1P281MB1906.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2024 18:12:01.9376
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tj4YGfjZeIacXjwqOsLab969WBbFE8nseGTX2kMX9JZ1uYjxiZMMOoN4cpJaMS9g0tUATY0yH1szObpiEDiCcA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEZP281MB2245
+X-TM-AS-ERS: 40.93.78.51-0.0.0.0
+X-TMASE-Version: StarCloud-1.3-9.1.1026-28502.001
+X-TMASE-Result: 10--21.682300-4.000000
+X-TMASE-MatchedRID: ZFzIhWOuIzv5ETspAEX/ngw4DIWv1jSVbU+XbFYs1xIRU2V0pUrEuth1
+	HxXdHsI8rom31Her2mfAaX2MpgGS385v+H7gn35I7hzwMwStqTsS5Hzh70YD4oo6vdFKcH6Ogbr
+	9ms5C/Dje15dnDpkp2t3XCdWPo+xewmD/OoYb7ItcB5L7DliBJS+ckrkAB5mQi9dqe3GagVjNwE
+	HRsS7DKnaxXrGAWyiSBvco4mEge2h2MDBkdqe8kIO2sppVKEGO7gd5SqHIhjIEo7RuIMv80CkSG
+	6psrYlInL8fU/fu1hTWMgFUl++77H1oaxkqu7I4H7WbjGX5tkmB1fO2o4QGcM7uFDejoNiC5Eib
+	31BWLes/LKCM0Y80j4jNdqqk+SlcXRJSl4ZYvKLGdq9RSTxjI80baotdQU5OS4l8zny2qZ70u9h
+	BgtYHEzsmAXzvHn0kjHk5JhbV9uagwuHyu9UsLAvpq/ti8dx8EAcRQPO2TzjW6I4Shu1jquihCT
+	u0kel4JLyRa7A4dIeV1h6ijsb1eK0AyU/iBF0WJPlTeUnhPwqlrcQNKg029ImRx7OV7paz3CH2Z
+	Nj9XqUWtOyzfwL8xlo7GmCOJYd1AqYBE3k9Mpw=
+X-TMASE-XGENCLOUD: 3423d488-40a1-474f-8f73-12947f7fc5c1-0-0-200-0
+X-TM-Deliver-Signature: 2724CFDC703C590015F26FA2AC843870
+X-TM-Addin-Auth: roIEs28Jp4JQo8QJkRs9LmVyOUlGjuBduFSDuet9fYOU4ODU0VF1ToLTHvt
+	cEDHdhnkx4Iby6FfcApfsN+Iq7fUvHsrFCW0YH3k7MY2nLiOIcjMZFsbOCnLsJL5QQHLdQcfpIE
+	Fy3fymxgcTfZ8QYh0z3DvKwvoMJx6GAB0X0oYXjhEF+VF+aRo8YI/sqS1fa+NQ1WKDISp9LjcNx
+	GX/0JWhgpCil3SXOJv5LsxJcTtZmXzVABrrpE4BlQcTX4BK+YllifCbKfw7lYMITCu7dM+xUCr9
+	7GKx7E/lx2fse6I=.CoG0pdLofuhpfiENnENDkvvOeus7R0yqZYDE9LOBodYLBHqlvo7TFx0iRW
+	nhQJ5Hf+AoFCYWDGGVYNwr+hkZiaq03v7jWSd2UNOmKLMA59hH2nz14hO+0j0zsn01YzjE56UfI
+	6oeYVccdFMyoiI/ppxKCO4qxox237yfFw7AwLJS1T6D9Qj95AEa0uErPE6MEyswx6tVjJstJv7H
+	ljn9nirQySBcVvEI+Ay8IZGwj2wedmMENTq4842jhfRTr0+7FUx0mlzu3OnKxY6JZLN+aE2KXdT
+	ieNxU7JYXDPUG3q49CG0G96DbZMya+8F05Eeh6/DS/vqqWzlPZYyAcnNf7Q==
+X-TM-Addin-ProductCode: EMS
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
+	s=TM-DKIM-20210503141657; t=1719943923;
+	bh=/1RyhdWuhE2h/M6ptVq5HifNqDe2FP6rXIqHX1WQJXk=; l=6144;
+	h=Date:From:To;
+	b=xagwIUN6c4Iv4TXPePCzl2LlcL6aTZ1BjWqy/KqQ6O7Fum07Qtm2UzOFlbJSrovqb
+	 aNIDTHbefTigUL6auXudkKgSKREkX+2y8yU20sp36g5/XCwg/MyzRPr6cjy/WT2HJx
+	 S3JS8s2e6SK93MnVUBSaZwZakMLOP7+wHAroqTZRVcQC+a1Hxm5orfBbjFb/0WeLyP
+	 7cX0n+YX29F/Og/hi/wIDXKuJjHLq2sw12yRlEj5yueDRUD43D4H90s8qkcdK44Kra
+	 krXkqlYhn9ov5OSQUKFpiMC3NBIDfKZnDtfdSJyV00cBhmq8dGh1WVPdYFEAnAXaat
+	 7VsVydY147vgw==
 
-From: Anil Samal <anil.samal@intel.com>
+On 02.07.24 18:39, David Woodhouse wrote:
+> On Tue, 2024-07-02 at 17:03 +0200, Peter Hilber wrote:
+>>> On 01.07.24 10:57, David Woodhouse wrote:
+>>>>> If my proposed memory structure is subsumed into the virtio-rtc
+>>>>> proposal we'd literally use the same names, but for the time being I'll
+>>>>> update mine to:
+>>>
+>>> Do you intend vmclock and virtio-rtc to be ABI compatible?
+> 
+> I intend you to incorporate a shared memory structure like the vmclock
+> one into the virtio-rtc standard :)
+> 
+> Because precision clocks in a VM are fundamentally nonsensical without
+> a way for the guest to know when live migration has screwed them up.
+> 
+> So yes, so facilitate that, I'm trying to align things so that the
+> numeric values of fields like the time_type and smearing hint are
+> *precisely* the same as the VIRTIO_RTC_xxx values.
+> 
+> Time pressure *may* mean I have to ship an ACPI-based device with a
+> preliminary version of the structure before I've finished persuading
+> you, and before we've completely finalized the structure. I am hoping
+> to avoid that.
+> 
+> (In fact, my time pressure only applies to a version of the structure
+> which carries the disruption_marker field; the actual clock calibration
+> information doesn't have to be present in the interim implementation.)
+> 
+> 
+>>>  FYI, I see a
+>>> potential problem in that Virtio does avoid the use of signed integers so
+>>> far. I did not check carefully if there might be other problems, yet.
+> 
+> Hm, you use an unsigned integer to convey the tai_offset. I suppose at
+> +37 and with a plan to stop doing leap seconds in the next decade,
+> we're unlikely to get back below zero?
+> 
 
-To debug link issues in the field, serdes Tx/Rx equalizer values
-help to determine the health of serdes lane.
+I think so.
 
-Extend 'ethtool -d' option to dump serdes Tx/Rx equalizer.
-The following list of equalizer param is supported
-    a. rx_equalization_pre2
-    b. rx_equalization_pre1
-    c. rx_equalization_post1
-    d. rx_equalization_bflf
-    e. rx_equalization_bfhf
-    f. rx_equalization_drate
-    g. tx_equalization_pre1
-    h. tx_equalization_pre3
-    i. tx_equalization_atten
-    j. tx_equalization_post1
-    k. tx_equalization_pre2
+> The other signed integer I had was for the leap second direction, but I
+> think I'm happy to drop that and just adopt your uint8_t leap field
+> with VIRTIO_RTC_LEAP_{PRE_POS,PRE_NEG,etc.}.
+> 
+> 
+> 
+> 
+> 
+>>>>>
+>>>>>         /*
+>>>>>          * What time is exposed in the time_sec/time_frac_sec fields?
+>>>>>          */
+>>>>>         uint8_t time_type;
+>>>>> #define VMCLOCK_TIME_UTC                0       /* Since 1970-01-01 00:00:00z */
+>>>>> #define VMCLOCK_TIME_TAI                1       /* Since 1970-01-01 00:00:00z */
+>>>>> #define VMCLOCK_TIME_MONOTONIC          2       /* Since undefined epoch */
+>>>>> #define VMCLOCK_TIME_INVALID            3       /* virtio-rtc uses this for smeared UTC */
+>>>>>
+>>>>>
+>>>>> I can then use your smearing subtype values as the 'hint' field in the
+>>>>> shared memory structure. You currently have:
+>>>>>
+>>>>> +\begin{lstlisting}
+>>>>> +#define VIRTIO_RTC_SUBTYPE_STRICT 0
+>>>>> +#define VIRTIO_RTC_SUBTYPE_SMEAR 1
+>>>>> +#define VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR 2
+>>>>> +#define VIRTIO_RTC_SUBTYPE_LEAP_UNSPECIFIED 3
+>>>>> +\end{lstlisting}
+>>>>>
+>>>
+>>> I agree with the above part of your proposal.
+>>>
+>>>>> I can certainly ensure that 'noon linear' has the same value. I don't
+>>>>> think you need both 'SMEAR' and 'LEAP_UNSPECIFIED' though:
+>>>>>
+>>>>>
+>>>>> +\item VIRTIO_RTC_SUBTYPE_SMEAR deviates from the UTC standard by
+>>>>> +       smearing time in the vicinity of the leap second, in a not
+>>>>> +       precisely defined manner. This avoids clock steps due to UTC
+>>>>> +       leap seconds.
+>>>>>
+>>>>> ...
+>>>>>
+>>>>> +\item VIRTIO_RTC_SUBTYPE_LEAP_UNSPECIFIED may deviate from the UTC
+>>>>> +       standard w.r.t.\ leap second introduction in an unspecified
+>>>>> way
+>>>>> +       (leap seconds may, or may not, be smeared).
+>>>>>
+>>>>> To the client, both of those just mean "for a day or so around a leap
+>>>>> second event, you can't trust this device to know what the time is".
+>>>>> There isn't any point in separating "does lie to you" from "might lie
+>>>>> to you", surely? The guest can't do anything useful with that
+>>>>> distinction. Let's drop SMEAR and keep only LEAP_UNSPECIFIED?
+>>>
+>>> As for VIRTIO_RTC_SUBTYPE_SMEAR, I think this could be dropped indeed
+>>> (resp., UTC_SLS may be added).
+>>>
+>>> But VIRTIO_RTC_CLOCK_SMEARED_UTC is an assurance that there will be no
+>>> steps (in particular, steps backwards, which some clients might not like)
+>>> due to leap seconds, while LEAP_UNSPECIFIED provides no such guarantee.
+>>>
+>>> So I think this might be better handled by adding, alongside
+>>>
+>>>>> #define VIRTIO_RTC_CLOCK_SMEARED_UTC 3
+>>>
+>>> #define VIRTIO_RTC_CLOCK_LEAP_UNSPECIFIED_UTC 4
+>>>
+>>> (or any better name, like VIRTIO_RTC_CLOCK_MAYBE_SMEARED_UTC).
+>>>
+>>>>>
+>>>>> And if you *really* want to parameterise it, I think that's a bad idea
+>>>>> and it encourages the proliferation of different time "standards", but
+>>>>> I'd probably just suck it up and do whatever you do because that's not
+>>>>> strictly within the remit of my live-migration part.
+>>>
+>>> I think the above proposal to have subtypes for
+>>> VIRTIO_RTC_CLOCK_SMEARED_UTC should work.
+> 
+> To clarify then, the main types are
+> 
+>  VIRTIO_RTC_CLOCK_UTC == 0
+>  VIRTIO_RTC_CLOCK_TAI == 1
+>  VIRTIO_RTC_CLOCK_MONOTONIC == 2
+>  VIRTIO_RTC_CLOCK_SMEARED_UTC == 3
+> 
+> And the subtypes are *only* for the case of
+> VIRTIO_RTC_CLOCK_SMEARED_UTC. They include
+> 
+>  VIRTIO_RTC_SUBTYPE_STRICT
+>  VIRTIO_RTC_SUBTYPE_UNDEFINED /* or whatever you want to call it */
+>  VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR 
+>  VIRTIO_RTC_SUBTYPE_UTC_SLS /* if it's worth doing this one */
+> 
+> Is that what we just agreed on?
+> 
+> 
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Anil Samal <anil.samal@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  51 +++++++
- drivers/net/ethernet/intel/ice/ice_common.c   |  37 +++++
- drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 141 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ethtool.h  |  19 +++
- 5 files changed, 248 insertions(+), 2 deletions(-)
+This is a misunderstanding. My idea was that the main types are
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 621a2ca7093e..b70d4ca43443 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1461,6 +1461,55 @@ struct ice_aqc_get_sensor_reading_resp {
- 	} data;
- };
- 
-+/* DNL call command (indirect 0x0682)
-+ * Struct is used for both command and response
-+ */
-+struct ice_aqc_dnl_call_command {
-+	u8 ctx; /* Used in command, reserved in response */
-+	u8 reserved;
-+	__le16 activity_id;
-+#define ICE_AQC_ACT_ID_DNL 0x1129
-+	__le32 reserved1;
-+	__le32 addr_high;
-+	__le32 addr_low;
-+};
-+
-+struct ice_aqc_dnl_equa_param {
-+	__le16 data_in;
-+#define ICE_AQC_RX_EQU_SHIFT 8
-+#define ICE_AQC_RX_EQU_PRE2 (0x10 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_PRE1 (0x11 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_POST1 (0x12 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_BFLF (0x13 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_BFHF (0x14 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_DRATE (0x15 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_TX_EQU_PRE1 0x0
-+#define ICE_AQC_TX_EQU_PRE3 0x3
-+#define ICE_AQC_TX_EQU_ATTEN 0x4
-+#define ICE_AQC_TX_EQU_POST1 0x8
-+#define ICE_AQC_TX_EQU_PRE2 0xC
-+	__le16 op_code_serdes_sel;
-+#define ICE_AQC_OP_CODE_SHIFT 4
-+#define ICE_AQC_OP_CODE_RX_EQU (0x9 << ICE_AQC_OP_CODE_SHIFT)
-+#define ICE_AQC_OP_CODE_TX_EQU (0x10 << ICE_AQC_OP_CODE_SHIFT)
-+	__le32 reserved[3];
-+};
-+
-+struct ice_aqc_dnl_equa_respon {
-+	/* Equalization value can be negative */
-+	int val;
-+	__le32 reserved[3];
-+};
-+
-+/* DNL call command/response buffer (indirect 0x0682) */
-+struct ice_aqc_dnl_call {
-+	union {
-+		struct ice_aqc_dnl_equa_param txrx_equa_reqs;
-+		__le32 stores[4];
-+		struct ice_aqc_dnl_equa_respon txrx_equa_resp;
-+	} sto;
-+};
-+
- struct ice_aqc_link_topo_params {
- 	u8 lport_num;
- 	u8 lport_num_valid;
-@@ -2564,6 +2613,7 @@ struct ice_aq_desc {
- 		struct ice_aqc_get_link_status get_link_status;
- 		struct ice_aqc_event_lan_overflow lan_overflow;
- 		struct ice_aqc_get_link_topo get_link_topo;
-+		struct ice_aqc_dnl_call_command dnl_call;
- 		struct ice_aqc_i2c read_write_i2c;
- 		struct ice_aqc_read_i2c_resp read_i2c_resp;
- 		struct ice_aqc_get_set_tx_topo get_set_tx_topo;
-@@ -2688,6 +2738,7 @@ enum ice_adminq_opc {
- 	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
- 	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
- 	ice_aqc_opc_get_sensor_reading			= 0x0632,
-+	ice_aqc_opc_dnl_call                            = 0x0682,
- 	ice_aqc_opc_get_link_topo			= 0x06E0,
- 	ice_aqc_opc_read_i2c				= 0x06E2,
- 	ice_aqc_opc_write_i2c				= 0x06E3,
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index a4f175cf5c61..e311a41a74fa 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3371,6 +3371,43 @@ int ice_update_link_info(struct ice_port_info *pi)
- 	return status;
- }
- 
-+/**
-+ * ice_aq_get_phy_equalization - function to read serdes equaliser
-+ * value from firmware using admin queue command.
-+ * @hw: pointer to the HW struct
-+ * @data_in: represents the serdes equalization parameter requested
-+ * @op_code: represents the serdes number and flag to represent tx or rx
-+ * @serdes_num: represents the serdes number
-+ * @output: pointer to the caller-supplied buffer to return serdes equaliser
-+ *
-+ * Return: non-zero status on error and 0 on success.
-+ */
-+int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
-+				u8 serdes_num, int *output)
-+{
-+	struct ice_aqc_dnl_call_command *cmd;
-+	struct ice_aqc_dnl_call buf = {};
-+	struct ice_aq_desc desc;
-+	int err;
-+
-+	buf.sto.txrx_equa_reqs.data_in = cpu_to_le16(data_in);
-+	buf.sto.txrx_equa_reqs.op_code_serdes_sel =
-+		cpu_to_le16(op_code | (serdes_num & 0xF));
-+	cmd = &desc.params.dnl_call;
-+	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_dnl_call);
-+	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_BUF |
-+				  ICE_AQ_FLAG_RD |
-+				  ICE_AQ_FLAG_SI);
-+	desc.datalen = cpu_to_le16(sizeof(struct ice_aqc_dnl_call));
-+	cmd->activity_id = cpu_to_le16(ICE_AQC_ACT_ID_DNL);
-+
-+	err = ice_aq_send_cmd(hw, &desc, &buf, sizeof(struct ice_aqc_dnl_call),
-+			      NULL);
-+	*output = err ? 0 : buf.sto.txrx_equa_resp.val;
-+
-+	return err;
-+}
-+
- #define FEC_REG_PORT(port) {	\
- 	FEC_CORR_LOW_REG_PORT##port,		\
- 	FEC_CORR_HIGH_REG_PORT##port,	\
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index bd814e751cbf..66f29bac783a 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -142,6 +142,8 @@ int
- ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
- 			      struct ice_port_info *pi);
- bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
-+int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
-+				u8 serdes_num, int *output);
- int
- ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
- 		     enum ice_fec_stats_types fec_type, u32 *output);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 886977d53b1a..5c52c693c548 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -463,7 +463,8 @@ ice_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- 
- static int ice_get_regs_len(struct net_device __always_unused *netdev)
- {
--	return sizeof(ice_regs_dump_list);
-+	return (sizeof(ice_regs_dump_list) +
-+		sizeof(struct ice_regdump_to_ethtool));
- }
- 
- /**
-@@ -681,6 +682,140 @@ static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
- 	return 0;
- }
- 
-+/**
-+ * ice_get_tx_rx_equa - read serdes tx rx equaliser param
-+ * @hw: pointer to the HW struct
-+ * @serdes_num: represents the serdes number
-+ * @ptr: structure to read all serdes parameter for given serdes
-+ *
-+ * Return: all serdes equalization parameter supported per serdes number
-+ */
-+static int ice_get_tx_rx_equa(struct ice_hw *hw, u8 serdes_num,
-+			      struct ice_serdes_equalization_to_ethtool *ptr)
-+{
-+	int err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE1,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE3,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre3);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_ATTEN,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_atten);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_POST1,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_post1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE2,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre2);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE2,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_pre2);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE1,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_pre1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_POST1,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_post1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFLF,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_bflf);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFHF,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_bfhf);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_DRATE,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_drate);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_get_extended_regs - returns FEC correctable, uncorrectable stats per
-+ *                         pcsquad, pcsport
-+ * @netdev: pointer to net device structure
-+ * @p: output buffer to fill requested register dump
-+ *
-+ * Return: 0 on success, negative on failure.
-+ */
-+static int ice_get_extended_regs(struct net_device *netdev, void *p)
-+{
-+	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_regdump_to_ethtool *ice_prv_regs_buf;
-+	struct ice_port_topology port_topology = {};
-+	struct ice_port_info *pi;
-+	struct ice_pf *pf;
-+	struct ice_hw *hw;
-+	unsigned int i;
-+	int err;
-+
-+	pf = np->vsi->back;
-+	hw = &pf->hw;
-+	pi = np->vsi->port_info;
-+
-+	if (!hw || !pi)
-+		return -EINVAL;
-+
-+	/* Serdes parameters are not supported if not the PF VSI */
-+	if (np->vsi->type != ICE_VSI_PF)
-+		return -EINVAL;
-+
-+	err = ice_get_port_topology(hw, pi->lport, &port_topology);
-+	if (err)
-+		return -EINVAL;
-+	if (port_topology.serdes_lane_count > 4)
-+		return -EINVAL;
-+
-+	ice_prv_regs_buf = p;
-+
-+	/* Get serdes equalization parameter for available serdes */
-+	for (i = 0; i < port_topology.serdes_lane_count; i++) {
-+		u8 serdes_num = 0;
-+
-+		serdes_num = port_topology.primary_serdes_lane + i;
-+		err = ice_get_tx_rx_equa(hw, serdes_num,
-+					 &ice_prv_regs_buf->equalization[i]);
-+		if (err)
-+			return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- static void
- ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- {
-@@ -690,10 +825,12 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- 	u32 *regs_buf = (u32 *)p;
- 	unsigned int i;
- 
--	regs->version = 1;
-+	regs->version = 2;
- 
- 	for (i = 0; i < ARRAY_SIZE(ice_regs_dump_list); ++i)
- 		regs_buf[i] = rd32(hw, ice_regs_dump_list[i]);
-+
-+	ice_get_extended_regs(netdev, (void *)&regs_buf[i]);
- }
- 
- static u32 ice_get_msglevel(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-index ffc8ad180e61..9acccae38625 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-@@ -9,6 +9,25 @@ struct ice_phy_type_to_ethtool {
- 	u8 link_mode;
- };
- 
-+struct ice_serdes_equalization_to_ethtool {
-+	int rx_equalization_pre2;
-+	int rx_equalization_pre1;
-+	int rx_equalization_post1;
-+	int rx_equalization_bflf;
-+	int rx_equalization_bfhf;
-+	int rx_equalization_drate;
-+	int tx_equalization_pre1;
-+	int tx_equalization_pre3;
-+	int tx_equalization_atten;
-+	int tx_equalization_post1;
-+	int tx_equalization_pre2;
-+};
-+
-+struct ice_regdump_to_ethtool {
-+	/* A multilane port can have max 4 serdes */
-+	struct ice_serdes_equalization_to_ethtool equalization[4];
-+};
-+
- /* Port topology from lport i.e.
-  * serdes mapping, pcsquad, macport, cage etc...
-  */
--- 
-2.41.0
+>  VIRTIO_RTC_CLOCK_UTC == 0
+>  VIRTIO_RTC_CLOCK_TAI == 1
+>  VIRTIO_RTC_CLOCK_MONOTONIC == 2
+>  VIRTIO_RTC_CLOCK_SMEARED_UTC == 3
 
+VIRTIO_RTC_CLOCK_MAYBE_SMEARED_UTC == 4
+
+The subtypes would be (1st for clocks other than
+VIRTIO_RTC_CLOCK_SMEARED_UTC, 2nd to last for
+VIRTIO_RTC_CLOCK_SMEARED_UTC):
+
+#define VIRTIO_RTC_SUBTYPE_STRICT 0
+#define VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR 1
+#define VIRTIO_RTC_SUBTYPE_SMEAR_UTC_SLS 2
 
