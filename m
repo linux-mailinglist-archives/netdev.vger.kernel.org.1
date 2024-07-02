@@ -1,140 +1,103 @@
-Return-Path: <netdev+bounces-108607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54B33924857
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:31:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A285792485B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F19328ACAD
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D230B22304
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22AD6F06A;
-	Tue,  2 Jul 2024 19:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE271C007D;
+	Tue,  2 Jul 2024 19:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=dan.merillat.org header.i=@dan.merillat.org header.b="gfBXwdH8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LK2+1nh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from penfold.furryhost.com (penfold.furryhost.com [199.168.187.9])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4522A4084E
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 19:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.168.187.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F326E5ED
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 19:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719948671; cv=none; b=sRmDyGwVNcAhGObo9W9Wqp4bhKCe1dgCmqWx022qWKXGV1HcYDlWWpuIFqwNYkdgG+7ozC4tTEDdAt/1BUmugCz+eGhvW8xv74o9IM+bFjToihElzuVxa82n0PzVp5X3pH6XZYbsuzEO95iqbld1S+JtI04mHXtYyNaGzrhuGOU=
+	t=1719948802; cv=none; b=ddpvw1iPW/WL/rWGSCNghbHAE1ivLJJSAJd5kepn4x0RLZAdIlqAUYICT4X/4XH1KkT2Vb2s5X+Fr0YhX3EzOyL7KQ9M5DNSekPx5+vuDLi+NcrVo8w2wS6mgfDy8A2/rZoV/HPLVB+MQTlslX/E1EpwEzCXJKsRpRKGGA3krFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719948671; c=relaxed/simple;
-	bh=0ur7NHgsN+e0XRL4YTBEwdgjJAktKbj0mvGuLcZH8bc=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=uJuDLs4uEiefZaDqP8nr5V1ek66ufvkZOSULKaiVmjQRBXjkpkhU+SYDN/RcSHyv0MjrT8NBm9QcbonnPrEZrW/oVzn6qyaP6ZSc01+pmXSOp5is46k+i2aEpaKq5AWWNqrhkVMeM4uxoVuRK4Y/dwFydd8GdlNTd/VR0hm7iVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dan.merillat.org; spf=pass smtp.mailfrom=dan.merillat.org; dkim=pass (1024-bit key) header.d=dan.merillat.org header.i=@dan.merillat.org header.b=gfBXwdH8; arc=none smtp.client-ip=199.168.187.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dan.merillat.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dan.merillat.org
-Received: from [192.168.0.10] (syn-050-088-096-145.res.spectrum.com [50.88.96.145])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dan@merillat.org)
-	by penfold.furryhost.com (Postfix) with ESMTPSA id 8DC3520812;
-	Tue,  2 Jul 2024 15:30:59 -0400 (EDT)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.103.10 at penfold
-DKIM-Filter: OpenDKIM Filter v2.11.0 penfold.furryhost.com 8DC3520812
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dan.merillat.org;
-	s=default; t=1719948659;
-	bh=WehZVrVBpavludTMw9YVWetEyez79ZHA9QVaGRJoDBo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=gfBXwdH8x7Er5OG/yIEBeWdNCCXHHmVs6XtsItotUEOLx0TSt/xhTg2KlrGBo4Acn
-	 KP6JN4BPjIhlmzlsxOG4tD7RhS8R5/Qq+HV+FmEcLmRUCb3/FJIfrkP4SPI/j2TnOZ
-	 bEzR3VU01XSUSwMttAvyMU8ztlRSstd51mU+keMw=
-Message-ID: <10ec2a87-5d9e-40a7-a4ea-1e50fd8109e6@dan.merillat.org>
-Date: Tue, 2 Jul 2024 15:30:58 -0400
+	s=arc-20240116; t=1719948802; c=relaxed/simple;
+	bh=uRvrPfVezyFHcX/ZeCoi8rowwbb4plczl2+D9q/ZIRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4ho0fDT0eRYjEdt4agetcjM4wZogCEvjw9M304iLCuK1jNmVKhNdKZD6P3EHcfYmAe4cn82/rJOU8aUdDr6Caiu10PKMzevDwrxaR2TBZ3J72pxIuXwxsbQJGsDHlLfGqCp1RXjzLNRyE3BEThz9/KrEdnSFBGXn+x/wXH/43A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LK2+1nh9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=309Rczb1yfKg4vgXLNKEQjCTftmdEEojmcvrhbrS3TY=; b=LK2+1nh9MiKvwEkNCHmuoSVNfZ
+	xzyAjh6aBpUAO7ZMnpbNcEMMDKXFtFsLsMXWkIdqnEisqs/hmsRwzmUUl8pKKrH3RFSlJ7EmMcJPg
+	u8A5l1czyBa1h6i7fUzq9t4qxGdsBI2tcSi9JRrneye0bVdEVy5uJSu9y4vxR7X4Gbwk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sOjFa-001fNq-Fr; Tue, 02 Jul 2024 21:33:14 +0200
+Date: Tue, 2 Jul 2024 21:33:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	kernel-team@meta.com
+Subject: Re: [net-next PATCH v3 11/15] eth: fbnic: Add link detection
+Message-ID: <281cdc6a-635f-499d-a312-9c7d8bb949f1@lunn.ch>
+References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
+ <171993242260.3697648.17293962511485193331.stgit@ahduyck-xeon-server.home.arpa>
+ <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk>
+ <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Dan Merillat <git@dan.merillat.org>
-To: netdev <netdev@vger.kernel.org>
-Cc: Dan Merillat <git@dan.merillat.org>, Ido Schimmel <idosch@idosch.org>
-Subject: Re: ethtool fails to read some QSFP+ modules.
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
 
-Sorry, I'm not subscribed to netdev and didn't get a CC so I'm trying to follow via the web archives
-and I can't see who was CC'd.
-
-On Mon, Jul 01, 2024 at 10:28:39AM +0300, Ido Schimmel wrote:
-> On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
-> > 
-> > I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
-> > the optional page3 data as a hard failure.
-> > 
-> > This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
+> I was actually going to reach out to you guys about that. For this
+> patch set I think it may be needed as I have no way to sort out
+> 50000baseCR2 (NRZ, 2 lanes) vs 50000baseCR (PAM4, 1 lane) in the
+> current phylink code for setting the mac link up. I was wondering if
+> you had any suggestions on how I might resolve that?
 > 
-> Thanks for the report and the patch. Krzysztof OlÄ™dzki reported the same
-> issue earlier this year:
-> https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
+> Basically I have a laundry list of things that I was planning to start
+> on in the follow on sets:
 > 
-> Krzysztof, are you going to submit the ethtool and mlx4 patches?
+> 1. I still need to add CGMII support as technically we are using a
+> different interface mode to support 100Gbps. Seems like I can mostly
+> just do a find/insert based on the PHY_INTERFACE_MODE_XLGMII to add
+> that so it should be straight forward.
 > 
-> > From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
-> > From: Dan Merillat <git@dan.eginity.com>
-> > Date: Sun, 30 Jun 2024 13:11:51 -0400
-> > Subject: [PATCH] Some qsfp modules do not support page 3
-> > 
-> > Tested on an older Kaiam XQX2502 40G-LR4 module.
-> > ethtool -m aborts with netlink error due to page 3
-> > not existing on the module. Ignore the error and
-> > leave map->page_03h NULL.
+> 2. We have 2 PCS blocks we are working with to set up the CR2 modes. I
+> was wondering if I should just be writing my PCS code to be handling
+> the merged pair of IP or if I should look at changing the phylink code
+> to support more than one PCS device servicing a given connection?
 > 
-> User space only tries to read this page because the module advertised it
-> as supported. It is more likely that the NIC driver does not return all
-> the pages. Which driver is it?
+> 3. The FEC config is integral to the PCS and MAC setup on my device. I
+> was wondering why FEC isn't included as a part of the phylink code?
+> Are there any plans to look at doing that? Otherwise what is the
+> recommended setup for handling that as it can be negotiated via
+> autoneg for our 25G and 50G-R2 links so I will need to work out how to
+> best go after that.
 
-Same as Kyrzysztof, a connectx3 board.  I'm using mlx4_core/en in the stock 6.9.3 kernel.
+You are pushing the envelope for current phylink. So far, i don't
+think it has been used for anything more than 10G. Although 10GBase-KR
+does have FEC, nobody has needed it yet. So this is something you
+should extend phylink with.
 
-Raw dump:
-# ethtool -m enp65s0d1 raw on | hexdump -C 
-00000000  0d 05 00 0f 00 00 00 00  00 44 44 00 00 44 44 00  |.........DD..DD.|
-00000010  00 00 00 00 00 00 30 a4  00 00 82 3b 00 00 00 00  |......0....;....|
-00000020  00 00 00 10 00 11 00 31  00 00 36 ff 36 ff 36 ff  |.......1..6.6.6.|
-00000030  36 83 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |6...............|
-00000040  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-00000050  00 00 00 00 00 00 00 00  00 00 00 00 00 03 00 00  |................|
-00000060  00 00 00 00 00 00 00 00  00 00 1f 00 00 00 00 00  |................|
-00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-00000080  0d 80 07 02 00 00 00 00  00 00 00 00 67 00 02 00  |............g...|
-00000090  00 00 00 40 4b 41 49 41  4d 20 43 4f 52 50 20 20  |...@KAIAM CORP  |
-000000a0  20 20 20 20 00 14 ed e4  58 51 58 32 35 30 32 20  |    ....XQX2502 |
-000000b0  20 20 20 20 20 20 20 20  31 41 66 58 05 14 46 14  |        1AfX..F.|
-000000c0  00 00 00 92 4b 44 37 30  32 30 31 31 35 39 20 20  |....KD70201159  |
-000000d0  20 20 20 20 31 37 30 32  30 31 30 30 08 00 00 0d  |    17020100....|
-000000e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-*
-00000100
+As for multiple PCS for one connection, is this common, or special to
+your hardware?
 
-
-The ioctl path handles it properly when ethtool is built with --disable-netlink, since it checks the
-total buffer size returned by the kernel and does not set map->page_03h if the size does not match.
-
-Status byte 2, bit 2 is 'Upper memory flat or paged.   0x1b: Flat memory.  0x0b: Paging (at least upper
-page 0x03h supported)'
-
-SFF8636_STATUS_FLAT_MEMORY would be clearer, as page_00h[STATUS_2] & PAGE_3_PRESENT is really a
-negative test.
-
-I confirmed that status 2 is 0x00, which would indicate the module supports paged memory.
-
-So either this cheap module is non-compliant or there's a problem in the driver/firmware for
-connectx3/3pro cards.  Either way, it would be better to warn about the non-compliance and still
-display  the optical information gathered rather than a fatal error that shows nothing.  If it can
-also be fixed in the mlx4_core driver to properly read page 3, that would be better, but that
-will require someone with more knowledge of mellanox/nVidia internals than I have.
-
-If anyone wants to test with a different adapter, these xqx2502 modules are dirt cheap on ebay, only $4 when 
-I bought mine a few weeks ago.
+     Andrew
 
