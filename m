@@ -1,129 +1,117 @@
-Return-Path: <netdev+bounces-108326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FFD691ED8B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 05:57:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311E791ED8D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 05:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8DDDB2196C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA52E284496
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54A91A286;
-	Tue,  2 Jul 2024 03:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36482770E;
+	Tue,  2 Jul 2024 03:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aDKgUNXy"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cxT0dMnt"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E482B9A5
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 03:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A4618E0E
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 03:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719892661; cv=none; b=XOW9tJxLIEwvmtf95KzuocE0KLQ0WoXKUPxVjvZ76On3n4iRa7M8gbuz+63O1Kr8iHqs1pVjhL9Dtu0FYAQZ/BeFtsy9BzeOR64AFBYZHhcIK0p7im3a6CL/rS2v2VLU4/P+hFQRXBOQhm+4s4Ylj/x/vdBOtYJovc9QnU7EUOg=
+	t=1719892741; cv=none; b=FnakA9/C3hwVfHpXjgQ2jOMoMMG+xoS1MJlTNkT6cZ4xiMvtlFSYP0r9tDBprLUrb02gn75bdeawP9iXX0Qne0YHS6+wUmX5UKR+v2pGLJctoFhxlCvHTfYURIqahQbaehi4U0kBdH0ZF9crTAafToqvrRfAJCbpPymMBE0IH2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719892661; c=relaxed/simple;
-	bh=LRbXeK9qa+ZwhdURybkuBrPxTuiryAARvkYLqqVMWfo=;
+	s=arc-20240116; t=1719892741; c=relaxed/simple;
+	bh=QVv/w4SDz4HbGalrYV0DhWIJh2vHDhmVcfZYY8MgIK0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FGAEUpBXzul/erywxFxeCUD7Cg09ObWrHS3ydrbnKbkRutbjG04WYvUIjI+1FAk7eqB+CSMuzZQUOF6BK40Mao18N63Bqho9ISuH8Xnc3icFzKjHD8JfW6OXwM83eoA8JPhErJ/iuSSsfOz1GebOPykZABkSRw5/qIOPdpAXfBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aDKgUNXy; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=QCEpStoxsAu7rhcqG1OY7khtCJh9Kfb5y7JMWB9TVE+LK54EbiMazbBjAknKIiDzVjzyww6As3v17gHvDYqitbWxioLnkd1QW5oysyuWaI4swLxkzhb6Lcd+eX0wRlANh9S7ZSjniunY/eqUxK+F8XJdnnEoYEZK2HRyLXq7hWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cxT0dMnt; arc=none smtp.client-ip=209.85.167.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cdbc20faeso5315230e87.1
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 20:57:39 -0700 (PDT)
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cdea1387eso3906425e87.0
+        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 20:58:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719892658; x=1720497458; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1719892738; x=1720497538; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yTpwN5ADV7FXKKNBNnhkGX4Sq+3H5stJklV9hiyTKxs=;
-        b=aDKgUNXyYsX9QgutNDP96Wbjc9055cgUBiWtMv8U7nM7+0ttPFNzlHIjroeKws2RAl
-         fUYex15ZTCao7xPusqGjk/5qfq0AS8DT6idbqtIDyegP8YZvG5yh5m53waR7JKT4pTM+
-         v4C/pvUv0dHgD2ng6oz+FW6OW6qByyASoyr/8=
+        bh=qTNzClis7RE95LNlPjo/s/4ysamW42Mhc1j7TBEj4w0=;
+        b=cxT0dMnt9ObFV6QIPeeV0hU0MOJCXvXKuGHFlWd7UiNHhRcscs1NxJbFDHmoaa+Yrn
+         prlsuQ/A1gzBnOipdQLmtOTjTdtNwu6DLrdTbXWQ4eukA47q2otctkgvOJk/Y4OM6AfP
+         77HNgBrL8bFSHO12O8xhGL+N/ryRpwiSui958=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719892658; x=1720497458;
+        d=1e100.net; s=20230601; t=1719892738; x=1720497538;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yTpwN5ADV7FXKKNBNnhkGX4Sq+3H5stJklV9hiyTKxs=;
-        b=uUMfXVqCSHqFa8WyOQ7P1ZBqrFDN3tuJHURkETBX9ckXeDZVZasMcwXbq7fFJsvfFP
-         eZOW/Q+rytDto0m9SU3rDXWMwI4NvA4nCfN5lC0d5UKEURH/fM5mVaurmpEfpHoz2Wht
-         GRTTLEPQ019oiglRXBGFYWZpsNpeRDJYWiQknk7xV1TN9d3TRRWiQxlV+D/go00i4VWb
-         IyF7a4yz2L7lONrHFM8RsAnIP3BOXd1yK++G1UV7D/eAo6BZAfZhsutym/tVXhxcvuS6
-         zh5OFwiG9Pv0OAIiwWznEIDvabq/MtPl/PbySJGshvip33zKq/dC5nmfG9izl5+Wrl2m
-         paAg==
-X-Gm-Message-State: AOJu0YzBNCsQ5551C/jUWjtqbJK0BhHFvSr1R/gslNxh9xUhglBYYLlG
-	P+9WNcjcVBBSYKsy0T6RUVBM07cQc0x5nCMfrUmbGdTWjYH7CN9D7AkuW4SwHidlOetkwczjLSj
-	DAiTANRnRHSMX69tapE32Ax+T3bavELU7cUdJ
-X-Google-Smtp-Source: AGHT+IHEWj0ptTMqcvaebxZUEGW0j7jILw1EXBJLs/tn40vpu8Qljqgy1jOiDYZbKcmaaiQnn4Z37wcstA7VC6CQ4rM=
-X-Received: by 2002:a05:6512:10d0:b0:52c:80fa:2967 with SMTP id
- 2adb3069b0e04-52e82648fd5mr4373675e87.12.1719892658026; Mon, 01 Jul 2024
- 20:57:38 -0700 (PDT)
+        bh=qTNzClis7RE95LNlPjo/s/4ysamW42Mhc1j7TBEj4w0=;
+        b=cF7jcUsEZh79TAmJb6CjozwLifOyvkXDIF2yYC1mJ43TPot9XpdTbftgwUNXqLv7MR
+         q4E5Qpjx91Y6qZv/LOSXcj9cV8AgM+KjzSpfPTp+XPmVBQR8SH+2w3ko+4CtKak+quUf
+         9m/7OjY3bs3AFfdmLVEgGFXGUXrXYPD3QpHo8N3bGqVceRc+tQQlZLHN0JnlO/wr9E1g
+         upnI/CZbpNQUmqZM1Dc9V/Edq99DL6aMvgxiFaodxGnm7Y+6aXkOnAoYX6oB3YcOScgR
+         Ip91bnejznzGrefo2YMUwtbL8RByBkhv3XyCyPQVbNB06xcOfCCd1SsLsN07/10/MtHy
+         Xi2Q==
+X-Gm-Message-State: AOJu0YyVR4TV4V32kYWcTg+hLd3iTNmuYhdi3+VYk9qGraY5AqkVee3E
+	at8AEsJIiPibIMMaYxHn42QP8x9liGatbL5b4S2xAH6kgRDWOn5cVkmPh7app44n//J3IcQ3Zsw
+	ZzLgWW2szcWlmOS2QQ4nTWcIeMeVeLaDlR5Ai
+X-Google-Smtp-Source: AGHT+IGucCdAjY3iZuP7qNzEicZssswJbzWj8F66nYCzeE7NtK4nPyGc3Qyov4x1WZpe3JStOql4mXnTLSx1QJFo1BA=
+X-Received: by 2002:a05:6512:acc:b0:52b:c27c:ea1f with SMTP id
+ 2adb3069b0e04-52e826fc26dmr5075805e87.55.1719892738294; Mon, 01 Jul 2024
+ 20:58:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240701090746.2171565-1-schalla@marvell.com> <20240701090746.2171565-5-schalla@marvell.com>
-In-Reply-To: <20240701090746.2171565-5-schalla@marvell.com>
+References: <20240701090746.2171565-1-schalla@marvell.com> <20240701090746.2171565-4-schalla@marvell.com>
+In-Reply-To: <20240701090746.2171565-4-schalla@marvell.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 2 Jul 2024 09:27:26 +0530
-Message-ID: <CAH-L+nMPjgN-Vf9kquG8+F8DJ9sWz++9p11Wx5yG5HcRogJTTA@mail.gmail.com>
-Subject: Re: [PATCH net,4/6] octeontx2-af: Fix issue with IPv6 ext match for RSS
+Date: Tue, 2 Jul 2024 09:28:47 +0530
+Message-ID: <CAH-L+nObwyjjsbXLk1Q8vRLAzEKCntjemd_EpzpAp+P_B+MQgw@mail.gmail.com>
+Subject: Re: [PATCH net,3/6] Fix CPT_LF_ALLOC mailbox error due to
+ incompatible mailbox message format
 To: Srujana Challa <schalla@marvell.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
 	davem@davemloft.net, pabeni@redhat.com, sgoutham@marvell.com, 
 	lcherian@marvell.com, gakula@marvell.com, jerinj@marvell.com, 
-	hkelam@marvell.com, sbhatta@marvell.com, 
-	Kiran Kumar K <kirankumark@marvell.com>
+	hkelam@marvell.com, sbhatta@marvell.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f4a86e061c3bb6a6"
+	boundary="000000000000bdb9ee061c3bbb24"
 
---000000000000f4a86e061c3bb6a6
+--000000000000bdb9ee061c3bbb24
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 1, 2024 at 2:38=E2=80=AFPM Srujana Challa <schalla@marvell.com>=
+On Mon, Jul 1, 2024 at 2:39=E2=80=AFPM Srujana Challa <schalla@marvell.com>=
  wrote:
 >
-> From: Kiran Kumar K <kirankumark@marvell.com>
+> This patch addresses the issue introduced by commit de2854c87c64
+> ("octeontx2-af: Mailbox changes for 98xx CPT block"). Specifically, it
+> corrects the `blkaddr` field type from `int` to `u8`.
 >
-> While performing RSS based on IPv6, extension ltype
-> is not being considered. This will be problem for
-> fragmented packets or packets with extension header.
-> Adding changes to match IPv6 ext header along with IPv6
-> ltype.
->
-> Fixes: 41a7aa7b800d ("octeontx2-af: NIX Rx flowkey configuration for RSS"=
-)
-> Signed-off-by: Kiran Kumar K <kirankumark@marvell.com>
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
+[Kalesh] Missing Fixes tag?
 > ---
->  drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 2 +-
+>  drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/driver=
-s/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index 00af8888e329..bf5c9cc3df87 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> @@ -3990,7 +3990,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey=
-_alg *alg, u32 flow_cfg)
->                                         field->bytesm1 =3D 15; /* DIP,16 =
-bytes */
->                                 }
->                         }
-> -                       field->ltype_mask =3D 0xF; /* Match only IPv6 */
-> +                       field->ltype_mask =3D 0xE; /* Match IPv6 and IPv6=
-_ext */
-[Kalesh] I would suggest you to have a macro + short comment for the
-magic number. This magic number is used at multiple places(subsequent
-patches in this series).
-
->                         break;
->                 case NIX_FLOW_KEY_TYPE_TCP:
->                 case NIX_FLOW_KEY_TYPE_UDP:
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/n=
+et/ethernet/marvell/octeontx2/af/mbox.h
+> index 41b46724cb3d..799aa54103a2 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -1745,7 +1745,7 @@ struct cpt_lf_alloc_req_msg {
+>         u16 nix_pf_func;
+>         u16 sso_pf_func;
+>         u16 eng_grpmsk;
+> -       int blkaddr;
+> +       u8 blkaddr;
+>         u8 ctx_ilen_valid : 1;
+>         u8 ctx_ilen : 7;
+>  };
 > --
 > 2.25.1
 >
@@ -134,7 +122,7 @@ patches in this series).
 Regards,
 Kalesh A P
 
---000000000000f4a86e061c3bb6a6
+--000000000000bdb9ee061c3bbb24
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -206,14 +194,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIIgWAwcxk7p9hVYz3HUgBwCEcnyhH/m6XPaWioYgM69iMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcwMjAzNTczOFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIN8ruEVVi1HNogUrAj1FI9gRG9i5IB/uaZZPLoQYuYDUMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcwMjAzNTg1OFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA7mqqASrwK
-V2SC7E7DQBfgGbrqfVY3Ucd7tDqFf1F91PJxmQSmTF1TkDhCcsvUNTTVm/HFGMWFeFP1yEezkw2s
-hx3lmn+Ymo50Tccsc+CVazBXYAeUdl49N5B+QVNIRMflPpERTrb2dD6/NobZjRrBmU5ozJ/GxBA4
-ZpkByWSnesQPbAWPFsQS81fWN024IBjwIHXs690hWqk7lZpvKDWGOUNYlgZfO9k6onk4pcYhE64G
-zPmmgDy9Os6nunHPRJZUD67eAp4HdGhtQPcnO2+MIdTe7n2r3daPUuZqpCbero05qGO3dZuOj4U5
-bFGCLN2tJ7tjeMJaGbcDrB3NxuvF
---000000000000f4a86e061c3bb6a6--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBpeR3hEEER
+QbeTXrz2WFOzBOERh5r4Rq91043FnN+hEHoNiAYXhCANoCTqXPbSrPK+gWxzaM4v3zT49mViEIo8
+ujgjjPGe1BhnqUfBI8WkriSPE3DxJyQcErZYHSqxZFIPL8wFvzmhP9lQrnDPKZ11MzbfKTrVkPIn
+s2FyHB5bpTtARMke5j2SBWx/ZAaKULZ8vwmpdxCudJ7jty10US5eh8MYRfi6ZzqybRSc4gLPIe8e
+SaNErkohoBhItFxcZ+kvy1TDNewFFJyWnTRM+NsB2O1C2CDPcqR5LRXsVVJNf0R9AcDdgDMj8lnL
+0lQ76ERaNaUfwfZIA9cQJhmDrIU/
+--000000000000bdb9ee061c3bbb24--
 
