@@ -1,174 +1,228 @@
-Return-Path: <netdev+bounces-108625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691B5924C30
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:39:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 529A9924C4A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88F0E1C22D20
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:39:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55601F233B2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDBF17A5B4;
-	Tue,  2 Jul 2024 23:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LuR9WHgh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCEA17A5BD;
+	Tue,  2 Jul 2024 23:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28F12F37B;
-	Tue,  2 Jul 2024 23:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E913158853;
+	Tue,  2 Jul 2024 23:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719963564; cv=none; b=G85W8kL3Gi8Mk3KJk0h8EvWRZMVDOfnAodvJOXFmjyt/uwl7quUy+aI1wvC7Wmf8pDXbKIskcLTSH0q7vuhZnFEyDgZt9wYAJuVu142Dc1AiuSwJXonM2wYzYt6PSZjlvil/4MjBCBkdG6t5JIOyElFp72HwFX2N5rTcFg6BcG4=
+	t=1719963898; cv=none; b=AK6P8DT2ViA4V70OoGN+wUFH35UNxBCgQ9wHNi4Wv7Ss6xeRB/FTLvYjH573fDo7RKq0hxAB09/MZxbBvNAacTfPfnQoYwAeyk999V+b/RgTjE5Jd8Pkf/HZY1Srb9fwBuyhS0G3s68Yon23hK8y4tTLf3hGuKqy7FT3ALtqx3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719963564; c=relaxed/simple;
-	bh=9iHKGaCvUhgAzDNyNQfkicaDyAaAdfPOtqrEyXNvaXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VdF1lQg8oU9kjxI3iCHGAOHgUhMY16vR1OqeIFhpLaQpa3gidbQDAXIjC79TTNEJrNZwcL+w4KAan4JFla/0gvojak0dRpH2eUtsxUollA9Mso4CCfuAMUXBS32eP1wKwJZnOZzpEu1VLU7ya3ml0odJqkyKDc/1mv/vIMtu7Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LuR9WHgh; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 462HA2a8026187;
-	Tue, 2 Jul 2024 23:38:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	a9QKQLFDVHH7M2yZELH6J8W3bzlpa8FwEYoxmvRJ3Cc=; b=LuR9WHgh+LA2qTcV
-	i/0WCieOpJaEu1gmw3+TJfjWYHEwq2sXMAzq0rp0uDz0uknStjmYmAyOz4e8Z92R
-	xm0ozpwBGmhGRqkr3R7IHmQoUAbwHU7vQrEv2+4ZrxtCTuQZGNb9oEvIusxq+qjo
-	eTvMEfItsvzJqsCNtfoy7biQpSb9aVFfUIr9Fvd+phCDCZce5uoVifZWwEXvzjT3
-	kJs5CGlTCE9j/43qz8s8sP1RmXeEpl+6yz22MStklrZGH84xuWqufbie+c4lsrU3
-	88221o8dnWSRPlvWyMk7+IfGr3HEBHTBuW0cc3VWx9Y3p7532xfk6/nQfkCl4H5g
-	r/Vh/Q==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 402abtq6tx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 23:38:52 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 462Ncpqk031705
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 2 Jul 2024 23:38:51 GMT
-Received: from [10.110.54.196] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
- 16:38:47 -0700
-Message-ID: <02dbe022-b45d-43eb-8769-bcf2a92e7c6f@quicinc.com>
-Date: Tue, 2 Jul 2024 16:38:47 -0700
+	s=arc-20240116; t=1719963898; c=relaxed/simple;
+	bh=QIGQ12SfRMKhY4RdG2H7gQvUao7tIDkEk7Yy9wG41gc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ab1/dFvT8kvs1K8GDbJcP1rUTfITGLM3oCqSkrPBR1BuaETxmw6G7QZSLVM5U4pMmfklsFhdxgt1aPrZ3ELzMxxksxVNd3Sr3UhIcMyjNoRcv1CcXtlUMO+buAZmUQ1di0jkM/42Qf3B3ibBlVjzpLhFgxZL9uRnwlM552Pj7+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sOnAq-000000006lM-23eU;
+	Tue, 02 Jul 2024 23:44:36 +0000
+Date: Wed, 3 Jul 2024 00:44:28 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, regressions@lists.linux.dev
+Subject: [PATCH net v3] net: dsa: mt7530: fix impossible MDIO address and
+ issue warning
+Message-ID: <7e3fed489c0bbca84a386b1077c61589030ff4ab.1719963228.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] net: stmmac: Bring down the clocks to lower
- frequencies when mac link goes down
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        "Bhupesh
- Sharma" <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
-        Andrew Halaney
-	<ahalaney@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-3-eaa7cf9060f0@quicinc.com>
- <Zn82VaTQBe0LkhSa@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <Zn82VaTQBe0LkhSa@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: KZYOA__XQ6LuL0KP4BYDvMtVwsvrjhxq
-X-Proofpoint-ORIG-GUID: KZYOA__XQ6LuL0KP4BYDvMtVwsvrjhxq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-02_16,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 suspectscore=0 malwarescore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0 impostorscore=0
- mlxlogscore=822 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407020174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+using bootstrap pins. However, there are only 4 possible options for the
+switch itself: 7, 15, 23 and 31. As in MediaTek's SDK the address of the
+switch is wrongly stated in the device tree as 0 (while in reality it is
+31), warn the user about such broken device tree and make a good guess
+what was actually intended.
 
+This is imporant also to not break compatibility with older Device Trees
+as with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
+switch from device tree") the address in device tree will be taken into
+account, while before it was hard-coded to 0x1f.
 
-On 6/28/2024 3:16 PM, Russell King (Oracle) wrote:
-> On Tue, Jun 25, 2024 at 04:49:30PM -0700, Sagar Cheluvegowda wrote:
->> When mac link goes down we don't need to mainitain the clocks to operate
->> at higher frequencies, as an optimized solution to save power when
->> the link goes down we are trying to bring down the clocks to the
->> frequencies corresponding to the lowest speed possible.
-> 
-> I thought I had already commented on a similar patch, but I can't find
-> anything in my mailboxes to suggest I had.
-> 
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> index ec7c61ee44d4..f0166f0bc25f 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> @@ -996,6 +996,9 @@ static void stmmac_mac_link_down(struct phylink_config *config,
->>  {
->>  	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
->>  
->> +	if (priv->plat->fix_mac_speed)
->> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
->> +
->>  	stmmac_mac_set(priv, priv->ioaddr, false);
->>  	priv->eee_active = false;
->>  	priv->tx_lpi_enabled = false;
->> @@ -1004,6 +1007,11 @@ static void stmmac_mac_link_down(struct phylink_config *config,
->>  
->>  	if (priv->dma_cap.fpesel)
->>  		stmmac_fpe_link_state_handle(priv, false);
->> +
->> +	stmmac_set_icc_bw(priv, SPEED_10);
->> +
->> +	if (priv->plat->fix_mac_speed)
->> +		priv->plat->fix_mac_speed(priv->plat->bsp_priv, SPEED_10, mode);
-> 
-> Two things here:
-> 
-> 1) Why do we need to call fix_mac_speed() at the start and end of this
->    stmmac_mac_link_down()?
-This was a typo, i will remove this.
-> 
-> 2) What if the MAC doesn't support 10M operation? For example, dwxgmac2
->    and dwxlgmac2 do not support anything below 1G. It feels that this
->    is storing up a problem for the future, where a platform that uses
->    e.g. xlgmac2 also implements fix_mac_speed() and then gets a
->    surprise when it's called with SPEED_10.
-> 
-> Personally, I don't like "fix_mac_speed", and I don't like it even more
-> with this change. I would prefer to see link_up/link_down style
-> operations so that platforms can do whatever they need to on those
-> events, rather than being told what to do by a single call that may
-> look identical irrespective of whether the link came up or went down.
-> 
-I will drop this patch[3/3] from this series now and i will do some analysis
-on platform level link up and link down functions and post the changes as a
-new series altogether.
+Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+Only tested on BPi-R3 (with various deliberately broken DT) for now!
+
+Changes since v2 [2]:
+ - use macros instead of magic numbers
+ - introduce helper functions
+ - register new device on MDIO bus instead of messing with the address
+   and schedule delayed_work to unregister the "wrong" device.
+   This is a slightly different approach than suggested by Russell, but
+   imho makes things much easier than keeping the "wrong" device and
+   having to deal with keeping the removal of both devices linked.
+ - improve comments
+
+Changes since v1 [1]:
+ - use FW_WARN as suggested.
+ - fix build on net tree which doesn't have 'mdiodev' as member of the
+   priv struct. Imho including this patch as fix makes sense to warn
+   users about broken firmware, even if the change introducing the
+   actual breakage is only present in net-next for now.
+
+[1]: https://patchwork.kernel.org/project/netdevbpf/patch/e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org/
+[2]: https://patchwork.kernel.org/project/netdevbpf/patch/11f5f127d0350e72569c36f9060b6e642dfaddbb.1714514208.git.daniel@makrotopia.org/
+
+ drivers/net/dsa/mt7530-mdio.c | 92 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+
+diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+index 51df42ccdbe6..b5049ec2d84d 100644
+--- a/drivers/net/dsa/mt7530-mdio.c
++++ b/drivers/net/dsa/mt7530-mdio.c
+@@ -11,6 +11,7 @@
+ #include <linux/regmap.h>
+ #include <linux/reset.h>
+ #include <linux/regulator/consumer.h>
++#include <linux/workqueue.h>
+ #include <net/dsa.h>
+ 
+ #include "mt7530.h"
+@@ -136,6 +137,93 @@ static const struct of_device_id mt7530_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, mt7530_of_match);
+ 
++static int
++mt7530_correct_addr(int phy_addr)
++{
++	/* The corrected address is calculated as stated below:
++	 * 0~6   -> 31
++	 * 8~14  -> 7
++	 * 16~22 -> 15
++	 * 24~30 -> 23
++	 */
++return ((((phy_addr - MT7530_NUM_PORTS) & ~MT7530_NUM_PORTS) % PHY_MAX_ADDR) +
++	MT7530_NUM_PORTS) & (PHY_MAX_ADDR - 1);
++}
++
++static bool
++mt7530_is_invalid_addr(int phy_addr)
++{
++	/* Only MDIO bus addresses 7, 15, 23, and 31 are valid options,
++	 * which all have the least significant three bits set. Check
++	 * for this.
++	 */
++	return (phy_addr & MT7530_NUM_PORTS) != MT7530_NUM_PORTS;
++}
++
++struct remove_impossible_priv {
++	struct delayed_work remove_impossible_work;
++	struct mdio_device *mdiodev;
++};
++
++static void
++mt7530_remove_impossible(struct work_struct *work)
++{
++	struct remove_impossible_priv *priv = container_of(work, struct remove_impossible_priv,
++							   remove_impossible_work.work);
++	struct mdio_device *mdiodev = priv->mdiodev;
++
++	mdio_device_remove(mdiodev);
++	mdio_device_free(mdiodev);
++	kfree(priv);
++}
++
++static int
++mt7530_reregister(struct mdio_device *mdiodev)
++{
++	/* If the address in DT must be wrong, make a good guess about
++	 * the most likely intention, issue a warning, register a new
++	 * MDIO device at the correct address and schedule the removal
++	 * of the device having an impossible address.
++	 */
++	struct fwnode_handle *fwnode = dev_fwnode(&mdiodev->dev);
++	int corrected_addr = mt7530_correct_addr(mdiodev->addr);
++	struct remove_impossible_priv *rem_priv;
++	struct mdio_device *new_mdiodev;
++	int ret;
++
++	rem_priv = kmalloc(sizeof(*rem_priv), GFP_KERNEL);
++	if (!rem_priv)
++		return -ENOMEM;
++
++	new_mdiodev = mdio_device_create(mdiodev->bus, corrected_addr);
++	if (IS_ERR(new_mdiodev)) {
++		ret = PTR_ERR(new_mdiodev);
++		goto out_free_work;
++	}
++	device_set_node(&new_mdiodev->dev, fwnode);
++
++	ret = mdio_device_register(new_mdiodev);
++	if (WARN_ON(ret))
++		goto out_free_dev;
++
++	dev_warn(&mdiodev->dev, FW_WARN
++		 "impossible switch MDIO address in device tree, assuming %d\n",
++		 corrected_addr);
++
++	/* schedule impossible device for removal from mdio bus */
++	rem_priv->mdiodev = mdiodev;
++	INIT_DELAYED_WORK(&rem_priv->remove_impossible_work, mt7530_remove_impossible);
++	schedule_delayed_work(&rem_priv->remove_impossible_work, 0);
++
++	return -EFAULT;
++
++out_free_dev:
++	mdio_device_free(new_mdiodev);
++out_free_work:
++	kfree(rem_priv);
++	return ret;
++}
++
+ static int
+ mt7530_probe(struct mdio_device *mdiodev)
+ {
+@@ -144,6 +232,10 @@ mt7530_probe(struct mdio_device *mdiodev)
+ 	struct device_node *dn;
+ 	int ret;
+ 
++	/* Check and if needed correct the MDIO address of the switch */
++	if (mt7530_is_invalid_addr(mdiodev->addr))
++		return mt7530_reregister(mdiodev);
++
+ 	dn = mdiodev->dev.of_node;
+ 
+ 	priv = devm_kzalloc(&mdiodev->dev, sizeof(*priv), GFP_KERNEL);
+-- 
+2.45.2
+
 
