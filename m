@@ -1,138 +1,130 @@
-Return-Path: <netdev+bounces-108334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0550791EE62
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 07:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 606A491EED3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 08:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9105AB22681
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 05:37:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2233B21A1A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 06:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD9547F7F;
-	Tue,  2 Jul 2024 05:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4E2481D0;
+	Tue,  2 Jul 2024 06:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="N7bKrAr2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kHAgzBVC"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36513D548;
-	Tue,  2 Jul 2024 05:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9358BFA;
+	Tue,  2 Jul 2024 06:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719898641; cv=none; b=jdFplU/ECBwfugav6HansAePBdmXpfNZIBZLp1yAuT3n1TbrJaU+wXg5GKSmVnD+hO+aE7ckGx7xp7VZMRFc/q41LCMRnXhcpsIQkH0ys4UcV5EJvlJq22J+1IvT69cRh4cFBBRbXXfSFWipzCmh26SQdGjcZJjiFs7rFTX1S5o=
+	t=1719901139; cv=none; b=VioukIEZWVM4hYg0lGAq6quv8Xtydx0EThOMESyOEWY1lZF0xQUE0pAYnozTXNS20TADD03MpsUETYXdN4D0tS1cdM6vQ3hHqsg6K0xoNfJxFp+WFgZ9bcm5adjt/la80PwdgtZi0tjl7bKXawQyPs0BvrPLV6U5L2u0RL9ekbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719898641; c=relaxed/simple;
-	bh=16pWVQDlV3oMxIYcAJWP63TGtGj5GzcFV1gJpcFFfU8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqzGakV/Mupa1j1FwbvYIggT7deS7wjpEHP/F3QPRIx++kNfCOZDopnfvlhlhBlUC1g2B+WERTgYzEIMB9npFa/e6qwpfmB1z3eibqKwmCFnRuC8q84PsG9ht58pKGohty3C3xfsh1qvitSxwy7TigR2Ra/cAG/lE01+hQR4VzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=N7bKrAr2; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=DS77JC9w8wcnStim2W/xitvraXik/3HNJqyNkDayJog=;
-	t=1719898639; x=1720330639; b=N7bKrAr2jZFhWWJg3MaE1vvqSt9XZbCWHIbSiBIIOWWwuTe
-	rNtukRTtpO115hOHSdFI5XF9LlkZbl7e2i0/JV+s4fp6U7NHJcuISmRbYMGMofYmIG8U+2DGNpkY6
-	+v77NiPXsblmvgp7DvBRBNQL+SBHFxYKxzhY+LuJy24w/PUANPzOjtGFenImkMKUzCWPzXOVBbdqz
-	4R2AcCyKP3/O/ojTLnIc2B7Z77Bvs8Zbm4QVbMz3ENdz74DxbcIyQNvALcTlIE4kzZutXYWT1Gpia
-	Nv4qw5VAsKLurRRZ6OZToFyEJf8p3oaLrxZP8xyNJ3RjjITaBqsppX1AfhMMeqgw==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sOWCX-0005Ro-VY; Tue, 02 Jul 2024 07:37:14 +0200
-Message-ID: <08aabeaf-6a81-48a9-9c5b-82a69b071faa@leemhuis.info>
-Date: Tue, 2 Jul 2024 07:37:13 +0200
+	s=arc-20240116; t=1719901139; c=relaxed/simple;
+	bh=z2qRpavm2IBeL3dqoSrTiUiRP+4wh58flkN+8pF6XVE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fvzr0b45xo4tBST4w5AM7iHNgCsLXlYa129/cU2q/3j3SLwwr5BHMUyjlKN7GYimVP6sUPtpjrYpR40aMixjgz1RpJYqQ4ZcSlxqBX0zGZIbMLrZ3DtOubgma3/prmIuM2vLfXih2a7dZpKvOxPTRiTYMfHe6waRSScQcRjb39g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kHAgzBVC; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719901138; x=1751437138;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=z2qRpavm2IBeL3dqoSrTiUiRP+4wh58flkN+8pF6XVE=;
+  b=kHAgzBVC3RvozzmcSNEdmAmHOSzjquarfsKT9MsxRJEJx+9Ye+x3/3yI
+   G3rsmafW1bR7tt9DKNrv5q6AMioaH4G0RhMx1lCOdJihmGJnfRA6W+udS
+   nIwk2q1jhtg8Um4R5UGH5P99q37n/YgRUJaPdd6bYLRRBfyV0lKURXzNj
+   hJVkxhkdV73serLpj0UBXrXdpA8P+TsxyoY+XlbagoV0Hx8gIXLwmSTvN
+   tw68TfNcnLVEBs3ReJ8hhF0PeIIEU4z/bAy5RRYBJTWZR49kY3O36QAOj
+   XKLSVaXHi/kFYmq+SfV2Kro25LSUzViQOgy7fCnkPYmDzEUrCwwmpn0mC
+   w==;
+X-CSE-ConnectionGUID: ir4i/JxhTYyKXvIYqZ4DFA==
+X-CSE-MsgGUID: 49TzcwbpSaSIegNPpRT3Og==
+X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="20866593"
+X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
+   d="scan'208";a="20866593"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 23:18:57 -0700
+X-CSE-ConnectionGUID: 8HtkeyqWSqikvwKjkj1khg==
+X-CSE-MsgGUID: lchK49MbRE657UgWb5m37w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
+   d="scan'208";a="45919938"
+Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 23:18:54 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Subject: [PATCH bpf-next v3 0/2] selftests/xsk: Enhance traffic validation and batch size support
+Date: Tue,  2 Jul 2024 05:59:14 +0000
+Message-Id: <20240702055916.48071-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel hang caused by commit "can: m_can: Start/Cancel polling
- timer together with interrupts"
-To: Markus Schneider-Pargmann <msp@baylibre.com>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Tony Lindgren <tony@atomide.com>, Judith Mendez <jm@ti.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-References: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
- <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
- <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1719898639;2ce6bdd2;
-X-HE-SMSGID: 1sOWCX-0005Ro-VY
+Content-Transfer-Encoding: 8bit
 
-On 01.07.24 16:34, Markus Schneider-Pargmann wrote:
-> On Mon, Jul 01, 2024 at 02:12:55PM GMT, Linux regression tracking (Thorsten Leemhuis) wrote:
->> [CCing the regression list, as it should be in the loop for regressions:
->> https://docs.kernel.org/admin-guide/reporting-regressions.html]
->>
->> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
->> for once, to make this easily accessible to everyone.
->>
->> Hmm, looks like there was not even a single reply to below regression
->> report. But also seens Markus hasn't posted anything archived on Lore
->> since about three weeks now, so he might be on vacation.
->>
->> Marc, do you might have an idea what's wrong with the culprit? Or do we
->> expected Markus to be back in action soon?
-> 
-> Great, ping here.
+This patch series introduces enhancements to xsk selftests, focusing on
+dynamic batch size configurations and robust traffic validation.
 
-Thx for replying!
+v1->v2:
+- Correctly bind UMEM queue sizes to TX and RX queues for standard
+  operational alignment.
+- Set cfg.rx_size directly from umem->fill_size when umem->fill_size is
+  true, ensuring alignment with test specifications.
 
-> @Matthias: Thanks for debugging and sorry for breaking it. If you have a
-> fix for this, let me know. I have a lot of work right now, so I am not
-> sure when I will have a proper fix ready. But it is on my todo list.
+v2->v3:
+- Update commit messages and cover letter for clarity and precision in
+  documentation.
 
-Thx. This made me wonder: is "revert the culprit to resolve this quickly
-and reapply it later together with a fix" something that we should
-consider if a proper fix takes some time? Or is this not worth it in
-this case or extremely hard? Or would it cause a regression on it's own
-for users of 6.9?
+Patch series summary:
 
-Ciao, Thorsten
+Patch 1/2: Robust traffic validation post-ring size adjustment
 
->> On 18.06.24 18:12, Matthias Schiffer wrote:
->>> Hi Markus,
->>>
->>> we've found that recent kernels hang on the TI AM62x SoC (where no m_can interrupt is available and
->>> thus the polling timer is used), always a few seconds after the CAN interfaces are set up.
->>>
->>> I have bisected the issue to commit a163c5761019b ("can: m_can: Start/Cancel polling timer together
->>> with interrupts"). Both master and 6.6 stable (which received a backport of the commit) are
->>> affected. On 6.6 the commit is easy to revert, but on master a lot has happened on top of that
->>> change.
->>>
->>> As far as I can tell, the reason is that hrtimer_cancel() tries to cancel the timer synchronously,
->>> which will deadlock when called from the hrtimer callback itself (hrtimer_callback -> m_can_isr ->
->>> m_can_disable_all_interrupts -> hrtimer_cancel).
->>>
->>> I can try to come up with a fix, but I think you are much more familiar with the driver code. Please
->>> let me know if you need any more information.
->>>
->>> Best regards,
->>> Matthias
->>>
->>>
-> 
-> 
+- Fixed the flow in HW_SW_MIN_RING_SIZE and HW_SW_MAX_RING_SIZE test cases
+  to validate Tx/Rx traffic by checking the return value of
+  set_ring_size(), preventing premature test termination.
+
+Patch 2/2: Dynamic batch size configuration
+
+- Overcomes the 2K batch size limit by introducing dynamic adjustments for
+  fill_size and comp_size.
+- Update HW_SW_MAX_RING_SIZE test case that evaluates the maximum ring
+  sizes for AF_XDP, ensuring its reliability under maximum ring utilization.
+
+Ensure the xsk selftests patches improve overall reliability and
+efficiency, allowing the system to handle larger batch sizes and
+effectively validate traffic after configuration changes.
+
+Tushar Vyavahare (2):
+  selftests/xsk: Ensure traffic validation proceeds after ring size
+    adjustment in xskxceiver
+  selftests/xsk: Enhance batch size support with dynamic configurations
+
+ tools/testing/selftests/bpf/xskxceiver.c | 40 +++++++++++++++++-------
+ tools/testing/selftests/bpf/xskxceiver.h |  2 ++
+ 2 files changed, 31 insertions(+), 11 deletions(-)
+
+-- 
+2.34.1
+
 
