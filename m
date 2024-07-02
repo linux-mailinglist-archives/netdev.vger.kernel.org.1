@@ -1,304 +1,154 @@
-Return-Path: <netdev+bounces-108386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FC6923A9C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:50:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D5C923ABB
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719181C22B13
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:50:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B181C21F0B
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC01156F55;
-	Tue,  2 Jul 2024 09:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368B9156C6B;
+	Tue,  2 Jul 2024 09:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFXeIihp"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="hNZOWcX3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C703156980
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 09:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C2C15748F;
+	Tue,  2 Jul 2024 09:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719913764; cv=none; b=WF+1x9sHZyVU9/1FBVm9pGnovM0f19bXHJP/b2/SKkXBgHSndWFKs/4T7z/q6IlzJAB18U2jf1UqajAqiVVyzzBA0houYPPprgVtNRLaheCUryt4n7+LAMxOpRlBttU1l6YrNMe9fJ+NjrEbU5LiV4XmhY3A6FBlP7Xo7DXv4to=
+	t=1719913970; cv=none; b=EMoNblCn7Kc9ke06ixeuz/wGbVGwqjgyuTnKRRasz7b5/2B4vjJLiFpYkQoy+uOj4TphqzUjJmptvSP+B2K7mUcdL5C0hV79tqDtkZVZZMp5W+NISrmDpTr/EEwYcHKr5BPbwN17W8n9AgJGovx4xOlHKBkPYe98h0Alw4DIkOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719913764; c=relaxed/simple;
-	bh=ChOuMiwGOzBpP3sNCHMWI4qVZ4l5LHUl3YiuYdFClBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d0CpbeSLOjKMh5LGR+c9p9CrpkEK+J+hAxpAYLPucb6UCnb1gSrsq6dLy/iQRCudfacYfxpWlEhxoZWxACamCQDqOaYzRPpQ8UWZ9hW2pS8uh9MM+9dCnjM+SDtgA91L8exKmQ2co9amGWAfbmfzA3pwjiEt911SQsRVZb+6lW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NFXeIihp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719913761;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I5C9hn1xC00HSAhZfwY+mFDAG9W+9IK6IOhPCt4SQMQ=;
-	b=NFXeIihp63Rr/OD4jRKaPb0cGW6shn8FFQQDy7dsG2tEGp8CZ3ZZ35y8EpjqkzrB3746wE
-	bDj5EiQ9CzJ2LnBTbhyVm51qLkuL60XHPsmLcG3RUICIVV7n1KVB9Itm1aQ46Nki3Kw8fu
-	GbfmKCHCMujSjbUBMLtLiZlIreksrXU=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-OGKbIp2-P0-1sDVHTZHPiQ-1; Tue, 02 Jul 2024 05:49:19 -0400
-X-MC-Unique: OGKbIp2-P0-1sDVHTZHPiQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b5cec74f1dso4452956d6.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 02:49:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719913759; x=1720518559;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I5C9hn1xC00HSAhZfwY+mFDAG9W+9IK6IOhPCt4SQMQ=;
-        b=H4e/6+bxvPD1CELyU5A34XPYcQQ08R1H3Oc3D4Y1sfgUtbUcgD//C1dVdyTtbGDj7c
-         J4/MIrVWciIJJ7ZzPI0Aj4szeVHyS3igta9gOaPRySV8Vq02YxVl90N7J4XbE24IZjFn
-         89VzDj29TnegPXWjL2yDUvvYhzMjSuJ373cRcCTzmfWzIIxqPT+zUvN9JbeTb1yFE8PB
-         aheC83AtFJUD/iBxnngHILKT3uMnm8g8d/FOwsBnVVcSUA/IP5NNP1j1hQxrZr5MSbKI
-         Rjiwv6hXuCyUiCj+oJkXfXQPVti1QbQc7Ueeg47PWTXMvRb59wJEg5B7ZqI0QYYMPZbV
-         KgfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWB+kJ5Uyx3SzUuVsFI1n+W4Eu6lD04tyHlfmiiKDcjcQEYMh0o67a8qPCO8kI0XzpluN0eNyDkzouhCV7HtiKFe5hQA3n9
-X-Gm-Message-State: AOJu0YzBfhJfDOYPS00djcsc5xrvQrIpctANj69D0TiqC83arDEdaCU3
-	gLBAD1XSVMNMAqSfOmuetTr9o3BsREDBXlSpI8k4JusJwusia+Ipm9ZLmp0d8PBT1athp/lsWXM
-	jcDxRT7nIlE3fHuajJsv29FOEYimbKbbttdh3vZhruRx8NpWEZJGQCg==
-X-Received: by 2002:a05:6214:3005:b0:6b5:42b7:122 with SMTP id 6a1803df08f44-6b5b717b58bmr97377536d6.60.1719913759505;
-        Tue, 02 Jul 2024 02:49:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEgjbJl5pAjHk9X3v0oZqCcimvYtk9tuAmSK1l2XBB63KoGDxZm9QoDjYoqcF0qXR1twRoDnw==
-X-Received: by 2002:a05:6214:3005:b0:6b5:42b7:122 with SMTP id 6a1803df08f44-6b5b717b58bmr97377396d6.60.1719913759015;
-        Tue, 02 Jul 2024 02:49:19 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.133.110])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f39c1sm41979666d6.97.2024.07.02.02.49.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 02:49:18 -0700 (PDT)
-Date: Tue, 2 Jul 2024 11:49:09 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Marco Pinna <marco.pinn95@gmail.com>
-Subject: Re: [PATCH PATCH net-next v2 1/2] vsock/virtio: refactor
- virtio_transport_send_pkt_work
-Message-ID: <5togzaghzoau7jxkbqpn6ydp45oc3rbwrmavtrimhpfxo5wxdi@hav2bj3l4ozo>
-References: <20240701-pinna-v2-0-ac396d181f59@outlook.com>
- <20240701-pinna-v2-1-ac396d181f59@outlook.com>
+	s=arc-20240116; t=1719913970; c=relaxed/simple;
+	bh=bxm7EwGm4U7hZabbWvg8Mgu7xEnH4BGn9uR6qJR2Fg0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YLoqY1r6+nnneXDubJGH2n7kKmfhMfTKgQaRe5Je6BBPcMexr2QhrVymd9e9vdCA5TOEJL156RTkcQ5wz4CTTANSkm7UiuPAUUjMhQO3H4UQygGIU7im95prs/31SY0i6yQil3Jzk/rq6fpDqrZvUh3t2Tg5w16pKxCvpdh4KoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=hNZOWcX3; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 09A0D100003;
+	Tue,  2 Jul 2024 12:52:27 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1719913947; bh=zivgzMCNQd/zVFarZ2SxkTXpeBtz2aMNAkA+qBWI4m0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=hNZOWcX33q8Ds50Sv4Rn4agriI1Y+ZFoAsZUtRteaZR6fJp3lhlUpfh8wsYfxg9Ri
+	 uIXfHeIYr1UCoIBx6eT6ovY776IX55o7tHC6MkrYyX4xNIbhEGuc2O3Tlr6HthmJ53
+	 OpTuu5AL2/mPG/J7V5l+4RjrH00aGLuEbfrNs0N5GuIRG9X7tfpG9e1ZO1sHLJo28N
+	 aVVJ9Kw17ZiMi47pxbH/EoNC0mFxrHdO8/BRuZFOinpBVsYUXDGls8YdJEZavkhFaI
+	 6J3G+wjajosJt61AIY5hDxxzMpnxDkPTJmeTI7lB2aWeVpJWNE5zfsdA+To2AYB2Vt
+	 r9fpmhHh4angg==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Tue,  2 Jul 2024 12:51:20 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
+ 12:50:56 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Igal Liberman <igal.liberman@freescale.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Madalin Bucur
+	<madalin.bucur@nxp.com>, Sean Anderson <sean.anderson@seco.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH] fsl/fman: Validate cell-index value obtained from Device Tree
+Date: Tue, 2 Jul 2024 12:50:34 +0300
+Message-ID: <20240702095034.12371-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240701-pinna-v2-1-ac396d181f59@outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186273 [Jul 02 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 21 0.3.21 ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/07/02 08:55:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/02 07:20:00 #25796017
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Mon, Jul 01, 2024 at 04:28:02PM GMT, Luigi Leonardi via B4 Relay wrote:
->From: Marco Pinna <marco.pinn95@gmail.com>
->
->Preliminary patch to introduce an optimization to the
->enqueue system.
->
->All the code used to enqueue a packet into the virtqueue
->is removed from virtio_transport_send_pkt_work()
->and moved to the new virtio_transport_send_skb() function.
->
->Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
->---
-> net/vmw_vsock/virtio_transport.c | 133 +++++++++++++++++++++------------------
-> 1 file changed, 73 insertions(+), 60 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 43d405298857..a74083d28120 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -94,6 +94,77 @@ static u32 virtio_transport_get_local_cid(void)
-> 	return ret;
-> }
->
->+/* Caller need to hold vsock->tx_lock on vq */
->+static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
->+				     struct virtio_vsock *vsock, bool *restart_rx)
->+{
->+	int ret, in_sg = 0, out_sg = 0;
->+	struct scatterlist **sgs;
->+	bool reply;
->+
->+	reply = virtio_vsock_skb_reply(skb);
->+	sgs = vsock->out_sgs;
->+	sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
->+		    sizeof(*virtio_vsock_hdr(skb)));
->+	out_sg++;
->+
->+	if (!skb_is_nonlinear(skb)) {
->+		if (skb->len > 0) {
->+			sg_init_one(sgs[out_sg], skb->data, skb->len);
->+			out_sg++;
->+		}
->+	} else {
->+		struct skb_shared_info *si;
->+		int i;
->+
->+		/* If skb is nonlinear, then its buffer must contain
->+		 * only header and nothing more. Data is stored in
->+		 * the fragged part.
->+		 */
->+		WARN_ON_ONCE(skb_headroom(skb) != sizeof(*virtio_vsock_hdr(skb)));
->+
->+		si = skb_shinfo(skb);
->+
->+		for (i = 0; i < si->nr_frags; i++) {
->+			skb_frag_t *skb_frag = &si->frags[i];
->+			void *va;
->+
->+			/* We will use 'page_to_virt()' for the userspace page
->+			 * here, because virtio or dma-mapping layers will call
->+			 * 'virt_to_phys()' later to fill the buffer descriptor.
->+			 * We don't touch memory at "virtual" address of this page.
->+			 */
->+			va = page_to_virt(skb_frag_page(skb_frag));
->+			sg_init_one(sgs[out_sg],
->+				    va + skb_frag_off(skb_frag),
->+				    skb_frag_size(skb_frag));
->+			out_sg++;
->+		}
->+	}
->+
->+	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->+	/* Usually this means that there is no more space available in
->+	 * the vq
->+	 */
->+	if (ret < 0)
->+		return ret;
->+
->+	virtio_transport_deliver_tap_pkt(skb);
->+
->+	if (reply) {
->+		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->+		int val;
->+
->+		val = atomic_dec_return(&vsock->queued_replies);
->+
->+		/* Do we now have resources to resume rx processing? */
->+		if (val + 1 == virtqueue_get_vring_size(rx_vq))
->+			*restart_rx = true;
->+	}
+Cell-index value is obtained from Device Tree and then used to calculate
+the index for accessing arrays port_mfl[], mac_mfl[] and intr_mng[].
+In case of broken DT due to any error cell-index can contain any value
+and it is possible to go beyond the array boundaries which can lead
+at least to memory corruption.
+Validate cell-index value obtained from Device Tree.
 
-Looking more closely at this patch, perhaps we can leave reply handling 
-out of this refactoring, as it is only needed in the worker.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-IIUC, this is to prevent the RX worker from leaving room for the TX 
-worker by handling too many replies. So when we have a large enough 
-number of replies (equal to the size of the RX queue) in the queue of 
-the TX worker ready to be queued in the virtqueue, we stop the RX worker 
-and restart it only when the TX worker has had a chance to send replies.
+Fixes: 414fd46e7762 ("fsl/fman: Add FMan support")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ drivers/net/ethernet/freescale/fman/fman.c | 7 +++++++
+ drivers/net/ethernet/freescale/fman/fman.h | 2 ++
+ drivers/net/ethernet/freescale/fman/mac.c  | 5 +++++
+ 3 files changed, 14 insertions(+)
 
-@Stefan can you confirm this since you were involved in the original 
-implementation?
-
-If we skip the worker, we don't need this.
-Moreover, we know well that the worker has no queued elements, so we 
-will only go to increment `queued_replies` and then decrement it 
-immediately afterwards.
-
-Thanks,
-Stefano
-
->+
->+	return 0;
->+}
->+
-> static void
-> virtio_transport_send_pkt_work(struct work_struct *work)
-> {
->@@ -111,77 +182,19 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 	vq = vsock->vqs[VSOCK_VQ_TX];
->
-> 	for (;;) {
->-		int ret, in_sg = 0, out_sg = 0;
->-		struct scatterlist **sgs;
-> 		struct sk_buff *skb;
->-		bool reply;
->+		int ret;
->
-> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
-> 		if (!skb)
-> 			break;
->
->-		reply = virtio_vsock_skb_reply(skb);
->-		sgs = vsock->out_sgs;
->-		sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
->-			    sizeof(*virtio_vsock_hdr(skb)));
->-		out_sg++;
->-
->-		if (!skb_is_nonlinear(skb)) {
->-			if (skb->len > 0) {
->-				sg_init_one(sgs[out_sg], skb->data, skb->len);
->-				out_sg++;
->-			}
->-		} else {
->-			struct skb_shared_info *si;
->-			int i;
->-
->-			/* If skb is nonlinear, then its buffer must contain
->-			 * only header and nothing more. Data is stored in
->-			 * the fragged part.
->-			 */
->-			WARN_ON_ONCE(skb_headroom(skb) != sizeof(*virtio_vsock_hdr(skb)));
->-
->-			si = skb_shinfo(skb);
->-
->-			for (i = 0; i < si->nr_frags; i++) {
->-				skb_frag_t *skb_frag = &si->frags[i];
->-				void *va;
->-
->-				/* We will use 'page_to_virt()' for the userspace page
->-				 * here, because virtio or dma-mapping layers will call
->-				 * 'virt_to_phys()' later to fill the buffer descriptor.
->-				 * We don't touch memory at "virtual" address of this page.
->-				 */
->-				va = page_to_virt(skb_frag_page(skb_frag));
->-				sg_init_one(sgs[out_sg],
->-					    va + skb_frag_off(skb_frag),
->-					    skb_frag_size(skb_frag));
->-				out_sg++;
->-			}
->-		}
->-
->-		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->-		/* Usually this means that there is no more space available in
->-		 * the vq
->-		 */
->+		ret = virtio_transport_send_skb(skb, vq, vsock, &restart_rx);
-> 		if (ret < 0) {
-> 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
-> 			break;
-> 		}
->
->-		virtio_transport_deliver_tap_pkt(skb);
->-
->-		if (reply) {
->-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-			int val;
->-
->-			val = atomic_dec_return(&vsock->queued_replies);
->-
->-			/* Do we now have resources to resume rx processing? */
->-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
->-				restart_rx = true;
->-		}
->-
-> 		added = true;
-> 	}
->
->
->-- 
->2.45.2
->
->
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index d96028f01770..6929bca3f768 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -2933,3 +2933,10 @@ module_exit(fman_unload);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("Freescale DPAA Frame Manager driver");
++
++int check_mac_id(u32 mac_id)
++{
++	if (mac_id >= MAX_NUM_OF_MACS)
++		return -EINVAL;
++	return 0;
++}
+diff --git a/drivers/net/ethernet/freescale/fman/fman.h b/drivers/net/ethernet/freescale/fman/fman.h
+index 2ea575a46675..3cedde4851e1 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.h
++++ b/drivers/net/ethernet/freescale/fman/fman.h
+@@ -372,6 +372,8 @@ u16 fman_get_max_frm(void);
+ 
+ int fman_get_rx_extra_headroom(void);
+ 
++int check_mac_id(u32 mac_id);
++
+ #ifdef CONFIG_DPAA_ERRATUM_A050385
+ bool fman_has_errata_a050385(void);
+ #endif
+diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
+index 9767586b4eb3..7a67b4c887e2 100644
+--- a/drivers/net/ethernet/freescale/fman/mac.c
++++ b/drivers/net/ethernet/freescale/fman/mac.c
+@@ -247,6 +247,11 @@ static int mac_probe(struct platform_device *_of_dev)
+ 		dev_err(dev, "failed to read cell-index for %pOF\n", mac_node);
+ 		return -EINVAL;
+ 	}
++	err = check_mac_id(val);
++	if (err) {
++		dev_err(dev, "cell-index value is out of range for %pOF\n", mac_node);
++		return err;
++	}
+ 	priv->cell_index = (u8)val;
+ 
+ 	/* Get the MAC address */
+-- 
+2.30.2
 
 
