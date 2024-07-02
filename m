@@ -1,196 +1,194 @@
-Return-Path: <netdev+bounces-108552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B80D8924308
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:01:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B28C92432E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CCF31F22672
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:01:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 523E1B260A1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B991B4C4B;
-	Tue,  2 Jul 2024 16:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06001BD016;
+	Tue,  2 Jul 2024 16:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/vantZK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqK076EE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4A615218A;
-	Tue,  2 Jul 2024 16:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11A116131A
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 16:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719936089; cv=none; b=smSZnVtpwaz8SUORFYLypclGbb8zTlSsDV2uJmRCoJ4eushTEI5sIDUX6PwZjFrAe8DmqC+kCcUmPNTQx0t7nhCkVXrC2XZ9YHMdo2tvMcaJrjNu5ugglMSZZJP6FCA7AWNCbp7NnMIpnYtK5Fz6yAhs45gw2UyDEPOKq2HA/LA=
+	t=1719936368; cv=none; b=Vdln1gf0cZr177VEoI8aMN91mkbIG0iyFF1S/9DmXSHD0HefbHPOt+2JK4tGj+DHu1eIO6MyHFd04+ZwboRtx7IuWMtuUcPlTR7VxrUOnP90hQ/MSpVWVaZCoTaoCOrKLPprKCitHlIA8uEBgqlvGijT77YeXLseb5mBi3AJSxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719936089; c=relaxed/simple;
-	bh=y0asDZ6AOiQDi9OqpPJGUWAlYWwe9TVX/IzWJ84yMWs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uDQvrrvGuUyyCw66mD9m7S7/uBn9MW2w0pwL7ceHGVpLbhJPO9mAVlsBhd2dX5JWe0obBCwywTU5oe/pVWjr9sODfH/GewBZ8sXscAyliwhuOfokN8CQjXyJ+fIxeZuB4WWVUW1s9fyGwEA+SMzuA1qYgyvu3/GFfJUm4NV2XwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/vantZK; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42578fe58a6so22510595e9.3;
-        Tue, 02 Jul 2024 09:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719936086; x=1720540886; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tKrebsbYn4wTrPIAqK35IeD8+1XjetsIa1WTSDDePoc=;
-        b=G/vantZK/b9pTz4YkA1B+JV7SGmC1eWPZ8lr+NUd8DsxDO91O1u6HTQH2eK1fXc8ee
-         6JGOlik/Xj/oiOxzV4NNzaqMzXOJrrzB3nqvHurYfS6ADjNNijzld8m+y1ADsSYY5o4+
-         YiPjGafExZQwkpwwdemik4hGUviGM11lpf3MVU7l5LrQJjEBCewewvUT1DtLLz5M5N+l
-         WTIvBueoLG3S/xERbXhaUpx0i++tKOIGTQfJRDMRyNe3phw/KPfWR86OZztHSuoTooWx
-         JcVnkv1J9fvsEM3jiQfvpXjb0ua8vDMfa6HoJ035J/MDwH53/Kbw5ofj5exnzl3H74Ry
-         7azQ==
+	s=arc-20240116; t=1719936368; c=relaxed/simple;
+	bh=4dzETbi9Y/b084FicibKmVea7ZM5e5Sg03XoJbguRug=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ms+Brxno6VA/SCvC7W3ltO4jQaAO1aYHvJZdw3q2WH05peUgGcYvIkNYYRWDoa7S5ncoaJXc1m7+sTicK121YlQ+8lqZRb2STdElSYcTolqDaZ3BKGIVDUofMhqGrw4U5sKopFrhTv31hDqZysZa3Xx7GfFszlFhjyYh1gDhaTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SqK076EE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719936365;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Mjj83sWED4E39rMUhKU3CbXImDWJ5adzZW0P/Iuo6cg=;
+	b=SqK076EEOEsKc9nBgKIsYY/7//1Qd5tJ/P1pdusfvKw1RyakKzTdeKuA7DWOv+OjJ4bUEe
+	FIw+XZ4kDw9BdUpMrp2RsX1Pp8AUHx4QkrM7ymY77pcmyi5VaeAb3Ever3YAa6jtkj/ee6
+	DPMi8GZbqXX9xxuwZi/+SEq4XVT09qU=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-318-nYBUGwRyPxa3M9xpWsOu8Q-1; Tue, 02 Jul 2024 12:06:04 -0400
+X-MC-Unique: nYBUGwRyPxa3M9xpWsOu8Q-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-704d99cb97aso2843258a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 09:06:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719936086; x=1720540886;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tKrebsbYn4wTrPIAqK35IeD8+1XjetsIa1WTSDDePoc=;
-        b=dQKrXlAyOZ8yuO4K8vX2kNG3g+7QFpMaqWXDUj5ekY5PVrJGR8X+jF6EFTq4WPVO5Y
-         Gu4N0JfDa06XJ9MU5c0kxBRhNTy0IWz5mGr19Q2144JPHtWeN3vaBuHaqHjzc4iIPF/U
-         48UQEYvuNTysKkaeHkpNMI9eoHtGQA8vzD4Cy/LdBFlE07oXs/G9uLEEc5T/6PJhknCs
-         tDi4rbk7L4q7va9lJNXrDwcHl0qcxfzCOwLzExSxieiA4h9sMZNCpnO7H5jCWIWRGnCt
-         as91u7eYCDh37iXwsbfMKKBr6fnpmf06VJ+1oWJ2r6J1pqj/oICkY/VoXWCG32Qdj3dp
-         rPsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUUdkVLSgFEsIRSD1QK8T48JaWNowZT8F0mvgrU6M695nWrMROuKtCzQvqpd8Y4c/MfxAsZnFtx5y+xQ5eVCOXBlLfohbk+//evwqTVLneH+rPoh+hfQHtGgAf9K2QziH+j5B9S
-X-Gm-Message-State: AOJu0Yz/2HJsafDnGvq4heBc/xPIV162uC1mTRMawfhIgAGDT5yBlQ6n
-	jg/fz14SDXew/8JKr7PUVB/H/BIVpW2KMG9LlYaG9ujoMk0nPVL0fYKT06UybpHRciXYjYuO69N
-	6K4IKGISJ+u7uZAVpaEKpxAIN1HU=
-X-Google-Smtp-Source: AGHT+IFDMjotfmZMNXNo0rphhG+Eq5zowZbnss+IgOKermgiUGNR3yONIm6CrrrgvL9jw6dU2EQB8KZbWt4rsN7QJZo=
-X-Received: by 2002:a05:600c:4792:b0:425:6207:12b4 with SMTP id
- 5b1f17b1804b1-4257a03c80emr72337475e9.24.1719936085688; Tue, 02 Jul 2024
- 09:01:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719936363; x=1720541163;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mjj83sWED4E39rMUhKU3CbXImDWJ5adzZW0P/Iuo6cg=;
+        b=g27W9EIpXITJIx9w64UGg9eECSCPD+ie6yLyNvn7HqIjcmy4yCNYvL82UY5EuAWI37
+         1zOb5fUvggiG3A5XOer5hdMQUmVf0CqoVrQosgsuWY/ZmxBngSC8qTF4jboDxuYAlXHq
+         0SI8S7e7cvssS7FEtTwWDedDFVjFBvuZK60utGmLqUMSlaHnaVvMDuZGyMtVmuxvu/yv
+         EU8TLMXtZR6miyXmU9NDNiY4z4GhP0MCCP8SysihWGGPfG2Dqr4unyYQaIKingwirBMJ
+         CkrUyD5JCrJ4Gfln8rFwiVXFxOJl1GaxvJc/i76BMEeNZitJNWyqrvboCaxziljzscJk
+         n9VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfSFz9FscqYpCEKnC/2C3kPlJJ/c+JWtDGythzrKbTBFu7y7FXnWbptraDL6llQNszqO8ac2fOxfaxizPW8wS5c5Ul2nPb
+X-Gm-Message-State: AOJu0YxYGgsYovlvfKGnrQSRLUe8nWhL58mF6FYtna7ZF9Ixv+Gw7ng5
+	21Ts+BODnYMgASMzbgTAR4rlHjJrkwLB4KdGRbUxVgsH09I79pKj1tkih760rOoh6FFykA5wPNX
+	4ErKOO3jXMS1xzTxWMClqsRJRXUTakq3DXfhJXqxnCiKpL71xo6RlAA==
+X-Received: by 2002:a17:902:f545:b0:1f7:11c8:bdd3 with SMTP id d9443c01a7336-1fadbc95462mr61872635ad.29.1719936363107;
+        Tue, 02 Jul 2024 09:06:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFdwWP/5Xu3XpRWOahLnmgTsWWlEmtfBhnw9Oooenlhz1CzdwiplFFIvm2iazLql9A9mmRvUw==
+X-Received: by 2002:a17:902:f545:b0:1f7:11c8:bdd3 with SMTP id d9443c01a7336-1fadbc95462mr61872425ad.29.1719936362728;
+        Tue, 02 Jul 2024 09:06:02 -0700 (PDT)
+Received: from ryzen.. ([240d:1a:c0d:9f00:ca7f:54ff:fe01:979d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac156903bsm85565195ad.208.2024.07.02.09.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 09:06:02 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: kuniyu@amazon.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: [PATCH net 1/2] af_unix: Fix uninit-value in __unix_walk_scc()
+Date: Wed,  3 Jul 2024 01:04:27 +0900
+Message-ID: <20240702160428.10153-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
- <20240625135216.47007-4-linyunsheng@huawei.com> <8e80507c685be94256e0e457ee97622c4487716c.camel@gmail.com>
- <01dc5b5a-bddf-bd2d-220c-478be6b62924@huawei.com>
-In-Reply-To: <01dc5b5a-bddf-bd2d-220c-478be6b62924@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 2 Jul 2024 09:00:48 -0700
-Message-ID: <CAKgT0Ud-q-Z-ri0FQxdsHQegf1daVATEg3bKhs0cavQBcxwieg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 03/13] mm: page_frag: use initial zero offset
- for page_frag_alloc_align()
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 2, 2024 at 5:28=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2024/7/2 7:27, Alexander H Duyck wrote:
-> > On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
-> >> We are above to use page_frag_alloc_*() API to not just
-> > "about to use", not "above to use"
->
-> Ack.
->
-> >
-> >> allocate memory for skb->data, but also use them to do
-> >> the memory allocation for skb frag too. Currently the
-> >> implementation of page_frag in mm subsystem is running
-> >> the offset as a countdown rather than count-up value,
-> >> there may have several advantages to that as mentioned
-> >> in [1], but it may have some disadvantages, for example,
-> >> it may disable skb frag coaleasing and more correct cache
-> >> prefetching
-> >>
->
-> ...
->
-> >> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> >> index 88f567ef0e29..da244851b8a4 100644
-> >> --- a/mm/page_frag_cache.c
-> >> +++ b/mm/page_frag_cache.c
-> >> @@ -72,10 +72,6 @@ void *__page_frag_alloc_align(struct page_frag_cach=
-e *nc,
-> >>              if (!page)
-> >>                      return NULL;
-> >>
-> >> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> -            /* if size can vary use size else just use PAGE_SIZE */
-> >> -            size =3D nc->size;
-> >> -#endif
-> >>              /* Even if we own the page, we do not use atomic_set().
-> >>               * This would break get_page_unless_zero() users.
-> >>               */
-> >> @@ -84,11 +80,16 @@ void *__page_frag_alloc_align(struct page_frag_cac=
-he *nc,
-> >>              /* reset page count bias and offset to start of new frag =
-*/
-> >>              nc->pfmemalloc =3D page_is_pfmemalloc(page);
-> >>              nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> >> -            nc->offset =3D size;
-> >> +            nc->offset =3D 0;
-> >>      }
-> >>
-> >> -    offset =3D nc->offset - fragsz;
-> >> -    if (unlikely(offset < 0)) {
-> >> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> +    /* if size can vary use size else just use PAGE_SIZE */
-> >> +    size =3D nc->size;
-> >> +#endif
-> >> +
-> >> +    offset =3D __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
-> >> +    if (unlikely(offset + fragsz > size)) {
-> >
-> > The fragsz check below could be moved to here.
-> >
-> >>              page =3D virt_to_page(nc->va);
-> >>
-> >>              if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
-> >> @@ -99,17 +100,13 @@ void *__page_frag_alloc_align(struct page_frag_ca=
-che *nc,
-> >>                      goto refill;
-> >>              }
-> >>
-> >> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> -            /* if size can vary use size else just use PAGE_SIZE */
-> >> -            size =3D nc->size;
-> >> -#endif
-> >>              /* OK, page count is 0, we can safely set it */
-> >>              set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
-> >>
-> >>              /* reset page count bias and offset to start of new frag =
-*/
-> >>              nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> >> -            offset =3D size - fragsz;
-> >> -            if (unlikely(offset < 0)) {
-> >> +            offset =3D 0;
-> >> +            if (unlikely(fragsz > PAGE_SIZE)) {
-> >
-> > Since we aren't taking advantage of the flag that is left after the
-> > subtraction we might just want to look at moving this piece up to just
-> > after the offset + fragsz check. That should prevent us from trying to
-> > refill if we have a request that is larger than a single page. In
-> > addition we could probably just drop the 3 PAGE_SIZE checks above as
-> > they would be redundant.
->
-> I am not sure I understand the 'drop the 3 PAGE_SIZE checks' part and
-> the 'redundant' part, where is the '3 PAGE_SIZE checks'? And why they
-> are redundant?
+KMSAN reported uninit-value access in __unix_walk_scc() [1].
 
-I was referring to the addition of the checks for align > PAGE_SIZE in
-the alloc functions at the start of this diff. I guess I had dropped
-them from the first half of it with the "...". Also looking back
-through the patch you misspelled "avoid" as "aovid".
+In the list_for_each_entry_reverse() loop, when the vertex's index
+equals it's scc_index, the loop uses the variable vertex as a
+temporary variable that points to a vertex in scc. And when the loop
+is finished, the variable vertex points to the list head, in this case
+scc, which is a local variable on the stack (more precisely, it's not
+even scc and might underflow the call stack of __unix_walk_scc():
+container_of(&scc, struct unix_vertex, scc_entry)).
 
-The issue is there is a ton of pulling things forward that don't
-necessarily make sense into these diffs. Now that I have finished
-looking through the set I have a better idea of why those are there
-and they might make sense. It is just difficult to review since code
-is being added for things that aren't applicable to the patch being
-reviewed.
+However, the variable vertex is used under the label prev_vertex. So
+if the edge_stack is not empty and the function jumps to the
+prev_vertex label, the function will access invalid data on the
+stack. This causes the uninit-value access issue.
+
+Fix this by introducing a new temporary variable for the loop.
+
+[1]
+BUG: KMSAN: uninit-value in __unix_walk_scc net/unix/garbage.c:478 [inline]
+BUG: KMSAN: uninit-value in unix_walk_scc net/unix/garbage.c:526 [inline]
+BUG: KMSAN: uninit-value in __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
+ __unix_walk_scc net/unix/garbage.c:478 [inline]
+ unix_walk_scc net/unix/garbage.c:526 [inline]
+ __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
+ worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
+ kthread+0x3c4/0x530 kernel/kthread.c:389
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was stored to memory at:
+ unix_walk_scc net/unix/garbage.c:526 [inline]
+ __unix_gc+0x2adf/0x3c20 net/unix/garbage.c:584
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
+ worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
+ kthread+0x3c4/0x530 kernel/kthread.c:389
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Local variable entries created at:
+ ref_tracker_free+0x48/0xf30 lib/ref_tracker.c:222
+ netdev_tracker_free include/linux/netdevice.h:4058 [inline]
+ netdev_put include/linux/netdevice.h:4075 [inline]
+ dev_put include/linux/netdevice.h:4101 [inline]
+ update_gid_event_work_handler+0xaa/0x1b0 drivers/infiniband/core/roce_gid_mgmt.c:813
+
+CPU: 1 PID: 12763 Comm: kworker/u8:31 Not tainted 6.10.0-rc4-00217-g35bb670d65fc #32
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
+Workqueue: events_unbound __unix_gc
+
+Fixes: 3484f063172d ("af_unix: Detect Strongly Connected Components.")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+v1->v2: https://lore.kernel.org/all/20240625152713.1147650-1-syoshida@redhat.com/
+- A bit of elaboration on the commit message, as suggested by Iwashima-san.
+- Bundle a selftest written by Iwashima-san.
+---
+ net/unix/garbage.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index dfe94a90ece4..23efb78fe9ef 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -476,6 +476,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
+ 	}
+ 
+ 	if (vertex->index == vertex->scc_index) {
++		struct unix_vertex *v;
+ 		struct list_head scc;
+ 		bool scc_dead = true;
+ 
+@@ -486,15 +487,15 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
+ 		 */
+ 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+ 
+-		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
++		list_for_each_entry_reverse(v, &scc, scc_entry) {
+ 			/* Don't restart DFS from this vertex in unix_walk_scc(). */
+-			list_move_tail(&vertex->entry, &unix_visited_vertices);
++			list_move_tail(&v->entry, &unix_visited_vertices);
+ 
+ 			/* Mark vertex as off-stack. */
+-			vertex->index = unix_vertex_grouped_index;
++			v->index = unix_vertex_grouped_index;
+ 
+ 			if (scc_dead)
+-				scc_dead = unix_vertex_dead(vertex);
++				scc_dead = unix_vertex_dead(v);
+ 		}
+ 
+ 		if (scc_dead)
+-- 
+2.45.2
+
 
