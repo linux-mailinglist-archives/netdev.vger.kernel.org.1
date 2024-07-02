@@ -1,193 +1,449 @@
-Return-Path: <netdev+bounces-108299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9FD91EB95
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:53:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED73B91EBB2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 02:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4E1B1F2212E
-	for <lists+netdev@lfdr.de>; Mon,  1 Jul 2024 23:53:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B9CC2838B8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 00:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A375D173323;
-	Mon,  1 Jul 2024 23:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CB0372;
+	Tue,  2 Jul 2024 00:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9YlDVI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BE6502A9
-	for <netdev@vger.kernel.org>; Mon,  1 Jul 2024 23:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C79ECC;
+	Tue,  2 Jul 2024 00:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719878001; cv=none; b=oI15yDCdQpRr3JhceVPDoR/Ri8pXnAHF41vThABQ34uGO5GnzhNnL9SFeyUcrv2zy23yXWeQ98T8KzIkCPYRDjBuMXwKM+xaPpPBltCaKBbwmJcCvZrGZa/h+p1RoLVYWfcEd1zZvqhPWmMpjeqnvrzxH5JfyCjVkRYOAzSTI+8=
+	t=1719878912; cv=none; b=Q/pmE0gOOovShhmHDrpcE3y9d5xv8FbyZW8Ik4vhm1uPcQ0jYgGrjtJ3W599PJBjMir8l7ZIM6A8dBelXiNQqUII8sH6xzfjLIc+JNxdlzrbsRnP4CzkgL4019BIpmJ3PTTNAyCE3qcCgekV3sLt+ZTT+uVjWHmBlOtlif11zaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719878001; c=relaxed/simple;
-	bh=PY2FAyPkvPGdHRXhpBQW569AJiePHyIVLAqLrk23LYo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eWchAeToHmPdEVFj8KA7WKCRk+MnTPMBcc2IUvDZK6zWwPMNyk75+OU0bhGyCZRvRcoj4QxhFFIEbQehR/rHQxkaiZR6m1KEvC2B0XzQRKG+HnnMFvCbpJYj/inGiqmzVfWOTJA28JNdBnUwxQmA8qnGkhBfEooUNa+AQ1ujHJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7ec0802fd0dso414508339f.0
-        for <netdev@vger.kernel.org>; Mon, 01 Jul 2024 16:53:19 -0700 (PDT)
+	s=arc-20240116; t=1719878912; c=relaxed/simple;
+	bh=FDVWcLmwNg13JppX8QDj1e6CIDHM2o7mhcfA8dmytKo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ae8mAP4qZ+eyYkdbvRQs5R/r5NctCHVlmIU+vKOUzSqd56aqAXRVxmVmmmQW2g1yNmFvX3D+FNmY86gNAnNP6gGe2PZ4MmZDJH7Ke0UNVNxDUqjgJfPkAV7ioSXtlTuYF9wGjvntgHYkEdPRXFW5arjZQEZYoJ0wCrMyGrRoKqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9YlDVI0; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-70aaab1cb72so2161153b3a.0;
+        Mon, 01 Jul 2024 17:08:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719878910; x=1720483710; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zwXlu1WVqsnVJZ9utDU8T7rgXo210umX1xN+HtCfvHk=;
+        b=H9YlDVI0z+Kxlg4pC7AWo4BDrAXGNywsbeoWDywis8cZWz3A0V4wP4SChSiMjfNr3+
+         KbY1Dvv2UB1K0QHwrbKr/dXIw0PjR0C9GLitrANt2iKAxUIlWl7JdenDLe4ynkpbV1MQ
+         tl9yykkW75PqI0GRo83zodVN3ezkRIyk1Na9J+2fAvJ0Ouf9lDJXIFkAlxgBu17RTvmz
+         FeHf6JRftzSUivyh3BYQrEFxcwLDvZHNP85IPNt8+GuUaetUj1HvcwV71ILC62RUKIvv
+         XY1QJXLH+Unpc9EdLxMcvApIVY3+gLmoQ5gxi0J6wC0KvSvzK/DJTys4csGjFH3R7GFT
+         PmoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719877999; x=1720482799;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1719878910; x=1720483710;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KaI/LO8DSIptlZVh7gM3/Uo8GPtDaJ/F+a6tBBbt6ow=;
-        b=g3sXO8a0W6NSTRIuDRU/5XLueKmZUV4gk3isteXhvKoAhPEoeiikw+kn6/gncgbkLH
-         QFCEHnBq0Sw/YEGQBStI1BdxOqCji0FVG+NBx8Eptqc7eZ4KedME4I4JcBCg+rB+Ro1H
-         9mxlyiv2G7ZGQxI58LIA/Mlc7Wu2HwPmyXTxevhhKR2q/PqI/FV2U2AavkmbER/kF+Wf
-         WYKqih0gkOfPfj6AYOqa5330p1KfUBPH518raiWN2V9iMIGnaoi/w8R7Yzevd4KRZnyO
-         g1vvPWPN0yWWzjKyq+RGRlpkySDTa6bDmk8kgJBoDiHlFdUgIlVxAy/vXuvvxXA+rumH
-         mfRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdTPawZfQPcrHQfHRnlf+lIR+GDwkoHketlyPOsKidxN0S/Zk8i8zLBSnG1nbI+FB8xnWW8Uxaa/CD4QBK+uTloEsZSm3T
-X-Gm-Message-State: AOJu0YyF9+38QG2aUreRqPTKkX5YkvkOX7WXjvJxaMye151Cn1tFQobO
-	jQZ8rkuRv2UOHd3j0XvVXF8HJVSM0gGsA3KPWLs8IvugXOH2ytDvCdSVTU6R7ClPXYQsEeThVqY
-	bV2yC2Hx9NEnu6wd4ddpkUGevxgM6RI5TLDSe+dnJ4xspPXBp1lU7R2Q=
-X-Google-Smtp-Source: AGHT+IHYYMxefTUx0j/nVT23EjKfahCClX/zg25CWwLrdKau/tYn5C+kDh8Fx3kRiqxdkGD0qYChZjdeDyFCtboyZXEXVd6QOltM
+        bh=zwXlu1WVqsnVJZ9utDU8T7rgXo210umX1xN+HtCfvHk=;
+        b=niMe3ae3pLGatTXxTmh3Spd2gPE+mK2/wElXhNck1VCrA7T9tKui4hrT3k6Ia8cZlV
+         HpjmP+ecg8rPS3DgvqyDKzNimXIUssI++sqD4Yysz5P5EUjLlGiZsTAb6AWoS//BoXom
+         ZTMWBLSIG/mrk4NniwPQMzFTEI5sP4Rcntxn6ar70hnrXYsXGhzSpdQAiM+Saieouyp4
+         utZyW8xTpHzh236uzmsTqs0p00OADXMtLKTOa1GYw7bnrjIHmkPFBVOE+al1MJOpY+EK
+         KCG0HlDugc7T9JIo6tFo0GmgJQY1Jdlv6blhMF5QiRznGlrZOlEyMscmio2kaj8gWmrr
+         5fuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVirNcs8t0qsRxsI9n9rlnvTLZG0RMIaOAOIbn27kBjtOeXqKGV2unDJfpChTyUhSb4NVEihZn2MN8qHLsiWBcq7leff8M1xefavI1l
+X-Gm-Message-State: AOJu0YxnMDORecAfWaBN0M+ixH5Y9bd8VtMUz0d4t2gFPvuGgRETPAE6
+	pjgQO3F+InG4/8/Xt1mJQ9vsN0sO48IfUjIiw9HCU5Kuqhj0q7Dm
+X-Google-Smtp-Source: AGHT+IFL9tfJxnSiQ1ohuj80uEisjABTfCEmpgMn4bUaZduxfPeqy8o3YyadjSYRSeX9qvb5RNfDgg==
+X-Received: by 2002:a05:6a21:6d96:b0:1be:ca24:964c with SMTP id adf61e73a8af0-1bef6109d5bmr11975347637.16.1719878909973;
+        Mon, 01 Jul 2024 17:08:29 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1fac1535b94sm70925405ad.155.2024.07.01.17.08.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 17:08:29 -0700 (PDT)
+Message-ID: <12a8b9ddbcb2da8431f77c5ec952ccfb2a77b7ec.camel@gmail.com>
+Subject: Re: [PATCH net-next v9 06/13] mm: page_frag: reuse existing space
+ for 'size' and 'pfmemalloc'
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Mon, 01 Jul 2024 17:08:28 -0700
+In-Reply-To: <20240625135216.47007-7-linyunsheng@huawei.com>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+	 <20240625135216.47007-7-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd85:0:b0:375:9f67:6e7d with SMTP id
- e9e14a558f8ab-37cd2ed93bemr6559925ab.4.1719877999357; Mon, 01 Jul 2024
- 16:53:19 -0700 (PDT)
-Date: Mon, 01 Jul 2024 16:53:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000357ea9061c384d6d@google.com>
-Subject: [syzbot] [bpf?] [net?] general protection fault in xdp_do_redirect
-From: syzbot <syzbot+0b5c75599f1d872bea6f@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
+> Currently there is one 'struct page_frag' for every 'struct
+> sock' and 'struct task_struct', we are about to replace the
+> 'struct page_frag' with 'struct page_frag_cache' for them.
+> Before begin the replacing, we need to ensure the size of
+> 'struct page_frag_cache' is not bigger than the size of
+> 'struct page_frag', as there may be tens of thousands of
+> 'struct sock' and 'struct task_struct' instances in the
+> system.
+>=20
+> By or'ing the page order & pfmemalloc with lower bits of
+> 'va' instead of using 'u16' or 'u32' for page size and 'u8'
+> for pfmemalloc, we are able to avoid 3 or 5 bytes space waste.
+> And page address & pfmemalloc & order is unchanged for the
+> same page in the same 'page_frag_cache' instance, it makes
+> sense to fit them together.
+>=20
+> Also, it is better to replace 'offset' with 'remaining', which
+> is the remaining size for the cache in a 'page_frag_cache'
+> instance, we are able to do a single 'fragsz > remaining'
+> checking for the case of cache not being enough, which should be
+> the fast path if we ensure size is zoro when 'va' =3D=3D NULL by
+> memset'ing 'struct page_frag_cache' in page_frag_cache_init()
+> and page_frag_cache_drain().
+>=20
+> After this patch, the size of 'struct page_frag_cache' should be
+> the same as the size of 'struct page_frag'.
+>=20
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/linux/page_frag_cache.h | 76 +++++++++++++++++++++++-----
+>  mm/page_frag_cache.c            | 90 ++++++++++++++++++++-------------
+>  2 files changed, 118 insertions(+), 48 deletions(-)
+>=20
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> index 6ac3a25089d1..b33904d4494f 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -8,29 +8,81 @@
+>  #define PAGE_FRAG_CACHE_MAX_SIZE	__ALIGN_MASK(32768, ~PAGE_MASK)
+>  #define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
+> =20
+> -struct page_frag_cache {
+> -	void *va;
+> +/*
+> + * struct encoded_va - a nonexistent type marking this pointer
+> + *
+> + * An 'encoded_va' pointer is a pointer to a aligned virtual address, wh=
+ich is
+> + * at least aligned to PAGE_SIZE, that means there are at least 12 lower=
+ bits
+> + * space available for other purposes.
+> + *
+> + * Currently we use the lower 8 bits and bit 9 for the order and PFMEMAL=
+LOC
+> + * flag of the page this 'va' is corresponding to.
+> + *
+> + * Use the supplied helper functions to endcode/decode the pointer and b=
+its.
+> + */
+> +struct encoded_va;
+> +
 
-syzbot found the following issue on:
+Why did you create a struct for this? The way you use it below it is
+just a pointer. No point in defining a struct that doesn't exist
+anywhere.
 
-HEAD commit:    642a16ca7994 Add linux-next specific files for 20240627
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=147914c6980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ba15715f73169384
-dashboard link: https://syzkaller.appspot.com/bug?extid=0b5c75599f1d872bea6f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> +#define PAGE_FRAG_CACHE_ORDER_MASK		GENMASK(7, 0)
+> +#define PAGE_FRAG_CACHE_PFMEMALLOC_BIT		BIT(8)
+> +#define PAGE_FRAG_CACHE_PFMEMALLOC_SHIFT	8
+> +
+> +static inline struct encoded_va *encode_aligned_va(void *va,
+> +						   unsigned int order,
+> +						   bool pfmemalloc)
+> +{
+>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -	__u16 offset;
+> -	__u16 size;
+> +	return (struct encoded_va *)((unsigned long)va | order |
+> +			pfmemalloc << PAGE_FRAG_CACHE_PFMEMALLOC_SHIFT);
+>  #else
+> -	__u32 offset;
+> +	return (struct encoded_va *)((unsigned long)va |
+> +			pfmemalloc << PAGE_FRAG_CACHE_PFMEMALLOC_SHIFT);
+> +#endif
+> +}
+> +
+> +static inline unsigned long encoded_page_order(struct encoded_va *encode=
+d_va)
+> +{
+> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> +	return PAGE_FRAG_CACHE_ORDER_MASK & (unsigned long)encoded_va;
+> +#else
+> +	return 0;
+> +#endif
+> +}
+> +
+> +static inline bool encoded_page_pfmemalloc(struct encoded_va *encoded_va=
+)
+> +{
+> +	return PAGE_FRAG_CACHE_PFMEMALLOC_BIT & (unsigned long)encoded_va;
+> +}
+> +
 
-Unfortunately, I don't have any reproducer for this issue yet.
+My advice is that if you just make encoded_va an unsigned long this
+just becomes some FIELD_GET and bit operations.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/72ed10c6e9be/disk-642a16ca.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f2ca81ede1c4/vmlinux-642a16ca.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/af14c94fa854/bzImage-642a16ca.xz
+> +static inline void *encoded_page_address(struct encoded_va *encoded_va)
+> +{
+> +	return (void *)((unsigned long)encoded_va & PAGE_MASK);
+> +}
+> +
+> +struct page_frag_cache {
+> +	struct encoded_va *encoded_va;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0b5c75599f1d872bea6f@syzkaller.appspotmail.com
+This should be an unsigned long, not a pointer since you are storing
+data other than just a pointer in here. The pointer is just one of the
+things you extract out of it.
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
-CPU: 0 UID: 60928 PID: 8680 Comm: syz.1.877 Not tainted 6.10.0-rc5-next-20240627-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:xdp_do_redirect+0x63/0xb40 net/core/filter.c:4423
-Code: c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 ec 04 91 f8 4c 8b 23 4d 8d 74 24 38 4c 89 f3 48 c1 eb 03 <42> 0f b6 04 2b 84 c0 0f 85 fc 07 00 00 41 8b 2e 89 ee 83 e6 02 31
-RSP: 0018:ffffc9001600f828 EFLAGS: 00010202
-RAX: 1ffff110033f1301 RBX: 0000000000000007 RCX: 0000000000040000
-RDX: ffffc9000ac74000 RSI: 0000000000000204 RDI: 0000000000000205
-RBP: ffffc9001600f9b0 R08: 0000000000000005 R09: ffffffff866b25e9
-R10: 0000000000000005 R11: ffff888019f88000 R12: 0000000000000000
-R13: dffffc0000000000 R14: 0000000000000038 R15: ffffc9001600faf0
-FS:  00007fe5bc2366c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2411f23000 CR3: 000000005d692000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- tun_xdp_act+0xe9/0xb70 drivers/net/tun.c:1626
- tun_build_skb drivers/net/tun.c:1716 [inline]
- tun_get_user+0x346d/0x4560 drivers/net/tun.c:1819
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe5bb3746df
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 8b 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 8c 02 00 48
-RSP: 002b:00007fe5bc236010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007fe5bb503fa0 RCX: 00007fe5bb3746df
-RDX: 000000000000003e RSI: 0000000020000280 RDI: 00000000000000c8
-RBP: 00007fe5bb3f6756 R08: 0000000000000000 R09: 0000000000000000
-R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fe5bb503fa0 R15: 00007ffe2c314948
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:xdp_do_redirect+0x63/0xb40 net/core/filter.c:4423
-Code: c3 08 18 00 00 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 ec 04 91 f8 4c 8b 23 4d 8d 74 24 38 4c 89 f3 48 c1 eb 03 <42> 0f b6 04 2b 84 c0 0f 85 fc 07 00 00 41 8b 2e 89 ee 83 e6 02 31
-RSP: 0018:ffffc9001600f828 EFLAGS: 00010202
-RAX: 1ffff110033f1301 RBX: 0000000000000007 RCX: 0000000000040000
-RDX: ffffc9000ac74000 RSI: 0000000000000204 RDI: 0000000000000205
-RBP: ffffc9001600f9b0 R08: 0000000000000005 R09: ffffffff866b25e9
-R10: 0000000000000005 R11: ffff888019f88000 R12: 0000000000000000
-R13: dffffc0000000000 R14: 0000000000000038 R15: ffffc9001600faf0
-FS:  00007fe5bc2366c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2411f23000 CR3: 000000005d692000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	c3                   	ret
-   1:	08 18                	or     %bl,(%rax)
-   3:	00 00                	add    %al,(%rax)
-   5:	48 89 d8             	mov    %rbx,%rax
-   8:	48 c1 e8 03          	shr    $0x3,%rax
-   c:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  11:	74 08                	je     0x1b
-  13:	48 89 df             	mov    %rbx,%rdi
-  16:	e8 ec 04 91 f8       	call   0xf8910507
-  1b:	4c 8b 23             	mov    (%rbx),%r12
-  1e:	4d 8d 74 24 38       	lea    0x38(%r12),%r14
-  23:	4c 89 f3             	mov    %r14,%rbx
-  26:	48 c1 eb 03          	shr    $0x3,%rbx
-* 2a:	42 0f b6 04 2b       	movzbl (%rbx,%r13,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 fc 07 00 00    	jne    0x833
-  37:	41 8b 2e             	mov    (%r14),%ebp
-  3a:	89 ee                	mov    %ebp,%esi
-  3c:	83 e6 02             	and    $0x2,%esi
-  3f:	31                   	.byte 0x31
+> +
+> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <=3D 32)
+> +	u16 pagecnt_bias;
+> +	u16 remaining;
+> +#else
+> +	u32 pagecnt_bias;
+> +	u32 remaining;
+>  #endif
+> -	/* we maintain a pagecount bias, so that we dont dirty cache line
+> -	 * containing page->_refcount every time we allocate a fragment.
+> -	 */
+> -	unsigned int		pagecnt_bias;
+> -	bool pfmemalloc;
+>  };
+> =20
+>  static inline void page_frag_cache_init(struct page_frag_cache *nc)
+>  {
+> -	nc->va =3D NULL;
+> +	memset(nc, 0, sizeof(*nc));
 
+Shouldn't need to memset 0 the whole thing. Just setting page and order
+to 0 should be enough to indicate that there isn't anything there.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>  }
+> =20
+>  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache =
+*nc)
+>  {
+> -	return !!nc->pfmemalloc;
+> +	return encoded_page_pfmemalloc(nc->encoded_va);
+> +}
+> +
+> +static inline unsigned int page_frag_cache_page_size(struct encoded_va *=
+encoded_va)
+> +{
+> +	return PAGE_SIZE << encoded_page_order(encoded_va);
+>  }
+> =20
+>  void page_frag_cache_drain(struct page_frag_cache *nc);
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index dd640af5607a..a3316dd50eff 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -18,34 +18,61 @@
+>  #include <linux/page_frag_cache.h>
+>  #include "internal.h"
+> =20
+> +static void *page_frag_cache_current_va(struct page_frag_cache *nc)
+> +{
+> +	struct encoded_va *encoded_va =3D nc->encoded_va;
+> +
+> +	return (void *)(((unsigned long)encoded_va & PAGE_MASK) |
+> +		(page_frag_cache_page_size(encoded_va) - nc->remaining));
+> +}
+> +
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Rather than an OR here I would rather see this just use addition.
+Otherwise this logic becomes overly complicated.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+>  static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+>  					     gfp_t gfp_mask)
+>  {
+>  	struct page *page =3D NULL;
+>  	gfp_t gfp =3D gfp_mask;
+> +	unsigned int order;
+> =20
+>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>  	gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+>  		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+>  	page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+>  				PAGE_FRAG_CACHE_MAX_ORDER);
+> -	nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+>  #endif
+> -	if (unlikely(!page))
+> +	if (unlikely(!page)) {
+>  		page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
+> +		if (unlikely(!page)) {
+> +			memset(nc, 0, sizeof(*nc));
+> +			return NULL;
+> +		}
+> +
+> +		order =3D 0;
+> +		nc->remaining =3D PAGE_SIZE;
+> +	} else {
+> +		order =3D PAGE_FRAG_CACHE_MAX_ORDER;
+> +		nc->remaining =3D PAGE_FRAG_CACHE_MAX_SIZE;
+> +	}
+> =20
+> -	nc->va =3D page ? page_address(page) : NULL;
+> +	/* Even if we own the page, we do not use atomic_set().
+> +	 * This would break get_page_unless_zero() users.
+> +	 */
+> +	page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+> =20
+> +	/* reset page count bias of new frag */
+> +	nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+I would rather keep the pagecnt_bias, page reference addition, and
+resetting of remaining outside of this. The only fields we should be
+setting are order, the virtual address, and pfmemalloc since those are
+what is encoded in your unsigned long variable.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> +	nc->encoded_va =3D encode_aligned_va(page_address(page), order,
+> +					   page_is_pfmemalloc(page));
+>  	return page;
+>  }
+> =20
+>  void page_frag_cache_drain(struct page_frag_cache *nc)
+>  {
+> -	if (!nc->va)
+> +	if (!nc->encoded_va)
+>  		return;
+> =20
+> -	__page_frag_cache_drain(virt_to_head_page(nc->va), nc->pagecnt_bias);
+> -	nc->va =3D NULL;
+> +	__page_frag_cache_drain(virt_to_head_page(nc->encoded_va),
+> +				nc->pagecnt_bias);
+> +	memset(nc, 0, sizeof(*nc));
 
-If you want to undo deduplication, reply with:
-#syz undup
+Again, no need for memset when "nv->encoded_va =3D 0" will do.
+
+>  }
+>  EXPORT_SYMBOL(page_frag_cache_drain);
+> =20
+> @@ -62,51 +89,41 @@ void *__page_frag_alloc_va_align(struct page_frag_cac=
+he *nc,
+>  				 unsigned int fragsz, gfp_t gfp_mask,
+>  				 unsigned int align_mask)
+>  {
+> -	unsigned int size =3D PAGE_SIZE;
+> +	struct encoded_va *encoded_va =3D nc->encoded_va;
+>  	struct page *page;
+> -	int offset;
+> +	int remaining;
+> +	void *va;
+> =20
+> -	if (unlikely(!nc->va)) {
+> +	if (unlikely(!encoded_va)) {
+>  refill:
+> -		page =3D __page_frag_cache_refill(nc, gfp_mask);
+> -		if (!page)
+> +		if (unlikely(!__page_frag_cache_refill(nc, gfp_mask)))
+>  			return NULL;
+> =20
+> -		/* Even if we own the page, we do not use atomic_set().
+> -		 * This would break get_page_unless_zero() users.
+> -		 */
+> -		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
+> -
+> -		/* reset page count bias and offset to start of new frag */
+> -		nc->pfmemalloc =3D page_is_pfmemalloc(page);
+> -		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		nc->offset =3D 0;
+> +		encoded_va =3D nc->encoded_va;
+>  	}
+> =20
+> -#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> -	/* if size can vary use size else just use PAGE_SIZE */
+> -	size =3D nc->size;
+> -#endif
+> -
+> -	offset =3D __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
+> -	if (unlikely(offset + fragsz > size)) {
+> -		page =3D virt_to_page(nc->va);
+> -
+> +	remaining =3D nc->remaining & align_mask;
+> +	remaining -=3D fragsz;
+> +	if (unlikely(remaining < 0)) {
+
+Now this is just getting confusing. You essentially just added an
+additional addition step and went back to the countdown approach I was
+using before except for the fact that you are starting at 0 whereas I
+was actually moving down through the page.
+
+What I would suggest doing since "remaining" is a negative offset
+anyway would be to look at just storing it as a signed negative number.
+At least with that you can keep to your original approach and would
+only have to change your check to be for "remaining + fragsz <=3D 0".
+With that you can still do your math but it becomes an addition instead
+of a subtraction.
+
+> +		page =3D virt_to_page(encoded_va);
+>  		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+>  			goto refill;
+> =20
+> -		if (unlikely(nc->pfmemalloc)) {
+> -			free_unref_page(page, compound_order(page));
+> +		if (unlikely(encoded_page_pfmemalloc(encoded_va))) {
+> +			VM_BUG_ON(compound_order(page) !=3D
+> +				  encoded_page_order(encoded_va));
+> +			free_unref_page(page, encoded_page_order(encoded_va));
+>  			goto refill;
+>  		}
+> =20
+>  		/* OK, page count is 0, we can safely set it */
+>  		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+> =20
+> -		/* reset page count bias and offset to start of new frag */
+> +		/* reset page count bias and remaining of new frag */
+>  		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> -		offset =3D 0;
+> -		if (unlikely(fragsz > PAGE_SIZE)) {
+> +		nc->remaining =3D remaining =3D page_frag_cache_page_size(encoded_va);
+> +		remaining -=3D fragsz;
+> +		if (unlikely(remaining < 0)) {
+>  			/*
+>  			 * The caller is trying to allocate a fragment
+>  			 * with fragsz > PAGE_SIZE but the cache isn't big
+
+I find it really amusing that you went to all the trouble of flipping
+the logic just to flip it back to being a countdown setup. If you were
+going to bother with all that then why not just make the remaining
+negative instead? You could save yourself a ton of trouble that way and
+all you would need to do is flip a few signs.
+
+> @@ -120,10 +137,11 @@ void *__page_frag_alloc_va_align(struct page_frag_c=
+ache *nc,
+>  		}
+>  	}
+> =20
+> +	va =3D page_frag_cache_current_va(nc);
+>  	nc->pagecnt_bias--;
+> -	nc->offset =3D offset + fragsz;
+> +	nc->remaining =3D remaining;
+> =20
+> -	return nc->va + offset;
+> +	return va;
+>  }
+>  EXPORT_SYMBOL(__page_frag_alloc_va_align);
+> =20
+
+Not sure I am huge fan of the way the order of operations has to get so
+creative for this to work.  Not that I see a better way to do it, but
+my concern is that this is going to add technical debt as I can easily
+see somebody messing up the order of things at some point in the future
+and generating a bad pointer.
 
