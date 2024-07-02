@@ -1,163 +1,156 @@
-Return-Path: <netdev+bounces-108500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE59A923FC2
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:59:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7AC9923FD6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ED80B2ACAE
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:58:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65361B223D1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1FA1B4C5C;
-	Tue,  2 Jul 2024 13:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB701B5805;
+	Tue,  2 Jul 2024 14:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NV2pOtL0"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="OHSlqMtW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D1716631A;
-	Tue,  2 Jul 2024 13:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F3ABA2D;
+	Tue,  2 Jul 2024 14:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719928678; cv=none; b=OStOtP5K6kkXPvqijGe4eU86HFw5cUoh5Hm6Xg9E0zv1YsTsP/dtcz7CDiISlWt28ViTGRfrtZ/s8hpifg2256wU95QunuWQ7H0jPwNzBaQwCCh8cv73DRzSFBZnH5aLMcywu1fIIJO0xv/HhpAz+gjoELR8N4UkZYa+144vHiA=
+	t=1719929034; cv=none; b=Dihkhuih33Df8seMIE63wIYGW5H+tlHZaLPwa3vHOJ3S3yP1ugzA3JxEmhmmQJSk31jdaAYS3fM3WqPkUZZkXsaaPi1XmUS0WyKaI0WdwGvpZwn4c+iQB00dMAT0oD2XJmv9S+6vqeBNc/Jx17t2iqZ9fZ6RS1GMIaH19SspN9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719928678; c=relaxed/simple;
-	bh=R5jYsYDsbM4YHchYzsZARuDYKzl4575wfzad4Gt38O8=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JlkW0zL7N4HA6BandD46KIH1ieoqDULRQmyO0fbB/lUrSLn6zqD7O6twLWE2+R99q+IlbDxRMtoVxWCMAapV4HpHWyVyONkLj2gPA7K0GAHbRoFi1XQTbvFmT5FCS8mcpxJowhhwtzMeNLg7ppIrNOY30Vl4hZOGTSOOqZPTpDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NV2pOtL0; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a732cb4ea31so553227066b.0;
-        Tue, 02 Jul 2024 06:57:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719928674; x=1720533474; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=n7FK8iXLG1SnlI4ndAhM4FDLc7t8LfJYFyucJUdAyuE=;
-        b=NV2pOtL0xVTxjfXO5Joh5J5vUrus2V62Aptt6VRl7OBFTxi9HZpLBxEt1OvlVL9Y8T
-         cgJm/IzdaDzdzHDn2BhUxwTY9n3TqlLPU2X7jodGNXuB233/4hzxsYUmUd3hClAN5EFa
-         sfzSz4kXJnN6fC1NZn7le83aqa2LlWCcP9CW3dKOnj5WpcBgahIdcCWxEoN1dVrAuW23
-         tvA9vbRb+s/uqZ0OnCCIrmyvPb5j8CULFBHUo099XPcrQMKPFYkU2mcZBwUh4Vi1nXFW
-         Ipz6J1pYGPrZ1JK+8HaCvWWyTqLvKCx/63WUGHocIjA2j06xAnUglWqtTJdLyOGZzqnk
-         0Oxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719928674; x=1720533474;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n7FK8iXLG1SnlI4ndAhM4FDLc7t8LfJYFyucJUdAyuE=;
-        b=ibldktMISp81Z4lypxBRy+VVdthkaEUJYAmlGo1V6trd4CKjF1z5Cy4TNb4drkK8HK
-         +3l7cPfURrutaNXNR5JW0BGijeVECdnRJ7ooG5h2CIy9geNDrvRHPf+nKP3Ue4pJ59uN
-         Jg49mK2E6JMwgB5ErE6VB1aB8OjNat5CsBJL4mQtIPjxnEQtkIKGyXa4PNTedqx3WUsn
-         wfxO/9NYOuVxR8WP/TEKKpHTn661CMsw1Ygw/TrjlrTMB+VbKPckGYLg281TezQ5VJAO
-         yz8TpLvSC/zl+IcNBDFBBYEBAoLfdD+gA7Bg0RsMRg6x5CHa82ehybahLmRRXzVTcKxm
-         2xKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnaBCx8tfyO8tqDZSueae4ekafDpEdO6gHxRLee0CrPHXMF6IH9A2YjQjlZTsTHbpv+DHhnBHxgJwJ2Fbl6QtXAQus4IOM
-X-Gm-Message-State: AOJu0YwUdl+rAbsBUsKYQIECYOI+hNYZqmn1M0UrOZq+cig1FSsSF0Wq
-	T1FHWBgVL06MOIqtCsLncucIV82NSsoFaEzKYPT0qULof3XAJ15E
-X-Google-Smtp-Source: AGHT+IH2HqD5izfKCSSLrGswi6+i1YWaBA+ICZDZLQ4sVhN4O2GnDe+J7F6F+MWd2qssMhCawY4LUQ==
-X-Received: by 2002:a17:906:494a:b0:a6f:7707:b846 with SMTP id a640c23a62f3a-a72aee66c4dmr877328666b.15.1719928673929;
-        Tue, 02 Jul 2024 06:57:53 -0700 (PDT)
-Received: from krava (37-188-191-130.red.o2.cz. [37.188.191.130])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72aaf61f4dsm421550166b.71.2024.07.02.06.57.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 06:57:53 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 2 Jul 2024 15:57:47 +0200
-To: Pu Lehui <pulehui@huaweicloud.com>
-Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Puranjay Mohan <puranjay@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next v6 0/3] Add 12-argument support for RV64 bpf
- trampoline
-Message-ID: <ZoQHW2EaisezC1t5@krava>
-References: <20240702121944.1091530-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1719929034; c=relaxed/simple;
+	bh=625v53wes7Bvv0wAtLAXA470pPJVJzm/uHoRyuklkVU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OhGWqoLWKwLY+96bIVvOuwxE3oLJv4ZyR34qbska/1DsjeMDp2zz9FXWPePP0PvZG8GcspMz9dJyMoWkjWCPkSn6GvufWNrCyAhVHQaA/oU4GBQq+jFNbzTWjg9/irvoA7yVEdl7KeS7yfidczFjQd5aSnq5njBRnf++MkCrIKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=OHSlqMtW; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 6F2EB100002;
+	Tue,  2 Jul 2024 17:03:32 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1719929012; bh=OIRWtO9tmmvE5rTVXX2zQUO9W6ij8CfZDofL07ySZds=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=OHSlqMtWM45LdOJGQaQszpLwJYeZ1cn4GGbhfFwpxWjNwj6ymQQxU2qY8KU5lQapM
+	 plg4JurwmY4pbT6oLGUjxftqfOiaq71204y0vZ4sXWIH80WqopAkZsVuFBZNQBdM3u
+	 ASuApnHOKGLdhzTzH9b+MDVyauCpN787NTFQvu/ukh+82sO3+3eBpwkXJugo8ljKON
+	 wYTdhWMB+uqP3z8o5i4m0QekUax3m+6b1gPqOt/z8wl6Xl5Dx20rXtGO7ALoHCGnpE
+	 bT2YwZ1FuQN0fcL4qDo5KM0Ow93VEHYjmlY+KzWlz8OcVEStd7QBK88lg5Soknke7s
+	 GFO+5WQABIa2w==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Tue,  2 Jul 2024 17:02:24 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
+ 17:02:04 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Igal Liberman <igal.liberman@freescale.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Madalin Bucur
+	<madalin.bucur@nxp.com>, Sean Anderson <sean.anderson@seco.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH v2] fsl/fman: Validate cell-index value obtained from Device Tree
+Date: Tue, 2 Jul 2024 17:01:24 +0300
+Message-ID: <20240702140124.19096-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240702095034.12371-1-amishin@t-argos.ru>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240702121944.1091530-1-pulehui@huaweicloud.com>
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186281 [Jul 02 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 21 0.3.21 ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mx1.t-argos.ru.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/07/02 10:26:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/02 07:20:00 #25796017
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Tue, Jul 02, 2024 at 12:19:41PM +0000, Pu Lehui wrote:
-> This patch adds 12 function arguments support for riscv64 bpf
-> trampoline. The current bpf trampoline supports <= sizeof(u64) bytes
-> scalar arguments [0] and <= 16 bytes struct arguments [1]. Therefore, we
-> focus on the situation where scalars are at most XLEN bits and
-> aggregates whose total size does not exceed 2×XLEN bits in the riscv
-> calling convention [2].
-> 
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6184 [0]
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6769 [1]
-> Link: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/download/draft-20230929-e5c800e661a53efe3c2678d71a306323b60eb13b/riscv-abi.pdf [2]
-> 
-> v6:
-> - Remove unnecessary skel detach ops as it will be covered by skel destroy ops.
+Cell-index value is obtained from Device Tree and then used to calculate
+the index for accessing arrays port_mfl[], mac_mfl[] and intr_mng[].
+In case of broken DT due to any error cell-index can contain any value
+and it is possible to go beyond the array boundaries which can lead
+at least to memory corruption.
+Validate cell-index value obtained from Device Tree.
 
-selftests bits lgtm
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Acked-by: Jiri Olsa <jolsa@kernel.org>
+Fixes: 414fd46e7762 ("fsl/fman: Add FMan support")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+v1->v2: Move check to mac.c to avoid allmodconfig build errors and reference leaks
 
-jirka
+ drivers/net/ethernet/freescale/fman/fman.c | 1 -
+ drivers/net/ethernet/freescale/fman/fman.h | 3 +++
+ drivers/net/ethernet/freescale/fman/mac.c  | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
-> 
-> v5: https://lore.kernel.org/all/20240702013730.1082285-1-pulehui@huaweicloud.com/
-> - Remove unnecessary copyright.
-> 
-> v4: https://lore.kernel.org/all/20240622022129.3844473-1-pulehui@huaweicloud.com/
-> - Separate many args test logic from tracing_struct. (Daniel)
-> 
-> v3: https://lore.kernel.org/all/20240403072818.1462811-1-pulehui@huaweicloud.com/
-> - Variable and macro name alignment:
->   nr_reg_args: number of args in reg
->   nr_stack_args: number of args on stack
->   RV_MAX_REG_ARGS: macro for riscv max args in reg
-> 
-> v2: https://lore.kernel.org/all/20240403041710.1416369-1-pulehui@huaweicloud.com/
-> - Add tracing_struct to DENYLIST.aarch64 while aarch64 does not yet support
->   bpf trampoline with more than 8 args.
-> - Change the macro RV_MAX_ARG_REGS to RV_MAX_ARGS_REG to synchronize with
->   the variable definition below.
-> - Add some comments for stk_arg_off and magic number of skip slots for loading
->   args on stack.
-> 
-> v1: https://lore.kernel.org/all/20240331092405.822571-1-pulehui@huaweicloud.com/
-> 
-> Pu Lehui (3):
->   riscv, bpf: Add 12-argument support for RV64 bpf trampoline
->   selftests/bpf: Factor out many args tests from tracing_struct
->   selftests/bpf: Add testcase where 7th argment is struct
-> 
->  arch/riscv/net/bpf_jit_comp64.c               | 66 +++++++++----
->  tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
->  .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++
->  .../selftests/bpf/prog_tests/tracing_struct.c | 44 ++++++++-
->  .../selftests/bpf/progs/tracing_struct.c      | 54 -----------
->  .../bpf/progs/tracing_struct_many_args.c      | 95 +++++++++++++++++++
->  6 files changed, 202 insertions(+), 77 deletions(-)
->  create mode 100644 tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-> 
-> -- 
-> 2.34.1
-> 
+diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
+index d96028f01770..fb416d60dcd7 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.c
++++ b/drivers/net/ethernet/freescale/fman/fman.c
+@@ -24,7 +24,6 @@
+ 
+ /* General defines */
+ #define FMAN_LIODN_TBL			64	/* size of LIODN table */
+-#define MAX_NUM_OF_MACS			10
+ #define FM_NUM_OF_FMAN_CTRL_EVENT_REGS	4
+ #define BASE_RX_PORTID			0x08
+ #define BASE_TX_PORTID			0x28
+diff --git a/drivers/net/ethernet/freescale/fman/fman.h b/drivers/net/ethernet/freescale/fman/fman.h
+index 2ea575a46675..74eb62eba0d7 100644
+--- a/drivers/net/ethernet/freescale/fman/fman.h
++++ b/drivers/net/ethernet/freescale/fman/fman.h
+@@ -74,6 +74,9 @@
+ #define BM_MAX_NUM_OF_POOLS		64 /* Buffers pools */
+ #define FMAN_PORT_MAX_EXT_POOLS_NUM	8  /* External BM pools per Rx port */
+ 
++/* General defines */
++#define MAX_NUM_OF_MACS			10
++
+ struct fman; /* FMan data */
+ 
+ /* Enum for defining port types */
+diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
+index 9767586b4eb3..ac9ad5e67b44 100644
+--- a/drivers/net/ethernet/freescale/fman/mac.c
++++ b/drivers/net/ethernet/freescale/fman/mac.c
+@@ -247,6 +247,10 @@ static int mac_probe(struct platform_device *_of_dev)
+ 		dev_err(dev, "failed to read cell-index for %pOF\n", mac_node);
+ 		return -EINVAL;
+ 	}
++	if (val >= MAX_NUM_OF_MACS) {
++		dev_err(dev, "cell-index value is too big for %pOF\n", mac_node);
++		return -EINVAL;
++	}
+ 	priv->cell_index = (u8)val;
+ 
+ 	/* Get the MAC address */
+-- 
+2.30.2
+
 
