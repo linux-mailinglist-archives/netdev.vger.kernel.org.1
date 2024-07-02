@@ -1,63 +1,38 @@
-Return-Path: <netdev+bounces-108594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CACEE92478D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:51:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524BA924796
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02EB11C2093A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:51:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE4461F21EEA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335221C9EA8;
-	Tue,  2 Jul 2024 18:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gkHwVJSR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCB81CB31A;
+	Tue,  2 Jul 2024 18:53:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9902E1BD00A;
-	Tue,  2 Jul 2024 18:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9114043152;
+	Tue,  2 Jul 2024 18:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719946268; cv=none; b=jw6WXAbbFnqvT3xGY5J6yd0SrEsk7W84qhDhctd6HwQrXxM7QW037oZprFg81pBmgJ6RqYqSLctMumKE17AgtyzQWcBEsFrAus7t5bX/xm+LAsS65enGpuKU7NbMAbbBfIzPq5ioV/AwuskgrlsmLLavqqcgScyW+qbIY9KY4PA=
+	t=1719946381; cv=none; b=UVKzSamZFkEAR3Vs/Z51FHs1iMX6Td9olbJsJe5IqtnBVXSEoj20TCqSxlZaCcYgOPosPTUEuCBUJfbOx2xyc84kL/r5I3wo73WgMW1CGYwcxe50YMfsyqajM0IXwPFUdH/lSNgkjX8xe8JJYyxNoO/KrsigpSiSlApcR1ALWBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719946268; c=relaxed/simple;
-	bh=Wsl56kQ0sDxYM+v/9gwmollAHIJgLokdiF+Sjkgu9ic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FPQ6flrAQ3iT8nmNOAmEjIPs7Z8SOnzl30brO4uSNVerW4qYyLR4g/WZzxCCmZGRY5+M/3qFSEHtm7d0DtEINmtlssQAh8z3J+ULfJSWWR4KDTt962Z4zZi2GtOhim1ijIfwfhtqDqhiYLC/eA4x9ELee5Tm87wZ0hYqZ8R1Wg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gkHwVJSR; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 462Gs2hM000402;
-	Tue, 2 Jul 2024 18:50:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	AlYcI/o49WIolw4v/nPXCS8dUNWb7ZRGwwrKnFWXixM=; b=gkHwVJSRdUiQb4MA
-	s0cNx3e7NC3x8aiZUf2WCFSGgW0AtPb6Oi0Qf6j9dj9Qe1+6+i11R4IaFvsMIQFS
-	n7oyTxX/9mpIyhAmt7wV9BQjm4sPKrlRQ7zEBZwHvCjf+kyvKNjFNYIVjrReW2Xp
-	vz69m6hkyKh4yZtzvQN/Ik+jm3Xlv/YvEY2UrCqsi9dOTqQn9TPD+CLAJlmASa05
-	pzZaaTuqT1RURmXidQY9DBZ7JyYWU+pkURlevN5uTDudi4a6zf+Q1aIftpbFL6yZ
-	ZKUDRF9kiboaMwDHqln0B4jUSaduwuGj31wSJZsmxICxsRZkfSTt0LotOtqbOFa3
-	6eTRgQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 402bj899wd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 18:50:32 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 462IoVKD014773
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 2 Jul 2024 18:50:31 GMT
-Received: from [10.110.54.196] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
- 11:50:28 -0700
-Message-ID: <4934d0cc-3a9d-4e31-a8f2-32b3cbf73915@quicinc.com>
-Date: Tue, 2 Jul 2024 11:50:27 -0700
+	s=arc-20240116; t=1719946381; c=relaxed/simple;
+	bh=5Dg8bFTgjy9yiTLLqi6coW5BHHilvLZYvB8KNwGZjwo=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jbOfOaNhU5cKKFIOC9dDc9uMCNHxndy8TOFcKTKDYUW53lslsbvmpCEiby0nA2w0Xtt8H7tFKENT6/3IL+AXmPf4GqPlYI6cXsWEovaj2fp3miXu5oAunw40luJ1esLTjPQSxDjZJ0l0VALgpGvpVxgiORUvXyYUZopTBZTOQDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8E87160005;
+	Tue,  2 Jul 2024 18:52:53 +0000 (UTC)
+Message-ID: <8c42156c-747b-4d4d-b6e0-93fcd19fad92@ovn.org>
+Date: Tue, 2 Jul 2024 20:52:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,95 +40,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: qcom: ethernet: Add interconnect
- properties
-To: Andrew Halaney <ahalaney@redhat.com>
-CC: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
-        Andrew Lunn <andrew@lunn.ch>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-References: <20240625-icc_bw_voting_from_ethqos-v2-0-eaa7cf9060f0@quicinc.com>
- <20240625-icc_bw_voting_from_ethqos-v2-1-eaa7cf9060f0@quicinc.com>
- <q2ou73goc2pgrmx7xul4z7zrqo4zylh3nd2ldxw5vnz2z4fnkf@axbse4awc6lf>
+Cc: i.maximets@ovn.org, Simon Horman <horms@kernel.org>,
+ =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>,
+ Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
+ echaudro@redhat.com, dev@openvswitch.org,
+ Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 05/10] net: openvswitch: add psample action
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20240630195740.1469727-1-amorenoz@redhat.com>
+ <20240630195740.1469727-6-amorenoz@redhat.com> <f7to77hvunj.fsf@redhat.com>
+ <CAG=2xmOaMy2DVNfTOkh1sK+NR_gz+bXvKLg9YSp1t_K+sEUzJg@mail.gmail.com>
+ <20240702093726.GD598357@kernel.org>
+ <447c0d2a-f7cf-4c34-b5d5-96ca6fffa6b0@ovn.org>
+ <20240702110645.1c6b5b1a@kernel.org>
+ <a6728234-b453-4404-8d4f-eed64293a5f6@ovn.org>
+ <20240702112454.408757f7@kernel.org>
 Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <q2ou73goc2pgrmx7xul4z7zrqo4zylh3nd2ldxw5vnz2z4fnkf@axbse4awc6lf>
-Content-Type: text/plain; charset="UTF-8"
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20240702112454.408757f7@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: eISxxj9D8Oitlj92rMYg7_qkn--LieGe
-X-Proofpoint-GUID: eISxxj9D8Oitlj92rMYg7_qkn--LieGe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-02_14,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- spamscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407020137
+X-GND-Sasl: i.maximets@ovn.org
 
-
-
-On 6/26/2024 7:53 AM, Andrew Halaney wrote:
-> On Tue, Jun 25, 2024 at 04:49:28PM GMT, Sagar Cheluvegowda wrote:
->> Add documentation for the interconnect and interconnect-names
->> properties required when voting for AHB and AXI buses.
+On 7/2/24 20:24, Jakub Kicinski wrote:
+> On Tue, 2 Jul 2024 20:16:51 +0200 Ilya Maximets wrote:
+>> On 7/2/24 20:06, Jakub Kicinski wrote:
+>>> On Tue, 2 Jul 2024 11:53:01 +0200 Ilya Maximets wrote:  
+>>>> Or create a simple static function and mark all the arguments as unused,
+>>>> which kind of compliant to the coding style, but the least pretty.  
+>>>
+>>> To be clear - kernel explicitly disables warnings about unused
+>>> arguments. Unused arguments are not a concern.  
 >>
->> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
->> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
->> ---
->>  Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 8 ++++++++
->>  1 file changed, 8 insertions(+)
+>> OK.  Good to know.
 >>
->> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->> index 6672327358bc..b7e2644bfb18 100644
->> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->> @@ -63,6 +63,14 @@ properties:
->>  
+>> Though I think, the '12) Macros, Enums and RTL' section of the
+>> coding style document needs some rephrasing in that case.
 > 
-> Does it make sense to make these changes in snps,dwmac.yaml since you're
-> trying to do this generically for stmmac? I don't poke bindings super
-> often so might be a silly question, the inheritance of snps,dwmac.yaml
-> into the various platform specific bindings (qcom,ethqos.yaml) would
-> then let you define it once in the snps,dwmac.yaml right?
+> Do you mean something like:
 > 
->>    dma-coherent: true
->>  
->> +  interconnects:
->> +    maxItems: 2
->> +
->> +  interconnect-names:
->> +    items:
->> +      - const: axi
->> +      - const: ahb
-> 
-> Sorry to bikeshed, and with Krzysztof's review on this already its
-> probably unnecessary, but would names like cpu-mac and mac-mem be
-> more generic / appropriate? I see that sort of convention a lot in the
-> other bindings, and to me those read really well and are understandable.
+> diff --git a/Documentation/process/coding-style.rst b/Documentation/process/coding-style.rst
+> index 7e768c65aa92..0516b7009688 100644
+> --- a/Documentation/process/coding-style.rst
+> +++ b/Documentation/process/coding-style.rst
+> @@ -828,7 +828,7 @@ Generally, inline functions are preferable to macros resembling functions.
+>  		} while (0)
+>  
+>  Function-like macros with unused parameters should be replaced by static
+> -inline functions to avoid the issue of unused variables:
+> +inline functions to avoid the issue of unused variables in the caller:
+>  
+>  .. code-block:: c
+>  
+> ?
 
-I agree with changing the names to "cpu-mac" and "mac-mem" in that
-way the properties are more understandable.
-@Krzysztof Kozlowski let me know your opinion on the same.
+Yes, that makes the logic behind the sentence way more clear.  At least
+for me.  Without this change it's hard to tell if the doc is talking about
+unused function arguments or unused variables in the caller.
+
+
+
+There is another issue though that this particular phrase directly leads
+a developer to declaring 'static inline' functions in .c files.  And even
+'15) The inline disease' cites this use case as appropriate.  And it is,
+with the exception for a macro that is a no-op stub version of some function.
+Having an example on how to write a stub version of the function in both
+.h and .c files might be a good addition to '21) Conditional Compilation'
+section breaking the tie for this particular use case.  This section also
+discourages from conditional compilation in .c files, but it doesn't seem
+reasonable to export a static function outside for that reason.  I suppose
+that section is mostly concerned about use of other modules.
+
+Best regards, Ilya Maximets.
 
