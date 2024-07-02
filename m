@@ -1,253 +1,95 @@
-Return-Path: <netdev+bounces-108447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFD5923D7C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:18:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A7C923DD7
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 295B3B227A4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:18:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593761C249DC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4531607B2;
-	Tue,  2 Jul 2024 12:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6D616DC2C;
+	Tue,  2 Jul 2024 12:27:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AAC16C688;
-	Tue,  2 Jul 2024 12:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1339016C6A8;
+	Tue,  2 Jul 2024 12:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719922690; cv=none; b=P5nGN6f9SaHsRZGdW8IlXn15XRtmpYG9pki4+cFtUISuMmc00QEYw6HYvoAMVT8UNyB0zy9+cs5lnAg+KVK6B64X/6lNPnWw4BbFoLiQU/CvNf6sfxnkA1EErI86SR/v0dLnzRZFjhgudHHwSnQvw17E2RpWrN0lXHfyLZy4oxs=
+	t=1719923277; cv=none; b=BKhp7mWpQfxi1C/AoMBjnbAxqhmnvnS86oJeQBM4IOV793YLKCn7DRtiqPfyMfdnso5TcNVzCFPl0C/EH/Kjqw2PaI/aOel23qcvI+XYj6c/2wh1UE+xG0WI4aGjJ4qBc1ID6XgKBOof8AQ94zMaC+2mEGZNm1l3vN5IKRm8wvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719922690; c=relaxed/simple;
-	bh=zzfzvxTDiceooDjOQIjaXFd+VFhKtGQKw/kMT8EuMLo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XPD5ZBvP6Gu7mFlVoexXSN5PbC+mzeOwIGnWUgVXylhgtR55dG4evXWjTc+0q4Z9G3vLrlLv0sHDKiJaitYiayLSJHBcg0Ue7WBkXxLxTDL//2DR6iV7K49bM9+8f+0W1NqFrOiLqPNbgq08Co4PyKKyndEKbv1quJr/kehbtHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WD24175Fcz4f3k6C;
-	Tue,  2 Jul 2024 20:17:53 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 501961A058E;
-	Tue,  2 Jul 2024 20:18:01 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP1 (Coremail) with SMTP id cCh0CgBHvnr174NmXMK6Aw--.13394S5;
-	Tue, 02 Jul 2024 20:18:01 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: [PATCH bpf-next v6 3/3] selftests/bpf: Add testcase where 7th argment is struct
-Date: Tue,  2 Jul 2024 12:19:44 +0000
-Message-Id: <20240702121944.1091530-4-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240702121944.1091530-1-pulehui@huaweicloud.com>
-References: <20240702121944.1091530-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1719923277; c=relaxed/simple;
+	bh=XgRdsTsKnLkYsDUEKrD3xPL2FQ/EQXo97ANxIUdq+90=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=V4ylJOV4j3JQTReRJSWVzWBYouDEo9dG/peKLp7C+qtr6SLqclKefHdlLzekJ/c/IhffNs7xdq8o0BnOqEipArcc8kETqGw9iV107hcYhR4Xt8QB5kCIu1+svhZZXWRBFtB2LkuICkNva9PBR+vbVgrThdCwEU4JvdqhqwG2+UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WD2BJ4sjPz1T4lL;
+	Tue,  2 Jul 2024 20:23:20 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C4B64180AA6;
+	Tue,  2 Jul 2024 20:27:52 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemf200006.china.huawei.com
+ (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 2 Jul
+ 2024 20:27:52 +0800
+Subject: Re: [PATCH net-next v9 02/13] mm: move the page fragment allocator
+ from page_alloc into its own file
+To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, David Howells
+	<dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+	<linux-mm@kvack.org>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-3-linyunsheng@huawei.com>
+ <86c56c9a88d07efbfe1e85bec678e86704588a15.camel@gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <3ac9d5ef-50a4-286d-eeec-a8d9a846278f@huawei.com>
+Date: Tue, 2 Jul 2024 20:27:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBHvnr174NmXMK6Aw--.13394S5
-X-Coremail-Antispam: 1UD129KBjvJXoW3GrWxCryxGr1DCFW5Aw4xWFg_yoWxWrW8pa
-	s7Xw1jyFWrJr47WryxGa1UZr4S9393Xr1UJFW7J3s0vry0q3s7JF1xKF4jyFn5W398uwnx
-	AayqkFZ8Ca1xJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAkuxUUUUU=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+In-Reply-To: <86c56c9a88d07efbfe1e85bec678e86704588a15.camel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-From: Pu Lehui <pulehui@huawei.com>
+On 2024/7/2 7:10, Alexander H Duyck wrote:
+> On Tue, 2024-06-25 at 21:52 +0800, Yunsheng Lin wrote:
+>> Inspired by [1], move the page fragment allocator from page_alloc
+>> into its own c file and header file, as we are about to make more
+>> change for it to replace another page_frag implementation in
+>> sock.c
+>>
+>> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.com/
+>>
+>> CC: David Howells <dhowells@redhat.com>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> 
+> So one thing that I think might have been overlooked in the previous
+> reviews is the fact that the headers weren't necessarily self
+> sufficient. You were introducing dependencies that had to be fulfilled
+> by other headers.
+> 
+> One thing you might try doing as part of your testing would be to add a
+> C file that just adds your header and calls your functions to verify
+> that there aren't any unincluded dependencies.
 
-Add testcase where 7th argument is struct for architectures with 8
-argument registers, and increase the complexity of the struct.
+Sure, will do.
 
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
-Acked-by: Björn Töpel <bjorn@kernel.org>
-Reviewed-by: Björn Töpel <bjorn@rivosinc.com>
----
- tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
- .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
- .../selftests/bpf/prog_tests/tracing_struct.c | 14 ++++++++
- .../bpf/progs/tracing_struct_many_args.c      | 35 +++++++++++++++++++
- 4 files changed, 69 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
-index 0445ac38bc07..3c7c3e79aa93 100644
---- a/tools/testing/selftests/bpf/DENYLIST.aarch64
-+++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
-@@ -6,6 +6,7 @@ kprobe_multi_test                                # needs CONFIG_FPROBE
- module_attach                                    # prog 'kprobe_multi': failed to auto-attach: -95
- fentry_test/fentry_many_args                     # fentry_many_args:FAIL:fentry_many_args_attach unexpected error: -524
- fexit_test/fexit_many_args                       # fexit_many_args:FAIL:fexit_many_args_attach unexpected error: -524
-+tracing_struct/struct_many_args                  # struct_many_args:FAIL:tracing_struct_many_args__attach unexpected error: -524
- fill_link_info/kprobe_multi_link_info            # bpf_program__attach_kprobe_multi_opts unexpected error: -95
- fill_link_info/kretprobe_multi_link_info         # bpf_program__attach_kprobe_multi_opts unexpected error: -95
- fill_link_info/kprobe_multi_invalid_ubuff        # bpf_program__attach_kprobe_multi_opts unexpected error: -95
-diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-index d8bd01d8560b..f8962a1dd397 100644
---- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-@@ -53,6 +53,13 @@ struct bpf_testmod_struct_arg_4 {
- 	int b;
- };
- 
-+struct bpf_testmod_struct_arg_5 {
-+	char a;
-+	short b;
-+	int c;
-+	long d;
-+};
-+
- __bpf_hook_start();
- 
- noinline int
-@@ -110,6 +117,15 @@ bpf_testmod_test_struct_arg_8(u64 a, void *b, short c, int d, void *e,
- 	return bpf_testmod_test_struct_arg_result;
- }
- 
-+noinline int
-+bpf_testmod_test_struct_arg_9(u64 a, void *b, short c, int d, void *e, char f,
-+			      short g, struct bpf_testmod_struct_arg_5 h, long i)
-+{
-+	bpf_testmod_test_struct_arg_result = a + (long)b + c + d + (long)e +
-+		f + g + h.a + h.b + h.c + h.d + i;
-+	return bpf_testmod_test_struct_arg_result;
-+}
-+
- noinline int
- bpf_testmod_test_arg_ptr_to_struct(struct bpf_testmod_struct_arg_1 *a) {
- 	bpf_testmod_test_struct_arg_result = a->a;
-@@ -305,6 +321,7 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 	struct bpf_testmod_struct_arg_2 struct_arg2 = {2, 3};
- 	struct bpf_testmod_struct_arg_3 *struct_arg3;
- 	struct bpf_testmod_struct_arg_4 struct_arg4 = {21, 22};
-+	struct bpf_testmod_struct_arg_5 struct_arg5 = {23, 24, 25, 26};
- 	int i = 1;
- 
- 	while (bpf_testmod_return_ptr(i))
-@@ -319,6 +336,8 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 					    (void *)20, struct_arg4);
- 	(void)bpf_testmod_test_struct_arg_8(16, (void *)17, 18, 19,
- 					    (void *)20, struct_arg4, 23);
-+	(void)bpf_testmod_test_struct_arg_9(16, (void *)17, 18, 19, (void *)20,
-+					    21, 22, struct_arg5, 27);
- 
- 	(void)bpf_testmod_test_arg_ptr_to_struct(&struct_arg1_2);
- 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tracing_struct.c b/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-index cb2a95da2617..19e68d4b3532 100644
---- a/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-@@ -94,6 +94,20 @@ static void test_struct_many_args(void)
- 	ASSERT_EQ(skel->bss->t8_g, 23, "t8:g");
- 	ASSERT_EQ(skel->bss->t8_ret, 156, "t8 ret");
- 
-+	ASSERT_EQ(skel->bss->t9_a, 16, "t9:a");
-+	ASSERT_EQ(skel->bss->t9_b, 17, "t9:b");
-+	ASSERT_EQ(skel->bss->t9_c, 18, "t9:c");
-+	ASSERT_EQ(skel->bss->t9_d, 19, "t9:d");
-+	ASSERT_EQ(skel->bss->t9_e, 20, "t9:e");
-+	ASSERT_EQ(skel->bss->t9_f, 21, "t9:f");
-+	ASSERT_EQ(skel->bss->t9_g, 22, "t9:f");
-+	ASSERT_EQ(skel->bss->t9_h_a, 23, "t9:h.a");
-+	ASSERT_EQ(skel->bss->t9_h_b, 24, "t9:h.b");
-+	ASSERT_EQ(skel->bss->t9_h_c, 25, "t9:h.c");
-+	ASSERT_EQ(skel->bss->t9_h_d, 26, "t9:h.d");
-+	ASSERT_EQ(skel->bss->t9_i, 27, "t9:i");
-+	ASSERT_EQ(skel->bss->t9_ret, 258, "t9 ret");
-+
- destroy_skel:
- 	tracing_struct_many_args__destroy(skel);
- }
-diff --git a/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c b/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-index 3de4bb918178..4742012ace06 100644
---- a/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-+++ b/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-@@ -8,8 +8,16 @@ struct bpf_testmod_struct_arg_4 {
- 	int b;
- };
- 
-+struct bpf_testmod_struct_arg_5 {
-+	char a;
-+	short b;
-+	int c;
-+	long d;
-+};
-+
- long t7_a, t7_b, t7_c, t7_d, t7_e, t7_f_a, t7_f_b, t7_ret;
- long t8_a, t8_b, t8_c, t8_d, t8_e, t8_f_a, t8_f_b, t8_g, t8_ret;
-+long t9_a, t9_b, t9_c, t9_d, t9_e, t9_f, t9_g, t9_h_a, t9_h_b, t9_h_c, t9_h_d, t9_i, t9_ret;
- 
- SEC("fentry/bpf_testmod_test_struct_arg_7")
- int BPF_PROG2(test_struct_many_args_1, __u64, a, void *, b, short, c, int, d,
-@@ -57,4 +65,31 @@ int BPF_PROG2(test_struct_many_args_4, __u64, a, void *, b, short, c, int, d,
- 	return 0;
- }
- 
-+SEC("fentry/bpf_testmod_test_struct_arg_9")
-+int BPF_PROG2(test_struct_many_args_5, __u64, a, void *, b, short, c, int, d, void *, e,
-+	      char, f, short, g, struct bpf_testmod_struct_arg_5, h, long, i)
-+{
-+	t9_a = a;
-+	t9_b = (long)b;
-+	t9_c = c;
-+	t9_d = d;
-+	t9_e = (long)e;
-+	t9_f = f;
-+	t9_g = g;
-+	t9_h_a = h.a;
-+	t9_h_b = h.b;
-+	t9_h_c = h.c;
-+	t9_h_d = h.d;
-+	t9_i = i;
-+	return 0;
-+}
-+
-+SEC("fexit/bpf_testmod_test_struct_arg_9")
-+int BPF_PROG2(test_struct_many_args_6, __u64, a, void *, b, short, c, int, d, void *, e,
-+	      char, f, short, g, struct bpf_testmod_struct_arg_5, h, long, i, int, ret)
-+{
-+	t9_ret = ret;
-+	return 0;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.34.1
-
+> 
 
