@@ -1,182 +1,143 @@
-Return-Path: <netdev+bounces-108445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE18C923D5E
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:14:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8463923D7A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E26D71C21987
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:14:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CF43281CDD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45DA1607B8;
-	Tue,  2 Jul 2024 12:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LxwkcBQV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F2315ADB6;
+	Tue,  2 Jul 2024 12:18:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DF915D5AB;
-	Tue,  2 Jul 2024 12:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC43D171AF;
+	Tue,  2 Jul 2024 12:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719922446; cv=none; b=EHcD2YqLWLFKl8Kt53kjdI/xy4iML3U2AH8wP38a/SIQtJtIERRvaWNxV7DhfXFYjHDSM7/21lupqUvbKOAX7K0XLqUHS3tBiZ7pYNwREJisURSgCtLhri7gGb2sZbPjS2qF7b6F4PZVRB5J+L+S/tHT9clUr4g/BrLkG6thRI0=
+	t=1719922688; cv=none; b=WhV2UuVB18EGTlxjZcVXSU4yf5KboCyOz0M4piBGLF3rxuFs+76OZRPiZMAniesYP/0SDubzNle3wocQWPOPtabXv3f0gTSZR0OyAjwogN6cXygs3BksEOQEvKImJ4YAwZjZsQ027xCFBgVH2/KgEvV+eu2XsS2NjlL4dGC0OX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719922446; c=relaxed/simple;
-	bh=+s6jgiAJELxreoow36uUgrgozKOOjkSRma04ypAOOY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=i2CECPgR7vanVt3qnUaATEWkV9DTLW8+zpE1LL/6MkqYysRYh1ijh/zlUWtbEpKrWogqavOzKppLxbfa3n8X5RKkZDw+LZfomXpgOFU3ImoB1eNYzuffLhTmprNdQC5u886Z56REOau3i1IZOFBm9u2pAX2lokiSmW4Z0qyMuZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LxwkcBQV; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4628FSIe006162;
-	Tue, 2 Jul 2024 12:13:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	WAc+27O8bp3KbN84Q0eAMJawfTO1NX5ZOKDBTeZA1oQ=; b=LxwkcBQVgolmjPWK
-	Uas18qBtOu04XZDaSHgpyE5C9Cg21ukIWiiNLzxqUx+MsxbQpaSFuicy5TQ8k+xs
-	OIoS1VBRzxbtC8CbLst03UWR8BRTRSZKtBZ9MFCYeT9UCV4qr2zF0N3Hb4LEv0fd
-	Nsx/92Z0ezvnRQwbpN3A5u2rCbutpShj98y633QSI5U1O0BAItQQDuQMNy9sTgfa
-	S27VV8GjNZ4UMMB3HRTsUjZv6TnKA2dK0EJ4d4yAdFzU8rk39iTYJ0vYik6S2Z4W
-	bNOcTgtBm60jhLdOd3GIkPc1CyJ9L40GlniIkWcw7Xl5Aeipo9ta36i7dCncSD+j
-	6siugQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 402bj87n5v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 12:13:23 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 462CDM4C026821
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 2 Jul 2024 12:13:22 GMT
-Received: from [10.50.55.70] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
- 05:13:12 -0700
-Message-ID: <5ccbfde6-f26a-4796-abac-e8d6a18c74e7@quicinc.com>
-Date: Tue, 2 Jul 2024 17:43:08 +0530
+	s=arc-20240116; t=1719922688; c=relaxed/simple;
+	bh=MLGA9dd3k7LKwo+Y2s6oyaRx1Y/+GW7PWoNmO1vb00M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=J0GavK6xy+xSsHu23akALoc6UK8FeEjou8/QzIhP3CBLcYauFNDR9+p6A4evlpAvay9rD2LmwXsOZ5gGminHqe/DDB+qfhbd+Nz1mQfn9nQeopYiYtq0dlvPHOO3DGAg1TZZMiqGqPW2gCwLlfe1EsJHF/0qNJD5isEqfKEiiLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WD23x5bTvz4f3kF9;
+	Tue,  2 Jul 2024 20:17:49 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id EAEEF1A058E;
+	Tue,  2 Jul 2024 20:18:00 +0800 (CST)
+Received: from ultra.huawei.com (unknown [10.90.53.71])
+	by APP1 (Coremail) with SMTP id cCh0CgBHvnr174NmXMK6Aw--.13394S2;
+	Tue, 02 Jul 2024 20:17:58 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Pu Lehui <pulehui@huawei.com>
+Subject: [PATCH bpf-next v6 0/3] Add 12-argument support for RV64 bpf trampoline
+Date: Tue,  2 Jul 2024 12:19:41 +0000
+Message-Id: <20240702121944.1091530-1-pulehui@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
- reset definitions
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: <catalin.marinas@arm.com>, <u-kumar1@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>, <krzk+dt@kernel.org>,
-        <geert+renesas@glider.be>, <neil.armstrong@linaro.org>,
-        <nfraprado@collabora.com>, <mturquette@baylibre.com>,
-        <linux-kernel@vger.kernel.org>, <dmitry.baryshkov@linaro.org>,
-        <netdev@vger.kernel.org>, <konrad.dybcio@linaro.org>,
-        <m.szyprowski@samsung.com>, <arnd@arndb.de>,
-        <richardcochran@gmail.com>, <will@kernel.org>, <sboyd@kernel.org>,
-        <andersson@kernel.org>, <p.zabel@pengutronix.de>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <conor+dt@kernel.org>, <linux-arm-msm@vger.kernel.org>
-References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
- <20240626143302.810632-5-quic_devipriy@quicinc.com>
- <171941612020.3280624.794530163562164163.robh@kernel.org>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <171941612020.3280624.794530163562164163.robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 6shE0fNeo2vFEYGKXPuqETHTSuM8sMwR
-X-Proofpoint-GUID: 6shE0fNeo2vFEYGKXPuqETHTSuM8sMwR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-02_08,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- spamscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407020090
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgBHvnr174NmXMK6Aw--.13394S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw4xtw4fKFWDtr4kZF1UWrg_yoW5GF4fpa
+	1Ig3Wa9FnYgr4Iq34xGa1Uuryrtr4rXw15Cr4xJ34F9ayqyryYyr1I9a1Yv345Wr93W34S
+	yr9IvF98GF4DZ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUk2b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
+	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI
+	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+	IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+	87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFDGOUUUUU
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 
+This patch adds 12 function arguments support for riscv64 bpf
+trampoline. The current bpf trampoline supports <= sizeof(u64) bytes
+scalar arguments [0] and <= 16 bytes struct arguments [1]. Therefore, we
+focus on the situation where scalars are at most XLEN bits and
+aggregates whose total size does not exceed 2×XLEN bits in the riscv
+calling convention [2].
 
+Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6184 [0]
+Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6769 [1]
+Link: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/download/draft-20230929-e5c800e661a53efe3c2678d71a306323b60eb13b/riscv-abi.pdf [2]
 
-On 6/26/2024 9:05 PM, Rob Herring (Arm) wrote:
-> 
-> On Wed, 26 Jun 2024 20:02:59 +0530, Devi Priya wrote:
->> Add NSSCC clock and reset definitions for ipq9574.
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> ---
->>   Changes in V5:
->> 	- Dropped interconnects and added interconnect-cells to NSS
->> 	  clock provider so that it can be  used as icc provider.
->>
->>   .../bindings/clock/qcom,ipq9574-nsscc.yaml    |  74 +++++++++
->>   .../dt-bindings/clock/qcom,ipq9574-nsscc.h    | 152 ++++++++++++++++++
->>   .../dt-bindings/reset/qcom,ipq9574-nsscc.h    | 134 +++++++++++++++
->>   3 files changed, 360 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
->>   create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
->>   create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
->>
-> 
-> My bot found errors running 'make dt_binding_check' on your patch:
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> Error: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dts:26.26-27 syntax error
-> FATAL ERROR: Unable to parse input tree
-> make[2]: *** [scripts/Makefile.lib:427: Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.example.dtb] Error 1
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
-> make: *** [Makefile:240: __sub-make] Error 2
-> 
-> doc reference errors (make refcheckdocs):
-> 
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240626143302.810632-5-quic_devipriy@quicinc.com
-> 
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
-> 
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
-> 
-> pip3 install dtschema --upgrade
-> 
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your schema.
-> Hi Rob,
+v6:
+- Remove unnecessary skel detach ops as it will be covered by skel destroy ops.
 
-We tried running dt_binding_check on linux-next and we do not face any
-sort of errors.
+v5: https://lore.kernel.org/all/20240702013730.1082285-1-pulehui@huaweicloud.com/
+- Remove unnecessary copyright.
 
-However in case of v6.10-rc1, patch[1] failed to apply as the dependent
-patch[2] is not available on rc1.
+v4: https://lore.kernel.org/all/20240622022129.3844473-1-pulehui@huaweicloud.com/
+- Separate many args test logic from tracing_struct. (Daniel)
 
-[1] 
-https://patchwork.kernel.org/project/linux-arm-msm/patch/20240626143302.810632-3-quic_devipriy@quicinc.com/
+v3: https://lore.kernel.org/all/20240403072818.1462811-1-pulehui@huaweicloud.com/
+- Variable and macro name alignment:
+  nr_reg_args: number of args in reg
+  nr_stack_args: number of args on stack
+  RV_MAX_REG_ARGS: macro for riscv max args in reg
 
-[2] 
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?h=next-20240531&id=475beea0b9f631656b5cc39429a39696876af613
+v2: https://lore.kernel.org/all/20240403041710.1416369-1-pulehui@huaweicloud.com/
+- Add tracing_struct to DENYLIST.aarch64 while aarch64 does not yet support
+  bpf trampoline with more than 8 args.
+- Change the macro RV_MAX_ARG_REGS to RV_MAX_ARGS_REG to synchronize with
+  the variable definition below.
+- Add some comments for stk_arg_off and magic number of skip slots for loading
+  args on stack.
 
-Patch [2] does not hold any functional dependency on this series but has 
-a patch rebase dependency.
+v1: https://lore.kernel.org/all/20240331092405.822571-1-pulehui@huaweicloud.com/
 
-The Bot has went ahead and tried running the dt_binding_check on patch 
-https://patchwork.kernel.org/project/linux-arm-msm/patch/20240626143302.810632-5-quic_devipriy@quicinc.com/
-which is dependent on patch [1] and hence the issue was reported.
+Pu Lehui (3):
+  riscv, bpf: Add 12-argument support for RV64 bpf trampoline
+  selftests/bpf: Factor out many args tests from tracing_struct
+  selftests/bpf: Add testcase where 7th argment is struct
 
-Is this the expected behaviour?
+ arch/riscv/net/bpf_jit_comp64.c               | 66 +++++++++----
+ tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++
+ .../selftests/bpf/prog_tests/tracing_struct.c | 44 ++++++++-
+ .../selftests/bpf/progs/tracing_struct.c      | 54 -----------
+ .../bpf/progs/tracing_struct_many_args.c      | 95 +++++++++++++++++++
+ 6 files changed, 202 insertions(+), 77 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
 
-Thanks & Regards,
-Devi Priya
-> 
+-- 
+2.34.1
+
 
