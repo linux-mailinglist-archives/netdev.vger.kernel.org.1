@@ -1,229 +1,160 @@
-Return-Path: <netdev+bounces-108372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5B69239C9
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:23:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE759239CE
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4E2D1C214FB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:23:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FEB3B2180D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F321509A4;
-	Tue,  2 Jul 2024 09:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D12E152166;
+	Tue,  2 Jul 2024 09:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NEXvdIRz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2Hjq0TU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67FA14039D
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 09:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC881A28B;
+	Tue,  2 Jul 2024 09:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719912231; cv=none; b=TJwYtgcmRZZLmQPfjTlf8fIAzkomc3lPLm37aSbosftFivh5Bpts8aQHjV4CwHxpQsClQxMAzpjokhRoFpJWPJ2ZKr9mmiGBHi/niqaQ0951iiLNcUuzSj7R8GM7103BNerLlXgdHl+lbvw39NJewX/4/xKUuEpM8wup9FRENYM=
+	t=1719912259; cv=none; b=O7YKfsa++dM2XqlrCsJFMJ8RGJM0OMyvu43zdiUeYiCS/nvhAH4i7tsqChR+qFAv2qoVWrQ5WUhBvgh9e9p8mA5zMtLsT/Dd+2zTk4RlvWzBwKD6L4R2zCwivcrvnfQIDWQqYeNRS1d1xoUXsV9am0ajXWyQzElfmWbwLWBlGv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719912231; c=relaxed/simple;
-	bh=hDTH/MaA/ICnydS4TBySOg+LV4kE2oTgYGre9E1DOKU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HbS2MrrJ2a3xDOv/If95Rdm1xuCAjBxVAVEU6duTQ08v0HIXIjeSb0XxyNgL5xz9HmnqIr4dA4pdE6n25k7wuqyvB6uXcmMeXqPgVuJLfL04YugIe+DVwie5HvAB8G/vf40/ARi3dnJXr94oYBf3Udip9LLphXK42C5JEfoppcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NEXvdIRz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719912228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UaPOuhsj6tCNLaZ5bjVrx34kvuXz5QnPcYyj6Z75iKc=;
-	b=NEXvdIRzTwXhyH49LbSh8jB9R7nYNjImKnZE77UPeja6bbpvPMH+q2U+Nk2uomVthMytMa
-	qpbp1oJTslXl8JUrdpAE60MTugOfBdv/aDF0m9dVCASYT2Hrt9MT1Y+LRtG5uDNkCMft5y
-	w70I6/8NsLnoXjXf5zRfLHd4uYfeKx4=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-BcwDZXOmP5imC6RvkzNBtA-1; Tue, 02 Jul 2024 05:23:46 -0400
-X-MC-Unique: BcwDZXOmP5imC6RvkzNBtA-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-52e845857d6so440579e87.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 02:23:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719912225; x=1720517025;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UaPOuhsj6tCNLaZ5bjVrx34kvuXz5QnPcYyj6Z75iKc=;
-        b=OgVU+ATfDZpLRp0wUKFSL3vcLDGE+MnH/egHwnYM0vAhlYd4pGhyYwc6eoy5L0Wf4X
-         FJtBy8nslaZ45I3OceIOhBIYSQBvq0/dcSm4W6iWWfl5Ggmeje81x29mVFqpoADQMVCC
-         bXXk6AiyIoJ46EZ+ilnOD7SRGz84f2AwEDmS3TxRiwKBqeeqnugsY3QAWnuMfRVzNOzb
-         DS+gEtRJzXUvYYP0BvIQnNMNZfAs88HyzA1ia6ckSRAXLiiA7goePgSntbeo5zFltBCC
-         EaWuKZabIH7mKO1vKsu+z3tYsU/LsFLPTYef8p9e65PJ/b5fwbiYLJJURnStOjbCaiiI
-         9fUQ==
-X-Gm-Message-State: AOJu0YwcsXd3lVxR5GNvlvpbwuunPaZfuKy4DV+/FfuII+BiCArm0TUn
-	JQt3WANA7ZVKGpukLXpTW+SGNVSFk927XPS9J3mOrn6n8XL1aRT+GVnHvVflUcJXYDxYI1165BS
-	ZSFSSpxLA/11gHhqecFFXK/g37KBnsjX1eCxFFIco96ocuF635d1YVQ==
-X-Received: by 2002:a05:6512:b95:b0:52c:6b51:2e9a with SMTP id 2adb3069b0e04-52e8267ee01mr5152899e87.2.1719912225311;
-        Tue, 02 Jul 2024 02:23:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/du4/f+47zB9a3lFEQ3O0bJ+//0RPuS+OLhA6v4Apj6Wp+Iab+S1fhVhfRqiCRDSCiNBp8Q==
-X-Received: by 2002:a05:6512:b95:b0:52c:6b51:2e9a with SMTP id 2adb3069b0e04-52e8267ee01mr5152865e87.2.1719912224818;
-        Tue, 02 Jul 2024 02:23:44 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0a6:6710:872d:b0f7:af0b:a62f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256af5b61bsm191343975e9.17.2024.07.02.02.23.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 02:23:44 -0700 (PDT)
-Message-ID: <fd44c91884d0ebf3625ac85a1049679a987f8f79.camel@redhat.com>
-Subject: Re: [PATCH v2 1/2] net: Fix skb_segment when splitting gso_size
- mangled skb having linear-headed frag_list whose head_frag=true
-From: Paolo Abeni <pabeni@redhat.com>
-To: Fred Li <dracodingfly@gmail.com>, davem@davemloft.net,
- edumazet@google.com,  kuba@kernel.org, aleksander.lobakin@intel.com,
- sashal@kernel.org,  linux@weissschuh.net, hawk@kernel.org, nbd@nbd.name,
- mkhalfella@purestorage.com,  ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev,  song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com,  kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Date: Tue, 02 Jul 2024 11:23:41 +0200
-In-Reply-To: <20240626065555.35460-2-dracodingfly@gmail.com>
-References: <20240626065555.35460-1-dracodingfly@gmail.com>
-	 <20240626065555.35460-2-dracodingfly@gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1719912259; c=relaxed/simple;
+	bh=AtHy76LhHZBuSG9Zh2PI2i7sJXyX+B7OpLr/QLRadpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sm129PvAWYF1pj90DPUqB+OCU8aS7wtaYc/Tk+XXXxRJVRUytn9gsPgibwKIcgpupms0iBptBj8eWhztlaxZEaHomaHvd83Oc5dSd8x+NqQoEslULRMmWFLm76T0FXOO0agO6xYcUbsC3VZlYm3y+rcA8etaAkj7PLMoQX5ymy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2Hjq0TU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEF5EC116B1;
+	Tue,  2 Jul 2024 09:24:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719912258;
+	bh=AtHy76LhHZBuSG9Zh2PI2i7sJXyX+B7OpLr/QLRadpI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q2Hjq0TU9t3QwFokgmXFJjV7uoaiaMVjGf4tOzonGWAPERO39E9APLO+kpIb9ziSZ
+	 JNhvtfxPTYxiaBYEsus2q2gKwUqEwI8Xr9jIt/gnWnsj21Sp2Q8XfmiTVwcUlMlXVl
+	 3suRjumYVFt53AALwPX1M2NvEJl6HWQtuD9SzLNH4sdwkKq0j39UhpBeewFeaFqbRL
+	 oMBn910fmL31N/GZTE/hxNURN7TDwHEPel7oP4X0sH/E+zCANua+sUi4aDCIH3jxFo
+	 z+oKC49/gCjvlmLAAI4TsYX6WjwZxtgdbemQ+BkatQxA4VxOKzBURC1W1AK7iVaHGL
+	 DA2wMa4ZST45w==
+Date: Tue, 2 Jul 2024 10:24:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Julien Panis <jpanis@baylibre.com>, Andrew Lunn <andrew@lunn.ch>,
+	srk@ti.com, vigneshr@ti.com, danishanwar@ti.com,
+	pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v2 6/7] net: ethernet: ti: cpsw_ale: add helper
+ to setup classifier defaults
+Message-ID: <20240702092413.GB598357@kernel.org>
+References: <20240628-am65-cpsw-multi-rx-v2-0-c399cb77db56@kernel.org>
+ <20240628-am65-cpsw-multi-rx-v2-6-c399cb77db56@kernel.org>
+ <20240701073505.GI17134@kernel.org>
+ <4124798a-cda5-47fe-a67b-e84d72f3ecf8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4124798a-cda5-47fe-a67b-e84d72f3ecf8@kernel.org>
 
-On Wed, 2024-06-26 at 14:55 +0800, Fred Li wrote:
-> When using calico bpf based NAT, hits a kernel BUG_ON at function
-> skb_segment(), line 4560. Performing NAT translation when accessing
-> a Service IP across subnets, the calico will encap vxlan and calls the
-> bpf_skb_adjust_room to decrease the gso_size, and then call bpf_redirect
-> send packets out.
->=20
-> 4438 struct sk_buff *skb_segment(struct sk_buff *head_skb,
-> 4439                             netdev_features_t features)
-> 4440 {
-> 4441     struct sk_buff *segs =3D NULL;
-> 4442     struct sk_buff *tail =3D NULL;
-> ...
-> 4558         if (hsize <=3D 0 && i >=3D nfrags && skb_headlen(list_skb) &=
-&
-> 4559             (skb_headlen(list_skb) =3D=3D len || sg)) {
-> 4560                 BUG_ON(skb_headlen(list_skb) > len);
-> 4561
-> 4562                 nskb =3D skb_clone(list_skb, GFP_ATOMIC);
-> 4563                 if (unlikely(!nskb))
-> 4564                     goto err;
->=20
-> call stack:
-> ...
->    [exception RIP: skb_segment+3016]
->     RIP: ffffffffb97df2a8  RSP: ffffa3f2cce08728  RFLAGS: 00010293
->     RAX: 000000000000007d  RBX: 00000000fffff7b3  RCX: 0000000000000011
->     RDX: 0000000000000000  RSI: ffff895ea32c76c0  RDI: 00000000000008c1
->     RBP: ffffa3f2cce087f8   R8: 000000000000088f   R9: 0000000000000011
->     R10: 000000000000090c  R11: ffff895e47e68000  R12: ffff895eb2022f00
->     R13: 000000000000004b  R14: ffff895ecdaf2000  R15: ffff895eb2023f00
->     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->  #9 [ffffa3f2cce08720] skb_segment at ffffffffb97ded63
-> ...
->=20
-> The skb has the following properties:
->     doffset =3D 66
->     list_skb =3D skb_shinfo(skb)->frag_list
->     list_skb->head_frag =3D true
->     skb->len =3D 2441 && skb->data_len =3D 2250
->     skb_shinfo(skb)->nr_frags =3D 17
->     skb_shinfo(skb)->gso_size =3D 75
->     skb_shinfo(skb)->frags[0...16].bv_len =3D 125
->     list_skb->len =3D 125
->     list_skb->data_len =3D 0
->=20
-> When slicing the frag_list skb, there three cases:
-> 1. Only *non* head_frag
->     sg will be false, only when skb_headlen(list_skb)=3D=3Dlen is satisfi=
-ed,
->     it will enter the branch at line 4560, and there will be no crash.
-> 2. Mixed head_frag
->     sg will be false, Only when skb_headlen(list_skb)=3D=3Dlen is satisfi=
-ed,
->     it will enter the branch at line 4560, and there will be no crash.
-> 3. Only frag_list with head_frag=3Dtrue
->     sg is true, three cases below:
->     (1) skb_headlen(list_skb)=3D=3Dlen is satisfied, it will enter the br=
-anch
->        at line 4560, and there will be no crash.
->     (2) skb_headlen(list_skb)<len is satisfied, it will enter the branch
->        at line 4560, and there will be no crash.
->     (3) skb_headlen(list_skb)>len is satisfied, it will be crash.
->=20
-> Applying this patch, three cases will be:
-> 1. Only *non* head_frag
->     sg will be false. No difference with before.
-> 2. Mixed head_frag
->     sg will be false. No difference with before.
-> 3. Only frag_list with head_frag=3Dtrue
->     sg is true, there also three cases:
->     (1) skb_headlen(list_skb)=3D=3Dlen is satisfied, no difference with b=
-efore.
->     (2) skb_headlen(list_skb)<len is satisfied, will be revert to copying
->         in this case.
->     (3) skb_headlen(list_skb)>len is satisfied, will be revert to copying
->         in this case.
->=20
-> Since commit 13acc94eff122("net: permit skb_segment on head_frag frag_lis=
-t
-> skb"), it is allowed to segment the head_frag frag_list skb.
->=20
-> Signed-off-by: Fred Li <dracodingfly@gmail.com>
-> ---
->  net/core/skbuff.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index f0a9ef1aeaa2..b1dab1b071fc 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4556,7 +4556,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_sk=
-b,
->  		hsize =3D skb_headlen(head_skb) - offset;
-> =20
->  		if (hsize <=3D 0 && i >=3D nfrags && skb_headlen(list_skb) &&
-> -		    (skb_headlen(list_skb) =3D=3D len || sg)) {
-> +		    (skb_headlen(list_skb) =3D=3D len)) {
->  			BUG_ON(skb_headlen(list_skb) > len);
-> =20
->  			nskb =3D skb_clone(list_skb, GFP_ATOMIC);
+On Mon, Jul 01, 2024 at 01:32:08PM +0300, Roger Quadros wrote:
+> 
+> On 01/07/2024 10:35, Simon Horman wrote:
+> > On Fri, Jun 28, 2024 at 03:01:55PM +0300, Roger Quadros wrote:
+> >> Default behaviour is to have 8 classifiers to map 8 DSCP/PCP
+> >> priorities to N receive threads (flows). N depends on number of
+> >> RX channels enabled for the port.
+> >>
+> >> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> >> ---
+> >>  drivers/net/ethernet/ti/cpsw_ale.c | 57 ++++++++++++++++++++++++++++++++++++++
+> >>  drivers/net/ethernet/ti/cpsw_ale.h |  1 +
+> >>  2 files changed, 58 insertions(+)
+> >>
+> >> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+> >> index 75a17184d34c..51da527388df 100644
+> >> --- a/drivers/net/ethernet/ti/cpsw_ale.c
+> >> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
+> >> @@ -1650,3 +1650,60 @@ static void cpsw_ale_policer_thread_idx_enable(struct cpsw_ale *ale, u32 idx,
+> >>  	regmap_field_write(ale->fields[ALE_THREAD_VALUE], thread_id);
+> >>  	regmap_field_write(ale->fields[ALE_THREAD_ENABLE], enable ? 1 : 0);
+> >>  }
+> >> +
+> >> +/* Disable all policer entries and thread mappings */
+> >> +static void cpsw_ale_policer_reset(struct cpsw_ale *ale)
+> >> +{
+> >> +	int i;
+> >> +
+> >> +	for (i = 0; i < ale->params.num_policers ; i++) {
+> >> +		cpsw_ale_policer_read_idx(ale, i);
+> >> +		regmap_field_write(ale->fields[POL_PORT_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_PRI_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_OUI_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_DST_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_SRC_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_OVLAN_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_IVLAN_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_ETHERTYPE_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_IPSRC_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_IPDST_MEN], 0);
+> >> +		regmap_field_write(ale->fields[POL_EN], 0);
+> >> +		regmap_field_write(ale->fields[POL_RED_DROP_EN], 0);
+> >> +		regmap_field_write(ale->fields[POL_YELLOW_DROP_EN], 0);
+> >> +		regmap_field_write(ale->fields[POL_PRIORITY_THREAD_EN], 0);
+> >> +
+> >> +		cpsw_ale_policer_thread_idx_enable(ale, i, 0, 0);
+> >> +	}
+> >> +}
+> >> +
+> >> +/* Default classifer is to map 8 user priorities to N receive channels */
+> >> +void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
+> >> +{
+> >> +	int pri, idx;
+> >> +	int pri_thread_map[8][9] = {	{ 0, 0, 0, 0, 0, 0, 0, 0, },
+> >> +					{ 0, 0, 0, 0, 1, 1, 1, 1, },
+> >> +					{ 0, 0, 0, 0, 1, 1, 2, 2, },
+> >> +					{ 1, 0, 0, 1, 2, 2, 3, 3, },
+> >> +					{ 1, 0, 0, 1, 2, 3, 4, 4, },
+> >> +					{ 1, 0, 0, 2, 3, 4, 5, 5, },
+> >> +					{ 1, 0, 0, 2, 3, 4, 5, 6, },
+> >> +					{ 2, 0, 1, 3, 4, 5, 6, 7, } };
+> > 
+> > Hi Roger,
+> > 
+> > Perhaps it is obvious, but I'm wondering if it is appropriate
+> > to add a comment explaining the layout of the table, especially
+> > the latter rows where the mapping of priority to receive channel
+> > seems somewhat non-trivial.
+> 
+> Sure. I took the table straight off from the All new switch book. [1]
+> 
+> Priorities 3 to 7 are straight forward. Priorities 0 to 2 are listed like so in
+> decreasing order of priority
+> 
+> 0 (default)	Best Effort
+> 2 		Spare (undefined)
+> 1 (lowest)	Background
+> 
+> [1] Table 13-2 IEEE 802.1p Recommended Priority Mappings to Class of Service.
 
-I must admit I more than a bit lost in the many turns of skb_segment(),
-but the above does not look like the correct solution, as it will make
-the later BUG_ON() unreachable/meaningless.
+Thanks Roger,
 
-Do I read correctly that when the BUG_ON() triggers:
+I was able to correlate this with tables G-2 and G-3 of 802.1D-2004.
 
-list_skb->len is 125
-len is 75
-list_skb->frag_head is true
+I do think it would be adding some sort of comment to the code
+about this.
 
-It looks like skb_segment() is becoming even and ever more complex to
-cope with unexpected skb layouts, only possibly when skb_segment() is
-called by some BPF helpers.
-
-I think it should be up to the helper itself to adjust the skb and/or
-the device features to respect skb_segment() constraints, instead of
-making the common code increasingly not maintainable.
-
-Thanks,
-
-Paolo
-
+...
 
