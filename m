@@ -1,169 +1,118 @@
-Return-Path: <netdev+bounces-108310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5128491ECC5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:40:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE1991ECC8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEF6EB21403
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EEA01F21EEC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDD48C07;
-	Tue,  2 Jul 2024 01:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249A19449;
+	Tue,  2 Jul 2024 01:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i1vl7NjM"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="esvr3f/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1594564D;
-	Tue,  2 Jul 2024 01:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FA08BFC;
+	Tue,  2 Jul 2024 01:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719884427; cv=none; b=dP2hdsU2JCWtKk9VI/2TXvwvJ5Q602K+uza+OUQeQtYvYEetm0JdG75uJ44hFeZzPRv0imXguIEncWpf5eji4ZUk9Zkx4jFBdWDMQedQPHVW327O2bZBWqZRfwns58NFswwi3ogDUvdI4+59EAFYfgH+Tl86hNZfvQUURpIo4bc=
+	t=1719884601; cv=none; b=RcgvsB5eeRyc4OJmT3qX/wjYXz/U2eweifzQM/MFY+8KKvLvBGE2kUbqPzWAQf3VaFR6+7R8QIVLj9d3aM3UtZ0xdXY7f9X4moAcDXCYcaQwdLKRNb6x7jegpGnIfmXbNVB3akpLnqQeYmdcBtMxMtaF4m6mgQHNuvdtuhKOjls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719884427; c=relaxed/simple;
-	bh=3rWIcEBuDquwT65mdmMptUDstbXhoHxLkzl2I+eVtbE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fz8zw04wVslWdbcSudZz7JUVWx13/nzb6fH/dDN0i/8RH9oEwymdoOuG7hHiO/myRz140VQL9NkqClYPEOqPMdvTt3J+7Z4No6YvRgJCIgmjKcz8uXOzJHwZr7ixuDeQQMmdIffvPigbWdrn2lacYVVEaEQhGJZa1SV6x4CMEPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i1vl7NjM; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719884426; x=1751420426;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3rWIcEBuDquwT65mdmMptUDstbXhoHxLkzl2I+eVtbE=;
-  b=i1vl7NjMTN28RiBHaD/0R+0YjdHLcx2f+gntf2nd3znrlj1TOxw7KZiA
-   RhP9KBOIhhQbLkP/lPPgu3shhpcQWhExEEjq9+ZoeL/zTqSTbXuhDbAHN
-   YvXEYUgiyQp4cVQblDs4pIHemKLDC6w6Z4Y1q0amoN+0++IINs6JMKN/A
-   B7hRqxHhWvWHfiUjLmqLneRE7CGUFOgcJtBb1vuiUUabjFbhfPgcY6j4w
-   WkIE5IxBUy4PMs6NFMM0vbXJUXAgFAQGe+6594Ygl1NB+butuudcQ/y0a
-   +MR0DcBxDJU4s+ilqa5yE5hRpoKVrgDKUCzPrsMIAlvgTtud3qN3kYV1U
-   Q==;
-X-CSE-ConnectionGUID: 9wroL5s2S2O146ABOk1n1Q==
-X-CSE-MsgGUID: 4rb+p1atRreB6mF6McSPjw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="28170611"
-X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
-   d="scan'208";a="28170611"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 18:40:25 -0700
-X-CSE-ConnectionGUID: bZfVIyY8QFmgdJ7w841ySA==
-X-CSE-MsgGUID: KN3DL8ezQbWFQVfa63X4LQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
-   d="scan'208";a="50168557"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.38.161]) ([10.247.38.161])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 18:40:21 -0700
-Message-ID: <d14d14ec-2d86-46f4-9a70-6a1cd3b016c5@linux.intel.com>
-Date: Tue, 2 Jul 2024 09:40:09 +0800
+	s=arc-20240116; t=1719884601; c=relaxed/simple;
+	bh=aoPiI/KCw8ZYQ+EiNnWknG1EiOBnkYltsodd008VqX8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=WXpX7QGyyXkgdU3XA4dkoBS5K4IhrnHrke0+x+NY1v1Sep8YMnzKEGF5vhO/vRrQkmd2rmOG51INBYAI1Lvrl5BwizXsjjV13HxjyVz+QrJ1FFD8jq4T82Zxh+NIhhJ3td9v3w1RoCxbKbYpQnv+usXngAhkgzGqUn9/PyhWojQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=esvr3f/7; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1719884597;
+	bh=vXMYu7bQHpE9hlxtss9XH7J0+vE2VrJPMiFUDJ9/O5M=;
+	h=Date:From:To:Cc:Subject:From;
+	b=esvr3f/7KBWY9RkxOqzboOdOeyCmTj+oKGzOpvuGcJ5juVG6NcFLVQJtrLVt3vho3
+	 CUviTHruLbm3bUn4Wov45K4IV/hPyxJUwQMuBW2u2N3b0DWg4LTPeNW0gV8aU8ezcq
+	 3APg1qC03wuff4eypGa0mRc+zyzYWuPMBf/oRtW264heB0LYfViKMi80JnpKRmYU3D
+	 eZ2EzaX3AXnFUXHcjcluWTHXde1SksR/TqnKm7Nv9kZbBx6wJ66WadNbNrslGZyWZm
+	 wYnKt82eiA4jV8jtvi61MeKsGm6XWAi5aC9GSfzaWZoph2/QuSol+QXsNnF7Dr7QIh
+	 +3G9QWJ4UM2lQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WClzl4wZJz4wcr;
+	Tue,  2 Jul 2024 11:43:15 +1000 (AEST)
+Date: Tue, 2 Jul 2024 11:43:14 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Luiz Augusto von Dentz
+ <luiz.von.dentz@intel.com>
+Subject: linux-next: manual merge of the bluetooth tree with the net tree
+Message-ID: <20240702114314.6bea5fe4@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 1/1] igc: Fix packet still tx
- after gate close by reducing i226 MAC retry buffer
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20240701100058.3301229-1-faizal.abdul.rahim@linux.intel.com>
- <e981261e-77be-407b-b601-f7214a4f57dd@molgen.mpg.de>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <e981261e-77be-407b-b601-f7214a4f57dd@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/XxHDJP42Z/tEGn2=KGyv0jo";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hi Paul,
+--Sig_/XxHDJP42Z/tEGn2=KGyv0jo
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for reviewing.
+Hi all,
 
-On 1/7/2024 8:42 pm, Paul Menzel wrote:
-> Dear Faizal,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 01.07.24 um 12:00 schrieb Faizal Rahim:
->> AVNU testing uncovered that even when the taprio gate is closed,
->> some packets still transmit.
-> 
-> What is AVNU? *some* would fit on the line above.
+Today's linux-next merge of the bluetooth tree got a conflict in:
 
-AVNU stands for "Avnu Alliance." AVNU (Audio Video Bridging Network 
-Alliance) is an industry consortium that promotes and certifies 
-interoperability of devices implementing IEEE 802.1 standards for 
-time-sensitive applications.
+  net/bluetooth/hci_core.c
 
-This AVNU test refers to AVNU certification test plan.
-Should I add this information in the commit ?
+between commit:
 
->> A known i225/6 hardware errata states traffic might overflow the planned
-> 
-> Do you have an idea for that errata? Please document it. (I see you added 
-> it at the end. Maybe use [1] notation for referencing it.)
+  f1a8f402f13f ("Bluetooth: L2CAP: Fix deadlock")
 
-Sure.
+from the net tree and commits:
 
->> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> 
-> As you Cc’ed stable@vger.kernel.org, add a Fixes: tag?
+  6851d11d389c ("Bluetooth: Fix double free in hci_req_sync_complete")
+  7b256038ca7c ("Bluetooth: Fix usage of __hci_cmd_sync_status")
 
-Accidentally CC'ed stable@vger.kernel.org.
-Since it's a hardware bug, not software, probably Fixes: tag not needed ?
-Not sure which Fixes: commit to point to hmm.
+from the bluetooth tree.
 
-I'll remove stable kernel email and omit Fixes: tag, is that okay?
+I fixed it up (I basically used the latter where they conflicted) and
+can carry the fix as necessary. This is now fixed as far as linux-next
+is concerned, but any non trivial conflicts should be mentioned to your
+upstream maintainer when your tree is submitted for merging.  You may
+also want to consider cooperating with the maintainer of the
+conflicting tree to minimise any particularly complex conflicts.
 
->>   /* Returns the TSN specific registers to their default values after
->>    * the adapter is reset.
->>    */
->> @@ -91,6 +100,9 @@ static int igc_tsn_disable_offload(struct igc_adapter 
->> *adapter)
->>       wr32(IGC_TXPBS, I225_TXPBSIZE_DEFAULT);
->>       wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_DEFAULT);
->> +    if (igc_is_device_id_i226(hw))
->> +        igc_tsn_restore_retx_default(adapter);
->> +
->>       tqavctrl = rd32(IGC_TQAVCTRL);
->>       tqavctrl &= ~(IGC_TQAVCTRL_TRANSMIT_MODE_TSN |
->>                 IGC_TQAVCTRL_ENHANCED_QAV | IGC_TQAVCTRL_FUTSCDDIS);
->> @@ -111,6 +123,25 @@ static int igc_tsn_disable_offload(struct 
->> igc_adapter *adapter)
->>       return 0;
->>   }
->> +/* To partially fix i226 HW errata, reduce MAC internal buffering from 
->> 192 Bytes
->> + * to 88 Bytes by setting RETX_CTL register using the recommendation from:
->> + * a) Ethernet Controller I225/I22 Specification Update Rev 2.1
->> + *    Item 9: TSN: Packet Transmission Might Cross the Qbv Window
->> + * b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
->> + */
->> +static void igc_tsn_set_retx_qbvfullth(struct igc_adapter *adapter)
-> 
-> It’d put threshold in the name.
+--=20
+Cheers,
+Stephen Rothwell
 
-My earlier thought is that it is easier to look for the keyword "qbvfullth" 
-in the i226 SW User Manual where you'll get a hit that brings you directly 
-to that register. "qbvfullthreshold" would not.
-There are some comments in the new code that links 'th' to 'threshold' for 
-the reader.
+--Sig_/XxHDJP42Z/tEGn2=KGyv0jo
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-But I'm okay to change it to "qbvfullthreshold".
-Thoughts?
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Faizal
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmaDWzIACgkQAVBC80lX
+0GzWDggAntpqccb5xUNZz7Z36NHCgF3sFWLffiRVHIus7SaByFdVyNmw1jcO9KT3
+zxvEb3UrqKfN3EKEpM6MiZhNGPQndjh11p6LoeaxIFt6QHmyD7Qbzi6YVzglzZNa
+IqqBJzehNTMmK5GNWhkoF76nufYQNC0XrmqOn9xloOuYqk5zqo1Y7pXtcGIHD+Rh
+Sig3MxUIIo1yeJLp5LrjsgxAsd1tnXi0hwZjc6oVdyF1ABFGN9WAXeOwm/5Gf32q
+Xyl4yZkBtYrWFlzWNeOfDZtr6uiarQoqUz2ZGwfhFq3aZcrurce3Aa/gROXbS3Lw
+vsxedMCvgwRhXE4ZkqaTvi2APBA2Rg==
+=hief
+-----END PGP SIGNATURE-----
+
+--Sig_/XxHDJP42Z/tEGn2=KGyv0jo--
 
