@@ -1,201 +1,143 @@
-Return-Path: <netdev+bounces-108574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 119FA9246B3
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:54:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 834F19246E0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847561F23CEB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:54:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDE2E1C24B18
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A2D155335;
-	Tue,  2 Jul 2024 17:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C0D1C0DE3;
+	Tue,  2 Jul 2024 18:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8x+wrmP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23131BE873;
-	Tue,  2 Jul 2024 17:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3062F4A;
+	Tue,  2 Jul 2024 18:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719942840; cv=none; b=ZlRIZyh8G0zfLUFfbazj3+w9O5LgxTsCcMiM9kkCTiZiiiJh4sTGCqt4Fl0TQaNW74DoqrIhFMrYdo2ailXXeGpAdHRBKyArmOF5+T0B/Ye7axFSlnqvnRzrQ89um2v0rPKkg6JEgWcOWGx2EZixUsPwOE/OMFyDk1mOxW66q+0=
+	t=1719943386; cv=none; b=gxEglnCqCyySsWmoySFMqOi7PoTRCH/zZFrFCkkeoRDs5ejcZGtQ+9QKGFylL1op+kmeFcmwNe3Bjn9ObOvhIZuji5aGUlinp+1VRg3IqVB3m2wNHtM3+HVdWG8ljW/lDs6LRFGm3FjC+9gTtGCeQOnrX3NKAAiClaoQgQrDxyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719942840; c=relaxed/simple;
-	bh=yvLMvBy0+1otlEibY6ok9ydC9gmPj672qN+b7belio0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OtCjKJJjGl3YWz3WAe+NdPmoULPjoMvtAs83YY4DcG+HLQE1COgrBHNPyeFW/tk1r2Qbt4K/KOUrNjzzBYeJeg/vhH1zgPJpP670eZ3CYZqHqUeUbNgvDKciQfXT2IzWB42BU/8HGRS4M644socqTIhJFy1H3Pbd5gSWgLa4KKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1719943386; c=relaxed/simple;
+	bh=B3dWdEDyNXQmx6muZkNVWHD7xKSIJpgZf/xlYbSegAA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m6R78aaHRW/OdLkr1vk0YwVgVXkbDlo1uNPBbLhmF9uSkSxhsWvQb6Z+idG/t9wtmWyvniP1ozu/fgEc2pgETlOgBmswJfMmAEyPQ5zsEEHzRB7/k/hRJ5w8uALWN6EBWSS0SV+hG2YRnVYCS0/GgNZyZ9En1eDqxq++FezrZRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8x+wrmP; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a70c0349b64so596175166b.1;
-        Tue, 02 Jul 2024 10:53:58 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fa55dbf2e7so25332205ad.2;
+        Tue, 02 Jul 2024 11:03:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719943385; x=1720548185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qvoM6VT0CJn7MVKzubAGpZvllDEzwbyo5vD8p8L/0v8=;
+        b=W8x+wrmPf2I+S48Gkvq6HW8DWtOa9hr7eiI5uoY5eaPapYgbS+qVfsXxBYC/vKxhP0
+         LOSNukXRwnOAzU/F4jq/nprmc4WyGxHi0MqVpQJABAA+pKjci+brv6GpY1/JT2PmtRRL
+         7OebjQKjwCia2L8/iZD/b4lRH/sT+xytNreKo+C89FJxu36s4imbg0PobRUyc774N2X5
+         X92mYBJdUd1kqZxIFuj52SiKTrAs0un4h7FVD+Os5VpkRcAVDOWELN1WG5m+oejhwMoY
+         iuwa/RwZ08q9hf/Q8Q27D2nBNgIvHfXjnsVRmolwo2ZydNtd+tBdzepn74pwCOEkDGs7
+         TkhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719942837; x=1720547637;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WFhXTk49J7JdTh0lfYEvpqmeq+8M8zcqsRkfkO5ZaBg=;
-        b=HaKPXUQT3Q0G/VHLwNRATAahOGqOng/2BsW59qBOmrSff6BP0PinFqWnP+jL8aUYHq
-         AycB2BEwmTaqzs9rXJjb4pFTl20KfPeoJNipJo91xbKkWWqC43nqG8bAnROYfEhqx+eg
-         oH+PrDNOsAJhpg2ez31qvS80i2MkwP1LVd83XADrwgHc0xsZdQVz7y19EQ35PJ4YXl+I
-         Yyc8P7txWgdw5C46n6GQDYVwTsSySAgqsVpKbVYrJ7Iwv8iMddKf7tTxg9jvA1TfU3S0
-         CF1lJ4C7izaY1KxoFVJ8D8gxgIo7QMf5P+cUC5IbjTNJqngqh2W4k3dWATkrK0CmdGeL
-         S7Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWukf+uMVFrJedfWXEDZdL1X0mQDUIdvMzlpUbxA9/+6XXzD3MYZ+KP0bB1rQIQELcNXkxv1KzwcgMU8SDocTfcT5Kqu7zGjqo08pcjI6JZuOzXUFo9Z8iIEQOknm7neyvhkC1fhcVCSfCWSc5lBQWtyK6dqXG5GSVyTZUdKRUCkdQN
-X-Gm-Message-State: AOJu0YyJ6x4yxgG63LtZYCtAmxi9UDeRFjybBrfhmnBDzskLJEYaNzTQ
-	ouA8TZGM+a03KQ7+K/p0rfQDrOC4lgDAsieQnTrwOEJp0iM85OyTgd+Uww==
-X-Google-Smtp-Source: AGHT+IFnAVqJ3O2Q8aIdhmkkjE1j+Fm1XfaodkkcdmoRrrC68/Bn9KyBFsMLV+BTv1FvVW1s5rafow==
-X-Received: by 2002:a17:906:29cf:b0:a6f:17a9:947a with SMTP id a640c23a62f3a-a75144a8a9cmr544931866b.71.1719942836902;
-        Tue, 02 Jul 2024 10:53:56 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab0651dfsm448430766b.142.2024.07.02.10.53.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 10:53:56 -0700 (PDT)
-Date: Tue, 2 Jul 2024 10:53:54 -0700
-From: Breno Leitao <leitao@debian.org>
-To: kernel test robot <lkp@intel.com>
-Cc: kuba@kernel.org, horia.geanta@nxp.com, pankaj.gupta@nxp.com,
-	gaurav.jain@nxp.com, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	horms@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/3] crypto: caam: Make CRYPTO_DEV_FSL_CAAM
- dependent of COMPILE_TEST
-Message-ID: <ZoQ+snH2GTnwKNT2@gmail.com>
-References: <20240628161450.2541367-2-leitao@debian.org>
- <202407011309.cpTuOGdg-lkp@intel.com>
+        d=1e100.net; s=20230601; t=1719943385; x=1720548185;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qvoM6VT0CJn7MVKzubAGpZvllDEzwbyo5vD8p8L/0v8=;
+        b=e/QsMZPKpv3bXmGH7kQSz54VlLUul6tsa05+1RPrkfaiUHa8vzhpbCsigPc5GDm0q8
+         b74PFUfkglAecG1Jjxu9kQFqEMHekmNw606sYAKO1n6lDU0KOpHwn3sDcXvvWvKf9IpT
+         J4x6didvmQ/2fWQFm0oNQV9hObr6V/xNB7PEBdhCL7pOcCI9dYivbAdO5Ph9T421c1V3
+         jwjpRbzl27PbxIk7U0RrXi7BTd498BnM2V0P/d1ZKN0DJeFbO8HqZk61DtA/GjnhhKgD
+         hLbYbaX0VjY9bAkiLumIe6s97sikpTl3us13dpaf3rUV0EvNCA2lOJkg8H933LnxWB2l
+         YEpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqvl9PclItVlBt62o0k/kVD7Tt9DiDNdaf9mE6gbNZ7he0E5HzXj2TGJEB4J9KIvZ5+P78FlyBDYrqZONmOg4iOonxZXZkYBruDFVJ4eKR+LHSHLq29oV5zyjwVbbqUp5jMuk/l1mscIDZq9rw+a4taCm8mTG7q9ttRI38vkiBWJLHpuBWqSar1KX5rZmN4ndu/ingqjahQU+wdy0zye5i
+X-Gm-Message-State: AOJu0YyBIaqj2Q+rebYT2DLeXTRYlk5bWghoDIYeW18bwNelRUK3TC4q
+	moAiM4CN12T3VdoMR3OTKrQfUgvPbot1VRmi9v7m56reBaVQ0hvI
+X-Google-Smtp-Source: AGHT+IHfXBmJeNjdGUFTKNNAA0/gNX+F/GIrIVr1TbrrIrL6KTYRjIkDBb+7kMaXkDHLKvHq8JwmSg==
+X-Received: by 2002:a17:903:2303:b0:1f9:fca9:742a with SMTP id d9443c01a7336-1fadbd04454mr59020895ad.57.1719943384771;
+        Tue, 02 Jul 2024 11:03:04 -0700 (PDT)
+Received: from localhost.localdomain ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fad2eb7cdesm78518005ad.146.2024.07.02.11.03.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 02 Jul 2024 11:03:04 -0700 (PDT)
+From: Yunseong Kim <yskelg@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>
+Cc: Taehee Yoo <ap420073@gmail.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Austin Kim <austindh.kim@gmail.com>,
+	MichelleJin <shjy180909@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	ppbuk5246@gmail.com,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH] tracing/net_sched: NULL pointer dereference in perf_trace_qdisc_reset()
+Date: Wed,  3 Jul 2024 03:01:47 +0900
+Message-ID: <20240702180146.5126-2-yskelg@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202407011309.cpTuOGdg-lkp@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 01, 2024 at 01:48:21PM +0800, kernel test robot wrote:
+Support backports for stable version. There are two places where null
+deref could happen before
+commit 2c92ca849fcc ("tracing/treewide: Remove second parameter of __assign_str()")
+Link: https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
 
-> reproduce:
->         git clone https://github.com/intel/lkp-tests.git ~/lkp-tests
->         # apt-get install sparse
->         # sparse version: v0.6.4-66-g0196afe1
->         # https://github.com/intel-lab-lkp/linux/commit/ca1603af1770827216f5f67a91f6f13fbb05a050
->         git remote add linux-review https://github.com/intel-lab-lkp/linux
->         git fetch --no-tags linux-review Breno-Leitao/crypto-caam-Make-CRYPTO_DEV_FSL_CAAM-dependent-of-COMPILE_TEST/20240630-073726
->         git checkout ca1603af1770827216f5f67a91f6f13fbb05a050
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-13.2.0 ~/lkp-tests/kbuild/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__ -fmax-errors=unlimited -fmax-warnings=unlimited' O=build_dir ARCH=m68k olddefconfig
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-13.2.0 ~/lkp-tests/kbuild/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__ -fmax-errors=unlimited -fmax-warnings=unlimited' O=build_dir ARCH=m68k SHELL=/bin/bash
+I've checked +v6.1.82 +v6.6.22 +v6.7.10, +v6.8, +6.9, this version need
+to be applied, So, I applied the patch, tested it again, and confirmed
+working fine.
 
-Thanks, this seems a valid error, but, I am unfortunately not able to
-reproduce it:
+Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string")
+Link: https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
+Cc: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org # +v6.1.82 +v6.6.22 +v6.7.10, +v6.8, +6.9
+Tested-by: Yunseong Kim <yskelg@gmail.com>
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Link: https://lore.kernel.org/r/20240624173320.24945-4-yskelg@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/trace/events/qdisc.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-	#  COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-13.2.0 ~/lkp-tests/kbuild/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__-fmax-errors=unlimited -fmax-warnings=unlimited' O=build_dir ARCH=m68k SHELL=/bin/bash
-	Compiler will be installed in /home/leit/0day
-	PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/bin/:/home/leit/.cargo/bin:/usr/share/Modules/bin:/usr/lib64/ccache:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/usr/facebook/ops/scripts:/usr/facebook/scripts:/usr/facebook/ops/scripts:/usr/facebook/scripts:/usr/facebook/scripts:/usr/facebook/scripts/db:/usr/facebook/ops/scripts:/usr/facebook/scripts:/usr/facebook/scripts:/usr/facebook/scripts/db:/usr/local/sbin:/usr/sbin:/sbin:/var/www/scripts/bin:/home/leit/.yarn/bin:/home/leit/bin:/usr/facebook/ops/scripts:/usr/facebook/scripts:/usr/lib/cargo/bin:/home/leit/bin:/home/leit/.local/bin:/home/leit/bin:~/Devel/virtme:/home/leit/bin/virtme:/home/leit/bin/twtf:/home/leit/Devel/git-fuzzy/bin:/home/leit/bin/kernel:/home/leit/bin/git:/home/leit/bin/iterm:/usr/facebook/ops/scripts:/usr/facebook/scripts:/usr/local/sbin:/usr/sbin:/sbin:/var/www/scripts/bin:/home/leit/.yarn/bin
-	make --keep-going CROSS_COMPILE=/home/leit/0day/gcc-13.2.0-nolibc/m68k-linux/bin/m68k-linux- --jobs=332 KCFLAGS= -Wtautological-compare -Wno-error=return-type -Wreturn-type -Wcast-function-type -funsigned-char -Wundef -fstrict-flex-arrays=3 -Wformat-overflow -Wformat-truncation -Wrestrict -Wenum-conversion C=1 CF=-fdiagnostic-prefix -D__CHECK_ENDIAN__-fmax-errors=unlimited -fmax-warnings=unlimited O=build_dir ARCH=m68k SHELL=/bin/bash
-	make[1]: Entering directory '/home/leit/Devel/upstream/build_dir'
-	  GEN     Makefile
-	  CALL    ../scripts/checksyscalls.sh
-	  CC      drivers/crypto/caam/error.o
-	  CC      drivers/crypto/caam/ctrl.o
-	  CC      drivers/crypto/caam/debugfs.o
-	  CC      drivers/crypto/caam/jr.o
-	  CC      drivers/crypto/caam/key_gen.o
-	  CC      drivers/crypto/caam/caamalg.o
-	  CC      drivers/crypto/caam/caamrng.o
-	  CC      drivers/crypto/caam/caampkc.o
-	  CC      drivers/crypto/caam/pkc_desc.o
-	  CC      drivers/crypto/caam/caamalg_desc.o
-	  CHECK   ../drivers/crypto/caam/debugfs.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/error.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/key_gen.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/caamrng.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/jr.c
-	  CHECK   ../drivers/crypto/caam/pkc_desc.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/ctrl.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/caampkc.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/caamalg_desc.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  CHECK   ../drivers/crypto/caam/caamalg.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  AR      drivers/crypto/caam/built-in.a
-	  AR      drivers/crypto/built-in.a
-	  AR      drivers/built-in.a
-	  AR      built-in.a
-	  AR      vmlinux.a
-	  LD      vmlinux.o
-	  OBJCOPY modules.builtin.modinfo
-	  GEN     modules.builtin
-	  MODPOST vmlinux.symvers
-	  UPD     include/generated/utsversion.h
-	  CC      init/version-timestamp.o
-	  CHECK   ../init/version-timestamp.c
-	command-line: note: in included file:
-	builtin:1:25: sparse: warning: no whitespace before object-like macro body
-	  LD      .tmp_vmlinux.kallsyms1
-	  NM      .tmp_vmlinux.kallsyms1.syms
-	  KSYMS   .tmp_vmlinux.kallsyms1.S
-	  AS      .tmp_vmlinux.kallsyms1.o
-	  LD      .tmp_vmlinux.kallsyms2
-	  NM      .tmp_vmlinux.kallsyms2.syms
-	  KSYMS   .tmp_vmlinux.kallsyms2.S
-	  AS      .tmp_vmlinux.kallsyms2.o
-	  LD      vmlinux
-	  NM      System.map
-	cp vmlinux vmlinux.tmp
-	/home/leit/0day/gcc-13.2.0-nolibc/m68k-linux/bin/m68k-linux-strip vmlinux.tmp
-	gzip -9c vmlinux.tmp >vmlinux.gz
-	rm vmlinux.tmp
-	make[1]: Leaving directory '/home/leit/Devel/upstream/build_dir'
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index 1f4258308b96..061fd4960303 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+ 
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	dev,		qdisc_dev(q) ? qdisc_dev(q)->name : "(null)"	)
+ 		__string(	kind,		q->ops->id		)
+ 		__field(	u32,		parent			)
+ 		__field(	u32,		handle			)
+ 	),
+ 
+ 	TP_fast_assign(
+-		__assign_str(dev, qdisc_dev(q)->name);
++		__assign_str(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "(null)");
+ 		__assign_str(kind, q->ops->id);
+ 		__entry->parent = q->parent;
+ 		__entry->handle = q->handle;
+-- 
+2.45.2
 
-
-# The repo I am building:
-
-	# git show --oneline
-	ca1603af1770 (HEAD) crypto: caam: Make CRYPTO_DEV_FSL_CAAM dependent of COMPILE_TEST
-	diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-	index c631f99e415f..05210a0edb8a 100644
-	--- a/drivers/crypto/caam/Kconfig
-	+++ b/drivers/crypto/caam/Kconfig
-	@@ -10,7 +10,7 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC
-
-	 config CRYPTO_DEV_FSL_CAAM
-		tristate "Freescale CAAM-Multicore platform driver backend"
-	-       depends on FSL_SOC || ARCH_MXC || ARCH_LAYERSCAPE
-	+       depends on FSL_SOC || ARCH_MXC || ARCH_LAYERSCAPE || COMPILE_TEST
-		select SOC_BUS
-		select CRYPTO_DEV_FSL_CAAM_COMMON
-		imply FSL_MC_BUS
-
-My version of tools:
-
-	# sparse --version
-	v0.6.4-66-g0196afe1
-
-	# cd ~/lkp-tests; git show --stat
-	commit 22f5cf2c860a5604f182f966b1f105ce1c0becb7 (HEAD -> master, origin/master, origin/HEAD)
 
