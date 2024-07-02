@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-108634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 393C1924C59
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:48:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F9A924C5A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C2401C222CA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:48:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E90361F23739
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F98F191F74;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0194191F80;
 	Tue,  2 Jul 2024 23:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHHRWfmg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3XDWL2b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6F8191F6E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B09E191F7A
 	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 23:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719964104; cv=none; b=Zq7tjjun5g7juNyi8DlgTJIr1rg3DmcYAChtbxFIhJcmPEOIln8w154jukqgq/Kq6zUuYAHgjIVYMtI7eS61CK/bQygOfBDXtVBQ2LFZGuWsc6+RA8hWpbOEDiD/fJuykU0DZDHE+gnpPEOL4yB3nKB1FINgLGF9HrLL7uTa2Tg=
+	t=1719964104; cv=none; b=hrcvK6F2Ehs3E/54iDNpJmDYMIu1/K1Cnjhdi6BefL0a7AeD5axhO8p4atS9vr0/CLD17ZMfNz76i10CzX8yLTq24VO94FHiHwLJQF/Sox5QaQjMpeGO2zs8WNq+kTN4q4kGPATRHwNjtoS7r6qt403CG5mOwyDPtdCij0aLjdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719964104; c=relaxed/simple;
-	bh=J4NkYTbrHWMHR6UzVquUafYcm+l8zOYZc5aPwOnbdrg=;
+	bh=wsqLICet8/BuezYj4ZeNpLgNxjGWR46Cx9rmcKiHYFU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P1FivZC3YQ3fwq60fAHNEmiamEn6Ybz1qZPahpzrotn9yDkiOiHBU0N0SuyUYwHlVVxpSm6s8ZT/jkhrsiIzYzWFZ+mnxsKBRbMf43S18QUW4eHFf5KIftOCTXR/yttsfnMfVWf1Xsr1zSv8AMxpsJ/MmTALeXhQeInWu8HHScY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHHRWfmg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D18FC32781;
-	Tue,  2 Jul 2024 23:48:23 +0000 (UTC)
+	 MIME-Version; b=kwcTh7qlkn4BCDDJyre3WuGhob1aLGv5moI/cafO4oxly7J2ADu/1zFAbrGstTf6K2rmv03P0GFnGGJgFq+rLu8MthBiNcgsv3yKWOmUKqIcRbDKjLZzTURgfAEmuQEdUJO9u/ozopecACYwxCPDXp0vnYt1nBnbkV1DIqR4Ib8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3XDWL2b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26EF1C4AF0E;
+	Tue,  2 Jul 2024 23:48:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719964104;
-	bh=J4NkYTbrHWMHR6UzVquUafYcm+l8zOYZc5aPwOnbdrg=;
+	bh=wsqLICet8/BuezYj4ZeNpLgNxjGWR46Cx9rmcKiHYFU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aHHRWfmg4iZaoLYJSHt9d5UV/G9QKjQR/R93mB9XciuNbGxNrMLqBpNKE3bi4Yc5/
-	 K5ptLgoDLY9kyK1jus2jcWJPiH3zSm99YZ9m5qTUDZXcOCnzog56Z17jzOHE8jqNJ+
-	 HJrIti9OtenB8vQ+OOOitfm7W7IZz3XUynvnx8NG35Z6lRKfQ2tFQn6kVcW0No6FqE
-	 wCDV0ydue9jQ65UIOVHZo6SiDyr17c6Mz7JGD03jUFiyFnU6O5Fws2ErT/ylCEisMt
-	 jv3JbyNmAj6+HeppcVFZRsk6p8YDBCMBc5JN+Eo5RsL5tEdo/1pDH/hfvqQzh0yn1q
-	 KNhe51PeaLLGw==
+	b=k3XDWL2bs9rZsqm8igRKPgiQOLfqj5st9c01WARwLe7z7SNEGTzPgN/EI2kCRfPE2
+	 +ntYNkXNJRtmfgNtOHpPl292RcnTuZR+B8vUtVdZv8q+aCZZXC0lgd7lVDIKRlc1vN
+	 luWMGh1+8vjf6MRDmsuMnVXIe1tbFwk8EETF+iknOvaxH/s47Vft9fTC0bFbYGS+RX
+	 jpRVKoRPTB4jvI7t/Mx7HESDO5b25pMVIO2vboXr2voH6zxwm2TB7D3xAy7V5phFgR
+	 qvoBjQbyqLgWNpoKL4HsdFPPk/9tI/FBCUAyySHTkJtezQepLdXekalH3Zj3C4dJ/i
+	 eTvZpsy1cNnyw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: netdev@vger.kernel.org,
 	ecree.xilinx@gmail.com,
 	michael.chan@broadcom.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 06/11] eth: bnxt: depend on core cleaning up RSS contexts
-Date: Tue,  2 Jul 2024 16:47:52 -0700
-Message-ID: <20240702234757.4188344-8-kuba@kernel.org>
+Subject: [PATCH net-next 07/11] eth: bnxt: use context priv for struct bnxt_rss_ctx
+Date: Tue,  2 Jul 2024 16:47:53 -0700
+Message-ID: <20240702234757.4188344-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240702234757.4188344-1-kuba@kernel.org>
 References: <20240702234757.4188344-1-kuba@kernel.org>
@@ -63,89 +63,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-New RSS context API removes old contexts on netdev unregister.
-No need to wipe them manually.
+Core can allocate space for per-context driver-private data,
+use it for struct bnxt_rss_ctx. Inline bnxt_alloc_rss_ctx()
+at this point, most of the init (as in the actions bnxt_del_one_rss_ctx()
+will undo) is open coded in bnxt_create_rxfh_context(), anyway.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 11 ++++-------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  2 +-
- 3 files changed, 6 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 14 -----------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 -
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 24 +++++++------------
+ 3 files changed, 9 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 02aeba4b5df5..b6915261c15d 100644
+index b6915261c15d..39876feae1a4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10259,12 +10259,12 @@ struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp)
- 	return rss_ctx;
+@@ -10224,7 +10224,6 @@ void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
+ 	kfree(rss_ctx->rss_indir_tbl);
+ 	list_del(&rss_ctx->list);
+ 	bp->num_rss_ctx--;
+-	kfree(rss_ctx);
  }
  
--void bnxt_clear_rss_ctxs(struct bnxt *bp, bool all)
-+void bnxt_clear_rss_ctxs(struct bnxt *bp)
+ static void bnxt_hwrm_realloc_rss_ctx_vnic(struct bnxt *bp)
+@@ -10246,19 +10245,6 @@ static void bnxt_hwrm_realloc_rss_ctx_vnic(struct bnxt *bp)
+ 	}
+ }
+ 
+-struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp)
+-{
+-	struct bnxt_rss_ctx *rss_ctx = NULL;
+-
+-	rss_ctx = kzalloc(sizeof(*rss_ctx), GFP_KERNEL);
+-	if (rss_ctx) {
+-		rss_ctx->vnic.rss_ctx = rss_ctx;
+-		list_add_tail(&rss_ctx->list, &bp->rss_ctx_list);
+-		bp->num_rss_ctx++;
+-	}
+-	return rss_ctx;
+-}
+-
+ void bnxt_clear_rss_ctxs(struct bnxt *bp)
  {
  	struct bnxt_rss_ctx *rss_ctx, *tmp;
- 
- 	list_for_each_entry_safe(rss_ctx, tmp, &bp->rss_ctx_list, list)
--		bnxt_del_one_rss_ctx(bp, rss_ctx, all);
-+		bnxt_del_one_rss_ctx(bp, rss_ctx, false);
- }
- 
- static void bnxt_init_multi_rss_ctx(struct bnxt *bp)
-@@ -12316,7 +12316,7 @@ static void __bnxt_close_nic(struct bnxt *bp, bool irq_re_init,
- 		msleep(20);
- 
- 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
--		bnxt_clear_rss_ctxs(bp, false);
-+		bnxt_clear_rss_ctxs(bp);
- 	/* Flush rings and disable interrupts */
- 	bnxt_shutdown_nic(bp, irq_re_init);
- 
-@@ -15227,8 +15227,7 @@ static void bnxt_remove_one(struct pci_dev *pdev)
- 
- 	bnxt_free_l2_filters(bp, true);
- 	bnxt_free_ntp_fltrs(bp, true);
--	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
--		bnxt_clear_rss_ctxs(bp, true);
-+	WARN_ON(bp->num_rss_ctx);
- 	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
- 	/* Flush any pending tasks */
- 	cancel_work_sync(&bp->sp_task);
-@@ -15879,8 +15878,6 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	bnxt_clear_int_mode(bp);
- 
- init_err_pci_clean:
--	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
--		bnxt_clear_rss_ctxs(bp, true);
- 	bnxt_hwrm_func_drv_unrgtr(bp);
- 	bnxt_free_hwrm_resources(bp);
- 	bnxt_hwmon_uninit(bp);
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index f4365a840e3a..04c4ff7b9052 100644
+index 04c4ff7b9052..21c3296cf6d9 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2846,7 +2846,7 @@ int __bnxt_setup_vnic_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
+@@ -2845,7 +2845,6 @@ int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
+ int __bnxt_setup_vnic_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
  void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
  			  bool all);
- struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp);
--void bnxt_clear_rss_ctxs(struct bnxt *bp, bool all);
-+void bnxt_clear_rss_ctxs(struct bnxt *bp);
+-struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp);
+ void bnxt_clear_rss_ctxs(struct bnxt *bp);
  int bnxt_open_nic(struct bnxt *, bool, bool);
  int bnxt_half_open_nic(struct bnxt *bp);
- void bnxt_half_close_nic(struct bnxt *bp);
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 48f8e14685a1..397aedad3d4f 100644
+index 397aedad3d4f..2e6e060e2b44 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -970,7 +970,7 @@ static int bnxt_set_channels(struct net_device *dev,
+@@ -1901,11 +1901,13 @@ static int bnxt_create_rxfh_context(struct net_device *dev,
+ 		return -ENOMEM;
+ 	}
  
- 	bnxt_clear_usr_fltrs(bp, true);
- 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
--		bnxt_clear_rss_ctxs(bp, false);
-+		bnxt_clear_rss_ctxs(bp);
- 	if (netif_running(dev)) {
- 		if (BNXT_PF(bp)) {
- 			/* TODO CHIMP_FW: Send message to all VF's
+-	rss_ctx = bnxt_alloc_rss_ctx(bp);
+-	if (!rss_ctx)
+-		return -ENOMEM;
++	rss_ctx = ethtool_rxfh_context_priv(ctx);
++
++	list_add_tail(&rss_ctx->list, &bp->rss_ctx_list);
++	bp->num_rss_ctx++;
+ 
+ 	vnic = &rss_ctx->vnic;
++	vnic->rss_ctx = rss_ctx;
+ 	vnic->flags |= BNXT_VNIC_RSSCTX_FLAG;
+ 	vnic->vnic_id = BNXT_VNIC_ID_INVALID;
+ 	rc = bnxt_alloc_rss_ctx_rss_table(bp, rss_ctx);
+@@ -1958,12 +1960,7 @@ static int bnxt_modify_rxfh_context(struct net_device *dev,
+ 	if (rc)
+ 		return rc;
+ 
+-	rss_ctx = bnxt_get_rss_ctx_from_index(bp, rxfh->rss_context);
+-	if (!rss_ctx) {
+-		NL_SET_ERR_MSG_FMT_MOD(extack, "RSS context %u not found",
+-				       rxfh->rss_context);
+-		return -EINVAL;
+-	}
++	rss_ctx = ethtool_rxfh_context_priv(ctx);
+ 
+ 	bnxt_modify_rss(bp, rss_ctx, rxfh);
+ 
+@@ -1978,12 +1975,7 @@ static int bnxt_remove_rxfh_context(struct net_device *dev,
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_rss_ctx *rss_ctx;
+ 
+-	rss_ctx = bnxt_get_rss_ctx_from_index(bp, rss_context);
+-	if (!rss_ctx) {
+-		NL_SET_ERR_MSG_FMT_MOD(extack, "RSS context %u not found",
+-				       rss_context);
+-		return -EINVAL;
+-	}
++	rss_ctx = ethtool_rxfh_context_priv(ctx);
+ 
+ 	bnxt_del_one_rss_ctx(bp, rss_ctx, true);
+ 	return 0;
+@@ -5292,6 +5284,8 @@ const struct ethtool_ops bnxt_ethtool_ops = {
+ 	.cap_link_lanes_supported	= 1,
+ 	.cap_rss_ctx_supported		= 1,
+ 	.rxfh_max_context_id		= BNXT_MAX_ETH_RSS_CTX,
++	.rxfh_indir_space		= BNXT_MAX_RSS_TABLE_ENTRIES_P5,
++	.rxfh_priv_size			= sizeof(struct bnxt_rss_ctx),
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES |
+ 				     ETHTOOL_COALESCE_USECS_IRQ |
 -- 
 2.45.2
 
