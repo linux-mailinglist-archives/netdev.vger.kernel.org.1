@@ -1,101 +1,122 @@
-Return-Path: <netdev+bounces-108435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F24923CCD
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:47:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A287D923CFD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2D23B22EAF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D809285E85
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A8715B54B;
-	Tue,  2 Jul 2024 11:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WzF7k7hb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CBE15B14C;
+	Tue,  2 Jul 2024 11:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92024145B09
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 11:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E46015B12A;
+	Tue,  2 Jul 2024 11:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719920853; cv=none; b=Df7pjCqbmLB5S2m2qIR6SAvDJf+J+3b9Ji1/7OmDqdcMP6LRWJarRoVPIcTxM7ZeskzOvCamQGLluBLuBATmoZ9zVAC1sdW6oMPTjhFLdDN99HNaJ/iJ+SZLtP8KGqFM5eQfStg2WegdpYgr+I106TcSJK1a8pLqPC6a/LnFjpQ=
+	t=1719921447; cv=none; b=rgr4btSblkBCt997/ht7rYsx2q6bwAbIW90FY5UgmIXqkZJT/NGLqB+uvnjN2Mj/Wp4XF9FHLOZnXX0j01pubKQQ686lbFfSLfO7WWuRYltw7Zm/x7ZLVE7nhzsR9On9QDROvP+VMPQXvrRclIBOFFpH7Rcy5dfJEKwlqgiJiCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719920853; c=relaxed/simple;
-	bh=FglxcTnzwOQwmJlE5WNCXHTrByMhmiPk6znqE6jdt1Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lLaO7fICCheR/+TY+4QHTKkiXzoSBSbOSN3AWICloZdaRoGO8LJmgC+vxnmOthiDbd4NhNAvufEtg7nSsR9SNY4Y3S1ruODPSedd0RTrFpWscGB8sGExXh0j0AYjXXrnsKY48yHj1uBUsIvMrF8UV1P53WA5rxKVTsetbZvTYV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WzF7k7hb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719920850;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FglxcTnzwOQwmJlE5WNCXHTrByMhmiPk6znqE6jdt1Y=;
-	b=WzF7k7hb9J6aC0fUEQ2xXqEtMbascZNL9JplZYu0nh3S+Qm6An/CVk4+W6ujGGdWnxO0Pq
-	bbVqmjcKfpZ6leQHuzefIKWyAxzQslUc2MPbOK5+tYaElc0pUb3ztiYE3oJ8c3hadk686W
-	3HIcFJfqKs50e8b5Cxxwof09pjmCgbk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-671-CMqW4YMWNiaOc1-uPSWZvg-1; Tue,
- 02 Jul 2024 07:47:27 -0400
-X-MC-Unique: CMqW4YMWNiaOc1-uPSWZvg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E632E1955F0D;
-	Tue,  2 Jul 2024 11:47:25 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.8.184])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64B2C19560A3;
-	Tue,  2 Jul 2024 11:47:22 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
-  i.maximets@ovn.org,  dev@openvswitch.org,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Donald
- Hunter <donald.hunter@gmail.com>,  Pravin B Shelar <pshelar@ovn.org>,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 05/10] net: openvswitch: add psample action
-In-Reply-To: <20240702095336.596506-6-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Tue, 2 Jul 2024 11:53:22 +0200")
-References: <20240702095336.596506-1-amorenoz@redhat.com>
-	<20240702095336.596506-6-amorenoz@redhat.com>
-Date: Tue, 02 Jul 2024 07:47:20 -0400
-Message-ID: <f7t7ce4ow1j.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1719921447; c=relaxed/simple;
+	bh=kuy2cZPLbHz9e6A9Bj/DCoxwj7MW3iTyXUT94QldROM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mEiNn8eiF9tJt4QL/rNxV2k/qUgh8kBVmI0mDsIeaAUHxk83rcnEBYrnNARWY/v3bKvCl6Aa6+Si5D8yGvnyQPrSXFUquWeksSXyqdSQ1ik2Ldkn6pV3zMLMdVsWDunP+z9BlrB6sM/yJrczCnTkrupodlSqRjzngc8nTyPsJdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WD1W63GRVzZhJF;
+	Tue,  2 Jul 2024 19:52:50 +0800 (CST)
+Received: from kwepemf100007.china.huawei.com (unknown [7.202.181.221])
+	by mail.maildlp.com (Postfix) with ESMTPS id AB824180A9C;
+	Tue,  2 Jul 2024 19:57:22 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemf100007.china.huawei.com (7.202.181.221) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 2 Jul 2024 19:57:21 +0800
+Message-ID: <ea07cb5a-da1e-4ba9-b895-1a12be224962@huawei.com>
+Date: Tue, 2 Jul 2024 19:57:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v5 2/3] selftests/bpf: Factor out many args tests
+ from tracing_struct
+To: Jiri Olsa <olsajiri@gmail.com>, Pu Lehui <pulehui@huaweicloud.com>
+CC: <bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+	<bjorn@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@google.com>, Hao Luo <haoluo@google.com>, Puranjay Mohan
+	<puranjay@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>
+References: <20240702013730.1082285-1-pulehui@huaweicloud.com>
+ <20240702013730.1082285-3-pulehui@huaweicloud.com> <ZoPfSe-CvdEwlxjo@krava>
+Content-Language: en-US
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <ZoPfSe-CvdEwlxjo@krava>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemf100007.china.huawei.com (7.202.181.221)
 
-Adrian Moreno <amorenoz@redhat.com> writes:
 
-> Add support for a new action: psample.
->
-> This action accepts a u32 group id and a variable-length cookie and uses
-> the psample multicast group to make the packet available for
-> observability.
->
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie, to discourage using cookies that will not be offloadable.
->
-> Reviewed-by: Ilya Maximets <i.maximets@ovn.org>
-> Acked-by: Eelco Chaudron <echaudro@redhat.com>
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+On 2024/7/2 19:06, Jiri Olsa wrote:
+> On Tue, Jul 02, 2024 at 01:37:29AM +0000, Pu Lehui wrote:
+> 
+> SNIP
+> 
+>> +
+>> +static void test_struct_many_args(void)
+>> +{
+>> +	struct tracing_struct_many_args *skel;
+>> +	int err;
+>> +
+>> +	skel = tracing_struct_many_args__open_and_load();
+>> +	if (!ASSERT_OK_PTR(skel, "tracing_struct_many_args__open_and_load"))
+>> +		return;
+>> +
+>> +	err = tracing_struct_many_args__attach(skel);
+>> +	if (!ASSERT_OK(err, "tracing_struct_many_args__attach"))
+>> +		goto destroy_skel;
+>> +
+>> +	ASSERT_OK(trigger_module_test_read(256), "trigger_read");
+>> +
+>>   	ASSERT_EQ(skel->bss->t7_a, 16, "t7:a");
+>>   	ASSERT_EQ(skel->bss->t7_b, 17, "t7:b");
+>>   	ASSERT_EQ(skel->bss->t7_c, 18, "t7:c");
+>> @@ -74,12 +95,15 @@ static void test_fentry(void)
+>>   	ASSERT_EQ(skel->bss->t8_g, 23, "t8:g");
+>>   	ASSERT_EQ(skel->bss->t8_ret, 156, "t8 ret");
+>>   
+>> -	tracing_struct__detach(skel);
+>> +	tracing_struct_many_args__detach(skel);
+> 
+> nit, I know it's in the current code, but tracing_struct_many_args__destroy
+> will take care of the detach, so no need to call it explicitly
 
+Alright, will resend a new version. Thanks
+
+> 
+> jirka
+> 
+> 
+>>   destroy_skel:
+>> -	tracing_struct__destroy(skel);
+>> +	tracing_struct_many_args__destroy(skel);
+>>   }
+>>   
+> 
+> SNIP
 
