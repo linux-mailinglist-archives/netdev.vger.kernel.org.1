@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-108467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD96923EBE
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:20:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 502C9923EC1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39F072873FE
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:20:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E011FB22748
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992071B372F;
-	Tue,  2 Jul 2024 13:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493D71B4C21;
+	Tue,  2 Jul 2024 13:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Azd7ESXw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNq0cbuX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AC318733F;
-	Tue,  2 Jul 2024 13:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250261B47D5
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 13:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719926429; cv=none; b=NtgugC2+J1dLXcDY+Q/IUQx4SY+MsqxTB5yH2RhQyGzWLLsyTDZUYc07Gg3rEYlU2XpYjxI7a4z8BNyCuY0ywy5v8T1RiMdjvS1N1XdUGLuNhJE9m/yI/mZ7A/x81Bvq6LPhayP5y0dFXaqG3J0/zuKmYUIOvM1u0LOXDBaXcCs=
+	t=1719926430; cv=none; b=MLdm9Ab4e4JWDXSJIQ50DlB5zQiSBgYgBTlYN/kbefwshWDnr61Q8gPzz0nwr0gnECpzvBdQn6kc2mtzjxEyED0U09IUchqMvB1AlivXwwaC4weyNN/yvs7Xe3oVZcXAY40WZ2W2frmz44VfnDhrkSdHTXBmdJyzoQkQAv0owGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719926429; c=relaxed/simple;
-	bh=pCbqn+qD4xtTx1wUkvRH8BBsvYS9w0HEd26xAfwMACI=;
+	s=arc-20240116; t=1719926430; c=relaxed/simple;
+	bh=3CuepPftJk/TWHf1Ra+QMvZfoRCfNV/ua/CRSYDMcOE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jJKjgEf9U97hfWm0n9TuQ5ffFemLkHCQZCcxymxu+CKFokOAOs7Qann5zwxgylG+ebxr6Cdv6exhT0aURMDaGcfaGTyvmQE6NZ8L/lmRh8GgI7pb0PjG6GiHlQtNez6VAddbhWzwaVKZdekpgP9vkBWlZxOdQznQeRW5IbsxGF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Azd7ESXw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E6588C2BD10;
-	Tue,  2 Jul 2024 13:20:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=sb3ZiFh2K9KYIgPmXcqCvg6WkaKZmkg/am34rWDg7RhE/Uch07uBGmudqrb8uewzz9aYJ4HlV/Vo3fnVYnPIDaKau+sWjeKRwtkZGFc5+SalApa74kB+nxsCra4Gp9rW/BP8aRwCXqVmEx18G3G6go03lVv9IG41+Me4/9ksfHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNq0cbuX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F1961C4AF0E;
+	Tue,  2 Jul 2024 13:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719926429;
-	bh=pCbqn+qD4xtTx1wUkvRH8BBsvYS9w0HEd26xAfwMACI=;
+	s=k20201202; t=1719926430;
+	bh=3CuepPftJk/TWHf1Ra+QMvZfoRCfNV/ua/CRSYDMcOE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Azd7ESXwYchY2PtMCRmuxAfI/BMc+PObSjIrEAltw4/o3V7jzQuR1HvRcf5fax3hk
-	 Y/ovVLvVK1SuNGeCmf6vje72F9klmVJR62g+szHEtq858nnR5vA2bZa4vzNc7Beh0x
-	 Ox47J/Z0VEWtvGSyuAytfF0Yom6IZL2m8eNmzpp9+sIpx+JxBXDINYksAkYVHi5tzO
-	 E9SPrSoSGRk3nfyn3TT+bYYQwsnTASIIFmZNCGYoDdoqg9Osvi+ozuOhB2ASnN8XgJ
-	 dT0SLsJYSd8UVSQ4/WIOWkGoiwXVL9u+SVGs4xN2TnqP4qooEityMKljUCW7jBAJde
-	 1G7E/BsvBIChg==
+	b=XNq0cbuXvOfRroalKQYa7mr3ZHCqbqhTGgcAVf9JCUn2L2JoeR6Q/M6W90U/HOTET
+	 QHfd2yGQn7YAGGCs65MZa58l1ogrMJ3yOLNuRiV2apRzp/tfsU/UMVICBllg3lmN9V
+	 KGTiH5v8vShEi1MxKcSvpYu+J8rb90zMxSXHwUXxulYDCPPOOkcb6PCMBqik6qakGL
+	 ztw+qwMn56tjb7eoGyEu596Oh+oer36aw54LyuNKvJkmkJT5ELGBLd6C+1mXcBBUql
+	 +XXLU5b0/jDb2UbAEForWNgTZqFge0Uw0BCnAaIvzkBddMTvMj14Ml2v/3M4LGPxC/
+	 3LsePFv/lj5bQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DBD19C43331;
-	Tue,  2 Jul 2024 13:20:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFF3DD2D0E2;
+	Tue,  2 Jul 2024 13:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3 0/2] selftests/xsk: Enhance traffic validation and
- batch size support
+Subject: Re: [PATCH net-next v2 0/2] page_pool: bnxt_en: unlink old page pool in
+ queue api using helper
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171992642889.16847.4890071581135436135.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jul 2024 13:20:28 +0000
-References: <20240702055916.48071-1-tushar.vyavahare@intel.com>
-In-Reply-To: <20240702055916.48071-1-tushar.vyavahare@intel.com>
-To: Tushar Vyavahare <tushar.vyavahare@intel.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- tirthendu.sarkar@intel.com
+ <171992642989.16847.4738082206088376537.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jul 2024 13:20:29 +0000
+References: <20240627030200.3647145-1-dw@davidwei.uk>
+In-Reply-To: <20240627030200.3647145-1-dw@davidwei.uk>
+To: David Wei <dw@davidwei.uk>
+Cc: michael.chan@broadcom.com, andrew.gospodarek@broadcom.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, aleksander.lobakin@intel.com,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
 
 Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue,  2 Jul 2024 05:59:14 +0000 you wrote:
-> This patch series introduces enhancements to xsk selftests, focusing on
-> dynamic batch size configurations and robust traffic validation.
+On Wed, 26 Jun 2024 20:01:58 -0700 you wrote:
+> 56ef27e3 unexported page_pool_unlink_napi() and renamed it to
+> page_pool_disable_direct_recycling(). This is because there was no
+> in-tree user of page_pool_unlink_napi().
 > 
-> v1->v2:
-> - Correctly bind UMEM queue sizes to TX and RX queues for standard
->   operational alignment.
-> - Set cfg.rx_size directly from umem->fill_size when umem->fill_size is
->   true, ensuring alignment with test specifications.
+> Since then Rx queue API and an implementation in bnxt got merged. In the
+> bnxt implementation, it broadly follows the following steps: allocate
+> new queue memory + page pool, stop old rx queue, swap, then destroy old
+> queue memory + page pool.
 > 
 > [...]
 
 Here is the summary with links:
-  - [bpf-next,v3,1/2] selftests/xsk: Ensure traffic validation proceeds after ring size adjustment in xskxceiver
-    https://git.kernel.org/bpf/bpf-next/c/d80d61ab0609
-  - [bpf-next,v3,2/2] selftests/xsk: Enhance batch size support with dynamic configurations
-    https://git.kernel.org/bpf/bpf-next/c/e4a195e2b95e
+  - [net-next,v2,1/2] page_pool: export page_pool_disable_direct_recycling()
+    https://git.kernel.org/netdev/net-next/c/d7f39aee79f0
+  - [net-next,v2,2/2] bnxt_en: unlink page pool when stopping Rx queue
+    https://git.kernel.org/netdev/net-next/c/40eca00ae605
 
 You are awesome, thank you!
 -- 
