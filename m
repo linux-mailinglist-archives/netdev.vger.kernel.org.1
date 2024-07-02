@@ -1,125 +1,91 @@
-Return-Path: <netdev+bounces-108591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83DDD924762
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:40:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD12924765
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F576282886
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:40:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 220621F26AAF
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD4F1C9EC2;
-	Tue,  2 Jul 2024 18:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A06F1C9EC2;
+	Tue,  2 Jul 2024 18:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W8u3i889"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+wi4Ob6"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275461DFE3;
-	Tue,  2 Jul 2024 18:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08EA1DFE3;
+	Tue,  2 Jul 2024 18:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719945622; cv=none; b=YD7+m27XCmcpJW9tpbLdOsPFYUPb5iGR2pTdiduBvZLdQZAKBzS5YSD+YW/Or3546tZdqZE4qed6TFsXed+KKKUj/AYK3/Cm6lmppAWlHQ8XoweOW4ihc0TzCHLzMH6ox70Mx03qpyfcFmtlAfH87bzIebtxPfjh9mAlFPlaFuk=
+	t=1719945628; cv=none; b=ZMICyctFPxqVbb5pFmbfWtOABTMsjNPH8RRakfOb6IuCGFiwYt4jJpblsl+uWTW2QhDkzEvvrPkCL92znS3gFa7R6mUloyNcfyY2lFx9UlcuCE5F0E4fNfQ1mLgZmQh7z1rx57AfKoWpuMeLkC28krDUTVvnP91WZNB4lwR4CWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719945622; c=relaxed/simple;
-	bh=XlhLqAUMcg+sJf064MDVicDasZ/lcOHYbpSPJSTSDvI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=G9X0vP6+SfjLScSMv20+d0ZNZH7p72a/pipKdLYaPYQhj/axp/yJbUiKmgxrDUpnI1PnszMCtgZPEIzkRqkYoGnN5EZQll28/oyOtw0zzycWGey8f7TGY37NFPdIZNj6e6eWWDm/8+saAMWp1+kAWwuUPspDi2Xk6q0RGWJ7xRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W8u3i889; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=RJSqylBZlzW9UDCHCqo3Xfdt29Ffczco70FXx734zXo=; b=W8u3i889blo/jC1uilhFu/Yv9K
-	DQ9k2/5RYKE9bFhzWgXt+qmRVEYimUpcIzTQorHpZTs0sI+Wuw9P7Y9PKvMWZy7Hyt+1ku1VT3L4j
-	zigvimNVllEcFg+TAavc51UyH6hvMn5lWe7yyv/WCORZItTjkvmM+ible75PooH827bgjsC3/HBzY
-	DxFtxU+Nl4iICPDA/17ID9pxbpRhuTxgAZjT7ZiSwSySjsRuQMugzG6eSy/oUKFrjqf3pXeBiJsGR
-	ywLBRO+CmelMGec+Q/a6G+Lp5eow6Xtl6Ei4AfGmU79ts4I4BYyE0s0VInEBotHZ770lYW+Q+HD8l
-	EGHkoTbQ==;
-Received: from [2a00:23ee:2318:7901:3188:7b97:6ee:f783] (helo=[IPv6:::1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOiQ9-00000009rA4-2tiF;
-	Tue, 02 Jul 2024 18:40:06 +0000
-Date: Tue, 02 Jul 2024 19:40:04 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>
-CC: "Christopher S. Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>
-Subject: Re: [RFC PATCH v2] ptp: Add vDSO-style vmclock support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <19c75212-bcb6-49e3-964d-ed727da2ba54@opensynergy.com>
-References: <20231218073849.35294-1-peter.hilber@opensynergy.com> <684eac07834699889fdb67be4cee09319c994a42.camel@infradead.org> <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com> <db594efd5a5774748a9ef07cc86741f5a677bdbf.camel@infradead.org> <c0ae63fc88365c93d5401972683a41112c094704.camel@infradead.org> <4a0a240dffc21dde4d69179288547b945142259f.camel@infradead.org> <8d9d7ce2-4dd1-4f54-a468-79ef5970a708@opensynergy.com> <bdcafc76ea44db244b52f8a092287cb33950d5d6.camel@infradead.org> <db1113d5-a427-4eb7-b5d1-8174a71e63b6@opensynergy.com> <c69d7d380575e49bd9cb995e060d205fb41aef8f.camel@infradead.org> <2de9275f-b344-4a76-897b-52d5f4bdca59@opensynergy.com> <BC212953-A043-4D65-ABF3-326DBF7F10F7@infradead.org> <51087cd7149ce576aa166d32d051592b146ce2c4.camel@infradead.org> <cb11ff57-4d58-4d47-824b-761712e12bdc@opensynergy.com> <3707d99d0dfea45d05fd65f669132c2e546f35c6.camel@infradead.org> <19c75212-bcb6-49e3-964d-ed727da2ba54@opensynergy.com>
-Message-ID: <02E9F187-A38C-4D14-A287-AFD7503B6B0F@infradead.org>
+	s=arc-20240116; t=1719945628; c=relaxed/simple;
+	bh=JoUNhJKdDEN3RYQhJzhOpSG5BQd7+bo0EiMrC2sQIGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J1fadlgTOrjheI6L7Mdlrl4CkVPSQk1ZifIejbVrp0QS7EGfRF7cUWZtsDBHlKFGis3a/SSLchfH9EAee1DJPoqbDxUrTGoRJcHJW5nWrUjauUMyxbo9S5SFuzNGNapP2/3g0kyxGIYGf1YjrNq9RrJdFWBDIaSs0ZQfBIGutaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+wi4Ob6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FF07C116B1;
+	Tue,  2 Jul 2024 18:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719945628;
+	bh=JoUNhJKdDEN3RYQhJzhOpSG5BQd7+bo0EiMrC2sQIGw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h+wi4Ob6dowjBLypFV28ctg32SyErLY9V/bOnS1oTnq73Rnmlm8bQdqec98HdkVHN
+	 B/UekECPjwJdo6Rg1iPJziBr90/7asxzYe4/N2hpA1Wl89TU0M4sgvi1sMHsVQwrlO
+	 3W39HmXS+zSG81yXPSnWjJg6zRlwr8SUVYKC/BDMykWJ1zKaNI6mPnow0rVZFZ29lL
+	 l4McHngjUfTAWiyf5/JkNiNkbPSKVZ0Qc9NxBWQC6lzDJRYLSdd3+R7OUKBkapkwRb
+	 nn26lBTfW9CGjdekb0iVCNgf04ndh2DIcWlQBOKYBoOmWL0UDCyjJWcB74pHxT/NL3
+	 d8idpsdo67qoA==
+Date: Tue, 2 Jul 2024 11:40:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+ haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
+ jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+ song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [syzbot] [net?] [bpf?] general protection fault in
+ dev_map_redirect
+Message-ID: <20240702114026.1e1f72b7@kernel.org>
+In-Reply-To: <000000000000adb970061c354f06@google.com>
+References: <000000000000adb970061c354f06@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2 July 2024 19:12:00 BST, Peter Hilber <peter=2Ehilber@opensynergy=2Ecom=
-> wrote:
->On 02=2E07=2E24 18:39, David Woodhouse wrote:
->> To clarify then, the main types are
->>=20
->>  VIRTIO_RTC_CLOCK_UTC =3D=3D 0
->>  VIRTIO_RTC_CLOCK_TAI =3D=3D 1
->>  VIRTIO_RTC_CLOCK_MONOTONIC =3D=3D 2
->>  VIRTIO_RTC_CLOCK_SMEARED_UTC =3D=3D 3
->>=20
->> And the subtypes are *only* for the case of
->> VIRTIO_RTC_CLOCK_SMEARED_UTC=2E They include
->>=20
->>  VIRTIO_RTC_SUBTYPE_STRICT
->>  VIRTIO_RTC_SUBTYPE_UNDEFINED /* or whatever you want to call it */
->>  VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR=20
->>  VIRTIO_RTC_SUBTYPE_UTC_SLS /* if it's worth doing this one */
->>=20
->> Is that what we just agreed on?
->>=20
->>=20
->
->This is a misunderstanding=2E My idea was that the main types are
->
->>  VIRTIO_RTC_CLOCK_UTC =3D=3D 0
->>  VIRTIO_RTC_CLOCK_TAI =3D=3D 1
->>  VIRTIO_RTC_CLOCK_MONOTONIC =3D=3D 2
->>  VIRTIO_RTC_CLOCK_SMEARED_UTC =3D=3D 3
->
->VIRTIO_RTC_CLOCK_MAYBE_SMEARED_UTC =3D=3D 4
->
->The subtypes would be (1st for clocks other than
->VIRTIO_RTC_CLOCK_SMEARED_UTC, 2nd to last for
->VIRTIO_RTC_CLOCK_SMEARED_UTC):
->
->#define VIRTIO_RTC_SUBTYPE_STRICT 0
->#define VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR 1
->#define VIRTIO_RTC_SUBTYPE_SMEAR_UTC_SLS 2
->
+On Mon, 01 Jul 2024 13:19:15 -0700 syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    74564adfd352 Add linux-next specific files for 20240701
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12e5b0e1980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=111e4e0e6fbde8f0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=08811615f0e17bc6708b
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
 
-Thanks=2E I really do think that from the guest point of view there's real=
-ly no distinction between "maybe smeared" and "undefined smearing", and hav=
-e a preference for using the latter form, which is the key difference there=
-?
+Hi Sebastian!
 
-Again though, not a hill for me to die on=2E
+We have a few of these:
+
+https://lore.kernel.org/all/0000000000008f77c2061c357383@google.com/
+https://lore.kernel.org/all/00000000000079d168061c36ce83@google.com/
+https://lore.kernel.org/all/000000000000357ea9061c384d6d@google.com/
+
+tun's local XDP and XDP generic also need to be covered.
 
