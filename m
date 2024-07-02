@@ -1,40 +1,96 @@
-Return-Path: <netdev+bounces-108375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68CD9239D8
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:25:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8649239D9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:25:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 675C71F22B83
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8095282FFD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015BD156962;
-	Tue,  2 Jul 2024 09:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C82315217F;
+	Tue,  2 Jul 2024 09:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="F9+I5ki4";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="PdrXH2ZG";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QYs9mOYm";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ZFzFQMGO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B49F153836
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 09:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D787B1514E0;
+	Tue,  2 Jul 2024 09:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719912277; cv=none; b=kua85fjen/GRQ43d/TTQs4gHNuvCpMrRkVYmEcvMFBw/CxduUFPF7w++v/oVRUynj08yHtzpP26yueCJKR46mgOYx31FfxvARdSqVBINcxDjCJh4OtfJRw+4pgvpcKOJjw3q86B5NGCUlPJwWCVEWDtr1Ae5RO7ALA2nrCR1JAk=
+	t=1719912301; cv=none; b=mq3o+yRhXWFPFg63p8XXc/y4o7peXZU66EZkk2+yBQZEbLrs27RhKhpJC/Mmt6Ub2dvVPSdNBIYIOgaGlZvaHqOs7NgW7rYAX4SSZWOxpjtK19TxHe97xWs1Am2eQGUuKjquCnMD6IeZXtG82sxMccrQqur6yI5XhjtSObv3ZEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719912277; c=relaxed/simple;
-	bh=Apb08SlADGIPecUxWIzphbbJaxEu4VxBte60/Q7syrA=;
+	s=arc-20240116; t=1719912301; c=relaxed/simple;
+	bh=Vnzj3qnk7b6cjDEN60nc7RvJ49vCjCaFwSdAAmBSPv8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lp9q1VVPkFQ6YUjibTGhDJaGRCzA+q5OrWdbzoY+YFxVKd1o+Aouleq4lVNy0B52d5kgHRWbai/Fas1lBfxEr/xoWWCxn6Gee5rlkoSD2Kj0Y5s/eIo8UVUQZ8wm/cX/fQfXfWGWVDbp8y8gRUi0Jqz+daBzJoaXE+Jn1E3Kh2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.45])
-	by gateway (Coremail) with SMTP id _____8AxDOtQx4NmBxgAAA--.180S3;
-	Tue, 02 Jul 2024 17:24:32 +0800 (CST)
-Received: from [192.168.100.8] (unknown [223.64.68.45])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxZcVMx4NmSmk4AA--.55315S3;
-	Tue, 02 Jul 2024 17:24:29 +0800 (CST)
-Message-ID: <dc3abcec-abaa-4ca5-a651-428b6e583f39@loongson.cn>
-Date: Tue, 2 Jul 2024 17:24:28 +0800
+	 In-Reply-To:Content-Type; b=rGLEYEUo8FdftwfMK53y9oH5WN+4/ueyuukZSnO+v6HBz2M7Kg9qARYuvQvDjg31Gy7p9rnUR5Y06z09+bwYzbhPMoEVPIHrBuvHVjhPH+pdt9jkBeLCTSd1V2H86+ddYs2ukHt8rR9zt6atsyzrXyRdu1rjc2jasKL42sOcLyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=F9+I5ki4; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=PdrXH2ZG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QYs9mOYm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ZFzFQMGO; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CD17221B26;
+	Tue,  2 Jul 2024 09:24:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1719912298; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UktWkysOiCUWKutaYWCtQrqgdTH2AKGF5J22mQ/F9zA=;
+	b=F9+I5ki4Odmoy2XHAPDDhDae8UbD7BBAcn3h+J6yyvu9seSX2T+sZ/7asrxcTctL3qlGTr
+	EjQWot4RNmDqSUQbbKZOhoL3jTQZwh6H4pwd4TaVdvV/czY31JK/dR0xmPic94JH596+73
+	e6lSvsGBmt63gyLcSeQ1Lmw2ORnxGqc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1719912298;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UktWkysOiCUWKutaYWCtQrqgdTH2AKGF5J22mQ/F9zA=;
+	b=PdrXH2ZGrJH9C6F056rNRXZAAmPy3wHDUYmAnW395cB8I4V/C5yeBNcRBrDLFl2R+ovcqJ
+	Vr3CxngIDtNUljBg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=QYs9mOYm;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=ZFzFQMGO
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1719912297; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UktWkysOiCUWKutaYWCtQrqgdTH2AKGF5J22mQ/F9zA=;
+	b=QYs9mOYmguxLYkYMgP9N2AY3+Ggoh829eXjbX/cLuUHZCY2g3x19soWbV8ZR1xmOj1U6g6
+	bt0VWVtPOxrxMtvbc77JRt2HvoAJNtUyUIsff5wv9XnHiwjbhYIKxPficoqzEVSCFsaPma
+	pTtHq6cFWpIawuT8kfnKzep4BPYwom4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1719912297;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UktWkysOiCUWKutaYWCtQrqgdTH2AKGF5J22mQ/F9zA=;
+	b=ZFzFQMGOxGEXxyOq2I7ufsh7NdiC7YFkl5lyMnOe79oXNGLkX8Akt4hv7oYTblQy/B411x
+	9YIqnfzoSlFAk6BQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B10F1395F;
+	Tue,  2 Jul 2024 09:24:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /WiFJWnHg2bNLAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Tue, 02 Jul 2024 09:24:57 +0000
+Message-ID: <e74d47c7-0873-4adb-88a3-60597bf31af6@suse.cz>
+Date: Tue, 2 Jul 2024 11:24:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,177 +98,126 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
- GMAC-specific platform data init
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
- <wosihpytgfb6icdw7326xtez45cm6mbfykt4b7nlmg76xpwu4m@6xwvqj7ls7is>
- <eb305275-6509-4887-ad33-67969a9d5144@loongson.cn>
- <xafdw4u5nqknn2qehkke5p4mrj4bnfh33pcmkob5gbl7y5apr4@pkwmf6vphxsh>
- <55193345-f390-4fbb-b4e6-0bcd82cedc9a@loongson.cn>
- <6ergp6oqrccwzsvdshnapkaukurquouf74x7l7agnmzbhctwma@qw63qlynrred>
+Subject: Re: [PATCH v6 0/6] slab: Introduce dedicated bucket allocator
 Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <6ergp6oqrccwzsvdshnapkaukurquouf74x7l7agnmzbhctwma@qw63qlynrred>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxZcVMx4NmSmk4AA--.55315S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxKFW7CFWfWF1kKr1rCF1fKrX_yoWxXF43pr
-	WrAa9rGr9rXF1xAan0qr1UJry0vFy5Jw4UuF48tFyUK3sF9w1jqr1xuFWYgr9rZr4kZFyU
-	ZFy8XFnruFs8CrXCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
+To: Kees Cook <kees@kernel.org>
+Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+ Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+ David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+ jvoisin <julien.voisin@dustri.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>, Xiu Jianfeng <xiujianfeng@huawei.com>,
+ Suren Baghdasaryan <surenb@google.com>,
+ Kent Overstreet <kent.overstreet@linux.dev>, Jann Horn <jannh@google.com>,
+ Matteo Rizzo <matteorizzo@google.com>, Thomas Graf <tgraf@suug.ch>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org
+References: <20240701190152.it.631-kees@kernel.org>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJkBREIBQkRadznAAoJECJPp+fMgqZkNxIQ
+ ALZRqwdUGzqL2aeSavbum/VF/+td+nZfuH0xeWiO2w8mG0+nPd5j9ujYeHcUP1edE7uQrjOC
+ Gs9sm8+W1xYnbClMJTsXiAV88D2btFUdU1mCXURAL9wWZ8Jsmz5ZH2V6AUszvNezsS/VIT87
+ AmTtj31TLDGwdxaZTSYLwAOOOtyqafOEq+gJB30RxTRE3h3G1zpO7OM9K6ysLdAlwAGYWgJJ
+ V4JqGsQ/lyEtxxFpUCjb5Pztp7cQxhlkil0oBYHkudiG8j1U3DG8iC6rnB4yJaLphKx57NuQ
+ PIY0Bccg+r9gIQ4XeSK2PQhdXdy3UWBr913ZQ9AI2usid3s5vabo4iBvpJNFLgUmxFnr73SJ
+ KsRh/2OBsg1XXF/wRQGBO9vRuJUAbnaIVcmGOUogdBVS9Sun/Sy4GNA++KtFZK95U7J417/J
+ Hub2xV6Ehc7UGW6fIvIQmzJ3zaTEfuriU1P8ayfddrAgZb25JnOW7L1zdYL8rXiezOyYZ8Fm
+ ZyXjzWdO0RpxcUEp6GsJr11Bc4F3aae9OZtwtLL/jxc7y6pUugB00PodgnQ6CMcfR/HjXlae
+ h2VS3zl9+tQWHu6s1R58t5BuMS2FNA58wU/IazImc/ZQA+slDBfhRDGYlExjg19UXWe/gMcl
+ De3P1kxYPgZdGE2eZpRLIbt+rYnqQKy8UxlszsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZAUSmwUJDK5EZgAKCRAiT6fnzIKmZOJGEACOKABgo9wJXsbWhGWYO7mD
+ 8R8mUyJHqbvaz+yTLnvRwfe/VwafFfDMx5GYVYzMY9TWpA8psFTKTUIIQmx2scYsRBUwm5VI
+ EurRWKqENcDRjyo+ol59j0FViYysjQQeobXBDDE31t5SBg++veI6tXfpco/UiKEsDswL1WAr
+ tEAZaruo7254TyH+gydURl2wJuzo/aZ7Y7PpqaODbYv727Dvm5eX64HCyyAH0s6sOCyGF5/p
+ eIhrOn24oBf67KtdAN3H9JoFNUVTYJc1VJU3R1JtVdgwEdr+NEciEfYl0O19VpLE/PZxP4wX
+ PWnhf5WjdoNI1Xec+RcJ5p/pSel0jnvBX8L2cmniYnmI883NhtGZsEWj++wyKiS4NranDFlA
+ HdDM3b4lUth1pTtABKQ1YuTvehj7EfoWD3bv9kuGZGPrAeFNiHPdOT7DaXKeHpW9homgtBxj
+ 8aX/UkSvEGJKUEbFL9cVa5tzyialGkSiZJNkWgeHe+jEcfRT6pJZOJidSCdzvJpbdJmm+eED
+ w9XOLH1IIWh7RURU7G1iOfEfmImFeC3cbbS73LQEFGe1urxvIH5K/7vX+FkNcr9ujwWuPE9b
+ 1C2o4i/yZPLXIVy387EjA6GZMqvQUFuSTs/GeBcv0NjIQi8867H3uLjz+mQy63fAitsDwLmR
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <20240701190152.it.631-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CD17221B26
+X-Spam-Score: -3.00
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.00 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[huaweicloud.com,linux.com,kernel.org,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,gmail.com,huawei.com,suug.ch,gondor.apana.org.au,lwn.net,vger.kernel.org,kvack.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
+On 7/1/24 9:12 PM, Kees Cook wrote:
+> 
+> Kees Cook (6):
+>   mm/slab: Introduce kmem_buckets typedef
+>   mm/slab: Plumb kmem_buckets into __do_kmalloc_node()
+>   mm/slab: Introduce kvmalloc_buckets_node() that can take kmem_buckets
+>     argument
+>   mm/slab: Introduce kmem_buckets_create() and family
+>   ipc, msg: Use dedicated slab buckets for alloc_msg()
+>   mm/util: Use dedicated slab buckets for memdup_user()
 
-在 2024/7/2 06:57, Serge Semin 写道:
-> On Tue, Jun 25, 2024 at 08:31:32PM +0800, Yanteng Si wrote:
->> 在 2024/6/24 09:47, Serge Semin 写道:
->>> On Mon, Jun 17, 2024 at 06:00:19PM +0800, Yanteng Si wrote:
->>>> Hi Serge,
->>>>
->>>> 在 2024/6/15 00:19, Serge Semin 写道:
->>>>> On Wed, May 29, 2024 at 06:19:03PM +0800, Yanteng Si wrote:
->>>>>> Loongson delivers two types of the network devices: Loongson GMAC and
->>>>>> Loongson GNET in the framework of four CPU/Chipsets revisions:
->>>>>>
->>>>>>       Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
->>>>>> LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
->>>>>> LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
->>>>>> LS2K2000 CPU         GNET      0x7a13          v3.73a            8
->>>>>> LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
->>>>> You mentioned in the cover-letter
->>>>> https://lore.kernel.org/netdev/cover.1716973237.git.siyanteng@loongson.cn/
->>>>> that LS2K now have GMAC NICs too:
->>>>> " 1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
->>>>>        channels, so we have to reconsider the initialization of
->>>>>        tx/rx_queues_to_use into probe();"
->>>>>
->>>>> But I don't see much changes in the series which would indicate that
->>>>> new data. Please clarify what does it mean:
->>>>>
->>>>> Does it mean LS2K2000 has two types of the DW GMACs, right?
->>>> Yes!
->>>>> Are both of them based on the DW GMAC v3.73a IP-core with AV-feature
->>>>> enabled and 8 DMA-channels?
->>>> Yes!
->>>>> Seeing you called the new device as GMAC it doesn't have an
->>>>> integrated PHY as GNETs do, does it? If so, then neither
->>>>> STMMAC_FLAG_DISABLE_FORCE_1000 nor loongson_gnet_fix_speed() relevant
->>>>> for the new device, right?
->>>> YES!
->>>>> Why haven't you changed the sheet in the commit log? Shall the sheet
->>>>> be updated like this:
->>>>>
->>>>>        Chip             Network  PCI Dev ID   Synopys Version   DMA-channel
->>>>>     LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a        1
->>>>>     LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a        1
->>>>> +LS2K2000 CPU         GMAC      0x7a13          v3.73a            8
->>>>>     LS2K2000 CPU         GNET      0x7a13          v3.73a            8
->>>>>     LS7A2000 Chipset     GNET      0x7a13          v3.73a            1
->>>>>
->>>>> ?
->>>> No! PCI Dev ID of GMAC is 0x7a03. So:
->>>>
->>>>    LS2K1000 CPU         GMAC      0x7a03       v3.50a/v3.73a 1
->>>>    LS7A1000 Chipset     GMAC      0x7a03       v3.50a/v3.73a 1
->>>> +LS2K2000 CPU         GMAC      0x7a03          v3.73a 8
->>>>    LS2K2000 CPU         GNET      0x7a13          v3.73a 8
->>>>    LS7A2000 Chipset     GNET      0x7a13          v3.73a 1
->>>>
->>>>> I'll continue reviewing the series after the questions above are
->>>>> clarified.
->>>> OK, If anything else is unclear, please let me know.
->>> Got it. Thanks for clarifying. I'll get back to reviewing the series
->>> tomorrow. Sorry for the timebreak.
->> OK. No worries.
-> Seeing Loongson GMAC can be also found with the 8-channels AV feature
-> enabled, we'll need to reconsider the patches logic and thus the
-> commit logs too. I'll try to thoroughly describe the changes in the
-> respective parts of the series. But in general, if what I've come up
-> with is implemented, the patchset will turn to look as follows:
->
-> [PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
-> [PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
-> [PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
-> [PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
-> [PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
-> [PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
->
-> [PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
-> +-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
->      in the loongson_gmac_data() method.
->
-> [PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
-> [PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
->
-> [PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
-> +-> Make sure the setup() method is called after the pci_enable_device()
->      invocation.
->
-> [PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
-> +-> Introduce the loongson_dwmac_dt_config() method here instead of
->      doing that in a separate patch.
-> +-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
->      the pdev->irq field and make sure it is valid.
->
-> [PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
-> +-> ... not sure what to do with this ...
->
-> [PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
-> +-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
->      support" patch, but which adds the support of the Loongson GMAC with the
->      8-channels AV-feature available.
-> +-> loongson_dwmac_intx_config() shall be dropped due to the
->      loongson_dwmac_acpi_config() method added in the PATCH 11/15.
-> +-> Make sure loongson_data::loongson_id is initialized before the
->      stmmac_pci_info::setup() is called.
-> +-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
->      fields initialization to the loongson_gmac_data() method.
-> +-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
->      Loongson MAC has been detected.
-> +-> Move everything GNET-specific to the next patch.
->
-> [PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
-> +-> Everything Loonsgson GNET-specific is supposed to be added in the
->      framework of this patch:
->      + PCI_DEVICE_ID_LOONGSON_GNET macro
->      + loongson_gnet_fix_speed() method
->      + loongson_gnet_data() method
->      + loongson_gnet_pci_info data
->      + The GNET-specific part of the loongson_dwmac_setup() method.
->      + ...
->
-> [PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
->
-> Hopefully I didn't forget anything. I'll give more details in the
-> comments to the respective patches.
+pushed to slab/for-6.11/buckets, slab/for-next
 
-OK.  Thanks!
+Thanks!
 
-
-Thanks,
-
-Yanteng
-
-> -Serge(y)
->
+> 
+>  include/linux/slab.h            |  48 ++++++++++++---
+>  ipc/msgutil.c                   |  13 +++-
+>  kernel/configs/hardening.config |   1 +
+>  mm/Kconfig                      |  17 ++++++
+>  mm/slab.h                       |   6 +-
+>  mm/slab_common.c                | 101 +++++++++++++++++++++++++++++++-
+>  mm/slub.c                       |  20 +++----
+>  mm/util.c                       |  23 ++++++--
+>  scripts/kernel-doc              |   1 +
+>  9 files changed, 200 insertions(+), 30 deletions(-)
+> 
 
 
