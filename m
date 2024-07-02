@@ -1,291 +1,208 @@
-Return-Path: <netdev+bounces-108516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74BBE9240E0
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:30:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC1C9240F1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 994DD1C22407
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:30:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C969B28015
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448B61BA075;
-	Tue,  2 Jul 2024 14:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91D91BA872;
+	Tue,  2 Jul 2024 14:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1UznOQH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XcjrS/mU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B55515B0FE
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 14:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025DE1BA063
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 14:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930602; cv=none; b=X0jAYmfdI4pTJdAQoxsc5cGsQBzrWpgZfc5oWZN8PgnLoettl5cV1Li/pV8izR9WyBsDSKxUXZUZvrlk8yssJ1L/5RV4KC+BHplpUnyTs7Ys7PhFqQz2+/Kbj3oYEwEC0/H94vSGe8JZMOfwaPSO2mr9RZFZLaEpQfVV38zapgM=
+	t=1719930653; cv=none; b=ESaicluCXh1uzaUVMxr7jmWDQXpPv9SNff31UhsepghUca7u5M4tNudyeEVLuz3Qygb/s8HMx93+NGc4iMldhLHmWTG8Q2ocM8MYvmIPpi1HbryvLOms7xXwtWidJ5AgwCm2j6w8V9zK2dvkjH8RDKaY3lhXt/dQQNYdaGUEEG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930602; c=relaxed/simple;
-	bh=AksUKb3HV++Nbk4Q+Qpm5rXNKBYb9EoUW+ib/cR5SQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GZmn9wIkpENz/QCw59Z95c4dSSdVq4pSRwaH9JuVURRfZaNpmxAgck6ZJcU1GHHssS2PyN+bUWd4Mt04FZtwjBnepmfr4DbVd42Tn0zfjecPluow7k0gnN87arM/GeIoIxUzz1xkwcvfEPJbvyn9gnan1EwUWrTOm8VMce6euzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P1UznOQH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719930599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=g8gIvg7Tcd9T+zmmSpo2Rip4McYLSwKIHuHAwqweqZE=;
-	b=P1UznOQHMEUWY0Ne0KHaLldpL7VLRtv1zQPdVMHu2Zb2ElpC6tIEdLsjwebgGR4776Ata3
-	wkBybJIr3k5OuIBK0+asqH3j6psGhviAMT2rpN6XCwABGlQEZHM4sMGiZdGcaBz3sy50tC
-	9+RU/bfmDDTYqEEMzJ+Yvg92kKBBJts=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-a3Lhk2QSMQ2KhJdNOY0W5Q-1; Tue,
- 02 Jul 2024 10:29:57 -0400
-X-MC-Unique: a3Lhk2QSMQ2KhJdNOY0W5Q-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E2291944D38;
-	Tue,  2 Jul 2024 14:29:53 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.3])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 07F2D1944DD3;
-	Tue,  2 Jul 2024 14:29:45 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next] tools: ynl: use ident name for Family, too.
-Date: Tue,  2 Jul 2024 16:29:31 +0200
-Message-ID: <9bbcab3094970b371bd47aa18481ae6ca5a93687.1719930479.git.pabeni@redhat.com>
+	s=arc-20240116; t=1719930653; c=relaxed/simple;
+	bh=nPsWzSKNKWp6syDtdY7Ir2nt0wTvI1SQEd/GjSGs6hs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sQmr3T7XsCiRWXZrXYlzAQ7eZjRtkU1A93qXY+lvlDZXdQ5cVPYb1KP1QuFGBpnp1Pi1WJGEBmDZ4f7N8S3hnhVDH+w8k5+rUoZPHEr062XMKhcLJ5UIbLz6YVbz4N4nUCd2XC2XAW3GlBFCJdL7eowdetTrqbsCaGLRmlyMrJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XcjrS/mU; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57d119fddd9so23710a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 07:30:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719930649; x=1720535449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3jM7/wfZzza6LzDSng98O/sFMouLELQtFerEOq9E8OA=;
+        b=XcjrS/mUBdohB1KNhGJQfJf/nbZ8kwgOfO6qBmU7gseA2VjYs3KYNg6P3qjdS6kXwA
+         t3PYUEXsAYNAnugIOeyWNrMKC9zpbt9E2WcvB3YJqqb45ymsEt1oYukBzuoT48ERCr13
+         qAhDw+AsJhrb54yNrOORg0LQz50mBF2K7N645UDwGtgq3FLU/FUwoCEkGz8KC/gfnEPh
+         kCjhKxR/KPHv8ud5NsMekoA8HF6CNdf2M9HPr5BKCrCkxZhD6UFov63lSjr16CW4Qv/0
+         UUNHiPyslXVCt/BKP8SCP6MSQOYal4roNuMJgSUBSneb1BxDv8FD0LAV+td72x/VG8LW
+         /vnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719930649; x=1720535449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3jM7/wfZzza6LzDSng98O/sFMouLELQtFerEOq9E8OA=;
+        b=px8Yy/n8vd4ao5Hqx0qGdQK6s5e53x0ES0q/2KTWN3h8dkoMzWF+pp92ADoHbpteBk
+         nXZxQxU6CIfyiSEHbh9C9FLskC599PaoFPtFEOqK36vDnWNS3AHnpaiYs3lzwR/RQpO6
+         QhiSG6y0/KhMMzHXqKPRUZbJMsahaxF2bvD6gY7tJc3E24NoHF9IxSaBtG95Q7WP+/38
+         8FCivrQNNNyzG4h0LVkLxW/aWAFuElP3QAtVG2gbbl+DbAfXZeaSQHSfHmiDxRbIlNq1
+         vR9zmYXWOW+GPXtFm1LcyERq822TRMKEff186XKVOwtnOSvl85bRucZOp4Hk9vwARdhD
+         pVSw==
+X-Gm-Message-State: AOJu0YyDPVjelMD4e/V/gDqsR2cJCljWcANe8g4dXP25A3QMC9EWWtIO
+	cUX7n1Qlom45B99Nzm+JF45i3ya+Poft4HTfr9OqJH3CNRexnlDxVwRHdTMhyv0EAVWMLECWQfO
+	XOLa9qR83tZkWWYQB74oDsEXErSobQxryenU2Gb2r7q0xzlqFfqr35LM=
+X-Google-Smtp-Source: AGHT+IG6q9qlZv6p0XsjYtQr/2CJh2iWJHZfafuRVFcTNadBZxk7tzb9cfayzAyvnfb859R1NpQn1uwJAUI6SXHDoq4=
+X-Received: by 2002:a50:f68b:0:b0:58b:e3b:c5d8 with SMTP id
+ 4fb4d7f45d1cf-58c61e8924fmr10222a12.0.1719930648903; Tue, 02 Jul 2024
+ 07:30:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20240628003253.1694510-1-almasrymina@google.com> <20240628003253.1694510-12-almasrymina@google.com>
+In-Reply-To: <20240628003253.1694510-12-almasrymina@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 2 Jul 2024 16:30:37 +0200
+Message-ID: <CANn89iLRRaf31svCM9KUChwmKo53T9TTKayr3_bnbUu+Fuej7g@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 11/14] net: add SO_DEVMEM_DONTNEED setsockopt
+ to release RX frags
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This allow consistent naming convention between Family and others
-element's name.
+On Fri, Jun 28, 2024 at 2:33=E2=80=AFAM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> Add an interface for the user to notify the kernel that it is done
+> reading the devmem dmabuf frags returned as cmsg. The kernel will
+> drop the reference on the frags to make them available for reuse.
+>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
+> ---
+>
+> v10:
+> - Fix leak of tokens (Nikolay).
+>
+> v7:
+> - Updated SO_DEVMEM_* uapi to use the next available entry (Arnd).
+>
+> v6:
+> - Squash in locking optimizations from edumazet@google.com. With his
+>   changes we lock the xarray once per sock_devmem_dontneed operation
+>   rather than once per frag.
+>
+> Changes in v1:
+> - devmemtoken -> dmabuf_token (David).
+> - Use napi_pp_put_page() for refcounting (Yunsheng).
+> - Fix build error with missing socket options on other asms.
+>
+> ---
+>  arch/alpha/include/uapi/asm/socket.h  |  1 +
+>  arch/mips/include/uapi/asm/socket.h   |  1 +
+>  arch/parisc/include/uapi/asm/socket.h |  1 +
+>  arch/sparc/include/uapi/asm/socket.h  |  1 +
+>  include/uapi/asm-generic/socket.h     |  1 +
+>  include/uapi/linux/uio.h              |  4 ++
+>  net/core/sock.c                       | 61 +++++++++++++++++++++++++++
+>  7 files changed, 70 insertions(+)
+>
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/net/ynl/ynl-gen-c.py | 52 +++++++++++++++++++-------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+>
+> +struct dmabuf_token {
+> +       __u32 token_start;
+> +       __u32 token_count;
+> +};
+>  /*
+>   *     UIO_MAXIOV shall be at least 16 1003.1g (5.4.1.1)
+>   */
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 9abc4fe259535..040c66ac26244 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -124,6 +124,7 @@
+>  #include <linux/netdevice.h>
+>  #include <net/protocol.h>
+>  #include <linux/skbuff.h>
+> +#include <linux/skbuff_ref.h>
+>  #include <net/net_namespace.h>
+>  #include <net/request_sock.h>
+>  #include <net/sock.h>
+> @@ -1049,6 +1050,62 @@ static int sock_reserve_memory(struct sock *sk, in=
+t bytes)
+>         return 0;
+>  }
+>
+> +#ifdef CONFIG_PAGE_POOL
+> +static noinline_for_stack int
+> +sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int opt=
+len)
+> +{
+> +       unsigned int num_tokens, i, j, k, netmem_num =3D 0;
+> +       struct dmabuf_token *tokens;
+> +       netmem_ref netmems[16];
+> +       int ret =3D 0;
+> +
+> +       if (sk->sk_type !=3D SOCK_STREAM || sk->sk_protocol !=3D IPPROTO_=
+TCP)
+> +               return -EBADF;
 
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 374ca5e86e24..51529fabd517 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -59,9 +59,9 @@ class Type(SpecAttr):
-         if 'nested-attributes' in attr:
-             self.nested_attrs = attr['nested-attributes']
-             if self.nested_attrs == family.name:
--                self.nested_render_name = c_lower(f"{family.name}")
-+                self.nested_render_name = c_lower(f"{family.ident_name}")
-             else:
--                self.nested_render_name = c_lower(f"{family.name}_{self.nested_attrs}")
-+                self.nested_render_name = c_lower(f"{family.ident_name}_{self.nested_attrs}")
- 
-             if self.nested_attrs in self.family.consts:
-                 self.nested_struct_type = 'struct ' + self.nested_render_name + '_'
-@@ -693,9 +693,9 @@ class Struct:
- 
-         self.nested = type_list is None
-         if family.name == c_lower(space_name):
--            self.render_name = c_lower(family.name)
-+            self.render_name = c_lower(family.ident_name)
-         else:
--            self.render_name = c_lower(family.name + '-' + space_name)
-+            self.render_name = c_lower(family.ident_name + '-' + space_name)
-         self.struct_name = 'struct ' + self.render_name
-         if self.nested and space_name in family.consts:
-             self.struct_name += '_'
-@@ -761,7 +761,7 @@ class EnumEntry(SpecEnumEntry):
- 
- class EnumSet(SpecEnumSet):
-     def __init__(self, family, yaml):
--        self.render_name = c_lower(family.name + '-' + yaml['name'])
-+        self.render_name = c_lower(family.ident_name + '-' + yaml['name'])
- 
-         if 'enum-name' in yaml:
-             if yaml['enum-name']:
-@@ -777,7 +777,7 @@ class EnumSet(SpecEnumSet):
-         else:
-             self.user_type = 'int'
- 
--        self.value_pfx = yaml.get('name-prefix', f"{family.name}-{yaml['name']}-")
-+        self.value_pfx = yaml.get('name-prefix', f"{family.ident_name}-{yaml['name']}-")
- 
-         super().__init__(family, yaml)
- 
-@@ -802,9 +802,9 @@ class AttrSet(SpecAttrSet):
-             if 'name-prefix' in yaml:
-                 pfx = yaml['name-prefix']
-             elif self.name == family.name:
--                pfx = family.name + '-a-'
-+                pfx = family.ident_name + '-a-'
-             else:
--                pfx = f"{family.name}-a-{self.name}-"
-+                pfx = f"{family.ident_name}-a-{self.name}-"
-             self.name_prefix = c_upper(pfx)
-             self.max_name = c_upper(self.yaml.get('attr-max-name', f"{self.name_prefix}max"))
-             self.cnt_name = c_upper(self.yaml.get('attr-cnt-name', f"__{self.name_prefix}max"))
-@@ -861,7 +861,7 @@ class Operation(SpecOperation):
-     def __init__(self, family, yaml, req_value, rsp_value):
-         super().__init__(family, yaml, req_value, rsp_value)
- 
--        self.render_name = c_lower(family.name + '_' + self.name)
-+        self.render_name = c_lower(family.ident_name + '_' + self.name)
- 
-         self.dual_policy = ('do' in yaml and 'request' in yaml['do']) and \
-                          ('dump' in yaml and 'request' in yaml['dump'])
-@@ -911,11 +911,11 @@ class Family(SpecFamily):
-         if 'uapi-header' in self.yaml:
-             self.uapi_header = self.yaml['uapi-header']
-         else:
--            self.uapi_header = f"linux/{self.name}.h"
-+            self.uapi_header = f"linux/{self.ident_name}.h"
-         if self.uapi_header.startswith("linux/") and self.uapi_header.endswith('.h'):
-             self.uapi_header_name = self.uapi_header[6:-2]
-         else:
--            self.uapi_header_name = self.name
-+            self.uapi_header_name = self.ident_name
- 
-     def resolve(self):
-         self.resolve_up(super())
-@@ -923,7 +923,7 @@ class Family(SpecFamily):
-         if self.yaml.get('protocol', 'genetlink') not in {'genetlink', 'genetlink-c', 'genetlink-legacy'}:
-             raise Exception("Codegen only supported for genetlink")
- 
--        self.c_name = c_lower(self.name)
-+        self.c_name = c_lower(self.ident_name)
-         if 'name-prefix' in self.yaml['operations']:
-             self.op_prefix = c_upper(self.yaml['operations']['name-prefix'])
-         else:
-@@ -2173,7 +2173,7 @@ def print_kernel_op_table_fwd(family, cw, terminate):
-     exported = not kernel_can_gen_family_struct(family)
- 
-     if not terminate or exported:
--        cw.p(f"/* Ops table for {family.name} */")
-+        cw.p(f"/* Ops table for {family.ident_name} */")
- 
-         pol_to_struct = {'global': 'genl_small_ops',
-                          'per-op': 'genl_ops',
-@@ -2225,12 +2225,12 @@ def print_kernel_op_table_fwd(family, cw, terminate):
-             continue
- 
-         if 'do' in op:
--            name = c_lower(f"{family.name}-nl-{op_name}-doit")
-+            name = c_lower(f"{family.ident_name}-nl-{op_name}-doit")
-             cw.write_func_prot('int', name,
-                                ['struct sk_buff *skb', 'struct genl_info *info'], suffix=';')
- 
-         if 'dump' in op:
--            name = c_lower(f"{family.name}-nl-{op_name}-dumpit")
-+            name = c_lower(f"{family.ident_name}-nl-{op_name}-dumpit")
-             cw.write_func_prot('int', name,
-                                ['struct sk_buff *skb', 'struct netlink_callback *cb'], suffix=';')
-     cw.nl()
-@@ -2256,13 +2256,13 @@ def print_kernel_op_table(family, cw):
-                                             for x in op['dont-validate']])), )
-             for op_mode in ['do', 'dump']:
-                 if op_mode in op:
--                    name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
-+                    name = c_lower(f"{family.ident_name}-nl-{op_name}-{op_mode}it")
-                     members.append((op_mode + 'it', name))
-             if family.kernel_policy == 'per-op':
-                 struct = Struct(family, op['attribute-set'],
-                                 type_list=op['do']['request']['attributes'])
- 
--                name = c_lower(f"{family.name}-{op_name}-nl-policy")
-+                name = c_lower(f"{family.ident_name}-{op_name}-nl-policy")
-                 members.append(('policy', name))
-                 members.append(('maxattr', struct.attr_max_val.enum_name))
-             if 'flags' in op:
-@@ -2294,7 +2294,7 @@ def print_kernel_op_table(family, cw):
-                         members.append(('validate',
-                                         ' | '.join([c_upper('genl-dont-validate-' + x)
-                                                     for x in dont_validate])), )
--                name = c_lower(f"{family.name}-nl-{op_name}-{op_mode}it")
-+                name = c_lower(f"{family.ident_name}-nl-{op_name}-{op_mode}it")
-                 if 'pre' in op[op_mode]:
-                     members.append((cb_names[op_mode]['pre'], c_lower(op[op_mode]['pre'])))
-                 members.append((op_mode + 'it', name))
-@@ -2305,9 +2305,9 @@ def print_kernel_op_table(family, cw):
-                                     type_list=op[op_mode]['request']['attributes'])
- 
-                     if op.dual_policy:
--                        name = c_lower(f"{family.name}-{op_name}-{op_mode}-nl-policy")
-+                        name = c_lower(f"{family.ident_name}-{op_name}-{op_mode}-nl-policy")
-                     else:
--                        name = c_lower(f"{family.name}-{op_name}-nl-policy")
-+                        name = c_lower(f"{family.ident_name}-{op_name}-nl-policy")
-                     members.append(('policy', name))
-                     members.append(('maxattr', struct.attr_max_val.enum_name))
-                 flags = (op['flags'] if 'flags' in op else []) + ['cmd-cap-' + op_mode]
-@@ -2326,7 +2326,7 @@ def print_kernel_mcgrp_hdr(family, cw):
- 
-     cw.block_start('enum')
-     for grp in family.mcgrps['list']:
--        grp_id = c_upper(f"{family.name}-nlgrp-{grp['name']},")
-+        grp_id = c_upper(f"{family.ident_name}-nlgrp-{grp['name']},")
-         cw.p(grp_id)
-     cw.block_end(';')
-     cw.nl()
-@@ -2339,7 +2339,7 @@ def print_kernel_mcgrp_src(family, cw):
-     cw.block_start('static const struct genl_multicast_group ' + family.c_name + '_nl_mcgrps[] =')
-     for grp in family.mcgrps['list']:
-         name = grp['name']
--        grp_id = c_upper(f"{family.name}-nlgrp-{name}")
-+        grp_id = c_upper(f"{family.ident_name}-nlgrp-{name}")
-         cw.p('[' + grp_id + '] = { "' + name + '", },')
-     cw.block_end(';')
-     cw.nl()
-@@ -2361,7 +2361,7 @@ def print_kernel_family_struct_src(family, cw):
-     if not kernel_can_gen_family_struct(family):
-         return
- 
--    cw.block_start(f"struct genl_family {family.name}_nl_family __ro_after_init =")
-+    cw.block_start(f"struct genl_family {family.ident_name}_nl_family __ro_after_init =")
-     cw.p('.name\t\t= ' + family.fam_key + ',')
-     cw.p('.version\t= ' + family.ver_key + ',')
-     cw.p('.netnsok\t= true,')
-@@ -2429,7 +2429,7 @@ def render_uapi(family, cw):
-                 cw.p(' */')
- 
-             uapi_enum_start(family, cw, const, 'name')
--            name_pfx = const.get('name-prefix', f"{family.name}-{const['name']}-")
-+            name_pfx = const.get('name-prefix', f"{family.ident_name}-{const['name']}-")
-             for entry in enum.entries.values():
-                 suffix = ','
-                 if entry.value_change:
-@@ -2451,7 +2451,7 @@ def render_uapi(family, cw):
-             cw.nl()
-         elif const['type'] == 'const':
-             defines.append([c_upper(family.get('c-define-name',
--                                               f"{family.name}-{const['name']}")),
-+                                               f"{family.ident_name}-{const['name']}")),
-                             const['value']])
- 
-     if defines:
-@@ -2529,7 +2529,7 @@ def render_uapi(family, cw):
-     defines = []
-     for grp in family.mcgrps['list']:
-         name = grp['name']
--        defines.append([c_upper(grp.get('c-define-name', f"{family.name}-mcgrp-{name}")),
-+        defines.append([c_upper(grp.get('c-define-name', f"{family.ident_name}-mcgrp-{name}")),
-                         f'{name}'])
-     cw.nl()
-     if defines:
--- 
-2.45.2
+This might use sk_is_tcp() helper.
 
+> +
+> +       if (optlen % sizeof(struct dmabuf_token) ||
+> +           optlen > sizeof(*tokens) * 128)
+> +               return -EINVAL;
+> +
+> +       tokens =3D kvmalloc_array(128, sizeof(*tokens), GFP_KERNEL);
+
+This allocates 8192 bytes even for small optlen ?
+
+Probably no big deal, no need to send a new version.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
