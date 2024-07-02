@@ -1,70 +1,98 @@
-Return-Path: <netdev+bounces-108319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A393691ED4C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 05:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1381991ED55
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 05:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D13671C21C57
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:04:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF91E1C2140F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495D2179B2;
-	Tue,  2 Jul 2024 03:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3455317741;
+	Tue,  2 Jul 2024 03:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5TwHVY5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+XCo4p1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE5A288A4;
-	Tue,  2 Jul 2024 03:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DC715E8C;
+	Tue,  2 Jul 2024 03:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719889389; cv=none; b=mM6p5Wyw513Y8pnfQJrPypIOZA2zIz46NJMZB7FCHWuTt7Sh2hHxsl1LA3MlOCwzi+pdkivZsH3UY49VmZzheV8vhkU/lGuBUAtF/RSjgI9K0bMTnxYOS0GvTFJvXvKuZY2RCMX8omZ/GIeVNpBEIdu1k1oWJ/IyjxuqS5qJW90=
+	t=1719889828; cv=none; b=M+tGnre1yCDuHIDiKDX1BJgAFvUCrtgF+kSaFa3tiCPI4KN/93AvLvgTq5GU1GsMUtpdzziRHHU5MVUsW6mv/joZMnzAuwGbXRR0SBZJw7AsvemULAHGwyxgZ7Y/MTR+Xl9/cbb6YJOyp5jaZ7r5kJsQJWKCUX3l5Paa+vOE00A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719889389; c=relaxed/simple;
-	bh=Mst3gO62KAP9YjVa3vTLzVXE7I0SlzT0bNqTqL4l9zU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LT+O1QjAl2vHTUWoBJXvffddCYqxAJRVrT2RFabIZzpWixUrhbeqwoVd1eX94yi0L7g4Mr8IpTEe5/gBdZYeUQak5nvLw95pH9l/nOspr/wYpvN7rK/iK/oZexjQ+IDyw8znAg+7kwV4x+8/VRKGOXr15LtSLnXw6vNzkBWhNn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5TwHVY5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D76BC116B1;
-	Tue,  2 Jul 2024 03:03:08 +0000 (UTC)
+	s=arc-20240116; t=1719889828; c=relaxed/simple;
+	bh=McvXrlIAb0Df/RkudyuvJDZeF32sxxPSd3dTl3D/b/Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=j4a4Pxo4lTrWgmtF1m+H2K5uE6ZZn8MngBKDQ1mXByzKQLhesGv6CtpOsEOcte+mW5ZakqJRMMUQNePfIQdFgl7IQ2IiGotcbYrYp7j3DXHqQZHPvG7ZJMmJecEpITf4UrJ+OKm5F/EKtQ0YNH7Xr9bsz0sDyztnwcI4uC/7Gho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+XCo4p1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C4B6EC4AF0A;
+	Tue,  2 Jul 2024 03:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719889388;
-	bh=Mst3gO62KAP9YjVa3vTLzVXE7I0SlzT0bNqTqL4l9zU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m5TwHVY5HTqK/mNXkW/uj/CP1tRkMf9iFRErq0Xo9PNBpDYvN4V5Mgw2I//JwomBN
-	 y+e7mlV6VaIK+TkJWNZ3TaMM96OiFDTerg4DZR/hzmChQTpWUf/jXMuaT9SEkxH1K2
-	 6BV9IrO/tOqv/maFN+3vd2+DEqRkYGoNk1F1VScK2v067DVuAXuwpumSMp+7j04ocT
-	 Ux0OeLDjZKc/Dze8W1Ujtb2DwULbfqV8MxYOFAp8yd5B0r7zCeE1cvnzLYG+LqTRZN
-	 KLw0PuunMjKT58MoSXRzRfzmr61HvqsJiPDX+bRjS62z6lq32i2FHTvlyXG+9aiVJ8
-	 1jk7nBa114fug==
-Date: Mon, 1 Jul 2024 20:03:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Liu Jing <liujing@cmss.chinamobile.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftest: epoll_busy_poll: remove unnecessary
- assignment in TEST_F(epoll_busy_poll, test_get_params)
-Message-ID: <20240701200307.6fbcbacc@kernel.org>
-In-Reply-To: <20240701113251.6630-1-liujing@cmss.chinamobile.com>
-References: <20240701113251.6630-1-liujing@cmss.chinamobile.com>
+	s=k20201202; t=1719889827;
+	bh=McvXrlIAb0Df/RkudyuvJDZeF32sxxPSd3dTl3D/b/Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q+XCo4p1WdlPUz3lyfIT85Ugwz6EHnY8mKPP1mFWNIxl2hwtxa9CjtijUcx8f8Fcn
+	 SX5Ah+X3CXxbT8NBHlIt7f0LiAy6oMyC+k/9w+MiaK8/SwxlkJbpX7QYRRtJ14NMYK
+	 eV6+uzXIb4r4uF8gkLDdc+Czmiw7eHniE85gU+3mfL0SCExGWw+ARGKdcNe7e/denb
+	 mvOwcwTweuaAmmrWBLVzuoBkNFUpjwhF+/R5R9fTogEYHPSMVQ/9oSRNJ1ZWSn8C5T
+	 sSd0ZtG/jAoUg77hERevTN7EWwm+SAUDeUL/X0R/+ZB8L1zh3mX1y+tQmlflV4o9XO
+	 ZnUDzR3R6awUg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B20E9C43446;
+	Tue,  2 Jul 2024 03:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] can: kvaser_usb: Explicitly initialize family in leafimx
+ driver_info struct
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171988982772.28007.2255372828790530709.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jul 2024 03:10:27 +0000
+References: <20240701080643.1354022-2-mkl@pengutronix.de>
+In-Reply-To: <20240701080643.1354022-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, extja@kvaser.com,
+ stable@vger.kernel.org
 
-On Mon,  1 Jul 2024 19:32:51 +0800 Liu Jing wrote:
-> In the TEST_F(epoll_busy_poll, test_get_params), the initialized value of 'ret' is unused,
-> because it will be assigned by the ioctl.thus remove it.
+Hello:
 
-I don't think this is worth the noise, please don't send such changes
-to networking.
+This patch was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Mon,  1 Jul 2024 10:03:22 +0200 you wrote:
+> From: Jimmy Assarsson <extja@kvaser.com>
+> 
+> Explicitly set the 'family' driver_info struct member for leafimx.
+> Previously, the correct operation relied on KVASER_LEAF being the first
+> defined value in enum kvaser_usb_leaf_family.
+> 
+> Fixes: e6c80e601053 ("can: kvaser_usb: kvaser_usb_leaf: fix CAN clock frequency regression")
+> Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
+> Link: https://lore.kernel.org/all/20240628194529.312968-1-extja@kvaser.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] can: kvaser_usb: Explicitly initialize family in leafimx driver_info struct
+    https://git.kernel.org/netdev/net/c/19d5b2698c35
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
