@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-108359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB759238E2
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 10:53:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6AA9237E2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 10:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C01951F21C72
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 08:43:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A61BAB24007
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 08:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B42614EC7F;
-	Tue,  2 Jul 2024 08:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF8214E2F1;
+	Tue,  2 Jul 2024 08:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1p2epTo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JAYilRh1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8749414A4ED
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 08:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E5C14E2E8;
+	Tue,  2 Jul 2024 08:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719909823; cv=none; b=Dx+4nuvhWv9UhZ2HShO7BK61zMYJYYEhdffH5gPfeif1KwFE9Xzi7pnLGRSkA6KGNlxfKWnRrRVknjwZ6VLM7cFzlO3Vc7AaGH7fwuZ9NDNCXkjUDsAUz/DKGUhVcPlm/e+CTBhSN0tuiJv7Elp24gCGqQcC0oU6eEugD4DOoyU=
+	t=1719909811; cv=none; b=cksStywxcCmz3wtL+K7biHPzcJEYNzm8pRoIWt0wC5gDmPu3Rj/4rCtfzJ3+czGY5DxKU6N+92TqBDeMDsrO9sVGTF52mhk7y9XBR04of5wCQAFf9FvheY+9WNQnODE4jxKZho0G/MbfaYdk2U27get6qBgPfMlN8eD/tHfklNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719909823; c=relaxed/simple;
-	bh=2lGsLbD3/X0bbcV5T/UrCuuhOllMp5r3FRRNeq0XbHg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sqfzrfMB9xc2NRa0Mt2suQxW/RpP7JB08aUhDIlcHy62Ybv77kGYXUA/KNomnBJ7lIzkOK1KLRWVmThYPWRMCCyVGvy5sKI0XIn7itxV5fLe4y9Ir6HnsZyVVPkL/8i647kT963Qwp+b3QoPXb9Vb6YrrMok/EQqLZTEnz0SL2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1p2epTo; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52e829086f3so3806391e87.3
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 01:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719909820; x=1720514620; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzbQlfTsk2J+hyDVmnhmJepgjor2ee+VWH8cAdglbbc=;
-        b=Q1p2epToduEXdQwGOxcasBD+RYWUVzK+FX4WX03u6/iNb2mM8U26SKLbq0JP0qISeh
-         lKV9L1NkoI9XMb4N2Q5uNzJFkkLufH6bpWJtw/090pL14WANpbNZzFgav8NHesuF6kOJ
-         eGhI/CJDlhoClRjtMMTvwsYoHL6JhJ7+l3aRrFz98Luzf/KYbou8lB1Y3mXMclmwE5nW
-         ra28HsTIX6xd/S/T/0C4i7lfPGUu/YYael/z3/au/Bjn2o0Sfqkqe2NzyEb6izdykDyU
-         IXMf5G/RKNdDamN7jl0/f3VrSC3Fh+PqdK2/8NvbZpvv7smSBhwO7w+dfwvakQBE/wev
-         B71A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719909820; x=1720514620;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qzbQlfTsk2J+hyDVmnhmJepgjor2ee+VWH8cAdglbbc=;
-        b=enIJ7ueJRDY6zEp1S+1ak5sHRV+HDhlAYTlnb08qZZICYEb4QMQfUzhKCzjr8MNLeO
-         gZTxQg7NpMbfIW5LNhQppvsn/VQHZl1hZ9ZzZef22hD8eEvTGrFWmomIUNIYxgI1mwCk
-         CdaXunmuVU27y88z+iez7KFqNkOv4kQXV9q64euQTOxV9c8E01VqxSdFU6yCm2sFis1E
-         XmZgTldjrxKbforjPVdIVqwfUGVx61VeY8U+E0L0YIL7O/yk8uQseUND4EVmNtzI0WAJ
-         C/zoKOrsHJPjGrBwxKMgrMyHxncC8ABaARUIMDu7eReB0ufNr6T0TiZQ2kxXij7dv/H+
-         1NPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXhcWAxkv68eSgnsF0/g7bdGqjlXGGG+y+ftrNilT3KWaLA7p8yg8YhKrTVpBYPz+we79hzZjvJpWMPiXT9EQBMwojl8IPo
-X-Gm-Message-State: AOJu0Yzt6O6Nnm9teqOQ6Wua8seAJUFur3ui8ZexOoDuhxSTS1iHRrfV
-	dr2gVDdPSnzpjYPgRjWbWbP0t0d3cRKYbwLGXHZzsM+HThe1Tpw6
-X-Google-Smtp-Source: AGHT+IGNeILGZxF2YJ00+pELedyUgNf85QeetQ6yPBiGAu3WdXM4elWoyDvV8xRpvlDuw4hQ6UD84g==
-X-Received: by 2002:a05:6512:2809:b0:52e:7444:162e with SMTP id 2adb3069b0e04-52e826f75femr5429780e87.55.1719909819349;
-        Tue, 02 Jul 2024 01:43:39 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab2f721sm1732443e87.238.2024.07.02.01.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 01:43:38 -0700 (PDT)
-Date: Tue, 2 Jul 2024 11:43:36 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-Subject: Re: [PATCH net-next v13 08/15] net: stmmac: dwmac-loongson: Add
- phy_interface for Loongson GMAC
-Message-ID: <s72su7rcpazqhvzumec6yiw25ickabmcvd4omcz35gyqjv7meo@hoqzgm7bpyfv>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <b6c038eb4daa00760a484692b192957d3ac574db.1716973237.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1719909811; c=relaxed/simple;
+	bh=HXFeBtQ2nJcSAHi9tFupC1wLuKQP+oXjQcCxaB0UapQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WpDIJUW+1j+WYmv0cuSvnuPeBoobGRirGUgohZIKyKYX1VU9IVtd7NWdDyv9GzJ+AgUBhLfkk31+DiqeUufKLuFPWPDhIBykEuhtdpY0tdDZnFoitVumLc1vIuF7RdcDmox9TQcQkOai7RXLYWhl23BoEMdNihBDhd4e7vH8CRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JAYilRh1; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DA00B240003;
+	Tue,  2 Jul 2024 08:43:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719909807;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ESiFCwdIijiYKdTgoUxnWvhTex6WtiiBxTyR4etpb9Q=;
+	b=JAYilRh1vX1i2kUkXnuWb3U40CeaCGpuwSK4xKmSiLuF2R7Zk1QhoGWQ/KJbsVBumSIMKH
+	FcutiaGlCysRV3/zD8UB6iPNnRHBaXoToEj2FvVNraRojwyMGPbC1BD09mqr4OOhQF6AXf
+	lSj5KEcNA1PxZNVK7d+fQ5XiXP0hTBjb0tnE06NyQfFkkYAADrR1AXiuy1pD6Oh3aWDcXp
+	aUwj3DSK8sG+9P/WZlP/dncXOqimhqd+KJT/SCzLL8w1OistzhHjAmVgt2hwawpgtsz674
+	fXQfJJ2LFhRTH7huSB+36Co3ebvF2oGIwnowBIQzjX7ma+5sTdfULKhSBPo+HA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH net-next 1/6] net: phy: dp83869: Disable autonegotiation in
+ RGMII/1000Base-X mode
+Date: Tue, 02 Jul 2024 10:44:12 +0200
+Message-ID: <3818335.kQq0lBPeGt@fw-rgant>
+In-Reply-To: <a244ce05-28a1-47b7-9093-12899f2c447f@lunn.ch>
+References:
+ <20240701-b4-dp83869-sfp-v1-0-a71d6d0ad5f8@bootlin.com>
+ <20240701-b4-dp83869-sfp-v1-1-a71d6d0ad5f8@bootlin.com>
+ <a244ce05-28a1-47b7-9093-12899f2c447f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6c038eb4daa00760a484692b192957d3ac574db.1716973237.git.siyanteng@loongson.cn>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Wed, May 29, 2024 at 06:19:47PM +0800, Yanteng Si wrote:
-> The phy_interface of gmac is PHY_INTERFACE_MODE_RGMII_ID.
-
-It's better to translate this to a normal sentence:
-"PHY-interface of the Loongson GMAC device is RGMII with no internal
-delays added to the data lines signal. So to comply with that let's
-pre-initialize the platform-data field with the respective enum
-constant."
-
--Serge(y)
-
+On lundi 1 juillet 2024 18:40:24 UTC+2 Andrew Lunn wrote:
+> On Mon, Jul 01, 2024 at 10:51:03AM +0200, Romain Gantois wrote:
+> > Currently, the DP83869 driver only disables autonegotiation in fiber
+> > configurations for 100Base-FX mode. However, the DP83869 PHY does not
+> > support autonegotiation in any of its fiber modes.
+> > 
+> > Disable autonegotiation for all fiber modes.
 > 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index e725c59c6c98..0289956e274b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -49,6 +49,8 @@ static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
->  {
->  	loongson_default_data(plat);
->  
-> +	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
-> +
->  	return 0;
->  }
->  
-> -- 
-> 2.31.4
-> 
+> I'm assuming to does work in copper mode?
+
+I'm unable to test any of the copper modes for the DP83869HM but
+according to the datasheet, autonegotiation should work in those.
+
+To be clear, "fiber mode" in the DP83869 linguo also includes
+1000Base-X which can be used with a direct-attach copper cable. From
+what I've seen, autonegotiation is not supported in this configuration.
+
+Thanks,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+
+
 
