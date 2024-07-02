@@ -1,426 +1,424 @@
-Return-Path: <netdev+bounces-108428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845B1923C3B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:17:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F06923CC3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:45:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C561F25B6C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:17:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C47A289446
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EB015B10F;
-	Tue,  2 Jul 2024 11:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA7C15B561;
+	Tue,  2 Jul 2024 11:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QlF+pl/6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+1itC1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933FC15B10B
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 11:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD9E179AF
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 11:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719919025; cv=none; b=PIS9BBxroMzRhtx5m0ioOhZVGEv/b6nSmgBM4V8EFOnHt0h3pF/M88K9VknXLuogInlb0oyH+P5EP43eitxrZ+jnB88ZvCUPsMR2Wf8UtZAggoenG6ew7PmCePhXqJQ51NB4mu098UQd9AA+Mrhe7RtIBSyMUkvzQlbYRDvFAns=
+	t=1719920737; cv=none; b=g9ds26FqdiKw962plbzfMk+uhu+lC3o93VgadzGd+ZRWZlosxN3woWqriwhl3ZmUL1pKCfivVJ3RgOrbOZf7gWY0+Fq8XhMwU5IazNqoQ3S2EQqR3SGu7Yg9p388JUxmfC0BPGPdN8ABF13WrJTMzXNy2L9Zzfta07pIjqtH/GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719919025; c=relaxed/simple;
-	bh=nmMHLCLoTrujP16iB7F/MT/Q1lf8MWahjzOOvpSjXxI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mIBWbBmFSss0qi2r+wd6fAhOy3vWFKbaGFYeb8VUizTlPTmxYUEEjhnj6k0jG1wVDKIrXvDFVJ+8LboycdMn1CjCC2de6o5wSIpDALKV+Mcw0G753PqlqvzI3LuqzbJLKF3BmxTIL+239C9AU9buFzlV1m2IdylmeSIBLb6Tjkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QlF+pl/6; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719919024; x=1751455024;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nmMHLCLoTrujP16iB7F/MT/Q1lf8MWahjzOOvpSjXxI=;
-  b=QlF+pl/6vuWeseER9DfsLIzZSTwZduPdaGUyXJJRMB67r12EBPu2Le+P
-   2M4GNbEFQ0ByhSLm1G1VLgOtxsSSO9uXtLzSfWgtdsv+o5I3D3mi7DL6H
-   1BDaceN57pSmIh/PoLwkuhtjTwMOPWBzsF3JvbiRhpZIgWkP2zqUn4hkf
-   3cSHHXdXrgNLN1I7XLnoqLR9lVEEvLt9RUx3DuWeBNq1H3T10X9NVReQk
-   4hQWnk2fYAp1MlgxoGXy61gBEhbLHUx5wPJwZE+CE432W0ABnqjbvI+7C
-   aXCMcXW6ihE0F6JqkwhJNMrxBt6krpymMvuy0cu8wSrRugSFK2uKvt8il
-   g==;
-X-CSE-ConnectionGUID: OVogQA2uQ2mNsqTAjaNaBw==
-X-CSE-MsgGUID: XKYuV9XNR7SRqNA2NOUzzw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="28481863"
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="28481863"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 04:17:04 -0700
-X-CSE-ConnectionGUID: LpCppw8ZSw6dyXNe4aLe1Q==
-X-CSE-MsgGUID: 9HMo7dbnRPCHhG3RGYirCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="46005771"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by orviesa009.jf.intel.com with ESMTP; 02 Jul 2024 04:17:01 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next v3 4/4] ice: Drop auxbus use for PTP to finalize ice_adapter move
-Date: Tue,  2 Jul 2024 13:15:33 +0200
-Message-ID: <20240702111533.83485-5-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240702111533.83485-1-sergey.temerkhanov@intel.com>
-References: <20240702111533.83485-1-sergey.temerkhanov@intel.com>
+	s=arc-20240116; t=1719920737; c=relaxed/simple;
+	bh=itu6pNVdyfoB76DotsYaSiqN7adMJczc3AiHky6OHEc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=sIGUed0pm2dSKOU7jjnYXyrjWdpCc1nlzy0pnVmkWJRmqbsbf38RLcQQH/3d9Iu/t0lZmsc1OLs36hl87Gs//8FEtLzYGjJSUCm74fcvBB3Od9Oki5DCn6DSrTICFDJj5jUo8ooLvwV7YgXwMIl0FMSFqTKpJH2ZKvwIAfh7zmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+1itC1f; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719920733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2ZSuG4jg6fN5yoroR9xZLM4JS/xKphek81wZ95P4CUI=;
+	b=F+1itC1fRlJbkNVB8t+YSsu0PDnL/BG/JhprfX6FNPhHRdlxdCIiHvj7zSL8VE1GFh4fXo
+	NC5aLJBfKF7YS9b59JT3BFUgCKBDAWlvZSUt6d9ln/a2/wcXu4909l1ftKwwfnBZ779Qx/
+	MTR6SYuI55ZSCc0SqUPp/FPlTmN27go=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-99-t9pzsh9oMdCjeV82ll5z8g-1; Tue,
+ 02 Jul 2024 07:45:28 -0400
+X-MC-Unique: t9pzsh9oMdCjeV82ll5z8g-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6B1F19560A7;
+	Tue,  2 Jul 2024 11:45:26 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.184])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7ECAF1956089;
+	Tue,  2 Jul 2024 11:45:23 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  horms@kernel.org,
+  i.maximets@ovn.org,  dev@openvswitch.org,  Pravin B Shelar
+ <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 10/10] selftests: openvswitch: add psample test
+In-Reply-To: <CAG=2xmNSe7TB0CBD9stYf8dDex6dPo_smr79rYGXZC0AXGEzWA@mail.gmail.com>
+	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Tue, 2 Jul 2024 02:16:49
+ -0500")
+References: <20240630195740.1469727-1-amorenoz@redhat.com>
+	<20240630195740.1469727-11-amorenoz@redhat.com>
+	<f7tfrstvtxn.fsf@redhat.com>
+	<CAG=2xmNSe7TB0CBD9stYf8dDex6dPo_smr79rYGXZC0AXGEzWA@mail.gmail.com>
+Date: Tue, 02 Jul 2024 07:45:21 -0400
+Message-ID: <f7to77gow4u.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Drop unused auxbus/auxdev support from the PTP code due to
-move to the ice_adapter.
+Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
 
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 252 -----------------------
- drivers/net/ethernet/intel/ice/ice_ptp.h |  21 --
- 2 files changed, 273 deletions(-)
+> On Mon, Jul 01, 2024 at 02:38:44PM GMT, Aaron Conole wrote:
+>> Adrian Moreno <amorenoz@redhat.com> writes:
+>>
+>> > Add a test to verify sampling packets via psample works.
+>> >
+>> > In order to do that, create a subcommand in ovs-dpctl.py to listen to
+>> > on the psample multicast group and print samples.
+>> >
+>> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>> > ---
+>> >  .../selftests/net/openvswitch/openvswitch.sh  | 115 +++++++++++++++++-
+>> >  .../selftests/net/openvswitch/ovs-dpctl.py    |  73 ++++++++++-
+>> >  2 files changed, 182 insertions(+), 6 deletions(-)
+>> >
+>> > diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/=
+tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > index 15bca0708717..02a366e01004 100755
+>> > --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+>> > @@ -20,7 +20,8 @@ tests=3D"
+>> >  	nat_related_v4				ip4-nat-related: ICMP related matches work with SN=
+AT
+>> >  	netlink_checks				ovsnl: validate netlink attrs and settings
+>> >  	upcall_interfaces			ovs: test the upcall interfaces
+>> > -	drop_reason				drop: test drop reasons are emitted"
+>> > +	drop_reason				drop: test drop reasons are emitted
+>> > +	psample					psample: Sampling packets with psample"
+>> >
+>> >  info() {
+>> >      [ $VERBOSE =3D 0 ] || echo $*
+>> > @@ -102,12 +103,21 @@ ovs_netns_spawn_daemon() {
+>> >  	shift
+>> >  	netns=3D$1
+>> >  	shift
+>> > -	info "spawning cmd: $*"
+>> > -	ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
+>> > +	if [ "$netns" =3D=3D "_default" ]; then
+>> > +		$*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
+>> > +	else
+>> > +		ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
+>> > +	fi
+>> >  	pid=3D$!
+>> >  	ovs_sbx "$sbx" on_exit "kill -TERM $pid 2>/dev/null"
+>> >  }
+>> >
+>> > +ovs_spawn_daemon() {
+>> > +	sbx=3D$1
+>> > +	shift
+>> > +	ovs_netns_spawn_daemon $sbx "_default" $*
+>> > +}
+>> > +
+>> >  ovs_add_netns_and_veths () {
+>> >  	info "Adding netns attached: sbx:$1 dp:$2 {$3, $4, $5}"
+>> >  	ovs_sbx "$1" ip netns add "$3" || return 1
+>> > @@ -170,6 +180,19 @@ ovs_drop_reason_count()
+>> >  	return `echo "$perf_output" | grep "$pattern" | wc -l`
+>> >  }
+>> >
+>> > +ovs_test_flow_fails () {
+>> > +	ERR_MSG=3D"Flow actions may not be safe on all matching packets"
+>> > +
+>> > +	PRE_TEST=3D$(dmesg | grep -c "${ERR_MSG}")
+>> > +	ovs_add_flow $@ &> /dev/null $@ && return 1
+>> > +	POST_TEST=3D$(dmesg | grep -c "${ERR_MSG}")
+>> > +
+>> > +	if [ "$PRE_TEST" =3D=3D "$POST_TEST" ]; then
+>> > +		return 1
+>> > +	fi
+>> > +	return 0
+>> > +}
+>> > +
+>> >  usage() {
+>> >  	echo
+>> >  	echo "$0 [OPTIONS] [TEST]..."
+>> > @@ -184,6 +207,92 @@ usage() {
+>> >  	exit 1
+>> >  }
+>> >
+>> > +
+>> > +# psample test
+>> > +# - use psample to observe packets
+>> > +test_psample() {
+>> > +	sbx_add "test_psample" || return $?
+>> > +
+>> > +	# Add a datapath with per-vport dispatching.
+>> > +	ovs_add_dp "test_psample" psample -V 2:1 || return 1
+>> > +
+>> > +	info "create namespaces"
+>> > +	ovs_add_netns_and_veths "test_psample" "psample" \
+>> > +		client c0 c1 172.31.110.10/24 -u || return 1
+>> > +	ovs_add_netns_and_veths "test_psample" "psample" \
+>> > +		server s0 s1 172.31.110.20/24 -u || return 1
+>> > +
+>> > +	# Check if psample actions can be configured.
+>> > +	ovs_add_flow "test_psample" psample \
+>> > +	'in_port(1),eth(),eth_type(0x0806),arp()' 'psample(group=3D1)'
+>>
+>> Might be good to redirect this stdout/stderr line to /dev/null -
+>> otherwise on an unsupported system there will be the following extra
+>> splat:
+>>
+>>   Traceback (most recent call last):
+>>     File "/home/aconole/git/linux/tools/testing/selftests/net/openvswitc=
+h/ovs-dpctl.py", line 2774, in <module>
+>>       sys.exit(main(sys.argv))
+>>    ...
+>>     File "/usr/lib/python3.12/site-packages/pyroute2/netlink/nlsocket.py=
+", line 489, in get
+>>       raise msg['header']['error']
+>>   pyroute2.netlink.exceptions.NetlinkError: (22, 'Invalid argument')
+>>
+>
+> I thought knowing the return value was kind of useful but sure, we can
+> redirect it to /dev/null.
+>
+>> > +	if [ $? =3D=3D 1 ]; then
+>> > +		info "no support for psample - skipping"
+>> > +		ovs_exit_sig
+>> > +		return $ksft_skip
+>> > +	fi
+>> > +
+>> > +	ovs_del_flows "test_psample" psample
+>> > +
+>> > +	# Test action verification.
+>> > +	OLDIFS=3D$IFS
+>> > +	IFS=3D'*'
+>> > +	min_key=3D'in_port(1),eth(),eth_type(0x0800),ipv4()'
+>> > +	for testcase in \
+>> > + "cookie to
+>> > large"*"psample(group=3D1,cookie=3D1615141312111009080706050403020100)"
+>> > \
+>> > +		"no group with cookie"*"psample(cookie=3Dabcd)" \
+>> > +		"no group"*"psample()";
+>> > +	do
+>> > +		set -- $testcase;
+>> > +		ovs_test_flow_fails "test_psample" psample $min_key $2
+>> > +		if [ $? =3D=3D 1 ]; then
+>> > +			info "failed - $1"
+>> > +			return 1
+>> > +		fi
+>> > +	done
+>> > +	IFS=3D$OLDIFS
+>> > +
+>> > +	ovs_del_flows "test_psample" psample
+>> > +	# Allow ARP
+>> > +	ovs_add_flow "test_psample" psample \
+>> > +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+>> > +	ovs_add_flow "test_psample" psample \
+>> > +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+>> > +
+>> > +	# Sample first 14 bytes of all traffic.
+>> > +	ovs_add_flow "test_psample" psample \
+>> > +	    "in_port(1),eth(),eth_type(0x0800),ipv4()" \
+>> > +            "trunc(14),psample(group=3D1,cookie=3Dc0ffee),2"
+>> > +
+>> > +	# Sample all traffic. In this case, use a sample() action with both
+>> > +	# psample and an upcall emulating simultaneous local sampling and
+>> > +	# sFlow / IPFIX.
+>> > +	nlpid=3D$(grep -E "listening on upcall packet handler" \
+>> > +            $ovs_dir/s0.out | cut -d ":" -f 2 | tr -d ' ')
+>> > +
+>> > +	ovs_add_flow "test_psample" psample \
+>> > +            "in_port(2),eth(),eth_type(0x0800),ipv4()" \
+>> > +
+>> > "sample(sample=3D100%,actions(psample(group=3D2,cookie=3Deeff0c),users=
+pace(pid=3D${nlpid},userdata=3Deeff0c))),1"
+>> > +
+>> > +	# Record psample data.
+>> > + ovs_spawn_daemon "test_psample" python3 $ovs_base/ovs-dpctl.py
+>> > psample-events
+>> > +
+>> > +	# Send a single ping.
+>> > +	sleep 1
+>> > + ovs_sbx "test_psample" ip netns exec client ping -I c1
+>> > 172.31.110.20 -c 1 || return 1
+>> > +	sleep 1
+>> > +
+>> > + # We should have received one userspace action upcall and 2
+>> > psample packets.
+>> > + grep -E "userspace action command" $ovs_dir/s0.out >/dev/null
+>> > 2>&1 || return 1
+>>
+>> I wonder if it would be better to check a few times instead of the one
+>> shot sleep.  There are some constrained environments that may run this
+>> test, and if you're worried about some kinds of races, maybe it makes
+>> sense to check a few times?
+>
+> Yes. I thought about that. There are other sleeps in this file that I
+> was planning to replace with a "wait_until()" function. Should we do
+> this as a follow-up patch to also cover the other instances?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 495bef485d05..c2dda9a8614f 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2950,188 +2950,6 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
- 		mutex_unlock(&pf->adapter->ports.lock);
- 	}
- }
--/**
-- * ice_ptp_aux_dev_to_aux_pf - Get auxiliary PF handle for the auxiliary device
-- * @aux_dev: auxiliary device to get the auxiliary PF for
-- */
--static struct ice_pf *
--ice_ptp_aux_dev_to_aux_pf(struct auxiliary_device *aux_dev)
--{
--	struct ice_ptp_port *aux_port;
--	struct ice_ptp *aux_ptp;
--
--	aux_port = container_of(aux_dev, struct ice_ptp_port, aux_dev);
--	aux_ptp = container_of(aux_port, struct ice_ptp, port);
--
--	return container_of(aux_ptp, struct ice_pf, ptp);
--}
--
--/**
-- * ice_ptp_aux_dev_to_owner_pf - Get PF handle for the auxiliary device
-- * @aux_dev: auxiliary device to get the PF for
-- */
--static struct ice_pf *
--ice_ptp_aux_dev_to_owner_pf(struct auxiliary_device *aux_dev)
--{
--	struct ice_ptp_port_owner *ports_owner;
--	struct auxiliary_driver *aux_drv;
--	struct ice_ptp *owner_ptp;
--
--	if (!aux_dev->dev.driver)
--		return NULL;
--
--	aux_drv = to_auxiliary_drv(aux_dev->dev.driver);
--	ports_owner = container_of(aux_drv, struct ice_ptp_port_owner,
--				   aux_driver);
--	owner_ptp = container_of(ports_owner, struct ice_ptp, ports_owner);
--	return container_of(owner_ptp, struct ice_pf, ptp);
--}
--
--/**
-- * ice_ptp_auxbus_probe - Probe auxiliary devices
-- * @aux_dev: PF's auxiliary device
-- * @id: Auxiliary device ID
-- */
--static int ice_ptp_auxbus_probe(struct auxiliary_device *aux_dev,
--				const struct auxiliary_device_id *id)
--{
--	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
--	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
--
--	if (WARN_ON(!owner_pf))
--		return -ENODEV;
--
--	INIT_LIST_HEAD(&aux_pf->ptp.port.list_node);
--	mutex_lock(&owner_pf->ptp.ports_owner.lock);
--	list_add(&aux_pf->ptp.port.list_node,
--		 &owner_pf->ptp.ports_owner.ports);
--	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
--
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_remove - Remove auxiliary devices from the bus
-- * @aux_dev: PF's auxiliary device
-- */
--static void ice_ptp_auxbus_remove(struct auxiliary_device *aux_dev)
--{
--	struct ice_pf *owner_pf = ice_ptp_aux_dev_to_owner_pf(aux_dev);
--	struct ice_pf *aux_pf = ice_ptp_aux_dev_to_aux_pf(aux_dev);
--
--	mutex_lock(&owner_pf->ptp.ports_owner.lock);
--	list_del(&aux_pf->ptp.port.list_node);
--	mutex_unlock(&owner_pf->ptp.ports_owner.lock);
--}
--
--/**
-- * ice_ptp_auxbus_shutdown
-- * @aux_dev: PF's auxiliary device
-- */
--static void ice_ptp_auxbus_shutdown(struct auxiliary_device *aux_dev)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--}
--
--/**
-- * ice_ptp_auxbus_suspend
-- * @aux_dev: PF's auxiliary device
-- * @state: power management state indicator
-- */
--static int
--ice_ptp_auxbus_suspend(struct auxiliary_device *aux_dev, pm_message_t state)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_resume
-- * @aux_dev: PF's auxiliary device
-- */
--static int ice_ptp_auxbus_resume(struct auxiliary_device *aux_dev)
--{
--	/* Doing nothing here, but handle to auxbus driver must be satisfied */
--	return 0;
--}
--
--/**
-- * ice_ptp_auxbus_create_id_table - Create auxiliary device ID table
-- * @pf: Board private structure
-- * @name: auxiliary bus driver name
-- */
--static struct auxiliary_device_id *
--ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
--{
--	struct auxiliary_device_id *ids;
--
--	/* Second id left empty to terminate the array */
--	ids = devm_kcalloc(ice_pf_to_dev(pf), 2,
--			   sizeof(struct auxiliary_device_id), GFP_KERNEL);
--	if (!ids)
--		return NULL;
--
--	snprintf(ids[0].name, sizeof(ids[0].name), "ice.%s", name);
--
--	return ids;
--}
--
--/**
-- * ice_ptp_register_auxbus_driver - Register PTP auxiliary bus driver
-- * @pf: Board private structure
-- */
--static int __always_unused ice_ptp_register_auxbus_driver(struct ice_pf *pf)
--{
--	struct auxiliary_driver *aux_driver;
--	struct ice_ptp *ptp;
--	struct device *dev;
--	char *name;
--	int err;
--
--	ptp = &pf->ptp;
--	dev = ice_pf_to_dev(pf);
--	aux_driver = &ptp->ports_owner.aux_driver;
--	INIT_LIST_HEAD(&ptp->ports_owner.ports);
--	mutex_init(&ptp->ports_owner.lock);
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
--			      ice_get_ptp_src_clock_index(&pf->hw));
--	if (!name)
--		return -ENOMEM;
--
--	aux_driver->name = name;
--	aux_driver->shutdown = ice_ptp_auxbus_shutdown;
--	aux_driver->suspend = ice_ptp_auxbus_suspend;
--	aux_driver->remove = ice_ptp_auxbus_remove;
--	aux_driver->resume = ice_ptp_auxbus_resume;
--	aux_driver->probe = ice_ptp_auxbus_probe;
--	aux_driver->id_table = ice_ptp_auxbus_create_id_table(pf, name);
--	if (!aux_driver->id_table)
--		return -ENOMEM;
--
--	err = auxiliary_driver_register(aux_driver);
--	if (err) {
--		devm_kfree(dev, aux_driver->id_table);
--		dev_err(dev, "Failed registering aux_driver, name <%s>\n",
--			name);
--	}
--
--	return err;
--}
--
--/**
-- * ice_ptp_unregister_auxbus_driver - Unregister PTP auxiliary bus driver
-- * @pf: Board private structure
-- */
--static void __always_unused ice_ptp_unregister_auxbus_driver(struct ice_pf *pf)
--{
--	struct auxiliary_driver *aux_driver = &pf->ptp.ports_owner.aux_driver;
--
--	auxiliary_driver_unregister(aux_driver);
--	devm_kfree(ice_pf_to_dev(pf), aux_driver->id_table);
--
--	mutex_destroy(&pf->ptp.ports_owner.lock);
--}
- 
- /**
-  * ice_ptp_clock_index - Get the PTP clock index for this device
-@@ -3270,76 +3088,6 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 	}
- }
- 
--/**
-- * ice_ptp_release_auxbus_device
-- * @dev: device that utilizes the auxbus
-- */
--static void ice_ptp_release_auxbus_device(struct device *dev)
--{
--	/* Doing nothing here, but handle to auxbux device must be satisfied */
--}
--
--/**
-- * ice_ptp_create_auxbus_device - Create PTP auxiliary bus device
-- * @pf: Board private structure
-- */
--static __always_unused int ice_ptp_create_auxbus_device(struct ice_pf *pf)
--{
--	struct auxiliary_device *aux_dev;
--	struct ice_ptp *ptp;
--	struct device *dev;
--	char *name;
--	int err;
--	u32 id;
--
--	ptp = &pf->ptp;
--	id = ptp->port.port_num;
--	dev = ice_pf_to_dev(pf);
--
--	aux_dev = &ptp->port.aux_dev;
--
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
--			      ice_get_ptp_src_clock_index(&pf->hw));
--	if (!name)
--		return -ENOMEM;
--
--	aux_dev->name = name;
--	aux_dev->id = id;
--	aux_dev->dev.release = ice_ptp_release_auxbus_device;
--	aux_dev->dev.parent = dev;
--
--	err = auxiliary_device_init(aux_dev);
--	if (err)
--		goto aux_err;
--
--	err = auxiliary_device_add(aux_dev);
--	if (err) {
--		auxiliary_device_uninit(aux_dev);
--		goto aux_err;
--	}
--
--	return 0;
--aux_err:
--	dev_err(dev, "Failed to create PTP auxiliary bus device <%s>\n", name);
--	devm_kfree(dev, name);
--	return err;
--}
--
--/**
-- * ice_ptp_remove_auxbus_device - Remove PTP auxiliary bus device
-- * @pf: Board private structure
-- */
--static __always_unused void ice_ptp_remove_auxbus_device(struct ice_pf *pf)
--{
--	struct auxiliary_device *aux_dev = &pf->ptp.port.aux_dev;
--
--	auxiliary_device_delete(aux_dev);
--	auxiliary_device_uninit(aux_dev);
--
--	memset(aux_dev, 0, sizeof(*aux_dev));
--}
--
- /**
-  * ice_ptp_init_tx_interrupt_mode - Initialize device Tx interrupt mode
-  * @pf: Board private structure
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 68975d835c55..71c09acb5558 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -171,7 +171,6 @@ struct ice_ptp_tx {
-  *
-  * @list_node: list member structure
-  * @tx: Tx timestamp tracking for this port
-- * @aux_dev: auxiliary device associated with this port
-  * @ov_work: delayed work task for tracking when PHY offset is valid
-  * @ps_lock: mutex used to protect the overall PTP PHY start procedure
-  * @link_up: indicates whether the link is up
-@@ -181,7 +180,6 @@ struct ice_ptp_tx {
- struct ice_ptp_port {
- 	struct list_head list_node;
- 	struct ice_ptp_tx tx;
--	struct auxiliary_device aux_dev;
- 	struct kthread_delayed_work ov_work;
- 	struct mutex ps_lock; /* protects overall PTP PHY start procedure */
- 	bool link_up;
-@@ -195,23 +193,6 @@ enum ice_ptp_tx_interrupt {
- 	ICE_PTP_TX_INTERRUPT_ALL,
- };
- 
--/**
-- * struct ice_ptp_port_owner - data used to handle the PTP clock owner info
-- *
-- * This structure contains data necessary for the PTP clock owner to correctly
-- * handle the timestamping feature for all attached ports.
-- *
-- * @aux_driver: the structure carring the auxiliary driver information
-- * @ports: list of porst handled by this port owner
-- * @lock: protect access to ports list
-- */
--
--struct ice_ptp_port_owner {
--	struct auxiliary_driver aux_driver;
--	struct list_head ports;
--	struct mutex lock;
--};
--
- #define GLTSYN_TGT_H_IDX_MAX		4
- 
- enum ice_ptp_state {
-@@ -227,7 +208,6 @@ enum ice_ptp_state {
-  * @state: current state of PTP state machine
-  * @tx_interrupt_mode: the TX interrupt mode for the PTP clock
-  * @port: data for the PHY port initialization procedure
-- * @ports_owner: data for the auxiliary driver owner
-  * @work: delayed work function for periodic tasks
-  * @cached_phc_time: a cached copy of the PHC time for timestamp extension
-  * @cached_phc_jiffies: jiffies when cached_phc_time was last updated
-@@ -251,7 +231,6 @@ struct ice_ptp {
- 	enum ice_ptp_state state;
- 	enum ice_ptp_tx_interrupt tx_interrupt_mode;
- 	struct ice_ptp_port port;
--	struct ice_ptp_port_owner ports_owner;
- 	struct kthread_delayed_work work;
- 	u64 cached_phc_time;
- 	unsigned long cached_phc_jiffies;
--- 
-2.43.0
+That makes sense to me.
+
+>>
+>> Outside of that:
+>>
+>> Reviewed-by: Aaron Conole <aconole@redhat.com>
+>>
+>> > +
+>> > +	# client -> server samples should only contain the first 14 bytes of=
+ the packet.
+>> > +	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
+>> > +			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
+>> > +	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
+>> > +			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
+>> > +
+>> > +	return 0
+>> > +}
+>> > +
+>> >  # drop_reason test
+>> >  # - drop packets and verify the right drop reason is reported
+>> >  test_drop_reason() {
+>> > diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/to=
+ols/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> > index e8dc9af10d4d..1e15b0818074 100644
+>> > --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> > +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+>> > @@ -28,8 +28,10 @@ try:
+>> >      from pyroute2.netlink import genlmsg
+>> >      from pyroute2.netlink import nla
+>> >      from pyroute2.netlink import nlmsg_atoms
+>> > +    from pyroute2.netlink.event import EventSocket
+>> >      from pyroute2.netlink.exceptions eimport NetlinkError
+>> >      from pyroute2.netlink.generic import GenericNetlinkSocket
+>> > +    from pyroute2.netlink.nlsocket import Marshal
+>> >      import pyroute2
+>> >      import pyroute2.iproute
+>> >
+>> > @@ -2460,10 +2462,70 @@ class OvsFlow(GenericNetlinkSocket):
+>> >          print("MISS upcall[%d/%s]: %s" % (seq, pktpres, keystr), flus=
+h=3DTrue)
+>> >
+>> >      def execute(self, packetmsg):
+>> > -        print("userspace execute command")
+>> > +        print("userspace execute command", flush=3DTrue)
+>> >
+>> >      def action(self, packetmsg):
+>> > -        print("userspace action command")
+>> > +        print("userspace action command", flush=3DTrue)
+>> > +
+>> > +
+>> > +class psample_sample(genlmsg):
+>> > +    nla_map =3D (
+>> > +        ("PSAMPLE_ATTR_IIFINDEX", "none"),
+>> > +        ("PSAMPLE_ATTR_OIFINDEX", "none"),
+>> > +        ("PSAMPLE_ATTR_ORIGSIZE", "none"),
+>> > +        ("PSAMPLE_ATTR_SAMPLE_GROUP", "uint32"),
+>> > +        ("PSAMPLE_ATTR_GROUP_SEQ", "none"),
+>> > +        ("PSAMPLE_ATTR_SAMPLE_RATE", "uint32"),
+>> > +        ("PSAMPLE_ATTR_DATA", "array(uint8)"),
+>> > +        ("PSAMPLE_ATTR_GROUP_REFCOUNT", "none"),
+>> > +        ("PSAMPLE_ATTR_TUNNEL", "none"),
+>> > +        ("PSAMPLE_ATTR_PAD", "none"),
+>> > +        ("PSAMPLE_ATTR_OUT_TC", "none"),
+>> > +        ("PSAMPLE_ATTR_OUT_TC_OCC", "none"),
+>> > +        ("PSAMPLE_ATTR_LATENCY", "none"),
+>> > +        ("PSAMPLE_ATTR_TIMESTAMP", "none"),
+>> > +        ("PSAMPLE_ATTR_PROTO", "none"),
+>> > +        ("PSAMPLE_ATTR_USER_COOKIE", "array(uint8)"),
+>> > +    )
+>> > +
+>> > +    def dpstr(self):
+>> > +        fields =3D []
+>> > +        data =3D ""
+>> > +        for (attr, value) in self["attrs"]:
+>> > +            if attr =3D=3D "PSAMPLE_ATTR_SAMPLE_GROUP":
+>> > +                fields.append("group:%d" % value)
+>> > +            if attr =3D=3D "PSAMPLE_ATTR_SAMPLE_RATE":
+>> > +                fields.append("rate:%d" % value)
+>> > +            if attr =3D=3D "PSAMPLE_ATTR_USER_COOKIE":
+>> > +                value =3D "".join(format(x, "02x") for x in value)
+>> > +                fields.append("cookie:%s" % value)
+>> > +            if attr =3D=3D "PSAMPLE_ATTR_DATA" and len(value) > 0:
+>> > +                data =3D "data:%s" % "".join(format(x, "02x") for x i=
+n value)
+>> > +
+>> > +        return ("%s %s" % (",".join(fields), data)).strip()
+>> > +
+>> > +
+>> > +class psample_msg(Marshal):
+>> > +    PSAMPLE_CMD_SAMPLE =3D 0
+>> > +    PSAMPLE_CMD_GET_GROUP =3D 1
+>> > +    PSAMPLE_CMD_NEW_GROUP =3D 2
+>> > +    PSAMPLE_CMD_DEL_GROUP =3D 3
+>> > +    PSAMPLE_CMD_SET_FILTER =3D 4
+>> > +    msg_map =3D {PSAMPLE_CMD_SAMPLE: psample_sample}
+>> > +
+>> > +
+>> > +class PsampleEvent(EventSocket):
+>> > +    genl_family =3D "psample"
+>> > +    mcast_groups =3D ["packets"]
+>> > +    marshal_class =3D psample_msg
+>> > +
+>> > +    def read_samples(self):
+>> > +        while True:
+>> > +            try:
+>> > +                for msg in self.get():
+>> > +                    print(msg.dpstr(), flush=3DTrue)
+>> > +            except NetlinkError as ne:
+>> > +                raise ne
+>> >
+>> >
+>> >  def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=3DNDB(), vpl=3DOvsVp=
+ort()):
+>> > @@ -2530,7 +2592,7 @@ def main(argv):
+>> >          help=3D"Increment 'verbose' output counter.",
+>> >          default=3D0,
+>> >      )
+>> > -    subparsers =3D parser.add_subparsers()
+>> > +    subparsers =3D parser.add_subparsers(dest=3D"subcommand")
+>> >
+>> >      showdpcmd =3D subparsers.add_parser("show")
+>> >      showdpcmd.add_argument(
+>> > @@ -2605,6 +2667,8 @@ def main(argv):
+>> >      delfscmd =3D subparsers.add_parser("del-flows")
+>> >      delfscmd.add_argument("flsbr", help=3D"Datapath name")
+>> >
+>> > +    subparsers.add_parser("psample-events")
+>> > +
+>> >      args =3D parser.parse_args()
+>> >
+>> >      if args.verbose > 0:
+>> > @@ -2619,6 +2683,9 @@ def main(argv):
+>> >
+>> >      sys.setrecursionlimit(100000)
+>> >
+>> > +    if args.subcommand =3D=3D "psample-events":
+>> > +        PsampleEvent().read_samples()
+>> > +
+>> >      if hasattr(args, "showdp"):
+>> >          found =3D False
+>> >          for iface in ndb.interfaces:
+>>
 
 
