@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-108510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67AF9240AB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C84B9240BD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 263B71F24C91
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:25:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5641F24334
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4561BA891;
-	Tue,  2 Jul 2024 14:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77A31BA898;
+	Tue,  2 Jul 2024 14:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U0lJZk7j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsAz2sqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64781BA874;
-	Tue,  2 Jul 2024 14:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8B11BA08F;
+	Tue,  2 Jul 2024 14:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930291; cv=none; b=XYvL//LMPPkvG7hKWSKy7/SwnAcFjlxWUYSdPLuaL/U5GZn4SbAxSn7pCWyxM6VKunL3tq7qAIPbEZiJwJsjC79OsRUWed3AL6aiQ0OmDPIdMV3Xx93p/rkaRYV4Tq9ix8j5h99IXjYQvh8QqzPzCdYRyHu/rB2fsQuSlXeclZQ=
+	t=1719930358; cv=none; b=M8qz+FO52R3bZJeqvMD8wiIn1BIO9tS87LLiHF5qgn2QLw1attGPCDG9zz1397bmH2Y5nl6KbvfRvGYmqyNkyfzMKX5XXwr8uYhA2owVOonu7lasXaIEUZzFbEbGzPMeSFmI58pwGdOKg5MmbTROcZtDFPe+7E6cBVeRzLpL+Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930291; c=relaxed/simple;
-	bh=pQ0VyLEWPbTzv8ueT/SYA25grM78ReWuMdOeMbNrUDg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gkVD1i9mKxP6NVfkL4qYfNThTOWihj1qNyHc/Kgli7RZMErXJEfuMqmW+lWWcRFy6f7Bcqa4EIMsfEPasvSXkNTPJRKNk+KYIsDLmQhKpbY2sEMgEZPa3JycJWmzAjkWpHV9rYpK35EWutyThp95ORM0Qyc4EYW2Uqqb4YydeW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U0lJZk7j; arc=none smtp.client-ip=209.85.128.68
+	s=arc-20240116; t=1719930358; c=relaxed/simple;
+	bh=MLZYFlsiS+kvju+BKYFcbKtNPb5CtXQPEdFDRDJl6zg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PePTw1txkRiF4rtqitpc7dRICfdi7d37pjutPOUx7aA7WINfokIgjMX3rCsh31lW/frl0UCnV+n2Ki9YM46SyTw6eaVl4eLzJTfESQJNPZS4kq+AFzsCY580UDt1f26QRpmhrACWEwqI8wgF38uCx02tMoUwmiMjGCjWch1/New=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PsAz2sqB; arc=none smtp.client-ip=209.85.128.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-42574064b16so26759465e9.2;
-        Tue, 02 Jul 2024 07:24:49 -0700 (PDT)
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-42563a9fa58so30231955e9.0;
+        Tue, 02 Jul 2024 07:25:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719930288; x=1720535088; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
-        b=U0lJZk7j838j0RN9wVhvEkgwxIIisef+6GnZvYMxQad3c4rA3CGBavY4V78+SFc8wc
-         mXayx2ZTLN+O4Ji2kLGr6tTsDsLM52998xf+1c/xY3mnkji5Wo8EbH38D/jZUjJKstRj
-         uK6UeULrboMTahGdVzPxnrEKW9qjEv6d7hEQvS/pjQQnhZfvY9OxfZTcyGR/frwL43DE
-         ue44YEJ7/B68cktWkenGK7bcFvFGiVHZzFR8yR7AoxgPbbkUcfHHH8bHTIaqAnoyQ+az
-         cziLmLlB73gk1ilOW4qUwNLm/vtug8QD6hvJ9Em0dcEonTfG/1qHwTNEmsu1uEAftP/r
-         cqSg==
+        d=gmail.com; s=20230601; t=1719930356; x=1720535156; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N2+SoMSqztWhKLaH4TpbgJXuTayM16wclZV4EEtmxt8=;
+        b=PsAz2sqBbdofxEyBgnJqeUuFK6YIKQ1aggQ6Ay3VMPXx3SKXZUXzDJG6KnMqo6ezxq
+         ZQsVPOHHTFXDX7XgQJgdbzIDY0aB/9+ECZJQ21lvAhmk30pLKk/19OiNAvXqscwjLjGu
+         Le8Pvg74xcpLeFth+SUCtr7KmPk8g2ilzVjiZe6I6/TmwVupXtBpGZ0zscsgR1jDvwRT
+         BTwsHbeBbaH0cd0STfN2ZRX5LW6WkxlI0vi4w6wAs2WWXO5+OJD3SeLs8TqmSDKy5QVK
+         nQcpGltHWc5o2Z4xG/cCyeYRXN9DMbz/j7IywM6FioB4PVSoBTzypXzanXCUp0uL2PcN
+         e35w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719930288; x=1720535088;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UeeAUA+M1CrSeGLqCio6FXkyYBfV90EEN3G250oeFOA=;
-        b=NITcHt3HIH54ETvg2uEBZTRRr3pwuWEYs1pYUhNbL/wCPZhmzhxsTV4j17NOrcTYH/
-         gOeBHJz14+prYIFkNvQhmhnZCxPMhfXDvB3B3zRaNsbrANe2kBEaiDGYvNptPO/+vkeE
-         BQ4Kv/i7hcTi8+cGdRYKjDiWvMo29JkRfT7cXbXdszSdScphZroVdWuVlU9GMmEnwqo2
-         75L7+QuZ35BIb4KWLH9wsUv/SxEKSvKzOxdhIDzO7Ruu5jdqY3g80H3p9dmwa01GBhT8
-         +/cvhMHAKtHeidTHUb+a9RdG5NIp+88rkkNJjz2wNAloPyIvAqU0fp78OIZHErYIXAoe
-         +RnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVq2E9+3D1cGYuH5VxsnTdInI/YpgiBkUKR0KP91ZaL3TNzl1QH7jCS9Lj0aJgIi8XocUK6i1AdBDHpxuVgxRGOOCuzXBGgzXUIm6KAdJ6yro8pLl0U8YQU9kW0iv2xdZx6gsLu
-X-Gm-Message-State: AOJu0YwzekyNjDvdgERkI2lefDR62QUidG5EHNaHe2vGUbU9V1P/Nk7J
-	eZeUbZiOv0A1Ovr95bqa0QgY4NiVQH9r/MIP8A+7FnneFN7d8ln4
-X-Google-Smtp-Source: AGHT+IFVs8QCxMuEfkGcfHEIMry2KNCFjt+wxd4AxRq+lltb3dEuh8t1F/BUWxxFZ5jbRr9E3aHOiw==
-X-Received: by 2002:a05:600c:705:b0:424:a4f1:8c3e with SMTP id 5b1f17b1804b1-4257a074b50mr68377395e9.34.1719930287765;
-        Tue, 02 Jul 2024 07:24:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719930356; x=1720535156;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N2+SoMSqztWhKLaH4TpbgJXuTayM16wclZV4EEtmxt8=;
+        b=LLO4421gJPLIdoKzKANOtboujHUoZPrYZ6cExYUSJgfuEItMdb98dRqKttJUgT3qPq
+         VkXcPetErZ5+YFw9hzb1f2yoLY4Z271vfIjGhJRk2zWzqIxti8MTSDfBDGePhKyalgQf
+         VWEuEeGp1axO+f7aDRXBEAnVUK/LekCQGXCKFK8WiW7WDJuP1SU1KFy036JzFBPZq0ks
+         859xqLnQHrDhtYSXkqQkCpoFYsQWnByxFhIa08UEWuF0HwwNKSm27acy9He97FTp3iCi
+         bsx6t2SgjqeSVTRwm53rs5wSRhiyWOXjZ9o5b/jeM1aZLwbyRade1Ntn6VT5p5mvDCUx
+         rJNg==
+X-Forwarded-Encrypted: i=1; AJvYcCWEsiCO7UkpHVCn8Ahi8BUUW5lnzir/S+RB73/7hSAQoiN3WU0NporgCbXS9zl4QZSc8JxaGUhYCpwyQfO5T8VkSf7sbrqWR2pkxNvk2wGIocK1Mq5S7zy3/xz55LGSmq72tFIZ
+X-Gm-Message-State: AOJu0YxSGTXWkGkLr6ZyJWwHOLWek7QdflBjrJxVXQFOH/Ogc0M9VZdR
+	XJX++XhJvhsYTq8L/b6nYchkabf6AKRXhWPJLVB3ZrUEUOAzPEv1
+X-Google-Smtp-Source: AGHT+IH2gOpUBvCZ1EPNqzsj68Kd1RGqjiqeAZ/PKSIFasj9ODV1XpxTM/B3jZe0a8FBtmiOeFm1JA==
+X-Received: by 2002:a05:600c:3515:b0:425:6f85:6013 with SMTP id 5b1f17b1804b1-4257a00aaaemr55217245e9.8.1719930355476;
+        Tue, 02 Jul 2024 07:25:55 -0700 (PDT)
 Received: from localhost ([45.130.85.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256f55c4b5sm186586065e9.43.2024.07.02.07.24.45
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0fba16sm13465151f8f.79.2024.07.02.07.25.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:24:47 -0700 (PDT)
+        Tue, 02 Jul 2024 07:25:55 -0700 (PDT)
 From: Leone Fernando <leone4fernando@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -75,9 +77,11 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Leone Fernando <leone4fernando@gmail.com>
-Subject: [RESEND PATCH net-next v2 0/4] net: route: improve route hinting
-Date: Tue,  2 Jul 2024 16:24:02 +0200
-Message-Id: <20240702142406.465415-1-leone4fernando@gmail.com>
+Subject: [PATCH net-next v2 1/4] net: route: expire rt if the dst it holds is expired
+Date: Tue,  2 Jul 2024 16:24:03 +0200
+Message-Id: <20240702142406.465415-2-leone4fernando@gmail.com>
+In-Reply-To: <20240702142406.465415-1-leone4fernando@gmail.com>
+References: <20240702142406.465415-1-leone4fernando@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,121 +90,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In 2017, Paolo Abeni introduced the hinting mechanism [1] to the routing
-sub-system. The hinting optimization improves performance by reusing
-previously found dsts instead of looking them up for each skb.
+The function rt_is_expired is used to verify that a cached dst is valid.
+Currently, this function ignores the rt.dst->expires value.
 
-This patch series introduces a generalized version of the hinting mechanism that
-can "remember" a larger number of dsts. This reduces the number of dst
-lookups for frequently encountered daddrs.
+Add a check to rt_is_expired that validates that the dst is not expired.
 
-Before diving into the code and the benchmarking results, it's important
-to address the deletion of the old route cache [2] and why
-this solution is different. The original cache was complicated,
-vulnerable to DOS attacks and had unstable performance.
+Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
+---
+ net/ipv4/route.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The new input dst_cache is much simpler thanks to its lazy approach,
-improving performance without the overhead of the removed cache
-implementation. Instead of using timers and GC, the deletion of invalid
-entries is performed lazily during their lookups.
-The dsts are stored in a simple, lightweight, static hash table. This
-keeps the lookup times fast yet stable, preventing DOS upon cache misses.
-The new input dst_cache implementation is built over the existing
-dst_cache code which supplies a fast lockless percpu behavior.
-
-The measurement setup is comprised of 2 machines with mlx5 100Gbit NIC.
-I sent small UDP packets with 5000 daddrs (10x of cache size) from one
-machine to the other while also varying the saddr and the tos. I set
-an iptables rule to drop the packets after routing. the receiving
-machine's CPU (i9) was saturated. 
-
-Thanks a lot to David Ahern for all the help and guidance!
-
-I measured the rx PPS using ifpps and the per-queue PPS using ethtool -S.
-These are the results:
-
-Total PPS:
-mainline              patched                   delta
-  Kpps                  Kpps                      %
-  6903                  8105                    17.41
-
-Per-Queue PPS:
-Queue          mainline         patched
-  0             345775          411780
-  1             345252          414387
-  2             347724          407501
-  3             346232          413456
-  4             347271          412088
-  5             346808          400910
-  6             346243          406699
-  7             346484          409104
-  8             342731          404612
-  9             344068          407558
-  10            345832          409558
-  11            346296          409935
-  12            346900          399084
-  13            345980          404513
-  14            347244          405136
-  15            346801          408752
-  16            345984          410865
-  17            346632          405752
-  18            346064          407539
-  19            344861          408364
- total          6921182         8157593
-
-I also verified that the number of packets caught by the iptables rule
-matches the measured PPS.
-
-TCP throughput was not affected by the patch, below is iperf3 output:
-       mainline                                     patched 
-15.4 GBytes 13.2 Gbits/sec                  15.5 GBytes 13.2 Gbits/sec
-
-[1] https://lore.kernel.org/netdev/cover.1574252982.git.pabeni@redhat.com/
-[2] https://lore.kernel.org/netdev/20120720.142502.1144557295933737451.davem@davemloft.net/
-
-v1->v2:
-- fix bitwise cast warning
-- improved measurements setup
-
-v1:
-- fix typo while allocating per-cpu cache
-- while using dst from the dst_cache set IPSKB_DOREDIRECT correctly
-- always compile dst_cache
-
-RFC-v2:
-- remove unnecessary macro
-- move inline to .h file
-
-RFC-v1: https://lore.kernel.org/netdev/d951b371-4138-4bda-a1c5-7606a28c81f0@gmail.com/
-RFC-v2: https://lore.kernel.org/netdev/3a17c86d-08a5-46d2-8622-abc13d4a411e@gmail.com/
-
-Leone Fernando (4):
-  net: route: expire rt if the dst it holds is expired
-  net: dst_cache: add input_dst_cache API
-  net: route: always compile dst_cache
-  net: route: replace route hints with input_dst_cache
-
- drivers/net/Kconfig        |   1 -
- include/net/dst_cache.h    |  68 +++++++++++++++++++
- include/net/dst_metadata.h |   2 -
- include/net/ip_tunnels.h   |   2 -
- include/net/route.h        |   6 +-
- net/Kconfig                |   4 --
- net/core/Makefile          |   3 +-
- net/core/dst.c             |   4 --
- net/core/dst_cache.c       | 132 +++++++++++++++++++++++++++++++++++++
- net/ipv4/Kconfig           |   1 -
- net/ipv4/ip_input.c        |  58 ++++++++--------
- net/ipv4/ip_tunnel_core.c  |   4 --
- net/ipv4/route.c           |  75 +++++++++++++++------
- net/ipv4/udp_tunnel_core.c |   4 --
- net/ipv6/Kconfig           |   4 --
- net/ipv6/ip6_udp_tunnel.c  |   4 --
- net/netfilter/nft_tunnel.c |   2 -
- net/openvswitch/Kconfig    |   1 -
- net/sched/act_tunnel_key.c |   2 -
- 19 files changed, 291 insertions(+), 86 deletions(-)
-
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 54512acbead7..fd0883da7834 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -390,7 +390,8 @@ static inline int ip_rt_proc_init(void)
+ 
+ static inline bool rt_is_expired(const struct rtable *rth)
+ {
+-	return rth->rt_genid != rt_genid_ipv4(dev_net(rth->dst.dev));
++	return rth->rt_genid != rt_genid_ipv4(dev_net(rth->dst.dev)) ||
++	       (rth->dst.expires && time_after(jiffies, rth->dst.expires));
+ }
+ 
+ void rt_cache_flush(struct net *net)
 -- 
 2.34.1
 
