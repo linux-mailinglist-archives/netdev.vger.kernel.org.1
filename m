@@ -1,161 +1,95 @@
-Return-Path: <netdev+bounces-108454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43ACD923E11
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:43:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B381C923E1D
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E413E1F24147
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:43:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51E6BB20BF0
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CAE168C3F;
-	Tue,  2 Jul 2024 12:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9383158862;
+	Tue,  2 Jul 2024 12:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Euc/Hw1E"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AF116C6A2;
-	Tue,  2 Jul 2024 12:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B033085C74;
+	Tue,  2 Jul 2024 12:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719924224; cv=none; b=kfnigZiNY9d9VnFFiIjt3MTCcTAk6Pfn6vzg+TS2vWWi5cKqEQa0PjZkIOSADDMqvICIpeACHDrgs4MuP7cabzgYDeNsYOgSFqYc6vhBKr0ui3Q7fd1sPqLkTFuB0XJH/Q0UMEzFU+i09kh93RtgVG6jVLtNwk0wsKyjc0luCA4=
+	t=1719924401; cv=none; b=IEX4z3NUc+zeconPMOOUw2Kf4DcSWmbClgNWP/bL/MqCe9vuXqJ4gzc2g7lbtU/lOPbXfV/8W5I6M76MYKJEec7Zkk875FlI7RDwd1r0WGSehflztW3vZ8/kVimUv2sf4Q8weEult4iwMVvjsv3Z/u1nECUjBBgH850EzSF6k/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719924224; c=relaxed/simple;
-	bh=+4pUZI8Vh3YIUfOxi6pW0WIBII4dOgHNC8SzYkgDUCw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WKxKPHBin60m4bVMw1UVVCRSr5kcNS7aWzk8cubNJt7H9XGc8o+e6qOhX/biDeYh4dqNHvFO9ARqfTzX496RW9URGW6rqctO+mjU+tcQAlYbIBeuNNzWj7jTX/ZuPgV+xlWMlvRH4l+Fgjwx2cMhkUKtZrVbBL0p7m8I0Xh+sQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WD2XV3dNTz1T4H3;
-	Tue,  2 Jul 2024 20:39:06 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9B3241400CD;
-	Tue,  2 Jul 2024 20:43:38 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 2 Jul 2024 20:43:34 +0800
-Message-ID: <9943a87b-b981-794a-2c3d-b8dc143fe3e9@huawei-partners.com>
-Date: Tue, 2 Jul 2024 15:43:21 +0300
+	s=arc-20240116; t=1719924401; c=relaxed/simple;
+	bh=i0Yfsijdh94yiEq7DVgp9B4aT3nBbF8AG7rJAZLWCkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlPdx8e6D1CIuTTNp7yi5Tu1bbaYT3KgVCwWtkqM5AXhJcoboRYyo10HFzXnkq0NV40bDcLE34LcNiHrhXFwUrmqHd8sdX1o/S7tG3yYZTe6SYIS0V4lGxeuLNcbpi+BsvNEqwIQz0ac0lHlqS8G2U0SAESU0tMps7C/bn7cSbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Euc/Hw1E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12A31C2BD10;
+	Tue,  2 Jul 2024 12:46:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719924401;
+	bh=i0Yfsijdh94yiEq7DVgp9B4aT3nBbF8AG7rJAZLWCkY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Euc/Hw1Eb8AqkQzqy+qxCOf4dOpE8gDj5tBdTCa4V+8Rgi74Jn8c9UQG3Z3BAf0q4
+	 /15aKYmA/Tv579wFiUZN+R34AtTxejvTSpOZKAmKFu3yqNd0DnbKL3mNYW32e+3Yjl
+	 lYgMdAMxjQYORk129swI/Js4Fl+hUQUvRYNJ/uEB7dHZ5UVQ7kIZSen8bqRDhdXikC
+	 2xZhJIkpLq3SdWBrwbOD6x/wZncyg/8sY6MIZ/7sJW/IooI4HWkr3iWKj02dh1midk
+	 0tX47GOP+VCnc7S0WWJethMQYThlPGTd+rT2TkdeM8HiKPRrO6EOC0XHN0PlK06nxv
+	 QvjpCFL1iOGUA==
+Date: Tue, 2 Jul 2024 13:46:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Chuck Lever III <chuck.lever@oracle.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+	Jakub Kicinski <kuba@kernel.org>, Neil Brown <neilb@suse.de>,
+	Jeff Layton <jlayton@kernel.org>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <dai.ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, netdev <netdev@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	Lex Siegel <usiegl00@gmail.com>
+Subject: Re: [PATCH net v2] net, sunrpc: Remap EPERM in case of connection
+ failure in xs_tcp_setup_socket
+Message-ID: <20240702124636.GI598357@kernel.org>
+References: <2e62f0fc284b2f27156cd497fbb733b55a5ade43.1719592013.git.daniel@iogearbox.net>
+ <Zn7wtStV+iafWRXj@tissot.1015granger.net>
+ <20240701105742.GV17134@kernel.org>
+ <39757894-2C57-4DD6-AF93-25EA35C87C3D@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] landlock: Add hook on socket_listen()
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	<willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240408094747.1761850-1-ivanov.mikhail1@huawei-partners.com>
- <20240408094747.1761850-2-ivanov.mikhail1@huawei-partners.com>
- <20240425.Soot5eNeexol@digikod.net>
- <a18333c0-4efc-dcf4-a219-ec46480352b1@huawei-partners.com>
- <ZnMr30kSCGME16rO@google.com>
- <b2d1a152-0241-6a3a-1f31-4a1045fff856@huawei-partners.com>
- <ZoKB7bl41ZOiiXmF@google.com>
- <bd2622cf-27e2-dbb6-735a-0adf6c79b339@huawei-partners.com>
- <ZoLPhQ4eyl0H_oSQ@google.com>
-From: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZoLPhQ4eyl0H_oSQ@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+In-Reply-To: <39757894-2C57-4DD6-AF93-25EA35C87C3D@oracle.com>
 
-7/1/2024 6:47 PM, Günther Noack wrote:
-> On Mon, Jul 01, 2024 at 04:10:27PM +0300, Ivanov Mikhail wrote:
->> Thanks for the great explanation! We're on the same page.
->>
->> Considering that binding to ephemeral ports can be done not only with
->> bind() or listen(), I think your approach is more correct.
->> Restricting any possible binding to ephemeral ports just using
->> LANDLOCK_ACCESS_NET_BIND_TCP wouldn't allow sandboxed processes
->> to deny listen() without pre-binding (which is quite unsafe) and
->> use connect() in the usuall way (without pre-binding).
->>
->> Controlling ephemeral ports allocation for listen() can be done in the
->> same way as for LANDLOCK_ACCESS_NET_BIND_TCP in the patch with
->> LANDLOCK_ACCESS_NET_LISTEN_TCP access right implementation.
-> 
-> That sounds good, yes! 👍
-> 
-> 
->> I'm only concerned about controlling the auto-binding for other
->> operations (such as connect() and sendto() for UDP). As I said, I think
->> this can also be useful: users will be able to control which processes
->> are allowed to use ephemeral ports from ip_local_port_range and which
->> are not, and they must assign ports for each operation explicitly. If
->> you agree that such control is reasonable, we'll probably  have to
->> consider some API changes, since such control is currently not possible.
->>
->> We should clarify this before I send a patch with the
->> LANDLOCK_ACCESS_NET_LISTEN_TCP implementation. WDYT?
-> 
-> LANDLOCK_ACCESS_NET_LISTEN_TCP seems like the most important to me.
-> 
-> For connect() and sendto(), I think the access rights are less urgent:
-> 
-> connect(): We already have LANDLOCK_ACCESS_NET_CONNECT_TCP, but that one is
-> getting restricted for the *remote* port number.
-> 
->   (a) I think it would be possible to do the same for the *local* port number, by
->       introducing a separate LANDLOCK_ACCESS_NET_CONNECT_TCP_LOCALPORT right.
->       (Yes, the name is absolutely horrible, this is just for the example :))
->       hook_socket_connect() would then need to do both a check for the remote
->       port using LANDLOCK_ACCESS_NET_CONNECT_TCP, as it already does today, as
->       well as a check for the (previously bound?) local port using
->       LANDLOCK_ACCESS_NET_CONNECT_TCP_LOCALPORT.
->       
->       So I think it is extensible in that direction, in principle, even though I
->       don't currently have a good name for that access right. :)
+On Mon, Jul 01, 2024 at 02:04:22PM +0000, Chuck Lever III wrote:
+> > On Jul 1, 2024, at 6:57 AM, Simon Horman <horms@kernel.org> wrote:
+> > On Fri, Jun 28, 2024 at 01:19:49PM -0400, Chuck Lever wrote:
+> >> On Fri, Jun 28, 2024 at 06:31:23PM +0200, Daniel Borkmann wrote:
 
-Indeed, implementing a new type of rule seems to be an optimal approach
-for this.
+...
 
->       
->   (b) Compared to what LANDLOCK_ACCESS_NET_BIND_TCP already restricts, a
->       hypothetical LANDLOCK_ACCESS_NET_CONNECT_TCP_LOCALPORT right would only
->       additionally restrict the use of ephemeral ports.  I'm currently having a
->       hard time seeing what an attacker could do with that (use up all ephemeral
->       ports?).
-
-I thought about something like that, yeah) Also, I tried to find out
-if there are cases where port remains bound to the client socket after
-the connection is completed. In this case, listen() can be called to a
-socket with a port bound via connect() call. In the case of TCP, such
-scenario is not possible, port is always deallocated in tcp_set_state()
-method.
-
-So, I don't see any realworld vulnerabilities, we can leave this case
-until someone comes up with a real issue.
-
+> >> Hi Daniel -
+> >> 
+> >> I know this is not documented in MAINTAINERS, but changes to
+> >> net/sunrpc/xprtsock.c go to Anna Schumaker and Trond Myklebust,
+> >> cc: linux-nfs@vger.
+> > 
+> > Would it be possible to update MAINTAINERS accordingly?
 > 
-> sendto(): I think this is not relevant yet, because as the documentation said,
-> ephemeral ports are only handed out when sendto() is used with datagram (UDP)
-> sockets.
-> 
-> Once Landlock starts having UDP support, this would become relevant, but for
-> this patch set, I think that the TCP server use case as discussed further above
-> in this thread is very compelling.
+> I can do it, of course, but I'd like to discuss this
+> with the NFS client maintainers to ensure they agree
+> on how the files are divided between the trees.
 
-Agreed. Anyway, if someone finds any interesting cases with
-auto-binding via sendto(), we can implement a new rule, as you suggested
-for connect().
+Hi Chuck,
 
-Thanks you for your research and ideas, Günther!
-I'll prepare the LANDLOCK_ACCESS_NET_LISTEN_TCP patchset for the review.
-
-> 
-> Thanks,
-> —Günther
+Thanks in advance for raising this with the NFS client maintainers.
+I do think it would be nice to resolve.
 
