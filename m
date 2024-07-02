@@ -1,246 +1,94 @@
-Return-Path: <netdev+bounces-108404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E984923AF5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB14923AF9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80E801C20BFB
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 10:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91D751C21E50
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 10:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5274D14D42C;
-	Tue,  2 Jul 2024 10:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nci9Ue/r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456701509AE;
+	Tue,  2 Jul 2024 10:00:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5B012F392
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 10:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A71112F392
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 10:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719914415; cv=none; b=RlDnGfFCfDIZEzt06sQo1LsbNZUkQzsaWSrFWD8XVOXrgEXPtXyeJfSfdHMl07Oy/lWk7HzAqHPbQUSbRz9yPBee2qhc3cKuyhPDrcAgeelkub9LF8gSFpvFOvHmhljLwU9QXXHtI1L4jDg5lAT0n0VuKhybq+l+JTj/pV1gTYA=
+	t=1719914447; cv=none; b=u3HxtqetySNf3/JmwyibN/0yifC+1D/fHr12JcDRUTRVAWddhAalt8ILkortpqLyvROiFNMUwgKhOqobaExpfgUS8bejyzrznnOY0iqdKvGnzoX0k5QniHYkTk87suBxqvzdjHyopJ/XGaMogjUZ431MhYvJJMiOupHRDS2q9tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719914415; c=relaxed/simple;
-	bh=FL9d6OezN0DaGSeDwX3ch8BUZ6rZMm7r6XTHPIhIbRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IINrn8kSk4KIFMxTxwrRkpGehGi3CQa3vR5l+bzaBKCCzdkLx3isepYrL5QbPZMH6lNgCwEhMBhJ2S77wfN5jToLF0+mDHC+2k/wfKtrqvX8n/NZsyuZknvjMB2lWEcYYA2n9BA9U6KXhQ2vvxXRSmnNfJGyqpY1ImDnuU89fvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nci9Ue/r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719914412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yv6opSv0vaul5KLer+4NSP+gJbph4rk+UabR1uMZGi8=;
-	b=Nci9Ue/rzg61nVL8k0hwpvHPk4kx8r9SdDV2MtOsF34jqqB5Y9kqXk0c+CSg7DzYRDPChw
-	ynLOzZRtx/U5AflUaIKCO12CwgcZwgyTnSRsr5DGzuoYClEcop5ev9GyLPoonzjhM6tERc
-	cO0dXoiLi4h1WqRht5BUyUi7cu8Jn+0=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-6PUzV59tMyub6pVZU7Ewfg-1; Tue, 02 Jul 2024 06:00:10 -0400
-X-MC-Unique: 6PUzV59tMyub6pVZU7Ewfg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b07ef34bfcso75276296d6.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 03:00:10 -0700 (PDT)
+	s=arc-20240116; t=1719914447; c=relaxed/simple;
+	bh=Ktl1tfVd73nnyU6RFdtGDuVOjDp+QDqMgQ/2LXNl/Bo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZkxAhQ8QD82QfkFNM+vORGfZNiw2oxMfMF6iMtcUqpe4um6VKwQBAj8m/t+fzgm0AfS/WM+1Y3DKka1UGwQ7O5B7rjfFPYyUjZR43PaqLxHtXHlku1t4fABo95OSNo9snRvvj1R6LM0Ok5A24ne4oRtar05/CLIh2nk2L7FK0uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ec5f72f073so3549431fa.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 03:00:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719914409; x=1720519209;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yv6opSv0vaul5KLer+4NSP+gJbph4rk+UabR1uMZGi8=;
-        b=WDLjcxHCCo4iW8sZgtvmfpHXajoGjKxSTX27cdyV6Kto+4AJJr4/Mi1GtrS+aPIL0J
-         e+PdVuGSNOx3WdIEdJlncg/mJqSniaMtlNwB2t4wBBFCpe6aMkbJLXHE2MxSsovuesKG
-         LtSIk9GutFnzjKmgSGPxSZdafEz+3WyRyCYOps7Tm8dYLLWhLLlN/x8BTu21NCGgyJh/
-         xnr/gv/khKS73sRdItNJ1RH7MZwrh+ge7oKyEFPP2mxxU3nexSjj4jKUXt1gHUZO3VEB
-         hrZHchGhxfwj1vPVH+GvoEssVxjqG18ekl3+FoAFB9hGp1sIp464bnzVkTvaM6J14mhR
-         cpjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJfuFxP2ek8qx80Avf3mZ89rJ51s8AY3+nmRJif4bqWdj9x/Dot0OTTGxsk9+vItSVWOUbAHDBU85Yp1vO9uf9/kwktb+I
-X-Gm-Message-State: AOJu0YwFCabEQSGOPiqjH46Ibc5LhXVkw0k60rT8X9DuVF0J1aN2GuvO
-	rluGgaRGIbwrymqcUC/RasCciPu4pwuJWdV4s/RPqmyQw4XMxYaYfs07Eg+UECatQuosEp0o2+D
-	GwvfgF3ZA60RTYFNPC7jqMKCNl+N/iteEP4R68IEFa4MW0ZdrzbNyOQ==
-X-Received: by 2002:ad4:5dc9:0:b0:6af:7b2e:1868 with SMTP id 6a1803df08f44-6b5b6eb34demr150374146d6.18.1719914409596;
-        Tue, 02 Jul 2024 03:00:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6OFvuiXkTbjAlYyeTGZ8incXsosT5LSwB4zEJQ1+txCs4HqKJX0owYZypPLWDDL7ByIDetg==
-X-Received: by 2002:ad4:5dc9:0:b0:6af:7b2e:1868 with SMTP id 6a1803df08f44-6b5b6eb34demr150373726d6.18.1719914409206;
-        Tue, 02 Jul 2024 03:00:09 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.133.110])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5631bcsm42009626d6.32.2024.07.02.03.00.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 03:00:08 -0700 (PDT)
-Date: Tue, 2 Jul 2024 12:00:00 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Marco Pinna <marco.pinn95@gmail.com>
-Subject: Re: [PATCH PATCH net-next v2 2/2] vsock/virtio: avoid enqueue
- packets when work queue is empty
-Message-ID: <omiwday3x75sfre6qp7zp7rzmdwyv27eq2wmzkz6hwt7p6jqvv@n2dx55e2xojf>
-References: <20240701-pinna-v2-0-ac396d181f59@outlook.com>
- <20240701-pinna-v2-2-ac396d181f59@outlook.com>
+        d=1e100.net; s=20230601; t=1719914443; x=1720519243;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ktl1tfVd73nnyU6RFdtGDuVOjDp+QDqMgQ/2LXNl/Bo=;
+        b=diKUxXG54aI+X0choMwF3Eue5EwvEE/Fh2P0u5LPlClXgot3z8QqX3VVLpqamN7IBD
+         79ENlTuk1rWqQc5Rxz4Qw8vE+iiMpMDBExuGv+0wCRHDaLaeaRDcTkqbDIOpsXsbASKT
+         hAX/veSnXSoErKy0DuSUs5v5qE0dMASbXTP3TnxA9s+aYTxe6BNijlnwd+XlaPnD70aA
+         uJQWIS1eMvB1ralmlR5EiiH+IG9JrWk8X9lNd/k6TVvsRWhe7VsIPj7jT6SFA045H5QY
+         eam5PCqk3PNKjYlNInaekZQM1IMlZ0KgbZHFfDZLHrJnS+5rgCYSelPVH2XxDECxqrqL
+         fHbw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSWBeeUv6TBLmXo/zn31/TTVmHBxBtp/TSW7q/ziE7uball3yJnpeNX4c5diQnWOabaKHH1RCA4xwa23LiLBdY0k91WuZt
+X-Gm-Message-State: AOJu0YxraqazLrh2615Oirwi9yP45+BVnLrD7ZiSst2B/ul3brFN1ZoL
+	HIqDL99qhHC4Ei/vMhiLbg3TSbBikkWmSsfU4khshnK5I+P++Krx
+X-Google-Smtp-Source: AGHT+IHNEMJLR0gUrBlAKAV1LbVzJ0AB3OjecbjfRZv2Qzd2IrJRGJ+xOrPglzbofLH3cgqqSV28Og==
+X-Received: by 2002:a05:651c:b23:b0:2ec:5467:375b with SMTP id 38308e7fff4ca-2ee5e2a77c6mr64466311fa.0.1719914441106;
+        Tue, 02 Jul 2024 03:00:41 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b0621fesm190003715e9.24.2024.07.02.03.00.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Jul 2024 03:00:40 -0700 (PDT)
+Message-ID: <15fe5c2a-78dd-4700-a175-94c8bd20b652@grimberg.me>
+Date: Tue, 2 Jul 2024 13:00:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240701-pinna-v2-2-ac396d181f59@outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] net: allow skb_datagram_iter to be called from any
+ context
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Matthew Wilcox <willy@infradead.org>
+References: <20240626100008.831849-1-sagi@grimberg.me>
+ <2346b61ddecfca4d95a20415d27bdd8c50a83e9b.camel@redhat.com>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <2346b61ddecfca4d95a20415d27bdd8c50a83e9b.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 01, 2024 at 04:28:03PM GMT, Luigi Leonardi via B4 Relay wrote:
->From: Marco Pinna <marco.pinn95@gmail.com>
->
->Introduce an optimization in virtio_transport_send_pkt:
->when the work queue (send_pkt_queue) is empty the packet is
->put directly in the virtqueue reducing latency.
->
->In the following benchmark (pingpong mode) the host sends
->a payload to the guest and waits for the same payload back.
->
->All vCPUs pinned individually to pCPUs.
->vhost process pinned to a pCPU
->fio process pinned both inside the host and the guest system.
->
->Host CPU: Intel i7-10700KF CPU @ 3.80GHz
->Tool: Fio version 3.37-56
->Env: Phys host + L1 Guest
->Payload: 512
->Runtime-per-test: 50s
->Mode: pingpong (h-g-h)
->Test runs: 50
->Type: SOCK_STREAM
->
->Before (Linux 6.8.11)
->------
->mean(1st percentile):    380.56 ns
->mean(overall):           780.83 ns
->mean(99th percentile):  8300.24 ns
->
->After
->------
->mean(1st percentile):   370.59 ns
->mean(overall):          720.66 ns
->mean(99th percentile): 7600.27 ns
->
->Same setup, using 4K payload:
->
->Before (Linux 6.8.11)
->------
->mean(1st percentile):    458.84 ns
->mean(overall):          1650.17 ns
->mean(99th percentile): 42240.68 ns
->
->After
->------
->mean(1st percentile):    450.12 ns
->mean(overall):          1460.84 ns
->mean(99th percentile): 37632.45 ns
->
->virtqueue.
->
->Throughput: iperf-vsock
->
->Before (Linux 6.8.11)
->G2H 28.7 Gb/s
->
->After
->G2H 40.8 Gb/s
 
-Cool!
 
-I'd suggest to add the length of buffer (-l param) used, and also
-check more lenghts, like at least 4k, 64k, 128k.
+On 02/07/2024 12:51, Paolo Abeni wrote:
+> On Wed, 2024-06-26 at 13:00 +0300, Sagi Grimberg wrote:
+>> We only use the mapping in a single context, so kmap_local is sufficient
+>> and cheaper. Make sure to use skb_frag_foreach_page as skb frags may
+>> contain highmem compound pages and we need to map page by page.
+> My understanding of the discussion on previous revision is that Matthew
+> prefers dropping the reference to 'highmem':
+>
+> https://lore.kernel.org/netdev/Zn1-2QVyOJe_y6l1@casper.infradead.org/#t
+>
+> To avoid a repost, I can drop it while applying the patch, if there is
+> agreement.
 
->
->The performance improvement is related to this optimization,
->I checked that each packet was put directly on the vq
->avoiding the work queue.
-
-How?
-
->
->Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
-
-I think you might want to change the author of this patch, since it's 
-changed a lot from Marco's original one. Obviously if you both agree on 
-this.
-
-Thanks,
-Stefano
-
->---
-> net/vmw_vsock/virtio_transport.c | 38 ++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 36 insertions(+), 2 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index a74083d28120..3815aa8d956b 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -213,6 +213,7 @@ virtio_transport_send_pkt(struct sk_buff *skb)
-> {
-> 	struct virtio_vsock_hdr *hdr;
-> 	struct virtio_vsock *vsock;
->+	bool use_worker = true;
-> 	int len = skb->len;
->
-> 	hdr = virtio_vsock_hdr(skb);
->@@ -234,8 +235,41 @@ virtio_transport_send_pkt(struct sk_buff *skb)
-> 	if (virtio_vsock_skb_reply(skb))
-> 		atomic_inc(&vsock->queued_replies);
->
->-	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
->-	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
->+	/* If the workqueue (send_pkt_queue) is empty there is no need to enqueue the packet.
->+	 * Just put it on the virtqueue using virtio_transport_send_skb.
->+	 */
->+	if (skb_queue_empty_lockless(&vsock->send_pkt_queue)) {
->+		bool restart_rx = false;
->+		struct virtqueue *vq;
->+		int ret;
->+
->+		/* Inside RCU, can't sleep! */
->+		ret = mutex_trylock(&vsock->tx_lock);
->+		if (unlikely(ret == 0))
->+			goto out_worker;
->+
->+		/* Driver is being removed, no need to enqueue the packet */
->+		if (!vsock->tx_run)
->+			goto out_rcu;
->+
->+		vq = vsock->vqs[VSOCK_VQ_TX];
->+
->+		if (!virtio_transport_send_skb(skb, vq, vsock, &restart_rx)) {
->+			use_worker = false;
->+			virtqueue_kick(vq);
->+		}
->+
->+		mutex_unlock(&vsock->tx_lock);
->+
->+		if (restart_rx)
->+			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->+	}
->+
->+out_worker:
->+	if (use_worker) {
->+		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
->+		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
->+	}
->
-> out_rcu:
-> 	rcu_read_unlock();
->
->-- 2.45.2
->
->
-
+Agree, would be preferable avoiding another repost if possible.
 
