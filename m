@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-108481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B032923F39
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:41:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B8F923F2F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82CA1B2AAE8
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500D31F22AE1
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CABE1B581A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4213B1B5812;
 	Tue,  2 Jul 2024 13:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9fqnT3J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6LehY74"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA6B14F135;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E6E1B5806;
 	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719927634; cv=none; b=e12Ev2F2FV2xd2tSYtgTD7a/SaH8rKgPXVn2mUtB0dVQLjY3WpB7W1rYqIW+MSGLhemS65UC5PHMTuxLGFamwL1iTtVs/XzYf0KhLFjd0+cTCn99IXiDHZHH0npCtPxcJuIbRUk6GW22Uf1r55sCd7YT6s2q2R9lyWNaEiHjijU=
+	t=1719927634; cv=none; b=LnRoiyYMVGlk18pGMW5sUnJ7fkI6l2leWdXtUEEO9Pw4fkDEcVdxA9v5lpxVxacNcXOWLhY+XJcYE8IzqWngBXpsOVYfXqpxA1TsAZzkXmRu4Zpc9nZ/Qn/oHZf+XwS2HXgbFiXgjnxcUFOTX0DxoECEcW2/3ylriMO21ne/qXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719927634; c=relaxed/simple;
-	bh=+W4yKMpVM0FnCCTlzkUBo33I+67EW0C3h2+ocDgYWbs=;
+	bh=pirxWw773xu5RQIIpdcnxs6Z4AgajmiN1N9tjfkWv30=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=A/0LJji7enbZTMDjLuVotvaEKoEqK68fmqg0PnP2ya6jNguGgMOVYwWTyMGewjbzTqomjTD5W1OLALd2EutsABRxkTuhG7QzWsNPy3mRMlvDRsNw/kuLUVF1B6oD7Y4Avn4J4Y576t7QjrqDM3aZf90gPJjy4J84Y59zoyz9HsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9fqnT3J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 987EFC4AF16;
+	 In-Reply-To:To:Cc; b=qn8VLv8qwLvSpEGcOZ6NNQWwtdwmHbioaLf7YR4N/vwE3OdYOclkI16dfAuXcDFdTFOI0prwJp/ayKLHjF/kCjo/jmBXs0LKO/GvMPPEz48bDp3+XrLgNTf4MwDSB49025Jd1TKQZIR0GlyK+3NhpOx+4mRpwK+nB/I3Jd24wDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6LehY74; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89082C4AF0C;
 	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719927633;
-	bh=+W4yKMpVM0FnCCTlzkUBo33I+67EW0C3h2+ocDgYWbs=;
+	bh=pirxWw773xu5RQIIpdcnxs6Z4AgajmiN1N9tjfkWv30=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=b9fqnT3JH22j4pp4VG0lRcS2AA6gOyCz9MXD97EiVK9d/RmQWpV+ZywZRDLGr50QX
-	 wDTRT0PciADFMMl+3194fMOnN8cq5X7b+LYLrCKqbaltLBnSQo3eDMDAFnjdbPTBhp
-	 HsNbQISM/A0SOQ4KziBeOfFk55CDtdfTbwCmMw7MXq6Yt8q5/qVj5ARoaBw2fU9ZHF
-	 pzUi7XzNOrofDlp5TnHPzALRa4wy2moIjGpqfnmUlstifjQdWXYNa0QhfmdIolwSC/
-	 7FONQ+xi0/mlTa9J557xvS7WrQekPuLgDvhF+5TgtyGujXg7EpqYmEiJCRs43QlVEo
-	 nnaB1YVFxuZmg==
+	b=u6LehY74eg+cOh6kEtnIMnRGosYjQ7jUv7ET/UBgLnQeOhEnwc9Ut9koYabzR5GRU
+	 CwFw2WCyCoymXKuJbdcF4SKbt9MK47avpEbbjUnJzE6swFcPSJh6Muv7zDNook1zID
+	 vBShPDV59Fgoc5qN2c/RSUHbB5V5loNbFsxpVuTJ26PgVEvs5WDy0mq1gaec2eih3S
+	 uYo3YVWZK7BqKUjCukJdMFE7oNh2B1xOOfxhpL3t+LjgL4Tie+EQL73mBCjvXhTWFq
+	 aGgjpcHDiqejWSZBoF0qSYL3GNM/s7SZlmFwtnMRx5fkJoJaeweNcQUVJ+pgp+krg8
+	 CgB1GNX30OiHQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83B8DD2D0E3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79454CF3B95;
 	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,42 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net: bpf_net_context cleanups.
+Subject: Re: [PATCH net-next] dt-bindings: net: dwmac: Validate PBL for all
+ IP-cores
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171992763353.28501.245433484118524334.git-patchwork-notify@kernel.org>
+ <171992763349.28501.13027793993497248100.git-patchwork-notify@kernel.org>
 Date: Tue, 02 Jul 2024 13:40:33 +0000
-References: <20240628103020.1766241-1-bigeasy@linutronix.de>
-In-Reply-To: <20240628103020.1766241-1-bigeasy@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, bjorn@kernel.org,
- davem@davemloft.net, ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- eddyz87@gmail.com, edumazet@google.com, haoluo@google.com, kuba@kernel.org,
- hawk@kernel.org, jolsa@kernel.org, john.fastabend@gmail.com,
- jonathan.lemon@gmail.com, kpsingh@kernel.org, maciej.fijalkowski@intel.com,
- magnus.karlsson@intel.com, martin.lau@linux.dev, pabeni@redhat.com,
- song@kernel.org, sdf@fomichev.me, tglx@linutronix.de, yonghong.song@linux.dev
+References: <20240628154515.8783-1-fancer.lancer@gmail.com>
+In-Reply-To: <20240628154515.8783-1-fancer.lancer@gmail.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ peppe.cavallaro@st.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 28 Jun 2024 12:18:53 +0200 you wrote:
-> Hi,
+On Fri, 28 Jun 2024 18:45:12 +0300 you wrote:
+> Indeed the maximum DMA burst length can be programmed not only for DW
+> xGMACs, Allwinner EMACs and Spear SoC GMAC, but in accordance with
+> [1, 2, 3] for Generic DW *MAC IP-cores. Moreover the STMMAC driver parses
+> the property and then apply the configuration for all supported DW MAC
+> devices. All of that makes the property being available for all IP-cores
+> the bindings supports. Let's make sure the PBL-related properties are
+> validated for all of them by the common DW *MAC DT schema.
 > 
-> a small series with bpf_net_context cleanups/ improvements.
-> Jakub asked for #1 and #2 and while looking around I made #3.
-> 
-> Sebastian
+> [...]
 
 Here is the summary with links:
-  - [net-next,1/3] net: Remove task_struct::bpf_net_context init on fork.
-    https://git.kernel.org/netdev/net-next/c/2896624be30b
-  - [net-next,2/3] net: Optimize xdp_do_flush() with bpf_net_context infos.
-    https://git.kernel.org/netdev/net-next/c/d839a73179ae
-  - [net-next,3/3] net: Move flush list retrieval to where it is used.
-    https://git.kernel.org/netdev/net-next/c/e3d69f585d65
+  - [net-next] dt-bindings: net: dwmac: Validate PBL for all IP-cores
+    https://git.kernel.org/netdev/net-next/c/d01e0e98de31
 
 You are awesome, thank you!
 -- 
