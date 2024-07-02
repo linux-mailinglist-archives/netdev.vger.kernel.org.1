@@ -1,71 +1,54 @@
-Return-Path: <netdev+bounces-108606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ECE7924812
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:20:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B33924857
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C882028966D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:20:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F19328ACAD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF251CB301;
-	Tue,  2 Jul 2024 19:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22AD6F06A;
+	Tue,  2 Jul 2024 19:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RT54ANWG"
+	dkim=pass (1024-bit key) header.d=dan.merillat.org header.i=@dan.merillat.org header.b="gfBXwdH8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from penfold.furryhost.com (penfold.furryhost.com [199.168.187.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8847B6E5ED
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 19:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4522A4084E
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 19:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.168.187.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719948035; cv=none; b=CoW28kA30mg6knHuMgqw0q8HmKZKC7TmwlDKfyGnGeoiqzCk6XswXB7DYG/9NoR8TVloviSyJiEFtVVOcmPQya+4vosmv+HmFDIPXbH9RJCeHfwPDoVsTvIO+W3DSiq9f2GwHqRsyAZaUc/IFxzmGKho4WN4okYIInrIluGDi+U=
+	t=1719948671; cv=none; b=sRmDyGwVNcAhGObo9W9Wqp4bhKCe1dgCmqWx022qWKXGV1HcYDlWWpuIFqwNYkdgG+7ozC4tTEDdAt/1BUmugCz+eGhvW8xv74o9IM+bFjToihElzuVxa82n0PzVp5X3pH6XZYbsuzEO95iqbld1S+JtI04mHXtYyNaGzrhuGOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719948035; c=relaxed/simple;
-	bh=IxE1/AgwTN0UBBqev7ti6bXqyZd29kwbD8pQMrZ/kYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TwFFPpjtLreRzhDnzOnmkuRk5X0A3p6JoE1MRo4iGEGR+/JyqXL3+t7qUNeMLX62xhmpOIkjxzzYQFkDFOlKpFL5U3wmZbi2OJa1ou5f5oHsJgfUOpHN0HWrdY+xFKCIgtYXR6Nkusz6tDxMIpX6o2hxJtzUJ0LC8tciphB020c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RT54ANWG; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e02748b2402so5037672276.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 12:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719948032; x=1720552832; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AygiT8TDbMU6rJTH0zm6fy6Fdxp5ZZwR713pjtKJk5Q=;
-        b=RT54ANWG2Kfs+pS2VWpE6j3KR5VCHvv2o1X5w+RVql9ldZnF9YqtR3UtQEyhO91JTn
-         h1NXcN0VHUojJYogFaebf2xVyOiaPbP3K7ou08wkOXj8Tt0uMdmoOvh64QzWg2FZfX9E
-         V8Te/s+pwQ9XVrgfCoCBTdvjMkR69AK25DJnk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719948032; x=1720552832;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AygiT8TDbMU6rJTH0zm6fy6Fdxp5ZZwR713pjtKJk5Q=;
-        b=k1yg1LmR2VZotw9xXnPhM9+4mJG6oXwch3Xp2PAIeZBFAJptOvwAyus6+deYkFYwa+
-         AhUoRkWWZgZuAUgcvjT9qm0yCn3psbBzvrEMtF1I6J8aa1SKsnZ38VDCUxfpChACUW8Y
-         yP82j5Tw7B5Nl3C09T+KxXrP/3/XzRjnAsc0K9jlcVe4wTtzU/iKF4Sc3YcLGWaT6HbP
-         wuT6TSPNxmP7lwr7XNzsE3Qgh5sB8wGgKVWOBaZq8rBu2Yh7XGzEteAYDsVjnuItFhiW
-         oINzRhCWV8Sq+9sUwPnyvBrmfAko4VH8yJSkY9jc/3heJSx6B30gKxHcimYv1+tYlDoH
-         Vh0A==
-X-Forwarded-Encrypted: i=1; AJvYcCV3DWXLY8BZZ8bdcGWfgGLVV7OLEIoG/RwnuGeFH7x8VKJ8XJCsTciWidB1Ns+5ls5hq8zHpQTfWuyzxXy7e6r19p3doXMH
-X-Gm-Message-State: AOJu0Yy5bqDCx2bc5w9j2JINOlecHyflpH3ZCjhFAZmivGxqgNO1OA40
-	0f44tPhNVuQDURMsaDUgr3hc9atRfywZ7IW9XiekgNw+DdTuQRRUO3tC4Lhalg==
-X-Google-Smtp-Source: AGHT+IFS3jycrIjeuMHwLrHz8gi3/PYVYiiv4ErswOBy3xTVIB2ShOgd4sZ9sWJY3IuoWDR/EcSPfA==
-X-Received: by 2002:a25:ae12:0:b0:dfb:912:970f with SMTP id 3f1490d57ef6-e036ec79a6bmr7413991276.63.1719948032467;
-        Tue, 02 Jul 2024 12:20:32 -0700 (PDT)
-Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4465143dd1csm44000511cf.53.2024.07.02.12.20.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jul 2024 12:20:32 -0700 (PDT)
-Message-ID: <612a25e6-745f-4d52-9143-18650cc71362@broadcom.com>
-Date: Tue, 2 Jul 2024 21:20:24 +0200
+	s=arc-20240116; t=1719948671; c=relaxed/simple;
+	bh=0ur7NHgsN+e0XRL4YTBEwdgjJAktKbj0mvGuLcZH8bc=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=uJuDLs4uEiefZaDqP8nr5V1ek66ufvkZOSULKaiVmjQRBXjkpkhU+SYDN/RcSHyv0MjrT8NBm9QcbonnPrEZrW/oVzn6qyaP6ZSc01+pmXSOp5is46k+i2aEpaKq5AWWNqrhkVMeM4uxoVuRK4Y/dwFydd8GdlNTd/VR0hm7iVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dan.merillat.org; spf=pass smtp.mailfrom=dan.merillat.org; dkim=pass (1024-bit key) header.d=dan.merillat.org header.i=@dan.merillat.org header.b=gfBXwdH8; arc=none smtp.client-ip=199.168.187.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dan.merillat.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dan.merillat.org
+Received: from [192.168.0.10] (syn-050-088-096-145.res.spectrum.com [50.88.96.145])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dan@merillat.org)
+	by penfold.furryhost.com (Postfix) with ESMTPSA id 8DC3520812;
+	Tue,  2 Jul 2024 15:30:59 -0400 (EDT)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.103.10 at penfold
+DKIM-Filter: OpenDKIM Filter v2.11.0 penfold.furryhost.com 8DC3520812
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dan.merillat.org;
+	s=default; t=1719948659;
+	bh=WehZVrVBpavludTMw9YVWetEyez79ZHA9QVaGRJoDBo=;
+	h=Date:From:To:Cc:Subject:From;
+	b=gfBXwdH8x7Er5OG/yIEBeWdNCCXHHmVs6XtsItotUEOLx0TSt/xhTg2KlrGBo4Acn
+	 KP6JN4BPjIhlmzlsxOG4tD7RhS8R5/Qq+HV+FmEcLmRUCb3/FJIfrkP4SPI/j2TnOZ
+	 bEzR3VU01XSUSwMttAvyMU8ztlRSstd51mU+keMw=
+Message-ID: <10ec2a87-5d9e-40a7-a4ea-1e50fd8109e6@dan.merillat.org>
+Date: Tue, 2 Jul 2024 15:30:58 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,172 +56,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] wifi: brcmfmac: Add optional lpo clock enable
- support
-To: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org,
- krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
- minipli@grsecurity.net, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com
-References: <20240630073605.2164346-1-jacobe.zang@wesion.com>
- <20240630073605.2164346-5-jacobe.zang@wesion.com>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <20240630073605.2164346-5-jacobe.zang@wesion.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000087bc07061c489b5f"
-
---00000000000087bc07061c489b5f
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Dan Merillat <git@dan.merillat.org>
+To: netdev <netdev@vger.kernel.org>
+Cc: Dan Merillat <git@dan.merillat.org>, Ido Schimmel <idosch@idosch.org>
+Subject: Re: ethtool fails to read some QSFP+ modules.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Sorry, I'm not subscribed to netdev and didn't get a CC so I'm trying to follow via the web archives
+and I can't see who was CC'd.
+
+On Mon, Jul 01, 2024 at 10:28:39AM +0300, Ido Schimmel wrote:
+> On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
+> > 
+> > I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
+> > the optional page3 data as a hard failure.
+> > 
+> > This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
+> 
+> Thanks for the report and the patch. Krzysztof OlÄ™dzki reported the same
+> issue earlier this year:
+> https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
+> 
+> Krzysztof, are you going to submit the ethtool and mlx4 patches?
+> 
+> > From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
+> > From: Dan Merillat <git@dan.eginity.com>
+> > Date: Sun, 30 Jun 2024 13:11:51 -0400
+> > Subject: [PATCH] Some qsfp modules do not support page 3
+> > 
+> > Tested on an older Kaiam XQX2502 40G-LR4 module.
+> > ethtool -m aborts with netlink error due to page 3
+> > not existing on the module. Ignore the error and
+> > leave map->page_03h NULL.
+> 
+> User space only tries to read this page because the module advertised it
+> as supported. It is more likely that the NIC driver does not return all
+> the pages. Which driver is it?
+
+Same as Kyrzysztof, a connectx3 board.  I'm using mlx4_core/en in the stock 6.9.3 kernel.
+
+Raw dump:
+# ethtool -m enp65s0d1 raw on | hexdump -C 
+00000000  0d 05 00 0f 00 00 00 00  00 44 44 00 00 44 44 00  |.........DD..DD.|
+00000010  00 00 00 00 00 00 30 a4  00 00 82 3b 00 00 00 00  |......0....;....|
+00000020  00 00 00 10 00 11 00 31  00 00 36 ff 36 ff 36 ff  |.......1..6.6.6.|
+00000030  36 83 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |6...............|
+00000040  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000050  00 00 00 00 00 00 00 00  00 00 00 00 00 03 00 00  |................|
+00000060  00 00 00 00 00 00 00 00  00 00 1f 00 00 00 00 00  |................|
+00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000080  0d 80 07 02 00 00 00 00  00 00 00 00 67 00 02 00  |............g...|
+00000090  00 00 00 40 4b 41 49 41  4d 20 43 4f 52 50 20 20  |...@KAIAM CORP  |
+000000a0  20 20 20 20 00 14 ed e4  58 51 58 32 35 30 32 20  |    ....XQX2502 |
+000000b0  20 20 20 20 20 20 20 20  31 41 66 58 05 14 46 14  |        1AfX..F.|
+000000c0  00 00 00 92 4b 44 37 30  32 30 31 31 35 39 20 20  |....KD70201159  |
+000000d0  20 20 20 20 31 37 30 32  30 31 30 30 08 00 00 0d  |    17020100....|
+000000e0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000100
 
 
+The ioctl path handles it properly when ethtool is built with --disable-netlink, since it checks the
+total buffer size returned by the kernel and does not set map->page_03h if the size does not match.
 
-On 6/30/2024 9:36 AM, Jacobe Zang wrote:
-> WiFi modules often require 32kHz clock to function. Add support to
-> enable the clock to PCIe driver.
+Status byte 2, bit 2 is 'Upper memory flat or paged.   0x1b: Flat memory.  0x0b: Paging (at least upper
+page 0x03h supported)'
 
-you can add my....
+SFF8636_STATUS_FLAT_MEMORY would be clearer, as page_00h[STATUS_2] & PAGE_3_PRESENT is really a
+negative test.
 
-Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Co-developed-by: Ondrej Jirman <megi@xff.cz>
-> Signed-off-by: Ondrej Jirman <megi@xff.cz>
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> ---
->   .../net/wireless/broadcom/brcm80211/brcmfmac/pcie.c    | 10 ++++++++++
+I confirmed that status 2 is 0x00, which would indicate the module supports paged memory.
 
-These changes should really go into of.c.
+So either this cheap module is non-compliant or there's a problem in the driver/firmware for
+connectx3/3pro cards.  Either way, it would be better to warn about the non-compliance and still
+display  the optical information gathered rather than a fatal error that shows nothing.  If it can
+also be fixed in the mlx4_core driver to properly read page 3, that would be better, but that
+will require someone with more knowledge of mellanox/nVidia internals than I have.
 
->   1 file changed, 10 insertions(+)
-
---00000000000087bc07061c489b5f
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQdwYJKoZIhvcNAQcCoIIQaDCCEGQCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3OMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVYwggQ+oAMCAQICDE79bW6SMzVJMuOi1zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMTQzMjNaFw0yNTA5MTAxMTQzMjNaMIGV
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEFyZW5kIFZhbiBTcHJpZWwxKzApBgkqhkiG
-9w0BCQEWHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IB
-DwAwggEKAoIBAQDxOB8Yu89pZLsG9Ic8ZY3uGibuv+NRsij+E70OMJQIwugrByyNq5xgH0BI22vJ
-LT7VKCB6YJC88ewEFfYi3EKW/sn6RL16ImUM40beDmQ12WBquJRoxVNyoByNalmTOBNYR95ZQZJw
-1nrzaoJtK0XIsv0dNCUcLlAc+jHkngD+I0ptVuWoMO1BcJexqJf5iX2M1CdC8PXTh9g4FIQnG2mc
-2Gzj3QNJRLsZu1TLyOyBBIr/BE7UiY3RabgRzknBGAPmzhS+fmyM8OtM5BYBsFBrSUFtZZO2p/tf
-Nbc24J2zf2peoZ8MK+7WQqummYlOnz+FyDkA9EybeNMcS5C+xi/PAgMBAAGjggHdMIIB2TAOBgNV
-HQ8BAf8EBAMCBaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJl
-Lmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYI
-KwYBBQUHMAGGNWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24y
-Y2EyMDIwME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3
-dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqG
-OGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3Js
-MCcGA1UdEQQgMB6BHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYB
-BQUHAwQwHwYDVR0jBBgwFoAUljPR5lgXWzR1ioFWZNW+SN6hj88wHQYDVR0OBBYEFIikAXd8CEtv
-ZbDflDRnf3tuStPuMA0GCSqGSIb3DQEBCwUAA4IBAQCdS5XCYx6k2GGZui9DlFsFm75khkqAU7rT
-zBX04sJU1+B1wtgmWTVIzW7ugdtDZ4gzaV0S9xRhpDErjJaltxPbCylb1DEsLj+AIvBR34caW6ZG
-sQk444t0HPb29HnWYj+OllIGMbdJWr0/P95ZrKk2bP24ub3ZP/8SyzrohfIba9WZKMq6g2nTLZE3
-BtkeSGJx/8dy0h8YmRn+adOrxKXHxhSL8BNn8wsmIZyYWe6fRcBtO3Ks2DOLyHCdkoFlN8x9VUQF
-N2ulEgqCbRKkx+qNirW86eF138lr1gRxzclu/38ko//MmkAYR/+hP3WnBll7zbpIt0jc9wyFkSqH
-p8a1MYICbTCCAmkCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1z
-YTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIgQ0EgMjAyMAIMTv1t
-bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCCmFX3KlYYP2wpAINAq
-+S0h+f4xsahW1mAJB+r/0YuY4jAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
-BTEPFw0yNDA3MDIxOTIwMzJaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
-AwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzAL
-BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAHG+ZPQgmjp6Mzgshb3jjs5/KF9XzylSeMv8d
-YStFQD96iqegoj/TUUXpqoeI1srCX/CdqDz+GltKQSEvxi/VQH27DddsyLhiE8uTbwgzaV3Ysy4p
-0Hn3X3rDNLnSaqkn//TtVAgArLvzhQtXiC8TkjaEEYoJacEBf8uPys5ug72CN76nxbT9/L0qf+56
-Lj7TraBlvd66EZnbWVrooz9pPoFyY0FgnUF1fRVNy8X7tb8z6ipRdTB499lzahgr1RTuZVllzYwg
-naq7p/T6ZiJamljKyBybfTgTp+QahR6C5mddEtARHIlGboKF2YsTUSdXB/WW+e+j9Ba8oITtbTkZ
-Gw==
---00000000000087bc07061c489b5f--
+If anyone wants to test with a different adapter, these xqx2502 modules are dirt cheap on ebay, only $4 when 
+I bought mine a few weeks ago.
 
