@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-108629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627D0924C55
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:48:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E82AB924C54
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FFACB20378
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:48:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B15A1C2274C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95C617DA0C;
-	Tue,  2 Jul 2024 23:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1B017DA15;
+	Tue,  2 Jul 2024 23:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ik7cRkgj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aa9QDB/S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DED17DA05
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA18317DA12
 	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 23:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719964101; cv=none; b=VtCrlc9lnEj4pCj0jgaH1GlPBjND2w/mpsXdPHo9VMJFSp/iANuycd2ODpZ/iFp8KngzloioO9P5NsVpGTjxshCsyldL1C4NZ6DKZVzy4c4HUX/1Xz8xdZb4bmlJApM1I+AAuyeVvUyAs/Mp8HGoRC9+kua/6vumifO5xansofs=
+	t=1719964101; cv=none; b=Glb652c2YfJuUDuje2DcwJGB6Ovh/6HMmdYk3L+svUjLu3RsjOvCrusxpdN8v/lXi6QgMjK2kHWRgR41+Q038W8MEt4ScZwP0ozHwTAJeYNOC4PhwWgQflzGa3tWR9u96A9/cdeZrvbBhnsQBBIpR3C0qUbWGE/DeNJHjaeaw70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719964101; c=relaxed/simple;
 	bh=r3DwL5bmR6kxDFjNiaO+3ZgEHfTYNXRyo10iBdK3y2g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sUk/3q0WuG7I4vmPS/UNOsISQlaNgXQd0ogK6ZvzyVKTWabZ9dEE+KdfGXk6yf+4TU2iOzPMdgu3Rv3f3wKv9eJbcJjoCKbEf8vF46s8oHBbBT7Us6vhR+/xP8042ldzewaFcG5isUiMYCBOuXeBm9dX4Msnbjo2lgjWCWzc31s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ik7cRkgj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC003C4AF0E;
-	Tue,  2 Jul 2024 23:48:20 +0000 (UTC)
+	 MIME-Version; b=chxOGsSKoRkgRz+MVXM9RMX7p0B+xn1sdg/7veq9Sf+JiuuCg3NniYgDEDQg78uuZ+hiiFPdi3eaWBEJPNnNoMThK7K8BLAJIJbC8CacAdhgkX7AhnpZZJtlSQvKvqqCcVx+eigpzcOPR0pv5eIKw+qJsYap0esUHbX8U+IXh8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aa9QDB/S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618F0C32781;
+	Tue,  2 Jul 2024 23:48:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719964101;
 	bh=r3DwL5bmR6kxDFjNiaO+3ZgEHfTYNXRyo10iBdK3y2g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ik7cRkgjMRZmEhoiL3CIAJOBWI4RxVTN4cJ725JAXbrQeO47sljwCMQwQjS4QlOEX
-	 Sg+JV0dtpTXvIjuSfXyNe9z2RWmuwXvdDvLandYfNDFjr4S1FgTb40KFrh0NIVCGpz
-	 srg9JHBZR38+JP0uxTLDCENU0ahbHIrkD3TNlFRv3OyrJcki7GtAUATMgX/WHI4p7a
-	 1k5fy56UF6VvlyN5f4IHMPg0Ep8W66IYzpt1TzDQTTqls0jI8bjgIihUIdnwGoFkNj
-	 YlsILicSmpl1EvPmp+1sV6aQiUYwzC+PAXQ4bKF/MM0j8GmTJgzO8zelcDYPtM/6Hl
-	 5j0mxJC7VURsA==
+	b=Aa9QDB/S+G7SY17eJT3JpscJlY2fUIkhTItV/PuOfEZXnQU2rLH4Q+R67+452ZjdV
+	 is1+YkczW25vgundfF8YoaNXTIRvziTc7e3vEQYgObsgI28bX5/sOm0Xl6sV+9maRz
+	 XJLrELz+jX6B6iLOmyFisRg31cqqz3m4yHVP1NwqS+Sa0OqiRbUhFI5O1SBTvUblcs
+	 l44SYgPyd/Kt/Z0eCHhmmhP3GSASrtaNbSb3mOY567NIHAaahCz5czxjThu7HJxSw6
+	 0uSr/tBTEaBjTDjHlSIaUOx8XZpFDv0QJEQone+UZcwLh01w66Lo15CKs6As/iUluQ
+	 C33lVOluS2sLA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ Cc: netdev@vger.kernel.org,
 	ecree.xilinx@gmail.com,
 	michael.chan@broadcom.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 02/11] net: ethtool: let driver declare max size of RSS indir table and key
-Date: Tue,  2 Jul 2024 16:47:47 -0700
-Message-ID: <20240702234757.4188344-3-kuba@kernel.org>
+Subject: [PATCH net-next 02/11] net: ethtool: let drivers declare max size of RSS indir table and key
+Date: Tue,  2 Jul 2024 16:47:48 -0700
+Message-ID: <20240702234757.4188344-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240702234757.4188344-1-kuba@kernel.org>
 References: <20240702234757.4188344-1-kuba@kernel.org>
