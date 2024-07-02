@@ -1,123 +1,119 @@
-Return-Path: <netdev+bounces-108382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E881923A53
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:41:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A19B923A55
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4D7F2843C3
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:41:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFDF328455E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EAD15217F;
-	Tue,  2 Jul 2024 09:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35FC15530C;
+	Tue,  2 Jul 2024 09:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="O9M0Mcsc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pRaqfWxz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1AA1534E1;
-	Tue,  2 Jul 2024 09:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0605B15217F;
+	Tue,  2 Jul 2024 09:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719913272; cv=none; b=QL/SuDVx8HJZyCr8tqgh5y2btlqzWkOLI00g7osd7vEPZ81Iudrsu24o35lUOt7VtxuR2AnlVRga0ehSxO00QhfXaUxqNCjaUIAyT3bm/6a98Yhdb3RJkF9PSwGzNctVuzxlz/uMl2QXWrVXx62/onxyPSd7tzJp8jYfycnsnPs=
+	t=1719913283; cv=none; b=NdktH12oid1DwIFuG5l/RjSUiqDqq74ZR+JBwQg0OLiAFbpxwbcoAeojU52rCFT+F1WfUnE1SM0LDwdU3QXOSDGX7blLR2Enp90st4qTtrfHPNiEM8Qp0N/waOltX4QSqbqwl8gRSq/RaKgElnnYZQrBTMxUgXFa+wVJGwvZphQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719913272; c=relaxed/simple;
-	bh=SSoKdTE7J3wyQ8wXdaVFr0+jrWF0Mqur4rJoN/pmTco=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=El0t4fdQOdU3YY7L0ShuuTKGkvFSIAU3TvWdSzZcfoPd2Pom2UffzBtNXuDY9tBTCMvjEji/XDZUppcrJ9htrGoAZHgHNJT+i5kFS2IsWA95Etiz8yfdnbNRln2QJYxXt2aTMn+2zIvKc2cSHeG0yn6B3ez2hZnUSN55QWpfvsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=O9M0Mcsc; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id EAC85100003;
-	Tue,  2 Jul 2024 12:40:37 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1719913238; bh=uMIWXotdz+X51cAHpgFbhL9+8Mu/Jf13+XYc0uWi5G0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=O9M0McscqZ+DMH80PvQAnDVwwBbzZziweWwYrhsuuDkTPK6WrwpxPkN4NHp0obRIa
-	 NekJj+wjrWynixaEcqB3R9wGZ7TFM8mQhZ7LWVNmQAA4kGGxC7yYg8p1g/+0AnNdI0
-	 5rIO4ChcmQbbsAldsgWWGuMIjWKB+RJpDRHzyIo1OVE73gvewZrTmuQRMTQm88wqVr
-	 rFiifkrsuFdm0cu1wdppI3MiGX3eGZ1z7Qzea3+qx0yQ943+qntjuxGTmTldREHxq6
-	 TYzc//O9Mi0SJU4rQ/GQAoAt3Qt1X2NN0rwG2gS0DEFlw5RaoZ94oIPFQzUySGroUk
-	 4OBsfFbcbAVfQ==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Tue,  2 Jul 2024 12:40:03 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 2 Jul 2024
- 12:39:43 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Samuel Ortiz <sameo@linux.intel.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Krzysztof Kozlowski
-	<krzk@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH] nfc: pn533: Add poll mod list filling check
-Date: Tue, 2 Jul 2024 12:39:24 +0300
-Message-ID: <20240702093924.12092-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1719913283; c=relaxed/simple;
+	bh=R3ngL8Fv4zUiKpxmIUnkSD2duuv6wqVU5YmU8bbdbN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SdBJcBkCQuPr+G9+kbn9rm8FUaQIYbJugr6WXIgPbl7JBSChfkQSxU6FTc81I/+b9nYqLT6YQlDxh69EMfpoI+42VAZ7a63lzEDyJfFT9suw80DpTrweR1xgoEnOu7xTEyBjU5jan2SlWoGhwe4g+djVjETCU10OKRts1qoJ5jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pRaqfWxz; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9727A1BF212;
+	Tue,  2 Jul 2024 09:41:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719913279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G/8hFWK9UcvLwmvxQx5S9JAO7f5G9Pn+Hmqfq5j09fY=;
+	b=pRaqfWxz7ShvEpbGMyehKBsFqI6DV37eHtko40iUK13IxdeiNqS5pAfFbaKS5gV2zkhTKL
+	mY4gP1UmRATDhw4pCrojqv2yBq2pPi5yams5dgbm6Lc9Juj4a0ow/UDWgEajkBi2ZUU/0u
+	5mPY4VLbPgX5fW60tnOE9hSUIT9ijeHSr0CMW/AqnZ7S0OKa/LuCrqiVZPFYYk4HmYP2sJ
+	KaHMLWUUeod3kHa+04gIsg8t4B7bWLJQEKW3l8lTZUAjDY+0dcxKgRnI5QTd0nl5yxbznG
+	ZJjAqs208unbRu0I3tYI5CnEId14CFuMevH9UVqlv+WQ6Pj8zIKRJq24JJ2kyQ==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH net-next 1/6] net: phy: dp83869: Disable autonegotiation in
+ RGMII/1000Base-X mode
+Date: Tue, 02 Jul 2024 11:42:04 +0200
+Message-ID: <2614671.Lt9SDvczpP@fw-rgant>
+In-Reply-To: <ZoPHQms2bDo5zWZm@shell.armlinux.org.uk>
+References:
+ <20240701-b4-dp83869-sfp-v1-0-a71d6d0ad5f8@bootlin.com>
+ <3818335.kQq0lBPeGt@fw-rgant> <ZoPHQms2bDo5zWZm@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 186273 [Jul 02 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 21 0.3.21 ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;t-argos.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/07/02 08:55:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/02 07:20:00 #25796017
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-GND-Sasl: romain.gantois@bootlin.com
 
-In case of im_protocols value is 1 and tm_protocols value is 0 this
-combination successfully passes the check
-'if (!im_protocols && !tm_protocols)' in the nfc_start_poll().
-But then after pn533_poll_create_mod_list() call in pn533_start_poll()
-poll mod list will remain empty and dev->poll_mod_count will remain 0
-which lead to division by zero.
+Hello Russell,
 
-Add poll mod list filling check.
+On mardi 2 juillet 2024 11:24:18 UTC+2 Russell King (Oracle) wrote:
+> On Tue, Jul 02, 2024 at 10:44:12AM +0200, Romain Gantois wrote:
+> > To be clear, "fiber mode" in the DP83869 linguo also includes
+> > 1000Base-X which can be used with a direct-attach copper cable. From
+> > what I've seen, autonegotiation is not supported in this configuration.
+> 
+> Why? Direct-attached cables are 1000base-CX, which is defined by 802.3.
+> It uses the 1000base-X PCS which is shared with 1000base-SX, 1000base-LX
+> etc. If one looks at 37.1.3, Relationship to architectural layering,
+> or 36.1.5, Inter-sublayer interfaces, one can see in that diagram that
+> the PCS *including* auto-negotiation is included for SX, LX *and* CX.
+> 
+> Moreover, 39.3 states that TP1 and TP4 will be commin in many
+> implementations of LX, SX and CX.
+> 
+> Moreover, 39.1, 1000base-CX introduction, states that it incorporates
+> clause 36 and clause 38. Clause 36.2.2 states that the 1000base-X PCS
+> incorporates clause 37 auto-negotiation.
+> 
+> So, I think AN is supposed to be supported on CX in the same way that
+> it's supported for SX and LX.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+This seems to be a limitation of this particular PHY. From the DP83869
+datasheet:
 
-Fixes: dfccd0f58044 ("NFC: pn533: Add some polling entropy")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
- drivers/nfc/pn533/pn533.c | 5 +++++
- 1 file changed, 5 insertions(+)
+"7.4.2.1 1000BASE-X
+The DP83869HM supports the 1000Base-X Fiber Ethernet protocol as
+defined in IEEE 802.3 standard. In 1000M Fiber mode, the PHY will use
+two differential channels for communication. In fiber mode, the speed is not
+decided through auto-negotiation. Both sides of the link must be
+configured to the same operating speed. The PHY can be configured to
+operate in 1000BASE-X through the register settings (Section 7.4.8) or
+strap settings (Section 7.5.1.2)."
 
-diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
-index b19c39dcfbd9..e2bc67300a91 100644
---- a/drivers/nfc/pn533/pn533.c
-+++ b/drivers/nfc/pn533/pn533.c
-@@ -1723,6 +1723,11 @@ static int pn533_start_poll(struct nfc_dev *nfc_dev,
- 	}
- 
- 	pn533_poll_create_mod_list(dev, im_protocols, tm_protocols);
-+	if (!dev->poll_mod_count) {
-+		nfc_err(dev->dev,
-+			"Poll mod list is empty\n");
-+		return -EINVAL;
-+	}
- 
- 	/* Do not always start polling from the same modulation */
- 	get_random_bytes(&rand_mod, sizeof(rand_mod));
+Thanks,
+
 -- 
-2.30.2
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+
 
 
