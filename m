@@ -1,253 +1,169 @@
-Return-Path: <netdev+bounces-108306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 756A691ECB7
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:35:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5128491ECC5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 03:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99EF21C21300
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:35:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEF6EB21403
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 01:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096AE8801;
-	Tue,  2 Jul 2024 01:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDD48C07;
+	Tue,  2 Jul 2024 01:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i1vl7NjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30FD2F43;
-	Tue,  2 Jul 2024 01:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1594564D;
+	Tue,  2 Jul 2024 01:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719884153; cv=none; b=oKQbWgzMnFMmZqceyMMNePDpGqX3SJHI1z4Fswan9+OARwJD9MiioVid1jX63I3LxI/P0nyrHFtZSRywr3IUQtEu6NFammTr6CzjqLJ4KODM4mELlujxYqp9tn+ia68cJRHB7VGWAaQffX+u1OIG6bY2esR8ASQztrdwzLkkErk=
+	t=1719884427; cv=none; b=dP2hdsU2JCWtKk9VI/2TXvwvJ5Q602K+uza+OUQeQtYvYEetm0JdG75uJ44hFeZzPRv0imXguIEncWpf5eji4ZUk9Zkx4jFBdWDMQedQPHVW327O2bZBWqZRfwns58NFswwi3ogDUvdI4+59EAFYfgH+Tl86hNZfvQUURpIo4bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719884153; c=relaxed/simple;
-	bh=0YIb1crBhvzWhdl6nL2HInePKan9fvjO81UhTtfWzzg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PyI03U1kgeC20y9I/nIgI3BcxoPqGbOc7vfReDwrdJmP7TIaMT5Xzl+lP0kolC/n2MkUN4rBrKt6AkwJafPQFswkTkjLPMXj3lsYb4GvF+tK931YEzgPugFVJVjz4To+5oIGNnFmMjkqS0i8TeFai0yfNrXlahKaJYHkgyrgnPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WClq06sbXz4f3jYl;
-	Tue,  2 Jul 2024 09:35:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 442B71A0568;
-	Tue,  2 Jul 2024 09:35:48 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP1 (Coremail) with SMTP id cCh0CgCXwX1vWYNm+0GRAw--.62272S5;
-	Tue, 02 Jul 2024 09:35:48 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: [PATCH bpf-next v5 3/3] selftests/bpf: Add testcase where 7th argment is struct
-Date: Tue,  2 Jul 2024 01:37:30 +0000
-Message-Id: <20240702013730.1082285-4-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240702013730.1082285-1-pulehui@huaweicloud.com>
-References: <20240702013730.1082285-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1719884427; c=relaxed/simple;
+	bh=3rWIcEBuDquwT65mdmMptUDstbXhoHxLkzl2I+eVtbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fz8zw04wVslWdbcSudZz7JUVWx13/nzb6fH/dDN0i/8RH9oEwymdoOuG7hHiO/myRz140VQL9NkqClYPEOqPMdvTt3J+7Z4No6YvRgJCIgmjKcz8uXOzJHwZr7ixuDeQQMmdIffvPigbWdrn2lacYVVEaEQhGJZa1SV6x4CMEPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i1vl7NjM; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719884426; x=1751420426;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3rWIcEBuDquwT65mdmMptUDstbXhoHxLkzl2I+eVtbE=;
+  b=i1vl7NjMTN28RiBHaD/0R+0YjdHLcx2f+gntf2nd3znrlj1TOxw7KZiA
+   RhP9KBOIhhQbLkP/lPPgu3shhpcQWhExEEjq9+ZoeL/zTqSTbXuhDbAHN
+   YvXEYUgiyQp4cVQblDs4pIHemKLDC6w6Z4Y1q0amoN+0++IINs6JMKN/A
+   B7hRqxHhWvWHfiUjLmqLneRE7CGUFOgcJtBb1vuiUUabjFbhfPgcY6j4w
+   WkIE5IxBUy4PMs6NFMM0vbXJUXAgFAQGe+6594Ygl1NB+butuudcQ/y0a
+   +MR0DcBxDJU4s+ilqa5yE5hRpoKVrgDKUCzPrsMIAlvgTtud3qN3kYV1U
+   Q==;
+X-CSE-ConnectionGUID: 9wroL5s2S2O146ABOk1n1Q==
+X-CSE-MsgGUID: 4rb+p1atRreB6mF6McSPjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="28170611"
+X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
+   d="scan'208";a="28170611"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 18:40:25 -0700
+X-CSE-ConnectionGUID: bZfVIyY8QFmgdJ7w841ySA==
+X-CSE-MsgGUID: KN3DL8ezQbWFQVfa63X4LQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
+   d="scan'208";a="50168557"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.38.161]) ([10.247.38.161])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 18:40:21 -0700
+Message-ID: <d14d14ec-2d86-46f4-9a70-6a1cd3b016c5@linux.intel.com>
+Date: Tue, 2 Jul 2024 09:40:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 1/1] igc: Fix packet still tx
+ after gate close by reducing i226 MAC retry buffer
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20240701100058.3301229-1-faizal.abdul.rahim@linux.intel.com>
+ <e981261e-77be-407b-b601-f7214a4f57dd@molgen.mpg.de>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <e981261e-77be-407b-b601-f7214a4f57dd@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCXwX1vWYNm+0GRAw--.62272S5
-X-Coremail-Antispam: 1UD129KBjvJXoW3GrWxCryxGr1DCFW5Aw4xWFg_yoWxWFykpa
-	s7Xw1UtFWrJF47WryxGa1UZr4S9393Xr1UJFW7G3s0vry8t3s7JF1xKF4jyFn5G398uwnx
-	AayqkFZ8Ca1xJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
-	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1c4S7UUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 
-From: Pu Lehui <pulehui@huawei.com>
+Hi Paul,
 
-Add testcase where 7th argument is struct for architectures with 8
-argument registers, and increase the complexity of the struct.
+Thanks for reviewing.
 
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
-Acked-by: Björn Töpel <bjorn@kernel.org>
-Reviewed-by: Björn Töpel <bjorn@rivosinc.com>
----
- tools/testing/selftests/bpf/DENYLIST.aarch64  |  1 +
- .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 19 ++++++++++
- .../selftests/bpf/prog_tests/tracing_struct.c | 14 ++++++++
- .../bpf/progs/tracing_struct_many_args.c      | 35 +++++++++++++++++++
- 4 files changed, 69 insertions(+)
+On 1/7/2024 8:42 pm, Paul Menzel wrote:
+> Dear Faizal,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 01.07.24 um 12:00 schrieb Faizal Rahim:
+>> AVNU testing uncovered that even when the taprio gate is closed,
+>> some packets still transmit.
+> 
+> What is AVNU? *some* would fit on the line above.
 
-diff --git a/tools/testing/selftests/bpf/DENYLIST.aarch64 b/tools/testing/selftests/bpf/DENYLIST.aarch64
-index 0445ac38bc07..3c7c3e79aa93 100644
---- a/tools/testing/selftests/bpf/DENYLIST.aarch64
-+++ b/tools/testing/selftests/bpf/DENYLIST.aarch64
-@@ -6,6 +6,7 @@ kprobe_multi_test                                # needs CONFIG_FPROBE
- module_attach                                    # prog 'kprobe_multi': failed to auto-attach: -95
- fentry_test/fentry_many_args                     # fentry_many_args:FAIL:fentry_many_args_attach unexpected error: -524
- fexit_test/fexit_many_args                       # fexit_many_args:FAIL:fexit_many_args_attach unexpected error: -524
-+tracing_struct/struct_many_args                  # struct_many_args:FAIL:tracing_struct_many_args__attach unexpected error: -524
- fill_link_info/kprobe_multi_link_info            # bpf_program__attach_kprobe_multi_opts unexpected error: -95
- fill_link_info/kretprobe_multi_link_info         # bpf_program__attach_kprobe_multi_opts unexpected error: -95
- fill_link_info/kprobe_multi_invalid_ubuff        # bpf_program__attach_kprobe_multi_opts unexpected error: -95
-diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-index d8bd01d8560b..f8962a1dd397 100644
---- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-@@ -53,6 +53,13 @@ struct bpf_testmod_struct_arg_4 {
- 	int b;
- };
- 
-+struct bpf_testmod_struct_arg_5 {
-+	char a;
-+	short b;
-+	int c;
-+	long d;
-+};
-+
- __bpf_hook_start();
- 
- noinline int
-@@ -110,6 +117,15 @@ bpf_testmod_test_struct_arg_8(u64 a, void *b, short c, int d, void *e,
- 	return bpf_testmod_test_struct_arg_result;
- }
- 
-+noinline int
-+bpf_testmod_test_struct_arg_9(u64 a, void *b, short c, int d, void *e, char f,
-+			      short g, struct bpf_testmod_struct_arg_5 h, long i)
-+{
-+	bpf_testmod_test_struct_arg_result = a + (long)b + c + d + (long)e +
-+		f + g + h.a + h.b + h.c + h.d + i;
-+	return bpf_testmod_test_struct_arg_result;
-+}
-+
- noinline int
- bpf_testmod_test_arg_ptr_to_struct(struct bpf_testmod_struct_arg_1 *a) {
- 	bpf_testmod_test_struct_arg_result = a->a;
-@@ -305,6 +321,7 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 	struct bpf_testmod_struct_arg_2 struct_arg2 = {2, 3};
- 	struct bpf_testmod_struct_arg_3 *struct_arg3;
- 	struct bpf_testmod_struct_arg_4 struct_arg4 = {21, 22};
-+	struct bpf_testmod_struct_arg_5 struct_arg5 = {23, 24, 25, 26};
- 	int i = 1;
- 
- 	while (bpf_testmod_return_ptr(i))
-@@ -319,6 +336,8 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 					    (void *)20, struct_arg4);
- 	(void)bpf_testmod_test_struct_arg_8(16, (void *)17, 18, 19,
- 					    (void *)20, struct_arg4, 23);
-+	(void)bpf_testmod_test_struct_arg_9(16, (void *)17, 18, 19, (void *)20,
-+					    21, 22, struct_arg5, 27);
- 
- 	(void)bpf_testmod_test_arg_ptr_to_struct(&struct_arg1_2);
- 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tracing_struct.c b/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-index 2820fd912f2f..1e7ac6fc34bf 100644
---- a/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tracing_struct.c
-@@ -95,6 +95,20 @@ static void test_struct_many_args(void)
- 	ASSERT_EQ(skel->bss->t8_g, 23, "t8:g");
- 	ASSERT_EQ(skel->bss->t8_ret, 156, "t8 ret");
- 
-+	ASSERT_EQ(skel->bss->t9_a, 16, "t9:a");
-+	ASSERT_EQ(skel->bss->t9_b, 17, "t9:b");
-+	ASSERT_EQ(skel->bss->t9_c, 18, "t9:c");
-+	ASSERT_EQ(skel->bss->t9_d, 19, "t9:d");
-+	ASSERT_EQ(skel->bss->t9_e, 20, "t9:e");
-+	ASSERT_EQ(skel->bss->t9_f, 21, "t9:f");
-+	ASSERT_EQ(skel->bss->t9_g, 22, "t9:f");
-+	ASSERT_EQ(skel->bss->t9_h_a, 23, "t9:h.a");
-+	ASSERT_EQ(skel->bss->t9_h_b, 24, "t9:h.b");
-+	ASSERT_EQ(skel->bss->t9_h_c, 25, "t9:h.c");
-+	ASSERT_EQ(skel->bss->t9_h_d, 26, "t9:h.d");
-+	ASSERT_EQ(skel->bss->t9_i, 27, "t9:i");
-+	ASSERT_EQ(skel->bss->t9_ret, 258, "t9 ret");
-+
- 	tracing_struct_many_args__detach(skel);
- destroy_skel:
- 	tracing_struct_many_args__destroy(skel);
-diff --git a/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c b/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-index 3de4bb918178..4742012ace06 100644
---- a/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-+++ b/tools/testing/selftests/bpf/progs/tracing_struct_many_args.c
-@@ -8,8 +8,16 @@ struct bpf_testmod_struct_arg_4 {
- 	int b;
- };
- 
-+struct bpf_testmod_struct_arg_5 {
-+	char a;
-+	short b;
-+	int c;
-+	long d;
-+};
-+
- long t7_a, t7_b, t7_c, t7_d, t7_e, t7_f_a, t7_f_b, t7_ret;
- long t8_a, t8_b, t8_c, t8_d, t8_e, t8_f_a, t8_f_b, t8_g, t8_ret;
-+long t9_a, t9_b, t9_c, t9_d, t9_e, t9_f, t9_g, t9_h_a, t9_h_b, t9_h_c, t9_h_d, t9_i, t9_ret;
- 
- SEC("fentry/bpf_testmod_test_struct_arg_7")
- int BPF_PROG2(test_struct_many_args_1, __u64, a, void *, b, short, c, int, d,
-@@ -57,4 +65,31 @@ int BPF_PROG2(test_struct_many_args_4, __u64, a, void *, b, short, c, int, d,
- 	return 0;
- }
- 
-+SEC("fentry/bpf_testmod_test_struct_arg_9")
-+int BPF_PROG2(test_struct_many_args_5, __u64, a, void *, b, short, c, int, d, void *, e,
-+	      char, f, short, g, struct bpf_testmod_struct_arg_5, h, long, i)
-+{
-+	t9_a = a;
-+	t9_b = (long)b;
-+	t9_c = c;
-+	t9_d = d;
-+	t9_e = (long)e;
-+	t9_f = f;
-+	t9_g = g;
-+	t9_h_a = h.a;
-+	t9_h_b = h.b;
-+	t9_h_c = h.c;
-+	t9_h_d = h.d;
-+	t9_i = i;
-+	return 0;
-+}
-+
-+SEC("fexit/bpf_testmod_test_struct_arg_9")
-+int BPF_PROG2(test_struct_many_args_6, __u64, a, void *, b, short, c, int, d, void *, e,
-+	      char, f, short, g, struct bpf_testmod_struct_arg_5, h, long, i, int, ret)
-+{
-+	t9_ret = ret;
-+	return 0;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.34.1
+AVNU stands for "Avnu Alliance." AVNU (Audio Video Bridging Network 
+Alliance) is an industry consortium that promotes and certifies 
+interoperability of devices implementing IEEE 802.1 standards for 
+time-sensitive applications.
 
+This AVNU test refers to AVNU certification test plan.
+Should I add this information in the commit ?
+
+>> A known i225/6 hardware errata states traffic might overflow the planned
+> 
+> Do you have an idea for that errata? Please document it. (I see you added 
+> it at the end. Maybe use [1] notation for referencing it.)
+
+Sure.
+
+>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> 
+> As you Cc’ed stable@vger.kernel.org, add a Fixes: tag?
+
+Accidentally CC'ed stable@vger.kernel.org.
+Since it's a hardware bug, not software, probably Fixes: tag not needed ?
+Not sure which Fixes: commit to point to hmm.
+
+I'll remove stable kernel email and omit Fixes: tag, is that okay?
+
+>>   /* Returns the TSN specific registers to their default values after
+>>    * the adapter is reset.
+>>    */
+>> @@ -91,6 +100,9 @@ static int igc_tsn_disable_offload(struct igc_adapter 
+>> *adapter)
+>>       wr32(IGC_TXPBS, I225_TXPBSIZE_DEFAULT);
+>>       wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_DEFAULT);
+>> +    if (igc_is_device_id_i226(hw))
+>> +        igc_tsn_restore_retx_default(adapter);
+>> +
+>>       tqavctrl = rd32(IGC_TQAVCTRL);
+>>       tqavctrl &= ~(IGC_TQAVCTRL_TRANSMIT_MODE_TSN |
+>>                 IGC_TQAVCTRL_ENHANCED_QAV | IGC_TQAVCTRL_FUTSCDDIS);
+>> @@ -111,6 +123,25 @@ static int igc_tsn_disable_offload(struct 
+>> igc_adapter *adapter)
+>>       return 0;
+>>   }
+>> +/* To partially fix i226 HW errata, reduce MAC internal buffering from 
+>> 192 Bytes
+>> + * to 88 Bytes by setting RETX_CTL register using the recommendation from:
+>> + * a) Ethernet Controller I225/I22 Specification Update Rev 2.1
+>> + *    Item 9: TSN: Packet Transmission Might Cross the Qbv Window
+>> + * b) I225/6 SW User Manual Rev 1.2.4: Section 8.11.5 Retry Buffer Control
+>> + */
+>> +static void igc_tsn_set_retx_qbvfullth(struct igc_adapter *adapter)
+> 
+> It’d put threshold in the name.
+
+My earlier thought is that it is easier to look for the keyword "qbvfullth" 
+in the i226 SW User Manual where you'll get a hit that brings you directly 
+to that register. "qbvfullthreshold" would not.
+There are some comments in the new code that links 'th' to 'threshold' for 
+the reader.
+
+But I'm okay to change it to "qbvfullthreshold".
+Thoughts?
+
+Regards,
+Faizal
 
