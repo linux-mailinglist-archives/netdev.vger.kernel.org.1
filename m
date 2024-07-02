@@ -1,114 +1,74 @@
-Return-Path: <netdev+bounces-108569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E86992468B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:37:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B89924699
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48C612855A5
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:37:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 514F81F245AA
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366081C8FAB;
-	Tue,  2 Jul 2024 17:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4711BE86D;
+	Tue,  2 Jul 2024 17:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpICmlnb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NB55W28D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A501C0056
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 17:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E9E3D978;
+	Tue,  2 Jul 2024 17:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719941753; cv=none; b=AJ5MPjvaECmXWUUNPvUu/aWK5h3WRfTru7N8LZ6519DIvLrdocR05uixX5fia03gGMLpicJdzURy1yCjitFNWaH35TXtZOorL21ClIaiRdHSsNSn/IyrNtEjMqJcnOPKxkPHXhoAhmd21DrqJ52GqIsT54l9UVk2gBsq34rWQpA=
+	t=1719942281; cv=none; b=tx4P4ZHONspReGVgwG8ebp/bQh5CtjY+Pi5drUVOSjE02F6+/K836QRevJ+tVfLL0GJGcR7TO+OgEioctpLMwpWIZvouTBEBgYjwwXEwffMetkz/BSdQPLjZ0UYjZMRa1ka1ITTNsPMB/jSXjQqxC79pWA6fI0ADJwHDJnFl1Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719941753; c=relaxed/simple;
-	bh=NEKrRKMOly4RyOqQW5DuHPtvTr5bAsYeA6jrfljXxzQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ToKj/MGOCiEuT6JlLPYy8yfptiPKx7BjzidQ7anXEQgJgYUusPDti97bPAPs4WGSdIhbVnxdF/TrSIfvM8NqichN9CXmGV+j6JfGACt3ckxV+kB2HLXwPx/5psIMpr8r6T9oNLP4w/M8XxHs4lLmQwOIXyt94Suk3D0qI9+53jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpICmlnb; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-424ad289949so32595385e9.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 10:35:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719941750; x=1720546550; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i9OdqMsbcRZ7kiShEp8RLl5kFE6Pk3vU6GTPf+SL3qI=;
-        b=DpICmlnbNsF7jma4usdamdrbNWYjbQE6+kyqphEeBiH44yTJoA73mH1qNKNBPEFxnP
-         RcuyrJs/V3IpDDnFTLS1hpWPe+dwtdzf+Tr3S9nsip3wVbFrYl6kT2NCComv1XIvAMTI
-         oO70AKS+HOLQF7k8SS6Tb2VZVd9Dfqdf+YqXXxCLY7EhCYlKwE9Z0Qrg65Gq07SBIeNM
-         ba6dZUI1w7eW2tqae+OPF15ATzYXZAGDXlBP9Bi8YBgA109vrjUpnbjW2H5QXbJqFNIT
-         ksz8eIUnupUyM3v2DU2vIY+WnFcl9kPd1Leb2kpdJyw56+0ndjMkZgLYWVs4cBopG+CN
-         Ogow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719941750; x=1720546550;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i9OdqMsbcRZ7kiShEp8RLl5kFE6Pk3vU6GTPf+SL3qI=;
-        b=DcDgowTnzqrMBHOwh+XGgeP0HXEGDVM1ZAgDzYzrNFYHpWUejfXitbcAtX3WKPExKg
-         Ot4GTRYzFhI9B0cJhcm48F9IpMFbIXm19kfTtKEtdaZ4wLw9hGqXsDRQifB0u8tYMSJY
-         U8XghnXiJzqgUjrsW4LKF0GiMelBKICRzW+uRiL7XexdNfg6sYthZ1MmBtqonyDOf+dK
-         GfoLKFf1tWiWJ5KJ8RTc+7ec7zElrJXl6fl0NYT08zfzzf64u7qg0ZW6squkNZzl1qvO
-         OImkVf9iGFWurDoK51uxa3FHtHs4clRF3aUb6CQjDcoNV5og5tSCJM+UaeuVJuUOJM5D
-         6hsQ==
-X-Gm-Message-State: AOJu0YzTskT5YcniOeMLgz6rWC/apH4x+S5EQIwlWgyq7Tv8lLc09o+L
-	GkQqIbfABih8GJd4G45kxHEQ3BunXvkkp0UJcE8quo3Ey0eS8FSJ
-X-Google-Smtp-Source: AGHT+IFve6+ahz9n0XotmEfB5f5KcfNsWmum8mQqjU1Aub1spnsr02+nVYpr9zfjromcL7XGX+4nVQ==
-X-Received: by 2002:a05:6000:154f:b0:367:47e6:c7e8 with SMTP id ffacd0b85a97d-3677571ff44mr6478082f8f.53.1719941749825;
-        Tue, 02 Jul 2024 10:35:49 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0cd634sm14004404f8f.9.2024.07.02.10.35.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jul 2024 10:35:49 -0700 (PDT)
-Subject: Re: [PATCH net-next] net: ethtool: fix compat with old RSS context
- API
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- przemyslaw.kitszel@intel.com, andrew@lunn.ch, ahmed.zaki@intel.com
-References: <20240702164157.4018425-1-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <3730656b-8bce-bba0-ae0a-7ada427abca0@gmail.com>
-Date: Tue, 2 Jul 2024 18:35:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1719942281; c=relaxed/simple;
+	bh=PjK5GvqBTsMK4HFv10GHs5g18DsWzLixUs35c8qTVCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nchFsiKUcT/TMPAMCwg50zvKX9+cK4ZcRrDYFfR8nkMQKnjFRgiegdzGqTLjQs/ziXRSIeusmauIlJuaNY1NOwMxdEVdpxgoHV420QRtNzKPK6amKTB0JK3t0m3dncPUpFTLRX120Drx9Pw7ChURwvcG+x+Kioz2lUAbTyyxqA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NB55W28D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2373AC116B1;
+	Tue,  2 Jul 2024 17:44:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719942280;
+	bh=PjK5GvqBTsMK4HFv10GHs5g18DsWzLixUs35c8qTVCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NB55W28DgwxAIfJS/NlkBqQ+QGxd2DaiQoRy8OIPYXvz4fo0hr85k9nwb4qruXXaj
+	 drOx7/3/2Am8LYPDB+X/8X5XgzUx9ajXHTCcSNNDa5m4YjpN6/zVyjQ0cv5+zi/Obc
+	 nGNkC/f2KTjJnwuZk8ZcoqnMqSoLCZ5rgztj8RnBnFLCmWSUBnUXJqOUm3G9B1nTwJ
+	 m27XuUzpO85kmXHmmxTbqyTBNDf8Wh6L567oh/PCZIteuQOPABHA0xeJ0Wi1izTEpI
+	 jAlHjMEcu3/d3/T8AbEjW42MwPJ93OLldDqvP08Bo+skm1uJwUS18MarDIo8MvTIof
+	 XRynFgbKG3Mlg==
+Date: Tue, 2 Jul 2024 10:44:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: Simon Horman <horms@kernel.org>, Igal Liberman
+ <igal.liberman@freescale.com>, Madalin Bucur <madalin.bucur@nxp.com>, Sean
+ Anderson <sean.anderson@seco.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+Subject: Re: [PATCH] fsl/fman: Validate cell-index value obtained from
+ Device Tree
+Message-ID: <20240702104439.4df3a523@kernel.org>
+In-Reply-To: <20240702133651.GK598357@kernel.org>
+References: <20240702095034.12371-1-amishin@t-argos.ru>
+	<20240702133651.GK598357@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240702164157.4018425-1-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 02/07/2024 17:41, Jakub Kicinski wrote:
-> Device driver gets access to rxfh_dev, while rxfh is just a local
-> copy of user space params. We need to check what RSS context ID
-> driver assigned in rxfh_dev, not rxfh.
-> 
-> Using rxfh leads to trying to store all contexts at index 0xffffffff.
-> From the user perspective it leads to "driver chose duplicate ID"
-> warnings when second context is added and inability to access any
-> contexts even tho they were successfully created - xa_load() for
-> the actual context ID will return NULL, and syscall will return -ENOENT.
-> 
-> Looks like a rebasing mistake, since rxfh_dev was added relatively
-> recently by fb6e30a72539 ("net: ethtool: pass a pointer to parameters
-> to get/set_rxfh ethtool ops").
-> 
-> Fixes: eac9122f0c41 ("net: ethtool: record custom RSS contexts in the XArray")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, 2 Jul 2024 14:36:51 +0100 Simon Horman wrote:
+> Maybe it is intentional, I'm unsure.
+> Perhaps this can be investigated separately to the fix proposed by this
+> patch?
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
-
-My bad, I should have re-tested that side of things after the rebase
- onto Ahmed's changes, instead of just testing the new API via sfc.
-Thanks for catching it so quickly.
++1, please fix this first
 
