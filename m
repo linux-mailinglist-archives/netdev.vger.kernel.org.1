@@ -1,50 +1,72 @@
-Return-Path: <netdev+bounces-108480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B8F923F2F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:40:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F04923F48
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500D31F22AE1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:40:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 879EE1C21FBC
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4213B1B5812;
-	Tue,  2 Jul 2024 13:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6129B1B47DC;
+	Tue,  2 Jul 2024 13:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6LehY74"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LILiKqsk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E6E1B5806;
-	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4131B4C41
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 13:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719927634; cv=none; b=LnRoiyYMVGlk18pGMW5sUnJ7fkI6l2leWdXtUEEO9Pw4fkDEcVdxA9v5lpxVxacNcXOWLhY+XJcYE8IzqWngBXpsOVYfXqpxA1TsAZzkXmRu4Zpc9nZ/Qn/oHZf+XwS2HXgbFiXgjnxcUFOTX0DxoECEcW2/3ylriMO21ne/qXk=
+	t=1719927899; cv=none; b=ZqVN9LNV/JQU53ndErP3pUV7Rp22XSff+muM02hsR2Ozik44gbcBV63uk1WSvMnCsMlMBaxYxy+XoIqO3saCmlGqIcBRDRAGPiNxXHdUwUK+FQ/5bXA6sEMl7hWc/OFEmW3aR2pH+TJ8JFONezasnYFJKNtKIivwtrXw0csbu5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719927634; c=relaxed/simple;
-	bh=pirxWw773xu5RQIIpdcnxs6Z4AgajmiN1N9tjfkWv30=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qn8VLv8qwLvSpEGcOZ6NNQWwtdwmHbioaLf7YR4N/vwE3OdYOclkI16dfAuXcDFdTFOI0prwJp/ayKLHjF/kCjo/jmBXs0LKO/GvMPPEz48bDp3+XrLgNTf4MwDSB49025Jd1TKQZIR0GlyK+3NhpOx+4mRpwK+nB/I3Jd24wDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6LehY74; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 89082C4AF0C;
-	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719927633;
-	bh=pirxWw773xu5RQIIpdcnxs6Z4AgajmiN1N9tjfkWv30=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u6LehY74eg+cOh6kEtnIMnRGosYjQ7jUv7ET/UBgLnQeOhEnwc9Ut9koYabzR5GRU
-	 CwFw2WCyCoymXKuJbdcF4SKbt9MK47avpEbbjUnJzE6swFcPSJh6Muv7zDNook1zID
-	 vBShPDV59Fgoc5qN2c/RSUHbB5V5loNbFsxpVuTJ26PgVEvs5WDy0mq1gaec2eih3S
-	 uYo3YVWZK7BqKUjCukJdMFE7oNh2B1xOOfxhpL3t+LjgL4Tie+EQL73mBCjvXhTWFq
-	 aGgjpcHDiqejWSZBoF0qSYL3GNM/s7SZlmFwtnMRx5fkJoJaeweNcQUVJ+pgp+krg8
-	 CgB1GNX30OiHQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79454CF3B95;
-	Tue,  2 Jul 2024 13:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719927899; c=relaxed/simple;
+	bh=2gpnR2gAVTCUgMbD2zpjQMoFCN1JPTv8HiXHTi269wY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AVrjBDkOEQ18dAY1ItUJ2zgV3WGzK+v1PppPws4K+vNuop7cZ579BLUteduUgJLaLRdHrlFfIB6ykoS4QDKMwkr+eZp7Cs4gNJSodn2G1D9JVkqpA7XguQirNGX+V6N3phocNCjosChekZGOIWVj/PiJVKXffjEK8YqBhlQ2URs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LILiKqsk; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719927898; x=1751463898;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2gpnR2gAVTCUgMbD2zpjQMoFCN1JPTv8HiXHTi269wY=;
+  b=LILiKqskldYnuK/7M/nWJNQPLJPeW/3WUYUoJw8dBfQ118atozLh86qi
+   Jmlbsktz2oanWlQJAcvBLJ+Z9qV8VMR1ztqf1ksTDaUQhj/kn1NmMkxqY
+   ThUautt/BjmGkUQSnhQ/fttKRyx9J6z3DpA4/BSJo6pXzSz443+l2BHsR
+   vrojfDDulVqd547+48QyyicREwu+PZXN7pbN+sXelQfHWtugTOB9QMjsu
+   cxMhbGkSC0cbxOZnP+YHUFSjHWrFeBUcJ87/KJm3DVMKLIcviWz4bRKuq
+   I26LGrwTNYiIu7ceZXakBuIFBhEIpy8Qa4fwwVyGBGnPoLpheBsqBJKN/
+   g==;
+X-CSE-ConnectionGUID: E92c7PapRUC4xWwqicWK1g==
+X-CSE-MsgGUID: lfJLPRn3Sf620YJxF2tbHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="16826397"
+X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
+   d="scan'208";a="16826397"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 06:44:57 -0700
+X-CSE-ConnectionGUID: 8sa5tS7OTkypD3T1vOjt2A==
+X-CSE-MsgGUID: iAtLnuk5SlmKYxqn6500Xg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
+   d="scan'208";a="83460492"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.132])
+  by orviesa001.jf.intel.com with ESMTP; 02 Jul 2024 06:44:56 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-next 0/7] ice: Cleanup and refactor PTP pin handling
+Date: Tue,  2 Jul 2024 15:41:29 +0200
+Message-ID: <20240702134448.132374-9-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,45 +74,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: dwmac: Validate PBL for all
- IP-cores
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171992763349.28501.13027793993497248100.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Jul 2024 13:40:33 +0000
-References: <20240628154515.8783-1-fancer.lancer@gmail.com>
-In-Reply-To: <20240628154515.8783-1-fancer.lancer@gmail.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- peppe.cavallaro@st.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-Hello:
+This series cleans up current PTP GPIO pin handling, fixes minor bugs,
+refactors implementation for all products, introduces SDP (Software
+Definable Pins) for E825C and implements reading SDP section from NVM
+for E810 products.
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Karol Kolacinski (5):
+  ice: Implement ice_ptp_pin_desc
+  ice: Add SDPs support for E825C
+  ice: Align E810T GPIO to other products
+  ice: Cache perout/extts requests and check flags
+  ice: Disable shared pin on E810 on setfunc
 
-On Fri, 28 Jun 2024 18:45:12 +0300 you wrote:
-> Indeed the maximum DMA burst length can be programmed not only for DW
-> xGMACs, Allwinner EMACs and Spear SoC GMAC, but in accordance with
-> [1, 2, 3] for Generic DW *MAC IP-cores. Moreover the STMMAC driver parses
-> the property and then apply the configuration for all supported DW MAC
-> devices. All of that makes the property being available for all IP-cores
-> the bindings supports. Let's make sure the PBL-related properties are
-> validated for all of them by the common DW *MAC DT schema.
-> 
-> [...]
+Sergey Temerkhanov (1):
+  ice: Enable 1PPS out from CGU for E825C products
 
-Here is the summary with links:
-  - [net-next] dt-bindings: net: dwmac: Validate PBL for all IP-cores
-    https://git.kernel.org/netdev/net-next/c/d01e0e98de31
+Yochai Hagvi (1):
+  ice: Read SDP section from NVM for pin definitions
 
-You are awesome, thank you!
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |    9 +
+ drivers/net/ethernet/intel/ice/ice_gnss.c     |    4 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 1129 +++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  119 +-
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   |    2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  103 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   72 +-
+ 7 files changed, 799 insertions(+), 639 deletions(-)
+
+V1 -> V2: fixed formatting issues for:
+          - ice: Implement ice_ptp_pin_desc
+          - ice: Add SDPs support for E825C
+          - ice: Align E810T GPIO to other products
+          - ice: Cache perout/extts requests and check flags
+          - ice: Disable shared pin on E810 on setfunc
+          - ice: Enable 1PPS out from CGU for E825C products
+
+base-commit: e3b49a7f2d9eded4f7fa4d4a5c803986d747e192
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2
 
 
