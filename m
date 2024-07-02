@@ -1,94 +1,79 @@
-Return-Path: <netdev+bounces-108614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB380924967
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 22:37:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691C6924990
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 22:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED9411C2287A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:37:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B4801C22AE3
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF669200135;
-	Tue,  2 Jul 2024 20:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V0Dx6JMI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7B8200134;
+	Tue,  2 Jul 2024 20:47:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA691B5813
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 20:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3B41E531;
+	Tue,  2 Jul 2024 20:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719952647; cv=none; b=QL8+GdQkuco28hg+sKG22Gs0w0qOlP3n3qW8MiBPB0S0xX3I1N33cwCK8JE15zIWCqNFsMsuY82WO4Ck9Fq7qOomEoGNJU46Uah8q+LjKOq6D/ysCaP1z1dvrixJd+9kukXxv1otGVNLU36IEpPqvR2M6k37ZfLe4pjuXuxLtJ8=
+	t=1719953271; cv=none; b=d0oYQBEDYLZXQCYXy7pS/hTlAJ/zgCPBA+fFz+gBad0n8prePuq1WRv4R2zVLMFrIzTMyJ+xNuhYHkEIXK0eDmp6hHOK46pTz2iICIm1Bp5ZNQ+AU25gac7LiH+gg2r+HErYUQs1dzb15Yl+7iWw2OulSJdwhTmF8JAsm07LaZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719952647; c=relaxed/simple;
-	bh=HAsT+aH+kX4qzvs4QwoN8ulbUS9ZQ8J55ZxlIlYQEx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gkTnPTvgmkZRRuUgsBEcN24XPuK1/agl2J6DMWRc6J/DsBfPdyHY4XjlMt/SZbOyg9nzJvxY2W5AZIgb0ksQbLPERgLsOAk61m5GPpUpiLh/weCSJrXVpoet4AGAxz+v7I0cnWWPJEiOEYVMTo+n9b1iYTUxhfTHh8NsWp4EG8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=V0Dx6JMI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cCgKyv2Jiig0mHxbiPNcpl7uO/GAM/QfwldfnBuhzxA=; b=V0Dx6JMIms9w2za3HET8JbUtuS
-	mdGblfAwzhiVs53I709VhScwkaSoyZR4mQBOVJZxHkQg3C4V1hDgX9zCad6bhWJ51wmEARCarywmo
-	GAjdqsSASkYrcyONkO8LRgsLAkurkFErjTbKp5c/VjdlgBTDIqYOd8srvAnzGJWzH4Wc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sOkFc-001fZn-Ir; Tue, 02 Jul 2024 22:37:20 +0200
-Date: Tue, 2 Jul 2024 22:37:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	kernel-team@meta.com
-Subject: Re: [net-next PATCH v3 11/15] eth: fbnic: Add link detection
-Message-ID: <e7527f49-60a2-4e64-a93b-c72ad2cc4879@lunn.ch>
-References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
- <171993242260.3697648.17293962511485193331.stgit@ahduyck-xeon-server.home.arpa>
- <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk>
- <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
- <281cdc6a-635f-499d-a312-9c7d8bb949f1@lunn.ch>
- <CAKgT0UcAYxnKkCSk7a3EKv6GzZn51Xfrd2Yr0yjcC2_=tk9ZQA@mail.gmail.com>
+	s=arc-20240116; t=1719953271; c=relaxed/simple;
+	bh=0mfKML5YdAAG2tBLmjBtcbFJBQL1ZJApZDKstbioGaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Uz6eOL6TigmJCdk6d2Pwm0w7KmMxd/jKVYE6RAcVhnqTrCZmjGuaxD/7lFYxGjZLYV4Fa82X4+lMinBvAGbNIiNWwoACOpkvhBgWRLPPXQ37hbzCGMllI5N818ijYIlS/l+MMS22i2/5WcEfPINq/cKh1oCN/YUk+8Vo9KEpavs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047C4C116B1;
+	Tue,  2 Jul 2024 20:47:48 +0000 (UTC)
+Date: Tue, 2 Jul 2024 16:47:47 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Carlos Bilbao
+ <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, workflows@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+ ksummit@lists.linux.dev
+Subject: Re: [PATCH v2 0/2] Documentation: update information for mailing
+ lists
+Message-ID: <20240702164747.2e45ce66@rorschach.local.home>
+In-Reply-To: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UcAYxnKkCSk7a3EKv6GzZn51Xfrd2Yr0yjcC2_=tk9ZQA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > As for multiple PCS for one connection, is this common, or special to
-> > your hardware?
+On Wed, 19 Jun 2024 14:24:05 -0400
+Konstantin Ryabitsev <konstantin@linuxfoundation.org> wrote:
+
+> - drops the recommendation to use /r/ subpaths in lore.kernel.org links
+> (it has been unnecessary for a number of years)
+> - adds some detail on how to reference specific Link trailers from
+> inside the commit message
 > 
-> I would think it is common. Basically once you get over 10G you start
-> seeing all these XXXXXbase[CDKLS]R[248] speeds advertised and usually
-> the 2/4/8 represents the number of lanes being used. I would think
-> most hardware probably has a PCS block per lane as they can be
-> configured separately and in our case anyway you can use just the one
-> lane mode and then you only need to setup 1 lane, or you can use the 2
-> lane mode and you need to setup 2.
+> Some of these changes are the result of discussions on the ksummit
+> mailing list [2].
 > 
-> Some of our logic is merged like I mentioned though so maybe it would
-> make more sense to just merge the lanes. Anyway I guess I can start
-> working on that code for the next patch set. I will look at what I
-> need to do to extend the logic. For now I might be able to get by with
-> just dropping support for 50R1 since that isn't currently being used
-> as a default.
+> Link: https://subspace.kernel.org # [1]
+> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat/ # [2]
+> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+> ---
+> Changes in v2:
+> - Minor wording changes to text and commit messages based on feedback.
+> - Link to v1: https://lore.kernel.org/r/20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org
 
-So maybe a dumb question. How does negotiation work? Just one performs
-negotiation? They all do, and if you get different results you declare
-the link broken? First one to complete wins? Or even, you can
-configure each lane to use different negotiation parameters...
+Should drop the '/r' ;-)
 
-    Andrew
+-- Steve
 
