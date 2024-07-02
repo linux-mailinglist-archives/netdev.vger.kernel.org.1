@@ -1,125 +1,162 @@
-Return-Path: <netdev+bounces-108497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5179923F9B
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:54:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09A2923FA9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5049DB265F8
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:54:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A352528B47C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 13:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484F51BBBEA;
-	Tue,  2 Jul 2024 13:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DCE1B580F;
+	Tue,  2 Jul 2024 13:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EpXAyyW0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZN1KX9xu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93891BBBDB
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 13:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F81B4C51
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 13:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719928362; cv=none; b=fZYQ9S98MgF4n0EfEybAh1P7L29MsrBgCOlwsfdlE5Yo3pKPzEHIyslxbUsQ613rgOsrp9RwPTalLJQXq1F0uDYPhDl+bLVYtxiQLtp7FTgsNWkzqa5JSsLfvfMUQ+28HvfgInPdQv2G4x54TUh9Ll5stYyYzLL55T5jf7qCe5M=
+	t=1719928562; cv=none; b=A66XlyqJ3dniO2gd2aBOiekcADHo95Mxn5keMz+gAAUkJL4/7DNgMH+bA+sRe+of9rWVcaypYGs2ruwEHCk1U5o1E7CYt1oQN+x4YpVKIMtOWXbCjYwS3fEiBwxnhnJ3Pdrx7fA0lf1UgRMm98+2Y7jpkVZ7wgeBsE6CDFt0DwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719928362; c=relaxed/simple;
-	bh=P6S+NowqFefU6p5hl11O9W1QFA8EksZD70L3JdU7PD4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CzARxgnjPfRjkHJ0RBNt0AzAULWtKw92fUaVA0sZKivSs6L/A4Wg/6huiETdMiY63eKN0tb8FFXkxU/tu5aiYw/D+/RztgPH71KzEJ/lqlsnRcWo6TrS24e/aayHoPkqiNp8rJzq0YM/+dhUDqvpRSlIguvuwAjyuGHDxECLY1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EpXAyyW0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719928359;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=P6S+NowqFefU6p5hl11O9W1QFA8EksZD70L3JdU7PD4=;
-	b=EpXAyyW0Tx5VOx3+kDByfQ5emII/o+0IwKJn7HUsygP5Wd/gCbIBB58XWmm9BXU7TY8hDU
-	nbsaAFK/z1XyJgoIqidtrrlZGNu8VbbOsBqwB47Qs4obNnMbcSBeBRalZDH6c3sDgeHAdg
-	rzqVMKNYcoGdyShBfsHhVSnS9EbzEjU=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-JgKCu0_pMy20ezNyCRUsXQ-1; Tue, 02 Jul 2024 09:52:37 -0400
-X-MC-Unique: JgKCu0_pMy20ezNyCRUsXQ-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52e7f70b0deso50731e87.0
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 06:52:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719928355; x=1720533155;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P6S+NowqFefU6p5hl11O9W1QFA8EksZD70L3JdU7PD4=;
-        b=YiFYJpRovLkoguJbt35vqd1OVvUx7yPrWEli0Z+v5n1bcKuLHqV8QqsduGFMPq4x1K
-         qXve7cPpgyOgghmGYCAw72ysBOeCkC4oGyW8EvpLCAdRW1dqrZIUfboTYF2x251HUV3v
-         pZPnQ5oHhy2Hxij9fZCTt+uSZYHhT4nJm6teMg5G6iUeMSM+5d+AJV+58S8rxyemVN8F
-         8TV6LYr7OCrqg5l3k3iRseuZStDThrbDMLXkmVi7GNrCYN2aLFUX7rTapBopmrXD0CPZ
-         FBPRlpl08XXm4w/07m2TkIZ3YrZYFpm1ZESiLXoFbSfn2DHh0d1WrPZfaWoyS9yhHr48
-         Q8Lw==
-X-Gm-Message-State: AOJu0YyUI4RoD1raf74hVwjzMfSiSyPQjCggsf6zHLdYmHP2/wBLnHP2
-	pg4TYLVti+0aCxM9OSoB0kv3Gtes44XkdN213MTEJKGvHMQ8r0u2rkVgcP9wYLJKEQhMjiaPiw5
-	7BgE+hxzOWNHnQ9c1eZyTablVI/2aTVurcfk8jMleRLBLaMmU8LZmXA==
-X-Received: by 2002:a05:6512:1043:b0:52c:dc76:4876 with SMTP id 2adb3069b0e04-52e827a730fmr5447037e87.6.1719928355217;
-        Tue, 02 Jul 2024 06:52:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQj+pGW76WHzqiRnLGjvsGlzmwcV32Dvnzj0uL3mKPLrpmlXe/OQIVf+/a7TR0KyJNNKOiIA==
-X-Received: by 2002:a05:6512:1043:b0:52c:dc76:4876 with SMTP id 2adb3069b0e04-52e827a730fmr5446971e87.6.1719928352820;
-        Tue, 02 Jul 2024 06:52:32 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b0a6:6710::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256af376easm199653035e9.5.2024.07.02.06.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 06:52:32 -0700 (PDT)
-Message-ID: <6566bc6faf4e67e5ae3c7a3ecb93b16efc7ed221.camel@redhat.com>
-Subject: Re: [PATCH net-next 0/3] net: bpf_net_context cleanups.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	patchwork-bot+netdevbpf@kernel.org
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, bjorn@kernel.org, 
- davem@davemloft.net, ast@kernel.org, andrii@kernel.org,
- daniel@iogearbox.net,  eddyz87@gmail.com, edumazet@google.com,
- haoluo@google.com, kuba@kernel.org,  hawk@kernel.org, jolsa@kernel.org,
- john.fastabend@gmail.com,  jonathan.lemon@gmail.com, kpsingh@kernel.org,
- maciej.fijalkowski@intel.com,  magnus.karlsson@intel.com,
- martin.lau@linux.dev, song@kernel.org, sdf@fomichev.me, 
- tglx@linutronix.de, yonghong.song@linux.dev
-Date: Tue, 02 Jul 2024 15:52:30 +0200
-In-Reply-To: <20240702134546.2CeHYMhf@linutronix.de>
-References: <20240628103020.1766241-1-bigeasy@linutronix.de>
-	 <171992763353.28501.245433484118524334.git-patchwork-notify@kernel.org>
-	 <20240702134428.hUZawCsP@linutronix.de>
-	 <20240702134546.2CeHYMhf@linutronix.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1719928562; c=relaxed/simple;
+	bh=Y2Qu0TIJwKQDeoiTu4uTBHFv2uTrpIw73oRA4Oe8AXI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f377Jx+W0GL73URiSj2QXFA2lJto33uWgRInUO7gcEeObQJQZpd9xKAKkoet6vxFmLAWfbuwrJYaWnXllMZT50dJ3AsLJz/p662njAFW3bwQWABC805buDKzEY+O31l1146zMWdGFyvdvQltlP7xnmWjq2CbE+k59Z5XtY755fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZN1KX9xu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 037F2C4AF0C;
+	Tue,  2 Jul 2024 13:55:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719928561;
+	bh=Y2Qu0TIJwKQDeoiTu4uTBHFv2uTrpIw73oRA4Oe8AXI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ZN1KX9xuGLC5omBA15agB1FQzoqj5Ira9tugDRP3V5rXfuHysdrjlUCwPx04AI5dT
+	 t4G1Ljo1dQHcbasBrVURtOuIgmcSYCZMnhmQfv0xfx7toRaCcxJX3T2evwfRd8ot8c
+	 qAW0vubkt6q/L2rscU0/XKh/O/O4a36BY3e2yT9FbyZ29YZ/5Nkeo9plAO7woGZYl9
+	 zW2Vr8cJBzi5ddjJ/M/bqrtZVSKGRdJH+ioj2I48FLp5KhzO99UDW4z+Xp9Km0mIdY
+	 HfivqbiyHZFq3Q/5cQmc4sH9JczM3bakEbsSWcqJ0bYztH8NOwm/QqIjEAK14m+ov9
+	 gPQuqlCcpi1fA==
+From: 'Simon Horman' <horms@kernel.org>
+Date: Tue, 02 Jul 2024 14:55:55 +0100
+Subject: [PATCH net v6] bonding: Fix out-of-bounds read in
+ bond_option_arp_ip_targets_set()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240702-bond-oob-v6-1-2dfdba195c19@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOoGhGYC/2WMTQ7CIBBGr9LMWsxQKYgr72FclDK2RAMNNETT9
+ O4SNmpcfj/vrZAoOkpwalaIlF1ywZcgdw0MU+9HYs6WDC22AgXXzARvWQiGcXEc0OhOoh2g3Od
+ IN/esqgt4WuBaysmlJcRX1WdRp39TFowzqa3lvZTWtHi+U/T02Ic4VkvuPqQ84BfZFVJZpbUk7
+ FGpH3LbtjdlsmjG4AAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>, 
+ Andy Gospodarek <andy@greyhouse.net>, 
+ Ding Tianhong <dingtianhong@huawei.com>, Hangbin Liu <liuhangbin@gmail.com>, 
+ Sam Sun <samsun1006219@gmail.com>, netdev@vger.kernel.org
+X-Mailer: b4 0.12.3
 
-On Tue, 2024-07-02 at 15:45 +0200, Sebastian Andrzej Siewior wrote:
-> On 2024-07-02 15:44:30 [+0200], To patchwork-bot+netdevbpf@kernel.org wro=
-te:
-> > On 2024-07-02 13:40:33 [+0000], patchwork-bot+netdevbpf@kernel.org wrot=
-e:
-> > > You are awesome, thank you!
-> > no, I am not. The last one does not compile. I was waiting for some
-> > feedback.
-> > Let me send a fix real quick=E2=80=A6
->=20
-> Sorry. Wrong series. All good.
+From: Sam Sun <samsun1006219@gmail.com>
 
-Well, I actually test-build the series locally before pushing.
-Sometimes that is not enough, hopefully it was, this time :)
+In function bond_option_arp_ip_targets_set(), if newval->string is an
+empty string, newval->string+1 will point to the byte after the
+string, causing an out-of-bound read.
 
-/P
+BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0xc1/0x5e0 mm/kasan/report.c:475
+ kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+ strlen+0x7d/0xa0 lib/string.c:418
+ __fortify_strlen include/linux/fortify-string.h:210 [inline]
+ in4_pton+0xa3/0x3f0 net/core/utils.c:130
+ bond_option_arp_ip_targets_set+0xc2/0x910
+drivers/net/bonding/bond_options.c:1201
+ __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+ __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
+ bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+ bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
+ dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+ sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+ kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x96a/0xd80 fs/read_write.c:584
+ ksys_write+0x122/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+---[ end trace ]---
+
+Fix it by adding a check of string length before using it.
+
+Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
+Signed-off-by: Yue Sun <samsun1006219@gmail.com>
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+Changes in v6 (Simon):
+- Update check to strlen(...) < 1, as suggested by Jakub
+- Not accumulating tags due to above change,
+  which is material given the size of this patch
+- Link to v5: https://lore.kernel.org/r/20240630-bond-oob-v5-1-7d7996e0a077@kernel.org
+
+Changes in v5 (Simon):
+- Remove stray 'I4' from netdev_err() string. Thanks to Hangbin Liu.
+- Sorry for the long delay between v4 and v5, this completely slipped my
+  mind.
+- Link to v4: https://lore.kernel.org/r/20240419-bond-oob-v4-1-69dd1a66db20@kernel.org
+
+Changes in v4 (Simon):
+- Correct  whitespace mangled patch; posting as requested by Sam Sun
+- Link to v3: https://lore.kernel.org/r/CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com
+
+Changes in v3 (Sam Sun):
+- According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
+  ("bonding: convert arp_ip_target to use the new option API") to
+  f9de11a16594 ("bonding: add ip checks when store ip target").
+- Link to v2: https://lore.kernel.org/r/CAEkJfYMdDQKY1C-wBZLiaJ=dCqfM9r=rykwwf+J-XHsFp7D9Ag@mail.gmail.com/
+
+Changes in v2 (Sam Sun):
+- According to Jay and Hangbin's opinion, remove target address in
+  netdev_err message since target is not initialized in error path and
+  will not provide useful information.
+- Link to v1: https://lore.kernel.org/r/CAEkJfYPYF-nNB2oiXfXwjPG0VVB2Bd8Q8kAq+74J=R+4HkngWw@mail.gmail.com/
+---
+ drivers/net/bonding/bond_options.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+index 0cacd7027e35..bc80fb6397dc 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -1214,9 +1214,9 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
+ 	__be32 target;
+ 
+ 	if (newval->string) {
+-		if (!in4_pton(newval->string+1, -1, (u8 *)&target, -1, NULL)) {
+-			netdev_err(bond->dev, "invalid ARP target %pI4 specified\n",
+-				   &target);
++		if (strlen(newval->string) < 1 ||
++		    !in4_pton(newval->string + 1, -1, (u8 *)&target, -1, NULL)) {
++			netdev_err(bond->dev, "invalid ARP target specified\n");
+ 			return ret;
+ 		}
+ 		if (newval->string[0] == '+')
 
 
