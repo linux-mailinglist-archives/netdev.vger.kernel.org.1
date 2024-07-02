@@ -1,236 +1,476 @@
-Return-Path: <netdev+bounces-108597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04479247A6
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:56:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D840E9247B9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1579DB20B7F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BD21C24FDF
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 18:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B549B1CD5B9;
-	Tue,  2 Jul 2024 18:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6E41CCCBE;
+	Tue,  2 Jul 2024 18:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b8S4/aKC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTSwVGSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22A01CB31A
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 18:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DBE1CCCB5
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 18:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719946588; cv=none; b=kkgR5wSBte/E7vyhgmVADq3Sr0PrILGVpug65I39uCraSA3ChXpVHSPaVLLOIMXg9W5xc9sQlWAv3sUupIxsaySnpKB1fbCPK2CJSUsHWD5dS752Efyb/lkuIH0AiQUVgg4Jvb7OLwc1XjdlHIVH8KQ2b8ovfO2mdSd8OfBxWG8=
+	t=1719946694; cv=none; b=d/IGbnHOmul/FFi8GhIQKSHO3Ucnmr8CaBHQpQwbkFehAbZ4vvbMuk0VOoxKhs9gwL3s8zLMhmCbuv0dJt8rjDMyhKGm0MgZY0F9OM+9p6g0N+ogZ2WZbivJh7lnPD6LinHU0lor3lJQFYOr7m9Br+WOE10fpCH3Nupq1MQlY3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719946588; c=relaxed/simple;
-	bh=5OCx2cFK3yUe5kFIfM+aQvfFbiq5GuQs5TaSZOYO4I8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hflu1bsLO5GNO2XsTHK+aFJcTAFbyy/601pfRWY01aQY5GZJG+kz6qvb1Ny/dO6bCtjqmBGmckTYswwG/cf5bCBIqasA+XDa2za12ygxFB3ozFqDr9CCn/OMUpPUTTK1lqve2FyWL9sy/yjWcu+nPf+uyBLW+SZVqcmuDwVmr5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b8S4/aKC; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a70c0349b64so604007766b.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 11:56:25 -0700 (PDT)
+	s=arc-20240116; t=1719946694; c=relaxed/simple;
+	bh=4lGHtcpwZwS8LCTAnmMo55mSC0GqFCQQAX2udEuXA1w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GRnPDfkEk33H/NFT/qPagH47jNfpoGC2TLDNxGsahm7vK8tNWVzAt6NSHrAvOZ5SjEtFDKk3xjO72Dt/yJKfRYdzbGh7HTA51etLzL2qV1Y7XKJjFjwfe23WnM6Kh5yWiV9Addt3/sunIhCfT2H02w6lSgJc7IDH5noLBdSiKVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTSwVGSq; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52cdbc20faeso6546349e87.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 11:58:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1719946584; x=1720551384; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q+XaHg6afNyrzqwGpiFIDD5nbTUxVvV2uOXwi+TSKmc=;
-        b=b8S4/aKCukipXA27qKtLWWRBTz2bk4qcbRzkwwReL9hx5JOJdNN2sxmM5tf7rIoekV
-         15BiJysM9zeJibMCs2PSxi2r88se0zOe3LLsN37kJZcd8Phv+7pzh8NohY+6javzzxPt
-         o1KrBNoGiBatPHTBwNoRCD88cYiI54AGtSDHE=
+        d=gmail.com; s=20230601; t=1719946691; x=1720551491; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4N+tEbb75+Q2pUQdMXhYugfNfAsFBzQnVIehrTNFoC0=;
+        b=TTSwVGSq9o0kHd3eMsLcZ36wfE2EHXaxHBKzSvYg3f2H9ojtL1dr0FNRQU3NLnv3Zh
+         Q/by6swuf8cfMc3mxZy2LhvKiLXNbgC/1+HRtszK5A/QfvbYomZxxpApmbGcsXmzv1OW
+         A8QZ6TeRHNp71MxmSpiV+pTPvg9k2kmhctub4X/4PPm54nKjcXGDu/SobokOw7+F+OE2
+         A3xERmWPz93UftCHxr+Izq7TF2y/evi/AqnflCUDri6GkTi575UhZS1fW4slZ4YeUBPf
+         acq7tokyzQ5FXbFxwV4957UTgrVRLkIiA7RBJ6h7Bdozk59ORR0ZnDO4azEraivZ5IDq
+         DY0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719946584; x=1720551384;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=q+XaHg6afNyrzqwGpiFIDD5nbTUxVvV2uOXwi+TSKmc=;
-        b=K+NYdgSlSY516+1nRqWWUwe9JxCB7RGMKnAzZM8hUbdkOAYgkkqTjfi06h8VjYPLpm
-         jwijDbFnTLS5WwwnRThYrfcu5qaF2PWyLofXG1xTlC7NKPsCtap/teZEHp8WDgsIqESY
-         vBFCzuur5N9wVncBLfAzVzOSIP2fpCDsQa1eL0/gz2EKO365KAhrXo3wIRg6dVw7WVwk
-         Y6za3NEg8huvYuHVKE3dldPzcRTstUEYGaky3UPvB2qnbZA3H1TYY9tNeqRAf4IUkk0A
-         XtOnr+DPOWPzGwROAMgebqI/1NpAN2VhvjkQOZTUVljv/eu2yrBfB4ua1hfUjcGHtk2U
-         75og==
-X-Forwarded-Encrypted: i=1; AJvYcCVv7BlMqeXtLdd9zO6F4CrO1yNpDtjsQ9iwJCS6DlK8UALfc7/uquf6zZGE5w4GzEoXDH8Be3bClLj9L+ijw7evWgdesik1
-X-Gm-Message-State: AOJu0Yw7gQm0/4kG077bVD4WWGpDmtI+rUCQmqiuVx0oYJHEfm5h4ITC
-	0+otypRa1PyPb1rUhLvEMQI6/vwQ7+33NxavAOEZRwU9xNIem7wCTsMG5l9nQQ==
-X-Google-Smtp-Source: AGHT+IEZRaZ1BVbdg7i2LbA6OYbJb7VhMvfdxJZ2B9p/HJCSyf4aXVEI4lvRQjGElNqeTccIAb9A6Q==
-X-Received: by 2002:a17:907:d15:b0:a70:c031:3359 with SMTP id a640c23a62f3a-a7514438b44mr781140066b.34.1719946584065;
-        Tue, 02 Jul 2024 11:56:24 -0700 (PDT)
-Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a750fb362d4sm333643266b.49.2024.07.02.11.56.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jul 2024 11:56:23 -0700 (PDT)
-Message-ID: <efd4272c-81fa-49ec-a3ff-0dfb9b5da7c1@broadcom.com>
-Date: Tue, 2 Jul 2024 20:56:20 +0200
+        d=1e100.net; s=20230601; t=1719946691; x=1720551491;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4N+tEbb75+Q2pUQdMXhYugfNfAsFBzQnVIehrTNFoC0=;
+        b=HoRwui6blT9mHJEpRsxQAQUtRXnxRXZAN6R5akP45JzDYOLPT8g27hLShMWA17GSr0
+         /u+P5t3U49AbrxJPVMuuh6O6+i/0N00xs5k4JG4yu5eh89/7QpC3DiaNpG7cm6osFx8C
+         2E8ho1yxMnJzPqrkQGpt+jOazLIVnZ5UgqhHGg3Ia5UkhLDbufG5KbUtDVD4ggbAaRNQ
+         NtXhTMs7Il3ufbesTp0wa6Tr+mSlfe6zZmcJtV1+xIPVAyxBrFcyBxalfO4E/DRqMJjq
+         3idZh6eL27Sa4rXQMDSEgqEIw/yMM5w3zB0Fn/NIcVqI/tXT5iMv0p4hq3nrfr2xIQXV
+         1edg==
+X-Gm-Message-State: AOJu0YweyTCr2DKICJ4twwJTbaIKn7cLXI7rCSkKLYrR9BtoPplzRvcO
+	TlFd2f8zVcwGmRJFEnAlXSDpGQz5sspPS8k20DW6XJKammtKx/ioOJLrOmiVxSdWjKnD5JGjgmT
+	zjY7GZpFmhmrlx+FwyUrnDRwVGoM=
+X-Google-Smtp-Source: AGHT+IHxdwki1frrg4wpF5r9J1b83g9BL+ylle+kc9D53SNTzjFVgF2qJmY2acGzEMrFnb6hh8uIUcUjzh1oWsT1h4E=
+X-Received: by 2002:a05:6512:ea2:b0:52e:76e8:e18e with SMTP id
+ 2adb3069b0e04-52e82648fe0mr6789595e87.7.1719946690336; Tue, 02 Jul 2024
+ 11:58:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/5] dt-bindings: net: wireless: brcm4329-fmac: add
- pci14e4,449d
-To: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org,
- krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org
-Cc: efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com,
- minipli@grsecurity.net, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com
-References: <20240630073605.2164346-1-jacobe.zang@wesion.com>
- <20240630073605.2164346-2-jacobe.zang@wesion.com>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <20240630073605.2164346-2-jacobe.zang@wesion.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000033e13b061c484542"
+References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
+ <171993242260.3697648.17293962511485193331.stgit@ahduyck-xeon-server.home.arpa>
+ <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk>
+In-Reply-To: <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 2 Jul 2024 11:57:33 -0700
+Message-ID: <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
+Subject: Re: [net-next PATCH v3 11/15] eth: fbnic: Add link detection
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
+	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, davem@davemloft.net, 
+	pabeni@redhat.com, edumazet@google.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---00000000000033e13b061c484542
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, Jul 2, 2024 at 10:21=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> Thanks for the patch - this is a review mainly from the phylink
+> perspective.
+>
+> On Tue, Jul 02, 2024 at 08:00:22AM -0700, Alexander Duyck wrote:
+> > +static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *=
+data)
+> > +{
+> > +     struct fbnic_dev *fbd =3D data;
+> > +     struct fbnic_net *fbn;
+> > +     bool link_up;
+> > +
+> > +     if (!fbd->mac->pcs_get_link_event(fbd)) {
+> > +             fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
+> > +                        1u << FBNIC_PCS_MSIX_ENTRY);
+> > +             return IRQ_HANDLED;
+> > +     }
+> > +
+> > +     link_up =3D fbd->link_state =3D=3D FBNIC_LINK_UP;
+> > +
+> > +     fbd->link_state =3D FBNIC_LINK_EVENT;
+> > +     fbn =3D netdev_priv(fbd->netdev);
+> > +
+> > +     phylink_pcs_change(&fbn->phylink_pcs, link_up);
+>
+> fbd->link_state seems to be set to FBNIC_LINK_UP when the
+> mac_link_up(), more specifically fbnic_mac_link_up_asic() gets called.
+> No, never report back to phylink what phylink asked the MAC/PCS to do!
+>
+> If you don't know what happened to the link here, then report that the
+> link went down - in other words, always pass "false" to
+> phylink_pcs_change() which ensures that phylink will never miss a
+> link-down event (because it will assume that the link went down.)
+>
+> I think you could even do:
+>
+>         struct fbnic_dev *fbd =3D data;
+>         struct fbnic_net *fbn;
+>         int status;
+>
+>         status =3D fbd->mac->pcs_get_link_event(fbd);
+>         if (status =3D=3D 0) {
+>                 fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
+>                            1u << FBNIC_PCS_MSIX_ENTRY);
+>         } else {
+>                 fbn =3D netdiev_priv(fbd->netdev);
+>
+>                 phylink_pcs_change(&fbn->phylink_pcs, status > 0);
+>         }
+>
+>         return IRQ_HANDLED;
+>
 
-On 6/30/2024 9:36 AM, Jacobe Zang wrote:
-> It's the device id used by AP6275P which is the Wi-Fi module
-> used by Rockchip's RK3588 evaluation board and also used in
-> some other RK3588 boards.
+I will probably just default it to false for now to keep it simple.
 
-Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> ---
->   .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml      | 1 +
->   1 file changed, 1 insertion(+)
+> > +/**
+> > + * fbnic_mac_enable - Configure the MAC to enable it to advertise link
+> > + * @fbd: Pointer to device to initialize
+> > + *
+> > + * This function provides basic bringup for the CMAC and sets the link
+> > + * state to FBNIC_LINK_EVENT which tells the link state check that the
+> > + * current state is unknown and that interrupts must be enabled after =
+the
+> > + * check is completed.
+> > + *
+> > + * Return: non-zero on failure.
+> > + **/
+> > +int fbnic_mac_enable(struct fbnic_dev *fbd)
+> > +{
+> > +     struct fbnic_net *fbn =3D netdev_priv(fbd->netdev);
+> > +     u32 vector =3D fbd->pcs_msix_vector;
+> > +     int err;
+> > +
+> > +     /* Request the IRQ for MAC link vector.
+> > +      * Map MAC cause to it, and unmask it
+> > +      */
+> > +     err =3D request_irq(vector, &fbnic_pcs_msix_intr, 0,
+> > +                       fbd->netdev->name, fbd);
+> > +     if (err)
+> > +             return err;
+> > +
+> > +     fbnic_wr32(fbd, FBNIC_INTR_MSIX_CTRL(FBNIC_INTR_MSIX_CTRL_PCS_IDX=
+),
+> > +                FBNIC_PCS_MSIX_ENTRY | FBNIC_INTR_MSIX_CTRL_ENABLE);
+> > +
+> > +     phylink_start(fbn->phylink);
+> > +
+> > +     fbnic_wr32(fbd, FBNIC_INTR_SET(0), 1u << FBNIC_PCS_MSIX_ENTRY);
+>
+> If this is enabling the interrupt, ideally that should be before
+> phylink_start().
 
---00000000000033e13b061c484542
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Actually the interrupt is enabled after the first time
+fbnic_pcs_get_link_asic/pcs_get_state is called.
 
-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
-2Gzj3QNJRLsZu1TLyOyBBIr/BE7UiY3RabgRzknBGAPmzhS+fmyM8OtM5BYBsFBrSUFtZZO2p/tf
-Nbc24J2zf2peoZ8MK+7WQqummYlOnz+FyDkA9EybeNMcS5C+xi/PAgMBAAGjggHdMIIB2TAOBgNV
-HQ8BAf8EBAMCBaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJl
-Lmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYI
-KwYBBQUHMAGGNWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24y
-Y2EyMDIwME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3
-dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqG
-OGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3Js
-MCcGA1UdEQQgMB6BHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYB
-BQUHAwQwHwYDVR0jBBgwFoAUljPR5lgXWzR1ioFWZNW+SN6hj88wHQYDVR0OBBYEFIikAXd8CEtv
-ZbDflDRnf3tuStPuMA0GCSqGSIb3DQEBCwUAA4IBAQCdS5XCYx6k2GGZui9DlFsFm75khkqAU7rT
-zBX04sJU1+B1wtgmWTVIzW7ugdtDZ4gzaV0S9xRhpDErjJaltxPbCylb1DEsLj+AIvBR34caW6ZG
-sQk444t0HPb29HnWYj+OllIGMbdJWr0/P95ZrKk2bP24ub3ZP/8SyzrohfIba9WZKMq6g2nTLZE3
-BtkeSGJx/8dy0h8YmRn+adOrxKXHxhSL8BNn8wsmIZyYWe6fRcBtO3Ks2DOLyHCdkoFlN8x9VUQF
-N2ulEgqCbRKkx+qNirW86eF138lr1gRxzclu/38ko//MmkAYR/+hP3WnBll7zbpIt0jc9wyFkSqH
-p8a1MYICbTCCAmkCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1z
-YTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIgQ0EgMjAyMAIMTv1t
-bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCDGw93/OpyC9vFbUNI0
-KYsgXEqRqM8AJiA6k/pIPqhDODAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
-BTEPFw0yNDA3MDIxODU2MjRaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
-AwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzAL
-BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAYvmEReR1wY5pDjTgWocib9dMwV5j74Lq47Q4
-UQmSwwB/CV95agjOCA9X+892vbeoZDmGvFVKgmd6zDwauhaLItb2rfRHKisXoGPPZusebEbM3Sta
-vYXevPCcOHsj1+5pDjxzCrvAqPnoF8g81GbUNWm0fSmQ7pyeREA4ME+1WZ0RIK+gXyTCpyNNvmbG
-uMVldM2GXPUzBulRWjQ/0xMUyxlKtlUGq0e533AuyoQCk0HTo4kIpD6vE6BEtLs7JKBgkRxGt51L
-WS/LWZxCTVmm6MEAk3h3QlI2qIa6De5qiISp/3FsOfi3Tt5flwHt2Em7WkaBoU0psC1cW+5j0o33
-0A==
---00000000000033e13b061c484542--
+From what I can tell this is just adding an extra manual interrupt
+trigger, though it isn't setting any cause bits so it is most likely
+there just to trigger the interrupt to clear stale data. I suspect
+this is some holdover code from version 1 that wasn't based on
+phylink.
+
+> > +void fbnic_mac_disable(struct fbnic_dev *fbd)
+> > +{
+> > +     struct fbnic_net *fbn =3D netdev_priv(fbd->netdev);
+> > +
+> > +     /* Nothing to do if link is already disabled */
+> > +     if (fbd->link_state =3D=3D FBNIC_LINK_DISABLED)
+> > +             return;
+> > +
+> > +     phylink_stop(fbn->phylink);
+>
+> Why is this conditional? If you've called phylink_start(), and the
+> network interface is being taken down administratively, then
+> phylink_stop() needs to be called no matter what. If the link was
+> up at that point, phylink will call your mac_link_down() as part
+> of that. Moreover, the networking layers guarantee that .ndo_stop
+> won't be called unless .ndo_open has been successfully called.
+
+It is a bit of vestigial code from when we were running before adding
+phylink support. This shouldn't stop us from calling phylink_stop as
+the current setter for FBNIC_LINK_DISABLED is pcs_disable which is
+called at the end of the phylink_stop function. Odds are this probably
+mirrors PCS_STATE_DOWN
+
+> > +static int fbnic_pcs_get_link_event_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     u32 pcs_intr_mask =3D rd32(fbd, FBNIC_SIG_PCS_INTR_STS);
+> > +
+> > +     if (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_DOWN)
+> > +             return -1;
+> > +
+> > +     return (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_UP) ? 1 : 0;
+> > +}
+>
+> I think an enum/#define of some symbolic names would be useful both
+> here and in the interrupt handler so we have something descriptive
+> instead of -1, 0, 1.
+
+I can look at converting these to an enum.
+
+> > +static bool fbnic_pcs_get_link_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     int link_direction;
+> > +     bool link;
+> > +
+> > +     /* If disabled do not update link_state nor change settings */
+> > +     if (fbd->link_state =3D=3D FBNIC_LINK_DISABLED)
+> > +             return false;
+>
+> If phylink_stop() has been called (one of the places you set
+> link_state to FBNIC_LINK_DISABLED) then phylink will force the link
+> down and will disregard state read from the .pcs_get_state() method.
+>
+> The other place is when fbnic_pcs_disable_asic() has been called,
+> which I think is hooked into the .pcs_disable method. Well, if
+> phylink has called the .pcs_disable method, then it is disconnecting
+> from this PCS, and won't be calling .pcs_get_state anyway.
+>
+> So all in all, I think this check is unnecessary and should be removed.
+
+Agreed
+
+> > +
+> > +     /* In an interrupt driven setup we can just skip the check if
+> > +      * the link is up as the interrupt should toggle it to the EVENT
+> > +      * state if the link has changed state at any time since the last
+> > +      * check.
+> > +      */
+> > +     if (fbd->link_state =3D=3D FBNIC_LINK_UP)
+> > +             return true;
+>
+> Again, don't feed back to phylink what phylink asked you to do!
+
+So the general idea with this is to avoid the need to recheck the
+registers if there hasn't been an interrupt event to indicate that the
+link changed. If the link has been confirmed up, and there hasn't been
+a link event the assumption is we are still up. The interrupt for up
+would be masked so we shouldn't see any up events as long as we are
+up. That is why we just store the fact that the link is up and report
+true here to indicate the link is present.
+
+> > +
+> > +     link_direction =3D fbnic_pcs_get_link_event_asic(fbd);
+> > +
+> > +     /* Clear interrupt state due to recent changes. */
+> > +     wr32(fbd, FBNIC_SIG_PCS_INTR_STS,
+> > +          FBNIC_SIG_PCS_INTR_LINK_DOWN | FBNIC_SIG_PCS_INTR_LINK_UP);
+> > +
+> > +     /* If link bounced down clear the PCS_STS bit related to link */
+> > +     if (link_direction < 0) {
+> > +             wr32(fbd, FBNIC_SIG_PCS_OUT0, FBNIC_SIG_PCS_OUT0_LINK |
+> > +                                      FBNIC_SIG_PCS_OUT0_BLOCK_LOCK |
+> > +                                      FBNIC_SIG_PCS_OUT0_AMPS_LOCK);
+> > +             wr32(fbd, FBNIC_SIG_PCS_OUT1, FBNIC_SIG_PCS_OUT1_FCFEC_LO=
+CK);
+> > +     }
+>
+> If the link "bounces" down, then phylink needs to know - but that
+> would be covered if, when you receive an interrupt, you always
+> call phylink_pcs_change(..., false). Still, phylink can deal with
+> latched-low clear-on-read link statuses. I think you want to read
+> the link status, and if it's indicating link-failed, then clear
+> the latched link-failed state.
+>
+> > +
+> > +     link =3D fbnic_mac_get_pcs_link_status(fbd);
+> > +
+> > +     if (link_direction)
+> > +             wr32(fbd, FBNIC_SIG_PCS_INTR_MASK,
+> > +                  link ?  ~FBNIC_SIG_PCS_INTR_LINK_DOWN :
+> > +                          ~FBNIC_SIG_PCS_INTR_LINK_UP);
+>
+> Why do you need to change the interrupt mask? Can't you just leave
+> both enabled and let the hardware tell you when something changes?
+
+It is mostly just about screening out unwanted info. As I mentioned we
+were already tracking if we were up or down previously. So we were
+only concerned if the link transitioned to the other state.
+
+> > +static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     /* Mask and clear the PCS interrupt, will be enabled by link hand=
+ler */
+> > +     wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
+> > +     wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
+> > +
+> > +     /* Pull in settings from FW */
+> > +     fbnic_pcs_get_fw_settings(fbd);
+> > +
+> > +     /* Flush any stale link status info */
+> > +     wr32(fbd, FBNIC_SIG_PCS_OUT0, FBNIC_SIG_PCS_OUT0_LINK |
+> > +                              FBNIC_SIG_PCS_OUT0_BLOCK_LOCK |
+> > +                              FBNIC_SIG_PCS_OUT0_AMPS_LOCK);
+>
+> If the link went down, it's better to allow phylink to see that.
+
+This isn't link down, this is a state link up we are flushing.
+
+> > +static void fbnic_mac_link_down_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     u32 cmd_cfg, mac_ctrl;
+> > +
+> > +     if (fbd->link_state =3D=3D FBNIC_LINK_DOWN)
+> > +             return;
+>
+> You shouldn't need this.
+>
+> > +static void fbnic_mac_link_up_asic(struct fbnic_dev *fbd)
+> > +{
+> > +     u32 cmd_cfg, mac_ctrl;
+> > +
+> > +     if (fbd->link_state =3D=3D FBNIC_LINK_UP)
+> > +             return;
+>
+> You shouldn't need this.
+
+I can strip those two checks. They are mostly carry-over from an
+earlier version.
+
+> > +/* Treat the FEC bits as a bitmask laid out as follows:
+> > + * Bit 0: RS Enabled
+> > + * Bit 1: BASER(Firecode) Enabled
+> > + * Bit 2: Autoneg FEC
+> > + */
+> > +enum {
+> > +     FBNIC_FEC_OFF           =3D 0,
+> > +     FBNIC_FEC_RS            =3D 1,
+> > +     FBNIC_FEC_BASER         =3D 2,
+> > +     FBNIC_FEC_AUTO          =3D 4,
+> > +};
+> > +
+> > +#define FBNIC_FEC_MODE_MASK  (FBNIC_FEC_AUTO - 1)
+> > +
+> > +/* Treat the link modes as a set of moldulation/lanes bitmask:
+>
+> Spelling: modulation
+>
+
+Will fix.
+
+> > @@ -22,9 +23,19 @@ struct fbnic_net {
+> >
+> >       u16 num_napi;
+> >
+> > +     struct phylink *phylink;
+> > +     struct phylink_config phylink_config;
+> > +     struct phylink_pcs phylink_pcs;
+> > +
+> > +     u8 tx_pause;
+> > +     u8 rx_pause;
+>
+> If you passed these flags into your .link_up method, then you don't need
+> to store them.
+
+I need to keep track of the tx_pause at a minimum as a part of the Rx
+queue configuration as we use it to determine if we drop packets for
+full queues or push back into the FIFO.
+
+> > +     u8 fec;
+> > +     u8 link_mode;
+>
+> I think "link_mode" can be entirely removed.
+
+I was actually going to reach out to you guys about that. For this
+patch set I think it may be needed as I have no way to sort out
+50000baseCR2 (NRZ, 2 lanes) vs 50000baseCR (PAM4, 1 lane) in the
+current phylink code for setting the mac link up. I was wondering if
+you had any suggestions on how I might resolve that?
+
+Basically I have a laundry list of things that I was planning to start
+on in the follow on sets:
+
+1. I still need to add CGMII support as technically we are using a
+different interface mode to support 100Gbps. Seems like I can mostly
+just do a find/insert based on the PHY_INTERFACE_MODE_XLGMII to add
+that so it should be straight forward.
+
+2. We have 2 PCS blocks we are working with to set up the CR2 modes. I
+was wondering if I should just be writing my PCS code to be handling
+the merged pair of IP or if I should look at changing the phylink code
+to support more than one PCS device servicing a given connection?
+
+3. The FEC config is integral to the PCS and MAC setup on my device. I
+was wondering why FEC isn't included as a part of the phylink code?
+Are there any plans to look at doing that? Otherwise what is the
+recommended setup for handling that as it can be negotiated via
+autoneg for our 25G and 50G-R2 links so I will need to work out how to
+best go after that.
+
+> > +static void
+> > +fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs,
+> > +                         struct phylink_link_state *state)
+> > +{
+> > +     struct fbnic_net *fbn =3D fbnic_pcs_to_net(pcs);
+> > +     struct fbnic_dev *fbd =3D fbn->fbd;
+> > +
+> > +     /* For now we use hard-coded defaults and FW config to determine
+> > +      * the current values. In future patches we will add support for
+> > +      * reconfiguring these values and changing link settings.
+> > +      */
+> > +     switch (fbd->fw_cap.link_speed) {
+> > +     case FBNIC_FW_LINK_SPEED_25R1:
+> > +             state->speed =3D SPEED_25000;
+> > +             break;
+> > +     case FBNIC_FW_LINK_SPEED_50R2:
+> > +             state->speed =3D SPEED_50000;
+> > +             break;
+> > +     case FBNIC_FW_LINK_SPEED_100R2:
+> > +             state->speed =3D SPEED_100000;
+> > +             break;
+> > +     default:
+> > +             state->speed =3D SPEED_UNKNOWN;
+> > +             break;
+> > +     }
+> > +
+> > +     state->pause |=3D MLO_PAUSE_RX;
+> > +     state->duplex =3D DUPLEX_FULL;
+> > +     state->interface =3D PHY_INTERFACE_MODE_XLGMII;
+>
+> Please don't set state->interface, and please read the documentation
+> for this method:
+>
+>  * Read the current inband link state from the MAC PCS, reporting the
+>  * current speed in @state->speed, duplex mode in @state->duplex, pause
+>  * mode in @state->pause using the %MLO_PAUSE_RX and %MLO_PAUSE_TX bits,
+>  * negotiation completion state in @state->an_complete, and link up state
+>  * in @state->link. If possible, @state->lp_advertising should also be
+>  * populated.
+>
+> Note that it doesn't say that state->interface should be set (it
+> shouldn't.)
+
+Okay, I will remove that.
+
+> > +int fbnic_phylink_init(struct net_device *netdev)
+> > +{
+> > +     struct fbnic_net *fbn =3D netdev_priv(netdev);
+> > +     struct phylink *phylink;
+> > +
+> > +     fbn->phylink_pcs.ops =3D &fbnic_phylink_pcs_ops;
+>
+> Please also set phylink_pcs.pcs_neg_mode =3D true (required for modern
+> drivers), especially as you call the argument "neg_mode" in your
+> pcs_config function.
+
+Will do.
 
