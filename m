@@ -1,137 +1,188 @@
-Return-Path: <netdev+bounces-108369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FFE92391A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:05:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C25B9239A9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:19:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6F92B20C3A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:05:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284C428692E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029B314F9E4;
-	Tue,  2 Jul 2024 09:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEADF14C5BF;
+	Tue,  2 Jul 2024 09:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWSuon+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4C14E2E8;
-	Tue,  2 Jul 2024 09:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7174963F
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 09:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719911144; cv=none; b=f1/JK/RYiO44TMSX0ap0huGDOem1vwNMCMUzYupCHMoluErTNP47gdasN1xAcYpO/wnDQAr/ZrLi/xRHBSeOydgXdINzPd76ivo+JWA60mmvNb27cQRJDo535sRPnVTuH8YAc07oiFa5M/89bZRR1j84JuM5ByYK2Gh1A2N+qz4=
+	t=1719911932; cv=none; b=gyXMdQY8mVdlnFjRpNsN7qGR2Jt6wWGVCYDZpysNLFh6o/m8El2SB7CN5utKDC2/odcM927mzWAGhq5xy43GqzqUuMlXOgSCT9vasFlRd+HuYWZZz21XyfCzpevQ+RGfsOMLvCj0UowehDkiRw3igUQAis5c094BlhFLjT6qI0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719911144; c=relaxed/simple;
-	bh=MPRyW1RvhsLIXbCr3vfsubrMJwYXGQhfyrMaSdBpN68=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=RFXYqLM1iOHrxRMl/mEGi8v8pgsZvXWSZZqUsm5Tisc/NBohuw+CvHd6Qj/EuYoQ+YogjqJMEr/HmXK2EN61+rC3FEb+6aX93BjjTadMzd3MP5tDt26Urz6BjCF1FFYSdwXbnEOSpM0gG1UgklJwjLCvWrox3V21uypIBGbm0/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_128_GCM_SHA256:128)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sOZS4-00000000346-1GZX;
-	Tue, 02 Jul 2024 09:05:28 +0000
-Date: Tue, 02 Jul 2024 09:05:19 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: linux-mediatek@lists.infradead.org,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Elad Yifee <eladwf@gmail.com>
-CC: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next=5D_net=3A_ethernet=3A_m?=
- =?US-ASCII?Q?ediatek=3A_Allow_gaps_in_MAC_allocation?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <3bda121b-f11d-44d1-a761-15195f8a418c@intel.com>
-References: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org> <3bda121b-f11d-44d1-a761-15195f8a418c@intel.com>
-Message-ID: <C24C4687-1C00-434D-8C37-BDB85E39456C@makrotopia.org>
+	s=arc-20240116; t=1719911932; c=relaxed/simple;
+	bh=QAOD82h6ooiqJ0JVKg+R4mQhBIzcD5a4lUX4RWA8pWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GoNxl/IWxdVlp+srJa1uM3xXmS8/FG58EtHMeNjUJJ57MxA+iNzFhYLv86FZbJYLeh6FUNeQWB9jC11+l6TFKZUaA1LV9UJqcOIsU2GYzW8CtuMnEfxzEL2Lqb/HtsqBim6TcF0JfSlkOuQUkGme2ciiDz5KspnAahTwzs3wPHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWSuon+j; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52cecba8d11so4772045e87.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 02:18:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719911929; x=1720516729; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ze1mCA3IMhS4v96v2WxBvrlDZHv3v3wHviX7XM44X2A=;
+        b=PWSuon+jmMIGiXPGcHooYuUOXwag6tZtfVEVzksk3tATj3576ooYbDg8mGxlAWcCTe
+         0LvHOr5c86E4xrDq6HK0aAkZ4Uc7NJ2UtfRhcPYJ65AM3MjeUEbiD6HVOLnnL3dCH/h/
+         yHoiSAiz5kXcAaRycSIaP6ZaSK0G7HckGiCuHiR2gsgFVqh0ZXO/ACVY/N0B0jPBJpsD
+         GasbYoZ9zFEXaRHnhp/ASa4FoHkxofhBRWUjbyJQNhbCV6QIvdJwX5vxRa+Tp8iL2PRR
+         4KexuXntLaU4ES27VoeaYywvsfzc01JFpwkfsisbJGX1KvmXTT2CxR3+KKI067O5Iw5+
+         6cXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719911929; x=1720516729;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ze1mCA3IMhS4v96v2WxBvrlDZHv3v3wHviX7XM44X2A=;
+        b=QDFxyx811SfKRmU0R2xmWirKI5juVU2amSXiCh2N5O/y8tW5hugbh7eKolPO15eSp8
+         U1Jk1+8LOeqdJT8jwID6yQt0tdWLzQ2g9IsevvxrtsC0gj8dhYg3xEqP4y+e54RJ1Ik3
+         W18VCUgKNqQxllIfumCh6WAMKcldzpFgrMwEIbJWn6exhZgHxoOx0xuIuXVyARRhX5Fz
+         4FAa5H2FhR0Ix+fnKoM/Co/StVASMlz3l8hOfWxNBUolCd/H2AlE+KEc1nS6RIa+znPp
+         yaya/zwr84BIJvGpd9ytw0Sdu5AuQ13noDumiX69AGGh2gmElXYun4DkZebM4IH+Z93Z
+         VC2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXOZUZW5QqnM5jpebxaTlOie/EEMC4Nr9oQ2lthEfYeT7hPbAJFlmvkturNwI83wHCpMS8ksGMZYszpTjTa8r1TaNf/jlGg
+X-Gm-Message-State: AOJu0YzJsjVpLSu5gIXH/hcVy3HfDgRY9OjZo0Ur++EMoQaAdQcdfq56
+	Fq8l/c3skYMis4x5hmnecAFnhVAgkJlv/t0OZ+I41DwbXAc2FAA8
+X-Google-Smtp-Source: AGHT+IERWc5oInRvdvoDBQPRy757J6hg8k0JMwUyAmWNi3KQVzHIYKfmstNpvdfRdD76DHWA+5DMKw==
+X-Received: by 2002:a05:6512:10d6:b0:52c:dc57:868b with SMTP id 2adb3069b0e04-52e8264b5bdmr5992643e87.13.1719911928776;
+        Tue, 02 Jul 2024 02:18:48 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab27864sm1733389e87.136.2024.07.02.02.18.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 02:18:48 -0700 (PDT)
+Date: Tue, 2 Jul 2024 12:18:45 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 09/15] net: stmmac: dwmac-loongson:
+ Introduce PCI device info data
+Message-ID: <3k5aa676afjee64acvwa4dd4vlhzusjxvktwfzrvqzh7xahd5a@am6cxil2i5kw>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <817880fd50d623ac84f6a01fc7eb3748864386a8.1716973237.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <817880fd50d623ac84f6a01fc7eb3748864386a8.1716973237.git.siyanteng@loongson.cn>
 
+On Wed, May 29, 2024 at 06:19:48PM +0800, Yanteng Si wrote:
+> Just introduce PCI device info data to prepare for later
+> ACPI-base support. Loongson machines may use UEFI (implies
+> ACPI) or PMON/UBOOT (implies FDT) as the BIOS.
+> 
+> The BIOS type has no relationship with device types, which
+> means: machines can be either ACPI-based or FDT-based.
 
+AFAICS the commit log is misleading because the DT-less (ACPI-based)
+setups is being added in the next commit and it's implemented by using
+the if-else statement with no setup() callback infrastructure
+utilized.
 
-On 2 July 2024 06:58:22 UTC, Przemek Kitszel <przemyslaw=2Ekitszel@intel=
-=2Ecom> wrote:
->On 7/1/24 21:28, Daniel Golle wrote:
->> Some devices with MediaTek SoCs don't use the first but only the second
->> MAC in the chip=2E Especially with MT7981 which got a built-in 1GE PHY
->> connected to the second MAC this is quite common=2E
->> Make sure to reset and enable PSE also in those cases by skipping gaps
->> using 'continue' instead of aborting the loop using 'break'=2E
->>=20
->> Fixes: dee4dd10c79a ("net: ethernet: mtk_eth_soc: ppe: add support for =
-multiple PPEs")
->> Suggested-by: Elad Yifee <eladwf@gmail=2Ecom>
->> Signed-off-by: Daniel Golle <daniel@makrotopia=2Eorg>
->> ---
->> Note that this should go to 'net-next' because the commit being fixed
->> isn't yet part of the 'net' tree=2E
->
->makes sense, and the fix is correct, so:
->Reviewed-by: Przemek Kitszel <przemyslaw=2Ekitszel@intel=2Ecom>
+But this change is still needed for adding the Loongson GNET support
+later in the series. The setup() callback will be pre-initialized with
+the network controller specific method based on the PCIe Device ID. So
+to speak, please alter the commit log with the correct justification.
+Like this:
 
-Thank you the fast review!
+"The Loongson GNET device support is about to be added in one of the
+next commits. As another preparation for that introduce the PCI device
+info data with a setup() callback performing the device-specific
+platform data initializations. Currently it is utilized for the
+already supported Loongson GMAC device only."
 
->what about:
->4733=E2=94=82 static int mtk_sgmii_init(struct mtk_eth *eth)
->4734=E2=94=82 {
->4735=E2=94=82         struct device_node *np;
->4736=E2=94=82         struct regmap *regmap;
->4737=E2=94=82         u32 flags;
->4738=E2=94=82         int i;
->4739=E2=94=82
->4740=E2=94=82         for (i =3D 0; i < MTK_MAX_DEVS; i++) {
->4741=E2=94=82                 np =3D of_parse_phandle(eth->dev->of_node, =
-"mediatek,sgmiisys", i);
->4742=E2=94=82                 if (!np)
->4743=E2=94=82                         break;
->
->should we also continue here?
+-Serge(y)
 
-Good point=2E As sgmiisys is defined in dtsi it's not so relevant in pract=
-ise though, as the SoC components are of course always present even if we d=
-on't use them=2E Probably it is still better to not be overly strict on the=
- presence of things we may not even use, not even emit an error message and=
- silently break something else, so yes, worth fixing imho=2E
-
->
->4744=E2=94=82
->4745=E2=94=82                 regmap =3D syscon_node_to_regmap(np);
->4746=E2=94=82                 flags =3D 0;
->4747=E2=94=82                 if (of_property_read_bool(np, "mediatek,pns=
-wap"))
->4748=E2=94=82                         flags |=3D MTK_SGMII_FLAG_PN_SWAP;
->4749=E2=94=82
->4750=E2=94=82                 of_node_put(np);
->4751=E2=94=82
->4752=E2=94=82                 if (IS_ERR(regmap))
->4753=E2=94=82                         return PTR_ERR(regmap);
->4754=E2=94=82
->4755=E2=94=82                 eth->sgmii_pcs[i] =3D mtk_pcs_lynxi_create(=
-eth->dev, regmap,
->4756=E2=94=82 eth->soc->ana_rgc3,
->4757=E2=94=82                                                          fl=
-ags);
->4758=E2=94=82         }
->4759=E2=94=82
->4760=E2=94=82         return 0;
->4761=E2=94=82 }
->
->
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c    | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 0289956e274b..fec2aa0607d4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -11,6 +11,10 @@
+>  
+>  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>  
+> +struct stmmac_pci_info {
+> +	int (*setup)(struct plat_stmmacenet_data *plat);
+> +};
+> +
+>  static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>  {
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+> @@ -54,9 +58,14 @@ static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+>  	return 0;
+>  }
+>  
+> +static struct stmmac_pci_info loongson_gmac_pci_info = {
+> +	.setup = loongson_gmac_data,
+> +};
+> +
+>  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct plat_stmmacenet_data *plat;
+> +	struct stmmac_pci_info *info;
+>  	struct stmmac_resources res;
+>  	struct device_node *np;
+>  	int ret, i, phy_mode;
+> @@ -107,6 +116,11 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  		break;
+>  	}
+>  
+> +	info = (struct stmmac_pci_info *)id->driver_data;
+> +	ret = info->setup(plat);
+> +	if (ret)
+> +		goto err_disable_device;
+> +
+>  	plat->bus_id = of_alias_get_id(np, "ethernet");
+>  	if (plat->bus_id < 0)
+>  		plat->bus_id = pci_dev_id(pdev);
+> @@ -122,7 +136,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  
+>  	pci_set_master(pdev);
+>  
+> -	loongson_gmac_data(plat);
+>  	pci_enable_msi(pdev);
+>  	memset(&res, 0, sizeof(res));
+>  	res.addr = pcim_iomap_table(pdev)[0];
+> @@ -224,7 +237,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>  			 loongson_dwmac_resume);
+>  
+>  static const struct pci_device_id loongson_dwmac_id_table[] = {
+> -	{ PCI_DEVICE_DATA(LOONGSON, GMAC, NULL) },
+> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> -- 
+> 2.31.4
+> 
 
