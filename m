@@ -1,127 +1,134 @@
-Return-Path: <netdev+bounces-108616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3173D9249A9
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:00:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F299249C2
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 23:08:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADE78B21A5A
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:00:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241951C224AD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC021BD01D;
-	Tue,  2 Jul 2024 21:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDCC201260;
+	Tue,  2 Jul 2024 21:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d47iLZ58"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWKab6Rg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD1482886
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 21:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3053120125D
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 21:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719954021; cv=none; b=hCeA/7TIJQyFnEWuBbRGqzFrM9WkrdD026dB27l5mDUoZQu2Nlb177nbiHViSL3idi0rBx2Udhu3Gm92zjdJRfXvQcYxwbfY26cG3K6h4G/JhYUydIDziBXSJ3tQJU1B421xsyCGP3dFwDQkIwlGWSeSarZfggLsXzj7Y2fxyxY=
+	t=1719954528; cv=none; b=QdJ6160WN3WGaWvzL6WG6DJTNIVqwdSdNRXOO+oOesaUFbdKhJQaX9qLK44Zj0leFYWSrpPkJfvuHIXBQedWcJwbkVkCCwkbKtItkLIfqDfQ9ikXS32U9gnJTer3VgLPQoKLEtUWNxRu+wc36bKPu+E3+B0IOYV1qgot2b7qHnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719954021; c=relaxed/simple;
-	bh=bhmgdmXou6VIgHHcOK/jYNGwjYxbFMXulVA914qAwhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DAOhr/zQa07+a9ScVtHoH362YtJ5bpLeSeh1QxkgW5XW99XPOHnqgqA4qXCp+Rx/je9AA9WpPApJWPAHhuyRq1/7sDfP61SdLgT4o9NXVgGhIF7EXHHkKOpw0k20klKKUym5BxwOT9a6ZpCgPigOftKYW2RocimjU1OJb30cIj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d47iLZ58; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3651ee582cfso2637573f8f.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 14:00:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719954018; x=1720558818; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7goz2jzLE6WQPWSuKrAMxR08D3RSpD1MEzXtxQ4iFvg=;
-        b=d47iLZ58wgwiKYuPQ17WSZ6mfLs/vEOi1wR+j2WyikPjwri4+WBw9s8u/VRnG84is2
-         JbVm35uoFhkdgmtzFn4iSIorpLqQCNBolMWVtbui+xjBSQBjNzZoNHMg7LBG4LdAy47A
-         j7bOUqtW5Eu6+0tY1ROkpgOXT4zi9VUlhyOsCA2nWAXuzKjt/B6Vy1BjkxdGjA7Pb8RM
-         7TSs+kogze4aJNYhbVYQzjSGq3dZAX1Z/UX3fS6RcA250Bc9LN/sxNsc8hYcsQdknRKE
-         Cn5Xqg2ZX8TwHNz2Agb9VRu/0OS2+crw0Dsb8nA5jGTTDTRuKb7rY4Gf2lRTNZ9eG0N3
-         ZoSA==
+	s=arc-20240116; t=1719954528; c=relaxed/simple;
+	bh=iQAoLd3zEtpYYbvVSah/d8jhIfMBMAETp2gljBGBXRg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXINhGM0SrOQHlwcWK6RK9kdtrZC15A0wDBLSdrGAOv/ucXfPTc93W+vfE8GSOWFWnv5ILM7xV2tseNSyjXu0k4MfOjyhjMFhGU3usHKxylNrhQ30MmUO8tAPplXpyWOKir+bGC78oSdRZ3U5B6auXbZzl6xA7JoFFeuNYL8xK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CWKab6Rg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719954526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=se85jQN04juZgRCOlUB8db7Xj7Z+u0P5SXHucncyZCM=;
+	b=CWKab6RgZsPmpJpBX2bNELloLjvq5RganXR+oHCwF1umjLj0q/XK4CE74McF7POPUyQLAf
+	sL35zeNPLCcBrX43n05WrELje7rKfRPjpExnKUrvSwVPnEgAGXGJhRepK5ATKZYY+BncnC
+	6kaWq+z+hysxfJIsIeOCafYKRn0V0TQ=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-05UxgVulMDewBkClJivtEg-1; Tue, 02 Jul 2024 17:08:44 -0400
+X-MC-Unique: 05UxgVulMDewBkClJivtEg-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4464a6a2f23so59399491cf.3
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 14:08:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719954018; x=1720558818;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7goz2jzLE6WQPWSuKrAMxR08D3RSpD1MEzXtxQ4iFvg=;
-        b=LL8tmCgmrxpeS1iGfZqIuGxyH/q+AU1jINHc2YB93s0k0OfchjVVa7iEf44TM+Gsqc
-         o/MB5Plf1eW1VvG/LMq9fMEvuy+CjxurEsANcfqMafGSAobhwVySMhDTabxWT3EZPgCF
-         O1ZVrrN6rP4DfaDFBX7TLzdtab2TxeuVvaBH68VwxvjgzH4gcLMuFctyKNuxAKgfZx4K
-         lpJht6LlKwX4tPcSX9zu2uSfMVk2DI4VtafMalSj5q82eCip07R6YNWqN0zSPeY5bMRq
-         4njzc5w926HAy67L7J08CTYUsc3+68jxeCn7XutnOqvyBxtKVE/etgVK1fG4mwBZs224
-         WxWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/brnmXPamE80iElkwfwyDSKDGd/csX74GWTws7Aw49SsfGR8sz5GuWSFhgVN4wkKpob5KVVdigkPhmcMCQUzMtYINWaTD
-X-Gm-Message-State: AOJu0YyyMoZXU5w/a6DRy3Xho8VYcv0RMWHjFXyBs4frSEFTt2nNNvNg
-	s1FP9nI1/ey7FE/vUYI1UzW+GrO00TBstq8iK54Sn1hYFfhE9u9gM1Verf/l+GppojvtMS/zJSJ
-	3efjcQUDbhcm85uVtzBavAUF3MtM=
-X-Google-Smtp-Source: AGHT+IEyuRXxqaGeOjyAneHpt93s595/zTnq1ERoJXXxppkRzAupFv8JvYqPl4fPZLiQ/dUvueG00ggT2sgTavuvF8g=
-X-Received: by 2002:a5d:64cc:0:b0:367:8f84:ee1d with SMTP id
- ffacd0b85a97d-3678f84ef1fmr996221f8f.8.1719954018153; Tue, 02 Jul 2024
- 14:00:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719954524; x=1720559324;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=se85jQN04juZgRCOlUB8db7Xj7Z+u0P5SXHucncyZCM=;
+        b=l5I4bVymdPnkZ/6FyP5MqcmFc7N/Spoymlb+du06he+AeAwVbQnBKogAULCV+JDhYq
+         YWCkwOzpRR8kfxziMCiBKQZNKQhnZKLyOPwAScgiZzLmslLqfm2Jw6IaQu/idBkYnAOB
+         wHclNVdpWYqvZXw4Buxl/czTsMIZ8uAem4r+88vjCYbtgbcCGgb81Z8VzyHdacl8prTY
+         +8cXUNzqn9z1rd9OBIXa30H9D1kVqH5MIbt2GdtbXf6uZh4Jsj7xD0WvQ3xW9q/LlRr0
+         g7M7pldALz2sKEFggJ5WLXuK5lF7kRlIl3nMHuuuvyB3XyeTAHgIHn46q2wAoM3tPGhQ
+         zOiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVScy2WUtDWHgw3AZIXnIsGXM6guKyvbo+jInGgoJNpllJd7peVQIE/q6i4y5esbFjRtP5ddqhQCeAl+ePjWIPOK1a7ZtmV
+X-Gm-Message-State: AOJu0Yy9F3vK/5aiDHZFuKTr5VHopBX77UBcjPPlnIm0wfFGK/1rjEoY
+	jLShEeEL/6LfHeP1SRSbmFWdFqVy7xSyi0KJz3Ms2cNeef7UxoerpgXxkqHA9xn42oX6Nx4nO2m
+	Oi83Js2SHnxxt2AX/inYCoWAvtyxTlMVoNtcQwLBz3pyxb9eDcEcb3g==
+X-Received: by 2002:ac8:7c50:0:b0:446:5ee0:d1e with SMTP id d75a77b69052e-44662e31cefmr112423911cf.39.1719954524172;
+        Tue, 02 Jul 2024 14:08:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHbWzDKoO3DLysrqALy+oE4lA7uiaZ1zyzV/oKjhpoDTKDIA4cjZJMXRmR71FRAQA9DolwanA==
+X-Received: by 2002:ac8:7c50:0:b0:446:5ee0:d1e with SMTP id d75a77b69052e-44662e31cefmr112423701cf.39.1719954523863;
+        Tue, 02 Jul 2024 14:08:43 -0700 (PDT)
+Received: from thinkpad-p1.localdomain.com (pool-174-112-193-187.cpe.net.cable.rogers.com. [174.112.193.187])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-446514b0b1dsm44452501cf.79.2024.07.02.14.08.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 14:08:43 -0700 (PDT)
+From: Radu Rendec <rrendec@redhat.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: [PATCH] net: rswitch: Avoid use-after-free in rswitch_poll()
+Date: Tue,  2 Jul 2024 17:08:37 -0400
+Message-ID: <20240702210838.2703228-1-rrendec@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
- <171993242260.3697648.17293962511485193331.stgit@ahduyck-xeon-server.home.arpa>
- <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk> <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
- <281cdc6a-635f-499d-a312-9c7d8bb949f1@lunn.ch> <CAKgT0UcAYxnKkCSk7a3EKv6GzZn51Xfrd2Yr0yjcC2_=tk9ZQA@mail.gmail.com>
- <e7527f49-60a2-4e64-a93b-c72ad2cc4879@lunn.ch>
-In-Reply-To: <e7527f49-60a2-4e64-a93b-c72ad2cc4879@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 2 Jul 2024 13:59:41 -0700
-Message-ID: <CAKgT0UfbUrVR6U-cbNxufQ0MN9Cna0tdC6dPMBJRAHSdj5=C8Q@mail.gmail.com>
-Subject: Re: [net-next PATCH v3 11/15] eth: fbnic: Add link detection
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, davem@davemloft.net, 
-	pabeni@redhat.com, edumazet@google.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 2, 2024 at 1:37=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > As for multiple PCS for one connection, is this common, or special to
-> > > your hardware?
-> >
-> > I would think it is common. Basically once you get over 10G you start
-> > seeing all these XXXXXbase[CDKLS]R[248] speeds advertised and usually
-> > the 2/4/8 represents the number of lanes being used. I would think
-> > most hardware probably has a PCS block per lane as they can be
-> > configured separately and in our case anyway you can use just the one
-> > lane mode and then you only need to setup 1 lane, or you can use the 2
-> > lane mode and you need to setup 2.
-> >
-> > Some of our logic is merged like I mentioned though so maybe it would
-> > make more sense to just merge the lanes. Anyway I guess I can start
-> > working on that code for the next patch set. I will look at what I
-> > need to do to extend the logic. For now I might be able to get by with
-> > just dropping support for 50R1 since that isn't currently being used
-> > as a default.
->
-> So maybe a dumb question. How does negotiation work? Just one performs
-> negotiation? They all do, and if you get different results you declare
-> the link broken? First one to complete wins? Or even, you can
-> configure each lane to use different negotiation parameters...
->
->     Andrew
+The use-after-free is actually in rswitch_tx_free(), which is inlined in
+rswitch_poll(). Since `skb` and `gq->skbs[gq->dirty]` are in fact the
+same pointer, the skb is first freed using dev_kfree_skb_any(), then the
+value in skb->len is used to update the interface statistics.
 
-My understanding is that auto negotiation is done at 10G or 25G so
-that is with only one PCS link enabled if I am not mistaken.
+Let's move around the instructions to use skb->len before the skb is
+freed.
 
-Admittedly we haven't done the autoneg code yet so I can't say for
-certain. I know the hardware was tested with the driver handling the
-link after the fact, but I don't have the code in the driver for
-handling the autoneg yet since we don't use that in our datacenter.
+This bug is trivial to reproduce using KFENCE. It will trigger a splat
+every few packets. A simple ARP request or ICMP echo request is enough.
 
-- Alex
+Signed-off-by: Radu Rendec <rrendec@redhat.com>
+---
+ drivers/net/ethernet/renesas/rswitch.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+index dcab638c57fe8..24c90d8f5a442 100644
+--- a/drivers/net/ethernet/renesas/rswitch.c
++++ b/drivers/net/ethernet/renesas/rswitch.c
+@@ -871,13 +871,13 @@ static void rswitch_tx_free(struct net_device *ndev)
+ 		dma_rmb();
+ 		skb = gq->skbs[gq->dirty];
+ 		if (skb) {
++			rdev->ndev->stats.tx_packets++;
++			rdev->ndev->stats.tx_bytes += skb->len;
+ 			dma_unmap_single(ndev->dev.parent,
+ 					 gq->unmap_addrs[gq->dirty],
+ 					 skb->len, DMA_TO_DEVICE);
+ 			dev_kfree_skb_any(gq->skbs[gq->dirty]);
+ 			gq->skbs[gq->dirty] = NULL;
+-			rdev->ndev->stats.tx_packets++;
+-			rdev->ndev->stats.tx_bytes += skb->len;
+ 		}
+ 		desc->desc.die_dt = DT_EEMPTY;
+ 	}
+-- 
+2.45.2
+
 
