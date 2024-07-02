@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-108442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7303923D42
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:08:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8B2923D43
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:08:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF731F2317F
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:08:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1E861C22E3C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 12:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6CC16B390;
-	Tue,  2 Jul 2024 12:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F5916B735;
+	Tue,  2 Jul 2024 12:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="ykJKPOqu"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="i+RnPTbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C66C15D5B3
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 12:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625D11662F4
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 12:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719922116; cv=none; b=figIMdNiWyglc9lAj18Ie+yFjAxBTGZlgh7d64FZ+0KfzaB5Fqym3DPeSZZJOD+IAGEF6YeiKoETrJeTe55o/8Chtb6ta6Bgh5VInhhl52ekAr3VxfFffQb0DgGL/UxPtGdYqlaSvMohChvTgSirP9JfX+fwkinYyyk9qqv+w/o=
+	t=1719922117; cv=none; b=Kor0Les+KMQtbkKMHB3Czm6yC12Z3k43IMPl1tlBlFBfHSPVFbpw7tUtnsBUvYnEZUTi5wD2PEqJWavG1rPbmo//qflbJTCYLcXtxnPxZY5oZ4eQYDpghj2zk0UJo1Pb4yDj7TSJcyTaDSlFNo3vfmXZgV69Y4hKjhx533qAITw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719922116; c=relaxed/simple;
-	bh=hsftkSP2BDiz9TglzlG9ee1wDJWfkHJpC75tpg0xtkg=;
+	s=arc-20240116; t=1719922117; c=relaxed/simple;
+	bh=L4iknHWv24LRJnoIT3fvpcqfrurIP2YwW3xU1mKpwnA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AOJIbBHl+FpmGB/ZYojtZKvTs3EiPugXxK1HqkXx0AoOm8DJm/hcgoEawRlHFQlkGeqLq47mO//4BF6JkM5YGkI5+4MF7mKleTlCT4+ZzT2VVMO8e11ZRucF8shb2yWxQ+Xw8d05jUhDjBoSfmdK52bgqi9C/2wb7hjrVAbz7Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=ykJKPOqu; arc=none smtp.client-ip=209.85.167.49
+	 MIME-Version; b=S4Qa+KVpXITmcrv2w1WOeEp0v87zcnJDneRvruAAPoAejTFbyNCW4/kWEaxCFj6DyjYj4rB8hzUY+TGVLdL9MGGmWDL2vaUzmYiqTeTvpqQMakGJRDmvnxh0yKVFqMgsgYRceLNs6443uE/8ZeOaUknLRHm9CoxDmTkeMGeGMWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=i+RnPTbq; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52cdb0d816bso4050658e87.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 05:08:33 -0700 (PDT)
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5295eb47b48so4975328e87.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 05:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1719922112; x=1720526912; darn=vger.kernel.org;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1719922114; x=1720526914; darn=vger.kernel.org;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=8j4YJnckxoKym+ZcM9ZDthFzWyUhM2Uf5fbtBbrDdx4=;
-        b=ykJKPOqu7DueqzQ2GrhFUbFJ+wGCpY9ihKUoGAOsenKmD8ZGEvFBmq9Jqo1LNqO0tj
-         iIq/emaFr914xAr7OvllebgeiK45MZatc+7aaIs1c5TsjDchRm/61M93EhsXjJp+4jLV
-         M3boSQWKHT8g45XTWbO3fAB1p9Y1wxcdtmS2OK2VnrLfHJc9fAUwumggQMr1lDJCesE1
-         rKq3Xr2Dq3gOCcSf71szUz3iGDzGsktRuxXBqkIw7A0erW7tTT5x55Q5KgYe7xY5o8la
-         F1EigN0MQsgTqnUjQEK4mlKD9TFqBhaQ35u2Uasrvs0/uYDaTQF92ZXwPYBC6Y7qXuip
-         gy6A==
+        bh=FCahmSEYU6tX9FqLb0Uk9Z14eoHvtjROOSdSw1YJQpE=;
+        b=i+RnPTbqW9Wud0G6Bnk2/LZeFidNEwfAnlcDCj3sddtWNmo96DBcDwPN36CJ4gkWWZ
+         T86aCNjs4le8Pw7Fsy5XHdjPlqTJwlErnc8KJS/PGaM85dFYnoDNA6umpaRnVNEY20CT
+         ICloCOIb51nSxK46M4sZ3jnRsbrs83KXxKDyNQCrVBA3jM7wOt1Hwn2CtAZI4roSwC4F
+         oskcNhyBZePZBlLAJ6516gSZm4l+MPUDlDCK0wWKw+7ZoEaz7GtnmzW5aiNKfHfZkohf
+         AqL7LT4nERe5vtEK7+Achf0sHsb6J913C8RMQiSwytGCW4f6p58YWB3wWdvGL2lrbTnB
+         3I+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719922112; x=1720526912;
+        d=1e100.net; s=20230601; t=1719922114; x=1720526914;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8j4YJnckxoKym+ZcM9ZDthFzWyUhM2Uf5fbtBbrDdx4=;
-        b=fwOD1D6azn1/7QMFde17iOZ4RYD/cqfUwfBYXZCQrHB+77KUs1bcxZDLj27IQCOzve
-         OJ2wjxd7cJ/NanpaWcL2Bs9JE2rWlf5njc5KPGjjCxg8wwtv3BEfYesye2Bfndx+eNq0
-         gr7tLdx6JIT0owYyK7eYjQUcJ7wnZsfmYsHRei3lFwrbiatlEyaE3m86jt13CB9bDyjy
-         t3xYwG9dIlJNjrNz21RknJu3hIDj3DVHFRghjrRc+FeJeOklU7M/C1lZpXE8DwWDJCtQ
-         4hEBSaA/bLvxpV3UdDpLmuMd6fFu8CGOvlJO63c8ej1xXGGM+1iLoJBCYzzoWiupm9Z0
-         LSSA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfFg9AF2jkrEjNEdlw+jQW3dpU0aMQruHbIwAwEaOQ1SD4f1knvSH1hTlhXiOOqDuOOeEc7yXfRxisRTV2xRTQReOo0lTY
-X-Gm-Message-State: AOJu0Yz8asPDNwtx9pgpOiAmetqTHjym89Db2bXHiPyZ8mTClL56+ex/
-	5ySm3ELPlsiDIqLm9BwHjs0G8eedMgiVK7kS9OnrcLV9QHXSL8Je0LJ7hyH1ktg=
-X-Google-Smtp-Source: AGHT+IGr4wQPv5afUFDcinzrJ0DCOrcAewoDqVAFuxi9J7/AILw78OE4VOEWMCvm39t77WUoK8ZTEA==
-X-Received: by 2002:a05:6512:3e0c:b0:52c:ca8d:d1c with SMTP id 2adb3069b0e04-52e825976ecmr2619228e87.2.1719922112246;
-        Tue, 02 Jul 2024 05:08:32 -0700 (PDT)
+        bh=FCahmSEYU6tX9FqLb0Uk9Z14eoHvtjROOSdSw1YJQpE=;
+        b=kog49iI6/yUFsVuzZ5lrb8r90gOPi2h3BK5NFo95nLeyYIRIxuwmvSkCk34LU7Mq0N
+         Y0efQylP96J69qjKZ+7wDpUlvgo5DEPfN3R5mud6GjU+MflxsUX/XslCZ0AN/isAIeQM
+         nXVDV1sqsQIII8TFu7LVlTRxlkxMjwgvD07faGzZNlEGM1DKYzkS2dYck5VzHCBZeMEv
+         pJVWbKE/nMIguBRx4F9odNqBMv66iS4ItC1/dkUsSr4SeA4jMLm5jji+7ngGzFdHjodB
+         E0zKaltGiNDAnMHi7Mroh2atB7cYq0UPV7qJIh+iYU65J3wDHl9QHbtwUKCG61WMWsGA
+         MQPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsPzEJrr9oY2luNu2uERw5rkrDvwX83tumeBoVdrtCH/D0uurfZEaRj83F4HNlmVs0WE24aTx6POlhzE8TDOkH8M56kTro
+X-Gm-Message-State: AOJu0YxAMK8sLf+EGilSaO9JRC1P/Esro0svt80Smt6kL0Fp40o3Ib6o
+	A8slAB7R7bicoO60m7eu0p1V7Jzfdo8KmMUXlGmWPDHh/yoBWA0jbc0LJKBKm78=
+X-Google-Smtp-Source: AGHT+IHa8FAMkx5Vj/lheTFRq2vnO8kcgH30G8QkbdtT9a7fNLM9xq68XDWCaFIdq1JAVFRY9tlAWw==
+X-Received: by 2002:a05:6512:3e28:b0:52c:a5cb:69e4 with SMTP id 2adb3069b0e04-52e826f12d1mr5949124e87.54.1719922113775;
+        Tue, 02 Jul 2024 05:08:33 -0700 (PDT)
 Received: from wkz-x13.addiva.ad (h-176-10-146-181.NA.cust.bahnhof.se. [176.10.146.181])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab1064asm1799414e87.103.2024.07.02.05.08.31
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab1064asm1799414e87.103.2024.07.02.05.08.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 05:08:31 -0700 (PDT)
+        Tue, 02 Jul 2024 05:08:32 -0700 (PDT)
 From: Tobias Waldekranz <tobias@waldekranz.com>
 To: stephen@networkplumber.org,
 	dsahern@kernel.org,
@@ -75,9 +75,9 @@ To: stephen@networkplumber.org,
 	bridge@lists.linux.dev,
 	netdev@vger.kernel.org
 Cc: liuhangbin@gmail.com
-Subject: [PATCH v3 iproute2 2/4] bridge: Remove duplicated textification macros
-Date: Tue,  2 Jul 2024 14:08:03 +0200
-Message-Id: <20240702120805.2391594-3-tobias@waldekranz.com>
+Subject: [PATCH v3 iproute2 3/4] bridge: vlan: Add support for setting a VLANs MSTI
+Date: Tue,  2 Jul 2024 14:08:04 +0200
+Message-Id: <20240702120805.2391594-4-tobias@waldekranz.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240702120805.2391594-1-tobias@waldekranz.com>
 References: <20240702120805.2391594-1-tobias@waldekranz.com>
@@ -90,231 +90,89 @@ MIME-Version: 1.0
 Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
-include/utils.h already provides textify(), which is functionally
-equivalent to __stringify().
+Allow the user to associate one or more VLANs with a multiple spanning
+tree instance (MSTI), when MST is enabled on the bridge.
 
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 ---
- bridge/vlan.c | 41 +++++++++++++++++++----------------------
- bridge/vni.c  | 15 ++++++---------
- 2 files changed, 25 insertions(+), 31 deletions(-)
+ bridge/vlan.c     | 13 +++++++++++++
+ man/man8/bridge.8 |  9 ++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/bridge/vlan.c b/bridge/vlan.c
-index 0a7e6c45..70f01aff 100644
+index 70f01aff..ea4aff93 100644
 --- a/bridge/vlan.c
 +++ b/bridge/vlan.c
-@@ -28,9 +28,6 @@ enum vlan_show_subject {
- 
- #define VLAN_ID_LEN 9
- 
--#define __stringify_1(x...) #x
--#define __stringify(x...) __stringify_1(x)
--
- static void usage(void)
- {
- 	fprintf(stderr,
-@@ -579,7 +576,7 @@ static void open_vlan_port(int ifi_index, enum vlan_show_subject subject)
- {
- 	open_json_object(NULL);
- 	print_color_string(PRINT_ANY, COLOR_IFNAME, "ifname",
--			   "%-" __stringify(IFNAMSIZ) "s  ",
-+			   "%-" textify(IFNAMSIZ) "s  ",
- 			   ll_index_to_name(ifi_index));
- 	open_json_array(PRINT_JSON,
- 			subject == VLAN_SHOW_VLAN ? "vlans": "tunnels");
-@@ -643,7 +640,7 @@ static void print_vlan_tunnel_info(struct rtattr *tb, int ifindex)
- 			opened = true;
- 		} else {
- 			print_string(PRINT_FP, NULL,
--				     "%-" __stringify(IFNAMSIZ) "s  ", "");
-+				     "%-" textify(IFNAMSIZ) "s  ", "");
- 		}
- 
- 		open_json_object(NULL);
-@@ -716,13 +713,13 @@ static void print_vlan_flags(__u16 flags)
- 
- static void __print_one_vlan_stats(const struct bridge_vlan_xstats *vstats)
- {
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    ", "");
- 	print_lluint(PRINT_ANY, "rx_bytes", "RX: %llu bytes",
- 		     vstats->rx_bytes);
- 	print_lluint(PRINT_ANY, "rx_packets", " %llu packets\n",
- 		     vstats->rx_packets);
- 
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    ", "");
- 	print_lluint(PRINT_ANY, "tx_bytes", "TX: %llu bytes",
- 		     vstats->tx_bytes);
- 	print_lluint(PRINT_ANY, "tx_packets", " %llu packets\n",
-@@ -776,7 +773,7 @@ static void print_vlan_stats_attr(struct rtattr *attr, int ifindex)
- 			found_vlan = true;
- 		} else {
- 			print_string(PRINT_FP, NULL,
--				     "%-" __stringify(IFNAMSIZ) "s  ", "");
-+				     "%-" textify(IFNAMSIZ) "s  ", "");
- 		}
- 		print_one_vlan_stats(vstats);
- 	}
-@@ -822,7 +819,7 @@ static void print_vlan_router_ports(struct rtattr *rattr)
- 	int rem = RTA_PAYLOAD(rattr);
- 	struct rtattr *i;
- 
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    ", "");
- 	open_json_array(PRINT_ANY, is_json_context() ? "router_ports" :
- 						       "router ports: ");
- 	for (i = RTA_DATA(rattr); RTA_OK(i, rem); i = RTA_NEXT(i, rem)) {
-@@ -834,7 +831,7 @@ static void print_vlan_router_ports(struct rtattr *rattr)
- 			print_nl();
- 			/* start: IFNAMSIZ + 4 + strlen("router ports: ") */
- 			print_string(PRINT_FP, NULL,
--				     "%-" __stringify(IFNAMSIZ) "s    "
-+				     "%-" textify(IFNAMSIZ) "s    "
- 				     "              ",
- 				     "");
- 		}
-@@ -872,11 +869,11 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
- 		vlan_rtm_cur_ifidx = ifindex;
- 	} else {
- 		open_json_object(NULL);
--		print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s  ", "");
-+		print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s  ", "");
- 	}
- 	print_range("vlan", vid, vrange);
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    ", "");
- 	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_SNOOPING]) {
- 		vattr = vtb[BRIDGE_VLANDB_GOPTS_MCAST_SNOOPING];
- 		print_uint(PRINT_ANY, "mcast_snooping", "mcast_snooping %u ",
-@@ -1012,12 +1009,12 @@ static void print_vlan_opts(struct rtattr *a, int ifindex)
- 		vlan_rtm_cur_ifidx = ifindex;
- 	} else {
- 		open_json_object(NULL);
--		print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s  ", "");
-+		print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s  ", "");
- 	}
- 	print_range("vlan", vinfo->vid, vrange);
- 	print_vlan_flags(vinfo->flags);
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    ", "");
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    ", "");
- 	print_stp_state(state);
- 	if (vtb[BRIDGE_VLANDB_ENTRY_MCAST_ROUTER]) {
- 		vattr = vtb[BRIDGE_VLANDB_ENTRY_MCAST_ROUTER];
-@@ -1155,8 +1152,8 @@ static int vlan_show(int argc, char **argv, int subject)
- 		}
- 
- 		if (!is_json_context()) {
--			printf("%-" __stringify(IFNAMSIZ) "s  %-"
--			       __stringify(VLAN_ID_LEN) "s", "port",
-+			printf("%-" textify(IFNAMSIZ) "s  %-"
-+			       textify(VLAN_ID_LEN) "s", "port",
- 			       "vlan-id");
- 			printf("\n");
- 		}
-@@ -1183,8 +1180,8 @@ static int vlan_show(int argc, char **argv, int subject)
- 		}
- 
- 		if (!is_json_context()) {
--			printf("%-" __stringify(IFNAMSIZ) "s  %-"
--			       __stringify(VLAN_ID_LEN) "s", "port",
-+			printf("%-" textify(IFNAMSIZ) "s  %-"
-+			       textify(VLAN_ID_LEN) "s", "port",
- 			       "vlan-id");
- 			if (subject == VLAN_SHOW_TUNNELINFO)
- 				printf("  tunnel-id");
-@@ -1207,7 +1204,7 @@ static int vlan_show(int argc, char **argv, int subject)
- 		}
- 
- 		if (!is_json_context())
--			printf("%-" __stringify(IFNAMSIZ) "s  vlan-id\n",
-+			printf("%-" textify(IFNAMSIZ) "s  vlan-id\n",
- 			       "port");
- 
- 		if (rtnl_dump_filter(&rth, print_vlan_stats, stdout) < 0) {
-@@ -1269,8 +1266,8 @@ static int vlan_global_show(int argc, char **argv)
- 	}
- 
- 	if (!is_json_context()) {
--		printf("%-" __stringify(IFNAMSIZ) "s  %-"
--		       __stringify(VLAN_ID_LEN) "s", "port",
-+		printf("%-" textify(IFNAMSIZ) "s  %-"
-+		       textify(VLAN_ID_LEN) "s", "port",
- 		       "vlan-id");
- 		printf("\n");
- 	}
-@@ -1318,7 +1315,7 @@ static void print_vlan_info(struct rtattr *tb, int ifindex)
- 			opened = true;
- 		} else {
- 			print_string(PRINT_FP, NULL, "%-"
--				     __stringify(IFNAMSIZ) "s  ", "");
-+				     textify(IFNAMSIZ) "s  ", "");
- 		}
- 
- 		open_json_object(NULL);
-diff --git a/bridge/vni.c b/bridge/vni.c
-index e1f981fc..57b04c8c 100644
---- a/bridge/vni.c
-+++ b/bridge/vni.c
-@@ -27,9 +27,6 @@ static unsigned int filter_index;
- /* max len of "<start>-<end>" */
- #define VXLAN_ID_LEN 17
- 
--#define __stringify_1(x...) #x
--#define __stringify(x...) __stringify_1(x)
--
- static void usage(void)
- {
- 	fprintf(stderr,
-@@ -153,7 +150,7 @@ static void open_vni_port(int ifi_index)
- {
- 	open_json_object(NULL);
- 	print_color_string(PRINT_ANY, COLOR_IFNAME, "ifname",
--			   "%-" __stringify(IFNAMSIZ) "s  ",
-+			   "%-" textify(IFNAMSIZ) "s  ",
- 			   ll_index_to_name(ifi_index));
- 	open_json_array(PRINT_JSON, "vnis");
+@@ -53,6 +53,7 @@ static void usage(void)
+ 		"                      [ mcast_querier_interval QUERIER_INTERVAL ]\n"
+ 		"                      [ mcast_query_interval QUERY_INTERVAL ]\n"
+ 		"                      [ mcast_query_response_interval QUERY_RESPONSE_INTERVAL ]\n"
++		"                      [ msti MSTI ]\n"
+ 		"       bridge vlan global { show } [ dev DEV ] [ vid VLAN_ID ]\n");
+ 	exit(-1);
  }
-@@ -174,7 +171,7 @@ static void print_vnifilter_entry_stats(struct rtattr *stats_attr)
- 			   RTA_PAYLOAD(stats_attr), NLA_F_NESTED);
+@@ -403,6 +404,7 @@ static int vlan_global_option_set(int argc, char **argv)
+ 	short vid = -1;
+ 	__u64 val64;
+ 	__u32 val32;
++	__u16 val16;
+ 	__u8 val8;
  
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    RX: ",
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    RX: ",
- 		     "");
- 
- 	if (stb[VNIFILTER_ENTRY_STATS_RX_BYTES]) {
-@@ -195,7 +192,7 @@ static void print_vnifilter_entry_stats(struct rtattr *stats_attr)
- 	}
- 
- 	print_nl();
--	print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s    TX: ",
-+	print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s    TX: ",
- 		     "");
- 
- 	if (stb[VNIFILTER_ENTRY_STATS_TX_BYTES]) {
-@@ -327,7 +324,7 @@ int print_vnifilter_rtm(struct nlmsghdr *n, void *arg)
- 			open_vni_port(tmsg->ifindex);
- 			opened = true;
+ 	afspec = addattr_nest(&req.n, sizeof(req),
+@@ -533,6 +535,12 @@ static int vlan_global_option_set(int argc, char **argv)
+ 			addattr64(&req.n, 1024,
+ 				  BRIDGE_VLANDB_GOPTS_MCAST_STARTUP_QUERY_INTVL,
+ 				  val64);
++		} else if (strcmp(*argv, "msti") == 0) {
++			NEXT_ARG();
++			if (get_u16(&val16, *argv, 0))
++				invarg("invalid msti", *argv);
++			addattr16(&req.n, 1024,
++				 BRIDGE_VLANDB_GOPTS_MSTI, val16);
  		} else {
--			print_string(PRINT_FP, NULL, "%-" __stringify(IFNAMSIZ) "s  ", "");
-+			print_string(PRINT_FP, NULL, "%-" textify(IFNAMSIZ) "s  ", "");
- 		}
- 
- 		print_vni(t, tmsg->ifindex);
-@@ -373,8 +370,8 @@ static int vni_show(int argc, char **argv)
+ 			if (strcmp(*argv, "help") == 0)
+ 				NEXT_ARG();
+@@ -942,6 +950,11 @@ static void print_vlan_global_opts(struct rtattr *a, int ifindex)
+ 			     "mcast_query_response_interval %llu ",
+ 			     rta_getattr_u64(vattr));
  	}
++	if (vtb[BRIDGE_VLANDB_GOPTS_MSTI]) {
++		vattr = vtb[BRIDGE_VLANDB_GOPTS_MSTI];
++		print_uint(PRINT_ANY, "msti", "msti %u ",
++			   rta_getattr_u16(vattr));
++	}
+ 	print_nl();
+ 	if (vtb[BRIDGE_VLANDB_GOPTS_MCAST_ROUTER_PORTS]) {
+ 		vattr = RTA_DATA(vtb[BRIDGE_VLANDB_GOPTS_MCAST_ROUTER_PORTS]);
+diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+index bb02bd27..b4699801 100644
+--- a/man/man8/bridge.8
++++ b/man/man8/bridge.8
+@@ -266,7 +266,9 @@ bridge \- show / manipulate bridge addresses and devices
+ .B mcast_query_interval
+ .IR QUERY_INTERVAL " ] [ "
+ .B mcast_query_response_interval
+-.IR QUERY_RESPONSE_INTERVAL " ]"
++.IR QUERY_RESPONSE_INTERVAL " ] [ "
++.B msti
++.IR MSTI " ]"
  
- 	if (!is_json_context())
--		printf("%-" __stringify(IFNAMSIZ) "s  %-"
--		       __stringify(VXLAN_ID_LEN) "s  group/remote\n", "dev",
-+		printf("%-" textify(IFNAMSIZ) "s  %-"
-+		       textify(VXLAN_ID_LEN) "s  group/remote\n", "dev",
- 		       "vni");
+ .ti -8
+ .BR "bridge vlan global" " [ " show " ] [ "
+@@ -1493,6 +1495,11 @@ startup phase.
+ set the Max Response Time/Maximum Response Delay for IGMP/MLD
+ queries sent by the bridge.
  
- 	ret = rtnl_dump_filter(&rth, print_vnifilter_rtm, NULL);
++.TP
++.BI msti " MSTI "
++associate the VLAN with the specified multiple spanning tree instance
++(MSTI).
++
+ .SS bridge vlan global show - list global vlan options.
+ 
+ This command displays the global VLAN options for each VLAN entry.
 -- 
 2.34.1
 
