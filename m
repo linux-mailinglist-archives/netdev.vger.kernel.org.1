@@ -1,110 +1,137 @@
-Return-Path: <netdev+bounces-108368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F60923915
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FFE92391A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 11:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E88DB24C12
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:04:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6F92B20C3A
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03DC1514DA;
-	Tue,  2 Jul 2024 09:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SvYnMbo3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029B314F9E4;
+	Tue,  2 Jul 2024 09:05:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC27150991;
-	Tue,  2 Jul 2024 09:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4C14E2E8;
+	Tue,  2 Jul 2024 09:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719911035; cv=none; b=m15dP0zAY762Iq2BMLy2LPBYG/tTDJbfJrLmzkPAQIfTBxZJtwSVUBs+2/JbGLX8qmVRB4+qMW8HKUrRz6XzangaS5eE7fJcOVTNCfjszVAGEWHESluSX3BEDAa9qL2dcnjTrKhCtJYsowJ+bRgGHHE6FTKKfQ1mqAEG9IXlY+k=
+	t=1719911144; cv=none; b=f1/JK/RYiO44TMSX0ap0huGDOem1vwNMCMUzYupCHMoluErTNP47gdasN1xAcYpO/wnDQAr/ZrLi/xRHBSeOydgXdINzPd76ivo+JWA60mmvNb27cQRJDo535sRPnVTuH8YAc07oiFa5M/89bZRR1j84JuM5ByYK2Gh1A2N+qz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719911035; c=relaxed/simple;
-	bh=YEXOMHw/lotc3rT5a8xlE7JlHDosPHJ8mSGnl9JHG8o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u8UIBgZ8Nzp8Xgk3PeAn4EDdnHc+ccOP+mVHBjQKC77Sr38WJ0b+Z29eHtpD0wAPgYCRnvmrIcVr6ndxqHrVFpjXQw4GSPxq2L2sY3LfzF6qNqFn4uSgTf0QPPVvF9QVT5fFrPx5vE3g6Iv6/JNyQJPcX+WicBskM81YoomKJ08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SvYnMbo3; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 39D3A240004;
-	Tue,  2 Jul 2024 09:03:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1719911032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JSdrsQgymj8BJO7hni97fua9Gnf8/hUWnIpei5HqtXs=;
-	b=SvYnMbo354C9fH9oRETvgoj0YxWPei9t+r6uBmv/3/mvfagU8+10tBCx1IoGWWjWlxkSpQ
-	vZUBg/YHlQ/gOqf6XGqR0js0n6uJlJQNgHFvEaI3Zj11d70x4JJa1P8sAIsmlDmGPwV58r
-	lMswKs5fxy58/NnM2mKdGe+WphPHm17B6DWWkvBDa+WoYrTl6VXVaGiIeDMmJttKo8pKah
-	q/6X962qNR9XrxvtUdEqjMmvwtn3vohqyvTPXo8CYmtsUySrRTkj21IdTqSBEgxdTp5vr2
-	rvKZL4yGhaB02dFJ0keRBC2wF4Jrqf/FLia34jdbYTZNdQcY1H1DuToBrgCQoA==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1719911144; c=relaxed/simple;
+	bh=MPRyW1RvhsLIXbCr3vfsubrMJwYXGQhfyrMaSdBpN68=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=RFXYqLM1iOHrxRMl/mEGi8v8pgsZvXWSZZqUsm5Tisc/NBohuw+CvHd6Qj/EuYoQ+YogjqJMEr/HmXK2EN61+rC3FEb+6aX93BjjTadMzd3MP5tDt26Urz6BjCF1FFYSdwXbnEOSpM0gG1UgklJwjLCvWrox3V21uypIBGbm0/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_128_GCM_SHA256:128)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sOZS4-00000000346-1GZX;
+	Tue, 02 Jul 2024 09:05:28 +0000
+Date: Tue, 02 Jul 2024 09:05:19 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: linux-mediatek@lists.infradead.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Elad Yifee <eladwf@gmail.com>
+CC: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH net-next 6/6] net: phy: dp83869: Fix link up reporting in SGMII
- bridge mode
-Date: Tue, 02 Jul 2024 11:04:37 +0200
-Message-ID: <8435724.NyiUUSuA9g@fw-rgant>
-In-Reply-To: <289c5122-759f-408a-a48a-a3719f0331f9@lunn.ch>
-References:
- <20240701-b4-dp83869-sfp-v1-0-a71d6d0ad5f8@bootlin.com>
- <20240701-b4-dp83869-sfp-v1-6-a71d6d0ad5f8@bootlin.com>
- <289c5122-759f-408a-a48a-a3719f0331f9@lunn.ch>
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next=5D_net=3A_ethernet=3A_m?=
+ =?US-ASCII?Q?ediatek=3A_Allow_gaps_in_MAC_allocation?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <3bda121b-f11d-44d1-a761-15195f8a418c@intel.com>
+References: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org> <3bda121b-f11d-44d1-a761-15195f8a418c@intel.com>
+Message-ID: <C24C4687-1C00-434D-8C37-BDB85E39456C@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-GND-Sasl: romain.gantois@bootlin.com
-
-On lundi 1 juillet 2024 19:09:40 UTC+2 Andrew Lunn wrote:
-> > +			if (dp83869->mod_phy) {
-> > +				ret = phy_read_status(dp83869->mod_phy);
-> > +				if (ret)
-> > +					return ret;
-> 
-> Locking? When phylib does this in phy_check_link_status(), we have:
-> 
-> 	lockdep_assert_held(&phydev->lock);
-> 
-> I don't see anything which takes the downstreams PHY lock.
-> 
-> Is this also introducing race conditions? What happens if the link
-> just went down? phy_check_link_status() takes actions. Will they still
-> happen when phylib next talks to the downstream PHY? It is probably
-> safer to call phy_check_link_status() than phy_read_status().
-
-Given that the phylib state machine will call phy_check_link_status() itself,
-I think that this call to phy_read_status() could be dropped entirely and that
-dp83869_read_status() could just directly read mod_phy->{link,speed,duplex}.
-
-This raises the question of a potential race condition when reading
-mod_phy->{link, speed, duplex}. I haven't seen any kind of locking used in
-other parts of the net subsystem when reading these parameters.
-
-Thanks,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
 
+On 2 July 2024 06:58:22 UTC, Przemek Kitszel <przemyslaw=2Ekitszel@intel=
+=2Ecom> wrote:
+>On 7/1/24 21:28, Daniel Golle wrote:
+>> Some devices with MediaTek SoCs don't use the first but only the second
+>> MAC in the chip=2E Especially with MT7981 which got a built-in 1GE PHY
+>> connected to the second MAC this is quite common=2E
+>> Make sure to reset and enable PSE also in those cases by skipping gaps
+>> using 'continue' instead of aborting the loop using 'break'=2E
+>>=20
+>> Fixes: dee4dd10c79a ("net: ethernet: mtk_eth_soc: ppe: add support for =
+multiple PPEs")
+>> Suggested-by: Elad Yifee <eladwf@gmail=2Ecom>
+>> Signed-off-by: Daniel Golle <daniel@makrotopia=2Eorg>
+>> ---
+>> Note that this should go to 'net-next' because the commit being fixed
+>> isn't yet part of the 'net' tree=2E
+>
+>makes sense, and the fix is correct, so:
+>Reviewed-by: Przemek Kitszel <przemyslaw=2Ekitszel@intel=2Ecom>
+
+Thank you the fast review!
+
+>what about:
+>4733=E2=94=82 static int mtk_sgmii_init(struct mtk_eth *eth)
+>4734=E2=94=82 {
+>4735=E2=94=82         struct device_node *np;
+>4736=E2=94=82         struct regmap *regmap;
+>4737=E2=94=82         u32 flags;
+>4738=E2=94=82         int i;
+>4739=E2=94=82
+>4740=E2=94=82         for (i =3D 0; i < MTK_MAX_DEVS; i++) {
+>4741=E2=94=82                 np =3D of_parse_phandle(eth->dev->of_node, =
+"mediatek,sgmiisys", i);
+>4742=E2=94=82                 if (!np)
+>4743=E2=94=82                         break;
+>
+>should we also continue here?
+
+Good point=2E As sgmiisys is defined in dtsi it's not so relevant in pract=
+ise though, as the SoC components are of course always present even if we d=
+on't use them=2E Probably it is still better to not be overly strict on the=
+ presence of things we may not even use, not even emit an error message and=
+ silently break something else, so yes, worth fixing imho=2E
+
+>
+>4744=E2=94=82
+>4745=E2=94=82                 regmap =3D syscon_node_to_regmap(np);
+>4746=E2=94=82                 flags =3D 0;
+>4747=E2=94=82                 if (of_property_read_bool(np, "mediatek,pns=
+wap"))
+>4748=E2=94=82                         flags |=3D MTK_SGMII_FLAG_PN_SWAP;
+>4749=E2=94=82
+>4750=E2=94=82                 of_node_put(np);
+>4751=E2=94=82
+>4752=E2=94=82                 if (IS_ERR(regmap))
+>4753=E2=94=82                         return PTR_ERR(regmap);
+>4754=E2=94=82
+>4755=E2=94=82                 eth->sgmii_pcs[i] =3D mtk_pcs_lynxi_create(=
+eth->dev, regmap,
+>4756=E2=94=82 eth->soc->ana_rgc3,
+>4757=E2=94=82                                                          fl=
+ags);
+>4758=E2=94=82         }
+>4759=E2=94=82
+>4760=E2=94=82         return 0;
+>4761=E2=94=82 }
+>
+>
 
