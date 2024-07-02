@@ -1,275 +1,195 @@
-Return-Path: <netdev+bounces-108352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B6291F052
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 09:36:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD76791F0A8
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 10:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23A661C21B78
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 07:36:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5BC1C21519
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 08:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92704133987;
-	Tue,  2 Jul 2024 07:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3238212FF7B;
+	Tue,  2 Jul 2024 08:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rj7BOQz5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsWIANMa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75D774047;
-	Tue,  2 Jul 2024 07:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719905775; cv=fail; b=V9LvU1hVlywnJDMF0H4WWNc0NkcguiBJsFap/iaSStV8ZS9VrIWRlkFCYyNS8/nSQOMylp9qs7YODrMVI4R9GFVr/V9PW+9nzP6bXAMg56qeP1PIzpxICIQtdLtxd+0N3y3eHhZj50xNLTJAvtlmpMtekJPwElemEOFl1I3YcTY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719905775; c=relaxed/simple;
-	bh=fHrq/OrSicUdRi7fRcxurnZJjJINrGVstHyfs/10rG8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=TutYsfqQCdn9h549dYf7luIk4irdeQTU18LkzNlnwBdaqP3YNMNuYp02cF7988vwq/575KBo7wb6yjMYvICVOo0cBZWyveA043mWObf9XZRJSemBnffyBww5PBqxOSBS0BUXVGM8fNVdPEt/IgmpQdetYHFHG0pJ6YdyB3CJG5M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rj7BOQz5; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719905774; x=1751441774;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=fHrq/OrSicUdRi7fRcxurnZJjJINrGVstHyfs/10rG8=;
-  b=Rj7BOQz5du/WYqm+XUYTK3XiPUDEuBRsUJA0hOWxcQpaFWizaDQAfmz0
-   HoW7vJMhaigvidCqirpBXhHZx3WCP+PeclUI/9NPgJcQNrLH0OX07eTTR
-   q6TnC9nTQKhjalNzCUM9lGdNzmDZg63JTpIDlrtf6LKOHHuPijDN+gi/o
-   LFc2JQzKHp8sCM7W9E8/66gfAx9wW6YJ1va4DjIxz3NEVIaVEXeot9QI4
-   DVrWyPFEktNoUp/1WhccW6Y/lD9IySXXv7vs02sEHxLCTxKhns+KHlB6R
-   LOA/dLSjzfsPf5/LI7WyjMnVm+xN9wwsev8ubImVdLj1LJATQAWSK+8cN
-   Q==;
-X-CSE-ConnectionGUID: 0wO/oJWpS0GUjT9moWhjnQ==
-X-CSE-MsgGUID: sPTsaWG2QZ6I2J4c5Ivf+g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="42491827"
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="42491827"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 00:36:13 -0700
-X-CSE-ConnectionGUID: 7I+fepwQTbG3kwzSdzRA4g==
-X-CSE-MsgGUID: 1S4KWiqzQhGWI4xZR96yBA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,178,1716274800"; 
-   d="scan'208";a="45812610"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Jul 2024 00:36:12 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 2 Jul 2024 00:36:12 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 2 Jul 2024 00:36:11 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 2 Jul 2024 00:36:11 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 2 Jul 2024 00:36:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QCUgO/jWQDSVkjicAMkqNQA5xi8sWJu071oV2Lk0Kbb75bS+9JGyVoqDi8FP+dnLJL7dVvGIYZuacM5wy60UhFIAY/ufAPmJCPogTSTuvFU/Ry9bG6HVwrvp9DqDz+LZ1lW9qNn5e9Yn16RGYmW0hi284gkLle45F/qQ4XTFfGPF6q/kI/DQZ3yt6vjjpf1OPgOGGzAdClNIPb7QJNVqhNhBll1J8wRjafFSPE8V0pIkW37IupvcEICDcp3wfcGNKFB6r0Nq/YS27Q1R14qh/8LPOcHQIXZrX2L0p5yOB/cHkCKTPBgLwfWroAF3r4ZSFt0sHCsXjUg9i9lSCIIVcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HaJ3rrQwY3F20RdsDyS1iFfxYvNAh04j7vN+ERwIWKc=;
- b=nJTo0C8T7DGoW89CwMLZl05zuC+ww6V4ZZcQxDrdf1NxBQOctmAklZQ4YP5vrQflBxit3Tx61qMtfKLy3zWqHXh1zlOE23djrQGtsc4F5h8AUsTLuN/o24QlFdiqs7aXPu2YqBF+6czqzMcTf74HjV6ZPCiMxrCZr2WUhICGRBd5k+l4jPR8atyahy7S8TJrNpEnHVbTzBebq8it9Y8Qdq6X/LJpQ01h1I2pImBtYxqqFYqcMWq7El94NquW3XJ3XhEXWDIsrOlsm3Tf4VoVb8Wvlfsh7yRiBvKb5H1O8vAXkN5u3D3d1hM00juEBJur7CPZHzCRzcF1ZH9q2KIBBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by IA0PR11MB7837.namprd11.prod.outlook.com (2603:10b6:208:406::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.34; Tue, 2 Jul
- 2024 07:36:04 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7719.028; Tue, 2 Jul 2024
- 07:36:04 +0000
-Message-ID: <79ee5354-1d70-4059-aa9d-9d9ffa18689a@intel.com>
-Date: Tue, 2 Jul 2024 09:35:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] mlxsw: pci: Lock configuration space of
- upstream bridge during reset
-To: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-CC: <mlxsw@nvidia.com>, <linux-pci@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
-References: <cover.1719849427.git.petrm@nvidia.com>
- <b2090f454fbde67d47c6204e0c127a07fdeb8ca1.1719849427.git.petrm@nvidia.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <b2090f454fbde67d47c6204e0c127a07fdeb8ca1.1719849427.git.petrm@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0043.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:47::17) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B0514B960
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 08:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719907209; cv=none; b=oISa5+HaGyI2c/Xnlznx/oXBLQQ8YkGLPxGZfS9kh6UdgCUJ1iU7Kpedxp4Sh01NnXorWu+lbocRfweF3cnE+Unti/yOrCwyaeSWOGpesRWpGLrAxFs/PZIZIwRiAo0Hwt2umE0DTBGlCvOWbwVWEM7T8IgYXcrEPTJ8oR0jPyY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719907209; c=relaxed/simple;
+	bh=QnCjHQ3v3sFYVBr6IgVTx2rcuQYAqv7bx05CjStLZTI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F3chvTX4u04EWF/Nu53tYvWKTm42R5e2g0wW+AqtvCP/BDxIaeXa23oy2eiCg54onjkMJjDlHsLP9M3Nh1aZlngogjoNGN55zt7YAF3iPqMmOFNvBS3E5EnwfN/U8FSElzfPeyfLTN4S4kp6MWeYXZEbg/b36XfnNcmNqDi9ciA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsWIANMa; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f4a5344ec7so27714005ad.1
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 01:00:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719907207; x=1720512007; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y61zEMQUsNIc5tU+r3K6Kzv7ri/HytQMZQPZSk2Szoo=;
+        b=HsWIANMa2opibCHEoXyQkWzl30q3e6GXwtjLmSgikqgG9stgmop6ayFCFBETKBNUDB
+         oE5D7PKWBdn9Pzf5rn/bYaAoVd0HvQjWU0aOCy8nMfCwPrJbjv2K9na89p/WNt92gbIF
+         WQTw3E5t99U6Zqf4iVscaWgjR1n1nytVrIYK0UC+g6CsnOVTKaidkuOh3ULGK+xJt5zn
+         U52QPKXRSTOziYevD/A1dLG1P9o0pX/rvlUhA5g4novnAtZg8T+eAvHxMRQ/HfXrb+NY
+         5f24Zno2+DOyiKM6IT6j9fM5i4zXnUHvBPj1LotlV7quiU/Mznw4tLP6pvetEtYTSBkH
+         HOxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719907207; x=1720512007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y61zEMQUsNIc5tU+r3K6Kzv7ri/HytQMZQPZSk2Szoo=;
+        b=FsIYaf0CtdqFBiv57CIG3WTRSy8gZbrqwfdLNqe2meLgdWHg/Cw141KEa4yVDYfnoy
+         n6TIh9USsKIiU6s8RIXYGY4mnIWvjl7XTZZSVgJ97qzsUJ4vIGO4+/7wo/Z8enLOvCOH
+         wTj25Ztc3QqW1LZfCcuufbV3qP9aO9GeKYXLzkBsUw0kS0HGTXX99L9lHb6O0AOB6BFN
+         t45ia0IGqsd1PCq3e1WD+Ebjihxq6e4mMqnbamgImfQmuYEeQegdSiiuDdGc7WimGdVb
+         UaE/4F5JcBqT+2QwVteVdirHwZSqZyrAOgn9guorqq2sF4anf/AGq9x8CvkpKz/b+tiK
+         nFmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWScvX9Qq+CoG/2ubnrR3XH3xcrOWxWl2pgjcfNMxglJFxKObegQEmhUZrhs6ei1pGHfEpD7kmE01GXNEPJdEBVVFx1YzCt
+X-Gm-Message-State: AOJu0YxkjlDK2sUB0lIKU/AQ9CD28lOx8eaTtTXK8RFt5lQHNM6T16Op
+	Mt9pxYRYSeQYyWbd8sKWdEYYUC/eepL//0wISb/Nw/yJr6C9bHA0
+X-Google-Smtp-Source: AGHT+IGxv1WkyUQ0016TLgHlGViplzIU+qB63dX4YUSumwDR7VQiBV5+Vpw2eNOrdYnEyHeRyXdv/Q==
+X-Received: by 2002:a17:902:f688:b0:1f9:f6e6:5ada with SMTP id d9443c01a7336-1fac7eec818mr184307585ad.22.1719907206617;
+        Tue, 02 Jul 2024 01:00:06 -0700 (PDT)
+Received: from Laptop-X1 ([2409:8a02:7825:62b0:7aad:184a:7969:1422])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac1569606sm77480425ad.222.2024.07.02.01.00.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 01:00:06 -0700 (PDT)
+Date: Tue, 2 Jul 2024 16:00:01 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
+	Amit Cohen <amcohen@nvidia.com>
+Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
+ state changed
+Message-ID: <ZoOzge5Xn42QtG91@Laptop-X1>
+References: <7e0a0866-8e3c-4abd-8e4f-ac61cc04a69e@blackwall.org>
+ <Zn05dMVVlUmeypas@Laptop-X1>
+ <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
+ <Zn1mXRRINDQDrIKw@Laptop-X1>
+ <1467748.1719498250@famine>
+ <Zn4po-wJoFat3CUd@Laptop-X1>
+ <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
+ <8e978679-4145-445c-88ad-f98ffec6facb@blackwall.org>
+ <Zn6Ily5OnRnQvcNo@Laptop-X1>
+ <1518279.1719617777@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA0PR11MB7837:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ab41b9d-91bd-4e39-e2df-08dc9a69a0dd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UkR1bmIycHhtbkttVGlGNlhvcUttSDArYkdicHdLV1gvaUtsM0E3OHBmNW5t?=
- =?utf-8?B?QWdHMmlNL2FZclhDcmpLanFJaXFOZkFrN0p2YVYwYzZzMVhwYU5TbWRuNzk5?=
- =?utf-8?B?QTR3b2JQT3ZIVFZwVWFVM1pYbkxadkpwb1NpY0tZWkJMNHZhdTV1bkJOelZz?=
- =?utf-8?B?WTNGUmpQN3N6cUliM3lOdllLUUU3WURzMWZnZXE3MUxyaWRaM1FTaFZEN1Fa?=
- =?utf-8?B?NytIU3ZDa1pwUnFWVktWdklnTVI0Y0dDUjJsY2N1ZnMrVXQxUWJlWnE0ck5W?=
- =?utf-8?B?bmIvaTZ2MEUvUUExWDV0cXVUbFVyUStkaE5YWFVOVVROK283Y2ZFZngya2tR?=
- =?utf-8?B?YnB5dHdXM2FweUlXQitneHBNc3pWUHlCTTNMd0ZSMWtSV081bGpodmRNTUQ0?=
- =?utf-8?B?VEU3Y1M5ZFlYV0xSendaUXo0RTg2QzMzSnQ0TDN3Yzhtc0s3aGVsSkxjOTFG?=
- =?utf-8?B?RnJGRnordVVDa0d2RHhHN3FHWlRFSEIxV0NmOFhZWnNOc0RMcE9LaE5GNk11?=
- =?utf-8?B?T3QrM0k1T083dGNmRStOSDJpT0xKV0tIM2w3R1hzSkZmeDFWT3RKMkhpaXNN?=
- =?utf-8?B?Tlg5STEzMGZzdER6clFFQzNHR2hRcGZBMzFldkh2eEN3amxOMUNSbktseDBJ?=
- =?utf-8?B?cGphck1NallWNHFtTS9YWXpNL0pUR1pJY3l5RkwrR0xCOW5PQmFzUlhsQU9B?=
- =?utf-8?B?Wll4Q3BVLzNXNmhrNHRWbmhwK3A3VlZLREdNMFhWbXNMRDQzcWFaN0lTWHNS?=
- =?utf-8?B?eFp1TUtkMktWcUFiZzltYnNybkxINStiREdEWi95Q3E4U3diTVVvRFdSOStE?=
- =?utf-8?B?LzM5MXhXcXBHQU9mQ3FOeGFWMGNVYklvYVJpdlJ6aEU1YXJEM0k1UmI0ckd0?=
- =?utf-8?B?SDZ3OThQViswblg1d0lHVTNlNnovcjd4elcreGVzN1JpSEFRVWRLSWRCTFd6?=
- =?utf-8?B?bVFsQnl4Y0RaY3V5dTkvUk1Hb1hjMFJJRkM0aUFuQ1p3NXd1RExnMFNGOXpX?=
- =?utf-8?B?b05YR3hrY08zd0kxem84OURUM3RFbFhJYnRqWTE1SGJvS1F2R0VOSHBidG1X?=
- =?utf-8?B?VmZwQzNwRUhjQ1VjNWpCTlcydnZ0TjdjNkNYS3Y1d1Btelp0QThlRG5BMHp3?=
- =?utf-8?B?cnlMZ3E4dXFxN01ZV21xbHd1aVA3VGhvWEVjL0QwUlh2K05xRkpVV200RTRE?=
- =?utf-8?B?NTJuOWxvMEpkWURrU282UXFXakNscER3dzJVYVdYWE1BY2FOVUxKalFYNXdK?=
- =?utf-8?B?ampHcmc5ZTRoN1NKbEF5NnNQaElmMzdERlI4NE4xNzRnZWZXWmtUMm1EM3cv?=
- =?utf-8?B?dDR0RVhHeXF5L2tlQlJsSmJxaEJYRHVLcWV3c3hLUG4zSzVFc1BzdXNicWtr?=
- =?utf-8?B?d2EzbmZxSFVEVzFkK2xjQUtxS3lobUpUb1FlTHN4OWdSaUgwQkJUQTI3OU9J?=
- =?utf-8?B?Y0pNMW5uckVEU1NuQnFoNk9YTjM4bUVWTnN6NDFkQTFpT09wM0cxYk5qL2xF?=
- =?utf-8?B?SWZFVGh5ZWVQTmNua3NhS0tWME1wcitEcUNDT3hONzFQUE1CV3RnemJ4cWtu?=
- =?utf-8?B?MHNtR0h0QXdOM0wrNFhRdlFQTzNEQUJNZ2JmS05kMnBucUxNWCtnKzhLaFJt?=
- =?utf-8?B?d2pWbTVIci9vdTVpUCsxblkxNGJhSURxSnJBL1NoN2QwNklLL0NFM3FGZzVx?=
- =?utf-8?B?ejBJQW9PZkVQaEQ4Y0QyYVVwVmtkN2NvbzhZU0pmQW1TZzA4SjV6dG5sR0pp?=
- =?utf-8?Q?q3A+SQZBrr8fwXeC3NIHrWoRDEsunhZWP0qj5Tt?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmtNRHNuTjdwbDR0aEVDMm1HckJQbmZvWEhMQnhLMFYrMGt6dVU5SzRqb3hW?=
- =?utf-8?B?QTMyYUg0M092YjRaRlk1R0h6OVp1bUxpakNoUkozaUtwRGZZYjdOcE9ONUVN?=
- =?utf-8?B?OGJUSHlsTnZqME0rdEpkUWxvMHh1OHZiRksyN3pOUTRheUovYlB6MTNVV3pV?=
- =?utf-8?B?SDM0dUhvRy9jZnBmUGRnNElkaTduU0RYU1VYSmtLL3Ywd2pndTk3OFFaT2M4?=
- =?utf-8?B?R21PeW5UbUs2UWVOWEYzQUJpMVh4dGRtUGMwSWhBSThsRE5iS1d3K3NZbzVX?=
- =?utf-8?B?d1NFM2d5bWppaUlxNlhBVEdPNGc0eitXVW5TazNkYlhsOGlUN1h4dTg4eUth?=
- =?utf-8?B?ZnlSNE1zT1kwT0QwcDJQcitsekxwc0NaZllYUlY0YU9SU3MvNjBjN0EzUFFE?=
- =?utf-8?B?ZjNIekVNT1l3VkliNE9qSkpKbVpKTWFIVGlEbUVreVpSUTBLbSt3czBSYlF2?=
- =?utf-8?B?TnhmOWJZODdPaHVmWTRRT1lqM2crVEtmaXJWTFVXY1daRWxKdkxMUzE4SDYv?=
- =?utf-8?B?QUJnajVTck1YNHYrY05FRStENDN1VnM3REVHemIxS2VhR3hkUGJRN0VmbFM4?=
- =?utf-8?B?dStGSUNKcTFJYy9WcEljcm1jMVlFYytPdHhJVm81RTVORGNBa291QmVJeVdI?=
- =?utf-8?B?MjArRXRaRjBkaDZJaUFUdjlobVNMMkFEUnhOUlpCdllvVGdnUXpJaE96bHlq?=
- =?utf-8?B?MUIyQXZkek5qaVpqajVPTFhzL2t3VnM3a3czOHlnUnphcmNnc09HQnJmOCt0?=
- =?utf-8?B?OHRUeWxGOTdUREU4SDZCazBPWldKMFFaNlhRZzJLeXEwTWo5amFXSFpTbUx5?=
- =?utf-8?B?QXYyMHF6NnJtbXkyYkl0ODF4T2dNcXVSVW1Kb2dPOTdPS0dlelA0NzNaS2U5?=
- =?utf-8?B?RVRJQlo5eVlnd0ZXL2RMUUZZMytxMHU1L1BsdktmeWVJZUFrZWVHSzRKZjFY?=
- =?utf-8?B?djZMRURKcU1RYmNUR2JzR3l5SVYvbW82UXNlMmh6TXNmVVIxVXVPdEVkMmF2?=
- =?utf-8?B?OVZuUmc3QndIaVFlTW16T0dWUXNvc0tacXVpZjFkZ1NtQy8xYURvdmxnMjMx?=
- =?utf-8?B?SGNEVDZIck5CbjVQaGI5a0g3cllrdk0vUzBTY2VmTzdlS1NFZVdXVzYxelA3?=
- =?utf-8?B?R2hqNXppK2JXUGN5UUhjR3dXbEg1d3lMejNTRE1KR04rZkFjZlFyWTJsUnJD?=
- =?utf-8?B?T2FKQkUzVUNPeXhGdk9SR2dyQzQzU09XUk05a1kwd293cDBjTzJPZDBKSFVD?=
- =?utf-8?B?QnpIbHU3VElXQUh5Zjk3UXVobnRKc2M4K0RCYXNrc2VXVzcwZFRIZkwxUHZS?=
- =?utf-8?B?VEVtNnhLS2MyMVhzSzNTSUNhZXBSQm9hNXBiYVVnR3F0dmRPREl6dGc1MTRz?=
- =?utf-8?B?TmM5eWdsR01lS0pnKzQxNGpEZ3N0Ri9BNDV0V2VScU44cUVLWThWSXpDV0lP?=
- =?utf-8?B?enZkS1U5L3NuZ0VjZi9lY2hJL2dqQzJPTkFzVzh3c1dpTFprdGlaeWJXczFy?=
- =?utf-8?B?cnpDU0QrcG15aXdTdzhZZDRtZUkrRXBjM05EK1RQMnVIRkYyVm9UdE9XRVgr?=
- =?utf-8?B?TlpUV3FZcUx0VDB4aEMvVjIzV1hSRVM5aUpsK3VhMThLUktYQnRYTTdhcURl?=
- =?utf-8?B?a2FkR2xvTCtQUjBNK0lhVlhLZ3dYRXYzUE1wLzVvOTdPNjFzY21YSWRWeDMz?=
- =?utf-8?B?S3puSEVHQkphcU5VL3JRb2JrTFdDWUFqdUNVenUyTnI5OC9BOWxsQWFKVHp4?=
- =?utf-8?B?SjV3L2QvcmIwVmp4RUFsTzVuSXU3M3hmdWw1bEUyWStvbWh1cmZHRll2dFRK?=
- =?utf-8?B?MUlvdW56YnBxUEMreE5jaFNyektqSytkd0VuaERvTUp0MFlLN2hUVXlEcFpx?=
- =?utf-8?B?N1hXVVBRRG10R1dKOTNRUU5JQ3kwVGlzZDM0MHYxc3BqOTAzbGx2N0t0WW5w?=
- =?utf-8?B?TnF5MEY4akRrSzJOaUtFMnB5ZTZtV2hOaFZEY1FnZktQUW94amtyMDhYcTlG?=
- =?utf-8?B?SXU2dE84ZW1NbWxFeUdwSjI4M1hwbTFKMEtnZ0Zhemc0RjUzUmdGUEszZ3JW?=
- =?utf-8?B?azlPMVk1Y21nQ3FOVHpVOUxIc0h4TXo0ZStEd3plcXV3MDA0WnNyVDd4K0Nx?=
- =?utf-8?B?SnZNaXBhQzltbG9RQi95VldZMmpyYlRyNS9YSi84aEliZUNIeUtDNlhpb2Vk?=
- =?utf-8?B?K1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ab41b9d-91bd-4e39-e2df-08dc9a69a0dd
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2024 07:36:04.1667
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NgRMffFGJmW+bs6E0nNeebsN4j/zXkeStNZU3unVo42ToEh+8+WeKeBRmUHakiPOZvuOlSd7U+uBfak3anlVPA/Vq3T+iEIkFmjcyQnWo+w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7837
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1518279.1719617777@famine>
 
-On 7/1/24 18:41, Petr Machata wrote:
-> From: Ido Schimmel <idosch@nvidia.com>
+On Fri, Jun 28, 2024 at 04:36:17PM -0700, Jay Vosburgh wrote:
+> >Good question. The monitor application want a more elegant/general way
+> >to deal with the LACP state and do other network reconfigurations.
+> >Here is the requirement I got from customer.
+> >
+> >1) As a server administrator, I want ip monitor to show state change events
+> >   related to LACP bonds so that I can react quickly to network reconfigurations.
+> >2) As a network monitoring application developer, I want my application to be
+> >   notified about LACP bond operational state changes without having to
+> >   poll /proc/net/bonding/<bond> and parse its output so that it can trigger
+> >   predefined failover remediation policies.
+> >3) As a server administrator, I want my LACP bond monitoring application to
+> >   receive a Netlink-based notification whenever the number of member
+> >   interfaces is reduced so that the operations support system can provision
+> >   a member interface replacement.
 > 
-> The driver triggers a "Secondary Bus Reset" (SBR) by calling
-> __pci_reset_function_locked() which asserts the SBR bit in the "Bridge
-> Control Register" in the configuration space of the upstream bridge for
-> 2ms. This is done without locking the configuration space of the
-> upstream bridge port, allowing user space to access it concurrently.
+> 	What notifications are they not getting that they want?  Or is
+> it that events happen but lack some information they want?
 
-This means your patch is a bugfix.
+Yes, e.g. when the switch crashed while link still up, they can get notified
+from LACP partner state if we send the info via netlink message.
 
 > 
-> Linux 6.11 will start warning about such unlocked resets [1][2]:
+> 	Currently, the end of bond_3ad_state_machine_handler() will send
+> notifications via bond_slave_state_notify() if the state of any member
+> of the bond has changed (via the struct slave.should_notify field).
 > 
-> pcieport 0000:00:01.0: unlocked secondary bus reset via: pci_reset_bus_function+0x51c/0x6a0
-> 
-> Avoid the warning by locking the configuration space of the upstream
-> bridge prior to the reset and unlocking it afterwards.
+> 	The notifications here come from bond_lower_state_changed(),
+> which propagates link up/down and tx_enabled (active-ness), but not any
+> LACP specifics.  These are sent as NETDEV_CHANGELOWERSTATE events, which
+> rtnetlink_event() handles, so they should be visible to ip monitor.
 
-You are not avoiding the warning but protecting concurrent access,
-please add a Fixes tag.
+That's the problem. It only propagates link info via link up/down. The link
+info is not send if only LACP state changed.
 
 > 
-> [1] https://lore.kernel.org/all/171711746953.1628941.4692125082286867825.stgit@dwillia2-xfh.jf.intel.com/
-> [2] https://lore.kernel.org/all/20240531213150.GA610983@bhelgaas/
+> >What I understand is the user/admin need to know the latest stable state so
+> >they can do some other network configuration based on the status. Losing
+> >a middle state notification during fast changes is acceptable.
 > 
-> Cc: linux-pci@vger.kernel.org
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> ---
->   drivers/net/ethernet/mellanox/mlxsw/pci.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> index 0320dabd1380..060e5b939211 100644
-> --- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> +++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-> @@ -1784,6 +1784,7 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
->   {
->   	struct pci_dev *pdev = mlxsw_pci->pdev;
->   	char mrsr_pl[MLXSW_REG_MRSR_LEN];
-> +	struct pci_dev *bridge;
->   	int err;
->   
->   	if (!pci_reset_sbr_supported) {
-> @@ -1800,6 +1801,9 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
->   sbr:
->   	device_lock_assert(&pdev->dev);
->   
-> +	bridge = pci_upstream_bridge(pdev);
-> +	if (bridge)
-> +		pci_cfg_access_lock(bridge);
->   	pci_cfg_access_lock(pdev);
->   	pci_save_state(pdev);
->   
-> @@ -1809,6 +1813,8 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
->   
->   	pci_restore_state(pdev);
->   	pci_cfg_access_unlock(pdev);
-> +	if (bridge)
-> +		pci_cfg_access_unlock(bridge);
->   
->   	return err;
->   }
+> 	This is a much simpler problem to solve.
 
+Good.
+
+> 
+> >> Well, you mentioned administrators want to see the state changes, please
+> >> better clarify the exact end goal. Note that technically may even not be
+> >> the last state as the state change itself happens in parallel (different
+> >> locks) and any update could be delayed depending on rtnl availability
+> >> and workqueue re-scheduling. But sure, they will get some update at some point. :)
+> >
+> >Would you please help explain why we may not get the latest state? From what
+> >I understand:
+> >
+> >1) State A -> B, queue notify
+> >       rtnl_trylock, fail, queue again
+> >2) State B -> C, queue notify
+> >      rtnl_trylock, success, post current state C
+> >3) State C -> D, queue notify
+> >      rtnl_trylock, fail, queue again
+> >4) State D -> A, queue notify
+> >      rtnl_trylock, fail, queue again
+> >      rtnl_trylock, fail, queue again
+> >      rtnl_trylock, success, post current state A
+> >
+> >So how could the step 3) state send but step 4) state not send?
+> 
+> 	I'm going to speculate here that the scenario envisioned would
+> be something like CPU A is in the midst of generating an event at the
+> end of the state machine, but CPU B could be processing a LACPDU
+> simultaneously-ish.  The CPU A event is sent, but the CPU B event is
+> delayed due to RTNL contention.  In this scenario, the last event seen
+> in user space is CPU A, but the actual state has moved on to that set by
+> CPU B, whose notification will be received eventually.
+
+Is is possible that LACP event (The second to last state) in CPU A is delayed
+due to RTNL contention. While the LACP event (the latest state) in CPU B is
+sent successfully. And later the LACP event in CPU A is sent eventually.
+
+This would case the user space receives miss order message.
+
+> 	Looking at the current notifications in bonding, I wonder if it
+> would be sufficient to add the desired information to what
+> bond_lower_state_changed() sends, rather than trying to shoehorn in
+> another rtnl_trylock() gizmo.
+
+I'm not sure if the LACP state count for lower state. What do you think of
+my previous draft patch[1] that replied to you.
+
+[1] https://lore.kernel.org/netdev/Zn0iI3SPdRkmfnS1@Laptop-X1/
+
+Thanks
+Hangbin
 
