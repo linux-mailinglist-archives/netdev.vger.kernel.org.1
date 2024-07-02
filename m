@@ -1,67 +1,73 @@
-Return-Path: <netdev+bounces-108610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A389248A3
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 21:55:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 205459248CD
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 22:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A444B20D94
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1839285459
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 20:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3553C1BF30B;
-	Tue,  2 Jul 2024 19:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EF120012E;
+	Tue,  2 Jul 2024 20:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zC3meLCN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIMuzbG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC384084E;
-	Tue,  2 Jul 2024 19:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B1A200118;
+	Tue,  2 Jul 2024 20:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719950128; cv=none; b=U3aspHysgDjFguoLOt12Y1Am7JxDFSIV5pK/Vw8+//eM3t0r1gpE+nsU0/zqNefvAtMJkWPEICyOQcaxr3qVjuHrfrGOAACrA8KULNVBm8lL1vt9ONxXDz6j6BLPGOAWaWs06js2LI5V3n5Sp/u/xgOUUnW/U0+Z+UwHZTbBZP0=
+	t=1719951111; cv=none; b=dZCndAbg2Ic0ZHeaRVDI7Re0CvhxvFeMZYlzwsGoxXh9Rpf4b6Z/w7WucWA+1hVojffqf6xSxUd0KweErz1mc3SVQN8yV8HRj+D+0zLgQhfAFpOTeGRHYs8Jnc6Y32H830QlXyaOg5wMGAbi0JGW1z4QiSPz+nozT84TjE9ZhMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719950128; c=relaxed/simple;
-	bh=DYQzU9mLmqMY5MwJkjrPsB32iGb2jaHpxakRgbP3D1U=;
+	s=arc-20240116; t=1719951111; c=relaxed/simple;
+	bh=lvt2df83NkLUTgsbk8BOq8Dapmt5UAWGkzhq+iigNqQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oy6pEUz8NBLEczVZbItHyfGE63P3hqXJKtmR2UCVlyvfcGbM+Yk3UvzINUuaD9IzymJknW0z8vXz1uo8s0FD3MDfu//kEywGzAHRPW6g+6wdAaY1FdE7TBcRd6jT61rGMzX/hcyfCh0s3jjulTt6u1ZNNaawdjXM1boQ7AyS5Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zC3meLCN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0aFPpcTE3yikrnw+fNhJl3nzvBnfs8+kSJz+WiTm5zI=; b=zC3meLCNci+F/kPQ4zn9MSw+vk
-	d/cH3v58/sXnfNPTqKT8yRoWVp4KwYpgu+OZlD7913rqLrMzhrYQ7CT28MDtf6mwjc/G7P6R3COZy
-	ykgqR/nWmoh3PrIv6v+6Nz3QfILFOn5LyrPrD8dPj7GbTvOjcHMpZRz2IRTWmLznkFB0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sOjau-001fSU-6Q; Tue, 02 Jul 2024 21:55:16 +0200
-Date: Tue, 2 Jul 2024 21:55:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/6] net: phy: dp83869: Support SGMII SFP modules
-Message-ID: <ea532586-6b6b-4acc-b733-9a09ca2c7054@lunn.ch>
-References: <20240701-b4-dp83869-sfp-v1-0-a71d6d0ad5f8@bootlin.com>
- <20240701-b4-dp83869-sfp-v1-5-a71d6d0ad5f8@bootlin.com>
- <f9ed0d60-4883-4ca7-b692-3eedf65ca4dd@lunn.ch>
- <2273795.iZASKD2KPV@fw-rgant>
- <b3ff54a1-5242-46d7-8d9d-d469c06a7f7b@lunn.ch>
- <20240702165628.273d7f11@fedora-5.home>
- <ZoRDXvO/4sxJuotC@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4hdV7vM8PccfagMsdlVJyoMcQ5BGOiccfXiF5wYcLoz81j1sDyWWcLVeuRCON2Wsg6k1wZU5TbENkCW1HMQk9qGrn16TVqsiyvbNIqyP/kPdvN0lIrotGTWDG9aSXk+zsNl5dOemXtqk7f76wu7G39D2LyhWkSvoP9dydFunNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIMuzbG9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA71C116B1;
+	Tue,  2 Jul 2024 20:11:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719951110;
+	bh=lvt2df83NkLUTgsbk8BOq8Dapmt5UAWGkzhq+iigNqQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WIMuzbG906YGZpjUEAEondBndofI68Am1PNAkSAzHFzCQIuQhARm55mSr+30UGg/W
+	 KUG/fORw60SBI6qCY4gYxh9rm/JK8bXtRA0F9QygwWnkNbvtqUUcRXmrLQyMTy4jmO
+	 Is+CeCJ0eG7qcJiXjiNcOyGarMxtr107YgUXZy1FoMQ7T6N+mA5DrifAasjX6ZIcfg
+	 nG7uyklKekPzrfi6j1ITmYh7uJ+sxMgv0msYAq9FC3ZKKvdi5O66Omnxe8VEUA21A3
+	 ma2NEaklA64JfjRwg4AUQR8l+jF1a3W+8iOzz7Ykkh6nLVk2eY4gZ+9Dy4C2Q2Zsdg
+	 B+aqE16h7B44Q==
+Date: Tue, 2 Jul 2024 13:11:50 -0700
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v6 4/6] mm/slab: Introduce kmem_buckets_create() and
+ family
+Message-ID: <202407021311.A594875FC6@keescook>
+References: <20240701190152.it.631-kees@kernel.org>
+ <20240701191304.1283894-4-kees@kernel.org>
+ <5b8e6ddc-6472-4acd-a506-98bc3586f1f3@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,53 +76,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZoRDXvO/4sxJuotC@shell.armlinux.org.uk>
+In-Reply-To: <5b8e6ddc-6472-4acd-a506-98bc3586f1f3@suse.cz>
 
-On Tue, Jul 02, 2024 at 07:13:50PM +0100, Russell King (Oracle) wrote:
-> On Tue, Jul 02, 2024 at 04:56:28PM +0200, Maxime Chevallier wrote:
-> > But I do agree with you in that this logic should not belong to any
-> > specific PHY driver, and be made generic. phylink is one place to
-> > implement that indeed, but so far phylink can't manage both PHYs on the
-> > link (if I'm not mistaken).
+On Tue, Jul 02, 2024 at 11:19:28AM +0200, Vlastimil Babka wrote:
+> On 7/1/24 9:13 PM, Kees Cook wrote:
+> >  #ifdef SLAB_SUPPORTS_SYSFS
+> >  /*
+> >   * For a given kmem_cache, kmem_cache_destroy() should only be called
+> > @@ -931,6 +1023,10 @@ void __init create_kmalloc_caches(void)
+> >  
+> >  	/* Kmalloc array is now usable */
+> >  	slab_state = UP;
+> > +
+> > +	kmem_buckets_cache = kmem_cache_create("kmalloc_buckets",
+> > +					       sizeof(kmem_buckets),
+> > +					       0, SLAB_NO_MERGE, NULL);
 > 
-> This is not a phylink problem, but a phy*lib* implementation problem.
-> It was decided that phy*lib* would take part in layering violations
-> with various functions called *direct* from the core networking layer
-> bypassing MAC drivers entirely.
-> 
-> Even with phy*link* that still happens - as soon as netdev->phydev
-> has been set, the networking core will forward PHY related calls
-> to that phydev bypassing the MAC driver and phylink.
-> 
-> If we want to start handling multiple layers of PHYs, then we have
-> to get rid of this layering bypass.
+> Locally adjusted to put this behind "if (IS_ENABLED(CONFIG_SLAB_BUCKETS))"
 
-Or at least minimise them.
+Oops, yes, good catch. Thank you!
 
-SQI values probably don't cause an issue in this situation, that seems
-to be mostly automotive which is unlikely to have multiple PHYs.
-
-link_down_events probably should be cleaned up and set as part of
-ethtool_ops->get_link_ext_stats.
-
-All the plca is more automotive, i doubt there will be two PHYs
-involved there.
-
-PHY tunabled we need the work bootlin is doing so we can direct to
-towards a specific PHY. Going through the MAC does not help us.  The
-same is true for PHY statistics.
-
-There are no PHY drivers which implement module_info, so that bypass
-can be deleted.
-
-Work is being done on tsinfo, etc.
-
-Cable test ideally wants to be run on the outer PHY, but again, the
-bootlin work should solve this.
-
-PSE and multiple PHYs also seems unlikely.
-
-So i don't think the problem is too big.
-
-	Andrew
+-- 
+Kees Cook
 
