@@ -1,123 +1,148 @@
-Return-Path: <netdev+bounces-108542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEE749241D9
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:05:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93ED9241E6
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31B2CB2732D
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1855F1C23184
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 15:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA971BA86B;
-	Tue,  2 Jul 2024 15:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBBA1BB6A5;
+	Tue,  2 Jul 2024 15:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwDOsJbQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="daYvFN/A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA7A1BB682
-	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 15:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951721BB69D
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 15:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719932695; cv=none; b=HsOKBGKmUmoOZysh64GISIIYdM6M8XwUL3XGhlAC2RwbwT6KUTYl2nc/T9PNoXb5V8AvduK+WSYHmaUlY+U5itvYMDV0LA2DFVsskcP2gwUfEZQAuCWZh7LXC89YjpIYdyUWHo0PJKEnJzLPABgcV3/tF9L+17eMmdDvBRGVfU0=
+	t=1719932915; cv=none; b=ahPG7t5CLxEvvqnTNlFa62WhF8IeiqZ3Lw8FCN6o03erec+u9MWCmXYxchFvqnRnBLd4wWg1vA2mP3FVg0LA00P7lzNZnstWEA3AncvLsrAp10MQvMMfM+W9MIuuWsLpLbPTauFYD4ADMLS2RPrgR9fhVyRp9EAbVwd0lsu62qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719932695; c=relaxed/simple;
-	bh=w7/wTgVovHICtuZHKHCXp8nonLiQDD9PfU1CxzQnodo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JdbbVpbcesEmhsFCbbXDHLS0vgvwFHdYnqSuGQQqKhFkrIIIIZlh+LwHcKjjRxx1bTjEPQdCbNfzMztAQAatu6TPEso0VNLMJUYrXgADj4PWJVRJarVkcybkFDmwSHQXdeKbZf/YBCE1Vx/4CM3mii1euwHEPyynSMj0JD5xz4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwDOsJbQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1546BC116B1;
-	Tue,  2 Jul 2024 15:04:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719932694;
-	bh=w7/wTgVovHICtuZHKHCXp8nonLiQDD9PfU1CxzQnodo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dwDOsJbQ5UR6rl7GDgmIFbz6MRlYbq6kyRgkEPSJMcnQXGeRELT8kIPKcT3VK1qi+
-	 m8T4wlUhORGgkUNwl4gcTje4z+VcGijuTD2f7oNHwfalKeAgeS2GyBGgRji5kfP47j
-	 z197ncoNqnAXL2aE5ZfbUvBqI2Bvvyu3U7WMevEVyPdxMSRpBVPWhd7QqTa8MQg0Qi
-	 TcI8TjkgH8xGfHYGLXyCBTeGaAHedW4V/+cURe2Yojd1bI+Yz+zYeoUijLoQAZAZQv
-	 IKBC8TqsHniPC8hC3mhLP59Ok8RRHl/Hy/7KFJgXAvcj8q+/k/tsWv0ET3hYpYSJ+5
-	 x91bxcvEATTtQ==
-Date: Tue, 2 Jul 2024 08:04:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>
-Subject: Re: [PATCH net-next 1/5] netlink: spec: add shaper YAML spec
-Message-ID: <20240702080452.06e363ae@kernel.org>
-In-Reply-To: <e683f849274f95ce99607e79cba21111997454f9.camel@redhat.com>
-References: <cover.1719518113.git.pabeni@redhat.com>
-	<75cb77aa91040829e55c5cae73e79349f3988e06.1719518113.git.pabeni@redhat.com>
-	<20240628191230.138c66d7@kernel.org>
-	<4df85437379ae1d7f449fe2c362af8145b1512a5.camel@redhat.com>
-	<20240701195418.5b465d9c@kernel.org>
-	<e683f849274f95ce99607e79cba21111997454f9.camel@redhat.com>
+	s=arc-20240116; t=1719932915; c=relaxed/simple;
+	bh=dSS1zIc1qSp1uRhiYbfZ+AGvPvKSTo9TuaXhasfCU3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCxR3j1lifboJmsq30wRYF3xQqySZ+IcniU7Vhd5NsBlf02eCRJ/+a/8bTZyPeMgBe8iJle/nvqV056YnnkjmlkO821fphoZxfaH6igcOEJQL4pCtV0u1t0Y0/dcbQK87ZIloB3j3YjCgS23fyhhZ+4B5SdF9hXRNg/rSoq3wbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=daYvFN/A; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=D+9yhrsZmNEfs2IwUZXXPwRLvQq0OzgW+8UWPEQbnGM=; b=daYvFN/ANjmODCHFJFy1x/pe+e
+	Ra6eSrhAwdy7EO/i6jWXcN6pwTsuJXrRb7uX4EDJIUX1slsCkVv+ezzeUu7gT1upKmNPgejeau3f+
+	2feikN7GxCkagL9KX3RIoxvsxtcVl0Q0bos0GBvbzh3jbQ3HPMRAohpNrRtcHFUytubX9ejwo8oW5
+	Ngip7gEn6YbzGcrZhWrh9HNH/jppA82ERT0AZQgPKfQLLu8dGZEiAUannrNbcvZ3mNOAVAk2z7ob9
+	lPCCvV1b0HSnKQSvhielUIsmBx26KSIQopFTwiwbm10/4vq6RWf+8aCVOxsGgknnvaFzkVm2CkyOA
+	knF5TV2w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39552)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sOf6z-00041A-2r;
+	Tue, 02 Jul 2024 16:08:05 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sOf6z-00021O-NW; Tue, 02 Jul 2024 16:08:05 +0100
+Date: Tue, 2 Jul 2024 16:08:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>, andrew@lunn.ch
+Cc: si.yanteng@linux.dev, Huacai Chen <chenhuacai@kernel.org>,
+	Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
+ network speed to 1000.
+Message-ID: <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
+ <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+ <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+ <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
+ <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 02 Jul 2024 16:21:38 +0200 Paolo Abeni wrote:
-> > I see, I had a look at patch 2 now.
-> > But that's really "Andrew's use-case" it doesn't cover deletion, right?
-> > Sorry that I don't have a perfect suggestion either but it seems like
-> > a half-measure. It's a partial support for transactions. If we want
-> > transactions we should group ops like nftables. Have normal ops (add,
-> > delete, modify) and control ops (start, commit) which clone the entire
-> > tree, then ops change it, and commit presents new tree to the device. =
-=20
->=20
-> Yes, it does not cover deletion _and_ update/add/move within the same
-> atomic operation.
->=20
-> Still any configuration could be reached from default/initial state
-> with set(<possibly many shapers>). Additionally, given any arbitrary
-> configuration, the default/initial state could be restored with a
-> single delete(<possibly many handlers>).
+On Tue, Jul 02, 2024 at 01:31:44PM +0300, Serge Semin wrote:
+> On Tue, Jun 04, 2024 at 11:29:43AM +0000, si.yanteng@linux.dev wrote:
+> > 2024年5月30日 15:22, "Russell King (Oracle)" <linux@armlinux.org.uk> 写到:
+> > 
+> > Hi, Russell, Serge,
+> > 
+> > > I would like this patch to be held off until more thought can be put
+> > > 
+> > > into how to handle this without having a hack in the driver (stmmac
+> > > 
+> > > has too many hacks and we're going to have to start saying no to
+> > > 
+> > > these.)
+> > Yeah, you have a point there, but I would also like to hear Serge's opinion.
+> 
+> I would be really glad not to have so many hacks in the STMMAC driver.
+> It would have been awesome if we are able to find a solution without
+> introducing one more quirk in the common driver code.
+> 
+> I started digging into this sometime ago, but failed to come up with
+> any decent hypothesis about the problem nature. One of the glimpse
+> idea was that the loongson_gnet_fix_speed() method code might be somehow
+> connected with the problem. But I didn't have much time to go further
+> than that.
+> 
+> Anyway I guess we'll need to have at least two more patchset
+> re-spins to settle all the found issues. Until then we can keep
+> discussing the problem Yanteng experience on his device. Russell, do
+> you have any suggestion of what info Yanteng should provide to better
+> understand the problem and get closer to it' cause?
 
-From:
+First question: is auto-negotiation required by 802.3 for 1000base-T?
+By "required" I mean "required to be used" not "required to be
+implemented". This is an important distinction, and 802.3 tends to be
+a bit wooly about the exact meaning. However, I think on balance the
+conclusion is that AN is mandatory _to be used_ for 1000base-T links.
 
-q0 -. RR \
-q1 /      > SP
-q2 -. RR /
-q3 /
+Annex 40C's state diagrams seems to imply that mr_autoneg_enable
+(BMCR AN ENABLE) doesn't affect whether or not the AN state machines
+work for 1000base-T, and some PHY datasheets (e.g. Marvell Alaska)
+state that disabling mr_autoneg_enable leaves AN enabled but forced
+to 1G full duplex.
 
-To:
+So, I'm thinking is that the ethtool interface should reject any
+request where we have a PHY supporting *only* base-T for gigabit
+speeds, where the user is requesting !AN && SPEED_1000 on the basis
+that AN is part of the link setup of 1000base-T links.
 
-q0 ------\
-q1 -------> SP
-q2 -. RR /
-q3 /
+Maybe this should be a property of the struct phy_device so we can
+transition phylib and phylink to return an appropriate error to
+userspace?
 
-You have to both delete an RR node, and set SP params on Q0 and Q1.
+Alternatively, maybe just implement the Marvell Alaska solution
+to this problem (if the user attempts to disable AN on a PHY
+supporting only base-T at gigabit speeds, then we silently force
+AN with SPEED_1000 and DUPLEX_FULL.
 
-> The above covers any possible limitation enforced by the H/W, not just
-> the DSA use-case.
->=20
-> Do you have a strong feeling for atomic transactions from any arbitrary
-> state towards any other? If so, I=E2=80=99d like to understand why?
+Andrew - seems to be an IEEE 802.3 requirement that's been missed
+in phylib, any thoughts?
 
-I don't believe this is covers all cases.
-
-> Dealing with transactions allowing arbitrary any state <> any state
-> atomic changes will involve some complex logic that seems better
-> assigned to user-space.
-
-Complex logic in which part of the code?
-It's just a full clone of the xarray, then do whatever ops user is
-asking to do, then tree walk to render diff as a set of ops.
-If you mean the tree walk to convert tree diff into ops, I think we
-need that anyway, otherwise we may get into a situation where there's
-a dependency between the user space implementation and driver
-expectations.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
