@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-108573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A9719246B1
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:53:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3761392469C
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 19:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFFDA284B6C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:53:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68F5C1C220C9
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 17:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816001BE874;
-	Tue,  2 Jul 2024 17:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4601BD005;
+	Tue,  2 Jul 2024 17:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="URey39i0"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="yrX0AN3k"
 X-Original-To: netdev@vger.kernel.org
 Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FB0155335;
-	Tue,  2 Jul 2024 17:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E41F2F4A;
+	Tue,  2 Jul 2024 17:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719942826; cv=none; b=UAg4/zJd/Z4TY3pqckFvMwTGb6o+vZbPkY0kZHi0DEhA0OPjesmUdoR1jyNMeCJFXov/PyhlTBs0QN8M35FYpnZVfZUD4/XefLTKRlLyAFVLZyIl/oUSvvlSVSGlqx/q+GAXyvXO32nG2UvY4eYQ5WlG4LIo82qUu/s+Ths560g=
+	t=1719942351; cv=none; b=pOYGFTeMNM9o/RM+whL0P9z3yGbbVWsWPD2PgZXn39HF22UQl9Ole/2dOVnTN/lcOJeBsAorWNymsKpO9IXeYO52SlBIiLvNymx60XTMYwSZTVu9L4p77y+048DJGi/TgYC2a1h4H/l1op+6mm3ySGHiO9wc0NrsGZ1jUeP3Hf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719942826; c=relaxed/simple;
-	bh=hopb8jJXYjSgJxfRiT/jTw/DJbPUKO4GWu2WfEyTerI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZUBtdjkb8d3cq766UgCBVBXCFeqO6RYfOdGl1s5q+C7Wq2GwudsXgShjzisnvpYvfxxJyXLTubJZQtkM9+BoAGt0GnYKBl5CWXjuSOX4409dEQOW5c7/OGA7/7o/dOUQuet5sUHz/VaCQ93T6kaWfkNzwlyJIGehLSV70wS40yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=URey39i0; arc=none smtp.client-ip=139.165.32.111
+	s=arc-20240116; t=1719942351; c=relaxed/simple;
+	bh=79m0+IHKOGJpBG6VM+cdQYZz7BkdFizzIX3hwF2tek0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=RSq15ZBdrngyZ6VNaEjly1TT/n/nsJTGpdrgQjNVBasqS5QMdjMp80Q9DRKDNfoniwtDtbjp7fhMB/qnvvHFHDnphhwlkyjB7C04fRy4XIONOT6RsVif49zQze856nuudBaEPm7+E2NUMdjVafM5/NhN3eTsu1wz2I6ijmQ0JWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=yrX0AN3k; arc=none smtp.client-ip=139.165.32.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
 Received: from localhost.localdomain (48.39-182-91.adsl-dyn.isp.belgacom.be [91.182.39.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id DDB89200BFE3;
-	Tue,  2 Jul 2024 19:45:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be DDB89200BFE3
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 05142200BFE5;
+	Tue,  2 Jul 2024 19:45:47 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 05142200BFE5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1719942324;
-	bh=8KC+FJWfjQ8vb3wsEa+o1zXrrfgLfUradvGMOOm1hpw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=URey39i0gsUKzJJUldP8A++Y9SY8+AR+fh72V3WV5LiWebU34TTB9dWMZHWThSJXj
-	 tdms3HYkl7+/gPsz50ZYPFZBspFj/yhIzNCvW2Xm63TwMGGBS/EXk/4wseAtsvWX5Y
-	 w8QGiJ7DaULQiTx8Zr6BQBU+vICuaGHAUU8FIBrfVG/3b/8PEP1SBS/qFeiDDLuhiH
-	 LSps5jDYXX3TvpwabDu3s915y/aiDHhUujDpvH38qeaq8ZYxk/sPO6SziqY7OUTW/N
-	 aw5Ch/ul1ePZyhdGmGT5E4MxCSLBSWAHDwu8QLjQboM2vpcKSnYqLKSVIp1P/Je4p7
-	 Q9Ksq7UGEb3xQ==
+	s=ulg20190529; t=1719942347;
+	bh=lCaW80VzNxTMCxl0iWs4I+4RdjYWCe+gUOodsHPN+jI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=yrX0AN3kBNZJgjGw8ercURW2DmEl3Du/mC4Kxyf7GKdp3GvgsPtfgUfpeCJJPqIYb
+	 7ufWYV+NpZInF3iDqba2CKovPhCvHMFeY9045uW+M8KOXlUafRrROB+L7rk2+wAb9D
+	 X0IO+cHFB3Jogx2TgZWkcsV/NJlJsVlmfqnA2hXbaO+qQyabwrD7JFZTfmqR+Jr+qY
+	 hGDj0KbzX17exbpCF9Vu+qY8/tTB1PcCAK2yniey4mMWWdOBS4PIhj/8pGBChnf5vc
+	 MCvDux4G8D4bQIk5K+95oo9iUPmSAH+K4NadTk1J9NcYfz1m0YvrzUVzsGDZ5cvprF
+	 i87NwgL/nc+wA==
 From: Justin Iurman <justin.iurman@uliege.be>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -55,10 +56,12 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org,
 	justin.iurman@uliege.be
-Subject: [PATCH net 0/2] net: ioam6: fix bugs in ioam6_iptunnel
-Date: Tue,  2 Jul 2024 19:44:49 +0200
-Message-Id: <20240702174451.22735-1-justin.iurman@uliege.be>
+Subject: [PATCH net 1/2] net: ioam6: use "new" dst entry with skb_cow_head
+Date: Tue,  2 Jul 2024 19:44:50 +0200
+Message-Id: <20240702174451.22735-2-justin.iurman@uliege.be>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240702174451.22735-1-justin.iurman@uliege.be>
+References: <20240702174451.22735-1-justin.iurman@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,41 +70,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When running some measurements on IOAM, we discovered a "bug" that
-triggers two reallocations instead of one in some specific cases. Those
-specific cases are:
-- "inline" mode with pre-allocated data size 236 or 240 bytes
-- "encap" mode with pre-allocated data size 196 or 200 bytes
+In ioam6_output(), we call skb_cow_head() with LL_RESERVED_SPACE(). The
+latter uses "dst", which is potentially not the good one anymore. As a
+consequence, there might not be enough headroom, depending on the "new"
+dev (e.g., needed_headroom > 0). Therefore, we first need to get the
+"new" dst entry (from the cache or by calling ip6_route_output()), just
+like seg6 and rpl both do, and only then call skb_cow_head() with
+LL_RESERVED_SPACE() on the "new" dst entry.
 
-The reason is that we (unluckily) fall on a boundary and, since we use
-skb->mac_len by default in skb_cow_head(), the second call to
-skb_cow_head() after the insertion may need more than available in the
-headroom (because, there, we call LL_RESERVED_SPACE()). Example on a
-machine that reallocates by steps of 64 bytes:
-- I need to add 256 bytes (+14 skb->mac_len), so 270 bytes
-- current headroom is 206 bytes
-- call to skb_cow_head, the headroom is now 270 bytes (+64 bytes)
-- after the insertion, we want to make sure that the dev has enough
-  headroom (LL_RESERVED_SPACE() gives 16 bytes in our case: 14+2)
-- current headroom is 14 bytes (yep, remember... see above)
-- call to skb_cow_head... oh wait, I need 16 bytes and I only have 14
-  available... let's reallocate! The headroom is now 78 bytes (+64)
+Fixes: 8cb3bf8bff3c ("ipv6: ioam: Add support for the ip6ip6 encapsulation")
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ net/ipv6/ioam6_iptunnel.c | 65 +++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 33 deletions(-)
 
-And so every single time. Patch 2 solves this issue by providing a
-mitigation.
-
-Also, while fixing the above, we discovered another bug: after the
-insertion, the second call to skb_cow_head() makes sure that the dev has
-enough headroom for layer 2 and stuff. In that case, the "old" dst entry
-is used, which is not correct. Patch 1 solves this issue.
-
-Justin Iurman (2):
-  net: ioam6: use "new" dst entry with skb_cow_head
-  net: ioam6: mitigate the two reallocations problem
-
- net/ipv6/ioam6_iptunnel.c | 85 ++++++++++++++++++++-------------------
- 1 file changed, 44 insertions(+), 41 deletions(-)
-
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index bf7120ecea1e..b08c13550144 100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -295,7 +295,7 @@ static int ioam6_do_encap(struct net *net, struct sk_buff *skb,
+ 
+ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+-	struct dst_entry *dst = skb_dst(skb);
++	struct dst_entry *dst, *orig_dst = skb_dst(skb);
+ 	struct in6_addr orig_daddr;
+ 	struct ioam6_lwt *ilwt;
+ 	int err = -EINVAL;
+@@ -304,7 +304,7 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (skb->protocol != htons(ETH_P_IPV6))
+ 		goto drop;
+ 
+-	ilwt = ioam6_lwt_state(dst->lwtstate);
++	ilwt = ioam6_lwt_state(orig_dst->lwtstate);
+ 
+ 	/* Check for insertion frequency (i.e., "k over n" insertions) */
+ 	pkt_cnt = atomic_fetch_inc(&ilwt->pkt_cnt);
+@@ -346,45 +346,44 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		goto drop;
+ 	}
+ 
+-	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+-	if (unlikely(err))
+-		goto drop;
++	local_bh_disable();
++	dst = dst_cache_get(&ilwt->cache);
++	local_bh_enable();
++
++	if (unlikely(!dst)) {
++		struct ipv6hdr *hdr = ipv6_hdr(skb);
++		struct flowi6 fl6;
++
++		memset(&fl6, 0, sizeof(fl6));
++		fl6.daddr = hdr->daddr;
++		fl6.saddr = hdr->saddr;
++		fl6.flowlabel = ip6_flowinfo(hdr);
++		fl6.flowi6_mark = skb->mark;
++		fl6.flowi6_proto = hdr->nexthdr;
++
++		dst = ip6_route_output(net, NULL, &fl6);
++		if (dst->error) {
++			err = dst->error;
++			dst_release(dst);
++			goto drop;
++		}
+ 
+-	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
+ 		local_bh_disable();
+-		dst = dst_cache_get(&ilwt->cache);
++		dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+ 		local_bh_enable();
++	}
+ 
+-		if (unlikely(!dst)) {
+-			struct ipv6hdr *hdr = ipv6_hdr(skb);
+-			struct flowi6 fl6;
+-
+-			memset(&fl6, 0, sizeof(fl6));
+-			fl6.daddr = hdr->daddr;
+-			fl6.saddr = hdr->saddr;
+-			fl6.flowlabel = ip6_flowinfo(hdr);
+-			fl6.flowi6_mark = skb->mark;
+-			fl6.flowi6_proto = hdr->nexthdr;
+-
+-			dst = ip6_route_output(net, NULL, &fl6);
+-			if (dst->error) {
+-				err = dst->error;
+-				dst_release(dst);
+-				goto drop;
+-			}
+-
+-			local_bh_disable();
+-			dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+-			local_bh_enable();
+-		}
++	skb_dst_drop(skb);
++	skb_dst_set(skb, dst);
+ 
+-		skb_dst_drop(skb);
+-		skb_dst_set(skb, dst);
++	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
++	if (unlikely(err))
++		goto drop;
+ 
++	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr))
+ 		return dst_output(net, sk, skb);
+-	}
+ out:
+-	return dst->lwtstate->orig_output(net, sk, skb);
++	return orig_dst->lwtstate->orig_output(net, sk, skb);
+ drop:
+ 	kfree_skb(skb);
+ 	return err;
 -- 
 2.34.1
 
