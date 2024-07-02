@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-108514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6BE9240CF
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:27:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD6E9240D4
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 16:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F9B1F23A0C
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:27:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287A61F22E9F
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 14:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2C01BA87E;
-	Tue,  2 Jul 2024 14:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1E01BA083;
+	Tue,  2 Jul 2024 14:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOtVC89n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VBwP7JhW"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F12D1B5837;
-	Tue,  2 Jul 2024 14:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2349C1BA085;
+	Tue,  2 Jul 2024 14:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930390; cv=none; b=XKR66CHt/5Vi5JhO+vDXH9wXXekrzM4rCfqsua5AO16Sgcg8IG27LiZ2KTNAx6uwYBR6wC2XrEfskLyf8jwHql5D7MLZpArUkeaGDmkYi0z6htpXWw5fi2vRJaBG/uISUCzM4IqnjzFPi8HGQj06auCgo31uLIaHctZPjADdT3g=
+	t=1719930409; cv=none; b=YbuRiGtyyV95PEoqmVcvmzVqxKEQfiGONOcsoDVwnckGLv6fHh1gYmOvthxFS9WaZt2BEx78517evArK01PiH0G83/MCWPREl43GuYoMJU4Rkq7EHGnyB0nx8YsE5VIj61rUgI4FptYi+RtIPP10bMwePxkGdNFvLpVci2T4T2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930390; c=relaxed/simple;
-	bh=Ql5Cmxr3kku2hogu34XCPqXs+1xbAKubjFv3FsUXM+s=;
+	s=arc-20240116; t=1719930409; c=relaxed/simple;
+	bh=dl8FkdynMjnA9nS0bhjP2pvFH6zj6J4RYlUU3UzZN6w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ufi0ue8clfarWgIBO7t3hd71xpsa1R17O52SCyPqrsbOocqrxE3zU3ETJcUcREkmmKWi5MzptpnfrRsmtY+iWowD7aAXYXQBpKAh7LPy8IeQSlYUClf6f4iRJiw08kscsIg2lFbth0M1PwqO5PMk/uGmK39prKqNOkKqbOzH4Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOtVC89n; arc=none smtp.client-ip=209.85.128.68
+	 MIME-Version; b=TuEdfTQTQ3jlrGPwRUYViUeFACNN42ytBv2UWv2x/y40dzR/SY1US9eQvenOOrxRs47o3J023pigLdcNjAP/hBnjUetzuNXQXD9/ovj7I+AFwvip80dk2MoXxdBnNgxtsjhCLtlHkh4SzlL3EF9/PE9Vp2rc3dvz4KBnRhnLoA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VBwP7JhW; arc=none smtp.client-ip=209.85.128.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-42565697036so31847275e9.1;
-        Tue, 02 Jul 2024 07:26:28 -0700 (PDT)
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-4256742f67fso30983895e9.3;
+        Tue, 02 Jul 2024 07:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719930387; x=1720535187; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719930405; x=1720535205; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q4MqlWd8iHWYyXJMtIyjohC0qGpKJ9VdkQfGVkxrLK8=;
-        b=VOtVC89n4axoHcULV2arn3c7dsouvl3oK4TcHloATOtK20jAo92RJMNJObPSr0DTeZ
-         DNDSNdHjCfT/2Nk7RmKZdFbWeOM70r9YRLEv4KwIcTF38VgAhnavBvHfCTcZGULg0cjq
-         9s0ETLZ6aEalBmCKptSjB1IB5cCfcUPYS04+k8a0cYnSJyZyAS0KD1BUpXVCD9Fw1X/W
-         JmgQpfahDXhsGiHPo7tPupRI8ilnSIXfWZKxo/VkjyG3T5xO9BoLPGWVSlwaloCwjHw0
-         LbPt3MQJGg5ae4p+JTfr+HZguScXCkFCOPXCUkH6ZmQYS0YXb+U5ynV53VCWc5Y/Evuk
-         FdUA==
+        bh=svAbMYyhuwz/6U/mPJ02gUEICZnKb4zi0CpoXAVmtgs=;
+        b=VBwP7JhWvLUilpggfC5iyOgFMu/r/VHrg51v7GSmm/nt6+/FTCeS/2BDCsAtGDeQMr
+         yB5JO5rJeiSY1rmcMfWKXRIdO36Q9AzkhM3rT6Wy+r3OEk6GnW/bmFsN3v1Kqj/ujFIl
+         sNhlVzb/6vqBZHJKufVsd4U67SORSl8W3amPmOBKQneIaNT0VTaRN029Puiy1Efx0775
+         PyKkqbCrktqq8ftrpPIINwXhV/oO2bIMbiiSy+reCf0emjHrvAVve790NVWGH5vCaV8k
+         udx9gweEdYS+GNWc5HBPE2tW7QXIPiukY+faK5UyKYpFq3cw68timIWtOz6/YEYy0Fol
+         OTMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719930387; x=1720535187;
+        d=1e100.net; s=20230601; t=1719930405; x=1720535205;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Q4MqlWd8iHWYyXJMtIyjohC0qGpKJ9VdkQfGVkxrLK8=;
-        b=wu4EBKSJlCHMA75t+n42AahmjLsEDJSPwzfB98ocLBxkjRoaYxAWSUp/BdagBqWsp6
-         pMElJ1SqtRi9FAKl24f6OYq5XH38SAdojXJ7hMiZxXqYAnPeDyHCuEWrOC1VOgaH8viV
-         fjrXkBN1q+gqCDskLDjsSZyR8hsKJIpEwxQRvkbPZaYYVNbbhK58PN5ZSx1LCFjorl5a
-         aXGjs427RGRjWq18z1+gK7sxmOl5xZmknZtu2ZLYGj545JljVjz1Idn6jwN/RLmy4Q8x
-         pzhpOFYD0DHPq6nZw5jyoFKpI1uJYSGaV+vvtwwnn4sFKRTzEJYYlVDRW1GKWALnXUir
-         BQKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXetmjB/dYCilp0ruLLzFtoUzcyB3JelTVB2KDShprf7EnuxPvfjHyTGj4DQU1tpkPUjn16EYXOLSBbZE+nJxEHGMkEejWVCBa7egz5adShnNTGdrNHm+JMlKWk+yFcg7MO7RW3
-X-Gm-Message-State: AOJu0Yyu4++57N8oSJ5Ne1o89cUiCoJn2DoAFkUuouFcGqVWJplkQs/y
-	q12WXawwd5j1cY+TVajPzDmFvMBYkW6N0DUPxiFuVHu6vTrJrBMx
-X-Google-Smtp-Source: AGHT+IGP4qE3Tvj79sElNbVWh0i9sNSGavCUhOuw3ifq7rizBdsGaHa2Na+Id4inXue2VNQMbc1wLA==
-X-Received: by 2002:a05:600c:46d1:b0:424:7425:f8a0 with SMTP id 5b1f17b1804b1-4257989f82amr88023465e9.15.1719930386669;
-        Tue, 02 Jul 2024 07:26:26 -0700 (PDT)
+        bh=svAbMYyhuwz/6U/mPJ02gUEICZnKb4zi0CpoXAVmtgs=;
+        b=ZKUyESZNHyCHGZNTXrEanBz9YDVUmMxhUhDei00c2OSZ4A5gpzkSx2iPJF0OHenHub
+         2P1KVxtfSpRDFbhTbyKxFmBdHZ8ng3zCg2GeuWJRRrSGJ1EzWpSnRS3MBQkCaW6Yupcn
+         CLEvAg3qPbPOHjgjvZbdCyqROi5uzTTH/FMnpQsihHuoMH4EpB9AtPdg7rpdO1ZdAbo/
+         jm7b5YhxTQfRGpKMM6Jelir3TAZd8ZvdlR4TC+qF3XV+61DFUU5JMiWVvyndR7SpujJI
+         Ip4gos2peVKWwd9IEd03SNR4+O7vfVXTEk8U5UeXmwQD2caANlkHJHObHDuH2nbeGw+M
+         d3+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXw2JjoDmMmNUVHgb77eMx4MwGqq+pxRmLCm0pQnw1r8u9w9Sf+LxwbvQeBn9VqCJ65HjKtCDGOtNDjGp458lP+l98qgDsMRSSJqAvle5+9NOoBBf2TVBFEOY/7yUNnLJE1X6KA
+X-Gm-Message-State: AOJu0Yyxuhr9rarO4fIwHfpRMW1Ll7iyPuCpZonI6Zd7ppGPv+0viJka
+	44RwTdZcPPYSmzceS2Sxp65bCp0363Q97ZvL5veLJfzAI560YmgE
+X-Google-Smtp-Source: AGHT+IHjbX8RBidW/fRg1UwjOoD8GR7Or4Bg156RI8xT5xQs4yF7RpodgpTaDdIIRv9SsHdhPLdnqg==
+X-Received: by 2002:a05:600c:4e8c:b0:425:6726:ab25 with SMTP id 5b1f17b1804b1-42579fff44emr53513355e9.4.1719930405300;
+        Tue, 02 Jul 2024 07:26:45 -0700 (PDT)
 Received: from localhost ([45.130.85.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b0c18cfsm203393795e9.45.2024.07.02.07.26.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b09a073sm199774075e9.32.2024.07.02.07.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:26:26 -0700 (PDT)
+        Tue, 02 Jul 2024 07:26:45 -0700 (PDT)
 From: Leone Fernando <leone4fernando@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -77,9 +77,9 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Leone Fernando <leone4fernando@gmail.com>
-Subject: [PATCH net-next v2 3/4] net: route: always compile dst_cache
-Date: Tue,  2 Jul 2024 16:24:05 +0200
-Message-Id: <20240702142406.465415-4-leone4fernando@gmail.com>
+Subject: [PATCH net-next v2 4/4] net: route: replace route hints with input_dst_cache
+Date: Tue,  2 Jul 2024 16:24:06 +0200
+Message-Id: <20240702142406.465415-5-leone4fernando@gmail.com>
 In-Reply-To: <20240702142406.465415-1-leone4fernando@gmail.com>
 References: <20240702142406.465415-1-leone4fernando@gmail.com>
 Precedence: bulk
@@ -90,316 +90,290 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-make dst_cache to always compile, delete all relevant ifdefs
+Replace route hints with cached dsts - ip_rcv_finish_core will first try
+to use the cache and only then fall back to the demux or perform a full
+lookup.
+
+Only add newly found dsts to the cache after all the checks have passed
+successfully to avoid adding a dropped packet's dst to the cache.
+
+Multicast dsts are not added to the dst_cache as it will require additional
+checks and multicast packets are rarer and a slower path anyway.
+
+A check was added to ip_route_use_dst_cache that prevents forwarding
+packets received by devices for which forwarding is disabled.
+
+Relevant checks were added to ip_route_use_dst_cache to make sure the
+dst can be used and to ensure IPCB(skb) flags are correct.
 
 Signed-off-by: Leone Fernando <leone4fernando@gmail.com>
 ---
- drivers/net/Kconfig        | 1 -
- include/net/dst_metadata.h | 2 --
- include/net/ip_tunnels.h   | 2 --
- net/Kconfig                | 4 ----
- net/core/Makefile          | 3 +--
- net/core/dst.c             | 4 ----
- net/ipv4/Kconfig           | 1 -
- net/ipv4/ip_tunnel_core.c  | 4 ----
- net/ipv4/udp_tunnel_core.c | 4 ----
- net/ipv6/Kconfig           | 4 ----
- net/ipv6/ip6_udp_tunnel.c  | 4 ----
- net/netfilter/nft_tunnel.c | 2 --
- net/openvswitch/Kconfig    | 1 -
- net/sched/act_tunnel_key.c | 2 --
- 14 files changed, 1 insertion(+), 37 deletions(-)
+ include/net/route.h |  6 ++--
+ net/ipv4/ip_input.c | 58 +++++++++++++++++++-----------------
+ net/ipv4/route.c    | 72 +++++++++++++++++++++++++++++++++------------
+ 3 files changed, 88 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 9920b3a68ed1..6819ce6db863 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -78,7 +78,6 @@ config WIREGUARD
- 	depends on IPV6 || !IPV6
- 	depends on !KMSAN # KMSAN doesn't support the crypto configs below
- 	select NET_UDP_TUNNEL
--	select DST_CACHE
- 	select CRYPTO
- 	select CRYPTO_LIB_CURVE25519
- 	select CRYPTO_LIB_CHACHA20POLY1305
-diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
-index 4160731dcb6e..46cebd8ea374 100644
---- a/include/net/dst_metadata.h
-+++ b/include/net/dst_metadata.h
-@@ -165,7 +165,6 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+diff --git a/include/net/route.h b/include/net/route.h
+index 93833cfe9c96..c9433b8b9417 100644
+--- a/include/net/route.h
++++ b/include/net/route.h
+@@ -202,9 +202,9 @@ int ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+ 			  struct in_device *in_dev, u32 *itag);
+ int ip_route_input_noref(struct sk_buff *skb, __be32 dst, __be32 src,
+ 			 u8 tos, struct net_device *devin);
+-int ip_route_use_hint(struct sk_buff *skb, __be32 dst, __be32 src,
+-		      u8 tos, struct net_device *devin,
+-		      const struct sk_buff *hint);
++int ip_route_use_dst_cache(struct sk_buff *skb, __be32 daddr, __be32 saddr,
++			   u8 tos, struct net_device *dev,
++			   struct dst_entry *dst);
  
- 	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
- 	       sizeof(struct ip_tunnel_info) + md_size);
--#ifdef CONFIG_DST_CACHE
- 	/* Unclone the dst cache if there is one */
- 	if (new_md->u.tun_info.dst_cache.cache) {
- 		int ret;
-@@ -176,7 +175,6 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
- 			return ERR_PTR(ret);
+ static inline int ip_route_input(struct sk_buff *skb, __be32 dst, __be32 src,
+ 				 u8 tos, struct net_device *devin)
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index d6fbcbd2358a..35c8b122d62f 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -305,30 +305,44 @@ static inline bool ip_rcv_options(struct sk_buff *skb, struct net_device *dev)
+ 	return true;
+ }
+ 
+-static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
+-			    const struct sk_buff *hint)
++static bool ip_can_add_dst_cache(struct sk_buff *skb, __u16 rt_type)
+ {
+-	return hint && !skb_dst(skb) && ip_hdr(hint)->daddr == iph->daddr &&
+-	       ip_hdr(hint)->tos == iph->tos;
++	return skb_valid_dst(skb) &&
++	       rt_type != RTN_BROADCAST &&
++	       rt_type != RTN_MULTICAST &&
++	       !(IPCB(skb)->flags & IPSKB_MULTIPATH);
++}
++
++static bool ip_can_use_dst_cache(const struct net *net, struct sk_buff *skb)
++{
++	return !skb_dst(skb) && !fib4_has_custom_rules(net);
+ }
+ 
+ int tcp_v4_early_demux(struct sk_buff *skb);
+ int udp_v4_early_demux(struct sk_buff *skb);
+ static int ip_rcv_finish_core(struct net *net, struct sock *sk,
+-			      struct sk_buff *skb, struct net_device *dev,
+-			      const struct sk_buff *hint)
++			      struct sk_buff *skb, struct net_device *dev)
+ {
++	struct dst_cache *dst_cache = net_generic(net, dst_cache_net_id);
+ 	const struct iphdr *iph = ip_hdr(skb);
++	struct dst_entry *dst;
+ 	int err, drop_reason;
+ 	struct rtable *rt;
++	bool do_cache;
+ 
+ 	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 
+-	if (ip_can_use_hint(skb, iph, hint)) {
+-		err = ip_route_use_hint(skb, iph->daddr, iph->saddr, iph->tos,
+-					dev, hint);
+-		if (unlikely(err))
+-			goto drop_error;
++	do_cache = ip_can_use_dst_cache(net, skb);
++	if (do_cache) {
++		dst = dst_cache_input_get_noref(dst_cache, skb);
++		if (dst) {
++			err = ip_route_use_dst_cache(skb, iph->daddr,
++						     iph->saddr, iph->tos,
++						     dev, dst);
++			if (unlikely(err))
++				goto drop_error;
++			do_cache = false;
++		}
+ 	}
+ 
+ 	if (READ_ONCE(net->ipv4.sysctl_ip_early_demux) &&
+@@ -418,6 +432,9 @@ static int ip_rcv_finish_core(struct net *net, struct sock *sk,
  		}
  	}
--#endif
  
- 	skb_dst_drop(skb);
- 	skb_dst_set(skb, &new_md->dst);
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index 3877315cf8b8..c929789e614c 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -102,9 +102,7 @@ struct ip_tunnel_encap {
- struct ip_tunnel_info {
- 	struct ip_tunnel_key	key;
- 	struct ip_tunnel_encap	encap;
--#ifdef CONFIG_DST_CACHE
- 	struct dst_cache	dst_cache;
--#endif
- 	u8			options_len;
- 	u8			mode;
- };
-diff --git a/net/Kconfig b/net/Kconfig
-index d27d0deac0bf..7c4115aa99e5 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -447,10 +447,6 @@ config LWTUNNEL_BPF
- 	  Allows to run BPF programs as a nexthop action following a route
- 	  lookup for incoming and outgoing packets.
++	if (do_cache && ip_can_add_dst_cache(skb, rt->rt_type))
++		dst_cache_input_add(dst_cache, skb);
++
+ 	return NET_RX_SUCCESS;
  
--config DST_CACHE
--	bool
--	default n
+ drop:
+@@ -444,7 +461,7 @@ static int ip_rcv_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (!skb)
+ 		return NET_RX_SUCCESS;
+ 
+-	ret = ip_rcv_finish_core(net, sk, skb, dev, NULL);
++	ret = ip_rcv_finish_core(net, sk, skb, dev);
+ 	if (ret != NET_RX_DROP)
+ 		ret = dst_input(skb);
+ 	return ret;
+@@ -581,21 +598,11 @@ static void ip_sublist_rcv_finish(struct list_head *head)
+ 	}
+ }
+ 
+-static struct sk_buff *ip_extract_route_hint(const struct net *net,
+-					     struct sk_buff *skb, int rt_type)
+-{
+-	if (fib4_has_custom_rules(net) || rt_type == RTN_BROADCAST ||
+-	    IPCB(skb)->flags & IPSKB_MULTIPATH)
+-		return NULL;
 -
- config GRO_CELLS
- 	bool
- 	default n
-diff --git a/net/core/Makefile b/net/core/Makefile
-index 62be9aef2528..9e732a58764e 100644
---- a/net/core/Makefile
-+++ b/net/core/Makefile
-@@ -13,7 +13,7 @@ obj-y		     += dev.o dev_addr_lists.o dst.o netevent.o \
- 			neighbour.o rtnetlink.o utils.o link_watch.o filter.o \
- 			sock_diag.o dev_ioctl.o tso.o sock_reuseport.o \
- 			fib_notifier.o xdp.o flow_offload.o gro.o \
--			netdev-genl.o netdev-genl-gen.o gso.o
-+			netdev-genl.o netdev-genl-gen.o gso.o dst_cache.o
- 
- obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
- 
-@@ -34,7 +34,6 @@ obj-$(CONFIG_CGROUP_NET_PRIO) += netprio_cgroup.o
- obj-$(CONFIG_CGROUP_NET_CLASSID) += netclassid_cgroup.o
- obj-$(CONFIG_LWTUNNEL) += lwtunnel.o
- obj-$(CONFIG_LWTUNNEL_BPF) += lwt_bpf.o
--obj-$(CONFIG_DST_CACHE) += dst_cache.o
- obj-$(CONFIG_HWBM) += hwbm.o
- obj-$(CONFIG_GRO_CELLS) += gro_cells.o
- obj-$(CONFIG_FAILOVER) += failover.o
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 95f533844f17..f035c39be104 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -291,10 +291,8 @@ EXPORT_SYMBOL_GPL(metadata_dst_alloc);
- 
- void metadata_dst_free(struct metadata_dst *md_dst)
+-	return skb;
+-}
+-
+ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
+ 			       struct list_head *head)
  {
--#ifdef CONFIG_DST_CACHE
- 	if (md_dst->type == METADATA_IP_TUNNEL)
- 		dst_cache_destroy(&md_dst->u.tun_info.dst_cache);
--#endif
- 	if (md_dst->type == METADATA_XFRM)
- 		dst_release(md_dst->u.xfrm_info.dst_orig);
- 	kfree(md_dst);
-@@ -326,10 +324,8 @@ void metadata_dst_free_percpu(struct metadata_dst __percpu *md_dst)
- 	for_each_possible_cpu(cpu) {
- 		struct metadata_dst *one_md_dst = per_cpu_ptr(md_dst, cpu);
+-	struct sk_buff *skb, *next, *hint = NULL;
+ 	struct dst_entry *curr_dst = NULL;
++	struct sk_buff *skb, *next;
+ 	struct list_head sublist;
  
--#ifdef CONFIG_DST_CACHE
- 		if (one_md_dst->type == METADATA_IP_TUNNEL)
- 			dst_cache_destroy(&one_md_dst->u.tun_info.dst_cache);
--#endif
- 		if (one_md_dst->type == METADATA_XFRM)
- 			dst_release(one_md_dst->u.xfrm_info.dst_orig);
+ 	INIT_LIST_HEAD(&sublist);
+@@ -610,14 +617,11 @@ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
+ 		skb = l3mdev_ip_rcv(skb);
+ 		if (!skb)
+ 			continue;
+-		if (ip_rcv_finish_core(net, sk, skb, dev, hint) == NET_RX_DROP)
++		if (ip_rcv_finish_core(net, sk, skb, dev) == NET_RX_DROP)
+ 			continue;
+ 
+ 		dst = skb_dst(skb);
+ 		if (curr_dst != dst) {
+-			hint = ip_extract_route_hint(net, skb,
+-						     dst_rtable(dst)->rt_type);
+-
+ 			/* dispatch old sublist */
+ 			if (!list_empty(&sublist))
+ 				ip_sublist_rcv_finish(&sublist);
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index fd0883da7834..fde37f434d38 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1764,6 +1764,24 @@ static void ip_handle_martian_source(struct net_device *dev,
+ #endif
+ }
+ 
++static void ip_route_set_doredirect(struct in_device *in_dev,
++				    struct in_device *out_dev,
++				    struct sk_buff *skb,
++				    u8 gw_family,
++				    __be32 gw4,
++				    __be32 saddr)
++{
++	if (out_dev == in_dev && IN_DEV_TX_REDIRECTS(out_dev) &&
++	    skb->protocol == htons(ETH_P_IP)) {
++		__be32 gw;
++
++		gw = gw_family == AF_INET ? gw4 : 0;
++		if (IN_DEV_SHARED_MEDIA(out_dev) ||
++		    inet_addr_onlink(out_dev, saddr, gw))
++			IPCB(skb)->flags |= IPSKB_DOREDIRECT;
++	}
++}
++
+ /* called in rcu_read_lock() section */
+ static int __mkroute_input(struct sk_buff *skb,
+ 			   const struct fib_result *res,
+@@ -1796,15 +1814,10 @@ static int __mkroute_input(struct sk_buff *skb,
  	}
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index 8e94ed7c56a0..189f716b03e8 100644
---- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -185,7 +185,6 @@ config NET_IPGRE_DEMUX
  
- config NET_IP_TUNNEL
- 	tristate
--	select DST_CACHE
- 	select GRO_CELLS
- 	default n
+ 	do_cache = res->fi && !itag;
+-	if (out_dev == in_dev && err && IN_DEV_TX_REDIRECTS(out_dev) &&
+-	    skb->protocol == htons(ETH_P_IP)) {
+-		__be32 gw;
+-
+-		gw = nhc->nhc_gw_family == AF_INET ? nhc->nhc_gw.ipv4 : 0;
+-		if (IN_DEV_SHARED_MEDIA(out_dev) ||
+-		    inet_addr_onlink(out_dev, saddr, gw))
+-			IPCB(skb)->flags |= IPSKB_DOREDIRECT;
+-	}
++	if (err)
++		ip_route_set_doredirect(in_dev, out_dev, skb,
++					nhc->nhc_gw_family,
++					nhc->nhc_gw.ipv4, saddr);
  
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index a3676155be78..05fbc40c5d16 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -683,13 +683,11 @@ static int ip_tun_build_state(struct net *net, struct nlattr *attr,
- 		return err;
- 	}
+ 	if (skb->protocol != htons(ETH_P_IP)) {
+ 		/* Not IP (i.e. ARP). Do not create route, if it is
+@@ -2134,14 +2147,15 @@ static int ip_mkroute_input(struct sk_buff *skb,
  
--#ifdef CONFIG_DST_CACHE
- 	err = dst_cache_init(&tun_info->dst_cache, GFP_KERNEL);
- 	if (err) {
- 		lwtstate_free(new_state);
- 		return err;
- 	}
--#endif
- 
- 	if (tb[LWTUNNEL_IP_ID])
- 		tun_info->key.tun_id = nla_get_be64(tb[LWTUNNEL_IP_ID]);
-@@ -727,11 +725,9 @@ static int ip_tun_build_state(struct net *net, struct nlattr *attr,
- 
- static void ip_tun_destroy_state(struct lwtunnel_state *lwtstate)
+ /* Implements all the saddr-related checks as ip_route_input_slow(),
+  * assuming daddr is valid and the destination is not a local broadcast one.
+- * Uses the provided hint instead of performing a route lookup.
++ * Uses the provided dst from dst_cache instead of performing a route lookup.
+  */
+-int ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+-		      u8 tos, struct net_device *dev,
+-		      const struct sk_buff *hint)
++int ip_route_use_dst_cache(struct sk_buff *skb, __be32 daddr, __be32 saddr,
++			   u8 tos, struct net_device *dev,
++			   struct dst_entry *dst)
  {
--#ifdef CONFIG_DST_CACHE
- 	struct ip_tunnel_info *tun_info = lwt_tun_info(lwtstate);
++	struct in_device *out_dev = __in_dev_get_rcu(dst->dev);
+ 	struct in_device *in_dev = __in_dev_get_rcu(dev);
+-	struct rtable *rt = skb_rtable(hint);
++	struct rtable *rt = (struct rtable *)dst;
+ 	struct net *net = dev_net(dev);
+ 	int err = -EINVAL;
+ 	u32 tag = 0;
+@@ -2158,21 +2172,43 @@ int ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
+ 	if (ipv4_is_loopback(saddr) && !IN_DEV_NET_ROUTE_LOCALNET(in_dev, net))
+ 		goto martian_source;
  
- 	dst_cache_destroy(&tun_info->dst_cache);
--#endif
+-	if (rt->rt_type != RTN_LOCAL)
+-		goto skip_validate_source;
++	if (ipv4_is_loopback(daddr) && !IN_DEV_NET_ROUTE_LOCALNET(in_dev, net))
++		goto martian_destination;
+ 
++	if (rt->rt_type != RTN_LOCAL) {
++		if (!IN_DEV_FORWARD(in_dev)) {
++			err = -EHOSTUNREACH;
++			goto out_err;
++		}
++		goto skip_validate_source;
++	}
+ 	tos &= IPTOS_RT_MASK;
+ 	err = fib_validate_source(skb, saddr, daddr, tos, 0, dev, in_dev, &tag);
+ 	if (err < 0)
+ 		goto martian_source;
+ 
++	if (err)
++		ip_route_set_doredirect(in_dev, out_dev, skb, rt->rt_gw_family,
++					rt->rt_gw4, saddr);
++
+ skip_validate_source:
+-	skb_dst_copy(skb, hint);
++	skb_dst_set_noref(skb, dst);
+ 	return 0;
+ 
+ martian_source:
+ 	ip_handle_martian_source(dev, in_dev, skb, daddr, saddr);
++out_err:
+ 	return err;
++
++martian_destination:
++	RT_CACHE_STAT_INC(in_martian_dst);
++#ifdef CONFIG_IP_ROUTE_VERBOSE
++		if (IN_DEV_LOG_MARTIANS(in_dev))
++			net_warn_ratelimited("martian destination %pI4 from %pI4, dev %s\n",
++					     &daddr, &saddr, dev->name);
++#endif
++	err = -EINVAL;
++	goto out_err;
  }
  
- static int ip_tun_fill_encap_opts_geneve(struct sk_buff *skb,
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index e4e0fa869fa4..576ab973d1f4 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -216,13 +216,11 @@ struct rtable *udp_tunnel_dst_lookup(struct sk_buff *skb,
- 	struct rtable *rt = NULL;
- 	struct flowi4 fl4;
- 
--#ifdef CONFIG_DST_CACHE
- 	if (dst_cache) {
- 		rt = dst_cache_get_ip4(dst_cache, saddr);
- 		if (rt)
- 			return rt;
- 	}
--#endif
- 
- 	memset(&fl4, 0, sizeof(fl4));
- 	fl4.flowi4_mark = skb->mark;
-@@ -245,10 +243,8 @@ struct rtable *udp_tunnel_dst_lookup(struct sk_buff *skb,
- 		ip_rt_put(rt);
- 		return ERR_PTR(-ELOOP);
- 	}
--#ifdef CONFIG_DST_CACHE
- 	if (dst_cache)
- 		dst_cache_set_ip4(dst_cache, &rt->dst, fl4.saddr);
--#endif
- 	*saddr = fl4.saddr;
- 	return rt;
- }
-diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-index 08d4b7132d4c..093c768d41ab 100644
---- a/net/ipv6/Kconfig
-+++ b/net/ipv6/Kconfig
-@@ -124,7 +124,6 @@ config IPV6_MIP6
- config IPV6_ILA
- 	tristate "IPv6: Identifier Locator Addressing (ILA)"
- 	depends on NETFILTER
--	select DST_CACHE
- 	select LWTUNNEL
- 	help
- 	  Support for IPv6 Identifier Locator Addressing (ILA).
-@@ -203,7 +202,6 @@ config IPV6_NDISC_NODETYPE
- config IPV6_TUNNEL
- 	tristate "IPv6: IP-in-IPv6 tunnel (RFC2473)"
- 	select INET6_TUNNEL
--	select DST_CACHE
- 	select GRO_CELLS
- 	help
- 	  Support for IPv6-in-IPv6 and IPv4-in-IPv6 tunnels described in
-@@ -291,7 +289,6 @@ config IPV6_SEG6_LWTUNNEL
- 	bool "IPv6: Segment Routing Header encapsulation support"
- 	depends on IPV6
- 	select LWTUNNEL
--	select DST_CACHE
- 	select IPV6_MULTIPLE_TABLES
- 	help
- 	  Support for encapsulation of packets within an outer IPv6
-@@ -333,7 +330,6 @@ config IPV6_IOAM6_LWTUNNEL
- 	bool "IPv6: IOAM Pre-allocated Trace insertion support"
- 	depends on IPV6
- 	select LWTUNNEL
--	select DST_CACHE
- 	help
- 	  Support for the insertion of IOAM Pre-allocated Trace
- 	  Header using the lightweight tunnels mechanism.
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index c99053189ea8..de92aea01cfc 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -145,13 +145,11 @@ struct dst_entry *udp_tunnel6_dst_lookup(struct sk_buff *skb,
- 	struct dst_entry *dst = NULL;
- 	struct flowi6 fl6;
- 
--#ifdef CONFIG_DST_CACHE
- 	if (dst_cache) {
- 		dst = dst_cache_get_ip6(dst_cache, saddr);
- 		if (dst)
- 			return dst;
- 	}
--#endif
- 	memset(&fl6, 0, sizeof(fl6));
- 	fl6.flowi6_mark = skb->mark;
- 	fl6.flowi6_proto = IPPROTO_UDP;
-@@ -173,10 +171,8 @@ struct dst_entry *udp_tunnel6_dst_lookup(struct sk_buff *skb,
- 		dst_release(dst);
- 		return ERR_PTR(-ELOOP);
- 	}
--#ifdef CONFIG_DST_CACHE
- 	if (dst_cache)
- 		dst_cache_set_ip6(dst_cache, dst, &fl6.saddr);
--#endif
- 	*saddr = fl6.saddr;
- 	return dst;
- }
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index 60a76e6e348e..aa4a872edae2 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -514,13 +514,11 @@ static int nft_tunnel_obj_init(const struct nft_ctx *ctx,
- 		return -ENOMEM;
- 
- 	memcpy(&md->u.tun_info, &info, sizeof(info));
--#ifdef CONFIG_DST_CACHE
- 	err = dst_cache_init(&md->u.tun_info.dst_cache, GFP_KERNEL);
- 	if (err < 0) {
- 		metadata_dst_free(md);
- 		return err;
- 	}
--#endif
- 	ip_tunnel_info_opts_set(&md->u.tun_info, &priv->opts.u, priv->opts.len,
- 				priv->opts.flags);
- 	priv->md = md;
-diff --git a/net/openvswitch/Kconfig b/net/openvswitch/Kconfig
-index 29a7081858cd..b7a5ab6374b8 100644
---- a/net/openvswitch/Kconfig
-+++ b/net/openvswitch/Kconfig
-@@ -13,7 +13,6 @@ config OPENVSWITCH
- 	select LIBCRC32C
- 	select MPLS
- 	select NET_MPLS_GSO
--	select DST_CACHE
- 	select NET_NSH
- 	select NF_CONNTRACK_OVS if NF_CONNTRACK
- 	select NF_NAT_OVS if NF_NAT
-diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
-index af7c99845948..9d673b642b7c 100644
---- a/net/sched/act_tunnel_key.c
-+++ b/net/sched/act_tunnel_key.c
-@@ -476,11 +476,9 @@ static int tunnel_key_init(struct net *net, struct nlattr *nla,
- 			goto err_out;
- 		}
- 
--#ifdef CONFIG_DST_CACHE
- 		ret = dst_cache_init(&metadata->u.tun_info.dst_cache, GFP_KERNEL);
- 		if (ret)
- 			goto release_tun_meta;
--#endif
- 
- 		if (opts_len) {
- 			ret = tunnel_key_opts_set(tb[TCA_TUNNEL_KEY_ENC_OPTS],
+ /* get device for dst_alloc with local routes */
+@@ -2193,7 +2229,7 @@ static struct net_device *ip_rt_get_dev(struct net *net,
+  *	addresses, because every properly looped back packet
+  *	must have correct destination already attached by output routine.
+  *	Changes in the enforced policies must be applied also to
+- *	ip_route_use_hint().
++ *	ip_route_use_dst_cache().
+  *
+  *	Such approach solves two big problems:
+  *	1. Not simplex devices are handled properly.
 -- 
 2.34.1
 
