@@ -1,214 +1,221 @@
-Return-Path: <netdev+bounces-108313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A34F91ECE4
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 04:09:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A26E91ECE5
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 04:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBEE91C21415
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 02:08:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12B681F22861
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 02:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7D2C133;
-	Tue,  2 Jul 2024 02:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E67C2F2;
+	Tue,  2 Jul 2024 02:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LSH0KMR4"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="acgWr6EG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A437BC129;
-	Tue,  2 Jul 2024 02:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA476FCB
+	for <netdev@vger.kernel.org>; Tue,  2 Jul 2024 02:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719886137; cv=none; b=Yv7uNgUDNk3A2vCo+OMOlsGfB0j1m67st3MamVr35/LNyjmpfHI4MtdbSwPO/lu4q5VxkOo6/Ic+5XPmtiQgyArx5QplPRioBYNIZBKIly5ffkSiQn4RPt5rhegbhln9XJecMY3sY2pjMVs/fQ9XoewRntAPhZ3yMqFswf1IcNw=
+	t=1719886180; cv=none; b=QIQ5YVYizgq16zxc/FniAHGgX/+bNxfcENfSFqaGw8mqL6c2SIAbTo14fImJ1izvzyac0/pIFFsBDNPmLCkBKB5sjAq50J1lAyMd0DJPn32+3zcIRNay6olP1wsa3qC6ubeHew9Cobc1ms0JAoLTvqjEl9uXqhkSbu5WFYXMYfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719886137; c=relaxed/simple;
-	bh=q2dQRzE+aINYiLlUDRwYF0sHgWIJl6eq3nw5CuDIAEg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R4m+D+6Fd36Bus9wvkm/MbMi8cytE9yI9ap5pi8IjKxbXtpPiMiQaeI5Xh+D54Tolknt+xMmkHWCABr96C6SylGEDVbjNwGXGyS8KR+Q1gwtwrjXVqoBZEvpabYsIwx3YlZKLRkLIAh7SbHxMqDw0RcPFUhpo2vzzvKUwQza7l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LSH0KMR4; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2c7bf925764so2669263a91.0;
-        Mon, 01 Jul 2024 19:08:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719886135; x=1720490935; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3iPlmzgUkKMFHH6EFR/RoC05ho1mABcPgvKqXMWiosA=;
-        b=LSH0KMR4eo77d6KP9tuOR8ps7wddKaQw8GigESc0qEG5KZKLQz3vAhcrkrLD5gg8/A
-         fS28tgd+D31pRDbck5XKeJ0WU80G2Mw8cf3Hy931CUclf3Dj+JUaJb8soVzVM8GdeqXU
-         BZtQ40WmGRiTSvvCgYGZ/a4U0rqMCE8fYIirbT3ErHNunsELhP5fsul8/Kg3b6wwdW3P
-         xopKxORDHPrmR2IfpTYf7m+hKjCuFSYZq6eEsOddQzAhDLaqozotqvNtiS6xU7lLSH9G
-         8Y1KUBVFt2qNgTek2ti/NCaK2K4aEA9YQL3qJzikn1a5hk4ni+NSHMvpYluLl1IViX6h
-         4o6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719886135; x=1720490935;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3iPlmzgUkKMFHH6EFR/RoC05ho1mABcPgvKqXMWiosA=;
-        b=ZacxsGGRZ0+N6SOSVVdzDzfJ4DeWrWY/kOQIowICdRVjvQeRi0b0Pjm4Ql+xJjIADC
-         XeKAXahmPNz68UKR58bhjEvpx/UyM+xZOGYOoumC+DSmZp85ewNagQY4lKw6aKAABk1t
-         dxYHVRDKE9KXN3dCTQBwP6VfhNmNK/KYtrGyU6gpcY7lXO7joFJG1j8hro7WJUpCiRIY
-         ZHTYlNZiUc85Az151vNkh5n/GSyhpAGJmEd7ogWusGMe4W35HLxF0+1zyt8ZpXbiz7NO
-         iKuDJmIpsAZCM7B777L1bYJiJEonmMO9cns2ywAKAM867SvJ99amV41Hv4JeaH5mRqoM
-         Byjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjnLygUY/dBWKlZHE2qYqgNCnxmySQ51rppwKHCaumGqrLJnk19+jNQvTlh5EhhG3ma9N2b38UCz92iJH76j9MQmordJyV3yDO0GuqUZVlSI9tNlwGwEG7RrAT
-X-Gm-Message-State: AOJu0YwlCxpHKd+wONLVBlgb/SSKFhKKc167s4mRO1CC2+SZO7Vs0nOY
-	qCY8HqJHPQOiZbTD4Es7UoRlIk0K6C0q8UvqPK6Ozwv4PaGBxvJmvkyTIHNy4L/O5bG/65esacx
-	aO2lsMiSXE90/ty5BsNiPtg0IB1I=
-X-Google-Smtp-Source: AGHT+IFuHFs79uSz4c57ZsoyFVPORwa70gmeiK1+Nqnse2Zgj8pSKhvSLrGTdcae9Puv50+y6ig07dVud6Z1pPSA3xY=
-X-Received: by 2002:a17:90a:6c90:b0:2c4:aa78:b48b with SMTP id
- 98e67ed59e1d1-2c93d775c23mr6297581a91.38.1719886134790; Mon, 01 Jul 2024
- 19:08:54 -0700 (PDT)
+	s=arc-20240116; t=1719886180; c=relaxed/simple;
+	bh=1p5SSAb7qWtnxkRYsNQrcwnlK8Do+lQhJ411E3url84=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mznbWuN81k1nZjhfdRHC+d91AHi0PZttm04niVphvkF0zpZo+iCm1aE5rOMTfrs31f/Zv/hPSojZN3NN3BBM5JfVLOQpnDLPeWhQ9RcxDDiWg5C7ZPk2i8ZFVymL/DUSNQAPzI6f2fmbUM4t0wxGDm/Qrshvor/aiyuFRcVBgE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=acgWr6EG; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id F2BEB2C0372;
+	Tue,  2 Jul 2024 14:09:28 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1719886168;
+	bh=e6Uweuk36+t1GhH6gy7+RAA1GKrHEeOut/4k2q3eTg8=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=acgWr6EGciDtutsPoIOpJCgxjUXZKYFbc/8TcD0kJRP6hv/PscoZM5ovPZ+h07JTT
+	 p2nFbYpqs44xLu24gIe9haJOr/5ft9NywD7shJVjbDoGD1o31h476KC+ZNAUSOtRj/
+	 ri1wdHBjDemlvqogPcRPKD6JO0wQMNub+VLHO9t2MG1utn9kEmJkAqkPcc+CNhzkI7
+	 CyAbU1lQER0wVjCCqsgXCCfQx3fdLEm+luQSt2G+0+6xtquXGXHwHopKvwPnPMXVfd
+	 FQtYFrJc9bP1re3lEGdaMIM732KQD62vxEn+0rvCk6puUepbZWIcikmwxFYaFg7qDQ
+	 BbIMqXe2JDTvA==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B668361580000>; Tue, 02 Jul 2024 14:09:28 +1200
+Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id D73C313EE4B;
+	Tue,  2 Jul 2024 14:09:28 +1200 (NZST)
+Message-ID: <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
+Date: Tue, 2 Jul 2024 14:09:28 +1200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617072451.1403e1d2@kernel.org> <CAJwJo6ZjhLLSiBUntdGT8a6-d5pjdXyVv9AAQ3Yx1W01Nq=dwg@mail.gmail.com>
- <20240618074037.66789717@kernel.org> <fae8f7191d50797a435936d41f08df9c83a9d092.camel@redhat.com>
- <ee5a9d15-deaf-40c9-a559-bbc0f11fbe76@paulmck-laptop> <20240618100210.16c028e1@kernel.org>
- <53632733-ef55-496b-8980-27213da1ac05@paulmck-laptop> <CAJwJo6bnh_2=Bg7jajQ3qJAErMegDjp0F-aQP7yCENf_zBiTaw@mail.gmail.com>
- <37d3ca22-2dac-4088-94f5-54a07403dd27@paulmck-laptop>
-In-Reply-To: <37d3ca22-2dac-4088-94f5-54a07403dd27@paulmck-laptop>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Tue, 2 Jul 2024 03:08:42 +0100
-Message-ID: <CAJwJo6Y0hfB5royz0D8QPkgpRMxz9G5s81ktZbtHPBdt8EYdEQ@mail.gmail.com>
-Subject: Re: [TEST] TCP MD5 vs kmemleak
-To: paulmck@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, rcu@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird Beta
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Subject: Re: net: dsa: Realtek switch drivers
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>
+Cc: "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "olteanv@gmail.com" <olteanv@gmail.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, "ericwouds@gmail.com" <ericwouds@gmail.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "justinstitt@google.com" <justinstitt@google.com>,
+ "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
+ netdev <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "sander@svanheule.net" <sander@svanheule.net>
+References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz>
+ <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
+ <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=66836158 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=4kmOji7k6h8A:10 a=VwQbUJbxAAAA:8 a=l7AzUe4WSKfLcy4FgSgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=hPAN1OI7KfYA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-Hi Paul,
 
-Sorry for the delayed answer, I got a respiratory infection, so was in
-bed last week,
-
-On Thu, 20 Jun 2024 at 18:02, Paul E. McKenney <paulmck@kernel.org> wrote:
+On 15/06/24 09:36, Luiz Angelo Daros de Luca wrote:
+> Hello Chris and Linus,
 >
-> On Wed, Jun 19, 2024 at 01:33:36AM +0100, Dmitry Safonov wrote:
-[..]
-> > I'm sorry guys, that was me being inadequate.
+>>> I'm starting to look at some L2/L3 switches with Realtek silicon. I see
+>>> in the upstream kernel there are dsa drivers for a couple of simple L2
+>>> switches. While openwrt has support for a lot of the more advanced
+>>> silicon. I'm just wondering if there is a particular reason no-one has
+>>> attempted to upstream support for these switches?
+>> It began with the RTL8366RB ("RTL8366 revision B") which I think is
+>> equivalent to RTL8366S as well, but have not been able to test.
+>>
+>> Then Luiz and Alvin jumped in and fixed up the RTL8365MB family.
+>>
+>> So the support is pretty much what is stated in the DT bindings
+>> in Documentation/devicetree/bindings/net/dsa/realtek.yaml:
+>>
+>> properties:
+>>    compatible:
+>>      enum:
+>>        - realtek,rtl8365mb
+>>        - realtek,rtl8366rb
+>>      description: |
+>>        realtek,rtl8365mb:
+>>          Use with models RTL8363NB, RTL8363NB-VB, RTL8363SC, RTL8363SC-VB,
+>>          RTL8364NB, RTL8364NB-VB, RTL8365MB, RTL8366SC, RTL8367RB-VB, RTL8367S,
+>>          RTL8367SB, RTL8370MB, RTL8310SR
+>>        realtek,rtl8366rb:
+>>          Use with models RTL8366RB, RTL8366S
+>>
+>> It may look like just RTL8365 and RTL8366 on the surface but the sub-version
+>> is detected at runtime.
+>>
+>>> If I were to start
+>>> grabbing drivers from openwrt and trying to get them landed would that
+>>> be a problem?
+>> I think the base is there, when I started with RTL8366RB it was pretty
+>> uphill but the kernel DSA experts (Vladimir & Andrew especially) are super
+>> helpful so eventually we have arrived at something that works reasonably.
+>>
+>> The RTL8356MB-family driver is more advanced and has a lot more features,
+>> notably it supports all known RTL8367 variants.
+> I played with RTL8367R. It mostly works with rtl8365mb driver but I
+> wasn't able to enable the CPU tagging. Although
 >
-> I know that feeling!
-
-Thanks :)
-
-[adding/quoting back the context of the thread that I cut previously]
-
-> On Tue, Jun 18, 2024 at 10:02:10AM -0700, Jakub Kicinski wrote:
-> > On Tue, 18 Jun 2024 09:42:35 -0700 Paul E. McKenney wrote:
-> > > > FTR, with mptcp self-tests we hit a few kmemleak false positive on RCU
-> > > > freed pointers, that where addressed by to this patch:
-> > > >
-> > > > commit 5f98fd034ca6fd1ab8c91a3488968a0e9caaabf6
-> > > > Author: Catalin Marinas <catalin.marinas@arm.com>
-> > > > Date:   Sat Sep 30 17:46:56 2023 +0000
-> > > >
-> > > >     rcu: kmemleak: Ignore kmemleak false positives when RCU-freeing objects
-> > > >
-> > > > I'm wondering if this is hitting something similar? Possibly due to
-> > > > lazy RCU callbacks invoked after MSECS_MIN_AGE???
-> >
-> > Dmitry mentioned this commit, too, but we use the same config for MPTCP
-> > tests, and while we repro TCP AO failures quite frequently, mptcp
-> > doesn't seem to have failed once.
-> >
-> > > Fun!  ;-)
-> > >
-> > > This commit handles memory passed to kfree_rcu() and friends, but
-> > > not memory passed to call_rcu() and friends.  Of course, call_rcu()
-> > > does not necessarily know the full extent of the memory passed to it,
-> > > for example, if passed a linked list, call_rcu() will know only about
-> > > the head of that list.
-> > >
-> > > There are similar challenges with synchronize_rcu() and friends.
-> >
-> > To be clear I think Dmitry was suspecting kfree_rcu(), he mentioned
-> > call_rcu() as something he was expecting to have a similar issue but
-> > it in fact appeared immune.
-
-On Thu, 20 Jun 2024 at 18:02, Paul E. McKenney <paulmck@kernel.org> wrote:
-> > That's a real issue, rather than a false-positive:
-> > https://lore.kernel.org/netdev/20240619-tcp-ao-required-leak-v1-1-6408f3c94247@gmail.com/
+>> The upstream OpenWrt in target/linux/generic/files/drivers/net/phy
+>> has the following drivers for the old switchdev:
+>> -rw-r--r--. 1 linus linus 25382 Jun  7 21:44 rtl8306.c
+>> -rw-r--r--. 1 linus linus 40268 Jun  7 21:44 rtl8366rb.c
+>> -rw-r--r--. 1 linus linus 33681 Jun  7 21:44 rtl8366s.c
+>> -rw-r--r--. 1 linus linus 36324 Jun  7 21:44 rtl8366_smi.c
+>> -rw-r--r--. 1 linus linus  4838 Jun  7 21:44 rtl8366_smi.h
+>> -rw-r--r--. 1 linus linus 58021 Jun 12 18:50 rtl8367b.c
+>> -rw-r--r--. 1 linus linus 59612 Jun 12 18:50 rtl8367.c
+>>
+>> As far as I can tell we cover all but RTL8306 with the current in-tree
+>> drivers, the only reason these are still in OpenWrt would be that some
+>> boards are not migrated to DSA.
+> These drivers you listed are mostly found in old or low spec devices.
+> There is little incentive to invest too much time to migrate them. For
+> rtl8365mb, it still lacks support for vlan and forwarding offload. So,
+> the swconfig driver still makes sense.
+> There is also a performance problem with checksum offloading. These
+> switches are used with non-realtek SoC, which might lead to:
 >
-> So we need call_rcu() to mark memory flowing through it?  If so, we
-> need help from callers of call_rcu() in the case where more than one
-> object is being freed.
+> "Checksum offload should work with category 1 and 2 taggers when the
+> DSA conduit driver declares NETIF_F_HW_CSUM in vlan_features and looks
+> at csum_start and csum_offset. For those cases, DSA will shift the
+> checksum start and offset by the tag size. If the DSA conduit driver
+> still uses the legacy NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM in
+> vlan_features, the offload might only work if the offload hardware
+> already expects that specific tag (perhaps due to matching vendors).
+> DSA user ports inherit those flags from the conduit, and it is up to
+> the driver to correctly fall back to software checksum when the IP
+> header is not where the hardware expects. If that check is
+> ineffective, the packets might go to the network without a proper
+> checksum (the checksum field will have the pseudo IP header sum). For
+> category 3, when the offload hardware does not already expect the
+> switch tag in use, the checksum must be calculated before any tag is
+> inserted (i.e. inside the tagger). Otherwise, the DSA conduit would
+> include the tail tag in the (software or hardware) checksum
+> calculation. Then, when the tag gets stripped by the switch during
+> transmission, it will leave an incorrect IP checksum in place."
+> See: https://docs.kernel.org/networking/dsa/dsa.html
+>
+>> But maybe I missed something?
+> I guess Chris is talking about the realtek target that uses Realtek
+> SoC (target/linux/realtek/files-5.15/). That is a completely different
+> beast. Although it might share some (or a lot) logic with current
+> upstream drivers, it is way more complex. It might require a
+> multi-function device driver. Anyway, the current realtek SoC/target
+> drivers need some love, like using regmap, implement functions using
+> an abstraction layer (and not if model a inside the code), get rid of
+> all magic numbers and replace them with meaningful macros, create a
+> proper tagger (and not translate a generic one just before forwarding
+> it). In OpenWrt, a code that gets things done might be acceptable but
+> the upstream kernel requires something more maintainable. So, if you
+> want to upstream those drivers, you can start by improving them in the
+> openwrt.
 
-Not sure, I think one way to avoid explicitly marking pointers for
-call_rcu() or even avoiding the patch above would be a hackery like
-this:
+So now got access to the Realtek docs and I've been pouring over them 
+and the openwrt code (I'm avoiding looking at the Realtek SDK for now, 
+just to make sure I don't submit something I don't have the rights to).
 
-diff --git a/mm/kmemleak.c b/mm/kmemleak.c
-index d5b6fba44fc9..7a5eb55a155c 100644
---- a/mm/kmemleak.c
-+++ b/mm/kmemleak.c
-@@ -1587,6 +1587,7 @@ static void kmemleak_cond_resched(struct
-kmemleak_object *object)
- static void kmemleak_scan(void)
- {
-        struct kmemleak_object *object;
-+       unsigned long gp_start_state;
-        struct zone *zone;
-        int __maybe_unused i;
-        int new_leaks = 0;
-@@ -1630,6 +1631,7 @@ static void kmemleak_scan(void)
-                        kmemleak_cond_resched(object);
-        }
-        rcu_read_unlock();
-+       gp_start_state = get_state_synchronize_rcu();
+If someone were to look at the block diagram in the brief datasheet 
+they'd probably come away with the impression that it very much fits the 
+DSA model. There's a SoC portion with the CPU, peripherals and a "NIC". 
+That NIC is connected to the CPU MAC in the switch block. All seems like 
+a pretty standard DSA type design and that's what the openwrt code 
+implements a ethernet/rtl838x_eth.c driver for the Ethernet NIC and a 
+dsa/rtl83xx driver for the DSA switch.
 
- #ifdef CONFIG_SMP
-        /* per-cpu sections scanning */
-@@ -1690,6 +1692,13 @@ static void kmemleak_scan(void)
-         */
-        scan_gray_list();
+But when you start digging into the detail you find that the registers 
+for the NIC are scattered through the address space for the switch. Same 
+for the MDIO related registers. There is a more detailed block diagram 
+in the CPU and Peripherals datasheet that shows the NIC and switch as 
+part of the same IP block. The openwrt implementation does things that I 
+think would be frowned upon upstream like calling from the Ethernet 
+driver into the switch driver to access registers.
 
-+       /*
-+        * Wait for the greylist objects potentially migrating from
-+        * RCU callbacks or maybe getting freed.
-+        */
-+       cond_synchronize_rcu(gp_start_state);
-+       rcu_barrier();
-+
-        /*
-         * Check for new or unreferenced objects modified since the previous
-         * scan and color them gray until the next scan.
+This leads me to conclude that what Realtek call the "NIC" is actually 
+just the DMA interface for packets sent from or trapped to the CPU. 
+Rather than trying to make this fit the DSA model I should be looking at 
+using switchdev directly (I can still probably leverage a lot of code 
+from the openwrt drivers because the switch tables are the same either way).
+
+What would I be loosing if I don't use the DSA infrastructure? I got 
+kind of hung up at the point where it really wanted a CPU port and I 
+just couldn't provide a nice discrete NIC.
 
 
--->8--
-
-Not quite sure if this makes sense, my first time at kmemleak code,
-adding Catalin.
-But then if I didn't mess up, it's going to work only for one RCU
-period, so in case some object calls rcu/kfree_rcu() from the
-callback, it's going to be yet a false-positive.
-
-Some other options/ideas:
-- more RCU-invasive option which would be adding a mapping function to
-segmented lists of callbacks, which would allow kmemleak to request
-from RCU if the pointer is yet referenced by RCU.
-- the third option is for kmemleak to trust RCU and generalize the
-commit above, adding kmemleak_object::flags of OBJECT_RCU, which will
-be set by call_rcu()/kfree_rcu() and unset once the callback is
-invoked for RCU_DONE_TAIL.
-- add kmemleak_object::update_jiffies or just directly touch
-kmemleak_object::jiffies whenever the object has been modified (see
-update_checksum()), that will ignore recently changed objects. As
-rcu_head should be updated, that is going to automagically ignore
-those deferred to RCU objects.
-
-Not sure if I mis-looked anything and it seems there is no hurry in
-fixing anything yet, as this is a theoretical issue at this moment.
-
-Hopefully, these ideas don't look like a nonsense,
-             Dmitry
 
