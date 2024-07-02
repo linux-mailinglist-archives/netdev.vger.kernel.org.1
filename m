@@ -1,42 +1,43 @@
-Return-Path: <netdev+bounces-108620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0F3924BEC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 00:59:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A904924BEE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 00:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BD49B210BA
-	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 22:59:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D35D1C2258E
+	for <lists+netdev@lfdr.de>; Tue,  2 Jul 2024 22:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE9B155A55;
-	Tue,  2 Jul 2024 22:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE1217A59B;
+	Tue,  2 Jul 2024 22:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="SbBXp7XU"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="M7cto0CD"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2117.outbound.protection.outlook.com [40.107.102.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17DC1DA301;
-	Tue,  2 Jul 2024 22:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C16156F46;
+	Tue,  2 Jul 2024 22:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719961138; cv=fail; b=JN/YUtG1o1mD009mu9SxBsl8j9vFM4xk0Zdt4mivTASaeJ1Lg7Jrf9pGH6HRpY0WvwQ703Xdt26BOfI1gyDrGckanCohQiC5foRXx4vwhyqB3grTneJHyysP4dXBXhJRnJ01eJmdDZRBxzHND/gyrqOS5O8U1CrI+RlIVSAzuJk=
+	t=1719961140; cv=fail; b=Zq2c541XWVc8wfm6NJdKjZxsG07rd/ZqenVJ95ANX0YGtE7HZvDFJ4SZSGQR1KwXZv0G9xgxajPXI/ik/Mfb+UgdX6Ger7nIROgOYDPhNjcMTw3O7vLACQHUBiPkgbNHacAnviHAQkCOKyYn8RJRED67X5tiiMmsQwPxvkc/rig=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719961138; c=relaxed/simple;
-	bh=JE3wGZAvC3OBJBSo+rbTl8HgqQY7xNBpQnnaheKZSNM=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=SCJ5A8CREwXGdzdleEpDTj3GbqtFI3ypPR7LLWRN4PiAfa1lfXDCR7Kx9teitL/WsYPNFg+JuxyFfUveypcZoKq3uG2MOemkckwVd7ovlOdzPfLDhWk1KgSaDgXjKusCIuFG5pZ6Y3DpixCTPTB6AO4pRbJqEYsTtmXZ06w+l/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=SbBXp7XU; arc=fail smtp.client-ip=40.107.102.117
+	s=arc-20240116; t=1719961140; c=relaxed/simple;
+	bh=t8cwQiGlu3LV7udPIIEYwmA5Bih0MHXeTzPiFdLrKaI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fznCK5SFkVTA20r3b5+f54EIJIe1xotJ+dv2iPT1vwhHcczQxaPU9iK1Av38oVtPxe7KtHoQnvrUvrXKo/LK4PfbYetLYgKCettodH/FR4dtFfPi/9qaqzSySOtVyTGxTe9Q7fxM/oLjmpottc/eioKBXQTr7L5tw6o+G9yo1tg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=M7cto0CD; arc=fail smtp.client-ip=40.107.102.117
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZE9FdiHCwZgEfACwKGGYa9sxhND1Xv5VqEGydx0mhlu37CDhOUSfvnj43KUaWs2HQnv8u60H/cJRvDbBJYCf3xW79smSeUpvd3j/u+87aOrYkXI2icgT1wqPXRVIxe4VJSBEAcvMV1hSYrLN81UWUNQ/L1FWpX5Y8JF3f0XQB8N/UbHgQAs4rOEqirQzfjgbj/9/qlqfp48O9/0QJjyWBM2RQee5WXzgGgr3UF9tJG4O+HYceLR0vVcDEfl2DEmOve4WsjMPwwekyHg6ZbRqssT4v68TqL8YMJQh+fNJh7UVm4OxwkZmXkC0lQTlI2ZjFCn0cjJYNEcb2PCUe/QgLA==
+ b=J8zyle1ZHp6zym4uPWS1cesvOSmFnRSVjZfDaRyBJzukfUg9V102pSz7vQ0+2e+SScn6dA7/lvXNHwD1xq61t2FsAv2mrxgmK3Fff4WLxltOC+CEkrK5w6SQQhVUXHsZeNaQEhKX6V3+x9G+l1/IFPg56KEYtLwzwfKaE7D2NP70wO13SHSWVAf2c6+KaveMEP6XrassAbJZ0DjkKqoK4i/9k0kHjOnfw7xib48LggvJcU/Fo/C2b96oni5kqJU6cAjuvkDn3dmR7zFUJSvoZpjiClwloQsAakbAgP48vRXVsWIYkTSagNkOLDiXa+Cazm8SklXnzEw9UD+Elizzyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x6AyNDdEWX7vFzVXOit2MGEYQx76FjbpcAjVdlUfVv0=;
- b=fQTclKT4935I5/L/Ho+tcAVp2lMxE//L+t/BLMxb3Y410SJwVrIbfMcRkkqL19CAOlBQqF3GTf6UqNGwLuxn3zJgIBn94Fy3HtwkkGXo2zbTag4p8egi46fayMFydsesE3bIzwvEsxVFt5hJ/O/Yh6CoUT4d9TTPeq8YhfJHhtYwuHKpXZOt+ZF8bMRv8YYNoXlb+mwVxJT0fcULZuyZ9KJ5ISdPZRgeIcI5J8w8wGwU/kUi0rfWqXf4wO4ytPCcZCMoqFRQzQylrcqLJqiw5fVHlOU7ShxkNK2ovS9HV5V4DZDTn1jtGGpuyE0W5ojjzjV2gREQBp0b+hgK9OREXg==
+ bh=maZd4uPe+FGvO0CYNqqAqiANTFso0QKd0yJj6CXMSyE=;
+ b=VEvvdyPEFwuwiJmnrUb1gFuRxQcuQLSasS2E1h3qqaXwjhhi+O5YtSaBBl5p9/WiRU4sQvRfM3p/oY38iQHxA1yzXrDp5nSKZN8kEdeZG8g98DnKEfIsTL88IkWtS6Jx9m5v3so1i8G4vIJbu+AX8zFE4GPw7ecXJ4z4uNKrffRNEhR+dE1xrEc+fMbmQ5V7zyNK+lBBxB6XWkiYYVb1CMBMzeWl9pvq0/uHL8/I0tK6fWo04mdGz80NFPmY5HDwoPfowG2gus9KS9N/3d1I6qs93nwx2uXLkJ87sD0rK02BUeOIebQcC2pRSibvAP63VV/pwa/u1yPam74nJF7oyA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -44,20 +45,24 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x6AyNDdEWX7vFzVXOit2MGEYQx76FjbpcAjVdlUfVv0=;
- b=SbBXp7XUexopAsXfen4tl0oU4Nght/H6RKQxsN+mm6O6183gRHcr3qrSCpqwXLUt8vmmSMBwZJFhpW8po2fq1ABVUa5gOhqI5/hL3Xr1qa3pBetbjsH6yoRWWoYryt+NsDOmYrTuxPNh17YZEXvw8JcIiAKByi9VeS+ht+hExjQ=
+ bh=maZd4uPe+FGvO0CYNqqAqiANTFso0QKd0yJj6CXMSyE=;
+ b=M7cto0CD3zFJjk5dTqIuXh18J2LeDdWcs5f6PtuO4vpnxM6ZGR3NOWp+BhKmb+OwdmSpmpEVnbFiC66aEoT3b9QAIMx2bKCk8cPsjCwDGtcLiaMSRnLlX2Dq+ilbYFk/eS3FuXj4gurgQSwrXt+P9YDGw/vc4pou3+JvsnUirwU=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
  SJ0PR01MB6509.prod.exchangelabs.com (2603:10b6:a03:294::17) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7719.32; Tue, 2 Jul 2024 22:58:53 +0000
+ 15.20.7719.32; Tue, 2 Jul 2024 22:58:57 +0000
 Received: from SA0PR01MB6171.prod.exchangelabs.com
  ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
  ([fe80::b0e5:c494:81a3:5e1d%7]) with mapi id 15.20.7741.017; Tue, 2 Jul 2024
- 22:58:53 +0000
+ 22:58:57 +0000
 From: admiyo@os.amperecomputing.com
-To:
+To: Sudeep Holla <sudeep.holla@arm.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Robert Moore <robert.moore@intel.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Len Brown <lenb@kernel.org>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jeremy Kerr <jk@codeconstruct.com.au>,
@@ -66,17 +71,18 @@ Cc: netdev@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
 	Huisong Li <lihuisong@huawei.com>
-Subject: [PATCH v4 0/3] MCTP over PCC
-Date: Tue,  2 Jul 2024 18:58:42 -0400
-Message-Id: <20240702225845.322234-1-admiyo@os.amperecomputing.com>
+Subject: [PATCH v4 1/3] mctp pcc: Check before sending MCTP PCC response ACK
+Date: Tue,  2 Jul 2024 18:58:43 -0400
+Message-Id: <20240702225845.322234-2-admiyo@os.amperecomputing.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240702225845.322234-1-admiyo@os.amperecomputing.com>
+References: <20240702225845.322234-1-admiyo@os.amperecomputing.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0097.namprd05.prod.outlook.com
- (2603:10b6:a03:e0::38) To SA0PR01MB6171.prod.exchangelabs.com
+X-ClientProxiedBy: SJ0PR03CA0006.namprd03.prod.outlook.com
+ (2603:10b6:a03:33a::11) To SA0PR01MB6171.prod.exchangelabs.com
  (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,178 +92,186 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|SJ0PR01MB6509:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc15ac5e-1f21-4c8d-5ef9-08dc9aea8bad
+X-MS-Office365-Filtering-Correlation-Id: 3a01eff5-13e9-4025-76f5-08dc9aea8d98
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|366016|1800799024|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?es7TEIFp9XGo6naC9YgcM/+80yaErNrdEMpONFYEd4obBHG4VaQ7W7C0hrt6?=
- =?us-ascii?Q?5XVCrVy99FJld1mpPuTfYwB2MQ46H1cR19E1/MyOttyeT4D/RiHae7lDccLJ?=
- =?us-ascii?Q?mr4/CyJcDdgCnbwG3IhkR46UdEizOwtDFaERa6lWJrPU1a2nLLCvIFVBk2AO?=
- =?us-ascii?Q?9HRqa+FauKvdHBCjvCZyaTRTEEXJux/AKQaoRY4Sb0fIXYpuDjl4VZAH3C8q?=
- =?us-ascii?Q?9icQPiXxSErNgcnkUnve3kkE/Fs+WS21LI5UkOsIdO1oWXrNrtkQ5kTVQCrT?=
- =?us-ascii?Q?F9ydpK1FA9EtPUIytQzhUwbnBH5Y2FW9MIpa76W/ig3JOWOvNqtHvdAiZWjG?=
- =?us-ascii?Q?zq+ljr5r62Seahs6V7qc4q0QTIjWbVtAJqonr2JWzWe7ptWFTQSozsSbbyOM?=
- =?us-ascii?Q?xZ5Sw/Qp6kBmWfP7R/wbveqqIo4PxdhnX/mVr4S+YuLp1Kmglwf6Rt4LuaVb?=
- =?us-ascii?Q?M5ZrDNnePbzzafGroQO+LnTrN4KGR1N3bwugBt3GLrat2Qm0C3G+IHWqi20H?=
- =?us-ascii?Q?QOm9/nCODBuWsEU2508nmmA7FYwstPNOSoVm6l8jpEBwL+jpcgdKDfwsljJX?=
- =?us-ascii?Q?HPXD2zmttcdfhPh5kWktfbbJkCBpyCThxDQxSpE6X1aeBm3oUYCh4oX4uyas?=
- =?us-ascii?Q?TGB/ANpvLUMmimzhfUOIXccacBc5DkPvKV566yoJpdWTmN2NZQG6PwWSkmnr?=
- =?us-ascii?Q?FoL3srMRcgWXEMdtL9Q4uRCRQtTu69C2CBPGz9cxa47/RyWPoW3DX2vF2hp2?=
- =?us-ascii?Q?/mKMH+3o1ii/V/3ncWCG7KPM2TYNCSvvGfw1h4KMndUHu0pwx0Ih78I+4cKz?=
- =?us-ascii?Q?XrBjbxeGR3pgnzaLiTE5qpcUflRRIprpjVjbhVGQxLebZi0fSSS3v7YIYwOb?=
- =?us-ascii?Q?HLYZcwAu/TttGhC+tiTyPnYZ/M+oa1tUaQ1PR7w1dWZ7iZrHyDijy9RXMXAp?=
- =?us-ascii?Q?k8lRCHFVdg6EtF+Ab40AYwe36qpHy/EpR4GOi9hw3aqPgni8RAslR850sjI+?=
- =?us-ascii?Q?E8ZLnv5+qokjSBQ0yeWt9rADSViFL8+ISTup1lALeC18e2A5/3bX3HICJgGJ?=
- =?us-ascii?Q?1IPqOA9Utn8kV4U5tigPmojXTvINSif9u8Q+nwLS5Lvlte1zR2uHNc/enk8Y?=
- =?us-ascii?Q?oRwaNw2+Rr4Tc/Q6MZHR9bveyR9R6/DIMPMKZ8elwczKIUpkxeTUyYT3SccL?=
- =?us-ascii?Q?E9hdvTu1XYo91zGluLXO7C0hUMoL3iDgtwRrsy/c+Qn+LaGC+aNwh5mUHXuj?=
- =?us-ascii?Q?sYVhK24cBdfAwBGa0Kuw5Iv3raV+WuN4c9AjF0dowudx1rujfWa8C6rovtNe?=
- =?us-ascii?Q?/D8=3D?=
+	=?us-ascii?Q?yYcGoyRUEXnrvRRJPY7gQUEXqB0PNhs+Kimy0riwhzCoTGoYoZosIeBan+oh?=
+ =?us-ascii?Q?Qcp8oFuuIoQHWtkpED+4qO5Nq9i9ip/d4zRa25Jr7vyNpy2GvaGIqNYrEZBL?=
+ =?us-ascii?Q?4v583lY9kcQUM4QdAFWCg5nQeoGUgpXd+RAvR/FG1AomRo6HrsJew5UAeZXV?=
+ =?us-ascii?Q?ZQIKijr/70cX9beci0KZM3XgoBCnqBRE+IFrHvvMBv+r0VLq9Zy1OAKjn7Vx?=
+ =?us-ascii?Q?u1/oY6j2IQLlEDfyaJagOcMIy7qsFq9w+bYEZKFvDMVmpp3r0rtnwiW3BeS+?=
+ =?us-ascii?Q?TZsp8eVczmOG6+4KvSV1hapYU37pRg731X5StPTQGI1zX5aSFyw72K//KYkB?=
+ =?us-ascii?Q?lnzPocbYRpB/1rkG0+9hJSp5DKAKpbekWLB/sF3AllHigNj2nL+p5LUiQYfB?=
+ =?us-ascii?Q?7SuudTo5jhM3DPz+1CV2T0K7Cjrsi+/rLx4VElJU+zoNe5ouFykkoVS74xGm?=
+ =?us-ascii?Q?nxwyrD3NDt4I4KuBA7paHtszkZJGBcu81BRmwrlNRUSjpb6FtrFGTzK3tzyu?=
+ =?us-ascii?Q?mpDHWOvC6USZCc1dBIeeaqRHPozj9jyIL1zsSmGJeIabSaw5LcJThlKJ/Uav?=
+ =?us-ascii?Q?2V5px/Nu2+jzEU1RUrLGTSBj0xCUQt92gb8IXd/RdzjJ8ZavLMwif6VWAvd3?=
+ =?us-ascii?Q?W9wmhxvnX7P9AZsOpdHLvQaY5adW3u2mZOvj0DR2fGb3DcBMzviMo+W81q8d?=
+ =?us-ascii?Q?7VtBRZr8M6NHgaSCxAnpyl2qf/xmGcwr6bdKFkwzuhzW0WUhLwh1KtqAz/ZD?=
+ =?us-ascii?Q?8bO0MWKyiGGDqg4bl8lZC0nsODaSO7VFJK28nfdzaI8QlDUCJHFnRKjpjA0X?=
+ =?us-ascii?Q?ZfYzELFuXoPuDJ+E+nmckgoCUZUGtj3lzo3MDnwndXz2LtocbMFpiiEGNPYt?=
+ =?us-ascii?Q?bT41cOlSOQGdv8c+uTSs/SSsK5uCH3g+6A1Uu9zv+Nz2PGbKyNgpMg9UQBAG?=
+ =?us-ascii?Q?woLyMeSCRoLqj2EM5udXfel0e5wOgclER1oAslPnaNrkvYWO6x+ZV6s/WHJs?=
+ =?us-ascii?Q?GapVJQ9rqZQMfqQsBfI1YR8I/FK2ZZxfYXMzmvsGPI7LHu0rkzAGCD91Cs1n?=
+ =?us-ascii?Q?anABoudUhjBXI7nxIEx/DmN5hkZP0xEc4LRJ0rU9hatGG6flAo6jNL3PHHpI?=
+ =?us-ascii?Q?rs/up32QryC/20vfoW8ek9ZZZeM+ppPvOd/SVilUDnD8yQ2vCL1EqBqp2OK7?=
+ =?us-ascii?Q?ULzg4fRbEdj9wh9xLBo1C4CkeZXDwnhu6Nlgcrz9SCuYGxCtaAxieIk5zI3N?=
+ =?us-ascii?Q?yqArK7T3g+2LDmc+g2oQ87foktbVkyLDaom4fn6qUsF8Wc3oy6Wf4tUHNPiD?=
+ =?us-ascii?Q?X2TZHF4T0bskHsw8XitstgD8NS4ZiDaCkcNW0NdyidjwGw=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZygXTdaMV9CuCnNWjmE2ZkXBRml3Ixa3MFXYc9maqMpzIQwFqrv0SewmpoF1?=
- =?us-ascii?Q?SiYM0jz6nxOWoeKch58I/mCnAsIbVz5EiV9+3sLdSnHpaY0UEW71ZUWJhBF4?=
- =?us-ascii?Q?t3RE/+bII3016IpmXH/OBgwZn79G/dN2DVIJZoO7P6w4ukrsiCLdqO9SvQ72?=
- =?us-ascii?Q?IJgtC78nVYe2ir8zLkVM2jJ7rSWgODyriSMlp6OeuiDaIrjO79n9wk5I0MCO?=
- =?us-ascii?Q?GPVCdZ6ROU5QHaMxE1/4fyT9aJWWtvGLyF74Jd+GhhRo9SHDZcXxxKAv5AvQ?=
- =?us-ascii?Q?ZP66qUl0XXQNw+7cVc7Zz4ewX/GuqgTuv7pNQ3xbVZqK9zhY0nxTvW3J+/Nz?=
- =?us-ascii?Q?0ly0YDDxHTK91x70b3mTzwd6MV+NMpZv7bZ1CVzoiHE49mICB6ctcNsQL/Yo?=
- =?us-ascii?Q?uE9Q5qyF3j57zo8oc7eAOud5aAW/BywbXplDbAilTTalB0NRg8bbLagDPdPt?=
- =?us-ascii?Q?q6yxS7fQsqMbckMSGfAdGOl7B3ePETmCccsX3DAgcUYBmeM9BqH2RHdxsI6F?=
- =?us-ascii?Q?6ilFbc6JOiPBAiXbyOAnpk+ez5f8ygKw1ZkfGE0jSiRvfpody+1UOCeGqdmw?=
- =?us-ascii?Q?yE4PUPxz1HtVtMJ+ZHhrtNWBd5h2CR3TkludTnWdiCTFmYKyjUFPlgenmqYP?=
- =?us-ascii?Q?aCSpsj0QYAbN+7FDgR+H7EZjz8Lcoz3j5AZ44mCKujo2MMlcI143QAQYLoWr?=
- =?us-ascii?Q?m2RRp0MXWPNVijShEh6vfBN3ewqonAWNS725Ch5wYkLr2insdbiJi3/d2SXp?=
- =?us-ascii?Q?+3IZYFoICwzWRAb+2MsOi3aGkmqruc2Cv0ILegqwuAX/lvn8cMEZmcw+yQ0B?=
- =?us-ascii?Q?KC/nuHSQynyVm5gu1Q30lMNVRl7OiMxulRUUZZrLh6JM0HiNepRYCAfXmayC?=
- =?us-ascii?Q?MJlgBRsuzZxRTIVuDLdW5P5BFlXVRI6YQNzuXnTnXtWkOWUULY0ybSihmy31?=
- =?us-ascii?Q?dqAisIMDLeVbvTaCBburag5Mn12ZaeXvYhKqLY7YjvmMa0aOWBh2+B2fWhi4?=
- =?us-ascii?Q?DqZp0p9aYAhh07WL51C93U7SaDRC8ffziJDT1fpO+HBL+9e/1yjHywwm8DfQ?=
- =?us-ascii?Q?uuK1CcUb07JzIhG2dn7seFeMgmFkuIWX7VQSk/6kPtX9HLSYBOBkOe/hUZ9U?=
- =?us-ascii?Q?MbwotzdzSDUKBJIY5DVAM6U+ypbOOAShzFciPFpdbPU7ngUU/Ni2UDsc095F?=
- =?us-ascii?Q?bDSkfOiIf6l2lLxPK31LxCMfnzSZQc88p7QXVSA0vdG/mH3G4qAEPa6y20HZ?=
- =?us-ascii?Q?DcDOWodw2DZJOz2PkeZof0e36kO00GcHOJVbzfWF7A7NWNhWwbax8PfCiBTB?=
- =?us-ascii?Q?jKdJFieYyTS36yZwT3COw/jSqqOzh1EEweFPporeKqodxM4L6zfsdyJB6Zlk?=
- =?us-ascii?Q?ngbm5mQMAZOkW9J4aRJBZo6hAewRxOEPeV8ZZbh777dc/XsffszrDaJxcO22?=
- =?us-ascii?Q?s7WGiN2elcrR4JTRwcbtTcGjvX+06vM0/JtM9V9TUp08zwohN++Ux7bM58j3?=
- =?us-ascii?Q?Z3m38Dc7jpQAecStAiLt826JBtgc6x+dOVV/YAGJZXhu3KP+hBxcweDg5KIq?=
- =?us-ascii?Q?VgxR5tOhSXwHLFNTQUQQLuek7bM6xae7xgtp4QJzuO5ATAAC/GZkWYQTkTqB?=
- =?us-ascii?Q?EuUuqb9yIenlXT1xih/K96pcuk3sgvnPWAh5dw843Dd5aL/yxjhBvy8/lSHz?=
- =?us-ascii?Q?YGfJtCkEVt/Ml9aXrwgDfu/VWdw=3D?=
+	=?us-ascii?Q?GrQ3rFEo/Bv3p5Ss5aB+D/U2ZaGQjZa4yyWIvQh2X5YyERyQvAGDv/Wgrxpt?=
+ =?us-ascii?Q?dGZ0rGestoTjg4RCpe0ohvkUq9SeB3TYJuZJdRzdk5D4whibsMPceuo0tYLq?=
+ =?us-ascii?Q?UHt7XOfpdE5q2UX8+HUoOjWi4e+8kU1vO+HXa/OcpDPYfN9Sjii4IQTl4ryl?=
+ =?us-ascii?Q?kDoxA+EhfplsN/8Brmwd/cSOPG4PFia1BEe2CiG45GyuVnxtYKmvGpNwFRZS?=
+ =?us-ascii?Q?C+IegRuSFm8ob8+D+lFKJ1LPg1DIv+s+58fG16LsTUmnqx0cDRz3zyjczdnY?=
+ =?us-ascii?Q?E1sza5CERhFSkKZ0Zwfun2BGi7iLlu/D+BIfhKJ6+NHQRdzHH0n7UqVIDGy0?=
+ =?us-ascii?Q?A16/LrZ2BqXy0vCSUzblluQMNAPUg/gTAm9Lc87llkislgSvzNK1eNsvDy1V?=
+ =?us-ascii?Q?zC+uBF4rbWXg76M9oHbXVpsHVg7noa90iSBmky9omLy7Qm8bPVQoznu7EHxQ?=
+ =?us-ascii?Q?FERqsyq0XCG84/p9JICcvgKfGUKy7p3gAyqRrtFJ6KPdvZ1tnrcAtD3jsS/u?=
+ =?us-ascii?Q?BVLsJl41XJ8dfaUANKIyrFPlCOV5Gp/3KTg+7UDcBKa0arOJug/DkEJcbosB?=
+ =?us-ascii?Q?yYPDyCUQk5WDnbW9iEiynUOb/wcgVQhmCETjvVhuMlRURNDakceohZGmSU0g?=
+ =?us-ascii?Q?KpQYWCtuDTWE0ZG12Ky4tpO3Pg6XgEv+bBaVYbSxxJBxUnVtrFM6CDGkxped?=
+ =?us-ascii?Q?d1ISQTSPVrseHhs/PbVnUWk/KwvhElJBqgl3HNgwzMOI9OqD3kNOkZH6U3A9?=
+ =?us-ascii?Q?+cCMVGIKuF8Asfk1vMlWlpczFEb5nzbng6jObNRZHcMmKvj5fGoxU7OY+lET?=
+ =?us-ascii?Q?5QYiiuH/cXvmGN+/VZlAlhsauvX1EAcfTmix/etG+n7Vncn5x2xcfGqls5Q0?=
+ =?us-ascii?Q?u3YsPLmaYkc+GSAS9odZ4D24n7gCndurP/rmQW/UcS6+Ejkb2vKlJ1mD58rG?=
+ =?us-ascii?Q?28kyDGSV7vjsiMuVmJlJeMG/Esj5HSIHLynogewWT24Pv01Bp43TwwnUaOs0?=
+ =?us-ascii?Q?FrKBM9qJ8hyJb2diXflTT0oLWWsXJamHBETxjKlp7diaVYXWzhDMtolcTkuH?=
+ =?us-ascii?Q?TERx8QLOSf2EFJh5AjA+sq8C5Z6nJ3rVFWkR0c8Pgj5xDpQQCoP97snJwXCe?=
+ =?us-ascii?Q?odAeviLsVwVPaNPXsed3tGQVtclrRLZ4u0bS7LZayq+/3V1C4WVHgFLQ5iD9?=
+ =?us-ascii?Q?T7ZTctzYFubl4RtO9mXt8pZiz3+505pUCI9VyTYCD4wsDdzZejx5MXrVTUG5?=
+ =?us-ascii?Q?FPbroshYictjdjgLeQmNsWab6dGDJxmdNY3MUpJal/a+CBAGPnjjzykbj2CX?=
+ =?us-ascii?Q?K4VXBM4+pM7Mr3Irv8GGDD4+eIAzQUqPMCyzQSTUJQj73sc7aIduUUvPgjLW?=
+ =?us-ascii?Q?U5mp6lf59IujxgeuhxPi9c4DS6cBUqAcGSlczI969F0Td5AFZuOTuTDU/8V5?=
+ =?us-ascii?Q?DHbVN8IKgQlYZUVnojmsG/JgRd5ZBf2V3N3VctpLafrvS25OPoJl+7+d9UOL?=
+ =?us-ascii?Q?HfKRTzlgqVTQJ7LwaEygPIRS8twONnDjlpyQY4GCKej2Bf5ICDTlqcbLscRa?=
+ =?us-ascii?Q?MmLHq2Y3ISwtiuuo56dClVkB/rEkIDyvZNuqrYz6EK1ANUuAQ8L5AZSNgK89?=
+ =?us-ascii?Q?YNP9zyTh2JkQL94mDFYpfN5SYePJWxjli6MQQFdQvJj5P7Rm89rhXyJGePuX?=
+ =?us-ascii?Q?Au+BjInrBrf62X9Mc9V/k4HU8ao=3D?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc15ac5e-1f21-4c8d-5ef9-08dc9aea8bad
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a01eff5-13e9-4025-76f5-08dc9aea8d98
 X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2024 22:58:53.8098
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2024 22:58:57.0032
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nT/zTabykhPtmT5X6cWa02fxkD55mpqh9iwrLclZ8SjpttIPbnMnfTshtGC0Gv6GqmzPVi3q4HQVNzkiyeQtvFL+aKTRWc+8OPU9EuzCIAOUF9nQWNjTSWtHKy1X7YID
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3V8chWT8vm+vnsSDA0YM0+5ddZ7+0ZGGN5AHvlTZVlW/7jKYajkWauASXY4YiBNE9i9YFnlSMJwMZ2hJOS0gc5Mjupl/5NFy0F91aiCnyi5ys+KEhZdsKet2WezfW/Rl
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6509
 
 From: Adam Young <admiyo@os.amperecomputing.com>
 
-This series adds support for the Management Control Transport Protocol (MCTP)
-over the Platform Communication Channel (PCC) mechanism.
+Type 4 PCC channels have an option to send back a response
+to the platform when they are done processing the request.
+The flag to indicate whether or not to respond is inside
+the message body, and thus is not available to the pcc
+mailbox.
 
-MCTP defines a communication model intended to
-facilitate communication between Management controllers
-and other management controllers, and between Management
-controllers and management devices
+In order to read the flag, this patch maps the shared
+buffer to virtual memory.
 
-PCC is a mechanism for communication between components within
-the  Platform.  It is a composed of shared memory regions,
-interrupt registers, and status registers.
+Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
+---
+ drivers/mailbox/pcc.c | 31 +++++++++++++++++++++++--------
+ include/acpi/pcc.h    |  8 ++++++++
+ 2 files changed, 31 insertions(+), 8 deletions(-)
 
-The MCTP over PCC driver makes use of two PCC channels. For
-sending messages, it uses a Type 3 channel, and for receiving
-messages it uses the paired Type 4 channel.  The device
-and corresponding channels are specified via ACPI.
-
-The first patch in the series implements a mechanism to allow the driver
-to indicate whether an ACK should be sent back to the caller
-after processing the interrupt.  This is an optional feature in
-the PCC code, but has been made explicitly required in another driver.
-The implementation here maintains the backwards compatibility of that
-driver.
-
-The second patch in the series is the required change from ACPICA
-code that will be imported into the Linux kernel when synchronized
-with the ACPICA repository. It ahs already merged there and will
-be merged in as is.  It is included here so that the patch series
-can run and be tested prior to that merge.
-
-Previous Version:
-https://lore.kernel.org/20240619200552.119080-1-admiyo@os.amperecomputing.com/
-
-Changes in V4
-- Read flags out of shared buffer to trigger ACK for Type 4 RX
-- Remove list of netdevs and cleanup from devices only
-- tag PCCT protocol headers as little endian
-- Remove unused constants
-
-Changes in V3
-- removed unused header
-- removed spurious space
-- removed spurious semis after functiomns
-- removed null assignment for init
-- remove redundant set of device on skb
-- tabify constant declarations
-- added  rtnl_link_stats64 function
-- set MTU to minimum to start
-- clean up logic on driver removal
-- remove cast on void * assignment
-- call cleanup function directly
-- check received length before allocating skb
-- introduce symbolic constatn for ACK FLAG MASK
-- symbolic constant for PCC header flag.
-- Add namespace ID to PCC magic
-- replaced readls with copy from io of PCC header
-- replaced custom modules init and cleanup with ACPI version
-
-Changes in V2
-
-- All Variable Declarations are in reverse Xmass Tree Format
-- All Checkpatch Warnings Are Fixed
-- Removed Dead code
-- Added packet tx/rx stats
-- Removed network physical address.  This is still in
-  disucssion in the spec, and will be added once there
-  is consensus. The protocol can be used with out it.
-  This also lead to the removal of the Big Endian
-  conversions.
-- Avoided using non volatile pointers in copy to and from io space
-- Reorderd the patches to put the ACK check for the PCC Mailbox
-  as a pre-requisite.  The corresponding change for the MCTP
-  driver has been inlined in the main patch.
-- Replaced magic numbers with constants, fixed typos, and other
-  minor changes from code review.
-
-Code Review Change not made
-
-- Did not change the module init unload function to use the
-  ACPI equivalent as they do not remove all devices prior
-  to unload, leading to dangling references and seg faults.
-
-Adam Young (3):
-  mctp pcc: Check before sending MCTP PCC response ACK
-  mctp pcc: Allow PCC Data Type in MCTP resource.
-  mctp pcc: Implement MCTP over PCC Transport
-
- drivers/acpi/acpica/rsaddr.c |   2 +-
- drivers/mailbox/pcc.c        |  31 +++-
- drivers/net/mctp/Kconfig     |  13 ++
- drivers/net/mctp/Makefile    |   1 +
- drivers/net/mctp/mctp-pcc.c  | 322 +++++++++++++++++++++++++++++++++++
- include/acpi/pcc.h           |   8 +
- 6 files changed, 368 insertions(+), 9 deletions(-)
- create mode 100644 drivers/net/mctp/mctp-pcc.c
-
+diff --git a/drivers/mailbox/pcc.c b/drivers/mailbox/pcc.c
+index 94885e411085..cad6b5bc4b04 100644
+--- a/drivers/mailbox/pcc.c
++++ b/drivers/mailbox/pcc.c
+@@ -107,6 +107,7 @@ struct pcc_chan_info {
+ 	struct pcc_chan_reg cmd_complete;
+ 	struct pcc_chan_reg cmd_update;
+ 	struct pcc_chan_reg error;
++	void __iomem *shmem_base_addr;
+ 	int plat_irq;
+ 	u8 type;
+ 	unsigned int plat_irq_flags;
+@@ -269,6 +270,24 @@ static bool pcc_mbox_cmd_complete_check(struct pcc_chan_info *pchan)
+ 	return !!val;
+ }
+ 
++static void check_and_ack(struct pcc_chan_info *pchan, struct mbox_chan *chan)
++{
++	struct pcc_extended_type_hdr pcc_hdr;
++
++	if (pchan->type != ACPI_PCCT_TYPE_EXT_PCC_SLAVE_SUBSPACE)
++		return;
++	memcpy_fromio(&pcc_hdr, pchan->shmem_base_addr,
++		      sizeof(struct pcc_extended_type_hdr));
++	/*
++	 * The PCC slave subspace channel needs to set the command complete bit
++	 * and ring doorbell after processing message.
++	 *
++	 * The PCC master subspace channel clears chan_in_use to free channel.
++	 */
++	if (!!le32_to_cpup(&pcc_hdr.flags) & PCC_ACK_FLAG_MASK)
++		pcc_send_data(chan, NULL);
++}
++
+ /**
+  * pcc_mbox_irq - PCC mailbox interrupt handler
+  * @irq:	interrupt number
+@@ -306,14 +325,7 @@ static irqreturn_t pcc_mbox_irq(int irq, void *p)
+ 
+ 	mbox_chan_received_data(chan, NULL);
+ 
+-	/*
+-	 * The PCC slave subspace channel needs to set the command complete bit
+-	 * and ring doorbell after processing message.
+-	 *
+-	 * The PCC master subspace channel clears chan_in_use to free channel.
+-	 */
+-	if (pchan->type == ACPI_PCCT_TYPE_EXT_PCC_SLAVE_SUBSPACE)
+-		pcc_send_data(chan, NULL);
++	check_and_ack(pchan, chan);
+ 	pchan->chan_in_use = false;
+ 
+ 	return IRQ_HANDLED;
+@@ -352,6 +364,9 @@ pcc_mbox_request_channel(struct mbox_client *cl, int subspace_id)
+ 	if (rc)
+ 		return ERR_PTR(rc);
+ 
++	pchan->shmem_base_addr = devm_ioremap(chan->mbox->dev,
++					      pchan->chan.shmem_base_addr,
++					      pchan->chan.shmem_size);
+ 	return &pchan->chan;
+ }
+ EXPORT_SYMBOL_GPL(pcc_mbox_request_channel);
+diff --git a/include/acpi/pcc.h b/include/acpi/pcc.h
+index 9b373d172a77..6cb21f29d343 100644
+--- a/include/acpi/pcc.h
++++ b/include/acpi/pcc.h
+@@ -18,6 +18,13 @@ struct pcc_mbox_chan {
+ 	u16 min_turnaround_time;
+ };
+ 
++struct pcc_extended_type_hdr {
++	__le32 signature;
++	__le32 flags;
++	__le32 length;
++	char command[4];
++};
++
+ /* Generic Communications Channel Shared Memory Region */
+ #define PCC_SIGNATURE			0x50434300
+ /* Generic Communications Channel Command Field */
+@@ -31,6 +38,7 @@ struct pcc_mbox_chan {
+ #define PCC_CMD_COMPLETION_NOTIFY	BIT(0)
+ 
+ #define MAX_PCC_SUBSPACES	256
++#define PCC_ACK_FLAG_MASK       0x1
+ 
+ #ifdef CONFIG_PCC
+ extern struct pcc_mbox_chan *
 -- 
 2.34.1
 
