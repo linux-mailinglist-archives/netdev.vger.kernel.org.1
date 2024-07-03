@@ -1,155 +1,124 @@
-Return-Path: <netdev+bounces-108858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FFE59260FD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:58:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A276292617D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35AB6B21379
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:58:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BFEE28E96C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC1917334F;
-	Wed,  3 Jul 2024 12:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164FA178CF1;
+	Wed,  3 Jul 2024 13:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CXMISsik"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LBtVEfda"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9001E4A9
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 12:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAE0178CEE;
+	Wed,  3 Jul 2024 13:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720011492; cv=none; b=uNGQrf7WUySsgVJvfZPRpaGDbMC2YXX1xM3VtkbJLqNLz02wMMuG4IZ/pBGcQAJywfVNkgObQtPOHowfJNUbRaIiqpL8htQBTMgGvaYs5tRHwls775PlRtQ02b8sUCnD2z/caxy3RwVm1XPCNZbkSUFX/adBwZBQVcZnBa6GZkE=
+	t=1720012345; cv=none; b=kneq7HTJV3Lb/irjuZ1y+j5J59vsUEFkPs9dhsXnAdlxqqHBCpsXy9jTfQiwxqI28yRZGxojcXYBczrsJ1jtKtLrWxcjmYEshALJTqMWuqNXcr3MyR3ratASsW/O4HN5B4hW8VTAfDbSnE8YDx+cfzfUomKAS9gekutXpyXZlSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720011492; c=relaxed/simple;
-	bh=AY5W4wRU7EgGuEN7NQ19JHhpswBkigcgo+Tsk+a9yFY=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=DZNi5zZIUPfaHxb4u13p7vW2YXmk+gmBoEsI9LktF7gKr23p4GiurnbnNH/ZKG01H0385Ff382CpOobqFsNvCUBel2eJWLl4Hv4tvcLahmTmsNkcqG+DIFQiCxx3HE7jGl1+ImvzjdCw/JF2GDNmp1Xu388WfjCBMUH1jML1yV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXMISsik; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2c87a7df96eso856567a91.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 05:58:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720011490; x=1720616290; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fXVFIiIUYfoxHdro42xuevo9niN2lvAoiBpgZ+TRXR0=;
-        b=CXMISsik3/pqA2Fu7f3GcxN+d7o0281e959IPt/sEqGPuEitU+fPaWXirdv8cUMpE4
-         W3No24DkJQd2RP6dFIRHMJlXZea0dZJReeCUsYk+u3ZctaYwT5ZyieDFhgc9zHwZmIGF
-         ib56ZR8LJUox2luBCFqFLjG5laZYSOcObuqiTTzIiErfLI6qFl4cFUKzAOW0scjkwZrk
-         ifAPVYheaS5H57jmjzv9gjL54ZnrblCA6ad5GwO+MzI0CaOMSjSdVGT3bAtINITD/Beo
-         uPcUxz61KkkEUCoMNPHw+65nrZXPSwRAp3QCJ1j+Y+AZWBUkfhb7Z6DqMGRgJIPeUgjh
-         p3Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720011490; x=1720616290;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fXVFIiIUYfoxHdro42xuevo9niN2lvAoiBpgZ+TRXR0=;
-        b=KMQwLQRWSfClmB1Adby3LN43zfsUdgecXz0v3L+ogkpIqX7wqQ07ViutEpl5hLXrJI
-         JlVHgOeQmhAwzQr4F40uMUh3mIh7RYwPwrt6rNVkIqeIQ29mcGoIXbIQrdQWt1x3md9C
-         DqOUREUIKJVSiAFe6vfRzljpw8GtItEEiASChvpGWRR8otv6B+hmrVDGR5xXeKoAdlBp
-         Gvu15eglDKI4gLoTDxRuI1oN1HAdpfpCA4I8bk0QxGY8C5Mdg6ykl9XJiw60iqIz4Ai2
-         YBrzLspcnsdHJd3AQH/qF7brK6z3vTOCb2+b35fJ2w7qnsImwHpu1q70BiHAOPaI1xr5
-         +apw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0JgSRjGgPcoOZQhoANlLCkRl4DpWbHXm5J2wgtqGD5GfE66aZSScLX/vM0h0h+mdQi3J/cK5032jlb2NU8xliKpjiBIWj
-X-Gm-Message-State: AOJu0Yz+GkBkRcW4thy21uiNJtKC8+ByC+/SOdKN0byB00U/olwbGNME
-	NVs0OdaxeRIcGQ4eO9/mnS+DIN1ST15RruZvkS43Q13gY93AuU1AFPl/a0WG
-X-Google-Smtp-Source: AGHT+IHS3qaCeUDqW4aAKfnWBxI/J39cLSGL3LWKc267YYQI2vGq/bCbnHM2EVv+M/2Q/LtToXQJ7w==
-X-Received: by 2002:a17:90b:68c:b0:2c9:36d3:8934 with SMTP id 98e67ed59e1d1-2c93d6deab4mr11789441a91.1.1720011490299;
-        Wed, 03 Jul 2024 05:58:10 -0700 (PDT)
-Received: from localhost (p5199240-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.11.99.240])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c91d3bc5a1sm10654460a91.36.2024.07.03.05.58.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 05:58:09 -0700 (PDT)
-Date: Wed, 03 Jul 2024 21:57:28 +0900 (JST)
-Message-Id: <20240703.215728.957684876602887757.fujita.tomonori@gmail.com>
-To: linux@armlinux.org.uk
-Cc: andrew@lunn.ch, fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
-Subject: Re: [PATCH net-next] net: tn40xx: add initial ethtool_ops support
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Zn7afU9DiotL92jZ@shell.armlinux.org.uk>
-References: <20240628134116.120209-1-fujita.tomonori@gmail.com>
-	<fe33e69d-a17b-4afd-a5e5-1e1539e6572c@lunn.ch>
-	<Zn7afU9DiotL92jZ@shell.armlinux.org.uk>
+	s=arc-20240116; t=1720012345; c=relaxed/simple;
+	bh=TgQuOL8SI7Nc9fdOtjuyx541WCdNgM8oiZbIvEF6n1Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ekh4ZRp0udvrXs5Mb7kgz8CH8NgVRnTyxXmVp1sfMOwUda7Smb3wKYQuWB98XkeUV0EiM5xlHPitw8FMbvKDY5oHWQ267yH58FqZqqrAqmvRZS19ziQNItlVg/H8ShWE3ZhEWmczUDI7nbYx2xjPz//37nFgw0RkJBVyLwNmwO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LBtVEfda; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720012343; x=1751548343;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TgQuOL8SI7Nc9fdOtjuyx541WCdNgM8oiZbIvEF6n1Y=;
+  b=LBtVEfdalMAaC0N33deH7V21banARdyOaKjNEdfiamemQlhiR4ufei2B
+   NPaxGJ/Xi33VcOHDiWK1lgr2FZGvC6frp0yEq6Am2pLNylvOS8rcLC2wg
+   JkzjXeExIYTOrejzOyhwWh8N+rbTSum3I4ZPR/6Q29m5+Vdr1oVuSeq93
+   pCdiUsi52NPryFj5aYJ0556+2ArOTOJ1ntNoB7z4DtFkceqjqjx4mRiM9
+   k0AEXb6QrN78+BEHipnOPSNsXalM41UunPc/CoGYNWuKgtpRoaQ98JuwB
+   j5Nk521kiKUkJEWy6z+4UIDzk5K3wZYnk5U60yvbk9YZtt573EBph7NBQ
+   w==;
+X-CSE-ConnectionGUID: fyt6E6XjR/KwqmyGxvxOaw==
+X-CSE-MsgGUID: s+31pviuRPivgi0nr0wwOw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="27857006"
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="27857006"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 06:12:14 -0700
+X-CSE-ConnectionGUID: FCjh+Tf5TgCx7agfVAZgtA==
+X-CSE-MsgGUID: R3ZN7De1TiaiUMnBA+0gYQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="46321487"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa010.fm.intel.com with ESMTP; 03 Jul 2024 06:12:11 -0700
+Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id D45D828778;
+	Wed,  3 Jul 2024 14:12:09 +0100 (IST)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: apw@canonical.com,
+	joe@perches.com,
+	dwaipayanray1@gmail.com,
+	lukas.bulwahn@gmail.com,
+	akpm@linux-foundation.org,
+	willemb@google.com,
+	edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v1 0/6] Add support for devlink health events
+Date: Wed,  3 Jul 2024 08:59:16 -0400
+Message-Id: <20240703125922.5625-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, 28 Jun 2024 16:45:01 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Reports for two kinds of events are implemented, Malicious Driver
+Detection (MDD) and Tx hang.
 
->> > +static int tn40_ethtool_get_link_ksettings(struct net_device *ndev,
->> > +					   struct ethtool_link_ksettings *cmd)
->> > +{
->> > +	struct tn40_priv *priv = netdev_priv(ndev);
->> > +
->> > +	return phylink_ethtool_ksettings_get(priv->phylink, cmd);
->> > +}
->> 
->> Have you tried implementing tn40_ethtool_set_link_ksettings() in the
->> same way?
-> 
-> I did think about commenting on that, and the [sg]et_pauseparam
-> methods as well, but when one realises that the driver only supports
-> one speed and duplex (10G FD) but no pause it didn't seem to make
-> sense.
+Patches 1, 2: minor core improvements (checkpatch.pl and devlink extension)
+Patches 3, 4, 5: ice devlink health infra + straightforward status reports
+Patch 6: extension to dump also skb on Tx hang, this patch have much of
+ copy-paste from:
+ - net/core/skbuff.c (function skb_dump() - modified to dump into buffer)
+ - lib/hexdump.c (function print_hex_dump() - adjusted)
 
-I have not been able to find register configuration to make
-1000Base-SX work with QT2025 PHY.
+Ben Shelton (1):
+  ice: Add MDD logging via devlink health
 
-> Not having pause effectively rules out pause-frame rate adaption
-> by the PHY, so the PHY probably only supports 10G link speeds,
-> and if I remember correctly, 10GBASE-T requires autoneg.
+Przemek Kitszel (5):
+  checkpatch: don't complain on _Generic() use
+  devlink: add devlink_fmsg_put() macro
+  ice: add Tx hang devlink health reporter
+  ice: print ethtool stats as part of Tx hang devlink health reporter
+  ice: devlink health: dump also skb on Tx hang
 
-I suppose that the HW supports pause because a register named
-regPAUSE_QUANT is set up during initialization. But the original
-driver doesn't support [sg]et_pauseparam or give the details.
+ drivers/net/ethernet/intel/ice/Makefile       |   1 +
+ .../intel/ice/devlink/devlink_health.c        | 485 ++++++++++++++++++
+ .../intel/ice/devlink/devlink_health.h        |  45 ++
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.h  |   2 +
+ .../ethernet/intel/ice/ice_ethtool_common.h   |  19 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |  17 +-
+ include/net/devlink.h                         |  11 +
+ scripts/checkpatch.pl                         |   2 +
+ 10 files changed, 586 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_health.c
+ create mode 100644 drivers/net/ethernet/intel/ice/devlink/devlink_health.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_ethtool_common.h
 
-> The autonegotiation specification was improved in the 1998 release of
-> IEEE 802.3. This was followed by the release of the IEEE 802.3ab Gigabit
-> Ethernet standard in 1999 which specified mandatory autonegotiation for
-> 1000BASE-T. Autonegotiation is also mandatory for 1000BASE-TX and
-> 10GBASE-T implementations.
-> 
-> which is loose language - "mandatory autonegotiation" does that refer
-> to support for auto-negotiation or require auto-negotiation to be
-> always enabled?
-> 
-> We're already seeing some PHYs from some manufacturers that seem to be
-> following the "require auto-negotiation to be always enabled".
-> 
-> So why have I gone down what seems to be an unrelated rabbit hole?
-> 
-> If tn40 is connected to a 10GBASE-T PHY, implementing the
-> set_link_ksettings() method would give the user control over whether AN
-> is used on the media side.
->
-> If 802.3 requires AN to be supported but is not necessarily enabled,
-> then there is use in exposing the set_link_ksettings() method.
-> 
-> If 802.3 requires AN to be supproted and always enabled, then
-> implementing set_link_ksettings() in this case would not provide any
-> value.
-
-I've read your comment on stmmac patch:
-
-https://lore.kernel.org/netdev/ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk/
-
-When implementing BASE-T PHY support for tn40 driver, I'll check the
-situation again.
-
-Thanks a lot!
+-- 
+2.38.1
 
