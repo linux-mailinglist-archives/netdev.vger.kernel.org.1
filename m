@@ -1,76 +1,75 @@
-Return-Path: <netdev+bounces-109048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B81C926AC0
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:47:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4931926AC2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:48:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45E971F23A5D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:47:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26A3CB27350
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206AE194C69;
-	Wed,  3 Jul 2024 21:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA6F194C9B;
+	Wed,  3 Jul 2024 21:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2i2oGC5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7MTOPAN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D98E194A60;
-	Wed,  3 Jul 2024 21:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F40194AFE;
+	Wed,  3 Jul 2024 21:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720043215; cv=none; b=Aams68ur//FJ31RlP7V1C47XfvHpfwZMZDK0xPJUn5CBbEqoEoFHsSEyqOn4JBl/8tTtWLOwKg4vtN0lZUe3utELhAiN9jGkBbANzNaIVgSdiobYbznAwXyphoJ5X8SF0fgVtXsNrC+PoF1sCbk8x349uMFx7saMbak4w1HPK60=
+	t=1720043216; cv=none; b=s6gOs5wUM9rdmZle/sE4C29Mt8AU+6zsG3COOXNjW/sfxgBKYaVoHeS2xDHl6FLPxQGlKRMOZFWni4sU1gDXtJECMUr9y4zBEiM2xyr4cJeoaPrq5mDUnwbkzeBxtOxfeal3I+7kiJgNwPkodVcuz8e0m9ZZ5X5+KSGeWoBoNNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720043215; c=relaxed/simple;
-	bh=6q2DdO7S16bdyZgq1GbnvgpchKg/KexCeYaw8kP7yyY=;
+	s=arc-20240116; t=1720043216; c=relaxed/simple;
+	bh=TqqYwd9d+YYTEaJ3Hb+RHNh30zSbeM80XHxfUHUS+A4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=S4ophOhEBM00aiOvVfVae30lP79aOmcDndesSwln3F6jQ0F+3KFsOC9Qw2B8x+SbQ42DC/nnGjY7RDDjgD4Cr3FiHBy2aG6XXw+bLTXHDAxckMBgVWJYdjlpkeKt7MT1R7OAffP9iQT17KG32XTpaI2mhTQZ3q2MzZV4Y/A4STE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2i2oGC5; arc=none smtp.client-ip=209.85.221.47
+	 In-Reply-To:To:Cc; b=J9e10+/6s0BCgI4XhBBAURw7DFmlZBY+4Kk0mky4WQsph2SSHr9LDxK1eyCG+9+9oePc1dbSnGutHDA0rRxLFkp53HFzJOntjxlItcbTlL9/T/a7xSslWduDSx0seMIZBeZO20/VzLK0Wn1ywlPfgKk2PtQpWRWEZgCyZaMDz7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7MTOPAN; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-367975543a8so4126f8f.3;
-        Wed, 03 Jul 2024 14:46:53 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4255fa23f7bso41732925e9.2;
+        Wed, 03 Jul 2024 14:46:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720043212; x=1720648012; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720043213; x=1720648013; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BRnEsbWpiC4auC0zP97cCNMZQHKbNM/aAU/PO3sRgTg=;
-        b=S2i2oGC5WAs0kGosEb+Py97cYjXpUuWiJAHynQwqiKJFvO4FXUINZ2y/NIGBkzooQQ
-         AwxzQL7tTDhqlopCogGqBSAe/lISejvHf/eIFLuq5ZOvB4Ge40SYlLF2tnQE1qIwKwRS
-         ENKrX7odPsSYuaN3c5sp4o2tqKwYQz0WWw7e1av2nhwUPK6cN5SdcRxD1frwMFniRCZG
-         StCSle8AhTopAa2rbL2u9B+ig3oHu86DD3EcItSxIOiW4E4pkteyi9HGNJkwc5t0MDHt
-         x7WstwIWKGV6X8SI2O8RUSNng2IpvIHWCfwhs6EQW0ZejlgPJgm6mENZ26nG9cdJTrgy
-         DKqw==
+        bh=ZX5QuOeiGPzs72hiIcfMb49M5DXX4kyzDZ2bV2KJnA8=;
+        b=X7MTOPANa0ew1Maek3pHuvKp2MPbf6jf/zT5VWclp8Qlttg+j1gfynYTZB/EEAh/k7
+         ABH2kQl9vPWyeROkP0FwsA/Tblgjj5mAL5ZdChEHfm8jKo6gdT03XxsnaDzsu+bnk5UV
+         5gQvwP1He3YKzqICpN2fRQIDSsks1pzq+9mp3uGon9K5oJdgz2tceeJvT/Xy3Ocz0rg/
+         nS2uknb5sPq36Xc5ZqXwzkuT8e/Xk97B23Hwe10Vio8XX6HPApFd++c7hXZScWe540NN
+         CNhMtyci7YyTjw19VDO9n2OTP6ioLcOEzvUa4rmVjYWSUThuq5EreZV6yo6s5wXHNspn
+         pgig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720043212; x=1720648012;
+        d=1e100.net; s=20230601; t=1720043213; x=1720648013;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BRnEsbWpiC4auC0zP97cCNMZQHKbNM/aAU/PO3sRgTg=;
-        b=elV7WadcMMOCwTxe4LqniYrj9E/bPw53mQcLRBs4VkcVDXpJm2IGFyEgZwTkHyWqL0
-         Ij+vABahyib3dsTDq3hqtUaL+Bh7F5LyEJpTXywGQygA1zXcgAW84WWK+Zq6nVF4ecQ4
-         l1qRJeXM2LRkoGXwfH9z6ZibIMACCKqk/UGvstdDCWq6tYc09d2uCSg6l0azGVhLsON7
-         tXvq4IE0LLF32UllETnrmifybYnw6xfazszFiVEsMNWQy2gZyWylgW65RYYbdNjAz8ld
-         t8SmotphnLUNyfcmBak7DWJ/T4Wvj+Phu0+UlDLs3w2mXteb4GcUJGVX2fu1B/FAaXTV
-         Iwkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWzWh7AptdWRMdW4c6kNJ/0GYVcdlH2/qylYtzX8tZSMwzOY4QSArLD1u5QDzoukMNMuTFoarGi/pGKruNw8exmpC55Bi4xCW91IsNk
-X-Gm-Message-State: AOJu0YxPxJTijZK2n4u265vVOZDGihXTb/fgKwaso6lCI1kUw/KKz/O9
-	HYsMYjH9tTdRflEKsdMh92Pg+eF1ItK2zCwI+4zS68LvFYulC1+c
-X-Google-Smtp-Source: AGHT+IEjIk9IP242fY3YMgi2r7mtGX/Qr9/68nkAe/52Tlw1KiNc9kjTMLnVnjbTEjfbPVXEXhIYmw==
-X-Received: by 2002:a05:6000:1543:b0:360:9c4f:1f8 with SMTP id ffacd0b85a97d-367756bb76cmr9705790f8f.34.1720043211744;
-        Wed, 03 Jul 2024 14:46:51 -0700 (PDT)
+        bh=ZX5QuOeiGPzs72hiIcfMb49M5DXX4kyzDZ2bV2KJnA8=;
+        b=eKu2glqB9LLEA6xR5HzcfDRE4ewTpL0FKOFeMfs6/i8seQgSX2GfvS9skf0os88x6O
+         bEQhpm8JakXdwQUEtj1lVgDKf3/3o/UEgefRWnmlhWjPXQz8h7L9EmtFxo6T7pRaT25o
+         N/0/XYF0F9581jx9ZQqSw8ztyJKIWDrlDWov1HP/gSzch8jsiUTUWVQ2nHkRIyK55VKj
+         NXuGtLme78REs9BRMjClm/bEXKFjK30Bkojen5EklRT1SQo1i85tyHJKQSE39syr3zIc
+         +tJxaFp519Knh1ZmcmRZqmM+GPjHOhNNypXGMa2sQJbQJXa1ewVn+cg1sUH5D7Lk5Qvi
+         M2qA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqRSuUfTBdTDBH3O2108rqB/usQkUpetaO7uY2+wmq0mfez0/lhyNqPwie8yDAcTZY5cvFGMDPTXD1MTr8KVStaSUsb4coWLzfMkv7
+X-Gm-Message-State: AOJu0YwlbIYkOCPyjCNibHd2V+9t5A2byiZAfZ47XQUJNTs1WBagSUT5
+	IshfMlXENG7T9+zaxdrixWgAK9vB3wcf501NM5YvKOPJoq8jTPsX
+X-Google-Smtp-Source: AGHT+IFadoRKQNgnDNdrUcb/+eEl1uaAY0jFIVzWf1WzxiDNboC1scUUsRnJotR2TAM2bxb79HCYPg==
+X-Received: by 2002:a05:600c:35c3:b0:425:65c5:79b4 with SMTP id 5b1f17b1804b1-4257a02b6c5mr90382265e9.26.1720043213180;
+        Wed, 03 Jul 2024 14:46:53 -0700 (PDT)
 Received: from [127.0.1.1] (84-115-213-37.cable.dynamic.surfer.at. [84.115.213.37])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3678fbe89cdsm3628068f8f.61.2024.07.03.14.46.50
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3678fbe89cdsm3628068f8f.61.2024.07.03.14.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 14:46:51 -0700 (PDT)
+        Wed, 03 Jul 2024 14:46:52 -0700 (PDT)
 From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Date: Wed, 03 Jul 2024 23:46:35 +0200
-Subject: [PATCH 3/4] net: encx24j600: constify struct
- regmap_bus/regmap_config
+Date: Wed, 03 Jul 2024 23:46:36 +0200
+Subject: [PATCH 4/4] net: dsa: ar9331: constify struct regmap_bus
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,7 +78,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240703-net-const-regmap-v1-3-ff4aeceda02c@gmail.com>
+Message-Id: <20240703-net-const-regmap-v1-4-ff4aeceda02c@gmail.com>
 References: <20240703-net-const-regmap-v1-0-ff4aeceda02c@gmail.com>
 In-Reply-To: <20240703-net-const-regmap-v1-0-ff4aeceda02c@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
@@ -91,51 +90,35 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, 
  Javier Carrasco <javier.carrasco.cruz@gmail.com>
 X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1720043205; l=1431;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1720043205; l=827;
  i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
- bh=6q2DdO7S16bdyZgq1GbnvgpchKg/KexCeYaw8kP7yyY=;
- b=Oo469PHgcSkwQZn4uzhnc6b2A1jagh2BGeWP7cVvHDBXEGIgsoGBR4eCQyieNkCkj+UdYxFMe
- 3SFVNVE/AOsCZ3612i1TEytAQo96wcUljFNbpvc053/w8KlKFz5QQDQ
+ bh=TqqYwd9d+YYTEaJ3Hb+RHNh30zSbeM80XHxfUHUS+A4=;
+ b=sCCEmiWZsxe93jwseOtmSsLMWJQ42g2tAdOmtEVuX060VWAnURTf9DAk9BB1IiSFEXjBLmx7w
+ C1xYlaTuhjOCoCdA9u49QNzn5eU0HkbaP2AODrPcWGjnUPedJHO2iwI
 X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
  pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
 
-`regmap_encx24j600`, `phycfg` and `phymap_encx24j600` are not modified
-and can be declared as const to move their data to a read-only section.
+`ar9331_sw_bus` is not modified and can be declared as const to
+move its data to a read-only section.
 
 Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
 ---
- drivers/net/ethernet/microchip/encx24j600-regmap.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/dsa/qca/ar9331.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/microchip/encx24j600-regmap.c b/drivers/net/ethernet/microchip/encx24j600-regmap.c
-index 3885d6fbace1..26b00e66d912 100644
---- a/drivers/net/ethernet/microchip/encx24j600-regmap.c
-+++ b/drivers/net/ethernet/microchip/encx24j600-regmap.c
-@@ -474,13 +474,13 @@ static struct regmap_config regcfg = {
- 	.unlock = regmap_unlock_mutex,
+diff --git a/drivers/net/dsa/qca/ar9331.c b/drivers/net/dsa/qca/ar9331.c
+index 968cb81088bf..e9f2c67bc15f 100644
+--- a/drivers/net/dsa/qca/ar9331.c
++++ b/drivers/net/dsa/qca/ar9331.c
+@@ -1021,7 +1021,7 @@ static const struct regmap_config ar9331_mdio_regmap_config = {
+ 	.cache_type = REGCACHE_MAPLE,
  };
  
--static struct regmap_bus regmap_encx24j600 = {
-+static const struct regmap_bus regmap_encx24j600 = {
- 	.write = regmap_encx24j600_write,
- 	.read = regmap_encx24j600_read,
- 	.reg_update_bits = regmap_encx24j600_reg_update_bits,
- };
- 
--static struct regmap_config phycfg = {
-+static const struct regmap_config phycfg = {
- 	.name = "phy",
- 	.reg_bits = 8,
- 	.val_bits = 16,
-@@ -492,7 +492,7 @@ static struct regmap_config phycfg = {
- 	.volatile_reg = encx24j600_phymap_volatile,
- };
- 
--static struct regmap_bus phymap_encx24j600 = {
-+static const struct regmap_bus phymap_encx24j600 = {
- 	.reg_write = regmap_encx24j600_phy_reg_write,
- 	.reg_read = regmap_encx24j600_phy_reg_read,
- };
+-static struct regmap_bus ar9331_sw_bus = {
++static const struct regmap_bus ar9331_sw_bus = {
+ 	.reg_format_endian_default = REGMAP_ENDIAN_NATIVE,
+ 	.val_format_endian_default = REGMAP_ENDIAN_NATIVE,
+ 	.read = ar9331_mdio_read,
 
 -- 
 2.40.1
