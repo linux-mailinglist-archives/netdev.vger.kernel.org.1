@@ -1,165 +1,229 @@
-Return-Path: <netdev+bounces-108962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EBA926614
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:25:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F094926624
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B7F81C22F0F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:25:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62E9F1C22825
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BCA1822DF;
-	Wed,  3 Jul 2024 16:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757B91822D8;
+	Wed,  3 Jul 2024 16:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZN1u5gD2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w02YCLA2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF896185E4D
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA53417B42A
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720023812; cv=none; b=UZF1wAQnlEA21EHWRj0cnBjsWUSWATwOW7H+24JJzcMul9x2Q0hKxg/JhC8QdHubn5DFgCBhfcYyrNYH7hfxr1Jk2Q+wDAY/0x7B8wD1ln9oz4wEhfxicTPYTL6WcJcnmFNELH9FSCAFAZ45nEj5ujgy+y63293FsVVK0x3nRiE=
+	t=1720024225; cv=none; b=V3QWAfkZuWCvR9PPxswh6Sd3n61EMaR+1sBPflm4bLHb51TssQE3STfl2y7IxUwAPohzD6N/v9UpqrBkM8YGEzYtvt12dIqMHU2OOLyim0NxQzuAPVstK0IOBUnH3bdA8SfLsepiP5Y//GQ/m+7tWfOCkcbZ59hqKKeoLly5GQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720023812; c=relaxed/simple;
-	bh=yAl9WkIF75Z5792jsKO6kzvCg4MDRUb7mflCnX2qKpE=;
+	s=arc-20240116; t=1720024225; c=relaxed/simple;
+	bh=d0NAZPug++84yb4AClA5Oi57MC5MzzyJOItoVtUB+f4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JOUEYtMQ8jLjgelEdGHlrEuuC4hStSX3q2diX5wkS7tRJvYtKwbg0KayowndCvimZnSnk0AuILZpHb80E2BxK3Ts24aAS4c3yILHrE1Yk2tlBRQ+3AFD16s0YNsjVMCi90xj6dd3ofudGGwTjFbnQ5o7Cb7MYhIuEDaMpS8fBQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZN1u5gD2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720023809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n91rt4myNGjgsOAzA53ROWPaLTAmQTcNbTctluHszT0=;
-	b=ZN1u5gD2TtfSdfUDYeUg+Bu8Mwq57Z8mgZLKJRCBusxJZK0Y2WOZPmMQoH/wUIds1nePVI
-	iCUTbmKVbBRmDH/un3YL3ZH6SmlRwleNATuol2xctjsURxUZl6okeJ7yoBIOSmOxJmMtUK
-	6xh2iwfNNm1+mBfA2aJ3Zx09+gII8W0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-F6G-vRJePQqkkZg4NIxkQg-1; Wed, 03 Jul 2024 12:23:27 -0400
-X-MC-Unique: F6G-vRJePQqkkZg4NIxkQg-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57851ae6090so2393859a12.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:23:27 -0700 (PDT)
+	 To:Cc:Content-Type; b=W3hkQjQJCfBIGYk0Vse/rMDiJQFATAIuS5F/SieZdQnPP2khrsx9FLVwl5rtKXtfOxT/aOcVTvHABquAbn9ynCBgiYdkLELHw0FAQUewOShkRBrrU5Z9oFn+pJbYn1DXRWOQMiVJU8cPF97BEoKsk1cl496EnT6TLHafvySdlR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w02YCLA2; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-38206c2f5e3so176215ab.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:30:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720024222; x=1720629022; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T2QmZejWA+lzJtqe0C34oQ5/ww4Ua8unvP+2Hn+v+eA=;
+        b=w02YCLA2fIWbQqRFLC/GgONfKrAwApTpQWM6uz15kVgKz6v9QzsM6TDKE7C/4Rhgfd
+         J7nzyv2eEsGAb5JoljsKjd7fFflaaEj/3P/GtChE8bGORvYr1U4ZBqKfLiQa55K55Eqj
+         oDoZey7pmzllBJXRo37fCkEsKNz90oMGLV2I9Apz2jCws7JRCFtJzsxF/haCO0bjygYR
+         okYSb7H1wo1KMcUmWPBybPCadt+KSeXFJVqLPoC8X9XCz1Eji83shBbFQVyxyJtN7V4Q
+         HlS1Wd00eoX45jLnSjSs8W1nfM8TpDzQjgckNjiwbnI4VHtAgQ71PXo9Z1Imw1IS/vWG
+         OuuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720023806; x=1720628606;
+        d=1e100.net; s=20230601; t=1720024222; x=1720629022;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n91rt4myNGjgsOAzA53ROWPaLTAmQTcNbTctluHszT0=;
-        b=KCqJ7mIJztn89CAdDchGcsSE/VcpuCYLY5ZilCLAIF50BbUtscHj4HQxqaimX1E4Hg
-         OCHJYMo8SbV7RI8w6iekfN8lEB971aktzrLatrnBTbMhx+tdCsMsP8VYHQvfVhEV7/EN
-         CnTOaE7fcMmD+doiwCZDBgYWm1B23pXPM91MP2rnB3YI0zYZ5MvsWZ/wkm8RnmmiP8e7
-         A6PwdwNuOlBXbaSCEjCLBXhfpEKhqu4Qx8rkGZcJqYK5u6VZx/pC2fQWxkgXoe2qBGM2
-         WAz/2vj2z3iggohqPZKwIHuEcFmao83T090qnQVlUzrbwMTy9capAHepGZNo4CXJp+xN
-         tRwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQA/7kUNGTNwEYqLlBjhP/IJEgx5mEV9+HMcv/VdNV+g8KpMRIX3r4J3fggwzUgQSoym+DRhu0k5RzGJsw45c4QrpoXH04
-X-Gm-Message-State: AOJu0Yxuwe4TjF9jrDh2Lyzwli0Um8ySsYYc+HlaZsy/W/aWFj6+V/yJ
-	MjplTMNnrHFuPWk5YiPEvjCXjav+bpw2OHlvpG+EFrVdX76LNKs2zdgTgYXcd2xisZLLN8qKZV8
-	pAAJIfn3BE8DrjkrPKO7BdXLxz33uQWqHv/oGg1id/IloNgX4CVW0Jiwa+yRJcHq/4gXNqPzNKs
-	k79QyfyLI3GIHfPjS6++y0rlZfPqZF
-X-Received: by 2002:a05:6402:1cc1:b0:57c:6188:875a with SMTP id 4fb4d7f45d1cf-587a0637437mr7847856a12.26.1720023806607;
-        Wed, 03 Jul 2024 09:23:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDKcKhOUx+NmAMpJL8tgtpN3L8p4uaUWiZMnuqg99iVFuWIDVp5qSLrtsQb/GpER4ZLfVxi176Yy0Dko+cScU=
-X-Received: by 2002:a05:6402:1cc1:b0:57c:6188:875a with SMTP id
- 4fb4d7f45d1cf-587a0637437mr7847840a12.26.1720023806248; Wed, 03 Jul 2024
- 09:23:26 -0700 (PDT)
+        bh=T2QmZejWA+lzJtqe0C34oQ5/ww4Ua8unvP+2Hn+v+eA=;
+        b=VNtMFBaZe1qbu4oUG+hG5LOt9ePJ38NU9cfuDA2KngRqH5+pOLzybdXfW/poMsYbwM
+         WxyxY6hc4PhIB3PGu5wvrGYXs11hrdBJ9O+yjQ+r2xTaLxbB63YVAZkJgIfclnx2gQmI
+         yMD9mEoc3pjqt6eJ+AYKfWIy+H0veuMCCGuguQyUh9+qjWzbVRJaqqSrOTjyCO1kN5VE
+         lQIo3BvtZZT1nCqezspj2TO9zXukvvsWcXG5WZ5/zUs1XOD8hwdrW3Hr4sVUUHCmFwXQ
+         16hXsFHqZ5jLRuAhky04rXr9jG3jtW7jVuUzX+L/fC0InRkuiJux8o7BkE55NocMu4A4
+         rlOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbQHPGcx2bKbDS/YR1re3SSkZWjgBpoiOLdbP8U+mkk25U2nUxW+oerEXhIu3cDEDA8bGx9O4vgznUaMuFM26Kate09Eqk
+X-Gm-Message-State: AOJu0YxCCdgCg/xER8XoBZpyhxnBZQoAn9jfq65JwiHMmhQns1K5YLtv
+	BfizTmOOBDRlcmyd95xh/X6Hdjh7CYkLckgb31grNhv2tA7mp3wFO8/rXGDokLfAJVLN+FgIxlk
+	N29xPvwOjdTKTHsoRaGtoOl1TFfE97wZ0Z631
+X-Google-Smtp-Source: AGHT+IG6hY5y4NoTYor41L2x0GP2NyHLBmVuFfxMPssEry84/PqOf7ZeBqMct8kfno+pOkP7LjodSM/1XSZqM1fcVf0=
+X-Received: by 2002:a05:6e02:152c:b0:376:48d1:1764 with SMTP id
+ e9e14a558f8ab-3820cbf3e21mr3107115ab.17.1720024221710; Wed, 03 Jul 2024
+ 09:30:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240626-stage-vdpa-vq-precreate-v2-0-560c491078df@nvidia.com> <20240626-stage-vdpa-vq-precreate-v2-19-560c491078df@nvidia.com>
-In-Reply-To: <20240626-stage-vdpa-vq-precreate-v2-19-560c491078df@nvidia.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 3 Jul 2024 18:22:47 +0200
-Message-ID: <CAJaqyWccNsTo16CzUmSwNLFw2CTinrQ47YQ2JjRndyHLeRVFNg@mail.gmail.com>
-Subject: Re: [PATCH vhost v2 19/24] vdpa/mlx5: Forward error in suspend/resume device
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Si-Wei Liu <si-wei.liu@oracle.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	Cosmin Ratiu <cratiu@nvidia.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+References: <ZoVrzGBouwEQU3Bu@localhost.localdomain> <20240703160210.83667-1-aha310510@gmail.com>
+In-Reply-To: <20240703160210.83667-1-aha310510@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Jul 2024 18:30:05 +0200
+Message-ID: <CANn89iKbP4r+uAkHiz8_pdMB9XWoyRWR0NJ7ZuNCOr+LiFr9zg@mail.gmail.com>
+Subject: Re: [PATCH net] team: Fix ABBA deadlock caused by race in team_del_slave
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: michal.kubiak@intel.com, davem@davemloft.net, jiri@resnulli.us, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 26, 2024 at 12:28=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
-m> wrote:
+On Wed, Jul 3, 2024 at 6:02=E2=80=AFPM Jeongjun Park <aha310510@gmail.com> =
+wrote:
 >
-> Start using the suspend/resume_vq() error return codes previously added.
+> >
+> > On Wed, Jul 03, 2024 at 11:51:59PM +0900, Jeongjun Park wrote:
+> > >        CPU0                    CPU1
+> > >        ----                    ----
+> > >   lock(&rdev->wiphy.mtx);
+> > >                                lock(team->team_lock_key#4);
+> > >                                lock(&rdev->wiphy.mtx);
+> > >   lock(team->team_lock_key#4);
+> > >
+> > > Deadlock occurs due to the above scenario. Therefore,
+> > > modify the code as shown in the patch below to prevent deadlock.
+> > >
+> > > Regards,
+> > > Jeongjun Park.
+> >
+> > The commit message should contain the patch description only (without
+> > salutations, etc.).
+> >
+> > >
+> > > Reported-and-tested-by: syzbot+705c61d60b091ef42c04@syzkaller.appspot=
+mail.com
+> > > Fixes: 61dc3461b954 ("team: convert overall spinlock to mutex")
+> > > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> > > ---
+> > >  drivers/net/team/team_core.c | 14 ++++++++------
+> > >  1 file changed, 8 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_cor=
+e.c
+> > > index ab1935a4aa2c..3ac82df876b0 100644
+> > > --- a/drivers/net/team/team_core.c
+> > > +++ b/drivers/net/team/team_core.c
+> > > @@ -1970,11 +1970,12 @@ static int team_add_slave(struct net_device *=
+dev, struct net_device *port_dev,
+> > >                           struct netlink_ext_ack *extack)
+> > >  {
+> > >         struct team *team =3D netdev_priv(dev);
+> > > -       int err;
+> > > +       int err, locked;
+> > >
+> > > -       mutex_lock(&team->lock);
+> > > +       locked =3D mutex_trylock(&team->lock);
+> > >         err =3D team_port_add(team, port_dev, extack);
+> > > -       mutex_unlock(&team->lock);
+> > > +       if (locked)
+> > > +               mutex_unlock(&team->lock);
+> >
+> > This is not correct usage of 'mutex_trylock()' API. In such a case you
+> > could as well remove the lock completely from that part of code.
+> > If "mutex_trylock()" returns false it means the mutex cannot be taken
+> > (because it was already taken by other thread), so you should not modif=
+y
+> > the resources that were expected to be protected by the mutex.
+> > In other words, there is a risk of modifying resources using
+> > "team_port_add()" by several threads at a time.
+> >
+> > >
+> > >         if (!err)
+> > >                 netdev_change_features(dev);
+> > > @@ -1985,11 +1986,12 @@ static int team_add_slave(struct net_device *=
+dev, struct net_device *port_dev,
+> > >  static int team_del_slave(struct net_device *dev, struct net_device =
+*port_dev)
+> > >  {
+> > >         struct team *team =3D netdev_priv(dev);
+> > > -       int err;
+> > > +       int err, locked;
+> > >
+> > > -       mutex_lock(&team->lock);
+> > > +       locked =3D mutex_trylock(&team->lock);
+> > >         err =3D team_port_del(team, port_dev);
+> > > -       mutex_unlock(&team->lock);
+> > > +       if (locked)
+> > > +               mutex_unlock(&team->lock);
+> >
+> > The same story as in case of "team_add_slave()".
+> >
+> > >
+> > >         if (err)
+> > >                 return err;
+> > > --
+> > >
+> >
+> > The patch does not seem to be a correct solution to remove a deadlock.
+> > Most probably a synchronization design needs an inspection.
+> > If you really want to use "mutex_trylock()" API, please consider severa=
+l
+> > attempts of taking the mutex, but never modify the protected resources =
+when
+> > the mutex is not taken successfully.
+> >
 >
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-
-Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-
+> Thanks for your comment. I rewrote the patch based on those comments.
+> This time, we modified it to return an error so that resources are not
+> modified when a race situation occurs. We would appreciate your
+> feedback on what this patch would be like.
+>
+> > Thanks,
+> > Michal
+> >
+> >
+>
+> Regards,
+> Jeongjun Park
+>
 > ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  drivers/net/team/team_core.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
-x5_vnet.c
-> index e65d488f7a08..ce1f6a1f36cd 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -3436,22 +3436,25 @@ static int mlx5_vdpa_suspend(struct vdpa_device *=
-vdev)
->  {
->         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
->         struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
-> +       int err;
+> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+> index ab1935a4aa2c..43d7c73b25aa 100644
+> --- a/drivers/net/team/team_core.c
+> +++ b/drivers/net/team/team_core.c
+> @@ -1972,7 +1972,8 @@ static int team_add_slave(struct net_device *dev, s=
+truct net_device *port_dev,
+>         struct team *team =3D netdev_priv(dev);
+>         int err;
 >
->         mlx5_vdpa_info(mvdev, "suspending device\n");
+> -       mutex_lock(&team->lock);
+> +       if (!mutex_trylock(&team->lock))
+> +               return -EBUSY;
+>         err =3D team_port_add(team, port_dev, extack);
+>         mutex_unlock(&team->lock);
 >
->         down_write(&ndev->reslock);
->         unregister_link_notifier(ndev);
-> -       suspend_vqs(ndev);
-> +       err =3D suspend_vqs(ndev);
->         mlx5_vdpa_cvq_suspend(mvdev);
->         mvdev->suspended =3D true;
->         up_write(&ndev->reslock);
-> -       return 0;
-> +
-> +       return err;
->  }
+> @@ -1987,7 +1988,8 @@ static int team_del_slave(struct net_device *dev, s=
+truct net_device *port_dev)
+>         struct team *team =3D netdev_priv(dev);
+>         int err;
 >
->  static int mlx5_vdpa_resume(struct vdpa_device *vdev)
->  {
->         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
->         struct mlx5_vdpa_net *ndev;
-> +       int err;
->
->         ndev =3D to_mlx5_vdpa_ndev(mvdev);
->
-> @@ -3459,10 +3462,11 @@ static int mlx5_vdpa_resume(struct vdpa_device *v=
-dev)
->
->         down_write(&ndev->reslock);
->         mvdev->suspended =3D false;
-> -       resume_vqs(ndev);
-> +       err =3D resume_vqs(ndev);
->         register_link_notifier(ndev);
->         up_write(&ndev->reslock);
-> -       return 0;
-> +
-> +       return err;
->  }
->
->  static int mlx5_set_group_asid(struct vdpa_device *vdev, u32 group,
+> -       mutex_lock(&team->lock);
+> +       if (!mutex_trylock(&team->lock))
+> +               return -EBUSY;
+>         err =3D team_port_del(team, port_dev);
+>         mutex_unlock(&team->lock);
 >
 > --
-> 2.45.1
->
 
+Failing team_del_slave() is not an option. It will add various issues.
 
