@@ -1,174 +1,175 @@
-Return-Path: <netdev+bounces-109043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D5C926A68
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:37:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0612926A8B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:43:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5AC01C21571
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:37:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A82E1F22F72
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB8B191F80;
-	Wed,  3 Jul 2024 21:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38DB194083;
+	Wed,  3 Jul 2024 21:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="KucnQUjz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA17F191F64
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 21:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6C6191F91
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 21:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720042674; cv=none; b=H0jjIqONa99WcMj4YQhkNKeTgWzvD9XHC8IKq1GGL+tWfHYVmOZlZ9QID0fYg7q6wkgrmjYbEFG8ZCg8gEZt7vGVN+312i7MPN1tgwQ3LS0PxhOJb7V4qa1h+RAZo2HueXJZY6VjHY2mJVkM3LKSXm5di/2NvdBPDNa/cVjZB4I=
+	t=1720042971; cv=none; b=a/HZDAzA05pYJd08hBJBO7O3jGdLivPf3dVuavidCPTGZPBu8F57imI/MTu3LjoF0GnAcAWkPNFnOaFXplXeXDrfgOXd/vfCtm3iSSOcRwEXBRqShGuPLhy+y4yIv6dtU9mQFOvhnQSkfoDGzO4rwS2q/xiSQUDfyHeuT6kV1Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720042674; c=relaxed/simple;
-	bh=yxxyNSw8MvkdbjuWPn09iAiN4C6eaimDpKswbX7243o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=rWaUeofDxsu8BxhysFhBkAXDfxKh7ixIgmySSEQ8blU9B5j0rSveRKsjw/hO1SUrQY+PVQL8TmRqjxowGbBThSL6Yp6IBJJeSkBxxJ/lwgm2S9yg54a7WNMbv2xrblsoLunmemKtxUYibSPKsgfyjeXD9GzjlR7CPi8By3VtlEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-104-aHy0r1bTPS-qexqoYqvilg-1; Wed,
- 03 Jul 2024 17:37:45 -0400
-X-MC-Unique: aHy0r1bTPS-qexqoYqvilg-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 35BC11955E74;
-	Wed,  3 Jul 2024 21:37:44 +0000 (UTC)
-Received: from hog (unknown [10.39.192.70])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 732BB1955F21;
-	Wed,  3 Jul 2024 21:37:41 +0000 (UTC)
-Date: Wed, 3 Jul 2024 23:37:38 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
-	pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
-Subject: Re: [PATCH net-next v5 08/25] ovpn: introduce the ovpn_peer object
-Message-ID: <ZoXEosCwp6-WR7wb@hog>
-References: <20240627130843.21042-1-antonio@openvpn.net>
- <20240627130843.21042-9-antonio@openvpn.net>
+	s=arc-20240116; t=1720042971; c=relaxed/simple;
+	bh=iXzzgWwkyDyHIh13u4RNbNBL2fqXALY/XMcCu0blRFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JliQyIshtdkIopMAC4ixj+ht5lHYja2SC7FiNm4XkJRgcDMEqQ+LQtiQzPVRviEyB0bjJEV60d2CDqWeEQwanhByKA2cjBsWeUGSJ4F7yZaAUUl6xPr89NKgvlguHGQxvsUa0fvSmH4cdDR72jCx/kaVa4rS+a9Nkq8ezXcVFIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=KucnQUjz; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-362bc731810so7131f8f.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 14:42:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1720042968; x=1720647768; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sV7Pu5VTw2c+MSToNZekrnQnftzWdao0dFMW4X4SCSo=;
+        b=KucnQUjzu9eCLNnLRkrZDu8ZpxCYeIagAWwYDao/iIf2FIXYnrl1MU7uDaWesjHpMK
+         6n7BFWy+QrZyB4e8XLknBmPEWMNqPgcs1tHn4n8ndBmgJgm753Hd05il69smBBh2WWAK
+         Sjf1Fg4Vt8+AMuBwNo89GqrIFtfz3mcLInyg8FGrDlk0tHqxUZ/MaIzdjVyLxhYX0KT1
+         dbhc3AVClfhvfS0ZS6HEB8f+wHHEIm1OTTO4QimVPoA92hxuc7rDHeAtAWk5grziVceC
+         QV59NAcX8tTX2u9WT5QIlIduRd3minBQ1J+Cp2kLYEVrAcEIUa8/fqegUA2ov+IGepFe
+         zTFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720042968; x=1720647768;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sV7Pu5VTw2c+MSToNZekrnQnftzWdao0dFMW4X4SCSo=;
+        b=L9Rtk7C/JX/FLU5kApnyoYkrvfV2MwizBqjXF/TJr/VfIOFZ+ovsUzi42g7m27CX+X
+         L5Ltb/8/6z3yd2fxUs395pttiImFXSaQTZw4MN53kZhe08FE/Ndri/r+JDQKXFBXCy1b
+         7iGCIkg/6CjfFFDWyYT0Qo+K2APztxT9FMfgx4c/W+cgIR2bWLDf47X1xxEF7mYEt8eH
+         mij49Rw/g6p3+dflBZ25sGpQrPQytKW0OFCrjmfmrXOAEhNBBiKgpSFYDVUfBqW4mjTV
+         Z0T5jt48OJq74glTo1GQpu2TcX7qLdgSY+85cdZJmkfGcBsxrnRYTkEwVk1wYy/PiJQr
+         hmJQ==
+X-Gm-Message-State: AOJu0YyOYvL04BcdhZa27mTdsjAlkufrWlf3iuZ7pvepgb25D0/KwIfX
+	73yqYge4XQFDkDjGRpwB9KFaWxlv+kB7pwg2pI8qEs1TYCU1lovXdqjATofc06E=
+X-Google-Smtp-Source: AGHT+IGIhhE5X0Xag8E/q4POafNlqds4xnq9uvezbxHiGb4C6jhOe+TJgQVarUi0BeH3BA37pCO9Ug==
+X-Received: by 2002:a5d:64a4:0:b0:366:f04d:676f with SMTP id ffacd0b85a97d-367756995cdmr12375546f8f.12.1720042967795;
+        Wed, 03 Jul 2024 14:42:47 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:733d:9048:62cb:ccf? ([2001:67c:2fbc:0:733d:9048:62cb:ccf])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3679927d7aesm712272f8f.30.2024.07.03.14.42.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jul 2024 14:42:47 -0700 (PDT)
+Message-ID: <9822899c-b8ac-45e0-8cbf-d105320ee0e4@openvpn.net>
+Date: Wed, 3 Jul 2024 23:44:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240627130843.21042-9-antonio@openvpn.net>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 06/25] ovpn: implement interface
+ creation/destruction via netlink
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+ pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-7-antonio@openvpn.net> <ZoXCKPlwfhB2iPBC@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
+ L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
+ fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
+ 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
+ IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
+ tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
+ 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
+ r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
+ PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
+ DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
+ u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
+ jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
+ vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
+ U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
+ p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
+ sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
+ aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
+ AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
+ pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
+ zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
+ BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
+ wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
+ 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
+ ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
+ DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
+ BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
+ +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
+Organization: OpenVPN Inc.
+In-Reply-To: <ZoXCKPlwfhB2iPBC@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-2024-06-27, 15:08:26 +0200, Antonio Quartulli wrote:
-> +/**
-> + * struct ovpn_sockaddr - basic transport layer address
-> + * @in4: IPv4 address
-> + * @in6: IPv6 address
-> + */
-> +struct ovpn_sockaddr {
-> +=09union {
-> +=09=09struct sockaddr_in in4;
-> +=09=09struct sockaddr_in6 in6;
-> +=09};
-> +};
+On 03/07/2024 23:27, Sabrina Dubroca wrote:
+> 2024-06-27, 15:08:24 +0200, Antonio Quartulli wrote:
+>>   int ovpn_nl_new_iface_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> [...]
+>> +	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+>> +	if (!msg)
+>> +		return -ENOMEM;
+>> +
+>> +	hdr = genlmsg_iput(msg, info);
+>> +	if (!hdr) {
+>> +		nlmsg_free(msg);
+>> +		return -ENOBUFS;
+>> +	}
+>> +
+>> +	if (nla_put_string(msg, OVPN_A_IFNAME, dev->name)) {
+>> +		genlmsg_cancel(msg, hdr);
+>> +		nlmsg_free(msg);
+>> +		return -EMSGSIZE;
+>> +	}
+> 
+> Maybe the ifindex as well? The notifications in later patches use that
+> rather than the name, but I don't know how the client handles this reply.
 
-nit: wrapping the anonymous union in a struct that contains nothing
-else is not that useful.
+Userspace will just throw the name in if_nametoindex().
 
+However passing both doesn't hurt anybody, and actually spares the 
+conversion in userspace.
 
-> +/**
-> + * struct ovpn_bind - remote peer binding
-> + * @sa: the remote peer sockaddress
-> + * @local: local endpoint used to talk to the peer
-> + * @local.ipv4: local IPv4 used to talk to the peer
-> + * @local.ipv6: local IPv6 used to talk to the peer
-> + * @rcu: used to schedule RCU cleanup job
-> + */
-> +struct ovpn_bind {
-> +=09struct ovpn_sockaddr sa;  /* remote sockaddr */
+will add ifindex too.
 
-nit: then maybe call it "peer" or "remote" instead of sa?
+Thanks!
 
-> +=09union {
-> +=09=09struct in_addr ipv4;
-> +=09=09struct in6_addr ipv6;
-> +=09} local;
-> +
-> +=09struct rcu_head rcu;
-> +};
-> +
+> 
+>> +	genlmsg_end(msg, hdr);
+>> +
+>> +	return genlmsg_reply(msg, info);
+>>   }
+> 
 
-[...]
-> +struct ovpn_peer *ovpn_peer_new(struct ovpn_struct *ovpn, u32 id)
-> +{
-> +=09struct ovpn_peer *peer;
-> +=09int ret;
-> +
-> +=09/* alloc and init peer object */
-> +=09peer =3D kzalloc(sizeof(*peer), GFP_KERNEL);
-> +=09if (!peer)
-> +=09=09return ERR_PTR(-ENOMEM);
-> +
-> +=09peer->id =3D id;
-> +=09peer->halt =3D false;
-> +=09peer->ovpn =3D ovpn;
-> +
-> +=09peer->vpn_addrs.ipv4.s_addr =3D htonl(INADDR_ANY);
-> +=09peer->vpn_addrs.ipv6 =3D in6addr_any;
-> +
-> +=09RCU_INIT_POINTER(peer->bind, NULL);
-> +=09spin_lock_init(&peer->lock);
-> +=09kref_init(&peer->refcount);
-> +
-> +=09ret =3D dst_cache_init(&peer->dst_cache, GFP_KERNEL);
-> +=09if (ret < 0) {
-> +=09=09netdev_err(ovpn->dev, "%s: cannot initialize dst cache\n",
-> +=09=09=09   __func__);
-> +=09=09kfree(peer);
-> +=09=09return ERR_PTR(ret);
-> +=09}
-> +
-> +=09netdev_hold(ovpn->dev, NULL, GFP_KERNEL);
-
-It would be good to add a tracker to help debug refcount issues.
-
-
-> +
-> +=09return peer;
-> +}
-> +
-> +#define ovpn_peer_index(_tbl, _key, _key_len)=09=09\
-> +=09(jhash(_key, _key_len, 0) % HASH_SIZE(_tbl))=09\
-
-nit: not used in this patch, and even removed by patch 16 as you
-convert from index to buckets (that conversion should be squashed into
-patch 15)
-
-> +/**
-> + * ovpn_peer_transp_match - check if sockaddr and peer binding match
-> + * @peer: the peer to get the binding from
-> + * @ss: the sockaddr to match
-> + *
-> + * Return: true if sockaddr and binding match or false otherwise
-> + */
-> +static bool ovpn_peer_transp_match(const struct ovpn_peer *peer,
-> +=09=09=09=09   const struct sockaddr_storage *ss)
-> +{
-
-AFAICT ovpn_peer_transp_match is only called with ss from
-ovpn_peer_skb_to_sockaddr, so it's pretty much ovpn_bind_skb_src_match
-but using peer->bind. You can probably avoid the code duplication
-(ovpn_peer_transp_match and ovpn_bind_skb_src_match are very similar).
-
---=20
-Sabrina
-
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
