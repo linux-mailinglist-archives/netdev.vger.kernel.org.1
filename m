@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-109064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11AE926BF4
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:51:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDFA926BF6
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2EB8284A7D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E74351F22B9F
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF425194A70;
-	Wed,  3 Jul 2024 22:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F721194AC5;
+	Wed,  3 Jul 2024 22:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="HwJUGHi+"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="Osm/d23j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47255194AC5
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 22:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE15194AE4
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 22:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720047029; cv=none; b=UGKSX9jjhg7MvvFNnz8QB6oG+CK3ac7rNYOYX+iJ+rfXWBrGCySahnr50yDGKnqmnyxsnaVAXxt8/PLuJN6vTdkBWrxU+Z03DVri22TGPstzKRt4SsB9QV6+bZ2EHENVPMOK+j5D0bDgCwIGWQes5s7Ikf/Ilo34k1mLXh4rsBo=
+	t=1720047031; cv=none; b=WwJ5pAM8JaN+nSvXEEnUE/woK1fhZhI2gMQcsenViHOKB/iCMkVhRTjzQqRFkOxUF8bsK77DpACS2bdFgSSbCsdgV+jGkY7uQ/r1pZ/JNTh+sC+6TzYB58GGM28YTk+nw4dbBcuaInG4IMEsu3xY6mHVZP8UlCOW2JJoN45VoRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720047029; c=relaxed/simple;
-	bh=y/5XBT2zGJLo4oaSgQhEzSNcfSeLqRTuzxUK43iShk4=;
+	s=arc-20240116; t=1720047031; c=relaxed/simple;
+	bh=I01JCujZD1QdPv8eAGWz+U8ixUImkinN7MOWEG4qw1E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jxv05Tui+XT2B+Hv6wNyxQt+IkSAh3Lo+YdhrGtri9Vcx4JO2bzJ2fksfjCNzNCnlzzQMYz1FFDcCgqWlMOzcueu70D/xE2oxAP1hIGfBgjZL1WQH+CvPzihVVQrYhVikh6vDQymzH/Ma+b1N5Gpd04bAnOT5rX/l/2o1ai8nBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=HwJUGHi+; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=GgI3a8y+dQS61rPH8PkFdL8cgSkxRHMJGQ+VM3wXYICr+NGI7wXk+zwXdE/gEP8iXmZVjle85a6sEvgzF3mTHGMGLVZR2b1nChN23YcUvSJ6bhQamg8ggJdDYIszSXQb6h7rgWj6luAplMyVdOYr16dgDKeYeBJ6ZUsbcEHDdAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=Osm/d23j; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fa55dbf2e7so34927705ad.2
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 15:50:28 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70af5c40f8aso55701b3a.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 15:50:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1720047028; x=1720651828; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1720047029; x=1720651829; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JQ1mn/CTHjHcc9W+sTHEOUlyKZEA9X33Luiw+Y6JViw=;
-        b=HwJUGHi+OHYxiTMusrnwvYCrclq0cOdqZhFNHQaxIjEp6S5x9bsSPSrPkeJfAkoALP
-         lhu5rW6fyi5Ucp2CF3QXDIRm8MD0YkJQZPPEagtREpaIp7lZ5w09Ce6o1UMa6T4KsPeX
-         Qribz8JYDOHFJUOVFQZFkWeX+PjO1031gxBFwaKLUU1m0cYwudxJEERYy473fA1ltvmG
-         HIVS8QQELQe+kcvshC2HhaCdpj0OYt7kwc3ARyFh4XfRrkUBnaDhSvRy0cy4m3sJDJqE
-         rTTDJvOao09IZ4lWLjAJR4J66WAzGOdBZHJAX1nBIAFyKCu/9iY0tVNxIeuqkqvZBCf6
-         y28g==
+        bh=XTJo2+TT7Z/E9Sx4mrv8YBG7pTNZiSk0WbKEcv0vnsI=;
+        b=Osm/d23j2ADi/HYVO/+zNd2vk3ryU48fpmBcgsy4MKEqdp5RVwkw+bR2XYoFj5e+jF
+         eVUpDZTabP4TwhbXbgvYRpnfIuDi6XbLiQCCtyhWF5vYWv9sGuLtW9tA7lInfFKnWfVM
+         XZve40pPzL3hvCa1luWw3bNwJKzewoCxW1plXp6aul9EKbkEKaAzLZsFxjV+8duPk3D/
+         /zbcHpIhBIRrnvTKA/FCV1ZxrokSLqRYIYzJ3c73DIlVvf1GuQQ9QxSIsiykozdXFfsp
+         BGETFJLuahejHFH6HNHd/BIKRFB34kvpZZiwwTNBFtNmOvun/2NYs71aaUTC+r17M3FJ
+         NlcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720047028; x=1720651828;
+        d=1e100.net; s=20230601; t=1720047029; x=1720651829;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JQ1mn/CTHjHcc9W+sTHEOUlyKZEA9X33Luiw+Y6JViw=;
-        b=oeGfSrDS4Ijn/TQgKaOnFRISqKYFQvltoaQzKq2W9z2ie5J+LYz2adblvaqX3MKt6o
-         WBOmYGuNUebgeNiGGDWLpfV5O/dms1maNA8jgxD7ghnE99HONyNHatVTXuBo4YzTRIcH
-         mbrAliv48RAiCFVge7kQf8V6oqzzWIs8Nq39f15A6jJv9pc+Y1NRxkxR5yT/IW2ulhZg
-         LDp20cycZupaFa0chKWzI145ObhDgJKVEGFyqQ98PhPKj+wKxXo/xZmTysjNQBAQOMSm
-         u66uJH2/r3afcg9RVQdW1Cu7kbQLYHrnLk230FIhKf3nvOm9USZQRUbi0QMsIt7o720w
-         0+Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCWG/p44Vu9vuxrENjKWEP2Rvc5UhFV6aFTZ8UxteO6BSgN6YgXDLelaETWwc9K9PSX4kxDrwY3qvRAFfe2kF9Fkp+gUMTog
-X-Gm-Message-State: AOJu0YxUsDCeD6rnqxumuqikv9XJlAmkrPZlc1uxTWbovetxkwhBzX/M
-	lJVxMPdDYeSPqEdVoHfPp2x9QXLDcSqcRKJSqCvKDnjxu9SvQ433d8WFaTHgUQ==
-X-Google-Smtp-Source: AGHT+IGa8vzfyd/pKoF9FzRFSbE9pKBdacGN4QEAVONB0O6p6w6GixEhWA5JMCkThFXi/HbAHnpJCg==
-X-Received: by 2002:a17:902:f78e:b0:1f7:2a3a:dd9b with SMTP id d9443c01a7336-1fb33e19b57mr121745ad.18.1720047027710;
-        Wed, 03 Jul 2024 15:50:27 -0700 (PDT)
+        bh=XTJo2+TT7Z/E9Sx4mrv8YBG7pTNZiSk0WbKEcv0vnsI=;
+        b=dXXo80HySoDUPCbPAsaVFsRAmojPKcHMYgv7VblcLUMOVXFu97muuVZeo9wjvWSvmG
+         VtFiRy94IsJDxK1MH0nBr8Yh1PUX7+053Y1Gy1X7RIfEv+Lhuf65d9/tBvQCW2ybnZy6
+         CAwcsYRfj3g5e3wf+ifbyLKsruaejZPE0Cd9VTaFlVMZky2B6+4ATKGE3eTw2ZJiughH
+         Q1bRUuW+dOuWMylwgQuCl7o3GP9ipjdp2SjK0j8M1hvTOVvF2w2VKxLK6lxnxdKnflk2
+         B4lq4Al2RIi8l4FlAU4H3FhYmoLRQavy4SKGOxhPc/q7gUDNThIotgiD87exWejmwR7w
+         AQDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrIapSxcyND9m1qoeStfwLHbAnbdOxPsNIKouHKPN/F+VJ0Awp5OkTFAQQ9XsEStS9FjUUGNIbaYVmQ4T48EjmyVZrJGGs
+X-Gm-Message-State: AOJu0YykaNUE4aobJcZyhzZ9YY0m9v2qlx2Ll8YV39XK0z7giLlBuy4F
+	fvC8U7GMuB4RX4PaRXzZfETGtwgSgklQ0MYp7YOQbSbYN+saH63XEj+VzPis8g==
+X-Google-Smtp-Source: AGHT+IEpoxIlMPMkciQWHoIgF80I2G2SKnASFU6Q4wZeIQNRPbU26UlEjqw8rPc6IXvxIHYhOrU8AQ==
+X-Received: by 2002:a05:6a20:9143:b0:1bd:2358:8c94 with SMTP id adf61e73a8af0-1bef613f4a7mr12661149637.20.1720047029034;
+        Wed, 03 Jul 2024 15:50:29 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:af8e:aa48:5140:2b5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faf75b3407sm40242185ad.85.2024.07.03.15.50.26
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faf75b3407sm40242185ad.85.2024.07.03.15.50.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 15:50:27 -0700 (PDT)
+        Wed, 03 Jul 2024 15:50:28 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -76,9 +76,9 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	felipe@sipanda.io
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [RFC net-next 07/10] hisilicon: Call skb_set_csum_crc32_unnecessary
-Date: Wed,  3 Jul 2024 15:48:47 -0700
-Message-Id: <20240703224850.1226697-8-tom@herbertland.com>
+Subject: [RFC net-next 08/10] idpf: Call skb_set_csum_crc32_unnecessary
+Date: Wed,  3 Jul 2024 15:48:48 -0700
+Message-Id: <20240703224850.1226697-9-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240703224850.1226697-1-tom@herbertland.com>
 References: <20240703224850.1226697-1-tom@herbertland.com>
@@ -91,57 +91,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 When a validated offload CRC for SCTP is detected call
-skb_set_csum_crc32_unnessary instead of setting
+skb_set_csum_crc32_unnecessary instead of setting
 CHECKSUM_UNNECESSARY
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- drivers/net/ethernet/hisilicon/hns/hns_enet.c  |  5 ++++-
- .../net/ethernet/hisilicon/hns3/hns3_enet.c    | 18 +++++++++++++-----
- 2 files changed, 17 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c | 4 +++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c         | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_enet.c b/drivers/net/ethernet/hisilicon/hns/hns_enet.c
-index fd32e15cadcb..f3e8b9cb3779 100644
---- a/drivers/net/ethernet/hisilicon/hns/hns_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_enet.c
-@@ -556,7 +556,10 @@ static void hns_nic_rx_checksum(struct hns_nic_ring_data *ring_data,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index 27b93592c4ba..0ba7abd87d05 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -698,9 +698,11 @@ static void idpf_rx_singleq_csum(struct idpf_queue *rxq, struct sk_buff *skb,
+ 	case IDPF_RX_PTYPE_INNER_PROT_ICMP:
+ 	case IDPF_RX_PTYPE_INNER_PROT_TCP:
+ 	case IDPF_RX_PTYPE_INNER_PROT_UDP:
+-	case IDPF_RX_PTYPE_INNER_PROT_SCTP:
+ 		skb->ip_summed = CHECKSUM_UNNECESSARY;
  		return;
- 
- 	/* now, this has to be a packet with valid RX checksum */
--	skb->ip_summed = CHECKSUM_UNNECESSARY;
-+	if (l4id == HNS_RX_FLAG_L4ID_SCTP)
++	case IDPF_RX_PTYPE_INNER_PROT_SCTP:
 +		skb_set_csum_crc32_unnecessary(skb);
-+	else
-+		skb->ip_summed = CHECKSUM_UNNECESSARY;
- }
- 
- static int hns_nic_poll_rx_skb(struct hns_nic_ring_data *ring_data,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index a5fc0209d628..5fd98854f72d 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -3908,11 +3908,19 @@ static void hns3_rx_handle_csum(struct sk_buff *skb, u32 l234info,
- 					  HNS3_RXD_L4ID_S);
- 		/* Can checksum ipv4 or ipv6 + UDP/TCP/SCTP packets */
- 		if ((l3_type == HNS3_L3_TYPE_IPV4 ||
--		     l3_type == HNS3_L3_TYPE_IPV6) &&
--		    (l4_type == HNS3_L4_TYPE_UDP ||
--		     l4_type == HNS3_L4_TYPE_TCP ||
--		     l4_type == HNS3_L4_TYPE_SCTP))
--			skb->ip_summed = CHECKSUM_UNNECESSARY;
-+		     l3_type == HNS3_L3_TYPE_IPV6)) {
-+			switch (l4_type) {
-+			case HNS3_L4_TYPE_UDP:
-+			case HNS3_L4_TYPE_TCP:
-+				skb->ip_summed = CHECKSUM_UNNECESSARY;
-+				break;
-+			case HNS3_L4_TYPE_SCTP:
-+				skb_set_csum_crc32_unnecessary(skb);
-+				break;
-+			default:
-+				break;
-+			}
-+		}
++		return;
+ 	default:
+ 		return;
+ 	}
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index b023704bbbda..3ff1d181534c 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2804,7 +2804,7 @@ static void idpf_rx_csum(struct idpf_queue *rxq, struct sk_buff *skb,
+ 		}
+ 		break;
+ 	case IDPF_RX_PTYPE_INNER_PROT_SCTP:
+-		skb->ip_summed = CHECKSUM_UNNECESSARY;
++		skb_set_csum_crc32_unnecessary(skb);
  		break;
  	default:
  		break;
