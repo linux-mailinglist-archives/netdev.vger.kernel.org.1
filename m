@@ -1,181 +1,130 @@
-Return-Path: <netdev+bounces-108758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46AC29253E2
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 08:45:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8304692543E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 08:55:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDEA1C2095C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:45:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05EFEB2103B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6030D5FDA5;
-	Wed,  3 Jul 2024 06:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1CB132C3B;
+	Wed,  3 Jul 2024 06:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=miraclelinux-com.20230601.gappssmtp.com header.i=@miraclelinux-com.20230601.gappssmtp.com header.b="lKAU4BMf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="I8fKhS/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7776D6EB64
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 06:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A033C6BA;
+	Wed,  3 Jul 2024 06:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719989116; cv=none; b=FTtfZ5mCuMGi1EQobXrTEzgZ/1sVkQt5u/gbFP+Ori3HcIbT9CBC2PKdOqdqtq+DUEuHHRHhij2jdgKYsYGEVHucRcdN/Qgfr+7cfUQgrNwVpcW0+jPg3MI+icLIbvWTiSTuQm4HyTRyAj2KJ5tMnoQbfznvuiC+Nx7DOwsGAk0=
+	t=1719989724; cv=none; b=lL9VGMBLBd0HV6UieAOgvcCERUCxi1c3Cx6pVgWaNdADbaLYfJ96Q5mlqu/ZpqTwuyfpNwXdC0iEuPSz1zDwCRhXbt2NQV5sTE4hi7idBtNS9OqRjL7B8esP7kHopSra+HP4ABwBn1Vk2kXVflgF+ck1Vu3rDzdZD8j0byXEHF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719989116; c=relaxed/simple;
-	bh=HOW/lQWRUIc7FWyhXic28qmTL1KJ+uCJ8pZQSUHfiyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CFF6cIfvMh9aGNTOk2k/hfhAQMy5nKBUzYsHUm5sKgD4ZqN4At3tge88eHeYXuFTRYa1FUdWxUy54n0lkeHiY+qc6MhgbSFnpq8dmURNH0Aj5uVJQmj5U5MS+aiitqnJm1Jo4Oaq9DB598mZGCun/D39pa3V5m7+goD8kGmnycA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=miraclelinux.com; spf=pass smtp.mailfrom=miraclelinux.com; dkim=pass (2048-bit key) header.d=miraclelinux-com.20230601.gappssmtp.com header.i=@miraclelinux-com.20230601.gappssmtp.com header.b=lKAU4BMf; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=miraclelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraclelinux.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d56285aa18so2112252b6e.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 23:45:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=miraclelinux-com.20230601.gappssmtp.com; s=20230601; t=1719989112; x=1720593912; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5J4ADRk7D+11TLpLEN1TYzNIFMfFCzUMHNjAgN/k+zM=;
-        b=lKAU4BMfbAe0qxUY8KTAXuNH5Qh0wQw8a5XQ+1Uco1SUksCI9E6oO+qlGpzYczRim/
-         ec4GDHFtU5pyNJPYl7SDllVQtu6zqIxm1zbQV2w9ltSrTdduYcijHxIDRAyx6JhJawXs
-         IHojPQtAwAUejCe/cXUZ2XauNXtRht/lEAdc4k63t/khd5dFZOUOFuzS5lwhzl5gucHd
-         KmDHyoB0io723XtFobYVk8njJd2ju2GiAbnQq9WIUx/JLBz5CaUa5Ro0XwLGH2oyUy++
-         Flw4ueMQhs59ZhCfMgZNm1sIfBeYYPcZaaR5v55Gum7E56EeEvb41eykbSM/E+dDohhB
-         W9Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719989112; x=1720593912;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5J4ADRk7D+11TLpLEN1TYzNIFMfFCzUMHNjAgN/k+zM=;
-        b=Z8MY0W59V63gRjp600o29Vu80O79KVfvNpiy9MOar4SBf9i5EQQCnAKaUPw3Blq1qg
-         YMorOei3HG/zj0/b9J0BAcpA3kasu0wT2UgiL2IFAxH1xGzf21OgrO6gPzaAvWvhd91s
-         E37twwB4PmWk/0EAeRDGRJeFX7EHMy4oSfF37UhPN8DkbiD8g9LIM/9mH6pH/RDVH6il
-         L/ZiGCe5X1hdxpVP3NUPot68LLdnyh13qXrZFqyYnCW8ErXLSqDZ8J3/TVe8qdEpdpBn
-         VOKb2h/J/c1EvWyjFH9K8EvraAeVHufvpjCWiZEBXEHYE1dPXCKqYo0nlEsfjKzX9GBh
-         csgw==
-X-Gm-Message-State: AOJu0YycZNYkbaDsjXU50B6DiliUiVBM/Mk8zszBfiMQPAun/uogS6yY
-	jG3kY6CvFlnYtthCMl80IewGOvXSgd+2fLIwHsH6RUcLrXTTosIlhrTQpJLcow0=
-X-Google-Smtp-Source: AGHT+IF2I90yAYvAiJm3WaMT8wMepKHclm7yHSVey+ikNh+Ehd5cKcb+Hq7+IhSBo2k3Q39f/lSqxA==
-X-Received: by 2002:a05:6808:1493:b0:3d2:2585:bc5d with SMTP id 5614622812f47-3d6b4de2f3cmr15227720b6e.45.1719989112457;
-        Tue, 02 Jul 2024 23:45:12 -0700 (PDT)
-Received: from ?IPV6:240d:1a:ea3:6c00:3019:6089:f0ff:7c49? ([240d:1a:ea3:6c00:3019:6089:f0ff:7c49])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70804a96ac5sm9615690b3a.211.2024.07.02.23.45.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Jul 2024 23:45:11 -0700 (PDT)
-Message-ID: <dffd88ff-57c8-40b1-a02e-499d71f2986c@miraclelinux.com>
-Date: Wed, 3 Jul 2024 15:45:09 +0900
+	s=arc-20240116; t=1719989724; c=relaxed/simple;
+	bh=2GfBsRxrZDH/TfdgmHX2/PhCbLhSEw5SNB0zMATiQrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qFaMowh5SH5mJQdIj/C1HZoquSiFRNwi7S2Hgx1U870nKR/04PQjZYreFdq+wgy3ZRFcvT1qf+EfiIZuz5lmkcrS/zYL8MUJM9W5XKJZIlks2/JwaQt7RNqbSp2FTrSkcnwLY0GSAIQgqi1vIA8qsplSeM7GZm0HF6z9OXzDsgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=I8fKhS/P; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6359BE0005;
+	Wed,  3 Jul 2024 06:55:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1719989718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+112STnSmnBq9WUzd+MMzssxIWtDa9bVrOCWUEJOUuc=;
+	b=I8fKhS/PeXcxlVYKe8GK5xsSrkRKJFif/5MORW6V/qT3DUtUbQ9kbnfUxbs4tbbS/DJzEV
+	jPFWvgvEggNfffM640DrSbT0+fBra+dREqbHrZL1s7PhHeOvzA+cbriDYePT27AvLxbCj7
+	dqShxFxthmywaX1xvnXswUsV5D+iOhzHLHD4fc3CbgihqrODEomTMVS8TQ03Nls/1YiRaj
+	0hIINbX8JRqqt2Vf5TSazRnCf4I2dzk08SaXQP3p58mcqUjzQS6CwkJmhcqtrV03iDnXBk
+	NJvtlrNmJCUffYMxJG9sxt14dS+SlK/CtM06Rm/yl5SlDMh8KtQ+/m5ZCjQZcw==
+Date: Wed, 3 Jul 2024 08:55:15 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, mwojtas@chromium.org, Nathan Chancellor
+ <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>, Marc Kleine-Budde
+ <mkl@pengutronix.de>
+Subject: Re: [PATCH net-next v14 12/13] net: ethtool: strset: Allow querying
+ phy stats by index
+Message-ID: <20240703085515.25dab47c@fedora-2.home>
+In-Reply-To: <20240702105411.GF598357@kernel.org>
+References: <20240701131801.1227740-1-maxime.chevallier@bootlin.com>
+	<20240701131801.1227740-13-maxime.chevallier@bootlin.com>
+	<20240702105411.GF598357@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5.15 1/3] ipv6: annotate some data-races around
- sk->sk_prot
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
- linux-kernel@vger.kernel.org, hiraku.toyooka@miraclelinux.com,
- Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>
-References: <20230417165348.26189-1-kazunori.kobayashi@miraclelinux.com>
- <20230417165348.26189-2-kazunori.kobayashi@miraclelinux.com>
- <2024070241-equivocal-dismantle-5dd2@gregkh>
-Content-Language: en-US
-From: Kazunori Kobayashi <kazunori.kobayashi@miraclelinux.com>
-In-Reply-To: <2024070241-equivocal-dismantle-5dd2@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 2024/07/02 18:42, Greg KH wrote:
-> On Mon, Apr 17, 2023 at 04:53:46PM +0000, Kazunori Kobayashi wrote:
->> From: Eric Dumazet <edumazet@google.com>
->>
->> commit 086d49058cd8471046ae9927524708820f5fd1c7 upstream.
->>
->> IPv6 has this hack changing sk->sk_prot when an IPv6 socket
->> is 'converted' to an IPv4 one with IPV6_ADDRFORM option.
->>
->> This operation is only performed for TCP and UDP, knowing
->> their 'struct proto' for the two network families are populated
->> in the same way, and can not disappear while a reader
->> might use and dereference sk->sk_prot.
->>
->> If we think about it all reads of sk->sk_prot while
->> either socket lock or RTNL is not acquired should be using READ_ONCE().
->>
->> Also note that other layers like MPTCP, XFRM, CHELSIO_TLS also
->> write over sk->sk_prot.
->>
->> BUG: KCSAN: data-race in inet6_recvmsg / ipv6_setsockopt
->>
->> write to 0xffff8881386f7aa8 of 8 bytes by task 26932 on cpu 0:
->>   do_ipv6_setsockopt net/ipv6/ipv6_sockglue.c:492 [inline]
->>   ipv6_setsockopt+0x3758/0x3910 net/ipv6/ipv6_sockglue.c:1019
->>   udpv6_setsockopt+0x85/0x90 net/ipv6/udp.c:1649
->>   sock_common_setsockopt+0x5d/0x70 net/core/sock.c:3489
->>   __sys_setsockopt+0x209/0x2a0 net/socket.c:2180
->>   __do_sys_setsockopt net/socket.c:2191 [inline]
->>   __se_sys_setsockopt net/socket.c:2188 [inline]
->>   __x64_sys_setsockopt+0x62/0x70 net/socket.c:2188
->>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>   do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
->>   entry_SYSCALL_64_after_hwframe+0x44/0xae
->>
->> read to 0xffff8881386f7aa8 of 8 bytes by task 26911 on cpu 1:
->>   inet6_recvmsg+0x7a/0x210 net/ipv6/af_inet6.c:659
->>   ____sys_recvmsg+0x16c/0x320
->>   ___sys_recvmsg net/socket.c:2674 [inline]
->>   do_recvmmsg+0x3f5/0xae0 net/socket.c:2768
->>   __sys_recvmmsg net/socket.c:2847 [inline]
->>   __do_sys_recvmmsg net/socket.c:2870 [inline]
->>   __se_sys_recvmmsg net/socket.c:2863 [inline]
->>   __x64_sys_recvmmsg+0xde/0x160 net/socket.c:2863
->>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>   do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
->>   entry_SYSCALL_64_after_hwframe+0x44/0xae
->>
->> value changed: 0xffffffff85e0e980 -> 0xffffffff85e01580
->>
->> Reported by Kernel Concurrency Sanitizer on:
->> CPU: 1 PID: 26911 Comm: syz-executor.3 Not tainted 5.17.0-rc2-syzkaller-00316-g0457e5153e0e-dirty #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->>
->> Reported-by: syzbot <syzkaller@googlegroups.com>
->> Signed-off-by: Eric Dumazet <edumazet@google.com>
->> Signed-off-by: David S. Miller <davem@davemloft.net>
->> Signed-off-by: Kazunori Kobayashi <kazunori.kobayashi@miraclelinux.com>
-> This backport didn't apply at all, are you sure you made it against the
-> proper tree?
->
-> The original commit does seem to apply properly, so I'll go apply that
-> one instead...
->
-> greg k-h
+Hello Simon,
 
-I assumed the following commit is the latest version for 5.15 stable and 
-based the patch on this.
-Is there any difference from your expectation?
+On Tue, 2 Jul 2024 11:54:11 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-commit 4878aadf2d1519f3731ae300ce1fef78fc63ee30 (tag: v5.15.161, 
-origin/linux-5.15.y, li
-nux-5.15.y)
-Author: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Date:   Sun Jun 16 13:40:01 2024 +0200
+> On Mon, Jul 01, 2024 at 03:17:58PM +0200, Maxime Chevallier wrote:
+> > The ETH_SS_PHY_STATS command gets PHY statistics. Use the phydev pointer
+> > from the ethnl request to allow query phy stats from each PHY on the
+> > link.
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+> >  net/ethtool/strset.c | 24 +++++++++++++++++-------
+> >  1 file changed, 17 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c  
+> 
+> ...
+> 
+> > @@ -279,6 +280,8 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
+> >  	const struct strset_req_info *req_info = STRSET_REQINFO(req_base);
+> >  	struct strset_reply_data *data = STRSET_REPDATA(reply_base);
+> >  	struct net_device *dev = reply_base->dev;
+> > +	struct nlattr **tb = info->attrs;  
+> 
+> Hi Maxime,
+> 
+> Elsewhere in this function it is assumed that info may be NULL.
+> But here it is dereferenced unconditionally.
 
-     Linux 5.15.161
+Hmm in almst all netlink commands we do dereference the genl_info *info
+pointer without checks.
 
+I've looked into net/netlink/genetlink.c to backtrack call-sites and it
+looks to be that indeed info can't be NULL (either populated from
+genl_start() or genl_family_rcv_msg_doit(). Maybe Jakub can confirm
+this ?
 
-Regards,
+If what I say above is correct, I can include a small patch to remove
+the un-necessary check that makes smatch think the genl_info pointer can
+be NULL.
 
-Kazunori
+Thanks for the report,
 
--- 
-Kazunori Kobayashi
-Cybertrust Japan Co., Ltd.
-https://www.cybertrust.co.jp/
-
+Maxime
 
