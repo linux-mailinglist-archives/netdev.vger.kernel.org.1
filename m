@@ -1,63 +1,40 @@
-Return-Path: <netdev+bounces-108784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFF692570D
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:41:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF00925714
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EB8B1F2542C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 09:41:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DFF01F23E07
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 09:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFB013DBAA;
-	Wed,  3 Jul 2024 09:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="j3Ehs6Ap"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96A813D612;
+	Wed,  3 Jul 2024 09:42:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE0013D60F;
-	Wed,  3 Jul 2024 09:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C682747F
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 09:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719999683; cv=none; b=URM/u2nBBT9LTMbgCyDA6GNHplj9Pk03cMHPDDfztInf7ypWG65sbrfTquGoNiYIrNXAe8BHcUcUqfEWG5WsbGc9mIrSVGGn1GSXEI/ilIk2trUJBCYO/JxNrXLDNTAATGeiT+v2XJ5d8upiiQz6tzpcBc7eLsJsYiX07o+vQUs=
+	t=1719999725; cv=none; b=MC9sINWNsjgdk3lDJvnM92N+917AqXiLLRX8GfsnIbUSTYrvYyf4A5dBTKIp3vgE4/DLXQfJP4jK1EyRLNRChkkIFQDCNvWlr9GFfKhwxFSeKpHqXnSyUG+r6TiFqfLOZ8HQpx6zrgNoqOCXjIRgUlyNS1ITijzSax414VEv4p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719999683; c=relaxed/simple;
-	bh=D5bmYFbTnQTtjYsNZyh9ZSR8LSHiNPbLvAJD8cZzbYk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YAjIpYDqEmqlx6uWJD3zwUq1R2oZxb2DifGLmW/5ZKHxmrrMlezMP1RUre+cu0xnkeWo+H11YqEx5g79+Btq9vLZC4kuBZj5H5cpT3AkSKT7x7w8Rv29nAnxnpqTS2+7lO/h9NQ1aQZySaDcQr0i+PCMrB+8FRW0D2eHobVgwIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=j3Ehs6Ap; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 462NWMm4005551;
-	Wed, 3 Jul 2024 09:40:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	TMN22tJYs4aAZjuMNYZk5hWvC0MHLAbXmOFNPbB+8cE=; b=j3Ehs6ApzFhR+TWK
-	TyI+iTHF2SDxZXMzIkZP4hhe9cIOpc3TijwW24NKNOPUlhO9wXa/0PcKMf3uPEuW
-	7wRdbghFPiOnKi5WHpXAFijUmJpGnpUGB0ZiO0HAKwiZUOay6zguV3zO2cdZmYCm
-	+sLdGJi/UnwTU/IE96aO3Ie7ugQRsGW31saJv1SE1nRM7zbfztI+mc4M7phh4J3n
-	yM4DvlO7sM2jLqKLkRhetVWPhy/P1zV93AYxkBT/BK6HZ715PhzDW1153dj6Fx9s
-	XqQkvAyKoJgyiIlAs1kTF3sdmZS3oyAUsrGyeh53Sb5k8ehXyDz5ojVWcnakE+ih
-	WhFhiA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4027yfbcv6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 09:40:07 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4639e6gL020230
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 3 Jul 2024 09:40:06 GMT
-Received: from [10.239.132.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 3 Jul 2024
- 02:39:43 -0700
-Message-ID: <64934d64-3922-4cc1-a01d-6dcd773bc466@quicinc.com>
-Date: Wed, 3 Jul 2024 17:39:41 +0800
+	s=arc-20240116; t=1719999725; c=relaxed/simple;
+	bh=/Nkk+07r0gtlTJcexFll6QbvHuezlz4YnuAXhVDP5SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hCt0Mo1t5OV+CmVtOtaD9FE+V1HyA+/UTamcqMF6RMJN4rS01kU9sfwofe2ED2P10ILwlNtOnqi3YOn4J/0gjRXVtqgOItYQUiVU38cdrEcW3fyiMuYohgZ6Ay2tgxfJSXwtfroPTRSOcOAuwoyhfQn3bQcakfFporIMbIZDUb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.32])
+	by gateway (Coremail) with SMTP id _____8Cx7+vnHIVmDngAAA--.1383S3;
+	Wed, 03 Jul 2024 17:41:59 +0800 (CST)
+Received: from [192.168.100.8] (unknown [223.64.68.32])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxZcXjHIVmB3U5AA--.57678S3;
+	Wed, 03 Jul 2024 17:41:56 +0800 (CST)
+Message-ID: <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
+Date: Wed, 3 Jul 2024 17:41:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,159 +42,199 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
-To: Krzysztof Kozlowski <krzk@kernel.org>, <andersson@kernel.org>,
-        <konrad.dybcio@linaro.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-        <conor+dt@kernel.org>, <djakov@kernel.org>, <mturquette@baylibre.com>,
-        <sboyd@kernel.org>, <jassisinghbrar@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <manivannan.sadhasivam@linaro.org>, <will@kernel.org>,
-        <joro@8bytes.org>, <conor@kernel.org>, <tglx@linutronix.de>,
-        <amitk@kernel.org>, <thara.gopinath@gmail.com>,
-        <linus.walleij@linaro.org>, <wim@linux-watchdog.org>,
-        <linux@roeck-us.net>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
-        <vkoul@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>
-CC: <robimarko@gmail.com>, <bartosz.golaszewski@linaro.org>,
-        <kishon@kernel.org>, <quic_wcheng@quicinc.com>,
-        <alim.akhtar@samsung.com>, <avri.altman@wdc.com>, <bvanassche@acm.org>,
-        <agross@kernel.org>, <gregkh@linuxfoundation.org>,
-        <quic_tdas@quicinc.com>, <robin.murphy@arm.com>,
-        <daniel.lezcano@linaro.org>, <rui.zhang@intel.com>,
-        <lukasz.luba@arm.com>, <quic_rjendra@quicinc.com>,
-        <ulf.hansson@linaro.org>, <quic_sibis@quicinc.com>,
-        <otto.pflueger@abscue.de>, <luca@z3ntu.xyz>,
-        <neil.armstrong@linaro.org>, <abel.vesa@linaro.org>,
-        <bhupesh.sharma@linaro.org>, <alexandre.torgue@foss.st.com>,
-        <peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
-        <netdev@vger.kernel.org>, <lpieralisi@kernel.org>, <kw@linux.com>,
-        <bhelgaas@google.com>, <ahalaney@redhat.com>,
-        <krzysztof.kozlowski@linaro.org>, <u.kleine-koenig@pengutronix.de>,
-        <dmitry.baryshkov@linaro.org>, <quic_cang@quicinc.com>,
-        <danila@jiaxyga.com>, <quic_nitirawa@quicinc.com>,
-        <mantas@8devices.com>, <athierry@redhat.com>,
-        <quic_kbajaj@quicinc.com>, <quic_bjorande@quicinc.com>,
-        <quic_msarkar@quicinc.com>, <quic_devipriy@quicinc.com>,
-        <quic_tsoni@quicinc.com>, <quic_rgottimu@quicinc.com>,
-        <quic_shashim@quicinc.com>, <quic_kaushalk@quicinc.com>,
-        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
-        <linux-riscv@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <kernel@quicinc.com>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703035735.2182165-1-quic_tengfan@quicinc.com>
- <7417fd8c-e852-45ee-bac9-d92921036e2f@kernel.org>
-From: Tengfei Fan <quic_tengfan@quicinc.com>
-In-Reply-To: <7417fd8c-e852-45ee-bac9-d92921036e2f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: kiiVH7Fe3W0fNlX1fdY9JogHsKzjFhan
-X-Proofpoint-ORIG-GUID: kiiVH7Fe3W0fNlX1fdY9JogHsKzjFhan
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-03_06,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- clxscore=1015 malwarescore=0 suspectscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407030071
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
+ <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
+ <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
+ <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxZcXjHIVmB3U5AA--.57678S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxur1xJF13tr13GrW7tFy8tFc_yoWrAw15p3
+	y3Ca15Kry5tr1akF4UXrZ8Z3WYyrWYy3srKF4ak3WDC3s0kw4vqrZxKF1I9FZ7ZrZ5ur45
+	Zr48AFs7uF98trgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+	x2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAF
+	wI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+
+>>>> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+>>>>    	pci_set_master(pdev);
+>>>> -	loongson_default_data(plat);
+>>>> +	loongson_gmac_data(plat);
+>>>>    	pci_enable_msi(pdev);
+>>>>    	memset(&res, 0, sizeof(res));
+>>>>    	res.addr = pcim_iomap_table(pdev)[0];
+>>>> @@ -140,6 +142,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>>>    		goto err_disable_msi;
+>>>>    	}
+>>>> +	plat->tx_queues_to_use = 1;
+>>>> +	plat->rx_queues_to_use = 1;
+>>>> +
+>>> Please move this to the loongson_gmac_data(). Thus all the
+>>> platform-data initializations would be collected in two coherent
+>>> methods: loongson_default_data() and loongson_gmac_data(). It will be
+>>> positive from the readability and maintainability points of view.
+>> OK, I will move this to the  loongson_default_data(),
+>>
+>> Because loongson_gmac/gnet_data() call it.
+> It shall also work. But the fields will be overwritten in the
+> loongson_gmac_data()/loongson_gnet_data() methods for the
+> multi-channels case. I don't have a strong opinion against that. But
+> some maintainers may have.
+I see. I will move this to the loongson_gmac_data()/loongson_gnet_data().
+>
+>>
+>>> In the patch adding the Loongson multi-channel GMAC support make sure
+>>> the loongson_data::loongson_id field is initialized before the
+>>> stmmac_pci_info::setup() method is called.
+>> I've tried. It's almost impossible.
+> Emm, why is it impossible? I don't see any significant problem with
+> implementing that.
+Sorry, I've to take back my words.
+>
+>>
+>> The only way to do this is to initialize loongson_id again in
+>> loongson_default_data().
+>>
+>> But that will add a lot of code.
+> Not sure, why? What about the next probe() code snippet:
+Full marks!
+>
+> 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+> 	if (!plat)
+> 		return -ENOMEM;
+>
+> 	plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+> 					   sizeof(*plat->mdio_bus_data),
+> 					   GFP_KERNEL);
+>          if (!plat->mdio_bus_data)
+>                  return -ENOMEM;
+>
+> 	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+> 	if (!plat->dma_cfg)
+> 		return -ENOMEM;
+>
+> 	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+> 	if (!ld)
+> 		return -ENOMEM;
+>
+> 	/* Enable pci device */
+>   	ret = pci_enable_device(pdev);
+>   	if (ret)
+> 		return ret;
+>
+> 	// AFAIR the bus-mastering isn't required for the normal PCIe
+> 	// IOs. So pci_set_master() can be called some place
+> 	// afterwards.
+> 	pci_set_master(pdev);
+>
+> 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> 		if (pci_resource_len(pdev, i) == 0)
+> 			continue;
+> 		ret = pcim_iomap_regions(pdev, BIT(0), pci_name(pdev));
+> 		if (ret)
+> 			goto err_disable_device;
+> 		break;
+> 	}
+>
+> 	memset(&res, 0, sizeof(res));
+> 	res.addr = pcim_iomap_table(pdev)[0];
+>
+> 	plat->bsp_priv = ld;
+> 	plat->setup = loongson_dwmac_setup;
+> 	ld->dev = &pdev->dev;
+> 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+>
+> 	info = (struct stmmac_pci_info *)id->driver_data;
+> 	ret = info->setup(plat);
+> 	if (ret)
+> 		goto err_disable_device;
+>
+> 	if (dev_of_node(&pdev->dev))
+>   		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+> 	else
+
+> 		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
+
+I don't know how to write this function, it seems that there
+
+is no obvious acpi code in the probe method.
+
+>
+> 	if (ret)
+> 		goto err_disable_device;
+>
+> 	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
+> 		ret = loongson_dwmac_msi_config(pdev, plat, &res);
+> 		if (ret)
+> 			goto err_disable_device;
+> 	}
+
+It seems that we don't need if else.
+
+If failed to allocate msi,  it will fallback to intx.
+
+so loongson_dwmac_msi_config also needs a new name. How about:
+
+...
+
+     ret = loongson_dwmac_irq_config(pdev, plat, &res);
+     if (ret)
+         goto err_disable_device;
+
+     ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+
+...
 
 
 
-On 7/3/2024 12:45 PM, Krzysztof Kozlowski wrote:
-> On 03/07/2024 05:56, Tengfei Fan wrote:
->> Introduce support for the QCS9100 SoC device tree (DTSI) and the
->> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
->> While the QCS9100 platform is still in the early design stage, the
->> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
->> mounts the QCS9100 SoC instead of the SA8775p SoC.
-> 
-> The same huge patchset, to huge number of recipients was sent twice.
-> First, sorry, this is way too big. Second, it has way too many
-> recipients, but this is partially a result of first point. Only
-> partially because you put here dozen of totally unrelated emails. Sorry,
-> that does not make even sense. See form letter at the end how this
-> works. Third, sending it to everyone twice is a way to annoy them off
-> twice... Fourth,
-> 
-> Please split your work and do not cc dozen of unrelated folks.
+>
+> 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>   	if (ret)
+> 		goto err_clear_msi;
+>
+> 	return 0;
+>
+> 	...
+>
+> The code allocates all the data, then enables the PCIe device
+> and maps the PCIe device resources. After that it calls all the setup
+> and config methods. Do I miss something?
 
-I can split this patch series, there are two options for splitting:
-Option A:
-   1. Initial qcs9100.dtsi, qcs9100-pmics.dtsi, qcs9100-ride.dts renamed 
-from sa8775p with existing compatible.
+You are right!
 
-   2. Each subsystem have single patch series to each limited driver 
-maintainers.
 
-      - About 15 series need to update related drivers, so each series 
-will have 3 patches (bindings, drivers, the compatible names in 
-subsystem-related parts of dtsi/dts).
 
-      - About 14 series only need to add qcs9100 compatible in 
-bindings., so each series will have 2 patches (bindings, the compatible 
-names in subsystem-related parts of dtsi/dts).
+Thanks,
 
-Option B:
+Yanteng
 
-   1. Each subsystem have single patch series to each limited driver 
-maintainers. Each patch series only update bindings, drivers, but no 
-compatible names change in dts.
+>
+> -Serge(y)
+>
+>>>> 2.31.4
+>>>>
 
-      - About 15 series in total and each series will have 2 patches 
-(bindings, drivers).
-
-      - About 14 series only need to add qcs9100 compatible in bindings, 
-so each series will have 1 patches (bindings).
-
-   2. Squash current qcs9100.dtsi, qcs9100-pmics.dtsi, qcs9100-ride.dts 
-with compatible changed to qcs9100 dt files.
-
-We tend to use Option A.
-
-Welcome to other ideas ideas for splitting the huge numbers of patches 
-as well.
-
-Another, each splited series will also have cover letter contain the 
-whole story like this cover letter.
-
-> 
-> <form letter>
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC (and consider --no-git-fallback argument). It might
-> happen, that command when run on an older kernel, gives you outdated
-> entries. Therefore please be sure you base your patches on recent Linux
-> kernel.
-> 
-> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> people, so fix your workflow. Tools might also fail if you work on some
-> ancient tree (don't, instead use mainline), work on fork of kernel
-> (don't, instead use mainline) or you ignore some maintainers (really
-> don't). Just use b4 and everything should be fine, although remember
-> about `b4 prep --auto-to-cc` if you added new patches to the patchset.
-> </form letter>
-> 
-> Best regards,
-> Krzysztof
-> 
-
-Previously, I've been using scripts/get_maintainers.pl to obtain a list 
-of recipients and manually removing duplicate email addresses(although I 
-noticed you have two different email addresses, so I included both).
-I'll follow your advice and use b4 to submit a new version patch series 
-to upstream, confident that similar issues won't arise again.
-
--- 
-Thx and BRs,
-Tengfei Fan
 
