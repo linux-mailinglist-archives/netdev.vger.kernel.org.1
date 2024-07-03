@@ -1,121 +1,73 @@
-Return-Path: <netdev+bounces-108889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47060926254
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:54:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0FF92623C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E569B2B183
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:54:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A242284C3B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A037518133A;
-	Wed,  3 Jul 2024 13:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58F017B51B;
+	Wed,  3 Jul 2024 13:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZmEWP9j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LD8DLqB7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7559117B432;
-	Wed,  3 Jul 2024 13:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823AB17083F
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 13:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720014722; cv=none; b=r2z9BYjQM2ys0eoSmw/2sIhoBmhEysgsWySs5AkXw50+FVyiq74Z3cwrcqj8dIG0Y7AZYRSnI92oPLlTg7oOZ4RIx09phty8RrBHh+mv7CheBjqEDVrWj6SV4g0X9W58yjaKwIYigyVRrefgmpTfUuB5d03YmBxniqQdjQQ6goo=
+	t=1720014702; cv=none; b=TZqo1ZSz3VKNPeAM/5NWko4W0DDrMqDZByF/UwIazDJm9LpvDskTf+ONwgLBbXtC2DYu/BY58oz2Vrux5Vbipk00m99Zw3aAwpe1eb0OyAXX+6W7NLn1Z7zatU6Wmn76HUuDSZHjGX8iIhjzfix5kVqz4ivuX7uRzP69JlQCH4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720014722; c=relaxed/simple;
-	bh=8OS3EQTA1nsQoBdqA3J8k7Fv9Yb5rZa160z2POCWKtk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=D9LkQ5PTGQSeeqHARcotRpLMzxYdwMCPLa8L82lBgexmCQdi88kRKaAKhzx6i77DSpgO+xQEIYpGbhQ7PyCjrLFkC3mixdJG6PY0wjijY5Rspum63fmaiTgfnpF1nCye3/XqBPyVBSSoF2cGxgu3qiA0LC00oPNuLdOCBkVGpKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZmEWP9j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91CEDC3277B;
-	Wed,  3 Jul 2024 13:51:58 +0000 (UTC)
+	s=arc-20240116; t=1720014702; c=relaxed/simple;
+	bh=vohJkRmDREtV7zK+r/OengDY8oZi5Ve1UW1v/rLhsDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mC5fRIyVDMtqhbawzZqfsupgpOFuubkiiInnjOhm4ovZSzwlwuX2ssr6ZgOCZ6wvn9qdFdN0rSRP2bz7t9UT6bxMOvGPwdzmLFRfJTbgSGuW63vtJcgz3IRwfxgHxigeNKKzRAbn1ZDpU2bLTZ844WLsWll+s7QTncpttogK7SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LD8DLqB7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26D8C3277B;
+	Wed,  3 Jul 2024 13:51:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720014722;
-	bh=8OS3EQTA1nsQoBdqA3J8k7Fv9Yb5rZa160z2POCWKtk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=aZmEWP9jyupuCkzheaevVIXB2nm4yGoDXZwPomP9xyF9P8+YIfWrq+ozDe4NRjBL2
-	 Pib2KO37Qv1EcHUS9dOkLI6+mgkUx69AHIluXHeFXQxs825uzsGr/YrWFDiV4J8bmg
-	 qekDTuhS8VPDFOexJ+cZF8xQ6dXeLLh6AjEBhKpUwWieHDQmFRtbJ7jJJN5ddZLO5y
-	 wtfM/GrYA3jpIrdf5zGsKZvgY4ZXpQRQlfGU1xnbaqruIQO9Hxe2VqnJn/9ZOTa+Ja
-	 yh6g20GRkBEGHODExhGFz+dUF7/LpMeFpO+4wmDVlVXpcAX7kX1WKRoI3QlZro78OC
-	 mDKHteIm2Bj6w==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Wed, 03 Jul 2024 16:51:37 +0300
-Subject: [PATCH net-next v3 6/6] net: ethernet: ti: am65-cpsw: setup
- priority to flow mapping
+	s=k20201202; t=1720014702;
+	bh=vohJkRmDREtV7zK+r/OengDY8oZi5Ve1UW1v/rLhsDo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LD8DLqB7sIyQpDcvj2fOhNE0aiNvDiO+0wcnO4jPilrgXMxSycI8fJ+24wvIXNw/f
+	 aYdHpSOgaL4v59lmgrWUOYFjTSjK1eaOxNkAjaLTaXBEovgGS1hpS5DwVoVrt+QaK9
+	 /Q1z7hnUF3qKjrXScqzZiZuqfIhM6CpLNolVniWX2WroVM+T90ssJdvJBGU6G6rJy9
+	 WPWNNdokoLPAB2bT/ueDaQmQtrJGpHbGP4H6/zEUCynA1MbOZkd35/2l8P1IG6wbed
+	 4wTuKJ71MGBSpmGD3mN/b3/3kpprPjK1olJ7pnqZJ+mnq44vkqnDSRfVoxRJO/Ju48
+	 Oz6s3yeejgqrA==
+Date: Wed, 3 Jul 2024 06:51:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, michael.chan@broadcom.com
+Subject: Re: [PATCH net-next 10/11] eth: bnxt: use the indir table from
+ ethtool context
+Message-ID: <20240703065140.65abd1fd@kernel.org>
+In-Reply-To: <04214959-8b0c-2e5c-5dc7-8426746b48b9@gmail.com>
+References: <20240702234757.4188344-1-kuba@kernel.org>
+	<20240702234757.4188344-12-kuba@kernel.org>
+	<04214959-8b0c-2e5c-5dc7-8426746b48b9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240703-am65-cpsw-multi-rx-v3-6-f11cd860fd72@kernel.org>
-References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
-In-Reply-To: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Julien Panis <jpanis@baylibre.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- srk@ti.com, vigneshr@ti.com, danishanwar@ti.com, 
- pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1075; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=8OS3EQTA1nsQoBdqA3J8k7Fv9Yb5rZa160z2POCWKtk=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBmhVdm+OKRJdx9lr33jldo0NJ4kivOse5Ni9dtr
- cCQFZvK+tqJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZoVXZgAKCRDSWmvTvnYw
- k7tsEAC9Haw1DbVbwvt7Bfx397ddS5mrCZVd/3k0XTwOxBmM4cpkitCv1f/iuqL4rDDHlI+wPaT
- F8Do25w8YK7xBZDErXxmWTwDVM3CEv1Xv5sPlW4El+UPrWKma32XJEMAmVJ9cgwAgy0iB6+mBLG
- qfqMc0sRwwV5vhR++Vw8n1fP9H4QL4uZkjvVUMAgRg2wFIYjh7FGn0dK8ENwfSl+MFrexALhX3N
- lvatdFMb3kUfJOZ+S0g6JXHfPGHDFI3o4AwCc0dIFHaSVDC/+7ryaCV9n69OuJYkcdOxcXhf9+E
- x9V3IDX8m54rk4uo5kkV4wUFISD8lkLdgsMAwnTaFbDpTtZggcsH4/RSC1ElQw/5ToyGFGaVrfx
- 9+Gnuy6XDpoeaTqe1FlmfNpDIXIsMUtOznW9hWnUTr+cVHT04vsD2d6Qw1vd8qAL0cCES+dlK76
- h8/aD60HO7gxI/m/4moZpZACzn0uTRerW1V7Mi8Tugesh1IxiHLNFs2ZXJPTtkfKVH95M2WaSXP
- O1GCr2Man+LQ+a3rVg682qoX4sYvAUpPah0liiNksmDPZtUAV3evrHkmHRthMqS08s7civtVsYH
- J3hKTEGrCPKU9S/QqgqAR9LA+93eg8vrOhM4OPoaoAv944KNXVb7n+SBw0DAn/0mExtaRNAkos9
- qTBmB3J2I2IklAA==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-Now that we support multiple RX queues, enable default priority
-to flow mapping so that higher priority packets come on higher
-channels (flows).
+On Wed, 3 Jul 2024 12:39:09 +0100 Edward Cree wrote:
+> >  	tbl_size = bnxt_get_rxfh_indir_size(bp->dev);
+> > +	ctx = ethtool_rxfh_priv_context(vnic->rss_ctx);  
+> 
+> Not super familiar with this driver or why this need arises, but
+>  would it be simpler to just store ctx in vnic instead of priv?
 
-The Classifier checks for PCP/DSCP priority in the packet and
-routes them to the appropriate flow.
-
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-Changelog:
-v3:
-- added Reviewed-by Simon Horman
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index deb8e39e4648..4db03010d234 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2497,6 +2497,9 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 		}
- 	}
- 
-+	/* setup classifier to route priorities to flows */
-+	cpsw_ale_classifier_setup_default(common->ale, common->rx_ch_num_flows);
-+
- err:
- 	i = devm_add_action(dev, am65_cpsw_nuss_free_rx_chns, common);
- 	if (i) {
-
--- 
-2.34.1
-
+Yup, I think that should work!
 
