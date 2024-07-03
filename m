@@ -1,135 +1,106 @@
-Return-Path: <netdev+bounces-108943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E27DB92647E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:11:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47DFA9264AF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:17:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA381F21D3B
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:11:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A1971C211A2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6739181B8E;
-	Wed,  3 Jul 2024 15:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688CA17DA3F;
+	Wed,  3 Jul 2024 15:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ip5Iq2He"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="UywAO2P2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB85E17E8EE;
-	Wed,  3 Jul 2024 15:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558F417DA20
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 15:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720019440; cv=none; b=nRiHXrdjYK1fC8XT4FTJKoLL6InUpHqYqF5LDbQBer6dj7arBpf5Ln0W9DYkXvcW+UYBYTi5lKOmECfSabGJdHb18XfXWMWX0yyxFkOnR89M01+zpYjnNb3pSQ/HuQYmd4YDgrsSn/qj9YyrXNP+QWqw9rpiXObvf+E/6Jzizxw=
+	t=1720019815; cv=none; b=qiXyAc+Xs4Q394NSgWWe5sGn3/V2A42yZC7dLkmD7BP3lFbQ/WYzjSMyv9zaOInmsVGVfRR4PfZ9I2IzT4FJm1DLiRjE9umjXl/exVKhLsAt2ewXLlA7r1fA4G0RSM3EZ4QAzQ4jDAK96R7YsI0VMeJqMWeS1dyoNA3FIFAbDp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720019440; c=relaxed/simple;
-	bh=z5NT7nklWyh3rDy0r1YW8buRwoHbBrZ6LTh94YKUM84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rRRjgCWpfvRGqUjWMfhqw0ReFAYgAwwXosr9DSagVxk1IcWJnQMl7GTgcCarVpMVNI18bJtJWFmJEUCeLUVg0YHGR++a6gg5NYUg7xF7h5sZTyKNt09DK/AY/xMEdkjwZoJI88r8euwioiZ12JXVQyR2xdhxnovVeTIiPZ1LIa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ip5Iq2He; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C715DC2BD10;
-	Wed,  3 Jul 2024 15:10:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720019440;
-	bh=z5NT7nklWyh3rDy0r1YW8buRwoHbBrZ6LTh94YKUM84=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ip5Iq2HezpBHXYt/93hPbeMG7Zo/ec1gIvdcgAC9d8gL6AZN3LQUDCb874Tj88Cho
-	 4tKk+8DPYZFlQia57yoq0HWevC8Kw+XR+C7ZmDpCmXW+slcUp/I9w4zd/7EtxgG7K3
-	 /WrPDnpnK1Ki+fsWWSOAKR7hB6o4C05njYsnmFYyHb3sSeSCbaE30Mu2aXzk4YmoXx
-	 sEh9a5qkKq6KPKr+OGXfp4WnQLO2lYWnsouQXl3XbmCCMChZMbobi1MIsNNms/3yin
-	 cStctn9CCEXxDKaMmF1z0el9UOQDqR5yZADzGBYxR0vxXbC2LKEgiTpgXc5biTgHxC
-	 0drEK1adVdLxw==
-Date: Wed, 3 Jul 2024 16:10:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH iwl-net v1 4/4] igc: Fix qbv tx latency by setting
- gtxoffset
-Message-ID: <20240703151035.GQ598357@kernel.org>
-References: <20240702040926.3327530-1-faizal.abdul.rahim@linux.intel.com>
- <20240702040926.3327530-5-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1720019815; c=relaxed/simple;
+	bh=1es+Trjk37AaUG8ezmycVVMv9NS+kr48bMEvweIaoWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C/8jvcwtz3ekoZcKbZzZDCUCnaQgP/OX0kJYkT3d8EggeGTFp+PWs0w412Ypq7f5VOrnVbsA6zyX4nEVDeF66p6bKnc1JkDj4ctTc9+ke3U5DBs1JEKv52Rb8cx2mVZF9lf9JoinfCC9t644uo58Z37sLcCbgwFOTbHB7AOccHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=UywAO2P2; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-652fd0bb5e6so3770734a12.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 08:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720019812; x=1720624612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gMhw25NAy3tQGuL2MKvieK4UjtNyi6UoztExQ4eMyig=;
+        b=UywAO2P2sGCoyFQtwFnK3EjLB/firfPNaq7nk0D8EH4V+6KXBs18QQd9ZMz2vK/M1A
+         O+CW8qL2z6oMle/SHTKbwm1hD+ioSoWppQ3+UrZj+cqFubr/v8pJm3mIdyUYGrAHKk5O
+         ajHoDzSNZmbWtP/473ldgUqELRP2oIjFIooildIC2vr7/M4m0wx+jkio7kSFOTZZcC6U
+         tUxvMbSx0v3ynlk/oCGZ9kLPrnNpgN85id2dEZkECfQf/e8Ux6fBq+3bjI+tGjiLTbbd
+         eaOWR7O1PHtzCp4ecBExCpStD4vC+Itiig92VqYFh4qYlEwHGJBzEARQsVnwYpanDBVM
+         qOWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720019812; x=1720624612;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gMhw25NAy3tQGuL2MKvieK4UjtNyi6UoztExQ4eMyig=;
+        b=i0f+0vG6V+8ZKmfmWVMP2jbyzRVCj4cEpFIJWGgofw2QFfr+QINaLYPaOeJD65Ptfd
+         8nK50zH/Cj1Km9PMqxta2NR/3jsNk8PpoqTIlLfX3hOTOhpJTMNGwY+G3SF5mshtYZ6u
+         DwOiBLAGwbjfk90Y/7/r0wiFyx9n9AE8NTDAptdjfXwbPLVl6hknRibbkGfA6lXdAeHV
+         uz+tLkjnwxT5ULMVFQQzEXA7D8LNUzCFZaGj1WTFFrZJkHzG2js333HwM2AsJqfvkDCs
+         ADr1gDqetiC/iYGLdIvY19uDM78LW7P3iijKR4z15cAEykcnvTG0c/ZxHBkPTXrCQ+5T
+         MPRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxKiTUiWR5BYdUeMwRlT4lGnmTXcnXQwjSbMOgyfAZSnbsynY4iNKXQSf8aS0uun5MitpPbfc+qaZzBkmeFkTJ8a1Duoqr
+X-Gm-Message-State: AOJu0YzQ15Goq2xWCihIh2VfpmggjhWj0crOia8oBkWIUFdwxUhVlylF
+	yDGeEhj6D5/EuKM35IdEzyAYdnWmt92MLr0nbgW1PfibtJcGuDp5t/TJN9lW9r0=
+X-Google-Smtp-Source: AGHT+IFPJfU8SG1ys2V8a54fwXr0tqUxVoHSrLxME346erjv+Hjv7/D//jdgTpIwwZr8BVhXnofFHw==
+X-Received: by 2002:a05:6a21:33a2:b0:1b8:9d79:7839 with SMTP id adf61e73a8af0-1bef613f2abmr16276319637.29.1720019810913;
+        Wed, 03 Jul 2024 08:16:50 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7080246c662sm10558366b3a.61.2024.07.03.08.16.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jul 2024 08:16:50 -0700 (PDT)
+Date: Wed, 3 Jul 2024 08:16:48 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Lukasz Czapnik <lukasz.czapnik@intel.com>
+Subject: Re: [PATCH iproute2-next 3/3] Makefile: support building from
+ subdirectories
+Message-ID: <20240703081648.3109da55@hermes.local>
+In-Reply-To: <20240703131521.60284-4-przemyslaw.kitszel@intel.com>
+References: <20240703131521.60284-1-przemyslaw.kitszel@intel.com>
+	<20240703131521.60284-4-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240702040926.3327530-5-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 02, 2024 at 12:09:26AM -0400, Faizal Rahim wrote:
-> A large tx latency issue was discovered during testing when only QBV was
-> enabled. The issue occurs because gtxoffset was not set when QBV is
-> active, it was only set when launch time is active.
-> 
-> The patch "igc: Correct the launchtime offset" only sets gtxoffset when
-> the launchtime_enable field is set by the user. Enabling launchtime_enable
-> ultimately sets the register IGC_TXQCTL_QUEUE_MODE_LAUNCHT (referred to as
-> LaunchT in the SW user manual).
-> 
-> Section 7.5.2.6 of the IGC i225/6 SW User Manual Rev 1.2.4 states:
-> "The latency between transmission scheduling (launch time) and the
-> time the packet is transmitted to the network is listed in Table 7-61."
-> 
-> However, the patch misinterprets the phrase "launch time" in that section
-> by assuming it specifically refers to the LaunchT register, whereas it
-> actually denotes the generic term for when a packet is released from the
-> internal buffer to the MAC transmit logic.
-> 
-> This launch time, as per that section, also implicitly refers to the QBV
-> gate open time, where a packet waits in the buffer for the QBV gate to
-> open. Therefore, latency applies whenever QBV is in use. TSN features such
-> as QBU and QAV reuse QBV, making the latency universal to TSN features.
-> 
-> Discussed with i226 HW owner (Shalev, Avi) and we were in agreement that
-> the term "launch time" used in Section 7.5.2.6 is not clear and can be
-> easily misinterpreted. Avi will update this section to:
-> "When TQAVCTRL.TRANSMIT_MODE = TSN, the latency between transmission
-> scheduling and the time the packet is transmitted to the network is listed
-> in Table 7-61."
-> 
-> Fix this issue by using igc_tsn_is_tx_mode_in_tsn() as a condition to
-> write to gtxoffset, aligning with the newly updated SW User Manual.
-> 
-> Tested:
-> 1. Enrol taprio on talker board
->    base-time 0
->    cycle-time 1000000
->    flags 0x2
->    index 0 cmd S gatemask 0x1 interval1
->    index 0 cmd S gatemask 0x1 interval2
-> 
->    Note:
->    interval1 = interval for a 64 bytes packet to go through
->    interval2 = cycle-time - interval1
-> 
-> 2. Take tcpdump on listener board
-> 
-> 3. Use udp tai app on talker to send packets to listener
-> 
-> 4. Check the timestamp on listener via wireshark
-> 
-> Test Result:
-> 100 Mbps: 113 ~193 ns
-> 1000 Mbps: 52 ~ 84 ns
-> 2500 Mbps: 95 ~ 223 ns
-> 
-> Note that the test result is similar to the patch "igc: Correct the
-> launchtime offset".
-> 
-> Fixes: 790835fcc0cb ("igc: Correct the launchtime offset")
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+On Wed,  3 Jul 2024 15:15:21 +0200
+Przemek Kitszel <przemyslaw.kitszel@intel.com> wrote:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Support building also from subdirectories, like: `make -C devlink` or
+> `cd devlink; make`.
+> 
+> Extract common defines and include flags to a new file (common.mk) which
+> will be included from subdir makefiles via the generated config.mk file.
+> 
+> Note that the current, toplevel-issued, `make` still works as before.
+> Note that `./configure && make` is still required once after the fresh
+> checkout.
+> 
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
+Not sure if this really needed, it impacts more than devlink.
 
