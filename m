@@ -1,184 +1,103 @@
-Return-Path: <netdev+bounces-108985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C289266DC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:13:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F3989266E6
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 472A71F22C8C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:13:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 444401F21E6A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49DE18412E;
-	Wed,  3 Jul 2024 17:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00E818309B;
+	Wed,  3 Jul 2024 17:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fq7EHaq1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjHwhdaF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E32F170836
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 17:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839FE18308A
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 17:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720026777; cv=none; b=cV6QnEY9ulEGEj7Ek2mL6eOWclR0FDjlWy1jyiZSXzzGxwdpMKEh8A2OsePZ8aaS0lLoBUZv+HzJ8+zwwPicx2nuigsgaPQUskXvY/XK/EhvJNLH1Bmo9bpieJjbXMmfNlWCO29X5LAaRffBAfZXQ8db+vqwAHERRJ1AwPfs53I=
+	t=1720026978; cv=none; b=leJw8sK7lb+hx920N8gTINPBPFxsT21RV7m+xUPE41V+AAP4nwEPJt/Zy/g3GPMcmqmAzwlVtw7X4wrwXYIgoZ/yUb666ATmJi9QQr2NNoTlU5op0rnEcagnLkA4exhdFIFR2ommm/8l/1WRcWqxW8mYMoXXjsmLWkvePKtNkjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720026777; c=relaxed/simple;
-	bh=4zYxsmwtSfQegBJvIWUBl8jS6cwFqlCqnX8WofKHBWs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEmR9s7Qhu+XYGX4nkJZ+VBA+ghHXafKOItoPbTWMzZNfqoSp694oYCdmKC+/Y/UWh4v/BIlXAWEU1GBw3hs1Uk/nlqoQ5xZ8FNmUBXu2KtJqD56xx/aBsE+Cajra8Mvq8adDHQd/IaUPAcCpC69q8qlki+FFuV0BP5s1LgYZ/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fq7EHaq1; arc=none smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1720026978; c=relaxed/simple;
+	bh=PRe8+EhL+rdb6p2uTAxprA8wxWC20Q1arvRJ+g4zmqA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WEbOdYNmySIgIZMxRHk5/D2ithzZQR511Dy5R9rCm34Bn2qdhDvy3QihX7kCy4sWe90JJyqs9Z6DX8Ya0N1UBXz/cNrYeh1BMcHdeROxnxttajTnbnD6UZJKZz+iD5O0cDF4tK9xqv7jdSU6d7S2D1gLi8rQoP5RtYpD8aCYDVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TjHwhdaF; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6b553b1a159so27825956d6.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 10:12:55 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2c980a9fe88so547001a91.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 10:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720026775; x=1720631575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7tilZMfw+7+bPaghY6cWnvgwdBZycDiSBcjMRdhX6E=;
-        b=fq7EHaq19tbra8zcMUIVGlqEd+Q9VbpB3CZnL7LCMVme6h+pemhekVd6lmM9ZhcQoH
-         sgp6LLttwi7x6i89+osNhy0KDFHOssM/yS4bvEj1h+0UzZge3w1UU3EgSo0CKY11L0IO
-         ETyf18PfvJrxs3DOcLWkjF9XFhG2VpBxkqyeviBfuDD/F15x2j6IswLeTjXzsZE8AC7Y
-         3tEBnjsBv6TVwbR1OIXQRVi7+0bJefW/VlNBeEgPM785wGyLOhPqQ28PsXitoV5W1vwX
-         i+vOo48V/eYhvJRKX/8SY6poW2Ss/T6/ovysd8WkBIF93DyHzLCnfY15su79ugCKkj08
-         MY9w==
+        d=gmail.com; s=20230601; t=1720026977; x=1720631777; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fa7XnMj5RCKxWfhNwJQuri+ySkp7W4mLLv5DKR/LAz0=;
+        b=TjHwhdaFAIeH6HymqhwOuNGijaOCqe6cupNJyKlfRRdMq9jbbf8PetCwKxdBehuJK0
+         B4/glaT0O5ddUV7UqRvKzeqtLEZi/OrFljm+5Q9m+ir3R4tY2dhv4E8F46HHzfJb/D1Z
+         gHEsK1j/hAF6vNp2cuoDiejldz6hOgTz44NV43R5Q0ITfbaGJxMrmuxuQReM7SUW+Pqj
+         ZAkqIrxZ+Wege21WjI/Dc+1kn9aA4PpNrs5zfwVhBJdIcATTUqZ5wigGDcS+M4SSiwNV
+         thWTAMtChRcZDA/AJZQe7RC4BS+x7GiQwitYk46Kd4a52XyVxIJURjVJ4O8znkJVtZii
+         D9lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720026775; x=1720631575;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1720026977; x=1720631777;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=u7tilZMfw+7+bPaghY6cWnvgwdBZycDiSBcjMRdhX6E=;
-        b=fjbaKk7e1VJiAlyuZxZ5KdvPsFGW18w7EEtJui3jjY3yyz/bTiJxLKyDFMVPbWBvYm
-         pHQrJcaNpsTKEopESkz4cb++f/M0bk7uw0GiFquIgZChewSR6przj+x3vfR8uXIDqzAL
-         r4AVtYFISt+25ntNDOZ/CTboP54PJtHHF8KH/v8f2s1GIp6mY6S++ena6cYsaKDTVfqp
-         nNNjrG8RbhInucUSDX/gO+fjniWt+jNQFKF9RIQMMcEKYZJ0JCEd9tm8tT1prc4S/+8W
-         IVXeFMi3HaPqlKM5y/G/IbBkaNh2PwRUtl0taZQUOS/nH5tBpeYrBrGcsHOjaZPdd4NU
-         8bwg==
-X-Gm-Message-State: AOJu0YzfbcrhkXIy0V+sGcVYQlqdUVosGFTA6oDNeweyXOOdRse7FdyF
-	L1HRSv7zoiBlGVbO2UcR34gCeZnaRmEkJYZA2byos8U9lEgn9q3k
-X-Google-Smtp-Source: AGHT+IGDM9l66OHZQrEkeWVCovZsblEF6TCNGX+25fi88SngYwyGSaCznAxYw5+pWNkwrdbafKT+iw==
-X-Received: by 2002:a05:6214:acc:b0:6b5:7e0b:eafb with SMTP id 6a1803df08f44-6b5b70b3adamr165115056d6.24.1720026774842;
-        Wed, 03 Jul 2024 10:12:54 -0700 (PDT)
-Received: from soy.nyc.corp.google.com ([2620:0:1003:416:bf16:dffd:c26a:4ac])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5746f5sm55533856d6.52.2024.07.03.10.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 10:12:54 -0700 (PDT)
-From: Neal Cardwell <ncardwell.sw@gmail.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,
-	Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>,
-	Kevin Yang <yyd@google.com>
-Subject: [PATCH net] tcp: fix incorrect undo caused by DSACK of TLP retransmit
-Date: Wed,  3 Jul 2024 13:12:46 -0400
-Message-ID: <20240703171246.1739561-1-ncardwell.sw@gmail.com>
-X-Mailer: git-send-email 2.45.2.803.g4e1b14247a-goog
+        bh=Fa7XnMj5RCKxWfhNwJQuri+ySkp7W4mLLv5DKR/LAz0=;
+        b=j4JvyxQn6nHNmVmbuvuuX+cZqzbHvENeTELjXszOTuE4vq4cdSGksv51TMwmidY+1k
+         /OQGTXo0Oy0UpJ/9RBR+KSewXiUR8l1zYKBMEVDb8sqMB2MlJWn7I6kw+/mb4zkZwEdM
+         Gm4IJVpnLbuWdkynyiODoko5yUO1yXsZrDopyj/Bj0YRvACIvAdjeXl+cMQnt8mNz6dM
+         9Q8Ku0dJBdr6v/z6rxI8y9TkoFRP+o5oNDhmU0yGc9uEiXJQUcB3bcldnsdlOmr8sAIa
+         G7f20n2sl6khZmu7zgL8a/9fSLRynNVDrA7BLxMKR9IM2818ldI7+m5P0nz2hixqmZb3
+         296A==
+X-Forwarded-Encrypted: i=1; AJvYcCUSrW8eEhcoIQ4a6HSd5vptI3DFR47ANj0v4I/hdXroCV5EyqJnML8nHfaXDg0gYNgUGC6VV1gp0GlQoNp0DRDix9ljOfCe
+X-Gm-Message-State: AOJu0YyYGzi5N0YBcw9IdHYiZRziDIYp1xzIBUR+90s8pYJVSOj+tACe
+	erzaLnLoDcO2N7rIXZK+41/+qo4L5dJVnIzWUiDcCSMoGEhiRIjnzCsIGH98OJL0SOwCas99COG
+	obFyiJaozCqEaHQPb+9t0n7h3ykM=
+X-Google-Smtp-Source: AGHT+IErU/gXyzZEBrm+Vjpu/rAq1ZKaUIaqOn7dfO95TsL9MGQSIVOY+d7OxYB8uD3W2G3ABq8NvhkJ2nQoLFbob6Y=
+X-Received: by 2002:a17:90b:e18:b0:2c8:4f4e:d438 with SMTP id
+ 98e67ed59e1d1-2c97acd1d3cmr3674305a91.4.1720026976780; Wed, 03 Jul 2024
+ 10:16:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240703033508.6321-1-kuniyu@amazon.com>
+In-Reply-To: <20240703033508.6321-1-kuniyu@amazon.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Wed, 3 Jul 2024 18:16:05 +0100
+Message-ID: <CAJwJo6bC0R5z0Ps-vfEwfUpXVVWOGcyFZLxm-dOtD8JULjaArw@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for
+ TCP AO.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Neal Cardwell <ncardwell@google.com>
+On Wed, 3 Jul 2024 at 04:35, Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+>
+> When we process segments with TCP AO, we don't check it in
+> tcp_parse_options().  Thus, opt_rx->saw_unknown is set to 1,
+> which unconditionally triggers the BPF TCP option parser.
+>
+> Let's avoid the unnecessary BPF invocation.
+>
+> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Loss recovery undo_retrans bookkeeping had a long-standing bug where a
-DSACK from a spurious TLP retransmit packet could cause an erroneous
-undo of a fast recovery or RTO recovery that repaired a single
-really-lost packet (in a sequence range outside that of the TLP
-retransmit). Basically, because the loss recovery state machine didn't
-account for the fact that it sent a TLP retransmit, the DSACK for the
-TLP retransmit could erroneously be implicitly be interpreted as
-corresponding to the normal fast recovery or RTO recovery retransmit
-that plugged a real hole, thus resulting in an improper undo.
+LGTM, thanks!
 
-For example, consider the following buggy scenario where there is a
-real packet loss but the congestion control response is improperly
-undone because of this bug:
+Acked-by: Dmitry Safonov <0x7f454c46@gmail.com>
 
-+ send packets P1, P2, P3, P4
-+ P1 is really lost
-+ send TLP retransmit of P4
-+ receive SACK for original P2, P3, P4
-+ enter fast recovery, fast-retransmit P1, increment undo_retrans to 1
-+ receive DSACK for TLP P4, decrement undo_retrans to 0, undo (bug!)
-+ receive cumulative ACK for P1-P4 (fast retransmit plugged real hole)
-
-The fix: when we initialize undo machinery in tcp_init_undo(), if
-there is a TLP retransmit in flight, then increment tp->undo_retrans
-so that we make sure that we receive a DSACK corresponding to the TLP
-retransmit, as well as DSACKs for all later normal retransmits, before
-triggering a loss recovery undo. Note that we also have to move the
-line that clears tp->tlp_high_seq for RTO recovery, so that upon RTO
-we remember the tp->tlp_high_seq value until tcp_init_undo() and clear
-it only afterward.
-
-Also note that the bug dates back to the original 2013 TLP
-implementation, commit 6ba8a3b19e76 ("tcp: Tail loss probe (TLP)").
-
-However, this patch will only compile and work correctly with kernels
-that have tp->tlp_retrans, which was added only in v5.8 in 2020 in
-commit 76be93fc0702 ("tcp: allow at most one TLP probe per flight").
-So we associate this fix with that later commit.
-
-Fixes: 76be93fc0702 ("tcp: allow at most one TLP probe per flight")
-Signed-off-by: Neal Cardwell <ncardwell@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Cc: Yuchung Cheng <ycheng@google.com>
-Cc: Kevin Yang <yyd@google.com>
----
- net/ipv4/tcp_input.c | 11 ++++++++++-
- net/ipv4/tcp_timer.c |  2 --
- 2 files changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index e67cbeeeb95b..3d8f597989e3 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -2129,8 +2129,16 @@ void tcp_clear_retrans(struct tcp_sock *tp)
- static inline void tcp_init_undo(struct tcp_sock *tp)
- {
- 	tp->undo_marker = tp->snd_una;
-+
- 	/* Retransmission still in flight may cause DSACKs later. */
--	tp->undo_retrans = tp->retrans_out ? : -1;
-+	/* First, account for regular retransmits in flight: */
-+	tp->undo_retrans = tp->retrans_out;
-+	/* Next, account for TLP retransmits in flight: */
-+	if (tp->tlp_high_seq && tp->tlp_retrans)
-+		tp->undo_retrans++;
-+	/* Finally, avoid 0, because undo_retrans==0 means "can undo now": */
-+	if (!tp->undo_retrans)
-+		tp->undo_retrans = -1;
- }
- 
- static bool tcp_is_rack(const struct sock *sk)
-@@ -2209,6 +2217,7 @@ void tcp_enter_loss(struct sock *sk)
- 
- 	tcp_set_ca_state(sk, TCP_CA_Loss);
- 	tp->high_seq = tp->snd_nxt;
-+	tp->tlp_high_seq = 0;
- 	tcp_ecn_queue_cwr(tp);
- 
- 	/* F-RTO RFC5682 sec 3.1 step 1: retransmit SND.UNA if no previous
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index 5bfd76a31af6..db9d826560e5 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -536,8 +536,6 @@ void tcp_retransmit_timer(struct sock *sk)
- 	if (WARN_ON_ONCE(!skb))
- 		return;
- 
--	tp->tlp_high_seq = 0;
--
- 	if (!tp->snd_wnd && !sock_flag(sk, SOCK_DEAD) &&
- 	    !((1 << sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV))) {
- 		/* Receiver dastardly shrinks window. Our retransmits
 -- 
-2.45.2.803.g4e1b14247a-goog
-
+             Dmitry
 
