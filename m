@@ -1,152 +1,139 @@
-Return-Path: <netdev+bounces-108921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C5029263D9
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:52:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A97FB9263DE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEE371C20E11
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:52:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB3761C22A12
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C3E17BB1F;
-	Wed,  3 Jul 2024 14:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273B917B51B;
+	Wed,  3 Jul 2024 14:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNyYVSL6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wNFCYmoN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3658F6A342;
-	Wed,  3 Jul 2024 14:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FEA17625D;
+	Wed,  3 Jul 2024 14:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720018330; cv=none; b=jpHjr9SNKGAlal1BmXN1NxQ8an9tgZhCEA3NaKkcbhiqNWYldonpINGHJdfVWCKmxBb6tvkGXAwQydvWY19BqUX//F6WUr+GxPKuN1XE29/2mSGMddXWdDMzrJqdkSYF5aYy19R1qlLab4/xnQLDM2iJAjk84R5fjh9D7yNrN38=
+	t=1720018350; cv=none; b=pvL8cgFYPObsU+dZQpRO4yM63oGwBH/Y70f0kgzDuqadKTZ2poraqvGxOcdwT5U+/4wXxIfHv3lP2TOkwVFOoEz1+lDmSNJABhWZOcIxlgJA6O++ZMSNUTVkoIeeYvhg4YaughB0sy1s6lUBwMOykNQpyFXIuUl66EklmwBYmBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720018330; c=relaxed/simple;
-	bh=WWBTexeKlu3/m4CBeaLtt0EX7DuzSpqIQxTrunqvRBg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tSISzq4mewB123g3Kcof56HDakidBhR5u311XKBZ7dgXDv/bP+Njm2/ZgWg47zAhgQ/xHbKiZ/YJ8e8JR6+MsnS5c5Gfok6KMm6CaMredmoUdIkGW2gz5Ef18Q6q3JQkX9VkiEACecksN99y8PirH1i/BvGVWbz+ZXBol9rcibo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNyYVSL6; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3d841a56e1dso1788683b6e.2;
-        Wed, 03 Jul 2024 07:52:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720018328; x=1720623128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HQ2PNk6wpFX/f/zn7sOj1CSv21ZtsJPh8OUiiFyP9QU=;
-        b=hNyYVSL6yggH5eum30z7TeE1HV6kDsqD90Tw8HEMY4d+VgdoAhIqCH6Um4Rm7new9V
-         doeFw1O9MrJ75FLQQx5cGtnQkCGDmzPC0+LHZwLtT7noVrEECj5KB5m5JuegihVq1prJ
-         wy7ijQY6qVJ5NpKwcsoESIFFjnHWbYybE8dDPfC5yAP+MKD4GVc6zvZg6SE3pw+jUavx
-         bL2KItxFWcQL2QYadGl/NULYFHTgB3silB0gGCIbn3iWYCsbNJ9zUrTigDcO6mc1WUcE
-         wHYPapTk5sIbQ6dZ6ihFTBODkWLTUwQlzgTmSFe4x7YSHc+F+CBe7Zevh1oFi6wd3iMh
-         ky8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720018328; x=1720623128;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HQ2PNk6wpFX/f/zn7sOj1CSv21ZtsJPh8OUiiFyP9QU=;
-        b=Vv63a2VA/2rnyYt6GSkz3kl8YfJO/zxoaEuQk+KCnSHLWIGbU0+zM3jBrkx1PRl1oj
-         4PAndn9qZUz0kDxSx/cZBwATtffMEHDssjmyWR34GSz4vKBVGN+l/uUrvqGKjx4OmTCQ
-         7ufT9cRa2o9/zKF7JWpg/NzAvmOwca3C1xfxYUeRGtm8jFIFhReDbJhW4wtSwr1pES9M
-         tGQDu/BD+6oWpFY/0RF8YDSLEdg9AOxd0FY9YJOdxCoxQgqkzbn6vlnZhBsfzkXjmuYk
-         q3jNo0ICGrDnZvm75m44II+d9edgE0mCSL+SPX2gEVMfXcV5yAGWdi/J7YDJer5Ov0uG
-         2dog==
-X-Forwarded-Encrypted: i=1; AJvYcCW9ywuvKeVhoNATr7++agpETgjsRkN+aVSLux0tE4VaOB0dIW0jT20/2Y5BCWKYtJ32bpfuIoV7f0nMPgQ4CxbXYlCpIK5lxFhbYQZMPcyZMWqMYOxuK3uFRLQwysqom0Z2IVBv
-X-Gm-Message-State: AOJu0Yy/QeaSGbOtLyCiCgbZaU0t6XVZyHB6/ISpX9I6vWecf71cQ93+
-	0LWZPH00RhV1sX2evljfxjekROPE0ymffF4alNXnTC+lSJxLyybb
-X-Google-Smtp-Source: AGHT+IFDfhm0K6JoG12J5Rx2/x1IL2tWJEvmqkrUiN32sQcsyQBavttJjBMt0d5//xNr1G/wMaxoIA==
-X-Received: by 2002:a05:6808:23ca:b0:3d5:fdc5:cfb9 with SMTP id 5614622812f47-3d6b2b24facmr17631436b6e.1.1720018328311;
-        Wed, 03 Jul 2024 07:52:08 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-708044b0c5csm10492973b3a.167.2024.07.03.07.52.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 07:52:07 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: jiri@resnulli.us
-Cc: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net] team: Fix ABBA deadlock caused by race in team_del_slave
-Date: Wed,  3 Jul 2024 23:51:59 +0900
-Message-Id: <20240703145159.80128-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <000000000000ffc5d80616fea23d@google.com>
-References: <000000000000ffc5d80616fea23d@google.com>
+	s=arc-20240116; t=1720018350; c=relaxed/simple;
+	bh=p0/k9VQeW/IATPVXcdui0lUXFvcsx8iSSa/S+24EuLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1ZOG/aeajZcdYeOKK8LapasmsI72FrT8WTYEuP80uue/5mWyfMnsQsg2A13cDNl3soZHOOQnq4lLQycjozDbw4AZW0I8vV3eIlT5TKl/ZCMtHdOVFH1DaU+R4BgYBucvp+sdRLw1jceLZB2Z+tdz+phejk+YN7td8yRXomIQq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wNFCYmoN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GJQEvoz0wIDeZIENvMBRDSvSZb0uYILKO4p51jsjWXc=; b=wNFCYmoNy49f91CpMZqn4/Iq1L
+	KPLRCCAc3T61tv7x98xHEt73VD10OoEeAz/OADbqdIBgmLSCisoT/x0g4rwlJ2yTinMIW4sWg4McX
+	7yPiHZWXr4wSWbyyKFsYPCSEaHlbv1ADF6sXlyJuKGsmRNQjsP7NEZStkLQZKPyduho3PWhOWINdc
+	s5I/O1CUgzZgTZ5G4S4I4p0rtN3sLCeZVO+qYelKXUwCucRMAzqaeBEf+VLNT223H+5dIq1mArn2M
+	rZ/nkoUeGzLHVwBEnRYSjjzQ64S6/TiuoILQo1YXS+1AQ+G1ZD3qS6AqpcL+e60LxqLDDCDj9L9OR
+	sFxc4Tkw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50572)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sP1LC-0005hs-1a;
+	Wed, 03 Jul 2024 15:52:14 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sP1LA-00030B-8H; Wed, 03 Jul 2024 15:52:12 +0100
+Date: Wed, 3 Jul 2024 15:52:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Nathan Chancellor <nathan@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next v15 07/14] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <ZoVlnLkXuJ0J/da3@shell.armlinux.org.uk>
+References: <20240703140806.271938-1-maxime.chevallier@bootlin.com>
+ <20240703140806.271938-8-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240703140806.271938-8-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(&rdev->wiphy.mtx);
-                               lock(team->team_lock_key#4);
-                               lock(&rdev->wiphy.mtx);
-  lock(team->team_lock_key#4);
+On Wed, Jul 03, 2024 at 04:07:57PM +0200, Maxime Chevallier wrote:
+> +static int
+> +ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_buff *skb)
+> +{
+> +	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+> +	struct phy_device_node *pdn = req_info->pdn;
+> +	struct phy_device *phydev = pdn->phy;
+> +	enum phy_upstream ptype;
+> +
+> +	ptype = pdn->upstream_type;
+> +
+> +	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, phydev->phyindex) ||
+> +	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, dev_name(&phydev->mdio.dev)) ||
+> +	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, ptype) ||
+> +	    nla_put_u32(skb, ETHTOOL_A_PHY_ID, phydev->phy_id))
+> +		return -EMSGSIZE;
 
-Deadlock occurs due to the above scenario. Therefore,
-modify the code as shown in the patch below to prevent deadlock.
+I'm really not sure that it is a good idea to export phydev->phy_id
+through this API.
 
-Regards,
-Jeongjun Park.
+Clause 45-only PHYs don't have a phy_id, they have a whole bunch of
+IDs (actually, two per MMD - a device ID and a package ID. I think
+the package ID is supposed to be the same for all MMDs, but in
+practice it isn't.
 
-Reported-and-tested-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
-Fixes: 61dc3461b954 ("team: convert overall spinlock to mutex")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- drivers/net/team/team_core.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+For example, 88x3310 uses:
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index ab1935a4aa2c..3ac82df876b0 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1970,11 +1970,12 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
-                          struct netlink_ext_ack *extack)
- {
-        struct team *team = netdev_priv(dev);
--       int err;
-+       int err, locked;
- 
--       mutex_lock(&team->lock);
-+       locked = mutex_trylock(&team->lock);
-        err = team_port_add(team, port_dev, extack);
--       mutex_unlock(&team->lock);
-+       if (locked)
-+               mutex_unlock(&team->lock);
- 
-        if (!err)
-                netdev_change_features(dev);
-@@ -1985,11 +1986,12 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
- static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
- {
-        struct team *team = netdev_priv(dev);
--       int err;
-+       int err, locked;
- 
--       mutex_lock(&team->lock);
-+       locked = mutex_trylock(&team->lock);
-        err = team_port_del(team, port_dev);
--       mutex_unlock(&team->lock);
-+       if (locked)
-+               mutex_unlock(&team->lock);
- 
-        if (err)
-                return err;
---
+MMD	devid		pkgid
+1	002b09aa	002b09aa
+3	002b09aa	002b09aa
+4	01410daa	01410daa
+7	002b09aa	002b09aa
+
+So, if we want to report the ID of the PHY, then really we need to
+report the clause 22 ID, and at least all the devids of each MMD in
+a clause 45 PHY. Alternatively, we may decide it isn't worth the
+effort of reporting any of these IDs.
+
+However, reporting just the clause 22 ID would be a design error
+IMHO.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
