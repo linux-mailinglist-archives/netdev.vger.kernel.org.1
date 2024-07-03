@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-108871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C439261D3
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:29:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95209261D4
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 590961C22A54
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:29:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 772A2285302
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15F317BB01;
-	Wed,  3 Jul 2024 13:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D82D17B432;
+	Wed,  3 Jul 2024 13:28:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AEB17B501
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 13:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F52F17BB10
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 13:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720013299; cv=none; b=tA6JcJCtIBiEW2sbmCME8RUfFeNIN6afcCtBEVi8BLoDqChwbjVntbKp02lPXAmRaUSF9Ilc7Xa/PzP5EnDtT4jSnbSgXOZd38UO6m1Guwu5N2f71qpk8OUpPQCYvtE03ek9QH69KjTYsoxvZ3adC2QBrjhn1sYorgOIGldPNkg=
+	t=1720013304; cv=none; b=NRnwJ0nnVsq3GlWsYiTr6b0HLOJl2tykAFa0NfKax8nXmgymRPeCnZKv+BsZ1UPZmiNaJFeOG6C740otRs+C7sLvSymsBo8Qytx4D1jcYKNWVM+G6AbqVMHh9gAaNMsQIhsXE4uUkWcP8sC06I2D+XZRjR2rdkfoG7aHYTkxyPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720013299; c=relaxed/simple;
-	bh=QqUz30bwqog4MM9Ljt7I5fM+9D3dYywR0rlPjtJSifQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rh79Xcx2WIIB9LK67+JV6MN+4aOr8FhxuwUw8fnLYMfmJwCS3OPHbSiqZWJ+ivlTwPPTA7NqP9iwFAS5fdYspy2H/JyPt1PdLjbEF0AwiraKzAaajDLJDqlVx6IpfXBIBBQlfp31ag/UVl9JQ8JrP/ibqH4eACxi5x3kmK9Xmuw=
+	s=arc-20240116; t=1720013304; c=relaxed/simple;
+	bh=xl9E7mdmU2QSEhuoiWZFWr/Cz68F3jKLgGkRANW/65g=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=FDHaoZEhgc/bUxZmeKkiV/KsZkZ74Zq0TIiH0iXBdUf3dBXeVVnrGETkgWhv/oIygJ4+ip3QhVq3tnQqm1NfcgYCihJVpWMiN8YMsx7AB8BnZ38VPYkWrkrRQZ081z8sB76QgpajLuvvo2tlQeIWRU9iY05pkfRxslooIZEmXMs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sP01k-0005Vx-HF; Wed, 03 Jul 2024 15:28:04 +0200
+	id 1sP01k-0005Vy-HF; Wed, 03 Jul 2024 15:28:04 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sP01i-006rQf-Rx; Wed, 03 Jul 2024 15:28:02 +0200
+	id 1sP01i-006rQg-Sc; Wed, 03 Jul 2024 15:28:02 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1sP01i-002c8K-2X;
+	id 1sP01i-002c8U-2d;
 	Wed, 03 Jul 2024 15:28:02 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -59,10 +60,12 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH net v1 1/2] net: phy: microchip: lan87xx: reinit PHY after cable test
-Date: Wed,  3 Jul 2024 15:28:00 +0200
-Message-Id: <20240703132801.623218-1-o.rempel@pengutronix.de>
+Subject: [PATCH net v1 2/2] net: phy: microchip: lan87xx: do not report SQI if no link
+Date: Wed,  3 Jul 2024 15:28:01 +0200
+Message-Id: <20240703132801.623218-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240703132801.623218-1-o.rempel@pengutronix.de>
+References: <20240703132801.623218-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,29 +78,29 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Reinit PHY after cable test, otherwise link can't be established on
-tested port. This issue is reproducible on LAN9372 switches with
-integrated 100BaseT1 PHYs.
+Do not report SQI if no link is detected. Otherwise ethtool will show
+non zero value even if no cable is attached.
 
-Fixes: 788050256c411 ("net: phy: microchip_t1: add cable test support for lan87xx phy")
+Fixes: b649695248b15 ("net: phy: LAN87xx: add ethtool SQI support")
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/phy/microchip_t1.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/phy/microchip_t1.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index a838b61cd844b..a35528497a576 100644
+index a35528497a576..22530a5b76365 100644
 --- a/drivers/net/phy/microchip_t1.c
 +++ b/drivers/net/phy/microchip_t1.c
-@@ -748,7 +748,7 @@ static int lan87xx_cable_test_report(struct phy_device *phydev)
- 	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A,
- 				lan87xx_cable_test_report_trans(detect));
+@@ -840,6 +840,9 @@ static int lan87xx_get_sqi(struct phy_device *phydev)
+ 	u8 sqi_value = 0;
+ 	int rc;
  
--	return 0;
-+	return phy_init_hw(phydev);
- }
- 
- static int lan87xx_cable_test_get_status(struct phy_device *phydev,
++	if (!phydev->link)
++		return 0;
++
+ 	rc = access_ereg(phydev, PHYACC_ATTR_MODE_WRITE,
+ 			 PHYACC_ATTR_BANK_DSP, T1_COEF_RW_CTL_CFG, 0x0301);
+ 	if (rc < 0)
 -- 
 2.39.2
 
