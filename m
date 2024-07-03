@@ -1,183 +1,164 @@
-Return-Path: <netdev+bounces-108970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C81926682
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:56:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FDD926685
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:57:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462801C212D7
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:56:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647AF1F2363E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15C918306E;
-	Wed,  3 Jul 2024 16:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE8C18412F;
+	Wed,  3 Jul 2024 16:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q94C+NFQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vQZE0GZb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E854017E907
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43D21836CC
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720025798; cv=none; b=mwUcNy3HwD5a6PYXDjn/LYQY+qXUEVcH5QBLk3adWLNtHPvhkeUzDIahpOWiElxsvW6gqvuDeII68dJMZwdrpNkMH12JrCs3zat84ztHAh1uao9dskERyQyhdUVedG8kqOXtHuqm2azWhh+s1ql/ho5QxKkUvxw598yR8PPRt1Q=
+	t=1720025820; cv=none; b=RePCFGDQqugCk7HztqcgvxW+gTzdaLpkJzCZ6LVEFd3C+e3Y447OVJGz21c5JeGlsTZcvkqR4bH5yyaGPVWppB8138wxhWdrbNGnRl77jkXFkmiVu2m4uPGRXKYHRb53SpGIPp0lJSeBSrW03CfJKrm4P1i2z6FYYd6jN0ugPRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720025798; c=relaxed/simple;
-	bh=oGSdXQKug1/zIgpGOUZsP9kdyjFRk6t6QDLttROybR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GB0B1jq9ZHuzqF5o7rT9RBFxc7vxqGvoGyKgNn0IyT/F8b1Ouhr/EH+ayKAXJXWWJZ2RbywMTfNKE2GlIgguiQ8EBXEJq0R8TkRLF70jzxO4DbrqRrx2ZjnjBHQk//8Sd/HLJDSjaJPEAhBd1DHm3wifmhMhVL56uCu1Q1xOM7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q94C+NFQ; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52e8037f8a5so5665500e87.1
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:56:36 -0700 (PDT)
+	s=arc-20240116; t=1720025820; c=relaxed/simple;
+	bh=teX37XgyvV7Ru/Jak1UKwFMmY5CaQcTdzWuf15lXc+M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h9eAJodjEeEC8DUV6p5wMj7G9IS6kN6TkatpLwtLvkU/fHfEQ2/Ga7XYNYEdJjcfNk5Ctj91Um10il+QUGmmQOb5rZhwqft11trq6STOzPMbATw++zAcIl7mmA61gXMySzfYuoUheM4vzoWAgY3Wodn6LmhXz8O3XY5ZkNQUj/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vQZE0GZb; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b5e0d881a1so6601836d6.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720025795; x=1720630595; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ngap8fJeo6dsdjjRZOV8MsEeMGoevn03oWPA9lJwg5w=;
-        b=Q94C+NFQvI1hFx/5vy6lg94Hqf8gF0Qpbu4t4OVQMvLVIpFX3mnurJs7Yp2kDS5X7b
-         MZoBKV1mgKuU0jFs8fvJaJK4v9UKQGtUHsSHdU0H7bIxuM4U3kO14/3sDqFviLDVlA/b
-         57qhft5YvIjcIQj8CUR+jVS5YSB3+lrL+tx6MRwy/KFlZpV2LHzYo9QlcDjdB9BWY0q8
-         oPtc8vaPEh20Kn3ave09w4+rc/HJDY2BqBckXoyI8SveC/haeXyAQHp+UL3L3JS1+UWz
-         mFl+Ui9MkI+FVm8nX4qkAH6YNnvR1NSELYu413ks8qYCAMWfivtHfxuvYVamwcHH6RDX
-         JhFA==
+        d=google.com; s=20230601; t=1720025817; x=1720630617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZrJD6ayDYRlKNRvFck9p1oXm/3SuBonkBJdf4YKQA4Q=;
+        b=vQZE0GZb7fexqOcBdhRYPWAj0P4ObfKnMLiFFpPLEmD/xufEEl++ynxXqybA5aFUSP
+         kr4/XxCNQcPnfcgi0L32zq+/yxC1t2hvvqdx4xBe3HjZ/smRNixqDs2/WXoVZZknAM3L
+         WJTWnsdzRIBK1WMafbT/G283v09bfBV5zsJ+Zq7/hpfvn3r4DpBL+Ahyw9K4t4EFW5V+
+         RwrUTmV9adUhP0NdR4wl8WLp9xxDxHRU7XGmRZIUSdGYmt/9H4AxO+XwJgn6V1uIOuq2
+         RShRkje5Pjmx9VEP1HnD6OSPcHC+R/7+CLuAJEfwNsy5Pioa232pVhNz7kyzRLGaMgf1
+         jw9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720025795; x=1720630595;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ngap8fJeo6dsdjjRZOV8MsEeMGoevn03oWPA9lJwg5w=;
-        b=FlFyCguRjmAZPTaNkvzyIEVzJZP00bsujzXkwjCXNtJBAHzQDbiLkqX82cwHCLQl2p
-         Wfu/cTseYJeQh9K6IhGffcoSoKwvNE9FGcwU5Bxb9ZTUytiW5XC3PUppn1Knbsr6FUB3
-         0FI4/VV5QFIruIxmI2QqCS4LzHOXgtOeks8nLYCw1Gr3duRGJx+XT6v1SzKT4xKSx9Lj
-         84I7aBH83R+DdOpC0ZCZ8wv7BvH5Svjdq+7AV3v9+VzYwLiBkCE9e2cUkl7PaW50YOCN
-         2q6heVk04OB4AfMbEcsrD68bMgwhTZBS3VdIvFsfDhhvTQHDEGBtokewZjq7V8Wz1NvR
-         UQ3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUJumdBFPjrjBOG+s+UC42ouLImRkb4yPS+s+iXPmYFKxpb+pfmRfgEluow027EItABXc2Al7thT9CwbojVF2qukCT8c3qu
-X-Gm-Message-State: AOJu0YyRgoDan0aHnkcxgcKRg05yMspgx3WmIGxpAVBYkkYFZWOK89H+
-	bPIGCPRAJR0pjt4/bjaXBFglmouTYBqX3isPfHk8q3zfnCGZKjwS
-X-Google-Smtp-Source: AGHT+IGmnJJylBRLQAj9UKgfMIg1Jry6JTu11vH51Gnh5KbcyznOLpmCIs2SJpDTHhgS5RlM41J9+A==
-X-Received: by 2002:a19:f806:0:b0:52c:f555:8266 with SMTP id 2adb3069b0e04-52e8274a95fmr6561309e87.69.1720025794611;
-        Wed, 03 Jul 2024 09:56:34 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab41d0asm2219240e87.307.2024.07.03.09.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 09:56:34 -0700 (PDT)
-Date: Wed, 3 Jul 2024 19:56:31 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, andrew@lunn.ch
-Cc: si.yanteng@linux.dev, Huacai Chen <chenhuacai@kernel.org>, 
-	Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
- network speed to 1000.
-Message-ID: <hdqpsuq7n4aalav7jtzttfksw5ct36alowsc65e72armjt2h67@shph7z32rbc6>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
- <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
- <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
- <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
- <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
- <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1720025817; x=1720630617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZrJD6ayDYRlKNRvFck9p1oXm/3SuBonkBJdf4YKQA4Q=;
+        b=THVhDKaxLRrstHfMzw62LphxNVxZ4ITeqJsqfberhwsWlHHtGXVoPRnH01fq1T2Wp/
+         7ECHUYELHwKsrh/RhIKwrEOUoMC/82zUuXNyDkzVXh1zBFAohJmZMoVGdaoDDjEKooIA
+         Fv0c1VarVfYr4KcDBdTkt5VHghTmwrFNhuahzM4ui8TOh5Iden8/35FKZUf4KfG02NA2
+         wb+ynbAP/8pa1b9D5DhHCr7Q4lQkcI9cojx6Id8RTnZLHhN1nSj3KyRpbJAQGygvr1OY
+         kb6yyRJk+3i/G0A6jCMdBV7KZMsZjFF8VfQurYiuD6vlA5JirK7dtBxjg2rDPdIrJX68
+         /F4A==
+X-Gm-Message-State: AOJu0Yw+I2Qm+REshEgqdO6AQMYK0/9wdZb5OUnp8Ne+OMty5AuX4LWm
+	7aoKE/RvJvyTdHjqOzwANFKb1mQpACHoguBDAtzxo4fB9z5MdF3Y2FEepVN6L/rFqqNvtkh9BNm
+	eim0kAO0SRCpyuSUsdg/C0VnXAzdq/kgf+BNP
+X-Google-Smtp-Source: AGHT+IHa/cTtQMTpCl1GUnThR28S74I0bK2ol+291xiVaR+Vs/Jxc9vIdy+MzRrhMch0GbY9JMd0YjCsO1EcciUeO1w=
+X-Received: by 2002:a05:6214:20e2:b0:6b5:198e:353d with SMTP id
+ 6a1803df08f44-6b5e18b18f4mr30603556d6.10.1720025817412; Wed, 03 Jul 2024
+ 09:56:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
+References: <20240628003253.1694510-1-almasrymina@google.com>
+ <20240628003253.1694510-4-almasrymina@google.com> <20240702180908.0eccf78f@kernel.org>
+In-Reply-To: <20240702180908.0eccf78f@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 3 Jul 2024 09:56:45 -0700
+Message-ID: <CAHS8izOCuNZWfZR_jecFOMu2XGqcYUkuVf38wRqBvoE9tmGzoQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 03/14] netdev: support binding dma-buf to netdevice
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 02, 2024 at 04:08:05PM +0100, Russell King (Oracle) wrote:
-> On Tue, Jul 02, 2024 at 01:31:44PM +0300, Serge Semin wrote:
-> > On Tue, Jun 04, 2024 at 11:29:43AM +0000, si.yanteng@linux.dev wrote:
-> > > 2024年5月30日 15:22, "Russell King (Oracle)" <linux@armlinux.org.uk> 写到:
-> > > 
-> > > Hi, Russell, Serge,
-> > > 
-> > > > I would like this patch to be held off until more thought can be put
-> > > > 
-> > > > into how to handle this without having a hack in the driver (stmmac
-> > > > 
-> > > > has too many hacks and we're going to have to start saying no to
-> > > > 
-> > > > these.)
-> > > Yeah, you have a point there, but I would also like to hear Serge's opinion.
-> > 
-> > I would be really glad not to have so many hacks in the STMMAC driver.
-> > It would have been awesome if we are able to find a solution without
-> > introducing one more quirk in the common driver code.
-> > 
-> > I started digging into this sometime ago, but failed to come up with
-> > any decent hypothesis about the problem nature. One of the glimpse
-> > idea was that the loongson_gnet_fix_speed() method code might be somehow
-> > connected with the problem. But I didn't have much time to go further
-> > than that.
-> > 
-> > Anyway I guess we'll need to have at least two more patchset
-> > re-spins to settle all the found issues. Until then we can keep
-> > discussing the problem Yanteng experience on his device. Russell, do
-> > you have any suggestion of what info Yanteng should provide to better
-> > understand the problem and get closer to it' cause?
-> 
-> First question: is auto-negotiation required by 802.3 for 1000base-T?
-> By "required" I mean "required to be used" not "required to be
-> implemented". This is an important distinction, and 802.3 tends to be
-> a bit wooly about the exact meaning. However, I think on balance the
-> conclusion is that AN is mandatory _to be used_ for 1000base-T links.
+On Tue, Jul 2, 2024 at 6:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Fri, 28 Jun 2024 00:32:40 +0000 Mina Almasry wrote:
+> > +     if (binding->list.next)
+> > +             list_del(&binding->list);
+> > +
+> > +     xa_for_each(&binding->bound_rxq_list, xa_idx, rxq) {
+>
+> nit: s/bound_rxq_list/bound_rxqs/ ? it's not a list
+>
+> > +             if (rxq->mp_params.mp_priv =3D=3D binding) {
+> > +                     /* We hold the rtnl_lock while binding/unbinding
+> > +                      * dma-buf, so we can't race with another thread =
+that
+> > +                      * is also modifying this value. However, the pag=
+e_pool
+> > +                      * may read this config while it's creating its
+> > +                      * rx-queues. WRITE_ONCE() here to match the
+> > +                      * READ_ONCE() in the page_pool.
+> > +                      */
+> > +                     WRITE_ONCE(rxq->mp_params.mp_priv, NULL);
+>
+> Is this really sufficient in terms of locking? @binding is not
+> RCU-protected and neither is the reader guaranteed to be in
+> an RCU critical section. Actually the "reader" tries to take a ref
+> and use this struct so it's not even a pure reader.
+>
+> Let's add a lock or use one of the existing locks
+>
 
-One another statement in IEEE 802.3 C40 that implies the AN being
-mandatory is that 1000BASE-T PHYs determine their MASTER or SLAVE part
-during the Auto-Negotiation process. The part determines the clock
-source utilized by the PHYs: "The MASTER PHY uses a local clock to
-determine the timing of transmitter operations. The SLAVE PHY recovers
-the clock from the received signal and uses it to determine the timing
-of transmitter operations, i.e.," (40.1.3 Operation of 1000BASE-T)
+Can we just use rtnl_lock() for this synchronization? It seems it's
+already locked everywhere that access mp_params.mp_priv, so the
+WRITE/READ_ONCE are actually superfluous. Both the dmabuf bind/unbind
+already lock rtnl_lock, and the only other place that access
+mp_params.mp_priv is page_pool_init(). I think it's reasonable to
+assume rtnl_lock is also held during page_pool_init, no? AFAICT it
+would be very weird for some code path to be reconfiguring the driver
+page_pools without holding rtnl_lock?
 
-So I guess that without Auto-negotiation the link just won't be
-established due to the clocks missconfiguration.
+What I wanna do here is delete the incorrect comment, remove the
+READ/WRITE_ONCE, and maybe add a DEBUG_NET_WARN_ON(!rtnl_is_locked())
+in mp_dmabuf_devmem_init() but probably that is too defensive.
 
-> 
-> Annex 40C's state diagrams seems to imply that mr_autoneg_enable
-> (BMCR AN ENABLE) doesn't affect whether or not the AN state machines
-> work for 1000base-T, and some PHY datasheets (e.g. Marvell Alaska)
-> state that disabling mr_autoneg_enable leaves AN enabled but forced
-> to 1G full duplex.
-> 
-> So, I'm thinking is that the ethtool interface should reject any
-> request where we have a PHY supporting *only* base-T for gigabit
-> speeds, where the user is requesting !AN && SPEED_1000 on the basis
-> that AN is part of the link setup of 1000base-T links.
-> 
-> Maybe this should be a property of the struct phy_device so we can
-> transition phylib and phylink to return an appropriate error to
-> userspace?
-> 
+Will apply the other comments, thanks.
 
-> Alternatively, maybe just implement the Marvell Alaska solution
-> to this problem (if the user attempts to disable AN on a PHY
-> supporting only base-T at gigabit speeds, then we silently force
-> AN with SPEED_1000 and DUPLEX_FULL.
-
-I am not that much knowledgable about the PHY-lib and PHY-link
-internals, but if we get to establish that the standard indeed
-implies the AN being mandatory, then this sounds like the least
-harmful solution from the user-space point of view.
-
--SergeY
-
-> 
-> Andrew - seems to be an IEEE 802.3 requirement that's been missed
-> in phylib, any thoughts?
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Thanks,
+Mina
 
