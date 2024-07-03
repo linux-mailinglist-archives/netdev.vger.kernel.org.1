@@ -1,256 +1,130 @@
-Return-Path: <netdev+bounces-109038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742AB926993
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:31:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B3BD9269A4
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:35:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376302848EE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9FAC1F24CCE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B121B17DA20;
-	Wed,  3 Jul 2024 20:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA1187560;
+	Wed,  3 Jul 2024 20:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MaQELECc"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="oLxJbbiw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE644964E;
-	Wed,  3 Jul 2024 20:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B448B4964E;
+	Wed,  3 Jul 2024 20:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720038686; cv=none; b=u1UADqc2ZdNwFiwGAAOLGypPul9r5l6Kq7peDmsoemTKnZrFOzoj/m1oJYf6vD3/5oPnm43l1HWlnu4RPmr70wPghdTznHbiwuVRDReZkl08gYzi4lZxIwZ9RtjfMjcJzMwG2Au6Mgy/i3WEZZsu093FkK3tTkc6vQrGdyqi4W4=
+	t=1720038895; cv=none; b=s9/zRfuGCy/8x6m0+w0VpOCqgm2abjPlX7YMnV2zSYcgubISpH+HTpKQfTLJ6gR4qd7PFrBoZXPnLAKcZBL/yZECHjOVLhKGbIlipnSdk7Y2oXCb2ilGmO7MVfQ+LzINUHALOkTYWXkRYfF7LstJOBPuN9jT/OE48R5nbssM0ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720038686; c=relaxed/simple;
-	bh=28CwKUBpxn29hreka2jtVxsXjE9DWJUpeBMm2mXFMKw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WxMehRX6BpJgLVFtTxVdUWa0PibeCWsEbzuhuXm3K2SzRF6cg7qK6ynYHnLlvFirSm4iTIGbrdwbXqsjXHVByF1vgk8N8OUVrqW+sTz3jhGlkrkKReIDvb8xzN8ujmdLBLcrmFsUXufOVHYwZwBV0bR5CDp7VpAjajSSrbNV8Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MaQELECc; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso56989731fa.3;
-        Wed, 03 Jul 2024 13:31:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720038683; x=1720643483; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AxQPKIQ3HTrHnNwff3QYIMoIek786yjRZFVT1LlX/d8=;
-        b=MaQELECcLuYYVx1UGpfAkc+CKhlnd5tL1AglJStZMt4q+ADz05JgyTFyVDwJgjbkJo
-         NdNNpEw8i56rTqYBP1qU6QsbMEUPwZrj9ifh6t95Btzs06Gx60EP2bxz15K+UMYGOKCp
-         PyM/5NpgZhCJZ0NP8BXobiTXjisJ6HKysD03mdYbGkwH8fIw2xX7BHFgBzjYJX5TfCCJ
-         QATi7pko7yWAtocsCi2oCKXk90THGoQDpAAVwl7cBA4HpKD79oP7RAT3AQgnGcXyXyET
-         tv/GdJaEtd3Z6YxeDhl0pTmqcBGfc5IR3/dOXRx+fxaqH6i/ftu83TmyuLl5o7lgi06N
-         OtpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720038683; x=1720643483;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AxQPKIQ3HTrHnNwff3QYIMoIek786yjRZFVT1LlX/d8=;
-        b=O23I+/dtbRmEVbpzNnsqWIKN9mIBXxyTGwQ0wPshy/s+seo5UW1mfIRCeVRQxnRiNC
-         vMziWChmJwV67A+/M9kZJ+WqjWqfdjaegFh5oqhvT6AARKgA/FOwnLU8bKALsmbcvt6F
-         xN5EykndcIvti/UR9Wd83diuadj3YGWAugavNTlEzjB1y/eKmDV513CZgdILXsLrfPR/
-         /kKZdeXAjry8+dZDjiVtyjWyDtOEYsYGYNKUBHAZdBTTOJuZkOoF7vM5XVuyHHA5Cslg
-         k3cDq6IFn+XjQX7VfDu+xQGRCo8Q3I62diR/Hv8SasGbYtZCQXeAT+oU3F9AOgCWP3Ev
-         NhhA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6IZn/ZgWSKsTzNh5EMCZvJZLcnfg4w6TP0vXvo905JPmNnhGMp29fhoWLUr7sRlXHeYnUWz0M3dS7qNauvVzIsOZ6vVWy7JtvTrOWW5o79WiK6xd/EIMQLQflWyFFH+jFhFxE
-X-Gm-Message-State: AOJu0YzUD5hVt/064lwUg1rBu85DkQ0OZkJ9tD/ROFSXasOh2ZVHptCp
-	Ea/R1yTdBpnc4jNi9e0d6Pc09Ay8IyWCNL8oWYsR7HJGrQtqsMTbsLqpp87NkuQaf1K16aGLP2P
-	4av6J5vUfkFlR9HJ0LNtmenihHKdXUmKk
-X-Google-Smtp-Source: AGHT+IFoeK/j/BiQlJ84Hk5d+C/64MO9ULJ/NDXv9h23TkeLVAeFB9gn8BRnxA72N8BTWVLsxHFnRxw/4FSKuI6Qdkg=
-X-Received: by 2002:a2e:a78a:0:b0:2ee:5ed4:792f with SMTP id
- 38308e7fff4ca-2ee5ed47fcbmr98080471fa.2.1720038682299; Wed, 03 Jul 2024
- 13:31:22 -0700 (PDT)
+	s=arc-20240116; t=1720038895; c=relaxed/simple;
+	bh=Zz/epqt5ZRh8ui97t65GrBhekOF+Qb7LbgbykpbYtdk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Iyvl9dSv3fL08VUyuKJQHyiDFX4D3dUFyEXVT5RLn8f09pQL6QHQHf6XmiIo2aZK7RHnYIXo+TZOUK6I1HwuwnOX4PIfuKIeLluUDm+qohz5GpLGVURSw30o6ACk/8kq5NHOBQaN4IB2VPkumhDfVv3KxgMIZt1qNTtCtJJTuxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=oLxJbbiw; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id D097F100004;
+	Wed,  3 Jul 2024 23:34:30 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1720038870; bh=+w5nLEKphcLgW6rn0LDohsYxcRdzToxepNB2cUqDYdY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=oLxJbbiwUyUJp9W+ibOTqjN5D3p1y4+h5MFGapmdzoEtwEE7svaRLTf2SpLf478Rg
+	 19bhKEVo9ZMZkJnxBd2TAqtV7WGzbQLdYHYiP4FYMm2U8oO3CeoAPAwgMvXkz44QpE
+	 lpPqxpVrRkPtXXOCprls/BpNGOukTafD+cpHTrf6a5L4Js3Ln3naP8dop9BGA47Cpu
+	 0xCnOaGfb/VjdcfvTgeTWWJgQbPL4ngbkjNOKSF1P2n2v3WVbk3GUhlABRNVCcpynE
+	 2YVN2bOaDSo/fdmxdOJh3WnkXGIFcWv2G+QvQV6Zk6DxerWsCLBCcMpqui9MHhXnJU
+	 GuXHJKopS92Tg==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Wed,  3 Jul 2024 23:33:23 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 3 Jul 2024
+ 23:33:02 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH net v2] mlxsw: core_linecards: Fix double memory deallocation in case of invalid INI file
+Date: Wed, 3 Jul 2024 23:32:51 +0300
+Message-ID: <20240703203251.8871-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz>
- <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
- <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com> <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
-In-Reply-To: <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 3 Jul 2024 17:31:10 -0300
-Message-ID: <CAJq09z5EWps3j1jZPj2J+j=hmzmpvF8QdUJpKADz6nQ_jJEjGw@mail.gmail.com>
-Subject: Re: net: dsa: Realtek switch drivers
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: Linus Walleij <linus.walleij@linaro.org>, "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"olteanv@gmail.com" <olteanv@gmail.com>, =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
-	"ericwouds@gmail.com" <ericwouds@gmail.com>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"justinstitt@google.com" <justinstitt@google.com>, 
-	"rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>, netdev <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"sander@svanheule.net" <sander@svanheule.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186316 [Jul 03 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 21 0.3.21 ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/07/03 19:52:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/03 17:02:00 #25823003
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Em seg., 1 de jul. de 2024, 23:09, Chris Packham
-<chris.packham@alliedtelesis.co.nz> escreveu:
->
->
-> On 15/06/24 09:36, Luiz Angelo Daros de Luca wrote:
-> > Hello Chris and Linus,
-> >
-> >>> I'm starting to look at some L2/L3 switches with Realtek silicon. I see
-> >>> in the upstream kernel there are dsa drivers for a couple of simple L2
-> >>> switches. While openwrt has support for a lot of the more advanced
-> >>> silicon. I'm just wondering if there is a particular reason no-one has
-> >>> attempted to upstream support for these switches?
-> >> It began with the RTL8366RB ("RTL8366 revision B") which I think is
-> >> equivalent to RTL8366S as well, but have not been able to test.
-> >>
-> >> Then Luiz and Alvin jumped in and fixed up the RTL8365MB family.
-> >>
-> >> So the support is pretty much what is stated in the DT bindings
-> >> in Documentation/devicetree/bindings/net/dsa/realtek.yaml:
-> >>
-> >> properties:
-> >>    compatible:
-> >>      enum:
-> >>        - realtek,rtl8365mb
-> >>        - realtek,rtl8366rb
-> >>      description: |
-> >>        realtek,rtl8365mb:
-> >>          Use with models RTL8363NB, RTL8363NB-VB, RTL8363SC, RTL8363SC-VB,
-> >>          RTL8364NB, RTL8364NB-VB, RTL8365MB, RTL8366SC, RTL8367RB-VB, RTL8367S,
-> >>          RTL8367SB, RTL8370MB, RTL8310SR
-> >>        realtek,rtl8366rb:
-> >>          Use with models RTL8366RB, RTL8366S
-> >>
-> >> It may look like just RTL8365 and RTL8366 on the surface but the sub-version
-> >> is detected at runtime.
-> >>
-> >>> If I were to start
-> >>> grabbing drivers from openwrt and trying to get them landed would that
-> >>> be a problem?
-> >> I think the base is there, when I started with RTL8366RB it was pretty
-> >> uphill but the kernel DSA experts (Vladimir & Andrew especially) are super
-> >> helpful so eventually we have arrived at something that works reasonably.
-> >>
-> >> The RTL8356MB-family driver is more advanced and has a lot more features,
-> >> notably it supports all known RTL8367 variants.
-> > I played with RTL8367R. It mostly works with rtl8365mb driver but I
-> > wasn't able to enable the CPU tagging. Although
-> >
-> >> The upstream OpenWrt in target/linux/generic/files/drivers/net/phy
-> >> has the following drivers for the old switchdev:
-> >> -rw-r--r--. 1 linus linus 25382 Jun  7 21:44 rtl8306.c
-> >> -rw-r--r--. 1 linus linus 40268 Jun  7 21:44 rtl8366rb.c
-> >> -rw-r--r--. 1 linus linus 33681 Jun  7 21:44 rtl8366s.c
-> >> -rw-r--r--. 1 linus linus 36324 Jun  7 21:44 rtl8366_smi.c
-> >> -rw-r--r--. 1 linus linus  4838 Jun  7 21:44 rtl8366_smi.h
-> >> -rw-r--r--. 1 linus linus 58021 Jun 12 18:50 rtl8367b.c
-> >> -rw-r--r--. 1 linus linus 59612 Jun 12 18:50 rtl8367.c
-> >>
-> >> As far as I can tell we cover all but RTL8306 with the current in-tree
-> >> drivers, the only reason these are still in OpenWrt would be that some
-> >> boards are not migrated to DSA.
-> > These drivers you listed are mostly found in old or low spec devices.
-> > There is little incentive to invest too much time to migrate them. For
-> > rtl8365mb, it still lacks support for vlan and forwarding offload. So,
-> > the swconfig driver still makes sense.
-> > There is also a performance problem with checksum offloading. These
-> > switches are used with non-realtek SoC, which might lead to:
-> >
-> > "Checksum offload should work with category 1 and 2 taggers when the
-> > DSA conduit driver declares NETIF_F_HW_CSUM in vlan_features and looks
-> > at csum_start and csum_offset. For those cases, DSA will shift the
-> > checksum start and offset by the tag size. If the DSA conduit driver
-> > still uses the legacy NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM in
-> > vlan_features, the offload might only work if the offload hardware
-> > already expects that specific tag (perhaps due to matching vendors).
-> > DSA user ports inherit those flags from the conduit, and it is up to
-> > the driver to correctly fall back to software checksum when the IP
-> > header is not where the hardware expects. If that check is
-> > ineffective, the packets might go to the network without a proper
-> > checksum (the checksum field will have the pseudo IP header sum). For
-> > category 3, when the offload hardware does not already expect the
-> > switch tag in use, the checksum must be calculated before any tag is
-> > inserted (i.e. inside the tagger). Otherwise, the DSA conduit would
-> > include the tail tag in the (software or hardware) checksum
-> > calculation. Then, when the tag gets stripped by the switch during
-> > transmission, it will leave an incorrect IP checksum in place."
-> > See: https://docs.kernel.org/networking/dsa/dsa.html
-> >
-> >> But maybe I missed something?
-> > I guess Chris is talking about the realtek target that uses Realtek
-> > SoC (target/linux/realtek/files-5.15/). That is a completely different
-> > beast. Although it might share some (or a lot) logic with current
-> > upstream drivers, it is way more complex. It might require a
-> > multi-function device driver. Anyway, the current realtek SoC/target
-> > drivers need some love, like using regmap, implement functions using
-> > an abstraction layer (and not if model a inside the code), get rid of
-> > all magic numbers and replace them with meaningful macros, create a
-> > proper tagger (and not translate a generic one just before forwarding
-> > it). In OpenWrt, a code that gets things done might be acceptable but
-> > the upstream kernel requires something more maintainable. So, if you
-> > want to upstream those drivers, you can start by improving them in the
-> > openwrt.
->
-> So now got access to the Realtek docs and I've been pouring over them
-> and the openwrt code (I'm avoiding looking at the Realtek SDK for now,
-> just to make sure I don't submit something I don't have the rights to).
->
-> If someone were to look at the block diagram in the brief datasheet
-> they'd probably come away with the impression that it very much fits the
-> DSA model. There's a SoC portion with the CPU, peripherals and a "NIC".
-> That NIC is connected to the CPU MAC in the switch block. All seems like
-> a pretty standard DSA type design and that's what the openwrt code
-> implements a ethernet/rtl838x_eth.c driver for the Ethernet NIC and a
-> dsa/rtl83xx driver for the DSA switch.
->
-> But when you start digging into the detail you find that the registers
-> for the NIC are scattered through the address space for the switch. Same
-> for the MDIO related registers. There is a more detailed block diagram
-> in the CPU and Peripherals datasheet that shows the NIC and switch as
-> part of the same IP block. The openwrt implementation does things that I
-> think would be frowned upon upstream like calling from the Ethernet
-> driver into the switch driver to access registers.
+In case of invalid INI file mlxsw_linecard_types_init() deallocates memory
+but doesn't reset pointer to NULL and returns 0. In case of any error
+occurred after mlxsw_linecard_types_init() call, mlxsw_linecards_init()
+calls mlxsw_linecard_types_fini() which performs memory deallocation again.
 
-Wouldn't that be a case for Multi-Function Device driver? From docs,
-"A typical MFD can be:
-- A mixed signal ASIC on an external bus, sometimes a PMIC (Power
-Management Integrated Circuit) that is manufactured in a lower
-technology node (rough silicon) that handles analog drivers for things
-like audio amplifiers, LED drivers, level shifters, PHY (physical
-interfaces to things like USB or ethernet), regulators etc.
-- A range of memory registers containing "miscellaneous system
-registers" also known as a system controller "syscon" or any other
-memory range containing a mix of unrelated hardware devices."
+Add pointer reset to NULL.
 
-Vladimir Oltean was the first to suggest to me the use of MFD for DSA
-switches as they commonly need two drivers: DSA and the user mii bus
-driver. The Realtek SoC just seems to make it more needed as we have
-other functions registers scattered.
-https://lore.kernel.org/netdev/20231211143513.n6ms3dlp6rrcqya6@skbuf/
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-The OpenWrt driver does work and I think it can be incrementally
-improved up to upstream status. It is a bit messy but you could start
-untangling it there, trying to decouple (the non-existing) tagger,
-ethernet, phy and DSA drivers (and whatever else shares the same
-register space). The upstream realtek drivers use a common
-code+subdrivers model while the Realtek SoC DSA driver in OpenWrt uses
-a single driver with lots of ifs inside each function. I don't know if
-they can be merged into a single driver tree, sharing as much as
-possible, or Realtek SoC will require a completely duplicated tree.
-
-> This leads me to conclude that what Realtek call the "NIC" is actually
-> just the DMA interface for packets sent from or trapped to the CPU.
-> Rather than trying to make this fit the DSA model I should be looking at
-> using switchdev directly (I can still probably leverage a lot of code
-> from the openwrt drivers because the switch tables are the same either way).
->
-> What would I be loosing if I don't use the DSA infrastructure? I got
-> kind of hung up at the point where it really wanted a CPU port and I
-> just couldn't provide a nice discrete NIC.
-
+Fixes: b217127e5e4e ("mlxsw: core_linecards: Add line card objects and implement provisioning")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
-     Luiz Angelo Daros de Luca
-            luizluca@gmail.com
+v2:
+  - fix few typos in comment as suggested by Przemek and Ido
+  - add Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+    (https://lore.kernel.org/all/c631fc5e-1cc6-467a-963a-69ef03c20f40@intel.com/)
+  - add Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+    (https://lore.kernel.org/all/ZoWJzqaRJKjtTlNO@shredder.mtl.com/)
+v1: https://lore.kernel.org/all/20240702103352.15315-1-amishin@t-argos.ru/
+
+ drivers/net/ethernet/mellanox/mlxsw/core_linecards.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c b/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
+index 025e0db983fe..b032d5a4b3b8 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
+@@ -1484,6 +1484,7 @@ static int mlxsw_linecard_types_init(struct mlxsw_core *mlxsw_core,
+ 	vfree(types_info->data);
+ err_data_alloc:
+ 	kfree(types_info);
++	linecards->types_info = NULL;
+ 	return err;
+ }
+ 
+-- 
+2.30.2
+
 
