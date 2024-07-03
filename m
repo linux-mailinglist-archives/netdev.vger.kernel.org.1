@@ -1,106 +1,105 @@
-Return-Path: <netdev+bounces-108918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB2D926392
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:38:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548D892639C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A5CB28544A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16308284F04
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E6717C237;
-	Wed,  3 Jul 2024 14:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B763D17BB1E;
+	Wed,  3 Jul 2024 14:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="lC8BEujs"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="ZU5Ii0UP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F2117C7C4
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 14:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118E6176ADB
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 14:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720017489; cv=none; b=chNd9mZ+Qmurj0u/D372jXdawu2O+AiIAbgVYq3fXT6R+96S3aY0aTk7aftrIpBVEUtggt/goldzcfrzgK+bvlhaQACkJs75S0Sz6ZRGgVVsDSeOjBy5iCEKRKLIefBxxdiaD0vG8UulANWfKCTsiLWBi8PJA7M9q5oALZtDPVE=
+	t=1720017577; cv=none; b=iVJhl4ck/BYOrP79oZoqdvCIeS5qvDeywwKaJInQ42f+7Dxn3mzCUvJ4MStsEHW7xfOoMJZrSvig6s3rCgNlgvfRYKJDRvBCi314RiKdI2fEOnZOAoIZIyuwqu7NBxXjcMm+RNz6QhfRlClHjixaDgvr4J4yujx7TTfHsTVCiac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720017489; c=relaxed/simple;
-	bh=CYh3BkrG7T+W/+wmTlPOSWNqGCWtE0fTIUBW1jkG2lg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U03XAmtUs39QhQkPWxifdMcHKiryrgZ3UDMCfAusGyWrn+p5pC9aMs5OvjIU9lYopn5TvfbCFZNtg2C6AkV1B1nnnmu4S3tam4w12Wx7bD1SQEuld2A0HZsi/1J08XlUtf3Njw18Gdm4XsljIun+dXFJDXIkjuFvLMpMyPsUYR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=lC8BEujs; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 463Easi6002785
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 3 Jul 2024 16:36:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1720017418; bh=atWuzXJyO5cKrY9JGXJtLK1hvFGQgksnhEvzTYnAiBY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=lC8BEujsPNu/kDZN4oZ6J0zI/UF76y4/mmM74JwjyttLuZGZ3o/5KO8ghPjs5OOpT
-	 b48Yp0N0RxNdZyfKNp4pzRRO/3WZDM5S6gjg4Cw6zAisRrbit85cm6ZDRaq5LCPYc4
-	 Mj/ILNyz2kTX3S+pbEt6yp42onJPAQWLoLUUKur4=
-Message-ID: <49bf6eca-9ad0-49a7-ac8d-d5104581f137@ans.pl>
-Date: Wed, 3 Jul 2024 07:36:52 -0700
+	s=arc-20240116; t=1720017577; c=relaxed/simple;
+	bh=zqs/S4HfuT/mMZIv2i6FS5axAqEpuhFMOaT+29ULZ4c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ipMl1bvr4PBJLmxNlQtHLZAfg2s/E3NzlMEzEtqXsmdQWMpLFp4dn5tTgSrl+m0hobozMV/FlN+YHvWvjeO737aFyS3KLy1cUyJDFebst+kR+MSRlbLYS/IN1tRPnH76qnrOydbBuKuZyIllFobd/aIn4lmP+fxnTyCq2QCFf38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=ZU5Ii0UP; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a6fe61793e2so314848966b.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 07:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=herbertland.com; s=google; t=1720017574; x=1720622374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W1PsUXKPUub912pKCGeBU3/M4oCz8Ulzi51DYjGCbdI=;
+        b=ZU5Ii0UPcUf6qZfwxQN3JsfKsBEAHdhYxQjE5HoY/Q6SRMP/j5/l0mUm0KEJNiEt1p
+         KhaMSHkwe5aiNJNBTVhdF6rrAGHUFLX7X+z2pArdZEABHwFqdphEWMOZKsAUTnv7o6CH
+         e8fA1KU+/iXwyXTezE2wS0KxXYXzjmInm5re20bj/Gv6yjtLhE+PLmgi4YbyjGAaQ6U+
+         /LMFxU/7kJ9/PlqnXgQu5CCkn0i/yBrtYJOlMhum4h/uONZyjWhCk3Ts2BeBhgxX3mnt
+         GgDgh37v0Wlm9k0uBlOFl19p7omq+lzwz7F06NCsQOTQV78FkhK5uBekLuSZ0BbYK5Eb
+         /M+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720017574; x=1720622374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W1PsUXKPUub912pKCGeBU3/M4oCz8Ulzi51DYjGCbdI=;
+        b=K4dI8XTdSuRyQA1zNFdrMLOOH+JJCtQAly2QCwYJuDNfB879s08r9QNOVJxqRbgo8Z
+         acesaWIlB1A7ia3qyKR3/13GobFWDBK6goEnyfDQ7lNSGaiwhPRQFHaaO7JKvb3t0DdH
+         lJlH1cBdLYx5W0jJJYGIlJu1erXl4ghyKxqaHQoXwqLKIWfN0KMXyVh6XQe41nbhOY1N
+         tVu9bqBoLG4ZuiBiRxBq2awD6J+QqWvYNjHwqfeTySqKm9vP6rtKu8gSyojFIQpnsqXr
+         RHedwQ83qeW8kebrwpOBr3B2XLw6sUpgCh7LI/cxNlMEQk8hDaq3gE7fnAOZy2AR2PXR
+         rJyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCxpNKOzFac+A6ApZFFghV+5Qaryv6l/f3Q4HHiYeNB2H4mHAGzGv1as98crUOKbn+G9Di3wGvD8mU2OQ93Dq39x6+DdmP
+X-Gm-Message-State: AOJu0YxAySc1asxZk/iU03YxYR+ethl5fD8aHp3CVtxdQxer8m4VX6sr
+	lyV4GXeRpHpldTsM7ZlGd+AeIN2JSLqA+v1YsasMnAtAGfa6qLUM/8eImmbRx8oj4uRjUYHA0GP
+	XwcUYRAHgkPh21i7lOcj58eU5mvOod/INt4iZ
+X-Google-Smtp-Source: AGHT+IEAryDZIZW5HPIxZlOmiMOd7zHSKqikS1Z0q6ifIxLuFLBnfNI1sZBoalR/9yuQK5v9xA1wXv6Yz1Vhw9CQwkM=
+X-Received: by 2002:a05:6402:1cc1:b0:57c:7c44:74df with SMTP id
+ 4fb4d7f45d1cf-587a0822c1dmr8474116a12.29.1720017574269; Wed, 03 Jul 2024
+ 07:39:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ethtool fails to read some QSFP+ modules.
-To: Ido Schimmel <idosch@idosch.org>, Dan Merillat <git@dan.merillat.org>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev <netdev@vger.kernel.org>
-References: <54b537c6-aca4-45be-9df0-53c80a046930@dan.merillat.org>
- <ZoJaoLq3sYQcsbDb@shredder.mtl.com> <ZoJdxmZ1HvmARmB1@shredder.mtl.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-In-Reply-To: <ZoJdxmZ1HvmARmB1@shredder.mtl.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240701195507.256374-1-tom@herbertland.com> <20240702184633.1f05673c@kernel.org>
+In-Reply-To: <20240702184633.1f05673c@kernel.org>
+From: Tom Herbert <tom@herbertland.com>
+Date: Wed, 3 Jul 2024 07:39:22 -0700
+Message-ID: <CALx6S359NS66o1npL494NQ_pe3A_5BKKHt+GRvMTV-ud7RhXew@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/7] drivers: Fix drivers doing TX csum
+ offload with EH
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, jesse.brandeburg@intel.com, 
+	anthony.l.nguyen@intel.com, cai.huoqing@linux.dev, netdev@vger.kernel.org, 
+	felipe@sipanda.io, justin.iurman@uliege.be
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Good morning,
+On Tue, Jul 2, 2024 at 6:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Mon,  1 Jul 2024 12:55:00 -0700 Tom Herbert wrote:
+> > Testing: The code compiles, but is otherwise untested due to lack of
+> > NIC hardware. It would be appreciated if someone with access to the
+> > hardware could test.
+>
+> Could you pop a script under tools/testing/selftests/drivers/net/
+> that'd exercise this?
+>
+> This will hopefully guarantee good coverage soon, due to:
+> https://netdev.bots.linux.dev/devices.html
 
-On 01.07.2024 at 00:41, Ido Schimmel wrote:
-> Forgot to add Krzysztof :p
-> 
-> On Mon, Jul 01, 2024 at 10:28:39AM +0300, Ido Schimmel wrote:
->> On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
->>>
->>> I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
->>> the optional page3 data as a hard failure.
->>>
->>> This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
->>
->> Thanks for the report and the patch. Krzysztof Olędzki reported the same
->> issue earlier this year:
->> https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
->>
->> Krzysztof, are you going to submit the ethtool and mlx4 patches?
+Sure. Thanks for the pointer.
 
-Yes, and I apologize for the delay - I have been traveling with my family and was unable to get into it.
-
-I should be able to work on the patches later this week, so please expect something from me around the weekend.
-
->>> From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
->>> From: Dan Merillat <git@dan.eginity.com>
->>> Date: Sun, 30 Jun 2024 13:11:51 -0400
->>> Subject: [PATCH] Some qsfp modules do not support page 3
->>>
->>> Tested on an older Kaiam XQX2502 40G-LR4 module.
->>> ethtool -m aborts with netlink error due to page 3
->>> not existing on the module. Ignore the error and
->>> leave map->page_03h NULL.
->>
->> User space only tries to read this page because the module advertised it
->> as supported. It is more likely that the NIC driver does not return all
->> the pages. Which driver is it?
-> 
-
-Thanks,
- Krzysztof
+Tom
 
