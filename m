@@ -1,117 +1,99 @@
-Return-Path: <netdev+bounces-108657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC11924D65
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9716B924D73
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C45284D43
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:00:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22005B22563
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C401C2E;
-	Wed,  3 Jul 2024 02:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A934683;
+	Wed,  3 Jul 2024 02:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsZVXGri"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZkiJu8V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A117F1FAA;
-	Wed,  3 Jul 2024 02:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841128F5B;
+	Wed,  3 Jul 2024 02:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719972034; cv=none; b=W1t7siR5uUm3OCf1Ta++YJvBRoX5iHsTTHweH7TcQij41PeLbvyYvrWv2CqmnO8XZIYAfWXX4IL0pwjpeq0NluPTovS9PYjfSnChrdgt25l+SDQTbMGyeCNaVlI3MvEkzIebXdk8KTVIzqm4JodS1ObZaN/14ERz/C3qlWs2iHs=
+	t=1719972156; cv=none; b=ARn1Qkidza5oc8OE+X/i5+2JMEWS5k3//5K1WUMtGiplHzZoVrXwMkwNyf5dDRYsU+glo2g8EYxdWjEe4XJxTaEAkjmtPCqahMw7OmwqEmoETrVJA8jre5epwOwAU4av5ABq7fmWL2/q4d4B04wgBwim5ffpOdS7NJnmovi2Ym0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719972034; c=relaxed/simple;
-	bh=ddoWIzMvun+BiAae8QNh2KY6WQqqmwq7hCuAmlJwRvo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kHgFeeOfW6uqvyFZhNScxLKHL+TGSPrxvr6MskPLi0eZPvdWyGXgRmgdXQrS3UurztldxSJIwnuL0Uw0IB4SpTf5dw7dlQcLCuwsTGp5blvhaDTqQKpuhNxrChn6N14hFVlozqi51GbRHUbnaEr4k37ObEDNpf7SJFqNRfx8h5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsZVXGri; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B71AC4AF0A;
-	Wed,  3 Jul 2024 02:00:34 +0000 (UTC)
+	s=arc-20240116; t=1719972156; c=relaxed/simple;
+	bh=R6kgAs73TS+N4+4Y27yXxUyZx91QX/oME+K5F6DbZ1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bZlu7eDKKnjHX7f+Czk1p805q1VLOV148XZ4RDTrt4xQzlXB0HwSyJ87CftOesDO3tIDiqh037YBEe4K6T13tDw/31+dlV59w6be0tWdJNezZinNJ8dp5mjTvFPUanFMjWYIGiKXeBgXs4zTrJebVZPCZdrUt5jWIxPLLvZ/kLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZkiJu8V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E22CC32781;
+	Wed,  3 Jul 2024 02:02:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719972034;
-	bh=ddoWIzMvun+BiAae8QNh2KY6WQqqmwq7hCuAmlJwRvo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jsZVXGriUXLqQVjuFYpI9QcX6hWXb7/UY4KSCr6VdQHERPLqpzcEyxKx85c3y2IKL
-	 Ad+nMrBGEpT4M1AVeuvPxE/y6jcDv/k2u+OVQmT6pB1Ije3rGF6G2p6nDIwj6qHeXX
-	 0JbET8ufHK5Fx4jSjlbAzGGnUnC8p2Ayh/Q88fuKMvOnRI0jefxLQeXb6OKMMfsEVr
-	 aPg6GPAH6rfPBxYECA5bNdRpeheEI6G8j+xOQqxiSXei9CAPnJjDxqRswuFwZPmumK
-	 +ZS4ULbCO8YRXkAEi0pxSdD9LB3ShosaqLBBpL7RLcE07ejexp5zGzgC+WHBCelLmx
-	 WvLuc0W6iIDGQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35FE1C43331;
-	Wed,  3 Jul 2024 02:00:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1719972156;
+	bh=R6kgAs73TS+N4+4Y27yXxUyZx91QX/oME+K5F6DbZ1c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nZkiJu8VGkExL+V5eE4TDNRvf6KjZSSsn/r8tuggjTUlWsOLkZpiVUHTnjLRiNwNU
+	 VeTQthUWctRpmaY5e/iSnDXXpAF2t86pYqMWLsTKj25XULlKC2vLrCx7hGY3xvcFuv
+	 Uj09eyf8otNb8v9e39qs7Lxed4UQvrG50QOns/dziVCxTqzN6QKAtP/7MTwkC52Yvn
+	 X2Rr75v95DZXNFuMqrUO5D9PIsCgHfg72jH5LhBVJaJKHbLGnZCIT5snd5fDgANFyC
+	 VUbx8fAuRtC/pj/Eea0xyvGwlc5iucM3sDRIte3Z2CJ74+DIpSCuhaPkTTzjly8lpE
+	 2pasIfmYiJF3Q==
+Date: Tue, 2 Jul 2024 19:02:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
+ Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+ <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
+ =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Bagas Sanjaya
+ <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>
+Subject: Re: [PATCH net-next v15 00/14] Device Memory TCP
+Message-ID: <20240702190232.7cbe4c41@kernel.org>
+In-Reply-To: <20240628003253.1694510-1-almasrymina@google.com>
+References: <20240628003253.1694510-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: ntb_netdev: Move ntb_netdev_rx_handler() to call
- netif_rx() from __netif_rx()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171997203421.32241.9722125326402444129.git-patchwork-notify@kernel.org>
-Date: Wed, 03 Jul 2024 02:00:34 +0000
-References: <20240701181538.3799546-1-dave.jiang@intel.com>
-In-Reply-To: <20240701181538.3799546-1-dave.jiang@intel.com>
-To: Dave Jiang <dave.jiang@intel.com>
-Cc: ntb@lists.linux.dev, netdev@vger.kernel.org, jdmason@kudzu.us,
- allenbh@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- abeni@redhat.com, jerry.dai@intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 28 Jun 2024 00:32:37 +0000 Mina Almasry wrote:
+> v15: https://patchwork.kernel.org/project/netdevbpf/list/?series=865481&state=*
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  1 Jul 2024 11:15:38 -0700 you wrote:
-> The following is emitted when using idxd (DSA) dmanegine as the data
-> mover for ntb_transport that ntb_netdev uses.
-> 
-> [74412.546922] BUG: using smp_processor_id() in preemptible [00000000] code: irq/52-idxd-por/14526
-> [74412.556784] caller is netif_rx_internal+0x42/0x130
-> [74412.562282] CPU: 6 PID: 14526 Comm: irq/52-idxd-por Not tainted 6.9.5 #5
-> [74412.569870] Hardware name: Intel Corporation ArcherCity/ArcherCity, BIOS EGSDCRB1.E9I.1752.P05.2402080856 02/08/2024
-> [74412.581699] Call Trace:
-> [74412.584514]  <TASK>
-> [74412.586933]  dump_stack_lvl+0x55/0x70
-> [74412.591129]  check_preemption_disabled+0xc8/0xf0
-> [74412.596374]  netif_rx_internal+0x42/0x130
-> [74412.600957]  __netif_rx+0x20/0xd0
-> [74412.604743]  ntb_netdev_rx_handler+0x66/0x150 [ntb_netdev]
-> [74412.610985]  ntb_complete_rxc+0xed/0x140 [ntb_transport]
-> [74412.617010]  ntb_rx_copy_callback+0x53/0x80 [ntb_transport]
-> [74412.623332]  idxd_dma_complete_txd+0xe3/0x160 [idxd]
-> [74412.628963]  idxd_wq_thread+0x1a6/0x2b0 [idxd]
-> [74412.634046]  irq_thread_fn+0x21/0x60
-> [74412.638134]  ? irq_thread+0xa8/0x290
-> [74412.642218]  irq_thread+0x1a0/0x290
-> [74412.646212]  ? __pfx_irq_thread_fn+0x10/0x10
-> [74412.651071]  ? __pfx_irq_thread_dtor+0x10/0x10
-> [74412.656117]  ? __pfx_irq_thread+0x10/0x10
-> [74412.660686]  kthread+0x100/0x130
-> [74412.664384]  ? __pfx_kthread+0x10/0x10
-> [74412.668639]  ret_from_fork+0x31/0x50
-> [74412.672716]  ? __pfx_kthread+0x10/0x10
-> [74412.676978]  ret_from_fork_asm+0x1a/0x30
-> [74412.681457]  </TASK>
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] net: ntb_netdev: Move ntb_netdev_rx_handler() to call netif_rx() from __netif_rx()
-    https://git.kernel.org/netdev/net/c/e15a5d821e51
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'll pick up a couple of patches unlikely to change.
 
