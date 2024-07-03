@@ -1,234 +1,155 @@
-Return-Path: <netdev+bounces-108857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3386C9260E0
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:50:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFE59260FD
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 349AB1C210CA
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:50:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35AB6B21379
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FF41791ED;
-	Wed,  3 Jul 2024 12:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC1917334F;
+	Wed,  3 Jul 2024 12:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="Mdj1CD/z";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="m5aSbOPw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CXMISsik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A504A178CEE;
-	Wed,  3 Jul 2024 12:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9001E4A9
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 12:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720011028; cv=none; b=jSnthUhwJnjBLs8lF8+gWxhWnWLLm0c9Rf3M+IPQFAG9fQSV7GkTtUL8TJjKHC8reNIkgSHcfWSKDNR2qjmvmerLGtHzbPVK3ySbzT6OMuQLanEfqL19igiOo8cLiG/TFcbaU8lSwDFvwAzmjSLTXpkQ3YTK2d2mHXoeKbm1NN4=
+	t=1720011492; cv=none; b=uNGQrf7WUySsgVJvfZPRpaGDbMC2YXX1xM3VtkbJLqNLz02wMMuG4IZ/pBGcQAJywfVNkgObQtPOHowfJNUbRaIiqpL8htQBTMgGvaYs5tRHwls775PlRtQ02b8sUCnD2z/caxy3RwVm1XPCNZbkSUFX/adBwZBQVcZnBa6GZkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720011028; c=relaxed/simple;
-	bh=//htds0Gxwdc60HRVxJ4E2umUzYUbcipiNv8kYB+0lo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LR8jpTyuVvi/r6wShVpSV4FXQPOW3P8gxHX8cqsyyZXzk99BYZ104QThRZLMJEoEjRVnBORTXWZxxncWVRXqX645jjCqqv4UYDA7whAMDVg7eYbu6BvgFRoLOf1AX5PYvwsrtcuB+gFA3t78fFqNGOn9cNBJyp0gC0coFCJXe4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=Mdj1CD/z; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=m5aSbOPw reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1720011492; c=relaxed/simple;
+	bh=AY5W4wRU7EgGuEN7NQ19JHhpswBkigcgo+Tsk+a9yFY=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=DZNi5zZIUPfaHxb4u13p7vW2YXmk+gmBoEsI9LktF7gKr23p4GiurnbnNH/ZKG01H0385Ff382CpOobqFsNvCUBel2eJWLl4Hv4tvcLahmTmsNkcqG+DIFQiCxx3HE7jGl1+ImvzjdCw/JF2GDNmp1Xu388WfjCBMUH1jML1yV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXMISsik; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2c87a7df96eso856567a91.1
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 05:58:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1720011026; x=1751547026;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=//htds0Gxwdc60HRVxJ4E2umUzYUbcipiNv8kYB+0lo=;
-  b=Mdj1CD/zVc1eseetasYglak9Ifzs7BLugUWvUGxLj1Dl1IE90D09MROu
-   6xQoggrMHYCP0F/3f2TfVWCA4nutHvP4jfyaYnowBySoCTRT3kfvnndg7
-   vmr1KDfxyG/pVHCQot5P0uyXmUTM/9X2Z4xGHncbper0Nnq+/VguTkR5N
-   iCCkUsxpzXmbf8IkhuL3odj+2We1vIMvSd84bAuekpnbFfYMZp8Ndt1hU
-   IyOiKjWoyfR00WFzsqqaOGkWCQ2oy/f4x4BsOh/yXSu+kq145fQ6kJ1BK
-   8MLnJzmPc2BjOWrfLrkJ5FK9UlrrULwiueTUg8uHvKnv0UM6Sjyh9gYOS
-   Q==;
-X-CSE-ConnectionGUID: UmoDDHTySqmy3obZG+emog==
-X-CSE-MsgGUID: E3uAuytsQTaT+bzp83WV6Q==
-X-IronPort-AV: E=Sophos;i="6.09,182,1716242400"; 
-   d="scan'208";a="37726950"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 03 Jul 2024 14:50:23 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A8D9F1667A7;
-	Wed,  3 Jul 2024 14:50:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1720011008;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=//htds0Gxwdc60HRVxJ4E2umUzYUbcipiNv8kYB+0lo=;
-	b=m5aSbOPwNA8DlMbJCgRwbV7PyXvKbpIn70J+te46DpME8mLBQXLbkBCA3WCZCI80xKnGVO
-	G529PFjz9zq3fawD3YcJZOz8jnRZlUbLcdebaC54mY/6kbsHDlZbzXi5uFEFKl9e3hF+IU
-	+09q+tzRlK4vNIoSIfGvhNm0q+YwVVmtry6xry4LoklhXWgM1RUbJ5Afr7uEPqYaFFF6tl
-	EfmpuBFBWvlH+vf6RIPBvXbX4FqenHjsICDuzh4dayXSDTwDbuPgkOPCxrsnXMjaimfITx
-	bB5dwwP+2Y3Ij/0sH2QgeNGWzs1fJLCrsX7WuMGQ/6B0+aW/lgvn4QEBpTct1A==
-Message-ID: <76faeb323353b584b310f2f1b53e9b2745d2f12c.camel@ew.tq-group.com>
-Subject: Re: Kernel hang caused by commit "can: m_can: Start/Cancel polling
- timer together with interrupts"
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Chandrasekar Ramakrishnan
- <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Tony Lindgren
- <tony@atomide.com>, Judith Mendez <jm@ti.com>,  linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux@ew.tq-group.com, Linux regressions mailing list
- <regressions@lists.linux.dev>
-Date: Wed, 03 Jul 2024 14:50:04 +0200
-In-Reply-To: <734a29a87613b9052fc795d56a30690833e4aba9.camel@ew.tq-group.com>
-References: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
-	 <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
-	 <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
-	 <08aabeaf-6a81-48a9-9c5b-82a69b071faa@leemhuis.info>
-	 <734a29a87613b9052fc795d56a30690833e4aba9.camel@ew.tq-group.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        d=gmail.com; s=20230601; t=1720011490; x=1720616290; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fXVFIiIUYfoxHdro42xuevo9niN2lvAoiBpgZ+TRXR0=;
+        b=CXMISsik3/pqA2Fu7f3GcxN+d7o0281e959IPt/sEqGPuEitU+fPaWXirdv8cUMpE4
+         W3No24DkJQd2RP6dFIRHMJlXZea0dZJReeCUsYk+u3ZctaYwT5ZyieDFhgc9zHwZmIGF
+         ib56ZR8LJUox2luBCFqFLjG5laZYSOcObuqiTTzIiErfLI6qFl4cFUKzAOW0scjkwZrk
+         ifAPVYheaS5H57jmjzv9gjL54ZnrblCA6ad5GwO+MzI0CaOMSjSdVGT3bAtINITD/Beo
+         uPcUxz61KkkEUCoMNPHw+65nrZXPSwRAp3QCJ1j+Y+AZWBUkfhb7Z6DqMGRgJIPeUgjh
+         p3Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720011490; x=1720616290;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fXVFIiIUYfoxHdro42xuevo9niN2lvAoiBpgZ+TRXR0=;
+        b=KMQwLQRWSfClmB1Adby3LN43zfsUdgecXz0v3L+ogkpIqX7wqQ07ViutEpl5hLXrJI
+         JlVHgOeQmhAwzQr4F40uMUh3mIh7RYwPwrt6rNVkIqeIQ29mcGoIXbIQrdQWt1x3md9C
+         DqOUREUIKJVSiAFe6vfRzljpw8GtItEEiASChvpGWRR8otv6B+hmrVDGR5xXeKoAdlBp
+         Gvu15eglDKI4gLoTDxRuI1oN1HAdpfpCA4I8bk0QxGY8C5Mdg6ykl9XJiw60iqIz4Ai2
+         YBrzLspcnsdHJd3AQH/qF7brK6z3vTOCb2+b35fJ2w7qnsImwHpu1q70BiHAOPaI1xr5
+         +apw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0JgSRjGgPcoOZQhoANlLCkRl4DpWbHXm5J2wgtqGD5GfE66aZSScLX/vM0h0h+mdQi3J/cK5032jlb2NU8xliKpjiBIWj
+X-Gm-Message-State: AOJu0Yz+GkBkRcW4thy21uiNJtKC8+ByC+/SOdKN0byB00U/olwbGNME
+	NVs0OdaxeRIcGQ4eO9/mnS+DIN1ST15RruZvkS43Q13gY93AuU1AFPl/a0WG
+X-Google-Smtp-Source: AGHT+IHS3qaCeUDqW4aAKfnWBxI/J39cLSGL3LWKc267YYQI2vGq/bCbnHM2EVv+M/2Q/LtToXQJ7w==
+X-Received: by 2002:a17:90b:68c:b0:2c9:36d3:8934 with SMTP id 98e67ed59e1d1-2c93d6deab4mr11789441a91.1.1720011490299;
+        Wed, 03 Jul 2024 05:58:10 -0700 (PDT)
+Received: from localhost (p5199240-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.11.99.240])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c91d3bc5a1sm10654460a91.36.2024.07.03.05.58.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jul 2024 05:58:09 -0700 (PDT)
+Date: Wed, 03 Jul 2024 21:57:28 +0900 (JST)
+Message-Id: <20240703.215728.957684876602887757.fujita.tomonori@gmail.com>
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch, fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: tn40xx: add initial ethtool_ops support
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <Zn7afU9DiotL92jZ@shell.armlinux.org.uk>
+References: <20240628134116.120209-1-fujita.tomonori@gmail.com>
+	<fe33e69d-a17b-4afd-a5e5-1e1539e6572c@lunn.ch>
+	<Zn7afU9DiotL92jZ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-07-02 at 12:03 +0200, Matthias Schiffer wrote:
-> On Tue, 2024-07-02 at 07:37 +0200, Linux regression tracking (Thorsten Le=
-emhuis) wrote:
-> >=20
-> >=20
-> > On 01.07.24 16:34, Markus Schneider-Pargmann wrote:
-> > > On Mon, Jul 01, 2024 at 02:12:55PM GMT, Linux regression tracking (Th=
-orsten Leemhuis) wrote:
-> > > > [CCing the regression list, as it should be in the loop for regress=
-ions:
-> > > > https://docs.kernel.org/admin-guide/reporting-regressions.html]
-> > > >=20
-> > > > Hi, Thorsten here, the Linux kernel's regression tracker. Top-posti=
-ng
-> > > > for once, to make this easily accessible to everyone.
-> > > >=20
-> > > > Hmm, looks like there was not even a single reply to below regressi=
-on
-> > > > report. But also seens Markus hasn't posted anything archived on Lo=
-re
-> > > > since about three weeks now, so he might be on vacation.
-> > > >=20
-> > > > Marc, do you might have an idea what's wrong with the culprit? Or d=
-o we
-> > > > expected Markus to be back in action soon?
-> > >=20
-> > > Great, ping here.
-> >=20
-> > Thx for replying!
-> >=20
-> > > @Matthias: Thanks for debugging and sorry for breaking it. If you hav=
-e a
-> > > fix for this, let me know. I have a lot of work right now, so I am no=
-t
-> > > sure when I will have a proper fix ready. But it is on my todo list.
-> >=20
-> > Thx. This made me wonder: is "revert the culprit to resolve this quickl=
-y
-> > and reapply it later together with a fix" something that we should
-> > consider if a proper fix takes some time? Or is this not worth it in
-> > this case or extremely hard? Or would it cause a regression on it's own
-> > for users of 6.9?
-> >=20
-> > Ciao, Thorsten
->=20
-> Hi,
->=20
-> I think on 6.9 a revert is not easily possible (without reverting several=
- other commits adding new
-> features), but it should be considered for 6.6.
->=20
-> I don't think further regressions are possible by reverting, as on 6.6 th=
-e timer is only used for
-> platforms without an m_can IRQ, and on these platforms the current behavi=
-or is "the kernel
-> reproducibly deadlocks in atomic context", so there is not much room for =
-making it worse.
->=20
-> Like Markus, I have writing a proper fix for this on my TODO list, but I'=
-m not sure when I can get
-> to it - hopefully next week.
->=20
-> Best regards,
-> Matthias
+On Fri, 28 Jun 2024 16:45:01 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-A small update from my side:
+>> > +static int tn40_ethtool_get_link_ksettings(struct net_device *ndev,
+>> > +					   struct ethtool_link_ksettings *cmd)
+>> > +{
+>> > +	struct tn40_priv *priv = netdev_priv(ndev);
+>> > +
+>> > +	return phylink_ethtool_ksettings_get(priv->phylink, cmd);
+>> > +}
+>> 
+>> Have you tried implementing tn40_ethtool_set_link_ksettings() in the
+>> same way?
+> 
+> I did think about commenting on that, and the [sg]et_pauseparam
+> methods as well, but when one realises that the driver only supports
+> one speed and duplex (10G FD) but no pause it didn't seem to make
+> sense.
 
-I had a short look into the issue today, but I've found that I don't quite =
-grasp the (lack of)
-locking in the m_can driver. The m_can_classdev fields active_interrupts an=
-d irqstatus are accessed
-from a number of=C2=A0different contexts:
+I have not been able to find register configuration to make
+1000Base-SX work with QT2025 PHY.
 
-- active_interrupts is *mostly* read and written from the ISR/hrtimer callb=
-ack, but also from
-m_can_start()/m_can_stop() and (in error paths) indirectly from m_can_poll(=
-) (NAPI callback). It is
-not clear to me whether start/stop/poll could race with the ISR on a differ=
-ent CPU. Besides being
-used for ndo_open/stop, m_can_start/stop also happen from PM callbacks.
-- irqstatus is written from the ISR (or hrtimer callback) and read from m_c=
-an_poll() (NAPI callback)
+> Not having pause effectively rules out pause-frame rate adaption
+> by the PHY, so the PHY probably only supports 10G link speeds,
+> and if I remember correctly, 10GBASE-T requires autoneg.
 
-Is this correct without explicit sychronization, or should there be some lo=
-cking or atomic for these
-accesses?
+I suppose that the HW supports pause because a register named
+regPAUSE_QUANT is set up during initialization. But the original
+driver doesn't support [sg]et_pauseparam or give the details.
 
-Best regards,
-Matthias
+> The autonegotiation specification was improved in the 1998 release of
+> IEEE 802.3. This was followed by the release of the IEEE 802.3ab Gigabit
+> Ethernet standard in 1999 which specified mandatory autonegotiation for
+> 1000BASE-T. Autonegotiation is also mandatory for 1000BASE-TX and
+> 10GBASE-T implementations.
+> 
+> which is loose language - "mandatory autonegotiation" does that refer
+> to support for auto-negotiation or require auto-negotiation to be
+> always enabled?
+> 
+> We're already seeing some PHYs from some manufacturers that seem to be
+> following the "require auto-negotiation to be always enabled".
+> 
+> So why have I gone down what seems to be an unrelated rabbit hole?
+> 
+> If tn40 is connected to a 10GBASE-T PHY, implementing the
+> set_link_ksettings() method would give the user control over whether AN
+> is used on the media side.
+>
+> If 802.3 requires AN to be supported but is not necessarily enabled,
+> then there is use in exposing the set_link_ksettings() method.
+> 
+> If 802.3 requires AN to be supproted and always enabled, then
+> implementing set_link_ksettings() in this case would not provide any
+> value.
 
+I've read your comment on stmmac patch:
 
+https://lore.kernel.org/netdev/ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk/
 
->=20
->=20
->=20
-> >=20
-> > > > On 18.06.24 18:12, Matthias Schiffer wrote:
-> > > > > Hi Markus,
-> > > > >=20
-> > > > > we've found that recent kernels hang on the TI AM62x SoC (where n=
-o m_can interrupt is available and
-> > > > > thus the polling timer is used), always a few seconds after the C=
-AN interfaces are set up.
-> > > > >=20
-> > > > > I have bisected the issue to commit a163c5761019b ("can: m_can: S=
-tart/Cancel polling timer together
-> > > > > with interrupts"). Both master and 6.6 stable (which received a b=
-ackport of the commit) are
-> > > > > affected. On 6.6 the commit is easy to revert, but on master a lo=
-t has happened on top of that
-> > > > > change.
-> > > > >=20
-> > > > > As far as I can tell, the reason is that hrtimer_cancel() tries t=
-o cancel the timer synchronously,
-> > > > > which will deadlock when called from the hrtimer callback itself =
-(hrtimer_callback -> m_can_isr ->
-> > > > > m_can_disable_all_interrupts -> hrtimer_cancel).
-> > > > >=20
-> > > > > I can try to come up with a fix, but I think you are much more fa=
-miliar with the driver code. Please
-> > > > > let me know if you need any more information.
-> > > > >=20
-> > > > > Best regards,
-> > > > > Matthias
-> > > > >=20
-> > > > >=20
-> > >=20
-> > >=20
->=20
+When implementing BASE-T PHY support for tn40 driver, I'll check the
+situation again.
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+Thanks a lot!
 
