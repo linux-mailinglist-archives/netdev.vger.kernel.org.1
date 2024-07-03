@@ -1,117 +1,101 @@
-Return-Path: <netdev+bounces-108753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE8A925384
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 08:12:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F905925386
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 08:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C97D7B213AB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:12:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61CDD1C2183E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8832212DDB3;
-	Wed,  3 Jul 2024 06:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ACB49641;
+	Wed,  3 Jul 2024 06:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="ZM9TjA8n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1pUmTt/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A900B1C69A
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 06:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D126AC2F2
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 06:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719987133; cv=none; b=qYAQXrlo/15sie/F8OOkRLwqzHft9zQARHhzKyrSCfgUl8MezaHmwROghNWbhg9pN+ZxRb9c00mYSs1AB2RQqk1JWqi80uswcgRQEHBcVYQk+95BfcfUIAdmoIZ7n30oJqn+SjevlYRNGPktP9EjpMLgru3aafaDK06XC1MBbj0=
+	t=1719987279; cv=none; b=EextvmrL+bdSluXUthOqwyeVHiXMrSLNxDSS/GR0zkyFWaHLiFRMTKMlf4wWxnFrJNDaWIhDy+kAz6jeKfSvSVfafI0fFsot7VjAZi4M2TVmVVobDyOWDwkgle+9/zB+qBbQIQja2PBwoOlecRe5ucAWz7/w92KygV8UYWqDE5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719987133; c=relaxed/simple;
-	bh=3J99y5+6OxbwcKwAHIcLAKi5CZ2ycbqsCw8ezkKjM80=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rBiyNFltjJqX6y19wA0TcgbOFgdfVZIfCw1acmHY9GpgT44aJNpw8uiq40v3mn9y3WYnPLFL0ngH4XJdtM5GSEjbW4Q6KPaEsgWElDB7tzOJ0AvTKWRqOJDZQ7bUVZkIFRtvjAY7dMqZBW+ULWsxjTdHe5+3JdGrs9drkL0glvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=ZM9TjA8n; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e035ecb35ffso4917304276.2
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 23:12:10 -0700 (PDT)
+	s=arc-20240116; t=1719987279; c=relaxed/simple;
+	bh=CSt7lpvHgv01W/xOxpH3qAJfS1ZPwKjffh8W9kbBTzA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wj/mvIDMr81hyMS870tgqJx4fawW8QPnEPwTzxqjPUjcySIT//eQ3y+1qq+72++nZ8lEgxWgiZ/Y7uK3CSCXjEhJ+GrZSJwnB7hm+FQysxqnOSGnmgZJwpgTWZjASiFcm4dHE5eZ3VwcsoezkhoS/UWvhWEeTwf3FPMv8iERatA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1pUmTt/D; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-58c0abd6b35so9645a12.0
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 23:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1719987129; x=1720591929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1YgzDReIaUyz8u4XHHLiy/BwQZOZxxkCv3LtW0SkUnc=;
-        b=ZM9TjA8nvdacXOC+i8jV18hP312AcUixvWRcDGa7PG288hGgq9BuqSACT7NHNFXAsx
-         bPZiy9qykcnRjP3Q8VVlO4YiizNsWwOgbl/Yx8WTNvdCFd1d7dGRMA++8aMZHonB8mpK
-         M4R01h7b3L1TBGLv1SAP5C+gjVtaRuOcZritfHoptPXih1SgVSnFT4H2Rju2QbSlcjFD
-         BbDpw5woDX+PVrKSpeoW7pdmAfB7Cj97YNScln1KcqC7LXgQcA4JuJuEveiUTRhgi7Ut
-         X6p6L3jvOc0St6SpkO6sQOYfOnvFB+SzGzudJH8GsuH9fmORQJqhZcTneeY4QnqMr/Kf
-         kMtw==
+        d=google.com; s=20230601; t=1719987276; x=1720592076; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T9BRI3VL+FnVFgKLMKQtHesxyg+ZB7RxOJjtvrdfb3E=;
+        b=1pUmTt/DIJBTz0wr6bKrwrwfzLvIgR47rDOIs1quS9ZwWAkocGIlLc9L17YtUbRpQd
+         0NcsXJZsFgask2JjRcDCB6geg87c99kjLlo8TBPQve4l2x7wDfmLXd84KGkis2Mm4SMX
+         OHDQHA3g8dGRw33cLRDjo6PHyJUFw1J0UaXGEtk8cKyqIQ6FAx2qAMq6PQCEFPA5SCcL
+         Ra/4PCK05/D6bPZOktHXbvExQtJ4UcLaFlrERGQeTc44Xx0YeL8YbpCfjDl73kTe4ob+
+         WT+LzWaluStlF2avPyhzXU6y2KiSjwAZwDwW6SwUBLj1oUz07i9lU2lJXUP272llGgKw
+         kRKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719987129; x=1720591929;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1YgzDReIaUyz8u4XHHLiy/BwQZOZxxkCv3LtW0SkUnc=;
-        b=bQyMWTkch8qLlYVJvlWIRTGuPKRvnqkZasT3HSBEaow1tHe+JEZL6uYV0bLWHgxf+l
-         UaeewQIt5W17PjBx/R4pjCdxIQ5o50DDxT0OsM4laWK6cBdMRkxkA2cqu8Z57O1XbK9Y
-         T5Z8BxzE1YcinilRvq8vYE4JQUy56PqAS5spqhLxF3/Ri7s7045QIqibB4CJ8pCJIsg0
-         ZiHPi3uPNSj1kaXFH9L1p/xMY0sfyB0wZZrBP2Z7ZJEqScwx5ly3ZNQORU44htlup3CS
-         T0qMepJMawpbF8HpkkXokARA6vGmPuztroTMPzesEMQOqFGPOlyv4RiqL3gml3jK6KRR
-         n1WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6mCyTZr5tnicws0NuiP6KA5S679MhL1YQBS3HkLsxvL0y1Ry8hd9KmCpwNAWeZFafWnYEKZL+mKewX2v+uxtly6YJl92z
-X-Gm-Message-State: AOJu0YwIZuPW+MIqCVU8jHKWpN11gv5hqauA4SrMQ3iLU5u63Zc3ZxVb
-	2WMlUiMIAwxxsDFX5JPJbGwZjxmwspAmuDgeVrAW6ZFKCwkp5846wXelBWH2eoo=
-X-Google-Smtp-Source: AGHT+IEYwaFScpXSpfOjk0NDboyzDAX10kkBsDpozYzsFOW5+JJ9NVaivETucKRFmAX9S49/+mU4Bw==
-X-Received: by 2002:a5b:9cf:0:b0:e02:b7d6:c97 with SMTP id 3f1490d57ef6-e036eaf633emr12008074276.8.1719987129659;
-        Tue, 02 Jul 2024 23:12:09 -0700 (PDT)
-Received: from fedora.vc.shawcable.net (S0106c09435b54ab9.vc.shawcable.net. [24.85.107.15])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6a8dbdfdsm7531927a12.29.2024.07.02.23.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 23:12:09 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: samuel.thibault@ens-lyon.org,
-	tparkin@katalix.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>
-Subject: [PATCH net-next] l2tp: Remove duplicate included header file trace.h
-Date: Wed,  3 Jul 2024 08:11:48 +0200
-Message-ID: <20240703061147.691973-2-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1719987276; x=1720592076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T9BRI3VL+FnVFgKLMKQtHesxyg+ZB7RxOJjtvrdfb3E=;
+        b=m3N0HWqCasU5nBrqZHdk2ZcDL+xNqHcUQdBrokMjIbT31ftdVEL1Dq1VhkobYNyHzn
+         NUyqWaPzKulSo4UjOjVWuXLgAijENpvV+CKBVUJvn6rI228v8OEM7wTwcHb8Z2jKzTap
+         /4KpfJk9ZuwuIZOMXi9MmZYCm3+d08N2qAvBL1Q//ouos07guvmwqSU4UbN7/KKdaokm
+         NYUqAk450snq1iXcDO187g4OIdAdaUoCZvdqeueNo8/B35wi/2I1VXhe+9c6L6Nbk/fc
+         TbSpgw4Da8vjoiPEQ7cVi33WMV+IO/aKS/Nqd1/AIlmNxbz0lSiH9GpNd0cLYNgmMX/0
+         eTDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVd3d+ebyO1+ahSDHoAxZ3+kFNFbf1eWd1jMm0F80ZJzEqVp65Yby/gBjTJ4VDzwQ19KcfNxKCtGq4yySTC5A3dZTFnz3uQ
+X-Gm-Message-State: AOJu0Yxdfm7eqFWi11koCscHq+/ijVC3xfmVo+QBTyYQOvIbRdmzqNGo
+	v9FYCjPk7VhIJuP9ac7vvtHlwmKmQbxwb7LGbPQHUTdUxueKvlqMN8aD6uOT36p3KIWNTCnTolg
+	/KBJF720TKXlSu0dwTVe5ASETb7wUc/qw40gl
+X-Google-Smtp-Source: AGHT+IHVkfjMkSoQGf5h0HkN2b1/pqlVu04i1pywUOqMlSGKmIZOEqmK7u0eiKEkVsdBokrNpX/OnoEBL+BgrL+dp18=
+X-Received: by 2002:a50:c346:0:b0:57c:c5e2:2c37 with SMTP id
+ 4fb4d7f45d1cf-58cbd48d275mr113013a12.3.1719987275858; Tue, 02 Jul 2024
+ 23:14:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240703033508.6321-1-kuniyu@amazon.com>
+In-Reply-To: <20240703033508.6321-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Jul 2024 08:14:24 +0200
+Message-ID: <CANn89iK2NJSvyEQWiw-C5oAF4mCJjAeXbUOzBDQCBdeWSAC6cg@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for
+ TCP AO.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove duplicate included header file trace.h and the following warning
-reported by make includecheck:
+On Wed, Jul 3, 2024 at 5:35=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> When we process segments with TCP AO, we don't check it in
+> tcp_parse_options().  Thus, opt_rx->saw_unknown is set to 1,
+> which unconditionally triggers the BPF TCP option parser.
+>
+> Let's avoid the unnecessary BPF invocation.
+>
+> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-  trace.h is included more than once
-
-Compile-tested only.
-
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
----
- net/l2tp/l2tp_core.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 88a34db265d8..e45e38be1e7c 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -61,7 +61,6 @@
- #include <linux/atomic.h>
- 
- #include "l2tp_core.h"
--#include "trace.h"
- 
- #define CREATE_TRACE_POINTS
- #include "trace.h"
--- 
-2.45.2
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
