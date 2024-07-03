@@ -1,99 +1,116 @@
-Return-Path: <netdev+bounces-108658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9716B924D73
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA1D924DE6
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22005B22563
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:02:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED72B27503
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A934683;
-	Wed,  3 Jul 2024 02:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0521E1FB4;
+	Wed,  3 Jul 2024 02:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZkiJu8V"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="rvzpSked"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841128F5B;
-	Wed,  3 Jul 2024 02:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54A2523A
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 02:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719972156; cv=none; b=ARn1Qkidza5oc8OE+X/i5+2JMEWS5k3//5K1WUMtGiplHzZoVrXwMkwNyf5dDRYsU+glo2g8EYxdWjEe4XJxTaEAkjmtPCqahMw7OmwqEmoETrVJA8jre5epwOwAU4av5ABq7fmWL2/q4d4B04wgBwim5ffpOdS7NJnmovi2Ym0=
+	t=1719974373; cv=none; b=ks62r8oYMXfKB4Mi/UtujuMfVuiJxCqb8CBoOCTjw7z6oaTiAU245Z78D+jh1aNh4Ri5SJLz86fEzdMbPORWcqMcR8lHQ1x+1E/FOYHf9Wx1UXdOrnx4uB956KHsGCJmznrlrZIyQOmQHMt9GkdYNOJ5q3ocMUVWTTWipIVI6zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719972156; c=relaxed/simple;
-	bh=R6kgAs73TS+N4+4Y27yXxUyZx91QX/oME+K5F6DbZ1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bZlu7eDKKnjHX7f+Czk1p805q1VLOV148XZ4RDTrt4xQzlXB0HwSyJ87CftOesDO3tIDiqh037YBEe4K6T13tDw/31+dlV59w6be0tWdJNezZinNJ8dp5mjTvFPUanFMjWYIGiKXeBgXs4zTrJebVZPCZdrUt5jWIxPLLvZ/kLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZkiJu8V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E22CC32781;
-	Wed,  3 Jul 2024 02:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719972156;
-	bh=R6kgAs73TS+N4+4Y27yXxUyZx91QX/oME+K5F6DbZ1c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nZkiJu8VGkExL+V5eE4TDNRvf6KjZSSsn/r8tuggjTUlWsOLkZpiVUHTnjLRiNwNU
-	 VeTQthUWctRpmaY5e/iSnDXXpAF2t86pYqMWLsTKj25XULlKC2vLrCx7hGY3xvcFuv
-	 Uj09eyf8otNb8v9e39qs7Lxed4UQvrG50QOns/dziVCxTqzN6QKAtP/7MTwkC52Yvn
-	 X2Rr75v95DZXNFuMqrUO5D9PIsCgHfg72jH5LhBVJaJKHbLGnZCIT5snd5fDgANFyC
-	 VUbx8fAuRtC/pj/Eea0xyvGwlc5iucM3sDRIte3Z2CJ74+DIpSCuhaPkTTzjly8lpE
-	 2pasIfmYiJF3Q==
-Date: Tue, 2 Jul 2024 19:02:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
- Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
- Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
- =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Bagas Sanjaya
- <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
- Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>
-Subject: Re: [PATCH net-next v15 00/14] Device Memory TCP
-Message-ID: <20240702190232.7cbe4c41@kernel.org>
-In-Reply-To: <20240628003253.1694510-1-almasrymina@google.com>
-References: <20240628003253.1694510-1-almasrymina@google.com>
+	s=arc-20240116; t=1719974373; c=relaxed/simple;
+	bh=nesRTquYSmAgGVBGCb6VKWwFQ3BzkeM3+SZXjJ0qOSo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aEeJBOv2rERXCeGQSepPVdsEgTPVAiWiIRi4VMxAVJvcn+OnNgoREwTD2k0kuWlXeKegHU3Dyl1RFr8GMF81QL8igiIn6jScyaFSJwvN/fCMEjFsj2Ro7OhMyeAQD7G49F461d5nw8Cm42SawECsdjP1KIuVLZf5CH33YJidebw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=rvzpSked; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 8F7082C044B;
+	Wed,  3 Jul 2024 14:39:22 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1719974362;
+	bh=mSPdwjA6VRheCRrQxnrkew5mjmQX0ILCVy3v5OXgySM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rvzpSkedJ7CyBO8MdjZPYq5M5JkPmqpS9lKgIzDAMy09c4u7rCWVYhOuDNP3jltWA
+	 pSLOJ7jdTq/MEZ2Eshp800RzozG3qfolob3q9n2BtC6EQ6MGiZUHZRPm/ixRXpDGFh
+	 Krj8RZdwhqB/im71DwvglQCHe54s27aum8x1eluTJzUxs4c0x2jtvE1V4pThwYlBkC
+	 pSM9IK33DmsBHVcOlFfRRfCP0TqAUoEaWc8xbgIDaTyN3TURnPx47kcvx9CwpkF5Oi
+	 EnihWH9g0CS3O1J937xz081PMyxTe1FUnzDB4ePk5zpidtOta8Iuqa6N+Nw9OUe21s
+	 vFb4x9YJRgzTQ==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6684b9da0000>; Wed, 03 Jul 2024 14:39:22 +1200
+Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 6627D13ED5B;
+	Wed,  3 Jul 2024 14:39:22 +1200 (NZST)
+Message-ID: <c8132fc9-37e2-42c3-8e6b-fbe88cc2d633@alliedtelesis.co.nz>
+Date: Wed, 3 Jul 2024 14:39:22 +1200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: net: dsa: Realtek switch drivers
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "olteanv@gmail.com" <olteanv@gmail.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, "ericwouds@gmail.com" <ericwouds@gmail.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "justinstitt@google.com" <justinstitt@google.com>,
+ "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
+ netdev <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "sander@svanheule.net" <sander@svanheule.net>
+References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz>
+ <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
+ <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
+ <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
+ <c19eb8d0-f89b-4909-bf14-dfffcdc7c1a6@lunn.ch>
+Content-Language: en-US
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <c19eb8d0-f89b-4909-bf14-dfffcdc7c1a6@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=6684b9da a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=4kmOji7k6h8A:10 a=CfxWgEXZv7hflEJXd20A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On Fri, 28 Jun 2024 00:32:37 +0000 Mina Almasry wrote:
-> v15: https://patchwork.kernel.org/project/netdevbpf/list/?series=865481&state=*
 
-I'll pick up a couple of patches unlikely to change.
+On 2/07/24 14:50, Andrew Lunn wrote:
+>> What would I be loosing if I don't use the DSA infrastructure? I got kind of
+>> hung up at the point where it really wanted a CPU port and I just couldn't
+>> provide a nice discrete NIC.
+>   
+> DSA gives you a wrapper which handles some common stuff, which you
+> will end up implementing if you do a pure switchdev driver. Mostly
+> translating netdev to port index. The tagging part of DSA does not
+> apply if you have DMA per user port, so you don't loose anything
+> there.  I guess you cannot cascade multiple switches, so the D in DSA
+> also does not apply. You do lose out on tcpdump support, since you
+> don't have a conduit interface which all traffic goes through.
+>
+> But you should not try to impose DSA if it does not fit. There are
+> 'simple' pure switchdev drivers, you don't need to try to understand
+> the mellanox code. Look at the microchip drivers for something to
+> copy.
+One reason for using DSAI've just found is that in theory the RTL930x 
+supports a CPU disabled mode where you do connect it to an external CPU 
+and the data travels over SGMII like you'd get with a traditional DSA 
+design. It's not a mode I'm planning on supporting anytime soon but it 
+might come up when I get round to submitting some patches.
 
