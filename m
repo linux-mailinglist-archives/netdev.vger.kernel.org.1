@@ -1,97 +1,84 @@
-Return-Path: <netdev+bounces-109054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C11926B6F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:21:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF8EA926B9F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A7A282945
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:21:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 696FD1F227AC
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCFE18E75D;
-	Wed,  3 Jul 2024 22:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IWZBrYsD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DE81946A1;
+	Wed,  3 Jul 2024 22:33:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CDF13D638;
-	Wed,  3 Jul 2024 22:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693A017995;
+	Wed,  3 Jul 2024 22:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720045293; cv=none; b=bGZXLMTyBfMUnvpnrW+HTHRL2Mg8WRvrMSqcrXGRKMgZ54+Tc4D5cuqsgMiV+6z87A+sx/88gsfRIIMpTt8WV3RF2gisFzwML9+DyoC0tU8yjPKKrGWm1Ohr7sMiZR5NMDQ/LJuKx4ZexsF3tjXFoh7A2/pYrLV5vvjOC88nNUE=
+	t=1720046003; cv=none; b=ayU2f5jt+x/KcQQyE16SgQjXt0gvncTLUiZO3jI3hBJHia4FAIirK/GgVq0lRbrcsaCBPCJfJEPQNLnY9BXSvlXH2Ge2ZjIrUAhs01IhPqESwC/OIsaAIKhHZXuNUzgGhy17UOFONDb3kx7Q1TZ/Nb/41ESCLwbZ3LBOc4V8eEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720045293; c=relaxed/simple;
-	bh=qzUnn7OULqI4PPdR5CslAgQmY67Olz1L9cTNx/GdJMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TztYcywmrii8mwVkmH4nPWfYmCFV76OBxsyBwZFieg4y4+efF+el91G/SobKzwIMrZopV/xkpLNQK675qv7ainiW7UvoZtRts8fD4jYFazwdVq50OhXLxRhvu+a7pRw3GPVuN/rIfV8b2AyvCkKyoGNV5elkXXGk9T9nz+K3VDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IWZBrYsD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8q9zES3+zTRSwBcBDNrOTV1zjiXViyGhReGb+fJ4Fpo=; b=IWZBrYsD2j71YtY44VQeBpXYEC
-	7TnuKsoqMTaPuelBlItQgCSPeQdljmwpisJtHO9hq/HAw1dMfPgtVay2Vg46R0ZdjBfAGZF2IzatK
-	1Y3hVLJ+5EM60H6DscRNcQflJdlgTEwgohD0jma3HnnvWODWDGBDEvGiL1T/Tz9We+sM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sP8LX-001lt8-SR; Thu, 04 Jul 2024 00:21:03 +0200
-Date: Thu, 4 Jul 2024 00:21:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, kernel@quicinc.com,
-	Andrew Halaney <ahalaney@redhat.com>, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] Add interconnect support for stmmac driver.\
-Message-ID: <72c55623-8d62-4346-8f04-506d0eaed867@lunn.ch>
-References: <20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com>
+	s=arc-20240116; t=1720046003; c=relaxed/simple;
+	bh=dR9A5vI4ZF4Ju786MTEbR/AWvC8yLfcS2O8dbEjpY0I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iNZPVp2t9ccXyk3y1qRZC0LHmOM7VF6zLnyqu4+dypDa7syO9/4wxV5vFIULZT+fHCp8dASHhTChHolyAhO3uFY/L2RRUGAwQKtn70GnaJwexg5CVS95yk73+ry54k2N03aDszQAyutayUzlw9TrWLbE6gZ9IKAfq8MNxTsQU9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/1] Netfilter fixes for net
+Date: Thu,  4 Jul 2024 00:33:03 +0200
+Message-Id: <20240703223304.1455-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 03, 2024 at 03:15:20PM -0700, Sagar Cheluvegowda wrote:
-> Interconnect is a software framework to access NOC bus topology
-> of the system, this framework is designed to provide a standard
-> kernel interface to control the settings of the interconnects on
-> an SoC.
-> The interconnect support is now being added to the stmmac driver
-> so that any vendors who wants to use this feature can just
-> define corresponging dtsi properties according to their
-> NOC bus topologies. 
-> 
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Hi,
 
-Thanks for the rework.
+The following batch contains a oneliner patch to inconditionally flush
+workqueue containing stale objects to be released, syzbot managed to
+trigger UaF. Patch from Florian Westphal.
 
-It is normal to have a user of a new feature. Please could you patch a
-few .dts files with these new properties.
+Please, pull these changes from:
 
-Thanks
-	Andrew
----
-pw-bot: cr
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-07-04
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 8905a2c7d39b921b8a62bcf80da0f8c45ec0e764:
+
+  Merge branch 'net-txgbe-fix-msi-and-intx-interrupts' (2024-07-02 16:07:07 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-07-04
+
+for you to fetch changes up to 9f6958ba2e902f9820c594869bd710ba74b7c4c0:
+
+  netfilter: nf_tables: unconditionally flush pending work before notifier (2024-07-04 00:28:27 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-07-04
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: nf_tables: unconditionally flush pending work before notifier
+
+ net/netfilter/nf_tables_api.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
