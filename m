@@ -1,227 +1,139 @@
-Return-Path: <netdev+bounces-108643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5CDF924CB6
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:20:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E18924CC1
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89409284184
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 00:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE73C1C22094
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 00:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C3C17D2;
-	Wed,  3 Jul 2024 00:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2FD623;
+	Wed,  3 Jul 2024 00:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CiWEWXh/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nS6guZQi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCCE621;
-	Wed,  3 Jul 2024 00:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997A391
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 00:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719965997; cv=none; b=T1Mg0CLs9mGg0J9w36PxuZybc+UluVCri907+kPzVrGkvF8q0ypi6iPWFaTL4TeQNttu7XBCKeWMLPEwL41HK1nehJqBa7hRYfPeiNiFeY0RwAuWgf7dMiUK49Zb9HBmko+0g8luDG5uBRspT5T0EWjBikTXu572cSv4C7vwN3c=
+	t=1719966625; cv=none; b=pbhXWlb+CIwgvXDq9sz9gUm4UcyU/J7FfD/x7MqOHktetIBWW3m/nNW6Kz63ru8ujJZSC0FBn0iYdXX8cLd7td0QM2aoQLELOF5sUhAGM1pq6lBZyCQjwnw5SDQkxmshBPUEfIw7gn1DTcGAuOnRJopjLHu31l2hKtNIoOqcnSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719965997; c=relaxed/simple;
-	bh=SFsqNX+6slZmjSB86CGH3XB+ZErTnNT0rtJ8aW8Urz0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvRQi1sdOXSnOeavf5zFPOca8daW6pzIi4KI41V6MNeCOLNnuwo4E5pDVCrx6XZ5opWPleNNw1RFMstb2+yb40wkT2URfyzyGcUbe2GgUt2rG43/2EBGSrJawctDYiVeXYt1n8hkYj+N8ejlApSqHW7P5ZXuHY1IqjEjdAiGpTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CiWEWXh/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E2EC116B1;
-	Wed,  3 Jul 2024 00:19:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719965997;
-	bh=SFsqNX+6slZmjSB86CGH3XB+ZErTnNT0rtJ8aW8Urz0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CiWEWXh/UkVNmeAUfZXdtG67Y1o49S9dbYoJ0d6QyE8RKvUU9FNdAKA2NUpPNV9PI
-	 bN41jqlN514pW/0dqfjftsE6C1Wl/gey08FMJGlkX+FEtsrqOG6Jrd7wYaZw5oGVTx
-	 BPvwt9pjrvgo8hMtjSWSZHjpQQHjRa5AT89glk/nTXEwMu2EjQMrv0D2h/Bq3/aR0s
-	 duFLcXIui+tre++3IefsnC8WBEUTIIqVuvE2wFaj0m/deieFGTvZAwznVeS92uKcJf
-	 +Hk8u3LzmuanxtVkpELuHg4qBKIfgdn5+Jkie18lSYvYRX44x/THC6zycH2Ald7Tli
-	 4Ls+aEZ227geg==
-Date: Tue, 2 Jul 2024 17:19:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
- Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
- Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, "Christian
- =?UTF-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Bagas Sanjaya
- <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, Nikolay
- Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCH net-next v15 02/14] net: netdev netlink api to bind
- dma-buf to a net device
-Message-ID: <20240702171953.00886d5a@kernel.org>
-In-Reply-To: <20240628003253.1694510-3-almasrymina@google.com>
-References: <20240628003253.1694510-1-almasrymina@google.com>
-	<20240628003253.1694510-3-almasrymina@google.com>
+	s=arc-20240116; t=1719966625; c=relaxed/simple;
+	bh=8e79/fLj3JfMOkhBbOz/L6hoDK/GEIHor8k+KYPAJ5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m2DtkGd1EouhVO6iJoJxvTeTXAXlDIeMaFbupFAVML/HsfZohvCyPVxRMaftMv9yaxsFp6F2C+PNoZuaW/pJgMNbMiPF/Hrs0BMVVy3FiJwB0EvIpQrhMrmNlW23HepWfnFY5b15iAVT82+NFt+1PQs/291GWtzJedHfKfKYsLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nS6guZQi; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7226821ad86so3059057a12.2
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 17:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719966623; x=1720571423; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bYQtXFmBGu3MLcTd5T6+LlU+aNFFc/l1vdC2SyQcYFQ=;
+        b=nS6guZQiu7mFaO2VRTooPYvwideKp1+bcOiHu3CFs+qLZ1pyQb9lOLM8+cO1Hgn9dF
+         lXcqGF6E+xBT3xgsGPHTWSx33HcXkiqFEhIGLjcKy+O9lpWffaZCpFp2pFe36TjBuC99
+         2lDDb5zEL9Sa2zJz04Ry1MKyatAyXLbR5ijuBE8Xlj+Tbvch9l6VQ20Yc6XG9SNecJZD
+         2d9njviUOyRd8+ojmAim3kuq7qEfrF97KQAPcZxvgCwWe3z1yDs9nLToZl3MfMnQjo+h
+         zI6LSub+Nko2RJ8yAhhbot+8Y5x2sG3TClbkC2kEkZx5s1DLTueHmwz9RGBhnH8lL4Lt
+         d9OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719966623; x=1720571423;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bYQtXFmBGu3MLcTd5T6+LlU+aNFFc/l1vdC2SyQcYFQ=;
+        b=krLPjbilh+OzLQJv6F3ILj/GcH6C1KfibR1sxebBJdIODfsAP8l8DsHWsMOstj0Az6
+         P3QIt5nQfsFbDSHjizmtJPRCwZIi7qkxVEtlprf0vaMcUyb6HMYoVyNm749zjbUosvAe
+         28QmIfm2GhSTIcCRlDAlC6Ws5JD1Uu2X7b5dPuCdHtmpPoDSrfjIe2WpYL/EkE+252um
+         I79+UfvoC3UPJCump22+UWCwGDlJ3/gaIGgLdjkq65CdL1IqiFF2Z2b43m+oTlScRAD8
+         gn5GzlE5cMDOkp7cZBZUlJGesHDLeZB7c2fu3e2cIA9fGITugKkMNVOb1v0kjMvHAWZv
+         5NMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXWT5LXItTfn8HFa8+opZWgCkw7wf1BbiCa7/Ein5d+1K1JwrT214zS7WRCd0RXy1GdLRi3Qvgh87cD/aAIrbJyQkgXK9Mq
+X-Gm-Message-State: AOJu0YzNzWy9OCxd3Fe8HtoQ02RlCDsHEbPrnmCo4gbE+0f89MaatP6T
+	smIoJFqfSA1ivf2Ft1kL45HHH2E/I+jxmfWlpB96XI34j1efxNZE
+X-Google-Smtp-Source: AGHT+IEIkKnSL7OhzGceo5wdcjhqTiqCw6W86HQG2pVC4+NO0b3xhZhHz4vhKlzILQpS3UzQaSUCUA==
+X-Received: by 2002:a05:6a20:3d83:b0:1be:cc01:6a6b with SMTP id adf61e73a8af0-1bef611dd8fmr10553577637.1.1719966622791;
+        Tue, 02 Jul 2024 17:30:22 -0700 (PDT)
+Received: from Laptop-X1 ([2409:8a02:7825:62b0:7aad:184a:7969:1422])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb1a075616sm567865ad.15.2024.07.02.17.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 17:30:22 -0700 (PDT)
+Date: Wed, 3 Jul 2024 08:30:17 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: 'Simon Horman' <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Ding Tianhong <dingtianhong@huawei.com>,
+	Sam Sun <samsun1006219@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net v6] bonding: Fix out-of-bounds read in
+ bond_option_arp_ip_targets_set()
+Message-ID: <ZoSbmdPWWFauvY2Q@Laptop-X1>
+References: <20240702-bond-oob-v6-1-2dfdba195c19@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240702-bond-oob-v6-1-2dfdba195c19@kernel.org>
 
-On Fri, 28 Jun 2024 00:32:39 +0000 Mina Almasry wrote:
-> API takes the dma-buf fd as input, and binds it to the netdevice. The
-> user can specify the rx queues to bind the dma-buf to.
+On Tue, Jul 02, 2024 at 02:55:55PM +0100, 'Simon Horman' wrote:
+> From: Sam Sun <samsun1006219@gmail.com>
 > 
-> Suggested-by: Stanislav Fomichev <sdf@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> In function bond_option_arp_ip_targets_set(), if newval->string is an
+> empty string, newval->string+1 will point to the byte after the
+> string, causing an out-of-bound read.
+> 
+> BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+> Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+> CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+>  print_address_description mm/kasan/report.c:364 [inline]
+>  print_report+0xc1/0x5e0 mm/kasan/report.c:475
+>  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+>  strlen+0x7d/0xa0 lib/string.c:418
+>  __fortify_strlen include/linux/fortify-string.h:210 [inline]
+>  in4_pton+0xa3/0x3f0 net/core/utils.c:130
+>  bond_option_arp_ip_targets_set+0xc2/0x910
+> drivers/net/bonding/bond_options.c:1201
+>  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+>  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
+>  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+>  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
+>  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+>  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+>  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+>  call_write_iter include/linux/fs.h:2020 [inline]
+>  new_sync_write fs/read_write.c:491 [inline]
+>  vfs_write+0x96a/0xd80 fs/read_write.c:584
+>  ksys_write+0x122/0x250 fs/read_write.c:637
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> ---[ end trace ]---
+> 
+> Fix it by adding a check of string length before using it.
+> 
+> Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
+> Signed-off-by: Yue Sun <samsun1006219@gmail.com>
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index 959755be4d7f9..899ac0882a098 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -268,6 +268,45 @@ attribute-sets:
->          name: napi-id
->          doc: ID of the NAPI instance which services this queue.
->          type: u32
-> +  -
-> +    name: queue-dmabuf
-> +    attributes:
-> +      -
-> +        name: type
-> +        doc: rx or tx queue
-> +        type: u8
-> +        enum: queue-type
-> +      -
-> +        name: idx
-> +        doc: queue index
-> +        type: u32
-
-u8 is a waste of space, since attrs are rounded up to 4B
-and we don't use "idx"
-
-How about we use a subset of queue attrs?
-
-	name: queue-id
-	subset-of: queue
-	attributes:
-	  -
-	    name: id
-	  -
-	    name: type
-
-> +  -
-> +    name: bind-dmabuf
-
-The naming is a bit too command specific, how about pp-buf ?
-Or just dmabuf ?
-
-> +    attributes:
-> +      -
-> +        name: ifindex
-> +        doc: netdev ifindex to bind the dma-buf to.
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +      -
-> +        name: queues
-> +        doc: receive queues to bind the dma-buf to.
-> +        type: nest
-> +        nested-attributes: queue-dmabuf
-> +        multi-attr: true
-> +      -
-> +        name: dmabuf-fd
-> +        doc: dmabuf file descriptor to bind.
-> +        type: u32
-> +      -
-> +        name: dmabuf-id
-> +        doc: id of the dmabuf binding
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +
-
-We need some form of introspection. Can we add both in the queue dump
-and page pool dump some info (dmabuf-id?) to indicate there is a DMABUF
-bound to the queue / page pool?
-
->    -
->      name: qstats
-> @@ -579,6 +618,20 @@ operations:
->            attributes:
->              - ifindex
->          reply: *queue-get-op
-> +    -
-> +      name: bind-rx
-> +      doc: Bind dmabuf to netdev
-> +      attribute-set: bind-dmabuf
-> +      flags: [ admin-perm ]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - dmabuf-fd
-> +            - queues
-> +        reply:
-> +          attributes:
-> +            - dmabuf-id
-
-The ops end up getting rendered as an enum, so the ordering matters.
-You can't insert in the middle without breaking uAPI.
-For attribute sets (which you also added before qstat) it technically
-doesn't matter but would be good to have them in order to match ops.
-
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index 43742ac5b00da..190a504a62358 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -136,6 +136,24 @@ enum {
->  	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
->  };
->  
-> +enum {
-> +	NETDEV_A_QUEUE_DMABUF_TYPE = 1,
-> +	NETDEV_A_QUEUE_DMABUF_IDX,
-> +
-> +	__NETDEV_A_QUEUE_DMABUF_MAX,
-> +	NETDEV_A_QUEUE_DMABUF_MAX = (__NETDEV_A_QUEUE_DMABUF_MAX - 1)
-> +};
-> +
-> +enum {
-> +	NETDEV_A_BIND_DMABUF_IFINDEX = 1,
-> +	NETDEV_A_BIND_DMABUF_QUEUES,
-> +	NETDEV_A_BIND_DMABUF_DMABUF_FD,
-> +	NETDEV_A_BIND_DMABUF_DMABUF_ID,
-
-This does look kinda repetitive, maybe let's drop the dmabuf from attr
-names?
-
-> +	__NETDEV_A_BIND_DMABUF_MAX,
-> +	NETDEV_A_BIND_DMABUF_MAX = (__NETDEV_A_BIND_DMABUF_MAX - 1)
-> +};
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
