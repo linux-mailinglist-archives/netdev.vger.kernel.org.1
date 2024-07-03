@@ -1,89 +1,98 @@
-Return-Path: <netdev+bounces-109027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04F69268DB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:10:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEDC89268E0
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 21:12:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB09B1C22038
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:10:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 585831F23094
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F9A1822E0;
-	Wed,  3 Jul 2024 19:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D38188CAE;
+	Wed,  3 Jul 2024 19:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FKG/whSO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ut843I53"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFFD41A81
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 19:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A9741A81;
+	Wed,  3 Jul 2024 19:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720033811; cv=none; b=T8w7vqOFN242ZpmYLwpW5H0So211ihPAarUcrAtVNoeL+9YUc9NvyU6a054YFIDrONuNwXS4k2xrmDxE4bzlTIynlbyvyEmyV2m5F4VlZGYU1FH2BDKbkhIIhyVLyhKqct2BbRO0a1OZVyZormQQSZM2Td0AfLPQFmIo+cO9lr4=
+	t=1720033959; cv=none; b=bJ5u0PfgAr5K+lGTXtIaCYHzzlEmaXpcxUR3THv3enBbE7ItFR14YLCmUKxfkrrXFPlntUONz9qQxlLUqULYGw0Uik1rGBRaSwHhPNSZX2B9UCNZEVaw6YSkPIyWisFSIP7Iyl19SY6+tVBxSK+oFBbpfpRdYy2+7v4Ex5rLXe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720033811; c=relaxed/simple;
-	bh=3Jtth2Z5iq6FFWQ1ERqR7jOh95JUVLVdwQrrMDib2+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PXOr5Mr327HQOZjkhtQkU/ZqdIHCfhpu2et1nZHyBStFfztbiMbxXj6Pd10YsOgps1TXcwWdkCmS2yC6jMbJ7Cj5CAD9ibU4ecFBBsMu85Lb1qardVMZllk1X0IJ2utAY1bLij4IZgNoRVaVePx5o1oN44As31SGi2679zDDtAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FKG/whSO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=scCnbiYENQc9N93uIbyPuit3RJTpk8ZUKMyyqdGf5ms=; b=FKG/whSOTl+O+T/mrp03Nh+AS7
-	tC89xCvA2YvQs1+tpI+ylUgIkoE5fQCsgclf8VR25hPaNYCBzWzRjtP6xCx0dxztYYXIBkagp18KG
-	8/2jBRhUAz4l98IS9ObtAJIzAJwAXCEWGQr0XN4LpBpFeL7+gBaKkiXJYIzS1ZD2z0Lc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sP5MX-001lGB-AS; Wed, 03 Jul 2024 21:09:53 +0200
-Date: Wed, 3 Jul 2024 21:09:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Serge Semin <fancer.lancer@gmail.com>, si.yanteng@linux.dev,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com,
-	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
- network speed to 1000.
-Message-ID: <eb4bed28-c04e-4098-b947-e9fc626ba478@lunn.ch>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
- <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
- <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
- <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
- <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
- <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
- <hdqpsuq7n4aalav7jtzttfksw5ct36alowsc65e72armjt2h67@shph7z32rbc6>
- <ZoWex6T0QbRBmDFE@shell.armlinux.org.uk>
+	s=arc-20240116; t=1720033959; c=relaxed/simple;
+	bh=W2TV0tGrwkg2U2nDDi7LC0UCR05ZRDjKA7OZgxB/bVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E9iuUiliXBOcMlXX9Z5bCSW2pQ6coto6XkkYMHk84z+nmXLYblm88yCGPdMKFOTU7GBxF0vSnevYCGP7pwQTr6PhMgg2erb7j1O+YyVxm14IMWMTrHLc/B0YQ7e8k4WsRDAy+NEGMrAQ1hwLgUH/4DoCDqdk0eQwPdgQ4I136+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ut843I53; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F97C2BD10;
+	Wed,  3 Jul 2024 19:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720033959;
+	bh=W2TV0tGrwkg2U2nDDi7LC0UCR05ZRDjKA7OZgxB/bVE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ut843I53JZz/Ny77u61NsPKMd05t/m3FYzT2+ZkMRPxjY/MxqdRQ/gw7sHX/UpSsF
+	 gojYoZk14OiQ6e8ysFX47iaSLTbknKTI81QMsOfzWqRxoDJFb0Y4oF9rukqa5G9sPv
+	 FcKwPfBwvFY95L1Xa7zv4mpcdRaFhI50qdozouxDA7Nq5vStsgacIDJp+d6fah+AcV
+	 DGTVxZ1AIUa58R1k6+b1LpBdkDXpISKIoOU3eTUhIE+oxKV+c4Ba3SeP3nfjesDbis
+	 Yk1KcZqQq/i5EtxGSl0EfVfBf33S5qg+TtrCgP/P0GUG7AQRvr+sh6E0hEXRySGxnk
+	 5GvvCZoRpzwIw==
+Date: Wed, 3 Jul 2024 12:12:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, mwojtas@chromium.org, Nathan Chancellor
+ <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>, Marc Kleine-Budde
+ <mkl@pengutronix.de>
+Subject: Re: [PATCH net-next v14 12/13] net: ethtool: strset: Allow querying
+ phy stats by index
+Message-ID: <20240703121237.3f8b9125@kernel.org>
+In-Reply-To: <20240703085515.25dab47c@fedora-2.home>
+References: <20240701131801.1227740-1-maxime.chevallier@bootlin.com>
+	<20240701131801.1227740-13-maxime.chevallier@bootlin.com>
+	<20240702105411.GF598357@kernel.org>
+	<20240703085515.25dab47c@fedora-2.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZoWex6T0QbRBmDFE@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Rather than erroring out, I think it may be better to just adopt
-> the Marvell solution to this problem to give consistent behaviour
-> across all PHYs.
+On Wed, 3 Jul 2024 08:55:15 +0200 Maxime Chevallier wrote:
+> > Elsewhere in this function it is assumed that info may be NULL.
+> > But here it is dereferenced unconditionally.  
+> 
+> Hmm in almst all netlink commands we do dereference the genl_info *info
+> pointer without checks.
+> 
+> I've looked into net/netlink/genetlink.c to backtrack call-sites and it
+> looks to be that indeed info can't be NULL (either populated from
+> genl_start() or genl_family_rcv_msg_doit(). Maybe Jakub can confirm
+> this ?
+> 
+> If what I say above is correct, I can include a small patch to remove
+> the un-necessary check that makes smatch think the genl_info pointer can
+> be NULL.
 
-Yes, expand phy_config_aneg() to look for this condition and enable
-autoneg. But should we disable it when the condition is reverted? The
-user swaps to 100Mbps forced?
-
-What about other speeds? Is this limited to 1G? Since we have devices
-without auto-neg for 2500BaseX i assume it is not an issue there.
-
-	Andrew
+The info used to be null during dumps, but I think we fixed that in
+f946270d05c2 ("ethtool: netlink: always pass genl_info to .prepare_data")
+Perhaps I should have cleaned up existing code :S
 
