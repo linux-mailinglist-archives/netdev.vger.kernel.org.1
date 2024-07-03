@@ -1,370 +1,353 @@
-Return-Path: <netdev+bounces-108958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C719265DF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:19:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 759C19265DA
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27562B255FC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:19:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC06BB24C8D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FD41836D6;
-	Wed,  3 Jul 2024 16:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EBB18307B;
+	Wed,  3 Jul 2024 16:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aX6ZtfEb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIg9m7ca"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16D018309B
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A6218308A
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720023568; cv=none; b=dc6JYCl28GmT9ATBhvCGFiUwF1Qhvjs3ObwUBrOXqkCe0UnucWB+Ni/TKZumnwLA+3cNUn3v5+n+grmIJxt1sYChrl9iTfjU9PQ/qfa/VPlPWVlmFLhtj69lec2pEfWgQpaY8YWWDZxhuW9WYTJZx7FfB4dSVyj2BJexut3UYE0=
+	t=1720023560; cv=none; b=VYjbZNAmZRCbWVel09Xm6MtT1xCLy9VWTVgrEs1zU9QWycsHgM3L01XSvVK+D6fN10zk6m2hFGylqj0naboQRC0t4fFnio1xjzcmAKaOoO/i7TmfONEbLuEGM2NeH/6aNX/f0ymvz372tX4PVZOlv6RpwOdHKi3IHfSPQK5NFXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720023568; c=relaxed/simple;
-	bh=XZQ2khpGw92ayYyOOjfsbAZCVbk4sLWNq5yArPaelbQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I5ZJ7pG8n0Uc4fLp4z0c8JLkZkDjY2liFzr40G4fxapCDSj3MIZ8LDgQmtcEyJemqvYcMs0fIIqpEUq8o1MDY2lWBNLGABqgwqf5pzJKYu1ZVUanC9E026St4G3t8lbV576Q4eXUIuEH2kJRTVMfj/hL7WZLL9Xjc6Ea+k3bMZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aX6ZtfEb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720023564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c65T9aGcCrnJaJaWK+o0SC+aJQfT0XzRMaqMZ/EJDM4=;
-	b=aX6ZtfEbo98pypUCvf4AMeZ1spGLC32UTmmcXs+aK7ozjLJHnoFUZ7HmLrpnjMTAxsdZP/
-	ayB7dawGtYr4FgEVTR9ILLN/mUjWd3IUCXJWxnPzzmC0MtTfA4kGfv/765ZlPeLzjweqS3
-	njOP0lMWO5o/ZBR+CobUU8MV4E6gv8A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-wjvDjeCoMu6Ruj-coKXsLQ-1; Wed, 03 Jul 2024 12:19:23 -0400
-X-MC-Unique: wjvDjeCoMu6Ruj-coKXsLQ-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-58b92b79a46so1154311a12.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:19:23 -0700 (PDT)
+	s=arc-20240116; t=1720023560; c=relaxed/simple;
+	bh=OrnBuWqkGC/SxYpNZXZN7OS11/YgLEAjJ1PmUUtZQWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxmVoAesnboSz6nHwuiM1DvihhPs+mT7K7AS/BO3ox3GT2CYI9b08hoqNe+Rp5qsQLjb2ZWj+/TMWRkSXCwPXenFkc8ZAhYarXrqRD2jvwjyjoO/xr2ipyO4vcgWiysMs03RK996ehVm5iO5aTyVR5ZI78Oyu8+qc5I3KsLcP7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIg9m7ca; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ee4ae13aabso58919831fa.2
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:19:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720023557; x=1720628357; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vUHTrKMcqYP0bBiD/Ixn8UKNaPDkfBR56HJg/FVEVLg=;
+        b=WIg9m7cap/ALw+fYrY2kzZYil96FSWNNRRuRwZ2ZrNZm69FSI5JigovYPQKJctvKm0
+         SQVWV0Po3Qs0/+MJTrE94dm3kRdWikJ0fR6XNy4AnTY+o155JZB8mZIkNOCfenU1Wdel
+         yJuA5x1ks1X5NN+YRpCOXtsI+2QP4i+T53v3koUx2/TrYNawwyjZtrGlHmya26REQd3i
+         ys0FUsJiyBMlQwicTkkeK2IyonKwOR2ZjMmJCsIyhYCiXHiYpSQI4z4ax+TCnAZF3Nfp
+         HQjzhnRMso4LSdtzwAFtOn93UdM7qsKxicQVMS9UtZjW1XC2mD3fTelrAofTan4W++76
+         jKCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720023562; x=1720628362;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c65T9aGcCrnJaJaWK+o0SC+aJQfT0XzRMaqMZ/EJDM4=;
-        b=fXhZ3IcorkcqqvqAqYVb84aKDyxlSVEJT2SxDpKSuHhv6Jh9PWtF2utv/roXLunk9j
-         s+gtWNwLascfYQhkGC9GiSltFGG6ZqddWVkObF4nj8FhT8QpJuO7WSF9jJjv5uqJ5uz6
-         OWE+ZSj5nioPHYCpU7murCjEHPYJhc5sAKE/OU7AqGHYuJ6vut/LKkwSkZVMjkjaPvqd
-         8garFfutgAFcUcp2WMSCjUIJ1MCBZ3KKSbi5PKy36tftJKe4+nBijzKAkTZG2sukcIgx
-         Rg9tRv9Mr9rhfD3JLL09bIQcHZx0GBYOkQpH2XL14GbNSjrQD4PsS0snxoNywr7GlB1L
-         Szjg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8UKFPqs4DnGrmjYm53MIZ5Eqasm/O+ANULOdY/sX9EMbjT4adGuDiiLL0PBLLW36HgiQgaftdz3F60GqVGF1NDpn1OlaL
-X-Gm-Message-State: AOJu0Yx8jfeuy1fwzexjpSRr82y3a+GsywcdD7xrRItVgCJco+y6pcWI
-	3/moQAEe6tJsTek5WTusFrsKmr0nVYwPyVrXOn5euY7cyQwUEvlR90zE9UZ+i8KNunj4l2pkYKy
-	6ap70/WZEds9/HPd2zSXUq4G0uhDJMr+OcG1NcOLBbo8bG9YCXZ54QXl0HitwEZ0mwcDpBTJQUm
-	CM/72Rjj9s9rMpSaYZKu8bSlwCPyvF
-X-Received: by 2002:a05:6402:3591:b0:58c:b2b8:31b2 with SMTP id 4fb4d7f45d1cf-58ce5ef6ad8mr1719685a12.17.1720023562392;
-        Wed, 03 Jul 2024 09:19:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOPm2RKAFqhIP4SkrsoOYtpsOdJlOeWv6pMlJEn55IU/y69hvTL9KLEEXmYY5vce/n+pf4qv0hzVawdzxulgw=
-X-Received: by 2002:a05:6402:3591:b0:58c:b2b8:31b2 with SMTP id
- 4fb4d7f45d1cf-58ce5ef6ad8mr1719679a12.17.1720023562050; Wed, 03 Jul 2024
- 09:19:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720023557; x=1720628357;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vUHTrKMcqYP0bBiD/Ixn8UKNaPDkfBR56HJg/FVEVLg=;
+        b=gZLqMgwzc+HHdBvQxKN1ZKAyBgJ2cl+2BToWkpNZr3D0PSY7dKQXMhHlEasUMpzPy2
+         TyYW5+sK4jEK8DVABwdKHFKEDwQgTewVPu28knq/ywrRi6Tx9n1QueMdylcgAywf8vH8
+         2DJdyd6PF4b1laseipwH5kBc2f/6gqOn98ivGw6DKgvB2/0fhvXjAQyECQZpayIYoY0z
+         jnDSOth25aS7XOeDNq4AIdeV5+J9uXsot8ApbwHeTnAecMMFe1Sw3R99/h3EfdqMgfV6
+         IzM5JwLgZdeHCwS1ry2tDEgeZYKwBvcDkxV/3pZS0uP5SDC9ZNsVdEX0iBbcrU70D5uN
+         t5Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCWWV4+UFwdFTKJSMoeA8e/P6dtzVTfpe82ITXqfBPx428F9K761SW+Km6HgjqmWKtZ2dmIu7qaB5HJbS578xI80vHRJ+5DI
+X-Gm-Message-State: AOJu0YyxTMMEo+sLp3bBhYt3LkjqK8PQiQHcs5w0+Uwsrj/KAszmNEcX
+	0o422L8SNaMiPRnfMa/2ngxGR6FGwSYYVmhnbHB4Bm3g0Q8nhRgZ
+X-Google-Smtp-Source: AGHT+IH/ZrR9FAAKxrE3FgUd9ZYgZVtYc/WWgfzNyVQOWZfozG10iEgKoqo7iu4rj16QUnhx9el/qg==
+X-Received: by 2002:a2e:a98b:0:b0:2ee:4f22:33f9 with SMTP id 38308e7fff4ca-2ee5e38096fmr95838481fa.24.1720023554316;
+        Wed, 03 Jul 2024 09:19:14 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee59fd21a5sm17229501fa.129.2024.07.03.09.19.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jul 2024 09:19:13 -0700 (PDT)
+Date: Wed, 3 Jul 2024 19:19:10 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+Message-ID: <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
+ <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
+ <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
+ <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+ <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240626-stage-vdpa-vq-precreate-v2-0-560c491078df@nvidia.com> <20240626-stage-vdpa-vq-precreate-v2-15-560c491078df@nvidia.com>
-In-Reply-To: <20240626-stage-vdpa-vq-precreate-v2-15-560c491078df@nvidia.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 3 Jul 2024 18:18:44 +0200
-Message-ID: <CAJaqyWfEv9KLKDSZidiO=ZoJvKVLaHzHW3+ModPxfGEiu1xMUw@mail.gmail.com>
-Subject: Re: [PATCH vhost v2 15/24] vdpa/mlx5: Allow creation of blank VQs
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Si-Wei Liu <si-wei.liu@oracle.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	Cosmin Ratiu <cratiu@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
 
-On Wed, Jun 26, 2024 at 12:28=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
-m> wrote:
->
-> Based on the filled flag, create VQs that are filled or blank.
-> Blank VQs will be filled in later through VQ modify.
->
-> Downstream patches will make use of this to pre-create blank VQs at
-> vdpa device creation.
->
+On Wed, Jul 03, 2024 at 05:41:55PM +0800, Yanteng Si wrote:
+> > > > > -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
+> > > > >    	pci_set_master(pdev);
+> > > > > -	loongson_default_data(plat);
+> > > > > +	loongson_gmac_data(plat);
+> > > > >    	pci_enable_msi(pdev);
+> > > > >    	memset(&res, 0, sizeof(res));
+> > > > >    	res.addr = pcim_iomap_table(pdev)[0];
+> > > > > @@ -140,6 +142,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+> > > > >    		goto err_disable_msi;
+> > > > >    	}
+> > > > > +	plat->tx_queues_to_use = 1;
+> > > > > +	plat->rx_queues_to_use = 1;
+> > > > > +
+> > > > Please move this to the loongson_gmac_data(). Thus all the
+> > > > platform-data initializations would be collected in two coherent
+> > > > methods: loongson_default_data() and loongson_gmac_data(). It will be
+> > > > positive from the readability and maintainability points of view.
+> > > OK, I will move this to the  loongson_default_data(),
+> > > 
+> > > Because loongson_gmac/gnet_data() call it.
+> > It shall also work. But the fields will be overwritten in the
+> > loongson_gmac_data()/loongson_gnet_data() methods for the
+> > multi-channels case. I don't have a strong opinion against that. But
+> > some maintainers may have.
+> I see. I will move this to the loongson_gmac_data()/loongson_gnet_data().
+> > 
+> > > 
+> > > > In the patch adding the Loongson multi-channel GMAC support make sure
+> > > > the loongson_data::loongson_id field is initialized before the
+> > > > stmmac_pci_info::setup() method is called.
+> > > I've tried. It's almost impossible.
+> > Emm, why is it impossible? I don't see any significant problem with
+> > implementing that.
+> Sorry, I've to take back my words.
+> > 
+> > > 
+> > > The only way to do this is to initialize loongson_id again in
+> > > loongson_default_data().
+> > > 
+> > > But that will add a lot of code.
+> > Not sure, why? What about the next probe() code snippet:
+> Full marks!
+> > 
+> > 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+> > 	if (!plat)
+> > 		return -ENOMEM;
+> > 
+> > 	plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
+> > 					   sizeof(*plat->mdio_bus_data),
+> > 					   GFP_KERNEL);
+> >          if (!plat->mdio_bus_data)
+> >                  return -ENOMEM;
+> > 
+> > 	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+> > 	if (!plat->dma_cfg)
+> > 		return -ENOMEM;
+> > 
+> > 	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+> > 	if (!ld)
+> > 		return -ENOMEM;
+> > 
+> > 	/* Enable pci device */
+> >   	ret = pci_enable_device(pdev);
+> >   	if (ret)
+> > 		return ret;
+> > 
+> > 	// AFAIR the bus-mastering isn't required for the normal PCIe
+> > 	// IOs. So pci_set_master() can be called some place
+> > 	// afterwards.
+> > 	pci_set_master(pdev);
+> > 
+> > 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> > 		if (pci_resource_len(pdev, i) == 0)
+> > 			continue;
+> > 		ret = pcim_iomap_regions(pdev, BIT(0), pci_name(pdev));
+> > 		if (ret)
+> > 			goto err_disable_device;
+> > 		break;
+> > 	}
+> > 
+> > 	memset(&res, 0, sizeof(res));
+> > 	res.addr = pcim_iomap_table(pdev)[0];
+> > 
+> > 	plat->bsp_priv = ld;
+> > 	plat->setup = loongson_dwmac_setup;
+> > 	ld->dev = &pdev->dev;
+> > 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+> > 
+> > 	info = (struct stmmac_pci_info *)id->driver_data;
+> > 	ret = info->setup(plat);
+> > 	if (ret)
+> > 		goto err_disable_device;
+> > 
+> > 	if (dev_of_node(&pdev->dev))
+> >   		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+> > 	else
+> 
 
-s/Downstream/Later/ ?
+> > 		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
+> 
+> I don't know how to write this function, it seems that there
+> 
+> is no obvious acpi code in the probe method.
 
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+I've provided the method code here:
+https://lore.kernel.org/netdev/glm3jfqf36t5vnkmk4gsdqfx53ga7ohs3pxnsizqlogkbim7gg@a3dxav5siczn/
 
-Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+It just gets the IRQ from the pci_device::irq field:
 
-> ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 85 +++++++++++++++++++++++++--------=
-------
->  1 file changed, 55 insertions(+), 30 deletions(-)
->
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
-x5_vnet.c
-> index a8ac542f30f7..0a62ce0b4af8 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -158,7 +158,7 @@ static bool is_index_valid(struct mlx5_vdpa_dev *mvde=
-v, u16 idx)
->
->  static void free_fixed_resources(struct mlx5_vdpa_net *ndev);
->  static void mvqs_set_defaults(struct mlx5_vdpa_net *ndev);
-> -static int setup_vq_resources(struct mlx5_vdpa_net *ndev);
-> +static int setup_vq_resources(struct mlx5_vdpa_net *ndev, bool filled);
->  static void teardown_vq_resources(struct mlx5_vdpa_net *ndev);
->
->  static bool mlx5_vdpa_debug;
-> @@ -874,13 +874,16 @@ static bool msix_mode_supported(struct mlx5_vdpa_de=
-v *mvdev)
->                 pci_msix_can_alloc_dyn(mvdev->mdev->pdev);
->  }
->
-> -static int create_virtqueue(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa=
-_virtqueue *mvq)
-> +static int create_virtqueue(struct mlx5_vdpa_net *ndev,
-> +                           struct mlx5_vdpa_virtqueue *mvq,
-> +                           bool filled)
->  {
->         int inlen =3D MLX5_ST_SZ_BYTES(create_virtio_net_q_in);
->         u32 out[MLX5_ST_SZ_DW(create_virtio_net_q_out)] =3D {};
->         struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
->         struct mlx5_vdpa_mr *vq_mr;
->         struct mlx5_vdpa_mr *vq_desc_mr;
-> +       u64 features =3D filled ? mvdev->actual_features : mvdev->mlx_fea=
-tures;
->         void *obj_context;
->         u16 mlx_features;
->         void *cmd_hdr;
-> @@ -898,7 +901,7 @@ static int create_virtqueue(struct mlx5_vdpa_net *nde=
-v, struct mlx5_vdpa_virtque
->                 goto err_alloc;
->         }
->
-> -       mlx_features =3D get_features(ndev->mvdev.actual_features);
-> +       mlx_features =3D get_features(features);
->         cmd_hdr =3D MLX5_ADDR_OF(create_virtio_net_q_in, in, general_obj_=
-in_cmd_hdr);
->
->         MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, opcode, MLX5_CMD_OP_CRE=
-ATE_GENERAL_OBJECT);
-> @@ -906,8 +909,6 @@ static int create_virtqueue(struct mlx5_vdpa_net *nde=
-v, struct mlx5_vdpa_virtque
->         MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, uid, ndev->mvdev.res.ui=
-d);
->
->         obj_context =3D MLX5_ADDR_OF(create_virtio_net_q_in, in, obj_cont=
-ext);
-> -       MLX5_SET(virtio_net_q_object, obj_context, hw_available_index, mv=
-q->avail_idx);
-> -       MLX5_SET(virtio_net_q_object, obj_context, hw_used_index, mvq->us=
-ed_idx);
->         MLX5_SET(virtio_net_q_object, obj_context, queue_feature_bit_mask=
-_12_3,
->                  mlx_features >> 3);
->         MLX5_SET(virtio_net_q_object, obj_context, queue_feature_bit_mask=
-_2_0,
-> @@ -929,17 +930,36 @@ static int create_virtqueue(struct mlx5_vdpa_net *n=
-dev, struct mlx5_vdpa_virtque
->         MLX5_SET(virtio_q, vq_ctx, queue_index, mvq->index);
->         MLX5_SET(virtio_q, vq_ctx, queue_size, mvq->num_ent);
->         MLX5_SET(virtio_q, vq_ctx, virtio_version_1_0,
-> -                !!(ndev->mvdev.actual_features & BIT_ULL(VIRTIO_F_VERSIO=
-N_1)));
-> -       MLX5_SET64(virtio_q, vq_ctx, desc_addr, mvq->desc_addr);
-> -       MLX5_SET64(virtio_q, vq_ctx, used_addr, mvq->device_addr);
-> -       MLX5_SET64(virtio_q, vq_ctx, available_addr, mvq->driver_addr);
-> -       vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GROUP]];
-> -       if (vq_mr)
-> -               MLX5_SET(virtio_q, vq_ctx, virtio_q_mkey, vq_mr->mkey);
-> -
-> -       vq_desc_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_DESC_=
-GROUP]];
-> -       if (vq_desc_mr && MLX5_CAP_DEV_VDPA_EMULATION(mvdev->mdev, desc_g=
-roup_mkey_supported))
-> -               MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_desc_mr->m=
-key);
-> +                !!(features & BIT_ULL(VIRTIO_F_VERSION_1)));
-> +
-> +       if (filled) {
-> +               MLX5_SET(virtio_net_q_object, obj_context, hw_available_i=
-ndex, mvq->avail_idx);
-> +               MLX5_SET(virtio_net_q_object, obj_context, hw_used_index,=
- mvq->used_idx);
-> +
-> +               MLX5_SET64(virtio_q, vq_ctx, desc_addr, mvq->desc_addr);
-> +               MLX5_SET64(virtio_q, vq_ctx, used_addr, mvq->device_addr)=
-;
-> +               MLX5_SET64(virtio_q, vq_ctx, available_addr, mvq->driver_=
-addr);
-> +
-> +               vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GR=
-OUP]];
-> +               if (vq_mr)
-> +                       MLX5_SET(virtio_q, vq_ctx, virtio_q_mkey, vq_mr->=
-mkey);
-> +
-> +               vq_desc_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATA=
-VQ_DESC_GROUP]];
-> +               if (vq_desc_mr &&
-> +                   MLX5_CAP_DEV_VDPA_EMULATION(mvdev->mdev, desc_group_m=
-key_supported))
-> +                       MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_de=
-sc_mr->mkey);
-> +       } else {
-> +               /* If there is no mr update, make sure that the existing =
-ones are set
-> +                * modify to ready.
-> +                */
-> +               vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GR=
-OUP]];
-> +               if (vq_mr)
-> +                       mvq->modified_fields |=3D MLX5_VIRTQ_MODIFY_MASK_=
-VIRTIO_Q_MKEY;
-> +
-> +               vq_desc_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATA=
-VQ_DESC_GROUP]];
-> +               if (vq_desc_mr)
-> +                       mvq->modified_fields |=3D MLX5_VIRTQ_MODIFY_MASK_=
-DESC_GROUP_MKEY;
-> +       }
->
->         MLX5_SET(virtio_q, vq_ctx, umem_1_id, mvq->umem1.id);
->         MLX5_SET(virtio_q, vq_ctx, umem_1_size, mvq->umem1.size);
-> @@ -959,12 +979,15 @@ static int create_virtqueue(struct mlx5_vdpa_net *n=
-dev, struct mlx5_vdpa_virtque
->         kfree(in);
->         mvq->virtq_id =3D MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
->
-> -       mlx5_vdpa_get_mr(mvdev, vq_mr);
-> -       mvq->vq_mr =3D vq_mr;
-> +       if (filled) {
-> +               mlx5_vdpa_get_mr(mvdev, vq_mr);
-> +               mvq->vq_mr =3D vq_mr;
->
-> -       if (vq_desc_mr && MLX5_CAP_DEV_VDPA_EMULATION(mvdev->mdev, desc_g=
-roup_mkey_supported)) {
-> -               mlx5_vdpa_get_mr(mvdev, vq_desc_mr);
-> -               mvq->desc_mr =3D vq_desc_mr;
-> +               if (vq_desc_mr &&
-> +                   MLX5_CAP_DEV_VDPA_EMULATION(mvdev->mdev, desc_group_m=
-key_supported)) {
-> +                       mlx5_vdpa_get_mr(mvdev, vq_desc_mr);
-> +                       mvq->desc_mr =3D vq_desc_mr;
-> +               }
->         }
->
->         return 0;
-> @@ -1442,7 +1465,9 @@ static void dealloc_vector(struct mlx5_vdpa_net *nd=
-ev,
->                 }
->  }
->
-> -static int setup_vq(struct mlx5_vdpa_net *ndev, struct mlx5_vdpa_virtque=
-ue *mvq)
-> +static int setup_vq(struct mlx5_vdpa_net *ndev,
-> +                   struct mlx5_vdpa_virtqueue *mvq,
-> +                   bool filled)
->  {
->         u16 idx =3D mvq->index;
->         int err;
-> @@ -1471,7 +1496,7 @@ static int setup_vq(struct mlx5_vdpa_net *ndev, str=
-uct mlx5_vdpa_virtqueue *mvq)
->                 goto err_connect;
->
->         alloc_vector(ndev, mvq);
-> -       err =3D create_virtqueue(ndev, mvq);
-> +       err =3D create_virtqueue(ndev, mvq, filled);
->         if (err)
->                 goto err_vq;
->
-> @@ -2062,7 +2087,7 @@ static int change_num_qps(struct mlx5_vdpa_dev *mvd=
-ev, int newqps)
->         } else {
->                 ndev->cur_num_vqs =3D 2 * newqps;
->                 for (i =3D cur_qps * 2; i < 2 * newqps; i++) {
-> -                       err =3D setup_vq(ndev, &ndev->vqs[i]);
-> +                       err =3D setup_vq(ndev, &ndev->vqs[i], true);
->                         if (err)
->                                 goto clean_added;
->                 }
-> @@ -2558,14 +2583,14 @@ static int verify_driver_features(struct mlx5_vdp=
-a_dev *mvdev, u64 features)
->         return 0;
->  }
->
-> -static int setup_virtqueues(struct mlx5_vdpa_dev *mvdev)
-> +static int setup_virtqueues(struct mlx5_vdpa_dev *mvdev, bool filled)
->  {
->         struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
->         int err;
->         int i;
->
->         for (i =3D 0; i < mvdev->max_vqs; i++) {
-> -               err =3D setup_vq(ndev, &ndev->vqs[i]);
-> +               err =3D setup_vq(ndev, &ndev->vqs[i], filled);
->                 if (err)
->                         goto err_vq;
->         }
-> @@ -2877,7 +2902,7 @@ static int mlx5_vdpa_change_map(struct mlx5_vdpa_de=
-v *mvdev,
->
->         if (teardown) {
->                 restore_channels_info(ndev);
-> -               err =3D setup_vq_resources(ndev);
-> +               err =3D setup_vq_resources(ndev, true);
->                 if (err)
->                         return err;
->         }
-> @@ -2888,7 +2913,7 @@ static int mlx5_vdpa_change_map(struct mlx5_vdpa_de=
-v *mvdev,
->  }
->
->  /* reslock must be held for this function */
-> -static int setup_vq_resources(struct mlx5_vdpa_net *ndev)
-> +static int setup_vq_resources(struct mlx5_vdpa_net *ndev, bool filled)
->  {
->         struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
->         int err;
-> @@ -2906,7 +2931,7 @@ static int setup_vq_resources(struct mlx5_vdpa_net =
-*ndev)
->         if (err)
->                 goto err_setup;
->
-> -       err =3D setup_virtqueues(mvdev);
-> +       err =3D setup_virtqueues(mvdev, filled);
->         if (err) {
->                 mlx5_vdpa_warn(mvdev, "setup_virtqueues\n");
->                 goto err_setup;
-> @@ -3000,7 +3025,7 @@ static void mlx5_vdpa_set_status(struct vdpa_device=
- *vdev, u8 status)
->                                 goto err_setup;
->                         }
->                         register_link_notifier(ndev);
-> -                       err =3D setup_vq_resources(ndev);
-> +                       err =3D setup_vq_resources(ndev, true);
->                         if (err) {
->                                 mlx5_vdpa_warn(mvdev, "failed to setup dr=
-iver\n");
->                                 goto err_driver;
->
-> --
-> 2.45.1
->
+static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
+				      struct plat_stmmacenet_data *plat,
+				      struct stmmac_resources *res)
+{
+	if (!pdev->irq)
+		return -EINVAL;
 
+	res->irq = pdev->irq;
+
+	return 0;
+}
+
+It implies that if there is no DT found on the platform or no DT-node
+assigned to the device, the IRQ line was supposed to be detected via
+the ACPI interface by the PCIe subsystem core. Just recently you said
+that the Loongson platforms are either UEFI or U-boot based. So at
+least the loongson_dwmac_acpi_config() method would imply that the IRQ
+number was supposed to be retrieved by means of the ACPI interface.
+
+> 
+> > 
+> > 	if (ret)
+> > 		goto err_disable_device;
+> > 
+> > 	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
+> > 		ret = loongson_dwmac_msi_config(pdev, plat, &res);
+> > 		if (ret)
+> > 			goto err_disable_device;
+> > 	}
+> 
+
+> It seems that we don't need if else.
+> 
+> If failed to allocate msi,  it will fallback to intx.
+> 
+> so loongson_dwmac_msi_config also needs a new name. How about:
+> 
+> ...
+> 
+>     ret = loongson_dwmac_irq_config(pdev, plat, &res);
+>     if (ret)
+>         goto err_disable_device;
+
+Well, I've been thinking about that for quite some time. The problem
+with your approach is that you _always_ override the res->irq field
+with data retrieved from pci_irq_vector(pdev, 0). What's the point in
+the res->irq initialization in the loongson_dwmac_dt_config() method
+then?
+
+Originally I suggested to use the PCI_IRQ_INTX flag in the
+loongson_dwmac_msi_config() method because implied that eventually we
+could come up to some generic IRQs initialization method with no
+IRQ-related code performed in the rest of the driver. But after some
+brainstorming I gave up that topic for now. Sending comments connected
+with that would mean to cause a one more discussion. Seeing we already
+at v13 it would have extended the review process for even longer than
+it has already got to.
+
+So since the MSI IRQs are required for the multi-channels device it
+would be better to allocate MSIs for that case only. Thus I'd preserve
+the conditional loongson_dwmac_msi_config() execution and would drop
+the PCI_IRQ_INTX flag seeing we aren't going to implement the generic
+IRQ setup method anymore. Like this:
+
++static int loongson_dwmac_msi_config(struct pci_dev *pdev,
++				     struct plat_stmmacenet_data *plat,
++				     struct stmmac_resources *res)
++{
++	int i, ret, vecs;
++
++	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
++	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Failed to allocate per-channels IRQs\n");
++		return ret;
++	}
++
++	res->irq = pci_irq_vector(pdev, 0);
++
++	for (i = 0; i < plat->rx_queues_to_use; i++) {
++		res->rx_irq[CHANNEL_NUM - 1 - i] =
++			pci_irq_vector(pdev, 1 + i * 2);
++	}
++	for (i = 0; i < plat->tx_queues_to_use; i++) {
++		res->tx_irq[CHANNEL_NUM - 1 - i] =
++			pci_irq_vector(pdev, 2 + i * 2);
++	}
++
++	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
++
++	return 0;
++}
+
+* Please note the pci_alloc_irq_vectors(..., vecs, vecs, PCI_IRQ_MSI) arguments.
+
+Seeing the discussion has started anyway, could you please find out
+whether the multi-channel controller will still work if the MSI IRQs
+allocation failed? Will the multi-channel-ness still work in that
+case?
+
+If the IRQ events from _all_ DMA-channels would still be delivered via
+the main MAC IRQ (AFAICS from the DW GMAC v3.73a HW databook it works
+like that by default), then we could ignore the errors returned from
+the loongson_dwmac_msi_config() method, and simplify the probe()
+method like this:
+
+	/* Fallback to the common MAC IRQ if MSIs allocation failed */
+	if (ld->loongson_id == DWMAC_CORE_LOONGSON_MULTI_CH)
+		loongson_dwmac_msi_config(pdev, plat, &res);
+
+-Serge(y)
+
+> 
+>     ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+> 
+> ...
+> 
+> 
+> 
+> > 
+> > 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+> >   	if (ret)
+> > 		goto err_clear_msi;
+> > 
+> > 	return 0;
+> > 
+> > 	...
+> > 
+> > The code allocates all the data, then enables the PCIe device
+> > and maps the PCIe device resources. After that it calls all the setup
+> > and config methods. Do I miss something?
+> 
+> You are right!
+> 
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
+> > 
+> > -Serge(y)
+> > 
+> > > > > 2.31.4
+> > > > > 
+> 
 
