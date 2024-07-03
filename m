@@ -1,119 +1,186 @@
-Return-Path: <netdev+bounces-108838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 166D2925ECD
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:40:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A2A925EE3
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:43:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EDC229080E
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1EFF1F269A1
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0BE17622C;
-	Wed,  3 Jul 2024 11:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4AD143879;
+	Wed,  3 Jul 2024 11:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ckmK7zYU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WW/D+cdr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99064135414
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 11:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757A91428F8;
+	Wed,  3 Jul 2024 11:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720006754; cv=none; b=OQ/O32S6YPtKGHcX9FcNXO8cgoQkXARJQs3zTV0ivFP+SWhQ3RTvws/5YSGZ9Kr6GU0Yg3p5ksqBOTnjZrU/V3ScLRaOISzYsmeflZnx/m0jdh+XaVspjfDvGN1N3HQbWPhrP7T8cvRqtJ4AWDo+8sHDEb8wZT98d5ryS5ee6FE=
+	t=1720006974; cv=none; b=SS0MUXCTIaMZ7KdpgQVObfy8GfvzId5TyCSS+HciV0S1FWgMR+NNB2YTbwf/+ZWAEFAZXEKfrjZmbUga3/aeAoO4HR9uHJKDcMX+61lURJ7qErw3YEXhhg9sw74ohAxyV1HulCdr2mr5QOdCNn4qXU2Hs/7kt23hFxZ4JH0uXo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720006754; c=relaxed/simple;
-	bh=2a1q2GV1WkAiQmqD8jHv1FCBn6EPH1IBR3AxRL92OEs=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=GDEEPrSE2+ZhSuDu7lbS88mzSPfLQxg01sWA3TyBfQsVaW+PgC9yiRpyGTIHcjdPo5nleOdynxAa9KRlgdR0Svbm1R+IqOp77sdKptD9Ajpp3kvzM0KlWCUEZVHGgotQ94sb0b6OJyWpYHysbAoYDGX9LLT15Und1JGg7kzlOjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ckmK7zYU; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1720006974; c=relaxed/simple;
+	bh=K7qNNKCemwJNnX+1BcIXpnr6N/yn50dUXjm/HbTkLYU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FiZpnN/whcYVxhAvnWof0wtPyjei8OD5DQrIJRvQ4NTN4nwtvd5NWm8W8Yx0Os5RsDUAgh6KezwwjLQ+9NXuHzvz9ejHbWh3FgjIJSG0LeQKS0RxJf9GkjvT12axQyxqWFq82l/8J+vYGIiPOq46aeaG8u9XCA5wJzbKmrGmUkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WW/D+cdr; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ec50a5e230so52682001fa.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 04:39:12 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb05b0be01so9158475ad.2;
+        Wed, 03 Jul 2024 04:42:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720006751; x=1720611551; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g86+A7tUmbSQ07GzPT5KF8zw5EmR1kjksGSMt38IM0A=;
-        b=ckmK7zYUeZ5DswJU+r0m30dDj9pbOhk9R06Y7tjIwlKqipGz0SLqalVUOmgo8jLPFP
-         f1G+fplRcWe24392297cwYXgcs4fBw2mLO7qBbpycvz/YjB42H81hqj/cLGtYg0Gk48+
-         4dAckKuGlslUQqOU687vXqw+JE8onc3sse+7RU2QqZie7hkQcNjXSyGGHgRChhrDFaCC
-         +KuWg+ywxhgxaeFR8Me6wcev/q+73NOTES9nlkGaAsjv+bBix2wxnt40ZkvErK5ewqBa
-         kP0R4XIZzkZfQCr6qZm/Jvo8A+cfyUgibR1H5D5QHZbzvqjIFAo6h8xfO4N8nbpc0CBr
-         GMkw==
+        d=gmail.com; s=20230601; t=1720006973; x=1720611773; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ge1wWoFHDAtDCXZQGNb/dsW5tPLZbTcFYOX+qhqBchw=;
+        b=WW/D+cdrmECyM2sWCSx3FZ4WCkBKMiUy0HtJh1hlWIcxD0mrOLKycj9kv1/mMV+jYa
+         WZpmP4G/aDsh+kmXza/DFcp/AjPUZXhJ5fpYsVNsAW3zObNBzyfLhlx9nGTcHyZhdCfK
+         9Z3lc5LYKNxoSFhxgk8I8VfdmTduQHYt5aQFx3L/D6aMPtDQC2lAR9WeUfI2WO+BAGe7
+         m8Dz2STGxzbITKgCDZG805EKyuycK0odBVjGHY9pzZ5Yj0eW3igqd7Bp7s8ubtbaN7UH
+         zyW72LoMOkhIWpMRFGjID7G9Dy8qp5p6t6IF4l426ymrvtx/CDowK8lHWkNYKwiz5Qls
+         NAmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720006751; x=1720611551;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
+        d=1e100.net; s=20230601; t=1720006973; x=1720611773;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g86+A7tUmbSQ07GzPT5KF8zw5EmR1kjksGSMt38IM0A=;
-        b=gfZ8398RWEwh3d0Q7NtNUQN3ZCHvF0JTv1xoOewF/zfKRm9MJPmDQio3d0TURZDohF
-         f/PTE7dhL3/jLgHgBbRCm4XYFsT5qio06CCUi+mbIacsEJLChdRO7GadDLDdlP7cZshL
-         yu062NS/1N1nCqzTQ1R6DXNEhVRgQ88uT8aZJDur/iTDTCO091nnXHsgN5lkdbChInYh
-         bhltmOal8OwFVcoNeI4hxDDqHqn2E2jNcQCFDxO50tjxsIayBbnVn1AJgAittMebFqO6
-         EFgs2Qz/dOQimz5OXeQAgTIziG2pI6AfyGWDSaM2sHlKuKVPIPgbuAIOwbOJctvklq7D
-         FcFA==
-X-Gm-Message-State: AOJu0YxeficohfosTC0s17LGWvez6OxZHjjLn0HLgqBXqdV/IzFBmsOV
-	Y5FBmMoqw1WViqLodVE+6KaNScuvJPpiTbI8MyIdfRIyW+uYjS2J
-X-Google-Smtp-Source: AGHT+IEwIzZX62hL7tcJ/YykvXX1Vyp4zuUfMNNyZ4cKygsiwvTJAeRGFT90pZatmvPAoIyr0aBJew==
-X-Received: by 2002:a2e:bc82:0:b0:2ee:7c12:7b36 with SMTP id 38308e7fff4ca-2ee7c127e6bmr21217791fa.19.1720006750633;
-        Wed, 03 Jul 2024 04:39:10 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b09890dsm236323285e9.36.2024.07.03.04.39.09
+        bh=ge1wWoFHDAtDCXZQGNb/dsW5tPLZbTcFYOX+qhqBchw=;
+        b=Tabm+x7Y9qkn1rGnY+I2V1sABIwC+x03Jup0/YMiH4e1q1s79htZAHm6L0zSvTN4FQ
+         L4ht//6HrFSuuKcfPLZwaQueiaTeMX1MZBC3yuILLW0kd0Gz3+n7hHHwnuYY37ehdekS
+         KRxMhWUTymh11/T7tcjpV+clIVEo7xsXpMaMVNTc7GTj6eUzI2JJZphTkJRet1nUm2TV
+         hhejko54IlDisT5N181y+oZp8+ZiMxYJi02qpXpEMlx7n8NdlA/FYGGmbN8Dx+bX4Dah
+         AGAYAELfeC2AY2uyUJQBH+PT+xzHFitE1abqR+NmUOPHhvIHkmtB/w0Wxd+EQ3wpVz1o
+         aNjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqBm2GXPvYh2tsF/LAxt5KCvX2UAX61qnJdxEv1ieP0Ee56uFoDqFGOVOe8mKQ0swtxGaEnxQjkl0Y6cmXe8QHxLBCGz4jLMIHk6/ocW+QFYt7tvYop97Xmxzi2s7Z
+X-Gm-Message-State: AOJu0Yx8U6EI7oQ67xQBjDeEmF+SseIz9iIPijWYE3PY8Q1HsWSe0C5W
+	08YaXr8RJlZdlo3yg148dpnbg9S7nrOlEH7lp0DscC9SeFk/V0rs
+X-Google-Smtp-Source: AGHT+IFbmGqpCrPp2DHnF9f4E0obqrsea7nIt1awnOigtyr4ECVltV3vSLfaUTJvNYIpmMopU63g7A==
+X-Received: by 2002:a17:902:cf01:b0:1fa:fc13:8bbc with SMTP id d9443c01a7336-1fafc138ddcmr33072075ad.57.1720006972724;
+        Wed, 03 Jul 2024 04:42:52 -0700 (PDT)
+Received: from [10.150.96.32] ([14.34.86.36])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fad58e84d7sm88502545ad.74.2024.07.03.04.42.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jul 2024 04:39:10 -0700 (PDT)
-Subject: Re: [PATCH net-next 10/11] eth: bnxt: use the indir table from
- ethtool context
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- michael.chan@broadcom.com
-References: <20240702234757.4188344-1-kuba@kernel.org>
- <20240702234757.4188344-12-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <04214959-8b0c-2e5c-5dc7-8426746b48b9@gmail.com>
-Date: Wed, 3 Jul 2024 12:39:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Wed, 03 Jul 2024 04:42:52 -0700 (PDT)
+Message-ID: <65a38070-cccf-45a0-af10-fd482eab64be@gmail.com>
+Date: Wed, 3 Jul 2024 20:42:48 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240702234757.4188344-12-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5.10 228/290] tracing/net_sched: NULL pointer dereference
+ in perf_trace_qdisc_reset()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org
+Cc: patches@lists.linux.dev, netdev@vger.kernel.org,
+ Yeoreum Yun <yeoreum.yun@arm.com>, Paolo Abeni <pabeni@redhat.com>,
+ Sasha Levin <sashal@kernel.org>
+References: <20240703102904.170852981@linuxfoundation.org>
+ <20240703102912.767573728@linuxfoundation.org>
+Content-Language: en-US
+From: Yunseong Kim <yskelg@gmail.com>
+In-Reply-To: <20240703102912.767573728@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 03/07/2024 00:47, Jakub Kicinski wrote:
-> Instead of allocating a separate indir table in the vnic use
-> the one already present in the RSS context allocated by the core.
-> This doesn't save much LoC but we won't have to worry about syncing
-> the local version back to the core, once core learns how to dump
-> contexts.
+Hi Greg,
+
+On 7/3/24 7:40 오후, Greg Kroah-Hartman wrote:
+> 5.10-stable review patch.  If anyone has any objections, please let me know.
 > 
-> Add ethtool_rxfh_priv_context() for converting from priv pointer
-> to the context. The cast is a bit ugly (understatement) and some
-> driver paths make carrying the context pointer in addition to
-> driver priv pointer quite tedious.
+> ------------------
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-...
-> @@ -6315,10 +6311,12 @@ static void bnxt_fill_hw_rss_tbl_p5(struct bnxt *bp,
->  				    struct bnxt_vnic_info *vnic)
->  {
->  	__le16 *ring_tbl = vnic->rss_table;
-> +	struct ethtool_rxfh_context *ctx;
->  	struct bnxt_rx_ring_info *rxr;
->  	u16 tbl_size, i;
+> From: Yunseong Kim <yskelg@gmail.com>
+> 
+> [ Upstream commit bab4923132feb3e439ae45962979c5d9d5c7c1f1 ]
+> 
+> In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
+> 
+>  qdisc->dev_queue->dev <NULL> ->name
+> 
+> This situation simulated from bunch of veths and Bluetooth disconnection
+> and reconnection.
+> 
+> During qdisc initialization, qdisc was being set to noop_queue.
+> In veth_init_queue, the initial tx_num was reduced back to one,
+> causing the qdisc reset to be called with noop, which led to the kernel
+> panic.
+
+
+> Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string")
+> Link: https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
+> Cc: netdev@vger.kernel.org
+> Tested-by: Yunseong Kim <yskelg@gmail.com>
+> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> Link: https://lore.kernel.org/r/20240624173320.24945-4-yskelg@gmail.com
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>  include/trace/events/qdisc.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+> index a50df41634c58..f661d3d7c410a 100644
+> --- a/include/trace/events/qdisc.h
+> +++ b/include/trace/events/qdisc.h
+> @@ -53,7 +53,7 @@ TRACE_EVENT(qdisc_reset,
+>  	TP_ARGS(q),
 >  
->  	tbl_size = bnxt_get_rxfh_indir_size(bp->dev);
-> +	ctx = ethtool_rxfh_priv_context(vnic->rss_ctx);
+>  	TP_STRUCT__entry(
+> -		__string(	dev,		qdisc_dev(q)->name	)
+> +		__string(	dev,		qdisc_dev(q) ? qdisc_dev(q)->name : "(null)"	)
+>  		__string(	kind,		q->ops->id		)
+>  		__field(	u32,		parent			)
+>  		__field(	u32,		handle			)
 
-Not super familiar with this driver or why this need arises, but
- would it be simpler to just store ctx in vnic instead of priv?
+Since that code changed in +v5.10.213, +v5.15.152, +v6.1.82 +v6.6.22
++v6.7.10, +v6.8, +6.9 and the stable is in an intermediate state.
+
+commit 2c92ca849fcc ("tracing/treewide: Remove second parameter of
+__assign_str()")
+Link:
+https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
+
+
+I had to fix some other part for the stable branch backporting.
+
+
+So, I submit another patch. Please check out.
+Link:
+https://lore.kernel.org/stable/20240702180146.5126-2-yskelg@gmail.com/T/#u
+
+---
+ include/trace/events/qdisc.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index 1f4258308b96..061fd4960303 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,14 +81,14 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	dev,		qdisc_dev(q) ? qdisc_dev(q)->name : "(null)"	)
+ 		__string(	kind,		q->ops->id		)
+ 		__field(	u32,		parent			)
+ 		__field(	u32,		handle			)
+ 	),
+
+ 	TP_fast_assign(
+-		__assign_str(dev, qdisc_dev(q)->name);
++		__assign_str(dev, qdisc_dev(q) ? qdisc_dev(q)->name : "(null)");
+ 		__assign_str(kind, q->ops->id);
+ 		__entry->parent = q->parent;
+ 		__entry->handle = q->handle;
+-- 
 
