@@ -1,120 +1,175 @@
-Return-Path: <netdev+bounces-108830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F16A925D3C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:27:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9C2925D54
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:27:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B27A298E55
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 417951F21C51
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6663717D89A;
-	Wed,  3 Jul 2024 11:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B866F1802CC;
+	Wed,  3 Jul 2024 11:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM7TMBHe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ArzpZTEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5ED213776F
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 11:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1880617FAB8;
+	Wed,  3 Jul 2024 11:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720005413; cv=none; b=GBpvL7Iap9X1/OWK+492cWxc2b8o9uQdSreU6OQwTButvT1rzhq+HvrHArUXS+Digto4lILxOSteKlqzvAhTh3alSA0cQsGR9gH8qnHv0se47p47JvPrh5ueRUWPALVJkpSBIXCUb8PENcGw0grx/glxGLpjLH86LW98xtqI+ZU=
+	t=1720005493; cv=none; b=kXumtmBtu/52Nz/6fW4CAsPaDm2YaA5U8903agG7PbrNXhbaSyVmI5AINq34qqjCIOz7ItpQTHo2DE5jE2d79ZPHn3wJe16g3tM+vmWucSBsx+6/lq+ceJENv/J5CscN2Q14loRRdbPrs6nswgh13s7EtVdapwOvB5VPQh4e8CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720005413; c=relaxed/simple;
-	bh=ukpiZRV7vl/3zhrgnKaEb14mimJQeFxwYl83UyoGH+o=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=eLTHf27JHrQ3PYZ6JPboTXHQVM8iqWXcUj15XfwqeUZC3xxyxIwnio+yX0H/qBIp439xOBi0O30b3EFC5c+nM6E0ZbZApsifeLv6KXUWQL5M7tPWkmXYoILCjbqbGVi0p0g+TIpf6qEaINfcwScBENG+MW6rTzFcKE91uqh5ZW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QM7TMBHe; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-36743a79dceso336857f8f.0
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 04:16:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720005410; x=1720610210; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Kd2RCFCJgBonbgau+UpTTKPwwLyhZJyKdZByPKrFdc=;
-        b=QM7TMBHeepD/iczOFIAExXNJSuek7cUdD3PlDv9Zdr8UeT2HdaJSrZN2Hg3tf/1z3y
-         aGRtX4KzPPPJGGmXgNNuKdyiL94VMMnnuxRggS+vNCt+BVVoTWSykvnvSPUsTH3D8tbc
-         TDlxUWP7YYsU73AZsmDUj/plURmwhJqt0j38zBfSR/KDYzin+3Ij5HcnWY0B32MFwFgm
-         Ui9PpYMoATcMwZx7VWsLVxfYvywIr1Klcp6UazOie/tYk/S1onypOc4VLe9duOs3MOKV
-         +CtZ4DGhvSclOGIVakOsBfRcupP6QYaADT6lHN3Y7oDH06hdxVHYMhvNcl1Rujq3kbVN
-         flwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720005410; x=1720610210;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Kd2RCFCJgBonbgau+UpTTKPwwLyhZJyKdZByPKrFdc=;
-        b=LFDmGNcP6HczEuzse0h6aZZ9oHO8wgS+YZ0WrApnxE3t6H71YszHV7d45kCCI8yaN9
-         YkFzb6E4RoM+7qtIX4y9jxadxKipG/F90oPJI5HG3feA6I8+Tf6RWZaUyxvJ6UpMuTT6
-         pIYCTRxaqovdfaY/PRbO09GanUoiBvM38oO4ZM5JvYQrtKkFymRsHvmg9dsmv8GjmQhu
-         u1W9562O34nySJXcC1OVjiGIysBhxkfYrgSOII5o82y/rhBW3TsWZjRg5vqAFNkC1xpB
-         3bCIQTg6wUTJIga016efJqYuOxcmgIqH3OMhAv+afzS6zDzZZeWQ94tVXAI3E/+WaxKL
-         pf+Q==
-X-Gm-Message-State: AOJu0YzxvJlozDiyaddrq1rg9C3gGje5xGdfrHPb02Wz2RmMOcuLYkcW
-	NYhXU32Q0RRah1kG8d+bkawPvGbIUXdHlCZiKEM8oneBxUORuR0TX1qV2PK5
-X-Google-Smtp-Source: AGHT+IG0TeC9PZ8JKvhUexXzuDVESkV7fhCVJRUodTUMREHbgMkMhpEfSDQF6mIRbtjmC7Joab7/Gw==
-X-Received: by 2002:adf:fed2:0:b0:367:8f89:f7c9 with SMTP id ffacd0b85a97d-367947bed8emr1030491f8f.33.1720005409835;
-        Wed, 03 Jul 2024 04:16:49 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3679814a276sm13097f8f.84.2024.07.03.04.16.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jul 2024 04:16:49 -0700 (PDT)
-Subject: Re: [PATCH net-next 02/11] net: ethtool: let drivers declare max size
- of RSS indir table and key
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- michael.chan@broadcom.com
-References: <20240702234757.4188344-1-kuba@kernel.org>
- <20240702234757.4188344-4-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <377302f2-f081-9737-c0a8-8cffe2a5fcd0@gmail.com>
-Date: Wed, 3 Jul 2024 12:16:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1720005493; c=relaxed/simple;
+	bh=sZu3WEtVwQ9fs2ISGrtXyLLe+vIoesZ01sKD9VWZu5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hozqe0nsfKMW/sNeBT/FW6XdsOWrgYCgWslycoyAymX3bwYP0G549L65wrbwoRAzzpZlKz5kan1qRafr86xRf1JCJenN0CBv2pS4uN8GXamYqYB4j7yZnEkVxoaYbZMCl2M7mtBbCaMp6D0M3sdoQQuBjY7DvqPVA4XwnjOWY+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ArzpZTEI; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720005492; x=1751541492;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sZu3WEtVwQ9fs2ISGrtXyLLe+vIoesZ01sKD9VWZu5o=;
+  b=ArzpZTEI9kNo43GuhEun31bSzHsIt56FZAcUYbSTuPVr4bYZhkgt1UuI
+   c5x+C5sh7OR7ocpe2lNeO826lzGGQ8Npql4bJ5NOaXgc62La7oIIjN2B/
+   MHv0pGI7RHYNWFsHailYIAyFiYe3YyctWKzj9yJA5IjS4wkNyqxMl2JHO
+   deq9a8HLd6CkNvhxKxgKn5AHG/DqmUnqI/OsyZ5mgvbmVF+qYlENnxHOH
+   Qf6c7rfLa6S+iDL4uaWTJ8U31xQp0WtVvKmjy6pwlQ93dodzuKMdehFuj
+   8B+XH42Ah9WzxWSkzA9G1ZEpfqHxF2XF75Ik2box8+1lCeVq/Bk0B4tVk
+   Q==;
+X-CSE-ConnectionGUID: upSXtZFYT5i2iBr4f8oE5w==
+X-CSE-MsgGUID: Jinl/rb5RgeN6EjsLktJAw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="34677381"
+X-IronPort-AV: E=Sophos;i="6.09,181,1716274800"; 
+   d="scan'208";a="34677381"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 04:18:12 -0700
+X-CSE-ConnectionGUID: XrOeSyk8TZy62vYVf9OUPw==
+X-CSE-MsgGUID: fltt//wxQBiTuWRISZn2XA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,181,1716274800"; 
+   d="scan'208";a="51411818"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 03 Jul 2024 04:18:06 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sOxzv-000PeM-1b;
+	Wed, 03 Jul 2024 11:18:03 +0000
+Date: Wed, 3 Jul 2024 19:17:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, nbd@nbd.name,
+	lorenzo.bianconi83@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	conor@kernel.org, linux-arm-kernel@lists.infradead.org,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, devicetree@vger.kernel.org,
+	catalin.marinas@arm.com, will@kernel.org, upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
+	sgoutham@marvell.com, andrew@lunn.ch, arnd@arndb.de,
+	horms@kernel.org
+Subject: Re: [PATCH v4 2/2] net: airoha: Introduce ethernet support for
+ EN7581 SoC
+Message-ID: <202407031841.Ww5ZFVKk-lkp@intel.com>
+References: <56f57f37b80796e9706555503e5b4cf194f69479.1719672695.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240702234757.4188344-4-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56f57f37b80796e9706555503e5b4cf194f69479.1719672695.git.lorenzo@kernel.org>
 
-On 03/07/2024 00:47, Jakub Kicinski wrote:
-> Some drivers (bnxt but I think also mlx5 from ML discussions) change
-> the size of the indirection table depending on the number of Rx rings.
-> Decouple the max table size from the size of the currently used table,
-> so that we can reserve space in the context for table growth.
-> 
-> Static members in ethtool_ops are good enough for now, we can add
-> callbacks to read the max size more dynamically if someone needs
-> that.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  include/linux/ethtool.h | 20 +++++++-----------
->  net/ethtool/ioctl.c     | 46 ++++++++++++++++++++++++++++++++---------
->  2 files changed, 44 insertions(+), 22 deletions(-)
-> 
-> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> index 3ce5be0d168a..dc8ed93097c3 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -173,6 +173,7 @@ static inline u32 ethtool_rxfh_indir_default(u32 index, u32 n_rx_rings)
->  struct ethtool_rxfh_context {
->  	u32 indir_size;
->  	u32 key_size;
-> +	u32 key_off;
+Hi Lorenzo,
 
-kdoc needed.
-Other than that LGTM.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master v6.10-rc6]
+[cannot apply to horms-ipvs/master next-20240703]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/dt-bindings-net-airoha-Add-EN7581-ethernet-controller/20240630-185836
+base:   net/main
+patch link:    https://lore.kernel.org/r/56f57f37b80796e9706555503e5b4cf194f69479.1719672695.git.lorenzo%40kernel.org
+patch subject: [PATCH v4 2/2] net: airoha: Introduce ethernet support for EN7581 SoC
+config: arm-randconfig-r123-20240703 (https://download.01.org/0day-ci/archive/20240703/202407031841.Ww5ZFVKk-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240703/202407031841.Ww5ZFVKk-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407031841.Ww5ZFVKk-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/mediatek/airoha_eth.c:848:19: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void [noderef] __iomem *base @@     got struct airoha_eth *eth @@
+   drivers/net/ethernet/mediatek/airoha_eth.c:848:19: sparse:     expected void [noderef] __iomem *base
+   drivers/net/ethernet/mediatek/airoha_eth.c:848:19: sparse:     got struct airoha_eth *eth
+   drivers/net/ethernet/mediatek/airoha_eth.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, ...):
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+
+vim +848 drivers/net/ethernet/mediatek/airoha_eth.c
+
+   809	
+   810	#define airoha_fe_rr(eth, offset)				\
+   811		airoha_rr((eth)->fe_regs, (offset))
+   812	#define airoha_fe_wr(eth, offset, val)				\
+   813		airoha_wr((eth)->fe_regs, (offset), (val))
+   814	#define airoha_fe_rmw(eth, offset, mask, val)			\
+   815		airoha_rmw((eth)->fe_regs, (offset), (mask), (val))
+   816	#define airoha_fe_set(eth, offset, val)				\
+   817		airoha_rmw((eth)->fe_regs, (offset), 0, (val))
+   818	#define airoha_fe_clear(eth, offset, val)			\
+   819		airoha_rmw((eth)->fe_regs, (offset), (val), 0)
+   820	
+   821	#define airoha_qdma_rr(eth, offset)				\
+   822		airoha_rr((eth)->qdma_regs, (offset))
+   823	#define airoha_qdma_wr(eth, offset, val)			\
+   824		airoha_wr((eth)->qdma_regs, (offset), (val))
+   825	#define airoha_qdma_rmw(eth, offset, mask, val)			\
+   826		airoha_rmw((eth)->qdma_regs, (offset), (mask), (val))
+   827	#define airoha_qdma_set(eth, offset, val)			\
+   828		airoha_rmw((eth)->qdma_regs, (offset), 0, (val))
+   829	#define airoha_qdma_clear(eth, offset, val)			\
+   830		airoha_rmw((eth)->qdma_regs, (offset), (val), 0)
+   831	
+   832	static void airoha_qdma_set_irqmask(struct airoha_eth *eth, int index,
+   833					    u32 clear, u32 set)
+   834	{
+   835		unsigned long flags;
+   836	
+   837		if (WARN_ON_ONCE(index >= ARRAY_SIZE(eth->irqmask)))
+   838			return;
+   839	
+   840		spin_lock_irqsave(&eth->irq_lock, flags);
+   841	
+   842		eth->irqmask[index] &= ~clear;
+   843		eth->irqmask[index] |= set;
+   844		airoha_qdma_wr(eth, REG_INT_ENABLE(index), eth->irqmask[index]);
+   845		/* Read irq_enable register in order to guarantee the update above
+   846		 * completes in the spinlock critical section.
+   847		 */
+ > 848		airoha_rr(eth, REG_INT_ENABLE(index));
+   849	
+   850		spin_unlock_irqrestore(&eth->irq_lock, flags);
+   851	}
+   852	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
