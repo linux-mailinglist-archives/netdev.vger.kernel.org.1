@@ -1,122 +1,197 @@
-Return-Path: <netdev+bounces-108843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3774925FA5
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:06:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93F9926026
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA91C1F20EFC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:06:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7F93B22B11
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAECB16DEAC;
-	Wed,  3 Jul 2024 12:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B8617164D;
+	Wed,  3 Jul 2024 12:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gESSkFzJ"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="w0BLMBJb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC9F13B5B2
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 12:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D7645945;
+	Wed,  3 Jul 2024 12:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720008377; cv=none; b=WWQn1Zsmz08ieMzK5FbVn5vv+iG+OOYBwsg4ikXJGuRDIKKsx/hV7RMYuDJqehmVYyjcbCVqCerOFl/C7is44GDslRVp9PqqdvIMculs2M20tP+eg4vCjbaEGH3FjSVJDuSYUTT9y3DsOWpjcjx0PYDOysLJvPPiDq+bdBtIecI=
+	t=1720008433; cv=none; b=T0fB9O3P0cO9obazLdKHgxKk9E/Lh0qUCsof719E+fjQtwDVg9ovkRKaWD+A11/FHtTADGK+htmHVOecUUxMLxgDskCZhOcD60GaEFUakup2jNyAemhrGKbV4SufHbcsMlbbpTpMTQ069Brwlno+ebq7Glldlio00sxxQBxaa8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720008377; c=relaxed/simple;
-	bh=JVuls2IpRp3ihuNg63JnqrVt0M2mR/bsdIIULNvhMhQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=V8cVNnS0UQ+89rdXU5UoILb1x41i4lN3A95vqmppMKLbNdcmxLc88LjMcICYG9SANU6VHlk1snnfNZgsukByNRpraOSd2Q+9L3ZSjkC+xXVW94vZnXbJQBM10+E42OZdNkI3pipHz/APOoPXlyqjCMLmCH0Cz3xGFcAyOskEuUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gESSkFzJ; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-36733f09305so2880166f8f.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 05:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720008374; x=1720613174; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iropvlS1ULsfZa8EM+3IzzM21M1qOq5sJTwOfD7Pomo=;
-        b=gESSkFzJrauxuKGL1PaDjBRvR8y44cS8uVPdJKVIZ+unEPTOTrreACB+t4XFEvkZqw
-         NQWFix4JgIgmH9XQOEzb1TSUlX/S7E4DIenAtdmcTzL/XD361treuYNvWcNgz1Op4FLe
-         OhbJ2/VDej/yu2KKMBQ3GNHsPuu6Lt7l+MHmQeIOp9sQ2azxCTckAKL4j/+kcFzapWeb
-         pgJU4tgspv7Zwfhh2EF+d5q0XBR+VoaADFqoItF96i3yTa8mzD78azGi9Qx5tticJ1BS
-         OAIBLch1TLkonFIa73Okl3rcQ26OerCPgxZ0qp7cyVqIyEUxMkSrlH6vo7leJ9aYwNfU
-         aaFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720008374; x=1720613174;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iropvlS1ULsfZa8EM+3IzzM21M1qOq5sJTwOfD7Pomo=;
-        b=Gz6xhoV+mXs8WJ1QQM5MforhthHcXDarZqNkUtXceDHJfpQ1YU9ij3yZ0e6N7bSsiP
-         YYyO5m2fv+oAHN6Qhw3o6/+lu5QZlPa6zfNnQ5puXyHwnqJYPeE/R3w3GK3bmmbpgASE
-         6INlAtlV/hYeYhmANC8RuB8YU0WzQmSN/t20x4TZHnotlRof4lPFyR6CW5JUQN46/2Sy
-         eqUO8c+qSUTfg3IC+g8/y6msABaYV4fPuB9opvpw9DEBDEHWRcmH/XPEpV/t6kNaf7b5
-         s0TAlr/JflXvUaHc4M6AwNxDpaZiF8kXDO8K5Y3ltwqz97R4TW08il4kkhFE5dGmo01O
-         T80Q==
-X-Gm-Message-State: AOJu0YwV/RjIF0BSRSMUGdnl9yaMDEtJABCXKF92/ayN46qva+KLcxlK
-	cTQjQJHxOo/K0bZoZuo3wXmLxI6+PKv7GLdIula2AxHU4tXCx5N4
-X-Google-Smtp-Source: AGHT+IFHwPO0cam5VV93CXEUtPwmq1K7kaS+vEuVS5KwcNiq9Aor9IGE79Tu/VqYkSaHYtpP/ipC1w==
-X-Received: by 2002:a5d:630f:0:b0:362:41a4:974d with SMTP id ffacd0b85a97d-3677571b76bmr9055297f8f.46.1720008374290;
-        Wed, 03 Jul 2024 05:06:14 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0fc4c9sm15708364f8f.86.2024.07.03.05.06.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jul 2024 05:06:13 -0700 (PDT)
-Subject: Re: [PATCH net-next 04/11] eth: bnxt: move from .set_rxfh to
- .create_rxfh_context and friends
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- michael.chan@broadcom.com, Pavan Chebbi <pavan.chebbi@broadcom.com>
-References: <20240702234757.4188344-1-kuba@kernel.org>
- <20240702234757.4188344-6-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <575edb3a-3c52-0bcf-4c19-b627dc99d2e5@gmail.com>
-Date: Wed, 3 Jul 2024 13:06:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1720008433; c=relaxed/simple;
+	bh=xAUwGWmp2Hl2S78EcEtu1s0V5BlSHNn5+p43jBpD7F4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iRraqax1husbk+8rYAXqZo1Tv5q5m/lC37aukhc5BXzsmkODEW1DQDIfZ2HOo++VP1zYkmdyEs8wxXz1e9vZBsUG/zUlRAPmWCCWwfcYAeAW0H+c8yjVe98MrvknH/9QdTXl2R1Whx6xB9/BCOBJ6N2oVP5qMfVEmPzzwj2ckuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=w0BLMBJb; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from localhost (unknown [IPv6:2a02:8012:909b:0:1e90:7398:2278:75e2])
+	(Authenticated sender: tom)
+	by mail.katalix.com (Postfix) with ESMTPSA id 0E2147D76D;
+	Wed,  3 Jul 2024 13:07:11 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1720008431; bh=xAUwGWmp2Hl2S78EcEtu1s0V5BlSHNn5+p43jBpD7F4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Disposition:In-Reply-To:From;
+	z=Date:=20Wed,=203=20Jul=202024=2013:07:10=20+0100|From:=20Tom=20Pa
+	 rkin=20<tparkin@katalix.com>|To:=20syzbot=20<syzbot+c041b4ce3a6dfd
+	 1e63e2@syzkaller.appspotmail.com>|Cc:=20linux-kernel@vger.kernel.o
+	 rg,=20netdev@vger.kernel.org,=0D=0A=09syzkaller-bugs@googlegroups.
+	 com|Subject:=20Re:=20[syzbot]=20[net?]=20KASAN:=20slab-use-after-f
+	 ree=20Write=20in=0D=0A=20l2tp_session_delete|Message-ID:=20<ZoU+7g
+	 bOSzWMOOPC@katalix.com>|References:=20<0000000000008405e0061bb6d4d
+	 5@google.com>|MIME-Version:=201.0|Content-Disposition:=20inline|In
+	 -Reply-To:=20<0000000000008405e0061bb6d4d5@google.com>;
+	b=w0BLMBJbDBFIXB290mdCgyzw4g78apzkAqDnE8dFFQlM/ILK+q354zuNwBLhWwyoq
+	 5QrnZ2m5J681Fy755vGc+fF265RLmDSjtNMD0WWuSO/lYOOH16D6dYO0fCe6ka0NF2
+	 xdEAmaZ9AOzrk/rZAruKkygyoF79/Qmh8u3iZRcGSa9wABLFd58ZJC9yd8NAIkQuBO
+	 1yhPzWRIYz+6xsfBp/Q8jlIPSaXyiV76eBzpwf4VpfoKnC+OduC3Ean5uA/Hq9WIIy
+	 B8/1MoYjwo0mQlhkZ65zC9JVm1ulI8SC6EKGZB9OimuAyS20UjS+4ivqq3HuGPDM3O
+	 LOmA94O4fE9IA==
+Date: Wed, 3 Jul 2024 13:07:10 +0100
+From: Tom Parkin <tparkin@katalix.com>
+To: syzbot <syzbot+c041b4ce3a6dfd1e63e2@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Write in
+ l2tp_session_delete
+Message-ID: <ZoU+7gbOSzWMOOPC@katalix.com>
+References: <0000000000008405e0061bb6d4d5@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240702234757.4188344-6-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SmA1Ol97I3F9djjj"
+Content-Disposition: inline
+In-Reply-To: <0000000000008405e0061bb6d4d5@google.com>
 
-On 03/07/2024 00:47, Jakub Kicinski wrote:
-> Use the new ethtool ops for RSS context management. The conversion
-> is pretty straightforward cut / paste of the right chunks of the
-> combined handler. Main change is that we let the core pick the IDs
-> (bitmap will be removed separately for ease of review), so we need
-> to tell the core when we lose a context.
-> Since the new API passes rxfh as const, change bnxt_modify_rss()
-> to also take const.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-...
-> @@ -5271,6 +5296,7 @@ void bnxt_ethtool_free(struct bnxt *bp)
->  const struct ethtool_ops bnxt_ethtool_ops = {
->  	.cap_link_lanes_supported	= 1,
->  	.cap_rss_ctx_supported		= 1,
-> +	.rxfh_max_context_id		= BNXT_MAX_ETH_RSS_CTX,
 
-According to Pavan [1], this limit only existed for the sake of the
- SW side (presumably the rss_ctx_bmap), so probably it can be removed
- in patch #5.
-The higher FW limit Pavan mentions appears to be on number rather
- than index; at least I can't see anything in the driver feeding the
- user-facing context ID to the device.  But I don't know whether FW
- has any opportunity to say ENOMEM, or whether the driver needs to
- validate against the hardware limit itself.  Hopefully Pavan (CCed)
- can elaborate.
+--SmA1Ol97I3F9djjj
+Content-Type: multipart/mixed; boundary="6dG6xs0iNw9vxUoM"
+Content-Disposition: inline
 
--ed
 
-[1] https://lore.kernel.org/netdev/CALs4sv2dyy3uy+Xznm41M3uOkv1TSoGMwVBL5Cwzv=_E=+L_4A@mail.gmail.com/
+--6dG6xs0iNw9vxUoM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On  Tue, Jun 25, 2024 at 06:25:23 -0700, syzbot wrote:
+> syzbot found the following issue on:
+>=20
+> HEAD commit:    185d72112b95 net: xilinx: axienet: Enable multicast by de=
+f..
+> git tree:       net-next
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1062bd46980000
+
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
+it  185d72112b95
+=20
+
+--6dG6xs0iNw9vxUoM
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-l2tp-fix-possible-UAF-when-cleaning-up-tunnels.patch"
+Content-Transfer-Encoding: quoted-printable
+
+=46rom 15d6d4c290810d5b8f357b9e494c5ad420c8a2fb Mon Sep 17 00:00:00 2001
+=46rom: Tom Parkin <tparkin@katalix.com>
+Date: Wed, 3 Jul 2024 13:02:51 +0100
+Subject: [PATCH] l2tp: fix possible UAF when cleaning up tunnels
+
+syzbot reported a UAF caused by a race when the L2TP work queue closes a
+tunnel at the same time as a userspace thread closes a session in that
+tunnel.
+
+Tunnel cleanup is handled by a work queue which iterates through the
+sessions contained within a tunnel, and closes them in turn.
+
+Meanwhile, a userspace thread may arbitrarily close a session via
+either netlink command or by closing the pppox socket in the case of
+l2tp_ppp.
+
+The race condition may occur when l2tp_tunnel_closeall walks the list
+of sessions in the tunnel and deletes each one.  Currently this is
+implemented using list_for_each_safe, but because the list spinlock is
+dropped in the loop body it's possible for other threads to manipulate
+the list during list_for_each_safe's list walk.  This can lead to the
+list iterator being corrupted, leading to list_for_each_safe spinning.
+One sequence of events which may lead to this is as follows:
+
+ * A tunnel is created, containing two sessions A and B.
+ * A thread closes the tunnel, triggering tunnel cleanup via the work
+   queue.
+ * l2tp_tunnel_closeall runs in the context of the work queue.  It
+   removes session A from the tunnel session list, then drops the list
+   lock.  At this point the list_for_each_safe temporary variable is
+   pointing to the other session on the list, which is session B, and
+   the list can be manipulated by other threads since the list lock has
+   been released.
+ * Userspace closes session B, which removes the session from its parent
+   tunnel via l2tp_session_delete.  Since l2tp_tunnel_closeall has
+   released the tunnel list lock, l2tp_session_delete is able to call
+   list_del_init on the session B list node.
+ * Back on the work queue, l2tp_tunnel_closeall resumes execution and
+   will now spin forever on the same list entry until the underlying
+   session structure is freed, at which point UAF occurs.
+
+The solution is to iterate over the tunnel's session list using
+list_first_entry_not_null to avoid the possibility of the list
+iterator pointing at a list item which may be removed during the walk.
+---
+ net/l2tp/l2tp_core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index be4bcbf291a1..fa75a8eb8782 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1290,12 +1290,14 @@ static void l2tp_session_unhash(struct l2tp_session=
+ *session)
+ static void l2tp_tunnel_closeall(struct l2tp_tunnel *tunnel)
+ {
+ 	struct l2tp_session *session;
+-	struct list_head __rcu *pos;
+-	struct list_head *tmp;
+=20
+ 	spin_lock_bh(&tunnel->list_lock);
+ 	tunnel->acpt_newsess =3D false;
+-	list_for_each_safe(pos, tmp, &tunnel->session_list) {
++	for (;;) {
++		session =3D list_first_entry_or_null(&tunnel->session_list,
++						   struct l2tp_session, list);
++		if (!session)
++			break;
+ 		session =3D list_entry(pos, struct l2tp_session, list);
+ 		list_del_init(&session->list);
+ 		spin_unlock_bh(&tunnel->list_lock);
+--=20
+2.34.1
+
+
+--6dG6xs0iNw9vxUoM--
+
+--SmA1Ol97I3F9djjj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmaFPuoACgkQlIwGZQq6
+i9CrwQf7BBc5N63d0HQY0kvvRRlqKPEWIMS5AJ2lfoKEkpll/MaNURPv9PjKypdQ
+w31Prbzd96i1ZBw7is0BeTfdPch9mULTr7Hj4IfITSxRadUR/DuKnNaWWGeTDbM+
+NC7hM6lsCsuVn9zXz2Mm7KFyjUoy1TVUQ1fjP4wfM+5EhCJQfN+RbCmpXXS5pyNV
+VtYIflrjxu562d0wE7/MoAu6qCnEtIFmCRNVWtpkNvVjXDaMXMs+j0pKTr0jd8q5
+/+oRpJQai/NOza4acd0lsd0Tuw0msQuweDmHOswOlGpaBAdAqryCXr6NQnAef+g+
+HfcldotjcV6+ZKgDiBo+uuNcRLxzjw==
+=Y74Y
+-----END PGP SIGNATURE-----
+
+--SmA1Ol97I3F9djjj--
 
