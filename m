@@ -1,130 +1,194 @@
-Return-Path: <netdev+bounces-109040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B3BD9269A4
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:35:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 741E492699D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9FAC1F24CCE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:35:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98AB61C21EBA
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA1187560;
-	Wed,  3 Jul 2024 20:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D671C1850B9;
+	Wed,  3 Jul 2024 20:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="oLxJbbiw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YBdk8dK2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B448B4964E;
-	Wed,  3 Jul 2024 20:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0924E4964E
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 20:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720038895; cv=none; b=s9/zRfuGCy/8x6m0+w0VpOCqgm2abjPlX7YMnV2zSYcgubISpH+HTpKQfTLJ6gR4qd7PFrBoZXPnLAKcZBL/yZECHjOVLhKGbIlipnSdk7Y2oXCb2ilGmO7MVfQ+LzINUHALOkTYWXkRYfF7LstJOBPuN9jT/OE48R5nbssM0ec=
+	t=1720038801; cv=none; b=fCYDjRuCBTypsGimDVUCpsad4XN3kf3hOqG8kCEfCjKy4YaoN9sG0jYTLfwhC3wb8Y890pDXv3lT3IFdjAknnS4KaSwEQDHZ2Xtt4HnKerElL6VmWsIlIRUJV2w5P71vWEscaw1fXEHaxIpgvKU24BzGWyQlXkJSUpEf3XaYynk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720038895; c=relaxed/simple;
-	bh=Zz/epqt5ZRh8ui97t65GrBhekOF+Qb7LbgbykpbYtdk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Iyvl9dSv3fL08VUyuKJQHyiDFX4D3dUFyEXVT5RLn8f09pQL6QHQHf6XmiIo2aZK7RHnYIXo+TZOUK6I1HwuwnOX4PIfuKIeLluUDm+qohz5GpLGVURSw30o6ACk/8kq5NHOBQaN4IB2VPkumhDfVv3KxgMIZt1qNTtCtJJTuxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=oLxJbbiw; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id D097F100004;
-	Wed,  3 Jul 2024 23:34:30 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1720038870; bh=+w5nLEKphcLgW6rn0LDohsYxcRdzToxepNB2cUqDYdY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=oLxJbbiwUyUJp9W+ibOTqjN5D3p1y4+h5MFGapmdzoEtwEE7svaRLTf2SpLf478Rg
-	 19bhKEVo9ZMZkJnxBd2TAqtV7WGzbQLdYHYiP4FYMm2U8oO3CeoAPAwgMvXkz44QpE
-	 lpPqxpVrRkPtXXOCprls/BpNGOukTafD+cpHTrf6a5L4Js3Ln3naP8dop9BGA47Cpu
-	 0xCnOaGfb/VjdcfvTgeTWWJgQbPL4ngbkjNOKSF1P2n2v3WVbk3GUhlABRNVCcpynE
-	 2YVN2bOaDSo/fdmxdOJh3WnkXGIFcWv2G+QvQV6Zk6DxerWsCLBCcMpqui9MHhXnJU
-	 GuXHJKopS92Tg==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Wed,  3 Jul 2024 23:33:23 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 3 Jul 2024
- 23:33:02 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, Przemek
- Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net v2] mlxsw: core_linecards: Fix double memory deallocation in case of invalid INI file
-Date: Wed, 3 Jul 2024 23:32:51 +0300
-Message-ID: <20240703203251.8871-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1720038801; c=relaxed/simple;
+	bh=LyITkQQhJ1RzIHc0MfA3b1Op3/GzxrkaQAHT3WTxBtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c4eQCQhJkQoSDRx5Y1oUzi5o4kBgt7cBXUCJvVo+lQCNkWw7+t7U0dl2xI9zcIbni7Ea075AQYGfU+g3PI7OYANQ+PWaQV/fi5Q2blcTWn1T/ZwS3N8LYDLO1FFt0Ore+voUF2bLZgbBoRuyDyN2K+kt62pQAdjmTn/mcmznzAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YBdk8dK2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xAI/1QABtax3Gh0SAl+F4c+m56HNVv/9XGTdoJZ+9Lg=; b=YBdk8dK2N40BgEFsuA6NAFuf+g
+	89nMMD5aiRoiFIqGC1Cvos0nhVYMUYoQYCbGDHqKtbZN2HVvVCcucN8rQt2u3kmL9Rk9cROpOUPBk
+	gSoiR1n+BLOcRtVFYs0WDw5Jn/0X1GwYQswui45fvLsn61tbcngRJFMIUSeKwm7/zxhExXd9xa+et
+	1DrS+idA/VFrMw+dnJcCgOE8HBeQ3j6bniyN7kuORyPo6Mo/7wnUCKowMI1ePDiYTp4W08kKOKPFG
+	ozsWE8UpOpQ33aHGv+tvSGEvOF5c0Xy7kOz7VwgKFbJMJvTdsDJNdDYBm6a5UryGPh36bUpWr92dz
+	VKX7+Qmw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39264)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sP6ex-00067z-2i;
+	Wed, 03 Jul 2024 21:32:59 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sP6ey-0003HC-IV; Wed, 03 Jul 2024 21:33:00 +0100
+Date: Wed, 3 Jul 2024 21:33:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Serge Semin <fancer.lancer@gmail.com>, si.yanteng@linux.dev,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
+ network speed to 1000.
+Message-ID: <ZoW1fNqV3PxEobFx@shell.armlinux.org.uk>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
+ <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+ <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+ <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
+ <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
+ <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
+ <hdqpsuq7n4aalav7jtzttfksw5ct36alowsc65e72armjt2h67@shph7z32rbc6>
+ <ZoWex6T0QbRBmDFE@shell.armlinux.org.uk>
+ <eb4bed28-c04e-4098-b947-e9fc626ba478@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 186316 [Jul 03 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 21 0.3.21 ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/07/03 19:52:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/03 17:02:00 #25823003
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb4bed28-c04e-4098-b947-e9fc626ba478@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-In case of invalid INI file mlxsw_linecard_types_init() deallocates memory
-but doesn't reset pointer to NULL and returns 0. In case of any error
-occurred after mlxsw_linecard_types_init() call, mlxsw_linecards_init()
-calls mlxsw_linecard_types_fini() which performs memory deallocation again.
+On Wed, Jul 03, 2024 at 09:09:53PM +0200, Andrew Lunn wrote:
+> > Rather than erroring out, I think it may be better to just adopt
+> > the Marvell solution to this problem to give consistent behaviour
+> > across all PHYs.
+> 
+> Yes, expand phy_config_aneg() to look for this condition and enable
+> autoneg. But should we disable it when the condition is reverted? The
+> user swaps to 100Mbps forced?
 
-Add pointer reset to NULL.
+I think we should "lie" to userspace rather than report how the
+hardware was actually programmed - again, because that's what would
+happen with Marvell Alaska.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> What about other speeds? Is this limited to 1G? Since we have devices
+> without auto-neg for 2500BaseX i assume it is not an issue there.
 
-Fixes: b217127e5e4e ("mlxsw: core_linecards: Add line card objects and implement provisioning")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
-v2:
-  - fix few typos in comment as suggested by Przemek and Ido
-  - add Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-    (https://lore.kernel.org/all/c631fc5e-1cc6-467a-963a-69ef03c20f40@intel.com/)
-  - add Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-    (https://lore.kernel.org/all/ZoWJzqaRJKjtTlNO@shredder.mtl.com/)
-v1: https://lore.kernel.org/all/20240702103352.15315-1-amishin@t-argos.ru/
+1000base-X can have AN disabled - that's not an issue. Yes, there's
+the ongoing issues with 2500base-X. 10Gbase-T wording is similar to
+1000base-T, so we probably need to do similar there. Likely also the
+case for 2500base-T and 5000base-T as well.
 
- drivers/net/ethernet/mellanox/mlxsw/core_linecards.c | 1 +
- 1 file changed, 1 insertion(+)
+So I'm thinking of something like this (untested):
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c b/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
-index 025e0db983fe..b032d5a4b3b8 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_linecards.c
-@@ -1484,6 +1484,7 @@ static int mlxsw_linecard_types_init(struct mlxsw_core *mlxsw_core,
- 	vfree(types_info->data);
- err_data_alloc:
- 	kfree(types_info);
-+	linecards->types_info = NULL;
- 	return err;
- }
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 6c6ec9475709..197c4d5ab55b 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2094,22 +2094,20 @@ EXPORT_SYMBOL(phy_reset_after_clk_enable);
+ /**
+  * genphy_config_advert - sanitize and advertise auto-negotiation parameters
+  * @phydev: target phy_device struct
++ * @advert: auto-negotiation parameters to advertise
+  *
+  * Description: Writes MII_ADVERTISE with the appropriate values,
+  *   after sanitizing the values to make sure we only advertise
+  *   what is supported.  Returns < 0 on error, 0 if the PHY's advertisement
+  *   hasn't changed, and > 0 if it has changed.
+  */
+-static int genphy_config_advert(struct phy_device *phydev)
++static int genphy_config_advert(struct phy_device *phydev,
++				const unsigned long *advert)
+ {
+ 	int err, bmsr, changed = 0;
+ 	u32 adv;
  
--- 
-2.30.2
+-	/* Only allow advertising what this PHY supports */
+-	linkmode_and(phydev->advertising, phydev->advertising,
+-		     phydev->supported);
+-
+-	adv = linkmode_adv_to_mii_adv_t(phydev->advertising);
++	adv = linkmode_adv_to_mii_adv_t(advert);
+ 
+ 	/* Setup standard advertisement */
+ 	err = phy_modify_changed(phydev, MII_ADVERTISE,
+@@ -2132,7 +2130,7 @@ static int genphy_config_advert(struct phy_device *phydev)
+ 	if (!(bmsr & BMSR_ESTATEN))
+ 		return changed;
+ 
+-	adv = linkmode_adv_to_mii_ctrl1000_t(phydev->advertising);
++	adv = linkmode_adv_to_mii_ctrl1000_t(advert);
+ 
+ 	err = phy_modify_changed(phydev, MII_CTRL1000,
+ 				 ADVERTISE_1000FULL | ADVERTISE_1000HALF,
+@@ -2356,6 +2354,9 @@ EXPORT_SYMBOL(genphy_check_and_restart_aneg);
+  */
+ int __genphy_config_aneg(struct phy_device *phydev, bool changed)
+ {
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(fixed_advert);
++	const struct phy_setting *set;
++	unsigned long *advert;
+ 	int err;
+ 
+ 	err = genphy_c45_an_config_eee_aneg(phydev);
+@@ -2370,10 +2371,25 @@ int __genphy_config_aneg(struct phy_device *phydev, bool changed)
+ 	else if (err)
+ 		changed = true;
+ 
+-	if (AUTONEG_ENABLE != phydev->autoneg)
++	if (phydev->autoneg == AUTONEG_ENABLE) {
++		/* Only allow advertising what this PHY supports */
++		linkmode_and(phydev->advertising, phydev->advertising,
++			     phydev->supported);
++		advert = phydev->advertising;
++	} else if (phydev->speed < SPEED_1000) {
+ 		return genphy_setup_forced(phydev);
++	} else {
++		linkmode_zero(fixed_advert);
++
++		set = phy_lookup_setting(phydev->speed, phydev->duplex,
++					 phydev->supported, true);
++		if (set)
++			linkmode_set(set->bit, fixed_advert);
++
++		advert = fixed_advert;
++	}
+ 
+-	err = genphy_config_advert(phydev);
++	err = genphy_config_advert(phydev, advert);
+ 	if (err < 0) /* error */
+ 		return err;
+ 	else if (err)
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
