@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-108926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08338926410
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:58:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02328926413
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E65E1F23045
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:58:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 832011F21046
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9411822C8;
-	Wed,  3 Jul 2024 14:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F3F1822E2;
+	Wed,  3 Jul 2024 14:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="NE8sgKhT"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="HL/9SsE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02hn2228.outbound.protection.outlook.com [52.100.202.228])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05hn2235.outbound.protection.outlook.com [52.100.174.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708DF17E904;
-	Wed,  3 Jul 2024 14:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.100.202.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991D1181D1A;
+	Wed,  3 Jul 2024 14:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.100.174.235
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720018663; cv=fail; b=o34tP1gWAe40sqnMRCJZvac0bc2IwH7In97BmuBsgNlWMFOEAUooJRglAqUor1YDQgcgMoW4SzQIXLOB8OiYFQordEBHRC/BKbre5nTEX+v2OBXoysyb5M8I0MFZWGTCUk5eKRJ5P3RbPBOVjl6A3RHcuS7BBvAt1XqZ7V9oWZc=
+	t=1720018665; cv=fail; b=geg0ehmnYRtQPIITZBv4Kwx1c9WFIAq/LkmdYkX99lEfCjBNMSt/u+Ts92mLAOV/t0r52gqH/Pm6yAPEdwJASEt/TF6H30du1WR2jwtrbgmZ1UWEQM+gEDe4X701ToLsTsvqlrRvjov9MeSApjSdTwo4Dlan1uOGXM8Z98XUDoM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720018663; c=relaxed/simple;
-	bh=dH1lqlI73nwHTfmTtWhu6gg5rxKsFGlMPgaJUhDAD1U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vr+oB7DpI94sQv2JSRA8TcSss6KUmVA4QMiv/sRHlN8GvN5x7ht7wu+s3+S6zMAskbm4xgmfgOfb8sKq9oagy79xTfDi1oXhXPXJQ6y3Ln3jCg79EDzzqAGP3L4laaPW0pX7vADjrbesdhXzVS511859Up5yCZr8p4DPlx9l2zg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=NE8sgKhT; arc=fail smtp.client-ip=52.100.202.228
+	s=arc-20240116; t=1720018665; c=relaxed/simple;
+	bh=1xoBAkrdIgUmj9FBWp+qKZdOPtOuNx12WQIpIeoIhKI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kSMMqgQZlKCfjYf3aO/eQcapq+knGW4M2spAm6Lgd64Oy/4lMKj/JUJZ5D5hFXnVu9FkTx3IW9XsxkGu9Za2GRmbN0/KDU5qJuh4zo8bf5lrSklJyz2veoSln/5LkGl9mL/EmjZN2CxCiUjNzz8ElipY8hvkrrsuFIFPsfOfNUY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=HL/9SsE/; arc=fail smtp.client-ip=52.100.174.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m1Mptvr2FvfZCybkKyMfcJN4a6COgYrrcuJP1XFV3REM0u4ZWyCKI9bTqCRH/BSQpQwD8tKuzsjKJF9A/z7yIaD+CaYT2nkmqaB8QXiZq3TStJs+Ztss0N6umOeCx/WFdn5pYJg5jRcKfE45Q5GDgGv2Nrm6fIZY3bALjChOrD2v1zwvEPYDl5QaCgma/fD3otHS26ax1sEoOdC/tF7ia5L7RukA6hk36OODUHUQpJo9xuo6Bsg05ZdsjypvSrEPbxUWo5pt10gSUPpS9WE/2dI8x+kvKur2lMRP53vLwvaRlBv/67T/+uhvGe5Awkt7Gnd1gvavmsmreprIDQ1hFw==
+ b=lWCnYeHjWEWqIm6dBxmNn8hJ617uA6pomrPDffegjbMAHfQQH//PZ29J5WRcuG6Io7Lc82UhVJm5R+yKSceQkNDq+/P5rsEiEZSY1DmuP53XYRlyAgMUAqYAsldwtM7h1vCw9Kr90b4qUW5aUQqF4DDQ0kQpXRGPi9GOXkgi6ECN8xUhS7cqEXSEhvzDR7SMN+4+SO1/1x/hIBhIHa+qrlEcr7TM3S2UvmgQZSmlcR/+w6+jGoR/C/ZZpDLyM41XcncPh1EFLqdQNACXgVIO4JDhmFGpeSqGxL2/9Mr3Al1tHncisyzQw9dfNskxzrbC6ZwRzL/y14HbHKKOOaNkvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lwU9KFby2UrfklUYFq+Lg59U6fKOAcMEnNy+uqbKSZI=;
- b=ExZlONK2NUtvpGcvZoBhbYMopu36JXT92HNL3OzK0mXY40t8DkArPY+2eMnlrMCyqbQ848vDbGUbV7CReRGeGuDIExp9SH+c6wM6vaod4mAPERSV/z8/KXZocV92VY+DbmCL7hWwjAy6wLRfMe3z5slxHRaAhPT9Kr1XPcDVRKpT/XSwMxOwqGIVB+Wy5reqRJ7jp/U5qM08C6GpgMTu1jA3hO2O6F7X7OHC++r2WMd1R/yM0e1TzQtFEtwsko4lLsMTh/oh9iPAje8fADCQAeVPb9qRl2OVn/wzdqNU4AEAYCuHNX1MKbMAURz7OXftoXuD0R5u37d+19LGjAFHog==
+ bh=SOsLc1RRGj7Cx25GUugndgTuCBtowFqMXO3cEi6jm4o=;
+ b=VI06DQJOKefLw1o/73klXs1RO/x+HJoh3kaCfWGidjPj9x2l/IwJnZlzbWjfr7+Ax0AMDjw6cDe/a90RJKB3Jk1+QCJDNnFr+EHrEJTAhYKcstuAmptl4PGLZUhOyVO46bmT5Dm+ufMkW5GJD5QNrQw1SqeG7cyW3cQY6h8X/6y9C1h0rQNOLSnqitQFdr5xt0Pt4mcEhTypXt/TfqLLVpaQYLun3c6IQw1bEO8aophCdSIc3LKhj0K5LyG6GEnv9MzwqBSUw0cT8UPdKKglaTJagM2HH2fC2bamQzlFPYDKs9BINcqLdOW73Zg2oyyuS26w7Z+U9Url+tCSu0y+yQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
  217.111.95.7) smtp.rcpttodomain=lunn.ch smtp.mailfrom=arri.de; dmarc=fail
  (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
  not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lwU9KFby2UrfklUYFq+Lg59U6fKOAcMEnNy+uqbKSZI=;
- b=NE8sgKhTcK02YhPnmOQhx4dHTJrJI+pfyVDjwe2GXOtbp5oR+GAIn43e8q/NF+MSD5ormq5QPamlUkPJO7GqZRVxukpaxbwoBhVuyzmGGmBvlr4ijObMQ6AQHkW9sq0GNLj2Np74fwuqw3TztBSeNmWf9jFeaCbJZtX70CUst0k=
-Received: from DUZP191CA0028.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:4f8::24)
- by AS5PR07MB9985.eurprd07.prod.outlook.com (2603:10a6:20b:67e::18) with
+ bh=SOsLc1RRGj7Cx25GUugndgTuCBtowFqMXO3cEi6jm4o=;
+ b=HL/9SsE/dj6vXnktnNZI4ldeIDifetY28DVRkukh7Op3gkz62ICNNzKvJ1AVVDRl7CVN5BlfTcm6InrEEdaHOk7DmRL4SSqBIBiSmWw1YqwW0FJrqmSmvIv8FoFceDSDwjdf4aswRaxoCnQAezRk2xqq6JMUEZn06eiTobBFJEc=
+Received: from DB7PR02CA0001.eurprd02.prod.outlook.com (2603:10a6:10:52::14)
+ by GVXPR07MB10219.eurprd07.prod.outlook.com (2603:10a6:150:223::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.25; Wed, 3 Jul
- 2024 14:57:36 +0000
-Received: from DU2PEPF00028D0E.eurprd03.prod.outlook.com
- (2603:10a6:10:4f8:cafe::cd) by DUZP191CA0028.outlook.office365.com
- (2603:10a6:10:4f8::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.23; Wed, 3 Jul
+ 2024 14:57:37 +0000
+Received: from DU2PEPF00028D11.eurprd03.prod.outlook.com
+ (2603:10a6:10:52:cafe::1e) by DB7PR02CA0001.outlook.office365.com
+ (2603:10a6:10:52::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.25 via Frontend
- Transport; Wed, 3 Jul 2024 14:57:36 +0000
+ Transport; Wed, 3 Jul 2024 14:57:37 +0000
 X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
  smtp.mailfrom=arri.de; dkim=none (message not signed)
  header.d=none;dmarc=fail action=none header.from=arri.de;
@@ -62,13 +63,13 @@ Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
  designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
  client-ip=217.111.95.7; helo=mta.arri.de;
 Received: from mta.arri.de (217.111.95.7) by
- DU2PEPF00028D0E.mail.protection.outlook.com (10.167.242.22) with Microsoft
+ DU2PEPF00028D11.mail.protection.outlook.com (10.167.242.25) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7741.18 via Frontend Transport; Wed, 3 Jul 2024 14:57:35 +0000
+ 15.20.7741.18 via Frontend Transport; Wed, 3 Jul 2024 14:57:36 +0000
 Received: from N9W6SW14.arri.de (10.30.4.245) by mta.arri.de (10.10.18.5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Wed, 3 Jul
- 2024 16:57:35 +0200
+ 2024 16:57:36 +0200
 From: Christian Eggers <ceggers@arri.de>
 To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
@@ -78,10 +79,12 @@ To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	<kernel@pengutronix.de>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Christian Eggers
 	<ceggers@arri.de>
-Subject: [PATCH net 1/2] dsa: lan9303: Fix mapping between DSA port number and PHY address
-Date: Wed, 3 Jul 2024 16:57:17 +0200
-Message-ID: <20240703145718.19951-1-ceggers@arri.de>
+Subject: [PATCH net 2/2] dsa: lan9303: consistent naming for PHY address parameter
+Date: Wed, 3 Jul 2024 16:57:18 +0200
+Message-ID: <20240703145718.19951-2-ceggers@arri.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240703145718.19951-1-ceggers@arri.de>
+References: <20240703145718.19951-1-ceggers@arri.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,137 +95,103 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2PEPF00028D0E:EE_|AS5PR07MB9985:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a0af5bf-fc57-43da-42b0-08dc9b70797c
+X-MS-TrafficTypeDiagnostic: DU2PEPF00028D11:EE_|GVXPR07MB10219:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2eea6028-66b1-49c0-6637-08dc9b707a45
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013|34020700016|921020|12100799063;
+	BCL:0;ARA:13230040|82310400026|7416014|376014|1800799024|34020700016|36860700013|921020|12100799063;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MMkVo5QLr2b5AV7Ztwi6U8Ar6BSYE7jGEwN+RoAo8u+Kk1Lk6NIXfNqzNMBA?=
- =?us-ascii?Q?Mw1De2jz4x0kFbUIQW84Ym+fDqc+NnfS1mwYLm3C+Nc08FwEQkXEGeQtpPu9?=
- =?us-ascii?Q?uAHmXGh9HlKaMqs1XxBTdxU3dpsG48mlK+xVmpASX8lxKe+Ac/ZMvgiYogxu?=
- =?us-ascii?Q?5GR0fZ0rBKgRPOtD9KWn33E6CdfPY4ov1Sd1QeGBwUQxw+gqa8o/PRuggTKK?=
- =?us-ascii?Q?frSEzXfTyTpJOQ2CSvNXNWyPiHIbHPiSfyCLd/cqiX832RLZXFfUXhIVE1Dl?=
- =?us-ascii?Q?4dRT/r0ABlesqD+vmNB+YR3rwjV+SjvOj03yXDUP2MFTU+1yEWY013mG/cYz?=
- =?us-ascii?Q?CaxF6TFyUbDAUM7K3NGLE3DdcNiDunnA4/P5mCLC8ZTzkfY0QJT6pyvaZovw?=
- =?us-ascii?Q?gtkG1JkVQ4UrGZ1r0fzaIhDTFI2JqbIDLIyCsj8vUtJO4bxh9d3PcTCzvepr?=
- =?us-ascii?Q?qA99h0mxCfIAevLTL2qJri3n30dxyhOkzsPx8QZ5l8TBR2gvZ5Vx0aQrXa8h?=
- =?us-ascii?Q?5Yk5k7OPQ6gOzvhoZtGpa0NLUv2Yb/3JxJZXHDx7GlMAi0YUSrzTpcGUAdst?=
- =?us-ascii?Q?2XOZEfFBAq+DKYgPD2YS+vG8y1qJpKAMArUfscYn7D2eOi6TzikA3PAbJPbl?=
- =?us-ascii?Q?zBrh+kvO5aN3j5kjv6vU4dF+B7SsgJu9EGUZwkRrDgP199758c+cUgYTybIj?=
- =?us-ascii?Q?voF1EWc7UPpXy0xqoS2zMrIpZhznL5wtSissle0KPGzuPcHLxmvPxVDp8Sg7?=
- =?us-ascii?Q?3FOaAFip2SkmIffN0CWZ9BmugKBaAqEgsoemPZKlvlWbh4aM2zowsWEp+HXW?=
- =?us-ascii?Q?lTUJ5wquaFmbRQkeMzDPiZgxtUTl84GxdTJb6sqpbVuvaHjG5+wyEixIVouv?=
- =?us-ascii?Q?5LK53//M1FkaOV7bDon4W/Nrp5rVfOoBDviiDwy2BALdfpjlYSRkxwNK/Air?=
- =?us-ascii?Q?PGOm5a0UnwJC7m0huh4YE9ic86a9Te7peHUSicPWscfRy8uVHzGFyKfFVDDH?=
- =?us-ascii?Q?bQmBmlPb+DpA/GcMSvTVXDe0eWN/uvqOEFxSqY2yxwSNigqRyhum6cC2BrRt?=
- =?us-ascii?Q?miLztMSE5NKaHLTPlodegnRdAY//PC/RM518R05YQLOZv66pMeW2SfjgEtZN?=
- =?us-ascii?Q?u19g7UXrTurCKldy14CPKHrr79Ia06yYy0JywfdZBrXFYxwSCNpWoepgpzq+?=
- =?us-ascii?Q?2WZSF5V4QUEx87bG5CGad67jaR7KVW8vkWEZst4RajSrNd6SDq7FZqx4f8bA?=
- =?us-ascii?Q?0Ny36sWd3YwneQ0o85ro9d7g1WY7ErDqa4AYoW8KTq2WaaPR4MLsb5S6SdWJ?=
- =?us-ascii?Q?YbJKnjsnps3No+RGO6bcRIrSbiEoiZ+43DPaExcFOHA8rJD7U3q2/wR2pnT5?=
- =?us-ascii?Q?efdCsWqoflSQxSAyC26a3xTleE+NcxKbTgU1r8wTIS5MfucPjkVxqBroeaUW?=
- =?us-ascii?Q?v7HANqO2O53PI8+8IIgHR+W9UKjPHE2Wm+jgOk6qBRj6xbpZeYDSNg=3D=3D?=
+	=?us-ascii?Q?7Hy/1VsMxbJ1IsDT0V8cMK7vQ8O/jCvqI5PFXoBM8uYrDjdtsfYFfDXKDNAe?=
+ =?us-ascii?Q?UBdYrrXPC1dK8/n7vu2EtO2cVMFakmeaCZJDlE39ZTTqChhLLyzIVTJsDgkM?=
+ =?us-ascii?Q?j0/LJIwuG+x2KLc4RXHhptLjJfxxNnVKSRIXx+XlJxjttuMTrQl8H7bLof19?=
+ =?us-ascii?Q?3bdMxIBcs0kpv3JdTPfTGlV5LnkcqUNePpD5b8sAfnVipuIq9Kf05QcMr1oP?=
+ =?us-ascii?Q?YB8cvnLIbs4l5ZPweCw5JhWNpPE8drDnqyjo+3btS4c5Ca9SybaY0p17kH87?=
+ =?us-ascii?Q?oAIWjH2CvIyd/pV98uTrNe1F0XK4h6y1xxLBfGoX/M8Nmes61mR2JXhMY+Ib?=
+ =?us-ascii?Q?Asy2XHnpeUxGBX6jC9iRM0mMSwpaHroan7p7uEb4BLy+h1XmJhiEOC1o8G9k?=
+ =?us-ascii?Q?3DvyQGu/H/bQWWZvgy13JySWFkrTC2mVWNi323Ri9kEqx1sfQcmn9mLGnTYy?=
+ =?us-ascii?Q?xsGdauDLMuX/UxhX1dtq9n8dmFe571KXqtp4ryUAw7Nn2eEmHINrygEwZXE5?=
+ =?us-ascii?Q?UErkGf1M5q/MFX+DI1+38HHDT/t37AvVD6Un+4zBS/DCB1VUWkJjIJQy4HzD?=
+ =?us-ascii?Q?0Kr1ul+ckzSRB4H5C8NPzcoMO8svNe00Vjsa8RQUU1whIP1XTBK+rn+LUMbD?=
+ =?us-ascii?Q?6ZbrBIg9MBeCcWRyCkzh+tBvwWk8n8zVTY5+3RNEGP2OOhDAsfsa+NQOgASY?=
+ =?us-ascii?Q?emKV9orIMxjY91Hfj8zBoXpEcai7JDwSL60AMeaEIUTSWzuu+ykZiWKYmm5/?=
+ =?us-ascii?Q?7LhUDNGA366A2m+8ZhwTCdLMAp7jq9vo1WkieyJ8z3bNl/4NpMtO1StoC6sP?=
+ =?us-ascii?Q?Y8FI72AvcRRvGoOZyZQEpUG14A9rPQHYESZw4C+qW47obSSBFlJ9JEc29rbe?=
+ =?us-ascii?Q?OWdORU8gA7+A6KD8aBsR604yWG4mMoZrGJc2rTvuVRJyGkFFBTVSMOCSp9LB?=
+ =?us-ascii?Q?3f0QP6MaWHc5lk2GEgHCbA/FB/7uJSt8j5CMHJWJPwy78icYSa6A5jN3HyoW?=
+ =?us-ascii?Q?+5Qomtvh0+5fm/SVA6sGSkbDjZwvapJeVw+0CW89PV8l2r4NdL0T+0dD7m9j?=
+ =?us-ascii?Q?k70tM/DXyzhBheEoyfCSzJSbugFeITtYoiRveO/DFaqEMmJ65YTC+kvL+wBw?=
+ =?us-ascii?Q?WAISpBqTp/4n2aW9yDZFq6DM0pkVUOTzZY/lsNZkBNzluLhXulwwzjJZJzhp?=
+ =?us-ascii?Q?Dk0FxQTBN7C3pJdDNaxmprjofFfC8+36xeO6y5vtKE4hFs63GCStg74XjyC3?=
+ =?us-ascii?Q?fkCdb+78lRITnobXmM72Hcx1AJQ/dpEpTn3ZbHgave7FHIM+Ay5Ab76cE2EH?=
+ =?us-ascii?Q?t1wew9ITnM5WIF1FkK33uJMLXVvM5M4OpBprxrVe4x192z13W3x5tkzzZLjm?=
+ =?us-ascii?Q?ADCPDGfFQrsM0w0jGCtAYGWVFGEnez7Nv04iCB/37S2ZMnWInluadGj6QwRq?=
+ =?us-ascii?Q?EJg+bpX4RrPNJ1qzbdp0tkTrBsoznH4N4Tl+QBnr1zRJ6Cr6GmfF+A=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013)(34020700016)(921020)(12100799063);DIR:OUT;SFP:1501;
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(1800799024)(34020700016)(36860700013)(921020)(12100799063);DIR:OUT;SFP:1501;
 X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2024 14:57:35.5815
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2024 14:57:36.9153
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a0af5bf-fc57-43da-42b0-08dc9b70797c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2eea6028-66b1-49c0-6637-08dc9b707a45
 X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU2PEPF00028D0E.eurprd03.prod.outlook.com
+	DU2PEPF00028D11.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR07MB9985
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR07MB10219
 
-The 'phy' parameter supplied to lan9303_phy_read/_write was sometimes a
-DSA port number and sometimes a PHY address. This isn't a problem as
-long as they are equal.  But if the external phy_addr_sel_strap pin is
-wired to 'high', the PHY addresses change from 0-1-2 to 1-2-3 (CPU,
-slave0, slave1).  In this case, lan9303_phy_read/_write must translate
-between DSA port numbers and the corresponding PHY address.
+Name it 'addr' instead of 'port' or 'phy'.
 
-Fixes: a1292595e006 ("net: dsa: add new DSA switch driver for the SMSC-LAN9303")
 Signed-off-by: Christian Eggers <ceggers@arri.de>
 ---
- drivers/net/dsa/lan9303-core.c | 23 ++++++++++-------------
- 1 file changed, 10 insertions(+), 13 deletions(-)
+ drivers/net/dsa/lan9303_mdio.c | 8 ++++----
+ include/linux/dsa/lan9303.h    | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-index 02f07b870f10..268949939636 100644
---- a/drivers/net/dsa/lan9303-core.c
-+++ b/drivers/net/dsa/lan9303-core.c
-@@ -1047,31 +1047,31 @@ static int lan9303_get_sset_count(struct dsa_switch *ds, int port, int sset)
- 	return ARRAY_SIZE(lan9303_mib);
+diff --git a/drivers/net/dsa/lan9303_mdio.c b/drivers/net/dsa/lan9303_mdio.c
+index 167a86f39f27..0ac4857e5ee8 100644
+--- a/drivers/net/dsa/lan9303_mdio.c
++++ b/drivers/net/dsa/lan9303_mdio.c
+@@ -58,19 +58,19 @@ static int lan9303_mdio_read(void *ctx, uint32_t reg, uint32_t *val)
+ 	return 0;
  }
  
--static int lan9303_phy_read(struct dsa_switch *ds, int phy, int regnum)
-+static int lan9303_phy_read(struct dsa_switch *ds, int port, int regnum)
+-static int lan9303_mdio_phy_write(struct lan9303 *chip, int phy, int reg,
++static int lan9303_mdio_phy_write(struct lan9303 *chip, int addr, int reg,
+ 				  u16 val)
  {
- 	struct lan9303 *chip = ds->priv;
- 	int phy_base = chip->phy_addr_base;
+ 	struct lan9303_mdio *sw_dev = dev_get_drvdata(chip->dev);
  
--	if (phy == phy_base)
-+	if (port == 0)
- 		return lan9303_virt_phy_reg_read(chip, regnum);
--	if (phy > phy_base + 2)
-+	if (port > 2)
- 		return -ENODEV;
- 
--	return chip->ops->phy_read(chip, phy, regnum);
-+	return chip->ops->phy_read(chip, phy_base + port, regnum);
+-	return mdiobus_write_nested(sw_dev->device->bus, phy, reg, val);
++	return mdiobus_write_nested(sw_dev->device->bus, addr, reg, val);
  }
  
--static int lan9303_phy_write(struct dsa_switch *ds, int phy, int regnum,
-+static int lan9303_phy_write(struct dsa_switch *ds, int port, int regnum,
- 			     u16 val)
+-static int lan9303_mdio_phy_read(struct lan9303 *chip, int phy,  int reg)
++static int lan9303_mdio_phy_read(struct lan9303 *chip, int addr, int reg)
  {
- 	struct lan9303 *chip = ds->priv;
- 	int phy_base = chip->phy_addr_base;
+ 	struct lan9303_mdio *sw_dev = dev_get_drvdata(chip->dev);
  
--	if (phy == phy_base)
-+	if (port == 0)
- 		return lan9303_virt_phy_reg_write(chip, regnum, val);
--	if (phy > phy_base + 2)
-+	if (port > 2)
- 		return -ENODEV;
- 
--	return chip->ops->phy_write(chip, phy, regnum, val);
-+	return chip->ops->phy_write(chip, phy_base + port, regnum, val);
+-	return mdiobus_read_nested(sw_dev->device->bus, phy, reg);
++	return mdiobus_read_nested(sw_dev->device->bus, addr, reg);
  }
  
- static int lan9303_port_enable(struct dsa_switch *ds, int port,
-@@ -1099,7 +1099,7 @@ static void lan9303_port_disable(struct dsa_switch *ds, int port)
- 	vlan_vid_del(dsa_port_to_conduit(dp), htons(ETH_P_8021Q), port);
+ static const struct lan9303_phy_ops lan9303_mdio_phy_ops = {
+diff --git a/include/linux/dsa/lan9303.h b/include/linux/dsa/lan9303.h
+index b4f22112ba75..3ce7cbcc37a3 100644
+--- a/include/linux/dsa/lan9303.h
++++ b/include/linux/dsa/lan9303.h
+@@ -5,8 +5,8 @@ struct lan9303;
  
- 	lan9303_disable_processing_port(chip, port);
--	lan9303_phy_write(ds, chip->phy_addr_base + port, MII_BMCR, BMCR_PDOWN);
-+	lan9303_phy_write(ds, port, MII_BMCR, BMCR_PDOWN);
- }
+ struct lan9303_phy_ops {
+ 	/* PHY 1 and 2 access*/
+-	int	(*phy_read)(struct lan9303 *chip, int port, int regnum);
+-	int	(*phy_write)(struct lan9303 *chip, int port,
++	int	(*phy_read)(struct lan9303 *chip, int addr, int regnum);
++	int	(*phy_write)(struct lan9303 *chip, int addr,
+ 			     int regnum, u16 val);
+ };
  
- static int lan9303_port_bridge_join(struct dsa_switch *ds, int port,
-@@ -1374,8 +1374,6 @@ static const struct dsa_switch_ops lan9303_switch_ops = {
- 
- static int lan9303_register_switch(struct lan9303 *chip)
- {
--	int base;
--
- 	chip->ds = devm_kzalloc(chip->dev, sizeof(*chip->ds), GFP_KERNEL);
- 	if (!chip->ds)
- 		return -ENOMEM;
-@@ -1385,8 +1383,7 @@ static int lan9303_register_switch(struct lan9303 *chip)
- 	chip->ds->priv = chip;
- 	chip->ds->ops = &lan9303_switch_ops;
- 	chip->ds->phylink_mac_ops = &lan9303_phylink_mac_ops;
--	base = chip->phy_addr_base;
--	chip->ds->phys_mii_mask = GENMASK(LAN9303_NUM_PORTS - 1 + base, base);
-+	chip->ds->phys_mii_mask = GENMASK(LAN9303_NUM_PORTS - 1, 0);
- 
- 	return dsa_register_switch(chip->ds);
- }
 -- 
 2.43.0
 
