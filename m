@@ -1,155 +1,130 @@
-Return-Path: <netdev+bounces-109018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD18D9268A1
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:51:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1389268A8
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D6DF1F210DC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:51:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1CA91C21952
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DCDE187570;
-	Wed,  3 Jul 2024 18:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9B8188CA5;
+	Wed,  3 Jul 2024 18:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="pcseMG5l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zlmbb+dJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9543217DA02;
-	Wed,  3 Jul 2024 18:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAD6134409
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 18:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720032703; cv=none; b=AvrOUdYIQK8IsAnIkZM7j8+somlGIrf6PVi7//nJGb57SjdBDEbBf169YtdNLprvQMEgDmfZrkLisB6PNHrCvXiun7eKy0gz/fApds6ENdJh888RHnOSnhqyLQxH4RAbSQIoOeQvTb/u+EuvZ1Utgd02PWLSpT7W8cxHO1bK8N4=
+	t=1720032995; cv=none; b=pXmyu3uGHvCXetJELMiYzBQWFYPPQwXo+N8dcBO881Egs0/pP4SxVu6DCcxCsKiMSbnJRECc1Gh455eDKnbZyzPB0S77KRruVdN2DLLpjS5cZ5Nyh2qa6ORkEZowdebRr5QmVO5sx9k5Ukb9LfUtkjsELvhNzipBOu32gQ2wmuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720032703; c=relaxed/simple;
-	bh=usyYEl6aoJBeL0nIMgMejoTFHIpo52vrsasnARDQLqk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d82hd7OZ/HTGhnM0se3NNhqNLhv+X9ev//Sr2qIL8iPIPFtxi6G0IVSGxzisTlr2YIskXJ/OUQwGkbeqQiC7jLevLF6yu9mZ3Fop/E2+zkGbR8x+AtXYtPoQeUzUgy38NxQ/FApbjiW9OM7OHqAW4FPrL1DBMB5w+iVuj/kuW4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=pcseMG5l; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:ccf0:7211:42ee:b851])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 7392E7D57F;
-	Wed,  3 Jul 2024 19:51:40 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1720032700; bh=usyYEl6aoJBeL0nIMgMejoTFHIpo52vrsasnARDQLqk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09linux-kernel@vger.kernel.org,=
-	 0D=0A=09pabeni@redhat.com,=0D=0A=09syzkaller-bugs@googlegroups.com
-	 ,=0D=0A=09tparkin@katalix.com,=0D=0A=09James=20Chapman=20<jchapman
-	 @katalix.com>,=0D=0A=09syzbot+b471b7c936301a59745b@syzkaller.appsp
-	 otmail.com,=0D=0A=09syzbot+c041b4ce3a6dfd1e63e2@syzkaller.appspotm
-	 ail.com|Subject:=20[PATCH=20net-next]=20l2tp:=20fix=20possible=20U
-	 AF=20when=20cleaning=20up=20tunnels|Date:=20Wed,=20=203=20Jul=2020
-	 24=2019:51:08=20+0100|Message-Id:=20<20240703185108.1752795-1-jcha
-	 pman@katalix.com>|MIME-Version:=201.0;
-	b=pcseMG5lZi6Io+6cggrcGvoa4U9md33SwY+6jB9Jy6AG4uX7D0oD6pvh9PUU0rAgO
-	 O6miGQbKGjbWlxg39AVP9qMppFZzVvzRxqMzePXOY6f5hkuouOtwiUxEE3lizlGvs7
-	 JwfUYWCrC6dZ0kXHG+QYWLEjQ6UxAAUWR4J6oedYhUtatKWIamTLD51hwxcNk1WZGJ
-	 7QLBF98NlqbI4BO6D4W2qsJHXW0jlGCML79DglsVrn7qE6SNck3r7fi4Cbjfkje0nw
-	 xVLMcTJvTP7RuOBOdy0954FuM9zzuRD8SG56gKTBG/d43YYIR8DAVsjCHqNvD+xKYe
-	 kRtjOyNxLBfug==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	tparkin@katalix.com,
-	James Chapman <jchapman@katalix.com>,
-	syzbot+b471b7c936301a59745b@syzkaller.appspotmail.com,
-	syzbot+c041b4ce3a6dfd1e63e2@syzkaller.appspotmail.com
-Subject: [PATCH net-next] l2tp: fix possible UAF when cleaning up tunnels
-Date: Wed,  3 Jul 2024 19:51:08 +0100
-Message-Id: <20240703185108.1752795-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1720032995; c=relaxed/simple;
+	bh=1Wwa5E9FFH4dSDXlcmk6CY/spc9LJyFRMkHxH2fs90s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kl3K8okj813+4n740zmYsXMb4kzP5kg4tzxDmjB7jf339OQNpo162ou5mJPJJgE961B4xHVIbuna3D7E9+mmpI7Q6T49zCoskk+Ggt9SLeKQ1NQu6t+/ndvvk7VoNDXzyGt+geBVkV9J/DCEg14rn5Augwl9ntXuBb1LBklLlM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zlmbb+dJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iDlgRTQ2fbT7OyGBiQgLihKbeuSctOBWymvryNwt/Q4=; b=zlmbb+dJufzfJ17W5ut2orcj1V
+	DFys82GwAxQfllIWmr15w0VPQAl113UFdRnB9SLDBhwjsXgVaIxTs+p/vrxvMjA32z6lM6Jn9wpeR
+	L/cyDvgEpZT6hqONbDyebcnRl8Ad4/SMpah4Oq3KWqygKIMBn0+cc/mpWqrkFp2fzMWigmNzle+Uf
+	qgokU9XAAnDVCLF06hq/YatYtVGuw4Wz0XNfecpYojPTabDhct6OrGE7EYd6ahwccvurLF5GK3S9u
+	D2h45FwSsJCymd0qyO1A4S9PXK29Tsot0TLW1plSr9JlhD3bxMkiiLwop+u9VC77mrDqmG3KbKgiN
+	/qJOWvVw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41260)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sP59E-00062h-15;
+	Wed, 03 Jul 2024 19:56:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sP59E-00038p-24; Wed, 03 Jul 2024 19:56:08 +0100
+Date: Wed, 3 Jul 2024 19:56:07 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, si.yanteng@linux.dev,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
+ network speed to 1000.
+Message-ID: <ZoWex6T0QbRBmDFE@shell.armlinux.org.uk>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
+ <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+ <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+ <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
+ <gndedhwq6q6ou56nxnld6irkv4curb7mql4sy2i4wx5qnqksoh@6kpyuozs656l>
+ <ZoQX1bqtJI2Zd9qH@shell.armlinux.org.uk>
+ <hdqpsuq7n4aalav7jtzttfksw5ct36alowsc65e72armjt2h67@shph7z32rbc6>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <hdqpsuq7n4aalav7jtzttfksw5ct36alowsc65e72armjt2h67@shph7z32rbc6>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-syzbot reported a UAF caused by a race when the L2TP work queue closes a
-tunnel at the same time as a userspace thread closes a session in that
-tunnel.
+On Wed, Jul 03, 2024 at 07:56:31PM +0300, Serge Semin wrote:
+> One another statement in IEEE 802.3 C40 that implies the AN being
+> mandatory is that 1000BASE-T PHYs determine their MASTER or SLAVE part
+> during the Auto-Negotiation process. The part determines the clock
+> source utilized by the PHYs: "The MASTER PHY uses a local clock to
+> determine the timing of transmitter operations. The SLAVE PHY recovers
+> the clock from the received signal and uses it to determine the timing
+> of transmitter operations, i.e.," (40.1.3 Operation of 1000BASE-T)
+> 
+> So I guess that without Auto-negotiation the link just won't be
+> established due to the clocks missconfiguration.
 
-Tunnel cleanup is handled by a work queue which iterates through the
-sessions contained within a tunnel, and closes them in turn.
+Oh damn, I did a reply, then cocked up sending it (lost it instead!)
+So, this is going to be a brief response now.
 
-Meanwhile, a userspace thread may arbitrarily close a session via
-either netlink command or by closing the pppox socket in the case of
-l2tp_ppp.
+It seems AN is basically required for 1000base-T.
 
-The race condition may occur when l2tp_tunnel_closeall walks the list
-of sessions in the tunnel and deletes each one.  Currently this is
-implemented using list_for_each_safe, but because the list spinlock is
-dropped in the loop body it's possible for other threads to manipulate
-the list during list_for_each_safe's list walk.  This can lead to the
-list iterator being corrupted, leading to list_for_each_safe spinning.
-One sequence of events which may lead to this is as follows:
+> > Alternatively, maybe just implement the Marvell Alaska solution
+> > to this problem (if the user attempts to disable AN on a PHY
+> > supporting only base-T at gigabit speeds, then we silently force
+> > AN with SPEED_1000 and DUPLEX_FULL.
+> 
+> I am not that much knowledgable about the PHY-lib and PHY-link
+> internals, but if we get to establish that the standard indeed
+> implies the AN being mandatory, then this sounds like the least
+> harmful solution from the user-space point of view.
 
- * A tunnel is created, containing two sessions A and B.
- * A thread closes the tunnel, triggering tunnel cleanup via the work
-   queue.
- * l2tp_tunnel_closeall runs in the context of the work queue.  It
-   removes session A from the tunnel session list, then drops the list
-   lock.  At this point the list_for_each_safe temporary variable is
-   pointing to the other session on the list, which is session B, and
-   the list can be manipulated by other threads since the list lock has
-   been released.
- * Userspace closes session B, which removes the session from its parent
-   tunnel via l2tp_session_delete.  Since l2tp_tunnel_closeall has
-   released the tunnel list lock, l2tp_session_delete is able to call
-   list_del_init on the session B list node.
- * Back on the work queue, l2tp_tunnel_closeall resumes execution and
-   will now spin forever on the same list entry until the underlying
-   session structure is freed, at which point UAF occurs.
+The Atheros PHYs are another PHY where we should not be disabling
+AN when wishing to use 1000base-T (so says the datasheet - I did
+quote it in my original reply but lost that...)
 
-The solution is to iterate over the tunnel's session list using
-list_first_entry_not_null to avoid the possibility of the list
-iterator pointing at a list item which may be removed during the walk.
+As has already been mentioned, Marvell Alaska takes an interesting
+approach - when BMCR AN enable is cleared but speed is forced to
+1000, it internally keeps AN enabled and advertises the appropriate
+1G speed + duplex capability bit depending on the BMCR duplex bit.
 
-Reported-by: syzbot+b471b7c936301a59745b@syzkaller.appspotmail.com
-Reported-by: syzbot+c041b4ce3a6dfd1e63e2@syzkaller.appspotmail.com
-Fixes: d18d3f0a24f ("l2tp: replace hlist with simple list for per-tunnel session list")
+Rather than erroring out, I think it may be better to just adopt
+the Marvell solution to this problem to give consistent behaviour
+across all PHYs.
 
-Signed-off-by: James Chapman <jchapman@katalix.com>
-Signed-off-by: Tom Parkin <tparkin@katalix.com>
----
- net/l2tp/l2tp_core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 64f446f0930b..afa180b7b428 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1290,13 +1290,14 @@ static void l2tp_session_unhash(struct l2tp_session *session)
- static void l2tp_tunnel_closeall(struct l2tp_tunnel *tunnel)
- {
- 	struct l2tp_session *session;
--	struct list_head *pos;
--	struct list_head *tmp;
- 
- 	spin_lock_bh(&tunnel->list_lock);
- 	tunnel->acpt_newsess = false;
--	list_for_each_safe(pos, tmp, &tunnel->session_list) {
--		session = list_entry(pos, struct l2tp_session, list);
-+	for (;;) {
-+		session = list_first_entry_or_null(&tunnel->session_list,
-+						   struct l2tp_session, list);
-+		if (!session)
-+			break;
- 		list_del_init(&session->list);
- 		spin_unlock_bh(&tunnel->list_lock);
- 		l2tp_session_delete(session);
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
