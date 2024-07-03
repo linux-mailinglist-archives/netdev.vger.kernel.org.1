@@ -1,174 +1,265 @@
-Return-Path: <netdev+bounces-108951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C2F92657C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:01:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 459B9926584
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 362221C2357F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:01:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA669B25E99
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 16:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E0318131D;
-	Wed,  3 Jul 2024 16:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CED17DA06;
+	Wed,  3 Jul 2024 16:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="DN2UJXz9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IuEQC/lz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15E917A589;
-	Wed,  3 Jul 2024 16:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B7817C7C
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 16:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720022477; cv=none; b=VZbX3XNqN+IIpQFHyD4sXcriI/0XXotuGCFk0n6QzghkAoNkOMIyabc4pNWUDmpfM7HgPXkKIqScBMa9G00zm4Xp0iTh890u7m5s9QgILVXXmdxBMXYamBk47Hr700/ES55Unn81lugZF60uqTXofL813ydcKBHpe57Bo7b5yC4=
+	t=1720022579; cv=none; b=Xizur6zPdBvqXJp0SC3fv8nwjjYX1eqphj2a+s6bOO2yW3I0S1bX02am4BnVzMlrnQacinQ+mG/kV/+y/JW2nHnrixDYRTCLU38Uw65N7VbMrKD+gBO4s1bmj4UcBe4a1X6qA3Kz4HeBptQMNfFRx9PJyyrNRgwm5BXdakSjM6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720022477; c=relaxed/simple;
-	bh=ZR9BK/GWJEq7gHd/0bbA64bMZiRioRHZNtKi3Saf/YY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JEQiHREwFGHZ2Hp+kg9LCtmiCwQL4x+e+7DqABh0yPZAq75NoxDDwYoLsMbzEoNAu+Fxp9822DXeukGfgzqfykJS8h9iDDk+V/CaRCDyjfMEaZH5SPP4oYup5QK2K7+Zae9YwVd7VF4LWboj7QxggMVqTkNjMxhhAa7jdN9s12g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b=DN2UJXz9; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1720022460; x=1720627260; i=rwahl@gmx.de;
-	bh=3hwJTNAzBcv9p6zS7trpMax+3zGjHvUT11S8vrZthl8=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=DN2UJXz9TFra3ZPXbPaFHCr64eBC5K3EDOoH10Dd3ZHCp4L8wFCGUzKf1KNK4A3b
-	 m7vu9pQVjf3UlBK6cOxZrtSnj8x+4s7ADOulVwTJoUi/sAiz9ZtK8w2viD4rjhrut
-	 D9i3Y6uNhiwycdnixMl4s7LJpkZDm8cms93qayAodIiAyjgwWrafVLjoFOFdBCyM0
-	 Zm/T1urmGMFG4LTvI6aylFLje7kIpIx+M95k2gfNSC0TUp7CxFJf7utD9sddC+S7D
-	 RTtS4r4BpcpCtCkkZ+eXUrbOGkM6Qw8JMyOxy5YV0Q23904i9eTvSgAlON6sTlAZp
-	 ZdXwRjXoUu/17pJ2dg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.148.180]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MEFzr-1sWQGH2qQP-009tk4; Wed, 03
- Jul 2024 18:01:00 +0200
-From: Ronald Wahl <rwahl@gmx.de>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] ks8851: Fix deadlock with the SPI chip variant
-Date: Wed,  3 Jul 2024 18:00:53 +0200
-Message-ID: <20240703160053.9892-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1720022579; c=relaxed/simple;
+	bh=6L9NY57jmpj8sQ+NfzV23lGrMZsexvRx3xhnQCcLgdE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vw9r8dZ5OZ/giqzFwjm4zmQuvFOVxDXXbVBs1Ar6hJvG/HvlaVqZorLBAaM7n0hOd/d9THfyZDgaTWFPm3trcg4UL03dm1kpVtXZCCUo31hIG907r77pnJ/O5Jc0kXjJuyInKsxiIhwvXmx+jFVENo/yyV1L8MU/TG8wXV/Esqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IuEQC/lz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720022575;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2cZYZWG6Pe+QgIPXlNlnU44T2JexrvRdPhkV7V2BNno=;
+	b=IuEQC/lz7ST7g8qbTy0zV+g/G3Ph+wExzoPerBeQvzOPC+dy9LLbDbBwJmhVEFASscJZyx
+	xgEHHxAxqwNy8At97UxukIg3q5upIqtfEqzf2pU6in/xSynWliZhL/WqF4jgPwbnkilPyg
+	gjKVRVrO+Fd64h5zg9kgf5l+MZrhLtU=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-494-eLwK-W0ePtC12raDKEMcCg-1; Wed, 03 Jul 2024 12:02:42 -0400
+X-MC-Unique: eLwK-W0ePtC12raDKEMcCg-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-6501bac2d6aso9199227b3.0
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 09:02:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720022555; x=1720627355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2cZYZWG6Pe+QgIPXlNlnU44T2JexrvRdPhkV7V2BNno=;
+        b=KwpdfYp1/iPG3d+JFiO59XDKVySFoLyZFDkEml8VnQ2Us36SE2OS3g8/2egxR8kvC2
+         22y9RXk1jelyuEksXo3e0QSXM6kg6gSxxW+O1aLmEevW5kHlo+xkrzsxAv4Ugr6zJNnj
+         dO7WT5yTzVYZyFN0Jr8gz8HGG817n92EAOVZEmfstglmadsGz1LuADq9J3LME7gvsObN
+         uma/0V/Qya3442v7QIzkqz8zoxqhZzYyzhnGYP4hxTTR7vhlSzwsBGZpm0A9UFQd/FE0
+         G4lt9aYmwiWc9i5SFJxdbsyrenklUKrX8PMgHiQdbDcQpw9c6EYkdyFrtr7RTqRe+Zil
+         117w==
+X-Forwarded-Encrypted: i=1; AJvYcCU0kF62ma2hg6xPZ0+tZlHBkFBKoPsTgRV07RNhCRZMELB2qGScnb1yFzSPfe2gm9hhyYvU7uXAjBMBV43C5fPl7nhR/iUK
+X-Gm-Message-State: AOJu0Yy4gY+h/cLYsAA38SYAXt09AunLOXSVd1MkgIV4rZ+X08bOEMfV
+	kwBfcInJOHzRcuX+ju7qaGgLEwPzg2T2tH19v04vfapiUItHeVPMcr2LkUI9uPwDzrDtVmp0Wu4
+	iTLkGfD/3vhcx1Mfxqlrc3NYu7cPHvN+nNOWAykT6U6sCAgxKZUGj+thjWipOsFiTk3WcVHcc2C
+	IjjIhC75wid8q3jxG9eFxp1uqLO5J1
+X-Received: by 2002:a05:690c:680f:b0:651:ee07:76c with SMTP id 00721157ae682-651ee07079bmr10340247b3.15.1720022555413;
+        Wed, 03 Jul 2024 09:02:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJEOD0j6Fdz3pMKQ3JW6XMwPwyu8ibTc12rO5h2L/BNg/OImtMoNq9K9CCxxA4ZFtP+3+hN3kt2OxZI51fJeQ=
+X-Received: by 2002:a05:690c:680f:b0:651:ee07:76c with SMTP id
+ 00721157ae682-651ee07079bmr10339557b3.15.1720022554801; Wed, 03 Jul 2024
+ 09:02:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com>
+ <20240617-stage-vdpa-vq-precreate-v1-20-8c0483f0ca2a@nvidia.com>
+ <CAJaqyWd3yiPUMaGEmzgHF-8u+HcqjUxBNB3=Xg6Lon-zYNVCow@mail.gmail.com> <308f90bb505d12e899e3f4515c4abc93c39cfbd5.camel@nvidia.com>
+In-Reply-To: <308f90bb505d12e899e3f4515c4abc93c39cfbd5.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 3 Jul 2024 18:01:58 +0200
+Message-ID: <CAJaqyWeHDD0drkAZQqEP_ZfbUPscOmM7T8zXRie5Q14nfAV0sg@mail.gmail.com>
+Subject: Re: [PATCH vhost 20/23] vdpa/mlx5: Pre-create hardware VQs at vdpa
+ .dev_add time
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, Tariq Toukan <tariqt@nvidia.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"mst@redhat.com" <mst@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Hb8Cg3leN6wUrtRM1p9dTOgOlPf4jnME98EIaURLd77AGXedIsC
- Q4zLoEmWcfq33vr6sSCvry63lk99Cb/46Akx8j26I2HM8fglooKU28z21/yiWWSPUdTLCvR
- hNIbMo8mknz+2zT7iR1oVQZXlMq2G/ZokTU6Lj3dS2YwXkizKYqnbCIr96CJUMEDAusUqiS
- 7rHCxbbTUGLUARl7O0vFg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:C08WSY/PR1A=;mpCj2jWlSfR3Xb3SUFfkxH/H3VH
- j00I0TCIA+jHQtHRq3PTRTGVJ3x1QqY96f17bJnODrInew63DWU7obcrw2Q2Mz2jqGIezH8+/
- zIQ5cIPW4sXmetX4YxaAGHsjBkKy4cIEhH3nuOpwQhb+WHGkeGoo3CNPWxYOd2u6Jk0YgmgDC
- nAY8E5gdrqYukLvXLD9yo9Xl0v2qMB6UpdBUDwaN8dULZ4zyXD2HyrXW+hCFq5h40o3UnMNoQ
- Jcx06ABL054ts4F1fXnAK1jVYC9rTII650tBo3zQ9dWkULKEwqwvGwcDScrX56iFpsPGaW/qu
- gp8WKDWVQxqqP4rESdC67R4sDM6nZkmr/96NEhi7zYXtqwcNtgz0lc1AhE6J3Eo/1fjhbQ0Y+
- KItPQ6qlgq6EQWpDW1jE+ZerzPSCkcuF9m24owjrwnASABUniaygbwlZfRcxa/5GGLFyxCrQm
- HGcIoMa7vsIqWnojzAoOcdU6D/1TbeGvw0Rgo4dsUzmuDolZykqnVxCjtZhJBw96NiS/NW3kQ
- oQ0cvNvOQ57QnpeCP7hiAIEDct+JIV34fpvE2JKO0KBJTKdoY2BsNFcnKAYfl0udWSJOUfqOe
- 1uT0SiYfQ+y3GaCvoaVV/DEDgb6fcubumW4aXXVRHCjnRBpGoRFM2+GnabAZxQm43b51kPsw8
- x/P5heQDcQ+lkOWOTGNSRI4y0OPlCVncIUQ4pg2h0nE7nIKrvrkfTbTYOs7jsoscRUPiK0HMP
- Bo4XrTRZ+lF+IpWTuG27c9nuDICx4t6kZdtveySgKOKfv3kIQe8XkAvp+gBceAKTDPgrFWe2Z
- cTykTFYgU6UciwC02KLvGe3NfdtrRbRAPGISIMMLlOf/0=
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+On Wed, Jun 26, 2024 at 11:27=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> On Wed, 2024-06-19 at 17:54 +0200, Eugenio Perez Martin wrote:
+> > On Mon, Jun 17, 2024 at 5:09=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> > >
+> > > Currently, hardware VQs are created right when the vdpa device gets i=
+nto
+> > > DRIVER_OK state. That is easier because most of the VQ state is known=
+ by
+> > > then.
+> > >
+> > > This patch switches to creating all VQs and their associated resource=
+s
+> > > at device creation time. The motivation is to reduce the vdpa device
+> > > live migration downtime by moving the expensive operation of creating
+> > > all the hardware VQs and their associated resources out of downtime o=
+n
+> > > the destination VM.
+> > >
+> > > The VQs are now created in a blank state. The VQ configuration will
+> > > happen later, on DRIVER_OK. Then the configuration will be applied wh=
+en
+> > > the VQs are moved to the Ready state.
+> > >
+> > > When .set_vq_ready() is called on a VQ before DRIVER_OK, special care=
+ is
+> > > needed: now that the VQ is already created a resume_vq() will be
+> > > triggered too early when no mr has been configured yet. Skip calling
+> > > resume_vq() in this case, let it be handled during DRIVER_OK.
+> > >
+> > > For virtio-vdpa, the device configuration is done earlier during
+> > > .vdpa_dev_add() by vdpa_register_device(). Avoid calling
+> > > setup_vq_resources() a second time in that case.
+> > >
+> >
+> > I guess this happens if virtio_vdpa is already loaded, but I cannot
+> > see how this is different here. Apart from the IOTLB, what else does
+> > it change from the mlx5_vdpa POV?
+> >
+> I don't understand your question, could you rephrase or provide more cont=
+ext
+> please?
+>
 
-When SMP is enabled and spinlocks are actually functional then there is
-a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
-and ks8851_irq:
+My main point is that the vdpa parent driver should not be able to
+tell the difference between vhost_vdpa and virtio_vdpa. The only
+difference I can think of is because of the vhost IOTLB handling.
 
-    watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
-    call trace:
-      queued_spin_lock_slowpath+0x100/0x284
-      do_raw_spin_lock+0x34/0x44
-      ks8851_start_xmit_spi+0x30/0xb8
-      ks8851_start_xmit+0x14/0x20
-      netdev_start_xmit+0x40/0x6c
-      dev_hard_start_xmit+0x6c/0xbc
-      sch_direct_xmit+0xa4/0x22c
-      __qdisc_run+0x138/0x3fc
-      qdisc_run+0x24/0x3c
-      net_tx_action+0xf8/0x130
-      handle_softirqs+0x1ac/0x1f0
-      __do_softirq+0x14/0x20
-      ____do_softirq+0x10/0x1c
-      call_on_irq_stack+0x3c/0x58
-      do_softirq_own_stack+0x1c/0x28
-      __irq_exit_rcu+0x54/0x9c
-      irq_exit_rcu+0x10/0x1c
-      el1_interrupt+0x38/0x50
-      el1h_64_irq_handler+0x18/0x24
-      el1h_64_irq+0x64/0x68
-      __netif_schedule+0x6c/0x80
-      netif_tx_wake_queue+0x38/0x48
-      ks8851_irq+0xb8/0x2c8
-      irq_thread_fn+0x2c/0x74
-      irq_thread+0x10c/0x1b0
-      kthread+0xc8/0xd8
-      ret_from_fork+0x10/0x20
+Do you also observe this behavior if you add the device with "vdpa
+add" without the virtio_vdpa module loaded, and then modprobe
+virtio_vdpa?
 
-This issue has not been identified earlier because tests were done on
-a device with SMP disabled and so spinlocks were actually NOPs.
+At least the comment should be something in the line of "If we have
+all the information to initialize the device, pre-warm it here" or
+similar.
 
-This commit moves the netif_wake_queue call outside the spinlock
-protected area.
-
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overru=
-n")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
- drivers/net/ethernet/micrel/ks8851_common.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/eth=
-ernet/micrel/ks8851_common.c
-index 6453c92f0fa7..60b959126b26 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -348,15 +348,17 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
-
- 	if (status & IRQ_TXI) {
- 		unsigned short tx_space =3D ks8851_rdreg16(ks, KS_TXMIR);
-+		bool need_wake_queue;
-
- 		netif_dbg(ks, intr, ks->netdev,
- 			  "%s: txspace %d\n", __func__, tx_space);
-
- 		spin_lock(&ks->statelock);
- 		ks->tx_space =3D tx_space;
--		if (netif_queue_stopped(ks->netdev))
--			netif_wake_queue(ks->netdev);
-+		need_wake_queue =3D netif_queue_stopped(ks->netdev);
- 		spin_unlock(&ks->statelock);
-+		if (need_wake_queue)
-+			netif_wake_queue(ks->netdev);
- 	}
-
- 	if (status & IRQ_SPIBEI) {
-=2D-
-2.45.2
+> Thanks,
+> Dragos
+>
+> > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > > ---
+> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 37 +++++++++++++++++++++++++++++=
++++-----
+> > >  1 file changed, 32 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/ne=
+t/mlx5_vnet.c
+> > > index 249b5afbe34a..b2836fd3d1dd 100644
+> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > @@ -2444,7 +2444,7 @@ static void mlx5_vdpa_set_vq_ready(struct vdpa_=
+device *vdev, u16 idx, bool ready
+> > >         mvq =3D &ndev->vqs[idx];
+> > >         if (!ready) {
+> > >                 suspend_vq(ndev, mvq);
+> > > -       } else {
+> > > +       } else if (mvdev->status & VIRTIO_CONFIG_S_DRIVER_OK) {
+> > >                 if (resume_vq(ndev, mvq))
+> > >                         ready =3D false;
+> > >         }
+> > > @@ -3078,10 +3078,18 @@ static void mlx5_vdpa_set_status(struct vdpa_=
+device *vdev, u8 status)
+> > >                                 goto err_setup;
+> > >                         }
+> > >                         register_link_notifier(ndev);
+> > > -                       err =3D setup_vq_resources(ndev, true);
+> > > -                       if (err) {
+> > > -                               mlx5_vdpa_warn(mvdev, "failed to setu=
+p driver\n");
+> > > -                               goto err_driver;
+> > > +                       if (ndev->setup) {
+> > > +                               err =3D resume_vqs(ndev);
+> > > +                               if (err) {
+> > > +                                       mlx5_vdpa_warn(mvdev, "failed=
+ to resume VQs\n");
+> > > +                                       goto err_driver;
+> > > +                               }
+> > > +                       } else {
+> > > +                               err =3D setup_vq_resources(ndev, true=
+);
+> > > +                               if (err) {
+> > > +                                       mlx5_vdpa_warn(mvdev, "failed=
+ to setup driver\n");
+> > > +                                       goto err_driver;
+> > > +                               }
+> > >                         }
+> > >                 } else {
+> > >                         mlx5_vdpa_warn(mvdev, "did not expect DRIVER_=
+OK to be cleared\n");
+> > > @@ -3142,6 +3150,7 @@ static int mlx5_vdpa_compat_reset(struct vdpa_d=
+evice *vdev, u32 flags)
+> > >                 if (mlx5_vdpa_create_dma_mr(mvdev))
+> > >                         mlx5_vdpa_warn(mvdev, "create MR failed\n");
+> > >         }
+> > > +       setup_vq_resources(ndev, false);
+> > >         up_write(&ndev->reslock);
+> > >
+> > >         return 0;
+> > > @@ -3836,8 +3845,21 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_=
+dev *v_mdev, const char *name,
+> > >                 goto err_reg;
+> > >
+> > >         mgtdev->ndev =3D ndev;
+> > > +
+> > > +       /* For virtio-vdpa, the device was set up during device regis=
+ter. */
+> > > +       if (ndev->setup)
+> > > +               return 0;
+> > > +
+> > > +       down_write(&ndev->reslock);
+> > > +       err =3D setup_vq_resources(ndev, false);
+> > > +       up_write(&ndev->reslock);
+> > > +       if (err)
+> > > +               goto err_setup_vq_res;
+> > > +
+> > >         return 0;
+> > >
+> > > +err_setup_vq_res:
+> > > +       _vdpa_unregister_device(&mvdev->vdev);
+> > >  err_reg:
+> > >         destroy_workqueue(mvdev->wq);
+> > >  err_res2:
+> > > @@ -3863,6 +3885,11 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt=
+_dev *v_mdev, struct vdpa_device *
+> > >
+> > >         unregister_link_notifier(ndev);
+> > >         _vdpa_unregister_device(dev);
+> > > +
+> > > +       down_write(&ndev->reslock);
+> > > +       teardown_vq_resources(ndev);
+> > > +       up_write(&ndev->reslock);
+> > > +
+> > >         wq =3D mvdev->wq;
+> > >         mvdev->wq =3D NULL;
+> > >         destroy_workqueue(wq);
+> > >
+> > > --
+> > > 2.45.1
+> > >
+> >
+>
 
 
