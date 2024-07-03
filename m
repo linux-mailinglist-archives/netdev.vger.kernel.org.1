@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-109059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C678926BED
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:50:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4EDA926BEF
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7B491F22B23
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91EC1C21C5B
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFAF1946B4;
-	Wed,  3 Jul 2024 22:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D183194A51;
+	Wed,  3 Jul 2024 22:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="KbdUyR7U"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="b39GvHbn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC05A13C8EE
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 22:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175E21946AD
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 22:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720047023; cv=none; b=arddzglhWpqJ5hd1a7s9jDLa/GJmEMkSPnDo310jidCbgNghR9gxdNvoEhwEhNjhSyjunUpcKcHrhhf59J1cY3NpTyOVqZmok3A+aAQYxJ9rUlcPPdMvaakvEHo1i8Yf6UIX420b/D2CIO/ltMiEQL8ViHdSbFSnALEnfxQfn0U=
+	t=1720047024; cv=none; b=G9B7K/dASPOCPv/k0CNETHJphDQdMIgICy5wR2A0TN9RQoQbEr/eY9LZInQzXXmRzt7V7jncX0bbQFZ9Eqa2UnJeRNxd7qwXnlhFDLQn6kN9/LfPOAScHWJGNtLVp6Uk/ioYDEiGjAcDF1Z+qMnadONgGMcWWmzYJVYQTFZMsCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720047023; c=relaxed/simple;
-	bh=vWqf0Ku/TZihcy3YsfNgD8uDJxw8f2hi3jOdZ1h10GY=;
+	s=arc-20240116; t=1720047024; c=relaxed/simple;
+	bh=vHw3k/vnc0AvDY42UtMhOAkPoRPw+6C2GmDPX+qMpQk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RjTz4zuZ6mpPRsKN1tfxjoUyYQKV0namFnPrittB26PHQUcDhuAf5u7PY1cFj4inq+LYhCleoupIiIu+w1ZVtjj8bSuH7VsdpITKCb27+9fc4CjnRIgpkenWrme0QVfoBsi2yECuSpbjNuFoz7ui6dK+DxcVr7e8mPvL5yjd7Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=KbdUyR7U; arc=none smtp.client-ip=209.85.215.181
+	 MIME-Version; b=tRuOFU4m7nglCBZckNR45dImzHHrhKAli5xYtVvQ4Ln0MbOEnJObATXmvcqJS8hbcOw2+O45mvlspCyyR0Gkr6zCKescpoi1C00JgmqLJJTNWojhNdpRC2PfzHVhQVWVZf4UHbFDXcN36I6CXfu36QniX6SunGLCuphkq9sVcvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=b39GvHbn; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-707040e3017so4296486a12.3
-        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 15:50:21 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7594c490b04so847886a12.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 15:50:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1720047021; x=1720651821; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1720047022; x=1720651822; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4+4223rrxsI4aokhw13pQNiFvacvgaAEpuPuOjIrohQ=;
-        b=KbdUyR7UauBUKG63z6BkN3/bYtpO4h2UTrByGOVcDbumBVs6BJtFPuAUmupDrdoKNb
-         NUsCA78lOH5t2YpKouMsvFNnCgOSqQqhz5wOxNVX6n3G8m9elqmL92H/wPVcaDmNBfXm
-         w+Hu4NCoLMpTgzYydylTIff8nwhwxbY89ts9ut1MzFg4G/UmoaG/Wg+/Fow6L7/IlLb3
-         DeKuOjofKQ1Rth0tT3Dl2c4sla1uDdS338yF6ABWoXdl810tJevMKTVGFHgY4kUuRdfw
-         XtAiL9vpvDM5ogQ1U6LlJbGsI+CLxeFbGvGlA/5K5TYz6yHFPW3lgwVe58Wn27LlLbg6
-         YPRg==
+        bh=uVi8l9klyfMSdBgsqxGLAILZJt9Kry9cOTzZnzdmEuc=;
+        b=b39GvHbnoYVbJYpaaRyr00zD90YiyML7kUaBZFtYD+w0Bd+/6KDCtqEzXfZlZsst4V
+         Dmy2XJ4GwlKjxdY9PFbmyg2yNgo9qerhf75WaOr/qmvDXN7iO9BfsXKPlDomN17OfXIm
+         cWCsywHNmaZZpbDAJzDc6ZXKuZoCkdmy4hws/lPpqrT64QYdvQ8xQzFBwJmIaec6MyDQ
+         YorQTqdOxEnEpjwSM3RYB4xtKST54COnd9KZAmahULCUe0eopPmkt4ILDT7ggEEeDmpB
+         x+1uaWfSre/ZRdVEm0EjHj7YvItMH7/ujMgKLDvMUI7KHjmn9cdofKvpdPCTQlLySeCT
+         oM2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720047021; x=1720651821;
+        d=1e100.net; s=20230601; t=1720047022; x=1720651822;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4+4223rrxsI4aokhw13pQNiFvacvgaAEpuPuOjIrohQ=;
-        b=Xqt3LvpIiHsA3tBdCj3rgIL1lkyUy9foqwsG8cxFhpbS9lNTQK6TlMnMlr2ZmO0+gt
-         +3NyoG+qqgGVUl3ESpWXI2GN25eI0APWyGbiot16M43J3XXJst2Ogwh6hfBHN7ckwgUx
-         SM/MJisr5DAENIDFwNtL9NM3FneNS0rNr/UMcoD74GYNLXswvjkpMMvabR1ClxL0wceo
-         2sr7sFMka2U9KYWyjZSa2Jrd5R5zD9OXKECQXhwSXe9jgL+GvZuHFWCD9KhibwFUv+VO
-         dC7H856mjFcdd7PjHxxehlzjFM327+56s59AtTXJxibTDa0k1067BMB5F4l7B3tVpMKX
-         wr5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWqB7Iy5xeqZ8FL9rpoNzWzNYbOOi5NQIFpGF+4pZXd6IOLK2TP8vMl63kcjItWny6A5AfryOp+iAc1H6vdfRF7zowAGsy/
-X-Gm-Message-State: AOJu0Yz02y6uG112Z+jEG5arVLp6RM+oTdFXej43AnN/BMgywzbatS+h
-	u6AJpE9zbbmZWb37F+reF0NnTM0CfPAICNrZiaeFDrSARC7iQ0ngy42c+ObvgA==
-X-Google-Smtp-Source: AGHT+IHosrRUDkz8fvCnRyH6UzAXi6KAalZdOFs9yqUXqj5RAe1YOZdin8uEoC4yMDi0SosN7b8Sug==
-X-Received: by 2002:a05:6a20:c22:b0:1be:d7b1:2869 with SMTP id adf61e73a8af0-1bef624618fmr13517436637.56.1720047020994;
-        Wed, 03 Jul 2024 15:50:20 -0700 (PDT)
+        bh=uVi8l9klyfMSdBgsqxGLAILZJt9Kry9cOTzZnzdmEuc=;
+        b=rAcqC8cW5ZipAmR9CJvMme+WDVVAhsc0G4SDD6amNrh16bZtJ1Uw75+qC5AUpaPLIf
+         b9oH9S1SU7PMzHm6c9oync0wSxeETyksTgGiJq3nUeNnOjMYYqC+KGy6CGKw3G8szS3s
+         0z+KH2gQP3u7Hj3rRAitol1qNALGvdaG2UisWKSwWbUFRGXM/tpZBxWq/IAba727H6cM
+         FlbjVi9/lsN5JCGpLiYd7vk327YMoy9SGeb1XrCNco/UnoYm81AwVohkBb3e5XJbfv5J
+         kIRrQQUXgAb4CSPlbyE+seT/fAyS5mlriSEtmZ4HcQWujoe+p3joE1qtLP3lhsrA0EnB
+         S9JA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJYtVc2CzsGvMFfusms4hnPhQPRE48pZkalePI1lipWOBxul8BuPtoeu6Lax+hzUYkZUWugl270Go+z24pb7loqVVgyeWc
+X-Gm-Message-State: AOJu0YztrQsSCGbwLLvYkouBzSTilQctHMe0meMRMxBtqgloxSkZNaBf
+	ux9ASE2vgyB3UEBiO++6dGlxRAi5rh69sxf4tvrZAOZMjtpilykmCHlkv5Gh1w==
+X-Google-Smtp-Source: AGHT+IFht41aqWqSjVGLHDI9b0xQXkAqs9V2n3rCUh6l+b23xLlNxGl5rysxtTyVbIqkQCviw+yh7g==
+X-Received: by 2002:a05:6a20:a988:b0:1bd:27fd:ff56 with SMTP id adf61e73a8af0-1bef6243146mr13268444637.58.1720047022496;
+        Wed, 03 Jul 2024 15:50:22 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:af8e:aa48:5140:2b5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faf75b3407sm40242185ad.85.2024.07.03.15.50.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1faf75b3407sm40242185ad.85.2024.07.03.15.50.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 15:50:20 -0700 (PDT)
+        Wed, 03 Jul 2024 15:50:21 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -76,9 +76,9 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	felipe@sipanda.io
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [RFC net-next 02/10] skbuff: Add csum_valid_crc32 flag
-Date: Wed,  3 Jul 2024 15:48:42 -0700
-Message-Id: <20240703224850.1226697-3-tom@herbertland.com>
+Subject: [RFC net-next 03/10] sctp: Call skb_csum_crc32_unnecessary
+Date: Wed,  3 Jul 2024 15:48:43 -0700
+Message-Id: <20240703224850.1226697-4-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240703224850.1226697-1-tom@herbertland.com>
 References: <20240703224850.1226697-1-tom@herbertland.com>
@@ -90,117 +90,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When a device gets notification of that a CRC has been validated
-(either for SCTP or FCOE) then this is treated as an instance of
-checksum-unnecessary. This creates a few problems:
-
-1) It's incompatible with checksum-complete. We cannot do checksum-
-   complete with a validate CRC at the same time
-2) Checksum-unnecessary conversion may erase the indication of
-   the offloaded CRC. For instance in a SCTP/UDP packet where the
-   driver reports both the non-zero UDP checksum and the CRC
-   have been validated (i.e. csum_level is set to 1), then checksum-
-   complete conversion erases the indication and the host has to compute
-   the CRC again
-3) It just seems awkward in general to be mixing fundamentally different
-   verifications, and wouldn't be surprising if there are bugs lurking
-   in this area
-
-This patch introduces csum_valid_crc32 flag in the skbuff. This is
-used to inidicate an offloaded CRC. It's independent of the checksum
-fields.
-
-Additionally, some helper functions are added:
-   - skb_csum_crc32_unnecessary
-   - skb_set_csum_crc32_unnecessary
-   - skb_reset_csum_crc32_unnecessary
-
-Add comment about new method for offloading SCTP and FCOE RX CRC
+Instead of checking for CHECKSUM_UNNECESSARY, call
+skb_csum_crc32_unnecessary to see if the SCTP CRC has been
+validated. If it is then call skb_reset_csum_crc32_unnecessary
+to clear the flag
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- include/linux/skbuff.h | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ net/sctp/input.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 7fd6ce4df0ec..8706984ea56e 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -119,8 +119,6 @@
-  *       zero UDP checksum for either IPv4 or IPv6, the networking stack
-  *       may perform further validation in this case.
-  *     - GRE: only if the checksum is present in the header.
-- *     - SCTP: indicates the CRC in SCTP header has been validated.
-- *     - FCOE: indicates the CRC in FC frame has been validated.
-  *
-  *   &sk_buff.csum_level indicates the number of consecutive checksums found in
-  *   the packet minus one that have been verified as %CHECKSUM_UNNECESSARY.
-@@ -142,7 +140,6 @@
-  *
-  *   - Even if device supports only some protocols, but is able to produce
-  *     skb->csum, it MUST use CHECKSUM_COMPLETE, not CHECKSUM_UNNECESSARY.
-- *   - CHECKSUM_COMPLETE is not applicable to SCTP and FCoE protocols.
-  *
-  * - %CHECKSUM_PARTIAL
-  *
-@@ -156,6 +153,15 @@
-  *   packet that are after the checksum being offloaded are not considered to
-  *   be verified.
-  *
-+ * SCTP or FCOE CRC in received packets verfied by device
-+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+ *
-+ * An SCTP or FCOE CRC may be verified by device and reported as valid by a
-+ * driver. This is done by setting skb->csum_valid_crc32 to 1. The helper
-+ * function skb_set_csum_crc32_unnecessary should be called to do that.
-+ * The CRC validation can be checked by calling skb_csum_crc32_unnecessary
-+ * and cleared by calling skb_reset_csum_crc32_unnecessary
-+ *
-  * Checksumming on transmit for non-GSO
-  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  *
-@@ -1008,6 +1014,9 @@ struct sk_buff {
- #if IS_ENABLED(CONFIG_IP_SCTP)
- 	__u8			csum_is_crc32:1;
- #endif
-+#if IS_ENABLED(CONFIG_IP_SCTP) || IS_ENABLED(CONFIG_FCOE)
-+	__u8			csum_valid_crc32:1;
-+#endif
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+index 17fcaa9b0df9..aefcc3497d27 100644
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -124,14 +124,12 @@ int sctp_rcv(struct sk_buff *skb)
+ 	/* Pull up the IP header. */
+ 	__skb_pull(skb, skb_transport_offset(skb));
  
- #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
- 	__u16			tc_index;	/* traffic control index */
-@@ -4453,6 +4462,31 @@ static inline int skb_csum_unnecessary(const struct sk_buff *skb)
- 		 skb_checksum_start_offset(skb) >= 0));
- }
+-	skb->csum_valid = 0; /* Previous value not applicable */
+-	if (skb_csum_unnecessary(skb))
+-		__skb_decr_checksum_unnecessary(skb);
++	if (skb_csum_crc32_unnecessary(skb))
++		skb_reset_csum_crc32_unnecessary(skb);
+ 	else if (!sctp_checksum_disable &&
+ 		 !is_gso &&
+ 		 sctp_rcv_checksum(net, skb) < 0)
+ 		goto discard_it;
+-	skb->csum_valid = 1;
  
-+static inline int skb_csum_crc32_unnecessary(const struct sk_buff *skb)
-+{
-+#if IS_ENABLED(CONFIG_IP_SCTP) || IS_ENABLED(CONFIG_FCOE)
-+	return (skb->csum_valid_crc32 ||
-+		(skb->ip_summed == CHECKSUM_PARTIAL &&
-+		 skb_checksum_start_offset(skb) >= 0));
-+#else
-+	return 0;
-+#endif
-+}
-+
-+static inline void skb_reset_csum_crc32_unnecessary(struct sk_buff *skb)
-+{
-+#if IS_ENABLED(CONFIG_IP_SCTP) || IS_ENABLED(CONFIG_FCOE)
-+	skb->csum_valid_crc32 = 0;
-+#endif
-+}
-+
-+static inline void skb_set_csum_crc32_unnecessary(struct sk_buff *skb)
-+{
-+#if IS_ENABLED(CONFIG_IP_SCTP) || IS_ENABLED(CONFIG_FCOE)
-+	skb->csum_valid_crc32 = 1;
-+#endif
-+}
-+
- /**
-  *	skb_checksum_complete - Calculate checksum of an entire packet
-  *	@skb: packet to process
+ 	__skb_pull(skb, sizeof(struct sctphdr));
+ 
 -- 
 2.34.1
 
