@@ -1,117 +1,130 @@
-Return-Path: <netdev+bounces-108650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37516924D2C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 03:27:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AE8924D2D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 03:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D15284444
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:27:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC1A11C20BEE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 01:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B6A10F7;
-	Wed,  3 Jul 2024 01:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBB610F7;
+	Wed,  3 Jul 2024 01:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z/DPd1F4"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XC6nxYXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C41804
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 01:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806224409;
+	Wed,  3 Jul 2024 01:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719970049; cv=none; b=f3dv0IAIOqgK67FXhVZi1zEiXG3lELALpYxMjWcOuQ9vptu2io4y5sQ1MOmh1zdYlFR51Bg0ugrTzmXkmtRdNXtmz8gP5bgoq5wXoFI8rovsz459cBmwRnd0Z9nucvUZ1OaSfrP7YqOwEb+GZ0KdGQ109ZoY29TporDjr8fZPEo=
+	t=1719970185; cv=none; b=jVozjarE1eH6ofE1iLrsgpiM00BrR32fdd/1cw5YO97mdjOIe+y0s+mizQ4sjU8fp6d2t5xiARMJlCw0XW8UgZYf3hznLEEomRK4XK/yAdf1k2vDpe9/HPqEOTdBhULMnYTTmalzJ2uT9LBlaW4ItB8aFyD/OweaB0bSlctYWK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719970049; c=relaxed/simple;
-	bh=7L960WFOZ5xrpVpGSameSKuR0TTS5JzbeC+Id3Y3AYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwSHXE8F6nJpwY6FP547AjQiY3H9p8CxllMLezsTwSQ/ZYoWM+YUWS+9YKn7AFuk6GV+ZIJOV+AmaJN1t0W5coaVMF0abB7u04Wh7i4urqad+LZYEsVw5V66pJJhJgsQx7g86onwQ9xozR5WDT5qg8gq9IOZxVhbmxG1lswXOds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z/DPd1F4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=9I9eBGa3q2xcXc9FOmzuahPpktre4U27TwuqQO1e9EQ=; b=Z/
-	DPd1F4ygc94nmTe/WnNICU+sgXfOB2Xo7+00j6p5gB7hPE6qy4BsFiKJQh6n5JfCxSDLJNQnBZu1f
-	I5EmG5i5Sr+DnnxtxIAJg/yxYOu51eIW4Lztbo0UH1bAJHPD+jrIJCkdjeM++JdlxfH1C4dSubumE
-	JgxIPm+bGrUywPM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sOomJ-001g90-SL; Wed, 03 Jul 2024 03:27:23 +0200
-Date: Wed, 3 Jul 2024 03:27:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	kernel-team@meta.com
-Subject: Re: [net-next PATCH v3 11/15] eth: fbnic: Add link detection
-Message-ID: <d2bb35c5-8c88-4d59-9e6f-4f49625317b5@lunn.ch>
-References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
- <171993242260.3697648.17293962511485193331.stgit@ahduyck-xeon-server.home.arpa>
- <ZoQ3LlZZ47AJ5fnL@shell.armlinux.org.uk>
- <CAKgT0UcPExnW2jcZ9pAs0D65gXTU89jPEoCpsGVVT=FAW616Vg@mail.gmail.com>
- <281cdc6a-635f-499d-a312-9c7d8bb949f1@lunn.ch>
- <CAKgT0UcAYxnKkCSk7a3EKv6GzZn51Xfrd2Yr0yjcC2_=tk9ZQA@mail.gmail.com>
- <e7527f49-60a2-4e64-a93b-c72ad2cc4879@lunn.ch>
- <CAKgT0UfbUrVR6U-cbNxufQ0MN9Cna0tdC6dPMBJRAHSdj5=C8Q@mail.gmail.com>
+	s=arc-20240116; t=1719970185; c=relaxed/simple;
+	bh=g+XXyHOzir2A2nh4K4ouH8PO9d/BcCXBpfaXdmkAeN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=AhDjg/fliRWFownExQmTCR8lP/2u/8ifzReP+VG6d6EvbqoNxtMKSL5izRbpD6A4NkY99+HL+TeWAnC0XMx8tfn5KFMV00ePCPOyb/h9pQqBj9Rn8h2ps/Ubs88pETfEAjd1J7EMuwjZLZKvbwkXyFgKmnsBmNTqZv+USLhGjrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=XC6nxYXd; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1719970179;
+	bh=nIM5iPvChSeqRiNksJ2bd1KdDzBJoaJC7afh/m1jadA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=XC6nxYXdzsXwAtOUKw73d5PjyMc7HeX7ZJoT1mjy60zHjNwsaENQxUKfuBro+MEUV
+	 RA3vOaLPjOxVQ69UAkQteAu/lvlSXd2Qoi8zW9aQBaRAhpnnlAboZhUc6eGaz4ReYL
+	 RuLfJpIkn0DO6NTkhM7M5Z7f46ieoyqjzBB750gApxSKQAJtv1cdsEAmahXow2fJuc
+	 Nd3qqvhw5o7a/pwVi0eGXLUuXb6KYtC/Qx05Aoy+aeJOFbAiK7wOjvNxhgwQbepP4l
+	 kjbFLinaKFVnU2EbfaHnue+nf/0C/56GOQkUIS0BnFyEROTMLa6kPtL44EMwzyZkuL
+	 MFe3s2Thub0WQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WDMdZ5cJnz4wc1;
+	Wed,  3 Jul 2024 11:29:37 +1000 (AEST)
+Date: Wed, 3 Jul 2024 11:29:36 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Jiawen Wu
+ <jiawenwu@trustnetic.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20240703112936.483c1975@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UfbUrVR6U-cbNxufQ0MN9Cna0tdC6dPMBJRAHSdj5=C8Q@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/_UeR91GFvX0uJsm9Y8KOSP1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, Jul 02, 2024 at 01:59:41PM -0700, Alexander Duyck wrote:
-> On Tue, Jul 2, 2024 at 1:37 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > > As for multiple PCS for one connection, is this common, or special to
-> > > > your hardware?
-> > >
-> > > I would think it is common. Basically once you get over 10G you start
-> > > seeing all these XXXXXbase[CDKLS]R[248] speeds advertised and usually
-> > > the 2/4/8 represents the number of lanes being used. I would think
-> > > most hardware probably has a PCS block per lane as they can be
-> > > configured separately and in our case anyway you can use just the one
-> > > lane mode and then you only need to setup 1 lane, or you can use the 2
-> > > lane mode and you need to setup 2.
-> > >
-> > > Some of our logic is merged like I mentioned though so maybe it would
-> > > make more sense to just merge the lanes. Anyway I guess I can start
-> > > working on that code for the next patch set. I will look at what I
-> > > need to do to extend the logic. For now I might be able to get by with
-> > > just dropping support for 50R1 since that isn't currently being used
-> > > as a default.
-> >
-> > So maybe a dumb question. How does negotiation work? Just one performs
-> > negotiation? They all do, and if you get different results you declare
-> > the link broken? First one to complete wins? Or even, you can
-> > configure each lane to use different negotiation parameters...
-> >
-> >     Andrew
-> 
-> My understanding is that auto negotiation is done at 10G or 25G so
-> that is with only one PCS link enabled if I am not mistaken.
-> 
-> Admittedly we haven't done the autoneg code yet so I can't say for
-> certain. I know the hardware was tested with the driver handling the
-> link after the fact, but I don't have the code in the driver for
-> handling the autoneg yet since we don't use that in our datacenter.
+--Sig_/_UeR91GFvX0uJsm9Y8KOSP1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-So you currently always force the pause configuration? Or is pause
-negotiation not supported in these link modes? What about FEC, is that
-negotiated?
+Hi all,
 
-I suppose i should go read 802.3.
+Today's linux-next merge of the net-next tree got a conflict in:
 
-	Andrew
+  drivers/net/ethernet/wangxun/libwx/wx_hw.c
+
+between commit:
+
+  bd07a9817846 ("net: txgbe: remove separate irq request for MSI and INTx")
+
+from the net tree and commit:
+
+  b501d261a5b3 ("net: txgbe: add FDIR ATR support")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index d1b682ce9c6d,44cd7a5866c1..000000000000
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@@ -1959,7 -1977,7 +1977,8 @@@ int wx_sw_init(struct wx *wx
+  	}
+ =20
+  	bitmap_zero(wx->state, WX_STATE_NBITS);
+ +	wx->misc_irq_domain =3D false;
++ 	bitmap_zero(wx->flags, WX_PF_FLAGS_NBITS);
+ =20
+  	return 0;
+  }
+
+--Sig_/_UeR91GFvX0uJsm9Y8KOSP1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmaEqYAACgkQAVBC80lX
+0GyYZAf8DxYgI5fhkZtmy+Uwo+WcOxg8hYCNADg8Ozmw0ZpfyWjjaemX75sVac8P
+AV58qTSoA98P+ktBpOlJrZVgmd3vOasBB3HqIWp6HiS8oVySYqxxW5zboNC3uUut
+/X3tzuUBlkggYIHZElnmyDUWJCXs7rDhUihBEkU04dOdFyTI5OhwL6Vp5M7069bY
+zluk5SjeM23y0hn9WswmzOJZw7OUE6ELKCPaen+fSqKTpadDSDHLm8VuaSmlKPtc
+hr3nyvPSR/SsPufnOLO30crCz8bomm5y6ashou7OPNAV3IKAOpU7QvW4k8R3w8/r
+ChJtUFF6DShtJAY9KjQM2t5RthSRkg==
+=HcsQ
+-----END PGP SIGNATURE-----
+
+--Sig_/_UeR91GFvX0uJsm9Y8KOSP1--
 
