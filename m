@@ -1,84 +1,371 @@
-Return-Path: <netdev+bounces-108800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B919258CF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:36:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A08925CC3
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B1A1F262BB
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 10:36:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A5821C20AAB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFF316EBF2;
-	Wed,  3 Jul 2024 10:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAE21922F8;
+	Wed,  3 Jul 2024 11:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UafIGwRS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail114-241.sinamail.sina.com.cn (mail114-241.sinamail.sina.com.cn [218.30.114.241])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2762313D61B
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 10:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.241
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76ED191F97;
+	Wed,  3 Jul 2024 11:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720002972; cv=none; b=ji9dc+kpnGgg6fTCANgKamU29e6/0LpckczZmhQuYnKeWhjisMMoL43b3Gnqgpqk9+4LRLYtIoRlMtTifbnp4EHjxlOnwVrPoElH2vUT5tb2Jn4TJZCHwOwCJHV4mB1pSnyxPQtKgESBTnP76J+eapCe/CAKidmvephL2KTA6yU=
+	t=1720005096; cv=none; b=Q2mMqCBtM58Exk1ihKUpf0fBKgHq8KECsMq+k5EzGO/o5yYGB4NYZag8o9or+K0ofx1GVm5W4pSmxRoHyiTHkqplhCq1kJ5417pU/7sqSAt1k/uOtOnmJqQM17Q8y/1LCE/4ZoPqgx7a2HwEHi+GbphisZ8vtKi5AvYUnIlNSYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720002972; c=relaxed/simple;
-	bh=Oj2XBv/HMF5uB8m1GDKSCwlLjhQ8YPZdw9ShmXnxVMg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fi2klp8QOi780VtPy70nPUWiX5mwrYW51WcR5N1jUHvIsv6m5mc5gn2Q7laFkybxx7lnzCO4qD66n1PvY8fyzyBGvsBrW9A6g3RbXXK667QCW6T25WkOi3AaBONXJ4AwajpDmR5k8eH05MnRkLIrjE/so3tD+618h9tP47P3hW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.241
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.64.67])
-	by sina.com (10.185.250.23) with ESMTP
-	id 6685298A00004CBD; Wed, 3 Jul 2024 18:35:56 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 9998688913377
-X-SMAIL-UIID: 64AC182C870D4FF98CF825E46BB7D733-20240703-183556-1
-From: Hillf Danton <hdanton@sina.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1720005096; c=relaxed/simple;
+	bh=0QE0eI+CJNM845jvFM0Yio8Bi8SqIaYVStry1DtJMR0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BbliUxYQ4ZYO13A79qNQ5hzmj9rRU7QrGmXyD1CW6F38MzMW1oXMzojRDeP6wINXbjQRvx9JSxBW/pBPjitwzo9ZqXMlR0yfF1ItFggd+eSWUeV6OHRwBT+bWLOYd2qFiq/NlkAgJI24wFWRxAEyXHMTijfjseZlxNWaHwDwSAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UafIGwRS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5961DC2BD10;
+	Wed,  3 Jul 2024 11:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720005096;
+	bh=0QE0eI+CJNM845jvFM0Yio8Bi8SqIaYVStry1DtJMR0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UafIGwRSjG4kWghVBSWRZ+SQEA1w9oAxCIpZMjm2bBfqCZ1EuqFR8wP6I9HG7Gcrr
+	 B09qHI6o++RunNHz6KercA1eUWy2gs6OcDfgG2O4Xi+7H2egov9Z8uY2z5PEpR7G53
+	 2Ox7wQEwVghUQsE/YO7fW7mSovWMPYTogjg6xbVE=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
 	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
-Date: Wed,  3 Jul 2024 18:35:44 +0800
-Message-Id: <20240703103544.2872-1-hdanton@sina.com>
-In-Reply-To: <20240702140841.3337-1-fw@strlen.de>
-References: 
+	Yunseong Kim <yskelg@gmail.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10 228/290] tracing/net_sched: NULL pointer dereference in perf_trace_qdisc_reset()
+Date: Wed,  3 Jul 2024 12:40:09 +0200
+Message-ID: <20240703102912.767573728@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240703102904.170852981@linuxfoundation.org>
+References: <20240703102904.170852981@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Tue,  2 Jul 2024 16:08:14 +0200 Florian Westphal <fw@strlen.de>
-> syzbot reports:
-> 
-> KASAN: slab-uaf in nft_ctx_update include/net/netfilter/nf_tables.h:1831
-> KASAN: slab-uaf in nft_commit_release net/netfilter/nf_tables_api.c:9530
-> KASAN: slab-uaf int nf_tables_trans_destroy_work+0x152b/0x1750 net/netfilter/nf_tables_api.c:9597
-> Read of size 2 at addr ffff88802b0051c4 by task kworker/1:1/45
-> [..]
-> Workqueue: events nf_tables_trans_destroy_work
-> Call Trace:
->  nft_ctx_update include/net/netfilter/nf_tables.h:1831 [inline]
->  nft_commit_release net/netfilter/nf_tables_api.c:9530 [inline]
->  nf_tables_trans_destroy_work+0x152b/0x1750 net/netfilter/nf_tables_api.c:9597
-> 
-> Problem is that the notifier does a conditional flush, but its possible
-> that the table-to-be-removed is still referenced by transactions being
-> processed by the worker, so we need to flush unconditionally.
-> 
-Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
-if trans outlives table.
+5.10-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Yunseong Kim <yskelg@gmail.com>
+
+[ Upstream commit bab4923132feb3e439ae45962979c5d9d5c7c1f1 ]
+
+In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
+
+ qdisc->dev_queue->dev <NULL> ->name
+
+This situation simulated from bunch of veths and Bluetooth disconnection
+and reconnection.
+
+During qdisc initialization, qdisc was being set to noop_queue.
+In veth_init_queue, the initial tx_num was reduced back to one,
+causing the qdisc reset to be called with noop, which led to the kernel
+panic.
+
+I've attached the GitHub gist link that C converted syz-execprogram
+source code and 3 log of reproduced vmcore-dmesg.
+
+ https://gist.github.com/yskelg/cc64562873ce249cdd0d5a358b77d740
+
+Yeoreum and I use two fuzzing tool simultaneously.
+
+One process with syz-executor : https://github.com/google/syzkaller
+
+ $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
+    -enable=none -collide=false log1
+
+The other process with perf fuzzer:
+ https://github.com/deater/perf_event_tests/tree/master/fuzzer
+
+ $ perf_event_tests/fuzzer/perf_fuzzer
+
+I think this will happen on the kernel version.
+
+ Linux kernel version +v6.7.10, +v6.8, +v6.9 and it could happen in v6.10.
+
+This occurred from 51270d573a8d. I think this patch is absolutely
+necessary. Previously, It was showing not intended string value of name.
+
+I've reproduced 3 time from my fedora 40 Debug Kernel with any other module
+or patched.
+
+ version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
+
+[ 5287.164555] veth0_vlan: left promiscuous mode
+[ 5287.164929] veth1_macvtap: left promiscuous mode
+[ 5287.164950] veth0_macvtap: left promiscuous mode
+[ 5287.164983] veth1_vlan: left promiscuous mode
+[ 5287.165008] veth0_vlan: left promiscuous mode
+[ 5287.165450] veth1_macvtap: left promiscuous mode
+[ 5287.165472] veth0_macvtap: left promiscuous mode
+[ 5287.165502] veth1_vlan: left promiscuous mode
+…
+[ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
+[ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
+[ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
+[ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
+[ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
+[ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
+[ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
+…
+[ 5298.002798] bridge_slave_0: left promiscuous mode
+[ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+[ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+[ 5298.320207] bond0 (unregistering): Released all slaves
+[ 5298.354296] hsr_slave_0: left promiscuous mode
+[ 5298.360750] hsr_slave_1: left promiscuous mode
+[ 5298.374889] veth1_macvtap: left promiscuous mode
+[ 5298.374931] veth0_macvtap: left promiscuous mode
+[ 5298.374988] veth1_vlan: left promiscuous mode
+[ 5298.375024] veth0_vlan: left promiscuous mode
+[ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
+[ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
+…
+[ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
+[ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
+[ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
+….
+[ 5301.075531] team0: Port device team_slave_1 added
+[ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5301.085588] bridge_slave_0: entered allmulticast mode
+[ 5301.085800] bridge_slave_0: entered promiscuous mode
+[ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
+…
+[ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.193481] hsr_slave_0: entered promiscuous mode
+[ 5301.204425] hsr_slave_1: entered promiscuous mode
+[ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.210185] Cannot create hsr debugfs directory
+[ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.255934] team0: Port device team_slave_0 added
+[ 5301.256480] team0: Port device team_slave_1 added
+[ 5301.256948] team0: Port device team_slave_0 added
+…
+[ 5301.435928] hsr_slave_0: entered promiscuous mode
+[ 5301.446029] hsr_slave_1: entered promiscuous mode
+[ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.455884] Cannot create hsr debugfs directory
+[ 5301.502664] hsr_slave_0: entered promiscuous mode
+[ 5301.513675] hsr_slave_1: entered promiscuous mode
+[ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.526164] Cannot create hsr debugfs directory
+[ 5301.563662] hsr_slave_0: entered promiscuous mode
+[ 5301.576129] hsr_slave_1: entered promiscuous mode
+[ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.580270] Cannot create hsr debugfs directory
+[ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
+
+[ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+[ 5301.595877] Mem abort info:
+[ 5301.595881]   ESR = 0x0000000096000006
+[ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
+[ 5301.595889]   SET = 0, FnV = 0
+[ 5301.595893]   EA = 0, S1PTW = 0
+[ 5301.595896]   FSC = 0x06: level 2 translation fault
+[ 5301.595900] Data abort info:
+[ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+[ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+[ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ 5301.595915] [dfff800000000026] address between user and kernel address ranges
+[ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
+…
+[ 5301.596076] CPU: 2 PID: 102769 Comm:
+syz-executor.3 Kdump: loaded Tainted:
+ G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
+[ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
+ BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
+[ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[ 5301.596085] pc : strnlen+0x40/0x88
+[ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596124] sp : ffff8000beef6b40
+[ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
+[ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
+[ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
+[ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
+[ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
+[ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
+[ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
+[ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
+[ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
+[ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
+[ 5301.596166] Call trace:
+[ 5301.596175]  strnlen+0x40/0x88
+[ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
+[ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
+[ 5301.596188]  qdisc_reset+0x43c/0x5e8
+[ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
+[ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
+[ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
+[ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
+[ 5301.596205]  __rtnl_newlink+0x92c/0xb60
+[ 5301.596208]  rtnl_newlink+0xd8/0x130
+[ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
+[ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
+[ 5301.596225]  rtnetlink_rcv+0x20/0x38
+[ 5301.596227]  netlink_unicast+0x3c8/0x640
+[ 5301.596231]  netlink_sendmsg+0x658/0xa60
+[ 5301.596234]  __sock_sendmsg+0xd0/0x180
+[ 5301.596243]  __sys_sendto+0x1c0/0x280
+[ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
+[ 5301.596249]  invoke_syscall+0xdc/0x268
+[ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
+[ 5301.596259]  do_el0_svc+0x48/0x68
+[ 5301.596261]  el0_svc+0x50/0x188
+[ 5301.596265]  el0t_64_sync_handler+0x120/0x130
+[ 5301.596268]  el0t_64_sync+0x194/0x198
+[ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842)
+[ 5301.596285] SMP: stopping secondary CPUs
+[ 5301.597053] Starting crashdump kernel...
+[ 5301.597057] Bye!
+
+After applying our patch, I didn't find any kernel panic errors.
+
+We've found a simple reproducer
+
+ # echo 1 > /sys/kernel/debug/tracing/events/qdisc/qdisc_reset/enable
+
+ # ip link add veth0 type veth peer name veth1
+
+ Error: Unknown device type.
+
+However, without our patch applied, I tested upstream 6.10.0-rc3 kernel
+using the qdisc_reset event and the ip command on my qemu virtual machine.
+
+This 2 commands makes always kernel panic.
+
+Linux version: 6.10.0-rc3
+
+[    0.000000] Linux version 6.10.0-rc3-00164-g44ef20baed8e-dirty
+(paran@fedora) (gcc (GCC) 14.1.1 20240522 (Red Hat 14.1.1-4), GNU ld
+version 2.41-34.fc40) #20 SMP PREEMPT Sat Jun 15 16:51:25 KST 2024
+
+Kernel panic message:
+
+[  615.236484] Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+[  615.237250] Dumping ftrace buffer:
+[  615.237679]    (ftrace buffer empty)
+[  615.238097] Modules linked in: veth crct10dif_ce virtio_gpu
+virtio_dma_buf drm_shmem_helper drm_kms_helper zynqmp_fpga xilinx_can
+xilinx_spi xilinx_selectmap xilinx_core xilinx_pr_decoupler versal_fpga
+uvcvideo uvc videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videodev
+videobuf2_common mc usbnet deflate zstd ubifs ubi rcar_canfd rcar_can
+omap_mailbox ntb_msi_test ntb_hw_epf lattice_sysconfig_spi
+lattice_sysconfig ice40_spi gpio_xilinx dwmac_altr_socfpga mdio_regmap
+stmmac_platform stmmac pcs_xpcs dfl_fme_region dfl_fme_mgr dfl_fme_br
+dfl_afu dfl fpga_region fpga_bridge can can_dev br_netfilter bridge stp
+llc atl1c ath11k_pci mhi ath11k_ahb ath11k qmi_helpers ath10k_sdio
+ath10k_pci ath10k_core ath mac80211 libarc4 cfg80211 drm fuse backlight ipv6
+Jun 22 02:36:5[3   6k152.62-4sm98k4-0k]v  kCePUr:n e1l :P IUDn:a b4le6
+8t oC ohmma: nidpl eN oketr nteali nptaedg i6n.g1 0re.0q-urecs3t- 0at0
+1v6i4r-tgu4a4le fa2d0dbraeeds0se-dir tyd f#f2f08
+  615.252376] Hardware name: linux,dummy-virt (DT)
+[  615.253220] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS
+BTYPE=--)
+[  615.254433] pc : strnlen+0x6c/0xe0
+[  615.255096] lr : trace_event_get_offsets_qdisc_reset+0x94/0x3d0
+[  615.256088] sp : ffff800080b269a0
+[  615.256615] x29: ffff800080b269a0 x28: ffffc070f3f98500 x27:
+0000000000000001
+[  615.257831] x26: 0000000000000010 x25: ffffc070f3f98540 x24:
+ffffc070f619cf60
+[  615.259020] x23: 0000000000000128 x22: 0000000000000138 x21:
+dfff800000000000
+[  615.260241] x20: ffffc070f631ad00 x19: 0000000000000128 x18:
+ffffc070f448b800
+[  615.261454] x17: 0000000000000000 x16: 0000000000000001 x15:
+ffffc070f4ba2a90
+[  615.262635] x14: ffff700010164d73 x13: 1ffff80e1e8d5eb3 x12:
+1ffff00010164d72
+[  615.263877] x11: ffff700010164d72 x10: dfff800000000000 x9 :
+ffffc070e85d6184
+[  615.265047] x8 : ffffc070e4402070 x7 : 000000000000f1f1 x6 :
+000000001504a6d3
+[  615.266336] x5 : ffff28ca21122140 x4 : ffffc070f5043ea8 x3 :
+0000000000000000
+[  615.267528] x2 : 0000000000000025 x1 : 0000000000000000 x0 :
+0000000000000000
+[  615.268747] Call trace:
+[  615.269180]  strnlen+0x6c/0xe0
+[  615.269767]  trace_event_get_offsets_qdisc_reset+0x94/0x3d0
+[  615.270716]  trace_event_raw_event_qdisc_reset+0xe8/0x4e8
+[  615.271667]  __traceiter_qdisc_reset+0xa0/0x140
+[  615.272499]  qdisc_reset+0x554/0x848
+[  615.273134]  netif_set_real_num_tx_queues+0x360/0x9a8
+[  615.274050]  veth_init_queues+0x110/0x220 [veth]
+[  615.275110]  veth_newlink+0x538/0xa50 [veth]
+[  615.276172]  __rtnl_newlink+0x11e4/0x1bc8
+[  615.276944]  rtnl_newlink+0xac/0x120
+[  615.277657]  rtnetlink_rcv_msg+0x4e4/0x1370
+[  615.278409]  netlink_rcv_skb+0x25c/0x4f0
+[  615.279122]  rtnetlink_rcv+0x48/0x70
+[  615.279769]  netlink_unicast+0x5a8/0x7b8
+[  615.280462]  netlink_sendmsg+0xa70/0x1190
+
+Yeoreum and I don't know if the patch we wrote will fix the underlying
+cause, but we think that priority is to prevent kernel panic happening.
+So, we're sending this patch.
+
+Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string")
+Link: https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
+Cc: netdev@vger.kernel.org
+Tested-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Link: https://lore.kernel.org/r/20240624173320.24945-4-yskelg@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/trace/events/qdisc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index a50df41634c58..f661d3d7c410a 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -53,7 +53,7 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+ 
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	dev,		qdisc_dev(q) ? qdisc_dev(q)->name : "(null)"	)
+ 		__string(	kind,		q->ops->id		)
+ 		__field(	u32,		parent			)
+ 		__field(	u32,		handle			)
+-- 
+2.43.0
+
+
+
 
