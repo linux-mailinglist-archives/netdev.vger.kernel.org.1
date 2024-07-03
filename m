@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-108747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE7729252A4
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:45:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58519252BE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 07:02:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A261E2847D2
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:45:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133591C2240E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 05:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D1549634;
-	Wed,  3 Jul 2024 04:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDBF2745B;
+	Wed,  3 Jul 2024 05:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGCvU4O7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7kBDFBP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF32A17BCE;
-	Wed,  3 Jul 2024 04:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DE91DA317;
+	Wed,  3 Jul 2024 05:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719981934; cv=none; b=hbLkvVlcax+ngdEH2AUGAKh4EonDjTw/CFo2MoK0TcNNBnY9u56mLgSF7wL/Y06Sscx9s0G9oQVGL/zO9UEI3E570JZ4TlL6nNBgO0GftoWRmuJ933jkESxaRI3chFkzwzXfhBV6+Ao77ot7H9SEO4oqO7DKvi6O6ECKsH0d4MA=
+	t=1719982965; cv=none; b=dFs3jkKLvy7wXUqwtMR4RgWAhK3GkWkCFH4/TLFCAandkQ9A8EGcuB1YYuIQZUAZgeeCJci9JMtC1kjbbqYaNmnQJKcCcQRzCGiYmRT00JnILRBSWuP431o8gSwi6otnvo4YSd9PQ+cOyuIMMhtey8AMRvgaK2Cdm85e7aLN6S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719981934; c=relaxed/simple;
-	bh=ivVCeA51TNNPsWY2k1Ev7Ipke2mr3itsaOxAPyIsJRE=;
+	s=arc-20240116; t=1719982965; c=relaxed/simple;
+	bh=tqodm5LXmDW7fB6efoOZfjUgq6nKZ30g0K3nhfm75yM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pyas6SVPRlvXgcWxITJcxUSbkN4RC84oFIZsSRN/Dv2EkAWS8D9cuyumvf3YnC+tVl8fh4FuNrI9w8xyAfuIOuWFyjlOxp/l4DE/x0EMAZfQ1pFwh3hqStAWEZ0BFpPsbLil7lEoFoyuF/2dhX6k1fAAw/S1SIVYDMgGYyVN/G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGCvU4O7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7995AC32781;
-	Wed,  3 Jul 2024 04:45:03 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=a/VTEydzDGAhkOucua30EDlgCjw0nqmBhfRqH6PkcQex0wfVg4jmj9mw+L6v+F3TskDLSN6FLK3e9q6EgxHh7CUZgPTT8STtHE5t4IBF37i1cuqW4z6MsgYvx5pDryz70zA9FYD06Gkr+popyw/+YWBd7sBU7HytvO6dLBaxAYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7kBDFBP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9218C32781;
+	Wed,  3 Jul 2024 05:02:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719981933;
-	bh=ivVCeA51TNNPsWY2k1Ev7Ipke2mr3itsaOxAPyIsJRE=;
+	s=k20201202; t=1719982964;
+	bh=tqodm5LXmDW7fB6efoOZfjUgq6nKZ30g0K3nhfm75yM=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lGCvU4O78jSX5Z/RvG6MGLCGu3VOiw/KJ2zd+NsxhJmZchr9MD2NOK9ST1AXns3zX
-	 rFdrprQoXklrYc5cA1+pUDI9IvxmL/IQ2hB09EahjNP5/wgwVSdJra3s8dNHsqRC1B
-	 hoMZicWiuJEvPMM+AwB8EfChaaHBfGYrgIRbEbI/xEy4w74/FddnT6Hf23grJEmXGz
-	 ErXgLMKa0MbGdZPh7ia42T9Ig9ISFxM60Ok45BRjDoq59SjS2WzP4Xn8qeFMPOt6bX
-	 cM40OSOiTGUo3wxiCxPkfxfNqzHVkXWWf9RT6A7oicjlQ0rIXXSj8b8Af6YEdf71dQ
-	 qiRerIFmh0gtg==
-Message-ID: <7417fd8c-e852-45ee-bac9-d92921036e2f@kernel.org>
-Date: Wed, 3 Jul 2024 06:45:00 +0200
+	b=X7kBDFBP0YomTwTukk3LQeIHq6XxIe2ZETRVYi0TTM6tEkT2DNHKvczpYdODOFgfI
+	 DDo0dxz65qyzTT2NdTS68a2NSomJB3gcfx2qUFXFRTkeziW3RC9VUIYcFmt3jIkVxO
+	 LbYMWT4o1IPOpAFtaQj0g0jD+JM0k9Ocu5evoGxkH9msY7lFHLjvztPQ7fp3iK18ec
+	 fs0xhxsCO6sijUtsJOVjQ+dl/u4S3+y7xl3OkpD301xnyjw986Uc0ydwW5WidhUZdg
+	 WDmOs52iflfu1dwqEyQHBgDEtSz5O7kidrvKfYlzNBV9qa7GxMK6BSLgBTVI6jW88r
+	 naqC1acD4t9Eg==
+Message-ID: <d146fb2c-50bb-4339-b330-155f22879446@kernel.org>
+Date: Wed, 3 Jul 2024 07:02:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,50 +50,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
-To: Tengfei Fan <quic_tengfan@quicinc.com>, andersson@kernel.org,
- konrad.dybcio@linaro.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, djakov@kernel.org, mturquette@baylibre.com,
- sboyd@kernel.org, jassisinghbrar@gmail.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, manivannan.sadhasivam@linaro.org, will@kernel.org,
- joro@8bytes.org, conor@kernel.org, tglx@linutronix.de, amitk@kernel.org,
- thara.gopinath@gmail.com, linus.walleij@linaro.org, wim@linux-watchdog.org,
- linux@roeck-us.net, rafael@kernel.org, viresh.kumar@linaro.org,
- vkoul@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com
-Cc: robimarko@gmail.com, quic_gurus@quicinc.com,
- bartosz.golaszewski@linaro.org, kishon@kernel.org, quic_wcheng@quicinc.com,
- alim.akhtar@samsung.com, avri.altman@wdc.com, bvanassche@acm.org,
- agross@kernel.org, gregkh@linuxfoundation.org, quic_tdas@quicinc.com,
- robin.murphy@arm.com, daniel.lezcano@linaro.org, rui.zhang@intel.com,
- lukasz.luba@arm.com, quic_rjendra@quicinc.com, ulf.hansson@linaro.org,
- quic_sibis@quicinc.com, otto.pflueger@abscue.de, quic_rohiagar@quicinc.com,
- luca@z3ntu.xyz, neil.armstrong@linaro.org, abel.vesa@linaro.org,
- bhupesh.sharma@linaro.org, alexandre.torgue@foss.st.com,
- peppe.cavallaro@st.com, joabreu@synopsys.com, netdev@vger.kernel.org,
- lpieralisi@kernel.org, kw@linux.com, bhelgaas@google.com,
- ahalaney@redhat.com, krzysztof.kozlowski@linaro.org,
- u.kleine-koenig@pengutronix.de, dmitry.baryshkov@linaro.org,
- quic_cang@quicinc.com, danila@jiaxyga.com, quic_nitirawa@quicinc.com,
- mantas@8devices.com, athierry@redhat.com, quic_kbajaj@quicinc.com,
- quic_bjorande@quicinc.com, quic_msarkar@quicinc.com,
- quic_devipriy@quicinc.com, quic_tsoni@quicinc.com,
- quic_rgottimu@quicinc.com, quic_shashim@quicinc.com,
- quic_kaushalk@quicinc.com, quic_tingweiz@quicinc.com,
- quic_aiquny@quicinc.com, srinivas.kandagatla@linaro.org,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- iommu@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-gpio@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- kernel@quicinc.com
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703035735.2182165-1-quic_tengfan@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH] nfc: pn533: Add poll mod list filling check
+To: Aleksandr Mishin <amishin@t-argos.ru>,
+ Samuel Ortiz <sameo@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240702093924.12092-1-amishin@t-argos.ru>
 Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -137,41 +101,57 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240703035735.2182165-1-quic_tengfan@quicinc.com>
+In-Reply-To: <20240702093924.12092-1-amishin@t-argos.ru>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 03/07/2024 05:56, Tengfei Fan wrote:
-> Introduce support for the QCS9100 SoC device tree (DTSI) and the
-> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
-> While the QCS9100 platform is still in the early design stage, the
-> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
-> mounts the QCS9100 SoC instead of the SA8775p SoC.
+On 02/07/2024 11:39, Aleksandr Mishin wrote:
+> In case of im_protocols value is 1 and tm_protocols value is 0 this
 
-The same huge patchset, to huge number of recipients was sent twice.
-First, sorry, this is way too big. Second, it has way too many
-recipients, but this is partially a result of first point. Only
-partially because you put here dozen of totally unrelated emails. Sorry,
-that does not make even sense. See form letter at the end how this
-works. Third, sending it to everyone twice is a way to annoy them off
-twice... Fourth,
+Which im protocol has value 1 in the mask?
 
-Please split your work and do not cc dozen of unrelated folks.
+The pn533_poll_create_mod_list() handles all possible masks, so your
+case is just not possible to happen.
 
-<form letter>
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
+This patch is purely to satisfy (your) static analyzers, so this should
+be clear in commit msg. You are not fixing any bug but adding sort of
+defensive code and suppresion of false-positive warning...
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline), work on fork of kernel
-(don't, instead use mainline) or you ignore some maintainers (really
-don't). Just use b4 and everything should be fine, although remember
-about `b4 prep --auto-to-cc` if you added new patches to the patchset.
-</form letter>
+> combination successfully passes the check
+> 'if (!im_protocols && !tm_protocols)' in the nfc_start_poll().
+> But then after pn533_poll_create_mod_list() call in pn533_start_poll()
+> poll mod list will remain empty and dev->poll_mod_count will remain 0
+> which lead to division by zero.
+> 
+> Add poll mod list filling check.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: dfccd0f58044 ("NFC: pn533: Add some polling entropy")
+> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+> ---
+>  drivers/nfc/pn533/pn533.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
+> index b19c39dcfbd9..e2bc67300a91 100644
+> --- a/drivers/nfc/pn533/pn533.c
+> +++ b/drivers/nfc/pn533/pn533.c
+> @@ -1723,6 +1723,11 @@ static int pn533_start_poll(struct nfc_dev *nfc_dev,
+>  	}
+>  
+>  	pn533_poll_create_mod_list(dev, im_protocols, tm_protocols);
+> +	if (!dev->poll_mod_count) {
+> +		nfc_err(dev->dev,
+> +			"Poll mod list is empty\n");
+
+Odd wrapping.
+
+> +		return -EINVAL;
+> +	}
+>  
+>  	/* Do not always start polling from the same modulation */
+>  	get_random_bytes(&rand_mod, sizeof(rand_mod));
 
 Best regards,
 Krzysztof
