@@ -1,87 +1,115 @@
-Return-Path: <netdev+bounces-109016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450FC92688F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C9892689A
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 20:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7740B1C223C1
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:48:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13B051C211BD
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 18:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09364187353;
-	Wed,  3 Jul 2024 18:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895A91891D1;
+	Wed,  3 Jul 2024 18:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1UUf+8XU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQ7eo1Ak"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A9A17A5B0;
-	Wed,  3 Jul 2024 18:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F04217A5B0;
+	Wed,  3 Jul 2024 18:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720032526; cv=none; b=lnw0Y1sC+2edQM35DHqdrsX7p5CL+TLJ0+3nQRGrODEazCyDqD6/OXqFg+bvmOSQ1WpUJGXUxTk4n58jkgArkXn92NaPk5L3PdMYBgcZtBwHbSjCuIOplh8OU01gj54ZV8CRSRgLYK/GrIbW+IBFgTSSWeynY5Yip8CWsyPLiJE=
+	t=1720032597; cv=none; b=WE22ywmJmHRtS6u/MFaxb+9nO+2vFc7NhL8o/LpFMpzUKOKrWOJD9w0uM0GjMwZMS7Y8kQaPlF7AdFRcZHJ0xTMAg1HmG1jTH21c98pMFBgn18EDfNCEBm1ck8Hdrn0H0s8rk2NgKsC1fsVpt9PLOZHFrlDoCwF3PshI5WHxgd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720032526; c=relaxed/simple;
-	bh=N9+slwo6VV6sFpPSkyuZITuZfbr6x6sZUha2Kt1ruCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tpCC2D/YVTKEBJfpaEjrJ5zB9t5qNc3ePm6YsBsxGFIj+5A6kRBrtnnTYjCGXIa6iqdd5PKoOEMKyxM0+BCTy2BWw//ft7V4pfJfebDAnvLWP7GJRCvOV13a32V4c9vz1jPUHC7uj7E5Im+Ond5atpvmCM4vEhlYEqeIYNlNock=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1UUf+8XU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5FKbXW05GBpGZuyZea5TqNBmmnVr3vaHPEG8vaezhFQ=; b=1UUf+8XUgTemlzb5ex3ZEZiIEH
-	nzhR6iCuJ8KOB2n0xeue9uQ5qEJDBrqUeldnYaiOIFq+9VDvkWTXQ6y+Ht+z2Y4Bwh+ofAwEPY3hB
-	h4sVSFY+B4IKza8oUuhtlNu+85gKRWp0ouBz7hEWIuoGCgSeWHF2TOWiaEwfR4YxBb0E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sP51o-001l9I-8V; Wed, 03 Jul 2024 20:48:28 +0200
-Date: Wed, 3 Jul 2024 20:48:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yuiko Oshino <yuiko.oshino@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net v1 1/2] net: phy: microchip: lan87xx: reinit PHY
- after cable test
-Message-ID: <eb08bbbb-449a-4dee-857f-a0ebad7e8df3@lunn.ch>
-References: <20240703132801.623218-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1720032597; c=relaxed/simple;
+	bh=tL3e/ur6/KMkg7mh3t7r3ZIFeZQ4xi5Q34S/7FlZ2qA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SLq2w25GpHpJBUellizhaTjqXXk76DXYVeBiRdvDL7I8h7/vRs3pjJ1J40oIPwxA/uls4pJOVx7u1tzsLEceO+TuGQgjyA1/QA+yKbeX5uuaueX724HZHO5boF25b4Bkxs49NUb2f8Y7/MrgRLdac44sLslW72RIbiIdV51tqBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQ7eo1Ak; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B6EC2BD10;
+	Wed,  3 Jul 2024 18:49:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720032596;
+	bh=tL3e/ur6/KMkg7mh3t7r3ZIFeZQ4xi5Q34S/7FlZ2qA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SQ7eo1AkC8LjRWberzbfTrXdEmn8AVAPTH1nI5h830+ubxo1C5MaKmEtPRy9gsG1o
+	 M8aW67LDGZEnsrCM4Q/GRKRYn+r39JIjjMUn4+wwhQ4mb+Nyw7/6h4NQGIjateXcmW
+	 XAfTSrhx2kUyLwJweon5gGjsH9sMGD6YpKO/TIf9EwzO/u3UL14SYAuIKAMoMlbYkK
+	 bxKEJlfNCtFdikjht8PVx57e+Ez2TZA0kY1xDB4xr5o96jrOLhYPq5oX8riaz0aLMe
+	 pQxRIT/WAYj12CgJvmnxQibErDTaKj3syhCujN4MjJ27ACtbE6kpJopp6TU3GIN89Q
+	 vkEmm7DBvS+3g==
+Date: Wed, 3 Jul 2024 11:49:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: Tengfei Fan <quic_tengfan@quicinc.com>, andersson@kernel.org,
+ konrad.dybcio@linaro.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, djakov@kernel.org, mturquette@baylibre.com,
+ sboyd@kernel.org, jassisinghbrar@gmail.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, manivannan.sadhasivam@linaro.org, will@kernel.org,
+ joro@8bytes.org, conor@kernel.org, tglx@linutronix.de, amitk@kernel.org,
+ thara.gopinath@gmail.com, linus.walleij@linaro.org, wim@linux-watchdog.org,
+ linux@roeck-us.net, rafael@kernel.org, viresh.kumar@linaro.org,
+ vkoul@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, robimarko@gmail.com, quic_gurus@quicinc.com,
+ bartosz.golaszewski@linaro.org, kishon@kernel.org, quic_wcheng@quicinc.com,
+ alim.akhtar@samsung.com, avri.altman@wdc.com, bvanassche@acm.org,
+ agross@kernel.org, gregkh@linuxfoundation.org, quic_tdas@quicinc.com,
+ robin.murphy@arm.com, daniel.lezcano@linaro.org, rui.zhang@intel.com,
+ lukasz.luba@arm.com, quic_rjendra@quicinc.com, ulf.hansson@linaro.org,
+ quic_sibis@quicinc.com, otto.pflueger@abscue.de, quic_rohiagar@quicinc.com,
+ luca@z3ntu.xyz, neil.armstrong@linaro.org, abel.vesa@linaro.org,
+ bhupesh.sharma@linaro.org, alexandre.torgue@foss.st.com,
+ peppe.cavallaro@st.com, joabreu@synopsys.com, netdev@vger.kernel.org,
+ lpieralisi@kernel.org, kw@linux.com, bhelgaas@google.com,
+ ahalaney@redhat.com, krzysztof.kozlowski@linaro.org,
+ u.kleine-koenig@pengutronix.de, dmitry.baryshkov@linaro.org,
+ quic_cang@quicinc.com, danila@jiaxyga.com, quic_nitirawa@quicinc.com,
+ mantas@8devices.com, athierry@redhat.com, quic_kbajaj@quicinc.com,
+ quic_bjorande@quicinc.com, quic_msarkar@quicinc.com,
+ quic_devipriy@quicinc.com, quic_tsoni@quicinc.com,
+ quic_rgottimu@quicinc.com, quic_shashim@quicinc.com,
+ quic_kaushalk@quicinc.com, quic_tingweiz@quicinc.com,
+ quic_aiquny@quicinc.com, srinivas.kandagatla@linaro.org,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ iommu@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-gpio@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ kernel@quicinc.com
+Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
+Message-ID: <20240703114952.6013f05e@kernel.org>
+In-Reply-To: <171998042970.21654.12559535993133117436.git-patchwork-notify@kernel.org>
+References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
+	<171998042970.21654.12559535993133117436.git-patchwork-notify@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240703132801.623218-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 03, 2024 at 03:28:00PM +0200, Oleksij Rempel wrote:
-> Reinit PHY after cable test, otherwise link can't be established on
-> tested port. This issue is reproducible on LAN9372 switches with
-> integrated 100BaseT1 PHYs.
+On Wed, 03 Jul 2024 04:20:29 +0000 patchwork-bot+netdevbpf@kernel.org
+wrote:
+> This series was applied to netdev/net-next.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
 
-Since this is a patchset, a cover letter would be normal.
+> Here is the summary with links:
+>   - [01/47] dt-bindings: arm: qcom: Document QCS9100 SoC and RIDE board
+>     (no matching commit)
+>   - [02/47] arm64: dts: qcom: qcs9100: Introduce QCS9100 SoC dtsi
+>     (no matching commit)
+>   - [03/47] arm64: dts: qcom: qcs9100: Introduce QCS9100 PMIC dtsi
+>     https://git.kernel.org/netdev/net-next/c/df18948d331e
 
-> 
-> Fixes: 788050256c411 ("net: phy: microchip_t1: add cable test support for lan87xx phy")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+This is some bug / false positive in the bot, to be clear.
+Commit df18948d331e is ("Merge branch 'device-memory-tcp'").
+No idea how it got from that to DTS.
 
