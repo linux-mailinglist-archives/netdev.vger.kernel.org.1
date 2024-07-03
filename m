@@ -1,240 +1,131 @@
-Return-Path: <netdev+bounces-108785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF00925714
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:42:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B05092572E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DFF01F23E07
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 09:42:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC11E1C210DF
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 09:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96A813D612;
-	Wed,  3 Jul 2024 09:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7ED413DDCF;
+	Wed,  3 Jul 2024 09:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="FxImH4Cc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C682747F
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 09:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C3913541F;
+	Wed,  3 Jul 2024 09:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719999725; cv=none; b=MC9sINWNsjgdk3lDJvnM92N+917AqXiLLRX8GfsnIbUSTYrvYyf4A5dBTKIp3vgE4/DLXQfJP4jK1EyRLNRChkkIFQDCNvWlr9GFfKhwxFSeKpHqXnSyUG+r6TiFqfLOZ8HQpx6zrgNoqOCXjIRgUlyNS1ITijzSax414VEv4p0=
+	t=1720000019; cv=none; b=Z5gmd2fxtNF6d+k3lLsYtrmkX9bhC8ZXAgsAfLWZDx1bSaab2Ob1yG26fvFbViOsGGDgSfFBIYQv/VlMA5C/ymvlzA1BAzUIzZ835xzUunv/Nx0+rNT1WvlPZo5zuMYeYw3FegViMjzO6pTAgW0QkNkzs2yOWS5ITxa0lmuASRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719999725; c=relaxed/simple;
-	bh=/Nkk+07r0gtlTJcexFll6QbvHuezlz4YnuAXhVDP5SU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hCt0Mo1t5OV+CmVtOtaD9FE+V1HyA+/UTamcqMF6RMJN4rS01kU9sfwofe2ED2P10ILwlNtOnqi3YOn4J/0gjRXVtqgOItYQUiVU38cdrEcW3fyiMuYohgZ6Ay2tgxfJSXwtfroPTRSOcOAuwoyhfQn3bQcakfFporIMbIZDUb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.32])
-	by gateway (Coremail) with SMTP id _____8Cx7+vnHIVmDngAAA--.1383S3;
-	Wed, 03 Jul 2024 17:41:59 +0800 (CST)
-Received: from [192.168.100.8] (unknown [223.64.68.32])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxZcXjHIVmB3U5AA--.57678S3;
-	Wed, 03 Jul 2024 17:41:56 +0800 (CST)
-Message-ID: <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
-Date: Wed, 3 Jul 2024 17:41:55 +0800
+	s=arc-20240116; t=1720000019; c=relaxed/simple;
+	bh=bouHdOsxPVaf7RPMK1kJM80X30VaeGQat5pdp7fw4K8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=crYSQ0supDonFMu8G7crOW/x/eKJkbzufh7Iq3NAgjjKT7wbfA9L0wIn8e2qityNQnToiyl2rIUJDltimbUmZFXkiOlWBlKByql2Xu01eGENEAYLSqe1+gib/KQbqIhCe5z5aUL+g+LEwXPPcI78aTqgiAkhDn/oRJR00wq+7Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=FxImH4Cc; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from localhost (unknown [IPv6:2a02:8012:909b:0:1e90:7398:2278:75e2])
+	(Authenticated sender: tom)
+	by mail.katalix.com (Postfix) with ESMTPSA id B81097D76D;
+	Wed,  3 Jul 2024 10:46:50 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1720000010; bh=bouHdOsxPVaf7RPMK1kJM80X30VaeGQat5pdp7fw4K8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Disposition:In-Reply-To:From;
+	z=Date:=20Wed,=203=20Jul=202024=2010:46:50=20+0100|From:=20Tom=20Pa
+	 rkin=20<tparkin@katalix.com>|To:=20syzbot=20<syzbot+c041b4ce3a6dfd
+	 1e63e2@syzkaller.appspotmail.com>|Cc:=20linux-kernel@vger.kernel.o
+	 rg,=20netdev@vger.kernel.org,=0D=0A=09syzkaller-bugs@googlegroups.
+	 com|Subject:=20Re:=20[syzbot]=20[net?]=20KASAN:=20slab-use-after-f
+	 ree=20Write=20in=0D=0A=20l2tp_session_delete|Message-ID:=20<ZoUeCo
+	 DMkRA/9DSi@katalix.com>|References:=20<0000000000008405e0061bb6d4d
+	 5@google.com>|MIME-Version:=201.0|Content-Disposition:=20inline|In
+	 -Reply-To:=20<0000000000008405e0061bb6d4d5@google.com>;
+	b=FxImH4Cc+MmKNP/W1dIfK745SW7hYM6WudOVJcab9XMPeNyGvnm/z4pmVzbwzA9gm
+	 iirs2VMH7FkBMP4HKvof46cisiOu1XogdfgzHUIYEdYXSftxp9VVs04DsLWAAPcxc3
+	 TT4Am5Bff4xGj/9Tta+pXYZNA69Mj8KJRzW6/pYFoG4hR4wKvUVgbpeoseBF1+0u8Y
+	 qajBRLu2yCjNKhtuio+gs1/qiTRXgaafUtiCM05hn/nNPgsonlZhPM9tkojoM2pTcQ
+	 jkUgARp+f0QmmiD15gIokLIMZc96n6gsNhNWE/bPcKBTWV+FqyOWp5z1AnzxBjEMpx
+	 u7R0Cex694xgA==
+Date: Wed, 3 Jul 2024 10:46:50 +0100
+From: Tom Parkin <tparkin@katalix.com>
+To: syzbot <syzbot+c041b4ce3a6dfd1e63e2@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Write in
+ l2tp_session_delete
+Message-ID: <ZoUeCoDMkRA/9DSi@katalix.com>
+References: <0000000000008405e0061bb6d4d5@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
- GMAC-specific platform data init
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
- <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
- <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
- <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxZcXjHIVmB3U5AA--.57678S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxur1xJF13tr13GrW7tFy8tFc_yoWrAw15p3
-	y3Ca15Kry5tr1akF4UXrZ8Z3WYyrWYy3srKF4ak3WDC3s0kw4vqrZxKF1I9FZ7ZrZ5ur45
-	Zr48AFs7uF98trgCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAF
-	wI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
-
->>>> -	plat->mac_interface = PHY_INTERFACE_MODE_GMII;
->>>>    	pci_set_master(pdev);
->>>> -	loongson_default_data(plat);
->>>> +	loongson_gmac_data(plat);
->>>>    	pci_enable_msi(pdev);
->>>>    	memset(&res, 0, sizeof(res));
->>>>    	res.addr = pcim_iomap_table(pdev)[0];
->>>> @@ -140,6 +142,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>>>    		goto err_disable_msi;
->>>>    	}
->>>> +	plat->tx_queues_to_use = 1;
->>>> +	plat->rx_queues_to_use = 1;
->>>> +
->>> Please move this to the loongson_gmac_data(). Thus all the
->>> platform-data initializations would be collected in two coherent
->>> methods: loongson_default_data() and loongson_gmac_data(). It will be
->>> positive from the readability and maintainability points of view.
->> OK, I will move this to the  loongson_default_data(),
->>
->> Because loongson_gmac/gnet_data() call it.
-> It shall also work. But the fields will be overwritten in the
-> loongson_gmac_data()/loongson_gnet_data() methods for the
-> multi-channels case. I don't have a strong opinion against that. But
-> some maintainers may have.
-I see. I will move this to the loongson_gmac_data()/loongson_gnet_data().
->
->>
->>> In the patch adding the Loongson multi-channel GMAC support make sure
->>> the loongson_data::loongson_id field is initialized before the
->>> stmmac_pci_info::setup() method is called.
->> I've tried. It's almost impossible.
-> Emm, why is it impossible? I don't see any significant problem with
-> implementing that.
-Sorry, I've to take back my words.
->
->>
->> The only way to do this is to initialize loongson_id again in
->> loongson_default_data().
->>
->> But that will add a lot of code.
-> Not sure, why? What about the next probe() code snippet:
-Full marks!
->
-> 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
-> 	if (!plat)
-> 		return -ENOMEM;
->
-> 	plat->mdio_bus_data = devm_kzalloc(&pdev->dev,
-> 					   sizeof(*plat->mdio_bus_data),
-> 					   GFP_KERNEL);
->          if (!plat->mdio_bus_data)
->                  return -ENOMEM;
->
-> 	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
-> 	if (!plat->dma_cfg)
-> 		return -ENOMEM;
->
-> 	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> 	if (!ld)
-> 		return -ENOMEM;
->
-> 	/* Enable pci device */
->   	ret = pci_enable_device(pdev);
->   	if (ret)
-> 		return ret;
->
-> 	// AFAIR the bus-mastering isn't required for the normal PCIe
-> 	// IOs. So pci_set_master() can be called some place
-> 	// afterwards.
-> 	pci_set_master(pdev);
->
-> 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> 		if (pci_resource_len(pdev, i) == 0)
-> 			continue;
-> 		ret = pcim_iomap_regions(pdev, BIT(0), pci_name(pdev));
-> 		if (ret)
-> 			goto err_disable_device;
-> 		break;
-> 	}
->
-> 	memset(&res, 0, sizeof(res));
-> 	res.addr = pcim_iomap_table(pdev)[0];
->
-> 	plat->bsp_priv = ld;
-> 	plat->setup = loongson_dwmac_setup;
-> 	ld->dev = &pdev->dev;
-> 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
->
-> 	info = (struct stmmac_pci_info *)id->driver_data;
-> 	ret = info->setup(plat);
-> 	if (ret)
-> 		goto err_disable_device;
->
-> 	if (dev_of_node(&pdev->dev))
->   		ret = loongson_dwmac_dt_config(pdev, plat, &res);
-> 	else
-
-> 		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
-
-I don't know how to write this function, it seems that there
-
-is no obvious acpi code in the probe method.
-
->
-> 	if (ret)
-> 		goto err_disable_device;
->
-> 	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
-> 		ret = loongson_dwmac_msi_config(pdev, plat, &res);
-> 		if (ret)
-> 			goto err_disable_device;
-> 	}
-
-It seems that we don't need if else.
-
-If failed to allocate msi,  it will fallback to intx.
-
-so loongson_dwmac_msi_config also needs a new name. How about:
-
-...
-
-     ret = loongson_dwmac_irq_config(pdev, plat, &res);
-     if (ret)
-         goto err_disable_device;
-
-     ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
-
-...
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="8snERkfl58I8EGWb"
+Content-Disposition: inline
+In-Reply-To: <0000000000008405e0061bb6d4d5@google.com>
 
 
+--8snERkfl58I8EGWb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->   	if (ret)
-> 		goto err_clear_msi;
->
-> 	return 0;
->
-> 	...
->
-> The code allocates all the data, then enables the PCIe device
-> and maps the PCIe device resources. After that it calls all the setup
-> and config methods. Do I miss something?
+On  Tue, Jun 25, 2024 at 06:25:23 -0700, syzbot wrote:
+> syzbot found the following issue on:
+>=20
+> HEAD commit:    185d72112b95 net: xilinx: axienet: Enable multicast by de=
+f..
+> git tree:       net-next
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1062bd46980000
 
-You are right!
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
+it  185d72112b95
 
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1290,13 +1290,14 @@ static void l2tp_session_unhash(struct l2tp_session=
+ *session)
+ static void l2tp_tunnel_closeall(struct l2tp_tunnel *tunnel)
+ {
+    struct l2tp_session *session;
+-   struct list_head *pos;
+-   struct list_head *tmp;
 
+    spin_lock_bh(&tunnel->list_lock);
+    tunnel->acpt_newsess =3D false;
+-   list_for_each_safe(pos, tmp, &tunnel->session_list) {
+-       session =3D list_entry(pos, struct l2tp_session, list);
++   for (;;) {
++       session =3D list_first_entry_or_null(&tunnel->session_list,
++                          struct l2tp_session, list);
++       if (!session)
++           break;
+        list_del_init(&session->list);
+        spin_unlock_bh(&tunnel->list_lock);
+        l2tp_session_delete(session);
 
-Thanks,
+--8snERkfl58I8EGWb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Yanteng
+-----BEGIN PGP SIGNATURE-----
 
->
-> -Serge(y)
->
->>>> 2.31.4
->>>>
+iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmaFHgQACgkQlIwGZQq6
+i9CeRAf/W3LdHltDdn3pvAj9TMVybZHHF9EwniUz3G3NRWazvpq5T4svhx/H7uf/
+OJ+m5auCgiDOHuz7DtMP4LKd3VPnRZ2RYFtYztDNKZDSIsWQNBVVkfkV97+FmARu
+mBgW684e8gRLVybRG+sQEgJaXHieG+hz7mO7YGfQBK0sncrMcKVn40SLGhB3LA9F
+0W/Jnm3QhFRGqtmka23k3od7kASz+87LxGrZhclemnu+knTpyTA/Uf7YsD176TH+
+fdtrjUBPJy4BX3qcThTks2NgQdS6WQ2dtTRk792lNNOUtfo0m/Tx4B0dALbVP3Wr
+1VoijlJ88UWjNjb1Hr36qpzddS48rQ==
+=j0cV
+-----END PGP SIGNATURE-----
 
+--8snERkfl58I8EGWb--
 
