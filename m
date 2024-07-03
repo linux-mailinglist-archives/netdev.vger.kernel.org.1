@@ -1,561 +1,371 @@
-Return-Path: <netdev+bounces-108992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B751892673A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:33:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26AFB926747
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 19:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6EE71C22137
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:33:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D68282E5E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D171822FB;
-	Wed,  3 Jul 2024 17:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64500184136;
+	Wed,  3 Jul 2024 17:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qRZ7zBqM"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="dRH6Ym6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2078.outbound.protection.outlook.com [40.107.237.78])
+Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazolkn19011027.outbound.protection.outlook.com [52.103.43.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F80442C;
-	Wed,  3 Jul 2024 17:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B654181B9F;
+	Wed,  3 Jul 2024 17:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.43.27
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720028015; cv=fail; b=ontX+LIcBt0ihd0jeD7j6OajDG0rXd2gUgMGbCxjWhTukXGkZDtp9dOX9Pqqji46rDM08Az67RLI9/PF5z7o4Dfovxm+kfBfWGopX57w4y9MUpmZ3qQRruYdZk3Sm+3o78sZVXa5r1/3W9H1yTTONy0AENWCE3AW9WZ5VdzMjTM=
+	t=1720028342; cv=fail; b=tcnh6WNDo5XlZf0D2lMP8adoV/ugphaYERTrYo3Dqy5Wmcm3o3Qu0+8YD6lHGcjOverGif2foZnwNbecK6miWVKX96P2VLsiCTp54QwLsmSUs4N/2tCRfLkwWWLSYe1Y64TxuXi/Rq/AiH7kOkyozb+Kg8/Naazc9PKx/6pLPXg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720028015; c=relaxed/simple;
-	bh=ykf391GWnBD0lBW+EiYJxdyBNBxch5LVPwvxvBJSeRo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FJElwQ/kYckTioRWGlNpPAwi5JZLeR31+vUe2oqzIqL/LJ7Gs73AHv6jEkLpdRwGLvJfPep/WAa4aGvmk+G5sgvW6bIs5Crs6VFMFIS2HfWhpKG2eaSjs+Dm9O0W3vdz8r1h9PVHLvFZf5I0j8NGHVr+PPYdBg20q2UpTvbIDdU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qRZ7zBqM; arc=fail smtp.client-ip=40.107.237.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1720028342; c=relaxed/simple;
+	bh=Aufh20Ld/hGh0HLN2HOuPrlOks46cvIwicGr1mP9Cls=;
+	h=Message-ID:Date:Cc:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DJKqCDqVFEUHfO2/N5WnQ1M+N62YsGwj2bB2PpvkQBevFaLSfxhkUgaeB8yXqoeMWIJP4GzmnjUmnZTG4ifIGB4sHkQNwx0D1WvkFK4YJS5kfh7Cr+XMye23K66seDjOcueNCDUYrTIwVk2tqR6ICVg4BcLGiV6DFeLS5kZPkmU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=dRH6Ym6G; arc=fail smtp.client-ip=52.103.43.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ep3TogJTNzzkCLjED6MpWee5N9tFgOxUSAeeRN3JSNis4X2XHXcTlARrZgy0E4zhn5pjSjZ8Z9JDy1AnrXdXBvaYdqGLC9yfp7FgRxPSp5r11ipG9CkwhMiCf/MCH11LmQIv+1COxwHOmJy6o6rqZ+so/DZCxuITqV6zinIU1PtF4ph82xsmNKGgdMISYwlzjtDX/F5BKD08i91mdtj3emm8cY7qU40CxAKETuXtOeiuxyhbLCjA/ZsBQ3NcVc/zRzhbYvTGt0NTWHqZvP8Ze3bmlmuZQgjrhM/hMvHbfXfBANZAWNFtMUhly4p3vUbrHQsHZJdAwvz5B39g+i3N1A==
+ b=kZYAzqe165algaQNbYMLQcS2dQTZyyKkY89DR6+5LmFqlbFb187UMFwBY9yzsS9j9iULdy9d+BuC2qwvXk+z1xLLcSgPLkzaKcRAf5EolxdjscYzUVz910Q47jHykuLEsEbJA7KlrHa+JpKWxynU+++eHn7bLeGKX079ncFsQP90JWD/OOXCZxvgaG9bOeylXQQ4xq3/UdSCi+mCOlz0oEJDNxXYYY+5RYtWj38BpCjCCcBve5d4ULo+JTbNy8TiGuDnxr5LgczMdI36v2QhmEqI7H12dRzM2ynJ4x8oJgMbt1Y8yBr21uS9NUvjekHGnVpzpKW2cUPZWJ5BoBw4ew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oKGEKMG0mtR6FVseku3lJxDecmmojqn3m+5MyJOhWrI=;
- b=LcylXO/yWJgEXYpM+75XeDR1kBkncSlxtoE5hOeC09IYMXzIUIHZhpt+IpLv7qsz06YG5q7mS/lHrI5rDm/tpawWY4lnEPXiyFAnbGFcYyfPdnIIlbMwbYXQFIFrVRJzNuDxK9mDdL7Jn5RBP3vpUpW9mKK9bVXYn/JoFQMgMWh/i5lEEITPcVuGxyUbM0KbloM1DBRAbF4yikdMit/sTu76ygSy2TM023n9sV9pTSKpB1Il/3u3wqC0oefuf7qKo7v1dW5sr8xny6YhnA9aIxSGW1tAhGJZBjAfepXPIbnMl7nNvK4yzZ5OQTnofwSDQIUdMNCdWTjK4f0qqEeXGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=Aufh20Ld/hGh0HLN2HOuPrlOks46cvIwicGr1mP9Cls=;
+ b=IzvL/6nv7rOV6P1EvRhB4U2Ko5tfMMuEfNMxEPgEBMLzI2/rmcocTCudK38xFx295QvGvg1zPvOkfe9oP8xFHwjdav5b+YgcUProzNqDMs1iL/TJGEALeaMEh0677VvB6uuWoahgIceZISeWaRzV895Xp0fso79r7HYGBtJjqdIVdJe0ljEhStGeDEsj3Wo/dzgqhQP3Ppa/HUWQKNxGhypSW+/Ff3ZAuZKzXAAqEw1uIc5uyMPGyzKywttiSiCpV1ECecHlxTKf9bWR7ZL/Bca0QFwNmFaIctXPgtmxan3qgtGzTx4Aoya+3UTUt0AM5HghGb5LI/xEjjJu9DxT4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oKGEKMG0mtR6FVseku3lJxDecmmojqn3m+5MyJOhWrI=;
- b=qRZ7zBqMAELw0dTKL8z+uMXhPr4jMm1AVmxjqtnDlonoia4Pdvs2GcYsDsRWen0HbjLZpDj8ooK6dg6KNjDFHAtWxH1cigvY/4jspllQlkyRsEeiNI9mjS5LMMRNDpx5EPOfYIR1l48rk79Afm4KjBzEmKf85zkQK/EB3+l83MP3etNNLEX5j8wtR+2/Wnn7ALCwH72rJiF/DzIurDcINkmVDrSHKa/+uEPPRhZyfBGLtzvNsYNaCKipTrri8DENBjG5sNnt2QVtC3U8jvzWU9RGSPKmecy0Obe17nDLJiCMybTFU7b9RpfTUSfRTAHXqtFMYFG/VBAIxH4P3461gA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH8PR12MB7110.namprd12.prod.outlook.com (2603:10b6:510:22e::11)
- by IA1PR12MB6260.namprd12.prod.outlook.com (2603:10b6:208:3e4::17) with
+ bh=Aufh20Ld/hGh0HLN2HOuPrlOks46cvIwicGr1mP9Cls=;
+ b=dRH6Ym6Gt9h+lIIo+qaRkl8lDtacs5nj/Y/P4CVjKQe++pZGSi13BW87Z/UTjNnYt0KBy8PBOfrjdgnsPRcOzKjvphBEmno23UFtUFDOC5r1exA2RB2n+yIuD4aUsWJvJX6jIhk9Duf8PLRjXXDiCJnHcqEWt5TecwuZ7rFiAaoLKEsR1j66uZMqc23YyO9bf3I6+e8fFZzse0zaHDD8kdAYEgdXqHeKvd3L2xYfaTg8uZ2cX3JVLEdo8qs4C3uuHvErvDDtjxSPtg41gUgcEcC6lTr54/kr1JFjgYSrnvGw120UIgNuDflc7MyxiUa7u9nRAP8rFxg83TeOf3wzMw==
+Received: from TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:23e::10)
+ by TYCP286MB2162.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:158::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.34; Wed, 3 Jul
- 2024 17:33:29 +0000
-Received: from PH8PR12MB7110.namprd12.prod.outlook.com
- ([fe80::ab36:6f89:896f:13bb]) by PH8PR12MB7110.namprd12.prod.outlook.com
- ([fe80::ab36:6f89:896f:13bb%7]) with mapi id 15.20.7719.028; Wed, 3 Jul 2024
- 17:33:29 +0000
-Message-ID: <38443fee-bb05-49a1-9962-f5309be5dddb@nvidia.com>
-Date: Wed, 3 Jul 2024 10:33:24 -0700
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.25; Wed, 3 Jul
+ 2024 17:38:55 +0000
+Received: from TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::85b8:3d49:3d3e:2b3]) by TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::85b8:3d49:3d3e:2b3%5]) with mapi id 15.20.7719.029; Wed, 3 Jul 2024
+ 17:38:55 +0000
+Message-ID:
+ <TY3P286MB26119C0A14621AD8D411466A98DD2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Date: Thu, 4 Jul 2024 01:38:50 +0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v7 02/10] octeontx2-pf: RVU representor driver
-To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, sgoutham@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com
-References: <20240628133517.8591-1-gakula@marvell.com>
- <20240628133517.8591-3-gakula@marvell.com>
+Cc: wiagn233@outlook.com, nbd@nbd.name, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, pablo@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ stable@vger.kernel.org, Elad Yifee <eladwf@gmail.com>
+Subject: Re: [PATCH v2] net: ethernet: mtk_ppe: Change PPE entries number to
+ 16K
+To: Jakub Kicinski <kuba@kernel.org>
+References: <TY3P286MB2611AD036755E0BC411847FC98D52@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <20240702110224.74abfcea@kernel.org>
+From: Shengyu Qu <wiagn233@outlook.com>
 Content-Language: en-US
-From: William Tu <witu@nvidia.com>
-In-Reply-To: <20240628133517.8591-3-gakula@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0054.namprd11.prod.outlook.com
- (2603:10b6:806:d0::29) To PH8PR12MB7110.namprd12.prod.outlook.com
- (2603:10b6:510:22e::11)
+Autocrypt: addr=wiagn233@outlook.com; keydata=
+ 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
+In-Reply-To: <20240702110224.74abfcea@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------7eYjI62tq2hmBOSczrM0xbfC"
+X-TMN: [ar3CV+Rr3uiPrWUOhflbG1fRR41UQc4hhvUMdwl4tk7VD5rGUpuMon3V3+kDu2GH]
+X-ClientProxiedBy: SG2PR02CA0107.apcprd02.prod.outlook.com
+ (2603:1096:4:92::23) To TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:23e::10)
+X-Microsoft-Original-Message-ID:
+ <3a3f0b5d-3b92-4077-b07f-d5278f6fa83c@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR12MB7110:EE_|IA1PR12MB6260:EE_
-X-MS-Office365-Filtering-Correlation-Id: d984ca86-0e6b-4397-6bf9-08dc9b864084
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-MS-TrafficTypeDiagnostic: TY3P286MB2611:EE_|TYCP286MB2162:EE_
+X-MS-Office365-Filtering-Correlation-Id: a5d0e178-b565-48e8-32d1-08dc9b8702bc
+X-MS-Exchange-SLBlob-MailProps:
+	Cq7lScuPrnpXB0xcNeDVdJIgd0h0Wm5oDRfh+5EF2fUegZqKgcNYEOmMYcDUor9AediZULGAVc/WhZFnHsiBFrdheiFSQcDyVjIp16A9OiSzeZ/RNvvtAsk2kAbb3flJc4Wjyenf/D9mzdPWNHGwyxI8cdaUfUjdu6Lcc8/Q+2DY5wG9yaKjHiBGC96QKiSUa4qnBJC36T7FuPjI3UngiqsiRD9J0OKWw6ZcAj+irAyoYPn7Nz0xDBlVwYmzpivIhUOXFR+aVafFpUI+Hdgyo+whXFcZcvH/fjDcVuN/1Xt/pPJNN2Vck0eiyU7eW53WJTB5Gn4RFyntaQu6lgPmmTzNazww6j7ZVS0v2lOA0+Wp+9KaPYs4JFUm3cWuuv71GPYhUKxDWg4vbh6p8FV01vK+yZFhM0LOX66i70ZLJGEclJusI3mJQ+JfFwnRCyRk91IAT9aBKp/TFF3bZry8eUJQ1CnU97UCgnMlPkhxg1YoJzp/GzL8ehZa1twCjPbw52MfF3QXL0+5e7Qy8X59BF8bU6rkOLyOCZGe3AWux8fZM2DjKB5lUmgYxjZiAkILz+LwgFIypaWhdYkP0yYZgbCKrHcYRTP78yFa/SWYghhG53iSuDGVc1nnMD/UsFjCXWiNE9CXt6Qpuw7iA8D/0iDr8hlvHH63nw5scECLjnvY0AYLbxZVs2pVgIKdocWDgPu7BKFHcVdKjAihNMzVXtHau1safJKqEOb1WRjyi5ktSOgsebcl7s90F75KDcXmlWjagq/Ueoo=
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|8060799006|461199028|6092099012|3412199025|440099028|1710799026;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bXU5dHVPeWdHRkRRejcwUzZKVnNGdFNFTVF3bmR2WmFXN2dWekZ4Qk4xMnJa?=
- =?utf-8?B?a216QWdYL0tMbDZpd3B5VmlYcFhWWENpMmlsUDdxUEl6Y0YvVE1qcUxoMXVi?=
- =?utf-8?B?SWVLeHJxYzdIdWtkQ29DbVpEY3dONVFyRW1lbWxzeHZtMDkyTUdmUnh5VU1h?=
- =?utf-8?B?OGJPM0pYVGpWUWJuNmp3YTZoekYwQVlxQkFnK1dKYk9BTllCTzVyaUo5QmVx?=
- =?utf-8?B?aHJXNllEVjhCNXlmT2hhMTdjOVJ5V3BzcTJYdVNrcm4zR3pNSzBpSy9SK2hj?=
- =?utf-8?B?eDdVUTlTWnI4Vkd6YjMyU2RVbVpJQzY1ZDNETWFRakRxRWtLZ2hDdFpKNWU1?=
- =?utf-8?B?NEg0Sm54TUlTT1lHeG16d0IwVXpKc1AyQ2h1cTVISEN1a0lRZE5WdG1ZYk9C?=
- =?utf-8?B?SExnMUNTRzZGZThxdTZQRy9wQUNITnFsMGdtRzJ2ajlQd0J3dTZ1L1g1Y0p0?=
- =?utf-8?B?N3h5blJlcW11cXlWb01wMzVOTnJ6M2NFaDFrV1ZNTTIwOUc4aFgxWTdGOE1j?=
- =?utf-8?B?QVV0TE1uYVA3VlBQVkJEVDhHWEU2c05mbzFYSnZjOTZhQWxKS1RDTWtpRm5O?=
- =?utf-8?B?NGpzUWpDUHlYUkIxTHRQZzVJT1FBYS90QXhWRWN2SEhsQk9LM2dlZG9KbU0v?=
- =?utf-8?B?MVVQb1NOQUp6Wmt6dWdMZUlYcWlDS1RnWDJ2dG91STdEcnhJSlRnRGErYWVD?=
- =?utf-8?B?S2F4YUthYnlxa1REQmpocHJ5dDBhLzYvcWk2UWcwOGpKN1lTZ25JNUZRM1Zu?=
- =?utf-8?B?aTc1azNnVlI0ZG5qR0hBeU1DcHpuMGhhWm9uOVZOOHdqTzlWei9TcC9FNlpz?=
- =?utf-8?B?Y0RBU3Y0cThIZFUyUm5UbmZMUU9Md0dyN051OURKRWkrN1lEWjc0OGxjSTVY?=
- =?utf-8?B?MHlnL0RTRTlvbEZzT0hXbUk3WWJqcG1ReGpGN2UweVRkYm56QU9oNFUrMG9G?=
- =?utf-8?B?OU4xOHFJZlFqb25zcnV6S1F5YXUwcGhvc0RXZCt5NlVSdktHelB4V1NQZ3Vr?=
- =?utf-8?B?TmNPSXlJMElKNCszL0lPM1d5ZXFnZTFWK0hnQ1IxZHdTTk4xODZZNEFLT0Q5?=
- =?utf-8?B?ejBvdUhaWTlIalY4V1hOaDI5SUczL0V0clY0bStXS1QxYm5ubE9FUDNGWHNL?=
- =?utf-8?B?anNGWmwvdFB2bytVWWRaOGxIbDVVZEJ3eHFEYjZRMGptemM1Z2dONjVFL1A2?=
- =?utf-8?B?WHJidVFpSU5uTldSUlhaRWF0bkF2Z0o5NkpFMnpLRTlxdndNN0Q0V3dxMjN2?=
- =?utf-8?B?QkdGZTlKR0U1czV4b2xnbTc3Z2dlazRqTHVlMlZnTHBpYzhPOWVmeUgyNm1T?=
- =?utf-8?B?eHJEODBWM08wZElrdk52cDdSV0tFYnQxQldGUHloY3JTVmVITUxWS1JXRFZL?=
- =?utf-8?B?REZLa2d3bktZOHNBcjFXVzAyWUFCOVNKMVpjTTZGVVVZd1owNU1rZnh2Uk0z?=
- =?utf-8?B?OHJQZkZ1WWRRTmp1Rk1RcGJOcXczYnE1MUlrR3JkUkN1Ym9JSWFZUW1tMFB1?=
- =?utf-8?B?bGd1Qkhob2I0VWU5c3dDRm9qRFc0SWtlcHpMcFNtZzBxQXViUW9HTktmTnoz?=
- =?utf-8?B?QzdBNm1sSXlxcWtHU0R0KzVDR1U5dHlrNkhZbnpzR3pSM0xTdjF0Mkh6d1dW?=
- =?utf-8?B?dC9OdmpTbXl1cEc0WW5ETXJKUGJPUnM4d3ljUmVmME12LzlscWc1aUxTQkhE?=
- =?utf-8?B?Z21lWXhoSytYSkZZQmNINmFGU25DOHhqK3FzUzlOOVQxSkRCcE8rUUNObFZi?=
- =?utf-8?B?Y3JkL1lqdEwyY1JFcGpBeWpCd25YanpiZ3dzR3Njcis0STVjdUhUeG52czhs?=
- =?utf-8?Q?ehCXyEnMI4UzjM+zSUcvm6Ethi9lySYNEFPRM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7110.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+	RyriUE7/A06Mv8kqwZ1Y+OugBbAOhpjqiTX4deVA79Vp4ejfXF6ZoBFH6R8EGmEgC9X7iYXYeSSYSW8gO8Uw2UFhnFARmJVqM4w5Pzrh/uPFluyE1VchqBab8AGRFyOevaLLuaMpdfLHNFrskRf7OK3HofuN65NI01eYnBgVh70AJZuOynrFrnFHgZhq30ZDdOUqFCU35APMKYcmmnnnVZ3y4g78I6mF0UyRZW6wK7P7s5ruvSgqKPSTFtoINWNpThuA8eYwhP0hkMQc8yNTBFp+FjcfnW3DQ2JdDks5sJb3RcKooB/GSzB5rBMux2uF8QCghv6pywxD3JIEBIH1LMAlvdcIyrdXm5MPMisngZ75FFKM6Gcs4l+FsVuco43GdO1uITcLOfzjF3DxfblDXSGBhvF+qjY4ooeioFfI+KFZWjRK9LUUeB9Glx7l4Vr4WkZ74CVZbd8glZyJplOIUPFYyI3fnvvUsD0YJsc4taAdFiYN/Qo7DvTM5vQQx+ZdZRZ8FAAP6rleAd9/ikW4KCWAo0ha/YtwY49dQ2rywyZH+Vm6aMWwyHyk1Dy5vASJOuSRNuD8e48hby/U5UnTYaUSIk7Hznj4BPlc2pI9r+mpFws8umGgG/OAnJSixVg7uG+MYt4XB/r0Om+fva04EKCqwhfGogotz77Q5CLkRLf3bpMCz7inN03yyLyprAXi
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?akVnd0RmUXQwVEpVTnVOeUwzamhnakNERjFKaS84RkEyU1plOU5RU0RKS2Rn?=
- =?utf-8?B?dEtTdE1qYk9FTGZpQzV4QnRXOG9qVmpUS3R5YitQQ1paTlA2MjVDdW9QaFpn?=
- =?utf-8?B?YUNFRjh1RW9OUEJEQjNGOTRUYXUzbWRUc041MHV1c1dPN0pVNjN6b3F3VW10?=
- =?utf-8?B?YW0ydThnbHg5NmwvWUxBWW9RQklJTzNMUm5ka3FIMWhkTkRKV05tbFMrUUhI?=
- =?utf-8?B?UWZQZGlNWUhTVWdpQ0RzMTlPK1ZJNHgrV0trMmZRRnk1ZHR3R1hYd0s5dlF0?=
- =?utf-8?B?TkdBanl1eEJiVytxWUMyWHVJS0sraGd1VVNZSUN6eEErMGZjOEd2aEo5QmJr?=
- =?utf-8?B?enh6Njk3c1dZTW5mQjJ6V0xWV0J4MXFvUm5xZmFjUEE3QnZRdkJPSWNqaXd4?=
- =?utf-8?B?QU1WZkEwM1YrYWpUN0hkZHV3Zjg1TXNQQzkyd0N1SWIyNDRybkh5U3JKYkxu?=
- =?utf-8?B?NlVMT3VyNW5SVEJUNmE2SjVMWCthY1dpMGhXUzROSlEwWVI0clZHOHlGcjlC?=
- =?utf-8?B?VzYyWGt4VFUranZ4emtuaEFyWFdhZDMrKzBTSGI2czEyVE5IK2UzWS9VS3NQ?=
- =?utf-8?B?ZHdzTFVmeGhqN1pPaDNER0V0QVVadmJrdUtPZXYxM3FlSEJXc2JJbzREYXFj?=
- =?utf-8?B?TUs2ZDNBUmdGY1dXc0tFRU4rbmJBZnl4YzB3QUxWeUFYSjJaQUZLUml2Z3dz?=
- =?utf-8?B?ODNxSTBXZm9uVSttbjNhMG8rUFNhaXZ1a25lODQxN20zWnowWStLOUM4OFl5?=
- =?utf-8?B?TllDaVNkNkRqWU5ScXdkUmtYQVZMNWtPMlVURTV1Nm9ONDBPUWt1cHl6UGpK?=
- =?utf-8?B?bEs5U0VqekcrbzhObjJ3Q2V4VjFmVjRCMDNsL0IyNnJiR2tRcHNIdHY3MnR3?=
- =?utf-8?B?UmI2Y1cybDRoY1BMREl2L2pJT3U4dlJWN1NLSWh3bmlXN2hkV0VEZDVzMGww?=
- =?utf-8?B?bCtoL0poajJ1UlArM1M2cllQSEtuUEtMWjlqc0tVSGlrcXJwMHUwTzI2TUQy?=
- =?utf-8?B?VjFrcFpKMW5uMnFOQUJzT3IrckNVdnEvNWgxYnBQMmtqYXZvOHRWcXpjdTMx?=
- =?utf-8?B?SEppNWZSUVFONkc1WWZBaGpxM3hCeVlSR0JkLzkzU3V3UkVQNElkRGg4eHFT?=
- =?utf-8?B?RVcrKzNvZVpvbElsNUowUnYxTnNNdkxXb0dmRWR6L29CSzNncEg1Rm9SSVpr?=
- =?utf-8?B?TFJxMWtMWERsdjEwWk5lc1JsZjV1aXZxZCtLaVd1MTByYlNxV25TYmpMRHVD?=
- =?utf-8?B?VitvWjVOUzFLbXBEZCt6YjFtREZMdmtYMWF4dG9KWm5QcS9HMDRraXZMS1Jp?=
- =?utf-8?B?RTZPN05jQTVUbFJyVEd2bTJ0S3g5RVkxamhTZDkxbkc4NCttUjdIQy9oTWNQ?=
- =?utf-8?B?cmptbzR1cnZEc3ZYUGNPT3RKbjcxK21HKzZNUG5KN0tDMjA5SklSOG1rejdP?=
- =?utf-8?B?WXVjVHVBcmEwNWFKSkpHR05wNXNlVFN5dTlwT0RQWnhpb2g2a1YvWDVlWm9M?=
- =?utf-8?B?ZWlCeG9BOUlGMnVBd2VZMFJ0TkpxeTU5Ujl5YURMYktUOHBtTWo5N1FvWjIy?=
- =?utf-8?B?dm5vaTRsaXVVZjdHbmJFeE4vcjI0NEJhTjVkVnd1aGU0TUllOHFzc0d6cHlR?=
- =?utf-8?B?QXp3b0NjU3lVbnRDZU9jT3hHQVhRR0NRazNZMUZmOUl2Nzc2UjNSTjd6UkNk?=
- =?utf-8?B?V3FNUlU3Y1J2SlhEZFAvOWpoUlBnRytLTlc1VklxQlpwWlZiM2pTNS9xL3BC?=
- =?utf-8?B?MWdoYVpjL0xBVmtPcXh5cDNKUFJtci92Ukk4Tm5yeUtjZEc5Qm93by9heVlD?=
- =?utf-8?B?bDhNYUpLYVI1YWpVVDRucHEvNlFMNnBLdmNTa2RBRTVnMzRJREc1cG43LzB1?=
- =?utf-8?B?ZGw2aUlhM3RQK05ZbzIvcHkyWmVGclF4ZGFGKzdtVU1Jd3gvODgrNFA2QmZo?=
- =?utf-8?B?ZEdCakRpZVJhREZaQkRJZytFdTlDNmU4NmE3Wmo3Y2Q3VEN6Mnl5cGhXdEhn?=
- =?utf-8?B?M3NOai9oUGxQM3laaElpQm0vOUg5Um9xREhpcEcwSy90KzcvZDBtcERtYmlO?=
- =?utf-8?B?WTRQQkZZU3BKNkl3U3lGN2ZzV0wrR2pRbHpjWTVaMVhSWWZ3NHVaakMwZTNB?=
- =?utf-8?Q?Yzj55seUf5lDxVLmwSxoTm25Q?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d984ca86-0e6b-4397-6bf9-08dc9b864084
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7110.namprd12.prod.outlook.com
+	=?utf-8?B?YjBORWJ1VHM4RWJ3Mnh5Yko3QmVuTkhjWkovc2JtbkRNVjRZQTMyaWUycU92?=
+ =?utf-8?B?V084MVpRRjRScDlSVTREQy80R1VYOSt2WnZ3S3BNZ1F6amFtRUxxZDdXdXBu?=
+ =?utf-8?B?K1JsbU1UL2F6TnBVY09ta1JWL25mR1dTaXllOXZqM1lRK1JmdU05b0IrNkls?=
+ =?utf-8?B?Zi9GOGZocERMbmp6UXFibllzRjBQUFZhMnN2TndpY0drU2lid0R3MWJDSmVH?=
+ =?utf-8?B?WHBzUUplWjVtNy9FZU9mbjBjSFV1cWlSeUhWbThFbGtRcmE5a3RUZENKbnM5?=
+ =?utf-8?B?SWlBS1NKT29nN1lhejlVN2U1VisrWXYvVC81NThLYXVaQUhoUkpkRWZuVXVq?=
+ =?utf-8?B?K0txbGtvM0VpZlFybW9hQTRLalpMLzQ5SXFQaFFJdHZrQm9Od3gxUXBGb3BU?=
+ =?utf-8?B?aW9qWjJVcFZGS2lRQVJKL3creUQrY1FjamhyTWVOSXdWbGs1WkR4UzBNSHhz?=
+ =?utf-8?B?YlcvemhWWWljUUE4S1RqK0lPa0Z4a29QNE0xTWcwRHFoOTZ6ZmpNZGNiNVRu?=
+ =?utf-8?B?U3ltZFhWcVhYNVNBYnhKS21BUXBRZTE1WEpteVBBWXNneUlQVUNHUEtVZUlU?=
+ =?utf-8?B?eU9uWFM3cDN1RFk1ZDlHaUZZMHdRRzFvYy9kYTQwZXFXNTFHeTBNUnJmYnl1?=
+ =?utf-8?B?YXVuQm1UbVdqMis3UnVHaE1PcERmSXM0SFFLVzhMQlBibk5KMWM2Y3VDUlYw?=
+ =?utf-8?B?Y3IySWkzN3NRcXJWcjBoT21nL3lFWmtPaGFqb0Z6S29zdEpQOUpxblczSnVL?=
+ =?utf-8?B?SEdWNmdxNGxFaWtFL1lIQ3h0ekxyb25Fd050eGh3SWtnWi9hTG5Oam5UaTJq?=
+ =?utf-8?B?TzZDeTU1NzZucUdqVG9KaU12R1lKMlZuSGxCRnBLbCtVMUt1OUFvaXI4MVBP?=
+ =?utf-8?B?ZVIxc1U2Mmx0bkRqTkR2dHR3Z0lHYzdOMTlzM3NqbzRjVDIzQzhKT1cyYnJV?=
+ =?utf-8?B?M2prQUxHaWVmSWp5cFp0K3FnOGtyeVR1SWp1UmNmTk44a2pJR2lhbldWUmhU?=
+ =?utf-8?B?OXRsOWRteHdPQmkyTHJ4N01rYThiSnRxQStUVlY1QUdKTUNpQlYxZ3lLWnZW?=
+ =?utf-8?B?QkhwbVZITnZ2cGtaNmNPNnhmUVRkTzZoMFA0cDNQeWUyc1I1ZjZyZE9QdVhr?=
+ =?utf-8?B?aGFBc2VMTXFITDhQRlVTREM4R3plcUxJSTE2NUl0SFN4cTExVEplQnRiT1Ns?=
+ =?utf-8?B?aXhXY21ZOEZ2TjZ1Q3Fva3I2U2FJdzc4dWFZQzVJQ2lXVG5vZFFTeVZ2MTQ1?=
+ =?utf-8?B?NkJIZVFtRmNjM01hekowTXBCbGM3OXlCYmVGTkxVYmxxT1pML0EydU1nQjZR?=
+ =?utf-8?B?YWdDVktIdkM2Zk1BemdxNGdFWDlyODNJNDBPY2VHeUJYOHdBY2cxRWl4WmND?=
+ =?utf-8?B?TTJMT3g5dFIyZTVPMFlpb1A1T1FxWHFjSTAySWdqNlhwNkN3RkIzdXpaaXRS?=
+ =?utf-8?B?OXEzMHFzNm96M0FQM0dkMVVKNVcrcnFOUExJbGt1Sis5QWdvbUtVL202cVVD?=
+ =?utf-8?B?VldqbzNjVXhvcFN3SUtrSldEc1U4bnB4eXJJVFo4NmcvWGpKUWw2NyswQ01B?=
+ =?utf-8?B?cWs1a00xeWpGZ1JnQThHQXFNTlN4TS9FbVNvMmxsenhYVHRwMjNhOUFQQWhE?=
+ =?utf-8?B?Y01mMXBRdllDc0N6S0tRbjNkZXBGRUl5S3hmR3FFYVRyZnBYTjdKVENsVnlN?=
+ =?utf-8?B?enp0eCtNd0RMOU1HMVRtY3ZzekwxOEhSUUNIbzlsc1lkTy9rRmZUUUM2UVFu?=
+ =?utf-8?Q?RmKpgdiTH5J7/KZc4E=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5d0e178-b565-48e8-32d1-08dc9b8702bc
+X-MS-Exchange-CrossTenant-AuthSource: TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2024 17:33:29.1359
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2024 17:38:55.1855
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /VnOnrOyi8elrd0+CVcXfBsdDvclE/xNxit70dZsbFHvbjRmtBHrUyJKtix9f+GW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6260
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCP286MB2162
 
+--------------7eYjI62tq2hmBOSczrM0xbfC
+Content-Type: multipart/mixed; boundary="------------G1RbEShLKlQcM5pnAPp2aygK";
+ protected-headers="v1"
+From: Shengyu Qu <wiagn233@outlook.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: wiagn233@outlook.com, nbd@nbd.name, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, pablo@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ stable@vger.kernel.org, Elad Yifee <eladwf@gmail.com>
+Message-ID: <3a3f0b5d-3b92-4077-b07f-d5278f6fa83c@outlook.com>
+Subject: Re: [PATCH v2] net: ethernet: mtk_ppe: Change PPE entries number to
+ 16K
+References: <TY3P286MB2611AD036755E0BC411847FC98D52@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+ <20240702110224.74abfcea@kernel.org>
+In-Reply-To: <20240702110224.74abfcea@kernel.org>
 
+--------------G1RbEShLKlQcM5pnAPp2aygK
+Content-Type: multipart/mixed; boundary="------------zhj4vS5hQXciw88n0VjxGtjp"
 
-On 6/28/24 6:35 AM, Geetha sowjanya wrote:
-> External email: Use caution opening links or attachments
->
->
-> Adds basic driver for the RVU representor.
->
-> Driver on probe does pci specific initialization and
-> does hw resources configuration. Introduces RVU_ESWITCH
-> kernel config to enable/disable the driver. Representor
-> and NIC shares the code but representors netdev support
-> subset of NIC functionality. Hence "otx2_rep_dev" API
-> helps to skip the features initialization that are not
-> supported by the representors.
-Hi Geetha,
-I'm trying to summarize how all representor device works, here:
-https://lore.kernel.org/netdev/39dbf7f6-76e0-4319-97d8-24b54e788435@nvidia.com/
+--------------zhj4vS5hQXciw88n0VjxGtjp
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-So in the RVU representor case, IIUC,
-- it has its own PCI func id?
-- it has its own receive queue (unlike ice which shares the rxq with 
-PF), does representor netdev support multiple rx queues?
-- it has its own send queue (always use qidx=0)
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-> ---
->   .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
->   .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
->   .../net/ethernet/marvell/octeontx2/af/mbox.h  |   8 +
->   .../net/ethernet/marvell/octeontx2/af/rvu.h   |  11 +
->   .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  21 +-
->   .../ethernet/marvell/octeontx2/af/rvu_rep.c   |  47 ++++
->   .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
->   .../marvell/octeontx2/nic/otx2_common.h       |  12 +-
->   .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  17 +-
->   .../marvell/octeontx2/nic/otx2_txrx.c         |  23 +-
->   .../net/ethernet/marvell/octeontx2/nic/rep.c  | 223 ++++++++++++++++++
->   .../net/ethernet/marvell/octeontx2/nic/rep.h  |  31 +++
->   12 files changed, 388 insertions(+), 18 deletions(-)
->   create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
->   create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
->   create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/Kconfig b/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> index a32d85d6f599..ff86a5f267c3 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> +++ b/drivers/net/ethernet/marvell/octeontx2/Kconfig
-> @@ -46,3 +46,11 @@ config OCTEONTX2_VF
->          depends on OCTEONTX2_PF
->          help
->            This driver supports Marvell's OcteonTX2 NIC virtual function.
-> +
-> +config RVU_ESWITCH
-> +       tristate "Marvell RVU E-Switch support"
-> +       depends on OCTEONTX2_PF
-> +       default m
-> +       help
-> +         This driver supports Marvell's RVU E-Switch that
-> +         provides internal SRIOV packet steering and switching for the
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/Makefile b/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-> index 3cf4c8285c90..ccea37847df8 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-> @@ -11,4 +11,5 @@ rvu_mbox-y := mbox.o rvu_trace.o
->   rvu_af-y := cgx.o rvu.o rvu_cgx.o rvu_npa.o rvu_nix.o \
->                    rvu_reg.o rvu_npc.o rvu_debugfs.o ptp.o rvu_npc_fs.o \
->                    rvu_cpt.o rvu_devlink.o rpm.o rvu_cn10k.o rvu_switch.o \
-> -                 rvu_sdp.o rvu_npc_hash.o mcs.o mcs_rvu_if.o mcs_cnf10kb.o
-> +                 rvu_sdp.o rvu_npc_hash.o mcs.o mcs_rvu_if.o mcs_cnf10kb.o \
-> +                 rvu_rep.o
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> index e6d7d6e862c0..befb327e8aff 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> @@ -144,6 +144,7 @@ M(LMTST_TBL_SETUP,  0x00a, lmtst_tbl_setup, lmtst_tbl_setup_req,    \
->                                  msg_rsp)                                \
->   M(SET_VF_PERM,         0x00b, set_vf_perm, set_vf_perm, msg_rsp)       \
->   M(PTP_GET_CAP,         0x00c, ptp_get_cap, msg_req, ptp_get_cap_rsp)   \
-> +M(GET_REP_CNT,         0x00d, get_rep_cnt, msg_req, get_rep_cnt_rsp)   \
->   /* CGX mbox IDs (range 0x200 - 0x3FF) */                               \
->   M(CGX_START_RXTX,      0x200, cgx_start_rxtx, msg_req, msg_rsp)        \
->   M(CGX_STOP_RXTX,       0x201, cgx_stop_rxtx, msg_req, msg_rsp)         \
-> @@ -1525,6 +1526,13 @@ struct ptp_get_cap_rsp {
->          u64 cap;
->   };
->
-> +struct get_rep_cnt_rsp {
-> +       struct mbox_msghdr hdr;
-> +       u16 rep_cnt;
-> +       u16 rep_pf_map[64];
-> +       u64 rsvd;
-> +};
-> +
->   struct flow_msg {
->          unsigned char dmac[6];
->          unsigned char smac[6];
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> index 30efa5607c58..cbdc7aeaccfc 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> @@ -594,6 +594,9 @@ struct rvu {
->          spinlock_t              cpt_intr_lock;
->
->          struct mutex            mbox_lock; /* Serialize mbox up and down msgs */
-> +       u16                     rep_pcifunc;
+SGksDQoNCkJUIGRvd25sb2FkIGFuZCBQQ0ROIHdvdWxkIGNyZWF0ZSB0b25zIG9mIGNvbm5l
+Y3Rpb25zLCBhbmQgbWlnaHQgYmUNCmVhc2lseSB0byByZWFjaCB0aGUgODE5MiBsaW1pdCwg
+b25lIG9mIG15IGZyaWVuZCBzZWVzIDUwMDAwKyBsaW5rcyB3aGVuDQpob3N0aW5nIFBDRE4u
+DQoNCkJlc3QgcmVnYXJkcywNClNoZW5neXUNCg0K5ZyoIDIwMjQvNy8zIDI6MDIsIEpha3Vi
+IEtpY2luc2tpIOWGmemBkzoNCj4gT24gVHVlLCAyNSBKdW4gMjAyNCAxOToxNjo1NCArMDgw
+MCBTaGVuZ3l1IFF1IHdyb3RlOg0KPj4gTVQ3OTgxLDc5ODYgYW5kIDc5ODggYWxsIHN1cHBv
+cnRzIDMyNzY4IFBQRSBlbnRyaWVzLCBhbmQgTVQ3NjIxL01UNzYyMA0KPj4gc3VwcG9ydHMg
+MTYzODQgUFBFIGVudHJpZXMsIGJ1dCBvbmx5IHNldCB0byA4MTkyIGVudHJpZXMgaW4gZHJp
+dmVyLiBTbw0KPj4gaW5jcmFzZSBtYXggZW50cmllcyB0byAxNjM4NCBpbnN0ZWFkLg0KPj4N
+Cj4+IENjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQo+PiBTaWduZWQtb2ZmLWJ5OiBFbGFk
+IFlpZmVlIDxlbGFkd2ZAZ21haWwuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogU2hlbmd5dSBR
+dSA8d2lhZ24yMzNAb3V0bG9vay5jb20+DQo+PiBGaXhlczogYmEzN2I3Y2FmMWVkICgibmV0
+OiBldGhlcm5ldDogbXRrX2V0aF9zb2M6IGFkZCBzdXBwb3J0IGZvciBpbml0aWFsaXppbmcg
+dGhlIFBQRSIpDQo+IA0KPiBuaXQ6IEZpeGVzIHRhZyB1c3VhbGx5IGdvZXMgYmVmb3JlIHRo
+ZSBzaWduLW9mZnMNCj4gDQo+IFRoaXMgZG9lc24ndCBzdHJpa2UgbWUgYXMgYSBidWcgZml4
+LCB0aG8uIFdoYXQncyB0aGUgdXNlci12aXNpYmxlDQo+IGltcGFjdD8gV2UgY2FuJ3QgdXRp
+bGl6ZSBIVyB0byBpdHMgZnVsbCBhYmlsaXRpZXM/DQo=
+--------------zhj4vS5hQXciw88n0VjxGtjp
+Content-Type: application/pgp-keys; name="OpenPGP_0xE3520CC91929C8E7.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xE3520CC91929C8E7.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-does rep_pcifunc mean the VF/SF's pcifunc, or rep itself has its own 
-pcifunc?
-> +       int                     rep_cnt;
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-does rep_cnt mean number of rx/tx queues in representor?
-> +       u16                     *rep2pfvf_map;
->   };
->
->   static inline void rvu_write64(struct rvu *rvu, u64 block, u64 offset, u64 val)
-> @@ -822,6 +825,14 @@ bool is_sdp_pfvf(u16 pcifunc);
->   bool is_sdp_pf(u16 pcifunc);
->   bool is_sdp_vf(struct rvu *rvu, u16 pcifunc);
->
-> +static inline bool is_rep_dev(struct rvu *rvu, u16 pcifunc)
-> +{
-> +       if (rvu->rep_pcifunc && rvu->rep_pcifunc == pcifunc)
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
->   /* CGX APIs */
->   static inline bool is_pf_cgxmapped(struct rvu *rvu, u8 pf)
->   {
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index 785ef71a5ead..02d83c4958d9 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> @@ -329,7 +329,9 @@ static bool is_valid_txschq(struct rvu *rvu, int blkaddr,
->
->          /* TLs aggegating traffic are shared across PF and VFs */
->          if (lvl >= hw->cap.nix_tx_aggr_lvl) {
-> -               if (rvu_get_pf(map_func) != rvu_get_pf(pcifunc))
-> +               if ((nix_get_tx_link(rvu, map_func) !=
-> +                    nix_get_tx_link(rvu, pcifunc)) &&
-> +                    (rvu_get_pf(map_func) != rvu_get_pf(pcifunc)))
->                          return false;
->                  else
->                          return true;
-> @@ -1634,6 +1636,12 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
->          cfg = NPC_TX_DEF_PKIND;
->          rvu_write64(rvu, blkaddr, NIX_AF_LFX_TX_PARSE_CFG(nixlf), cfg);
->
-> +       if (is_rep_dev(rvu, pcifunc)) {
-> +               pfvf->tx_chan_base = RVU_SWITCH_LBK_CHAN;
-> +               pfvf->tx_chan_cnt = 1;
-> +               goto exit;
-> +       }
-> +
->          intf = is_lbk_vf(rvu, pcifunc) ? NIX_INTF_TYPE_LBK : NIX_INTF_TYPE_CGX;
->          if (is_sdp_pfvf(pcifunc))
->                  intf = NIX_INTF_TYPE_SDP;
-> @@ -1704,6 +1712,9 @@ int rvu_mbox_handler_nix_lf_free(struct rvu *rvu, struct nix_lf_free_req *req,
->          if (nixlf < 0)
->                  return NIX_AF_ERR_AF_LF_INVALID;
->
-> +       if (is_rep_dev(rvu, pcifunc))
-> +               goto free_lf;
-> +
->          if (req->flags & NIX_LF_DISABLE_FLOWS)
->                  rvu_npc_disable_mcam_entries(rvu, pcifunc, nixlf);
->          else
-> @@ -1715,6 +1726,7 @@ int rvu_mbox_handler_nix_lf_free(struct rvu *rvu, struct nix_lf_free_req *req,
->
->          nix_interface_deinit(rvu, pcifunc, nixlf);
->
-> +free_lf:
->          /* Reset this NIX LF */
->          err = rvu_lf_reset(rvu, block, nixlf);
->          if (err) {
-> @@ -2010,7 +2022,8 @@ static void nix_get_txschq_range(struct rvu *rvu, u16 pcifunc,
->          struct rvu_hwinfo *hw = rvu->hw;
->          int pf = rvu_get_pf(pcifunc);
->
-> -       if (is_lbk_vf(rvu, pcifunc)) { /* LBK links */
-> +       /* LBK links */
-> +       if (is_lbk_vf(rvu, pcifunc) || is_rep_dev(rvu, pcifunc)) {
->                  *start = hw->cap.nix_txsch_per_cgx_lmac * link;
->                  *end = *start + hw->cap.nix_txsch_per_lbk_lmac;
->          } else if (is_pf_cgxmapped(rvu, pf)) { /* CGX links */
-> @@ -4523,7 +4536,7 @@ int rvu_mbox_handler_nix_set_hw_frs(struct rvu *rvu, struct nix_frs_cfg *req,
->          if (!nix_hw)
->                  return NIX_AF_ERR_INVALID_NIXBLK;
->
-> -       if (is_lbk_vf(rvu, pcifunc))
-> +       if (is_lbk_vf(rvu, pcifunc) || is_rep_dev(rvu, pcifunc))
->                  rvu_get_lbk_link_max_frs(rvu, &max_mtu);
->          else
->                  rvu_get_lmac_link_max_frs(rvu, &max_mtu);
-> @@ -4551,6 +4564,8 @@ int rvu_mbox_handler_nix_set_hw_frs(struct rvu *rvu, struct nix_frs_cfg *req,
->                  /* For VFs of PF0 ingress is LBK port, so config LBK link */
->                  pfvf = rvu_get_pfvf(rvu, pcifunc);
->                  link = hw->cgx_links + pfvf->lbkid;
-> +       } else if (is_rep_dev(rvu, pcifunc)) {
-> +               link = hw->cgx_links + 0;
->          }
->
->          if (link < 0)
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-> new file mode 100644
-> index 000000000000..cf13c5f0a3c5
-> --- /dev/null
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-> @@ -0,0 +1,47 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Marvell RVU Admin Function driver
-> + *
-> + * Copyright (C) 2024 Marvell.
-> + *
-> + */
-> +
-> +#include <linux/types.h>
-> +#include <linux/device.h>
-> +#include <linux/module.h>
-> +#include <linux/pci.h>
-> +
-> +#include "rvu.h"
-> +#include "rvu_reg.h"
-> +
-> +int rvu_mbox_handler_get_rep_cnt(struct rvu *rvu, struct msg_req *req,
-> +                                struct get_rep_cnt_rsp *rsp)
-> +{
-> +       int pf, vf, numvfs, hwvf, rep = 0;
-> +       u16 pcifunc;
-> +
-> +       rvu->rep_pcifunc = req->hdr.pcifunc;
-> +       rsp->rep_cnt = rvu->cgx_mapped_pfs + rvu->cgx_mapped_vfs;
-> +       rvu->rep_cnt = rsp->rep_cnt;
-> +
-> +       rvu->rep2pfvf_map = devm_kzalloc(rvu->dev, rvu->rep_cnt *
-> +                                        sizeof(u16), GFP_KERNEL);
-> +       if (!rvu->rep2pfvf_map)
-> +               return -ENOMEM;
-> +
-> +       for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
-> +               if (!is_pf_cgxmapped(rvu, pf))
-> +                       continue;
-> +               pcifunc = pf << RVU_PFVF_PF_SHIFT;
-> +               rvu->rep2pfvf_map[rep] = pcifunc;
-> +               rsp->rep_pf_map[rep] = pcifunc;
-> +               rep++;
-> +               rvu_get_pf_numvfs(rvu, pf, &numvfs, &hwvf);
-> +               for (vf = 0; vf < numvfs; vf++) {
-> +                       rvu->rep2pfvf_map[rep] = pcifunc |
-> +                               ((vf + 1) & RVU_PFVF_FUNC_MASK);
-> +                       rsp->rep_pf_map[rep] = rvu->rep2pfvf_map[rep];
-> +                       rep++;
-> +               }
-> +       }
-> +       return 0;
-> +}
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-> index 64a97a0a10ed..dbc971266865 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-> @@ -5,11 +5,13 @@
->
->   obj-$(CONFIG_OCTEONTX2_PF) += rvu_nicpf.o otx2_ptp.o
->   obj-$(CONFIG_OCTEONTX2_VF) += rvu_nicvf.o otx2_ptp.o
-> +obj-$(CONFIG_RVU_ESWITCH) += rvu_rep.o
->
->   rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
->                  otx2_flows.o otx2_tc.o cn10k.o otx2_dmac_flt.o \
->                  otx2_devlink.o qos_sq.o qos.o
->   rvu_nicvf-y := otx2_vf.o
-> +rvu_rep-y := rep.o
->
->   rvu_nicpf-$(CONFIG_DCB) += otx2_dcbnl.o
->   rvu_nicpf-$(CONFIG_MACSEC) += cn10k_macsec.o
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> index 772fe01bdf98..d297138c356e 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> @@ -29,6 +29,7 @@
->   #include "otx2_devlink.h"
->   #include <rvu_trace.h>
->   #include "qos.h"
-> +#include "rep.h"
->
->   /* IPv4 flag more fragment bit */
->   #define IPV4_FLAG_MORE                         0x20
-> @@ -439,6 +440,7 @@ struct otx2_nic {
->   #define OTX2_FLAG_PTP_ONESTEP_SYNC             BIT_ULL(15)
->   #define OTX2_FLAG_ADPTV_INT_COAL_ENABLED BIT_ULL(16)
->   #define OTX2_FLAG_TC_MARK_ENABLED              BIT_ULL(17)
-> +#define OTX2_FLAG_REP_MODE_ENABLED              BIT_ULL(18)
->          u64                     flags;
->          u64                     *cq_op_addr;
->
-> @@ -506,11 +508,19 @@ struct otx2_nic {
->   #if IS_ENABLED(CONFIG_MACSEC)
->          struct cn10k_mcs_cfg    *macsec_cfg;
->   #endif
-> +
-> +#if IS_ENABLED(CONFIG_RVU_ESWITCH)
-> +       struct rep_dev          **reps;
-> +       int                     rep_cnt;
-> +       u16                     rep_pf_map[RVU_MAX_REP];
-> +       u16                     esw_mode;
-> +#endif
->   };
->
->   static inline bool is_otx2_lbkvf(struct pci_dev *pdev)
->   {
-> -       return pdev->device == PCI_DEVID_OCTEONTX2_RVU_AFVF;
-> +       return (pdev->device == PCI_DEVID_OCTEONTX2_RVU_AFVF) ||
-> +               (pdev->device == PCI_DEVID_RVU_REP);
->   }
->
->   static inline bool is_96xx_A0(struct pci_dev *pdev)
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> index 2b2afcc4b921..8078d1c1fff9 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> @@ -1502,10 +1502,11 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
->          hw->sqpool_cnt = otx2_get_total_tx_queues(pf);
->          hw->pool_cnt = hw->rqpool_cnt + hw->sqpool_cnt;
->
-> -       /* Maximum hardware supported transmit length */
-> -       pf->tx_max_pktlen = pf->netdev->max_mtu + OTX2_ETH_HLEN;
-> -
-> -       pf->rbsize = otx2_get_rbuf_size(pf, pf->netdev->mtu);
-> +       if (!otx2_rep_dev(pf->pdev)) {
-> +               /* Maximum hardware supported transmit length */
-> +               pf->tx_max_pktlen = pf->netdev->max_mtu + OTX2_ETH_HLEN;
-> +               pf->rbsize = otx2_get_rbuf_size(pf, pf->netdev->mtu);
-> +       }
->
->          mutex_lock(&mbox->lock);
->          /* NPA init */
-> @@ -1634,11 +1635,12 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
->                  otx2_pfc_txschq_stop(pf);
->   #endif
->
-> -       otx2_clean_qos_queues(pf);
-> +       if (!otx2_rep_dev(pf->pdev))
-> +               otx2_clean_qos_queues(pf);
->
->          mutex_lock(&mbox->lock);
->          /* Disable backpressure */
-> -       if (!(pf->pcifunc & RVU_PFVF_FUNC_MASK))
-> +       if (!is_otx2_lbkvf(pf->pdev))
->                  otx2_nix_config_bp(pf, false);
->          mutex_unlock(&mbox->lock);
->
-> @@ -1670,7 +1672,8 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
->          otx2_free_cq_res(pf);
->
->          /* Free all ingress bandwidth profiles allocated */
-> -       cn10k_free_all_ipolicers(pf);
-> +       if (!otx2_rep_dev(pf->pdev))
-> +               cn10k_free_all_ipolicers(pf);
->
->          mutex_lock(&mbox->lock);
->          /* Reset NIX LF */
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> index fbd9fe98259f..5dcdd8b65837 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> @@ -375,11 +375,13 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
->                  }
->                  start += sizeof(*sg);
->          }
-> -       otx2_set_rxhash(pfvf, cqe, skb);
->
-> -       skb_record_rx_queue(skb, cq->cq_idx);
-> -       if (pfvf->netdev->features & NETIF_F_RXCSUM)
-> -               skb->ip_summed = CHECKSUM_UNNECESSARY;
-> +       if (!(pfvf->flags & OTX2_FLAG_REP_MODE_ENABLED)) {
-> +               otx2_set_rxhash(pfvf, cqe, skb);
-> +               skb_record_rx_queue(skb, cq->cq_idx);
-> +               if (pfvf->netdev->features & NETIF_F_RXCSUM)
-> +                       skb->ip_summed = CHECKSUM_UNNECESSARY;
-> +       }
+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
+lMSoVV3z1s8dA1DK95ykSdIFtVZT
+=3Dr4B8
+-----END PGP PUBLIC KEY BLOCK-----
 
-Does this mean representor have only one rxq, and it doesn't support 
-checksum offload?
+--------------zhj4vS5hQXciw88n0VjxGtjp--
 
-Thanks
-William
+--------------G1RbEShLKlQcM5pnAPp2aygK--
+
+--------------7eYjI62tq2hmBOSczrM0xbfC
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEET/yoGP3p5Zl+RKVuX75KBAfJsRkFAmaFjKoFAwAAAAAACgkQX75KBAfJsRnX
+Iw//Z16YTMwS0NaZih1/GEVUnidskHqdNmlHcesFmSeXukx+yEv83Z5mfeQsiQDhmvA/3FM3VHG+
+zasXZBmh+iXA+RDEmsHxkgAG4wCXAhHbFkXHsRr76SvB7kWlOhhRrEGWT6QzYt4W5nVaeEI7EOSf
+Ghy643AWsQ8p6h7qFC7+P6tXOVeHKiLSXKfxqQJyOydaGLrNisr9G9LIL44s9vPuo4YFts468mKt
+XqxtZYilQKpKiqj2BeIEijx3KtGn/u2so6NNcdNQi1vdlw5XoThdoDQp63T0y3ASqYskHCpbybuq
+c4YtocoPxpsgJTaRKB5netnqtNX3ZJ0NJr0ywreZk0KysVG9EU4YocYcrsbLebVE5DslSSfenihX
+LfAjQGV+fiTvEmlg6J6hZmfdye8+onocVYghEZYc3G2aOEhoR9zXIx3vE0IoNAjHeCVs0+a3ipM5
+m6mq/tgxLpx4il1LPRys8FFL6g7ydpGqt82Hq/Ipo8pTCHSgDpBTxm+mW3OfjaCVXUE/cOI07VDt
+ho8bmSWgggZL7BEgiS45Pv3yMFHcRJSaLmokFbchtd2S6Ukj/o+Kw5DetO+P61ezCVtRpjeeIRsB
+x4n8UUY+vtdLsBrfxsVn6GkGVUXNAZSRgrgxSNTqIyYstwXwoSSuBv6FusFcF2v6kkNPPSMuyMJW
+eJI=
+=7SW5
+-----END PGP SIGNATURE-----
+
+--------------7eYjI62tq2hmBOSczrM0xbfC--
 
