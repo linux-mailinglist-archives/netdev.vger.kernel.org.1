@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-108859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C21C926102
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:01:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CA692619D
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3B461F234EF
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:01:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47E01B29A8E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D2E1741F4;
-	Wed,  3 Jul 2024 13:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6D516F827;
+	Wed,  3 Jul 2024 13:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n7+HzfDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17DE12D76E;
-	Wed,  3 Jul 2024 13:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8491E4BE
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 13:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720011677; cv=none; b=W4yVcnMf6kICs34UPY/iJ4d6Xi7kpRPPRENluEOZUHxcuv0HxRfBOk35DLEsOfIwtSvb0UMhqzVxZGkzX4rWXMPWh87x+VlZ7u0scG/3T4t/39D+sDlcVNB/xbpd+0GZfTxhUddiXl7/P2Zdq92uH6+McZOwPNrdeqWRYR2avjM=
+	t=1720012578; cv=none; b=uGyJX9ce5jsMF4wMbcIDKSI6G73G6vNhadWF6nrvNCmujFRQmF+62mE8cqU70teZ1d6oQZwAH45Y8MtHHDEZjPJvVaE4t+NDj87iRr56MFU1YONa6tsKiCxfmv/vB3TygpC6Zl6p+AmZesLjZBJ7LZm8VdHh5XDsDdFuo+yNQto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720011677; c=relaxed/simple;
-	bh=FlsCaFSg5VHWt2OU13H8/f4LqzE6kXlYNYbP0vddRVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L/SUyALy+Rfj4+jB5Zm2Zl4RjxUBbYUPj3jeXL01Qbzj+O6Yi/BdsY6K3aRQdFFGJS6IjsU0hF83P2YV0+94pBYsy28t0f7eJComjEVZyt/DvzE1RJr985j9oUfSGlUyqRs4Ni416/FsAMPhbRUxIZdEb9jlixz4lzpP3yhtZRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sOzbf-0008Ka-Ft; Wed, 03 Jul 2024 15:01:07 +0200
-Date: Wed, 3 Jul 2024 15:01:07 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending
- work before notifier
-Message-ID: <20240703130107.GB29258@breakpoint.cc>
-References: <20240702140841.3337-1-fw@strlen.de>
- <20240703103544.2872-1-hdanton@sina.com>
- <20240703120913.2981-1-hdanton@sina.com>
+	s=arc-20240116; t=1720012578; c=relaxed/simple;
+	bh=TP/ppx/cq3u7qkLqLaXkSh5C+kpwmGVYUxuMox6NGIE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RRQPvzlxi3tEqWC1iWGJY6+F47P6IWaq4lV6miTDd2NttWrJU2W9KQIEhloxc6Clnve16ALmGIFEC4BbBPxjxYYdHUAhUt4bXoTgw6QdYr/Gtw6JqbD9MreHtVlFag2laOmflgVHEWUspSIIPCaEk4/39cCmRBlh5GvwRquibYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n7+HzfDa; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720012577; x=1751548577;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TP/ppx/cq3u7qkLqLaXkSh5C+kpwmGVYUxuMox6NGIE=;
+  b=n7+HzfDaYAf+FencsJw2Kv3TWh8EhhpuH0kTfeXS1dOj3DvILTd6lQQj
+   iugA0RNf+XCWmlAi2GOBfk1Xyxhsi3+xOLRDnXmhKSk0dJfdlatDI9FRl
+   nfjhShc7qzgF8ZUSgTMTAFEM/a41+6CBN+FL90o14haZL17WuspuXEHgA
+   Zl0FUdnl5cGfG8JX/Ee4eBnMxHEJRmwDlemrs6mjdOuxpcXtwwiIaK8QE
+   We3eX0KN4FClsyfrrLjjbVkkp7kYHOdjPyTrPcibLVqinvvUWmTBmyGtR
+   YNQf/c3qhv5RaFVoEoFsIg3Zk+l4kBqKIreJAkZkwIyY2D1JYNoubmTVJ
+   g==;
+X-CSE-ConnectionGUID: bav8tEApQN6hIwWNzhlsyg==
+X-CSE-MsgGUID: g0zQPoNiS9WMVLGvAnHO5A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17195084"
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="17195084"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 06:16:14 -0700
+X-CSE-ConnectionGUID: kRpeQjVWReKiCpNIr9AGww==
+X-CSE-MsgGUID: 15MfImwEQOSlV7/1dbh11A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="83805882"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa001.jf.intel.com with ESMTP; 03 Jul 2024 06:16:11 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 567FE284FF;
+	Wed,  3 Jul 2024 14:16:10 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Lukasz Czapnik <lukasz.czapnik@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iproute2-next 0/3] minor improvements to makefile, devlink
+Date: Wed,  3 Jul 2024 15:15:18 +0200
+Message-Id: <20240703131521.60284-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240703120913.2981-1-hdanton@sina.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 
-Hillf Danton <hdanton@sina.com> wrote:
-> On Wed, 3 Jul 2024 12:52:15 +0200 Florian Westphal <fw@strlen.de>
-> > Hillf Danton <hdanton@sina.com> wrote:
-> > > Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
-> > > if trans outlives table.
-> > 
-> > trans must never outlive table.
-> > 
-> What is preventing trans from being freed after closing sock, given
-> trans is freed in workqueue?
-> 
-> 	close sock
-> 	queue work
+Three minor improvements: better error messages from devlink app,
+fix to one example in the man page of devlink-resource,
+and better build experience for single-app focused devs.
 
-The notifier acquires the transaction mutex, locking out all other
-transactions, so no further transactions requests referencing
-the table can be queued.
+Przemek Kitszel (3):
+  man: devlink-resource: add missing words in the example
+  devlink: print missing params even if an unknown one is present
+  Makefile: support building from subdirectories
 
-The work queue is flushed before potentially ripping the table
-out.  After this, no transactions referencing the table can exist
-anymore; the only transactions than can still be queued are those
-coming from a different netns, and tables are scoped per netns.
+ Makefile                    | 45 -------------------------------------
+ common.mk                   | 43 +++++++++++++++++++++++++++++++++++
+ devlink/devlink.c           | 27 +++++++++++++++-------
+ configure                   |  3 +++
+ man/man8/devlink-resource.8 |  2 +-
+ 5 files changed, 66 insertions(+), 54 deletions(-)
+ create mode 100644 common.mk
 
-Table is torn down.  Transaction mutex is released.
 
-Next transaction from userspace can't find the table anymore (its gone),
-so no more transactions can be queued for this table.
+base-commit: 357808abd3a67bcf4d1444a25268c45dda62e87f
+-- 
+2.39.3
 
-As I wrote in the commit message, the flush is dumb, this should first
-walk to see if there is a matching table to be torn down, and then flush
-work queue once before tearing the table down.
-
-But its better to clearly split bug fix and such a change.
 
