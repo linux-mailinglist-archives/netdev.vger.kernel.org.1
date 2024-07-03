@@ -1,66 +1,73 @@
-Return-Path: <netdev+bounces-109068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B188926C3C
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 01:04:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D869926C62
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 01:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28BD4B2192F
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:04:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB7D61F22578
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 23:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C369D1946AD;
-	Wed,  3 Jul 2024 23:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974A715B54F;
+	Wed,  3 Jul 2024 23:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="foN6g2Aw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMR+Ydyt"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B35C4964E;
-	Wed,  3 Jul 2024 23:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86F5136643
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 23:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720047870; cv=none; b=hX9UZIsGafgUqX2cWM6DhAp2BGYIY01eMBSc7MOB7aEbCRLN59T86fDxUmrrat8Ta3J8vTAlx8A8xEIn1om5tOkZd6sbe1YWSEtZunXiw4XweLJfKh+Bz10yFDLWW/U6w5UTLp1VL9cQ90VdTiY0bt5Bm+BA7yMn2dH2pXuCFe8=
+	t=1720048922; cv=none; b=eO7O80DPMWipLmXNpH8w9tvhLNhJvt21uxwyG6NqA9rT2eGM0RT39c3wgrgMAhhpVldXeBliXWAUxtFsY6gJqveixWEVdfz9Z2ramHUJWEzaZcXypZ9RMs5zknch96/arsluGU8eOV14IXaZHNPE7w9JD//RHktG4jSRkB/lhqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720047870; c=relaxed/simple;
-	bh=sjUlk2dyanMoOOvqU/NU0Qw0qLzZxQECvFTWbr3HFx0=;
+	s=arc-20240116; t=1720048922; c=relaxed/simple;
+	bh=JoIxIH8HYoJIFoUCNXLSaQQKK6rOyheoyuMKYwN25O0=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KKXsP4fWYkH08g9DBDWpZo7IPn97T8Ssf6ClQQG4RHi/1aCwA2/qLoEQhsZ9BuaA+gWxDYBvqlmV51+dBuvp6QAC9dQ54u9W6qokIxnAeNX+HW8U8bxtCeBCJ2qOOfMbUcITksxeBY04PvXszawaTKm654MkubFVGKA5Qw3hgPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=foN6g2Aw; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 491D74189E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1720047868; bh=YTLOx/1o2O6vgLftzil18tbHX7AAy8OKyo+xBns4TL8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=foN6g2Awy5eiKZju1LPimmtXOR26SvHVLj3GQfBqu75Gzkyb2rCX4/C9CLU0E9Scn
-	 25gOIiHYzDk+1wKQFy24VU/7F1d0eBMctpd+BfpUBJ9X5Uk4xIH87HaczPT4wLhjDE
-	 2kA2efk/k+pm4mvDW2bffK229qejCmKvk3CseEWzwSg2V6BKe674vCJepuzP7OXUHB
-	 ALwDATik/GzfLBsi1VIVIuNhfVBQqN2jrQerInqOxDPBJnNp0t/bVeUn80NIQsONG3
-	 VSAiHzfOqEYvarluqY1xD6t5yh+JcBhpWnwt0sB3R9JSUkBctTWBx+huc1oueKTEFu
-	 6FHk79eTvoCIg==
-Received: from localhost (c-24-9-249-71.hsd1.co.comcast.net [24.9.249.71])
+	 MIME-Version:Content-Type; b=pM8JFhAXUb4EQZY8j7TwUI7uN0UYcrA9sW4C/fUwxuoYVQ1t5kt82h/UwbHCVDuHDtPr32PknOh1dVNfjYbg4sYiRq+XhANlSM0ezy5PY/zOO6IkcZjSGtLvtVpLQfvpoNPiC1NWX6ANJTx9Rm8uXtFyx+jcue/REGAaA27O+Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMR+Ydyt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720048919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9D5ZUuOZ+skRCi07Xfug19ZtfocIaSHEUIlY636Amk=;
+	b=GMR+YdytWaARqZiY/mVdkPw33DI6FQbMLxgSuF6f0OhrlP0a8UFx1CvOaxB4AEK4vGurxU
+	nn4SRBYFi/JCZOGzVvAVApcC6nT2MwVMEBR2J2hRsl69A0Ga964ZPNvWrc2X7mX4Iv3p09
+	d69kRoaZWtFiEAWuIboFKdf00y4ljsU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-633-sPE9h1-3MHCXG-ze21cTjA-1; Wed,
+ 03 Jul 2024 19:21:58 -0400
+X-MC-Unique: sPE9h1-3MHCXG-ze21cTjA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 491D74189E;
-	Wed,  3 Jul 2024 23:04:28 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Carlos Bilbao
- <carlos.bilbao.osdev@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: workflows@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Konstantin Ryabitsev
- <konstantin@linuxfoundation.org>, Dan Williams <dan.j.williams@intel.com>,
- ksummit@lists.linux.dev
-Subject: Re: [PATCH v2 0/2] Documentation: update information for mailing lists
-In-Reply-To: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
-References: <20240619-docs-patch-msgid-link-v2-0-72dd272bfe37@linuxfoundation.org>
-Date: Wed, 03 Jul 2024 17:04:27 -0600
-Message-ID: <87y16irsas.fsf@trenco.lwn.net>
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 410461955EF0;
+	Wed,  3 Jul 2024 23:21:57 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.34])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B7F181954B0E;
+	Wed,  3 Jul 2024 23:21:55 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Florian Westphal <fw@strlen.de>
+Cc: dev@openvswitch.org,  Dumitru Ceara <dceara@redhat.com>,
+  netdev@vger.kernel.org
+Subject: Re: [ovs-dev] [PATCH net-next] openvswitch: prepare for stolen
+ verdict coming from conntrack and nat engine
+In-Reply-To: <20240703151900.GC29258@breakpoint.cc> (Florian Westphal's
+	message of "Wed, 3 Jul 2024 17:19:00 +0200")
+References: <20240703104640.20878-1-fw@strlen.de> <f7t34oqplmh.fsf@redhat.com>
+	<20240703151900.GC29258@breakpoint.cc>
+Date: Wed, 03 Jul 2024 19:21:53 -0400
+Message-ID: <f7ttth6njse.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,47 +75,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Konstantin Ryabitsev <konstantin@linuxfoundation.org> writes:
+Florian Westphal <fw@strlen.de> writes:
 
-> There have been some important changes to the mailing lists hosted at
-> kernel.org, most importantly that vger.kernel.org was migrated from
-> majordomo+zmailer to mlmmj and is now being served from the unified
-> mailing list platform called "subspace" [1].
+> Aaron Conole <aconole@redhat.com> wrote:
+>> > verdict with NF_DROP_REASON() helper,
+>> >
+>> > This helper releases the skb instantly (so drop_monitor can pinpoint
+>> > precise location) and returns NF_STOLEN.
+>> >
+>> > Prepare call sites to deal with this before introducing such changes
+>> > in conntrack and nat core.
+>> >
+>> > Signed-off-by: Florian Westphal <fw@strlen.de>
+>> > ---
+>> 
+>> AFAIU, these changes are only impacting the existing NF_DROP cases, and
+>> won't impact how ovs + netfilter communicate about invalid packets.  One
+>> important thing to note is that we rely on:
+>> 
+>>  * Note that if the packet is deemed invalid by conntrack, skb->_nfct will be
+>>  * set to NULL and 0 will be returned.
 >
-> This series updates many links pointing at obsolete locations, but also
-> makes the following changes:
+> Right, this is about how to communicate 'packet dropped'.
 >
-> - drops the recommendation to use /r/ subpaths in lore.kernel.org links
-> (it has been unnecessary for a number of years)
-> - adds some detail on how to reference specific Link trailers from
-> inside the commit message
+> NF_DROP means 'please call kfree_skb for me'.  Problem from introspection point
+> of view is that drop monitor will blame nf_hook_slow() (for netfilter)
+> and ovs resp. act_ct for the drop.
 >
-> Some of these changes are the result of discussions on the ksummit
-> mailing list [2].
+> Plan is to allow conntrack/nat engine to return STOLEN verdict ("skb
+> might have been free'd already").
 >
-> Link: https://subspace.kernel.org # [1]
-> Link: https://lore.kernel.org/20240617-arboreal-industrious-hedgehog-5b84ae@meerkat/ # [2]
-> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-> ---
-> Changes in v2:
-> - Minor wording changes to text and commit messages based on feedback.
-> - Link to v1: https://lore.kernel.org/r/20240618-docs-patch-msgid-link-v1-0-30555f3f5ad4@linuxfoundation.org
+> Example change:
+> @@ -52,10 +53,8 @@ nf_nat_masquerade_ipv4(struct sk_buff *skb,
+> unsigned int hooknum,
+>         rt = skb_rtable(skb);
+>         nh = rt_nexthop(rt, ip_hdr(skb)->daddr);
+>         newsrc = inet_select_addr(out, nh, RT_SCOPE_UNIVERSE);
+> -       if (!newsrc) {
+> -               pr_info("%s ate my IP address\n", out->name);
+> -               return NF_DROP;
+> -       }
+> +       if (!newsrc)
+> + return NF_DROP_REASON(skb, SKB_DROP_REASON_NETFILTER_DROP,
+> EADDRNOTAVAIL);
 >
-So I have gone ahead and applied this.  There are some important changes
-here that shouldn't miss the merge window, and we can argue about the #
-marking with it in-tree.
+>
+> Where NF_DROP_REASON() is:
+>
+> static __always_inline int
+> NF_DROP_REASON(struct sk_buff *skb, enum skb_drop_reason reason, u32 err)
+> {
+>         BUILD_BUG_ON(err > 0xffff);
+>
+>         kfree_skb_reason(skb, reason);
+>
+>         return ((err << 16) | NF_STOLEN);
+> }
+>
+> So drop monitoring tools will blame
+> nf_nat_masquerade.c:nf_nat_masquerade_ipv4 and not
+> the consumer of the NF_DROP verdict.
+>
+> I can't make such changes ATM because ovs and act_ct assume conntrack
+> returns only ACCEPT and DROP, so we'd get double-free.  Hope that makes
+> sense.
+>
+> Thanks!
 
-I am rather amused, though, that b4 added a few extra tag lines:
+Makes sense to me, thanks!
 
-> Link: https://example.com/somewhere.html  optional-other-stuff
-> Signed-off-by: Random Developer <rdevelop@company.com>
->      [ Fixed formatting ]
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-
-I do believe I'll amend the changelog before pushing this one :)
-
-Thanks,
-
-jon
 
