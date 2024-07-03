@@ -1,507 +1,371 @@
-Return-Path: <netdev+bounces-108801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537E79259BC
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:49:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45F38925E50
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 13:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77EBD1C2297C
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 10:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD771C23729
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 11:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E20178CDE;
-	Wed,  3 Jul 2024 10:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D77417E459;
+	Wed,  3 Jul 2024 11:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NuGkBQe/"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="QDAHd/I5"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A510513959D;
-	Wed,  3 Jul 2024 10:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C9217DE12;
+	Wed,  3 Jul 2024 11:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720003227; cv=none; b=oADhORz63lUuC9mbj93SMSdYmdLQ1wFX2WoKVG3mNyfdaxAwg7V57jONfplElIPcHneVFRqCqlVLWRm3St7Sxw/xQJj4PEut2wXcOkIqqGcaalK29Gl8biYAzISjUtWxdoocdcI9ziN6w7s8FK356M2vj4qn7IgLs+zPyMwKE1g=
+	t=1720006140; cv=none; b=FZibjTfVbKOAeGqzZDxiTfP0ac0CAMlv/ZfUnkPePOQ0J5sVcsr3+DHf+iOECfVCJhvSCYiD0cihaTGqmAEBdjhV+XdjJTzg78Szi4dT63L7Yxr+SVO7EIPqik8wCPFYvcpkjhsxr6zq5oR6GiCX4Q5b27OVOTiXJKZZjMd/KgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720003227; c=relaxed/simple;
-	bh=zqhNKkByO62L09f1PbEYUwBd5x6TJuhIrMg+Mqx4eUw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Rw2DiYomsBuFxNjDALHwih/z8xn/yW1ZfEzaIYJDp1vui9c9qdNzxj5kvAa9h/6YZ7kyrZuQ+YPu6kWYepm5QG1tGPCWM8YleyaQgvMBf1HV1r5uY/iaZd4Tf3PgQUFfaEhS+inY359Ea7tCsIemMGbe4d/H2/iZiZVD/aPnY/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NuGkBQe/; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=rqObL9ZXGRydSULbQuBby1JVG4WzP2AoNB7FH8o3U0w=; b=NuGkBQe/OU25s0vT5tV6cCx9Y9
-	d5qHxwmfjk7LdT+YecpUKTox3V7JoXm8VIAEdq4quVcmboaU7mRMl5FPUs+yipnCT3hqcM4lw1L/y
-	0nUWpr8K44R2XM4x0k0XFN2n0tTx0esPfAHYQhDHt7DoqudILgonkVyMLgV/IykGsSDu7LCgOfJUL
-	98l/NN+4asYQ2Q4Lqp986i2XvlZnkVicY2XwEfBE0NnE25nW26PIwm9S0vsMvWerTE+dyLG4e2CAc
-	njuZiEQYlNX3nAIXY/i/RnE6GZd03HjrizBO2GM6Vc6r5fi82YO1h2ynmFXOrAZK4HiAB9DH+Xvj4
-	0fvAj7Dg==;
-Received: from [2001:8b0:10b:5:c274:66b2:6bbc:35da] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sOxPN-00000001ji0-0hjy;
-	Wed, 03 Jul 2024 10:40:17 +0000
-Message-ID: <352a7f910269daf1a7ff57ea4a41a306d6981b21.camel@infradead.org>
-Subject: Re: [RFC PATCH v2] ptp: Add vDSO-style vmclock support
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>,
- linux-kernel@vger.kernel.org,  virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org,  linux-rtc@vger.kernel.org, "Ridoux,
- Julien" <ridouxj@amazon.com>,  virtio-dev@lists.linux.dev, "Luu, Ryan"
- <rluu@amazon.com>, "Chashper, David" <chashper@amazon.com>
-Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>, Jason Wang
- <jasowang@redhat.com>, John Stultz <jstultz@google.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, Richard Cochran
- <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc
- Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel
- Lezcano <daniel.lezcano@linaro.org>, Alessandro Zummo
- <a.zummo@towertech.it>,  Alexandre Belloni <alexandre.belloni@bootlin.com>
-Date: Wed, 03 Jul 2024 11:40:16 +0100
-In-Reply-To: <02077acb-7f26-4cfb-90be-cf085a048334@opensynergy.com>
-References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
-	 <671a784b-234f-4be6-80bf-5135e257ed40@opensynergy.com>
-	 <db594efd5a5774748a9ef07cc86741f5a677bdbf.camel@infradead.org>
-	 <c0ae63fc88365c93d5401972683a41112c094704.camel@infradead.org>
-	 <4a0a240dffc21dde4d69179288547b945142259f.camel@infradead.org>
-	 <8d9d7ce2-4dd1-4f54-a468-79ef5970a708@opensynergy.com>
-	 <bdcafc76ea44db244b52f8a092287cb33950d5d6.camel@infradead.org>
-	 <db1113d5-a427-4eb7-b5d1-8174a71e63b6@opensynergy.com>
-	 <c69d7d380575e49bd9cb995e060d205fb41aef8f.camel@infradead.org>
-	 <2de9275f-b344-4a76-897b-52d5f4bdca59@opensynergy.com>
-	 <BC212953-A043-4D65-ABF3-326DBF7F10F7@infradead.org>
-	 <51087cd7149ce576aa166d32d051592b146ce2c4.camel@infradead.org>
-	 <cb11ff57-4d58-4d47-824b-761712e12bdc@opensynergy.com>
-	 <3707d99d0dfea45d05fd65f669132c2e546f35c6.camel@infradead.org>
-	 <19c75212-bcb6-49e3-964d-ed727da2ba54@opensynergy.com>
-	 <02E9F187-A38C-4D14-A287-AFD7503B6B0F@infradead.org>
-	 <02077acb-7f26-4cfb-90be-cf085a048334@opensynergy.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-hmmOuEDQGPI61e8TF6l2"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1720006140; c=relaxed/simple;
+	bh=dBo+PByeHOErZYMW5v7LDpJ4ous2KafBMJdpRzndm/M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m2kmfeH0ijfQdxYu1rkxOR4N7K8SmPbCmwzAsrZn7V7QQr51eA55ivDqgkA1pxAo6vZO9sUaJAA8ixk/CgiLQJ9xo0JRhf4OmkIBsB+oOgF9iA3F6ALcXo2WWQzelINV6xqmiVsJ7DykDkk5K9cz9KOz+2+Td+uNBTrT7EE0ht0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=QDAHd/I5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76FD2C2BD10;
+	Wed,  3 Jul 2024 11:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720006139;
+	bh=dBo+PByeHOErZYMW5v7LDpJ4ous2KafBMJdpRzndm/M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QDAHd/I53VygewCgJKRJpAQHMcuZW3t/Iw8l2JxI8QWxWpjEahb2zr2U9ArvgZJW0
+	 CIoZp+MsrAuBFFYGy+9w56tetLR1CVF6KEOXbTQd5bJXBj8r7VUwJ/hw5c+w1C3PH5
+	 47wDQ3CGvRyk3yZQIvxcEDiYHgt9vgqIgRq1ltxY=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Yunseong Kim <yskelg@gmail.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 282/356] tracing/net_sched: NULL pointer dereference in perf_trace_qdisc_reset()
+Date: Wed,  3 Jul 2024 12:40:18 +0200
+Message-ID: <20240703102923.785092652@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240703102913.093882413@linuxfoundation.org>
+References: <20240703102913.093882413@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+5.15-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Yunseong Kim <yskelg@gmail.com>
+
+[ Upstream commit bab4923132feb3e439ae45962979c5d9d5c7c1f1 ]
+
+In the TRACE_EVENT(qdisc_reset) NULL dereference occurred from
+
+ qdisc->dev_queue->dev <NULL> ->name
+
+This situation simulated from bunch of veths and Bluetooth disconnection
+and reconnection.
+
+During qdisc initialization, qdisc was being set to noop_queue.
+In veth_init_queue, the initial tx_num was reduced back to one,
+causing the qdisc reset to be called with noop, which led to the kernel
+panic.
+
+I've attached the GitHub gist link that C converted syz-execprogram
+source code and 3 log of reproduced vmcore-dmesg.
+
+ https://gist.github.com/yskelg/cc64562873ce249cdd0d5a358b77d740
+
+Yeoreum and I use two fuzzing tool simultaneously.
+
+One process with syz-executor : https://github.com/google/syzkaller
+
+ $ ./syz-execprog -executor=./syz-executor -repeat=1 -sandbox=setuid \
+    -enable=none -collide=false log1
+
+The other process with perf fuzzer:
+ https://github.com/deater/perf_event_tests/tree/master/fuzzer
+
+ $ perf_event_tests/fuzzer/perf_fuzzer
+
+I think this will happen on the kernel version.
+
+ Linux kernel version +v6.7.10, +v6.8, +v6.9 and it could happen in v6.10.
+
+This occurred from 51270d573a8d. I think this patch is absolutely
+necessary. Previously, It was showing not intended string value of name.
+
+I've reproduced 3 time from my fedora 40 Debug Kernel with any other module
+or patched.
+
+ version: 6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug
+
+[ 5287.164555] veth0_vlan: left promiscuous mode
+[ 5287.164929] veth1_macvtap: left promiscuous mode
+[ 5287.164950] veth0_macvtap: left promiscuous mode
+[ 5287.164983] veth1_vlan: left promiscuous mode
+[ 5287.165008] veth0_vlan: left promiscuous mode
+[ 5287.165450] veth1_macvtap: left promiscuous mode
+[ 5287.165472] veth0_macvtap: left promiscuous mode
+[ 5287.165502] veth1_vlan: left promiscuous mode
+…
+[ 5297.598240] bridge0: port 2(bridge_slave_1) entered blocking state
+[ 5297.598262] bridge0: port 2(bridge_slave_1) entered forwarding state
+[ 5297.598296] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5297.598313] bridge0: port 1(bridge_slave_0) entered forwarding state
+[ 5297.616090] 8021q: adding VLAN 0 to HW filter on device bond0
+[ 5297.620405] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5297.620730] bridge0: port 2(bridge_slave_1) entered disabled state
+[ 5297.627247] 8021q: adding VLAN 0 to HW filter on device team0
+[ 5297.629636] bridge0: port 1(bridge_slave_0) entered blocking state
+…
+[ 5298.002798] bridge_slave_0: left promiscuous mode
+[ 5298.002869] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5298.309444] bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+[ 5298.315206] bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+[ 5298.320207] bond0 (unregistering): Released all slaves
+[ 5298.354296] hsr_slave_0: left promiscuous mode
+[ 5298.360750] hsr_slave_1: left promiscuous mode
+[ 5298.374889] veth1_macvtap: left promiscuous mode
+[ 5298.374931] veth0_macvtap: left promiscuous mode
+[ 5298.374988] veth1_vlan: left promiscuous mode
+[ 5298.375024] veth0_vlan: left promiscuous mode
+[ 5299.109741] team0 (unregistering): Port device team_slave_1 removed
+[ 5299.185870] team0 (unregistering): Port device team_slave_0 removed
+…
+[ 5300.155443] Bluetooth: hci3: unexpected cc 0x0c03 length: 249 > 1
+[ 5300.155724] Bluetooth: hci3: unexpected cc 0x1003 length: 249 > 9
+[ 5300.155988] Bluetooth: hci3: unexpected cc 0x1001 length: 249 > 9
+….
+[ 5301.075531] team0: Port device team_slave_1 added
+[ 5301.085515] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.085531] bridge0: port 1(bridge_slave_0) entered disabled state
+[ 5301.085588] bridge_slave_0: entered allmulticast mode
+[ 5301.085800] bridge_slave_0: entered promiscuous mode
+[ 5301.095617] bridge0: port 1(bridge_slave_0) entered blocking state
+[ 5301.095633] bridge0: port 1(bridge_slave_0) entered disabled state
+…
+[ 5301.149734] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.173234] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.180517] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.193481] hsr_slave_0: entered promiscuous mode
+[ 5301.204425] hsr_slave_1: entered promiscuous mode
+[ 5301.210172] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.210185] Cannot create hsr debugfs directory
+[ 5301.224061] bond0: (slave bond_slave_1): Enslaving as an active interface with an up link
+[ 5301.246901] bond0: (slave bond_slave_0): Enslaving as an active interface with an up link
+[ 5301.255934] team0: Port device team_slave_0 added
+[ 5301.256480] team0: Port device team_slave_1 added
+[ 5301.256948] team0: Port device team_slave_0 added
+…
+[ 5301.435928] hsr_slave_0: entered promiscuous mode
+[ 5301.446029] hsr_slave_1: entered promiscuous mode
+[ 5301.455872] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.455884] Cannot create hsr debugfs directory
+[ 5301.502664] hsr_slave_0: entered promiscuous mode
+[ 5301.513675] hsr_slave_1: entered promiscuous mode
+[ 5301.526155] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.526164] Cannot create hsr debugfs directory
+[ 5301.563662] hsr_slave_0: entered promiscuous mode
+[ 5301.576129] hsr_slave_1: entered promiscuous mode
+[ 5301.580259] debugfs: Directory 'hsr0' with parent 'hsr' already present!
+[ 5301.580270] Cannot create hsr debugfs directory
+[ 5301.590269] 8021q: adding VLAN 0 to HW filter on device bond0
+
+[ 5301.595872] KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+[ 5301.595877] Mem abort info:
+[ 5301.595881]   ESR = 0x0000000096000006
+[ 5301.595885]   EC = 0x25: DABT (current EL), IL = 32 bits
+[ 5301.595889]   SET = 0, FnV = 0
+[ 5301.595893]   EA = 0, S1PTW = 0
+[ 5301.595896]   FSC = 0x06: level 2 translation fault
+[ 5301.595900] Data abort info:
+[ 5301.595903]   ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+[ 5301.595907]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+[ 5301.595911]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ 5301.595915] [dfff800000000026] address between user and kernel address ranges
+[ 5301.595971] Internal error: Oops: 0000000096000006 [#1] SMP
+…
+[ 5301.596076] CPU: 2 PID: 102769 Comm:
+syz-executor.3 Kdump: loaded Tainted:
+ G        W         -------  ---  6.10.0-0.rc2.20240608gitdc772f8237f9.29.fc41.aarch64+debug #1
+[ 5301.596080] Hardware name: VMware, Inc. VMware20,1/VBSA,
+ BIOS VMW201.00V.21805430.BA64.2305221830 05/22/2023
+[ 5301.596082] pstate: 01400005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[ 5301.596085] pc : strnlen+0x40/0x88
+[ 5301.596114] lr : trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596124] sp : ffff8000beef6b40
+[ 5301.596126] x29: ffff8000beef6b40 x28: dfff800000000000 x27: 0000000000000001
+[ 5301.596131] x26: 6de1800082c62bd0 x25: 1ffff000110aa9e0 x24: ffff800088554f00
+[ 5301.596136] x23: ffff800088554ec0 x22: 0000000000000130 x21: 0000000000000140
+[ 5301.596140] x20: dfff800000000000 x19: ffff8000beef6c60 x18: ffff7000115106d8
+[ 5301.596143] x17: ffff800121bad000 x16: ffff800080020000 x15: 0000000000000006
+[ 5301.596147] x14: 0000000000000002 x13: ffff0001f3ed8d14 x12: ffff700017ddeda5
+[ 5301.596151] x11: 1ffff00017ddeda4 x10: ffff700017ddeda4 x9 : ffff800082cc5eec
+[ 5301.596155] x8 : 0000000000000004 x7 : 00000000f1f1f1f1 x6 : 00000000f2f2f200
+[ 5301.596158] x5 : 00000000f3f3f3f3 x4 : ffff700017dded80 x3 : 00000000f204f1f1
+[ 5301.596162] x2 : 0000000000000026 x1 : 0000000000000000 x0 : 0000000000000130
+[ 5301.596166] Call trace:
+[ 5301.596175]  strnlen+0x40/0x88
+[ 5301.596179]  trace_event_get_offsets_qdisc_reset+0x6c/0x2b0
+[ 5301.596182]  perf_trace_qdisc_reset+0xb0/0x538
+[ 5301.596184]  __traceiter_qdisc_reset+0x68/0xc0
+[ 5301.596188]  qdisc_reset+0x43c/0x5e8
+[ 5301.596190]  netif_set_real_num_tx_queues+0x288/0x770
+[ 5301.596194]  veth_init_queues+0xfc/0x130 [veth]
+[ 5301.596198]  veth_newlink+0x45c/0x850 [veth]
+[ 5301.596202]  rtnl_newlink_create+0x2c8/0x798
+[ 5301.596205]  __rtnl_newlink+0x92c/0xb60
+[ 5301.596208]  rtnl_newlink+0xd8/0x130
+[ 5301.596211]  rtnetlink_rcv_msg+0x2e0/0x890
+[ 5301.596214]  netlink_rcv_skb+0x1c4/0x380
+[ 5301.596225]  rtnetlink_rcv+0x20/0x38
+[ 5301.596227]  netlink_unicast+0x3c8/0x640
+[ 5301.596231]  netlink_sendmsg+0x658/0xa60
+[ 5301.596234]  __sock_sendmsg+0xd0/0x180
+[ 5301.596243]  __sys_sendto+0x1c0/0x280
+[ 5301.596246]  __arm64_sys_sendto+0xc8/0x150
+[ 5301.596249]  invoke_syscall+0xdc/0x268
+[ 5301.596256]  el0_svc_common.constprop.0+0x16c/0x240
+[ 5301.596259]  do_el0_svc+0x48/0x68
+[ 5301.596261]  el0_svc+0x50/0x188
+[ 5301.596265]  el0t_64_sync_handler+0x120/0x130
+[ 5301.596268]  el0t_64_sync+0x194/0x198
+[ 5301.596272] Code: eb15001f 54000120 d343fc02 12000801 (38f46842)
+[ 5301.596285] SMP: stopping secondary CPUs
+[ 5301.597053] Starting crashdump kernel...
+[ 5301.597057] Bye!
+
+After applying our patch, I didn't find any kernel panic errors.
+
+We've found a simple reproducer
+
+ # echo 1 > /sys/kernel/debug/tracing/events/qdisc/qdisc_reset/enable
+
+ # ip link add veth0 type veth peer name veth1
+
+ Error: Unknown device type.
+
+However, without our patch applied, I tested upstream 6.10.0-rc3 kernel
+using the qdisc_reset event and the ip command on my qemu virtual machine.
+
+This 2 commands makes always kernel panic.
+
+Linux version: 6.10.0-rc3
+
+[    0.000000] Linux version 6.10.0-rc3-00164-g44ef20baed8e-dirty
+(paran@fedora) (gcc (GCC) 14.1.1 20240522 (Red Hat 14.1.1-4), GNU ld
+version 2.41-34.fc40) #20 SMP PREEMPT Sat Jun 15 16:51:25 KST 2024
+
+Kernel panic message:
+
+[  615.236484] Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+[  615.237250] Dumping ftrace buffer:
+[  615.237679]    (ftrace buffer empty)
+[  615.238097] Modules linked in: veth crct10dif_ce virtio_gpu
+virtio_dma_buf drm_shmem_helper drm_kms_helper zynqmp_fpga xilinx_can
+xilinx_spi xilinx_selectmap xilinx_core xilinx_pr_decoupler versal_fpga
+uvcvideo uvc videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videodev
+videobuf2_common mc usbnet deflate zstd ubifs ubi rcar_canfd rcar_can
+omap_mailbox ntb_msi_test ntb_hw_epf lattice_sysconfig_spi
+lattice_sysconfig ice40_spi gpio_xilinx dwmac_altr_socfpga mdio_regmap
+stmmac_platform stmmac pcs_xpcs dfl_fme_region dfl_fme_mgr dfl_fme_br
+dfl_afu dfl fpga_region fpga_bridge can can_dev br_netfilter bridge stp
+llc atl1c ath11k_pci mhi ath11k_ahb ath11k qmi_helpers ath10k_sdio
+ath10k_pci ath10k_core ath mac80211 libarc4 cfg80211 drm fuse backlight ipv6
+Jun 22 02:36:5[3   6k152.62-4sm98k4-0k]v  kCePUr:n e1l :P IUDn:a b4le6
+8t oC ohmma: nidpl eN oketr nteali nptaedg i6n.g1 0re.0q-urecs3t- 0at0
+1v6i4r-tgu4a4le fa2d0dbraeeds0se-dir tyd f#f2f08
+  615.252376] Hardware name: linux,dummy-virt (DT)
+[  615.253220] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS
+BTYPE=--)
+[  615.254433] pc : strnlen+0x6c/0xe0
+[  615.255096] lr : trace_event_get_offsets_qdisc_reset+0x94/0x3d0
+[  615.256088] sp : ffff800080b269a0
+[  615.256615] x29: ffff800080b269a0 x28: ffffc070f3f98500 x27:
+0000000000000001
+[  615.257831] x26: 0000000000000010 x25: ffffc070f3f98540 x24:
+ffffc070f619cf60
+[  615.259020] x23: 0000000000000128 x22: 0000000000000138 x21:
+dfff800000000000
+[  615.260241] x20: ffffc070f631ad00 x19: 0000000000000128 x18:
+ffffc070f448b800
+[  615.261454] x17: 0000000000000000 x16: 0000000000000001 x15:
+ffffc070f4ba2a90
+[  615.262635] x14: ffff700010164d73 x13: 1ffff80e1e8d5eb3 x12:
+1ffff00010164d72
+[  615.263877] x11: ffff700010164d72 x10: dfff800000000000 x9 :
+ffffc070e85d6184
+[  615.265047] x8 : ffffc070e4402070 x7 : 000000000000f1f1 x6 :
+000000001504a6d3
+[  615.266336] x5 : ffff28ca21122140 x4 : ffffc070f5043ea8 x3 :
+0000000000000000
+[  615.267528] x2 : 0000000000000025 x1 : 0000000000000000 x0 :
+0000000000000000
+[  615.268747] Call trace:
+[  615.269180]  strnlen+0x6c/0xe0
+[  615.269767]  trace_event_get_offsets_qdisc_reset+0x94/0x3d0
+[  615.270716]  trace_event_raw_event_qdisc_reset+0xe8/0x4e8
+[  615.271667]  __traceiter_qdisc_reset+0xa0/0x140
+[  615.272499]  qdisc_reset+0x554/0x848
+[  615.273134]  netif_set_real_num_tx_queues+0x360/0x9a8
+[  615.274050]  veth_init_queues+0x110/0x220 [veth]
+[  615.275110]  veth_newlink+0x538/0xa50 [veth]
+[  615.276172]  __rtnl_newlink+0x11e4/0x1bc8
+[  615.276944]  rtnl_newlink+0xac/0x120
+[  615.277657]  rtnetlink_rcv_msg+0x4e4/0x1370
+[  615.278409]  netlink_rcv_skb+0x25c/0x4f0
+[  615.279122]  rtnetlink_rcv+0x48/0x70
+[  615.279769]  netlink_unicast+0x5a8/0x7b8
+[  615.280462]  netlink_sendmsg+0xa70/0x1190
+
+Yeoreum and I don't know if the patch we wrote will fix the underlying
+cause, but we think that priority is to prevent kernel panic happening.
+So, we're sending this patch.
+
+Fixes: 51270d573a8d ("tracing/net_sched: Fix tracepoints that save qdisc_dev() as a string")
+Link: https://lore.kernel.org/lkml/20240229143432.273b4871@gandalf.local.home/t/
+Cc: netdev@vger.kernel.org
+Tested-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Link: https://lore.kernel.org/r/20240624173320.24945-4-yskelg@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/trace/events/qdisc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/trace/events/qdisc.h b/include/trace/events/qdisc.h
+index 5180da19d837f..fc77362386a5b 100644
+--- a/include/trace/events/qdisc.h
++++ b/include/trace/events/qdisc.h
+@@ -81,7 +81,7 @@ TRACE_EVENT(qdisc_reset,
+ 	TP_ARGS(q),
+ 
+ 	TP_STRUCT__entry(
+-		__string(	dev,		qdisc_dev(q)->name	)
++		__string(	dev,		qdisc_dev(q) ? qdisc_dev(q)->name : "(null)"	)
+ 		__string(	kind,		q->ops->id		)
+ 		__field(	u32,		parent			)
+ 		__field(	u32,		handle			)
+-- 
+2.43.0
 
 
---=-hmmOuEDQGPI61e8TF6l2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-07-03 at 11:56 +0200, Peter Hilber wrote:
-> On 02.07.24 20:40, David Woodhouse wrote:
-> > On 2 July 2024 19:12:00 BST, Peter Hilber <peter.hilber@opensynergy.com=
-> wrote:
-> > > On 02.07.24 18:39, David Woodhouse wrote:
-> > > > To clarify then, the main types are
-> > > >=20
-> > > > =C2=A0VIRTIO_RTC_CLOCK_UTC =3D=3D 0
-> > > > =C2=A0VIRTIO_RTC_CLOCK_TAI =3D=3D 1
-> > > > =C2=A0VIRTIO_RTC_CLOCK_MONOTONIC =3D=3D 2
-> > > > =C2=A0VIRTIO_RTC_CLOCK_SMEARED_UTC =3D=3D 3
-> > > >=20
-> > > > And the subtypes are *only* for the case of
-> > > > VIRTIO_RTC_CLOCK_SMEARED_UTC. They include
-> > > >=20
-> > > > =C2=A0VIRTIO_RTC_SUBTYPE_STRICT
-> > > > =C2=A0VIRTIO_RTC_SUBTYPE_UNDEFINED /* or whatever you want to call =
-it */
-> > > > =C2=A0VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR=20
-> > > > =C2=A0VIRTIO_RTC_SUBTYPE_UTC_SLS /* if it's worth doing this one */
-> > > >=20
-> > > > Is that what we just agreed on?
-> > > >=20
-> > > >=20
-> > >=20
-> > > This is a misunderstanding. My idea was that the main types are
-> > >=20
-> > > > =C2=A0VIRTIO_RTC_CLOCK_UTC =3D=3D 0
-> > > > =C2=A0VIRTIO_RTC_CLOCK_TAI =3D=3D 1
-> > > > =C2=A0VIRTIO_RTC_CLOCK_MONOTONIC =3D=3D 2
-> > > > =C2=A0VIRTIO_RTC_CLOCK_SMEARED_UTC =3D=3D 3
-> > >=20
-> > > VIRTIO_RTC_CLOCK_MAYBE_SMEARED_UTC =3D=3D 4
-> > >=20
-> > > The subtypes would be (1st for clocks other than
-> > > VIRTIO_RTC_CLOCK_SMEARED_UTC, 2nd to last for
-> > > VIRTIO_RTC_CLOCK_SMEARED_UTC):
-> > >=20
-> > > #define VIRTIO_RTC_SUBTYPE_STRICT 0
-> > > #define VIRTIO_RTC_SUBTYPE_SMEAR_NOON_LINEAR 1
-> > > #define VIRTIO_RTC_SUBTYPE_SMEAR_UTC_SLS 2
-> > >=20
-> >=20
-> > Thanks. I really do think that from the guest point of view there's
-> > really no distinction between "maybe smeared" and "undefined
-> > smearing", and have a preference for using the latter form, which
-> > is the key difference there?
-> >=20
-> > Again though, not a hill for me to die on.
->=20
-> I have no issue with staying with "undefined smearing", so would you agre=
-e
-> to something like
->=20
-> VIRTIO_RTC_CLOCK_SMEAR_UNDEFINED_UTC =3D=3D 4
->=20
-> (or another name if you prefer)?
-
-Well, the point of contention was really whether that was a *type* or a
-*subtype*.
-
-Either way, it's a "precision clock" telling its consumer that the
-device *itself* doesn't really know what time is being exposed. Which
-seems like a bizarre thing to support.
-
-But I think I've constructed an argument which persuades me to your
-point of view that *if* we permit it, it should be a primary type...
-
-A clock can *either* be UTC, *or* it can be monotonic. The whole point
-of smearing is to produce a monotonic clock, of course.
-
-VIRTIO_RTC_CLOCK_UTC is UTC. It is not monotonic.
-
-VIRTIO_RTC_CLOCK_SMEARED is, presumably, monotonic (and I think we
-should explicitly require that to be true in virtio-rtc).
-
-
-But VIRTIO_RTC_CLOCK_MAYBE_SMEARED is the worst of both worlds. It is
-neither known to be correct UTC, *nor* is it known to be monotonic. So
-(again, if we permit it at all) I think it probably does make sense for
-that to be a primary type.
-
-
-This is what I currently have for 'struct vmclock_abi' that I'd like to
-persuade you to adopt. I need to tweak it some more, for at least the
-following reasons, as well as any more you can see:
-
- =E2=80=A2 size isn't big enough for 64KiB pages
- =E2=80=A2 Should be explicitly little-endian
- =E2=80=A2 Does it need esterror as well as maxerror?
- =E2=80=A2 Why is maxerror in picoseconds? It's the only use of that unit
- =E2=80=A2 Where do the clock_status values come from? Do they make sense?
- =E2=80=A2 Are signed integers OK? (I think so!).
-
-=20
-/*
- * This structure provides a vDSO-style clock to VM guests, exposing the
- * relationship (or lack thereof) between the CPU clock (TSC, timebase, arc=
-h
- * counter, etc.) and real time. It is designed to address the problem of
- * live migration, which other clock enlightenments do not.
- *
- * When a guest is live migrated, this affects the clock in two ways.
- *
- * First, even between identical hosts the actual frequency of the underlyi=
-ng
- * counter will change within the tolerances of its specification (typicall=
-y
- * =C2=B150PPM, or 4 seconds a day). This frequency also varies over time o=
-n the
- * same host, but can be tracked by NTP as it generally varies slowly. With
- * live migration there is a step change in the frequency, with no warning.
- *
- * Second, there may be a step change in the value of the counter itself, a=
-s
- * its accuracy is limited by the precision of the NTP synchronization on t=
-he
- * source and destination hosts.
- *
- * So any calibration (NTP, PTP, etc.) which the guest has done on the sour=
-ce
- * host before migration is invalid, and needs to be redone on the new host=
-.
- *
- * In its most basic mode, this structure provides only an indication to th=
-e
- * guest that live migration has occurred. This allows the guest to know th=
-at
- * its clock is invalid and take remedial action. For applications that nee=
-d
- * reliable accurate timestamps (e.g. distributed databases), the structure
- * can be mapped all the way to userspace. This allows the application to s=
-ee
- * directly for itself that the clock is disrupted and take appropriate
- * action, even when using a vDSO-style method to get the time instead of a
- * system call.
- *
- * In its more advanced mode. this structure can also be used to expose the
- * precise relationship of the CPU counter to real time, as calibrated by t=
-he
- * host. This means that userspace applications can have accurate time
- * immediately after live migration, rather than having to pause operations
- * and wait for NTP to recover. This mode does, of course, rely on the
- * counter being reliable and consistent across CPUs.
- *
- * Note that this must be true UTC, never with smeared leap seconds. If a
- * guest wishes to construct a smeared clock, it can do so. Presenting a
- * smeared clock through this interface would be problematic because it
- * actually messes with the apparent counter *period*. A linear smearing
- * of 1 ms per second would effectively tweak the counter period by 1000PPM
- * at the start/end of the smearing period, while a sinusoidal smear would
- * basically be impossible to represent.
- *
- * This structure is offered with the intent that it be adopted into the
- * nascent virtio-rtc standard, as a virtio-rtc that does not address the l=
-ive
- * migration problem seems a little less than fit for purpose. For that
- * reason, certain fields use precisely the same numeric definitions as in
- * the virtio-rtc proposal. The structure can also be exposed through an AC=
-PI
- * device with the CID "VMCLOCK", modelled on the "VMGENID" device except f=
-or
- * the fact that it uses a real _CRS to convey the address of the structure
- * (which should be a full page, to allow for mapping directly to userspace=
-).
- */
-
-#ifndef __VMCLOCK_ABI_H__
-#define __VMCLOCK_ABI_H__
-
-#ifdef __KERNEL__
-#include <linux/types.h>
-#else
-#include <stdint.h>
-#endif
-
-struct vmclock_abi {
-	uint64_t magic;
-#define VMCLOCK_MAGIC	0x4b4c4356 /* "VCLK" */
-	uint16_t size;		/* Size of page containing this structure */
-	uint16_t version;	/* 1 */
-
-	/* Sequence lock. Low bit means an update is in progress. */
-	uint32_t seq_count;
-
-
-
-	uint32_t flags;
-	/* Indicates that the tai_offset_sec field is valid */
-#define VMCLOCK_FLAG_TAI_OFFSET_VALID		(1 << 0)
-	/*
-	 * Optionally used to notify guests of pending maintenance events.
-	 * A guest may wish to remove itself from service if an event is
-	 * coming up. Two flags indicate the rough imminence of the event.
-	 */
-#define VMCLOCK_FLAG_DISRUPTION_SOON		(1 << 1) /* About a day */
-#define VMCLOCK_FLAG_DISRUPTION_IMMINENT	(1 << 2) /* About an hour */
-	/* Indicates that the utc_time_maxerror_picosec field is valid */
-#define VMCLOCK_FLAG_UTC_MAXERROR_VALID		(1 << 3)
-	/* Indicates counter_period_error_rate_frac_sec is valid */
-#define VMCLOCK_FLAG_PERIOD_ERROR_VALID		(1 << 4)
-
-	/*
-	 * This field changes to another non-repeating value when the CPU
-	 * counter is disrupted, for example on live migration. This lets
-	 * the guest know that it should discard any calibration it has
-	 * performed of the counter against external sources (NTP/PTP/etc.).
-	 */
-	uint64_t disruption_marker;
-
-	uint8_t clock_status;
-#define VMCLOCK_STATUS_UNKNOWN		0
-#define VMCLOCK_STATUS_INITIALIZING	1
-#define VMCLOCK_STATUS_SYNCHRONIZED	2
-#define VMCLOCK_STATUS_FREERUNNING	3
-#define VMCLOCK_STATUS_UNRELIABLE	4
-
-	uint8_t counter_id; /* Matches VIRTIO_RTC_COUNTER_xxx */
-#define VMCLOCK_COUNTER_ARM_VCNT	0
-#define VMCLOCK_COUNTER_X86_TSC		1
-#define VMCLOCK_COUNTER_INVALID		0xff
-
-	/*
-	 * By providing the offset from UTC to TAI, the guest can know both
-	 * UTC and TAI reliably, whichever is indicated in the time_type
-	 * field. Valid if VMCLOCK_FLAG_TAI_OFFSET_VALID is set in flags.
-	 */
-	int16_t tai_offset_sec;
-
-	/*
-	 * What time is exposed in the time_sec/time_frac_sec fields?
-	 */
-	uint8_t time_type; /* Matches VIRTIO_RTC_TYPE_xxx */
-#define VMCLOCK_TIME_UTC			0	/* Since 1970-01-01 00:00:00z */
-#define VMCLOCK_TIME_TAI			1	/* Since 1970-01-01 00:00:00z */
-#define VMCLOCK_TIME_MONOTONIC			2	/* Since undefined epoch */
-#define VMCLOCK_TIME_INVALID_SMEARED		3	/* Not supported */
-#define VMCLOCK_TIME_INVALID_MAYBE_SMEARED	4	/* Not supported */
-
-	/*
-	 * The time exposed through this device is never smeared. This field
-	 * corresponds to the 'subtype' field in virtio-rtc, which indicates
-	 * the smearing method. However in this case it provides a *hint* to
-	 * the guest operating system, such that *if* the guest OS wants to
-	 * provide its users with an alternative clock which does not follow
-	 * the POSIX CLOCK_REALTIME standard, it may do so in a fashion
-	 * consistent with the other systems in the nearby environment.
-	 */
-	uint8_t leap_second_smearing_hint; /* Matches VIRTIO_RTC_SUBTYPE_xxx */
-#define VMCLOCK_SMEARING_STRICT		0
-#define VMCLOCK_SMEARING_NOON_LINEAR	1
-#define VMCLOCK_SMEARING_UTC_SLS	2
-
-	/* Bit shift for counter_period_frac_sec and its error rate */
-	uint8_t counter_period_shift;
-
-	/*
-	 * Unlike in NTP, this can indicate a leap second in the past. This
-	 * is needed to allow guests to derive an imprecise clock with
-	 * smeared leap seconds for themselves, as some modes of smearing
-	 * need the adjustments to continue even after the moment at which
-	 * the leap second should have occurred.
-	 */
-	uint8_t leap_indicator; /* Matches VIRTIO_RTC_LEAP_xxx */
-#define VMCLOCK_LEAP_NONE	0
-#define VMCLOCK_LEAP_PRE_POS	1
-#define VMCLOCK_LEAP_PRE_NEG	2
-#define VMCLOCK_LEAP_POS	3
-#define VMCLOCK_LEAP_NEG	4
-
-	uint64_t leapsecond_tai_sec; /* Since 1970-01-01 00:00:00z */
-
-	/*
-	 * Paired values of counter and UTC at a given point in time.
-	 */
-	uint64_t counter_value;
-	uint64_t time_sec;
-	uint64_t time_frac_sec;
-
-	/*
-	 * Counter frequency, and error margin. The unit of these fields is
-	 * seconds >> (64 + counter_period_shift)
-	 */
-	uint64_t counter_period_frac_sec;
-	uint64_t counter_period_error_rate_frac_sec;
-
-	/* Error margin of UTC reading above (=C2=B1 picoseconds) */
-	uint64_t utc_time_maxerror_picosec;
-};
-
-#endif /*  __VMCLOCK_ABI_H__ */
-
-
-
-
---=-hmmOuEDQGPI61e8TF6l2
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNzAzMTA0MDE2WjAvBgkqhkiG9w0BCQQxIgQgZCe40p6F
-Jgn36ip6I7DbUCNmxUxGAC+l5pv8I4EE8V8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCHbtEsKN0XCsye7v/O3ytAZs9GNnidXNoI
-TRRlRab3i91KR9xK/U8Pa4un33GyMEXIAHuXfq7Z6WU4EHuAd1zPsNGRJA3UFszafdsQiUyTvXHK
-6vyR0Fnp0OC8jTHqAbIX6lziyExC8APKJ9o+gf/pfK5E+bYf5o120Ryr9lIqprAkFfwXY9tGxEAf
-poIQDIzB+QDv+zkTMcFYsWHQk/2w1BnJlDX32en6Vxwm+Fkhv1nz5c+VxIrfZL5zH25tnOtTWhVH
-+62FyPyXcphxzwS6BRdx10L4PmpmVoqWWfM7Sv3HK3+VqZ3MoHDImfrDGHtXCFf3rIuwHuoFcAoi
-T8U/wvd5WrxabLbRlqCuGlwSRk4yyXt4BgNixn7m29IDU8e5rKL6SJ9qvZDPna6NWN7BB6sUJWD7
-Ri9unXyLHWVaEk0j5SZ2mZH0fzl9PJTUHB8bktTk6ERqsdqZgvqNDvpEayh04TrqRDxrHT1OpumC
-8IrSlV8etCCeig89RQpg77JSrFHrumNrrU6TH/aNln3w8TZcqZ/7gdM95KxRTSfmetaScdssg+7Y
-VWe1GM5dKefuyimUT8EHQ1/tfBsoOsedNSySSJJ2KF5/z6Q0PqjCBeYvBsC3Q7W0IFvWWswo2Uro
-qz4onw5ksN8Q4Oxvv+u1GHDOQMJeiG6wXR8XfFoWSgAAAAAAAA==
-
-
---=-hmmOuEDQGPI61e8TF6l2--
 
