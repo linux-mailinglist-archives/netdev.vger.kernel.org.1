@@ -1,197 +1,224 @@
-Return-Path: <netdev+bounces-108930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E0E4926437
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:03:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C160092643C
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 17:05:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00D471F22134
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:03:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0644B20CA6
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 15:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A79417DA2E;
-	Wed,  3 Jul 2024 15:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6187917CA09;
+	Wed,  3 Jul 2024 15:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NcJTnO6n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d4VHI1nV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1AC617967F;
-	Wed,  3 Jul 2024 15:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721121DFEA;
+	Wed,  3 Jul 2024 15:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720019004; cv=none; b=qBxcHAjk8Lybjd6O0HUsRzxSQzRtquEFC65oLj9+BDW8ch0djz/1mNsE3ccnKiAyTZ9SODAIj4DRWn+prO1a2IZCuNX4j8RMFUrXlBuGcShJ2bRq7S9lujOo4Rs6IPxm9wJaRnEjf71761k8WLhywuxwB7e+01lULvp28ZGn/cw=
+	t=1720019095; cv=none; b=Y47tDJGx7QyWzN05DjgQ0Oy6tcqLVB096G0dviBRT6DBzrFMs2poHsS5D5HL5r1JHXdcS3X/YeNwCoe8SnSSGp9oXIZOLgGHynBKYtYvj9jxfJlBQ4wTUuV3VzSnxP2HtcDM0GleX5Jm4f+B7/z/75NUC3VyN3Yo2iuOdThS5zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720019004; c=relaxed/simple;
-	bh=FoeiMXNWygQHXGa/435t5CfC/zmEoNiICB+QwCj3c/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OT+UX7Ipewgt1ldfAUayQHifHvYRojQx7sP0ZHANp6kF62Wv7azKLx+O6DyZ+uDRhwvVpjqpnJq0vaePSAZsCP6jITrgHH7beIijrt8/i03XkHE8tex43n1mRsi+UGYbTcCsiaBgTxabvwI316PgwZ3a5V3QP03L+ljPxEw45yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NcJTnO6n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BCD9C32781;
-	Wed,  3 Jul 2024 15:03:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720019003;
-	bh=FoeiMXNWygQHXGa/435t5CfC/zmEoNiICB+QwCj3c/E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NcJTnO6nmkVfC0ALn0oTGFLCMNHrRvb6GNLJW75ya9R2xkUGZvDawJi9SFlHKG0Sx
-	 aCXF2Sltzp8fBmUhkWlBVYni3OKaW5WqhaPLP2IaS6f+9Zo4NIPaxiEIjK6bmnTHmF
-	 IxsXgUsjfnKTZ/by4PY8qZbn/aoqNZUNsGZT943/Ta9EBKoORh7CFqAL8LDDjVOSmq
-	 AV4PXOljdV4Q4kmmJ5vPMryNExBmkhJoJYC/rxGT0tgcs7oYluk23dRSElR6kVaCsm
-	 qL8913WAiI6zDqk+1+ieA7zYqs8N0gLycgPp4PWiWvLardPjuBY+4o/8UOzDXzh8bU
-	 JWSWGuvVvUkSg==
-Date: Wed, 3 Jul 2024 16:03:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1720019095; c=relaxed/simple;
+	bh=JducdG6Q9NlS+BnXrH82XW+CuRQmhRH8LnqhBENZXUY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SDv/Yni4BOQc8n7bh/GrveMk9vJ+36dFTucq0qHgBcPERXfoIRyntW7ctfO6B6COR73dyMI0RuUlIMNtltpQIWWUPvNYAHhJsMtzB4LLnT2nm8bkS5RD+DWz17wYqoSQg4PRBlp7Tr7MuytBj67io/HvWdPdry9GwdZVQE3AzJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d4VHI1nV; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720019094; x=1751555094;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JducdG6Q9NlS+BnXrH82XW+CuRQmhRH8LnqhBENZXUY=;
+  b=d4VHI1nVTGPPkAGNKvYTCPbHb42URqUIyTzcAACM/BBXLYvMEVTkarG2
+   oqDXqBXWbMJPCaFL7veCDrJlqDXJLbE28FSPjiykgKtqX37AIQh6YBb2/
+   5K+Hsvu/q6wYBRLRWDLIrERWehVVcuVkZR2+FGg0K5c9sFRrCdq50EvA9
+   QpJrUBj6lDZIZI9rb2w3xvjjTr9OG/y1hi84xmrKGcqFCWX7RqBNbgEF/
+   yyboOj5LVIOUBZph9C7/NZRpPdd8MMaWRSi26J/I4U8tau69PTIZQM0pI
+   7TmtkX6hgOh5F+HlWthI4NM70pKXw4rF3z28EHw3gQ6KqPYXIEvsDuDl0
+   w==;
+X-CSE-ConnectionGUID: 1X9T31q6T4SSSwTIMGAABg==
+X-CSE-MsgGUID: L/EP9EtZRQGsK3E8F+oTiA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17079116"
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="17079116"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 08:04:49 -0700
+X-CSE-ConnectionGUID: 6f+Q581HSdW9n+fLlAfGxQ==
+X-CSE-MsgGUID: rM9aJyXkQBe59TMT41sNWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,182,1716274800"; 
+   d="scan'208";a="77016615"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa002.jf.intel.com with ESMTP; 03 Jul 2024 08:04:45 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH iwl-net v1 2/4] igc: Fix reset adapter logics when tx
- mode change
-Message-ID: <20240703150318.GN598357@kernel.org>
-References: <20240702040926.3327530-1-faizal.abdul.rahim@linux.intel.com>
- <20240702040926.3327530-3-faizal.abdul.rahim@linux.intel.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/5] netdev_features: start cleaning netdev_features_t up
+Date: Wed,  3 Jul 2024 17:03:37 +0200
+Message-ID: <20240703150342.1435976-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240702040926.3327530-3-faizal.abdul.rahim@linux.intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 02, 2024 at 12:09:24AM -0400, Faizal Rahim wrote:
-> Following the "igc: Fix TX Hang issue when QBV Gate is close" changes,
-> remaining issues with the reset adapter logic in igc_tsn_offload_apply()
-> have been observed:
-> 
-> 1. The reset adapter logics for i225 and i226 differ, although they should
->    be the same according to the guidelines in I225/6 HW Design Section
->    7.5.2.1 on software initialization during tx mode changes.
-> 2. The i225 resets adapter every time, even though tx mode doesn't change.
->    This occurs solely based on the condition  igc_is_device_id_i225() when
->    calling schedule_work().
-> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It only
->    resets adapter for legacy->tsn tx mode transitions.
-> 4. qbv_count introduced in the patch is actually not needed; in this
->    context, a non-zero value of qbv_count is used to indicate if tx mode
->    was unconditionally set to tsn in igc_tsn_enable_offload(). This could
->    be replaced by checking the existing register
->    IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
-> 
-> This patch resolves all issues and enters schedule_work() to reset the
-> adapter only when changing tx mode. It also removes reliance on qbv_count.
-> 
-> qbv_count field will be removed in a future patch.
-> 
-> Test ran:
-> 
-> 1. Verify reset adapter behaviour in i225/6:
->    a) Enrol a new GCL
->       Reset adapter observed (tx mode change legacy->tsn)
->    b) Enrol a new GCL without deleting qdisc
->       No reset adapter observed (tx mode remain tsn->tsn)
->    c) Delete qdisc
->       Reset adapter observed (tx mode change tsn->legacy)
-> 
-> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is closed"
->    to confirm it remains resolved.
-> 
-> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is closed")
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+NETDEV_FEATURE_COUNT is currently 64, which means we can't add any new
+features as netdev_features_t is u64.
+As per several discussions, instead of converting netdev_features_t to
+a bitmap, which would mean A LOT of changes, we can try cleaning up
+netdev feature bits.
+There's a bunch of bits which don't really mean features, rather device
+attributes/properties that can't be changed via Ethtool in any of the
+drivers. Such attributes can be moved to netdev private flags without
+losing any functionality.
 
-Hi Faizal,
+Start converting some read-only netdev features to private flags from
+the ones that are most obvious, like lockless Tx, inability to change
+network namespace etc. I was able to reduce NETDEV_FEATURE_COUNT from
+64 to 60, which mean 4 free slots for new features. There are obviously
+more read-only features to convert, such as highDMA, "challenged VLAN",
+HSR (4 bits) - this will be done in subsequent series.
+Please note that netdev features are not uAPI/ABI by any means. Ethtool
+passes their names and bits to the userspace separately and there are no
+hardcoded names/bits in the userspace, so that new Ethtool could work
+on older kernels and vice versa. Even shell scripts won't most likely
+break since the removed bits were always read-only, meaning nobody would
+try touching them from a script.
 
-Nits below not withstahdning, this looks good to me.
+Alexander Lobakin (5):
+  netdevice: convert private flags > BIT(31) to bitfields
+  netdev_features: remove unused __UNUSED_NETIF_F_1
+  netdev_features: convert NETIF_F_LLTX to dev->lltx
+  netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local
+  netdev_features: convert NETIF_F_FCOE_MTU to dev->fcoe_mtu
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+ .../networking/net_cachelines/net_device.rst  |  7 ++-
+ Documentation/networking/netdev-features.rst  | 15 -------
+ Documentation/networking/netdevices.rst       |  4 +-
+ Documentation/networking/switchdev.rst        |  4 +-
+ drivers/net/ethernet/tehuti/tehuti.h          |  2 +-
+ include/linux/netdev_features.h               | 14 +-----
+ include/linux/netdevice.h                     | 43 +++++++++++++------
+ drivers/net/amt.c                             |  4 +-
+ drivers/net/bareudp.c                         |  2 +-
+ drivers/net/bonding/bond_main.c               |  8 ++--
+ drivers/net/dummy.c                           |  3 +-
+ drivers/net/ethernet/adi/adin1110.c           |  2 +-
+ drivers/net/ethernet/chelsio/cxgb/cxgb2.c     |  3 +-
+ .../net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c   |  6 +--
+ .../net/ethernet/freescale/dpaa/dpaa_eth.c    |  3 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-eth.c  |  3 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |  4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 11 ++---
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  4 +-
+ .../ethernet/marvell/prestera/prestera_main.c |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  4 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  3 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum.c    |  6 ++-
+ .../ethernet/microchip/lan966x/lan966x_main.c |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_net_repr.c |  3 +-
+ drivers/net/ethernet/pasemi/pasemi_mac.c      |  5 ++-
+ .../net/ethernet/qualcomm/rmnet/rmnet_vnd.c   |  2 +-
+ drivers/net/ethernet/rocker/rocker_main.c     |  3 +-
+ drivers/net/ethernet/sfc/ef100_rep.c          |  4 +-
+ drivers/net/ethernet/tehuti/tehuti.c          |  4 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |  3 +-
+ drivers/net/ethernet/toshiba/spider_net.c     |  3 +-
+ drivers/net/geneve.c                          |  2 +-
+ drivers/net/gtp.c                             |  2 +-
+ drivers/net/hamradio/bpqether.c               |  2 +-
+ drivers/net/ipvlan/ipvlan_main.c              |  3 +-
+ drivers/net/loopback.c                        |  4 +-
+ drivers/net/macsec.c                          |  4 +-
+ drivers/net/macvlan.c                         |  6 ++-
+ drivers/net/net_failover.c                    |  4 +-
+ drivers/net/netkit.c                          |  3 +-
+ drivers/net/nlmon.c                           |  4 +-
+ drivers/net/ppp/ppp_generic.c                 |  2 +-
+ drivers/net/rionet.c                          |  2 +-
+ drivers/net/team/team_core.c                  |  8 ++--
+ drivers/net/tun.c                             |  5 ++-
+ drivers/net/veth.c                            |  2 +-
+ drivers/net/vrf.c                             |  4 +-
+ drivers/net/vsockmon.c                        |  4 +-
+ drivers/net/vxlan/vxlan_core.c                |  5 ++-
+ drivers/net/wireguard/device.c                |  2 +-
+ drivers/scsi/fcoe/fcoe.c                      |  4 +-
+ drivers/staging/octeon/ethernet.c             |  2 +-
+ lib/test_bpf.c                                |  3 +-
+ net/8021q/vlan_dev.c                          |  5 ++-
+ net/8021q/vlanproc.c                          |  4 +-
+ net/batman-adv/soft-interface.c               |  5 ++-
+ net/bridge/br_device.c                        |  6 ++-
+ net/core/dev.c                                |  8 ++--
+ net/core/dev_ioctl.c                          |  9 ++--
+ net/core/net-sysfs.c                          |  3 +-
+ net/core/rtnetlink.c                          |  2 +-
+ net/dsa/user.c                                |  3 +-
+ net/ethtool/common.c                          |  3 --
+ net/hsr/hsr_device.c                          | 12 +++---
+ net/ieee802154/6lowpan/core.c                 |  2 +-
+ net/ieee802154/core.c                         | 10 ++---
+ net/ipv4/ip_gre.c                             |  4 +-
+ net/ipv4/ip_tunnel.c                          |  2 +-
+ net/ipv4/ip_vti.c                             |  2 +-
+ net/ipv4/ipip.c                               |  2 +-
+ net/ipv4/ipmr.c                               |  2 +-
+ net/ipv6/ip6_gre.c                            |  7 +--
+ net/ipv6/ip6_tunnel.c                         |  4 +-
+ net/ipv6/ip6mr.c                              |  2 +-
+ net/ipv6/sit.c                                |  4 +-
+ net/l2tp/l2tp_eth.c                           |  2 +-
+ net/openvswitch/vport-internal_dev.c          | 11 ++---
+ net/wireless/core.c                           | 10 ++---
+ net/xfrm/xfrm_interface_core.c                |  2 +-
+ tools/testing/selftests/net/forwarding/README |  2 +-
+ 83 files changed, 204 insertions(+), 192 deletions(-)
 
-> ---
->  drivers/net/ethernet/intel/igc/igc_tsn.c | 26 +++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> index 02dd41aff634..61f047ebf34d 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> @@ -49,6 +49,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
->  	return new_flags;
->  }
->  
-> +static bool igc_tsn_is_tx_mode_in_tsn(struct igc_adapter *adapter)
-> +{
-> +	struct igc_hw *hw = &adapter->hw;
-> +
-> +	return (bool)(rd32(IGC_TQAVCTRL) & IGC_TQAVCTRL_TRANSMIT_MODE_TSN);
+---
+From v1[0]:
+* split bitfield priv flags into "hot" and "cold", leave the first
+  placed where the old ::priv_flags is and move the rest down next
+  to ::threaded (Jakub);
+* document all the changes in Documentation/networking/net_cachelines/
+  net_device.rst;
+* #3: remove the "-1 cacheline on Tx" paragraph, not really true (Eric).
 
-Perhaps it is more a question of taste than anything else.
-But my preference, FIIW, is to avoid casts.
-And I think in this case using !! is a common pattern.
+From RFC[1]:
+* drop:
+  * IFF_LOGICAL (as (LLTX | IFF_NO_QUEUE)) - will be discussed later;
+  * NETIF_F_HIGHDMA conversion - requires priv flags inheriting etc.,
+    maybe later;
+  * NETIF_F_VLAN_CHALLENGED conversion - same as above;
+* convert existing priv_flags > BIT(31) to bitfield booleans and define
+  new flags the same way (Jakub);
+* mention a couple times that netdev features are not uAPI/ABI by any
+  means (Andrew).
 
-(Completely untested!)
+[0] https://lore.kernel.org/netdev/20240625114432.1398320-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20240405133731.1010128-1-aleksander.lobakin@intel.com
+-- 
+2.45.2
 
-	return !!(rd32(IGC_TQAVCTRL) & IGC_TQAVCTRL_TRANSMIT_MODE_TSN);
-
-> +}
-> +
->  void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
->  {
->  	struct igc_hw *hw = &adapter->hw;
-> @@ -334,15 +341,28 @@ int igc_tsn_reset(struct igc_adapter *adapter)
->  	return err;
->  }
->  
-> +static bool igc_tsn_will_tx_mode_change(struct igc_adapter *adapter)
-> +{
-> +	bool any_tsn_enabled = (bool)(igc_tsn_new_flags(adapter) &
-> +			       IGC_FLAG_TSN_ANY_ENABLED);
-
-Ditto.
-
-> +
-> +	if ((any_tsn_enabled && !igc_tsn_is_tx_mode_in_tsn(adapter)) ||
-> +	    (!any_tsn_enabled && igc_tsn_is_tx_mode_in_tsn(adapter)))
-> +		return true;
-> +	else
-> +		return false;
-
-Likewise, this is probably more a matter of taste than anything else.
-But I think this could be expressed as:
-
-(Completely untested!)
-
-	return (any_tsn_enabled && !igc_tsn_is_tx_mode_in_tsn(adapter)) ||
-		(!any_tsn_enabled && igc_tsn_is_tx_mode_in_tsn(adapter));
-
-Similarly in the previous patch of this series.
-
-> +}
-> +
->  int igc_tsn_offload_apply(struct igc_adapter *adapter)
->  {
->  	struct igc_hw *hw = &adapter->hw;
->  
-> -	/* Per I225/6 HW Design Section 7.5.2.1, transmit mode
-> -	 * cannot be changed dynamically. Require reset the adapter.
-> +	/* Per I225/6 HW Design Section 7.5.2.1 guideline, if tx mode change
-> +	 * from legacy->tsn or tsn->legacy, then reset adapter is needed.
->  	 */
->  	if (netif_running(adapter->netdev) &&
-> -	    (igc_is_device_id_i225(hw) || !adapter->qbv_count)) {
-> +	    (igc_is_device_id_i225(hw) || igc_is_device_id_i226(hw)) &&
-> +	     igc_tsn_will_tx_mode_change(adapter)) {
->  		schedule_work(&adapter->reset_task);
->  		return 0;
->  	}
-> -- 
-> 2.25.1
-> 
-> 
 
