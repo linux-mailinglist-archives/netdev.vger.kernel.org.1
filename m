@@ -1,147 +1,112 @@
-Return-Path: <netdev+bounces-108847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EA2926065
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:33:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F6692606E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 14:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AD4DB262DE
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:22:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49892280286
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 12:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47A1174EFE;
-	Wed,  3 Jul 2024 12:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF3517335C;
+	Wed,  3 Jul 2024 12:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j4w1z5JB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eaea149E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561CC85298;
-	Wed,  3 Jul 2024 12:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28D7143C6B
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 12:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720009324; cv=none; b=ZmVKXxRGNaqgXTnW8FeX4wq/fLW7ce9ASS0r5ecsQb74PL3GZYbs1P7gj69vI++f+/FmbNHjE0Onq7qKSUIT7p0AKDcGVJQKwFuC4dg378rijYkQUfiA+cf9daGBJwvI6iaYMM+vxYs+N/3focGqSwZKfn9lTrXWvtJ6kNBwkYQ=
+	t=1720010105; cv=none; b=dR32Suj6TQ/kqFnq01BIzuG/nzjeqZV3U3DCett+oUVw2SgKIyS1wjpsPfnE8Mn7RUwrivVtI0WY+nGoC8WdIKudqNTZNIFMnefKlrBFCqJgPojloThBTnab0Bsh1DRHWqvRc+7jFXdVFIJTD/e4znp+xhkyfA3hfHJXiC/AlkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720009324; c=relaxed/simple;
-	bh=m4n82d0J3T8685flgzkuvY6d+GsiP8d6MyWa3RazyGM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ot4GJiiZQz2A2XFhqX1gUyqtzU/EAl9e205fOCVxdIn/TCZ+FxEXC99uaLiTAS0j76lA1mmI7ubZocQuMknUKHnkRTsiwJchIAocnSMUc0y6N6G+0qdp08UU+sJC6EpLPDd5U3aKOoXXTmpUyYzqBNa+tJt74+Ouev5nEjotShw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j4w1z5JB; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1fa2ea1c443so40291015ad.0;
-        Wed, 03 Jul 2024 05:22:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720009322; x=1720614122; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KUmNJmYy7NJ6Dze7UhH2LVbEnF29e+6mD1oyuBQ6Egk=;
-        b=j4w1z5JB8ICqmeD0b4W3tMu5KHTVtlts4AS48fpMdz84uceQsGSLfZjDDOHj68uoOY
-         8xF5aDRsZO/wQWNE/jnf+U7slrHK7R0IMdLIVcEkDpWGT7tjmJm3jR04diLRxXkjgfR6
-         T7mMJPPDAK2z7YhWbXXpQyP6p/ItJ3mPeCyrDgl+IabzDTLuhlSKJP35IeaCBDufQ5Ss
-         FxKcfovhWJQLCm5wkl72TDvIUzn/1shInoO7/33dz36vdRGTVXxeI33vQ5qIkecoamhL
-         A38M9M6tBZhmk5AiBCLph4UqR0pUb0gaqEohTELUvHGZUMuU8fLoVtN1Y+GVlQriM6ml
-         bp4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720009322; x=1720614122;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KUmNJmYy7NJ6Dze7UhH2LVbEnF29e+6mD1oyuBQ6Egk=;
-        b=lmJjWjzU/Ox+S/1p3GF8buD+ZbkULg18J+FYWro4PbKYxzeKitjTPU30PSq9KhPpNH
-         WHy6ZY7/vBUpIDF39EIXRlviqu3TzXW6jF/DNON+FCm6KQav1MUpw19EKMzAxUNMp1LS
-         JTs1l0oBGL5zt3djaG0bRt/iuIrCFIe5coo2ek7mWwaNaBwdS7P2tl6nqV+SMElHmSEM
-         nss21FuOJq2KoGPJIV73/afyMAYmszghzwvLL/RybGtb/ZwqFNIIp46wD0Zwv8Wb53wi
-         RwKEAK4Xin4e0CEfV+vmdTQvJl8qK6D5yfevYXhYq2qU74aKKPQNUUzotFsJLBzlHVD4
-         3rSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWsGz9fX1ueOw4Qkzk2jYUkvt7g45T+7XmVJ9KcPI5jfboUriEQf8qkJper26/y8zU8iRBdwOBrYi5Jw5OllQmIPRk3YyeMDCRC3u4/kaqMrGODm/d1zSwRHFQyM2Jgfsr1bTqchWb3AYd4GfzQeIjiTj0+z6+uRUS
-X-Gm-Message-State: AOJu0YwmWSEA6ZKpa4AwViZB/zZzNDZjTNgjuRbi1EIq3hVMIC4fl4sJ
-	NuWnUbu0NhgwMNAKilDem5rufldJhMAR15QHUZrR9Nik/Z3fy/EQ
-X-Google-Smtp-Source: AGHT+IHFhpUsM+UjoIZsvc9abfXBBwVr4Pvy2R6DexEfQuaMWZGPVsyFvMSpNFqyTQepijGjgMqDtw==
-X-Received: by 2002:a17:903:18d:b0:1fa:f9e1:5d33 with SMTP id d9443c01a7336-1faf9e15e0amr32122215ad.50.1720009322425;
-        Wed, 03 Jul 2024 05:22:02 -0700 (PDT)
-Received: from localhost.localdomain ([240e:604:203:6020:9d53:3114:91d1:7a47])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb24fbd598sm3616985ad.199.2024.07.03.05.21.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 05:22:01 -0700 (PDT)
-From: Fred Li <dracodingfly@gmail.com>
-To: pabeni@redhat.com
-Cc: aleksander.lobakin@intel.com,
-	andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	dracodingfly@gmail.com,
-	edumazet@google.com,
-	haoluo@google.com,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@weissschuh.net,
-	martin.lau@linux.dev,
-	mkhalfella@purestorage.com,
-	nbd@nbd.name,
+	s=arc-20240116; t=1720010105; c=relaxed/simple;
+	bh=v4/8BGxQtFgVIAVqXcyx74rvV2O6MpzsvonThb1aivs=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=Xx19/wOXj0ODz3laqullywekm/Nntle0ynLoS1Wrkg4ExVpnF1gquRT7lB4VmPi1n6v5bL7zW4CwNjhDgcO12hBubF1xzfYuZ/q8dSkQ5Kcd8n8TTFgu923UH54RqKlyQRQ3NTjZ44YAJDM+fiS4VnLLnv6DLnZR1RibG5PcrfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eaea149E; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=KbSHbMOBCE90JQVtnf7edu8ZUklrZJRldNFyQDvZE6E=; b=eaea149Edup5ie9i6V5fifOFtX
+	vGGwzR3rvs3QyTZQhoYKwqIt+Vj2e3Dz80G7D3DwJ4YCL/ZVx4wJ2fLQ4uvYMwRNAmzclHLugSs+X
+	HyzGlOelmFHCTmKlLSqx8LVs8DqQxz3j5TU9CtkkmtSnRWbypyjWZn9tN+AJUOHbNawQuIYvrkQVx
+	DQG97K1tVqPYYuOihAF+yHU28JFACYQyvewqCunNGCnuhNk2UW/rO3YSyFngXwZQNsjIs2HSGi9Ly
+	DvFTcnJPmCAqwecTLzB2RD5rZF6JdR1m045MUtUS3lhnCL6zsjwqi/ATcBs7kvxq6G3Es5DQyo8WG
+	vBki/qJQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37350 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1sOz2K-0005Yo-17;
+	Wed, 03 Jul 2024 13:24:36 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1sOz2O-00Gm9W-B7; Wed, 03 Jul 2024 13:24:40 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>,
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	"Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
-	sashal@kernel.org,
-	sdf@google.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	herbert@gondor.apana.org.au
-Subject: Re: [PATCH v2 1/2] net: Fix skb_segment when splitting gso_size mangled skb having linear-headed frag_list whose head_frag=true
-Date: Wed,  3 Jul 2024 20:21:53 +0800
-Message-Id: <20240703122153.25381-1-dracodingfly@gmail.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
-In-Reply-To: <fd44c91884d0ebf3625ac85a1049679a987f8f79.camel@redhat.com>
-References: <fd44c91884d0ebf3625ac85a1049679a987f8f79.camel@redhat.com>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net] net: stmmac: dwmac4: fix PCS duplex mode decode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1sOz2O-00Gm9W-B7@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 03 Jul 2024 13:24:40 +0100
 
-> I must admit I more than a bit lost in the many turns of skb_segment(),
-> but the above does not look like the correct solution, as it will make
-> the later BUG_ON() unreachable/meaningless.
+dwmac4 was decoding the duplex mode from the GMAC_PHYIF_CONTROL_STATUS
+register incorrectly, using GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK (value 1)
+rather than GMAC_PHYIF_CTRLSTATUS_LNKMOD (bit 16). Fix this.
 
-Sorry, the subsequent BUG_ON maybe should be removed in this patch, because
-for skb_headlen(list_skb) > len, it will continue splitting as commit 13acc94eff122 
-(net: permit skb_segment on head_frag frag_list skb) does.
+Thanks to Abhishek Chauhan for providing a response on this issue.
 
-> 
-> Do I read correctly that when the BUG_ON() triggers:
-> 
-> list_skb->len is 125
-> len is 75
-> list_skb->frag_head is true
->
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-yes, it's correct.
-list_skb->len is 125
-gso_size is 75, also the len in the BUG_ON conditon
-list_skb->head_frag is true
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+index b25774d69195..26d837554a2d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+@@ -791,7 +791,7 @@ static void dwmac4_phystatus(void __iomem *ioaddr, struct stmmac_extra_stats *x)
+ 		else
+ 			x->pcs_speed = SPEED_10;
  
-> It looks like skb_segment() is becoming even and ever more complex to
-> cope with unexpected skb layouts, only possibly when skb_segment() is
-> called by some BPF helpers.
-> 
-> Thanks,
-> 
-> Paolo
-
-I'll wait for more suggestions from others.
-
-Thanks
-
-Fred Li
-
+-		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK);
++		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD);
+ 
+ 		pr_info("Link is Up - %d/%s\n", (int)x->pcs_speed,
+ 			x->pcs_duplex ? "Full" : "Half");
+-- 
+2.30.2
 
 
