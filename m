@@ -1,207 +1,261 @@
-Return-Path: <netdev+bounces-109052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33DD7926B59
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:16:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C39926B4F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 00:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CEDDB21630
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:16:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08EA3B20ECE
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 22:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0449D18E746;
-	Wed,  3 Jul 2024 22:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266681422B7;
+	Wed,  3 Jul 2024 22:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FNQkNAjV"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="QKw+BhF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFA913B59A;
-	Wed,  3 Jul 2024 22:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE94141987
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 22:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720044971; cv=none; b=S72MjwkyVX+fXtp99ZSaiv/j1uAa2YbXMEJ6yCpA7M1u9/IeZPJfSTUWNAOgwAH3MyvOaSNdC63+aiNX/mQBCMDHWI6L+45WabP5CDHneUSq5RfUiNTcfLWW5SYudsNhbitrdAJt1a3eu51hBniD5oTChMF1Ey3NUc2Fv2qtAPQ=
+	t=1720044911; cv=none; b=lRReYlJigvsGfALxEJbjNikt4qkDSo0Jna75AtZEh2ty9h8ffMC9hpaAH0LAKAR/J41fygV2C42R6b67lY7jk5bmdwBmRq2wGeGzaC4TtuciEJJSM9gA8ZhK4idSiM4V90zwPokeLa6m/wM/CoKbyy5Lrc++ajkW6DUdLt77zTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720044971; c=relaxed/simple;
-	bh=UQd0EeHvwuiEjQaFcAKp5z898/9I3p67P2UNvkMBYmQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=D3pYpw/3Jtc3iEVcaApMS1sNUxRI8+esBURP41vXbIMWzwQqi8k/I9iNAcxbsL3ZLGanfJI5w8iZiwZyKdCVosqvsyDaVLD2qy5MY3zKy+fsQ+L1wQrqzXhWIMEnvEdP/eNifFuDxzzezTtasUwqSYOKhZ1pcTl0KlNWXmhehVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FNQkNAjV; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 463K3EdV022467;
-	Wed, 3 Jul 2024 22:15:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	KS606ZWf5wW3Nf/IpnMfTERzoRSsXb3f/8SaJ+eoiwA=; b=FNQkNAjVvuu31Bjl
-	ezcEvUWvV9ywpUEUSNUnI5Xj0We/gsoiDAI/Kxf9fsw2kEp5O+xtCJKGEvHNYqOX
-	T4h2L0vBWgFhFrfEk5WdsNcbKSGSh/rAzvRao8DSXi8q3jURLZpzF6zoOO0Fh23u
-	N2CV3ofBsR1ogvKMzXQOmOIvsqlVTDrZG6YAz8ODcACdPyYVs1qz12Ps3hIQAGUN
-	HTiTrKK9/sjwt+4l+0vcyVsxpakimg//AXxl5eaMfVLg399WpJoRvJNOfJ6tFIZT
-	GyTQ3hT9jgtyL6TSsS6rCjoAdVHT8357Fh15q0owq2q0mZOSzgjutBTcHYmExE4C
-	8Tlbvg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 405dbe06q1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 22:15:41 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 463MFeOF007405
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 3 Jul 2024 22:15:40 GMT
-Received: from hu-scheluve-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 3 Jul 2024 15:15:37 -0700
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Date: Wed, 3 Jul 2024 15:15:22 -0700
-Subject: [PATCH v3 2/2] net: stmmac: Add interconnect support
+	s=arc-20240116; t=1720044911; c=relaxed/simple;
+	bh=cXiMuV7zPK5mYxfonoj5pmfDrVklglhqgm489X1bwv0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RhfPIe6kiDnAB7l6aoryHCbsMUhoe0ljGGjrho/djkVxxMyAaap7ypkXrF9VbTHz1SDZlftgRsuSOOKCqd5RuL9v77uwqHJCy2sE6ucWNMjdeZ+DqbH1OGIQfWypoGU8RK9jumwu4j81lUQx1FEtZ8bdeoNV5hWUpf8FuJ/GVIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=QKw+BhF1; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42561c16ffeso45423555e9.3
+        for <netdev@vger.kernel.org>; Wed, 03 Jul 2024 15:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1720044907; x=1720649707; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FX9eAbs1Wlp8D5VlT+9PukjweeuHBmFcQEYjfEvEC2I=;
+        b=QKw+BhF1PTkqOMQAl3G7Jkjpe5+9oDA7rs4LicEsDdchgaREv2dcRpIhG8/6tA+kdk
+         JT52zJwnj3gIOByYbIVDT8ZCytNvQiDJBgskCEG41w/yUEZ2jciWDVG6AJ5K1uyG0V92
+         gUSXsQDuwiBc0rPsEHWw/2jGNQbnxKIrBhCyMlTJK905KeX0Is6FPr/bw40gyCa/h4wf
+         jQ46BS5hnMexuykfrLIsWHKbEvBGazzaVULcInG6LWxLGWJfNEflvks5GCvqBwD3MFPv
+         BmyoZm81Yh2fkREQaVtPLhk4oFU3JaB7MCNlaDVec2FUG9GPqXKWEehDqLM4KwqBu8Iw
+         9NNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720044907; x=1720649707;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FX9eAbs1Wlp8D5VlT+9PukjweeuHBmFcQEYjfEvEC2I=;
+        b=iwuZuNZcg2c8j/xOiGNCS7wt+Z57Qk62yYs4toJD7Qaf0AEm6rRXjoAunKXchwUm2d
+         5ks2FB9ZDhqlV7Lj8MWj4bS/GUy243sbfDnaKM4rUHRzQKYmW7Q8EKXT+xBxAqv87WxS
+         FtJHcmc+vzSzkCEuh10BSy1vLanOiZMYpXwlkOXHd160OXOChyUm9LoSvPa9209KCqyw
+         nFvULeZK4VyA4x7pGVSWWYb/uAcsP8qEcpvmw65WycYnBy4g+pEFzhkeJhlVEMmleDEB
+         wxxIoHC+2uW3Wf/Z2Z+VPqeBlZJuE/6Jh7ORV6grPfZfKEX7CUiA/udUNEmkG56HcsY1
+         iY/A==
+X-Gm-Message-State: AOJu0YzALXMDodsQZv8J7vJH/SW06rYcDjR7kgR8DQIjE+IeEDCQfCmp
+	QIJbRrF/qiEVFyDtFVrmord8YObDgUN1ZqgeEvi2WdKAPf6DxcDeuHd78EZEn+g=
+X-Google-Smtp-Source: AGHT+IFM3j/vompGrkzxDNUxbT8lVeRTIsTD2slMV657k+TvHlua3yPMqmBntGu5Q4gyZqY2PjGj6A==
+X-Received: by 2002:a05:600c:3542:b0:425:65fd:449 with SMTP id 5b1f17b1804b1-4257a05c08dmr78117015e9.28.1720044906695;
+        Wed, 03 Jul 2024 15:15:06 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:733d:9048:62cb:ccf? ([2001:67c:2fbc:0:733d:9048:62cb:ccf])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1d6677sm546205e9.17.2024.07.03.15.15.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Jul 2024 15:15:06 -0700 (PDT)
+Message-ID: <69443dab-1eaa-4754-8973-750f653ef716@openvpn.net>
+Date: Thu, 4 Jul 2024 00:16:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 08/25] ovpn: introduce the ovpn_peer object
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+ pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-9-antonio@openvpn.net> <ZoXEosCwp6-WR7wb@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
+ L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
+ fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
+ 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
+ IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
+ tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
+ 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
+ r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
+ PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
+ DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
+ u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
+ jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
+ vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
+ U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
+ p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
+ sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
+ aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
+ AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
+ pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
+ zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
+ BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
+ wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
+ 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
+ ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
+ DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
+ BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
+ +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
+Organization: OpenVPN Inc.
+In-Reply-To: <ZoXEosCwp6-WR7wb@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240703-icc_bw_voting_from_ethqos-v3-2-8f9148ac60a3@quicinc.com>
-References: <20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com>
-In-Reply-To: <20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-CC: <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: KgCNz1_N_5gVeeMPqWskJum1U1lOOxEv
-X-Proofpoint-GUID: KgCNz1_N_5gVeeMPqWskJum1U1lOOxEv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-03_16,2024-07-03_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 malwarescore=0 phishscore=0 clxscore=1015 suspectscore=0
- impostorscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407030166
 
-Add interconnect support to vote for bus bandwidth based
-on the current speed of the driver.
-Adds support for two different paths - one from ethernet to
-DDR and the other from CPU to ethernet, Vote from each
-interconnect client is aggregated and the on-chip interconnect
-hardware is configured to the most appropriate bandwidth profile.
+On 03/07/2024 23:37, Sabrina Dubroca wrote:
+> 2024-06-27, 15:08:26 +0200, Antonio Quartulli wrote:
+>> +/**
+>> + * struct ovpn_sockaddr - basic transport layer address
+>> + * @in4: IPv4 address
+>> + * @in6: IPv6 address
+>> + */
+>> +struct ovpn_sockaddr {
+>> +	union {
+>> +		struct sockaddr_in in4;
+>> +		struct sockaddr_in6 in6;
+>> +	};
+>> +};
+> 
+> nit: wrapping the anonymous union in a struct that contains nothing
+> else is not that useful.
 
-Suggested-by: Andrew Halaney <ahalaney@redhat.com>
-Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac.h          |  1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     |  8 ++++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 12 ++++++++++++
- include/linux/stmmac.h                                |  2 ++
- 4 files changed, 23 insertions(+)
+yeah, I guess I can just turn ovpn_sockaddr in a union.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index b23b920eedb1..56a282d2b8cd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -21,6 +21,7 @@
- #include <linux/ptp_clock_kernel.h>
- #include <linux/net_tstamp.h>
- #include <linux/reset.h>
-+#include <linux/interconnect.h>
- #include <net/page_pool/types.h>
- #include <net/xdp.h>
- #include <uapi/linux/bpf.h>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b3afc7cb7d72..ec7c61ee44d4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -985,6 +985,12 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
- 	}
- }
- 
-+static void stmmac_set_icc_bw(struct stmmac_priv *priv, unsigned int speed)
-+{
-+	icc_set_bw(priv->plat->axi_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
-+	icc_set_bw(priv->plat->ahb_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
-+}
-+
- static void stmmac_mac_link_down(struct phylink_config *config,
- 				 unsigned int mode, phy_interface_t interface)
- {
-@@ -1080,6 +1086,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 	if (priv->plat->fix_mac_speed)
- 		priv->plat->fix_mac_speed(priv->plat->bsp_priv, speed, mode);
- 
-+	stmmac_set_icc_bw(priv, speed);
-+
- 	if (!duplex)
- 		ctrl &= ~priv->hw->link.duplex;
- 	else
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 54797edc9b38..201f9dea6da9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -642,6 +642,18 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
- 	}
- 
-+	plat->axi_icc_path = devm_of_icc_get(&pdev->dev, "mac-mem");
-+	if (IS_ERR(plat->axi_icc_path)) {
-+		ret = ERR_CAST(plat->axi_icc_path);
-+		goto error_hw_init;
-+	}
-+
-+	plat->ahb_icc_path = devm_of_icc_get(&pdev->dev, "cpu-mac");
-+	if (IS_ERR(plat->ahb_icc_path)) {
-+		ret = ERR_CAST(plat->ahb_icc_path);
-+		goto error_hw_init;
-+	}
-+
- 	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
- 							   STMMAC_RESOURCE_NAME);
- 	if (IS_ERR(plat->stmmac_rst)) {
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index f92c195c76ed..385f352a0c23 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -283,6 +283,8 @@ struct plat_stmmacenet_data {
- 	struct reset_control *stmmac_rst;
- 	struct reset_control *stmmac_ahb_rst;
- 	struct stmmac_axi *axi;
-+	struct icc_path *axi_icc_path;
-+	struct icc_path *ahb_icc_path;
- 	int has_gmac4;
- 	int rss_en;
- 	int mac_port_sel_speed;
+> 
+> 
+>> +/**
+>> + * struct ovpn_bind - remote peer binding
+>> + * @sa: the remote peer sockaddress
+>> + * @local: local endpoint used to talk to the peer
+>> + * @local.ipv4: local IPv4 used to talk to the peer
+>> + * @local.ipv6: local IPv6 used to talk to the peer
+>> + * @rcu: used to schedule RCU cleanup job
+>> + */
+>> +struct ovpn_bind {
+>> +	struct ovpn_sockaddr sa;  /* remote sockaddr */
+> 
+> nit: then maybe call it "peer" or "remote" instead of sa?
+
+yap, makes sense. I will call it "remote".
+
+> 
+>> +	union {
+>> +		struct in_addr ipv4;
+>> +		struct in6_addr ipv6;
+>> +	} local;
+>> +
+>> +	struct rcu_head rcu;
+>> +};
+>> +
+> 
+> [...]
+>> +struct ovpn_peer *ovpn_peer_new(struct ovpn_struct *ovpn, u32 id)
+>> +{
+>> +	struct ovpn_peer *peer;
+>> +	int ret;
+>> +
+>> +	/* alloc and init peer object */
+>> +	peer = kzalloc(sizeof(*peer), GFP_KERNEL);
+>> +	if (!peer)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	peer->id = id;
+>> +	peer->halt = false;
+>> +	peer->ovpn = ovpn;
+>> +
+>> +	peer->vpn_addrs.ipv4.s_addr = htonl(INADDR_ANY);
+>> +	peer->vpn_addrs.ipv6 = in6addr_any;
+>> +
+>> +	RCU_INIT_POINTER(peer->bind, NULL);
+>> +	spin_lock_init(&peer->lock);
+>> +	kref_init(&peer->refcount);
+>> +
+>> +	ret = dst_cache_init(&peer->dst_cache, GFP_KERNEL);
+>> +	if (ret < 0) {
+>> +		netdev_err(ovpn->dev, "%s: cannot initialize dst cache\n",
+>> +			   __func__);
+>> +		kfree(peer);
+>> +		return ERR_PTR(ret);
+>> +	}
+>> +
+>> +	netdev_hold(ovpn->dev, NULL, GFP_KERNEL);
+> 
+> It would be good to add a tracker to help debug refcount issues.
+
+Ok, will do!
+
+> 
+> 
+>> +
+>> +	return peer;
+>> +}
+>> +
+>> +#define ovpn_peer_index(_tbl, _key, _key_len)		\
+>> +	(jhash(_key, _key_len, 0) % HASH_SIZE(_tbl))	\
+> 
+> nit: not used in this patch, and even removed by patch 16 as you
+> convert from index to buckets (that conversion should be squashed into
+> patch 15)
+
+You're correct. Will merge all these pieces in patch 15.
+
+> 
+>> +/**
+>> + * ovpn_peer_transp_match - check if sockaddr and peer binding match
+>> + * @peer: the peer to get the binding from
+>> + * @ss: the sockaddr to match
+>> + *
+>> + * Return: true if sockaddr and binding match or false otherwise
+>> + */
+>> +static bool ovpn_peer_transp_match(const struct ovpn_peer *peer,
+>> +				   const struct sockaddr_storage *ss)
+>> +{
+> 
+> AFAICT ovpn_peer_transp_match is only called with ss from
+> ovpn_peer_skb_to_sockaddr, so it's pretty much ovpn_bind_skb_src_match
+> but using peer->bind. You can probably avoid the code duplication
+> (ovpn_peer_transp_match and ovpn_bind_skb_src_match are very similar).
+> 
+
+mhh it is not called in ovpn_peer_skb_to_sockaddr, but I guess your 
+comment still applies: ovpn_peer_transp_match and 
+ovpn_bind_skb_src_match are very similar.
+
+However in one we have a sockaddr_storage while in the other we have an 
+skb. How do we combine the two?
+The only way I see is to create an ss out of the skb and then always use
+ovpn_peer_transp_match. Is this what you were alluding to?
+
+
+Thanks!
 
 -- 
-2.34.1
-
+Antonio Quartulli
+OpenVPN Inc.
 
