@@ -1,116 +1,143 @@
-Return-Path: <netdev+bounces-108659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA1D924DE6
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:39:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C2D924DF2
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 04:43:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED72B27503
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:39:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 670A928121E
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 02:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0521E1FB4;
-	Wed,  3 Jul 2024 02:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438074A3D;
+	Wed,  3 Jul 2024 02:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="rvzpSked"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MqodcdQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54A2523A
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 02:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630B01DA32B;
+	Wed,  3 Jul 2024 02:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719974373; cv=none; b=ks62r8oYMXfKB4Mi/UtujuMfVuiJxCqb8CBoOCTjw7z6oaTiAU245Z78D+jh1aNh4Ri5SJLz86fEzdMbPORWcqMcR8lHQ1x+1E/FOYHf9Wx1UXdOrnx4uB956KHsGCJmznrlrZIyQOmQHMt9GkdYNOJ5q3ocMUVWTTWipIVI6zY=
+	t=1719974587; cv=none; b=FHc7mfP8+iAdpINGubvfe+XwIvhtRTr4d4vylh3qgX6SNrKvYg4CHfS/SSDvafVpvTY7oyAzGj9N3JRW25+frg4FYi8DiisK9NEIeu4hDZll3mv5EL7j+uZewV1+QZ4nKkrxkGieW8KiaOId806GVy61Tjp3yZAa72tWf7igEaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719974373; c=relaxed/simple;
-	bh=nesRTquYSmAgGVBGCb6VKWwFQ3BzkeM3+SZXjJ0qOSo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aEeJBOv2rERXCeGQSepPVdsEgTPVAiWiIRi4VMxAVJvcn+OnNgoREwTD2k0kuWlXeKegHU3Dyl1RFr8GMF81QL8igiIn6jScyaFSJwvN/fCMEjFsj2Ro7OhMyeAQD7G49F461d5nw8Cm42SawECsdjP1KIuVLZf5CH33YJidebw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=rvzpSked; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 8F7082C044B;
-	Wed,  3 Jul 2024 14:39:22 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1719974362;
-	bh=mSPdwjA6VRheCRrQxnrkew5mjmQX0ILCVy3v5OXgySM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rvzpSkedJ7CyBO8MdjZPYq5M5JkPmqpS9lKgIzDAMy09c4u7rCWVYhOuDNP3jltWA
-	 pSLOJ7jdTq/MEZ2Eshp800RzozG3qfolob3q9n2BtC6EQ6MGiZUHZRPm/ixRXpDGFh
-	 Krj8RZdwhqB/im71DwvglQCHe54s27aum8x1eluTJzUxs4c0x2jtvE1V4pThwYlBkC
-	 pSM9IK33DmsBHVcOlFfRRfCP0TqAUoEaWc8xbgIDaTyN3TURnPx47kcvx9CwpkF5Oi
-	 EnihWH9g0CS3O1J937xz081PMyxTe1FUnzDB4ePk5zpidtOta8Iuqa6N+Nw9OUe21s
-	 vFb4x9YJRgzTQ==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6684b9da0000>; Wed, 03 Jul 2024 14:39:22 +1200
-Received: from [10.33.22.30] (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 6627D13ED5B;
-	Wed,  3 Jul 2024 14:39:22 +1200 (NZST)
-Message-ID: <c8132fc9-37e2-42c3-8e6b-fbe88cc2d633@alliedtelesis.co.nz>
-Date: Wed, 3 Jul 2024 14:39:22 +1200
+	s=arc-20240116; t=1719974587; c=relaxed/simple;
+	bh=0+c8IamQc/JMP0Yy89b6rMfbUIOtGU6qGDJkh4JCqfI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N0OYYe684APSC+ls8cZGKBDslGVSnnno/a4oSXn2gwPIbBUHca4zuEXPYwP+AuTebw/zUQLDDFu/hARVwGeMST3nj4LNGkxMiWdxokCZK21aH/mR7eqat5p5VQg/G+D1b/PJdAnIw7MhMKktoq5J6Kr1XdxqLAXG67UM3IOihzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MqodcdQV; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1719974585; x=1751510585;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5IJUkVWImTRVEE1Lr4LGpvHulAgZFkW5TdFDxsW2jUU=;
+  b=MqodcdQVv3klT0bUxSwTo+RLrOn2VtX/TIDZqQ24o58/nTx75k9IkuPn
+   Gp/AwZnrHzy+BX/S2WZeAYIXWxrqpe4R0uHchoT6muZ5Tr0t3v8s375Bf
+   b8SZ8O3W6b+otCYr6Ek/9TvHkONnIEzYjzA4NRRpy2f//U3m/3DDQs7Jv
+   k=;
+X-IronPort-AV: E=Sophos;i="6.09,180,1716249600"; 
+   d="scan'208";a="407384094"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 02:43:02 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:52391]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.167:2525] with esmtp (Farcaster)
+ id 3c320ed6-bed0-4404-822c-201001489b19; Wed, 3 Jul 2024 02:43:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 3c320ed6-bed0-4404-822c-201001489b19
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 3 Jul 2024 02:43:01 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.100.30) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 3 Jul 2024 02:42:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syoshida@redhat.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net 1/2] af_unix: Fix uninit-value in __unix_walk_scc()
+Date: Tue, 2 Jul 2024 19:42:48 -0700
+Message-ID: <20240703024248.99131-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240702160428.10153-1-syoshida@redhat.com>
+References: <20240702160428.10153-1-syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: net: dsa: Realtek switch drivers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "olteanv@gmail.com" <olteanv@gmail.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, "ericwouds@gmail.com" <ericwouds@gmail.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "justinstitt@google.com" <justinstitt@google.com>,
- "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
- netdev <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "sander@svanheule.net" <sander@svanheule.net>
-References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz>
- <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
- <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
- <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
- <c19eb8d0-f89b-4909-bf14-dfffcdc7c1a6@lunn.ch>
-Content-Language: en-US
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <c19eb8d0-f89b-4909-bf14-dfffcdc7c1a6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=6684b9da a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=IkcTkHD0fZMA:10 a=4kmOji7k6h8A:10 a=CfxWgEXZv7hflEJXd20A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+From: Shigeru Yoshida <syoshida@redhat.com>
+Date: Wed,  3 Jul 2024 01:04:27 +0900
+> KMSAN reported uninit-value access in __unix_walk_scc() [1].
+> 
+> In the list_for_each_entry_reverse() loop, when the vertex's index
+> equals it's scc_index, the loop uses the variable vertex as a
+> temporary variable that points to a vertex in scc. And when the loop
+> is finished, the variable vertex points to the list head, in this case
+> scc, which is a local variable on the stack (more precisely, it's not
+> even scc and might underflow the call stack of __unix_walk_scc():
+> container_of(&scc, struct unix_vertex, scc_entry)).
+> 
+> However, the variable vertex is used under the label prev_vertex. So
+> if the edge_stack is not empty and the function jumps to the
+> prev_vertex label, the function will access invalid data on the
+> stack. This causes the uninit-value access issue.
+> 
+> Fix this by introducing a new temporary variable for the loop.
+> 
+> [1]
+> BUG: KMSAN: uninit-value in __unix_walk_scc net/unix/garbage.c:478 [inline]
+> BUG: KMSAN: uninit-value in unix_walk_scc net/unix/garbage.c:526 [inline]
+> BUG: KMSAN: uninit-value in __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
+>  __unix_walk_scc net/unix/garbage.c:478 [inline]
+>  unix_walk_scc net/unix/garbage.c:526 [inline]
+>  __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
+>  process_one_work kernel/workqueue.c:3231 [inline]
+>  process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
+>  worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
+>  kthread+0x3c4/0x530 kernel/kthread.c:389
+>  ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> Uninit was stored to memory at:
+>  unix_walk_scc net/unix/garbage.c:526 [inline]
+>  __unix_gc+0x2adf/0x3c20 net/unix/garbage.c:584
+>  process_one_work kernel/workqueue.c:3231 [inline]
+>  process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
+>  worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
+>  kthread+0x3c4/0x530 kernel/kthread.c:389
+>  ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> Local variable entries created at:
+>  ref_tracker_free+0x48/0xf30 lib/ref_tracker.c:222
+>  netdev_tracker_free include/linux/netdevice.h:4058 [inline]
+>  netdev_put include/linux/netdevice.h:4075 [inline]
+>  dev_put include/linux/netdevice.h:4101 [inline]
+>  update_gid_event_work_handler+0xaa/0x1b0 drivers/infiniband/core/roce_gid_mgmt.c:813
+> 
+> CPU: 1 PID: 12763 Comm: kworker/u8:31 Not tainted 6.10.0-rc4-00217-g35bb670d65fc #32
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
+> Workqueue: events_unbound __unix_gc
+> 
+> Fixes: 3484f063172d ("af_unix: Detect Strongly Connected Components.")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 
-On 2/07/24 14:50, Andrew Lunn wrote:
->> What would I be loosing if I don't use the DSA infrastructure? I got kind of
->> hung up at the point where it really wanted a CPU port and I just couldn't
->> provide a nice discrete NIC.
->   
-> DSA gives you a wrapper which handles some common stuff, which you
-> will end up implementing if you do a pure switchdev driver. Mostly
-> translating netdev to port index. The tagging part of DSA does not
-> apply if you have DMA per user port, so you don't loose anything
-> there.  I guess you cannot cascade multiple switches, so the D in DSA
-> also does not apply. You do lose out on tcpdump support, since you
-> don't have a conduit interface which all traffic goes through.
->
-> But you should not try to impose DSA if it does not fit. There are
-> 'simple' pure switchdev drivers, you don't need to try to understand
-> the mellanox code. Look at the microchip drivers for something to
-> copy.
-One reason for using DSAI've just found is that in theory the RTL930x 
-supports a CPU disabled mode where you do connect it to an external CPU 
-and the data travels over SGMII like you'd get with a traditional DSA 
-design. It's not a mode I'm planning on supporting anytime soon but it 
-might come up when I get round to submitting some patches.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thanks!
 
