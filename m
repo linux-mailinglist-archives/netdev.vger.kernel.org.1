@@ -1,114 +1,117 @@
-Return-Path: <netdev+bounces-108752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-108753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EAC92532A
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 07:50:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE8A925384
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 08:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71C3528A349
-	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 05:50:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C97D7B213AB
+	for <lists+netdev@lfdr.de>; Wed,  3 Jul 2024 06:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6C949641;
-	Wed,  3 Jul 2024 05:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8832212DDB3;
+	Wed,  3 Jul 2024 06:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="AZlJETt3"
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="ZM9TjA8n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3D6C2F2
-	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 05:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A900B1C69A
+	for <netdev@vger.kernel.org>; Wed,  3 Jul 2024 06:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719985813; cv=none; b=bvMTqe77xBU8sm6wAtpnIUJNvnpko3KsJtUsHbUJmqUkTCf8gPH/d812gbtVRqLCsTOijDtWTX298foBvb/OSPU3FgIpZmgbt74/Hbmre/DOmvZKs2pmbqkBmOJHogdlwxF7M54VV7Jx8gbWWlGcRHdSkyLx2sUbfySW6rHhZew=
+	t=1719987133; cv=none; b=qYAQXrlo/15sie/F8OOkRLwqzHft9zQARHhzKyrSCfgUl8MezaHmwROghNWbhg9pN+ZxRb9c00mYSs1AB2RQqk1JWqi80uswcgRQEHBcVYQk+95BfcfUIAdmoIZ7n30oJqn+SjevlYRNGPktP9EjpMLgru3aafaDK06XC1MBbj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719985813; c=relaxed/simple;
-	bh=acTW0/kBCsnpdMbl8++jAAFAOZp52xMnqY2t13vpoUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qnGt1aQBCaY03Rx/QxbadLLpBeBTiKDqni46Xh3hp7CS9rK9G0TkmZNzhO949FT26N9UPvu/OxUW+gCmsfHitXmy/bmTQUvLMwN+FDOZ7PQlLob8CWATXdKpkne85kpxhzCbHjHXIqKY6X6qC1qdyK1R/N7aqsbhW0PxXlg/1hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=AZlJETt3; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70a078edb8aso200299b3a.1
-        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 22:50:10 -0700 (PDT)
+	s=arc-20240116; t=1719987133; c=relaxed/simple;
+	bh=3J99y5+6OxbwcKwAHIcLAKi5CZ2ycbqsCw8ezkKjM80=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rBiyNFltjJqX6y19wA0TcgbOFgdfVZIfCw1acmHY9GpgT44aJNpw8uiq40v3mn9y3WYnPLFL0ngH4XJdtM5GSEjbW4Q6KPaEsgWElDB7tzOJ0AvTKWRqOJDZQ7bUVZkIFRtvjAY7dMqZBW+ULWsxjTdHe5+3JdGrs9drkL0glvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=ZM9TjA8n; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e035ecb35ffso4917304276.2
+        for <netdev@vger.kernel.org>; Tue, 02 Jul 2024 23:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1719985810; x=1720590610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OtXRsO3ABIH1xguC/+WmLwv74N1+Hb8hKREtjoV46Kk=;
-        b=AZlJETt3cePGUhezjebpS9Ciug0Vs2304ML9l9bFC+dxTxRmYnXMUXr0G70/ctY86w
-         0h3iEzdpl6miWskJBLcVU+/+CYVNVlMYrw0UPmsGf1HteXdIA2CufJp6jg2CYDHv+9dR
-         TmELpuv8iTHzagRyVmJAJjhpMQy/RgEdKplIs+RoZ9VErq8gTHmhqxeJpuVd6q0WcIWH
-         zBJNos/Ywaq8H3pXfum6SnV9slFwrSyH+GTrNFvi3CJYJH3A3D7CBdEXlOupJD60aatg
-         DpZcV5kFnB+lY00KOlyjj3E7d39VPMa5E7ro6mE/o7JM4H4TNRb7YkuFah0Mwfl48RoW
-         +HYA==
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1719987129; x=1720591929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1YgzDReIaUyz8u4XHHLiy/BwQZOZxxkCv3LtW0SkUnc=;
+        b=ZM9TjA8nvdacXOC+i8jV18hP312AcUixvWRcDGa7PG288hGgq9BuqSACT7NHNFXAsx
+         bPZiy9qykcnRjP3Q8VVlO4YiizNsWwOgbl/Yx8WTNvdCFd1d7dGRMA++8aMZHonB8mpK
+         M4R01h7b3L1TBGLv1SAP5C+gjVtaRuOcZritfHoptPXih1SgVSnFT4H2Rju2QbSlcjFD
+         BbDpw5woDX+PVrKSpeoW7pdmAfB7Cj97YNScln1KcqC7LXgQcA4JuJuEveiUTRhgi7Ut
+         X6p6L3jvOc0St6SpkO6sQOYfOnvFB+SzGzudJH8GsuH9fmORQJqhZcTneeY4QnqMr/Kf
+         kMtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719985810; x=1720590610;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OtXRsO3ABIH1xguC/+WmLwv74N1+Hb8hKREtjoV46Kk=;
-        b=PjL7amyMGdTJhOwB4oNP/TohQ1UsbEMeSKewaFK4QkKUT423WIFPaF+xjpayDX5SX6
-         DKgWdaQJ9R+fav5zhgMIvEbtHpyD83MktxExhg/Hx6XrtFaF7BJ5H7+mbuEaft76Df8K
-         eIlOp5BYUFmvIKMx9AQ+cbAz++SCiPr0i/zNC4Y2RI8T/C/S0xdDxo4L+ZpnqZvemocu
-         I9H7xjAXwcyt33OKskAU9yL+6LPGtCPvzl+N9huCtZndFk/nJQ8gjsI31PjEdh9TAyPv
-         tRu1ftwpL9l9MxWCSE1xQaAQlM+40Ct51I0/Z/YZB9xJfPyvq6SrjaXYBQ6edc0ufFF+
-         gKLw==
-X-Gm-Message-State: AOJu0YxQwxwlevfCY2YoskKUIfZ1Jwxa/puMXBIS2jhEKtT9UbRI79II
-	nz6dJ/aj+Te3G2HkANv3j6vNbevdqdSSEucTZC8ISbe38JwTuqxtW2nwhFOTfs+CM7jXEjaKtrB
-	i21c=
-X-Google-Smtp-Source: AGHT+IEjyMsViZbi7s/QgjIL9VfJ2c9GBrZVFWC5WeVr9Tsvi/DWcOVTtxQgVGoMm62vMO5UhKO3ZQ==
-X-Received: by 2002:a62:ab11:0:b0:706:1bfd:4e8e with SMTP id d2e1a72fcca58-70aeb3ebce8mr1089552b3a.0.1719985810197;
-        Tue, 02 Jul 2024 22:50:10 -0700 (PDT)
-Received: from hermes.local ([84.39.151.145])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70801f5a2e3sm9525885b3a.21.2024.07.02.22.50.09
+        d=1e100.net; s=20230601; t=1719987129; x=1720591929;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1YgzDReIaUyz8u4XHHLiy/BwQZOZxxkCv3LtW0SkUnc=;
+        b=bQyMWTkch8qLlYVJvlWIRTGuPKRvnqkZasT3HSBEaow1tHe+JEZL6uYV0bLWHgxf+l
+         UaeewQIt5W17PjBx/R4pjCdxIQ5o50DDxT0OsM4laWK6cBdMRkxkA2cqu8Z57O1XbK9Y
+         T5Z8BxzE1YcinilRvq8vYE4JQUy56PqAS5spqhLxF3/Ri7s7045QIqibB4CJ8pCJIsg0
+         ZiHPi3uPNSj1kaXFH9L1p/xMY0sfyB0wZZrBP2Z7ZJEqScwx5ly3ZNQORU44htlup3CS
+         T0qMepJMawpbF8HpkkXokARA6vGmPuztroTMPzesEMQOqFGPOlyv4RiqL3gml3jK6KRR
+         n1WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6mCyTZr5tnicws0NuiP6KA5S679MhL1YQBS3HkLsxvL0y1Ry8hd9KmCpwNAWeZFafWnYEKZL+mKewX2v+uxtly6YJl92z
+X-Gm-Message-State: AOJu0YwIZuPW+MIqCVU8jHKWpN11gv5hqauA4SrMQ3iLU5u63Zc3ZxVb
+	2WMlUiMIAwxxsDFX5JPJbGwZjxmwspAmuDgeVrAW6ZFKCwkp5846wXelBWH2eoo=
+X-Google-Smtp-Source: AGHT+IEYwaFScpXSpfOjk0NDboyzDAX10kkBsDpozYzsFOW5+JJ9NVaivETucKRFmAX9S49/+mU4Bw==
+X-Received: by 2002:a5b:9cf:0:b0:e02:b7d6:c97 with SMTP id 3f1490d57ef6-e036eaf633emr12008074276.8.1719987129659;
+        Tue, 02 Jul 2024 23:12:09 -0700 (PDT)
+Received: from fedora.vc.shawcable.net (S0106c09435b54ab9.vc.shawcable.net. [24.85.107.15])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6a8dbdfdsm7531927a12.29.2024.07.02.23.12.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 22:50:10 -0700 (PDT)
-Date: Tue, 2 Jul 2024 22:50:07 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: "Muggeridge, Matt" <matt.muggeridge2@hpe.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: "ip route show dev enp0s9" does not show all routes for enp0s9
-Message-ID: <20240702225007.33b0fe3b@hermes.local>
-In-Reply-To: <SJ0PR84MB2088D9C951AF8B39C631950DD8DD2@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
-References: <SJ0PR84MB2088D9C951AF8B39C631950DD8DD2@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
+        Tue, 02 Jul 2024 23:12:09 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: samuel.thibault@ens-lyon.org,
+	tparkin@katalix.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@toblux.com>
+Subject: [PATCH net-next] l2tp: Remove duplicate included header file trace.h
+Date: Wed,  3 Jul 2024 08:11:48 +0200
+Message-ID: <20240703061147.691973-2-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 3 Jul 2024 04:00:44 +0000
-"Muggeridge, Matt" <matt.muggeridge2@hpe.com> wrote:
+Remove duplicate included header file trace.h and the following warning
+reported by make includecheck:
 
-> > On Sun, Jun 30, 2024 at 09:23:08AM -0700, Stephen Hemminger wrote:  
-> > >  Good catch, original code did not handle multipath in filtering.
-> > >  
-> > >  Suggest moving the loop into helper function for clarity  
-> > 
-> > Thanks, looks good. Do you want to submit it?
-> > 
-> > You can add:
-> > 
-> > Reviewed-by: Ido Schimmel mailto:idosch@nvidia.com  
-> 
-> Just wondering which repo this will find its way into.  I sleuthed
-> your repos and the iproute2 repo but could not find it.
-> 
-> Thanks,
-> Matt.
-> 
-> 
+  trace.h is included more than once
 
-It would go in iproute2 but was not an official patch since it was not
-tested. Since you are doing multipath routing, could you please make sure
-it works.
+Compile-tested only.
 
-Suppose a test with dummy devices is possible, but somewhat artificial
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+ net/l2tp/l2tp_core.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 88a34db265d8..e45e38be1e7c 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -61,7 +61,6 @@
+ #include <linux/atomic.h>
+ 
+ #include "l2tp_core.h"
+-#include "trace.h"
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+-- 
+2.45.2
+
 
