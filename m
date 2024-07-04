@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA3C926F77
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 08:26:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D273E926F91
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 08:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA993B23010
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 06:26:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D99281E41
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 06:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5BB1A01BD;
-	Thu,  4 Jul 2024 06:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B889A1A0730;
+	Thu,  4 Jul 2024 06:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GDoCuzMt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnnXzXxY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3DE1BDCF;
-	Thu,  4 Jul 2024 06:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA0D1A0716;
+	Thu,  4 Jul 2024 06:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720074364; cv=none; b=PpnEKuDQsv3Sh0h23wRzUFDj3bKGnJnq2HJFDoLUkwFh5Pq6C682tQfhD4YbkYgJ9hB0b7MmVEDDZWZCsGXh6EzgNrbUCePuHStQgxyICtODdFg7MXZiVnxS8wvT9j8AQ3AMZTOvtnESZLz2MqOyOZ5/Jpwo+LGyOJizPdQ0F0g=
+	t=1720074571; cv=none; b=fZGLSfBJI//FIpXiaLVgx2F/6cvaRA362fvzg7t3sZ5WFIJhiOKtm4sWQFbxwmrwF16KxfADtfqP5TQDTKZn6Oeh2OFAn6r7U0hCYK9iRMe4iSQciAnsRnrlhiFm7i+cKhxLjJlA63Cq1cfpXpF3NtZNuSyHauW3/bq4QGPvt+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720074364; c=relaxed/simple;
-	bh=q7udoVJl5yTg51eTfZNs+WlAf/x0e0Bje3mXtuTT8g0=;
+	s=arc-20240116; t=1720074571; c=relaxed/simple;
+	bh=oi4vYFefgWoHU6xqUG6fjqaCl/WzuHlY267qdKyZTSc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T3/+A5QVgk7cBlhmQOTtiD9PbQMV6Xb7yWADVfK0a0N0Xg8HThbrLGbh99+uwLRNQS3PxrsSMbbGwI20sazvtsGxN29r5vEQGpTyyGcybt24VpYDt6tYFQApvKQZdEiirFbVGCip9LxrK7mHj0CjMHmO2mymcbzjwVtnfQhgteY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GDoCuzMt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7859C3277B;
-	Thu,  4 Jul 2024 06:25:56 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=NHiydQdgG+zrc4K4YjtNV6fpZx6M+fidVvJYFKuhXO500d+Ipp10FX888mcRdNzjk46wtLjxJan3sjIJYB1t+fpfq4tzFmnq3mV44xWuaVdBwKgxk+ACOmUlIgZEkWIkZFINbGOXMcPMuYzd+duHzVKjfMVPlz66PgeX+TZjqj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnnXzXxY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B2FBC3277B;
+	Thu,  4 Jul 2024 06:29:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720074364;
-	bh=q7udoVJl5yTg51eTfZNs+WlAf/x0e0Bje3mXtuTT8g0=;
+	s=k20201202; t=1720074570;
+	bh=oi4vYFefgWoHU6xqUG6fjqaCl/WzuHlY267qdKyZTSc=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GDoCuzMtoE6Q9ahsq83O7CL53sP37Qx/Y3uFj7uQIqddlW/wyUFEPoCpSjuYRufug
-	 p286Jbza9+eqQmSq0NI2NrkF3zqqJwrqRJ6V6EpQRy1sp9zRmAWx1FH0u8JzJVALv4
-	 +qEh48qHOKmp3eeMtzFNw5Y/nvm2jlTJGd3w8sS9ofjizoA6DewrojvgvZaAp+ID/+
-	 U48FzMs+aEZsQTK+UG7Vye7kROskoD9+qR8Rldng9WPE2IcpBPXs92DVY1XQLVgFJT
-	 8gIkys5DfXvsm0tKY8OQnB8lQO5W84/NDVDRS4FxIZpyNKQX2JfwAtag81CF6ttr7o
-	 i909kC9mW6HFA==
-Message-ID: <5e7041ad-8e76-469f-9698-b7debcdde5b0@kernel.org>
-Date: Thu, 4 Jul 2024 08:25:53 +0200
+	b=DnnXzXxY2TL2pd/PnNcZfLTnjsw4QZgYW1zRkhnu5q3GRicIjw0hG7xnLebbXof/w
+	 2wLcb3fCW6vhxU35pQvH1aeoPpPwViNy3ZdeiqiQNu9+o3m1ieNwNnOQTMlmUjOYPh
+	 dDVmUjoMjf2ROI+T0+2/zJHAalZ0PENhtaW/DOy+0D1LbkV2gecxvJDNydPM2gOhsx
+	 2bNkrSAND28ifA1kBtx4oFbuxULg+5Gyanz4RhV2S5RkNE22bvrFAD96lldk8AKZty
+	 owFNbASuW0k2RHVN6CbbyoNJwtTc1HSVm630M+T478Cxj6oUHiNVkoHmHjAxAx4Wjr
+	 XDkpC36zGdMjw==
+Message-ID: <1326b277-9084-4750-acc9-e6f4bccc0425@kernel.org>
+Date: Thu, 4 Jul 2024 08:29:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,25 +50,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] dt-bindings: net: qcom: ethernet: Add interconnect
- properties
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
- Vinod Koul <vkoul@kernel.org>,
+Subject: Re: [PATCH v2] dt-bindings: net: Define properties at top-level
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+ Serge Semin <fancer.lancer@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
  Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com>
- <20240703-icc_bw_voting_from_ethqos-v3-1-8f9148ac60a3@quicinc.com>
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240703195827.1670594-2-robh@kernel.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -114,17 +111,19 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240703-icc_bw_voting_from_ethqos-v3-1-8f9148ac60a3@quicinc.com>
+In-Reply-To: <20240703195827.1670594-2-robh@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/07/2024 00:15, Sagar Cheluvegowda wrote:
-> Add documentation for the interconnect and interconnect-names
-> properties required when voting for AHB and AXI buses.
+On 03/07/2024 21:58, Rob Herring (Arm) wrote:
+> Convention is DT schemas should define all properties at the top-level
+> and not inside of if/then schemas. That minimizes the if/then schemas
+> and is more future proof.
 > 
-> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > ---
+> v2:
+>  - Drop the parts already applied from Serge
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
