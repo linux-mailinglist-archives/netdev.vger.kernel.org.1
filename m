@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-109261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C87927983
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5481C92797E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A491B28A4A1
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:04:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0746E28984B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35071B29A7;
-	Thu,  4 Jul 2024 15:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B9B1B143A;
+	Thu,  4 Jul 2024 15:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b="Y5Zmh1Qk"
+	dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b="k0kQeAjR"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2102.outbound.protection.outlook.com [40.107.20.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BB01B14ED;
-	Thu,  4 Jul 2024 15:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AA71B11E9;
+	Thu,  4 Jul 2024 15:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.102
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720105437; cv=fail; b=OitXaBzih+X3udpQIZoFeAGQHINSKtn9cDfPRQLRf7OatTW8DLuPAmnikm+oe5xLfpvQG+GP4+zOMR3voFR+n7LH8UO89KjVzQfGIDT267r04hX40wlVhoxvCqfEArLeZhWQfOHdE1FTxCI9rE7iQQuyviea88T+L0AXcUz76Qs=
+	t=1720105434; cv=fail; b=Ru3ZGlqsEFJ07henbp2yhHTbbRKw0XTGddm7csiu5AoH68jyBOixEF2fdVGBYtXL/tttWOWr7MbEly6deqoyQrf6zP2rBB8p35YmRlDdbxdcgmJnwWHn1rW81imSNCb0YBC+h4ZIuDTzdITXEtQOMQ40eZcSJBhEF8q4sHxhf+0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720105437; c=relaxed/simple;
-	bh=kES2HB3UmJwXWYZulDjoJS0K/eITeISVm+N26XBUkUI=;
+	s=arc-20240116; t=1720105434; c=relaxed/simple;
+	bh=TjqY5poStO6rZ9XUcYuW1uk2taLdDumd2hFUIavQPV4=;
 	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=sIWYMA9SY7AXP58me5WLJXK8iF4vwVpOZ//Rccly3ibyJ5f0KXZAVyJZlJkqdX+rqclHAqjsCSo3ITCfv12js5RNFutDzJsh4zXF2/6YY6WuA2yoafAvbO3MmfXYtCcUBUyfvNwGlDikYWDTf5SFq59agJ9TR8pLSd4gFiwSUFI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b=Y5Zmh1Qk; arc=fail smtp.client-ip=40.107.20.102
+	 To:Cc:MIME-Version; b=Duy0yeITvdRbXCfsn9LUSOIFrxc8Ve3aInm7ej2QRQ0zd7Ffj5JnT7G+WH+Qs4G1adssrp8yY+l+aYZwpqWqlgq8UD+zV7snsuJZ4DfJyCGjPEPUQ5K2a6tC8LfMEolTiOpOXm3JgJNNFAlnQEsqVufozEa31Hjdgg4YzlFHDpM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b=k0kQeAjR; arc=fail smtp.client-ip=40.107.20.102
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=solid-run.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jKoGuu4GjVkyG/lQwliffiR7nX2MnR3NqsvqB42U1UeZYsf5i889z6XAySVdY8yqXDTXGwBJ3gyWmhEma2KZj/ixE54YD50y6ITUiOIghNpIhep9MyQcj9JjgqJRh2wi2FWnf/BIxOVbO8wOo7zADNBd4gpDl+8WMaTOYaL4O6jnsgMk7vT4hp84SAKEuaizPoDMbVDku8w1jfWKTqexYsnHcsAL8ZfrBM83c2Tbl1+r/cyHKBBioJ8EAnYh3i7KVZEflxA+G32TM9pxRtnec3npvZq1GuGpZcf6f1M667+wfKLczyrSwY+Q1XxTpruCF/Lv2EnJpsbXIGfD36cyfA==
+ b=A3LH7LX+B4A/OCLklLHGtvH1LZTpZdBJSqGQ+Hoo1vgfHPvVKsPtvk5ffct8og8pvUS4saPI/Tp9AhzUaWv7hUlGoRFUybl+AJH46antARywQkIAjrnhFM0MkGG9ZDnB9IU7ZBMjrPDX+as7bmfYO5/QXX7i/V7VVqYkEEOnQwIurbcdSZreLrrfutJDgT1MFt0JzRjYSQSJ/cXLoUIpn0unfS1WM4tTtnv7LnT+8oPWt2DC6pmBlM+KVv4rKFAPfeYR7T6gFdxgtBA8QxgWzaSyGsjJDj2gtqVBwD1P2cv9udwpNjABROcrWtGxCGevhAt9fPStzIcr3xMXjASADQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4d05q49xYLdldzIAJAOLYnFweox24PXDvvTxGws5LHM=;
- b=djX0vI2+n9ZsTuX4sehraxB173AZk/1sFg+JykiRHgetx6Frdrge7WuWO2aJyqcA2WHni8zRFPmKjt1MxW8XhhfPrbU3r4MrH63foP7xSOBMSpXeh7nw85o6bPUbXsAsU/Urc8DkE54EEaxTLyV0bHEkt9atwV1iW+p9jiDC5dO1wDKMG9ExuPGmDzwrJJEmxSRsMW7qTFiXGqlwK46378BM4f9CjnlQWv6b2zBGIo2zzoBVZ0RnYQxxzd4TKsu8Pz8ZaqSddy+T1D3lL26flmOOmbhQWT9VSr2JmCzXaUgFAOY0+0Qsb273BTNBWu1H9+pEuztQirQ4I39waIRFDg==
+ bh=e5UHay0sun3GYifzFmxig3whsD1MbfqU+nn+/IfF07g=;
+ b=A1Tu2FQMN0RUHFIR6hcnFzGWz2q5aVLLVTAhSaM+3XwZ2AIoVe4nBpTg+awS3bKT7NaSys9hjF5ADmQCkZisuRtpZDtCJZru+Y8ehRq/rTVDU03WDG15uOcoIkZuJ8xXFxeCegszVZt0fHDcp5uesvKo8F/XjCSffnZ2xWHz/VfZH+0D5/rVACkGUw3qMZiiDa+R2W/zwzZEbF5yS1l0XOvH74eKRPPINaQwJavqaOB1tNln8DZU58+PW1KKMMWBTwsxatNB1W2b/gDZJnc1NHNfIOBvWtWXESx2b7337PxYq1VfHqDYsxGHJiMca6Cjkbh8f8bRGF+/MDZqAlpBmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=solid-run.com; dmarc=pass action=none
  header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=solidrn.onmicrosoft.com; s=selector1-solidrn-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4d05q49xYLdldzIAJAOLYnFweox24PXDvvTxGws5LHM=;
- b=Y5Zmh1Qk2cBAGg8CSDHUmK/Yy5hu9wp/ClnkcvyRaHF93QLg59ZKM27rJvFgN0fhLjbtRn2nfGLttOoPS5Oo/+AlubNlnsf1ITivgjqSGwf14jQOxnJe0/H4mw5hp8ffU/PICsqGF+4EeJayzPni2j6/U8rtTKGb1ZHejaI+uSs=
+ bh=e5UHay0sun3GYifzFmxig3whsD1MbfqU+nn+/IfF07g=;
+ b=k0kQeAjRxaC2LgXWTN8B2vNTLJ0uZ+cpOosF824SzFMUXbSMO7DEgjzKklcG/PawopGtJ8Sa4tOJwkW2nc8AuG+aqfXkK1jc36CAR1EwreXinik0fUKFDnJbieBa/tiM8TJCdDoLnZI14FZzzgGxIo28xZBAoOgoDzL9QPh42DY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=solid-run.com;
 Received: from AM9PR04MB7586.eurprd04.prod.outlook.com (2603:10a6:20b:2d5::17)
@@ -58,12 +58,12 @@ Received: from AM9PR04MB7586.eurprd04.prod.outlook.com
  ([fe80::c04e:8a97:516c:5529%5]) with mapi id 15.20.7741.017; Thu, 4 Jul 2024
  15:03:46 +0000
 From: Josua Mayer <josua@solid-run.com>
-Date: Thu, 04 Jul 2024 17:03:21 +0200
-Subject: [PATCH v7 3/5] arm64: dts: add description for solidrun cn9130 som
- and clearfog boards
+Date: Thu, 04 Jul 2024 17:03:22 +0200
+Subject: [PATCH v7 4/5] arm64: dts: add description for solidrun cn9131
+ solidwan board
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240704-cn9130-som-v7-3-eea606ba5faa@solid-run.com>
+Message-Id: <20240704-cn9130-som-v7-4-eea606ba5faa@solid-run.com>
 References: <20240704-cn9130-som-v7-0-eea606ba5faa@solid-run.com>
 In-Reply-To: <20240704-cn9130-som-v7-0-eea606ba5faa@solid-run.com>
 To: Andrew Lunn <andrew@lunn.ch>, 
@@ -88,145 +88,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM9PR04MB7586:EE_|VI2PR04MB10714:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f0eee58-e0a8-432e-8c3e-08dc9c3a80ad
+X-MS-Office365-Filtering-Correlation-Id: d3255fc3-4af0-45ca-1ebc-08dc9c3a80f6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|52116014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?anlDejNrVlFwMlNaV29wYVpBVVB2bWJjbFU0a3duRkJxNzBINGc5K3g2NXFz?=
- =?utf-8?B?ek1TcSs2R3BLT2pQdG1JdWtYcFJvZFpDM0czTEhYU29saTcxeDl3M1ozYUZm?=
- =?utf-8?B?VzlUa3l2VER5VFBscFF2NmdCVmRJN0J1VHBiYnZqVDZvTTZLS1JWZlViNXBq?=
- =?utf-8?B?UkxLTC9UTk1CV0U0OHNQV3g1ZktmZm5vWFhUYjQ0bXozNWNoYU1FNng1dG1v?=
- =?utf-8?B?K3BzdXQvc0hmWFZJTytYcTU4NFhZQ0NFSXhNRUhSNHlaWk14anc1b0w0OWxr?=
- =?utf-8?B?TG1zSldGczFSR2FXV2ZwOWJ0SURZNU02M1dNV3F1N25GNkUvclFZcXdqYXRr?=
- =?utf-8?B?elE5Q2tvQXdqNUhieVBoblRxUS9BR3pyZlJJTVJqSXU2RTUwYVB0UTBuRmRp?=
- =?utf-8?B?V25FcXY2cFdST0NkUjdJVlgyN2cvWEQxdVRqQ2l1anA1Z0pWQW9yY3FwaVJC?=
- =?utf-8?B?M1VOV0tnM2pxc05EUkwzN3lPcC9oeCtCb3J3RU42Zkx0M25BN2ZwU1hJcjdk?=
- =?utf-8?B?OS94TVg2VnhSa1hwbTN2ZGd5Skl2SHRXeG1UNFJWTlFXdzhJaE0yQjN1amNm?=
- =?utf-8?B?aGNjeEduUUVXU2szRkJ0eVVGMHMxalVHMS9oS0pZOGtJUHl3V1lqWjNldW5H?=
- =?utf-8?B?b25xMm1BRHdjeFhGeHhVTk5MdFllQmk5enBNaDhCYjFsRmRWbjNtSnovSTk1?=
- =?utf-8?B?amI2cXBMYWNSUkdsVkMwQTZpall3azBtMVM5eGVMSGNVZHpxRUhBS1ZXSkNX?=
- =?utf-8?B?UGV4Q09RWldaMEw2SHUrMkkreVJ2eGNhdUJPZVRwQ2xTbGJDckpNMk1qQnkr?=
- =?utf-8?B?aUlEeEpRN00yZlFBS0dUWkRKQi9ZT2ZHeFh1aklISDhFL05LaUU5blJEcklw?=
- =?utf-8?B?TXVRU003QnA1SGF2Vnl0UElPdVQya2I1Z3NadHAwcVRDM3llYS9sMC90a3FQ?=
- =?utf-8?B?dW1rbGJqUnBHbmpFaitaM2lzRjloWFo4eGRnb2pIb3hTM1IrMWFGMGI1VExo?=
- =?utf-8?B?SGpnUmdUWmNoNW1hcFNGR3pXaENYR3IrK2czMmdRcDlIZGUxamo0VUtyaWtI?=
- =?utf-8?B?aUJvMS83a1U2TDVtMW93TXZrQkZmbk1MbldpT1cxNlJzbGlnbzdnU2Q5MFEx?=
- =?utf-8?B?dTFKcCtoeWp2cllwbmdpZEM2RXVFMHQzS0lESk00d3J1NUhYVW5pa0dSYjdM?=
- =?utf-8?B?K09NTFpnU2F2d1ZoK3M4aGhYZzgxbFJ2OU1mbEVMTStNZ095bG81dXBQOFlH?=
- =?utf-8?B?Ky9pbzlzckFtK1FXUmVzV0JFbnZ0RFZ5NlpMamlPZWM2R2R6UjdXT2JWaG9k?=
- =?utf-8?B?eExYZlNMVU5yakZnRjRzVFJSL2VaUmFtS2x3bnVmMStGQlNRZ0xUQk16b0tX?=
- =?utf-8?B?WkIrckJLbVd6akRIM25sZFNmTi9aaWpYNWl6YU5TS1VEWDF1Y3FZaW8wSisr?=
- =?utf-8?B?RWZoTkp3VVVOaWgwcTZ3VGsvNEt1Y3Z4cEpTS0FpZzIwc05qV1JyeHh6aHkx?=
- =?utf-8?B?WlJwdWY2N0JzWmN5TmI3UVFYWDdBZDhUMURadk5ZRVdSRHYwT0MwSGEyRE5s?=
- =?utf-8?B?eE9xNlJvSHQwQ29EWEZUcWR4VHl2Qkl5bXdvZ1BTeUFSajJUTW1lYjA3ZUR0?=
- =?utf-8?B?bGhBQVIxNGZaQzZ5TFZPaFVDUmx2R1NNTjZIYkRnanJSaUNzeEhNN3FQdi90?=
- =?utf-8?B?d3BOeE5IYlBJVkcwcnFqRVZZWUIyZlFPTHA4OEYwSVdOOWpZMEdGbG16U2hT?=
- =?utf-8?B?bGM3RU5aSGk1eHM0c2IwY1lhcS90T2I1dHluemE3UURFMGc1MnB0RWtGQW00?=
- =?utf-8?B?RXd1TE9nbDkyb3NnSUpqMXNqbmdtcjZHbUsrdWFsVWtsUDQ3UXVmbWNKUVNr?=
- =?utf-8?B?VmZvTFJkcjBSZjl0YURaaUZFd29vbDlSbGo1UXoxajdzTFE9PQ==?=
+	=?utf-8?B?UXM2aTZheVVUMGFiYjc2WHRwTWNTV2QvZFZCTnpEV2NCSkhFRjhVTjc1MTAw?=
+ =?utf-8?B?TUdFQmlJQ096R1pTTTlmaU00Y1NMU0tFSXFMempqRGsrdmlLeVlxTzBsRHY5?=
+ =?utf-8?B?RXlEa0dQNmcvNTAyQ0xGZDRENm9UU09memVMVmdUSzg3TWRyWUttOG5Oc2t0?=
+ =?utf-8?B?Y25qYTFpbDB5eVdCZVo3VFp0Z3M3OWZ3c1hrR09TaFZrR2ZlZi9jZkJYRkZJ?=
+ =?utf-8?B?cjFwSGg0ek9yeE9VWVFDSldSUjYwWElxRXI1d1pabFNrSkZISTFSK3BoSHRp?=
+ =?utf-8?B?cUcxa0xsdjNkMDBhYVFvQUJZMmdaTUM2SnFLNS90QXc2S09pZkJCSXUxanIw?=
+ =?utf-8?B?aFFrOW9hdEQvQnFoWWJiWVNrZWhwbUdRekxLTk55a3pUT3lVTWR1b0tVTzg4?=
+ =?utf-8?B?QzNQd2lUNEJuMS9zMGYrZktqa1FmbU1yNlVIS0tlR2d4ZVNsanpMbURFMk5O?=
+ =?utf-8?B?Y0tiZnIwTmUxdmJ4emplQUhRU2hncElXS2diRzFNTDhvYUtEK2ZKR1dJcUIy?=
+ =?utf-8?B?bWFOL1FYM1I3VkdSN2llUy9FTXpSYURFWHpwNnJXaG9KeVdXRGc4bnN1YzV3?=
+ =?utf-8?B?UVdQeEhJQjJGdUhzUkVjNHE2SlZJai9ydExTckJuREpoOUR0aUdUc0lYdWQ5?=
+ =?utf-8?B?WjZhMmlLVlBmT21ua3hhT1RsSVRNc0lzNkRnKzlGUTA3dVlyejlTTDd4VDlQ?=
+ =?utf-8?B?am5XQk1HdFlpOGNRN242bUJLNDNncE1QTk12cEg2czBrTkJUcEtKZUozRVh1?=
+ =?utf-8?B?eHd1T2VQTTVJZytLZkxmQ3V3eDl2dGJZWXRsRjdhb0E0K1dENXBYeUx4ZHpD?=
+ =?utf-8?B?V25PcHNmalJSemxkMHJPbDAvQXRubk1Xdm1KZzZHS2IzK1BZMW9hUjZCeEVy?=
+ =?utf-8?B?TitEb3VYbmVMaFRybDI3MzRMZzI2WGRFeTBxOWppUjJOcVdrUEpHVGttVDBw?=
+ =?utf-8?B?WFpzQkNFWFhpUzZoNU94L0hUS2lqdGV3ZnltNmxyeGhVeWVuYnlnKzdzL0sy?=
+ =?utf-8?B?V29JbFd5djBtMVlReGRsSDZGL2dhKzJGTG9vMUoybVYwSDBVTkFZL2tkVk11?=
+ =?utf-8?B?V2J3SHNOOGNUL2NvRjN1Qlc0a2dkTUVvNUxzWWVTWlZncWZaZjJCWVdRWmJo?=
+ =?utf-8?B?TW13Qlo4bklqY29jTUdDenJVSEtNMHo5N3RHNHY0cHpUdHdVWnRiQk9QRUpR?=
+ =?utf-8?B?YnYxRWxQYmdYTXdLc25Famdzc2dROW1mazZpVm5JM2s5a2xLWkxMZ016WXFh?=
+ =?utf-8?B?NXJTdVhrajB0U2hZTitOU3dZM0xLTlpmKzJQZWNNdDlFbGZYRU9DUDQ5b2dF?=
+ =?utf-8?B?NXk3NUZ5MUhkWm1GLzNDRno4dHYwcGRyMDRHVTJzVi9XTy83M3RSeUhOeFpU?=
+ =?utf-8?B?NmVnaHg4dGpxeSt1UEdVa1BTLzNhRjBla0drVmtPQ1dqQjdGeHdzVE12OS85?=
+ =?utf-8?B?aGRSY2NiSzFGY0xUa2w3SEtUSGRwSmNmR0xJYmFsTGY1VHl6cnE0WWlKRWtv?=
+ =?utf-8?B?dmdjb0tGTFdldkErenNITU9RTnhhdHBJMXFzc0NLK29rMmMvOTkrcGo2OUJs?=
+ =?utf-8?B?TWxXdnd0cnVKMmEzcFd1T2NKaFl6NUJCQ2U1bWtFTy93SUNyK2VoNHI3TTdV?=
+ =?utf-8?B?cmlSTTJMRWNRVkhrdkdvMzVjS052Q2hocGRlSS9MS2YrZmQ5ZXFkTVdLR084?=
+ =?utf-8?B?emdINVgxQ0d6b3RBV3lka1Jpa2FSWHlmSUVBZ2F6U2lvWTR3OTQvcHFkVXU0?=
+ =?utf-8?B?UzdWQzhYamV0RndJRHhQSGk2MEhyVUszMXNLK1MrL3p1bFZzZ1NacGl4a2c4?=
+ =?utf-8?B?dG9OMTluekd0RGNYWGp0YlVyc21hdUMwSkFKaXp5V2tTS0FNMk9ORytpWDcx?=
+ =?utf-8?B?T2poenZJK2lteXVBUTdkN1UzUzlsZTJCMDh6S3JwSjczaUE9PQ==?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB7586.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dmNEelF5MzF0bEJvQ0pTNmxoZU9HNk5Nc01kaDBPSWcwQ01RYU9NREJvbDBn?=
- =?utf-8?B?aURacGtJb0dhRnUzYlRUeEk1S2FaaHVERy9zQW56ZDJMdFpVNndaRFBOdHFv?=
- =?utf-8?B?UGxwbWxRRytwYkVDZXU5cEVZSGtiQUNzY2ptRFBuWmFraDhERm8yVEhBTHFG?=
- =?utf-8?B?RW9vSDdZbUFxc2FEUThZUDQybVE2dGlISWJsbFRuQlVZQmZoNngvSk85MUdu?=
- =?utf-8?B?ZnQrQmVjTXg5SE1jNGJNTzJpRkxYR0xyYi9hOGdMQVlESzhYYTVpMldrTjJa?=
- =?utf-8?B?T3lhVHRCckxYeVdnRS9KeldGT25GSjlWVmdTdmt0ZkhiS3lvVERERGYvSkFz?=
- =?utf-8?B?UGM2eUUweWVZRTR2UFpEbmcxcHJTa3E4NzBUL1J6aDBXVERnZW9uamlWcEcw?=
- =?utf-8?B?UEZIcmM1aVAwaS9YMis5cXlhVFgzVW9Ub1VDUmRsL2FucExGTGhKM2piOVN5?=
- =?utf-8?B?WlA5UlUwL1UzWXdqUnk1RldNZTg5Q1FDZ0tXb1ZRZnhCbm1rVk1QOHJIWkQx?=
- =?utf-8?B?WExWdzNnbi92NmZRclArb3REdGFtcUVyTzIxODVwRjRkUHZuQmprTXRqdGM4?=
- =?utf-8?B?L2FrQkYrbjZMTzlsb0JyMEhHSlE4djEzdkVGQ2NaM2gzR2xJeWl2UEFSYUpr?=
- =?utf-8?B?Ry82dzUxTkhIeUMxQ2lKQWRZVjIxL2FiYWxtMUF0TjQ4NWdhQ3VCNUg4bFN0?=
- =?utf-8?B?RkN4YUNxaWE3YmNYMWRXQXhUbGN4U0FvQ3J6OUpuWHdRbDZuRDdhZUNZUnF3?=
- =?utf-8?B?Yk5aTmM3UXVEZmw5ekVkMnZjTHFUVXp3aFl2a09QditJQnJQUmV3WXM0TDFo?=
- =?utf-8?B?VVpvblVGYUNKM1RUV2Q3dTdnc015K1gveDRVZkU0SzV2YUZ1dldJbE9QTUYy?=
- =?utf-8?B?U0g4b0RIZG9JbUpTZTZUYW5NaTRDRS95aTAwYmY0bFhiUjVrUVY3alozckNj?=
- =?utf-8?B?YmpTS3NOb2E4NmpycWhVaFVVeUkxaG4zdmhXMTBXRS9XeWQ2cHlldVByeUN3?=
- =?utf-8?B?WnpkK2JiT2tWN1BldFhEWVhMNzZva3FoSG4xais0L21aVjZlRlkydzhnWlZ4?=
- =?utf-8?B?U0dxTk9jdmlQQW1XS3NDeTRRanllVDN3QVNpMFhBUzlFNlFoV2xaMjZ2Wk5G?=
- =?utf-8?B?RFRGbTI2QWI4SzFEWGgxb3VYNlhkYnpUTEx3bnhwdHFWakVaRis2YWh2ekxj?=
- =?utf-8?B?K3lnNEt4d2dBS3Q1UjVDcS82NjZEd0dEd2NFbm8vTmwyZ1VRQTRFY1VXenVX?=
- =?utf-8?B?U1gzQ2lxMFhsbXl3NnQvL2xSWE82ZEkzcGpYbm5pOE00aTRuTm9aNmwyMXhV?=
- =?utf-8?B?aDFkbWNUUlVCTGZWNzJwd2tGQlFBUm5kbkk1Y1pkTXhVQVRua1g4UGlyZDlO?=
- =?utf-8?B?L3NLNWppL3VmTWNvUEsvRy9JekxnbjJ5WG1MZXptb0dieUt3KzVrL1VkUHFQ?=
- =?utf-8?B?Yi9LY1MzOWpoTWZkSGwyeUJZeU1IaUpLU2hLd2c4TmdrUjVreFgvV0NsNE55?=
- =?utf-8?B?akVjdVFJYXJDRVZvQ1dUZ080QW5LaTd3V21hOVZYSncwQm9Ld3oyZnJWTE9k?=
- =?utf-8?B?UXVmLzBWTDBKZTBjMTZHWFljaFF6QTdZdnROSXhjQkdBdEtnUEkyajNRMVJu?=
- =?utf-8?B?MHpqeGRpS2lNRnF2UldsSXpLa1FFYWs2NzA5UzA2aEFKTVdBd09XRW5xazl2?=
- =?utf-8?B?RVkySCtVdUx1cEd1Yk9XUkR3YUVnZk9za1NRRHVRMUttcEIwRTBWVSt3dlJ6?=
- =?utf-8?B?azlQSmtiVzR0aDgranhZS0wxV1doSWRpbnVTS3pzK2pwV2lQVDNLdTJtTTFs?=
- =?utf-8?B?ZUtUTVF4L0Y0ODdpQWpqRENRMVRqb3pnNkRXeWhtZnl6aFVBSW8xZHhuVU02?=
- =?utf-8?B?WUljOTROOVJQTjlwY2JYU2dBTFQrSzM4UnJIbDJGRkdXWGl1dVVPMnl3YXF1?=
- =?utf-8?B?OXJOTDZQYXZWMVpmdncrSUtBUTZLQStnc1NQaGd4RkpyWjZYN1lXYytkTWdG?=
- =?utf-8?B?YUx1eWZnYlQxMTRoOW8rL0NOZ01wQU5uSUZDbUQvTVVEUFdjc1cydTN1K0ky?=
- =?utf-8?B?NjlFVSszSUNwcDN3Zys5cVRsRDJPRzl4clhJQktLZmtEM2FHQlNGa0VpYzVR?=
- =?utf-8?Q?cPaY8LHc7/xg7wnvoz1wa+moW?=
+	=?utf-8?B?RWVVWVdiOTZzbDBlWUtmblltcThjdjA4ZVlKRTdqUC9sRFdnK0dQaWx6VGgr?=
+ =?utf-8?B?WEIwenB5N0JEekNnRDZzZ2xzbnI3K0xHNmZhSDZQaW1YNG5QMnNKOEI0VXVv?=
+ =?utf-8?B?b3BFTGQ3ekx5aVpkQzMzVEIzWWduOXdNOHE1SG1YTTR2bENIRll1NnV6RUUz?=
+ =?utf-8?B?ekp0aVZjcW5JM1hDMGFJWGxWaHZMZTdidGd2Tjc3ZE82MlFTN3FMQmQ1ek9J?=
+ =?utf-8?B?SWFqYVNzSlVwaHJBSG9sR1hNYWYya3VmbUdlMTBaQmlSa3Z1VGdDZnVwbjUv?=
+ =?utf-8?B?N2hQL252VUU5TWFsMVo2Z2NyWHZIKzBjaVlEQmpDTnY4VWNQb3ZzclZjVk5G?=
+ =?utf-8?B?QmZSUWJJdk5MeTVVM0g0THRJS3VsaDRiSVlYYURhVGVhVDB4QmkraTJwMlBi?=
+ =?utf-8?B?SCtxT1gyd2s2ODVwK3MrZEQvUC9YckhMc1BOekhVTE1QWDM4QzdPSVhkdys0?=
+ =?utf-8?B?Q3FzZ1cwbzkreUxCeHVqdUtwUGswNW92WGs3Qk5QblVNUXVPb0pwMjZMeG55?=
+ =?utf-8?B?ZXFQeFdCdDYzeUdxUG9JYzg3dnpQSmtaQjJvUXp2TlFCcTJFbDlkd3hSTkoz?=
+ =?utf-8?B?V2MwMUVqNXNKbU80UmhxUzhCalpwaTlmV0Vwb1VyZ2pjRk02TFYzNVRBeWNP?=
+ =?utf-8?B?b2J1L3M2cTNhb1NXNmpRZktkbEd5NktEWEttMjlmcjJFUUk1L2xEKzZVOEJn?=
+ =?utf-8?B?MVhLNkJmSnpoajBhblcrZDhMQlg0VmtHUzRIbmhKRkwvdDR4NmFRS0szT3Jt?=
+ =?utf-8?B?c21Qa0ErbE1kRi9xSi9rUG9WV2oxVkhKa2E4RG12c3lRMVp4dnFNUkxvaU52?=
+ =?utf-8?B?NmZOUHE1R0ZXL3FrL0U4NHVKVkNXQXBBeFBudDRxWW1LWDkyQjB2MkRhc2sr?=
+ =?utf-8?B?NU9keXBlbWRRZERPMEJUK1NIU2VvZy9nZmlJSytYTG03amhRQ1d5dkFxR1I2?=
+ =?utf-8?B?bnlEdS9KSk1pemQ0OUZxdFM3ajc1VEszWGlQdU1FZG1ueDR6Y3lZOXljMURs?=
+ =?utf-8?B?SUdSa3VVSEExTHZzcEt3enpWVEVTL2p6ZjBBSE1OT3h6YWhtRm1yWWJmTk5s?=
+ =?utf-8?B?TmxhMWg5a0htd3J2bVlaT2ZoODdCakNJRmh1ZTNqN1ZVbjZaWjZsVk1rUkJO?=
+ =?utf-8?B?TWRRSkRtbDlacE4zRE9YY21WY1FrcVc3MSs1WWl1OWc4NlpIVHJuVVBSS0JV?=
+ =?utf-8?B?bEEyVjArY1M5eE40bGtOUVVBMyt2TU1oRE4xemE2TUhoWnFFVTBKbm9HbVJq?=
+ =?utf-8?B?ZjY1Y2FvU0pnQmNVMk9OUVNrb1c4d2x0MkVwaUVOY1c1WS8wenBvUy9IY0ww?=
+ =?utf-8?B?dEJEa3cvZHAzWjJzRFJBM0xaek40c3lxK0lOSFluUFRndjUwcklJeDNzM2pj?=
+ =?utf-8?B?NE9nMDlPZWROaUhTMi9Xc2dOTkorSm9odlY1WVIzU00rOHFwNGpmL2J6V2FL?=
+ =?utf-8?B?OFdHY2lDMGhsbmJNWkkrSW5KTFNUVVJLVmcvZTlwUDNlcjFMYldKYXRjOFJv?=
+ =?utf-8?B?SW1WZ1VybFQzN3FLWDZITnNQdkFlQVRYenljRGhaRDh1YWFDS3FERTM1bkxV?=
+ =?utf-8?B?b0hrMzhnM29rYW9IVlVEZHIzRHl5N2NKeEd2K3FsbzlDUWIzOENtVkRyRXZp?=
+ =?utf-8?B?RDFMZGFVb01pa1crL29yWWp2VWs2UkZTRGhsS1BmVEhTVUp5Y0htV1lJZThQ?=
+ =?utf-8?B?WTJWOWFkRGxDQ1VrZFJhaHF1UFVQeStyeTQvR1kxTG05YUhnay9sNmM4ODhS?=
+ =?utf-8?B?RXVWOU1EbnpxUEZ3UGMvQ0ZLZUJHTHN3dHVSYlJZVjJqYjZoQ1c2TTVwR0lz?=
+ =?utf-8?B?dmhiVHlRNHNvcmNDemtSdm9HOVkvR0FNaWxNVmI4emdtaUN0cU9KUE9hckJq?=
+ =?utf-8?B?N3p1bVJaRXRNNUtDdG1DMEROZi92WklIUjN0anBnZTRITllwNXBxZDQ3WFhj?=
+ =?utf-8?B?eDZVSjNTNHRDNDJOdjdsTlRFby9ydCtHQkJWQkx0aklQYVg0dVZqVTk4N1dO?=
+ =?utf-8?B?TXQyZ0pFSjhwODVzb05UaUJWME5SZ3dRTk03bkxNTHVJZ1ZCYzlEOTdYR1J2?=
+ =?utf-8?B?NWlWS2ZibXQwbVNyUlAvTUxqL2tyV29weTRwNmlpWlF6TWUwL2RkZGdmN2Vn?=
+ =?utf-8?Q?gRdtAH3f//klyHT2+JCL+XYSK?=
 X-OriginatorOrg: solid-run.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f0eee58-e0a8-432e-8c3e-08dc9c3a80ad
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3255fc3-4af0-45ca-1ebc-08dc9c3a80f6
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB7586.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2024 15:03:46.1536
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2024 15:03:46.6523
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IeSO10Ded9JTOYmDZrOUSbPVePrD6AdJKkwBYy3ZeQlpZ3zn4EQCu2XphqV/2HWpLVyTzF/AW1TtdSgMHh9X6A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zr60tEqYvHw9WOH5V0sobKblhKHgTDE89pR9snXR6PAMB2NDnWdOhZUNSMDHd10pvNjgWaIfBMXVJQcHY+khcQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10714
 
-Add description for the SolidRun CN9130 SoM, and Clearfog Base / Pro
-reference boards.
+Add description for the SolidRun CN9131 SolidWAN, based on CN9130 SoM
+with an extra communication  processor on the carrier board.
 
-The SoM has been designed as a pin-compatible replacement for the older
-Armada 388 based SoM. Therefore it supports the same boards and a
-similar feature set.
-
-Most notable upgrades:
-- 4x Cortex-A72
-- 10Gbps SFP
-- Both eMMC and SD supported at the same time
-
-The developer first supporting this product at SolidRun decided to use
-different filenames for the DTBs: Armada 388 uses the full
-"clearfog" string while cn9130 uses the abbreviation "cf".
-This name is already hard-coded in pre-installed vendor u-boot and can
-not be changed easily.
-
-NOTICE IN CASE ANYBODY WANTS TO SELF-UPGRADE:
-CN9130 SoM has a different footprint from Armada 388 SoM.
-Components on the carrier board below the SoM may collide causing
-damage, such as on Clearfog Base.
+This board differentiates itself from CN9130 Clearfog by providing
+additional SoC native network interfaces and pci buses:
+2x 10Gbps SFP+
+4x 1Gbps RJ45
+1x miniPCI-E
+1x m.2 b-key with sata, usb-2.0 and usb-3.0
+1x m.2 m-key with pcie and usb-2.0
+1x m.2 b-key with pcie, usb-2.0, usb-3.0 and 2x sim slots
+1x mpcie with pcie only
+2x type-a usb-2.0/3.0
 
 Signed-off-by: Josua Mayer <josua@solid-run.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- arch/arm64/boot/dts/marvell/Makefile           |   2 +
- arch/arm64/boot/dts/marvell/cn9130-cf-base.dts | 178 ++++++++++++
- arch/arm64/boot/dts/marvell/cn9130-cf-pro.dts  | 375 +++++++++++++++++++++++++
- arch/arm64/boot/dts/marvell/cn9130-cf.dtsi     | 197 +++++++++++++
- arch/arm64/boot/dts/marvell/cn9130-sr-som.dtsi | 160 +++++++++++
- 5 files changed, 912 insertions(+)
+ arch/arm64/boot/dts/marvell/Makefile               |   1 +
+ arch/arm64/boot/dts/marvell/cn9131-cf-solidwan.dts | 637 +++++++++++++++++++++
+ 2 files changed, 638 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/marvell/Makefile b/arch/arm64/boot/dts/marvell/Makefile
-index 99b8cb3c49e1..019f2251d696 100644
+index 019f2251d696..16f9d7156d9f 100644
 --- a/arch/arm64/boot/dts/marvell/Makefile
 +++ b/arch/arm64/boot/dts/marvell/Makefile
-@@ -28,3 +28,5 @@ dtb-$(CONFIG_ARCH_MVEBU) += cn9130-crb-A.dtb
- dtb-$(CONFIG_ARCH_MVEBU) += cn9130-crb-B.dtb
- dtb-$(CONFIG_ARCH_MVEBU) += ac5x-rd-carrier-cn9131.dtb
+@@ -30,3 +30,4 @@ dtb-$(CONFIG_ARCH_MVEBU) += ac5x-rd-carrier-cn9131.dtb
  dtb-$(CONFIG_ARCH_MVEBU) += ac5-98dx35xx-rd.dtb
-+dtb-$(CONFIG_ARCH_MVEBU) += cn9130-cf-base.dtb
-+dtb-$(CONFIG_ARCH_MVEBU) += cn9130-cf-pro.dtb
-diff --git a/arch/arm64/boot/dts/marvell/cn9130-cf-base.dts b/arch/arm64/boot/dts/marvell/cn9130-cf-base.dts
+ dtb-$(CONFIG_ARCH_MVEBU) += cn9130-cf-base.dtb
+ dtb-$(CONFIG_ARCH_MVEBU) += cn9130-cf-pro.dtb
++dtb-$(CONFIG_ARCH_MVEBU) += cn9131-cf-solidwan.dtb
+diff --git a/arch/arm64/boot/dts/marvell/cn9131-cf-solidwan.dts b/arch/arm64/boot/dts/marvell/cn9131-cf-solidwan.dts
 new file mode 100644
-index 000000000000..788a5c302b17
+index 000000000000..b1ea7dcaed17
 --- /dev/null
-+++ b/arch/arm64/boot/dts/marvell/cn9130-cf-base.dts
-@@ -0,0 +1,178 @@
++++ b/arch/arm64/boot/dts/marvell/cn9131-cf-solidwan.dts
+@@ -0,0 +1,637 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2024 Josua Mayer <josua@solid-run.com>
@@ -242,648 +228,225 @@ index 000000000000..788a5c302b17
 +
 +#include "cn9130.dtsi"
 +#include "cn9130-sr-som.dtsi"
-+#include "cn9130-cf.dtsi"
++
++/*
++ * Instantiate the external CP115
++ */
++
++#define CP11X_NAME		cp1
++#define CP11X_BASE		f4000000
++#define CP11X_PCIEx_MEM_BASE(iface) (0xe2000000 + (iface * 0x1000000))
++#define CP11X_PCIEx_MEM_SIZE(iface) 0xf00000
++#define CP11X_PCIE0_BASE	f4600000
++#define CP11X_PCIE1_BASE	f4620000
++#define CP11X_PCIE2_BASE	f4640000
++
++#include "armada-cp115.dtsi"
++
++#undef CP11X_NAME
++#undef CP11X_BASE
++#undef CP11X_PCIEx_MEM_BASE
++#undef CP11X_PCIEx_MEM_SIZE
++#undef CP11X_PCIE0_BASE
++#undef CP11X_PCIE1_BASE
++#undef CP11X_PCIE2_BASE
 +
 +/ {
-+	model = "SolidRun CN9130 Clearfog Base";
-+	compatible = "solidrun,cn9130-clearfog-base",
++	model = "SolidRun CN9131 SolidWAN";
++	compatible = "solidrun,cn9131-solidwan",
 +		     "solidrun,cn9130-sr-som", "marvell,cn9130";
 +
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		pinctrl-0 = <&rear_button_pins>;
-+		pinctrl-names = "default";
-+
-+		button-0 {
-+			/* The rear SW3 button */
-+			label = "Rear Button";
-+			gpios = <&cp0_gpio1 31 GPIO_ACTIVE_LOW>;
-+			linux,can-disable;
-+			linux,code = <BTN_0>;
-+		};
-+	};
-+
-+	rfkill-m2-gnss {
-+		compatible = "rfkill-gpio";
-+		label = "m.2 GNSS";
-+		radio-type = "gps";
-+		/* rfkill-gpio inverts internally */
-+		shutdown-gpios = <&expander0 9 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	/* M.2 is B-keyed, so w-disable is for WWAN */
-+	rfkill-m2-wwan {
-+		compatible = "rfkill-gpio";
-+		label = "m.2 WWAN";
-+		radio-type = "wwan";
-+		/* rfkill-gpio inverts internally */
-+		shutdown-gpios = <&expander0 8 GPIO_ACTIVE_HIGH>;
-+	};
-+};
-+
-+/* SRDS #3 - SGMII 1GE */
-+&cp0_eth1 {
-+	phy = <&phy1>;
-+	phys = <&cp0_comphy3 1>;
-+	phy-mode = "sgmii";
-+	status = "okay";
-+};
-+
-+&cp0_eth2_phy {
-+	/*
-+	 * Configure LEDs default behaviour:
-+	 * - LED[0]: link/activity: On/blink (green)
-+	 * - LED[1]: link is 100/1000Mbps: On (yellow)
-+	 * - LED[2]: high impedance (floating)
-+	 */
-+	marvell,reg-init = <3 16 0xf000 0x0a61>;
-+
-+	leds {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		led@0 {
-+			reg = <0>;
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_WAN;
-+			default-state = "keep";
-+		};
-+
-+		led@1 {
-+			reg = <1>;
-+			color = <LED_COLOR_ID_YELLOW>;
-+			function = LED_FUNCTION_WAN;
-+			default-state = "keep";
-+		};
-+	};
-+};
-+
-+&cp0_gpio1 {
-+	sim-select-hog {
-+		gpio-hog;
-+		gpios = <27 GPIO_ACTIVE_HIGH>;
-+		output-high;
-+		line-name = "sim-select";
-+	};
-+};
-+
-+&cp0_mdio {
-+	phy1: ethernet-phy@1 {
-+		reg = <1>;
-+		/*
-+		 * Configure LEDs default behaviour:
-+		 * - LED[0]: link/activity: On/blink (green)
-+		 * - LED[1]: link is 100/1000Mbps: On (yellow)
-+		 * - LED[2]: high impedance (floating)
-+		 *
-+		 * Configure LEDs electrical polarity
-+		 * - on-state: low
-+		 * - off-state: high (not hi-z, to avoid residual glow)
-+		 */
-+		marvell,reg-init = <3 16 0xf000 0x0a61>,
-+				   <3 17 0x003f 0x000a>;
-+
-+		leds {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			led@0 {
-+				reg = <0>;
-+				color = <LED_COLOR_ID_GREEN>;
-+				function = LED_FUNCTION_LAN;
-+				default-state = "keep";
-+			};
-+
-+			led@1 {
-+				reg = <1>;
-+				color = <LED_COLOR_ID_YELLOW>;
-+				function = LED_FUNCTION_LAN;
-+				default-state = "keep";
-+			};
-+		};
-+	};
-+};
-+
-+&cp0_pinctrl {
-+	pinctrl-0 = <&sim_select_pins>;
-+	pintrl-names = "default";
-+
-+	rear_button_pins: cp0-rear-button-pins {
-+		marvell,pins = "mpp31";
-+		marvell,function = "gpio";
-+	};
-+
-+	sim_select_pins: cp0-sim-select-pins {
-+		marvell,pins = "mpp27";
-+		marvell,function = "gpio";
-+	};
-+};
-+
-+/*
-+ * SRDS #4 - USB 3.0 host on M.2 connector
-+ * USB-2.0 Host on Type-A connector
-+ */
-+&cp0_usb3_1 {
-+	phys = <&cp0_comphy4 1>, <&cp0_utmi1>;
-+	phy-names = "comphy", "utmi";
-+	dr_mode = "host";
-+	status = "okay";
-+};
-+
-+&expander0 {
-+	m2-full-card-power-off-hog {
-+		gpio-hog;
-+		gpios = <2 GPIO_ACTIVE_LOW>;
-+		output-low;
-+		line-name = "m2-full-card-power-off";
-+	};
-+
-+	m2-reset-hog {
-+		gpio-hog;
-+		gpios = <10 GPIO_ACTIVE_LOW>;
-+		output-low;
-+		line-name = "m2-reset";
-+	};
-+};
-diff --git a/arch/arm64/boot/dts/marvell/cn9130-cf-pro.dts b/arch/arm64/boot/dts/marvell/cn9130-cf-pro.dts
-new file mode 100644
-index 000000000000..a27fe0042867
---- /dev/null
-+++ b/arch/arm64/boot/dts/marvell/cn9130-cf-pro.dts
-@@ -0,0 +1,375 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Copyright (C) 2024 Josua Mayer <josua@solid-run.com>
-+ *
-+ * DTS for SolidRun CN9130 Clearfog Pro.
-+ *
-+ */
-+
-+/dts-v1/;
-+
-+#include <dt-bindings/input/input.h>
-+#include <dt-bindings/leds/common.h>
-+
-+#include "cn9130.dtsi"
-+#include "cn9130-sr-som.dtsi"
-+#include "cn9130-cf.dtsi"
-+
-+/ {
-+	model = "SolidRun CN9130 Clearfog Pro";
-+	compatible = "solidrun,cn9130-clearfog-pro",
-+		     "solidrun,cn9130-sr-som", "marvell,cn9130";
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		pinctrl-0 = <&rear_button_pins>;
-+		pinctrl-names = "default";
-+
-+		button-0 {
-+			/* The rear SW3 button */
-+			label = "Rear Button";
-+			gpios = <&cp0_gpio2 0 GPIO_ACTIVE_LOW>;
-+			linux,can-disable;
-+			linux,code = <BTN_0>;
-+		};
-+	};
-+};
-+
-+/* SRDS #3 - SGMII 1GE to L2 switch */
-+&cp0_eth1 {
-+	phys = <&cp0_comphy3 1>;
-+	phy-mode = "sgmii";
-+	status = "okay";
-+
-+	fixed-link {
-+		speed = <1000>;
-+		full-duplex;
-+	};
-+};
-+
-+&cp0_eth2_phy {
-+	/*
-+	 * Configure LEDs default behaviour similar to switch ports:
-+	 * - LED[0]: link/activity: On/blink (green)
-+	 * - LED[1]: link is 100/1000Mbps: On (red)
-+	 * - LED[2]: high impedance (floating)
-+	 *
-+	 * Switch port defaults:
-+	 * - LED0: link/activity: On/blink (green)
-+	 * - LED1: link is 1000Mbps: On (red)
-+	 *
-+	 * Identical configuration is impossible with hardware offload.
-+	 */
-+	marvell,reg-init = <3 16 0xf000 0x0a61>;
-+
-+	leds {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		led@0 {
-+			reg = <0>;
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_WAN;
-+			label = "LED2";
-+			default-state = "keep";
-+		};
-+
-+		led@1 {
-+			reg = <1>;
-+			color = <LED_COLOR_ID_RED>;
-+			function = LED_FUNCTION_WAN;
-+			label = "LED1";
-+			default-state = "keep";
-+		};
-+	};
-+};
-+
-+&cp0_mdio {
-+	ethernet-switch@4 {
-+		compatible = "marvell,mv88e6085";
-+		reg = <4>;
-+		pinctrl-0 = <&dsa_clk_pins &dsa_pins>;
-+		pinctrl-names = "default";
-+		reset-gpios = <&cp0_gpio1 27 GPIO_ACTIVE_LOW>;
-+		interrupt-parent = <&cp0_gpio1>;
-+		interrupts = <29 IRQ_TYPE_EDGE_FALLING>;
-+
-+		ethernet-ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			ethernet-port@0 {
-+				reg = <0>;
-+				label = "lan5";
-+				phy = <&switch0phy0>;
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_GREEN>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED12";
-+						default-state = "keep";
-+					};
-+
-+					led@1 {
-+						reg = <1>;
-+						color = <LED_COLOR_ID_RED>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED11";
-+						default-state = "keep";
-+					};
-+				};
-+			};
-+
-+			ethernet-port@1 {
-+				reg = <1>;
-+				label = "lan4";
-+				phy = <&switch0phy1>;
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_GREEN>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED10";
-+						default-state = "keep";
-+					};
-+
-+					led@1 {
-+						reg = <1>;
-+						color = <LED_COLOR_ID_RED>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED9";
-+						default-state = "keep";
-+					};
-+				};
-+			};
-+
-+			ethernet-port@2 {
-+				reg = <2>;
-+				label = "lan3";
-+				phy = <&switch0phy2>;
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_GREEN>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED8";
-+						default-state = "keep";
-+					};
-+
-+					led@1 {
-+						reg = <1>;
-+						color = <LED_COLOR_ID_RED>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED7";
-+						default-state = "keep";
-+					};
-+				};
-+			};
-+
-+			ethernet-port@3 {
-+				reg = <3>;
-+				label = "lan2";
-+				phy = <&switch0phy3>;
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_GREEN>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED6";
-+						default-state = "keep";
-+					};
-+
-+					led@1 {
-+						reg = <1>;
-+						color = <LED_COLOR_ID_RED>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED5";
-+						default-state = "keep";
-+					};
-+				};
-+			};
-+
-+			ethernet-port@4 {
-+				reg = <4>;
-+				label = "lan1";
-+				phy = <&switch0phy4>;
-+
-+				leds {
-+					#address-cells = <1>;
-+					#size-cells = <0>;
-+
-+					led@0 {
-+						reg = <0>;
-+						color = <LED_COLOR_ID_GREEN>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED4";
-+						default-state = "keep";
-+					};
-+
-+					led@1 {
-+						reg = <1>;
-+						color = <LED_COLOR_ID_RED>;
-+						function = LED_FUNCTION_LAN;
-+						label = "LED3";
-+						default-state = "keep";
-+					};
-+				};
-+			};
-+
-+			ethernet-port@5 {
-+				reg = <5>;
-+				label = "cpu";
-+				ethernet = <&cp0_eth1>;
-+				phy-mode = "sgmii";
-+
-+				fixed-link {
-+					speed = <1000>;
-+					full-duplex;
-+				};
-+			};
-+
-+			ethernet-port@6 {
-+				reg = <6>;
-+				label = "lan6";
-+				phy-mode = "rgmii";
-+
-+				/*
-+				 * Because of mdio address conflict the
-+				 * external phy is not readable.
-+				 * Force a fixed link instead.
-+				 */
-+				fixed-link {
-+					speed = <1000>;
-+					full-duplex;
-+				};
-+			};
-+		};
-+
-+		mdio {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+
-+			switch0phy0: ethernet-phy@0 {
-+				reg = <0x0>;
-+			};
-+
-+			switch0phy1: ethernet-phy@1 {
-+				reg = <0x1>;
-+				/*
-+				 * Indirectly configure default behaviour
-+				 * for port lan6 leds behind external phy.
-+				 * Internal PHYs are not using page 3,
-+				 * therefore writing to it is safe.
-+				 */
-+				marvell,reg-init = <3 16 0xf000 0x0a61>;
-+			};
-+
-+			switch0phy2: ethernet-phy@2 {
-+				reg = <0x2>;
-+			};
-+
-+			switch0phy3: ethernet-phy@3 {
-+				reg = <0x3>;
-+			};
-+
-+			switch0phy4: ethernet-phy@4 {
-+				reg = <0x4>;
-+			};
-+		};
-+
-+		/*
-+		 * There is an external phy on the switch mdio bus.
-+		 * Because its mdio address collides with internal phys,
-+		 * it is not readable.
-+		 *
-+		 * mdio-external {
-+		 *	compatible = "marvell,mv88e6xxx-mdio-external";
-+		 *	#address-cells = <1>;
-+		 *	#size-cells = <0>;
-+		 *
-+		 *	ethernet-phy@1 {
-+		 *		reg = <0x1>;
-+		 *	};
-+		 * };
-+		 */
-+	};
-+};
-+
-+/* SRDS #4 - miniPCIe (CON2) */
-+&cp0_pcie1 {
-+	num-lanes = <1>;
-+	phys = <&cp0_comphy4 1>;
-+	/* dw-pcie inverts internally */
-+	reset-gpios = <&expander0 2 GPIO_ACTIVE_HIGH>;
-+	status = "okay";
-+};
-+
-+&cp0_pinctrl {
-+	dsa_clk_pins: cp0-dsa-clk-pins {
-+		marvell,pins = "mpp40";
-+		marvell,function = "synce1";
-+	};
-+
-+	dsa_pins: cp0-dsa-pins {
-+		marvell,pins = "mpp27", "mpp29";
-+		marvell,function = "gpio";
-+	};
-+
-+	rear_button_pins: cp0-rear-button-pins {
-+		marvell,pins = "mpp32";
-+		marvell,function = "gpio";
-+	};
-+
-+	cp0_spi1_cs1_pins: cp0-spi1-cs1-pins {
-+		marvell,pins = "mpp12";
-+		marvell,function = "spi1";
-+	};
-+};
-+
-+&cp0_spi1 {
-+	/* add pin for chip-select 1 on mikrobus */
-+	pinctrl-0 = <&cp0_spi1_pins &cp0_spi1_cs1_pins>;
-+};
-+
-+/* USB-2.0 Host on Type-A connector */
-+&cp0_usb3_1 {
-+	phys = <&cp0_utmi1>;
-+	phy-names = "utmi";
-+	dr_mode = "host";
-+	status = "okay";
-+};
-+
-+&expander0 {
-+	/* CON2 */
-+	pcie1-0-clkreq-hog {
-+		gpio-hog;
-+		gpios = <4 GPIO_ACTIVE_LOW>;
-+		input;
-+		line-name = "pcie1.0-clkreq";
-+	};
-+
-+	/* CON2 */
-+	pcie1-0-w-disable-hog {
-+		gpio-hog;
-+		gpios = <7 GPIO_ACTIVE_LOW>;
-+		output-low;
-+		line-name = "pcie1.0-w-disable";
-+	};
-+};
-diff --git a/arch/arm64/boot/dts/marvell/cn9130-cf.dtsi b/arch/arm64/boot/dts/marvell/cn9130-cf.dtsi
-new file mode 100644
-index 000000000000..ad0ab34b6602
---- /dev/null
-+++ b/arch/arm64/boot/dts/marvell/cn9130-cf.dtsi
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Copyright (C) 2024 Josua Mayer <josua@solid-run.com>
-+ *
-+ * DTS for common base of SolidRun CN9130 Clearfog Base and Pro.
-+ *
-+ */
-+
-+/ {
 +	aliases {
-+		/* label nics same order as armada 388 clearfog */
-+		ethernet0 = &cp0_eth2;
-+		ethernet1 = &cp0_eth1;
-+		ethernet2 = &cp0_eth0;
++		ethernet0 = &cp1_eth1;
++		ethernet1 = &cp1_eth2;
++		ethernet2 = &cp0_eth1;
++		ethernet3 = &cp0_eth2;
++		ethernet4 = &cp0_eth0;
++		ethernet5 = &cp1_eth0;
++		gpio0 = &ap_gpio;
++		gpio1 = &cp0_gpio1;
++		gpio2 = &cp0_gpio2;
++		gpio3 = &cp1_gpio1;
++		gpio4 = &cp1_gpio2;
++		gpio5 = &expander0;
++		i2c0 = &cp0_i2c0;
 +		i2c1 = &cp0_i2c1;
++		i2c2 = &cp1_i2c1;
++		mmc0 = &ap_sdhci0;
 +		mmc1 = &cp0_sdhci0;
++		rtc0 = &cp0_rtc;
++		rtc1 = &carrier_rtc;
 +	};
 +
-+	reg_usb3_vbus0: regulator-usb3-vbus0 {
++	leds {
++		compatible = "gpio-leds";
++		pinctrl-names = "default";
++		pinctrl-0 = <&cp0_led_pins &cp1_led_pins>;
++
++		/* for sfp-1 (J42) */
++		led-sfp1-activity {
++			label = "sfp1:green";
++			gpios = <&cp0_gpio1 7 GPIO_ACTIVE_HIGH>;
++		};
++
++		/* for sfp-1 (J42) */
++		led-sfp1-link {
++			label = "sfp1:yellow";
++			gpios = <&cp0_gpio1 4 GPIO_ACTIVE_HIGH>;
++		};
++
++		/* (J28) */
++		led-sfp0-activity {
++			label = "sfp0:green";
++			gpios = <&cp1_gpio2 22 GPIO_ACTIVE_HIGH>;
++		};
++
++		/* (J28) */
++		led-sfp0-link {
++			label = "sfp0:yellow";
++			gpios = <&cp1_gpio2 23 GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	/* Type-A port on J53 */
++	reg_usb_a_vbus0: regulator-usb-a-vbus0 {
 +		compatible = "regulator-fixed";
++		pinctrl-0 = <&cp0_reg_usb_a_vbus0_pins>;
++		pinctrl-names = "default";
 +		regulator-name = "vbus0";
 +		regulator-min-microvolt = <5000000>;
 +		regulator-max-microvolt = <5000000>;
-+		gpios = <&expander0 6 GPIO_ACTIVE_LOW>;
++		gpios = <&cp0_gpio1 27 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
 +	};
 +
-+	sfp: sfp {
++	reg_usb_a_vbus1: regulator-usb-a-vbus1 {
++		compatible = "regulator-fixed";
++		pinctrl-0 = <&cp0_reg_usb_a_vbus1_pins>;
++		pinctrl-names = "default";
++		regulator-name = "vbus1";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpios = <&cp0_gpio1 28 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
++	};
++
++	sfp0: sfp-0 {
 +		compatible = "sff,sfp";
++		pinctrl-0 = <&cp0_sfp0_pins>;
++		pinctrl-names = "default";
 +		i2c-bus = <&cp0_i2c1>;
-+		los-gpios = <&expander0 12 GPIO_ACTIVE_HIGH>;
-+		mod-def0-gpios = <&expander0 15 GPIO_ACTIVE_LOW>;
-+		tx-disable-gpios = <&expander0 14 GPIO_ACTIVE_HIGH>;
-+		tx-fault-gpios = <&expander0 13 GPIO_ACTIVE_HIGH>;
++		los-gpios = <&cp0_gpio2 2 GPIO_ACTIVE_HIGH>;
++		mod-def0-gpios = <&cp0_gpio2 0 GPIO_ACTIVE_LOW>;
++		tx-disable-gpios = <&cp0_gpio2 1 GPIO_ACTIVE_HIGH>;
++		tx-fault-gpios = <&cp0_gpio1 31 GPIO_ACTIVE_HIGH>;
 +		maximum-power-milliwatt = <2000>;
 +	};
++
++	sfp1: sfp-1 {
++		compatible = "sff,sfp";
++		pinctrl-0 = <&cp1_sfp1_pins>;
++		pinctrl-names = "default";
++		i2c-bus = <&cp1_i2c1>;
++		los-gpios = <&cp1_gpio2 2 GPIO_ACTIVE_HIGH>;
++		mod-def0-gpios = <&cp1_gpio2 18 GPIO_ACTIVE_LOW>;
++		tx-disable-gpios = <&cp1_gpio2 1 GPIO_ACTIVE_HIGH>;
++		tx-fault-gpios = <&cp1_gpio2 17 GPIO_ACTIVE_HIGH>;
++		maximum-power-milliwatt = <2000>;
++	};
++};
++
++&cp0_ethernet {
++	status = "okay";
 +};
 +
 +/* SRDS #2 - SFP+ 10GE */
 +&cp0_eth0 {
 +	managed = "in-band-status";
-+	phys = <&cp0_comphy2 0>;
 +	phy-mode = "10gbase-r";
-+	sfp = <&sfp>;
++	phys = <&cp0_comphy2 0>;
++	sfp = <&sfp0>;
 +	status = "okay";
 +};
 +
-+&cp0_i2c0 {
-+	expander0: gpio-expander@20 {
-+		compatible = "nxp,pca9555";
-+		reg = <0x20>;
-+		gpio-controller;
-+		#gpio-cells = <2>;
-+		pinctrl-0 = <&expander0_pins>;
-+		pinctrl-names = "default";
-+		interrupt-parent = <&cp0_gpio1>;
-+		interrupts = <4 IRQ_TYPE_LEVEL_LOW>;
++/* SRDS #3 - SGMII 1GE */
++&cp0_eth1 {
++	managed = "in-band-status";
++	phy-mode = "sgmii";
++	/* Without mdio phy access rely on sgmii auto-negotiation. */
++	phys = <&cp0_comphy3 1>;
++	status = "okay";
++};
 +
-+		/* CON3 */
-+		pcie2-0-clkreq-hog {
++/* SRDS #1 - SGMII */
++&cp0_eth2 {
++	/delete-property/ pinctrl-0;
++	/delete-property/ pinctrl-names;
++	managed = "in-band-status";
++	phy-mode = "sgmii";
++	phy = <&cp0_phy1>;
++	phys = <&cp0_comphy1 2>;
++};
++
++&cp0_gpio1 {
++	pcie0-0-w-disable-hog {
++		gpio-hog;
++		gpios = <6 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "pcie0.0-w-disable";
++	};
++
++	/* J34 */
++	m2-full-card-power-off-hog {
++		gpio-hog;
++		gpios = <8 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "m2-full-card-power-off";
++	};
++};
++
++&cp0_i2c0 {
++	/* assembly option */
++	fan-controller@18 {
++		compatible = "ti,amc6821";
++		reg = <0x18>;
++	};
++
++	expander0: gpio@41 {
++		compatible = "nxp,pca9536";
++		reg = <0x41>;
++
++		usb-a-vbus0-ilimit-hog {
 +			gpio-hog;
 +			gpios = <0 GPIO_ACTIVE_LOW>;
 +			input;
-+			line-name = "pcie2.0-clkreq";
++			line-name = "vbus0-ilimit";
 +		};
 +
-+		/* CON3 */
-+		pcie2-0-w-disable-hog {
++		/* duplicate connection, controlled by soc gpio */
++		usb-vbus0-enable-hog {
 +			gpio-hog;
-+			gpios = <3 GPIO_ACTIVE_LOW>;
-+			output-low;
-+			line-name = "pcie2.0-w-disable";
-+		};
-+
-+		usb3-ilimit-hog {
-+			gpio-hog;
-+			gpios = <5 GPIO_ACTIVE_LOW>;
++			gpios = <1 GPIO_ACTIVE_HIGH>;
 +			input;
-+			line-name = "usb3-current-limit";
++			line-name = "vbus0-enable";
 +		};
 +
-+		m2-devslp-hog {
++		usb-a-vbus1-ilimit-hog {
 +			gpio-hog;
-+			gpios = <11 GPIO_ACTIVE_HIGH>;
-+			output-low;
-+			line-name = "m.2 devslp";
++			gpios = <2 GPIO_ACTIVE_LOW>;
++			input;
++			line-name = "vbus1-ilimit";
 +		};
-+	};
 +
-+	/* The MCP3021 supports standard and fast modes */
-+	adc@4c {
-+		compatible = "microchip,mcp3021";
-+		reg = <0x4c>;
++		/* duplicate connection, controlled by soc gpio */
++		usb-vbus1-enable-hog {
++			gpio-hog;
++			gpios = <3 GPIO_ACTIVE_HIGH>;
++			input;
++			line-name = "vbus1-enable";
++		};
 +	};
 +
 +	carrier_eeprom: eeprom@52 {
@@ -891,15 +454,26 @@ index 000000000000..ad0ab34b6602
 +		reg = <0x52>;
 +		pagesize = <8>;
 +	};
++
++	/* usb-hub@60 */
++
++	/* assembly option */
++	carrier_rtc: rtc@68 {
++		compatible = "st,m41t83";
++		reg = <0x68>;
++		pinctrl-0 = <&cp1_rtc_pins>;
++		pinctrl-names = "default";
++		interrupt-parent = <&cp1_gpio1>;
++		interrupts = <12 IRQ_TYPE_EDGE_FALLING>;
++		reset-gpios = <&cp1_gpio1 13 GPIO_ACTIVE_LOW>;
++	};
 +};
 +
 +&cp0_i2c1 {
 +	/*
-+	 * Routed to SFP, M.2, mikrobus, and miniPCIe
-+	 * SFP limits this to 100kHz, and requires an AT24C01A/02/04 with
-+	 *  address pins tied low, which takes addresses 0x50 and 0x51.
-+	 * Mikrobus doesn't specify beyond an I2C bus being present.
-+	 * PCIe uses ARP to assign addresses, or 0x63-0x64.
++	 * Routed to SFP.
++	 * Limit to 100kHz for compatibility with SFP modules,
++	 * featuring AT24C01A/02/04 at addresses 0x50/0x51.
 +	 */
 +	clock-frequency = <100000>;
 +	pinctrl-0 = <&cp0_i2c1_pins>;
@@ -907,19 +481,78 @@ index 000000000000..ad0ab34b6602
 +	status = "okay";
 +};
 +
-+/* SRDS #5 - miniPCIe (CON3) */
++&cp0_mdio {
++	/*
++	 * SoM + Carrier each have a PHY at address 0.
++	 * Remove the SoM phy node, and skip adding the carrier node.
++	 * SGMII Auto-Negotation is enabled by bootloader for
++	 * autonomous operation without mdio control.
++	 */
++	/delete-node/ ethernet-phy@0;
++
++	/* U17016 */
++	cp0_phy1: ethernet-phy@1 {
++		reg = <1>;
++		/*
++		 * Configure LEDs default behaviour:
++		 * - LED[0]: link is 1000Mbps: On (yellow)
++		 * - LED[1]: link/activity: On/blink (green)
++		 * - LED[2]: high impedance (floating)
++		 */
++		marvell,reg-init = <3 16 0xf000 0x0a17>;
++
++		leds {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			led@0 {
++				reg = <0>;
++				color = <LED_COLOR_ID_YELLOW>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++
++			led@1 {
++				reg = <1>;
++				color = <LED_COLOR_ID_GREEN>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++		};
++	};
++};
++
++/* SRDS #0 - miniPCIe */
++&cp0_pcie0 {
++	num-lanes = <1>;
++	phys = <&cp0_comphy0 0>;
++	status = "okay";
++};
++
++/* SRDS #5 - M.2 B-Key (J34) */
 +&cp0_pcie2 {
 +	num-lanes = <1>;
 +	phys = <&cp0_comphy5 2>;
-+	/* dw-pcie inverts internally */
-+	reset-gpios = <&expander0 1 GPIO_ACTIVE_HIGH>;
 +	status = "okay";
 +};
 +
 +&cp0_pinctrl {
++	pinctrl-0 = <&cp0_m2_0_shutdown_pins &cp0_mpcie_rfkill_pins>;
++	pinctrl-names = "default";
++
 +	cp0_i2c1_pins: cp0-i2c1-pins {
 +		marvell,pins = "mpp35", "mpp36";
 +		marvell,function = "i2c1";
++	};
++
++	cp0_led_pins: cp0-led-pins {
++		marvell,pins = "mpp4", "mpp7";
++		marvell,function = "gpio";
++	};
++
++	cp0_m2_0_shutdown_pins: cp0-m2-0-shutdown-pins {
++		marvell,pins = "mpp8";
++		marvell,function = "gpio";
 +	};
 +
 +	cp0_mmc0_pins: cp0-mmc0-pins {
@@ -928,29 +561,30 @@ index 000000000000..ad0ab34b6602
 +		marvell,function = "sdio";
 +	};
 +
-+	mikro_spi_pins: cp0-spi1-cs1-pins {
++	cp0_mpcie_rfkill_pins: cp0-mpcie-rfkill-pins {
++		marvell,pins = "mpp6";
++		marvell,function = "gpio";
++	};
++
++	cp0_reg_usb_a_vbus0_pins: cp0-reg-usb-a-vbus0-pins {
++		marvell,pins = "mpp27";
++		marvell,function = "gpio";
++	};
++
++	cp0_reg_usb_a_vbus1_pins: cp0-reg-usb-a-vbus1-pins {
++		marvell,pins = "mpp28";
++		marvell,function = "gpio";
++	};
++
++	cp0_sfp0_pins: cp0-sfp0-pins {
++		marvell,pins = "mpp31", "mpp32", "mpp33", "mpp34";
++		marvell,function = "gpio";
++	};
++
++	cp0_spi1_cs1_pins: cp0-spi1-cs1-pins {
 +		marvell,pins = "mpp12";
 +		marvell,function = "spi1";
 +	};
-+
-+	mikro_uart_pins: cp0-uart-pins {
-+		marvell,pins = "mpp2", "mpp3";
-+		marvell,function = "uart1";
-+	};
-+
-+	expander0_pins: cp0-expander0-pins {
-+		marvell,pins = "mpp4";
-+		marvell,function = "gpio";
-+	};
-+};
-+
-+/* SRDS #0 - SATA on M.2 connector */
-+&cp0_sata0 {
-+	phys = <&cp0_comphy0 1>;
-+	status = "okay";
-+
-+	/* only port 1 is available */
-+	/delete-node/ sata-port@0;
 +};
 +
 +/* microSD */
@@ -963,18 +597,29 @@ index 000000000000..ad0ab34b6602
 +};
 +
 +&cp0_spi1 {
-+	/* CS1 for mikrobus */
-+	pinctrl-0 = <&cp0_spi1_pins &mikro_spi_pins>;
++	/* add pin for chip-select 1 */
++	pinctrl-0 = <&cp0_spi1_pins &cp0_spi1_cs1_pins>;
++
++	flash@1 {
++		compatible = "jedec,spi-nor";
++		reg = <1>;
++		/* read command supports max. 50MHz */
++		spi-max-frequency = <50000000>;
++	};
 +};
 +
-+/*
-+ * SRDS #1 - USB-3.0 Host on Type-A connector
-+ * USB-2.0 Host on mPCI-e connector (CON3)
-+ */
++/* USB-2.0 Host to USB-Hub */
 +&cp0_usb3_0 {
-+	phys = <&cp0_comphy1 0>, <&cp0_utmi0>;
++	phys = <&cp0_utmi0>;
++	phy-names = "utmi";
++	dr_mode = "host";
++	status = "okay";
++};
++
++/* SRDS #4 - USB-3.0 Host to USB-Hub */
++&cp0_usb3_1 {
++	phys = <&cp0_comphy4 1>, <&cp0_utmi1>;
 +	phy-names = "comphy", "utmi";
-+	vbus-supply = <&reg_usb3_vbus0>;
 +	dr_mode = "host";
 +	status = "okay";
 +};
@@ -983,176 +628,226 @@ index 000000000000..ad0ab34b6602
 +	status = "okay";
 +};
 +
-+/* mikrobus uart */
-+&cp0_uart0 {
-+	pinctrl-0 = <&mikro_uart_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+};
-diff --git a/arch/arm64/boot/dts/marvell/cn9130-sr-som.dtsi b/arch/arm64/boot/dts/marvell/cn9130-sr-som.dtsi
-new file mode 100644
-index 000000000000..4676e3488f54
---- /dev/null
-+++ b/arch/arm64/boot/dts/marvell/cn9130-sr-som.dtsi
-@@ -0,0 +1,160 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-+/*
-+ * Copyright (C) 2024 Josua Mayer <josua@solid-run.com>
-+ *
-+ */
-+
-+#include <dt-bindings/gpio/gpio.h>
-+
-+/ {
-+	model = "SolidRun CN9130 SoM";
-+	compatible = "solidrun,cn9130-sr-som", "marvell,cn9130";
-+
-+	aliases {
-+		ethernet0 = &cp0_eth0;
-+		ethernet1 = &cp0_eth1;
-+		ethernet2 = &cp0_eth2;
-+		i2c0 = &cp0_i2c0;
-+		mmc0 = &ap_sdhci0;
-+		rtc0 = &cp0_rtc;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	v_1_8: regulator-1-8 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "1v8";
-+		regulator-min-microvolt = <1800000>;
-+		regulator-max-microvolt = <1800000>;
-+	};
-+
-+	/* requires assembly of R9307 */
-+	vhv: regulator-vhv-1-8 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "vhv-1v8";
-+		regulator-min-microvolt = <1800000>;
-+		regulator-max-microvolt = <1800000>;
-+		pinctrl-0 = <&cp0_reg_vhv_pins>;
-+		pinctrl-names = "default";
-+		gpios = <&cp0_gpio2 9 GPIO_ACTIVE_HIGH>;
-+		enable-active-high;
-+	};
++&cp0_utmi1 {
++	status = "disabled";
 +};
 +
-+&ap_pinctrl {
-+	ap_mmc0_pins: ap-mmc0-pins {
-+		marvell,pins = "mpp0", "mpp1", "mpp2", "mpp3", "mpp4", "mpp5",
-+					   "mpp6", "mpp7", "mpp8", "mpp9", "mpp10", "mpp12";
-+		marvell,function = "sdio";
-+		/*
-+		 * mpp12 is emmc reset, function should be sdio (hw_rst),
-+		 * but pinctrl-mvebu does not support this.
-+		 *
-+		 * From pinctrl-mvebu.h:
-+		 * "The name will be used to switch to this setting in DT description, e.g.
-+		 * marvell,function = "uart2". subname is only for debugging purposes."
-+		 */
-+	};
-+};
-+
-+&ap_sdhci0 {
-+	bus-width = <8>;
-+	pinctrl-0 = <&ap_mmc0_pins>;
-+	pinctrl-names = "default";
-+	vqmmc-supply = <&v_1_8>;
++&cp1_ethernet {
 +	status = "okay";
 +};
 +
-+&cp0_ethernet {
++/* SRDS #4 - SFP+ 10GE */
++&cp1_eth0 {
++	managed = "in-band-status";
++	phy-mode = "10gbase-r";
++	phys = <&cp1_comphy4 0>;
++	sfp = <&sfp1>;
 +	status = "okay";
 +};
 +
-+/* for assembly with phy */
-+&cp0_eth2 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&cp0_eth2_pins>;
-+	phy-mode = "rgmii-id";
-+	phy = <&cp0_eth2_phy>;
++/* SRDS #3 - SGMII 1GE */
++&cp1_eth1 {
++	managed = "in-band-status";
++	phy-mode = "sgmii";
++	phy = <&cp1_phy0>;
++	phys = <&cp0_comphy3 1>;
 +	status = "okay";
 +};
 +
-+&cp0_i2c0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&cp0_i2c0_pins>;
++/* SRDS #5 - SGMII 1GE */
++&cp1_eth2 {
++	managed = "in-band-status";
++	phy-mode = "sgmii";
++	phy = <&cp1_phy1>;
++	phys = <&cp0_comphy5 2>;
++	status = "okay";
++};
++
++&cp1_gpio1 {
++	status = "okay";
++
++	/* J30 */
++	m2-full-card-power-off-hog-0 {
++		gpio-hog;
++		gpios = <29 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "m2-full-card-power-off";
++	};
++
++	/* J44 */
++	m2-full-card-power-off-hog-1 {
++		gpio-hog;
++		gpios = <30 GPIO_ACTIVE_LOW>;
++		output-low;
++		line-name = "m2-full-card-power-off";
++	};
++};
++
++&cp1_gpio2 {
++	status = "okay";
++};
++
++&cp1_i2c1 {
++	/*
++	 * Routed to SFP.
++	 * Limit to 100kHz for compatibility with SFP modules,
++	 * featuring AT24C01A/02/04 at addresses 0x50/0x51.
++	 */
 +	clock-frequency = <100000>;
-+	status = "okay";
-+
-+	som_eeprom: eeprom@53 {
-+		compatible = "atmel,24c02";
-+		reg = <0x53>;
-+		pagesize = <8>;
-+	};
-+};
-+
-+&cp0_mdio {
-+	pinctrl-0 = <&cp0_mdio_pins>;
-+	status = "okay";
-+
-+	/* assembly option */
-+	cp0_eth2_phy: ethernet-phy@0 {
-+		reg = <0>;
-+	};
-+};
-+
-+&cp0_spi1 {
-+	status = "okay";
++	pinctrl-0 = <&cp1_i2c1_pins>;
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&cp0_spi1_pins>;
-+	/* max speed limited by a mux */
-+	spi-max-frequency = <1800000000>;
++	status = "okay";
++};
 +
-+	flash@0 {
-+		compatible = "jedec,spi-nor";
++&cp1_mdio {
++	pinctrl-0 = <&cp1_mdio_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	cp1_phy0: ethernet-phy@0 {
 +		reg = <0>;
-+		/* read command supports max. 50MHz */
-+		spi-max-frequency = <50000000>;
++		/*
++		 * Configure LEDs default behaviour:
++		 * - LED[0]: link is 1000Mbps: On (yellow)
++		 * - LED[1]: link/activity: On/blink (green)
++		 * - LED[2]: high impedance (floating)
++		 */
++		marvell,reg-init = <3 16 0xf000 0x0a17>;
++
++		leds {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			led@0 {
++				reg = <0>;
++				color = <LED_COLOR_ID_YELLOW>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++
++			led@1 {
++				reg = <1>;
++				color = <LED_COLOR_ID_GREEN>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++		};
++	};
++
++	cp1_phy1: ethernet-phy@1 {
++		reg = <1>;
++		/*
++		 * Configure LEDs default behaviour:
++		 * - LED[0]: link is 1000Mbps: On (yellow)
++		 * - LED[1]: link/activity: On/blink (green)
++		 * - LED[2]: high impedance (floating)
++		 */
++		marvell,reg-init = <3 16 0xf000 0x0a17>;
++
++		leds {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			led@0 {
++				reg = <0>;
++				color = <LED_COLOR_ID_YELLOW>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++
++			led@1 {
++				reg = <1>;
++				color = <LED_COLOR_ID_GREEN>;
++				function = LED_FUNCTION_LAN;
++				default-state = "keep";
++			};
++		};
 +	};
 +};
 +
-+&cp0_syscon0 {
-+	cp0_pinctrl: pinctrl {
++/* SRDS #0 - M.2 (J30) */
++&cp1_pcie0 {
++	num-lanes = <1>;
++	phys = <&cp1_comphy0 0>;
++	status = "okay";
++};
++
++&cp1_rtc {
++	status = "disabled";
++};
++
++/* SRDS #1 - SATA on M.2 (J44) */
++&cp1_sata0 {
++	phys = <&cp1_comphy1 0>;
++	status = "okay";
++
++	/* only port 0 is available */
++	/delete-node/ sata-port@1;
++};
++
++&cp1_syscon0 {
++	cp1_pinctrl: pinctrl {
 +		compatible = "marvell,cp115-standalone-pinctrl";
++		pinctrl-0 = <&cp1_m2_1_shutdown_pins &cp1_m2_2_shutdown_pins>;
++		pinctrl-names = "default";
 +
-+		cp0_eth2_pins: cp0-ge2-rgmii-pins {
-+			marvell,pins = "mpp44", "mpp45", "mpp46", "mpp47",
-+				       "mpp48", "mpp49", "mpp50", "mpp51",
-+				       "mpp52", "mpp53", "mpp54", "mpp55";
-+			/* docs call it "ge2", but cp110-pinctrl "ge1" */
-+			marvell,function = "ge1";
++		cp1_i2c1_pins: cp0-i2c1-pins {
++			marvell,pins = "mpp35", "mpp36";
++			marvell,function = "i2c1";
 +		};
 +
-+		cp0_i2c0_pins: cp0-i2c0-pins {
++		cp1_led_pins: cp1-led-pins {
++			marvell,pins = "mpp54", "mpp55";
++			marvell,function = "gpio";
++		};
++
++		cp1_m2_1_shutdown_pins: cp1-m2-1-shutdown-pins {
++			marvell,pins = "mpp29";
++			marvell,function = "gpio";
++		};
++
++		cp1_m2_2_shutdown_pins: cp1-m2-2-shutdown-pins {
++			marvell,pins = "mpp30";
++			marvell,function = "gpio";
++		};
++
++		cp1_mdio_pins: cp1-mdio-pins {
 +			marvell,pins = "mpp37", "mpp38";
-+			marvell,function = "i2c0";
-+		};
-+
-+		cp0_mdio_pins: cp0-mdio-pins {
-+			marvell,pins = "mpp40", "mpp41";
 +			marvell,function = "ge";
 +		};
 +
-+		cp0_spi1_pins: cp0-spi1-pins {
-+			marvell,pins = "mpp13", "mpp14", "mpp15", "mpp16";
-+			marvell,function = "spi1";
++		cp1_rtc_pins: cp1-rtc-pins {
++			marvell,pins = "mpp12", "mpp13";
++			marvell,function = "gpio";
 +		};
 +
-+		cp0_reg_vhv_pins: cp0-reg-vhv-pins {
-+			marvell,pins = "mpp41";
++		cp1_sfp1_pins: cp1-sfp1-pins {
++			marvell,pins = "mpp33", "mpp34", "mpp49", "mpp50";
 +			marvell,function = "gpio";
 +		};
 +	};
 +};
 +
-+/* AP default console */
-+&uart0 {
-+	pinctrl-0 = <&uart0_pins>;
-+	pinctrl-names = "default";
++/*
++ * SRDS #2 - USB-3.0 Host to M.2 (J44)
++ * USB-2.0 Host to M.2 (J30)
++ */
++&cp1_usb3_0 {
++	phys = <&cp1_comphy2 0>, <&cp1_utmi0>;
++	phy-names = "comphy", "utmi";
++	dr_mode = "host";
++	status = "okay";
++};
++
++/* USB-2.0 Host to M.2 (J44) */
++&cp1_usb3_1 {
++	phys = <&cp1_utmi1>;
++	phy-names = "utmi";
++	dr_mode = "host";
++	status = "okay";
++};
++
++&cp1_utmi {
 +	status = "okay";
 +};
 
