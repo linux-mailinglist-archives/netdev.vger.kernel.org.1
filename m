@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-109078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5466926D23
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 03:41:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA02926D38
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 03:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C487B1C217EC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 01:41:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12B7A1F223DD
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 01:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2508F6E;
-	Thu,  4 Jul 2024 01:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDB0C2ED;
+	Thu,  4 Jul 2024 01:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vk8nuN+d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zm5Zuh5u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635532581;
-	Thu,  4 Jul 2024 01:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEB7746E
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 01:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720057305; cv=none; b=QJ26qxNCGxlltobXoa64Eq3h6dekH/ewSm9FWOoTaJIznsqztkoLQZzbB8XCi1tAnCPnPoL2QQPgAnSljNpevwayFRk7qkuJW4zuc6NRinpl43FHLMyTksxMUijLaLGo8/kUmXUrVKrBpAMqvIgP92Bt31yHehcw0MDsx1eZ2Bk=
+	t=1720057805; cv=none; b=NUGtkwgNUQnRdLt1ajiSw9VxnlV73UVZLfLhmlFBGqF/dKkxVCL9ZGLFw2qv6wWi4U0EgAnRTTjkxE/z12TxK9uwMZAdpaPnN3zZkxFLN6FTCY7uMdsNvdlsq28WCB69sXtzpBTVYlHiXHGrUjoRWPGbSEW5w1aZzO+1/bcIVig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720057305; c=relaxed/simple;
-	bh=x7Hf/tllTlDBBa3y/YrnYgYV/HhyT5DXOrpAPUTqH08=;
+	s=arc-20240116; t=1720057805; c=relaxed/simple;
+	bh=nvqeSAYCCkBaHb0hj7LhtO6pgKRB/ANEcnd/GmhdxFg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V2LmO+++5TWV2BmlRn1QsVZxMORFNOHZrCttYWiEwOxuz12oh5L2FTHbWh1FA+AflpFKF4lzacNPlIbjeNeHA7lRYWYWiUzi63a9mu6HPdJB/dv+vLKHTB/ca0+LsGoCUBLkZYy7UhxUvYdN67xCDZe7LI9DMgCAgD0BWvG+rzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vk8nuN+d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 517A8C2BD10;
-	Thu,  4 Jul 2024 01:41:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RNbSl463N46HH9MedLDv/RzA5rNi9Sa2rjD1AjSvl8JUuo3utk3Z01x/r33iLKRlz8sBzjY6hKdzHm8BueSzJBpbBwoA7BlIXjMlDDXX3SLm+GDMhJlqWD5lShY96A3YnFDNcZml7D7Niu85yTADvgRkcNiMoblPkVQgiXV7hfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zm5Zuh5u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F9BC2BD10;
+	Thu,  4 Jul 2024 01:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720057304;
-	bh=x7Hf/tllTlDBBa3y/YrnYgYV/HhyT5DXOrpAPUTqH08=;
+	s=k20201202; t=1720057804;
+	bh=nvqeSAYCCkBaHb0hj7LhtO6pgKRB/ANEcnd/GmhdxFg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Vk8nuN+dWNVKc5e7F2nsakHaZz+GOxj1SyRqTRGR8h3iNHBhAUrqvd0QDw9UN2uAo
-	 sHphAAsMLDOereCBasn9Et4bWIYPUAZLe0CINZrQfHxD/5r5d/qiu6UEFI8F57Z7Fh
-	 0U63yzc+BQMyHFTsQ5CPK/yU3rbfSODn+IbIkxlfJJ4a9q14fG+EQC/SODtMcqcmsa
-	 tmHdQj4c1xXhjUwn/WR+KVNMxW3gGFQ+5NqO4g+3hboVcAz8lET/NQPsCHbhSjth8l
-	 w1FWEbCVhAPJCDkuj03HlIDwfeix5E994k34NFoDj+XAazwCO7Uln4KfwG5f+foukF
-	 kkSW59MZJXURw==
-Date: Wed, 3 Jul 2024 18:41:43 -0700
+	b=Zm5Zuh5ubveRHyVc2G4Gxy34xCvPpCNAKd3ajf99oAX58nP+98PlZ4HvVgm6xt2Xq
+	 NMchGxvQT1b1gT+5DS5oPRb3AQu9150N/bmufpKtpafVUC/93OLnhgtwIwpvqsM2Ty
+	 gmP+RJQSD+C93U20bHw7L+BJ/8t/ABWybYjNesbrelUj0ArKYSc/1ccWqxyeO/exSS
+	 EM7EUv9QF5O/Hs3vplD2uVsse6R0b+w54jLqeJTC125mc+O7hySohGq3PAn0NfQfWb
+	 aUXhbCjga0XczO6aWsvWRNIiq6AIzqaAz9oM8DZm0kXt5qMEhLzgJak2wugCiJuFYv
+	 ZooFPCJQPz/6Q==
+Date: Wed, 3 Jul 2024 18:50:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>
-Cc: kotaranov@microsoft.com, pabeni@redhat.com, haiyangz@microsoft.com,
- kys@microsoft.com, edumazet@google.com, davem@davemloft.net,
- decui@microsoft.com, wei.liu@kernel.org, sharmaajay@microsoft.com,
- longli@microsoft.com, jgg@ziepe.ca, leon@kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/2] Provide master netdev to mana_ib
-Message-ID: <20240703184143.3340207d@kernel.org>
-In-Reply-To: <1719838736-20338-1-git-send-email-kotaranov@linux.microsoft.com>
-References: <1719838736-20338-1-git-send-email-kotaranov@linux.microsoft.com>
+To: zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+Subject: Re: [PATCH net 1/2] selftests: fix OOM in msg_zerocopy selftest
+Message-ID: <20240703185003.6f11ff73@kernel.org>
+In-Reply-To: <20240701225349.3395580-2-zijianzhang@bytedance.com>
+References: <20240701225349.3395580-1-zijianzhang@bytedance.com>
+	<20240701225349.3395580-2-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,18 +60,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  1 Jul 2024 05:58:54 -0700 Konstantin Taranov wrote:
-> This patch series aims to allow mana_ib to get master netdev
-> from mana. In the netvsc deployment, the VF netdev is enslaved
-> by netvsc and the upper device should be considered for the network
-> state. In the baremetal case, the VF netdev is a master device.
-> 
-> I would appreciate if I could get Acks on it from:
-> * netvsc maintainers (e.g., Haiyang)
-> * net maintainers (e.g., Jakub, David, Eric, Paolo)
+On Mon,  1 Jul 2024 22:53:48 +0000 zijianzhang@bytedance.com wrote:
+> In selftests/net/msg_zerocopy.c, it has a while loop keeps calling sendmsg
+> on a socket with MSG_ZEROCOPY flag, and it will recv the notifications
+> until the socket is not writable. Typically, it will start the receiving
+> process after around 30+ sendmsgs. However, as the introduction of commit
+> dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"), the sender is
+> always writable and does not get any chance to run recv notifications.
+> The selftest always exits with OUT_OF_MEMORY because the memory used by
+> opt_skb exceeds the net.core.optmem_max. Meanwhile, it could be set to a
+> different value to trigger OOM on older kernels too.
 
-Would you like us to take this via net-next?
- - it doesn't apply cleanly
- - the patches should be squashed, they aren't separate logical changes
- - please find a better word than master
+This test doesn't fail in netdev CI. Is the problem fix in net-next
+somehow? Or the "always exits with OUT_OF_MEMORY" is an exaggerations?
+(TBH I'm not even sure what it means to "exit with OUT_OF_MEMORY" in
+this context.)
+
+TAP version 13
+1..1
+# timeout set to 3600
+# selftests: net: msg_zerocopy.sh
+# ipv4 tcp -t 1
+# tx=164425 (10260 MB) txc=0 zc=n
+# rx=59526 (10260 MB)
+# ipv4 tcp -z -t 1
+# tx=111332 (6947 MB) txc=111332 zc=n
+# rx=55245 (6947 MB)
+# ok
+# ipv6 tcp -t 1
+# tx=168140 (10492 MB) txc=0 zc=n
+# rx=64633 (10492 MB)
+# ipv6 tcp -z -t 1
+# tx=108388 (6763 MB) txc=108388 zc=n
+# rx=54146 (6763 MB)
+# ok
+# ipv4 udp -t 1
+# tx=173970 (10856 MB) txc=0 zc=n
+# rx=173936 (10854 MB)
+# ipv4 udp -z -t 1
+# tx=117728 (7346 MB) txc=117728 zc=n
+# rx=117703 (7345 MB)
+# ok
+# ipv6 udp -t 1
+# tx=225502 (14072 MB) txc=0 zc=n
+# rx=225502 (14072 MB)
+# ipv6 udp -z -t 1
+# tx=111215 (6940 MB) txc=111215 zc=n
+# rx=111212 (6940 MB)
+# ok
+# OK. All tests passed
+ok 1 selftests: net: msg_zerocopy.sh
 
