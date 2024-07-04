@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-109235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F4F9277C3
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:07:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8C49277FA
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0647F282C69
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:07:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FB7C1F21867
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FD61AE873;
-	Thu,  4 Jul 2024 14:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfL5cptN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9F81B0106;
+	Thu,  4 Jul 2024 14:14:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B7E41A81;
-	Thu,  4 Jul 2024 14:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1F21ABC25
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 14:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720102038; cv=none; b=B9mczxcJx79zeTF8nPNP8xZiinFLa4oD+p4df9GphhfZL2VIWusT14rFi1Z74H35wagBrbLyte5jyqN48fHYWwZUjbz9bMzlH1nte1RQ24zkvn5xp6UnW7jpv16e/Gv76zb3JJwyViDp7/IZGLF7eWZaytN52u9p+l5MBRcn2+M=
+	t=1720102440; cv=none; b=oXehbvMyflmP1QR5SBchC87FtpM427c+EDdfhXQncC3ThikUSeOFe0c1mAjLFsmb0LIyOzoWyHGBNBcs/nOKCwFkRXRH0z//fmln/dLrShukyBZpWIJi7oxAIPThX8S0MFy2s4hLXu5tbjrTE27uw21lg07bUlpHejqyEUonfRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720102038; c=relaxed/simple;
-	bh=3/qvQlW/P53Rcj1MyrqxxazGgI/iuShcKu8AoUpghDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H98lBKF5kOmI8wCC61u0fOJ2vrAvYJ21fUgA63BJrdZs75Vhxug4PatKWKI1vd81fXBR2X3x9JkHM/0TtLtuap7UKGNTKftPElbK9sEUwDQi/k1TMK4gAoHX1hSjJVF+/AZappD3E8Me24Hqaz8lKd0tIcGQuU66MPvPxvkbtUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfL5cptN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3269CC3277B;
-	Thu,  4 Jul 2024 14:07:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720102037;
-	bh=3/qvQlW/P53Rcj1MyrqxxazGgI/iuShcKu8AoUpghDI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rfL5cptNuZ1YXnB62bWt+Nix3Ap9MUcZ1ZS6o33/TFp2HtT1tSecrsssyaAOTFt4A
-	 EmBOicavSpHCQqARXP8ijEakwx3vcZb0SpRXdteOmMTstGl/Yc30eZHor+U37INq+g
-	 wQCoKiie3eZ8m5+VD2/CPIEDNJjIZ4xAoJhR1DNpVl0U6KMZhGzb4HAWy6GV6e8Rvv
-	 lg3I1UA1GpZQ2WoO1NTAoNwDUBQy4Yw+FR5UHxwHy/CkmUxJKs/ziwnCoEgTu7s+XO
-	 c79QPdkoKv4/GClBqovNm7VWINTlMs3I8HJNkCrtaCKkw1BPctvUau984hSnls4vqS
-	 99lDnNEETrKyA==
-Date: Thu, 4 Jul 2024 07:07:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shengyu Qu <wiagn233@outlook.com>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, pablo@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- stable@vger.kernel.org, Elad Yifee <eladwf@gmail.com>
-Subject: Re: [PATCH v2] net: ethernet: mtk_ppe: Change PPE entries number to
- 16K
-Message-ID: <20240704070716.118db29e@kernel.org>
-In-Reply-To: <TY3P286MB261180E580D838704E6123B598DE2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
-References: <TY3P286MB2611AD036755E0BC411847FC98D52@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
-	<20240702110224.74abfcea@kernel.org>
-	<TY3P286MB26119C0A14621AD8D411466A98DD2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
-	<20240703164818.13e1d33c@kernel.org>
-	<TY3P286MB261180E580D838704E6123B598DE2@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1720102440; c=relaxed/simple;
+	bh=h9s8lt9FQqG7ktE4LECfjMZgHlDb+6WbwnDyQhTRyo4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k3SpdOXxBtcu4wNeaQhgOWzzo+OIUXfCBdDGff0uDNv3zgSuI076ptDAqEsJzNj/39eNKt2+bPV2Cnmk3OxlY4XHCR64taPAt0yOaO8eLqL97aSD+dDw18ST/MLIZwcQXmJGzI0MlZd0xCptdv8BlzieZ2qvQ0Ow1V+ia6GZQ2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPNDb-0004OQ-7c; Thu, 04 Jul 2024 16:13:51 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPNDa-0076mu-EM; Thu, 04 Jul 2024 16:13:50 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPNDa-00GYrQ-1D;
+	Thu, 04 Jul 2024 16:13:50 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net-next v1 1/1] net: dsa: microchip: lan9371/2: update MAC capabilities for port 4
+Date: Thu,  4 Jul 2024 16:13:48 +0200
+Message-Id: <20240704141348.3947232-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 4 Jul 2024 19:06:29 +0800 Shengyu Qu wrote:
-> PCDN means P2P CDN[1]; This modification already exists in a heavily
-> modified openwrt fork here[2] for over 2 years so it should be working
-> with to regression. Although a higher limit would be better for PCDN use
-> case, but only newer devices like MT7986 supports 32768 max entries.
-> Setting to 16384 would keep old devices working.
-> 
-> [1] https://www.w3.org/wiki/Networks/P2P_CDN
-> [2] https://github.com/coolsnowwolf/lede/blob/2ef8b6a6142798b5e58501fe12ffd10b0961947f/target/linux/ramips/files/drivers/net/ethernet/mtk/mtk_hnat/hnat.h#L604
+Set proper MAC capabilities for port 4 on LAN9371 and LAN9372 switches with
+integrated 100BaseTX PHY.
 
-Makes sense but not a fix, please resend without CC stable and without
-the fixes tag.
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/dsa/microchip/lan937x_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/dsa/microchip/lan937x_main.c b/drivers/net/dsa/microchip/lan937x_main.c
+index 83ac33fede3f5..44911bc7cea1d 100644
+--- a/drivers/net/dsa/microchip/lan937x_main.c
++++ b/drivers/net/dsa/microchip/lan937x_main.c
+@@ -324,6 +324,11 @@ void lan937x_phylink_get_caps(struct ksz_device *dev, int port,
+ 		/* MII/RMII/RGMII ports */
+ 		config->mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+ 					    MAC_100HD | MAC_10 | MAC_1000FD;
++	} else if ((dev->info->chip_id == LAN9371_CHIP_ID ||
++		    dev->info->chip_id == LAN9372_CHIP_ID) &&
++		   port == KSZ_PORT_4) {
++		config->mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
++					    MAC_100HD | MAC_10;
+ 	}
+ }
+ 
+-- 
+2.39.2
+
 
