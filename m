@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-109127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4A992713A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:08:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E2A92713D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07FD41F21ACE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 08:08:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62AA81F21DEB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 08:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC001A38FC;
-	Thu,  4 Jul 2024 08:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8561A3BCC;
+	Thu,  4 Jul 2024 08:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAkXAZkk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ogTvUBHg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BA31A38F2;
-	Thu,  4 Jul 2024 08:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA51310A35;
+	Thu,  4 Jul 2024 08:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720080506; cv=none; b=VgjtwHVmYWVkd9BYqljXO856f+lvUUTzB6a17jPLSTr5Q/dW3xwf9AGytnh1p5bUqP6lbNi/FrXIrX5yAVCmUsVNJDWavET9qj+j8nUCbZKAxGetdubAHZcYWb6Cgv0TzvEUgOCba+O+iPbgZ2FPq7xdvYBKXMMU68ZOsdn2FMU=
+	t=1720080510; cv=none; b=V/iNaQgm31GvVn8GQOWbavfhJK3FvExm6PJEPbEFGffYNcjpJ/AkGhx+S4Y7DnNHceRcVb/BI31o5wIOnu0XVk7ExxPdoImKLNemnqciPNGcL1kegRAdz48lmuei8RveHVSDiThbOhoOVicfIqlFyV5V68SawXI+3kJnFOSuDqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720080506; c=relaxed/simple;
-	bh=J/I/ZDCtfEc50f3py2WXkQJXNaJZrIWNnDDHj5sDshI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iXHDZI9OPU6Klb8YzMhOCvgFVcJVC9bHTMWbbNN/xsxE7YebUIalm484w/bouzwl9Gp/l7RV7EjF5A01Fdhx/11RbJn+DSQDwwxbK1icMsgyqowzKDCL3lIB54E+Ku13xsHHf1TeFE1MuStYBERQ9QvvGhExXCI5thLflItU3Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAkXAZkk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2358C3277B;
-	Thu,  4 Jul 2024 08:08:24 +0000 (UTC)
+	s=arc-20240116; t=1720080510; c=relaxed/simple;
+	bh=Jx0fc3zgb38iP8amYteqQWBGhS1Ud7RNb1uNcJJXirE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nPivOn9GRZbjdGDfZ/k+TXKY/hi7GQJVr14GnusnIX2Dhp34TYyCH52ORxomzPFZ2d4gtYh+223KPDTTH0qNWAKETMKB8Y241OtB6WTC94r+x0bJ5c2tBo1DIBZ4ZA+2uCnMMRJJC+XYuSXcpB9Ashgs83HU/6IxNrEFj4ZTj/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ogTvUBHg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D99C3277B;
+	Thu,  4 Jul 2024 08:08:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720080505;
-	bh=J/I/ZDCtfEc50f3py2WXkQJXNaJZrIWNnDDHj5sDshI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=bAkXAZkkVKFUTH4IK+UU2ZZzvBhwnvYnYAWAlwIUnrTewIBcIA2M4NMRrdC6WQdLm
-	 lJPaf6UOFuxOguhjb98xSuqaFG/Q1wt2zGh87ys+w6tMol2MpnKdwCJ76Ehq4ey1AD
-	 P/lKlI9KvivxCj5BpkphNQyBtv/fNP0cAjkPqYM0/nGgWklNF0M6PCafPXiFo6xm17
-	 x6GQA9KD7VFs8FlG/O/YFzekcV+mfzAh+X4HxarUFq0SSD9fgHsEdGftU+40V/cs7M
-	 k8TIBzrHgixQ3dUrVkKhSW0P7NRDmd+kyBEB2N/4ItrcD6NqbFrSJY03HVVLRfacrJ
-	 EAlzxipNqBRAg==
+	s=k20201202; t=1720080509;
+	bh=Jx0fc3zgb38iP8amYteqQWBGhS1Ud7RNb1uNcJJXirE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ogTvUBHg20iZq5MDfitFzwbpB8pkyc4yDux54cezyBlLqN0PVgMvQZXQZmiiuVKdo
+	 O0oz5yd9G2UPgwVeqOIIYltq7edMFbh98Q+Jb5VxfMKJ4J/pjOxSoRPlYqtLjh4ZkT
+	 sM01JqG9Hwj8O3VRVIqlOgxK9rYzPyDi3yMOC1EO3uJW25AfJtBxuKvBeq7sccQvE1
+	 TxxgU00hr+mG8Dll6WNdqT8ixxaojd71/LP3qwMd8qA14Yde47V61fUuZnWMJttV2q
+	 mrt7e0kSE5G6kuqLXFsZ+mRRmjh9wgGuKvy/iXLL72+s9RCn3LeK+VkYCtJf3ZHwVs
+	 EdvhUkn2MKYcA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: nbd@nbd.name,
@@ -64,10 +65,12 @@ Cc: nbd@nbd.name,
 	andrew@lunn.ch,
 	arnd@arndb.de,
 	horms@kernel.org
-Subject: [PATCH v5 net-next 0/2] Introduce EN7581 ethernet support
-Date: Thu,  4 Jul 2024 10:08:09 +0200
-Message-ID: <cover.1720079772.git.lorenzo@kernel.org>
+Subject: [PATCH v5 net-next 1/2] dt-bindings: net: airoha: Add EN7581 ethernet controller
+Date: Thu,  4 Jul 2024 10:08:10 +0200
+Message-ID: <48dde2595c6ff497a846183b117ac9704537b78c.1720079772.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <cover.1720079772.git.lorenzo@kernel.org>
+References: <cover.1720079772.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,57 +79,167 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add airoha_eth driver in order to introduce ethernet support for
-Airoha EN7581 SoC available on EN7581 development board.
-EN7581 mac controller is mainly composed by Frame Engine (FE) and
-QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
-functionalities are supported now) while QDMA is used for DMA operation
-and QOS functionalities between mac layer and the dsa switch (hw QoS is
-not available yet and it will be added in the future).
-Currently only hw lan features are available, hw wan will be added with
-subsequent patches.
+Introduce device-tree binding documentation for Airoha EN7581 ethernet
+mac controller.
 
-Changes since v4:
-- fix compilation warnings
-- use airoha_qdma_rr() and not airoha_rr() in airoha_qdma_set_irqmask()
-- add missing descriptions in dt-binding
-- remove mdio node in binding example
-Changes since v3:
-- rework architecture to allow future gdm{1,4} support
-- read REG_INT_ENABLE() register in airoha_qdma_set_irqmask() to guarantee
-  airoha_qdma_wr() complete in the spinlock critical section - thx Arnd for
-  the clarification
-- remove unnecessary wmb()
-- remove debugfs
-- move register definitions in .c and remove .h
-- fix warnings
-- enable NAPI thread by default
-Changes since v2:
-- rename airoha,en7581.yaml in airoha,en7581-eth.yaml
-- remove reset dependency in airoha,en7581-eth.yaml
-- remove airoha_dev_change_mtu() callback
-Changes since v1:
-- drop patch 2/3
-- remove queue lock for rx queues
-- add bql support
-- add ethtool stats support
-- fix possible infinite loop in airoha_qdma_rx_process routine
-- always destroy page_pool in case of error during initialization
-- cosmetics
-
-Lorenzo Bianconi (2):
-  dt-bindings: net: airoha: Add EN7581 ethernet controller
-  net: airoha: Introduce ethernet support for EN7581 SoC
-
- .../bindings/net/airoha,en7581-eth.yaml       |  146 +
- MAINTAINERS                                   |    9 +
- drivers/net/ethernet/mediatek/Kconfig         |   11 +-
- drivers/net/ethernet/mediatek/Makefile        |    1 +
- drivers/net/ethernet/mediatek/airoha_eth.c    | 2705 +++++++++++++++++
- 5 files changed, 2871 insertions(+), 1 deletion(-)
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ .../bindings/net/airoha,en7581-eth.yaml       | 146 ++++++++++++++++++
+ 1 file changed, 146 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
- create mode 100644 drivers/net/ethernet/mediatek/airoha_eth.c
 
+diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+new file mode 100644
+index 000000000000..f4b1f8afddd0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+@@ -0,0 +1,146 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,en7581-eth.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha EN7581 Frame Engine Ethernet controller
++
++allOf:
++  - $ref: ethernet-controller.yaml#
++
++maintainers:
++  - Lorenzo Bianconi <lorenzo@kernel.org>
++
++description:
++  The frame engine ethernet controller can be found on Airoha SoCs.
++  These SoCs have multi-GMAC ports.
++
++properties:
++  compatible:
++    enum:
++      - airoha,en7581-eth
++
++  reg:
++    items:
++      - description: Frame engine base address
++      - description: QDMA0 base address
++      - description: QDMA1 base address
++
++  reg-names:
++    items:
++      - const: fe
++      - const: qdma0
++      - const: qdma1
++
++  interrupts:
++    items:
++      - description: QDMA lan irq0
++      - description: QDMA lan irq1
++      - description: QDMA lan irq2
++      - description: QDMA lan irq3
++      - description: QDMA wan irq0
++      - description: QDMA wan irq1
++      - description: QDMA wan irq2
++      - description: QDMA wan irq3
++      - description: FE error irq
++      - description: PDMA irq
++
++  resets:
++    maxItems: 8
++
++  reset-names:
++    items:
++      - const: fe
++      - const: pdma
++      - const: qdma
++      - const: xsi-mac
++      - const: hsi0-mac
++      - const: hsi1-mac
++      - const: hsi-mac
++      - const: xfp-mac
++
++  "#address-cells":
++    const: 1
++
++  "#size-cells":
++    const: 0
++
++patternProperties:
++  "^mac@[1-4]$":
++    type: object
++    unevaluatedProperties: false
++    $ref: ethernet-controller.yaml#
++    description:
++      Ethernet GMAC port associated to the MAC controller
++    properties:
++      compatible:
++        const: airoha,eth-mac
++
++      reg:
++        minimum: 1
++        maximum: 4
++        description: GMAC port identifier
++
++    required:
++      - reg
++      - compatible
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - resets
++  - reset-names
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++    #include <dt-bindings/clock/en7523-clk.h>
++
++    soc {
++      #address-cells = <2>;
++      #size-cells = <2>;
++
++      eth0: ethernet@1fb50000 {
++        compatible = "airoha,en7581-eth";
++        reg = <0 0x1fb50000 0 0x2600>,
++              <0 0x1fb54000 0 0x2000>,
++              <0 0x1fb56000 0 0x2000>;
++        reg-names = "fe", "qdma0", "qdma1";
++
++        resets = <&scuclk 44>,
++                 <&scuclk 30>,
++                 <&scuclk 31>,
++                 <&scuclk 6>,
++                 <&scuclk 15>,
++                 <&scuclk 16>,
++                 <&scuclk 17>,
++                 <&scuclk 26>;
++        reset-names = "fe", "pdma", "qdma", "xsi-mac",
++                      "hsi0-mac", "hsi1-mac", "hsi-mac",
++                      "xfp-mac";
++
++        interrupts = <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
++
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        mac1: mac@1 {
++          compatible = "airoha,eth-mac";
++          reg = <1>;
++        };
++      };
++    };
 -- 
 2.45.2
 
