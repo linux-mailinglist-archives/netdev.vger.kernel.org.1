@@ -1,142 +1,121 @@
-Return-Path: <netdev+bounces-109173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6DE9273A0
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:05:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB8D9273A9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996031C20B06
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:05:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53C801F27392
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99741AB52C;
-	Thu,  4 Jul 2024 10:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4sDOzYz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9CD1AB914;
+	Thu,  4 Jul 2024 10:07:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AC81AB53B
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF11AB908
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720087550; cv=none; b=SJ8+nRM2cex1/VH87AAhhomqvp6hrHLY4V5d/QT8d6aNIZKd66jbwxe0n5tUSro9OGrdN1PoTsfkxPSh7eBsXHRRi+e3F7SUt+ilqajOobqsjEagfvDbPyTDNiXJLgaGOEvfWhsG2H4Cn4OXfRhg63xy0gt3hs0o5Eb/D0rv4Ek=
+	t=1720087657; cv=none; b=st/9GD21pWVNid8shNKma2w0F7Z/LBIGIdarvbh+LvX0H4T4ZwmpUzPRm0IjPFPxuXgWNM04E95E7iGiCgMOkr2p3nojqQXxYtKI8+fnLLIMXatWQ1b70c8UHBwLMyCKf//aisfNGeAVUrDRQ0Fy3SFs/NS+XWr2mc9tLxkGSIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720087550; c=relaxed/simple;
-	bh=JNC3WmUYPiAyzrEy4IEp6AVqvOKgHmsBlL4X9WuwRlU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uJfE5Ulbb6gAOFdYXH8i8SHPDfONULkBiSYoSy3Swx7Le0ED4cncFNvkkCh0KgYVKll/6skHcjfE6y1ZDdKdxkeDtXz03rHp5G3cFD1zw5I3rVJG+z6AXzVf+FVStXFTcNvFg4ldvD78Nui979pcDcLjvuthq50WNFCl8ZpWGDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b4sDOzYz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720087548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CD1IhA9KABk4sJk5G2IxN+kG0gryrBURZU/rNLhtbRg=;
-	b=b4sDOzYzNYUSTYz8+9Mmj9tO6FgVcqidJRii/dvAUHL4QH1DpSue2gnor83DaA46QaX1Bj
-	Y5QzEZH04Krk+BnfDAr0a2bebJKk9XlAzrTI0O5t8DYaXw7cqIwhCW7iO5uKUcfCZf48ce
-	n0lYOZOwMt2L1lRHfuZymsH9fHGOaS0=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-500-Pfntit02OjWSkTVxo0Ic6Q-1; Thu, 04 Jul 2024 06:05:46 -0400
-X-MC-Unique: Pfntit02OjWSkTVxo0Ic6Q-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52e9b906ce9so23328e87.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 03:05:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720087545; x=1720692345;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CD1IhA9KABk4sJk5G2IxN+kG0gryrBURZU/rNLhtbRg=;
-        b=jTePz51vTZ4OIqQLqvWD+2Vsj3SwyQyE+6W/qvyrQVroDlNoriEn8IRUuMMwmDwmA5
-         Yb2eP8LADmJPi2nLEyZGfEgYC6bYr1FRGaY+fNIWRzM4MY42Q47w72YARLyVx094Ii6u
-         fQL0lVxqorlWs2jCQKP9+HeR2aQsnKnek728pq7emKpNk79iB4sh84pvr2VXc7yat9dA
-         BRtJ+YdAp2yVddPbVj9YZLTpjXxIyQJ266Sy9QmnuO0L8Ba6g+G0COJPCm7J8SU3ClcB
-         FUYvOykUTwgy4MyXi59HXL/vVX0SfZKXeWb68yOcWkGTDXW4jX+DJJlA7UzkpylbP6RI
-         tQpg==
-X-Forwarded-Encrypted: i=1; AJvYcCX+dh66vuF3Tj7rClQILY14PfAuiIIHGobCBByb2PKZsci/DwwR9MTosa5a3wvrkTswp4Si8vM2bnFdYNrHzmLL1LaKJYqa
-X-Gm-Message-State: AOJu0YxGKJaxM805Nhm3rt9Mul4jp3tLv6R75l+5Pv/npmNvxC39z1Nz
-	4vI8yESSnQIo7TN9RPisImPC7dg/jTl1M/2xnNVfbMr3fMe68iieiub3E0NfkrjRrCBoJw+ZoSb
-	tCQchEcvAIGbea0A41qEAKJvodSv9NvfaIwEbA/9DWH1n4Ck5SHAe4PiNpQNdgQ==
-X-Received: by 2002:ac2:4d96:0:b0:52c:d81e:86e7 with SMTP id 2adb3069b0e04-52ea06438bcmr733010e87.2.1720087544985;
-        Thu, 04 Jul 2024 03:05:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOWU34rcM1aAx8bkNm6nEttPaOA0d4GLWPbSgGy5vT7VCcByZHDv9+eqsFylx3LI8m9QNaKQ==
-X-Received: by 2002:ac2:4d96:0:b0:52c:d81e:86e7 with SMTP id 2adb3069b0e04-52ea06438bcmr732996e87.2.1720087544615;
-        Thu, 04 Jul 2024 03:05:44 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:172b:1510:dd78:6ccd:a776:5943])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1d0b24sm17712555e9.3.2024.07.04.03.05.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 03:05:44 -0700 (PDT)
-Message-ID: <343d737fde9caa4aba549ed5eaa59c05965da927.camel@redhat.com>
-Subject: Re: [PATCH v1 net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown
- for TCP AO.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>,
-  Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Date: Thu, 04 Jul 2024 12:05:42 +0200
-In-Reply-To: <20240703033508.6321-1-kuniyu@amazon.com>
-References: <20240703033508.6321-1-kuniyu@amazon.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1720087657; c=relaxed/simple;
+	bh=L1au4gRMKcI5BIEcsS+8zjDDar+BRU9MILS6EafA7W4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLr7JLpKKq02tiaMTx2YYiIWPIAkfKAdMyRcUOFzmJNg+PfkN1y21eKqwfAcBG0sKf2+coCaXplxxam6zvGexBuVW/FtDRO4wUKfkCf4QwGpRW74bwhbJ/as+KnOJY2gV0mbi7UMXPJ5XEyh3BS/z0cghVgd+q45P7a+CIm1ILk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sPJMm-0004rB-JU; Thu, 04 Jul 2024 12:07:04 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sPJMl-007460-14; Thu, 04 Jul 2024 12:07:03 +0200
+Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 97EF92FABC2;
+	Thu, 04 Jul 2024 10:07:02 +0000 (UTC)
+Date: Thu, 4 Jul 2024 12:07:02 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
+Subject: Re: [PATCH v2 1/1] dt-bindings: can: fsl,flexcan: add common
+ 'can-transceiver' for fsl,flexcan
+Message-ID: <20240704-outstanding-outrageous-herring-003368-mkl@pengutronix.de>
+References: <20240629021754.3583641-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dr2n3t7ohmn737hp"
+Content-Disposition: inline
+In-Reply-To: <20240629021754.3583641-1-Frank.Li@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, 2024-07-02 at 20:35 -0700, Kuniyuki Iwashima wrote:
-> When we process segments with TCP AO, we don't check it in
-> tcp_parse_options().  Thus, opt_rx->saw_unknown is set to 1,
-> which unconditionally triggers the BPF TCP option parser.
+
+--dr2n3t7ohmn737hp
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 28.06.2024 22:17:54, Frank Li wrote:
+> Add common 'can-transceiver' children node for fsl,flexcan.
 >=20
-> Let's avoid the unnecessary BPF invocation.
+> Fix below warning:
+> arch/arm64/boot/dts/freescale/fsl-ls1028a-rdb.dtb: can@2180000: 'can-tran=
+sceiver' does not match any of the regexes: 'pinctrl-[0-9]+'
+>         from schema $id: http://devicetree.org/schemas/net/can/fsl,flexca=
+n.yaml#
 >=20
-> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/ipv4/tcp_input.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index e67cbeeeb95b..77294fd5fd3e 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -4223,6 +4223,13 @@ void tcp_parse_options(const struct net *net,
->  				 * checked (see tcp_v{4,6}_rcv()).
->  				 */
->  				break;
-> +#endif
-> +#ifdef CONFIG_TCP_AO
-> +			case TCPOPT_AO:
-> +				/* TCP AO has already been checked
-> +				 * (see tcp_inbound_ao_hash()).
-> +				 */
-> +				break;
->  #endif
->  			case TCPOPT_FASTOPEN:
->  				tcp_parse_fastopen_option(
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 
-[not strictly related to this patch] possibly even MPTCP could benefit
-from a similar change, but I'm unsure if we want to add even more cases
-to this statement.
+Applied to linux-can-next.
 
-Cheers,
+Thanks,
+Marc
 
-Paolo
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
+--dr2n3t7ohmn737hp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaGdEMACgkQKDiiPnot
+vG+ndwgAmTD3vI+lh+SpHXPC8faiwWnvlpIAuwu1ia2S5LNiIxhehoz6+WgxW3h/
+0KkIbn2zQva+MUsldVljBQd1tGssLrV54uni1v1OF1Hwnjd/E89cYqEZasllZEX/
+sBlUbgBOxj9DW8liWUhk7hsPxPmrSKHJIgnMDq6lW8998oT+EG2DSfTGyU19aJJr
+/mbyaZ/IXIGplQKbS/4tVGABrip20ab95BrbDf6WphlTIgtleyt9ZICdT7CQ6YCH
+WtWHrmy9L6hSNOSTR7qUSG7af7fcXVgg6P1Scmw1DyEirWKyqxXYldb9Tyl1H8gj
+RezwMSF47aHNA9/vXmPeX7WjWsH2Cw==
+=36qY
+-----END PGP SIGNATURE-----
+
+--dr2n3t7ohmn737hp--
 
