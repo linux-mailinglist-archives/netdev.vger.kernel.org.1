@@ -1,121 +1,214 @@
-Return-Path: <netdev+bounces-109174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB8D9273A9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:07:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B339273BF
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53C801F27392
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:07:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 936311F2170D
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9CD1AB914;
-	Thu,  4 Jul 2024 10:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F921AB8E0;
+	Thu,  4 Jul 2024 10:14:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Rn5C4B21";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="43Xxuyna"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF11AB908
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D411A0730;
+	Thu,  4 Jul 2024 10:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720087657; cv=none; b=st/9GD21pWVNid8shNKma2w0F7Z/LBIGIdarvbh+LvX0H4T4ZwmpUzPRm0IjPFPxuXgWNM04E95E7iGiCgMOkr2p3nojqQXxYtKI8+fnLLIMXatWQ1b70c8UHBwLMyCKf//aisfNGeAVUrDRQ0Fy3SFs/NS+XWr2mc9tLxkGSIY=
+	t=1720088098; cv=none; b=eWPuufFaO286BJd48WgG5g1zhA2/2h7MhZx/GPWs2aFcyGCbZN68yQqU1SdBwMStPxWBnpw9kaIes0RhEe5q7pRXGBTn5zb5IQS1wnsBSEpdIny8KePMN51o95YyC5rbUpS9/P1EZXXaBLeiSTTR+h5GhOzW97se9kMDYs2pxoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720087657; c=relaxed/simple;
-	bh=L1au4gRMKcI5BIEcsS+8zjDDar+BRU9MILS6EafA7W4=;
+	s=arc-20240116; t=1720088098; c=relaxed/simple;
+	bh=O+O6LayPI/ucOV55fifsqjz2WXJiCG2d0iPEeJI7Ewg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLr7JLpKKq02tiaMTx2YYiIWPIAkfKAdMyRcUOFzmJNg+PfkN1y21eKqwfAcBG0sKf2+coCaXplxxam6zvGexBuVW/FtDRO4wUKfkCf4QwGpRW74bwhbJ/as+KnOJY2gV0mbi7UMXPJ5XEyh3BS/z0cghVgd+q45P7a+CIm1ILk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sPJMm-0004rB-JU; Thu, 04 Jul 2024 12:07:04 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sPJMl-007460-14; Thu, 04 Jul 2024 12:07:03 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 97EF92FABC2;
-	Thu, 04 Jul 2024 10:07:02 +0000 (UTC)
-Date: Thu, 4 Jul 2024 12:07:02 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH v2 1/1] dt-bindings: can: fsl,flexcan: add common
- 'can-transceiver' for fsl,flexcan
-Message-ID: <20240704-outstanding-outrageous-herring-003368-mkl@pengutronix.de>
-References: <20240629021754.3583641-1-Frank.Li@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rQzSDhATK7qbhErrA5dvoDvjs4G6mFi6/x2xIFmIkmZL8cXHqRw9xRcXgecoxsLw3Zm/c3Oe9/Lldu1gg+Emf+r8Gz0RKS1RLfugsmg1SilmN0BtdeHaSzhfb5wYzkhidYV7H2+QNJzUWNAhle7DuH32CqeAx9sp7gLZvzqrkPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Rn5C4B21; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=43Xxuyna; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 4 Jul 2024 12:14:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1720088094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Eqi5r8/lvlC0iO7dImgh2SaHmrEu1KzUvfKE3LQnve4=;
+	b=Rn5C4B21zQTeI9g1jeHGMPag1XM9UjOJgnZ+c8va8ZD0iOzrH8+jJB9KKl4jNo0FpvDacP
+	ROa+ibw52j8JUA+jA78UQSn8dAnpqlTDEqM41XZi6BdAs41ENlvzhXHrxfBwXYQ2unJm6E
+	AE5EJ3ZiQfgZSeeyeCPNJ1vae+sIVr/uqmiZBVMWekAPe0AieBfMW2/FuaEyWbvR6vIEoC
+	/1ES6LJ96CCWHmpKT2Uq7Xuydp3y7je148U41Wuqv5qa0BI36wHcywlpaXsmgOEBILhzJV
+	yvqwnRsH+z1j9xwIhvLZ+vDdZsnUzln6tkRjJGrNhhF4wqsyVCVf+j3fqz+s2g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1720088094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Eqi5r8/lvlC0iO7dImgh2SaHmrEu1KzUvfKE3LQnve4=;
+	b=43XxuynaWvLks8CePNA9F7A6g2+lk5INmpicsDJRAexUuEKbpVhBPmUjYty7qm9N5I6PQi
+	b8VXCF52MVxrNFAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [PATCH v2 net-net] tun: Assign missing bpf_net_context.
+Message-ID: <20240704101452.NhpibjJt@linutronix.de>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240703192118.RIqHj9kS@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dr2n3t7ohmn737hp"
-Content-Disposition: inline
-In-Reply-To: <20240629021754.3583641-1-Frank.Li@nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---dr2n3t7ohmn737hp
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240703192118.RIqHj9kS@linutronix.de>
 
-On 28.06.2024 22:17:54, Frank Li wrote:
-> Add common 'can-transceiver' children node for fsl,flexcan.
->=20
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/fsl-ls1028a-rdb.dtb: can@2180000: 'can-tran=
-sceiver' does not match any of the regexes: 'pinctrl-[0-9]+'
->         from schema $id: http://devicetree.org/schemas/net/can/fsl,flexca=
-n.yaml#
->=20
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+During the introduction of struct bpf_net_context handling for
+XDP-redirect, the tun driver has been missed.
+Jakub also pointed out that there is another call chain to
+do_xdp_generic() originating from netif_receive_skb() and drivers may
+use it outside from the NAPI context.
 
-Applied to linux-can-next.
+Set the bpf_net_context before invoking BPF XDP program within the TUN
+driver. Set the bpf_net_context also in do_xdp_generic() if a xdp
+program is available.
 
-Thanks,
-Marc
+Reported-by: syzbot+0b5c75599f1d872bea6f@syzkaller.appspotmail.com
+Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
+Reported-by: syzbot+c1e04a422bbc0f0f2921@syzkaller.appspotmail.com
+Fixes: 401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on =
+PREEMPT_RT.")
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+v1=E2=80=A6v2:
+  - Add the wrapper to do_xdp_generic().
+  - Remove the wrapper from tun_get_user() where it was used for a
+    single do_xdp_generic() invocation.
 
+ drivers/net/tun.c | 7 +++++++
+ net/core/dev.c    | 5 +++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 9254bca2813dc..9b24861464bc6 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1661,6 +1661,7 @@ static struct sk_buff *tun_build_skb(struct tun_struc=
+t *tun,
+ 				     int len, int *skb_xdp)
+ {
+ 	struct page_frag *alloc_frag =3D &current->task_frag;
++	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 	struct bpf_prog *xdp_prog;
+ 	int buflen =3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+ 	char *buf;
+@@ -1700,6 +1701,7 @@ static struct sk_buff *tun_build_skb(struct tun_struc=
+t *tun,
+=20
+ 	local_bh_disable();
+ 	rcu_read_lock();
++	bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
+ 	xdp_prog =3D rcu_dereference(tun->xdp_prog);
+ 	if (xdp_prog) {
+ 		struct xdp_buff xdp;
+@@ -1728,12 +1730,14 @@ static struct sk_buff *tun_build_skb(struct tun_str=
+uct *tun,
+ 		pad =3D xdp.data - xdp.data_hard_start;
+ 		len =3D xdp.data_end - xdp.data;
+ 	}
++	bpf_net_ctx_clear(bpf_net_ctx);
+ 	rcu_read_unlock();
+ 	local_bh_enable();
+=20
+ 	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad);
+=20
+ out:
++	bpf_net_ctx_clear(bpf_net_ctx);
+ 	rcu_read_unlock();
+ 	local_bh_enable();
+ 	return NULL;
+@@ -2566,6 +2570,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
+ghdr *m, size_t total_len)
+=20
+ 	if (m->msg_controllen =3D=3D sizeof(struct tun_msg_ctl) &&
+ 	    ctl && ctl->type =3D=3D TUN_MSG_PTR) {
++		struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 		struct tun_page tpage;
+ 		int n =3D ctl->num;
+ 		int flush =3D 0, queued =3D 0;
+@@ -2574,6 +2579,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
+ghdr *m, size_t total_len)
+=20
+ 		local_bh_disable();
+ 		rcu_read_lock();
++		bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
+=20
+ 		for (i =3D 0; i < n; i++) {
+ 			xdp =3D &((struct xdp_buff *)ctl->ptr)[i];
+@@ -2588,6 +2594,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
+ghdr *m, size_t total_len)
+ 		if (tfile->napi_enabled && queued > 0)
+ 			napi_schedule(&tfile->napi);
+=20
++		bpf_net_ctx_clear(bpf_net_ctx);
+ 		rcu_read_unlock();
+ 		local_bh_enable();
+=20
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 385c4091aa775..73e5af6943c39 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5126,11 +5126,14 @@ static DEFINE_STATIC_KEY_FALSE(generic_xdp_needed_k=
+ey);
+=20
+ int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb)
+ {
++	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
++
+ 	if (xdp_prog) {
+ 		struct xdp_buff xdp;
+ 		u32 act;
+ 		int err;
+=20
++		bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
+ 		act =3D netif_receive_generic_xdp(pskb, &xdp, xdp_prog);
+ 		if (act !=3D XDP_PASS) {
+ 			switch (act) {
+@@ -5144,11 +5147,13 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, struc=
+t sk_buff **pskb)
+ 				generic_xdp_tx(*pskb, xdp_prog);
+ 				break;
+ 			}
++			bpf_net_ctx_clear(bpf_net_ctx);
+ 			return XDP_DROP;
+ 		}
+ 	}
+ 	return XDP_PASS;
+ out_redir:
++	bpf_net_ctx_clear(bpf_net_ctx);
+ 	kfree_skb_reason(*pskb, SKB_DROP_REASON_XDP);
+ 	return XDP_DROP;
+ }
 --=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+2.45.2
 
---dr2n3t7ohmn737hp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaGdEMACgkQKDiiPnot
-vG+ndwgAmTD3vI+lh+SpHXPC8faiwWnvlpIAuwu1ia2S5LNiIxhehoz6+WgxW3h/
-0KkIbn2zQva+MUsldVljBQd1tGssLrV54uni1v1OF1Hwnjd/E89cYqEZasllZEX/
-sBlUbgBOxj9DW8liWUhk7hsPxPmrSKHJIgnMDq6lW8998oT+EG2DSfTGyU19aJJr
-/mbyaZ/IXIGplQKbS/4tVGABrip20ab95BrbDf6WphlTIgtleyt9ZICdT7CQ6YCH
-WtWHrmy9L6hSNOSTR7qUSG7af7fcXVgg6P1Scmw1DyEirWKyqxXYldb9Tyl1H8gj
-RezwMSF47aHNA9/vXmPeX7WjWsH2Cw==
-=36qY
------END PGP SIGNATURE-----
-
---dr2n3t7ohmn737hp--
 
