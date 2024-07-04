@@ -1,62 +1,82 @@
-Return-Path: <netdev+bounces-109266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303FE9279C9
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:16:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AEC79279DE
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEE43289568
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4CA1C22943
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E84B1B011B;
-	Thu,  4 Jul 2024 15:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050BF1AEFFD;
+	Thu,  4 Jul 2024 15:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UXzjIbhW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B638F1B1427;
-	Thu,  4 Jul 2024 15:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF391B1208
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 15:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720106129; cv=none; b=WMLY36hBf5Lm0M9JIuxB6A923vzzbkyCRz0nTBeGdqiEPNT/3zUyOIpLvbyUnCK3cV56atvXPq5iytc578Hover2u9gBBa3lnymMpbtEpmac44FFeApf9qmlTYxiK3e4SJg/qdAy3FImuHq/ATQnHO7S9F5IixHYpbIfcSey5Co=
+	t=1720106389; cv=none; b=isx4lqpt6uubHpaC+UuDH4+QVlQIGNTjPxrC/ZIpk4BXtMIOqwa39dsXHBqsQDrw91+zjCWqYl1Y8Go9S5KV4geQHuv3ZlfIF4hZvq1eooqjY1QZi3HP3foGHJkkyH7eNtoMCndzAOxa+SIRF533aRjkw1acxQxG27nvd9MQ6Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720106129; c=relaxed/simple;
-	bh=1y75t4auajT+ALLNErXKMmJu9iQ2u9uJIIGptEDInCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nODdSR+9IsbVEkPaiL1kzjzIvKFBlT/jme+fq1vRlnHoHvUOn71igC3VxUfEBjF3ATYLZRfuEnddrMsqGlIMpVhSG2XzDJFy++siEr4C6B6zE1d8eCCM11GxP6gGgqZzc+8NB9yAeI+Xbq1uD/ukvnQ5iGqwZTjDTDT6zxF/isA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sPOB5-000000000xJ-1mHR;
-	Thu, 04 Jul 2024 15:15:19 +0000
-Date: Thu, 4 Jul 2024 16:15:15 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1720106389; c=relaxed/simple;
+	bh=rTi+HSfP+CDmR9Y8iR5mkNNK7g6n1NJse0dPKt9usAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=pMmaLeR4Pe8c6QFP4q5VJUb6trz8XXEP80gZGMMBhZM6s/DsQIOIiAXoReZ8K6ofC2/x4hVLOBLbRGsg17dXbyEXKChnPsFHXWSB46nvxkVthzASYXh9Poue4tQenNTpwVA1PABVcGlKR7Lo8/mHedeOiCSRmlfS+QRr4250ArQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UXzjIbhW; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c9cc681ee7so279487b6e.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 08:19:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1720106388; x=1720711188; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V+zXDUJM7lfgygxbXYWjttEkeiLpdqmsPDn2aj5otxo=;
+        b=UXzjIbhWdbJVnmk8NcCSyTsGxcyvFq8rI2NHjlztAfFJvEFpFRzOIQBo9zbc++1grb
+         +DMep5I7UP2shvYsgBq93mwvK8m41NT4PRKNMKTgUUSGV72r0fJrvQBDSOGxMsbHAyqM
+         LqsxqSi2LlYXNf7r9I9adPOcbmoiMACmUrKQ8sJJOJTNdGAU+XMsi/0pLqydeNoXYlh3
+         8FfTL8yr8Bt20+yggYZHdOTppE6hH/p2bulYSMFKOSqNYy2/a17ed1YvDDjF5tDaP26h
+         XhnzzoFx5Tpmawfqn8DHYGEqVxJMoHCNG6azd70OWOsB6XAyKSnYRLCM9SPLR6Gvg1rW
+         iCsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720106388; x=1720711188;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V+zXDUJM7lfgygxbXYWjttEkeiLpdqmsPDn2aj5otxo=;
+        b=ZUMkX9i7nELdjfHMsDFFx3w336aQlJk22FY5b0RECTVMCD4ergA/axsIdCD/qMyfvc
+         82xujrov2VkHIW+dEFrGSzj+Kfy6Y+k1EtthB48x2Zi/QhkLIEcOgvm5yfm8Vlxa0p3F
+         bv12ansZu8I6vc+Aeq0fg34fVUsv65aVGruNSZ/HXU7GQnvr/mrG5N54qSpDZnI/yVUN
+         g14t3zAmBTiMkVJ1/pWBlcCsQvGNSFVT1vTi8twgYtW9Pg+JIE1pvRBsOgX5PMpYhush
+         YVLMGRTnXqVGCigibRfcWBfxjWkHZ9S0DFZ7PDZ/gtdCGhiP2SLLQXmeFZPqNHLx0W+Q
+         JuaA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJossCzq6Na9uPgPYM4LnQPW9A2mOg8ToGSajMvj1qXxSy/mmPjXYMRYoJqo0EdOwNKpuf0tSx0j/5hmbdn+PmbKWRXPNP
+X-Gm-Message-State: AOJu0YyfITfoo4xryT+6Z7dXAevbB9oSlG/8mYdH+GmoeEm0WuqR8F+k
+	TsIPe/fYYyNp7LqrMkfRwAwWIl3WH4AofuQ4Zdz8jQxbpTFEw16xm1CI5OG1HX8=
+X-Google-Smtp-Source: AGHT+IHAWyWPp3t/3hLm3p6DC0AvvzzmljGLCooD0y9pIZ4rkXDGF9k2VyEEwC6Rp+KB4ThglvcN9A==
+X-Received: by 2002:a05:6808:1b14:b0:3d5:1f50:1860 with SMTP id 5614622812f47-3d915d2d73amr612153b6e.27.1720106387688;
+        Thu, 04 Jul 2024 08:19:47 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:96a0:e6e9:112e:f4c])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d62f9c7c51sm2442474b6e.18.2024.07.04.08.19.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 08:19:47 -0700 (PDT)
+Date: Thu, 4 Jul 2024 10:19:44 -0500
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, regressions@lists.linux.dev
-Subject: Re: [PATCH net v3] net: dsa: mt7530: fix impossible MDIO address and
- issue warning
-Message-ID: <Zoa8gyhHZ41ByNll@makrotopia.org>
-References: <7e3fed489c0bbca84a386b1077c61589030ff4ab.1719963228.git.daniel@makrotopia.org>
- <5c92dcae-ec10-4652-a5e4-3f050774fc8b@gmail.com>
+	Simon Horman <horms@kernel.org>,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net: bcmasp: Fix error code in probe()
+Message-ID: <ZoWKBkHH9D1fqV4r@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,34 +85,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5c92dcae-ec10-4652-a5e4-3f050774fc8b@gmail.com>
+X-Mailer: git-send-email haha only kidding
 
-On Thu, Jul 04, 2024 at 04:46:29PM +0200, Florian Fainelli wrote:
-> On 7/3/2024 12:44 AM, Daniel Golle wrote:
-> > [...]
-> > This is imporant also to not break compatibility with older Device Trees
-> > as with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
-> > switch from device tree") the address in device tree will be taken into
-> > account, while before it was hard-coded to 0x1f.
-> > 
-> > Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> > Only tested on BPi-R3 (with various deliberately broken DT) for now!
-> 
-> This seems like a whole lot of code just to auto-magically fix an issue that
-> could be caught with a warning. I appreciate that most of these devices
-> might be headless, and therefore having some attempt at getting functional
-> networking goes a long way into allowing users to correct their mistakes.
+Return an error code if bcmasp_interface_create() fails.  Don't return
+success.
 
-My initial motivation was to preserve compatibility with existing broken
-device trees.
+Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I then had given up on it because nobody seemed to care, but have
-resumed and completed the patch now that reverting the change taking the
-address in DT into account became the only alternative.
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+index a806dadc4196..20c6529ec135 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+@@ -1380,6 +1380,7 @@ static int bcmasp_probe(struct platform_device *pdev)
+ 			dev_err(dev, "Cannot create eth interface %d\n", i);
+ 			bcmasp_remove_intfs(priv);
+ 			of_node_put(intf_node);
++			ret = -ENOMEM;
+ 			goto of_put_exit;
+ 		}
+ 		list_add_tail(&intf->list, &priv->intfs);
+-- 
+2.43.0
 
-In OpenWrt all device trees with broken switch MDIO address have been
-fixed long ago... (and we always ship the DT along with the kernel, so
-DT backward-compatibility doesn't play a role there)
 
