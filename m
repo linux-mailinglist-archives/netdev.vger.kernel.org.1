@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-109200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325B492758B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 13:54:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BFA192759B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 13:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0C3D282B1C
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:54:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 232422835C5
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8A01AD9D3;
-	Thu,  4 Jul 2024 11:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AC81AD9D8;
+	Thu,  4 Jul 2024 11:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="VdNLFNnE"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="QMkPnL5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A649514B078;
-	Thu,  4 Jul 2024 11:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA341AC435;
+	Thu,  4 Jul 2024 11:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720094089; cv=none; b=Mf5J8PHWursvnsVTPBqmwcXa8zmtw6RvZWsWwHlZF5DnjJODwrnkD9Rod4fomSgMOUj1rono2SavwxDPaCGyGjrtX/raxx2kFNibginHAm4+1FforJk0xinIUbGkoVTi7xUoWfV5UkWRPTYx5bjrvYy5kpwQQmaiEsbrhWzEpqI=
+	t=1720094333; cv=none; b=MQg1bJ85e+28tThR7Xk4YXwG7Z3yl5rXUaOEdXJW3o/d+hEZzKdQOH8GD68/YPwYX4a3wRODdEWZSKnxjK9hZYT6RzkrPOq5ND64oAoEgLLviUNpDLhn5mTj5Z9p3sce2eTUs4yEdWF/Ow9nu8rI1EFv9lYin4mLXkpnXKZ1mHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720094089; c=relaxed/simple;
-	bh=kl9XkKFbLG8/cbOoGcnf0G2TA157gAgTav5mc9Tz9mo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VdkTAyFisWg4SNvLJehA6XH/Z7b9eJrVUFJne7sQzWoOS+vtaAGg5ivsMYB3uQA6xRK4Am4n5/ZWCVF411PP14GGiUfSCPpVHlt/jaUuIdkjIEytJX3GN0T6qI+tiaSb15Fl6JGEcD4Z1LEgBq34I6eDEvcuT7pJXuRirknu2LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=VdNLFNnE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8260C4AF0A;
-	Thu,  4 Jul 2024 11:54:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720094089;
-	bh=kl9XkKFbLG8/cbOoGcnf0G2TA157gAgTav5mc9Tz9mo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VdNLFNnEeg09B2Du5hdaglmBnpQb4YpGCY1fFY+n9RN84QB/EyxadevuGDZRWM6+K
-	 c2twI58mEvTjsigqDX9PIsE3nPRn3+yJd+OqX75YoXnfOpqagxA0d51RL66QDoAVJR
-	 zjaIpjySpyrLrIkyNioQf1JRnvCvUn5lr46UQJaM=
-Date: Thu, 4 Jul 2024 13:54:46 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Yunseong Kim <yskelg@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, stable@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sasha Levin <sashal@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Austin Kim <austindh.kim@gmail.com>,
-	MichelleJin <shjy180909@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: Re: [PATCH] tracing/net_sched: NULL pointer dereference in
- perf_trace_qdisc_reset()
-Message-ID: <2024070441-stool-quit-b846@gregkh>
-References: <20240702180146.5126-2-yskelg@gmail.com>
- <20240703191835.2cc2606f@kernel.org>
- <2024070400-slideshow-professor-af80@gregkh>
- <6391f34a-b401-47e8-8093-d3b067f26c1b@gmail.com>
+	s=arc-20240116; t=1720094333; c=relaxed/simple;
+	bh=p/6k71i6v8OdPnGY+lv9/vmvcEoCpDcg+67YsCBN4x4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uRAV8add5PSu/BA6F0TlJioM9QPxFOCZH1I5kiTdpugKpNUZcCDBRstt2U4h8oJHTRXNWZGyNJNO6AVzflFoXPBQ31wLf2W/zJryvyGz3dBKdfYTsp89/PkU/aIGKPAzBQfcl1/NPcqtDqjuBJxvWq8SuWbjbZM7jkYJc41ajcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=QMkPnL5R; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.55] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id EC1CF200CD06;
+	Thu,  4 Jul 2024 13:58:40 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be EC1CF200CD06
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1720094321;
+	bh=U/ywlGjkek4RHAQwTk9TPOPL3yDvvLL40zoLmh8F3xs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QMkPnL5RgiJBOV2MK3Je7CaEVDQVDRYrOJpjotw0bQk1aEzDbCX3YAdbM+k9LfloP
+	 KpJ+YALf12xveJONlNZ87+60vsAXXcdjarOqVEhlzjoh+rQClM20x2ix3IwUQY6LCv
+	 M4FNUjn1EyK6g2yWb/nojTW1RH8ns2tZk6e2SVJNOs9r0YAwt04q1sLtQdBzkI0air
+	 Oup1d8fRRoyx/hS2PpzYO8wWHLLI8AWINwLgScNBLqxjrZcWP/hP0oElfZwVhB4ki/
+	 r+aYj39WczB6dvm1390ayNB85zFBhChFfXLUQ2B5kue3HZxjW9FMTjTXlND3wnbF5b
+	 /sRnaLDN0yYuQ==
+Message-ID: <08784a20-48a4-40ec-a641-95a474673a3c@uliege.be>
+Date: Thu, 4 Jul 2024 13:58:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6391f34a-b401-47e8-8093-d3b067f26c1b@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] net: ioam6: mitigate the two reallocations
+ problem
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, justin.iurman@uliege.be
+References: <20240702174451.22735-1-justin.iurman@uliege.be>
+ <20240702174451.22735-3-justin.iurman@uliege.be>
+ <54d30d951eddf0846b88b7f9f73ce16994550bd7.camel@redhat.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <54d30d951eddf0846b88b7f9f73ce16994550bd7.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 04, 2024 at 08:16:34PM +0900, Yunseong Kim wrote:
-> Hi Greg, Hi Jakub
+On 7/4/24 11:23, Paolo Abeni wrote:
+> On Tue, 2024-07-02 at 19:44 +0200, Justin Iurman wrote:
+>> @@ -313,6 +316,10 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>>   
+>>   	orig_daddr = ipv6_hdr(skb)->daddr;
+>>   
+>> +	local_bh_disable();
+>> +	dst = dst_cache_get(&ilwt->cache);
+>> +	local_bh_enable();
+>> +
+>>   	switch (ilwt->mode) {
+>>   	case IOAM6_IPTUNNEL_MODE_INLINE:
 > 
-> On 7/4/24 6:32 오후, Greg Kroah-Hartman wrote:
-> > On Wed, Jul 03, 2024 at 07:18:35PM -0700, Jakub Kicinski wrote:
-> >> On Wed,  3 Jul 2024 03:01:47 +0900 Yunseong Kim wrote:
-> >>> Support backports for stable version. There are two places where null
-> >>> deref could happen before
-> >>> commit 2c92ca849fcc ("tracing/treewide: Remove second parameter of __assign_str()")
-> >>> Link: https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
-> >>>
-> >>> I've checked +v6.1.82 +v6.6.22 +v6.7.10, +v6.8, +6.9, this version need
-> >>> to be applied, So, I applied the patch, tested it again, and confirmed
-> >>> working fine.
-> >>
-> >> You're missing the customary "[ Upstream commit <upstream commit> ]"
-> >> line, not sure Greg will pick this up.
-> >>
-> > 
-> > Yeah, I missed this, needs to be very obvious what is happening here.
-> > I'll replace the version in the queues with this one now, thanks.
-> > 
-> > greg k-h
-> 
-> 
-> Thank you for your hard work.
-> 
-> 
-> This fix need to be applied versions in +v5.10.213, +v5.15.152, +v6.1.82
-> +v6.6.22, +v6.7.10, +v6.8, +6.9
-> 
+> I now see that the way you coded patch 1/2 makes this one easier.
 
-Already done.
+Hi Paolo,
+
+Indeed. I originally had it as a single two-in-one patch, then I thought 
+it would be clearer to split it up (looks like I was wrong, sorry).
+
+> Still I think it's quite doubtful to make the dst cache access
+> unconditional.
+
+By unconditional, you mean to get the cache _before_ the switch, right? 
+If so, that's indeed the only solution to provide it to the encap/inline 
+function for the mitigation. However, I don't see it as a problem. 
+Instead of having (a) call encap/fill function, then (b) get cache; 
+you'd have (a) get cache, then (b) call encap/fill function. IMHO, it's 
+the same. I'll re-run our measurements and compare them to our previous 
+results in order to confirm getting the cache early does not impact 
+performance. The only exception would be when skb_cow_head returns an 
+error in encap/fill functions: in that case, getting the cache early 
+would be a waste of time, but this situation suggests there is a problem 
+already so it's probably fine.
+
+> Given the above I suggest to replace the 2 patches with a single one
+> moving the whole dst_cache logic before the switch statement.
+
+Will do!
+
+> Also this does not address a functional issue, IMHO it's more a
+> performance improvement, could as well target net-next with no fixes
+> tag.
+
+Hmmm, it's indeed OK to target net-next for patch #2 since it could be 
+considered as an improvement (not really a functional issue per se). 
+However, I'm not sure for patch #1. Wouldn't the kernel crash if not 
+enough headroom was allocated (assuming no check is done before writing 
+in the driver)?
+
+> WRT seg6 and rpl tunnels, before any patch, I think we first need
+> confirmation the problem is present there, too.
+
+Ack. I'll try to run some tests to check that.
+
+Thanks,
+Justin
+
+> Thanks,
+> 
+> Paolo
+> 
 
