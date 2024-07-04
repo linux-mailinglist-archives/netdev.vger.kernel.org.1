@@ -1,304 +1,232 @@
-Return-Path: <netdev+bounces-109315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748C5927E06
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:56:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA12F927E14
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 22:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A103D1C2225C
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:56:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4655E1F244EB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 20:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EBD13CFB9;
-	Thu,  4 Jul 2024 19:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5EB13C813;
+	Thu,  4 Jul 2024 20:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RMgoR0KY"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ilU4XFaH";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fVlX4uwO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739242F23;
-	Thu,  4 Jul 2024 19:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720122987; cv=none; b=TZgHmyoQkZO7stGUGbHN6oOgffSzyE+tA2U1/5vCff3Un5t1c9MGsaMFL5a7XLc8MTYYRcF/qB0tD54yeAErbQkfxfwxVhniAaErR3AIC01O4dvfYoAZcIOha8ylGuYuM3/oBbz7i3PqwkhKr/wiYpFKlOmwbhtKqeQgr/m1b/U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720122987; c=relaxed/simple;
-	bh=YFGCG+Y1mFcp8uFnyfNRgPfbiEY3mJmP+i948uSZaZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4maeH6nIte+VtMl/QKYg3dNeSeT8GbSCODFJo/18/Ldo0PZ/S2aNl25Mz81ih9trvjEgfZ6hX5XuKCZVlWUd5QlLKeKa/eA0oNKB3Hd0RjnOJvuEOkeVrSfakOw6+yCuHB8i+SE7X/j3gHB/8id/x0FTFINdcCIAqcQmAAhCWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RMgoR0KY; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ee920b0781so4894211fa.1;
-        Thu, 04 Jul 2024 12:56:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720122983; x=1720727783; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T5hX7DNMSGVPeQt2ruoRa6Yr82t4hcURljOV5Qu5BwY=;
-        b=RMgoR0KY1tpqCCpw7l6djTj1Ra0HgLbKVQjtxn5EtZ3yCRnMJ//Pw38SpJ6GVDmd68
-         yxE1T2BQn3NKp01M/9Cq30SDKDyHRJW6sLvNdKgccL2JWNSGOJKy5aFrMULI4OlfMs7e
-         GhxjPzD0JP2uizwco1AsEDwZ0/THmiiPn/ulPBxA7PjVwbGCCP84qmjaXlSw0+GsxTcN
-         Y2akbb655HD3Dvj9OwzDBYvHNhku0KlJ50Yx3FGsgqWeQZZjRVkjOtJxAWhb0YFu7vZw
-         do/a2RvShce6l55YIUU4vMkd8FkTnWbNRfgXGlZaFY/6uisu61Noeh9Dxu+KzyG1plpO
-         vVhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720122983; x=1720727783;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T5hX7DNMSGVPeQt2ruoRa6Yr82t4hcURljOV5Qu5BwY=;
-        b=Y7TMl0mAaLbcIanFGKrYTfeUvL/QG/koW4r2LvpSA0NumKnwKCKK7g2oOJP9hoVb3x
-         k7Hm/sIW5kxK98PHn9J67mvzuen9uGR4fTRioaZ19zsNZY6cmdmSUHBEpgraL4/YK2Hc
-         1f0RCZryu3494o3nz7ESpwY0NWnFi8qk+BBPhPpb8JRbARSE02/3xYKMrZF8XHP1luvl
-         yb4z9eibY9H8hNpMncRLZ8vm8Eq6xcqe+iWS+tLEiXmLyReeqAv0fr7u/TKjH/jzXd5P
-         6MjFtOr1ApGacFQnQxjgJIEMQEhdHuF8zuMzuTiY6QRlaWtqACxC8v2aCCB/6WOCYkBH
-         Fo5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVW7X7bIqkU8Nb4+XNVqF+JDSUMBR8ZYUGoj4YG7E2qtovk+qbLK4qsbJNl3//fC+RVrdwFV7Ta0S++6aJ6J/buJVjiH2W6W/XcSslO/HXO5WD9S0iNaXN0JlT8XQPu1bkO7gJenO37K1O7jUB70AgiZe38eTCT7nqk
-X-Gm-Message-State: AOJu0YzhvdBRdlEQbuHemINPPXOkKBZ9SVhi757tX11u3zBFL9SeiEGn
-	cFCVWJfcSG4MKcHbE9speLek05vqJJoCx8fJ2NxDVBj9ic2kPm82
-X-Google-Smtp-Source: AGHT+IGbU17GjcUH7kKqzQCOajDryup2rgaM1Kxc28/sqbd8meWamzP4ZHG3VTliJxJ1isrF/OA3gA==
-X-Received: by 2002:ac2:596a:0:b0:52e:767a:ada7 with SMTP id 2adb3069b0e04-52ea06ba8afmr1576303e87.50.1720122982057;
-        Thu, 04 Jul 2024 12:56:22 -0700 (PDT)
-Received: from mobilestation ([95.79.180.161])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab0bbf0sm2585230e87.25.2024.07.04.12.56.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 12:56:21 -0700 (PDT)
-Date: Thu, 4 Jul 2024 22:56:19 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Halaney <ahalaney@redhat.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v2 14/17] net: stmmac: Move internal PCS
- PHYLINK ops to stmmac_pcs.c
-Message-ID: <3mpvgoh6sdyccpppmwkoqugvoyv3spgyry47gg6sjmpg5es3iy@zqd3p3k6lpnn>
-References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
- <20240624132802.14238-6-fancer.lancer@gmail.com>
- <Zn7Rwt9KNac2mMah@shell.armlinux.org.uk>
- <4q6a2vo23clanqs36e2idzjybh7ugp7pxqldeyhkk4upfn4lhp@75mz4t7rbhjm>
- <ZoWvejkng/Ch/YIz@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B59745976;
+	Thu,  4 Jul 2024 20:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720123347; cv=fail; b=OzbxvbE8k9y05PmraCg5LZiYDvshRgwdU1Kz+EtYT2OtEW80fYTF1BSoz4fRv5mfkSgzeMEaT0717qzeuBl8UTxlFgLYOyCCUKxoGa6dGffQJWYHptsPHQDv7g/L/giNv7wU7IsrRAUTqn82MvGQauEM0A/WCKU1ETWqLdvT6Eo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720123347; c=relaxed/simple;
+	bh=bpl50F4PARkQYTi8/B8VBUf8G1/l8XHP+iEvcaqHbLc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ne+8A5eLhwbHyPDvC7nBxIqQS0X1ap3cYDUm6bAQDCmc2wLmDUuay74EELKmInRhqFLbLm6kTRQN15pfTzhUTxUsgRHJfvFP/0sOnHtBNkquUEuiNUtz0uWRdd3x3vdnv2NIc0dEZXMQ5epj15b35+zfogVuz6XLoCSq4BMcdgc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=fail smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ilU4XFaH; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fVlX4uwO; arc=fail smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1720123345; x=1751659345;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bpl50F4PARkQYTi8/B8VBUf8G1/l8XHP+iEvcaqHbLc=;
+  b=ilU4XFaH9dyLp1SAW2O7FcikivT/wHYkBCXAZk5ZFt16Pdh1/8RH2xtT
+   S1cCKD/lFbMuF02ergXRk7DcTaR9FLEQ87g3uV3yI4g2nK7ClWa1p5ZWz
+   TLBM3UjL1TcKJlxnLB85c+oRZr//Bs9Textxz3vo1a7EuAziO9Rvy77Jt
+   mt5IrvIqexAfc80AKJqVDY42/HWeVlRvojs4xtynQ2glfSjuJfggmYMCD
+   9UuiXv3EoWj1aR4CbNQyuyMTS1ic4rA7L1pzeNv5msZ4JZfagX74CEEyF
+   ByEVpgahkWVw8JA0tv1zk1THoMYqeaTTOibzYv3PFUOyyevneMwMyv7hT
+   g==;
+X-CSE-ConnectionGUID: zMecV7zqT5KOVWFE2yW5uw==
+X-CSE-MsgGUID: n015tLOgSsmWQXFujC7WoA==
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="31495347"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2024 13:02:23 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 4 Jul 2024 13:02:03 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 4 Jul 2024 13:02:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dhwiC1aigyKPo91ONwkJ5SAdnwetSypx4ERJqGsE1DZNMAvmXTpEC97gvt+US92wDPBoL8NaIV98+A1Jo6t5L8S9x1fff6HIl/MdX/wmOCAuD7zVef7x7R+MiYer4b+IMJc3iHSt7ZHh/DlBSeFVw61R9L+bcUNNm4AmVrqdX+TZDzccQPPlCuasIkOUlkh1uj/B9XJuNViUAei/Kj+oxwZYu/Wg1spWl7hztbCh8XnQPL3ooW3tWpqMrYbFUaDMBo8eog/HscBbtjzqh598gPxxRZJ8szjuM4Y47dAej4nrxrN8j2gCwS/l8oSbEujSzh/Fcd056XTt0k2TU4ZBHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bpl50F4PARkQYTi8/B8VBUf8G1/l8XHP+iEvcaqHbLc=;
+ b=JxU9A8KnBq4s+tiFoHDV+ND6bASTIt3CuxF+dya2ABFcWPqJYHOdR2+/hmqS64Xw3sF/v8ISRev9Rblck3Emb3cQ6udwnDaizu0vDOByRnvkBBT4wTQ/m13qvqtYQWEk5fku/ANm4o3qVGMviTvBCJUVyaqe1spOn1tKfentfa14afTwCQHmpjxCFWiGb313rUE4sLC82HIOlvi909wHr+HHaOM6KiscOyrqg5keuam63Yq0Rb7Mix5Ruq9588WtSmeelREuA/QwVqeaLBW3BrhFAk3kay2H4dVpIfhCAKb7uQ0CNIZf58IU0HSw19rF7U0O4k7XHFlQbze6Iy2bZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bpl50F4PARkQYTi8/B8VBUf8G1/l8XHP+iEvcaqHbLc=;
+ b=fVlX4uwO8pJdBf1NwiEAw4FJliI3fOpQT9DV+CYiHD8SciqHE5YL+/weo6qWFNwqWnVRIcevkLuQ8nqheQQsvnsufzU4YUNDczb5Z58pdMhTcmJIb3g8MgjnpzjEwxBbVVZBOt2no15GmKCOwEmqQrWfUXT6oRN3z5N9y02hcVfbAadwGm61xy6nzr0MGlUoEp7RXjsMX8ZrV7g3TTPGEyChQKjIdIj67tgamBgtNyWtPIzmro9RqCzIG97XM0RGO95MyK2tvJjl/7IDLIlM7o8Ax3dS7V/s/MfEshUows35KyHp/pJILPUHatkExovII/qV3NdgZJU9AxwQfzIfRg==
+Received: from BL0PR11MB2913.namprd11.prod.outlook.com (2603:10b6:208:79::29)
+ by DM4PR11MB5971.namprd11.prod.outlook.com (2603:10b6:8:5e::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7741.26; Thu, 4 Jul 2024 20:02:00 +0000
+Received: from BL0PR11MB2913.namprd11.prod.outlook.com
+ ([fe80::3bc1:80d8:bfa5:e742]) by BL0PR11MB2913.namprd11.prod.outlook.com
+ ([fe80::3bc1:80d8:bfa5:e742%3]) with mapi id 15.20.7698.025; Thu, 4 Jul 2024
+ 20:02:00 +0000
+From: <Woojung.Huh@microchip.com>
+To: <o.rempel@pengutronix.de>
+CC: <davem@davemloft.net>, <andrew@lunn.ch>, <edumazet@google.com>,
+	<f.fainelli@gmail.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<Arun.Ramadoss@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <Yuiko.Oshino@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <linux-kernel@vger.kernel.org>,
+	<kernel@pengutronix.de>, <netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v1 1/1] net: phy: microchip: lan937x: add support
+ for 100BaseTX PHY
+Thread-Topic: [PATCH net-next v1 1/1] net: phy: microchip: lan937x: add
+ support for 100BaseTX PHY
+Thread-Index: AQHazhpnRTNboJbIQE2PiY5dbV/LyrHmtZQOgAA4RgCAAA9RUA==
+Date: Thu, 4 Jul 2024 20:02:00 +0000
+Message-ID: <BL0PR11MB2913A0855BCD3EFF290F8018E7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+References: <20240704135850.3939342-1-o.rempel@pengutronix.de>
+ <BL0PR11MB29132F1C667E478728BCE4ECE7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <ZobyTGbbzXlhTBbz@pengutronix.de>
+In-Reply-To: <ZobyTGbbzXlhTBbz@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB2913:EE_|DM4PR11MB5971:EE_
+x-ms-office365-filtering-correlation-id: f276dbce-2f7c-4eca-c8a1-08dc9c642aa7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?K1JXTENQSzZGaldWZ2tDNUtFV3g3djVnZ3VMeVREZnphcG9OT0ZEREFERFp4?=
+ =?utf-8?B?SFZ3ZFNkZWQ0QS9kSFp4TW9odzB1RTJENmx3NnZKUXNRcnFhR2RPUDZrVVYr?=
+ =?utf-8?B?WkN5d0tES3FTVnFWL0wydTEySUwyWjRaeE00eTZoTHJVd29QM1UvNGdsYzhr?=
+ =?utf-8?B?VWhOWCt6YkhzYkdwaitnMCszcUoyK0tZNkVIVE5nMjVxdmZHOEsrVEJXMmM3?=
+ =?utf-8?B?VUx4NnZNc2p0Y1RuaHBEeVBsYW13eGFmaFJkaUZnSlpZNjUxbWg2UjFDSGhh?=
+ =?utf-8?B?dlBvNENwN1hwR3lsWHdydVpJQU5NdHBpRXlQMmdpQjMyaWthMU50K1JNdGts?=
+ =?utf-8?B?ZHlkZU1tSmltTUtGemNrRDBoeWR0UERMUzA1eEl0SHM1TFJOOFZkT1NtNGZQ?=
+ =?utf-8?B?QXdZK2JBYXZHc0hJRTJvZVFaU29ZYVVtRXlvOHd1Sno5K3ZRMTQvTVY5UExI?=
+ =?utf-8?B?R043RlRDVlU4RU1ENnFGcHZUTDd0SUZTWWFOd2I2NndReUw2RU15U3p3UTN2?=
+ =?utf-8?B?eTlmZVl6VndoSGJJUkIxZUhwVFlqWENzQW5RUHRWS2pEaSt6SUh3cWFnNkM0?=
+ =?utf-8?B?aThHS1BYb3hIWm1tOUozSUErSGttWWRvcW5FOTlIaGxVdGVzMTVGalB2Q2xn?=
+ =?utf-8?B?M3dYaG0yWkpjWFIvZjA2aUpOTjg0bUNyaTNvT05hekhoOXA5UDIrQWxDVWlD?=
+ =?utf-8?B?QlB6WDlUYzhyWWJQV2VDcGFab2FyMjdDMm9qdHF3K3gxOGgvZ0hjYzZvYXRZ?=
+ =?utf-8?B?U2Yrc0IyOGZEcGlPdXlWZkRBa3Mvb2RpekxldjlNUkp2Ujd3cGxsN2F1ZHJF?=
+ =?utf-8?B?QnUwMllNNXVDNXBTTEpjYWlZd1BQdDl2VG11L2M0VDFxaDZoQUYyVDg5M0lt?=
+ =?utf-8?B?YXBPcGdGQm9JbHFPWDE2R0Nuc0JkYTMxenRpbE1DLzBWdnlId2Q0N3cwcHpY?=
+ =?utf-8?B?OTZGcHE5VUJZbGdMWTBRWENjUStVZ3plVmlQUER4MjFNVGR1S1pDTjNxVDV2?=
+ =?utf-8?B?L0x1OFAvUWpHY1JmV0w3by80ZWxib09IbmJTZElEVzBYdUVicXpid25TSzZt?=
+ =?utf-8?B?bXgzZ2NOb3RhN2VjM25jMlZtWlA1L0p2N2JsZXlmblRvMG8xc2tXRHFaSFpI?=
+ =?utf-8?B?QlJTRC84VS9NUHhINjY3aEo2TkpKSFJnRHd1SjhGYktWVDQ1bm9WSURqdzcw?=
+ =?utf-8?B?RjYxdTJHOFJNenVPa25Sc0Z0WnphRjU2UCtub3JpaW5LUkZHb29JR25JdC9o?=
+ =?utf-8?B?R0VCU0t1cHFHUldKNmI0RFpBeEFVU1MxcVhLVnFMK252cmxuSnRZN1A5SmJt?=
+ =?utf-8?B?MWtER1VSWENGenpJZ2Izbm4yWXRBa00zQjhiblZOdGN3QnlwbzhCRGVlYXdi?=
+ =?utf-8?B?TElQTTNxendsQUpNdEh2WmR1THpMaE5VbVRmKzJ4UTg3ZVFhT2pUUVZDOS8v?=
+ =?utf-8?B?MDJVZEkzaUNOMzBUV2pnNVdkK0FVUzlrdzRjb0dySGwvWEc5aFlIdkRWVktN?=
+ =?utf-8?B?QXRXajNjd1loTVluT0ZmMm5LUlRHTlR4VGRJcmtBWk85UGJhTmVRZEQyMWRL?=
+ =?utf-8?B?L0l3b0Y3U1d1MVFhY0IxTEtibng5Z094ZWtWWVBKaHI5UXA0eVk3elZvUlp3?=
+ =?utf-8?B?ZlRZdmowZ0dqRzM5QTJXanJQS3Z1NzBOYlJUTmsvMHViQ3dMRGlFYjBxY3Fj?=
+ =?utf-8?B?emlXYW56L1dXbHFkVGd6VndWRURIdkgvRWZLSWdxQzhvaWdNTVgyMmYzQVYr?=
+ =?utf-8?B?MmFFcXduOWNhb1c4RHdCRnFXRWkrOEdvR3dOMytoV2ZGWndTckwwUXI1SGR1?=
+ =?utf-8?B?ZzlXdTJ1VzlZWVUxK1ZjQT09?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB2913.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L3JhSjF5U3BtNEt6SEQrb2V5WW1PYnBNM3dqQldFT1RvV0tRZWpNMDk5OEQ4?=
+ =?utf-8?B?c1ZBYlMrWWdZMmVOd29FSmlrODJKdjdCMjhHRytyNEM5SDBZeDZxNzk2eFRx?=
+ =?utf-8?B?OXQ4SXYzYThmaEMwQUUyWExuN015djRhNXhkdnc1YzY4Qmt3WjJObnlxVEM0?=
+ =?utf-8?B?MlV3eGlmcEtKNFRqMUpDTXk3dzllSmY0M3IrSE9DUzQ0ZG9MSWNwRU1KVzdP?=
+ =?utf-8?B?ODc4VGVaWm96RVhoZWE3NFpxUnI4MmJnTElHYTlVZ2lReHd4Si9uaHlCUUxw?=
+ =?utf-8?B?V2VRdVE4STNTeGdmM3k5OWcxM3Q0ekJ4bW9SZjRad2dodkc3K284T25wR2xp?=
+ =?utf-8?B?dy9rbTkrLzJZc2tTSWphZ0tMUngzcDRDSVdIU21GbXBTMkRxZk90Y0xTd3dH?=
+ =?utf-8?B?V0wzMVZRY2hMNjdsZGR4Y1h2RmRUSkFRZXZST1pEMWJxY01oVnRlR2pKQXlv?=
+ =?utf-8?B?NVJVQW1HbUtLK0NMYmFodDNMZ3hqM0ZFaVlTd2s2RDNSanEvSGt4TDNlVnpF?=
+ =?utf-8?B?MnVCSzdaMTkzTlZxMTZPMEpOV25vL2hheUl4VVNjSXVjU1dOYjJXdFlEMjFh?=
+ =?utf-8?B?UFB0Vmc3TU1qZUJDUUtoMnhqWEZSRGMvYjE2QkxmSTBDQUNoNHBrRjREb1Aw?=
+ =?utf-8?B?WkFMQXVaNXBSWGQySzJCNGdXNEVRcUg0RjhzQVdDZXdwWFNEazN4ZVg0WFZr?=
+ =?utf-8?B?UEJTajNXOFhkY1J4TjdjeVFRU3VJQVNuUHd2bWU5b3R0aENublAzOXY5U0NO?=
+ =?utf-8?B?bGhZRS9GRFFxZXNmbUgweFpWZDRuZGdIckd5OC94aUlXdXJMTXNUZDUzcFA0?=
+ =?utf-8?B?VUdYYmpUdm9RRTg5d1hZL3hOM3J1Wk9RSkFSREFLblVoMWNlOHB0YzYzcTRR?=
+ =?utf-8?B?WlpaUjMvMUw3b0tuKyt4bnJGWitqMUNZRjVRdCtRUGQxMWIzVmJzMnFMM0xE?=
+ =?utf-8?B?TS80RXBidzRXUnZMZFlHd0FmZGFScXREbTdjbUg4TFE2S281eE9CZDBTWlVY?=
+ =?utf-8?B?eFpWUzQwSmQvbUMwRjRwTTZHbHZjellEY2s3eE9MYXdrVmtUcGxiejBVSFZz?=
+ =?utf-8?B?Yzk2cGpYZjVOWkh6d3JEd0E5TUM0R1VPQUxjR2ROYzVibngyVzVIaFhmQXZL?=
+ =?utf-8?B?dTJNMG5KMTY5QkNTTVVaZGtnbkw3a1pwT0JvM3JVN3F6b2tGUDVwNWxwK1Vm?=
+ =?utf-8?B?cFFjQ2Vvbm56cElZYXMycUdkb0lqZy9UUXFLOWtLd3pycHpMMytSN0trMmQ5?=
+ =?utf-8?B?cStYUkRWUWpleFZxeWVDeGhCem9aNTQ3OGxpYmM2aXhBVm4rdzBLZ2xrMSsz?=
+ =?utf-8?B?Uy83VTZUcE83ZjVvY3Q4VHZObDBZWGpEUXZ4ZXJ2MHk4eG1GTEVvSnRiWEdS?=
+ =?utf-8?B?dHRvdGd3aFZsa1djYW0vc0dHbm4xbHpjbExJNzlkaXZoM0FEZ0Z0Z3dRQThx?=
+ =?utf-8?B?WkdUR2ovazJKODZBaFp3dU5LSVJuT0ZLTDFKZStsUUg4RDRUUFpqMGQ0Rks1?=
+ =?utf-8?B?dDlTQm92U1paeFZVS1h6U0JkbWhBV2l5RHpGV2xRalJvSWVIOUtjWndHaVVN?=
+ =?utf-8?B?SURqOFhqeGRBcnpxczVyUVNtTksxL0k0ckwrZWQ1dW9SUG9qOFNwUlNsMmRY?=
+ =?utf-8?B?YUFpMksxZWpWQWdUb2JXTG91Mm9pZ3lad2U0TEQzZkl4YVd5emU0NlRqczJW?=
+ =?utf-8?B?OTFoK2RBUUFFUE9WQnhUbUNQRG55NTNWTXZvZWlBUjZtU0xZZFkwdWVxS1Fn?=
+ =?utf-8?B?N0QzTXQ1c3ROcjByQlZDMWRBNDY0dC95b1AzbEh0bVJ5Q2J2N3dsYlA5d1V0?=
+ =?utf-8?B?Y1AycXlGTU80OXJwYXhWTFdWcUNYSStNbUs5a1ZmSzY0bVU5bVIxdlQwMWRw?=
+ =?utf-8?B?UXpVcHNDK1ZpVWJlNVFzcS94R1EycFcrNlhyczdQaWpiNzU1bXhZd3RzYVpV?=
+ =?utf-8?B?YWNWVlExemVYZ2RqdzFDYVJEYkt6bTN1a1BZUC9TUmVxSExBQzRJd1hMS0tV?=
+ =?utf-8?B?dW5PdE1YME1wdFV3eWVEei9zUlp3LzlUL29uRElUQmc0aFhZY0l3L1dOaVEv?=
+ =?utf-8?B?SzhZaERFSTFuT1pZSjlyWWJPeTBTQlRzcGxUbnBLU2plT2tGb3RRYmhYTkhJ?=
+ =?utf-8?Q?SQ5t1kUa9e/CG2hC3Zi4Yvx0l?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZoWvejkng/Ch/YIz@shell.armlinux.org.uk>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB2913.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f276dbce-2f7c-4eca-c8a1-08dc9c642aa7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2024 20:02:00.5471
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nS0gwZoD58hlfF3gwxBIpfkmc7v/5Wra6LZ9GB90xacV/S42bDotTRM4N/oU+nphs9xxsCfDquxPIhCvXIx1kj26IakiYZzE4TvCJTwtKZ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5971
 
-On Wed, Jul 03, 2024 at 09:07:22PM +0100, Russell King (Oracle) wrote:
-> On Wed, Jul 03, 2024 at 10:08:16PM +0300, Serge Semin wrote:
-> > On Fri, Jun 28, 2024 at 04:07:46PM +0100, Russell King (Oracle) wrote:
-> > > On Mon, Jun 24, 2024 at 04:26:31PM +0300, Serge Semin wrote:
-> > > > @@ -621,7 +548,6 @@ int dwmac1000_setup(struct stmmac_priv *priv)
-> > > >  	mac->mii.clk_csr_shift = 2;
-> > > >  	mac->mii.clk_csr_mask = GENMASK(5, 2);
-> > > >  
-> > > > -	mac->mac_pcs.ops = &dwmac1000_mii_pcs_ops;
-> > > >  	mac->mac_pcs.neg_mode = true;
-> > > 
-> > > "mac->mac_pcs.neg_mode = true;" is a property of the "ops" so should
-> > > move with it.
-> > > 
-> > > > @@ -1475,7 +1396,6 @@ int dwmac4_setup(struct stmmac_priv *priv)
-> > > >  	mac->mii.clk_csr_mask = GENMASK(11, 8);
-> > > >  	mac->num_vlan = dwmac4_get_num_vlan(priv->ioaddr);
-> > > >  
-> > > > -	mac->mac_pcs.ops = &dwmac4_mii_pcs_ops;
-> > > >  	mac->mac_pcs.neg_mode = true;
-> > > 
-> > > Also applies here.
-> > > 
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > index 3666893acb69..c42fb2437948 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > @@ -363,6 +363,7 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
-> > > >  		mac->tc = mac->tc ? : entry->tc;
-> > > >  		mac->mmc = mac->mmc ? : entry->mmc;
-> > > >  		mac->est = mac->est ? : entry->est;
-> > > > +		mac->mac_pcs.ops = mac->mac_pcs.ops ?: entry->pcs;
-> > > 
-> > 
-> > > Removing both of the above means that mac->mac_pcs.ops won't ever be set
-> > > prior to this, so this whole thing should just be:
-> > > 
-> > > 		mac->mac_pcs.ops = entry->pcs;
-> > > 		mac->mac_pcs.neg_mode = true;
-> > 
-> > Actually, no. mac->mac_pcs.ops can be set by the platform-specific
-> > plat_stmmacenet_data::setup() method.
-> 
-> mac->mac_pcs is there for the _internal_ MAC only, not for platforms
-> to fiddle around with (remember, my patch set adds this!)
-> 
-> I think you're thinking of mac->phylink_pcs which platforms can and
-> do fiddle with.
-
-Actually I did mean mac->mac_pcs.ops. AFAICS the stmmac_hwif_init()
-method semantics implies that the plat_stmmacenet_data::setup()
-function responsibility is to allocate the mac_device_info instance
-and pre-initialize it' fields with the data specific for the
-particular device including the DW MAC HW-interface ops. Like it's
-done in the dwmac-sun8i.c driver (and in the currently being reviewed
-Loongson GMAC/GNET series). So I suppose it should also concern the
-internal PCS ops implementation being added by you. In case if some
-particular controller has some internal PCS peculiarities required to
-be fixed on the PHY-link PCS ops implementation level. No?
-
-> 
-> > > > +	/* TODO Check the PCS_AN_STATUS.Link status here?.. Note the flag is latched-low */
-> > > > +
-> > > > +	/* TODO The next is the TBI/RTBI-specific and seems to be valid if PCS_AN_STATUS.ANC */
-> > > >  	val = readl(priv->pcsaddr + PCS_ANE_LPA);
-> > > 
-> > 
-> > > I thought these registers only existed of dma_cap.pcs is true ?
-> > 
-> > Right. The AN-registers are SGMII/TBI/RTBI-specific.
-> 
-
-> Therefore, I suggest that if state->interface is RGMII, then these
-> registers should not be accessed.
-
-Fully agree.
-
-> 
-> My idea is to provide two PCS per MAC:
-> 
-> One simple one which covers RGMII which only reads the PHYIF/RGSMIIIS
-> register, does no configuration, but does implement the .pcs_enable/
-> .pcs_disable etc. The .pcs_validate method should also be empty for
-> this because the AutoNeg ethtool capability does not refer to the
-> inband signalling, but to the media PHY.
-> 
-> Then a more complex PCS implementation that does everything the RGMII
-> one does, but also the bits for SGMII (and TBI/RTBI).
-
-Agreed. Good idea.
-
-> 
-> > > If we
-> > > start checking PCS_AN_STATUS.Link here, and this register reads as
-> > > zeros, doesn't it mean that RMGII inband mode won't ever signal link
-> > > up?
-> > 
-> > Right. The PCS_AN_STATUS.Link should be checked for the SGMII (and
-> > TBI/RTBI) only. The databooks defines the flag as follows:
-> > 
-> > DW GMAC v3.73a:
-> > Link Status   This bit indicates whether the data channel (link) is up or
-> > R_SS_SC_LLO   down. For the TBI, RTBI or SGMII interfaces, if ANEG is going
-> >               on, data cannot be transferred across the link and hence the
-> >               link is given as down.
-> > 
-> > DW QoS Eth:
-> > Link Status   When this bit is set, it indicates that the link is up between
-> > Read-only     the MAC and the TBI, RTBI, or SGMII interface. When this bit is
-> >               reset, it indicates that the link is down between the MAC and
-> >               the TBI, RTBI, or SGMII interface.
-> > 
-> > I guess that in fact the flag semantics is the same on both devices.
-> > But the Access-status for some reason different. Although DW QoS Eth
-> > databook doesn't define any latched-low CSR. So there is a chance that
-> > some of the databooks might be wrong in the flag access status.
-> 
-> Yes, it sounds like it.
-> 
-> > > > -	/* TODO Make sure that STMMAC_PCS_PAUSE STMMAC_PCS_ASYM_PAUSE usage is legitimate */
-> > > > +	/* TODO The databook says the encoding is defined in IEEE 802.3z,
-> > > > +	 * Section 37.2.1.4. Do we need the STMMAC_PCS_PAUSE and
-> > > > +	 * STMMAC_PCS_ASYM_PAUSE mask here?
-> > > > +	 */
-> > > >  	linkmode_mod_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-> > > >  			 state->lp_advertising,
-> > > >  			 FIELD_GET(PCS_ANE_PSE, val) & STMMAC_PCS_PAUSE);
-> > > 
-> > 
-> > > If it's 802.3z aka 1000base-X format, then yes, we should be using
-> > > these bits if we are getting state from this register.
-> > 
-> > I meant that should we be using the driver-specific macro in here
-> > seeing the field encoding is defined by the IEEE 802.3z? Is there any
-> > ready-to-use macros/constants defined in the network subsystem core
-> > for the standard Pause encoding (IEEE 802.3z Section 37.2.1.4)?
-> 
-> include/uapi/linux/mii.h:
-> 
-> #define ADVERTISE_1000XFULL     0x0020  /* Try for 1000BASE-X full-duplex */
-> 	/* GMAC_ANE_FD */
-> #define ADVERTISE_1000XHALF     0x0040  /* Try for 1000BASE-X half-duplex */
-> 	/* GMAC_ANE_HD */
-> #define ADVERTISE_1000XPAUSE    0x0080  /* Try for 1000BASE-X pause    */
-> 	/* GMAC_ANE_PSE bit 0 */
-> #define ADVERTISE_1000XPSE_ASYM 0x0100  /* Try for 1000BASE-X asym pause */
-> 	/* GMAC_ANE_PSE bit 1 */
-> #define ADVERTISE_LPACK         0x4000  /* Ack link partners response  */
-> 	/* GMAC_ANE_ACK */
-> 
-> #define LPA_1000XFULL           0x0020  /* Can do 1000BASE-X full-duplex */
-> 	/* GMAC_ANE_FD */
-> #define LPA_1000XHALF           0x0040  /* Can do 1000BASE-X half-duplex */
-> 	/* GMAC_ANE_HD */
-> #define LPA_1000XPAUSE          0x0080  /* Can do 1000BASE-X pause     */
-> 	/* GMAC_ANE_PSE bit 0 */
-> #define LPA_1000XPAUSE_ASYM     0x0100  /* Can do 1000BASE-X pause asym*/
-> 	/* GMAC_ANE_PSE bit 1 */
-> #define LPA_RESV                0x1000  /* Unused...                   */
-> 	/* GMAC_ANE_RFE bit 0 */
-> #define LPA_RFAULT              0x2000  /* Link partner faulted        */
-> 	/* GMAC_ANE_RFE bit 1 */
-> #define LPA_LPACK               0x4000  /* Link partner acked us       */
-> 	/* GMAC_ANE_ACK */
-
-Got it. Thanks.
-
-> 
-> > > If TBI/RTBI is ever used, rather than trying to shoe-horn it all into
-> > > these functions, please consider splitting them into separate PCSes,
-> > > and sharing code between them e.g. using common functions called from
-> > > the method functions or shared method functions where appropriate.
-> > 
-> > Ok. Sounds reasonable.
-> > 
-> > I guess your message also means that the patchset re-spinning will be
-> > on me from now, right?) If so, please note, I can't promise I'll be
-> > able to do that soonish. I am quite busy at the moment. I'll be
-> > more-or-less free for that in a month or so.
-> 
-> Not necessarily - some good news today, the high priority issue I was
-> working on is lower priority at last, which means I've more time to
-> look at mainline again. Bad news... I need a break after about 2.5
-> months of frustrations, which could be from this weekend!
-> 
-> Given the fix for the LNKMOD issue, I suspect that won't be merged
-> into net-next until after the weekend, but I'll see whether I can
-> sneak a respin of the patch set once that's happened. That said,
-> given that we'll be at -rc7, it's likely too late to be thinking
-> about getting the PCS changes queued up for this coming merge
-> window. In any case, I don't think even if I did post a series, we're
-> at the point where we have something that would be ready.
-
-Ok. Let me know what is going to be my part in the next patch set
-revision preparation and when my help is needed. I think I'll be able
-to allocate some evenings and a few weekend days for that in this
-month. I very much hope my work schedule will be less occupied in the
-next month.
-
--Serge(y)
-
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+SGkgT2xla3NpaiwNCg0KcGh5L21pY3JvY2hpcC5jIHdvdWxkIGJlIGEgZmlsZSBmb3IgdGhpcyAx
+MDBCYXNlLVRYIFBIWSBvZiBMQU45Mzd4Lg0KDQpUaGFua3MuDQpXb29qdW5nDQoNCj4gLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogT2xla3NpaiBSZW1wZWwgPG8ucmVtcGVsQHBl
+bmd1dHJvbml4LmRlPg0KPiBTZW50OiBUaHVyc2RheSwgSnVseSA0LCAyMDI0IDM6MDUgUE0NCj4g
+VG86IFdvb2p1bmcgSHVoIC0gQzIxNjk5IDxXb29qdW5nLkh1aEBtaWNyb2NoaXAuY29tPg0KPiBD
+YzogZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgYW5kcmV3QGx1bm4uY2g7IGVkdW1hemV0QGdvb2dsZS5j
+b207DQo+IGYuZmFpbmVsbGlAZ21haWwuY29tOyBrdWJhQGtlcm5lbC5vcmc7IHBhYmVuaUByZWRo
+YXQuY29tOyBBcnVuIFJhbWFkb3NzDQo+IC0gSTE3NzY5IDxBcnVuLlJhbWFkb3NzQG1pY3JvY2hp
+cC5jb20+OyBoa2FsbHdlaXQxQGdtYWlsLmNvbTsNCj4gbGludXhAYXJtbGludXgub3JnLnVrOyBZ
+dWlrbyBPc2hpbm8gLSBDMTgxNzcNCj4gPFl1aWtvLk9zaGlub0BtaWNyb2NoaXAuY29tPjsgVU5H
+TGludXhEcml2ZXINCj4gPFVOR0xpbnV4RHJpdmVyQG1pY3JvY2hpcC5jb20+OyBsaW51eC1rZXJu
+ZWxAdmdlci5rZXJuZWwub3JnOw0KPiBrZXJuZWxAcGVuZ3V0cm9uaXguZGU7IG5ldGRldkB2Z2Vy
+Lmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQtbmV4dCB2MSAxLzFdIG5ldDog
+cGh5OiBtaWNyb2NoaXA6IGxhbjkzN3g6IGFkZA0KPiBzdXBwb3J0IGZvciAxMDBCYXNlVFggUEhZ
+DQo+IA0KPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNo
+bWVudHMgdW5sZXNzIHlvdSBrbm93DQo+IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IEhpIFdv
+b2p1bmcsDQo+IA0KPiBPbiBUaHUsIEp1bCAwNCwgMjAyNCBhdCAwMzo0NDo1MlBNICswMDAwLCBX
+b29qdW5nLkh1aEBtaWNyb2NoaXAuY29tDQo+IHdyb3RlOg0KPiA+IEhpIE9sZWtzaWosDQo+ID4N
+Cj4gPiBXZSB1c2UgcGh5L21pY3JvY2hpcF90MS5jIGZvciBUMSBwaHkuIENhbiB5b3UgcGxlYXNl
+IHB1dCB0aGUgY2FzZSBpbg0KPiBkaWZmZXJlbnQgcGh5IGRyaXZlciBmaWxlPw0KPiANCj4gV2hp
+Y2ggZmlsZSB3b3VsZCB5b3Ugc3VnZ2VzdD8NCj4gDQo+IFJlZ2FyZHMsDQo+IE9sZWtzaWoNCj4g
+LS0NCj4gUGVuZ3V0cm9uaXggZS5LLiAgICAgICAgICAgICAgICAgICAgICAgICAgIHwNCj4gfA0K
+PiBTdGV1ZXJ3YWxkZXIgU3RyLiAyMSAgICAgICAgICAgICAgICAgICAgICAgfCBodHRwOi8vd3d3
+LnBlbmd1dHJvbml4LmRlLw0KPiB8DQo+IDMxMTM3IEhpbGRlc2hlaW0sIEdlcm1hbnkgICAgICAg
+ICAgICAgICAgICB8IFBob25lOiArNDktNTEyMS0yMDY5MTctMA0KPiB8DQo+IEFtdHNnZXJpY2h0
+IEhpbGRlc2hlaW0sIEhSQSAyNjg2ICAgICAgICAgICB8IEZheDogICArNDktNTEyMS0yMDY5MTct
+NTU1NQ0KPiB8DQo=
 
