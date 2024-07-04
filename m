@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CC5926D89
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:40:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C43A5926D8B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4A931C20E02
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511BD282A71
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8899FC02;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D500714AA9;
 	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rveda8gD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7t0F+Dn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A374517543
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A377617557;
+	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720060829; cv=none; b=eMKWkJeSfQn/LhSA7SFysXrrty8uN1Ut5JNjVmMsSklu/1F0AGoOGp0Xq958KwQXrwE/OGT1vR6bcTqQtrZJIdrMdEEKYsEMoEgfn7BpSnyc78XrRjc0HN3T4CtJdW1Y8BIwTbNCAj51GOKqjiMQfeYdaF2quE+cKJ6gSYComoI=
+	t=1720060829; cv=none; b=bLQwqfYIh92zKB6G6J9422JY93k6tVIfAOiJiJaO5zMUnQkWeVFg7Sou9h4U9/yDCRTTp1PDt08lTYGKg0O3y0OgVCnjDRXjUvQN6feYheXH9+N1+RktUDzhhPHUhspM4dimT7ldcKBByu45EPDbvjRsnWamg9UKzWwnfbNIkn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720060829; c=relaxed/simple;
-	bh=bp9st4QS2tJ9r7hD1G8amVRkD7w0Jtm5BEcxeqZg+0I=;
+	bh=2/wkO/DKiCzJSgP4LgFRca8mDh4nH/zUhrKYzOFIZew=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=swCvA7J1MvFW/CLLwHRgNhpBAWv+9U3r3D5iQwxYl0WplrV5gCCAJrfJR3Twrou+xR5OD5SIR2GWtmoqOwRldiok17K5W6cFerNR7BP9ylAZ2KaFXcxdSS3jWDXrIq64ZcCrXE3pzsSLFtQggD6CoGaTC/fvodB8LMNZzrqvOro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rveda8gD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B80DC4AF07;
+	 In-Reply-To:To:Cc; b=NUSOuZMFbuT+CMIWxjRuVWJoDOYHCv9qEoE6ovfnrabaJNyCpgig7v9LbDBYTQtEPvsehb6xq5Ky+Ce0QRYFcByMROxulqh75RaQxBaNkD9m53kkixYnv6A/xC0X6f7WAImj15tX/ht6jbxFJ5JxGPRkh0rfZHucxl5cl/ep0LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7t0F+Dn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13391C32781;
 	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720060829;
-	bh=bp9st4QS2tJ9r7hD1G8amVRkD7w0Jtm5BEcxeqZg+0I=;
+	bh=2/wkO/DKiCzJSgP4LgFRca8mDh4nH/zUhrKYzOFIZew=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rveda8gDtSbK7Z7bxrcc5W6M22v1oGvbnEUqMYcTQ6nqQ4WNc3pIP89wK082d3M2S
-	 e0YyrcbYgUAGZs4q+AHj3iGZqJfHzAQIIeiP7RY/OqTnHduCTdje4j5vZnO0tCbL+8
-	 wREeDSpE8kU0DTojdSB0/fIbIpbO+LhKS9UyFAqvIiRn6U/UyfTyt1bxf/vGsCgRT/
-	 m9n9gt2nisQodBAtuym+OoXVGnT5QQMFdE/SlOnJH2TnSbSveSBl0oVrCWvBS+gz08
-	 74nBM4yseGXJMVMwPsw7OytWUkzIKhm8/NFHYmWkeW+06WsKQL4RyEhd7Cnb7CdqMI
-	 CKEhRuhRd6ntw==
+	b=g7t0F+DnYiwuzwWK+rZhDf9d8eBcof/YJc5HmWQLJDfcZi4xrl+XvY2Z532uf2tyX
+	 rCchU4DHwZqrolp4gzzF4NlG2ePt52A2oqQUeDP/iw495qNqQukPvbA8OYr5Hr9yjK
+	 GniSDrFJooW6vc1MC3+Clgd8es5IawXG1feoxnXoK2DNFMbt2bFHju/YiOdB82txFu
+	 GQV74EnQPq9NV+kU1RENfQaKFPAPnzHM8tGL5JZdcE9Ig8C7HpxlClH5OYBN2mCb9b
+	 5jw2R4uTo5NFLZ7nPNhZfUiJfGWlzrjztVjQblBjg/tVywd4R39qW6u3ERYTMcW75k
+	 zhDF4NMq8STaQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0ABDBC43446;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0245CC43612;
 	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethtool: fix compat with old RSS context API
+Subject: Re: [PATCH net-next 0/3] selftests: openvswitch: Address some flakes in
+ the CI environment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172006082904.10999.3101326452343638462.git-patchwork-notify@kernel.org>
+ <172006082900.10999.9026063323208803275.git-patchwork-notify@kernel.org>
 Date: Thu, 04 Jul 2024 02:40:29 +0000
-References: <20240702164157.4018425-1-kuba@kernel.org>
-In-Reply-To: <20240702164157.4018425-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, przemyslaw.kitszel@intel.com, andrew@lunn.ch,
- ecree.xilinx@gmail.com, ahmed.zaki@intel.com
+References: <20240702132830.213384-1-aconole@redhat.com>
+In-Reply-To: <20240702132830.213384-1-aconole@redhat.com>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ pshelar@ovn.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, amorenoz@redhat.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  2 Jul 2024 09:41:57 -0700 you wrote:
-> Device driver gets access to rxfh_dev, while rxfh is just a local
-> copy of user space params. We need to check what RSS context ID
-> driver assigned in rxfh_dev, not rxfh.
-> 
-> Using rxfh leads to trying to store all contexts at index 0xffffffff.
-> From the user perspective it leads to "driver chose duplicate ID"
-> warnings when second context is added and inability to access any
-> contexts even tho they were successfully created - xa_load() for
-> the actual context ID will return NULL, and syscall will return -ENOENT.
+On Tue,  2 Jul 2024 09:28:27 -0400 you wrote:
+> These patches aim to make using the openvswitch testsuite more reliable.
+> These should address the major sources of flakiness in the openvswitch
+> test suite allowing the CI infrastructure to exercise the openvswitch
+> module for patch series.  There should be no change for users who simply
+> run the tests (except that patch 3/3 does make some of the debugging a bit
+> easier by making some output more verbose).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ethtool: fix compat with old RSS context API
-    https://git.kernel.org/netdev/net-next/c/1a16cdf77e0d
+  - [net-next,1/3] selftests: openvswitch: Bump timeout to 15 minutes.
+    https://git.kernel.org/netdev/net-next/c/ff015706fc73
+  - [net-next,2/3] selftests: openvswitch: Attempt to autoload module.
+    https://git.kernel.org/netdev/net-next/c/818481db3df4
+  - [net-next,3/3] selftests: openvswitch: Be more verbose with selftest debugging.
+    https://git.kernel.org/netdev/net-next/c/7abfd8ecb785
 
 You are awesome, thank you!
 -- 
