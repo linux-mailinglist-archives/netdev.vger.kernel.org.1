@@ -1,221 +1,128 @@
-Return-Path: <netdev+bounces-109167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D40F927322
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:35:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F58C927326
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC401C2136B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:35:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323901C213A9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD0F1A0B19;
-	Thu,  4 Jul 2024 09:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FD11A3BDD;
+	Thu,  4 Jul 2024 09:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="kyTMAa7R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XyVM4buK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEC8748F
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 09:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96458748F
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 09:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720085744; cv=none; b=XetNymEMRMfAoDaiyJYIWsCURW8YnqS+/ht7xEpyupGX6RO9egoJpHzvbhvyeLv6ybEQXtvFJY6T9ap8j1HvLtQXSViqB/QK7fCa4ydNOVygfXND9oNrydCw5jqYt4aNyFcY2F/vYY6KRezGoNpP0ksp47Z5JCiWYQWyk0WyXNY=
+	t=1720085806; cv=none; b=cKMbbtwMZlRiFJiawMvorv2HZIIKYvMHkDmK8ipYRrjUPjatpi80/v+VOK/6dQpxoA4ml5SS4p/veV5Opifwe4TsakWRfXud9uzOuAWjNI7tEtQ5kNoNZuqihiBeMhUAnhj6XLj/OBGLcUZhI6nD9mWlruLTBsoNHuutCQJc+94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720085744; c=relaxed/simple;
-	bh=Oy7dKvHiGFYXx+I7lg+7RcbtYemeYKr5TDO40BXEiQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G29cvtVePefZBITINdc+o6KFIQdarD8LlumUD5N/YOlf7Pnl6ZwVENY5R/HoOj0DzOHZOomZosYPZzPv/Cv/lvrSzK4M0GTXLxHQBugIF3yVKqBJNC1f8R0KUWYO3txK+avvpASi+kV67uerV+GQveCtG/LFCEYvY3dukTDG7Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=kyTMAa7R; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 83B7A3F6AF
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 09:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1720085735;
-	bh=wiJxNUkYycJsSDpu62b6poSEZxZfrfFCF631xd6P5LQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=kyTMAa7RrAJ7OhpJXhkJxSCGqucEmOrGYka4wMQW2ned8L0BBfi0WUoMtunHQDQAw
-	 OaJykP/n48uUu8fqrtc41iisI5WsujfxaUjSmc+KMKc9buxkD3Gf4Mva2lGZ7bHkd1
-	 wBn5tuxnfgHGYCwAyNeGX8ZaJDqVanNr8KecOrGqUuUvxGYQtxlzBHQAGnlAkzmljU
-	 GOwVeeUrl/S5QWkQXD48bxKpQYxXF0UCQibZ15EMDu2N3PrbTyTlHJYJ3Jh5o9Q1BY
-	 9iSMMQngJt5n7+NkW97mKWfL8Zqf9CgVixqulA5EtpQwMIe+0M+ELHXUb47CxyS+75
-	 yjnEFEruFAjEA==
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1f6810e43e0so4536205ad.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 02:35:35 -0700 (PDT)
+	s=arc-20240116; t=1720085806; c=relaxed/simple;
+	bh=UYHgdrm5mVpms80udoSPFvlRdflG4BHyFvKupYGXpkE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Zxo4JYPJe39PfBG277iE+e7gv/leebN5CT+vsJtzZk4g+jABl9YjV2DFWUehjwkGlH65eww/zQY6KAR2bKitkbv2xmkZzYDQIyjMa0dWf1PJaf98fQGheiyxctxPjjdEr9/Qv7E0sdEe1iPO0DHTlRtPwK4KCwwHSyoCmq4gSwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XyVM4buK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720085803;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UYHgdrm5mVpms80udoSPFvlRdflG4BHyFvKupYGXpkE=;
+	b=XyVM4buK4rW8FCPWDXXzzeCtfL7gSmwuaJQSqs02XCDghVw5EyFF7KVRsxBXJvDmy3Oy5v
+	GiqSvyzHr4n1n+93J4BR2ksZgYG5UB47V04yQjb1uOZ9Pe3NLMJ2068iKt+wUwb8lIOAOQ
+	Si8w4+RdtSHRLVNqOi3OC0kHeaWS5ZU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-154-GfO6gsCQPbqORQWFOrv55w-1; Thu, 04 Jul 2024 05:36:39 -0400
+X-MC-Unique: GfO6gsCQPbqORQWFOrv55w-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36795758ce3so80778f8f.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 02:36:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720085734; x=1720690534;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wiJxNUkYycJsSDpu62b6poSEZxZfrfFCF631xd6P5LQ=;
-        b=T7BHCs1gXbQSF6mI+zMmdMkKuOsxzKdzV1cYD3JZxBEShjERyi/oyW9u4cqHuTS1NO
-         ubDmmeB3V9P9GX2I6Uh+DnckGZ9Lt5UEUm/mf2m3i7fCruikyFVutZSGd+KpSzpfruD8
-         +DmzfVMCR/p4baD77VO1+w0usSGxV6j2bKYQSQL4fcZDgW8mJQE4TcbXYnpj+iRB9HCC
-         FUGrEC6ODQBpfk+Vdl3ElRnlFjM4mytp2BRPsYf5noaImvpYjltbyXcDFzvB8B8DfmkN
-         W91FK5ZflqeNQhbJx+nAMnGNMovrGjvPIeNnosCzdo0xW7xlBPuQEtFNvBznUOWoBJqp
-         jtjg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Wt4gO5o6Pwc8KSSG29AqVo5vWzuIszedPGO4VoUSvQxbiUENAKRDYUtCd2g9CGZrB7/E1G22EIfbhJLC5cXTYrK5s9GS
-X-Gm-Message-State: AOJu0Yyv8ag8vuFb3w6r3+K3aUIGdzYeB2p9BQpBhcvOgYNNFOUZBeR7
-	Zf5Kod7TrKguPt5SSfQyxkNbA9Ca4Om/JsXzJ517Cy3+aHwUYomldnFjoTkQ4OXflr5crHOU3Vq
-	E8CU89F5wWr7cGDvMPTAZbFN3McOB4+ROQ+CCnu6zM7vKlnyI4jHWbghUzGnzRBjeZJ8iJQ==
-X-Received: by 2002:a17:902:cecb:b0:1fb:2e1d:acdb with SMTP id d9443c01a7336-1fb37047770mr13990595ad.12.1720085733622;
-        Thu, 04 Jul 2024 02:35:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOXt2HSyqcWAnEGOSShpHjEDdGJVAIPy5yyNQs45QakgMU34R+QMFUZG8sl5Weo2rhUKkcsg==
-X-Received: by 2002:a17:902:cecb:b0:1fb:2e1d:acdb with SMTP id d9443c01a7336-1fb37047770mr13990185ad.12.1720085733186;
-        Thu, 04 Jul 2024 02:35:33 -0700 (PDT)
-Received: from chengendu.. (2001-b011-381c-3667-42c0-8e79-026a-04b5.dynamic-ip6.hinet.net. [2001:b011:381c:3667:42c0:8e79:26a:4b5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac15992a0sm118498515ad.263.2024.07.04.02.35.26
+        d=1e100.net; s=20230601; t=1720085798; x=1720690598;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYHgdrm5mVpms80udoSPFvlRdflG4BHyFvKupYGXpkE=;
+        b=rMrWDBzroQ9a2/xJqd0P/OjNNl5IjX1PEpiMwwoe++zCVPZCCQY4EqVRvXnC8JE+LS
+         SpN2lmUVRrOblYE9tPmc3UpbSkZRIWCRD3mRBzq4byoO4yAHBUf81dmDY9hlntBIShJR
+         k/+gZLkeBxCnYZd1+4OxPWZjrnsyyweRI3piVjalew82Qbi0cCNxKO6m6Ud5Um1leVkl
+         VkPxfl0tPVhvWV4UyQMRIXxaSn4EMMwymUz5gAqcCTW2jJwHZQkFhKTrK75pZtUf74GG
+         cEF5r45IS6DziNzkcOQQOq5EF1luIXBO+xm34boO4ko5pkPIB7L3P2M25SghNhAmurTF
+         qI3w==
+X-Forwarded-Encrypted: i=1; AJvYcCW3XVwJOh1RRXGvS8JTTSAGdck8iLbV5TpUjuVM6SFl1gF8UHIhUIHkvL5KIM0+kYXNs2insRigxm45/opdnyz4poG2ZqbG
+X-Gm-Message-State: AOJu0Yy7A75n2Z872/TXSu0vfFgmw2ZObZCuaZaaGltVcdvNwbdQ4ZB0
+	y0E+40CZbeeNP31880uChvf57KLy/pO+boO2vXIkKDOc/QSENf7D8SQ2jgcd5VMx8E3FOb6Q2Bb
+	3GKyjP+zlZafgCu4qljEeszCUhwVrXXoLD5NAm+PtgA7HzE00W4BgyQ==
+X-Received: by 2002:a05:6000:1847:b0:35f:2584:76e9 with SMTP id ffacd0b85a97d-3679dd170acmr808216f8f.2.1720085798704;
+        Thu, 04 Jul 2024 02:36:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHqMYfRCeOduG8hmxDn1os8aMqWyFiuk1czJ0qPOICA/k5l/iFZ0n0rpzcYV6E3kNOasUJjEg==
+X-Received: by 2002:a05:6000:1847:b0:35f:2584:76e9 with SMTP id ffacd0b85a97d-3679dd170acmr808204f8f.2.1720085798363;
+        Thu, 04 Jul 2024 02:36:38 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:172b:1510:dd78:6ccd:a776:5943])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0cd784sm18022859f8f.7.2024.07.04.02.36.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 02:35:32 -0700 (PDT)
-From: Chengen Du <chengen.du@canonical.com>
-To: jhs@mojatatu.com
-Cc: xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ozsh@nvidia.com,
-	paulb@nvidia.com,
-	marcelo.leitner@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chengen Du <chengen.du@canonical.com>,
-	Gerald Yang <gerald.yang@canonical.com>
-Subject: [PATCH] net/sched: Fix UAF when resolving a clash
-Date: Thu,  4 Jul 2024 17:34:58 +0800
-Message-ID: <20240704093458.39198-1-chengen.du@canonical.com>
-X-Mailer: git-send-email 2.43.0
+        Thu, 04 Jul 2024 02:36:37 -0700 (PDT)
+Message-ID: <65153ac3f432295a89b42c8b9de83fcabdefe19c.camel@redhat.com>
+Subject: Re: [PATCH net-next] ntp: fix size argument for kcalloc
+From: Paolo Abeni <pabeni@redhat.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Chen Ni
+ <nichen@iscas.ac.cn>
+Cc: oss-drivers@corigine.com, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, louis.peens@corigine.com, kuba@kernel.org, 
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+ yinjun.zhang@corigine.com, johannes.berg@intel.com,
+ ryno.swart@corigine.com,  ziyang.chen@corigine.com, linma@zju.edu.cn,
+ niklas.soderlund@corigine.com
+Date: Thu, 04 Jul 2024 11:36:36 +0200
+In-Reply-To: <5cafbf6e-37ad-4792-963e-568bcc20640d@intel.com>
+References: <20240703025625.1695052-1-nichen@iscas.ac.cn>
+	 <5cafbf6e-37ad-4792-963e-568bcc20640d@intel.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-KASAN reports the following UAF:
+On Wed, 2024-07-03 at 11:16 +0200, Przemek Kitszel wrote:
+> On 7/3/24 04:56, Chen Ni wrote:
+> > The size argument to kcalloc should be the size of desired structure,
+>=20
+> xsk_pools is a double pointer, so not "desired structure" but rather you
+> should talk about an element size.
+>=20
+> > not the pointer to it.
+> >=20
+> > Fixes: 6402528b7a0b ("nfp: xsk: add AF_XDP zero-copy Rx and Tx support"=
+)
+>=20
+> even if the the behavior is not changed, the fix should be targeted to
+> net tree
 
- BUG: KASAN: slab-use-after-free in tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
- Read of size 1 at addr ffff888c07603600 by task handler130/6469
+This patch is IMHO more a cleanup than a real fix. As such it's more
+suited for net-next. For the same reason I think it should not go to
+stable, so I'm dropping the fixes tag, too.
 
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x48/0x70
-  print_address_description.constprop.0+0x33/0x3d0
-  print_report+0xc0/0x2b0
-  kasan_report+0xd0/0x120
-  __asan_load1+0x6c/0x80
-  tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
-  tcf_ct_act+0x886/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-  __irq_exit_rcu+0x82/0xc0
-  irq_exit_rcu+0xe/0x20
-  common_interrupt+0xa1/0xb0
-  </IRQ>
-  <TASK>
-  asm_common_interrupt+0x27/0x40
+Thanks,
 
- Allocated by task 6469:
-  kasan_save_stack+0x38/0x70
-  kasan_set_track+0x25/0x40
-  kasan_save_alloc_info+0x1e/0x40
-  __kasan_krealloc+0x133/0x190
-  krealloc+0xaa/0x130
-  nf_ct_ext_add+0xed/0x230 [nf_conntrack]
-  tcf_ct_act+0x1095/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-
- Freed by task 6469:
-  kasan_save_stack+0x38/0x70
-  kasan_set_track+0x25/0x40
-  kasan_save_free_info+0x2b/0x60
-  ____kasan_slab_free+0x180/0x1f0
-  __kasan_slab_free+0x12/0x30
-  slab_free_freelist_hook+0xd2/0x1a0
-  __kmem_cache_free+0x1a2/0x2f0
-  kfree+0x78/0x120
-  nf_conntrack_free+0x74/0x130 [nf_conntrack]
-  nf_ct_destroy+0xb2/0x140 [nf_conntrack]
-  __nf_ct_resolve_clash+0x529/0x5d0 [nf_conntrack]
-  nf_ct_resolve_clash+0xf6/0x490 [nf_conntrack]
-  __nf_conntrack_confirm+0x2c6/0x770 [nf_conntrack]
-  tcf_ct_act+0x12ad/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-
-The ct may be dropped if a clash has been resolved but is still passed to
-the tcf_ct_flow_table_process_conn function for further usage. This issue
-can be fixed by retrieving ct from skb again after confirming conntrack.
-
-Fixes: 0cc254e5aa37 ("net/sched: act_ct: Offload connections with commit action")
-Co-developed-by: Gerald Yang <gerald.yang@canonical.com>
-Signed-off-by: Gerald Yang <gerald.yang@canonical.com>
-Signed-off-by: Chengen Du <chengen.du@canonical.com>
----
- net/sched/act_ct.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 2a96d9c1db65..079562f6ca71 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1077,6 +1077,13 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
- 		 */
- 		if (nf_conntrack_confirm(skb) != NF_ACCEPT)
- 			goto drop;
-+		/* The ct may be dropped if a clash has been resolved,
-+		 * so it's necessary to retrieve it from skb again to
-+		 * prevent UAF.
-+		 */
-+		ct = nf_ct_get(skb, &ctinfo);
-+		if (!ct)
-+			goto drop;
- 	}
- 
- 	if (!skip_add)
--- 
-2.43.0
+Paolo
 
 
