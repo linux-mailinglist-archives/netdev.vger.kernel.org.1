@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E806926D71
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:30:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15DB8926D70
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB1191F22C27
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:30:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE9191F22D26
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA7812B82;
-	Thu,  4 Jul 2024 02:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F83DDC3;
+	Thu,  4 Jul 2024 02:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2aHYHy6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aO02bzCj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED01CFC02
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 02:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98CF1DA334;
+	Thu,  4 Jul 2024 02:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720060229; cv=none; b=lOM2VlQ+S9aPM9DzgP+KLDgElUu+dt42aYued9b5kx6l+92OyviUNsDKfODt7YEjIRC9j7TZg0i8ItiCAYcfnpTaqGZHSvmxwP+Z5DfJWurx0pXs/EvXcJ0nHasuWdTmL8ROSMxJQCRC4bf/9ldMGzKTL+0gTooOmc+hLcEw7uo=
+	t=1720060228; cv=none; b=UuKg1zisZbGxl1x/VDbdaGCNP4yhvyMyuN8Pf1HzJ3GEn8SFJgu8xkqZF3YNbCkUATbMPa26TbBYyJYweW5Dt03ySDtTv0VQ9X6ptAhmFzqt7jKYZDuBD14ugih5EKDP6Y1TW7oEvZ4fie+aMFGwaXQs+Gz3xlLA56YR1+I1YSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720060229; c=relaxed/simple;
-	bh=Y0oT0x81D7NSX5F0Q5aylZte8X5OF92Itj1icNn7IQ8=;
+	s=arc-20240116; t=1720060228; c=relaxed/simple;
+	bh=eGoaTL7YIMj9E4dmJnynaJLUdEB90a5ASRmAa84CSyQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Llft9QBDuAjzEG/7WZLl0qd5PfM8F/gLvWlxVrw4vCrZutfOUdlcvhSl0RjKuJPK0FiOy5/uOxtOqlIjsalpssnCodt59rICtWLLG208uiXDuN77ShQFKNYLA/B3NhdCeR0/lW1ly8WhbbSY+68EeXOquiJf4NRC/JlHg629D0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2aHYHy6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FADFC4AF0F;
+	 In-Reply-To:To:Cc; b=PYGLdwe3tocKc4fxaym5h3+ts+VIclaSddWS/oFAlk4OP4Fa7UjJKw3IEqEx0zM5LcLR/XqM+RelLUjCvSq8i9Atgfo/cZ5ABNrcz6u7MjHAEZSwH0eqYswaqLMAQiMYCUzMDs6qSevxdZOPgnerzP5IWDpW7wNHkYmsetZAq20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aO02bzCj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 34799C3277B;
 	Thu,  4 Jul 2024 02:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720060228;
-	bh=Y0oT0x81D7NSX5F0Q5aylZte8X5OF92Itj1icNn7IQ8=;
+	bh=eGoaTL7YIMj9E4dmJnynaJLUdEB90a5ASRmAa84CSyQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M2aHYHy6zsM200w1DmIGbatvq5vPrtSYrpSIvrS1k/2FCNMFmseBQDRNTq2t4LdUR
-	 TRa2nxqWilA91Qedn4Cyi+ppdorZHeLGlaUm+RIaKyuIfUnaLU3VR6RSobIOmIPjCP
-	 YBQVAHJWXHLJLlIQ36uosUYI4RBefKidogShyHIa0LT509Kd3hDjH+aIXVPgkvxMsM
-	 VXLH8NVo3kRNVde+NKu1xkJxzVn7jKt3NHSyYWIpSDyyVnD5mnHfaYFbrvxr17YVfT
-	 EzB0olodUSWHRDs+WHAopAnu+dKR3dqDpwf1bF2D6B8x7y4qgVMGc4Dkv62kwFNSL1
-	 AW/NGJybePb9Q==
+	b=aO02bzCjZU+y+Ly/mH0674pqcJdQNIan8R7AWDP9mCewVMJoRi7UB2nnvp3UBE0e4
+	 q/jhGBy+G46ZEagmimdALcZyXi95KseyNpLF+tRDQ3AjxMijOLIZxhczewxndrJwnQ
+	 XiD7GKzzjdGg4fvm8ZoQtreNw0XAQv3rpLCLcRKXepNSWyuNZaHKZm06KMqguznTIR
+	 wky7ZVSUMcZAl9ea5MRzu0nZMaP5fEx6kG/ukb0VF3dJajU9FV3XqbHp1aiobUoFqv
+	 +o94ulJFgfzeIhLlEW7keNkoy6aS+4b32VGIkkaeXe0Fx5wXY7p5Ve1OLifcTMAKQ6
+	 QKUwlTBZZumTw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 85AA8C433A2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 24DECC43446;
 	Thu,  4 Jul 2024 02:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: drv-net: rss_ctx: allow more noise on
- default context
+Subject: Re: [PATCH] net: rswitch: Avoid use-after-free in rswitch_poll()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172006022854.6400.9654309823031582639.git-patchwork-notify@kernel.org>
+ <172006022814.6400.15151962053735623334.git-patchwork-notify@kernel.org>
 Date: Thu, 04 Jul 2024 02:30:28 +0000
-References: <20240702233728.4183387-1-kuba@kernel.org>
-In-Reply-To: <20240702233728.4183387-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, dw@davidwei.uk, petrm@nvidia.com, willemb@google.com
+References: <20240702210838.2703228-1-rrendec@redhat.com>
+In-Reply-To: <20240702210838.2703228-1-rrendec@redhat.com>
+To: Radu Rendec <rrendec@redhat.com>
+Cc: yoshihiro.shimoda.uh@renesas.com, davem@davemloft.net, pabeni@redhat.com,
+ niklas.soderlund+renesas@ragnatech.se, kuba@kernel.org, horms@kernel.org,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  2 Jul 2024 16:37:28 -0700 you wrote:
-> As predicted by David running the test on a machine with a single
-> interface is a bit unreliable. We try to send 20k packets with
-> iperf and expect fewer than 10k packets on the default context.
-> The test isn't very quick, iperf will usually send 100k packets
-> by the time we stop it. So we're off by 5x on the number of iperf
-> packets but still expect default context to only get the hardcoded
-> 10k. The intent is to make sure we get noticeably less traffic
-> on the default context. Use half of the resulting iperf traffic
-> instead of the hard coded 10k.
+On Tue,  2 Jul 2024 17:08:37 -0400 you wrote:
+> The use-after-free is actually in rswitch_tx_free(), which is inlined in
+> rswitch_poll(). Since `skb` and `gq->skbs[gq->dirty]` are in fact the
+> same pointer, the skb is first freed using dev_kfree_skb_any(), then the
+> value in skb->len is used to update the interface statistics.
+> 
+> Let's move around the instructions to use skb->len before the skb is
+> freed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: drv-net: rss_ctx: allow more noise on default context
-    https://git.kernel.org/netdev/net-next/c/0b8774586be5
+  - net: rswitch: Avoid use-after-free in rswitch_poll()
+    https://git.kernel.org/netdev/net/c/9a0c28efeec6
 
 You are awesome, thank you!
 -- 
