@@ -1,105 +1,120 @@
-Return-Path: <netdev+bounces-109322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC4B927E76
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 23:12:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7273B927EBB
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 23:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EFB5281972
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:12:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14C011F22B1E
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DBC139597;
-	Thu,  4 Jul 2024 21:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DFC14389F;
+	Thu,  4 Jul 2024 21:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EGhoQSVd"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="n/69CsbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCE01755B;
-	Thu,  4 Jul 2024 21:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F341411E9;
+	Thu,  4 Jul 2024 21:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720127518; cv=none; b=izH5Dv6RqGci9+BfviWauX+maWgIBWHvL0UWA+i+Bi295F6NKYQh8kDycuKtHEjEwe1S7jApHFJmpkdTdgn/aihf/c60dES/IbcUwpLzabtcJtX2p2DO9qAfBw7k31lHu0CWislciCBNSvjqTNKDhnDtJoplIWaE/ezgk/ay5gQ=
+	t=1720129535; cv=none; b=Xcox3U2yeMoaoMVBxeySILyjgLcia5n/9JUt8nI51yPyPihm2zVBdD0B9rSItbNuUirSAVvssGK4pD/zlrvlMHhCwDSjC7ZBoDllsnEr/CE3DxUFi9EQZXVhC9Z4zIJumx5xQAUrChXs2dscOS343FVJmlvDYQyfIxPVKr0/A1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720127518; c=relaxed/simple;
-	bh=1HtV605rr1/Y3GdSz1tJZ3XhiXaiq/FJwY3hYlYAuq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0YwVyn2Mq37kO0fwry7CAuUERDkDomNlsA9x4XjGkiccURbDdRRH9rUdllcEm5KRxVxYJmgjruFe7p5sGKw0o3MaQHRmJlmSG4Kvq1cuJlwlRGMIsKt2gFvheSXZZUC1WSU1mDguieRkTBvSzeXvBmgnoIxSu4qGbvD1t71/UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EGhoQSVd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iS4Ki0FfgKFDGFlTkcQJD+T+q8NKxHbuR15GMQm4etM=; b=EGhoQSVdSKOnHDaL16nn+ug5Si
-	zukYO68rDkOFds4nGPLCNHEQqOgCqOEQWCETTUMe2dUduxmH08c11Mx7BWZTwuBcYBZJjiTDAoU58
-	CZLQgJ4qJ3Z6pdKLWJSm8tPF6s0tWy6vsPer5mn6jwS7/LUUYca1Yv2i+cCKMlD5f/4A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sPTjx-001qMx-7h; Thu, 04 Jul 2024 23:11:41 +0200
-Date: Thu, 4 Jul 2024 23:11:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Conor Dooley <conor@kernel.org>
-Cc: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>,
-	florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 3/4] dt-bindings: ethernet-phy: add optional brr-mode
- flag
-Message-ID: <35d571bd-251d-45b5-9e4f-93c83d1a43c8@lunn.ch>
-References: <20240704140413.2797199-1-kamilh@axis.com>
- <20240704140413.2797199-4-kamilh@axis.com>
- <20240704-snitch-national-0ac33afdfb68@spud>
+	s=arc-20240116; t=1720129535; c=relaxed/simple;
+	bh=CQYRZeEJYehwol1s8+mG6Q+2ubuR3CvZFq0eup2MD64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ExjSlFs+wGHFjll5y5gLhYRuaqcPs240+94NScFsjQX3wBNLo95DI3zS4sQBeOqPKEMJ4tmeR0fgrTjlYM3cQWk03D/rHiC0GsXiiWxZyO+HIm0q+ljiWNZZHYfoM43RVl2DzSYM7MXx+/RInQuaO6X1t+cRil7BS5BJadcpFsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=n/69CsbT; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1720129521;
+	bh=CQYRZeEJYehwol1s8+mG6Q+2ubuR3CvZFq0eup2MD64=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=n/69CsbTkiO93w/BWlUW309bIbnR67JDjVvSm5YJ88PM8D0Rw7HwIQwikGTMczCE/
+	 vQjWZRsKwOe1/dL/4nqN7NPNmQo81yFsx4xt9bg4yR+6K5Hzy/AzRHBmjNW0dOmGwE
+	 Cmp4jwrh3eUwJZvKUfuHL7DUuVO13IXpGpft4dnfCWjYEgOgM2ZMDV3FJRW2Vv6XQg
+	 WDaKB81bXBAPW6d+hXGvkm/IKbtx6amFziijSXEBt7yEMpKCnUazOIbk0So5hbswUd
+	 W+lQWSrW7eJJ9bo24fyKHPF6MQHDLZ4czU8f/bMsEhDe8g+XaKf9mfG5AOMrugVfmZ
+	 JN9o5+na0tkKg==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id E3C8360079;
+	Thu,  4 Jul 2024 21:45:20 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id AEDB4201F16;
+	Thu, 04 Jul 2024 21:45:14 +0000 (UTC)
+Message-ID: <7db43f91-80d5-4034-ab25-f589e5510024@fiberby.net>
+Date: Thu, 4 Jul 2024 21:45:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240704-snitch-national-0ac33afdfb68@spud>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/9] net/sched: flower: define new tunnel flags
+To: Jakub Kicinski <kuba@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, Davide Caratti <dcaratti@redhat.com>,
+ Ilya Maximets <i.maximets@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ratheesh Kannoth <rkannoth@marvell.com>,
+ Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org
+References: <20240703104600.455125-1-ast@fiberby.net>
+ <20240703104600.455125-2-ast@fiberby.net>
+ <b501f628-695a-488e-8581-fa28f4c20923@intel.com>
+ <20240703172039.55658e68@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20240703172039.55658e68@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> > ---
-> >  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > index 8fb2a6ee7e5b..349ae72ebf42 100644
-> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > @@ -93,6 +93,14 @@ properties:
-> >        the turn around line low at end of the control phase of the
-> >        MDIO transaction.
-> >  
-> > +  brr-mode:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      If set, indicates the network cable interface is alternative one as
-> > +      defined in the BroadR-Reach link mode specification under 1BR-100 and
-> > +      1BR-10 names. The driver needs to configure the PHY to operate in
-> > +      BroadR-Reach mode.
+Hi Kuba and Alexander,
+
+On 7/4/24 12:20 AM, Jakub Kicinski wrote:
+> On Wed, 3 Jul 2024 12:59:54 +0200 Alexander Lobakin wrote:
+>>>   enum {
+>>>   	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
+>>>   	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
+>>> +	/* FLOW_DIS_ENCAPSULATION (1 << 2) is not exposed to userspace */
+>>
+>> Should uAPI header contain this comment? FLOW_DIS_ENCAPSULATION is an
+>> internal kernel definition, so I believe its name shouldn't leak to the
+>> userspace header.
 > 
-> I find this second sentence unclear. Does the driver need to do
-> configure the phy because this mode is not enabled by default or because
-> the device will not work outside of this mode.
+> Also since it's internal, can avoid the gap in uAPI and make
+> ENCAPSULATION be something like "last uAPI bit + 1" ?
 
-BroadR-Reach uses one pair. Standard 10/100Mbps ethernet needs 2 pair,
-and 1G needs 4 pair. So any attempt to use standard 10/100/1G is going
-to fail, the socket/plug and cable just don't work for anything other
-than BroadR-Reach.
+Would the below work?
 
-As far as i understand it, the PHY could be strapped into BroadR-Reach
-mode, but there is no guarantee it is, so we should also program it to
-BroadR-Reach mode if this property is present.
+-#define FLOW_DIS_IS_FRAGMENT   BIT(0)
+-#define FLOW_DIS_FIRST_FRAG    BIT(1)
+-#define FLOW_DIS_ENCAPSULATION BIT(2)
++/* The control flags are kept in sync with TCA_FLOWER_KEY_FLAGS_*, as those
++ * flags are exposed to userspace in some error paths, ie. unsupported flags.
++ */
++enum flow_dissector_ctrl_flags {
++       FLOW_DIS_IS_FRAGMENT            = TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT,
++       FLOW_DIS_FIRST_FRAG             = TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
++       FLOW_DIS_F_TUNNEL_CSUM          = TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM,
++       FLOW_DIS_F_TUNNEL_DONT_FRAGMENT = TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT,
++       FLOW_DIS_F_TUNNEL_OAM           = TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM,
++       FLOW_DIS_F_TUNNEL_CRIT_OPT      = TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT,
++
++       /* These flags are internal to the kernel */
++       FLOW_DIS_ENCAPSULATION          = (TCA_FLOWER_KEY_FLAGS_MAX << 1),
++};
 
-	Andrew
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
