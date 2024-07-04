@@ -1,50 +1,58 @@
-Return-Path: <netdev+bounces-109180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37313927413
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:30:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9279E927427
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68AA11C21813
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:30:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D6A5B21F4A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16AA1A0AEA;
-	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pbm2slpJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32C21ABC3D;
+	Thu,  4 Jul 2024 10:36:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp134-24.sina.com.cn (smtp134-24.sina.com.cn [180.149.134.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9161D696
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64E11ABC32
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720089029; cv=none; b=LWwHFeGUYj6dNDASVCgjxAyAhhXohix3seRnVNu3V9qQqFNJU9PGI8sES34W8iU2BXqL48VCL6v0M4LNIZzrfgEY5AEaiPsndg24C43pVKUL+kJQiHBEWKKHDMQFwEn+RI13uZrx9v2T+pmHef0eOeyGunc+MMvxBvSFgQHXSKY=
+	t=1720089375; cv=none; b=s8A7xED57e/RL0tOtPvGEVOG0tGDHBAl+Xes69pafvXZdPrHmRSIoE3hdjt/tKtipaA3LEBqMFbZiKQpz0VWDU7vIdMqyWex8wflNyNvlOJDis2CnJKPL5OI1GKl0Y8LyBnNUN1ANUz+v0aLH6Ot/D1kXK3j+6C2T4qllEUvXss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720089029; c=relaxed/simple;
-	bh=CET3sWaZQexn4QPdCuliU2XqHB7GdEGqL7gZHBWIMhY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=esymjllge+fjWkd8XHlEG4UStHRCFuSwTxoXm+u/wgBpMXus3eMGDrTPy4vhvK/lEYQG5tQ7UY5liOv1lBb0vkSd+Bt7d1acHXHfJimqta7vA0ik236MQKbywD0C3AZ3F7y7nL2Ty1lrxF2/K3yA/k5rttgxWKysETLNKkzx4Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pbm2slpJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B0B8C4AF0A;
-	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720089029;
-	bh=CET3sWaZQexn4QPdCuliU2XqHB7GdEGqL7gZHBWIMhY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Pbm2slpJbsQZe+S2AjY/2NTlYablrFmDi75ec2RzUv1yfbxtORhTLXrX8qJetBnlp
-	 8xHh7GneTmagAFeRAFIvXeoFIVV7hiW6fTypPe2qs4sQeM+U9JE59d3/fw902iDTKx
-	 IZaqubEsUBRpzTYgwiCpKw5s5wxPbBJ9uQnJQKb2QKuIJdE7Yw1scSBd/iDk5SA9C5
-	 AyxJ2fow9RUabvXrCqvMgs5YG0+/4a2ABDmesBUrZKZI6xU2Pnc9Uz8g79H9GhZdQl
-	 t8Hgupko1kw31p+b3wYCuPgBOesgMMfbbW0FdEEkM8astTj+MyfbLbgumjI3+CLxil
-	 +aYCm1UgLmv2A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 219EEC43446;
-	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720089375; c=relaxed/simple;
+	bh=F0U+LFngqNZTjEjSJVQJ9Hzl5vylWxE0tv1FzcykhCY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=rS0zNPPbLv7R0fFRznMkJLKTIgVMCEhV5BqD+xYx8UaEmAPrsdZfIzJbNinbUhJYeZvDtS/zSeXtIGfAyUEULnDhpvbvdrmmZXfyknfdTkbhxJkGn1OrcPCVYCvng1VTx6MNXy1erVCrlWRvWi7Vi65W5FUsjQm/gczwR60XEtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.65.201])
+	by sina.com (10.185.250.21) with ESMTP
+	id 66867AEB00007F26; Thu, 4 Jul 2024 18:35:25 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6097673408358
+X-SMAIL-UIID: BAA4D347F2CB48EBA17B1782EB4B3DA7-20240704-183525-1
+From: Hillf Danton <hdanton@sina.com>
+To: Florian Westphal <fw@strlen.de>
+Cc: netfilter-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
+Date: Thu,  4 Jul 2024 18:35:14 +0800
+Message-Id: <20240704103514.3035-1-hdanton@sina.com>
+In-Reply-To: <20240703130107.GB29258@breakpoint.cc>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +60,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for TCP
- AO.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172008902913.22684.433848898987679005.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jul 2024 10:30:29 +0000
-References: <20240703033508.6321-1-kuniyu@amazon.com>
-In-Reply-To: <20240703033508.6321-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, 0x7f454c46@gmail.com,
- kuni1840@gmail.com, netdev@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 2 Jul 2024 20:35:08 -0700 you wrote:
-> When we process segments with TCP AO, we don't check it in
-> tcp_parse_options().  Thus, opt_rx->saw_unknown is set to 1,
-> which unconditionally triggers the BPF TCP option parser.
+On Wed, 3 Jul 2024 15:01:07 +0200 Florian Westphal <fw@strlen.de>
+> Hillf Danton <hdanton@sina.com> wrote:
+> > On Wed, 3 Jul 2024 12:52:15 +0200 Florian Westphal <fw@strlen.de>
+> > > Hillf Danton <hdanton@sina.com> wrote:
+> > > > Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
+> > > > if trans outlives table.
+> > > 
+> > > trans must never outlive table.
+> > > 
+> > What is preventing trans from being freed after closing sock, given
+> > trans is freed in workqueue?
+> > 
+> > 	close sock
+> > 	queue work
 > 
-> Let's avoid the unnecessary BPF invocation.
+> The notifier acquires the transaction mutex, locking out all other
+> transactions, so no further transactions requests referencing
+> the table can be queued.
 > 
-> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+As per the syzbot report, trans->table could be instantiated before
+notifier acquires the transaction mutex. And in fact the lock helps
+trans outlive table even with your patch.
+
+	cpu1			cpu2
+	---			---
+	transB->table = A
+				lock trans mutex
+				flush work
+				free A
+				unlock trans mutex
+
+	queue work to free transB
+
+> The work queue is flushed before potentially ripping the table
+> out.  After this, no transactions referencing the table can exist
+> anymore; the only transactions than can still be queued are those
+> coming from a different netns, and tables are scoped per netns.
 > 
-> [...]
-
-Here is the summary with links:
-  - [v1,net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for TCP AO.
-    https://git.kernel.org/netdev/net/c/4b74726c01b7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Table is torn down.  Transaction mutex is released.
+> 
+> Next transaction from userspace can't find the table anymore (its gone),
+> so no more transactions can be queued for this table.
+> 
+> As I wrote in the commit message, the flush is dumb, this should first
+> walk to see if there is a matching table to be torn down, and then flush
+> work queue once before tearing the table down.
+> 
+> But its better to clearly split bug fix and such a change.
 
