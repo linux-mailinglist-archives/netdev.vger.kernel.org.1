@@ -1,94 +1,80 @@
-Return-Path: <netdev+bounces-109311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69450927D92
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:05:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 870B3927DDE
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:37:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A4811C23569
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:05:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14DBBB216B8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434A051C42;
-	Thu,  4 Jul 2024 19:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CB11369B8;
+	Thu,  4 Jul 2024 19:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="moLC8QlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4233049629
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 19:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C3E4CB28;
+	Thu,  4 Jul 2024 19:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720119920; cv=none; b=QIcqXU1xg7LRfkZPdcGbwDD6Fd/AvUelH6KONipdGCj9WxVQzYd16HXyuWfI4RSrUyL0d2qTbwO9WnqgHrEZ/XDfR6uvOE1Qkm7O8fDibIf0LkFvOHBwGXNAHWMrnI42ZczFtCd5BRil5/RB2G29tymSlgbGdMW6wObDz/3qXB4=
+	t=1720121815; cv=none; b=H33OohxdsvlaGvZr2RWnKdI1R5FwM/w5I6NTs2ecRjKlxXsEEZNKxVnn3EWg2QRYqhEnU6BfgH5/0hu4bXl6+hoMaGoX/dcM7XOohY5OQLvMycYzysrnVtfgfCUR/aGGEcIfuq8MgSYLsuckdSHkRHyVEfuikjsA62lXzUswZc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720119920; c=relaxed/simple;
-	bh=pHbOcWLEcn9Xqrgf+5/Gho5nIyey0ri49aANfeFQVds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AP/MlIy5b2+RefcS+3rcUWBHnVe5FwGd9U4OXXQqSmE1+1A0G0quOCGpYd2Qny4N7lK2pfeAlh6z9Kb5WfiPY7qgtdd1Eo/9UL55OLqrbj0EUmaHPGx2UXI+laqYpneJJg/x6DZzk+mTjGK8YzcM6G1DuS4U9xKzBJTdHe5crrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPRl7-0006ZF-VH; Thu, 04 Jul 2024 21:04:45 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPRl6-0079X4-7j; Thu, 04 Jul 2024 21:04:44 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPRl6-00EZSD-0S;
-	Thu, 04 Jul 2024 21:04:44 +0200
-Date: Thu, 4 Jul 2024 21:04:44 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Woojung.Huh@microchip.com
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
-	f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com,
-	Arun.Ramadoss@microchip.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, Yuiko.Oshino@microchip.com,
-	UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] net: phy: microchip: lan937x: add
- support for 100BaseTX PHY
-Message-ID: <ZobyTGbbzXlhTBbz@pengutronix.de>
-References: <20240704135850.3939342-1-o.rempel@pengutronix.de>
- <BL0PR11MB29132F1C667E478728BCE4ECE7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1720121815; c=relaxed/simple;
+	bh=TatNQtxn5JyqmX3Ox0iKpM8SH6exsf48BoqyvDPWe5g=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=rIvaSFiJME3V1MQrhMlRIj5otkH/ZCE3oi+p3kSonGhcrhh89KSkqBRFEFWBRB1k+X8hOVPFGy0tVdrIeLVZ/1/d3xgVYONTndm79nMYj0muq5q+6LorFxLtz4amormbW4qErxjkskguEDsRVtTJZPYqFUJOng0gtAG6wJuBgS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=moLC8QlR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A96FFC3277B;
+	Thu,  4 Jul 2024 19:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720121814;
+	bh=TatNQtxn5JyqmX3Ox0iKpM8SH6exsf48BoqyvDPWe5g=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=moLC8QlRspJNwkVtBnauz0eSgdNHwCs2eGOFqJC8kcWQZSWm8i3sQqpnWkjxwwWpq
+	 YwUV2/E3tEJBwh0OAzdq3WY5Ij9+Xukjg7MZAvORJUkxT1jSoaL4RYDH+nhQM3P7Vs
+	 dk3URQpqelgHpgkbweTCKgPIVvSi9LZNI76JvDqPKHveJHdVhOCWzY0KpTpEdhxwgK
+	 TmQZc8KZITgGA/Npr81QTBMltMrtn71E6VvYZBSage0vWTAz7yD2B+zne9PyFGS0zB
+	 DS/9I7WY8q5QlUr5DcGlWWdlS4o41e2SG/NLZ0Qwpeh3UGEoBDE00EoEH595riZtmX
+	 0wiEtnNlYe5DA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 98BE5C433A2;
+	Thu,  4 Jul 2024 19:36:54 +0000 (UTC)
+Subject: Re: [GIT PULL] Kselftest fixes for v6.10
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240704123816.669022-1-mic@digikod.net>
+References: <20240704123816.669022-1-mic@digikod.net>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240704123816.669022-1-mic@digikod.net>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-2024-07-04
+X-PR-Tracked-Commit-Id: 130e42806773013e9cf32d211922c935ae2df86c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4d85acef10252c59e3b6c197c61d9252ff950431
+Message-Id: <172012181461.16688.4465728826585876343.pr-tracker-bot@kernel.org>
+Date: Thu, 04 Jul 2024 19:36:54 +0000
+To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Brendan Higgins <brendanhiggins@google.com>, Christian Brauner <brauner@kernel.org>, David Gow <davidgow@google.com>, "David S . Miller" <davem@davemloft.net>, Florian Fainelli <florian.fainelli@broadcom.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>, Jakub Kicinski <kuba@kernel.org>, Johannes Berg <johannes@sipsolutions.net>, Jon Hunter <jonathanh@nvidia.com>, Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, Richard Weinberger <richard@nod.at>, Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>, Sasha Levin <sashal@kernel.org>, Sean Christopherson <seanjc@google.com>, Shengyu Li <shengyu.li.evgeny@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Will Drewry <wad@chromiu
+ m.org>, kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-um@lists.infradead.org, netdev@vger.kernel.org, stable@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BL0PR11MB29132F1C667E478728BCE4ECE7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Woojung,
+The pull request you sent on Thu,  4 Jul 2024 14:38:16 +0200:
 
-On Thu, Jul 04, 2024 at 03:44:52PM +0000, Woojung.Huh@microchip.com wrote:
-> Hi Oleksij,
-> 
-> We use phy/microchip_t1.c for T1 phy. Can you please put the case in different phy driver file?
+> https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-2024-07-04
 
-Which file would you suggest?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4d85acef10252c59e3b6c197c61d9252ff950431
 
-Regards,
-Oleksij
+Thank you!
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
