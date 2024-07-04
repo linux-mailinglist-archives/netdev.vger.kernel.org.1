@@ -1,98 +1,96 @@
-Return-Path: <netdev+bounces-109090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C43A5926D8B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:40:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7BA926D8F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 04:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511BD282A71
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 795BB28459C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 02:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D500714AA9;
-	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313AE175B1;
+	Thu,  4 Jul 2024 02:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7t0F+Dn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bi7rpBWN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A377617557;
-	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE741757D
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 02:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720060829; cv=none; b=bLQwqfYIh92zKB6G6J9422JY93k6tVIfAOiJiJaO5zMUnQkWeVFg7Sou9h4U9/yDCRTTp1PDt08lTYGKg0O3y0OgVCnjDRXjUvQN6feYheXH9+N1+RktUDzhhPHUhspM4dimT7ldcKBByu45EPDbvjRsnWamg9UKzWwnfbNIkn0=
+	t=1720060931; cv=none; b=CwCNdYbNkc5PCvgn+QnoOcVzxF/3r6V+9hLIdFkzvHomSe+wSpIPYXmQieyJMFAHJSfFLC+UEQOHiqXsXJAsxCVQBD2MXGLZuCGtjUJnfhenpnMfJteMICPoFbMdeN6yg/rB8Zag2lv1ZEFf4v+KyqmXmHO+mbIhNFi+uXC+sHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720060829; c=relaxed/simple;
-	bh=2/wkO/DKiCzJSgP4LgFRca8mDh4nH/zUhrKYzOFIZew=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NUSOuZMFbuT+CMIWxjRuVWJoDOYHCv9qEoE6ovfnrabaJNyCpgig7v9LbDBYTQtEPvsehb6xq5Ky+Ce0QRYFcByMROxulqh75RaQxBaNkD9m53kkixYnv6A/xC0X6f7WAImj15tX/ht6jbxFJ5JxGPRkh0rfZHucxl5cl/ep0LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7t0F+Dn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13391C32781;
-	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
+	s=arc-20240116; t=1720060931; c=relaxed/simple;
+	bh=IsXqF/U7scbYExy2ttF0ANNg1l9mfmTVZRHRgRKz7Yg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qgUXT91CKL78T6zI3+xPXoInPFfzHUutA+CtLV3E1raRZYYeSs2FQmRYJrNjXtwAPM8HhSUKIOCYXrdsT653dui/+MjgF3NpyPaEZEFfBlkhqFmCJnUsC5q2Strrc3fsW/El9wdK0aGkawZneLxGxGP0OiqQhaSr53QEq5qHSXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bi7rpBWN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55EE8C3277B;
+	Thu,  4 Jul 2024 02:42:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720060829;
-	bh=2/wkO/DKiCzJSgP4LgFRca8mDh4nH/zUhrKYzOFIZew=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g7t0F+DnYiwuzwWK+rZhDf9d8eBcof/YJc5HmWQLJDfcZi4xrl+XvY2Z532uf2tyX
-	 rCchU4DHwZqrolp4gzzF4NlG2ePt52A2oqQUeDP/iw495qNqQukPvbA8OYr5Hr9yjK
-	 GniSDrFJooW6vc1MC3+Clgd8es5IawXG1feoxnXoK2DNFMbt2bFHju/YiOdB82txFu
-	 GQV74EnQPq9NV+kU1RENfQaKFPAPnzHM8tGL5JZdcE9Ig8C7HpxlClH5OYBN2mCb9b
-	 5jw2R4uTo5NFLZ7nPNhZfUiJfGWlzrjztVjQblBjg/tVywd4R39qW6u3ERYTMcW75k
-	 zhDF4NMq8STaQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0245CC43612;
-	Thu,  4 Jul 2024 02:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720060929;
+	bh=IsXqF/U7scbYExy2ttF0ANNg1l9mfmTVZRHRgRKz7Yg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bi7rpBWNqwp7nurSFgRw85lPmlk/5TnTj+49nKkgkCtOEFZOWf0/zS8L4FLEVEzFZ
+	 kh4VtFtkTv/wyqVmNEVyRpeIjB1R44PTxAZMYdPY34Czjva/27Y+AMVcMJzpPshT+4
+	 d1f5zsgiMNH3mH3/7xEvjUOGimG9vYW3HKYlJxgG473fE5dMQfHX3VMTgVOrrtJoUW
+	 iQ09mRlmv3mntI0Y/K0YrLn1092syAjpjRaCEMg7IpPES3DK8//Yyv6t3VU9hSOfHI
+	 +dVhyaIpL5PtQIGsKyj5qr0hKl/rgCtxca/NKd9ez7FCdAfrSw5OVRy8FawIwb5oku
+	 vTqNuEbnT0A3Q==
+Date: Wed, 3 Jul 2024 19:42:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zijian Zhang <zijianzhang@bytedance.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+Subject: Re: [PATCH net 1/2] selftests: fix OOM in msg_zerocopy selftest
+Message-ID: <20240703194208.7650d8bb@kernel.org>
+In-Reply-To: <5eddb78a-ba1a-4568-aeac-0dc296efdd51@bytedance.com>
+References: <20240701225349.3395580-1-zijianzhang@bytedance.com>
+	<20240701225349.3395580-2-zijianzhang@bytedance.com>
+	<20240703185003.6f11ff73@kernel.org>
+	<5eddb78a-ba1a-4568-aeac-0dc296efdd51@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] selftests: openvswitch: Address some flakes in
- the CI environment
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172006082900.10999.9026063323208803275.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jul 2024 02:40:29 +0000
-References: <20240702132830.213384-1-aconole@redhat.com>
-In-Reply-To: <20240702132830.213384-1-aconole@redhat.com>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- pshelar@ovn.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, amorenoz@redhat.com, horms@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  2 Jul 2024 09:28:27 -0400 you wrote:
-> These patches aim to make using the openvswitch testsuite more reliable.
-> These should address the major sources of flakiness in the openvswitch
-> test suite allowing the CI infrastructure to exercise the openvswitch
-> module for patch series.  There should be no change for users who simply
-> run the tests (except that patch 3/3 does make some of the debugging a bit
-> easier by making some output more verbose).
+On Wed, 3 Jul 2024 19:32:33 -0700 Zijian Zhang wrote:
+> > This test doesn't fail in netdev CI. Is the problem fix in net-next
+> > somehow? Or the "always exits with OUT_OF_MEMORY" is an exaggerations?
+> > (TBH I'm not even sure what it means to "exit with OUT_OF_MEMORY" in
+> > this context.)
+> >  
+> The reason why this test doesn't fail in CI:
 > 
-> [...]
+> According to the test output,
+> # ipv4 tcp -z -t 1
+> # tx=111332 (6947 MB) txc=111332 zc=n
+> zerocopy is false here.
+> 
+> This is because of some limitation of zerocopy in localhost.
+> Specifically, the subsection "Notification Latency" in the sendmsg
+> zerocopy the paper.
+> 
+> In order to make "zc=y", we may need to update skb_orphan_frags_rx to
+> the same as skb_orphan_frags, recompile the kernel, and run the test.
+> 
+> By OUT_OF_MEMORY I mean:
+> 
+> Each calling of sendmsg with zerocopy will allocate an skb with
+> sock_omalloc. If users never recv the notifications but keep calling
+> sendmsg with zerocopy. The send system call will finally return with
+> -ENOMEM.
+> 
+> I hope this clarifies your confusion :)
 
-Here is the summary with links:
-  - [net-next,1/3] selftests: openvswitch: Bump timeout to 15 minutes.
-    https://git.kernel.org/netdev/net-next/c/ff015706fc73
-  - [net-next,2/3] selftests: openvswitch: Attempt to autoload module.
-    https://git.kernel.org/netdev/net-next/c/818481db3df4
-  - [net-next,3/3] selftests: openvswitch: Be more verbose with selftest debugging.
-    https://git.kernel.org/netdev/net-next/c/7abfd8ecb785
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+It does, thanks!
 
 
