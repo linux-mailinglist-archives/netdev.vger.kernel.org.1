@@ -1,198 +1,285 @@
-Return-Path: <netdev+bounces-109299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36BCC927C7A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:48:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F2A2927C7C
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:48:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E73A2283870
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:48:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F32041F235CA
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EDA4085D;
-	Thu,  4 Jul 2024 17:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="V1y7+Gtz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F87347F69;
+	Thu,  4 Jul 2024 17:48:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D7C4C70;
-	Thu,  4 Jul 2024 17:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456E439FC1;
+	Thu,  4 Jul 2024 17:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720115307; cv=none; b=TIpK0VXTp6AMajEUbn5wZiEpeS2ql5EUHESblBf1EsZ84WLGMzYVZL5mktfodzJl9WZpWTRsmxSJs3WaOIkgi6DjMZaaXPu4oi1WFLQ5J96OFGwGSTDGACTluFvoph2jInD2aKMifR9XF+kg5H/THoRupTFAeZq3gfRwNZCIIAY=
+	t=1720115335; cv=none; b=oIV1HJdw5Bu0xUrxHd2EHcPV40WVgLGDxWFC8v8KgMnX5SutsfZT6phX/U2xU+7sPFT3NV4ZG7iOZ8VYiru+27tArpiIN4Aele6arUqVGLHyRlxs5Ocy2sNjfOqFOz/hebMJh5O3j9Svovd1qFoxOb73+JmZ7XgP9lN3nPIESSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720115307; c=relaxed/simple;
-	bh=Yc0zNpZ7yoOoesJaCOQkk0Xhy57Zg/icg5CJTpzqzNI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O4jo81Nhks5zvHtuwag5/cS8ttvtdT/2ilRjiy90tyoKl00put9NQJTdAK3dJnQeWjnJrp/p2Db4sIuYpO5jI4GOUTijiuNm6knx1tECOGgGJ70iA9GWbS3jWsu7NkPvYu2t8lwN/a1A5Purc6LzvSB3StaA4wDc3gBUU9Mh6Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b=V1y7+Gtz; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1720115288; x=1720720088; i=rwahl@gmx.de;
-	bh=7LDXHLNLfnxrAFNgMdyIX1fCxVRtyyU9V4pGYiZPxgM=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=V1y7+GtzHpKpxUmUvK/fezAADG0iHuLRFGAf9Q3aKNSqF1jq3bUKagSn83WWD1cU
-	 zqXA0IYJr3Tz/rSYZX/CPo2MK+FiLZvH/CYuZeGGDiSj9jLBrpPAGgY2llCSCrYPl
-	 M7Hkh3Fm8TVaCjrmc6jxmgE07+RsUneu92lOJ+Wm8SnITZ29tTijn28VedkLfGZj8
-	 Fyk28iM6KKMahpgC+2mopDBXb0p1gIXxHYDonBwMBxTvdVk0wFxNpzhPIv/Hcq9N7
-	 kFk4T9dWrzAK1ykE902TLSpQ4DNkI8Lb4hIoXEJzwj52+z8gs5zfHjUzBsvo2jdUm
-	 BfcFLSlmtjzpCY9MgA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.148.180]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mlf0U-1ryJI20jj8-00kV1L; Thu, 04
- Jul 2024 19:48:08 +0200
-From: Ronald Wahl <rwahl@gmx.de>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
+	s=arc-20240116; t=1720115335; c=relaxed/simple;
+	bh=uEh2jR3Zsi4rDdKJwyKsASV3LbXZz0tuyTV2t1erg1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYOgeVKfYXNt6HRui58J7gis+Q3yI0lCDKULlvA/EekVzoWyDb0lSIqiAviAyRA+iF+12+lmubV1LUcu2vNCelEW7JHaDIL06o7/DCx5IWxEJR0sc+LXL2HGT/Buj/yoLI0HeHNRoxQPFZA0CyxmVrdWvjeoAl9/ANjVZGncD4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sPQZS-000000001WV-0D7e;
+	Thu, 04 Jul 2024 17:48:38 +0000
+Date: Thu, 4 Jul 2024 18:48:33 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] net: ks8851: Fix deadlock with the SPI chip variant
-Date: Thu,  4 Jul 2024 19:47:56 +0200
-Message-ID: <20240704174756.1225995-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.45.2
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v4] net: dsa: mt7530: fix impossible MDIO address and
+ issue warning
+Message-ID: <ZobgcXm9-am7xX6f@makrotopia.org>
+References: <1c378be54d0fb76117f6d72dadd4a43a9950f0dc.1720105125.git.daniel@makrotopia.org>
+ <20240704171604.3ownsxasch5hokty@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sJYiy9JTOJQCBASi0xLwnIAhQLZHvk0tde4aJDG+y37WRKIC0KC
- sX8LML5acO8eLkl9nNtmZ6UVVw8CR2dBgUmvrGpn05EmV00I3Wu+W1I2/IfGeYdUuS0eP76
- jFYJGLwWUXdZx8QaOImT5mappJHudsGVLoA0Rv6JM/OePeKM1x6g0FlYVaFlvYCv73wQqeL
- 76uaJTDPhbuApPkbhq/YQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:7Z6QciS3880=;uasue+K82X3QyU6E6+U8RXeeebn
- /CLyc6iWjWHqk8UwzRQPESm7vYfpxahRDNz/5uSMJAcZz/1UJfxzE7LCVlAmfpINdeTHao4hV
- 5y+sYf7em8YKGxohxBYtqG9AcVQ9Av9SXhKJJbmnU24Bn9J70RBPO1jz72br+BFdGIFf3blNX
- pizKYoSE0l3dRRLQEdFr4UubMvrj/iJrB/w/GQF/l2YuIxIfA3fyDQfVt69Ur2/rkm3dyIK+T
- FqOh+b0KP8byKS0klVyKKRCcwqPvRa0DY0uf9vY/zvO+dkN+s6Fmmk5MhdsrwZQrWs7WVQ0GF
- DbxmTJAn7pCtY/lwRcf0aUuuPq30KGvnppBj0gzbeB2aiyAW+bSXykM0GaH1SGS01u6NjWvxZ
- 0isBJmTkIUVqkjwrBbutModsAG469UJCMBb4vBOAEYLio3KL7B+o3UwXyKCxXVuUfgjWBUw1E
- DHbwahicusPoOlBk/F1MTM+rCAokh+a9/KgkR+q53l1V9nMh2X/ov8za07kiUGpeTAOb5jNdQ
- 1kN1IIjYxYj6TffL/QvIV+V1S9KSSPB+hHYw5SPK6m9lQkvNOCXXrSuBZS+w4J2cGMfUk+X6/
- 0ANZB9xq57xISwub+cldlb7TkHbbhUMM7LlC+pzxh797rhiihQmB5gTXBkQQg6JR4ww35ZgAr
- OZ2XyBbx/g46ukq4Ta/QfVGJNNPCk8xV+pFmIbWGiuiVRoyhvODc01WmXtEw33VZmgCUtvM2d
- 0bQWUkJfTPAlrsdi49i11aeZNv94AqKpaI6cVehLTABp75x9Euiab1h/wfQ9o0mWKVz48hpgv
- Ublztoz9RDEGSrTCdW/YpuKtrpB4xgISCFTm/fXjIYWNg=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240704171604.3ownsxasch5hokty@skbuf>
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+Hi Vladimir,
 
-When SMP is enabled and spinlocks are actually functional then there is
-a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
-and ks8851_irq:
+On Thu, Jul 04, 2024 at 08:16:04PM +0300, Vladimir Oltean wrote:
+> On Thu, Jul 04, 2024 at 04:08:22PM +0100, Daniel Golle wrote:
+> > The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+> > using bootstrap pins. However, there are only 4 possible options for the
+> > switch itself: 7, 15, 23 and 31. As in MediaTek's SDK the address of the
+> > switch is wrongly stated in the device tree as 0 (while in reality it is
+> > 31), warn the user about such broken device tree and make a good guess
+> > what was actually intended.
+> 
+> Zero is the MDIO broadcast address. Doesn't the switch respond to it, or
+> what's exactly the problem?
 
-    watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
-    call trace:
-      queued_spin_lock_slowpath+0x100/0x284
-      do_raw_spin_lock+0x34/0x44
-      ks8851_start_xmit_spi+0x30/0xb8
-      ks8851_start_xmit+0x14/0x20
-      netdev_start_xmit+0x40/0x6c
-      dev_hard_start_xmit+0x6c/0xbc
-      sch_direct_xmit+0xa4/0x22c
-      __qdisc_run+0x138/0x3fc
-      qdisc_run+0x24/0x3c
-      net_tx_action+0xf8/0x130
-      handle_softirqs+0x1ac/0x1f0
-      __do_softirq+0x14/0x20
-      ____do_softirq+0x10/0x1c
-      call_on_irq_stack+0x3c/0x58
-      do_softirq_own_stack+0x1c/0x28
-      __irq_exit_rcu+0x54/0x9c
-      irq_exit_rcu+0x10/0x1c
-      el1_interrupt+0x38/0x50
-      el1h_64_irq_handler+0x18/0x24
-      el1h_64_irq+0x64/0x68
-      __netif_schedule+0x6c/0x80
-      netif_tx_wake_queue+0x38/0x48
-      ks8851_irq+0xb8/0x2c8
-      irq_thread_fn+0x2c/0x74
-      irq_thread+0x10c/0x1b0
-      kthread+0xc8/0xd8
-      ret_from_fork+0x10/0x20
+No, MT7530 main device (ie. the switch itself, not the built-in PHYs
+which on MT7530 can also be exposed on the same bus) only responds to
+address 31 (default), 7, 15 or 23 (the latter 3 via non-default
+bootstrap configuration).
 
-This issue has not been identified earlier because tests were done on
-a device with SMP disabled and so spinlocks were actually NOPs.
+MT7531 always uses address 31 by default and also doesn't respond on
+address 0.
 
-Now use spin_(un)lock_bh for TX queue related locking to avoid execution
-of softirq work synchronously that would lead to a deadlock.
+See also https://lkml.org/lkml/2024/5/31/236
 
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overru=
-n")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
-V2: - use spin_lock_bh instead of moving netif_wake_queue outside of
-      locked region (doing the same in the start_xmit function)
-    - add missing net: tag
+> 
+> > 
+> > This is imporant also to not break compatibility with older Device Trees
+> 
+> important
 
- drivers/net/ethernet/micrel/ks8851_common.c | 4 ++--
- drivers/net/ethernet/micrel/ks8851_spi.c    | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Well spotted, will fix.
 
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/eth=
-ernet/micrel/ks8851_common.c
-index 6453c92f0fa7..51fb6c27153e 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -352,11 +352,11 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 		netif_dbg(ks, intr, ks->netdev,
- 			  "%s: txspace %d\n", __func__, tx_space);
+> 
+> > as with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
+> > switch from device tree") the address in device tree will be taken into
+> > account, while before it was hard-coded to 0x1f.
+> > 
+> > Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
+> 
+> I fail to understand the logic behind blaming this commit. There was no
+> observable issue prior to 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY
+> address of switch from device tree"), was there?
 
--		spin_lock(&ks->statelock);
-+		spin_lock_bh(&ks->statelock);
- 		ks->tx_space =3D tx_space;
- 		if (netif_queue_stopped(ks->netdev))
- 			netif_wake_queue(ks->netdev);
--		spin_unlock(&ks->statelock);
-+		spin_unlock_bh(&ks->statelock);
- 	}
+Please see the lengthy debate here:
 
- 	if (status & IRQ_SPIBEI) {
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethern=
-et/micrel/ks8851_spi.c
-index 670c1de966db..818e1ce3227b 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -385,7 +385,7 @@ static netdev_tx_t ks8851_start_xmit_spi(struct sk_buf=
-f *skb,
- 	netif_dbg(ks, tx_queued, ks->netdev,
- 		  "%s: skb %p, %d@%p\n", __func__, skb, skb->len, skb->data);
+https://lore.kernel.org/linux-arm-kernel/af561268-9793-4b5d-aa0f-d09698fd6fb0@arinc9.com/T/#mc967f795a062f6aaedea7375a3be104266e88cc4
 
--	spin_lock(&ks->statelock);
-+	spin_lock_bh(&ks->statelock);
+I should have provided a reference to that in the commit message or
+cover letter.
 
- 	if (ks->queued_len + needed > ks->tx_space) {
- 		netif_stop_queue(dev);
-@@ -395,7 +395,7 @@ static netdev_tx_t ks8851_start_xmit_spi(struct sk_buf=
-f *skb,
- 		skb_queue_tail(&ks->txq, skb);
- 	}
+> That's what 'git bisect' with a broken device tree would point towards?
 
--	spin_unlock(&ks->statelock);
-+	spin_unlock_bh(&ks->statelock);
- 	if (ret =3D=3D NETDEV_TX_OK)
- 		schedule_work(&kss->tx_work);
+Yes, exactly.
 
-=2D-
-2.45.2
-
+> 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > Tested-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > Reviewed-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > ---
+> > Changes since v3 [3]:
+> >  - simplify calculation of correct address
+> > 
+> > Changes since v2 [2]:
+> >  - use macros instead of magic numbers
+> >  - introduce helper functions
+> >  - register new device on MDIO bus instead of messing with the address
+> >    and schedule delayed_work to unregister the "wrong" device.
+> >    This is a slightly different approach than suggested by Russell, but
+> >    imho makes things much easier than keeping the "wrong" device and
+> >    having to deal with keeping the removal of both devices linked.
+> >  - improve comments
+> > 
+> > Changes since v1 [1]:
+> >  - use FW_WARN as suggested.
+> >  - fix build on net tree which doesn't have 'mdiodev' as member of the
+> >    priv struct. Imho including this patch as fix makes sense to warn
+> >    users about broken firmware, even if the change introducing the
+> >    actual breakage is only present in net-next for now.
+> > 
+> > [1]: https://patchwork.kernel.org/project/netdevbpf/patch/e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org/
+> > [2]: https://patchwork.kernel.org/project/netdevbpf/patch/11f5f127d0350e72569c36f9060b6e642dfaddbb.1714514208.git.daniel@makrotopia.org/
+> > [3]: https://patchwork.kernel.org/project/netdevbpf/patch/7e3fed489c0bbca84a386b1077c61589030ff4ab.1719963228.git.daniel@makrotopia.org/
+> > 
+> >  drivers/net/dsa/mt7530-mdio.c | 91 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 91 insertions(+)
+> > 
+> > diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+> > index 51df42ccdbe6..2037ed944801 100644
+> > --- a/drivers/net/dsa/mt7530-mdio.c
+> > +++ b/drivers/net/dsa/mt7530-mdio.c
+> > @@ -11,6 +11,7 @@
+> >  #include <linux/regmap.h>
+> >  #include <linux/reset.h>
+> >  #include <linux/regulator/consumer.h>
+> > +#include <linux/workqueue.h>
+> >  #include <net/dsa.h>
+> >  
+> >  #include "mt7530.h"
+> > @@ -136,6 +137,92 @@ static const struct of_device_id mt7530_of_match[] = {
+> >  };
+> >  MODULE_DEVICE_TABLE(of, mt7530_of_match);
+> >  
+> > +static int
+> > +mt7530_correct_addr(int phy_addr)
+> 
+> The prototype fits onto a single line.
+> 
+> > +{
+> > +	/* The corrected address is calculated as stated below:
+> > +	 * 0~6, 31 -> 31
+> > +	 * 7~14    -> 7
+> > +	 * 15~22   -> 15
+> > +	 * 23~30   -> 23
+> > +	 */
+> > +return (phy_addr - MT7530_NUM_PORTS & ~MT7530_NUM_PORTS) + MT7530_NUM_PORTS & PHY_MAX_ADDR - 1;
+> 
+> In addition to being weirdly indented and having difficult to follow
+> logic.. Why not opt for the simple, self-documenting variant below?
+> 
+> 	switch (phy_addr) {
+> 	case 0 ... 6:
+> 	case 31:
+> 		return 31;
+> 	case 7 ... 14:
+> 		return 7;
+> 	case 15 ... 22:
+> 		return 15;
+> 	case 23 ... 30:
+> 		return 23;
+> 	default:
+> 		return -EINVAL ???
+> 	}
+> 
+> > +}
+> > +
+> > +static bool
+> > +mt7530_is_invalid_addr(int phy_addr)
+> > +{
+> > +	/* Only MDIO bus addresses 7, 15, 23, and 31 are valid options,
+> > +	 * which all have the least significant three bits set. Check
+> > +	 * for this.
+> > +	 */
+> > +	return (phy_addr & MT7530_NUM_PORTS) != MT7530_NUM_PORTS;
+> 
+> Why not implement this in terms of phy_addr != mt7530_correct_addr(phy_addr)?
+> 
+> > +}
+> > +
+> > +struct remove_impossible_priv {
+> > +	struct delayed_work remove_impossible_work;
+> > +	struct mdio_device *mdiodev;
+> > +};
+> > +
+> > +static void
+> > +mt7530_remove_impossible(struct work_struct *work)
+> 
+> Fits onto a single line.
+> 
+> > +{
+> > +	struct remove_impossible_priv *priv = container_of(work, struct remove_impossible_priv,
+> > +							   remove_impossible_work.work);
+> > +	struct mdio_device *mdiodev = priv->mdiodev;
+> > +
+> > +	mdio_device_remove(mdiodev);
+> > +	mdio_device_free(mdiodev);
+> > +	kfree(priv);
+> > +}
+> > +
+> > +static int
+> > +mt7530_reregister(struct mdio_device *mdiodev)
+> > +{
+> > +	/* If the address in DT must be wrong, make a good guess about
+> > +	 * the most likely intention, issue a warning, register a new
+> > +	 * MDIO device at the correct address and schedule the removal
+> > +	 * of the device having an impossible address.
+> > +	 */
+> > +	struct fwnode_handle *fwnode = dev_fwnode(&mdiodev->dev);
+> > +	int corrected_addr = mt7530_correct_addr(mdiodev->addr);
+> > +	struct remove_impossible_priv *rem_priv;
+> > +	struct mdio_device *new_mdiodev;
+> > +	int ret;
+> > +
+> > +	rem_priv = kmalloc(sizeof(*rem_priv), GFP_KERNEL);
+> > +	if (!rem_priv)
+> > +		return -ENOMEM;
+> > +
+> > +	new_mdiodev = mdio_device_create(mdiodev->bus, corrected_addr);
+> > +	if (IS_ERR(new_mdiodev)) {
+> > +		ret = PTR_ERR(new_mdiodev);
+> > +		goto out_free_work;
+> > +	}
+> > +	device_set_node(&new_mdiodev->dev, fwnode);
+> > +
+> > +	ret = mdio_device_register(new_mdiodev);
+> > +	if (WARN_ON(ret))
+> > +		goto out_free_dev;
+> > +
+> > +	dev_warn(&mdiodev->dev, FW_WARN
+> > +		 "impossible switch MDIO address in device tree, assuming %d\n",
+> > +		 corrected_addr);
+> > +
+> > +	/* schedule impossible device for removal from mdio bus */
+> > +	rem_priv->mdiodev = mdiodev;
+> > +	INIT_DELAYED_WORK(&rem_priv->remove_impossible_work, mt7530_remove_impossible);
+> > +	schedule_delayed_work(&rem_priv->remove_impossible_work, 0);
+> 
+> What makes it so that mt7530_remove_impossible() is actually guaranteed
+> to run after the probing of the mdio_device @ the incorrect address
+> _finishes_? mdio_device_remove() will not work on a device which has
+> probing in progress, will it?
+> 
+> There's also the more straightforward option of fixing up priv->mdiodev->addr
+> in mt7530.c to be something like priv->switch_base, which is derived
+> from priv->mdiodev->addr, with a fallback to 0x1f if the latter is zero,
+> and a FW_WARN().
 
