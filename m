@@ -1,114 +1,135 @@
-Return-Path: <netdev+bounces-109267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AEC79279DE
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:20:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABB49279E7
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4CA1C22943
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8661C2456A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050BF1AEFFD;
-	Thu,  4 Jul 2024 15:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9D01B1419;
+	Thu,  4 Jul 2024 15:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UXzjIbhW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAw4I7ZJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF391B1208
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 15:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB611B1415
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 15:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720106389; cv=none; b=isx4lqpt6uubHpaC+UuDH4+QVlQIGNTjPxrC/ZIpk4BXtMIOqwa39dsXHBqsQDrw91+zjCWqYl1Y8Go9S5KV4geQHuv3ZlfIF4hZvq1eooqjY1QZi3HP3foGHJkkyH7eNtoMCndzAOxa+SIRF533aRjkw1acxQxG27nvd9MQ6Vw=
+	t=1720106436; cv=none; b=kolcPbPPJNVQseC5WS29DpE0OYaz3Wku5AQA3wfiJtNZyCITqlzO4fLPeHZAZXxjJW7VwRsGpDaa7TxJM/DfTzN2rHRFirA+XobBluFiMtuDgtoR0zn1Q4uJCdrdycgfBhADnlhf/1wkLlzTVXQ5IgyxfxB6hvfHp9fv73E/kbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720106389; c=relaxed/simple;
-	bh=rTi+HSfP+CDmR9Y8iR5mkNNK7g6n1NJse0dPKt9usAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=pMmaLeR4Pe8c6QFP4q5VJUb6trz8XXEP80gZGMMBhZM6s/DsQIOIiAXoReZ8K6ofC2/x4hVLOBLbRGsg17dXbyEXKChnPsFHXWSB46nvxkVthzASYXh9Poue4tQenNTpwVA1PABVcGlKR7Lo8/mHedeOiCSRmlfS+QRr4250ArQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UXzjIbhW; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c9cc681ee7so279487b6e.1
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 08:19:48 -0700 (PDT)
+	s=arc-20240116; t=1720106436; c=relaxed/simple;
+	bh=m1MSzlO1UoTFgOYGm4bHdM2hcVgh4Gj/4/U6sShVFck=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DIdMa6dc29hlW02Pr5Ry4unp8+n7BV2sdobTH0MKcHLqDllxLgPTqzq1Cl25hwyRV4zTPc3sv0EOH7FEUouXRxbuaD4ibAAJzAaCCmwCm/asJQvS07vpPTaEA3In0d61Ov86LZog5e3yJJshuESeEUrJunuJfauoqhLAqvU6KIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DAw4I7ZJ; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52e9a920e73so794803e87.2
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 08:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720106388; x=1720711188; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V+zXDUJM7lfgygxbXYWjttEkeiLpdqmsPDn2aj5otxo=;
-        b=UXzjIbhWdbJVnmk8NcCSyTsGxcyvFq8rI2NHjlztAfFJvEFpFRzOIQBo9zbc++1grb
-         +DMep5I7UP2shvYsgBq93mwvK8m41NT4PRKNMKTgUUSGV72r0fJrvQBDSOGxMsbHAyqM
-         LqsxqSi2LlYXNf7r9I9adPOcbmoiMACmUrKQ8sJJOJTNdGAU+XMsi/0pLqydeNoXYlh3
-         8FfTL8yr8Bt20+yggYZHdOTppE6hH/p2bulYSMFKOSqNYy2/a17ed1YvDDjF5tDaP26h
-         XhnzzoFx5Tpmawfqn8DHYGEqVxJMoHCNG6azd70OWOsB6XAyKSnYRLCM9SPLR6Gvg1rW
-         iCsw==
+        d=gmail.com; s=20230601; t=1720106432; x=1720711232; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m1MSzlO1UoTFgOYGm4bHdM2hcVgh4Gj/4/U6sShVFck=;
+        b=DAw4I7ZJick/HYSN9SZsSmSoHczd036w3E6RQF/UDUd6i5wDDfbqjuDeFQx7JjZEjH
+         lAqux1bSjjuOWpyn/Zyb8egYRCWYxjWyhDrOpg2/6PLDYbqC2wSin7ZJK40K+O6A+dnt
+         JQZWELmc8ialZYcuud6yO+IKXow8dw4/U/vT8bnj9TL6ah4A/ZbYlDvCBJTd+bh2Va/5
+         Z2wnXOij4VXN8dwNxq9xSn2bq8Gog+4eRbNwtmPt29vP+CQkjdqSEiaDGRF1QNgqciJi
+         shlgSbGM1LQu72ZeoBSTLEskrMCaghA2E0lxhU2Ra+heyEKxAv35wNvRnSxlBof+8K70
+         9NxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720106388; x=1720711188;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+zXDUJM7lfgygxbXYWjttEkeiLpdqmsPDn2aj5otxo=;
-        b=ZUMkX9i7nELdjfHMsDFFx3w336aQlJk22FY5b0RECTVMCD4ergA/axsIdCD/qMyfvc
-         82xujrov2VkHIW+dEFrGSzj+Kfy6Y+k1EtthB48x2Zi/QhkLIEcOgvm5yfm8Vlxa0p3F
-         bv12ansZu8I6vc+Aeq0fg34fVUsv65aVGruNSZ/HXU7GQnvr/mrG5N54qSpDZnI/yVUN
-         g14t3zAmBTiMkVJ1/pWBlcCsQvGNSFVT1vTi8twgYtW9Pg+JIE1pvRBsOgX5PMpYhush
-         YVLMGRTnXqVGCigibRfcWBfxjWkHZ9S0DFZ7PDZ/gtdCGhiP2SLLQXmeFZPqNHLx0W+Q
-         JuaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJossCzq6Na9uPgPYM4LnQPW9A2mOg8ToGSajMvj1qXxSy/mmPjXYMRYoJqo0EdOwNKpuf0tSx0j/5hmbdn+PmbKWRXPNP
-X-Gm-Message-State: AOJu0YyfITfoo4xryT+6Z7dXAevbB9oSlG/8mYdH+GmoeEm0WuqR8F+k
-	TsIPe/fYYyNp7LqrMkfRwAwWIl3WH4AofuQ4Zdz8jQxbpTFEw16xm1CI5OG1HX8=
-X-Google-Smtp-Source: AGHT+IHAWyWPp3t/3hLm3p6DC0AvvzzmljGLCooD0y9pIZ4rkXDGF9k2VyEEwC6Rp+KB4ThglvcN9A==
-X-Received: by 2002:a05:6808:1b14:b0:3d5:1f50:1860 with SMTP id 5614622812f47-3d915d2d73amr612153b6e.27.1720106387688;
-        Thu, 04 Jul 2024 08:19:47 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:96a0:e6e9:112e:f4c])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d62f9c7c51sm2442474b6e.18.2024.07.04.08.19.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 08:19:47 -0700 (PDT)
-Date: Thu, 4 Jul 2024 10:19:44 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Justin Chen <justin.chen@broadcom.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net: bcmasp: Fix error code in probe()
-Message-ID: <ZoWKBkHH9D1fqV4r@stanley.mountain>
+        d=1e100.net; s=20230601; t=1720106432; x=1720711232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m1MSzlO1UoTFgOYGm4bHdM2hcVgh4Gj/4/U6sShVFck=;
+        b=QoIUgT7Jn4F7ZOHMesFRNQxz0LqjX+VOy1rncHUvxrsIAXbqwCJapUR70WWMnFUtYV
+         dVvBI/KWLjbG+0r98DZO/CYI7V8nVQHP3X2oBeJbD0qX+sci7eVRGfesPEVniYJ85x7o
+         U/n016Si+eOYQfnFj+prZyxIVByyjDez/DCFPw5gk/cfupnXrnwZEmicCu16/WWIJf8S
+         noVPOicoyKclwCzPcuyfR/0UXdU1ZVOEec42cYAE5He/A40UrMk6jxss9YF/b1IJaUv8
+         wZ8wBpuKfEPKGkRpkkO2UWaHrxgZTSep1K1BkunsMucmpMEfGYsVr6g4lK5LWwaJvCCy
+         Ez+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYk8NnCvY3ZpojuEomRWrpVAwJCJuTquEu+YuHPV18YEKmlXihWEG6rWbIJEkkwOVG384VbjS+5It2eFtN2tbftP1nLEkK
+X-Gm-Message-State: AOJu0YwMktmyQQa7wPJtm08mQhPtmHTRprGKZHmhMQgs7yCgLOBNu/Bj
+	LzwebKIllLLGlYFBAm8EYyeItigweA8reEEWCRMgCzpXCwu+lC0HjctoTnpejQQ4KR/4qDLT3su
+	uG8Z9Ev+N+N6TGZc4itR/GQqdwd8=
+X-Google-Smtp-Source: AGHT+IHgU8m/bAYFZTEp3gyeBmKUS86R6KiPpeOSHKpEjKHWJkzWnVNALIFITjWt1C+BJzyZypoFCmh8HHfYSwnPOmE=
+X-Received: by 2002:ac2:5dfa:0:b0:52e:9beb:a2e2 with SMTP id
+ 2adb3069b0e04-52ea062d034mr1319098e87.19.1720106432220; Thu, 04 Jul 2024
+ 08:20:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <20240704074153.1508825-1-ap420073@gmail.com> <20240704063325.7ddd6e8a@kernel.org>
+In-Reply-To: <20240704063325.7ddd6e8a@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 5 Jul 2024 00:20:20 +0900
+Message-ID: <CAMArcTUNz7rABdgk2TMZAOSpHFr+fW8cu_X1jHa1H4j3MuUUBg@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt_en: fix kernel panic in queue api functions
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	michael.chan@broadcom.com, netdev@vger.kernel.org, somnath.kotur@broadcom.com, 
+	dw@davidwei.uk, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Return an error code if bcmasp_interface_create() fails.  Don't return
-success.
+On Thu, Jul 4, 2024 at 10:33=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Jakub,
+Thanks a lot for review!
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index a806dadc4196..20c6529ec135 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1380,6 +1380,7 @@ static int bcmasp_probe(struct platform_device *pdev)
- 			dev_err(dev, "Cannot create eth interface %d\n", i);
- 			bcmasp_remove_intfs(priv);
- 			of_node_put(intf_node);
-+			ret = -ENOMEM;
- 			goto of_put_exit;
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
--- 
-2.43.0
 
+> On Thu, 4 Jul 2024 07:41:53 +0000 Taehee Yoo wrote:
+> > bnxt_queue_{mem_alloc,start,stop} access bp->rx_ring array and this is
+> > initialized while an interface is being up.
+> > The rings are initialized as a number of channels.
+> >
+> > The queue API functions access rx_ring without checking both null and
+> > ring size.
+> > So, if the queue API functions are called when interface status is down=
+,
+> > they access an uninitialized rx_ring array.
+> > Also if the queue index parameter value is larger than a ring, it
+> > would also access an uninitialized rx_ring.
+>
+> Shouldn't the core be checking against dev->real_num_rx_queues instead ?
+
+Oh, I missed it.
+I agree the core should check dev->real_num_rx_queues.
+But the current devmem TCP code checks dev->num_rx_queues instead of
+dev->real_num_rx_queues.
+I tested the below change, and it works well.
+So, I will comment on it in Mina's patch.
+
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 7afaf17801ef..da27778c2421 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -146,7 +146,7 @@ int net_devmem_bind_dmabuf_to_queue(struct
+net_device *dev, u32 rxq_idx,
+u32 xa_idx;
+int err;
+
+- if (rxq_idx >=3D dev->num_rx_queues)
++ if (rxq_idx >=3D dev->real_num_rx_queues)
+return -ERANGE;
+
+rxq =3D __netif_get_rx_queue(dev, rxq_idx);
+
+
+Thanks a lot!
+Taehee Yoo
 
