@@ -1,122 +1,95 @@
-Return-Path: <netdev+bounces-109224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6821092777F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:51:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DE34927730
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 15:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1E91C22A15
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 13:51:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0E42858B7
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 13:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0FB1AED28;
-	Thu,  4 Jul 2024 13:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7EC28373;
+	Thu,  4 Jul 2024 13:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHSu4LaN"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9261822E2;
-	Thu,  4 Jul 2024 13:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646084C70;
+	Thu,  4 Jul 2024 13:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720101111; cv=none; b=RTXH8pUGNi3L+Q+CGFe+7zHlm/KqhQTiS0VCNXaFa4b7vLJEEkQREBubKikXR6GUjK7GtDOob5Vv5cSEZBjXG2sNZJTVNM+LE5+UDcxDCPcugiB09JBbT14HJargmCfY8XQjF/UkksbQ+fO1HhVJyTPymyzIutr5hRC3ycu6C4s=
+	t=1720099830; cv=none; b=TdF/KrsrHtkJU/cEkcqbtmwph0ZaVQEAtvOc22UOnskXMzWx9a24htpViFzzIcH1tAtIK7aWkQxXYNUtQ8CkshI+Jh0doF7jCkZRjT1k7qdeOyjdSjlH4VoWZRDZ5qW51yi1ij+23EqOuvoJdGzQLqGEuXDHr3ODkU8Cu5yzWSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720101111; c=relaxed/simple;
-	bh=j7y3SaNZOdZ/qlSujb8S0Jm/YN/yBFAlgHfB7bnQva4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iYJYXGfVF4yL4UAr+DWvkVDfvIh1Grr9LkYnWTHYx4vaHqP63ZmfywIsQdGomfGevvL2jgD0UTMlIFUCZ/v0T01X0GRngxxYnDUl5FenW5m3nixMfCIezTI5HbKOtoPGeqCL6Qsqq1fm2K9OJCdFZ8EGAf437Sv3a9UeOoEZ0l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=48078 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sPMWm-004unV-LC; Thu, 04 Jul 2024 15:29:39 +0200
-Date: Thu, 4 Jul 2024 15:29:34 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
-	fw@strlen.de
-Subject: Re: [PATCH net 1/1] netfilter: nf_tables: unconditionally flush
- pending work before notifier
-Message-ID: <ZoajvtlIVk3mNMk7@calendula>
-References: <20240703223304.1455-1-pablo@netfilter.org>
- <20240703223304.1455-2-pablo@netfilter.org>
- <af0c0ca73af3d4442d2de49c54fa58d3d2b759af.camel@redhat.com>
+	s=arc-20240116; t=1720099830; c=relaxed/simple;
+	bh=oEEA/VHkH+uWWv466RtkE9FrCA6zYPpRID8sNfEaRpE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EXR89ZuUgrkKcoqiXHbJG8wfqb5PM91+8gtiRBwYOBcACWX+Xe+I61oE2wMl00gxDdS7SXdJXkhIIXsCMt8nNzyxVtJe+w1sRaRNvjLIP6BlAlA7CP248wNnhd48KfaAZkWp+nXN/9v2EhJzAUKMtjvn/DgdKcOgWTCeXTamoU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHSu4LaN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DDEFFC4AF0A;
+	Thu,  4 Jul 2024 13:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720099829;
+	bh=oEEA/VHkH+uWWv466RtkE9FrCA6zYPpRID8sNfEaRpE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CHSu4LaNO9sEDAZj0jTu/an+1ZGmSjnPe9npjPeKWCtpgP7qudGYsU3ZxE/ghdJXq
+	 TI2yrzw4J8mND+ELc4/6oXd+0SdL0mYmiLneSn7XbsVAw6XZUDA3OcITDGRYJV3HAB
+	 n2xHyvMbWwJk60H+d4Nexw4+Ljn5Z/ekICRh9se3hI+KKIkTjA+AAFS2q7auZU4odB
+	 j3NzmIcefkASZ322iSyL7T5R0j1/AneYdG55lu7YRul/o8IL4G3GqyUdecoeNFBJyS
+	 PbTsHVCUdoB38T9IE8lK6l1Fbej5vXDBrMDRJKjBp7TNBsv4HK0mSUQpeAH1CoJXxu
+	 7pr07gAkoL7rw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CDFBCC43331;
+	Thu,  4 Jul 2024 13:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <af0c0ca73af3d4442d2de49c54fa58d3d2b759af.camel@redhat.com>
-X-Spam-Score: -1.8 (-)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] inet_diag: Initialize pad field in struct
+ inet_diag_req_v2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172009982983.30398.11491339248404155106.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jul 2024 13:30:29 +0000
+References: <20240703091649.111773-1-syoshida@redhat.com>
+In-Reply-To: <20240703091649.111773-1-syoshida@redhat.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller@googlegroups.com
 
-On Thu, Jul 04, 2024 at 03:24:17PM +0200, Paolo Abeni wrote:
-> Hi,
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed,  3 Jul 2024 18:16:49 +0900 you wrote:
+> KMSAN reported uninit-value access in raw_lookup() [1]. Diag for raw
+> sockets uses the pad field in struct inet_diag_req_v2 for the
+> underlying protocol. This field corresponds to the sdiag_raw_protocol
+> field in struct inet_diag_req_raw.
 > 
-> On Thu, 2024-07-04 at 00:33 +0200, Pablo Neira Ayuso wrote:
-> > From: Florian Westphal <fw@strlen.de>
-> > 
-> > syzbot reports:
-> > 
-> > KASAN: slab-uaf in nft_ctx_update include/net/netfilter/nf_tables.h:1831
-> > KASAN: slab-uaf in nft_commit_release net/netfilter/nf_tables_api.c:9530
-> > KASAN: slab-uaf int nf_tables_trans_destroy_work+0x152b/0x1750 net/netfilter/nf_tables_api.c:9597
-> > Read of size 2 at addr ffff88802b0051c4 by task kworker/1:1/45
-> > [..]
-> > Workqueue: events nf_tables_trans_destroy_work
-> > Call Trace:
-> >  nft_ctx_update include/net/netfilter/nf_tables.h:1831 [inline]
-> >  nft_commit_release net/netfilter/nf_tables_api.c:9530 [inline]
-> >  nf_tables_trans_destroy_work+0x152b/0x1750 net/netfilter/nf_tables_api.c:9597
-> > 
-> > Problem is that the notifier does a conditional flush, but its possible
-> > that the table-to-be-removed is still referenced by transactions being
-> > processed by the worker, so we need to flush unconditionally.
-> > 
-> > We could make the flush_work depend on whether we found a table to delete
-> > in nf-next to avoid the flush for most cases.
-> > 
-> > AFAICS this problem is only exposed in nf-next, with
-> > commit e169285f8c56 ("netfilter: nf_tables: do not store nft_ctx in transaction objects"),
-> > with this commit applied there is an unconditional fetch of
-> > table->family which is whats triggering the above splat.
-> > 
-> > Fixes: 2c9f0293280e ("netfilter: nf_tables: flush pending destroy work before netlink notifier")
-> > Reported-and-tested-by: syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=4fd66a69358fc15ae2ad
-> > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> > ---
-> >  net/netfilter/nf_tables_api.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-> > index e8dcf41d360d..081c08536d0f 100644
-> > --- a/net/netfilter/nf_tables_api.c
-> > +++ b/net/netfilter/nf_tables_api.c
-> > @@ -11483,8 +11483,7 @@ static int nft_rcv_nl_event(struct notifier_block *this, unsigned long event,
-> >  
-> >  	gc_seq = nft_gc_seq_begin(nft_net);
-> >  
-> > -	if (!list_empty(&nf_tables_destroy_list))
-> > -		nf_tables_trans_destroy_flush_work();
-> > +	nf_tables_trans_destroy_flush_work();
-> >  again:
-> >  	list_for_each_entry(table, &nft_net->tables, list) {
-> >  		if (nft_table_has_owner(table) &&
+> inet_diag_get_exact_compat() converts inet_diag_req to
+> inet_diag_req_v2, but leaves the pad field uninitialized. So the issue
+> occurs when raw_lookup() accesses the sdiag_raw_protocol field.
 > 
-> It look like there is still some discussion around this patch, but I
-> guess we can still take it and in the worst case scenario a follow-up
-> will surface, right?
+> [...]
 
-Let's do that.
+Here is the summary with links:
+  - [net] inet_diag: Initialize pad field in struct inet_diag_req_v2
+    https://git.kernel.org/netdev/net/c/61cf1c739f08
 
-Thanks.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
