@@ -1,294 +1,254 @@
-Return-Path: <netdev+bounces-109177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97869273C5
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:15:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627C19273D2
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E146289DC8
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A79228A4B4
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AD41AB515;
-	Thu,  4 Jul 2024 10:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F801A38FE;
+	Thu,  4 Jul 2024 10:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ILKseFTZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kVlcmp7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994AB1A38FE
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720088141; cv=none; b=CPFApLgaKZVUGJEu5kE1+SfY5kcEFygHqTT/JuHF+oznkD38DLK1Y1ZVsw0hiByetYcDN+6dxOUrZdCQjNIwYkUBOQiy3SVmsMm5GA0gLTuU7YyJ6LbvtxtsUHNd5qsPKKn8xsZMa/yLaqGRgOogiejysqHfJ0tgg20/zqozM8c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720088141; c=relaxed/simple;
-	bh=OcqFvCsl1jaf9vnV430gSaCk0wtW/+MqT1/41Zhv3KY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Twyw/c5F8oxClT7a6IutzF1eleLz3kC6PvP3P7r/kqWK5CMmTBYpU39+wKI5k3Uh9aQ1h9jAuPSIMHEvCeDyhr8KIM9Dnlyypes/W4nA6y5NyhZHGx8+x4IouZc+L/XfeizJ95M/rMfv/gA5FW08wDg+Q6ydGTJsGfwhmEsXmlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ILKseFTZ; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-36794da7c96so302457f8f.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 03:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1720088137; x=1720692937; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HkycAIXX9oozgwI/VIWUIGVyqGP4im+iT/UCwrMuXbk=;
-        b=ILKseFTZxR+u+Ec7W6M6sBO/7+ZY9r7RoH6vFtEB7LulFFey1Ax03M2mgzU98GUOvR
-         BgrYix/GGFu1s7ez5QVXALNUkoaDWxlOpLsIHATJQkr2K5yH2MYhrEVbZmUiRKEF4eLT
-         L1ts2Lq4DxPlAcZBKboRcyFkZlLy/eBSSJ8/Lxe7DngjirriX5QxoVE83HWxMuge7BFo
-         ub+Z4aHW1beV4AaPAJbLyiOyapuUgp43ZBhPmjnzG4TV9eVBLNB0lzha3/+NcS2zStry
-         1CGuZe72U0JRcDjvaXo8RPtsfBHG5pwvHjpxjcdEv1FrmWPNEeTDn0OvPfgT46kh1LlJ
-         4Rsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720088137; x=1720692937;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HkycAIXX9oozgwI/VIWUIGVyqGP4im+iT/UCwrMuXbk=;
-        b=p8zOS5xwTULLfoNIei0eN9SXeWOAKYUKei5Y82u8nastoaW7IqIOQ0q2W4XafQqRMw
-         sIBYVxYZWHrm/e8f0pY34Jl1yEVrrUJcaNld8DxH3mK4JxNm9IP5KCvwYlC9xpvjGpyI
-         rqcbsCjNgMJMgnyQYL+7r8ErWFKYmzCpVEhnDD6GJh7QPIs5hD1xMbMnLqn9+zW3mHWV
-         o4nFvZ0iFGAJIF9A5tB1TuQdGwFMg4XDW5EJ7xtzKeMkgznTMponz3P97C5XuQctAMY0
-         7Us2m0gXQdxNR+1T/4n9sx7Yj8o6jgiTSP6zpY3aRUK3P8clxJrZMuOx2pA0eR4lnLym
-         gA9w==
-X-Forwarded-Encrypted: i=1; AJvYcCX623T28a2/BeG7ek8qCMH6qPmR6qWH7GOS5IfC85WMuvyUu+WHKrl0EE0ebANVl0sgvNNVYylrZllEEE7RGaPD84ZGEsSo
-X-Gm-Message-State: AOJu0Yzqr6ih/zMUNKJr2me9ZuGhc5aeEjEpSU7AsLWPV04HOpyTbmEE
-	HPzqjN9bcUmnrMJXA84j6BbkhmiOLwnnUYFaWWh+/7YU0173mXYp6Nx7H1qPv9Q=
-X-Google-Smtp-Source: AGHT+IFGt551R6kJztXGmVqIbX0qoJLGqZJCf7ejNT6cC7aUYlHwsttJTgnYlKq3FizU8yPYFOlDNw==
-X-Received: by 2002:adf:f30c:0:b0:367:89d3:5d3e with SMTP id ffacd0b85a97d-3679dd19a0fmr956960f8f.12.1720088136910;
-        Thu, 04 Jul 2024 03:15:36 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367938a6e97sm3735482f8f.109.2024.07.04.03.15.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 03:15:36 -0700 (PDT)
-Date: Thu, 4 Jul 2024 12:15:32 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: syzbot <syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] possible deadlock in team_del_slave (3)
-Message-ID: <ZoZ2RH9BcahEB9Sb@nanopsycho.orion>
-References: <000000000000ffc5d80616fea23d@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09C3A41;
+	Thu,  4 Jul 2024 10:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720088276; cv=fail; b=u8y6ZBLWwHYdOls/2iaE933vNn3KZEimMhASZtB9ldDQHd2nKk/cHrhXwtFaqz/HQl6THJDyOh8gQbxmVmMJ4GbfBl9HxqX1iBVpH/XsECeDyqXx8vN3oexmnZ/ZxTTpdxqqCH5stW0hIr31Bro9rvP7KBlMoTmGtkuJ+wL3fR4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720088276; c=relaxed/simple;
+	bh=MK5YQFb2NwTrdkzveMYsev9ecET/UQufg98+PN4R/aw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=e8UGcsSgUZtHUyFJcBkiIEBCRGpdjGHvDx15mZLAs6Zg3eh5SkQ3qadjfKtaS33EDRguaumzulb76DodWya1atJ/gFjlJRv+GuSusJOrnpyvGLvihQDk/tu07P6Ch3y6hsNGho3r5yQfK3p9kfAI41uvxpGF/IQAQ5qO5oeS1Gk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kVlcmp7r; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720088274; x=1751624274;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MK5YQFb2NwTrdkzveMYsev9ecET/UQufg98+PN4R/aw=;
+  b=kVlcmp7rhkmsw7NRHQf+y9qpzs7kyKYrP2IqRSupPCJl44C1HX3tn4lO
+   ssIcsQq9L0JLVujeCQxrHjsEtqemUPa/ATLEroMsURgPj7NChfUpoanIw
+   xhulfIGM+CxbvlDm2NxCqs3kuw4MrV71B48HionPEyl0yn3Ros/TbHzxu
+   9rRjlvAXJQ5ncx97uAcPEQPHKx9qJQh/aeN2Uo3Z9jPOuWMwhBOhaLkie
+   gSJoPbItc3ApUwIUl+Yke5aPSHisgvQiFQ3z2fYj4IwNaVFU6dBMbQeqL
+   ToLXuOMVt3Z0kvaBEWRYctIc+CbaI3LmFNLQWQGzfaKUklou2KVPvJ+OY
+   Q==;
+X-CSE-ConnectionGUID: 8+BoIsS4T1WSeXDNr+DFLw==
+X-CSE-MsgGUID: fbXHIGDDQqW/waG4grQ4wg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="17179773"
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="17179773"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 03:17:53 -0700
+X-CSE-ConnectionGUID: IZCFMxufSKCXh+pMAfCWOA==
+X-CSE-MsgGUID: o1lRLlELRXmg/mc2iMJy1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="47209727"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Jul 2024 03:17:52 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 4 Jul 2024 03:17:51 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 4 Jul 2024 03:17:51 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 4 Jul 2024 03:17:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OyGu3osDKmlIJ+c7OBgI8y8+3acXjUq7QjowFBAu0jAzsIFi/JM3Tai7k8IlMdtUZw2m7ssE57tJnlIxUvlbNi6wkL/tqjoKsumbYec99CaGU/SKujpPvU7SCQWO4dxwS9Ms8WCMntFmNJlUngU9lAogSyeJqO+AAn/fwLYKJxAF2JjbE6/EPwjSPfHozgnbay9gM0XCrTohfb3/9ofdSwfBHx+xZ/QUoP33qU/6g0t8PU+gUfjfiRKuKqecsmOJohWZSfWK/2lQi9eivBayzKZ71NLfXdpLUdZ2LkcuArJigUJz78G5hmjrxQuHSZHYd+sABtoFmEMI326BsO9lhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DyGBy5FDaw2Te9ki3PSYEnGVSb+mrclE9BMHTzSflos=;
+ b=gvI9vhxTjYlrzN1NBzb8CrsdO7jaUxnGluwaWhTIolgPui3ZM7sYeAxCVRZhY0F54b3aPUcnl81dKDFy+zNPdyFJSXLcTH7q27G2m6PryYk87hBRkkRusCe1Dp2mPj3ejbIu2RouZV8b1e1E3ttrmYHjpxo9SNzZ+8c8IhGlZQSpOif+MK/8SXAm/vhluKufEd1QzJniQ3pTj6it6S1WiDW9vL1IhU+mtedTdUgJuItYd4p7t2UIjAMLvF3cjjRdzPA9uvdBTwI+Y5S2lJJSkT7v9Y0o3DpERfFSy+WrkbOd6imiBylErQLL+NGqNMtOu4X9DaQffHrcaTNaEAHj+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by MW4PR11MB6572.namprd11.prod.outlook.com (2603:10b6:303:1ee::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.29; Thu, 4 Jul
+ 2024 10:17:48 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7741.017; Thu, 4 Jul 2024
+ 10:17:48 +0000
+Message-ID: <2230e0ee-2bf4-4d86-b81d-1615125d3084@intel.com>
+Date: Thu, 4 Jul 2024 12:17:39 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ntp: fix size argument for kcalloc
+To: Paolo Abeni <pabeni@redhat.com>
+CC: <oss-drivers@corigine.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <louis.peens@corigine.com>,
+	<kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <yinjun.zhang@corigine.com>, <johannes.berg@intel.com>,
+	<ryno.swart@corigine.com>, <ziyang.chen@corigine.com>, <linma@zju.edu.cn>,
+	<niklas.soderlund@corigine.com>, Chen Ni <nichen@iscas.ac.cn>, "Sebastian
+ Andrzej Siewior" <bigeasy@linutronix.de>
+References: <20240703025625.1695052-1-nichen@iscas.ac.cn>
+ <5cafbf6e-37ad-4792-963e-568bcc20640d@intel.com>
+ <65153ac3f432295a89b42c8b9de83fcabdefe19c.camel@redhat.com>
+ <b30c7c109f41651809d9899c30b15a46595f11ef.camel@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <b30c7c109f41651809d9899c30b15a46595f11ef.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VE1PR03CA0059.eurprd03.prod.outlook.com
+ (2603:10a6:803:118::48) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000ffc5d80616fea23d@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MW4PR11MB6572:EE_
+X-MS-Office365-Filtering-Correlation-Id: b19424bc-37f7-4f0f-cb3e-08dc9c128dca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?azRvYU9pYTE5OFlzTXNXWk1RUXF6YVoxVEtWeEl6aktHNjlhWkN5NU9RMXVU?=
+ =?utf-8?B?NVpva1hBWWlRVC9JdzJxakhVNWVOdktMbG0yVEp4a0l1WlhJa1d6TDVaamlu?=
+ =?utf-8?B?T3I3ZFdDSlY5OGtoM1RXQjRhZmh1eXdrM1RldXNMK1kwUGpyR3JYWWMrUFIz?=
+ =?utf-8?B?dlRiUVBBQ0ZQeEhwVzdRblZRb2tScTUvYU9wSjRrZ2FnemszOEpmVXZudUFQ?=
+ =?utf-8?B?U0JiQjl5alBtU1BLS0VnZTZ1dFhTaEYxMEtwR1pZZmZ2ZnhYc3ZCc1NnTUpM?=
+ =?utf-8?B?Zis5SStBbGVqNEJ2TnhtMENEN0YxTWw1UEhUcVJhN2pXZmhxSGwvUlZ4bi9s?=
+ =?utf-8?B?d2x5aVMxMTA2aXZNK2RDelYvV2J6eHpBYkRvZjE2cFdMMmxaK2Z1SFlaU0w2?=
+ =?utf-8?B?SEdDL0kvY0ExUlJYbGc0cUxHQ0RRdlFxV2QyWW9pZW5zRWlDYkxTc08wU2pS?=
+ =?utf-8?B?MWNhV2IzdVBIT2RkdnpSSnMwZVA4azJueXd0RjdZS0x1dzBBYUdQNUoyd2xQ?=
+ =?utf-8?B?UG9ndWR6ekFITkM5OHFuUEw0dGIxeDhhZmhMQjUrcy9pMGZ6aWFpelk5eE84?=
+ =?utf-8?B?KzYvVkxtRWJTd1BNcDdGK2RZa05JeVRyUndBeTdwSS9wejR1Rnd3QnllMFhK?=
+ =?utf-8?B?L0hRRTdVMlo1anFTYWdmQVliWGdVUEpGUVhnVHVIeXh3RTRuLzVwNW83Njc2?=
+ =?utf-8?B?UXRFT3IzMDVqQUlndTd0TWp3ZlhETGxWcHZFOWYxWjV3MWU3ZWNSWEtMdy9v?=
+ =?utf-8?B?YnBnRlZXWXVibytEcG95QzBtNWdxTUZSMFluSlo5SGltWFhtQk9WYmtwQUNy?=
+ =?utf-8?B?ZE5ld004dkpIYkRyWWlWVlRCSmVtemgrdmR5UTk5VXowYXA5VlNQMXVvMUV6?=
+ =?utf-8?B?MVl4VDIwamJ1MFRQeGkvcEh6U1ZNRUFQTlNWQzQ1dFRyNXlBd3NOZ2xSMzFO?=
+ =?utf-8?B?RDFPMEp2UUR5aG9SWDlwdDFaNU1lejlBR1JZVEVZcE92cmgvVWxhbkk3QUFa?=
+ =?utf-8?B?WktTbC8yNUFFUFEvbjFnZ3luYk1yYWpqVFkwSitNd1NHY0RyQmtkQ2NtbW9a?=
+ =?utf-8?B?WW5nVmZ1UnFoNVVUU3hqR1pqL0tKNlJaTnNrNUU0eElwM244cEpONUZDOEp2?=
+ =?utf-8?B?SGNFRG9QMXloTWVra2RPVGZYZzA5MTZhTzFGNHByL3dFZ0dqUG9vanFXMFBm?=
+ =?utf-8?B?WFJSMU1KSWpmbHRVQU1pSDdZSGkrR1lkeHVQUWgrNmV5Zi8rRnVWTFcrcGNI?=
+ =?utf-8?B?M2xmWWo2aUNNbGx1TFZ5STZnZk55czh0bitkS3M1c01pUEloZDQrRXlERVR5?=
+ =?utf-8?B?dDRlQ0YrSzVMcWlNRy9RZjVoMUlqRnhrbzBmVHpySjFGd28yNjUyU2NGRThH?=
+ =?utf-8?B?RmdFdXc0ZWx4RnQwaWpQanJETjNyKy9QL0xkK3M1TFZnZldQUGNvM2tTRVdY?=
+ =?utf-8?B?TkxnbENJbDVVRjRoS3p4b3Q5SUVTeTNUTUpaVW5NakdQMHZWLzdNMFIrWlhK?=
+ =?utf-8?B?b1FaNGhzU01DU29yUFp2RlNyR25xdCtWTUlZOTV3aGxOWE0xY2ViZTBHLzB4?=
+ =?utf-8?B?YjFhMzRYTm4zeGRydm5Qd3Y0WmJMbkptKzA5WWdPcWdnVGw0NkY4V2QvNUEv?=
+ =?utf-8?B?L2Z0MUp6NE9aWU8zMllPb1ZrQnFFN2gyclQxWktmMGJwTWNiVFhzNWpGeGtD?=
+ =?utf-8?B?VWVJODVVTFFxSkJLdVFoWW5mRlhVVDBwZVNLTWZQTTQ0MHVVMHJ5TW9PZDRz?=
+ =?utf-8?Q?49waGBFae9Eq9xTCqM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OHJrU3VkMExMdUtvNldwbXJkdjRQZDVzY0ZpV2J0TmhBa2lLbVBkQUY3QVdV?=
+ =?utf-8?B?amZUYmlmVENOSld1MG0zUWkzaDM1cE52T1Z6Q21ET1A4VDk2VExVYWFXSDZM?=
+ =?utf-8?B?MjFsUS9GYWhjVXdFNWJLOXRVZ1gvdEUxL2k4dDJzbVB5RHZjOU1nazYyMFRq?=
+ =?utf-8?B?ajZEZHJSY3kzSGlIcHAwL08yZ3dUYXZXb1M4UVh1aWFJY1l0SnFReHNTckRW?=
+ =?utf-8?B?YnNaTHBpbkF2M3NCOHFmWkUzUHZSMm5idlRiU3JNOGFqRnlpeXZndWZtNFJv?=
+ =?utf-8?B?Nk9ucFYwSDl6eERqZURqMktGbnNtcjUrMnI1TkJqVURtQzJLSmMyQXovK1ZZ?=
+ =?utf-8?B?UlRXKzdvdGhjbU1vN0Z1cWJkcHVCYzNHdDZiczgxcEV3TVkvSmNkT0Q0a0NK?=
+ =?utf-8?B?cUFDWkRQTFIxdnEwQk9rNEJETjByekZBNXVpakNodmFQRkFRZzl0STk0R2Nw?=
+ =?utf-8?B?djFHMWtBbGcwVkhRMng3bElvUlQ2Mk9tMVQrOEZkcE0vMzhpejJwN2R6bGQz?=
+ =?utf-8?B?b3p5M3hDOEtISlJ2bUpmZmt1VkdRczNSY0tFZk9sZitudlVIUzBrVHBWNzJH?=
+ =?utf-8?B?dmtyKzlNaXUrTW9WZDN4cTVoL0R2bXI0VnhVVFhJbXFkMkRVK2RnQmwrd1k5?=
+ =?utf-8?B?ZjM1RWlvUE9EVHJEMXhhZzVKNzRFeUhVTmZUcGJOTlJzdmZIR2N1L1VkOVdT?=
+ =?utf-8?B?Qm5nSFVpTVpCams0eWx4R1FHUCtlcm9IT0dMNmRYdC9Dem9KamV4Qi9UYjRx?=
+ =?utf-8?B?NG5yQ0dUU2U1SWd6UllaTHBaejI2R0x1RkJLalNodVU0cXVWZ2RHZWFlVEZO?=
+ =?utf-8?B?NllNaURYM1J1bEQwYmNjMHkwVkk4T0t6aWtwOVlNbytxclh4Q1BnYk5SZ09j?=
+ =?utf-8?B?M1NPRkZ0QWhQQlFQazNoYlJUY2NISG5zbGpnbFU5T2EybUF3d0YzZE5hNGsz?=
+ =?utf-8?B?cURyaHh3TVY5U1IzK3RzRDdHVGZPd1BabytnUE9tcVpYeU1MR3VES2x4V0kz?=
+ =?utf-8?B?U2RRdkM0bytWRVdGWkJGanZoTkZNWUtzZFdmVlQxak1GbG5PenUwRTg1Q2tM?=
+ =?utf-8?B?QXZLcWJxbzBTbjFlUmZEQnVHR1JSNmhLK2lFNjk0dDBPbnNneFZFKzFSVmRt?=
+ =?utf-8?B?cXhKNVZVZThyRnFwdXB6SlBlVml6R3Z5RU82N2luM0lGUG5vYmgzMmdDNlRX?=
+ =?utf-8?B?WkdTNDJVdktMWGxNd1ZiSTI0cENkdEZWTXE1cWZaNEpaaS9uTHRjbTNVNWND?=
+ =?utf-8?B?Z1VmcytrQkxsc2FLVEJoZjIxVkVDMmdwNXRMTEJvc291N1hZemhnbXhqTldo?=
+ =?utf-8?B?Qkdib0U3RW1McExQUU9aMGYzNFNsOE5XWEFTSkFXKzhiZmRSR3cvaDU0N2k1?=
+ =?utf-8?B?WnRjRzVXNzcxTmZlUW9zNDBqanE0YjFCcHRXRGNMbHhPMDRFUkNCSmNoSDRJ?=
+ =?utf-8?B?NVRmbjFDYk5JeFdZdzRabGo5QkFDb1NYRUFWa21pbi9TZElBSTRqZlZEMDNW?=
+ =?utf-8?B?S3A4NFRUOE1vQWdvZ1Fzd2ZPVm40eHgwVVlmam9KUGdTL3k4bzR0S3hkZUc1?=
+ =?utf-8?B?eWU5a3QwbmdFc0NNdnVranNFY0pydkZNQmxKZmxPMXUwaHpqNWxuYk11ZUhT?=
+ =?utf-8?B?ci9zblNLQUR2YkkreXFRRTcxNS84bGxTWTJ1K05vWllQNUxnK0ttbCtMUXhN?=
+ =?utf-8?B?Q3F0YUV4MTVBR0lqOHk1K01xUVJnYkF4OWpuRTdNbFNuU1hwcEZsQmZwM2dk?=
+ =?utf-8?B?MnZSOWhYME05ZEpvZTZ6dUg0UVlCVHhXWGR4d3ZFNGFqWUs5RStHUSs5ZjN4?=
+ =?utf-8?B?UDhNMWE1bFdkNzhUV000bTFSVXFLMklyZFMzTWNKZGhYcmc3L1Y3TEYrMTNE?=
+ =?utf-8?B?Qjd3WFZNWU15SFBvWEp0cVlLVm9CbXI2Z2kzSG5QMmZEblkxc3d4S1FubHFy?=
+ =?utf-8?B?L3lzK2ZSSlNCdk91NHAzcXJ2Qmp2M0VuOWhoMFJTd2FXczFMZlRtUjczTFAr?=
+ =?utf-8?B?RU1sZU1vOVpjTXRuVXhicW4vaE16dy9kc2tHcTgrcnduaERMSEVzUVo5RDVl?=
+ =?utf-8?B?Ny9RSWwvN1MyeUNFeGxpbVJ2V3JyMktuT3VpQ1Mrb3pnNXVrdnd4a3JualNV?=
+ =?utf-8?B?RWtiR2EzSENmbXExaTZwbFA5MWc3SWpLLy9sUCtObnIzZC8yTVhnVytQaXls?=
+ =?utf-8?Q?axEGYbcLJOPZ5TNHNjqghxE=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b19424bc-37f7-4f0f-cb3e-08dc9c128dca
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2024 10:17:48.3825
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sudO6SsYz3ZedZY4c2YFKq7pZJbcpgMlLRnyBiNAuXV3ha9PNiy+76+KuN6p+mj2hOHymn6+9tvMZee45kGGtLlh/uZ8lxpvpC1d1bcURcY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6572
+X-OriginatorOrg: intel.com
 
-Fri, Apr 26, 2024 at 01:59:32PM CEST, syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com wrote:
->Hello,
->
->syzbot found the following issue on:
->
->HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
->git tree:       upstream
->console+strace: https://syzkaller.appspot.com/x/log.txt?x=1662179e180000
->kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
->dashboard link: https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
->compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1058e7b9180000
->C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11919365180000
->
->Downloadable assets:
->disk image: https://storage.googleapis.com/syzbot-assets/5f73b6ef963d/disk-480e035f.raw.xz
->vmlinux: https://storage.googleapis.com/syzbot-assets/46c949396aad/vmlinux-480e035f.xz
->kernel image: https://storage.googleapis.com/syzbot-assets/e3b4d0f5a5f8/bzImage-480e035f.xz
->
->IMPORTANT: if you fix the issue, please add the following tag to the commit:
->Reported-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
->
->======================================================
->WARNING: possible circular locking dependency detected
->6.8.0-syzkaller-08073-g480e035fc4c7 #0 Not tainted
->------------------------------------------------------
->syz-executor419/5074 is trying to acquire lock:
->ffff888023dc4d20 (team->team_lock_key){+.+.}-{3:3}, at: team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
->
->but task is already holding lock:
->ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
->
->which lock already depends on the new lock.
->
->
->the existing dependency chain (in reverse order) is:
->
->-> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
->       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->       wiphy_lock include/net/cfg80211.h:5951 [inline]
->       ieee80211_open+0xe7/0x200 net/mac80211/iface.c:449
->       __dev_open+0x2d3/0x450 net/core/dev.c:1430
->       dev_open+0xae/0x1b0 net/core/dev.c:1466
->       team_port_add drivers/net/team/team.c:1214 [inline]
->       team_add_slave+0x9b3/0x2750 drivers/net/team/team.c:1974
->       do_set_master net/core/rtnetlink.c:2685 [inline]
->       do_setlink+0xe70/0x41f0 net/core/rtnetlink.c:2891
->       rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3185
->       rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
->       netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->       netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->       netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->       netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->       sock_sendmsg_nosec net/socket.c:730 [inline]
->       __sock_sendmsg+0x221/0x270 net/socket.c:745
->       ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->       ___sys_sendmsg net/socket.c:2638 [inline]
->       __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->       do_syscall_64+0xfb/0x240
->       entry_SYSCALL_64_after_hwframe+0x6d/0x75
->
->-> #0 (team->team_lock_key){+.+.}-{3:3}:
->       check_prev_add kernel/locking/lockdep.c:3134 [inline]
->       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
->       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
->       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
->       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->       team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
->       team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
->       notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
->       call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
->       call_netdevice_notifiers net/core/dev.c:2002 [inline]
->       unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
->       unregister_netdevice_many net/core/dev.c:11154 [inline]
->       unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
->       unregister_netdevice include/linux/netdevice.h:3115 [inline]
->       _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
->       ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
->       ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
->       rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
->       cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
->       genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
->       genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
->       genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
->       netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
->       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
->       netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->       netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
->       netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
->       sock_sendmsg_nosec net/socket.c:730 [inline]
->       __sock_sendmsg+0x221/0x270 net/socket.c:745
->       ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
->       ___sys_sendmsg net/socket.c:2638 [inline]
->       __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
->       do_syscall_64+0xfb/0x240
->       entry_SYSCALL_64_after_hwframe+0x6d/0x75
+On 7/4/24 11:41, Paolo Abeni wrote:
+> On Thu, 2024-07-04 at 11:36 +0200, Paolo Abeni wrote:
+>> On Wed, 2024-07-03 at 11:16 +0200, Przemek Kitszel wrote:
+>>> On 7/3/24 04:56, Chen Ni wrote:
+>>>> The size argument to kcalloc should be the size of desired structure,
+>>>
+>>> xsk_pools is a double pointer, so not "desired structure" but rather you
+>>> should talk about an element size.
+>>>
+>>>> not the pointer to it.
+>>>>
+>>>> Fixes: 6402528b7a0b ("nfp: xsk: add AF_XDP zero-copy Rx and Tx support")
+>>>
+>>> even if the the behavior is not changed, the fix should be targeted to
+>>> net tree
+>>
+>> This patch is IMHO more a cleanup than a real fix. As such it's more
+>> suited for net-next. For the same reason I think it should not go to
+>> stable, so I'm dropping the fixes tag, too.
 
-I wonder, since we already rely on rtnl in lots of team code, perhaps we
-can remove team->lock completely and convert the rest of the code to be
-protected by rtnl lock as well.
+I'm fine with targeting it at any of the trees.
 
+But I still believe it is a fix, even if a trivial one, and even if code
+"works" - it's a "wrong" code.
 
+Here I received similar feedback in a similar case:
+https://www.mail-archive.com/intel-wired-lan@osuosl.org/msg03252.html
+and I changed my mind then.
 
->
->other info that might help us debug this:
->
-> Possible unsafe locking scenario:
->
->       CPU0                    CPU1
->       ----                    ----
->  lock(&rdev->wiphy.mtx);
->                               lock(team->team_lock_key);
->                               lock(&rdev->wiphy.mtx);
->  lock(team->team_lock_key);
->
-> *** DEADLOCK ***
->
->3 locks held by syz-executor419/5074:
-> #0: ffffffff8f3f1a30 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1216
-> #1: ffffffff8f38ce88 (rtnl_mutex){+.+.}-{3:3}, at: nl80211_pre_doit+0x5f/0x8b0 net/wireless/nl80211.c:16401
-> #2: ffff88802a210768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: nl80211_del_interface+0x11a/0x140 net/wireless/nl80211.c:4389
->
->stack backtrace:
->CPU: 1 PID: 5074 Comm: syz-executor419 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
->Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
->Call Trace:
-> <TASK>
-> __dump_stack lib/dump_stack.c:88 [inline]
-> dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-> check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
-> check_prev_add kernel/locking/lockdep.c:3134 [inline]
-> check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-> validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-> __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-> lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-> __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-> __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-> team_del_slave+0x32/0x1d0 drivers/net/team/team.c:1988
-> team_device_event+0x200/0x5b0 drivers/net/team/team.c:3029
-> notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
-> call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-> call_netdevice_notifiers net/core/dev.c:2002 [inline]
-> unregister_netdevice_many_notify+0xd96/0x16d0 net/core/dev.c:11096
-> unregister_netdevice_many net/core/dev.c:11154 [inline]
-> unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11033
-> unregister_netdevice include/linux/netdevice.h:3115 [inline]
-> _cfg80211_unregister_wdev+0x162/0x560 net/wireless/core.c:1206
-> ieee80211_if_remove+0x25d/0x3a0 net/mac80211/iface.c:2242
-> ieee80211_del_iface+0x19/0x30 net/mac80211/cfg.c:202
-> rdev_del_virtual_intf net/wireless/rdev-ops.h:62 [inline]
-> cfg80211_remove_virtual_intf+0x230/0x3f0 net/wireless/util.c:2847
-> genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
-> genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
-> genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1208
-> netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
-> genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
-> netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
-> netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
-> netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg+0x221/0x270 net/socket.c:745
-> ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
-> ___sys_sendmsg net/socket.c:2638 [inline]
-> __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
-> do_syscall_64+0xfb/0x240
-> entry_SYSCALL_64_after_hwframe+0x6d/0x75
->RIP: 0033:0x7f963cb981a9
->Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->RSP: 002b:00007ffdde1419a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
->RAX: ffffffffffffffda RBX: 00007f963cbe53f6 RCX: 00007f963cb981a9
->RDX: 0000000000000000 RSI: 0000000020000400 RDI: 0000000000000004
->RBP: 00007f963cc17440 R08: 0000000000000000 R09: 0000000000000000
->R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000031
->R13: 0000000000000003 R14: 0000000000050012 R15: 00007ffdde141a02
-> </TASK>
->team0: Port device wlan0 removed
->
->
->---
->This report is generated by a bot. It may contain errors.
->See https://goo.gl/tpsmEJ for more information about syzbot.
->syzbot engineers can be reached at syzkaller@googlegroups.com.
->
->syzbot will keep track of this issue. See:
->https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
->If the report is already addressed, let syzbot know by replying with:
->#syz fix: exact-commit-title
->
->If you want syzbot to run the reproducer, reply with:
->#syz test: git://repo/address.git branch-or-commit-hash
->If you attach or paste a git patch, syzbot will apply it before testing.
->
->If you want to overwrite report's subsystems, reply with:
->#syz set subsystems: new-subsystem
->(See the list of subsystem names on the web dashboard)
->
->If the report is a duplicate of another one, reply with:
->#syz dup: exact-subject-of-another-report
->
->If you want to undo deduplication, reply with:
->#syz undup
+> 
+> Thinking again about it, this patch has a few things to be cleaned-up.
+> 
+> @Chen Ni, please submit a new revision, adjusting the subj and commit
+> message as per Przemek and Simon feedback and dropping the fixes tag,
+> still targeting net-next.
+> 
+> You can retain the already collected tags.
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
 
