@@ -1,139 +1,144 @@
-Return-Path: <netdev+bounces-109206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6E29275FA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:28:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BEAD927616
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B6E282E68
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:28:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0692B1F2412A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7F11AE845;
-	Thu,  4 Jul 2024 12:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="FyFg0wZG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FAD1AE861;
+	Thu,  4 Jul 2024 12:32:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21F01AE842
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 12:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id AD62A1822FB;
+	Thu,  4 Jul 2024 12:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720096124; cv=none; b=S5uRfjipaFxYqiID1bjJkA1+eeG4UmM3XqS2DpvFTEGQcpSsXnlbDkH9FCwRZ6NdSYBj8t+q/br0AXx9Apsr2qtmUfh1Q/7964riyDv/qNOA7xHzXb6So0jWPEb/X6JfZexc6H9DV0DWFlVsKKaBi/Ew27ndHe9y9uVINMb/AhA=
+	t=1720096354; cv=none; b=galaTWH1VeP2QfMru8W3lsqBgVsifjJlPARstgQccp30t3Y2i++yeloW5/pkx7vMr8HJ+NaDewUOtmQzdrCQ+BRqq7AYh5DRVrRTBNAmdb5BL/XVMH+JEskyCQmNwZ5lEdW34EDOLhjLzLujj07u9vrYFviOmhinqZGdmPzsZCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720096124; c=relaxed/simple;
-	bh=GSgU6z84HFCsGnjYik2f1z6k+gv7IzsJmDFTjYYdZhY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ulXgdt63vlgGUxoeauhSNGg2rIqii6O4U7nhxyovExWJyqtCQ1o/I2gfygqE6H2DTM2PzHNSufamrHqbokBXEMn5MYWWgAkpABlvY0jXccEUhKHFi8EvT4LQb4r1/YR+MmtBf5OCnEog+9ywWuqFA+VVmRdcMY663idnJJqdFJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=FyFg0wZG; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 464CRqBX025570
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 4 Jul 2024 14:27:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1720096075; bh=fc4aP9yklrajGNF7Ody1qzxVFCGxKEODf6A9Gc6nlg4=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=FyFg0wZG6sZ+DsJenhKqWycyi5icas1kiISNqY6iMxR5Ke+lizwwi5adLdXTuEijT
-	 VifLY6Rcut7ES7MNDu0GsjJG6VNzUR+SKR3ROmPwokUuUt3qjGum1aGnMCjp5dO+DJ
-	 OooTTnPw5X6h+v6m+wsdJahl0xatgPTuOt7oa05c=
-Message-ID: <8711f66b-9461-4e3c-8881-5bda2379b926@ans.pl>
-Date: Thu, 4 Jul 2024 05:27:49 -0700
+	s=arc-20240116; t=1720096354; c=relaxed/simple;
+	bh=fqDu8pYK9AkqEy53xImbufF/zeWILv9N9MLM8NviZwU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q/y3/xo4RvG1oJh9hp/O2p0sSN0qTgXSZgkRVH3ggJ5cR5giLIthxcjeV/udDO7gDrX0UBPjs9Nwo4pbf1bvsdS0syfL0rX3lCiuMDC2XybEzJSyAt6R931ueCGsHzx2nT9PBsol19Otv156J41NlyQtd6r4YUTE2yrsoNJcSkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
+Received: from localhost.localdomain (unknown [103.163.180.3])
+	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPA id 880BA606D1292;
+	Thu,  4 Jul 2024 20:32:13 +0800 (CST)
+X-MD-Sfrom: youwan@nfschina.com
+X-MD-SrcIP: 103.163.180.3
+From: Youwan Wang <youwan@nfschina.com>
+To: andrew@lunn.ch
+Cc: hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Youwan Wang <youwan@nfschina.com>
+Subject: [net-next,v1] net: phy: phy_device: fix PHY WOL enabled, PM failed to suspend
+Date: Thu,  4 Jul 2024 20:32:00 +0800
+Message-Id: <20240704123200.603654-1-youwan@nfschina.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ethtool fails to read some QSFP+ modules.
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-To: Ido Schimmel <idosch@idosch.org>, Dan Merillat <git@dan.merillat.org>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev <netdev@vger.kernel.org>
-References: <54b537c6-aca4-45be-9df0-53c80a046930@dan.merillat.org>
- <ZoJaoLq3sYQcsbDb@shredder.mtl.com> <ZoJdxmZ1HvmARmB1@shredder.mtl.com>
- <49bf6eca-9ad0-49a7-ac8d-d5104581f137@ans.pl>
-Content-Language: en-US
-In-Reply-To: <49bf6eca-9ad0-49a7-ac8d-d5104581f137@ans.pl>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 03.07.2024 at 07:36, Krzysztof Olędzki wrote:
-> Good morning,
-> 
-> On 01.07.2024 at 00:41, Ido Schimmel wrote:
->> Forgot to add Krzysztof :p
->>
->> On Mon, Jul 01, 2024 at 10:28:39AM +0300, Ido Schimmel wrote:
->>> On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
->>>>
->>>> I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
->>>> the optional page3 data as a hard failure.
->>>>
->>>> This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
->>>
->>> Thanks for the report and the patch. Krzysztof Olędzki reported the same
->>> issue earlier this year:
->>> https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
->>>
->>> Krzysztof, are you going to submit the ethtool and mlx4 patches?
-> 
-> Yes, and I apologize for the delay - I have been traveling with my family and was unable to get into it.
-> 
-> I should be able to work on the patches later this week, so please expect something from me around the weekend.
-> 
->>>> From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
->>>> From: Dan Merillat <git@dan.eginity.com>
->>>> Date: Sun, 30 Jun 2024 13:11:51 -0400
->>>> Subject: [PATCH] Some qsfp modules do not support page 3
->>>>
->>>> Tested on an older Kaiam XQX2502 40G-LR4 module.
->>>> ethtool -m aborts with netlink error due to page 3
->>>> not existing on the module. Ignore the error and
->>>> leave map->page_03h NULL.
+If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
+we cannot suspend the PHY. Although the WOL status has been
+checked in phy_suspend(), returning -EBUSY(-16) would cause
+the Power Management (PM) to fail to suspend. Since
+phy_suspend() is an exported symbol (EXPORT_SYMBOL),
+timely error reporting is needed. Therefore, an additional
+check is performed here. If the PHY of the mido bus is enabled
+with WOL, we skip calling phy_suspend() to avoid PM failure.
 
-BTW - the code change does what we have discussed, but I think the comment
-may be incorrect? Before we call nl_get_eeprom_page, there is a check to
-verify that Page 03h is present:
+Thank you all for your analysis.
+I am using the Linux kernel version 6.6, the current system is
+utilizing ACPI firmware. However, in terms of configuration,
+the system only includes MAC layer configuration while lacking
+PHY configuration. Furthermore, it has been observed that the
+phydev->attached_dev is NULL, phydev is "stmmac-0:01", it not
+attached, but it will affect suspend and resume. The actually
+attached "stmmac-0:00" will not dpm_run_callback():
+mdio_bus_phy_suspend().
 
-        /* Page 03h is only present when the module memory model is paged and
-         * not flat.
-         */
-        if (map->lower_memory[SFF8636_STATUS_2_OFFSET] &
-            SFF8636_STATUS_PAGE_3_PRESENT)
-                return 0;
+The current modification is solely aimed at ensuring that PHY
+have WOL enabled but are not attached are calling phy_suspend()
 
-In this case, it seems to me that the failure can only be caused by either
-HW issues (NIC or SFP) *or* a bug in the driver. Assuming we want to provide
-some details in the code, maybe something like this may be better?
+log:
+[    5.932502] YT8521 Gigabit Ethernet stmmac-0:00: attached PHY driver
+(mii_bus:phy_addr=stmmac-0:00, irq=POLL)
+[    5.932512] YT8521 Gigabit Ethernet stmmac-0:01: attached PHY driver
+(mii_bus:phy_addr=stmmac-0:01, irq=POLL)
+[   24.566289] YT8521 Gigabit Ethernet stmmac-0:00: yt8521_read_status,
+link down, media: UTP
 
-+	/* Page 03h is not available due to either HW issue or a bug
-+	 * in the driver. This is a non-fatal error and sff8636_dom_parse()
-+	 * handles this correctly.
+log:
+[  322.631362] OOM killer disabled.
+[  322.631364] Freezing remaining freezable tasks
+[  322.632536] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+[  322.632540] printk: Suspending console(s) (use no_console_suspend to debug)
+[  322.633052] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x110 [libphy] returns -16
+[  322.633071] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: failed to suspend: error -16
+[  322.669699] PM: Some devices failed to suspend, or early wake event detected
+[  322.669949] OOM killer enabled.
+[  322.669951] Restarting tasks ... done.
+[  322.671008] random: crng reseeded on system resumption
+[  322.671014] PM: suspend exit
+
+log:
+[  260.814763] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: dpm_run_callback():mdio_bus_phy_resume+0x0/0x160 [libphy] returns -95
+[  260.814782] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: failed to resume: error -95
+
+Signed-off-by: Youwan Wang <youwan@nfschina.com>
+---
+ drivers/net/phy/phy_device.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 2ce74593d6e4..0564decf701f 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -270,6 +270,7 @@ static DEFINE_MUTEX(phy_fixup_lock);
+ 
+ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ {
++	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+ 	struct device_driver *drv = phydev->mdio.dev.driver;
+ 	struct phy_driver *phydrv = to_phy_driver(drv);
+ 	struct net_device *netdev = phydev->attached_dev;
+@@ -277,6 +278,15 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ 	if (!drv || !phydrv->suspend)
+ 		return false;
+ 
++	/* If the PHY on the mido bus is not attached but has WOL enabled
++	 * we cannot suspend the PHY.
 +	 */
-
-We were also discussing if printing a warning in such situation may make sense.
-As I was thinking about this more, I wonder if we can just use the same check
-in sff8636_show_dom() and if map->page_03h is NULL print for
- "Alarm/warning flags implemented"
-something like:
- "Failed (Page 03h access error, HW issue or kernel driver bug?)"
-
-We would get it in addition to "netlink error: Invalid argument" that comes from:
-./netlink/nlsock.c:             perror("netlink error");
-
-
->>> User space only tries to read this page because the module advertised it
->>> as supported. It is more likely that the NIC driver does not return all
->>> the pages. Which driver is it?
->>
-
-Krzysztof
++	phy_ethtool_get_wol(phydev, &wol);
++	phydev->wol_enabled = !!(wol.wolopts);
++	if (!netdev && phydev->wol_enabled &&
++	    !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
++		return false;
++
+ 	/* PHY not attached? May suspend if the PHY has not already been
+ 	 * suspended as part of a prior call to phy_disconnect() ->
+ 	 * phy_detach() -> phy_suspend() because the parent netdev might be the
+-- 
+2.25.1
 
 
