@@ -1,122 +1,87 @@
-Return-Path: <netdev+bounces-109165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 269C992731B
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:32:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59109927318
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8358DB2241A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:32:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E57C1F2284B
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD261AB535;
-	Thu,  4 Jul 2024 09:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575FD191F76;
+	Thu,  4 Jul 2024 09:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BNAqwIcf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A45171A7
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 09:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294C013B29D;
+	Thu,  4 Jul 2024 09:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720085548; cv=none; b=ja5m759E4o3vpXsiGXlLcHihiomUms+F+a/rTmowhUHrJUs6pkpcNBDzzleoNUy4jBcfdQ1AR34Qep7KNRH2UGBAQo7VOi/csgMeWFhjtS3qu9ah5K3eBHvQMGZKuupCAEVR4Pdi2eBO64a+1LiYvnR0pTunO8GHM0cGFjRvIP8=
+	t=1720085547; cv=none; b=hXO2yWLRzvi+eixKryHURq4L16408dqDRlIHDeAE4gbj8jayM+61aV8VBgnWNp2uEW/0ukE3/KY65I4RDkxsmmKyStnUNVAl8v1VTzRbPZ+yPJIVfsdFlO3mePi/71xnHZjjC+WEtoAy1kOzClCyJYW+dkP7wf0su5K10CiKq1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720085548; c=relaxed/simple;
-	bh=+KJrw2uVVohWtr1jzVvmdI3TTSiQZzgjnMhs5jqRhFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qq/A332qC4GMNgZMOFFpGkG0nAS4N5uzOMnk1RAh85JTovE37/X2fTLHwgzkgotUVjepU/Xmfr9EcBNhPnX607dSWogPyrn7NzAMmjQcaK/1r7214btWlNBNn0ugOu4wfsWEBDCDlRU0FB58EicsiZGOuSqZy4A23ol18yryBR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.2])
-	by gateway (Coremail) with SMTP id _____8Bx7vAobIZmR+IAAA--.3015S3;
-	Thu, 04 Jul 2024 17:32:24 +0800 (CST)
-Received: from [192.168.100.8] (unknown [223.64.68.2])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxnscmbIZmXuY6AA--.6180S3;
-	Thu, 04 Jul 2024 17:32:23 +0800 (CST)
-Message-ID: <0aa9bb3e-f81c-4677-8872-e01cb6522881@loongson.cn>
-Date: Thu, 4 Jul 2024 17:32:22 +0800
+	s=arc-20240116; t=1720085547; c=relaxed/simple;
+	bh=w19DchiW/7C37L4MuQM+qfzoS3IEIWVbJxorCmkgc9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M64ITIAVeV/nywuhNjoPfesBcdfCZ9Ivjp+CLp/eAlif62nBxmGgkWnjjaSWkH5GPgJSrPrzlAfcyNm5ZFAm6iDZHzbsLvR/p0f3seP5rFexSZ0/hu9Mu7YM4DvteiuCajTsTdYd0kcBcNgAg/ZQjIsGgh74zQQRIvdpRPll6Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BNAqwIcf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34C3DC32786;
+	Thu,  4 Jul 2024 09:32:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720085546;
+	bh=w19DchiW/7C37L4MuQM+qfzoS3IEIWVbJxorCmkgc9I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BNAqwIcfUM2oyPOu+N0omQ/Aw48pvHWGoHOgMqmb5UR/G0e4vgIkVFYvqx0iZDSOr
+	 9t/ejfmTQYtXZniUGFqg8BDScdTYtrChTtBeGk24je6r2xBdutolp7FTElPJcm36lH
+	 v09x0CK3UNja4i6Jbm9A34j6eGriKxcgbWG9I3Vw=
+Date: Thu, 4 Jul 2024 11:32:24 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Yunseong Kim <yskelg@gmail.com>, stable@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Sasha Levin <sashal@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Taehee Yoo <ap420073@gmail.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Austin Kim <austindh.kim@gmail.com>,
+	MichelleJin <shjy180909@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	ppbuk5246@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [PATCH] tracing/net_sched: NULL pointer dereference in
+ perf_trace_qdisc_reset()
+Message-ID: <2024070400-slideshow-professor-af80@gregkh>
+References: <20240702180146.5126-2-yskelg@gmail.com>
+ <20240703191835.2cc2606f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 13/15] net: stmmac: dwmac-loongson: Drop
- pci_enable/disable_msi temporarily
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <2c5e376641ac8e791245815aa9e81fbc163dfb5a.1716973237.git.siyanteng@loongson.cn>
- <zniayk52akd6dfbfoga7f6m6ubdmteijkr2luubccmqiflhuya@x2cfleoodqlh>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <zniayk52akd6dfbfoga7f6m6ubdmteijkr2luubccmqiflhuya@x2cfleoodqlh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxnscmbIZmXuY6AA--.6180S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxJrWfurW3JFy5Xw4fGw18Xrc_yoW8ZrWUp3
-	yFv3s3Kr1DZFyI9anIvr4DJa48ZF1jqrWkGrWkK3Wjk3sxZw1xtF1xKFW5ZFyIvw4kW3Wa
-	qFZ7XF1kC3yDuFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU28nYUUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240703191835.2cc2606f@kernel.org>
 
+On Wed, Jul 03, 2024 at 07:18:35PM -0700, Jakub Kicinski wrote:
+> On Wed,  3 Jul 2024 03:01:47 +0900 Yunseong Kim wrote:
+> > Support backports for stable version. There are two places where null
+> > deref could happen before
+> > commit 2c92ca849fcc ("tracing/treewide: Remove second parameter of __assign_str()")
+> > Link: https://lore.kernel.org/linux-trace-kernel/20240516133454.681ba6a0@rorschach.local.home/
+> > 
+> > I've checked +v6.1.82 +v6.6.22 +v6.7.10, +v6.8, +6.9, this version need
+> > to be applied, So, I applied the patch, tested it again, and confirmed
+> > working fine.
+> 
+> You're missing the customary "[ Upstream commit <upstream commit> ]"
+> line, not sure Greg will pick this up.
+> 
 
-在 2024/7/1 09:17, Serge Semin 写道:
->> [PATCH net-next v13 13/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi temporarily
-> You don't drop the methods call "temporarily" but forever. So fix
-> the subject like this please:
-> [PATCH net-next v13 13/15] net: stmmac: dwmac-loongson: Drop pci_enable_msi/disable_msi methods call
->
-> I understand that you meant that the MSI IRQs support will be
-> added later in framework of another commit and for the multi-channel
-> device case. But mentioning that in a way you did makes the commit log
-> more confusing than better explaining the change.
->
-> On Wed, May 29, 2024 at 06:21:08PM +0800, Yanteng Si wrote:
->> The LS2K2000 patch added later will alloc vectors, so let's
->> remove pci_enable/disable_msi temporarily to prepare for later
->> calls to pci_alloc_irq_vectors/pci_free_irq_vectors. This does
->> not affect the work of gmac devices, as they actually use intx.
-> As I mentioned in v12 AFAICS the MSI IRQs haven't been utilized on the
-> Loongseon GMAC devices so far since the IRQ numbers have been retrieved
-> directly from device DT-node. That's what you should have mentioned in
-> the log. Like this:
-> "The Loongson GMAC driver currently doesn't utilize the MSI IRQs, but
-> retrieves the IRQs specified in the device DT-node. Let's drop the
-> direct pci_enable_msi()/pci_disable_msi() calls then as redundant."
->
-> If what I said was correct and MSIs enable wasn't required for the
-> platform IRQs to work, then please use the log and move this patch to
-> being submitted between
-> [PATCH net-next v13 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
-> and
-> [PATCH net-next v13 05/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
->
-> so the redundant pci_enable_msi()/pci_disable_msi() code wouldn't be
-> getting on a way of the subsequent preparation changes.
+Yeah, I missed this, needs to be very obvious what is happening here.
+I'll replace the version in the queues with this one now, thanks.
 
-Ok, Thanks!
-
-
-Thanks,
-
-Yanteng
-
+greg k-h
 
