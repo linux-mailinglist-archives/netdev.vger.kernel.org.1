@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-109155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B758792727E
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:01:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1DB927283
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 11:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85021C24C3A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:01:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594E01C235A3
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF851AC445;
-	Thu,  4 Jul 2024 08:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C6AD1ACE65;
+	Thu,  4 Jul 2024 08:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6PO2rpR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9a06msM"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243BB1AB8EB
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 08:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CC71AB8F1
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 08:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720083517; cv=none; b=T0Ck7XdIF5XVFw59sAV0PUPq8bauy3e7BzucGEliMr9AkHeNnislwdBxJmQCOtL5g3UE7tuNqBY7sY3IzUTO7i5qbd2uoiNe38s2AA8KeRwmJYqxr2GQfu41D+adfb1BQ1Fd0BHhjE8wQtLZJd7kMulIvyoFR36ksbCTCjpoCag=
+	t=1720083523; cv=none; b=fY4gBn967yFe0xrp/0Pz/kq44Cb8eVyGrh22bOa6Zd5IK24SbDIxE0yvUR3aTFoTsojzzW1R34qCUUOKzJGTFiCzjooL8+o2e7cWR9Q909kj9G6lTQ6R2qH6klUciOnWKMlRyKn9gOgfTPR8a9D2IIRc3DtCnEelgCVO1PMY+qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720083517; c=relaxed/simple;
-	bh=rhrUK4kSWPb2+QOzvaLUotusmiPqRE5EK/ab8QLEDrs=;
+	s=arc-20240116; t=1720083523; c=relaxed/simple;
+	bh=gXYyJAtFATkjz93RgGVL4XAb3nglHPwb/RYHBs1Zbbg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B/S5x+ccjBkAag/SKFDMWXF3AU83gkzf6HRD1ifnbzF1K9V3lY/Ji6tDDVx5cGNrJmSRxZIx3tCJ36Q0y51485N2qQpbImky2nXv7wgVojYtGahwlkgME4BWY7sQsz9+fp3VZHFAEbxmVPW4HPzezQmIjq/NV1UTYWK5ms0i+EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6PO2rpR; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=awErHPRfMcJXEmYxOG0hyaHC+9Jdvuw5eDTLh5tD/CVuZqZ4L3kjoCxUeaYjflhGqISFaVcbp8gaVxGRfqQ5fiZrye6AevFAAOF8CtaMLsWsGXPRbsHdcEi79sslOQm0wT4dyspp5n2a+54RgQ2KRakRdWHGEvycD3GGmfQ6qK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c9a06msM; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720083515;
+	s=mimecast20190719; t=1720083519;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TCsarsE51WIWuJR3kqpDN3VLDdV6+uotyzVsuXmGHHw=;
-	b=d6PO2rpRKE84etXj2bN5Zz3Xj33r03zjIFIImbmf1MYIv/O13DhIAc+ku4WaCmp++DbqUH
-	opoq3Vu86T7IzMjdmZ5QdYR4DjOArvCZiC3pdyKX5Dik9VHQewq/eZyvYZqQ0DVXw3AaYd
-	BDeXbI0up85/415ImbJy+3kUwOeToJg=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=8jeNLSBugI0M1dRtmXMBFqt3/bH4xQpzUzLsQB473u4=;
+	b=c9a06msMPDbBtwkgJTMvjKluZKFtaRid3J2M8829FDcmNjuBYZAE4LD01IaHrCXK++X46g
+	ikxdoKtdytT6Tlu625/LjQuwe7T+qwyEXBZjiDV3bQO/eVpYDpZqJKVPBSsE6W4mNGdrPm
+	y9j0p9d9nbGj0p5REBGonNMLg3+hEhM=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-582-SYhQ_q6UNRO4vDgw4xyv9Q-1; Thu,
- 04 Jul 2024 04:58:30 -0400
-X-MC-Unique: SYhQ_q6UNRO4vDgw4xyv9Q-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-SANUMPCfOAOWJcs0yXUfFA-1; Thu,
+ 04 Jul 2024 04:58:36 -0400
+X-MC-Unique: SANUMPCfOAOWJcs0yXUfFA-1
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E7DE019560B0;
-	Thu,  4 Jul 2024 08:58:28 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 360E019560BA;
+	Thu,  4 Jul 2024 08:58:34 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.194.59])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B6697195605F;
-	Thu,  4 Jul 2024 08:58:24 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8C26195605A;
+	Thu,  4 Jul 2024 08:58:29 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: aconole@redhat.com,
@@ -72,9 +72,9 @@ Cc: aconole@redhat.com,
 	Shuah Khan <shuah@kernel.org>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v9 09/10] selftests: openvswitch: parse trunc action
-Date: Thu,  4 Jul 2024 10:57:00 +0200
-Message-ID: <20240704085710.353845-10-amorenoz@redhat.com>
+Subject: [PATCH net-next v9 10/10] selftests: openvswitch: add psample test
+Date: Thu,  4 Jul 2024 10:57:01 +0200
+Message-ID: <20240704085710.353845-11-amorenoz@redhat.com>
 In-Reply-To: <20240704085710.353845-1-amorenoz@redhat.com>
 References: <20240704085710.353845-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -86,39 +86,286 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The trunc action was supported decode-able but not parse-able. Add
-support for parsing the action string.
+Add a test to verify sampling packets via psample works.
+
+In order to do that, create a subcommand in ovs-dpctl.py to listen to
+on the psample multicast group and print samples.
 
 Reviewed-by: Aaron Conole <aconole@redhat.com>
+Tested-by: Ilya Maximets <i.maximets@ovn.org>
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- .../testing/selftests/net/openvswitch/ovs-dpctl.py  | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ .../selftests/net/openvswitch/openvswitch.sh  | 115 +++++++++++++++++-
+ .../selftests/net/openvswitch/ovs-dpctl.py    |  73 ++++++++++-
+ 2 files changed, 182 insertions(+), 6 deletions(-)
 
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 531951086d9c..bc71dbc18b21 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -20,7 +20,8 @@ tests="
+ 	nat_related_v4				ip4-nat-related: ICMP related matches work with SNAT
+ 	netlink_checks				ovsnl: validate netlink attrs and settings
+ 	upcall_interfaces			ovs: test the upcall interfaces
+-	drop_reason				drop: test drop reasons are emitted"
++	drop_reason				drop: test drop reasons are emitted
++	psample					psample: Sampling packets with psample"
+ 
+ info() {
+ 	[ "${ovs_dir}" != "" ] &&
+@@ -105,12 +106,21 @@ ovs_netns_spawn_daemon() {
+ 	shift
+ 	netns=$1
+ 	shift
+-	info "spawning cmd: $*"
+-	ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
++	if [ "$netns" == "_default" ]; then
++		$*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
++	else
++		ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
++	fi
+ 	pid=$!
+ 	ovs_sbx "$sbx" on_exit "kill -TERM $pid 2>/dev/null"
+ }
+ 
++ovs_spawn_daemon() {
++	sbx=$1
++	shift
++	ovs_netns_spawn_daemon $sbx "_default" $*
++}
++
+ ovs_add_netns_and_veths () {
+ 	info "Adding netns attached: sbx:$1 dp:$2 {$3, $4, $5}"
+ 	ovs_sbx "$1" ip netns add "$3" || return 1
+@@ -173,6 +183,19 @@ ovs_drop_reason_count()
+ 	return `echo "$perf_output" | grep "$pattern" | wc -l`
+ }
+ 
++ovs_test_flow_fails () {
++	ERR_MSG="Flow actions may not be safe on all matching packets"
++
++	PRE_TEST=$(dmesg | grep -c "${ERR_MSG}")
++	ovs_add_flow $@ &> /dev/null $@ && return 1
++	POST_TEST=$(dmesg | grep -c "${ERR_MSG}")
++
++	if [ "$PRE_TEST" == "$POST_TEST" ]; then
++		return 1
++	fi
++	return 0
++}
++
+ usage() {
+ 	echo
+ 	echo "$0 [OPTIONS] [TEST]..."
+@@ -187,6 +210,92 @@ usage() {
+ 	exit 1
+ }
+ 
++
++# psample test
++# - use psample to observe packets
++test_psample() {
++	sbx_add "test_psample" || return $?
++
++	# Add a datapath with per-vport dispatching.
++	ovs_add_dp "test_psample" psample -V 2:1 || return 1
++
++	info "create namespaces"
++	ovs_add_netns_and_veths "test_psample" "psample" \
++		client c0 c1 172.31.110.10/24 -u || return 1
++	ovs_add_netns_and_veths "test_psample" "psample" \
++		server s0 s1 172.31.110.20/24 -u || return 1
++
++	# Check if psample actions can be configured.
++	ovs_add_flow "test_psample" psample \
++	'in_port(1),eth(),eth_type(0x0806),arp()' 'psample(group=1)' &> /dev/null
++	if [ $? == 1 ]; then
++		info "no support for psample - skipping"
++		ovs_exit_sig
++		return $ksft_skip
++	fi
++
++	ovs_del_flows "test_psample" psample
++
++	# Test action verification.
++	OLDIFS=$IFS
++	IFS='*'
++	min_key='in_port(1),eth(),eth_type(0x0800),ipv4()'
++	for testcase in \
++		"cookie to large"*"psample(group=1,cookie=1615141312111009080706050403020100)" \
++		"no group with cookie"*"psample(cookie=abcd)" \
++		"no group"*"psample()";
++	do
++		set -- $testcase;
++		ovs_test_flow_fails "test_psample" psample $min_key $2
++		if [ $? == 1 ]; then
++			info "failed - $1"
++			return 1
++		fi
++	done
++	IFS=$OLDIFS
++
++	ovs_del_flows "test_psample" psample
++	# Allow ARP
++	ovs_add_flow "test_psample" psample \
++		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_psample" psample \
++		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++
++	# Sample first 14 bytes of all traffic.
++	ovs_add_flow "test_psample" psample \
++	    "in_port(1),eth(),eth_type(0x0800),ipv4()" \
++            "trunc(14),psample(group=1,cookie=c0ffee),2"
++
++	# Sample all traffic. In this case, use a sample() action with both
++	# psample and an upcall emulating simultaneous local sampling and
++	# sFlow / IPFIX.
++	nlpid=$(grep -E "listening on upcall packet handler" \
++            $ovs_dir/s0.out | cut -d ":" -f 2 | tr -d ' ')
++
++	ovs_add_flow "test_psample" psample \
++            "in_port(2),eth(),eth_type(0x0800),ipv4()" \
++            "sample(sample=100%,actions(psample(group=2,cookie=eeff0c),userspace(pid=${nlpid},userdata=eeff0c))),1"
++
++	# Record psample data.
++	ovs_spawn_daemon "test_psample" python3 $ovs_base/ovs-dpctl.py psample-events
++
++	# Send a single ping.
++	sleep 1
++	ovs_sbx "test_psample" ip netns exec client ping -I c1 172.31.110.20 -c 1 || return 1
++	sleep 1
++
++	# We should have received one userspace action upcall and 2 psample packets.
++	grep -E "userspace action command" $ovs_dir/s0.out >/dev/null 2>&1 || return 1
++
++	# client -> server samples should only contain the first 14 bytes of the packet.
++	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
++			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
++	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
++			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
++
++	return 0
++}
++
+ # drop_reason test
+ # - drop packets and verify the right drop reason is reported
+ test_drop_reason() {
 diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 4ccf26f96327..e8dc9af10d4d 100644
+index e8dc9af10d4d..1e15b0818074 100644
 --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
 +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -863,6 +863,19 @@ class ovsactions(nla):
-                 self["attrs"].append(["OVS_ACTION_ATTR_USERSPACE", uact])
-                 parsed = True
+@@ -28,8 +28,10 @@ try:
+     from pyroute2.netlink import genlmsg
+     from pyroute2.netlink import nla
+     from pyroute2.netlink import nlmsg_atoms
++    from pyroute2.netlink.event import EventSocket
+     from pyroute2.netlink.exceptions import NetlinkError
+     from pyroute2.netlink.generic import GenericNetlinkSocket
++    from pyroute2.netlink.nlsocket import Marshal
+     import pyroute2
+     import pyroute2.iproute
  
-+            elif parse_starts_block(actstr, "trunc(", False):
-+                parencount += 1
-+                actstr, val = parse_extract_field(
-+                    actstr,
-+                    "trunc(",
-+                    r"([0-9]+)",
-+                    int,
-+                    False,
-+                    None,
-+                )
-+                self["attrs"].append(["OVS_ACTION_ATTR_TRUNC", val])
-+                parsed = True
+@@ -2460,10 +2462,70 @@ class OvsFlow(GenericNetlinkSocket):
+         print("MISS upcall[%d/%s]: %s" % (seq, pktpres, keystr), flush=True)
+ 
+     def execute(self, packetmsg):
+-        print("userspace execute command")
++        print("userspace execute command", flush=True)
+ 
+     def action(self, packetmsg):
+-        print("userspace action command")
++        print("userspace action command", flush=True)
 +
-             actstr = actstr[strspn(actstr, ", ") :]
-             while parencount > 0:
-                 parencount -= 1
++
++class psample_sample(genlmsg):
++    nla_map = (
++        ("PSAMPLE_ATTR_IIFINDEX", "none"),
++        ("PSAMPLE_ATTR_OIFINDEX", "none"),
++        ("PSAMPLE_ATTR_ORIGSIZE", "none"),
++        ("PSAMPLE_ATTR_SAMPLE_GROUP", "uint32"),
++        ("PSAMPLE_ATTR_GROUP_SEQ", "none"),
++        ("PSAMPLE_ATTR_SAMPLE_RATE", "uint32"),
++        ("PSAMPLE_ATTR_DATA", "array(uint8)"),
++        ("PSAMPLE_ATTR_GROUP_REFCOUNT", "none"),
++        ("PSAMPLE_ATTR_TUNNEL", "none"),
++        ("PSAMPLE_ATTR_PAD", "none"),
++        ("PSAMPLE_ATTR_OUT_TC", "none"),
++        ("PSAMPLE_ATTR_OUT_TC_OCC", "none"),
++        ("PSAMPLE_ATTR_LATENCY", "none"),
++        ("PSAMPLE_ATTR_TIMESTAMP", "none"),
++        ("PSAMPLE_ATTR_PROTO", "none"),
++        ("PSAMPLE_ATTR_USER_COOKIE", "array(uint8)"),
++    )
++
++    def dpstr(self):
++        fields = []
++        data = ""
++        for (attr, value) in self["attrs"]:
++            if attr == "PSAMPLE_ATTR_SAMPLE_GROUP":
++                fields.append("group:%d" % value)
++            if attr == "PSAMPLE_ATTR_SAMPLE_RATE":
++                fields.append("rate:%d" % value)
++            if attr == "PSAMPLE_ATTR_USER_COOKIE":
++                value = "".join(format(x, "02x") for x in value)
++                fields.append("cookie:%s" % value)
++            if attr == "PSAMPLE_ATTR_DATA" and len(value) > 0:
++                data = "data:%s" % "".join(format(x, "02x") for x in value)
++
++        return ("%s %s" % (",".join(fields), data)).strip()
++
++
++class psample_msg(Marshal):
++    PSAMPLE_CMD_SAMPLE = 0
++    PSAMPLE_CMD_GET_GROUP = 1
++    PSAMPLE_CMD_NEW_GROUP = 2
++    PSAMPLE_CMD_DEL_GROUP = 3
++    PSAMPLE_CMD_SET_FILTER = 4
++    msg_map = {PSAMPLE_CMD_SAMPLE: psample_sample}
++
++
++class PsampleEvent(EventSocket):
++    genl_family = "psample"
++    mcast_groups = ["packets"]
++    marshal_class = psample_msg
++
++    def read_samples(self):
++        while True:
++            try:
++                for msg in self.get():
++                    print(msg.dpstr(), flush=True)
++            except NetlinkError as ne:
++                raise ne
+ 
+ 
+ def print_ovsdp_full(dp_lookup_rep, ifindex, ndb=NDB(), vpl=OvsVport()):
+@@ -2530,7 +2592,7 @@ def main(argv):
+         help="Increment 'verbose' output counter.",
+         default=0,
+     )
+-    subparsers = parser.add_subparsers()
++    subparsers = parser.add_subparsers(dest="subcommand")
+ 
+     showdpcmd = subparsers.add_parser("show")
+     showdpcmd.add_argument(
+@@ -2605,6 +2667,8 @@ def main(argv):
+     delfscmd = subparsers.add_parser("del-flows")
+     delfscmd.add_argument("flsbr", help="Datapath name")
+ 
++    subparsers.add_parser("psample-events")
++
+     args = parser.parse_args()
+ 
+     if args.verbose > 0:
+@@ -2619,6 +2683,9 @@ def main(argv):
+ 
+     sys.setrecursionlimit(100000)
+ 
++    if args.subcommand == "psample-events":
++        PsampleEvent().read_samples()
++
+     if hasattr(args, "showdp"):
+         found = False
+         for iface in ndb.interfaces:
 -- 
 2.45.2
 
