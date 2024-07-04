@@ -1,115 +1,105 @@
-Return-Path: <netdev+bounces-109321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBD1927E55
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 22:47:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC4B927E76
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 23:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A461F248D0
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 20:47:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EFB5281972
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 21:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D221428F2;
-	Thu,  4 Jul 2024 20:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DBC139597;
+	Thu,  4 Jul 2024 21:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HCj25mVo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EGhoQSVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FF7C2ED
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 20:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCE01755B;
+	Thu,  4 Jul 2024 21:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720126068; cv=none; b=LtL00oQYyJkFC6kbZhdiIH5NTMQieVHJc4ZRtOmjgpTu3q6Z4FU/0/qeGOJreq2znuj9h2I4GmMl/cGU1aaXykjVdCfmOnYZRqaRAxb2RB6MS4ZAtUoj0t/GeUcSpg5PZwQaYh0swRethFynGoiOiMrAozFRBOykr6HwTGt0KdY=
+	t=1720127518; cv=none; b=izH5Dv6RqGci9+BfviWauX+maWgIBWHvL0UWA+i+Bi295F6NKYQh8kDycuKtHEjEwe1S7jApHFJmpkdTdgn/aihf/c60dES/IbcUwpLzabtcJtX2p2DO9qAfBw7k31lHu0CWislciCBNSvjqTNKDhnDtJoplIWaE/ezgk/ay5gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720126068; c=relaxed/simple;
-	bh=pknVDfz3Ym2CLi7ZQTkPCJp4T2a6uyQ2BpMKtD0sFCs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=auKuCIJP2eGQE1ew6NsciK2WlmW11IcMCWe2IQG8gx3ctzrY04VfSS0F12BPnuyXico8JrY+uOPjojmmzHqeKn2kaVBkZ+H5obP3UGipTWItNZDKMh5U3E91So+by/ydg7v8y79Si8A6FXfdN4R6nGaGiSVVww21Eah7F7Cyfak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HCj25mVo; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2c9785517c0so702849a91.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 13:47:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720126067; x=1720730867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=umqPbZhY77BWJpLXOD7EcR0NlxRkYXFTFvFqXEAa3o0=;
-        b=HCj25mVoItDP8fjeF2b+q3gUg8MetyelwcMX1RfvGpTJwHGCIjcjnnjw0EmxPhhzis
-         8YMKnkayOpz7LvBYyB+0SsQmT+LtKjTe8HOAjXrD+zT62rECH+SOLMiKKAhnhuZq5Tsn
-         I3Pjb8gssU6n+txoPIZSoq/UCDp0UwFTdVULYJH3KKfzOKuBwjJCX8lj+OBVINP3BSaF
-         KV1t5j+J2G6WjYabEfy/9njZ6XfmdGJ6hJYgXTM7D8pvHTsi+dZmUN2oCJCxm5JzE23f
-         bLzehRFLFIAuzWqrwyiRXEJo0zgmI56D2FlJ35TpJz940k/sotNO3R2hCvvO4Q0s0iaH
-         w2Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720126067; x=1720730867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=umqPbZhY77BWJpLXOD7EcR0NlxRkYXFTFvFqXEAa3o0=;
-        b=krnEeIj2u+xJlOm9p/NfbqlouY9/6QKNZ+7ZWakfu52VoNFCK3thulP7YpJnJJnelp
-         pqXeVAPkZQw8ch9jihSC+ulmx7cVIDuL59E69B94ibDTPcdMOjnbjQK6x3hxnm6AzPSz
-         yRY0MhNBJGuXnAoAB08YCcIMpvK0aZaFKHNMWQIljfdBMznPuXJyyBFNVbGONgS63CDf
-         KivdGbUWGrPDBPU4wDqiNqu6cLU6JzinZ8Ufcdy2LkuKckd6aGb/aOEyokThxs4NQMtd
-         ixeJ4s7FFhbdnEX48Lq6+cnikURIe7eHRJfMwoK19YjnbbPnEgYmRoqbAVm7CxWBQ8hA
-         aJgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjbHG6q+QvOHovt9YJB4q6U1nJmTumwl8JelXg44fZ3BcPu298is5nGR/ggYweO0paQP9M2/jR8bWKeYjsjSWHEcvat6K3
-X-Gm-Message-State: AOJu0Yz9ZoYC5oNzQ+ObLh5iS8w3RU2JjY39AqfNkjlZ1SCyHidHTiSx
-	jjtdqaBA/7LZ2axTuimSo3xw54tqFxNhh9XDSBYFxY1Thxe5SqbG57CXpXtMjEHcpJOby7UPOT7
-	2r7cTCaXiQSgrQwWwzHifs7T8vRY=
-X-Google-Smtp-Source: AGHT+IEYI5evzXwZncTp0Ds/4KuMcob7a+vxku+wc40JCP+1w73XZbFp1QN7/2wo3GinAD3F/K0s/VHRiZnLO4jKQp0=
-X-Received: by 2002:a17:90b:30c:b0:2c9:6187:98ca with SMTP id
- 98e67ed59e1d1-2c99c7f7a4fmr2136096a91.22.1720126066557; Thu, 04 Jul 2024
- 13:47:46 -0700 (PDT)
+	s=arc-20240116; t=1720127518; c=relaxed/simple;
+	bh=1HtV605rr1/Y3GdSz1tJZ3XhiXaiq/FJwY3hYlYAuq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F0YwVyn2Mq37kO0fwry7CAuUERDkDomNlsA9x4XjGkiccURbDdRRH9rUdllcEm5KRxVxYJmgjruFe7p5sGKw0o3MaQHRmJlmSG4Kvq1cuJlwlRGMIsKt2gFvheSXZZUC1WSU1mDguieRkTBvSzeXvBmgnoIxSu4qGbvD1t71/UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EGhoQSVd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iS4Ki0FfgKFDGFlTkcQJD+T+q8NKxHbuR15GMQm4etM=; b=EGhoQSVdSKOnHDaL16nn+ug5Si
+	zukYO68rDkOFds4nGPLCNHEQqOgCqOEQWCETTUMe2dUduxmH08c11Mx7BWZTwuBcYBZJjiTDAoU58
+	CZLQgJ4qJ3Z6pdKLWJSm8tPF6s0tWy6vsPer5mn6jwS7/LUUYca1Yv2i+cCKMlD5f/4A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sPTjx-001qMx-7h; Thu, 04 Jul 2024 23:11:41 +0200
+Date: Thu, 4 Jul 2024 23:11:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Conor Dooley <conor@kernel.org>
+Cc: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 3/4] dt-bindings: ethernet-phy: add optional brr-mode
+ flag
+Message-ID: <35d571bd-251d-45b5-9e4f-93c83d1a43c8@lunn.ch>
+References: <20240704140413.2797199-1-kamilh@axis.com>
+ <20240704140413.2797199-4-kamilh@axis.com>
+ <20240704-snitch-national-0ac33afdfb68@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240704035703.95065-1-kuniyu@amazon.com> <7c1264b94e70d591adfda405bf358ba1dfadafd5.camel@redhat.com>
- <CANn89iKO=Y8P_tms-nymhLF8QbWmOD-g_N33DLMfA6WcO+vhbg@mail.gmail.com>
-In-Reply-To: <CANn89iKO=Y8P_tms-nymhLF8QbWmOD-g_N33DLMfA6WcO+vhbg@mail.gmail.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Thu, 4 Jul 2024 21:47:34 +0100
-Message-ID: <CAJwJo6bFnNKXvxtpEBC5TqrQ0ATXJeFr7onivgNM1cqz3HJWgg@mail.gmail.com>
-Subject: Re: [PATCH v1 net] tcp: Don't drop SYN+ACK for simultaneous connect().
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Lawrence Brakmo <brakmo@fb.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704-snitch-national-0ac33afdfb68@spud>
 
-On Thu, 4 Jul 2024 at 13:23, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Thu, Jul 4, 2024 at 1:16=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-[..]
-> >
-> > Apparently this behavior change is causing TCP AO self-tests failures:
-> >
-> > https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-2=
-024-07-04--09-00
-> > e.g.
-> > https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/668061/22-sel=
-f-connect-ipv4/stdout
-> >
->
-> These tests seem to have broken assumptions on a kernel behavior which
-> are orthogonal to TCP AO.
+> > ---
+> >  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > index 8fb2a6ee7e5b..349ae72ebf42 100644
+> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > @@ -93,6 +93,14 @@ properties:
+> >        the turn around line low at end of the control phase of the
+> >        MDIO transaction.
+> >  
+> > +  brr-mode:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      If set, indicates the network cable interface is alternative one as
+> > +      defined in the BroadR-Reach link mode specification under 1BR-100 and
+> > +      1BR-10 names. The driver needs to configure the PHY to operate in
+> > +      BroadR-Reach mode.
+> 
+> I find this second sentence unclear. Does the driver need to do
+> configure the phy because this mode is not enabled by default or because
+> the device will not work outside of this mode.
 
-Yes, I think my intention here was to verify that it tests
-simultaneous connect code-path. Which is quite guaranteed in
-self-connect tcp case, I guess, but some experience tells that
-anything may go or evolve with time in unexpected ways (aka paranoia),
-I thought it's reasonable to check TCPChallengeACK & TCPSYNChallenge
-counters to verify. It seems those checks can be just dropped.
+BroadR-Reach uses one pair. Standard 10/100Mbps ethernet needs 2 pair,
+and 1G needs 4 pair. So any attempt to use standard 10/100/1G is going
+to fail, the socket/plug and cable just don't work for anything other
+than BroadR-Reach.
 
-Thanks,
-             Dmitry
+As far as i understand it, the PHY could be strapped into BroadR-Reach
+mode, but there is no guarantee it is, so we should also program it to
+BroadR-Reach mode if this property is present.
+
+	Andrew
 
