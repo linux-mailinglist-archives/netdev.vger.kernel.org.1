@@ -1,132 +1,160 @@
-Return-Path: <netdev+bounces-109285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB40D927B03
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 18:17:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C7D927B28
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 18:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87F71283625
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:17:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3087E1F239C8
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5241B29B4;
-	Thu,  4 Jul 2024 16:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+WVeMF+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDF81B3721;
+	Thu,  4 Jul 2024 16:33:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2B91AEFFF;
-	Thu,  4 Jul 2024 16:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2978A1B151A
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 16:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720109864; cv=none; b=KrWdZWFTOq4rl3B4w1nTrJLrntQoFGufo77AmgvzzNEbBtCb/YsaI7Hmsbuyo0epSoI1naHXgIPt5D6iXA8lxQSaLydMWyN9rVtpWGuS/3npvwqRWYQqk4mcGV4O+4ck37bAlTvzwGrvEPmvV7l4POC+6pnMyH32GfIcSLrTrgs=
+	t=1720110803; cv=none; b=AlrSJdSgM8krweQ5vO5LiO+zIdRd4BWvFWK3Yoq5q9i2PPV7wzXZYzP17Ag37+QlQk0st+2aYCymo783bCEeCTmqmv4qCRZny2CcCiTVd0iNjUkRgFYBU3VgiidbrubUti05t76eLbyof8YrK0GIgaMdbJg01g8vLPS2vr2CrbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720109864; c=relaxed/simple;
-	bh=pcYwbjCfgj34IXSyuEgh8UhDZzrsWrKWN//jUhn90xY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pjjv7f9uIoRnHOT224n8ARG9zAdbKa89SIGkvypC1G8uGMUvM5uMTnx/uCRQX3qpaTtr2dEjmxVTldKurjKVptXSLbw+37dOrV2obVx7DUW2UABWUoAhc26CZrV786vG2FQQO6E4q4PnLaGYmGK19h+yVvgY7Q8AD4xv7J2pab4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+WVeMF+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14181C3277B;
-	Thu,  4 Jul 2024 16:17:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720109864;
-	bh=pcYwbjCfgj34IXSyuEgh8UhDZzrsWrKWN//jUhn90xY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P+WVeMF+NYPDsHpwlhbI6h6KdYEeIqGROvpXW+rJP51I+9O6hvRGNTTrmjZzFPxRl
-	 ggcDM2r8PlFDZkwQvJMFpcszBkwn1py/KkcSxlQGsRw4EehK2eskO58UXIU6tNTkTq
-	 LPmIlOMACdI81J7aBeKBB/HEcuf+SL0lMdGepAL42WU41BqnHd34MEsmlfxBKRLgww
-	 nFEoV5LKyZj5u0yRHlc8HEhbVj6WUFfEjoIUbTNxDKUmcBttS3RwCzBOo70LTB+Qvj
-	 rZOwfKlmMGP0h3YS+1G2Sgv7w3RfQ6+Kz9Pb8pJ97OvYvGDiJWhL70DTRGJ3PHnJbe
-	 phgWZH51pUzKA==
-Date: Thu, 4 Jul 2024 17:17:38 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 3/4] dt-bindings: ethernet-phy: add optional brr-mode
- flag
-Message-ID: <20240704-snitch-national-0ac33afdfb68@spud>
-References: <20240704140413.2797199-1-kamilh@axis.com>
- <20240704140413.2797199-4-kamilh@axis.com>
+	s=arc-20240116; t=1720110803; c=relaxed/simple;
+	bh=5ITx1Qun66+GeWVbD/FYi+IU72IBJ5jSnCo7fyr73LI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WOo9d5wMTcbc+iPbOQ+KxZF20rMF32+RiNOLB9PGheJvE+NXz3ThObliK6jjoZ/mtXJ5X9dERNQwGwANzQAOwduEQ9dHmbsvPJo5fW3DqD4L33O25y6PO5t23y3QrbOPJjL7ZN20C9HNBOa8+nmvHTOdKS5YK5tsCBVORw4WUOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f3ccfec801so92765039f.3
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 09:33:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720110801; x=1720715601;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tG35q1StV/2z7cK6mhk2/Wuuk7vbrJGi0KGHNAimHPA=;
+        b=raaEZrou6s5QAuO78SVRSBiOx3HZ5tBsRPLeLw1COywUHNbYqmNUrEDVdkFvMOekvV
+         bYYeAblSnhu5SgdFmw+AdBvZvo45PXoXH9ve3nSWmNSsZB0RRJBEp2iDqoq5UV9Exuzf
+         6mQdFDwkXxz6O6eCr42VIrIpBJTxIQKWFqO/QuGB0GVEXaZaqokM9NC5soMiGUsMg346
+         XTefCzLdwXnedpaP6+KWLiqUWE1p461f3gkK5T5g7eh61Oa6xIIQQjZ//J9S6lhnQIDs
+         lFD6cyCm8XU2UfbJ1n3CCPCvfV4aUddkBmFx2aC2s6cL+8qLt3n6PuJNvg2OAvtB2d2R
+         SmUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWd6iRKTQ67d9wEKes+CPENFB9DCEex8ZkfKc21kiZVp4D96uWxGbiJzHlIyCFb/Y1AE0z69UoqnavEPt45kH6WAooB+Dc5
+X-Gm-Message-State: AOJu0YxGbBF4RMGpuUk3gIww+a85eM7ZIeGujjXRA3Llaqbq2H5Uq79Q
+	KWe15DFeltFS2VifyTD/4TNvxlzC78LWqYyXBAh0YH6TSnYTFJ/X9F4kIWhyFyJNKrzQgp+F87X
+	FFONZIAwH7Sfz/vXFDi0RGflQ/lUXQ34lDl5Y1YHL5wtxtlQJ+i53S3A=
+X-Google-Smtp-Source: AGHT+IGSvKTeR4Ftvy1VSZCCfNPptop45KTh2jm8edQ3/bXDMb60Xma0Hv5Zvta3bZoSo08lS7A2VoxJseIgu1kmLWrHdEMYJWDv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="akwRYHEp/6rrMnoh"
-Content-Disposition: inline
-In-Reply-To: <20240704140413.2797199-4-kamilh@axis.com>
+X-Received: by 2002:a05:6638:13cf:b0:4b9:e5b4:67fd with SMTP id
+ 8926c6da1cb9f-4bf60321c8amr163624173.1.1720110801300; Thu, 04 Jul 2024
+ 09:33:21 -0700 (PDT)
+Date: Thu, 04 Jul 2024 09:33:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000494468061c6e81ea@google.com>
+Subject: [syzbot] [ppp?] KMSAN: uninit-value in ppp_async_push (3)
+From: syzbot <syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    614da38e2f7a Merge tag 'hid-for-linus-2024051401' of git:/..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1315203c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f5d2cbf33633f507
+dashboard link: https://syzkaller.appspot.com/bug?extid=ec0723ba9605678b14bf
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14b284e8980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1653d768980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/89eafb874b71/disk-614da38e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/356000512ad9/vmlinux-614da38e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/839c73939115/bzImage-614da38e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ppp_async_encode drivers/net/ppp/ppp_async.c:548 [inline]
+BUG: KMSAN: uninit-value in ppp_async_push+0xc05/0x2660 drivers/net/ppp/ppp_async.c:675
+ ppp_async_encode drivers/net/ppp/ppp_async.c:548 [inline]
+ ppp_async_push+0xc05/0x2660 drivers/net/ppp/ppp_async.c:675
+ ppp_async_send+0x130/0x1b0 drivers/net/ppp/ppp_async.c:634
+ ppp_push+0x220/0x22b0 drivers/net/ppp/ppp_generic.c:1883
+ ppp_send_frame drivers/net/ppp/ppp_generic.c:1846 [inline]
+ __ppp_xmit_process+0x123a/0x2780 drivers/net/ppp/ppp_generic.c:1646
+ ppp_xmit_process+0x100/0x2b0 drivers/net/ppp/ppp_generic.c:1667
+ ppp_write+0x63a/0x7d0 drivers/net/ppp/ppp_generic.c:521
+ do_loop_readv_writev fs/read_write.c:764 [inline]
+ vfs_writev+0xb0e/0x1450 fs/read_write.c:973
+ do_pwritev fs/read_write.c:1072 [inline]
+ __do_sys_pwritev fs/read_write.c:1119 [inline]
+ __se_sys_pwritev fs/read_write.c:1114 [inline]
+ __x64_sys_pwritev+0x2e5/0x500 fs/read_write.c:1114
+ x64_sys_call+0x3539/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:297
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3877 [inline]
+ slab_alloc_node mm/slub.c:3918 [inline]
+ kmem_cache_alloc_node+0x622/0xc90 mm/slub.c:3961
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1319 [inline]
+ ppp_write+0xe5/0x7d0 drivers/net/ppp/ppp_generic.c:509
+ do_loop_readv_writev fs/read_write.c:764 [inline]
+ vfs_writev+0xb0e/0x1450 fs/read_write.c:973
+ do_pwritev fs/read_write.c:1072 [inline]
+ __do_sys_pwritev fs/read_write.c:1119 [inline]
+ __se_sys_pwritev fs/read_write.c:1114 [inline]
+ __x64_sys_pwritev+0x2e5/0x500 fs/read_write.c:1114
+ x64_sys_call+0x3539/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:297
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 PID: 5049 Comm: syz-executor420 Not tainted 6.9.0-syzkaller-02707-g614da38e2f7a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+=====================================================
 
 
---akwRYHEp/6rrMnoh
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On Thu, Jul 04, 2024 at 04:04:12PM +0200, Kamil Hor=E1k (2N) wrote:
-> There is a group of PHY chips supporting BroadR-Reach link modes in
-> a manner allowing for more or less identical register usage as standard
-> Clause 22 PHY.
-> These chips support standard Ethernet link modes as well, however, the
-> circuitry is mutually exclusive and cannot be auto-detected.
-> The link modes in question are 100Base-T1 as defined in IEEE802.3bw,
-> based on Broadcom's 1BR-100 link mode, and newly defined 10Base-T1BRR
-> (1BR-10 in Broadcom documents).
->=20
-> Add optional brr-mode flag to switch the PHY to BroadR-Reach mode.
->=20
-> Signed-off-by: Kamil Hor=E1k (2N) <kamilh@axis.com>
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Where did the tags go? There's no mention of why they were dropped.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> ---
->  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Do=
-cumentation/devicetree/bindings/net/ethernet-phy.yaml
-> index 8fb2a6ee7e5b..349ae72ebf42 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> @@ -93,6 +93,14 @@ properties:
->        the turn around line low at end of the control phase of the
->        MDIO transaction.
-> =20
-> +  brr-mode:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      If set, indicates the network cable interface is alternative one as
-> +      defined in the BroadR-Reach link mode specification under 1BR-100 =
-and
-> +      1BR-10 names. The driver needs to configure the PHY to operate in
-> +      BroadR-Reach mode.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-I find this second sentence unclear. Does the driver need to do
-configure the phy because this mode is not enabled by default or because
-the device will not work outside of this mode.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Cheers,
-Conor.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
---akwRYHEp/6rrMnoh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZobLIgAKCRB4tDGHoIJi
-0khVAQDaogE6E7Bmwygq9kfblzI9ZEadOk4sGBJj3y6H4ltyHwEAwOOszI49sk1m
-0zPPtlKlL5GBNerNOZGS74x2NHoW6Ak=
-=pxKj
------END PGP SIGNATURE-----
-
---akwRYHEp/6rrMnoh--
+If you want to undo deduplication, reply with:
+#syz undup
 
