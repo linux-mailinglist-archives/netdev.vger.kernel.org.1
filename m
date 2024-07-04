@@ -1,133 +1,255 @@
-Return-Path: <netdev+bounces-109113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AFF3926FCA
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 08:42:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D47CF92705A
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 09:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ECBF1C2120F
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 06:42:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF28A1C2278F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 07:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54841A08A6;
-	Thu,  4 Jul 2024 06:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE601A0AFA;
+	Thu,  4 Jul 2024 07:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gp0SzTiU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+04g6wU"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B632200A3;
-	Thu,  4 Jul 2024 06:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1866170836;
+	Thu,  4 Jul 2024 07:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720075332; cv=none; b=Rg/H32lE+JUW1DKQJVmxcQfWUsKr1Q+29nmVdqIYgTd+udRHq4Foyf8aaK6u3jgYxAbpSK13NEAXPTlcQM0+7GC47p52aDunF11YefNEzpLL6/Dq3Dp2LKkVDfdnI0e5NK35CpaiGd5bHXMalm7MURQ2NQxPCJbD6k/cCTe/GF8=
+	t=1720077371; cv=none; b=nJtC4dbCAGL8jGZkkX+ajlxaR7GS5jPjvmt0ExTQC7pNS/wwLnS2t/z00Ev8cd+fe1f3fdv3SAN7u7XQDBGmD/0A+sg6qdaejJrjmzyHG3xwvtZMaZainKH14YuYowB09Lcl/Eo116ftPaL4bzKd7F0kT9+ASRmAHwi1QF8GH4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720075332; c=relaxed/simple;
-	bh=+iO7Wy3tq973FOPKw8BQTqJd9ZV8zPaKAMo6GvLKhEw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GCAHID9JCWshw1bgQjrkKckk7+cKtaeJJ7okprqs3csnrqAaBIADMlVJ5CNTyQrHH0jzLc8MIm8IJ40x+zFQ068wzbyai6Ay2dDmbihHvZGPW0FLl2HkkjtYV1t2FdjDAWI1EY7eVVu6lBO8O3DEL9jiqjL7gpTBQgmnvDuGgIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=gp0SzTiU; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=KoRkv1cwU4n5JXXBByQDctK7NLjIkmWsmoCZ4F4jUjI=; b=gp0SzTiUWIQ0tj3KJ8yKnLys83
-	hZycpz2Y9U2b4a0rfcx7K5mOJmcR5TKnM5ZwgFcYCVYB4nExpqUNDlqtH5TdVtqOlGB01D+x/naDs
-	+czMzwo3dAivtx6iSXAqtBU/v57/HbrpStfIsk8YW8enqbuQ7+lY6cRSn8Y7nw3S4WsZIwz+514+m
-	wfQb9AGOO3M1/IRcJZco04Cbth+LYDGULNquK4kOmy97t30Bewi7wnpAroNMc+KMfNye6uMscuYVj
-	Qdbcv9dV3osRLcCPsCro8dT/9dskrGk6E3I3dNSWETNBS6UbvOgUtRGR6ZRC1lDXOyO1zCEYMhqGM
-	7UvWcYgA==;
-Received: from 32.248.197.178.dynamic.cust.swisscom.net ([178.197.248.32] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sPGAN-000GE3-Bm; Thu, 04 Jul 2024 08:42:03 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lex Siegel <usiegl00@gmail.com>,
-	Neil Brown <neilb@suse.de>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>
-Subject: [PATCH net v3 resend] net, sunrpc: Remap EPERM in case of connection failure in xs_tcp_setup_socket
-Date: Thu,  4 Jul 2024 08:41:57 +0200
-Message-Id: <9069ec1d59e4b2129fc23433349fd5580ad43921.1720075070.git.daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1720077371; c=relaxed/simple;
+	bh=ykK2NmqiAhRxDgi+CJocifOaQpjFRrk4m3nuxZ7ne5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R72CjNNTgsHpx2wVAP6etwwVeliAQ/lXtWRRWLfcjLLSwTo7hIA3ut6GpH4dnGt0cTnqTN8d/f+A6BgWDAFDEhMOm3/mn9xgeIWBDxpf82XIvWpYvb4fPETaHSNnFHmscjiWl3I2u1Z3fTyocXVzDRLIahqtfKK8Se6Df7+YpEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S+04g6wU; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720077370; x=1751613370;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ykK2NmqiAhRxDgi+CJocifOaQpjFRrk4m3nuxZ7ne5s=;
+  b=S+04g6wUgG0iE/PKYJtsLity3nipXCCi2Ob3OAapSYwAE+x51oCM/2pf
+   JEPC89+IL8ZO6dGrwRz8C40unsIqJZClYcJK2N4hn14D7hsfMN7U+D0Zg
+   kU0CigaqI5Qe5QrSjOrirxyCeovhsOCAItthqK+okWvqAAleren+ssPM3
+   MidW5Y5Jv7KnNaVZdiRpo2G3Xuc7XsxY0Z5yT0lvF/z0pF057bKhXtRXJ
+   Og+8uKse4gLOzHXKOHipge6t/KiO31xsu1Kk/9OBwXvCUw/Yn+pU2kCEG
+   mnEwSJ273fQ32xXmdKLNz8XZ3Er2QnyxKtYA/0FQUwJdSEMpvnL6Dro5Y
+   Q==;
+X-CSE-ConnectionGUID: uyCLFcZ0TyCSssg0GgIwIg==
+X-CSE-MsgGUID: sWEDoBatSkKVbED4LFowYw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="17174898"
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="17174898"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 00:16:10 -0700
+X-CSE-ConnectionGUID: pevV34pxT9WgreqQaTK5og==
+X-CSE-MsgGUID: dh3meRwSR3mxkmSNK3eLxQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="77246664"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 00:16:06 -0700
+Date: Thu, 4 Jul 2024 09:14:52 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Geethasowjanya Akula <gakula@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [EXTERNAL] Re: [net-next PATCH v7 00/10] Introduce RVU
+ representors
+Message-ID: <ZoZL7Hc5l3amIxIs@mev-dev.igk.intel.com>
+References: <20240628133517.8591-1-gakula@marvell.com>
+ <ZoUri0XggubbjQvg@mev-dev.igk.intel.com>
+ <CH0PR18MB4339D4A85FA97B2136BF7E1CCDDD2@CH0PR18MB4339.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27325/Wed Jul  3 10:39:00 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CH0PR18MB4339D4A85FA97B2136BF7E1CCDDD2@CH0PR18MB4339.namprd18.prod.outlook.com>
 
-When using a BPF program on kernel_connect(), the call can return -EPERM. This
-causes xs_tcp_setup_socket() to loop forever, filling up the syslog and causing
-the kernel to potentially freeze up.
+On Wed, Jul 03, 2024 at 02:34:03PM +0000, Geethasowjanya Akula wrote:
+> 
+> 
+> >-----Original Message-----
+> >From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> >Sent: Wednesday, July 3, 2024 4:14 PM
+> >To: Geethasowjanya Akula <gakula@marvell.com>
+> >Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org;
+> >davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
+> >Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
+> ><sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
+> >Subject: [EXTERNAL] Re: [net-next PATCH v7 00/10] Introduce RVU representors
+> >On Fri, Jun 28, 2024 at 07:05:07PM +0530, Geetha sowjanya wrote:
+> >> This series adds representor support for each rvu devices.
+> >> When switchdev mode is enabled, representor netdev is registered for
+> >> each rvu device. In implementation of representor model, one NIX HW LF
+> >> with multiple SQ and RQ is reserved, where each RQ and SQ of the LF
+> >> are mapped to a representor. A loopback channel is reserved to support
+> >> packet path between representors and VFs.
+> >> CN10K silicon supports 2 types of MACs, RPM and SDP. This patch set
+> >> adds representor support for both RPM and SDP MAC interfaces.
+> >>
+> >> - Patch 1: Refactors and exports the shared service functions.
+> >> - Patch 2: Implements basic representor driver.
+> >> - Patch 3: Add devlink support to create representor netdevs that
+> >>   can be used to manage VFs.
+> >> - Patch 4: Implements basec netdev_ndo_ops.
+> >> - Patch 5: Installs tcam rules to route packets between representor and
+> >> 	   VFs.
+> >> - Patch 6: Enables fetching VF stats via representor interface
+> >> - Patch 7: Adds support to sync link state between representors and VFs .
+> >> - Patch 8: Enables configuring VF MTU via representor netdevs.
+> >> - Patch 9: Add representors for sdp MAC.
+> >> - Patch 10: Add devlink port support.
+> >>
+> >> Command to create VF representor
+> >> #devlink dev eswitch set pci/0002:1c:00.0 mode switchdev VF
+> >> representors are created for each VF when switch mode is set switchdev
+> >> on representor PCI device
+> >
+> >Does it mean that VFs needs to be created before going to switchdev mode? (in
+> >legacy mode). Keep in mind that in both mellanox and ice driver assume that
+> >VFs are created after chaning mode to switchdev (mode can't be changed if
+> >VFs).
+> No. RVU representor driver implementation is similar to mellanox and ice drivers. 
+> It assumes that VF gets created only after switchdev mode is enabled. 
+> Sorry, if above commit description is confusing. Will rewrite it.
+>   
 
-Neil suggested:
+Ok, but why the rvu_rep_create() is called in switching mode to
+switchdev function? In this function you are creating netdevs, only for PF
+representor? It looks like it doesn't called from other context in this
+patchset, so where the port representor netdevs for VFs are created?
 
-  This will propagate -EPERM up into other layers which might not be ready
-  to handle it. It might be safer to map EPERM to an error we would be more
-  likely to expect from the network system - such as ECONNREFUSED or ENETDOWN.
+Thanks,
+Michal
 
-ECONNREFUSED as error seems reasonable. For programs setting a different error
-can be out of reach (see handling in 4fbac77d2d09) in particular on kernels
-which do not have f10d05966196 ("bpf: Make BPF_PROG_RUN_ARRAY return -err
-instead of allow boolean"), thus given that it is better to simply remap for
-consistent behavior. UDP does handle EPERM in xs_udp_send_request().
-
-Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
-Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
-Co-developed-by: Lex Siegel <usiegl00@gmail.com>
-Signed-off-by: Lex Siegel <usiegl00@gmail.com>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Neil Brown <neilb@suse.de>
-Cc: Trond Myklebust <trondmy@kernel.org>
-Cc: Anna Schumaker <anna@kernel.org>
-Link: https://github.com/cilium/cilium/issues/33395
-Link: https://lore.kernel.org/bpf/171374175513.12877.8993642908082014881@noble.neil.brown.name
----
- [ Fixes tags are set to the orig connect commit so that stable team
-   can pick this up.
-
-   Resend as it turns out that patchwork did not pick up the earlier
-   resends likely due to the message id being the same. ]
-
- v1 -> v2 -> v3:
-   - Plain resend, adding correct sunrpc folks to Cc
-     https://lore.kernel.org/bpf/Zn7wtStV+iafWRXj@tissot.1015granger.net/
-
- net/sunrpc/xprtsock.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index dfc353eea8ed..0e1691316f42 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -2441,6 +2441,13 @@ static void xs_tcp_setup_socket(struct work_struct *work)
- 		transport->srcport = 0;
- 		status = -EAGAIN;
- 		break;
-+	case -EPERM:
-+		/* Happens, for instance, if a BPF program is preventing
-+		 * the connect. Remap the error so upper layers can better
-+		 * deal with it.
-+		 */
-+		status = -ECONNREFUSED;
-+		fallthrough;
- 	case -EINVAL:
- 		/* Happens, for instance, if the user specified a link
- 		 * local IPv6 address without a scope-id.
--- 
-2.21.0
-
+> >
+> >Different order can be problematic. For example (AFAIK) kubernetes scripts for
+> >switchdev assume that first is switching to switchdev and VFs creation is done
+> >after that.
+> >
+> >Thanks,
+> >Michal
+> >
+> >> # devlink dev eswitch set pci/0002:1c:00.0  mode switchdev # ip link
+> >> show
+> >> 25: r0p1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode
+> >DEFAULT group default qlen 1000
+> >>     link/ether 32:0f:0f:f0:60:f1 brd ff:ff:ff:ff:ff:ff
+> >> 26: r1p1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode
+> >DEFAULT group default qlen 1000
+> >>     link/ether 3e:5d:9a:4d:e7:7b brd ff:ff:ff:ff:ff:ff
+> >>
+> >> #devlink dev
+> >> pci/0002:01:00.0
+> >> pci/0002:02:00.0
+> >> pci/0002:03:00.0
+> >> pci/0002:04:00.0
+> >> pci/0002:05:00.0
+> >> pci/0002:06:00.0
+> >> pci/0002:07:00.0
+> >>
+> >> ~# devlink port
+> >> pci/0002:1c:00.0/0: type eth netdev r0p1v0 flavour pcipf controller 0
+> >> pfnum 1 vfnum 0 external false splittable false
+> >> pci/0002:1c:00.0/1: type eth netdev r1p1v1 flavour pcivf controller 0
+> >> pfnum 1 vfnum 1 external false splittable false
+> >> pci/0002:1c:00.0/2: type eth netdev r2p1v2 flavour pcivf controller 0
+> >> pfnum 1 vfnum 2 external false splittable false
+> >> pci/0002:1c:00.0/3: type eth netdev r3p1v3 flavour pcivf controller 0
+> >> pfnum 1 vfnum 3 external false splittable false
+> >>
+> >> -----------
+> >> v1-v2:
+> >>  -Fixed build warnings.
+> >>  -Address review comments provided by "Kalesh Anakkur Purayil".
+> >>
+> >> v2-v3:
+> >>  - Used extack for error messages.
+> >>  - As suggested reworked commit messages.
+> >>  - Fixed sparse warning.
+> >>
+> >> v3-v4:
+> >>  - Patch 2 & 3: Fixed coccinelle reported warnings.
+> >>  - Patch 10: Added devlink port support.
+> >>
+> >> v4-v5:
+> >>   - Patch 3: Removed devm_* usage in rvu_rep_create()
+> >>   - Patch 3: Fixed build warnings.
+> >>
+> >> v5-v6:
+> >>   - Addressed review comments provided by "Simon Horman".
+> >>   - Added review tag.
+> >>
+> >> v6-v7:
+> >>   - Rebased on top net-next branch.
+> >>
+> >> Geetha sowjanya (10):
+> >>   octeontx2-pf: Refactoring RVU driver
+> >>   octeontx2-pf: RVU representor driver
+> >>   octeontx2-pf: Create representor netdev
+> >>   octeontx2-pf: Add basic net_device_ops
+> >>   octeontx2-af: Add packet path between representor and VF
+> >>   octeontx2-pf: Get VF stats via representor
+> >>   octeontx2-pf: Add support to sync link state between representor and
+> >>     VFs
+> >>   octeontx2-pf: Configure VF mtu via representor
+> >>   octeontx2-pf: Add representors for sdp MAC
+> >>   octeontx2-pf: Add devlink port support
+> >>
+> >>  .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
+> >>  .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
+> >>  .../ethernet/marvell/octeontx2/af/common.h    |   2 +
+> >>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  74 ++
+> >>  .../net/ethernet/marvell/octeontx2/af/npc.h   |   1 +
+> >>  .../net/ethernet/marvell/octeontx2/af/rvu.c   |  11 +
+> >>  .../net/ethernet/marvell/octeontx2/af/rvu.h   |  30 +-
+> >>  .../marvell/octeontx2/af/rvu_debugfs.c        |  27 -
+> >>  .../marvell/octeontx2/af/rvu_devlink.c        |   6 +
+> >>  .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  81 ++-
+> >>  .../marvell/octeontx2/af/rvu_npc_fs.c         |   5 +
+> >>  .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   4 +
+> >>  .../ethernet/marvell/octeontx2/af/rvu_rep.c   | 464 ++++++++++++
+> >>  .../marvell/octeontx2/af/rvu_struct.h         |  26 +
+> >>  .../marvell/octeontx2/af/rvu_switch.c         |  20 +-
+> >>  .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
+> >>  .../ethernet/marvell/octeontx2/nic/cn10k.c    |   4 +-
+> >>  .../ethernet/marvell/octeontx2/nic/cn10k.h    |   2 +-
+> >>  .../marvell/octeontx2/nic/otx2_common.c       |  56 +-
+> >>  .../marvell/octeontx2/nic/otx2_common.h       |  84 ++-
+> >>  .../marvell/octeontx2/nic/otx2_devlink.c      |  49 ++
+> >>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 305 +++++---
+> >>  .../marvell/octeontx2/nic/otx2_txrx.c         |  38 +-
+> >>  .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +-
+> >>  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  19 +-
+> >> .../net/ethernet/marvell/octeontx2/nic/rep.c  | 684 ++++++++++++++++++
+> >> .../net/ethernet/marvell/octeontx2/nic/rep.h  |  53 ++
+> >>  27 files changed, 1834 insertions(+), 227 deletions(-)  create mode
+> >> 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+> >>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+> >>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
+> >>
+> >> --
+> >> 2.25.1
+> >>
 
