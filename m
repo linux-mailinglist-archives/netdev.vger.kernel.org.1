@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-109254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A1992794D
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:51:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7CC927952
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:52:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 972151F22B55
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:51:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85430B252E2
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91B21B1205;
-	Thu,  4 Jul 2024 14:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180841B011E;
+	Thu,  4 Jul 2024 14:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUQSCdZ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fya3ElqA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506C31B11FC;
-	Thu,  4 Jul 2024 14:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE741B010C;
+	Thu,  4 Jul 2024 14:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720104679; cv=none; b=Jimo432LSPKXu6TfslnVDAcNj+oeraYGdURgClvt16zFNFBRagayi/yK0xYmlALWZ17PQCCv/WeLIom0iddUk3IINojc67aPPt7oV/J3P7ZVKpKFwnidHr/QRFi+36eGbq61HNeLABU/YxQpujFp5NbrkOJYlThmfvxisbZ8IUw=
+	t=1720104764; cv=none; b=g9jE12/AjATSlJIdYpKOFyVxgc93Xk/egSf8BOur07DSxhoOCHIupLM4mtqou5Ejn0UxN0AS+CXPbs3wSq8WlwHx0ocBZV/eJ/+UNyUGUuBFBzYSPfEBNnuyFJrUOJhd44w8iRuriFfvnMLgBp+AJqf1uxq84klpjYbNR8ObCQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720104679; c=relaxed/simple;
-	bh=g/7vOroP9f5W0cumiyj1gx2Z6T1BVT0ETgOOO0aRtu0=;
+	s=arc-20240116; t=1720104764; c=relaxed/simple;
+	bh=RBsIdMB94i1smMD7GeEfV0cjO5WwY9sCGUBRtXlEYm4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qNyMLZ1N0/1IeBRYtKXmi95n/nj5IDA7A0ZDsyZPSVJgPIV3EFc2qwMy3Xhi3uNR16a/gNfKGiFbucpHmnAnIm8bt4as/TXBEtIX0+3Lux9aUtAOa6GsHkiB+4rOKsc8kBhaRARGTS6GsC8jri/ltcZ2efelGDe7clOasOClBCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUQSCdZ9; arc=none smtp.client-ip=209.85.219.50
+	 In-Reply-To:Content-Type; b=uWmGYMwXlOfMYB/33AZM+DktAdshRovLUU6Ygv06SMy0biSsYVZOw3qqXEmjbRAY+vK60iVwVbXhQ+5yjFCimthjwN3fCJHBLf21E2b65+FUaOlHfFVG1Ksu1PXVkQ2fHglMWGvMLiUFe4NxVFhHrqxxqIV06aWoSAhbBTQJeUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fya3ElqA; arc=none smtp.client-ip=209.85.167.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6b5def3916bso3343646d6.3;
-        Thu, 04 Jul 2024 07:51:18 -0700 (PDT)
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3d56285aa18so294701b6e.2;
+        Thu, 04 Jul 2024 07:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720104677; x=1720709477; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720104761; x=1720709561; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hyo7nbfknLAdRckRj/UmxcR044dyUDIu6cMVN0RV4AA=;
-        b=mUQSCdZ9KEJrd5fHuSYn8FUdQ4RmvVHENWda1FXMtvbov1sCKxzbxFvRlu3o9zfh4B
-         vQ8ZemFQMN6JAGYw866oFXUn+qMzRbU02N/u/G/I4SxJkE1sxFDoEB7m9gfDDPDGextg
-         QKlDW6tOIqTPhIMEeROOtQN2RsrZ/HHV8Y1w0gSor/BPHahGdCa4qxUiRvl2QCOb/Ouk
-         +uCgYEwpgyF0ivgDPQUw3pbx13FOQzBimbFjzLQhTEJxPgpztP8TFETsP+Sw6MHsIohS
-         9U/5yw5knZTz0ycA+ITil9Gi0+ZN2dkA6FU698j3jqVABNqb625ia/x9xsidOpoTUnLp
-         Dd5Q==
+        bh=Z80RMyfkSC9GLCOYGUpg/OE+zKV6FgJptOKxg2l0ayw=;
+        b=Fya3ElqAE3rip+72HR/9MGSkpyOcrtYse3qlgpSP2z4Mny4C9IkOHf+Z5EI2kKuenR
+         8vQeTogRl5LNeDHzbeE7b/2SvdjK6pwnJZ1sV7GkXpiFXQXsT3lNIsqd7AtyNu9kKPdg
+         5/lGDY/t82q9ub5m6z9OqNMwG2VO9S3dMX1TzppDSQ0UET5ztZ6k0TKfIh0/q+wAOf+K
+         9XHE5Q0WGbQ0vWjLPacHbRYyrd1ujyKL1BpCHEyPQSOzM2OyHnHtzXytZ32pFrvYFzfW
+         a7eA5f6QQArbcuNMenfS89nH2e6panPqacRoBORUVSUNeVn1aDsNIBHBERVug3W8NUB8
+         GnLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720104677; x=1720709477;
+        d=1e100.net; s=20230601; t=1720104761; x=1720709561;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hyo7nbfknLAdRckRj/UmxcR044dyUDIu6cMVN0RV4AA=;
-        b=bLBpeZTC6cv0+Zbyz139j2SZW05105LRF9TY8c7AIS5FggnvqcjmBOYw5ZByUuSC9k
-         H2zciJMm0U2ypfDh9Ta1JJb40+WEjezC6L0HdyOA2zr9LVfw4K47zpGrQ4TtwTEcJE2/
-         L7kXkZ8RT9BwDnxo9XrwgJdB2r7Aj/TfrrrhDbV6fmdkapLzgRsmtx6bmQLCJQjuKnB1
-         +sGBchx8rweRRqObR6RGCDJj8nmXRFoOGc4P3ASXO0YVKepxQ0vf0QcDCu5fxEVkl44b
-         LfZpAZ1uMxHGzf5I7cwgdD4M2BXKPgwbyj04EUI2QeQ8nA8CiqtrPOPymHCHoynU/wfN
-         V87A==
-X-Forwarded-Encrypted: i=1; AJvYcCWZCvfgei4kDPNHgOdeo8oNUXvIaZ6o9pA4fewlMp+QpmtdtmG5FtFVAhjIRdLAHsXManh+SK4xcKRmBCHsLwiXqInLW0A5C1OCJTBq
-X-Gm-Message-State: AOJu0YwUvbf4rbhuzl21oFNoAuX/EiyLSPBsVwkbL8mR9WbEbkVGBh/A
-	pmS/GEvUnBTdKMuKG7jsBnGWqE3XftRiSZn2H7gb73Ffgj28da8c
-X-Google-Smtp-Source: AGHT+IF0kEoqJQ/7/4YpfiTsb/1z/kelC/OmR6Pv7HWh9rRQ5Co0EyIKXuhP+5iWZfN7XMKxcqO2nw==
-X-Received: by 2002:ad4:594d:0:b0:6b5:6331:4d4 with SMTP id 6a1803df08f44-6b5ed19c1c0mr20729416d6.51.1720104677125;
-        Thu, 04 Jul 2024 07:51:17 -0700 (PDT)
+        bh=Z80RMyfkSC9GLCOYGUpg/OE+zKV6FgJptOKxg2l0ayw=;
+        b=w5uVc+/Ja8MV4ycdE8X1ARxirGfd+9lKlqeTej7x3dVUefW9YxCmvOr0VtPRGb3hwG
+         Pls7BCUu8CJZe7lD/RtkNYHkIUNARGBgruCgwb1pQceH7PKKRoKS5w+H38Sgtjh6+J0T
+         uHBjd19+ONTGZEHl7WywhHMLJ+75r04oRWRMCYewYYpWaTUjf6cFl6Q9A3jB3v/2WnQx
+         Sd3+jvWM7ATuWynz8p+BlFBjMkTXMprr5WK7myPdgY7ZZ6A1E6XQntlEnG8iK3NNWfOU
+         4uh6sDJgZnVftf+xmYgGqRLJ2rScMEkhyRvS7O9hOVWweIVlkjHsA7tKJtIVln0FISIb
+         uLfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWYQiXANW1G0b1zo6OAqXEYK40d7PHqyinc+DI4wjEL3X0ZdknenL/XhtmrpFlHGJ38zOBjZ7IECpNhc23Q+IOe/wrSr9Rj1nC/lEAE9YjWF77z7zy429arA0sC7jq+dpmDwZ5t
+X-Gm-Message-State: AOJu0YwXxsKqjITL6W9OLdrGEnpQzALLj0o3oOiKltgGzGCDxsf7Gau+
+	qklOoIgjy86NZFOLzsXl2GxFWyPOxlPZKio/NQ1yKnrx+7dbn7zG
+X-Google-Smtp-Source: AGHT+IE7/nsxhg0rmCg4ks/sdnE6hm78RIjiwbMUH8/XNgcsuXj9eU4GMOkSinatq0qzB2eS06gZWQ==
+X-Received: by 2002:a05:6808:152a:b0:3d6:2cc2:6b33 with SMTP id 5614622812f47-3d914cb4c50mr2200990b6e.39.1720104759596;
+        Thu, 04 Jul 2024 07:52:39 -0700 (PDT)
 Received: from [10.40.5.113] ([89.207.175.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e368bcasm64363416d6.5.2024.07.04.07.51.12
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6925f578sm679206785a.8.2024.07.04.07.52.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jul 2024 07:51:15 -0700 (PDT)
-Message-ID: <2b0f7253-685f-4af9-853d-66060be69489@gmail.com>
-Date: Thu, 4 Jul 2024 16:51:10 +0200
+        Thu, 04 Jul 2024 07:52:21 -0700 (PDT)
+Message-ID: <c6c97d6d-93aa-4164-ba28-bfefe13ee184@gmail.com>
+Date: Thu, 4 Jul 2024 16:52:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,17 +77,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] dsa: lan9303: consistent naming for PHY address
- parameter
-To: Christian Eggers <ceggers@arri.de>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Juergen Beisert <jbe@pengutronix.de>, Stefan Roese <sr@denx.de>,
- Juergen Borleis <kernel@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240703145718.19951-1-ceggers@arri.de>
- <20240703145718.19951-2-ceggers@arri.de>
+Subject: Re: [PATCH net v1 1/2] net: phy: microchip: lan87xx: reinit PHY after
+ cable test
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>,
+ Arun Ramadoss <arun.ramadoss@microchip.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Yuiko Oshino <yuiko.oshino@microchip.com>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com
+References: <20240703132801.623218-1-o.rempel@pengutronix.de>
 Content-Language: en-US
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
@@ -123,16 +124,19 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240703145718.19951-2-ceggers@arri.de>
+In-Reply-To: <20240703132801.623218-1-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 7/3/2024 3:57 PM, Christian Eggers wrote:
-> Name it 'addr' instead of 'port' or 'phy'.
+On 7/3/2024 2:28 PM, Oleksij Rempel wrote:
+> Reinit PHY after cable test, otherwise link can't be established on
+> tested port. This issue is reproducible on LAN9372 switches with
+> integrated 100BaseT1 PHYs.
 > 
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
+> Fixes: 788050256c411 ("net: phy: microchip_t1: add cable test support for lan87xx phy")
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
