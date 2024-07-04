@@ -1,112 +1,143 @@
-Return-Path: <netdev+bounces-109181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9279E927427
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:36:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C08927437
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:41:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D6A5B21F4A
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:36:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E13C1F24AC0
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32C21ABC3D;
-	Thu,  4 Jul 2024 10:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A531ABC4A;
+	Thu,  4 Jul 2024 10:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PfxpnSDV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp134-24.sina.com.cn (smtp134-24.sina.com.cn [180.149.134.24])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64E11ABC32
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F221ABC3F;
+	Thu,  4 Jul 2024 10:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720089375; cv=none; b=s8A7xED57e/RL0tOtPvGEVOG0tGDHBAl+Xes69pafvXZdPrHmRSIoE3hdjt/tKtipaA3LEBqMFbZiKQpz0VWDU7vIdMqyWex8wflNyNvlOJDis2CnJKPL5OI1GKl0Y8LyBnNUN1ANUz+v0aLH6Ot/D1kXK3j+6C2T4qllEUvXss=
+	t=1720089670; cv=none; b=EXJllssXOxi8EQCJunrOWJnUWcXD77Xr/7+NnfEVqUmIwyFoAZJm45c5+sO2YotfYdhDIOpRHBJ79u7jJyd5oVoeJfnAD58ntWK7WcA6jXFumhDqRlpWkZYyAh5uSNqEBde4RT5/ISmbptUpSkBuoJ1ZvXFzJEKHf9GSMWSrQxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720089375; c=relaxed/simple;
-	bh=F0U+LFngqNZTjEjSJVQJ9Hzl5vylWxE0tv1FzcykhCY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rS0zNPPbLv7R0fFRznMkJLKTIgVMCEhV5BqD+xYx8UaEmAPrsdZfIzJbNinbUhJYeZvDtS/zSeXtIGfAyUEULnDhpvbvdrmmZXfyknfdTkbhxJkGn1OrcPCVYCvng1VTx6MNXy1erVCrlWRvWi7Vi65W5FUsjQm/gczwR60XEtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.65.201])
-	by sina.com (10.185.250.21) with ESMTP
-	id 66867AEB00007F26; Thu, 4 Jul 2024 18:35:25 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6097673408358
-X-SMAIL-UIID: BAA4D347F2CB48EBA17B1782EB4B3DA7-20240704-183525-1
-From: Hillf Danton <hdanton@sina.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
-Date: Thu,  4 Jul 2024 18:35:14 +0800
-Message-Id: <20240704103514.3035-1-hdanton@sina.com>
-In-Reply-To: <20240703130107.GB29258@breakpoint.cc>
-References: 
+	s=arc-20240116; t=1720089670; c=relaxed/simple;
+	bh=0x4ZOi9C7DdyMVJHpVTHw/IUws1rmnmEhR3InDO/NCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R370++X8Jw0Ed5t3Dzf6kVdfJrWCnuCxWjhu07P9Pap/VTLP+F8VhgzpthD+x9Vev/UV1ErQ05Hf4ZDTzNxMxy21W4614cTVn5E6/rGWGkFWnGWhtaUadyNWGirEzMuWEVpaZYf2y5BkRKNBN2jPg7o5igwK/lgGlyS3sR52gKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PfxpnSDV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D389C3277B;
+	Thu,  4 Jul 2024 10:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720089669;
+	bh=0x4ZOi9C7DdyMVJHpVTHw/IUws1rmnmEhR3InDO/NCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PfxpnSDVtQammiKOSkdkXaVFG2FUdEKrU1AnZCxMGXnNzO4Ghr7CmaYD+mhqlOLQD
+	 BAOxqTeTtdLBUm0n3spesrabPFFcHsnrH+ogh6fxRkiZubuWTiOtcH5nVUtBKe+qet
+	 EioEXA38Aej7+z9BVUEoukfVg12glFhs3q2BWGlU=
+Date: Thu, 4 Jul 2024 12:41:07 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shay Drory <shayd@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com, Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Parav Pandit <parav@nvidia.com>
+Subject: Re: [PATCH net-next v9 1/2] driver core: auxiliary bus: show
+ auxiliary device IRQs
+Message-ID: <2024070457-creatable-heroics-94cb@gregkh>
+References: <20240703073858.932299-1-shayd@nvidia.com>
+ <20240703073858.932299-2-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240703073858.932299-2-shayd@nvidia.com>
 
-On Wed, 3 Jul 2024 15:01:07 +0200 Florian Westphal <fw@strlen.de>
-> Hillf Danton <hdanton@sina.com> wrote:
-> > On Wed, 3 Jul 2024 12:52:15 +0200 Florian Westphal <fw@strlen.de>
-> > > Hillf Danton <hdanton@sina.com> wrote:
-> > > > Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
-> > > > if trans outlives table.
-> > > 
-> > > trans must never outlive table.
-> > > 
-> > What is preventing trans from being freed after closing sock, given
-> > trans is freed in workqueue?
-> > 
-> > 	close sock
-> > 	queue work
-> 
-> The notifier acquires the transaction mutex, locking out all other
-> transactions, so no further transactions requests referencing
-> the table can be queued.
-> 
-As per the syzbot report, trans->table could be instantiated before
-notifier acquires the transaction mutex. And in fact the lock helps
-trans outlive table even with your patch.
+On Wed, Jul 03, 2024 at 10:38:57AM +0300, Shay Drory wrote:
+> +/**
+> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: The associated interrupt number.
+> + *
+> + * This function should be called after auxiliary device have successfully
+> + * received the irq.
+> + * The driver is responsible to add a unique irq for the auxiliary device. The
+> + * driver can invoke this function from multiple thread context safely for
+> + * unique irqs of the auxiliary devices. The driver must not invoke this API
+> + * multiple times if the irq is already added previously.
+> + *
+> + * Return: zero on success or an error code on failure.
+> + */
+> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct auxiliary_irq_info *info __free(kfree) = NULL;
+> +	struct device *dev = &auxdev->dev;
+> +	char *name __free(kfree) = NULL;
+> +	int ret;
+> +
+> +	ret = auxiliary_irq_dir_prepare(auxdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return -ENOMEM;
+> +
+> +	sysfs_attr_init(&info->sysfs_attr.attr);
+> +	name = kasprintf(GFP_KERNEL, "%d", irq);
+> +	if (!name)
+> +		return -ENOMEM;
+> +
+> +	ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
+> +	if (ret)
+> +		return ret;
+> +
+> +	info->sysfs_attr.attr.name = name;
+> +	ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
+> +				      auxiliary_irqs_group.name);
+> +	if (ret)
+> +		goto sysfs_add_err;
+> +
+> +	info->sysfs_attr.attr.name = no_free_ptr(name);
 
-	cpu1			cpu2
-	---			---
-	transB->table = A
-				lock trans mutex
-				flush work
-				free A
-				unlock trans mutex
+This assignment of a name AFTER it has been created is odd.  I think I
+know why you are doing this, but please make it obvious and perhaps
+solve it in a cleaner way.  Assigning this "deep" in a sysfs structure
+is not ok.
 
-	queue work to free transB
 
-> The work queue is flushed before potentially ripping the table
-> out.  After this, no transactions referencing the table can exist
-> anymore; the only transactions than can still be queued are those
-> coming from a different netns, and tables are scoped per netns.
-> 
-> Table is torn down.  Transaction mutex is released.
-> 
-> Next transaction from userspace can't find the table anymore (its gone),
-> so no more transactions can be queued for this table.
-> 
-> As I wrote in the commit message, the flush is dumb, this should first
-> walk to see if there is a matching table to be torn down, and then flush
-> work queue once before tearing the table down.
-> 
-> But its better to clearly split bug fix and such a change.
+> +	xa_store(&auxdev->irqs, irq, no_free_ptr(info), GFP_KERNEL);
+> +	return 0;
+> +
+> +sysfs_add_err:
+> +	xa_erase(&auxdev->irqs, irq);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
+> +
+> +/**
+> + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
+> + * @auxdev: auxiliary bus device to add the sysfs entry.
+> + * @irq: the IRQ to remove.
+> + *
+> + * This function should be called to remove an IRQ sysfs entry.
+> + * The driver must invoke this API when IRQ is released by the device.
+> + */
+> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
+> +{
+> +	struct auxiliary_irq_info *info __free(kfree) =	xa_load(&auxdev->irqs, irq);
+
+No verification that this is an actual entry before you dereferenced it?
+Bold move...
+
+greg k-h
 
