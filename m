@@ -1,193 +1,95 @@
-Return-Path: <netdev+bounces-109179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4481D9273EC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:23:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37313927413
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EECC51F224BC
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:23:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68AA11C21813
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 10:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8360F1AB907;
-	Thu,  4 Jul 2024 10:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16AA1A0AEA;
+	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="l3mca594"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pbm2slpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2491C1AB53B;
-	Thu,  4 Jul 2024 10:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9161D696
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720088590; cv=none; b=aM1VqeSn2YTcDfamLiEwAJE8RnruaVeT0cPdreV+uUiSKRRHUi75PTzpEers4SVdu4wrYNKPKkuL2UtyNTjVji1UxSR9HhjHyBaStbHFbx/J/OmnzHUxmoV2JPOL734H/9PrvjZhqSzoYpUkiGECS3L3KyFSrOBhNZ1wFgAFuxA=
+	t=1720089029; cv=none; b=LWwHFeGUYj6dNDASVCgjxAyAhhXohix3seRnVNu3V9qQqFNJU9PGI8sES34W8iU2BXqL48VCL6v0M4LNIZzrfgEY5AEaiPsndg24C43pVKUL+kJQiHBEWKKHDMQFwEn+RI13uZrx9v2T+pmHef0eOeyGunc+MMvxBvSFgQHXSKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720088590; c=relaxed/simple;
-	bh=7nyOpKME690gkvlBcGeJF0SLp1Y4QA/z18+829pfKwg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FYkurxbWqvUbLiUMYDMA9w0lLRQCGDve3VHKaXLjBXKRMBCrcYqZVbdglRvac2/sV41JBoZkAEx7KlYtBs6oK4oYjWF1Jbu6hJPvSBLvrGisLfGKxVbrcs6e+LwazQYJ64D6gVr/yfNIPWeY9E9L5GGuxzIDfpFtsv5S7XQvBs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=l3mca594; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 8A9AC200E9;
-	Thu,  4 Jul 2024 18:23:03 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1720088585;
-	bh=7nyOpKME690gkvlBcGeJF0SLp1Y4QA/z18+829pfKwg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=l3mca594A+J75xqCfbb8jWGh8SOWpbzVHF08kUhIZ81tD2orne5B6vF19VFYx5VD3
-	 D+6FaMqwBheR/TmKEcpzGBI+Q5kkbOjXNKdINEOUpIDbBHUXtVo3SaQPqMTTinoAyO
-	 AHpVndrY4Qm6urEgvhpJmskSU5gEgVffNPDDWq+zvOoy8APicNrbwVR6GlX/GKxIqB
-	 ZHnG1JEBBGAKqwSxPfGBIz7AWOitZXeZXhCOeNx5VBLfYh9k9tuD38xOEe7Djh4P1c
-	 OF9lF5caWsjCTkiZxMsmx5G20+kHRWOfjA9wpcKwqY5iegynPRuBnJxZDHPQUtB32w
-	 RehSnSN/2fTww==
-Message-ID: <35d8f28ef8d7de30733da7d8b1b16da39545879e.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v4 3/3] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: admiyo@os.amperecomputing.com, Matt Johnston
- <matt@codeconstruct.com.au>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Thu, 04 Jul 2024 18:23:03 +0800
-In-Reply-To: <20240702225845.322234-4-admiyo@os.amperecomputing.com>
-References: <20240702225845.322234-1-admiyo@os.amperecomputing.com>
-	 <20240702225845.322234-4-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1720089029; c=relaxed/simple;
+	bh=CET3sWaZQexn4QPdCuliU2XqHB7GdEGqL7gZHBWIMhY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=esymjllge+fjWkd8XHlEG4UStHRCFuSwTxoXm+u/wgBpMXus3eMGDrTPy4vhvK/lEYQG5tQ7UY5liOv1lBb0vkSd+Bt7d1acHXHfJimqta7vA0ik236MQKbywD0C3AZ3F7y7nL2Ty1lrxF2/K3yA/k5rttgxWKysETLNKkzx4Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pbm2slpJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B0B8C4AF0A;
+	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720089029;
+	bh=CET3sWaZQexn4QPdCuliU2XqHB7GdEGqL7gZHBWIMhY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pbm2slpJbsQZe+S2AjY/2NTlYablrFmDi75ec2RzUv1yfbxtORhTLXrX8qJetBnlp
+	 8xHh7GneTmagAFeRAFIvXeoFIVV7hiW6fTypPe2qs4sQeM+U9JE59d3/fw902iDTKx
+	 IZaqubEsUBRpzTYgwiCpKw5s5wxPbBJ9uQnJQKb2QKuIJdE7Yw1scSBd/iDk5SA9C5
+	 AyxJ2fow9RUabvXrCqvMgs5YG0+/4a2ABDmesBUrZKZI6xU2Pnc9Uz8g79H9GhZdQl
+	 t8Hgupko1kw31p+b3wYCuPgBOesgMMfbbW0FdEEkM8astTj+MyfbLbgumjI3+CLxil
+	 +aYCm1UgLmv2A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 219EEC43446;
+	Thu,  4 Jul 2024 10:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for TCP
+ AO.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172008902913.22684.433848898987679005.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jul 2024 10:30:29 +0000
+References: <20240703033508.6321-1-kuniyu@amazon.com>
+In-Reply-To: <20240703033508.6321-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, 0x7f454c46@gmail.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 
-SGkgQWRhbSwKClN0aWxsIHNvbWUgbWlub3IgdGhpbmdzLCBhbmQgbG9ja2luZyBxdWVyeSwgaW5s
-aW5lLgoKWW91J2xsIHdhbnQgdG8gYWRkcmVzcyB0aGUga2VybmVsLXRlc3Qtcm9ib3QgZmFpbHVy
-ZSB0b287IGl0IGxvb2tzIGxpa2UKdGhlIGNvbmZpZyBpdCdzIGhpdHRpbmcgZW5kcyB1cCB3aXRo
-b3V0IHRoZSBhY3BpIGRlZmluaXRpb25zIGF2YWlsYWJsZTsKcG9zc2libHkgQ09ORklHX0FDUEkg
-aXMgbm90IHNldC4gTWF5YmUgeW91IG5lZWQgYSBkZXBlbmRzIGluc3RlYWQgb2YgYQpzZWxlY3Q/
-Cgo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9tY3RwL0tjb25maWcgYi9kcml2ZXJzL25ldC9t
-Y3RwL0tjb25maWcKPiBpbmRleCBjZTlkMmQyY2NmM2IuLmZmNGVmZmQ4ZTk5YyAxMDA2NDQKPiAt
-LS0gYS9kcml2ZXJzL25ldC9tY3RwL0tjb25maWcKPiArKysgYi9kcml2ZXJzL25ldC9tY3RwL0tj
-b25maWcKPiBAQCAtNDIsNiArNDIsMTkgQEAgY29uZmlnIE1DVFBfVFJBTlNQT1JUX0kzQwo+IMKg
-wqDCoMKgwqDCoMKgwqDCoCBBIE1DVFAgcHJvdG9jb2wgbmV0d29yayBkZXZpY2UgaXMgY3JlYXRl
-ZCBmb3IgZWFjaCBJM0MgYnVzCj4gwqDCoMKgwqDCoMKgwqDCoMKgIGhhdmluZyBhICJtY3RwLWNv
-bnRyb2xsZXIiIGRldmljZXRyZWUgcHJvcGVydHkuCj4gwqAKPiArY29uZmlnIE1DVFBfVFJBTlNQ
-T1JUX1BDQwo+ICvCoMKgwqDCoMKgwqDCoHRyaXN0YXRlICJNQ1RQwqAgUENDIHRyYW5zcG9ydCIK
-Ck5pdDogeW91IGhhdmUgdHdvIHNwYWNlcyB0aGVyZS4KCj4gK3N0cnVjdCBtY3RwX3BjY19oZHIg
-ewo+ICvCoMKgwqDCoMKgwqDCoHUzMiBzaWduYXR1cmU7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGZs
-YWdzOwo+ICvCoMKgwqDCoMKgwqDCoHUzMiBsZW5ndGg7Cj4gK8KgwqDCoMKgwqDCoMKgY2hhciBt
-Y3RwX3NpZ25hdHVyZVs0XTsKPiArfTsKCkkgc2VlIHlvdSd2ZSBhZGRlZCB0aGUgX19sZSBhbm5v
-dGF0aW9ucyB0aGF0IEkgbWVudGlvbmVkLCBidXQgdG8gYQpkaWZmZXJlbnQgcGF0Y2ggaW4gdGhl
-IHNlcmllcy4gV2FzIHRoYXQgaW50ZW50aW9uYWw/Cgo+ICsKPiArc3RydWN0IG1jdHBfcGNjX2h3
-X2FkZHIgewo+ICvCoMKgwqDCoMKgwqDCoHUzMiBpbmJveF9pbmRleDsKPiArwqDCoMKgwqDCoMKg
-wqB1MzIgb3V0Ym94X2luZGV4Owo+ICt9Owo+ICsKPiArLyogVGhlIG5ldGRldiBzdHJ1Y3R1cmUu
-IE9uZSBvZiB0aGVzZSBwZXIgUENDIGFkYXB0ZXIuICovCj4gK3N0cnVjdCBtY3RwX3BjY19uZGV2
-IHsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbGlzdF9oZWFkIG5leHQ7CgpUaGlzIGlzIG5vdyB1
-bnVzZWQuCgo+ICvCoMKgwqDCoMKgwqDCoC8qIHNwaW5sb2NrIHRvIHNlcmlhbGl6ZSBhY2Nlc3Mg
-dG8gcGNjIGJ1ZmZlciBhbmQgcmVnaXN0ZXJzKi8KPiArwqDCoMKgwqDCoMKgwqBzcGlubG9ja190
-IGxvY2s7CgpUaGUgYWRkaXRpb24gb2YgdGhlIGNvbW1lbnQgaXMgZ29vZCwgYnV0IEknbSBzdGls
-bCBub3QgY2xlYXIgb24gd2hhdApkYXRhIHRoaXMgbG9jayBpcyBzZXJpYWxpc2luZyBhY2Nlc3Mg
-dG8uIERvZXMgInBjYyBidWZmZXIiIHJlZmVyIHRvIGJvdGgKdGhlIHBjY19jb21tX2luYm94X2Fk
-ZHIgYW5kIHBjY19jb21tX291dGJveF9hZGRyIGJ1ZmZlcj8KCklmIHNvLCB5b3UgbWF5IGJlIG1p
-c3NpbmcgbG9ja2luZyBvbiB0aGUgY2xpZW50X3J4X2NhbGxiYWNrLgoKQW5kIHdoYXQgYXJlIHRo
-ZSAicmVnaXN0ZXJzIiByZWZlcnJpbmcgdG8gaGVyZT8gZXZlcnl0aGluZyBzZWVtcyB0byBiZQph
-Y2Nlc3NlZCB0aHJvdWdoIHRoZSBtYm94IGludGVyZmFjZS4gRG9lcyB0aGF0IHJlcXVpcmUgc2Vy
-aWFsaXNhdGlvbj8KCihpZiB5b3UgY2FuIGxpc3QgYWN0dWFsIHN0cnVjdCBtZW1iZXJzIHRoYXQg
-YXJlIG9ubHkgYWNjZXNzZWQgdW5kZXIgdGhlCmxvY2ssIHRoYXQgbWF5IG1ha2UgdGhpbmdzIG1v
-cmUgY2xlYXIgLSBidXQgaXQgY2FuIGJlIGEgYml0IG9mIGEgYmFsYW5jZQppbiBub3QgZ29pbmcg
-KnRvbyogb3ZlcmJvYXJkIHdpdGggdGhlIGRlc2NyaXB0aW9uISkKCj4gK8KgwqDCoMKgwqDCoMKg
-c3RydWN0IG1jdHBfZGV2IG1kZXY7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IGFjcGlfZGV2aWNl
-ICphY3BpX2RldmljZTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgcGNjX21ib3hfY2hhbiAqaW5f
-Y2hhbjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgcGNjX21ib3hfY2hhbiAqb3V0X2NoYW47Cj4g
-K8KgwqDCoMKgwqDCoMKgc3RydWN0IG1ib3hfY2xpZW50IG91dGJveF9jbGllbnQ7Cj4gK8KgwqDC
-oMKgwqDCoMKgc3RydWN0IG1ib3hfY2xpZW50IGluYm94X2NsaWVudDsKPiArwqDCoMKgwqDCoMKg
-wqB2b2lkIF9faW9tZW0gKnBjY19jb21tX2luYm94X2FkZHI7Cj4gK8KgwqDCoMKgwqDCoMKgdm9p
-ZCBfX2lvbWVtICpwY2NfY29tbV9vdXRib3hfYWRkcjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
-bWN0cF9wY2NfaHdfYWRkciBod19hZGRyOwo+ICt9Owo+ICsKPiArc3RhdGljIHZvaWQgbWN0cF9w
-Y2NfY2xpZW50X3J4X2NhbGxiYWNrKHN0cnVjdCBtYm94X2NsaWVudCAqYywgdm9pZCAqYnVmZmVy
-KQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1jdHBfcGNjX2Rl
-djsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfaGRyIG1jdHBfcGNjX2hkcjsKPiAr
-wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9za2JfY2IgKmNiOwo+ICvCoMKgwqDCoMKgwqDCoHN0
-cnVjdCBza19idWZmICpza2I7Cj4gK8KgwqDCoMKgwqDCoMKgdm9pZCAqc2tiX2J1ZjsKPiArwqDC
-oMKgwqDCoMKgwqB1MzIgZGF0YV9sZW47Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNjX2Rl
-diA9IGNvbnRhaW5lcl9vZihjLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgaW5ib3hfY2xpZW50KTsK
-PiArwqDCoMKgwqDCoMKgwqBtZW1jcHlfZnJvbWlvKCZtY3RwX3BjY19oZHIsIG1jdHBfcGNjX2Rl
-di0+cGNjX2NvbW1faW5ib3hfYWRkciwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBzaXplb2Yoc3RydWN0IG1jdHBfcGNjX2hkcikpOwo+ICvCoMKgwqDCoMKgwqDC
-oGRhdGFfbGVuID0gbWN0cF9wY2NfaGRyLmxlbmd0aCArIE1DVFBfSEVBREVSX0xFTkdUSDsKPiAr
-Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGRhdGFfbGVuID4gbWN0cF9wY2NfZGV2LT5tZGV2LmRldi0+
-bWF4X210dSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19kZXYt
-Pm1kZXYuZGV2LT5zdGF0cy5yeF9kcm9wcGVkKys7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9CgpTaG91bGRuJ3QgdGhpcyBiZSBjb21w
-YXJpbmcgb24gdGhlIGN1cnJlbnRseS1zZXQgTVRVLCByYXRoZXIgdGhhbiB0aGUKbWF4PwoKW2lu
-IGVpdGhlciBjYXNlLCB0aGlzIGFzc3VtZXMgdGhhdCB3ZSB3YW50IHRvIGVuZm9yY2UgUlggcGFj
-a2V0cyB0byBiZQp3aXRoaW4gdGhlIHRyYW5zbWl0IGxpbWl0LCB3aGljaCBtYXkgYmUgcmVhc29u
-YWJsZSwgYnV0IG1heWJlIG5vdApzdHJpY3RseSBuZWNlc3NhcnldCgo+ICsKPiArwqDCoMKgwqDC
-oMKgwqBza2IgPSBuZXRkZXZfYWxsb2Nfc2tiKG1jdHBfcGNjX2Rldi0+bWRldi5kZXYsIGRhdGFf
-bGVuKTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoIXNrYikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBtY3RwX3BjY19kZXYtPm1kZXYuZGV2LT5zdGF0cy5yeF9kcm9wcGVkKys7Cj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9
-Cj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfZGV2LT5tZGV2LmRldi0+c3RhdHMucnhfcGFja2V0
-cysrOwo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfcGNjX2Rldi0+bWRldi5kZXYtPnN0YXRzLnJ4X2J5
-dGVzICs9IGRhdGFfbGVuOwo+ICvCoMKgwqDCoMKgwqDCoHNrYi0+cHJvdG9jb2wgPSBodG9ucyhF
-VEhfUF9NQ1RQKTsKPiArwqDCoMKgwqDCoMKgwqBza2JfYnVmID0gc2tiX3B1dChza2IsIGRhdGFf
-bGVuKTsKPiArwqDCoMKgwqDCoMKgwqBtZW1jcHlfZnJvbWlvKHNrYl9idWYsIG1jdHBfcGNjX2Rl
-di0+cGNjX2NvbW1faW5ib3hfYWRkciwgZGF0YV9sZW4pOwo+ICsKPiArwqDCoMKgwqDCoMKgwqBz
-a2JfcmVzZXRfbWFjX2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9wdWxsKHNrYiwg
-c2l6ZW9mKHN0cnVjdCBtY3RwX3BjY19oZHIpKTsKPiArwqDCoMKgwqDCoMKgwqBza2JfcmVzZXRf
-bmV0d29ya19oZWFkZXIoc2tiKTsKPiArwqDCoMKgwqDCoMKgwqBjYiA9IF9fbWN0cF9jYihza2Ip
-Owo+ICvCoMKgwqDCoMKgwqDCoGNiLT5oYWxlbiA9IDA7Cj4gK8KgwqDCoMKgwqDCoMKgbmV0aWZf
-cngoc2tiKTsKPiArfQo+ICsKPiArc3RhdGljIG5ldGRldl90eF90IG1jdHBfcGNjX3R4KHN0cnVj
-dCBza19idWZmICpza2IsIHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2KQo+ICt7Cj4gK8KgwqDCoMKg
-wqDCoMKgc3RydWN0IG1jdHBfcGNjX2hkciBwY2NfaGVhZGVyOwo+ICvCoMKgwqDCoMKgwqDCoHN0
-cnVjdCBtY3RwX3BjY19uZGV2ICptcG5kOwo+ICvCoMKgwqDCoMKgwqDCoHZvaWQgX19pb21lbSAq
-YnVmZmVyOwo+ICvCoMKgwqDCoMKgwqDCoHVuc2lnbmVkIGxvbmcgZmxhZ3M7Cj4gKwo+ICvCoMKg
-wqDCoMKgwqDCoG5kZXYtPnN0YXRzLnR4X2J5dGVzICs9IHNrYi0+bGVuOwo+ICvCoMKgwqDCoMKg
-wqDCoG5kZXYtPnN0YXRzLnR4X3BhY2tldHMrKzsKPiArwqDCoMKgwqDCoMKgwqBtcG5kID0gbmV0
-ZGV2X3ByaXYobmRldik7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5fbG9ja19pcnFzYXZlKCZt
-cG5kLT5sb2NrLCBmbGFncyk7Cj4gK8KgwqDCoMKgwqDCoMKgYnVmZmVyID0gbXBuZC0+cGNjX2Nv
-bW1fb3V0Ym94X2FkZHI7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX2hlYWRlci5zaWduYXR1cmUgPSBQ
-Q0NfTUFHSUMgfCBtcG5kLT5od19hZGRyLm91dGJveF9pbmRleDsKPiArwqDCoMKgwqDCoMKgwqBw
-Y2NfaGVhZGVyLmZsYWdzID0gUENDX0hFQURFUl9GTEFHUzsKPiArwqDCoMKgwqDCoMKgwqBtZW1j
-cHkocGNjX2hlYWRlci5tY3RwX3NpZ25hdHVyZSwgTUNUUF9TSUdOQVRVUkUsIFNJR05BVFVSRV9M
-RU5HVEgpOwo+ICvCoMKgwqDCoMKgwqDCoHBjY19oZWFkZXIubGVuZ3RoID0gc2tiLT5sZW4gKyBT
-SUdOQVRVUkVfTEVOR1RIOwoKQXJlIHRoZXJlIGFueSBjb25zdHJhaW50cyBvbiB0aGlzIGxlbmd0
-aD8KCj4gK8KgwqDCoMKgwqDCoMKgbWVtY3B5X3RvaW8oYnVmZmVyLCAmcGNjX2hlYWRlciwgc2l6
-ZW9mKHN0cnVjdCBtY3RwX3BjY19oZHIpKTsKPiArwqDCoMKgwqDCoMKgwqBtZW1jcHlfdG9pbyhi
-dWZmZXIgKyBzaXplb2Yoc3RydWN0IG1jdHBfcGNjX2hkciksIHNrYi0+ZGF0YSwgc2tiLT5sZW4p
-Owo+ICvCoMKgwqDCoMKgwqDCoG1wbmQtPm91dF9jaGFuLT5tY2hhbi0+bWJveC0+b3BzLT5zZW5k
-X2RhdGEobXBuZC0+b3V0X2NoYW4tPm1jaGFuLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIE5VTEwpOwo+ICvCoMKgwqDCoMKgwqDCoHNwaW5fdW5sb2NrX2ly
-cXJlc3RvcmUoJm1wbmQtPmxvY2ssIGZsYWdzKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgZGV2X2Nv
-bnN1bWVfc2tiX2FueShza2IpOwo+ICvCoMKgwqDCoMKgwqDCoHJldHVybiBORVRERVZfVFhfT0s7
-Cj4gK30KPiArCj4gK3N0YXRpYyB2b2lkCj4gK21jdHBfcGNjX25ldF9zdGF0cyhzdHJ1Y3QgbmV0
-X2RldmljZSAqbmV0X2RldiwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBz
-dHJ1Y3QgcnRubF9saW5rX3N0YXRzNjQgKnN0YXRzKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3Ry
-dWN0IG1jdHBfcGNjX25kZXYgKm1wbmQ7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoG1wbmQgPSBuZXRk
-ZXZfcHJpdihuZXRfZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBzdGF0cy0+cnhfZXJyb3JzID0gMDsK
-PiArwqDCoMKgwqDCoMKgwqBzdGF0cy0+cnhfcGFja2V0cyA9IG1wbmQtPm1kZXYuZGV2LT5zdGF0
-cy5yeF9wYWNrZXRzOwo+ICvCoMKgwqDCoMKgwqDCoHN0YXRzLT50eF9wYWNrZXRzID0gbXBuZC0+
-bWRldi5kZXYtPnN0YXRzLnR4X3BhY2tldHM7Cj4gK8KgwqDCoMKgwqDCoMKgc3RhdHMtPnJ4X2Ry
-b3BwZWQgPSAwOwo+ICvCoMKgwqDCoMKgwqDCoHN0YXRzLT50eF9ieXRlcyA9IG1wbmQtPm1kZXYu
-ZGV2LT5zdGF0cy50eF9ieXRlczsKPiArwqDCoMKgwqDCoMKgwqBzdGF0cy0+cnhfYnl0ZXMgPSBt
-cG5kLT5tZGV2LmRldi0+c3RhdHMucnhfYnl0ZXM7CgpJc24ndCBtcG5kLT5tZGV2LmRldiBqdXN0
-IG5ldF9kZXY/CgpTaG91bGQgd2UgYmUgZG9pbmcgdGhpcyAoYXMgd2VsbCBhcyB0aGUgc3RhdHMg
-dXBkYXRlcykgd2l0aCBtcG5kLT5sb2NrCmhlbGQ/IAoKPiArc3RhdGljIHZvaWQgbWN0cF9wY2Nf
-ZHJpdmVyX3JlbW92ZShzdHJ1Y3QgYWNwaV9kZXZpY2UgKmFkZXYpCj4gK3sKPiArwqDCoMKgwqDC
-oMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldiA9IGFjcGlfZHJpdmVyX2Rh
-dGEoYWRldik7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHBjY19tYm94X2ZyZWVfY2hhbm5lbChtY3Rw
-X3BjY19uZGV2LT5vdXRfY2hhbik7Cj4gK8KgwqDCoMKgwqDCoMKgcGNjX21ib3hfZnJlZV9jaGFu
-bmVsKG1jdHBfcGNjX25kZXYtPmluX2NoYW4pOwo+ICvCoMKgwqDCoMKgwqDCoG1jdHBfdW5yZWdp
-c3Rlcl9uZXRkZXYobWN0cF9wY2NfbmRldi0+bWRldi5kZXYpOwo+ICt9CgpOaWNlIQoKQ2hlZXJz
-LAoKCkplcmVteQo=
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 2 Jul 2024 20:35:08 -0700 you wrote:
+> When we process segments with TCP AO, we don't check it in
+> tcp_parse_options().  Thus, opt_rx->saw_unknown is set to 1,
+> which unconditionally triggers the BPF TCP option parser.
+> 
+> Let's avoid the unnecessary BPF invocation.
+> 
+> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v1,net] tcp: Don't flag tcp_sk(sk)->rx_opt.saw_unknown for TCP AO.
+    https://git.kernel.org/netdev/net/c/4b74726c01b7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
