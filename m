@@ -1,161 +1,288 @@
-Return-Path: <netdev+bounces-109288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEAF1927B27
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 18:33:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65B0927BC9
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 19:16:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 592391F22C25
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:33:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CACDC1C23192
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 17:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8961B29BB;
-	Thu,  4 Jul 2024 16:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F78345976;
+	Thu,  4 Jul 2024 17:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1hJevEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96951B0104
-	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 16:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A5044C7E;
+	Thu,  4 Jul 2024 17:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720110803; cv=none; b=Cppgi4vBxMhjtFW9gxK6vpYTByYvWlgcHSov/hgZMfeGFpi1f2MOm17otr+BAipjXnRnbeDDmkS5/1Nc4CaF0ejG/ZeC2jmD+IQbLgBfgsC/HrysXXZG+a4US/XMRt0mqVTQd5zKlOhS6x3E8l0zgrhQkLZBYtpISNas4oiMNXk=
+	t=1720113372; cv=none; b=LhcY8uuviuHLuVfiHHgEEHxO0OXpaofL13JFb31M25pcrSxNhkL+sLUFgWqu/T1vDEf0e4ho0BXu/G0B9bbMDqHOD83FT+AuEqRwsl2lFlLwGOtNRU1Ii4fWfL3cTQA/o4nVpTfPNIhjzs+2DA3RkyZfKpmKNjL60zDcwpREGF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720110803; c=relaxed/simple;
-	bh=oHgUj9RNVdjnFkamtyzSaZh2U2oXd+4eUW+sFd/bc+Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=APev9vOTJwEKAlvpTIyl0xpyl/0CEwBdG/67exk4TbYSQBTTXlAwvzj4sEHF7Jnq9FgST4Alm6QFAeV2v4QNf2MJvWMcpmCm6NOdvNLDVrRJvnP5Oodr4LJlFv79CsKkSUYrraO7HFcscBKCfZNlwYwJ56qW+rH49xmfyYXacVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7f61fca8c40so101013139f.3
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 09:33:21 -0700 (PDT)
+	s=arc-20240116; t=1720113372; c=relaxed/simple;
+	bh=3x8lP/aTiF5WqSbnLsl7dbOKsbYQj2t1Eh7lHauCaek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EZwu3aDdJuxQkx9u6Q3X1LKX502liF5Ruf7qqUgdQT7rhPHuQnFqa+ns84NfMB/ebd5lenBIjr8S/DXOaFbulujBLXDiFmRMaSkAqYknW7H/kt0iFemwBknNqabxPBNtHGqMDQNSvBXtgVH/bBWrihHftCW0FB/A9geWdc+Szos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1hJevEy; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ec1ac1aed2so9047301fa.3;
+        Thu, 04 Jul 2024 10:16:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720113369; x=1720718169; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=akj1yGVTlXRj2mY3MwoGNS6aRJcCL4nmykWEYKR6h6Q=;
+        b=Q1hJevEyTpL5w6Xlq4QLBfkySlH5p09tFZfg9ZVqJU4G6fmB7nsJoxyAV8J73T+G4T
+         yYltIfvSQ+spVIh6WiJAMcURvF2cXL7dVpTeFRgYCUH/DQ+M4VZTHiU6fmjz3y/5qkxN
+         ojPk5y6EcYBUiC9hhOXPZgirgzVEBLJ5kBA/CcKdfh/dNryk2l5GXvSakvh4wykRn5gy
+         DqLEJ7t9sgv+UhQLOMiAnmnOSa+YvF87ogFeP1eX+RZPZeTGy7sEVCdQn089eO/DOfUR
+         SxoAb38+L371ZD7xTo8+3e53CRmoSSJFl3M8FSxHRsH5wGXzwI3Fi6Mh0pnniCWC5pX9
+         3IVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720110801; x=1720715601;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qUKxMIsnh86EKvdFfJf776bnEDX8f4aMiOh9C/pfS/o=;
-        b=ORpnTIsIT/ifW5Gu2kY1D91T9Dnz0oAwFFi5xBjVcDv3C/vVaA3v4y+WF0rjpkmZFX
-         O1KEfS8LrOImNhaS6vBmR1/u4AHfplcdwHmDdZZ8iUnd2OqxdSrAf/nVPbJ0p5BgUveU
-         SVf9y1piEALZ5E6aiJho8M/bJUXII8RhszhnBdAzvhVyeFJW+z3SS1a0O0ObkC6qOce/
-         clONtFxzA1scpFGPGy91Ndw15n31NRCY/TVoulDiwb+NzcQN++9YinbQPyYEWwyGHWpc
-         fMJGu56TQokEhG9RedMFEdA8mJqvDb5Hb1qmYs4oxmM4jdlaN9uSvbt6k5C3nBtdR6nu
-         L8yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWxajoi83o12XB0dCTpbInVj8J24enPRhmR1IFuNuA8DgkzNzY+IwqmKDwJ9PevyVu6A2Zq1rVcgykAoptHhcgleqkCWM1
-X-Gm-Message-State: AOJu0Ywj00FO9x2kmvEZ0pDOr3DtKrCbc8x7KjZUgLFgZsE++g9EZ/H8
-	kSyMVpbm61ou+U378nRy1CMOjRYafIo8qmJV/DKvgK9dnEJDesx4J1b8xm/qSiP3m5MwH4f5dLr
-	utHJA8A6htPvB699YT2gOvLdRFuY+CFI+rNpymjxfY+yPuIL7jmbrOmk=
-X-Google-Smtp-Source: AGHT+IHWysKmk8S/npyqeKHy2fCBHQ0tjog4ECmymqcWf0CzoBCgl3niFulWEkUAN0knz+qOG6w83FwEhbZEe9xToq7ABFNUgu/A
+        d=1e100.net; s=20230601; t=1720113369; x=1720718169;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=akj1yGVTlXRj2mY3MwoGNS6aRJcCL4nmykWEYKR6h6Q=;
+        b=vB/7gKHFbnZdjaTXydQ56RWMBcNlQZqwhoJA6I1nXcsLpWnROxfpJ9g8VNXKjhMzEA
+         vVJjwoy0dRjmaCuwpKGu3qQfuYW1T9WHv/e1Wndcs0ysy9lFwZAfA91QL7I+GQFXwDZ4
+         UNooL+bZ/9YHTY4WZu4T6XzUZKdBJ2CibbOYZRm3DqsY4eTU/zF5iy6ylCQRsgS2eL9D
+         9N1r7L8c/tkgQqe/LBA02+/nQTf29zg2h+/5FFP/N7sJLef/P+h8VEydzFEJOJhoC6XO
+         29EJ6eFVGByq7m8lZTU3bbjJ7W/kkrj9QQNnKCdRV5VZUQQPh1XCiM5/FMqT2ysVnKdx
+         KgQw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4/qjbaHkyIWdwXOlUIG1iZglZeJvRQ9vmmuRef3/NZ8YT2lH76fx155DClojWmpaMauZ+6+jJwSJWYobzjYQp437UkmY07Wp/xvNB9+398i2IB2nxQ36hzmU2WtJMLaABDgB7
+X-Gm-Message-State: AOJu0YwQeaMND3tgK9AB4sYENXr8Dg8oDjk39UWWYGQ/nPIIwdeUqRXB
+	UUTi59E8oFzu7MQ6BYZZpRef1QPKNuS0wIczaS10fpFzt4WHKPKC
+X-Google-Smtp-Source: AGHT+IFTA8kd9mjM2p40e2ZtadZbcVKxwDbfrWZ/Shn/mauifxOtKFwqzRmFtdoxFS3r+DxEPLODog==
+X-Received: by 2002:a2e:9515:0:b0:2eb:f472:e7d3 with SMTP id 38308e7fff4ca-2ee8ed22c62mr15348351fa.6.1720113368407;
+        Thu, 04 Jul 2024 10:16:08 -0700 (PDT)
+Received: from skbuf ([188.25.110.57])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42649dec1cbsm12327265e9.1.2024.07.04.10.16.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 10:16:07 -0700 (PDT)
+Date: Thu, 4 Jul 2024 20:16:04 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v4] net: dsa: mt7530: fix impossible MDIO address and
+ issue warning
+Message-ID: <20240704171604.3ownsxasch5hokty@skbuf>
+References: <1c378be54d0fb76117f6d72dadd4a43a9950f0dc.1720105125.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4118:b0:4bf:38f9:eb1b with SMTP id
- 8926c6da1cb9f-4bf643fbae3mr110699173.6.1720110801082; Thu, 04 Jul 2024
- 09:33:21 -0700 (PDT)
-Date: Thu, 04 Jul 2024 09:33:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000045f576061c6e8142@google.com>
-Subject: [syzbot] [batman?] INFO: rcu detected stall in batadv_iv_send_outstanding_bat_ogm_packet
- (5)
-From: syzbot <syzbot+7beee86dd68b7ee38e4a@syzkaller.appspotmail.com>
-To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	mareklindner@neomailbox.ch, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sven@narfation.org, sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1c378be54d0fb76117f6d72dadd4a43a9950f0dc.1720105125.git.daniel@makrotopia.org>
 
-Hello,
+On Thu, Jul 04, 2024 at 04:08:22PM +0100, Daniel Golle wrote:
+> The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+> using bootstrap pins. However, there are only 4 possible options for the
+> switch itself: 7, 15, 23 and 31. As in MediaTek's SDK the address of the
+> switch is wrongly stated in the device tree as 0 (while in reality it is
+> 31), warn the user about such broken device tree and make a good guess
+> what was actually intended.
 
-syzbot found the following issue on:
+Zero is the MDIO broadcast address. Doesn't the switch respond to it, or
+what's exactly the problem?
 
-HEAD commit:    707081b61156 Merge branch 'for-next/core', remote-tracking..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1182b083180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=caeac3f3565b057a
-dashboard link: https://syzkaller.appspot.com/bug?extid=7beee86dd68b7ee38e4a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
+> 
+> This is imporant also to not break compatibility with older Device Trees
 
-Unfortunately, I don't have any reproducer for this issue yet.
+important
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6cad68bf7532/disk-707081b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1a27e5400778/vmlinux-707081b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/67dfc53755d0/Image-707081b6.gz.xz
+> as with commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of
+> switch from device tree") the address in device tree will be taken into
+> account, while before it was hard-coded to 0x1f.
+> 
+> Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7beee86dd68b7ee38e4a@syzkaller.appspotmail.com
+I fail to understand the logic behind blaming this commit. There was no
+observable issue prior to 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY
+address of switch from device tree"), was there? That's what 'git bisect'
+with a broken device tree would point towards?
 
-watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [kworker/u4:5:575]
-Modules linked in:
-irq event stamp: 132863
-hardirqs last  enabled at (132862): [<ffff80008ad68de8>] __exit_to_kernel_mode arch/arm64/kernel/entry-common.c:85 [inline]
-hardirqs last  enabled at (132862): [<ffff80008ad68de8>] exit_to_kernel_mode+0xdc/0x10c arch/arm64/kernel/entry-common.c:95
-hardirqs last disabled at (132863): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
-hardirqs last disabled at (132863): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-softirqs last  enabled at (128034): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
-softirqs last  enabled at (128034): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
-softirqs last disabled at (128036): [<ffff80008aad75f4>] spin_lock_bh include/linux/spinlock.h:356 [inline]
-softirqs last disabled at (128036): [<ffff80008aad75f4>] batadv_tt_local_commit_changes+0x24/0x44 net/batman-adv/translation-table.c:3717
-CPU: 0 PID: 575 Comm: kworker/u4:5 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : queued_spin_lock_slowpath+0x15c/0xcf8 kernel/locking/qspinlock.c:383
-lr : queued_spin_lock_slowpath+0x168/0xcf8 kernel/locking/qspinlock.c:383
-sp : ffff800098c77720
-x29: ffff800098c777c0 x28: 1fffe0001b8a126a x27: 1ffff0001318eef0
-x26: dfff800000000000 x25: 1fffe0001b8a126c x24: ffff800098c77740
-x23: ffff800098c77780 x22: ffff70001318eee8 x21: 0000000000000001
-x20: 0000000000000001 x19: ffff0000dc509350 x18: ffff0001b4015840
-x17: ffff800125414000 x16: ffff8000809fd934 x15: 0000000000000001
-x14: 1fffe0001b8a126a x13: 0000000000000000 x12: 0000000000000000
-x11: ffff60001b8a126b x10: 1fffe0001b8a126a x9 : 0000000000000000
-x8 : 0000000000000001 x7 : ffff80008aad75f4 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008ae5db50
-x2 : 0000000000000000 x1 : 0000000000000001 x0 : 0000000000000001
-Call trace:
- __cmpwait_case_8 arch/arm64/include/asm/cmpxchg.h:229 [inline]
- __cmpwait arch/arm64/include/asm/cmpxchg.h:257 [inline]
- queued_spin_lock_slowpath+0x15c/0xcf8 kernel/locking/qspinlock.c:383
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x320/0x348 kernel/locking/spinlock_debug.c:116
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:127 [inline]
- _raw_spin_lock_bh+0x50/0x60 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- batadv_tt_local_commit_changes+0x24/0x44 net/batman-adv/translation-table.c:3717
- batadv_iv_ogm_schedule_buff net/batman-adv/bat_iv_ogm.c:811 [inline]
- batadv_iv_ogm_schedule+0x1ec/0xdf0 net/batman-adv/bat_iv_ogm.c:868
- batadv_iv_send_outstanding_bat_ogm_packet+0x740/0x900 net/batman-adv/bat_iv_ogm.c:1712
- process_one_work+0x694/0x1204 kernel/workqueue.c:2633
- process_scheduled_works kernel/workqueue.c:2706 [inline]
- worker_thread+0x938/0xef4 kernel/workqueue.c:2787
- kthread+0x288/0x310 kernel/kthread.c:388
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Tested-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Reviewed-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
+> Changes since v3 [3]:
+>  - simplify calculation of correct address
+> 
+> Changes since v2 [2]:
+>  - use macros instead of magic numbers
+>  - introduce helper functions
+>  - register new device on MDIO bus instead of messing with the address
+>    and schedule delayed_work to unregister the "wrong" device.
+>    This is a slightly different approach than suggested by Russell, but
+>    imho makes things much easier than keeping the "wrong" device and
+>    having to deal with keeping the removal of both devices linked.
+>  - improve comments
+> 
+> Changes since v1 [1]:
+>  - use FW_WARN as suggested.
+>  - fix build on net tree which doesn't have 'mdiodev' as member of the
+>    priv struct. Imho including this patch as fix makes sense to warn
+>    users about broken firmware, even if the change introducing the
+>    actual breakage is only present in net-next for now.
+> 
+> [1]: https://patchwork.kernel.org/project/netdevbpf/patch/e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org/
+> [2]: https://patchwork.kernel.org/project/netdevbpf/patch/11f5f127d0350e72569c36f9060b6e642dfaddbb.1714514208.git.daniel@makrotopia.org/
+> [3]: https://patchwork.kernel.org/project/netdevbpf/patch/7e3fed489c0bbca84a386b1077c61589030ff4ab.1719963228.git.daniel@makrotopia.org/
+> 
+>  drivers/net/dsa/mt7530-mdio.c | 91 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 91 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+> index 51df42ccdbe6..2037ed944801 100644
+> --- a/drivers/net/dsa/mt7530-mdio.c
+> +++ b/drivers/net/dsa/mt7530-mdio.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/regmap.h>
+>  #include <linux/reset.h>
+>  #include <linux/regulator/consumer.h>
+> +#include <linux/workqueue.h>
+>  #include <net/dsa.h>
+>  
+>  #include "mt7530.h"
+> @@ -136,6 +137,92 @@ static const struct of_device_id mt7530_of_match[] = {
+>  };
+>  MODULE_DEVICE_TABLE(of, mt7530_of_match);
+>  
+> +static int
+> +mt7530_correct_addr(int phy_addr)
 
+The prototype fits onto a single line.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> +{
+> +	/* The corrected address is calculated as stated below:
+> +	 * 0~6, 31 -> 31
+> +	 * 7~14    -> 7
+> +	 * 15~22   -> 15
+> +	 * 23~30   -> 23
+> +	 */
+> +return (phy_addr - MT7530_NUM_PORTS & ~MT7530_NUM_PORTS) + MT7530_NUM_PORTS & PHY_MAX_ADDR - 1;
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+In addition to being weirdly indented and having difficult to follow
+logic.. Why not opt for the simple, self-documenting variant below?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+	switch (phy_addr) {
+	case 0 ... 6:
+	case 31:
+		return 31;
+	case 7 ... 14:
+		return 7;
+	case 15 ... 22:
+		return 15;
+	case 23 ... 30:
+		return 23;
+	default:
+		return -EINVAL ???
+	}
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+> +}
+> +
+> +static bool
+> +mt7530_is_invalid_addr(int phy_addr)
+> +{
+> +	/* Only MDIO bus addresses 7, 15, 23, and 31 are valid options,
+> +	 * which all have the least significant three bits set. Check
+> +	 * for this.
+> +	 */
+> +	return (phy_addr & MT7530_NUM_PORTS) != MT7530_NUM_PORTS;
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Why not implement this in terms of phy_addr != mt7530_correct_addr(phy_addr)?
 
-If you want to undo deduplication, reply with:
-#syz undup
+> +}
+> +
+> +struct remove_impossible_priv {
+> +	struct delayed_work remove_impossible_work;
+> +	struct mdio_device *mdiodev;
+> +};
+> +
+> +static void
+> +mt7530_remove_impossible(struct work_struct *work)
+
+Fits onto a single line.
+
+> +{
+> +	struct remove_impossible_priv *priv = container_of(work, struct remove_impossible_priv,
+> +							   remove_impossible_work.work);
+> +	struct mdio_device *mdiodev = priv->mdiodev;
+> +
+> +	mdio_device_remove(mdiodev);
+> +	mdio_device_free(mdiodev);
+> +	kfree(priv);
+> +}
+> +
+> +static int
+> +mt7530_reregister(struct mdio_device *mdiodev)
+> +{
+> +	/* If the address in DT must be wrong, make a good guess about
+> +	 * the most likely intention, issue a warning, register a new
+> +	 * MDIO device at the correct address and schedule the removal
+> +	 * of the device having an impossible address.
+> +	 */
+> +	struct fwnode_handle *fwnode = dev_fwnode(&mdiodev->dev);
+> +	int corrected_addr = mt7530_correct_addr(mdiodev->addr);
+> +	struct remove_impossible_priv *rem_priv;
+> +	struct mdio_device *new_mdiodev;
+> +	int ret;
+> +
+> +	rem_priv = kmalloc(sizeof(*rem_priv), GFP_KERNEL);
+> +	if (!rem_priv)
+> +		return -ENOMEM;
+> +
+> +	new_mdiodev = mdio_device_create(mdiodev->bus, corrected_addr);
+> +	if (IS_ERR(new_mdiodev)) {
+> +		ret = PTR_ERR(new_mdiodev);
+> +		goto out_free_work;
+> +	}
+> +	device_set_node(&new_mdiodev->dev, fwnode);
+> +
+> +	ret = mdio_device_register(new_mdiodev);
+> +	if (WARN_ON(ret))
+> +		goto out_free_dev;
+> +
+> +	dev_warn(&mdiodev->dev, FW_WARN
+> +		 "impossible switch MDIO address in device tree, assuming %d\n",
+> +		 corrected_addr);
+> +
+> +	/* schedule impossible device for removal from mdio bus */
+> +	rem_priv->mdiodev = mdiodev;
+> +	INIT_DELAYED_WORK(&rem_priv->remove_impossible_work, mt7530_remove_impossible);
+> +	schedule_delayed_work(&rem_priv->remove_impossible_work, 0);
+
+What makes it so that mt7530_remove_impossible() is actually guaranteed
+to run after the probing of the mdio_device @ the incorrect address
+_finishes_? mdio_device_remove() will not work on a device which has
+probing in progress, will it?
+
+There's also the more straightforward option of fixing up priv->mdiodev->addr
+in mt7530.c to be something like priv->switch_base, which is derived
+from priv->mdiodev->addr, with a fallback to 0x1f if the latter is zero,
+and a FW_WARN().
 
