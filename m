@@ -1,227 +1,94 @@
-Return-Path: <netdev+bounces-109251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81146927933
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:48:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8F1927943
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 16:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37B6C286B89
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:48:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B17391C20A87
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A83D1B1205;
-	Thu,  4 Jul 2024 14:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9614E1AE87F;
+	Thu,  4 Jul 2024 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A9G99dop";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Yo9Veu5u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEdhPRwF"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DD31B0119;
-	Thu,  4 Jul 2024 14:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718CC1A3BDA
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 14:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720104504; cv=none; b=HNTynO8I/wxDyXpNPJgfeXZ0WgyE1V59pb0anNkycUO5b1plV5uQsw8mC+fGOv8PcdZj6c0FH0EWBS//0OpZUkZuZIEFyGkRqEqHy8Ypa50CtIwgFg9sZ0ACBNrExIOH+0qqCGCjRLKppDHig+Q12L4NmgBUHwYr9q56VTB2bTM=
+	t=1720104629; cv=none; b=Xj9jq+Ubdl9ZstnObuIAwbvcSND8FHpCSkBCYGcNKqS0pHZtYO+VenXZFcUxLQmpp5OPNsj5Int36MVkJIaZTI+X2l42KqTIPfSkH1nDvoEnZO1cNmfbY5GsjoZjtrPZ90M6KTiv/hz6X6APwNRQcNRDVlo2KBKtlH2FH21Bups=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720104504; c=relaxed/simple;
-	bh=7IbRb6nkHrpJ13bDe2oFJmfdzxaSQs8AktYQ5Q2YCuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ot3VBTP64QkAtV1OyQN/h2DmrRD0qXMUpGX/Q8xF07q294yqE0F8CQchcoSsTTYXRHMUlDwfmKGgaWE/TLCOwYdI7o26Cqkw1pxJaZmm/ADoXcXwBoeFp7C47kbUlKSPtAKASCjugLUnAs4luGtOmIGG2VycIQEq9X9Y1OdNO8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A9G99dop; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Yo9Veu5u; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 4 Jul 2024 16:48:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1720104497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ku+Vvlezy5P2YrWCu67ao5XGVudaVeUu84F76nh+12M=;
-	b=A9G99dophpgFq/nF/UDQWNVx0Cn6XSNXDOsBApopEbe8Brgnps41VC2zszYz6KNBUn7Uds
-	Sj6SoPh8t//FBxfFwKQo67C56pfkfXKPBzaxgf9k4hbrApLKxnguv+fYgtufUTc9F+j1wP
-	FyOATW121JzIyzwc+/PMt3YvVxH5e6NKQ6zCBMXxtGnZLZLo+2HvhHvpPb25BPL9z1sU+H
-	g3+6ckVuaftKmsekTWnHWSmsxYSbLHT2KN6XI27L04uxKTYxcC4TPFMqSmz5ALWteag+oz
-	ynyAPyDwJsIFqUKbB1czc1Ch+nlnCfaD7NDPDB1j0XrrEaD2ptuW1zk2tNcBtw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1720104497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ku+Vvlezy5P2YrWCu67ao5XGVudaVeUu84F76nh+12M=;
-	b=Yo9Veu5ulTGYhTyIymRCAHj3kVOvMpb3JaoJLJTUL71m8wLHXOL8MMxAwH7Wp9Jwi3CNTC
-	6pMNjetcP6w9gEDA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
-	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [PATCH v3 net-next] tun: Assign missing bpf_net_context.
-Message-ID: <20240704144815.j8xQda5r@linutronix.de>
-References: <000000000000adb970061c354f06@google.com>
- <20240702114026.1e1f72b7@kernel.org>
- <20240703122758.i6lt_jii@linutronix.de>
- <20240703120143.43cc1770@kernel.org>
- <20240703192118.RIqHj9kS@linutronix.de>
- <20240704101452.NhpibjJt@linutronix.de>
- <20240704072433.4531a7e1@kernel.org>
+	s=arc-20240116; t=1720104629; c=relaxed/simple;
+	bh=n16kSNcmuFZbiWOBZ3ewCDDRfotuY+O4zFL7CyDuv80=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AsoTiFNYHyTFkzKEJF+oeqAcvd8vS9IlgzBL9qF40zYD7QkOM0SuMZu1tt13VNr6l7wEz/reGH2Ko4oNlOPauW7AIPepziSu9kK6aNNcaVw/Ap/filyEyB3hP2peOD3MQfzWm18PC7kTvk99hjlbVvHZofb3YheDVyScJn2ENWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEdhPRwF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EBDA5C32781;
+	Thu,  4 Jul 2024 14:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720104629;
+	bh=n16kSNcmuFZbiWOBZ3ewCDDRfotuY+O4zFL7CyDuv80=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eEdhPRwFDwGPiw0bTs/rwmzzx/xbdA0OOTDD7FOPCtS6lnnhHReU0OQ+quySwWZi3
+	 CCdlmpYFeoNSqLDKz59u0o1nSQfHNDOxeg/kNA5XD4L/WbutPXvNUoiuOTp+cgqjEt
+	 9Q+Vzy8JzBddXmALV580S8m1E5RvPafwOqXwdSgzOFwWFc8mR/g65uv0LF7YH3VTPd
+	 xuNW86XUcTc5PDzitGnahUSq8eECqgbNMcptlrpesT20tdswakKNePffphzs0sH+rg
+	 WFi7FlyHYTt4++7sp2l/oA0uEutZbcHhkoSC5TuvTRLLV2NXE9P1sz0Uqu3/qTzLnu
+	 3f+ba0QsrKo6Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DAEF2C43446;
+	Thu,  4 Jul 2024 14:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240704072433.4531a7e1@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] bnxt_en: Fix the resource check condition for RSS
+ contexts
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172010462889.15534.10045966069300718867.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Jul 2024 14:50:28 +0000
+References: <20240703180112.78590-1-michael.chan@broadcom.com>
+In-Reply-To: <20240703180112.78590-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com
 
-During the introduction of struct bpf_net_context handling for
-XDP-redirect, the tun driver has been missed.
-Jakub also pointed out that there is another call chain to
-do_xdp_generic() originating from netif_receive_skb() and drivers may
-use it outside from the NAPI context.
+Hello:
 
-Set the bpf_net_context before invoking BPF XDP program within the TUN
-driver. Set the bpf_net_context also in do_xdp_generic() if a xdp
-program is available.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reported-by: syzbot+0b5c75599f1d872bea6f@syzkaller.appspotmail.com
-Reported-by: syzbot+5ae46b237278e2369cac@syzkaller.appspotmail.com
-Reported-by: syzbot+c1e04a422bbc0f0f2921@syzkaller.appspotmail.com
-Fixes: 401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on =
-PREEMPT_RT.")
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
-On 2024-07-04 07:24:33 [-0700], Jakub Kicinski wrote:
-> LG, but can I bother you for a repost? the subject tag is typo'ed
-> (net-net vs net-next) and our CI put this on top of net, since it
-> applies. But it doesn't build on top of net.=20
-> Feel free to repost without any wait.
+On Wed,  3 Jul 2024 11:01:12 -0700 you wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> 
+> While creating a new RSS context, bnxt_rfs_capable() currently
+> makes a strict check to see if the required VNICs are already
+> available.  If the current VNICs are not what is required,
+> either too many or not enough, it will call the firmware to
+> reserve the exact number required.
+> 
+> [...]
 
-I am sorry for the trouble.
+Here is the summary with links:
+  - [net] bnxt_en: Fix the resource check condition for RSS contexts
+    https://git.kernel.org/netdev/net/c/5d350dc3429b
 
-v2=E2=80=A6v3:
-  - Repost due to typo in subject.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-v1=E2=80=A6v2:
-  - Add the wrapper to do_xdp_generic().
-  - Remove the wrapper from tun_get_user() where it was used for a
-    single do_xdp_generic() invocation.
-
- drivers/net/tun.c | 7 +++++++
- net/core/dev.c    | 5 +++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 9254bca2813dc..9b24861464bc6 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1661,6 +1661,7 @@ static struct sk_buff *tun_build_skb(struct tun_struc=
-t *tun,
- 				     int len, int *skb_xdp)
- {
- 	struct page_frag *alloc_frag =3D &current->task_frag;
-+	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
- 	struct bpf_prog *xdp_prog;
- 	int buflen =3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 	char *buf;
-@@ -1700,6 +1701,7 @@ static struct sk_buff *tun_build_skb(struct tun_struc=
-t *tun,
-=20
- 	local_bh_disable();
- 	rcu_read_lock();
-+	bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
- 	xdp_prog =3D rcu_dereference(tun->xdp_prog);
- 	if (xdp_prog) {
- 		struct xdp_buff xdp;
-@@ -1728,12 +1730,14 @@ static struct sk_buff *tun_build_skb(struct tun_str=
-uct *tun,
- 		pad =3D xdp.data - xdp.data_hard_start;
- 		len =3D xdp.data_end - xdp.data;
- 	}
-+	bpf_net_ctx_clear(bpf_net_ctx);
- 	rcu_read_unlock();
- 	local_bh_enable();
-=20
- 	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad);
-=20
- out:
-+	bpf_net_ctx_clear(bpf_net_ctx);
- 	rcu_read_unlock();
- 	local_bh_enable();
- 	return NULL;
-@@ -2566,6 +2570,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
-ghdr *m, size_t total_len)
-=20
- 	if (m->msg_controllen =3D=3D sizeof(struct tun_msg_ctl) &&
- 	    ctl && ctl->type =3D=3D TUN_MSG_PTR) {
-+		struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
- 		struct tun_page tpage;
- 		int n =3D ctl->num;
- 		int flush =3D 0, queued =3D 0;
-@@ -2574,6 +2579,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
-ghdr *m, size_t total_len)
-=20
- 		local_bh_disable();
- 		rcu_read_lock();
-+		bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
-=20
- 		for (i =3D 0; i < n; i++) {
- 			xdp =3D &((struct xdp_buff *)ctl->ptr)[i];
-@@ -2588,6 +2594,7 @@ static int tun_sendmsg(struct socket *sock, struct ms=
-ghdr *m, size_t total_len)
- 		if (tfile->napi_enabled && queued > 0)
- 			napi_schedule(&tfile->napi);
-=20
-+		bpf_net_ctx_clear(bpf_net_ctx);
- 		rcu_read_unlock();
- 		local_bh_enable();
-=20
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 385c4091aa775..73e5af6943c39 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5126,11 +5126,14 @@ static DEFINE_STATIC_KEY_FALSE(generic_xdp_needed_k=
-ey);
-=20
- int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb)
- {
-+	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
-+
- 	if (xdp_prog) {
- 		struct xdp_buff xdp;
- 		u32 act;
- 		int err;
-=20
-+		bpf_net_ctx =3D bpf_net_ctx_set(&__bpf_net_ctx);
- 		act =3D netif_receive_generic_xdp(pskb, &xdp, xdp_prog);
- 		if (act !=3D XDP_PASS) {
- 			switch (act) {
-@@ -5144,11 +5147,13 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, struc=
-t sk_buff **pskb)
- 				generic_xdp_tx(*pskb, xdp_prog);
- 				break;
- 			}
-+			bpf_net_ctx_clear(bpf_net_ctx);
- 			return XDP_DROP;
- 		}
- 	}
- 	return XDP_PASS;
- out_redir:
-+	bpf_net_ctx_clear(bpf_net_ctx);
- 	kfree_skb_reason(*pskb, SKB_DROP_REASON_XDP);
- 	return XDP_DROP;
- }
---=20
-2.45.2
 
 
