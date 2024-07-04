@@ -1,141 +1,176 @@
-Return-Path: <netdev+bounces-109202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2263B9275B6
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:07:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4C99275DC
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 14:23:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509941C21B03
-	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:07:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19A7B1C22F9F
+	for <lists+netdev@lfdr.de>; Thu,  4 Jul 2024 12:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4275F1AD9D8;
-	Thu,  4 Jul 2024 12:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FDF1ABCC4;
+	Thu,  4 Jul 2024 12:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+4gmk4F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X+wgQKBo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ADC1AB503;
-	Thu,  4 Jul 2024 12:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855B51A072E
+	for <netdev@vger.kernel.org>; Thu,  4 Jul 2024 12:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720094874; cv=none; b=PDxSILXmcT9QlaSH/GA0L2YXffH4YS1gwKjrqjXFBktEdIZeN+AvdChz9vjxy6vCRkVSu9KYCLbVwTUcXB0Y8ZM1SPF+E8uYzay8dtTCeWhlkO5x4Mc0NHIxW9rWm9dSAmjWupebxYZ7xDwYgms54m3mcqFCOweKVvotYxkWfZ0=
+	t=1720095806; cv=none; b=WwqeN0a5id247XzvlN8vDInGNcrxcHtShKiTdiDHQKEiOQMG97SAs4TB8rGQRJbs33kFk+nP7zEFovkBbAnjnkkM2JI+7JT9LDj/hqZkzuDww/aUtfhyqal6nznzR8VJv7feO5rEpC/WcPyXaBalbPaO1Y260fxyxnYgVBS0dEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720094874; c=relaxed/simple;
-	bh=8yRea6Ea5Kn0J7oYIT188SB3HJQbtEuhkGaOzAcbyzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gPD5LSxvPjBjz/vhxMQ5SGVmR80lQ7CWA5CzMIo8UaZC92RBPB6mr1pxli37uWd1Wqr5zX8n8FditoJxxlSXqRcqpwZRHZbHSDIN3GbZ3e065P3toysDPyTyMyduAPc4r/lqC2PC1UlCYNpUHfl3cS4gV04N7WdWS9k7WtMMrd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+4gmk4F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B425CC3277B;
-	Thu,  4 Jul 2024 12:07:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720094873;
-	bh=8yRea6Ea5Kn0J7oYIT188SB3HJQbtEuhkGaOzAcbyzo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E+4gmk4Fu92J+JbPQujstTnxK9d6gu2myvGtIOgYgeSa0c3IunEI3PNuySZY8mwex
-	 coG1zJH7OJDCEB6wybXnLMa82hHgiWRtiUPONJak2ILKI+54dd69eIRMh6Kfogd8Xs
-	 I12L3Rtb7XQZ27yvogiQzlkK7PVlTod4kqZEc0o1ZWkB4+pL9mtEhi3dUQ5Ie5YUwe
-	 KQfqqlGspDm39kHsr2+tZdtaPcvTpbqakmay9RaUmijEwfN5HW5Iceuwka86ORq5S/
-	 yp8x7By8EjtEQCZPI6Ovmht3q56gtftauU6GsVMRwtcv8oCkHYYGChHqHHxg63WEzW
-	 ncOa25cXwpFLA==
-Message-ID: <ed68c600-aca8-4773-94e3-92347e79877c@kernel.org>
-Date: Thu, 4 Jul 2024 14:07:49 +0200
+	s=arc-20240116; t=1720095806; c=relaxed/simple;
+	bh=P/7WUUah2ylD8u9g6ueacZdQmHgLe3HDXoi6Y8Gzqzk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hAKkLJu4ytvhQ+U/htIfFUHPOviIR/MKHi+w1Ma4onq7uHCtW/i/HB6HC1heRsBTBNy9gRZMpIF9Zlf5EOtgobBrvHNUIahQEr9lfcIDcZn8mjJxo76xJoC8jrD7ctVjc6EtV5d/aa0A0unJbC8XcOS6Zac1+jrevGlV04KaRac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X+wgQKBo; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-58ce966a1d3so8736a12.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 05:23:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720095803; x=1720700603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/hX9K9IyzuNVorPZbqs6R5CkF934QKkB7aeWBDN/oZM=;
+        b=X+wgQKBo7b14r8virJ2yRYnKAbXx2x/2F5Jy1qMBLNO/BbhELgNSGNYWJ9K0s1DgUs
+         lF9oykOQpe5osQLeLx5CYCiRAcFEmt2JlRiImcn6w/g72EjeVv4yhhnCShpoMzX8iCRV
+         fQqlJZ6dgzAWSJP/RDve1bc9OYqRBjdXiYMyIeeUs75tmoc/pbu8LW/acBaov5HWNG4L
+         449ZD25zjc/nUyLePi5g1RDS2aphqMqXtqdFVpgHrwtVFXG57ZYVEjktJlbZayRp1hWe
+         tA5Hc+Oog4FK75kkfABZFCOZxXZgQVaH3BLN8Vu4OcYjitVKsBE3aRJS7RdDToOkVDol
+         kyxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720095803; x=1720700603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/hX9K9IyzuNVorPZbqs6R5CkF934QKkB7aeWBDN/oZM=;
+        b=wqysxyvoZA5+2HN5AqV43t2xvjdyqf7Wiqyw2kEX+pMXiLP8plsCyvQ/2JHZ/d1Ywr
+         41WqwdN3a8S+UGAiwOpPwkuyJTvBgVrM0l+34QFZmQodEIV44vpGmXOVMyw+2fhyWLpI
+         Wg4Pp1d2fIH4iGPndMZuZMK1Bjx9WA1Ie1wmxhgGVw5prg6co2yELI5G+pDvvvMOim4H
+         V9TXCjayPLaoiugKLTUTM65skXrbHTNdizK1hXxGAXNI0QKmnJK6MAM3XUbQAe96i6Wl
+         /RR4YZj1qJPBPSZFANebcMf0uO7zIFuOUtWiVTnsM7QTqN6qwAploPaNffiEf7FJmj3A
+         tjGw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzbP6o/vYhvH69MDvDg2Ee07EDKIwGrjbBNifKAYtF4zlruQ647+2nEZSmhFwiFT89PQMhp97SCArHnBzsnB/iiDSR5Umn
+X-Gm-Message-State: AOJu0Yw9DOPKbId+DI1OrJ9Oojy3/hITLG1mH3SGxb3d6NVXsZfYxkSB
+	+0tK2GKFHq2dSU6Dj0a6D4PFR8aDeyXr3NmspiG+d9VFh+bNG+ryAMccvakAawgS2ogeF7VyQgF
+	hcvf7PKa8l1PN/e8Tf0EGRHTfIP0DWzQ+f+qX
+X-Google-Smtp-Source: AGHT+IEejRBeobtILfbLRV01p0azcsLsKDMQwXzlRBasC/j+KIpzciwn0RMzXafWbVSN4Uu8QTSTf5bcI/bIHAlay48=
+X-Received: by 2002:a50:954f:0:b0:58b:93:b623 with SMTP id 4fb4d7f45d1cf-58e2942d69cmr102605a12.5.1720095802541;
+ Thu, 04 Jul 2024 05:23:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc: pn533: Add poll mod list filling check
-To: Aleksandr Mishin <amishin@t-argos.ru>,
- Samuel Ortiz <sameo@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <20240702093924.12092-1-amishin@t-argos.ru>
- <d146fb2c-50bb-4339-b330-155f22879446@kernel.org>
- <4899faf4-14cc-4e68-86e5-8745b38e5ab1@t-argos.ru>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <4899faf4-14cc-4e68-86e5-8745b38e5ab1@t-argos.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240704035703.95065-1-kuniyu@amazon.com> <7c1264b94e70d591adfda405bf358ba1dfadafd5.camel@redhat.com>
+In-Reply-To: <7c1264b94e70d591adfda405bf358ba1dfadafd5.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 4 Jul 2024 14:23:11 +0200
+Message-ID: <CANn89iKO=Y8P_tms-nymhLF8QbWmOD-g_N33DLMfA6WcO+vhbg@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp: Don't drop SYN+ACK for simultaneous connect().
+To: Paolo Abeni <pabeni@redhat.com>, Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Lawrence Brakmo <brakmo@fb.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/07/2024 09:26, Aleksandr Mishin wrote:
-> 
-> 
-> On 03.07.2024 8:02, Krzysztof Kozlowski wrote:
->> On 02/07/2024 11:39, Aleksandr Mishin wrote:
->>> In case of im_protocols value is 1 and tm_protocols value is 0 this
->>
->> Which im protocol has value 1 in the mask?
->>
->> The pn533_poll_create_mod_list() handles all possible masks, so your
->> case is just not possible to happen.
-> 
-> Exactly. pn533_poll_create_mod_list() handles all possible specified 
-> masks. No im protocol has value 1 in the mask. In case of 'im_protocol' 
+On Thu, Jul 4, 2024 at 1:16=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On Wed, 2024-07-03 at 20:57 -0700, Kuniyuki Iwashima wrote:
+> > RFC 9293 states that in the case of simultaneous connect(), the connect=
+ion
+> > gets established when SYN+ACK is received. [0]
+> >
+> >       TCP Peer A                                       TCP Peer B
+> >
+> >   1.  CLOSED                                           CLOSED
+> >   2.  SYN-SENT     --> <SEQ=3D100><CTL=3DSYN>              ...
+> >   3.  SYN-RECEIVED <-- <SEQ=3D300><CTL=3DSYN>              <-- SYN-SENT
+> >   4.               ... <SEQ=3D100><CTL=3DSYN>              --> SYN-RECE=
+IVED
+> >   5.  SYN-RECEIVED --> <SEQ=3D100><ACK=3D301><CTL=3DSYN,ACK> ...
+> >   6.  ESTABLISHED  <-- <SEQ=3D300><ACK=3D101><CTL=3DSYN,ACK> <-- SYN-RE=
+CEIVED
+> >   7.               ... <SEQ=3D100><ACK=3D301><CTL=3DSYN,ACK> --> ESTABL=
+ISHED
+> >
+> > However, since commit 0c24604b68fc ("tcp: implement RFC 5961 4.2"), suc=
+h a
+> > SYN+ACK is dropped in tcp_validate_incoming() and responded with Challe=
+nge
+> > ACK.
+> >
+> > For example, the write() syscall in the following packetdrill script fa=
+ils
+> > with -EAGAIN, and wrong SNMP stats get incremented.
+> >
+> >    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) =3D 3
+> >   +0 connect(3, ..., ...) =3D -1 EINPROGRESS (Operation now in progress=
+)
+> >
+> >   +0 > S  0:0(0) <mss 1460,sackOK,TS val 1000 ecr 0,nop,wscale 8>
+> >   +0 < S  0:0(0) win 1000 <mss 1000>
+> >   +0 > S. 0:0(0) ack 1 <mss 1460,sackOK,TS val 3308134035 ecr 0,nop,wsc=
+ale 8>
+> >   +0 < S. 0:0(0) ack 1 win 1000
+> >
+> >   +0 write(3, ..., 100) =3D 100
+> >   +0 > P. 1:101(100) ack 1
+> >
+> >   --
+> >
+> >   # packetdrill cross-synack.pkt
+> >   cross-synack.pkt:13: runtime error in write call: Expected result 100=
+ but got -1 with errno 11 (Resource temporarily unavailable)
+> >   # nstat
+> >   ...
+> >   TcpExtTCPChallengeACK           1                  0.0
+> >   TcpExtTCPSYNChallenge           1                  0.0
+> >
+> > That said, this is no big deal because the Challenge ACK finally let th=
+e
+> > connection state transition to TCP_ESTABLISHED in both directions.  If =
+the
+> > peer is not using Linux, there might be a small latency before ACK thou=
+gh.
+> >
+> > The problem is that bpf_skops_established() is triggered by the Challen=
+ge
+> > ACK instead of SYN+ACK.  This causes the bpf prog to miss the chance to
+> > check if the peer supports a TCP option that is expected to be exchange=
+d
+> > in SYN and SYN+ACK.
+> >
+> > Let's accept a bare SYN+ACK for non-TFO TCP_SYN_RECV sockets to avoid s=
+uch
+> > a situation.
+>
+> Apparently this behavior change is causing TCP AO self-tests failures:
+>
+> https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-202=
+4-07-04--09-00
+> e.g.
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/668061/22-self-=
+connect-ipv4/stdout
+>
 
-Which cannot happen.
+These tests seem to have broken assumptions on a kernel behavior which
+are orthogonal to TCP AO.
 
-> parameter has value of 1, no mod will be added. So dev->poll_mod_count 
-> will remain 0.
-
-Which cannot happen.
-
-> I assume 'im_protocol' parameter is "external" to this driver, it comes 
-> from outside and can contain any value, so driver has to be able to 
-> protect itself from incorrect values.
-
-Did you read what I wrote? It cannot happen.
-
-Best regards,
-Krzysztof
-
+> Could you please have a look?
+>
+> Thanks!
+>
+> Paolo
+>
 
