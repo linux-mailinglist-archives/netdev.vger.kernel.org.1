@@ -1,138 +1,241 @@
-Return-Path: <netdev+bounces-109430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BEA92870A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:48:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D62D92870D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAF521C227C1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:48:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6A2DB22AD2
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86065145FF5;
-	Fri,  5 Jul 2024 10:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07974146A74;
+	Fri,  5 Jul 2024 10:49:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-95.sinamail.sina.com.cn (mail115-95.sinamail.sina.com.cn [218.30.115.95])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C5214658B
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 10:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFAF14658C;
+	Fri,  5 Jul 2024 10:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720176525; cv=none; b=eOacC5qNmUD4cr6qe3vAvc44HmifY2JcyPlOzXmwVN0APaq0E2DaXvFv7D/3f54bz3FT3uPLgJ0V0A1hJh7t81qBViPODdPTkvYISUTNbVDsPg15ZFU7uaJUfG7IUnYqe05R5VUXLoNj0A3WqJl5h6aj5oiNPXnFcpBgyCy+kok=
+	t=1720176547; cv=none; b=HWoXvclBqYASHNx+29aVCXFLnj3mAT74Vs/GLqJxnWnXPC9syBWH82GYq/4qv/rA8pCa3SrIKTXxydEKc6Nwmv/Ag4WFSnWRsCb9aJ1s57Bv9uo24lrm9jOdWqO46pVHFZNacOt2ykEc+ygBCzP7FwZfFPV3bCqw3LSXPAyggKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720176525; c=relaxed/simple;
-	bh=DZkXGAZOqOS8UxKTgq8Ci4H6svemPL5M77w8Qgr0DAg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ODBZZlEEJq+yVxCDH8DJphdxdcOZiH+YcgV4K+VMvrMPNpC+pwGU7+x3eUA66n/qLPvabGnVBXuoBhkOSZWSaZyu6URArdULXuPE/DQkPtmc5V6kvqdnRdxhDHNWOq0Hmwm7aKdV4n9CdybsV4FPEuSnLvKJ113tqSIg+ZxqcDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.71.197])
-	by sina.com (10.185.250.23) with ESMTP
-	id 6687CF7D00007C71; Fri, 5 Jul 2024 18:48:32 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 2348268913080
-X-SMAIL-UIID: 81AAD2B8BC994A36B295E5AF557FEB82-20240705-184832-1
-From: Hillf Danton <hdanton@sina.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
-Date: Fri,  5 Jul 2024 18:48:21 +0800
-Message-Id: <20240705104821.3202-1-hdanton@sina.com>
-In-Reply-To: <20240704105418.GA31039@breakpoint.cc>
-References: 
+	s=arc-20240116; t=1720176547; c=relaxed/simple;
+	bh=esPDpEApx4zj4Yo7wj9fcSyQ8vyUkNYVODN1kPFC3wU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=CaAbvsjJWokrXH9nlJn8w59xKN0BywpKcyKeYtdACKGl5DxfXgPkykCJl0tzEx1i8oFFJ45c4fD84o8T/GzUGtpQCQuniXa1N5bb6alkr8i9AAInqNYURUoEGs6x71W+AbFLhTo1rdS360YcI/AvouqZgeCAe9ATKPwTO3679xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sPgUe-000000004uj-3adT;
+	Fri, 05 Jul 2024 10:48:44 +0000
+Date: Fri, 5 Jul 2024 11:48:40 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Landen Chao <Landen.Chao@mediatek.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v5] net: dsa: mt7530: fix impossible MDIO address and issue
+ warning
+Message-ID: <f485d1d4f7b34cc2ebf3d60030d1c67b4016af3c.1720107535.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Thu, 4 Jul 2024 12:54:18 +0200 Florian Westphal <fw@strlen.de>
-> Hillf Danton <hdanton@sina.com> wrote:
-> > On Wed, 3 Jul 2024 15:01:07 +0200 Florian Westphal <fw@strlen.de>
-> > > Hillf Danton <hdanton@sina.com> wrote:
-> > > > On Wed, 3 Jul 2024 12:52:15 +0200 Florian Westphal <fw@strlen.de>
-> > > > > Hillf Danton <hdanton@sina.com> wrote:
-> > > > > > Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
-> > > > > > if trans outlives table.
-> > > > > 
-> > > > > trans must never outlive table.
-> > > > > 
-> > > > What is preventing trans from being freed after closing sock, given
-> > > > trans is freed in workqueue?
-> > > > 
-> > > > 	close sock
-> > > > 	queue work
-> > > 
-> > > The notifier acquires the transaction mutex, locking out all other
-> > > transactions, so no further transactions requests referencing
-> > > the table can be queued.
-> > > 
-> > As per the syzbot report, trans->table could be instantiated before
-> > notifier acquires the transaction mutex. And in fact the lock helps
-> > trans outlive table even with your patch.
-> > 
-> > 	cpu1			cpu2
-> > 	---			---
-> > 	transB->table = A
-> > 				lock trans mutex
-> > 				flush work
-> > 				free A
-> > 				unlock trans mutex
-> > 
-> > 	queue work to free transB
-> 
-> Can you show a crash reproducer or explain how this assign
-> and queueing happens unordered wrt. cpu2?
-> 
-Not so difficult.
+The MDIO address of the MT7530 and MT7531 switch ICs can be configured
+using bootstrap pins. However, there are only 4 possible options for the
+switch itself: 7, 15, 23 and 31. As in MediaTek's SDK the address of the
+switch is wrongly stated in the device tree as 0 (while in reality it is
+31), warn the user about such broken device tree and make a good guess
+what was actually intended.
 
-> This should look like this:
-> 
->  	cpu1			cpu2
->  	---			---
-> 	lock trans mutex
->   				lock trans mutex -> blocks
->  	transB->table = A
->   	queue work to free transB
-> 	unlock trans mutex
-> 				lock trans mutex returns
->   				flush work
->   				free A
->   				unlock trans mutex
-> 
-If your patch is correct, it should survive a warning.
+This is necessary to not break compatibility with existing Device Trees
+wrongly declaring the switch to be present at address 0 or 1, as with
+commit 868ff5f4944a ("net: dsa: mt7530-mdio: read PHY address of switch
+from device tree") the address in device tree will be taken into
+account, while before it was hard-coded in the driver to 0x1f
+independently of the value in Device Tree.
 
-#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git  1c5fc27bc48a
+Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Tested-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+Reviewed-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes since v4 [4]:
+ - fix indentation
+ - bring back parentheses to satisfy GCC
+ - print warning before registering new device to avoid confusing
+   order of messages in kernel log
+ - improve commit message
 
---- x/net/netfilter/nf_tables_api.c
-+++ y/net/netfilter/nf_tables_api.c
-@@ -11552,9 +11552,10 @@ static int nft_rcv_nl_event(struct notif
+Changes since v3 [3]:
+ - simplify calculation of correct address
+
+Changes since v2 [2]:
+ - use macros instead of magic numbers
+ - introduce helper functions
+ - register new device on MDIO bus instead of messing with the address
+   and schedule delayed_work to unregister the "wrong" device.
+   This is a slightly different approach than suggested by Russell, but
+   imho makes things much easier than keeping the "wrong" device and
+   having to deal with keeping the removal of both devices linked.
+ - improve comments
+
+Changes since v1 [1]:
+ - use FW_WARN as suggested.
+ - fix build on net tree which doesn't have 'mdiodev' as member of the
+   priv struct. Imho including this patch as fix makes sense to warn
+   users about broken firmware, even if the change introducing the
+   actual breakage is only present in net-next for now.
+
+[1]: https://patchwork.kernel.org/project/netdevbpf/patch/e615351aefba25e990215845e4812e6cb8153b28.1714433716.git.daniel@makrotopia.org/
+[2]: https://patchwork.kernel.org/project/netdevbpf/patch/11f5f127d0350e72569c36f9060b6e642dfaddbb.1714514208.git.daniel@makrotopia.org/
+[3]: https://patchwork.kernel.org/project/netdevbpf/patch/7e3fed489c0bbca84a386b1077c61589030ff4ab.1719963228.git.daniel@makrotopia.org/
+[4]: https://patchwork.kernel.org/project/netdevbpf/patch/1c378be54d0fb76117f6d72dadd4a43a9950f0dc.1720105125.git.daniel@makrotopia.org/
+
+ drivers/net/dsa/mt7530-mdio.c | 92 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+
+diff --git a/drivers/net/dsa/mt7530-mdio.c b/drivers/net/dsa/mt7530-mdio.c
+index 51df42ccdbe6..c666edec6b9e 100644
+--- a/drivers/net/dsa/mt7530-mdio.c
++++ b/drivers/net/dsa/mt7530-mdio.c
+@@ -11,6 +11,7 @@
+ #include <linux/regmap.h>
+ #include <linux/reset.h>
+ #include <linux/regulator/consumer.h>
++#include <linux/workqueue.h>
+ #include <net/dsa.h>
  
- 	gc_seq = nft_gc_seq_begin(nft_net);
+ #include "mt7530.h"
+@@ -136,6 +137,93 @@ static const struct of_device_id mt7530_of_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, mt7530_of_match);
  
--	if (!list_empty(&nf_tables_destroy_list))
--		nf_tables_trans_destroy_flush_work();
-+	nf_tables_trans_destroy_flush_work();
- again:
-+	WARN_ON(!list_empty(&nft_net->commit_list));
++static int
++mt7530_correct_addr(int phy_addr)
++{
++	/* The corrected address is calculated as stated below:
++	 *  0 ~  6, 31 -> 31
++	 *  7 ~ 14     -> 7
++	 * 15 ~ 22     -> 15
++	 * 23 ~ 30     -> 23
++	 */
++	return (((phy_addr - MT7530_NUM_PORTS) & ~MT7530_NUM_PORTS) +
++		MT7530_NUM_PORTS) & (PHY_MAX_ADDR - 1);
++}
 +
- 	list_for_each_entry(table, &nft_net->tables, list) {
- 		if (nft_table_has_owner(table) &&
- 		    n->portid == table->nlpid) {
---
++static bool
++mt7530_is_invalid_addr(int phy_addr)
++{
++	/* Only MDIO bus addresses 7, 15, 23, and 31 are valid options,
++	 * which all have the least significant three bits set. Check
++	 * for this.
++	 */
++	return (phy_addr & MT7530_NUM_PORTS) != MT7530_NUM_PORTS;
++}
++
++struct remove_impossible_priv {
++	struct delayed_work remove_impossible_work;
++	struct mdio_device *mdiodev;
++};
++
++static void
++mt7530_remove_impossible(struct work_struct *work)
++{
++	struct remove_impossible_priv *priv = container_of(work, struct remove_impossible_priv,
++							   remove_impossible_work.work);
++	struct mdio_device *mdiodev = priv->mdiodev;
++
++	mdio_device_remove(mdiodev);
++	mdio_device_free(mdiodev);
++	kfree(priv);
++}
++
++static int
++mt7530_reregister(struct mdio_device *mdiodev)
++{
++	/* If the address in DT must be wrong, make a good guess about
++	 * the most likely intention, issue a warning, register a new
++	 * MDIO device at the correct address and schedule the removal
++	 * of the device having an impossible address.
++	 */
++	struct fwnode_handle *fwnode = dev_fwnode(&mdiodev->dev);
++	int corrected_addr = mt7530_correct_addr(mdiodev->addr);
++	struct remove_impossible_priv *rem_priv;
++	struct mdio_device *new_mdiodev;
++	int ret;
++
++	dev_warn(&mdiodev->dev, FW_WARN
++		 "impossible switch MDIO address in device tree, assuming %d\n",
++		 corrected_addr);
++
++	rem_priv = kmalloc(sizeof(*rem_priv), GFP_KERNEL);
++	if (!rem_priv)
++		return -ENOMEM;
++
++	new_mdiodev = mdio_device_create(mdiodev->bus, corrected_addr);
++	if (IS_ERR(new_mdiodev)) {
++		ret = PTR_ERR(new_mdiodev);
++		goto out_free_work;
++	}
++	device_set_node(&new_mdiodev->dev, fwnode);
++
++	ret = mdio_device_register(new_mdiodev);
++	if (WARN_ON(ret))
++		goto out_free_dev;
++
++	/* schedule impossible device for removal from mdio bus */
++	rem_priv->mdiodev = mdiodev;
++	INIT_DELAYED_WORK(&rem_priv->remove_impossible_work, mt7530_remove_impossible);
++	schedule_delayed_work(&rem_priv->remove_impossible_work, 0);
++
++	return -EFAULT;
++
++out_free_dev:
++	mdio_device_free(new_mdiodev);
++out_free_work:
++	kfree(rem_priv);
++	return ret;
++}
++
+ static int
+ mt7530_probe(struct mdio_device *mdiodev)
+ {
+@@ -144,6 +232,10 @@ mt7530_probe(struct mdio_device *mdiodev)
+ 	struct device_node *dn;
+ 	int ret;
+ 
++	/* Check and if needed correct the MDIO address of the switch */
++	if (mt7530_is_invalid_addr(mdiodev->addr))
++		return mt7530_reregister(mdiodev);
++
+ 	dn = mdiodev->dev.of_node;
+ 
+ 	priv = devm_kzalloc(&mdiodev->dev, sizeof(*priv), GFP_KERNEL);
+-- 
+2.45.2
 
