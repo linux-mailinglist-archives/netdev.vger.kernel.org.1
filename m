@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-109483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E639592899E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:30:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D65089289A1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D75F1C20A7F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:30:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B734288059
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B0A15F330;
-	Fri,  5 Jul 2024 13:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEFE15FD16;
+	Fri,  5 Jul 2024 13:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="M6uAoan8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dq1jQ2Ru"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F451598EE;
-	Fri,  5 Jul 2024 13:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3018F15F3F9;
+	Fri,  5 Jul 2024 13:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186046; cv=none; b=RIX/yu1AFxcIJDdU4znDHdihMS6EglIuVOTQ9xbaG3Mlit9PIsJBW7YMR2Z0JCwmGZLm+AOgmIxtiUW//PEVSpq5fHEu5gteLu25WY8MggCoo0qNY6W2fFeq8aC16pe0sHcvqeIJBOV8oeTkbtfOc91WslmmzdHJQRu/HyJVvLg=
+	t=1720186049; cv=none; b=b47Pa4wIYhXzwtkCQuHYT0muoQ4+L8hDDBccdcLH0JOSorHFX0/s8IEutkq0q5r53lWn35lE2bma8jkKSvQyYMjcN0TaWZTOR7IsZdu5rkgfUCqod9Imobj8ntKnyPh+r2nXq6IhT6/JSxcfddPO92xwGE4eTSi6zQvUBc3+4K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186046; c=relaxed/simple;
-	bh=L0ONWoy9z7ss22OWuzBPdJcEsX+sQsE8JCPEXqdLPTM=;
+	s=arc-20240116; t=1720186049; c=relaxed/simple;
+	bh=TmR+UuvfgZTseZIMgnfVAOO15vw0ZUtinq9Xy3NYkH0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m4v2q7PVWDm3E6/VFC5nljO6fh+aY0TUxj/L7v/Kr9mYo8bYD2Fo+nssPVxD7r7L92Yu+4NVp/syKr6otLKVihQd6nBsFYiGzq0L2wwpMiT67SD8ajODxxXSy7DGpPDzVIE3ruR3GdsAuW5CEEH0IrCsKO3M8yM7cPqxWlBCQNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=M6uAoan8; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=cROwz6MgqaxR5Naa2fux9/+Sq2bjGo15UOuRWrqTZBY4CGx3ijoffThLTO4QbaXKDV+xxmxHfNLBX2FeVHVK4MfokARUdwji2uszge9lAww9BN7s4GryMDNuzdDhLuhAz/R7PQAwi4IoZuMzpOZ8tuT0F91SyATdst+s7uVXMjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dq1jQ2Ru; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A02431C0009;
-	Fri,  5 Jul 2024 13:27:21 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 35BA71C0013;
+	Fri,  5 Jul 2024 13:27:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720186043;
+	t=1720186044;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QzTBo7l3QbBVpqce2Y0sMqV+sQ4S8OpXIK1DNekBelo=;
-	b=M6uAoan8vLu967hWVj/Q+n9hCuVUeoOK4cpBu0SudDMY8GZEQSqvwI5lb1WniorR3A17d8
-	iu7kRkmyItPINY5USXv3yjrkqYEdEfyKr2kM5B9P3/dxfhNrjTTnot+HaIhdnHMtsvbbUk
-	4JUW+O5XtCEXYwSjlorpAJ4g5rmm7rGV/j4a5uI8VyZpVydClEgpi2fg6QuOqk+CzL0OA5
-	PQNWMJfEl2xpaykfjizA2rKbjRjrAIxsQN9E1wfEKNX3XVEqkYo2BfxAERiCq/knYYxYls
-	LNsW8PVFGaRa7PNQXGCOnwLSFWzIYDz7frZmBaEPU/OhpA2NvEF9AHqURnT7IQ==
+	bh=ZcNDOxoH6/zdiBj3X1TPSXqVnikTFNrR8IEOctgMAVY=;
+	b=dq1jQ2RuHEaOG3XlRcdQAFZT36cAapiZzOT0yacOekhpEA/4zNyeP8TMZlEbmfdbFL32GV
+	Q3LPbTsZWC/MJFPMseFS/gS983EQVqvgEroqOoOIA3U157VdbYUB0+SIzGDoja6NDtQyLY
+	w42Q0PGWJbiNtcxGWTlQ0OOqjG+MNchGtIzY8/l0iYOPE9RzYENF45M1Sf2UrmFTPdmhQE
+	HecDtXxjjINOTDD/Oy1H3EFU3LGZZKcSv1IkZDXVWMD6bAouFePfsLReNH+t/YzLKour0V
+	a+gt21zykmcpxhRhZI3p5/F0xE7shNGydW7Nm5UqX3Vv1sDwomxGMSLYiNJ0Ag==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -75,9 +75,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Dan Carpenter <dan.carpenter@linaro.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v16 09/14] net: ethtool: plca: Target the command to the requested PHY
-Date: Fri,  5 Jul 2024 15:27:00 +0200
-Message-ID: <20240705132706.13588-10-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v16 10/14] net: ethtool: pse-pd: Target the command to the requested PHY
+Date: Fri,  5 Jul 2024 15:27:01 +0200
+Message-ID: <20240705132706.13588-11-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
 References: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
@@ -90,124 +90,102 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-PLCA is a PHY-specific command. Instead of targeting the command
-towards dev->phydev, use the request to pick the targeted PHY.
+PSE and PD configuration is a PHY-specific command. Instead of targeting
+the command towards dev->phydev, use the request to pick the targeted
+PHY device.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- net/ethtool/plca.c | 30 ++++++++++++++++++++----------
- 1 file changed, 20 insertions(+), 10 deletions(-)
+ net/ethtool/pse-pd.c | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
-index b1e2e3b5027f..d95d92f173a6 100644
---- a/net/ethtool/plca.c
-+++ b/net/ethtool/plca.c
-@@ -25,7 +25,7 @@ struct plca_reply_data {
+diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
+index 2c981d443f27..f8c6fe552d3c 100644
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -28,15 +28,13 @@ struct pse_reply_data {
+ /* PSE_GET */
  
- const struct nla_policy ethnl_plca_get_cfg_policy[] = {
- 	[ETHTOOL_A_PLCA_HEADER]		=
--		NLA_POLICY_NESTED(ethnl_header_policy),
-+		NLA_POLICY_NESTED(ethnl_header_policy_phy),
+ const struct nla_policy ethnl_pse_get_policy[ETHTOOL_A_PSE_HEADER + 1] = {
+-	[ETHTOOL_A_PSE_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
++	[ETHTOOL_A_PSE_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy_phy),
  };
  
- static void plca_update_sint(int *dst, struct nlattr **tb, u32 attrid,
-@@ -58,10 +58,14 @@ static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
- 	struct plca_reply_data *data = PLCA_REPDATA(reply_base);
+-static int pse_get_pse_attributes(struct net_device *dev,
++static int pse_get_pse_attributes(struct phy_device *phydev,
+ 				  struct netlink_ext_ack *extack,
+ 				  struct pse_reply_data *data)
+ {
+-	struct phy_device *phydev = dev->phydev;
+-
+ 	if (!phydev) {
+ 		NL_SET_ERR_MSG(extack, "No PHY is attached");
+ 		return -EOPNOTSUPP;
+@@ -58,13 +56,20 @@ static int pse_prepare_data(const struct ethnl_req_info *req_base,
+ {
+ 	struct pse_reply_data *data = PSE_REPDATA(reply_base);
  	struct net_device *dev = reply_base->dev;
- 	const struct ethtool_phy_ops *ops;
 +	struct nlattr **tb = info->attrs;
 +	struct phy_device *phydev;
  	int ret;
  
-+	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PLCA_HEADER],
-+				      info->extack);
- 	// check that the PHY device is available and connected
--	if (!dev->phydev) {
-+	if (IS_ERR_OR_NULL(phydev)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
- 	}
-@@ -80,7 +84,7 @@ static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
- 	memset(&data->plca_cfg, 0xff,
- 	       sizeof_field(struct plca_reply_data, plca_cfg));
+ 	ret = ethnl_ops_begin(dev);
+ 	if (ret < 0)
+ 		return ret;
  
--	ret = ops->get_plca_cfg(dev->phydev, &data->plca_cfg);
-+	ret = ops->get_plca_cfg(phydev, &data->plca_cfg);
+-	ret = pse_get_pse_attributes(dev, info->extack, data);
++	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PSE_HEADER],
++				      info->extack);
++	if (IS_ERR_OR_NULL(phydev))
++		return -ENODEV;
++
++	ret = pse_get_pse_attributes(phydev, info->extack, data);
+ 
  	ethnl_ops_complete(dev);
  
- out:
-@@ -129,7 +133,7 @@ static int plca_get_cfg_fill_reply(struct sk_buff *skb,
+@@ -123,7 +128,7 @@ static int pse_fill_reply(struct sk_buff *skb,
+ /* PSE_SET */
  
- const struct nla_policy ethnl_plca_set_cfg_policy[] = {
- 	[ETHTOOL_A_PLCA_HEADER]		=
--		NLA_POLICY_NESTED(ethnl_header_policy),
-+		NLA_POLICY_NESTED(ethnl_header_policy_phy),
- 	[ETHTOOL_A_PLCA_ENABLED]	= NLA_POLICY_MAX(NLA_U8, 1),
- 	[ETHTOOL_A_PLCA_NODE_ID]	= NLA_POLICY_MAX(NLA_U32, 255),
- 	[ETHTOOL_A_PLCA_NODE_CNT]	= NLA_POLICY_RANGE(NLA_U32, 1, 255),
-@@ -141,15 +145,17 @@ const struct nla_policy ethnl_plca_set_cfg_policy[] = {
+ const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1] = {
+-	[ETHTOOL_A_PSE_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
++	[ETHTOOL_A_PSE_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy_phy),
+ 	[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] =
+ 		NLA_POLICY_RANGE(NLA_U32, ETHTOOL_PODL_PSE_ADMIN_STATE_DISABLED,
+ 				 ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED),
+@@ -135,12 +140,12 @@ const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1] = {
  static int
- ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+ ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
  {
 -	struct net_device *dev = req_info->dev;
- 	const struct ethtool_phy_ops *ops;
  	struct nlattr **tb = info->attrs;
- 	struct phy_plca_cfg plca_cfg;
-+	struct phy_device *phydev;
- 	bool mod = false;
- 	int ret;
+ 	struct phy_device *phydev;
  
-+	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PLCA_HEADER],
+-	phydev = dev->phydev;
+-	if (!phydev) {
++	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
 +				      info->extack);
- 	// check that the PHY device is available and connected
--	if (!dev->phydev)
-+	if (IS_ERR_OR_NULL(phydev))
- 		return -EOPNOTSUPP;
- 
- 	ops = ethtool_phy_ops;
-@@ -168,7 +174,7 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
- 	if (!mod)
- 		return 0;
- 
--	ret = ops->set_plca_cfg(dev->phydev, &plca_cfg, info->extack);
-+	ret = ops->set_plca_cfg(phydev, &plca_cfg, info->extack);
- 	return ret < 0 ? ret : 1;
- }
- 
-@@ -191,7 +197,7 @@ const struct ethnl_request_ops ethnl_plca_cfg_request_ops = {
- 
- const struct nla_policy ethnl_plca_get_status_policy[] = {
- 	[ETHTOOL_A_PLCA_HEADER]		=
--		NLA_POLICY_NESTED(ethnl_header_policy),
-+		NLA_POLICY_NESTED(ethnl_header_policy_phy),
- };
- 
- static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
-@@ -201,10 +207,14 @@ static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
- 	struct plca_reply_data *data = PLCA_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
- 	const struct ethtool_phy_ops *ops;
-+	struct nlattr **tb = info->attrs;
-+	struct phy_device *phydev;
- 	int ret;
- 
-+	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PLCA_HEADER],
-+				      info->extack);
- 	// check that the PHY device is available and connected
--	if (!dev->phydev) {
 +	if (IS_ERR_OR_NULL(phydev)) {
- 		ret = -EOPNOTSUPP;
- 		goto out;
+ 		NL_SET_ERR_MSG(info->extack, "No PHY is attached");
+ 		return -EOPNOTSUPP;
  	}
-@@ -223,7 +233,7 @@ static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
- 	memset(&data->plca_st, 0xff,
- 	       sizeof_field(struct plca_reply_data, plca_st));
+@@ -171,12 +176,15 @@ ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
+ static int
+ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
+ {
+-	struct net_device *dev = req_info->dev;
+ 	struct pse_control_config config = {};
+ 	struct nlattr **tb = info->attrs;
+ 	struct phy_device *phydev;
  
--	ret = ops->get_plca_status(dev->phydev, &data->plca_st);
-+	ret = ops->get_plca_status(phydev, &data->plca_st);
- 	ethnl_ops_complete(dev);
- out:
- 	return ret;
+-	phydev = dev->phydev;
++	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
++				      info->extack);
++	if (IS_ERR_OR_NULL(phydev))
++		return -ENODEV;
++
+ 	/* These values are already validated by the ethnl_pse_set_policy */
+ 	if (pse_has_podl(phydev->psec))
+ 		config.podl_admin_control = nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL]);
 -- 
 2.45.1
 
