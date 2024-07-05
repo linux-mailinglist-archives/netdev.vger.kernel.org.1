@@ -1,260 +1,183 @@
-Return-Path: <netdev+bounces-109464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F95928907
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 14:52:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28696928917
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 14:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C104F1F2205A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:52:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2BD2288A08
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21265149C4C;
-	Fri,  5 Jul 2024 12:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA03714A62F;
+	Fri,  5 Jul 2024 12:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3ATi96g"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NXUgf4BJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC27014A611;
-	Fri,  5 Jul 2024 12:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE6413C8F9;
+	Fri,  5 Jul 2024 12:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720183919; cv=none; b=YzkAc0aIhMyDpBa/09TTEAoH0GiHJDvGKicYV5Pn+BcQ70t2Ufy+m5gQ0ofQXW3rB65ZBg5YT0X3jvIhagjEAZBLAltTBAFWwOCIFROTnJTj03iaI2IIJaKv+ZFCYKvgGw9hiwmK1fGPv5fD9DRni/Fff7Gsp9rdOeEi75KrEZU=
+	t=1720184134; cv=none; b=KUmdS1EMjGFP4Ib7GW31lVR5ejF7a72Pz5aO1vxWQYGNzWkRoE0imLLqoF/YuV/lGgomtdpvutFUGDqGUhGkTtVNeOAkHIFd3vZ85r1228EjFEV+/XFkBy7CvIwANRq1Eg5N2euyopVeC7wIKwCRhbbDSXffeonZmC9jvTK2E3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720183919; c=relaxed/simple;
-	bh=tywzzqXTM3ofbyDOTsWWX9rMUuX3wToN0cFy8fdbH60=;
+	s=arc-20240116; t=1720184134; c=relaxed/simple;
+	bh=Z5KVVpVzJXWZTDYsocGuEMhDUmkZAVHCjL4h2Uv1m1A=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=B/bHrlJsPrcSkfFBErtUlgf/CN9pVEtxhDD/yWhgo4CIneIt7I6Aryr8pkZL1PlJW4BFyqXoBnDdwj4yHmS2UNvxP4P9qP527XTiX8Ry5RJvFySkbGVWZuU+57PXkByPvfVBLg+9i/XBhFgyq55hd5dQ9lCGmt+0omcNIhpyvnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3ATi96g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11586C116B1;
-	Fri,  5 Jul 2024 12:51:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720183918;
-	bh=tywzzqXTM3ofbyDOTsWWX9rMUuX3wToN0cFy8fdbH60=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=h3ATi96gOBVDY6kMulp4OPha8kVtaO5PM+6r5TZxGUbqOXe26N+iTsPMbzE5qaadQ
-	 tgTZsEISXFMJAQTHU4xlt/GbioctJO/9NdSona+2l9JHI+FExr3Z5iU2jFiAajHMFN
-	 c7VnK9BOEJF1EURYMDHlXwzVXUwcMWjvZKP1sSeIYcx5b9Kf+BMff8EuLhMSR9ouls
-	 k+nDYrqnWhUAszMoluFX8zeN1fZYzbRuweutlXsyhaIOJTZ7EnXF8plC0llRMC4Lcc
-	 zMvFOazdQRZmbvOK+M7VUeolBym43fSFwQyNO78udbnBhWrq522Q55CVaaM3Jy3aca
-	 fxWd8Gs3cxicQ==
-From: Puranjay Mohan <puranjay@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next v6 1/3] riscv, bpf: Add 12-argument support for
- RV64 bpf trampoline
-In-Reply-To: <20240702121944.1091530-2-pulehui@huaweicloud.com>
-References: <20240702121944.1091530-1-pulehui@huaweicloud.com>
- <20240702121944.1091530-2-pulehui@huaweicloud.com>
-Date: Fri, 05 Jul 2024 12:51:36 +0000
-Message-ID: <mb61p7ce0roh3.fsf@kernel.org>
+	 MIME-Version:Content-Type; b=C+nl1gCWpGTt1IvM05l0SbJLXzDf5mmqZhFmFNwA8U2cwQxEyVj9jRhya9Fo7g3TXwIDsPUCRvt1m3tdX9KgaYL9njhkttnG+MxO3QImcoPZSUi6I1sIm33bRNT678Q1FSaHw7fgiV3PhDQOm+GCYY2VGdCOS1l3ClSBv7wCtiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NXUgf4BJ; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1A52D1BF203;
+	Fri,  5 Jul 2024 12:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720184130;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lkgdhWZpV73wja8j2NNVmvhUuPQEYOksDpCMcDjmmaU=;
+	b=NXUgf4BJj0wmKWhJnyfVixE2x94XeGk/xAfGBuP1f7ziJ7A4z5MFm+lXPEYxXp28SieMER
+	HYti3Q4/Zyd/kHK23zeKlKLfi8Of58Ss3MQiGCUvmRW765bv2URtYnMQQ+N4SYJRTP3YVI
+	GDRxQ+74Ngx0kynw+unwWLpcAQWEGVHupZe856UUX3WC0QfM8HAU+YU+jsdE5af75LTqvA
+	2DpNBtJyN182bwC5qf9rNjyS4RMX2EZMOD1gHlGkyE0E+TvtgoHz06DD+GMJlnmYJzx0KW
+	XviMTHzayaCTBdlSNcUNR3P5MdaXtTm8q4YbBrMl5MGhWSF9mF1ZGzuGumAPWg==
+From: Gregory CLEMENT <gregory.clement@bootlin.com>
+To: Josua Mayer <josua@solid-run.com>, Andrew Lunn <andrew@lunn.ch>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Cc: Yazan Shhady <yazan.shhady@solid-run.com>,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Josua Mayer
+ <josua@solid-run.com>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v7 0/5] arm64: dts: add description for solidrun cn9130
+ som and clearfog boards
+In-Reply-To: <20240704-cn9130-som-v7-0-eea606ba5faa@solid-run.com>
+References: <20240704-cn9130-som-v7-0-eea606ba5faa@solid-run.com>
+Date: Fri, 05 Jul 2024 14:55:29 +0200
+Message-ID: <8734ooj8vy.fsf@BLaptop.bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain
+X-GND-Sasl: gregory.clement@bootlin.com
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Josua Mayer <josua@solid-run.com> writes:
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
-
-> From: Pu Lehui <pulehui@huawei.com>
+> SolidRun CN9130 SoM is a mostly pin-comptible replacement for Armada 388
+> SoM used in Clearfog and Clearfog Pro boards.
 >
-> This patch adds 12 function arguments support for riscv64 bpf
-> trampoline. The current bpf trampoline supports <=3D sizeof(u64) bytes
-> scalar arguments [0] and <=3D 16 bytes struct arguments [1]. Therefore, we
-> focus on the situation where scalars are at most XLEN bits and
-> aggregates whose total size does not exceed 2=C3=97XLEN bits in the riscv
-> calling convention [2].
+> 1. Add new binding for compatible strings closely matching the original.
 >
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6184=
- [0]
-> Link: https://elixir.bootlin.com/linux/v6.8/source/kernel/bpf/btf.c#L6769=
- [1]
-> Link: https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/downl=
-oad/draft-20230929-e5c800e661a53efe3c2678d71a306323b60eb13b/riscv-abi.pdf [=
-2]
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
-> Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
-> ---
->  arch/riscv/net/bpf_jit_comp64.c | 66 +++++++++++++++++++++++----------
->  1 file changed, 47 insertions(+), 19 deletions(-)
+> 2. Add device-tree includes for SoM and carrier shared design.
 >
-> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_com=
-p64.c
-> index 351e1484205e..685c7389ae7e 100644
-> --- a/arch/riscv/net/bpf_jit_comp64.c
-> +++ b/arch/riscv/net/bpf_jit_comp64.c
-> @@ -15,6 +15,7 @@
->  #include <asm/percpu.h>
->  #include "bpf_jit.h"
->=20=20
-> +#define RV_MAX_REG_ARGS 8
->  #define RV_FENTRY_NINSNS 2
->  /* imm that allows emit_imm to emit max count insns */
->  #define RV_MAX_COUNT_IMM 0x7FFF7FF7FF7FF7FF
-> @@ -692,26 +693,45 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke=
-_type poke_type,
->  	return ret;
->  }
->=20=20
-> -static void store_args(int nregs, int args_off, struct rv_jit_context *c=
-tx)
-> +static void store_args(int nr_arg_slots, int args_off, struct rv_jit_con=
-text *ctx)
->  {
->  	int i;
->=20=20
-> -	for (i =3D 0; i < nregs; i++) {
-> -		emit_sd(RV_REG_FP, -args_off, RV_REG_A0 + i, ctx);
-> +	for (i =3D 0; i < nr_arg_slots; i++) {
-> +		if (i < RV_MAX_REG_ARGS) {
-> +			emit_sd(RV_REG_FP, -args_off, RV_REG_A0 + i, ctx);
-> +		} else {
-> +			/* skip slots for T0 and FP of traced function */
-> +			emit_ld(RV_REG_T1, 16 + (i - RV_MAX_REG_ARGS) * 8, RV_REG_FP, ctx);
-> +			emit_sd(RV_REG_FP, -args_off, RV_REG_T1, ctx);
-> +		}
->  		args_off -=3D 8;
->  	}
->  }
->=20=20
-> -static void restore_args(int nregs, int args_off, struct rv_jit_context =
-*ctx)
-> +static void restore_args(int nr_reg_args, int args_off, struct rv_jit_co=
-ntext *ctx)
->  {
->  	int i;
->=20=20
-> -	for (i =3D 0; i < nregs; i++) {
-> +	for (i =3D 0; i < nr_reg_args; i++) {
->  		emit_ld(RV_REG_A0 + i, -args_off, RV_REG_FP, ctx);
->  		args_off -=3D 8;
->  	}
->  }
->=20=20
-> +static void restore_stack_args(int nr_stack_args, int args_off, int stk_=
-arg_off,
-> +			       struct rv_jit_context *ctx)
-> +{
-> +	int i;
-> +
-> +	for (i =3D 0; i < nr_stack_args; i++) {
-> +		emit_ld(RV_REG_T1, -(args_off - RV_MAX_REG_ARGS * 8), RV_REG_FP, ctx);
-> +		emit_sd(RV_REG_FP, -stk_arg_off, RV_REG_T1, ctx);
-> +		args_off -=3D 8;
-> +		stk_arg_off -=3D 8;
-> +	}
-> +}
-> +
->  static int invoke_bpf_prog(struct bpf_tramp_link *l, int args_off, int r=
-etval_off,
->  			   int run_ctx_off, bool save_ret, struct rv_jit_context *ctx)
->  {
-> @@ -784,8 +804,8 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->  {
->  	int i, ret, offset;
->  	int *branches_off =3D NULL;
-> -	int stack_size =3D 0, nregs =3D m->nr_args;
-> -	int retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off;
-> +	int stack_size =3D 0, nr_arg_slots =3D 0;
-> +	int retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off, stk=
-_arg_off;
->  	struct bpf_tramp_links *fentry =3D &tlinks[BPF_TRAMP_FENTRY];
->  	struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
->  	struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_RETURN];
-> @@ -831,20 +851,21 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
-_tramp_image *im,
->  	 * FP - sreg_off    [ callee saved reg	]
->  	 *
->  	 *		    [ pads              ] pads for 16 bytes alignment
-> +	 *
-> +	 *		    [ stack_argN        ]
-> +	 *		    [ ...               ]
-> +	 * FP - stk_arg_off [ stack_arg1        ] BPF_TRAMP_F_CALL_ORIG
->  	 */
->=20=20
->  	if (flags & (BPF_TRAMP_F_ORIG_STACK | BPF_TRAMP_F_SHARE_IPMODIFY))
->  		return -ENOTSUPP;
->=20=20
-> -	/* extra regiters for struct arguments */
-> -	for (i =3D 0; i < m->nr_args; i++)
-> -		if (m->arg_flags[i] & BTF_FMODEL_STRUCT_ARG)
-> -			nregs +=3D round_up(m->arg_size[i], 8) / 8 - 1;
-> -
-> -	/* 8 arguments passed by registers */
-> -	if (nregs > 8)
-> +	if (m->nr_args > MAX_BPF_FUNC_ARGS)
->  		return -ENOTSUPP;
->=20=20
-> +	for (i =3D 0; i < m->nr_args; i++)
-> +		nr_arg_slots +=3D round_up(m->arg_size[i], 8) / 8;
-> +
->  	/* room of trampoline frame to store return address and frame pointer */
->  	stack_size +=3D 16;
->=20=20
-> @@ -854,7 +875,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->  		retval_off =3D stack_size;
->  	}
->=20=20
-> -	stack_size +=3D nregs * 8;
-> +	stack_size +=3D nr_arg_slots * 8;
->  	args_off =3D stack_size;
->=20=20
->  	stack_size +=3D 8;
-> @@ -871,8 +892,14 @@ static int __arch_prepare_bpf_trampoline(struct bpf_=
-tramp_image *im,
->  	stack_size +=3D 8;
->  	sreg_off =3D stack_size;
->=20=20
-> +	if (nr_arg_slots - RV_MAX_REG_ARGS > 0)
-> +		stack_size +=3D (nr_arg_slots - RV_MAX_REG_ARGS) * 8;
+> 3. Add device-tree for both Clearfog Base and Pro.
+>
+> While dtbs_check is happy with LED descriptions behind dsa switch,
+> functionally they require supporting code by Andrew Lunn:
+> https://lore.kernel.org/r/20240401-v6-8-0-net-next-mv88e6xxx-leds-v4-v3-0-221b3fa55f78@lunn.ch
+>
+> NOTICE IN CASE ANYBODY WANTS TO SELF-UPGRADE:
+> CN9130 SoM has a different footprint from Armada 388 SoM.
+> Components on the carrier board below the SoM may collide causing
+> damage, such as on Clearfog Base.
+>
+> Signed-off-by: Josua Mayer <josua@solid-run.com>
 
-Hi Pu,
-Although this is merged now, while working on this for arm64 I realised
-that the above doesn't check for BPF_TRAMP_F_CALL_ORIG and can waste
-some stack space, we should change this to:
-
-if ((flags & BPF_TRAMP_F_CALL_ORIG) && (nr_arg_slots - RV_MAX_REG_ARGS > 0))
-        stack_size +=3D (nr_arg_slots - RV_MAX_REG_ARGS) * 8;
-
-It will save some stack space when BPF_TRAMP_F_CALL_ORIG is not set?
-
-I can send a patch if you think this is worth fixing.
-
+Seriues applied on mvebu/dt64
 
 Thanks,
-Puranjay
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iIoEARYKADIWIQQ3wHGvVs/5bdl78BKwwPkjG3B2nQUCZofsWRQccHVyYW5qYXlA
-a2VybmVsLm9yZwAKCRCwwPkjG3B2nVLvAP90WXi/Yhb+D7G+xMI9Ul4lb/QgzP3o
-mpZFUc3OSw0C9gEA3Pfz/ubFrgU0VX9pgWGQp7va5fPrrL0zh795YgseaQI=
-=wqzf
------END PGP SIGNATURE-----
---=-=-=--
+Gregory
+> ---
+> Changes in v7:
+> - dropped dt-bindings for usb phy and adc which were picked into their
+>   respective trees
+> - Link to v6: https://lore.kernel.org/r/20240602-cn9130-som-v6-0-89393e86d4c7@solid-run.com
+>
+> Changes in v6:
+> - add device-tree for cn9132 clearfog and CEX-7 module
+> - add dt compatible for tla2021 adc
+>   --> I don't plan to submit a driver patch because I can't test it
+>   --> might share untested patch
+> - add dt property for swapping d+-/d- on cp110 utmi phy
+>   --> I plan to submit a driver patch, already prototyped
+> - removed duplicate node reference / status=okay for cp0_utmi from
+>   cn9131-cf-solidwan.dts
+> - rebased on 6.10-rc1
+> - Link to v5: https://lore.kernel.org/r/20240509-cn9130-som-v5-0-95493eb5c79d@solid-run.com
+>
+> Changes in v5:
+> - replaced *-gpio properties with preferred *-gpios
+>   (Reported-by: robh@kernel.org)
+> - removed fixed-regulator regulator-oc-protection-microamp properties
+>   This property is intended to set a configurable over-current limit to
+>   a particular value. The physical component however is not
+>   configurable, remove the property.
+> - kept all review tags since the changes were minor, hope that is okay
+>   with everybody.
+> - Link to v4: https://lore.kernel.org/r/20240502-cn9130-som-v4-0-0a2e2f1c70d8@solid-run.com
+>
+> Changes in v4:
+> - Picked up reviewed-by tags by Andrew Lunn.
+> - fixed a typo and changed 3-line comment into single-line comment
+>   for clearfog-base/-pro dts, but kept review tags since change was
+>   minor.
+> - Updated SFP led labels to use "sfp?:colour" without "color" property,
+>   to avoid duplicate labels while reflecting they are each dual-colour.
+> - Link to v3: https://lore.kernel.org/r/20240414-cn9130-som-v3-0-350a67d44e0a@solid-run.com
+>
+> Changes in v3:
+> - picked up acked-by for dt-bindings
+> - skipped acked-by for dts because additional changes were made:
+>   - moved legacy netdev aliases to carrier dts
+>   - fix status property style errors
+>   - add pinctrl for secondary spi chip-select on mikrobus header (& som)
+>   - specify spi bus frequency limits for som
+> - Added CN9131 SolidWAN board
+> - Link to v2: https://lore.kernel.org/r/20240404-cn9130-som-v2-0-3af2229c7d2d@solid-run.com
+>
+> Changes in v2:
+> - rewrote dt bindings dropping unnecessary compatibles
+>   (Reported-By: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>)
+> - added bindings for two additional boards (cn9131/9132)
+>   support planned for the coming weeks, mostly serves
+>   illustrational purposes, to understand cn913x variants
+> - cf-pro: add description for LEDs behind DSA switch
+> - cf-base: add description for LEDs behind PHYs
+>   (Reported-By: Andrew Lunn <andrew@lunn.ch>)
+> - Link to v1: https://lore.kernel.org/r/20240321-cn9130-som-v1-0-711127a409ae@solid-run.com
+>
+> ---
+> Josua Mayer (5):
+>       dt-bindings: arm64: marvell: add solidrun cn9130 som based boards
+>       dt-bindings: arm64: marvell: add solidrun cn9132 CEX-7 evaluation board
+>       arm64: dts: add description for solidrun cn9130 som and clearfog boards
+>       arm64: dts: add description for solidrun cn9131 solidwan board
+>       arm64: dts: add description for solidrun cn9132 cex7 module and clearfog board
+>
+>  .../bindings/arm/marvell/armada-7k-8k.yaml         |  18 +
+>  arch/arm64/boot/dts/marvell/Makefile               |   4 +
+>  arch/arm64/boot/dts/marvell/cn9130-cf-base.dts     | 178 ++++++
+>  arch/arm64/boot/dts/marvell/cn9130-cf-pro.dts      | 375 +++++++++++
+>  arch/arm64/boot/dts/marvell/cn9130-cf.dtsi         | 197 ++++++
+>  arch/arm64/boot/dts/marvell/cn9130-sr-som.dtsi     | 160 +++++
+>  arch/arm64/boot/dts/marvell/cn9131-cf-solidwan.dts | 637 ++++++++++++++++++
+>  arch/arm64/boot/dts/marvell/cn9132-clearfog.dts    | 673 +++++++++++++++++++
+>  arch/arm64/boot/dts/marvell/cn9132-sr-cex7.dtsi    | 712 +++++++++++++++++++++
+>  9 files changed, 2954 insertions(+)
+> ---
+> base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+> change-id: 20240318-cn9130-som-848e86acb0ac
+>
+> Sincerely,
+> -- 
+> Josua Mayer <josua@solid-run.com>
 
