@@ -1,49 +1,61 @@
-Return-Path: <netdev+bounces-109402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F06A2928560
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A3B928563
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:45:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EF6A28437B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:45:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2228B2828D0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E02147C7F;
-	Fri,  5 Jul 2024 09:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32141474AF;
+	Fri,  5 Jul 2024 09:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOn7XLTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096F8146A8D;
-	Fri,  5 Jul 2024 09:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF682146A8D
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 09:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720172626; cv=none; b=QKMmYpzDwJsaLVl1uf2SAi8D9GZEw1BfOErtElPbwx/t9ixdunmVVXl7xAsIoXCUq/EYhNOLpNiYL5/M4bHEr2YO1ScHGwruqqdKz/aAZQ1X/xkoHgLH0pe+/nlXEsDMV3bQCYDZwRd5NuIJCHZ6uBWz3hed6dQpn2tZsKUWKOM=
+	t=1720172674; cv=none; b=KaNjeF10AvoIeZYwZEMW+iy4Rn52396+SjLhMH1Rf0cYPw4SlR9FzA69BudJyI2qccMHvyQCG88XB8B8rlUrmI6hAZPEi+VhU84+lnU5XVSjOy3CLUPPZ4qk2iGFMEvKplyiDj5zuoacwSGVyX08m8Ys6sDDljKuzpuYplaLAbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720172626; c=relaxed/simple;
-	bh=En2qOjPD1WZPJVdH9mcRoOPC7p3aqmF+PJMGB9P3eV4=;
+	s=arc-20240116; t=1720172674; c=relaxed/simple;
+	bh=odhNEpOhcJcVEmGLfNAw9CM4dxuY5tNci9MDXc4HW08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BjQTt1oYUWNECAgqqb1clwMf6ft4Nrm7FlzIH1j5ryKvMQnoSzK6CqaJTDic8nTQGRkVZZHWH21ogfiWOEtKUeZnFITGNesJ6T0OT2/H4Ga0zj9vuCAlftfAdj6V44HNN7jBaJrNUeMkd1lnkfMVxOE0wBBxYjx2zyBk9ApJQT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sPfTZ-0008HZ-0e; Fri, 05 Jul 2024 11:43:33 +0200
-Date: Fri, 5 Jul 2024 11:43:33 +0200
-From: Florian Westphal <fw@strlen.de>
-To: yyxRoy <yyxroy22@gmail.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, gregkh@linuxfoundation.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yyxRoy <979093444@qq.com>
-Subject: Re: [PATCH] netfilter: conntrack: tcp: do not lower timeout to CLOSE
- for in-window RSTs
-Message-ID: <20240705094333.GB30758@breakpoint.cc>
-References: <20240705040013.29860-1-979093444@qq.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=S+CZkKGk1E5BLyH6B9V780hBXWpPbXlYkiKy4lPAq1+KHbPn9ptqlSy0idugAexwoyXz7MTBr3EBtjDftD0Z5wEThZnUZf8C3s5db1LD39DXnSo1RyP0dwHi+KKdSzrP9sAyA5+Dkcna7tZHoU+/oruxE0uuDOKoJ5tKkemOLEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XOn7XLTj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30A5CC116B1;
+	Fri,  5 Jul 2024 09:44:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720172674;
+	bh=odhNEpOhcJcVEmGLfNAw9CM4dxuY5tNci9MDXc4HW08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XOn7XLTj/ZbJcAGkvcaxn/yW10uCuh2FcZtuLsXqdyROoxxcvxI4can/bsTHrFqvm
+	 SD2GC0L2V9uGtcPFg1ZO9Qc0sIhhMDgFg3gJuHjulTFzZ8Aw+dTLMnNpMUFhWTTI+J
+	 VrGHpfbPrCIYV9W8XDhNAXV/B9vY0hAplJQwntTW3MDmYWAULRQchsRcsPrzdHLAXv
+	 jw9msB6yln/6oiPE8VVcZLzzVkD/NtpumBUcZYqTf0chIlqBe2bGUzeuE1jsfVTahM
+	 5PqZnSYBKXRVGcGaunMmbdcVq8ddKDAg1YTQr6jWNdu8yFU1xe26Gj5VsR43cAPXTS
+	 PvCHAn/49CKAw==
+Date: Fri, 5 Jul 2024 10:44:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next 07/10] net/mlx5: Implement PTM cross
+ timestamping support
+Message-ID: <20240705094430.GD1095183@kernel.org>
+References: <20240705071357.1331313-1-tariqt@nvidia.com>
+ <20240705071357.1331313-8-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,55 +64,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240705040013.29860-1-979093444@qq.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240705071357.1331313-8-tariqt@nvidia.com>
 
-yyxRoy <yyxroy22@gmail.com> wrote:
-> With previous commit https://github.com/torvalds/linux/commit/be0502a
-> ("netfilter: conntrack: tcp: only close if RST matches exact sequence")
-> to fight against TCP in-window reset attacks, current version of netfilter
-> will keep the connection state in ESTABLISHED, but lower the timeout to
-> that of CLOSE (10 seconds by default) for in-window TCP RSTs, and wait for
-> the peer to send a challenge ack to restore the connection timeout
-> (5 mins in tests).
+On Fri, Jul 05, 2024 at 10:13:54AM +0300, Tariq Toukan wrote:
+> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 > 
-> However, malicious attackers can prevent incurring challenge ACKs by
-> manipulating the TTL value of RSTs. The attacker can probe the TTL value
-> between the NAT device and itself and send in-window RST packets with
-> a TTL value to be decreased to 0 after arriving at the NAT device.
-> This causes the packet to be dropped rather than forwarded to the
-> internal client, thus preventing a challenge ACK from being triggered.
-> As the window of the sequence number is quite large (bigger than 60,000
-> in tests) and the sequence number is 16-bit, the attacker only needs to
-> send nearly 60,000 RST packets with different sequence numbers
-> (i.e., 1, 60001, 120001, and so on) and one of them will definitely
-> fall within in the window.
+> Expose Precision Time Measurement support through related PTP ioctl.
 > 
-> Therefore we can't simply lower the connection timeout to 10 seconds
-> (rather short) upon receiving in-window RSTs. With this patch, netfilter
-> will lower the connection timeout to that of CLOSE only when it receives
-> RSTs with exact sequence numbers (i.e., old_state != new_state).
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Co-developed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  .../ethernet/mellanox/mlx5/core/lib/clock.c   | 86 +++++++++++++++++++
+>  1 file changed, 86 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> index 0361741632a6..e023fb323a32 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> @@ -30,10 +30,13 @@
+>   * SOFTWARE.
+>   */
+>  
+> +#include <asm/tsc.h>
 
-This effectively ignores most RST packets, which will clog up the
-conntrack table (established timeout is 5 days).
+Hi Tariq, all,
 
-I don't think there is anything sensible that we can do here.
+This appears to break compilation on architectures that don't have tsc.h -
+those other than x86.
 
-Also, one can send train with data packet + rst and we will hit
-the immediate close conditional:
+E.g. allmodconfig on arm64.
 
-   /* Check if rst is part of train, such as
-    *   foo:80 > bar:4379: P, 235946583:235946602(19) ack 42
-    *   foo:80 > bar:4379: R, 235946602:235946602(0)  ack 42
-    */
-    if (ct->proto.tcp.last_index == TCP_ACK_SET &&
-        ct->proto.tcp.last_dir == dir &&
-        seq == ct->proto.tcp.last_end)
-            break;
+-- 
+pw-bot: changes-requested
 
-So even if we'd make this change it doesn't prevent remote induced
-resets.
-
-Conntrack cannot validate RSTs precisely due to lack of information,
-only the endpoints can do this.
+...
 
