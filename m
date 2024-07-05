@@ -1,141 +1,285 @@
-Return-Path: <netdev+bounces-109347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CA592811E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:00:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A6EC928121
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90BE284D0B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 04:00:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36C461C23C6B
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 04:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1A03AC16;
-	Fri,  5 Jul 2024 04:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B342A4D11B;
+	Fri,  5 Jul 2024 04:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFYh9zvj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="No1opytv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BBB81E;
-	Fri,  5 Jul 2024 04:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8093AC16;
+	Fri,  5 Jul 2024 04:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720152038; cv=none; b=XM4POc7h58XVDC5930naz2SC+qFMkwu4o54OL8IOOqoVH+j6s5lRitbdbaiK39QAFm1/9ttCfSn+QaDamwtDUPldFYjQgH55BeRNMECSe7BofLlct0jb2IR0USqTyCLpKuTE5yR23iPqS90cPScBt7Jf9kTbl5jzKj/l2MIqVxI=
+	t=1720152111; cv=none; b=cF3yLOSkssXsu7xw9WjntGtVkBe1SHj8eNJDYzRVSV7pI9dbuDJwfY05pX5meCubFPrsRJE+y099edc7jg3gDTSiGD/lBxPV0rCkLUyyur8EPPW+N7FSJR0bmn7Y9MktL5eZVN8yvhNUfGbECEtlw4/rCV83Ojs43wrhCCcapz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720152038; c=relaxed/simple;
-	bh=WaumuGDGrorQizvhwn22mns7Wbc5Sh2UiLhtc9m1eCg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Csjnnort7cbI3RkcghyTSMfSz4K1odZZ1OERosyO5GyD4HUPLIyk+exKusAoxYrOtxJmADqUP/kweUfQRyVYeOGQK4Q/r58MrOdWzgmsj84ICgXtOVSMOWzRDiTgOJP/07gHHsvN5TjwU0QB4Icg56dR+ohWOwzn5aAhHOLpjtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFYh9zvj; arc=none smtp.client-ip=209.85.210.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-70211abf4cbso802238a34.3;
-        Thu, 04 Jul 2024 21:00:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720152036; x=1720756836; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vkEn4BlrQbhC1pOzdi5ltRctTkOQPmmbMk4HFASDkZk=;
-        b=CFYh9zvj48ZLxAEwqfL79ELsOs0RjA3MKaA1bn032Z1wmRAagnEluPS+pyOvz7AeXs
-         t+cuz/7pBY3mBnqRYp2/YCBZZguW/7Az+/ff60xbT1IfV0liSzJpIte3uL2sTOVyrOy/
-         fyO4jL7fXq13DToVGuGBl0/0/CcpuyNXUsgOj3CGyOQfV9rckn55TBpB40DsjRTFs8Hw
-         aQmaxjjeTyAq7bZ5xwcGlh/0Gem3BThnkFhx5icFsrN8f4JGq7B974Er14klSKF+eOwZ
-         LFtDePp4iOil/iUDe0EjECyyQAPFRUtFuXuuhRLL9Tn8ni8XsRHyqQeTi+1RcrkfRSWx
-         V4vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720152036; x=1720756836;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vkEn4BlrQbhC1pOzdi5ltRctTkOQPmmbMk4HFASDkZk=;
-        b=Zr889/SvVuCgk0xQeTe8LRkzmGXAovNwYFgEV7GVfsVdC8ib5Q3Vi1j1IBBTUemykp
-         rcvX1+Ea/5O3pNNyyYKxgZhmbR/mpIuw6hHBZZYaLOAsI6xcsrkTHAXGH6y9TOrX8xD6
-         Bnncg06hpZPS37X5EtWvK+03UCfSXiX4+hVa/xDpqqsVyfF+oN/yO8sk1E7e+2vkybGT
-         CYlxK85gVTrv0BxFH809EWpIWAgS5uKaXaiXNX8MRAje+QmvlBR2HXVRvDj5fwjrGOz1
-         ABmsh2JbFyH+eX3c7tinJm4g7T9W0NtR+rcr7dp7YAnmOx++PfvGTFLP/WrxMi8czsBC
-         f2ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXEZgnlhPgQ+os4QETF8uWrweade5cQippcG8ZQoadfGb0zJjDRLZ1LA88zyGVmm2u0KHn88IVwjiQ2v3hu/cuM8NN8aWcqOWxGWul+1Q9POrGkXBj2Aus11MYFP3O+HKseBg/ler1qV3XAfov9t8Vxz+y8+UsT9/UhOUgswv6OASuBCfB3
-X-Gm-Message-State: AOJu0Yxyf+KnKzRTP4RY5SAX10cDxVSz/L75WUsDUYgKQ8EFuWu+240z
-	KBq5ogOFQo0LbT05klq3YqqB/l7zZUjHxGmGKTuXqRARUMJFiegm
-X-Google-Smtp-Source: AGHT+IEzVcTG/3nA8s2W+/eTJlO4NkviPp0EvCHcEHRkzD3jDNBYwIycFpwpA+78ZiLgpE6T2daCrg==
-X-Received: by 2002:a05:6871:548:b0:24f:eada:e32 with SMTP id 586e51a60fabf-25e2ba220f4mr3167869fac.17.1720152035861;
-        Thu, 04 Jul 2024 21:00:35 -0700 (PDT)
-Received: from localhost.localdomain ([166.111.236.150])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6afb54basm8809424a12.39.2024.07.04.21.00.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 21:00:35 -0700 (PDT)
-From: yyxRoy <yyxroy22@gmail.com>
-X-Google-Original-From: yyxRoy <979093444@qq.com>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	gregkh@linuxfoundation.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yyxRoy <979093444@qq.com>
-Subject: [PATCH] netfilter: conntrack: tcp: do not lower timeout to CLOSE for in-window RSTs
-Date: Fri,  5 Jul 2024 12:00:13 +0800
-Message-Id: <20240705040013.29860-1-979093444@qq.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1720152111; c=relaxed/simple;
+	bh=5EBce3E8eE1JEfT2FfDkG8yDu+DyvXnM1e4rPXI45c8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LjVGoVeSizspU0W07imPA29ks++DAwlflyzcvyJHTaOoJx7nXV/n8lhV7UkC10QUu34OdfxFRsU0OZSZD5GBM39B/B+e60REt8HzDR3OwHdJaJacV9hCzFeRVI+4nTafv2uyE7EkMHajXc384djP3vSDEwo7CvHQ6V80KAO4Y4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=No1opytv; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720152110; x=1751688110;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=5EBce3E8eE1JEfT2FfDkG8yDu+DyvXnM1e4rPXI45c8=;
+  b=No1opytvQncpGd197nhkHyUHoz2O2w/HZ0HM2C7z4U1Dt+w8e4YDO/j2
+   /RN2dZjo+ojaED7sWERrAF9M+WHpLkjSfTvsDLP5v39Xq3JERn9ppnWxR
+   76XNjRVOlkoVgBIZcx2EqrgbPLjzANBNoRPkQqrvwWCna8hW8sjLUF+Cn
+   TMzoKoXkTgUabXWavY6NDK/pQ1qu6ZnWBJc5I3j8pF6Vq1fyU03nAq3Nr
+   n6ALIw+HDOUcOZXMQ/RqXt6YFoFkHrLRq08W2axTdMEqeiOIf+baRJzK5
+   hy97v0T0IwYVkKwigPoqMOF1SiXq6zMlpJuQXdUvdolX6SUtD+mGTA6B1
+   w==;
+X-CSE-ConnectionGUID: q50TD5btScaXzS/5MjPIAQ==
+X-CSE-MsgGUID: kt2gM2+BTgGcdAbDe8a54A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17304555"
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="17304555"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 21:01:49 -0700
+X-CSE-ConnectionGUID: jIEgJw+DRYKM1ua22SjyEQ==
+X-CSE-MsgGUID: S2q88q0QTd+FLhMN1qHT9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="46542221"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 04 Jul 2024 21:01:46 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sPa8m-000Rsx-0b;
+	Fri, 05 Jul 2024 04:01:44 +0000
+Date: Fri, 5 Jul 2024 12:01:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiri Pirko <jiri@nvidia.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [mst-vhost:vhost 45/58] drivers/s390/virtio/virtio_ccw.c:708:8:
+ error: use of undeclared identifier 'vq_info'; did you mean 'vqs_info'?
+Message-ID: <202407051104.7NJ6bvCs-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-With previous commit https://github.com/torvalds/linux/commit/be0502a
-("netfilter: conntrack: tcp: only close if RST matches exact sequence")
-to fight against TCP in-window reset attacks, current version of netfilter
-will keep the connection state in ESTABLISHED, but lower the timeout to
-that of CLOSE (10 seconds by default) for in-window TCP RSTs, and wait for
-the peer to send a challenge ack to restore the connection timeout
-(5 mins in tests).
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   b3dab3dfaa73df6bde78cb52f6bc03f57c4d056c
+commit: f07c2dc394264dd811776de1dec9544f2181f2e4 [45/58] virtio: convert find_vqs() op implementations to find_vqs_info()
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20240705/202407051104.7NJ6bvCs-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project a0c6b8aef853eedaa0980f07c0a502a5a8a9740e)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240705/202407051104.7NJ6bvCs-lkp@intel.com/reproduce)
 
-However, malicious attackers can prevent incurring challenge ACKs by
-manipulating the TTL value of RSTs. The attacker can probe the TTL value
-between the NAT device and itself and send in-window RST packets with
-a TTL value to be decreased to 0 after arriving at the NAT device.
-This causes the packet to be dropped rather than forwarded to the
-internal client, thus preventing a challenge ACK from being triggered.
-As the window of the sequence number is quite large (bigger than 60,000
-in tests) and the sequence number is 16-bit, the attacker only needs to
-send nearly 60,000 RST packets with different sequence numbers
-(i.e., 1, 60001, 120001, and so on) and one of them will definitely
-fall within in the window.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407051104.7NJ6bvCs-lkp@intel.com/
 
-Therefore we can't simply lower the connection timeout to 10 seconds
-(rather short) upon receiving in-window RSTs. With this patch, netfilter
-will lower the connection timeout to that of CLOSE only when it receives
-RSTs with exact sequence numbers (i.e., old_state != new_state).
+All errors (new ones prefixed by >>):
 
-Signed-off-by: yyxRoy <979093444@qq.com>
----
- net/netfilter/nf_conntrack_proto_tcp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+   In file included from drivers/s390/virtio/virtio_ccw.c:12:
+   In file included from include/linux/memblock.h:12:
+   In file included from include/linux/mm.h:2258:
+   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     501 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     508 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     520 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     529 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   In file included from drivers/s390/virtio/virtio_ccw.c:12:
+   In file included from include/linux/memblock.h:13:
+   In file included from arch/s390/include/asm/dma.h:5:
+   In file included from include/linux/io.h:14:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
+     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
+         |                                                      ^
+   In file included from drivers/s390/virtio/virtio_ccw.c:12:
+   In file included from include/linux/memblock.h:13:
+   In file included from arch/s390/include/asm/dma.h:5:
+   In file included from include/linux/io.h:14:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
+     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
+         |                                                      ^
+   In file included from drivers/s390/virtio/virtio_ccw.c:12:
+   In file included from include/linux/memblock.h:13:
+   In file included from arch/s390/include/asm/dma.h:5:
+   In file included from include/linux/io.h:14:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:693:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     693 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:701:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     701 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:709:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     709 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:718:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     718 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:727:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     727 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:736:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     736 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> drivers/s390/virtio/virtio_ccw.c:708:8: error: use of undeclared identifier 'vq_info'; did you mean 'vqs_info'?
+     708 |                 if (!vq_info->name) {
+         |                      ^~~~~~~
+         |                      vqs_info
+   drivers/s390/virtio/virtio_ccw.c:692:33: note: 'vqs_info' declared here
+     692 |                                struct virtqueue_info vqs_info[],
+         |                                                      ^
+   17 warnings and 1 error generated.
 
-diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
-index ae493599a..d06259407 100644
---- a/net/netfilter/nf_conntrack_proto_tcp.c
-+++ b/net/netfilter/nf_conntrack_proto_tcp.c
-@@ -1280,7 +1280,8 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
- 	if (ct->proto.tcp.retrans >= tn->tcp_max_retrans &&
- 	    timeouts[new_state] > timeouts[TCP_CONNTRACK_RETRANS])
- 		timeout = timeouts[TCP_CONNTRACK_RETRANS];
--	else if (unlikely(index == TCP_RST_SET))
-+	else if (unlikely(index == TCP_RST_SET) &&
-+		 old_state != new_state)
- 		timeout = timeouts[TCP_CONNTRACK_CLOSE];
- 	else if ((ct->proto.tcp.seen[0].flags | ct->proto.tcp.seen[1].flags) &
- 		 IP_CT_TCP_FLAG_DATA_UNACKNOWLEDGED &&
+
+vim +708 drivers/s390/virtio/virtio_ccw.c
+
+   689	
+   690	static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+   691				       struct virtqueue *vqs[],
+   692				       struct virtqueue_info vqs_info[],
+   693				       struct irq_affinity *desc)
+   694	{
+   695		struct virtio_ccw_device *vcdev = to_vc_device(vdev);
+   696		struct virtqueue_info *vqi;
+   697		dma64_t *indicatorp = NULL;
+   698		int ret, i, queue_idx = 0;
+   699		struct ccw1 *ccw;
+   700		dma32_t indicatorp_dma = 0;
+   701	
+   702		ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw), NULL);
+   703		if (!ccw)
+   704			return -ENOMEM;
+   705	
+   706		for (i = 0; i < nvqs; ++i) {
+   707			vqi = &vqs_info[i];
+ > 708			if (!vq_info->name) {
+   709				vqs[i] = NULL;
+   710				continue;
+   711			}
+   712	
+   713			vqs[i] = virtio_ccw_setup_vq(vdev, queue_idx++, vqi->callback,
+   714						     vqi->name, vqi->ctx, ccw);
+   715			if (IS_ERR(vqs[i])) {
+   716				ret = PTR_ERR(vqs[i]);
+   717				vqs[i] = NULL;
+   718				goto out;
+   719			}
+   720		}
+   721		ret = -ENOMEM;
+   722		/*
+   723		 * We need a data area under 2G to communicate. Our payload is
+   724		 * the address of the indicators.
+   725		*/
+   726		indicatorp = ccw_device_dma_zalloc(vcdev->cdev,
+   727						   sizeof(*indicatorp),
+   728						   &indicatorp_dma);
+   729		if (!indicatorp)
+   730			goto out;
+   731		*indicatorp = indicators_dma(vcdev);
+   732		if (vcdev->is_thinint) {
+   733			ret = virtio_ccw_register_adapter_ind(vcdev, vqs, nvqs, ccw);
+   734			if (ret)
+   735				/* no error, just fall back to legacy interrupts */
+   736				vcdev->is_thinint = false;
+   737		}
+   738		ccw->cda = indicatorp_dma;
+   739		if (!vcdev->is_thinint) {
+   740			/* Register queue indicators with host. */
+   741			*indicators(vcdev) = 0;
+   742			ccw->cmd_code = CCW_CMD_SET_IND;
+   743			ccw->flags = 0;
+   744			ccw->count = sizeof(*indicatorp);
+   745			ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_IND);
+   746			if (ret)
+   747				goto out;
+   748		}
+   749		/* Register indicators2 with host for config changes */
+   750		*indicatorp = indicators2_dma(vcdev);
+   751		*indicators2(vcdev) = 0;
+   752		ccw->cmd_code = CCW_CMD_SET_CONF_IND;
+   753		ccw->flags = 0;
+   754		ccw->count = sizeof(*indicatorp);
+   755		ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_CONF_IND);
+   756		if (ret)
+   757			goto out;
+   758	
+   759		if (indicatorp)
+   760			ccw_device_dma_free(vcdev->cdev, indicatorp,
+   761					    sizeof(*indicatorp));
+   762		ccw_device_dma_free(vcdev->cdev, ccw, sizeof(*ccw));
+   763		return 0;
+   764	out:
+   765		if (indicatorp)
+   766			ccw_device_dma_free(vcdev->cdev, indicatorp,
+   767					    sizeof(*indicatorp));
+   768		ccw_device_dma_free(vcdev->cdev, ccw, sizeof(*ccw));
+   769		virtio_ccw_del_vqs(vdev);
+   770		return ret;
+   771	}
+   772	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
