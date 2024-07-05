@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-109487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92B49289A7
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:31:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793769289A9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E9E11F224AE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:31:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F06BE1F22CCD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC1F169AE3;
-	Fri,  5 Jul 2024 13:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB6216A92B;
+	Fri,  5 Jul 2024 13:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dfiqE6Wn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RP/UxF2Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BB21667ED;
-	Fri,  5 Jul 2024 13:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470F216848B;
+	Fri,  5 Jul 2024 13:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186053; cv=none; b=T7gMnkAKXjR8fceCkW+CdsA1HVkIBsHdoCuiP+ziiiX8G/7y4Zt47GW9YlcGD210qOSowvhFql3UO04LYTc9uuIufB1XnsPU2xzHNPl62pkIT2rt9QLQInMxBEc//8I77toWsccIUUeGU3fWIuEpT1FzQSwSXYiNSKibr4hDYhw=
+	t=1720186054; cv=none; b=pgxp3Zvr9SkySsfEt/vVJnWknBZOhvXxdLK18JnUym3YgerJVNHCxQ8ahrQSCbezlhDkCO5IJuY0xlKikugo1lHs4aE2SpCkvEmfL9OrsmWbqNtS2MX7vSiMyn+gctcS1VBXyC/wp0bYX2MEAKxCkDs84rruXCyed7RZVn1Bv28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186053; c=relaxed/simple;
-	bh=0ZUa1Fak+q04M/9vHFmWrxuQdPAbuEV/riaxeV4T430=;
+	s=arc-20240116; t=1720186054; c=relaxed/simple;
+	bh=7GFrCX31QO5+cVyJPLOJOzBGhXWupgc3TiWzXmgixTw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eoDIFRjjfCR/HDM39E1AvK2gY1YcyApoHd2QF3HiGqZ7gqfb90HjVjyabJAutDi9B8kGN3rimhSLbhO1wcYYViXEf6diQWSY1GtwfJdnts3YvGuDIqbuQu9kXkdkRgawRlmwxIBsTyjAdPf9dT5cTggWY+0om3ppDP2CReMzfyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dfiqE6Wn; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=MdDekSXQcI/x07asoh12TOhk+LzjG6uKSODnJoxE+7LJvxyHT4rMZI9gEosxNw3/8JMzwFucmODCUez8oGiXaqaTruC1gcTmUftfx+RS3VM+uDFugJw3O+miq+OdYc9mHhXrmRsLLGSFEArlUd+FEQIEzD4UUhQVsAjvJkZOUAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RP/UxF2Q; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C6C561C0007;
-	Fri,  5 Jul 2024 13:27:27 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C2021C0009;
+	Fri,  5 Jul 2024 13:27:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720186049;
+	t=1720186050;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=thN6IdfOGL5JBJUVblIwdG2InFbFxvoTmh4Xec8y75w=;
-	b=dfiqE6Wnk90SGotpm+Q7SpNxlyxEI4mAbNCH2i9j+ewgece52m16ZBB5lQQv5gRUXOMNK8
-	Vq5zYamaRVlZr7obzDNJJHcRqR9pXD4/YxrCFFN7kS5d1Nb+0hTgGE/eqAAYcCBthNK+CU
-	VIpbD9CpNNU7BwTSTafl+RT+x2p6+lqtIYQVG4/2msvyYS3yVNhvKX2iBbL7ZchcQwM9B4
-	MoEA6LhgZO1KoSg/1y+rslqBMndhg41ETl80kBY78SsYhcdfLcZfWQBJCVMDb40nCsIzNS
-	nXKwTicXXzfj5XhLYK9Llw2pEI7MCCxnDgJ5nKKLLkclHChbZeGt7UbPbAGoDA==
+	bh=RBdoKTuUGXb+mXgpn+V5ybVVDS+LD1pMTHF4IEsFQSI=;
+	b=RP/UxF2QiccCwOgjTVDgn7ayb4+6Qa7J3TAXdbkEpnBSs1EGwtFPyQeMtRZjkWU+xuDdSK
+	SEVVxyh7FsKXYxrJ6Yf3/X1weLJjxrjgDSQdT/toUOaBymWJHfmNxSYPpH0t+VrZhz3r/H
+	tdzDOzVd/jEJiF2nHVjJFS4eN8hLcfe3yQnPM8teSPywSCAYSp6o98+8HL5NB6Kze8hY4d
+	U6K62bi1uAVgTIPYc+QEpQn9dxlU/GWkcWLSIsFd87oeHzN4MxYAJQXhJ4YftBWDRTwit9
+	AisPfgC/kvAakhGK08p+saRqhw2hQ3RUrzfPyFCiAIQ26lVIXGxkbOA95LHlbQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -75,9 +75,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Dan Carpenter <dan.carpenter@linaro.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v16 13/14] net: ethtool: strset: Allow querying phy stats by index
-Date: Fri,  5 Jul 2024 15:27:04 +0200
-Message-ID: <20240705132706.13588-14-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v16 14/14] Documentation: networking: document phy_link_topology
+Date: Fri,  5 Jul 2024 15:27:05 +0200
+Message-ID: <20240705132706.13588-15-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
 References: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
@@ -90,95 +90,178 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The ETH_SS_PHY_STATS command gets PHY statistics. Use the phydev pointer
-from the ethnl request to allow query phy stats from each PHY on the
-link.
+The newly introduced phy_link_topology tracks all ethernet PHYs that are
+attached to a netdevice. Document the base principle, internal and
+external APIs. As the phy_link_topology is expected to be extended, this
+documentation will hold any further improvements and additions made
+relative to topology handling.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- net/ethtool/strset.c | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ Documentation/networking/ethtool-netlink.rst  |   3 +
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
+ 3 files changed, 125 insertions(+)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
 
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index 56b99606f00b..b3382b3cf325 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -126,7 +126,7 @@ struct strset_reply_data {
- 
- const struct nla_policy ethnl_strset_get_policy[] = {
- 	[ETHTOOL_A_STRSET_HEADER]	=
--		NLA_POLICY_NESTED(ethnl_header_policy),
-+		NLA_POLICY_NESTED(ethnl_header_policy_phy),
- 	[ETHTOOL_A_STRSET_STRINGSETS]	= { .type = NLA_NESTED },
- 	[ETHTOOL_A_STRSET_COUNTS_ONLY]	= { .type = NLA_FLAG },
- };
-@@ -233,17 +233,18 @@ static void strset_cleanup_data(struct ethnl_reply_data *reply_base)
- }
- 
- static int strset_prepare_set(struct strset_info *info, struct net_device *dev,
--			      unsigned int id, bool counts_only)
-+			      struct phy_device *phydev, unsigned int id,
-+			      bool counts_only)
- {
- 	const struct ethtool_phy_ops *phy_ops = ethtool_phy_ops;
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	void *strings;
- 	int count, ret;
- 
--	if (id == ETH_SS_PHY_STATS && dev->phydev &&
-+	if (id == ETH_SS_PHY_STATS && phydev &&
- 	    !ops->get_ethtool_phy_stats && phy_ops &&
- 	    phy_ops->get_sset_count)
--		ret = phy_ops->get_sset_count(dev->phydev);
-+		ret = phy_ops->get_sset_count(phydev);
- 	else if (ops->get_sset_count && ops->get_strings)
- 		ret = ops->get_sset_count(dev, id);
- 	else
-@@ -258,10 +259,10 @@ static int strset_prepare_set(struct strset_info *info, struct net_device *dev,
- 		strings = kcalloc(count, ETH_GSTRING_LEN, GFP_KERNEL);
- 		if (!strings)
- 			return -ENOMEM;
--		if (id == ETH_SS_PHY_STATS && dev->phydev &&
-+		if (id == ETH_SS_PHY_STATS && phydev &&
- 		    !ops->get_ethtool_phy_stats && phy_ops &&
- 		    phy_ops->get_strings)
--			phy_ops->get_strings(dev->phydev, strings);
-+			phy_ops->get_strings(phydev, strings);
- 		else
- 			ops->get_strings(dev, id, strings);
- 		info->strings = strings;
-@@ -279,6 +280,8 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 	const struct strset_req_info *req_info = STRSET_REQINFO(req_base);
- 	struct strset_reply_data *data = STRSET_REPDATA(reply_base);
- 	struct net_device *dev = reply_base->dev;
-+	struct nlattr **tb = info->attrs;
-+	struct phy_device *phydev;
- 	unsigned int i;
- 	int ret;
- 
-@@ -296,6 +299,13 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 		return 0;
- 	}
- 
-+	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_HEADER_FLAGS],
-+				      info->extack);
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index 98bc6fe51737..8cd0da712344 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -2124,10 +2124,13 @@ Retrieve information about a given Ethernet PHY sitting on the link. The DO
+ operation returns all available information about dev->phydev. User can also
+ specify a PHY_INDEX, in which case the DO request returns information about that
+ specific PHY.
 +
-+	/* phydev can be NULL, check for errors only */
-+	if (IS_ERR(phydev))
-+		return PTR_ERR(phydev);
-+
- 	ret = ethnl_ops_begin(dev);
- 	if (ret < 0)
- 		goto err_strset;
-@@ -304,7 +314,7 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 		    !data->sets[i].per_dev)
- 			continue;
+ As there can be more than one PHY, the DUMP operation can be used to list the PHYs
+ present on a given interface, by passing an interface index or name in
+ the dump request.
  
--		ret = strset_prepare_set(&data->sets[i], dev, i,
-+		ret = strset_prepare_set(&data->sets[i], dev, phydev, i,
- 					 req_info->counts_only);
- 		if (ret < 0)
- 			goto err_ops;
++For more information, refer to :ref:`phy_link_topology`
++
+ Request contents:
+ 
+   ====================================  ======  ==========================
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index d1af04b952f8..c71b87346178 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -91,6 +91,7 @@ Contents:
+    operstates
+    packet_mmap
+    phonet
++   phy-link-topology
+    pktgen
+    plip
+    ppp_generic
+diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
+new file mode 100644
+index 000000000000..4dec5d7d6513
+--- /dev/null
++++ b/Documentation/networking/phy-link-topology.rst
+@@ -0,0 +1,121 @@
++.. SPDX-License-Identifier: GPL-2.0
++.. _phy_link_topology:
++
++=================
++PHY link topology
++=================
++
++Overview
++========
++
++The PHY link topology representation in the networking stack aims at representing
++the hardware layout for any given Ethernet link.
++
++An Ethernet interface from userspace's point of view is nothing but a
++:c:type:`struct net_device <net_device>`, which exposes configuration options
++through the legacy ioctls and the ethtool netlink commands. The base assumption
++when designing these configuration APIs were that the link looks something like ::
++
++  +-----------------------+        +----------+      +--------------+
++  | Ethernet Controller / |        | Ethernet |      | Connector /  |
++  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
++  +-----------------------+        +----------+      +--------------+
++  struct net_device               struct phy_device
++
++Commands that needs to configure the PHY will go through the net_device.phydev
++field to reach the PHY and perform the relevant configuration.
++
++This assumption falls apart in more complex topologies that can arise when,
++for example, using SFP transceivers (although that's not the only specific case).
++
++Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
++interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
++10GBaseR, etc.
++
++The link topology then looks like this (when an SFP module is inserted) ::
++
++  +-----+  SGMII  +------------+
++  | MAC | ------- | SFP Module |
++  +-----+         +------------+
++
++Knowing that some modules embed a PHY, the actual link is more like ::
++
++  +-----+  SGMII   +--------------+
++  | MAC | -------- | PHY (on SFP) |
++  +-----+          +--------------+
++
++In this case, the SFP PHY is handled by phylib, and registered by phylink through
++its SFP upstream ops.
++
++Now some Ethernet controllers aren't able to output a serialized interface, so
++we can't directly connect them to an SFP cage. However, some PHYs can be used
++as media-converters, to translate the non-serialized MAC MII interface to a
++serialized MII interface fed to the SFP ::
++
++  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
++  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
++  +-----+         +-----------------------+         +--------------+
++
++This is where the model of having a single net_device.phydev pointer shows its
++limitations, as we now have 2 PHYs on the link.
++
++The phy_link topology framework aims at providing a way to keep track of every
++PHY on the link, for use by both kernel drivers and subsystems, but also to
++report the topology to userspace, allowing to target individual PHYs in configuration
++commands.
++
++API
++===
++
++The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
++resource, that gets initialized at netdevice creation. Once it's initialized,
++it is then possible to register PHYs to the topology through :
++
++:c:func:`phy_link_topo_add_phy`
++
++Besides registering the PHY to the topology, this call will also assign a unique
++index to the PHY, which can then be reported to userspace to refer to this PHY
++(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
++0 is reserved to indicate the PHY doesn't belong to any topology yet.
++
++The PHY can then be removed from the topology through
++
++:c:func:`phy_link_topo_del_phy`
++
++These function are already hooked into the phylib subsystem, so all PHYs that
++are linked to a net_device through :c:func:`phy_attach_direct` will automatically
++join the netdev's topology.
++
++PHYs that are on a SFP module will also be automatically registered IF the SFP
++upstream is phylink (so, no media-converter).
++
++PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
++and :c:func:`phy_sfp_detach_phy`, which can be used as a
++.attach_phy / .detach_phy implementation for the
++:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
++
++UAPI
++====
++
++There exist a set of netlink commands to query the link topology from userspace,
++see ``Documentation/networking/ethtool-netlink.rst``.
++
++The whole point of having a topology representation is to assign the phyindex
++field in :c:type:`struct phy_device <phy_device>`. This index is reported to
++userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
++will result in all PHYs from all net_device being listed. The DUMP command
++accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
++to be passed in the request to filter the DUMP to a single net_device.
++
++The retrieved index can then be passed as a request parameter using the
++``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
++
++* ``ETHTOOL_MSG_STRSET_GET`` to get the stats string set from a given PHY
++* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
++  cable testing on a given PHY on the link (most likely the outermost PHY)
++* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
++* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
++  to set the PLCA (Physical Layer Collision Avoidance) parameters
++
++Note that the PHY index can be passed to other requests, which will silently
++ignore it if present and irrelevant.
 -- 
 2.45.1
 
