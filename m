@@ -1,80 +1,87 @@
-Return-Path: <netdev+bounces-109346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDCA9280E3
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 05:21:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CA592811E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2FD21F230FC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 03:21:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90BE284D0B
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 04:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F3A1B963;
-	Fri,  5 Jul 2024 03:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1A03AC16;
+	Fri,  5 Jul 2024 04:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="0IKqpZJg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFYh9zvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4109F9C9
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 03:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BBB81E;
+	Fri,  5 Jul 2024 04:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720149660; cv=none; b=U1SYdj7xZW1AbaLEN5RIIH+YTUd8QUJqKu2D1j0Akf9/o0V1tsik99QRtzP5xKDPqUht0Bl38jlEPgWyLGtTNtdsy2MpUUPp7ZiKSLAt8CeMN6EBLyDCwG4ROIMztV9R4XNd6fa9ccKC8bp39WcZNpj3+LhBc//UrylQfQVf/pg=
+	t=1720152038; cv=none; b=XM4POc7h58XVDC5930naz2SC+qFMkwu4o54OL8IOOqoVH+j6s5lRitbdbaiK39QAFm1/9ttCfSn+QaDamwtDUPldFYjQgH55BeRNMECSe7BofLlct0jb2IR0USqTyCLpKuTE5yR23iPqS90cPScBt7Jf9kTbl5jzKj/l2MIqVxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720149660; c=relaxed/simple;
-	bh=8w+l88N0ay0DP5baXPiAOfw5yIbPXiW0S1kxxDfJ4g4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fn51iYwwdaMeAYnCKwKfLhWATBU8tOnLJu+JAcflBenW2kVxRGFqnvLRulEJYSTO5AvyV4/xmS9NYEVMNEKzMSydI7R/3sCpeJ4CC3MjMoPv4rp3kCCIajtH9uSoId8Z/uM4gFWXuogJVn99cgQMUy0clrIxkNOlBGYudtZbM+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=0IKqpZJg; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-701eea2095eso700901a34.2
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 20:20:58 -0700 (PDT)
+	s=arc-20240116; t=1720152038; c=relaxed/simple;
+	bh=WaumuGDGrorQizvhwn22mns7Wbc5Sh2UiLhtc9m1eCg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Csjnnort7cbI3RkcghyTSMfSz4K1odZZ1OERosyO5GyD4HUPLIyk+exKusAoxYrOtxJmADqUP/kweUfQRyVYeOGQK4Q/r58MrOdWzgmsj84ICgXtOVSMOWzRDiTgOJP/07gHHsvN5TjwU0QB4Icg56dR+ohWOwzn5aAhHOLpjtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFYh9zvj; arc=none smtp.client-ip=209.85.210.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-70211abf4cbso802238a34.3;
+        Thu, 04 Jul 2024 21:00:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1720149658; x=1720754458; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720152036; x=1720756836; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4m+wLWb9gkModAj2RkagVThSSmZ6lzDQL2hRBJ4sn6M=;
-        b=0IKqpZJgEb7zOeNHrzFg5EsrBTOwXBkYI3lFEDC7H5ErkPQCNXEVfbxNANom4bKzkz
-         LwF33hkfzuyNTocdvzd+ipL9jtKJarKJym91341V/BNQAH2/4+iS1aMrEfFA4f9NelPM
-         vzWU9zPBAIIGdfzjaScIgKZvB2BjUZMNev6yA8zQBsgiqsZULLZiNnhL5jguW+N9b2Hv
-         m4D+8kWUWyjOfypQiT0rvBzb8jDW8FmNdc7iJUhp9Sms+AqR94AmpktwfqlB3gPLG0SC
-         MTc1VQsPgAOdRYABuk3AO4OpviYbb8maZfCUAiSc75IOL5XnlLVg0IIE0UQpIeT6zDiv
-         x0zA==
+        bh=vkEn4BlrQbhC1pOzdi5ltRctTkOQPmmbMk4HFASDkZk=;
+        b=CFYh9zvj48ZLxAEwqfL79ELsOs0RjA3MKaA1bn032Z1wmRAagnEluPS+pyOvz7AeXs
+         t+cuz/7pBY3mBnqRYp2/YCBZZguW/7Az+/ff60xbT1IfV0liSzJpIte3uL2sTOVyrOy/
+         fyO4jL7fXq13DToVGuGBl0/0/CcpuyNXUsgOj3CGyOQfV9rckn55TBpB40DsjRTFs8Hw
+         aQmaxjjeTyAq7bZ5xwcGlh/0Gem3BThnkFhx5icFsrN8f4JGq7B974Er14klSKF+eOwZ
+         LFtDePp4iOil/iUDe0EjECyyQAPFRUtFuXuuhRLL9Tn8ni8XsRHyqQeTi+1RcrkfRSWx
+         V4vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720149658; x=1720754458;
+        d=1e100.net; s=20230601; t=1720152036; x=1720756836;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4m+wLWb9gkModAj2RkagVThSSmZ6lzDQL2hRBJ4sn6M=;
-        b=QFTsFgW/9TOdqelrlk7hMQU8AuFOrUIBlbEQlD6jDcCDl5jdjy/ZeW2Lbdk5R7ozju
-         Q9JZeEfLJ2PniofH1TJQJxPykHrtOvUKiEv0wxpG+1GsAkCMTlUWAbkmOGtRG+nrMgwo
-         DJBrUTvmHZ/1PQ62qyTRoM7q67YA9Zl1nKcjVeniES2yrqUFhaCRbN/heMHqYG+iK/Od
-         O8y+U/YCVg2IAAY3pp/jpty7x3ZcSPAfcMoOoJ0U+KdYKHiwmgpA9QmTAzs8tXgkQfuB
-         tTBnT/6iIpCyO1qX0skUU/XfEEc9fT3yIwmUoBBFgYYPV0dnVjibD2v00SEunbtIcrLf
-         1rxg==
-X-Gm-Message-State: AOJu0YxaqMjrtr5lDWH0vnJ+K11m2lRQwpfrAfWIkDfSsCfkk4g+6u4U
-	ujhwHxrswPVIG7chiAVrUmVJXV20YAhWqQ4Aa12TpWMQtYdSl+6yZ/kAHmaYnhE=
-X-Google-Smtp-Source: AGHT+IFn2XdhgB88bdLcHkqaGNa+vFp/NLHEl4eeGjUKhR5UGYOLVChbMaJJftp5OFbUBLt+g2QsXg==
-X-Received: by 2002:a9d:7382:0:b0:701:f4b0:bef9 with SMTP id 46e09a7af769-7034a74cdebmr3575073a34.14.1720149657296;
-        Thu, 04 Jul 2024 20:20:57 -0700 (PDT)
-Received: from echken.smartx.com ([103.172.41.204])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-70afaa8126dsm2433163b3a.197.2024.07.04.20.20.54
+        bh=vkEn4BlrQbhC1pOzdi5ltRctTkOQPmmbMk4HFASDkZk=;
+        b=Zr889/SvVuCgk0xQeTe8LRkzmGXAovNwYFgEV7GVfsVdC8ib5Q3Vi1j1IBBTUemykp
+         rcvX1+Ea/5O3pNNyyYKxgZhmbR/mpIuw6hHBZZYaLOAsI6xcsrkTHAXGH6y9TOrX8xD6
+         Bnncg06hpZPS37X5EtWvK+03UCfSXiX4+hVa/xDpqqsVyfF+oN/yO8sk1E7e+2vkybGT
+         CYlxK85gVTrv0BxFH809EWpIWAgS5uKaXaiXNX8MRAje+QmvlBR2HXVRvDj5fwjrGOz1
+         ABmsh2JbFyH+eX3c7tinJm4g7T9W0NtR+rcr7dp7YAnmOx++PfvGTFLP/WrxMi8czsBC
+         f2ag==
+X-Forwarded-Encrypted: i=1; AJvYcCXEZgnlhPgQ+os4QETF8uWrweade5cQippcG8ZQoadfGb0zJjDRLZ1LA88zyGVmm2u0KHn88IVwjiQ2v3hu/cuM8NN8aWcqOWxGWul+1Q9POrGkXBj2Aus11MYFP3O+HKseBg/ler1qV3XAfov9t8Vxz+y8+UsT9/UhOUgswv6OASuBCfB3
+X-Gm-Message-State: AOJu0Yxyf+KnKzRTP4RY5SAX10cDxVSz/L75WUsDUYgKQ8EFuWu+240z
+	KBq5ogOFQo0LbT05klq3YqqB/l7zZUjHxGmGKTuXqRARUMJFiegm
+X-Google-Smtp-Source: AGHT+IEzVcTG/3nA8s2W+/eTJlO4NkviPp0EvCHcEHRkzD3jDNBYwIycFpwpA+78ZiLgpE6T2daCrg==
+X-Received: by 2002:a05:6871:548:b0:24f:eada:e32 with SMTP id 586e51a60fabf-25e2ba220f4mr3167869fac.17.1720152035861;
+        Thu, 04 Jul 2024 21:00:35 -0700 (PDT)
+Received: from localhost.localdomain ([166.111.236.150])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6afb54basm8809424a12.39.2024.07.04.21.00.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 20:20:56 -0700 (PDT)
-From: echken <chengcheng.luo@smartx.com>
-To: davem@davemloft.net,
+        Thu, 04 Jul 2024 21:00:35 -0700 (PDT)
+From: yyxRoy <yyxroy22@gmail.com>
+X-Google-Original-From: yyxRoy <979093444@qq.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	gregkh@linuxfoundation.org
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	echken <chengcheng.luo@smartx.com>
-Subject: [PATCH] Support for segment offloading on software interfaces for packets from virtual machine guests without the SKB_GSO_UDP_L4 flag.
-Date: Fri,  5 Jul 2024 03:20:48 +0000
-Message-Id: <20240705032048.110896-1-chengcheng.luo@smartx.com>
+	yyxRoy <979093444@qq.com>
+Subject: [PATCH] netfilter: conntrack: tcp: do not lower timeout to CLOSE for in-window RSTs
+Date: Fri,  5 Jul 2024 12:00:13 +0800
+Message-Id: <20240705040013.29860-1-979093444@qq.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,40 +91,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When running virtual machines on a host, and the guest uses a kernel
-version below v6.2 (without commit https://
-github.com/torvalds/linux/commit/860b7f27b8f78564ca5a2f607e0820b2d352a562),
- the UDP packets emitted from the guest do not include the SKB_GSO_UDP_L4
-flag in their skb gso_type. Therefore, UDP packets from such guests always
-bypass the __udp_gso_segment during the udp4_ufo_fragment process and go
-directly to software segmentation prematurely. When the guest sends UDP
-packets significantly larger than the MSS, and there are software
-interfaces in the data path, such as Geneve, this can lead to substantial
-additional performance overhead.
+With previous commit https://github.com/torvalds/linux/commit/be0502a
+("netfilter: conntrack: tcp: only close if RST matches exact sequence")
+to fight against TCP in-window reset attacks, current version of netfilter
+will keep the connection state in ESTABLISHED, but lower the timeout to
+that of CLOSE (10 seconds by default) for in-window TCP RSTs, and wait for
+the peer to send a challenge ack to restore the connection timeout
+(5 mins in tests).
 
-Signed-off-by: echken <chengcheng.luo@smartx.com>
+However, malicious attackers can prevent incurring challenge ACKs by
+manipulating the TTL value of RSTs. The attacker can probe the TTL value
+between the NAT device and itself and send in-window RST packets with
+a TTL value to be decreased to 0 after arriving at the NAT device.
+This causes the packet to be dropped rather than forwarded to the
+internal client, thus preventing a challenge ACK from being triggered.
+As the window of the sequence number is quite large (bigger than 60,000
+in tests) and the sequence number is 16-bit, the attacker only needs to
+send nearly 60,000 RST packets with different sequence numbers
+(i.e., 1, 60001, 120001, and so on) and one of them will definitely
+fall within in the window.
+
+Therefore we can't simply lower the connection timeout to 10 seconds
+(rather short) upon receiving in-window RSTs. With this patch, netfilter
+will lower the connection timeout to that of CLOSE only when it receives
+RSTs with exact sequence numbers (i.e., old_state != new_state).
+
+Signed-off-by: yyxRoy <979093444@qq.com>
 ---
- net/ipv4/udp_offload.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/netfilter/nf_conntrack_proto_tcp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 59448a2dbf2c..6aa5a97d8bde 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -402,6 +402,13 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
- 	if (unlikely(skb->len <= mss))
- 		goto out;
- 
-+	if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST)) {
-+		/* Packet is from an untrusted source, reset gso_segs. */
-+		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len - sizeof(*uh),
-+							 mss);
-+		return NULL;
-+	}
-+
- 	/* Do software UFO. Complete and fill in the UDP checksum as
- 	 * HW cannot do checksum of UDP packets sent as multiple
- 	 * IP fragments.
+diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
+index ae493599a..d06259407 100644
+--- a/net/netfilter/nf_conntrack_proto_tcp.c
++++ b/net/netfilter/nf_conntrack_proto_tcp.c
+@@ -1280,7 +1280,8 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+ 	if (ct->proto.tcp.retrans >= tn->tcp_max_retrans &&
+ 	    timeouts[new_state] > timeouts[TCP_CONNTRACK_RETRANS])
+ 		timeout = timeouts[TCP_CONNTRACK_RETRANS];
+-	else if (unlikely(index == TCP_RST_SET))
++	else if (unlikely(index == TCP_RST_SET) &&
++		 old_state != new_state)
+ 		timeout = timeouts[TCP_CONNTRACK_CLOSE];
+ 	else if ((ct->proto.tcp.seen[0].flags | ct->proto.tcp.seen[1].flags) &
+ 		 IP_CT_TCP_FLAG_DATA_UNACKNOWLEDGED &&
 -- 
 2.34.1
 
