@@ -1,127 +1,83 @@
-Return-Path: <netdev+bounces-109445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932C59287E1
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 616989287EC
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52CF1C23D9D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:24:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 933F31C20BA7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FB1148FF3;
-	Fri,  5 Jul 2024 11:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42383149C51;
+	Fri,  5 Jul 2024 11:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m9A0KCF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7038149C53;
-	Fri,  5 Jul 2024 11:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7FE149C4B
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720178673; cv=none; b=Czg8VRr3aPm9WRG+SGyHF8c1ttjGDwsJGqdg/IxOTckp9GHqM1WgWxas8kCgSOel/FckXLgz33C0Mx/HC6YrEIfw38rEFkTQVHTj2G9kXYfCGEI7Xhm4fV2MSeZ9AXCrCYWbthUxM7FR1BDui+5wJwRACpRJt7BK1OHIt48hpUA=
+	t=1720178825; cv=none; b=hX/pZlrtrsroq16jWBUjysURd+f2dQT0doZSKHziEDksBU3pzzysRbY18f+ufarTvLUZ3nKz94bImxIBrAGpICsJLC/bnh71e5vBYdC0ZjXc5MG3pOiwrm35bf42qjhDmqnRg8ArS+io9mGUdUQqtsKMcpWaUofY4xQasy8aoII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720178673; c=relaxed/simple;
-	bh=7s23rkWuC612dnSWcePNRJLy1PhobERMINXQ/deokm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zdi5cLi7i1E8MVRmWxTVnu5L//Ae6KhIfQu53VB5ilko3dA+mgygb08hzdp3T2kxDKv6paWdL4irbtHCBzs4hhBCclNCui0yufhUvUcuTCzlH+CCT4+l9psNe7JClfjEf0+8RVyNRaSsA8JizzP21uacqHdnaQggwTW9QjdKLN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sPh37-00000000572-213d;
-	Fri, 05 Jul 2024 11:24:21 +0000
-Date: Fri, 5 Jul 2024 12:24:18 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: linux-mediatek@lists.infradead.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Elad Yifee <eladwf@gmail.com>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next] net: ethernet: mediatek: Allow gaps in MAC
- allocation
-Message-ID: <ZofX4qfGf93Q8jys@makrotopia.org>
-References: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org>
- <3bda121b-f11d-44d1-a761-15195f8a418c@intel.com>
- <C24C4687-1C00-434D-8C37-BDB85E39456C@makrotopia.org>
+	s=arc-20240116; t=1720178825; c=relaxed/simple;
+	bh=3KuxEM/+l5r0XBieG6SH9ClxZdwePH/a6D/GClTvD98=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hkE9ROnwOVoUFoqm+f68tzIBhpTGOI1f6vHB7Y0OwYY7mJiJnncxXFKaH4GSDPd+JUnjjBWNppXZDawQq18YI+C2TziBKsTe27YYG/pc9gZtnWrBBa5BRZVR2xux/Oveuwaj6tSgozMnK6CQXgpbvCRaOnMmDYDmUl2PFVXwja8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m9A0KCF5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA0BC116B1;
+	Fri,  5 Jul 2024 11:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720178824;
+	bh=3KuxEM/+l5r0XBieG6SH9ClxZdwePH/a6D/GClTvD98=;
+	h=From:Subject:Date:To:Cc:From;
+	b=m9A0KCF5DGI88mmboqAZ+n6wU01PRKA49wp54/8O43iUqQrTqfYEf/imk6sG7u+xS
+	 W64VAaO+JQz0f+kt2sPUQ882b/vC3Ba3dPxvfhl4hsqdYo2Cf/AL2IZobbbhXPvwLH
+	 m3S7D0L3wuiW5lWZbA+9f5z2MfizZintE3gFBtgMIOlojowrmld095xS9KGFObm+QD
+	 kTBFqm0XC2OPu1cEI/F2FRBc6thAHNLmJgmdBgWZw+4ZeFjzRERW/Ai4CxoTsu83Gt
+	 a3heF1HtsKwtSm6XHC/W8btvyJPf+KtqyQcjmtKb4WaHpAmMxJolpOF91KbqjXSnlN
+	 Q3hNpUdI1qbVg==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 0/3] bnxt_en: address string truncation
+Date: Fri, 05 Jul 2024 12:26:46 +0100
+Message-Id: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <C24C4687-1C00-434D-8C37-BDB85E39456C@makrotopia.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHbYh2YC/x3MTQqAIBBA4avErBtQ+zG6SrSonGo2U6iEIN09a
+ fnB42UI5JkCjFUGTw8HvqRA1xVs5yIHIbtiMMq0yqoOV0kRQ/RoBm0XbXXfNg5KfnvaOf2rCYQ
+ iCqUI8/t+0whlDGQAAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org
+X-Mailer: b4 0.12.3
 
-Hi netdev maintainers,
+Hi,
 
-On Tue, Jul 02, 2024 at 09:05:19AM +0000, Daniel Golle wrote:
-> >what about:
-> >4733│ static int mtk_sgmii_init(struct mtk_eth *eth)
-> >4734│ {
-> >4735│         struct device_node *np;
-> >4736│         struct regmap *regmap;
-> >4737│         u32 flags;
-> >4738│         int i;
-> >4739│
-> >4740│         for (i = 0; i < MTK_MAX_DEVS; i++) {
-> >4741│                 np = of_parse_phandle(eth->dev->of_node, "mediatek,sgmiisys", i);
-> >4742│                 if (!np)
-> >4743│                         break;
-> >
-> >should we also continue here?
-> 
-> Good point. As sgmiisys is defined in dtsi it's not so relevant in
-> practise though, as the SoC components are of course always present even
-> if we don't use them. Probably it is still better to not be overly
-> strict on the presence of things we may not even use, not even emit an
-> error message and silently break something else, so yes, worth fixing
-> imho.
-> 
+This series addresses several string truncation issues that are flagged
+by gcc-14. I do not have any reason to believe these are bugs, so I am
+targeting this at net-next and have not provided Fixes tags.
 
-I've noticed that this patch was marked as "Changes Requested" on patchwork
-despite having received a positive review.
+---
+Simon Horman (3):
+      bnxt_en: check for fw_ver_str truncation
+      bnxt_en: check for irq name truncation
+      bnxt_en: avoid truncation of per rx run debugfs filename
 
-I'm afraid this is possibly due to a misunderstanding:
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 30 +++++++++++++++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c |  4 +--
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 23 +++++++++++------
+ 3 files changed, 40 insertions(+), 17 deletions(-)
 
-The (unrelated and rather exotic) similar issue pointed to by Przemek
-Kitszel should not be fixed in the same commit. It is unrelated, and if
-at all, should be sent to 'net' tree rather than 'net-next'.
+base-commit: aba43bdfdccf15da1dfdc657bd9dada9010d77a4
 
-Looking at it more closely I would not consider it an issue as we
-currently in the bindings we **require** the correct number of sgmiisys phandles to be
-present for each SoC supporting SGMII:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/net/mediatek,net.yaml#n200
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/net/mediatek,net.yaml#n245
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/net/mediatek,net.yaml#n287
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/net/mediatek,net.yaml#n325
-
-Hence there aren't ever any gaps, also because the sgmiisys phandles are
-defined in the SoC-specific DTSI **even for boards not making any use of
-them**.
-
-I hence would like this very patch to be merged (or at least discussed)
-as-is, and if there is really a need to address the issue mentioned by
-Przemek Kitszel, then deal with it in a separate commit.
-
-
-Cheers
-
-
-Daniel
 
