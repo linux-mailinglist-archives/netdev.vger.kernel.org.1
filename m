@@ -1,102 +1,229 @@
-Return-Path: <netdev+bounces-109546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24633928B8D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 17:21:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E409928BFD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 17:53:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F915B22BE8
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:21:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ED9A28258D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBFE16C688;
-	Fri,  5 Jul 2024 15:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mGstUTGf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7D716CD13;
+	Fri,  5 Jul 2024 15:53:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA1014AA0
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 15:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C722B9B9
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 15:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720192902; cv=none; b=mSAsz7kd+BPELeLlFi/EdiKr/GADsJo9ajWBhZlrTvCpIYrENJN+uBcsv8IPOXsgEVMl/tGRsI5mSTPbGb5GReCSfZXaCS6AMkhmq5+OPekkRs4YoLcklPAx/kUL8l93BJP4GEJIbUsRoKoelzZC3o8hNEFM/SqmsBWe+2hPEC0=
+	t=1720194792; cv=none; b=HFBh/KzK7KudP6hBJrxWcC+AhLckV/NfnwZPrG1c9CK86GkMWGl5ASBNCY4ghMcREXHBOcfTBQnVWtmSV8sweiUPGyQYDmouEsUDSB+90Y9TjhZYcw84zdC+LzK4iX37vKaEn3ppGNS1uWzOKLYrbZHqX2Rr/yEvIxbIi6XX+jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720192902; c=relaxed/simple;
-	bh=iU9YW4M4qVClrJ65RPjTEgtYq5wl0ooEWFamMJ6+c1U=;
+	s=arc-20240116; t=1720194792; c=relaxed/simple;
+	bh=Js1jHHcbW9bl2iGDt0WGXDTwBcDTsvtF99F1XVhBwc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nw4hT5KfAdYF33Sd2M564D4v9YRC6DOjrxv45EtgbxNk+L5/VzH6/JIpnsndw5eUoXasoFVe+9/HY6GD9YdLaN8KUAxgLThp/Jzz47Kxx1Q94nZYEi5a/uD5NlMuljYhf0+XaYLHPjmnc2uNfeo80JvSfk4vNLq2Mqkt07p4EW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mGstUTGf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD713C116B1;
-	Fri,  5 Jul 2024 15:21:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720192902;
-	bh=iU9YW4M4qVClrJ65RPjTEgtYq5wl0ooEWFamMJ6+c1U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mGstUTGff+7qIef+smpEPXj9NZfC+VjFkhK44hOM51iWNS0Zh2MXjAUFfukwy9Tu0
-	 HjLIiGsDqlggV56hl2ncOiknuZ8nNyqHySQgQmBa1ubs65qt05HfmJABUA8N+1efPF
-	 JW3aWY75DG5Z6uy9gR3g7ipDwZkQPvi+kiJ3djEh1AHsGviyv3f46QGei2wIG93jbg
-	 0KpNZ5W4B1WQ0KDVySrhQ6yMB6JzJSk4hWvBJfplAQpI+fCdT2YOJ1vSc7jhG29I++
-	 a+dsbR8j888kOYxN8GTTWurQcwp7HmpKMjfO7xYEkzkDgIJxDZCjn6wPXxUfgHrIB4
-	 6F5I2KFjp5jZQ==
-Date: Fri, 5 Jul 2024 16:21:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next] net: tls: Pass union tls_crypto_context pointer
- to memzero_explicit
-Message-ID: <20240705152138.GF1095183@kernel.org>
-References: <20240705-tls-memzero-v1-1-0496871cfe9b@kernel.org>
- <bb960821-a67b-4d61-afeb-ead10ea2a4dc@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mbajvD8IhJXkfO/M9t/c0X0s8slfizQCpccIiAesbSV717A7uy78FIVuq6B5Bm/fcjBQfbxOT1Fyhf9ayL66KWf6S0wul2ZNUPX807iTMyLl2dsGq0wQSAelLglMxMbRnTBQzqD1dvFLOTNsHLFMow1VRSlTErohDWhvEu2OS9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPlEo-0005qz-V1; Fri, 05 Jul 2024 17:52:42 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPlEm-007MEv-17; Fri, 05 Jul 2024 17:52:40 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sPlEl-00GTcu-30;
+	Fri, 05 Jul 2024 17:52:39 +0200
+Date: Fri, 5 Jul 2024 17:52:39 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, davem@davemloft.net, hkallweit1@gmail.com,
+	Yuiko.Oshino@microchip.com, linux@armlinux.org.uk,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	f.fainelli@gmail.com, kuba@kernel.org, michal.kubiak@intel.com,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	florian.fainelli@broadcom.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/1] net: phy: microchip: lan937x: add
+ support for 100BaseTX PHY
+Message-ID: <ZogWx59tzuH7t4PG@pengutronix.de>
+References: <20240705085550.86678-1-o.rempel@pengutronix.de>
+ <457179162ca6fd067b22b3b7733c60c2a17129a5.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <bb960821-a67b-4d61-afeb-ead10ea2a4dc@intel.com>
+In-Reply-To: <457179162ca6fd067b22b3b7733c60c2a17129a5.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Jul 05, 2024 at 03:54:59PM +0200, Przemek Kitszel wrote:
-> On 7/5/24 15:41, Simon Horman wrote:
-> > Pass union tls_crypto_context pointer, rather than struct
-> > tls_crypto_info pointer, to memzero_explicit().
+On Fri, Jul 05, 2024 at 03:15:36PM +0000, Arun.Ramadoss@microchip.com wrote:
+> Hi Oleksij,
+> On Fri, 2024-07-05 at 10:55 +0200, Oleksij Rempel wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
 > > 
-> > The address of the pointer is the same before and after.
-> > But the new construct means that the size of the dereferenced pointer type
-> > matches the size being zeroed. Which aids static analysis.
+> > Add support of 100BaseTX PHY build in to LAN9371 and LAN9372
+> > switches.
 > > 
-> > As reported by Smatch:
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> > ---
+> > changes v2:
+> > - move LAN937X_TX code from microchip_t1.c to microchip.c
+> > - add Reviewed-by tags
+> > ---
+> >  drivers/net/phy/microchip.c | 75
+> > +++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 75 insertions(+)
 > > 
-> >    .../tls_main.c:842 do_tls_setsockopt_conf() error: memzero_explicit() 'crypto_info' too small (4 vs 56)
+> > diff --git a/drivers/net/phy/microchip.c
+> > b/drivers/net/phy/microchip.c
+> > index 0b88635f4fbca..b46d5d43e2585 100644
+> > --- a/drivers/net/phy/microchip.c
+> > +++ b/drivers/net/phy/microchip.c
+> > @@ -12,6 +12,12 @@
+> >  #include <linux/of.h>
+> >  #include <dt-bindings/net/microchip-lan78xx.h>
 > > 
-> > No functional change intended.
-> > Compile tested only.
-> > 
-> > Signed-off-by: Simon Horman <horms@kernel.org>
+> > +#define PHY_ID_LAN937X_TX                      0x0007c190
 > 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> one small nitpick only
+> 0x0007c190 -> 0x0007C190
 
-...
+Why? 
 
-> > @@ -710,7 +713,7 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
-> >   	return 0;
-> >   err_crypto_info:
-> > -	memzero_explicit(crypto_info, sizeof(union tls_crypto_context));
-> > +	memzero_explicit(crypto_ctx, sizeof(union tls_crypto_context));
+I wrote a python script to gather stats in the drivers/net/phy:
+
+Uppercase hex digits count:
+E: 83
+F: 216
+C: 130
+A: 148
+B: 65
+D: 74
+
+Lowercase hex digits count:
+b: 218
+a: 337
+d: 190
+e: 238
+f: 2560
+c: 368
+
+Sum of uppercase A-F: 716
+Sum of lowercase a-f: 3911
+
+> > +#define LAN937X_MODE_CTRL_STATUS_REG           0x11
+> > +#define LAN937X_AUTOMDIX_EN                    BIT(7)
+> > +#define LAN937X_MDI_MODE                       BIT(6)
+> > +
+> >  #define DRIVER_AUTHOR  "WOOJUNG HUH <woojung.huh@microchip.com>"
+> >  #define DRIVER_DESC    "Microchip LAN88XX PHY driver"
 > 
-> nit: That's a good fix to aid static analyzers, and reviewers.
-> Now it's also easy to follow the standard style and pass
-> sizeof(*crypto_ctx) instead of the type.
+> nitpick:
+> It can be updated to include "Microchip LAN88XX/LAN937X TX PHY driver"
 
-Thanks, that is a good suggestion.
-I'll incorporate it in a v2.
+ack
+
+> > @@ -373,6 +379,66 @@ static void lan88xx_link_change_notify(struct
+> > phy_device *phydev)
+> >         }
+> >  }
+> > 
+> 
+> Adding function description will be good.
+
+ack
+
+> > +static int lan937x_tx_config_mdix(struct phy_device *phydev, u8
+> > ctrl)
+> > +{
+> > +       u16 val;
+> > +
+> > +       switch (ctrl) {
+> > +       case ETH_TP_MDI:
+> > +               val = 0;
+> > +               break;
+> > +       case ETH_TP_MDI_X:
+> > +               val = LAN937X_MDI_MODE;
+> > +               break;
+> > +       case ETH_TP_MDI_AUTO:
+> > +               val = LAN937X_AUTOMDIX_EN;
+> > +               break;
+> > +       default:
+> > +               return 0;
+> > +       }
+> > +
+> > +       return phy_modify(phydev, LAN937X_MODE_CTRL_STATUS_REG,
+> > +                         LAN937X_AUTOMDIX_EN | LAN937X_MDI_MODE,
+> > val);
+> > +}
+> > +
+> > +static int lan937x_tx_config_aneg(struct phy_device *phydev)
+> > +{
+> > +       int ret;
+> > +
+> > +       ret = genphy_config_aneg(phydev);
+> > +       if (ret)
+> 
+> Is this if( ret < 0) ?
+
+ack
+
+> > +               return ret;
+> > +
+> > +       return lan937x_tx_config_mdix(phydev, phydev->mdix_ctrl);
+> 
+> why we need to pass argument phydev->mdix_ctrl, since already phydev is
+> passed.
+
+good point.
+
+> Also IMO, this two function can be combined together if
+> lan937x_tx_config_mdix is not used by other functions. 
+
+I disagree here.
+
+> > +{
+> > +       PHY_ID_MATCH_MODEL(PHY_ID_LAN937X_TX),
+> > +       .name           = "Microchip LAN937x TX",
+> > +       .suspend        = genphy_suspend,
+> > +       .resume         = genphy_resume,
+> > +       .config_aneg    = lan937x_tx_config_aneg,
+> > +       .read_status    = lan937x_tx_read_status,
+> 
+> Do we need to add genphy_suspend/resume, .features?
+
+From PHY driver perspective - yes, otherwise to suspend or resume will be
+called.
+From internal PHY perspective - i do not know. Will the MAC disable PHY
+automatically?
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
