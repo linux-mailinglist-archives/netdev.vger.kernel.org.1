@@ -1,99 +1,190 @@
-Return-Path: <netdev+bounces-109358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5424A928215
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 08:29:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6B00928221
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 08:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1022D286B7A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:29:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D2FFB225D3
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA986E5FD;
-	Fri,  5 Jul 2024 06:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E69C13C8F9;
+	Fri,  5 Jul 2024 06:34:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5006E611
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 06:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB76A17995
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 06:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720160985; cv=none; b=WbCDG1C+xGlrN9+iwmDrvlHH1i5xlBWWjtcf4OrKtxvZQZG03Ym61Ccddf4Ejdbvi1gX4T/kXavxcedmjHprf+hD7a12M65esKEJorZdRmRVBWHxqPuDPzneeAb/j93sF0GOCjkR/g86fNNvWp0bKqZceFt2G29tjQqqBI49QPY=
+	t=1720161264; cv=none; b=BTQs/lhenl33TK1XHEyhVlDCYqO11KMHT+M9S6Bkqlkce8Nrge3HFqIt61n49Ksy9PafBEMn/FlpNy1brdeVnG/UtgMW4/+ycEmu4geRYPbXEzasqSZUe7hnqyViJv1qDYZfyEWI+ukyhWpxBKQCg8j1BWO+wj4HUFVnR4pMXhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720160985; c=relaxed/simple;
-	bh=5Ef4WJT1iwgXPMJStNYXCB+2Hk6u8dYrVg+1AB1g10A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=db5xfTxnXSFXxT+caPw1VBjXySBOeX6iYQnFFrs0H/vscsZS32mWB5AYeG9WbkIzCj4LtAelbdblY0hkJEqdTr4ziuH9j1jclKB51+A4Vm6SFmQaw9ScEUuzfcz7XwcqS7FsG+BxG85WX2uU8A4wEqpMi140xYY8W+8xHQce3B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPcRS-0004x3-8p; Fri, 05 Jul 2024 08:29:10 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPcRQ-007GQD-70; Fri, 05 Jul 2024 08:29:08 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sPcRQ-00GM3S-0N;
-	Fri, 05 Jul 2024 08:29:08 +0200
-Date: Fri, 5 Jul 2024 08:29:08 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Woojung.Huh@microchip.com
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
-	f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com,
-	Arun.Ramadoss@microchip.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, Yuiko.Oshino@microchip.com,
-	UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] net: phy: microchip: lan937x: add
- support for 100BaseTX PHY
-Message-ID: <ZoeStBG6aGu9WmHu@pengutronix.de>
-References: <20240704135850.3939342-1-o.rempel@pengutronix.de>
- <BL0PR11MB29132F1C667E478728BCE4ECE7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
- <ZobyTGbbzXlhTBbz@pengutronix.de>
- <BL0PR11MB2913A0855BCD3EFF290F8018E7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1720161264; c=relaxed/simple;
+	bh=85Es58jzRms7gGzAuuYOZ6vgzuUrUwVycYLN/X+iT3o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sKIOUcVrHYYtwZmaEANstSnQ3fVKysQjZlubB74Z54VkuyCPY4n6IDEL/1P+hzB5MabCJwPowELtuGDW6mGzeLfUM9SLBZWseiUHnulFP/AAnS/UnIo/ikxpTkef15aaaTHJXnLuFUlIFJKVAcb0httqRpiOwGOdu5+Dd1fLoYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7f63eb9f141so200522139f.1
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 23:34:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720161262; x=1720766062;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qmwBaO/n15LUxmQZN3FFPDmzpBVBWqHutkbJ10gUEEU=;
+        b=S7FSxgqk86SmzK65NToVZhjkJZv4zDxaM7y0zBJfJEBYEgr1aV5MvKTVSafAoxQmfy
+         0Ga4JfgkKB3kkUEAm2FlbkmMVOG6VUTE5u4kSJY0XDP7GI4kAQb9o3OU2kdNcpAssSbN
+         /7a8Hs6Jz5gw8uZAuz/slOHPlD+xauGiPnO/u+ALoT0pBZuF3nL4H/43sRpLSZHVw6fR
+         tdWbUO3fiFIVGGsjZz+tiJLR10R9yQzkH1kl6poMZNPKo+n1Ay91yNyNNlfsDt9pOQtm
+         uKOmgBx/j+ltbZFmKi6jdJ6MYdELC2gKhqdyeh7xEIE0VzawqogbP16JR405TTQTHYmA
+         6ORA==
+X-Forwarded-Encrypted: i=1; AJvYcCWVDbrmJxbq5fYg0ZUnMI+MeAxEsRJVIkqY+KgwnMx+EIrEk5EDbGewCEaHqghRoXBm9gSO9Xq3hN7QqV9Zweu+K9r2W4OH
+X-Gm-Message-State: AOJu0YwxxnfG+c3NXVYUWQGSZqiPkZtajDwX82BrGIVN+BiJ+3kzjhey
+	mDWde7aUsPaKaEcR2gGIa0L7UL9TTlnC2tJiwqIMIm9HpnNAebKqSNcnH5t2hcmptdnZIfiNhKF
+	pFGSyKTj7Rn+NCvtB3+Ebua/Z+8iLd6I3mhIjYAUiVvtVQks5MPnKCqc=
+X-Google-Smtp-Source: AGHT+IFdRzcPV6uGugz7sSwHdnfjiuWtXM06p4xdJFyJKwULHmEagLqf+0Y5Iux5mmzLN1CcXeW9kktxQis8mZbS6ifBd7NE+3Ut
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <BL0PR11MB2913A0855BCD3EFF290F8018E7DE2@BL0PR11MB2913.namprd11.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Received: by 2002:a05:6638:22cb:b0:4b9:ad94:2074 with SMTP id
+ 8926c6da1cb9f-4bf6bd341c1mr239454173.3.1720161262181; Thu, 04 Jul 2024
+ 23:34:22 -0700 (PDT)
+Date: Thu, 04 Jul 2024 23:34:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000fd3017061c7a405c@google.com>
+Subject: [syzbot] [net?] [bpf?] general protection fault in xdp_do_generic_redirect
+From: syzbot <syzbot+380f7022f450dd776e64@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 04, 2024 at 08:02:00PM +0000, Woojung.Huh@microchip.com wrote:
-> Hi Oleksij,
-> 
-> phy/microchip.c would be a file for this 100Base-TX PHY of LAN937x.
+Hello,
 
-Thx!
+syzbot found the following issue on:
 
-Are there any diagnostic features in this? I was not able to find
-anything in the register manual, MDIX status, no cable testing or
-counters. Do I hold it wrong? How about the T1 PHY? Are there anything
-beside cable testing and SQI?
+HEAD commit:    0b58e108042b Add linux-next specific files for 20240703
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15de4eb9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ed034204f2e40e53
+dashboard link: https://syzkaller.appspot.com/bug?extid=380f7022f450dd776e64
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1d079762feae/disk-0b58e108.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e53996c8d8c2/vmlinux-0b58e108.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a0bf21cdd844/bzImage-0b58e108.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+380f7022f450dd776e64@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
+CPU: 0 UID: 0 PID: 8647 Comm: syz.3.1455 Not tainted 6.10.0-rc6-next-20240703-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:xdp_do_generic_redirect+0x7e/0x8f0 net/core/filter.c:4525
+Code: 3c 01 00 74 12 48 89 df e8 9f 26 90 f8 48 b8 00 00 00 00 00 fc ff df 48 89 5c 24 48 48 8b 1b 4c 8d 73 38 4d 89 f7 49 c1 ef 03 <41> 0f b6 04 07 84 c0 0f 85 37 06 00 00 41 8b 2e 89 ee 83 e6 02 31
+RSP: 0018:ffffc900094777f8 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 1ffff1100fd9f6c0
+RDX: ffffc900042a9000 RSI: 0000000000001ab7 RDI: 0000000000001ab8
+RBP: ffffc900094779b0 R08: 0000000000000005 R09: ffffffff89601c5e
+R10: 0000000000000003 R11: ffff88807ecf9e00 R12: ffffc90009477b60
+R13: 1ffff9200128ef1c R14: 0000000000000038 R15: 0000000000000007
+FS:  00007fa9faca56c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020011000 CR3: 000000002c750000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ do_xdp_generic+0x884/0xb90 net/core/dev.c:5138
+ tun_get_user+0x2805/0x4560 drivers/net/tun.c:1924
+ tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa9f9f7475f
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
+RSP: 002b:00007fa9faca5010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007fa9fa103f60 RCX: 00007fa9f9f7475f
+RDX: 000000000000fdef RSI: 0000000020001540 RDI: 00000000000000c8
+RBP: 00007fa9f9fe4aa1 R08: 0000000000000000 R09: 0000000000000000
+R10: 000000000000fdef R11: 0000000000000293 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fa9fa103f60 R15: 00007fff952046f8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
+RIP: 0010:xdp_do_generic_redirect+0x7e/0x8f0 net/core/filter.c:4525
+Code: 3c 01 00 74 12 48 89 df e8 9f 26 90 f8 48 b8 00 00 00 00 00 fc ff df 48 89 5c 24 48 48 8b 1b 4c 8d 73 38 4d 89 f7 49 c1 ef 03 <41> 0f b6 04 07 84 c0 0f 85 37 06 00 00 41 8b 2e 89 ee 83 e6 02 31
+RSP: 0018:ffffc900094777f8 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 1ffff1100fd9f6c0
+RDX: ffffc900042a9000 RSI: 0000000000001ab7 RDI: 0000000000001ab8
+RBP: ffffc900094779b0 R08: 0000000000000005 R09: ffffffff89601c5e
+R10: 0000000000000003 R11: ffff88807ecf9e00 R12: ffffc90009477b60
+R13: 1ffff9200128ef1c R14: 0000000000000038 R15: 0000000000000007
+FS:  00007fa9faca56c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020011000 CR3: 000000002c750000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	3c 01                	cmp    $0x1,%al
+   2:	00 74 12 48          	add    %dh,0x48(%rdx,%rdx,1)
+   6:	89 df                	mov    %ebx,%edi
+   8:	e8 9f 26 90 f8       	call   0xf89026ac
+   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  14:	fc ff df
+  17:	48 89 5c 24 48       	mov    %rbx,0x48(%rsp)
+  1c:	48 8b 1b             	mov    (%rbx),%rbx
+  1f:	4c 8d 73 38          	lea    0x38(%rbx),%r14
+  23:	4d 89 f7             	mov    %r14,%r15
+  26:	49 c1 ef 03          	shr    $0x3,%r15
+* 2a:	41 0f b6 04 07       	movzbl (%r15,%rax,1),%eax <-- trapping instruction
+  2f:	84 c0                	test   %al,%al
+  31:	0f 85 37 06 00 00    	jne    0x66e
+  37:	41 8b 2e             	mov    (%r14),%ebp
+  3a:	89 ee                	mov    %ebp,%esi
+  3c:	83 e6 02             	and    $0x2,%esi
+  3f:	31                   	.byte 0x31
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
