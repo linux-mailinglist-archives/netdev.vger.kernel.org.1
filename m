@@ -1,203 +1,174 @@
-Return-Path: <netdev+bounces-109577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B842928F66
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7615B928F79
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF1B1C21391
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 22:49:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9914C1C22184
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 23:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D42146A6C;
-	Fri,  5 Jul 2024 22:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14559148307;
+	Fri,  5 Jul 2024 23:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DuWBceR9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="me8hNNEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA471448D3
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 22:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C7E14532A
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 23:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720219749; cv=none; b=qkNLF4YWF6ko/nCW040/O5FfgiGlDNk5DsIB+DP037pVV+xNILrewSmfYW9Z9/0chSJuL8CEwmHIiEBXFMKhi8vi0fq870KvlibdMXLKXf1IH8LJ+NHXMTh+dbZ7omdd3Baf5kW5RxU4kt82QhV05AIa+T30akIq/yT22VcfrxI=
+	t=1720221045; cv=none; b=eCohqy+Nbchpverlo9s9O4un74P7d4a0LlWCnHB4nOQ7LiCvanAqX2SG4RFuq2gkQwWL+f4QioiLUXzWRSktuN5ywP5HAL/0J+TXcwMkHI4/WmQnDbkc2Clat1rOWzrQlhyDDmpayGWhCUPDpVx0aVm8g7myQOUnOGcqsEL8l+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720219749; c=relaxed/simple;
-	bh=9tcf34YQbu1rlSWJrw++NpxqbuzC/HQi/z2Kw/SR2aU=;
+	s=arc-20240116; t=1720221045; c=relaxed/simple;
+	bh=4CEqD7VmRndX/qN6v0TFl5xl7rdwJo23W+D2nNPbChY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uxvLXRKWS7xf54pnOhrx1ITKharUT5uCatnv5ZN/ZLBNJf1Midz/a8y9DQLzXQ7r87RiE7jzlMxJuhrEYogQ1/qgDTSRgheRKFhhso6vczejn5EFMuyGPinj19KMaCv+Oty6b6hohtW7V6EeyUh8eSKSo4/vOhHZGLA24Kiavhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DuWBceR9; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6b5f3348f05so6572306d6.0
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 15:49:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720219747; x=1720824547; darn=vger.kernel.org;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=croG2zJPROLkB12gwsm4IzSUMmc3bkMLi1pIDu19vhM=;
-        b=DuWBceR97lewMXfElS6CLtX8Zd+dv8qzAiklFvMw2VlpwKPDzIIfAh+F1w/usKYX4O
-         GwILYdpJf9pa5Kvexjn0GZmyPqXk9cvr33CxHeUQKjgnYyR+Pj8pT7ASteM6vXqL9yVi
-         2IqEbfCx0HzpmAB19e5SUG8znldeVpFlLxbjw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720219747; x=1720824547;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=croG2zJPROLkB12gwsm4IzSUMmc3bkMLi1pIDu19vhM=;
-        b=hKe92wlp3rRwsG3axYdwzDrRbgdurdd+M1Y46p5/PvDegbwp/EF5nAZAN0dG+vUdQu
-         VPG30g1Y4yMCzcomaKVJ0YF8hrjnUDiUqBkjM0uzsQ1oPIX0+ZWUVkVsIz7yQv0nRaAZ
-         2UUBUpIs1NK/GcwArewgYpjJ2b2k73AYprC3Vgj+7DO55W9y84R6kefZPq72vzjhhXL6
-         pm7l45Z5D8Kz1xDmcK7iQ5rpYTaA89aYBbOYdXgfANE11SZfYiEPwGTp4E6Luv40SA0g
-         bEGeMKovuxqEIU2tFwWBq1aJvwmMmMv736ZhcdFp6DMm6r3CfyUwaWPLTgEdk8rG48a+
-         0z7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXv1YrzLKdMkWyqlbjiwqvwZI9JirVqkzQ49wGn4zMaIA+1BA0bJAl4KBQKYk0ydH3ZHQZFiVxIGywjcaF9UGb9tFEtwIPy
-X-Gm-Message-State: AOJu0YyCFqRtKIKqUkYmS7KPE7GWOiu+PMzuBLHVOQIQ9ah0mJKqstxu
-	d3vfVSAlYnG++PRew/jL2rdrOa8HUwaFzlk64YPsxVGLXTa9RNZVxWUqcqPgKA==
-X-Google-Smtp-Source: AGHT+IGDeqRb5K0vp/+96hBTSOUnrg6VK4bQn7Nukf5L0oY5BMDumCsiW/SI2RONp72Dtafo/Cm4KQ==
-X-Received: by 2002:a05:6214:4888:b0:6b5:dfc2:6699 with SMTP id 6a1803df08f44-6b5ecfb22edmr72526526d6.5.1720219746687;
-        Fri, 05 Jul 2024 15:49:06 -0700 (PDT)
-Received: from [192.168.68.65] ([136.52.15.143])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b60091e4f3sm2654096d6.66.2024.07.05.15.49.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jul 2024 15:49:05 -0700 (PDT)
-Message-ID: <c02e58da-450c-4ef4-8130-b281a01a7146@broadcom.com>
-Date: Fri, 5 Jul 2024 15:49:03 -0700
+	 In-Reply-To:Content-Type; b=haYCj7qlD3+DFWG0TP1tpaz/vhEAFGsrulAT1fteewq6L+xx3cjZeGKS/DYiEE7AGzb5c2D2oLYudkpt2M25XEkKHrtI9hqU8MBQ/AL0if31a6sE/H84VUo3murZrnKiOFtf4i2rLxjeD6z3lp7pDTX4caDqbYOXkIvuR+OrURw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=me8hNNEe; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: matttbe@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1720221040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EYSTaBvET+7Y92pC4W26UTSlgkepbfTnQLMrMemfNbQ=;
+	b=me8hNNEesaK3JInhevdUm0hR3gV8oybY6jYc26r6lfTHDKE9vrBfNkSMKvP4W2oU+nvRZ6
+	BHj5L+4KLS/ywY4cbb88o1ZyRNGsZs2ILYOGuQBH8bPxktRYXPvxBHj5c5j81IOSQLgSPI
+	+97Vo9G+TKKCxFWTGjHImfVxTcQ+rQQ=
+X-Envelope-To: andrii@kernel.org
+X-Envelope-To: eddyz87@gmail.com
+X-Envelope-To: mykolal@fb.com
+X-Envelope-To: ast@kernel.org
+X-Envelope-To: daniel@iogearbox.net
+X-Envelope-To: song@kernel.org
+X-Envelope-To: yonghong.song@linux.dev
+X-Envelope-To: john.fastabend@gmail.com
+X-Envelope-To: kpsingh@kernel.org
+X-Envelope-To: sdf@google.com
+X-Envelope-To: haoluo@google.com
+X-Envelope-To: jolsa@kernel.org
+X-Envelope-To: davem@davemloft.net
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: hawk@kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: bpf@vger.kernel.org
+X-Envelope-To: linux-kselftest@vger.kernel.org
+X-Envelope-To: tanggeliang@kylinos.cn
+X-Envelope-To: mptcp@lists.linux.dev
+X-Envelope-To: martineau@kernel.org
+X-Envelope-To: geliang@kernel.org
+X-Envelope-To: shuah@kernel.org
+Message-ID: <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
+Date: Fri, 5 Jul 2024 16:10:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmasp: Fix error code in probe()
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, bcm-kernel-feedback-list@broadcom.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <ZoWKBkHH9D1fqV4r@stanley.mountain>
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <ZoWKBkHH9D1fqV4r@stanley.mountain>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f8a1ca061c87de28"
-
---000000000000f8a1ca061c87de28
+Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>,
+ mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, Shuah Khan <shuah@kernel.org>
+References: <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
+ <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
+ <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
 Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 7/4/24 8:19 AM, Dan Carpenter wrote:
-> Return an error code if bcmasp_interface_create() fails.  Don't return
-> success.
+On 7/4/24 3:48 AM, Matthieu Baerts wrote:
+>> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+>> index e0b3887b3d2d..204269d0b5b8 100644
+>> --- a/tools/testing/selftests/bpf/Makefile
+>> +++ b/tools/testing/selftests/bpf/Makefile
+>> @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED = test_skb_cgroup_id_user \
+>>   	flow_dissector_load test_flow_dissector test_tcp_check_syncookie_user \
+>>   	test_lirc_mode2_user xdping test_cpp runqslower bench bpf_testmod.ko \
+>>   	xskxceiver xdp_redirect_multi xdp_synproxy veristat xdp_hw_metadata \
+>> -	xdp_features bpf_test_no_cfi.ko
+>> +	xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
+> On the BPF CI, we have such errors:
 > 
-> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-
-Reviewed-by: Justin Chen <justin.chen@broadcom.com>
-
-> ---
->   drivers/net/ethernet/broadcom/asp2/bcmasp.c | 1 +
->   1 file changed, 1 insertion(+)
+>     mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file not found
+>       20 | #include "linux/mptcp.h"
+>          |          ^~~~~~~~~~~~~~~
 > 
-> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> index a806dadc4196..20c6529ec135 100644
-> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> @@ -1380,6 +1380,7 @@ static int bcmasp_probe(struct platform_device *pdev)
->   			dev_err(dev, "Cannot create eth interface %d\n", i);
->   			bcmasp_remove_intfs(priv);
->   			of_node_put(intf_node);
-> +			ret = -ENOMEM;
->   			goto of_put_exit;
->   		}
->   		list_add_tail(&intf->list, &priv->intfs);
+> On my side, I don't have any issue, because the compiler uses the
+> mptcp.h file from the system: /usr/include/linux/mptcp.h
+> 
+> I suppose that's not OK on the BPF CI, as it looks like it doesn't have
+> this file there, probably because it still uses Ubuntu 20.04 as base,
+> which doesn't include this file in the linux-libc-dev package.
+> 
+> When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the other
+> programs from that list -- is compiled (V=1), I see that the following
+> "-I" options are given:
+> 
+>    -I${PWD}/tools/testing/selftests/bpf
+>    -I${BUILD}//tools/include
+>    -I${BUILD}/include/generated
+>    -I${PWD}/tools/lib
+>    -I${PWD}/tools/include
+>    -I${PWD}/tools/include/uapi
+>    -I${BUILD}/
+> 
+> It will then not look at -I${PWD}/usr/include or the directory generated
+> with:
+> 
+>    make headers_install INSTALL_HDR_PATH=(...)
 
---000000000000f8a1ca061c87de28
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+It sounds like the tools/testing/selftests/net/mptcp/Makefile is looking at this 
+include path, so it works?
 
-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
-NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
-4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
-BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
-Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
-NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
-A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
-aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
-cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
-MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
-GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
-DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
-dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
-xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
-sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
-VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
-ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
-bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFxLBb/wNUlnRj1xn8rzrNjr2Cr6GaHZikDL
-IG7bq6LJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcwNTIy
-NDkwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
-AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQCgk2leWXXI9UAKMvu58ka3urqbwxaNMBqVpP8zNs3wf8u39NOlJ8i6
-Py5S13ynrJXRzM+dm7j8GxYuxoma/02VbU/1oOECSEHxLdbOmcALrrtf3t5bs8RbHAI2xnrdzTb3
-F1vVL7JxcHUMx6KlR58lagBGyQHiXPsB4bghN4ku4mB6VURl91EjPcAkKF1FqLQA/sh/P1KJzQ9W
-yO5p6mltkANcfXqOpfsQhcc8iPIZ5+dtoZcS9/Zm3Jz/UMi9JYgV4dgqkNmdd1kPh9IVUebMeeC8
-FgpLEcgM37WJEtMbbACu9aQ52RkFKXywv/f2Xi8UDLyfGEwGGatqLQnRDq8K
---000000000000f8a1ca061c87de28--
+iiu the bpf/Makefile correctly, it has the bpftool "make" compiled and installed 
+at tools/testing/selftests/bpf/tools/sbin/. May be directly compile the 
+pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
+
+> 
+> I guess that's why people have duplicated files in 'tools/include/uapi',
+> but I also understood from Jakub that it is not a good idea to continue
+> to do so.
+> 
+> What would be the best solution to avoid a copy? A symlink still looks
+> like a workaround.
+> 
+> In the other selftests, KHDR_INCLUDES is used to be able to include the
+> path containing the UAPI headers. So if someone built the headers in a
+
+Meaning KHDR_INCLUDES should be used and -I${PWD}/tools/include/uapi can be 
+retired? I haven't looked into the details. I quickly tried but it fails in my 
+environment.
+
+> seperated directory -- INSTALL_HDR_PATH=(...) -- KHDR_INCLUDES can be
+> overridden to look there, instead of ${KERNEL_SRC}/usr/include. Would it
+> be OK to do that? Would it work for the CI without extra changes? Or do
+> you still prefer a copy/symlink to 'tools/include/uapi' instead?
+
+> 
+> Cheers,
+> Matt
+
 
