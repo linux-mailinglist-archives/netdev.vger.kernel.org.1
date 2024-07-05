@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-109446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616989287EC
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BE19287ED
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 933F31C20BA7
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:27:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8BD5B21713
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42383149C51;
-	Fri,  5 Jul 2024 11:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A17F149C4B;
+	Fri,  5 Jul 2024 11:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m9A0KCF5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITt+bPGu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7FE149C4B
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F7B149DE4
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720178825; cv=none; b=hX/pZlrtrsroq16jWBUjysURd+f2dQT0doZSKHziEDksBU3pzzysRbY18f+ufarTvLUZ3nKz94bImxIBrAGpICsJLC/bnh71e5vBYdC0ZjXc5MG3pOiwrm35bf42qjhDmqnRg8ArS+io9mGUdUQqtsKMcpWaUofY4xQasy8aoII=
+	t=1720178826; cv=none; b=RskEmeqLXKw8LbeQzd8dzuTRnURfdIgosmDSr9DznS42SXfVecQukFmDzJtHJ5c9ZK4qdyMNZfyUpjeIxtW5SoptpYoRMR3UFlKJBey30drEitvoAMu2GIqnSV3HzXIBCBl1w+DBONGxeh23HEQVQf93FgkWZ0gMnv4Uz/dcsOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720178825; c=relaxed/simple;
-	bh=3KuxEM/+l5r0XBieG6SH9ClxZdwePH/a6D/GClTvD98=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hkE9ROnwOVoUFoqm+f68tzIBhpTGOI1f6vHB7Y0OwYY7mJiJnncxXFKaH4GSDPd+JUnjjBWNppXZDawQq18YI+C2TziBKsTe27YYG/pc9gZtnWrBBa5BRZVR2xux/Oveuwaj6tSgozMnK6CQXgpbvCRaOnMmDYDmUl2PFVXwja8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m9A0KCF5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA0BC116B1;
-	Fri,  5 Jul 2024 11:27:03 +0000 (UTC)
+	s=arc-20240116; t=1720178826; c=relaxed/simple;
+	bh=/iqhISmyjp10Y9gZXJqXSHFekdzGto3I0yZH76KXFPw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=l18C7Fx3Tcj+1b5rFAfzJ/b+fHz6Iqoi0F/39eY3Lv4AA/86vUpEppNbnmypXjJfDZ3uucO5gZtPm99NpOosSw5PTR7iNsTXLATjt2DCiYs8qhVyfYBAvIPkTXR2RmszAFvi+6mWnRxknxNkkc3qGWYZY+iQNadMZ8NgD3N2gpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITt+bPGu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213C5C32781;
+	Fri,  5 Jul 2024 11:27:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720178824;
-	bh=3KuxEM/+l5r0XBieG6SH9ClxZdwePH/a6D/GClTvD98=;
-	h=From:Subject:Date:To:Cc:From;
-	b=m9A0KCF5DGI88mmboqAZ+n6wU01PRKA49wp54/8O43iUqQrTqfYEf/imk6sG7u+xS
-	 W64VAaO+JQz0f+kt2sPUQ882b/vC3Ba3dPxvfhl4hsqdYo2Cf/AL2IZobbbhXPvwLH
-	 m3S7D0L3wuiW5lWZbA+9f5z2MfizZintE3gFBtgMIOlojowrmld095xS9KGFObm+QD
-	 kTBFqm0XC2OPu1cEI/F2FRBc6thAHNLmJgmdBgWZw+4ZeFjzRERW/Ai4CxoTsu83Gt
-	 a3heF1HtsKwtSm6XHC/W8btvyJPf+KtqyQcjmtKb4WaHpAmMxJolpOF91KbqjXSnlN
-	 Q3hNpUdI1qbVg==
+	s=k20201202; t=1720178826;
+	bh=/iqhISmyjp10Y9gZXJqXSHFekdzGto3I0yZH76KXFPw=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=ITt+bPGujL39bzyL+8MC5J48OI+puhMSJeRgObQImIADNNaAu/StWrx2phhDEVAVb
+	 9oHPEKuJxyQBo75mjMr81g1iyEcY3mn1bxr3Rk3YfBwowuhb8Uy3XiRIVYK589gbPl
+	 ZtYi8aKfNbsRu4Y6riGrO5OosUnM78QZx4AThfMc/C6urxTqhJLY9D/aiKGE77cJDD
+	 +X1ZPMC0efhjjfFjjqS8V+gb/UrSPLfQAN7zBiBQrYuFzcXSG71cbuQmOTFsJEe/ZA
+	 uOO4cBifihf+lZhk2twficp/zKlweaTrmHj/BRSG024WmQ9bP/gtXTPZrQ+RZKdnG+
+	 hmLCz+3xnWFVg==
 From: Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 0/3] bnxt_en: address string truncation
-Date: Fri, 05 Jul 2024 12:26:46 +0100
-Message-Id: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
+Date: Fri, 05 Jul 2024 12:26:47 +0100
+Subject: [PATCH net-next 1/3] bnxt_en: check for fw_ver_str truncation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,32 +52,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHbYh2YC/x3MTQqAIBBA4avErBtQ+zG6SrSonGo2U6iEIN09a
- fnB42UI5JkCjFUGTw8HvqRA1xVs5yIHIbtiMMq0yqoOV0kRQ/RoBm0XbXXfNg5KfnvaOf2rCYQ
- iCqUI8/t+0whlDGQAAAA=
+Message-Id: <20240705-bnxt-str-v1-1-bafc769ed89e@kernel.org>
+References: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
+In-Reply-To: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>
 Cc: Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org
 X-Mailer: b4 0.12.3
 
-Hi,
+Given the sizes of the buffers involved, it is theoretically
+possible for fw_ver_str to be truncated. Detect this and
+stop ethtool initialisation if this occurs.
 
-This series addresses several string truncation issues that are flagged
-by gcc-14. I do not have any reason to believe these are bugs, so I am
-targeting this at net-next and have not provided Fixes tags.
+Flagged by gcc-14:
 
+  .../bnxt_ethtool.c: In function 'bnxt_ethtool_init':
+  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c:4144:32: warning: '%s' directive output may be truncated writing up to 31 bytes into a region of size 26 [-Wformat-truncation=]
+   4144 |                          "/pkg %s", buf);
+        |                                ^~   ~~~
+  In function 'bnxt_get_pkgver',
+      inlined from 'bnxt_ethtool_init' at .../bnxt_ethtool.c:5056:3:
+  .../bnxt_ethtool.c:4143:17: note: 'snprintf' output between 6 and 37 bytes into a destination of size 31
+   4143 |                 snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len - 1,
+        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4144 |                          "/pkg %s", buf);
+        |                          ~~~~~~~~~~~~~~~
+
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-Simon Horman (3):
-      bnxt_en: check for fw_ver_str truncation
-      bnxt_en: check for irq name truncation
-      bnxt_en: avoid truncation of per rx run debugfs filename
+It appears to me that size is underestimated by 1 byte -
+it should be FW_VER_STR_LEN - offset rather than FW_VER_STR_LEN - offset - 1,
+because the size argument to snprintf should include the space for the
+trailing '\0'. But I have not changed that as it is separate from
+the issue this patch addresses.
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 30 +++++++++++++++++------
- drivers/net/ethernet/broadcom/bnxt/bnxt_debugfs.c |  4 +--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 23 +++++++++++------
- 3 files changed, 40 insertions(+), 17 deletions(-)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index bf157f6cc042..5ccc3cc4ba7d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -4132,17 +4132,23 @@ int bnxt_get_pkginfo(struct net_device *dev, char *ver, int size)
+ 	return rc;
+ }
+ 
+-static void bnxt_get_pkgver(struct net_device *dev)
++static int bnxt_get_pkgver(struct net_device *dev)
+ {
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	char buf[FW_VER_STR_LEN];
+-	int len;
+ 
+ 	if (!bnxt_get_pkginfo(dev, buf, sizeof(buf))) {
+-		len = strlen(bp->fw_ver_str);
+-		snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len - 1,
+-			 "/pkg %s", buf);
++		int offset, size, rc;
++
++		offset = strlen(bp->fw_ver_str);
++		size = FW_VER_STR_LEN - offset - 1;
++
++		rc = snprintf(bp->fw_ver_str + offset, size, "/pkg %s", buf);
++		if (rc >= size)
++			return -E2BIG;
+ 	}
++
++	return 0;
+ }
+ 
+ static int bnxt_get_eeprom(struct net_device *dev,
+@@ -5052,8 +5058,11 @@ void bnxt_ethtool_init(struct bnxt *bp)
+ 	struct net_device *dev = bp->dev;
+ 	int i, rc;
+ 
+-	if (!(bp->fw_cap & BNXT_FW_CAP_PKG_VER))
+-		bnxt_get_pkgver(dev);
++	if (!(bp->fw_cap & BNXT_FW_CAP_PKG_VER)) {
++		rc = bnxt_get_pkgver(dev);
++		if (rc)
++			return;
++	}
+ 
+ 	bp->num_tests = 0;
+ 	if (bp->hwrm_spec_code < 0x10704 || !BNXT_PF(bp))
 
-base-commit: aba43bdfdccf15da1dfdc657bd9dada9010d77a4
+-- 
+2.43.0
 
 
