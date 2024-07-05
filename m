@@ -1,222 +1,122 @@
-Return-Path: <netdev+bounces-109344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DF9192809A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 04:51:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 893EA9280D6
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 05:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70DA91C2170B
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 02:51:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A9D51F255C9
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 03:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198E81BC4B;
-	Fri,  5 Jul 2024 02:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BFB61FF0;
+	Fri,  5 Jul 2024 03:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="m5p1vOxu"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="f+0magwH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C47367
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 02:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE781643D
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 03:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720147878; cv=none; b=lRBGKE4nEGL1BHYak5K6NzfbSlcy6ZbLq1yNfTgHMR1bPrL5fSKeO4jjg929e4RLkizfkhMi9A2I7UAw1BCii3JyeCZsG1GtAtSj9kbS/FRyBg8l4rm6ZhFJwSjplm17fA0+3UqOB09Gj4Kv++z6F3gw5l2WMy2eilflPDL9Tro=
+	t=1720148455; cv=none; b=uZZ2IX7k5VNDUZhQYCJ73JMCijHPMl1G3QZWFWwBvXYdC2zU7varIissaBEddjEbnAva6vBQi2FvwUlFUjM9DHjqEibyNA/smgFSX0x5IIi41DS8q2oI/8+5lINdM4Ma+kQckl+7fMHmyS7h5lfr4/rMwM1cKd+9a5y1bE1O6PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720147878; c=relaxed/simple;
-	bh=+SqwYfC1A5+GjnJofMmf059emLsqPccapLMwF9uYPag=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PZFxspLZk445nntNk1lEeZoD2OKA618kS4JIdbJhXzbB8gjjl1nWX3EFZnATl6J6sDBR4qVha6yP51cW2Q0kFblylJmiW2Nah5GRuty2IOHZ8uSFnDbswCtRNctSEajNig7GFLpnWDloNPXk6J3UYsMITR4EsXaK4whC1DThS6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=m5p1vOxu; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	s=arc-20240116; t=1720148455; c=relaxed/simple;
+	bh=JiJY+j6TyfBV9LR9ycgqUi+s3rgLJnFnQqqJZj6khuY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FQHnwQuI5yWFJLGPr6wACk4Bf9fcDLWr6Vf81G8OVMlnIspjWm6UbDHIWItOADRTI3e2iEvAF9qDvWp5oSRKjj5FQ1AgbQsJ3wO1MuzD4Yi1EUa16w2JoR56sujgOdfsnJAofsiPlLSlQ/jCGnJqXRyOo7d0DmZWKOJJp9u4thA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=f+0magwH; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6FA1D4132D
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 02:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1720147872;
-	bh=9juZtiYe22wi4ot7/n0osuKqapdtykb5hL7YDbGZMZY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=m5p1vOxurbLMii7GU5/Yu01JV0MTOEXp8E7aaG7+ppvHBqP6jXv4s3pnNIVsKHqYw
-	 k8U4wfaXQJlfPqXzkwg/DQLX/poFTBSVxjbH/6uym5fyOygcHnlHOjw5TbtaAm8du/
-	 c0LVCxRDO7YXyCdDEoEYPV8wsDAVU4OM6Pgz0X3BGyEg2+7PwwELlB88vI6BIUBVK/
-	 Auht4bCGTNJgLkfh35AfMOVjxCu8gPud571GCcK3p7J3P+zhSw9KAtHNTbzB5y6gax
-	 orYfwQ+7z5CxXc+ajKMDORFw8r65w59i6atw0GFMewEmyUm6c/lWCav8bJKgZtln1W
-	 +fK9SV5jx95hQ==
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-70afe95d6d5so919475b3a.0
-        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 19:51:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720147870; x=1720752670;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9juZtiYe22wi4ot7/n0osuKqapdtykb5hL7YDbGZMZY=;
-        b=tt3KIkG+dHxoz96PkdNL4YIvrtiJ7HHJiI4mg1YeKviwOMglOvVrsrWBF3tnzN/3kw
-         CvBX0nkss9oLNfkzZoyE8BldZWQdyxgz240z29aXBJXR2wjmbKgZtKMpTtepgBhlCJoH
-         XGm/v1xwC00vYEz0cnx+YgGC38sGjgiJJ/RP7gd/6T3T+j+ZzfhNBjOWgGLILfY8r3ii
-         2aCmihamqFxd8JYuRsgyGscoJS2Vss9+ZAy2hvmVjp58ILK5qIWiodqL5MBTqC3Iy7K5
-         Scc7zoro00PWUEOqZNnqWUuQvyxCuq0RRlDB1I7Ma52dNF8650PxEuL64wcG3HMLE17l
-         HnYw==
-X-Forwarded-Encrypted: i=1; AJvYcCWg/b8ucX00sgOtDfhNv0YvkBwH764LWZ1K9dTw2mVIEeA2Kis+9BXwkjpnau3bBUf8P6AF/6SSetVXvdRopBWRNYPNHRg4
-X-Gm-Message-State: AOJu0Ywp2LqpnutDiWffvm8YoUmHkSlfxI361X2SuBkU60/hWWVUOcau
-	vtlGQHbYc8Ixh2WcvJc8aIeFuQhgQbGwLkr6pyXJnF/64c/PP9Oloo3zI4axsa2K2r8MUb/aqXO
-	K8O/rPO1s+L67W8xGr+yrOVfTWWtu4ifq428ecK758HQWGcNtcVI41qHUcluHb5ySdP7COg==
-X-Received: by 2002:a05:6a00:178b:b0:706:5bf1:586f with SMTP id d2e1a72fcca58-70b007eea27mr3847126b3a.0.1720147870094;
-        Thu, 04 Jul 2024 19:51:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFDMonNXypqZZHFPjZZyJ8kX9T0YMXjkP88/cDPPt/fAW4LrZB7+keFASdssrTHu8rT8jF3jA==
-X-Received: by 2002:a05:6a00:178b:b0:706:5bf1:586f with SMTP id d2e1a72fcca58-70b007eea27mr3847107b3a.0.1720147869696;
-        Thu, 04 Jul 2024 19:51:09 -0700 (PDT)
-Received: from chengendu.. (2001-b011-381c-18de-5dc6-a962-e026-019f.dynamic-ip6.hinet.net. [2001:b011:381c:18de:5dc6:a962:e026:19f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-708029582fasm12926379b3a.88.2024.07.04.19.51.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 19:51:09 -0700 (PDT)
-From: Chengen Du <chengen.du@canonical.com>
-To: jhs@mojatatu.com
-Cc: xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ozsh@nvidia.com,
-	paulb@nvidia.com,
-	marcelo.leitner@gmail.com,
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 4CCCD2C01D5;
+	Fri,  5 Jul 2024 15:00:49 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1720148449;
+	bh=zJySgUg5KnNtBOK7uwX7TCw7Zzzq8wJpmdXhs5nEk7I=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f+0magwHpL2OOLtrVrykxqerhRCQYet1UYpaJElC/3DEQG4WQGgpACml20paHoggc
+	 Dg4HEMN2UlB2wom/Ttt2rfs9VsmWcRYjLanEriHJ8+d+2Nm/6cKJ9iveEOoH06Z5Zf
+	 PTiTy1bTqxdss9DATnbRX3LqNLXVv3FekWjjDGBd5M4KtMhMUd0MDinHex3lrgX/Cr
+	 /2wxHnH0wSKLtUeSHr60xQO805UWuJbgqOtiXB0HE7tGg/7ShNRAAbeQcuo9+AnlOn
+	 mfK8VSeOl9ULl5hyoKdOUf3IBGCuTRMdXqNDc+pvNyU2uZjtQPa+06bx1eL2Q9SjXn
+	 2qk7Kz5J8iPPw==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B668761e10000>; Fri, 05 Jul 2024 15:00:49 +1200
+Received: from elliota2-dl.ws.atlnz.lc (elliota-dl.ws.atlnz.lc [10.33.23.28])
+	by pat.atlnz.lc (Postfix) with ESMTP id 18FC013ED5B;
+	Fri,  5 Jul 2024 15:00:49 +1200 (NZST)
+Received: by elliota2-dl.ws.atlnz.lc (Postfix, from userid 1775)
+	id 136623C0681; Fri,  5 Jul 2024 15:00:49 +1200 (NZST)
+From: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+To: davem@davemloft.net
+Cc: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tobias Waldekranz <tobias@waldekranz.com>,
+	bridge@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chengen Du <chengen.du@canonical.com>,
-	Gerald Yang <gerald.yang@canonical.com>
-Subject: [PATCH net v2] net/sched: Fix UAF when resolving a clash
-Date: Fri,  5 Jul 2024 10:50:56 +0800
-Message-ID: <20240705025056.12712-1-chengen.du@canonical.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: bridge: mst: Check vlan state for egress decision
+Date: Fri,  5 Jul 2024 15:00:40 +1200
+Message-ID: <20240705030041.1248472-1-elliot.ayrey@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=CvQccW4D c=1 sm=1 tr=0 ts=668761e1 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=4kmOji7k6h8A:10 a=JXkHKJOXY2Ndxws4tuMA:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-KASAN reports the following UAF:
+If a port is blocking in the common instance but forwarding in an MST
+instance, traffic egressing the bridge will be dropped because the
+state of the common instance is overriding that of the MST instance.
 
- BUG: KASAN: slab-use-after-free in tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
- Read of size 1 at addr ffff888c07603600 by task handler130/6469
+Fix this by temporarily forcing the port state to forwarding when in
+MST mode to allow checking the vlan state via br_allowed_egress().
+This is similar to what happens in br_handle_frame_finish() when
+checking ingress traffic, which was introduced in the change below.
 
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x48/0x70
-  print_address_description.constprop.0+0x33/0x3d0
-  print_report+0xc0/0x2b0
-  kasan_report+0xd0/0x120
-  __asan_load1+0x6c/0x80
-  tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
-  tcf_ct_act+0x886/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-  __irq_exit_rcu+0x82/0xc0
-  irq_exit_rcu+0xe/0x20
-  common_interrupt+0xa1/0xb0
-  </IRQ>
-  <TASK>
-  asm_common_interrupt+0x27/0x40
-
- Allocated by task 6469:
-  kasan_save_stack+0x38/0x70
-  kasan_set_track+0x25/0x40
-  kasan_save_alloc_info+0x1e/0x40
-  __kasan_krealloc+0x133/0x190
-  krealloc+0xaa/0x130
-  nf_ct_ext_add+0xed/0x230 [nf_conntrack]
-  tcf_ct_act+0x1095/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-
- Freed by task 6469:
-  kasan_save_stack+0x38/0x70
-  kasan_set_track+0x25/0x40
-  kasan_save_free_info+0x2b/0x60
-  ____kasan_slab_free+0x180/0x1f0
-  __kasan_slab_free+0x12/0x30
-  slab_free_freelist_hook+0xd2/0x1a0
-  __kmem_cache_free+0x1a2/0x2f0
-  kfree+0x78/0x120
-  nf_conntrack_free+0x74/0x130 [nf_conntrack]
-  nf_ct_destroy+0xb2/0x140 [nf_conntrack]
-  __nf_ct_resolve_clash+0x529/0x5d0 [nf_conntrack]
-  nf_ct_resolve_clash+0xf6/0x490 [nf_conntrack]
-  __nf_conntrack_confirm+0x2c6/0x770 [nf_conntrack]
-  tcf_ct_act+0x12ad/0x1350 [act_ct]
-  tcf_action_exec+0xf8/0x1f0
-  fl_classify+0x355/0x360 [cls_flower]
-  __tcf_classify+0x1fd/0x330
-  tcf_classify+0x21c/0x3c0
-  sch_handle_ingress.constprop.0+0x2c5/0x500
-  __netif_receive_skb_core.constprop.0+0xb25/0x1510
-  __netif_receive_skb_list_core+0x220/0x4c0
-  netif_receive_skb_list_internal+0x446/0x620
-  napi_complete_done+0x157/0x3d0
-  gro_cell_poll+0xcf/0x100
-  __napi_poll+0x65/0x310
-  net_rx_action+0x30c/0x5c0
-  __do_softirq+0x14f/0x491
-
-The ct may be dropped if a clash has been resolved but is still passed to
-the tcf_ct_flow_table_process_conn function for further usage. This issue
-can be fixed by retrieving ct from skb again after confirming conntrack.
-
-Fixes: 0cc254e5aa37 ("net/sched: act_ct: Offload connections with commit action")
-Co-developed-by: Gerald Yang <gerald.yang@canonical.com>
-Signed-off-by: Gerald Yang <gerald.yang@canonical.com>
-Signed-off-by: Chengen Du <chengen.du@canonical.com>
+Fixes: ec7328b59176 ("net: bridge: mst: Multiple Spanning Tree (MST) mode=
+")
+Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
 ---
- net/sched/act_ct.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ net/bridge/br_forward.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 2a96d9c1db65..6f41796115e3 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1077,6 +1077,14 @@ TC_INDIRECT_SCOPE int tcf_ct_act(struct sk_buff *skb, const struct tc_action *a,
- 		 */
- 		if (nf_conntrack_confirm(skb) != NF_ACCEPT)
- 			goto drop;
+diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+index d97064d460dc..911b37a38a32 100644
+--- a/net/bridge/br_forward.c
++++ b/net/bridge/br_forward.c
+@@ -22,10 +22,16 @@ static inline int should_deliver(const struct net_bri=
+dge_port *p,
+ 				 const struct sk_buff *skb)
+ {
+ 	struct net_bridge_vlan_group *vg;
++	u8 state;
 +
-+		/* The ct may be dropped if a clash has been resolved,
-+		 * so it's necessary to retrieve it from skb again to
-+		 * prevent UAF.
-+		 */
-+		ct = nf_ct_get(skb, &ctinfo);
-+		if (!ct)
-+			goto drop;
- 	}
- 
- 	if (!skip_add)
--- 
-2.43.0
-
++	if (br_mst_is_enabled(p->br))
++		state =3D BR_STATE_FORWARDING;
++	else
++		state =3D p->state;
+=20
+ 	vg =3D nbp_vlan_group_rcu(p);
+ 	return ((p->flags & BR_HAIRPIN_MODE) || skb->dev !=3D p->dev) &&
+-		p->state =3D=3D BR_STATE_FORWARDING && br_allowed_egress(vg, skb) &&
++		state =3D=3D BR_STATE_FORWARDING && br_allowed_egress(vg, skb) &&
+ 		nbp_switchdev_allowed_egress(p, skb) &&
+ 		!br_skb_isolated(p, skb);
+ }
 
