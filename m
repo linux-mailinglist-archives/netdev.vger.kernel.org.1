@@ -1,246 +1,215 @@
-Return-Path: <netdev+bounces-109473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E7FB928984
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:25:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC54928987
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0CCFB245C9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:25:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFD461F26332
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CE013C8F9;
-	Fri,  5 Jul 2024 13:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3004D14B097;
+	Fri,  5 Jul 2024 13:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="djISFQtM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O2yUNiD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943B914B094
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 13:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720185897; cv=fail; b=YPvT77di0bqFgb046L2jKs8t9RK1gD6sZqRDf/d0ZSVstWEST7dLqmfVuVnPk9iLxEL9/MBLx/1uJhwa5KecFU7jsRscNzoEqArztn3fD71AuFOyQ038zqWo6g7R6GcahBSa77897KOQ8WmuGjniMVw1hqWLRQ6JfZy/DLwzr1I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720185897; c=relaxed/simple;
-	bh=iP5jYCvQZcMgH6o9rtRIAxO8DlPKr8HsnRP3RNHx8Pw=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=M/1o3B4PUy7sqmYnOvN7ZW30FpS52reb5k3MA0LTcBMEzM0mEjFAmnvTJWj+9mz1VoBOM/BvmroZ4H4A3F5CFYH93yPeTz0CumTy6hfew7L96/PX4Zw6EYEngefbvKXe16xDUjvB+3qJh2errPD/7/zHW1vf0EjSICRbl76G4+8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=djISFQtM; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720185896; x=1751721896;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iP5jYCvQZcMgH6o9rtRIAxO8DlPKr8HsnRP3RNHx8Pw=;
-  b=djISFQtMPRNarCGh3ZaWgpg2IrCslDiCKQPShCafXDShgaAyqo4A0aDK
-   P3SSqanjLRLPYI6H2W4/FN6+oOzPXd9J2TYOn1cTTNARIQFLcE2Gu4XzA
-   l0ixCxhp9iUFhmNn8Quow3rihc48IYef8OWxkrv5+EpEA/k6HA35xHsiS
-   jOf0ANC2nHlVwQ7/L+ZOblyRqximtIo2dLFpYbLvw3yCIQBC5xdU6shIi
-   flDd0AlOXnpffDHIpOqSpNFdX429p5QMIed9AQeDtdiThYptsraTpGPJm
-   Fu8RR2hr8tavbu0ROtpoI+l9WFbBcsY+scQqf0DW89RwLoXG+2HusBtFs
-   Q==;
-X-CSE-ConnectionGUID: W+wm7ByPTZ2dofZ06Qx7dA==
-X-CSE-MsgGUID: g9vqw0J9RQSizzkvVNEAVw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="28634171"
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="28634171"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 06:24:55 -0700
-X-CSE-ConnectionGUID: 7fiRU5fSTQiJH6nVDV0LSQ==
-X-CSE-MsgGUID: prw3GqmxQx+3qVCXJRuXLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="84434915"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jul 2024 06:24:54 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 5 Jul 2024 06:24:54 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 5 Jul 2024 06:24:54 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.49) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 5 Jul 2024 06:24:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FTprXnk8pFBJoMGQrbNlSLRtgDDWLYFVIxA28WD37eIvWeCa88M+HeoNjvUZSFwrlRzn+bLGhD1Hg2DJ27p+kvUAifRdb4U7g38U1c+SEjC4KJXHrmqNasXQ8u0gDl3ClpcFHXnNnHGisFQGQOk40cm/fJ8SHlqGzyh4of4/aK5GK8JB2Hv6ojz0d73t/pY1ocOhzhbj4QhNGnNEbcs/bVkZum+Xo161rvmY2WD4y512hy4ESu8LF6ojCenOhGEw3Tsf9kL5MlPYky091fKNFY5e22L/q3qC+DO2Unc5ASdS3sO/1ZHOieoi6vGNUVxxD1UkN5xZhYhcHdgyIWZOcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5pmSMds3dolA2kVlj9q+guORJpsxFcEiYPAl53HOw3Q=;
- b=ky++WSmd1BaixXrg3pEhb/GfMfqN7c5QP1WazVC6l2lUW7AFUc7gWAnjKEKC14F8FibrtosoU3Lxo/k+HwvQVa1BYPXIqVyg8LRbOzxa6+Pqf1UhCOkCojViYdOyXSfqYgtI8o88A2mNIjghb2DS/SlcrnnUI8rUCbG8Gtp2l9EtYhtbudjTt0I7wbgQMjr8iwA1AtJxIvFfRRcQBumIUMb+qaRA80IQkUe7ukJGeAyl6JJxnQmjUMNatHInSds+5pkXm6L80Gku6f08OTbZOdh1aRtlzIVG+1QxL/PGVG/Qio3lB28Zh7qmQhYAr/N0Rgtkpw74YaRDQdvjBWjRHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CY5PR11MB6414.namprd11.prod.outlook.com (2603:10b6:930:36::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.31; Fri, 5 Jul
- 2024 13:24:46 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7741.017; Fri, 5 Jul 2024
- 13:24:46 +0000
-Message-ID: <9d38d987-6968-4495-8311-ad846d6cde89@intel.com>
-Date: Fri, 5 Jul 2024 15:24:41 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next] i40e: correct i40e_addr_to_hkey() name in kdoc
-To: Simon Horman <horms@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20240705-i40e-kdoc-v1-1-529d0808a1ef@kernel.org>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240705-i40e-kdoc-v1-1-529d0808a1ef@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR0902CA0031.eurprd09.prod.outlook.com
- (2603:10a6:802:1::20) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC6D146D7E;
+	Fri,  5 Jul 2024 13:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720186034; cv=none; b=NwjQvIyMdfMqIKQH+CGVVDCD0QapGf4+jnokO96Ms9N9RcTTKu0UPRD3SeyHeQwmaCnqPuoXpiIJSqzceNw9dy8hdmcfaI9xH0t07MsTB2uy3bmilDQMG9v208Gj8OApCeJVJWqpwXdSsoPzYDy3qN2KqtuBY3nWIz3CVJ3zhJ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720186034; c=relaxed/simple;
+	bh=nJbuph+RUzwgbDfHIwZskIFi+IW19h7mWMR5gIT2MOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JYMpAoJMl73nxPjZYAE0SDi9C7KpGu4dLSc4dPPVfg1MF2Y8zf9TTupKZ7ZbVL5FzKNAgLEtyv268uC8QAUnaoKK7HfO8hPGMeamVNJS+bZmgy1g8dgnSgqjnEV9UEPXGChMviCABW5gCwHZUP95nLXSCPtlvs6Ldxxb0J/nZ9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O2yUNiD+; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D720F1C000C;
+	Fri,  5 Jul 2024 13:27:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720186029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=E2m+9eJRnfx2USMOVWoWK4kDvrhAJh9qV1ylRE1YWS0=;
+	b=O2yUNiD+54pfHbHMSe+Se5ljmvJwWh6yxafH2zvEY3e1YONEcRmuZNxHXJZPSHXhCix46X
+	EwEv1A7y0s45brRgcMsD8KYniALs3L8IApxd6GhYrwXx2ytKKC02Tr23ek9yjRMeuqJGN5
+	l4HTq3ia9Bve40QTN/lpDjiOAZJ3zUGYQXNyZMSqvWO+O9d08jMTkV2U8uWhNeM9+/iuTO
+	l2nga7n3KVngcneqNjn19BWNqkddK75fdid+AE6wDeJCmOAkZUBvYGwfSNKdXYCEidfdWI
+	BNM9fvcENd9aXetilMqPKAEwR/HXA4JZCjbSmi7asEpVxqcdGRGbma8m2IQU6w==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Nathan Chancellor <nathan@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v16 00/14] Introduce PHY listing and link_topology tracking
+Date: Fri,  5 Jul 2024 15:26:51 +0200
+Message-ID: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CY5PR11MB6414:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06b45ef4-e29b-42dd-ec64-08dc9cf5d6d3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?eVNxdHBOdVFKYmdIMzhET1hPL1IxdzV2UElZTHZXTks2b0hzNHpFditCZEdh?=
- =?utf-8?B?b1hkRW1ORXN6Z05LNnlsemhqVE9Xa2RIc3B1cUZlKzJJZUtHdVVYY0p1OEZn?=
- =?utf-8?B?ODA4SUNVU1dsWWxqN1BCMWZ4RGIzelR6RVZVWGlYOTJCUmU4cVZaYjJlT3V2?=
- =?utf-8?B?MDljNDhPeUJjTjhMUGRUQ21XSWNEWmxyTWhZY1I3ajBQbURiWTd1TUZOT3l0?=
- =?utf-8?B?MXlpa2tlRnhPVGkzcHhiNksrdGE4UU1Neml0U1Z4Vmx3eVVYWTJHa1Z2UGJh?=
- =?utf-8?B?b2NCaHBIK3JKVDlWeXpFUjhlQTlqeVNCVlp3dDh3YVQ3TmV0aVVmMWxHL2lW?=
- =?utf-8?B?Y2VXUDB2NmFHWGlSQlYrd0ZyQzFnWnBuRTk1WFZuS1Q3My9vV1NOeDBzejRW?=
- =?utf-8?B?NTFsRTEwU2YxbzhNK0VtbGVPaVpSWkJWZ291SUt2TmxmandJWHRiQnlBeUcy?=
- =?utf-8?B?RW10TmFmVzgzTCtRNHMxOUlqNVl4OXJBNkYyRWhhNHZrenkwaEtRUDUwdXNR?=
- =?utf-8?B?MURMeklQdlg4SjZrZ1RHNGhva1VGK0ZHaHJyUjZLQnRuL1F3NUJ0bVFFUHBm?=
- =?utf-8?B?UEt2dkZjYWk1WXJ1UDBBRkt0bHpQeS9DRmZ6K05yVTRJVDNuNytOVjI4dHpz?=
- =?utf-8?B?ZGRrM1JGSHJtTUc3MWZxZ1NLYUF3bmptbG9oMU1aQ2luODNMTndvV0tEQnFQ?=
- =?utf-8?B?cU5iUXpta2hmeFFBSXVpbDc5Q0xvWVdoWHRRNSt6Q3BVbWkzQTV6a20wb2s5?=
- =?utf-8?B?YUYzYXpMS2pwVGF0NVRQYk9tMlNZTzc4SEhXY3N2cDNvOUhMVEJSVDBHSXQx?=
- =?utf-8?B?THh1U0RXTVBKUWZNaStCT0MwWGxxaVNLUks0U05JZ1d5SUQwd0JmMmdDNUdO?=
- =?utf-8?B?N1dLQ1ovaHcxVWE0UmlkVEE3b0dRb3JEdmlpdU5HamZOTXhyTHRoTHcvZ2Na?=
- =?utf-8?B?bEdCYmcyd3hlcCtiRlNKRmFoWENwTjZaSzFhY0dQdHlxNXVyZ2lhUStIRUZI?=
- =?utf-8?B?QWVNU1BvQlY1RGRlbVhrSzN6aVNQK0p6dnMvdDVXNzIveUt0b2FKbGZ2bDVl?=
- =?utf-8?B?dmQ4S1h0SVR6UE1aT2lUeFAwZ25GNVdud0tOd0VSQVd5U1ExbFc2cGF2K2o0?=
- =?utf-8?B?d0NhWTVMZTFzcTExWGRMOTc0cXVnb2Mya0JlZjVOZnN1SEY4b1NzOWIxOFpw?=
- =?utf-8?B?NlRjMU11S0pIUmUxSUx4K0dIMlROOEhtTVFkTVgvc2paVjhsMDJZQzd6VTRB?=
- =?utf-8?B?OUhhbnFoaG9qN094TXVnd0FlcFduL0dRdEl2cExBenFLRTl5eHZwK1d1Y2RO?=
- =?utf-8?B?L3NxdktOVjRBUlBLYnN0NEYzOHh6b3ExZHN3My83VktjdG5jYktRWlg3TEpF?=
- =?utf-8?B?ZWZpYzNEMjl6djU2SVg1TXpSUmZLUy9ZRzM4QmpWaUpCcW5uckZod3liL3Bj?=
- =?utf-8?B?UTZ1Vktxc0IxeDQ2Z1dQQjdISnBmVS8ya3dyUnJTc1gycERudWp0MU41Yndu?=
- =?utf-8?B?TmNNOVdaK2VWaGxtRWs5dFA5S3laN0xENXpEZE1DNmRUSkRhVkdOZmJZaWNp?=
- =?utf-8?B?a01mNHd3RjBMSVd5Y0JCUUg3YjEycWFEL3J5RnZQck9pYjZMNjFINnpuQVZl?=
- =?utf-8?B?SkI5enF2WDlVWjZ2dW1mcVUyaC83RGlNdmxsclVMNHZsblovamdDLzJ0K2RZ?=
- =?utf-8?B?YmZzZXNKSjFhRnJKWEVaWTUzdkw3VzJxRUpmQmpCemh1Q3FET210QWxoazZm?=
- =?utf-8?B?WHJkaEtKc0Yxc295U2lUZGtmaGpWdjRQQXdFclV4dmo5OFJSWmpBLzFJSG1s?=
- =?utf-8?B?dXZ4YVJyTkYxSFhSa2lvUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ekRmWXo2RlRNblVFbmdxVUwxREV2Unc0dVRqaWcwVDFwRlM2SkRhVCtaNlNC?=
- =?utf-8?B?NXlTdVRJeklxZEI1WllyQjl4cUcrcWFxeWhWQ0t1cXJnT0RJRnVtdktzUHVy?=
- =?utf-8?B?TnZnSTFWM0puRXI3aUEzS3NLSWxuNS9nVUt0cUVQeEFkT3JBbXF3RVh1Slh1?=
- =?utf-8?B?b1ltZ0ljV3hDaDdCS3BTRXdqOU84R012aDk2ZnF5dlVBNnZLREtuSU1BREJW?=
- =?utf-8?B?WUIxM0hKZEY3SU1ZaTh5NUJqK2VKa1BxTnllNlprTE1oVWh6eldoa01Ueito?=
- =?utf-8?B?VEdxdUxkbDRiSmo2ZEJ5ZUV4L0ZqRkJUb3FVY2NTTFA3eUtYNTUwYkpsUVhN?=
- =?utf-8?B?cUg5Mmhhek1ybXZZbXJzVm9wb3B5dExNRlVVQVh5VXNpMEpPbUpxVzlvNUdP?=
- =?utf-8?B?SnVkNnk1WnFybjRKVGxIREhGRHh0MWFrQi90aER6WDJCV1R6eTN4c2k0MmRm?=
- =?utf-8?B?MWR3MkRDRUlpVFp4OEpheC91cjdVLzMxMUlCTm85RUZWWE1SeGJJczEzc1d2?=
- =?utf-8?B?S0ZOd0hhelMyTGkybVVIMHRQYjh5cGZQcDkwTVh6M2ViN2ZXVHFsOFhya0ZO?=
- =?utf-8?B?c0V2Rjg4eTNLeGRFYzB6SVpJMVc3QUszYmhsajNLQUdHSlo3SHVjalRXdTUz?=
- =?utf-8?B?K1BaMGJsMjhSckVpYTZMSGZaY2tnV0t4TlFKWU00M2h3KzhjeUtLZnIrZmZV?=
- =?utf-8?B?bjE4cmVOZ1FFOGV3Rkw2cm9QME1ndU5oQTVCNFQvTlpidFplNXExL0dKcEUv?=
- =?utf-8?B?MUJyYXRHZ3Q4SWx6THhXOW4yYkF1bHhhOFJIVGF0cmhRMW5kaG9ZaTNKbkdH?=
- =?utf-8?B?cTdmYTNUejZsNEg4TG9VcGwwNmVNWnlQMldOR2JDcXJOc3NNOGtXMVhJTlVF?=
- =?utf-8?B?YlphMFBhQ3NyNUtlc0dzSldGSm9wR08vajZzMGl0bW5pTUJBK2hGclp3eXhC?=
- =?utf-8?B?NVdlV0dRWEFWMkY2UUx2TW9aRmhSREJvRUFYbTNxUkhEUi84OFFvaGtGM3p5?=
- =?utf-8?B?NzVtU0VMRXRQQmZ1ajUrUEJ5T1J6RVVUSCtqOTRmMWY3QlVZQTVsQWRVc294?=
- =?utf-8?B?aC8zQndLMEI4dDBoUTlEUXZuSWxPbVJ4SkNrOWFkT0EvdHVrQUV6aDhhaEJs?=
- =?utf-8?B?NWJwSzlHdGZ1TzNPb05UZllobDVpbllXZEp1RWhqUTNyL0JFODBSeVVSbVpp?=
- =?utf-8?B?TWdKRkR6WkhYeWt4YTcwWFBHZDFKb0NMdzdKZHR2amlCYkJBR2s3Z3NPaGQ4?=
- =?utf-8?B?VGJ2YVNZNHVRSlAvM2ZIaTM5cFdkWWxpKy9HVTRRTkJVSjgybzlVMUtCYjRt?=
- =?utf-8?B?VTNOL2M1SDBuM0dqRUVaRnFQZHBId2hENWV4bUpIaUpoa2JQcDdKdUF2b0Rp?=
- =?utf-8?B?azh6U3RGUlk4aFM3N2VRMGZIK1BMYXZFcFhNcVh2Q0hQS2FVNUlYZFp4SDNk?=
- =?utf-8?B?UlRzYUdJdTR0OFcreFZTNUJZa2VUU1hxd1hSMzJidmZkWTFieWR3c3hUSktv?=
- =?utf-8?B?SjJvN3MzZytHYWhoTTBhK05WamdQTjNRTXBQNGdpZGVrTTFTYjlZd092T0Ez?=
- =?utf-8?B?eEI0V3g4MHNoQlhqdk1rcmFKZUZjVlUxSEx0UllwYmpydVlHbXJQeE9BTDdv?=
- =?utf-8?B?cUxteUtpYVh0V3JyZHNqczhBSGQxbk9aM2FYb2tNVTdzYW9Xei91d1cyYUMv?=
- =?utf-8?B?Rjk3akg4d3ErSzVhc0d4VGxUTVdRc3p3M2R4Slg2U0tzOVBlNXp0S1VaUjlQ?=
- =?utf-8?B?bS9RQ3p4QjRaaXBsaFhLQ0NxTDFUcWUwU0VaTVNweU51akgvNEZVL3dDaFlu?=
- =?utf-8?B?TDhVU2JNakxzNjR1WjhqZS9LQVFxRjFkWDRsV3hRTC9yemZSZks4eW43bGNY?=
- =?utf-8?B?dmZ0T0ZrYWw0L2FTdXBrNVkvUDJReVYyUVhrNnpqQ0hyLys4ZzZqeDlPN21R?=
- =?utf-8?B?RnltQ093SUg2cU5JU0RSREUzMG9Yb3k2VUt6WVl3VjluN2ZnYXB3UU54bHJS?=
- =?utf-8?B?d0dMckMrdHB2aGFPYU0wamR6Z2FsYnFxbk9UcU5KdmpkTVFNWmZSNUt0VmNR?=
- =?utf-8?B?NWF0RVdNcVRlUmxFSW5rcSs1RmI2S0NzZ0I5QzhDV0g3T3h6N2R1WTZ1Y1du?=
- =?utf-8?B?dDBTN1Fnak42N2VOc0tVcXFxVTRjMmpDNXFaN0FVRUlKOFFDalB1am53djFW?=
- =?utf-8?B?bFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06b45ef4-e29b-42dd-ec64-08dc9cf5d6d3
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2024 13:24:46.6660
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C0wTMy9yYwNP97RyqR8Pz1IwCks9gWKU0o/9TaQl3k6upN9J9lkerm1HroLhZSHBw3jKEamJCjcYl8QJLQNQ1ziFFSdGvV1QZG0m8j/vYEc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6414
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 7/5/24 15:15, Simon Horman wrote:
-> Correct name of i40e_addr_to_hkey() in it's kdoc.
-> 
-> kernel-doc -none reports:
-> 
->   drivers/net/ethernet/intel/i40e/i40e.h:739: warning: expecting prototype for i40e_mac_to_hkey(). Prototype was for i40e_addr_to_hkey() instead
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+Hello everyone,
 
-thank you,
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+This is V16 of the phy_link_topology series, aiming at improving support
+for multiple PHYs being attached to the same MAC.
 
-(unrelated digression below)
+There are 2 changes in V16 compared to V15 :
 
-> ---
->   drivers/net/ethernet/intel/i40e/i40e.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-> index bca2084cc54b..d546567e0286 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -735,7 +735,7 @@ __i40e_pf_next_veb(struct i40e_pf *pf, int *idx)
->   	     _i++, _veb = __i40e_pf_next_veb(_pf, &_i))
->   
->   /**
-> - * i40e_mac_to_hkey - Convert a 6-byte MAC Address to a u64 hash key
-> + * i40e_addr_to_hkey - Convert a 6-byte MAC Address to a u64 hash key
->    * @macaddr: the MAC Address as the base key
->    *
->    * Simply copies the address and returns it as a u64 for hashing
-> 
+ - In patch 4, the sfp_get_name() helper was moved around to better
+   match the structure of the file. Russell, I've added a Suggested-by
+   tag from you, as I used a description paragraph verbatim from your
+   last review.
 
-I really look forward to the day that sender will be able to add
-metadata to the patch displaying options - here changing context to 5
-would make review an instant thing, as now there is no signature line:
-static inline u64 i40e_addr_to_hkey(const u8 *macaddr).
-But if Simon will send like that, this will be lost when applied to 
-Tony's tree.
+ - Patches 7 and 8 were reworked so that we don't report the phy id in
+   the netlink command PHY_GET, as this is inconsistent between C22 and
+   C45, and C45 wasn't even supported.
 
-I'm picking such trivial patch to bring the topic to don't derail any
-which will have it's own on-topic discussion, but this is for the
-benefit of reviewers of bigger changes of course.
+All other patches are left unchanged from V15, besides a net-next
+rebase.
+
+As a remainder, here's what the PHY listings would look like :
+ - eth0 has a 88x3310 acting as media converter, and an SFP module with
+   an embedded 88e1111 PHY
+ - eth2 has a 88e1510 PHY
+
+# ethtool --show-phys *
+
+PHY for eth0:
+PHY index: 1
+Driver name: mv88x3310
+PHY device name: f212a600.mdio-mii:00
+Downstream SFP bus name: sfp-eth0
+Upstream type: MAC
+
+PHY for eth0:
+PHY index: 2
+Driver name: Marvell 88E1111
+PHY device name: i2c:sfp-eth0:16
+Upstream type: PHY
+Upstream PHY index: 1
+Upstream SFP name: sfp-eth0
+
+PHY for eth2:
+PHY index: 1
+Driver name: Marvell 88E1510
+PHY device name: f212a200.mdio-mii:00
+Upstream type: MAC
+
+Ethtool patches : https://github.com/minimaxwell/ethtool/tree/mc/topo-v16
+
+Link to V15: https://lore.kernel.org/netdev/20240703140806.271938-1-maxime.chevallier@bootlin.com/
+Link to V14: https://lore.kernel.org/netdev/20240701131801.1227740-1-maxime.chevallier@bootlin.com/
+Link to V13: https://lore.kernel.org/netdev/20240607071836.911403-1-maxime.chevallier@bootlin.com/
+Link to v12: https://lore.kernel.org/netdev/20240605124920.720690-1-maxime.chevallier@bootlin.com/
+Link to v11: https://lore.kernel.org/netdev/20240404093004.2552221-1-maxime.chevallier@bootlin.com/
+Link to V10: https://lore.kernel.org/netdev/20240304151011.1610175-1-maxime.chevallier@bootlin.com/
+Link to V9: https://lore.kernel.org/netdev/20240228114728.51861-1-maxime.chevallier@bootlin.com/
+Link to V8: https://lore.kernel.org/netdev/20240220184217.3689988-1-maxime.chevallier@bootlin.com/
+Link to V7: https://lore.kernel.org/netdev/20240213150431.1796171-1-maxime.chevallier@bootlin.com/
+Link to V6: https://lore.kernel.org/netdev/20240126183851.2081418-1-maxime.chevallier@bootlin.com/
+Link to V5: https://lore.kernel.org/netdev/20231221180047.1924733-1-maxime.chevallier@bootlin.com/
+Link to V4: https://lore.kernel.org/netdev/20231215171237.1152563-1-maxime.chevallier@bootlin.com/
+Link to V3: https://lore.kernel.org/netdev/20231201163704.1306431-1-maxime.chevallier@bootlin.com/
+Link to V2: https://lore.kernel.org/netdev/20231117162323.626979-1-maxime.chevallier@bootlin.com/
+Link to V1: https://lore.kernel.org/netdev/20230907092407.647139-1-maxime.chevallier@bootlin.com/
+
+More discussions on specific issues that happened in 6.9-rc:
+
+https://lore.kernel.org/netdev/20240412104615.3779632-1-maxime.chevallier@bootlin.com/
+https://lore.kernel.org/netdev/20240429131008.439231-1-maxime.chevallier@bootlin.com/
+https://lore.kernel.org/netdev/20240507102822.2023826-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (14):
+  net: phy: Introduce ethernet link topology representation
+  net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+  net: phy: add helpers to handle sfp phy connect/disconnect
+  net: sfp: Add helper to return the SFP bus name
+  net: ethtool: Allow passing a phy index for some commands
+  netlink: specs: add phy-index as a header parameter
+  net: ethtool: Introduce a command to list PHYs on an interface
+  netlink: specs: add ethnl PHY_GET command set
+  net: ethtool: plca: Target the command to the requested PHY
+  net: ethtool: pse-pd: Target the command to the requested PHY
+  net: ethtool: cable-test: Target the command to the requested PHY
+  net: ethtool: strset: Remove unnecessary check on genl_info
+  net: ethtool: strset: Allow querying phy stats by index
+  Documentation: networking: document phy_link_topology
+
+ Documentation/netlink/specs/ethtool.yaml      |  58 ++++
+ Documentation/networking/ethtool-netlink.rst  |  51 +++
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 +++++++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/marvell-88x2222.c             |   2 +
+ drivers/net/phy/marvell.c                     |   2 +
+ drivers/net/phy/marvell10g.c                  |   2 +
+ drivers/net/phy/phy_device.c                  |  48 +++
+ drivers/net/phy/phy_link_topology.c           | 105 ++++++
+ drivers/net/phy/phylink.c                     |   3 +-
+ drivers/net/phy/qcom/at803x.c                 |   2 +
+ drivers/net/phy/qcom/qca807x.c                |   2 +
+ drivers/net/phy/sfp-bus.c                     |  26 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  82 +++++
+ include/linux/sfp.h                           |   8 +-
+ include/uapi/linux/ethtool.h                  |  16 +
+ include/uapi/linux/ethtool_netlink.h          |  20 ++
+ net/core/dev.c                                |  15 +
+ net/ethtool/Makefile                          |   3 +-
+ net/ethtool/cabletest.c                       |  35 +-
+ net/ethtool/netlink.c                         |  66 +++-
+ net/ethtool/netlink.h                         |  33 ++
+ net/ethtool/phy.c                             | 308 ++++++++++++++++++
+ net/ethtool/plca.c                            |  30 +-
+ net/ethtool/pse-pd.c                          |  30 +-
+ net/ethtool/strset.c                          |  27 +-
+ 30 files changed, 1057 insertions(+), 52 deletions(-)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
+ create mode 100644 drivers/net/phy/phy_link_topology.c
+ create mode 100644 include/linux/phy_link_topology.h
+ create mode 100644 net/ethtool/phy.c
+
+-- 
+2.45.1
+
 
