@@ -1,81 +1,133 @@
-Return-Path: <netdev+bounces-109490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C9E9289AE
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:32:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7269289D7
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5216CB25505
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:32:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3C851F22903
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F8614F9FA;
-	Fri,  5 Jul 2024 13:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC1715F3E6;
+	Fri,  5 Jul 2024 13:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCZlwsTq"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="eALgaQeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3C314AD2B;
-	Fri,  5 Jul 2024 13:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 443DB155A25;
+	Fri,  5 Jul 2024 13:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186134; cv=none; b=k1hsveAmtyyY18+xrMKiQ/oIeGDwKkO/R8ccjK6HXFNrxGLpM+iw9VbRsOF4QDoiS5LAmH8JyfyKB/DfGXwE3dzvVxJHUFxkhxm/unXuMaHBHADGfNvmY/Y3lGu3sBeMS5FMHKaYgdKGpxhAgW8y6i24r5mwqSzrRHP8w4DnGoE=
+	t=1720186461; cv=none; b=tGI/V/Fj3UssVQWC8YeqtoQMRGZkB9fMWARoJrXTN1Huwn8qDZnVHg7YhupCL0jCUjTxUiehteVUIMHP7bxoqyA9+22QByUxQEDmWBwkZPOYiU4JrbXJRxDHbyUXcdkYqHW1KQWlv/vEY1FVzAWqwdeXvAt/9o3EOrk89L2LFR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186134; c=relaxed/simple;
-	bh=jt7f+2jmTHEmIKfo0UmDvt8VtgDT12rAndwW8ol4AmQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HXf54KxhCHPDEQ1S6rAE+kQiEhocWKXoiSnDBcdqNGI+aql0fQzbqU5UrBx8mI0USrE0MLg7dEPdIZhF4eJ4nx5cVZVZCAYOlBehLAZ25Z5Dgaz/Ad16JWFuKnxjQgi+uAS/90MAq+/LDJBw3QIDNikTsI3/x7/tiGlOO+A/Xjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kCZlwsTq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1278C116B1;
-	Fri,  5 Jul 2024 13:28:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720186133;
-	bh=jt7f+2jmTHEmIKfo0UmDvt8VtgDT12rAndwW8ol4AmQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kCZlwsTqn32bGdE5Vd5t8ZaMOodTg+L130TkoXAmV4EaQ0AeLQN7yBcOWVbJ+W2Z0
-	 OovMF+EygBrpSwOewtdlqpUIstxsP7wcl0mTdSTqzJo3dJBLSMeKFprvyiFaF8Zj3Z
-	 KSxjtsVj4mcgM8mrn5QbznjmmtKpORYKTEWUV9HC7pts75elGyHZb2HmPtigVPWewE
-	 bcQiDrQS/QED8Aj+AKFOw4M0LTLRd+D+SBvpaysUGdkKUlO3lI2pNnl+QJQ+v4r/fd
-	 Slzg1JiwC3rB+CPJErSmoqRUswwsobzGxqdS7WpxCCaXGYPS7VKCTX+f8uw8HiiebO
-	 IQMfi25lw1Q4w==
-Date: Fri, 5 Jul 2024 06:28:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Pravin B
- Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, =?UTF-8?B?QWRyacOhbg==?= Moreno <amorenoz@redhat.com>,
- Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 0/3] selftests: openvswitch: Address some
- flakes in the CI environment
-Message-ID: <20240705062851.36694176@kernel.org>
-In-Reply-To: <20240702132830.213384-1-aconole@redhat.com>
-References: <20240702132830.213384-1-aconole@redhat.com>
+	s=arc-20240116; t=1720186461; c=relaxed/simple;
+	bh=Ut2thkfTCY+dzcyEc4GpL/dIubksO+vlTjNGrJChsok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZBuLvH5SwVnDgTht3hnNrqPkJPFAyFzLx9wkAvSxAZTcURHcsZz9D3mTIPW7EZFVT1/Mqcsj48MDwgkNkuUr953ZXO8xKGYiz2/22LYtWCAdHLmFG98I/tFzWEOZdh1DIk6j9sxvx9oV65MuvtBagWurgDL2NKKDTrWifM7keYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=eALgaQeH; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1720186451;
+	bh=Ut2thkfTCY+dzcyEc4GpL/dIubksO+vlTjNGrJChsok=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eALgaQeHRk7+sykJRDVvA9e1JB4i/aKBBNB2IzOeE+oCcbPm4dxF9stDkwPKoolem
+	 lnp98Z5gMjaNbgbfY7lp5xl5datEBUypPLPaQN5fACGrW9wP34EKq596iRihNN8Yii
+	 nA9TvEoY7gfKJxe7JUNIZ/KuU9kCVdXGOVKB+NUsh+AzjdXpCHN1zmNuhVOfvQYmA/
+	 Isf1ZPZYvPbQIowHM3Jr0oDvAYsETgdePw337ceCa64kxCrX1ZnmrOiUXGgTxsHhHR
+	 23MyhIMANaNB7zxO4OCs0jQ8MnzLFaveQsw1ZBnGdoeUjnk+vxiE2xgmht08AAIqqF
+	 5WTjWuo/A+jzg==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id E574960078;
+	Fri,  5 Jul 2024 13:34:09 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id 4601B20474A; Fri, 05 Jul 2024 13:33:49 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Davide Caratti <dcaratti@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Florian Westphal <fw@strlen.de>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 00/10] flower: rework TCA_FLOWER_KEY_ENC_FLAGS usage
+Date: Fri,  5 Jul 2024 13:33:36 +0000
+Message-ID: <20240705133348.728901-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue,  2 Jul 2024 09:28:27 -0400 Aaron Conole wrote:
-> These patches aim to make using the openvswitch testsuite more reliable.
-> These should address the major sources of flakiness in the openvswitch
-> test suite allowing the CI infrastructure to exercise the openvswitch
-> module for patch series.  There should be no change for users who simply
-> run the tests (except that patch 3/3 does make some of the debugging a bit
-> easier by making some output more verbose).
+This series reworks the recently added TCA_FLOWER_KEY_ENC_FLAGS
+attribute, to be more like TCA_FLOWER_KEY_FLAGS, and use the unused
+u32 flags field in FLOW_DISSECTOR_KEY_ENC_CONTROL, instead of adding
+a new flags field as FLOW_DISSECTOR_KEY_ENC_FLAGS.
 
-Hi Aaron!
+I have defined the new FLOW_DIS_F_* and TCA_FLOWER_KEY_FLAGS_*
+flags to co-exist with the existing flags, so the meaning
+of the flags field in struct flow_dissector_key_control is not
+depending on the context it is used in. If we run out of bits
+then we can always split them up later, if we really want to.
+Future flags might also be valid in both contexts.
 
-The results look solid on normal builds now, but with a debug kernel
-the test is failing consistently:
+iproute2 RFC patch: (needs update of uAPI headers)
+https://lore.kernel.org/897379f1850a50d8c320ca3facd06c5f03943bac.1719506876.git.dcaratti@redhat.com/
 
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-net-dbg&test=openvswitch-sh
+---
+Changelog:
+
+v2:
+- Refactor flower control flag definitions
+  (requested by Jakub and Alexander)
+- Add Tested-by from Davide Caratti on patch 3-10.
+
+v1: https://lore.kernel.org/20240703104600.455125-1-ast@fiberby.net/
+- Change netlink attribute type from NLA_U32 to NLA_BE32.
+- Ensure that the FLOW_DISSECTOR_KEY_ENC_CONTROL
+  is also masked for non-IP.
+- Fix preexisting typo in kdoc for struct flow_dissector_key_control
+  (all suggested by Davide)
+
+RFC: https://lore.kernel.org/20240611235355.177667-1-ast@fiberby.net/
+
+Asbjørn Sloth Tønnesen (10):
+  net/sched: flower: refactor tunnel flag definitions
+  net/sched: flower: define new tunnel flags
+  net/sched: cls_flower: prepare fl_{set,dump}_key_flags() for ENC_FLAGS
+  net/sched: cls_flower: add policy for TCA_FLOWER_KEY_FLAGS
+  flow_dissector: prepare for encapsulated control flags
+  flow_dissector: set encapsulated control flags from tun_flags
+  net/sched: cls_flower: add tunnel flags to fl_{set,dump}_key_flags()
+  net/sched: cls_flower: rework TCA_FLOWER_KEY_ENC_FLAGS usage
+  flow_dissector: cleanup FLOW_DISSECTOR_KEY_ENC_FLAGS
+  flow_dissector: set encapsulation control flags for non-IP
+
+ include/net/flow_dissector.h |  30 ++++----
+ include/net/ip_tunnels.h     |  12 ---
+ include/uapi/linux/pkt_cls.h |  11 ++-
+ net/core/flow_dissector.c    |  50 ++++++------
+ net/sched/cls_flower.c       | 142 ++++++++++++++++++++---------------
+ 5 files changed, 135 insertions(+), 110 deletions(-)
+
+-- 
+2.45.2
+
 
