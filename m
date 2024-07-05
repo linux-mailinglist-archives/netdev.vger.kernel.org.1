@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-109447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BE19287ED
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004329287EE
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8BD5B21713
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:27:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D6F81F23BE2
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A17F149C4B;
-	Fri,  5 Jul 2024 11:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BED149DE4;
+	Fri,  5 Jul 2024 11:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITt+bPGu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D7nE/x0T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F7B149DE4
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653CD149C70
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720178826; cv=none; b=RskEmeqLXKw8LbeQzd8dzuTRnURfdIgosmDSr9DznS42SXfVecQukFmDzJtHJ5c9ZK4qdyMNZfyUpjeIxtW5SoptpYoRMR3UFlKJBey30drEitvoAMu2GIqnSV3HzXIBCBl1w+DBONGxeh23HEQVQf93FgkWZ0gMnv4Uz/dcsOQ=
+	t=1720178828; cv=none; b=ECrwW592hoPeMUiIw9YGCkkfsVvx2/0MJw8D3w6E41uas1phGOHmo+UIrG3Vg9TGyKq44COnxr05Z0mXy+178v6tGE7TEhPhbVDiN3LLh1lKNF5I7kCeG+vfAvcMfZdlUScBBUjwDTEN1+1x4oTYeRZqt4A4St+vWiTvU8zt4ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720178826; c=relaxed/simple;
-	bh=/iqhISmyjp10Y9gZXJqXSHFekdzGto3I0yZH76KXFPw=;
+	s=arc-20240116; t=1720178828; c=relaxed/simple;
+	bh=yrBV5IftFpUXlj5MIMux76e/rLUFvmgMTRAmNwhBNoI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=l18C7Fx3Tcj+1b5rFAfzJ/b+fHz6Iqoi0F/39eY3Lv4AA/86vUpEppNbnmypXjJfDZ3uucO5gZtPm99NpOosSw5PTR7iNsTXLATjt2DCiYs8qhVyfYBAvIPkTXR2RmszAFvi+6mWnRxknxNkkc3qGWYZY+iQNadMZ8NgD3N2gpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITt+bPGu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213C5C32781;
-	Fri,  5 Jul 2024 11:27:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bfM5iNvwLb+OdAebzvLRX+BSzxrltlf1YQ0D2Ug6h0vmGmgTRnudNVaoLpvHnPt77AIk0Q6akS2CHz1NAc6wUPHK/H/mBTGUtlfq45Ykz/q5P93jTzh5Ksr06/4RUFywXGAeExuNXm4r7e4IXk1qUWuQz5jSjuIuLryka/QLd98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D7nE/x0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19D0C32781;
+	Fri,  5 Jul 2024 11:27:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720178826;
-	bh=/iqhISmyjp10Y9gZXJqXSHFekdzGto3I0yZH76KXFPw=;
+	s=k20201202; t=1720178827;
+	bh=yrBV5IftFpUXlj5MIMux76e/rLUFvmgMTRAmNwhBNoI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ITt+bPGujL39bzyL+8MC5J48OI+puhMSJeRgObQImIADNNaAu/StWrx2phhDEVAVb
-	 9oHPEKuJxyQBo75mjMr81g1iyEcY3mn1bxr3Rk3YfBwowuhb8Uy3XiRIVYK589gbPl
-	 ZtYi8aKfNbsRu4Y6riGrO5OosUnM78QZx4AThfMc/C6urxTqhJLY9D/aiKGE77cJDD
-	 +X1ZPMC0efhjjfFjjqS8V+gb/UrSPLfQAN7zBiBQrYuFzcXSG71cbuQmOTFsJEe/ZA
-	 uOO4cBifihf+lZhk2twficp/zKlweaTrmHj/BRSG024WmQ9bP/gtXTPZrQ+RZKdnG+
-	 hmLCz+3xnWFVg==
+	b=D7nE/x0T/C+QisBajqr9Irh+NeIxuAd18OzXZ1XEB95o0gViRPX5se1yXytKCkR/v
+	 nFVem7Sado/NIMcgRWCQ6jtSdVOGEstS3iPU6W5WAZyVyHZj44qdksEr0dY+KEtlJZ
+	 Wp57udGBEUtX7kFB7i5/AM28XRgschlpiaHTcGnjRTuQ/52W1zY6GfaP6XI0dCV5xI
+	 pxlF1nnZdvYk8DM+ezuYJ5weg3T2LU6NQauZ2NxAYTtkN1RGI/VtAYcOnHFOPRXIdF
+	 Z3YPAY62ZBk26CUeIkTQxbhAWK8NTltP8WzdY3TRaJd9grs8JhqujiwrheRQPppQDp
+	 lWLG9i9TMI7gQ==
 From: Simon Horman <horms@kernel.org>
-Date: Fri, 05 Jul 2024 12:26:47 +0100
-Subject: [PATCH net-next 1/3] bnxt_en: check for fw_ver_str truncation
+Date: Fri, 05 Jul 2024 12:26:48 +0100
+Subject: [PATCH net-next 2/3] bnxt_en: check for irq name truncation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240705-bnxt-str-v1-1-bafc769ed89e@kernel.org>
+Message-Id: <20240705-bnxt-str-v1-2-bafc769ed89e@kernel.org>
 References: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
 In-Reply-To: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -62,83 +62,120 @@ Cc: Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org
 X-Mailer: b4 0.12.3
 
 Given the sizes of the buffers involved, it is theoretically
-possible for fw_ver_str to be truncated. Detect this and
-stop ethtool initialisation if this occurs.
+possible for irq names to be truncated. Detect this and
+propagate an error if this occurs.
 
 Flagged by gcc-14:
 
-  .../bnxt_ethtool.c: In function 'bnxt_ethtool_init':
-  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c:4144:32: warning: '%s' directive output may be truncated writing up to 31 bytes into a region of size 26 [-Wformat-truncation=]
-   4144 |                          "/pkg %s", buf);
-        |                                ^~   ~~~
-  In function 'bnxt_get_pkgver',
-      inlined from 'bnxt_ethtool_init' at .../bnxt_ethtool.c:5056:3:
-  .../bnxt_ethtool.c:4143:17: note: 'snprintf' output between 6 and 37 bytes into a destination of size 31
-   4143 |                 snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len - 1,
-        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4144 |                          "/pkg %s", buf);
-        |                          ~~~~~~~~~~~~~~~
+  .../bnxt.c: In function 'bnxt_setup_int_mode':
+  .../bnxt.c:10584:48: warning: '%s' directive output may be truncated writing 4 bytes into a region of size between 2 and 17 [-Wformat-truncation=]
+  10584 |         snprintf(bp->irq_tbl[0].name, len, "%s-%s-%d", bp->dev->name, "TxRx",
+        |                                                ^~                     ~~~~~~
+  In function 'bnxt_setup_inta',
+      inlined from 'bnxt_setup_int_mode' at .../bnxt.c:10604:3:
+  .../bnxt.c:10584:9: note: 'snprintf' output between 8 and 23 bytes into a destination of size 18
+  10584 |         snprintf(bp->irq_tbl[0].name, len, "%s-%s-%d", bp->dev->name, "TxRx",
+        |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10585 |                  0);
+        |                  ~~
+  .../bnxt.c: In function 'bnxt_setup_int_mode':
+  .../bnxt.c:10569:62: warning: '%s' directive output may be truncated writing between 2 and 4 bytes into a region of size between 2 and 17 [-Wformat-truncation=]
+  10569 |                 snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d", dev->name,
+        |                                                              ^~
+  In function 'bnxt_setup_msix',
+      inlined from 'bnxt_setup_int_mode' at .../bnxt.c:10602:3:
+  .../bnxt.c:10569:58: note: directive argument in the range [-2147483643, 2147483646]
+  10569 |                 snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d", dev->name,
+        |                                                          ^~~~~~~~~~
+  .../bnxt.c:10569:17: note: 'snprintf' output between 6 and 33 bytes into a destination of size 18
+  10569 |                 snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d", dev->name,
+        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10570 |                          attr, i);
+        |                          ~~~~~~~~
 
 Compile tested only.
 
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
-It appears to me that size is underestimated by 1 byte -
-it should be FW_VER_STR_LEN - offset rather than FW_VER_STR_LEN - offset - 1,
-because the size argument to snprintf should include the space for the
-trailing '\0'. But I have not changed that as it is separate from
-the issue this patch addresses.
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index bf157f6cc042..5ccc3cc4ba7d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4132,17 +4132,23 @@ int bnxt_get_pkginfo(struct net_device *dev, char *ver, int size)
- 	return rc;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 220d05e2f6fa..15e68c8e599d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -10538,7 +10538,7 @@ static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
+ 	return __bnxt_trim_rings(bp, rx, tx, max, sh);
  }
  
--static void bnxt_get_pkgver(struct net_device *dev)
-+static int bnxt_get_pkgver(struct net_device *dev)
+-static void bnxt_setup_msix(struct bnxt *bp)
++static int bnxt_setup_msix(struct bnxt *bp)
  {
- 	struct bnxt *bp = netdev_priv(dev);
- 	char buf[FW_VER_STR_LEN];
--	int len;
+ 	const int len = sizeof(bp->irq_tbl[0].name);
+ 	struct net_device *dev = bp->dev;
+@@ -10558,6 +10558,7 @@ static void bnxt_setup_msix(struct bnxt *bp)
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+ 		char *attr;
++		int rc;
  
- 	if (!bnxt_get_pkginfo(dev, buf, sizeof(buf))) {
--		len = strlen(bp->fw_ver_str);
--		snprintf(bp->fw_ver_str + len, FW_VER_STR_LEN - len - 1,
--			 "/pkg %s", buf);
-+		int offset, size, rc;
-+
-+		offset = strlen(bp->fw_ver_str);
-+		size = FW_VER_STR_LEN - offset - 1;
-+
-+		rc = snprintf(bp->fw_ver_str + offset, size, "/pkg %s", buf);
-+		if (rc >= size)
+ 		if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+ 			attr = "TxRx";
+@@ -10566,24 +10567,35 @@ static void bnxt_setup_msix(struct bnxt *bp)
+ 		else
+ 			attr = "tx";
+ 
+-		snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d", dev->name,
+-			 attr, i);
++		rc = snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d",
++			      dev->name, attr, i);
++		if (rc >= len)
 +			return -E2BIG;
+ 		bp->irq_tbl[map_idx].handler = bnxt_msix;
  	}
 +
 +	return 0;
  }
  
- static int bnxt_get_eeprom(struct net_device *dev,
-@@ -5052,8 +5058,11 @@ void bnxt_ethtool_init(struct bnxt *bp)
- 	struct net_device *dev = bp->dev;
- 	int i, rc;
+-static void bnxt_setup_inta(struct bnxt *bp)
++static int bnxt_setup_inta(struct bnxt *bp)
+ {
+ 	const int len = sizeof(bp->irq_tbl[0].name);
++	int rc;
++
  
--	if (!(bp->fw_cap & BNXT_FW_CAP_PKG_VER))
--		bnxt_get_pkgver(dev);
-+	if (!(bp->fw_cap & BNXT_FW_CAP_PKG_VER)) {
-+		rc = bnxt_get_pkgver(dev);
-+		if (rc)
-+			return;
-+	}
+ 	if (bp->num_tc) {
+ 		netdev_reset_tc(bp->dev);
+ 		bp->num_tc = 0;
+ 	}
  
- 	bp->num_tests = 0;
- 	if (bp->hwrm_spec_code < 0x10704 || !BNXT_PF(bp))
+-	snprintf(bp->irq_tbl[0].name, len, "%s-%s-%d", bp->dev->name, "TxRx",
+-		 0);
++	rc = snprintf(bp->irq_tbl[0].name, len, "%s-%s-%d", bp->dev->name,
++		      "TxRx", 0);
++	if (rc >= len)
++		return -E2BIG;
++
+ 	bp->irq_tbl[0].handler = bnxt_inta;
++
++	return 0;
+ }
+ 
+ static int bnxt_init_int_mode(struct bnxt *bp);
+@@ -10599,9 +10611,11 @@ static int bnxt_setup_int_mode(struct bnxt *bp)
+ 	}
+ 
+ 	if (bp->flags & BNXT_FLAG_USING_MSIX)
+-		bnxt_setup_msix(bp);
++		rc = bnxt_setup_msix(bp);
+ 	else
+-		bnxt_setup_inta(bp);
++		rc = bnxt_setup_inta(bp);
++	if (rc)
++		return rc;
+ 
+ 	rc = bnxt_set_real_num_queues(bp);
+ 	return rc;
 
 -- 
 2.43.0
