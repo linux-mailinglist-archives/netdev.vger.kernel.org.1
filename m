@@ -1,207 +1,125 @@
-Return-Path: <netdev+bounces-109428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C567B9286FB
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:42:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EDD928705
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479981F21EAD
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:42:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86D211C22501
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B9B14882E;
-	Fri,  5 Jul 2024 10:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WQQl+oZe";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FKpLMTkU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9493143C59;
+	Fri,  5 Jul 2024 10:45:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E665F148312;
-	Fri,  5 Jul 2024 10:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D33214386B
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 10:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720176098; cv=none; b=WZrEp1Vzr5iQa1yZWTA2KAgQsLzdIHwA/5/KI2Hj573clxuomntiePncOzpxu+gcL9rvhYg4Dkx4Mhfh2uRJRx3lqD0eiwhO5r2hXl4ESv9/ZDEz1pzOIFuQtx8Pa7KJ2FKuiUu4X3G2KWspBTLxo44mG6k3R+Mg1nIW6BderI0=
+	t=1720176357; cv=none; b=t5Umt86nCvld8Z3JbrwRsemEAds2DZZeTyrAEZt/Uf4+NGeKW6LLlzl7K2C774EGRVfMSPaUpLgDMq6tTpjBba0JODUeVYIBlO6P23c4dMaojicRdbvCoWibc7VpI5fjJyPvW2kQYyRJQWrebQfaL9C5L3nqMB3V75U5/hrplE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720176098; c=relaxed/simple;
-	bh=WrLvEPqussB+gTxkjuUCsszsRl9PTpcdBFp0rLY5tyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LgcfIEc5bwadr4lyHNUYWhSkMEacWhjmiFfVSCiHNMBYVdCNCDIaoOVS2pvCRUFV6zcEwgSf3/xQIOVPjj+KBWgBJNzAU9Nj3rQ6+o66i++9oqp1pGOKeJ981A4TGHz7V4ogid9J9s/W1sWbnOJvj2gOcWKy+a59AqiS9AL6F4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WQQl+oZe; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FKpLMTkU; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 5 Jul 2024 12:41:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1720176095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fXMq/XNQs5YpQvzDhmCSvQaZvdAfxzgd0YaozA/EAD8=;
-	b=WQQl+oZeP0joyZOhtAJVbQCISatfHb1QhLSblDu7/bjS5fnjeSIaMDe7MdvlIe518KnpRv
-	DkLz/zOoKB1IsZE2FS4qGzH05oh4zEBBwaao7+QFUyJbRUZ7jzaVpT9+guiHTKzRgaWSFx
-	dNljz4/B1G6Lv6dtpDxyXPq3tQt7vhqNujh202sDz5VNocSIMaig8GcbiKdtpewcQq5D22
-	ryJ7RUk2M/xMDf/uZsITSdQavqT9bXKHX7VPKZ5dVLy+sK2HkO2c17tNwMEWaVDIIyH2uG
-	1ohX0FpkNbMc1vIwMao0wr3VsbhjHeooLWTDTsxuTNKCxZDr8cv0+IM/ZF90JA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1720176095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fXMq/XNQs5YpQvzDhmCSvQaZvdAfxzgd0YaozA/EAD8=;
-	b=FKpLMTkUO5S+Qaxu69ab4S/+Nqs0cKUGfPTGF7Blt6ZIBxJfspWM4rs6x3QeoomzN79u2q
-	LAwf5RVr7mbPP8Bg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: syzbot <syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, dsahern@kernel.org, eddyz87@gmail.com,
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
-	martin.lau@linux.dev, pabeni@redhat.com, sdf@fomichev.me,
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev, Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH bpf-next] seg6: Ensure that seg6_bpf_srh_states can only be
- accessed from input_action_end_bpf()
-Message-ID: <20240705104133.NU9AwKDS@linutronix.de>
-References: <000000000000571681061bb9b5ad@google.com>
+	s=arc-20240116; t=1720176357; c=relaxed/simple;
+	bh=1Y7ZljmHy6Zq7XzfE9MKtOjXiUVUWL5qxF5SPQ42vRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g5Ux7rvVHJM5GaRF4s+r3z14Q/aaJUOuzjiGa73Lrpjc7X4Se7J46N/wH4e6vL+Xb89tMvaDYsHiUQ+a9HEFpRmhaSAZuPyGRvE/Zb3BkJoX+t0hwxSwjgveQCrs45AQi8DeKOqdAnXif/Tr2INBVM5LJgdImoBHW25TgF5kHbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.2])
+	by gateway (Coremail) with SMTP id _____8Bx3+vgzodm60QBAA--.3861S3;
+	Fri, 05 Jul 2024 18:45:52 +0800 (CST)
+Received: from [192.168.100.8] (unknown [223.64.68.2])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxHMfezodmmEU8AA--.9527S3;
+	Fri, 05 Jul 2024 18:45:51 +0800 (CST)
+Message-ID: <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
+Date: Fri, 5 Jul 2024 18:45:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <000000000000571681061bb9b5ad@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
+ <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
+ <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
+ <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+ <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
+ <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
+ <648058f6-7e0f-4e6e-9e27-cecf48ef1e2c@loongson.cn>
+ <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxHMfezodmmEU8AA--.9527S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWrKr45XryxGr1fZF4UAr17twc_yoW8Jr4Upr
+	WDJa92ka97JF1Sy3Wvyw48G3WUKa95JwnrGF1Dt348Ar13WFyqvrWa93909a4kWws7J3yY
+	vF1ktFW3ur1DtagCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-Initially I assumed that the per-CPU variable is `seg6_bpf_srh_states'
-is first initialized in input_action_end_bpf() and then accessed during
-the bpf_prog_run_save_cb() invocation by the eBPF via the BPF callbacks.
-syzbot demonstrated that is possible to invoke the BPF callbacks (and
-access `seg6_bpf_srh_states') without entering input_action_end_bpf()
-first.
 
-The valid path via input_action_end_bpf() is invoked within NAPI
-context which means it has bpf_net_context set. This can be used to
-identify the "valid" calling path.
+在 2024/7/5 18:16, Serge Semin 写道:
+>>> Seeing the discussion has started anyway, could you please find out
+>>> whether the multi-channel controller will still work if the MSI IRQs
+>>> allocation failed? Will the multi-channel-ness still work in that
+>>> case?
+>> Based on my test results:
+>>
+>> In this case, multi-channel controller don't work. If the MSI IRQs
+>> allocation
+>>
+>> failed, NIC will work in single channel.
+> What does "NIC will work in single channel" mean? Do the driver
+> (network traffic flow with a normal performance) still work even with
+> the plat->tx_queues_to_use and plat->rx_queues_to_use fields set to
+> eight? If it's then the multi-channel-ness still seems to be working
+> but the IRQs are delivered via the common MAC IRQ. If you get to
+> experience the data loss, or poor performance, or no traffic flowing
+> at all, then indeed the non-zero channels IRQs aren't delivered.
+>
+> So the main question how did you find out that the controller work in
+> single channel?
 
-Set in input_action_end_bpf() the BPF_RI_F_SEG6_STATE bit to signal the
-valid calling path and clear it at the end. Check for the context and
-the bit in bpf_lwt_seg6.*() and abort if missing.
+sorry, I meant that if the MSI allocation failed, it will fallback to 
+INTx, in which case
 
-Reported-by: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
-Fixes: d1542d4ae4dfd ("seg6: Use nested-BH locking for seg6_bpf_srh_states.")
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/linux/filter.h | 24 ++++++++++++++++++++++++
- net/core/filter.c      |  6 ++++++
- net/ipv6/seg6_local.c  |  3 +++
- 3 files changed, 33 insertions(+)
+only the single channel works.  if the MSI allocation failed, the 
+multi-channel-ness
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index 0bbd2585e6def..cadddb25ff4db 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -739,6 +739,7 @@ struct bpf_nh_params {
- #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
- #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
- #define BPF_RI_F_XSK_MAP_INIT	BIT(4)
-+#define BPF_RI_F_SEG6_STATE	BIT(5)
- 
- struct bpf_redirect_info {
- 	u64 tgt_index;
-@@ -856,6 +857,29 @@ static inline void bpf_net_ctx_get_all_used_flush_lists(struct list_head **lh_ma
- 		*lh_xsk = lh;
- }
- 
-+static inline bool bpf_net_ctx_seg6_state_avail(void)
-+{
-+	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-+
-+	if (!bpf_net_ctx)
-+		return false;
-+	return bpf_net_ctx->ri.kern_flags & BPF_RI_F_SEG6_STATE;
-+}
-+
-+static inline void bpf_net_ctx_seg6_state_set(void)
-+{
-+	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-+
-+	bpf_net_ctx->ri.kern_flags |= BPF_RI_F_SEG6_STATE;
-+}
-+
-+static inline void bpf_net_ctx_seg6_state_clr(void)
-+{
-+	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-+
-+	bpf_net_ctx->ri.kern_flags &= ~BPF_RI_F_SEG6_STATE;
-+}
-+
- /* Compute the linear packet data range [data, data_end) which
-  * will be accessed by various program types (cls_bpf, act_bpf,
-  * lwt, ...). Subsystems allowing direct data access must (!)
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 403d23faf22e1..ea5bc4a4a6a23 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -6459,6 +6459,8 @@ BPF_CALL_4(bpf_lwt_seg6_store_bytes, struct sk_buff *, skb, u32, offset,
- 	void *srh_tlvs, *srh_end, *ptr;
- 	int srhoff = 0;
- 
-+	if (!bpf_net_ctx_seg6_state_avail())
-+		return -EINVAL;
- 	lockdep_assert_held(&srh_state->bh_lock);
- 	if (srh == NULL)
- 		return -EINVAL;
-@@ -6516,6 +6518,8 @@ BPF_CALL_4(bpf_lwt_seg6_action, struct sk_buff *, skb,
- 	int hdroff = 0;
- 	int err;
- 
-+	if (!bpf_net_ctx_seg6_state_avail())
-+		return -EINVAL;
- 	lockdep_assert_held(&srh_state->bh_lock);
- 	switch (action) {
- 	case SEG6_LOCAL_ACTION_END_X:
-@@ -6593,6 +6597,8 @@ BPF_CALL_3(bpf_lwt_seg6_adjust_srh, struct sk_buff *, skb, u32, offset,
- 	int srhoff = 0;
- 	int ret;
- 
-+	if (!bpf_net_ctx_seg6_state_avail())
-+		return -EINVAL;
- 	lockdep_assert_held(&srh_state->bh_lock);
- 	if (unlikely(srh == NULL))
- 		return -EINVAL;
-diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-index c74705ead9849..3e3a48b7266b5 100644
---- a/net/ipv6/seg6_local.c
-+++ b/net/ipv6/seg6_local.c
-@@ -1429,6 +1429,7 @@ static int input_action_end_bpf(struct sk_buff *skb,
- 	 * bpf_prog_run_save_cb().
- 	 */
- 	local_lock_nested_bh(&seg6_bpf_srh_states.bh_lock);
-+	bpf_net_ctx_seg6_state_set();
- 	srh_state = this_cpu_ptr(&seg6_bpf_srh_states);
- 	srh_state->srh = srh;
- 	srh_state->hdrlen = srh->hdrlen << 3;
-@@ -1452,6 +1453,7 @@ static int input_action_end_bpf(struct sk_buff *skb,
- 
- 	if (srh_state->srh && !seg6_bpf_has_valid_srh(skb))
- 		goto drop;
-+	bpf_net_ctx_seg6_state_clr();
- 	local_unlock_nested_bh(&seg6_bpf_srh_states.bh_lock);
- 
- 	if (ret != BPF_REDIRECT)
-@@ -1460,6 +1462,7 @@ static int input_action_end_bpf(struct sk_buff *skb,
- 	return dst_input(skb);
- 
- drop:
-+	bpf_net_ctx_seg6_state_clr();
- 	local_unlock_nested_bh(&seg6_bpf_srh_states.bh_lock);
- 	kfree_skb(skb);
- 	return -EINVAL;
--- 
-2.45.2
+don't work.
+
+
+Thanks,
+
+Yanteng
+
+
+
 
 
