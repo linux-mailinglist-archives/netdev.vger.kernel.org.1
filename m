@@ -1,209 +1,196 @@
-Return-Path: <netdev+bounces-109560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12087928D81
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 20:28:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888FC928D9A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 20:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0DFE285452
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 18:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47BBA2834DD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 18:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E22A13DB88;
-	Fri,  5 Jul 2024 18:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E4716C87B;
+	Fri,  5 Jul 2024 18:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZUQXEfg2"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="elqokpdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377114B075
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 18:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9E281E
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 18:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720204083; cv=none; b=lCra9etK7aIh5mT6vbXdnmJ3bpPqUWRmrJ7EjqbGTsvfBVmHrzReO1nhhSbJ2HU65YVo2F62YYsMgFM5UmPfoxW0PFo5vvG9CH6B3/6C8iVaLZDdUVEKGsZl/kBtW3dc4RUQb9XWWtYdJdNgytvKaXcJZpYlSyUcxAr5bL120HQ=
+	t=1720204961; cv=none; b=LujlzGpwR2jmotiKTOLnx97P8Cnm9UMZNeD4n0JYNVKy8KsGs30TLzz5tE4ftbjZa1eFndjjqlgjme+tCGnTFdIXa2KQFZ3BcsEjXlihkjjFkvMM6t8aOLoVBY9t1jJMhWcHOd8INZCUSFPqLrea/gjBTGi0OcHBWB25UmBN0rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720204083; c=relaxed/simple;
-	bh=K32j6xe15nR75cwMwLXac78wTp2JSBFQvXkKk9cCFsw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WIaYc8+71/XltdL1SxjAx2ADw9K5nA9GJRX5l4NotStbIdaMc7gNPuYPj0pp9Tj3a9YP5rUZTO1Ln3v28KwMSWxN9QqXRukvjPh05Fj/fOuxTfCMfGc8Yn3HmZYVBR2mesc0TJsSG9BmaaVPzK6ssnv4FidbK4lMdPASylpi3bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZUQXEfg2; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a77cc44f8aaso54076866b.3
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 11:28:01 -0700 (PDT)
+	s=arc-20240116; t=1720204961; c=relaxed/simple;
+	bh=gNZKuI5Rdk9eOuppPB3/Sw93HRub2msB3pi/0b0psyo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QfW4ENIgGaAIOGjqKG+AKibyF1/iIXAqLlFuaalK8vYRcKSytXGDeWtq1U4T1Qv1AX5aLuYX6G+3mEzxm9x8awczyiypMpEJCy63Zj7WIKLZyaMYnIf4p+2NNvnfKbLRvPGDW2FVR6jj2iTULU+MXSuda0aq/Utrmt3HW3Cib7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=elqokpdL; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-70df213542bso1074155a12.3
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 11:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720204080; x=1720808880; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2CjB3sgIGNuR0ngpm1vWD6zXtPrtHKBNLNiVKxC+meM=;
-        b=ZUQXEfg29bFcb8wStWBRSl/CqLn6uJS4Xw35meQZTiePVSQQNcsJDOXH7ZWhbwH72E
-         PeyA4dKHJDI4JGTEsylfKrJGRvCjdKosQy61eCi2tv1X9isE8JbaiLnBMJ3lwzcdJLm1
-         d45Jh7NId2iughDan/cMfZamoYqyuNMjC1Ej8=
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1720204959; x=1720809759; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=365s+OOpeGLX38mp/s9fwwXO1Xbubh83KH7yyJikVI8=;
+        b=elqokpdL/hsHo58Chy/y9sGK6DAIrRgMGM2ToYIXZk4OXrPJtNXDHr3lqz/x6YydtQ
+         lPtVyOf4BBLmtr7aXe18I3wzO/7baphB3mbhCQPXNVA8LFZ1/yjbu9Q91VBWp2uRUwgD
+         Nk/Sh37p3r0RKWGGXdLP3N3TW3oxrPmo6X/rx7xJCIRiifd3KbCfGN2KRUf1HJilEQBt
+         OHYPrZoyjlgGNaPR7ZLqZu8pcqPAA2vjenRV38XxStOuQcm4q1T1T3nfkZk1RX4NM/jE
+         3ocHaTX8HqziUj6vKvYyvxWgYSDA0k5hrmlE5Z4WPTIZcHR0Bs0YywrQthVABLAXsOfB
+         GNaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720204080; x=1720808880;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2CjB3sgIGNuR0ngpm1vWD6zXtPrtHKBNLNiVKxC+meM=;
-        b=SKURBuiGNtoSFd2K74LnoMMu7nhYhlbQwQLJylu+AP7HhKT1C3rTb2J25PftT0sij+
-         UXroU4CQsK/yR9BKEC+9B9wcLG4Gy8aDHLSP5J7sYE8/Q92qb/jRLOtN3gJiV8JAMZkH
-         BwFMf6mCJNQFN/fPu7VnVSj5h/9Xq+vKimiX3LQc1It+3dAoEmzapS8+aWPeEJ+JlLJj
-         6/j6ESCG4TeyPlcUcjTT/Mg+GQ0qGbyamGaDTxHy9673lVk4jyUDcWVIMZtGjScYugA/
-         5XC2c3MlsXXnltY45PTkC9ntNINaTkHtwG1/1H6fj8TKwBFOI/lVBDowx6dkMIIupz70
-         KlVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXbpiyBS3TyQ9RsMkiREcPBEc+ALtnUD2UtaJGXFHah97S/netw12Y3c+454tTF2Io/velenahl8G7n808ht5XTNS5TvGwz
-X-Gm-Message-State: AOJu0YwjQiUtcxQiRpH9FbqyOkRmr51vEoh2rUVZFJEVYv6joSOOg51/
-	xCRJJEwHudKO58LorD9Hde4FUYypRTc2C/q+KtsG6dvI9SrNO+YrTmHB07QuPbw/h903UU5vRHZ
-	J5ngo2kQ+bglzQsEbQYcKn38KQnshBBU4E8zq
-X-Google-Smtp-Source: AGHT+IEi42ijiP5+XdJK5/ey6gvNYXh8PX38SxU+i02KJG451ulBjErb2UBhz424ePYwM6Ykg3rMzvJ9qWZnit25BNM=
-X-Received: by 2002:a05:6402:1ece:b0:57d:496:209a with SMTP id
- 4fb4d7f45d1cf-58e5994eb84mr5302054a12.6.1720204079602; Fri, 05 Jul 2024
- 11:27:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720204959; x=1720809759;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=365s+OOpeGLX38mp/s9fwwXO1Xbubh83KH7yyJikVI8=;
+        b=gUcqCpFwrqV2BA2GiGoS6NuQ7utRvhdslF/REHK2/a87c0du/V037LVyIhBU1OPyYZ
+         prAbiw3irbvOwAc48IThnc7pvVRjco0O53kfucvRuyr4qSNj0SOjI9rDzQpWQ3gjv2lp
+         8jk5RREUdwng//wApCEADCDYuxsE5vNX7ZGCWQc6CByUiXVhq1IQ7v6vjFabpr4Iq0Dd
+         SuMgfwNzajkNSs+aE9o8ROHysg2aOWGitGBImF+3ACIzp7F/cglPZy8hFc9BO4PvO6N4
+         Qdmqgvyt+R2nD9SNkOH0WM3cT19N43fc7AaHlbmFBO7UIcgDO8PctdfF3eVoRpa67rme
+         T6vw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbj1TPDMCIu56kNficDb26Ykh0oSO+9g4lNoQsD8Tk25iFE48VwjwBji5iaMNL7UZW83JSowZkAULcUh3JCrc8aUq96j6I
+X-Gm-Message-State: AOJu0YztE7vNivHbO80ulbh/mQQi3igM6C6zJEa4iDddWpGeDOITgmI5
+	bfLkiG1s7WHliFxY5xGArb0JxH/WtONK6sVSAbm3Sb1dqeeRmy6JKDFR+lCjjOI=
+X-Google-Smtp-Source: AGHT+IEPGJ0Rz9fgjmd8xiRuK6L+nvC2o0gcWxVIKQln77diNSr9XCjPi9O7kfEwobUiuH8SdKMDhg==
+X-Received: by 2002:a05:6a20:6a11:b0:1bd:2555:a4fb with SMTP id adf61e73a8af0-1c0cc73920emr5485933637.4.1720204958797;
+        Fri, 05 Jul 2024 11:42:38 -0700 (PDT)
+Received: from [192.168.1.13] (174-21-189-109.tukw.qwest.net. [174.21.189.109])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb18b1fde8sm53938615ad.297.2024.07.05.11.42.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jul 2024 11:42:38 -0700 (PDT)
+Message-ID: <d4b341f3-7c0c-47cd-b7cb-81f9fccd3d0f@davidwei.uk>
+Date: Fri, 5 Jul 2024 11:42:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240705-bnxt-str-v1-0-bafc769ed89e@kernel.org> <20240705-bnxt-str-v1-2-bafc769ed89e@kernel.org>
-In-Reply-To: <20240705-bnxt-str-v1-2-bafc769ed89e@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 5 Jul 2024 11:27:47 -0700
-Message-ID: <CACKFLi=N6deF89AncWbuadMZrL9Z8_w5bLkL6WOJBgUWzDPpmg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] bnxt_en: check for irq name truncation
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000002263c8061c843933"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] bnxt_en: fix kernel panic in queue api functions
+Content-Language: en-GB
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, michael.chan@broadcom.com,
+ netdev@vger.kernel.org
+Cc: somnath.kotur@broadcom.com, horms@kernel.org
+References: <20240704074153.1508825-1-ap420073@gmail.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240704074153.1508825-1-ap420073@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---0000000000002263c8061c843933
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2024-07-04 00:41, Taehee Yoo wrote:
+> bnxt_queue_{mem_alloc,start,stop} access bp->rx_ring array and this is
+> initialized while an interface is being up.
+> The rings are initialized as a number of channels.
+> 
+> The queue API functions access rx_ring without checking both null and
+> ring size.
+> So, if the queue API functions are called when interface status is down,
+> they access an uninitialized rx_ring array.
+> Also if the queue index parameter value is larger than a ring, it
+> would also access an uninitialized rx_ring.
 
-On Fri, Jul 5, 2024 at 4:27=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 220d05e2f6fa..15e68c8e599d 100644
+Hi Taehee, I deliberately didn't do a check as it is too defensive. The
+caller of the queue API e.g. netdev_rx_queue_restart() should be the one
+doing the check instead.
+
+> 
+>  BUG: kernel NULL pointer dereference, address: 0000000000000000
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 0 P4D 0
+>  Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+>  CPU: 1 PID: 1697 Comm: ncdevmem Not tainted 6.10.0-rc5+ #34
+>  RIP: 0010:bnxt_queue_mem_alloc+0x38/0x410 [bnxt_en]
+>  Code: 49 89 f5 41 54 4d 89 c4 4d 69 c0 c0 05 00 00 55 48 8d af 40 0a 00 00 53 48 89 fb 48 83 ec 05
+>  RSP: 0018:ffffa1ad0449ba48 EFLAGS: 00010246
+>  RAX: ffffffffc04c7710 RBX: ffff9b88aee48000 RCX: 0000000000000000
+>  RDX: 0000000000000000 RSI: ffff9b8884ba0000 RDI: ffff9b8884ba0008
+>  RBP: ffff9b88aee48a40 R08: 0000000000000000 R09: ffff9b8884ba6000
+>  R10: ffffa1ad0449ba88 R11: ffff9b8884ba6000 R12: 0000000000000000
+>  R13: ffff9b8884ba0000 R14: ffff9b8884ba0000 R15: ffff9b8884ba6000
+>  FS:  00007f7b2a094740(0000) GS:ffff9b8f9f680000(0000) knlGS:0000000000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 0000000000000000 CR3: 000000015f394000 CR4: 00000000007506f0
+>  PKRU: 55555554
+>  Call Trace:
+>   <TASK>
+>   ? __die+0x20/0x70
+>   ? page_fault_oops+0x15a/0x460
+>   ? __vmalloc_node_range_noprof+0x4f7/0x8e0
+>   ? exc_page_fault+0x6e/0x180
+>   ? asm_exc_page_fault+0x22/0x30
+>   ? __pfx_bnxt_queue_mem_alloc+0x10/0x10 [bnxt_en 2b2843e995211f081639d5c0e74fe1cce7fed534]
+>   ? bnxt_queue_mem_alloc+0x38/0x410 [bnxt_en 2b2843e995211f081639d5c0e74fe1cce7fed534]
+>   netdev_rx_queue_restart+0xa9/0x1c0
+>   net_devmem_bind_dmabuf_to_queue+0xcb/0x100
+>   netdev_nl_bind_rx_doit+0x2f6/0x350
+>   genl_family_rcv_msg_doit+0xd9/0x130
+>   genl_rcv_msg+0x184/0x2b0
+>   ? __pfx_netdev_nl_bind_rx_doit+0x10/0x10
+>   ? __pfx_genl_rcv_msg+0x10/0x10
+>   netlink_rcv_skb+0x54/0x100
+>   genl_rcv+0x24/0x40
+>   netlink_unicast+0x243/0x370
+>   netlink_sendmsg+0x1bb/0x3e0
+> 
+> Fixes: 2d694c27d32e ("bnxt_en: implement netdev_queue_mgmt_ops")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+> 
+> The branch is not net because the commit 2d694c27d32e is not
+> yet merged into net branch.
+> 
+> devmem TCP causes this problem, but it is not yet merged.
+> So, to test this patch, please patch the current devmem TCP.
+> The /tools/testing/selftests/net/ncdevmem will immediately reproduce 
+> this problem.
+> 
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 6fc34ccb86e3..e270fb6b2866 100644
 > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -10538,7 +10538,7 @@ static int bnxt_trim_rings(struct bnxt *bp, int *=
-rx, int *tx, int max,
->         return __bnxt_trim_rings(bp, rx, tx, max, sh);
->  }
->
-> -static void bnxt_setup_msix(struct bnxt *bp)
-> +static int bnxt_setup_msix(struct bnxt *bp)
->  {
->         const int len =3D sizeof(bp->irq_tbl[0].name);
->         struct net_device *dev =3D bp->dev;
-> @@ -10558,6 +10558,7 @@ static void bnxt_setup_msix(struct bnxt *bp)
->         for (i =3D 0; i < bp->cp_nr_rings; i++) {
->                 int map_idx =3D bnxt_cp_num_to_irq_num(bp, i);
->                 char *attr;
-> +               int rc;
->
->                 if (bp->flags & BNXT_FLAG_SHARED_RINGS)
->                         attr =3D "TxRx";
-> @@ -10566,24 +10567,35 @@ static void bnxt_setup_msix(struct bnxt *bp)
->                 else
->                         attr =3D "tx";
->
-> -               snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d", dev-=
->name,
-> -                        attr, i);
-> +               rc =3D snprintf(bp->irq_tbl[map_idx].name, len, "%s-%s-%d=
-",
-> +                             dev->name, attr, i);
-> +               if (rc >=3D len)
-> +                       return -E2BIG;
-
-I may be missing something obvious here.  snprintf() will truncate and
-not overwrite the buffer, right?  Why is it necessary to abort if
-there is truncation?  Thanks.
-
---0000000000002263c8061c843933
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILHqz8gydTBrtrMVYuWNAAogNWOhWuDV
-TFocHvG4u8UOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcw
-NTE4MjgwMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCgmKVVFqfQQG8l1U6C0V7JC35lQyhoAvc/tuNcclAOIm+eTEal
-L2ErwywwKgNXmdOucjRqz+JiylvBgtmqgbLKSgvVpkELb1J7XBRbzIHSZtzN41SsoIsrwd+w+mXL
-X6N0GdPYe7k+2Pg3c5JhQyHJVT74/TtVfdQfh7XbL8ml7qRGXl7iW0VeXt5ubveMw7GV0/oFNZrz
-xqaNip3XgnLKbyW9cuTPU7016IJGKZWIIz07x2rK2pc6F/hrsdyJnsAlSUHjshS5AyT78j69q7v6
-GhesgP9/kTR0FTOAaC4AIX9D84dZFOzOQ3bHBzGVvS3Kv0Gn3GRLjE2NfqZXJXd2
---0000000000002263c8061c843933--
+> @@ -15022,6 +15022,9 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
+>  	struct bnxt_ring_struct *ring;
+>  	int rc;
+>  
+> +	if (!bp->rx_ring || idx >= bp->rx_nr_rings)
+> +		return -EINVAL;
+> +
+>  	rxr = &bp->rx_ring[idx];
+>  	clone = qmem;
+>  	memcpy(clone, rxr, sizeof(*rxr));
+> @@ -15156,6 +15159,9 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>  	struct bnxt_cp_ring_info *cpr;
+>  	int rc;
+>  
+> +	if (!bp->rx_ring || idx >= bp->rx_nr_rings)
+> +		return -EINVAL;
+> +
+>  	rxr = &bp->rx_ring[idx];
+>  	clone = qmem;
+>  
+> @@ -15195,6 +15201,9 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>  	struct bnxt *bp = netdev_priv(dev);
+>  	struct bnxt_rx_ring_info *rxr;
+>  
+> +	if (!bp->rx_ring || idx >= bp->rx_nr_rings)
+> +		return -EINVAL;
+> +
+>  	rxr = &bp->rx_ring[idx];
+>  	napi_disable(&rxr->bnapi->napi);
+>  	bnxt_hwrm_rx_ring_free(bp, rxr, false);
 
