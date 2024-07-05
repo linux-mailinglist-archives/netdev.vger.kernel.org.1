@@ -1,143 +1,184 @@
-Return-Path: <netdev+bounces-109432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6581C928760
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:59:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4855E92876A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 893301C2271E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:59:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C23A91F2819A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE05147C9A;
-	Fri,  5 Jul 2024 10:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762D31482F2;
+	Fri,  5 Jul 2024 11:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S09WL7eJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LAace7b1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959FC148FE3
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 10:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99801465A3
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720177189; cv=none; b=jxhd5RjcIRIAkDTpqbYgv/WQfRVNDpE1X1QXdNBajd9MTURDEflXifk+d62R27pdJHS0AF1dH2V22t5WaqUlHPoa/Em8TYdXC9sotSx7ivPC6osNLtOpbfm07+rwaqthFe+PlUhyNE/ykw2EzcZv8rl8nxe6toOBEr3CZPeBNbU=
+	t=1720177285; cv=none; b=uUlmDzCz6MvLqVYRDzxLRlhUNiw0FWdgAnF1w7MWT25kEzIPmz/wwwG14T5zyDQ3x0oPDW8ZUjUHitEfWaiKII3AHmyAef+PVhEpvZ9mtXjgQTleEVijH4muASpF/NTM+PiG8TX1QtsIUFHvMebDmN2vsTESV/gmstL4a6LOxoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720177189; c=relaxed/simple;
-	bh=OVwqISTWovAIkQN4/EgRkZ+vD4eftfc/wgbHBWVWsjk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KpXaBevTm2mbNCZPC0dNAG6Qo9prGsk+6nSismt+VgGPpA/AgPYkFv5d6jNMCmc+jTeNr+0pye4MubMSGy5Mj2FlRDO9fgT/gSWfg9ggz0GLU4FHiRPZMHamP25c6KmU83rL8cQOmLzfsXdbO7y7G9+ln2BNpaI7AhYuoOJMcA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S09WL7eJ; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ee4ae13aabso15708151fa.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 03:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720177186; x=1720781986; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IwCe746/Ce3+X8YJ4u9+OppkGmoTNZZWRS7gUOb5NW0=;
-        b=S09WL7eJOz5KgqfM3xOWP2Utib7+0yhK249UeIXP3XZnc8pooh+MnW219E/KHKapI0
-         RTrvugmgVtjoWVdx4i/HJ8K780RIn5H2NW7dl/bR5QkrsgTgtw8gzDrSC2pw+bRFcMRf
-         iHFkEZV9U968qxVRwZMjcWmURaEgFSwPtEXPrj3Li4p3C47E7OQSeJVa9NLxfLNoMPh0
-         G/qoQ06anYQLIG4QwoMKno6Sb6Cccb8mn3i1l70cBgE+dZa+Hasf/h4+h3XMNX1ZRFk6
-         kMfue811vbbSeeQ21RKayxG5J5Q+GkfJTslgVXUalC/3HnT4ZBm7Rt+6oT9E0r1VPqKK
-         E6yA==
+	s=arc-20240116; t=1720177285; c=relaxed/simple;
+	bh=HJLmxBNBhQfKAg6xP07Wabw1Q9MIdul+vdU7VL1GiVY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KXFZ4FnDfqC/QOaMBYjbP9w3bUce3RRnyJ5h+llyt0COlviXWGK8U/fp/QYSAwaIpPmBJ7yt2KXCLbo9PbR8l5TdSnYAWBhgSAubuUlWRkAUZf97WyoIMjJFfrh5+XxJcN/ScJr2qTK4wctR6oAlmW9+QAvC8T6Gs9sIzOZ1vPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LAace7b1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720177282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jsdOBGQRbEZiuJVFLzl7TXLq8jlmfbnrL+M6I+EjsqI=;
+	b=LAace7b12HqPeVAsDFAd18J84GJJ4ZxkIYnYyj8zpB1tS0uhWyaaWUlOrQ/RpRBXzM6IdG
+	G4Q86rL9C3q5WJFAaaB8Ungbzgfihq2JZAy6WxiN2mSwIuBKDYCZniwCn4I8e5egETjQQd
+	Mcs/6Xy7V6dt+AFwhsK2nr5djbVjvgs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-449-qZWrV_k2NBiHZn2m1n2EmQ-1; Fri, 05 Jul 2024 07:01:21 -0400
+X-MC-Unique: qZWrV_k2NBiHZn2m1n2EmQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4255f94080bso10506585e9.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 04:01:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720177186; x=1720781986;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IwCe746/Ce3+X8YJ4u9+OppkGmoTNZZWRS7gUOb5NW0=;
-        b=soJjvPdfQt2qd3gkFCtK4zQjT7q5RkLBjK8qbvUzonrof9hpI4QkCBe1fhnhg3VBpY
-         Tgz5h6EpVp/UvoxHd4I+XGipZaVi7XdysOYw1zMpIvQSajIhXGm8CTioFtoToJCrlHp/
-         CuAi+T2LqgoPzR39jlnTP5JzWq9ErZhTsmZmq7pJ6U+fFzPWo0FufhREF+F/n4Xyvq8D
-         GCgGKl8dvBUN9PqYIw8j3VKxpgPKY8Ez6xF1VYG92Hfxcl3RqoPNJZKdx0J+2KGn2QR2
-         TgVruZt8qZHAxNsTxjqq6GKo437xNI6D9hu2hH7tpCYVfAWjZCicXFeNwEUliozrJYQv
-         Ss6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXeR/GeCF05LIq0crD2e2YwUbb6/HYhQUBBh+CK9cHXqalx75Kuk3Aph2njVL8/kh6oM93hl2E826KDQ8a+P9Op74hfKYGK
-X-Gm-Message-State: AOJu0YySxQAGwk6h1MV1wc38foRS2a6WsB80wvmAMurjxfGd+bQwdiDL
-	SSR2nvj8f9ey1vo5iZP+nj7PEZCiAxAI4iNh7Qp43+EIMieIQEVj
-X-Google-Smtp-Source: AGHT+IHhV9spZKEmfNykvFeqOJwg1mmW+m4Atofy6IrkLX/QoqsEiGq1GgD7wt8KqTgX2BepWFK/4Q==
-X-Received: by 2002:a05:651c:19a2:b0:2ea:e98e:4399 with SMTP id 38308e7fff4ca-2ee8ee01aa7mr37825351fa.36.1720177185529;
-        Fri, 05 Jul 2024 03:59:45 -0700 (PDT)
-Received: from mobilestation ([81.9.126.50])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee8f958b3dsm5177181fa.43.2024.07.05.03.59.44
+        d=1e100.net; s=20230601; t=1720177280; x=1720782080;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jsdOBGQRbEZiuJVFLzl7TXLq8jlmfbnrL+M6I+EjsqI=;
+        b=rqm7DmtSo7/hlfuElcmDziTraKx2cptASntBcYUJVg0riAvMk4h2E28oTbk9HztKw7
+         T9LWwe+r+CCIY90lyiOjkSbab6W2imMOubFI501mB5Z8I3BM08V6aaGhkpCMt6jYR5rZ
+         yAOmUGzP7IeZw9i0s+aK8Ke/4EdSlVbQSmImuquLxm+XocKUK0wFQqZSIguAXmwZkYT6
+         XUSf6e0nKmk4w2ttZhHWVXqpUXWZfd6XaN+tYDPVxogW/fxR11IFz3oG7x7i1nlVCN1K
+         f4PJRtGp8g9DMmegSKTGL7RG91AlXNjfBpXgyzEjqMirWQZ6gwCqO1eCAV5AUM9yX6sd
+         NxUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMQ9dbNp9CGHucdwJjxuBO83b8Jqcp/3aeUbXEYGG3pCz1KfWwFDDrAZGdm3v3DpM1bYOIvC4SBrv4PYK+DVsEiY5818wZ
+X-Gm-Message-State: AOJu0YyokVsN07dlxeRgP+DrFcL5e4Z2Xht8q9v4Dafls4XOhzXXqMaO
+	q7iM/0k8aKhPfZifBNq3pjhSuO6TRlSTpAZrdUElD4vyn8j1/ioHwS+DdfzTOflWYYqttxHruMw
+	sMDTUlFhRUMbTsxK0Zr9jdn9k8s1ztEMiFquVQ64CrrVL0GW5lXVfuQ==
+X-Received: by 2002:adf:f28e:0:b0:367:4dce:1ff5 with SMTP id ffacd0b85a97d-3679dd36309mr3209453f8f.32.1720177280128;
+        Fri, 05 Jul 2024 04:01:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGapJ7br0AVN/5buxgLShDBUUn055ES3+7oIVK/jWrV2wiSwwyFSGSxAPMocNKmomK6HoVOqQ==
+X-Received: by 2002:adf:f28e:0:b0:367:4dce:1ff5 with SMTP id ffacd0b85a97d-3679dd36309mr3209415f8f.32.1720177279667;
+        Fri, 05 Jul 2024 04:01:19 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36783e9faa8sm9483845f8f.64.2024.07.05.04.01.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jul 2024 03:59:45 -0700 (PDT)
-Date: Fri, 5 Jul 2024 13:59:42 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
- GMAC-specific platform data init
-Message-ID: <qj4ogerklgciopzhqrge27dngmoi7ijui274zlbuz6qozubi7n@itih73kfumhn>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
- <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
- <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
- <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
- <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
- <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
- <648058f6-7e0f-4e6e-9e27-cecf48ef1e2c@loongson.cn>
- <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
- <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
+        Fri, 05 Jul 2024 04:01:19 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 2EA9E13FDC30; Fri, 05 Jul 2024 13:01:18 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, ast@kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com
+Cc: Florian Kauer <florian.kauer@linutronix.de>, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xdp-newbies@vger.kernel.org
+Subject: Re: [PATCH] bpf: provide map key to BPF program after redirect
+In-Reply-To: <20240705103853.21235-1-florian.kauer@linutronix.de>
+References: <20240705103853.21235-1-florian.kauer@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 05 Jul 2024 13:01:18 +0200
+Message-ID: <87zfqw85mp.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
+Content-Type: text/plain
 
-On Fri, Jul 05, 2024 at 06:45:50PM +0800, Yanteng Si wrote:
-> 
-> 在 2024/7/5 18:16, Serge Semin 写道:
-> > > > Seeing the discussion has started anyway, could you please find out
-> > > > whether the multi-channel controller will still work if the MSI IRQs
-> > > > allocation failed? Will the multi-channel-ness still work in that
-> > > > case?
-> > > Based on my test results:
-> > > 
-> > > In this case, multi-channel controller don't work. If the MSI IRQs
-> > > allocation
-> > > 
-> > > failed, NIC will work in single channel.
-> > What does "NIC will work in single channel" mean? Do the driver
-> > (network traffic flow with a normal performance) still work even with
-> > the plat->tx_queues_to_use and plat->rx_queues_to_use fields set to
-> > eight? If it's then the multi-channel-ness still seems to be working
-> > but the IRQs are delivered via the common MAC IRQ. If you get to
-> > experience the data loss, or poor performance, or no traffic flowing
-> > at all, then indeed the non-zero channels IRQs aren't delivered.
-> > 
-> > So the main question how did you find out that the controller work in
-> > single channel?
-> 
-> sorry, I meant that if the MSI allocation failed, it will fallback to INTx,
-> in which case
-> 
-> only the single channel works.  if the MSI allocation failed, the
-> multi-channel-ness
-> 
-> don't work.
+Florian Kauer <florian.kauer@linutronix.de> writes:
 
-Could you please clarify what are the symptoms by which you figured
-out that the "multi-channel-ness" didn't work?
+> Both DEVMAP as well as CPUMAP provide the possibility
+> to attach BPF programs to their entries that will be
+> executed after a redirect was performed.
+>
+> With BPF_F_BROADCAST it is in also possible to execute
+> BPF programs for multiple clones of the same XDP frame
+> which is, for example, useful for establishing redundant
+> traffic paths by setting, for example, different VLAN tags
+> for the replicated XDP frames.
+>
+> Currently, this program itself has no information about
+> the map entry that led to its execution. While egress_ifindex
+> can be used to get this information indirectly and can
+> be used for path dependent processing of the replicated frames,
+> it does not work if multiple entries share the same egress_ifindex.
+>
+> Therefore, extend the xdp_md struct with a map_key
+> that contains the key of the associated map entry
+> after performing a redirect.
+>
+> See
+> https://lore.kernel.org/xdp-newbies/5eb6070c-a12e-4d4c-a9f0-a6a6fafa41d1@linutronix.de/T/#u
+> for the discussion that led to this patch.
+>
+> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+> ---
+>  include/net/xdp.h        |  3 +++
+>  include/uapi/linux/bpf.h |  2 ++
+>  kernel/bpf/devmap.c      |  6 +++++-
+>  net/core/filter.c        | 18 ++++++++++++++++++
+>  4 files changed, 28 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index e6770dd40c91..e70f4dfea1a2 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -86,6 +86,7 @@ struct xdp_buff {
+>  	struct xdp_txq_info *txq;
+>  	u32 frame_sz; /* frame size to deduce data_hard_end/reserved tailroom*/
+>  	u32 flags; /* supported values defined in xdp_buff_flags */
+> +	u64 map_key; /* set during redirect via a map */
+>  };
+>  
+>  static __always_inline bool xdp_buff_has_frags(struct xdp_buff *xdp)
+> @@ -175,6 +176,7 @@ struct xdp_frame {
+>  	struct net_device *dev_rx; /* used by cpumap */
+>  	u32 frame_sz;
+>  	u32 flags; /* supported values defined in xdp_buff_flags */
+> +	u64 map_key; /* set during redirect via a map */
+>  };
 
-Suppose you have an LS2K2000 SoC-based device, the
-plat->tx_queues_to_use and plat->rx_queues_to_use to eight and the
-loongson_dwmac_msi_config() function call is omitted. What is
-happening with the activated network interface and with the traffic
-flow then?
+struct xdp_frame is size constrained, so we shouldn't be using precious
+space on this. Besides, it's not information that should be carried
+along with the packet after transmission. So let's put it into struct
+xdp_txq_info and read it from there the same way we do for egress_ifindex :)
 
--Serge(y)
+>  static __always_inline bool xdp_frame_has_frags(struct xdp_frame *frame)
+> @@ -257,6 +259,7 @@ void xdp_convert_frame_to_buff(struct xdp_frame *frame, struct xdp_buff *xdp)
+>  	xdp->data_meta = frame->data - frame->metasize;
+>  	xdp->frame_sz = frame->frame_sz;
+>  	xdp->flags = frame->flags;
+> +	xdp->map_key = frame->map_key;
+>  }
+>  
+>  static inline
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 35bcf52dbc65..7dbb0f2a236c 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6455,6 +6455,8 @@ struct xdp_md {
+>  	__u32 rx_queue_index;  /* rxq->queue_index  */
+>  
+>  	__u32 egress_ifindex;  /* txq->dev->ifindex */
+> +
+> +	__u64 map_key; /* set during redirect via a map in xdp_buff */
+>  };
+
+Maybe make the comment a bit easier to understand? Something like "key
+of devmap/cpumap entry that is executing"?
+
+-Toke
+
 
