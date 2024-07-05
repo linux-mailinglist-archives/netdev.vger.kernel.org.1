@@ -1,88 +1,114 @@
-Return-Path: <netdev+bounces-109439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26CE9287A9
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:18:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC1C9287BA
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE37F1C2095D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:18:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182A2287191
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542A2149C5A;
-	Fri,  5 Jul 2024 11:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048A5149C50;
+	Fri,  5 Jul 2024 11:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVYpLAHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85AC1487C1
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 11:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C491487C1;
+	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720178285; cv=none; b=j56GDE2dm9T1ksUFi8u5NNjOtVYoe4MxRD2ncIERTMwHQHRSSkP6Z9hrBzjQXmxkvvGWyIuE8BEsZ/p7B42BaXx3xkdIgzI4RvVF0RpDU7FYQ8epqh70BAJNfnF5VA2PFgm7B8R8Fn23VyCyJAJkQ3DOejmsT4kqB1GbWSls28o=
+	t=1720178458; cv=none; b=RYV5h220rACyWvUp/dAaWantr5zKcNBOh5toSMDAkcftS8cfNmAgaNtgHZGFGlymQUQv9xcF2InfgOzQgD8zaI4U5K9dtFVdLfJbm16R88CeUD/12CR+Vuqbh2eQoVkWWe4VY2rOo1ekxJg+JIddK3cWYzECCOmb97JojpLfdAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720178285; c=relaxed/simple;
-	bh=DcEvBQzYn4eHzbpGBy15PzrDsQIOG4YC35uyd6YyNUg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=CoJl8pv7+FbjChP2q267M7acd8T5sDosrMs1B12px6Om84l4YHzHGDNzhxKu27yb3j/6p9+MX73PYwEfE70q5ZM0irotDLQ7KGPGZOvA/xEeYsHN2zwHUE30JXDX6y+oNUYfwkyChoRPahrJADNHh9+h6xZBfp43vPfGqwJA87o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f664993edbso203570939f.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 04:18:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720178283; x=1720783083;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FcXD0BG3kuwJsqIbgzDKmojoQKPo+GlBR5V8khmyXns=;
-        b=IzLRXL4keIAoKP32MCRVylr93m+AjQZ68MZIg+7zOeugH043wMIR/5G6Zy/Q3rtA7g
-         Un0wROPMgYVS/LE6QAROsvKL1oum0g2WcV3RjMOneFetslfg+lniCa2hIwZ40aJOmKhF
-         0FmKJMwAgHGuR+s8PabxI2+1EP7CWKl2ziFbTRs0ulDkMbNKYKs9EB6QuZK2ThiqrP2P
-         xX9BufBHWLKycJHW3aZf8uXhvaTKGYnCuZ5dDYd+F8Wu/pwoOKOqOGMK6mHoYsTNuqoo
-         DS0T+fZHBgodVmEzcmKeqx9Gq0WWeEJhTjCFwr6TJK5AUIwOChORDMKdU97fd1Z2VmO5
-         y+aw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSk8RvwKa/Ek/gOkq1qHi7wZmv3tHtcxhzDs0SIO/ptmDWUE8lEnJcxWXlDLYRfK4PCPLcA4Np2XFbOhKQ/KsivyvTt3iJ
-X-Gm-Message-State: AOJu0YyVYkjc7XpCBSXmNxJOFo6/tRhJYe4Ez1Dvh2fHmbp1TicVmZ65
-	ZXQp5mxGopRh0lkIVnRQar424Yeq4gFBm54ITEsa+gfg2PH8xy+AtrjwrXBNz00NAG42LhLYSuv
-	/Lrrz8t0URjautur0C/Iv/PJE0CNFFhJLac58072MDyT6lumRjhceLaI=
-X-Google-Smtp-Source: AGHT+IFMVpbI/oyUD/Nzf6SMZz+ORuXDMuVeo/VwepvtWQMChUOmoisakOynndWpToGIlO7sv74oPSteHwMvhUCQGIieG7LgFupM
+	s=arc-20240116; t=1720178458; c=relaxed/simple;
+	bh=ljo98Oix0zF4HtbxIYPVKXMO3zcHlaqIjHBPe9TuLUw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lRmyi19aU/Ev7NwViUTUeCG8z4dDGB7Og2CgLHCYNLrJO4NTrshAwdanmtLKiDCqT4Bqs7dDteBD3cGIUDKS1Rq58IkW1qBiw6nnPo2SIanj+865VQ+RitIT/swivz4SsE1f8zIAHoG0ABtHL7WWPvekWnD6U6shJjkp8mR6vmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVYpLAHH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58966C116B1;
+	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720178458;
+	bh=ljo98Oix0zF4HtbxIYPVKXMO3zcHlaqIjHBPe9TuLUw=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=oVYpLAHHYqf0rqaqYNaFBSs6mQSIKoR3X5yxs3asrVMZVZSL3DPMcul02DjOnlN0Z
+	 0XaDkVJoeCxLYsdZLisAO4PYAepSe/z8Kp25Q43VLO0E/bVUH2ngMq7R4AGnFHCmtP
+	 IzLNFSpHrbN//lAUkOIj3LI2a2CHfrK+2EFWYLpXxkr9PpBpfAr8nG++391Y4Llg/X
+	 4wde89IBMN0/k9U+uvD+lqFm9Z0uBRuSQ8iLMHhlGkoaSVPxCxLvmJrfmpi2f4RZGN
+	 zHSeG2az9DT5XE5xFcYnZBixCgBG1pLoY3CG42UduEnUX6Wmi4PhZqzh7xckWxtQwj
+	 9RK1vainZ7xWA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE30C30658;
+	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Subject: [PATCH 0/4] Add support for Amlogic HCI UART
+Date: Fri, 05 Jul 2024 19:20:43 +0800
+Message-Id: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:35ac:b0:4c0:7f51:c3c5 with SMTP id
- 8926c6da1cb9f-4c07f51da77mr85862173.1.1720178283056; Fri, 05 Jul 2024
- 04:18:03 -0700 (PDT)
-Date: Fri, 05 Jul 2024 04:18:03 -0700
-In-Reply-To: <20240705104821.3202-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000832194061c7e37c3@google.com>
-Subject: Re: [syzbot] [netfilter?] KASAN: slab-use-after-free Read in nf_tables_trans_destroy_work
-From: syzbot <syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com>
-To: fw@strlen.de, hdanton@sina.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAvXh2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDE0ML3aSSxNwc3TTLFPMkQ0tzI5PEJCWg2oKi1LTMCrA50bG1tQA2fFp
+ IVwAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, Yang Li <yang.li@amlogic.com>, 
+ Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1720178456; l=1154;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=ljo98Oix0zF4HtbxIYPVKXMO3zcHlaqIjHBPe9TuLUw=;
+ b=wVCKzjwrsOMYUCq8ga1twDNQUMMYDrVatd/xEz7R4znyMbF++ttuGYNqnZ85XWj298yrSuLEY
+ 2yR0llMi5+HDAp7a2s9Z6wUWVBWLVuhsLRU1IfBDsEWuXwBUgzVnG+c
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Hello,
+Add support for Amlogic HCI UART, including dt-binding, Amlogic Bluetooth driver
+and enable HCIUART_AML in defconfig.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Yang Li (4):
+      dt-bindings: net: bluetooth: Add support for Amlogic Bluetooth
+      Bluetooth: hci_uart: Add support for Amlogic HCI UART
+      arm64: defconfig: Enable hci_uart for Amlogic Bluetooth
+      MAINTAINERS: Add an entry for Amlogic HCI UART
 
-Reported-and-tested-by: syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
+ .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  |  62 ++
+ MAINTAINERS                                        |   8 +
+ arch/arm64/configs/defconfig                       |   1 +
+ drivers/bluetooth/Kconfig                          |  13 +
+ drivers/bluetooth/Makefile                         |   1 +
+ drivers/bluetooth/hci_aml.c                        | 749 +++++++++++++++++++++
+ drivers/bluetooth/hci_ldisc.c                      |   8 +-
+ drivers/bluetooth/hci_uart.h                       |   8 +-
+ 8 files changed, 847 insertions(+), 3 deletions(-)
+---
+base-commit: e3203b17771757fdcd259d6378673f1590e36694
+change-id: 20240418-btaml-f9d7b19724ab
 
-Tested on:
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
-commit:         1c5fc27b Merge tag 'nf-next-24-06-28' of git://git.ker..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=152db3d1980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
-dashboard link: https://syzkaller.appspot.com/bug?extid=4fd66a69358fc15ae2ad
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1395cd71980000
 
-Note: testing is done by a robot and is best-effort only.
 
