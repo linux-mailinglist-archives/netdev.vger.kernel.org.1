@@ -1,126 +1,140 @@
-Return-Path: <netdev+bounces-109493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E61F9289C2
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:34:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF289289C0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDAA91F2198A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:34:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC89828667E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7EA14D2A8;
-	Fri,  5 Jul 2024 13:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C5414AD24;
+	Fri,  5 Jul 2024 13:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="hgTWH+iJ"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="QOWM/B1W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AC0148FFB;
-	Fri,  5 Jul 2024 13:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1085E1487C0
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 13:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186456; cv=none; b=KqcMrZtjplI2ZVDcQv2CpdYldOLcL9RjQ8aRWElwqQ10CSfLzknB+1gMZcZRdog2t/FenT1A+sYC3mePShh3yxAok5Jg55drwHbuC42/C2bjBIX69ldAikeiqkHaoCVOig1Z49t77f5jETeaIZ50FFbDAcgQDj08tDiclUR4Bc8=
+	t=1720186455; cv=none; b=ZjIw/UIUK9n69cvsUthYmbyNXDF/73L3XaGJ85V4bZFNpGyPAeTqikhDFVYvdDtc1EAxi9ZjR6wmbKfVCbv9d7L34BKuUZshggsz9cD3mTDcRlE7mexpcZGtdn3FDSaeHKDViYmikmrh2SfsRai2vOYVkLbQbXCNbCuT8e0H50I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186456; c=relaxed/simple;
-	bh=SAPg0fozvoj3F2KG1fuguRG7wOIqoyJx/Pogexzx0HQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mnB4tfKIMtYjHLtqUhNwGb2AyE2edGDxoQSicSpJrhAZIbb5szfCuQxxjm8gm+moAmqDCDAWBFquasj0HqwIxB7lJOy7CaUFAwqUprq8cUvYCVEP5R7A3K/uVqY7Ml8A9skAKdyyx7T5xtp2zmtmHZbat/WXWfGrvoLEmnuRNpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=hgTWH+iJ; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1720186450;
-	bh=SAPg0fozvoj3F2KG1fuguRG7wOIqoyJx/Pogexzx0HQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hgTWH+iJmgQ8QF3Plh56CdkhZ1encNeXV9yD2DPIyNgKaTizRuo0RxpZ3cZNqxNdu
-	 6gbOBAwrrnonIT1Aam7qAkxZ/N3LG7KJTbvkZ0kz8xco0/vS+NKxC589aKsmoRSid0
-	 5AlNGqXpCNNcwyaYBnrZc49X+hb30nK0oO2WLQhIIIXyQazy6ZXKus8h3YWyIuCbGn
-	 zOjZXDKdlkB2JGxg2XtMnkvvbOh0sK6hPW6T88H3vK7msnm0Y5OsVfOGZ8cqU5jde5
-	 z2kkA4TiVom7+au6mxjTlqU3XOZ3vAVhKV7j0pGJaIwWo9K5XyWWAmf+qMIcyfzV05
-	 pb/uMGUei+ugQ==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 8DEA16007D;
-	Fri,  5 Jul 2024 13:34:10 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 9C6C720499A; Fri, 05 Jul 2024 13:33:51 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Florian Westphal <fw@strlen.de>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 10/10] flow_dissector: set encapsulation control flags for non-IP
-Date: Fri,  5 Jul 2024 13:33:46 +0000
-Message-ID: <20240705133348.728901-11-ast@fiberby.net>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240705133348.728901-1-ast@fiberby.net>
-References: <20240705133348.728901-1-ast@fiberby.net>
+	s=arc-20240116; t=1720186455; c=relaxed/simple;
+	bh=0E6eFn6pi1G+OMyDwr+91Kg1LtA5/QXD8Psa8Yz3RHA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y0KyOWFSk1EnSqeh1Q/4PUSHU4ssc26Qj5Wqsk1uG+7mKERsGFKab4GChfiTjnlkBb5Xmhnk8H/ywFfUMfV735xdtxdSMI6x0xoXGQh2sDS/8AociyAz10KC6RSpzQeITdrKoRlHJRHlnsSsR2IeEsWyWFhC9hzG6FJxkTN88E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=QOWM/B1W; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso16255171fa.3
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 06:34:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1720186452; x=1720791252; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4A60BGrflv30WABncs69EPulmNjteZhoN5pOKXNgMXI=;
+        b=QOWM/B1W2+8ZTYMCasu03V8AnrdP6RqgN/wOPjw4CeRz6vdNR39ONGqEw6bcrZcx45
+         g/SmvP0MmfOkjeBVSNFR0Lfl4Rx4K09OGOjUMjKN2VvprP4tJLSzWjOs0fx8gW8I2u8T
+         1aE1UjRbGq9/nm1xRBs1N9TRlrcXbG43YCpThPHk6IQDkHQ2+94bfbILCBDkIaNTtbMi
+         pOcP+6nisWLfdqm6NQF9KmPrhFFirsNPJzTcMavRJj95oAniaspjSqmzWr31shdne2il
+         GUxBdgKkJbywuodakNGyfbcMIxz8gGgT8vLGMzflIOLXWJAfyIynYSYEvff35vtWc7Fp
+         rhfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720186452; x=1720791252;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4A60BGrflv30WABncs69EPulmNjteZhoN5pOKXNgMXI=;
+        b=Zm/Zmb9T7lw40B7Aunu9rhxMeW5huTbBIcoVMa9piE1H94jZs+CeFJ6G0OdSSMoYEH
+         2K0cjNAd/c4JKULYmshIDtKfR4thwoQy/7tCGmpRGbYh5IX1hnE4vG7gPdMnddKjDnsq
+         X+/U5UxPRWG4ugMi+6klq4uTr6Yb+0kTAVVtO0k2psbtJ13kJiQ6MxYspt1j6PNIhrUV
+         AxCvJU5r5hkWPUxXDSiKtQGGe/6mTP+6hf++i09l4MEoiw1xJCW8SAqV9JZBSXg49fCO
+         e1q0ELf/Om16eobQJeAhV1Ol+ALCNLXtDD83RDW+0rabZWK/iTmKLNlFr2RvXH4EvtOc
+         zYWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdrKsjrsDTt4Sa+qJ9VN28K1OUTMVz3zc4u1fcvH043cHNfB9Yqd6zkNTmunADxUHUdYufcgeE5ysaRSj77B/yLZlFgqFH
+X-Gm-Message-State: AOJu0YwN7zCmucxJw9GLJQoYNJkqzeVIrJvK2Qx+PAQO50B1c0xe/W+k
+	9+QSGP1V/qS72ZCY3x/MpZL1rSePlfHkJGyqHraHkuIIh2+/dOim1Bw5bzPy+e7PVJCm7gbqpcg
+	U
+X-Google-Smtp-Source: AGHT+IEp2DjdO6Pq0t7v30FXeKl3DPTDEEp8ItzAO2H50rJUL4Pz54NXaLbDlOnGOQgLAphUop79xQ==
+X-Received: by 2002:a2e:3514:0:b0:2ee:8777:f87a with SMTP id 38308e7fff4ca-2ee8eda81f3mr29749541fa.29.1720186452154;
+        Fri, 05 Jul 2024 06:34:12 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:a64f:8c21:bf82:ab40? ([2a01:e0a:b41:c160:a64f:8c21:bf82:ab40])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1dda61sm63271995e9.19.2024.07.05.06.34.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jul 2024 06:34:11 -0700 (PDT)
+Message-ID: <83f8423b-3ac6-4e62-a1ab-11fddb385753@6wind.com>
+Date: Fri, 5 Jul 2024 15:34:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net 4/4] selftests: vrf_route_leaking: add local ping test
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org
+References: <20240624130859.953608-1-nicolas.dichtel@6wind.com>
+ <20240624130859.953608-5-nicolas.dichtel@6wind.com>
+ <20240627105734.GF3104@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20240627105734.GF3104@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Make sure to set encapsulated control flags also for non-IP
-packets, such that it's possible to allow matching on e.g.
-TUNNEL_OAM on a geneve packet carrying a non-IP packet.
+Le 27/06/2024 à 12:57, Simon Horman a écrit :
+> On Mon, Jun 24, 2024 at 03:07:56PM +0200, Nicolas Dichtel wrote:
+>> The goal is to check that the source address selected by the kernel is
+>> routable when a leaking route is used.
+>>
+>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+>> ---
+>>  .../selftests/net/vrf_route_leaking.sh        | 38 ++++++++++++++++++-
+>>  1 file changed, 36 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/net/vrf_route_leaking.sh b/tools/testing/selftests/net/vrf_route_leaking.sh
+>> index 2da32f4c479b..6c59e0bbbde3 100755
+>> --- a/tools/testing/selftests/net/vrf_route_leaking.sh
+>> +++ b/tools/testing/selftests/net/vrf_route_leaking.sh
+>> @@ -533,6 +533,38 @@ ipv6_ping_frag_asym()
+>>  	ipv6_ping_frag asym
+>>  }
+>>  
+>> +ipv4_ping_local()
+>> +{
+>> +	local ttype="$1"
+>> +
+>> +	[ "x$ttype" = "x" ] && ttype="$DEFAULT_TTYPE"
+> 
+> Hi Nicolas,
+> 
+> I see this pattern already elsewhere in this file, but shellecheck flags that:
+> 
+> 1. No arguments are passed to ipv4_ping_local
+Yes, I don't add an asymmetric version of this test, I don't think that's
+relevant. I wanted to keep it to be consistent with other tests.
 
-Suggested-by: Davide Caratti <dcaratti@redhat.com>
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Tested-by: Davide Caratti <dcaratti@redhat.com>
----
- net/core/flow_dissector.c | 4 ++++
- net/sched/cls_flower.c    | 3 ++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> 2. The condition can be more simply expressed as [ "$ttype" = "" ]
+>    (my 2c worth would be [ -z "$ttype" ])
+Yeah, I asked myself also, but like for the previous point, I wanted to be
+consistent with other tests.
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 1a9ca129fddde..ada1e39b557e0 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -434,6 +434,10 @@ skb_flow_dissect_tunnel_info(const struct sk_buff *skb,
- 			ipv6->dst = key->u.ipv6.dst;
- 		}
- 		break;
-+	default:
-+		skb_flow_dissect_set_enc_control(0, ctrl_flags, flow_dissector,
-+						 target_container);
-+		break;
- 	}
- 
- 	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_ENC_KEYID)) {
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 897d6b683cc6f..38b2df387c1e1 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -2199,7 +2199,8 @@ static void fl_init_dissector(struct flow_dissector *dissector,
- 	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
- 			     FLOW_DISSECTOR_KEY_ENC_IPV6_ADDRS, enc_ipv6);
- 	if (FL_KEY_IS_MASKED(mask, enc_ipv4) ||
--	    FL_KEY_IS_MASKED(mask, enc_ipv6))
-+	    FL_KEY_IS_MASKED(mask, enc_ipv6) ||
-+	    FL_KEY_IS_MASKED(mask, enc_control))
- 		FL_KEY_SET(keys, cnt, FLOW_DISSECTOR_KEY_ENC_CONTROL,
- 			   enc_control);
- 	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
--- 
-2.45.2
+I will remove this test.
 
+
+Thank you,
+Nicolas
 
