@@ -1,52 +1,65 @@
-Return-Path: <netdev+bounces-109553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC8B928C78
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 18:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF76F928C80
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 18:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8782F1F2411E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 16:50:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F9AC1F24E05
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 16:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8990716CD00;
-	Fri,  5 Jul 2024 16:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3802D16CD00;
+	Fri,  5 Jul 2024 16:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="xXzvN6ut"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pi6FKv0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD71114E2D6;
-	Fri,  5 Jul 2024 16:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8603816ABC6;
+	Fri,  5 Jul 2024 16:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720198252; cv=none; b=um0UVOEZyJEzbdV4yWPvvWwF0N4D6lNI+Z8tykIbFsg1fmkNLaFzcW5YffIlFRai9zCbxxlAOlUg4VUZh+CmADYEj9hFbKjIpVKGxvTPXRidEbk5WrS/AB3PuuQZBUUw/6hjMTucQJgudMRSUrlMCvTaMmt+5ICOAS2PYe5/ZTs=
+	t=1720198357; cv=none; b=p/CQT331D6TWeYXI7zk8JOxOyYUbJD70anNBhPdsZsO2nzsOA3azODyiAnz4abac2Rbd7BLLAULped5Pf2S6hndLkLbLt8yjdRgQYatFTwJEFwW8n8hu8KrDE05FF9+VqFYzMmlYNAZ87ICb+W70PP0/wfrjGMKrvYNefa/CIKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720198252; c=relaxed/simple;
-	bh=THpNz3GdpyxXNx1U0XkxvQAwQ4nBLkZO77Oiih/WhTg=;
+	s=arc-20240116; t=1720198357; c=relaxed/simple;
+	bh=bVhBpudNHtT6aZemL1Hlw4OKJZa6uNcfbc/AzBjAcHA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ViX4hYCCaLLQUYftFZ1COJ8ernuck3bbER1TTGQF9NdBVIImoaEzc/tPb7rhBWs11sV5mIm7/qEQMgWaseKEPppDGnuo69stcLWscQp+TLY3Cp7ad/jnuhBFC5dDXIjNbf82R5pw3d3RYLT+mOWCghMkLn3+jVw1T2Z/zG/NrVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=xXzvN6ut; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=TyacVIb4lVynekdoUcj7ogqnStFwwVkSIvRUoiyphBs=;
-	t=1720198250; x=1720630250; b=xXzvN6ut7wjhDjaTqHrpihXcS0h08eFqCerIr/jGl0b8GlY
-	9PsoOhnCgzT5v2qlp+uSrHVBSBjCNsA0niChWV++QLu79tWJUvBbA1NMIHgW+e1TP0GHG0iP7mC9S
-	b6TPE77NMkUPEa80d1eRsqmBCh6tfU84BqYto+gCvheen+v2nfmF3GpoRbi2DzQLO0JXcsny0i7eq
-	vzVGTdzo6RmJHfVnteTgOHXSXirxnYCvO/75StDJXThKc+7IMUW+0AR79bzfdVPUWR3W/S2UCYhZ4
-	2e4XroF6mPZKD8QABig4UkcHuOmMVkPMVtkqJQ9+4wZlVYCXSjwgU2XDVoJ90jbQ==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sPm8u-0004M8-T7; Fri, 05 Jul 2024 18:50:40 +0200
-Message-ID: <0b96edcc-6b5f-447f-8023-440427a9fff2@leemhuis.info>
-Date: Fri, 5 Jul 2024 18:50:40 +0200
+	 In-Reply-To:Content-Type; b=Jy3fNEyDsy2+YARo54mA5+zxSX+xyqusXYLZnTgqHdtC2meoPFWN7XLFLLXM5ckUMc0EQkkZm/6FzeMVQ4KqEu+nFwa6/7r3klbmcoeIgEUmhpXehiTr7WVf94wMOeeiOhnrrXPPgnE0Q5nSVTO/uNBI6nDacJhf34lA/PcOJFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pi6FKv0J; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720198356; x=1751734356;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bVhBpudNHtT6aZemL1Hlw4OKJZa6uNcfbc/AzBjAcHA=;
+  b=Pi6FKv0JOkvg1xopoD1P4TDWmuRetftcNBcAXbGWwMdCd4XEBUIB9xRB
+   kTQ/J0yfsGP4MehaYsY0nwfLtsT9vCdBCZc8t+Fh305aap0QlpJlOR8kY
+   qP8OaGuQj+tM/lvepFKIk1ALgdZ6nFqrp7sqeXH6H1cAO6KwTehm67ULQ
+   ZJGgPwV5cUmK7R58QKmP5wHYsXquRCdm1HmS3y98FocM1I07oljXUTLDy
+   rV/bQlufVF5UhlXOjBLiJmuZB80VUYq/qzRyRKjUIp9+sNS+1UK3zyEHa
+   nNgGe5cJL4xXG4Ewnpt0Q9EZ5nU3ZieDF5irCxOebCmVAnt9dBtYcJJHw
+   w==;
+X-CSE-ConnectionGUID: 7dO4p0AwQAikYjv4imS/AQ==
+X-CSE-MsgGUID: NQN5glWYR/OuiJpHfBDbug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17628324"
+X-IronPort-AV: E=Sophos;i="6.09,185,1716274800"; 
+   d="scan'208";a="17628324"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 09:52:35 -0700
+X-CSE-ConnectionGUID: BPtgV7+XSzyw7zOf+zxruw==
+X-CSE-MsgGUID: 3AUomb7nSEuFS8hAk75H7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,185,1716274800"; 
+   d="scan'208";a="47659166"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.38.162]) ([10.247.38.162])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 09:52:32 -0700
+Message-ID: <89ffac90-0293-4621-8178-99120af354ef@linux.intel.com>
+Date: Sat, 6 Jul 2024 00:52:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,90 +67,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: e1000e regressions reg. suspend and resume (was: Re: [GIT PULL]
- Networking for v6.10-rc7)
-To: torvalds@linux-foundation.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20240704153350.960767-1-kuba@kernel.org>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <20240704153350.960767-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH iwl-net v1 2/4] igc: Fix reset adapter logics when tx mode
+ change
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20240702040926.3327530-1-faizal.abdul.rahim@linux.intel.com>
+ <20240702040926.3327530-3-faizal.abdul.rahim@linux.intel.com>
+ <20240703150318.GN598357@kernel.org>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20240703150318.GN598357@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1720198250;c7cb92f7;
-X-HE-SMSGID: 1sPm8u-0004M8-T7
 
-On 04.07.24 17:33, Jakub Kicinski wrote:
+
+>> ---
+>>   drivers/net/ethernet/intel/igc/igc_tsn.c | 26 +++++++++++++++++++++---
+>>   1 file changed, 23 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> index 02dd41aff634..61f047ebf34d 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+>> @@ -49,6 +49,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+>>   	return new_flags;
+>>   }
+>>   
+>> +static bool igc_tsn_is_tx_mode_in_tsn(struct igc_adapter *adapter)
+>> +{
+>> +	struct igc_hw *hw = &adapter->hw;
+>> +
+>> +	return (bool)(rd32(IGC_TQAVCTRL) & IGC_TQAVCTRL_TRANSMIT_MODE_TSN);
 > 
-> The following changes since commit fd19d4a492af77b1e8fb0439781a3048d1d1f554:
+> Perhaps it is more a question of taste than anything else.
+> But my preference, FIIW, is to avoid casts.
+> And I think in this case using !! is a common pattern.
 > 
->   Merge tag 'net-6.10-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-06-27 10:05:35 -0700)
+> (Completely untested!)
 > 
-> [...] 
->
-> There's one fix for power management with Intel's e1000e here,
-> Thorsten tells us there's another problem that started in v6.9.
-> We're trying to wrap that up but I don't think it's blocking.
+> 	return !!(rd32(IGC_TQAVCTRL) & IGC_TQAVCTRL_TRANSMIT_MODE_TSN);
+> 
 
-Linus, in the scope of the topics I recently brought up on the ksummit
-list I'd really like to know how you feel about the particular situation
-Jakub hinted at avove, as I wonder if you would have preferred to see
-the culprits reverted weeks ago.
+Sure, will update.
 
-I agree with Jakub that the problem might not qualify as "blocking", as
-it seems to only affect users with certain ethernet chips. But OTOH it's
-not one, but two stacked regressions -- and one is in proper releases
-for a few weeks already now. And both afaics could have been solved
-weeks ago by quick reverts (while reintroducing an old(?) problem the
-first of the two culprits tried to fix); the author of the second
-culprit even submitted a revert weeks ago and suggested to revert the
-other change, too.
+>> +
+>> +	if ((any_tsn_enabled && !igc_tsn_is_tx_mode_in_tsn(adapter)) ||
+>> +	    (!any_tsn_enabled && igc_tsn_is_tx_mode_in_tsn(adapter)))
+>> +		return true;
+>> +	else
+>> +		return false;
+> 
+> Likewise, this is probably more a matter of taste than anything else.
+> But I think this could be expressed as:
+> 
+> (Completely untested!)
+> 
+> 	return (any_tsn_enabled && !igc_tsn_is_tx_mode_in_tsn(adapter)) ||
+> 		(!any_tsn_enabled && igc_tsn_is_tx_mode_in_tsn(adapter));
+> 
+> Similarly in the previous patch of this series.
+> 
 
-That was the long story short, here are the details.
-
-The first culprit is 861e8086029e00 ("e1000e: move force SMBUS from
-enable ulp function to avoid PHY loss issue") [v6.9-rc3, v6.8.5,
-v6.6.26]. Due to it ethernet after a suspend and resume did not work
-anymore for some users. This is something that bothers people, as
-https://lore.kernel.org/all/ZmfcJsyCB6M3wr84@pirotess/ shows.
-
-This regression was something the second culprit bfd546a552e140
-("e1000e: move force SMBUS near the end of enable_ulp function")
-[v6.10-rc2] tried to fix. Since two days after that rc was out it's
-known that this change causes some systems to not even enter suspend.
-For details see https://bugzilla.kernel.org/show_bug.cgi?id=218936 and
-https://bugzilla.kernel.org/show_bug.cgi?id=218940 . Side note: commit
-bfd546a552e140 nearly entered stable kernels as well, but I told Greg
-about the problem, who then decided to wait:
-https://lore.kernel.org/all/2024061406-refreeze-flatfoot-f33a@gregkh/
-
-It quickly became known that both regression can be fixed with reverts;
-the author of bfd546a552e140 even submitted one and suggested to revert
-861e8086029e00 as well:
-https://lore.kernel.org/all/20240610013222.12082-1-hui.wang@canonical.com/
-https://lore.kernel.org/all/20240611062416.16440-1-hui.wang@canonical.com/
-
-But another developer wanted to fix the root cause. The last version of
-the patch to do so is from 2024-06-20 afaics:
-https://lore.kernel.org/all/20240620063645.4151337-1-vitaly.lifshits@intel.com/
-The discussion about it stalled until I pointed the -net maintainers to
-it two days ago in private, as afterwards there was one more reply.
-
-All that makes me wonder if both commits should have been reverted in
-mainline weeks ago; yes, sure, the problem that 861e8086029e00 tried to
-fix would be back. But it's Fixes: tag points to a change to 4.2-rc1, so
-maybe that would not be that bad (hard to say without knowing more about
-what motivated the development of that change).
-
-That way Greg then could have reverted 861e8086029e00 as well to resolve
-this in 6.9.y and 6.6.y (the latter contains this commit since
-2024-04-10 and thus likely also shows the regression that bfd546a552e140
-was meant to fix).
-
-Ciao, Thorsten
+Will update, your suggestion is better, lesser parenthesis.
+Thanks.
 
