@@ -1,125 +1,138 @@
-Return-Path: <netdev+bounces-109429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55EDD928705
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:46:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9BEA92870A
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 12:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86D211C22501
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:46:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAF521C227C1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 10:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9493143C59;
-	Fri,  5 Jul 2024 10:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86065145FF5;
+	Fri,  5 Jul 2024 10:48:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D33214386B
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 10:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail115-95.sinamail.sina.com.cn (mail115-95.sinamail.sina.com.cn [218.30.115.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C5214658B
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 10:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720176357; cv=none; b=t5Umt86nCvld8Z3JbrwRsemEAds2DZZeTyrAEZt/Uf4+NGeKW6LLlzl7K2C774EGRVfMSPaUpLgDMq6tTpjBba0JODUeVYIBlO6P23c4dMaojicRdbvCoWibc7VpI5fjJyPvW2kQYyRJQWrebQfaL9C5L3nqMB3V75U5/hrplE8=
+	t=1720176525; cv=none; b=eOacC5qNmUD4cr6qe3vAvc44HmifY2JcyPlOzXmwVN0APaq0E2DaXvFv7D/3f54bz3FT3uPLgJ0V0A1hJh7t81qBViPODdPTkvYISUTNbVDsPg15ZFU7uaJUfG7IUnYqe05R5VUXLoNj0A3WqJl5h6aj5oiNPXnFcpBgyCy+kok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720176357; c=relaxed/simple;
-	bh=1Y7ZljmHy6Zq7XzfE9MKtOjXiUVUWL5qxF5SPQ42vRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g5Ux7rvVHJM5GaRF4s+r3z14Q/aaJUOuzjiGa73Lrpjc7X4Se7J46N/wH4e6vL+Xb89tMvaDYsHiUQ+a9HEFpRmhaSAZuPyGRvE/Zb3BkJoX+t0hwxSwjgveQCrs45AQi8DeKOqdAnXif/Tr2INBVM5LJgdImoBHW25TgF5kHbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.2])
-	by gateway (Coremail) with SMTP id _____8Bx3+vgzodm60QBAA--.3861S3;
-	Fri, 05 Jul 2024 18:45:52 +0800 (CST)
-Received: from [192.168.100.8] (unknown [223.64.68.2])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxHMfezodmmEU8AA--.9527S3;
-	Fri, 05 Jul 2024 18:45:51 +0800 (CST)
-Message-ID: <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
-Date: Fri, 5 Jul 2024 18:45:50 +0800
+	s=arc-20240116; t=1720176525; c=relaxed/simple;
+	bh=DZkXGAZOqOS8UxKTgq8Ci4H6svemPL5M77w8Qgr0DAg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ODBZZlEEJq+yVxCDH8DJphdxdcOZiH+YcgV4K+VMvrMPNpC+pwGU7+x3eUA66n/qLPvabGnVBXuoBhkOSZWSaZyu6URArdULXuPE/DQkPtmc5V6kvqdnRdxhDHNWOq0Hmwm7aKdV4n9CdybsV4FPEuSnLvKJ113tqSIg+ZxqcDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.71.197])
+	by sina.com (10.185.250.23) with ESMTP
+	id 6687CF7D00007C71; Fri, 5 Jul 2024 18:48:32 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 2348268913080
+X-SMAIL-UIID: 81AAD2B8BC994A36B295E5AF557FEB82-20240705-184832-1
+From: Hillf Danton <hdanton@sina.com>
+To: Florian Westphal <fw@strlen.de>
+Cc: netfilter-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
+Date: Fri,  5 Jul 2024 18:48:21 +0800
+Message-Id: <20240705104821.3202-1-hdanton@sina.com>
+In-Reply-To: <20240704105418.GA31039@breakpoint.cc>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
- GMAC-specific platform data init
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <b987281834a734777ad02acf96e968f05024c031.1716973237.git.siyanteng@loongson.cn>
- <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
- <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
- <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
- <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
- <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
- <648058f6-7e0f-4e6e-9e27-cecf48ef1e2c@loongson.cn>
- <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxHMfezodmmEU8AA--.9527S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWrKr45XryxGr1fZF4UAr17twc_yoW8Jr4Upr
-	WDJa92ka97JF1Sy3Wvyw48G3WUKa95JwnrGF1Dt348Ar13WFyqvrWa93909a4kWws7J3yY
-	vF1ktFW3ur1DtagCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
+On Thu, 4 Jul 2024 12:54:18 +0200 Florian Westphal <fw@strlen.de>
+> Hillf Danton <hdanton@sina.com> wrote:
+> > On Wed, 3 Jul 2024 15:01:07 +0200 Florian Westphal <fw@strlen.de>
+> > > Hillf Danton <hdanton@sina.com> wrote:
+> > > > On Wed, 3 Jul 2024 12:52:15 +0200 Florian Westphal <fw@strlen.de>
+> > > > > Hillf Danton <hdanton@sina.com> wrote:
+> > > > > > Given trans->table goes thru the lifespan of trans, your proposal is a bandaid
+> > > > > > if trans outlives table.
+> > > > > 
+> > > > > trans must never outlive table.
+> > > > > 
+> > > > What is preventing trans from being freed after closing sock, given
+> > > > trans is freed in workqueue?
+> > > > 
+> > > > 	close sock
+> > > > 	queue work
+> > > 
+> > > The notifier acquires the transaction mutex, locking out all other
+> > > transactions, so no further transactions requests referencing
+> > > the table can be queued.
+> > > 
+> > As per the syzbot report, trans->table could be instantiated before
+> > notifier acquires the transaction mutex. And in fact the lock helps
+> > trans outlive table even with your patch.
+> > 
+> > 	cpu1			cpu2
+> > 	---			---
+> > 	transB->table = A
+> > 				lock trans mutex
+> > 				flush work
+> > 				free A
+> > 				unlock trans mutex
+> > 
+> > 	queue work to free transB
+> 
+> Can you show a crash reproducer or explain how this assign
+> and queueing happens unordered wrt. cpu2?
+> 
+Not so difficult.
 
-在 2024/7/5 18:16, Serge Semin 写道:
->>> Seeing the discussion has started anyway, could you please find out
->>> whether the multi-channel controller will still work if the MSI IRQs
->>> allocation failed? Will the multi-channel-ness still work in that
->>> case?
->> Based on my test results:
->>
->> In this case, multi-channel controller don't work. If the MSI IRQs
->> allocation
->>
->> failed, NIC will work in single channel.
-> What does "NIC will work in single channel" mean? Do the driver
-> (network traffic flow with a normal performance) still work even with
-> the plat->tx_queues_to_use and plat->rx_queues_to_use fields set to
-> eight? If it's then the multi-channel-ness still seems to be working
-> but the IRQs are delivered via the common MAC IRQ. If you get to
-> experience the data loss, or poor performance, or no traffic flowing
-> at all, then indeed the non-zero channels IRQs aren't delivered.
->
-> So the main question how did you find out that the controller work in
-> single channel?
+> This should look like this:
+> 
+>  	cpu1			cpu2
+>  	---			---
+> 	lock trans mutex
+>   				lock trans mutex -> blocks
+>  	transB->table = A
+>   	queue work to free transB
+> 	unlock trans mutex
+> 				lock trans mutex returns
+>   				flush work
+>   				free A
+>   				unlock trans mutex
+> 
+If your patch is correct, it should survive a warning.
 
-sorry, I meant that if the MSI allocation failed, it will fallback to 
-INTx, in which case
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git  1c5fc27bc48a
 
-only the single channel works.  if the MSI allocation failed, the 
-multi-channel-ness
-
-don't work.
-
-
-Thanks,
-
-Yanteng
-
-
-
-
+--- x/net/netfilter/nf_tables_api.c
++++ y/net/netfilter/nf_tables_api.c
+@@ -11552,9 +11552,10 @@ static int nft_rcv_nl_event(struct notif
+ 
+ 	gc_seq = nft_gc_seq_begin(nft_net);
+ 
+-	if (!list_empty(&nf_tables_destroy_list))
+-		nf_tables_trans_destroy_flush_work();
++	nf_tables_trans_destroy_flush_work();
+ again:
++	WARN_ON(!list_empty(&nft_net->commit_list));
++
+ 	list_for_each_entry(table, &nft_net->tables, list) {
+ 		if (nft_table_has_owner(table) &&
+ 		    n->portid == table->nlpid) {
+--
 
