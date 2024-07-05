@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-109478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FABC928990
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:28:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 022C5928992
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3397FB2578F
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:28:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BAF1C22103
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19177156238;
-	Fri,  5 Jul 2024 13:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE070157A6C;
+	Fri,  5 Jul 2024 13:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bPYtqH4L"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mvUEpxsw"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31BC1527B8;
-	Fri,  5 Jul 2024 13:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EB2146D7E;
+	Fri,  5 Jul 2024 13:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720186039; cv=none; b=FEuFOKTTovVWU6PM1dR+LfHXK0UxcicBaxRlIDD4ltoLknWBB5ht3QU9HuaJGeKnUzKAtkXAaeTo9VqJBgDczTqCDgLYAth/vWu4R+mL95HRb/OiUvqVd0F8XUDDmRt155iIA6EEV3G+oZk2r2E3jWr5VM29iHdM4hXn9KIZEMg=
+	t=1720186040; cv=none; b=jtxTXTgU7sjcBN2diBQfLpV3qfD2Ju5eQT+kaTKATEZIQeaao1h1UxR93BrKBKFnrGBD3DyZ7UVhlXxOetD72yLPXqt10a4uKeHJNYdvcBw1Z/i27UQ67UiwizJSMxhfiOaAhpj3EeyB4fU5YY8OTASDr5O/KWvSXYPxIBwI3c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720186039; c=relaxed/simple;
-	bh=CAd5Qlo15/pKBKEu259DqHJMG/vSFX/zyMPS3Uy+hc4=;
+	s=arc-20240116; t=1720186040; c=relaxed/simple;
+	bh=T2reYrMTmf+Fd0m4HL+t0mvKjWTXe1crbuU324G/4CQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XVW1mxiSKKxZJVA/FZXowe+TZz4NMtmBP4DUEu1o4BLKL8dRWIbtI1+3k1Nb9qkLaSwmz8ZMrRM4raTxTkcviUlmaC4hrwS0RtSqRVN09zlqk7vaSRjsG/lxk9chz3LZRHgkV8ZyUJy7NobpM7QftjUwJB9vhEIdARoGF3mKI2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bPYtqH4L; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=OlMwdNUUcKfXxDj/B3BjdD7w9oK+igiGp9R4q2dpvIM2GN1U4xMs5i1Tt+bmobt2DiHiKSrHquWMwk5sCqf2XS5sQFisZ0jzkQIoq40Y7Ocnkla3PmS4dqcFcHSK7Rt4aR2ZZxsW2h/d50GOIA7JnrkvoHOxIFttAhUmA+T2fcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mvUEpxsw; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 17F641C000B;
-	Fri,  5 Jul 2024 13:27:14 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8F2B11C0009;
+	Fri,  5 Jul 2024 13:27:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720186035;
+	t=1720186037;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1lMI41lkYPrfVKFeLYdb6NDuhFK+s7QWeP97b3mixAs=;
-	b=bPYtqH4LVjyrKfxDBc/OdF4uCndxoPW8CqPekzMMNfCozTZkQh3OSfWGUBZ5iX2nnVSPtR
-	NymxSMdz31MgWLoF/CfHaMNPRRZe+TMZNnvi1YsPiHhyHwxoPUpIGSXpgfblmV2FpCbFWB
-	xJN+ku1TkPO3XzgAWP19Re8QEIP7VawkNTE7TWzrEQkBGyC6++Sd0EABmFV0aLtjpJQ6cB
-	4/kx/GAIVTTELQlK0/HSGS6uM4iQYv37lwrCutRxO6wBOS4SyXiWAkrYb0ubn7gkjFvOT+
-	ytlQhnQwHkx+rKfC6Wxfbg5u4mAixFsYjxNdBlSPTmcMZGTBicYxDZjG09WQEg==
+	bh=zvBYGfieJNSgOMTMs4ygDpieBcSveTVULv9bAWmHcks=;
+	b=mvUEpxswN27hTVnmH5xQRCp5Dd0kLjGHqCrCIf4Dh0Q7QsU5+Xa8+WRjJwdyZIjtiPaBDD
+	qw/IK7pm3imKoFu7zJNKfMutZQKBmtvy2viPe7lrpOfoCtuuPiIlHkb9N8+07IGLzeNccj
+	sGiR8bdpZqhH/7z9TC/MTIyFyt7/2c5hb2yumiAR8zi+FEZck67MZAgbjs054sPeKdtoXx
+	IOgU4aQtxXZGNV8jZ18w4NI9k/tqYgDoEkOnIVOG5lj9Qdu3xBmxZE8XdzSPJW7Ik1rTYc
+	ZWs8qP7qkC7kZ9EKOPvChYRMavFzuRqRZtqwLn2m2SObap1Y4e+nKQGrFdTPYQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -75,9 +75,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Dan Carpenter <dan.carpenter@linaro.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v16 04/14] net: sfp: Add helper to return the SFP bus name
-Date: Fri,  5 Jul 2024 15:26:55 +0200
-Message-ID: <20240705132706.13588-5-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v16 05/14] net: ethtool: Allow passing a phy index for some commands
+Date: Fri,  5 Jul 2024 15:26:56 +0200
+Message-ID: <20240705132706.13588-6-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
 References: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
@@ -90,77 +90,224 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Knowing the bus name is helpful when we want to expose the link topology
-to userspace, add a helper to return the SFP bus name.
+Some netlink commands are target towards ethernet PHYs, to control some
+of their features. As there's several such commands, add the ability to
+pass a PHY index in the ethnl request, which will populate the generic
+ethnl_req_info with the passed phy_index.
 
-This call will always be made while holding the RTNL which ensures
-that the SFP driver won't unbind from the device. The returned pointer
-to the bus name will only be used while RTNL is held.
+Add a helper that netlink command handlers need to use to grab the
+targeted PHY from the req_info. This helper needs to hold rtnl_lock()
+while interacting with the PHY, as it may be removed at any point.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Suggested-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
 ---
- drivers/net/phy/sfp-bus.c | 22 ++++++++++++++++++++++
- include/linux/sfp.h       |  6 ++++++
- 2 files changed, 28 insertions(+)
+ Documentation/networking/ethtool-netlink.rst |  7 +++
+ include/uapi/linux/ethtool_netlink.h         |  1 +
+ net/ethtool/netlink.c                        | 57 +++++++++++++++++++-
+ net/ethtool/netlink.h                        | 28 ++++++++++
+ 4 files changed, 91 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
-index 56953e66bb7b..f13c00b5b449 100644
---- a/drivers/net/phy/sfp-bus.c
-+++ b/drivers/net/phy/sfp-bus.c
-@@ -722,6 +722,28 @@ void sfp_bus_del_upstream(struct sfp_bus *bus)
- }
- EXPORT_SYMBOL_GPL(sfp_bus_del_upstream);
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index bfe2eda8580d..0b5712d7c0cb 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -57,6 +57,7 @@ Structure of this header is
+   ``ETHTOOL_A_HEADER_DEV_INDEX``  u32     device ifindex
+   ``ETHTOOL_A_HEADER_DEV_NAME``   string  device name
+   ``ETHTOOL_A_HEADER_FLAGS``      u32     flags common for all requests
++  ``ETHTOOL_A_HEADER_PHY_INDEX``  u32     phy device index
+   ==============================  ======  =============================
  
-+/**
-+ * sfp_get_name() - Get the SFP device name
-+ * @bus: a pointer to the &struct sfp_bus structure for the sfp module
-+ *
-+ * Gets the SFP device's name, if @bus has a registered socket. Callers must
-+ * hold RTNL, and the returned name is only valid until RTNL is released.
-+ *
-+ * Returns:
-+ *	- The name of the SFP device registered with sfp_register_socket()
-+ *	- %NULL if no device was registered on @bus
-+ */
-+const char *sfp_get_name(struct sfp_bus *bus)
+ ``ETHTOOL_A_HEADER_DEV_INDEX`` and ``ETHTOOL_A_HEADER_DEV_NAME`` identify the
+@@ -81,6 +82,12 @@ the behaviour is backward compatible, i.e. requests from old clients not aware
+ of the flag should be interpreted the way the client expects. A client must
+ not set flags it does not understand.
+ 
++``ETHTOOL_A_HEADER_PHY_INDEX`` identifies the Ethernet PHY the message relates to.
++As there are numerous commands that are related to PHY configuration, and because
++there may be more than one PHY on the link, the PHY index can be passed in the
++request for the commands that needs it. It is, however, not mandatory, and if it
++is not passed for commands that target a PHY, the net_device.phydev pointer
++is used.
+ 
+ Bit sets
+ ========
+diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+index 840dabdc9d88..754e662ffdf4 100644
+--- a/include/uapi/linux/ethtool_netlink.h
++++ b/include/uapi/linux/ethtool_netlink.h
+@@ -134,6 +134,7 @@ enum {
+ 	ETHTOOL_A_HEADER_DEV_INDEX,		/* u32 */
+ 	ETHTOOL_A_HEADER_DEV_NAME,		/* string */
+ 	ETHTOOL_A_HEADER_FLAGS,			/* u32 - ETHTOOL_FLAG_* */
++	ETHTOOL_A_HEADER_PHY_INDEX,		/* u32 */
+ 
+ 	/* add new constants above here */
+ 	__ETHTOOL_A_HEADER_CNT,
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 81fe2e5b95f6..65cc453b60dd 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -2,6 +2,7 @@
+ 
+ #include <net/sock.h>
+ #include <linux/ethtool_netlink.h>
++#include <linux/phy_link_topology.h>
+ #include <linux/pm_runtime.h>
+ #include "netlink.h"
+ #include "module_fw.h"
+@@ -31,6 +32,24 @@ const struct nla_policy ethnl_header_policy_stats[] = {
+ 							  ETHTOOL_FLAGS_STATS),
+ };
+ 
++const struct nla_policy ethnl_header_policy_phy[] = {
++	[ETHTOOL_A_HEADER_DEV_INDEX]	= { .type = NLA_U32 },
++	[ETHTOOL_A_HEADER_DEV_NAME]	= { .type = NLA_NUL_STRING,
++					    .len = ALTIFNAMSIZ - 1 },
++	[ETHTOOL_A_HEADER_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
++							  ETHTOOL_FLAGS_BASIC),
++	[ETHTOOL_A_HEADER_PHY_INDEX]		= NLA_POLICY_MIN(NLA_U32, 1),
++};
++
++const struct nla_policy ethnl_header_policy_phy_stats[] = {
++	[ETHTOOL_A_HEADER_DEV_INDEX]	= { .type = NLA_U32 },
++	[ETHTOOL_A_HEADER_DEV_NAME]	= { .type = NLA_NUL_STRING,
++					    .len = ALTIFNAMSIZ - 1 },
++	[ETHTOOL_A_HEADER_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
++							  ETHTOOL_FLAGS_STATS),
++	[ETHTOOL_A_HEADER_PHY_INDEX]		= NLA_POLICY_MIN(NLA_U32, 1),
++};
++
+ int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
+ 			enum ethnl_sock_type type)
+ {
+@@ -119,7 +138,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
+ 			       const struct nlattr *header, struct net *net,
+ 			       struct netlink_ext_ack *extack, bool require_dev)
+ {
+-	struct nlattr *tb[ARRAY_SIZE(ethnl_header_policy)];
++	struct nlattr *tb[ARRAY_SIZE(ethnl_header_policy_phy)];
+ 	const struct nlattr *devname_attr;
+ 	struct net_device *dev = NULL;
+ 	u32 flags = 0;
+@@ -134,7 +153,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
+ 	/* No validation here, command policy should have a nested policy set
+ 	 * for the header, therefore validation should have already been done.
+ 	 */
+-	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_header_policy) - 1, header,
++	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_header_policy_phy) - 1, header,
+ 			       NULL, extack);
+ 	if (ret < 0)
+ 		return ret;
+@@ -175,11 +194,45 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
+ 		return -EINVAL;
+ 	}
+ 
++	if (tb[ETHTOOL_A_HEADER_PHY_INDEX]) {
++		if (dev) {
++			req_info->phy_index = nla_get_u32(tb[ETHTOOL_A_HEADER_PHY_INDEX]);
++		} else {
++			NL_SET_ERR_MSG_ATTR(extack, header,
++					    "phy_index set without a netdev");
++			return -EINVAL;
++		}
++	}
++
+ 	req_info->dev = dev;
+ 	req_info->flags = flags;
+ 	return 0;
+ }
+ 
++struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
++					const struct nlattr *header,
++					struct netlink_ext_ack *extack)
 +{
++	struct phy_device *phydev;
++
 +	ASSERT_RTNL();
 +
-+	if (bus->sfp_dev)
-+		return dev_name(bus->sfp_dev);
++	if (!req_info->dev)
++		return NULL;
 +
-+	return NULL;
++	if (!req_info->phy_index)
++		return req_info->dev->phydev;
++
++	phydev = phy_link_topo_get_phy(req_info->dev, req_info->phy_index);
++	if (!phydev) {
++		NL_SET_ERR_MSG_ATTR(extack, header,
++				    "no phy matching phyindex");
++		return ERR_PTR(-ENODEV);
++	}
++
++	return phydev;
 +}
-+EXPORT_SYMBOL_GPL(sfp_get_name);
 +
- /* Socket driver entry points */
- int sfp_add_phy(struct sfp_bus *bus, struct phy_device *phydev)
- {
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index 54abb4d22b2e..60c65cea74f6 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -576,6 +576,7 @@ struct sfp_bus *sfp_bus_find_fwnode(const struct fwnode_handle *fwnode);
- int sfp_bus_add_upstream(struct sfp_bus *bus, void *upstream,
- 			 const struct sfp_upstream_ops *ops);
- void sfp_bus_del_upstream(struct sfp_bus *bus);
-+const char *sfp_get_name(struct sfp_bus *bus);
- #else
- static inline int sfp_parse_port(struct sfp_bus *bus,
- 				 const struct sfp_eeprom_id *id,
-@@ -654,6 +655,11 @@ static inline int sfp_bus_add_upstream(struct sfp_bus *bus, void *upstream,
- static inline void sfp_bus_del_upstream(struct sfp_bus *bus)
- {
- }
-+
-+static inline const char *sfp_get_name(struct sfp_bus *bus)
-+{
-+	return NULL;
-+}
- #endif
+ /**
+  * ethnl_fill_reply_header() - Put common header into a reply message
+  * @skb:      skb with the message
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 46ec273a87c5..4db16048f8d4 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -251,6 +251,9 @@ static inline unsigned int ethnl_reply_header_size(void)
+  * @dev:   network device the request is for (may be null)
+  * @dev_tracker: refcount tracker for @dev reference
+  * @flags: request flags common for all request types
++ * @phy_index: phy_device index connected to @dev this request is for. Can be
++ *	       0 if the request doesn't target a phy, or if the @dev's attached
++ *	       phy is targeted.
+  *
+  * This is a common base for request specific structures holding data from
+  * parsed userspace request. These always embed struct ethnl_req_info at
+@@ -260,6 +263,7 @@ struct ethnl_req_info {
+ 	struct net_device	*dev;
+ 	netdevice_tracker	dev_tracker;
+ 	u32			flags;
++	u32			phy_index;
+ };
  
- #endif
+ static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
+@@ -267,6 +271,27 @@ static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
+ 	netdev_put(req_info->dev, &req_info->dev_tracker);
+ }
+ 
++/**
++ * ethnl_req_get_phydev() - Gets the phy_device targeted by this request,
++ *			    if any. Must be called under rntl_lock().
++ * @req_info:	The ethnl request to get the phy from.
++ * @header:	The netlink header, used for error reporting.
++ * @extack:	The netlink extended ACK, for error reporting.
++ *
++ * The caller must hold RTNL, until it's done interacting with the returned
++ * phy_device.
++ *
++ * Return: A phy_device pointer corresponding either to the passed phy_index
++ *	   if one is provided. If not, the phy_device attached to the
++ *	   net_device targeted by this request is returned. If there's no
++ *	   targeted net_device, or no phy_device is attached, NULL is
++ *	   returned. If the provided phy_index is invalid, an error pointer
++ *	   is returned.
++ */
++struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
++					const struct nlattr *header,
++					struct netlink_ext_ack *extack);
++
+ /**
+  * struct ethnl_reply_data - base type of reply data for GET requests
+  * @dev:       device for current reply message; in single shot requests it is
+@@ -409,9 +434,12 @@ extern const struct ethnl_request_ops ethnl_rss_request_ops;
+ extern const struct ethnl_request_ops ethnl_plca_cfg_request_ops;
+ extern const struct ethnl_request_ops ethnl_plca_status_request_ops;
+ extern const struct ethnl_request_ops ethnl_mm_request_ops;
++extern const struct ethnl_request_ops ethnl_phy_request_ops;
+ 
+ extern const struct nla_policy ethnl_header_policy[ETHTOOL_A_HEADER_FLAGS + 1];
+ extern const struct nla_policy ethnl_header_policy_stats[ETHTOOL_A_HEADER_FLAGS + 1];
++extern const struct nla_policy ethnl_header_policy_phy[ETHTOOL_A_HEADER_PHY_INDEX + 1];
++extern const struct nla_policy ethnl_header_policy_phy_stats[ETHTOOL_A_HEADER_PHY_INDEX + 1];
+ extern const struct nla_policy ethnl_strset_get_policy[ETHTOOL_A_STRSET_COUNTS_ONLY + 1];
+ extern const struct nla_policy ethnl_linkinfo_get_policy[ETHTOOL_A_LINKINFO_HEADER + 1];
+ extern const struct nla_policy ethnl_linkinfo_set_policy[ETHTOOL_A_LINKINFO_TP_MDIX_CTRL + 1];
 -- 
 2.45.1
 
