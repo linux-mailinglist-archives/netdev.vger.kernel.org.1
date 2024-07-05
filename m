@@ -1,118 +1,233 @@
-Return-Path: <netdev+bounces-109398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524769284DD
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:13:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9789284FD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7FE1F21F70
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:13:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 790E9B20CA8
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CF14601D;
-	Fri,  5 Jul 2024 09:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67649139E;
+	Fri,  5 Jul 2024 09:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TO72eB/2"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="BHxXWldj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA666145B21
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 09:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173C514601D
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 09:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720170778; cv=none; b=gXL3cisoewcoGtbm5mYK9w9gkG342Ef9TwCOCO2RVqxB8a40ot8+7o/+o0eLkgucQi8930ZEZQe/Ec6H7jD5PwhXEmagrdQDH6ZCOP9kBapENcH+8Lq/cmtTbmoTDiKHiGQPr/fQIStI7hpD0XYZ8mMD9C6qqrttuyuV27AwrGU=
+	t=1720171290; cv=none; b=QpmWrU6EKDL5oJoeJ5lhbTjhWMLJ98tiYr7wSObbw5B2JiLpPS7IyUUsGS3xB/tqDz36fStGyyjcVkVI4QeZWpZV3debTU5V6sEszBuB+c5jSCYMzwjCeVBLMMDPhjfh+dRjbY58/mUxjsyAbPXeLGYg63simVU1GWcGwWh1E4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720170778; c=relaxed/simple;
-	bh=Eg0ZC4E+9HjgLT96m4ApciWRyd7GnlXW287wuigi1+s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UouS8iGEoGYcKFzJvqAY5HYwtBLge6WAuE3GR2HXo5n01+7jbH6BebLdiUjgCBtOXTs1+lh/9pOfLXGYDfZ46J4sQMtd+xg922l5wqOcgd2wjTXTCQXANVyOPhxQOEfe8BNcDYNgW6oDLnlRxZbB+A6nTAnfIWTVNtkhEj5qc+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TO72eB/2; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fb0d88fdc8so6856635ad.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 02:12:56 -0700 (PDT)
+	s=arc-20240116; t=1720171290; c=relaxed/simple;
+	bh=DAsvD8/mLkcQAkkYRWz+VC5gPXf282xVyAGgndXBPhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eKsUP/fbdIak/oHCopZET/OFbuuKBWXLnHsulp/3gNh2eSsIoEQxgxEHwtV7wjC5jS885eNqfVk9Hwrfs9gms9V7heHh15TGMsT+eGh+Zwh0ZgOEtHsXSrPhCe152Ib9ZzNIT2qNDQmXVqo0hgpbBs+qP4B2Q0y+kXtoRA/GaHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=BHxXWldj; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a77b4387302so179096366b.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 02:21:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720170776; x=1720775576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R2z2N0FIhvVT7Pm142enyggu6yTxiTfmHspIFBG8Nh0=;
-        b=TO72eB/26KVLj1R1edpoaZR1MlQBS0IM3O3aOkY7MkwvT49liWj83pgQ6qtl3GY64B
-         muv4f5dGiO9HNL4PyF4jZz6rX5P8i84tBr+9G2L6x84cVxMVA7dPMMsewJ05k6DHTVQr
-         zl/7OqjSBBOjrZ8723BJXEjyQX2oWMitIVaaNRnmWd/Q6dsjdAsuesB2P+vZF3Mgr4dr
-         UXbptcR5grs0M4WeV7l+zOEynuC5yxr+mI88U4DtMzey2Iiz1RzDBnAPgK34O/xjem87
-         aIku1eYsV4ptMjSteErIieshC0HCV0kXTfBkv1ZbYmvWmPllAHPpGOw2Sey2Q4pNoszt
-         Qnfg==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1720171286; x=1720776086; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DAsvD8/mLkcQAkkYRWz+VC5gPXf282xVyAGgndXBPhk=;
+        b=BHxXWldj+hHqE2ns8S7/HAU42Z7MkYBmemSuhBWSrNKLJElFlh+Q7FcO+aA+P9LbaA
+         EAYq1RdO44rOCVBQIN7NgVzw5+vw9GZXvknaG0YFg/JZExIY6Ex6YAvsSbvIyrCbT1Fk
+         SymdVF1FI8op/8C6GBynndXKuBvrUlCd7+Orq+SdWWRrmREve0aOYgn+m9F7lNz8pCmy
+         FX7mtN7hJUMBz7mmYMIbddHt6ohOM24jP83x4BCkktmhK91m4j7HsLvHwH7jy1VI5k4S
+         M7Qyb+ARd26QRITXmUIfMXUvfuVm+MhhkaFkNiZglCxndpvv5En9S08MJPo8WpnSxewy
+         oRRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720170776; x=1720775576;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R2z2N0FIhvVT7Pm142enyggu6yTxiTfmHspIFBG8Nh0=;
-        b=f8m7DPaKdnM8lutCdBTdifkKilRVHlXDegpw2yhL6CanoePhv1iizNK7CbxSsG+oXv
-         8dR4LJ6o4jAAD/aKIAiGl04YKHK+KD2hmsiBS5/rI0y7qT3EvgOidk789En+SCwQWKE1
-         UPtHw0HxYUAqjycDF1Yk2mLuuro7QRgAwlYe8Pqz54Q3VKUVZoicbtbBZVH0xZ7DYbqv
-         02ti/oa032pPsX0BAOgRCRF7wv6gpD2ZghWCGw6yazzI97pmDu87nG+iqUpfCnqMqo8W
-         /ihLKckjtYT2Uq5+CLiUHyzOqEysWA1onHuM5bupEwvsV8zLTKJosuhkCiajhAgwZ+rL
-         5yGw==
-X-Gm-Message-State: AOJu0YzZYMkHO1XhPgltbkVUMOxRlnAbfWrr3CczKILxlSbwFOn6Rlmi
-	K6Vhpn2+v+zY7uQTcLlm6bXBGcw20LP5GWbAUiEY80XB7fDgF6DoAHtHL7N2Fmg=
-X-Google-Smtp-Source: AGHT+IFm2/8yR5AFtpPuhbktBPmgCO4mvQK681Sb+GSmk+4HdpVgj6Ixh37vrtXb8ZAMyhkyujbuMw==
-X-Received: by 2002:a17:902:c94f:b0:1fa:b511:5d44 with SMTP id d9443c01a7336-1fb33edfe7bmr28620835ad.46.1720170775602;
-        Fri, 05 Jul 2024 02:12:55 -0700 (PDT)
-Received: from localhost ([2402:7500:487:c5af:fb81:3659:f2a:922])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb48dc7220sm10306415ad.145.2024.07.05.02.12.54
+        d=1e100.net; s=20230601; t=1720171286; x=1720776086;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DAsvD8/mLkcQAkkYRWz+VC5gPXf282xVyAGgndXBPhk=;
+        b=GAcSBw7A8jS7ix2+h4IuLrrWwvVfr2/DSxlGCo/0e3+X7zU7aqkyQRVCgQIgJhjXRh
+         BvK1k4b0byAJDfLRxcXvDRPGZDUUO8yBYXf0TZf6oa/aDZaOeFsPupRobTV1qQkWzq2a
+         DHcxbcA+k67MOlIgiv5KB5AgOPSqAoQIC6hfNr196lt4Fq9NTXedIwrDbtTlJ7FQNw1A
+         HNEEpf6HozU04NjPboZXMxKCFcB75CQ/hs4iVPZyhmGZjHc5O9L7p7MfLWxOGJaEOUHE
+         PrL4XGNFMD6UB5Q/IVNfy/BspyYSjYHdmnU5TIDYH3+QO4n5Fn4u2Cwn2rdoDJTJCYDw
+         9Tpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXn+BFedWWnzmQucwMqyHhW1/10m5pgoTBfuXTt+6sg4YIMQvoJ3mXA8ET3+HJR2vXGCfBkm5vj0k6b5wEbDhJZKSBZAKkE
+X-Gm-Message-State: AOJu0YwXY+xczXBFEQyFHf17JRDDOfZz9kY5/Nu381JJwGCNWkUEDoHl
+	rk7p+4V7kQgUsxDvMB7ih3CaTu2Ocq/ztlfPiF7+a2lipYWubxTUp+h6WEKghVk=
+X-Google-Smtp-Source: AGHT+IH5GBzifj2YL+uV1tph7kmD/UU37Fput+e22tUxmHwQFDW0cLo/eN2fRQ1OiC6xRmZjvtbAaw==
+X-Received: by 2002:a17:906:fb95:b0:a6f:b400:4751 with SMTP id a640c23a62f3a-a77ba46ccffmr181755366b.22.1720171286291;
+        Fri, 05 Jul 2024 02:21:26 -0700 (PDT)
+Received: from localhost (p50915e7b.dip0.t-ipconnect.de. [80.145.94.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77d9cdf337sm10855266b.53.2024.07.05.02.21.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jul 2024 02:12:55 -0700 (PDT)
-From: wojackbb@gmail.com
-To: netdev@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jackbb_wu <wojackbb@gmail.com>
-Subject: [PATCH] [PATCH net] net: wwan: t7xx: add support for Dell DW5933e
-Date: Fri,  5 Jul 2024 17:12:23 +0800
-Message-Id: <20240705091223.653749-1-wojackbb@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 05 Jul 2024 02:21:25 -0700 (PDT)
+Date: Fri, 5 Jul 2024 11:21:25 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Nikita Shubin <nikita.shubin@maquefel.me>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@kernel.org>, 
+	Hartley Sweeten <hsweeten@visionengravers.com>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, 
+	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Andy Shevchenko <andy@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Thierry Reding <thierry.reding@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
+	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-ide@vger.kernel.org, linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH v10 00/38] ep93xx device tree conversion
+Message-ID: <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
+ <CAHp75VfSC9gAD9ipeWRPdQOxUp4FXqYYei-cJTs38nbz0cHpkg@mail.gmail.com>
+ <48c242838c77034485a9e667dc0e867207c5beed.camel@maquefel.me>
+ <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="icynwgj6p72h37hs"
+Content-Disposition: inline
+In-Reply-To: <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me>
 
-From: jackbb_wu <wojackbb@gmail.com>
 
-add support for Dell DW5933e (0x14c0, 0x4d75)
+--icynwgj6p72h37hs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: jackbb_wu <wojackbb@gmail.com>
----
- drivers/net/wwan/t7xx/t7xx_pci.c | 1 +
- 1 file changed, 1 insertion(+)
+Hello,
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-index e0b1e7a616ca..7f3d0f51c350 100644
---- a/drivers/net/wwan/t7xx/t7xx_pci.c
-+++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-@@ -852,6 +852,7 @@ static void t7xx_pci_remove(struct pci_dev *pdev)
- 
- static const struct pci_device_id t7xx_pci_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x4d75) },
-+	{ PCI_DEVICE(0x14c0, 0x4d75) },//Dell DW5933e
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, t7xx_pci_table);
--- 
-2.34.1
+On Thu, Jun 27, 2024 at 11:29:44AM +0300, Nikita Shubin wrote:
+> On Tue, 2024-06-18 at 19:20 +0300, Nikita Shubin wrote:
+> > Hello Andy!
+> > On Mon, 2024-06-17 at 12:58 +0200, Andy Shevchenko wrote:
+> > > On Mon, Jun 17, 2024 at 11:38=E2=80=AFAM Nikita Shubin via B4 Relay
+> > > <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+> > > >=20
+> > > > The goal is to recieve ACKs for all patches in series to merge it
+> > > > via Arnd branch.
+> > >=20
+> > > 'receive'
+> > >=20
+> > > > Unfortunately, CLK subsystem suddenly went silent on clk portion
+> > > > of
+> > > > series V2 reroll,
+> > > > tried to ping them for about a month but no luck.
+> > > >=20
+> > > > Link:
+> > > > https://lore.kernel.org/r/20240408-ep93xx-clk-v2-1-adcd68c13753@maq=
+uefel.me
+> > > >=20
+> > > > Some changes since last version (v9) - see "Changes in v10",
+> > > > mostly
+> > > > cosmetic.
+> > >=20
+> > > ...
+> > >=20
+> > > > Patches should be formated with '--histogram'
+> > >=20
+> > > 'formatted'
+> > >=20
+> > > ...
+> > >=20
+> > > > Changes in v10:
+> > > >=20
+> > > > Reordered SoB tags to make sure they appear before Rb and Acked
+> > > > tags.
+> > >=20
+> > > This is not required. The importance is only the order of SoBs
+> > > themselves. If they are interleaved with other tags, it's fine.
+> >=20
+> > Ah - ok. Just saw someone was complaining about b4 reordering them.=20
+> >=20
+> > >=20
+> > > ...
+> > >=20
+> > >=20
+> > > Hopefully to see this series being eventually applied soon.
+> > > Arnd? (Do we have all necessary subsystem maintainers' tags, btw?)
+> > >=20
+> > >=20
+> >=20
+> > As i see from my perspective only three left:
+> >=20
+> > Clk subsystem:
+> >=20
+> > - clk: ep93xx: add DT support for Cirrus EP93xx
+> >=20
+> > DMA subsystem (but the only request from Vinod, as far as i remember,
+> > was fixing commits titles):
+> >=20
+> > - dmaengine: cirrus: Convert to DT for Cirrus EP93xx
+> > - dmaengine: cirrus: remove platform code
+> >=20
+> > Beside that tags missing on platform code removal (which can be Acked
+> > by Arnd himself i believe) and dtsi/dts files (same ?).
+>=20
+> Vinod acked the above two patches:
+>=20
+> https://lore.kernel.org/all/ZnkIp8bOcZK3yVKP@matsya/
+> https://lore.kernel.org/all/ZnkImp8BtTdxl7O3@matsya/
+>=20
+> so only:
+>=20
+> - clk: ep93xx: add DT support for Cirrus EP93xx
+>=20
+> https://lore.kernel.org/all/20240617-ep93xx-v10-3-662e640ed811@maquefel.m=
+e/
+>=20
+> left.
+>=20
+> Hope Stephen will find some time for this one.
 
+As we're approaching the merge window and this is still unclear, I
+applied the pwm bits (i.e. patches 12, 13). If I understand correctly,
+patch 33 isn't suitable for application yet as it has a dependency on
+pinctrl changes in that series.
+
+(side note: Your patches are signed, but that doesn't bring any benefit
+if the receivers don't have your key. I didn't find it neither on
+keys.openpgp.org nor in the kernel pgp key collection.)
+
+Best regards
+Uwe
+
+--icynwgj6p72h37hs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmaHuxIACgkQj4D7WH0S
+/k63agf/ctyXHUSwirhdvMJNeHEME1eqwJPf8P71cxUigi0cvcf0NrTT4jEqglzC
+BqT8dRZCw6LKUShZlhwO7ymRXcAjNYTvFLuJKQYOGuVQZQEtoK7PDa80NeQjFhZP
+r0CwuOQfcg2ovACIA1T/iSX2APqGatvsO4Ke7h2u5kawsGxQIu2TZnfPDhwTIdqj
+Ib33BChvzlU45YrMZrQUHKE3/3XOHyxVvZSutJmaHLtSdIOE/fPr/U5anDzjdWFS
+gxrbDGE0Z3LyDIb0OB8iZiVIeyXDjysmlTdYpfPQi3/4JT+ohaNXgpSC5dmYo/s+
+R6QHGSe+ahTTQGyCjdYkOM/hMh/CiQ==
+=1/WB
+-----END PGP SIGNATURE-----
+
+--icynwgj6p72h37hs--
 
