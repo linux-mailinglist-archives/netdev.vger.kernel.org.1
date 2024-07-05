@@ -1,94 +1,118 @@
-Return-Path: <netdev+bounces-109397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72D9928494
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:04:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524769284DD
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 11:13:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD931F21BF3
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:04:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7FE1F21F70
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 09:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BB014A4D4;
-	Fri,  5 Jul 2024 09:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CF14601D;
+	Fri,  5 Jul 2024 09:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TO72eB/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5249E146A9A
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 09:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA666145B21
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 09:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720170124; cv=none; b=AhZTDOkaQrsDr+yWJRrNLcLe5HOHp4aNNmBlYd/4APPc2AQ14UZnJon6sNG9/P/1VdxstZLtk5t1lscPO0fAlQf0N21e9eRXo/EedhOfl0FcdHrZQJs4Qo1lqF5M8UObEgzBw8m2+UMEJJwEHuH19/Zb9A6NRM95LWIlnUi6Rp8=
+	t=1720170778; cv=none; b=gXL3cisoewcoGtbm5mYK9w9gkG342Ef9TwCOCO2RVqxB8a40ot8+7o/+o0eLkgucQi8930ZEZQe/Ec6H7jD5PwhXEmagrdQDH6ZCOP9kBapENcH+8Lq/cmtTbmoTDiKHiGQPr/fQIStI7hpD0XYZ8mMD9C6qqrttuyuV27AwrGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720170124; c=relaxed/simple;
-	bh=wwoG6Lpl9xZtxkYIagwDKoYnXMumsgi0K1nZQVQu0qM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=JS95RWxNNrk3iO3HGTiXvCNTsSEFIXmTpN/qBrupVQuRwRtFXrz0po0FazhO12/l0hUMpWbzP3LCp8Mc7PUaZOuTpijIhjf8n8slQMQOn8i46Mg+Vu34uMponcUqkEvArDPhfkTA2h2jnuFywLp3x092WBLN+EZF7/pgQBUNgUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7f3d2fd6ad6so185657439f.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 02:02:03 -0700 (PDT)
+	s=arc-20240116; t=1720170778; c=relaxed/simple;
+	bh=Eg0ZC4E+9HjgLT96m4ApciWRyd7GnlXW287wuigi1+s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UouS8iGEoGYcKFzJvqAY5HYwtBLge6WAuE3GR2HXo5n01+7jbH6BebLdiUjgCBtOXTs1+lh/9pOfLXGYDfZ46J4sQMtd+xg922l5wqOcgd2wjTXTCQXANVyOPhxQOEfe8BNcDYNgW6oDLnlRxZbB+A6nTAnfIWTVNtkhEj5qc+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TO72eB/2; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fb0d88fdc8so6856635ad.2
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 02:12:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720170776; x=1720775576; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R2z2N0FIhvVT7Pm142enyggu6yTxiTfmHspIFBG8Nh0=;
+        b=TO72eB/26KVLj1R1edpoaZR1MlQBS0IM3O3aOkY7MkwvT49liWj83pgQ6qtl3GY64B
+         muv4f5dGiO9HNL4PyF4jZz6rX5P8i84tBr+9G2L6x84cVxMVA7dPMMsewJ05k6DHTVQr
+         zl/7OqjSBBOjrZ8723BJXEjyQX2oWMitIVaaNRnmWd/Q6dsjdAsuesB2P+vZF3Mgr4dr
+         UXbptcR5grs0M4WeV7l+zOEynuC5yxr+mI88U4DtMzey2Iiz1RzDBnAPgK34O/xjem87
+         aIku1eYsV4ptMjSteErIieshC0HCV0kXTfBkv1ZbYmvWmPllAHPpGOw2Sey2Q4pNoszt
+         Qnfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720170122; x=1720774922;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qzTl7Q3LR/274B03FBxIgW0YDXP4HwIZSnQeLs9vxpU=;
-        b=inHQNwUmf/QFb9PtO4ZvcZK6NQwQwm2o12VZ7GvuEoTro7yn5iWFCRDeU6vuG2eDmT
-         S8VXbjzLEiMeYDdcgjnNoPsAfAO8jJhyKU3fgASkOc7EgUbdr4vge+bf0sVpWhPl4LIi
-         vPngNyXU/MTPzm6Omnlox0NpLN64TxdjTRSdDfuqYWLg2CoqULuACr8WxskbzUFv+VLN
-         4WCF393M01h9K1YGYNzAJl7Kc5Ubpruu7cMi6nhrQl4d0FGlaIQII2xj2iOOjHdaDZEB
-         o4GFNmFgzputVIUydrfHKuYHlnRH6uIuSvqG6jxrPsT5fmlqpsRECLVpdJa5eFpGorGq
-         YnpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4jp/vNqXxAe0jhIWnt+Hvv9r2qs1cWVJG0gXpg8UKDeTJavBXRA9sxV0zbdnGyE5J7JLNuFwOgQ3m+Il8yc2tTn+Zz4l8
-X-Gm-Message-State: AOJu0YxDKKB97jvdAcO17norfmBQUCHWd+/uKsW1b4vy44ZDlxtEYCkS
-	Uh8bAp/d6WPfHtYK53FdrvnaeSWveivkcywh1HMyiR3xbj3lNM5H0wlLAH3eQEuTKtj51QNJM5m
-	6+ecse4s3cQFCame8wfN9P8TsJJknYvn186g5s71DPuHs7/mXUD2bwyE=
-X-Google-Smtp-Source: AGHT+IELRk6XZwDyIRgtXLXp8PUm5XnDWTAcvpZglL3K3krXw22STFyjgdwXM5F/iCT0Di5uLC0KOviVojIrTXmCKvbDDKq+GoBZ
+        d=1e100.net; s=20230601; t=1720170776; x=1720775576;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R2z2N0FIhvVT7Pm142enyggu6yTxiTfmHspIFBG8Nh0=;
+        b=f8m7DPaKdnM8lutCdBTdifkKilRVHlXDegpw2yhL6CanoePhv1iizNK7CbxSsG+oXv
+         8dR4LJ6o4jAAD/aKIAiGl04YKHK+KD2hmsiBS5/rI0y7qT3EvgOidk789En+SCwQWKE1
+         UPtHw0HxYUAqjycDF1Yk2mLuuro7QRgAwlYe8Pqz54Q3VKUVZoicbtbBZVH0xZ7DYbqv
+         02ti/oa032pPsX0BAOgRCRF7wv6gpD2ZghWCGw6yazzI97pmDu87nG+iqUpfCnqMqo8W
+         /ihLKckjtYT2Uq5+CLiUHyzOqEysWA1onHuM5bupEwvsV8zLTKJosuhkCiajhAgwZ+rL
+         5yGw==
+X-Gm-Message-State: AOJu0YzZYMkHO1XhPgltbkVUMOxRlnAbfWrr3CczKILxlSbwFOn6Rlmi
+	K6Vhpn2+v+zY7uQTcLlm6bXBGcw20LP5GWbAUiEY80XB7fDgF6DoAHtHL7N2Fmg=
+X-Google-Smtp-Source: AGHT+IFm2/8yR5AFtpPuhbktBPmgCO4mvQK681Sb+GSmk+4HdpVgj6Ixh37vrtXb8ZAMyhkyujbuMw==
+X-Received: by 2002:a17:902:c94f:b0:1fa:b511:5d44 with SMTP id d9443c01a7336-1fb33edfe7bmr28620835ad.46.1720170775602;
+        Fri, 05 Jul 2024 02:12:55 -0700 (PDT)
+Received: from localhost ([2402:7500:487:c5af:fb81:3659:f2a:922])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb48dc7220sm10306415ad.145.2024.07.05.02.12.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 02:12:55 -0700 (PDT)
+From: wojackbb@gmail.com
+To: netdev@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jackbb_wu <wojackbb@gmail.com>
+Subject: [PATCH] [PATCH net] net: wwan: t7xx: add support for Dell DW5933e
+Date: Fri,  5 Jul 2024 17:12:23 +0800
+Message-Id: <20240705091223.653749-1-wojackbb@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1650:b0:4c0:8165:c391 with SMTP id
- 8926c6da1cb9f-4c08165c540mr39237173.4.1720170122540; Fri, 05 Jul 2024
- 02:02:02 -0700 (PDT)
-Date: Fri, 05 Jul 2024 02:02:02 -0700
-In-Reply-To: <000000000000ce42b9061c54d76a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001b8a1f061c7c512b@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in rate_control_rate_init (3)
-From: syzbot <syzbot+9bdc0c5998ab45b05030@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes.berg@intel.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, miriam.rachel.korenblit@intel.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has bisected this issue to:
+From: jackbb_wu <wojackbb@gmail.com>
 
-commit 03ecd745dde181f537bf84374caafb121463136b
-Author: Johannes Berg <johannes.berg@intel.com>
-Date:   Wed Jun 5 10:57:18 2024 +0000
+add support for Dell DW5933e (0x14c0, 0x4d75)
 
-    wifi: mac80211: fix erroneous errors for STA changes
+Signed-off-by: jackbb_wu <wojackbb@gmail.com>
+---
+ drivers/net/wwan/t7xx/t7xx_pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16a5cd71980000
-start commit:   aa77b1128016 net: dsa: microchip: lan937x: Add error handl..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=15a5cd71980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a5cd71980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5264b58fdff6e881
-dashboard link: https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10e4644e980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=108cedc1980000
+diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
+index e0b1e7a616ca..7f3d0f51c350 100644
+--- a/drivers/net/wwan/t7xx/t7xx_pci.c
++++ b/drivers/net/wwan/t7xx/t7xx_pci.c
+@@ -852,6 +852,7 @@ static void t7xx_pci_remove(struct pci_dev *pdev)
+ 
+ static const struct pci_device_id t7xx_pci_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x4d75) },
++	{ PCI_DEVICE(0x14c0, 0x4d75) },//Dell DW5933e
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(pci, t7xx_pci_table);
+-- 
+2.34.1
 
-Reported-by: syzbot+9bdc0c5998ab45b05030@syzkaller.appspotmail.com
-Fixes: 03ecd745dde1 ("wifi: mac80211: fix erroneous errors for STA changes")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
