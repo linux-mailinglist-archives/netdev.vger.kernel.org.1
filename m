@@ -1,183 +1,207 @@
-Return-Path: <netdev+bounces-109571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B7E8928E3D
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 22:29:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E830F928EC1
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 23:22:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ED46286A83
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 20:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17C9B1C21AE0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 21:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C011F17C7AD;
-	Fri,  5 Jul 2024 20:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8B413F42A;
+	Fri,  5 Jul 2024 21:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="kqhNYSGu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1qHhH0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25AD17B42F
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 20:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B361C693;
+	Fri,  5 Jul 2024 21:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720211237; cv=none; b=Yo0L2Hl/CO2TncTmxXGtkROJFRtk2gpqVa86PoEiqRPYWIUgrjgJtDI5W2kNiCLg4FOkPiO4Kj5FZw5IwVvShlnHsd3Obp3X7ASi4TQvTNfrQGSgAdcp2L5dC4VY6imaKgH6+By22Ilho9S31ojK9LfbzmrO06eCMlUjCnghcBg=
+	t=1720214558; cv=none; b=eDzVPCXXdSjYIenbP9HsxoDFMe0b6vnH85SjlXbLq2dIvalFbTsqaomKwQnrPjcKhTPmZyy2AT6CLtWLMs62z3YG2ROBz0MTQ6VSbwWsXO1iH2BG4b6UqYKrRZaT/g8yffbuwzdC+XvBF/v6kvw5YSOEVoAAV/mQtvkTWF5ORvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720211237; c=relaxed/simple;
-	bh=x+REoia1SPVixROvzFdazwCRh5mhW9XzZbQzMlPar2M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XwEAEN+kniLy+8vT5LSj7CVdFOCcvC9HDct/QC6PDbXDa/XvQh1GjYwLoooxiZzaCWOamPzweIoa7aI2tXJNCJUabqRig7gf1I7Yj5qXbCa7oDhSn94wXhF5uoKKe/PlyINbsQ77g9bDafB3sJD9Qex7URurMjBOBQ9U4tOXgOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=kqhNYSGu; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-426526d31a3so5572175e9.1
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 13:27:15 -0700 (PDT)
+	s=arc-20240116; t=1720214558; c=relaxed/simple;
+	bh=LP9JoMyO4RZYpmRyEi7/n2mZtToGbzb3V52WgLGytew=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qDYDeWepcT7GJ0BeG2qaGkll6ou6L6iSvSQJ3+zAEuxS28wkkjoXatl/+Uc6KqY5PE3SNTxgQn+FFpTdpNzbNMTsBBn+XS4nXG3CfDoa2j1tu1iiZ/RvTjB1JrtwBFIAmj7yShbRDpOmPbdZ58pQybweqU6uHKfxk6twtxUQ8AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1qHhH0u; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-25e43dda1edso644470fac.0;
+        Fri, 05 Jul 2024 14:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720211234; x=1720816034; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xo8BvOJHNg5KkElAnqbJxKoNs4vF5XqhPo69/tFmIJc=;
-        b=kqhNYSGu6VaYR1mjSrfrMzijCLnGY2zRDZeZ1Ou0s5wrwyX97PAr8ANVsCUP0d3hbh
-         abf9pxBH3fDbinDMG9nLyJ80e8qXjXfbbBSwyL84yVJqu9Ql5AAiz4GgGOthaFHYlxIK
-         j8L5XkrjM2t+OeGiZKASTZ9I37T3SdpBuf3NlVrxpMn3y3gj1U4I/Ff2CnHBPCJ0UucC
-         NIoulD+QBaMhuGMNfJFlAhZ/pSJyz0/gFN6sxUMQJw/Pl371y1p04A2iQV+Mg3atFxz8
-         dPQLvqiECX0qj8jbTYNH69jwPmqc5X2QtUa3Cop9y6T7xZuZUfXU4qLloxIYmfbycqrQ
-         oFsg==
+        d=gmail.com; s=20230601; t=1720214556; x=1720819356; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1IhT7MF8kH57E/SnoiAkldNxZCcRzmTR9RjNaE8Yyeo=;
+        b=I1qHhH0uLKZ5F0k9bmajmlCV+v5Wi7S8+tx7cD8A8grJb/xnqs53YbPnrnnqdJCo6L
+         RmlRSs/fkfzxHG0XrtwcKp2LYuEVQyz1pw0khkv9I4N2MlIzAMu7HQi+ggzSpo+20bOz
+         1YKV0b7cA9sam0tri7U4ydbb5ZWQY3jAZNdglPZjrrUnOK+CJZT3/bV7tfyST/2ipCgC
+         vtiEfuMCib0GNh4TVkku9NOUR/ptKOM5VOnawVsRLqICCeiiV+6egL8tHGZNjpwGRVbt
+         KappanQjz/tTokntALxh2t2b4x/9cBucJZxMzfCk3QeokpteHYW5lB9epSW4nHsE6DAa
+         /1fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720211234; x=1720816034;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xo8BvOJHNg5KkElAnqbJxKoNs4vF5XqhPo69/tFmIJc=;
-        b=jijFf/zXhH1h+SoGqnalnfTaAko45yBUlNx9+TZlELwnjIdVwJAckkvTZE9QSr7jNe
-         JJBn7YI/XmoKeXClvelWQviWtwTbWTvwNyRxKxGLIoH4XDNCwqSKlKWtqE6q2N4ZyAYO
-         7DwhO/JN+W2NEMFrLpJmSJcUz54cvCJbyuo/vlUIcodQiedZ+h/Ol1zrIsnImfg+DA69
-         wXUJVK28fo5rji+L4LwhcVZk1xtbSktM2cvMH+v4AVXvfCf0+8LFgAcx2BX9JKKjqRZJ
-         0aMNkc/wgAWB9rlC0yrmmkHdf3rjNOBpVzlOPu6F4d8aMxPh9QmoG05EdaY/Vpl6MLIS
-         Zj1A==
-X-Forwarded-Encrypted: i=1; AJvYcCXcPxdXnTvOImQaPn/nzYaT0uNHijMtuAVS6WodMgfVdgDuQYw478YjXAkivd2ixq3RwcJtUgG5vhnd2BUy89OaPGUj55Sb
-X-Gm-Message-State: AOJu0YzktNVG68cyu1J9ouJ+xRuJnw5XTxCtk8Auq8PGPtDW/QSoZp9E
-	q6XCPDCc2Iq3LYvisIk0txyEvBWdpNdKezZuS0N17iHMUWkDebY3VQ81D/u0pbM=
-X-Google-Smtp-Source: AGHT+IHk45VodLs4hfZ4bMqYhA8JhJaClHg8mzt3znbrPWdgMMhSoHE2jkLb2VW+d//JgbWdYJaYpA==
-X-Received: by 2002:a05:600c:4993:b0:426:54c9:dfe5 with SMTP id 5b1f17b1804b1-42654c9e20emr18480915e9.10.1720211234305;
-        Fri, 05 Jul 2024 13:27:14 -0700 (PDT)
-Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:c688:2842:8675:211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1d5116sm74397625e9.10.2024.07.05.13.27.13
+        d=1e100.net; s=20230601; t=1720214556; x=1720819356;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1IhT7MF8kH57E/SnoiAkldNxZCcRzmTR9RjNaE8Yyeo=;
+        b=kcQnHQhgHjRotjN1JENCg6sXBYeIpUCPmo47nwXMmHE6gwUQsI/0FHRHmiPHArBVvI
+         auUI0FZFUtUK5/CXWwOa61cHzhsBJulNlsuChsMiMUr2QFH8jIe4A+Ke+D8DASp3sA/N
+         2Mue0yexDa/fZU0DgskfWv5aXIsYI9UbFWrpyLRAVESC0Ge3qKY44HCz0vs7UoAJvigj
+         PvNuIakdj2kmblpjulNYynHIm4Gm8SS6MkrDigXgpKos2RZBosHyaW/kLN0ouQZ5qOLY
+         LKXwRya5GROXyZ0PxgGmn11Xp6wZBaxOJKsfLkltUlmIQ+2MB4FY8o5vyyR4YUp8TNxl
+         hh5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVKDCMuwE6KcyUne5ElmtWn0Kapa0fYIn8uuo5OByqU8WRnnz7Y1HvEhWjhSXqdvclzgtaU3heJvwwSvG0FTFH1jyp/oGmI5Jj1F5ypqLwAgy1Sj1/uedRMAtpxkcbfGqxeVHtIpk6QTjGEjMTW6+dGMKcrdL+byQXBj9SCBSJcjRGIL80gI5Io5Cqk
+X-Gm-Message-State: AOJu0Ywlq+vea0gqPWKHthYO2mqMUCizPy39BkO2HWlw9sRQuLZMhRSJ
+	1zGi5fTcuJRxPtKIZWrwQChjdtnlwKbUlC6OIlvosjD2UEUMOKXn
+X-Google-Smtp-Source: AGHT+IEeLwgtXYb/uj8sDcO09wT71NkvpSBq/jo4Esw2OxgX+mlE6v9Dh2n5HNVFAIktMgSFbTyp7A==
+X-Received: by 2002:a05:6870:63a6:b0:25e:1659:4ce9 with SMTP id 586e51a60fabf-25e2b5a06admr4612401fac.0.1720214555903;
+        Fri, 05 Jul 2024 14:22:35 -0700 (PDT)
+Received: from tahera-OptiPlex-5000.uc.ucalgary.ca ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70802566511sm14507529b3a.75.2024.07.05.14.22.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jul 2024 13:27:14 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 05 Jul 2024 22:26:40 +0200
-Subject: [PATCH 6/6] arm64: dts: qcom: sm8650-qrd: use the PMU to power up
- bluetooth
+        Fri, 05 Jul 2024 14:22:35 -0700 (PDT)
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: mic@digikod.net,
+	gnoack@google.com,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bjorn3_gh@protonmail.com,
+	jannh@google.com,
+	outreachy@lists.linux.dev,
+	netdev@vger.kernel.org
+Cc: Tahera Fahimi <fahimitahera@gmail.com>
+Subject: [PATCH v1 1/2] Landlock: Add signal control
+Date: Fri,  5 Jul 2024 15:21:42 -0600
+Message-Id: <36958dbc486e1f975f4d4ecdfa51ae65c2c4ced0.1720213293.git.fahimitahera@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240705-hci_qca_refactor-v1-6-e2442121c13e@linaro.org>
-References: <20240705-hci_qca_refactor-v1-0-e2442121c13e@linaro.org>
-In-Reply-To: <20240705-hci_qca_refactor-v1-0-e2442121c13e@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Rocky Liao <quic_rjliao@quicinc.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, 
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1973;
- i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=kdQldVCRGhnIPxVPu3DpUjVdb4CujtCOUfjhf5GMlEY=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmiFcaeCfsaInBBJIIlhG+1f/h4DrpvPHua2tpg
- s7T2ZuAaUqJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZohXGgAKCRARpy6gFHHX
- cvPIEACF7n3xgUaa9Am60rAm+YiQrXmvaiDReuJWuKZ2mJCC0pglCJK5K9XEpSalxPOhUGbaIpH
- nu93vvC0ZL9kH1Ow8Oxpi8Cd0sqjcKWgLQHVfuXw3fTPO+vX7OC+wTN9OoyTtc68Gp08HUV402W
- ZA64XN/frf4gLo8MynFzddhlYz+oScisQx1zlRYkgY0m4HCdoRK22ATDh4fvaVESUIqDyoWkHJ8
- 4HzwpZvKHop1HGHRk+3uaC+uxhaXUAITTZ14vD5X9h7QZYSD0pMELSgTEWH9LMGmX8z81KHjhF0
- np9v5kI8M7IRISCndFEThWWnIkC/HjJW+tnTwIRQad9FmhempXux2cxDNkF8lq91sHJl38y3mN8
- SNwRhM5gGTu8/2HLyX6+eER3PEy8/fp47TtRz3uU9DXwJ6AGnjK+YyEtpHRpvxkjDR6xl0Dyn9t
- nQjczoH92VdohNbX48KtbynSTQ97wfspJG3WNF3fY5imsJDz+HBTCBXZq08BnWFrsZnqu2C/EVJ
- Fev/KcrZP+j4qa+UtjdWs9JEHBzmGjibFQSMwoDMRh00jnrafkD2NeCPBjL+iWYEFBzneAWTW7/
- LFy+wz6TZA8iQ2bJHJTA0/vtIp2+ZKpPjGGCKSGfpkRU5NiKkgS26M+YSlyCrMokhlIOwKmiGYd
- c40Ymd6+uyULcrQ==
-X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
- fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
+Content-Transfer-Encoding: 8bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Currently, a sandbox process is not restricted to send a signal
+(e.g. SIGKILL) to a process outside of the sandbox environment.
+Ability to sending a signal for a sandboxed process should be
+scoped the same way abstract unix sockets are scoped.
 
-Change the HW model in sm8650-qrd.dts to a one closer to reality - where
-the WLAN and Bluetooth modules of the WCN7850 are powered by the PMU
-inside the package.
+The same way as abstract unix socket, we extend "scoped" field
+in a ruleset with "LANDLOCK_SCOPED_SIGNAL" to specify that a ruleset
+will deny sending any signal from within a sandbox process to its
+parent(i.e. any parent sandbox or non-sandboxed procsses).
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 ---
- arch/arm64/boot/dts/qcom/sm8650-qrd.dts | 28 +++++++++-------------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+ include/uapi/linux/landlock.h |  3 +++
+ security/landlock/limits.h    |  2 +-
+ security/landlock/task.c      | 49 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-index b0d7927b708f..8ca0d28eba9b 100644
---- a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-+++ b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
-@@ -208,13 +208,10 @@ wcn7850-pmu {
- 		compatible = "qcom,wcn7850-pmu";
+diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+index 010aaca5b05a..878479a1b9dd 100644
+--- a/include/uapi/linux/landlock.h
++++ b/include/uapi/linux/landlock.h
+@@ -291,8 +291,11 @@ struct landlock_net_port_attr {
+  *   from connecting to an abstract unix socket created by a process
+  *   outside the related Landlock domain (e.g. a parent domain or a process
+  *   which is not sandboxed).
++ * - %LANDLOCK_SCOPED_SIGNAL: Restrict a sandboxed process from sending a signal
++ *   to another process outside sandbox domain.
+  */
+ /* clang-format off */
+ #define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
++#define LANDLOCK_SCOPED_SIGNAL		                (1ULL << 1)
+ /* clang-format on*/
+ #endif /* _UAPI_LINUX_LANDLOCK_H */
+diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+index eb01d0fb2165..fa28f9236407 100644
+--- a/security/landlock/limits.h
++++ b/security/landlock/limits.h
+@@ -26,7 +26,7 @@
+ #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+ #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
  
- 		pinctrl-names = "default";
--		pinctrl-0 = <&wlan_en>;
-+		pinctrl-0 = <&wlan_en>, <&bt_default>;
+-#define LANDLOCK_LAST_SCOPE		LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
++#define LANDLOCK_LAST_SCOPE		LANDLOCK_SCOPED_SIGNAL
+ #define LANDLOCK_MASK_SCOPE		((LANDLOCK_LAST_SCOPE << 1) - 1)
+ #define LANDLOCK_NUM_SCOPE		__const_hweight64(LANDLOCK_MASK_SCOPE)
+ /* clang-format on */
+diff --git a/security/landlock/task.c b/security/landlock/task.c
+index acc6e0fbc111..caee485b97b2 100644
+--- a/security/landlock/task.c
++++ b/security/landlock/task.c
+@@ -168,11 +168,60 @@ static int hook_unix_may_send(struct socket *const sock,
+ 	return -EPERM;
+ }
  
- 		wlan-enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
--		/*
--		 * TODO Add bt-enable-gpios once the Bluetooth driver is
--		 * converted to using the power sequencer.
--		 */
-+		bt-enable-gpios = <&tlmm 17 GPIO_ACTIVE_HIGH>;
- 
- 		vdd-supply = <&vreg_s4i_0p85>;
- 		vddio-supply = <&vreg_l15b_1p8>;
-@@ -1255,22 +1252,15 @@ &uart14 {
- 	bluetooth {
- 		compatible = "qcom,wcn7850-bt";
- 
--		clocks = <&rpmhcc RPMH_RF_CLK1>;
--
--		vddio-supply = <&vreg_l3c_1p2>;
--		vddaon-supply = <&vreg_l15b_1p8>;
--		vdddig-supply = <&vreg_s3c_0p9>;
--		vddrfa0p8-supply = <&vreg_s3c_0p9>;
--		vddrfa1p2-supply = <&vreg_s1c_1p2>;
--		vddrfa1p9-supply = <&vreg_s6c_1p8>;
-+		vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
-+		vddaon-supply = <&vreg_pmu_aon_0p59>;
-+		vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
-+		vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
-+		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
-+		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
-+		vddrfa1p8-supply = <&vreg_pmu_rfa_1p8>;
- 
- 		max-speed = <3200000>;
--
--		enable-gpios = <&tlmm 17 GPIO_ACTIVE_HIGH>;
--		swctrl-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
--
--		pinctrl-0 = <&bt_default>;
--		pinctrl-names = "default";
- 	};
++static bool signal_is_scoped(const struct landlock_ruleset *const sender_dom,
++			     struct task_struct *const target)
++{
++	const struct landlock_ruleset *target_dom =
++		landlock_get_task_domain(target);
++
++	/* quick return if there is no domain or .scoped is not set */
++	if (!sender_dom || !get_scoped_accesses(sender_dom))
++		return true;
++
++	if (!target_dom || !get_scoped_accesses(target_dom))
++		return false;
++
++	/* other is scoped, they connect if they are in the same domain */
++	return domain_scope_le(sender_dom, target_dom);
++}
++
++static int hook_task_kill(struct task_struct *const p,
++			  struct kernel_siginfo *const info, const int sig,
++			  const struct cred *const cred)
++{
++	const struct landlock_ruleset *const dom =
++		landlock_get_current_domain();
++	bool ret = false;
++
++	if (!cred)
++		ret = signal_is_scoped(dom, p);
++	else
++		ret = signal_is_scoped(landlock_cred(cred)->domain, p);
++	if (ret)
++		return 0;
++	return EPERM;
++}
++
++static int hook_file_send_sigiotask(struct task_struct *tsk,
++				    struct fown_struct *fown, int signum)
++{
++	const struct task_struct *result =
++		get_pid_task(fown->pid, fown->pid_type);
++
++	const struct landlock_ruleset *const dom =
++		landlock_get_task_domain(result);
++	if (signal_is_scoped(dom, tsk))
++		return 0;
++	return EPERM;
++}
++
+ static struct security_hook_list landlock_hooks[] __ro_after_init = {
+ 	LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
+ 	LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
+ 	LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
+ 	LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
++	LSM_HOOK_INIT(task_kill, hook_task_kill),
++	LSM_HOOK_INIT(file_send_sigiotask, hook_file_send_sigiotask),
  };
  
-
+ __init void landlock_add_task_hooks(void)
 -- 
-2.43.0
+2.34.1
 
 
