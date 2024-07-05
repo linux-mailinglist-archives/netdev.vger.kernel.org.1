@@ -1,334 +1,257 @@
-Return-Path: <netdev+bounces-109357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF05928212
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 08:29:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B901592821D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 08:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9431F25E2E
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:29:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266E1287583
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0884D142E6F;
-	Fri,  5 Jul 2024 06:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92BE1448DF;
+	Fri,  5 Jul 2024 06:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cEQrHi4D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgQnoqJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E617413C8FB;
-	Fri,  5 Jul 2024 06:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720160896; cv=fail; b=jj3pklDo+Q3+GZkWBgmq7rlmQpzYJ+3ovOx00ylTl+uW6ZIcRnYb4d7QCNqFhDbZSoBS48U6rBgodOtqULGv8NdIhFYhFSP9Qxq4wKit5X/urUpvDZAKhzW5IzyZLWg7N6uthZgSlYAA3tJqIHeF2X2TpJlMy69QgZXx3lWtKCo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720160896; c=relaxed/simple;
-	bh=gZ5UX80t7wTRSv9uxCu1FVPR2YNw/3J9rqqCZ6vvrPs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ahDfPxZmRCGOVS42y/1lUEFiAxCd6fqByqt4mFByVZCFaH1v25BbZzivGQh7OPcBkKZ2N2Hc0Tpg4V6/5guErZ21zds1mhb25f/nZ9wXvWsK4Dfkropm/p8xoPDjHRkouLO8mDwcqdVxGHdfwe6H0k03pkHWioZyRBEyAgqj8N4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cEQrHi4D; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720160895; x=1751696895;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=gZ5UX80t7wTRSv9uxCu1FVPR2YNw/3J9rqqCZ6vvrPs=;
-  b=cEQrHi4DrHbDiHR+QHa83byorUCtmSvkAmxKVBmb7ID2K/FxvaLZ1w1N
-   xnEPjiYgAijC1X7nHSBwPlW2sqJteP3kT09HG/zHRHB3HFlQSu7/5HqDC
-   +K0FKlciG0JRYBnfOXhAM2R+Bsj5C0S+Ydsey3++j0Q40zkAxoiPuNyMb
-   xZd11lPbZFfk+TV7HtoEx/5v2cJpX9LAFPwRzbGJ2UC81Xo/ddFrJ2wna
-   ejGd5k7+09Hb2xjLZ9GehNXTD1sFGMN3jTinUmLtrXGlPyKW/JdEqy+1d
-   2Zr1a1GB+1QG34pZfaY9mJd4cW+mh8O/UGMr5fRaHqXUVSm/AjPBsZOm5
-   Q==;
-X-CSE-ConnectionGUID: I03yQQl3RCaNDDEMMoVvwQ==
-X-CSE-MsgGUID: RagaZCCiQXKgwkCGw2ajiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17575294"
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="17575294"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 23:28:15 -0700
-X-CSE-ConnectionGUID: ItZ//gk0SdCiQmoNk5RwuQ==
-X-CSE-MsgGUID: WeXy1i5uQjqQchQOY59F6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="46572120"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Jul 2024 23:28:10 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 4 Jul 2024 23:28:08 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 4 Jul 2024 23:28:08 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 4 Jul 2024 23:28:08 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 4 Jul 2024 23:28:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hEyJ7C5ikWOcNvnxtKkud/2NAt4JdxlWuy6eJGb+1iW+F3Ee0CS4Y04DjBZ29HNTWhHMBQgMHXNbV0dAJzoAZWcuorE6Ztqd/9mC4LjjkEeMyXvqoLtyU0WaLntGUVsE6DJnYuzJSOsnOFO119EwS1jMnkADDraDVLPf+6Qp4B6XM6Kr7N0bDLU4GWvrL9wqQQUOrLvssUJ5hvYHnqj0ySjLP02gk4Ge0FpeloJvKUE3v/yC28RFrnu6/4sr86K5MU3o0ilMn66gI1DfT7J7IBEhXvM2lLrAyTANi9b133rJ6qyU8W8Mu5AMMf+PV3GAL2qu1VHZ2IE7OLS6EWcSWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tdGZbYUlyVyvAPYyf73KRWyeUhYKQdp5dYVmsuBrzWk=;
- b=JK+SiNmo8D933h9T5qvSKYsaxFKKyg5Rmvs4rq5cckCgjN5p8zOPsScGSzkPv+klgKj4SoCj21sGsBrPrhok3cKoU1eZOsXvRMvHRKvu8qok6ouJ2RN9DB7Bry72s/D7p4ASL6RGnAuxOKEIhvsYGtrS6rO8Bq3iIk7g8PgvJ03T2Uj04Cka5OBF1hASMgGdP9H3gF5VzkmdqHsJM8ulPisbXv7IS9fI82W50XSzyHS1gqSlLyX9QZHuJelQm/HXpGhrmnUDRcdx9RSf8wkg8IvG9zuyqkVkNNIzb4A57E4aNWN58lUgcfH31xOZomr4JMqCfXMKmwuBeW7iUlXl6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by MN6PR11MB8243.namprd11.prod.outlook.com (2603:10b6:208:46e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.30; Fri, 5 Jul
- 2024 06:28:06 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7741.017; Fri, 5 Jul 2024
- 06:28:05 +0000
-Message-ID: <84e0195b-598e-4e7c-bd0b-82abb36ecb51@intel.com>
-Date: Fri, 5 Jul 2024 08:27:58 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-To: Shay Drori <shayd@nvidia.com>, Greg KH <gregkh@linuxfoundation.org>
-CC: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <edumazet@google.com>, <david.m.ertman@intel.com>,
-	<rafael@kernel.org>, <ira.weiny@intel.com>, <linux-rdma@vger.kernel.org>,
-	<leon@kernel.org>, <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>,
-	Parav Pandit <parav@nvidia.com>
-References: <20240703073858.932299-1-shayd@nvidia.com>
- <20240703073858.932299-2-shayd@nvidia.com>
- <2024070457-creatable-heroics-94cb@gregkh>
- <c2f4a607-2840-4468-9c16-2edaca7844be@nvidia.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <c2f4a607-2840-4468-9c16-2edaca7844be@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR0P278CA0058.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:21::9) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F4817995;
+	Fri,  5 Jul 2024 06:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720161041; cv=none; b=Ty0im/uysxg+H5ZVSb6CMFAi8NrahwQpnZNyMOtC7pRcCos/k0nHRrzyXWnAq5UzCUZ6upmHomNc0SesDi7heLdY4tpaXNuZT1bzitXVXyWeg6GAZEtYLUr7mVGEYZpYukrFrlxadKqB3RVfJ8UgDteQFQdr/GtYAZuPrNfjU7U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720161041; c=relaxed/simple;
+	bh=58oOxES0lzM392/6H8RgwAqerwHqbbjny/y5448aMuc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jM58Yg1TO6Kk27oH2FZjExOQWyNIJZXdr0GW0v56WatgVOHPyyCJR9YIuJ5EhjrcJvQTI9Zg3rzSf7n+jdU0Zla6vXqUzbbSKNGhylT4qjAvFvGlK9E4tqCa9M7dr3zG5orhGXcsj1IKdNPh60PEblwbrhWkMajskX45Ho2q4Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgQnoqJn; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fa2ea1c443so8920955ad.0;
+        Thu, 04 Jul 2024 23:30:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720161039; x=1720765839; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=znD+DHZ03Xc1hLW5FfmfP3AjgTz3IHInSXaFKd4zqU4=;
+        b=OgQnoqJn0N4hOaiqSwkFDmriuvkhDpKcZY3S9SCd4zJwNlhHc1964zGZbzwfeg2yyR
+         MzAyL9Lg7Jsd8GqWlbabeY8gV8axH8SXH95/DUNDid9r+KDKZUMKl5MJZTJNtIjAZAl8
+         oaeVFCycFNRk2hc2jnZn1d1pY3Obg3Zbqbk6Rg1xREuqXFOeTU5CjQPL66iYbfSP0Wqk
+         R+hQ+420GaTOV9zidqm9md0iU7me8DnBnre4FuFI2a0KXr8vT7RriGoLl8Vsa8XebZ8G
+         f8PyFVmNw5/WI+/RRsiJSKm8nm3cmTUD0R2FhmEfoSmV/gspLdiE/ObGBl2+5jCzrwXd
+         IITw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720161039; x=1720765839;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=znD+DHZ03Xc1hLW5FfmfP3AjgTz3IHInSXaFKd4zqU4=;
+        b=QSHFkzIk6sDOfZCfZsOQk67Pcii/WBu0/8zUwX/EhWrvK1AP6PER6jD520zSLp2jJk
+         aek9faxwNLhUYQU/IRxLX/u2sCqKrhj2uNa4NqaV4IFCuxOmX9/ngNfyQVK3JMb1MdA3
+         ZYUO+PeSFUSefRWpvFEHouEQCWjgIe4+2SAHFOVkbgmav/fY5xZQwSTtSiah+v/Y1Phb
+         AqNYuk+hX1osdQsTRe6iewdivpG/ogocy0kJb84KS9QE+MVuhmP2Kn+PPotqVE258eUy
+         KSvKBQY4Qu7rOx6WRsSKOCJRowjcXDtbS7tB86mWmG9bPWE2dU8RUvXP9XJGGeyqMiAd
+         Rqcg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjMkijNU2PqrF9O4yywoQffUb2k16mnH0GMKCIV1iky7w++F+YiGgByp/+2RTS9uPwvRvmFESK4S/TQyotjEfTIc5xPni6sBUQ8057
+X-Gm-Message-State: AOJu0YyX/btPSDq30xDCb6tO/HvdoTw8UJBcgIe+ERlf+phzLLcrn04R
+	sR+cqS2IT4nmagQllxJiYsL/FI8eYmUOjebbWFOea/T9PdY/4wYe
+X-Google-Smtp-Source: AGHT+IGiekAtzI6KVFfNnBe7S/cylZJ4g2TdGcaP75Xl91oUKJ+AwWvYJL5v9f+jbUZu4wDMKFueRQ==
+X-Received: by 2002:a17:902:e751:b0:1fa:ac73:ca28 with SMTP id d9443c01a7336-1fb33e62d7fmr30255415ad.32.1720161039026;
+        Thu, 04 Jul 2024 23:30:39 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1fb44752cf2sm9976255ad.268.2024.07.04.23.30.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 23:30:38 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1] net: stmmac: xgmac: add support for HW-accelerated VLAN stripping
+Date: Fri,  5 Jul 2024 14:28:08 +0800
+Message-Id: <20240705062808.805071-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MN6PR11MB8243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 894898c9-3fb7-437e-b06f-08dc9cbba0f7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?cVlkTnk4SzZ4Z2VQcEN3U2Y0WDdGVmFJUUtWeXRCang3dC9EWWt2cmRacjZZ?=
- =?utf-8?B?R3ZFNTBXYm81MTZKYkVqWWJxcmw2eHMvZ0J4SStvS21GNFVCL0NHajNHSDhy?=
- =?utf-8?B?cG55bjByTEhNM2M5UklQTHZKMmZkdWpaOVZyVFlwM3oycVlBbmNnSUVYeFo2?=
- =?utf-8?B?Ui9lNWlTSUxNbkY3U29QVnU4Z3FFcEJVdmh6QmV2dWVLMlZxR2pWckdJbU5Q?=
- =?utf-8?B?cW00UXZ0M3RCNTl6ZzFWYUloNk9QQVg0WVB5KzIzb0pUZjAwbXJFVy83V1J3?=
- =?utf-8?B?bkxKcWZwVUdXelFLVGgxVUoxa0FqekQ3Tnc1YzRya0JTWUdjbXM5UkE0RzB2?=
- =?utf-8?B?c1RjNmdpbkpIdm9jMTUyL1l0dmRhbFFVL2M0dEwwdWkyZXMrb2tFN2FsZzlm?=
- =?utf-8?B?R0xkdmRndzFyNkxhK1VnY1k0UUNkK1Y2QTNjeTk5NjFBSWE3RWRsa2U4RVpK?=
- =?utf-8?B?Y2NrczJtUzhhQ2ZLUkNVRzl4aVVDd3lhZnYwdXNtdlhnK09kSFdmWHkyMUcv?=
- =?utf-8?B?a0NoRG9LdjRzbEVGNWNrNGZUY2R0RnROUmJiUkx1U2FUVkQ5Q0hPVFhxV2pp?=
- =?utf-8?B?S0dxM202ZWY0djFTTW51L0lhYUtVeWV4d1pJSFoyVDdGNmE2ZlhBN3h5a1ZH?=
- =?utf-8?B?Z21oTEk0MW5YWE9iOTdrREpqUjM0MUhpSDU5VHZmbXJKTGs4dzh4dXB3cVZ3?=
- =?utf-8?B?TXpheFE4YnhZK3pac0VodGhhb21iNEpsKy9GS2RpNElLZ21tYlBoS3dhRGxu?=
- =?utf-8?B?a2ROd2luSFVFYW53aFhmbjVvRmxtY1hwT01sNXpzeFA1Ukx3TTEvanRTN1Rk?=
- =?utf-8?B?aEgzSWJBUEhra01SdXlueEs5bGVROGxNazdqeW1lME05Sko1d1RzcHIwWXMr?=
- =?utf-8?B?YkZwR3hNVDQ2N3lBdGpNNzNIZkRob2VYMGJWc0oyT0hNL1h0Um9oVnpvZzBv?=
- =?utf-8?B?cFhZYzZ2UmEyZXA4R1N5SnF4bnRuMmZtcGtpM0VObGxBZDVuY0ZUWWFrcnU1?=
- =?utf-8?B?cExjbFJxankyTmdkU2lZWHhVY1J0bzhrZFdCR2liYUFWdHNURFF2OXRRcjJ5?=
- =?utf-8?B?OVBBVVltRW5nMXRiZ3hOTkV0RkNoSWRVQzB1Y3l6Q1diNXBTNlQ0ZmpkZStY?=
- =?utf-8?B?N0VEZW9NaFRtV3g3V3BuUmZ4SWZKT0NzMjljaXI5NHAyYjhHaGQ4TGVoSUZu?=
- =?utf-8?B?aitXY1cvcG5EUnFzM3owVVpCTnByWEZuWFdhdVhwMkdTeUJvOTZiL0phbjJN?=
- =?utf-8?B?ZGlEUnlQYUllemhSQk1jOC9ZQlVaMFpybWtFWmtJRldjR2luV3Mvb0xObXpq?=
- =?utf-8?B?djdXNWNWc1o4NkJJRStDT3k5RitnclBXQXFPUzZMenFyNnRpeFg1cVRYYlBN?=
- =?utf-8?B?UGNIYUcxSWVzOFIxMlRmdjRjeG0zL29iUFJsb2FsUjFXbWpWOG8yZjdwWGNR?=
- =?utf-8?B?WFRsallqaHNSNnBsVkFKTWhtckVLeW1tamo1bmRWb3F1L3dFdHk3NlRraU9j?=
- =?utf-8?B?clFpTHpEeGltald5b0NyRnhycUQ2ditiL3hCMDVyL3MycFFhcEtzNnlwRW96?=
- =?utf-8?B?d25ibk8wc2RtU25DUk5ORlQrUG1nRERORnlMaDQ1dFV3T2FMc3dsc3BqY1lP?=
- =?utf-8?B?RHVTS09CdVlnTjlIM25LM3ArT0Rib2VSOFE4akR2ZU8vRWlMNGRnWUVKbHBn?=
- =?utf-8?B?NExpV3hBNDNnUC80cHpjSVpTdUMrTERvMDNld1gzejBXVTRaRjhyUyswMFdU?=
- =?utf-8?B?YVVIMFlROUhvU21yaVVSeWZ1TnAwejJVc0tJQWk1MzNWc3RvazdkcjdRUTV0?=
- =?utf-8?B?ZjgzZXhnbit5clozS055QT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWJNdDNLTitoTmtOOGx4cGZ0eDcvbkFWS1B1dEd2cUpZMjBjYmZleXgybDVF?=
- =?utf-8?B?SlRaYmdLbnhNNkNXR05odVduMGd3NXN5OUI2bXhFYWk5a09mUTFRanlSM1I1?=
- =?utf-8?B?aWFITVZuY09uWTlSbVpyOVh4QytXL01rc0ZidEN1YmhnRW84dGFleUUwbkhZ?=
- =?utf-8?B?SFdjajVBWkhwOUxMUzVadXBpbnhENnNEQ052NlBsdWxablBEMW1yR3F3Wk1k?=
- =?utf-8?B?VXZkRXNEUDZFVm53UUkyTy9vRXpFMzdoNzk0Q1RXbm1oOGx5WGZVN2hFK2tZ?=
- =?utf-8?B?V1pWMlZqYkdFeHVSbnVvT1k5NE50TkNhZVo0V1V5UFFFVzFOWHMyTEtOOHg5?=
- =?utf-8?B?ODBablNOcEZGTXJ2RUtsbDhWTjhlV09iM0p2b0lwUjhpNU9mNnVZTFpraVh6?=
- =?utf-8?B?aTBlMklZRW9vZzJRRHROaTlVKy9kcXlCNWVBaTkyNENaN0NVZENuQVl4YTN1?=
- =?utf-8?B?di9wcDZWVmR5SlFUVHFSL1RyWWM2SzVreXExcksyc01vbnNJc2k2amZucVIv?=
- =?utf-8?B?VkFRbHJ5RzBXMWVzUThrazIvY0dtbFloYU9aUmIrbEtPRnJFK3gxaG9ncnFn?=
- =?utf-8?B?NUpEbVFhNUhOUEF3MlNEbXRYTnNLc1ZVdndhK082Sm5IVUJTMXllUlZCK1dC?=
- =?utf-8?B?QWNaV3puTU5BTFpOdHhxb2liSG5GaytNb20zakRrTEFiYUJjVFZaYWlkdnFF?=
- =?utf-8?B?S0dvVUYzeTgzaVJPZmdhSFErWTJHUFo1MkFmS2JtNkQ1dUNoRlU4NjFLbnd1?=
- =?utf-8?B?VlpUZ0h0dEN1QWwxbVorYStwVTNLTmFKdkJwU1ZObVI0ZHVxYUg5allVYmN3?=
- =?utf-8?B?Ti8vQ2VMeUxYYldOajdCYnZGaUtFVmY4K2o3R3BWcVE4S1B1dUczMUNQY29T?=
- =?utf-8?B?SFFSUXM3emxZTGdEVDl1OU9mSlgyamxBZzZGNnQ5NzNmNnFjU2w2WFRSUFVu?=
- =?utf-8?B?MWprL2o3NGovZzBwRkJhRWF5b21ZREtCR2J1S3ZEcXUwekdpeVJWRUhKTk5r?=
- =?utf-8?B?SGt6WlNmR2FNUkh5dkpNV3N6bXg1U001bWVIa0ZvZHVUN1NqZ1ZBL1h0cHJo?=
- =?utf-8?B?RVNHWVNhbEc5UXZTbFNlQlhoTUE4d1VoZkkxZVIvbmVPYnR4eEtXQldyRmd1?=
- =?utf-8?B?MkZCUDdyeFZBdkFtUlhyd0VxQTNUMkdvZFZSRzIrcm92Z1JPMXVJdFNNVElW?=
- =?utf-8?B?bkJXZjJxNk1LUWsrOWZRT0dybDhzdmU2SnJVNUpVQnVvUDFHZWgyUHdyZzY0?=
- =?utf-8?B?c29kY3FXRXJncVRGUi9yTC9rMUdCVHFqZHlUdXMzalZaMzJDZlFvLzFxUDA1?=
- =?utf-8?B?L0RyY21OMldyRzF6MEY3QVc0bXZsZXg0ZEJ5Nlo2YzZwSmY1dEgzRGJ3QmtB?=
- =?utf-8?B?Nk8xZk13SXVjYmswT254WndDTWRVemJrVFUvcnpycGprWVpqZXFrRkx2WThn?=
- =?utf-8?B?YjUyZVQ4a21MZnBMclNINXBienJnbnFOSkY0d0hGRk9jUXdGTlN0MW5rMWN0?=
- =?utf-8?B?RkRNdjBKRisyZXYwdU1yRWF2cEJLREJyRU9DbEdNTld4NWhYdjZObFZmN3I5?=
- =?utf-8?B?eXFiY2diYUNrbzh6SXZhTUk0M1hDajZPQm5naGhlSFZtTDgwbVNydE1LTDdj?=
- =?utf-8?B?RXlTVzExVHg0T2c1ZTFTMXd0SGRRK1ovWHJKcjNGeTIwUTFHUkhLbk5WWU52?=
- =?utf-8?B?ZkQrSVlOaUpWZ2NCU1pGT2EvczZuYTk1M3pqd3gxL3pqWXkvbE9qSW5mWDJG?=
- =?utf-8?B?ZHNKUDMvVWFDUFlQbGZtVG5nN1lQb0pUU3F3WHozeitWK3V2YXhSYnFqQk1Y?=
- =?utf-8?B?QitLOGNXZG5nNEtHNW55MWNkUUhWNnJFMVR2WHFYeWZiK3JPN2JXOVVaZkxm?=
- =?utf-8?B?U2oxdlFOcFV4V2ttZVR6TVNXeitXVFNjNkFJOVlMMXliSExtcHM0dUprMWEw?=
- =?utf-8?B?Q3VVK3RoSzQ1bTZCeGdGNVBucjJOdmZGbGdEZmwwVHBzdVYyTlRqcjhrWVhy?=
- =?utf-8?B?QlA1b01ITytnWTY0SUJxbndqek9pSW83K3BhTEJBVXBDdG8zMHJkeUFXSWdK?=
- =?utf-8?B?Um4xZWdqcnJEQkpuRDMvdVF1VlRLVXQvQVp4ZHp1aXhhMVdQTUVFTzdxV01q?=
- =?utf-8?B?Nmx2dU05ZjhKU0RocmEzczRVcDBtSnE5Y3g1YW4rSytRT2tUTzZWdGJKeUIv?=
- =?utf-8?B?enc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 894898c9-3fb7-437e-b06f-08dc9cbba0f7
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2024 06:28:05.4315
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8b6OJZQD34g9vw+cuxCxI8LLal3pXx1bw+9u54ETJbcRd6OBRiG6YK9L4SbhDQLG41AcKA1Iy0KKhDZPpelhkt8jpoPXPYufjNTf08BvmG4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8243
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 7/5/24 07:35, Shay Drori wrote:
-> 
-> 
-> On 04/07/2024 13:41, Greg KH wrote:
->> External email: Use caution opening links or attachments
->>
->>
->> On Wed, Jul 03, 2024 at 10:38:57AM +0300, Shay Drory wrote:
->>> +/**
->>> + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
->>> + * @auxdev: auxiliary bus device to add the sysfs entry.
->>> + * @irq: The associated interrupt number.
->>> + *
->>> + * This function should be called after auxiliary device have 
->>> successfully
->>> + * received the irq.
->>> + * The driver is responsible to add a unique irq for the auxiliary 
->>> device. The
->>> + * driver can invoke this function from multiple thread context 
->>> safely for
->>> + * unique irqs of the auxiliary devices. The driver must not invoke 
->>> this API
->>> + * multiple times if the irq is already added previously.
->>> + *
->>> + * Return: zero on success or an error code on failure.
->>> + */
->>> +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, 
->>> int irq)
->>> +{
->>> +     struct auxiliary_irq_info *info __free(kfree) = NULL;
->>> +     struct device *dev = &auxdev->dev;
->>> +     char *name __free(kfree) = NULL;
->>> +     int ret;
->>> +
->>> +     ret = auxiliary_irq_dir_prepare(auxdev);
->>> +     if (ret)
->>> +             return ret;
->>> +
->>> +     info = kzalloc(sizeof(*info), GFP_KERNEL);
->>> +     if (!info)
->>> +             return -ENOMEM;
->>> +
->>> +     sysfs_attr_init(&info->sysfs_attr.attr);
->>> +     name = kasprintf(GFP_KERNEL, "%d", irq);
->>> +     if (!name)
->>> +             return -ENOMEM;
->>> +
->>> +     ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
->>> +     if (ret)
->>> +             return ret;
->>> +
->>> +     info->sysfs_attr.attr.name = name;
->>> +     ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
->>> +                                   auxiliary_irqs_group.name);
->>> +     if (ret)
->>> +             goto sysfs_add_err;
->>> +
->>> +     info->sysfs_attr.attr.name = no_free_ptr(name);
->>
->> This assignment of a name AFTER it has been created is odd.  I think I
->> know why you are doing this, but please make it obvious and perhaps
->> solve it in a cleaner way. 
-> 
-> I am doing it since I want the name memory to be freed in case of
-> sysfs_add_file_to_group() fails.
-> I don’t see a cleaner way available with cleanup.h.
-> 
->> Assigning this "deep" in a sysfs structure is not ok.
-> 
-> when creating sysfs dynamically, there isn't a cleaner way to assign the
-> name memory.
-> The closest and exact same use case for pci irq sysfs which uses dynamic
-> sysfs is msi_sysfs_populate_desc().
-> It does not use cleanup.h but still has to assign.
-> I Don’t have any other ideas on how to implement it any more elegantly
-> with cleanup.h.
-> Do you prefer to assign it before sysfs_add_file_to_group() similar to
-> msi_sysfs_populate_desc() and avoid cleanup.h for now?
+Commit 750011e239a5 ("net: stmmac: Add support for HW-accelerated VLAN
+stripping") introduced MAC level VLAN tag stripping for gmac4 core.
+This patch extend the support to xgmac core.
 
-I've overlooked it earlier, sorry.
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  7 ++++
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 39 +++++++++++++++++++
+ .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  | 19 +++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
+ 4 files changed, 66 insertions(+), 1 deletion(-)
 
-easiest solution for "general" case would be:
-	info->sysfs_attr.attr.name = no_free_ptr(name);
-	ret = sysfs_add_file_to_group(&dev->kobj,
-			&info->sysfs_attr.attr,
-			auxiliary_irqs_group.name);
-	if (ret) {
-		/* freeing manualy since auto cleanup was
-		 * disabled by no_free_ptr() */
-		kfree(info->sysfs_attr.attr.name);
-		goto sysfs_add_err;
-	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 6a2c7d22df1e..db3217784cb0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -60,6 +60,10 @@
+ #define XGMAC_VLAN_TAG			0x00000050
+ #define XGMAC_VLAN_EDVLP		BIT(26)
+ #define XGMAC_VLAN_VTHM			BIT(25)
++#define XGMAC_VLAN_TAG_CTRL_EVLRXS	BIT(24)
++#define XGMAC_VLAN_TAG_CTRL_EVLS	GENMASK(22, 21)
++#define XGMAC_VLAN_TAG_STRIP_NONE	0x0
++#define XGMAC_VLAN_TAG_STRIP_ALL	0x3
+ #define XGMAC_VLAN_DOVLTC		BIT(20)
+ #define XGMAC_VLAN_ESVL			BIT(18)
+ #define XGMAC_VLAN_ETV			BIT(16)
+@@ -477,6 +481,7 @@
+ #define XGMAC_TDES3_VLTV		BIT(16)
+ #define XGMAC_TDES3_VT			GENMASK(15, 0)
+ #define XGMAC_TDES3_FL			GENMASK(14, 0)
++#define XGMAC_RDES0_VLAN_TAG		GENMASK(15, 0)
+ #define XGMAC_RDES2_HL			GENMASK(9, 0)
+ #define XGMAC_RDES3_OWN			BIT(31)
+ #define XGMAC_RDES3_CTXT		BIT(30)
+@@ -490,6 +495,8 @@
+ #define XGMAC_L34T_IP4UDP		0x2
+ #define XGMAC_L34T_IP6TCP		0x9
+ #define XGMAC_L34T_IP6UDP		0xA
++#define XGMAC_RDES3_L2T			GENMASK(19, 16)
++#define XGMAC_L2T_SINGLE_C_VLAN		0x9
+ #define XGMAC_RDES3_ES			BIT(15)
+ #define XGMAC_RDES3_PL			GENMASK(13, 0)
+ #define XGMAC_RDES3_TSD			BIT(6)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index 6a987cf598e4..89ac9ad6164a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -1530,6 +1530,41 @@ static void dwxgmac3_fpe_configure(void __iomem *ioaddr, struct stmmac_fpe_cfg *
+ 	writel(value, ioaddr + XGMAC_FPE_CTRL_STS);
+ }
+ 
++static void dwxgmac2_rx_hw_vlan(struct mac_device_info *hw,
++				struct dma_desc *rx_desc, struct sk_buff *skb)
++{
++	u16 vid;
++
++	if (!hw->desc->get_rx_vlan_valid(rx_desc))
++		return;
++
++	vid = hw->desc->get_rx_vlan_tci(rx_desc);
++
++	__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vid);
++}
++
++static void dwxgmac2_set_hw_vlan_mode(struct mac_device_info *hw)
++{
++	void __iomem *ioaddr = hw->pcsr;
++	u32 value = readl(ioaddr + XGMAC_VLAN_TAG);
++
++	value &= ~XGMAC_VLAN_TAG_CTRL_EVLS;
++
++	if (hw->hw_vlan_en)
++		/* Always strip VLAN on Receive */
++		value |= FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS,
++				    XGMAC_VLAN_TAG_STRIP_ALL);
++	else
++		/* Do not strip VLAN on Receive */
++		value |= FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS,
++				    XGMAC_VLAN_TAG_STRIP_NONE);
++
++	/* Enable outer VLAN Tag in Rx DMA descriptor */
++	value |= XGMAC_VLAN_TAG_CTRL_EVLRXS;
++
++	writel(value, ioaddr + XGMAC_VLAN_TAG);
++}
++
+ const struct stmmac_ops dwxgmac210_ops = {
+ 	.core_init = dwxgmac2_core_init,
+ 	.set_mac = dwxgmac2_set_mac,
+@@ -1571,6 +1606,8 @@ const struct stmmac_ops dwxgmac210_ops = {
+ 	.config_l4_filter = dwxgmac2_config_l4_filter,
+ 	.set_arp_offload = dwxgmac2_set_arp_offload,
+ 	.fpe_configure = dwxgmac3_fpe_configure,
++	.rx_hw_vlan = dwxgmac2_rx_hw_vlan,
++	.set_hw_vlan_mode = dwxgmac2_set_hw_vlan_mode,
+ };
+ 
+ static void dwxlgmac2_rx_queue_enable(struct mac_device_info *hw, u8 mode,
+@@ -1628,6 +1665,8 @@ const struct stmmac_ops dwxlgmac2_ops = {
+ 	.config_l4_filter = dwxgmac2_config_l4_filter,
+ 	.set_arp_offload = dwxgmac2_set_arp_offload,
+ 	.fpe_configure = dwxgmac3_fpe_configure,
++	.rx_hw_vlan = dwxgmac2_rx_hw_vlan,
++	.set_hw_vlan_mode = dwxgmac2_set_hw_vlan_mode,
+ };
+ 
+ int dwxgmac2_setup(struct stmmac_priv *priv)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+index fc82862a612c..f5293f75fbb4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+@@ -67,6 +67,23 @@ static int dwxgmac2_get_tx_ls(struct dma_desc *p)
+ 	return (le32_to_cpu(p->des3) & XGMAC_RDES3_LD) > 0;
+ }
+ 
++static u16 dwxgmac2_wrback_get_rx_vlan_tci(struct dma_desc *p)
++{
++	return (le32_to_cpu(p->des0) & XGMAC_RDES0_VLAN_TAG);
++}
++
++static bool dwxgmac2_wrback_get_rx_vlan_valid(struct dma_desc *p)
++{
++	u32 l2_type;
++
++	if (!(le32_to_cpu(p->des3) & XGMAC_RDES3_LD))
++		return false;
++
++	l2_type = FIELD_GET(XGMAC_RDES3_L2T, le32_to_cpu(p->des3));
++
++	return (l2_type == XGMAC_L2T_SINGLE_C_VLAN);
++}
++
+ static int dwxgmac2_get_rx_frame_len(struct dma_desc *p, int rx_coe)
+ {
+ 	return (le32_to_cpu(p->des3) & XGMAC_RDES3_PL);
+@@ -349,6 +366,8 @@ const struct stmmac_desc_ops dwxgmac210_desc_ops = {
+ 	.set_tx_owner = dwxgmac2_set_tx_owner,
+ 	.set_rx_owner = dwxgmac2_set_rx_owner,
+ 	.get_tx_ls = dwxgmac2_get_tx_ls,
++	.get_rx_vlan_tci = dwxgmac2_wrback_get_rx_vlan_tci,
++	.get_rx_vlan_valid = dwxgmac2_wrback_get_rx_vlan_valid,
+ 	.get_rx_frame_len = dwxgmac2_get_rx_frame_len,
+ 	.enable_tx_timestamp = dwxgmac2_enable_tx_timestamp,
+ 	.get_tx_timestamp_status = dwxgmac2_get_tx_timestamp_status,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 4b6a359e5a94..6f594c455d0f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7663,7 +7663,7 @@ int stmmac_dvr_probe(struct device *device,
+ #ifdef STMMAC_VLAN_TAG_USED
+ 	/* Both mac100 and gmac support receive VLAN tag detection */
+ 	ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
+-	if (priv->plat->has_gmac4) {
++	if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
+ 		ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
+ 		priv->hw->hw_vlan_en = true;
+ 	}
+-- 
+2.34.1
 
-but in your case it will be cleaner to alloc the space for name
-together with struct auxiliary_irq_info, by placing a char array
-there, either with static size or a flex one (if such case would
-be generic)
-
-going one step further would be be to reorder struct device_attribute
-and struct attribute fields to have @name as the last one and make it
-a flex array - but it is perhaps for another series ;)
-
->>> +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
->>> +{
->>> +     struct auxiliary_irq_info *info __free(kfree) = xa_load(&auxdev->irqs, irq);
->>
->> No verification that this is an actual entry before you dereferenced it?
->> Bold move...
-> 
-> Driver must do this for allocated irq. So xa_load cannot fail.
-> In previous versions we had WARN_ON to catch driver bugs, but you didn’t
-> like it.
-> I think this is fine the way it is in v9.
-> 
->>
->> greg k-h 
-
-Perhaps this is more about trust boundaries?,
-I would like to learn something from this case :)
 
