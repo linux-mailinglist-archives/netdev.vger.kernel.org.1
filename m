@@ -1,88 +1,180 @@
-Return-Path: <netdev+bounces-109471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81561928966
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:15:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C24792896D
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 15:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2222BB22C13
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:15:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3324E283E3E
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 13:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0774D149DF7;
-	Fri,  5 Jul 2024 13:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F5514AD02;
+	Fri,  5 Jul 2024 13:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWsookLm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PMZ0wTLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C242AD39
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 13:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BF1149DF7
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 13:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720185343; cv=none; b=eNFn+Yw7NSmlxxShynxlAQ//HwSsHDen6o8j5z+WDGUxMwmhFwy5OYRJZ2Z6FPcmK3cWIZJaoHWBFeAVbUTVMtkbAlI1jAwF1Mh1O+AHlUo9ZmDkpYpnUNQykJyYAcao5L8Yp0zdUjfrlqELVYThSvSInyzNccxAK7V9AwKcaZs=
+	t=1720185521; cv=none; b=f8fv4pdVBfZzbntdW0G8EI5ym4UvK0z/2XPH9iqx2xUxt2+6AeG2SCFkPPn6+nrtTI/wEndW99rlSZIr3+ia4Eky+3o9XGOA6ZIap+KJmN00VxYOF+3QPdJjsTExOcJmAhEUPVF7UQt7iYIDy5lmDAnU4c51WMok8EwX28InsbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720185343; c=relaxed/simple;
-	bh=DxcxTZVuuNTU4W0/gz5O/gSVTAwCzeA90soDR50/TgQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rTz/Hj01nRsnndCLgwNwDZ53jFUyqc9ZQTKR4tBhAjgtGBtH2tiziD+7CR2Jn/nUTUKuoxr+4lQ4XUHDFD7Xu6tcaFDL9S5WADobWr64h5fgnMhmzKyL9EzrknWp6V8Gvax2t/P7O/i4jdrNXqM4kgRNj6U0S8ptHFGQozUHOmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWsookLm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD64C116B1;
-	Fri,  5 Jul 2024 13:15:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720185343;
-	bh=DxcxTZVuuNTU4W0/gz5O/gSVTAwCzeA90soDR50/TgQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=TWsookLmYHt5LqPLjdaGWrMG0zU85RgXg+qpOSF03Tz8eNLuTFpRwq4nQZPUL9jIL
-	 SmZfJvI4wi1R715t+jg3fd8+ZFzwmnqZ7lY/ZNz3axjORtKojgoTKAy2e0am+HuAna
-	 UDmOcxsNVzzj0oYZ6zTG8fmHXC22Z6XAKWwLe6+5bvFsvcAaIa9yQyjvfemvPsJXlZ
-	 ZXaqZj2MpmQzsLmKW1lTxvZamChLuGm5w5gajoQawD4Gf2AIE6PeotNCUN0ke3LKQb
-	 nG5h0Q41R5AeX7N12y6WPMJD4227WdQR6RcRIIcIXz6wdA1GohUjPUYY3DLEqktQkJ
-	 cYb7JY08Md0EA==
-From: Simon Horman <horms@kernel.org>
-Date: Fri, 05 Jul 2024 14:15:40 +0100
-Subject: [PATCH iwl-next] i40e: correct i40e_addr_to_hkey() name in kdoc
+	s=arc-20240116; t=1720185521; c=relaxed/simple;
+	bh=XabRrceFxcF0KBIJc9MbE+XTnegGGAzIgYPWZjAd71I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ekFDSv+hKSz1ACWOxvvy+VjlqNDkczIUZU6VN1teBR7/RG1fpcdbALP7MBkon2xHm/EQBr9wHFbamrhpF6vntmMZJGojl2rYr24HBNqEeG36lvFx1t3U+5QvBBkBd60XK0Dv8TLUuzNZFlcUXyjcSNPaOD7oiJgWGXEnZGjS0lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PMZ0wTLA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720185518;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=62aYuvlj0aJrfftHw3OdTbReRjrfxK3xjdMTv0VrPgI=;
+	b=PMZ0wTLA0Q73V85WsF4WzwrjNZVUjiMuTRWHAuW0YieBThSjmv/lXC9aEcJmP5BWBRFfSp
+	ZCSzs8fa6Ot25uONkwgCzTQ+ztQmlQsY8HdU4MPQLzxpt+NJwEzVa4oWwW+6Udr9J4WetR
+	kaPQjyWrdpeuK1wNcXZJsuFs9ahqV5c=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-687-9YNbntdYM6eb-fZXiDDwuQ-1; Fri, 05 Jul 2024 09:18:37 -0400
+X-MC-Unique: 9YNbntdYM6eb-fZXiDDwuQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a728c02df80so136415666b.1
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 06:18:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720185516; x=1720790316;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=62aYuvlj0aJrfftHw3OdTbReRjrfxK3xjdMTv0VrPgI=;
+        b=saa0gr6TfWn51TOtHJ8745gXVRxmRr/qTHE8HdIsmPnt6lkVAEVtDBYegcgFc7Ulbp
+         z4XHDn4QWI7QFxyq+iFG4NGzt9esVt8HSGI8v9LCUg+TnQ7kpjUojZeFxNDfY0/DQVy1
+         J/FqM/8e3rQOCQASLEkDXTbDH2GGW2iL3cgChvNSVBZ/EDUwWx4WGNhn5s65hFyZEUL+
+         SMXd9pdqecYY6U1JG7xMeDc2y6nXnPdTBJXonLroP8ckdmznh+65f6cufnaXZkPCp6z/
+         1s2K1KePjPqy1RsIfVLgfaA4eidpPjhRAR5uZqlIMe0XOpjqGjwO+P63HSwRUIELxGR0
+         KksA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4XVHWPqCyDzye2ZmWF1bg0wzJPIWKqXktYZMF1/KSJocBEz9c9XJ/LqhbDXsTTDml7t6hO+Eu4ICFXjtBl9VNwLdSgFO+
+X-Gm-Message-State: AOJu0Yz2nls9Ym5EMxUWyq+c4sLqSmhvQupx8viddDC/TGfzVt2+hVjs
+	Y/ZKl/JSDntGW60kwUXEj4+beBO+YtJ1S4rwaQNtFi/qrcZ1Ue11Eb1xoPIK35ay+y7OwY8NdiG
+	qnQQ/tiE23f+bDHM9aeyVlvuhoV9QGTbadAdnW4/bCKRwtUzZRpo9Hw==
+X-Received: by 2002:a17:906:c9c6:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a77ba70e46bmr325709966b.37.1720185516240;
+        Fri, 05 Jul 2024 06:18:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEb9mUZwv0LhDRrdW6Gq2ToasHLSkXTvO7pDP+kDNwoiP/yJeMD+4Nmr3QADNVIspVclQSnJQ==
+X-Received: by 2002:a17:906:c9c6:b0:a6f:4a42:1976 with SMTP id a640c23a62f3a-a77ba70e46bmr325706366b.37.1720185515818;
+        Fri, 05 Jul 2024 06:18:35 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77c2aee010sm103537566b.102.2024.07.05.06.18.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 06:18:35 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0A1F313FDC48; Fri, 05 Jul 2024 15:18:35 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, ast@kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com
+Cc: davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xdp-newbies@vger.kernel.org
+Subject: Re: [PATCH] bpf: provide map key to BPF program after redirect
+In-Reply-To: <987c3ca8-156b-47ed-b0b6-ed6d7d54d168@linutronix.de>
+References: <20240705103853.21235-1-florian.kauer@linutronix.de>
+ <87zfqw85mp.fsf@toke.dk>
+ <987c3ca8-156b-47ed-b0b6-ed6d7d54d168@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 05 Jul 2024 15:18:35 +0200
+Message-ID: <87wmm07z9w.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240705-i40e-kdoc-v1-1-529d0808a1ef@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPvxh2YC/x3MQQqAIBBG4avErBswKYKuEi1Ef2soLDQqkO6et
- Pzg8TIlREGiocoUcUmSPRQ0dUV2MWEGiysmrXSretWxtAq8ut2ygdPe9KaD9VT6I8LL879Gknv
- jgOek6X0/qGwv7WUAAAA=
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Correct name of i40e_addr_to_hkey() in it's kdoc.
+Florian Kauer <florian.kauer@linutronix.de> writes:
 
-kernel-doc -none reports:
+> On 7/5/24 13:01, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Florian Kauer <florian.kauer@linutronix.de> writes:
+>>=20
+>>> Both DEVMAP as well as CPUMAP provide the possibility
+>>> to attach BPF programs to their entries that will be
+>>> executed after a redirect was performed.
+>>>
+>>> With BPF_F_BROADCAST it is in also possible to execute
+>>> BPF programs for multiple clones of the same XDP frame
+>>> which is, for example, useful for establishing redundant
+>>> traffic paths by setting, for example, different VLAN tags
+>>> for the replicated XDP frames.
+>>>
+>>> Currently, this program itself has no information about
+>>> the map entry that led to its execution. While egress_ifindex
+>>> can be used to get this information indirectly and can
+>>> be used for path dependent processing of the replicated frames,
+>>> it does not work if multiple entries share the same egress_ifindex.
+>>>
+>>> Therefore, extend the xdp_md struct with a map_key
+>>> that contains the key of the associated map entry
+>>> after performing a redirect.
+>>>
+>>> See
+>>> https://lore.kernel.org/xdp-newbies/5eb6070c-a12e-4d4c-a9f0-a6a6fafa41d=
+1@linutronix.de/T/#u
+>>> for the discussion that led to this patch.
+>>>
+>>> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+>>> ---
+>>>  include/net/xdp.h        |  3 +++
+>>>  include/uapi/linux/bpf.h |  2 ++
+>>>  kernel/bpf/devmap.c      |  6 +++++-
+>>>  net/core/filter.c        | 18 ++++++++++++++++++
+>>>  4 files changed, 28 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/net/xdp.h b/include/net/xdp.h
+>>> index e6770dd40c91..e70f4dfea1a2 100644
+>>> --- a/include/net/xdp.h
+>>> +++ b/include/net/xdp.h
+>>> @@ -86,6 +86,7 @@ struct xdp_buff {
+>>>  	struct xdp_txq_info *txq;
+>>>  	u32 frame_sz; /* frame size to deduce data_hard_end/reserved tailroom=
+*/
+>>>  	u32 flags; /* supported values defined in xdp_buff_flags */
+>>> +	u64 map_key; /* set during redirect via a map */
+>>>  };
+>>>=20=20
+>>>  static __always_inline bool xdp_buff_has_frags(struct xdp_buff *xdp)
+>>> @@ -175,6 +176,7 @@ struct xdp_frame {
+>>>  	struct net_device *dev_rx; /* used by cpumap */
+>>>  	u32 frame_sz;
+>>>  	u32 flags; /* supported values defined in xdp_buff_flags */
+>>> +	u64 map_key; /* set during redirect via a map */
+>>>  };
+>>=20
+>> struct xdp_frame is size constrained, so we shouldn't be using precious
+>> space on this. Besides, it's not information that should be carried
+>> along with the packet after transmission. So let's put it into struct
+>> xdp_txq_info and read it from there the same way we do for egress_ifinde=
+x :)
+>
+> Very reasonable, but do you really mean struct xdp_frame or xdp_buff?
+> Only the latter has the xdp_txq_info?
 
- drivers/net/ethernet/intel/i40e/i40e.h:739: warning: expecting prototype for i40e_mac_to_hkey(). Prototype was for i40e_addr_to_hkey() instead
+Well, we should have the field in neither, but xdp_frame is the one that
+is size constrained. Whenever a cpumap/devmap program is run (in
+xdp_bq_bpf_prog_run() and dev_map_bpf_prog_run_skb()), a struct
+xdp_txq_info is prepared on the stack, so you'll just need to add
+setting of the new value to that...
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/intel/i40e/i40e.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index bca2084cc54b..d546567e0286 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -735,7 +735,7 @@ __i40e_pf_next_veb(struct i40e_pf *pf, int *idx)
- 	     _i++, _veb = __i40e_pf_next_veb(_pf, &_i))
- 
- /**
-- * i40e_mac_to_hkey - Convert a 6-byte MAC Address to a u64 hash key
-+ * i40e_addr_to_hkey - Convert a 6-byte MAC Address to a u64 hash key
-  * @macaddr: the MAC Address as the base key
-  *
-  * Simply copies the address and returns it as a u64 for hashing
+-Toke
 
 
