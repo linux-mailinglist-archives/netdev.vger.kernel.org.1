@@ -1,186 +1,139 @@
-Return-Path: <netdev+bounces-109355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23D9092818A
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 07:53:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 563C69281D0
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 08:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5585F1C22730
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 05:53:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AB101F2146F
+	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 06:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F72913BC3D;
-	Fri,  5 Jul 2024 05:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03551411FD;
+	Fri,  5 Jul 2024 06:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qiJQVhUy"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="JSzythbE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322D513AD31;
-	Fri,  5 Jul 2024 05:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F3B8565E
+	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 06:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720158785; cv=none; b=LnlRdgVYnk+ZVuoTWCcTVvFZ6GVzqPPWAdr59QnZeFAnSr37IOjhTUi3bbLRW2o9L2O5ofPYE5wh20+zeayU9bY5Z8QW5gKOV1Rd22DCtPgrSrL6LaOvtzSHMM8tjYl+g2q4uKb7kDIC94wa5GPMjcUBcttGpO9lH4SY6fpMLbI=
+	t=1720160365; cv=none; b=oq7q/7AL+Xe/TgIJQzs0TgqQHlIs3tWZzPLlXUx7vvgUI91eWbcW+cR1/JXh0aCgncz2xqX8UURIkbt8ojiMrXLeykSf4tHLNmvnOBYck0P/gAs1d2wdwBTP9/KV7vU4KZnG/uSl+MIJd+qulIrDDV3F1iyLOeVl0jo6VwqwfvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720158785; c=relaxed/simple;
-	bh=jMHVZeNcRV8JsaFDa4g59qr7+S/J+FjO3I0snJlN7sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OO/WRpMRzSaybjCWSy4Lv6NGBRxqEokeJ+oLW010EoW3eJnr38aF0cbA1Jw5H18ZOHeoVH27TpSucvVOXqSZz7godVQDX7l/yPcj0irn24MdchpV7h+KbkRnGUcKjcIUCBbPwF8Cyj0ghH31rUtLWRo9gUbuTeEo8RTJhfdZxgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qiJQVhUy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2318CC116B1;
-	Fri,  5 Jul 2024 05:53:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720158784;
-	bh=jMHVZeNcRV8JsaFDa4g59qr7+S/J+FjO3I0snJlN7sc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qiJQVhUy2scDBW9Mn0YOVrzNalfIGvoT/bT3ThsHPfOhzdn44FQylAgfr4Gp7VWcs
-	 h/rUnMsXAqBUxheG5oEdOnrBJHMNnzm1vqkRHjUgLsX9zV6aDdFxEDScoOSEaPhXJR
-	 wAdmsPkVtoh2qS9beiwZwVWcybINB3kdJojTd5+o=
-Date: Fri, 5 Jul 2024 07:53:01 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Shay Drori <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Simon Horman <horms@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v9 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <2024070533-smashing-kilowatt-8ac0@gregkh>
-References: <20240703073858.932299-1-shayd@nvidia.com>
- <20240703073858.932299-2-shayd@nvidia.com>
- <2024070457-creatable-heroics-94cb@gregkh>
- <c2f4a607-2840-4468-9c16-2edaca7844be@nvidia.com>
+	s=arc-20240116; t=1720160365; c=relaxed/simple;
+	bh=NuBcaZBXyaib8wjHT9yk4FJ5ZvdCAVX8JNjlI0ndxKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pr2X7luscL7k08NkymHxm4XeB5svo6qVlAscone0r5Xl+EoYT3Dq7dHaCIN3knFXjpIGIfPeWifmtONKbL/60kL/kn/cWLrVVzXFh0ZhYTQoVQ+zy1mPqmfADe+5loilVxcOCXOCTJk/YZyDKFWOCJ+L5JTQbtf/xMdVk3u0fkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=JSzythbE; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a724958f118so148726366b.0
+        for <netdev@vger.kernel.org>; Thu, 04 Jul 2024 23:19:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1720160362; x=1720765162; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mwsffRzyhXVoC3K5uOT5OFHBsBv3WDoaAysWJVFt7KU=;
+        b=JSzythbEguQefDa8i0BWeGb0shrMF1cTi4Hv6CbmBWXg7FxrV+1hrSdg5x+7AtDXl1
+         UwrSduQLJ+14M/FhIun0PyYBpecpjXnPGh3/J8OL82lLy6jb9iLPW91SRcXnl08C3kzI
+         VztfBPuw3hg9r0wkbAyzfpFTq4SucfO5eR4nS+/nb3RUF7a3OyZ5qWlXW44omwX3hGLV
+         4PDkIQkAJ/VE+vuUlqi3J4h7CBfTpBTfquZzx9fMCoT1yNPRGtnLtt51FgVAXmLNPT+s
+         kSMCoTzw1NwOQKx5uR/rewt4iRypN54XnZEibyBzPsbSES3CVDMQCVG9WtzTkcsvFGMd
+         rr6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720160362; x=1720765162;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mwsffRzyhXVoC3K5uOT5OFHBsBv3WDoaAysWJVFt7KU=;
+        b=W1d5qRanIqCs/V4PBNSt0a93/0uVtUl5TaSO93h7Uf0CZkhJqk+/tOa7SzWO4cy2Nj
+         7iSgoCH2qM1ZBAXX0BG9pDj6/kwgC536z0KazBna6OqYt2mpTsAijNuWyru182GtzCKC
+         aw59OQjX8qYjYX01VvgtM6LgNldp3cWOHxv28DQn1myS2y4glHDw6ppitkvkm+du1Ni9
+         CPFKeM8fiHGLMIzq0eSaz6mXVbC4+e0Z4Uygni5iez1Hwm7g/im2ywHXuiwNormPqTzM
+         SOhCC3q0kgVWhBE5mGqO/fwXIKE+lP77dI+BVwBUyTaGalmq1ZMSouQ33M9mYSps/lcx
+         hR9A==
+X-Forwarded-Encrypted: i=1; AJvYcCU1WSenpZSjwpc8HJHVnTN92losEmRtztIL7mNc4dz7Pid+aSvYx8uyhN0bBVum3KMaXDB02UNXILivtRC+O3wvpUK5tj1a
+X-Gm-Message-State: AOJu0YxX37fqFw3Rwiy+jt43b09ywI6i0Yin6MFHSGnBz2xoz+5XLIRz
+	U0i2rYsyDajGrqQ2Pdc2V8iI49sDqspzDTBcxd6lmAQFOrNIshnKMHU9KNqwSvY=
+X-Google-Smtp-Source: AGHT+IHYGWxgJcxU2JtXZe2SYuFdQkZAhNQBf2vwDFlVHIX1WeUVW/S7nDMmVDMT9pyEI4qfY0LaVw==
+X-Received: by 2002:a17:907:97c8:b0:a77:b410:b1ed with SMTP id a640c23a62f3a-a77ba48325cmr317201666b.36.1720160362091;
+        Thu, 04 Jul 2024 23:19:22 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72aaf184fdsm653369866b.3.2024.07.04.23.19.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jul 2024 23:19:21 -0700 (PDT)
+Message-ID: <8f3fe53c-0bee-44d9-9c23-6fdd3362ebe4@blackwall.org>
+Date: Fri, 5 Jul 2024 09:19:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c2f4a607-2840-4468-9c16-2edaca7844be@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: bridge: mst: Check vlan state for egress
+ decision
+To: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>, davem@davemloft.net
+Cc: Roopa Prabhu <roopa@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Tobias Waldekranz <tobias@waldekranz.com>, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240705030041.1248472-1-elliot.ayrey@alliedtelesis.co.nz>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240705030041.1248472-1-elliot.ayrey@alliedtelesis.co.nz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 05, 2024 at 08:35:33AM +0300, Shay Drori wrote:
+On 05/07/2024 06:00, Elliot Ayrey wrote:
+> If a port is blocking in the common instance but forwarding in an MST
+> instance, traffic egressing the bridge will be dropped because the
+> state of the common instance is overriding that of the MST instance.
 > 
+> Fix this by temporarily forcing the port state to forwarding when in
+> MST mode to allow checking the vlan state via br_allowed_egress().
+> This is similar to what happens in br_handle_frame_finish() when
+> checking ingress traffic, which was introduced in the change below.
 > 
-> On 04/07/2024 13:41, Greg KH wrote:
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > On Wed, Jul 03, 2024 at 10:38:57AM +0300, Shay Drory wrote:
-> > > +/**
-> > > + * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
-> > > + * @auxdev: auxiliary bus device to add the sysfs entry.
-> > > + * @irq: The associated interrupt number.
-> > > + *
-> > > + * This function should be called after auxiliary device have successfully
-> > > + * received the irq.
-> > > + * The driver is responsible to add a unique irq for the auxiliary device. The
-> > > + * driver can invoke this function from multiple thread context safely for
-> > > + * unique irqs of the auxiliary devices. The driver must not invoke this API
-> > > + * multiple times if the irq is already added previously.
-> > > + *
-> > > + * Return: zero on success or an error code on failure.
-> > > + */
-> > > +int auxiliary_device_sysfs_irq_add(struct auxiliary_device *auxdev, int irq)
-> > > +{
-> > > +     struct auxiliary_irq_info *info __free(kfree) = NULL;
-> > > +     struct device *dev = &auxdev->dev;
-> > > +     char *name __free(kfree) = NULL;
-> > > +     int ret;
-> > > +
-> > > +     ret = auxiliary_irq_dir_prepare(auxdev);
-> > > +     if (ret)
-> > > +             return ret;
-> > > +
-> > > +     info = kzalloc(sizeof(*info), GFP_KERNEL);
-> > > +     if (!info)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     sysfs_attr_init(&info->sysfs_attr.attr);
-> > > +     name = kasprintf(GFP_KERNEL, "%d", irq);
-> > > +     if (!name)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     ret = xa_insert(&auxdev->irqs, irq, info, GFP_KERNEL);
-> > > +     if (ret)
-> > > +             return ret;
-> > > +
-> > > +     info->sysfs_attr.attr.name = name;
-> > > +     ret = sysfs_add_file_to_group(&dev->kobj, &info->sysfs_attr.attr,
-> > > +                                   auxiliary_irqs_group.name);
-> > > +     if (ret)
-> > > +             goto sysfs_add_err;
-> > > +
-> > > +     info->sysfs_attr.attr.name = no_free_ptr(name);
-> > 
-> > This assignment of a name AFTER it has been created is odd.  I think I
-> > know why you are doing this, but please make it obvious and perhaps
-> > solve it in a cleaner way.
+> Fixes: ec7328b59176 ("net: bridge: mst: Multiple Spanning Tree (MST) mode")
+> Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+> ---
+>  net/bridge/br_forward.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> I am doing it since I want the name memory to be freed in case of
-> sysfs_add_file_to_group() fails.
-> I don’t see a cleaner way available with cleanup.h.
-> 
-> > Assigning this "deep" in a sysfs structure is not ok.
-> 
-> when creating sysfs dynamically, there isn't a cleaner way to assign the
-> name memory.
-> The closest and exact same use case for pci irq sysfs which uses dynamic
-> sysfs is msi_sysfs_populate_desc().
-> It does not use cleanup.h but still has to assign.
-> I Don’t have any other ideas on how to implement it any more elegantly
-> with cleanup.h.
-> Do you prefer to assign it before sysfs_add_file_to_group() similar to
-> msi_sysfs_populate_desc() and avoid cleanup.h for now?
+> diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+> index d97064d460dc..911b37a38a32 100644
+> --- a/net/bridge/br_forward.c
+> +++ b/net/bridge/br_forward.c
+> @@ -22,10 +22,16 @@ static inline int should_deliver(const struct net_bridge_port *p,
+>  				 const struct sk_buff *skb)
+>  {
+>  	struct net_bridge_vlan_group *vg;
+> +	u8 state;
 
-No, what msi_sysfs_populate_desc() does is not good, the only objection
-here is the assignment after-the-fact you are doing just to work around
-cleanup.h.  Surely there's a better way to tell it not to free the
-pointer at this point in time other than this.
+state = p->state
+...
 
-> > > +     xa_store(&auxdev->irqs, irq, no_free_ptr(info), GFP_KERNEL);
-> > > +     return 0;
-> > > +
-> > > +sysfs_add_err:
-> > > +     xa_erase(&auxdev->irqs, irq);
-> > > +     return ret;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
-> > > +
-> > > +/**
-> > > + * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
-> > > + * @auxdev: auxiliary bus device to add the sysfs entry.
-> > > + * @irq: the IRQ to remove.
-> > > + *
-> > > + * This function should be called to remove an IRQ sysfs entry.
-> > > + * The driver must invoke this API when IRQ is released by the device.
-> > > + */
-> > > +void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
-> > > +{
-> > > +     struct auxiliary_irq_info *info __free(kfree) = xa_load(&auxdev->irqs, irq);
-> > 
-> > No verification that this is an actual entry before you dereferenced it?
-> > Bold move...
-> 
-> Driver must do this for allocated irq. So xa_load cannot fail.
-> In previous versions we had WARN_ON to catch driver bugs, but you didn’t
-> like it.
+> +
+> +	if (br_mst_is_enabled(p->br))
+> +		state = BR_STATE_FORWARDING;
 
-Yes, because if something can happen, you handle the error properly, you
-don't reboot a machine.
+...
+and you can drop the else clause
 
-> I think this is fine the way it is in v9.
-
-No, you are now causing a NULL dereference (or close to it) if something
-went wrong.  Properly check this and handle it correctly.
-
-thanks,
-
-greg k-h
+> +	else
+> +		state = p->state;
+>  
+>  	vg = nbp_vlan_group_rcu(p);
+>  	return ((p->flags & BR_HAIRPIN_MODE) || skb->dev != p->dev) &&
+> -		p->state == BR_STATE_FORWARDING && br_allowed_egress(vg, skb) &&
+> +		state == BR_STATE_FORWARDING && br_allowed_egress(vg, skb) &&
+>  		nbp_switchdev_allowed_egress(p, skb) &&
+>  		!br_skb_isolated(p, skb);
+>  }
 
