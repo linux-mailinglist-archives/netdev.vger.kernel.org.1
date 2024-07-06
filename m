@@ -1,48 +1,55 @@
-Return-Path: <netdev+bounces-109646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B2992948D
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 17:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8FC792948F
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 17:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A8E1F22568
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:26:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 907091F226FF
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF3C13A418;
-	Sat,  6 Jul 2024 15:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB7613AA47;
+	Sat,  6 Jul 2024 15:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XW24CNfD"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="a+7kZAq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1701860275;
-	Sat,  6 Jul 2024 15:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D06E17FE;
+	Sat,  6 Jul 2024 15:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720279608; cv=none; b=bCbd30UNGbP94NVjeR+QwE8BcmtLjSh5nqIMP248J+AecD96Cjp0Z9NUAiDFXVRill4Qazt7cxUWstcx+zSFY7uq5WC+p3FZRsJYgYQPppve3aM0yelVMDkMLeV0hDdJRGKmGPacVX+9Thc9fT0cA3vH9Nng6X7r9yYybeD235I=
+	t=1720279728; cv=none; b=EGfVoIJkdmAVeTaivbxtz7npQADLcat2sU17IzqXh8IUve2xF6ZlANihWizpPnFsJSVCy+5jQTkuksM/XcFkUFcD1/7d1umgnVxj2BNUXEatd+Oi6iLoMxTA9Y1LaWsnwrLsNghXoA6+IzgP1436cRLGKOI0c+yQ/9Q1CuUX3+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720279608; c=relaxed/simple;
-	bh=Z4s7Ke8P4I+dajGWfpsCZLdONC21kEws/gzbQw0g1SE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cd/emRdVIpHcx8xoD8F/F0XkPvtiB7cyYbAYSSbM94AQ0H0DQ/xur0sRqmSQJmQcJCyDhTSWI/v/QO3/fq47vZUMvc4JmA85iK7WH1p/fxIDIYkKE1o5UzmTFKwsBlKgKSefOphfsUwBVdKJZZprCAuBRFzRCA8gMIrziX8JJWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XW24CNfD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724BCC2BD10;
-	Sat,  6 Jul 2024 15:26:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720279607;
-	bh=Z4s7Ke8P4I+dajGWfpsCZLdONC21kEws/gzbQw0g1SE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XW24CNfDSiQ6BhGYyY4G9W+0MBlaUDzOdOZAmss3k5bXnjVVTrxIBDQ3ArzjknnCx
-	 Lns/SSaBvEZ7nvBR1+Dwko4w3zg9LPsw6GtboRCYyElSURSD46x9LkHoY5AQ5p+v/c
-	 N7n2gUVhwbd9xsvqqClpFq1rWrJJYxI4Ovnk6NjIxGy3b5OQb3XfpkKpvZ5gIIZbqq
-	 5pJZGqKDwmnJHN/6JiwlnevZpfe2RhHfyFYm+WXKC8ZWIhzRk9qmxBDGlUpwtu1JBC
-	 G2dWaLDAytkFWJ+4VAJoT6VyeW5wkgBbaNQLh8QgC0TroWl7dFLIxeTPbnB5j6EqKH
-	 zmcn/diDwHlyA==
-Message-ID: <547c13c8-c3c3-495e-8ca9-d87156bfe3f5@kernel.org>
-Date: Sat, 6 Jul 2024 09:26:46 -0600
+	s=arc-20240116; t=1720279728; c=relaxed/simple;
+	bh=vRClq9i1306ZLGBOCJYul9XYsyDMue5hezY8+hwtWGo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=jhavyW5bUXfihtDuikWXR5Zgij6mqgLutMBArtdrZ+r9d+zz6rORcmN1E4vwY57QE4S8EvIhRoS5rL6aEF1wsOPtn/2NU20csYoAUifV9CxqF78Im2R0OXrneebxyGMUu3tsvJUzcpXfJLo1VB4ZB8j6nHZ2HZm8sld7CBGixD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=a+7kZAq9; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1720279705; x=1720884505; i=markus.elfring@web.de;
+	bh=y0z43LmUQtSPMzRn6rC6gy3IC+FhmcMKXgdL44ZMpt8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=a+7kZAq9IKKRvkSilfFRE67o5baShXVkskGWcYPGoMNroBfouMYADwV5CIQ73Poa
+	 Qt9LXTWqL/u2ROhdZdXk/gNaT2CDF3+bRuWaFjSvpJGQkop7Eijqy/Yjy/Olw+y5b
+	 aTIhdLXx/kUNDrICrhXs8JCm5wYXd7yoKu+XLkOskR0LnysTp6UIiSEER4BVh2ZkW
+	 G9mvkX5/w7cqPuv3Xnzueqmt9MAC2Y6YTqYA4v0M4Ihsoh1mS49suJPkAlTx/nNqG
+	 2CkOZnRq4j9b+dCKFNAAJooiME0M0O0E19Z4446am7VLp4gYSQjLMqAY390WJVOgs
+	 F+JwCw1kB6lXvM4Zug==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MYtx4-1supVQ3U8W-00K398; Sat, 06
+ Jul 2024 17:28:24 +0200
+Message-ID: <72d39860-2530-4254-83d4-fa14c92eb755@web.de>
+Date: Sat, 6 Jul 2024 17:28:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,40 +57,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 iproute2 0/4] Multiple Spanning Tree (MST) Support
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, liuhangbin@gmail.com,
- Tobias Waldekranz <tobias@waldekranz.com>
-References: <20240702120805.2391594-1-tobias@waldekranz.com>
- <172020068352.8177.8028215256014256151.git-patchwork-notify@kernel.org>
- <d6e8ce6e-53f4-4f69-951e-e300477f1ebe@kernel.org>
- <20240705204915.1e9333ae@hermes.local>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240705204915.1e9333ae@hermes.local>
+To: Aleksandr Mishin <amishin@t-argos.ru>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org, Sunil Goutham <sgoutham@marvell.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jerin Jacob <jerinj@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
+References: <20240705095317.12640-1-amishin@t-argos.ru>
+Subject: Re: [PATCH net] octeontx2-af: Fix incorrect value output on error
+ path in rvu_check_rsrc_availability()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240705095317.12640-1-amishin@t-argos.ru>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:fEvH7QllrIgI8F6IK3aXZfF4YJdnXBWBW898xgfQobUMBwGyFBn
+ suYjiCVWS/jd7kXfnA2tI5BOiRuY4Xw5W8BseFhuyGLUXjknPzYHUBPRzYe5Hn3VtMI1Qtq
+ B3KbARzP5H4On2zxfuo14/IYksu5niqR4V6zOlAdSVFksKBr7OxEJ+VGG04sAhhSNNOU3d3
+ KNfaxTUZARpK1ROrQBCbg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:txT0w8ZBZ+c=;F52XtGv3/zbTBzR842zCXgx3wVH
+ B0xT6N2QVwn1ke/T+4SEBcHkj+sVQuMJCklNjljmqlFTNBW9w2DO4dc8vF5xe1/7d7+DrxgN2
+ Ffvaklvz9dLGXum9Rvt7FbbR0Z9IS+j9njAR1C2mR9cebtJdNmfM56ynXB0CtKtUUqvZ+92xL
+ DCZrUAUrTMM+p3C+c45CgsncxTa1xNLMU6rdKx/6TI+ECWAKMvIue6lAZ6xr4nu5Gf6OU2mIh
+ QEJe2Plg1FKPvkUyDotltTXi8bdZcw3HRJTcfxEkhuTXunJzlrA4qOT7rJLJm/tf+yjOawZYz
+ rXyvc+97SBL9HvSNHUt7MaO1YRomaS5UhmbsQdlIQVq9DWQM8WOKYXMC5YJ30TvdSBrfRb0ER
+ kaZLjST5JspZWJVT5HBKhLxCb7fJNWv1pPOk3aSpBB/sSvHj6MjrmN0D5jcT4PWaBafjw1oWI
+ ZHt5zDM4zniXpIdVxATeDF7NfbmVCmmQrVWI0KHX9ZYzPqK0J/jMf33r+MBYfy+h2klf9TlR6
+ +5H+iR8NXkesg//DbYMFD/+uD1Mc59Uf/KRnaBOV+3W7Aafg4b5jTywjZdMuX9XyV8j0yeuxk
+ XALzgvQfKxk2E7EhDGVMTVjV9YJSat6j5k+wnCGnzNwsZ8d7NQ7YN8l9HCJBjNu/Bhv2wPlg1
+ 9vMICYwMLZtNbvzEriheSBAg3HvoLJDQ1PfqBAaHLyJuI/Hwz1uzlXDgCoFU68GiJpe3plRg4
+ 1M/34bBmPBG/315mTSS7TsdxRYKRujFfek2QsqEBGNIhNfDtxESOHw0dj10NlsXpQURKaILyd
+ Uiyhu9Yz4+7FrWaYNiW6PHH91HPkmVaKLRRT+3aeE4Axc=
 
-On 7/5/24 9:49 PM, Stephen Hemminger wrote:
-> On Fri, 5 Jul 2024 18:53:47 -0600
-> David Ahern <dsahern@kernel.org> wrote:
-> 
->> On 7/5/24 11:31 AM, patchwork-bot+netdevbpf@kernel.org wrote:
->>> Hello:
->>>
->>> This series was applied to iproute2/iproute2.git (main)
->>> by Stephen Hemminger <stephen@networkplumber.org>:
->>>   
->>
->> Why was this merged to the main repro? As a new feature to iproute2 this
->> should be committed to next and only put in main on the next dev cycle.
-> 
-> Because the kernel support was already added, I prefer to not force waiting
-> for code that is non-intrusive and kernel support is already present.
+> In rvu_check_rsrc_availability() in case of invalid SSOW req, an incorre=
+ct
+> data is printed to error log. 'req->sso' value is printed instead of
+=E2=80=A6
 
-I have told multiple people - with you in CC - that is not how iproute2
-branching works. People need to send userspace patches for iproute2 in
-the same dev cycle as the kernel patches. You are now selectively
-undermining that process. What is the point of -next branch then?
+Another wording suggestion:
+                                                         =E2=80=A6 request=
+,
+  wrong data were logged. =E2=80=A6
+
+
+Regards,
+Markus
 
