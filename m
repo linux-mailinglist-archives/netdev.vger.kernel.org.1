@@ -1,92 +1,138 @@
-Return-Path: <netdev+bounces-109630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3E09293D0
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:38:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A53229293EE
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 792651F21E1D
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 13:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 521F52831AB
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 13:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65BE12DDA2;
-	Sat,  6 Jul 2024 13:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C5F71B3A;
+	Sat,  6 Jul 2024 13:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4Or+5RC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488D674063
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 13:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43254C3D0
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 13:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720273084; cv=none; b=WzHoL7rBCl+oa5ZfdW/bOjxrFOTfRW9w87LEf8XL7JdulnvgOTn4wwkk1U0bVYjovgxxkCgY4qYlmv3zje9J02o7ZPhi+gUGnnXvbgfB1VcQAuyuxtx6IUGuw0OAFpCBdSdRJ+fHhkTp934UgFvDa4NWpBRv2UnbjlCHZubK15U=
+	t=1720274025; cv=none; b=Qj/JYgikWc1ni1HAFNwNv/rcMXYbj0nlGftK8gk5ijDfzTwjIVXxblXlX9huEs5p/24wigtxlLjIR5lVPaKBnMeaauQil/S1Ei76xclCoG4/+XP5TaEge7GvL8HpxOuuiMBjVLuypEDoWTeAX2XdVHJsbjZuU8npG7uDXTbDSts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720273084; c=relaxed/simple;
-	bh=zWaW7v6PJhOBV43NT3fE4HnLKL+0G6JoD8gx4YTscdU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=SyymE3rTsHAgdLYTQiJ4XbhwF3c/zrxEW4GzeVg1/Yd7b8RfKw9CrEG9Tgx6xLK2R0j640CJoCIVL+lkXZ2T/2NtvuNEHH0weAmdPQO/J92lUKtukHH7zwAiXABReX2N2DJaBMQ16TmfR10y0r/Ql1JlU9uRPy4a7UkTKWbter8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7ec0802fd0dso300111239f.0
-        for <netdev@vger.kernel.org>; Sat, 06 Jul 2024 06:38:03 -0700 (PDT)
+	s=arc-20240116; t=1720274025; c=relaxed/simple;
+	bh=HvDnSRgcm7lQ8qUtV+hO9G66uJipikccUT9YBOOxlHg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=aEOoeMr+Ws5KOPdyuMD6OmKtSwxf07ETNXtqv75UoYZSHAcDn8pKxTm7wYbGEQKNl6DixU8hr/ReRHGeKb3AUJvfgiTisFwuSmu+QrRdwka1OCcxNyT4SF5o8w7qiBlLOkZMV0IV3FZw+WyIbknVuKkepq4RDht9NGjdP9JU4zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4Or+5RC; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-79ef7ecc7d4so107338785a.0
+        for <netdev@vger.kernel.org>; Sat, 06 Jul 2024 06:53:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720274022; x=1720878822; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QwVF6MZu0lHB0fVsks3TXMBE9BXW3MUVus1J2mzS5Tw=;
+        b=D4Or+5RC9ssY39WHKYDviRTZUbWOqv+oK6KilqX0kmlVP5mursvLjHenoOjjgJ2qtP
+         HhuBH0QDpdryHMPHSwjNfIfifGVChWpNHj0flerdSQXOpmsHR9R5MnlAPTIFfD7CRKEJ
+         9niZLvAfPb9YaC4YJf3KWC2ihVvGFggBRXFgJJor4VoLAe3CWcgkmt7I66rpPYhRoC0p
+         tou93QKelaNTeoDCaYEDsD5drW5r2KtTWLFaiMHDeNnu/YUb53oDVvQ3JMECsaIeq1tD
+         3TfBorUCnC5CZLVNJboCwvXh3TKbNVu9dxleM7NQRi6hIVapYoaZnGoM6pjAekTKlvbO
+         9JhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720273082; x=1720877882;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SrvwA9+kz/VdMLLWXSyRN3pFrHfsHxWlAply6NHrwzg=;
-        b=OJn9gV497Ks1LagNG7v4JuU0ZvlQXvCBWkCVPU2mXkQVd0gF9gd1AzcKly9UEPDpAX
-         BS7sdYL1y/cQLzjV7A+8EbU9HBP8a069KyKJKc96exJ/B+cWZEbO771YXhDcAv1WuVEY
-         3/pZs8X+GFUP8cs/QchH0x/L2tLwSWB1b6my7ZGmjfNOFX5uUiH+2EpMPOKqf8bD1cUf
-         4dhikNZb7D+MtwwoAMPrG5w3Ug6HKa37MiJiL2+0S71hf+sNVaOElDANWdT1AXWm4IEZ
-         BUlIyv5gIc6fZMuG5p1I4o1/X+qNNSRqYZkLo/G6MbeXVAxQg1mtda35U04hCn0fT6L6
-         2ydA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7Rt73XRl6clqciP1WVpO7HNTfjzbxyzhaKfVAgdFW3XBOVtwFIezOLydLHqpsLQmiqCgDEQuVa7udY/ExKGiRUJ1WgDOG
-X-Gm-Message-State: AOJu0YxO4DxOiq3mXncYo95zV4vdlugQHh5Yj9/hh6RcR1TShi9WU4eU
-	aLZBo6h7sUy3fV9z32NW6p0l8FuLO5j0yO/5Pz0LaWlu3Gp0pqSPcMFTZ1roSsuwgTWVZuC5Yx/
-	Yt4SsmCu6bsM2QMj5aHcI7o9FWYhCA2lfKylFHVPalr0crRUWNEKa9g8=
-X-Google-Smtp-Source: AGHT+IHCSx2+VbzZCCozhjDVuSHJ5tQ1gic4b9jAHvFVi10Tecnep7tLHfjFLuZpWjQmZJs8YvMggPuufjgt+z+fOZLhmQgFhl/w
+        d=1e100.net; s=20230601; t=1720274022; x=1720878822;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QwVF6MZu0lHB0fVsks3TXMBE9BXW3MUVus1J2mzS5Tw=;
+        b=GgXeMmoewznIpPYbR9kZ57LVgFcbrwzpMO9izIt+aFmkpRupHHJOukooXx5Qi4C1uC
+         xxd1C09/N+A2SNfdb4g/HsDx2AhJOIxwJwutZSgKUvhmi+2/1rqYinH2kniIXzjjL3ZN
+         vvxzIRAG5vVxiWyIsMQuykeRA0jCfqGZxT0tCJ5piXuFLBNnQPx3OQbbIeK9r0q6GlvZ
+         meI4rTfFtBNkpceqj5WpE8oLuOdcvW+2z82623JlrjQ4ZsXDSFynU7EpCn1F/Y0GJ5gp
+         K1zxTgO0grZhI9hOGZtSfDiIwZfCea1gJwV6dbQ+S3r3KqpfAdU5UPvEGEPQQqf8CDcl
+         tTiw==
+X-Gm-Message-State: AOJu0YyYzHkye/NoNY09GRG9ec0MZ2/8wyT6dmsx9b+iizPA68vBhhvw
+	DGywsDDIuWPlGUtpaHsqbODQaFV2MVQNPT7S/XORwh+u7+xwSUI1
+X-Google-Smtp-Source: AGHT+IHmN8HqLjhWkTbKcGuGKpysod5xM1bWzBtaOg7ugXGCMQahyGSNWffSajtAdCv9oi1GhwQb+w==
+X-Received: by 2002:a05:620a:22c6:b0:79d:8798:7f21 with SMTP id af79cd13be357-79eee170138mr720396585a.10.1720274022380;
+        Sat, 06 Jul 2024 06:53:42 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79ef9aa8889sm139974785a.20.2024.07.06.06.53.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jul 2024 06:53:41 -0700 (PDT)
+Date: Sat, 06 Jul 2024 09:53:41 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ petrm@nvidia.com, 
+ przemyslaw.kitszel@intel.com, 
+ willemdebruijn.kernel@gmail.com, 
+ ecree.xilinx@gmail.com, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <66894c659cee8_12869e2942c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240705015725.680275-2-kuba@kernel.org>
+References: <20240705015725.680275-1-kuba@kernel.org>
+ <20240705015725.680275-2-kuba@kernel.org>
+Subject: Re: [PATCH net-next 1/5] selftests: drv-net: rss_ctx: fix cleanup in
+ the basic test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:144d:b0:4b7:c9b5:675c with SMTP id
- 8926c6da1cb9f-4bf63c2f6efmr1014361173.6.1720273082401; Sat, 06 Jul 2024
- 06:38:02 -0700 (PDT)
-Date: Sat, 06 Jul 2024 06:38:02 -0700
-In-Reply-To: <20240706131317.Vx3MriDC@linutronix.de>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fe576c061c944907@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_redirect
-From: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bigeasy@linutronix.de, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, patchwork-bot@kernel.org, sdf@fomichev.me, 
-	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Jakub Kicinski wrote:
+> The basic test may fail without resetting the RSS indir table.
+> While at it reformat the doc a tiny bit.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/testing/selftests/drivers/net/hw/rss_ctx.py | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+> index 475f2a63fcd5..de2a55c0f35c 100755
+> --- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+> +++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+> @@ -64,9 +64,8 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+>  
+>  
+>  def test_rss_key_indir(cfg):
+> -    """
+> -    Test basics like updating the main RSS key and indirection table.
+> -    """
+> +    """Test basics like updating the main RSS key and indirection table."""
+> +
+>      if len(_get_rx_cnts(cfg)) < 2:
+>          KsftSkipEx("Device has only one queue (or doesn't support queue stats)")
+>  
+> @@ -89,6 +88,7 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+>  
+>      # Set the indirection table
+>      ethtool(f"-X {cfg.ifname} equal 2")
+> +    reset_indir = defer(ethtool, f"-X {cfg.ifname} default")
+>      data = get_rss(cfg)
+>      ksft_eq(0, min(data['rss-indirection-table']))
+>      ksft_eq(1, max(data['rss-indirection-table']))
+> @@ -104,7 +104,7 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+>      ksft_eq(sum(cnts[2:]), 0, "traffic on unused queues: " + str(cnts))
+>  
+>      # Restore, and check traffic gets spread again
+> -    ethtool(f"-X {cfg.ifname} default")
+> +    reset_indir.exec()
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
-
-Reported-and-tested-by: syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         2f5e6395 Merge branch 'net-pse-pd-add-new-pse-c33-feat..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=12f8b8a5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=db697e01efa9d1d7
-dashboard link: https://syzkaller.appspot.com/bug?extid=08811615f0e17bc6708b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+When is this explicit exec needed?
 
