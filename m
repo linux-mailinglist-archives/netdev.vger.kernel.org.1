@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-109591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1C6928FE2
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:10:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 181E7928FEE
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:15:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B82F1C21788
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:10:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 495DA1C21723
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2676AB8;
-	Sat,  6 Jul 2024 01:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3611847A;
+	Sat,  6 Jul 2024 01:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfI6cLM1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdDecK+P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7C14A19;
-	Sat,  6 Jul 2024 01:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA426FC2;
+	Sat,  6 Jul 2024 01:15:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720228233; cv=none; b=Cpcjh5w0advIWnvy4yFVB4br3rIiQCnAdfwcZ3EeipMmMESu74+Mw2d6FuW1B3XuI1ygLmB6SdW4ehHgbN5Xp6XbcBuG9gT+LyQfJ6mipsbbJcou29WSDUIdKAObJvy1jkYdfWHMA7Qb9BzwEHI4ZPn9n18gf+tyEm00TFilecg=
+	t=1720228511; cv=none; b=Mm8EyJpd6gjb4tNQ2dEfz5Z5b10UbXtaaMGxzn4/9RxfBb0zSXJD4GeVdlXq9l63RtmslNfpIxGzBWO03Hjt+g8CiKpYpy9XrFaLX6CKvUbhoPpCOXWJ9iA2xcUkue+CrMYykhiWkXdbQucO+0yRJwOqxeChcm/JgMICSkZaD7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720228233; c=relaxed/simple;
-	bh=zkCxmVfyAcZ3ameHi0iJtKJwpuGLKb+DGOkw/aensNY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fFitaoj8y9hDJGVQQJTdYAytsfyed32zWYtjv1AJ8w3LFx/J2Tq6W3wD7oyv0W+alQpkREJWMmI+bx84+qD/f4O+2pO5ZOGr4WFKHuNmpGH42XGs3AuMrpP+Yjy3xfQl7fNTXknOFDHl7rvGU9s+N7b+9yqsH00Dt0wjScFoMP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfI6cLM1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BD9F5C32781;
-	Sat,  6 Jul 2024 01:10:32 +0000 (UTC)
+	s=arc-20240116; t=1720228511; c=relaxed/simple;
+	bh=PAaZD1M7e9sIxFScmdr1WJTZAFf2RfyaoOLdehXK6i0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iJqrTLuLl4gtMWuv2ErlAZ5pVSO2ByEuanG8+MIuD2z1driLq05w3ssVS45AP28TO+7SkWmRsMVVBmkabR736QMpbZ2cwk6j8PeCuoiylkEM7cyLcfhi+myi/1cc1qNe1n2UssazeNFWwXYa2oQ5Y+xt1B5sHX8sX+F+ZjS0T9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdDecK+P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2810C32781;
+	Sat,  6 Jul 2024 01:15:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720228232;
-	bh=zkCxmVfyAcZ3ameHi0iJtKJwpuGLKb+DGOkw/aensNY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FfI6cLM1x64E4KFsAMKmN4ng2Xj0cJGiPYZ+qiLGU7tpjnlsQ+eiunOvsE8rJ3oYO
-	 cVchYkPHgW+Und3Kqvp2/9H8GJIdk7vwYaNFMK0dF05BN/L0RjQEFQU+AJLsDudGUS
-	 KqsyGa2nh+F7Y5FanmvKl+uHl2wQ1U3cQ9/7L9gDKk82SVkfYDRqmP2pq9HcO/qdRp
-	 4jp+KyQ+ZLDU2gifyz5JQonqH5JxdjyidIhbOgXsTJNDkfE0/uko3Aav6TthMNU8ps
-	 6qSbjFS59O2h3orpruXLO7ryOcxxQ9pSGEIlP6TrhrDkpZbiuD5arD7urEEbHTdu39
-	 7xYZo8IO0glng==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A51B6C43332;
-	Sat,  6 Jul 2024 01:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720228511;
+	bh=PAaZD1M7e9sIxFScmdr1WJTZAFf2RfyaoOLdehXK6i0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tdDecK+PGicM3lkQueAE/603HJc8tfzepIx69meYL4OctZLn5p/s7y+JbqoVTBVb0
+	 JE4BpWIIpdbCtPdgkzbktMMYCBZD1IumBzVA/6sWsHP2r1UR52i8pDYdsKUcK2Y/+s
+	 JwKYh+vQWblgzis9fg5Q85+ZO8fZ/tMQU0ZKL8+N1TGZKBK/N6qyXoKMBMn6ZmyWpv
+	 xmYoWkt9NMleO5C9IGnWR15U5fzEfACf3Tpupy3FYBp25+80nPJGxmUH0wqVsWMUZv
+	 GO/UnK3PMPAQ2W2+9mE1n79WWc9jkul0X44RRAZnqSt/hRCJGd5p+oH1K8tWUF4xd+
+	 4tASO6btqkSAQ==
+Date: Fri, 5 Jul 2024 18:15:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Julien Panis <jpanis@baylibre.com>, Simon Horman
+ <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, srk@ti.com,
+ vigneshr@ti.com, danishanwar@ti.com, pekka Varis <p-varis@ti.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/6] net: ethernet: ti: am65-cpsw: Introduce
+ multi queue Rx
+Message-ID: <20240705181509.1437b12e@kernel.org>
+In-Reply-To: <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
+References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
+	<20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 00/10] net: openvswitch: Add sample multicasting.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172022823267.9162.5749363663019747112.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jul 2024 01:10:32 +0000
-References: <20240704085710.353845-1-amorenoz@redhat.com>
-In-Reply-To: <20240704085710.353845-1-amorenoz@redhat.com>
-To: =?utf-8?q?Adri=C3=A1n_Moreno_=3Camorenoz=40redhat=2Ecom=3E?=@codeaurora.org
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
- horms@kernel.org, i.maximets@ovn.org, dev@openvswitch.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 03 Jul 2024 16:51:32 +0300 Roger Quadros wrote:
+>  
+> -	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
+> +	if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
+> +	    queue >= AM65_CPSW_MAX_RX_QUEUES)
+>  		return -EINVAL;
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+both MAXes are 8, the else conditions below are dead code
+Same for set
 
-On Thu,  4 Jul 2024 10:56:51 +0200 you wrote:
-> ** Background **
-> Currently, OVS supports several packet sampling mechanisms (sFlow,
-> per-bridge IPFIX, per-flow IPFIX). These end up being translated into a
-> userspace action that needs to be handled by ovs-vswitchd's handler
-> threads only to be forwarded to some third party application that
-> will somehow process the sample and provide observability on the
-> datapath.
-> 
-> [...]
+> -	tx_chn = &common->tx_chns[queue];
+> +	if (queue < AM65_CPSW_MAX_TX_QUEUES) {
+> +		tx_chn = &common->tx_chns[queue];
+> +		coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
+> +	} else {
+> +		coal->tx_coalesce_usecs = ~0;
+> +	}
+>  
+> -	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
+> +	if (queue < AM65_CPSW_MAX_RX_QUEUES) {
+> +		rx_flow = &common->rx_chns.flows[queue];
+> +		coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
+> +	} else {
+> +		coal->rx_coalesce_usecs = ~0;
+> +	}
 
-Here is the summary with links:
-  - [net-next,v9,01/10] net: psample: add user cookie
-    https://git.kernel.org/netdev/net-next/c/093b0f366567
-  - [net-next,v9,02/10] net: sched: act_sample: add action cookie to sample
-    https://git.kernel.org/netdev/net-next/c/03448444ae5c
-  - [net-next,v9,03/10] net: psample: skip packet copy if no listeners
-    https://git.kernel.org/netdev/net-next/c/c35d86a23029
-  - [net-next,v9,04/10] net: psample: allow using rate as probability
-    https://git.kernel.org/netdev/net-next/c/7b1b2b60c63f
-  - [net-next,v9,05/10] net: openvswitch: add psample action
-    https://git.kernel.org/netdev/net-next/c/aae0b82b46cb
-  - [net-next,v9,06/10] net: openvswitch: store sampling probability in cb.
-    https://git.kernel.org/netdev/net-next/c/71763d8a8203
-  - [net-next,v9,07/10] selftests: openvswitch: add psample action
-    https://git.kernel.org/netdev/net-next/c/60ccf62d3ceb
-  - [net-next,v9,08/10] selftests: openvswitch: add userspace parsing
-    https://git.kernel.org/netdev/net-next/c/c7815abbea45
-  - [net-next,v9,09/10] selftests: openvswitch: parse trunc action
-    https://git.kernel.org/netdev/net-next/c/b192bf12dbb0
-  - [net-next,v9,10/10] selftests: openvswitch: add psample test
-    https://git.kernel.org/netdev/net-next/c/30d772a03582
++	for (flow_idx = 0; flow_idx < common->rx_ch_num_flows; flow_idx++) {
++		flow = &rx_chn->flows[flow_idx];
++		for (i = 0; i < AM65_CPSW_MAX_RX_DESC; i++) {
++			page = page_pool_dev_alloc_pages(flow->page_pool);
++			if (!page) {
++				dev_err(common->dev, "cannot allocate page in flow %d\n",
++					flow_idx);
++				ret = -ENOMEM;
++				if (i)
++					goto fail_rx;
+ 
+-			return ret;
+-		}
+-		rx_chn->pages[i] = page;
++				return ret;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+the direct returns now that it's a double-nested loop seem questionable,
+don't you have to goto fail_rx?
 
