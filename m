@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FA2928FCA
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:50:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98E71928FCB
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 174641F2227C
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CADEC1C22166
 	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341995223;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408E253A9;
 	Sat,  6 Jul 2024 00:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZQQe80n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQ13BSAy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6653D68
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F621256D;
+	Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720227032; cv=none; b=cdeADKbsT14dyGHwBhunJSQiWfpmPRV8rlUqts1Q4SPpWiOZ2sWszuYE3ES9Dn7D0sowN5xe6NmKDvFC4vY9iNW3yBTDVrCvMN48OGEwybay6F0jPSXRwrtbYrjiyx+o7RPApCroQbIrJCo6vnUJ54qQgbm6DqBf/wZfiN1P77A=
+	t=1720227032; cv=none; b=Iue5i9oQecoBJ3HC1hDFtU4lNmcmk+1hEsH/TPpt7yxBv6N0hJYQmwvqmMiE4k3tp1kwx3oglPdLzgdO6F5gokFj22gQeLByCcYwmHBF1b1U9vkX5pHxUAcYoFgyHKgiiTisy9FyUlNF+ZOug0NQsprJptN967AOaMOnXQkS17s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720227032; c=relaxed/simple;
-	bh=0YtTdPHUf0XABN1f88jDo0wJHwHI/jEC3QUnL2f9ObU=;
+	bh=HXI9F2ozN47lIoalS26/JYpw58LCH3Ts4N8MhjcGSRg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bh9TXY0uQyXOaoUlhvkHWJ6IWbZvohHrIRIaHUevFzSRwi5s+Ud+ZWQbvQ9gaJrxNSVeZUHPeXtJ3f9kfy/k5AReL3QS+kjNC6ktbe9gydEQ8c/Up0iBpghJiy1Nz0bNlfQR5n88r4iGuLchommR7ga0Ffuzmrob9B66U20menc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZQQe80n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F3A0C32781;
+	 In-Reply-To:To:Cc; b=gA3JxgudhZUqznxM4Ry8YgKPWLXqPN4lxQaH0nT4DlafLbExLTEUnlrRYvCDZLZVIuBJq8LNLnhcxZUfboz89jAxdxVyiIH3E2QB+V9j9L1V2qX7/bzuBtw5b+sqo/P4aW7QZs/hR0RxDAY6XxmB5R039qCCJByD+pNtSuKY/ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQ13BSAy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A540C4AF0A;
 	Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720227031;
-	bh=0YtTdPHUf0XABN1f88jDo0wJHwHI/jEC3QUnL2f9ObU=;
+	bh=HXI9F2ozN47lIoalS26/JYpw58LCH3Ts4N8MhjcGSRg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JZQQe80nKucp7KNvAiOE9CoSuizz6dhDP/wTHMlsRI352ksPvfxiPKf4fZdVjJvnD
-	 Y5bVVg3hcYZQKxwS/0oJJ/mX2TTSRzA9bWJ5ViwD5AldMaqQ1MS1jqZ5ICFeW4ee4r
-	 qkXo3+EBUZaW3Zu4LAdFgqQ59v2vUODJ0BVSS5z8iUAKFMSRZzcupP7kTYVKlGPcJP
-	 juki52rh3QwHPuGHNvHzzPnUMR4+7MLQototQmbc8sBss5PU/uFvjEgBp6gdJKT9z+
-	 Cfo5jGME5wjiXTW7Gtm7Ip9XuCOvzVRZypg50rx1joc1Vnc2MhtRnvpaUka5dX9IcT
-	 w/3VKP+fdqZSA==
+	b=JQ13BSAyJAcj+HqE4VITbXvGp5bh5LKDp0SuXKBPhAf5zMn3jB4K8neJAnSfnLNL8
+	 q/7kb5fa/dDSTHVTt6WuUGDKJyDL2MR6OIZCX8McdSDURcnFx4hnAxA6m1KoU26uaa
+	 /hrHcuwPq13uD7NxXVUdDLJfzqLrJa+8dddVPNpcMdYRkxXAa3iV29eJ/CRtnUN8C8
+	 TK94jp6AvNt6dVUIXdQgR04W+cgg34bR1ie9XmNlP0ZZr7hLulTiyCLHQskDIN9+rO
+	 14grHr/lJ8AalelomHQfBOchspgmY4Z3FJJSse0x6mvLR4kduK8zf2Kg/dMgLZwYMX
+	 NXjkoBZcTzWYw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1EA90C43332;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8E7E3C433A2;
 	Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] wireguard fixes for 6.10-rc7
+Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: implement
+ .{get,set}_pauseparam ethtool ops
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172022703112.32390.4312776541216490625.git-patchwork-notify@kernel.org>
+ <172022703158.32390.5319141379722143709.git-patchwork-notify@kernel.org>
 Date: Sat, 06 Jul 2024 00:50:31 +0000
-References: <20240704154517.1572127-1-Jason@zx2c4.com>
-In-Reply-To: <20240704154517.1572127-1-Jason@zx2c4.com>
-To: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
+References: <e3ece47323444631d6cb479f32af0dfd6d145be0.1720088047.git.daniel@makrotopia.org>
+In-Reply-To: <e3ece47323444631d6cb479f32af0dfd6d145be0.1720088047.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: john@phrozen.org, nbd@nbd.name, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  4 Jul 2024 17:45:13 +0200 you wrote:
-> Hi Jakub,
+On Thu, 4 Jul 2024 11:14:55 +0100 you wrote:
+> Implement operations to get and set flow-control link parameters.
+> Both is done by simply calling phylink_ethtool_{get,set}_pauseparam().
+> Fix whitespace in mtk_ethtool_ops while at it.
 > 
-> These are four small fixes for WireGuard, which are all marked for
-> stable:
-> 
-> 1) A QEMU command line fix to remove deprecated flags.
-> 
-> [...]
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,1/4] wireguard: selftests: use acpi=off instead of -no-acpi for recent QEMU
-    https://git.kernel.org/netdev/net/c/2cb489eb8dfc
-  - [net,2/4] wireguard: allowedips: avoid unaligned 64-bit memory accesses
-    https://git.kernel.org/netdev/net/c/948f991c62a4
-  - [net,3/4] wireguard: queueing: annotate intentional data race in cpu round robin
-    https://git.kernel.org/netdev/net/c/2fe3d6d2053c
-  - [net,4/4] wireguard: send: annotate intentional data race in checking empty queue
-    https://git.kernel.org/netdev/net/c/381a7d453fa2
+  - [net-next] net: ethernet: mtk_eth_soc: implement .{get,set}_pauseparam ethtool ops
+    https://git.kernel.org/netdev/net-next/c/064fbc4e9b5a
 
 You are awesome, thank you!
 -- 
