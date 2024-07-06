@@ -1,75 +1,83 @@
-Return-Path: <netdev+bounces-109589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79927928FD5
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:53:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF30928FDB
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04C1BB2171E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:53:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 128B9B21A08
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412DE5258;
-	Sat,  6 Jul 2024 00:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93604C8F;
+	Sat,  6 Jul 2024 01:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c2qYL/x+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9vWIFNI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C553D68;
-	Sat,  6 Jul 2024 00:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A4E36B;
+	Sat,  6 Jul 2024 01:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720227229; cv=none; b=tr9LdkAWd1ihMxRgZdCel6zjpGi2pBGziJhf27n2P++2q6NM3540jlhGbF2IkiV2gh1M6ft7QqH7ksC+JenTogdpA1oonpNkbTt/vZtYZYgh6ZkWrkTt3zcOzR5/gVuEHPgEziGEcuit94/Y2wRgmKs7/hSKy0wIdj4myUHjZpI=
+	t=1720227617; cv=none; b=atOhip/pyFIAsAT9eRopeXhrKTBSLOMY6MFwQmUrXvTgWOLTAu0YmE2g0YqBEaKBpRDq0q/ELp/RnCSBkXKGtNS7gBo6ALizxiWEJjgAPkIuE/A5XmhlhLaDBLuMSh6OUYoHAtdbpOT0WfbGJuo+KNMkyRxx+txusC521HdbE4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720227229; c=relaxed/simple;
-	bh=+bhRs6l/CzlBuDKVzbcHGyvGGEpftGuNjbqAMIbVjTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJr4bZxKYNHTs8qh7Kyo2bbvK3sMoRSjBFjIEOmgkaZ/8gL3cOU9EEADao0WcQU6rtYzfvYQN8DFQW96QWadu/30aUhR2qamqGI055lVjmsyEvwm+m0/683+UcwmrDAEssOWI93I2sb//4Xx4LW4X+7vtJRkbw9VgkrxWLI3x7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c2qYL/x+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 543E6C116B1;
-	Sat,  6 Jul 2024 00:53:48 +0000 (UTC)
+	s=arc-20240116; t=1720227617; c=relaxed/simple;
+	bh=NKe8d7nE7KBBUVo3XpcWOiOEGCATtjXXgO3ZyCTv0Aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h5FHKgHm397bFjCNp9bIKVB1jIesbXe0u4EHDJaNqD1c/ySG0x/kdXs9Tj0Z67022H3/PgIYqVCy+JLTqjA173+/Zb3HEB/uRe7Br7OlJzLVWWtUYsndC8VPC1p3wheabTb83Cby0H9IXz3o1aO+GHxmnT4LcgHD4Q+W2aLrXjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9vWIFNI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE218C116B1;
+	Sat,  6 Jul 2024 01:00:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720227228;
-	bh=+bhRs6l/CzlBuDKVzbcHGyvGGEpftGuNjbqAMIbVjTI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=c2qYL/x+gGpVltd9Hb57ry4OKDQ0Rgyvm/3EJyKkphbeX/d5BGpPqKfirRleyZr0B
-	 mNnaEgUiBr/y4Ehdot8rGhzvR6fO1cW4ozLR+06jSFJc0SoOjXY10A9JrOMCAR8/Xj
-	 ix4cozmyt8XqdPIFOOLF/3+0+6glrjUBq6yfIdoaPTGyGUBDpwbQjnMaHZyUB9SFa0
-	 zXfLaPaVpYFuQDfSEGUaRt9fEKJ5FFbpLF17k1D2yjtkDeDmNl6iWFIarozHkS9uR7
-	 zCRXE47Tqc5Bc/7Sl4m3nQ8B4mp1CcZHoByRskH2h3CcV0yNTT3Y0KLR4YFVRG0ljx
-	 Ho8plEzpx2KfQ==
-Message-ID: <d6e8ce6e-53f4-4f69-951e-e300477f1ebe@kernel.org>
-Date: Fri, 5 Jul 2024 18:53:47 -0600
+	s=k20201202; t=1720227617;
+	bh=NKe8d7nE7KBBUVo3XpcWOiOEGCATtjXXgO3ZyCTv0Aw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=c9vWIFNI+El3Ec46hVmyNAaGWJrzKLn9F4vgRmTtNFwzldQa5lNcKirMyHuxAnJvS
+	 YSHYHTKKklK5rfFEIERUQ+KNfkrJzBDLtVWqdI+49dyBvc2Th5Yn8BEwWA2gn1wKtg
+	 UYT/r08XockYoUwASx1qcT50oUOn5lSP1UTPOM8P3JgaKQcVvbi2W+BMrM3RLH6d/s
+	 QBCSc3wOwXrN0eqGb+A7ypmDk6/ThtCcAVoEeQMsCikCTAu/HduDtCehItN+J4jfbl
+	 8qyOTUr/8S87vGL6g8JhH5YxK5FjxXnTS4kWXNTiF2B58VO+D66hQqkBskZEutVmlM
+	 cxSX5g49dQ9AA==
+Date: Fri, 5 Jul 2024 18:00:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Michal Kubecek <mkubecek@suse.cz>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, Woojung.Huh@microchip.com,
+ kernel@pengutronix.de, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] ethtool: netlink: do not return SQI value if
+ link is down
+Message-ID: <20240705180016.64085ea5@kernel.org>
+In-Reply-To: <20240704054007.969557-1-o.rempel@pengutronix.de>
+References: <20240704054007.969557-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 iproute2 0/4] Multiple Spanning Tree (MST) Support
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, liuhangbin@gmail.com,
- Tobias Waldekranz <tobias@waldekranz.com>
-References: <20240702120805.2391594-1-tobias@waldekranz.com>
- <172020068352.8177.8028215256014256151.git-patchwork-notify@kernel.org>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <172020068352.8177.8028215256014256151.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/5/24 11:31 AM, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This series was applied to iproute2/iproute2.git (main)
-> by Stephen Hemminger <stephen@networkplumber.org>:
-> 
+On Thu,  4 Jul 2024 07:40:07 +0200 Oleksij Rempel wrote:
+>  	if (!phydev->drv || !phydev->drv->get_sqi)
+>  		ret = -EOPNOTSUPP;
+> +	else if (!phydev->link)
+> +		ret = -ENETDOWN;
 
-Why was this merged to the main repro? As a new feature to iproute2 this
-should be committed to next and only put in main on the next dev cycle.
+Can we stick to EOPNOTSUPP for the link down case as well?
+We're consuming the error, the exact value doesn't matter.
+Or let's add a helper which checks the int sqi in all it's
+incarnations for validity:
+
+static bool linkstate_sqi_no_data(int sqi)
+{
+	return sqi == -EOPNOTSUPP || sqi == -ENETDOWN;
+}
 
