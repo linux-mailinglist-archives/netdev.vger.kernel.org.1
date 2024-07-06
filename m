@@ -1,111 +1,154 @@
-Return-Path: <netdev+bounces-109617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B7D92923C
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 11:30:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042D0929248
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 11:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06A60283031
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 09:30:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C9EE1F225BA
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 09:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64804F881;
-	Sat,  6 Jul 2024 09:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4520047A76;
+	Sat,  6 Jul 2024 09:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Kc5x37IP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X296gz03"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DECB52F6F;
-	Sat,  6 Jul 2024 09:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A18F1804F;
+	Sat,  6 Jul 2024 09:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720258204; cv=none; b=Tw+Vv4Rs16256MgebWsBIbKOY/JvtWBugAZ78PSYgt2Xo3toKXRDvmWFwnoIkIyp3fBJLmWWd0P0wbWj1phHN3kCUXldpW/ijZx0Bo6UyJLWD3hEhgUT9Fu6EFNZa5lBceWfMnKsRxvdg8D9oYEGI8xhxLLcBUxG8t25SnQq6aU=
+	t=1720258550; cv=none; b=kfoY9NgKtcaImULdzG/v8ErCzFyBW69zxAYkd0wqgQOnDBC9xsYL6GhZPeoQ2ulgQ5IjiE1mhDSG9DCoMwx8COsOzPrZRt5heMA4g9AU6uRvIJB9bwYWcrXiswNsB/7xlgmgPnKN9hWAda/AJJL+ab3HHwyMTrS8dlcTHmWyoEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720258204; c=relaxed/simple;
-	bh=Q+ZAuNvfo1PLDNuwb6saf6UKRg3oyUIqT65wz6VNwlQ=;
+	s=arc-20240116; t=1720258550; c=relaxed/simple;
+	bh=TsL34T/F7oR/95XQunnwvOsRd932cw4s38BYIYJjNGI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mdBtXg9yQlXGfo9EB1f41eT/wAgePqLI+lr63+guBSxr/j3rooDWE5Zw7R+3fUdApbdeCJctXzagtGTD9Dk9jJTv8QNe8lnDbT9o+smpti+K+mI+Ob1TEWkr3qGpRFZBmzqcdtQ2bpAaiJ+hoN354xqgzT9cyj763LOacmLRPQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Kc5x37IP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC60C2BD10;
-	Sat,  6 Jul 2024 09:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720258203;
-	bh=Q+ZAuNvfo1PLDNuwb6saf6UKRg3oyUIqT65wz6VNwlQ=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=DlyVM8hYTUT1nTQNea4055ANPp2ZfHzLMAKFDvr58xQlAyWeVDU8vsVIniB3bFqTSghc1mfgV/eA/Ncaa5/IFZaYu9qszGaFApxm5Lqo1c7dbKQaREzSR9gDg3snNbq8DHzW15omVsbColvDG5+0SyPL+8HWqKyptC4DVBgqnLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X296gz03; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D65E4C2BD10;
+	Sat,  6 Jul 2024 09:35:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720258549;
+	bh=TsL34T/F7oR/95XQunnwvOsRd932cw4s38BYIYJjNGI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kc5x37IPXd/KXYTnyhWVxzDoXwmOXsRa5lkhUApri9j23K0WVDUdWsoChDf/QZzIn
-	 nLBCT1GGHeh3IqQRpILYy+hn/QzfyHCk1qNDsE+52O4RoyRVdr3K26E82uxxYOtDvu
-	 DeHaNNHlFiUxPMmQrYl3UWnAaoMEYUipQBUHvb/o=
-Date: Sat, 6 Jul 2024 11:30:00 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: stable@vger.kernel.org, sashal@kernel.org, ast@kernel.org,
-	keescook@chromium.org, linux-hardening@vger.kernel.org,
-	christophe.leroy@csgroup.eu, catalin.marinas@arm.com,
-	song@kernel.org, puranjay12@gmail.com, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
-	haoluo@google.com, jolsa@kernel.org, illusionist.neo@gmail.com,
-	linux@armlinux.org.uk, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	chenhuacai@kernel.org, kernel@xen0n.name, loongarch@lists.linux.dev,
-	johan.almbladh@anyfinetworks.com, paulburton@kernel.org,
-	tsbogend@alpha.franken.de, linux-mips@vger.kernel.org,
-	deller@gmx.de, linux-parisc@vger.kernel.org, iii@linux.ibm.com,
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-	borntraeger@linux.ibm.com, svens@linux.ibm.com,
-	linux-s390@vger.kernel.org, davem@davemloft.net,
-	sparclinux@vger.kernel.org, kuba@kernel.org, hawk@kernel.org,
-	netdev@vger.kernel.org, dsahern@kernel.org, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, guanwentao@uniontech.com,
-	baimingcong@uniontech.com
-Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()" for linux-6.6.37
-Message-ID: <2024070631-unrivaled-fever-8548@gregkh>
-References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
+	b=X296gz03TsEeGAvE8xVmqzWlOgLfD7ih8VPD04Bhc4q/xIR3v1EzXaaTaztbtPuYw
+	 Lc/GvH/O3od5ORV6zoNBV6xk1vAVqJJZVdXaqFKBc05Q0LjnhLx/RAkNbZ2X3MrK35
+	 jtFwLabmBl576EG5MSEAV345aVAp5QUMpVf7FmIe2FXxNqJ3eKPPAK/bsoC+nFLb79
+	 PzPjexjYXX2zNd7ynkfd7xPHuPH+EDNX4sq7ZOspYEPs98j04/v4ducyh2WsK1fOK7
+	 3xYhgCwhVpuzUIsNp3BEy8hLDk007Cb8J/CnKWgbeJj1aOAskH80Psj63NN0OPOyxe
+	 GgHSMqunCyzGg==
+Date: Sat, 6 Jul 2024 10:35:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org, lvc-project@linuxtesting.org,
+	syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: ppp: reject claimed-as-LCP but actually malformed
+ packets
+Message-ID: <20240706093545.GA1481495@kernel.org>
+References: <20240705160808.113296-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
+In-Reply-To: <20240705160808.113296-1-dmantipov@yandex.ru>
 
-On Sat, Jul 06, 2024 at 11:11:01AM +0800, WangYuli wrote:
-> This reverts commit 08f6c05feb1db21653e98ca84ea04ca032d014c7.
++ Ricardo, Eric, Jakub, and Paolo
+  Please derive CC list from get_maintainers.pl my.patch
+
+On Fri, Jul 05, 2024 at 07:08:08PM +0300, Dmitry Antipov wrote:
+> Since 'ppp_async_encode()' assumes valid LCP packets (with code
+> from 1 to 7 inclusive), add 'ppp_check_packet()' to ensure that
+> LCP packet has an actual body beyond PPP_LCP header bytes, and
+> reject claimed-as-LCP but actually malformed data otherwise.
 > 
-> Upstream commit e60adf513275 ("bpf: Take return from set_memory_rox() into account with bpf_jit_binary_lock_ro()")
-> depends on
-> upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory management").
+> Reported-by: syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=ec0723ba9605678b14bf
+
+Hi Dmitry,
+
+As a fix, a Fixes tag should go here (no blank line between any tags).
+And the patch should be targeted at the net tree:
+
+	Subject: [PATCH net] ...
+
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+>  drivers/net/ppp/ppp_generic.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 > 
-> It will cause a compilation warning on the arm64 if it's not merged:
->   arch/arm64/net/bpf_jit_comp.c: In function ‘bpf_int_jit_compile’:
->   arch/arm64/net/bpf_jit_comp.c:1651:17: warning: ignoring return value of ‘bpf_jit_binary_lock_ro’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
->    1651 |                 bpf_jit_binary_lock_ro(header);
->         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+> index 0a65b6d690fe..2c8dfeb8ca58 100644
+> --- a/drivers/net/ppp/ppp_generic.c
+> +++ b/drivers/net/ppp/ppp_generic.c
+> @@ -493,6 +493,18 @@ static ssize_t ppp_read(struct file *file, char __user *buf,
+>  	return ret;
+>  }
+>  
+> +static bool ppp_check_packet(struct sk_buff *skb, size_t count)
+> +{
+> +	if (get_unaligned_be16(skb->data) == PPP_LCP &&
+> +	    count < PPP_PROTO_LEN + 4)
+> +		/* Claimed as LCP but has no actual LCP body,
+> +		 * which is 4 bytes at least (code, identifier,
+> +		 * and 2-byte length).
+> +		 */
+> +		return false;
+> +	return true;
+> +}
+
+I agree that this fix is correct, that it addresses the issue at hand,
+and that ppp_write() is a good place for this check for invalid input.
+But I have some minor feedback on the implementation above.
+
+1. It might be nicer to add define, say near where PPP_PROTO_LEN is
+   defined, instead of using 4.
+
+   E.g. #define PPP_LCP_HDR_LEN 4
+
+2. I would express the boolean logic without an if condition:
+   (Completely untested!)
+
+static bool ppp_check_packet(struct sk_buff *skb, size_t count)
+{
+	/* LCP packets must include LCP header which 4 bytes long:
+	 * 1-byte code, 1-byte identifier, and 2-byte length.
+	 */
+	return get_unaligned_be16(skb->data) != PPP_LCP ||
+		count >= PPP_PROTO_LEN + PPP_LCP_HDR_LEN;
+}
+
+> +
+>  static ssize_t ppp_write(struct file *file, const char __user *buf,
+>  			 size_t count, loff_t *ppos)
+>  {
+> @@ -515,6 +527,11 @@ static ssize_t ppp_write(struct file *file, const char __user *buf,
+>  		kfree_skb(skb);
+>  		goto out;
+>  	}
+> +	ret = -EINVAL;
+> +	if (unlikely(!ppp_check_packet(skb, count))) {
+> +		kfree_skb(skb);
+> +		goto out;
+> +	}
+
+FWIIW, I agree the above is in keeping with the existing flow of this function.
+
+>  
+>  	switch (pf->kind) {
+>  	case INTERFACE:
+> -- 
+> 2.45.2
 > 
-> This will prevent the kernel with the '-Werror' compile option from
-> being compiled successfully.
 > 
-> We might as well revert this commit in linux-6.6.37 to solve the
-> problem in a simple way.
-
-This makes it sound like you are reverting this because of a build
-error, which is not the case here, right?  Isn't this because of the
-powerpc issue reported here:
-	https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
-?
-
-If not, why not just backport the single missing arm64 commit, and why
-didn't this show up in testing?
-
-confused,
-
-greg k-h
 
