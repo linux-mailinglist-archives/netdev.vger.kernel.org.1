@@ -1,58 +1,61 @@
-Return-Path: <netdev+bounces-109618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042D0929248
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 11:35:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 918B092924E
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 11:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C9EE1F225BA
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 09:35:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 404E91F2177B
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 09:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4520047A76;
-	Sat,  6 Jul 2024 09:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006A546556;
+	Sat,  6 Jul 2024 09:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X296gz03"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oF3hrZ8H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A18F1804F;
-	Sat,  6 Jul 2024 09:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0BD1F61C;
+	Sat,  6 Jul 2024 09:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720258550; cv=none; b=kfoY9NgKtcaImULdzG/v8ErCzFyBW69zxAYkd0wqgQOnDBC9xsYL6GhZPeoQ2ulgQ5IjiE1mhDSG9DCoMwx8COsOzPrZRt5heMA4g9AU6uRvIJB9bwYWcrXiswNsB/7xlgmgPnKN9hWAda/AJJL+ab3HHwyMTrS8dlcTHmWyoEU=
+	t=1720259583; cv=none; b=BkkLkTZfA/G64fFj0ov+oo926y8t5s5mLWPnRK5T5etWveAvPMaKIbEwrWtwCX2HqM/4UCfG8OTmc3X83tjtVOFdipebcElbOKyOyNkgn68Z0WirnC5gwJqvJzOouNLOjW6MHTGRFBf3jKjqCrsTpmMtfLwZ4ifFqxEeoUB2OH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720258550; c=relaxed/simple;
-	bh=TsL34T/F7oR/95XQunnwvOsRd932cw4s38BYIYJjNGI=;
+	s=arc-20240116; t=1720259583; c=relaxed/simple;
+	bh=EoJn9pc2K+C/K7BLu1o4zFCKx6+NE9Wo+WHt6QnrWSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DlyVM8hYTUT1nTQNea4055ANPp2ZfHzLMAKFDvr58xQlAyWeVDU8vsVIniB3bFqTSghc1mfgV/eA/Ncaa5/IFZaYu9qszGaFApxm5Lqo1c7dbKQaREzSR9gDg3snNbq8DHzW15omVsbColvDG5+0SyPL+8HWqKyptC4DVBgqnLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X296gz03; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D65E4C2BD10;
-	Sat,  6 Jul 2024 09:35:47 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ds6LzIMqjmJdcB7XrT6UsXx4uXx8H8/p4W0mKCmK3pZtfkuEjx7+PC+eAaf/ne931ootbZTyenO13L1JWfmqYaTXXA4BQt4QsT3I/xSm7I5XctDe+/W45AuL6Abc4ejBoWcwomFbg07nXezRqQL2k19p4Xan5cF+jWRQMVhaNZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oF3hrZ8H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E28E8C2BD10;
+	Sat,  6 Jul 2024 09:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720258549;
-	bh=TsL34T/F7oR/95XQunnwvOsRd932cw4s38BYIYJjNGI=;
+	s=k20201202; t=1720259583;
+	bh=EoJn9pc2K+C/K7BLu1o4zFCKx6+NE9Wo+WHt6QnrWSM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X296gz03TsEeGAvE8xVmqzWlOgLfD7ih8VPD04Bhc4q/xIR3v1EzXaaTaztbtPuYw
-	 Lc/GvH/O3od5ORV6zoNBV6xk1vAVqJJZVdXaqFKBc05Q0LjnhLx/RAkNbZ2X3MrK35
-	 jtFwLabmBl576EG5MSEAV345aVAp5QUMpVf7FmIe2FXxNqJ3eKPPAK/bsoC+nFLb79
-	 PzPjexjYXX2zNd7ynkfd7xPHuPH+EDNX4sq7ZOspYEPs98j04/v4ducyh2WsK1fOK7
-	 3xYhgCwhVpuzUIsNp3BEy8hLDk007Cb8J/CnKWgbeJj1aOAskH80Psj63NN0OPOyxe
-	 GgHSMqunCyzGg==
-Date: Sat, 6 Jul 2024 10:35:45 +0100
+	b=oF3hrZ8HY+7i9IMoKfw0AtfX5ocmKNXTt9vQ41mFKyuTSb1Mzp9OYb+rg2lKQdX5v
+	 Gkha4nLpVioUDVOrnvBybTy1NEUc6pJVk2OlY8fmhUgRjaDESph8fY61qACYvJ8vRX
+	 FsI5/5g6PWk8ZZIocJOUxC6+I6SDnOvn5P4lTb6Ubx8n8fz9ybDZvcAKKF07dy1cVl
+	 08d7OLyM5/bySva0iotFvQhNRK8VpQSfhXfh/e4xOClw9xJateezPtgPyf8ZqI/SHb
+	 5c3uU9a/V2dDtLv6kayhdVB9/B+2vgU26ZJFj6Ui0IYr1fT/B8n+Ue9iK75xiK4sho
+	 HXWXsYewNPg8g==
+Date: Sat, 6 Jul 2024 10:52:58 +0100
 From: Simon Horman <horms@kernel.org>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org, lvc-project@linuxtesting.org,
-	syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: ppp: reject claimed-as-LCP but actually malformed
- packets
-Message-ID: <20240706093545.GA1481495@kernel.org>
-References: <20240705160808.113296-1-dmantipov@yandex.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH net] ice: Adjust memory overrun in
+ ice_sched_add_root_node() and ice_sched_add_node()
+Message-ID: <20240706095258.GB1481495@kernel.org>
+References: <20240705163620.12429-1-amishin@t-argos.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,94 +64,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240705160808.113296-1-dmantipov@yandex.ru>
+In-Reply-To: <20240705163620.12429-1-amishin@t-argos.ru>
 
-+ Ricardo, Eric, Jakub, and Paolo
-  Please derive CC list from get_maintainers.pl my.patch
+On Fri, Jul 05, 2024 at 07:36:20PM +0300, Aleksandr Mishin wrote:
+> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
+> devm_kcalloc() in order to allocate memory for array of pointers to
+> 'ice_sched_node' structure. But in this calls there are 'sizeof(*root)'
+> instead of 'sizeof(root)' and 'sizeof(*node)' instead of 'sizeof(node)'.
+> So memory is allocated for structures instead pointers. This lead to
+> significant memory overrun.
+> Looks like it was done for "coverity[suspicious_sizeof] workaround".
 
-On Fri, Jul 05, 2024 at 07:08:08PM +0300, Dmitry Antipov wrote:
-> Since 'ppp_async_encode()' assumes valid LCP packets (with code
-> from 1 to 7 inclusive), add 'ppp_check_packet()' to ensure that
-> LCP packet has an actual body beyond PPP_LCP header bytes, and
-> reject claimed-as-LCP but actually malformed data otherwise.
+Hi Aleksandr,
+
+While I agree that your patch is correct, I doesn't look to me like it was
+done for "coverity[suspicious_sizeof] workaround", as that annotation was
+added after the cited patch where the problem appears to have been
+introduced.
+
 > 
-> Reported-by: syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=ec0723ba9605678b14bf
+> Adjust memory overrun by correcting devm_kcalloc() parameters.
 
-Hi Dmitry,
+I also think it is misleading to describe this as an overrun.  In my
+opinion, an overrun refers to writing over the end of a buffer, or similar
+conditions where values are written to memory or read from that is not
+intended for that purpose.
 
-As a fix, a Fixes tag should go here (no blank line between any tags).
-And the patch should be targeted at the net tree:
+But that is not the case here.  Instead it is an over allocation of memory.
+Which is, in a sense, the opposite of an overrun. I suggest updating the
+description of the problem.
 
-	Subject: [PATCH net] ...
-
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
->  drivers/net/ppp/ppp_generic.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
 > 
-> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-> index 0a65b6d690fe..2c8dfeb8ca58 100644
-> --- a/drivers/net/ppp/ppp_generic.c
-> +++ b/drivers/net/ppp/ppp_generic.c
-> @@ -493,6 +493,18 @@ static ssize_t ppp_read(struct file *file, char __user *buf,
->  	return ret;
->  }
->  
-> +static bool ppp_check_packet(struct sk_buff *skb, size_t count)
-> +{
-> +	if (get_unaligned_be16(skb->data) == PPP_LCP &&
-> +	    count < PPP_PROTO_LEN + 4)
-> +		/* Claimed as LCP but has no actual LCP body,
-> +		 * which is 4 bytes at least (code, identifier,
-> +		 * and 2-byte length).
-> +		 */
-> +		return false;
-> +	return true;
-> +}
-
-I agree that this fix is correct, that it addresses the issue at hand,
-and that ppp_write() is a good place for this check for invalid input.
-But I have some minor feedback on the implementation above.
-
-1. It might be nicer to add define, say near where PPP_PROTO_LEN is
-   defined, instead of using 4.
-
-   E.g. #define PPP_LCP_HDR_LEN 4
-
-2. I would express the boolean logic without an if condition:
-   (Completely untested!)
-
-static bool ppp_check_packet(struct sk_buff *skb, size_t count)
-{
-	/* LCP packets must include LCP header which 4 bytes long:
-	 * 1-byte code, 1-byte identifier, and 2-byte length.
-	 */
-	return get_unaligned_be16(skb->data) != PPP_LCP ||
-		count >= PPP_PROTO_LEN + PPP_LCP_HDR_LEN;
-}
-
-> +
->  static ssize_t ppp_write(struct file *file, const char __user *buf,
->  			 size_t count, loff_t *ppos)
->  {
-> @@ -515,6 +527,11 @@ static ssize_t ppp_write(struct file *file, const char __user *buf,
->  		kfree_skb(skb);
->  		goto out;
->  	}
-> +	ret = -EINVAL;
-> +	if (unlikely(!ppp_check_packet(skb, count))) {
-> +		kfree_skb(skb);
-> +		goto out;
-> +	}
-
-FWIIW, I agree the above is in keeping with the existing flow of this function.
-
->  
->  	switch (pf->kind) {
->  	case INTERFACE:
-> -- 
-> 2.45.2
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
-> 
+> Fixes: dc49c7723676 ("ice: Get MAC/PHY/link info and scheduler topology")
+
+I do agree there is a problem. But I'm not convinced this is fixing a bug -
+is the overallocation of memory manifesting, in a real problem, other than
+perhaps contributing to memory pressure (I assume in not a very significant
+way).
+
+My feeling is that it would be better to target this change to net-next and
+drop the Fixes tag.
+
+> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+
+...
 
