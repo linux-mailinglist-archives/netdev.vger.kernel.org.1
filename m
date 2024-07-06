@@ -1,97 +1,82 @@
-Return-Path: <netdev+bounces-109593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A59928FF3
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:30:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B14F928FF7
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366591C217C2
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:30:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A64351C218B8
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4BE5C99;
-	Sat,  6 Jul 2024 01:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB197483;
+	Sat,  6 Jul 2024 01:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrkEm0fE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnXf5UiP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA050EC0
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE45C33F9;
+	Sat,  6 Jul 2024 01:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720229430; cv=none; b=jqXTTH1g03GB+qV64gJY1l+NP+i4kjgSOsZOFyokv/lsU/V4yiRUTNTPAvzFvh53W5wrb04WfmYrOX2V4LaSeDphw+tldgy3kfDVmTWKF3OyI4zHgH2aXPgrbSVe+3Vxyrvxz+2RaR2Lc3b/H4sQ8iwYzuBh6elKVIpuwLLEdok=
+	t=1720230078; cv=none; b=mcoL8SEx5u1C2Q6jhnAJm4o8x5bfHQZ0H8l7S+7eKLdMqoz3XfcG3DnGJjEQswsb8frNrOuZSSpQEX6ZJXsDzYhwiSguBfAjGTfQM5bzUJ95AWzjJo9XpaEUW0kdwrbgNDDnyCEMP43BRYJZtvgTZCLpRx1815NtvccDwT5GfGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720229430; c=relaxed/simple;
-	bh=FGzgXY7WQKji30GWN12qFJHBl8ZVPOLeEYiySBvdkGg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kvh9RznT5zNjfRNPbApfbFUM5xPWTcxQjlhm/bz+9V8uwfpyx95sCxEcv5ZvNzgSAZTlDF3RAYgp8Bd8mot4MpkEVhNtOFAE+2JMqo4J2iGFRCh2jCj0gG0LBz4WTQtWkD5KWFluPEliM4S6AFO1bJb6vXVS3wEBvTRM+VtQz+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrkEm0fE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5BB6FC4AF0A;
-	Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
+	s=arc-20240116; t=1720230078; c=relaxed/simple;
+	bh=CB5xnPiURRUfsrDWz5BC2R5ksUafNpcL4HmVkzoybUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AOxVCML6OwLm3uO688be1x3QDCDMMtj5mdg2DIRI+O9WhWrcys1TyxRe9VaN1gYWnZuVop7usslf8D5vsGqdrs4DpkZ2RJgXYw83y86I41EwrE4XzRmH1HWRAiOh3c0nSYrofXxhH/4Tzeszp6akfjRmeDp7/ZpoduRmZkkKytM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XnXf5UiP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC58FC116B1;
+	Sat,  6 Jul 2024 01:41:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720229430;
-	bh=FGzgXY7WQKji30GWN12qFJHBl8ZVPOLeEYiySBvdkGg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TrkEm0fEBjqs6zzbGAakbHS2GVvdys2e5iHVV7LVPgDyMnGT6Mg2UZVciEXg/FQT7
-	 45pOcunv6YsWTbvBXgjp8p1dlTfN//ADvFV+Sjxq9a5zZwBy0CISlLs+gKbkmqTIut
-	 NOvon2opTCc0WOCfA20uWfqdDIdtj3XJTAwQiMaZOwxR+9kwEoi8zuF+JarNA/UuBy
-	 mgY27pLYRq5JWae+pv2Ch9ppyW3i8LjkoJaC3DmJIp/+E3ZPigKQgKb8e3QVjPidjV
-	 WvGbQTLykM6k7Ug1bs2RpTB6kF8gdVdF5/3fgDtm3nK0+Q8hjypJm4jqI7Rr+hwuHg
-	 wy7FIXb/tYKKA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41F05C43332;
-	Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720230077;
+	bh=CB5xnPiURRUfsrDWz5BC2R5ksUafNpcL4HmVkzoybUA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XnXf5UiPoqiR4BJOuw3YdC/bBs+9EFTP8hsTDhxzz4NbM/TYVj8vx7TCQT++maESX
+	 yVZk8nqR93sFBqZlT6cfBRKjaOdi8uo855I/i2RUcUU0MwwQ7zj5dIqVwteg5/tUIC
+	 emxf25IscVOaDxK0YgWdCBTjcb/E1hn2TgwvXlqkM7i1RXBvt2OdgR5vZOkWQ4hvfD
+	 rUIk0hEd6G4DbnW118Oeb1bypTqVq1VlBNn/kXFgrN6i/+F4M5oJrRUxtG5pCawX6o
+	 CZn/9JPGwzBZuRepwu0Icqp75V65Oci+oODzCIyXLIz0hIB8wkGNMlz+Yok775lDIq
+	 6edsyD57ZY0Aw==
+Date: Fri, 5 Jul 2024 18:41:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Jonathan Corbet <corbet@lwn.net>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v6 5/7] net: ethtool: Add new power limit get
+ and set features
+Message-ID: <20240705184116.13d8235a@kernel.org>
+In-Reply-To: <20240704-feature_poe_power_cap-v6-5-320003204264@bootlin.com>
+References: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
+	<20240704-feature_poe_power_cap-v6-5-320003204264@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tcp: fix incorrect undo caused by DSACK of TLP retransmit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172022943026.18706.18202616674867302507.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jul 2024 01:30:30 +0000
-References: <20240703171246.1739561-1-ncardwell.sw@gmail.com>
-In-Reply-To: <20240703171246.1739561-1-ncardwell.sw@gmail.com>
-To: Neal Cardwell <ncardwell.sw@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- netdev@vger.kernel.org, ncardwell@google.com, ycheng@google.com,
- yyd@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 04 Jul 2024 10:12:00 +0200 Kory Maincent wrote:
+> +	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
+> +	    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
+> +		struct pse_control_config config = {};
+> +
+> +		if (pse_has_podl(phydev->psec))
+> +			config.podl_admin_control = nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL]);
+> +		if (pse_has_c33(phydev->psec))
+> +			config.c33_admin_control = nla_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]);
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  3 Jul 2024 13:12:46 -0400 you wrote:
-> From: Neal Cardwell <ncardwell@google.com>
-> 
-> Loss recovery undo_retrans bookkeeping had a long-standing bug where a
-> DSACK from a spurious TLP retransmit packet could cause an erroneous
-> undo of a fast recovery or RTO recovery that repaired a single
-> really-lost packet (in a sequence range outside that of the TLP
-> retransmit). Basically, because the loss recovery state machine didn't
-> account for the fact that it sent a TLP retransmit, the DSACK for the
-> TLP retransmit could erroneously be implicitly be interpreted as
-> corresponding to the normal fast recovery or RTO recovery retransmit
-> that plugged a real hole, thus resulting in an improper undo.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] tcp: fix incorrect undo caused by DSACK of TLP retransmit
-    https://git.kernel.org/netdev/net/c/0ec986ed7bab
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This smells of null-deref if user only passes one of the attributes.
+But the fix should probably be in ethnl_set_pse_validate() so it won't
+conflict (I'm speculating that it will need to go to net).
 
