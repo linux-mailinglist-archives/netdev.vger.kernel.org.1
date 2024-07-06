@@ -1,174 +1,99 @@
-Return-Path: <netdev+bounces-109578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7615B928F79
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:10:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D76928F9C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9914C1C22184
-	for <lists+netdev@lfdr.de>; Fri,  5 Jul 2024 23:10:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F7A5B247C7
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14559148307;
-	Fri,  5 Jul 2024 23:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C62C256D;
+	Sat,  6 Jul 2024 00:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="me8hNNEe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTp+PwrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C7E14532A
-	for <netdev@vger.kernel.org>; Fri,  5 Jul 2024 23:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11421A3D;
+	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720221045; cv=none; b=eCohqy+Nbchpverlo9s9O4un74P7d4a0LlWCnHB4nOQ7LiCvanAqX2SG4RFuq2gkQwWL+f4QioiLUXzWRSktuN5ywP5HAL/0J+TXcwMkHI4/WmQnDbkc2Clat1rOWzrQlhyDDmpayGWhCUPDpVx0aVm8g7myQOUnOGcqsEL8l+M=
+	t=1720224032; cv=none; b=fWI38JLBH8t3xTMmM5mgJ2kdBTTFT2Ye6mjZKZ+yJdttTsCd9sTQnD/n+F0UH1DRXvyK9MZbIG3emK3vljyRC9xq67uMq7npdNoOty7yqEj178wJbl1L1F4xZGkpWEf55jJmw/xk+JIfk1pMlGqnlmbkJ7Y6pIb/HdvJOjOh6dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720221045; c=relaxed/simple;
-	bh=4CEqD7VmRndX/qN6v0TFl5xl7rdwJo23W+D2nNPbChY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=haYCj7qlD3+DFWG0TP1tpaz/vhEAFGsrulAT1fteewq6L+xx3cjZeGKS/DYiEE7AGzb5c2D2oLYudkpt2M25XEkKHrtI9hqU8MBQ/AL0if31a6sE/H84VUo3murZrnKiOFtf4i2rLxjeD6z3lp7pDTX4caDqbYOXkIvuR+OrURw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=me8hNNEe; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: matttbe@kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720221040;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EYSTaBvET+7Y92pC4W26UTSlgkepbfTnQLMrMemfNbQ=;
-	b=me8hNNEesaK3JInhevdUm0hR3gV8oybY6jYc26r6lfTHDKE9vrBfNkSMKvP4W2oU+nvRZ6
-	BHj5L+4KLS/ywY4cbb88o1ZyRNGsZs2ILYOGuQBH8bPxktRYXPvxBHj5c5j81IOSQLgSPI
-	+97Vo9G+TKKCxFWTGjHImfVxTcQ+rQQ=
-X-Envelope-To: andrii@kernel.org
-X-Envelope-To: eddyz87@gmail.com
-X-Envelope-To: mykolal@fb.com
-X-Envelope-To: ast@kernel.org
-X-Envelope-To: daniel@iogearbox.net
-X-Envelope-To: song@kernel.org
-X-Envelope-To: yonghong.song@linux.dev
-X-Envelope-To: john.fastabend@gmail.com
-X-Envelope-To: kpsingh@kernel.org
-X-Envelope-To: sdf@google.com
-X-Envelope-To: haoluo@google.com
-X-Envelope-To: jolsa@kernel.org
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: hawk@kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: bpf@vger.kernel.org
-X-Envelope-To: linux-kselftest@vger.kernel.org
-X-Envelope-To: tanggeliang@kylinos.cn
-X-Envelope-To: mptcp@lists.linux.dev
-X-Envelope-To: martineau@kernel.org
-X-Envelope-To: geliang@kernel.org
-X-Envelope-To: shuah@kernel.org
-Message-ID: <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
-Date: Fri, 5 Jul 2024 16:10:27 -0700
+	s=arc-20240116; t=1720224032; c=relaxed/simple;
+	bh=WhMcksiqGoZDH0KM2bnh5KtXmtQWYKWu4lTqKhd6JHY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CHorjHnlU7T2cHAU+42DHYlQKxK1yh3EHO1++eGyMtR8ak4spqeoU5TriHxSCHMPkHVPwV51Ha2qhpVX/Ghpa75Kh3PIlbnmYpiv5MGMUH/gampE9Xelb8fZxsdJFQnH30wazN7bT+33Nk2SFqtrA03jlWODt7JhcGj/vaIYhpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTp+PwrW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 799C4C4AF0A;
+	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720224031;
+	bh=WhMcksiqGoZDH0KM2bnh5KtXmtQWYKWu4lTqKhd6JHY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iTp+PwrWdcFQ7z87SyPZ0O05b6n2/niJM5tt1ubEKT1f1iMrfb1hfcKk6bY8Akexu
+	 fqWaqNH15R3nAWgx+r19RyacXf8bBk2aEFKKCAmbakSsHsKkRIlLfTDpR+Qz/Qb2XC
+	 cs3QDye+1ZLKSqX+Sjh2wYgCIRkg4V42M3ds82KInjn1A1sPpHJW3e30Uxld8Qktrx
+	 /driQAndvMa52c+00dB3sANciDkoBkqyD35VaeKGOlKgzKAElkF9KgAKqsC30055lV
+	 Z90rcW287YEbTQLe4iCzGz3kusZWkNz2PJJdS2g16OpMTlCZuJltwDe+NkqInkKE+o
+	 QwAfzYK/GpAUw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 630C0C43446;
+	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
- <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>,
- mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Shuah Khan <shuah@kernel.org>
-References: <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
- <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
- <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ethernet: mediatek: Allow gaps in MAC
+ allocation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172022403140.7894.3886257470983936157.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jul 2024 00:00:31 +0000
+References: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org>
+In-Reply-To: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, eladwf@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-On 7/4/24 3:48 AM, Matthieu Baerts wrote:
->> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
->> index e0b3887b3d2d..204269d0b5b8 100644
->> --- a/tools/testing/selftests/bpf/Makefile
->> +++ b/tools/testing/selftests/bpf/Makefile
->> @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED = test_skb_cgroup_id_user \
->>   	flow_dissector_load test_flow_dissector test_tcp_check_syncookie_user \
->>   	test_lirc_mode2_user xdping test_cpp runqslower bench bpf_testmod.ko \
->>   	xskxceiver xdp_redirect_multi xdp_synproxy veristat xdp_hw_metadata \
->> -	xdp_features bpf_test_no_cfi.ko
->> +	xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
-> On the BPF CI, we have such errors:
-> 
->     mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file not found
->       20 | #include "linux/mptcp.h"
->          |          ^~~~~~~~~~~~~~~
-> 
-> On my side, I don't have any issue, because the compiler uses the
-> mptcp.h file from the system: /usr/include/linux/mptcp.h
-> 
-> I suppose that's not OK on the BPF CI, as it looks like it doesn't have
-> this file there, probably because it still uses Ubuntu 20.04 as base,
-> which doesn't include this file in the linux-libc-dev package.
-> 
-> When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the other
-> programs from that list -- is compiled (V=1), I see that the following
-> "-I" options are given:
-> 
->    -I${PWD}/tools/testing/selftests/bpf
->    -I${BUILD}//tools/include
->    -I${BUILD}/include/generated
->    -I${PWD}/tools/lib
->    -I${PWD}/tools/include
->    -I${PWD}/tools/include/uapi
->    -I${BUILD}/
-> 
-> It will then not look at -I${PWD}/usr/include or the directory generated
-> with:
-> 
->    make headers_install INSTALL_HDR_PATH=(...)
+Hello:
 
-It sounds like the tools/testing/selftests/net/mptcp/Makefile is looking at this 
-include path, so it works?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-iiu the bpf/Makefile correctly, it has the bpftool "make" compiled and installed 
-at tools/testing/selftests/bpf/tools/sbin/. May be directly compile the 
-pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
-
+On Mon, 1 Jul 2024 20:28:14 +0100 you wrote:
+> Some devices with MediaTek SoCs don't use the first but only the second
+> MAC in the chip. Especially with MT7981 which got a built-in 1GE PHY
+> connected to the second MAC this is quite common.
+> Make sure to reset and enable PSE also in those cases by skipping gaps
+> using 'continue' instead of aborting the loop using 'break'.
 > 
-> I guess that's why people have duplicated files in 'tools/include/uapi',
-> but I also understood from Jakub that it is not a good idea to continue
-> to do so.
+> Fixes: dee4dd10c79a ("net: ethernet: mtk_eth_soc: ppe: add support for multiple PPEs")
+> Suggested-by: Elad Yifee <eladwf@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > 
-> What would be the best solution to avoid a copy? A symlink still looks
-> like a workaround.
-> 
-> In the other selftests, KHDR_INCLUDES is used to be able to include the
-> path containing the UAPI headers. So if someone built the headers in a
+> [...]
 
-Meaning KHDR_INCLUDES should be used and -I${PWD}/tools/include/uapi can be 
-retired? I haven't looked into the details. I quickly tried but it fails in my 
-environment.
+Here is the summary with links:
+  - [net-next] net: ethernet: mediatek: Allow gaps in MAC allocation
+    https://git.kernel.org/netdev/net-next/c/3b2aef99221d
 
-> seperated directory -- INSTALL_HDR_PATH=(...) -- KHDR_INCLUDES can be
-> overridden to look there, instead of ${KERNEL_SRC}/usr/include. Would it
-> be OK to do that? Would it work for the CI without extra changes? Or do
-> you still prefer a copy/symlink to 'tools/include/uapi' instead?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> 
-> Cheers,
-> Matt
 
 
