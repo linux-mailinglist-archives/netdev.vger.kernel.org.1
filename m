@@ -1,161 +1,109 @@
-Return-Path: <netdev+bounces-109635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A26B8929409
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 16:26:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B8B929437
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 16:49:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08203B22541
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 14:26:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 549581C21176
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 14:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96382139D00;
-	Sat,  6 Jul 2024 14:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2408413A87C;
+	Sat,  6 Jul 2024 14:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keZgZSMY"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Xoh5xWOc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A8724B5B;
-	Sat,  6 Jul 2024 14:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C0913A86C;
+	Sat,  6 Jul 2024 14:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720275992; cv=none; b=Qkg8na8OPh+h+OGYokkQ2qjWOwYfXiuX+vebv+HiDDlS0kTLIzLuevtfFDQ0LvaeJvctZT/rxs0jehDtgK/1eG3BYN+XuxB1mzZz8r0su1Z5kDbDmy8UHJ2R6SlISSYR6FVKrUmLJLY+fzOUw3nHP0CsrwXweRN57aM/3Tk/p/Q=
+	t=1720277356; cv=none; b=FbMyQX+RQdkmAYP5aYUi3oQ2/YQBzKcuxfjhr6ttePdn9yuwE0lT86nBVy6m+o4kCQnRW8bACp1vRIq1eB/Jro7ZJsM4oiLuK74/Wf13DzbcTZIZsSXH5+hswuAWdr7QirBWktx455oUUo0qRAHs3Exyyg9zdDHiSJKezuH3Rsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720275992; c=relaxed/simple;
-	bh=1Yf5eXxazwQxeNpPUkRrRB1Xu3aBBRE79k2g+ye2u20=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=URm2dvq8q97tV7Cx2H8NTN6KdfTvXpoFWU5jvJZbQ+a8tHepM6f2ZFRqMk90uUaj8Cg66t5QYKNgNs8ncwUPabSU73qPAIIa2uk710Y83fPyIEARvt1RBbKbNzR5oiS+st+H4inWsCLVGtYBiXfhNRjQ+wT3na2sRXk2b0xZLik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=keZgZSMY; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6b5def3916bso12385406d6.3;
-        Sat, 06 Jul 2024 07:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720275990; x=1720880790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=seYqp1dT5F5vy2P9brEQHllr9NxXw0Yqi8+EB26VwJM=;
-        b=keZgZSMYeMUNJZu64O7p/gWG+a0bnSO/FX17ZC54Q1gR1PG9AnD0Y+m+LlS4FQ9hEW
-         uRnLQW7xYMwjUOiCfsU61dmSxYt++jOkKe74ghfez5APLOE5hV69a3XPwoaxvArbC8I4
-         dZxZhAhWQxAqAGj7o+hwtLwh25ok04ePRybit3RzpTEhPouKbelaw3BbWpmG6qDEd6yj
-         TTeG2DI23VU2rHnG1TcL9nG3SvqJ5ZJMxt54Mw57Cw7FbgubZMqGxEJhcWwlXxhAZG/M
-         s/WarVl+SXgFk2GL3l3RAqW9ZLHsEF0heo4jDgSqX5+lZVewtEfJNLbZmwO21YZxK/Mo
-         glVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720275990; x=1720880790;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=seYqp1dT5F5vy2P9brEQHllr9NxXw0Yqi8+EB26VwJM=;
-        b=sy1vY7v0LYXsyN7Nc1dACy0bLxGhIRlXYHW60aR2BjgjREElUNMtCwOii4h4GBd58/
-         HMoA35B5aOFZpMa8fJyX2vQFQkb+ImIhX/t0G432Nl0sU02MsazWTm7z/MBT4tYA/h5/
-         m5yQ/zcHAwrYzOVVwlreUaO8x2O5Vm/RenQTcBhYFdFLdiiku3aMTpufWsgI2d5eNSoy
-         aGB0Fs5Yo54WI48fi/pBwm9Cfj34HUA6f6UNzBU+0XTgDIR66VOfLleuiODlFZTedEBG
-         4wHKmdTZ9vpjkqvxle/i3eKGdl460w4z7JvDcY/f+Uufljxm4e+nXH9wlMWPK96KeE+p
-         erhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXM3jUOUhs9cMJQpo/RJDYuKBNjq0Bf81idhIesMTRRCw8K7vq/4PtJnP6mCXy8pCQiXfusRn6FwdVqyJayIWoS/T6S8OIupy5wmiOC5tJSglcWR1jan84AGYs1x6Sc8njBgD2JgW4J1zLiF7lB6n4ZJ2ktIpkHKQ/g
-X-Gm-Message-State: AOJu0YxMhmuQzJqvVPz65uJkJguuzC5oJiKc3cvnTEYL40TnBsIl5t9l
-	cpTsazmjk42Y/qOK02LBuZKOB97sATJ1/GLwXUt+i5pA7/SGb1Bs
-X-Google-Smtp-Source: AGHT+IHCoEogj25RngjUznqdwqR1FD0j1Dq20vECsA/TsfiSL9Y7zCCU8h42SrUSaOAyGLsoH/xZFA==
-X-Received: by 2002:ad4:4ee5:0:b0:6b5:e3f2:11c9 with SMTP id 6a1803df08f44-6b5ed19c47bmr106387576d6.49.1720275989786;
-        Sat, 06 Jul 2024 07:26:29 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b5fe1de71esm11176416d6.75.2024.07.06.07.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jul 2024 07:26:29 -0700 (PDT)
-Date: Sat, 06 Jul 2024 10:26:29 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Fred Li <dracodingfly@gmail.com>, 
- pabeni@redhat.com
-Cc: aleksander.lobakin@intel.com, 
- andrii@kernel.org, 
- ast@kernel.org, 
- bpf@vger.kernel.org, 
- daniel@iogearbox.net, 
- davem@davemloft.net, 
- dracodingfly@gmail.com, 
- edumazet@google.com, 
- haoluo@google.com, 
- hawk@kernel.org, 
- john.fastabend@gmail.com, 
- jolsa@kernel.org, 
- kpsingh@kernel.org, 
- kuba@kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux@weissschuh.net, 
- martin.lau@linux.dev, 
- mkhalfella@purestorage.com, 
- nbd@nbd.name, 
- netdev@vger.kernel.org, 
- sashal@kernel.org, 
- sdf@google.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- herbert@gondor.apana.org.au
-Message-ID: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240703122153.25381-1-dracodingfly@gmail.com>
-References: <fd44c91884d0ebf3625ac85a1049679a987f8f79.camel@redhat.com>
- <20240703122153.25381-1-dracodingfly@gmail.com>
-Subject: Re: [PATCH v2 1/2] net: Fix skb_segment when splitting gso_size
- mangled skb having linear-headed frag_list whose head_frag=true
+	s=arc-20240116; t=1720277356; c=relaxed/simple;
+	bh=NLKhHzw2iL4qhzrhvGOTXyRs6loQBaqDJT4atgx9ZAI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=aJ0Xfr92Ko3gAMeJFuIfn3LbObpwHqidsUL3PgOnoPGzAfkUAZrbMDTUT0tnEaxKuuBX+cH5rX0+nFOmEiA7MnlgXOAGGrkqsBXW+NDs2dQnfjolbU+GzbRamudHK+5NC6r8ZOgs9gs4x/F7SEVk1aE2l/hd2ixTfkDT5zMo9n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Xoh5xWOc; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1720277326; x=1720882126; i=markus.elfring@web.de;
+	bh=Z75ZznpIbvuXtNcDLfumWj2gSi9XkiI5AnYv1mRIAA4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Xoh5xWOcip3Q6vPl4p43tJ3b4JWYaS/OxvZeAPKUYvi3JN4CINBU+ZM4lvBdwFKu
+	 km1Lx5qTwRhg5abA+PZQ5lyCRFBFww1+AiS+KpNbTjTZ71Iqd+aBWDK/tBaWVj58/
+	 m73PejEYPb1fPFE5qyFES7Wq4QP8Q5JwpZNw5pxofLbH6sQcesuFbi9kuIjfXob9f
+	 x7+1/8EgpCyQjVoPrz0F5Ry/CEXk55z4JPSNhOJtPd37b5bDzCxNFIS2UqEwQbUug
+	 WBbaRfHLeFBAaAe0dKXgFYtvkwq0XgMO65MHQbB4b5R4J/0Amu2LRrHlTItp8f7mN
+	 AZEoMWvt5Qv+kS8zpg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MmQcl-1rzbbT1Tc1-00g8Oh; Sat, 06
+ Jul 2024 16:48:46 +0200
+Message-ID: <63e3f609-69fe-4cfd-8418-eec00705cf32@web.de>
+Date: Sat, 6 Jul 2024 16:48:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Aleksandr Mishin <amishin@t-argos.ru>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org, intel-wired-lan@lists.osuosl.org,
+ Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <20240706140518.9214-1-amishin@t-argos.ru>
+Subject: Re: [PATCH net-next v2] ice: Adjust over allocation of memory in
+ ice_sched_add_root_node() and ice_sched_add_node()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240706140518.9214-1-amishin@t-argos.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:sf3LwDMEQp+t08dgcYNRjXtXbVPpC4vwx8LVmzPbHJrnE+iFDn1
+ 4zBskLf0c2bv3hSGuVVp/cwnjPm1gZ4EDBLQNnEOOauQpbklTf9Fm+i8fYEC05xgIJJRBjM
+ weu/5k4C2Y35ffpivJcka07YRt81ilXzy6RDQbBlep5YT/pqduVOGPBkiVniEQrenTRzxoF
+ 0OA7Egdtz+o1Mf6jAlaDQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:mbw4cSzkPyA=;AqdL42jObrHSi+bdKLMwGFEUY6s
+ yaP7sjkWCgnNitUBOFvihU3uMsVDt379O/LzhMoHmEhSgBHxQeRm/yVoC4rKNDBThXnwBTFC/
+ EGyqWFCiShb2dAp0YBRRPbb89rEF+Myc2OJ3jt9+YrdaSLTrL+pVjuNwdivjMqfSDI60ynsET
+ 4l0+u6o4g/N0pgH8eQejtjv5UaxWmxUHc0oOpQVz83zFLdu8GWHOGc6hQkAA/HxlzQZz2TBhW
+ NRCfGqm1B0R/Cu4dccn/dEB99C3c9DoXKwpU6JcxpNQS6JkxUoEjoIRbRs2oz21grR73evI11
+ J3pRjVsmpFclFFXgi5tmS5HJQpHKWCjIZ6jrJoh+jZX1wlk+7bIVfiQl+mPTpSpvMvHh2HWSK
+ N9GoVhg3p1N6F5FxfBh+fKid/+mYQG+VPaQUfdTZquU/hm1FO7zbVgpBdCCnwmEvFhsXeY9oh
+ z1LgWvWw9rEPXsK/5UdlFT+gpvpjATIPwEall2KfnoZEMXKl/6vF4APIKTgeU6Nb+ERBlHNBu
+ TJqVPukeFYA024hvfnaMu2gF5GV5/8xFXqhVhByjlU/4/Z8kPa9hMLUB6njSTlu2ucnuv0tjp
+ yQLf6WuVWfP9bI3n5fA2GCeAHw1b3eBh1AunSz9JKFYzuGrK/SaLp7Q08M8+edSadbkkWStjc
+ 7GW5YvTxySZ71jGruYAnfEJX+Q4Sgd7IckEmcwj2EagMYJXgM5dIY73q8/DZ9ieY2RsXo5YqJ
+ t5/PUtIxYyOqjzt0bRazxlucNa98uxXz/xm0hyOpouy0ElZV87Hx2eJ4LUcupnLXQBl+4rZBp
+ Wb/jAwiVFiABU5pa6M7kUPaEFINDec551aDiGRWC5GmHM=
 
-Fred Li wrote:
-> > I must admit I more than a bit lost in the many turns of skb_segment(),
-> > but the above does not look like the correct solution, as it will make
-> > the later BUG_ON() unreachable/meaningless.
-> 
-> Sorry, the subsequent BUG_ON maybe should be removed in this patch, because
-> for skb_headlen(list_skb) > len, it will continue splitting as commit 13acc94eff122 
-> (net: permit skb_segment on head_frag frag_list skb) does.
-> 
-> > 
-> > Do I read correctly that when the BUG_ON() triggers:
-> > 
-> > list_skb->len is 125
-> > len is 75
-> > list_skb->frag_head is true
-> >
-> 
-> yes, it's correct.
-> list_skb->len is 125
-> gso_size is 75, also the len in the BUG_ON conditon
-> list_skb->head_frag is true
->  
-> > It looks like skb_segment() is becoming even and ever more complex to
-> > cope with unexpected skb layouts, only possibly when skb_segment() is
-> > called by some BPF helpers.
-> > 
-> > Thanks,
-> > 
-> > Paolo
-> 
-> I'll wait for more suggestions from others.
+=E2=80=A6
+> 'ice_sched_node' structure. But in this calls there are 'sizeof(*root)'
 
-In general, agreed with Paolo. Segmentation is getting ever more
-complex and the code hard to follow.
+                              But there are calls for?
 
-Maybe at some point we'll have to bite the bullet and seriously
-refactor it. Or at least parts, such as the frag_list handling case.
-But that kills any odds of backporting fixes, so not if we can avoid
-it.
 
-In particular, changing gso_size on skbs with frag_list is fragile.
+> So memory is allocated for structures instead pointers. This lead to
+=E2=80=A6
 
-Instead of adding another special case, how about just linearizing
-sbks after BPF calls adjust_room (at least if called without
-BPF_F_ADJ_ROOM_FIXED_GSO) if they have frag_list.
+                                                of?            leads?
 
+Regards,
+Markus
 
