@@ -1,212 +1,128 @@
-Return-Path: <netdev+bounces-109620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DA592926F
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 12:14:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF653929293
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 12:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4A29282706
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 10:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87EDF1F21FC6
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 10:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9090047A74;
-	Sat,  6 Jul 2024 10:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="ET+Pwwsv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10633BB2E;
+	Sat,  6 Jul 2024 10:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BC81804F;
-	Sat,  6 Jul 2024 10:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84A15695
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 10:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720260846; cv=none; b=ZH4CtD6Zyzujjeef4VdTWvk4odWNJqhlaOzxXNvRx1E1MsujCupN1XvSYazrP2hxLVyFgCmYxbdYfeBhYZZEilJZpc2S//nh326Tst3PuZnf9swQ5RVkxcadgeZ8uHUqnHWXQR4TPb7QI68gnyvTsskQvkIRvUAqSRsFDPmQKaY=
+	t=1720261867; cv=none; b=OJdjxITXfoxkCj+5v5Hpqu8gZC4A4fjqfakGpmZLeydcaFjjuPXZ2w0qchkTDVxyHVhstPYo37gigF3CLMDeqd+Kbw3BfNRu+gU1LgLqZq5tA+8qq3byQMMsW59Z2JM7aHJjGNxEQIzUrG/9vbfWi0ZGic4lkbyiodjjAJGN3fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720260846; c=relaxed/simple;
-	bh=YxzFQTfNZcef/1tEKq+XSz/47xbZZ+JX6yvn+RFS3lY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lUhOr9W1cnnMLXyWpxFNAWtEJfX78oCo46tRPCXDjL8upuAKNxCx6iDBM64/HYmlk0XT5s4UCGQ++gpyhecozDEM77vVJEzRr2hrNRqCuEn8Fg8E2g7p5+GIDbAniWDM7CmZqv7XpfqN58uxUFb6DrBSDDz1Jn1c396zbG3wYT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b=ET+Pwwsv; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1720260826; x=1720865626; i=rwahl@gmx.de;
-	bh=sKptHKoTuQagbCsE0QBZI7P7LK/i8w9EaJqdov5EZEw=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ET+PwwsvIfxpfgbJmOOm9JKQQn4nfb20wJERbacN/IhQ8nEu6Q3G2tKPj0T8vEEK
-	 9p3hffqIwwtXDAdJrvpQF7kwnhNE/Kjj/es4qctnAFvcUlvNrz16yxefH32d9reiS
-	 Tk8nqBzWFXwZuN9g7zU7Q8hqAGdE9kpjGJkFXHA0ONzgXzndYf3m7g77m8Y5mYlUQ
-	 G8SgyyHQgm2Bf27iLlaRLXuzp+AAz6w5CnS/yDGVJM3aT6p/mMYB9adgDwp8r31nE
-	 oBJ8ALYOabBCJL6NQj2iORiPbsJ62TXHFYsz7HaP5Y8noV0Rv84oUb/v5KLfYZfmK
-	 rkCrpjhZww346PNRog==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.148.180]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M8ygO-1sW4pb3l5y-004cP4; Sat, 06
- Jul 2024 12:13:45 +0200
-From: Ronald Wahl <rwahl@gmx.de>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v3] net: ks8851: Fix deadlock with the SPI chip variant
-Date: Sat,  6 Jul 2024 12:13:37 +0200
-Message-ID: <20240706101337.854474-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1720261867; c=relaxed/simple;
+	bh=whsptQZF/BtFJXLQIkT+DRFFTp9wScZLxTuuHa4S1Dc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZUTqq1yGel4U8OQRFQRcU4bk1a9y1eAkYwxLP5CvcJ0+K+wXvMXCajELiIysg5pX5euiEJpkmwl20Gwmal+3inTKLZuKvnlPyB+Ygm7enC1mNNclRVpI8e6J1EPbJ0j/AgcsfIlm74ROJj/qXOyz/2U00vX79pDn1var0tzAiSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.2])
+	by gateway (Coremail) with SMTP id _____8Bx3+veHIlm144BAA--.4722S3;
+	Sat, 06 Jul 2024 18:30:54 +0800 (CST)
+Received: from [192.168.100.8] (unknown [223.64.68.2])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxXcfdHIlm9kE9AA--.10840S3;
+	Sat, 06 Jul 2024 18:30:53 +0800 (CST)
+Message-ID: <2b819d91-8c2a-4262-9cbb-c10e520f10c9@loongson.cn>
+Date: Sat, 6 Jul 2024 18:30:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gg492lsOmKd5XrvljZT0KKFMQnKwwKmB0Yvup+05QLZiWdztdv3
- L92Mfjzad/z005Y30F/2sI7PLNSQbWui2NLDcIkEZxeCb0hJRXZcAK7HYAgyWHpOlrR3oo+
- ClskxQXxL7H8FJXc6IC4U/D/dwqN+3N+DbGcQmz+m6D4dVvTT8kTZT+9iw+f/vy9MD0/2E6
- SJ2a39f7ftUxkdFXnZWhg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:JEDy5pP0dzI=;Yh6JcwdE4nwR8e84VpykaNYa2La
- dEp6ZVtG19TcJ9kcIURLX+eaTDwFFyqm+7SZC1gY2g+DAQ1uUXeQko5s4JAqNxTmOyZYRalkq
- kny4CUPwuQPwb2gqBK5h/39BvsBByOYq51jf+uwTDRMA2ylFbtox3t4MiA7qokMdwDtcxG0Bm
- 4IRBULY0YhqPrBkQm7/FUzPhc+fesAQfDz0vqnh4WUlHjVQGfH2L11ehquqaJhzFejMJkc+Av
- XR5Gcrqcdf1TjbjhzBgCrthglr7NjnqcWzdW47jFVlcmA5KYGAeDeGBuPzmPo7Ft7gfEUYivd
- kdWWYbcGIPbKXZkfVU49jFB9Yt/id6PKO94Uu0oPjSOAC6nCpa34ahlpTpO21lZN3gW9RJeC+
- hyq0zb65f3UFnBd5OiGG/MDu0ibnvuVUfWTEs0+fEx5VC2MMu/1PieB6Tebveifu8y6QUGp06
- 7T8XMuR6BHtdgXpqQJENPVqWmi2qce39rhRbsZ6fMIyFcS14l043DiYSDJ8qVCqpphvVEpSXf
- HugImCItPHTAOcSqg4Yk83pH+LZUZd1rf4/CzMxInWglxRYUDIP4d55MlBuVVl0F7YsD24YEq
- Bxm2sT7cIsHsN3mH7UI1r3CzgCD6iJL/l8z+xAaCK6bsbLq1NWh5O2lV6WflTy5yrQkhHFkNb
- aD3mGPi/TDSkoBX4JkrLelJ413R1zNGHQ/M9U2FRShKB6wEsRwfjXKVseZHfz0GguT1KlWtdj
- uNh7xgKRCNiDdd5MQrdvdUTibAZSpEV6XQPKFXZGBMe3aJJswE3HemGnoqQn5vItG0j4pPU0Q
- QJg7NLQ8sfyTYKlHZdOGVvpS5yYXou39jHFu4TUpKkDPY=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 14/15] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Huacai Chen <chenhuacai@kernel.org>, andrew@lunn.ch,
+ hkallweit1@gmail.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, Jose.Abreu@synopsys.com, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+ si.yanteng@linux.dev
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <16ec5a0665bcce96757be140019d81b0fe5f6303.1716973237.git.siyanteng@loongson.cn>
+ <ktvlui43g6q7ju3tmga7ut3rg2hkhnbxwfbjzr46jx4kjbubwk@l4gqqvhih5ug>
+ <CAAhV-H4JEec7CuNDaQX3AUT=9itcTRgRtWa61XACrYEvvLfd8g@mail.gmail.com>
+ <yz2pb6h7dkbz3egpilkadcmqfnejtpphtlgypc2ppwhzhv23vv@d3ipubmg36xt>
+ <8652851c-a407-4e20-b3f3-11a8a797debf@loongson.cn>
+ <kgysya6lhczbqiq4al6f5tgppmjuzamucbaitl4ho5cdekjsan@6qxlyr6j66yd>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <kgysya6lhczbqiq4al6f5tgppmjuzamucbaitl4ho5cdekjsan@6qxlyr6j66yd>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxXcfdHIlm9kE9AA--.10840S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7ur4fXF43WF1UJw1rJFWrJFc_yoW8Xry5pr
+	yjqFWDKws7CF4fK34vyr4YgryFqw1Sqr4UZF15Wr18GFZF934Ikryvkr4rCFyjvr1DJ3W2
+	vFyFga9xCFy5JFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
 
-When SMP is enabled and spinlocks are actually functional then there is
-a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
-and ks8851_irq:
+在 2024/7/5 20:17, Serge Semin 写道:
+> On Fri, Jul 05, 2024 at 08:06:32PM +0800, Yanteng Si wrote:
+>>>>> But if you aren't comfortable with such naming we can change the
+>>>>> macro to something like:
+>>>>> #define DWMAC_CORE_LOONGSON_MULTI_CH    0x10
+>>>> Maybe DWMAC_CORE_LOONGSON_MULTICHAN or DWMAC_CORE_LOONGSON_MULTI_CHAN
+>>>> is a little better?
+>>>>
+>>> Well, I don't have a strong opinion about that in this case.
+>>> Personally I prefer to have the shortest and still readable version.
+>>> It decreases the probability of the lines splitting in case of the
+>>> long-line statements or highly indented code. From that perspective
+>>> something like DWMAC_CORE_LS_MULTI_CH would be even better. But seeing
+>>> the driver currently don't have such cases, we can use any of those
+>>> name. But it's better to be of such length so the code lines the name
+>>> is utilized in wouldn't exceed +80 chars.
+>> Okay.
+>>
+>> I added an indent before 0xXX and left three Spaces before the comment,
+>>
+>> which uses huacai's MULTICHAN and doesn't exceed 80 chars.
+> I meant that it's better to have the length of the macro name so
+> !the code where it's utilized!
+> wouldn't exceed +80 chars. That's the criteria for the upper length
+> boundary I normally follow in such cases.
+>
+Oh, I see!
 
-    watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
-    call trace:
-      queued_spin_lock_slowpath+0x100/0x284
-      do_raw_spin_lock+0x34/0x44
-      ks8851_start_xmit_spi+0x30/0xb8
-      ks8851_start_xmit+0x14/0x20
-      netdev_start_xmit+0x40/0x6c
-      dev_hard_start_xmit+0x6c/0xbc
-      sch_direct_xmit+0xa4/0x22c
-      __qdisc_run+0x138/0x3fc
-      qdisc_run+0x24/0x3c
-      net_tx_action+0xf8/0x130
-      handle_softirqs+0x1ac/0x1f0
-      __do_softirq+0x14/0x20
-      ____do_softirq+0x10/0x1c
-      call_on_irq_stack+0x3c/0x58
-      do_softirq_own_stack+0x1c/0x28
-      __irq_exit_rcu+0x54/0x9c
-      irq_exit_rcu+0x10/0x1c
-      el1_interrupt+0x38/0x50
-      el1h_64_irq_handler+0x18/0x24
-      el1h_64_irq+0x64/0x68
-      __netif_schedule+0x6c/0x80
-      netif_tx_wake_queue+0x38/0x48
-      ks8851_irq+0xb8/0x2c8
-      irq_thread_fn+0x2c/0x74
-      irq_thread+0x10c/0x1b0
-      kthread+0xc8/0xd8
-      ret_from_fork+0x10/0x20
+Hmm, let's compare the two options:
 
-This issue has not been identified earlier because tests were done on
-a device with SMP disabled and so spinlocks were actually NOPs.
+DWMAC_CORE_LS_MULTI_CH
 
-Now use spin_(un)lock_bh for TX queue related locking to avoid execution
-of softirq work synchronously that would lead to a deadlock.
+DWMAC_CORE_LS_MULTICHAN
 
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overru=
-n")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
-V2: - use spin_lock_bh instead of moving netif_wake_queue outside of
-      locked region (doing the same in the start_xmit function)
-    - add missing net: tag
+With just one more char, the increased readability seems to be
+worth it.
 
-V3: - spin_lock_bh(ks->statelock) always except in xmit which is in BH
-      already
 
- drivers/net/ethernet/micrel/ks8851_common.c | 8 ++++----
- drivers/net/ethernet/micrel/ks8851_spi.c    | 4 ++--
- 2 files changed, 6 insertions(+), 6 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/eth=
-ernet/micrel/ks8851_common.c
-index 6453c92f0fa7..13462811eaae 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -352,11 +352,11 @@ static irqreturn_t ks8851_irq(int irq, void *_ks)
- 		netif_dbg(ks, intr, ks->netdev,
- 			  "%s: txspace %d\n", __func__, tx_space);
-
--		spin_lock(&ks->statelock);
-+		spin_lock_bh(&ks->statelock);
- 		ks->tx_space =3D tx_space;
- 		if (netif_queue_stopped(ks->netdev))
- 			netif_wake_queue(ks->netdev);
--		spin_unlock(&ks->statelock);
-+		spin_unlock_bh(&ks->statelock);
- 	}
-
- 	if (status & IRQ_SPIBEI) {
-@@ -635,14 +635,14 @@ static void ks8851_set_rx_mode(struct net_device *de=
-v)
-
- 	/* schedule work to do the actual set of the data if needed */
-
--	spin_lock(&ks->statelock);
-+	spin_lock_bh(&ks->statelock);
-
- 	if (memcmp(&rxctrl, &ks->rxctrl, sizeof(rxctrl)) !=3D 0) {
- 		memcpy(&ks->rxctrl, &rxctrl, sizeof(ks->rxctrl));
- 		schedule_work(&ks->rxctrl_work);
- 	}
-
--	spin_unlock(&ks->statelock);
-+	spin_unlock_bh(&ks->statelock);
- }
-
- static int ks8851_set_mac_address(struct net_device *dev, void *addr)
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethern=
-et/micrel/ks8851_spi.c
-index 670c1de966db..3062cc0f9199 100644
-=2D-- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -340,10 +340,10 @@ static void ks8851_tx_work(struct work_struct *work)
-
- 	tx_space =3D ks8851_rdreg16_spi(ks, KS_TXMIR);
-
--	spin_lock(&ks->statelock);
-+	spin_lock_bh(&ks->statelock);
- 	ks->queued_len -=3D dequeued_len;
- 	ks->tx_space =3D tx_space;
--	spin_unlock(&ks->statelock);
-+	spin_unlock_bh(&ks->statelock);
-
- 	ks8851_unlock_spi(ks, &flags);
- }
-=2D-
-2.45.2
+Yanteng
 
 
