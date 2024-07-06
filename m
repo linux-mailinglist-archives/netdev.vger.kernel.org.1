@@ -1,87 +1,96 @@
-Return-Path: <netdev+bounces-109585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC72A928FC6
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:39:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FA2928FCA
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BD761F21E4A
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 174641F2227C
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF09A3D;
-	Sat,  6 Jul 2024 00:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341995223;
+	Sat,  6 Jul 2024 00:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="et3Qls7j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZQQe80n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F7F4C6D;
-	Sat,  6 Jul 2024 00:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6653D68
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720226373; cv=none; b=HDUExufpANwmMuD9M1yjQlidgc9go5jvCETjcenEoc+hrnB9n49CY+7MlhUKUO4Dg2IKo94iiLj3CXWbc8fOvX0eke2EpdFCa+743uH/w2sDrKImu3CQ4MOpk0own/lA6/T0efgFYFTeBdcomsPu9KIRAbdK7TtJyjD3LRleyKk=
+	t=1720227032; cv=none; b=cdeADKbsT14dyGHwBhunJSQiWfpmPRV8rlUqts1Q4SPpWiOZ2sWszuYE3ES9Dn7D0sowN5xe6NmKDvFC4vY9iNW3yBTDVrCvMN48OGEwybay6F0jPSXRwrtbYrjiyx+o7RPApCroQbIrJCo6vnUJ54qQgbm6DqBf/wZfiN1P77A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720226373; c=relaxed/simple;
-	bh=CpHBOeXV3xmjPz2+jOCXA/1+Ba175UmTM9J9t7F7AJM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=avwzh02QaGwDVT5DFJ8nVel38nAPQS7OWH3lvapiI4JWCwRC12ouygdtjZ7yuGvmmlfdH4unX3MUpFAfI/O3wniTtSzKNHQuFlNZTsNMPT8EqR0CEBB1OhfxirnUqPMW9F7g5JHztvkQEjuVQbdObiAhzkzs6f+ta3e38LEZa3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=et3Qls7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA85BC116B1;
-	Sat,  6 Jul 2024 00:39:32 +0000 (UTC)
+	s=arc-20240116; t=1720227032; c=relaxed/simple;
+	bh=0YtTdPHUf0XABN1f88jDo0wJHwHI/jEC3QUnL2f9ObU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bh9TXY0uQyXOaoUlhvkHWJ6IWbZvohHrIRIaHUevFzSRwi5s+Ud+ZWQbvQ9gaJrxNSVeZUHPeXtJ3f9kfy/k5AReL3QS+kjNC6ktbe9gydEQ8c/Up0iBpghJiy1Nz0bNlfQR5n88r4iGuLchommR7ga0Ffuzmrob9B66U20menc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZQQe80n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F3A0C32781;
+	Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720226373;
-	bh=CpHBOeXV3xmjPz2+jOCXA/1+Ba175UmTM9J9t7F7AJM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=et3Qls7jz+778nihi/Hi5XUJVv26OZS4i50ioy+4ymVDvpwVj5DM2G3VbssDGusbO
-	 oI4tkCqjBskJUXTqDf/o90ks20S+om51GKISLlMeGay6jFGHxzI+tbBim+FemKOK4H
-	 5iVq57kQ++JHQdcIZkylS255aLcwLEnzqlFdbFSvETYmmknhnpdJqmGQ9t0XG1lraj
-	 21ZTJ2lT5Z6/GjTLI6TvgrBzCRRbRt7xN31YUyKFvmXq2XabgCFrGm4avMs9IRcUb4
-	 5lA/j/KWw+Jg8+0uqmKbRBKYJDY6EoPKyqW3UgbwKGCvu3YujEQNhK+k6pEMy9SB1h
-	 EPgoeIlpj0iaQ==
-Date: Fri, 5 Jul 2024 17:39:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: ks8851: Fix deadlock with the SPI chip variant
-Message-ID: <20240705173931.28e8b858@kernel.org>
-In-Reply-To: <20240704174756.1225995-1-rwahl@gmx.de>
-References: <20240704174756.1225995-1-rwahl@gmx.de>
+	s=k20201202; t=1720227031;
+	bh=0YtTdPHUf0XABN1f88jDo0wJHwHI/jEC3QUnL2f9ObU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JZQQe80nKucp7KNvAiOE9CoSuizz6dhDP/wTHMlsRI352ksPvfxiPKf4fZdVjJvnD
+	 Y5bVVg3hcYZQKxwS/0oJJ/mX2TTSRzA9bWJ5ViwD5AldMaqQ1MS1jqZ5ICFeW4ee4r
+	 qkXo3+EBUZaW3Zu4LAdFgqQ59v2vUODJ0BVSS5z8iUAKFMSRZzcupP7kTYVKlGPcJP
+	 juki52rh3QwHPuGHNvHzzPnUMR4+7MLQototQmbc8sBss5PU/uFvjEgBp6gdJKT9z+
+	 Cfo5jGME5wjiXTW7Gtm7Ip9XuCOvzVRZypg50rx1joc1Vnc2MhtRnvpaUka5dX9IcT
+	 w/3VKP+fdqZSA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1EA90C43332;
+	Sat,  6 Jul 2024 00:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/4] wireguard fixes for 6.10-rc7
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172022703112.32390.4312776541216490625.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jul 2024 00:50:31 +0000
+References: <20240704154517.1572127-1-Jason@zx2c4.com>
+In-Reply-To: <20240704154517.1572127-1-Jason@zx2c4.com>
+To: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
 
-On Thu,  4 Jul 2024 19:47:56 +0200 Ronald Wahl wrote:
-> --- a/drivers/net/ethernet/micrel/ks8851_spi.c
-> +++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-> @@ -385,7 +385,7 @@ static netdev_tx_t ks8851_start_xmit_spi(struct sk_buff *skb,
->  	netif_dbg(ks, tx_queued, ks->netdev,
->  		  "%s: skb %p, %d@%p\n", __func__, skb, skb->len, skb->data);
-> 
-> -	spin_lock(&ks->statelock);
-> +	spin_lock_bh(&ks->statelock);
-> 
->  	if (ks->queued_len + needed > ks->tx_space) {
->  		netif_stop_queue(dev);
-> @@ -395,7 +395,7 @@ static netdev_tx_t ks8851_start_xmit_spi(struct sk_buff *skb,
->  		skb_queue_tail(&ks->txq, skb);
->  	}
-> 
-> -	spin_unlock(&ks->statelock);
-> +	spin_unlock_bh(&ks->statelock);
+Hello:
 
-this one probably can stay as spin_lock() since networking stack only
-calls xmit in BH context. But I see 2 other spin_lock(statelock) in the
-driver which I'm not as sure about. Any taking of this lock has to be
-_bh() unless you're sure the caller is already in BH.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  4 Jul 2024 17:45:13 +0200 you wrote:
+> Hi Jakub,
+> 
+> These are four small fixes for WireGuard, which are all marked for
+> stable:
+> 
+> 1) A QEMU command line fix to remove deprecated flags.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/4] wireguard: selftests: use acpi=off instead of -no-acpi for recent QEMU
+    https://git.kernel.org/netdev/net/c/2cb489eb8dfc
+  - [net,2/4] wireguard: allowedips: avoid unaligned 64-bit memory accesses
+    https://git.kernel.org/netdev/net/c/948f991c62a4
+  - [net,3/4] wireguard: queueing: annotate intentional data race in cpu round robin
+    https://git.kernel.org/netdev/net/c/2fe3d6d2053c
+  - [net,4/4] wireguard: send: annotate intentional data race in checking empty queue
+    https://git.kernel.org/netdev/net/c/381a7d453fa2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
