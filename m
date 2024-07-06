@@ -1,106 +1,122 @@
-Return-Path: <netdev+bounces-109596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D07928FFD
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:50:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A441B929012
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 04:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B75CB223F0
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:50:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EC4D1F21D16
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037AD5672;
-	Sat,  6 Jul 2024 01:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/tkkBqq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FAAB67E;
+	Sat,  6 Jul 2024 02:28:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85EB211C;
-	Sat,  6 Jul 2024 01:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A71C8E1;
+	Sat,  6 Jul 2024 02:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720230632; cv=none; b=R5QGJRsn/5TlTy1LlxJ2FDBux2wFssf54o6omS0OfvMwdGMqgqtOMk/0/D3iMubZI6N3ZcwLe2kDa2yUjOZ4IbBPTfjvetcGNcCM9vqBLc1ihXoryjAoJP4W7/ug/2/5RbYusySMXDy2qN/1SMxmJZrCd4nHbvYBwqVTOTL1FvY=
+	t=1720232915; cv=none; b=l+oIXXM3kDreNfL8sqVprEQ5IlUw2w4u/Lm8IUVtj4WNqO8yPooe4pm2iSna9ybjm/rxZxFskXvj8MXYB7vNFZzxvZDSOdN3UkIoVC0/DevwKhJZj8Ecb92+xnFNwNzSIHsexxnnILiWwhXBaBlk3ayD68gVXWzoRSduRGZojw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720230632; c=relaxed/simple;
-	bh=1Uynl4Wyo6bxPwItWLnZ1wF42xTY5ATumBq6UCjr0yA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dEBD/BwhQ8XjHF+1dSJG1YcVYVy5ssyw+HeXD2HT3/4Tk9ZPJzI8HDLYlvku/3wtrX2pO64GHCuBGu0jEVwxnKUAT3Xyxeafu4gupOpxnnGIuwcwENO7pbNEjq24vUPj4v4Y/XNrggMlTSp7S6R8svefL+OBKPWqqh3Dkbfq7oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/tkkBqq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3359EC32781;
-	Sat,  6 Jul 2024 01:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720230631;
-	bh=1Uynl4Wyo6bxPwItWLnZ1wF42xTY5ATumBq6UCjr0yA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K/tkkBqqgq5jNmwH4sFntT2G/1ztM8IX1gX1qVpqqQ1KGYeqUK3CmMQDPIPjuuK5Y
-	 A+dPSsV45NzsSXq1V1SNHQZUoDmd+pCK9rLQ9nrxKLHwAnJKDXdS/tOyoEPKhS6/v0
-	 R7QgUDE3yAHnR9egFZ90hAgfMrpQin5B2Cy5y9q7SkMRwwZQy2CPDneeUJ/pR0P5vR
-	 4eQEjPIRCuWXCECv4zuaIFQCOjxO0omkg/u7o7MEnHwy4ojuvDTYs+MlwQ7gVVJ9Hr
-	 nLy2lugrPOAa+moqTFfUAgLBDCG68VReHOInoP88vS9J0EMhmDbWPJ49nlV4KRP50U
-	 t9aO1K0igbCHg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 209D9C43446;
-	Sat,  6 Jul 2024 01:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720232915; c=relaxed/simple;
+	bh=RT2skHsMbcoRSdfhjBhyS6aEvIIMn0BUIIP/ogu396Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bxxRNNf66newyUHFEaBW9dmOKPDdhXVkmbChxE4pm6TWEQiRPmiwSL/CQih/obogQfll/sELT2mvMPc6IuYJMTIjQ8Gzk49SVZ1Q4+h0xn89RMpJLfHvBypDuJnhHV+S92CFArOtOTUnvnTpJZU8X3wc3bGJWG8Jqh2yt7cYr24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WGDhv3nmQzxTcV;
+	Sat,  6 Jul 2024 10:23:59 +0800 (CST)
+Received: from kwepemf100007.china.huawei.com (unknown [7.202.181.221])
+	by mail.maildlp.com (Postfix) with ESMTPS id EA93B180AA6;
+	Sat,  6 Jul 2024 10:28:29 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemf100007.china.huawei.com (7.202.181.221) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 6 Jul 2024 10:28:29 +0800
+Message-ID: <885c2504-8f32-4936-ac6e-24fbfd07e43d@huawei.com>
+Date: Sat, 6 Jul 2024 10:28:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v6 1/3] riscv, bpf: Add 12-argument support for
+ RV64 bpf trampoline
+Content-Language: en-US
+To: Puranjay Mohan <puranjay@kernel.org>, Pu Lehui <pulehui@huaweicloud.com>,
+	<bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<netdev@vger.kernel.org>
+CC: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+	<palmer@dabbelt.com>
+References: <20240702121944.1091530-1-pulehui@huaweicloud.com>
+ <20240702121944.1091530-2-pulehui@huaweicloud.com>
+ <mb61p7ce0roh3.fsf@kernel.org>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <mb61p7ce0roh3.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/7] net: pse-pd: Add new PSE c33 features
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172023063113.28145.15061182082357066469.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jul 2024 01:50:31 +0000
-References: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
-In-Reply-To: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, o.rempel@pengutronix.de,
- corbet@lwn.net, thomas.petazzoni@bootlin.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, dentproject@linuxfoundation.org,
- kernel@pengutronix.de, linux-doc@vger.kernel.org, saikrishnag@marvell.com
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemf100007.china.huawei.com (7.202.181.221)
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 04 Jul 2024 10:11:55 +0200 you wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 2024/7/5 20:51, Puranjay Mohan wrote:
+> Pu Lehui <pulehui@huaweicloud.com> writes:
 > 
-> This patch series adds new c33 features to the PSE API.
-> - Expand the PSE PI informations status with power, class and failure
->   reason
-> - Add the possibility to get and set the PSE PIs power limit
+>> From: Pu Lehui <pulehui@huawei.com>
+>>
+>> This patch adds 12 function arguments support for riscv64 bpf
+>> trampoline. The current bpf trampoline supports <= sizeof(u64) bytes
+>> scalar arguments [0] and <= 16 bytes struct arguments [1]. Therefore, we
+>> focus on the situation where scalars are at most XLEN bits and
+>> aggregates whose total size does not exceed 2×XLEN bits in the riscv
+>> calling convention [2].
+[SNIP]
+>> @@ -854,7 +875,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
+>>   		retval_off = stack_size;
+>>   	}
+>>   
+>> -	stack_size += nregs * 8;
+>> +	stack_size += nr_arg_slots * 8;
+>>   	args_off = stack_size;
+>>   
+>>   	stack_size += 8;
+>> @@ -871,8 +892,14 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
+>>   	stack_size += 8;
+>>   	sreg_off = stack_size;
+>>   
+>> +	if (nr_arg_slots - RV_MAX_REG_ARGS > 0)
+>> +		stack_size += (nr_arg_slots - RV_MAX_REG_ARGS) * 8;
 > 
-> [...]
+> Hi Pu,
+> Although this is merged now, while working on this for arm64 I realised
+> that the above doesn't check for BPF_TRAMP_F_CALL_ORIG and can waste
+> some stack space, we should change this to:
+> 
+> if ((flags & BPF_TRAMP_F_CALL_ORIG) && (nr_arg_slots - RV_MAX_REG_ARGS > 0))
+>          stack_size += (nr_arg_slots - RV_MAX_REG_ARGS) * 8;
+> 
+> It will save some stack space when BPF_TRAMP_F_CALL_ORIG is not set?
 
-Here is the summary with links:
-  - [net-next,v6,1/7] net: ethtool: pse-pd: Expand C33 PSE status with class, power and extended state
-    https://git.kernel.org/netdev/net-next/c/e46296002113
-  - [net-next,v6,2/7] netlink: specs: Expand the PSE netlink command with C33 new features
-    https://git.kernel.org/netdev/net-next/c/c8149739af86
-  - [net-next,v6,3/7] net: pse-pd: pd692x0: Expand ethtool status message
-    https://git.kernel.org/netdev/net-next/c/ae37dc574259
-  - [net-next,v6,4/7] net: pse-pd: Add new power limit get and set c33 features
-    https://git.kernel.org/netdev/net-next/c/4a83abcef5f4
-  - [net-next,v6,5/7] net: ethtool: Add new power limit get and set features
-    https://git.kernel.org/netdev/net-next/c/30d7b6727724
-  - [net-next,v6,6/7] netlink: specs: Expand the PSE netlink command with C33 pw-limit attributes
-    https://git.kernel.org/netdev/net-next/c/dac3de193095
-  - [net-next,v6,7/7] net: pse-pd: pd692x0: Enhance with new current limit and voltage read callbacks
-    https://git.kernel.org/netdev/net-next/c/a87e699c9d33
+Nice catch. It will be better. Feel free to patch it. Thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> 
+> I can send a patch if you think this is worth fixing.
+> 
+> 
+> Thanks,
+> Puranjay
 
