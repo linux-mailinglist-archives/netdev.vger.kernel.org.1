@@ -1,228 +1,152 @@
-Return-Path: <netdev+bounces-109625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784479293AC
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 14:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E289293AF
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 007881F21B7E
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 12:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3882F1C20EF8
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 13:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58DD574070;
-	Sat,  6 Jul 2024 12:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803DD757EA;
+	Sat,  6 Jul 2024 13:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JL1PmJgB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yw7DzEWC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3584D8BD;
-	Sat,  6 Jul 2024 12:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B244F4C79;
+	Sat,  6 Jul 2024 13:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720270689; cv=none; b=hSOwUyiKV/AR2FXOY1ZN7DEFcDn/zHsOKqD8MVucVcdLwlWXNVSBaL1HUvQoEPZu9sDKeq9HFiaLFxIVaxn/oULxn4waee1FVo+Ajs5rmFjt2C65dD36MZx+4/0LR86cBcGkkZWjq2Lf8191nAdLd8kKMbM/4E/kztGmwYIZZWU=
+	t=1720271217; cv=none; b=Wb5nuu4aSH4AAHCdfO82nX++4vyU5jleYrr+uAx9g+At80slYbuWmMth32E7bVCDxOurB58S8t3cGYpR71/RTECN4e56lrcgFYOh8RCm08ME8SFmcFSi0kiN1ZdIwRAfGJrNGUKj9QLkPnes/Ka6XCOJwv8SZ00BR/IkryMk8zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720270689; c=relaxed/simple;
-	bh=4i+n6jLTfRQb5qAWWBPB966ZtbRLERn012w742IXk4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y6cf7l6dj5e2T6l1qVnnFa/VJCd8ZGpirmGxWLpqzB7Aw2+WxWC95b7mevrM1WvrWCM3qK9a8hLmHjjl/FkqzLZOzDtIZruWr1kn9BS7b96As9Or9FqjOL2EJhr6F2OpxzUfSZ6XgGxSp4CE0sBRdET+oqqukLlIE9ftK7L3yGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JL1PmJgB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B385C3277B;
-	Sat,  6 Jul 2024 12:58:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720270688;
-	bh=4i+n6jLTfRQb5qAWWBPB966ZtbRLERn012w742IXk4Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JL1PmJgBQEE+L1HdW7mi2M0tjGNixcBcuePxq+x3oZLpJfaGQMfoIJO2Q83eBpYzr
-	 KPgSohB7RUP5i4ejkTHwddzZdV9jW9Uq6CP7k6+bTVGKi7407HBJ2sLX8VX519Mr60
-	 zO8vRBYBv0byZjPb4s3RRltqAZa6/o9k5glB9BkBdhCRTlCzGwORKB1seUqfUoArBC
-	 dzkE5GjbCHdnh8uhFU8SL6dWqL0G1rrGJwFpT3Xek8tuAERNsZ2kT8j9CYtUCXFoFb
-	 jXP6icGtm/S89mpvAIzLbH7FsGtriEbv7+T6uCClkJ99lCw75I61xLgywpJl+HdQk4
-	 9x4A1FEjohzdA==
-Date: Sat, 6 Jul 2024 14:58:04 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com, andrew@lunn.ch, arnd@arndb.de
-Subject: Re: [PATCH v5 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <Zok_XOR7lVtfdhjc@lore-desk>
-References: <cover.1720079772.git.lorenzo@kernel.org>
- <18e837f0f9377b68302d42ec9174473046a4a30a.1720079772.git.lorenzo@kernel.org>
- <20240705190644.GB1480790@kernel.org>
- <Zoj_1JWfd_3Yu71t@lore-desk>
- <20240706122754.GD1481495@kernel.org>
+	s=arc-20240116; t=1720271217; c=relaxed/simple;
+	bh=ITG/Z8kP1Mn7kjCQSGQLhNgA6BBoYTJl6W2jhxfXJjU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GD9ngv3xNWE4dODLLmlQqvP0jUq9CsGc+DZDn3nenOB0gFj8Kt0TObHX0vk08WEVrhZDJkr/8Uc6tFG2F2fdZ2g/F5/6l3zuB/UFpu//VOyvHmYVVDeqa4I7eZDVxCp85fikYWRjtd4jmAONNusyfSUkoeWfYhgU81xOj3MKkYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yw7DzEWC; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79efb877760so60368185a.3;
+        Sat, 06 Jul 2024 06:06:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720271214; x=1720876014; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qSCQj2degSTK+qsPzw81NmlVV+zzbYgqLm9ceOV5bfw=;
+        b=Yw7DzEWCsvieUYDZsuAybpw/9muDz8QSnu3oQjq2MfiqN7Izw0+sk/xQRguSStBh9e
+         LsOovN2V4onC+5P94sMkDfmr/UYVE/w4exx4IM4alvvqDvp7k+0GLbbrI4sBrmg2nkqr
+         diGQuvE79yGSI2ANwQaUSOPrCFDXuVlLWED9KxcWXM+pS4wzJSisIWMzcFC3W1wARWhp
+         PPtSV9X3oRT2sSHsAsTtTKFF6GUp8irHPJO79b8MLMQrmQ/AsmQaqGe4Mbeb8H4wpE92
+         bcd2KeG2Y9G6jAU4/WfSOHc4kQvs+pUo7WFKg6BQ2aoqTuOahH45ghJwFJunf4BqCH1p
+         es9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720271214; x=1720876014;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qSCQj2degSTK+qsPzw81NmlVV+zzbYgqLm9ceOV5bfw=;
+        b=c0L9hQLKa6AnNFsWkzT7xzpORoKSlPT0LAfRxUXATNzuLEaRuxrdTlClzjGsE8MI/E
+         wsaFFwIDyIIv1Oiqifmc2UTdd2EDDrxKcIS4+ZbJTYPJHTMzUzsItSi0Ly9HfOdHlF9Y
+         e9odS82IkHNTjBl03NDS9ha9kqr7nv3KO9Vno35SSq1oeWlELcJB9tSBgYJ4X7DcvU4Q
+         8GcgbolzOEdVnC0rlvQZbBv3pXZnVDEYyrfVctP8V0Aom1LmJmBlnMXIhYVRZftFH7Zv
+         coPCmcDDn1HcSRhL6gAFe/rk7hQWEoalyblxaaAktGNWz8TdUVDoiR41OiN6o4sD958F
+         6tUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPdneqsI9GHRP2m0hCdphHU08mRTS5oGevjWkL/4w7aQyrxNaZhyf9k6vmFZ/Wx3Ju7eoRZR+yC+cSbKALpCVDM45e6HN/eqynqBrd
+X-Gm-Message-State: AOJu0Ywkiew7kmIBMOts0SCVLPKhQ0CuaC6zONVZ8CWDQzFZLEhR5o4q
+	yVgwpR9GdNpLmrAtpBxYoOfC8dkCvLzJ5Ef2Pkd0Eo55YaSiS66+
+X-Google-Smtp-Source: AGHT+IGIy7gqfCWqSXog2cFahn8QlkKDRIFTZEVOoyXeRoinbhclTmAuGAEy3AAyjKl3kxF2rloeZg==
+X-Received: by 2002:ad4:4ea9:0:b0:6b5:dc3e:fcb5 with SMTP id 6a1803df08f44-6b5ecf8d18amr80474256d6.2.1720271214348;
+        Sat, 06 Jul 2024 06:06:54 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b609925635sm42726d6.33.2024.07.06.06.06.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jul 2024 06:06:53 -0700 (PDT)
+Date: Sat, 06 Jul 2024 09:06:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: echken <chengcheng.luo@smartx.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ echken <chengcheng.luo@smartx.com>
+Message-ID: <6689416d489e3_12869e29438@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240705032048.110896-1-chengcheng.luo@smartx.com>
+References: <20240705032048.110896-1-chengcheng.luo@smartx.com>
+Subject: Re: [PATCH] Support for segment offloading on software interfaces for
+ packets from virtual machine guests without the SKB_GSO_UDP_L4 flag.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="27jVVEXjJPrb9d+/"
-Content-Disposition: inline
-In-Reply-To: <20240706122754.GD1481495@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+echken wrote:
+> When running virtual machines on a host, and the guest uses a kernel
+> version below v6.2 (without commit https://
+> github.com/torvalds/linux/commit/860b7f27b8f78564ca5a2f607e0820b2d352a562),
+
+Prefer format commit 860b7f27b8f7 ("linux/virtio_net.h: Support USO
+offload in vnet header.")
+
+>  the UDP packets emitted from the guest do not include the SKB_GSO_UDP_L4
+> flag in their skb gso_type. Therefore, UDP packets from such guests always
+> bypass the __udp_gso_segment during the udp4_ufo_fragment process and go
+> directly to software segmentation prematurely.
+
+GSO packets should have either SKB_GSO_UDP_L4 (UDP segmentation) or
+SKB_GSO_UDP (UDP fragmentation). Not both. Note that UFO is also long
+deprecated and discouraged.
+
+> When the guest sends UDP
+> packets significantly larger than the MSS, and there are software
+> interfaces in the data path, such as Geneve, this can lead to substantial
+> additional performance overhead.
+> 
+> Signed-off-by: echken <chengcheng.luo@smartx.com>
+> ---
+>  net/ipv4/udp_offload.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> index 59448a2dbf2c..6aa5a97d8bde 100644
+> --- a/net/ipv4/udp_offload.c
+> +++ b/net/ipv4/udp_offload.c
+> @@ -402,6 +402,13 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
+>  	if (unlikely(skb->len <= mss))
+>  		goto out;
+>  
+> +	if (skb_gso_ok(skb, features | NETIF_F_GSO_ROBUST)) {
+> +		/* Packet is from an untrusted source, reset gso_segs. */
+> +		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(skb->len - sizeof(*uh),
+> +							 mss);
+> +		return NULL;
+> +	}
+> +
+
+So what this really does is bypass software fragmentation in virtual
+devices that advertise SKB_GSO_UDP.
+
+That's fine, I suppose. But is not what the commit message currently
+says.
+
+>  	/* Do software UFO. Complete and fill in the UDP checksum as
+>  	 * HW cannot do checksum of UDP packets sent as multiple
+>  	 * IP fragments.
+> -- 
+> 2.34.1
+> 
 
 
---27jVVEXjJPrb9d+/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> On Sat, Jul 06, 2024 at 10:27:00AM +0200, Lorenzo Bianconi wrote:
-> > > On Thu, Jul 04, 2024 at 10:08:11AM +0200, Lorenzo Bianconi wrote:
-> > > > Add airoha_eth driver in order to introduce ethernet support for
-> > > > Airoha EN7581 SoC available on EN7581 development board (en7581-evb=
-).
-> > > > en7581-evb networking architecture is composed by airoha_eth as mac
-> > > > controller (cpu port) and a mt7530 dsa based switch.
-> > > > EN7581 mac controller is mainly composed by Frame Engine (FE) and
-> > > > QoS-DMA (QDMA) modules. FE is used for traffic offloading (just bas=
-ic
-> > > > functionalities are supported now) while QDMA is used for DMA opera=
-tion
-> > > > and QOS functionalities between mac layer and the dsa switch (hw Qo=
-S is
-> > > > not available yet and it will be added in the future).
-> > > > Currently only hw lan features are available, hw wan will be added =
-with
-> > > > subsequent patches.
-> > > >=20
-> > > > Tested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > >=20
-> > > ...
-> > >=20
-> > > > +static const char * const airoha_ethtool_stats_name[] =3D {
-> > > > +	"tx_eth_pkt_cnt",
-> > > > +	"tx_eth_byte_cnt",
-> > > > +	"tx_ok_pkt_cnt",
-> > > > +	"tx_ok_byte_cnt",
-> > > > +	"tx_eth_drop_cnt",
-> > > > +	"tx_eth_bc_cnt",
-> > > > +	"tx_eth_mc_cnt",
-> > > > +	"tx_eth_lt64_cnt",
-> > > > +	"tx_eth_eq64_cnt",
-> > > > +	"tx_eth_65_127_cnt",
-> > > > +	"tx_eth_128_255_cnt",
-> > > > +	"tx_eth_256_511_cnt",
-> > > > +	"tx_eth_512_1023_cnt",
-> > > > +	"tx_eth_1024_1518_cnt",
-> > > > +	"tx_eth_gt1518_cnt",
-> > > > +	"rx_eth_pkt_cnt",
-> > > > +	"rx_eth_byte_cnt",
-> > > > +	"rx_ok_pkt_cnt",
-> > > > +	"rx_ok_byte_cnt",
-> > > > +	"rx_eth_drop_cnt",
-> > > > +	"rx_eth_bc_cnt",
-> > > > +	"rx_eth_mc_cnt",
-> > > > +	"rx_eth_crc_drop_cnt",
-> > > > +	"rx_eth_frag_cnt",
-> > > > +	"rx_eth_jabber_cnt",
-> > > > +	"rx_eth_lt64_cnt",
-> > > > +	"rx_eth_eq64_cnt",
-> > > > +	"rx_eth_65_127_cnt",
-> > > > +	"rx_eth_128_255_cnt",
-> > > > +	"rx_eth_256_511_cnt",
-> > > > +	"rx_eth_512_1023_cnt",
-> > > > +	"rx_eth_1024_1518_cnt",
-> > > > +	"rx_eth_gt1518_cnt",
-> > > > +};
-> > >=20
-> > > Hi Lorenzo,
-> > >=20
-> > > Sorry for not noticing this earlier.
-> >=20
-> > Hi Simon,
-> >=20
-> > no worries :)
-> >=20
-> > > It seems to me that some of the stats above could
-> > > use standard stats, which is preferred.
-> >=20
-> > Please correct me if I am wrong but it seems quite a common approach to=
- have
-> > same stats in both .ndo_get_stats64() and .get_ethtool_stats():
-> > - https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/me=
-diatek/mtk_eth_soc.c#L212
-> > - https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/ma=
-rvell/mvneta.c#L435
-> > - https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/in=
-tel/i40e/i40e_ethtool.c#L243
-> > - https://github.com/torvalds/linux/blob/master/net/mac80211/ethtool.c#=
-L52
-> > - ...
-> >=20
-> > Do you mean I should just report common stats (e.g. tx_packets or tx_by=
-tes) in
-> > .ndo_get_stats64()? Or it is fine to just add .ndo_get_stats64() callba=
-ck (not
-> > supported at the moment)?
->=20
-> The first option: It is my understanding that it preferred to only
-> report common stats via ndo_get_stats64.
->=20
->   "Please limit stats you report in ethtool -S to just the stats for which
->    proper interfaces don't exist. Don't duplicate what's already reported
->    via rtase_get_stats64(), also take a look at what can be reported via
->    various *_stats members of struct ethtool_ops."
->=20
->    - Re: [PATCH net-next v18 10/13] rtase: Implement ethtool function
->      by Jakub Kicinski
->      https://lore.kernel.org/netdev/20240509204047.149e226e@kernel.org/
-
-ack, thx for the clarification. I will move common stats in ndo_get_stats64=
-()
-in v6.
-
-Regards,
-Lorenzo
-
->=20
-> > > Basically, my understanding is that one should:
-> > > 1. Implement .ndo_get_stats64
-> > >    (that seems relevant here)
-> > > 2. As appropriate implement ethtool_stats non-extended stats operatio=
-ns
-> > >    (perhaps not relevant here)
-> >=20
-> > Can you please provide me a pointer for it?
->=20
-> Sorry, that was not at all clear.
-> I meant, as per the quote above, *_stats members of struct ethtool_ops,
-> other than those that implement extended ops.
-> e.g. get_rmon_stats.
->=20
-> >=20
-> > Regards,
-> > Lorenzo
-> >=20
-> > > 3. Then implement get_ethtool_stats for what is left over
-> > >=20
-> > > ...
->=20
->=20
-
---27jVVEXjJPrb9d+/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZok/XAAKCRA6cBh0uS2t
-rJsvAQDWPekAHROreseCbMT+1YpFHd0F30QgDgH1589HPspJ1QEAhbBE4UYjpZkr
-oldsh7UQ+AykBLlnzqmMoEmvhnuvrA8=
-=KxMj
------END PGP SIGNATURE-----
-
---27jVVEXjJPrb9d+/--
 
