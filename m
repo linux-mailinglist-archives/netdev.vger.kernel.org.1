@@ -1,99 +1,82 @@
-Return-Path: <netdev+bounces-109579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D76928F9C
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:00:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7900E928F9F
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 02:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F7A5B247C7
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:00:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3D311C21C4B
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 00:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C62C256D;
-	Sat,  6 Jul 2024 00:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6428A50;
+	Sat,  6 Jul 2024 00:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTp+PwrW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZHS3ugT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11421A3D;
-	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4C3A2D;
+	Sat,  6 Jul 2024 00:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720224032; cv=none; b=fWI38JLBH8t3xTMmM5mgJ2kdBTTFT2Ye6mjZKZ+yJdttTsCd9sTQnD/n+F0UH1DRXvyK9MZbIG3emK3vljyRC9xq67uMq7npdNoOty7yqEj178wJbl1L1F4xZGkpWEf55jJmw/xk+JIfk1pMlGqnlmbkJ7Y6pIb/HdvJOjOh6dA=
+	t=1720224281; cv=none; b=oJhqL87/3/xfinFRx4m4aC5wZ2zrHKgxNIc0aaqDF6CqNAXYqkioIK9AbvXUijXXxbb8cdx0IcogW/bCCdwFCIYn8nNt6NQj9o+Exj6cKG7vWMLT5L58NB6AfJWM3I05xeQwVBJfTxb2qG5vAgH2PgEyogIoBHMPfUbwu4zBSys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720224032; c=relaxed/simple;
-	bh=WhMcksiqGoZDH0KM2bnh5KtXmtQWYKWu4lTqKhd6JHY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CHorjHnlU7T2cHAU+42DHYlQKxK1yh3EHO1++eGyMtR8ak4spqeoU5TriHxSCHMPkHVPwV51Ha2qhpVX/Ghpa75Kh3PIlbnmYpiv5MGMUH/gampE9Xelb8fZxsdJFQnH30wazN7bT+33Nk2SFqtrA03jlWODt7JhcGj/vaIYhpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTp+PwrW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 799C4C4AF0A;
-	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
+	s=arc-20240116; t=1720224281; c=relaxed/simple;
+	bh=IArMh7LBFAFgRILBSoSxBbLYgPD5itwwAMFiH8rLREM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PHT7Fn5UAQguWuVzeGKlGsyORfOqu0jvuXrjh6gQYUBIlhfBwdijDDnbMUCaCnnR4oAouOeby6HAR7L0lREAz/oXHVfoL5j1Bi+88LieUPbiWS3NMke/tX3NTVxlHUw1uwc2PgWwSiO51fCd1Qv6VPR2nizAKupXCq2oXbtkKzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZHS3ugT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1B7DC116B1;
+	Sat,  6 Jul 2024 00:04:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720224031;
-	bh=WhMcksiqGoZDH0KM2bnh5KtXmtQWYKWu4lTqKhd6JHY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iTp+PwrWdcFQ7z87SyPZ0O05b6n2/niJM5tt1ubEKT1f1iMrfb1hfcKk6bY8Akexu
-	 fqWaqNH15R3nAWgx+r19RyacXf8bBk2aEFKKCAmbakSsHsKkRIlLfTDpR+Qz/Qb2XC
-	 cs3QDye+1ZLKSqX+Sjh2wYgCIRkg4V42M3ds82KInjn1A1sPpHJW3e30Uxld8Qktrx
-	 /driQAndvMa52c+00dB3sANciDkoBkqyD35VaeKGOlKgzKAElkF9KgAKqsC30055lV
-	 Z90rcW287YEbTQLe4iCzGz3kusZWkNz2PJJdS2g16OpMTlCZuJltwDe+NkqInkKE+o
-	 QwAfzYK/GpAUw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 630C0C43446;
-	Sat,  6 Jul 2024 00:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720224281;
+	bh=IArMh7LBFAFgRILBSoSxBbLYgPD5itwwAMFiH8rLREM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PZHS3ugTPEhrdsx4ao8bYfhCGh58kXZEX5JQT1O27ohym7WVDSL9Sxf+E/WrNpwGI
+	 R7VboSuCOOtOyCo8PJ/wnphv0GSzskpYw2ZDH/DKJPtOJLFdtUia/Ava41IhfugUqH
+	 X3E4qQ4Z1pWZ1h0XkKiYfBWn5gKCKjE7pr0zWNIQHqQNjJN33h5rCXkXr3AxaYJ/3s
+	 MlF5ak7CbMZSJTkgxavdRRgAaKItaM/584bQ2tVp72zO0Ut969zMPQFg34uyovmGHE
+	 kjtNAd8FSHEXB8lyB70DSGCttezXnB0ly7WtWOcI620H4OcREtKtbiH63JiFs9DdAY
+	 QEAO2x050RIrg==
+Date: Fri, 5 Jul 2024 17:04:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v3 0/4] net: phy: aquantia: enable support for
+ aqr115c
+Message-ID: <20240705170440.22a39045@kernel.org>
+In-Reply-To: <20240703181132.28374-1-brgl@bgdev.pl>
+References: <20240703181132.28374-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethernet: mediatek: Allow gaps in MAC
- allocation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172022403140.7894.3886257470983936157.git-patchwork-notify@kernel.org>
-Date: Sat, 06 Jul 2024 00:00:31 +0000
-References: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org>
-In-Reply-To: <379ae584cea112db60f4ada79c7e5ba4f3364a64.1719862038.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, eladwf@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  3 Jul 2024 20:11:27 +0200 Bartosz Golaszewski wrote:
+> [PATCH net-next v3 0/4] net: phy: aquantia: enable support for aqr115c
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Doesn't seem to apply:
 
-On Mon, 1 Jul 2024 20:28:14 +0100 you wrote:
-> Some devices with MediaTek SoCs don't use the first but only the second
-> MAC in the chip. Especially with MT7981 which got a built-in 1GE PHY
-> connected to the second MAC this is quite common.
-> Make sure to reset and enable PSE also in those cases by skipping gaps
-> using 'continue' instead of aborting the loop using 'break'.
-> 
-> Fixes: dee4dd10c79a ("net: ethernet: mtk_eth_soc: ppe: add support for multiple PPEs")
-> Suggested-by: Elad Yifee <eladwf@gmail.com>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: ethernet: mediatek: Allow gaps in MAC allocation
-    https://git.kernel.org/netdev/net-next/c/3b2aef99221d
-
-You are awesome, thank you!
+Applying: net: phy: aquantia: rename and export aqr107_wait_reset_complete()
+error: patch failed: drivers/net/phy/aquantia/aquantia.h:201
+error: drivers/net/phy/aquantia/aquantia.h: patch does not apply
+Patch failed at 0001 net: phy: aquantia: rename and export aqr107_wait_reset_complete()
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config advice.mergeConflict false"
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
