@@ -1,136 +1,157 @@
-Return-Path: <netdev+bounces-109655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EE3929528
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 21:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 459919295C1
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 01:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53B771F21736
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 19:56:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6C671F21985
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 23:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF091208BA;
-	Sat,  6 Jul 2024 19:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD5A73440;
+	Sat,  6 Jul 2024 23:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="B/VAis8f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PUZW8vqv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A36208CB
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 19:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DAD2557A;
+	Sat,  6 Jul 2024 23:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720295781; cv=none; b=OWSKsGEPejq4AzBqDx0vfiHCr1rQ2m9Tx0sl8l7BdOf3hJPeTNUDvJQMZjzzx9hZw/EA1ohYN5mz9UZCqHMQPKDB/PkT3jtRRDspqwEBYn639KWs2eVXHRcS/TRUetDQk1OZyyIUER+ulFil1T8M/xS4NrlXEEH/BfPaFxVIoVQ=
+	t=1720307126; cv=none; b=ZqZZA4Mokx+CVTpSCkZtafkY2AMGSpO6sMToEvioMpcmM4dCbTkaVg0WjHNsB/8MkbFlRndF0N+D08jYmBw/IoT1dmTUmz4FonuPPabk0c41OGVjEdz16MDil43zinmtjGT7q3XW3IoVA+26vIGcdupzVAtWfCppR84Kw+d4DOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720295781; c=relaxed/simple;
-	bh=ABamVRk+WKBdPkS3Nr1R+yq9+y8SA7oZNui2ovWzqng=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HQnJVEtt8BZCdqnanZls+IOSRyhC44sgSLGLNUuy7U10KjyLDinCzvRUCqg8HSW2RcGg9bXID/ZxG6M98KDVYvVjlZ0pl5kfS4AS6qaJRtKexzKE/8Aug7R+cn1eQo/4wBRWHmV3kM2WL/80WTr0LhXkk6mvQm7rHALi9kGUVmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=B/VAis8f; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3d92bbadfd6so16748b6e.3
-        for <netdev@vger.kernel.org>; Sat, 06 Jul 2024 12:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720295779; x=1720900579; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pmKC/6dx3mlxXNLCeWHfcXH8XN1JAAa8PHgB5ApKUK4=;
-        b=B/VAis8ftiTwG4jATSGUR2qtCaLjP0Q+vLH4ox7KIPkV+9vo+USjnYVCeDd1C750A3
-         WLJwznZqRhmc12GlhqcFTbWTVBqLLfejzSx31AGQ5YHbNEmpZh/Q99cgivgYu/41Oj8h
-         EZIyKao/7vpPLInvhB1WBz2M8Yuz+6VuLMJX+/1n1eb95/ftYR078WEsEgipTz5mm9jE
-         NvbccT2o7UwhvysLtqRXgXMDztKXPzS/kUBu6129jWa642lrRx7NnhHOJ0D/OfUio5kY
-         87VDBTVvHTJPRO/tUu9wmX7M7s46ng5vPHYZXt7wBu5c9f2utZTcdQgVXVKIIH4jW3Gt
-         ONkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720295779; x=1720900579;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pmKC/6dx3mlxXNLCeWHfcXH8XN1JAAa8PHgB5ApKUK4=;
-        b=Y8b/8L3LbD0swljN1LSIk94MxdUn6HIAB7u7YDDpLRbrW9M8NyAS2QzS4OVpwG38Od
-         OJyJUCL4cXubmknTVVaHWWZ6nyV+ZbEeS5Kn28Z75lrNQfOgt63csU5dB2i/9J0tdE+N
-         lKk9DGaB89pco3UlA4+6fqRfUcF51sOQdH7ZCls76j7d3jRGd0R9/HQpdv0dDi5ZxRqY
-         Zu9Pqab99vb1xHxhHt2OIdEhag/M9g6fOhZm51RHhgWXoLZdERVF7/CYQaFmUX5hLNim
-         ezqNeyjOvyNlKZ7ek5ED/gDLgwQkf0Jcig14hPKQXyXMhNY2Um3Gvf8UXwB5PFPMcIrM
-         dBIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjer4Tt9u2J7AssnqViphdRkUp8D4JyPZyF7Sim0hnyYUYD5i/MHf0QsSMo8XwNxXHHpEL7U2QC/CxcxyUahHCUwlNZV9f
-X-Gm-Message-State: AOJu0YzsRJ7/EFsdafJQac0VTM6c49YfLJxbIupIcxqAs4sgXWitiOoq
-	xHIJ5O18oKTWcZLy7r/mjwEYKW5tDEPyBnJUyVf6g8CPMzGWMBfdPTS6PB+r/hyU8aQe+frbW9+
-	97hY=
-X-Google-Smtp-Source: AGHT+IGqmw155Q3yIZQQnkRDwG/nqm14bMzVG6d+hLJ9DIXKp3mUoZo96llflZNaLnVzFoL5uauEag==
-X-Received: by 2002:a05:6808:2227:b0:3d9:2190:9d56 with SMTP id 5614622812f47-3d92190a02cmr3701431b6e.59.1720295779119;
-        Sat, 06 Jul 2024 12:56:19 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-76c7a4c4741sm1467746a12.45.2024.07.06.12.56.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jul 2024 12:56:18 -0700 (PDT)
-Date: Sat, 6 Jul 2024 12:56:16 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, liuhangbin@gmail.com, Tobias Waldekranz
- <tobias@waldekranz.com>
-Subject: Re: [PATCH v3 iproute2 0/4] Multiple Spanning Tree (MST) Support
-Message-ID: <20240706125616.690e7b98@hermes.local>
-In-Reply-To: <547c13c8-c3c3-495e-8ca9-d87156bfe3f5@kernel.org>
-References: <20240702120805.2391594-1-tobias@waldekranz.com>
-	<172020068352.8177.8028215256014256151.git-patchwork-notify@kernel.org>
-	<d6e8ce6e-53f4-4f69-951e-e300477f1ebe@kernel.org>
-	<20240705204915.1e9333ae@hermes.local>
-	<547c13c8-c3c3-495e-8ca9-d87156bfe3f5@kernel.org>
+	s=arc-20240116; t=1720307126; c=relaxed/simple;
+	bh=04SjTScBVn0ZrO9ZB3vn4HuohMW1iHxZDkEg44AqNuE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k608y0mLxfpukdXMA9XBePD1ojxOzAsWHuvNu/rkrnevwe9cg5M9x3xaONSK2zg59QwNOy54eCr9UgA4iu/bewsFE9cOYVs1YicntnIX8awl/XRImqP+OH2CYY/xOjJdIqzO4APsSGPRbLoiFd1NtWWY/znR9ATQ47bOAHDpO04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PUZW8vqv; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720307124; x=1751843124;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=04SjTScBVn0ZrO9ZB3vn4HuohMW1iHxZDkEg44AqNuE=;
+  b=PUZW8vqvsW6pf2xAHwgVFgGjrNqmb9ZeVVQ9uwn3UN1O/GTMNNZPr8VN
+   4nwFWPUV48pQ7P2leoi/ABLwoBFQHW92PV5QjivCJ2RhOqJ+Z3wZ6/cRJ
+   AQkNbiRs3eawPvGIAAn7swF5mTRDNd2LpXkP78i+6MTGceld3cAtdMx8P
+   gSSft0ZA+r8SEjnBqnvLVsK8SS5DOx1TycI11ug9vctlkuXtpg8alx+Wz
+   6Rc4gpge2a5Pp54ekmEGG+MAd4p1Blxrh1BmFjjYhSVG3ZbaB/0aI3Jpn
+   IXSu/o+WJDTotLyP68Vjq6w2TRrYjq+kC9WTEbJSnoIPQOsDYRpfCVvEG
+   A==;
+X-CSE-ConnectionGUID: yi1xQzx6T+SxW6oZDNSP0w==
+X-CSE-MsgGUID: Oq/qWYMkQd2f8LaOVAb6EQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11125"; a="28148096"
+X-IronPort-AV: E=Sophos;i="6.09,188,1716274800"; 
+   d="scan'208";a="28148096"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2024 16:05:23 -0700
+X-CSE-ConnectionGUID: a/NGx3ZTRvuAPnRFXgxJCQ==
+X-CSE-MsgGUID: UOE72lJkSi+1iHO7f4qP6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,188,1716274800"; 
+   d="scan'208";a="47038345"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 06 Jul 2024 16:05:18 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sQESy-000UNW-2m;
+	Sat, 06 Jul 2024 23:05:16 +0000
+Date: Sun, 7 Jul 2024 07:05:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 2/6] Bluetooth: hci_qca: schedule a devm action for
+ disabling the clock
+Message-ID: <202407070656.wRERdKMy-lkp@intel.com>
+References: <20240705-hci_qca_refactor-v1-2-e2442121c13e@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240705-hci_qca_refactor-v1-2-e2442121c13e@linaro.org>
 
-On Sat, 6 Jul 2024 09:26:46 -0600
-David Ahern <dsahern@kernel.org> wrote:
+Hi Bartosz,
 
-> On 7/5/24 9:49 PM, Stephen Hemminger wrote:
-> > On Fri, 5 Jul 2024 18:53:47 -0600
-> > David Ahern <dsahern@kernel.org> wrote:
-> >   
-> >> On 7/5/24 11:31 AM, patchwork-bot+netdevbpf@kernel.org wrote:  
-> >>> Hello:
-> >>>
-> >>> This series was applied to iproute2/iproute2.git (main)
-> >>> by Stephen Hemminger <stephen@networkplumber.org>:
-> >>>     
-> >>
-> >> Why was this merged to the main repro? As a new feature to iproute2 this
-> >> should be committed to next and only put in main on the next dev cycle.  
-> > 
-> > Because the kernel support was already added, I prefer to not force waiting
-> > for code that is non-intrusive and kernel support is already present.  
-> 
-> I have told multiple people - with you in CC - that is not how iproute2
-> branching works. People need to send userspace patches for iproute2 in
-> the same dev cycle as the kernel patches. You are now selectively
-> undermining that process. What is the point of -next branch then?
- 
-The original point was to have kernel -next and iproute2 -next branches
-and have support arrive at same time on both sides. The problem is when
-developers get behind, and the iproute2 patches arrive after the kernel cycle
-and then would end up get delayed another 3 to 4 months.
+kernel test robot noticed the following build errors:
 
-Example:
-	If mst had been submitted during 6.9 -next open window, then
-	it would have arrived in iproute2 when -next was merged in May 2024 and
-	would get released concurrently with 6.10 (July 2024).
-	When MST was submitted later, if it goes through -next, then it would
-	get merged to main in August 2024 and released concurrently with 6.11
-	in October. By merging to main, it will be in July.
+[auto build test ERROR on 0b58e108042b0ed28a71cd7edf5175999955b233]
 
-I understand your concern, and probably better not to have done it.
-The problem with accepting things early is the review process gets
-truncated, and new features often have lots of feedback.
+url:    https://github.com/intel-lab-lkp/linux/commits/Bartosz-Golaszewski/dt-bindings-bluetooth-qualcomm-describe-the-inputs-from-PMU-for-wcn7850/20240706-055822
+base:   0b58e108042b0ed28a71cd7edf5175999955b233
+patch link:    https://lore.kernel.org/r/20240705-hci_qca_refactor-v1-2-e2442121c13e%40linaro.org
+patch subject: [PATCH 2/6] Bluetooth: hci_qca: schedule a devm action for disabling the clock
+config: i386-buildonly-randconfig-006-20240707 (https://download.01.org/0day-ci/archive/20240707/202407070656.wRERdKMy-lkp@intel.com/config)
+compiler: gcc-9 (Ubuntu 9.5.0-4ubuntu2) 9.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240707/202407070656.wRERdKMy-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407070656.wRERdKMy-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/bluetooth/hci_qca.c: In function 'qca_serdev_remove':
+>> drivers/bluetooth/hci_qca.c:2498:2: error: label at end of compound statement
+    2498 |  default:
+         |  ^~~~~~~
+
+
+vim +2498 drivers/bluetooth/hci_qca.c
+
+05ba533c5c1155 Thierry Escande                2018-03-29  2478  
+05ba533c5c1155 Thierry Escande                2018-03-29  2479  static void qca_serdev_remove(struct serdev_device *serdev)
+05ba533c5c1155 Thierry Escande                2018-03-29  2480  {
+05ba533c5c1155 Thierry Escande                2018-03-29  2481  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+054ec5e94a46b0 Venkata Lakshmi Narayana Gubba 2020-09-10  2482  	struct qca_power *power = qcadev->bt_power;
+05ba533c5c1155 Thierry Escande                2018-03-29  2483  
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2484  	switch (qcadev->btsoc_type) {
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2485  	case QCA_WCN3988:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2486  	case QCA_WCN3990:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2487  	case QCA_WCN3991:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2488  	case QCA_WCN3998:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2489  	case QCA_WCN6750:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2490  	case QCA_WCN6855:
+e0c1278ac89b03 Neil Armstrong                 2023-08-16  2491  	case QCA_WCN7850:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2492  		if (power->vregs_on) {
+c2d7827338618a Balakrishna Godavarthi         2018-08-22  2493  			qca_power_shutdown(&qcadev->serdev_hu);
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2494  			break;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2495  		}
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2496  		fallthrough;
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2497  
+691d54d0f7cb14 Neil Armstrong                 2023-08-16 @2498  	default:
+691d54d0f7cb14 Neil Armstrong                 2023-08-16  2499  	}
+fa9ad876b8e0eb Balakrishna Godavarthi         2018-08-03  2500  
+fa9ad876b8e0eb Balakrishna Godavarthi         2018-08-03  2501  	hci_uart_unregister_device(&qcadev->serdev_hu);
+05ba533c5c1155 Thierry Escande                2018-03-29  2502  }
+05ba533c5c1155 Thierry Escande                2018-03-29  2503  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
