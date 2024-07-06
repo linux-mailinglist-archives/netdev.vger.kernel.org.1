@@ -1,83 +1,111 @@
-Return-Path: <netdev+bounces-109590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DF30928FDB
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:00:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1C6928FE2
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 128B9B21A08
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:00:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B82F1C21788
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93604C8F;
-	Sat,  6 Jul 2024 01:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2676AB8;
+	Sat,  6 Jul 2024 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9vWIFNI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfI6cLM1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A4E36B;
-	Sat,  6 Jul 2024 01:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7C14A19;
+	Sat,  6 Jul 2024 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720227617; cv=none; b=atOhip/pyFIAsAT9eRopeXhrKTBSLOMY6MFwQmUrXvTgWOLTAu0YmE2g0YqBEaKBpRDq0q/ELp/RnCSBkXKGtNS7gBo6ALizxiWEJjgAPkIuE/A5XmhlhLaDBLuMSh6OUYoHAtdbpOT0WfbGJuo+KNMkyRxx+txusC521HdbE4c=
+	t=1720228233; cv=none; b=Cpcjh5w0advIWnvy4yFVB4br3rIiQCnAdfwcZ3EeipMmMESu74+Mw2d6FuW1B3XuI1ygLmB6SdW4ehHgbN5Xp6XbcBuG9gT+LyQfJ6mipsbbJcou29WSDUIdKAObJvy1jkYdfWHMA7Qb9BzwEHI4ZPn9n18gf+tyEm00TFilecg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720227617; c=relaxed/simple;
-	bh=NKe8d7nE7KBBUVo3XpcWOiOEGCATtjXXgO3ZyCTv0Aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h5FHKgHm397bFjCNp9bIKVB1jIesbXe0u4EHDJaNqD1c/ySG0x/kdXs9Tj0Z67022H3/PgIYqVCy+JLTqjA173+/Zb3HEB/uRe7Br7OlJzLVWWtUYsndC8VPC1p3wheabTb83Cby0H9IXz3o1aO+GHxmnT4LcgHD4Q+W2aLrXjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9vWIFNI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE218C116B1;
-	Sat,  6 Jul 2024 01:00:16 +0000 (UTC)
+	s=arc-20240116; t=1720228233; c=relaxed/simple;
+	bh=zkCxmVfyAcZ3ameHi0iJtKJwpuGLKb+DGOkw/aensNY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fFitaoj8y9hDJGVQQJTdYAytsfyed32zWYtjv1AJ8w3LFx/J2Tq6W3wD7oyv0W+alQpkREJWMmI+bx84+qD/f4O+2pO5ZOGr4WFKHuNmpGH42XGs3AuMrpP+Yjy3xfQl7fNTXknOFDHl7rvGU9s+N7b+9yqsH00Dt0wjScFoMP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfI6cLM1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BD9F5C32781;
+	Sat,  6 Jul 2024 01:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720227617;
-	bh=NKe8d7nE7KBBUVo3XpcWOiOEGCATtjXXgO3ZyCTv0Aw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c9vWIFNI+El3Ec46hVmyNAaGWJrzKLn9F4vgRmTtNFwzldQa5lNcKirMyHuxAnJvS
-	 YSHYHTKKklK5rfFEIERUQ+KNfkrJzBDLtVWqdI+49dyBvc2Th5Yn8BEwWA2gn1wKtg
-	 UYT/r08XockYoUwASx1qcT50oUOn5lSP1UTPOM8P3JgaKQcVvbi2W+BMrM3RLH6d/s
-	 QBCSc3wOwXrN0eqGb+A7ypmDk6/ThtCcAVoEeQMsCikCTAu/HduDtCehItN+J4jfbl
-	 8qyOTUr/8S87vGL6g8JhH5YxK5FjxXnTS4kWXNTiF2B58VO+D66hQqkBskZEutVmlM
-	 cxSX5g49dQ9AA==
-Date: Fri, 5 Jul 2024 18:00:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Michal Kubecek <mkubecek@suse.cz>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>, Arun Ramadoss
- <arun.ramadoss@microchip.com>, Woojung.Huh@microchip.com,
- kernel@pengutronix.de, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] ethtool: netlink: do not return SQI value if
- link is down
-Message-ID: <20240705180016.64085ea5@kernel.org>
-In-Reply-To: <20240704054007.969557-1-o.rempel@pengutronix.de>
-References: <20240704054007.969557-1-o.rempel@pengutronix.de>
+	s=k20201202; t=1720228232;
+	bh=zkCxmVfyAcZ3ameHi0iJtKJwpuGLKb+DGOkw/aensNY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FfI6cLM1x64E4KFsAMKmN4ng2Xj0cJGiPYZ+qiLGU7tpjnlsQ+eiunOvsE8rJ3oYO
+	 cVchYkPHgW+Und3Kqvp2/9H8GJIdk7vwYaNFMK0dF05BN/L0RjQEFQU+AJLsDudGUS
+	 KqsyGa2nh+F7Y5FanmvKl+uHl2wQ1U3cQ9/7L9gDKk82SVkfYDRqmP2pq9HcO/qdRp
+	 4jp+KyQ+ZLDU2gifyz5JQonqH5JxdjyidIhbOgXsTJNDkfE0/uko3Aav6TthMNU8ps
+	 6qSbjFS59O2h3orpruXLO7ryOcxxQ9pSGEIlP6TrhrDkpZbiuD5arD7urEEbHTdu39
+	 7xYZo8IO0glng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A51B6C43332;
+	Sat,  6 Jul 2024 01:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v9 00/10] net: openvswitch: Add sample multicasting.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172022823267.9162.5749363663019747112.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jul 2024 01:10:32 +0000
+References: <20240704085710.353845-1-amorenoz@redhat.com>
+In-Reply-To: <20240704085710.353845-1-amorenoz@redhat.com>
+To: =?utf-8?q?Adri=C3=A1n_Moreno_=3Camorenoz=40redhat=2Ecom=3E?=@codeaurora.org
+Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
+ horms@kernel.org, i.maximets@ovn.org, dev@openvswitch.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-On Thu,  4 Jul 2024 07:40:07 +0200 Oleksij Rempel wrote:
->  	if (!phydev->drv || !phydev->drv->get_sqi)
->  		ret = -EOPNOTSUPP;
-> +	else if (!phydev->link)
-> +		ret = -ENETDOWN;
+Hello:
 
-Can we stick to EOPNOTSUPP for the link down case as well?
-We're consuming the error, the exact value doesn't matter.
-Or let's add a helper which checks the int sqi in all it's
-incarnations for validity:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-static bool linkstate_sqi_no_data(int sqi)
-{
-	return sqi == -EOPNOTSUPP || sqi == -ENETDOWN;
-}
+On Thu,  4 Jul 2024 10:56:51 +0200 you wrote:
+> ** Background **
+> Currently, OVS supports several packet sampling mechanisms (sFlow,
+> per-bridge IPFIX, per-flow IPFIX). These end up being translated into a
+> userspace action that needs to be handled by ovs-vswitchd's handler
+> threads only to be forwarded to some third party application that
+> will somehow process the sample and provide observability on the
+> datapath.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v9,01/10] net: psample: add user cookie
+    https://git.kernel.org/netdev/net-next/c/093b0f366567
+  - [net-next,v9,02/10] net: sched: act_sample: add action cookie to sample
+    https://git.kernel.org/netdev/net-next/c/03448444ae5c
+  - [net-next,v9,03/10] net: psample: skip packet copy if no listeners
+    https://git.kernel.org/netdev/net-next/c/c35d86a23029
+  - [net-next,v9,04/10] net: psample: allow using rate as probability
+    https://git.kernel.org/netdev/net-next/c/7b1b2b60c63f
+  - [net-next,v9,05/10] net: openvswitch: add psample action
+    https://git.kernel.org/netdev/net-next/c/aae0b82b46cb
+  - [net-next,v9,06/10] net: openvswitch: store sampling probability in cb.
+    https://git.kernel.org/netdev/net-next/c/71763d8a8203
+  - [net-next,v9,07/10] selftests: openvswitch: add psample action
+    https://git.kernel.org/netdev/net-next/c/60ccf62d3ceb
+  - [net-next,v9,08/10] selftests: openvswitch: add userspace parsing
+    https://git.kernel.org/netdev/net-next/c/c7815abbea45
+  - [net-next,v9,09/10] selftests: openvswitch: parse trunc action
+    https://git.kernel.org/netdev/net-next/c/b192bf12dbb0
+  - [net-next,v9,10/10] selftests: openvswitch: add psample test
+    https://git.kernel.org/netdev/net-next/c/30d772a03582
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
