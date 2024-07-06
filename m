@@ -1,258 +1,144 @@
-Return-Path: <netdev+bounces-109649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF64F9294A2
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 17:42:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576209294B9
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 18:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 859D3283769
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:42:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B4B21C20E70
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 16:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB2F13BAD7;
-	Sat,  6 Jul 2024 15:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5785213792B;
+	Sat,  6 Jul 2024 16:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="j+h/bjEw"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp0-kfki.kfki.hu (smtp0-kfki.kfki.hu [148.6.0.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83758757E5
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 15:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5C623BE;
+	Sat,  6 Jul 2024 16:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720280562; cv=none; b=LIecezFDLKYjpj2A0QMwfrVspx83XeE4rP3YJ5/iODIR/U0IOqdihOwxNZdht7XmYKzsQejyDisX4um0O5J8nl5P2QZnRgFq04cjSgK5hxHivRCnotNH0VJF0JOY/H3LOg2t4XA8PRpB09LuM0eYLCPzzFjrJj5/czG+VY3U9sg=
+	t=1720283111; cv=none; b=KomttPB3MC5U3vYS2Hm9GEggE8OeH5VeL0YAE8/TH9umszwiKIDxEpkrRNDO99SjuVMrv9JZLjufAHtNi1m1csbYX30nE73i+Jl7TsBe39vQWq5ECSH79yLyVq2Kwew796XyU0hQ5+cER0nFhfh2ugOavCuXVRrAjbgFXZOPeqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720280562; c=relaxed/simple;
-	bh=DWLUaXqYP1mg61bu9brJr6ahpMLrmmgFA0Hc/DO8xoQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AWfs18gfNWuA0IW56xSGeoguAI/2N2rRQSa1pldj+Fuk18W+rxpRo1TErSIm+shZtxqIq2LWJD/TQUAooAgXXJM+Yvv27UHN8ADfjsvTgE7s0/zHvmj9JvgfWysdPQ6TQ6dgbdXnQoJs8zQSVIpNRnlb89Wy5NBLDi5EDZbLHbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sQ7Y5-0006YD-MF; Sat, 06 Jul 2024 17:42:05 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sQ7Y2-007bN9-Sb; Sat, 06 Jul 2024 17:42:02 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sQ7Y2-0066nl-2c;
-	Sat, 06 Jul 2024 17:42:02 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yuiko Oshino <yuiko.oshino@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v3 1/1] net: phy: microchip: lan937x: add support for 100BaseTX PHY
-Date: Sat,  6 Jul 2024 17:42:01 +0200
-Message-Id: <20240706154201.1456098-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1720283111; c=relaxed/simple;
+	bh=yzuqB1ahBjHothxqzHppk9bd4Bz98MkN5vE8AgzGvBc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=FjDCwXT5EYBIaYujeykxZBS3UpD0pDqDMyZCy1PHTtTW58Hlbp8vMkpLNEXTZv3IqheAQnK/8hTQd7uXNZz6n3/CiJ+MVVOUP9duhdoigbgySPZZIFkVbv2IzBzaA3oAiG8QL9HYL2twqajh3jRwQ2SiGbNfVDNzt8XpwJIPOww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=j+h/bjEw; arc=none smtp.client-ip=148.6.0.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
+Received: from localhost (localhost [127.0.0.1])
+	by smtp0.kfki.hu (Postfix) with ESMTP id 876C4674010C;
+	Sat,  6 Jul 2024 18:16:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=mime-version:references:message-id
+	:in-reply-to:from:from:date:date:received:received:received
+	:received; s=20151130; t=1720282574; x=1722096975; bh=jHJHkf31U+
+	8UwKd/kThgQslxJA+f8gODKZm1Ph5NdNg=; b=j+h/bjEwQZvrCxQYJb1ypJH3ls
+	x5RguauVNfRT/9mA8xiGuGLXCzjt0EUrRvrSVIgrgkGssPa//Obp/QCSkW85FiH5
+	CWf70AE0d9HyLkvycx5Bkn0D5lgXFCwoACV3BHj15ciomIh4Z8lSqdfQzd64HLfv
+	t+B0uNh6SFFGGO/qo=
+X-Virus-Scanned: Debian amavisd-new at smtp0.kfki.hu
+Received: from smtp0.kfki.hu ([127.0.0.1])
+	by localhost (smtp0.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Sat,  6 Jul 2024 18:16:14 +0200 (CEST)
+Received: from mentat.rmki.kfki.hu (77-234-64-135.pool.digikabel.hu [77.234.64.135])
+	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
+	by smtp0.kfki.hu (Postfix) with ESMTPSA id 964EB6740107;
+	Sat,  6 Jul 2024 18:16:13 +0200 (CEST)
+Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
+	id 36AEC408; Sat,  6 Jul 2024 18:16:13 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by mentat.rmki.kfki.hu (Postfix) with ESMTP id 2D2F8406;
+	Sat,  6 Jul 2024 18:16:13 +0200 (CEST)
+Date: Sat, 6 Jul 2024 18:16:13 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: Florian Westphal <fw@strlen.de>
+cc: yyxRoy <yyxroy22@gmail.com>, pablo@netfilter.org, 
+    gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com, 
+    kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, yyxRoy <979093444@qq.com>
+Subject: Re: [PATCH] netfilter: conntrack: tcp: do not lower timeout to CLOSE
+ for in-window RSTs
+In-Reply-To: <20240705094333.GB30758@breakpoint.cc>
+Message-ID: <1173262c-a471-683f-9e00-abc8192c9ca8@blackhole.kfki.hu>
+References: <20240705040013.29860-1-979093444@qq.com> <20240705094333.GB30758@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+X-deepspam: dunno 31%
 
-Add support of 100BaseTX PHY build in to LAN9371 and LAN9372 switches.
+On Fri, 5 Jul 2024, Florian Westphal wrote:
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
----
-changes v3:
-- add function comments
-- split read_status function
-- use (ret < 0) instead of (ret)
-changes v2:
-- move LAN937X_TX code from microchip_t1.c to microchip.c
-- add Reviewed-by tags
----
- drivers/net/phy/microchip.c | 126 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 125 insertions(+), 1 deletion(-)
+> yyxRoy <yyxroy22@gmail.com> wrote:
+> > With previous commit https://github.com/torvalds/linux/commit/be0502a
+> > ("netfilter: conntrack: tcp: only close if RST matches exact sequence")
+> > to fight against TCP in-window reset attacks, current version of netfilter
+> > will keep the connection state in ESTABLISHED, but lower the timeout to
+> > that of CLOSE (10 seconds by default) for in-window TCP RSTs, and wait for
+> > the peer to send a challenge ack to restore the connection timeout
+> > (5 mins in tests).
+> > 
+> > However, malicious attackers can prevent incurring challenge ACKs by
+> > manipulating the TTL value of RSTs. The attacker can probe the TTL value
+> > between the NAT device and itself and send in-window RST packets with
+> > a TTL value to be decreased to 0 after arriving at the NAT device.
+> > This causes the packet to be dropped rather than forwarded to the
+> > internal client, thus preventing a challenge ACK from being triggered.
+> > As the window of the sequence number is quite large (bigger than 60,000
+> > in tests) and the sequence number is 16-bit, the attacker only needs to
+> > send nearly 60,000 RST packets with different sequence numbers
+> > (i.e., 1, 60001, 120001, and so on) and one of them will definitely
+> > fall within in the window.
+> > 
+> > Therefore we can't simply lower the connection timeout to 10 seconds
+> > (rather short) upon receiving in-window RSTs. With this patch, netfilter
+> > will lower the connection timeout to that of CLOSE only when it receives
+> > RSTs with exact sequence numbers (i.e., old_state != new_state).
+> 
+> This effectively ignores most RST packets, which will clog up the
+> conntrack table (established timeout is 5 days).
+> 
+> I don't think there is anything sensible that we can do here.
+> 
+> Also, one can send train with data packet + rst and we will hit
+> the immediate close conditional:
+> 
+>    /* Check if rst is part of train, such as
+>     *   foo:80 > bar:4379: P, 235946583:235946602(19) ack 42
+>     *   foo:80 > bar:4379: R, 235946602:235946602(0)  ack 42
+>     */
+>     if (ct->proto.tcp.last_index == TCP_ACK_SET &&
+>         ct->proto.tcp.last_dir == dir &&
+>         seq == ct->proto.tcp.last_end)
+>             break;
+> 
+> So even if we'd make this change it doesn't prevent remote induced
+> resets.
+> 
+> Conntrack cannot validate RSTs precisely due to lack of information,
+> only the endpoints can do this.
 
-diff --git a/drivers/net/phy/microchip.c b/drivers/net/phy/microchip.c
-index 0b88635f4fbca..d3273bc0da4a1 100644
---- a/drivers/net/phy/microchip.c
-+++ b/drivers/net/phy/microchip.c
-@@ -12,8 +12,14 @@
- #include <linux/of.h>
- #include <dt-bindings/net/microchip-lan78xx.h>
+I fully agree with Florian: conntrack plays the role of a middle box and 
+cannot absolutely know the right seq/ack numbers of the client/server 
+sides. Add NAT on top of that and there are a couple of ways to attack a 
+given traffic. I don't see a way by which the checkings/parameters could 
+be tightened without blocking real traffic.
  
-+#define PHY_ID_LAN937X_TX			0x0007c190
-+
-+#define LAN937X_MODE_CTRL_STATUS_REG		0x11
-+#define LAN937X_AUTOMDIX_EN			BIT(7)
-+#define LAN937X_MDI_MODE			BIT(6)
-+
- #define DRIVER_AUTHOR	"WOOJUNG HUH <woojung.huh@microchip.com>"
--#define DRIVER_DESC	"Microchip LAN88XX PHY driver"
-+#define DRIVER_DESC	"Microchip LAN88XX/LAN937X TX PHY driver"
- 
- struct lan88xx_priv {
- 	int	chip_id;
-@@ -373,6 +379,115 @@ static void lan88xx_link_change_notify(struct phy_device *phydev)
- 	}
- }
- 
-+/**
-+ * lan937x_tx_read_mdix_status - Read the MDIX status for the LAN937x TX PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This function reads the MDIX status of the LAN937x TX PHY and sets the
-+ * mdix_ctrl and mdix fields of the phy_device structure accordingly.
-+ * Note that MDIX status is not supported in AUTO mode, and will be set
-+ * to invalid in such cases.
-+ *
-+ * Return: 0 on success, a negative error code on failure.
-+ */
-+static int lan937x_tx_read_mdix_status(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = phy_read(phydev, LAN937X_MODE_CTRL_STATUS_REG);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (ret & LAN937X_AUTOMDIX_EN) {
-+		phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
-+		/* MDI/MDIX status is unknown */
-+		phydev->mdix = ETH_TP_MDI_INVALID;
-+	} else if (ret & LAN937X_MDI_MODE) {
-+		phydev->mdix_ctrl = ETH_TP_MDI_X;
-+		phydev->mdix = ETH_TP_MDI_X;
-+	} else {
-+		phydev->mdix_ctrl = ETH_TP_MDI;
-+		phydev->mdix = ETH_TP_MDI;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * lan937x_tx_read_status - Read the status for the LAN937x TX PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This function reads the status of the LAN937x TX PHY and updates the
-+ * phy_device structure accordingly.
-+ *
-+ * Return: 0 on success, a negative error code on failure.
-+ */
-+static int lan937x_tx_read_status(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_read_status(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	return lan937x_tx_read_mdix_status(phydev);
-+}
-+
-+/**
-+ * lan937x_tx_set_mdix - Set the MDIX mode for the LAN937x TX PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This function configures the MDIX mode of the LAN937x TX PHY based on the
-+ * mdix_ctrl field of the phy_device structure. The MDIX mode can be set to
-+ * MDI (straight-through), MDIX (crossover), or AUTO (auto-MDIX). If the mode
-+ * is not recognized, it returns 0 without making any changes.
-+ *
-+ * Return: 0 on success, a negative error code on failure.
-+ */
-+static int lan937x_tx_set_mdix(struct phy_device *phydev)
-+{
-+	u16 val;
-+
-+	switch (phydev->mdix_ctrl) {
-+	case ETH_TP_MDI:
-+		val = 0;
-+		break;
-+	case ETH_TP_MDI_X:
-+		val = LAN937X_MDI_MODE;
-+		break;
-+	case ETH_TP_MDI_AUTO:
-+		val = LAN937X_AUTOMDIX_EN;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return phy_modify(phydev, LAN937X_MODE_CTRL_STATUS_REG,
-+			  LAN937X_AUTOMDIX_EN | LAN937X_MDI_MODE, val);
-+}
-+
-+/**
-+ * lan937x_tx_config_aneg - Configure auto-negotiation and fixed modes for the
-+ *                          LAN937x TX PHY.
-+ * @phydev: Pointer to the phy_device structure.
-+ *
-+ * This function configures the MDIX mode for the LAN937x TX PHY and then
-+ * proceeds to configure the auto-negotiation or fixed mode settings
-+ * based on the phy_device structure.
-+ *
-+ * Return: 0 on success, a negative error code on failure.
-+ */
-+static int lan937x_tx_config_aneg(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = lan937x_tx_set_mdix(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	return genphy_config_aneg(phydev);
-+}
-+
- static struct phy_driver microchip_phy_driver[] = {
- {
- 	.phy_id		= 0x0007c132,
-@@ -400,12 +515,21 @@ static struct phy_driver microchip_phy_driver[] = {
- 	.set_wol	= lan88xx_set_wol,
- 	.read_page	= lan88xx_read_page,
- 	.write_page	= lan88xx_write_page,
-+},
-+{
-+	PHY_ID_MATCH_MODEL(PHY_ID_LAN937X_TX),
-+	.name		= "Microchip LAN937x TX",
-+	.suspend	= genphy_suspend,
-+	.resume		= genphy_resume,
-+	.config_aneg	= lan937x_tx_config_aneg,
-+	.read_status	= lan937x_tx_read_status,
- } };
- 
- module_phy_driver(microchip_phy_driver);
- 
- static struct mdio_device_id __maybe_unused microchip_tbl[] = {
- 	{ 0x0007c132, 0xfffffff2 },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_LAN937X_TX) },
- 	{ }
- };
- 
+Best regards,
+Jozsef
 -- 
-2.39.2
-
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
 
