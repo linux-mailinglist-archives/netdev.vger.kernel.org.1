@@ -1,220 +1,194 @@
-Return-Path: <netdev+bounces-109628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397BA9293C5
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:29:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76919293C7
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 15:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BF5B1C20E00
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 13:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 403381F21D96
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 13:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72E771B52;
-	Sat,  6 Jul 2024 13:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTX1vNb5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3C16A33A;
+	Sat,  6 Jul 2024 13:31:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1113482D3;
-	Sat,  6 Jul 2024 13:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4863626AC2
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 13:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720272580; cv=none; b=VZbv9EnihSYlKThRU7OXPgZE0PqcgeCwNSRI+mBYs/fJMx+Hh5PMlT641c+H23jL4ya/X40ZKjAU5lx+g51zqYtgACB/PxHyUAs9CyJeS1HeanI5raQnOmq479wIMbG+YkBbZS6MRfRPeWW6KW45uvn1aswSm49gW81Huhyeomw=
+	t=1720272712; cv=none; b=Y2joSI0tkO/Ph1GPgkEb7FbW4YU4A5ADhRmQTsIa3IwDSr0EldxusUW5q54CHFLUcAn1K/HxQVZAbFgcjXX0C9Nn8eVLUjjxH2OKjjwNOdqM8P6Dt0T6MkIEIm6G5CDW58bsj3wAOxeDd/r2c6k1hS41lCe+Jvi9T7+ma4Jtw8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720272580; c=relaxed/simple;
-	bh=tyWj4fij4P/SkbMsqeIBPpxU0hUoLxa3AxMnnTqsQRg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Ej3XYt25+mN7ol6yYUVtOKRrpCTanfzOgzB/sJtO8vqnqsM1h9QfG9Onf4ZvTWXnhIN/r2Narh2+AJCe8pMZfhOTySlBl0M6xlJ1LdG0tnV0IeLHajrYJ2m23aj329QZhDy2fdJVeIAu437z+aLRdyHVZ/KaU/030jLdMYjASGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WTX1vNb5; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-654cf0a069eso9071327b3.1;
-        Sat, 06 Jul 2024 06:29:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720272578; x=1720877378; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u+0C3hzJM3P4EhoexxB9qMOOcPx/HYZc4cqwJ6D3Ay8=;
-        b=WTX1vNb5OTQGanO6EW1o3iFrD04IQZ/mXvnLolJ9LuEyV2L7QU6ZFU3yqP2LmkjEdB
-         uPNr8pdrlOZ1iRpxJIywS/3T0CzTlmyCCGUp8HGYXJon92VCUGcupDvh+kVIJUYK9qW/
-         fd4AjyDygokegs+4h3et7qyWVI7ZbzlBIQgqbZWO5yE3l6oBM1/e5CCjGPOtKvFuCtJg
-         y4nfC8fDxivV/iQ/K5MsJDlQvjcoUnJ9RnVMSfYbM2LLcCYfvcGM6H3gB+xhnw+vHk7l
-         LeGu75fuFLKvN5GWKwLQy1HFkbi93ut1eyUtEWGyWo6Oayn2FVttdRWBMCL9jknG3Hb7
-         SVzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720272578; x=1720877378;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=u+0C3hzJM3P4EhoexxB9qMOOcPx/HYZc4cqwJ6D3Ay8=;
-        b=TjIzUxZUA6Vf8v3w4Cm5+kFCqejT5LIR1PJO3UQqiQY7d3b7hXpNzRN/NZywkjIovb
-         vWa4l7KRmUVe2hadtKYZ2JWP0Hz72N8vlXHKHEmdFl9EizQGltl12icBVjUsFmAxeRjC
-         PbbMESUOjCrgx5P2nXtNkTAcNe5uvO13aNqDSSdj2DKIUtdlMLRNvunr/epXxRExP7F9
-         SrdrxzRAN3sjT5u8SuRllp562Iy74PkzqKJpqG4wxsH9a+B+t9FGx0hRfXBsUzG7Y4jY
-         cmSk8XadhuB1pmg6W37BegmtcFy8J9nQdHIcRLGWswhwFlThJ/ew2hq7+kVjwxqZOYih
-         RGSw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOjKLbeNdfukzwUGcY9z3+OPWECU5FHbo1W2bpl92Cp+zNgxnof4p+MhH3/cGsfXpywHhE8YI9bM9kbEsqjewrb9lDpf3gq+uk8x1yPq1mgLnUF++APhKgXf35wxq4fxqJxKZ8
-X-Gm-Message-State: AOJu0YzP81MBMewbFmeJablPIeF/yYHW1SP+39hWMr0TJWmvmoDMar1H
-	BxnkOiLZ6Wxa1fSxL/cBlG9QGXGTJxQ88WracQ6DJFqhH0OzU13G
-X-Google-Smtp-Source: AGHT+IFwfFMQQZX1qK22eMO9B7PVE3XTEtpharBfanLuZEq+jgSO/uqHA520GfSsvYfac2XRjx1Mpw==
-X-Received: by 2002:a05:690c:ec4:b0:64a:956b:c063 with SMTP id 00721157ae682-652d8438d69mr90724117b3.39.1720272577785;
-        Sat, 06 Jul 2024 06:29:37 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d692f0aafsm876897985a.77.2024.07.06.06.29.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jul 2024 06:29:37 -0700 (PDT)
-Date: Sat, 06 Jul 2024 09:29:37 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- David Ahern <dsahern@kernel.org>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Andrew Lunn <andrew@lunn.ch>, 
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <668946c1ddef_12869e29412@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240703150342.1435976-4-aleksander.lobakin@intel.com>
-References: <20240703150342.1435976-1-aleksander.lobakin@intel.com>
- <20240703150342.1435976-4-aleksander.lobakin@intel.com>
-Subject: Re: [PATCH net-next v2 3/5] netdev_features: convert NETIF_F_LLTX to
- dev->lltx
+	s=arc-20240116; t=1720272712; c=relaxed/simple;
+	bh=tSWiw4/TAfdsKhjkofslm1BUUKfWRLlbN1sS3s3zCog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YdMQ9jpuovMgrRSMydAicTY9L4M7nFZgw6jWPffIjdKuvs4m3Nr/xacxo2KbUHIlSm37Y9/Vm60XcCYG5hVqrF3aiyeNh1MtM/AVlpB4AXjCJLwSLm1KLP6wxfv0YX68IruWF/tApXhvfSrkHppjrYy9ngd8rz5gvAak3m/pbNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.2])
+	by gateway (Coremail) with SMTP id _____8AxXPBDR4lm2ZQBAA--.4769S3;
+	Sat, 06 Jul 2024 21:31:47 +0800 (CST)
+Received: from [192.168.100.8] (unknown [223.64.68.2])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxMMQ_R4lmfGM9AA--.39789S3;
+	Sat, 06 Jul 2024 21:31:44 +0800 (CST)
+Message-ID: <16ce72fa-585a-4522-9f8c-a987f1788e67@loongson.cn>
+Date: Sat, 6 Jul 2024 21:31:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-Alexander Lobakin wrote:
-> NETIF_F_LLTX can't be changed via Ethtool and is not a feature,
-> rather an attribute, very similar to IFF_NO_QUEUE (and hot).
-> Free one netdev_features_t bit and make it a "hot" private flag.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-
-> diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-> index d7b15bb64deb..f29d982ebf5d 100644
-> --- a/Documentation/networking/netdev-features.rst
-> +++ b/Documentation/networking/netdev-features.rst
-> @@ -139,14 +139,6 @@ chained skbs (skb->next/prev list).
->  Features contained in NETIF_F_SOFT_FEATURES are features of networking
->  stack. Driver should not change behaviour based on them.
->  
-> - * LLTX driver (deprecated for hardware drivers)
-> -
-> -NETIF_F_LLTX is meant to be used by drivers that don't need locking at all,
-> -e.g. software tunnels.
-> -
-> -This is also used in a few legacy drivers that implement their
-> -own locking, don't use it for new (hardware) drivers.
-> -
->   * netns-local device
->  
->  NETIF_F_NETNS_LOCAL is set for devices that are not allowed to move between
-> diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-> index c2476917a6c3..857c9784f87e 100644
-> --- a/Documentation/networking/netdevices.rst
-> +++ b/Documentation/networking/netdevices.rst
-> @@ -258,11 +258,11 @@ ndo_get_stats:
->  ndo_start_xmit:
->  	Synchronization: __netif_tx_lock spinlock.
->  
-> -	When the driver sets NETIF_F_LLTX in dev->features this will be
-> +	When the driver sets dev->lltx this will be
->  	called without holding netif_tx_lock. In this case the driver
->  	has to lock by itself when needed.
->  	The locking there should also properly protect against
-> -	set_rx_mode. WARNING: use of NETIF_F_LLTX is deprecated.
-> +	set_rx_mode. WARNING: use of dev->lltx is deprecated.
->  	Don't use it for new drivers.
->  
->  	Context: Process with BHs disabled or BH (timer),
-> diff --git a/drivers/net/ethernet/tehuti/tehuti.h b/drivers/net/ethernet/tehuti/tehuti.h
-> index 909e7296cecf..47a2d3e5f8ed 100644
-> --- a/drivers/net/ethernet/tehuti/tehuti.h
-> +++ b/drivers/net/ethernet/tehuti/tehuti.h
-
-> @@ -23,8 +23,6 @@ enum {
->  	NETIF_F_HW_VLAN_CTAG_FILTER_BIT,/* Receive filtering on VLAN CTAGs */
->  	NETIF_F_VLAN_CHALLENGED_BIT,	/* Device cannot handle VLAN packets */
->  	NETIF_F_GSO_BIT,		/* Enable software GSO. */
-> -	NETIF_F_LLTX_BIT,		/* LockLess TX - deprecated. Please */
-> -					/* do not use LLTX in new drivers */
->  	NETIF_F_NETNS_LOCAL_BIT,	/* Does not change network namespaces */
->  	NETIF_F_GRO_BIT,		/* Generic receive offload */
->  	NETIF_F_LRO_BIT,		/* large receive offload */
-
-> @@ -1749,6 +1749,8 @@ enum netdev_reg_state {
->   *			booleans combined, only to assert cacheline placement
->   *	@priv_flags:	flags invisible to userspace defined as bits, see
->   *			enum netdev_priv_flags for the definitions
-> + *	@lltx:		device supports lockless Tx. Mainly used by logical
-> + *			interfaces, such as tunnels
-
-This loses some of the explanation in the NETIF_F_LLTX documentation.
-
-lltx is not deprecated, for software devices, existing documentation
-is imprecise on that point. But don't use it for new hardware drivers
-should remain clear.
-
->   *
->   *	@name:	This is the first field of the "visible" part of this structure
->   *		(i.e. as seen by users in the "Space.c" file).  It is the name
-
-> @@ -3098,7 +3098,7 @@ static void amt_link_setup(struct net_device *dev)
->  	dev->hard_header_len	= 0;
->  	dev->addr_len		= 0;
->  	dev->priv_flags		|= IFF_NO_QUEUE;
-> -	dev->features		|= NETIF_F_LLTX;
-> +	dev->lltx		= true;
->  	dev->features		|= NETIF_F_GSO_SOFTWARE;
->  	dev->features		|= NETIF_F_NETNS_LOCAL;
->  	dev->hw_features	|= NETIF_F_SG | NETIF_F_HW_CSUM;
-
-Since this is an integer type, use 1 instead of true?
-
-Type conversion will convert true to 1. But especially when these are
-integer bitfields, relying on conversion is a minor unnecessary risk.
-
->  int dsa_user_suspend(struct net_device *user_dev)
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index 6b2a360dcdf0..44199d1780d5 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -24,7 +24,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
->  	[NETIF_F_HW_VLAN_STAG_FILTER_BIT] = "rx-vlan-stag-filter",
->  	[NETIF_F_VLAN_CHALLENGED_BIT] =  "vlan-challenged",
->  	[NETIF_F_GSO_BIT] =              "tx-generic-segmentation",
-> -	[NETIF_F_LLTX_BIT] =             "tx-lockless",
->  	[NETIF_F_NETNS_LOCAL_BIT] =      "netns-local",
->  	[NETIF_F_GRO_BIT] =              "rx-gro",
->  	[NETIF_F_GRO_HW_BIT] =           "rx-gro-hw",
-
-Is tx-lockless no longer reported after this?
-
-These features should ideally still be reported, even if not part of
-the features bitmap in the kernel implementation.
-
-This removal is what you hint at in the cover letter with
-
-  Even shell scripts won't most likely break since the removed bits
-  were always read-only, meaning nobody would try touching them from
-  a script.
-
-It is a risk. And an avoidable one?
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+References: <io5eoyp7eq656fzrrd5htq3d7rc22tm7b5zpi6ynaoawhdb7sp@b5ydxzhtqg6x>
+ <475878c7-f386-4dd3-acb8-9f5a5f1b9102@loongson.cn>
+ <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+ <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
+ <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
+ <648058f6-7e0f-4e6e-9e27-cecf48ef1e2c@loongson.cn>
+ <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
+ <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
+ <qj4ogerklgciopzhqrge27dngmoi7ijui274zlbuz6qozubi7n@itih73kfumhn>
+ <c26f0926-7a2e-4634-8004-52a5929cd80a@loongson.cn>
+ <3pmtzvpk5mu75forbcro7maegum2dehzkqajwbxyyjhauakapr@j7sovtlzc6c6>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <3pmtzvpk5mu75forbcro7maegum2dehzkqajwbxyyjhauakapr@j7sovtlzc6c6>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxMMQ_R4lmfGM9AA--.39789S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKFyfXFWrtw13tw1kWF4UGFX_yoW7Cw15pr
+	48Jr1UGryUJr18Jr1UJr1UJryUJr1UJw1UJr18JF1UJr1UJr1jqr1UXF1jgr1DJr48Jr1U
+	Jr1UJr1UZr1UJrbCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4cdbUUUUU
 
 
- 
+在 2024/7/5 19:53, Serge Semin 写道:
+>> $: cat /proc/interrupts
+>>
+>>             CPU0       CPU1
+>>   20:       3826      12138   CPUINTC  12  IPI
+>>   21:      15242      11791   CPUINTC  11  timer
+>>   22:          0          0   PCH PIC   1  acpi
+>>   28:          0          0   PCH PIC   7  loongson-alarm
+>>   29:          0          0   PCH PIC   8  ls2x-i2c, ls2x-i2c, ls2x-i2c,
+>> ls2x-i2c, ls2x-i2c, ls2x-i2c
+>>   34:       7456          0   LIOINTC  10  ttyS0
+>>   42:       1192          0   PCH PIC  17  0000:00:06.1
+>>   43:          0          0   PCH PIC  18  ahci[0000:00:08.0]
+>>   44:         40          0   PCH PIC  19  enp0s3f0
+>>   45:          0          0   PCH PIC  20  enp0s3f1
+>>   46:       1446          0   PCH PIC  21  enp0s3f2
+>>   47:      11164          0   PCH PIC  22  xhci-hcd:usb1
+>>   48:        338          0   PCH PIC  23  xhci-hcd:usb3
+>>   49:          0          0   PCH PIC  24  snd_hda_intel:card0
+>> IPI0:       117        132  LoongArch  1  Rescheduling interrupts
+>> IPI1:      3713      12007  LoongArch  2  Function call interrupts
+>> ERR:          1
+>>
+>>
+> So, what made you thinking that the enp0s3f0, enp0s3f1 and enp0s3f2
+> interfaces weren't working? I failed to find any immediate problem in
+> the log.
+I'm sorry. I made a mistake. It works fine.
+>
+> The driver registered eight Rx-queues (and likely eight Tx-queues).
+> enp0s3f0 and enp0s3f2 links got up. Even the log reported that two
+> interfaces have some network access (whatever it meant in your
+> boot-script):
+>
+>> The device(7a03 and 7a13) can access the network.
+> Yes, there is only one IRQ registered for each interface. But that's
+> what was expected seeing you have a single MAC IRQ detected. The
+> main question is: do the network traffic still get to flow in this
+> case? Are you able to send/receive data over all the DMA-channels?
+
+Yes, I can. in this case, enp0s3f0/1/2 can access www.sing.com.
+
+
+Because I did another test. I turn on the checksum.
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c 
+b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 25ddd99ae112..e1cde9e0e530 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -133,8 +133,8 @@ static int loongson_gmac_data(struct pci_dev *pdev,
+                 /* Only channel 0 supports checksum,
+                  * so turn off checksum to enable multiple channels.
+                  */
+-               for (i = 1; i < CHANNEL_NUM; i++)
+-                       plat->tx_queues_cfg[i].coe_unsupported = 1;
++               // for (i = 1; i < CHANNEL_NUM; i++)
++                       // plat->tx_queues_cfg[i].coe_unsupported = 1;
+         } else {
+                 plat->tx_queues_to_use = 1;
+                 plat->rx_queues_to_use = 1;
+@@ -185,8 +185,8 @@ static int loongson_gnet_data(struct pci_dev *pdev,
+                 /* Only channel 0 supports checksum,
+                  * so turn off checksum to enable multiple channels.
+                  */
+-               for (i = 1; i < CHANNEL_NUM; i++)
+-                       plat->tx_queues_cfg[i].coe_unsupported = 1;
++               // for (i = 1; i < CHANNEL_NUM; i++)
++                       // plat->tx_queues_cfg[i].coe_unsupported = 1;
+         } else {
+                 plat->tx_queues_to_use = 1;
+                 plat->rx_queues_to_use = 1;
+@@ -576,11 +576,11 @@ static int loongson_dwmac_probe(struct pci_dev 
+*pdev, const struct pci_device_id
+         if (ret)
+                 goto err_disable_device;
+
+-       if (ld->loongson_id == DWMAC_CORE_LOONGSON_MULTI_CH) {
+-               ret = loongson_dwmac_msi_config(pdev, plat, &res);
+-               if (ret)
+-                       goto err_disable_device;
+-       }
++       // if (ld->loongson_id == DWMAC_CORE_LOONGSON_MULTI_CH) {
++               // ret = loongson_dwmac_msi_config(pdev, plat, &res);
++               // if (ret)
++                       // goto err_disable_device;
++       // }
+
+         ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+         if (ret)
+
+In this case, enp0s3f0/1/2 cannot access the www.sing.com.
+
+therefore, the network traffic still get to flow, and I can
+
+send/receive data over all the DMA-channels.
+
+If there are any other tests you would like me to do, please let
+
+me know and I will be happy to do them.
+
+Thanks,
+
+Yanteng
+
 
