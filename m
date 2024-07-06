@@ -1,113 +1,97 @@
-Return-Path: <netdev+bounces-109592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 181E7928FEE
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:15:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A59928FF3
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 03:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 495DA1C21723
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:15:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366591C217C2
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 01:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3611847A;
-	Sat,  6 Jul 2024 01:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4BE5C99;
+	Sat,  6 Jul 2024 01:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdDecK+P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrkEm0fE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA426FC2;
-	Sat,  6 Jul 2024 01:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA050EC0
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720228511; cv=none; b=Mm8EyJpd6gjb4tNQ2dEfz5Z5b10UbXtaaMGxzn4/9RxfBb0zSXJD4GeVdlXq9l63RtmslNfpIxGzBWO03Hjt+g8CiKpYpy9XrFaLX6CKvUbhoPpCOXWJ9iA2xcUkue+CrMYykhiWkXdbQucO+0yRJwOqxeChcm/JgMICSkZaD7Q=
+	t=1720229430; cv=none; b=jqXTTH1g03GB+qV64gJY1l+NP+i4kjgSOsZOFyokv/lsU/V4yiRUTNTPAvzFvh53W5wrb04WfmYrOX2V4LaSeDphw+tldgy3kfDVmTWKF3OyI4zHgH2aXPgrbSVe+3Vxyrvxz+2RaR2Lc3b/H4sQ8iwYzuBh6elKVIpuwLLEdok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720228511; c=relaxed/simple;
-	bh=PAaZD1M7e9sIxFScmdr1WJTZAFf2RfyaoOLdehXK6i0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iJqrTLuLl4gtMWuv2ErlAZ5pVSO2ByEuanG8+MIuD2z1driLq05w3ssVS45AP28TO+7SkWmRsMVVBmkabR736QMpbZ2cwk6j8PeCuoiylkEM7cyLcfhi+myi/1cc1qNe1n2UssazeNFWwXYa2oQ5Y+xt1B5sHX8sX+F+ZjS0T9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdDecK+P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2810C32781;
-	Sat,  6 Jul 2024 01:15:10 +0000 (UTC)
+	s=arc-20240116; t=1720229430; c=relaxed/simple;
+	bh=FGzgXY7WQKji30GWN12qFJHBl8ZVPOLeEYiySBvdkGg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kvh9RznT5zNjfRNPbApfbFUM5xPWTcxQjlhm/bz+9V8uwfpyx95sCxEcv5ZvNzgSAZTlDF3RAYgp8Bd8mot4MpkEVhNtOFAE+2JMqo4J2iGFRCh2jCj0gG0LBz4WTQtWkD5KWFluPEliM4S6AFO1bJb6vXVS3wEBvTRM+VtQz+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrkEm0fE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5BB6FC4AF0A;
+	Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720228511;
-	bh=PAaZD1M7e9sIxFScmdr1WJTZAFf2RfyaoOLdehXK6i0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tdDecK+PGicM3lkQueAE/603HJc8tfzepIx69meYL4OctZLn5p/s7y+JbqoVTBVb0
-	 JE4BpWIIpdbCtPdgkzbktMMYCBZD1IumBzVA/6sWsHP2r1UR52i8pDYdsKUcK2Y/+s
-	 JwKYh+vQWblgzis9fg5Q85+ZO8fZ/tMQU0ZKL8+N1TGZKBK/N6qyXoKMBMn6ZmyWpv
-	 xmYoWkt9NMleO5C9IGnWR15U5fzEfACf3Tpupy3FYBp25+80nPJGxmUH0wqVsWMUZv
-	 GO/UnK3PMPAQ2W2+9mE1n79WWc9jkul0X44RRAZnqSt/hRCJGd5p+oH1K8tWUF4xd+
-	 4tASO6btqkSAQ==
-Date: Fri, 5 Jul 2024 18:15:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Julien Panis <jpanis@baylibre.com>, Simon Horman
- <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, srk@ti.com,
- vigneshr@ti.com, danishanwar@ti.com, pekka Varis <p-varis@ti.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/6] net: ethernet: ti: am65-cpsw: Introduce
- multi queue Rx
-Message-ID: <20240705181509.1437b12e@kernel.org>
-In-Reply-To: <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
-References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
-	<20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
+	s=k20201202; t=1720229430;
+	bh=FGzgXY7WQKji30GWN12qFJHBl8ZVPOLeEYiySBvdkGg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TrkEm0fEBjqs6zzbGAakbHS2GVvdys2e5iHVV7LVPgDyMnGT6Mg2UZVciEXg/FQT7
+	 45pOcunv6YsWTbvBXgjp8p1dlTfN//ADvFV+Sjxq9a5zZwBy0CISlLs+gKbkmqTIut
+	 NOvon2opTCc0WOCfA20uWfqdDIdtj3XJTAwQiMaZOwxR+9kwEoi8zuF+JarNA/UuBy
+	 mgY27pLYRq5JWae+pv2Ch9ppyW3i8LjkoJaC3DmJIp/+E3ZPigKQgKb8e3QVjPidjV
+	 WvGbQTLykM6k7Ug1bs2RpTB6kF8gdVdF5/3fgDtm3nK0+Q8hjypJm4jqI7Rr+hwuHg
+	 wy7FIXb/tYKKA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41F05C43332;
+	Sat,  6 Jul 2024 01:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] tcp: fix incorrect undo caused by DSACK of TLP retransmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172022943026.18706.18202616674867302507.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Jul 2024 01:30:30 +0000
+References: <20240703171246.1739561-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20240703171246.1739561-1-ncardwell.sw@gmail.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ netdev@vger.kernel.org, ncardwell@google.com, ycheng@google.com,
+ yyd@google.com
 
-On Wed, 03 Jul 2024 16:51:32 +0300 Roger Quadros wrote:
->  
-> -	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-> +	if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
-> +	    queue >= AM65_CPSW_MAX_RX_QUEUES)
->  		return -EINVAL;
+Hello:
 
-both MAXes are 8, the else conditions below are dead code
-Same for set
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> -	tx_chn = &common->tx_chns[queue];
-> +	if (queue < AM65_CPSW_MAX_TX_QUEUES) {
-> +		tx_chn = &common->tx_chns[queue];
-> +		coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-> +	} else {
-> +		coal->tx_coalesce_usecs = ~0;
-> +	}
->  
-> -	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-> +	if (queue < AM65_CPSW_MAX_RX_QUEUES) {
-> +		rx_flow = &common->rx_chns.flows[queue];
-> +		coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
-> +	} else {
-> +		coal->rx_coalesce_usecs = ~0;
-> +	}
+On Wed,  3 Jul 2024 13:12:46 -0400 you wrote:
+> From: Neal Cardwell <ncardwell@google.com>
+> 
+> Loss recovery undo_retrans bookkeeping had a long-standing bug where a
+> DSACK from a spurious TLP retransmit packet could cause an erroneous
+> undo of a fast recovery or RTO recovery that repaired a single
+> really-lost packet (in a sequence range outside that of the TLP
+> retransmit). Basically, because the loss recovery state machine didn't
+> account for the fact that it sent a TLP retransmit, the DSACK for the
+> TLP retransmit could erroneously be implicitly be interpreted as
+> corresponding to the normal fast recovery or RTO recovery retransmit
+> that plugged a real hole, thus resulting in an improper undo.
+> 
+> [...]
 
-+	for (flow_idx = 0; flow_idx < common->rx_ch_num_flows; flow_idx++) {
-+		flow = &rx_chn->flows[flow_idx];
-+		for (i = 0; i < AM65_CPSW_MAX_RX_DESC; i++) {
-+			page = page_pool_dev_alloc_pages(flow->page_pool);
-+			if (!page) {
-+				dev_err(common->dev, "cannot allocate page in flow %d\n",
-+					flow_idx);
-+				ret = -ENOMEM;
-+				if (i)
-+					goto fail_rx;
- 
--			return ret;
--		}
--		rx_chn->pages[i] = page;
-+				return ret;
+Here is the summary with links:
+  - [net] tcp: fix incorrect undo caused by DSACK of TLP retransmit
+    https://git.kernel.org/netdev/net/c/0ec986ed7bab
 
-the direct returns now that it's a double-nested loop seem questionable,
-don't you have to goto fail_rx?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
