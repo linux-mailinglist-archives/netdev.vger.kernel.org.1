@@ -1,181 +1,211 @@
-Return-Path: <netdev+bounces-109604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040AE929141
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 08:21:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B98792915A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 08:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764131F223EE
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 06:21:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9C71F21D5A
+	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 06:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94511BC43;
-	Sat,  6 Jul 2024 06:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975B814295;
+	Sat,  6 Jul 2024 06:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKD6u5AJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C03817BD3
-	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 06:21:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104591B947
+	for <netdev@vger.kernel.org>; Sat,  6 Jul 2024 06:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720246886; cv=none; b=Tux0LzrLLoFPn2di0aMyBaUbVaB1N7g/jxkEivwoxOxFmsx4HuPszhrTMWjE0hVUmHTsG7vORWrHa9HP2ESssw5B800pEWwUagSPkU48duaZXyPmLHQmb+Uuix3cqbseBpeVIhoymiEAN2JwatCqnz7MEIiq5sHlHWTIEO1UMHE=
+	t=1720248266; cv=none; b=kQagfEgPYYgY6MNbDyFguzLCHO7JmP64rxufSSFGH/cr9nrAFzMmiQGh9WvOZoALbNcB4vwDAeG85Qt/FvK7HuXJpun15E2OuokvTVFcZlO5jh09ZE8Eywch+er+eq4rhyc4Uf1SqjBcJkRZqwk//iSx5mtGNlt/6G0Y8YEiX9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720246886; c=relaxed/simple;
-	bh=i+YznmfnmStVata3WBXb1cgfkdx0doyoSeWA+buQSsc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=j1YiZdHwAkt2rT1Q/LQfke+r7Q+nAvYI4Ji7b8ysrtYoaihBVaCNDSqgK1S7OvtyXAb8JSRNvAGY8j3pUCHuqFeMA6ffy5tR+7jNTbyOFb+KlvF8WqZGt4ThGLPvBVu/ojFu1seh7KgIwkiRItbWMfHhv7GlhHtMrgUM1RkuHak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7f61da4d7beso277560139f.2
-        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 23:21:24 -0700 (PDT)
+	s=arc-20240116; t=1720248266; c=relaxed/simple;
+	bh=IIUHxbJ6/zFuq/7O8BVmABEtbqQjVhOXQY5vgLP4ncE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JnVlnwwKd9DminTU305P8GLKo9hvo5T0P9wiKf5jbN1pbP1Sj3LAdKcrncoAeDICZLRh31/VUlexQAP4+JgzVgTaGJ8FVPhznAAjdizt3A5Ekpj3QkpwEYOewVRYL3CKJyf3Tv+BWk79FX/QFVuiefJ5rvcqRiYQCQzjZjD4xs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKD6u5AJ; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-25e23e0492dso337016fac.3
+        for <netdev@vger.kernel.org>; Fri, 05 Jul 2024 23:44:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720248264; x=1720853064; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y3SO9Xvg0AqGBeSUxEy9cmt6J2jlhbj+RiF4QcMW8w0=;
+        b=jKD6u5AJNb4sjsaMEI42Z0n3X9v4qtT14egbOEXIPjk4/ErsQVhV3VbYFgJ/pnXkUb
+         r4XHx7gJCjxZl45Rd0fr5S1o/pRAljn/gtHDUfWF47tVcI25Uic5JgdMmZmayqeLZUsi
+         ABlMqe0QHTx2bnx0lfT8kZKdIVp18WdMyCVaGwWCCe2viYpuZsNmd8YWaqJWlephjg2f
+         r89K0Tl8Dp5hshcKGjgtflcZL5ehoqMsPpzWu/K38QdYou5mt7usVO6hrYRwaDrkPGFM
+         UqfZtbEWlCFybpq5DVaj6K0Py3PDBA46eQoteZDYf2mZ3IN9vjVHFxQS/sPRlqHYzg/4
+         8/ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720246884; x=1720851684;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HvF3U4FNYQ7TdKEZe0QBJjv+VB2dCsN7syqEZ5rBFqs=;
-        b=BjhKPR1iYoZ4zGBBKpqP6UdBmWD8Tx400urzFyoDsL9jrgF2NOwXmDqGVOLD57PMct
-         pDhGeUdFHvuTCEymAk2+EvlpQ+JAk00i4D+T9w+BF4lw5+ZQfNJ7utM5GC5wb6uZZnaK
-         Qm+3H3qD3M21N8O7bcDnSKcZ0O+Yj0W/ZIibBsEvPKy08qpyHVNpNzTU4Kdcl3LjXLNT
-         +F/TkCg2LqFyU5yQCLMxU1aGoEWwIjVmwLwJvLzEvWLOd8ZZ+SxLpSVrHMiYH1ElidVQ
-         qdMIJNQ1IT9aBqJVd8+k9tL+GrfPhoHK6b3hkyxvDUhWdbtWlMOHlKBFCFT6QXAAcHSh
-         jjhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtDdKFyMpj5IDmnYcpBmPcytH318JPqpVVw4ddT7G4YekEO2lDg0s8lWAjsZ507Trz22J/bIHGQyk+LC8AUzV4XPCs/HN4
-X-Gm-Message-State: AOJu0YwGELRg69vi/ACVSY2keaOdX0Ny3bSRLA0Tdr4r3DFMmG4cRXpa
-	Hs/p/E2W4/YLUfJ+vlv+5XY1CLVE3/ZJUxgmbDIu8sxiIpuwv4Xw1rHZYOGTb0abFdacBp4GNo2
-	deV7CVQClZNGNWUk0vRY2VRr8zSUL+sEzKUIW8j5MNb+ynUSIVvIS4ok=
-X-Google-Smtp-Source: AGHT+IFpWxQJpIFnmxzXWBs15CP8b1VBO0TV0e8rpooFaScrwB1N3bvOKJLR8nS7xeX/LFMD/9sE3u91wfQeExUYsXz2heCWk7Oc
+        d=1e100.net; s=20230601; t=1720248264; x=1720853064;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y3SO9Xvg0AqGBeSUxEy9cmt6J2jlhbj+RiF4QcMW8w0=;
+        b=TzxkHCzp4FuFfVqh5tw1d99b5PkHlXB2tyq5CvcfT/ZrDWZji480m1WT21Khsb9oh1
+         9v817BqskQSgNMbCdOr4xkQa6I+er/W5nF4tlj22OxwfkzQ3YAQLyTxl1EytcfzMGdX0
+         9J5NYQfv433eB34GOS0cvmFsgsKoePSnXWZEGvZtnso9lLELcz2ncT/WfD2FE788/+1B
+         UurUVWI/wzAO2FvuAHz54Tq63cXcUn8YSL0aP0qFx3gKfrNWWD2ttQHxVPjW8gIlPtna
+         OIrdUbtbRdnOX0MUC6lm0wjVWogyYUtILhSPCDINIzzowcMuI6vnZTdO340Tyr+8z9if
+         8tGA==
+X-Gm-Message-State: AOJu0YzJOuLdc6s+fA0uQFQ0AZ5dc+LSvbI1i0FW2EXn0WrMCdMkQaGZ
+	ss7+MJMkXARZBN1PFG+1/5GwiU0c6LivOLpPe/37UifHq9oxuutWu/Yi1R0r
+X-Google-Smtp-Source: AGHT+IHpRqNnLHBGEofra/rm7FaPBetn4yQYh0YvBoMGfgEnmBJO6xnHE6feQrsZ3OhiC1/28Np9cg==
+X-Received: by 2002:a05:6871:798e:b0:25e:15e1:35c6 with SMTP id 586e51a60fabf-25e2b5af44dmr6251391fac.0.1720248263578;
+        Fri, 05 Jul 2024 23:44:23 -0700 (PDT)
+Received: from rpi.. (p5199240-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.11.99.240])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b044bdac4sm3675046b3a.192.2024.07.05.23.44.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 23:44:23 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jdamato@fastly.com
+Subject: [PATCH net-next] net: tn40xx: add per queue netdev-genl stats support
+Date: Sat,  6 Jul 2024 15:43:24 +0900
+Message-Id: <20240706064324.137574-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2cd3:b0:7f6:8521:fb2f with SMTP id
- ca18e2360f4ac-7f68521fcdcmr20268139f.1.1720246884262; Fri, 05 Jul 2024
- 23:21:24 -0700 (PDT)
-Date: Fri, 05 Jul 2024 23:21:24 -0700
-In-Reply-To: <000000000000adb970061c354f06@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000767898061c8e30e8@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_redirect
-From: syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bigeasy@linutronix.de, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, patchwork-bot@kernel.org, sdf@fomichev.me, 
-	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+Add support for the netdev-genl per queue stats API.
 
-HEAD commit:    0b58e108042b Add linux-next specific files for 20240703
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1228a3b9980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ed034204f2e40e53
-dashboard link: https://syzkaller.appspot.com/bug?extid=08811615f0e17bc6708b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12512bc1980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10fe346e980000
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+--dump qstats-get --json '{"scope":"queue"}'
+[{'ifindex': 4,
+  'queue-id': 0,
+  'queue-type': 'rx',
+  'rx-alloc-fail': 0,
+  'rx-bytes': 266613,
+  'rx-packets': 3325},
+ {'ifindex': 4,
+  'queue-id': 0,
+  'queue-type': 'tx',
+  'tx-bytes': 142823367,
+  'tx-packets': 2387}]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1d079762feae/disk-0b58e108.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e53996c8d8c2/vmlinux-0b58e108.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a0bf21cdd844/bzImage-0b58e108.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000007: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
-CPU: 1 UID: 0 PID: 5101 Comm: syz-executor153 Not tainted 6.10.0-rc6-next-20240703-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:__bpf_xdp_redirect_map include/linux/filter.h:1699 [inline]
-RIP: 0010:dev_map_redirect+0x65/0x6a0 kernel/bpf/devmap.c:1015
-Code: 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 83 b3 3d 00 4c 8b 2b 4d 8d 7d 38 4c 89 fb 48 c1 eb 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 03 84 c0 0f 85 6e 04 00 00 41 8b 2f 89 ee 83 e6 02 31 ff
-RSP: 0018:ffffc9000355f6e8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000007 RCX: ffff888018b78000
-RDX: 0000000000000000 RSI: 000000000355f738 RDI: ffff8880183a2800
-RBP: dffffc0000000000 R08: 0000000000000007 R09: ffffffff81b5ee2f
-R10: 0000000000000004 R11: ffff888018b78000 R12: 000000000355f738
-R13: 0000000000000000 R14: 0000000000000008 R15: 0000000000000038
-FS:  000055557cbd4380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002000f000 CR3: 0000000078ac6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_prog_ec9efaa32d58ce69+0x56/0x5a
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run_xdp include/net/xdp.h:514 [inline]
- bpf_prog_run_generic_xdp+0x679/0x14c0 net/core/dev.c:4962
- netif_receive_generic_xdp net/core/dev.c:5075 [inline]
- do_xdp_generic+0x673/0xb90 net/core/dev.c:5134
- tun_get_user+0x2805/0x4560 drivers/net/tun.c:1924
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa9a2adcf90
-Code: 40 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 80 3d 31 e1 07 00 00 74 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 28 48 89
-RSP: 002b:00007ffd3cd09788 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fa9a2adcf90
-RDX: 000000000000fdef RSI: 0000000020000100 RDI: 00000000000000c8
-RBP: 0000000000000000 R08: 00007ffd3cd098b8 R09: 00007ffd3cd098b8
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_net_ctx_get_ri include/linux/filter.h:788 [inline]
-RIP: 0010:__bpf_xdp_redirect_map include/linux/filter.h:1699 [inline]
-RIP: 0010:dev_map_redirect+0x65/0x6a0 kernel/bpf/devmap.c:1015
-Code: 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 83 b3 3d 00 4c 8b 2b 4d 8d 7d 38 4c 89 fb 48 c1 eb 03 48 b8 00 00 00 00 00 fc ff df <0f> b6 04 03 84 c0 0f 85 6e 04 00 00 41 8b 2f 89 ee 83 e6 02 31 ff
-RSP: 0018:ffffc9000355f6e8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000007 RCX: ffff888018b78000
-RDX: 0000000000000000 RSI: 000000000355f738 RDI: ffff8880183a2800
-RBP: dffffc0000000000 R08: 0000000000000007 R09: ffffffff81b5ee2f
-R10: 0000000000000004 R11: ffff888018b78000 R12: 000000000355f738
-R13: 0000000000000000 R14: 0000000000000008 R15: 0000000000000038
-FS:  000055557cbd4380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002000f000 CR3: 0000000078ac6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 c1 e8 03          	shr    $0x3,%rax
-   4:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1)
-   8:	74 08                	je     0x12
-   a:	48 89 df             	mov    %rbx,%rdi
-   d:	e8 83 b3 3d 00       	call   0x3db395
-  12:	4c 8b 2b             	mov    (%rbx),%r13
-  15:	4d 8d 7d 38          	lea    0x38(%r13),%r15
-  19:	4c 89 fb             	mov    %r15,%rbx
-  1c:	48 c1 eb 03          	shr    $0x3,%rbx
-  20:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  27:	fc ff df
-* 2a:	0f b6 04 03          	movzbl (%rbx,%rax,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	0f 85 6e 04 00 00    	jne    0x4a4
-  36:	41 8b 2f             	mov    (%r15),%ebp
-  39:	89 ee                	mov    %ebp,%esi
-  3b:	83 e6 02             	and    $0x2,%esi
-  3e:	31 ff                	xor    %edi,%edi
-
-
+Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/net/ethernet/tehuti/tn40.c | 54 ++++++++++++++++++++++++++++--
+ drivers/net/ethernet/tehuti/tn40.h |  1 +
+ 2 files changed, 53 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
+index 565b72537efa..259bdac24cf2 100644
+--- a/drivers/net/ethernet/tehuti/tn40.c
++++ b/drivers/net/ethernet/tehuti/tn40.c
+@@ -10,6 +10,7 @@
+ #include <linux/pci.h>
+ #include <linux/phylink.h>
+ #include <linux/vmalloc.h>
++#include <net/netdev_queues.h>
+ #include <net/page_pool/helpers.h>
+ 
+ #include "tn40.h"
+@@ -378,6 +379,7 @@ static int tn40_rx_receive(struct tn40_priv *priv, int budget)
+ 		if (!skb) {
+ 			u64_stats_update_begin(&priv->syncp);
+ 			priv->stats.rx_dropped++;
++			priv->alloc_fail++;
+ 			u64_stats_update_end(&priv->syncp);
+ 			tn40_recycle_rx_buffer(priv, rxdd);
+ 			break;
+@@ -1580,8 +1582,55 @@ static int tn40_ethtool_get_link_ksettings(struct net_device *ndev,
+ }
+ 
+ static const struct ethtool_ops tn40_ethtool_ops = {
+-	.get_link		= ethtool_op_get_link,
+-	.get_link_ksettings	= tn40_ethtool_get_link_ksettings,
++	.get_link = ethtool_op_get_link,
++	.get_link_ksettings = tn40_ethtool_get_link_ksettings,
++};
++
++static void tn40_get_queue_stats_rx(struct net_device *ndev, int idx,
++				    struct netdev_queue_stats_rx *stats)
++{
++	struct tn40_priv *priv = netdev_priv(ndev);
++	unsigned int start;
++
++	do {
++		start = u64_stats_fetch_begin(&priv->syncp);
++
++		stats->packets = priv->stats.rx_packets;
++		stats->bytes = priv->stats.rx_bytes;
++		stats->alloc_fail = priv->alloc_fail;
++	} while (u64_stats_fetch_retry(&priv->syncp, start));
++}
++
++static void tn40_get_queue_stats_tx(struct net_device *ndev, int idx,
++				    struct netdev_queue_stats_tx *stats)
++{
++	struct tn40_priv *priv = netdev_priv(ndev);
++	unsigned int start;
++
++	do {
++		start = u64_stats_fetch_begin(&priv->syncp);
++
++		stats->packets = priv->stats.tx_packets;
++		stats->bytes = priv->stats.tx_bytes;
++	} while (u64_stats_fetch_retry(&priv->syncp, start));
++}
++
++static void tn40_get_base_stats(struct net_device *ndev,
++				struct netdev_queue_stats_rx *rx,
++				struct netdev_queue_stats_tx *tx)
++{
++	rx->packets = 0;
++	rx->bytes = 0;
++	rx->alloc_fail = 0;
++
++	tx->packets = 0;
++	tx->bytes = 0;
++}
++
++static const struct netdev_stat_ops tn40_stat_ops = {
++	.get_queue_stats_rx = tn40_get_queue_stats_rx,
++	.get_queue_stats_tx = tn40_get_queue_stats_tx,
++	.get_base_stats = tn40_get_base_stats,
+ };
+ 
+ static int tn40_priv_init(struct tn40_priv *priv)
+@@ -1613,6 +1662,7 @@ static struct net_device *tn40_netdev_alloc(struct pci_dev *pdev)
+ 		return NULL;
+ 	ndev->netdev_ops = &tn40_netdev_ops;
+ 	ndev->ethtool_ops = &tn40_ethtool_ops;
++	ndev->stat_ops = &tn40_stat_ops;
+ 	ndev->tx_queue_len = TN40_NDEV_TXQ_LEN;
+ 	ndev->mem_start = pci_resource_start(pdev, 0);
+ 	ndev->mem_end = pci_resource_end(pdev, 0);
+diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
+index 10368264f7b7..490781fe5120 100644
+--- a/drivers/net/ethernet/tehuti/tn40.h
++++ b/drivers/net/ethernet/tehuti/tn40.h
+@@ -123,6 +123,7 @@ struct tn40_priv {
+ 
+ 	int stats_flag;
+ 	struct rtnl_link_stats64 stats;
++	u64 alloc_fail;
+ 	struct u64_stats_sync syncp;
+ 
+ 	u8 txd_size;
+
+base-commit: 2f5e6395714d0ee53c150da38b25975fe37755c2
+-- 
+2.34.1
+
 
