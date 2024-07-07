@@ -1,139 +1,101 @@
-Return-Path: <netdev+bounces-109658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089C99296F6
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 09:35:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25325929701
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 09:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 381D41C20DC3
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 07:35:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9BC51F21642
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 07:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2394FD2E5;
-	Sun,  7 Jul 2024 07:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5461E11723;
+	Sun,  7 Jul 2024 07:57:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from smtp134-32.sina.com.cn (smtp134-32.sina.com.cn [180.149.134.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F9D1170F;
-	Sun,  7 Jul 2024 07:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CDA8F6D
+	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 07:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720337713; cv=none; b=U/6ODUiMungC2pPJ3ndCWCwpWH1s4Sr/xdUvxgjgwPkQYXh1NBQy/tCrH7QbijT1A6Eay83AEH7h9PkbxWuFzVdrC/kBDXfJPRrAY0/Ut/NXGdCg0r8lJenenetXiRiIYLdTwF9mnj46yE0xHmqujJqA1GYtBdgb8ChgxR+TKtM=
+	t=1720339036; cv=none; b=QwWx4LB9ZuAci/TDWzDEsrF9w2/35vI4nsoaHbflp97EojHQDxEB3ygYoRMhpz66gw28jMT8Y9nJhGgqOQJOjL5biKNbIRij6iYIN2yehS7yyB4QDfOIaMSc8sR+n60HtSu58kyYzaae5fU08FUtZZ1+s7KC3jmDfYbcNqebta4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720337713; c=relaxed/simple;
-	bh=SdMTMEyAxrDIFF9Na+K5TW8VSz8xAY0Kf2QaI/yF0XU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqydHzVFCPBDjKjKgtSokTrxqjAs0OGYhapguAtHi6cFUrLZKb5Az6rYAmR8MJG0PN9F+uzoTu8Xc9oqzrmrDl5f8X463TdUG0bGyZ7nE2ynZruce5B4F9lBeWvX6a6jDpAocgGaUk7biDVZtoYTZdL90L2JMvnPxaeZE1QGqEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtpip3t1720337660tkacxpm
-X-QQ-Originating-IP: xEPDphvktVF415/GqFjUMqm3UtXJmiJdfibU97Nz69Q=
-Received: from [IPV6:240e:36c:d19:e900:dfc1:d0 ( [255.153.174.1])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 07 Jul 2024 15:34:15 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8694329200217638920
-Message-ID: <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
-Date: Sun, 7 Jul 2024 15:34:15 +0800
+	s=arc-20240116; t=1720339036; c=relaxed/simple;
+	bh=IAaStqRr7hyLLG8bbQzWfK4Jo2PvQI4E75hxcwWi3TQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=puqNILWwX1J6xsQuJTVT+FfHzof1jTndK0xNuBUz1DZeYsRV5iS/5PRz10aZbQqgs/jFdPpXrZgXTMk/kUG1EwSM+GrHbPD1g+t26aJHW3X+TRWpUWRx/4agd61/H/r2Us7gIOtI0+Fk55HuZUgWhTqmjYqv/N/LKrr1pdydDzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.8.88])
+	by sina.com (10.185.250.21) with ESMTP
+	id 668A4A4600003EF9; Sun, 7 Jul 2024 15:56:57 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 5756333408340
+X-SMAIL-UIID: D2DAC477427848E99147B9746D864345-20240707-155657-1
+From: Hillf Danton <hdanton@sina.com>
+To: Florian Westphal <fw@strlen.de>
+Cc: netfilter-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
+Date: Sun,  7 Jul 2024 15:56:44 +0800
+Message-Id: <20240707075644.752-1-hdanton@sina.com>
+In-Reply-To: <20240705110218.GA1616@breakpoint.cc>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
-Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()" for linux-6.6.37
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, sashal@kernel.org, ast@kernel.org,
- keescook@chromium.org, linux-hardening@vger.kernel.org,
- christophe.leroy@csgroup.eu, catalin.marinas@arm.com, song@kernel.org,
- puranjay12@gmail.com, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- illusionist.neo@gmail.com, linux@armlinux.org.uk, bpf@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- chenhuacai@kernel.org, kernel@xen0n.name, loongarch@lists.linux.dev,
- johan.almbladh@anyfinetworks.com, paulburton@kernel.org,
- tsbogend@alpha.franken.de, linux-mips@vger.kernel.org, deller@gmx.de,
- linux-parisc@vger.kernel.org, iii@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, linux-s390@vger.kernel.org, davem@davemloft.net,
- sparclinux@vger.kernel.org, kuba@kernel.org, hawk@kernel.org,
- netdev@vger.kernel.org, dsahern@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, guanwentao@uniontech.com, baimingcong@uniontech.com
-References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
- <2024070631-unrivaled-fever-8548@gregkh>
-From: WangYuli <wangyuli@uniontech.com>
-Content-Language: en-US
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <2024070631-unrivaled-fever-8548@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Transfer-Encoding: 8bit
 
+On Fri, 5 Jul 2024 13:02:18 +0200 Florian Westphal <fw@strlen.de>
+> Hillf Danton <hdanton@sina.com> wrote:
+> > > 				lock trans mutex returns
+> > >   				flush work
+> > >   				free A
+> > >   				unlock trans mutex
+> > > 
+> > If your patch is correct, it should survive a warning.
+> > 
+> > #syz test https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git  1c5fc27bc48a
+> > 
+> > --- x/net/netfilter/nf_tables_api.c
+> > +++ y/net/netfilter/nf_tables_api.c
+> > @@ -11552,9 +11552,10 @@ static int nft_rcv_nl_event(struct notif
+> >  
+> >  	gc_seq = nft_gc_seq_begin(nft_net);
+> >  
+> > -	if (!list_empty(&nf_tables_destroy_list))
+> > -		nf_tables_trans_destroy_flush_work();
+> > +	nf_tables_trans_destroy_flush_work();
+> >  again:
+> > +	WARN_ON(!list_empty(&nft_net->commit_list));
+> > +
+> 
+> You could officially submit this patch to nf-next, this
+> is a slow path and the transaction list must be empty here.
+> 
+> I think this change might be useful as it also documents
+> this requirement.
 
-On 2024/7/6 17:30, Greg KH wrote:
-> This makes it sound like you are reverting this because of a build
-> error, which is not the case here, right?  Isn't this because of the
-> powerpc issue reported here:
-> 	https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
-> ?
+Yes it is boy and the current reproducer triggered another warning [1,2].
 
-No, it only occurs on ARM64 architecture. The reason is that before 
-being modified, the function
+[1] https://lore.kernel.org/lkml/20240706231332.3261-1-hdanton@sina.com/
+[2] https://lore.kernel.org/lkml/000000000000a42289061c9d452e@google.com/
 
-bpf_jit_binary_lock_ro() in arch/arm64/net/bpf_jit_comp.c +1651
-
-was introduced with __must_check, which is defined as 
-__attribute__((__warn_unused_result__)).
-
-
-However, at this point, calling bpf_jit_binary_lock_ro(header) 
-coincidentally results in an unused-result
-
-warning.
-
-> If not, why not just backport the single missing arm64 commit,
-
-Upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory 
-management") is part of
-
-a larger change that involves multiple commits. It's not an isolated commit.
-
-
-We could certainly backport all of them to solve this problem, but it's 
-not the simplest solution.
-
-> and why
-> didn't this show up in testing?
-
-Thanks for the tip.
-
-I'll be sure to keep a closer eye on the stable kernel testing phase in 
-the future and hopefully catch any
-
-problems more timely.
-
-> confused,
->
-> greg k-h
->
-Sincerely
--- 
-WangYuli <wangyuli@uniontech.com>
+And feel free to take a look at fput() and sock_put() for instance of
+freeing slab pieces asyncally.
 
