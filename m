@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03C192980B
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 15:08:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60402929811
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 15:11:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D0F51C213A9
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 13:08:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F731C20C76
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 13:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7FA20B04;
-	Sun,  7 Jul 2024 13:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D545720B04;
+	Sun,  7 Jul 2024 13:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2ZuglGR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bIDSeso3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F3720319;
-	Sun,  7 Jul 2024 13:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9993517556;
+	Sun,  7 Jul 2024 13:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720357733; cv=none; b=XDsmp2N+GVQCdVjwYCTyhSwkYlEGqQnfE5kce8Dv6pEtZkuVaovYcN7IXRXAylgeiq+P/lB80eDAwywGq/804BYICDiLRxxdUW/DR/4+FZNSRxRUEh//HFcRMEDCDIbAEPdoTRJQy4PJlpjR0CItffeIY8mwE7F8j7FrfIU0LvU=
+	t=1720357866; cv=none; b=Mr3PEz/k2Vl+beerotaQ7gahyrn+hN6Hzn9iKJRHIwHl9azVWRBoRWjtjbVQHFuHvBspl5sXMF12i6g1Slg5gK37DYIdM4Iykf/QPNdFliL5h97Zis8nvRPRGBr71gmHwacDt2r97tSsQ8lmYwZMRAsHUfAvS+b74B6PFuZ1Dk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720357733; c=relaxed/simple;
-	bh=j+xPRbbPaYiXSNyNcEcAXNQskEAM89MU31kQHLvsE/E=;
+	s=arc-20240116; t=1720357866; c=relaxed/simple;
+	bh=vtrPycQjknbTj7wiVbOb39VYQqiTHzoiu6m4WyG/GvQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d51DoIqPCy95tqzv4tzWRCtjxYZLLxhRCIQCC1QhaNNSNJizwVZtMb+J0H8o5xHWy5LLmEWw6fSiEJSHNo5SE+gbDxyyZhbTdkD70STWrcmNq/iA/QpnBEIox+xfAD+0Pu38kdGtNfQiybibOG1EWm8+9sUj2y6yS0NT8ZkZ3mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2ZuglGR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77F7C3277B;
-	Sun,  7 Jul 2024 13:08:47 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=a4GVZ/hBy6ZXuPOeqhHeVL6dXueO8ZhpobKiiKACCfN12O3aHyyzZEczKKbROOUA14BW+GUoTzjmt6bcvs+DtjTL25xFyNPcZq2sj8fwspuTjcoxOcZL8KpoNL1hq5LLY7NZTPOIbtPHhZi0M5xAWrRJ0KRdp6FG+0or27uqAU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bIDSeso3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81194C3277B;
+	Sun,  7 Jul 2024 13:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720357733;
-	bh=j+xPRbbPaYiXSNyNcEcAXNQskEAM89MU31kQHLvsE/E=;
+	s=k20201202; t=1720357866;
+	bh=vtrPycQjknbTj7wiVbOb39VYQqiTHzoiu6m4WyG/GvQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=B2ZuglGRLshSIRZjzgzvKe2X2oU+6eAzEI3GTh8U/su6QaJD83cQ068k8GzyfaX+L
-	 mFb3ksSk0OVXlix+MveOdd2POdhtXCpP0V6RwHYyumeV2QtSUNBBXSZw3y+GrJetcb
-	 irrofK4wpb27fyy2ShLurjQOsDilGVi41GuQE+bc758r1gIsXQ+XkIoC2lS7q+mUGQ
-	 wqrpTJecV2tY4n4RoU6GwT7f3u+QKatl57cGSkjCr5YFGPZVcB5PNaGOs6PtYf0KGy
-	 8lXn7ym0FBcUaan7YPu3AhvpgjFwy7zRaSlzxPiAIqEcypmUhjYDfrhgV4HZbEa1em
-	 lv/MEUQdJDoGQ==
-Message-ID: <98f3e5d2-f0bc-46b8-8560-e732dcbe8532@kernel.org>
-Date: Sun, 7 Jul 2024 15:08:45 +0200
+	b=bIDSeso3ohXDEY9DoFJNc3xtEmL7hnO7jIzXRyW50jiZHHnOLSDyBFic0DnITza3P
+	 aQYvgKb/7jGa8QiqtzdKQmhFrMzaMuBlF8OXCSNQVIIg7z2sMXC3VLITAJ00q7m0F/
+	 KYA7WFaDTSk9wqJn/fYVkD1ahIfEwOVNOnScy80bVKwPmqhJce/qaMwenUlCWrZSEY
+	 g2OjKS/i/EMoRkML0PmMohAQ8UgauglqmuGDuACm1l7/qYoRa0DW1Q+V5Ou44M5CL5
+	 LAD11NIHIgPQD+XC/9WTpVn37J8pOP3daNFnxITE8fvIgd8fTMIc6XnPaccEtigqs+
+	 9NdUNl7i11l/A==
+Message-ID: <3e364c38-c5ac-49e6-9a9b-5b2b4e3cf5a1@kernel.org>
+Date: Sun, 7 Jul 2024 15:10:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] arm64: defconfig: Enable hci_uart for Amlogic
- Bluetooth
+Subject: Re: [PATCH 2/4] Bluetooth: hci_uart: Add support for Amlogic HCI UART
 To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -61,11 +60,11 @@ To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org, Ye He <ye.he@amlogic.com>
 References: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
- <20240705-btaml-v1-3-7f1538f98cef@amlogic.com>
-Content-Language: en-US
+ <20240705-btaml-v1-2-7f1538f98cef@amlogic.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -109,18 +108,63 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240705-btaml-v1-3-7f1538f98cef@amlogic.com>
+In-Reply-To: <20240705-btaml-v1-2-7f1538f98cef@amlogic.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 05/07/2024 13:20, Yang Li via B4 Relay wrote:
 > From: Yang Li <yang.li@amlogic.com>
 > 
-> Enable the HCI protocol of Amlogitc Bluetooth.
+> This patch introduces support for Amlogic Bluetooth controller over
+> UART. In order to send the final firmware at full speed. It is a pretty
+> straight forward H4 driver with exception of actually having it's own
+> setup address configuration.
+> 
+> Co-developed-by: Ye He <ye.he@amlogic.com>
 
-Why? Commit msg MUST answer this.
+Read submitting patches. Missing SoB.
 
-Also, this is supposed to be module.
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  drivers/bluetooth/Kconfig     |  13 +
+
+
+
+> +
+> +static void aml_serdev_remove(struct serdev_device *serdev)
+> +{
+> +	struct aml_serdev *amldev = serdev_device_get_drvdata(serdev);
+> +
+> +	hci_uart_unregister_device(&amldev->serdev_hu);
+> +}
+> +
+> +static const struct aml_device_data data_w155s2 __maybe_unused = {
+> +	.iccm_offset = 256 * 1024,
+> +};
+> +
+> +static const struct aml_device_data data_w265s2 __maybe_unused = {
+
+How this can be "maybe_unused" while it is referenced always? This is
+buggy. Either everything in OF chain can be unused or not. Not half yes,
+half not.
+
+> +	.iccm_offset = 384 * 1024,
+> +};
+> +
+> +static const struct of_device_id aml_bluetooth_of_match[] = {
+> +	{ .compatible = "amlogic,w155s2-bt", .data = &data_w155s2 },
+> +	{ .compatible = "amlogic,w265s2-bt", .data = &data_w265s2 },
+> +	{ /* sentinel */ },
+> +};
+> +
+> +static struct serdev_device_driver aml_serdev_driver = {
+> +	.probe = aml_serdev_probe,
+> +	.remove = aml_serdev_remove,
+> +	.driver = {
+> +		.name = "hci_uart_aml",
+> +		.of_match_table = of_match_ptr(aml_bluetooth_of_match),
+
+So now you have warnings... drop of_match_ptr.
 
 Best regards,
 Krzysztof
