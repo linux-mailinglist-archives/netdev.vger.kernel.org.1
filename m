@@ -1,200 +1,234 @@
-Return-Path: <netdev+bounces-109665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8928392975A
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 11:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0562929775
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 12:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0305F1F214E8
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 09:56:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29A551F213BB
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 10:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B03125DB;
-	Sun,  7 Jul 2024 09:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1406517C91;
+	Sun,  7 Jul 2024 10:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uIkDw9Tl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyvRH6ro"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2068.outbound.protection.outlook.com [40.107.102.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2179A2914
-	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 09:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720346183; cv=fail; b=l24lr4RnR24s4x6Sq5Byw/F8ZNc/nXwN6sW55FvS504GhLf6ib3jM4FjsrUpUUSXwQctXaecMqX0Q5J07ppp3ILZfrcYK+uWrT77G1HNpyJNgyZhbhYYSwPoPkah7ogFMylhMWygBodHjxdyyzgcyIzQREkRvoGBtiWdWjwymNg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720346183; c=relaxed/simple;
-	bh=3/8qfCqcaRXa8KK5W60USfAFRSMH6sVqdn+IVacJgmc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pa+bORfoZbk9D3hZLto4al4HSDn0J47H0URcgo+6CrqI6cEFYIzJ6AbhP2WJF2IDrEwm4aaB4yrvHzQcILh/xfiLwpJokx8aOftw6uayxI6lV/B1edhMOhosMn3Bo4baBXPEkZFHzgckgLUpB51AKCorjTu1re+4/tPLVgR/jGE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uIkDw9Tl; arc=fail smtp.client-ip=40.107.102.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mA61W3q3u0/XRsnASy1xBV5Gg6TBSj9tlIB4URWA8lNW1VXKyESqpv767EgPKj3ePYbyAb5hIP+eEjlM/hxyikn5Y+cwxsFC9wBgxx6Rr3RVjFxgwgFSoxWoL+7s8BlyICwQFUSmfFxJJsosXkreL0nuEHpdRdgucZFFRiPVhTMVv8wuhsJZuq0fs+LmDj4uZNz39Vm8/NY/LvB2PpD0kUB9bQxNfbPGKl7jcna+mUkpyl0OqBjRJcpw5v/hP0zESIgEYQESrV3fQRoReQqk4P1T68iinAQcDze8paMwkwANK//Tfllk7XoJFIp0xe2joDwrGKQsK4ViTkFRjBv+kA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h4x9fEP4uK3jHNG/+/9cSRhjtmz4warPBGAElAmlzWU=;
- b=KywnOX6SNQ88dICLQjq+mg/4iHgcD1KRS21BmNZmEPfRFgOYBo9bPyy2GlwWpz9pe9/6CIX8rZ7CGvmLJD54JRAICkgeAKeY1Ou6796cHOBO7rie+iVtGokSaXl+te2lISWFh1LKhSn5DYg5hsZUNq5hroiZhlX96hED+GOcfMS+1FrHouGCSPjwgvj5Hreyy5Gm/G/HW8ctqb5KjAL8b548S74xRcTcFqH8wwYiVNBanTv8vU1X2kgDOyek21O6vYPFZZyNSaAupk9ITebl/7bkAuAVueHO85q2N5u6lbe8OP3pnidW9eUaQ2VOSiihucyQpudTDH2nCxDETD3eKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h4x9fEP4uK3jHNG/+/9cSRhjtmz4warPBGAElAmlzWU=;
- b=uIkDw9TlCsZUdRKfVP8m6mr3oB4Fr7bkq0CzykCXfpuI6MqnSc9+rpEAz5ghHx6TlIMB7L6EOs7fOEoQ6IbRi6Som3AxCxtYSXmP1ZgJ/JpK8ZTwubSRu1okxJoHaaxiMV0t3PMaD7kZGXaB3ueuM019QiH8+R4Jq3fThsXicAQ4tmLzyOeU6o2Lv6HdKqVeCgVjXj9xO3rjbpjKWeUe3JGNYw/PK9wA1dzCcXf1uWWu7LaNPUdCpd8EjJazt1E6VYSMJLygnWgPcGloFB2aJ2QeRBov6wo2bdH9X8z+GjJzm9IBitEC4jp41ItKzHDY3Vplam3d8tanEkRKd+8uUA==
-Received: from CH0PR03CA0436.namprd03.prod.outlook.com (2603:10b6:610:10e::33)
- by MN0PR12MB5905.namprd12.prod.outlook.com (2603:10b6:208:379::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.34; Sun, 7 Jul
- 2024 09:56:19 +0000
-Received: from CH2PEPF0000009E.namprd02.prod.outlook.com
- (2603:10b6:610:10e:cafe::7b) by CH0PR03CA0436.outlook.office365.com
- (2603:10b6:610:10e::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.34 via Frontend
- Transport; Sun, 7 Jul 2024 09:56:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF0000009E.mail.protection.outlook.com (10.167.244.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7762.17 via Frontend Transport; Sun, 7 Jul 2024 09:56:18 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 7 Jul 2024
- 02:56:10 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 7 Jul 2024 02:56:07 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next] selftests: forwarding: Make vxlan-bridge-1d pass on debug kernels
-Date: Sun, 7 Jul 2024 12:54:58 +0300
-Message-ID: <20240707095458.2870260-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.45.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEFE17BD2
+	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 10:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720348838; cv=none; b=SFdiGwSW7UH670FDmt60Y84laEyhIsCn5polRDJmeTmWieFogJH35xw75Qsf6JBlUptYvoKGK5VBN7jITlexZMkzXkIgxe9ma6uMKF/TI3XHfYlnnbtp9XWmOWP8eRt3ceKChJRLaVOOOcCEvB+0BtHOT21E6/++gDYjvmI+sL4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720348838; c=relaxed/simple;
+	bh=EDsjsCoR5OWghDtVOebaM7T7DbpC1sYYluRaZ375cbE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0FBiuyxbw6dI38D8CkCecyORKGtQ1i6fnJabRo5Y3cpAGWbIqhzfcUF7lzV/DLmqY6M/uRbvilR3u77a/3LYzll2qmKBzckrMFqbhRAJpjkxCPmLBdcxu9dqa4X/qSYEmjcyZn7Pj+BQ5pot+xzTNhE+DxQWsmqcGlOLZ5KoXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VyvRH6ro; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52ea79e689eso2623419e87.1
+        for <netdev@vger.kernel.org>; Sun, 07 Jul 2024 03:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720348834; x=1720953634; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q0zXTAuvNjLIUjZcMx+/0g7rsjd7wX/OE6P399QAvfQ=;
+        b=VyvRH6roIaISEZJF4uFoDW1Qm8yHhplU8BEU8j5TUsWPsX63efeYCGN6WuD8nNgloN
+         YVQJZ0qRWEVFYDF2+hel7QSwyZWCXgmO1s1slnolvYwSpeu51mSspKEX224I9Xrz2vSF
+         3yKaZRa3MtSoT0kO7BBOFbYQeT7T4JQJOZWBmPhLve+PUmQF0CKizRdpltP4OhRH5NdF
+         pCI5Xak8LCjO4dX0K5l/R3n6Kn10WhxVd5eY/+si9U9h3WNH/Awiqg2LNCxGizoddI23
+         K0uT2Q15QW9VCeV34cHPOKUCSUeYmDv2ErwJ2RP0X37Bwbcilr9d7q5Vs5WEshxcb4gG
+         ckAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720348834; x=1720953634;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0zXTAuvNjLIUjZcMx+/0g7rsjd7wX/OE6P399QAvfQ=;
+        b=SuE7R1Eo7R90SOPnpuDTfY5EhZZPAG1kE2Q5dBHe07SCVDwXON1SSAxKGKKsSrYxTE
+         qSNC0ezd+Pz0tJpFb5h/FOBufR6weVCDOTwTl+iwiSPAeVRXrnL4jC6sNEMoS+hPaaB9
+         oeYhOuHetsskkNWk8SL+psg7nW7UM8p4AUbVSc5GmYBs3mvRDlaQjeIZbvnlnPRgiz9x
+         hkNDGDhIvHurVWjY/8EMog0k/R0Vf0U5rib6yjJsEkymeXmdjlM9QKOEThxg4zYsHXSw
+         q57D2WeOuVhY7FCTLm1dZfrNbjCr1nVHy+T4VY0GqqSL99bUt9XeLbaxyS06Gzqs/Oag
+         de2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXeCm7zh0R3B9mgGhdGItUNJNnIUkCe/NiNKizt/vjTen5Y+Ub+AyvfHP1UBEfJFifDaHHhC9P5yEdUQrn/ayvsb0SHnTtk
+X-Gm-Message-State: AOJu0Yz0Pd8L9BG+pUtoh2LbYQIOWyK0TEJ5L7MqQR1JgMBJnRmuCsf9
+	+Iy0WrP49R6kuqamd2FTqxtSk3DdwGC9lEcvBAm+tlAk8Ii06/Xd
+X-Google-Smtp-Source: AGHT+IHd3H6J8OHBqlIEti3wkiFoFLk/c/ogW8ySSBAyY5GI8lD4wF8wpXK94RioRNCkXN2Vx6yhTw==
+X-Received: by 2002:ac2:5a50:0:b0:52c:dd94:bda9 with SMTP id 2adb3069b0e04-52ea06c78d5mr6774690e87.56.1720348833997;
+        Sun, 07 Jul 2024 03:40:33 -0700 (PDT)
+Received: from mobilestation ([95.79.243.20])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52e7ab27b14sm3256082e87.125.2024.07.07.03.40.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jul 2024 03:40:33 -0700 (PDT)
+Date: Sun, 7 Jul 2024 13:40:31 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 06/15] net: stmmac: dwmac-loongson: Detach
+ GMAC-specific platform data init
+Message-ID: <2iptp5kd4kk2pqpynqx6apdhfrri3mtmhgt7kqzglgd26h7pmv@56up3lir53dd>
+References: <7creyrbprodoh2p2wvdx52mijqyu53ypf3dzjgx3tuawpoz4xm@cfls65sqlwq7>
+ <d9e684c5-52b3-4da3-8119-d2e3b7422db6@loongson.cn>
+ <vss2wuq5ivfnpdfgkjsp23yaed5ve2c73loeybddhbwdx2ynt2@yfk2nmj5lmod>
+ <648058f6-7e0f-4e6e-9e27-cecf48ef1e2c@loongson.cn>
+ <y7uzja4j5jscllaq52fdlcibww7pp5yds4juvdtgob275eek5c@hlqljyd7nlor>
+ <d8a15267-8dff-46d9-adb3-dffb5216d539@loongson.cn>
+ <qj4ogerklgciopzhqrge27dngmoi7ijui274zlbuz6qozubi7n@itih73kfumhn>
+ <c26f0926-7a2e-4634-8004-52a5929cd80a@loongson.cn>
+ <3pmtzvpk5mu75forbcro7maegum2dehzkqajwbxyyjhauakapr@j7sovtlzc6c6>
+ <16ce72fa-585a-4522-9f8c-a987f1788e67@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009E:EE_|MN0PR12MB5905:EE_
-X-MS-Office365-Filtering-Correlation-Id: aeba2ab2-44fa-4f63-ffdf-08dc9e6b0c7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8ccFw3IQCSNZracwbk06KyvREhhyRzWh4PxuI9v7GuTJp8VKV5OVIz+KAnLG?=
- =?us-ascii?Q?Wmt0BdAwoqlzaVDjojDilWegIxV3esx0T8s5QJBjhFoDAEGM60mhzeCFq4GP?=
- =?us-ascii?Q?NW2Lh6ZwSummnYtn618IBuMcYI6UHCrlTVPgN3O2Lnbr/5GjWQ7VBDmEe5hs?=
- =?us-ascii?Q?DcwKNuSZ9gDlGkq5Z9xdiTcn+U6YvEHR8qmcf6RL5ma6UT6TNggWy1sLZOML?=
- =?us-ascii?Q?Se+8jxfzbvdQ8C977wEHk2ZX6S3b+lJvBhZjbsvyue7eqEwv0cMnT6j6hFzR?=
- =?us-ascii?Q?Q/cVSJQoYa1ClUZhHMoqERqaM6XeREiU+SAtK6Lv+nqNqGQXfUY0ylz5tb5Z?=
- =?us-ascii?Q?ITVZexH8GMELaa7mFtu/Wq9dnnmXr6ictVSXLcCYPaeRK9J9R579xMKZDBpy?=
- =?us-ascii?Q?iy/+rBIecVPtrHFNHMcidvq2VlRE59oNS6TdTM43Hj969O0oKzygLOTqUgMb?=
- =?us-ascii?Q?NYRpLNYjbO4zpLBVuw7HDE23iPKqUAYD/Bl4ulo0L4PSuL04z816U5YQZM0h?=
- =?us-ascii?Q?RMcGGVVP60DcmdjqgzDxBvLzuPJrAbE3TpeBRhahegXgXKkZkWIJLO9/3QRJ?=
- =?us-ascii?Q?o+IXsME0amgVzY9ignTZVgExKTeYQm6NSZ1jtsQaJKPaHhA4VZmr00Rr81v3?=
- =?us-ascii?Q?DtNoW/jxAruksQVfz+HpNz1gzOH0/n/vG2eX0YMHRlbdBODQPDmE3k9udX3j?=
- =?us-ascii?Q?+aQkMonc7weHbjMwKE+GXJqtCWbBRWPJUyxt5HrZY8u5oMBoycc1intkXD6I?=
- =?us-ascii?Q?QmCcssAgZ18i/7pXyVLGsQS7SN9Ig1AFnehxgyLSIR1QXzOXmrnxHiMSLMAb?=
- =?us-ascii?Q?WhDwJcvoG36MlpRtjwkRU6WXVhe3zREpxZJIcC3yzGR+39M+LDjUfDijYCV4?=
- =?us-ascii?Q?VkalK8t9vsWpdeQB95rXpsjm5cRhcB/hvVfO0ZGohOMJCw9STL7WUncb6gmp?=
- =?us-ascii?Q?H2I5JR872AiubTfg8UFLjDYCAE8RZ613oSaWvbSiKSF12WOFk//DRzBinMgf?=
- =?us-ascii?Q?OaGu3AQpPVdtzsMAWciIy76eD3tYMtl8lzXu47gmze+PruYnSoLU6u8cPyUM?=
- =?us-ascii?Q?/Xfa9n5CNLraOVY/BVdPnhmCn0twSxML0YCNkTFlFFm0QdVFF3FJj+bHAqw0?=
- =?us-ascii?Q?3CP0k8uqPuUG/QUA+ToZyZ3kv7a3Bwf+LtSE4vjhicS2haWRZkpPioG2EQ3V?=
- =?us-ascii?Q?6AsBOGirnL2vv/V8sW0vsEsJyNZyl95F+PQ9y2DQbsJkL54SRprhGoTjbhKz?=
- =?us-ascii?Q?deo942ql8Sxb6Ud8AYJFFfGLQcCJqU/ASPsVRpBeDfT6pWSzXj0x5vjXL+rP?=
- =?us-ascii?Q?lmIINFZWJMjYq0PDiqP35fRhg6ye6oDUiD4xYlaDws5Q95g4YNwKh/3UVffl?=
- =?us-ascii?Q?fExbT3fCW9OvOQhp7yE+GotfD4Z+h9hs73oqqm2Epb8LneIY3vH1PYLtmFn8?=
- =?us-ascii?Q?Rr1NxBC6Y5++N++7NF9nYtKXO8LFyTjA?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2024 09:56:18.6413
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aeba2ab2-44fa-4f63-ffdf-08dc9e6b0c7c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5905
+In-Reply-To: <16ce72fa-585a-4522-9f8c-a987f1788e67@loongson.cn>
 
-The ageing time used by the test is too short for debug kernels and
-results in entries being aged out prematurely [1].
+On Sat, Jul 06, 2024 at 09:31:43PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/7/5 19:53, Serge Semin 写道:
+> > > $: cat /proc/interrupts
+> > > 
+> > >             CPU0       CPU1
+> > >   20:       3826      12138   CPUINTC  12  IPI
+> > >   21:      15242      11791   CPUINTC  11  timer
+> > >   22:          0          0   PCH PIC   1  acpi
+> > >   28:          0          0   PCH PIC   7  loongson-alarm
+> > >   29:          0          0   PCH PIC   8  ls2x-i2c, ls2x-i2c, ls2x-i2c,
+> > > ls2x-i2c, ls2x-i2c, ls2x-i2c
+> > >   34:       7456          0   LIOINTC  10  ttyS0
+> > >   42:       1192          0   PCH PIC  17  0000:00:06.1
+> > >   43:          0          0   PCH PIC  18  ahci[0000:00:08.0]
+> > >   44:         40          0   PCH PIC  19  enp0s3f0
+> > >   45:          0          0   PCH PIC  20  enp0s3f1
+> > >   46:       1446          0   PCH PIC  21  enp0s3f2
+> > >   47:      11164          0   PCH PIC  22  xhci-hcd:usb1
+> > >   48:        338          0   PCH PIC  23  xhci-hcd:usb3
+> > >   49:          0          0   PCH PIC  24  snd_hda_intel:card0
+> > > IPI0:       117        132  LoongArch  1  Rescheduling interrupts
+> > > IPI1:      3713      12007  LoongArch  2  Function call interrupts
+> > > ERR:          1
+> > > 
+> > > 
+> > So, what made you thinking that the enp0s3f0, enp0s3f1 and enp0s3f2
+> > interfaces weren't working? I failed to find any immediate problem in
+> > the log.
+> I'm sorry. I made a mistake. It works fine.
+> > 
+> > The driver registered eight Rx-queues (and likely eight Tx-queues).
+> > enp0s3f0 and enp0s3f2 links got up. Even the log reported that two
+> > interfaces have some network access (whatever it meant in your
+> > boot-script):
+> > 
+> > > The device(7a03 and 7a13) can access the network.
+> > Yes, there is only one IRQ registered for each interface. But that's
+> > what was expected seeing you have a single MAC IRQ detected. The
+> > main question is: do the network traffic still get to flow in this
+> > case? Are you able to send/receive data over all the DMA-channels?
+> 
+> Yes, I can. in this case, enp0s3f0/1/2 can access www.sing.com.
+> 
+> 
+> Because I did another test. I turn on the checksum.
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 25ddd99ae112..e1cde9e0e530 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -133,8 +133,8 @@ static int loongson_gmac_data(struct pci_dev *pdev,
+>                 /* Only channel 0 supports checksum,
+>                  * so turn off checksum to enable multiple channels.
+>                  */
+> -               for (i = 1; i < CHANNEL_NUM; i++)
+> -                       plat->tx_queues_cfg[i].coe_unsupported = 1;
+> +               // for (i = 1; i < CHANNEL_NUM; i++)
+> +                       // plat->tx_queues_cfg[i].coe_unsupported = 1;
+>         } else {
+>                 plat->tx_queues_to_use = 1;
+>                 plat->rx_queues_to_use = 1;
+> @@ -185,8 +185,8 @@ static int loongson_gnet_data(struct pci_dev *pdev,
+>                 /* Only channel 0 supports checksum,
+>                  * so turn off checksum to enable multiple channels.
+>                  */
+> -               for (i = 1; i < CHANNEL_NUM; i++)
+> -                       plat->tx_queues_cfg[i].coe_unsupported = 1;
+> +               // for (i = 1; i < CHANNEL_NUM; i++)
+> +                       // plat->tx_queues_cfg[i].coe_unsupported = 1;
+>         } else {
+>                 plat->tx_queues_to_use = 1;
+>                 plat->rx_queues_to_use = 1;
+> @@ -576,11 +576,11 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,> const struct pci_device_id
+>         if (ret)
+>                 goto err_disable_device;
+> 
+> -       if (ld->loongson_id == DWMAC_CORE_LOONGSON_MULTI_CH) {
+> -               ret = loongson_dwmac_msi_config(pdev, plat, &res);
+> -               if (ret)
+> -                       goto err_disable_device;
+> -       }
+> +       if (ld->loongson_id == DWMAC_CORE_LOONGSON_MULTI_CH) {
+> +               // ret = loongson_dwmac_msi_config(pdev, plat, &res);
+> +               // if (ret)
+> +                       // goto err_disable_device;
+> +       // }
+> 
+>         ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>         if (ret)
+> 
+> In this case, enp0s3f0/1/2 cannot access the www.sing.com.
 
-Fix by increasing the ageing time.
+Smart.) Indeed it implicitly proves that at least two channels get to
+work. Checking out the interface queues statistics (ethtool -S
+<interface>) would make it less implicit. Although something more
+comprehensive covering all the channels would be better. But it's up
+to you to decide whether you need such test implemented and performed.
+I just wanted to make sure whether the common MAC IRQ case was indeed
+tested since your original result contradicted to what the DW MAC
+explicitly stated:
 
-The same change was done for the VLAN-aware version of the test in
-commit dfbab74044be ("selftests: forwarding: Make vxlan-bridge-1q pass
-on debug kernels").
+"The interrupts from different DMA channels are combined by using the
+OR function to generate a single interrupt signal sbd_intr_o.
+Therefore, the software needs to read the Interrupt Status Registers
+of all DMA channels to get the source of interrupt. The MAC interrupt
+status (Bits [29:26]) is updated only in the interrupt status register
+of Channel 0."
 
-[1]
- # ./vxlan_bridge_1d.sh
- [...]
- # TEST: VXLAN: flood before learning                                  [ OK ]
- # TEST: VXLAN: show learned FDB entry                                 [ OK ]
- # TEST: VXLAN: learned FDB entry                                      [FAIL]
- # veth3: Expected to capture 0 packets, got 4.
- # RTNETLINK answers: No such file or directory
- # TEST: VXLAN: deletion of learned FDB entry                          [ OK ]
- # TEST: VXLAN: Ageing of learned FDB entry                            [FAIL]
- # veth3: Expected to capture 0 packets, got 2.
- [...]
+The sbd_intr_o line is the main IRQ signal reporting all the DMA and
+MAC events (so called "macirq" in the STMMAC driver). (There is a case
+when the later events are reported via a separate mci_intr_o wire, but
+it's rather rare.) So it seemed strange that the Loongson GMAC/GNET
+HW-designers could have diverted the IRQs delivery logic so much.
+That's why I was so persistent in asking the way the test was
+performed.
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
----
- tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+-Serge(y)
 
-diff --git a/tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh b/tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh
-index 6f0a2e452ba1..3f9d50f1ef9e 100755
---- a/tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh
-+++ b/tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh
-@@ -680,9 +680,9 @@ test_learning()
- 	local mac=de:ad:be:ef:13:37
- 	local dst=192.0.2.100
- 
--	# Enable learning on the VxLAN device and set ageing time to 10 seconds
--	ip link set dev br1 type bridge ageing_time 1000
--	ip link set dev vx1 type vxlan ageing 10
-+	# Enable learning on the VxLAN device and set ageing time to 30 seconds
-+	ip link set dev br1 type bridge ageing_time 3000
-+	ip link set dev vx1 type vxlan ageing 30
- 	ip link set dev vx1 type vxlan learning
- 	reapply_config
- 
-@@ -740,7 +740,7 @@ test_learning()
- 
- 	vxlan_flood_test $mac $dst 0 10 0
- 
--	sleep 20
-+	sleep 60
- 
- 	bridge fdb show brport vx1 | grep $mac | grep -q self
- 	check_fail $?
--- 
-2.45.1
-
+> 
+> therefore, the network traffic still get to flow, and I can
+> 
+> send/receive data over all the DMA-channels.
+> 
+> If there are any other tests you would like me to do, please let
+> 
+> me know and I will be happy to do them.
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
