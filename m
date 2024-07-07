@@ -1,76 +1,156 @@
-Return-Path: <netdev+bounces-109679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0CB92985E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:43:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D00929860
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85BC11C20619
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 14:43:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CCBA1F20F5D
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 14:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B5825569;
-	Sun,  7 Jul 2024 14:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281FD25634;
+	Sun,  7 Jul 2024 14:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lg4diSOy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lz9w1q3J"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2266F25634;
-	Sun,  7 Jul 2024 14:43:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5E224B29
+	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 14:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720363422; cv=none; b=eYSt4tx8TYmey+uoHJ+gIwIzYmBOJsZXoHvAHrY1IV3XCtQPNOOIPHVkHvPMnSQYex9FLEuLBTqlp/XQ8AzcA9f/hiv60nzkj5BqAUBafbDqkCMF7mNG6/zkAotk2WeksZmY0RsRJOQLoPPIIsI9auu415KxErGhYWco2GlmfP4=
+	t=1720363447; cv=none; b=EZoibpwEjeFUkvahEGXNn5MZA3YQOW/0Z38dC9+eGXVunaartUgEoBSiG/gVIGfqAD4OVkX+NVNVBVyfE8SWDxl0XJry3AqIjuN/vNvq1W3F4GmsrgZW+w5RU+EKtOU/YWl27BTrq54aUhVwJIcPikdawNNMFDhL6Kt9ByP1b9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720363422; c=relaxed/simple;
-	bh=SIEbwpjTXW7Uwj3MBOJdM7a212KIh53gSTLNUWRhLT0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ztzn8H0NUvRKeFeQMpgb+zZsHBnNVhyU33CTIRgzXpyTVIzCo8feAoaB0zLBEF/9hAn3TF+shBzI+TH2FLbPvALOnxwr1UFZZigFPSjSJf/2YHSFjKiWveIYHfdav8ZZZWUbUUStBJStfPG8lHwIiHCV4A0BNq+6zMCxxZRZtdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lg4diSOy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cjRKsN6ub/8uCcKFZqN9SviIl4u+WaB08jVTx0tnWZc=; b=lg4diSOy/x1bs4ruhR3J5Qx1TX
-	5SEknxE27zgPOkeR7z/sIB6VnFvfFObp33jsjTgrcOwdhlI92EgMlJOPYIkl0tuHDZQyy5dL4GrUA
-	eTKRkDWBNuq72cv5Dk+9fPz8D6hyQzTA1FOy5kHEY3qC06HPNTUUzIk0xvx1WOJq8yqM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sQT6e-001zA0-Vj; Sun, 07 Jul 2024 16:43:12 +0200
-Date: Sun, 7 Jul 2024 16:43:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jacob.e.keller@intel.com,
-	u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] net: ethernet: lantiq_etop: fix double free in detach
-Message-ID: <0a18329d-2098-48cf-8787-d86099b0bf0b@lunn.ch>
-References: <20240707141037.1924202-1-olek2@wp.pl>
+	s=arc-20240116; t=1720363447; c=relaxed/simple;
+	bh=AW6keBs1Ul57Un5+ysy6hgjSXWTaRwpRMfLWZu9ZJsM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wgwspj/M/xfnMtXNVFdlF94ZCXGn7rj1IkOJs3Db6+kKdWhpg+7EY70ACKvVN9WjRcSEBD18UfuVFLqJGuwDAk8vGa+zj/eCUlkDsQPxsOkfxr5MsQLb46GVNZsTSPGyg4j+ZMjHrkc+niF7D9PZQ/BahFhMmXzWP7yOjIeBQaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lz9w1q3J; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-36796bbf687so1742447f8f.0
+        for <netdev@vger.kernel.org>; Sun, 07 Jul 2024 07:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720363444; x=1720968244; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IGMlismzpIIV36hUDEQhX4YT1GWs90McG/xr7WmfCzo=;
+        b=Lz9w1q3Jh7wQuY+m2ecLNbJ7F5RvJ2odTMlnlLj6LFdiYuJk/oofYzOPc4QsSQlU4l
+         7dWKmNs1j1LDF+ACs3Efa5a945fknXDnXGOmk8Yffs9w6JfZUk/3j0EqMZ/7IvPPSvwT
+         erXG6qw1DT462aut7soykoe1e2V9m8YM9cJJm6KHFyjsqaPZd5FsUIPi/VXF0Ky6QJwa
+         Vd2Or+pwQK8YjnlzSZAo275NXhBPL4I7qMgOc6XheyHpWQBOwQSv190EXtgw+ZXqpaeX
+         IX0xqAW9660/zSiYLnX00/+UaZx37iJhNyMcvbxwVLcNrJ5l12WAGt01zu/ARJng29ql
+         Zpiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720363444; x=1720968244;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IGMlismzpIIV36hUDEQhX4YT1GWs90McG/xr7WmfCzo=;
+        b=tCg+QF6eVt+/jGj4nNy9gI38ftOPjGgXnaVbvx/3VtHF4KCqD54TE4BafwRlZiWhX9
+         MWOGJeT8AulvPYYZojD98lWnVC/jsuhRRVXWF3fak1K/Yd1agoVok/OjYzCYDhhlvAm/
+         fSHgpwBazYntjlEUSdNiLUTzW59i/JUqAYoDRqHw3i34lwpq31ZIg2jcltdPlc0n86Tz
+         x8FaNGqC6JuzDBt/m8TZqZRx8GWFrIii15mGAFlsLq4IxxAfHNfGwTL41UTykk8z3EyI
+         zKuorAovS1KmOth5xsi5lqdX0w6ofPiceEQZWzROCTaxQ4BLD178VfYosqvHz5Ht95Ik
+         KJtQ==
+X-Gm-Message-State: AOJu0Yyl6Apz2SDqgxKRfCdOTDfUxeHL44G59yyqdCQ1PqPDO8oaeLev
+	A+Fz2/9HP7D7r5xhPcp9RomIsfUiPMAINplSVNS+UR7Y3dF6ilYyYnUy/CsOruQn9leDow/3TtD
+	XzVK7tvuXmLJ1MIMNLTG9paWhquctTA==
+X-Google-Smtp-Source: AGHT+IFDJVVSgYumVweaA7B5Z5wCkdEe8RDtKe8RhU2DYB8n6eEHkAL4FmnHsPmKCoGBv60hBUNk+MCx0szqG+oWVAc=
+X-Received: by 2002:a5d:5747:0:b0:367:8e56:f6be with SMTP id
+ ffacd0b85a97d-3679dd314d3mr6533461f8f.32.1720363443476; Sun, 07 Jul 2024
+ 07:44:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240707141037.1924202-1-olek2@wp.pl>
+References: <171993231020.3697648.2741754761742678186.stgit@ahduyck-xeon-server.home.arpa>
+ <171993241104.3697648.17268108844942551733.stgit@ahduyck-xeon-server.home.arpa>
+ <20240703201502.GS598357@kernel.org>
+In-Reply-To: <20240703201502.GS598357@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Sun, 7 Jul 2024 07:43:27 -0700
+Message-ID: <CAKgT0UckcQ_XFpf3_SS6XXcJ6vsjBYARC-y3VQs04zL2c5HCKA@mail.gmail.com>
+Subject: Re: [net-next PATCH v3 08/15] eth: fbnic: Implement Tx queue alloc/start/stop/free
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 07, 2024 at 04:10:37PM +0200, Aleksander Jan Bajkowski wrote:
-> The number of the currently released descriptor is never incremented
-> which results in the same skb being released multiple times.
-> 
-> Reported-by: Joe Perches <joe@perches.com>
-> Closes: https://lore.kernel.org/all/fc1bf93d92bb5b2f99c6c62745507cc22f3a7b2d.camel@perches.com/
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+On Wed, Jul 3, 2024 at 1:15=E2=80=AFPM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> On Tue, Jul 02, 2024 at 08:00:11AM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > Implement basic management operations for Tx queues.
+> > Allocate memory for submission and completion rings.
+> > Learn how to start the queues, stop them, and wait for HW
+> > to be idle.
+> >
+> > We call HW rings "descriptor rings" (stored in ring->desc),
+> > and SW context rings "buffer rings" (stored in ring->*_buf union).
+> >
+> > This is the first patch which actually touches CSRs so add CSR
+> > helpers.
+> >
+> > No actual datapath / packet handling here, yet.
+> >
+> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+>
+> ...
+>
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net=
+/ethernet/meta/fbnic/fbnic_txrx.c
+>
+> ...
+>
+> > +void fbnic_fill(struct fbnic_net *fbn)
+>
+> Hi Alexander,
+>
+> Although it is done as part of a later patch in the series,
+> to avoid W=3D1 builds complaining, it would be best to add
+> a declaration of fbnic_fill to this patch.
+>
+> > +{
+> > +     struct fbnic_napi_vector *nv;
+> > +
+> > +     list_for_each_entry(nv, &fbn->napis, napis) {
+> > +             int i;
+> > +
+> > +             /* Configure NAPI mapping for Tx */
+> > +             for (i =3D 0; i < nv->txt_count; i++) {
+> > +                     struct fbnic_q_triad *qt =3D &nv->qt[i];
+> > +
+> > +                     /* Nothing to do if Tx queue is disabled */
+> > +                     if (qt->sub0.flags & FBNIC_RING_F_DISABLED)
+> > +                             continue;
+> > +
+> > +                     /* Associate Tx queue with NAPI */
+> > +                     netif_queue_set_napi(nv->napi.dev, qt->sub0.q_idx=
+,
+> > +                                          NETDEV_QUEUE_TYPE_TX, &nv->n=
+api);
+> > +             }
+>
+> It is fixed in a subsequent patch of this series,
+> but a '}' should go here.
+>
+> > +}
+>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Thanks. I will fix both of these up for v4. Most likely I will just
+move fbnic_fill into the next patch as that way I can address both of
+the issues in one shot.
 
-    Andrew
+- Alex
 
