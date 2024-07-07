@@ -1,49 +1,78 @@
-Return-Path: <netdev+bounces-109660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BDE929706
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 10:08:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A224092970E
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 10:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF381281C7D
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 08:08:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43B861F2165A
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 08:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0C4CA40;
-	Sun,  7 Jul 2024 08:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B8E101CA;
+	Sun,  7 Jul 2024 08:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0tlN9Rv"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5F1101CA;
-	Sun,  7 Jul 2024 08:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575A3B67F;
+	Sun,  7 Jul 2024 08:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720339710; cv=none; b=hT32yRP2OApYzPleNlJNUPfmaJrDEsuExVud5GZ/hpk0XR/hXyp6aTcTkBycvVYHrRLm8uok7otvlz7I+fg5I0BvaZhuzKhPeOpSxGNtM4xNgOCRS+cWCZrkshcar3sK/C1LIv1nhcG9DiMH/fGZ7N0dGqwgbrVOcwB25uB11JA=
+	t=1720340656; cv=none; b=nMqbReTsJyfF5HlF0rBDJr7snc0PmXgsvu/0vw9SoM124cfagCaRQOEsDYyoSDw93cozguQTVeibfpamgnBVBHGWBcn/jzz2aam187WOCpF8+l160DWYeG7KKveARugUxkHCXLzneCFYfMS9qejhUyumfGrUvAzzFeFrK17/Urc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720339710; c=relaxed/simple;
-	bh=1rttPyuSa8fkhuT1EBmrD0ZvIWR2Zg1hG6GJRNc1R4k=;
+	s=arc-20240116; t=1720340656; c=relaxed/simple;
+	bh=LXMrQ3C7YtlFtAjJOecI8T+KbonpE2eQ/2SoojEsjro=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gsP28g8eZJENpIsyIqqFDvL/EQeLKuFovqNav5reC2CHXM0eQg2XQEKqCjWW465jMU2RCFKQ7ycoU4iv9SOgzE6M1fXwPDU4wruHoFlXPsZ4sW6UreNwPSBZnoxoabOFrlpo0rOdq5ICPa+qCzc1Q6/A/qhg7Y2Zfca1JQF+wNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sQMwa-0007es-17; Sun, 07 Jul 2024 10:08:24 +0200
-Date: Sun, 7 Jul 2024 10:08:24 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending
- work before notifier
-Message-ID: <20240707080824.GA29318@breakpoint.cc>
-References: <20240705110218.GA1616@breakpoint.cc>
- <20240707075644.752-1-hdanton@sina.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PBpR0ewBFV4CvqtIFA6tfxS76whXjLIsXyIuxsOZWDCsCexKz5s+q6Md8X5cGlk/KyENfSVXPt4ZkAtF+l7urXKzae8GQsDAXYbZIXwER91UU3qlnEkaoeRg0WaN8rHixHQlzMP8uugPaXQoYCT+NUKKBw6QMjk8akhDy4CseVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0tlN9Rv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD89EC3277B;
+	Sun,  7 Jul 2024 08:24:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720340655;
+	bh=LXMrQ3C7YtlFtAjJOecI8T+KbonpE2eQ/2SoojEsjro=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q0tlN9RvsrAdNKblfVOHB5mvrUOCxtJdjHDmMBc1VUHoUioVpDG+3c5alUV+PoD38
+	 Z8/7UP/u9bMSlLgyaeTfLk11h/z7y5riZMCMzSRH1Pn3K2vjhCv17ldAU4Qzd8N5ba
+	 IwwBfT0i/pjP9zRJrQ5mSAQawIDoXx7FjOELalKNS51o2gWe0jGZ2ZpGoog/FE4ceU
+	 J6Pwc0WFEBLZnygXN0Pn2sqkhnT9cf1DIAZmtYkgBvoHB0VW5XGtX6iWZ7mj7HGIVg
+	 gWQqLrlMaP2Sj0j9/RMLzC9AaM53wqRcFlqXxwRh23Uss8dFURUkdoTg++aUopEGXX
+	 nIo4sRzbdw0Qg==
+Date: Sun, 7 Jul 2024 09:24:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v16 13/14] net: ethtool: Add support for
+ tsconfig command to get/set hwtstamp config
+Message-ID: <20240707082408.GF1481495@kernel.org>
+References: <20240705-feature_ptp_netnext-v16-0-5d7153914052@bootlin.com>
+ <20240705-feature_ptp_netnext-v16-13-5d7153914052@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,17 +81,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240707075644.752-1-hdanton@sina.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240705-feature_ptp_netnext-v16-13-5d7153914052@bootlin.com>
 
-Hillf Danton <hdanton@sina.com> wrote:
-> > I think this change might be useful as it also documents
-> > this requirement.
+On Fri, Jul 05, 2024 at 05:03:14PM +0200, Kory Maincent wrote:
+> Introduce support for ETHTOOL_MSG_TSCONFIG_GET/SET ethtool netlink socket
+> to read and configure hwtstamp configuration of a PHC provider. Note that
+> simultaneous hwtstamp isn't supported; configuring a new one disables the
+> previous setting.
 > 
-> Yes it is boy and the current reproducer triggered another warning [1,2].
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 > 
-> [1] https://lore.kernel.org/lkml/20240706231332.3261-1-hdanton@sina.com/
+> Changes in v16:
+> - Add a new patch to separate tsinfo into a new tsconfig command to get
+>   and set the hwtstamp config.
+> ---
+>  Documentation/networking/timestamping.rst |  33 +--
+>  include/uapi/linux/ethtool_netlink.h      |  18 ++
+>  net/ethtool/Makefile                      |   3 +-
+>  net/ethtool/netlink.c                     |  20 ++
+>  net/ethtool/netlink.h                     |   3 +
+>  net/ethtool/tsconfig.c                    | 347 ++++++++++++++++++++++++++++++
+>  6 files changed, 411 insertions(+), 13 deletions(-)
+> 
 
-The WARN is incorrect.  The destroy list can be non-empty; i already
-tried to explain why.
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+> index 5e93cd71f99f..8b864ae33297 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -493,8 +493,8 @@ implicitly defined. ts[0] holds a software timestamp if set, ts[1]
+>  is again deprecated and ts[2] holds a hardware timestamp if set.
+>  
+>  
+> -3. Hardware Timestamping configuration: SIOCSHWTSTAMP and SIOCGHWTSTAMP
+> -=======================================================================
+> +3. Hardware Timestamping configuration: ETHTOOL_MSG_TSCONFIG_SET/GET
+> +==================================================================
+
+nit: make htmldocs flags that this title underline is too short
+
+...
 
