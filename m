@@ -1,177 +1,121 @@
-Return-Path: <netdev+bounces-109672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 953D29297F4
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 14:56:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209959297E5
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 14:55:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F9628203B
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 12:56:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98355B20FAF
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 12:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B4C364A4;
-	Sun,  7 Jul 2024 12:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA40C1DFDE;
+	Sun,  7 Jul 2024 12:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hwA0rndF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DQQYWzK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BC037143;
-	Sun,  7 Jul 2024 12:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D4C1E498;
+	Sun,  7 Jul 2024 12:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720356957; cv=none; b=cqahdpxMbl7WmBn2sWXy7MlbPI0bP4D3J8m9nWxfrbkkkgpzxfAHWsx2OhVv7Tv/nZ6J4jIs/O9H9o+IimGVV7zWSDtI0O1lWvAEgFiqeZHvSgiT0HEoPncAia9PjoaoDGUL3HgRxVcRcRqIwlO0AKJq9sjx1dqcd76nhnxZdT8=
+	t=1720356932; cv=none; b=ISpwuyp1cddrJdcBMfTK5BYaU2o2lhihqr41tZauKgq3wRoCuW0EvLxKArCCCDX0H9ukutIulz4wNKoPe+1d0cyvb77OshmER1zhOJu7Q9VVpy1FcRYYkU72b8akcIg1es/GsQP1/fxvbQExLqGV9T5MjU1w1sSMDvWqrEUhnOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720356957; c=relaxed/simple;
-	bh=yq9fdn79P/7uXLeqkaqvokXNESEJw6LEGZiE5haj0rk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H4M4StYh3Ur3BXQUjTXVlvFC3QXNSbjXkmFC6e+F6ItCBKzQ8m+KzSpq99U5uyZ4RFKzwhYuShfr5StXN8l351xIFtwUOHyX5YOM0+Tk2AqddgGqzfqrlfBQO9nyLSYNZsBSoaG7frYmskeyrEfnhKPa6RslqbDMMmlQToJ20l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hwA0rndF; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720356956; x=1751892956;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yq9fdn79P/7uXLeqkaqvokXNESEJw6LEGZiE5haj0rk=;
-  b=hwA0rndFL9qfbsFDksMiZ9cLIUW95MBJqaXu6vX5rTz03hrpYBwfeg4a
-   bR75vWbo8a6nM32+foCXYXIWbfa7BZLiosw2ARKNDEyLgrekVt+pGDwab
-   gglGxl4mO16WJUdZmYseF1ZAav2Zv52wqTCJwugugmlV2ofo7HAaR5qZc
-   nXnsLlx5gqk6LSoP1voXioI2h5xYtmjGG1r6ETwQKPPV1Wc78gBGnmObp
-   HfWfA0ENt7xmq5cezs0tCtGOv3t10dX40w0l5lSM4B6RtUrJlYX23Bflb
-   DNA4ZdUzZUyn03N8Q6vyplsZBptDFYGHuUkqNRqW+N3KOd9pVUo+J3pi5
-   Q==;
-X-CSE-ConnectionGUID: /VNgHnndTAGdutYeo+UIEg==
-X-CSE-MsgGUID: Kgn66ITeTSe7hECb71koOA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11125"; a="17673469"
-X-IronPort-AV: E=Sophos;i="6.09,190,1716274800"; 
-   d="scan'208";a="17673469"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2024 05:55:55 -0700
-X-CSE-ConnectionGUID: xPp/wiFMS6+0YZ9L/LZb1w==
-X-CSE-MsgGUID: rdCxZ3vISw62k2inJpqk0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,190,1716274800"; 
-   d="scan'208";a="47029673"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2024 05:55:55 -0700
-Received: from mohdfai2-iLBPG12-1.png.intel.com (mohdfai2-iLBPG12-1.png.intel.com [10.88.227.73])
-	by linux.intel.com (Postfix) with ESMTP id E556420738C7;
-	Sun,  7 Jul 2024 05:55:50 -0700 (PDT)
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Sasha Neftin <sasha.neftin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Subject: [PATCH iwl-net v2 3/3] igc: Fix qbv tx latency by setting gtxoffset
-Date: Sun,  7 Jul 2024 08:53:18 -0400
-Message-Id: <20240707125318.3425097-4-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
-References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1720356932; c=relaxed/simple;
+	bh=699Dr1Zzftx7dykQBKJJCEHmbS/vhJfNO9kbYbzbuBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XKBEn8XQKlWFhUJpfw1LV9mWqMqbZpt3DiXYvNCYOeEyo9WAx3xj0Q/0879EnYDHY4u6GFQ/SGJJu7qCuRNObuQnb+hHZrU2RrIkL3GDSCCD4OEow/mEJ86oeSXOAaF+oAaE/BJc+RmJIZufWWSPqEP4tCoggwMBS7Lp9kanpMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DQQYWzK4; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1832B60003;
+	Sun,  7 Jul 2024 12:55:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720356927;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bf1fF8WwiErDA75AsNYKAJh+BycwFxySDUH58lCZ6iY=;
+	b=DQQYWzK4nfe8TvCSLPXaPkrU4Jp4Ov33l2pvuxBymaPFP7LXr5/nz57XxpUmJnBZaR4Q/G
+	BcXUz1IMEjakNEDx3sSaLSXSnBsOmlSCtMTNZ41K/jnVDMtnh49bORy29oLwsZ1gyvkFC4
+	twR2/K7mi4yJo+zD6QiA0sTzYElhZfvKtwKgckR/squSxUdZaVCu4HVadoAYXkNnrX/jN2
+	qXKjXZEAZxUruXdfmEuNcTi57ZlgjGIPr/OTpwi7TuPsBikXR2TP9DG2nwyOu72mVotdkJ
+	4IDoPnXlUU3WOX93pchqu1+cNCBBbh73Xjmf2POgju0D8O5IMEbWAM6IgmqzCA==
+Date: Sun, 7 Jul 2024 14:55:23 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v16 13/14] net: ethtool: Add support for
+ tsconfig command to get/set hwtstamp config
+Message-ID: <20240707145523.37fdfeec@kmaincent-XPS-13-7390>
+In-Reply-To: <20240707082408.GF1481495@kernel.org>
+References: <20240705-feature_ptp_netnext-v16-0-5d7153914052@bootlin.com>
+	<20240705-feature_ptp_netnext-v16-13-5d7153914052@bootlin.com>
+	<20240707082408.GF1481495@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-A large tx latency issue was discovered during testing when only QBV was
-enabled. The issue occurs because gtxoffset was not set when QBV is
-active, it was only set when launch time is active.
+On Sun, 7 Jul 2024 09:24:08 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-The patch "igc: Correct the launchtime offset" only sets gtxoffset when
-the launchtime_enable field is set by the user. Enabling launchtime_enable
-ultimately sets the register IGC_TXQCTL_QUEUE_MODE_LAUNCHT (referred to as
-LaunchT in the SW user manual).
+> On Fri, Jul 05, 2024 at 05:03:14PM +0200, Kory Maincent wrote:
+>  [...] =20
+>=20
+> > diff --git a/Documentation/networking/timestamping.rst
+> > b/Documentation/networking/timestamping.rst index
+> > 5e93cd71f99f..8b864ae33297 100644 ---
+> > a/Documentation/networking/timestamping.rst +++
+> > b/Documentation/networking/timestamping.rst @@ -493,8 +493,8 @@ implici=
+tly
+> > defined. ts[0] holds a software timestamp if set, ts[1] is again deprec=
+ated
+> > and ts[2] holds a hardware timestamp if set.=20
+> > =20
+> > -3. Hardware Timestamping configuration: SIOCSHWTSTAMP and SIOCGHWTSTAMP
+> > -=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +3. Hardware Timestamping configuration: ETHTOOL_MSG_TSCONFIG_SET/GET
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =20
+>=20
+> nit: make htmldocs flags that this title underline is too short
+>=20
+> ...
 
-Section 7.5.2.6 of the IGC i225/6 SW User Manual Rev 1.2.4 states:
-"The latency between transmission scheduling (launch time) and the
-time the packet is transmitted to the network is listed in Table 7-61."
+Arf, indeed forgot to rebuild the doc, sorry.
 
-However, the patch misinterprets the phrase "launch time" in that section
-by assuming it specifically refers to the LaunchT register, whereas it
-actually denotes the generic term for when a packet is released from the
-internal buffer to the MAC transmit logic.
-
-This launch time, as per that section, also implicitly refers to the QBV
-gate open time, where a packet waits in the buffer for the QBV gate to
-open. Therefore, latency applies whenever QBV is in use. TSN features such
-as QBU and QAV reuse QBV, making the latency universal to TSN features.
-
-Discussed with i226 HW owner (Shalev, Avi) and we were in agreement that
-the term "launch time" used in Section 7.5.2.6 is not clear and can be
-easily misinterpreted. Avi will update this section to:
-"When TQAVCTRL.TRANSMIT_MODE = TSN, the latency between transmission
-scheduling and the time the packet is transmitted to the network is listed
-in Table 7-61."
-
-Fix this issue by using igc_tsn_is_tx_mode_in_tsn() as a condition to
-write to gtxoffset, aligning with the newly updated SW User Manual.
-
-Tested:
-1. Enrol taprio on talker board
-   base-time 0
-   cycle-time 1000000
-   flags 0x2
-   index 0 cmd S gatemask 0x1 interval1
-   index 0 cmd S gatemask 0x1 interval2
-
-   Note:
-   interval1 = interval for a 64 bytes packet to go through
-   interval2 = cycle-time - interval1
-
-2. Take tcpdump on listener board
-
-3. Use udp tai app on talker to send packets to listener
-
-4. Check the timestamp on listener via wireshark
-
-Test Result:
-100 Mbps: 113 ~193 ns
-1000 Mbps: 52 ~ 84 ns
-2500 Mbps: 95 ~ 223 ns
-
-Note that the test result is similar to the patch "igc: Correct the
-launchtime offset".
-
-Fixes: 790835fcc0cb ("igc: Correct the launchtime offset")
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/intel/igc/igc_tsn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 9fafe275f30f..efe13a9350ca 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -61,7 +61,7 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
- 	struct igc_hw *hw = &adapter->hw;
- 	u16 txoffset;
- 
--	if (!is_any_launchtime(adapter))
-+	if (!igc_tsn_is_tx_mode_in_tsn(adapter))
- 		return;
- 
- 	switch (adapter->link_speed) {
--- 
-2.25.1
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
