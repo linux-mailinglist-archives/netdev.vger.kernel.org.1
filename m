@@ -1,111 +1,91 @@
-Return-Path: <netdev+bounces-109693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA90A929909
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:59:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F9F92990B
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:59:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 455A0B21B0E
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 019ED1C20456
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B286C62A02;
-	Sun,  7 Jul 2024 16:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF63B548EE;
+	Sun,  7 Jul 2024 16:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2Bozkz0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsjlzvyW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEDA61FF6;
-	Sun,  7 Jul 2024 16:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A463E4D8DF;
+	Sun,  7 Jul 2024 16:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720371529; cv=none; b=PRGiWD7mfNj/lfLf0EFzixQR/rujmvA/M0+oxOOLwTLj3mLvgoJaT+tOP2p6Rx3hA6pFfxqwiP8MPbJhe6RPZ8cqDB4JUpXvqfTG2tiXBDVtCBYWQWNnFu0H7fu7bgMWrixqQs+0pkspEWmtmk08SmDQQfUTN7aIa9ePYqxofI4=
+	t=1720371580; cv=none; b=ir7JR+PwGlVPeZ3C/d21+UWTRdknKLDgIIZzAR5VhsR3InIx2a83ePcvHo947KnZxIN7BkrfpIPD6Z7TesPgws8/ts6kiLNnNeQ1lgl0xwWrMdzvsFiS5fPqIMOsvOY4gKkeSLFKuF23HjhHTCcpX/zNPqG8e7bR+vLmmQqsRQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720371529; c=relaxed/simple;
-	bh=bFOfg9DCQRNJqgkYrAa01kEpXfWJpHqF/D86SoHqwOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQ+8wW71uWaUPyGVHJWzJnG0Pwa/2hC5cW+UO66fu++6JRk2ZPJBbu1Mh78f35hu8oPsxOjcDw5IRFFcDCuCg1rNtE/4K0HLnCTAE01ntPsJoBVyDI9IXgDw0oHFnQDeDS8nn4W910F5vOgVMHJ69RDEOd0g7DlxspFy0c2bz+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2Bozkz0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E93DC3277B;
-	Sun,  7 Jul 2024 16:58:49 +0000 (UTC)
+	s=arc-20240116; t=1720371580; c=relaxed/simple;
+	bh=xT1ziNJA/xAO/tLDQLg/t8ceseRnsib1OpUFbyHOV1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T43HUm9cfeG1Q4P6G/cxKmIRGvP9bfuts+Jiv6zQx1swHzZc4OFrC3kCp5qN5LPjEmP00WZs2xm1Nncc490TbaHskSISug2s6+wDhA/wkFVno6O+dxtEN6eB72AxPhcF9d0H7etnjUb7ZTt3h1JwzzPF9zbwdQ0CFDEj5gj/Yk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsjlzvyW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E1FFC3277B;
+	Sun,  7 Jul 2024 16:59:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720371529;
-	bh=bFOfg9DCQRNJqgkYrAa01kEpXfWJpHqF/D86SoHqwOg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=u2Bozkz03mxeSBvm8SF3gYpvOyyBkLxEcZXvh3f5Vvio/ed6pvkpIuxAas38fnECk
-	 weV3GMW5SoZLbVZlwqPui/ie5pQfyZWhWJeoLlnA8wmqApY7mpjIbi6fGRW5LLTmka
-	 UeqrM3IWYLV724rvNhNfb7WjwffePIUChOlmh0XK6VszmWYliMhmH7bn1Crik9x/dS
-	 pF2HiN/bcq8N5BZF+ezqul87C8jb+euB9knGiixaj62ML+uFaE8A3i3JYJKghXS5xe
-	 o8/2r+AMeqgEsZD6zUaSnxvbyL3Zim2Om7hW+Ra8lwmPbLwQVKATjf/Ioho9JndIfD
-	 TOYAony20If8g==
-Message-ID: <35638894-254f-4e30-98ee-5a3d6886d87a@kernel.org>
-Date: Sun, 7 Jul 2024 10:58:49 -0600
+	s=k20201202; t=1720371580;
+	bh=xT1ziNJA/xAO/tLDQLg/t8ceseRnsib1OpUFbyHOV1k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DsjlzvyWRe0wAmR+4HEz3fC8k7/rXVERuLQ5n13s20TFUN1FhQ5gcE9LXpB4zGqi3
+	 bb43w1zq+BlkVD4P+J8/iAMwxdcA+swiNL9ncBL7BhjCOUv4m9fRr+W2pQ9vbJLmqq
+	 joT24C1fS4nQ372a2mozXR46n6PwswvFMhw1bZ1t/8MIqhCGrXHGsvBDG+FGcP3I9X
+	 z69TVvwSfQX+8s7ZwFyT6VMKM2OCr2q3kk1VIWE6COSQyfjXjgIXo70LA+JH/66u+C
+	 Ux9k4VLvJ1QIFhMfrL27zGg5o+Zzxr1YQLJHilIVR28atvMaD+ncyYyoxc8sPSEeGJ
+	 fH/k5uSzQb8AQ==
+Date: Sun, 7 Jul 2024 17:59:27 +0100
+From: Jonathan Cameron <jic23@kernel.org>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Rob Herring <robh@kernel.org>, Daniel Scally <djrscally@gmail.com>, Heikki
+ Krogerus <heikki.krogerus@linux.intel.com>, Sakari Ailus
+ <sakari.ailus@linux.intel.com>, Jean Delvare <jdelvare@suse.com>, Guenter
+ Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+ <lee@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, linux-acpi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-leds@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 5/6] leds: pca995x: use device_for_each_child_node() to
+ access device child nodes
+Message-ID: <20240707175927.18c4340e@jic23-huawei>
+In-Reply-To: <20240706-device_for_each_child_node-available-v1-5-8a3f7615e41c@gmail.com>
+References: <20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com>
+	<20240706-device_for_each_child_node-available-v1-5-8a3f7615e41c@gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/4] ipv6: fix source address selection with route
- leak
-Content-Language: en-US
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org
-References: <20240705145302.1717632-1-nicolas.dichtel@6wind.com>
- <20240705145302.1717632-3-nicolas.dichtel@6wind.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240705145302.1717632-3-nicolas.dichtel@6wind.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/5/24 8:52 AM, Nicolas Dichtel wrote:
-> diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-> index a18ed24fed94..a7c27f0c6bce 100644
-> --- a/include/net/ip6_route.h
-> +++ b/include/net/ip6_route.h
-> @@ -127,18 +127,23 @@ void rt6_age_exceptions(struct fib6_info *f6i, struct fib6_gc_args *gc_args,
->  
->  static inline int ip6_route_get_saddr(struct net *net, struct fib6_info *f6i,
->  				      const struct in6_addr *daddr,
-> -				      unsigned int prefs,
-> +				      unsigned int prefs, int l3mdev_index,
->  				      struct in6_addr *saddr)
->  {
-> +	struct net_device *l3mdev;
-> +	struct net_device *dev;
-> +	bool same_vrf;
->  	int err = 0;
->  
-> -	if (f6i && f6i->fib6_prefsrc.plen) {
-> +	rcu_read_lock();
-> +	l3mdev = dev_get_by_index_rcu(net, l3mdev_index);
-> +	dev = f6i ? fib6_info_nh_dev(f6i) : NULL;
-> +	same_vrf = l3mdev == NULL || l3mdev_master_dev_rcu(dev) == l3mdev;
+On Sat, 06 Jul 2024 17:23:37 +0200
+Javier Carrasco <javier.carrasco.cruz@gmail.com> wrote:
 
-!l3mdev; checkpatch should complain
-
-> +	if (f6i && f6i->fib6_prefsrc.plen && same_vrf)
->  		*saddr = f6i->fib6_prefsrc.addr;
-> -	} else {
-> -		struct net_device *dev = f6i ? fib6_info_nh_dev(f6i) : NULL;
-> -
-> -		err = ipv6_dev_get_saddr(net, dev, daddr, prefs, saddr);
-> -	}
-> +	else
-> +		err = ipv6_dev_get_saddr(net, same_vrf ? dev : l3mdev, daddr, prefs, saddr);
-> +	rcu_read_unlock();
->  
->  	return err;
->  }
-
-lot of logic lines jammed together. put a new line after the read_lock()
-and before the unlock().
-
-
+> The iterated nodes are direct children of the device node, and the
+> `device_for_each_child_node()` macro accounts for child node
+> availability.
+> 
+> `fwnode_for_each_available_child_node()` is meant to access the child
+> nodes of an fwnode, and therefore not direct child nodes of the device
+> node.
+> 
+> Use `device_for_each_child_node()` to indicate device's direct child
+> nodes.
+> 
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
