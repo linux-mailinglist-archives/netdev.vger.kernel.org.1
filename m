@@ -1,201 +1,139 @@
-Return-Path: <netdev+bounces-109657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A305B9295E4
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 01:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 089C99296F6
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 09:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FA5F1C20BAF
-	for <lists+netdev@lfdr.de>; Sat,  6 Jul 2024 23:28:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 381D41C20DC3
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 07:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2E841A94;
-	Sat,  6 Jul 2024 23:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtAFVVc9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2394FD2E5;
+	Sun,  7 Jul 2024 07:35:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AACF45BF3;
-	Sat,  6 Jul 2024 23:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F9D1170F;
+	Sun,  7 Jul 2024 07:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720308508; cv=none; b=B0lOwXRKhvEx4hjdX/bTKWz93CtWjpiG0Ymjffi4LeOv967YOC9201ESSHeaHmaik51U8huuENiKew/3f15jvGSdJPSxkpPCzKKn1pOQrukZAUcA8Tlt9LFKhLoop43thIYi7+zAxgzWiI17EDUKi7asTa/S80Ov7B6lxMWSsqY=
+	t=1720337713; cv=none; b=U/6ODUiMungC2pPJ3ndCWCwpWH1s4Sr/xdUvxgjgwPkQYXh1NBQy/tCrH7QbijT1A6Eay83AEH7h9PkbxWuFzVdrC/kBDXfJPRrAY0/Ut/NXGdCg0r8lJenenetXiRiIYLdTwF9mnj46yE0xHmqujJqA1GYtBdgb8ChgxR+TKtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720308508; c=relaxed/simple;
-	bh=KKo+oGs4TSAe84B4lLvyAQD2Yu0uFJMI3pTFZWerumM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SAdwvZyULWK6FMXVdivkACWv0T6QcCKoNGxAo5PPdgayBpxJvjsXTZXJI48KEZ4iF9lpRMblI7KalzckTmQ9GKhKSIE8op25kuaeeHAamjydJVSQkWI10pdFBRDoOVh8RCcz0s6VcasnLvqfq17bugOH/s4SwtMfZfDxhFSnyAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtAFVVc9; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720308506; x=1751844506;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KKo+oGs4TSAe84B4lLvyAQD2Yu0uFJMI3pTFZWerumM=;
-  b=LtAFVVc9oQ9TYYB595lSx5624xyobtEGQXTkE72IZC1ZP+uPJAcc/8ho
-   Fp+7Z90bLd+1dHuRLWFuRmp9Ew2fzermxPZEK9lhBYiSdfKyUoL+wDmpI
-   IbTU7PY918a191+LQpHZrWsfz+pFII9qaFa1rCtMgxSgrqJnhdoyBWakz
-   m/go3b4OcGK+LajBczZbPRcNjsRQXsfBoSvHts7qB3TPXAr14nWK0CRU3
-   LLscBG5HjBHp2FQJ4qJwpBMveTP+ZwL7ppkIVKyT3M1LnWKxxRuve9t2y
-   /YbngZrUj9rpjBFu6KWCq7fuzI941mX7jR9AYX0bMQtJf6Yvl/bPw4el2
-   A==;
-X-CSE-ConnectionGUID: pHiW6EWaSoyNDOeJCq4GXg==
-X-CSE-MsgGUID: C2C2CCkCT42/3nnr5x9kRw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11125"; a="21317109"
-X-IronPort-AV: E=Sophos;i="6.09,188,1716274800"; 
-   d="scan'208";a="21317109"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2024 16:28:25 -0700
-X-CSE-ConnectionGUID: 89uIwiqsRbS9b7F/jfaP2A==
-X-CSE-MsgGUID: dp1IKG+zTt+nmFQzyBu1Vg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,188,1716274800"; 
-   d="scan'208";a="46930242"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 06 Jul 2024 16:28:20 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sQEpF-000UOo-23;
-	Sat, 06 Jul 2024 23:28:17 +0000
-Date: Sun, 7 Jul 2024 07:27:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 2/6] Bluetooth: hci_qca: schedule a devm action for
- disabling the clock
-Message-ID: <202407070754.L1XER9qH-lkp@intel.com>
-References: <20240705-hci_qca_refactor-v1-2-e2442121c13e@linaro.org>
+	s=arc-20240116; t=1720337713; c=relaxed/simple;
+	bh=SdMTMEyAxrDIFF9Na+K5TW8VSz8xAY0Kf2QaI/yF0XU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oqydHzVFCPBDjKjKgtSokTrxqjAs0OGYhapguAtHi6cFUrLZKb5Az6rYAmR8MJG0PN9F+uzoTu8Xc9oqzrmrDl5f8X463TdUG0bGyZ7nE2ynZruce5B4F9lBeWvX6a6jDpAocgGaUk7biDVZtoYTZdL90L2JMvnPxaeZE1QGqEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtpip3t1720337660tkacxpm
+X-QQ-Originating-IP: xEPDphvktVF415/GqFjUMqm3UtXJmiJdfibU97Nz69Q=
+Received: from [IPV6:240e:36c:d19:e900:dfc1:d0 ( [255.153.174.1])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 07 Jul 2024 15:34:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 8694329200217638920
+Message-ID: <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
+Date: Sun, 7 Jul 2024 15:34:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240705-hci_qca_refactor-v1-2-e2442121c13e@linaro.org>
-
-Hi Bartosz,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on 0b58e108042b0ed28a71cd7edf5175999955b233]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Bartosz-Golaszewski/dt-bindings-bluetooth-qualcomm-describe-the-inputs-from-PMU-for-wcn7850/20240706-055822
-base:   0b58e108042b0ed28a71cd7edf5175999955b233
-patch link:    https://lore.kernel.org/r/20240705-hci_qca_refactor-v1-2-e2442121c13e%40linaro.org
-patch subject: [PATCH 2/6] Bluetooth: hci_qca: schedule a devm action for disabling the clock
-config: hexagon-allyesconfig (https://download.01.org/0day-ci/archive/20240707/202407070754.L1XER9qH-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project a0c6b8aef853eedaa0980f07c0a502a5a8a9740e)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240707/202407070754.L1XER9qH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407070754.L1XER9qH-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/bluetooth/hci_qca.c:23:
-   In file included from include/linux/devcoredump.h:12:
-   In file included from include/linux/scatterlist.h:8:
-   In file included from include/linux/mm.h:2229:
-   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   In file included from drivers/bluetooth/hci_qca.c:23:
-   In file included from include/linux/devcoredump.h:12:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     548 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/bluetooth/hci_qca.c:23:
-   In file included from include/linux/devcoredump.h:12:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/bluetooth/hci_qca.c:23:
-   In file included from include/linux/devcoredump.h:12:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     585 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
->> drivers/bluetooth/hci_qca.c:2499:2: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
-    2499 |         }
-         |         ^
-   8 warnings generated.
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
+ account with bpf_jit_binary_lock_ro()" for linux-6.6.37
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, sashal@kernel.org, ast@kernel.org,
+ keescook@chromium.org, linux-hardening@vger.kernel.org,
+ christophe.leroy@csgroup.eu, catalin.marinas@arm.com, song@kernel.org,
+ puranjay12@gmail.com, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ illusionist.neo@gmail.com, linux@armlinux.org.uk, bpf@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ chenhuacai@kernel.org, kernel@xen0n.name, loongarch@lists.linux.dev,
+ johan.almbladh@anyfinetworks.com, paulburton@kernel.org,
+ tsbogend@alpha.franken.de, linux-mips@vger.kernel.org, deller@gmx.de,
+ linux-parisc@vger.kernel.org, iii@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, linux-s390@vger.kernel.org, davem@davemloft.net,
+ sparclinux@vger.kernel.org, kuba@kernel.org, hawk@kernel.org,
+ netdev@vger.kernel.org, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, guanwentao@uniontech.com, baimingcong@uniontech.com
+References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
+ <2024070631-unrivaled-fever-8548@gregkh>
+From: WangYuli <wangyuli@uniontech.com>
+Content-Language: en-US
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+In-Reply-To: <2024070631-unrivaled-fever-8548@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
 
-vim +2499 drivers/bluetooth/hci_qca.c
+On 2024/7/6 17:30, Greg KH wrote:
+> This makes it sound like you are reverting this because of a build
+> error, which is not the case here, right?  Isn't this because of the
+> powerpc issue reported here:
+> 	https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
+> ?
 
-05ba533c5c1155 Thierry Escande                2018-03-29  2478  
-05ba533c5c1155 Thierry Escande                2018-03-29  2479  static void qca_serdev_remove(struct serdev_device *serdev)
-05ba533c5c1155 Thierry Escande                2018-03-29  2480  {
-05ba533c5c1155 Thierry Escande                2018-03-29  2481  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-054ec5e94a46b0 Venkata Lakshmi Narayana Gubba 2020-09-10  2482  	struct qca_power *power = qcadev->bt_power;
-05ba533c5c1155 Thierry Escande                2018-03-29  2483  
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2484  	switch (qcadev->btsoc_type) {
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2485  	case QCA_WCN3988:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2486  	case QCA_WCN3990:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2487  	case QCA_WCN3991:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2488  	case QCA_WCN3998:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2489  	case QCA_WCN6750:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2490  	case QCA_WCN6855:
-e0c1278ac89b03 Neil Armstrong                 2023-08-16  2491  	case QCA_WCN7850:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2492  		if (power->vregs_on) {
-c2d7827338618a Balakrishna Godavarthi         2018-08-22  2493  			qca_power_shutdown(&qcadev->serdev_hu);
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2494  			break;
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2495  		}
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2496  		fallthrough;
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2497  
-691d54d0f7cb14 Neil Armstrong                 2023-08-16  2498  	default:
-691d54d0f7cb14 Neil Armstrong                 2023-08-16 @2499  	}
-fa9ad876b8e0eb Balakrishna Godavarthi         2018-08-03  2500  
-fa9ad876b8e0eb Balakrishna Godavarthi         2018-08-03  2501  	hci_uart_unregister_device(&qcadev->serdev_hu);
-05ba533c5c1155 Thierry Escande                2018-03-29  2502  }
-05ba533c5c1155 Thierry Escande                2018-03-29  2503  
+No, it only occurs on ARM64 architecture. The reason is that before 
+being modified, the function
 
+bpf_jit_binary_lock_ro() in arch/arm64/net/bpf_jit_comp.c +1651
+
+was introduced with __must_check, which is defined as 
+__attribute__((__warn_unused_result__)).
+
+
+However, at this point, calling bpf_jit_binary_lock_ro(header) 
+coincidentally results in an unused-result
+
+warning.
+
+> If not, why not just backport the single missing arm64 commit,
+
+Upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory 
+management") is part of
+
+a larger change that involves multiple commits. It's not an isolated commit.
+
+
+We could certainly backport all of them to solve this problem, but it's 
+not the simplest solution.
+
+> and why
+> didn't this show up in testing?
+
+Thanks for the tip.
+
+I'll be sure to keep a closer eye on the stable kernel testing phase in 
+the future and hopefully catch any
+
+problems more timely.
+
+> confused,
+>
+> greg k-h
+>
+Sincerely
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+WangYuli <wangyuli@uniontech.com>
 
