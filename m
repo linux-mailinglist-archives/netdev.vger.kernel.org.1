@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-109673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82315929808
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 15:08:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03C192980B
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 15:08:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C40280EFC
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 13:08:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D0F51C213A9
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 13:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5C7208A5;
-	Sun,  7 Jul 2024 13:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7FA20B04;
+	Sun,  7 Jul 2024 13:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFjJp5FV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2ZuglGR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F2F1F951;
-	Sun,  7 Jul 2024 13:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F3720319;
+	Sun,  7 Jul 2024 13:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720357706; cv=none; b=FZdDOvDpgwQyxWwuQNzef5/UXUaYv4aOccNFUELo1QVapJMuIuFP5+hbd63VKoRTliTjpm7rtR9Dw1R4SkYwwAmFoX54dDKwhAd42EnyABi06HMEKAwjIpF7Qq/nNQ84ypD3v5p4+VCJJZ5DhsjclUNnTC+GQj5QcimsKyBI1CA=
+	t=1720357733; cv=none; b=XDsmp2N+GVQCdVjwYCTyhSwkYlEGqQnfE5kce8Dv6pEtZkuVaovYcN7IXRXAylgeiq+P/lB80eDAwywGq/804BYICDiLRxxdUW/DR/4+FZNSRxRUEh//HFcRMEDCDIbAEPdoTRJQy4PJlpjR0CItffeIY8mwE7F8j7FrfIU0LvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720357706; c=relaxed/simple;
-	bh=EG+A9YUWI7WQs9dT+rzDMuTdiTEedZeoYxyplzYa3/8=;
+	s=arc-20240116; t=1720357733; c=relaxed/simple;
+	bh=j+xPRbbPaYiXSNyNcEcAXNQskEAM89MU31kQHLvsE/E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TFkOeQ/2hcyeIcVSnEDF2KRxvZq7rx1BRSc+wfRb1hgC9gn8jkY+f5UlPVsxlHr0oVljotqqTinkTLrgHT+oOT9+jAqpusogzPgi7aTGqQ8zRqzg79jS+wfwenlmGWzqmKAgTqcmAcnpV/ZEdztSAFQ3aeAOM3fAjKQoo8Bl3nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFjJp5FV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD54C3277B;
-	Sun,  7 Jul 2024 13:08:19 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=d51DoIqPCy95tqzv4tzWRCtjxYZLLxhRCIQCC1QhaNNSNJizwVZtMb+J0H8o5xHWy5LLmEWw6fSiEJSHNo5SE+gbDxyyZhbTdkD70STWrcmNq/iA/QpnBEIox+xfAD+0Pu38kdGtNfQiybibOG1EWm8+9sUj2y6yS0NT8ZkZ3mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2ZuglGR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77F7C3277B;
+	Sun,  7 Jul 2024 13:08:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720357705;
-	bh=EG+A9YUWI7WQs9dT+rzDMuTdiTEedZeoYxyplzYa3/8=;
+	s=k20201202; t=1720357733;
+	bh=j+xPRbbPaYiXSNyNcEcAXNQskEAM89MU31kQHLvsE/E=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fFjJp5FVfyuFVGjMs4WyTGjqG52o1y9HmC9BbByfsL5i3Au3ZJT7WFSQ6cWW7+IQt
-	 /gzg23l/v4RqX4/SVx3uEM/aGGtByOof8ucmj6YVwH4hZTSDlnTIB/pgKYjRz67MCt
-	 VB1dU3lyUfGX043Bs1j87kak9eIPixtcnouybLk3r1vB7wQSc7x6MXBmAs7D1yj6sg
-	 45Z6Z+9ZfgInsu9D5xV0WSI0SZief81BbJ6m2e0NVMZaBY5EdsQwFjUbKP7mwMoCQD
-	 9u+ztR5WYH0m2h9sGb6d0mBY8I19cMB5Cdwvna6QSqlSHvGRvd29Dy2OgEfdkvNQSv
-	 CKl34pY7bCP6Q==
-Message-ID: <4f677e02-a7d3-4d5e-9d80-88169f8ff201@kernel.org>
-Date: Sun, 7 Jul 2024 15:08:17 +0200
+	b=B2ZuglGRLshSIRZjzgzvKe2X2oU+6eAzEI3GTh8U/su6QaJD83cQ068k8GzyfaX+L
+	 mFb3ksSk0OVXlix+MveOdd2POdhtXCpP0V6RwHYyumeV2QtSUNBBXSZw3y+GrJetcb
+	 irrofK4wpb27fyy2ShLurjQOsDilGVi41GuQE+bc758r1gIsXQ+XkIoC2lS7q+mUGQ
+	 wqrpTJecV2tY4n4RoU6GwT7f3u+QKatl57cGSkjCr5YFGPZVcB5PNaGOs6PtYf0KGy
+	 8lXn7ym0FBcUaan7YPu3AhvpgjFwy7zRaSlzxPiAIqEcypmUhjYDfrhgV4HZbEa1em
+	 lv/MEUQdJDoGQ==
+Message-ID: <98f3e5d2-f0bc-46b8-8560-e732dcbe8532@kernel.org>
+Date: Sun, 7 Jul 2024 15:08:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] dt-bindings: net: bluetooth: Add support for Amlogic
+Subject: Re: [PATCH 3/4] arm64: defconfig: Enable hci_uart for Amlogic
  Bluetooth
 To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -63,9 +63,9 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
 References: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
- <20240705-btaml-v1-1-7f1538f98cef@amlogic.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <20240705-btaml-v1-3-7f1538f98cef@amlogic.com>
 Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -109,121 +109,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240705-btaml-v1-1-7f1538f98cef@amlogic.com>
+In-Reply-To: <20240705-btaml-v1-3-7f1538f98cef@amlogic.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 05/07/2024 13:20, Yang Li via B4 Relay wrote:
 > From: Yang Li <yang.li@amlogic.com>
 > 
-> Add binding document for Amlogic Bluetooth chipsets attached over UART.
-> 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->  .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 62 ++++++++++++++++++++++
->  1 file changed, 62 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
-> new file mode 100644
-> index 000000000000..d59e3206af62
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
-> @@ -0,0 +1,62 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Amlogic Bluetooth chips
-> +
-> +description:
-> +  This binding describes UART-attached Amlogic bluetooth chips.
+> Enable the HCI protocol of Amlogitc Bluetooth.
 
-Do not say that binding describes a binding. It is not helpful. Describe
-the hardware instead.
+Why? Commit msg MUST answer this.
 
-> +
-> +maintainers:
-> +  - Yang Li <yang.li@amlogic.com>
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: amlogic,w155s2-bt
-> +      - items:
-> +          - enum:
-> +              - amlogic,w265s1-bt
-> +              - amlogic,w265p1-bt
-> +              - amlogic,w265s2-bt
-> +          - const: amlogic,w155s2-bt
-> +
-> +  amlogic,wcn-pwrseq:
-
-??
-
-> +    default: 0
-> +    description: specify the power sequence used to power on Bluetooth
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-
-What? I have no clue what is this and have no clue what to say here. Drop.
-
-> +
-> +  amlogic,firmware:
-> +    description: specify the path of firmware bin to load
-> +    $ref: /schemas/types.yaml#/definitions/string-array
-
-Srsly, it's third case in your bindings. Do not re-invent the wheel but
-use existing, common properties. How to find them? Well, git grep or ask
-your colleagues...
-
-
-
-
-> +
-> +  amlogic,antenna-number:
-> +    default: 1
-> +    description: number of antenna
-
-Useless description. Do not repeat the property name but explain what is
-it and how it is used.
-
-Or drop the property.
-
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +
-> +  amlogic,a2dp-sink-enable:
-> +    default: 0
-> +    description: enable sink mode with controller
-
-Again, not possible to figure out.
-
-NAK
-
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +
-> +required:
-> +  - compatible
-> +  - amlogic,wcn-pwrseq
-> +  - amlogic,firmware
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    serial {
-
-Drop
-
-> +        bluetooth {
-> +            compatible = "amlogic,w155s2-bt";
-> +            amlogic,wcn-pwrseq = <1>;
-
-Joking, right?
-
-
+Also, this is supposed to be module.
 
 Best regards,
 Krzysztof
