@@ -1,104 +1,81 @@
-Return-Path: <netdev+bounces-109683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF019298C8
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:16:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 483869298CD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEC822823BD
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:16:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6EFEB21BCD
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192143611B;
-	Sun,  7 Jul 2024 16:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502814436A;
+	Sun,  7 Jul 2024 16:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GknRDJL2"
+	dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b="Pdxrv9e5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17F518E28;
-	Sun,  7 Jul 2024 16:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C4A3AC01
+	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 16:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720368973; cv=none; b=Cxz7rLDyyxB4maVWENibWvYMQd/pSWMvj1UnJMpX03gSyf4ospQORdQclNfvT3bAFESntZCyDJ7xIlSefq4IHITOtYDcrFq1Aj2EQTZGVG6AAsS237+AG6jUavhsxNmO0LGEBEG+HdKbV0/qKzCzfLDT6T+fphDEVHxVrrhCtrw=
+	t=1720369048; cv=none; b=mrB/S+5wvAopKdKB86Ap2iz0bQmxhV93K51r+x2al2+STKk66BgXguchVcBlV7dRWIF9/GUU00neBLIIm1Mq/3bI6aiLXivrs737dgyAzV5nJtpEcTffvDhL9O5I3sWZ8NBpncs2Z8/lf8JCB1yAGLvLNbCTvppeSFHqA/c3qsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720368973; c=relaxed/simple;
-	bh=aA7uaVzlUG8Es5n7DDdXmzvi98lEyCK+vZrQB5OXVLk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xv2DXwDU0fuXTd4FBCznu4KNMOkl1Ai8lHXAJF4OXBs+c+nBB7B2EfvCc0Ldx++akaNx04BIIBcXX3wyAd/LjTmRFzyPY5fWblQ0mCw726/qZ8ORbUcIaILd09ahtKvXVyQFEZe3F5e/WCi/ZMuFJbLL3l7itHUFfbMW5jxB59c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GknRDJL2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 037FFC3277B;
-	Sun,  7 Jul 2024 16:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720368972;
-	bh=aA7uaVzlUG8Es5n7DDdXmzvi98lEyCK+vZrQB5OXVLk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GknRDJL2+hHKP7Ic5uIA6BP906pcdNzabg7xdEV60em1p2IFkDYi/MyJ9anDshecm
-	 +zWMUjIdrCBSAcRRH9P8Ynam8dfbvPCT6mUNuV0g0K23eg1SQV8HejQqkMrwa7ISvR
-	 stlovuPa0vjCbLvOcHCKO6xhXTyRWipN/XEHROWr9XCH3Wy14rj4rz11kBL5ZMcUhj
-	 r5toQXkwuu1LUefLJ8ceiXhtWwq8DBWiM3Ggy6wPw+M5Hc4TR7AOexvm/NUfGbkp/D
-	 Ym6HaoWGUKSdulLuKGvYzs6ntdgwTQsW4XwzebUzVWLLH3j7msddcrzYEdOD8b5XKk
-	 A3x+dpKo80xXg==
-Message-ID: <c83bb901-686e-4507-b4b1-020ae86d2381@kernel.org>
-Date: Sun, 7 Jul 2024 10:16:11 -0600
+	s=arc-20240116; t=1720369048; c=relaxed/simple;
+	bh=8LHfo1rOAaQlxdS3v/jalYjcSDAndZe5MOazuNAN9xo=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=YwVpvDqZ5/JAVMUs1DcYUP5JREKUDYG8eHzFCv5auKuKwaNkLrnZZc0gOuW0hy2sS+q+RyUayvd1VZl1/AVy5pRQqfqxVUbYqN3ESoBfxVBJSlQBgODIvzTHE+J8EDpH0j8+Lxyk/SlryPPbrc5T/63D3WRsv4k/tEiAURYjRdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b=Pdxrv9e5; arc=none smtp.client-ip=212.77.101.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 5204 invoked from network); 7 Jul 2024 18:17:20 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=1024a;
+          t=1720369041; bh=CCkAjOCiFaYK53JrnmxFZ2Ne9oZgyxcNpzrxjvr891M=;
+          h=From:To:Subject;
+          b=Pdxrv9e5fNeSSFAVSKZ1ah9Hx09tmDmTPjr7cmhD99wvwK88Hdw442LX0E+36TUnM
+           DX6sY/2saZYAlOKja9k2jolVOL/hWWAqujmpTzfxWXYt1k/dMs25sKqrOI7SDrB8Ys
+           G9nyx9wCX+dNJhwkR5viUQUipajBij90kxb/AFHo=
+Received: from 83.5.245.171.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.5.245.171])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <davem@davemloft.net>; 7 Jul 2024 18:17:20 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jacob.e.keller@intel.com,
+	u.kleine-koenig@pengutronix.de,
+	olek2@wp.pl,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH [net] v2 0/1] net: ethernet: lantiq_etop: fix double free in detach
+Date: Sun,  7 Jul 2024 18:17:12 +0200
+Message-Id: <20240707161713.1936393-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 iproute2 0/4] Multiple Spanning Tree (MST) Support
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, liuhangbin@gmail.com,
- Tobias Waldekranz <tobias@waldekranz.com>
-References: <20240702120805.2391594-1-tobias@waldekranz.com>
- <172020068352.8177.8028215256014256151.git-patchwork-notify@kernel.org>
- <d6e8ce6e-53f4-4f69-951e-e300477f1ebe@kernel.org>
- <20240705204915.1e9333ae@hermes.local>
- <547c13c8-c3c3-495e-8ca9-d87156bfe3f5@kernel.org>
- <20240706125616.690e7b98@hermes.local>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240706125616.690e7b98@hermes.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: dcc5dc2a3b3bc3e7b28cde8500ac2682
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 000000B [oQMk]                               
 
-On 7/6/24 1:56 PM, Stephen Hemminger wrote:
-> The original point was to have kernel -next and iproute2 -next branches
-> and have support arrive at same time on both sides. The problem is when
-> developers get behind, and the iproute2 patches arrive after the kernel cycle
-> and then would end up get delayed another 3 to 4 months.
+Changes in v2:
+- Wrap line around 80 characters
 
-Then the userspace patches should be sent when the kernel patches are
-merged. Period. no excuses. Any delay is on the developer.
+Aleksander Jan Bajkowski (1):
+  net: ethernet: lantiq_etop: fix double free in detach
 
-> 
-> Example:
-> 	If mst had been submitted during 6.9 -next open window, then
-> 	it would have arrived in iproute2 when -next was merged in May 2024 and
-> 	would get released concurrently with 6.10 (July 2024).
-> 	When MST was submitted later, if it goes through -next, then it would
-> 	get merged to main in August 2024 and released concurrently with 6.11
-> 	in October. By merging to main, it will be in July.
+ drivers/net/ethernet/lantiq_etop.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Same exact problem with netkit and I told Daniel no. We have a
-development policy for new features; it must apply across the board to
-all of them.
+-- 
+2.39.2
 
-> 
-> I understand your concern, and probably better not to have done it.
-
-You applied patches for a new feature just a week or two before release.
-It is just wrong. It would be best to either back up the branch or
-revert them.
-
-> The problem with accepting things early is the review process gets
-> truncated, and new features often have lots of feedback.
-> 
-
-I see no problem here; that is normal development work.
 
