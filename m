@@ -1,95 +1,111 @@
-Return-Path: <netdev+bounces-109692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED85D929904
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:58:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E29C929901
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 18:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A4B12810E3
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:58:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4AB21C20C94
+	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 16:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B0A5588E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D76502B1;
 	Sun,  7 Jul 2024 16:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ueuz1wW9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PHu9orTj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C31A5337F;
-	Sun,  7 Jul 2024 16:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B392A1B2;
+	Sun,  7 Jul 2024 16:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720371526; cv=none; b=ePeWggPfkGlxt+4WVSBOZKDUhoHbEXs8bB7u/AUeWcwsIx45Vpb2ueAxuHCsc69tMPiNmxyj67IYbGsQyggCLXxHWwUF9YQCWtwwQ8yTxdn9QhZvqPN561DTj6e3WDD/eBdtGGhiz2t3eCb0DdAjQwbAaKT4hbXld8ZB96zfaoQ=
+	t=1720371526; cv=none; b=VbCLxsUo7yP5sT9cT2vP7hdWzoDV3SXMGgDHRkW/b7jmpburru38xDBcFF4ifZKqo6flmD89Cn6sbOs+B0vEqdIZHXmXPdRx1KLvrO5nwZhCz/hhtqyOdCDkA/RxaFxzl1kdgvIkyHXXmy6wJYSx/ezQ/a7nCjfw3EFJDsgXe5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720371526; c=relaxed/simple;
-	bh=NX5O9Z6ai9tV4k690hOuPXtRQyXWHVC1y49XRiHK52E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZhsYUK2g3H9vWsnNKNJMAN7CaKADgKwyy8MyZ7YE3vAi5DadJDYjv1hytYfCEoXWhOG8V3Wk5jaIIxwWRgIHjXGtOB1UvTqrF2pcVA6T8PE1Fc9PYWoe232f8t0C7cVg7nqO6KQCscQmrkH05o28LacBR99AO/A/kK6IXGip4io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ueuz1wW9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8587C3277B;
-	Sun,  7 Jul 2024 16:58:37 +0000 (UTC)
+	bh=ek8/PkDSfiE6Y3MGzufPXapUFp3Uy2m2SAILQOHoRg0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NY/Po+hx97jK4/rnPiq4LDM2rQls4QlUx7Ia5P8y+b+aGDqvds1OIwZ4d8h2IKjiovnEA1YL3eMwm3hvRk7j/bvHWaL+B8bylkWxaRjI3R9MNV5Ojs820NHuB0MSw9FG57gIx3UCFHcyRcAULnpmhywgaNY2we6E15ZdMH12tww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PHu9orTj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BF59C32781;
+	Sun,  7 Jul 2024 16:58:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720371526;
-	bh=NX5O9Z6ai9tV4k690hOuPXtRQyXWHVC1y49XRiHK52E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ueuz1wW9S7RI7vFiY1/1jUmwPhDN1lxSyUY01RVcUWl2X+9qlQJWBx2JF/rlF0Btj
-	 1kBP+9lIdc7s4sei41pOmglxBauwtGVJGMHtx3EIFHc06MzhJyW0yNilCegzvQ+B/5
-	 omb4LBO60Kmbf9Q4tJQPF5ipR+FR5eUsyKz999MJlROy5Szmm2RzmwTZCJNQZgWWlI
-	 IWmNb688Fb3xLE64rwMLEYHIj/MxCqMW9LAmr7IgEbf7t1OXV0Erksw1d+Q/59PzUh
-	 ajRvGI1t0JFQJYk7u8YnBCj3ayo0Bov+degtlyOjiGOFtOyN83QhGurFUuWFG2lz6Z
-	 eainyYcPIG+oA==
-Date: Sun, 7 Jul 2024 17:58:33 +0100
-From: Jonathan Cameron <jic23@kernel.org>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Rob Herring <robh@kernel.org>, Daniel Scally <djrscally@gmail.com>, Heikki
- Krogerus <heikki.krogerus@linux.intel.com>, Sakari Ailus
- <sakari.ailus@linux.intel.com>, Jean Delvare <jdelvare@suse.com>, Guenter
- Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>, Lee Jones
- <lee@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-acpi@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-leds@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 4/6] leds: is31fl319x: use
- device_for_each_child_node_scoped() to access child nodes
-Message-ID: <20240707175833.34fc4ed5@jic23-huawei>
-In-Reply-To: <20240706-device_for_each_child_node-available-v1-4-8a3f7615e41c@gmail.com>
-References: <20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com>
-	<20240706-device_for_each_child_node-available-v1-4-8a3f7615e41c@gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-pc-linux-gnu)
+	s=k20201202; t=1720371525;
+	bh=ek8/PkDSfiE6Y3MGzufPXapUFp3Uy2m2SAILQOHoRg0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PHu9orTjPzajx5QmAgUfMKlcPNKQ/fY4i+EgLvcmhesCuOR5EM0zkdlMRnu38MAjq
+	 xP/PNX9dHamBimYyBR3Ok4tneMkfgu+w5jH2SFl417cPZ5ucEgP2VPuQqtlsiOydzc
+	 Mrb84b/8nRBLNcFWhdKM5gGypmcQbhyUolBpem9lhwhfEZ6bYrebQZ7JcggoO2AFR4
+	 9M98BRy/nvhbeOICaIzes/vcOTwQFZxk+3CCPVLIzvJXUr20RGKK5FWEZC/NTNYIvi
+	 ueBCqtk4HH7uBRvhVGvmbvIvHaOezS5omhmmQoGwuBCmTqHGveBipn/DKHrH2tns/U
+	 FB2qLzAyhioQQ==
+Message-ID: <339873c4-1c6c-4d9c-873c-75a007d4b162@kernel.org>
+Date: Sun, 7 Jul 2024 10:58:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/4] ipv4: fix source address selection with route
+ leak
+Content-Language: en-US
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org
+References: <20240705145302.1717632-1-nicolas.dichtel@6wind.com>
+ <20240705145302.1717632-2-nicolas.dichtel@6wind.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240705145302.1717632-2-nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Sat, 06 Jul 2024 17:23:36 +0200
-Javier Carrasco <javier.carrasco.cruz@gmail.com> wrote:
+On 7/5/24 8:52 AM, Nicolas Dichtel wrote:
+> By default, an address assigned to the output interface is selected when
+> the source address is not specified. This is problematic when a route,
+> configured in a vrf, uses an interface from another vrf (aka route leak).
+> The original vrf does not own the selected source address.
+> 
+> Let's add a check against the output interface and call the appropriate
+> function to select the source address.
+> 
+> CC: stable@vger.kernel.org
+> Fixes: 8cbb512c923d ("net: Add source address lookup op for VRF")
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> ---
+>  net/ipv4/fib_semantics.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+> index f669da98d11d..459082f4936d 100644
+> --- a/net/ipv4/fib_semantics.c
+> +++ b/net/ipv4/fib_semantics.c
+> @@ -2270,6 +2270,13 @@ void fib_select_path(struct net *net, struct fib_result *res,
+>  		fib_select_default(fl4, res);
+>  
+>  check_saddr:
+> -	if (!fl4->saddr)
+> -		fl4->saddr = fib_result_prefsrc(net, res);
+> +	if (!fl4->saddr) {
+> +		struct net_device *l3mdev = dev_get_by_index_rcu(net, fl4->flowi4_l3mdev);
 
-> The iterated nodes are direct children of the device node, and the
-> `device_for_each_child_node()` macro accounts for child node
-> availability.
-> 
-> `fwnode_for_each_available_child_node()` is meant to access the child
-> nodes of an fwnode, and therefore not direct child nodes of the device
-> node.
-> 
-> In this case, the child nodes are not required outside the loop, and
-> the scoped version of the macro can be used to remove the repetitive
-> `goto put` pattern.
-> 
-> Use `device_for_each_child_node_scoped_scoped()` to indicate device's
-> direct child nodes.
-> 
-> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+long line length. separate setting the value:
+
+		struct net_device *l3mdev;
+
+		l3mdev = dev_get_by_index_rcu(net, fl4->flowi4_l3mdev);
+
+> +
+> +		if (!l3mdev ||
+> +		    l3mdev_master_dev_rcu(FIB_RES_DEV(*res)) == l3mdev)
+> +			fl4->saddr = fib_result_prefsrc(net, res);
+> +		else
+> +			fl4->saddr = inet_select_addr(l3mdev, 0, RT_SCOPE_LINK);
+> +	}
+>  }
+
 
