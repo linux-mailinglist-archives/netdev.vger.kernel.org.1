@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-109779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CAC929EAF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:10:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2594929EB7
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:12:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12EC9B2373F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:10:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E86AB206B8
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CD547F53;
-	Mon,  8 Jul 2024 09:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE004D8B6;
+	Mon,  8 Jul 2024 09:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m8YNNCtw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwPFU+0x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282E5AD31;
-	Mon,  8 Jul 2024 09:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BA0AD31;
+	Mon,  8 Jul 2024 09:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720429811; cv=none; b=XG3fHRI7hU/V9hlY98lN3lR/SpYDjHcdcJrPTuj1gOVCbVpEsa2oimmEQinAjBKBlkb1FGDNe8Tl604V5mNcFIgpncp0l3P7deiKj8h3JheuBY7wJ44OcGRNfw52WAenLMv46cDHy6BXI5ZRztF4utpDP2qWpQP3dTWo6xtwoqU=
+	t=1720429920; cv=none; b=hgRDkwm+Ppv3LHzWasQzUYLDDSQVttrlTWuEK2YqEHlxHOms0u/j/FE/Y33ToXiDdqwOiWMQbQHjIqtNe8iAOBFFY++UT27Q66U6R3i0ckIYALpqN47kbA5XjEiuKzMG7sqIUnP9VTISJVWq6ZRVlV7jb7b0B4SDqO5V7ez7sDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720429811; c=relaxed/simple;
-	bh=mFEaZO2tWCG+ts/iG47KVGdxRadCEAG/yYrMVUas+30=;
+	s=arc-20240116; t=1720429920; c=relaxed/simple;
+	bh=pT2sgtwPB+Rrdne7/SbeMYcVkvH7SkEAyY48lsxW8ds=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QqoQxffiYCg/Re6NeomZruUg975ekiSsuBE9p6CentTcyFGuhemMLtIywttUdO6oefF21o5XStsjV227y4aDeGUPgN/1uWlwar8KWPBpjkLQC7zEPXpuvajD1bhq2HClZuubxqVC4cyKlw22iAC2AHl4LgnqpiWnDhElFaZ447k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m8YNNCtw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67364C116B1;
-	Mon,  8 Jul 2024 09:10:06 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7x4s40A76lrreGiZlnri3JsIlD1QJwajXW6iXG3npjymbHu3pDzoQ/MK0knxH4PifjMFc9hzT1z39yq0PNH8HcNF6pqk77rhMkIz8xo8qvUF6tfCPyp9tW5xNr7oYrGp1WnG6z7wOupWTafDqwZqITGmI0Pmnsji9O2CEtE2Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwPFU+0x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 420DFC4AF0A;
+	Mon,  8 Jul 2024 09:11:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720429809;
-	bh=mFEaZO2tWCG+ts/iG47KVGdxRadCEAG/yYrMVUas+30=;
+	s=k20201202; t=1720429919;
+	bh=pT2sgtwPB+Rrdne7/SbeMYcVkvH7SkEAyY48lsxW8ds=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m8YNNCtw5weviFhEveXgi4zTidAL7QXJs/gcscrmBVygtXEiaTSW045TRKcNapWGY
-	 SlabD/AOTeKGf/XmG8piIBv9oC01yOPr+EdQdfYS47ZhdWDhAsGJAbro5bqryBlkiU
-	 aOxBSZPcT6qLhctKxMtx/AwdFvNIc1ZqdXH4v3kPy3hDFmJGWuqP8mmTWVK8tW6yLc
-	 ERfUrw5q5E+oZPMdGtXP4HFvVEarFdZw0axJhKwvp5rLZl0icB13+40ZI8f7YJoY0c
-	 0jYRv7CCRv77aq5k/OZ1Ieq6jMMizNMab0vM3fL2WOuh5R8OI6ZPCntUlVxRrtaY6E
-	 G45DSSH0wpHsg==
-Date: Mon, 8 Jul 2024 10:10:04 +0100
+	b=jwPFU+0xi4bvGCirmq/hSMW6Fq3xMw5aXktER/ZZA1J/W1njpVKQouBMKZtsyg6ee
+	 vD6SUXAeYbEHeM3+iLM/D5OrQnLa+CajPf8g6Xf7Ux1CzvJNv7yBUOFPpuyGIrZ4Mh
+	 6Du3RGQOh04xgOcz3GIipuyjHCq16c7pmV6Fi9Hw+Gdqmq+WtBl61eAneTtAIUHVP6
+	 intYC9sgoxZtj/4iB4vqv3uivs4dRUoiZ/dWnRJkPMOe5PKW8p0Ap4qd3OfSCEa5a+
+	 gvNehP2MKRX3sik+Rfl8ZqdkbgDsodaIAgDmPWsWKCg0Z6j8EtkzzLL6FdtQAbq2+9
+	 Aq4RgPwvpXC/A==
+Date: Mon, 8 Jul 2024 10:11:55 +0100
 From: Simon Horman <horms@kernel.org>
-To: Gaosheng Cui <cuigaosheng1@huawei.com>
-Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, neilb@suse.de, kolga@netapp.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	steved@redhat.com, kwc@citi.umich.edu, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH -next] gss_krb5: Fix the error handling path for
- crypto_sync_skcipher_setkey
-Message-ID: <20240708091004.GH1481495@kernel.org>
-References: <20240706065008.451441-1-cuigaosheng1@huawei.com>
+To: Ronald Wahl <rwahl@gmx.de>
+Cc: Ronald Wahl <ronald.wahl@raritan.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3] net: ks8851: Fix deadlock with the SPI chip variant
+Message-ID: <20240708091155.GI1481495@kernel.org>
+References: <20240706101337.854474-1-rwahl@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,15 +60,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240706065008.451441-1-cuigaosheng1@huawei.com>
+In-Reply-To: <20240706101337.854474-1-rwahl@gmx.de>
 
-On Sat, Jul 06, 2024 at 02:50:08PM +0800, Gaosheng Cui wrote:
-> If we fail to call crypto_sync_skcipher_setkey, we should free the
-> memory allocation for cipher, replace err_return with err_free_cipher
-> to free the memory of cipher.
+On Sat, Jul 06, 2024 at 12:13:37PM +0200, Ronald Wahl wrote:
+> From: Ronald Wahl <ronald.wahl@raritan.com>
 > 
-> Fixes: 4891f2d008e4 ("gss_krb5: import functionality to derive keys into the kernel")
-> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> When SMP is enabled and spinlocks are actually functional then there is
+> a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
+> and ks8851_irq:
+> 
+>     watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
+>     call trace:
+>       queued_spin_lock_slowpath+0x100/0x284
+>       do_raw_spin_lock+0x34/0x44
+>       ks8851_start_xmit_spi+0x30/0xb8
+>       ks8851_start_xmit+0x14/0x20
+>       netdev_start_xmit+0x40/0x6c
+>       dev_hard_start_xmit+0x6c/0xbc
+>       sch_direct_xmit+0xa4/0x22c
+>       __qdisc_run+0x138/0x3fc
+>       qdisc_run+0x24/0x3c
+>       net_tx_action+0xf8/0x130
+>       handle_softirqs+0x1ac/0x1f0
+>       __do_softirq+0x14/0x20
+>       ____do_softirq+0x10/0x1c
+>       call_on_irq_stack+0x3c/0x58
+>       do_softirq_own_stack+0x1c/0x28
+>       __irq_exit_rcu+0x54/0x9c
+>       irq_exit_rcu+0x10/0x1c
+>       el1_interrupt+0x38/0x50
+>       el1h_64_irq_handler+0x18/0x24
+>       el1h_64_irq+0x64/0x68
+>       __netif_schedule+0x6c/0x80
+>       netif_tx_wake_queue+0x38/0x48
+>       ks8851_irq+0xb8/0x2c8
+>       irq_thread_fn+0x2c/0x74
+>       irq_thread+0x10c/0x1b0
+>       kthread+0xc8/0xd8
+>       ret_from_fork+0x10/0x20
+> 
+> This issue has not been identified earlier because tests were done on
+> a device with SMP disabled and so spinlocks were actually NOPs.
+> 
+> Now use spin_(un)lock_bh for TX queue related locking to avoid execution
+> of softirq work synchronously that would lead to a deadlock.
+> 
+> Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: stable@vger.kernel.org # 5.10+
+> Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
+> ---
+> V2: - use spin_lock_bh instead of moving netif_wake_queue outside of
+>       locked region (doing the same in the start_xmit function)
+>     - add missing net: tag
+> 
+> V3: - spin_lock_bh(ks->statelock) always except in xmit which is in BH
+>       already
+
+I agree that this lock is now always either taken _bh,
+or in the xmit path which is executed in BH context.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
