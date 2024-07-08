@@ -1,174 +1,134 @@
-Return-Path: <netdev+bounces-109750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22ED5929D93
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:48:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAD6D929DB3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 465AE1C21B49
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:48:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2859A1C20EB1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DA638FAD;
-	Mon,  8 Jul 2024 07:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348A32C694;
+	Mon,  8 Jul 2024 07:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="C8H2jH4K"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="ScBGe3xI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B31364A9;
-	Mon,  8 Jul 2024 07:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5B6156E4
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 07:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720424892; cv=none; b=YVRB8NuHnILEWvRjvE8Nif3g9Niv1yXRwKDe9vtQo1Vl9MbwIJXl3DL51Vs/YwUgkcqwZkCZ4l0fjJHcnU5fc0kch0zBgEg2WKvKEzr+yItdTUVAmZKAbxEAZ9ZmeoseqhKoDgrNgOJ+zATi+bl/5xnDVT6k/kPhUdZR+l7mhbU=
+	t=1720425032; cv=none; b=SKY1HUAqghAun9tz5sUESB++E4bX5wWr697txOjudUbR7PpGmYwMCRE8LcdTY8VaNOFYnKjLsxmzl0lMbG8RwLubxlKD0cjkw3x3Lkl4rI9xk/fMKqwexKlvchh7q4BynjcAiczWBcej/cGDXlPxWl9jFsrs4leyXmNIjVFd98c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720424892; c=relaxed/simple;
-	bh=rVBEw98YsMl1OrcDCG36qiCr3u6VVUckw8754YjmETM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=u7D3Uvaw8xPwSwcfMQ12Rtc8R58HfXdbIxBlCbplny90CRq4/hYrfZT9w3vlSIdLvErZuE5iSM1YwQHmrNkSuv2yUK00QpOMMI9eQZmhhZOFjCQvm7kcSSruj7ieeefwUhl8zoVQy4TtZahWJL5SWw8HkvRrux2P0HqK+446Sfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=C8H2jH4K; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4680W7K6001325;
-	Mon, 8 Jul 2024 07:47:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	i/uQYDKEprLvHhEtr15EIS+2LOUqtGYnciWz60brKUQ=; b=C8H2jH4Knqhy89w5
-	tqFeDHt6hlPjff5e1i7KCwZo3309m1ap0ZNrD071Jn3uzlSG4v8v8ewYLJdEZfSN
-	GJKKa99eekiaKcrdXjGyHuw/urdVYF1HTEn5VOepVeCoQJY/20W67edgOXEOm2ad
-	o5Di4F6Eyu3IiRTyHrfCbn8k5PNjzMrHSWG/ukDEc0gLDpLuz9CWXEhHlXKmeBCm
-	EqOtmEZH6+iDvMofCTH0bsR4YLVKoA1+nUHfxZYMdaxWJIGgulKB/vrGdGTndQXJ
-	gKxKzCsX8TvAJoMIGoy/02L8yfqMVZqhYfIx4jgQGbJdkR0BY62oStU0Jr5fgmdl
-	O3+5ow==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406we8txv0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jul 2024 07:47:33 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4687lV2H006833
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jul 2024 07:47:31 GMT
-Received: from [10.239.132.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 8 Jul 2024
- 00:47:09 -0700
-Message-ID: <1b32168b-7d1c-4b18-b4f3-a4979232b515@quicinc.com>
-Date: Mon, 8 Jul 2024 15:47:06 +0800
+	s=arc-20240116; t=1720425032; c=relaxed/simple;
+	bh=zlqTiyiSFReaiDoVro5r1Tj6xxCarZuSRspRmcKnFcM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGEm2nXr8pWiX2N4lNm4aT3+pdP9AfRISdDUTRkektQALjkTf36uRDHL9kq5AFVqC11EwjIV2Cmb3VROXGOjIP3PSzrxn1i+0DhX5T1VK9vxkzbECYQxRKKdBvjaEq/fBZTqXVdqLzRF1UKyH8LZUWSFyHhrx06Py6XMiSfrnss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=ScBGe3xI; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so30985085e9.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 00:50:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720425029; x=1721029829; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rL5EmpXsyEHR5xbjqSORtM1Tgm1TFK+MLaWF6mslrng=;
+        b=ScBGe3xICf4jsjVwqhrMdU3o8lpMckKla7jGHJ83qMZ3AEeA5HBlbacxsAG04HeSB2
+         +ijhlXrZ0PsT5m47UtQq0Xawik69p+xMGz+UuJCa8DcgblIpYea9R+cZmdP+ElYKw04i
+         d/dm7wm947wbmvyC7eTPtzegrprA+TTW93CVoQ6dYMXfelpRADJ8nf65wfSZBp5GYlt0
+         vqcLoYZoH9cW9OfuDO9MuQe2WZ108CaUIK7USBSzoR7nLFEYKMaB2CIo5dEtKAK+rf3l
+         QgC9+SgfTNiAOOipw551bZu3sSCfNF1AtHC2hGNHPjxeCAx/RRV2PQ0V1+hjVBGYrzsA
+         aXHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720425029; x=1721029829;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rL5EmpXsyEHR5xbjqSORtM1Tgm1TFK+MLaWF6mslrng=;
+        b=Cw0yJ0LLtrBJ55EPn3kSatwk6o0qbR44I2JkE4C3XRUslNbKFCAhQGV9teSaHK8X3M
+         rzDjPeYX0kRXhmpx2E37P2L7l1XuxZcjoWkw8RHpsS1+cE7ErGKW/Bc/9MKgLeImFazF
+         YvTee8QrgLCMX4qgVgNebolrpk/diP1vBosZuiSvIXGOV/MygqKfR4rnAPPqkmy//FqF
+         WjAK5U4BFb4cn//+hyqdIB+qLuyy74SrdJmimojPLoJE23UeyRa5f7JOx9J81HrfTesp
+         G1JExuPZyhOYV2O4ZV1mStsVDfGgbKsUnMf/Nyr2jKlti9FGsDBYOUsSRfesb3aJ7edY
+         K0+Q==
+X-Gm-Message-State: AOJu0YxaTVrHh/pv7CSghw25GWv/lMpc+mGbgUCh2o+VJ2NX584P/Heh
+	HamrJvsjsqGOVURAovsomzDnoXBknRrXRiIS/cMpYZMUF5OXxdBk+YzB7ANVQgs=
+X-Google-Smtp-Source: AGHT+IF8wgRd2T3knWIhdjphcEX1k5ZGI+v30Lz6M0/6seTTCf6NS4sgCajGkmxPTZ7m2e6Ohzxodw==
+X-Received: by 2002:a05:6000:1542:b0:364:ee85:e6e4 with SMTP id ffacd0b85a97d-3679dd658b8mr13290035f8f.53.1720425028552;
+        Mon, 08 Jul 2024 00:50:28 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:b5f9:a318:2e8a:9e50])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3679d827789sm10160055f8f.76.2024.07.08.00.50.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 00:50:28 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [RESEND PATCH net-next v3 0/4] net: phy: aquantia: enable support for aqr115c
+Date: Mon,  8 Jul 2024 09:50:19 +0200
+Message-ID: <20240708075023.14893-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
-To: Conor Dooley <conor.dooley@microchip.com>,
-        Krzysztof Kozlowski
-	<krzk@kernel.org>
-CC: <andersson@kernel.org>, <konrad.dybcio@linaro.org>, <robh@kernel.org>,
-        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <djakov@kernel.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>,
-        <jassisinghbrar@gmail.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <manivannan.sadhasivam@linaro.org>,
-        <will@kernel.org>, <joro@8bytes.org>, <conor@kernel.org>,
-        <tglx@linutronix.de>, <amitk@kernel.org>, <thara.gopinath@gmail.com>,
-        <linus.walleij@linaro.org>, <wim@linux-watchdog.org>,
-        <linux@roeck-us.net>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
-        <vkoul@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
-        <robimarko@gmail.com>, <quic_gurus@quicinc.com>,
-        <bartosz.golaszewski@linaro.org>, <kishon@kernel.org>,
-        <quic_wcheng@quicinc.com>, <alim.akhtar@samsung.com>,
-        <avri.altman@wdc.com>, <bvanassche@acm.org>, <agross@kernel.org>,
-        <gregkh@linuxfoundation.org>, <quic_tdas@quicinc.com>,
-        <robin.murphy@arm.com>, <daniel.lezcano@linaro.org>,
-        <rui.zhang@intel.com>, <lukasz.luba@arm.com>,
-        <quic_rjendra@quicinc.com>, <ulf.hansson@linaro.org>,
-        <quic_sibis@quicinc.com>, <otto.pflueger@abscue.de>,
-        <quic_rohiagar@quicinc.com>, <luca@z3ntu.xyz>,
-        <neil.armstrong@linaro.org>, <abel.vesa@linaro.org>,
-        <bhupesh.sharma@linaro.org>, <alexandre.torgue@foss.st.com>,
-        <peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
-        <netdev@vger.kernel.org>, <lpieralisi@kernel.org>, <kw@linux.com>,
-        <bhelgaas@google.com>, <ahalaney@redhat.com>,
-        <krzysztof.kozlowski@linaro.org>, <u.kleine-koenig@pengutronix.de>,
-        <dmitry.baryshkov@linaro.org>, <quic_cang@quicinc.com>,
-        <danila@jiaxyga.com>, <quic_nitirawa@quicinc.com>,
-        <mantas@8devices.com>, <athierry@redhat.com>,
-        <quic_kbajaj@quicinc.com>, <quic_bjorande@quicinc.com>,
-        <quic_msarkar@quicinc.com>, <quic_devipriy@quicinc.com>,
-        <quic_tsoni@quicinc.com>, <quic_rgottimu@quicinc.com>,
-        <quic_shashim@quicinc.com>, <quic_kaushalk@quicinc.com>,
-        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
-        <linux-riscv@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <kernel@quicinc.com>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703035735.2182165-1-quic_tengfan@quicinc.com>
- <7417fd8c-e852-45ee-bac9-d92921036e2f@kernel.org>
- <20240703-manager-armless-b13b18c79192@wendy>
-From: Tengfei Fan <quic_tengfan@quicinc.com>
-In-Reply-To: <20240703-manager-armless-b13b18c79192@wendy>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: WJaCcFF2njxbbZhKA7uiH0ECQvUaDd6U
-X-Proofpoint-GUID: WJaCcFF2njxbbZhKA7uiH0ECQvUaDd6U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-08_02,2024-07-05_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- bulkscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407080059
+Content-Transfer-Encoding: 8bit
 
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
+Resending rebased on top of current net-next.
 
-On 7/3/2024 2:28 PM, Conor Dooley wrote:
-> On Wed, Jul 03, 2024 at 06:45:00AM +0200, Krzysztof Kozlowski wrote:
->> On 03/07/2024 05:56, Tengfei Fan wrote:
->>> Introduce support for the QCS9100 SoC device tree (DTSI) and the
->>> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
->>> While the QCS9100 platform is still in the early design stage, the
->>> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
->>> mounts the QCS9100 SoC instead of the SA8775p SoC.
->>
->> The same huge patchset, to huge number of recipients was sent twice.
->> First, sorry, this is way too big. Second, it has way too many
->> recipients, but this is partially a result of first point. Only
->> partially because you put here dozen of totally unrelated emails. Sorry,
->> that does not make even sense. See form letter at the end how this
->> works. Third, sending it to everyone twice is a way to annoy them off
->> twice... Fourth,
->>
->> Please split your work and do not cc dozen of unrelated folks.
-> 
-> One of the extra recipients is cos that of that patch I sent adding the
-> cache bindings to the cache entry, forgetting that that would CC the
-> riscv list on all cache bindings. I modified that patch to drop the riscv
-> list from the entry.
-> 
-> Cheers,
-> Conor.
+This series addesses two issues with the aqr115c PHY on Qualcomm
+sa8775p-ride-r3 board and adds support for this PHY to the aquantia driver.
 
+While the manufacturer calls the 2.5G PHY mode OCSGMII, we reuse the existing
+2500BASEX mode in the kernel to avoid extending the uAPI.
 
-Thank you, Conor!
+It took me a while to resend because I noticed an issue with the PHY coming
+out of suspend with no possible interfaces listed and tracked it to the
+GLOBAL_CFG registers for different modes returning 0. A workaround has been
+added to the series. Unfortunately the HPG doesn't mention a proper way of
+doing it or even mention any such issue at all.
+
+Changes since v2:
+- add a patch that addresses an issue with GLOBAL_CFG registers returning 0
+- reuse aqr113c_config_init() for aqr115c
+- improve commit messages, give more details on the 2500BASEX mode reuse
+Link to v2: https://lore.kernel.org/lkml/Zn4Nq1QvhjAUaogb@makrotopia.org/T/
+
+Changes since v1:
+- split out the PHY patches into their own series
+- don't introduce new mode (OCSGMII) but use existing 2500BASEX instead
+- split the wait-for-FW patch into two: one renaming and exporting the
+  relevant function and the second using it before checking the FW ID
+Link to v1: https://lore.kernel.org/linux-arm-kernel/20240619184550.34524-1-brgl@bgdev.pl/T/
+
+Bartosz Golaszewski (4):
+  net: phy: aquantia: rename and export aqr107_wait_reset_complete()
+  net: phy: aquantia: wait for FW reset before checking the vendor ID
+  net: phy: aquantia: wait for the GLOBAL_CFG to start returning real
+    values
+  net: phy: aquantia: add support for aqr115c
+
+ drivers/net/phy/aquantia/aquantia.h          |  2 +
+ drivers/net/phy/aquantia/aquantia_firmware.c |  4 ++
+ drivers/net/phy/aquantia/aquantia_main.c     | 40 ++++++++++++++++++--
+ 3 files changed, 42 insertions(+), 4 deletions(-)
 
 -- 
-Thx and BRs,
-Tengfei Fan
+2.43.0
+
 
