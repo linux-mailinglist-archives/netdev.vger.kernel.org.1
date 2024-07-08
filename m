@@ -1,364 +1,268 @@
-Return-Path: <netdev+bounces-109834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F5792A0C0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:13:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C16DB92A0B7
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64B621C20FC8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:13:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4DB71C21000
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EA97FBA8;
-	Mon,  8 Jul 2024 11:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2445F6F305;
+	Mon,  8 Jul 2024 11:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xs3TkAQU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BEkxcHJX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D997E563;
-	Mon,  8 Jul 2024 11:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B661DA4E
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 11:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720437161; cv=none; b=IDwj5yEesTy/0ixcKNghv/fIBOMtJ6ALmDe9VlX3Cp31j8w49EofOgepd8zJDs1FVNy6sJgfzLHVCx0zbH7zEIzN6r2jiAsZBbuR+TFaeXk2wGGJ9pdBdvfYSPhfZhADae45pBoOxKElq272Ap46g9XlaBXPzG8GD2z7eEhg+1I=
+	t=1720437123; cv=none; b=RkCzE16CaLRYSGOYgm7xyzhumR34yveHIlasPECFY/7Si7ByOzIuvltQhNMZIIwuJIFNwL/F/69/vBF9u8Q3TwwF08CPtlOCCpxtcXWzjFbyvUrYfkMyIkD0gwcAGEAVJShJ+1poYWmDQ5neSwg7Vl3zxnH1VbNGnFcpWpeqfXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720437161; c=relaxed/simple;
-	bh=5BLcsTfo0rV5f4qZJpImeGyVeTz/xEjb4R0RfWgOikI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EqILwUTvTTxFO/v1bHE066bGKlu6ZyhXfIAN+i4hQLtxsZtNOy2IF0tiHW0oJmRGWz7ftXsoQQJhKkukTiE7hh0eNtrPzpCglY1+WuTUmGcGUERtlgeRPD7aqrpsMwO1styYYJd802z46dZr0f8UJ9+Mlk6WU5roC8uSE3L3Dwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xs3TkAQU; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52e9f863c46so4017577e87.1;
-        Mon, 08 Jul 2024 04:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720437157; x=1721041957; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=moshSUpTB58NWCr+RD24wwBakIQnGrq783baZS6Dezg=;
-        b=Xs3TkAQU6iS/dEpfxmoMMWMWuKgTzryND12/41JlU0U1f7y4Da0GjdbBj9mBjoMrIf
-         447SNbidIxqbRTwn+c3q4PO/lQDSgpXG+mM6aBf5M1VLvx7IpY1sLn83AZ7bUXnmPZ/w
-         GsYY9vNysCzdwPbDE6DNeEQsJBPAOit2uCzCHw9DDaiZuAovD926T+Q8rdlO9rYuZdjs
-         2Adw2jY4nXAmKJvW0K7MTXwsOadgCHWZj/p9j2+Tcg3OD3Br8ozii/l4T0DZpd9yc1c+
-         fA0QX5QHO2L46x4dpuIAfpgFjviGPQeEjGmOeJkezIbkCaLf59I6lvYhkPBSpdRk8grx
-         doHA==
+	s=arc-20240116; t=1720437123; c=relaxed/simple;
+	bh=qWnjy7Y5pHAW7UV2TE7pDAG6zxOsaMqL85xaLWWOj7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pLUSZN8URtuIFUxs9hcaNLlQEa8cUpEj71zuYnQur13zJ+OJR3IUwlBLwGWUzyTCeeEUgvYY6Ojmk2P3qhSNzH0jfiu/C2HWhFgw9AV6T4ZzGfu7p9+tit5svzyayvyUq+/b9a5gw6vbUQFaA6HKvoQxxfpehB0ELkBjuZtiMTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BEkxcHJX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720437119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hwRxo3am+BH28tltDF3Sm1iQk0SpyWcyddEqFxpN47k=;
+	b=BEkxcHJXCY9OnA1aUMKeu4YRrnV87Xe550F5tXeGhleeJZW85xOLqa1+VQF0BRGAZH9Uqb
+	SJuzziiHLEnRclOb+c0QTkEW4iw0GrY0jabUniS4by53zcHuq9/XOys3PIB+99Lw1E8ZKu
+	V2mbrR9jEBAwV1cGzZQ0dNGNFG0Iu+U=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-381-Bq1A3_EKNqC9NriwFkiVFA-1; Mon, 08 Jul 2024 07:11:57 -0400
+X-MC-Unique: Bq1A3_EKNqC9NriwFkiVFA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-52e960523ecso3759641e87.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 04:11:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720437157; x=1721041957;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=moshSUpTB58NWCr+RD24wwBakIQnGrq783baZS6Dezg=;
-        b=nz9iIl1gcrHVraNHFT8qYEP3pzrHC5J/suDCxKZrZw+4fqP1hnSVvjyzdmL3V83Fdt
-         k8ZHK0mHWHbOtcps2wHt/8BLwypJzYyhXSiApK6s9fqCzRhDpTXo/0ose0Uf7lf6nu0C
-         TAfWTtWSwYpc+rkywmQC+q25SQa+8BkxN01pk8d/tTkv1y0uH94GHv4MY1SLO38xjZ1t
-         1FnRYmdNhjXv5aoJ7mgJMZ+Z7P0ITUVhPlz1c3geJmQZVkW/RE2AD6kNOxh+F2kVjpPg
-         uf9qXDFZ3IakEb+ctF1LWc+Bf3UDf5krUmTmV/CJufrC5tEc0TgL/zPr4NC1xr1TVuLo
-         LS6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbaKQTcuYAymVRjZten4DoLDAJUVqeg6kz/bieKC/qzeH81NKmTa1b6JCR3tJKW7OSH2K2gjMJzhYfZJawEiEyImAIIYtHJG7iyup/TiJldU7yUrP9ibMAmjWSHv0sl41O9M3x
-X-Gm-Message-State: AOJu0Yzz1mCRu3OtcbOjJzl/KXli1uI57aViPuQHe4JdhVc24SPXlNk8
-	4Lwn1SEYSY55Wx/2XEY0jyK0kT//8bQpJ7n6gI5pBvxokJkkz0if
-X-Google-Smtp-Source: AGHT+IE/QZe2jq+2zc6qJ5cM6luB7AB54IQHSX6ZtrahaqxiOGpqj60NN3IUSliA6KkCvVwT6VFuxA==
-X-Received: by 2002:a19:6b0e:0:b0:52e:9df2:7ddd with SMTP id 2adb3069b0e04-52ea0629d76mr7520380e87.22.1720437157014;
-        Mon, 08 Jul 2024 04:12:37 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36799382af8sm11288592f8f.59.2024.07.08.04.12.35
+        d=1e100.net; s=20230601; t=1720437116; x=1721041916;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hwRxo3am+BH28tltDF3Sm1iQk0SpyWcyddEqFxpN47k=;
+        b=FyIiGB/gPq5Yqags74iLJeEeiyNF1wKMwpUHg4DeHLr1HGOQybsn+EzXEX3xrYUnAF
+         6PNCS/kVdA1iPlPitfmPpf6nqDxilIkQt8x8pP2CDrZe0lcFDG6X/GhvSx11C2D4N6Kg
+         fdYWIkCbvhha1lK1e8NXFlvH99M6cBAUTEDkMs5LMjJSa5LU0JjYFtdJxtC4Uek7k2W1
+         GaoOeiSZsglqmTfzYt5YuYxawByfayKUqY3/33fE38ZlxsLybK8nUyQFERU7gQQUwYwN
+         +Rt6mBqQTZ66+66H9sFPxkEBqL6yGUtGVfam2q4fmoBNCXIEuo9beCfU/Vmjtv6buYPt
+         A+zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8tq14J6tVDh0hXtcT1MUWhiqhD/p+i/M6cDUdeXkPfchlb65vQxDH2WNVjKwm4P4gDoNTH6TML07bZ0iJobRewVLOdItj
+X-Gm-Message-State: AOJu0YwUeVN170NcPL8i/6J2syoVO96k/roKj8HijjHTP/tONMvAjfW9
+	1/b4UDsQpCFrKMP0e7vDBzncWjCoeER4pB075LX/VefyPHWOloCtfETywi4TmLf8jecdmUdMKqa
+	E2D1+A7S6Mqws+7b9Kc8gKnjpBYYP1Wc9HY4Tupz2mlE4oCB/y7wxRA==
+X-Received: by 2002:a19:ee12:0:b0:52e:74d5:4bf9 with SMTP id 2adb3069b0e04-52ea06b2c85mr7572714e87.54.1720437116325;
+        Mon, 08 Jul 2024 04:11:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGeEKuXNCSRpv6QLGrM808zaQwAlNiRzR9v23kEbEO2+nfzlRZd7OeERy4dYwGIpxAQPDLwsg==
+X-Received: by 2002:a19:ee12:0:b0:52e:74d5:4bf9 with SMTP id 2adb3069b0e04-52ea06b2c85mr7572697e87.54.1720437115663;
+        Mon, 08 Jul 2024 04:11:55 -0700 (PDT)
+Received: from redhat.com ([2.52.29.103])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a2fc8bcsm161168965e9.44.2024.07.08.04.11.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 04:12:36 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	idosch@nvidia.com,
-	amcohen@nvidia.com,
-	petrm@nvidia.com,
-	gnault@redhat.com,
-	jbenc@redhat.com,
-	b.galvani@gmail.com,
-	martin.lau@kernel.org,
-	daniel@iogearbox.net,
-	aahila@google.com,
-	liuhangbin@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net-next v2 2/2] net: geneve: enable local address bind for geneve sockets
-Date: Mon,  8 Jul 2024 13:11:03 +0200
-Message-Id: <20240708111103.9742-3-richardbgobert@gmail.com>
-In-Reply-To: <20240708111103.9742-1-richardbgobert@gmail.com>
-References: <20240708111103.9742-1-richardbgobert@gmail.com>
+        Mon, 08 Jul 2024 04:11:55 -0700 (PDT)
+Date: Mon, 8 Jul 2024 07:11:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "eperezma@redhat.com" <eperezma@redhat.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH vhost 20/23] vdpa/mlx5: Pre-create hardware VQs at vdpa
+ .dev_add time
+Message-ID: <20240708071005-mutt-send-email-mst@kernel.org>
+References: <20240617-stage-vdpa-vq-precreate-v1-0-8c0483f0ca2a@nvidia.com>
+ <20240617-stage-vdpa-vq-precreate-v1-20-8c0483f0ca2a@nvidia.com>
+ <CAJaqyWd3yiPUMaGEmzgHF-8u+HcqjUxBNB3=Xg6Lon-zYNVCow@mail.gmail.com>
+ <308f90bb505d12e899e3f4515c4abc93c39cfbd5.camel@nvidia.com>
+ <CAJaqyWeHDD0drkAZQqEP_ZfbUPscOmM7T8zXRie5Q14nfAV0sg@mail.gmail.com>
+ <c6dc541919a0cc78521364dbf4db32293cf1071e.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <c6dc541919a0cc78521364dbf4db32293cf1071e.camel@nvidia.com>
 
-This patch adds support for binding to a local address in geneve sockets.
-It achieves this by adding a new netlink local argument and geneve_addr union
-to represent local address to bind to, and copying it to udp_port_cfg in
-geneve_create_sock.
+On Mon, Jul 08, 2024 at 11:01:39AM +0000, Dragos Tatulea wrote:
+> On Wed, 2024-07-03 at 18:01 +0200, Eugenio Perez Martin wrote:
+> > On Wed, Jun 26, 2024 at 11:27 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+> > > 
+> > > On Wed, 2024-06-19 at 17:54 +0200, Eugenio Perez Martin wrote:
+> > > > On Mon, Jun 17, 2024 at 5:09 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+> > > > > 
+> > > > > Currently, hardware VQs are created right when the vdpa device gets into
+> > > > > DRIVER_OK state. That is easier because most of the VQ state is known by
+> > > > > then.
+> > > > > 
+> > > > > This patch switches to creating all VQs and their associated resources
+> > > > > at device creation time. The motivation is to reduce the vdpa device
+> > > > > live migration downtime by moving the expensive operation of creating
+> > > > > all the hardware VQs and their associated resources out of downtime on
+> > > > > the destination VM.
+> > > > > 
+> > > > > The VQs are now created in a blank state. The VQ configuration will
+> > > > > happen later, on DRIVER_OK. Then the configuration will be applied when
+> > > > > the VQs are moved to the Ready state.
+> > > > > 
+> > > > > When .set_vq_ready() is called on a VQ before DRIVER_OK, special care is
+> > > > > needed: now that the VQ is already created a resume_vq() will be
+> > > > > triggered too early when no mr has been configured yet. Skip calling
+> > > > > resume_vq() in this case, let it be handled during DRIVER_OK.
+> > > > > 
+> > > > > For virtio-vdpa, the device configuration is done earlier during
+> > > > > .vdpa_dev_add() by vdpa_register_device(). Avoid calling
+> > > > > setup_vq_resources() a second time in that case.
+> > > > > 
+> > > > 
+> > > > I guess this happens if virtio_vdpa is already loaded, but I cannot
+> > > > see how this is different here. Apart from the IOTLB, what else does
+> > > > it change from the mlx5_vdpa POV?
+> > > > 
+> > > I don't understand your question, could you rephrase or provide more context
+> > > please?
+> > > 
+> > 
+> > My main point is that the vdpa parent driver should not be able to
+> > tell the difference between vhost_vdpa and virtio_vdpa. The only
+> > difference I can think of is because of the vhost IOTLB handling.
+> > 
+> > Do you also observe this behavior if you add the device with "vdpa
+> > add" without the virtio_vdpa module loaded, and then modprobe
+> > virtio_vdpa?
+> > 
+> Aah, now I understand what you mean. Indeed in my tests I was loading the
+> virtio_vdpa module before adding the device. When doing it the other way around
+> the device doesn't get configured during probe.
+>  
+> 
+> > At least the comment should be something in the line of "If we have
+> > all the information to initialize the device, pre-warm it here" or
+> > similar.
+> Makes sense. I will send a v3 with the commit + comment message update.
 
-Also change geneve_find_sock to search the socket based on listening address.
 
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- drivers/net/geneve.c               | 78 ++++++++++++++++++++++++++----
- drivers/net/vxlan/vxlan_core.c     |  5 +-
- include/net/geneve.h               |  6 +++
- include/uapi/linux/if_link.h       |  2 +
- tools/include/uapi/linux/if_link.h |  2 +
- 5 files changed, 81 insertions(+), 12 deletions(-)
+Is commit update the only change then?
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 838e85ddec67..d192efdfabcd 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -57,6 +57,7 @@ struct geneve_config {
- 	bool			ttl_inherit;
- 	enum ifla_geneve_df	df;
- 	bool			inner_proto_inherit;
-+	union geneve_addr saddr;
- };
- 
- /* Pseudo network device */
-@@ -461,7 +462,8 @@ static int geneve_udp_encap_err_lookup(struct sock *sk, struct sk_buff *skb)
- }
- 
- static struct socket *geneve_create_sock(struct net *net, bool ipv6,
--					 __be16 port, bool ipv6_rx_csum)
-+					 __be16 port, bool ipv6_rx_csum,
-+					 union geneve_addr *local_addr)
- {
- 	struct socket *sock;
- 	struct udp_port_cfg udp_conf;
-@@ -473,9 +475,17 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
- 		udp_conf.family = AF_INET6;
- 		udp_conf.ipv6_v6only = 1;
- 		udp_conf.use_udp6_rx_checksums = ipv6_rx_csum;
-+#if IS_ENABLED(CONFIG_IPV6)
-+		memcpy(&udp_conf.local_ip6,
-+		       &local_addr->sin6.sin6_addr,
-+		       sizeof(local_addr->sin6.sin6_addr));
-+#endif
- 	} else {
- 		udp_conf.family = AF_INET;
- 		udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
-+		memcpy(&udp_conf.local_ip,
-+		       &local_addr->sin.sin_addr,
-+		       sizeof(local_addr->sin.sin_addr));
- 	}
- 
- 	udp_conf.local_udp_port = port;
-@@ -582,7 +592,8 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
- 
- /* Create new listen socket if needed */
- static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
--						bool ipv6, bool ipv6_rx_csum)
-+						bool ipv6, bool ipv6_rx_csum,
-+						union geneve_addr *local_addr)
- {
- 	struct geneve_net *gn = net_generic(net, geneve_net_id);
- 	struct geneve_sock *gs;
-@@ -594,7 +605,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
- 	if (!gs)
- 		return ERR_PTR(-ENOMEM);
- 
--	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
-+	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum, local_addr);
- 	if (IS_ERR(sock)) {
- 		kfree(gs);
- 		return ERR_CAST(sock);
-@@ -653,16 +664,25 @@ static void geneve_sock_release(struct geneve_dev *geneve)
- 
- static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
- 					    sa_family_t family,
--					    __be16 dst_port)
-+					    __be16 dst_port,
-+					    union geneve_addr *saddr)
- {
- 	struct geneve_sock *gs;
- 
- 	list_for_each_entry(gs, &gn->sock_list, list) {
--		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
--		    geneve_get_sk_family(gs) == family) {
--			return gs;
-+		struct sock *sk = gs->sock->sk;
-+		struct inet_sock *inet = inet_sk(sk);
-+
-+		if (inet->inet_sport == dst_port && geneve_get_sk_family(gs) == family) {
-+			if (family == AF_INET && inet->inet_rcv_saddr == saddr->sin.sin_addr.s_addr)
-+				return gs;
-+#if IS_ENABLED(CONFIG_IPV6)
-+			else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, &saddr->sin6.sin6_addr) == 0)
-+				return gs;
-+#endif
- 		}
- 	}
-+
- 	return NULL;
- }
- 
-@@ -675,14 +695,16 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
- 	__u8 vni[3];
- 	__u32 hash;
- 
--	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst);
-+	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst,
-+			      &geneve->cfg.saddr);
- 	if (gs) {
- 		gs->refcnt++;
- 		goto out;
- 	}
- 
- 	gs = geneve_socket_create(net, geneve->cfg.info.key.tp_dst, ipv6,
--				  geneve->cfg.use_udp6_rx_checksums);
-+				  geneve->cfg.use_udp6_rx_checksums,
-+				  &geneve->cfg.saddr);
- 	if (IS_ERR(gs))
- 		return PTR_ERR(gs);
- 
-@@ -1234,6 +1256,8 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
- 	[IFLA_GENEVE_TTL_INHERIT]	= { .type = NLA_U8 },
- 	[IFLA_GENEVE_DF]		= { .type = NLA_U8 },
- 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
-+	[IFLA_GENEVE_LOCAL]	= NLA_POLICY_EXACT_LEN(sizeof_field(struct iphdr, saddr)),
-+	[IFLA_GENEVE_LOCAL6]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- };
- 
- static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -1561,6 +1585,31 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- 		cfg->inner_proto_inherit = true;
- 	}
- 
-+	if (data[IFLA_GENEVE_LOCAL]) {
-+		if (changelink && cfg->saddr.sa.sa_family != AF_INET) {
-+			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL], "New local address family does not match old");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		cfg->saddr.sin.sin_addr.s_addr = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
-+		cfg->saddr.sa.sa_family = AF_INET;
-+	}
-+
-+	if (data[IFLA_GENEVE_LOCAL6]) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+		if (changelink && cfg->saddr.sa.sa_family != AF_INET6) {
-+			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6], "New local address family does not match old");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		cfg->saddr.sin6.sin6_addr = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
-+		cfg->saddr.sa.sa_family = AF_INET6;
-+#else
-+		NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6], "IPv6 support not enabled in the kernel");
-+		return -EPFNOSUPPORT;
-+#endif
-+	}
-+
- 	return 0;
- change_notsup:
- 	NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
-@@ -1741,6 +1790,7 @@ static size_t geneve_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_UDP_ZERO_CSUM6_RX */
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT */
- 		nla_total_size(0) +	 /* IFLA_GENEVE_INNER_PROTO_INHERIT */
-+		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_LOCAL{6} */
- 		0;
- }
- 
-@@ -1762,6 +1812,11 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		if (nla_put_in_addr(skb, IFLA_GENEVE_REMOTE,
- 				    info->key.u.ipv4.dst))
- 			goto nla_put_failure;
-+
-+		if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-+				    info->key.u.ipv4.src))
-+			goto nla_put_failure;
-+
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_CSUM,
- 			       test_bit(IP_TUNNEL_CSUM_BIT,
- 					info->key.tun_flags)))
-@@ -1772,6 +1827,11 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		if (nla_put_in6_addr(skb, IFLA_GENEVE_REMOTE6,
- 				     &info->key.u.ipv6.dst))
- 			goto nla_put_failure;
-+
-+		if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-+				     &info->key.u.ipv6.src))
-+			goto nla_put_failure;
-+
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_ZERO_CSUM6_TX,
- 			       !test_bit(IP_TUNNEL_CSUM_BIT,
- 					 info->key.tun_flags)))
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 9a797147beb7..79be743874c7 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -90,13 +90,12 @@ static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
- 		    vxlan_get_sk_family(vs) == family &&
- 		    vs->flags == flags &&
- 		    vs->sock->sk->sk_bound_dev_if == ifindex) {
--			if (family == AF_INET && inet->inet_rcv_saddr == saddr->sin.sin_addr.s_addr) {
-+			if (family == AF_INET && inet->inet_rcv_saddr == saddr->sin.sin_addr.s_addr)
- 				return vs;
--			}
-+
- #if IS_ENABLED(CONFIG_IPV6)
- 			else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, &saddr->sin6.sin6_addr) == 0)
- 				return vs;
--			}
- #endif
- 		}
- 
-diff --git a/include/net/geneve.h b/include/net/geneve.h
-index 5c96827a487e..8dcd7fff2c0f 100644
---- a/include/net/geneve.h
-+++ b/include/net/geneve.h
-@@ -68,6 +68,12 @@ static inline bool netif_is_geneve(const struct net_device *dev)
- 	       !strcmp(dev->rtnl_link_ops->kind, "geneve");
- }
- 
-+union geneve_addr {
-+	struct sockaddr_in sin;
-+	struct sockaddr_in6 sin6;
-+	struct sockaddr sa;
-+};
-+
- #ifdef CONFIG_INET
- struct net_device *geneve_dev_create_fb(struct net *net, const char *name,
- 					u8 name_assign_type, u16 dst_port);
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 6dc258993b17..25ddf4dda47b 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1419,6 +1419,8 @@ enum {
- 	IFLA_GENEVE_TTL_INHERIT,
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index f0d71b2a3f1e..8321c8b32f6e 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -888,6 +888,8 @@ enum {
- 	IFLA_GENEVE_TTL_INHERIT,
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
--- 
-2.36.1
+> > 
+> > > Thanks,
+> > > Dragos
+> > > 
+> > > > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > > > Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > > > > ---
+> > > > >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 37 ++++++++++++++++++++++++++++++++-----
+> > > > >  1 file changed, 32 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > > > index 249b5afbe34a..b2836fd3d1dd 100644
+> > > > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > > > @@ -2444,7 +2444,7 @@ static void mlx5_vdpa_set_vq_ready(struct vdpa_device *vdev, u16 idx, bool ready
+> > > > >         mvq = &ndev->vqs[idx];
+> > > > >         if (!ready) {
+> > > > >                 suspend_vq(ndev, mvq);
+> > > > > -       } else {
+> > > > > +       } else if (mvdev->status & VIRTIO_CONFIG_S_DRIVER_OK) {
+> > > > >                 if (resume_vq(ndev, mvq))
+> > > > >                         ready = false;
+> > > > >         }
+> > > > > @@ -3078,10 +3078,18 @@ static void mlx5_vdpa_set_status(struct vdpa_device *vdev, u8 status)
+> > > > >                                 goto err_setup;
+> > > > >                         }
+> > > > >                         register_link_notifier(ndev);
+> > > > > -                       err = setup_vq_resources(ndev, true);
+> > > > > -                       if (err) {
+> > > > > -                               mlx5_vdpa_warn(mvdev, "failed to setup driver\n");
+> > > > > -                               goto err_driver;
+> > > > > +                       if (ndev->setup) {
+> > > > > +                               err = resume_vqs(ndev);
+> > > > > +                               if (err) {
+> > > > > +                                       mlx5_vdpa_warn(mvdev, "failed to resume VQs\n");
+> > > > > +                                       goto err_driver;
+> > > > > +                               }
+> > > > > +                       } else {
+> > > > > +                               err = setup_vq_resources(ndev, true);
+> > > > > +                               if (err) {
+> > > > > +                                       mlx5_vdpa_warn(mvdev, "failed to setup driver\n");
+> > > > > +                                       goto err_driver;
+> > > > > +                               }
+> > > > >                         }
+> > > > >                 } else {
+> > > > >                         mlx5_vdpa_warn(mvdev, "did not expect DRIVER_OK to be cleared\n");
+> > > > > @@ -3142,6 +3150,7 @@ static int mlx5_vdpa_compat_reset(struct vdpa_device *vdev, u32 flags)
+> > > > >                 if (mlx5_vdpa_create_dma_mr(mvdev))
+> > > > >                         mlx5_vdpa_warn(mvdev, "create MR failed\n");
+> > > > >         }
+> > > > > +       setup_vq_resources(ndev, false);
+> > > > >         up_write(&ndev->reslock);
+> > > > > 
+> > > > >         return 0;
+> > > > > @@ -3836,8 +3845,21 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
+> > > > >                 goto err_reg;
+> > > > > 
+> > > > >         mgtdev->ndev = ndev;
+> > > > > +
+> > > > > +       /* For virtio-vdpa, the device was set up during device register. */
+> > > > > +       if (ndev->setup)
+> > > > > +               return 0;
+> > > > > +
+> > > > > +       down_write(&ndev->reslock);
+> > > > > +       err = setup_vq_resources(ndev, false);
+> > > > > +       up_write(&ndev->reslock);
+> > > > > +       if (err)
+> > > > > +               goto err_setup_vq_res;
+> > > > > +
+> > > > >         return 0;
+> > > > > 
+> > > > > +err_setup_vq_res:
+> > > > > +       _vdpa_unregister_device(&mvdev->vdev);
+> > > > >  err_reg:
+> > > > >         destroy_workqueue(mvdev->wq);
+> > > > >  err_res2:
+> > > > > @@ -3863,6 +3885,11 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+> > > > > 
+> > > > >         unregister_link_notifier(ndev);
+> > > > >         _vdpa_unregister_device(dev);
+> > > > > +
+> > > > > +       down_write(&ndev->reslock);
+> > > > > +       teardown_vq_resources(ndev);
+> > > > > +       up_write(&ndev->reslock);
+> > > > > +
+> > > > >         wq = mvdev->wq;
+> > > > >         mvdev->wq = NULL;
+> > > > >         destroy_workqueue(wq);
+> > > > > 
+> > > > > --
+> > > > > 2.45.1
+> > > > > 
+> > > > 
+> > > 
+> > 
+> 
 
 
