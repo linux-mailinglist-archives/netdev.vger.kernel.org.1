@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-110030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A7C92AB57
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:36:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CB192AB58
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C7DF1F22C95
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:36:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118481C21E0D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E8314F117;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911A014F9D2;
 	Mon,  8 Jul 2024 21:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJDfzfqN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/GlJg4Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D698214EC65
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 21:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFD014F9C4
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 21:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720474597; cv=none; b=kGYvLnr0fOkvp4i+O24PdG/S24BMQoLT8AhIIDFRZ8eqVLds6qbbGmytZAvF2G1FWfd/iZJfu2h77CyRq92d91eN1sM43MD4tgiuyBQq3su1fiAcDdhrNy3itlxY1znEk4GeCusAFrC4e34sMPQy6ARhkDpVt7epmDwtp/xv5wQ=
+	t=1720474598; cv=none; b=bEH14Mxm/qEo6ow/qNh0ECZdbT7l6GcTo3JngUZ/b4+XVyH6WcyVhjnzYofgUpWoEAiVbRy81YZctIHjEDwkKpZ6BeEzfwcIZi0cMWgNH12sB57SwU1K39oxP3y9fYfyXc9ASYqOzRbLmG61I2HGn4AHOlbG0MdbZHi0Gqr5mUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720474597; c=relaxed/simple;
-	bh=VmsaBkh0kHzjYcEsMgjF+VALV24jkAW1Cjr6XJRu/AM=;
+	s=arc-20240116; t=1720474598; c=relaxed/simple;
+	bh=PJlCdL5g0Bjp+86/aLrza2mFoEZinUvGRzqaWZv2xbY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VsXG0/r32qAKaQkzCz/SCuL3TIRazeTukJfqN0lY1Jp7ZKo87mkpoSaJGDTYa9NYFqXW/qKlMaktl//AGypYvmVpJdCTfaRwqu+3bmce0k5fqTBIGb/+QIxk1yFQR4DA21rHCCZuULl4d9P93D2fNeOE11n/2dFlHMxnMPdNVwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJDfzfqN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4345AC4AF0D;
+	 MIME-Version; b=UqJCdkP+WORzhUgaGJDpKDV2ikbEjurlBJkQQipKMEUuR56b0OAc7RdUXMlScSaYip71olD1Xr4HEzj2zBJvlfTon/4gZBTz5OZBtL8vzjhEtNEPDqe79VzldWQHE/VVfvbt1e0TVV4T386Yx94qNotQlAE17QkolHAzVi/fQVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g/GlJg4Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF380C4AF0E;
 	Mon,  8 Jul 2024 21:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720474597;
-	bh=VmsaBkh0kHzjYcEsMgjF+VALV24jkAW1Cjr6XJRu/AM=;
+	s=k20201202; t=1720474598;
+	bh=PJlCdL5g0Bjp+86/aLrza2mFoEZinUvGRzqaWZv2xbY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oJDfzfqNfeTP5fYcRtIx2yZ9rDUPG3wms4TRlkfdN51Dswih6hPmFYZYEy9P9oYdq
-	 64Mnv586Rl35pwUgyH5hQt6J9UlFMc5BnCIUb61Jn9DRlQMScmGQUvvfxPEO1rGAzd
-	 Cm80XBBDLe5KQFmxaHDDnCk2okki7PInjxJHFMfOQzWcHOpnut3/Q1KJ3PQVPLvX6j
-	 alkfCvSpVM+m6wQCkPB9NIcsufce05VOFoS5zU+eh6jDMMy5PiVcZwkWH5AbVFI4xe
-	 2C4By4MQSpO3loBe0JpHTgA20dYyBKbHtT40jZSfXajguEwANwSM2OTuzgLdeV0YL2
-	 7fBN8dRqHy52w==
+	b=g/GlJg4YM66+tBJCDggvyYUh0TwdPwK+AV+1xlvCEih3MIAkxQghrUnQflpEoFA4V
+	 EjvAcqWxhw9Mo6DWiS6jXbsosHPpgD7HwCEb+1EKfnjp4XG3xPv0uIBY9zpUKfBV0L
+	 rAraKk6Jugt8h0XS3YVEpo5AiFQY2Q2GFfEqDoP096+AcEXMyXIM1X6hd8nAP+1Rfm
+	 A9lgQMkO9rzRHvNE+P7JtGdEbOGa80LnrPLti5zASGKOsxVqkezqD3S9XaM7ARfu9s
+	 t6M1GJ6TgARigEY3/BQdnyZPVC8rpTK5JYiZyPO+lPmk5BP/ahyIUS8p8/9y5i3Nnc
+	 eKQUJKFD/2wug==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	petrm@nvidia.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/5] selftests: drv-net: rss_ctx: factor out send traffic and check
-Date: Mon,  8 Jul 2024 14:36:24 -0700
-Message-ID: <20240708213627.226025-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 3/5] selftests: drv-net: rss_ctx: test queue changes vs user RSS config
+Date: Mon,  8 Jul 2024 14:36:25 -0700
+Message-ID: <20240708213627.226025-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240708213627.226025-1-kuba@kernel.org>
 References: <20240708213627.226025-1-kuba@kernel.org>
@@ -64,110 +64,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Wrap up sending traffic and checking in which queues it landed
-in a helper.
+By default main RSS table should change to include all queues.
+When user sets a specific RSS config the driver should preserve it,
+even when queue count changes. Driver should refuse to deactivate
+queues used in the user-set RSS config.
 
-The method used for testing is to send a lot of iperf traffic
-and check which queues received the most packets. Those should
-be the queues where we expect iperf to land - either because we
-installed a filter for the port iperf uses, or we didn't and
-expect it to use context 0.
-
-Contexts get disjoint queue sets, but the main context (AKA context 0)
-may receive some background traffic (noise).
+For additional contexts driver should still refuse to deactivate
+queues in use. Whether the contexts should get resized like
+context 0 when queue count increases is a bit unclear. I anticipate
+most driver today don't do that. Since main use case for additional
+contexts is to set the indir table - it doesn't seem worthwhile to
+care about behavior of the default table too much. Don't test that.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2: add a comment
----
- .../selftests/drivers/net/hw/rss_ctx.py       | 58 +++++++++++++------
- 1 file changed, 39 insertions(+), 19 deletions(-)
+ .../selftests/drivers/net/hw/rss_ctx.py       | 81 ++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index de2a55c0f35c..ede8eee1d9a9 100755
+index ede8eee1d9a9..177abfd06412 100755
 --- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
 +++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -63,6 +63,30 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
-     return queue_stats
+@@ -137,6 +137,80 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+     ksft_lt(sum(cnts[:2]), sum(cnts[2:]), "traffic distributed: " + str(cnts))
  
  
-+def _send_traffic_check(cfg, port, name, params):
-+    # params is a dict with 3 possible keys:
-+    #  - "target": required, which queues we expect to get iperf traffic
-+    #  - "empty": optional, which queues should see no traffic at all
-+    #  - "noise": optional, which queues we expect to see low traffic;
-+    #             used for queues of the main context, since some background
-+    #             OS activity may use those queues while we're testing
-+    # the value for each is a list, or some other iterable containing queue ids.
++def test_rss_queue_reconfigure(cfg, main_ctx=True):
++    """Make sure queue changes can't override requested RSS config.
 +
-+    cnts = _get_rx_cnts(cfg)
-+    GenerateTraffic(cfg, port=port).wait_pkts_and_stop(20000)
-+    cnts = _get_rx_cnts(cfg, prev=cnts)
++    By default main RSS table should change to include all queues.
++    When user sets a specific RSS config the driver should preserve it,
++    even when queue count changes. Driver should refuse to deactivate
++    queues used in the user-set RSS config.
++    """
 +
-+    directed = sum(cnts[i] for i in params['target'])
++    if not main_ctx:
++        require_ntuple(cfg)
 +
-+    ksft_ge(directed, 20000, f"traffic on {name}: " + str(cnts))
-+    if params.get('noise'):
-+        ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
-+                "traffic on other queues:" + str(cnts))
-+    if params.get('empty'):
-+        ksft_eq(sum(cnts[i] for i in params['empty']), 0,
-+                "traffic on inactive queues: " + str(cnts))
++    # Start with 4 queues, an arbitrary known number.
++    try:
++        qcnt = len(_get_rx_cnts(cfg))
++        ethtool(f"-L {cfg.ifname} combined 4")
++        defer(ethtool, f"-L {cfg.ifname} combined {qcnt}")
++    except:
++        raise KsftSkipEx("Not enough queues for the test or qstat not supported")
++
++    if main_ctx:
++        ctx_id = 0
++        ctx_ref = ""
++    else:
++        ctx_id = ethtool_create(cfg, "-X", "context new")
++        ctx_ref = f"context {ctx_id}"
++        defer(ethtool, f"-X {cfg.ifname} {ctx_ref} delete")
++
++    # Indirection table should be distributing to all queues.
++    data = get_rss(cfg, context=ctx_id)
++    ksft_eq(0, min(data['rss-indirection-table']))
++    ksft_eq(3, max(data['rss-indirection-table']))
++
++    # Increase queues, indirection table should be distributing to all queues.
++    # It's unclear whether tables of additional contexts should be reset, too.
++    if main_ctx:
++        ethtool(f"-L {cfg.ifname} combined 5")
++        data = get_rss(cfg)
++        ksft_eq(0, min(data['rss-indirection-table']))
++        ksft_eq(4, max(data['rss-indirection-table']))
++        ethtool(f"-L {cfg.ifname} combined 4")
++
++    # Configure the table explicitly
++    port = rand_port()
++    ethtool(f"-X {cfg.ifname} {ctx_ref} weight 1 0 0 1")
++    if main_ctx:
++        other_key = 'empty'
++        defer(ethtool, f"-X {cfg.ifname} default")
++    else:
++        other_key = 'noise'
++        flow = f"flow-type tcp{cfg.addr_ipver} dst-port {port} context {ctx_id}"
++        ntuple = ethtool_create(cfg, "-N", flow)
++        defer(ethtool, f"-N {cfg.ifname} delete {ntuple}")
++
++    _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
++                                              other_key: (1, 2) })
++
++    # We should be able to increase queues, but table should be left untouched
++    ethtool(f"-L {cfg.ifname} combined 5")
++    data = get_rss(cfg, context=ctx_id)
++    ksft_eq({0, 3}, set(data['rss-indirection-table']))
++
++    _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
++                                              other_key: (1, 2, 4) })
++
++    # Setting queue count to 3 should fail, queue 3 is used
++    try:
++        ethtool(f"-L {cfg.ifname} combined 3")
++    except CmdExitFailure:
++        pass
++    else:
++        raise Exception(f"Driver didn't prevent us from deactivating a used queue (context {ctx_id})")
 +
 +
- def test_rss_key_indir(cfg):
-     """Test basics like updating the main RSS key and indirection table."""
+ def test_rss_context(cfg, ctx_cnt=1, create_with_cfg=None):
+     """
+     Test separating traffic into RSS contexts.
+@@ -215,6 +289,10 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+     test_rss_context(cfg, 4, create_with_cfg=True)
  
-@@ -170,15 +194,10 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
-         defer(ethtool, f"-N {cfg.ifname} delete {ntuple}")
  
-     for i in range(ctx_cnt):
--        cnts = _get_rx_cnts(cfg)
--        GenerateTraffic(cfg, port=ports[i]).wait_pkts_and_stop(20000)
--        cnts = _get_rx_cnts(cfg, prev=cnts)
--
--        directed = sum(cnts[2+i*2:4+i*2])
--
--        ksft_lt(sum(cnts[ :2]), directed / 2, "traffic on main context:" + str(cnts))
--        ksft_ge(directed, 20000, f"traffic on context {i}: " + str(cnts))
--        ksft_eq(sum(cnts[2:2+i*2] + cnts[4+i*2:]), 0, "traffic on other contexts: " + str(cnts))
-+        _send_traffic_check(cfg, ports[i], f"context {i}",
-+                            { 'target': (2+i*2, 3+i*2),
-+                              'noise': (0, 1),
-+                              'empty': list(range(2, 2+i*2)) + list(range(4+i*2, 2+2*ctx_cnt)) })
- 
-     if requested_ctx_cnt != ctx_cnt:
-         raise KsftSkipEx(f"Tested only {ctx_cnt} contexts, wanted {requested_ctx_cnt}")
-@@ -230,18 +249,19 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
- 
-     def check_traffic():
-         for i in range(ctx_cnt):
--            cnts = _get_rx_cnts(cfg)
--            GenerateTraffic(cfg, port=ports[i]).wait_pkts_and_stop(20000)
--            cnts = _get_rx_cnts(cfg, prev=cnts)
--
-             if ctx[i]:
--                directed = sum(cnts[2+i*2:4+i*2])
--                ksft_lt(sum(cnts[ :2]), directed / 2, "traffic on main context:" + str(cnts))
--                ksft_ge(directed, 20000, f"traffic on context {i}: " + str(cnts))
--                ksft_eq(sum(cnts[2:2+i*2] + cnts[4+i*2:]), 0, "traffic on other contexts: " + str(cnts))
-+                expected = {
-+                    'target': (2+i*2, 3+i*2),
-+                    'noise': (0, 1),
-+                    'empty': list(range(2, 2+i*2)) + list(range(4+i*2, 2+2*ctx_cnt))
-+                }
-             else:
--                ksft_ge(sum(cnts[ :2]), 20000, "traffic on main context:" + str(cnts))
--                ksft_eq(sum(cnts[2: ]),     0, "traffic on other contexts: " + str(cnts))
-+                expected = {
-+                    'target': (0, 1),
-+                    'empty':  range(2, 2+2*ctx_cnt)
-+                }
++def test_rss_context_queue_reconfigure(cfg):
++    test_rss_queue_reconfigure(cfg, main_ctx=False)
 +
-+            _send_traffic_check(cfg, ports[i], f"context {i}", expected)
++
+ def test_rss_context_out_of_order(cfg, ctx_cnt=4):
+     """
+     Test separating traffic into RSS contexts.
+@@ -366,8 +444,9 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
+     with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
+         cfg.netdevnl = NetdevFamily()
  
-     # Use queues 0 and 1 for normal traffic
-     ethtool(f"-X {cfg.ifname} equal 2")
+-        ksft_run([test_rss_key_indir,
++        ksft_run([test_rss_key_indir, test_rss_queue_reconfigure,
+                   test_rss_context, test_rss_context4, test_rss_context32,
++                  test_rss_context_queue_reconfigure,
+                   test_rss_context_overlap, test_rss_context_overlap2,
+                   test_rss_context_out_of_order, test_rss_context4_create_with_cfg],
+                  args=(cfg, ))
 -- 
 2.45.2
 
