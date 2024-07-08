@@ -1,309 +1,368 @@
-Return-Path: <netdev+bounces-110034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C647592AB5F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:40:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B72992ABAD
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:02:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BE9A283EEE
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:40:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9701F21EAA
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA64A14EC64;
-	Mon,  8 Jul 2024 21:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B62214F9FF;
+	Mon,  8 Jul 2024 22:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2vgx+Ix"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbnT5Qkq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C1114D702
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 21:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B7CA29;
+	Mon,  8 Jul 2024 22:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720474811; cv=none; b=h7UTXII7ABpvWiL61HLtaAsZ0jWqlbBTrsaEW7trxU9ZWIUaMfJxwPaxHz50p7cuM8QoiZ4SNVk8WtyUOw2X3j0/6xkV5vuF2wYJ9BHgCaVDg1s2PMU1ijux/uKC5/l2Q1jusaAM94oaiEnYUVDFyqCguFfqwBSPwxUqYr09ow8=
+	t=1720476157; cv=none; b=RHRjZEwdhO1Yfy0jEiNFOO/yZSiwD3oO4aiMq5XOUvVTP49wb6CoHK7BfPAI6OLqIRr1fsh4frtcMQPcSkvQMfRJg5oWaedp87MK+l3yKK3H1OIApYaVrnFIzFv2Vi/xMoWOoCEKnFRX5QGcEOxn4fLfSHHq6MrkKO9VyPBw1zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720474811; c=relaxed/simple;
-	bh=ksWUl+7oU5im94h1dU1dhvwd56cmIXpc/qZXAFf5Rs4=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CdXuHzFU4Ijnq2F+B9l3ElGP3CWEz4AiSMNGZr/FZ8NLJuJZSTJAF7kfcmrXoukByiza0+X/qyrLAWo6pEo5d8n3ZKB19hS0UOYDfrSV9deS7PAOOyEjJ9UTem/TgL+hVcExOgRj1lDLVMTvzfKVUvyKh46A4R9HE0hjVJ6V8x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y2vgx+Ix; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720474809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xrmMfuh6zl+J0VMmb+jXkVGZeQnzPMh5oQVddVrOdbk=;
-	b=Y2vgx+IxGoDKORh0U8LDT8kZXq0YMmtX38V9ZGxvjttxH/voI2ZvXFZ8y1ZRs3RqQRVF1o
-	eqpoAP9Dz+zVOZXXNfTE1wEh0UeOH2FiBTMZIlaTXLdMqTjoWcGnyRoscCDT9lfdNOpEDN
-	q2iwvZjXBLNRZYw9std/YuGcMB+pzaQ=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-aXUy4KDgPemLu3IkMSaJng-1; Mon, 08 Jul 2024 17:40:07 -0400
-X-MC-Unique: aXUy4KDgPemLu3IkMSaJng-1
-Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e035949cc4eso8871300276.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 14:40:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720474806; x=1721079606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xrmMfuh6zl+J0VMmb+jXkVGZeQnzPMh5oQVddVrOdbk=;
-        b=j6i/Wz5CXrmcYC5h/KJMPNjnpZk+ghXsJXhpLOK+Ejyl5YBCu22XifxNt1K4V+kyvU
-         Q5A5C/ADTksrGqoLYRA43WYiOCFu3EDE7y2f0KEoIa/3ZJmca+YB2TjuuPkRtbh9e63S
-         55/TYd9d07p72fUDmQ8aXSo2TLyw7Eor06q6u0cRBDGkTE5x2RWSi8u3/fNf1dXnGcpe
-         Xm6kyqik8ZUxm3Rlh14b2EWu+ripSjD48VJFXweA7SNsc4Bu8gwkOQsXWQFfhnFTbwby
-         6pZIAdEOlEnSk7TS1EfVxV2Grt9FUkq9kyzn3BaqsF7SdYYOW/1CpLCgs8zIkjtsUe8k
-         BMTg==
-X-Gm-Message-State: AOJu0YzEtddym3hVQ3OuKBck0QNv8YeClbYh/wuXsWHYRtuEl5eAAzxC
-	dsagSeJnHOX1IBPBeDMYEctzDioLAdBD/RPq5q/DapZWBkwPBJ0ODS2aCArimfkxw09n+/wGDyi
-	lwnHQ1F6oC9TMrd92HeCip+Bd6oCGBrCmwO1KhUM0f7udCxyoaz18OIiUT4z11gsONnBvybzGGh
-	iDbr6T+L78SD8Flk1s7fmyMwdnrmSA
-X-Received: by 2002:a25:dc91:0:b0:e03:4e3b:2a49 with SMTP id 3f1490d57ef6-e041b15b11amr1075164276.60.1720474806277;
-        Mon, 08 Jul 2024 14:40:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHhcBFn0ofqIUHCwGg3OYl0O2Ng3lLsFfo+cuSb6XyWrWH/AvKTaMcedW1YcTsjxqISDHxVyzi9sPAVrwvwT+A=
-X-Received: by 2002:a25:dc91:0:b0:e03:4e3b:2a49 with SMTP id
- 3f1490d57ef6-e041b15b11amr1075148276.60.1720474805979; Mon, 08 Jul 2024
- 14:40:05 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 8 Jul 2024 14:40:05 -0700
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240708134451.3489802-1-amorenoz@redhat.com> <0fd40aed-04d1-43a3-ab3d-c7459a63f753@ovn.org>
+	s=arc-20240116; t=1720476157; c=relaxed/simple;
+	bh=7GmYg5+/tIOSyUEmjcq47eRXCKv3mmB4w1fkAwA0cvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G3s9opObR/6o84fUnZDFiM/9cpbAyIM4Fp7phDIVicKX09xNo1tuP9dm5lSgqXJnYU2nmHER4SdoLt64oZVncBWmk2mHFXPPLe/ULTjKRr2mWN7yTjEq1eoeZ0psmmOo21vLA7rSIdck2sb8Z+nZhVOIJjA36AwQS69+A8GDZfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbnT5Qkq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 105FCC3277B;
+	Mon,  8 Jul 2024 22:02:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720476156;
+	bh=7GmYg5+/tIOSyUEmjcq47eRXCKv3mmB4w1fkAwA0cvU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cbnT5QkqLO5gHQAE/anUT+59OE9ip/KPJQmYW2WDzhpgj77nUYHUPyaTNcK2WeAJa
+	 dt+XhdV3XpE0bXFRzK0ZHRjPAAl0O76L0PZxSuR+U1j0L6cBspv5bhPv+Mg9FP7o0d
+	 MM4vxkzGe+TmFEXC+LwIHZ+ZENniCQjE+DoWtrZMOQKkvPsygIT3UX/SdbRZM11AXa
+	 QiVcWfdVz+2BO9ewo5N+H53jNoH+frpg5PzeVeQubSSFDieggY4UWKzYnL4oxEkQFs
+	 1Eap14CI9+pT9F1nheRtTij61nT8TLCaXxoXUUtkjrikbsOMpNRHDuofHhCgQgkfnR
+	 fU3vYGeZtslPQ==
+Date: Tue, 9 Jul 2024 00:02:32 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, conor@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
+	sgoutham@marvell.com, andrew@lunn.ch, arnd@arndb.de,
+	horms@kernel.org
+Subject: Re: [PATCH v5 net-next 1/2] dt-bindings: net: airoha: Add EN7581
+ ethernet controller
+Message-ID: <Zoxh-GBdoIiPr775@lore-desk>
+References: <cover.1720079772.git.lorenzo@kernel.org>
+ <48dde2595c6ff497a846183b117ac9704537b78c.1720079772.git.lorenzo@kernel.org>
+ <20240708163708.GA3371750-robh@kernel.org>
+ <Zowb18jXTOw5L2aT@lore-desk>
+ <CAL_JsqJPe1=K7VimSWz+AH2h4fu_2WEud_rUw1dV=SE7pY3C6w@mail.gmail.com>
+ <ZoxV45hyccLHAm1P@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0fd40aed-04d1-43a3-ab3d-c7459a63f753@ovn.org>
-Date: Mon, 8 Jul 2024 14:40:05 -0700
-Message-ID: <CAG=2xmO3Je7W0pstvN_ALFcNFRqTLCaRhaCV=O+2VEu5_e+g-A@mail.gmail.com>
-Subject: Re: [ovs-dev] [PATCH v1] selftests: openvswitch: retry instead of sleep
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, linux-kselftest@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Aaron Conole <aconole@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="87nTVdQkdNaM1mN+"
+Content-Disposition: inline
+In-Reply-To: <ZoxV45hyccLHAm1P@lore-desk>
+
+
+--87nTVdQkdNaM1mN+
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 08, 2024 at 09:31:58PM GMT, Ilya Maximets wrote:
-> On 7/8/24 15:44, Adrian Moreno wrote:
-> > There are a couple of places where the test script "sleep"s to wait for
-> > some external condition to be met.
-> >
-> > This is error prone, specially in slow systems (identified in CI by
-> > "KSFT_MACHINE_SLOW=3Dyes").
-> >
-> > To fix this, add a "ovs_wait" function that tries to execute a command
-> > a few times until it succeeds. The timeout used is set to 5s for
-> > "normal" systems and doubled if a slow CI machine is detected.
-> >
-> > This should make the following work:
-> >
-> > $ vng --build  \
-> >     --config tools/testing/selftests/net/config \
-> >     --config kernel/configs/debug.config
-> >
-> > $ vng --run . --user root -- "make -C tools/testing/selftests/ \
-> >     KSFT_MACHINE_SLOW=3Dyes TARGETS=3Dnet/openvswitch run_tests"
-> >
-> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> > ---
-> >  .../selftests/net/openvswitch/openvswitch.sh  | 49 ++++++++++++++++---
-> >  .../selftests/net/openvswitch/ovs-dpctl.py    |  1 +
-> >  2 files changed, 42 insertions(+), 8 deletions(-)
-> >
->
-> Hi, Adrian.  See a small pile of nitpicks below.
->
-> None of them are blocking from my perspective, except for a typo.
-> Just listed them since there is a typo anyway.
->
-> > diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/t=
-ools/testing/selftests/net/openvswitch/openvswitch.sh
-> > index bc71dbc18b21..83407b42073a 100755
-> > --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> > +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> > @@ -11,6 +11,7 @@ ksft_skip=3D4
-> >  PAUSE_ON_FAIL=3Dno
-> >  VERBOSE=3D0
-> >  TRACING=3D0
-> > +WAIT_TIMEOUT=3D5
-> >
-> >  tests=3D"
-> >  	arp_ping				eth-arp: Basic arp ping between two NS
-> > @@ -29,6 +30,32 @@ info() {
-> >  	[ $VERBOSE =3D 0 ] || echo $*
-> >  }
-> >
-> > +ovs_wait() {
-> > +	info "waiting $WAIT_TIMEOUT s for: $@"
-> > +
-> > +	"$@"
-> > +	if [[ $? -eq 0 ]]; then
->
-> Maybe just 'if "$@"; then' ?
->
+> > On Mon, Jul 8, 2024 at 11:03=E2=80=AFAM Lorenzo Bianconi <lorenzo@kerne=
+l.org> wrote:
+> > >
+> > > > On Thu, Jul 04, 2024 at 10:08:10AM +0200, Lorenzo Bianconi wrote:
+> > > > > Introduce device-tree binding documentation for Airoha EN7581 eth=
+ernet
+> > > > > mac controller.
+> > > > >
+> > > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > > > ---
+> > > > >  .../bindings/net/airoha,en7581-eth.yaml       | 146 ++++++++++++=
+++++++
+> > > > >  1 file changed, 146 insertions(+)
+> > > > >  create mode 100644 Documentation/devicetree/bindings/net/airoha,=
+en7581-eth.yaml
+> > > > >
+> > > > > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-=
+eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > > > > new file mode 100644
+> > > > > index 000000000000..f4b1f8afddd0
+> > > > > --- /dev/null
+> > > > > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > > > > @@ -0,0 +1,146 @@
+> > > > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > > > +%YAML 1.2
+> > > > > +---
+> > > > > +$id: http://devicetree.org/schemas/net/airoha,en7581-eth.yaml#
+> > > > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > > > +
+> > > > > +title: Airoha EN7581 Frame Engine Ethernet controller
+> > > > > +
+> > > > > +allOf:
+> > > > > +  - $ref: ethernet-controller.yaml#
+> > > >
+> > > > Again, to rephrase, what are you using from this binding? It does n=
+ot
+> > > > make sense for the parent and child both to use it.
+> > >
+> > > Below I reported the ethernet dts node I am using (I have not posted =
+the dts
+> > > changes yet):
+> >=20
+> > What happens when you remove this $ref? Nothing, because you use 0
+> > properties from it. If none of the properties apply, then don't
+> > reference it. It is that simple.
+>=20
+> if I get rid of "$ref: ethernet-controller.yaml#" here I get the followin=
+g error using
+> en7581-evb.dts (not posted upstream yet):
+>=20
+> $make CHECK_DTBS=3Dy DT_SCHEMA_FILES=3Dairoha airoha/en7581-evb.dtb
+>   UPD     include/config/kernel.release
+>   DTC_CHK arch/arm64/boot/dts/airoha/en7581-evb.dtb
+>   /home/lorenzo/workspace/linux-mediatek/arch/arm64/boot/dts/airoha/en758=
+1-evb.dtb: ethernet@1fb50000: mac@1: Unevaluated properties are not allowed=
+ ('fixed-link', 'phy-mode' were unexpected)
+>   from schema $id: http://devicetree.org/schemas/net/airoha,en7581-eth.ya=
+ml#
 
-In my head this is a bit less clean but I don't mind.
+actually I confused the parent "$ref: ethernet-controller.yaml#" with the c=
+hild
+one. Please ignore the error above.
 
-> > +		info "wait succeeded inmediately"
->
-> * immediately
+Regards
+Lorenzo
 
-Thanks. Will fix the typo.
+>=20
+> >=20
+> > >
+> > > eth0: ethernet@1fb50000 {
+> > >         compatible =3D "airoha,en7581-eth";
+> > >         reg =3D <0 0x1fb50000 0 0x2600>,
+> > >               <0 0x1fb54000 0 0x2000>,
+> > >               <0 0x1fb56000 0 0x2000>;
+> > >         reg-names =3D "fe", "qdma0", "qdma1";
+> > >
+> > >         resets =3D <&scuclk EN7581_FE_RST>,
+> > >                  <&scuclk EN7581_FE_PDMA_RST>,
+> > >                  <&scuclk EN7581_FE_QDMA_RST>,
+> > >                  <&scuclk EN7581_XSI_MAC_RST>,
+> > >                  <&scuclk EN7581_DUAL_HSI0_MAC_RST>,
+> > >                  <&scuclk EN7581_DUAL_HSI1_MAC_RST>,
+> > >                  <&scuclk EN7581_HSI_MAC_RST>,
+> > >                  <&scuclk EN7581_XFP_MAC_RST>;
+> > >         reset-names =3D "fe", "pdma", "qdma", "xsi-mac",
+> > >                       "hsi0-mac", "hsi1-mac", "hsi-mac",
+> > >                       "xfp-mac";
+> > >
+> > >         interrupts =3D <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+> > >                      <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+> > >
+> > >         status =3D "disabled";
+> > >
+> > >         #address-cells =3D <1>;
+> > >         #size-cells =3D <0>;
+> > >
+> > >         gdm1: mac@1 {
+> > >                 compatible =3D "airoha,eth-mac";
+> > >                 reg =3D <1>;
+> > >                 phy-mode =3D "internal";
+> > >                 status =3D "disabled";
+> > >
+> > >                 fixed-link {
+> > >                         speed =3D <1000>;
+> > >                         full-duplex;
+> > >                         pause;
+> > >                 };
+> > >         };
+> > > };
+> > >
+> > > I am using phy related binding for gdm1:mac@1 node.
+> >=20
+> > Right, so you should reference ethernet-controller.yaml for the mac
+> > node because you use properties from the schema.
+>=20
+> ack. So, IIUC what you mean here, I need to get rid of "$ref: ethernet-co=
+ntroller.yaml#"
+> in the parent node and just use in the mac node. Correct?
+>=20
+> >=20
+> > > gdm1 is the GMAC port used
+> > > as cpu port by the mt7530 dsa switch
+> >=20
+> > That has nothing to do with *this* binding...
+> >=20
+> > >
+> > > switch: switch@1fb58000 {
+> > >         compatible =3D "airoha,en7581-switch";
+> > >         reg =3D <0 0x1fb58000 0 0x8000>;
+> > >         resets =3D <&scuclk EN7581_GSW_RST>;
+> > >
+> > >         interrupt-controller;
+> > >         #interrupt-cells =3D <1>;
+> > >         interrupt-parent =3D <&gic>;
+> > >         interrupts =3D <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH>;
+> > >
+> > >         status =3D "disabled";
+> > >
+> > >         #address-cells =3D <1>;
+> > >         #size-cells =3D <1>;
+> > >
+> > >         ports {
+> > >                 #address-cells =3D <1>;
+> > >                 #size-cells =3D <0>;
+> > >
+> > >                 gsw_port1: port@1 {
+> > >                         reg =3D <1>;
+> > >                         label =3D "lan1";
+> > >                         phy-mode =3D "internal";
+> > >                         phy-handle =3D <&gsw_phy1>;
+> > >                 };
+> > >
+> > >                 gsw_port2: port@2 {
+> > >                         reg =3D <2>;
+> > >                         label =3D "lan2";
+> > >                         phy-mode =3D "internal";
+> > >                         phy-handle =3D <&gsw_phy2>;
+> > >                 };
+> > >
+> > >                 gsw_port3: port@3 {
+> > >                         reg =3D <3>;
+> > >                         label =3D "lan3";
+> > >                         phy-mode =3D "internal";
+> > >                         phy-handle =3D <&gsw_phy3>;
+> > >                 };
+> > >
+> > >                 gsw_port4: port@4 {
+> > >                         reg =3D <4>;
+> > >                         label =3D "lan4";
+> > >                         phy-mode =3D "internal";
+> > >                         phy-handle =3D <&gsw_phy4>;
+> > >                 };
+> > >
+> > >                 port@6 {
+> > >                         reg =3D <6>;
+> > >                         label =3D "cpu";
+> > >                         ethernet =3D <&gdm1>;
+> > >                         phy-mode =3D "internal";
+> > >
+> > >                         fixed-link {
+> > >                                 speed =3D <1000>;
+> > >                                 full-duplex;
+> > >                                 pause;
+> > >                         };
+> > >                 };
+> > >         };
+> > >
+> > >         mdio {
+> > >                 #address-cells =3D <1>;
+> > >                 #size-cells =3D <0>;
+> > >
+> > >                 gsw_phy1: ethernet-phy@1 {
+> > >                         compatible =3D "ethernet-phy-ieee802.3-c22";
+> > >                         reg =3D <9>;
+> > >                         phy-mode =3D "internal";
+> > >                 };
+> > >
+> > >                 gsw_phy2: ethernet-phy@2 {
+> > >                         compatible =3D "ethernet-phy-ieee802.3-c22";
+> > >                         reg =3D <10>;
+> > >                         phy-mode =3D "internal";
+> > >                 };
+> > >
+> > >                 gsw_phy3: ethernet-phy@3 {
+> > >                         compatible =3D "ethernet-phy-ieee802.3-c22";
+> > >                         reg =3D <11>;
+> > >                         phy-mode =3D "internal";
+> > >                 };
+> > >
+> > >                 gsw_phy4: ethernet-phy@4 {
+> > >                         compatible =3D "ethernet-phy-ieee802.3-c22";
+> > >                         reg =3D <12>;
+> > >                         phy-mode =3D "internal";
+> > >                 };
+> > >         };
+> > > };
+> >=20
+> > None of this is relevant.
+> >=20
+> > > > > +patternProperties:
+> > > > > +  "^mac@[1-4]$":
+> > > >
+> > > > 'ethernet' is the defined node name for users of
+> > > > ethernet-controller.yaml.
+> > >
+> > > Looking at the dts above, ethernet is already used by the parent node.
+> >=20
+> > So? Not really any reason a node named foo can't have a child named foo=
+, too.
+>=20
+> ack, fine. I will fix it in the next revision.
+>=20
+> >=20
+> > An 'ethernet' node should implement an ethernet interface. It is the
+> > child nodes that implement the ethernet interface(s). Whether you use
+> > 'ethernet' on the parent or not, I don't care too much.
+>=20
+> ack, I will use "$ref: ethernet-controller.yaml#" just for the child in t=
+his case.
+>=20
+> Regards,
+> Lorenzo
+>=20
+> >=20
+> > > This approach has been already used here [0],[1],[2]. Is it fine to r=
+euse it?
+> >=20
+> > That one appears to be wrong too with the parent referencing
+> > ethernet-controller.yaml.
+> >=20
+> > Rob
+> >=20
+> > > Regards,
+> > > Lorenzo
+> > >
+> > > [0] https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts=
+/mediatek/mt7622.dtsi#L964
+> > > [1] https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts=
+/mediatek/mt7622-bananapi-bpi-r64.dts#L136
+> > > [2] https://github.com/torvalds/linux/blob/master/Documentation/devic=
+etree/bindings/net/mediatek%2Cnet.yaml#L370
 
->
-> > +		return 0
-> > +	fi
-> > +
-> > +	# A quick re-check helps speed up small races in fast systems.
-> > +	# However, fractional sleeps might not necessarily work.
-> > +	local start=3D0
-> > +	sleep 0.1 || { sleep 1; start=3D1; }
-> > +
-> > +	for (( i=3Dstart; i<WAIT_TIMEOUT; i++ )); do
->
-> for i in $(seq ${start} ${WAIT_TIMEOUT}); do
->
-> Will need to initialize start to 1 and 2.
->
-> It works, but seems like an unnecessary use of non-POSIX constructs.
 
-The reason why I chose this form is that I find it more robust on a
-script that changes IFS. If this function is called within a block that
-has changed IFS, "i" will take the entire sequence as the value for the
-first iteration.
 
->
-> > +		"$@"
-> > +		if [[ $? -eq 0 ]]; then
->
-> if "$@"; then
->
-> > +			info "wait succeeded after $i seconds"
-> > +			return 0
-> > +		fi
-> > +		sleep 1
-> > +	done
-> > +	info "wait failed after $i seconds"
-> > +	return 1
-> > +}
-> > +
-> >  ovs_base=3D`pwd`
-> >  sbxs=3D
-> >  sbx_add () {
-> > @@ -278,20 +305,21 @@ test_psample() {
-> >
-> >  	# Record psample data.
-> >  	ovs_spawn_daemon "test_psample" python3 $ovs_base/ovs-dpctl.py psampl=
-e-events
-> > +	ovs_wait grep -q "listening for psample events" ${ovs_dir}/stdout
-> >
-> >  	# Send a single ping.
-> > -	sleep 1
-> >  	ovs_sbx "test_psample" ip netns exec client ping -I c1 172.31.110.20 =
--c 1 || return 1
-> > -	sleep 1
-> >
-> >  	# We should have received one userspace action upcall and 2 psample p=
-ackets.
-> > -	grep -E "userspace action command" $ovs_dir/s0.out >/dev/null 2>&1 ||=
- return 1
-> > +	ovs_wait grep -q "userspace action command" $ovs_dir/s0.out
-> > +	[[ $? -eq 0 ]] || return 1
->
-> Why checking separately and not one the same line with || return 1 ?
+--87nTVdQkdNaM1mN+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-IMHO, passing complex commands to a function in bash can easily get very
-problematic. That's why I try to remove all pipes, redirections or
-logical operators like && and ||. At least for me it removes one extra
-cycle that my brain has to spend looking at quotes and figuring out if
-the operand will be interpreted inside the function or outside.
+-----BEGIN PGP SIGNATURE-----
 
-> Also double brackets seem unnecessary.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZoxh+AAKCRA6cBh0uS2t
+rGmmAQCwPOE46KEpvttErlfnNid8KkdmPYoItdvt48RH/FxAOAEA1r0G4xf8zpP/
+/Nw0dQ4HFzHbpQgguCQAUIYhxU1OCAk=
+=RIRz
+-----END PGP SIGNATURE-----
 
-That's true.
-
->
-> >
-> >  	# client -> server samples should only contain the first 14 bytes of =
-the packet.
-> > -	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
-> > -			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-> > -	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
-> > -			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-> > +	ovs_wait grep -qE "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f=
-]{28}$" $ovs_dir/stdout
-> > +	[[ $? -eq 0 ]] || return 1
-> > +
-> > +	ovs_wait grep -q "rate:4294967295,group:2,cookie:eeff0c" $ovs_dir/std=
-out
-> > +	[[ $? -eq 0 ]] || return 1
->
-> Same for above two.
->
-> >
-> >  	return 0
-> >  }
-> > @@ -711,7 +739,8 @@ test_upcall_interfaces() {
-> >  	ovs_add_netns_and_veths "test_upcall_interfaces" ui0 upc left0 l0 \
-> >  	    172.31.110.1/24 -u || return 1
-> >
-> > -	sleep 1
-> > +	ovs_wait grep -q "listening on upcall packet handler" ${ovs_dir}/left=
-0.out
-> > +
-> >  	info "sending arping"
-> >  	ip netns exec upc arping -I l0 172.31.110.20 -c 1 \
-> >  	    >$ovs_dir/arping.stdout 2>$ovs_dir/arping.stderr
-> > @@ -811,6 +840,10 @@ shift $(($OPTIND-1))
-> >  IFS=3D"=09
-> >  "
-> >
-> > +if test "X$KSFT_MACHINE_SLOW" =3D=3D "Xyes"; then
-> > +	WAIT_TIMEOUT=3D10
-> > +fi
->
-> Should this be done closer to the first initialization of WAIT_TIMEOUT ?
->
-
-My rationale was splitting "variable declaration" and "code". Sure
-we're not adding an explicit cli argument for this (as with TRACING or
-VERBOSE) but we kind-of are using KSFT_MACHINE_SLOW as an input so for
-me grouping input processing all together made some sense. Having said
-that, I don't have a very strong opinion. I guess we can move it up as
-well.
-
-> > +
-> >  for arg do
-> >  	# Check first that all requested tests are available before running a=
-ny
-> >  	command -v > /dev/null "test_${arg}" || { echo "=3D=3D=3D Test ${arg}=
- not found"; usage; }
-> > diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/too=
-ls/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > index 1e15b0818074..8a0396bfaf99 100644
-> > --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > @@ -2520,6 +2520,7 @@ class PsampleEvent(EventSocket):
-> >      marshal_class =3D psample_msg
-> >
-> >      def read_samples(self):
-> > +        print("listening for psample events", flush=3DTrue)
-> >          while True:
-> >              try:
-> >                  for msg in self.get():
->
-
-Thanks.
-Adri=C3=A1n
-
+--87nTVdQkdNaM1mN+--
 
