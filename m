@@ -1,155 +1,219 @@
-Return-Path: <netdev+bounces-109746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366F9929D22
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:32:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E11929D5D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678E21C20C83
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:32:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC4491F22495
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0867328B6;
-	Mon,  8 Jul 2024 07:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2639AE3;
+	Mon,  8 Jul 2024 07:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="VhLZU4xm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF211862A
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 07:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from forward500d.mail.yandex.net (forward500d.mail.yandex.net [178.154.239.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F5381B9;
+	Mon,  8 Jul 2024 07:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720423903; cv=none; b=qcJXLqnLcs3kYcGtAGADPe1z3jp6mIfzUznEEtr82L27WdvCCwd95B1deJSqYrRtZcFG4aL8lqYX3P1BXnS91wf7GY2tjKMSrty7+jQpbsJLTIBYZpmsLVts4FQziBwUzboUjFQRYLB2q8xTZ8QyNUH0DqnDMpAdL8OnZtMBVA8=
+	t=1720424534; cv=none; b=aCBRDhC+fQSIyKfGLvD9JovgMnyrTTrcT41pG4eHKAsC+PtnC9yiEwGk1TJGLyOHu9SPG8OE+8yUp0qBunhRnZeaJZabqH+nHO7A2lnyMB9+8ckJHPzSQbggwQD+A3SP+mVWLgZnR46JIl0sBGIf44o9j+s/n+JWVn/0V7Efhwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720423903; c=relaxed/simple;
-	bh=eRGWnBw3MLYCpyPq8Z0dl5fJkHCqvVJgi0g+cZfe4Ws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bOuKhv7hYtjHVi4xAx7TGs+cVCICvdYJr+VhmKULXJqYBbADeXJUCTNOvWLUTYmxNvsJKMRWbi/DCNxDyNXp5PiCOVKi9Ij9plEsJo1DOGERmJ2ub/GxJ3fmZHh+AXSynl0c6p6eoRr2BzMk1p+3oWOjjuvMKRQsaFwtlrV3z9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.2])
-	by gateway (Coremail) with SMTP id _____8DxvuvWlYtmFu4BAA--.5777S3;
-	Mon, 08 Jul 2024 15:31:34 +0800 (CST)
-Received: from [192.168.100.8] (unknown [223.64.68.2])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxRcXRlYtmm10_AA--.3150S3;
-	Mon, 08 Jul 2024 15:31:31 +0800 (CST)
-Message-ID: <036f740c-480c-425d-82b4-2e21522524d7@loongson.cn>
-Date: Mon, 8 Jul 2024 15:31:29 +0800
+	s=arc-20240116; t=1720424534; c=relaxed/simple;
+	bh=O9RoOO9HvF5SuUCeDg6vUA4wVmtzSSul9Xm5/s61R6Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GZvza9XF6nJILN6gLmoEHqQ9x8nje2HC//JgXX1onsz18q0bmZF87ZXtK401h6yLmsqZlTjYumbt54CpIWxqOvPMdhOIdd+9tu5rPaAtPegM8g7CQ2Z4dejZltQLbRzPUlvLaRHsYodxcKvQYCvqnD1gCliZs5P7kLaOUFGUk7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=VhLZU4xm; arc=none smtp.client-ip=178.154.239.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
+Received: from mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:7dca:0:640:d4d9:0])
+	by forward500d.mail.yandex.net (Yandex) with ESMTPS id C5DDC60A3F;
+	Mon,  8 Jul 2024 10:34:32 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 6YW3mBQe3W20-qUQtuv72;
+	Mon, 08 Jul 2024 10:34:30 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
+	t=1720424070; bh=O9RoOO9HvF5SuUCeDg6vUA4wVmtzSSul9Xm5/s61R6Y=;
+	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
+	b=VhLZU4xmXX2w4OBfMMBdLTuYfNHiVS81wr+5BeazZfJVOu+yyXSQdoaO60cjQziKc
+	 M0uTvIyCbbrFj9TBj/klf6qeczg17/a4YJiSE0dCEH6yKJCldgKqcd4qvfnukuaDOU
+	 WcbQbDv7ImiZUeCsbYrO017QDF3uXjKDnJWXQ9oc=
+Authentication-Results: mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
+Message-ID: <663b1749afeb5cec281149fdb445ed36fdcbc68e.camel@maquefel.me>
+Subject: Re: [PATCH v10 00/38] ep93xx device tree conversion
+From: Nikita Shubin <nikita.shubin@maquefel.me>
+To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>, 
+	Arnd Bergmann
+	 <arnd@arndb.de>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Stephen Boyd
+ <sboyd@kernel.org>,  Hartley Sweeten <hsweeten@visionengravers.com>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, Linus Walleij
+ <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Andy
+ Shevchenko <andy@kernel.org>, Michael Turquette <mturquette@baylibre.com>,
+ Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter
+ Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, Mark
+ Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,  Takashi Iwai
+ <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron"
+ <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, Olof Johansson
+ <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-pm@vger.kernel.org,  devicetree@vger.kernel.org,
+ dmaengine@vger.kernel.org,  linux-watchdog@vger.kernel.org,
+ linux-pwm@vger.kernel.org,  linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ linux-ide@vger.kernel.org, linux-input@vger.kernel.org, 
+ linux-sound@vger.kernel.org, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, Vinod
+ Koul <vkoul@kernel.org>
+Date: Mon, 08 Jul 2024 10:34:05 +0300
+In-Reply-To: <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
+	 <CAHp75VfSC9gAD9ipeWRPdQOxUp4FXqYYei-cJTs38nbz0cHpkg@mail.gmail.com>
+	 <48c242838c77034485a9e667dc0e867207c5beed.camel@maquefel.me>
+	 <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me>
+	 <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 14/15] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-To: Huacai Chen <chenhuacai@kernel.org>, Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
- chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <16ec5a0665bcce96757be140019d81b0fe5f6303.1716973237.git.siyanteng@loongson.cn>
- <ktvlui43g6q7ju3tmga7ut3rg2hkhnbxwfbjzr46jx4kjbubwk@l4gqqvhih5ug>
- <CAAhV-H4JEec7CuNDaQX3AUT=9itcTRgRtWa61XACrYEvvLfd8g@mail.gmail.com>
- <yz2pb6h7dkbz3egpilkadcmqfnejtpphtlgypc2ppwhzhv23vv@d3ipubmg36xt>
- <8652851c-a407-4e20-b3f3-11a8a797debf@loongson.cn>
- <kgysya6lhczbqiq4al6f5tgppmjuzamucbaitl4ho5cdekjsan@6qxlyr6j66yd>
- <2b819d91-8c2a-4262-9cbb-c10e520f10c9@loongson.cn>
- <CAAhV-H6ZzBJHNqGApXc-5wiCt9DqM51TMkC2zmj5xhoC-rfrnA@mail.gmail.com>
- <d7s5plkdd2ihxlhnvpds2r4dywivkfkszew567uevzkfv56ae2@r3p6asvdyu3j>
- <CAAhV-H6A_=5MjC1iriO2fHbvamLXkcn9susXxpru2LN5Qu0xLA@mail.gmail.com>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <CAAhV-H6A_=5MjC1iriO2fHbvamLXkcn9susXxpru2LN5Qu0xLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxRcXRlYtmm10_AA--.3150S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxAF4xGrW8XF1kGFWDXr4DJrc_yoW5Ar1xpr
-	yUZFWjkF4kAF1ftryvya1Ygr1Yy3s2qr4UXrn0gw48GF9F9ry7JrykKF45CFyjkr1DJw1j
-	vFWIqF9rWFy5JrXCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
+
+Arnd,=20
+
+Are we continuing this patch series ?
+
+You are silent since last version submit, which makes me a bit worried.
+
+If you suddenly changed your mind please let us know, cause anyway we
+have no possibility to merge these series without you.
 
 
-在 2024/7/7 21:57, Huacai Chen 写道:
-> On Sun, Jul 7, 2024 at 6:51 PM Serge Semin <fancer.lancer@gmail.com> wrote:
->> On Sat, Jul 06, 2024 at 06:36:06PM +0800, Huacai Chen wrote:
->>> On Sat, Jul 6, 2024 at 6:31 PM Yanteng Si <siyanteng@loongson.cn> wrote:
->>>>
->>>> 在 2024/7/5 20:17, Serge Semin 写道:
->>>>> On Fri, Jul 05, 2024 at 08:06:32PM +0800, Yanteng Si wrote:
->>>>>>>>> But if you aren't comfortable with such naming we can change the
->>>>>>>>> macro to something like:
->>>>>>>>> #define DWMAC_CORE_LOONGSON_MULTI_CH    0x10
->>>>>>>> Maybe DWMAC_CORE_LOONGSON_MULTICHAN or DWMAC_CORE_LOONGSON_MULTI_CHAN
->>>>>>>> is a little better?
->>>>>>>>
->>>>>>> Well, I don't have a strong opinion about that in this case.
->>>>>>> Personally I prefer to have the shortest and still readable version.
->>>>>>> It decreases the probability of the lines splitting in case of the
->>>>>>> long-line statements or highly indented code. From that perspective
->>>>>>> something like DWMAC_CORE_LS_MULTI_CH would be even better. But seeing
->>>>>>> the driver currently don't have such cases, we can use any of those
->>>>>>> name. But it's better to be of such length so the code lines the name
->>>>>>> is utilized in wouldn't exceed +80 chars.
->>>>>> Okay.
->>>>>>
->>>>>> I added an indent before 0xXX and left three Spaces before the comment,
->>>>>>
->>>>>> which uses huacai's MULTICHAN and doesn't exceed 80 chars.
->>>>> I meant that it's better to have the length of the macro name so
->>>>> !the code where it's utilized!
->>>>> wouldn't exceed +80 chars. That's the criteria for the upper length
->>>>> boundary I normally follow in such cases.
->>>>>
->>>> Oh, I see!
->>>>
->>>> Hmm, let's compare the two options:
->>>>
->>>> DWMAC_CORE_LS_MULTI_CH
->>>>
->>>> DWMAC_CORE_LS_MULTICHAN
->>>>
->>>> With just one more char, the increased readability seems to be
->>>> worth it.
->>> If you really like short names, please use DWMAC_CORE_MULTICHAN. LS
->>> has no valuable meaning in this loongson-specific file.
->> At least some version of the Loongson vendor name should be in the
->> macro. Omitting it may cause a confusion since the name would turn to
->> a too generic form. Seeing the multi DMA-channels feature is the
->> Synopsys invention, should you meet the macro like DWMAC_CORE_MULTI_CH
->> in the code that may cause an impression that there is a special
->> Synopsys DW MAC ID for that. Meanwhile in fact the custom ID is
->> specific for the Loongson GMAC/GNET controllers only.
-> Well,
-> I prefer
-> DWMAC_CORE_LOONGSON_MULTI_CHAN / DWMAC_CORE_LOONGSON_MULTICHAN /
-> DWMAC_CORE_LOONGSON_MCH / DWMAC_CORE_MULTICHAN,
-> But I also accept DWMAC_CORE_LS_MULTI_CHAN / DWMAC_CORE_LS_MULTICHAN,
-> But I can't accept DWMAC_CORE_LS2K2000.
->
-I'll use DWMAC_CORE_LS_MULTICHAN for now, Let's continue discussing
-
-this macro in v14 (If necessary).
-
-
-Thanks,
-
-Yanteng
+On Fri, 2024-07-05 at 11:21 +0200, Uwe Kleine-K=C3=B6nig wrote:
+> Hello,
+>=20
+> On Thu, Jun 27, 2024 at 11:29:44AM +0300, Nikita Shubin wrote:
+> > On Tue, 2024-06-18 at 19:20 +0300, Nikita Shubin wrote:
+> > > Hello Andy!
+> > > On Mon, 2024-06-17 at 12:58 +0200, Andy Shevchenko wrote:
+> > > > On Mon, Jun 17, 2024 at 11:38=E2=80=AFAM Nikita Shubin via B4 Relay
+> > > > <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+> > > > >=20
+> > > > > The goal is to recieve ACKs for all patches in series to
+> > > > > merge it
+> > > > > via Arnd branch.
+> > > >=20
+> > > > 'receive'
+> > > >=20
+> > > > > Unfortunately, CLK subsystem suddenly went silent on clk
+> > > > > portion
+> > > > > of
+> > > > > series V2 reroll,
+> > > > > tried to ping them for about a month but no luck.
+> > > > >=20
+> > > > > Link:
+> > > > > https://lore.kernel.org/r/20240408-ep93xx-clk-v2-1-adcd68c13753@m=
+aquefel.me
+> > > > >=20
+> > > > > Some changes since last version (v9) - see "Changes in v10",
+> > > > > mostly
+> > > > > cosmetic.
+> > > >=20
+> > > > ...
+> > > >=20
+> > > > > Patches should be formated with '--histogram'
+> > > >=20
+> > > > 'formatted'
+> > > >=20
+> > > > ...
+> > > >=20
+> > > > > Changes in v10:
+> > > > >=20
+> > > > > Reordered SoB tags to make sure they appear before Rb and
+> > > > > Acked
+> > > > > tags.
+> > > >=20
+> > > > This is not required. The importance is only the order of SoBs
+> > > > themselves. If they are interleaved with other tags, it's fine.
+> > >=20
+> > > Ah - ok. Just saw someone was complaining about b4 reordering
+> > > them.=20
+> > >=20
+> > > >=20
+> > > > ...
+> > > >=20
+> > > >=20
+> > > > Hopefully to see this series being eventually applied soon.
+> > > > Arnd? (Do we have all necessary subsystem maintainers' tags,
+> > > > btw?)
+> > > >=20
+> > > >=20
+> > >=20
+> > > As i see from my perspective only three left:
+> > >=20
+> > > Clk subsystem:
+> > >=20
+> > > - clk: ep93xx: add DT support for Cirrus EP93xx
+> > >=20
+> > > DMA subsystem (but the only request from Vinod, as far as i
+> > > remember,
+> > > was fixing commits titles):
+> > >=20
+> > > - dmaengine: cirrus: Convert to DT for Cirrus EP93xx
+> > > - dmaengine: cirrus: remove platform code
+> > >=20
+> > > Beside that tags missing on platform code removal (which can be
+> > > Acked
+> > > by Arnd himself i believe) and dtsi/dts files (same ?).
+> >=20
+> > Vinod acked the above two patches:
+> >=20
+> > https://lore.kernel.org/all/ZnkIp8bOcZK3yVKP@matsya/
+> > https://lore.kernel.org/all/ZnkImp8BtTdxl7O3@matsya/
+> >=20
+> > so only:
+> >=20
+> > - clk: ep93xx: add DT support for Cirrus EP93xx
+> >=20
+> > https://lore.kernel.org/all/20240617-ep93xx-v10-3-662e640ed811@maquefel=
+.me/
+> >=20
+> > left.
+> >=20
+> > Hope Stephen will find some time for this one.
+>=20
+> As we're approaching the merge window and this is still unclear, I
+> applied the pwm bits (i.e. patches 12, 13). If I understand
+> correctly,
+> patch 33 isn't suitable for application yet as it has a dependency on
+> pinctrl changes in that series.
+>=20
+> (side note: Your patches are signed, but that doesn't bring any
+> benefit
+> if the receivers don't have your key. I didn't find it neither on
+> keys.openpgp.org nor in the kernel pgp key collection.)
+>=20
+> Best regards
+> Uwe
 
 
