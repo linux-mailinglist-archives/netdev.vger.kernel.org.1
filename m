@@ -1,173 +1,107 @@
-Return-Path: <netdev+bounces-109997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2DE92AA06
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:46:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B761392AA28
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BEF285890
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 19:46:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D6A9B20EDF
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 19:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8969214A4D4;
-	Mon,  8 Jul 2024 19:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBE614B07A;
+	Mon,  8 Jul 2024 19:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="14o6G+kt"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="XcuKXP+t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D95C20DC3
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 19:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140414B963
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 19:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720467961; cv=none; b=PHF7tcbKU8GcsQqX1jx3oH1QH+3eGsvCtynbhHDycypXji9YSSPMtnQdOjS4STgS5lxzk/7NxEKWNxQ6vBTNGrUsucfYUOvgIiB10i4vZjpYgiJTCUvaeKZww44giV0ezi/1Dmz0LoP9rYZCBWWXcUzReU5dgfVoCw5+ETBJcSM=
+	t=1720468198; cv=none; b=JoU6a+Rs/UgJm1xitcDnD2FsWj0Ro6AfmdvexNbPLz8sqOyiSlGBz3wgpUBmu6dkOmK0ZOwNG70XpTo5yfDDq14L8r9XZySHsguM92TAFGmBTjeoJd7wlZn+OrZ4sl6ah4WsXZOGslE89Do13CA088r21eqEpUhDHo4gRlZZjp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720467961; c=relaxed/simple;
-	bh=f6J3SyMoDlZnX07mleC15lOwC8e7IIONVGk8M5fMiVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jqa0CcfcFpjrKoXkuOSlsiZ7Ayh9HdN5rtaiZmyqMa6Jx03euOtWWANwRPzeiaHDurvEZzbYA4CTKCfSXmwmYWX0zvGdEzRop1SKl8nSuI7UPj9Ow1t1VCGe+XS+teVzR34Vl+ptLEALs/KC0jNS43tvILn9ChsHtS9pwbIweqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=14o6G+kt; arc=none smtp.client-ip=84.16.66.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WHvkC0RZ8zTJk;
-	Mon,  8 Jul 2024 21:45:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1720467954;
-	bh=ilehYGP+q5fwPfEBN5/iUyPlmWRy6d513iG8m2WrmI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=14o6G+ktpNaLu4raXbCfVq0pepd/8UsG3XShk47o7zGTN4rGazuD5syQSYmnD2Ihg
-	 HDnlDIQIBwCMAmSJvEgcJrk1d4Vl4+PGEy4YdG4h/kYYXX1STAfivnR+7paePaMWTU
-	 7u8oCJK5OknQp9bCFzbLfNGwFSuL0rNel1zR3/IY=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WHvkB1W56zm5b;
-	Mon,  8 Jul 2024 21:45:54 +0200 (CEST)
-Date: Mon, 8 Jul 2024 21:45:42 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, =?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, 
-	Jann Horn <jannh@google.com>, outreachy@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH v1] landlock: Abstract unix socket restriction tests
-Message-ID: <20240708.rootai6weiXe@digikod.net>
-References: <Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000>
+	s=arc-20240116; t=1720468198; c=relaxed/simple;
+	bh=7D+xUpceViiMorxMSLfmyuVuvRBM/PAMKUSbLtin36w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mWadlaL8XMqHUYJqnQB9NbiJUrwd0DhwXFI2FNBD3KyWqY0wIynFVPuUBC/9H9Mk2GoksuI3HE8kZyMs7DPfrJJdqUtinmtC6z07Aeefgs0SXDlGzf1mSeBA96hcWkHJfOCDKAU3TcovASr+Fzjy9p2N2mtlSpj6+nYR+7452/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=XcuKXP+t; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b0013cf33so2893931b3a.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 12:49:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1720468196; x=1721072996; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZG+yy6mS1Jp1QmVxmrSL8tDecOwhdcnRRxckmQWjuH8=;
+        b=XcuKXP+tDxTGbNI1RwfmRF7kVWiEU6I3AD+O21j75HU8lmBJVdw/+/HhvXRIiHE9eQ
+         znjyh4+ZXHsuWtoCseC8MyaycBr+OBoct2i322GlmTTyAhahpWA8oGRDgfpzsmoDGZmG
+         mZz4l+6z6UXqbyYEwrIp03C0sDWAqYEBXWKkISrB297A1RuvYbZ0eAaxM2mAC8Dz/Axo
+         xrkzGrByg4axkzIN16W+mjft+wuzBg9tYUb4LGqVYsOKpARULXGlNkBQ36eLKsvUFj/K
+         OoAI28DBjF5DW+h1ypSH6qqHgzKKPTPHe7cIZ9v6e4w44ySZOslGgRlIfIGZPyGMH5B3
+         jV9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720468196; x=1721072996;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZG+yy6mS1Jp1QmVxmrSL8tDecOwhdcnRRxckmQWjuH8=;
+        b=LqbSwW/5h1c/ajRq/JpIRvlSsRacS309bSJfaHC0yGZUIfs+i32VN89L99v1nR20OT
+         eiBSPIRYWyVKCoH0+upGF9r1KHkMfyDDAqGBA86+6x96EtKt+/E9A/bCrtMGZ9sDcAjR
+         NkGCeDFNP0oB5pmgGw4ma6Vs0n/2qRO9d0E4LuxeuO72dTRWLN4hyHhzhZAnEXhaQmie
+         XHBCcTKA8CGbaPRLEwEfxY3rcPoaRtgWtEYfHyd6AfvV9hcN8eSJ1zgsBBPnoyG+jHFr
+         SQNx2i6nSxyztcajqJXFVzSrnAA4noLXHBCQjgceNOX3CDctM7tYXHmNt9oCmCZoWyXh
+         RhGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXE5ALBjKDvwRBcDGj5NSHlAK8DQgQHBFK0NVZeMcPXKDvClxIBIl6pb7NfURyUgQp3q7/VxXUPx5tTy+lSU/Ud/fdqXv6o
+X-Gm-Message-State: AOJu0Yznc4pQ39+MVKY4LFWnz+38pzlck5257mnfZjMTIOgpwVHviKo4
+	ZxXZCMpAuja3p40lkbUJl5weyFffuiIwAONzUT/g7p54qSl9w1uJb2afIWHK6m+fzG+8CpoYsCc
+	b50hCncFhuDPkTZVjk/MEm9JWUetwFswvR6no
+X-Google-Smtp-Source: AGHT+IH2MRLeGKshWQAHPvfceTh6DbvmHmVohL86pPOKEbXDhetWTsQzqQTWxo2PxXciOjA5LKYla+qc6Xd2L5XTsRU=
+X-Received: by 2002:a05:6a00:198c:b0:70a:9fea:71a2 with SMTP id
+ d2e1a72fcca58-70b4353b11amr950766b3a.9.1720468196346; Mon, 08 Jul 2024
+ 12:49:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000>
-X-Infomaniak-Routing: alpha
+References: <20240708180852.92919-1-kuniyu@amazon.com> <20240708180852.92919-3-kuniyu@amazon.com>
+In-Reply-To: <20240708180852.92919-3-kuniyu@amazon.com>
+From: Dmitry Safonov <dima@arista.com>
+Date: Mon, 8 Jul 2024 20:49:45 +0100
+Message-ID: <CAGrbwDSw-r5_NYCkiF3WELLU=UtJBegd6qYFJ1-WmbBbTAn_2A@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/2] selftests: tcp: Remove broken SNMP
+ assumptions for TCP AO self-connect tests.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-These are good tests!  However, I get errors when running some of them (using
-the latest formatted patches):
+On Mon, Jul 8, 2024 at 7:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> tcp_ao/self-connect.c checked the following SNMP stats before/after
+> connect() to confirm that the test exercises the simultaneous connect()
+> path.
+>
+>   * TCPChallengeACK
+>   * TCPSYNChallenge
+>
+> But the stats should not be counted for self-connect in the first place,
+> and the assumption is no longer true.
+>
+> Let's remove the check.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-#  RUN           unix_socket.allow_without_domain_connect_to_parent.abstract_unix_socket ...
-# ptrace_test.c:845:abstract_unix_socket:Expected 0 (0) == bind(self->server, (struct sockaddr *)&addr, addrlen) (-1)
-# abstract_unix_socket: Test terminated by assertion
-#          FAIL  unix_socket.allow_without_domain_connect_to_parent.abstract_unix_socket
-not ok 9 unix_socket.allow_without_domain_connect_to_parent.abstract_unix_socket
-#  RUN           unix_socket.allow_without_domain_connect_to_child.abstract_unix_socket ...
-# ptrace_test.c:793:abstract_unix_socket:Expected 0 (0) == bind(self->server, (struct sockaddr *)&addr, addrlen) (-1)
-# ptrace_test.c:826:abstract_unix_socket:Expected 1 (1) == read(pipe_child[0], &buf_parent, 1) (0)
-# abstract_unix_socket: Test terminated by assertion
-#          FAIL  unix_socket.allow_without_domain_connect_to_child.abstract_unix_socket
-not ok 10 unix_socket.allow_without_domain_connect_to_child.abstract_unix_socket
-
-
-On Thu, Jun 27, 2024 at 05:30:48PM -0600, Tahera Fahimi wrote:
-> Tests for scoping abstract unix sockets. The patch has three types of tests:
-> i) unix_socket: tests the scoping mechanism for a landlocked process, same as
-> ptrace test.
-> ii) optional_scoping: generates three processes with different domains and tests if
-> a process with a non-scoped domain can connect to other processes.
-> iii) unix_sock_special_cases: since the socket's creator credentials are used for
-> scoping datagram sockets, this test examine the cases where the socket's credentials
-> are different from the process who is using it.
-> 
-> Closes: https://github.com/landlock-lsm/linux/issues/7
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
-
-> +/* clang-format off */
-> +FIXTURE(optional_scoping)
-> +{
-> +	int parent_server, child_server, client;
-> +};
-> +/* clang-format on */
-> +
-> +/* Domain is defined as follows:
-> + * 0 --> no domain
-> + * 1 --> have domain
-> + * 2 --> have domain and is scoped
-
-You should use an enum instead of these hardcoded values.  This is
-better to understand/document, to review, and to maintain.
-
-> + **/
-> +FIXTURE_VARIANT(optional_scoping)
-> +{
-> +	int domain_all;
-> +	int domain_parent;
-> +	int domain_children;
-> +	int domain_child;
-> +	int domain_grand_child;
-> +	int type;
-> +};
-> +/*
-> + * .-----------------.
-> + * |         ####### |  P3 -> P2 : allow
-> + * |   P1----# P2  # |  P3 -> P1 : deny
-> + * |         #  |  # |
-> + * |         # P3  # |
-> + * |         ####### |
-> + * '-----------------'
-> + */
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(optional_scoping, deny_scoped) {
-> +	.domain_all = 1,
-> +	.domain_parent = 0,
-> +	.domain_children = 2,
-> +	.domain_child = 0,
-> +	.domain_grand_child = 0,
-> +	.type = SOCK_DGRAM,
-> +	/* clang-format on */
-> +};
-> +/*
-> + * .-----------------.
-> + * |         .-----. |  P3 -> P2 : allow
-> + * |   P1----| P2  | |  P3 -> P1 : allow
-> + * |         |     | |
-> + * |         | P3  | |
-> + * |         '-----' |
-> + * '-----------------'
-> + */
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(optional_scoping, allow_with_domain) {
-> +	.domain_all = 1,
-> +	.domain_parent = 0,
-> +	.domain_children = 1,
-> +	.domain_child = 0,
-> +	.domain_grand_child = 0,
-> +	.type = SOCK_DGRAM,
-> +	/* clang-format on */
-> +};
-
-I guess this should failed with the current kernel patch (see my review
-of the kernel patch), but something like that should be tested:
-
-FIXTURE_VARIANT_ADD(optional_scoping, allow_with_one_domain) {
-	.domain_parent = 0,
-	.domain_child = 2,
-	.domain_grand_child = 0,
-};
-
-grand_child should be able to connect to its parent (child), but not its
-grand parent (parent).
+Thanks!
+Reviewed-by: Dmitry Safonov <dima@arista.com>
 
