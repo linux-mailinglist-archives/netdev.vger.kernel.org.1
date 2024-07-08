@@ -1,141 +1,251 @@
-Return-Path: <netdev+bounces-110012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCB992AADC
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:03:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B388092AAE1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61ED31C2116B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:03:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1712BB2189A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4B47345B;
-	Mon,  8 Jul 2024 21:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF21C14A08D;
+	Mon,  8 Jul 2024 21:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="GPRoYSEo"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="VMovxTl3"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC27748A;
-	Mon,  8 Jul 2024 21:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E0114E2E2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 21:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720472604; cv=none; b=i6ACkf7l5d/FNzXaFy19SXBkaT733/1fzPjFrLrVvICyO3PSeq9dgGvzFCVB7LLtUIINtktde54emm4EBtI5UgpSxEp6L6zIFl+Yh/wfsJRLAbxFhX7agYeScKWJ+SczfUXSObl9gl65epUocqNaYASqL+0SCY1Pb6rLbQcYTSU=
+	t=1720472775; cv=none; b=i+zK1I6trbMzKZNw1DiEushunKjFfbhlgLYPvudMjs+8bob02gQ9a3pHINd409vukI18jC2UYPnZ7T/85SerY+LSZ/H20EktqZozUgRwVcCRha37Qo/ltRVR1bklwWUqFRtjxmq2OA07VVqIih0AqCZTmLWr2E9/AZky5gJB+mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720472604; c=relaxed/simple;
-	bh=yGezQoMEy+zGvFrwW4UjyRxSVNi5Vn7jd9oaO5/SiZ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=idWPc7sn53P2doW7T7YxeRUTLnLw2pWByZGvvftuLlQO0y4pgEDUZnkM4vpUeny5C/liUMqvshw+5Vtda4bN+gq/zy3yt10Z/U4ZuBFMh8Z6471xnn3NgplG5miD0VYgyGBGmM7AYgBMvQ8RguI1eExzNL2tLhLSOiGTXpIbr9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=GPRoYSEo; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4B75087F82;
-	Mon,  8 Jul 2024 23:03:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1720472600;
-	bh=PLmGDjfO7Iv9kSuPhUNnyxBxOdqK2f484rToFZUPeqw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GPRoYSEoQD549TZ8uU2yCDgWuGndxj+UaW1kxa9v7UaRn7uGj6vA4fOt/6UToiXKn
-	 H0T7UClybOe8egk4iYE9VUuIS7fFANwR65JNww30zzvbG37npCFY7V5SwBTPLnvQt7
-	 Y0WH/3OkART/c7dcVe7PvGvDP1n+Rj7nwv5J652hJj1RhOGA9PN5QnVQyDgRcoKOu3
-	 mJmSbtb7y2dI/yCiVb+6Nnlod+PV0Qop1GxKoqekYhDroRA8q0byLXgr9hnyYA6iqt
-	 c2TRz5QHAgvgvp3ODLPDLQUI+pjNhkOSm4zjRGPbW2m0TQP6knUiowIf5zGI7pxDGr
-	 E0wtaZo6OiiBg==
-Message-ID: <40249f5c-f034-41a5-8088-8b4c298ab6c6@denx.de>
-Date: Mon, 8 Jul 2024 23:01:06 +0200
+	s=arc-20240116; t=1720472775; c=relaxed/simple;
+	bh=WKQSkNlos++v6ilN3MZLl7UVAHDwyEwzYdwNd/LJeSQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G4IRpvUKNRdfHgXKxIh4HRYMWcrbneq9pAi2MKaSHVtkvcussXtcO746nhV5FSLfkO4hZdrg59IkVp80rBpXkwfSrnPmwl4PT27bU/YFXNFOCUsyjaqr+LXPJIRYrNC1QeUXvgnRajqyZCCIDqo5AgZCG2jhh7slfKoyY5jqc0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=VMovxTl3; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-79efbc9328bso333430685a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 14:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1720472771; x=1721077571; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yZQMwCJgS8y+Lt9eNHTIINWcgFrJoWHswNZCv4eOnsE=;
+        b=VMovxTl3Oz1osYSU49zzqI3PNBhYaMjpnaD5+/60XRA0fAIi1aXsQSkEqIuVTvFuyk
+         1KHL3/oKyoe0CZikA2cG7OrDBgshvDA3fVgiqnpTj2Xwi+GIMY2LrNnlGNVCFqXM0RPR
+         AkZkaWzafQZQfsRBeVkfibOhZFiKgx11GwPnFeh1FlnJj8hYAC5OG2sbJXqIUP3tbGDW
+         bLdmCpwTV2QFkXRSejB4RPj14L975NW3kPoNRbQDIUjdz2tjfolJncx9HgYJ667I82Ea
+         YBPZwS/aocM4FMNqvDd/WO0p/CENZuXrC/Bs9JSAvQk4/46kBRhjxN0ORZx0+b+sIH5o
+         1hGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720472771; x=1721077571;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yZQMwCJgS8y+Lt9eNHTIINWcgFrJoWHswNZCv4eOnsE=;
+        b=ne9p3HY55XQKa5+ntlJBxtqPGANq/diXAIy9ElMI/gtBAHVWUc3d7XrVy9pakaWTpt
+         RjoD0m5XGhUTALqipQQk+SZ5R6di/OasxdhpnK7m2oLs+sj3RQ/Ia1vH6LFG8N2XhfVd
+         +LmngIsoQ4hDY9RwvRNpBVuRS/JS/rbGIpicpmR0xsk6gNMnYMZ0xMLnLA7gpyIGTwfq
+         xvz0VzoH6JvJgOf9F/XrmNquP4177CrZDIklCjV7X+K91POqgW9pVkmGzNSA8zia8FjT
+         t5QgVRem5W48s7mQJrdxV9olgOJKutUMskPYdtMenNWPrHjpPXuSCgAnxQz4qBGe6om3
+         nqTA==
+X-Gm-Message-State: AOJu0YzGLJIbNSRNVmmfFwf4ev1CFyI+fjoTR+aUQO0HvT+970i3K2N2
+	fe2jfRFjVxnNi+gc1n56EBj7BA6TgT+7NaBUT7VHFLznSi0PBCe4ptLDeHTf+aR/r9NF5WNl2n/
+	2
+X-Google-Smtp-Source: AGHT+IHUhY4fDPMjejYIung90hitqhOfeHv5nywUZBw3aVKJIKAJlb0jvPRyjomF5PnAc9eolXvFiw==
+X-Received: by 2002:a05:620a:4506:b0:79f:10e6:2de with SMTP id af79cd13be357-79f19a686c8mr72946785a.41.1720472771431;
+        Mon, 08 Jul 2024 14:06:11 -0700 (PDT)
+Received: from n191-036-066.byted.org ([139.177.233.196])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f18ff82a7sm28212185a.9.2024.07.08.14.06.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 14:06:11 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH net-next v7 0/3] net: A lightweight zero-copy notification
+Date: Mon,  8 Jul 2024 21:04:02 +0000
+Message-Id: <20240708210405.870930-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
- RTL8211F LED support
-To: Rob Herring <robh@kernel.org>
-Cc: netdev@vger.kernel.org, kernel@dh-electronics.com,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- devicetree@vger.kernel.org
-References: <20240705215207.256863-1-marex@denx.de>
- <20240708205856.GA3874098-robh@kernel.org>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240708205856.GA3874098-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
 
-On 7/8/24 10:58 PM, Rob Herring wrote:
-> On Fri, Jul 05, 2024 at 11:51:46PM +0200, Marek Vasut wrote:
->> The RTL8211F PHY does support LED configuration, document support
->> for LEDs in the binding document.
->>
->> Signed-off-by: Marek Vasut <marex@denx.de>
->> ---
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Andrew Lunn <andrew@lunn.ch>
->> Cc: Conor Dooley <conor+dt@kernel.org>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Florian Fainelli <f.fainelli@gmail.com>
->> Cc: Heiner Kallweit <hkallweit1@gmail.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Rob Herring <robh@kernel.org>
->> Cc: devicetree@vger.kernel.org
->> Cc: netdev@vger.kernel.org
->> ---
->>   .../devicetree/bindings/net/realtek,rtl82xx.yaml   | 14 +++++++++++---
->>   1 file changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> index 18ee72f5c74a8..28c048368073b 100644
->> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> @@ -14,9 +14,6 @@ maintainers:
->>   description:
->>     Bindings for Realtek RTL82xx PHYs
->>   
->> -allOf:
->> -  - $ref: ethernet-phy.yaml#
->> -
->>   properties:
->>     compatible:
->>       enum:
->> @@ -54,6 +51,17 @@ properties:
->>   
->>   unevaluatedProperties: false
->>   
->> +allOf:
->> +  - $ref: ethernet-phy.yaml#
->> +  - if:
->> +      properties:
->> +        compatible:
->> +          contains:
->> +            const: ethernet-phy-id001c.c916
->> +    then:
->> +      properties:
->> +        leds: true
-> 
-> This has no effect. 'leds' node is already allowed with the ref to
-> ethernet-phy.yaml. I suppose you could negate the if and then, but I'm
-> not really that worried if someone defines LEDs for a device with no
-> LEDs.
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-So shall I simply do:
+Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG".
 
-leds: true
+Original notification mechanism needs poll + recvmmsg which is not
+easy for applcations to accommodate. And, it also incurs unignorable
+overhead including extra system calls.
 
-and by done with it, as the easier way out ?
+While making maximum reuse of the existing MSG_ZEROCOPY related code,
+this patch set introduces a new zerocopy socket notification mechanism.
+Users of sendmsg pass a control message as a placeholder for the incoming
+notifications. Upon returning, kernel embeds notifications directly into
+user arguments passed in. By doing so, we can significantly reduce the
+complexity and overhead for managing notifications.
+
+We also have the logic related to copying cmsg to the userspace in sendmsg
+generic for any possible uses cases in the future.
+
+Initially, we expect users to pass the user address of the user array
+as a data in cmsg, so that the kernel can copy_to_user to this address
+directly.
+
+As Willem commented,
+
+> The main design issue with this series is this indirection, rather
+> than passing the array of notifications as cmsg.
+
+> This trick circumvents having to deal with compat issues and having to
+> figure out copy_to_user in ____sys_sendmsg (as msg_control is an
+> in-kernel copy).
+
+> This is quite hacky, from an API design PoV.
+
+> As is passing a pointer, but expecting msg_controllen to hold the
+> length not of the pointer, but of the pointed to user buffer.
+
+> I had also hoped for more significant savings. Especially with the
+> higher syscall overhead due to meltdown and spectre mitigations vs
+> when MSG_ZEROCOPY was introduced and I last tried this optimization.
+
+We solve it by supporting put_cmsg to userspace in sendmsg path starting
+from v5.
+
+Changelog:
+  v1 -> v2:
+    - Reuse errormsg queue in the new notification mechanism,
+      users can actually use these two mechanisms in hybrid way
+      if they want to do so.
+    - Update case SCM_ZC_NOTIFICATION in __sock_cmsg_send
+      1. Regardless of 32-bit, 64-bit program, we will always handle
+      u64 type user address.
+      2. The size of data to copy_to_user is precisely calculated
+      in case of kernel stack leak.
+    - fix (kbuild-bot)
+      1. Add SCM_ZC_NOTIFICATION to arch-specific header files.
+      2. header file types.h in include/uapi/linux/socket.h
+
+  v2 -> v3:
+    - 1. Users can now pass in the address of the zc_info_elem directly
+      with appropriate cmsg_len instead of the ugly user interface. Plus,
+      the handler is now compatible with MSG_CMSG_COMPAT and 32-bit
+      pointer.
+    - 2. Suggested by Willem, another strategy of getting zc info is
+      briefly taking the lock of sk_error_queue and move to a private
+      list, like net_rx_action. I thought sk_error_queue is protected by
+      sock_lock, so that it's impossible for the handling of zc info and
+      users recvmsg from the sk_error_queue at the same time.
+      However, sk_error_queue is protected by its own lock. I am afraid
+      that during the time it is handling the private list, users may
+      fail to get other error messages in the queue via recvmsg. Thus,
+      I don't implement the splice logic in this version. Any comments?
+
+  v3 -> v4:
+    - 1. Change SOCK_ZC_INFO_MAX to 64 to avoid large stack frame size.
+    - 2. Fix minor typos.
+    - 3. Change cfg_zerocopy from int to enum in msg_zerocopy.c
+
+  v4 -> v5:
+    - 1. Passing user address directly to kernel raises concerns about
+    ABI. In this version, we support put_cmsg to userspace in TX path
+    to solve this problem.
+
+  v5 -> v6:
+    - 1. Cleanly copy cmsg to user upon returning of ___sys_sendmsg
+
+  v6 -> v7:
+    - 1. Remove flag MSG_CMSG_COPY_TO_USER, use a member in msghdr instead
+    - 2. Pass msg to __sock_cmsg_send.
+    - 3. sendmsg_copy_cmsg_to_user should be put at the end of
+    ____sys_sendmsg to make sure msg_sys->msg_control is a valid pointer.
+    - 4. Add struct zc_info to contain the array of zc_info_elem, so that
+    the kernel can update the zc_info->size. Another possible solution is
+    updating the cmsg_len directly, but it will break for_each_cmsghdr.
+    - 5. Update selftest to make cfg_notification_limit have the same
+    semantics in both methods for better comparison.
+
+* Performance
+
+We update selftests/net/msg_zerocopy.c to accommodate the new mechanism,
+cfg_notification_limit has the same semantics for both methods. Test
+results are as follows, we update skb_orphan_frags_rx to the same as
+skb_orphan_frags to support zerocopy in the localhost test.
+
+cfg_notification_limit = 1, both method get notifications after 1 calling
+of sendmsg. In this case, the new method has around 17% cpu savings in TCP
+and 23% cpu savings in UDP.
++----------------------+---------+---------+---------+---------+
+| Test Type / Protocol | TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++----------------------+---------+---------+---------+---------+
+| ZCopy (MB)           | 7523    | 7706    | 7489    | 7304    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy (MB)       | 8834    | 8993    | 9053    | 9228    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy    | 117.42% | 116.70% | 120.88% | 126.34% |
++----------------------+---------+---------+---------+---------+
+
+cfg_notification_limit = 32, both get notifications after 32 calling of
+sendmsg, which means more chances to coalesce notifications, and less
+overhead of poll + recvmsg for the original method. In this case, the new
+method has around 7% cpu savings in TCP and slightly better cpu usage in
+UDP. In the env of selftest, notifications of TCP are more likely to be
+out of order than UDP, it's easier to coalesce more notifications in UDP.
+The original method can get one notification with range of 32 in a recvmsg
+most of the time. In TCP, most notifications' range is around 2, so the
+original method needs around 16 recvmsgs to get notified in one round.
+That's the reason for the "New ZCopy / ZCopy" diff in TCP and UDP here.
++----------------------+---------+---------+---------+---------+
+| Test Type / Protocol | TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++----------------------+---------+---------+---------+---------+
+| ZCopy (MB)           | 8842    | 8735    | 10072   | 9380    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy (MB)       | 9366    | 9477    | 10108   | 9385    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy    | 106.00% | 108.28% | 100.31% | 100.01% |
++----------------------+---------+---------+---------+---------+
+
+In conclusion, when notification interval is small or notifications are
+hard to be coalesced, the new mechanism is highly recommended. Otherwise,
+the performance gain from the new mechanism is very limited.
+
+Zijian Zhang (3):
+  sock: support copying cmsgs to the user space in sendmsg
+  sock: add MSG_ZEROCOPY notification mechanism based on msg_control
+  selftests: add MSG_ZEROCOPY msg_control notification test
+
+ arch/alpha/include/uapi/asm/socket.h        |   2 +
+ arch/mips/include/uapi/asm/socket.h         |   2 +
+ arch/parisc/include/uapi/asm/socket.h       |   2 +
+ arch/sparc/include/uapi/asm/socket.h        |   2 +
+ include/linux/socket.h                      |   6 ++
+ include/net/sock.h                          |   2 +-
+ include/uapi/asm-generic/socket.h           |   2 +
+ include/uapi/linux/socket.h                 |  13 +++
+ net/core/sock.c                             |  52 ++++++++-
+ net/ipv4/ip_sockglue.c                      |   2 +-
+ net/ipv6/datagram.c                         |   2 +-
+ net/socket.c                                |  54 +++++++++-
+ tools/testing/selftests/net/msg_zerocopy.c  | 111 ++++++++++++++++++--
+ tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+ 14 files changed, 236 insertions(+), 17 deletions(-)
+
+-- 
+2.20.1
+
 
