@@ -1,87 +1,77 @@
-Return-Path: <netdev+bounces-109847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D390D92A122
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:27:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2040592A12F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109E11C2153B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:27:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE0C2281C23
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5187D07E;
-	Mon,  8 Jul 2024 11:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQ2uiRb4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19327E563;
+	Mon,  8 Jul 2024 11:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3227D3F0
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 11:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2AD7E0E8;
+	Mon,  8 Jul 2024 11:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720437985; cv=none; b=UGDkNCkkUe3JhpTXz5g1oEKtXg8TwaYwR3Jlz/WzKBNTBXdRgirZTp+ox4y+uO9+Kamjc19XIVnTIGg68a/xNlzEhJZpcH7/b5D50UBSrk0z4ImCuxAJkqrKQebm69fyIBMmn4PAruVwJUfE6NUZkL08PsoB1V3DaG6pJ0geZA4=
+	t=1720438175; cv=none; b=NfDyE9eETJ403+tsQzJljXxItdE4mJKdC4+ZIqz5wUn3VQHKuQ+2VIgWxeDiOZcZNfnqKDGDNURpwoAjpc7fLbrqxSJ7brpMHc8EzEjTEB51AiecKjqoC0bU79H2QmdnywxBSPxF88VsS4CjzTq2yLBKgKPPSznbIP72G22M1Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720437985; c=relaxed/simple;
-	bh=BiZcXjD0MF9+4zB3dvLvvXJajt6y3TabHLQgZnFuMWQ=;
+	s=arc-20240116; t=1720438175; c=relaxed/simple;
+	bh=l8tNADpvGTAgcZk4owxgrOrsGJwZxT/6zV7fMI1w4KE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ybf6KSZqW7rHA0QJRv1WRfZ2q8kbAjoBodyBGZJgzbf/0oz/D/GQ2L2kgJGFyiZzgbOl6h5Nw1hd2Fotcloya0BmPOJDmjGgWIxWb0bceFT+OeJdCq7KMwq5RHdKrELHFwugdhjLueX+yIeXEyhunYHCkw124aWCWlyJapUnSzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQ2uiRb4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720437983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H+1JhCgg1e3xAL9ukropoVjm3oRaKeBDSlDAr3D/8Qw=;
-	b=LQ2uiRb4y0F2J7JPP2jAPWoWTFUClBHHxp2E+Qbd89I8uOrZAy+inh3DFb+Y0T01VSpxfT
-	7kRMCTXTJgz1y0YPpDMDv0BZun1XsEXlSKFRrtJ0nARZ75C9GkJMGehmCOOj0I860W6vYt
-	sA3AjlHCyyCschv7y8MIsnJ2OAY1kCQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-2-Cd2WsZhMNGq0YZNK7KhHPg-1; Mon, 08 Jul 2024 07:26:21 -0400
-X-MC-Unique: Cd2WsZhMNGq0YZNK7KhHPg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42668796662so9399535e9.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 04:26:21 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mtDp9s6HaRNvn32D34+5YPGhNG/RkiFm4P0iqSMbFujm4t+745EyTry7/QlSabFg0PtunzRKi34RCsF6JGTSFLF2ZYkobpO8Z7rlv78RMqbR37M7cNol7OlxBTT64+Ob+NM3oNG19fZg09LdJ7hLTwZ1nCeBfSOp9bs0jOd+gc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a77e7420697so212988266b.1;
+        Mon, 08 Jul 2024 04:29:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720437981; x=1721042781;
+        d=1e100.net; s=20230601; t=1720438172; x=1721042972;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H+1JhCgg1e3xAL9ukropoVjm3oRaKeBDSlDAr3D/8Qw=;
-        b=rqnAP+Z40mfTqOGlMCAtAA2xJqBO6aWc7nkqDCnkXLfzEE4EJaep9rlNnWhn7K5eXI
-         Q0cCg5PvJCC6JfDUowIILK7xcJNuNJZ8pIXRo5F+h9qwDzoPnaLPIZIN3KKV6hIumVDQ
-         2OlNCUNDJyAo7L6TCT2HuM0yqQF8W6cmghLZlfoeg2kyZSmhIbFABF0GbUwRzz0+F7V9
-         6XFyYkb39Ml9otZ5DfagehBBcKHdGMAvnqwLOf8KF2w5/Y93RMeFqyk1qBExlkOI0Leh
-         e0jjmqmgGSrHG07ggXpdv/lrbUnxg40latDbANfjvU3vghM6U7LqiaEQLDymOmZV5yLT
-         TWsA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2YW01wUUGCBx51xlgW8hCGMXBIXnaJR45Z+AFWrf26N30bKRYBKhlHQIDzxWuqiqmGLDOgYglsDKxgm9QfgLlgid541un
-X-Gm-Message-State: AOJu0Yy5cXFgUXufeMQcvnFxjFgiyMXq7uU6uaZw8D2NfenCkYeDDNQp
-	8qwgO2L9dAj3yFvU3WkwqGs41esDCQYpArx4nlA83EMG5RzHH47fZT1Sc9BFhC0Waqa2bwyhFKV
-	QOYJ774GynJbynrYvXBPmh+NBaWvclvqygGzs40PNEfpeoK/NCCuGzQ==
-X-Received: by 2002:a05:600c:1d11:b0:426:6e9a:7a1e with SMTP id 5b1f17b1804b1-4266e9a7b2cmr4958705e9.35.1720437980863;
-        Mon, 08 Jul 2024 04:26:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGGpA7ji/rZ+8HL55hEF/BG5Syq+7fVBtOtgJNBvAR3h2aS4f0cQ39/TmwMykXfwdCiYI7Sog==
-X-Received: by 2002:a05:600c:1d11:b0:426:6e9a:7a1e with SMTP id 5b1f17b1804b1-4266e9a7b2cmr4958475e9.35.1720437980375;
-        Mon, 08 Jul 2024 04:26:20 -0700 (PDT)
-Received: from redhat.com ([2.52.29.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4265c2a99c7sm59914285e9.1.2024.07.08.04.26.17
+        bh=bcz3nh3P1QPB93IkBWiwLYfGJ8ranmn0k42SqHg0GD8=;
+        b=KBxJV8VtoZW9livy3cmtY4zLtcFta8OBWPhqiF3qLosCcnYqTBDzj/ZH8ydfB6emdq
+         6YueJJd8+DkP2pppcwVv1PkGx96kCbMKTA6OZKdVucEuzZzx5UyIaaBjwGVwt940vK2L
+         8qWFl9CU8SD9aZxE2Ic99xz9KK6HPnudUl57nGS6BPKgW/XWIC4p83aE1uklVokaI6on
+         z8hUuz50Y97i9UtyIxZHsWKLtZ+FdE1AKGmSQt6EiodggIDt6Z8qPqoaskcf79B2dDfb
+         Ipnj6dgNU6q1BP+znejYXwLhMwMDEqFXqLLMNccN8vBbeT6UgMm0hAW7gBhpHXlkQq6n
+         o0jA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKPQOyRM8/35gJOqgc8ZV3gg6hLmpfJC0q2NmR8BgB5z7tnwPqCR0Yid+ouSZTt25gDLd7xhjEX9x9OpCFUtgwwgImeTGRUkQuK55VWn0CD9os9jiVCN+rfFInDTpZGNyRmpz2gReo3cpT/Ziup3ifJ23gZMU6dLMM04ZOuuoKak8o
+X-Gm-Message-State: AOJu0YxfWgp5DatKvuQ6Ngh79vrrEAJ3mrt3ado7K9pmUfrQyjgoXKig
+	evr5O1NkQtZ71TUigd241qeqNvIefHrg4NvI41zL0kzKDXzciQY4
+X-Google-Smtp-Source: AGHT+IGwnmeCQCgRGyXdVA7s26btz7dHrIerUo2cdeyLDKvuIPKNqvP0pyiSx+yPrX1vGERkl5IksA==
+X-Received: by 2002:a17:906:3403:b0:a77:da14:840f with SMTP id a640c23a62f3a-a77da1485f2mr546194766b.9.1720438172279;
+        Mon, 08 Jul 2024 04:29:32 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77e1417c3dsm223512566b.92.2024.07.08.04.29.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 04:26:19 -0700 (PDT)
-Date: Mon, 8 Jul 2024 07:26:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, jasowang@redhat.com, parav@nvidia.com,
-	sgarzare@redhat.com, netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
-Message-ID: <20240708072603-mutt-send-email-mst@kernel.org>
-References: <20240708065549.89422-1-lulu@redhat.com>
+        Mon, 08 Jul 2024 04:29:31 -0700 (PDT)
+Date: Mon, 8 Jul 2024 04:29:29 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Horia Geanta <horia.geanta@nxp.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next v3 1/4] crypto: caam: Avoid unused
+ imx8m_machine_match variable
+Message-ID: <ZovNme6LSqxdYpS4@gmail.com>
+References: <20240702185557.3699991-1-leitao@debian.org>
+ <20240702185557.3699991-2-leitao@debian.org>
+ <ffcb4e2a-22f2-4ce2-a2cd-ad05763c91f4@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,62 +80,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240708065549.89422-1-lulu@redhat.com>
+In-Reply-To: <ffcb4e2a-22f2-4ce2-a2cd-ad05763c91f4@nxp.com>
 
-On Mon, Jul 08, 2024 at 02:55:49PM +0800, Cindy Lu wrote:
-> Add the function to support setting the MAC address.
-> For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
-> to set the mac address
-> 
-> Tested in ConnectX-6 Dx device
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+Hello Horia,
 
-Is this on top of your other patchset?
+On Fri, Jul 05, 2024 at 10:11:40AM +0000, Horia Geanta wrote:
+> On 7/2/2024 9:56 PM, Breno Leitao wrote:
 
-> ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 26ba7da6b410..f78701386690 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
->  	destroy_workqueue(wq);
->  	mgtdev->ndev = NULL;
->  }
-> +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
-> +				  struct vdpa_device *dev,
-> +				  const struct vdpa_dev_set_config *add_config)
-> +{
-> +	struct mlx5_vdpa_dev *mvdev = to_mvdev(dev);
-> +	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> +	struct mlx5_core_dev *mdev = mvdev->mdev;
-> +	struct virtio_net_config *config = &ndev->config;
-> +	int err;
-> +	struct mlx5_core_dev *pfmdev;
-> +
-> +	if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> +		if (!is_zero_ether_addr(add_config->net.mac)) {
-> +			memcpy(config->mac, add_config->net.mac, ETH_ALEN);
-> +			pfmdev = pci_get_drvdata(pci_physfn(mdev->pdev));
-> +			err = mlx5_mpfs_add_mac(pfmdev, config->mac);
-> +			if (err)
-> +				return -1;
-> +		}
-> +	}
-> +	return 0;
-> +}
->  
->  static const struct vdpa_mgmtdev_ops mdev_ops = {
->  	.dev_add = mlx5_vdpa_dev_add,
->  	.dev_del = mlx5_vdpa_dev_del,
-> +	.dev_set_attr = mlx5_vdpa_set_attr_mac,
->  };
->  
->  static struct virtio_device_id id_table[] = {
-> -- 
-> 2.45.0
+> > diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+> > index bd418dea586d..d4b39184dbdb 100644
+> > --- a/drivers/crypto/caam/ctrl.c
+> > +++ b/drivers/crypto/caam/ctrl.c
+> > @@ -80,6 +80,7 @@ static void build_deinstantiation_desc(u32 *desc, int handle)
+> >  	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
+> >  }
+> >  
+> > +#ifdef CONFIG_OF
+> >  static const struct of_device_id imx8m_machine_match[] = {
+> >  	{ .compatible = "fsl,imx8mm", },
+> >  	{ .compatible = "fsl,imx8mn", },
+> > @@ -88,6 +89,7 @@ static const struct of_device_id imx8m_machine_match[] = {
+> >  	{ .compatible = "fsl,imx8ulp", },
+> >  	{ }
+> >  };
+> > +#endif
 
+> Shouldn't using __maybe_unused instead of the ifdeffery be preferred
+> in this case?
+
+That is an option as well. Not sure if it makes any difference, tho.
+
+If you prefer __maybe_unused, I am more than happy to send a follow-up
+patch to convert the #ifdef to __maybe_unused. Up to you.
+
+Thanks!
 
