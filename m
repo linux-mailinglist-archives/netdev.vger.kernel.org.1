@@ -1,108 +1,138 @@
-Return-Path: <netdev+bounces-109924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EF8392A495
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:26:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE1192A4B7
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD11B28285D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:26:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 619751F22063
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A57E13D639;
-	Mon,  8 Jul 2024 14:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B049D13DDDA;
+	Mon,  8 Jul 2024 14:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Tche9g9/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H/WkP3UJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DC378C75
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 14:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0621B38DC3;
+	Mon,  8 Jul 2024 14:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720448751; cv=none; b=lr3KkY54/if7MCZIQL9s9dy6ZPXMdg65KtVRS3AIZJ6KwR97dcPrGhOCepZ3C18/lvk/L58pcBHRfLrY9aYeJuJYQ1eXkwUykvq3pJuy4XqqFNb+tKkj4iquZFZqrFenOt9jbp6nyR/UQXwjlGKdi0r07jmBJBXNgFE5iUWeeSM=
+	t=1720449070; cv=none; b=JULVPhK9tjfwapraOYHM2xuJJlf+YKHGSCb5icZr5Eb8t/5ZQ9NAWK6Abi0pWBc/EvCh5lPgMd1LfHTgzRvWSxBD1WrJu6MO4TtYVg/ygmDpnYZKMzHf3zDfBGYlMV+CyxFxcaqG0+hmb7iQEyNGiFTVQm8mQy3SCztH6YPwHAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720448751; c=relaxed/simple;
-	bh=sVqP3HYILE8K4kseLkzHEkhKSuPq7y6d7aGwycP+SqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fw3GZFMNqQvAs/xx1A9mGyz2xIbZhqU7MwtIYEWPE/k/K8/9IU0VLHHdEZnWiyGFI2T5mmGFHKmKFXIFcZUccuGZ+EnyAANsc6Xq08/erc+qdLvspw/Ppaksz457jk30Q0fFHHMdKJ6qD0iXmNmZZnDRPIl23E0hOIR/RFfjAH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Tche9g9/; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-367b0cc6c65so1707477f8f.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 07:25:46 -0700 (PDT)
+	s=arc-20240116; t=1720449070; c=relaxed/simple;
+	bh=UUtLVatZrv02Lzew8iQgrph1Pi3wQhH9u7SbiMLiv1Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mlJ4xFZIiS4kUaZS+EiLqSqX2BEVO4PS/wB8sEFVotNW8pKbnuekEe5U7CakHLMX4FdIcgdXV0aDq9I2AIwkG9/WIdHRqfxXlYygP02ypaUWEBUwBznM/R/U8ywGP9AFTpo+R8EEw9Tg6Yy/NKWtGyVAFrtyLkR38DvxVP7oT44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H/WkP3UJ; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3679f806223so2326596f8f.0;
+        Mon, 08 Jul 2024 07:31:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1720448745; x=1721053545; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W/eF7oIcPCmgh2btkuGSELcXuAe2AdViMi7aYroQLWw=;
-        b=Tche9g9/WVvR0FFk/CXfJuU/V9Wg9CJg+77U3ZPs8OV+/E8qjPQzL+ihN2gYyataOe
-         gKZzPyFhLYQAl5wgRST8RHj+9M7dXyfBIUcXILaRKK78OEivUSH4KJzjbs+NaWtxRFMq
-         53QbOg9cMnMPOWppotREzjSgYFeBDJPJ/TL2mYY5wbvwcBogYZW0QaBkL+NNKRViMjyq
-         wYigJwySeBWBtX813DVeBeOo1Q4QxV9CdxKLnxUWHFCGbvPrPoZSHVzJzfoURtgna6/8
-         sLzrzHQxcM0l/biX0QZGpw/acYbqBWnha08STsw61jWDG2kGQYfvj5lak9RWDTvZ+6qX
-         IBkA==
+        d=gmail.com; s=20230601; t=1720449067; x=1721053867; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=praCejWfnL4tvn8vRf99MQxNtfzrDObizyuJfLk1AHM=;
+        b=H/WkP3UJ/Ut7Wg6D2JCWme74/Iyq68hArKHcheqGBOX2Sttwr9Ad2Vp58NVBaFGmkC
+         8P4c+RtPeLCbNv+3v4Hg5wLiiUj2XngxG6VqAiW08Cco0Ari1QxSeShdQfHYMP2MwvLR
+         Z0qxERhLcNYfKsx1kY4PxbaKWv4LIBhEjx7Gv71V+TrgY+DBkoG+lQWrmMwonXEJCQ9l
+         R8rKnzZzmqmxTjcX4r99mCAa3rWHXUIZfWyJ16/w4ODpRz3sw3CJ+E2x2MqwKVfZ+3+R
+         dq5RUAkBiEO+uCzOkkwYTIc8RmnFLNMQITzq1ac4JohcqPEIcw9max+5UyjYpKdQlOOm
+         OeEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720448745; x=1721053545;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/eF7oIcPCmgh2btkuGSELcXuAe2AdViMi7aYroQLWw=;
-        b=JQ/dnDZWTphjHkR4F28XFEU8acArObdVHJBiWxzzs7cvty4uxZLHE2mxHRMoDiJXGz
-         +ZKROBfpRbIOkC89T89szBBmp4uqkvEXvju2ZIeSIQVtW7TBXZp1la9HnwWzoCuE4YMj
-         oSQ2qAx0/J3P48ODLoF0Fg0qti4Up/iY+byY/tuZtucIwXQFPFUfHJN8cuPRefvdmY4d
-         7BservJPD04wLgXEPQhIPd3lh2qYNBZlU4QAnIx/Kh0lyQx14Asv+/NWl8lOw/MlosvJ
-         FPfyk8/bTtwoFp4oMJ+ekHHnmdsOS+oUqhQ8OinSmkeCh35hmmdM91hSvd2OrY90+SxF
-         WWNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaTqgZhmKXVQD0mr435sh20gkurtP50xBLsEsfw64j1vXbcF0ODTAGBOnJ8MAw+pBZbfm6pGHcEN7jpmhU7uU4oxxQkVRU
-X-Gm-Message-State: AOJu0YxqbuVWGLfh4+NG2TNA5IS8A2e/DRP5pw9QD1+TOgufJhZ38+yH
-	xh6+GDqCynwjhpQVHtQ/0OSoD9Hiq9aDS1k984Vg3XEmwT9YUkR+mRRxE6uNrZ4=
-X-Google-Smtp-Source: AGHT+IGdkjg5ScqQmofH+S1f2GzeJU8mlai3Mw3zLq/JArqhrfdX0A2oYma/TLFVS0tZC1Er+OwZ+Q==
-X-Received: by 2002:a5d:6690:0:b0:367:89b0:f58a with SMTP id ffacd0b85a97d-3679dd73c4amr8167197f8f.58.1720448744888;
-        Mon, 08 Jul 2024 07:25:44 -0700 (PDT)
-Received: from ?IPV6:2a01:cb09:d029:b5a2:628c:ea6c:7082:b40d? (2a01cb09d029b5a2628cea6c7082b40d.ipv6.abo.wanadoo.fr. [2a01:cb09:d029:b5a2:628c:ea6c:7082:b40d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36789d5ec1csm16066152f8f.37.2024.07.08.07.25.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jul 2024 07:25:44 -0700 (PDT)
-Message-ID: <f8f33e5d-5595-4218-a754-eaab71e30510@baylibre.com>
-Date: Mon, 8 Jul 2024 16:25:43 +0200
+        d=1e100.net; s=20230601; t=1720449067; x=1721053867;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=praCejWfnL4tvn8vRf99MQxNtfzrDObizyuJfLk1AHM=;
+        b=paD66D9nFWYIrd5657RCDbERtmEeUmO+WtDV+VEKYfxs2XByiI3OS6I99eJR8Ekn4f
+         1NNPdzl7brxrNjsNFWjoWyI0shiirdNAZV3RjPsC5j6d6DuZ7kqZMEzw0IS3dwHzdYoh
+         AyGK7sLA2W6DEjM79082qnnAb9yhKo1IK3MjwyiOSaYGal6UJb5EUBlH7yGUeBWpiR4x
+         EcROdyYSRATfR23kJeunbC7xyB8surjOUJ+/PZmU9dhR6Rei8MqwRhPzcERqLQun1Vy5
+         5iWiCgj67TbRioQpEXYipRG6lUJ7JyclC0/09+wTsQgIBBVAxwA09oNadRlmhd2PRlMO
+         q/ng==
+X-Forwarded-Encrypted: i=1; AJvYcCVKSETKqugTBDsjBoz099Su31IcLYJUms0LoJren42rB6OotZKJI/y6pyofAMRKRbmLMadCuIFypB1Dvu3A4KAOdtN1CTZbpDceO8L++edFqLymCGe8nnJKk5LSHVo3iTTLWL2V
+X-Gm-Message-State: AOJu0Yy0w4ImWCddysKU/sV2L5zYwemZNCZSggLawO6lRQjUhmH9VpaG
+	S6k/a1AiFoGp6+TXfFLA1hgq9Y+NYZdA2u8JqHUdRe2KQTMr2aZly+PCqOQMpp/wTmLdTZ3KpmS
+	P59DtXDkR2WAwNA1jMcvC1upvm6g=
+X-Google-Smtp-Source: AGHT+IFoh68HLd0TMS0+kGGf5MwuNOwxGvMq4ZWjbXeoBxd9S6ujGKoBgyoOGLXMik21GVdPzCHmonPJZKz88mSGP0Q=
+X-Received: by 2002:adf:e790:0:b0:360:9500:9bbb with SMTP id
+ ffacd0b85a97d-3679f6eff1dmr12024136f8f.12.1720449067049; Mon, 08 Jul 2024
+ 07:31:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ti: icssg-prueth: add missing deps
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240708-net-deps-v1-1-835915199d88@baylibre.com>
- <1eec9f10-9eda-4f9b-b0f8-28f25a6153ca@lunn.ch>
-Content-Language: en-US
-From: Guillaume LA ROQUE <glaroque@baylibre.com>
-In-Reply-To: <1eec9f10-9eda-4f9b-b0f8-28f25a6153ca@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-11-linyunsheng@huawei.com> <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
+ <38da183b-92ba-ce9d-5472-def199854563@huawei.com> <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
+ <0a80e362-1eb7-40b0-b1b9-07ec5a6506ea@gmail.com> <CAKgT0UcRbpT6UFCSq0Wd9OHrCqOGR=BQ063-zNBZ4cVNmduZGw@mail.gmail.com>
+ <15623dac-9358-4597-b3ee-3694a5956920@gmail.com> <200ee8ff-557f-e17b-e71f-645267a49831@huawei.com>
+ <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com> <83cf5a36-055a-f590-9d41-59c45f93e7c5@huawei.com>
+In-Reply-To: <83cf5a36-055a-f590-9d41-59c45f93e7c5@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 8 Jul 2024 07:30:30 -0700
+Message-ID: <CAKgT0UdH1yD=LSCXFJ=YM_aiA4OomD-2wXykO42bizaWMt_HOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
+ prepare/probe/commit API
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Yunsheng Lin <yunshenglin0825@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 08/07/2024 à 15:53, Andrew Lunn a écrit :
-> On Mon, Jul 08, 2024 at 03:38:20PM +0200, Guillaume La Roque wrote:
->> Add missing dependency on NET_SWITCHDEV.
->>
->> Fixes: 5905de14c2a5 ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
->> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+On Mon, Jul 8, 2024 at 3:58=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
 >
->      Andrew
+> On 2024/7/8 1:12, Alexander Duyck wrote:
+>
+> ...
+>
+> > The issue is the dependency mess that has been created with patch 11
+> > in the set. Again you are conflating patches which makes this really
+> > hard to debug or discuss as I make suggestions on one patch and you
+> > claim it breaks things that are really due to issues in another patch.
+> > So the issue is you included this header into include/linux/sched.h
+> > which is included in linux/mm_types.h. So what happens then is that
+> > you have to include page_frag_cache.h *before* you can include the
+> > bits from mm_types.h
+> >
+> > What might make more sense to solve this is to look at just moving the
+> > page_frag_cache into mm_types_task.h and then having it replace the
+> > page_frag struct there since mm_types.h will pull that in anyway. That
+> > way sched.h can avoid having to pull in page_frag_cache.h.
+>
+> It seems the above didn't work either, as asm-offsets.c does depend on
+> mm_types_task.h too.
+>
+> In file included from ./include/linux/mm.h:16,
+>                  from ./include/linux/page_frag_cache.h:10,
+>                  from ./include/linux/mm_types_task.h:11,
+>                  from ./include/linux/mm_types.h:5,
+>                  from ./include/linux/mmzone.h:22,
+>                  from ./include/linux/gfp.h:7,
+>                  from ./include/linux/slab.h:16,
+>                  from ./include/linux/resource_ext.h:11,
+>                  from ./include/linux/acpi.h:13,
+>                  from ./include/acpi/apei.h:9,
+>                  from ./include/acpi/ghes.h:5,
+>                  from ./include/linux/arm_sdei.h:8,
+>                  from arch/arm64/kernel/asm-offsets.c:10:
+> ./include/linux/mmap_lock.h: In function =E2=80=98mmap_assert_locked=E2=
+=80=99:
+> ./include/linux/mmap_lock.h:65:23: error: invalid use of undefined type =
+=E2=80=98const struct mm_struct=E2=80=99
+>    65 |  rwsem_assert_held(&mm->mmap_lock);
 
-I will send a v2 , shaeone was wrong on Fixes line.
-
-
-Guillaume
-
+Do not include page_frag_cache.h in mm_types_task.h. Just move the
+struct page_frag_cache there to replace struct page_frag.
 
