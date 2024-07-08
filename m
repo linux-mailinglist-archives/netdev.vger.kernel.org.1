@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-110056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2750D92AC18
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:30:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B3292AC1A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCC4D1F21BAF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 365A91C222B6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAFB14E2F6;
-	Mon,  8 Jul 2024 22:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040F8152517;
+	Mon,  8 Jul 2024 22:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbiHnF5M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKUa4O7I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DC650276;
-	Mon,  8 Jul 2024 22:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32B514F9E9
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 22:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720477833; cv=none; b=V0yHpbTzHYK+N/XaSkVDTaa3ffT0lpXoH4f+ovzEHDLsM5BpERf9GA5dv/IZqYWX5kA7qOFP9nao4zRrw1/rjZt4VSYUYkVY4/x70lCLJ0EEX3HH73rV2g09UKNlQIen5gdQRqapmvqEuKp7qt9m/SRTzNFpsvXT9iZqtYaHLKI=
+	t=1720477833; cv=none; b=tPQ31HPGis9RGMnFWjiU3KaRD6QPu82IwDM02bSHukpCvYksOTq+VFQF4WzN8Z/2CvKucFoRw1OANBohd6+vHXnV8yXAQBOz6Oih7TnygbcJgJqVJ+zCgdKuGJLcncr64/xv2QmD9wSZXW4FD+6zM40oalWvxJxolJFwo6HEfAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720477833; c=relaxed/simple;
-	bh=Lt1sPnBmBELsxeDwYg9NblzD+5zoh0qpCKcy/lGokGo=;
+	bh=xYZS8qYQT3/Sjr07lZ3XQdhKVJH0iYUZtYazBGnrhzg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nz0p55cEr2dbs6on/2TYcHHUN8CIS8Kt4ApPJGNEGfrwBg8342IEBUBDg1lcQZXsyA/XOIjYo9z/awGf3xrqQVgQflSnvZD9Wahk1SgCYFwhOAVGiVc74fk71zXQN5SAwFGM1kA42b+30EcVweJ8Ze21wjC5CPvWtEa3ZXvvPY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbiHnF5M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3600CC3277B;
+	 In-Reply-To:To:Cc; b=Txky35G1WEPkCGkmeJruIUbKWMF0obNtr8s7AzSIGVa2m1OXK2Ts4yLnx7OqbvHRa2fkqFJODCYf/1Ajukur9sxVBdfaMUer5lfOXw7j/r3jZS4zFmq2dg6+tOAbFEqnw25Ega4I+DhDcjAOJpCPzzreG9vjV90QhrGdMs34WZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKUa4O7I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C588C4AF10;
 	Mon,  8 Jul 2024 22:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720477833;
-	bh=Lt1sPnBmBELsxeDwYg9NblzD+5zoh0qpCKcy/lGokGo=;
+	bh=xYZS8qYQT3/Sjr07lZ3XQdhKVJH0iYUZtYazBGnrhzg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WbiHnF5MJGf/4AW4uj+5O3RA+/aRDm2Z18XoYGkLvd4IC4blff6UVZPCTJaNY6mrx
-	 D5Uu1KpLLahxs7K3l2noBx7Bkv+h21lujZZuVkoFb68gIeBXFsDAsd2Ph6V6kNdqWN
-	 BynFPbND/PeNZ9PBgcT4RaCqVuI1PPPareRwjA7CNu4zbDiT/xst0zU9NH9yxGPfO2
-	 KV+wZuTuvIiAFKIUHFFdeZ/eP+HQOi+v1W/xqDrPvAqG0QWKiNgDa+2dx65b65iGzq
-	 PFpXkfMAD+sCh3RyeFwTrjhq4JE4QRjokd5npuC9mB7DlkIRWP20fS2zxetZYuF2qo
-	 OAk6uJ3LfIkGQ==
+	b=RKUa4O7I+bVm76OpRvDrvHUVXgVGhyVNyhRKfCpjbGoGLPNb3y54OBHSWocbUJDoC
+	 LUbk8wIgkAKh0KJ0Gynf6THFqKN+oR3wY2ZwWPBozvl5Seo8fA81hbOE7kI0XI8NDp
+	 nezi0F26y2amZXKhG0tOEjCgSkl8rSq/pQgO3HxE0zPfNpUfEQiZ/+/6x/cld9TCbq
+	 7aDlj+qcLGfFCC4KnJXW8RcHZifYOu4Njg4+xMNvDJVmQXSWrIo0mfLA8D7p85EbeJ
+	 uUnvEmyZcmhkyWfrju1UP+1NuysWBWM777ZqcfCTaarOiHnorvHRYokogWO7gnuJ71
+	 oiTKEzDrTeE9w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2205DDF3714;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F941DF3714;
 	Mon,  8 Jul 2024 22:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf 1/2] bpf: Fix too early release of tcx_entry
+Subject: Re: [PATCH iproute2-next 0/3] minor improvements to makefile, devlink
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172047783313.17442.16042215164463451364.git-patchwork-notify@kernel.org>
+ <172047783338.17442.9067699938088808843.git-patchwork-notify@kernel.org>
 Date: Mon, 08 Jul 2024 22:30:33 +0000
-References: <20240708133130.11609-1-daniel@iogearbox.net>
-In-Reply-To: <20240708133130.11609-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: martin.lau@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- xten@osec.io, v4bel@theori.io, qwerty@theori.io
+References: <20240703131521.60284-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240703131521.60284-1-przemyslaw.kitszel@intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, lukasz.czapnik@intel.com
 
 Hello:
 
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-On Mon,  8 Jul 2024 15:31:29 +0200 you wrote:
-> Pedro Pinto and later independently also Hyunwoo Kim and Wongi Lee reported
-> an issue that the tcx_entry can be released too early leading to a use
-> after free (UAF) when an active old-style ingress or clsact qdisc with a
-> shared tc block is later replaced by another ingress or clsact instance.
+On Wed,  3 Jul 2024 15:15:18 +0200 you wrote:
+> Three minor improvements: better error messages from devlink app,
+> fix to one example in the man page of devlink-resource,
+> and better build experience for single-app focused devs.
 > 
-> Essentially, the sequence to trigger the UAF (one example) can be as follows:
+> Przemek Kitszel (3):
+>   man: devlink-resource: add missing words in the example
+>   devlink: print missing params even if an unknown one is present
+>   Makefile: support building from subdirectories
 > 
 > [...]
 
 Here is the summary with links:
-  - [bpf,1/2] bpf: Fix too early release of tcx_entry
-    https://git.kernel.org/bpf/bpf/c/1cb6f0bae504
-  - [bpf,2/2] selftests/bpf: Extend tcx tests to cover late tcx_entry release
-    https://git.kernel.org/bpf/bpf/c/5f1d18de7918
+  - [iproute2-next,1/3] man: devlink-resource: add missing words in the example
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=830f490e92df
+  - [iproute2-next,2/3] devlink: print missing params even if an unknown one is present
+    (no matching commit)
+  - [iproute2-next,3/3] Makefile: support building from subdirectories
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
