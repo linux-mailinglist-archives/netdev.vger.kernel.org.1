@@ -1,321 +1,122 @@
-Return-Path: <netdev+bounces-109785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10147929F1C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:32:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E0A0929F3A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:38:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AA34B25AB0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59B3DB23760
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8304055892;
-	Mon,  8 Jul 2024 09:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxeDCgNE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFE5770E8;
+	Mon,  8 Jul 2024 09:37:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [195.130.137.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C305466B;
-	Mon,  8 Jul 2024 09:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAB16F2E2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 09:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720431125; cv=none; b=qj9miY0oRYv6xXmcjrrAnl7pvUVq+wgsQGFuwbL43VbqUXaxq1X+OY8cajjxUXxkvBiLAWak6XaKTiKrFUGJI1nu2vyscyNDmc3sLz7D//xh7GNpSwPFk4fHryAt70+0o2SGpHzma84RcSCNJ2oFqLggnCDsAe9gC2C/53uQips=
+	t=1720431457; cv=none; b=f+aEMZmxIdEYM2E218zE2BQ8hoddZ4r4U3pWkc5qgB2XwrFjCppzZM6s+LtNFto4cPX+jhRy9YMuswjTbXlNEkoriTtqE24ZUqaoCVbv0WpF7l7kRM9JyVeXuFV4BbOWg7bd+pBbj/zPm3YBw7X6Qk/HSn/IofiwgUL5fVrVgZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720431125; c=relaxed/simple;
-	bh=PSxQJUpdzgyKLJoY9ztDBUzNUgu33n/mFOB+EZ35Res=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jE0nV6PhDoQt1ib4768LEOBPz4p0vGsI5f1ZYHCpzN4v5XK2GpgINPSUJJ2Bauf+dZbn1t7LZbPt/wSxa8LFp2XLN6pelfXJarECOpLk3uABsNY4atkHsweBbLf+vJIFH7Ov5KyHdZ9jmSRnkct9vLgzTf8+pkh5qLra+zIg5+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxeDCgNE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D8C8DC116B1;
-	Mon,  8 Jul 2024 09:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720431124;
-	bh=PSxQJUpdzgyKLJoY9ztDBUzNUgu33n/mFOB+EZ35Res=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=bxeDCgNEcAlRzBsyoNuXrC7t/SmAs9R3ksxeZnuu8YhJJLTUj2Bj887a1F1cNV359
-	 P/xZBsGCnGCLtTqROVcHH6A/5NjGp3L/cuPEj3zCIM8nf2ncp4bukEnLYSYxg8I6zB
-	 WB+++IFF6u9avgtM2FPv+VEPhTs7yMsZbpEY1kKRB6yjALSJTMochxEmZQji+ON4/5
-	 wDhhrbILuHjIrK0sgYIIOeEEHpaolBtYzZIGcKSnZBZFTDDudQHRkzRzmPaOzPoBIm
-	 sydRx6cwDKv+g/mAoFkE2kXCbpnOy1JH0/nrQ+mW/sPjZwnziwNwSNyXwxfMUYlR6R
-	 Vz7DeS3BLF6ig==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C094AC3271E;
-	Mon,  8 Jul 2024 09:32:04 +0000 (UTC)
-From: Rodrigo Cataldo via B4 Relay <devnull+rodrigo.cadore.l-acoustics.com@kernel.org>
-Date: Mon, 08 Jul 2024 11:31:57 +0200
-Subject: [PATCH iwl-net] igc: Ensure PTM request is completed before
- timeout has started
+	s=arc-20240116; t=1720431457; c=relaxed/simple;
+	bh=3682u2+RM5bTACboe7g/UHTGCKdEe8meJmTBGIUebxA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fJSAjerrRvStd+ftS6tKlSAsNTBiVFGdtqERUiqqXS/rb7KLWS3G6UcSuL+Nc9kqGLPvEls+tmLQC85IKwYdfbemKydeORx0JtNxzHdYAW4fpUJVkBIJG0/6Yq5a6UbJ2CDmIiQBtxhg2M0sHCCc/qRepju0nLGmnCiW+HqpNec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:5564:ad59:41e5:4080])
+	by laurent.telenet-ops.be with bizsmtp
+	id kxdS2C00i5NeGrf01xdSwW; Mon, 08 Jul 2024 11:37:27 +0200
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1sQko6-001PJ4-P4;
+	Mon, 08 Jul 2024 11:37:26 +0200
+Received: from geert by rox.of.borg with local (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1sQkoI-009RRR-KV;
+	Mon, 08 Jul 2024 11:37:26 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Manish Chopra <manishc@marvell.com>,
+	Rahul Verma <rahulv@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH 00/12] arm64: dts: renesas: rcar-gen3/4: Add missing iommus properties
+Date: Mon,  8 Jul 2024 11:37:12 +0200
+Message-Id: <cover.1720430758.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240708-igc-flush-ptm-request-before-timeout-6-10-v1-1-70e5ebec9efe@l-acoustics.com>
-X-B4-Tracking: v=1; b=H4sIAAyyi2YC/x3NSwqDMBRG4a3IHfdCDDal3UrpwMY/ekETm0cVx
- L03dPhNzjkoIQoSPZqDIr6SJPiK9tKQnXo/gmWoJq10p27qyjJadnNJE6954YhPQcr8hgsRnGV
- BKJkNt4qdgdL2bpwZOqq9NcLJ/n89SbaZPTK9zvMHM7PALoQAAAA=
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
- Kurt Kanzenbach <kurt.kanzenbach@linutronix.de>, 
- "Christopher S. Hall" <christopher.s.hall@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11903;
- i=rodrigo.cadore@l-acoustics.com; h=from:subject:message-id;
- bh=Wfg75g71XmXkv4d1mekMWpTpqpPeT5sIegVpLSTXqac=;
- b=owGbwMvMwCGWd67IourLsUDG02pJDGndm4SDe2rWaU5LS9nG91Q5ameo1u2GTUn/a/imP74VF
- 7DqSvuljlIWBjEOBlkxRRb933xOq8uUjDgSJ6+EmcPKBDKEgYtTACZSE8bwP1HI4VDd85nKhh//
- LTjbek16i3PDpzXdZ1ds8LjxaeNxkzKGf3Y7eF7fZmVQcktRZ51/WK306uHtpwpNlbwXhigFsT1
- cyAcA
-X-Developer-Key: i=rodrigo.cadore@l-acoustics.com; a=openpgp;
- fpr=E0F4E67DE69A235AC356157D2DDD1455748BC38F
-X-Endpoint-Received: by B4 Relay for rodrigo.cadore@l-acoustics.com/default
- with auth_id=109
-X-Original-From: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
-Reply-To: rodrigo.cadore@l-acoustics.com
+Content-Transfer-Encoding: 8bit
 
-From: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+	Hi all,
 
-When a PTM is requested via wr32(IGC_PTM_STAT), the operation may only
-be completed by the next read operation (flush). Unfortunately, the next
-read operation in the PTM request loop happens after we have already
-started evaluating the response timeout.
+This patch series completes the description of Audio-DMAC, EthernetAVB,
+Frame Compression Processor, Gigabit Ethernet, SDHI, and Serial-ATA
+devices nodes on R-Car Gen3/Gen4 SoCs by adding iommus properties where
+they are still missing, so they can be used with the IOMMU.
 
-Thus, the following behavior has been observed::
+Note that this only covers device types that already have iommus
+properties on other SoCs from the same family.  Device types that
+currently lack such a property on all SoCs (e.g. PCIe, Video-IN, Image
+Signal Processor) are not touched.
 
-  phc2sys-1655  [010]   103.233752: funcgraph_entry:                    |  igc_ptp_getcrosststamp() {
-  phc2sys-1655  [010]   103.233754: funcgraph_entry:                    |    igc_phc_get_syncdevice_time() {
-  phc2sys-1655  [010]   103.233755: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1655  [010]   103.233931: preempt_disable: caller=irq_enter_rcu+0x14 parent=irq_enter_rcu+0x14
-  phc2sys-1655  [010]   103.233932: local_timer_entry: vector=236
-  phc2sys-1655  [010]   103.233932: hrtimer_cancel: hrtimer=0xffff8edeef526118
-  phc2sys-1655  [010]   103.233933: hrtimer_expire_entry: hrtimer=0xffff8edeef526118 now=103200127876 function=tick_nohz_handler/0x0
+Thanks for your comments!
 
-  ... tick handler ...
+I plan to queue this in renesas-devel for v6.12.
 
-  phc2sys-1655  [010]   103.233971: funcgraph_exit:       !  215.559 us |      }
-  phc2sys-1655  [010]   103.233972: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1655  [010]   103.234135: funcgraph_exit:       !  164.370 us |      }
-  phc2sys-1655  [010]   103.234136: funcgraph_entry:         1.942 us   |      igc_rd32();
-  phc2sys-1655  [010]   103.234147: console:              igc 0000:03:00.0 enp3s0: Timeout reading IGC_PTM_STAT register
+Geert Uytterhoeven (12):
+  arm64: dts: renesas: r8a774a1: Add missing iommus properties
+  arm64: dts: renesas: r8a774b1: Add missing iommus properties
+  arm64: dts: renesas: r8a774c0: Add missing iommus properties
+  arm64: dts: renesas: r8a774e1: Add missing iommus properties
+  arm64: dts: renesas: r8a77960: Add missing iommus properties
+  arm64: dts: renesas: r8a77961: Add missing iommus properties
+  arm64: dts: renesas: r8a77965: Add missing iommus properties
+  arm64: dts: renesas: r8a77970: Add missing iommus property
+  arm64: dts: renesas: r8a77980: Add missing iommus properties
+  arm64: dts: renesas: r8a779a0: Add missing iommus properties
+  arm64: dts: renesas: r8a779g0: Add missing iommus properties
+  arm64: dts: renesas: r8a779h0: Add missing iommus properties
 
-Based on the (simplified) code::
+ arch/arm64/boot/dts/renesas/r8a774a1.dtsi |  6 ++++++
+ arch/arm64/boot/dts/renesas/r8a774b1.dtsi | 26 +++++++++++++++++++++++
+ arch/arm64/boot/dts/renesas/r8a774c0.dtsi |  3 +++
+ arch/arm64/boot/dts/renesas/r8a774e1.dtsi |  8 +++++++
+ arch/arm64/boot/dts/renesas/r8a77960.dtsi |  2 ++
+ arch/arm64/boot/dts/renesas/r8a77961.dtsi |  2 ++
+ arch/arm64/boot/dts/renesas/r8a77965.dtsi | 22 +++++++++++++++++++
+ arch/arm64/boot/dts/renesas/r8a77970.dtsi |  1 +
+ arch/arm64/boot/dts/renesas/r8a77980.dtsi |  2 ++
+ arch/arm64/boot/dts/renesas/r8a779a0.dtsi | 20 +++++++++++++++++
+ arch/arm64/boot/dts/renesas/r8a779g0.dtsi |  5 +++++
+ arch/arm64/boot/dts/renesas/r8a779h0.dtsi |  2 ++
+ 12 files changed, 99 insertions(+)
 
-	ctrl = rd32(IGC_PTM_CTRL);
-        /* simplified: multiple writes here */
-	wr32(IGC_PTM_STAT, IGC_PTM_STAT_VALID);
-
-	err = readx_poll_timeout(rd32, IGC_PTM_STAT, stat,
-				 stat, IGC_PTM_STAT_SLEEP,
-				 IGC_PTM_STAT_TIMEOUT);
-	if (err < 0) {
-		netdev_err(adapter->netdev, "Timeout reading IGC_PTM_STAT register\n");
-		return err;
-	}
-
-Where readx_poll_timeout() starts the timeout evaluation before calling
-the rd32() parameter (rd32() is a macro for igc_rd32()).
-
-In the trace shown, the read operation of readx_poll_timeout() (second
-igc_rd32()) took so long that the timeout (IGC_PTM_STAT_VALID) has expired
-and no sleep has been performed.
-
-With this patch, a write flush is added (which is an additional
-igc_rd32() in practice) that can wait for the write before the timeout
-is evaluated::
-
-  phc2sys-1615  [010]    74.517954: funcgraph_entry:                    |  igc_ptp_getcrosststamp() {
-  phc2sys-1615  [010]    74.517956: funcgraph_entry:                    |    igc_phc_get_syncdevicetime() {
-  phc2sys-1615  [010]    74.517957: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1615  [010]    74.518127: preempt_disable: caller=irq_enter_rcu+0x14 parent=irq_enter_rcu+0x14
-  phc2sys-1615  [010]    74.518128: local_timer_entry: vector=236
-  phc2sys-1615  [010]    74.518128: hrtimer_cancel: hrtimer=0xffff96466f526118
-  phc2sys-1615  [010]    74.518128: hrtimer_expire_entry: hrtimer=0xffff96466f526118 now=74484007229 function=tick_nohz_handler/0x0
-
-  ... tick handler ...
-
-  phc2sys-1615  [010]    74.518180: funcgraph_exit:       !  222.282 us |      }
-  phc2sys-1615  [010]    74.518181: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1615  [010]    74.518349: funcgraph_exit:       !  168.160 us |      }
-  phc2sys-1615  [010]    74.518349: funcgraph_entry:         1.970 us   |      igc_rd32();
-  phc2sys-1615  [010]    74.518352: hrtimer_init: hrtimer=0xffffa6f9413a3940 clockid=CLOCK_MONOTONIC mode=0x0
-  phc2sys-1615  [010]    74.518352: preempt_disable: caller=_raw_spin_lock_irqsave+0x28 parent=hrtimer_start_range_ns+0x56
-  phc2sys-1615  [010]    74.518353: hrtimer_start: hrtimer=0xffffa6f9413a3940 function=hrtimer_wakeup/0x0 expires=74484232878 softexpires=74484231878
-
-  .. hrtimer setup and return ...
-
-  kworker/10:1-242   [010]    74.518382: sched_switch: kworker/10:1:242 [120] W ==> phc2sys:1615 [120]
-  phc2sys-1615  [010]    74.518383: preempt_enable: caller=schedule+0x36 parent=schedule+0x36
-  phc2sys-1615  [010]    74.518384: funcgraph_entry:      !  100.088 us |      igc_rd32();
-  phc2sys-1615  [010]    74.518484: funcgraph_entry:         1.958 us   |      igc_rd32();
-  phc2sys-1615  [010]    74.518488: funcgraph_entry:         2.019 us   |      igc_rd32();
-  phc2sys-1615  [010]    74.518490: funcgraph_entry:         1.956 us   |      igc_rd32();
-  phc2sys-1615  [010]    74.518492: funcgraph_entry:         1.980 us   |      igc_rd32();
-  phc2sys-1615  [010]    74.518494: funcgraph_exit:       !  539.386 us |    }
-
-Now the sleep is called as expected, and the operation succeeds.
-Therefore, regardless of how long it will take for the write to be
-completed, we will poll+sleep at least for the time specified in
-IGC_PTM_STAT_TIMEOUT.
-
-Fixes: a90ec8483732 ("igc: Add support for PTP getcrosststamp()")
-Signed-off-by: Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
----
-I have been searching for the proper solution for this PTM issue for a long
-time. The issue was observed on a 13700 (Raptor Lake). We also use a 8500
-(Coffee Lake) that is much less susceptible for this issue, but still
-happens. Both are using I225-LM cards.
-
-For a 24 hours test, idle system, I have observed with 13700::
-
-	number of timeouts in 86400 seconds: 2509
-
-The same test on a 8500::
-
-        number of timeouts in 86400 seconds: 9
-
-Where one PTM request is sent per second. Test was done this script::
-
-  record_multiple_timeout_param()
-  {
-  	local taskset_cpu=$1
-  	local cur_limit=$((SECONDS + LIMIT_SECONDS ))
-  	local timeouts=0
-  
-  	while [ $SECONDS -lt $cur_limit ]
-  	do
-  		REL_TO=$((cur_limit - SECONDS))
-  
-  		timeout $REL_TO taskset $taskset_cpu \
-  			phc2sys -c $ITF_NAME -s CLOCK_REALTIME -O 37 -m 1>/dev/null
-  		if [ $? -eq 255 ]; then
-  			timeouts=$((timeouts + 1))
-  		fi
-  	done
-  	printf "\tnumber of timeouts in %s seconds: %d\n" $LIMIT_SECONDS $timeouts
-  }
-
-  record_multiple_timeout_param $NON_ISOLCPU_MASK
-
-Firmware version for the cards::
-
-  # lshw -class network -json | jq '.[0].product,.[0].configuration.firmware'
-  "Ethernet Controller I225-LM"
-  "1057:8754"
-
-  # lshw -class network -json | jq '.[2].product,.[2].configuration.firmware'
-  "Ethernet Controller I225-LM"
-  "1057:8754
-
-A couple of attempts were made that did not lead to solving the
-issue (disabling ASPM in kernel and boot, using periodic tick), and a couple
-of solutions that worked but that were subpar:
-
-1. The issue was not observed for a phc2sys(8) running on a fully
-   isolated nohz_full core. We do not have the luxury of dedicating a a
-   core for it.
-2. Bumping the IGC_PTM_STAT_TIMEOUT value. Other machines may need
-   another value though.
-3. Retry (multiple times) readx_poll_timeout() in case of failure. This may
-   significantly increase the function latency, because each
-   readx_poll_timeout() can take more than 100 us.
-4. Disabling preemption during the PTM request. Horrible.
-
-For the Coffee Lake machine, the issue tends to be avoided because the
-read does not take so long. Here is basically the same trace using the
-Cofee Lake machine::
-
-  phc2sys-1204  [002]  1778.220288: funcgraph_entry:                    |  igc_ptp_getcrosststamp() {
-  phc2sys-1204  [002]  1778.220290: funcgraph_entry:                    |    igc_phc_get_syncdevicetime() {
-  phc2sys-1204  [002]  1778.220291: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1204  [002]  1778.220373: preempt_disable: caller=irq_enter_rcu+0x14 parent=irq_enter_rcu+0x14
-  phc2sys-1204  [002]  1778.220374: local_timer_entry: vector=236
-  phc2sys-1204  [002]  1778.220375: hrtimer_cancel: hrtimer=0xffff894027326118
-  phc2sys-1204  [002]  1778.220376: hrtimer_expire_entry: hrtimer=0xffff894027326118 now=1778228034802 function=tick_nohz_handler/0x0
-
-  ... tick handler ...
-
-  phc2sys-1204  [002]  1778.220411: funcgraph_exit:       !  119.843 us |      }
-  phc2sys-1204  [002]  1778.220412: funcgraph_entry:                    |      igc_rd32() {
-  phc2sys-1204  [002]  1778.220492: funcgraph_exit:       + 80.094 us   |      }
-  phc2sys-1204  [002]  1778.220493: funcgraph_entry:        2.951 us    |      igc_rd32();
-  phc2sys-1204  [002]  1778.220497: hrtimer_init: hrtimer=0xffffa504c0d83aa0 clockid=CLOCK_MONOTONIC mode=0x0
-  phc2sys-1204  [002]  1778.220498: preempt_disable: caller=_raw_spin_lock_irqsave+0x28 parent=hrtimer_start_range_ns+0x56
-  phc2sys-1204  [002]  1778.220499: hrtimer_start: hrtimer=0xffffa504c0d83aa0 function=hrtimer_wakeup/0x0 expires=1778228158866 softexpires=1778228157866
-
-  ... timer setup ....
-
-  phc2sys-1204  [002]  1778.220509: preempt_enable: caller=_raw_spin_unlock_irqrestore+0x2b parent=hrtimer_start_range_ns+0x12d
-  phc2sys-1204  [002]  1778.220511: funcgraph_entry:        7.338 us   |      igc_rd32();
-  phc2sys-1204  [002]  1778.220519: funcgraph_entry:        2.769 us   |      igc_rd32();
-  phc2sys-1204  [002]  1778.220522: funcgraph_entry:        2.798 us   |      igc_rd32();
-  phc2sys-1204  [002]  1778.220525: funcgraph_entry:        2.736 us   |      igc_rd32();
-  phc2sys-1204  [002]  1778.220529: funcgraph_entry:        2.750 us   |      igc_rd32();
-  phc2sys-1204  [002]  1778.220532: funcgraph_exit:       !  242.656 us |    }
-
-For both machines, I observed that the first igc_rd32() after an idle
-period (more than 10us) tends to take significantly more time. I assume
-this is a hardware power-saving technique, but I could not find any
-mention in the manuals. This is very easily observable with an idle
-system running phc2sys, since it will request only once every second.
-
-This is the typical trace of the operation::
-
-  phc2sys-1204  [002]  1749.209397: funcgraph_entry:                   |  igc_ptp_getcrosststamp() {
-  phc2sys-1204  [002]  1749.209398: funcgraph_entry:                   |    igc_phc_get_syncdevicetime() {
-  phc2sys-1204  [002]  1749.209400: funcgraph_entry:      + 81.491 us  |      igc_rd32();
-  phc2sys-1204  [002]  1749.209482: funcgraph_entry:        3.691 us   |      igc_rd32();
-  phc2sys-1204  [002]  1749.209487: funcgraph_entry:        2.942 us   |      igc_rd32();
-  phc2sys-1204  [002]  1749.209490: hrtimer_init: hrtimer=0xffffa504c0d83a00 clockid=CLOCK_MONOTONIC mode=0x0
-  phc2sys-1204  [002]  1749.209491: preempt_disable: caller=_raw_spin_lock_irqsave+0x28 parent=hrtimer_start_range_ns+0x56
-  ... timer setup and it goes on like before ...
-
-The preemption needs to happen for this issue, so that this power-saving
-mode is triggered, making the igc_rd32 'slow enough' so that all of the
-timeout is consumed before the card has time to answer.
-
-I believe flushing the write solves the issue definitely, since the
-write should be completed before the timeout has started. So that, even
-if the timeout is consumed by a slow read operation, the write has been
-received before and the card had time to process the request.
----
- drivers/net/ethernet/intel/igc/igc_ptp.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index 1bb026232efc..d7269e4f1a21 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -1005,6 +1005,10 @@ static int igc_phc_get_syncdevicetime(ktime_t *device,
- 		 * VALID bit.
- 		 */
- 		wr32(IGC_PTM_STAT, IGC_PTM_STAT_VALID);
-+		/* Ensure the hardware receives the ptm request before the
-+		 * response timeout starts.
-+		 */
-+		wrfl();
- 
- 		err = readx_poll_timeout(rd32, IGC_PTM_STAT, stat,
- 					 stat, IGC_PTM_STAT_SLEEP,
-
----
-base-commit: 0005b2dc43f96b93fc5b0850d7ca3f7aeac9129c
-change-id: 20240705-igc-flush-ptm-request-before-timeout-6-10-f6e02c96f6d4
-
-Best regards,
 -- 
-Rodrigo Cataldo <rodrigo.cadore@l-acoustics.com>
+2.34.1
 
+Gr{oetje,eeting}s,
 
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
 
