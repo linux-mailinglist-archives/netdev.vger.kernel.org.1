@@ -1,219 +1,267 @@
-Return-Path: <netdev+bounces-109747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E11929D5D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:42:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7DA929D80
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC4491F22495
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:42:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 244B0B21680
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2639AE3;
-	Mon,  8 Jul 2024 07:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3F639AEB;
+	Mon,  8 Jul 2024 07:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="VhLZU4xm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cgkShHGh"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward500d.mail.yandex.net (forward500d.mail.yandex.net [178.154.239.208])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F5381B9;
-	Mon,  8 Jul 2024 07:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90332D638;
+	Mon,  8 Jul 2024 07:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720424534; cv=none; b=aCBRDhC+fQSIyKfGLvD9JovgMnyrTTrcT41pG4eHKAsC+PtnC9yiEwGk1TJGLyOHu9SPG8OE+8yUp0qBunhRnZeaJZabqH+nHO7A2lnyMB9+8ckJHPzSQbggwQD+A3SP+mVWLgZnR46JIl0sBGIf44o9j+s/n+JWVn/0V7Efhwg=
+	t=1720424846; cv=none; b=lkW7e2evKFMFcarve31HWJvkqT4QyHGU64erJQvv5KQayGIFKYK3hEXOtW8cNktT23vkKP/oPk12q6lVl1RUBIqgHdM82C75rKYOdCwz8tXNWkRRcMxs5RqDWwyxoNQZ3oOxOykRw/KllZBbhkyCAP0w8ElM0Ma94Z3CkQtl8Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720424534; c=relaxed/simple;
-	bh=O9RoOO9HvF5SuUCeDg6vUA4wVmtzSSul9Xm5/s61R6Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GZvza9XF6nJILN6gLmoEHqQ9x8nje2HC//JgXX1onsz18q0bmZF87ZXtK401h6yLmsqZlTjYumbt54CpIWxqOvPMdhOIdd+9tu5rPaAtPegM8g7CQ2Z4dejZltQLbRzPUlvLaRHsYodxcKvQYCvqnD1gCliZs5P7kLaOUFGUk7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=VhLZU4xm; arc=none smtp.client-ip=178.154.239.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
-Received: from mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:7dca:0:640:d4d9:0])
-	by forward500d.mail.yandex.net (Yandex) with ESMTPS id C5DDC60A3F;
-	Mon,  8 Jul 2024 10:34:32 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 6YW3mBQe3W20-qUQtuv72;
-	Mon, 08 Jul 2024 10:34:30 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
-	t=1720424070; bh=O9RoOO9HvF5SuUCeDg6vUA4wVmtzSSul9Xm5/s61R6Y=;
-	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
-	b=VhLZU4xmXX2w4OBfMMBdLTuYfNHiVS81wr+5BeazZfJVOu+yyXSQdoaO60cjQziKc
-	 M0uTvIyCbbrFj9TBj/klf6qeczg17/a4YJiSE0dCEH6yKJCldgKqcd4qvfnukuaDOU
-	 WcbQbDv7ImiZUeCsbYrO017QDF3uXjKDnJWXQ9oc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
-Message-ID: <663b1749afeb5cec281149fdb445ed36fdcbc68e.camel@maquefel.me>
-Subject: Re: [PATCH v10 00/38] ep93xx device tree conversion
-From: Nikita Shubin <nikita.shubin@maquefel.me>
-To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>, 
-	Arnd Bergmann
-	 <arnd@arndb.de>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Stephen Boyd
- <sboyd@kernel.org>,  Hartley Sweeten <hsweeten@visionengravers.com>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Andy
- Shevchenko <andy@kernel.org>, Michael Turquette <mturquette@baylibre.com>,
- Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter
- Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, Mark
- Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,  Takashi Iwai
- <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron"
- <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, Olof Johansson
- <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org,  devicetree@vger.kernel.org,
- dmaengine@vger.kernel.org,  linux-watchdog@vger.kernel.org,
- linux-pwm@vger.kernel.org,  linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
- linux-ide@vger.kernel.org, linux-input@vger.kernel.org, 
- linux-sound@vger.kernel.org, Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, Vinod
- Koul <vkoul@kernel.org>
-Date: Mon, 08 Jul 2024 10:34:05 +0300
-In-Reply-To: <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
-References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
-	 <CAHp75VfSC9gAD9ipeWRPdQOxUp4FXqYYei-cJTs38nbz0cHpkg@mail.gmail.com>
-	 <48c242838c77034485a9e667dc0e867207c5beed.camel@maquefel.me>
-	 <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me>
-	 <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
-Content-Type: text/plain; charset="UTF-8"
+	s=arc-20240116; t=1720424846; c=relaxed/simple;
+	bh=UnDXitSkkEt+Jmw534QFr9fDFnlhoev+Fk+waL08Snc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=dbYuADl0vWlFbkdojfeBFByAspyjAlr5NjOpWLkp2oLTlu0/Vx7PUWG1bcphu1TovMJuSeFKN5Cp8CpXuztpKrg2mOv442HLJi8FTgpKXIfWIgi0BTK6+ebN8o2Pv31W3LP+1TbI5m4IeAXmKua31RLgHd5cgFYpHRREjkf/Gpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cgkShHGh; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1720424841; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=esA4bqpXazIS13FqDzWbuZkVwKbi2WXZCkSctGCHOvI=;
+	b=cgkShHGhhMQuGZzcuPrDMVLJutMjpDjhs+MjQEYbC0/r94PvLyI071l1kjX1oRq0J5AMQX31w9vOEc1wsm8OEzbFnj2OW3FuaKmVRb//wuuIvSHLCXcg50JCt5dBZoc7+nKcUCiyM72ZY4eFVhtPTDybtVQW4Om49YHSkCYdAV0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033023225041;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0WA2iGds_1720424839;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WA2iGds_1720424839)
+          by smtp.aliyun-inc.com;
+          Mon, 08 Jul 2024 15:47:20 +0800
+Message-ID: <1720424536.972943-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v7 09/10] virtio_net: xsk: rx: support recv small mode
+Date: Mon, 8 Jul 2024 15:42:16 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240705073734.93905-1-xuanzhuo@linux.alibaba.com>
+ <20240705073734.93905-10-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsiMTs=PymmPrrfhmF6W=Oviwg4hWEbSFb1sghGYadSgg@mail.gmail.com>
+In-Reply-To: <CACGkMEsiMTs=PymmPrrfhmF6W=Oviwg4hWEbSFb1sghGYadSgg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-Arnd,=20
+On Mon, 8 Jul 2024 15:00:50 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Fri, Jul 5, 2024 at 3:38=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+> >
+> > In the process:
+> > 1. We may need to copy data to create skb for XDP_PASS.
+> > 2. We may need to call xsk_buff_free() to release the buffer.
+> > 3. The handle for xdp_buff is difference from the buffer.
+> >
+> > If we pushed this logic into existing receive handle(merge and small),
+> > we would have to maintain code scattered inside merge and small (and bi=
+g).
+> > So I think it is a good choice for us to put the xsk code into an
+> > independent function.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >
+> > v7:
+> >    1. rename xdp_construct_skb to xsk_construct_skb
+> >    2. refactor virtnet_receive()
+> >
+> >  drivers/net/virtio_net.c | 176 +++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 168 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 2b27f5ada64a..64d8cd481890 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -498,6 +498,12 @@ struct virtio_net_common_hdr {
+> >  };
+> >
+> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf=
+);
+> > +static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_b=
+uff *xdp,
+> > +                              struct net_device *dev,
+> > +                              unsigned int *xdp_xmit,
+> > +                              struct virtnet_rq_stats *stats);
+> > +static void virtnet_receive_done(struct virtnet_info *vi, struct recei=
+ve_queue *rq,
+> > +                                struct sk_buff *skb, u8 flags);
+> >
+> >  static bool is_xdp_frame(void *ptr)
+> >  {
+> > @@ -1062,6 +1068,124 @@ static void sg_fill_dma(struct scatterlist *sg,=
+ dma_addr_t addr, u32 len)
+> >         sg->length =3D len;
+> >  }
+> >
+> > +static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> > +                                  struct receive_queue *rq, void *buf,=
+ u32 len)
+> > +{
+> > +       struct xdp_buff *xdp;
+> > +       u32 bufsize;
+> > +
+> > +       xdp =3D (struct xdp_buff *)buf;
+> > +
+> > +       bufsize =3D xsk_pool_get_rx_frame_size(rq->xsk_pool) + vi->hdr_=
+len;
+> > +
+> > +       if (unlikely(len > bufsize)) {
+> > +               pr_debug("%s: rx error: len %u exceeds truesize %u\n",
+> > +                        vi->dev->name, len, bufsize);
+> > +               DEV_STATS_INC(vi->dev, rx_length_errors);
+> > +               xsk_buff_free(xdp);
+> > +               return NULL;
+> > +       }
+> > +
+> > +       xsk_buff_set_size(xdp, len);
+> > +       xsk_buff_dma_sync_for_cpu(xdp);
+> > +
+> > +       return xdp;
+> > +}
+> > +
+> > +static struct sk_buff *xsk_construct_skb(struct receive_queue *rq,
+> > +                                        struct xdp_buff *xdp)
+> > +{
+> > +       unsigned int metasize =3D xdp->data - xdp->data_meta;
+> > +       struct sk_buff *skb;
+> > +       unsigned int size;
+> > +
+> > +       size =3D xdp->data_end - xdp->data_hard_start;
+> > +       skb =3D napi_alloc_skb(&rq->napi, size);
+> > +       if (unlikely(!skb)) {
+> > +               xsk_buff_free(xdp);
+> > +               return NULL;
+> > +       }
+> > +
+> > +       skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
+> > +
+> > +       size =3D xdp->data_end - xdp->data_meta;
+> > +       memcpy(__skb_put(skb, size), xdp->data_meta, size);
+> > +
+> > +       if (metasize) {
+> > +               __skb_pull(skb, metasize);
+> > +               skb_metadata_set(skb, metasize);
+> > +       }
+> > +
+> > +       xsk_buff_free(xdp);
+> > +
+> > +       return skb;
+> > +}
+> > +
+> > +static struct sk_buff *virtnet_receive_xsk_small(struct net_device *de=
+v, struct virtnet_info *vi,
+> > +                                                struct receive_queue *=
+rq, struct xdp_buff *xdp,
+> > +                                                unsigned int *xdp_xmit,
+> > +                                                struct virtnet_rq_stat=
+s *stats)
+> > +{
+> > +       struct bpf_prog *prog;
+> > +       u32 ret;
+> > +
+> > +       ret =3D XDP_PASS;
+> > +       rcu_read_lock();
+> > +       prog =3D rcu_dereference(rq->xdp_prog);
+> > +       if (prog)
+> > +               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, s=
+tats);
+> > +       rcu_read_unlock();
+> > +
+> > +       switch (ret) {
+> > +       case XDP_PASS:
+> > +               return xsk_construct_skb(rq, xdp);
+> > +
+> > +       case XDP_TX:
+> > +       case XDP_REDIRECT:
+> > +               return NULL;
+> > +
+> > +       default:
+> > +               /* drop packet */
+> > +               xsk_buff_free(xdp);
+> > +               u64_stats_inc(&stats->drops);
+> > +               return NULL;
+> > +       }
+> > +}
+> > +
+> > +static void virtnet_receive_xsk_buf(struct virtnet_info *vi, struct re=
+ceive_queue *rq,
+> > +                                   void *buf, u32 len,
+> > +                                   unsigned int *xdp_xmit,
+> > +                                   struct virtnet_rq_stats *stats)
+> > +{
+> > +       struct net_device *dev =3D vi->dev;
+> > +       struct sk_buff *skb =3D NULL;
+> > +       struct xdp_buff *xdp;
+> > +       u8 flags;
+> > +
+> > +       len -=3D vi->hdr_len;
+> > +
+> > +       u64_stats_add(&stats->bytes, len);
+> > +
+> > +       xdp =3D buf_to_xdp(vi, rq, buf, len);
+> > +       if (!xdp)
+> > +               return;
+> > +
+> > +       if (unlikely(len < ETH_HLEN)) {
+> > +               pr_debug("%s: short packet %i\n", dev->name, len);
+> > +               DEV_STATS_INC(dev, rx_length_errors);
+> > +               xsk_buff_free(xdp);
+> > +               return;
+> > +       }
+> > +
+> > +       flags =3D ((struct virtio_net_common_hdr *)(xdp->data - vi->hdr=
+_len))->hdr.flags;
+> > +
+> > +       if (!vi->mergeable_rx_bufs)
+> > +               skb =3D virtnet_receive_xsk_small(dev, vi, rq, xdp, xdp=
+_xmit, stats);
+>
+> I wonder if we add the mergeable support in the next patch would it be
+> better to re-order the patch? For example, the xsk binding needs to be
+> moved to the last patch, otherwise we break xsk with a mergeable
+> buffer here?
 
-Are we continuing this patch series ?
+If you worry that the user works with this commit, I want to say you do not
+worry.
 
-You are silent since last version submit, which makes me a bit worried.
+Because the flags NETDEV_XDP_ACT_XSK_ZEROCOPY is not added. I plan to add t=
+hat
+after the tx is completed.
 
-If you suddenly changed your mind please let us know, cause anyway we
-have no possibility to merge these series without you.
+I do test by adding this flags locally.
 
+Thanks.
 
-On Fri, 2024-07-05 at 11:21 +0200, Uwe Kleine-K=C3=B6nig wrote:
-> Hello,
->=20
-> On Thu, Jun 27, 2024 at 11:29:44AM +0300, Nikita Shubin wrote:
-> > On Tue, 2024-06-18 at 19:20 +0300, Nikita Shubin wrote:
-> > > Hello Andy!
-> > > On Mon, 2024-06-17 at 12:58 +0200, Andy Shevchenko wrote:
-> > > > On Mon, Jun 17, 2024 at 11:38=E2=80=AFAM Nikita Shubin via B4 Relay
-> > > > <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
-> > > > >=20
-> > > > > The goal is to recieve ACKs for all patches in series to
-> > > > > merge it
-> > > > > via Arnd branch.
-> > > >=20
-> > > > 'receive'
-> > > >=20
-> > > > > Unfortunately, CLK subsystem suddenly went silent on clk
-> > > > > portion
-> > > > > of
-> > > > > series V2 reroll,
-> > > > > tried to ping them for about a month but no luck.
-> > > > >=20
-> > > > > Link:
-> > > > > https://lore.kernel.org/r/20240408-ep93xx-clk-v2-1-adcd68c13753@m=
-aquefel.me
-> > > > >=20
-> > > > > Some changes since last version (v9) - see "Changes in v10",
-> > > > > mostly
-> > > > > cosmetic.
-> > > >=20
-> > > > ...
-> > > >=20
-> > > > > Patches should be formated with '--histogram'
-> > > >=20
-> > > > 'formatted'
-> > > >=20
-> > > > ...
-> > > >=20
-> > > > > Changes in v10:
-> > > > >=20
-> > > > > Reordered SoB tags to make sure they appear before Rb and
-> > > > > Acked
-> > > > > tags.
-> > > >=20
-> > > > This is not required. The importance is only the order of SoBs
-> > > > themselves. If they are interleaved with other tags, it's fine.
-> > >=20
-> > > Ah - ok. Just saw someone was complaining about b4 reordering
-> > > them.=20
-> > >=20
-> > > >=20
-> > > > ...
-> > > >=20
-> > > >=20
-> > > > Hopefully to see this series being eventually applied soon.
-> > > > Arnd? (Do we have all necessary subsystem maintainers' tags,
-> > > > btw?)
-> > > >=20
-> > > >=20
-> > >=20
-> > > As i see from my perspective only three left:
-> > >=20
-> > > Clk subsystem:
-> > >=20
-> > > - clk: ep93xx: add DT support for Cirrus EP93xx
-> > >=20
-> > > DMA subsystem (but the only request from Vinod, as far as i
-> > > remember,
-> > > was fixing commits titles):
-> > >=20
-> > > - dmaengine: cirrus: Convert to DT for Cirrus EP93xx
-> > > - dmaengine: cirrus: remove platform code
-> > >=20
-> > > Beside that tags missing on platform code removal (which can be
-> > > Acked
-> > > by Arnd himself i believe) and dtsi/dts files (same ?).
-> >=20
-> > Vinod acked the above two patches:
-> >=20
-> > https://lore.kernel.org/all/ZnkIp8bOcZK3yVKP@matsya/
-> > https://lore.kernel.org/all/ZnkImp8BtTdxl7O3@matsya/
-> >=20
-> > so only:
-> >=20
-> > - clk: ep93xx: add DT support for Cirrus EP93xx
-> >=20
-> > https://lore.kernel.org/all/20240617-ep93xx-v10-3-662e640ed811@maquefel=
-.me/
-> >=20
-> > left.
-> >=20
-> > Hope Stephen will find some time for this one.
->=20
-> As we're approaching the merge window and this is still unclear, I
-> applied the pwm bits (i.e. patches 12, 13). If I understand
-> correctly,
-> patch 33 isn't suitable for application yet as it has a dependency on
-> pinctrl changes in that series.
->=20
-> (side note: Your patches are signed, but that doesn't bring any
-> benefit
-> if the receivers don't have your key. I didn't find it neither on
-> keys.openpgp.org nor in the kernel pgp key collection.)
->=20
-> Best regards
-> Uwe
-
+>
+> Or anything I missed here?
+>
+> Thanks
+>
 
