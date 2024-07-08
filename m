@@ -1,99 +1,108 @@
-Return-Path: <netdev+bounces-109789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571EB929F34
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:37:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCDB0929F40
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1328D289EC5
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:37:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 929EB1F23F0F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0F05381B;
-	Mon,  8 Jul 2024 09:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF7256452;
+	Mon,  8 Jul 2024 09:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cu1rHfE1"
 X-Original-To: netdev@vger.kernel.org
-Received: from michel.telenet-ops.be (michel.telenet-ops.be [195.130.137.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E115F6BB5B
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 09:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9F73307B;
+	Mon,  8 Jul 2024 09:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720431456; cv=none; b=pThdcs4TkC2m1OzFg6H4q7bDQA4Cx/OlMxiqu+SfYoeNkGGYM9Y7bkVwyrYLcM5zBJTZ7nIusCQYP0Hj5pjLu6mm00zkSrA3ZDPf3MyhCjISQRqIYP1xgz7QNUAdnVyfHeGiOpSVzI+5tvHoVP4KWJQiYQJcA0+MT0w1Mzy2U7w=
+	t=1720431533; cv=none; b=Lb5SZC8DAREQhxDqgiB0ddufinTRw985JwdsqITzIvq/t5PnXtJSNTL5b65uW8XRW+edliyo9AcjOq892bPXmM5quHUMhsEcTSYX4gZewlpj2z4mhnS2IV2c8bGHsuQH/OopTaX9YAvGeYBAmbFuGzJT3ulq8J+Ts12t1vIKoY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720431456; c=relaxed/simple;
-	bh=nE5sZvjwG3cVZEeDS6eFA9WLOFuwjzZgJSHCooMkEpk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gDrITNmTfj3FiYoajw8b10nAIXhzHaencoerEruSUwUe1lowMAUMdtWYoXLx7npocM0adG4PLNXsKs9BrR3QGwvdltZt3JgWhwxel5WrGbjAPeO+vW/8+YlEcigO5mkGPSEzEOHk0MgmIB71H7afB4iKjL0YRInyrUQLXCFtml0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:5564:ad59:41e5:4080])
-	by michel.telenet-ops.be with bizsmtp
-	id kxdT2C0035NeGrf06xdT1i; Mon, 08 Jul 2024 11:37:27 +0200
-Received: from rox.of.borg ([192.168.97.57])
-	by ramsan.of.borg with esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1sQko7-001PJm-0V;
-	Mon, 08 Jul 2024 11:37:26 +0200
-Received: from geert by rox.of.borg with local (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1sQkoI-009RSK-U7;
-	Mon, 08 Jul 2024 11:37:26 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Manish Chopra <manishc@marvell.com>,
-	Rahul Verma <rahulv@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH 12/12] arm64: dts: renesas: r8a779h0: Add missing iommus properties
-Date: Mon,  8 Jul 2024 11:37:24 +0200
-Message-Id: <1ed05b12961662e8fed2f1a6790f5ae3b595f509.1720430758.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1720430758.git.geert+renesas@glider.be>
-References: <cover.1720430758.git.geert+renesas@glider.be>
+	s=arc-20240116; t=1720431533; c=relaxed/simple;
+	bh=TWEraFY57JPqsQkwWlsujpwcx804dr83NSVrRLQlsew=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VEjTqlbDquE8+B6IMYCBbXx6sVn9cbnhr7rOowSiiKBLNJDsy3NvLiojGJ+6SL/qhyd3sQvPFuMjbDMu3n5PuytwLSO29VByNikbBpKoPw7Z7h6YgNtjbQkL7h2x6YYP0mLfQCNAdkAhvZymiB+Jx5xz2BUtgedM0IG/kGF2D/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cu1rHfE1; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E1944E000A;
+	Mon,  8 Jul 2024 09:38:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720431529;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SBfIxKe4rTb0db0/aTl46JjinrlFkxyBKK4Tc4qLO2A=;
+	b=cu1rHfE1R2OdeprgUda1/8bnOa0TFTLhTjvY8UpiBAinvA78btCT0cr3wAUtbiRhmSVTeR
+	wpuTMrSZdslw+wYqJTXRRfYoTMHvg7TNEDt7zlthqirAk3YwRl0AAtPgAwnF8G1yup2PoV
+	Rt8MtCtcddIE0pvKaCYI+5a81mEarhq4FwBZGISvamMm6N2qGE8CGCSGqpvrybSGFGVcjR
+	AF1mpbE/WehihhdooHRD2zo49diYjD0koNrWT/6bP7NnoOL+rpkyKNKRU6BJiY0cypFmvC
+	zkRBoEQeUkjcosodmQHNAt8MWRLgff9pS1VEFsEVK1oHzZ1qtyMVXCM8jLIC2A==
+Date: Mon, 8 Jul 2024 11:38:46 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Jonathan Corbet <corbet@lwn.net>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v6 5/7] net: ethtool: Add new power limit get
+ and set features
+Message-ID: <20240708113846.215a2fde@kmaincent-XPS-13-7390>
+In-Reply-To: <20240705184116.13d8235a@kernel.org>
+References: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
+	<20240704-feature_poe_power_cap-v6-5-320003204264@bootlin.com>
+	<20240705184116.13d8235a@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Add missing iommus properties to all EthernetAVB device nodes that still
-lack them.
+On Fri, 5 Jul 2024 18:41:16 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- arch/arm64/boot/dts/renesas/r8a779h0.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+> On Thu, 04 Jul 2024 10:12:00 +0200 Kory Maincent wrote:
+> > +	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
+> > +	    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
+> > +		struct pse_control_config config =3D {};
+> > +
+> > +		if (pse_has_podl(phydev->psec))
+> > +			config.podl_admin_control =3D
+> > nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL]);
+> > +		if (pse_has_c33(phydev->psec))
+> > +			config.c33_admin_control =3D
+> > nla_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]); =20
+>=20
+> This smells of null-deref if user only passes one of the attributes.
+> But the fix should probably be in ethnl_set_pse_validate() so it won't
+> conflict (I'm speculating that it will need to go to net).
 
-diff --git a/arch/arm64/boot/dts/renesas/r8a779h0.dtsi b/arch/arm64/boot/dts/renesas/r8a779h0.dtsi
-index 1267a9790ec0610b..0124e682b248188c 100644
---- a/arch/arm64/boot/dts/renesas/r8a779h0.dtsi
-+++ b/arch/arm64/boot/dts/renesas/r8a779h0.dtsi
-@@ -769,6 +769,7 @@ avb1: ethernet@e6810000 {
- 			phy-mode = "rgmii";
- 			rx-internal-delay-ps = <0>;
- 			tx-internal-delay-ps = <0>;
-+			iommus = <&ipmmu_hc 1>;
- 			#address-cells = <1>;
- 			#size-cells = <0>;
- 			status = "disabled";
-@@ -817,6 +818,7 @@ avb2: ethernet@e6820000 {
- 			phy-mode = "rgmii";
- 			rx-internal-delay-ps = <0>;
- 			tx-internal-delay-ps = <0>;
-+			iommus = <&ipmmu_hc 2>;
- 			#address-cells = <1>;
- 			#size-cells = <0>;
- 			status = "disabled";
--- 
-2.34.1
+Mmh, indeed if the netlink PSE type attribute is different with the support=
+ed
+PSE type we might have an issue here.
 
+I am wondering, if I fix it in net won't it conflict with net-next now that
+this series is merged?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
