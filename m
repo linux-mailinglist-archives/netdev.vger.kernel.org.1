@@ -1,111 +1,118 @@
-Return-Path: <netdev+bounces-109824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C3C92A095
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:57:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C2F92A099
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4B9285890
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CCB41F21946
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727677C6C0;
-	Mon,  8 Jul 2024 10:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7532877F2F;
+	Mon,  8 Jul 2024 10:58:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp134-31.sina.com.cn (smtp134-31.sina.com.cn [180.149.134.31])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F337603A
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 10:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9095C3B791;
+	Mon,  8 Jul 2024 10:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720436220; cv=none; b=BCpTUkU7pc30ypAZimxLXWkRr3gSKSclyQCqx6I1f46VS1DIg0nYrygZWGCVw92m7JPguNGkJFmBJPQq0OnWfOxQ7Qcpk3p9vMkcFU5w77CahoaoDp0d1a5e3Bv+sQA51XHNH6UfHEmznNvUmhBfgyczmfSiqoCLZV9l4iq99xQ=
+	t=1720436302; cv=none; b=HptbYqGmwQxgwwFFmsg5l1q4SietnmXypkuAaJu2KA8WwfKyu97j1dc+uxGy+ApQSpvVIcPObYAJykeoQSKg4m9SGoy6YrYV/ZSJxY3THBXxFl7VwLzzPhGq37FoLFIKCFBSGnodqjcMs33WFTWqLwSgjv+r5KoS3tEkJr9ztRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720436220; c=relaxed/simple;
-	bh=vnzHPyqhh9uqjyMMGYHiAx4MW+nRasQ0HWpUhG1eEsc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RsggoIeBUI/qmamuf5YDtaJ//asyKTdXc2Gkv6OsvdH1gPN5+8abdvjgHCYJ0FO6kzhg7qHOywOXr7Q4JfEADsdpZJTBDBNPHwpHgZhRJPcM7KCL1lclz/UR7I+IIJwMztmhDHcbhlsVBbwMQX6ZkQ5oZq/KCfrHYHiWrUl8nzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.64.123])
-	by sina.com (10.185.250.21) with ESMTP
-	id 668BC5E70000702C; Mon, 8 Jul 2024 18:56:41 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6985133408355
-X-SMAIL-UIID: 2A7656D9FD7C49829FA8CEF8239B8943-20240708-185641-1
-From: Hillf Danton <hdanton@sina.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: Tejun Heo <tj@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	syzbot+4fd66a69358fc15ae2ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH nf] netfilter: nf_tables: unconditionally flush pending work before notifier
-Date: Mon,  8 Jul 2024 18:56:31 +0800
-Message-Id: <20240708105631.841-1-hdanton@sina.com>
-In-Reply-To: <20240707080824.GA29318@breakpoint.cc>
-References: 
+	s=arc-20240116; t=1720436302; c=relaxed/simple;
+	bh=b9sjkWTudOGHt4VQvMA2CTCvbLmw4UuD1r+AlcqUADU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qT1nxojPBGKzQ/KlvfUWNn2qQs0KBfaW1WvTH7CpDxvX8mdzXHsd2KbdF6VbGQC13Ix9v3aWiISdqkH28IqLziYuVKtn57x31dvdLmkSAkqoByZYfrho0y1rJtelc4R3P05+UJpeNjyzVp1svQz61eVqYXMa/uQHeV4KztVQNfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WHh0v3jkTznZbg;
+	Mon,  8 Jul 2024 18:57:51 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 03C99140416;
+	Mon,  8 Jul 2024 18:58:16 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemf200006.china.huawei.com
+ (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 8 Jul
+ 2024 18:58:15 +0800
+Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
+ prepare/probe/commit API
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Yunsheng Lin <yunshenglin0825@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	<linux-mm@kvack.org>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-11-linyunsheng@huawei.com>
+ <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
+ <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
+ <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
+ <0a80e362-1eb7-40b0-b1b9-07ec5a6506ea@gmail.com>
+ <CAKgT0UcRbpT6UFCSq0Wd9OHrCqOGR=BQ063-zNBZ4cVNmduZGw@mail.gmail.com>
+ <15623dac-9358-4597-b3ee-3694a5956920@gmail.com>
+ <200ee8ff-557f-e17b-e71f-645267a49831@huawei.com>
+ <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <83cf5a36-055a-f590-9d41-59c45f93e7c5@huawei.com>
+Date: Mon, 8 Jul 2024 18:58:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Sun, 7 Jul 2024 10:08:24 +0200 Florian Westphal <fw@strlen.de>
-> Hillf Danton <hdanton@sina.com> wrote:
-> > > I think this change might be useful as it also documents
-> > > this requirement.
-> > 
-> > Yes it is boy and the current reproducer triggered another warning [1,2].
-> > 
-> > [1] https://lore.kernel.org/lkml/20240706231332.3261-1-hdanton@sina.com/
+On 2024/7/8 1:12, Alexander Duyck wrote:
+
+...
+
+> The issue is the dependency mess that has been created with patch 11
+> in the set. Again you are conflating patches which makes this really
+> hard to debug or discuss as I make suggestions on one patch and you
+> claim it breaks things that are really due to issues in another patch.
+> So the issue is you included this header into include/linux/sched.h
+> which is included in linux/mm_types.h. So what happens then is that
+> you have to include page_frag_cache.h *before* you can include the
+> bits from mm_types.h
 > 
-> The WARN is incorrect.  The destroy list can be non-empty; i already
-> tried to explain why.
->
-That warning as-is could be false positive but it could be triggered with a
-single netns.
+> What might make more sense to solve this is to look at just moving the
+> page_frag_cache into mm_types_task.h and then having it replace the
+> page_frag struct there since mm_types.h will pull that in anyway. That
+> way sched.h can avoid having to pull in page_frag_cache.h.
 
-	cpu1		cpu2		cpu3
-	---		---		---
-					nf_tables_trans_destroy_work()
-					spin_lock(&nf_tables_destroy_list_lock);
+It seems the above didn't work either, as asm-offsets.c does depend on
+mm_types_task.h too.
 
-					// 1) clear the destroy list
-					list_splice_init(&nf_tables_destroy_list, &head);
-					spin_unlock(&nf_tables_destroy_list_lock);
+In file included from ./include/linux/mm.h:16,
+                 from ./include/linux/page_frag_cache.h:10,
+                 from ./include/linux/mm_types_task.h:11,
+                 from ./include/linux/mm_types.h:5,
+                 from ./include/linux/mmzone.h:22,
+                 from ./include/linux/gfp.h:7,
+                 from ./include/linux/slab.h:16,
+                 from ./include/linux/resource_ext.h:11,
+                 from ./include/linux/acpi.h:13,
+                 from ./include/acpi/apei.h:9,
+                 from ./include/acpi/ghes.h:5,
+                 from ./include/linux/arm_sdei.h:8,
+                 from arch/arm64/kernel/asm-offsets.c:10:
+./include/linux/mmap_lock.h: In function ‘mmap_assert_locked’:
+./include/linux/mmap_lock.h:65:23: error: invalid use of undefined type ‘const struct mm_struct’
+   65 |  rwsem_assert_held(&mm->mmap_lock);
 
-			nf_tables_commit_release()
-			spin_lock(&nf_tables_destroy_list_lock);
 
-			// 2) refill the destroy list
-			list_splice_tail_init(&nft_net->commit_list, &nf_tables_destroy_list);
-			spin_unlock(&nf_tables_destroy_list_lock);
-			schedule_work(&trans_destroy_work);
-			mutex_unlock(&nft_net->commit_mutex);
-
-	nft_rcv_nl_event()
-	mutex_lock(&nft_net->commit_mutex);
-	flush_work(&trans_destroy_work);
-	  start_flush_work()
-	    insert_wq_barrier()
-	    /*
-	     * If @target is currently being executed, schedule the
-	     * barrier to the worker; otherwise, put it after @target.
-	     */
-
-	// 3) flush work ends with the refilled destroy list left intact
-	tear tables down
-
+> .
+> 
 
