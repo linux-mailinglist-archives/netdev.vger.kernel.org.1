@@ -1,115 +1,117 @@
-Return-Path: <netdev+bounces-109905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE3E92A3BF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:37:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2982B92A3C1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70C031F21FF0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:37:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B92A7B20F42
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF1F7F7C7;
-	Mon,  8 Jul 2024 13:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EEC137757;
+	Mon,  8 Jul 2024 13:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sss0aAk7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ljZHzZp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416841AACC;
-	Mon,  8 Jul 2024 13:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47BD1E515;
+	Mon,  8 Jul 2024 13:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720445858; cv=none; b=lqWc2yQejk1z9GswgcjfsyLThqOTRnVGdRcHXIALfKWLnHn6V2JqKeEky8w5ZVfD8lJzzd+UnmneUHyKOpiVYGe09mGVhS+MBqWAZ7fp/bz2uhOghjP49Oz9Rjjcqjl0Ne75men2CIEVBGL622z0HIWozg8WE/KKGcoD2CuynNY=
+	t=1720445872; cv=none; b=kx4p+U34Cb3NhOihJf5W002/T9EyMIBlchunL+aTNB3IjVqDzCOl4jrBpRlffVcbAeGZ4JNQhF6NJG9JS8o2dezHYRjb++LS6OukmY40ywxZIEQHXlU1e6OZtSeBXc0hx4UGKfJA3e30AwzMtK06Twfow0PykWyJylX0slybmag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720445858; c=relaxed/simple;
-	bh=MNDlcVUEc+CZ+sZStwyCB1gmpka3YRbeXXUl7VcaNk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WgYD7twkKlfto7K6PXL8rDXy1NxTVPeUYmjsVfdJEfshb8h12tBu9DhFjDyY4wbhy8rigS1L97+l2j2JN1rnQUaD5Kd65SctDttwJKmPHDeGNUBQZt22BsCb/aYf4RDxG05xPjVpGwp2Vf1b1W8iuNj4pYVhE4eXHMcgr+POUhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sss0aAk7; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CD1CC1C000E;
-	Mon,  8 Jul 2024 13:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720445854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rSm0DVMNMKvBf/5qYND5WUTDjW2NLKuDtgQ+AqbYE4w=;
-	b=Sss0aAk7SMhXr1lkuZpJZ7B8yvCv3eXPyfue7H0+EhEV+k42BKfcYxKrcJkQBSIEQBPOtU
-	CB7b/N5aDSs9Wr3NReFaFEgRNT7JJwlt22MQe6KplQShz6hWbA19uQYIDlWB0qda50HTgR
-	5OQ2lZRn2bdbXF2q8EIJ61WjmdqJITvZmcy7LwLV4XAzwmbijYs6qyY+FBmewl6fGmIsJm
-	LkYOzzlTR80EFILFTXgzFma4vuCh1K7q4nV0y1OSQUhkJgIXhz6B59EQ06jMgalAFEfOxJ
-	blgcnnieY0HplQdaK/m9FLSAuFk6Y/vwJwYJlIJ/dpdeqVOJN8fCYBqGmmMD7w==
-Date: Mon, 8 Jul 2024 15:37:29 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
- <atenart@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter
- <dan.carpenter@linaro.org>, Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v16 00/14] Introduce PHY listing and
- link_topology tracking
-Message-ID: <20240708153729.3129e604@fedora-2.home>
-In-Reply-To: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
-References: <20240705132706.13588-1-maxime.chevallier@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1720445872; c=relaxed/simple;
+	bh=cbvwfZUwkX84LTkEjnJDsDR9xDx4OQCdfydbXNTR+Xo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K47u2DPALvc0xLwViI88i1Cw+u5h1JDa8AYMLkDlgQw3oSz0meh30uBLhqi6tTGP+UMoedWylsyWr/I7vZRw8TNCq/cqD6hOWjVcXSQNizDjgUlAAY+snLap7HZWsgTpIe8AimdqydXeK9gVke6FpohKBPCmm/sOtUYfYd3NtaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ljZHzZp/; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4266182a9d7so11297875e9.0;
+        Mon, 08 Jul 2024 06:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720445869; x=1721050669; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fKb3q0Y7TytSgi4aTS4oA0BDYeL9S2seeAThCNboSVY=;
+        b=ljZHzZp/MoOUjjEenfBEwsUM928UCbhKnCMWgBHSnLP8m0BlSdTyJVqi720tYrccMv
+         R8A7i2H2AMfW++3NYDLzAIemXP6G/N7iVSrJo8QuddOualkMQn4MZGPbl2HsyZOyiQpF
+         QofHrlw9J5UcJECKkyyKOTY9FTzRest7IBUUbwuzNiCCDObOEsAL8BSNHO+yuGeiruFJ
+         gOFtjPGMLayVukr/74VxWBP809zOF2b3/P5Gk6Uz8zSTZSYeMGkGGQHYSs13vyEg4kvg
+         nXRUwcwQTMLm1FoCQ77ASGOQGoX42n/t/GN/2tL9ySTdBGPWj+88jUhXn956u4GDRvP1
+         Dj5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720445869; x=1721050669;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fKb3q0Y7TytSgi4aTS4oA0BDYeL9S2seeAThCNboSVY=;
+        b=XPoO9WG7yqZ03P3kQPDrWMjgOfoMRaH0uD6Cp/PyLT+RO5qBfylAU6Z9oZ9xrOuxSI
+         ykf9gvIdVtTNa/ERCFC1XMroiWs/xr9i3+2FyHuZRVayRNnbmnTNVDIAi5g+kI8qCdoG
+         QVMdXTlijYhPcXbMz1vosOSdCE+HNwJ7GN5q0JWkYpmy1gvnXvTI8eR5dmnAib/NGvGv
+         t8xnA3jjLkRbgv8VWs6f2laBABB9XK2Whl5hdPOqHxxIRZS9cABAF3XBVNTzKJFtLMWC
+         88EeHqzyG5ujcVRRQ9gtWesfx5p6FToErREXHkcf9TyByRuRWdJmVDPWfnmrG7yHMFeI
+         Uc2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXdTbKCiF0Eq7NDgX+sD9usS6Z65yVznR7Zkf39mVDQynh8WTawIGdiwONE3gGR7IVfZEuS0FV5LH+oR+YOdYHQmJg6j2SSFhMJelSQeG7IwCAglr5an+RhiLp2C3h9Y9fES1Z5
+X-Gm-Message-State: AOJu0YyCKOIthw4hS0yNnsWBicFR+yhltcpVkLEppeLA19BbZFSlhiWe
+	ybs592UCjvHQLVatF+PGiViLJgTjo1L6t+P1PJR0bNPJnN0B/Dzp
+X-Google-Smtp-Source: AGHT+IFf2CtPfnw+MM5W8B/XjYd7ZO0yJR0wUNYpiS0Y2kF7RSShvAnNhhqjkbjraPsAS3o4pFs36Q==
+X-Received: by 2002:a05:600c:ad0:b0:426:61af:e1d3 with SMTP id 5b1f17b1804b1-42661afe258mr37880785e9.31.1720445869053;
+        Mon, 08 Jul 2024 06:37:49 -0700 (PDT)
+Received: from skbuf ([188.25.110.57])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-426615876bbsm85539585e9.6.2024.07.08.06.37.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 06:37:48 -0700 (PDT)
+Date: Mon, 8 Jul 2024 16:37:46 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kernel test robot <lkp@intel.com>, linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kuba@kernel.org, horms@kernel.org, Roy.Pledge@nxp.com,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/4] soc: fsl: qbman: FSL_DPAA depends on COMPILE_TEST
+Message-ID: <20240708133746.ea62kkeq2inzcos5@skbuf>
+References: <20240624162128.1665620-1-leitao@debian.org>
+ <202406261920.l5pzM1rj-lkp@intel.com>
+ <20240626140623.7ebsspddqwc24ne4@skbuf>
+ <Zn2yGBuwiW/BYvQ7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zn2yGBuwiW/BYvQ7@gmail.com>
 
-On Fri,  5 Jul 2024 15:26:51 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Thu, Jun 27, 2024 at 11:40:24AM -0700, Breno Leitao wrote:
+> Hello Vladimir,
+> 
+> On Wed, Jun 26, 2024 at 05:06:23PM +0300, Vladimir Oltean wrote:
+> > On Wed, Jun 26, 2024 at 08:09:53PM +0800, kernel test robot wrote:
+> 
+> > > All warnings (new ones prefixed by >>):
+> > > 
+> > > >> drivers/net/ethernet/freescale/dpaa/dpaa_eth.c:3280:12: warning: stack frame size (16664) exceeds limit (2048) in 'dpaa_eth_probe' [-Wframe-larger-than]
+> > >     3280 | static int dpaa_eth_probe(struct platform_device *pdev)
+> > >          |            ^
+> > >    1 warning generated.
+> > > --
+> > > >> drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c:454:12: warning: stack frame size (8264) exceeds limit (2048) in 'dpaa_set_coalesce' [-Wframe-larger-than]
+> > >      454 | static int dpaa_set_coalesce(struct net_device *dev,
+> > >          |            ^
+> > >    1 warning generated.
+> > 
+> > Arrays of NR_CPUS elements are what it probably doesn't like?
+> 
+> Can it use the number of online CPUs instead of NR_CPUS?
 
-> Hello everyone,
->=20
-> This is V16 of the phy_link_topology series, aiming at improving support
-> for multiple PHYs being attached to the same MAC.
-
-[...]
-
->=20
-> Maxime Chevallier (14):
->   net: phy: Introduce ethernet link topology representation
->   net: sfp: pass the phy_device when disconnecting an sfp module's PHY
->   net: phy: add helpers to handle sfp phy connect/disconnect
->   net: sfp: Add helper to return the SFP bus name
->   net: ethtool: Allow passing a phy index for some commands
->   netlink: specs: add phy-index as a header parameter
->   net: ethtool: Introduce a command to list PHYs on an interface
->   netlink: specs: add ethnl PHY_GET command set
-
-I'll resend this series, as with the very recent merge of K=C3=B6ry's PSE
-work [1], the ethtool specs will conflict upon applying the
-phy_link_topology work :)
-
-https://lore.kernel.org/netdev/172023063113.28145.15061182082357066469.git-=
-patchwork-notify@kernel.org/
-
-Thanks,
-
-Maxime
+I don't see how, given that variable length arrays are something which
+should be avoided in the kernel?
 
