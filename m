@@ -1,146 +1,114 @@
-Return-Path: <netdev+bounces-109979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA0192A8F5
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 20:30:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4293992A8F0
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 20:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AE3E1F21528
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 18:30:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFC35282358
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 18:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9927E14A60C;
-	Mon,  8 Jul 2024 18:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DD314A4D4;
+	Mon,  8 Jul 2024 18:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="DZi7NR4W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbhuJb+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2764C28EF;
-	Mon,  8 Jul 2024 18:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D43149C64
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 18:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720463401; cv=none; b=rE8DqL5MGXGMjzbN2dPm+CoZsuRWn/Tj5M7AMGHiWzxDOAzTtPiRyOGeITUusrHpiP554oxfPnlhBDdFd5dygPV0FIP+OiePZ40/F5yygqTbQhjdNfseIf57meHTT/X3Tl+9Oe7liNtofXe8SynERkPA/F3iVq4elRN2EuY2Ju0=
+	t=1720463279; cv=none; b=pAsr5xeupO4QeqS1E+WGCkm46/sCz2fwxBi+GRWqHAoRQFpU4T6pUeiVgJrJOFnptMrJ+yRH3kzcTIn9hg0rHayZv3Qyem2U6LEUIXPYfl7vdIDfAYoDvZWvldW9TTxOBl5BRyuBkQ2gjC7SQbkuaJUt7VkXAK19nlqSKXOQdbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720463401; c=relaxed/simple;
-	bh=O3xBDVnWQzb55rR/mzxUKhgpUevGiB0NqubMDbDd/UE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ug67Vlmi19eO1W/G87ETc4t3pDqo/EMZZHovWlQ8oHsuI5dnPRvAJrWt4YeKcYVksyeLPu257jnAEelPW8LJzztryhmJGKXopgxqOWy6c0sUDrk+ZzodQ1Opc79IpGYrUzAC0aitUIAbAXbQyE1ahWsMrVOV1aiq78Yw4IKsPAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=DZi7NR4W; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 4F7D9100003;
-	Mon,  8 Jul 2024 21:29:31 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1720463371; bh=lqlgfh7w5S1N0Xg3sR42UQkt3Wbstut9nFE9pC0xW0g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=DZi7NR4WOJF6Xs7dx8orMK06jRLVVorqm2lgEbqgKENapc/53dTwfbCxlAsmpkhmC
-	 7DZ3wJYa2jtN3ZOm9lllrC09RQXqHLpXuAlDw0ZPIbM3LpzqJll3EbMzNxj2l+7zoX
-	 oUwL5bfg1oPWa8iMWQ8YNGfeDbRLRCbVniNyr375bnFuYvXnA65hwHKJCFXtGqWLgq
-	 VeNwFVvY83QEg85OeY8jrWzliYGJPR3Emqsh7SsWdK23jE6Qb+bva8JMGPbsEHASvv
-	 VlnepPqiPUEscZ5p7/BYdIaQBXHQ1q/Mn53lJRiqtj3niG8B4d/nRXd7HzEMTJLidV
-	 ePENkKYOJyBWg==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Mon,  8 Jul 2024 21:28:14 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.5) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 8 Jul 2024
- 21:27:54 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, Przemek
- Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next v3] ice: Adjust over allocation of memory in ice_sched_add_root_node() and ice_sched_add_node()
-Date: Mon, 8 Jul 2024 21:27:36 +0300
-Message-ID: <20240708182736.8514-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1720463279; c=relaxed/simple;
+	bh=ilPn+u949EiekXc1fNlL1FFhQXdzr142oQcIyOq1/8E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=U0uL+CNK29awTkO5MwmGub3dqRkQOXhn/jQOkR0JYH6+mNNlOJ1LqHMi9Apv/fGAtxTE8FdhGZNa7eDx1G1nNryuwQRBwn9gvpZ5h0iKN+xhmu089kA2SZjecY8ofV2UoznEx3O7vadmJ5NT5tsbb3/Q/5iedvPLsvfC/EVQkTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbhuJb+l; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720463277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aFsqwavuUe9u0s443Cn3sa3uIqOnS2CpWueQCZ5/X/E=;
+	b=GbhuJb+lMDipIK7ipH6c+w5fb2ORCfS+hvtJK5rgR2iCZTN/kT7v0jN5YTbPbzYdZI4N8d
+	SM5B9dKNCUKRZ6SBRh/17V5CTSfzu+/eUPBminfK2wrNXDTCWF/c3yoOl/zcrsbB+W4gRQ
+	7HIwPsP5ocxiZvWsjOapNCB/sf/ILBA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-98-60_gX4xZOkidNDF89tLsgA-1; Mon,
+ 08 Jul 2024 14:27:53 -0400
+X-MC-Unique: 60_gX4xZOkidNDF89tLsgA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB174195609F;
+	Mon,  8 Jul 2024 18:27:51 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.34])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC8B619560AE;
+	Mon,  8 Jul 2024 18:27:47 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  Pravin B Shelar <pshelar@ovn.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Shuah Khan
+ <shuah@kernel.org>,  dev@openvswitch.org,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] selftests: openvswitch: retry instead of sleep
+In-Reply-To: <20240708134451.3489802-1-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Mon, 8 Jul 2024 15:44:49 +0200")
+References: <20240708134451.3489802-1-amorenoz@redhat.com>
+Date: Mon, 08 Jul 2024 14:27:45 -0400
+Message-ID: <f7tzfqrn3ha.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 186376 [Jul 08 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 23 0.3.23 8881c50ebb08f9085352475be251cf18bb0fcfdd, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, lore.kernel.org:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;t-argos.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/07/08 17:13:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/07/08 15:35:00 #25918408
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
-devm_kcalloc() in order to allocate memory for array of pointers to
-'ice_sched_node' structure. But incorrect types are used as sizeof()
-arguments in these calls (structures instead of pointers) which leads to
-over allocation of memory.
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-Adjust over allocation of memory by correcting types in devm_kcalloc()
-sizeof() arguments.
+> There are a couple of places where the test script "sleep"s to wait for
+> some external condition to be met.
+>
+> This is error prone, specially in slow systems (identified in CI by
+> "KSFT_MACHINE_SLOW=yes").
+>
+> To fix this, add a "ovs_wait" function that tries to execute a command
+> a few times until it succeeds. The timeout used is set to 5s for
+> "normal" systems and doubled if a slow CI machine is detected.
+>
+> This should make the following work:
+>
+> $ vng --build  \
+>     --config tools/testing/selftests/net/config \
+>     --config kernel/configs/debug.config
+>
+> $ vng --run . --user root -- "make -C tools/testing/selftests/ \
+>     KSFT_MACHINE_SLOW=yes TARGETS=net/openvswitch run_tests"
+>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Looks like this does resolve the issue in question on the -dbg
+environment:
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
-v3:
-  - Update comment and use the correct entities as suggested by Przemek
-v2: https://lore.kernel.org/all/20240706140518.9214-1-amishin@t-argos.ru/
-  - Update comment, remove 'Fixes' tag and change the tree from 'net' to
-    'net-next' as suggested by Simon
-    (https://lore.kernel.org/all/20240706095258.GB1481495@kernel.org/)
-v1: https://lore.kernel.org/all/20240705163620.12429-1-amishin@t-argos.ru/
+https://netdev.bots.linux.dev/contest.html?executor=vmksft-net-dbg&test=openvswitch-sh
 
- drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Thanks Adrian!  Also, thanks for including the fractional sleep.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index ecf8f5d60292..6ca13c5dcb14 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
- 	if (!root)
- 		return -ENOMEM;
- 
--	/* coverity[suspicious_sizeof] */
- 	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
--				      sizeof(*root), GFP_KERNEL);
-+				      sizeof(*root->children), GFP_KERNEL);
- 	if (!root->children) {
- 		devm_kfree(ice_hw_to_dev(hw), root);
- 		return -ENOMEM;
-@@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
- 	if (!node)
- 		return -ENOMEM;
- 	if (hw->max_children[layer]) {
--		/* coverity[suspicious_sizeof] */
- 		node->children = devm_kcalloc(ice_hw_to_dev(hw),
- 					      hw->max_children[layer],
--					      sizeof(*node), GFP_KERNEL);
-+					      sizeof(*node->children), GFP_KERNEL);
- 		if (!node->children) {
- 			devm_kfree(ice_hw_to_dev(hw), node);
- 			return -ENOMEM;
--- 
-2.30.2
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
 
