@@ -1,134 +1,186 @@
-Return-Path: <netdev+bounces-109727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78718929C72
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:49:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1562929C75
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:49:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21AAE1F21A53
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 06:49:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526821F213B3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 06:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9352032D;
-	Mon,  8 Jul 2024 06:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D053A101F7;
+	Mon,  8 Jul 2024 06:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+LJro03"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inW4Efpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A811864C
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 06:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509CF171C2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 06:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720421329; cv=none; b=XochVXCmNzHo7o/uj19p5obzNk5+AMqxtzlhlfP2shDZaSaaeWY0Y3uU4L5HmsgSHbaai2Dtg8CmiylLNltIKCMPokvxz2NPJgybOUXX0dCdEBN0XQUiIrUWz5NUP2sv0CLPXA1QWKRqTnpkWOswObCVJOPqxuItRmoVwLi9Xx8=
+	t=1720421392; cv=none; b=Nn2kVJm5BOQQx5f7Cpy36csDyXagDpLBE36uvrHfFP8YQl8pdfqH1CLgZkIfn0o4+DSwCIYzLaxiATdQgA2iRrCa4dydGq4P/nRL4nMTHGemLCXeKtFK5215knTEofy/klAiuHIlhO+S/EtFoxLyi8CGdRtvUkyz4PRbIrSwWl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720421329; c=relaxed/simple;
-	bh=5Xlv1sun4auRtl8JEHcPbgJZ2O7zh44jl7gcdycfm7g=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u5BDzK6XQqP+yTyCZ+e2bLWSkzHUKAGiTxtioph4H5bINF+J1HawFw/a64JN4VLeY1VdcV5Spm/k1DENUgB29woTyxbLrm7Hsrzm2BTc6iWrEa8AAyyqRkv2ainnUulCLg6aD8hrK7zPN5bV8EYAC2e//HvwoqDrQz444MGd7eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S+LJro03; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1720421392; c=relaxed/simple;
+	bh=3H8vMevzIvzcJrAIQhm87D6MyRx2wml/VHmQuniqz9Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q4LRkASEQ4J364zC8YgtmU230eOnWPSqkhlEecIom/lugLwEWsb0iq/0J9ZaEGnW12TrgslwOlDi5vZe/Nbr4AL/0FiBJ42PQSR+FX/p3VFChY5hc+N14aIxVz2luEAqKAp4s6P6WiPUF2KGXAgBczQevhke5fLBfSuVfQWfhtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=inW4Efpl; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720421327;
+	s=mimecast20190719; t=1720421390;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=i35Vp9MXO/r/LnANvdQMrcfbXgkBl2r0ZfhuxW1lCqE=;
-	b=S+LJro03jVV2LEHXVa0dRf7kVA8oRg6rxlaOeuhn7ZPWrKW6ps4fQQ3Uhr1P7N9RRgXok5
-	DS1U7TUzGfAYrw5HXWPRO1VGR9enH24P6vpKYtgx5CUGW0KN/Lm/92pUP5Asxdgf6VOt3M
-	1BEYtElVJf6WUZoyiCQJcvpNYD39KPY=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-7VOu9dqUNc6_-P9BImhytg-1; Mon,
- 08 Jul 2024 02:48:44 -0400
-X-MC-Unique: 7VOu9dqUNc6_-P9BImhytg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AFAD71955F0D;
-	Mon,  8 Jul 2024 06:48:42 +0000 (UTC)
-Received: from server.redhat.com (unknown [10.72.112.123])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8733619560AE;
-	Mon,  8 Jul 2024 06:48:37 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: lulu@redhat.com,
-	dtatulea@nvidia.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	parav@nvidia.com,
-	sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH v3 2/2] vdpa_sim_net: Add the support of set mac address
-Date: Mon,  8 Jul 2024 14:47:03 +0800
-Message-ID: <20240708064820.88955-3-lulu@redhat.com>
-In-Reply-To: <20240708064820.88955-1-lulu@redhat.com>
-References: <20240708064820.88955-1-lulu@redhat.com>
+	bh=pIbDsP10xfc6NaCkPVB60tYpkZUzdhw3HKdYVd55mQA=;
+	b=inW4EfplUMUO/ebqMY+PRfXufmkxoBnLLSAb5SudC8gqlx3ca43+MMJ8pOtK+I1eLHhM9E
+	T3Yala/p+y4u2DFAUYvplHWG8/J8JAXKQU+vMaMmrQycSBxTxZ+crqXeZ2iPku7OGZWPzW
+	PJ3NSFmyfh4QQWdVkvAjh9lko00yD6o=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-670-ziLNDFxjPtKHXQ50I8GnTw-1; Mon, 08 Jul 2024 02:49:48 -0400
+X-MC-Unique: ziLNDFxjPtKHXQ50I8GnTw-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-70af58f79d1so2328589b3a.0
+        for <netdev@vger.kernel.org>; Sun, 07 Jul 2024 23:49:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720421387; x=1721026187;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pIbDsP10xfc6NaCkPVB60tYpkZUzdhw3HKdYVd55mQA=;
+        b=slXT6XZSUEQDXcG2cnAVqLJy7BWe1X7kqT7ywl9DQYbHRAt+HEHycE4QttcxkGDs/5
+         APzvM1pEa2OEgyshLUT6xFXA+yY6rijtmKxf+EiFfD1kaNSuF1ZIOjMsBpt3//+8QpXS
+         n4dUarHbrY74zFUpo7vuRzz4Q4glKsr8szRCyA+OHca5up9ssSEiqPRybOMniWoeaArV
+         1OiTOEgKD8Pqiml8RLrtmDekjRYAjQa+s7QY4uAQZXAgKHK/dGEQcS9jSKh3v8t5i0Xf
+         1af3hcwPwwpiQQKKMkDdweomSqCB8WMLwFvpne6oS5234T5n2kt1pV94/EGv3sazVSbj
+         8smQ==
+X-Gm-Message-State: AOJu0YwMe95ngVi7oxw/ZRRIa/1dc3AbcCoLULPCx5H/RZcbuQvIONol
+	BXg/kskbDCgUEYVm75fEJzyxpkS/FGCbJ69JfTLHpXMPyEYANFNX0OX8/8x5Wy7AqyOauFSMXCP
+	wvLj/erIYQ8kG//x+3tY2Xbb9bb4fdhGDApRuU6IavJV+eTcDfM9t9tjUPVe8szTV9fo0vhYx2Z
+	PhEh9rPDHrUuHILvYsbpkc0yUTTpaO
+X-Received: by 2002:a05:6a00:1da2:b0:706:6962:4b65 with SMTP id d2e1a72fcca58-70b009520a4mr7278066b3a.14.1720421387505;
+        Sun, 07 Jul 2024 23:49:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiSyNQPaBEraFONt6FsI9Zk4on4jhj/4ZYxZehc8znesk8Dw39LiQoxSTRODV1PG/sr19cHEtsdkkC0A7SZxw=
+X-Received: by 2002:a05:6a00:1da2:b0:706:6962:4b65 with SMTP id
+ d2e1a72fcca58-70b009520a4mr7278051b3a.14.1720421387131; Sun, 07 Jul 2024
+ 23:49:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20240705073734.93905-1-xuanzhuo@linux.alibaba.com> <20240705073734.93905-9-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240705073734.93905-9-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 8 Jul 2024 14:49:35 +0800
+Message-ID: <CACGkMEvW72oG-HsLiOwKdUkdOdKCFiyUAU6Nhj8Q4FFbnXAAqA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 08/10] virtio_net: xsk: rx: support fill with
+ xsk buffer
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add the function to support setting the MAC address.
-For vdpa_sim_net, the driver will write the MAC address
-to the config space, and other devices can implement
-their own functions to support this.
+On Fri, Jul 5, 2024 at 3:37=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+m> wrote:
+>
+> Implement the logic of filling rq with XSK buffers.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>
+> v7:
+>    1. some small fixes
+>
+>  drivers/net/virtio_net.c | 70 +++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 66 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 29fa25ce1a7f..2b27f5ada64a 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -354,6 +354,8 @@ struct receive_queue {
+>
+>         /* xdp rxq used by xsk */
+>         struct xdp_rxq_info xsk_rxq_info;
+> +
+> +       struct xdp_buff **xsk_buffs;
+>  };
+>
+>  /* This structure can contain rss message with maximum settings for indi=
+rection table and keysize
+> @@ -1054,6 +1056,53 @@ static void check_sq_full_and_disable(struct virtn=
+et_info *vi,
+>         }
+>  }
+>
+> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
+)
+> +{
+> +       sg->dma_address =3D addr;
+> +       sg->length =3D len;
+> +}
+> +
+> +static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct recei=
+ve_queue *rq,
+> +                                  struct xsk_buff_pool *pool, gfp_t gfp)
+> +{
+> +       struct xdp_buff **xsk_buffs;
+> +       dma_addr_t addr;
+> +       int err =3D 0;
+> +       u32 len, i;
+> +       int num;
+> +
+> +       xsk_buffs =3D rq->xsk_buffs;
+> +
+> +       num =3D xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
+> +       if (!num)
+> +               return -ENOMEM;
+> +
+> +       len =3D xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
+> +
+> +       for (i =3D 0; i < num; ++i) {
+> +               /* use the part of XDP_PACKET_HEADROOM as the virtnet hdr=
+ space */
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+It's better to also say we assume hdr->len is larger than
+XDP_PACKET_HEADROOM. (see function xyz).
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-index cfe962911804..a472c3c43bfd 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-@@ -414,6 +414,22 @@ static void vdpasim_net_get_config(struct vdpasim *vdpasim, void *config)
- 	net_config->status = cpu_to_vdpasim16(vdpasim, VIRTIO_NET_S_LINK_UP);
- }
- 
-+static int vdpasim_net_set_attr(struct vdpa_mgmt_dev *mdev,
-+				struct vdpa_device *dev,
-+				const struct vdpa_dev_set_config *config)
-+{
-+	struct vdpasim *vdpasim = container_of(dev, struct vdpasim, vdpa);
-+
-+	struct virtio_net_config *vio_config = vdpasim->config;
-+	if (config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-+		if (!is_zero_ether_addr(config->net.mac)) {
-+			memcpy(vio_config->mac, config->net.mac, ETH_ALEN);
-+			return 0;
-+		}
-+	}
-+	return -EINVAL;
-+}
-+
- static void vdpasim_net_setup_config(struct vdpasim *vdpasim,
- 				     const struct vdpa_dev_set_config *config)
- {
-@@ -510,7 +526,8 @@ static void vdpasim_net_dev_del(struct vdpa_mgmt_dev *mdev,
- 
- static const struct vdpa_mgmtdev_ops vdpasim_net_mgmtdev_ops = {
- 	.dev_add = vdpasim_net_dev_add,
--	.dev_del = vdpasim_net_dev_del
-+	.dev_del = vdpasim_net_dev_del,
-+	.dev_set_attr = vdpasim_net_set_attr
- };
- 
- static struct virtio_device_id id_table[] = {
--- 
-2.45.0
+> +               addr =3D xsk_buff_xdp_get_dma(xsk_buffs[i]) - vi->hdr_len=
+;
+> +
+> +               sg_init_table(rq->sg, 1);
+> +               sg_fill_dma(rq->sg, addr, len);
+> +
+> +               err =3D virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buffs[=
+i], gfp);
+> +               if (err)
+> +                       goto err;
+> +       }
+> +
+> +       return num;
+> +
+> +err:
+> +       if (i)
+> +               err =3D i;
+
+Any reason to assign an index to err here?
+
+Others look good.
+
+Thanks
 
 
