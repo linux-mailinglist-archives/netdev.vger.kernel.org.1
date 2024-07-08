@@ -1,139 +1,237 @@
-Return-Path: <netdev+bounces-109917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7126392A45E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:14:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935E192A46F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:16:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1B811C21A5B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:14:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A6B51C2152F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4CF13C69B;
-	Mon,  8 Jul 2024 14:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE6084E11;
+	Mon,  8 Jul 2024 14:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9hflAOS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCcl3Nbg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794CB13C3D2;
-	Mon,  8 Jul 2024 14:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40201D54A;
+	Mon,  8 Jul 2024 14:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720448047; cv=none; b=IsLlSpLPLO3Nv/8e/uf8gQ9k3DEHrp+0KZE/JHl0CtsQ8ck+zTnXfhGo+bVcXoRTdAI05ZXPS4ENucSotjkAPhLL5huUA+ppRiXPi90m/R69/JlLOZTMdPjAb/71dscM+xEwWJSXRW9a1NDBUGO628jkKFIvI7fIxr9BAOqlskE=
+	t=1720448200; cv=none; b=VDYiSgM5/pvq4K/9GnkDjo0lKNS5QSx+RRm76RMxb3gYmPG6b6bBXI/Yjp+x5DtATy0gd/2sZbeqUYEAwDCInazGauEwQPVavjeleCJbYzbR5uccDesvNObyIPyBWd1+pqiwUQKqPPLZCyFSKgq/nhoEP6ctHtoEOCe8ziwpXmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720448047; c=relaxed/simple;
-	bh=7ag2vUUkNiiqzEIw5G9KKqVlh8v0Rj9Ng1deqOVj9rg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eyfqhuLKIHu74jVNXi5/XJZ3y0DGByLNZTDmPxz2BjhVeuB62CdTIisR0ly+M8h+lJZIa7ceDwy8LjAAg6CkHBy+vxoLBTde93X/2J1CSpDwWKSySsbpgVmxOMOamvpF1ziz4AY3oZFDbJMHsFkiyI7qyShrvagF2BrQsTtirPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W9hflAOS; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1720448200; c=relaxed/simple;
+	bh=0UzVHsAK7yOF1TSP7mSF4VhiIWB+Akga/TzonZrAjXU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Got3CTs9OJz8aVaut/QjWqOe00bgs2zJV+cB1RdYGStEhX6e4mZ1uJ3sZVOZgeH2XIvXTOdfeVkOsIbkuu73ode/yJ1CGyjEDhp0prmPmgoOlsPNS4cmKv30NF7ODHrg2uLT/6i3dUP2s8B285TI/4Z8FKC3otyK4msdKl3pbPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCcl3Nbg; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4265b7514fcso14626435e9.1;
-        Mon, 08 Jul 2024 07:14:05 -0700 (PDT)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-447e3a64aa1so8886361cf.2;
+        Mon, 08 Jul 2024 07:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720448044; x=1721052844; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GvZGRxwOuoxAgqAvDBjxYmKyF/+4Ihq85ZsbxBLBQsE=;
-        b=W9hflAOSYnGJyO0ZrX1VVuZ5CZQSSLxqkPBBFcbJnt/YxPL93pOqk8UpRdxYTvx4Fj
-         zlJ9C2WWrZflB2JKAYo+8DPolhorU7k7NOtxF6l7INhKeAxMs4aiAPeo/ICtLYI4hRsR
-         OO3N0rFLXxGIdIXR46vLUftmT5YwEdjlbHGKqv5ZCaW1tsCVkuv0T7WOMEaNiixydyE7
-         MULB24Mm+8CFJEHI8OAZRA3kLBZT/u5HxdW1/jEn7sIpTcdVXAW9nyWjKFC/joH1g5PK
-         9huwMYSMuRWF3M0BBLesfMfcUc34jK7+SS30n++3J0tBvFUI1LDv29ApdhG8kARFYTrL
-         q/Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720448044; x=1721052844;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1720448198; x=1721052998; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GvZGRxwOuoxAgqAvDBjxYmKyF/+4Ihq85ZsbxBLBQsE=;
-        b=v8uWLdF6C/hXr+RWU9A1hmqTAiNnEZjlqqeLghbnqa9QNuTR2BHAbtXSbwpSmJZ+x0
-         JqY+Z734tzpcIS5rTSd0kCVrXh/rURyW8EOcIjTqSACDfO/U+x49MaIMlvaAFHOcxfWB
-         tvlFdvZteDNgHz9sIF+18GPMm8nvZ6dJlA6AyFKa4oQVEBFeTU9DvqOPdm4UmZsktlZu
-         za69ztJNmLrIcOV3S28YSPu31Fv2XqpCm+4zdob9XKO0vGOBF5E0YY9537GnuKfDyT1z
-         /XPtthn1cMPST2v9pL+6EOgLmNB1tjBwQrfNjySB5En5j9VxmOBibWRcxotV31cQuFZh
-         diFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIAl8aLXvYtSk16uG+FC8Wd2eFuO9CM6Kl/6xqfa7VYo109j/C3+tWVWt3MuJ5h6QN/PsbNRkXEXMc4zJ+GVRZITMSyJ9QUVZ0x3D5KZ+k0AnHO+oEmR43/gVIp0bhjE06sZgx
-X-Gm-Message-State: AOJu0Yw86w7ZOLNDww0jyXwgnHkJBxdxzSqH+r6kpWZPUGhkzsp3d8kA
-	dnH4kfkRjMwgAsKspW6wAvHYn6KJZxTbEHqUFyd91QNeGkEa6FP2lgqJmRJa
-X-Google-Smtp-Source: AGHT+IHdjMaaUIYVHXztXF5gbplIxnDeJktpRWhzhs/msMmg4In6jR6hy4EJse8j2tV5h1ajT0Splg==
-X-Received: by 2002:a05:600c:1c98:b0:426:5fa7:b495 with SMTP id 5b1f17b1804b1-4265fa7b6c3mr53157515e9.15.1720448043692;
-        Mon, 08 Jul 2024 07:14:03 -0700 (PDT)
-Received: from skbuf ([188.25.110.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266f6f07dasm546485e9.12.2024.07.08.07.14.02
+        bh=wP0E5gIgFuQBnQGbv8A6NYVGVJnL5Clpudk9erlFk3M=;
+        b=jCcl3NbgruiTopKGArRnECy5Z03zOjwOb5tfOI26zQxgiwKfET/LQjUse2HDpo4zja
+         a74z8CDokOPRWPkT5GUksIpOOHkRTkNkOUCL0bKsObxzde2atLPtOFBxa85fgKtDrYQ1
+         E2u0OBCUWwCNOL2u9KEt16gUTyWp9lTL3w9P4uu3xU2ql4Z5aOzRKD+JfCzKHNsA/v0g
+         mY9tO/zcNNQyct60OYLAgQYyJNzxnsdBVJsrrti8oBK29mXJSFmqhADRxzb7zT4qvIvP
+         kmpB9Q6KA2NCEMSqctfmf38BL0FalAYHfE/gPVR2oqAQM3s+23bcYi1RL9E0r1Vg+wwh
+         k3zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720448198; x=1721052998;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wP0E5gIgFuQBnQGbv8A6NYVGVJnL5Clpudk9erlFk3M=;
+        b=aRa+mkTYa1OOFYsnAi6K32Yogaibvl6065YHjH9KtfxtM81l71A86J1Tyxabnrj4/d
+         o92m4ZQFs6CAF2+zn6hneFrkKnXrragxSdgPGFzMTCNrrUsfim4zmSk2yrGrxtTUkRAq
+         Pw7NyYhF1wT3JSNN+aj55CGwdRIrnTDlULXQQEkcWUZ7bZAXRSvZem1L1W4fhnJMgr8H
+         XwfWuMfS2azMFzuGqM3sHabMdOOxzuUZMzlIQNnjwxkglCxBJACp5sHGlT5PqPOCv5Rv
+         JzspG4URdmqQuMmZFix92I+jUC0/mtFdoTAq6Qly8oU1B0dw+p4yqHB6tT+0zGRelnnc
+         nx9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXSkuLb4XYK2FFB+eQmW7pyDO/IRbN6Dm9Z5PJMJ1VEaVqUxCy3Z0nZutF9/QgMC1wWNjQnK0FrusKbsVEPtk9axJ5dQj/eyf+ut0KDm3uY9VgVfmoZXwkAvXO6/dC7eDn9EcJV
+X-Gm-Message-State: AOJu0Yw9JglQyvm/QYnDr9URZ2+2clbrHwwDxvi1b+Gqx68dIn03MviP
+	8MqzvcvvT17UYTjJ+p0nBDoo0UXbZ7JyVyrnn2gkFnxpk+QiyGnF
+X-Google-Smtp-Source: AGHT+IE2JRwYdsDuo8j/MwQ9htT5JYiXKiVkKtMioWZNkxCJ/lK/i5qAzkfsn/Ab732uDDu61TBDKA==
+X-Received: by 2002:a05:622a:808f:b0:447:dc5c:fc73 with SMTP id d75a77b69052e-447dc5cfffamr99004791cf.45.1720448197622;
+        Mon, 08 Jul 2024 07:16:37 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4465143e475sm98481121cf.46.2024.07.08.07.16.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 07:14:03 -0700 (PDT)
-Date: Mon, 8 Jul 2024 17:14:00 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	"ericwouds@gmail.com" <ericwouds@gmail.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"justinstitt@google.com" <justinstitt@google.com>,
-	"rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
-	netdev <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"sander@svanheule.net" <sander@svanheule.net>
-Subject: Re: net: dsa: Realtek switch drivers
-Message-ID: <20240708141400.xbuor67hnnkxyigh@skbuf>
-References: <aa5ffa9a-62cc-4a79-9368-989f5684c29c@alliedtelesis.co.nz>
- <CACRpkdbF-OsV_jUp42yttvdjckqY0MsLg4kGxTr3JDnjGzLRsA@mail.gmail.com>
- <CAJq09z6dN0TkxxjmXT6yui8ydRUPTLcpFHyeExq_41RmSDdaHg@mail.gmail.com>
- <b15b15ce-ae24-4e04-83ab-87017226f558@alliedtelesis.co.nz>
- <c19eb8d0-f89b-4909-bf14-dfffcdc7c1a6@lunn.ch>
- <c8132fc9-37e2-42c3-8e6b-fbe88cc2d633@alliedtelesis.co.nz>
- <65566aaa-ba49-4ad9-ab3f-9d49780a809b@lunn.ch>
+        Mon, 08 Jul 2024 07:16:36 -0700 (PDT)
+Date: Mon, 08 Jul 2024 10:16:36 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <668bf4c48fd5a_18f88d2942f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <e53db011-fe6a-4e63-b740-a7d2ff33dfa9@intel.com>
+References: <20240703150342.1435976-1-aleksander.lobakin@intel.com>
+ <20240703150342.1435976-4-aleksander.lobakin@intel.com>
+ <668946c1ddef_12869e29412@willemb.c.googlers.com.notmuch>
+ <e53db011-fe6a-4e63-b740-a7d2ff33dfa9@intel.com>
+Subject: Re: [PATCH net-next v2 3/5] netdev_features: convert NETIF_F_LLTX to
+ dev->lltx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65566aaa-ba49-4ad9-ab3f-9d49780a809b@lunn.ch>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 03, 2024 at 05:39:49AM +0200, Andrew Lunn wrote:
-> > One reason for using DSAI've just found is that in theory the RTL930x
-> > supports a CPU disabled mode where you do connect it to an external CPU and
-> > the data travels over SGMII like you'd get with a traditional DSA design.
-> > It's not a mode I'm planning on supporting anytime soon but it might come up
-> > when I get round to submitting some patches.
+Alexander Lobakin wrote:
+> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
+> Date: Sat, 06 Jul 2024 09:29:37 -0400
 > 
-> You might want to look at ocelot, which is both a pure switchdev and a
-> DSA driver. Its design is not great because it became dual later in
-> its life. I suspect it would be designed differently if this has been
-> considered at the beginning.
+> > Alexander Lobakin wrote:
+> >> NETIF_F_LLTX can't be changed via Ethtool and is not a feature,
+> >> rather an attribute, very similar to IFF_NO_QUEUE (and hot).
+> >> Free one netdev_features_t bit and make it a "hot" private flag.
+> >>
+> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 > 
-> 	   Andrew
+> [...]
+> 
+> >> @@ -23,8 +23,6 @@ enum {
+> >>  	NETIF_F_HW_VLAN_CTAG_FILTER_BIT,/* Receive filtering on VLAN CTAGs */
+> >>  	NETIF_F_VLAN_CHALLENGED_BIT,	/* Device cannot handle VLAN packets */
+> >>  	NETIF_F_GSO_BIT,		/* Enable software GSO. */
+> >> -	NETIF_F_LLTX_BIT,		/* LockLess TX - deprecated. Please */
+> >> -					/* do not use LLTX in new drivers */
+> >>  	NETIF_F_NETNS_LOCAL_BIT,	/* Does not change network namespaces */
+> >>  	NETIF_F_GRO_BIT,		/* Generic receive offload */
+> >>  	NETIF_F_LRO_BIT,		/* large receive offload */
+> > 
+> >> @@ -1749,6 +1749,8 @@ enum netdev_reg_state {
+> >>   *			booleans combined, only to assert cacheline placement
+> >>   *	@priv_flags:	flags invisible to userspace defined as bits, see
+> >>   *			enum netdev_priv_flags for the definitions
+> >> + *	@lltx:		device supports lockless Tx. Mainly used by logical
+> >> + *			interfaces, such as tunnels
+> > 
+> > This loses some of the explanation in the NETIF_F_LLTX documentation.
+> > 
+> > lltx is not deprecated, for software devices, existing documentation
+> > is imprecise on that point. But don't use it for new hardware drivers
+> > should remain clear.
+> 
+> It's still written in netdevices.rst. I rephrased that part as
+> "deprecated" is not true.
+> If you really think this may harm, I can adjust this one.
 
-Another thing to consider is that you might want to join efforts with
-Bootlin who had a similar (and still unresolved) issue with ipqess/qca8k.
-See some of the feedback that they received.
-https://lore.kernel.org/netdev/20231116215645.3ex4yp36hrrm4uti@skbuf/
+Yeah, doesn't hurt to state here too: Deprecated for new hardware devices.
 
-In short, I am in principle in favor of extracting core stuff out of
-DSA into a more generic 'eth switch' library which is frontend-agnostic
-(this is also what the TODO in Documentation/networking/dsa/dsa.rst is
-really about, despite not being very well described). That new framework
-would essentially be the things that DSA does well, except for tagging
-packets, handling the conduit interface, etc. I just don't have the time
-(or incentive, sadly) to do it.
+> > 
+> >>   *
+> >>   *	@name:	This is the first field of the "visible" part of this structure
+> >>   *		(i.e. as seen by users in the "Space.c" file).  It is the name
+> > 
+> >> @@ -3098,7 +3098,7 @@ static void amt_link_setup(struct net_device *dev)
+> >>  	dev->hard_header_len	= 0;
+> >>  	dev->addr_len		= 0;
+> >>  	dev->priv_flags		|= IFF_NO_QUEUE;
+> >> -	dev->features		|= NETIF_F_LLTX;
+> >> +	dev->lltx		= true;
+> >>  	dev->features		|= NETIF_F_GSO_SOFTWARE;
+> >>  	dev->features		|= NETIF_F_NETNS_LOCAL;
+> >>  	dev->hw_features	|= NETIF_F_SG | NETIF_F_HW_CSUM;
+> > 
+> > Since this is an integer type, use 1 instead of true?
+> 
+> I used integer type only to avoid reading new private flags byte by byte
+> (bool is always 1 byte) instead of 4 bytes when applicable.
+> true/false looks more elegant for on/off values than 1/0.
+> 
+> > 
+> > Type conversion will convert true to 1. But especially when these are
+> > integer bitfields, relying on conversion is a minor unnecessary risk.
+> 
+> Any examples when/where true can be non-1, but something else, e.g. 0?
+> Especially given that include/linux/stddef.h says this:
+> 
+> enum {
+> 	false	= 0,
+> 	true	= 1
+> };
+> 
+> No risk here. Thinking that way (really sounds like "are you sure NULL
+> is always 0?") would force us to lose lots of stuff in the kernel for no
+> good.
 
-The most advanced switchdev drivers like mlxsw will probably not benefit
-from it, because they have their own highly specific use cases, although
-most of the rest should, since there is a lot of boilerplate which could
-go to common code, and which nobody really likes to re-re-re-write or
-re-re-re-review.
+Ack. Both C bitfields and C boolean "type" are not as trivial as they
+appear. But agreed that the stddef.h definition is.
+
+I hadn't seen use of true/false in bitfields in kernel code often. A
+quick scan of a few skb fields like ooo_okay and encapsulation shows
+use of 0/1.
+
+But do spot at least one: sk_reuseport. 
+> > 
+> >>  int dsa_user_suspend(struct net_device *user_dev)
+> >> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> >> index 6b2a360dcdf0..44199d1780d5 100644
+> >> --- a/net/ethtool/common.c
+> >> +++ b/net/ethtool/common.c
+> >> @@ -24,7 +24,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
+> >>  	[NETIF_F_HW_VLAN_STAG_FILTER_BIT] = "rx-vlan-stag-filter",
+> >>  	[NETIF_F_VLAN_CHALLENGED_BIT] =  "vlan-challenged",
+> >>  	[NETIF_F_GSO_BIT] =              "tx-generic-segmentation",
+> >> -	[NETIF_F_LLTX_BIT] =             "tx-lockless",
+> >>  	[NETIF_F_NETNS_LOCAL_BIT] =      "netns-local",
+> >>  	[NETIF_F_GRO_BIT] =              "rx-gro",
+> >>  	[NETIF_F_GRO_HW_BIT] =           "rx-gro-hw",
+> > 
+> > Is tx-lockless no longer reported after this?
+> > 
+> > These features should ideally still be reported, even if not part of
+> 
+> Why do anyone need tx-lockless in the output? What does this give to the
+> users? I don't believe this carries any sensible/important info.
+> 
+> > the features bitmap in the kernel implementation.
+> > 
+> > This removal is what you hint at in the cover letter with
+> > 
+> >   Even shell scripts won't most likely break since the removed bits
+> >   were always read-only, meaning nobody would try touching them from
+> >   a script.
+> > 
+> > It is a risk. And an avoidable one?
+> 
+> What risk are you talking about? Are you aware of any scripts or
+> applications that want to see this bit in Ethtool output? I'm not.
+
+The usual risk of ABI changes: absence of proof (of use) is not proof
+of absence.
+
+I agree that it's small here. And cannot immediately estimate the cost
+of maintaining this output, i.e., the risk/reward. But if it's easy to
+keep output as before, why not.
+
+And hard to say ahead of time that the argument for dropping lltx
+applies equally to subsequent bits removed from netdev_features_t.
+
+Alternatively, please do spell out clearly in the commit message how
+this changes user visible behavior. I did not fully understand the
+shell script comment until I read the code.
 
