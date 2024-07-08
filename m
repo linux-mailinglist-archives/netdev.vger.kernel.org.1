@@ -1,50 +1,63 @@
-Return-Path: <netdev+bounces-109715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8F7929B21
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 05:43:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5704929B57
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 06:49:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A11E21F214CC
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 03:43:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37FCCB20DD9
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 04:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F146FB6;
-	Mon,  8 Jul 2024 03:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C08EB673;
+	Mon,  8 Jul 2024 04:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="E6vZPO0W"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Pt3k0/gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40B03FC2
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 03:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA35812;
+	Mon,  8 Jul 2024 04:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720410213; cv=none; b=DFfDBUIjoD+I/pxZShTQaxLJDfNF+ygNt/JbD+7eUnAxiR2/vAFn1tIfI8wBOjvGfkzgCR200B4AhhrijkJ/NyXApQCkzaUHNWWcqRIqNldxUSi+g7w6k1CUhLWvHythfjAldaKv69vLadO0rb8xPEN21PkpHc8BevmW8Vh4e/s=
+	t=1720414156; cv=none; b=no/spolrRRRe2Sm9+mhPKQUE5lD0jCxkg24mG62XTIkF54MRwitJ4+H6hGMNq/wE1XmEGdCNwQwcNllBL6d4iJ7Hk8OzB6PmSJqaGmixcJF+kNlA0YYoKTEJ8o5lPc/s+ac60yJZsA1G8IvCyk3p8Hzx2BpqXLHvdbuVKMyeBPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720410213; c=relaxed/simple;
-	bh=tTsvtJxiivGQUDwdDlzI16o5n8r8V4S6PzVR4cwl8jM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mjdB2VP8x3HAq2xagwjwpAUh7tTXu8usDdXoXLMAMPe3SBproSA79ZUqB3WN+FO9pSJo3KKYu5e006c6NeNkO0cIOKJ2HppvyVrAOuFDQfggH1YRpSai5Mn2sus4smsYQC/5BWwqEc8B1u9lK1VVtpoeK6NwkRud5SwXi6zSwSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=E6vZPO0W; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 4683gndt008170
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 8 Jul 2024 05:42:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1720410171; bh=X2kiB7fKeiT8pjqapBJGMfj7BOiI1x79mJcwD+xQV0U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=E6vZPO0W66smXX4tqxoObVPo6jczZpyyl19O04SinOOJoE0InzmKzw2nsm1WKLq7T
-	 f6Y3ts3ihTdGzj0bZhCkcdtdMxl6v9IL76aYLd7+KPQiRsP6slpdYkYfENT4fOoVjP
-	 Dp/ISLLK6C2ifXfpLUN1SehzNp2nNnBy0avXjaBw=
-Message-ID: <ebbb0690-13d1-452d-95d7-5ce61bb8a0e8@ans.pl>
-Date: Sun, 7 Jul 2024 20:42:48 -0700
+	s=arc-20240116; t=1720414156; c=relaxed/simple;
+	bh=kldhXik17AMoxW+Je/3rPUwcD8RYnLflDyuBD3i6GJ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rP6oDSycCEHfAMsVTjwxx99BUFsYv31Y702k5U8zr5fKCoNSkI2Fjttp9ITlncu/TpdNPLFa5dkEAymwZneiqGJIpIDhNulZ/5o5Y6WKP+aXelC3otPlGu1/kKbNcMBxgEQq8dcS9wfj6/ptKBcIUwn4/HSznqyQTe5sUkPe34I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Pt3k0/gw; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 467NgQ4V005778;
+	Mon, 8 Jul 2024 04:47:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Mt2UNk9pZ3nG8SWY8ZJK5DyYFCJPucDgybc6SM6D4P4=; b=Pt3k0/gw3nDfHRL1
+	WH1j0zn74Dskno6RYtKxvoY3Lwqbkt4uZsKApdf64uz3Pm7tV/ZyBTzyLbVY/reC
+	5KhibpPMVXBub8eExpHBtzs27kr8trEIVEdEdu4Mh+R7budCktV5doOBpW6z9Gbo
+	c3RZ4vpPwS06yLqQcSRAarpHRbnLNmFXHfsKtBxeA56EyPkBE0RLPxGBmigNeLz3
+	1c1yEW0jXzHKbusYo1u80ekw2pJE5hQV7up0yOSh5e+u5jTWVuHAPgjgAcisY1Wg
+	L6n4Y9coVABsQWN1xD+OWOi4hMqd20I586+hLj2RnTxfgxfHzfolfdA0kuzk6QvO
+	41Is5g==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406we8tnpx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jul 2024 04:47:15 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4684lDsl027084
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 8 Jul 2024 04:47:13 GMT
+Received: from [10.239.132.150] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 7 Jul 2024
+ 21:46:52 -0700
+Message-ID: <63eb3f58-d4a4-4a27-b78c-f4cb83e62c63@quicinc.com>
+Date: Mon, 8 Jul 2024 12:45:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,120 +65,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: ethtool fails to read some QSFP+ modules.
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Dan Merillat <git@dan.merillat.org>, Michal Kubecek <mkubecek@suse.cz>,
-        netdev <netdev@vger.kernel.org>
-References: <54b537c6-aca4-45be-9df0-53c80a046930@dan.merillat.org>
- <ZoJaoLq3sYQcsbDb@shredder.mtl.com> <ZoJdxmZ1HvmARmB1@shredder.mtl.com>
- <49bf6eca-9ad0-49a7-ac8d-d5104581f137@ans.pl>
- <8711f66b-9461-4e3c-8881-5bda2379b926@ans.pl>
- <ZopTTqrHRekd8d8u@shredder.mtl.com>
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+Subject: Re: [PATCH 01/47] dt-bindings: arm: qcom: Document QCS9100 SoC and
+ RIDE board
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Tengfei Fan
+	<quic_tengfan@quicinc.com>, <andersson@kernel.org>,
+        <konrad.dybcio@linaro.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+        <conor+dt@kernel.org>, <djakov@kernel.org>, <mturquette@baylibre.com>,
+        <sboyd@kernel.org>, <jassisinghbrar@gmail.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <manivannan.sadhasivam@linaro.org>, <will@kernel.org>,
+        <joro@8bytes.org>, <conor@kernel.org>, <tglx@linutronix.de>,
+        <amitk@kernel.org>, <thara.gopinath@gmail.com>,
+        <linus.walleij@linaro.org>, <wim@linux-watchdog.org>,
+        <linux@roeck-us.net>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
+        <vkoul@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>
+CC: <robimarko@gmail.com>, <bartosz.golaszewski@linaro.org>,
+        <kishon@kernel.org>, <quic_wcheng@quicinc.com>,
+        <alim.akhtar@samsung.com>, <avri.altman@wdc.com>, <bvanassche@acm.org>,
+        <agross@kernel.org>, <gregkh@linuxfoundation.org>,
+        <quic_tdas@quicinc.com>, <robin.murphy@arm.com>,
+        <daniel.lezcano@linaro.org>, <rui.zhang@intel.com>,
+        <lukasz.luba@arm.com>, <quic_rjendra@quicinc.com>,
+        <ulf.hansson@linaro.org>, <quic_sibis@quicinc.com>,
+        <otto.pflueger@abscue.de>, <luca@z3ntu.xyz>,
+        <neil.armstrong@linaro.org>, <abel.vesa@linaro.org>,
+        <bhupesh.sharma@linaro.org>, <alexandre.torgue@foss.st.com>,
+        <peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
+        <netdev@vger.kernel.org>, <lpieralisi@kernel.org>, <kw@linux.com>,
+        <bhelgaas@google.com>, <ahalaney@redhat.com>,
+        <krzysztof.kozlowski@linaro.org>, <u.kleine-koenig@pengutronix.de>,
+        <dmitry.baryshkov@linaro.org>, <quic_cang@quicinc.com>,
+        <danila@jiaxyga.com>, <quic_nitirawa@quicinc.com>,
+        <mantas@8devices.com>, <athierry@redhat.com>,
+        <quic_kbajaj@quicinc.com>, <quic_bjorande@quicinc.com>,
+        <quic_msarkar@quicinc.com>, <quic_devipriy@quicinc.com>,
+        <quic_tsoni@quicinc.com>, <quic_rgottimu@quicinc.com>,
+        <quic_shashim@quicinc.com>, <quic_kaushalk@quicinc.com>,
+        <quic_tingweiz@quicinc.com>, <srinivas.kandagatla@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux.dev>, <linux-riscv@lists.infradead.org>,
+        <linux-gpio@vger.kernel.org>, <linux-watchdog@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>, <kernel@quicinc.com>
+References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
+ <20240703025850.2172008-2-quic_tengfan@quicinc.com>
+ <665f6c8c-4f43-4d20-90e9-9e037a942066@kernel.org>
+ <fbeb5969-0b3a-455e-88eb-b83734bf2c50@quicinc.com>
+ <97c9484b-e257-4163-a104-3457d59bc69b@kernel.org>
+From: "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>
 Content-Language: en-US
-In-Reply-To: <ZopTTqrHRekd8d8u@shredder.mtl.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <97c9484b-e257-4163-a104-3457d59bc69b@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: NaHbB22mWdLnCeOe5WUMhaQTLB8iQPsZ
+X-Proofpoint-ORIG-GUID: NaHbB22mWdLnCeOe5WUMhaQTLB8iQPsZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-08_01,2024-07-05_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ malwarescore=0 priorityscore=1501 clxscore=1011 impostorscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=976 phishscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407080035
 
-On 07.07.2024 at 01:35, Ido Schimmel wrote:
-> On Thu, Jul 04, 2024 at 05:27:49AM -0700, Krzysztof Olędzki wrote:
->> On 03.07.2024 at 07:36, Krzysztof Olędzki wrote:
->>> Good morning,
+
+
+On 7/3/2024 5:33 PM, Krzysztof Kozlowski wrote:
+> On 03/07/2024 11:21, Tengfei Fan wrote:
+>>>>         - items:
+>>>>             - enum:
+>>>> +              - qcom,qcs9100-ride
+>>>>                 - qcom,sa8775p-ride
+>>>> +          - const: qcom,qcs9100
 >>>
->>> On 01.07.2024 at 00:41, Ido Schimmel wrote:
->>>> Forgot to add Krzysztof :p
->>>>
->>>> On Mon, Jul 01, 2024 at 10:28:39AM +0300, Ido Schimmel wrote:
->>>>> On Sun, Jun 30, 2024 at 01:27:07PM -0400, Dan Merillat wrote:
->>>>>>
->>>>>> I was testing an older Kaiam XQX2502 40G-LR4 and ethtool -m failed with netlink error.  It's treating a failure to read
->>>>>> the optional page3 data as a hard failure.
->>>>>>
->>>>>> This patch allows ethtool to read qsfp modules that don't implement the voltage/temperature alarm data.
->>>>>
->>>>> Thanks for the report and the patch. Krzysztof Olędzki reported the same
->>>>> issue earlier this year:
->>>>> https://lore.kernel.org/netdev/9e757616-0396-4573-9ea9-3cb5ef5c901a@ans.pl/
->>>>>
->>>>> Krzysztof, are you going to submit the ethtool and mlx4 patches?
+>>> This changes existing compatible for sa8775p without any explanation in
+>>> commit msg.
 >>>
->>> Yes, and I apologize for the delay - I have been traveling with my family and was unable to get into it.
+>>> Best regards,
+>>> Krzysztof
 >>>
->>> I should be able to work on the patches later this week, so please expect something from me around the weekend.
->>>
->>>>>> From 3144fbfc08fbfb90ecda4848fc9356bde8933d4a Mon Sep 17 00:00:00 2001
->>>>>> From: Dan Merillat <git@dan.eginity.com>
->>>>>> Date: Sun, 30 Jun 2024 13:11:51 -0400
->>>>>> Subject: [PATCH] Some qsfp modules do not support page 3
->>>>>>
->>>>>> Tested on an older Kaiam XQX2502 40G-LR4 module.
->>>>>> ethtool -m aborts with netlink error due to page 3
->>>>>> not existing on the module. Ignore the error and
->>>>>> leave map->page_03h NULL.
 >>
->> BTW - the code change does what we have discussed, but I think the comment
->> may be incorrect? Before we call nl_get_eeprom_page, there is a check to
->> verify that Page 03h is present:
->>
->>         /* Page 03h is only present when the module memory model is paged and
->>          * not flat.
->>          */
->>         if (map->lower_memory[SFF8636_STATUS_2_OFFSET] &
->>             SFF8636_STATUS_PAGE_3_PRESENT)
->>                 return 0;
->>
->> In this case, it seems to me that the failure can only be caused by either
->> HW issues (NIC or SFP) *or* a bug in the driver. Assuming we want to provide
->> some details in the code, maybe something like this may be better?
->>
->> +	/* Page 03h is not available due to either HW issue or a bug
->> +	 * in the driver. This is a non-fatal error and sff8636_dom_parse()
->> +	 * handles this correctly.
->> +	 */
+>> In the next verion patch series, I will provide relevant explanatory 
+>> information in this patch commit message.
 > 
-> Looks fine to me although I believe an error in this case will always be
-> returned because of a driver bug. Reading a page that does not exist
-> should not result in an error, but in the module returning Upper Page
-> 00h. Yet to encounter a module that works in a different way. From
-> SFF-8636 Section 6.1:
+> TBH, I cannot think of any reasonable explanation for this, especially
+> considering rest of the patchset which does not fix resulting dtbs_check
+> warning.
+
+The existing compatible "sa8775p" warning can only be addressed When
+@Nikunj's "sa8775p" changes merged.
+
+Let me know if you have other suggestions for this.
+
 > 
-> "Writing the value of a non-supported page shall not be accepted by the
-> slave. The Page Select byte shall revert to 0h and read/write operations
-> shall be to Upper Page 00h. Because Upper Page 00h is read-only, this
-> scheme prevents the inadvertent corruption of module memory by a host
-> attempting to write to a non-supported location."
-
-Fair, I updated the comment based on your feedback.
-
->>
->> We were also discussing if printing a warning in such situation may make sense.
->> As I was thinking about this more, I wonder if we can just use the same check
->> in sff8636_show_dom() and if map->page_03h is NULL print for
->>  "Alarm/warning flags implemented"
->> something like:
->>  "Failed (Page 03h access error, HW issue or kernel driver bug?)"
->>
->> We would get it in addition to "netlink error: Invalid argument" that comes from:
->> ./netlink/nlsock.c:             perror("netlink error");
+> Best regards,
+> Krzysztof
 > 
-> I think it's better to print it in sff8636_memory_map_init_pages() as
-> that way the user can more easily understand the reason for "netlink
-> error: Invalid argument":
-> 
-> # ./ethtool -m swp13                                                                                                                                                                                                                                                                 
-> netlink error: Invalid argument
-> Failed to read Upper Page 03h
->         Identifier                                : 0x11 (QSFP28)
->         Extended identifier                       : 0xcf
-> [...]
 
-Great idea, done.
-
-
-> BTW, just to be sure, you are going to post patches for both ethtool and
-> mlx4, right?
-
-Yes, I just sent both.
- 
-Krzysztof
+-- 
+Thx and BRs,
+Aiqun(Maria) Yu
 
