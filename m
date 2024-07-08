@@ -1,217 +1,85 @@
-Return-Path: <netdev+bounces-109909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6999692A3F3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A714D92A416
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1BEC1F2227F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:45:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50E1D1F21663
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608577F490;
-	Mon,  8 Jul 2024 13:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F610132121;
+	Mon,  8 Jul 2024 13:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0ZZAFXY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmpSpmso"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D41F25776
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 13:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD9E1B970
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 13:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720446340; cv=none; b=Hun/6BRbxCQJs6gtch+5sVMSXNIAp795ilwudoB/8nxjnEwLUl+IY66XBg2rJ0r7oT8fGrg9Sa63mB3csXj5RToGRb+h8rPFccFzP23I3rxJtvNH6v54sE1KdkmhpzjKewy8yrTepxc5ZU93HoaA/rIpbPBGgQLz4kryRm/7RuA=
+	t=1720446754; cv=none; b=PMvMS2SqdGB1bDCytS07p/q/g19kgi8RplKZwEj/dcGX1PoYOMBvadp1Acm0WycKwR6OpGxHEfPUmLtG8Wc8aoMSJpovjYAXiS4cqed5RKYA2J58c3sObM/S/kbL7N/fvamW/chfFwT4lAc5FWc95gpx3moxmUrGXyblnV5HBW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720446340; c=relaxed/simple;
-	bh=hKsC8hLKhAOme5JLNrdbUYNktX7OC48C0XxC+BBv+hY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GTyn7ScQmoxK0obo8Ge0oWxdg1kkoH9nf5tTcN0NAJtiJvPxCSZdlQu04n8bWO+yIsc+BLNFACOCmItnYS1GtFgiW1r4YlcOCcFK8Y+kgqyfGMHEbeCOaYeBFam22PmuCA3uLQkjKioI9FnlBzehURHqFTIbY9PfG0SL6BJ0dCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G0ZZAFXY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720446337;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oKoWxhmEZfLLj02S5HWOBt9H4nPDVhLNXef78/NS5KU=;
-	b=G0ZZAFXYhJH5Al/P05VUxwLUwt6w0FSZGKQf3NTnvZtWg+11FYTT42bLW2FGb2jRajXCTu
-	2Nkr6vDFQiGuHfhySpWMn5Z5fcKaRnPcNAA7sMOu4i/6lHpUw8skUiE4aiq6qmkV3KFeV3
-	CxrQPt2fAxMhCjGY+EU7IMR4lsAmmWE=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-ocPFQvYHOBmBMUaUp-3xmQ-1; Mon,
- 08 Jul 2024 09:45:34 -0400
-X-MC-Unique: ocPFQvYHOBmBMUaUp-3xmQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D9B91977338;
-	Mon,  8 Jul 2024 13:45:26 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.192.91])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9373C1955F40;
-	Mon,  8 Jul 2024 13:45:22 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	Adrian Moreno <amorenoz@redhat.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] selftests: openvswitch: retry instead of sleep
-Date: Mon,  8 Jul 2024 15:44:49 +0200
-Message-ID: <20240708134451.3489802-1-amorenoz@redhat.com>
+	s=arc-20240116; t=1720446754; c=relaxed/simple;
+	bh=LCYVdr6UQo9gzA4OPYFJ4T1bPUoeJNQC5T6gf/CYb/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sITCmvQ7HigZL7wWepVWJZDyUnydb9+jHFjzxoYmF4AYpucV6Z42krux0M/N6j/0ILRPWjW8NnyX26xHdLxarQu1jZm+HzxGycMufbBZPExPfXbUQW3FzBq3oP2BOCWiKoK9dYRL5sEqyPX5duhZvrpyjdhARS33A0Vd/G0eSSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmpSpmso; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99AAFC116B1;
+	Mon,  8 Jul 2024 13:52:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720446753;
+	bh=LCYVdr6UQo9gzA4OPYFJ4T1bPUoeJNQC5T6gf/CYb/M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmpSpmsolN31ReQoVzmW2WupuBtyn/aIM77MaXeCFjqmaDTzvmrOK/6UT6R+FEcai
+	 VENesspDvt6veTSea2qmlwp7C7UafOSgJ+XO6kXLtN3gfWkNvu8pz6wTOx3bf2pQqX
+	 oBVDDhK/sq5P8YamRGSw/ZVUCCmKIb8aPZl3VckIkePsVZeAy4LxkCuIGg8+SHnLrP
+	 AAXCb8g0/7VAuVtbDwWpkYAUfQnfiVDom2+4Db1MsU8TUihi5PPdrmnY5CHmS4qWGl
+	 cC2l9zXcgBfAWuRoTqcpMqnrlj6QI8bdynjXCCPXQGhhbb7tSw4itDzjAMfwyQ8cKf
+	 deOdOdpXa9A8Q==
+Date: Mon, 8 Jul 2024 14:52:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Jan Sokolowski <jan.sokolowski@intel.com>
+Subject: Re: [PATCH iwl-next v8 2/7] ixgbe: Add support for E610 device
+ capabilities detection
+Message-ID: <20240708135230.GU1481495@kernel.org>
+References: <20240704122655.39671-1-piotr.kwapulinski@intel.com>
+ <20240704122655.39671-3-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704122655.39671-3-piotr.kwapulinski@intel.com>
 
-There are a couple of places where the test script "sleep"s to wait for
-some external condition to be met.
+On Thu, Jul 04, 2024 at 02:26:50PM +0200, Piotr Kwapulinski wrote:
+> Add low level support for E610 device capabilities detection. The
+> capabilities are discovered via the Admin Command Interface. Discover the
+> following capabilities:
+> - function caps: vmdq, dcb, rss, rx/tx qs, msix, nvm, orom, reset
+> - device caps: vsi, fdir, 1588
+> - phy caps
+> 
+> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 
-This is error prone, specially in slow systems (identified in CI by
-"KSFT_MACHINE_SLOW=yes").
+Thanks for addressing my review of v7.
 
-To fix this, add a "ovs_wait" function that tries to execute a command
-a few times until it succeeds. The timeout used is set to 5s for
-"normal" systems and doubled if a slow CI machine is detected.
-
-This should make the following work:
-
-$ vng --build  \
-    --config tools/testing/selftests/net/config \
-    --config kernel/configs/debug.config
-
-$ vng --run . --user root -- "make -C tools/testing/selftests/ \
-    KSFT_MACHINE_SLOW=yes TARGETS=net/openvswitch run_tests"
-
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 49 ++++++++++++++++---
- .../selftests/net/openvswitch/ovs-dpctl.py    |  1 +
- 2 files changed, 42 insertions(+), 8 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index bc71dbc18b21..83407b42073a 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -11,6 +11,7 @@ ksft_skip=4
- PAUSE_ON_FAIL=no
- VERBOSE=0
- TRACING=0
-+WAIT_TIMEOUT=5
- 
- tests="
- 	arp_ping				eth-arp: Basic arp ping between two NS
-@@ -29,6 +30,32 @@ info() {
- 	[ $VERBOSE = 0 ] || echo $*
- }
- 
-+ovs_wait() {
-+	info "waiting $WAIT_TIMEOUT s for: $@"
-+
-+	"$@"
-+	if [[ $? -eq 0 ]]; then
-+		info "wait succeeded inmediately"
-+		return 0
-+	fi
-+
-+	# A quick re-check helps speed up small races in fast systems.
-+	# However, fractional sleeps might not necessarily work.
-+	local start=0
-+	sleep 0.1 || { sleep 1; start=1; }
-+
-+	for (( i=start; i<WAIT_TIMEOUT; i++ )); do
-+		"$@"
-+		if [[ $? -eq 0 ]]; then
-+			info "wait succeeded after $i seconds"
-+			return 0
-+		fi
-+		sleep 1
-+	done
-+	info "wait failed after $i seconds"
-+	return 1
-+}
-+
- ovs_base=`pwd`
- sbxs=
- sbx_add () {
-@@ -278,20 +305,21 @@ test_psample() {
- 
- 	# Record psample data.
- 	ovs_spawn_daemon "test_psample" python3 $ovs_base/ovs-dpctl.py psample-events
-+	ovs_wait grep -q "listening for psample events" ${ovs_dir}/stdout
- 
- 	# Send a single ping.
--	sleep 1
- 	ovs_sbx "test_psample" ip netns exec client ping -I c1 172.31.110.20 -c 1 || return 1
--	sleep 1
- 
- 	# We should have received one userspace action upcall and 2 psample packets.
--	grep -E "userspace action command" $ovs_dir/s0.out >/dev/null 2>&1 || return 1
-+	ovs_wait grep -q "userspace action command" $ovs_dir/s0.out
-+	[[ $? -eq 0 ]] || return 1
- 
- 	# client -> server samples should only contain the first 14 bytes of the packet.
--	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
--			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
--	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
--			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-+	ovs_wait grep -qE "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" $ovs_dir/stdout
-+	[[ $? -eq 0 ]] || return 1
-+
-+	ovs_wait grep -q "rate:4294967295,group:2,cookie:eeff0c" $ovs_dir/stdout
-+	[[ $? -eq 0 ]] || return 1
- 
- 	return 0
- }
-@@ -711,7 +739,8 @@ test_upcall_interfaces() {
- 	ovs_add_netns_and_veths "test_upcall_interfaces" ui0 upc left0 l0 \
- 	    172.31.110.1/24 -u || return 1
- 
--	sleep 1
-+	ovs_wait grep -q "listening on upcall packet handler" ${ovs_dir}/left0.out
-+
- 	info "sending arping"
- 	ip netns exec upc arping -I l0 172.31.110.20 -c 1 \
- 	    >$ovs_dir/arping.stdout 2>$ovs_dir/arping.stderr
-@@ -811,6 +840,10 @@ shift $(($OPTIND-1))
- IFS="	
- "
- 
-+if test "X$KSFT_MACHINE_SLOW" == "Xyes"; then
-+	WAIT_TIMEOUT=10
-+fi
-+
- for arg do
- 	# Check first that all requested tests are available before running any
- 	command -v > /dev/null "test_${arg}" || { echo "=== Test ${arg} not found"; usage; }
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 1e15b0818074..8a0396bfaf99 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -2520,6 +2520,7 @@ class PsampleEvent(EventSocket):
-     marshal_class = psample_msg
- 
-     def read_samples(self):
-+        print("listening for psample events", flush=True)
-         while True:
-             try:
-                 for msg in self.get():
--- 
-2.45.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
