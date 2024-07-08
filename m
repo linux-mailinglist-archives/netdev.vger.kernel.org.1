@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-109885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C45892A2DD
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:36:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D6A92A2EA
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 176A21F22013
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:36:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51FA7B24841
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1127E56B;
-	Mon,  8 Jul 2024 12:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8F278C73;
+	Mon,  8 Jul 2024 12:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DKZMfkKI"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="R02JLmEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E79C3FB94;
-	Mon,  8 Jul 2024 12:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53EC7E0F1;
+	Mon,  8 Jul 2024 12:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720442203; cv=none; b=W7hDYQqiBg80f/Piyb4Q2Wm2ybCIHuCeWZUQhZtVBo2QHx83tMs6cmo2ns2n6VXCZWySlzTZrc9SIP/r/SeF40/JPtvyuhw4MJySu1337ePi4VwvyWc9rVLQNnTTNFmWi0U+U9D+PCbFnwY+yx27b4wY6bejtzAJ6pXvhmCBe7c=
+	t=1720442303; cv=none; b=Ggv0PohLebA4rMFWRPEuFLWRf8licPZ7KXAJndSnHNhT4mMmS0pK3alP4p+P1I3NUat55n6kGYt9FaZq31vOMNhkluQKayY0HlhIGHsDjZYWoUU1udP0Jvw3N83a5PIRV6G2ka4iKgzERpRLrgt2bX8JEXx46QX356qE/HoiO78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720442203; c=relaxed/simple;
-	bh=NWykdaXYXVK8+pVTG2FcuH3+VmdY5P2EdQq6iunNcAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nPB/g9ieLjx4XOQIRUGruLb0fUq4a93PeBR3O5wQ6+kbObsEbfUQeL0YSD7VaBevzo/scHzEm3OAPeDt+Vbac8oy1qCfHp2K5uRv479oVfS0jJCoK0Pcrq4SVfGPdqzMqsGeC2zelWqzCsKbr6DQflUgAgRTCSMjmAu1Xv8V3I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DKZMfkKI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7941DC116B1;
-	Mon,  8 Jul 2024 12:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720442202;
-	bh=NWykdaXYXVK8+pVTG2FcuH3+VmdY5P2EdQq6iunNcAU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DKZMfkKIXat/MJn9ga5gS/rsVeC2r2ZMW8uFMmaqQIl+gLWharsERyViDu7MkjJqB
-	 uEsU2ZvMMPoPD7Wi8sQlOhPfXsuuZiUmUaBWJ4myyoAXnhNXDznzOgoG+aF9fltUSM
-	 OfglVx4gPfaSj3wbzvJWKLDE0rvD+T2frLBxNhd4=
-Date: Mon, 8 Jul 2024 14:36:39 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: stable@vger.kernel.org, sashal@kernel.org, ast@kernel.org,
-	keescook@chromium.org, linux-hardening@vger.kernel.org,
-	christophe.leroy@csgroup.eu, catalin.marinas@arm.com,
-	song@kernel.org, puranjay12@gmail.com, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
-	haoluo@google.com, jolsa@kernel.org, illusionist.neo@gmail.com,
-	linux@armlinux.org.uk, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	chenhuacai@kernel.org, kernel@xen0n.name, loongarch@lists.linux.dev,
-	johan.almbladh@anyfinetworks.com, paulburton@kernel.org,
-	tsbogend@alpha.franken.de, linux-mips@vger.kernel.org,
-	deller@gmx.de, linux-parisc@vger.kernel.org, iii@linux.ibm.com,
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-	borntraeger@linux.ibm.com, svens@linux.ibm.com,
-	linux-s390@vger.kernel.org, davem@davemloft.net,
-	sparclinux@vger.kernel.org, kuba@kernel.org, hawk@kernel.org,
-	netdev@vger.kernel.org, dsahern@kernel.org, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, guanwentao@uniontech.com,
-	baimingcong@uniontech.com
-Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()" for linux-6.6.37
-Message-ID: <2024070815-udder-charging-7f75@gregkh>
-References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
- <2024070631-unrivaled-fever-8548@gregkh>
- <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
+	s=arc-20240116; t=1720442303; c=relaxed/simple;
+	bh=6YTcBypVx+Kf/BJx+Vz0MGCNsTs1ZskfwUvSJLUfHV4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L5hHdHsWs136nmJC/+HY/4FTlanUqRtxMbPes1UEzeVLZuAnXYtli06AW8N3woCsGx2S/IDgZuLJSJBs/uoucVgOcgAOrAagCu1u18IEaQtXe8e+YjEMTCADoFlNszBQ1kz+wCU9I0bllEKlEp/N5QMlUItmsUUy70Li1VaXnas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=R02JLmEZ; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1720442297;
+	bh=6YTcBypVx+Kf/BJx+Vz0MGCNsTs1ZskfwUvSJLUfHV4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=R02JLmEZGJ0YDiRP82phncL9p8m9P6IKTCcHFwfFKItoAMUZRQIuX+sd2h/jnnmKT
+	 4VOfHuzBK0qEThEOM2uyUO/XaFf4TMSJ6cNUgct9+4RlSZxHs+yXoEZgIovhRyOhwK
+	 eZ9+9MDpnDH+I6tjNueG01x4heNu+xOTE5wgWweeNNXnmnG1sTiE1n3xktl1cfa5iJ
+	 R+EtuWhDWAepqOVMdTJ0qUIlzFFTJFTGDLg2CyWobilQ/uEyQ3bP7e2z2CuFMRgyGF
+	 eXAe1zUMOK2B0n8TqF7K45tq44jMp34RmzxCoDX0D/bYPsnmokH63oxYw/ZTKbZbVl
+	 H0GhvDatES7QA==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 7491160078;
+	Mon,  8 Jul 2024 12:38:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id D23182011BC;
+	Mon, 08 Jul 2024 12:38:12 +0000 (UTC)
+Message-ID: <36b8ba99-0a8d-4b06-89cc-c1cc1cceeb8b@fiberby.net>
+Date: Mon, 8 Jul 2024 12:38:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 01/10] net/sched: flower: refactor tunnel flag
+ definitions
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: netdev@vger.kernel.org, Ilya Maximets <i.maximets@ovn.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ratheesh Kannoth <rkannoth@marvell.com>,
+ Florian Westphal <fw@strlen.de>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ linux-kernel@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
+References: <20240705133348.728901-1-ast@fiberby.net>
+ <20240705133348.728901-2-ast@fiberby.net>
+ <aadf8f7c-2f99-4282-b94e-9c46c55975dd@fiberby.net>
+ <CAKa-r6u85yD=Ct4nq2xZLXLT+3vWsz+WoDZ__xS4tkpge=yf-Q@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <CAKa-r6u85yD=Ct4nq2xZLXLT+3vWsz+WoDZ__xS4tkpge=yf-Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jul 07, 2024 at 03:34:15PM +0800, WangYuli wrote:
-> 
-> On 2024/7/6 17:30, Greg KH wrote:
-> > This makes it sound like you are reverting this because of a build
-> > error, which is not the case here, right?  Isn't this because of the
-> > powerpc issue reported here:
-> > 	https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
-> > ?
-> 
-> No, it only occurs on ARM64 architecture. The reason is that before being
-> modified, the function
-> 
-> bpf_jit_binary_lock_ro() in arch/arm64/net/bpf_jit_comp.c +1651
-> 
-> was introduced with __must_check, which is defined as
-> __attribute__((__warn_unused_result__)).
-> 
-> 
-> However, at this point, calling bpf_jit_binary_lock_ro(header)
-> coincidentally results in an unused-result
-> 
-> warning.
+Hi Davide,
 
-Ok, thanks, but why is no one else seeing this in their testing?
-
-> > If not, why not just backport the single missing arm64 commit,
+On 7/8/24 12:07 PM, Davide Caratti wrote:
+> On Mon, Jul 8, 2024 at 1:12 PM Asbjørn Sloth Tønnesen<ast@fiberby.net>  wrote:
+> [...]
 > 
-> Upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory
-> management") is part of
-> 
-> a larger change that involves multiple commits. It's not an isolated commit.
-> 
-> 
-> We could certainly backport all of them to solve this problem, but it's not
-> the simplest solution.
+>> Davide, I think David Ahern would be happy [1] if you could post a new iproute2 patch,
+>> since the kernel patches should preferably hit net-next this week (due to uAPI breakage).
+> I will send an updated patch (don't use "matches" + add missing man
+> page + rename keywords [1])  in the next hours.
 
-reverting the change feels wrong in that you will still have the bug
-present that it was trying to solve, right?  If so, can you then provide
-a working version?
+Great.
 
-thanks,
+>> Nit: I would prefix all of these with "tun_".
+> "tun_" or just "tun" ? please note that each flag can have a "no"
+> prefix, so is it better
+> 
+> notuncsum
+> notundf
+> notunoam
+> notuncrit
+> 
+> or
+> 
+> notun_csum
+> notun_df
+> notun_oam
+> notun_crit
+> 
+> ?
+> 
+> (I'm for not using the underscore - but I'm open to ideas: please let me know)
 
-greg k-h
+I'm fine with no underscores, alternatively recognizing both "no" and "no_" prefixes.
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
