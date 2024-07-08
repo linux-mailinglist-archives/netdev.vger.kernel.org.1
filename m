@@ -1,139 +1,120 @@
-Return-Path: <netdev+bounces-109707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86586929A22
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 01:11:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D78929A78
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 03:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FA54280FEA
-	for <lists+netdev@lfdr.de>; Sun,  7 Jul 2024 23:11:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00F2CB20CA9
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 01:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797376F2FD;
-	Sun,  7 Jul 2024 23:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F5863C;
+	Mon,  8 Jul 2024 01:14:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="DfyPwl5T"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rRU1pcaz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF5324205
-	for <netdev@vger.kernel.org>; Sun,  7 Jul 2024 23:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF0B138C;
+	Mon,  8 Jul 2024 01:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720393856; cv=none; b=sitI8Zm0jE0nrc1CXvM8OEYAN90N+sodPMTpFKmc+yD5fNXFZCYTg4w0TrtD+EyrXKY5eJQFuRxKIeKqfi7AYPyWdtRrT36gMhevf17vhaAscPLnuT06fUG3a3lcqNb1ZfmERyu8ZA8bdObv5/pcjuS49RF3/48vCyguLHUlOJI=
+	t=1720401277; cv=none; b=bQM9fPZE2cHftCKZb1sKLBLN1cRb+WZXqCXVCBeG+zQs1w2flVqANBH1d5RURKeSQcv9nQxwoWXdU0a/D/ICw82+3ay68H0SZ7ChZ2/kCBk+yxCogKrGhYwvKA0/WvqjF0Aj/OW5Qq3872GZXdUAaRKUguP6cUqN9bFAf4L/FQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720393856; c=relaxed/simple;
-	bh=O5o/eP4LgGugCxbHwEZDgcxUBVbVn9HGYGyiaGL9Cjg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PnM+cwidwaVeSzlcuFq2k1oKjn2oLiwaZce9hnf1mAV8mppoB2MlGxNUvubq1Lt0LE0c4APkafNc1hSsEl3EJ6l60z3NrReK1pOBg9CKpIY9yzQ3udKIXjZrbv7MRtm6d4VttETqzGg0iJRS8AKXdhdqrjOb/lqqzyMtZfyEunU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=DfyPwl5T; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sQb1r-00HDW3-TN; Mon, 08 Jul 2024 01:10:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=3qVjd2mndo9/JcAYjbDgkzf53A6FUdmQfE9RK1JjNJQ=; b=DfyPwl5TB74RXrOvRndiUvZpGs
-	kJ7tHTfcY+b4DF82ZCZ1a3xpfAl4r1WFYzORAd9biRIFAjr3o4SE500yrALRf1gBTM/wBl3UEhLRm
-	By25759yAHEd5Q+/E38q+mLkvfhCQokxiiNsjqGTVMKUcmNx77uQpY14LnCcZYvPqwL46XzGodr0g
-	79/gCPCQrR/YopDrrCqm+xSqkNPqi8tAQCWnvteme5PAiTcFC620oMFa8J1MY3o1duwTQ4YNJTYYX
-	Iak/MHJ8cTghVnzcN9pwrIuFJc5H53iSkpTdwxv9SgqtENmqtfBX8VefMG/OQmmfhIhdEFztSwM7L
-	ckA1N0HA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sQb1q-0006Vi-PH; Mon, 08 Jul 2024 01:10:46 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sQb1m-00C8Gs-Ba; Mon, 08 Jul 2024 01:10:42 +0200
-Message-ID: <8820c332-53e9-4d8d-99a1-3e8b1aad188b@rbox.co>
-Date: Mon, 8 Jul 2024 01:10:41 +0200
+	s=arc-20240116; t=1720401277; c=relaxed/simple;
+	bh=EGmHsUM7ZsL9j5vb+SBvndZ+Ey2bRq7reIiZ1/jYTHc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=b8/xL38McswmwnGdJwNprl8ze27RhNBJw88meMYX3CwvqooX1/vBB51rZJILAS3k8w78UvqCrWgwXQZqXKmkoLBQFUCmSbPC0z9xVkOmWe6bOJxSFpkKTAyIBJmrnlIm1jsgZ8LzWwuTDbxtfs2jhEN4eIawwLQNQUEbCDcQ1ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rRU1pcaz; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1720401267; h=Message-ID:Subject:Date:From:To;
+	bh=P4rq0mWeMYsjQWe1jWnuZ3Q9oiMae8YokG5kTWRSh4s=;
+	b=rRU1pcaz0Q9vNgNsWIJntRm/9dKUlVpBr2PFPpV7iOMuBftjoA9dmlo83nEcEoaau49JpjUBHKn7+93Fg4zBINahhowCdNw7GZrdEMQqVrRho+/zKS3l4BYaTuXYUakfvFQriiHQYlSlkE5WjGB4Aw6ON2bms1mQQMCXXw7k1fc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0WA-WzDY_1720401265;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WA-WzDY_1720401265)
+          by smtp.aliyun-inc.com;
+          Mon, 08 Jul 2024 09:14:26 +0800
+Message-ID: <1720401065.058343-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v7 00/10] virtio-net: support AF_XDP zero copy
+Date: Mon, 8 Jul 2024 09:11:05 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: <netdev@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ <virtualization@lists.linux.dev>,
+ <bpf@vger.kernel.org>
+References: <20240705073734.93905-1-xuanzhuo@linux.alibaba.com>
+ <Zof/rP1Tn2bsWYBO@localhost.localdomain>
+In-Reply-To: <Zof/rP1Tn2bsWYBO@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH bpf v2] af_unix: Disable MSG_OOB handling for sockets in
- sockmap/sockhash
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- john.fastabend@gmail.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
- Cong Wang <cong.wang@bytedance.com>
-References: <20240622223324.3337956-1-mhal@rbox.co>
- <874j9ijuju.fsf@cloudflare.com>
- <2301f9fb-dab5-4db7-8e69-309e7c7186b7@rbox.co>
- <87tthej0jj.fsf@cloudflare.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <87tthej0jj.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 6/27/24 09:40, Jakub Sitnicki wrote:
-> On Wed, Jun 26, 2024 at 12:19 PM +02, Michal Luczaj wrote:
->> On 6/24/24 16:15, Jakub Sitnicki wrote:
->>> On Sun, Jun 23, 2024 at 12:25 AM +02, Michal Luczaj wrote:
->>>> AF_UNIX socket tracks the most recent OOB packet (in its receive queue)
->>>> with an `oob_skb` pointer. BPF redirecting does not account for that: when
->>>> an OOB packet is moved between sockets, `oob_skb` is left outdated. This
->>>> results in a single skb that may be accessed from two different sockets.
->>>>
->>>> Take the easy way out: silently drop MSG_OOB data targeting any socket that
->>>> is in a sockmap or a sockhash. Note that such silent drop is akin to the
->>>> fate of redirected skb's scm_fp_list (SCM_RIGHTS, SCM_CREDENTIALS).
->>>>
->>>> For symmetry, forbid MSG_OOB in unix_bpf_recvmsg().
->>>>
->>>> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->>>> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
->>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>>> ---
->>>
->>> [+CC Cong who authored ->read_skb]
->>>
->>> I'm guessing you have a test program that you're developing the fix
->>> against. Would you like to extend the test case for sockmap redirect
->>> from unix stream [1] to incorporate it?
->>>
->>> Sadly unix_inet_redir_to_connected needs a fix first because it
->>> hardcodes sotype to SOCK_DGRAM.
->>
->> Ugh, my last two replies got silently dropped by vger. Is there any way to
->> tell what went wrong?
-> 
-> Not sure if it was vger or lore archive. Your reply hit my inbox but is
-> nowhere to be found in the archive:> [...]
+On Fri, 5 Jul 2024 16:14:04 +0200, Michal Kubiak <michal.kubiak@intel.com> wrote:
+> On Fri, Jul 05, 2024 at 03:37:24PM +0800, Xuan Zhuo wrote:
+> > v6:
+> >     1. start from supporting the rx zerocopy
+> >
+> > v5:
+> >     1. fix the comments of last version
+> >         http://lore.kernel.org/all/20240611114147.31320-1-xuanzhuo@linux.alibaba.com
+> > v4:
+> >     1. remove the commits that introduce the independent directory
+> >     2. remove the supporting for the rx merge mode (for limit 15
+> >        commits of net-next). Let's start with the small mode.
+> >     3. merge some commits and remove some not important commits
+> >
+> > ## AF_XDP
+> >
+> > XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+> > copy feature of xsk (XDP socket) needs to be supported by the driver. The
+> > performance of zero copy is very good. mlx5 and intel ixgbe already support
+> > this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+> > feature.
+> >
+> > At present, we have completed some preparation:
+> >
+> > 1. vq-reset (virtio spec and kernel code)
+> > 2. virtio-core premapped dma
+> > 3. virtio-net xdp refactor
+> >
+> > So it is time for Virtio-Net to complete the support for the XDP Socket
+> > Zerocopy.
+> >
+> >
+>
+> After taking a look at this series I haven't found adding
+> NETDEV_XDP_ACT_XSK_ZEROCOPY flag to netdev->xdp_features.
+> Is it intentional or just an oversight?
 
-24h later mailer daemon revealed that my SMTP server got (temporarily) on
-the Spamhaus Blocklist. Oh well.
 
->> So, again, sure, I'll extend the sockmap redirect test.
-> 
-> Appreciate the help with adding a regression test, if time allows.
-> Fixes are of course very welcome even without them.
+Because there are too many commits, the work of virtio net supporting af-xdp is
+split to rx part and tx part. This patch set is for rx part. The flags will be
+update after tx part.
 
-No problem, fix along with the test sent. Let me know what you think.
+Thanks.
 
->> And regarding Rao's comment, I took a look and I think sockmap'ed TCP OOB
->> does indeed act the same way. I'll try to add that into selftest as well.n
-> 
-> Right, it does sound like we're not clearing the offset kept in
-> tcp_sock::urg_data when skb is redirected.
 
-Yeah, so I also wanted to extend the TCP's redir_to_connected(), but is
-that code correct? It seems to be testing REDIR_INGRESS, yet
-prog_stream_verdict() doesn't run bpf_sk_redirect_map() with the
-BPF_F_INGRESS flag.
 
-Thanks,
-Michal
+
+>
+> Thanks,
+> Michal
 
