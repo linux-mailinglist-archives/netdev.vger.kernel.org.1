@@ -1,140 +1,239 @@
-Return-Path: <netdev+bounces-110007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97ED592AAC0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC4192AAC6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554D21F2208B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 20:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EA931F214FE
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 20:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A6C40849;
-	Mon,  8 Jul 2024 20:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2C414D435;
+	Mon,  8 Jul 2024 20:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AWIAbczp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0vbSjz6A"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234BD1E522;
-	Mon,  8 Jul 2024 20:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3DA38FA5
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 20:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720471702; cv=none; b=OXaIeKUGeGQCm1I+dMHu1sMxcrDJM4J7ZGxQbqkX4WgHGCxwvdK5byM4whzE8465PDYWnLwh/bhaLxFhKU4pebaSGF2XSr3quUfYXZlY24F6RuULWt3Dy847m631L9dx3EA1ykbU1vMBLsIm3nH4zQAgecAHxHhav2OgSzL8+dk=
+	t=1720472017; cv=none; b=re4yNRlAUU2FbjVnI+9mnrWp91NnEq2IkFCycTkw9cAVe+585xCgJzSdbarNmrhcjtAx2intvmkSQkdMs2KvmH2zUbNvNC00xsIrWN2CedHCJz3tN8rHJC+9uz37g3qqsXlq+7Bm8HmgLnck4QoARjqxb8tHHdpVDYZgGV7JJxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720471702; c=relaxed/simple;
-	bh=2GkQsCCPDTrqvfuEafdWglVgLfi+67h0EEETS2zDisg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgWP4AmNR5pGFF3lXlbtrR1xd72RLX7r83TD4hN4DfIYQJeeOdCZeHD53pqvqladZDqbZWARJCdYLPSfIbCqT96hA1fn7iHb+xyzmQAocEKENw8kvlPmDoAVywOilamxhmplWqRNw0H0L03MM50Mzx8jJABCkAA2mK/qVdymUwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AWIAbczp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3hgADx49+dWBMpzr3NECvdFeri8qwK2tYtwt9hplSU8=; b=AWIAbczpxE+iyVV3FSvTJjZ1/l
-	GVDr99Ml4qiOU427sMzeMZFUQZZ3uAWm2ezGR1UPDoQDsEI8PmFbirOXlXNmjcAigHOB4fNX/d6wc
-	6ljXeP6arOFKM4Ql88fs7kclsO6djZxkzQUSazJlWYixCVrUnRCrJ5StazYd7HxpueOM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sQvHJ-0024dh-Cj; Mon, 08 Jul 2024 22:48:05 +0200
-Date: Mon, 8 Jul 2024 22:48:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rob Herring <robh@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	nbd@nbd.name, lorenzo.bianconi83@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	conor@kernel.org, linux-arm-kernel@lists.infradead.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com, arnd@arndb.de, horms@kernel.org
-Subject: Re: [PATCH v5 net-next 1/2] dt-bindings: net: airoha: Add EN7581
- ethernet controller
-Message-ID: <8f8a1ee1-8c6c-48d6-a794-286464c38712@lunn.ch>
-References: <cover.1720079772.git.lorenzo@kernel.org>
- <48dde2595c6ff497a846183b117ac9704537b78c.1720079772.git.lorenzo@kernel.org>
- <20240708163708.GA3371750-robh@kernel.org>
- <Zowb18jXTOw5L2aT@lore-desk>
- <CAL_JsqJPe1=K7VimSWz+AH2h4fu_2WEud_rUw1dV=SE7pY3C6w@mail.gmail.com>
+	s=arc-20240116; t=1720472017; c=relaxed/simple;
+	bh=ocjADVUWVPl7uJvP9siX3rLYCmLxg6lXBfaNA0yZCDE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z4OVD62Yh0XyOc8HGjJ8+CFM28DGFc42TXYpeI30uHN513tqipydbFaAq5bV+7EWi56oYcOVeU9AKXt+tCiSJUlD+tIoLHpapWjZnVK3ux0M3+09WeYcoGiJwfOJqKVszE3Ywq/Xj8JrbSSzUZ4JBOyf+Ad14AhfCbgqAxWqsRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0vbSjz6A; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-58ce966a1d3so1467a12.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 13:53:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720472014; x=1721076814; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7o/VFJE9viE8RFNSBOtY7P5WVTGXG54GLMUU+ZvtDxU=;
+        b=0vbSjz6Ar7uZOcJye3UIVg+37Y7RNjYzHjy+s7OA/YbuLpFyWlef7YJ6HfHCpmcV7Z
+         cDCeu5RhKzMzJeyLYoGHC4MRPKz8Y7M7PGBwo70zmgWyqPK3ceA8J+Z1YLfKIBxLL0Pb
+         FW7Yfoix/TXalTZzn8KQIdnK2BbHCqsVRrAYAI777KOZnELjreEH2zfMIJ8OSWV6Rwl5
+         +9zYoxcrxxNudAQ41v20svVHfLIKn/UY9mXxQlLFEaBq0NSJ4BbONxGRtdkSyU58Xl6e
+         a9QVjTn6o2PPGJjoYSSPZU8vT76xq+tWoG2pfo27OFJZmClkifKmv04F/zq3rhF98XOk
+         NkMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720472014; x=1721076814;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7o/VFJE9viE8RFNSBOtY7P5WVTGXG54GLMUU+ZvtDxU=;
+        b=e41C4Aw8B99+b38YPJCqcWtVDwhCAbIA2kNN/QaCIJavzRaIyOS9V/PZFa7lwQb9UM
+         ScRpXt4MeTJ9biV13Ahtl4iFIyHFQH0h/dMKSl6YGUHt6RJ5ldwFcPXN59s5A+3gvdJv
+         XGMU3JElxMCSgYWTe8dGc7qnAVBeN0YwHUSo5nEw2Xy9xNurCtr31FdG9/v80zLaqUJX
+         i4vF7NvAhuJkdaoIM1xP5mm0sx3OQCa5KMcVNADX5LxfItGA7fqOUM+MznX4lk3kqAn8
+         8IPzwbaBgPDPZ10XfARbcKTqcGPBhMshqLbv3ypiVny7qf/2oAArz2aP62YhS+hD3nI9
+         Bj6A==
+X-Forwarded-Encrypted: i=1; AJvYcCX2m0XE3a6mVeoF6Q6Ium/C/EgVfJnegzv8qvLNdkp+gDOdee0uzxGbs+gg42yi3m8++UMBanfjqrA4JCHYbJXNOfsKycDM
+X-Gm-Message-State: AOJu0Yz9G485rGF9BnidrNIXIF/+U14hsvJwL2B44I5H6Xtr0D+ESzbR
+	6swdjZt4BeFVqBWhSYk4Yzipi/lmdd85xx4vnXqFC6LaxUfahAVP/vDnpHgWOKTGwLMxwZADcqN
+	plkLd6J2BMWOKj44GuIWWOeMe49rJkCHK/X1x
+X-Google-Smtp-Source: AGHT+IEM8fylOUuo9xHH9y+mm15Ya3Rn9Xy5f23CNFGHMmUMNwua4lAkyUoMXYAFqsUn3iN5ZcF3/JHhbuqrX8nZuKk=
+X-Received: by 2002:a50:9fc1:0:b0:58b:21f2:74e6 with SMTP id
+ 4fb4d7f45d1cf-594cf64511dmr61852a12.0.1720472013983; Mon, 08 Jul 2024
+ 13:53:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqJPe1=K7VimSWz+AH2h4fu_2WEud_rUw1dV=SE7pY3C6w@mail.gmail.com>
+References: <CANn89iKMDDzRox+KC4dGGBCL+VgBSR2S8NoKYcLHR3TS4r_XqQ@mail.gmail.com>
+ <20240708192034.99704-1-kuniyu@amazon.com>
+In-Reply-To: <20240708192034.99704-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Jul 2024 13:53:19 -0700
+Message-ID: <CANn89iLmhzrbuWu0xp-+yhy64UVbO9fN45y3D-D-OMWnB-+OEQ@mail.gmail.com>
+Subject: Re: [PATCH v1 net] udp: Set SOCK_RCU_FREE earlier in udp_lib_get_port().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller@googlegroups.com, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > eth0: ethernet@1fb50000 {
-> >         compatible = "airoha,en7581-eth";
-> >         reg = <0 0x1fb50000 0 0x2600>,
-> >               <0 0x1fb54000 0 0x2000>,
-> >               <0 0x1fb56000 0 0x2000>;
-> >         reg-names = "fe", "qdma0", "qdma1";
+On Mon, Jul 8, 2024 at 12:20=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Mon, 8 Jul 2024 12:07:56 -0700
+> > On Mon, Jul 8, 2024 at 11:55=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazo=
+n.com> wrote:
+> > >
+> > > From: Eric Dumazet <edumazet@google.com>
+> > > Date: Mon, 8 Jul 2024 11:38:41 -0700
+> > > > On Mon, Jul 8, 2024 at 11:20=E2=80=AFAM Kuniyuki Iwashima <kuniyu@a=
+mazon.com> wrote:
+> > > > >
+> > > > > syzkaller triggered the warning [0] in udp_v4_early_demux().
+> > > > >
+> > > > > In udp_v4_early_demux(), we do not touch the refcount of the look=
+ed-up
+> > > > > sk and use sock_pfree() as skb->destructor, so we check SOCK_RCU_=
+FREE
+> > > > > to ensure that the sk is safe to access during the RCU grace peri=
+od.
+> > > > >
+> > > > > Currently, SOCK_RCU_FREE is flagged for a bound socket after bein=
+g put
+> > > > > into the hash table.  Moreover, the SOCK_RCU_FREE check is done t=
+oo
+> > > > > early in udp_v4_early_demux(), so there could be a small race win=
+dow:
+> > > > >
+> > > > >   CPU1                                 CPU2
+> > > > >   ----                                 ----
+> > > > >   udp_v4_early_demux()                 udp_lib_get_port()
+> > > > >   |                                    |- hlist_add_head_rcu()
+> > > > >   |- sk =3D __udp4_lib_demux_lookup()    |
+> > > > >   |- DEBUG_NET_WARN_ON_ONCE(sk_is_refcounted(sk));
+> > > > >                                        `- sock_set_flag(sk, SOCK_=
+RCU_FREE)
+> > > > >
+> > > > > In practice, sock_pfree() is called much later, when SOCK_RCU_FRE=
+E
+> > > > > is most likely propagated for other CPUs; otherwise, we will see
+> > > > > another warning of sk refcount underflow, but at least I didn't.
+> > > > >
+> > > > > Technically, moving sock_set_flag(sk, SOCK_RCU_FREE) before
+> > > > > hlist_add_{head,tail}_rcu() does not guarantee the order, and we
+> > > > > must put smp_mb() between them, or smp_wmb() there and smp_rmb()
+> > > > > in udp_v4_early_demux().
+> > > > >
+> > > > > But it's overkill in the real scenario, so I just put smp_mb() on=
+ly under
+> > > > > CONFIG_DEBUG_NET to silence the splat.  When we see the refcount =
+underflow
+> > > > > warning, we can remove the config guard.
+> > > > >
+> > > > > Another option would be to remove DEBUG_NET_WARN_ON_ONCE(), but t=
+his could
+> > > > > make future debugging harder without the hints in udp_v4_early_de=
+mux() and
+> > > > > udp_lib_get_port().
+> > > > >
+> > > > > [0]:
+> > > > >
+> > > > > Fixes: 08842c43d016 ("udp: no longer touch sk->sk_refcnt in early=
+ demux")
+> > > > > Reported-by: syzkaller <syzkaller@googlegroups.com>
+> > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > > > ---
+> > > > >  net/ipv4/udp.c | 8 +++++++-
+> > > > >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > index 189c9113fe9a..1a05cc3d2b4f 100644
+> > > > > --- a/net/ipv4/udp.c
+> > > > > +++ b/net/ipv4/udp.c
+> > > > > @@ -326,6 +326,12 @@ int udp_lib_get_port(struct sock *sk, unsign=
+ed short snum,
+> > > > >                         goto fail_unlock;
+> > > > >                 }
+> > > > >
+> > > > > +               sock_set_flag(sk, SOCK_RCU_FREE);
+> > > >
+> > > > Nice catch.
+> > > >
+> > > > > +
+> > > > > +               if (IS_ENABLED(CONFIG_DEBUG_NET))
+> > > > > +                       /* for DEBUG_NET_WARN_ON_ONCE() in udp_v4=
+_early_demux(). */
+> > > > > +                       smp_mb();
+> > > > > +
+> > > >
+> > > > I do not think this smp_mb() is needed. If this was, many other RCU
+> > > > operations would need it,
+> > > >
+> > > > RCU rules mandate that all memory writes must be committed before t=
+he
+> > > > object can be seen
+> > > > by other cpus in the hash table.
+> > > >
+> > > > This includes the setting of the SOCK_RCU_FREE flag.
+> > > >
+> > > > For instance, hlist_add_head_rcu() does a
+> > > > rcu_assign_pointer(hlist_first_rcu(h), n);
+> > >
+> > > Ah, I was thinking spinlock will not prevent reordering, but
+> > > now I see, rcu_assign_pointer() had necessary barrier. :)
+> > >
+> > >   /**
+> > >    * rcu_assign_pointer() - assign to RCU-protected pointer
+> > >    ...
+> > >    * Assigns the specified value to the specified RCU-protected
+> > >    * pointer, ensuring that any concurrent RCU readers will see
+> > >    * any prior initialization.
+> > >
+> > > will remove smp_mb() and update the changelog in v2.
+> > >
 > >
-> >         resets = <&scuclk EN7581_FE_RST>,
-> >                  <&scuclk EN7581_FE_PDMA_RST>,
-> >                  <&scuclk EN7581_FE_QDMA_RST>,
-> >                  <&scuclk EN7581_XSI_MAC_RST>,
-> >                  <&scuclk EN7581_DUAL_HSI0_MAC_RST>,
-> >                  <&scuclk EN7581_DUAL_HSI1_MAC_RST>,
-> >                  <&scuclk EN7581_HSI_MAC_RST>,
-> >                  <&scuclk EN7581_XFP_MAC_RST>;
-> >         reset-names = "fe", "pdma", "qdma", "xsi-mac",
-> >                       "hsi0-mac", "hsi1-mac", "hsi-mac",
-> >                       "xfp-mac";
+> > A similar commit was
 > >
-> >         interrupts = <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
-> >                      <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+> > commit 871019b22d1bcc9fab2d1feba1b9a564acbb6e99
+> > Author: Stanislav Fomichev <sdf@fomichev.me>
+> > Date:   Wed Nov 8 13:13:25 2023 -0800
 > >
-> >         status = "disabled";
+> >     net: set SOCK_RCU_FREE before inserting socket into hashtable
 > >
-> >         #address-cells = <1>;
-> >         #size-cells = <0>;
-> >
-> >         gdm1: mac@1 {
-> >                 compatible = "airoha,eth-mac";
-> >                 reg = <1>;
-> >                 phy-mode = "internal";
-> >                 status = "disabled";
-> >
-> >                 fixed-link {
-> >                         speed = <1000>;
-> >                         full-duplex;
-> >                         pause;
-> >                 };
-> >         };
-> > };
-> >
-> > I am using phy related binding for gdm1:mac@1 node.
+> > So I wonder if the bug could be older...
+>
+> If we focus on the ordering, the Fixes tag would be
+>
+> Fixes: ca065d0cf80f ("udp: no longer use SLAB_DESTROY_BY_RCU")
+>
+> But, at that time, we had atomic_inc_not_zero_hint() and used
+> sock_efree(), which were removed later in 08842c43d016.
+>
+> Which one should I use as Fixes: ?
 
-Hi Lorenzo
+I think the older issue might only surface with eBPF users.
 
-phy-mode is a MAC property, not a PHY property. Same for
-fixed-link. These are in ethernet-controller.yaml.
+commit 6acc9b432e6714d72d7d77ec7c27f6f8358d0c71
+Author: Joe Stringer <joe@wand.net.nz>
+Date:   Tue Oct 2 13:35:36 2018 -0700
 
-You sometimes have an network controller IP which has multiple MACs
-and some shared infrastructure. You would typically describe the
-shared infrastructure at the top level. The MACs are then listed as
-children, and they make use of ethernet-controller.yaml, and that is
-where all the network specific properties are placed. Is that what you
-are trying to do here?
+    bpf: Add helper to retrieve socket in BPF
 
-    Andrew
+The effect of the bug would be an UDP socket leak (because an
+atomic_inc_not_zero_hint() could be used
+before SOCK_RCU_FREE has been set. Then the refcount decrement would
+be avoided if the SOCK_RCU_FREE was set before it)
+
+08842c43d016 ("udp: no longer touch sk->sk_refcnt in early demux")
+added a DEBUG_NET_WARN_ON_ONCE()
+which made the bug visible.
 
