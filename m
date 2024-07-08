@@ -1,141 +1,104 @@
-Return-Path: <netdev+bounces-109880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9DC92A245
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:13:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BA992A26D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 704CB1F2279C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:13:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CEAE2810DB
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CAF13B798;
-	Mon,  8 Jul 2024 12:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4732A7EEFD;
+	Mon,  8 Jul 2024 12:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h0vvqDe8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYM6ElBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0666C7407A
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 12:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F50611712;
+	Mon,  8 Jul 2024 12:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720440495; cv=none; b=Wgdozat8D+skoOPInEoXtBI70JLk2z6U+dchOliw/f5XknlD5ZM/3LDMS+mjV3maXnYfSCHqbJrNAKao5eDk5a5v3zpqGIOs4VnB1hp+6dSUuj7+NSTgGd7xd4zeYwWcZ2m3BMa/nXvM7ZqnwqUcr8NVM2aPZutGCMac8g6R31M=
+	t=1720440839; cv=none; b=g2bmmQIy9mDaN592qzGpOqAfl/b3N8P8rby4ohvdpqGvhIvmczMUjiLjKPiOMt5PbXI6uVuj8gUxeFBYR8HSkqQvLP40PO54ldTOoiVvyBuJIKPZfMHrY/CdWfvn53HB7laOEQDi4DOFjpWAD2Z5dNC+P0XeEiDCur3YFXLQfRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720440495; c=relaxed/simple;
-	bh=CZz0OjF+N3d/uH296pPaOfWKFpaq9SpRo0F+caUTF6I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h7UFbynUK1vzjvKkLadQta9aofqooVs1681g30E3DmgXw2MtRrSTsC5RT8kI2+IeOi0iBSvbOe8hFVhJ5B1gNSPBbut5GDQhEWwJQNZIviaioBGJu7RBDfbaFUdzQ1tDKmGqzyF1tkp4LxjRmMZFmHrrCPFibd3mjuB9PlUG0us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h0vvqDe8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720440493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nwb/NHCNDPBbNOYdrz+GYj8J2TCseSslvd8sX/M8mWk=;
-	b=h0vvqDe8ogmpj3+nSGVKfQmMZMw9Hiw/9bf973evxfzsnfJs4kayuvF5qez0SUe0KeYA+Y
-	HzEhrGrjgq9pU8kLg+GZMsXFSaycgVBWJ21frk8ZllG0XaRO8R+UAS8HWr7BHYWFFGlzcH
-	MZeDg/yeH0emLnO+2fPVQ8YWYf+G+J4=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-trSzgQdxPfuQfeSRVADw-A-1; Mon, 08 Jul 2024 08:08:11 -0400
-X-MC-Unique: trSzgQdxPfuQfeSRVADw-A-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-6c9b5e3dd67so2290455a12.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 05:08:11 -0700 (PDT)
+	s=arc-20240116; t=1720440839; c=relaxed/simple;
+	bh=VIxaSTJMP4e83SuwPanq+HI++XObKHsfmXv0NSHYuak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gOezLPetDYrrzKr9Z92wa1B0JtzDOQL3rka7t1+ZTYM2StTJGs2uIW8spLlbXrFp942l3yJUSZMrRPHW97vnwXti/GlTFXRIWd1rGEqIRqQVIfQAfM0uW1yvNomw2G2itxR3wEbxEw4uFRHnfk0jvKYWSBIuWG6l5P+OWjn+xfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYM6ElBb; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4265921b0f6so16629695e9.2;
+        Mon, 08 Jul 2024 05:13:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720440836; x=1721045636; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SeeftVXSInefzAV8X4+3PNovL2BBN2pSERX3ct9/JzM=;
+        b=MYM6ElBbpldImEVXZgfNzUNjWP2NP4dfy7bex08y7BEJhuBZrJ+/4Iint+l4a/c8Gq
+         Wjw/1wdraUdHvDJLuaziMT3sox956ZqKyDb3Ahyn+VwV5qKamiJSv5PH4zZsGx+t/ABL
+         qQXH+8WhqfzpqG4XANr76AmMs1hZnmUiPkoIXS3Ueaq7h/a5nYXHqZmL1U25HX6qUc4k
+         afO2U57zsQLsghAmqLCpF5j4MKjxxUiVIH/S6aFudbZji4Ko03o/ADe5iyLG/NpoPjEY
+         W2ONxyb23GLDZsDmmQhOQLb0xt1M2dwVKraRCFsij1dHggtD16smoDaX+zxt7fv8V6tk
+         Ii0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720440490; x=1721045290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Nwb/NHCNDPBbNOYdrz+GYj8J2TCseSslvd8sX/M8mWk=;
-        b=azHosjgpMnoqhUQfrqTIBJobVSmvACVePZAHZTgF8eNYn4lQsUSsrLOQtNeuTOz48P
-         OyMkUPde9wXkXRxBCwYpccwxtWVei4VAgUo/0v/5axt6k5TTaVZpTfGrmP/lksJHLCkW
-         5u9WwHz06Ar4eg1o4GlmvFBf76CY1lEhrcA1AdkKysSvwjaB7JIOJW665mT5YJAGhqbq
-         0TdFC05OjZSrC85IqOGD3tSL9zqM5arZ90ag0z58Sm7UJEesRg11U2LxJ2Ou+rbFoFzg
-         sZlFRm/u9E2MVY+lHxUzTbEzXOJo0Uqi/9ekvt5KCqlx1E5J8wekSEkrv7RanNw9NZ8D
-         S6mQ==
-X-Gm-Message-State: AOJu0YyLEiRJLTF6f3F6hZaK3BIzG28pmD+YCY9ioFpwOBKfciB0KgFB
-	/xy1RR6esD023h03xuCyAKWgHt13FDZ1PPglKv95Z2LstqUMqGAR6X+PAITh8b/5v3PD0/bV1TR
-	zVC/40lxjEjN62Tr7eJR8Ql7L5rI3y7tOPb3VGr4tS9pnkED1059gGZr0J7e070oWNTzkmvsZb+
-	qVoIrv8crHEdc860JPdauRBeKy6oXX
-X-Received: by 2002:a17:90a:ac0d:b0:2c9:7616:dec7 with SMTP id 98e67ed59e1d1-2c99c54186fmr7125423a91.6.1720440490515;
-        Mon, 08 Jul 2024 05:08:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPwHzsQDzGu+xR3DQUoweoTT1Kf7TAdTBOw1dFR4nyWDCgQYp85Jk5+a4EU54LIpsTE9hEkS0qlGqZ3527u2o=
-X-Received: by 2002:a17:90a:ac0d:b0:2c9:7616:dec7 with SMTP id
- 98e67ed59e1d1-2c99c54186fmr7125397a91.6.1720440490094; Mon, 08 Jul 2024
- 05:08:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720440836; x=1721045636;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SeeftVXSInefzAV8X4+3PNovL2BBN2pSERX3ct9/JzM=;
+        b=GM0uMTkn1FsfIdnGofzmGpsSMXC8UjFipWCSgPReZaKb0DuVv/hBx0mUQ0pnVjl8Ah
+         gW/F5531wyVPkzNmr5jSCUXOCoQUGNkjNeHW+8xW8r4bOB7dFg/3aBShnegjgo53Canm
+         Pvd4mbnxW/K+Y0tdSgKrRwdPKOm6rk3UuNlChNVGVT8sbjQ+ccwdXTLHRJ9YOremlObD
+         1bW2EwqqPGV6uS8CFf0btbeMnajgGdp8khP6BKmX4gQEiShfDI6psemqx0c2iYF7h5Xk
+         xx/dfS1HY5h/slY3byYbeOORrTlToJdIzbozUdiKZbAVRHSCXoccdNfHWCC8P9D/FOGy
+         njJg==
+X-Forwarded-Encrypted: i=1; AJvYcCV09pZktzKnr/qPQMGi/T3v7Uybfv5eL+kd/Vr0FiiqN6vt5hK3ATZcIa/4dedeeEu0uwBu/lMQBXyPGFxtW0PKDn1+DpzlycAO3jKxgbfTuCE/GfrYRxOej2AFJbvwnMY6crPN
+X-Gm-Message-State: AOJu0YwAolfscrzidqM62kpe3h/qCdUvQ5hop0zTwNVVH3c9d67YaFog
+	34wEjYvBVPuFP/vHFk1oFP/WdZgn+Xug2wfMpMwOEZdZ1mcokqt0
+X-Google-Smtp-Source: AGHT+IEPUB/CE/7/FTo9q3R9Q6EzwdPWS0D+NTCJD5ZMdzk4Th99z0AuoS1Pisg/BbLh/WUr+c69Kg==
+X-Received: by 2002:a05:600c:2253:b0:426:5b3e:daa6 with SMTP id 5b1f17b1804b1-4265b3edee4mr51235845e9.35.1720440835759;
+        Mon, 08 Jul 2024 05:13:55 -0700 (PDT)
+Received: from skbuf ([188.25.110.57])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266303ded9sm70801745e9.34.2024.07.08.05.13.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 05:13:55 -0700 (PDT)
+Date: Mon, 8 Jul 2024 15:13:52 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christian Eggers <ceggers@arri.de>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Juergen Beisert <jbe@pengutronix.de>, Stefan Roese <sr@denx.de>,
+	Juergen Borleis <kernel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] dsa: lan9303: consistent naming for PHY address
+ parameter
+Message-ID: <20240708121352.gnhhjuvvoxpjhtpv@skbuf>
+References: <20240703145718.19951-1-ceggers@arri.de>
+ <20240703145718.19951-2-ceggers@arri.de>
+ <20240704192034.23304ee8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240705133348.728901-1-ast@fiberby.net> <20240705133348.728901-2-ast@fiberby.net>
- <aadf8f7c-2f99-4282-b94e-9c46c55975dd@fiberby.net>
-In-Reply-To: <aadf8f7c-2f99-4282-b94e-9c46c55975dd@fiberby.net>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Mon, 8 Jul 2024 14:07:58 +0200
-Message-ID: <CAKa-r6u85yD=Ct4nq2xZLXLT+3vWsz+WoDZ__xS4tkpge=yf-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 01/10] net/sched: flower: refactor tunnel flag definitions
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, Ilya Maximets <i.maximets@ovn.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Ratheesh Kannoth <rkannoth@marvell.com>, Florian Westphal <fw@strlen.de>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, linux-kernel@vger.kernel.org, 
-	Stephen Hemminger <stephen@networkplumber.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704192034.23304ee8@kernel.org>
 
-hello,
+On Thu, Jul 04, 2024 at 07:20:34PM -0700, Jakub Kicinski wrote:
+> On Wed, 3 Jul 2024 16:57:18 +0200 Christian Eggers wrote:
+> > Name it 'addr' instead of 'port' or 'phy'.
+> 
+> Unfortunately the fix has narrowly missed today's PR.
+> Please resend this for net-next in a week+.
 
-On Mon, Jul 8, 2024 at 1:12=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen <as=
-t@fiberby.net> wrote:
->
-
-[...]
-
-> Davide, I think David Ahern would be happy [1] if you could post a new ip=
-route2 patch,
-> since the kernel patches should preferably hit net-next this week (due to=
- uAPI breakage).
-
-I will send an updated patch (don't use "matches" + add missing man
-page + rename keywords [1])  in the next hours.
-thanks,
---=20
-davide
-
-[1]
-
-> Nit: I would prefix all of these with "tun_".
-
-"tun_" or just "tun" ? please note that each flag can have a "no"
-prefix, so is it better
-
-notuncsum
-notundf
-notunoam
-notuncrit
-
-or
-
-notun_csum
-notun_df
-notun_oam
-notun_crit
-
-?
-
-(I'm for not using the underscore - but I'm open to ideas: please let me kn=
-ow)
-
+How does this work? You're no longer taking 'net' patches through the
+'net' tree in the last week before the net-next pull request?
 
