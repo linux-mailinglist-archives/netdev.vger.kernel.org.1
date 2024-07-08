@@ -1,90 +1,121 @@
-Return-Path: <netdev+bounces-109932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF7392A4F7
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:44:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146D592A503
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 16:46:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA042B226A2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:44:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 457ED1C212D3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AC513E3F6;
-	Mon,  8 Jul 2024 14:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6745613FD84;
+	Mon,  8 Jul 2024 14:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgVOK1Pa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xgZ0EFau"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF84513DDAC;
-	Mon,  8 Jul 2024 14:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7761411D7
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 14:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720449879; cv=none; b=mLTAug6RUqSYlE6Z5RbgTIjgG5IGogyWo13lvaw3qjaUnrCbEyD6dh72Puguc3zGxYGnEW5ga8GR1Z32Tp8GVW+GpGDxjSqVrPhqEQd0+swRNm3RVV8LsZ5+MXokxhXCyjIuriOGjNwFe3/jtn8Zo9CAcJrIKE/V+2h0b03t5X4=
+	t=1720449973; cv=none; b=Amrx184Nb/ZF1lC8FoNMyWLO+JDTjoB8ygV2RXKYOkT0xWXIylyKbMUbIBfvvhHWNcgJYXrhL4e9C3jGAKTtQWSddL1Mbef6V5/4JJ6y2Z/0zeUCPowyxg1dColLsLfTKxMSi/VA0bis45uppRodVScn6zRvGDWiMLKpZvYiFOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720449879; c=relaxed/simple;
-	bh=XOlkof7heUnyINqmNnRU1NkGO2/QrognmlUxLHzJxxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HE4cvdP5JgRC5A1HW6WK57mCqNZAQA2cOn4yeT/scwRdBMPrbjbEMCAdRJ/u7+jABoa5C5kLipz6RgSoD7g/aqbmzIOKdHFLrIne00/Io3r49y0PnToLHBo8VdEAmoMh2UfTtDSFFyAyWdmygkAUCpCTQsLR8CgiLDM1QwpYk+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgVOK1Pa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69D20C4AF0C;
-	Mon,  8 Jul 2024 14:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720449879;
-	bh=XOlkof7heUnyINqmNnRU1NkGO2/QrognmlUxLHzJxxE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mgVOK1PaoG2+z5fHjbpQCgjbgXDapnKot4qp1Ol8fk83NoRQSblAvhGWpLebd7doa
-	 cTP+xvUle8d1sugEXAqIuHZcB+rHUGG6vynie3vHsnmM69LZjPB1deOvEjqFhXRdQS
-	 21ZNXf1aIE+qlXrG+1zwh/YndRa2Jn2WJ0fe9SkgQJEQpI1ra7RF90jQoTfFCVLp6k
-	 KbMYCsFOKi97JTR0uatjDYb29zLiR6XmbpPZVCzb8ucOrYg3uAX0iPEsNGF2hLg8sk
-	 txKlvK2edCIljuKCJg+FL/QEGqyq1Q8TzDmNDROcG8pRrzK2SqNfvNq4Mk5NNawwVV
-	 MEVJH8Vea9NZQ==
-Date: Mon, 8 Jul 2024 08:44:37 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Kamil =?iso-8859-1?Q?Hor=E1k?= <kamilh@axis.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, edumazet@google.com,
-	devicetree@vger.kernel.org, davem@davemloft.net,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
-	kuba@kernel.org, florian.fainelli@broadcom.com, krzk+dt@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 3/4] dt-bindings: ethernet-phy: add optional brr-mode
- flag
-Message-ID: <172044987681.3165374.12381204340909635857.robh@kernel.org>
-References: <20240708102716.1246571-1-kamilh@axis.com>
- <20240708102716.1246571-4-kamilh@axis.com>
+	s=arc-20240116; t=1720449973; c=relaxed/simple;
+	bh=vxyvFviWFMzdQXkmA/FIp3YzReSch2WXezG5G5z+UXc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=YbmPf5x20ehFsMZ2nWj4dlvJoQ3vlEcEU9aS092wX2ObEFpd/r3FCig5ynVmnpXO1k1dUlLmgZ9Kk786fhRimKx7artywmTF/QueucG4ErkrPnIqp+U4J9o+A4Vn9mRxoSyoKXTE2RE62i0jRdr0Qi7cvML+EAQf5pu1vLfV7Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xgZ0EFau; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-703626a0704so1005985a34.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 07:46:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720449971; x=1721054771; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YjwJEbtyvDrUjV2HV+RIgx9GLehaO/ifBmLUE3mP+44=;
+        b=xgZ0EFauDk5iDoIr/NYfW/VNRXYoOjkZOoFFRV2J096U7J+TnagGGFzhKu/0RihNyE
+         5pKz6quKNQv9mzXXmGvCkCfSyXJHJP2USx+3U5G4buJbf+dDC0ohUv4az216S0g8AigM
+         alFLRlyJv7rn+jG5CMQBdxlytgqnPb673r+xcNlLif84OM1wGSCnIvFw0NNDM+SDRqPB
+         yiCrFqscnk+kWhSkctStZS5aFXQlnSi6r2j/H8RwsDEwEv4oyweBGP2vonbGVxpjhdPI
+         qGiSArKBEVwoGD5H89cYFh9XSKxXiYblchOn1DKwubJy9YUFxvtg6OOtEsO+mjE9GYPd
+         33iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720449971; x=1721054771;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YjwJEbtyvDrUjV2HV+RIgx9GLehaO/ifBmLUE3mP+44=;
+        b=txyxrtU1uKG6Fl5THRlOKD5XPE56LIFhq+LFrtOqzdMY/9UvlewAe+AyO97uFXyITw
+         p8pvpj2BmZ2Z69fEAAo7ylyneSp2MS6IWDbYAshis/rSvYK4Z9hPX/0x5341kx51woKK
+         A0hod7KrFbsURCYdpyVZxU/sGsNgQR+1jaGSX3amm11QTVm2q2gCuwfST8XSZ7ud6Fbd
+         13cUXEMmN31qz64FSoar/srmirAkd56wQYnsuq9jSOQlsfl/+kt0edLKXirL953RAGBb
+         wAgMx8nAdHcUwg17VxoBKUb6tEJ3qW88ua1BjHJ03GpCQIjJg8oyyiVq0xWjMo+ix2Pz
+         MbBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFKuG/3WJAnzARS9kyTAttwT5wBl7cQWiFBe0xqsVQLD2oujeFYFmfBDDCHwMTCq6F25FiFG/n+XGKCJ3WEFG1+BQ39yJt
+X-Gm-Message-State: AOJu0YxMto5Tre6y6CdNhhC/T/n62on8eoVaTgnNCRYkvgXTJ+WsPOv0
+	6MgD379LxcHwogaOZSAeToXguK7RDCQAMcn1KAy8WNLz6svlIXyMwHqwpSbpYg==
+X-Google-Smtp-Source: AGHT+IGMCL1iRgwqXTdZTTit88ovRe9lrZHPjnWJmD37C9x+zcdkRU7GOewgdpnAIWilaxW6DcEicg==
+X-Received: by 2002:a9d:7f0d:0:b0:703:668f:321c with SMTP id 46e09a7af769-703668f3360mr6007303a34.20.1720449970807;
+        Mon, 08 Jul 2024 07:46:10 -0700 (PDT)
+Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-70374f88ef8sm16133a34.46.2024.07.08.07.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 07:46:10 -0700 (PDT)
+Date: Mon, 8 Jul 2024 07:46:00 -0700 (PDT)
+From: Hugh Dickins <hughd@google.com>
+To: Sagi Grimberg <sagi@grimberg.me>
+cc: Hugh Dickins <hughd@google.com>, 
+    Linus Torvalds <torvalds@linux-foundation.org>, 
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+    Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: fix rc7's __skb_datagram_iter()
+In-Reply-To: <ae4e55df-6fe6-4cab-ac44-3ed10a63bfbe@grimberg.me>
+Message-ID: <fef352e8-b89a-da51-f8ce-04bc39ee6481@google.com>
+References: <58ad4867-6178-54bd-7e49-e35875d012f9@google.com> <ae4e55df-6fe6-4cab-ac44-3ed10a63bfbe@grimberg.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240708102716.1246571-4-kamilh@axis.com>
+Content-Type: text/plain; charset=US-ASCII
 
+X would not start in my old 32-bit partition (and the "n"-handling looks
+just as wrong on 64-bit, but for whatever reason did not show up there):
+"n" must be accumulated over all pages before it's added to "offset" and
+compared with "copy", immediately after the skb_frag_foreach_page() loop.
 
-On Mon, 08 Jul 2024 12:27:15 +0200, Kamil Horák (2N) wrote:
-> There is a group of PHY chips supporting BroadR-Reach link modes in
-> a manner allowing for more or less identical register usage as standard
-> Clause 22 PHY.
-> These chips support standard Ethernet link modes as well, however, the
-> circuitry is mutually exclusive and cannot be auto-detected.
-> The link modes in question are 100Base-T1 as defined in IEEE802.3bw,
-> based on Broadcom's 1BR-100 link mode, and newly defined 10Base-T1BRR
-> (1BR-10 in Broadcom documents).
-> 
-> Add optional brr-mode flag to switch the PHY to BroadR-Reach mode.
-> 
-> Signed-off-by: Kamil Horák (2N) <kamilh@axis.com>
-> ---
->  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
+Fixes: d2d30a376d9c ("net: allow skb_datagram_iter to be called from any context")
+Signed-off-by: Hugh Dickins <hughd@google.com>
+---
+v2: moved the "n = 0" down, per Sagi: no functional change.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+ net/core/datagram.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index e9ba4c7b449d..e72dd78471a6 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -423,11 +423,12 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+ 			if (copy > len)
+ 				copy = len;
+ 
++			n = 0;
+ 			skb_frag_foreach_page(frag,
+ 					      skb_frag_off(frag) + offset - start,
+ 					      copy, p, p_off, p_len, copied) {
+ 				vaddr = kmap_local_page(p);
+-				n = INDIRECT_CALL_1(cb, simple_copy_to_iter,
++				n += INDIRECT_CALL_1(cb, simple_copy_to_iter,
+ 					vaddr + p_off, p_len, data, to);
+ 				kunmap_local(vaddr);
+ 			}
+-- 
+2.35.3
 
