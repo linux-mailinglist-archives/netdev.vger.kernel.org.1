@@ -1,137 +1,149 @@
-Return-Path: <netdev+bounces-109729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30C7929C7E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:51:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E534F929C81
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7E71F21BD8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 06:51:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 139C71C20E6C
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 06:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61936125DB;
-	Mon,  8 Jul 2024 06:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBD5171D2;
+	Mon,  8 Jul 2024 06:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4iCZRxAA";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="R10/S8Mj"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="GM4Y2HZW"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0CF1CD15;
-	Mon,  8 Jul 2024 06:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93B713AF2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 06:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720421491; cv=none; b=AqgPg1NAVNNKdJL71/JsZ30Ob0QfLoZaudbL6F3I05/kALrLP2qpFskTURUyGwk6+vmGM7KJBXDL0musIiPZ/d4EwAVEGJTJK9cmv3+qr8BulKjEZf8oQO3UGSnyJ0JF7f/6VpkpKhrB6i3Seomf3L7FFRkGimyP2tgiaR8ZgMw=
+	t=1720421546; cv=none; b=ZWLs40PP0W+dKbSCuiZ/JD1iny7rbGiWQzdpb9FYNOcvOZZq2WasfZbwp4jyViEKjX64sxy2W04bEY+sfcKdqYVc6YWDNz1fIebOuBygk3EJxxjCEW26ks21yD/YNtl8f0LbGynB64v189vf0gVpNVrL/nKc0ZeVBPSPkz4KB0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720421491; c=relaxed/simple;
-	bh=YDWJ71ySH9PSDUOkMbL//TQGDlBWMRYEpclPL1HQ34s=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iEopVlq7EtpUs70t5sFxTASfCqsNkYnJzH38FBClElWtJKjLsIZ1ehhnjzcdNq2UiwDhFcQYBKAoVQAP9BMjJLVXtp1j0W1GBPid0QK2rmaXlrBZYAdbvNwiPIyGEnLvutErWCc04Zn2YMpZvTTXAkjzv922x1HCxpg8GuiRBRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4iCZRxAA; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=R10/S8Mj; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1720421487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qSogFxSiEFX+iVqpDcSRPS2yy5AUBU3Y928D6RpPBbc=;
-	b=4iCZRxAAF+qNUv9U7b1oMhzCKgMFDfCUQyedzfVF4Q5hjuATLxXZ5D3o+wqniRRDHXT7PZ
-	GLsOUPU3JG9oyiDWhEioJaQj5xR4YvxbLLPTi4zjPe6Jql6OkbToVIxOwxddxF/tvGGLeu
-	hvXyl7vqIdmxARbwx2GZxsoid3PVTvmIRIu/pBOJ0u/AvKD0HfLCrnVR+h413xNrOBP4Nt
-	9cFM6XzM5XtD2LwIenMgilIrGpRyo+tb4LZ6I5M+C2gkzPXkOePaKzUu3Z2+8nm1wqOqAQ
-	3SoJ5RnZd71lSKHAVR44pF6bG9pBhRk8WH1uFsbnn3Kb+qgY1r8di7DNBImbVw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1720421487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qSogFxSiEFX+iVqpDcSRPS2yy5AUBU3Y928D6RpPBbc=;
-	b=R10/S8Mjx724FBJfCRLDH1si8XrMNAHAVza2jMd/O5K47FqJ/io+H9lSK5ohaELgjabaof
-	7eTHpfq+5GZg4nDQ==
-To: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, Benjamin Steinke
- <benjamin.steinke@woks-audio.com>, Sriram Yagnaraman
- <sriram.yagnaraman@est.tech>
-Cc: "intel-wired-lan@osuosl.org" <intel-wired-lan@osuosl.org>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, John Fastabend <john.fastabend@gmail.com>,
- Alexei
- Starovoitov <ast@kernel.org>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Sriram Yagnaraman <sriram.yagnaraman@est.tech>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub
- Kicinski <kuba@kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>,
- Magnus Karlsson <magnus.karlsson@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v4 0/4] igb: Add support for
- AF_XDP zero-copy
-In-Reply-To: <AS4PR07MB8412F92231A7C6E9FFAF13ED90DF2@AS4PR07MB8412.eurprd07.prod.outlook.com>
-References: <20230804084051.14194-1-sriram.yagnaraman@est.tech>
- <878qyq9838.fsf@kurt.kurt.home> <3253130.2gtjKKCVsX@desktop>
- <87cyo2fgnm.fsf@kurt.kurt.home>
- <AS4PR07MB8412F92231A7C6E9FFAF13ED90DF2@AS4PR07MB8412.eurprd07.prod.outlook.com>
-Date: Mon, 08 Jul 2024 08:51:25 +0200
-Message-ID: <87bk38fkb6.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1720421546; c=relaxed/simple;
+	bh=XGAUAZ2tJFn06FQspuaDvlm800OeXNZrlzDbL5cCwhA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UZa8I/q6/FA579NCsgqavuItQ0+J/3gghYHb2ohFTJHLUyCxujlapU1VA+r4/TCUlTT7yXXH9NwN90U8Ix8GIdAszzjidtmF8IOBtCYPh19qBSxthhuAHMPVmotj5vGOJ/dcMVLfQj3XaePS6nhyesOOkN/HHpLSHjkxC4US+7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=GM4Y2HZW; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 978F83FE20
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 06:52:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1720421536;
+	bh=HbzMAQQs0beQFPhhkJhPUz49qUwPsn+ZS8RIbID3OKs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=GM4Y2HZW8SHC3Vm6rGPVn+HMAnkgWBk2iBeNy/xmVEfJEgrwDDIKX729NbkMzyWXy
+	 ZeisYI6Q08bXwH6oANqYaExVXpMfnlHY9onZJXqsuOkcGji1DrvAuUt11bUEvdoQF4
+	 YRoIJnzyYLhtaIc9dYzb5p/kTgyxgIf0JfTixGCScUUxT4t5JziicxhFENuoZuCFLa
+	 8/QevvnQ6fvLyIpHsym8e1snbZg91S0ZYfanx/xHo8SSJWt7VDMDlFY2DsHCIvq68j
+	 fxbL2XLt152SqyKd1tNqal8tWaCoc7oDknc4QC942+i00ZzgXlGsWWlL7gM5mbbK9r
+	 fxFrE3WbiAmaw==
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7035d9b8a65so1909840a34.3
+        for <netdev@vger.kernel.org>; Sun, 07 Jul 2024 23:52:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720421535; x=1721026335;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HbzMAQQs0beQFPhhkJhPUz49qUwPsn+ZS8RIbID3OKs=;
+        b=VVUEZNYtltPo98/WHVBdLJn/on+rHDxM7NpsMwdAGUe7gcn2+kEYtvPR+LyqPv2qkP
+         NfFdyN1ZpsNZFPPK4zs98xIVgKEYUsq5P6kmNBoipirf0KtLg62arwlO1md4/Zqp7Pez
+         aq9U3MKEczUTZmzHou8Tf+CfbPh4PKiDAZzjZY0XGYycnCtjz5U+uzmUiAGoInBWsTWV
+         5GPnNKo5xcXF6QwEDpo7DHGDkCZDGjWTuRHu5hbShQMveU6IMg7TgANYcQ7DOay7rbvk
+         m/x/Cwd9rd/+CB6WVp/6JmieJPJ3vzZqf5CyDscYBpwKPtIcU6cVG9ngG1d+omCXFR0o
+         1u/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWTPDe5Gb3WdKwh/CEF72GVXNs4FJMg5JWQgzNigYjRipdBwI/ayTM72A99TwEy/pVtY8pWEigCYOX9Vhz211YWnEQ9hxRR
+X-Gm-Message-State: AOJu0YxZvPXDBY2Mi/JLfi+YJju+lVdMPI6Ufv+pbnYocMOCfrmYFO0t
+	WgvaMpSW76BDkdPYetmgr6cpz9NOyWWsVj9iAQLoEiae8f9Uv/p7KHff+f8Lu0gdEigRzvoaJeZ
+	2iS0m53yFKnpMpo9gYXCr81PlP3fRej+bXr62BvUazNJOpGt1eUJ3yQPzHR46hM9Vjm7pkg==
+X-Received: by 2002:a05:6830:4121:b0:703:5be9:7eb2 with SMTP id 46e09a7af769-7035be97fb1mr10205065a34.1.1720421535289;
+        Sun, 07 Jul 2024 23:52:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDdcN3FhbXbJhL25LGgTT9SMrkYrFZRj+Qr84KVRq4ZsIxJ4/dnZO5KZecMBqaC8bwrBJVHA==
+X-Received: by 2002:a05:6830:4121:b0:703:5be9:7eb2 with SMTP id 46e09a7af769-7035be97fb1mr10205048a34.1.1720421534961;
+        Sun, 07 Jul 2024 23:52:14 -0700 (PDT)
+Received: from solution.. (125-228-254-191.hinet-ip.hinet.net. [125.228.254.191])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b15e0cefcsm4484195b3a.166.2024.07.07.23.52.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Jul 2024 23:52:14 -0700 (PDT)
+From: Jian Hui Lee <jianhui.lee@canonical.com>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2 net] net: ethernet: mtk-star-emac: set mac_managed_pm when probing
+Date: Mon,  8 Jul 2024 14:52:09 +0800
+Message-ID: <20240708065210.4178980-1-jianhui.lee@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+The below commit introduced a warning message when phy state is not in
+the states: PHY_HALTED, PHY_READY, and PHY_UP.
+commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
 
-On Fri Jul 05 2024, Sriram Yagnaraman wrote:
->> >> It seems like it hasn't been merged yet. Do you have any plans for
->> >> continuing to work on this?
->> >
->> > I can offer to do testing and debugging on real hardware if this helps.
->>=20
->> Great. Thanks!
->
-> I have since changed my position at my company, and my new position
-> doesn't allow me to contribute upstream to kernel unfortunately.  It
-> would be great if one of you can take over this and get it delivered
-> if possible.
+mtk-star-emac doesn't need mdiobus suspend/resume. To fix the warning
+message during resume, indicate the phy resume/suspend is managed by the
+mac when probing.
 
-Ok, I'll take it over.
+Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
+Signed-off-by: Jian Hui Lee <jianhui.lee@canonical.com>
+---
+v2: apply reverse x-mas tree order declaration
 
->
-> Glad that others find this patch useful as well.=20
+v1: https://lore.kernel.org/netdev/20240703061840.3137496-1-jianhui.lee@canonical.com/
 
-Yeah, it's very useful :).
+ drivers/net/ethernet/mediatek/mtk_star_emac.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thanks,
-Kurt
+diff --git a/drivers/net/ethernet/mediatek/mtk_star_emac.c b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+index 31aebeb2e285..25989c79c92e 100644
+--- a/drivers/net/ethernet/mediatek/mtk_star_emac.c
++++ b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+@@ -1524,6 +1524,7 @@ static int mtk_star_probe(struct platform_device *pdev)
+ {
+ 	struct device_node *of_node;
+ 	struct mtk_star_priv *priv;
++	struct phy_device *phydev;
+ 	struct net_device *ndev;
+ 	struct device *dev;
+ 	void __iomem *base;
+@@ -1649,6 +1650,12 @@ static int mtk_star_probe(struct platform_device *pdev)
+ 	netif_napi_add(ndev, &priv->rx_napi, mtk_star_rx_poll);
+ 	netif_napi_add_tx(ndev, &priv->tx_napi, mtk_star_tx_poll);
+ 
++	phydev = of_phy_find_device(priv->phy_node);
++	if (phydev) {
++		phydev->mac_managed_pm = true;
++		put_device(&phydev->mdio.dev);
++	}
++
+ 	return devm_register_netdev(dev, ndev);
+ }
+ 
+-- 
+2.43.0
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmaLjG0THGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgg8DD/4m6dxBxOZ97vfUSPDyC/ylGZpAyhHp
-JXYgiBiEvhNInWbXTq7m+uDTRH1CPqHF3skmi63KnBtyWpte9jLu4XkOuqABdIpw
-9Laq2qJKbG1iqy2pvsyJg9Vc41uaatOSvE72Dr1+6EqfOGltQiZ+Pohxgi9GTvoi
-tJCs0onHuzM5OrO9tBO6HZOGnAKFYYDJYL7Cv6DVTvEyetumN56JFwCbScjBJwWm
-RGA57geCepp6i3dFf8B4ex2AROZ6lO+4I2ZTTKADZd7uqNrOR6J4Ny3U+uHHvnTm
-3TXIK0SzT0iJ/RAHgshm4oXpfHFwyYzNMxxmgcfj9Z6YLUNULEtq6lvVNi2CkVab
-wEiaWLstW72KCaDewPFzRW1sZI6plpTPIZ+wrY6HXhXFOBnV0N3a7J9IEy6SZDYz
-+oXlmfF5hCcEff6x9fAk6yppuHoMGasXAG6bWi5rUiBPsDVKrbghq6n95jENsBsv
-PHUN/YnfxnRU7kAnB0SwGq5/eUzpX05Dia832XaBI5wiAsgYNsS8+jPYF3CP69YK
-jEnPT3vUqrbjQzAFVCGX6Dg4yc+HV/+LriAjBQ2+rxkF2TkARS6rJ3jABX3MahYh
-ejrpXrgjPO0KVSNGuoMoeXb1nLpKBOEUaPgoc+kEmLOBH68aZ8/+ate/pKRR/uTh
-3v9hSKjFtK8KZg==
-=upaM
------END PGP SIGNATURE-----
---=-=-=--
 
