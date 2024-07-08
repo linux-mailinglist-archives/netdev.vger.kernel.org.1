@@ -1,57 +1,77 @@
-Return-Path: <netdev+bounces-109780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2594929EB7
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:12:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70818929EC1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E86AB206B8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E88FF1F228D3
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE004D8B6;
-	Mon,  8 Jul 2024 09:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D104C54720;
+	Mon,  8 Jul 2024 09:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwPFU+0x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KxY8xRGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BA0AD31;
-	Mon,  8 Jul 2024 09:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B8F433CA;
+	Mon,  8 Jul 2024 09:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720429920; cv=none; b=hgRDkwm+Ppv3LHzWasQzUYLDDSQVttrlTWuEK2YqEHlxHOms0u/j/FE/Y33ToXiDdqwOiWMQbQHjIqtNe8iAOBFFY++UT27Q66U6R3i0ckIYALpqN47kbA5XjEiuKzMG7sqIUnP9VTISJVWq6ZRVlV7jb7b0B4SDqO5V7ez7sDA=
+	t=1720430157; cv=none; b=qFgWzjI0XYoheppo38nsQ3Flc/FwRb/yreQZ886yE5K7La5PT4qtVO+wSJU9gtEsP8uqFNaF4yEeh8G95W4qCHfJ+9LpQ1WhATsXCa4AO/4T/ROKWsBDCYqYD6gzmWoe6d8wTVavAk7Mu/w3OQgezk1RXkFn/Z8l9kY+rhR7P9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720429920; c=relaxed/simple;
-	bh=pT2sgtwPB+Rrdne7/SbeMYcVkvH7SkEAyY48lsxW8ds=;
+	s=arc-20240116; t=1720430157; c=relaxed/simple;
+	bh=hgN66bAz8IkkTy8CvtHp3JUw6MLJpCYUWOaeBYIssMU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7x4s40A76lrreGiZlnri3JsIlD1QJwajXW6iXG3npjymbHu3pDzoQ/MK0knxH4PifjMFc9hzT1z39yq0PNH8HcNF6pqk77rhMkIz8xo8qvUF6tfCPyp9tW5xNr7oYrGp1WnG6z7wOupWTafDqwZqITGmI0Pmnsji9O2CEtE2Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwPFU+0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 420DFC4AF0A;
-	Mon,  8 Jul 2024 09:11:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720429919;
-	bh=pT2sgtwPB+Rrdne7/SbeMYcVkvH7SkEAyY48lsxW8ds=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jwPFU+0xi4bvGCirmq/hSMW6Fq3xMw5aXktER/ZZA1J/W1njpVKQouBMKZtsyg6ee
-	 vD6SUXAeYbEHeM3+iLM/D5OrQnLa+CajPf8g6Xf7Ux1CzvJNv7yBUOFPpuyGIrZ4Mh
-	 6Du3RGQOh04xgOcz3GIipuyjHCq16c7pmV6Fi9Hw+Gdqmq+WtBl61eAneTtAIUHVP6
-	 intYC9sgoxZtj/4iB4vqv3uivs4dRUoiZ/dWnRJkPMOe5PKW8p0Ap4qd3OfSCEa5a+
-	 gvNehP2MKRX3sik+Rfl8ZqdkbgDsodaIAgDmPWsWKCg0Z6j8EtkzzLL6FdtQAbq2+9
-	 Aq4RgPwvpXC/A==
-Date: Mon, 8 Jul 2024 10:11:55 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3] net: ks8851: Fix deadlock with the SPI chip variant
-Message-ID: <20240708091155.GI1481495@kernel.org>
-References: <20240706101337.854474-1-rwahl@gmx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sXVvPIi3tfdOK39cAoX97GG+9X2X7Vlmc90GAIuN8fsFb3yHXBESnwD9b5H6WclRRI0DBWLWVxzCNhiLa2M/HVYRqiu3vsp8B2unoo4SNSKwbbhU/uH15GWzXx9S9aNMSS1+PTwJl97NVd6H+SFI8IV9ye358l5MFlTBfKiQ6Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KxY8xRGs; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720430156; x=1751966156;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hgN66bAz8IkkTy8CvtHp3JUw6MLJpCYUWOaeBYIssMU=;
+  b=KxY8xRGsbd3BfyVE/R2N5+YRZGwtBnkkRG4HvzhVf3SBWU1oyIhqzt7Y
+   73eq7M+pCMgTff/EMQJTDuHQaKhj/mo5TxvhP0rUVEn/chKtu4WrijXRg
+   VbfJtrCoBiZOQzBMa1lW0+xL08SfaRhQs0HLfljiMBm4JFtTZuE5p+twm
+   yhjLF35orJVhFCO25aH12kPzMtEddz3ehXl/DSneCUEeWFLHjgHLPrAA5
+   K3U8I7ToWufxaFnYJgbJjGn/YhtG2aQlnOHLTWnqIDS2yW0Wjf2EM8s/d
+   2V58eGuPeRKMgjRTzMC0NryvNOJwtmfiVlylRGEJuyOa01zaBcjzn+noe
+   Q==;
+X-CSE-ConnectionGUID: 58YOtsXYQxultniENuwPcg==
+X-CSE-MsgGUID: rmxa/o0uSzikG/hy/tWVvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11126"; a="17437027"
+X-IronPort-AV: E=Sophos;i="6.09,191,1716274800"; 
+   d="scan'208";a="17437027"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2024 02:15:56 -0700
+X-CSE-ConnectionGUID: GrQZXYTkQeW7szw5V2SzlQ==
+X-CSE-MsgGUID: 5eqphG5pS+y70DV+Iv/DwA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,191,1716274800"; 
+   d="scan'208";a="70652136"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 08 Jul 2024 02:15:52 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sQkTO-000Ve0-01;
+	Mon, 08 Jul 2024 09:15:50 +0000
+Date: Mon, 8 Jul 2024 17:15:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Cindy Lu <lulu@redhat.com>, dtatulea@nvidia.com, mst@redhat.com,
+	jasowang@redhat.com, parav@nvidia.com, sgarzare@redhat.com,
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v3 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <202407081733.FCiMubD8-lkp@intel.com>
+References: <20240708064820.88955-2-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,71 +80,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240706101337.854474-1-rwahl@gmx.de>
+In-Reply-To: <20240708064820.88955-2-lulu@redhat.com>
 
-On Sat, Jul 06, 2024 at 12:13:37PM +0200, Ronald Wahl wrote:
-> From: Ronald Wahl <ronald.wahl@raritan.com>
-> 
-> When SMP is enabled and spinlocks are actually functional then there is
-> a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
-> and ks8851_irq:
-> 
->     watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
->     call trace:
->       queued_spin_lock_slowpath+0x100/0x284
->       do_raw_spin_lock+0x34/0x44
->       ks8851_start_xmit_spi+0x30/0xb8
->       ks8851_start_xmit+0x14/0x20
->       netdev_start_xmit+0x40/0x6c
->       dev_hard_start_xmit+0x6c/0xbc
->       sch_direct_xmit+0xa4/0x22c
->       __qdisc_run+0x138/0x3fc
->       qdisc_run+0x24/0x3c
->       net_tx_action+0xf8/0x130
->       handle_softirqs+0x1ac/0x1f0
->       __do_softirq+0x14/0x20
->       ____do_softirq+0x10/0x1c
->       call_on_irq_stack+0x3c/0x58
->       do_softirq_own_stack+0x1c/0x28
->       __irq_exit_rcu+0x54/0x9c
->       irq_exit_rcu+0x10/0x1c
->       el1_interrupt+0x38/0x50
->       el1h_64_irq_handler+0x18/0x24
->       el1h_64_irq+0x64/0x68
->       __netif_schedule+0x6c/0x80
->       netif_tx_wake_queue+0x38/0x48
->       ks8851_irq+0xb8/0x2c8
->       irq_thread_fn+0x2c/0x74
->       irq_thread+0x10c/0x1b0
->       kthread+0xc8/0xd8
->       ret_from_fork+0x10/0x20
-> 
-> This issue has not been identified earlier because tests were done on
-> a device with SMP disabled and so spinlocks were actually NOPs.
-> 
-> Now use spin_(un)lock_bh for TX queue related locking to avoid execution
-> of softirq work synchronously that would lead to a deadlock.
-> 
-> Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Cc: stable@vger.kernel.org # 5.10+
-> Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-> ---
-> V2: - use spin_lock_bh instead of moving netif_wake_queue outside of
->       locked region (doing the same in the start_xmit function)
->     - add missing net: tag
-> 
-> V3: - spin_lock_bh(ks->statelock) always except in xmit which is in BH
->       already
+Hi Cindy,
 
-I agree that this lock is now always either taken _bh,
-or in the xmit path which is executed in BH context.
+kernel test robot noticed the following build warnings:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+[auto build test WARNING on linus/master]
+[also build test WARNING on horms-ipvs/master v6.10-rc7 next-20240703]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vdpa-support-set-mac-address-from-vdpa-tool/20240708-144942
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20240708064820.88955-2-lulu%40redhat.com
+patch subject: [PATCH v3 1/2] vdpa: support set mac address from vdpa tool
+config: i386-buildonly-randconfig-005-20240708 (https://download.01.org/0day-ci/archive/20240708/202407081733.FCiMubD8-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240708/202407081733.FCiMubD8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407081733.FCiMubD8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vdpa/vdpa.c:1377:6: warning: variable 'err' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+    1377 |         if ((mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)) &&
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1378 |             nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
+         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vdpa/vdpa.c:1394:9: note: uninitialized use occurs here
+    1394 |         return err;
+         |                ^~~
+   drivers/vdpa/vdpa.c:1377:2: note: remove the 'if' if its condition is always true
+    1377 |         if ((mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)) &&
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1378 |             nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
+         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vdpa/vdpa.c:1377:6: warning: variable 'err' is used uninitialized whenever '&&' condition is false [-Wsometimes-uninitialized]
+    1377 |         if ((mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)) &&
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vdpa/vdpa.c:1394:9: note: uninitialized use occurs here
+    1394 |         return err;
+         |                ^~~
+   drivers/vdpa/vdpa.c:1377:6: note: remove the '&&' if its condition is always true
+    1377 |         if ((mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)) &&
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/vdpa/vdpa.c:1371:9: note: initialize the variable 'err' to silence this warning
+    1371 |         int err;
+         |                ^
+         |                 = 0
+   2 warnings generated.
+
+
+vim +1377 drivers/vdpa/vdpa.c
+
+  1363	
+  1364	static int vdpa_dev_net_device_attr_set(struct vdpa_device *vdev,
+  1365						struct genl_info *info)
+  1366	{
+  1367		struct vdpa_dev_set_config set_config = {};
+  1368		const u8 *macaddr;
+  1369		struct vdpa_mgmt_dev *mdev = vdev->mdev;
+  1370		struct nlattr **nl_attrs = info->attrs;
+  1371		int err;
+  1372	
+  1373		if (!vdev->mdev)
+  1374			return -EINVAL;
+  1375	
+  1376		down_write(&vdev->cf_lock);
+> 1377		if ((mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)) &&
+  1378		    nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
+  1379			set_config.mask |= BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR);
+  1380			macaddr = nla_data(nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]);
+  1381			memcpy(set_config.net.mac, macaddr, ETH_ALEN);
+  1382	
+  1383			if (mdev->ops->dev_set_attr) {
+  1384				err = mdev->ops->dev_set_attr(mdev, vdev, &set_config);
+  1385			} else {
+  1386				NL_SET_ERR_MSG_FMT_MOD(info->extack,
+  1387						       "features 0x%llx not supported",
+  1388						       BIT_ULL(VIRTIO_NET_F_MAC));
+  1389				err = -EINVAL;
+  1390			}
+  1391		}
+  1392		up_write(&vdev->cf_lock);
+  1393	
+  1394		return err;
+  1395	}
+  1396	static int vdpa_nl_cmd_dev_attr_set_doit(struct sk_buff *skb,
+  1397						 struct genl_info *info)
+  1398	{
+  1399		const char *name;
+  1400		int err = 0;
+  1401		struct device *dev;
+  1402		struct vdpa_device *vdev;
+  1403		u64 classes;
+  1404	
+  1405		if (!info->attrs[VDPA_ATTR_DEV_NAME])
+  1406			return -EINVAL;
+  1407	
+  1408		name = nla_data(info->attrs[VDPA_ATTR_DEV_NAME]);
+  1409	
+  1410		down_write(&vdpa_dev_lock);
+  1411		dev = bus_find_device(&vdpa_bus, NULL, name, vdpa_name_match);
+  1412		if (!dev) {
+  1413			NL_SET_ERR_MSG_MOD(info->extack, "device not found");
+  1414			err = -ENODEV;
+  1415			goto dev_err;
+  1416		}
+  1417		vdev = container_of(dev, struct vdpa_device, dev);
+  1418		if (!vdev->mdev) {
+  1419			NL_SET_ERR_MSG_MOD(
+  1420				info->extack,
+  1421				"Fail to find the specified management device");
+  1422			err = -EINVAL;
+  1423			goto mdev_err;
+  1424		}
+  1425		classes = vdpa_mgmtdev_get_classes(vdev->mdev, NULL);
+  1426		if (classes & BIT_ULL(VIRTIO_ID_NET)) {
+  1427			err = vdpa_dev_net_device_attr_set(vdev, info);
+  1428		} else {
+  1429			NL_SET_ERR_MSG_FMT_MOD(info->extack, "%s device not supported",
+  1430					       name);
+  1431		}
+  1432	
+  1433	mdev_err:
+  1434		put_device(dev);
+  1435	dev_err:
+  1436		up_write(&vdpa_dev_lock);
+  1437		return err;
+  1438	}
+  1439	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
