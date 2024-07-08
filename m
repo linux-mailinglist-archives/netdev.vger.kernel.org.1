@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-109911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3874D92A41B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:53:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF1592A41E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 15:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69B691C21B1A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:53:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F8D284FE5
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADF913A3FF;
-	Mon,  8 Jul 2024 13:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC9913AD07;
+	Mon,  8 Jul 2024 13:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RGMP8Tzq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rnQRsXHd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B84137923
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 13:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3BB13A3FF;
+	Mon,  8 Jul 2024 13:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720446778; cv=none; b=icMr9n1R/tXoBrB5fHMiS82+s1IQ5GfGFNT3Pee0m1NUpWd4Y58c0Z2EMV2Hh8WoWAaTxcEVJatcalP6If3TcmkHO5tTCdnMqK07Q2Z76+HZa+EreTgNbYl5NsgYKO/26K2CFPrwej8sMM/s/HlwQcXcQPIFzFKNoSXDyOloM0s=
+	t=1720446801; cv=none; b=qBxagUpdN0CXTXciV9U70OZQ8UJe8CbttKJx3KCagh4ykqm5/hcYEF0DqihQxn5OSpdTs/ZSOafmU5PYBl2hHprECRqCJas1ohW3b74RVKtxLOK+xu59vPx4U/gcPplgNZC48yWG7s46NN6unNd+ZRGtJYA+FjmC+nzwkkWjtSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720446778; c=relaxed/simple;
-	bh=Y4BaQbuYt8F1sF8Wrtz6aYSuj6Q/I8XFlw9K1Vcdx8g=;
+	s=arc-20240116; t=1720446801; c=relaxed/simple;
+	bh=4gvVWnO+4ewFU4NAR/MX4F+pX/k1QNiJ4MV6c6MS9DY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L2CobNm5ils19xfuT7+bJJw9hcvL22wgTPlKLH/3oiHt7medRBJSz8rJW9KfuNRp9dPVK1c0QboVsA/cPR3TLawdlS7h+XtFvGO3LBYbbq1PQ9Gm4+/jEKlJCHsNHNcDav0w12Mb7NAdp9qLofMkyIqmPtJaKg6lJaSsNhTRjUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RGMP8Tzq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9C0C116B1;
-	Mon,  8 Jul 2024 13:52:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720446777;
-	bh=Y4BaQbuYt8F1sF8Wrtz6aYSuj6Q/I8XFlw9K1Vcdx8g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RGMP8Tzq72Wg3XlfBFCl2MJJMKMhE/11B+fiUX20XruvA4UvO29P8MSKEkFjOTkXL
-	 Rv7ZRTVG6TkeA5LpWYiGKp1ao6ujhAvrN/yzaDvRDjUohQvPxLmyNHiplOTWoEuaPL
-	 oXSDhrX+umgjlpDaTUj+RQaLJNv9nz6t1Wwaefusx7vp1krk/TQvp5OzTRI2dxyZvf
-	 RPtrDupIy7880+ggoWpE6ORxfQu4ShCF/vwQIBjILOVSW6Lyw+yN2WfyhlOu4RwfjY
-	 KMmoiVZrEpqA4t7rFnTOA4fekSgGCQwBYLvGx0SZrk7s2EcYc3xp4qWcytVMyw4YNi
-	 VR8PzW9ghfR8A==
-Date: Mon, 8 Jul 2024 14:52:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Jan Glaza <jan.glaza@intel.com>
-Subject: Re: [PATCH iwl-next v8 3/7] ixgbe: Add link management support for
- E610 device
-Message-ID: <20240708135254.GV1481495@kernel.org>
-References: <20240704122655.39671-1-piotr.kwapulinski@intel.com>
- <20240704122655.39671-4-piotr.kwapulinski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GjlVs95jo52C9NJTGW/eGYt8tgh7ad9IaakaJMdtonkn4Xzh5KP5Nvnic9SlC4z+rMXv+tujUjB26BnaQob1GEL4XFQNlOz+wglPZj2tpqOTcPJ6xsCrERWvRFV3n1+9dWCRWq23nscm8/oBYXJtABJ0fRETwF1iPRUu08Smkv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rnQRsXHd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=p2QPqbHIw/JAoYCdkof+USdy7A/iEKc+/fFJ4UJPt/c=; b=rnQRsXHdB7EosNcr0XOiV0hM7S
+	kf9NaRiuOMX0H+80+f4/NyaZltvtNpaoX+OfQopSlOZEBTYQ8yPjincmwRnKXwjsFSmXJCLnosMeM
+	I9fc7w26QiqzaU7J4rZLt1tkLrItMGFsBJohgwto1F9loU/VaHNccT54FljMNYWKEIUk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sQonl-0022uM-SJ; Mon, 08 Jul 2024 15:53:09 +0200
+Date: Mon, 8 Jul 2024 15:53:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Guillaume La Roque <glaroque@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	MD Danish Anwar <danishanwar@ti.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ti: icssg-prueth: add missing deps
+Message-ID: <1eec9f10-9eda-4f9b-b0f8-28f25a6153ca@lunn.ch>
+References: <20240708-net-deps-v1-1-835915199d88@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,26 +61,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240704122655.39671-4-piotr.kwapulinski@intel.com>
+In-Reply-To: <20240708-net-deps-v1-1-835915199d88@baylibre.com>
 
-On Thu, Jul 04, 2024 at 02:26:51PM +0200, Piotr Kwapulinski wrote:
-> Add low level link management support for E610 device. Link management
-> operations are handled via the Admin Command Interface. Add the following
-> link management operations:
-> - get link capabilities
-> - set up link
-> - get media type
-> - get link status, link status events
-> - link power management
+On Mon, Jul 08, 2024 at 03:38:20PM +0200, Guillaume La Roque wrote:
+> Add missing dependency on NET_SWITCHDEV.
 > 
-> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Jan Glaza <jan.glaza@intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> Fixes: 5905de14c2a5 ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
+> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
 
-Thanks for addressing my review of v7.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+    Andrew
 
