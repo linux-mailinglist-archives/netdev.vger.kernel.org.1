@@ -1,171 +1,253 @@
-Return-Path: <netdev+bounces-109849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA7F92A133
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:30:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A72A692A14E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 13:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D19B81C2039E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:30:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29CD61F22065
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 11:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEDD5579F;
-	Mon,  8 Jul 2024 11:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E455D7BAE3;
+	Mon,  8 Jul 2024 11:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="V+PhPgcA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Q08iRbQ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120451DA23
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 11:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07E1101E2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 11:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720438235; cv=none; b=FkxkChp2imb9maUDil07gnPJL+q/3TIDjQMB4m1mMivQQZbov6bWG/vT/+DagNykNBUPLp+PMyzUFk/gif4NKbVmDZtEYosQPPDAuxhVt667zEs3bPZ5YllDK1FApPQFWQTlcr2iREAHWMg5H/TVdXHfyT3q9x25QExaq4g5bO0=
+	t=1720438849; cv=none; b=JbuwhpunhNjt59rsMyWTbSB/ArQ59A+KVkAClZdzctUDofjRGY2tO5k/Nsxz2ZX9I8fkRhWNhComq3EzOAhMQC9+4LYIe7b8jZelCb1T/8mM3YU9lbVdFJBUQdGK9kmUtEzztVLKjwqsqJqVU4d9HBCqUn2Wx3egOrQWHBNn6iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720438235; c=relaxed/simple;
-	bh=O2YTG3UYLoMKc5Aqhnn76lgFEpKdzLTDAhyQ0Va5vg4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgRuyNQWKlCLiBdH2rXCwECAcR0+ogL6VW8+J/9dAnhNqgHiwg0C9r0GvkLjYQ/KNS3etEFDwQuUVEg5tRgrhg413pZIoE7zdLhLjj9lqBFq1YMPWiOSV3ooYU4R9YCFY9kALZ/D9Z6mI7JwgoyPgTKN29/CEx9BJvlAEoJV690=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=V+PhPgcA; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id CED88207B2;
-	Mon,  8 Jul 2024 13:30:23 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vzaBr35fjjrE; Mon,  8 Jul 2024 13:30:23 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 3213120748;
-	Mon,  8 Jul 2024 13:30:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 3213120748
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1720438223;
-	bh=j8CcVSIfInpwl//bVS3j68qNkFK5J6DOM80hnFojlSc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=V+PhPgcAXIfKjWzaVzQ9ck1yYRESjGKiyuTHcGW8x44Vx1M0KgBcKwxvRnV41kA/f
-	 DkTa9M6zMr1/d16MG9I7rpwC88WJyWkDc8irM2L9+1xr8MwAPZo1jHte4wqc16a/PA
-	 303Ux0jBv4MWG1n/l7wndhrUFWIt9evMnGDXeTLDQ0tyZNzOeCMXweMShYwcv3eSYG
-	 YvWT/dygGamDYU67v3A0dj3SqSxLGsLznf8vdkbw/othyPgu4CF4iewquNRkWnkrqv
-	 bMaWS/qLJIDm0cBQS9m+tqgV0i5WXjZ+5CxBjpZI5aol/vDQj+0N97+0bf4Iks3ZGo
-	 hX+c6MsRHJkrA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 29EC980004A;
-	Mon,  8 Jul 2024 13:30:23 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 8 Jul 2024 13:30:22 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 8 Jul
- 2024 13:30:22 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 4C9953182B1B; Mon,  8 Jul 2024 13:30:22 +0200 (CEST)
-Date: Mon, 8 Jul 2024 13:30:22 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Mike Yu <yumike@google.com>
-CC: <netdev@vger.kernel.org>, <stanleyjhu@google.com>, <martinwu@google.com>,
-	<chiachangwang@google.com>
-Subject: Re: [PATCH ipsec 4/4] xfrm: Support crypto offload for outbound IPv4
- UDP-encapsulated ESP packet
-Message-ID: <ZovNzu58oGJv1plS@gauss3.secunet.de>
-References: <20240702084452.2259237-1-yumike@google.com>
- <20240702084452.2259237-5-yumike@google.com>
+	s=arc-20240116; t=1720438849; c=relaxed/simple;
+	bh=4DQccTifEBBNX8gHmRvfdps4Uo3dR3DK7HsIbN7lBJo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PCvsqoEcR9qsZgDRcVungjRH39KYFXgOnol79R0wHee6TxVMC0uPNmfkZaFwCDWdYW5O/G6nJKEDl6itDOyiOUlwRgl2TWxi0AkHcBd5vFiEP4HGo03wBsuUZX2vfgKgrEH95ZBjx8a8KDqxOVZ8vZL/EBTJh/dfkXoeNkmMFEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Q08iRbQ3; arc=none smtp.client-ip=209.85.218.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-a77c1658c68so392507066b.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 04:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1720438845; x=1721043645; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9Oj9hVhewV9lGX86mRsVY7ZBdhsddt781yMM5sK/aJ0=;
+        b=Q08iRbQ3UeC3aLaVdgCzH3RB59V33xQGmMtI7s0J3Gbfqo9UG9pOTCPk2KksI6ZNo6
+         K9xcAqiaj/CuhWDY/ppnHyz4bNMInr6dUbbpV3B1wtzHDKxAmVH42E/0Ctl8utRGBZhH
+         z+zfBGFbB7KNQy9qgHOIaCZYEuxZFMqsP4wfuRJ993Jg5iseOtOHhLAFktL4NC1efPIu
+         /l9/awtWGf+Crv1zV1HBeD/RnQOU2+2/6nVvOEj0hRlLC5iokkY1jyDL/OfCJYsnkY1i
+         dbvIk+2XU2db7XoqNo8USIjeJcaxVmZrbrfQaDTIgyiAOC9/N6u/9aTkoFNnL8kRW4Bv
+         iBVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720438845; x=1721043645;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Oj9hVhewV9lGX86mRsVY7ZBdhsddt781yMM5sK/aJ0=;
+        b=pvfE1SodZ4ACC3h8nC46zPnB3HaZWnD5Q2TCWZRIN15UtMd7NZmIcYwIbw9QLXz/IB
+         /7vlg1PtbElTs4GOknqura3jYTdSegdGakcq9KSvBcvBoSMwfaxEFguwfN1xyCtSVeKo
+         NztQOblIQQtDvrt7eFTz9F+dPtXZUrSMyAh928q//mSdnVbFByEZEN+nwE6UgTOUB//t
+         zNNiz5SGVG4ea9PTqIvq79W7hhOAWxtb3pqI8oR315hwgSYUkMF+RBRWpafRrf04nF+X
+         +hsO5aQ+x5MA+iW2UUZ31eBxipo+wgsRi+c2KoGYHP3wQ41xh330osHfJ4pRXarPBGpz
+         Iy7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWjHAWUvqxFt3w2SNDOBukVmsaJMSZZ3IZuycfjG4v2WtZQ5RN/1eFIy+1HEo7mK6mKWkkZkOisTvXCGZgRAI74D5ybOXtz
+X-Gm-Message-State: AOJu0Ywaitkoxr3n1enmq7dXQGTMUP/qjHAmqgB53GyE/El+/xKHLpb+
+	ea+Y1OKggpbKju1ay2yD54qfcl/dTXti4glH4wRdhzmmg/RURlvkKecKkLZRxys=
+X-Google-Smtp-Source: AGHT+IGByAobiVYXxBMrpQrkE5cUurgwnnCaXBM6PFdoW6K3shR38ZsJV83iB0L93Z7GXll4KYSabA==
+X-Received: by 2002:a17:906:897:b0:a77:eb34:3b50 with SMTP id a640c23a62f3a-a77eb343cb9mr341666566b.20.1720438844745;
+        Mon, 08 Jul 2024 04:40:44 -0700 (PDT)
+Received: from localhost (78-80-19-19.customers.tmcz.cz. [78.80.19.19])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77ec25ec18sm164889866b.39.2024.07.08.04.40.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 04:40:44 -0700 (PDT)
+Date: Mon, 8 Jul 2024 13:40:42 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Heng Qi <hengqi@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 2/5] virtio_net: enable irq for the control vq
+Message-ID: <ZovQOpmfOMs77lJ2@nanopsycho.orion>
+References: <CACGkMEtryWEbe-07-7GWyntGN+f-sL+uS0ozN0Oc6aMemmsYEw@mail.gmail.com>
+ <1718877195.0503237-9-hengqi@linux.alibaba.com>
+ <20240620060816-mutt-send-email-mst@kernel.org>
+ <20240620061109-mutt-send-email-mst@kernel.org>
+ <1718879494.952194-11-hengqi@linux.alibaba.com>
+ <ZnvI2hJXPJZyveAv@nanopsycho.orion>
+ <20240626040730-mutt-send-email-mst@kernel.org>
+ <ZnvUn-Kq4Al0nMQZ@nanopsycho.orion>
+ <20240626045313-mutt-send-email-mst@kernel.org>
+ <ZnwApCUjIijZ7o0b@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240702084452.2259237-5-yumike@google.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnwApCUjIijZ7o0b@nanopsycho.orion>
 
-On Tue, Jul 02, 2024 at 04:44:51PM +0800, Mike Yu wrote:
-> esp_xmit() is already able to handle UDP encapsulation through the call to
-> esp_output_head(). The missing part in esp_xmit() is to correct the outer
-> IP header.
-> 
-> Test: Enabled both dir=in/out IPsec crypto offload, and verified IPv4
->       UDP-encapsulated ESP packets on both wifi/cellular network
-> Signed-off-by: Mike Yu <yumike@google.com>
-> ---
->  net/ipv4/esp4.c         |  7 ++++++-
->  net/ipv4/esp4_offload.c | 14 +++++++++++++-
->  2 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> index 3968d3f98e08..cd4b52e131ce 100644
-> --- a/net/ipv4/esp4.c
-> +++ b/net/ipv4/esp4.c
-> @@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
->  {
->  	struct udphdr *uh;
->  	unsigned int len;
-> +	struct xfrm_offload *xo = xfrm_offload(skb);
->  
->  	len = skb->len + esp->tailen - skb_transport_offset(skb);
->  	if (len + sizeof(struct iphdr) > IP_MAX_MTU)
-> @@ -360,7 +361,11 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
->  	uh->len = htons(len);
->  	uh->check = 0;
->  
-> -	*skb_mac_header(skb) = IPPROTO_UDP;
-> +	// For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
-> +	// data path, which means that esp_output_udp_encap is called outside of the XFRM stack.
-> +	// In this case, the mac header doesn't point to the IPv4 protocol field, so don't set it.
+Wed, Jun 26, 2024 at 01:51:00PM CEST, jiri@resnulli.us wrote:
+>Wed, Jun 26, 2024 at 11:58:08AM CEST, mst@redhat.com wrote:
+>>On Wed, Jun 26, 2024 at 10:43:11AM +0200, Jiri Pirko wrote:
+>>> Wed, Jun 26, 2024 at 10:08:14AM CEST, mst@redhat.com wrote:
+>>> >On Wed, Jun 26, 2024 at 09:52:58AM +0200, Jiri Pirko wrote:
+>>> >> Thu, Jun 20, 2024 at 12:31:34PM CEST, hengqi@linux.alibaba.com wrote:
+>>> >> >On Thu, 20 Jun 2024 06:11:40 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>> >> >> On Thu, Jun 20, 2024 at 06:10:51AM -0400, Michael S. Tsirkin wrote:
+>>> >> >> > On Thu, Jun 20, 2024 at 05:53:15PM +0800, Heng Qi wrote:
+>>> >> >> > > On Thu, 20 Jun 2024 16:26:05 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>> >> >> > > > On Thu, Jun 20, 2024 at 4:21 PM Jason Wang <jasowang@redhat.com> wrote:
+>>> >> >> > > > >
+>>> >> >> > > > > On Thu, Jun 20, 2024 at 3:35 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>> >> >> > > > > >
+>>> >> >> > > > > > On Wed, 19 Jun 2024 17:19:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>> >> >> > > > > > > On Thu, Jun 20, 2024 at 12:19:05AM +0800, Heng Qi wrote:
+>>> >> >> > > > > > > > @@ -5312,7 +5315,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>>> >> >> > > > > > > >
+>>> >> >> > > > > > > >     /* Parameters for control virtqueue, if any */
+>>> >> >> > > > > > > >     if (vi->has_cvq) {
+>>> >> >> > > > > > > > -           callbacks[total_vqs - 1] = NULL;
+>>> >> >> > > > > > > > +           callbacks[total_vqs - 1] = virtnet_cvq_done;
+>>> >> >> > > > > > > >             names[total_vqs - 1] = "control";
+>>> >> >> > > > > > > >     }
+>>> >> >> > > > > > > >
+>>> >> >> > > > > > >
+>>> >> >> > > > > > > If the # of MSIX vectors is exactly for data path VQs,
+>>> >> >> > > > > > > this will cause irq sharing between VQs which will degrade
+>>> >> >> > > > > > > performance significantly.
+>>> >> >> > > > > > >
+>>> >> >> > > > >
+>>> >> >> > > > > Why do we need to care about buggy management? I think libvirt has
+>>> >> >> > > > > been teached to use 2N+2 since the introduction of the multiqueue[1].
+>>> >> >> > > > 
+>>> >> >> > > > And Qemu can calculate it correctly automatically since:
+>>> >> >> > > > 
+>>> >> >> > > > commit 51a81a2118df0c70988f00d61647da9e298483a4
+>>> >> >> > > > Author: Jason Wang <jasowang@redhat.com>
+>>> >> >> > > > Date:   Mon Mar 8 12:49:19 2021 +0800
+>>> >> >> > > > 
+>>> >> >> > > >     virtio-net: calculating proper msix vectors on init
+>>> >> >> > > > 
+>>> >> >> > > >     Currently, the default msix vectors for virtio-net-pci is 3 which is
+>>> >> >> > > >     obvious not suitable for multiqueue guest, so we depends on the user
+>>> >> >> > > >     or management tools to pass a correct vectors parameter. In fact, we
+>>> >> >> > > >     can simplifying this by calculating the number of vectors on realize.
+>>> >> >> > > > 
+>>> >> >> > > >     Consider we have N queues, the number of vectors needed is 2*N + 2
+>>> >> >> > > >     (#queue pairs + plus one config interrupt and control vq). We didn't
+>>> >> >> > > >     check whether or not host support control vq because it was added
+>>> >> >> > > >     unconditionally by qemu to avoid breaking legacy guests such as Minix.
+>>> >> >> > > > 
+>>> >> >> > > >     Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com
+>>> >> >> > > >     Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> >> >> > > >     Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>> >> >> > > >     Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>> >> >> > > 
+>>> >> >> > > Yes, devices designed according to the spec need to reserve an interrupt
+>>> >> >> > > vector for ctrlq. So, Michael, do we want to be compatible with buggy devices?
+>>> >> >> > > 
+>>> >> >> > > Thanks.
+>>> >> >> > 
+>>> >> >> > These aren't buggy, the spec allows this. So don't fail, but
+>>> >> >> > I'm fine with using polling if not enough vectors.
+>>> >> >> 
+>>> >> >> sharing with config interrupt is easier code-wise though, FWIW -
+>>> >> >> we don't need to maintain two code-paths.
+>>> >> >
+>>> >> >Yes, it works well - config change irq is used less before - and will not fail.
+>>> >> 
+>>> >> Please note I'm working on such fallback for admin queue. I would Like
+>>> >> to send the patchset by the end of this week. You can then use it easily
+>>> >> for cvq.
+>>> >> 
+>>> >> Something like:
+>>> >> /* the config->find_vqs() implementation */
+>>> >> int vp_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
+>>> >>                 struct virtqueue *vqs[], vq_callback_t *callbacks[],
+>>> >>                 const char * const names[], const bool *ctx,
+>>> >>                 struct irq_affinity *desc)
+>>> >> {
+>>> >>         int err;
+>>> >> 
+>>> >>         /* Try MSI-X with one vector per queue. */
+>>> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+>>> >>                                VP_VQ_VECTOR_POLICY_EACH, ctx, desc);
+>>> >>         if (!err)
+>>> >>                 return 0;
+>>> >>         /* Fallback: MSI-X with one shared vector for config and
+>>> >>          * slow path queues, one vector per queue for the rest. */
+>>> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+>>> >>                                VP_VQ_VECTOR_POLICY_SHARED_SLOW, ctx, desc);
+>>> >>         if (!err)
+>>> >>                 return 0;
+>>> >>         /* Fallback: MSI-X with one vector for config, one shared for queues. */
+>>> >>         err = vp_find_vqs_msix(vdev, nvqs, vqs, callbacks, names,
+>>> >>                                VP_VQ_VECTOR_POLICY_SHARED, ctx, desc);
+>>> >>         if (!err)
+>>> >>                 return 0;
+>>> >>         /* Is there an interrupt? If not give up. */
+>>> >>         if (!(to_vp_device(vdev)->pci_dev->irq))
+>>> >>                 return err;
+>>> >>         /* Finally fall back to regular interrupts. */
+>>> >>         return vp_find_vqs_intx(vdev, nvqs, vqs, callbacks, names, ctx);
+>>> >> }
+>>> >> 
+>>> >> 
+>>> >
+>>> >
+>>> >Well for cvq, we'll need to adjust the API so core
+>>> >knows cvq interrupts are be shared with config not
+>>> >datapath.
+>>> 
+>>> Agreed. I was thinking about introducing some info struct and pass array
+>>> of it instead of callbacks[] and names[]. Then the struct can contain
+>>> flag indication. Something like:
+>>> 
+>>> struct vq_info {
+>>> 	vq_callback_t *callback;
+>>> 	const char *name;
+>>> 	bool slow_path;
+>>> };
+>>> 
+>>
+>>Yes. Add ctx too? There were attempts at it already btw.
+>
+>Yep, ctx too. I can take a stab at it if noone else is interested.
 
-Please use networking style comments.
+Since this work is in v4, and I hope it will get merged soon, I plan to
+send v2 of admin queue parallelization patchset after that. Here it is:
+https://github.com/jpirko/linux_mlxsw/tree/wip_virtio_parallel_aq2
 
-> +	if (!xo || encap_type != UDP_ENCAP_ESPINUDP)
-> +		*skb_mac_header(skb) = IPPROTO_UDP;
->  
->  	return (struct ip_esp_hdr *)(uh + 1);
->  }
-> diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-> index b3271957ad9a..ccfc466ddf6c 100644
-> --- a/net/ipv4/esp4_offload.c
-> +++ b/net/ipv4/esp4_offload.c
-> @@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
->  	struct esp_info esp;
->  	bool hw_offload = true;
->  	__u32 seq;
-> +	int encap_type = 0;
->  
->  	esp.inplace = true;
->  
-> @@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
->  
->  	esp.esph = ip_esp_hdr(skb);
->  
-> +	if (x->encap)
-> +		encap_type = x->encap->encap_type;
->  
-> -	if (!hw_offload || !skb_is_gso(skb)) {
-> +	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
->  		esp.nfrags = esp_output_head(x, skb, &esp);
->  		if (esp.nfrags < 0)
->  			return esp.nfrags;
-> @@ -324,6 +327,15 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
->  
->  	esp.seqno = cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
->  
-> +	if (hw_offload && encap_type == UDP_ENCAP_ESPINUDP) {
-> +		// In the XFRM stack, the encapsulation protocol is set to iphdr->protocol by
-> +		// setting *skb_mac_header(skb) (see esp_output_udp_encap()) where skb->mac_header
-> +		// points to iphdr->protocol (see xfrm4_tunnel_encap_add()).
-> +		// However, in esp_xmit(), skb->mac_header doesn't point to iphdr->protocol.
-> +		// Therefore, the protocol field needs to be corrected.
+Heng, note the last patch:
+virtio_pci: allow to indicate virtqueue being slow path
 
-Same here.
+That is not part of my set, it is ment to be merged in your control
+queue patchset. Then you can just indicate cvq to be slow like this:
 
+        /* Parameters for control virtqueue, if any */
+        if (vi->has_cvq) {
+                vqs_info[total_vqs - 1].callback = virtnet_cvq_done;
+                vqs_info[total_vqs - 1].name = "control";
+                vqs_info[total_vqs - 1].slow_path = true;
+        }
+
+I just wanted to let you know this is in process so you may prepare.
+Will keep you informed.
+
+Thanks.
 
