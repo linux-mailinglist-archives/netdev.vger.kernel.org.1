@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-109815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3549592A01F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:27:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149EA92A021
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65675B20158
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:27:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9354E1F227AC
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997E8770E5;
-	Mon,  8 Jul 2024 10:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5272C78C6B;
+	Mon,  8 Jul 2024 10:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="TkZ26nDW"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="atWtePvI"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2064.outbound.protection.outlook.com [40.107.22.64])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011035.outbound.protection.outlook.com [52.101.70.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2782F156E4;
-	Mon,  8 Jul 2024 10:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9C73A27B;
+	Mon,  8 Jul 2024 10:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.35
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720434469; cv=fail; b=H+Kz9+egBwUgYX13A8YtoowdJmthtNKZ3mKEujTxORAmZpz+sswQyzmhXbkjn93kD3GYz6FUEL2GhNkHPNUIEq5GtCXqcypbG5YL3IPs1qk2wHXVe+Ap0xc+QrUSOEqU44qqhwXzWrvw9NOAHgMHwuidQNC/RSYED4i7VW+xaqI=
+	t=1720434471; cv=fail; b=SkWTqsS5/vuJKT2ijc2NSKEwO11MEwDbIumZ7SyKXDLgUMI+nieKkG20eSskdCw/XhtR8RPWf70j8w4WSDVsopP0sa5vtkLtCZtW1kg1/h4TYdcMdcgjc1FRsspYjVRx7NheeOtKooORJbc1i4RLAU941K+CLHArHqlRFbMbtyA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720434469; c=relaxed/simple;
-	bh=DMyobsf8qQnxeTaQ4m2EecN1lb23ZZ4Ht5xYmMwD0G4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b96VyUTpSXzPfNN7EAJDS0ZxeVd1exXMP0NV1KyxgFfIticA/Xed+Qtwz1vyO84c0EVu7SFvrIBE557uRPETIb9jfXWjniyxXFY2w72FvyJGj3YQmunoE0dKRR5eMICzjF4h0gzesP/7OUpyDhPL6tmnUauWAyfrzMz77EexYHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=TkZ26nDW; arc=fail smtp.client-ip=40.107.22.64
+	s=arc-20240116; t=1720434471; c=relaxed/simple;
+	bh=rY2yN9ZhJccZa678cRD8YoBWUIqI4x8dUEU6EmR2Ye0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bqpsEEGCqY1qggTq/EqzDZIUNgpB1vG9t+7DIEBz2gpQtUZKNaI51g+gBjrcUHzhFxkwczfXpL2LjTMB2i6zmO0AM6Dv5CzBeXvc0gT1UbV7JZkR5wF+PydH1HvsyiIZ3shtz0iXKGfp/xCKo6T3TdToXiGb7AQDpN2TaHugO0w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=atWtePvI; arc=fail smtp.client-ip=52.101.70.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L83H/KJjrzQLz2w5B1OL3PnB+2atGxZ9LV8sMp9g7PHsuYkanGySRerhtTTFnSsoCEvBeKNBo3tfV5Z9KORzIROq5SbFFQ26ZGreVCAvWu0h7MPDcBtAPDvm2VyChMYjlogPVPcJbGGFzO50P/QtzC0qiS0i74fIIpxA2CqqZgMtEjPvl/YbqzC/gQCNkmFpz6BIHPxZSOvCtbJh9fqUJ3fNvgwhOqpx8fZkeqFehua6NWKFH1FvTwvN9sJVqGqTKqmzBq/hekK+guZ3OHSkz4HRNymPyOy3FMzvd7GDSIeHVvKaawS5OcOyi39odXxp5Jnz+A7K5oQWiLXdSM4OeA==
+ b=ANQgYqRhyQwDaYkFolFbvQb4m1bcbQsMSs9/2iFkiIkCpvwdzf2zLsr3m5l2I1/tcIDl63TBT/9QlU7SzURLwqz7ZnWjM8JsHF911HUD5zMTXIzfDkndmtgD5hsX1UJdoUiqgXlzwEwn2WwlmBDDmYjxYt5hJD3191Re3PxFk7fRm2fcSzmSsfkBBgJn3/bct8qRGX5gnrQdyhtMjD631j9uUpkjCrYeCtKDO56e2q8/Oev+tFKSzv1KDxaWkYm6gKmdMoqadMk41oF0ObmPp6i5PcZVZ6sSF7gzsOg4vzGMf3JOn977Ny5HfGVR+HExhTQJIFulRQ4Y12dP57auGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=stMVYkJDkx/4ibqQLccd2rbLCa2SEteAH40aUQHrNfM=;
- b=Er7grGwQai4LRuZFfVK3RmSJJ6mdlH3H/uLISGTCv3phuLpRMtjnKusKg9GqcMcOwGpzAQuDMnlCy1zuBRRvQo8eszmfVqaVT6IPXgM6gxKdmMg3MGrmzgLhITKuKFWFq99s/Z1J8PH7UMlAca6J7nGrlqfptKBNUsyncYTE/72YRV4iv9NHL+7kWX9F/q8SV8oOrSHIMcRcJh5hc0X2skJEdyz6fVHmCo8pL/za8hPgmhw+CsIU8lY/FVMwmtIwWgzBNzeYHJrTTD0n7oEDSfEsF8BriviM0T+EQgcRtp9EDWfCNSfl3/F5RIn+Bs0vuCOB4IbqWVObt4qGAz8U7g==
+ bh=VrzxF+efmd49eXzkBexWj4ZUsr9TZMniEw4M8z6Onpc=;
+ b=WeFnOfKjotFg6e2v3LKpb47FO7ETyBm8OLIyH1wZ036t5JDfUFd3bPbJRPyug1yz8YcXyHAT2qJ/xVUe3u2EWg77fWh2o6DxIXtc8e7uF+Lbw6oiT6G3ysDm6qKEIbblgoxeBMNyj63TPLC9rkgrxvd+QO/5dolRhq1I+clg4e2/zlE2iAr0U1ysTMyMn6gNTJSCmwJ0YxkO99/t7NNE/4brUbFYqHd5N/24VXEBq93wIt75np1+TAqIBRGNn4vfXzsZLqJb3U7vhZ/NqpE3Cw300+FBrIBGrOYUd9xGyH6Ra2s+wLsbPSEhwk+/mJVTYTuAF5C6iOA4NUH2j9i4xw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=stMVYkJDkx/4ibqQLccd2rbLCa2SEteAH40aUQHrNfM=;
- b=TkZ26nDWV8tJ879hn1Z3VhzAVsFHiLh1degZ0qyX2AEH30LNjz0ePVCQpfxwlX1FniBNk9C3S9LOgh1+VPoPrZgbnxqiHEvUllU4sXDNUCromDaUAx0cWBcRt8OS+W8KqX+20ySTUpb1dyFzl2WBIb9nyfxIM2bU26YHHVVlnwc=
-Received: from DUZPR01CA0274.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b9::13) by AM9PR02MB7011.eurprd02.prod.outlook.com
- (2603:10a6:20b:267::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Mon, 8 Jul
- 2024 10:27:42 +0000
-Received: from DU6PEPF00009525.eurprd02.prod.outlook.com
- (2603:10a6:10:4b9:cafe::9d) by DUZPR01CA0274.outlook.office365.com
- (2603:10a6:10:4b9::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35 via Frontend
- Transport; Mon, 8 Jul 2024 10:27:42 +0000
+ bh=VrzxF+efmd49eXzkBexWj4ZUsr9TZMniEw4M8z6Onpc=;
+ b=atWtePvIXFpo1IhPLa9OhJV1tHH0KqRuA6kw8SDfs0ZR4+arK3aBMqVEwNzaWnEFp+ecylhGHYw328uSvXJxzRX/7316x4aB6iIiIDdmVGbmXAlT8LtoZ8pbkfOYoZ/bk084FvJTUvnUYG8+UUjaWYFKCypHvQVVdEJKnj3Eafw=
+Received: from DU2PR04CA0073.eurprd04.prod.outlook.com (2603:10a6:10:232::18)
+ by PAVPR02MB9642.eurprd02.prod.outlook.com (2603:10a6:102:301::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.30; Mon, 8 Jul
+ 2024 10:27:45 +0000
+Received: from DU6PEPF00009524.eurprd02.prod.outlook.com
+ (2603:10a6:10:232:cafe::f1) by DU2PR04CA0073.outlook.office365.com
+ (2603:10a6:10:232::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.26 via Frontend
+ Transport; Mon, 8 Jul 2024 10:27:45 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
  smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
  action=none header.from=axis.com;
@@ -62,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of 2n.com designates
  195.60.68.100 as permitted sender) receiver=protection.outlook.com;
  client-ip=195.60.68.100; helo=mail.axis.com; pr=C
 Received: from mail.axis.com (195.60.68.100) by
- DU6PEPF00009525.mail.protection.outlook.com (10.167.8.6) with Microsoft SMTP
+ DU6PEPF00009524.mail.protection.outlook.com (10.167.8.5) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7762.17 via Frontend Transport; Mon, 8 Jul 2024 10:27:40 +0000
+ 15.20.7762.17 via Frontend Transport; Mon, 8 Jul 2024 10:27:44 +0000
 Received: from pcczc3457tyd.2n.cz.axis.com (10.0.5.60) by se-mail01w.axis.com
  (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 8 Jul
- 2024 12:27:40 +0200
+ 2024 12:27:43 +0200
 From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20=282N=29?= <kamilh@axis.com>
 To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
 	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
@@ -77,10 +78,12 @@ To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
 	<conor+dt@kernel.org>
 CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v11 0/4] net: phy: bcm5481x: add support for BroadR-Reach mode
-Date: Mon, 8 Jul 2024 12:27:12 +0200
-Message-ID: <20240708102716.1246571-1-kamilh@axis.com>
+Subject: [PATCH v11 1/4] net: phy: bcm54811: New link mode for BroadR-Reach
+Date: Mon, 8 Jul 2024 12:27:13 +0200
+Message-ID: <20240708102716.1246571-2-kamilh@axis.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240708102716.1246571-1-kamilh@axis.com>
+References: <20240708102716.1246571-1-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,125 +96,137 @@ X-ClientProxiedBy: se-mail01w.axis.com (10.20.40.7) To se-mail01w.axis.com
  (10.20.40.7)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009525:EE_|AM9PR02MB7011:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4b0ebd0-40f3-41da-559c-08dc9f3898d1
+X-MS-TrafficTypeDiagnostic: DU6PEPF00009524:EE_|PAVPR02MB9642:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2af525cb-6a39-4c96-56a3-08dc9f389abc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|7416014|36860700013|921020;
+	BCL:0;ARA:13230040|7416014|82310400026|376014|1800799024|36860700013|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SjdBdTVVeFA5Z3VNc2pLWmhhUEhYcy90OGtaOGUrTmRRNkxvRjIwdk5ML1hB?=
- =?utf-8?B?UlJVTGljbFV5Z2NPaVVielExdjBRWWV6K1NuSnIwMXUwcUxDYk5hUlFyVmdm?=
- =?utf-8?B?T2hlRXJOWjFxVjhnd2ZwSmNWUDFTREpBN2lodTZ1bUdhRDZrQjloZ1ZtNzR0?=
- =?utf-8?B?anNrTmxHQmF3SVhkaUZONDVwTVd5Z0NwQ1RGekxBTE5XTU9RdnZLSmxXL0Iy?=
- =?utf-8?B?VytwNjlKajMyUkgzUkF4ZzR5MDVCZ2lyOFNmNXZDdDJBSVFlSTNIZmVwbEZY?=
- =?utf-8?B?QXlaZDliY0hoSnROa2VvRDNxbnNtN1UyWFVBWklvcjZQQ2hMakMxdS94VHIz?=
- =?utf-8?B?NzQrc0NUS2pmbkRVZTVheVdWekVaZDdCTDZuaVVsdGdIc0NTZXlUUzZMRHNQ?=
- =?utf-8?B?Q2N0MWJRZERRc3J2eFdQUGhOZnFPalZYVXp5ZktRbWt0b3BSZTFYb0I4Wmtx?=
- =?utf-8?B?cVRkRUdNSXhwUHdYRzkzREVadktGTXlyZFJNMjNiZUxIb3lQdnFwRmVwRVh0?=
- =?utf-8?B?ck9abE52amdHN0g2ckh3bFRFNmx1bzNlN3J1dkU1ZFdFeU42eldVUFJGYnRa?=
- =?utf-8?B?ZDM3dkwrakRlN3dyK1QvRHc1WERraEFITVBjbkRLRXdScnNpRVRhNUJLcmJp?=
- =?utf-8?B?QUFtTWgyeElodG0vTzlDUTBZeEdPWVE3RW45M3RKRjZ6eDhDa0Nsc1AvMGV2?=
- =?utf-8?B?QW5Jd3lYOUNuZng1eDZpbFlyWWFKQllmOW5rR3oyR2QrTEMxRWdMMTcvclRs?=
- =?utf-8?B?TGFqM0c1NFozbzZINk5jalBTalI2SVJ0SWRLNFBGVUdsbnh6K0ZZTWhaNjZh?=
- =?utf-8?B?SnhoRFRKVlRZd3NVSmNKV3VtMkR2aDVpcWVZR25rS1FSWDNwWjRhNTNyZHFZ?=
- =?utf-8?B?a3EzMndOcyttb29RMzlaaEZ5a0ZnYjJhWWpWQlNFWHN1M0lwTHNhWjZtb29W?=
- =?utf-8?B?ZDBRbTA3YWpVRk5lNlZSYnR4a21ZZ08rbFhIRmZCZWhhY252RjFrRFRzcW9Q?=
- =?utf-8?B?ZSsvWi91QkFyaXhIRXV0S1lycGkvM3pPYlRVTUZFd0NyK0p6cHVIYkFuMDlR?=
- =?utf-8?B?UmU3MGFWNFN2eGtkL0xsR09sM01HRGlobXVOU3RlWGQ1N25ySzhBWFBWVjZ1?=
- =?utf-8?B?R09wSkU5ODdZZnpmQjJUdzhmYmlTUW1GaUtjTk9EOFFpa1Z1cTVMY3pWWjlk?=
- =?utf-8?B?djRvdGxpYmR1NUhKQVA4TDEvOHc4Wi85VkE1STMyWDVBTFMyN2VuaG5VdVhs?=
- =?utf-8?B?Z3J3RVZOQXc2VWtqQW5yMit6ZTdMaHJMeGwrR3VaeWo4NC9Xam5QR2t4RjRF?=
- =?utf-8?B?U0tpOUFTRmlXLy9oVm5qQ1Myc0JuSmY0MUxnejc5bEVaSFp3NDdlNDVLbUdz?=
- =?utf-8?B?YkhyZjloeFUzQlBiMTYyTkp1UHZEbDJGdmk2enBIUSs4TFd6S1dsdmVNS3A3?=
- =?utf-8?B?Tyt4RVloUG5RTHRDRWk4bDZVNkpUbHlWNk1iU1o0U2FrbDBoSE85cjB3czJt?=
- =?utf-8?B?ajJCclZxOU5vbms2dWNvVzJENnhsNzNqVXpaOXRkb2VER1FKK3ZaMVlRSWxU?=
- =?utf-8?B?WXQ2cjNyU3NJaVJYMGM3REVWSzU1TVI2KytUdkJwL0VpazNNY2N4cktscDdj?=
- =?utf-8?B?c0Jhc1FDcGVoVVlPUzhVVUtaZGNGQldvOG9uS0F5TFZqdDMzZzNEZnNubC9T?=
- =?utf-8?B?aThTWllSQWc3R2V2SngrR2FrdDIzOUVGYXRZUHV0N29tRFg0VEc3U2dvWWI4?=
- =?utf-8?B?cGJtbG5xdW9tSXJSR0lFaG1qanRja3E0MnozblN5OWcrOHNYaGcwdkJ6ckxP?=
- =?utf-8?B?RWtBQ2dZSklEdEdxeHJ3N1ljUFJhS3o4dEVpVE5naVBoOFQxSHV4V1ZoN0pE?=
- =?utf-8?B?azdxWEU0ZDFjRm9qbUtPbUxOVHFNemlFbzYyREhaNURydHZBeC9xQ1QyTDFv?=
- =?utf-8?B?KzBOWExyN25ZYjZzUmFVeEl6RHpyYzJ3RzBiYWxLVmVWYmMzU1hpN1VaRWpT?=
- =?utf-8?B?dHpzTEZYYVR3PT0=?=
+	=?utf-8?B?UVZzbW9Bekt5STE4Q2c0UHB5dFNSMHpzMHlrYzErS0Zvd0diODMvd25wU3BU?=
+ =?utf-8?B?NTdNTUJOdlZHVEFVY2wvZHRlNmMwOTg3aGZFYitkQkw2aHlkTC9xRVZ6TXZJ?=
+ =?utf-8?B?b1pMTkE3Q2EyYzBoaFU2Sm9ONS9KdDZRSmhWeEhjRjN3blA1ZnIzK1hSWTZ3?=
+ =?utf-8?B?KzV1RVdyd3FmNHFPdVYzMUk4eFdGZkRWQjVaT3ZvTThHa1NZUDE0SlBNd2M4?=
+ =?utf-8?B?aUZ2RVFldHRuT3VncTlJYU14ZGNZRE1PZXRsL2ZWdms5NDh3THVwVlRJczhU?=
+ =?utf-8?B?Z1hDRjdVYVlkSXAxN1NrY0ZWMk16SjVVdG5jQU9CZGUxOVh2VDEyZG5FZDRp?=
+ =?utf-8?B?YitmMXBSTVUrMjhhMXp6aGNENndHMEU0TEk0SkEzN3ROSkoyZGIwVWpZKzZL?=
+ =?utf-8?B?QVFQUFN0YVVhaFpKVmw3U3RkT0lONm01a1BiaWJWOEpZWGh0b1YyRGhZT0k0?=
+ =?utf-8?B?M0wzdHY1cXdvSUNwanExV0QySG9JdmZ5YjFpQnZteEU5Y0FzM3R0ZG5uUi9i?=
+ =?utf-8?B?dU9LNTFHYjBPZXpqUGV0UHI3SVFpTmd1dUZJb0NMZmpwdWJhT0o1dDRnYlhB?=
+ =?utf-8?B?bU91bXYzdzI1SlNHOExxVFU0b1ZCUXVQclpaWDdsWGI4NyswOStpaGphMTMx?=
+ =?utf-8?B?aVNiYmFpcmluNEZaV1N6RTRQSFVIckJGWmNIVCtyQjFBa3pvZjF2K2xmUHcy?=
+ =?utf-8?B?UGt2MHlHTlhCdzBqRUs3K2VidUh2K1hQbm5ac3NOQjRCa1J0N1BuVklmckht?=
+ =?utf-8?B?MlZSYkNPZFpLN212L1prcUVzQnV2dHQ5ckJzYkdEZ0ZHTnh5Q0hYRmxhTDZq?=
+ =?utf-8?B?emJOSlBsditzNllmZnhKTXZrZ2V0ak9BVDVFamtoa2NzQ3BnRzd5Zlg1bTNy?=
+ =?utf-8?B?cm5SeUt1a2RvZ1F1NkRqOEsyTkMzSUN1Qk40b0VEWldMQk82WWVlaXBraEtr?=
+ =?utf-8?B?aGw4cGFMQXg4S3R2cW15cEVhczBOTWNreEtmeEY3d1dGWWxwNUg3YW5iazBR?=
+ =?utf-8?B?TTNUbmFlTE9rTkhkaU9NVWR4TkJqVkpDalZJV2hjOCtodnJTYlk2a0FEdmhk?=
+ =?utf-8?B?ZGZTd0Y1UjZEMEZWd3JQc3hFVlZ6WkhZdHEzZ1N0NVFUZVdEMDdrM0RkZFBk?=
+ =?utf-8?B?UXdaUnRLa1IwVjFsYlJ5T0MxN3daV0c4VEFGZ0tPaEN4TkxacVdUSUViamxS?=
+ =?utf-8?B?V0dnanorSFdDbGl4ZFpSbHFYTjFYSnk3RnIxZ01Pc2htWjF2Sm9jekdOSE1w?=
+ =?utf-8?B?cU9iSzhsNDcvcElhTjNyV1AzOW9hb0lzTkh4aTZ0RXRzam9HTzBTa0lhb1RI?=
+ =?utf-8?B?K0VhSGVobUtGbWtucW9JbUlSa1dkYnBtSmF3RmcySis2SVJwcmlzbzJsd3F5?=
+ =?utf-8?B?MGxjWUxkNlI3RGpmTFpDVTFzWXlLZGZrbVpZeGdCN2RneFV6N0JoMzhDQnVv?=
+ =?utf-8?B?S1B4RGRuejBiYW9DUG96RmhsOU1nNVJtTEpSQVlVUzF5K08yVFp4TWV2RWdu?=
+ =?utf-8?B?VWlpMXdtN01sRkk4eFZLaDVwSjg4YTRGSEdxZ1I1YXJpZGlESGpmblRlNWN1?=
+ =?utf-8?B?eVExNk83ZHd5bmhlbjhrQ2FCUE5ITFhhVjdZZktGaVZicHJtTFBGMk50RTZG?=
+ =?utf-8?B?QVFIaVE0ckdlUFM1OStnTlp2bm9vUjgwWUc4dGQ5RW8xVzI5RkZpUDF1Wi9p?=
+ =?utf-8?B?Y1d4cVFGOVpSZEV6T1grK2NCWmo2T1gyWjZYUnRqdCtmQkwrS0F1VWNKNVZr?=
+ =?utf-8?B?YVF5ZXN1YWhMWllKYTBMVzBUSjdkSEc0b2tWT1JERVUzNUhLcUJEQS9CRkg5?=
+ =?utf-8?B?ZVNlZ2JoQ2NWNWhCa2t6SmkxR2E2bTZSYnZvMG1rV1V1R25KWE9UWjczMGpw?=
+ =?utf-8?B?N09kbEoyeWZjMVVZRHFHNVFjNkM4K1dSWGxGNHBvOHoxSVBJVzI1enFxVGZq?=
+ =?utf-8?B?ekNJcVJReHdMRFBvd25pd3lTdy9OazJScTRHNDlDeHZNRlI3aXJZNWRxMHI0?=
+ =?utf-8?B?b1ZxaWtQUGVBPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(7416014)(36860700013)(921020);DIR:OUT;SFP:1101;
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(376014)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2024 10:27:40.9827
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2024 10:27:44.1849
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4b0ebd0-40f3-41da-559c-08dc9f3898d1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2af525cb-6a39-4c96-56a3-08dc9f389abc
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009525.eurprd02.prod.outlook.com
+	DU6PEPF00009524.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR02MB7011
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR02MB9642
 
-PATCH 1 - Add the 10baseT1BRR_Full link mode
+Introduce a new link mode necessary for 10 MBit single-pair
+connection in BroadR-Reach mode on bcm5481x PHY by Broadcom.
+This new link mode, 10baseT1BRR, is known as 1BR10 in the Broadcom
+terminology. Another link mode to be used is 1BR100 and it is already
+present as 100baseT1, because Broadcom's 1BR100 became 100baseT1
+(IEEE 802.3bw).
 
-PATCH 2 - Add the definitions of LRE registers, necessary to use
-   BroadR-Reach modes on the BCM5481x PHY
+Signed-off-by: Kamil Horák (2N) <kamilh@axis.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+ drivers/net/phy/phy-core.c   | 3 ++-
+ include/uapi/linux/ethtool.h | 1 +
+ net/ethtool/common.c         | 3 +++
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-PATCH 3 - Add brr-mode flag to switch between IEEE802.3 and BroadR-Reach
-
-PATCH 4 - Implementation of the BroadR-Reach modes for the Broadcom
-   PHYs
-
-Changes in v2:
-  - Divided into multiple patches, removed useless link modes
-
-Changes in v3:
-  - Fixed uninitialized variable in bcm5481x_config_delay_swap function
-
-Changes in v4:
-  - Improved the division of functions between bcm-phy library and broadcom.c
-  - Changed the BroadR-Reach / IEEE mode switching to device tree boolean as
-    these modes are mutually exclusive and barely could coexist in one hardware
-  - Made the link mode selection compatible with current ethtool (i.e. the
-    linkmode is selected by choosing speed and master-slave)
-
-Changes in v5:
-  - Fixed the operator precedence as reported by the kernel test robot
-  - Fixed doc of bcm_linkmode_adv_to_mii_adv_t function
-
-Changes in v6:
-  - Moved the brr-mode flag to separate commit as required by the rules for 
-    DT binding patches
-  - Renamed some functions to make clear they handle LRE-related stuff
-  - Reordered variable definitions to match the coding style requirements
-
-Changes in v7:
-  - Fixed the changes distribution into patches (first one was not buildable)
-
-Changes in v8:
-  - Fixed coding style and did other changes on behalf of the reviewers
-
-Changes in v9:
-  - Applied reviewed tags to unchanged commits, reformatted the submitter's address
-
-Changes in v10:
-  - Fixed minor CR issues, clarified the embedded documentation and the commit message
-
-Changes in v11:
-  - Reworded the brr-mode flag documentation
-
-Kamil Horák (2N) (4):
-  net: phy: bcm54811: New link mode for BroadR-Reach
-  net: phy: bcm54811: Add LRE registers definitions
-  dt-bindings: ethernet-phy: add optional brr-mode flag
-  net: phy: bcm-phy-lib: Implement BroadR-Reach link modes
-
- .../devicetree/bindings/net/ethernet-phy.yaml |   8 +
- drivers/net/phy/bcm-phy-lib.c                 | 115 +++++
- drivers/net/phy/bcm-phy-lib.h                 |   4 +
- drivers/net/phy/broadcom.c                    | 405 +++++++++++++++++-
- drivers/net/phy/phy-core.c                    |   3 +-
- include/linux/brcmphy.h                       |  88 ++++
- include/uapi/linux/ethtool.h                  |   1 +
- net/ethtool/common.c                          |   3 +
- 8 files changed, 608 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index a235ea2264a7..1f98b6a96c15 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -13,7 +13,7 @@
+  */
+ const char *phy_speed_to_str(int speed)
+ {
+-	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 102,
++	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 103,
+ 		"Enum ethtool_link_mode_bit_indices and phylib are out of sync. "
+ 		"If a speed or mode has been added please update phy_speed_to_str "
+ 		"and the PHY settings array.\n");
+@@ -266,6 +266,7 @@ static const struct phy_setting settings[] = {
+ 	PHY_SETTING(     10, FULL,     10baseT1S_Full		),
+ 	PHY_SETTING(     10, HALF,     10baseT1S_Half		),
+ 	PHY_SETTING(     10, HALF,     10baseT1S_P2MP_Half	),
++	PHY_SETTING(     10, FULL,     10baseT1BRR_Full		),
+ };
+ #undef PHY_SETTING
+ 
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index e011384c915c..54b31344961d 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -1863,6 +1863,7 @@ enum ethtool_link_mode_bit_indices {
+ 	ETHTOOL_LINK_MODE_10baseT1S_Full_BIT		 = 99,
+ 	ETHTOOL_LINK_MODE_10baseT1S_Half_BIT		 = 100,
+ 	ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT	 = 101,
++	ETHTOOL_LINK_MODE_10baseT1BRR_Full_BIT		 = 102,
+ 
+ 	/* must be last entry */
+ 	__ETHTOOL_LINK_MODE_MASK_NBITS
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 6b2a360dcdf0..82ba2ca98d4c 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -211,6 +211,7 @@ const char link_mode_names[][ETH_GSTRING_LEN] = {
+ 	__DEFINE_LINK_MODE_NAME(10, T1S, Full),
+ 	__DEFINE_LINK_MODE_NAME(10, T1S, Half),
+ 	__DEFINE_LINK_MODE_NAME(10, T1S_P2MP, Half),
++	__DEFINE_LINK_MODE_NAME(10, T1BRR, Full),
+ };
+ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+ 
+@@ -251,6 +252,7 @@ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+ #define __LINK_MODE_LANES_T1S_P2MP	1
+ #define __LINK_MODE_LANES_VR8		8
+ #define __LINK_MODE_LANES_DR8_2		8
++#define __LINK_MODE_LANES_T1BRR		1
+ 
+ #define __DEFINE_LINK_MODE_PARAMS(_speed, _type, _duplex)	\
+ 	[ETHTOOL_LINK_MODE(_speed, _type, _duplex)] = {		\
+@@ -374,6 +376,7 @@ const struct link_mode_info link_mode_params[] = {
+ 	__DEFINE_LINK_MODE_PARAMS(10, T1S, Full),
+ 	__DEFINE_LINK_MODE_PARAMS(10, T1S, Half),
+ 	__DEFINE_LINK_MODE_PARAMS(10, T1S_P2MP, Half),
++	__DEFINE_LINK_MODE_PARAMS(10, T1BRR, Full),
+ };
+ static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+ 
 -- 
 2.39.2
 
