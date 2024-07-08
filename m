@@ -1,107 +1,88 @@
-Return-Path: <netdev+bounces-109998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B761392AA28
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:50:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A92C292AA41
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 22:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D6A9B20EDF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 19:50:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E754C282BF6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 20:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBE614B07A;
-	Mon,  8 Jul 2024 19:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6164D1CD23;
+	Mon,  8 Jul 2024 20:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="XcuKXP+t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQJJA/r9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140414B963
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 19:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BBD7494
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 20:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720468198; cv=none; b=JoU6a+Rs/UgJm1xitcDnD2FsWj0Ro6AfmdvexNbPLz8sqOyiSlGBz3wgpUBmu6dkOmK0ZOwNG70XpTo5yfDDq14L8r9XZySHsguM92TAFGmBTjeoJd7wlZn+OrZ4sl6ah4WsXZOGslE89Do13CA088r21eqEpUhDHo4gRlZZjp4=
+	t=1720469049; cv=none; b=OGG3Mb+EIP8iarUBfmtek3xh5laaWu1miqUzuS5Gs7lRnYa06mJfwcICKFbn837feN9dCH3m2XEvqCY7X6fNk5XyA4HLIkMbehojcuZcTKvDq5N7Ssvs6eNiGB+nGHaI7trvH+aBi6JqO3Egj5Jib/LyeXHpM/iqZRX+EdQbRgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720468198; c=relaxed/simple;
-	bh=7D+xUpceViiMorxMSLfmyuVuvRBM/PAMKUSbLtin36w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mWadlaL8XMqHUYJqnQB9NbiJUrwd0DhwXFI2FNBD3KyWqY0wIynFVPuUBC/9H9Mk2GoksuI3HE8kZyMs7DPfrJJdqUtinmtC6z07Aeefgs0SXDlGzf1mSeBA96hcWkHJfOCDKAU3TcovASr+Fzjy9p2N2mtlSpj6+nYR+7452/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=XcuKXP+t; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b0013cf33so2893931b3a.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 12:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1720468196; x=1721072996; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZG+yy6mS1Jp1QmVxmrSL8tDecOwhdcnRRxckmQWjuH8=;
-        b=XcuKXP+tDxTGbNI1RwfmRF7kVWiEU6I3AD+O21j75HU8lmBJVdw/+/HhvXRIiHE9eQ
-         znjyh4+ZXHsuWtoCseC8MyaycBr+OBoct2i322GlmTTyAhahpWA8oGRDgfpzsmoDGZmG
-         mZz4l+6z6UXqbyYEwrIp03C0sDWAqYEBXWKkISrB297A1RuvYbZ0eAaxM2mAC8Dz/Axo
-         xrkzGrByg4axkzIN16W+mjft+wuzBg9tYUb4LGqVYsOKpARULXGlNkBQ36eLKsvUFj/K
-         OoAI28DBjF5DW+h1ypSH6qqHgzKKPTPHe7cIZ9v6e4w44ySZOslGgRlIfIGZPyGMH5B3
-         jV9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720468196; x=1721072996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZG+yy6mS1Jp1QmVxmrSL8tDecOwhdcnRRxckmQWjuH8=;
-        b=LqbSwW/5h1c/ajRq/JpIRvlSsRacS309bSJfaHC0yGZUIfs+i32VN89L99v1nR20OT
-         eiBSPIRYWyVKCoH0+upGF9r1KHkMfyDDAqGBA86+6x96EtKt+/E9A/bCrtMGZ9sDcAjR
-         NkGCeDFNP0oB5pmgGw4ma6Vs0n/2qRO9d0E4LuxeuO72dTRWLN4hyHhzhZAnEXhaQmie
-         XHBCcTKA8CGbaPRLEwEfxY3rcPoaRtgWtEYfHyd6AfvV9hcN8eSJ1zgsBBPnoyG+jHFr
-         SQNx2i6nSxyztcajqJXFVzSrnAA4noLXHBCQjgceNOX3CDctM7tYXHmNt9oCmCZoWyXh
-         RhGw==
-X-Forwarded-Encrypted: i=1; AJvYcCXE5ALBjKDvwRBcDGj5NSHlAK8DQgQHBFK0NVZeMcPXKDvClxIBIl6pb7NfURyUgQp3q7/VxXUPx5tTy+lSU/Ud/fdqXv6o
-X-Gm-Message-State: AOJu0Yznc4pQ39+MVKY4LFWnz+38pzlck5257mnfZjMTIOgpwVHviKo4
-	ZxXZCMpAuja3p40lkbUJl5weyFffuiIwAONzUT/g7p54qSl9w1uJb2afIWHK6m+fzG+8CpoYsCc
-	b50hCncFhuDPkTZVjk/MEm9JWUetwFswvR6no
-X-Google-Smtp-Source: AGHT+IH2MRLeGKshWQAHPvfceTh6DbvmHmVohL86pPOKEbXDhetWTsQzqQTWxo2PxXciOjA5LKYla+qc6Xd2L5XTsRU=
-X-Received: by 2002:a05:6a00:198c:b0:70a:9fea:71a2 with SMTP id
- d2e1a72fcca58-70b4353b11amr950766b3a.9.1720468196346; Mon, 08 Jul 2024
- 12:49:56 -0700 (PDT)
+	s=arc-20240116; t=1720469049; c=relaxed/simple;
+	bh=LhWYvHkpR4scv3RZtrZEhzVug1rJepKz8rlmjvb16u8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p6Epyflzo7Z8VW5AqBK4r3qY18FQiGVE5q31ulFBH1Kx0T8YsNGXFrECHm3z3I43IvOf6KDfeucz3H92xvFUX35gyN20ajjapTce9VW0F9OIiWFo1utipxa+XEbg7Ri/oZQYW5A66UvNUL2+Cs8FcrkfKzn2/RqsIm7P9zsywD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQJJA/r9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52129C116B1;
+	Mon,  8 Jul 2024 20:04:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720469048;
+	bh=LhWYvHkpR4scv3RZtrZEhzVug1rJepKz8rlmjvb16u8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QQJJA/r9UerPGFOF4N2i47ElPYTzHqeO/GcGgjytpnnTdOH7TdJyXKv0pFc2ql9e8
+	 9ZA2hfkiZ8lyxuMzsSfTnebyD/OL6N7RYpz+qa7F3rYWdyZGVLEPn0pO6iTTdVtASP
+	 13ey9VPjJ2U6oCVxLF5uM83OOACW3BLF1+uBjSICNj8PE8eHMLbcsNUg6EGZvndvn1
+	 w+IYTDam3Vke5EIt9kY7KEaxzsvlVmN9+JjOeCEPP48m4iWys+UtzPj7+QXluHgh9d
+	 ihXHgKAPo6N2bGYFUn0+veTZo6xzMtbwTQHn50WbMfe6EvdBi8lFdgbaT/e9mXFRwo
+	 nzJScMf0yrQrA==
+Date: Mon, 8 Jul 2024 13:04:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, petrm@nvidia.com, przemyslaw.kitszel@intel.com,
+ ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next 3/5] selftests: drv-net: rss_ctx: test queue
+ changes vs user RSS config
+Message-ID: <20240708130407.7d22058d@kernel.org>
+In-Reply-To: <668c1a2168f55_1960bd29446@willemb.c.googlers.com.notmuch>
+References: <20240705015725.680275-1-kuba@kernel.org>
+	<20240705015725.680275-4-kuba@kernel.org>
+	<66894e1a6b087_12869e294de@willemb.c.googlers.com.notmuch>
+	<20240708091701.4cb6c5c0@kernel.org>
+	<668c1a2168f55_1960bd29446@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708180852.92919-1-kuniyu@amazon.com> <20240708180852.92919-3-kuniyu@amazon.com>
-In-Reply-To: <20240708180852.92919-3-kuniyu@amazon.com>
-From: Dmitry Safonov <dima@arista.com>
-Date: Mon, 8 Jul 2024 20:49:45 +0100
-Message-ID: <CAGrbwDSw-r5_NYCkiF3WELLU=UtJBegd6qYFJ1-WmbBbTAn_2A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/2] selftests: tcp: Remove broken SNMP
- assumptions for TCP AO self-connect tests.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 8, 2024 at 7:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> tcp_ao/self-connect.c checked the following SNMP stats before/after
-> connect() to confirm that the test exercises the simultaneous connect()
-> path.
->
->   * TCPChallengeACK
->   * TCPSYNChallenge
->
-> But the stats should not be counted for self-connect in the first place,
-> and the assumption is no longer true.
->
-> Let's remove the check.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Mon, 08 Jul 2024 12:56:01 -0400 Willem de Bruijn wrote:
+> > There may be background noise traffic on the main context.
+> > If we are running iperf to the main context the noise will just add up
+> > to the iperf traffic and all other queues should be completely idle.
+> > If we're testing additional context we'll get only iperf traffic on
+> > the target context, and all non-iperf noise stays on main context
+> > (hence noise rather than empty)  
+> 
+> That makes sense. Should the following be inverted then?
+> 
+> +    if main_ctx:
+> +        other_key = 'empty'
+> +        defer(ethtool, f"-X {cfg.ifname} default")
+> +    else:
+> +        other_key = 'noise'
 
-Thanks!
-Reviewed-by: Dmitry Safonov <dima@arista.com>
+No, unless I'm confused. if we're testing the main context the other
+queues will be empty. Else we're testing other (additional) contexts
+and queues outside those contexts will contain noise (the queues in 
+the main context, specifically).
 
