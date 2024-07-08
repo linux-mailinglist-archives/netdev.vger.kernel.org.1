@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-109713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2B5929B1F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 05:42:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEA0929B20
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 05:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3683B20DB2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 03:42:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 600FD1C20DB6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 03:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D2A6AAD;
-	Mon,  8 Jul 2024 03:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA028F5A;
+	Mon,  8 Jul 2024 03:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="J/Cz0gDK"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="eVAAIkhF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09EC3D76
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 03:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4B43FC2
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 03:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720410167; cv=none; b=ev4axHwrrW3zncWdvMPvK3gow+1DZGXFXewK2H7iZZZPTmiY8RbdOKSBcMA7LzRrQNU84IcwrqI41D+uw81XJ8WBHxGjrFtSG3+iuPxwgwvDdbZonzFnwCWApz/iyBK7OtwXFaWC+j72mqoanQEKyQgUjwLZmZ8krOoOQ8z/0VA=
+	t=1720410170; cv=none; b=UtI0SWrB4Di2+cvrYNWaaSZ88tqcjU8Sm495FqI3hkFilh9YX8Zx971lkLjfjU/Jp/ewf8NNCfVl6MKJepbf90Ri8P1OYHUvnP439NHlYNp2zdRsgMgZpddkpV8D39aomfJzzVqiWWLWcFC5aSFkfICj7JB6h5s5q1OZbGcwZq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720410167; c=relaxed/simple;
-	bh=XfbHPW/CBgjCNq5X5KSdoFex1tdY5vmRGeWBPUXpT6I=;
+	s=arc-20240116; t=1720410170; c=relaxed/simple;
+	bh=d9YNVuE6Py3TD5M4crRxlgz816Yf6LFaxjrd+07F5FM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gF1gh9QbgDtq6ree0D5GSMObfJZ+tY5TlZKyqQ4Np/tI0MgdlXq3GZXvh+3Iv68Xl55XJk4EtUYkPooBzf4X4GPjfc3cn6P6954vi40HtRVSOohD6zQAcvsIoFbRble8yCDfEO7+jVCfstzzk4HsY97PL+hAUNIUBBqJJQ78CX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=J/Cz0gDK; arc=none smtp.client-ip=217.79.154.63
+	 In-Reply-To:Content-Type; b=txKCIolm1FTLeu53GQrxMCuzF/OpDPEnuqEQa9SM1GTiU72tBgRZmj0hogbtx1jMruWDrmnsAHVtbrVgsoyJ/C5Z+FSz7Zavys8D49IyuZ08HXANH2FOOtfBx4cDV6yOu9VJbk2ztbvip+SaShA687wwPVEnnfwwQLFb2rIOSI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=eVAAIkhF; arc=none smtp.client-ip=217.79.154.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
 X-Virus-Scanned: amavisd-new at emenem.pl
 Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
 	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 4683fVKl008132
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 4683fVKm008132
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 8 Jul 2024 05:41:33 +0200
+	Mon, 8 Jul 2024 05:42:09 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1720410097; bh=3kRB52cUpyTOGMGkl165XS7lHtZZTm28uGPgb66G7uQ=;
+	t=1720410131; bh=Zm5bZpV8waaisVfUEIZpMVuciIDjlbJIFSBNKhd9woY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=J/Cz0gDKwu02nQdYHXPHTFExkzizu/+hVX7kDgg7ZL/3fxUGijmlyCEj5TPkaOA9T
-	 yRB1HcA1GjE8krGzvlSCGTBZcNvLXw21ilzom+bJjgQV7NRSHvJLm+bGKFsPvDPfPg
-	 4wshODMhCUnPm7IoiP4twJQUgAFDp/xBt2kDXVZQ=
-Message-ID: <c11f42c6-7d65-4292-840b-64f13740379c@ans.pl>
-Date: Sun, 7 Jul 2024 20:41:31 -0700
+	b=eVAAIkhFXas9PMEcthIapOwrd5gIT4j9eI8LHFB2CMdmADdEUQvn87G4MPM/Qe1AD
+	 48qm4jiGwsFq7I5TZ5Z92rVKXdw3s6LV8Swv3ZPGFHtSq7JjgreDXGXCRqDSbBkDcp
+	 df5rsihBmKv8cXNNecfOXwu8VbYb90LRnkHErgxk=
+Message-ID: <56384f82-6ce7-49c8-a20e-ffdf119804ae@ans.pl>
+Date: Sun, 7 Jul 2024 20:41:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,8 +52,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH] net/mlx4: Add support for EEPROM high pages query for
- QSFP/QSFP+/QSFP28
+Subject: [PATCH] qsfp: Better handling of Page 03h netlink read failure
 To: Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
         Michal Kubecek <mkubecek@suse.cz>
 Cc: Moshe Shemesh <moshe@nvidia.com>,
@@ -75,45 +74,39 @@ In-Reply-To: <de8f9536-7a00-43b2-8020-44d5370b722c@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Enable reading additional EEPROM information from high pages such as
-thresholds and alarms on QSFP/QSFP+/QSFP28 modules.
+Page 03h may not be available due to a bug in a driver.
+This is a non-fatal error and sff8636_dom_parse() handles this
+correctly, allowing it to provide the remaining information.
 
-The fix is similar to a708fb7b1f8dcc7a8ed949839958cd5d812dd939 but given
-all the required logic already exists in mlx4_qsfp_eeprom_params_set()
-only s/_LEN/MAX_LEN/ is needed.
+Also, add an error message to clarify otherwise cryptic
+"netlink error: Invalid argument" message.
 ---
- drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ qsfp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-index 619e1c3ef7f9..aca968b4dc15 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-@@ -2055,20 +2055,20 @@ static int mlx4_en_get_module_info(struct net_device *dev,
- 	switch (data[0] /* identifier */) {
- 	case MLX4_MODULE_ID_QSFP:
- 		modinfo->type = ETH_MODULE_SFF_8436;
--		modinfo->eeprom_len = ETH_MODULE_SFF_8436_LEN;
-+		modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
- 		break;
- 	case MLX4_MODULE_ID_QSFP_PLUS:
- 		if (data[1] >= 0x3) { /* revision id */
- 			modinfo->type = ETH_MODULE_SFF_8636;
--			modinfo->eeprom_len = ETH_MODULE_SFF_8636_LEN;
-+			modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
- 		} else {
- 			modinfo->type = ETH_MODULE_SFF_8436;
--			modinfo->eeprom_len = ETH_MODULE_SFF_8436_LEN;
-+			modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
- 		}
- 		break;
- 	case MLX4_MODULE_ID_QSFP28:
- 		modinfo->type = ETH_MODULE_SFF_8636;
--		modinfo->eeprom_len = ETH_MODULE_SFF_8636_LEN;
-+		modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
- 		break;
- 	case MLX4_MODULE_ID_SFP:
- 		modinfo->type = ETH_MODULE_SFF_8472;
+diff --git a/qsfp.c b/qsfp.c
+index a2921fb..208eddc 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -1038,8 +1038,16 @@ sff8636_memory_map_init_pages(struct cmd_context *ctx,
+ 
+ 	sff8636_request_init(&request, 0x3, SFF8636_PAGE_SIZE);
+ 	ret = nl_get_eeprom_page(ctx, &request);
+-	if (ret < 0)
+-		return ret;
++	if (ret < 0) {
++		/* Page 03h is not available due to a bug in the driver.
++		 * This is a non-fatal error and sff8636_dom_parse()
++		 * handles this correctly.
++		 */
++
++		fprintf(stderr, "Failed to read Upper Page 03h, driver error?\n");
++		return 0;
++	}
++
+ 	map->page_03h = request.data - SFF8636_PAGE_SIZE;
+ 
+ 	return 0;
 -- 
 2.45.2
 
