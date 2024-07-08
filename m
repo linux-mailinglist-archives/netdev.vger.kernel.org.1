@@ -1,203 +1,311 @@
-Return-Path: <netdev+bounces-109758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A74929DD8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:01:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFF4929DFA
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F134283F16
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25471C2228D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 08:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D66122086;
-	Mon,  8 Jul 2024 08:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD64D3B2A2;
+	Mon,  8 Jul 2024 08:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDtPNDkS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TTtONQcM"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F292F2E
-	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 08:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0334639AFD
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 08:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720425698; cv=none; b=Xzkg2AG++Sh5JeNOl3aM53IXozP/Ba0Y6g1rODnOGV4zF4aCcQ4kJYbMZjAQhsnEV+a8UnWT51hnobdBSjYzGa6KMOrRwjA+oGgzS0XMC/pyRF9QbJ5HFm1gphYNHsb9fxKVTrvFEdWx17YBIH7LxRHoPiKpWdUKZTIKJfN+Ae4=
+	t=1720426146; cv=none; b=LtGaBerQzSHYiNkTTjYGdWPAQBXIHX3i6ASNQikhVM3Q2ScxV0GEvdN96Y4BwIqviPuSts98jzQ+zrk7bi20bxmmcB6/TxGXAY1ouABPlG3D2SAlmeXeTH9kLfkMN1ytwgz7yC5MUAR6j1Hi3c5ZofmcvAgKxxK4/q1s1lNPKQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720425698; c=relaxed/simple;
-	bh=nlLhLflDa5bMvjhaApP9IsLVRkmOHEF5QWS4D2zNHw4=;
+	s=arc-20240116; t=1720426146; c=relaxed/simple;
+	bh=qMf0cWEIBDJI1wPVxIfS9rEbR2iypK+ArwrlvfqcS4Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qkpE8zsrcCmD0nYh4zql5zbWS8byiTWt1ePsNKVZjrLhn4Pskdt1ksgTSO8pucVfUjRPGSaxnppMWZ1ANQk1ZSV7QSMU0tl/1b7gbgy6yj9TGi0m0KXSJhVnzyqgurjrK3Kr50YqUewRtvav15V/GO4pSydatc5Zw9tyk3UiemM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dDtPNDkS; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=X5I9uetcvMLsQFxNhfWiOnY3j6SGpHN0Jr27fBdvHzO+GpXwY6M24AQL6uhZov9JS3QcL+1dm3fD6iy4fPhJT1Uv3rcpTU1zzHrwYRBstgi32jdxMNVIRS+wpsNc2m8SrOhCm3bH4PpkShUrzPx7r+vcJVc5uSuHJAw0l4mPMxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TTtONQcM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720425695;
+	s=mimecast20190719; t=1720426144;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=27lMaNCb81p4YFFh+LEEn0k8qDHH12ozaV7hZRSJBCA=;
-	b=dDtPNDkSpFBXAOsahGv2A6+E+UzHPHBmRw+ePCPycWK7fhDBxO0dNqvHYHgolm467xzAIv
-	aGluUS1a78rD1TsoSA1IWreijvklyTzenKdy0leRxxAepuyvjvZfxnQBJMGiW1Z0xtHK/N
-	xI8SAntMlRwEOWt4BgMEqpy5VoEOT4w=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CLTQ2PKwxy+i8qaPB4UwrsoPh7735CAQV0lSOIofn4k=;
+	b=TTtONQcMx9OVqQCgNCV6eUYbWSBd3T9Y/oy2/Sa+Zv8I3glrZUKnXaNe5giZNlhFrCwwXH
+	0Y+UN6AT9sJj6N1tAMIVj+KRv0v6+d2Tg6Cq95FYCLGsQy0bY7EqZQDz6eBKU0+BijrVT0
+	1i9999i4/MmRmjQSDCp59wVe2Vz0QM4=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-35-HNuYIf41OR6iPLlj3SN4NA-1; Mon, 08 Jul 2024 04:01:34 -0400
-X-MC-Unique: HNuYIf41OR6iPLlj3SN4NA-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1fba2bb1ad5so2134795ad.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 01:01:34 -0700 (PDT)
+ us-mta-259-i7E0XY3ANvGNgN5tdJAyKg-1; Mon, 08 Jul 2024 04:08:57 -0400
+X-MC-Unique: i7E0XY3ANvGNgN5tdJAyKg-1
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3d9253ff5d0so1821664b6e.0
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 01:08:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720425693; x=1721030493;
+        d=1e100.net; s=20230601; t=1720426137; x=1721030937;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=27lMaNCb81p4YFFh+LEEn0k8qDHH12ozaV7hZRSJBCA=;
-        b=FZv2mXUSipLG92IqcrubBfEYCPqHGxvvyNVdMdDG0GPFjRfgRrWM1j6UPdXYxa9pmO
-         QWchSchLuHO6xhqZStaLB0TLVVZpdG5KGARfbWKVIYP7iMbfATPJz+ESEu05XBe8aI28
-         XQRl7mj7sqbYgUPGZVKzq3ewxzw+K3SVyVNd8VETldl+1uT8ntnVn57gSP0qyPGDrAWc
-         uJC8gK5rK0ESAVcdm+pbyX4fLatth3tEugmLU2DjwLUlLo8/0vvsUTiJUMABOFkfI+Qx
-         5kmqkm7FYn1UxuVbvkQaCN81DdNLAEWkxI5vvXTiFu1uArRhZvGg3Jhhw+wuf8B+zO/u
-         WqSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxnSR9hPx8tKrlkVIHgXV+ntfbscbcjDpRQIf4Jme0/8Itj3c3UaQGNYwS0cbewszdZTne5vw8rAybOWjMwISb4bSZEJxh
-X-Gm-Message-State: AOJu0YzeI6HObDbvx9meiYZpYO1PYWyA6sXbIP6ac1rdSXh/cfuRFnFy
-	/4R0/H2vpKP5UZwM2cZgHia3gxeEvrRpimNJx4IfI3qpkJJczcAUgjAVPNss13ie2BFL9sP4rQi
-	+Bri1CC7tvNDfkbHE4QykyuHYEaBIixD4X/uRdjyBQPNp1WKtKXtt1u4CIncqNT4jqBTuJ1UN9q
-	edOBxRNE66xA5rLEjZ7bOUxoZJ8XdU
-X-Received: by 2002:a17:903:1252:b0:1fb:a1c6:db75 with SMTP id d9443c01a7336-1fba1c6de04mr6881615ad.6.1720425693348;
-        Mon, 08 Jul 2024 01:01:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7tEwJUQ3jL/FURLCL1Fmxt7rfHgT6zXgifTSPRjjPgC0FTxqJiDiptLT5gVxmpCf9aR+PWLt24EtwHzQHJqA=
-X-Received: by 2002:a17:903:1252:b0:1fb:a1c6:db75 with SMTP id
- d9443c01a7336-1fba1c6de04mr6881415ad.6.1720425692886; Mon, 08 Jul 2024
- 01:01:32 -0700 (PDT)
+        bh=CLTQ2PKwxy+i8qaPB4UwrsoPh7735CAQV0lSOIofn4k=;
+        b=fq74U6VPBmP7r/HuO/eLYC2RboEh/ezZULnadDQ+5ah23kOWIXzi5UgNicV3NIlG51
+         3sE4CwpE3aRRjdiT/1ndhbpMYZR3TuTd+uyUO3CBJZepWAwSitjksyl2bZnWVqvIiHfV
+         Lm2/XMUhvVwMOazbqGmsbGTI1C4yZXBjqn/pZPgnlrTR/F7dMYEcZWG8W9TO+FPbLIef
+         D9F06imKtdUmKIYg80cq0V4U+xPY8zj/uPLLKTjYoOF8dOIaeLtgAhtFlDPHgJiVLfgJ
+         vEyWP8YycH/jJNB2WyVjCZt8/1CxechCNdDKG9sT3SNuAdcm1XPW1TpJCoWft0HHCO9i
+         21jA==
+X-Gm-Message-State: AOJu0Yxp4H3/uYYpCjKxtUjjIpWoE1/ko6SdG9pCjKnMnjQc5RM1PN8q
+	R730Oyyv/0VkqMZN6a6UIUQq7f1ofom04h2VCHOqVbkXjXyZHQtDSh9x7m5G1BZkUwoeL8LfoIY
+	GxOtltG0e7fIddtT02cqhwxE/qqPxEqJWK4NcKX10s3q1JubemjkXpYbG3+t47iqYWiHnCncOG+
+	VQ7ofGxcmRcfOTkyBzj5gho0xtFksM
+X-Received: by 2002:a05:6808:1392:b0:3d9:1f05:845 with SMTP id 5614622812f47-3d91f050a43mr10973209b6e.19.1720426136684;
+        Mon, 08 Jul 2024 01:08:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHx08npK6Y9eZ9wfcXTZ97ykJuf1vmZybpLRDDSHLjVuDj4PfnM/DqOi0LEjJIYUprg6VDeGTzORQHHaGgkqlk=
+X-Received: by 2002:a05:6808:1392:b0:3d9:1f05:845 with SMTP id
+ 5614622812f47-3d91f050a43mr10973179b6e.19.1720426135888; Mon, 08 Jul 2024
+ 01:08:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708064820.88955-1-lulu@redhat.com> <20240708064820.88955-3-lulu@redhat.com>
- <CACGkMEum7Ufgkez9p4-o9tfYBqfvPUA+BPrxZD8gF7PmWVhE2g@mail.gmail.com> <CACLfguXdL_FvdvReQrzvKvzJrHnE9gcTv+rLYsCNB0HtvXC74w@mail.gmail.com>
-In-Reply-To: <CACLfguXdL_FvdvReQrzvKvzJrHnE9gcTv+rLYsCNB0HtvXC74w@mail.gmail.com>
+References: <20240705073734.93905-1-xuanzhuo@linux.alibaba.com>
+ <20240705073734.93905-10-xuanzhuo@linux.alibaba.com> <CACGkMEsiMTs=PymmPrrfhmF6W=Oviwg4hWEbSFb1sghGYadSgg@mail.gmail.com>
+ <1720424536.972943-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1720424536.972943-1-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 8 Jul 2024 16:01:21 +0800
-Message-ID: <CACGkMEuOz_fsBnX8BNnbUHMdNo48S8cEUT4M6O0_oBsSKRJmLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] vdpa_sim_net: Add the support of set mac address
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
-	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date: Mon, 8 Jul 2024 16:08:44 +0800
+Message-ID: <CACGkMEukkp9FxLfBGTXvSGso48Ugy2-m3rWNFiVGuEa52LT_-Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 09/10] virtio_net: xsk: rx: support recv small mode
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 8, 2024 at 3:19=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+On Mon, Jul 8, 2024 at 3:47=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+m> wrote:
 >
-> On Mon, 8 Jul 2024 at 15:06, Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Mon, Jul 8, 2024 at 2:48=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote=
+> On Mon, 8 Jul 2024 15:00:50 +0800, Jason Wang <jasowang@redhat.com> wrote=
 :
+> > On Fri, Jul 5, 2024 at 3:38=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
 > > >
-> > > Add the function to support setting the MAC address.
-> > > For vdpa_sim_net, the driver will write the MAC address
-> > > to the config space, and other devices can implement
-> > > their own functions to support this.
+> > > In the process:
+> > > 1. We may need to copy data to create skb for XDP_PASS.
+> > > 2. We may need to call xsk_buff_free() to release the buffer.
+> > > 3. The handle for xdp_buff is difference from the buffer.
 > > >
-> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > If we pushed this logic into existing receive handle(merge and small)=
+,
+> > > we would have to maintain code scattered inside merge and small (and =
+big).
+> > > So I think it is a good choice for us to put the xsk code into an
+> > > independent function.
+> > >
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > > > ---
-> > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++++++++++++++-
-> > >  1 file changed, 18 insertions(+), 1 deletion(-)
 > > >
-> > > diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa=
-_sim/vdpa_sim_net.c
-> > > index cfe962911804..a472c3c43bfd 100644
-> > > --- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-> > > +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
-> > > @@ -414,6 +414,22 @@ static void vdpasim_net_get_config(struct vdpasi=
-m *vdpasim, void *config)
-> > >         net_config->status =3D cpu_to_vdpasim16(vdpasim, VIRTIO_NET_S=
-_LINK_UP);
+> > > v7:
+> > >    1. rename xdp_construct_skb to xsk_construct_skb
+> > >    2. refactor virtnet_receive()
+> > >
+> > >  drivers/net/virtio_net.c | 176 +++++++++++++++++++++++++++++++++++++=
+--
+> > >  1 file changed, 168 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > index 2b27f5ada64a..64d8cd481890 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -498,6 +498,12 @@ struct virtio_net_common_hdr {
+> > >  };
+> > >
+> > >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *b=
+uf);
+> > > +static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp=
+_buff *xdp,
+> > > +                              struct net_device *dev,
+> > > +                              unsigned int *xdp_xmit,
+> > > +                              struct virtnet_rq_stats *stats);
+> > > +static void virtnet_receive_done(struct virtnet_info *vi, struct rec=
+eive_queue *rq,
+> > > +                                struct sk_buff *skb, u8 flags);
+> > >
+> > >  static bool is_xdp_frame(void *ptr)
+> > >  {
+> > > @@ -1062,6 +1068,124 @@ static void sg_fill_dma(struct scatterlist *s=
+g, dma_addr_t addr, u32 len)
+> > >         sg->length =3D len;
 > > >  }
 > > >
-> > > +static int vdpasim_net_set_attr(struct vdpa_mgmt_dev *mdev,
-> > > +                               struct vdpa_device *dev,
-> > > +                               const struct vdpa_dev_set_config *con=
-fig)
+> > > +static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> > > +                                  struct receive_queue *rq, void *bu=
+f, u32 len)
 > > > +{
-> > > +       struct vdpasim *vdpasim =3D container_of(dev, struct vdpasim,=
- vdpa);
+> > > +       struct xdp_buff *xdp;
+> > > +       u32 bufsize;
 > > > +
-> > > +       struct virtio_net_config *vio_config =3D vdpasim->config;
-> > > +       if (config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> > > +               if (!is_zero_ether_addr(config->net.mac)) {
-> > > +                       memcpy(vio_config->mac, config->net.mac, ETH_=
-ALEN);
-> > > +                       return 0;
-> > > +               }
+> > > +       xdp =3D (struct xdp_buff *)buf;
+> > > +
+> > > +       bufsize =3D xsk_pool_get_rx_frame_size(rq->xsk_pool) + vi->hd=
+r_len;
+> > > +
+> > > +       if (unlikely(len > bufsize)) {
+> > > +               pr_debug("%s: rx error: len %u exceeds truesize %u\n"=
+,
+> > > +                        vi->dev->name, len, bufsize);
+> > > +               DEV_STATS_INC(vi->dev, rx_length_errors);
+> > > +               xsk_buff_free(xdp);
+> > > +               return NULL;
 > > > +       }
-> > > +       return -EINVAL;
+> > > +
+> > > +       xsk_buff_set_size(xdp, len);
+> > > +       xsk_buff_dma_sync_for_cpu(xdp);
+> > > +
+> > > +       return xdp;
+> > > +}
+> > > +
+> > > +static struct sk_buff *xsk_construct_skb(struct receive_queue *rq,
+> > > +                                        struct xdp_buff *xdp)
+> > > +{
+> > > +       unsigned int metasize =3D xdp->data - xdp->data_meta;
+> > > +       struct sk_buff *skb;
+> > > +       unsigned int size;
+> > > +
+> > > +       size =3D xdp->data_end - xdp->data_hard_start;
+> > > +       skb =3D napi_alloc_skb(&rq->napi, size);
+> > > +       if (unlikely(!skb)) {
+> > > +               xsk_buff_free(xdp);
+> > > +               return NULL;
+> > > +       }
+> > > +
+> > > +       skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
+> > > +
+> > > +       size =3D xdp->data_end - xdp->data_meta;
+> > > +       memcpy(__skb_put(skb, size), xdp->data_meta, size);
+> > > +
+> > > +       if (metasize) {
+> > > +               __skb_pull(skb, metasize);
+> > > +               skb_metadata_set(skb, metasize);
+> > > +       }
+> > > +
+> > > +       xsk_buff_free(xdp);
+> > > +
+> > > +       return skb;
+> > > +}
+> > > +
+> > > +static struct sk_buff *virtnet_receive_xsk_small(struct net_device *=
+dev, struct virtnet_info *vi,
+> > > +                                                struct receive_queue=
+ *rq, struct xdp_buff *xdp,
+> > > +                                                unsigned int *xdp_xm=
+it,
+> > > +                                                struct virtnet_rq_st=
+ats *stats)
+> > > +{
+> > > +       struct bpf_prog *prog;
+> > > +       u32 ret;
+> > > +
+> > > +       ret =3D XDP_PASS;
+> > > +       rcu_read_lock();
+> > > +       prog =3D rcu_dereference(rq->xdp_prog);
+> > > +       if (prog)
+> > > +               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit,=
+ stats);
+> > > +       rcu_read_unlock();
+> > > +
+> > > +       switch (ret) {
+> > > +       case XDP_PASS:
+> > > +               return xsk_construct_skb(rq, xdp);
+> > > +
+> > > +       case XDP_TX:
+> > > +       case XDP_REDIRECT:
+> > > +               return NULL;
+> > > +
+> > > +       default:
+> > > +               /* drop packet */
+> > > +               xsk_buff_free(xdp);
+> > > +               u64_stats_inc(&stats->drops);
+> > > +               return NULL;
+> > > +       }
+> > > +}
+> > > +
+> > > +static void virtnet_receive_xsk_buf(struct virtnet_info *vi, struct =
+receive_queue *rq,
+> > > +                                   void *buf, u32 len,
+> > > +                                   unsigned int *xdp_xmit,
+> > > +                                   struct virtnet_rq_stats *stats)
+> > > +{
+> > > +       struct net_device *dev =3D vi->dev;
+> > > +       struct sk_buff *skb =3D NULL;
+> > > +       struct xdp_buff *xdp;
+> > > +       u8 flags;
+> > > +
+> > > +       len -=3D vi->hdr_len;
+> > > +
+> > > +       u64_stats_add(&stats->bytes, len);
+> > > +
+> > > +       xdp =3D buf_to_xdp(vi, rq, buf, len);
+> > > +       if (!xdp)
+> > > +               return;
+> > > +
+> > > +       if (unlikely(len < ETH_HLEN)) {
+> > > +               pr_debug("%s: short packet %i\n", dev->name, len);
+> > > +               DEV_STATS_INC(dev, rx_length_errors);
+> > > +               xsk_buff_free(xdp);
+> > > +               return;
+> > > +       }
+> > > +
+> > > +       flags =3D ((struct virtio_net_common_hdr *)(xdp->data - vi->h=
+dr_len))->hdr.flags;
+> > > +
+> > > +       if (!vi->mergeable_rx_bufs)
+> > > +               skb =3D virtnet_receive_xsk_small(dev, vi, rq, xdp, x=
+dp_xmit, stats);
 > >
-> > I think in the previous version, we agreed to have a lock to
-> > synchronize the writing here?
-> >
-> > Thanks
-> >
-> Hi Jason
-> I have moved the down_write(&vdev->cf_lock) and
-> up_write(&vdev->cf_lock) to the function vdpa_dev_net_device_attr_set
-> in vdpa/vdpa.c. Then the device itself doesn't need to call it again.
-> Do you think this is ok?
+> > I wonder if we add the mergeable support in the next patch would it be
+> > better to re-order the patch? For example, the xsk binding needs to be
+> > moved to the last patch, otherwise we break xsk with a mergeable
+> > buffer here?
+>
+> If you worry that the user works with this commit, I want to say you do n=
+ot
+> worry.
+>
+> Because the flags NETDEV_XDP_ACT_XSK_ZEROCOPY is not added. I plan to add=
+ that
+> after the tx is completed.
 
-I meant we have another path to modify the mac:
+Ok, this is something I missed, it would be better to mention it
+somewhere (or it is already there but I miss it).
 
-static virtio_net_ctrl_ack vdpasim_handle_ctrl_mac(struct vdpasim *vdpasim,
-                                                   u8 cmd)
-{
-        struct virtio_net_config *vio_config =3D vdpasim->config;
-        struct vdpasim_virtqueue *cvq =3D &vdpasim->vqs[2];
-        virtio_net_ctrl_ack status =3D VIRTIO_NET_ERR;
-        size_t read;
+>
+> I do test by adding this flags locally.
+>
+> Thanks.
 
-        switch (cmd) {
-case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-                read =3D vringh_iov_pull_iotlb(&cvq->vring, &cvq->in_iov,
-                                             vio_config->mac, ETH_ALEN);
-                if (read =3D=3D ETH_ALEN)
-            status =3D VIRTIO_NET_OK;
-        break;
-        default:
-                break;
-        }
-
-        return status;
-}
-
-We need to serialize between them.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
-> Thanks
-> Cindy
-> > > +}
-> > > +
-> > >  static void vdpasim_net_setup_config(struct vdpasim *vdpasim,
-> > >                                      const struct vdpa_dev_set_config=
- *config)
-> > >  {
-> > > @@ -510,7 +526,8 @@ static void vdpasim_net_dev_del(struct vdpa_mgmt_=
-dev *mdev,
-> > >
-> > >  static const struct vdpa_mgmtdev_ops vdpasim_net_mgmtdev_ops =3D {
-> > >         .dev_add =3D vdpasim_net_dev_add,
-> > > -       .dev_del =3D vdpasim_net_dev_del
-> > > +       .dev_del =3D vdpasim_net_dev_del,
-> > > +       .dev_set_attr =3D vdpasim_net_set_attr
-> > >  };
-> > >
-> > >  static struct virtio_device_id id_table[] =3D {
-> > > --
-> > > 2.45.0
-> > >
+>
+> >
+> > Or anything I missed here?
+> >
+> > Thanks
 > >
 >
 
