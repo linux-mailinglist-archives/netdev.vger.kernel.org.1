@@ -1,118 +1,92 @@
-Return-Path: <netdev+bounces-109825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C2F92A099
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:58:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7A992A09B
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CCB41F21946
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:58:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B4DF1C21000
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 10:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7532877F2F;
-	Mon,  8 Jul 2024 10:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A2577F2F;
+	Mon,  8 Jul 2024 10:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgncijKj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9095C3B791;
-	Mon,  8 Jul 2024 10:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3020E3B791
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 10:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720436302; cv=none; b=HptbYqGmwQxgwwFFmsg5l1q4SietnmXypkuAaJu2KA8WwfKyu97j1dc+uxGy+ApQSpvVIcPObYAJykeoQSKg4m9SGoy6YrYV/ZSJxY3THBXxFl7VwLzzPhGq37FoLFIKCFBSGnodqjcMs33WFTWqLwSgjv+r5KoS3tEkJr9ztRQ=
+	t=1720436308; cv=none; b=qUoTwlGfooj6jlvgMotKYgzlxWkcjqq4deLat9KKqomgcYsBpPA48ap4wLpfaHiZUDFklFfvBZ06vXKdan1fYYOQTrcPWurpIiCGJw70tj4bMI1GkHo2C9AU/vvObTuFFuDOFlA7ahxYMuFVjybL6L0z1b1iHv6lY10Bhiw7kNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720436302; c=relaxed/simple;
-	bh=b9sjkWTudOGHt4VQvMA2CTCvbLmw4UuD1r+AlcqUADU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qT1nxojPBGKzQ/KlvfUWNn2qQs0KBfaW1WvTH7CpDxvX8mdzXHsd2KbdF6VbGQC13Ix9v3aWiISdqkH28IqLziYuVKtn57x31dvdLmkSAkqoByZYfrho0y1rJtelc4R3P05+UJpeNjyzVp1svQz61eVqYXMa/uQHeV4KztVQNfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WHh0v3jkTznZbg;
-	Mon,  8 Jul 2024 18:57:51 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 03C99140416;
-	Mon,  8 Jul 2024 18:58:16 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemf200006.china.huawei.com
- (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 8 Jul
- 2024 18:58:15 +0800
-Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
- prepare/probe/commit API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: Yunsheng Lin <yunshenglin0825@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
-	<linux-mm@kvack.org>
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
- <20240625135216.47007-11-linyunsheng@huawei.com>
- <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
- <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
- <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
- <0a80e362-1eb7-40b0-b1b9-07ec5a6506ea@gmail.com>
- <CAKgT0UcRbpT6UFCSq0Wd9OHrCqOGR=BQ063-zNBZ4cVNmduZGw@mail.gmail.com>
- <15623dac-9358-4597-b3ee-3694a5956920@gmail.com>
- <200ee8ff-557f-e17b-e71f-645267a49831@huawei.com>
- <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <83cf5a36-055a-f590-9d41-59c45f93e7c5@huawei.com>
-Date: Mon, 8 Jul 2024 18:58:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1720436308; c=relaxed/simple;
+	bh=52+bBGuD9nKCHm6QsqQ/pE/mBBSRYE/1qlckqcjpAQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bvKPn9i9hpLnVDq34iRNDZxUjzZs757EOPScjkoh+B6OpF7qdZ0uHduoEJzrKX3zB1FxaQBIPLb0eZZ8MkURMFPqvUEY9tCwwTnvj5sJJO0UzT6Fd80hPvKrTu+1xT5c5AFrZ7mto8ls1v8MiMWNt9drlPLzxrQ94TlIOaIcYsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgncijKj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8032C116B1;
+	Mon,  8 Jul 2024 10:58:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720436307;
+	bh=52+bBGuD9nKCHm6QsqQ/pE/mBBSRYE/1qlckqcjpAQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CgncijKjBI5JPhIuXuXa8pgEYbVDz+unUKAdyEVE87SgIMEboI6lGISsuvKPNWcXw
+	 t5sebANZy1bMjNhwaC8JshcwbMxR5DCcdpbTx7+fn1B7C798wRPQnqtqF8jG8Z9hOr
+	 l4xX5pgA2QywrHWlY71TZf3mMMZVoJPwgRk/dgF2gNum0CXz1SfymBjmyjzH+vgAF0
+	 6+tr8wlnDB2DPKeshcQUiMmipSYqfwgvZ3rxsEaIS9ZgdMshGEH+Da3hah/1viWMvo
+	 6lVonWATb41JGC20Mx1aajmfr3dxQ2tZ8duJx+R4b7SLD3O+/5D7DuG2ZxZ7Zn0OU+
+	 UWwu4Eupx8xJg==
+Date: Mon, 8 Jul 2024 11:58:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net-next V2 00/10] mlx5 misc patches 2023-07-08
+Message-ID: <20240708105823.GL1481495@kernel.org>
+References: <20240708080025.1593555-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240708080025.1593555-1-tariqt@nvidia.com>
 
-On 2024/7/8 1:12, Alexander Duyck wrote:
+On Mon, Jul 08, 2024 at 11:00:15AM +0300, Tariq Toukan wrote:
+> Hi,
+> 
+> This patchset contains features and small enhancements from the team to
+> the mlx5 core and Eth drivers.
+> 
+> In patches 1-4, Dan completes the max_num_eqs logic of the SF.
+> 
+> Patches 5-7 by Rahul and Carolina add PTM (Precision Time Measurement)
+> support to driver. PTM is a PCI extended capability introduced by
+> PCI-SIG for providing an accurate read of the device clock offset
+> without being impacted by asymmetric bus transfer rates.
+> 
+> Patches 8-10 are misc fixes and cleanups.
+> 
+> Series generated against:
+> commit 390b14b5e9f6 ("dt-bindings: net: Define properties at top-level")
+> 
+> Regards,
+> Tariq
+> 
+> V2:
+> - Fixed compilation issue on !X86 archs.
+
+Thanks, I have confirmed compilation on ARM and arm64.
 
 ...
-
-> The issue is the dependency mess that has been created with patch 11
-> in the set. Again you are conflating patches which makes this really
-> hard to debug or discuss as I make suggestions on one patch and you
-> claim it breaks things that are really due to issues in another patch.
-> So the issue is you included this header into include/linux/sched.h
-> which is included in linux/mm_types.h. So what happens then is that
-> you have to include page_frag_cache.h *before* you can include the
-> bits from mm_types.h
-> 
-> What might make more sense to solve this is to look at just moving the
-> page_frag_cache into mm_types_task.h and then having it replace the
-> page_frag struct there since mm_types.h will pull that in anyway. That
-> way sched.h can avoid having to pull in page_frag_cache.h.
-
-It seems the above didn't work either, as asm-offsets.c does depend on
-mm_types_task.h too.
-
-In file included from ./include/linux/mm.h:16,
-                 from ./include/linux/page_frag_cache.h:10,
-                 from ./include/linux/mm_types_task.h:11,
-                 from ./include/linux/mm_types.h:5,
-                 from ./include/linux/mmzone.h:22,
-                 from ./include/linux/gfp.h:7,
-                 from ./include/linux/slab.h:16,
-                 from ./include/linux/resource_ext.h:11,
-                 from ./include/linux/acpi.h:13,
-                 from ./include/acpi/apei.h:9,
-                 from ./include/acpi/ghes.h:5,
-                 from ./include/linux/arm_sdei.h:8,
-                 from arch/arm64/kernel/asm-offsets.c:10:
-./include/linux/mmap_lock.h: In function ‘mmap_assert_locked’:
-./include/linux/mmap_lock.h:65:23: error: invalid use of undefined type ‘const struct mm_struct’
-   65 |  rwsem_assert_held(&mm->mmap_lock);
-
-
-> .
-> 
 
