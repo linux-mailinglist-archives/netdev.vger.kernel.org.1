@@ -1,104 +1,127 @@
-Return-Path: <netdev+bounces-109881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BA992A26D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:16:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E434E92A273
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 14:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CEAE2810DB
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:16:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D40E281041
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 12:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4732A7EEFD;
-	Mon,  8 Jul 2024 12:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72AF180034;
+	Mon,  8 Jul 2024 12:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYM6ElBb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqAbNyij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F50611712;
-	Mon,  8 Jul 2024 12:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C740D80024
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 12:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720440839; cv=none; b=g2bmmQIy9mDaN592qzGpOqAfl/b3N8P8rby4ohvdpqGvhIvmczMUjiLjKPiOMt5PbXI6uVuj8gUxeFBYR8HSkqQvLP40PO54ldTOoiVvyBuJIKPZfMHrY/CdWfvn53HB7laOEQDi4DOFjpWAD2Z5dNC+P0XeEiDCur3YFXLQfRs=
+	t=1720441048; cv=none; b=kmrYHQZ4U3U59OGJLRHvac3piIR6wkxUuyLJbeD9d2FFLc930DLon/LujLo5kv2uTirxF7vQE6Z19AmJdLZ5Y7JvpHz/eqkj3C8GZrVVfWlcBWdXqVurFNHz4lqrkWNv+WBkiRblcbmhaX5TPzpNXLLD5VXUiQ+19wusooAUWmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720440839; c=relaxed/simple;
-	bh=VIxaSTJMP4e83SuwPanq+HI++XObKHsfmXv0NSHYuak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gOezLPetDYrrzKr9Z92wa1B0JtzDOQL3rka7t1+ZTYM2StTJGs2uIW8spLlbXrFp942l3yJUSZMrRPHW97vnwXti/GlTFXRIWd1rGEqIRqQVIfQAfM0uW1yvNomw2G2itxR3wEbxEw4uFRHnfk0jvKYWSBIuWG6l5P+OWjn+xfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYM6ElBb; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1720441048; c=relaxed/simple;
+	bh=cNgG4sJNFrKD0CCkWlyht1Xiq6Jj6zN3B05I5LkJwsQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oCpxt4TZeM6yWIT82OOi9NR4CTwop8tDj20e0Y90ITf3yKYB3XKoq7TvL2YphNPDASfq9xyCrxMRJ/CoZMr/5+B0Sf0uY77nwmc1CjSkDf/ktXgXp3IbTODB6cIu+30GlR7OX1fEwXBzFoVkFUJ5RHSsISlQVCnnhbL9ETTGs4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqAbNyij; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4265921b0f6so16629695e9.2;
-        Mon, 08 Jul 2024 05:13:57 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4265b7514fcso13662045e9.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 05:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720440836; x=1721045636; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SeeftVXSInefzAV8X4+3PNovL2BBN2pSERX3ct9/JzM=;
-        b=MYM6ElBbpldImEVXZgfNzUNjWP2NP4dfy7bex08y7BEJhuBZrJ+/4Iint+l4a/c8Gq
-         Wjw/1wdraUdHvDJLuaziMT3sox956ZqKyDb3Ahyn+VwV5qKamiJSv5PH4zZsGx+t/ABL
-         qQXH+8WhqfzpqG4XANr76AmMs1hZnmUiPkoIXS3Ueaq7h/a5nYXHqZmL1U25HX6qUc4k
-         afO2U57zsQLsghAmqLCpF5j4MKjxxUiVIH/S6aFudbZji4Ko03o/ADe5iyLG/NpoPjEY
-         W2ONxyb23GLDZsDmmQhOQLb0xt1M2dwVKraRCFsij1dHggtD16smoDaX+zxt7fv8V6tk
-         Ii0w==
+        d=gmail.com; s=20230601; t=1720441045; x=1721045845; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mh2PihSggFxhCtx/jCViYrh994DXTDX0aEr2FXB2Ac0=;
+        b=QqAbNyij/nfAMOVoDV4h/18yEvGIwD7DBQw/+00gV0PCNoDgCKiz4vTESWsrcGCgae
+         al3wcuh5BtuWShvNRMhJ41kAlXmbelLeBtXCiOX5l1lF3BWL+t87N2tosTePh9O3Yod1
+         JOCVPcbCzKBhakC6vhLe99A4Vyct2sn0nKLRRj0kevwCrXoHTNMnIgQWbyq4uxU4N+s1
+         l9Uqwvdbr2/6yIgKSu7rIa59K1JqujG6QS9nmHYYP4+giY/5/DOS8oY2WnBqyJbq1Nsw
+         fTeB0UPTv2BfNT+T7mvploRbjzXJCWpLEIdbfVlAz1toIHsYwrgwj+ucsUHuv4pF38mn
+         maRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720440836; x=1721045636;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SeeftVXSInefzAV8X4+3PNovL2BBN2pSERX3ct9/JzM=;
-        b=GM0uMTkn1FsfIdnGofzmGpsSMXC8UjFipWCSgPReZaKb0DuVv/hBx0mUQ0pnVjl8Ah
-         gW/F5531wyVPkzNmr5jSCUXOCoQUGNkjNeHW+8xW8r4bOB7dFg/3aBShnegjgo53Canm
-         Pvd4mbnxW/K+Y0tdSgKrRwdPKOm6rk3UuNlChNVGVT8sbjQ+ccwdXTLHRJ9YOremlObD
-         1bW2EwqqPGV6uS8CFf0btbeMnajgGdp8khP6BKmX4gQEiShfDI6psemqx0c2iYF7h5Xk
-         xx/dfS1HY5h/slY3byYbeOORrTlToJdIzbozUdiKZbAVRHSCXoccdNfHWCC8P9D/FOGy
-         njJg==
-X-Forwarded-Encrypted: i=1; AJvYcCV09pZktzKnr/qPQMGi/T3v7Uybfv5eL+kd/Vr0FiiqN6vt5hK3ATZcIa/4dedeeEu0uwBu/lMQBXyPGFxtW0PKDn1+DpzlycAO3jKxgbfTuCE/GfrYRxOej2AFJbvwnMY6crPN
-X-Gm-Message-State: AOJu0YwAolfscrzidqM62kpe3h/qCdUvQ5hop0zTwNVVH3c9d67YaFog
-	34wEjYvBVPuFP/vHFk1oFP/WdZgn+Xug2wfMpMwOEZdZ1mcokqt0
-X-Google-Smtp-Source: AGHT+IEPUB/CE/7/FTo9q3R9Q6EzwdPWS0D+NTCJD5ZMdzk4Th99z0AuoS1Pisg/BbLh/WUr+c69Kg==
-X-Received: by 2002:a05:600c:2253:b0:426:5b3e:daa6 with SMTP id 5b1f17b1804b1-4265b3edee4mr51235845e9.35.1720440835759;
-        Mon, 08 Jul 2024 05:13:55 -0700 (PDT)
-Received: from skbuf ([188.25.110.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266303ded9sm70801745e9.34.2024.07.08.05.13.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 05:13:55 -0700 (PDT)
-Date: Mon, 8 Jul 2024 15:13:52 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christian Eggers <ceggers@arri.de>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Juergen Beisert <jbe@pengutronix.de>, Stefan Roese <sr@denx.de>,
-	Juergen Borleis <kernel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] dsa: lan9303: consistent naming for PHY address
- parameter
-Message-ID: <20240708121352.gnhhjuvvoxpjhtpv@skbuf>
-References: <20240703145718.19951-1-ceggers@arri.de>
- <20240703145718.19951-2-ceggers@arri.de>
- <20240704192034.23304ee8@kernel.org>
+        d=1e100.net; s=20230601; t=1720441045; x=1721045845;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mh2PihSggFxhCtx/jCViYrh994DXTDX0aEr2FXB2Ac0=;
+        b=FBCl9z8whgZEOvnp+vcMbxu51JVf4SdI5bk43d+bJuyd199ezNFn8OiOcxusfdW3NP
+         niFIwN8U5Tltkq3C0og45pgrsxs/CR3F+/Jiwj/2OPIPwcG1NgPV0P0gHbrQOLKzWB7p
+         Gb7l6v6tM/RS4GAMtSDZJZdVkdLSnCYxY1S9ZAVS3Ksq2mNgjrH2WbqYMcvFFPlVXwZ6
+         kHisH0LPEqqtlNbeiCR8fo33b8l1EShbCqGPnjnr60KnFwEvAwdTJsYKkHG+S8fVT1tN
+         5sdo2OjcB902A8kG6o4Sk1m4tkJ/vnVXBbu4bA9q3TYNEbeIsY2IbfI4CAtuGdki8v3D
+         XAkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXzJkZouBpt+0/FB1HhIVAk4P4WECbJ+UO/wIiga9ee1td3llOKDo0FdbUhZXCK1/HHOtBMFGE3ureNBAv8Y60Gd0e34LQ+
+X-Gm-Message-State: AOJu0YxVytidRai7gV4vVwBRBataRO+mlC5ARYCh7DPE7cSivWA6hE6z
+	BzxFYxpdbbnwq6CvVQPJFWpQicoZ873g9nDQ0R+Yr8WnzqfTiDI0txAbJA==
+X-Google-Smtp-Source: AGHT+IEQZk3svFexBPCdHAslaqMJPtvYt92u2/VjNX3ZhUMIEP4X+SS0wse7+I+yt2TRh7bXw7ZxNQ==
+X-Received: by 2002:a5d:5708:0:b0:367:40b6:b90b with SMTP id ffacd0b85a97d-3679f6e4f21mr10425619f8f.10.1720441044770;
+        Mon, 08 Jul 2024 05:17:24 -0700 (PDT)
+Received: from [10.158.37.53] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1d6435sm160466815e9.15.2024.07.08.05.17.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jul 2024 05:17:24 -0700 (PDT)
+Message-ID: <d1dba3e1-2ecc-4fdf-a23b-7696c4bccf45@gmail.com>
+Date: Mon, 8 Jul 2024 15:17:20 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240704192034.23304ee8@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 00/10] mlx5 misc patches 2023-07-08
+To: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>
+References: <20240708080025.1593555-1-tariqt@nvidia.com>
+ <20240708105823.GL1481495@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240708105823.GL1481495@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 04, 2024 at 07:20:34PM -0700, Jakub Kicinski wrote:
-> On Wed, 3 Jul 2024 16:57:18 +0200 Christian Eggers wrote:
-> > Name it 'addr' instead of 'port' or 'phy'.
+
+
+On 08/07/2024 13:58, Simon Horman wrote:
+> On Mon, Jul 08, 2024 at 11:00:15AM +0300, Tariq Toukan wrote:
+>> Hi,
+>>
+>> This patchset contains features and small enhancements from the team to
+>> the mlx5 core and Eth drivers.
+>>
+>> In patches 1-4, Dan completes the max_num_eqs logic of the SF.
+>>
+>> Patches 5-7 by Rahul and Carolina add PTM (Precision Time Measurement)
+>> support to driver. PTM is a PCI extended capability introduced by
+>> PCI-SIG for providing an accurate read of the device clock offset
+>> without being impacted by asymmetric bus transfer rates.
+>>
+>> Patches 8-10 are misc fixes and cleanups.
+>>
+>> Series generated against:
+>> commit 390b14b5e9f6 ("dt-bindings: net: Define properties at top-level")
+>>
+>> Regards,
+>> Tariq
+>>
+>> V2:
+>> - Fixed compilation issue on !X86 archs.
 > 
-> Unfortunately the fix has narrowly missed today's PR.
-> Please resend this for net-next in a week+.
+> Thanks, I have confirmed compilation on ARM and arm64.
+> 
+> ...
+> 
 
-How does this work? You're no longer taking 'net' patches through the
-'net' tree in the last week before the net-next pull request?
+Great. Thank you.
 
