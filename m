@@ -1,149 +1,196 @@
-Return-Path: <netdev+bounces-109990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5289392A998
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:08:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEE892A9BD
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 21:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2854B211FF
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 19:08:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6271C218F2
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 19:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146C414E2C5;
-	Mon,  8 Jul 2024 19:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6BD14884B;
+	Mon,  8 Jul 2024 19:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="d79hmBmk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEA614B967;
-	Mon,  8 Jul 2024 19:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EE8146D74
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 19:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720465694; cv=none; b=OyvB9Pkhg7GaiX4B0liNrsXOHkqJdcaSxczmgK7dE9sYmnvd9L0W+e3qmEW9AQuEZyz9iYf18XDznuq4jl90tixeQsiS39Eg+23GF4QfLzMh+rExKYtIjaMF+5ML78KeO3enSDqsyOXOJEkeuq/TNrskRXRunomDl/XbBDjiG50=
+	t=1720466452; cv=none; b=FhcGvmz9jzvEu+wI04Ap5TxPcB24C67JFnaWmMwSMQLNMZN7v+Kh7/IHGMNtEzU0LlyHAFytOYyBJBD3Gj9JEF/gB7FroOERYQukCr4jY2c/3j1Xm7EcGHpGx8V2rmGJkbG4KkKpwKq4PGeZG6WI6qXielbrq9X3NgifznVZEgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720465694; c=relaxed/simple;
-	bh=pYbSygs6DFw3cN9dVfNQF3w63IPyDQV/ph7ZmPU1o+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iO5eyqz+2e1vMIexsxRu9mAYoWJoZZcvIgRliayGuW42qOYFqtOXjCgucMe+DkoAPMJ20Ys6UilnrV2Ylsfo7Qe+Px0TGYTKegUr/r0n0gaZOllP/DS1JpHQMgdksuXLL2iGxsaJQU7b1a+Ps6GPC2+FxjrCVLd0gYPbnexxPEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-58b0dddab63so6406448a12.3;
-        Mon, 08 Jul 2024 12:08:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720465689; x=1721070489;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i5VCdX60NWwfC1nVwekLYgNiGy5kNm96Cosdiq19/GM=;
-        b=Vc3Mr2ZQG15v6DVdtNOutBGcabEVLFta2MGTxn8reDEw6Yo0IWSnD6IPzvEZM+6cKC
-         K5Db3rTYoum2l89EN+2KapWbCCn2d9+TjfMe5+lF10zFZDpZL8wlJwJTpkU6VqwvFwHO
-         mRwjZyAePEyyIHGTEyiNrRBFYsyC8F29SRGOjOYWDIKVaOkQ6OEmcTfp4uOGJ/YFSDZY
-         tPrlIm3gjCVCeDUDoBPxDlckVAm1iCMtrkBaRLF+gR3BigVwZk4ajIZBgbzmUAsxAZPb
-         uz4hFSze6MaFTGZaSCC329XEvXga+sc0IdH/cvTSGX/xXy+Wl5P/+HaCF4KlBl63Txf5
-         o3Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCV98chX5X/iQdUCLMuD/yVXw9gyp0O5j+3GQMr4BbxjP29lcyy67kpIIW/0d+tH4RBdTyelKRlbeCglU8qTHBNYAK5vXz19UiWxj/3c/JeMAdoJ53wkEIfzW1b/nNwbj/UPhH+N
-X-Gm-Message-State: AOJu0Ywr9vv+1LaplFf0i2oOdXdOV7jB9/C14FvGaCG+kgAflWQh3gMW
-	jiO2krWkoO7XHeXnUTP/zLrUHO+nQLkIta8qEnhLTD/UWNk2nuv3
-X-Google-Smtp-Source: AGHT+IHe2bAuF3QoVgM+CiLRff4u7OuOz5mDHUAISjnBCInvO4afmYAsw4m/dW4O/4hmNTBdmgEXYA==
-X-Received: by 2002:a05:6402:84d:b0:57d:12c3:eca6 with SMTP id 4fb4d7f45d1cf-594ba0ced20mr293140a12.18.1720465688385;
-        Mon, 08 Jul 2024 12:08:08 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bda30f76sm146037a12.97.2024.07.08.12.08.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 12:08:08 -0700 (PDT)
-Date: Mon, 8 Jul 2024 12:08:05 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: kernel test robot <lkp@intel.com>, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kuba@kernel.org, horms@kernel.org, Roy.Pledge@nxp.com,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/4] soc: fsl: qbman: FSL_DPAA depends on COMPILE_TEST
-Message-ID: <Zow5FUmOADrqUpM9@gmail.com>
-References: <20240624162128.1665620-1-leitao@debian.org>
- <202406261920.l5pzM1rj-lkp@intel.com>
- <20240626140623.7ebsspddqwc24ne4@skbuf>
- <Zn2yGBuwiW/BYvQ7@gmail.com>
- <20240708133746.ea62kkeq2inzcos5@skbuf>
+	s=arc-20240116; t=1720466452; c=relaxed/simple;
+	bh=/G4hHrqmNm289gSK2UA8wyq4UhbQz0/zM0t6ZlSBtcI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s7fbo1yZ4su89FPgZB0Po8Ww7w8bK67thbL540DRW6Oqf4LyVkaUbGHwZ7yeebnai4oIy2FqZ8AdQQt24M3OEs24zQJ/4uPlB/nKlwfO+pnNQaQdXFDasTtJs28zvQCLCyqKATG2EUEJrty/khE45XnrMg9BEn+Lr1HD/h6zd/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=d79hmBmk; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720466450; x=1752002450;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=f8WohAJ9iU3HtIy00CRwFg1TC3vubBx8O//B0v7g4xI=;
+  b=d79hmBmk28z0ALZrjQaaFCHCFdO49T94Z3u2Tv2NAIroGf/jycwlz3iU
+   ewn9PupsT7gc8raikMcWfSU4fpzDdptyu6hD3TEK9yDDGdlMUd6AWUJ1n
+   8WJNQqHJaznX/aSRdhz1mi7Sc0GEesxaD7M4PCgDbLfSpj1iWrD7QGtM7
+   E=;
+X-IronPort-AV: E=Sophos;i="6.09,192,1716249600"; 
+   d="scan'208";a="412987013"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2024 19:20:47 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:38851]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.122:2525] with esmtp (Farcaster)
+ id 6a510148-8410-482e-b87d-44bc25954a16; Mon, 8 Jul 2024 19:20:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 6a510148-8410-482e-b87d-44bc25954a16
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 8 Jul 2024 19:20:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.51) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 8 Jul 2024 19:20:43 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller@googlegroups.com>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 net] udp: Set SOCK_RCU_FREE earlier in udp_lib_get_port().
+Date: Mon, 8 Jul 2024 12:20:34 -0700
+Message-ID: <20240708192034.99704-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iKMDDzRox+KC4dGGBCL+VgBSR2S8NoKYcLHR3TS4r_XqQ@mail.gmail.com>
+References: <CANn89iKMDDzRox+KC4dGGBCL+VgBSR2S8NoKYcLHR3TS4r_XqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708133746.ea62kkeq2inzcos5@skbuf>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello Vladimir,
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 8 Jul 2024 12:07:56 -0700
+> On Mon, Jul 8, 2024 at 11:55 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > From: Eric Dumazet <edumazet@google.com>
+> > Date: Mon, 8 Jul 2024 11:38:41 -0700
+> > > On Mon, Jul 8, 2024 at 11:20 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > > >
+> > > > syzkaller triggered the warning [0] in udp_v4_early_demux().
+> > > >
+> > > > In udp_v4_early_demux(), we do not touch the refcount of the looked-up
+> > > > sk and use sock_pfree() as skb->destructor, so we check SOCK_RCU_FREE
+> > > > to ensure that the sk is safe to access during the RCU grace period.
+> > > >
+> > > > Currently, SOCK_RCU_FREE is flagged for a bound socket after being put
+> > > > into the hash table.  Moreover, the SOCK_RCU_FREE check is done too
+> > > > early in udp_v4_early_demux(), so there could be a small race window:
+> > > >
+> > > >   CPU1                                 CPU2
+> > > >   ----                                 ----
+> > > >   udp_v4_early_demux()                 udp_lib_get_port()
+> > > >   |                                    |- hlist_add_head_rcu()
+> > > >   |- sk = __udp4_lib_demux_lookup()    |
+> > > >   |- DEBUG_NET_WARN_ON_ONCE(sk_is_refcounted(sk));
+> > > >                                        `- sock_set_flag(sk, SOCK_RCU_FREE)
+> > > >
+> > > > In practice, sock_pfree() is called much later, when SOCK_RCU_FREE
+> > > > is most likely propagated for other CPUs; otherwise, we will see
+> > > > another warning of sk refcount underflow, but at least I didn't.
+> > > >
+> > > > Technically, moving sock_set_flag(sk, SOCK_RCU_FREE) before
+> > > > hlist_add_{head,tail}_rcu() does not guarantee the order, and we
+> > > > must put smp_mb() between them, or smp_wmb() there and smp_rmb()
+> > > > in udp_v4_early_demux().
+> > > >
+> > > > But it's overkill in the real scenario, so I just put smp_mb() only under
+> > > > CONFIG_DEBUG_NET to silence the splat.  When we see the refcount underflow
+> > > > warning, we can remove the config guard.
+> > > >
+> > > > Another option would be to remove DEBUG_NET_WARN_ON_ONCE(), but this could
+> > > > make future debugging harder without the hints in udp_v4_early_demux() and
+> > > > udp_lib_get_port().
+> > > >
+> > > > [0]:
+> > > >
+> > > > Fixes: 08842c43d016 ("udp: no longer touch sk->sk_refcnt in early demux")
+> > > > Reported-by: syzkaller <syzkaller@googlegroups.com>
+> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > > ---
+> > > >  net/ipv4/udp.c | 8 +++++++-
+> > > >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > index 189c9113fe9a..1a05cc3d2b4f 100644
+> > > > --- a/net/ipv4/udp.c
+> > > > +++ b/net/ipv4/udp.c
+> > > > @@ -326,6 +326,12 @@ int udp_lib_get_port(struct sock *sk, unsigned short snum,
+> > > >                         goto fail_unlock;
+> > > >                 }
+> > > >
+> > > > +               sock_set_flag(sk, SOCK_RCU_FREE);
+> > >
+> > > Nice catch.
+> > >
+> > > > +
+> > > > +               if (IS_ENABLED(CONFIG_DEBUG_NET))
+> > > > +                       /* for DEBUG_NET_WARN_ON_ONCE() in udp_v4_early_demux(). */
+> > > > +                       smp_mb();
+> > > > +
+> > >
+> > > I do not think this smp_mb() is needed. If this was, many other RCU
+> > > operations would need it,
+> > >
+> > > RCU rules mandate that all memory writes must be committed before the
+> > > object can be seen
+> > > by other cpus in the hash table.
+> > >
+> > > This includes the setting of the SOCK_RCU_FREE flag.
+> > >
+> > > For instance, hlist_add_head_rcu() does a
+> > > rcu_assign_pointer(hlist_first_rcu(h), n);
+> >
+> > Ah, I was thinking spinlock will not prevent reordering, but
+> > now I see, rcu_assign_pointer() had necessary barrier. :)
+> >
+> >   /**
+> >    * rcu_assign_pointer() - assign to RCU-protected pointer
+> >    ...
+> >    * Assigns the specified value to the specified RCU-protected
+> >    * pointer, ensuring that any concurrent RCU readers will see
+> >    * any prior initialization.
+> >
+> > will remove smp_mb() and update the changelog in v2.
+> >
+> 
+> A similar commit was
+> 
+> commit 871019b22d1bcc9fab2d1feba1b9a564acbb6e99
+> Author: Stanislav Fomichev <sdf@fomichev.me>
+> Date:   Wed Nov 8 13:13:25 2023 -0800
+> 
+>     net: set SOCK_RCU_FREE before inserting socket into hashtable
+> 
+> So I wonder if the bug could be older...
 
-On Mon, Jul 08, 2024 at 04:37:46PM +0300, Vladimir Oltean wrote:
-> On Thu, Jun 27, 2024 at 11:40:24AM -0700, Breno Leitao wrote:
+If we focus on the ordering, the Fixes tag would be
 
-> > > >      454 | static int dpaa_set_coalesce(struct net_device *dev,
-> > > >          |            ^
-> > > >    1 warning generated.
-> > > 
-> > > Arrays of NR_CPUS elements are what it probably doesn't like?
+Fixes: ca065d0cf80f ("udp: no longer use SLAB_DESTROY_BY_RCU")
 
-> > Can it use the number of online CPUs instead of NR_CPUS?
+But, at that time, we had atomic_inc_not_zero_hint() and used
+sock_efree(), which were removed later in 08842c43d016.
 
-> I don't see how, given that variable length arrays are something which
-> should be avoided in the kernel?
-
-I thought about a patch like the following (compile tested only). What
-do you think?
-
-	Author: Breno Leitao <leitao@debian.org>
-	Date:   Mon Jul 8 11:57:33 2024 -0700
-
-	    net: dpaa: Allocate only for online CPUs in dpaa_set_coalesce
-	    
-	    Currently, dpaa_set_coalesce allocates a boolean for every possible CPU
-	    (NR_CPUS). This approach is suboptimal and causes failures in COMPILE_TEST.
-	    For reference, see:
-	    https://lore.kernel.org/all/202406261920.l5pzM1rj-lkp@intel.com/
-	    
-	    Modify the allocation to consider only online CPUs instead of
-	    NR_CPUs. This change reduces the function's memory footprint and resolves
-	    the COMPILE_TEST issues.
-	    
-	    Signed-off-by: Breno Leitao <leitao@debian.org>
-
-	diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-	index 5bd0b36d1feb..7202a5310045 100644
-	--- a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-	+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-	@@ -457,7 +457,7 @@ static int dpaa_set_coalesce(struct net_device *dev,
-				     struct netlink_ext_ack *extack)
-	 {
-		const cpumask_t *cpus = qman_affine_cpus();
-	-	bool needs_revert[NR_CPUS] = {false};
-	+	bool *needs_revert;
-		struct qman_portal *portal;
-		u32 period, prev_period;
-		u8 thresh, prev_thresh;
-	@@ -466,6 +466,11 @@ static int dpaa_set_coalesce(struct net_device *dev,
-		period = c->rx_coalesce_usecs;
-		thresh = c->rx_max_coalesced_frames;
-	 
-	+	needs_revert = kmalloc_array(num_possible_cpus(), sizeof(bool), GFP_KERNEL);
-	+	if (!needs_revert)
-	+		return -ENOMEM;
-	+	memset(needs_revert, 0, num_online_cpus() * sizeof(bool));
-	+
-		/* save previous values */
-		portal = qman_get_affine_portal(smp_processor_id());
-		qman_portal_get_iperiod(portal, &prev_period);
-	@@ -498,6 +503,7 @@ static int dpaa_set_coalesce(struct net_device *dev,
-			qman_dqrr_set_ithresh(portal, prev_thresh);
-		}
-	 
-	+	kfree(needs_revert);
-		return res;
-	 }
-	 
+Which one should I use as Fixes: ?
 
