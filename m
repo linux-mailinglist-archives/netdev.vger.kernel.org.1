@@ -1,193 +1,171 @@
-Return-Path: <netdev+bounces-109740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-109741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3CAA929CE0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:14:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD537929CFC
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 09:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72FE01F21812
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5F628164F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 07:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D166B1CD2B;
-	Mon,  8 Jul 2024 07:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D2B18EB1;
+	Mon,  8 Jul 2024 07:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="k4k0gjOT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRilljeW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24421C68F;
-	Mon,  8 Jul 2024 07:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C14C224E8
+	for <netdev@vger.kernel.org>; Mon,  8 Jul 2024 07:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720422883; cv=none; b=NMknlXC7eHKbvs+wQeZvhttJn8sE5vgb1jZhPvgRnUuJAKgbwsUxDVZbj/UfnRLBcWvbMmE7JBvqghtTGwOftV4T5fmC4T+7wS3P37xVmERL0BfqEB0ZDZjgfWgG/PrErwqNspWaI0Ltb3XEp/NYiJ9PnA9y/LvVWFyGpbfmYBo=
+	t=1720423154; cv=none; b=aigLdyaigR4XCyToovuQ/94ezsaYballOInZHBzDOQL3ZY6M529C0MuDmBbVKkBy+eqvhaVdaNV5P2B4QjYx83Kla8AM/c2A37ob3YvNK6Wj0vdWGvdpcWZn5DCiMaEsOM+UT+EYgvNIhGw1MPnQaGxb10VYXs1ynAo9F0zkq2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720422883; c=relaxed/simple;
-	bh=CsZBoXzk0XIRrdPyPdyogoIooR3030G2XvdRQtmGPcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bt8Bsbn0Ah9hQc5BQp2GYj6J+S65oqzmJz3aYJkicaQdf0chE5ASV8ld2KbTf1MQ8BgS+upQOJieNUAp1aClAUbjpZBZadzMwGrHNeXTLsvi3v2YYy4WZWdi4tw467fB8N8TkCXOxc+CN3qUtUWnwdXqbst22qItU29sIeXBC8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=k4k0gjOT; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4680R1T3031488;
-	Mon, 8 Jul 2024 07:13:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	oVQgIh72nNA4GfK+pn5YNj9SZPpD84n0grZ2Sjd1hiM=; b=k4k0gjOTh+Vxo9s/
-	h9S8/RA7yKThjmbvcW/tFXO+sXXLk07A8ojbHYxPlHvFElRS9CX2tSmoPlG0WvoA
-	BD3e0KVxPgnJK5C7Q8ARMoE5DvnYQmSnBTz8b/EusqvvIUmk+krrOnkSUZLTcUko
-	yPM5CWKPOhDhwHhIninv839irig80p5xHdCayzX+4VCwSAyLd2RjWvHwkb+yrAxA
-	I3JL/ihKAuVbLfn6472ACWvJdbgeUUMZcaWc4u+iE9EbBg7NrSKPSxvdd0FcVLUv
-	1//BmZOHCzJnmVQqJkSlzIdbXEXACBKgaJ8/R3Nel/axg3KwBECd7MtoM431QbS4
-	zpDsQQ==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406wgwjvnj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jul 2024 07:13:46 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4687DiCn028522
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jul 2024 07:13:44 GMT
-Received: from [10.239.132.150] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 8 Jul 2024
- 00:13:23 -0700
-Message-ID: <c9822569-896c-4d5f-b917-2826bf414e67@quicinc.com>
-Date: Mon, 8 Jul 2024 15:13:20 +0800
+	s=arc-20240116; t=1720423154; c=relaxed/simple;
+	bh=BCpNb63WRewgJB37gIEoqo5egyIJUDlpbkKJgwO8OHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TtrqbRAR5vgjhlRCGgNXTWfaoZVoefjjDWlUpiNL4SygqBOS/66bZeA7rWZYUIeEuiIK4P2LLyg+xDoYLHud/eTyiunoKpFLn1c289YaWOGcha78R+chjuBIKB6X56hgUI36RCuL+cdtMIOdgtXL8nY/V9u26NzoxCg9Dfg3jKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MRilljeW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720423151;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jqM73JSLXU66f0uRVT9WU+gkf5AyrsxUM3dUDMhxBT4=;
+	b=MRilljeWXPZxeqBhAcYW+XPuVMcvo9jjJ/nufLr8Vc/WmxGsPpEfEVfB5tvyM4CK6grd9q
+	BNgmLxSqPxZBpEVFZu7XkBja50dz/2L9VBmlNM+lWDx+uooH9CDblGQBleLGzJwnV/Y3tZ
+	CK6g48/14a6OXv0Li8GtkpPz/z1GEvc=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-83-oiJTgphRP_-FJBaEKVPWbw-1; Mon, 08 Jul 2024 03:19:09 -0400
+X-MC-Unique: oiJTgphRP_-FJBaEKVPWbw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a77dbdc2cf6so152036366b.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 00:19:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720423148; x=1721027948;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jqM73JSLXU66f0uRVT9WU+gkf5AyrsxUM3dUDMhxBT4=;
+        b=BRWkJ4PNjBrmdJhYReiXeyfYcxrPk2sTsPi6wbse2BUViN3SGoOJFwO7GI9HC6xF4M
+         Sc4RHkqR98P5AAjiFuUhQrzXJTvKj27pNU7xJd5ZBsG/Nus/sCHOcstsoG9/Y1pUAlRL
+         7dEbZhdB9lOcgC+Xe24hXOqCJDHkXEK9ySMwAC/2nhruyyoZX5g+FUU/8jBc3Iw9pGLb
+         Q3+K6dQx01vGr29U4KivwK2J5Oj9G1zeNMarcwii+nrG0i0wBXFuZmfZIuC65Rn2+ZN2
+         8ZrM/K+KunqsoKFmTfwgAZmyM+QJKWCgiheOgRDnm5n8zbrEXvSNqiXDXVjLPq5cX1vj
+         ustg==
+X-Forwarded-Encrypted: i=1; AJvYcCW87u6CuQdA20wAPYfxsiDDDKUtz7LZ/Owhzwv1LI3vylm3AqHnqEClzWK2C12Nz2lhFLb4towdRyINJTdxOIwUxqOsWzMm
+X-Gm-Message-State: AOJu0YzH5vNp2G0/6h1X7asTlQZ8hHWq/hC88HhqH8w70XYV60P0rsIY
+	s3SOK2yM7LAxZrXqBpoYbzKiOQRZGIw7gpc6IfzdSTiKf0oBEDcI+7SuNq+YaMENNxoiW5Q3Vex
+	FkxnY4S9lrL56q+yfHKSRKgaow1f2Q+SybnOqT2zBoLzUoR9da9fSnmD3p03UrYhF4P1pEaDtDm
+	GUk2yJsMFj6IU/oNy63ID/cuhojU6H
+X-Received: by 2002:a17:906:175b:b0:a77:a630:cf89 with SMTP id a640c23a62f3a-a77b9dee79dmr706514866b.0.1720423148321;
+        Mon, 08 Jul 2024 00:19:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGUu1W6MyDpHHXhXDXEq+4hte1tFdv4eIOo7asqiTd/PZmPPhD5t+yUjE3Q9R2KpY/v0HSjx6vJ4Xu91Rb1yY=
+X-Received: by 2002:a17:906:175b:b0:a77:a630:cf89 with SMTP id
+ a640c23a62f3a-a77b9dee79dmr706512466b.0.1720423147970; Mon, 08 Jul 2024
+ 00:19:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/47] dt-bindings: arm: qcom: Document QCS9100 SoC and
- RIDE board
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Krzysztof Kozlowski
-	<krzk@kernel.org>,
-        Tengfei Fan <quic_tengfan@quicinc.com>, <andersson@kernel.org>,
-        <konrad.dybcio@linaro.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-        <conor+dt@kernel.org>, <djakov@kernel.org>, <mturquette@baylibre.com>,
-        <sboyd@kernel.org>, <jassisinghbrar@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <manivannan.sadhasivam@linaro.org>, <will@kernel.org>,
-        <joro@8bytes.org>, <conor@kernel.org>, <tglx@linutronix.de>,
-        <amitk@kernel.org>, <thara.gopinath@gmail.com>,
-        <linus.walleij@linaro.org>, <wim@linux-watchdog.org>,
-        <linux@roeck-us.net>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
-        <vkoul@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>
-CC: <robimarko@gmail.com>, <bartosz.golaszewski@linaro.org>,
-        <kishon@kernel.org>, <quic_wcheng@quicinc.com>,
-        <alim.akhtar@samsung.com>, <avri.altman@wdc.com>, <bvanassche@acm.org>,
-        <agross@kernel.org>, <gregkh@linuxfoundation.org>,
-        <quic_tdas@quicinc.com>, <robin.murphy@arm.com>,
-        <daniel.lezcano@linaro.org>, <rui.zhang@intel.com>,
-        <lukasz.luba@arm.com>, <quic_rjendra@quicinc.com>,
-        <ulf.hansson@linaro.org>, <quic_sibis@quicinc.com>,
-        <otto.pflueger@abscue.de>, <luca@z3ntu.xyz>,
-        <neil.armstrong@linaro.org>, <abel.vesa@linaro.org>,
-        <bhupesh.sharma@linaro.org>, <alexandre.torgue@foss.st.com>,
-        <peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
-        <netdev@vger.kernel.org>, <lpieralisi@kernel.org>, <kw@linux.com>,
-        <bhelgaas@google.com>, <ahalaney@redhat.com>,
-        <u.kleine-koenig@pengutronix.de>, <dmitry.baryshkov@linaro.org>,
-        <quic_cang@quicinc.com>, <danila@jiaxyga.com>,
-        <quic_nitirawa@quicinc.com>, <mantas@8devices.com>,
-        <athierry@redhat.com>, <quic_kbajaj@quicinc.com>,
-        <quic_bjorande@quicinc.com>, <quic_msarkar@quicinc.com>,
-        <quic_devipriy@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_rgottimu@quicinc.com>, <quic_shashim@quicinc.com>,
-        <quic_kaushalk@quicinc.com>, <quic_tingweiz@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
-        <linux-riscv@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <kernel@quicinc.com>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703025850.2172008-2-quic_tengfan@quicinc.com>
- <665f6c8c-4f43-4d20-90e9-9e037a942066@kernel.org>
- <fbeb5969-0b3a-455e-88eb-b83734bf2c50@quicinc.com>
- <97c9484b-e257-4163-a104-3457d59bc69b@kernel.org>
- <63eb3f58-d4a4-4a27-b78c-f4cb83e62c63@quicinc.com>
- <f8f3c4d4-bf24-4195-a7b0-eec95cd64b57@linaro.org>
-From: "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>
-Content-Language: en-US
-In-Reply-To: <f8f3c4d4-bf24-4195-a7b0-eec95cd64b57@linaro.org>
+References: <20240708064820.88955-1-lulu@redhat.com> <20240708064820.88955-3-lulu@redhat.com>
+ <CACGkMEum7Ufgkez9p4-o9tfYBqfvPUA+BPrxZD8gF7PmWVhE2g@mail.gmail.com>
+In-Reply-To: <CACGkMEum7Ufgkez9p4-o9tfYBqfvPUA+BPrxZD8gF7PmWVhE2g@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Mon, 8 Jul 2024 15:18:31 +0800
+Message-ID: <CACLfguXdL_FvdvReQrzvKvzJrHnE9gcTv+rLYsCNB0HtvXC74w@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] vdpa_sim_net: Add the support of set mac address
+To: Jason Wang <jasowang@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Xv0uyNlFtYweTJimUd2_Zu7YnPGml5J3
-X-Proofpoint-ORIG-GUID: Xv0uyNlFtYweTJimUd2_Zu7YnPGml5J3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-08_02,2024-07-05_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=966 mlxscore=0
- adultscore=0 malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 clxscore=1015 priorityscore=1501 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407080054
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, 8 Jul 2024 at 15:06, Jason Wang <jasowang@redhat.com> wrote:
+>
+> On Mon, Jul 8, 2024 at 2:48=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+> >
+> > Add the function to support setting the MAC address.
+> > For vdpa_sim_net, the driver will write the MAC address
+> > to the config space, and other devices can implement
+> > their own functions to support this.
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++++++++++++++-
+> >  1 file changed, 18 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa_s=
+im/vdpa_sim_net.c
+> > index cfe962911804..a472c3c43bfd 100644
+> > --- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> > +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> > @@ -414,6 +414,22 @@ static void vdpasim_net_get_config(struct vdpasim =
+*vdpasim, void *config)
+> >         net_config->status =3D cpu_to_vdpasim16(vdpasim, VIRTIO_NET_S_L=
+INK_UP);
+> >  }
+> >
+> > +static int vdpasim_net_set_attr(struct vdpa_mgmt_dev *mdev,
+> > +                               struct vdpa_device *dev,
+> > +                               const struct vdpa_dev_set_config *confi=
+g)
+> > +{
+> > +       struct vdpasim *vdpasim =3D container_of(dev, struct vdpasim, v=
+dpa);
+> > +
+> > +       struct virtio_net_config *vio_config =3D vdpasim->config;
+> > +       if (config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> > +               if (!is_zero_ether_addr(config->net.mac)) {
+> > +                       memcpy(vio_config->mac, config->net.mac, ETH_AL=
+EN);
+> > +                       return 0;
+> > +               }
+> > +       }
+> > +       return -EINVAL;
+>
+> I think in the previous version, we agreed to have a lock to
+> synchronize the writing here?
+>
+> Thanks
+>
+Hi Jason
+I have moved the down_write(&vdev->cf_lock) and
+up_write(&vdev->cf_lock) to the function vdpa_dev_net_device_attr_set
+in vdpa/vdpa.c. Then the device itself doesn't need to call it again.
+Do you think this is ok?
+Thanks
+Cindy
+> > +}
+> > +
+> >  static void vdpasim_net_setup_config(struct vdpasim *vdpasim,
+> >                                      const struct vdpa_dev_set_config *=
+config)
+> >  {
+> > @@ -510,7 +526,8 @@ static void vdpasim_net_dev_del(struct vdpa_mgmt_de=
+v *mdev,
+> >
+> >  static const struct vdpa_mgmtdev_ops vdpasim_net_mgmtdev_ops =3D {
+> >         .dev_add =3D vdpasim_net_dev_add,
+> > -       .dev_del =3D vdpasim_net_dev_del
+> > +       .dev_del =3D vdpasim_net_dev_del,
+> > +       .dev_set_attr =3D vdpasim_net_set_attr
+> >  };
+> >
+> >  static struct virtio_device_id id_table[] =3D {
+> > --
+> > 2.45.0
+> >
+>
 
-
-On 7/8/2024 2:07 PM, Krzysztof Kozlowski wrote:
-> On 08/07/2024 06:45, Aiqun Yu (Maria) wrote:
->>
->>
->> On 7/3/2024 5:33 PM, Krzysztof Kozlowski wrote:
->>> On 03/07/2024 11:21, Tengfei Fan wrote:
->>>>>>         - items:
->>>>>>             - enum:
->>>>>> +              - qcom,qcs9100-ride
->>>>>>                 - qcom,sa8775p-ride
->>>>>> +          - const: qcom,qcs9100
->>>>>
->>>>> This changes existing compatible for sa8775p without any explanation in
->>>>> commit msg.
->>>>>
->>>>> Best regards,
->>>>> Krzysztof
->>>>>
->>>>
->>>> In the next verion patch series, I will provide relevant explanatory 
->>>> information in this patch commit message.
->>>
->>> TBH, I cannot think of any reasonable explanation for this, especially
->>> considering rest of the patchset which does not fix resulting dtbs_check
->>> warning.
->>
->> The existing compatible "sa8775p" warning can only be addressed When
->> @Nikunj's "sa8775p" changes merged.
->>
->> Let me know if you have other suggestions for this.
-> 
-> I don't have, because I don't understand why do you want/need to change
-> existing board compatible.
-
-We can left the current existing sa8775p board compatible as it is. And
-have a brand new qcs9100 and qcs9100-board item for current non-scmi
-resources compatible.
-
-Will that be more reasonable from your end?
-
-> 
-> Best regards,
-> Krzysztof
-> 
-
--- 
-Thx and BRs,
-Aiqun(Maria) Yu
 
