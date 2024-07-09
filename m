@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-110148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFFD692B1E1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:14:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC7F92B1E4
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:14:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FAC51C2221B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:14:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77DFF1F220E0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007B6152524;
-	Tue,  9 Jul 2024 08:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002B41514F8;
+	Tue,  9 Jul 2024 08:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bE3BeyOZ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FnlgmJId"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE12E15217D;
-	Tue,  9 Jul 2024 08:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FCC15250A;
+	Tue,  9 Jul 2024 08:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720512846; cv=none; b=I/YXPYGxpcQh7XIlDiHbdFVHqR/3tMVByHll7tcTGoDGeHGTV7FEUGfH5tjDBuw+4AHBIzmHq58nmJTtrAjXquT2HhZrjVEci5nOE+R/Gn7FeUqAnOWknI8aHdtbs/3tGcp3q8gGvEzULfo97bWBh7XfaAd0ETPdKvWYh+yoO1A=
+	t=1720512863; cv=none; b=JN0zafXjMSi8n/gcGpnighoEgX20IlozxSf8b43Bu4B2/iUr/NhjkgvFPfma0myEjMX+wiuib1JaExJkO2OSQqAiZVVlfFxpU4mKSpp7uaWXI4U3ds6qtHGEf5THYIFDnXZJ6QL2lQhoBNccwaBAQ4tqnmWZmhdfrkhV18lbo9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720512846; c=relaxed/simple;
-	bh=qOYixWHwWz0mDnRBbUEelOVo20hVNaPPF8YAr92jNBw=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=BKW4IgQsu4ENVQpdDuzkJ2t+qpvK8PN7ZhHVE5JQRYu7qQ36tSgLfGQAFOFdOSDCikO35gUDZJtqluCpj1JKcNebf79AFhAYy70MUGVAQju+gP+k8a0SaSnBnUWH0nX9gcKMxQj2qBFXu1JDbW7OlN2T7NWW/70qx1nWgncATGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bE3BeyOZ; arc=none smtp.client-ip=115.124.30.97
+	s=arc-20240116; t=1720512863; c=relaxed/simple;
+	bh=RVtax/cydPCAPKnVI29kmRdNNf9y+jOhNkNxY9oFnzw=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=jmPOOfiUfTF9uBnKKWClE5XhugNHiQ4OArDOvTN+syBbXaYtOO2HRwF6Iqv8tw53dDTi9UBEB/FlNVyG5dHsuHjlw+/lgltC8SycXx2K7kPkSkeVdquZcpuui8g+ko1G7Pvn/jM1wPVhJGDVdasAgkRK0COzUHX/SPBgq31UfoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FnlgmJId; arc=none smtp.client-ip=115.124.30.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1720512836; h=Message-ID:Subject:Date:From:To;
-	bh=GuoyFS15rbzFrB5iVw6huvFAlrEeMu0BC7PmjWh/EUo=;
-	b=bE3BeyOZK20qyFwWZvCIBKOeq94FVdWoE1sSVTaWeyIEwy9b0DvtS+H0d3yfiYcx+rVx08YHOZpldkk52x1EJzU69GWMKEuUCi1WG4b1w7ZVy7++bfvfSab0+5rtdbdEQRlmQ9r6Ua7YIT88AvxGwC+pfBhw+Lou6GyaDNtXIRQ=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R721e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WAB1uuB_1720512835;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WAB1uuB_1720512835)
+	t=1720512854; h=Message-ID:Subject:Date:From:To;
+	bh=k4jnaRkPam0+HSWdw9HZ3KM1KrQVxWzXC5dPh+aQ7+A=;
+	b=FnlgmJIdzxiuWPLuVyV2GnfZHCyi4KguqSta7qaQrxHE2/RxCca0/ur/D0p1LQnv4MHqBXLrgnxbLG45X9jLs2HJh302gJK0RAaaoiBrqi5SjHSjNcA6aaCaUbRiOZFeyY4JG9q2rfhqHENwMk5dOGLJPbdZ4bmEKmNXiM8bH8c=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R841e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033023225041;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WAB1v0T_1720512853;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WAB1v0T_1720512853)
           by smtp.aliyun-inc.com;
-          Tue, 09 Jul 2024 16:13:56 +0800
-Message-ID: <1720512832.157104-2-xuanzhuo@linux.alibaba.com>
+          Tue, 09 Jul 2024 16:14:13 +0800
+Message-ID: <1720512843.116356-3-xuanzhuo@linux.alibaba.com>
 Subject: Re: [PATCH net-next v3 2/3] virtio: allow driver to disable the configure change notification
-Date: Tue, 9 Jul 2024 16:13:52 +0800
+Date: Tue, 9 Jul 2024 16:14:03 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: Jason Wang <jasowang@redhat.com>
 Cc: virtualization@lists.linux.dev,
@@ -79,6 +79,7 @@ On Tue,  9 Jul 2024 16:02:13 +0800, Jason Wang <jasowang@redhat.com> wrote:
 > Cc: Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
 > Signed-off-by: Jason Wang <jasowang@redhat.com>
 
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
 
 > ---
