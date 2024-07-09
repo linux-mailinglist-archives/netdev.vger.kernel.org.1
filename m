@@ -1,104 +1,140 @@
-Return-Path: <netdev+bounces-110261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B627092BAD5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:20:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3678992BAD8
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF3A281B73
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 680F21C21C56
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AEE158D92;
-	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22893158D8C;
+	Tue,  9 Jul 2024 13:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9vbrFjq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eg0Cjm/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7BE1EA74;
-	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3956D2B9DA;
+	Tue,  9 Jul 2024 13:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531229; cv=none; b=mPgNizJuxUFep3YPA2k1m4Ek90R/5IM3Vo2IPIJ0Uvtgc7gYioV10GhN0KUyTuuV/l3Pe86gWA5MQNuGFjO8ExMWp4ePSnq/EqsyG7PW0CQ5CysezFDx4n3hNAE4AzlTnxEfyESQjpjyalMCTaA1JggKDwFRmCun7x4aoCwrGKs=
+	t=1720531248; cv=none; b=ilKh/6kXjR5RkA8aS1jvzMsq+5ask4ykaXt0aaHeo+PcjEzN8A2RW3Uf5rQYFCxFxBRAeHb5pVe+OmHR4k+9DVLriDJIju/pi/SaHBX83NmDcS1/Zxr2v2BxX00PVIAtuQoBovhz2fTQ7Y7+kvpnDkI8ZPOGGzX77OtUfwiFRIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531229; c=relaxed/simple;
-	bh=BgrLyZZ3OPPlPIhvPTNiCSJwn6+2VtS9YFUiTxvLlhM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mbNF7biUChj0m9L8fv9Hf0Xe6KIZdEPkniXOr87AZGcGTAS5zBNCt6KQsMtrAM82OFdxu+8yVfWeV8q+Rc/dIBa5CcLmEcQCoH4fjtj19QBrCHujL0fYLbYcCahdIvWjb7YnUNx0QbCJ/tj3MonWOJmpUWplcuU1UXli0vx8a+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9vbrFjq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3256FC32786;
-	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720531229;
-	bh=BgrLyZZ3OPPlPIhvPTNiCSJwn6+2VtS9YFUiTxvLlhM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t9vbrFjqDuoI9V3g4OuryFAuUakCLvqe8ytCK5KDssSlWdFS9wJrnuNxMNU/61a/w
-	 qH+hcMbzEgIlA3U+yHClg981ZA3e1qBI5zDoJzmTUIt7cI/6q03BNvffq+n2X8ZsBu
-	 G0OlKhRr5DYRwrgxxREsbzgG7JtQDR4Y4vic+XfZHJ+DQTHASNKTi+wp1chMUnbXgB
-	 D5rGimrq5ErgaJyFb2Xr5vTcLJGK7jhSlOLUWquEgf7PoDSABctX3uBso+vRQ7To4v
-	 4k3ifgS7HNLwWSIe7RusZvdjNCg6IbJHptJ4tHzfnHNp0xmsAAGfKUaso1fmxOEAUR
-	 MuVdi/DNBCWTA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21B37C4332D;
-	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720531248; c=relaxed/simple;
+	bh=IWo9o+BR5hri80OXw059McKLXefmWML8DKmyfp52TPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KlCJeJaZQ8n7fpR2jWh8+ke2fRY1ZHY0YUeJ1LUvZzMrtvwkvevrMcFZdZMdivd3v78eyvTBYB1Ye7BUJviioEKBc6LjBrjsgL0hJ+JqJ47DXQjNqfM/pT51znU9hWj+rIPBnwt5SBPf8yga6wrNiVUlKVqDPyC0F1E0ruLVNZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eg0Cjm/T; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2B18E1BF20B;
+	Tue,  9 Jul 2024 13:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720531243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jdgtcZmaR8+U0BJCpEZXKmWLsv2ubjnvbI1hvNLijts=;
+	b=eg0Cjm/TBMLMJTS1BOIpLtUkMz04COoBTpzrwORid+BpxEyX+kDNujFxtgVc2TKgi/6s+X
+	ZsQYZUVdQRO1F2olaO6cOrSqVISF8oPJdFlM0kXMx3QFu4eOENVEkOFMZBkDKg2LBTLBbK
+	OwhnizFilnKwzPZCCR2kKpnElseJBhkd0kVqq6NtQfUfzX/zAP/yBrcu9QzMVCGtkzXWAX
+	NJO0AQtf6fBqo7TgbU1q4WRitgzmkvmsqwmNhDZ9bBB7uMDIdwLtF1P4qAtmm6hB3qycjz
+	0qCzV/9RVb3Wa2i/uyJ4HNvffzu8LoVD6q7E5B+SYUfbyBAvJOSnoAP8m8UoJw==
+Date: Tue, 9 Jul 2024 15:20:41 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Jonathan Corbet <corbet@lwn.net>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v6 5/7] net: ethtool: Add new power limit get
+ and set features
+Message-ID: <20240709152041.7493ffc5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240708113300.3544d36d@kernel.org>
+References: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
+	<20240704-feature_poe_power_cap-v6-5-320003204264@bootlin.com>
+	<20240705184116.13d8235a@kernel.org>
+	<20240708113846.215a2fde@kmaincent-XPS-13-7390>
+	<20240708113300.3544d36d@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 1/1] net: phy: microchip: lan937x: add support for
- 100BaseTX PHY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172053122913.19292.3616221576979957912.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jul 2024 13:20:29 +0000
-References: <20240706154201.1456098-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240706154201.1456098-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com, hkallweit1@gmail.com,
- linux@armlinux.org.uk, yuiko.oshino@microchip.com,
- florian.fainelli@broadcom.com, michal.kubiak@intel.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello:
+On Mon, 8 Jul 2024 11:33:00 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> On Mon, 8 Jul 2024 11:38:46 +0200 Kory Maincent wrote:
+>  [...] =20
+>  [...] =20
+>=20
+> Don't worry I understand the code well enough to resolve any conflicts
+> (famous last words?). And if we fix as part of ethnl_set_pse_validate()
+> then there's no conflict, AFAICT.
 
-On Sat,  6 Jul 2024 17:42:01 +0200 you wrote:
-> Add support of 100BaseTX PHY build in to LAN9371 and LAN9372 switches.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> ---
-> changes v3:
-> - add function comments
-> - split read_status function
-> - use (ret < 0) instead of (ret)
-> changes v2:
-> - move LAN937X_TX code from microchip_t1.c to microchip.c
-> - add Reviewed-by tags
-> 
-> [...]
+As you can see in the patch I just sent
+https://lore.kernel.org/netdev/20240709131201.166421-1-kory.maincent@bootli=
+n.com/T/#u
+the fix is not in set_pse_validate() therefore you will have a merge confli=
+ct.
 
-Here is the summary with links:
-  - [net-next,v3,1/1] net: phy: microchip: lan937x: add support for 100BaseTX PHY
-    https://git.kernel.org/netdev/net-next/c/870a1dbcbc2e
+You could do this to solve the merge conflict:
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -256,6 +256,7 @@ static int
+ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
+ {
+        struct net_device *dev =3D req_info->dev;
++       struct pse_control_config config =3D {};
+        struct nlattr **tb =3D info->attrs;
+        struct phy_device *phydev;
+        int ret =3D 0;
+@@ -273,15 +274,13 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct=
+ genl_info *info)
+        }
+=20
+        /* These values are already validated by the ethnl_pse_set_policy */
++       if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL])
++               config.podl_admin_control =3D nla_get_u32(tb[ETHTOOL_A_PODL=
+_PSE_ADMIN_CONTROL]);
++       if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
++               config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL_A_C33_P=
+SE_ADMIN_CONTROL]);
++
+        if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
+            tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
+-               struct pse_control_config config =3D {};
+-
+-               if (pse_has_podl(phydev->psec))
+-                       config.podl_admin_control =3D nla_get_u32(tb[ETHTOO=
+L_A_PODL_PSE_ADMIN_CONTROL]);
+-               if (pse_has_c33(phydev->psec))
+-                       config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL=
+_A_C33_PSE_ADMIN_CONTROL]);
+-
+                ret =3D pse_ethtool_set_config(phydev->psec, info->extack,
+                                             &config);
+                if (ret)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
 
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
