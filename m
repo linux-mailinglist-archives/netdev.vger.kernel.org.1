@@ -1,214 +1,150 @@
-Return-Path: <netdev+bounces-110066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4DE292AD21
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:33:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00BD592AD27
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9EA61C215F2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:33:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01A04B215FE
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF134A15;
-	Tue,  9 Jul 2024 00:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuaLewx/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065CC1EA80;
+	Tue,  9 Jul 2024 00:36:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FCF15BB;
-	Tue,  9 Jul 2024 00:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108F4A05
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 00:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720485184; cv=none; b=e8N7XRYHWchO5a6avN13/FxwtLDvELtcOqfjEgiwSBUZaGr74ZM3nFrUfH6gWBe2sVbHap8n6UuectW3R6diKlrKMp68XC+JUfH+kSZ9E5e3DE4oW1hh1u8VNzIkyrPGGegpck+r02lOuk4t257hc0sTF6KsDd6cSj0UJFjqMs0=
+	t=1720485383; cv=none; b=ZQm2bwD00nPq2ZZ/IgdxcFXQoL1llqJ7EHudXCXmBMzAX+i1djr1pJPS6Xig4EjgmVzxnILnT/TfN4PDVhG9RwzTpPB2My4/zL1/vZXgAj6A8marUm//hTQ544nK7fcja7F4PzWAoZxi7RiGvcFwzJc5WQ/PJETggN/OOZEgC0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720485184; c=relaxed/simple;
-	bh=k3/zS10JtPOCVxvS3f37FDn+IqhfPWXVJ3N/zYrYDJ0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=THc5Dqzai8yH825L6ei5UNF2qK/Lnig20QMIyBk8i1mBrJ1JEIsCnwv4VkgNRNOEqBuTzXXxw5OdKGn8hFT6Z7T9Xa+EKpbUyXu0Te+vFkB7HqvmvRHc2wP6ZQ75aOCPWZkTNLIF5S/2I17OpzwBJ3YZ+L7lAtYA+tafqZrYskY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HuaLewx/; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-6eab07ae82bso2348357a12.3;
-        Mon, 08 Jul 2024 17:33:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720485182; x=1721089982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gbmTmpGl9LGWIehww80/zM7iEVzfhtY6yCT6eHjeVS8=;
-        b=HuaLewx/eQSod4JtyPVha+62O+HQ2sS4CF1SEKz6LQrfI5GbNGIHyeAb/gPxR2fJ1L
-         tbDcq8Zkbxb6G1OfstfyvO1QEAj9MEzwpcbY3m5zKydrncXCAW2kz4GOOEyOivc9SKH3
-         4x7nrzMF3wlyHBkMmoaRtRMdbl4+LsDvn3SCNngMXNJPBuxlprurI3ll510qGCwGijnW
-         juDjrvQSoluR0r+swHm7h9rM/DHhUvqqEdFrsILCr5JRt+fpAP7GPyfc2iBh99FmaGzi
-         Q2kQAvvikKm+5PyzfSjbFxNpqDUigu2WZMPX7lQnPG1Al6G+P+GTG4V4U62GCmcB8KgN
-         gAnA==
+	s=arc-20240116; t=1720485383; c=relaxed/simple;
+	bh=8otHiJbE/VSdOupQC/73La9rg+QB5+G8BfHl1T3pUxg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=K6FoGKR70tsRbP2pjjM7c2a0OmaTNaX+gERYl41hoQrYCNgKs/5q/Ci7bfpdS7Pw9+/fuRAdoGonwuCNSFVMPIb6tDo0JpKFV8cWtU4LWk1oVuaKnAAlhk+TqUGoevZJpGVsHJAouYmsBP5gT+nlrw85RBQ4aj1tUXlqxfwQrBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3835285561fso51321775ab.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 17:36:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720485182; x=1721089982;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gbmTmpGl9LGWIehww80/zM7iEVzfhtY6yCT6eHjeVS8=;
-        b=HuqurRBz/0UZk4klxir+9wPzj3FKfotgKbQb0Z1N+eNotVZhFp/n9I/PWVgQu/5b05
-         29RMQstrpfxOQLteM/aEy2NZDZNYTILQfeJMU/fHSGBzdgggXY5uNSozR1d24Dr4+O03
-         9cMHm+/XYsXHt4VMNdhfLk6LzlTrgcGbh6XGa8Jpt1/hgU0uKYcSd2KuAvOLYyO7zbeW
-         8njrEHvBDm3fZ7hqdKJHwd4n/WHOXio4HOfUXOrwBLh48zddKwy+PeLon7/GyY30naRv
-         mBuNVtxW7PoBkdwxd8tVkK9iVLoeaaBYRL7PBW/y0ytXUkaUI0YZsk5gDIg+zFUcNjPJ
-         Gu8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUc26Cy+pNj+h1ROzG3ue4SDHgmyVIALl5n8kGxj9vqxVque5xIQB27vZf0otYjG9dotT/CNkWVZyHZXzBOREF+uCgnMEl4smov9MCzZMDkQkqylEEb3lWT7di5o1qVs4YKgulS07napQzkY7ul5/TotgtooBukC4zSsmMt
-X-Gm-Message-State: AOJu0YzyA6+65eLgjFub7L4RtsIy748kyo5inZiJPyaQQEG3UGOkDkOq
-	x4agzlPeKr2PqQGZrt3EZxzRCi3/qL3vSoxHTGP60u036XR+b5dB
-X-Google-Smtp-Source: AGHT+IERW/eDq4h5+NOdDSAyiBCa54iY/xmob/DozhAnYntCHQ3fG5yPiIkvES8ODeOBUw9oOuq4LA==
-X-Received: by 2002:a05:6a20:918d:b0:1be:c5ab:7388 with SMTP id adf61e73a8af0-1c298220a18mr1216126637.25.1720485181955;
-        Mon, 08 Jul 2024 17:33:01 -0700 (PDT)
-Received: from localhost ([98.97.32.172])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ac7921sm4363165ad.232.2024.07.08.17.33.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 17:33:01 -0700 (PDT)
-Date: Mon, 08 Jul 2024 17:33:00 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Geliang Tang <geliang@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>, 
- David Ahern <dsahern@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Mykyta Yatsenko <yatsenko@meta.com>, 
- Miao Xu <miaxu@meta.com>, 
- Yuran Pereira <yuran.pereira@hotmail.com>, 
- Huacai Chen <chenhuacai@kernel.org>, 
- Tiezhu Yang <yangtiezhu@loongson.cn>, 
- "D . Wythe" <alibuda@linux.alibaba.com>, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <668c853cc8820_d7720867@john.notmuch>
-In-Reply-To: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
-References: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
-Subject: RE: [PATCH net v5] skmsg: skip zero length skb in sk_msg_recvmsg
+        d=1e100.net; s=20230601; t=1720485381; x=1721090181;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NQ38Bd0kst9MLbWT6jyPb0KQ10UtFUksZmt6kSW4+Lc=;
+        b=LfahUHQItc+pxoYxDu+FclSEtzxXcyP/zcEqMEF0DEoAq3bhtyF1V/cx3D5paqaDwL
+         gqhDveg62zWxReJu+lYtXNMnkWzpzL8+mYYkUKQ6vuMLxpXm4Kqe15OR9P+jraftSuAG
+         z9qTANwsB9uB9qLjN5qBInfddl1lZn2aK9F1KKHKblZADhWjpmoCj9WvlYK3r2RQIdZ6
+         e9VDN8KEB00qwTmpSml55mbJr68hejWIUOg9aTndcvltp4NAMZSj7H6w0YNDtpyVFJJm
+         7ZAcugAY33SGlLqZNLpnxuNDp7N62+IYliImE1aWOHo2sttoFOnhsmrKoZqPbYUEaN7W
+         Dk7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUwyR6qAMXmo9ZG8QiRWPa+/tR2kbWdVYz8Mm0dFBPGK7xkTmYn7vIpARlDgiM285/hexIk3x5cgF3JuBzPWkZRrYIxrMVp
+X-Gm-Message-State: AOJu0Yxr28e0+Z9UjoGmMHhSOO8KfrYBgeAxFOozWAlDqGKPtGD+WRaD
+	CW+kiuwNXvR7xhttIFHIxYAkuM97V4v0IBEPmSusYgeGlkVh0JG3QZnw5waNvsepkHwHRinPujZ
+	LXR1N/ict2yoiY7WrDA9+MwRGqF5sFx5E8+TtKkHEds//OWPLAtEq2Hw=
+X-Google-Smtp-Source: AGHT+IF3SCdXTva0hGfrZCvmsu/5C2j5yWo0gBbzwdfD++/P47knw+V10pjexYLsUjE8W9HmOuw485812n30qHjjvBMYpeQhicIh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a92:d347:0:b0:381:7075:6911 with SMTP id
+ e9e14a558f8ab-38a56e0e95dmr147685ab.1.1720485381618; Mon, 08 Jul 2024
+ 17:36:21 -0700 (PDT)
+Date: Mon, 08 Jul 2024 17:36:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000346a6061cc5b897@google.com>
+Subject: [syzbot] [wireless?] WARNING in __cfg80211_bss_update (2)
+From: syzbot <syzbot+1a797e1c81be78a2ace7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Geliang Tang wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> Run this BPF selftests (./test_progs -t sockmap_basic) on a Loongarch
-> platform, a kernel panic occurs:
-> 
-> '''
-> Oops[#1]:
-> CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE  6.10.0-rc2+ #18
-> Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK2018
->    ... ...
->    ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
->   ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
->  CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=CC DACM=CC -WE)
->  PRMD: 0000000c (PPLV0 +PIE +PWE)
->  EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
->  ECFG: 00071c1d (LIE=0,2-4,10-12 VS=7)
-> ESTAT: 00010000 [PIL] (IS= ECode=1 EsubCode=0)
->  BADV: 0000000000000040
->  PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
-> Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrack
-> Process test_progs (pid: 2824, threadinfo=0000000000863a31, task=...)
-> Stack : ...
->         ...
-> Call Trace:
-> [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
-> [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
-> [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
-> [<90000000049aae34>] inet_recvmsg+0x54/0x100
-> [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
-> [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
-> [<900000000481e27c>] sys_recvfrom+0x1c/0x40
-> [<9000000004c076ec>] do_syscall+0x8c/0xc0
-> [<9000000003731da4>] handle_syscall+0xc4/0x160
-> 
-> Code: ...
-> 
-> ---[ end trace 0000000000000000 ]---
-> Kernel panic - not syncing: Fatal exception
-> Kernel relocated by 0x3510000
->  .text @ 0x9000000003710000
->  .data @ 0x9000000004d70000
->  .bss  @ 0x9000000006469400
-> ---[ end Kernel panic - not syncing: Fatal exception ]---
-> '''
-> 
-> This crash happens every time when running sockmap_skb_verdict_shutdown
-> subtest in sockmap_basic.
-> 
-> This crash is because a NULL pointer is passed to page_address() in
-> sk_msg_recvmsg(). Due to the difference implementations depending on the
-> architecture, page_address(NULL) will trigger a panic on Loongarch
-> platform but not on X86 platform. So this bug was hidden on X86 platform
-> for a while, but now it is exposed on Loongarch platform.
-> 
-> The root cause is a zero length skb (skb->len == 0) is put on the queue.
-> 
-> This zero length skb is a TCP FIN packet, which is sent by shutdown(),
-> invoked in test_sockmap_skb_verdict_shutdown():
-> 
-> 	shutdown(p1, SHUT_WR);
-> 
-> In this case, in sk_psock_skb_ingress_enqueue(), num_sge is zero, and no
-> page is put to this sge (see sg_set_page in sg_set_page), but this empty
-> sge is queued into ingress_msg list.
-> 
-> And in sk_msg_recvmsg(), this empty sge is used, and a NULL page is got by
-> sg_page(sge). Pass this NULL page to copy_page_to_iter(), which passes it
-> to kmap_local_page() and to page_address(), then kernel panics.
-> 
-> To solve this, we should skip this zero length skb. So in sk_msg_recvmsg(),
-> if copy is zero, that means it's a zero length skb, skip invoking
-> copy_page_to_iter(). We are using the EFAULT return triggered by
-> copy_page_to_iter to check for is_fin in tcp_bpf.c.
-> 
-> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-> Suggested-by: John Fastabend <john.fastabend@gmail.com>
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> ---
-> v5:
->  - update v5 as John suggested.
->  - skmsg: skip zero length skb in sk_msg_recvmsg
-> 
-> v4:
->  - skmsg: skip empty sge in sk_msg_recvmsg
-> 
-> v3:
->  - skmsg: prevent empty ingress skb from enqueuing
->    
-> v2:
->  - skmsg: null check for sg_page in sk_msg_recvmsg
-> ---
->  net/core/skmsg.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+Hello,
 
-I don't have any better ideas so lets use this.
+syzbot found the following issue on:
 
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+HEAD commit:    d270dd21bee0 Merge tag 'pci-v6.10-fixes-2' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=123cc8a5980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=864caee5f78cab51
+dashboard link: https://syzkaller.appspot.com/bug?extid=1a797e1c81be78a2ace7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/987e45087f46/disk-d270dd21.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/072b7b491dd1/vmlinux-d270dd21.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e0ddb6b56277/bzImage-d270dd21.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1a797e1c81be78a2ace7@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 19045 at net/wireless/scan.c:1714 cfg80211_combine_bsses net/wireless/scan.c:1714 [inline]
+WARNING: CPU: 1 PID: 19045 at net/wireless/scan.c:1714 __cfg80211_bss_update+0x114a/0x20c0 net/wireless/scan.c:1954
+Modules linked in:
+CPU: 1 PID: 19045 Comm: kworker/u8:9 Not tainted 6.10.0-rc6-syzkaller-00210-gd270dd21bee0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:cfg80211_combine_bsses net/wireless/scan.c:1714 [inline]
+RIP: 0010:__cfg80211_bss_update+0x114a/0x20c0 net/wireless/scan.c:1954
+Code: e1 07 fe c1 38 c1 0f 8c 49 fb ff ff 48 8b 7c 24 68 e8 aa fb 26 f7 e9 3a fb ff ff e8 e0 46 c1 f6 90 0f 0b 90 e9 c0 fb ff ff 90 <0f> 0b 90 48 89 ef e8 9b 99 e1 f9 84 c0 0f 84 9f 00 00 00 e8 be 46
+RSP: 0018:ffffc9000315ee98 EFLAGS: 00010206
+RAX: ffff88806d6fec10 RBX: ffff88802b936488 RCX: dffffc0000000000
+RDX: ffff88805e953c00 RSI: 0000000000000000 RDI: 0000000000000006
+RBP: ffff88802b936410 R08: ffffffff8ad4de30 R09: 00000010fffff448
+R10: 0000505050505050 R11: 0003000000000000 R12: ffff88802b936400
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88805ca01800
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f00aee80836 CR3: 0000000021fd0000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ cfg80211_inform_single_bss_data+0xfd6/0x2360 net/wireless/scan.c:2289
+ cfg80211_inform_bss_data+0x3dd/0x5a70 net/wireless/scan.c:3117
+ cfg80211_inform_bss_frame_data+0x3bc/0x720 net/wireless/scan.c:3207
+ ieee80211_bss_info_update+0x8a7/0xbc0 net/mac80211/scan.c:226
+ ieee80211_rx_bss_info net/mac80211/ibss.c:1099 [inline]
+ ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1578 [inline]
+ ieee80211_ibss_rx_queued_mgmt+0x1962/0x2d70 net/mac80211/ibss.c:1605
+ ieee80211_iface_process_skb net/mac80211/iface.c:1603 [inline]
+ ieee80211_iface_work+0x8a3/0xf10 net/mac80211/iface.c:1657
+ cfg80211_wiphy_work+0x221/0x260 net/wireless/core.c:437
+ process_one_work kernel/workqueue.c:3248 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3329
+ worker_thread+0x86d/0xd50 kernel/workqueue.c:3409
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
