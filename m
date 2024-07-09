@@ -1,140 +1,98 @@
-Return-Path: <netdev+bounces-110262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3678992BAD8
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:20:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543B192BB04
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 680F21C21C56
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:20:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 966D1B27E96
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22893158D8C;
-	Tue,  9 Jul 2024 13:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975EB15575C;
+	Tue,  9 Jul 2024 13:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eg0Cjm/T"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UspMwV8E"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3956D2B9DA;
-	Tue,  9 Jul 2024 13:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429F719E;
+	Tue,  9 Jul 2024 13:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531248; cv=none; b=ilKh/6kXjR5RkA8aS1jvzMsq+5ask4ykaXt0aaHeo+PcjEzN8A2RW3Uf5rQYFCxFxBRAeHb5pVe+OmHR4k+9DVLriDJIju/pi/SaHBX83NmDcS1/Zxr2v2BxX00PVIAtuQoBovhz2fTQ7Y7+kvpnDkI8ZPOGGzX77OtUfwiFRIc=
+	t=1720531477; cv=none; b=RCtGr1l2oWaqkSALKLwBc0REIU5jbbWU7jXAPJJaBRv0rfHTMi/9ONNHQ/fom6LqVNhp3jDuK436xE1Xzz93gUqRkhVmOUWgxiL5bFAjg9bsLiiabIhdpUJm0h7CyMqWSYHUXgJU8SW/RGNQqXJ3RjxVTy4R6GtJwomKlnP1aI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531248; c=relaxed/simple;
-	bh=IWo9o+BR5hri80OXw059McKLXefmWML8DKmyfp52TPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KlCJeJaZQ8n7fpR2jWh8+ke2fRY1ZHY0YUeJ1LUvZzMrtvwkvevrMcFZdZMdivd3v78eyvTBYB1Ye7BUJviioEKBc6LjBrjsgL0hJ+JqJ47DXQjNqfM/pT51znU9hWj+rIPBnwt5SBPf8yga6wrNiVUlKVqDPyC0F1E0ruLVNZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eg0Cjm/T; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2B18E1BF20B;
-	Tue,  9 Jul 2024 13:20:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720531243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jdgtcZmaR8+U0BJCpEZXKmWLsv2ubjnvbI1hvNLijts=;
-	b=eg0Cjm/TBMLMJTS1BOIpLtUkMz04COoBTpzrwORid+BpxEyX+kDNujFxtgVc2TKgi/6s+X
-	ZsQYZUVdQRO1F2olaO6cOrSqVISF8oPJdFlM0kXMx3QFu4eOENVEkOFMZBkDKg2LBTLBbK
-	OwhnizFilnKwzPZCCR2kKpnElseJBhkd0kVqq6NtQfUfzX/zAP/yBrcu9QzMVCGtkzXWAX
-	NJO0AQtf6fBqo7TgbU1q4WRitgzmkvmsqwmNhDZ9bBB7uMDIdwLtF1P4qAtmm6hB3qycjz
-	0qCzV/9RVb3Wa2i/uyJ4HNvffzu8LoVD6q7E5B+SYUfbyBAvJOSnoAP8m8UoJw==
-Date: Tue, 9 Jul 2024 15:20:41 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald Hunter
- <donald.hunter@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Jonathan Corbet <corbet@lwn.net>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v6 5/7] net: ethtool: Add new power limit get
- and set features
-Message-ID: <20240709152041.7493ffc5@kmaincent-XPS-13-7390>
-In-Reply-To: <20240708113300.3544d36d@kernel.org>
-References: <20240704-feature_poe_power_cap-v6-0-320003204264@bootlin.com>
-	<20240704-feature_poe_power_cap-v6-5-320003204264@bootlin.com>
-	<20240705184116.13d8235a@kernel.org>
-	<20240708113846.215a2fde@kmaincent-XPS-13-7390>
-	<20240708113300.3544d36d@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1720531477; c=relaxed/simple;
+	bh=gTdR6bvkUuYB7vnbxn9n1yUhza6OWLAXURpAoKtq8DQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fqNFrrfjSnFVGzFrZaSwPhPzC+V1n6dzpXYTx/a4qOTm1hW4GaEiZJJ/x27VqR6bfMmC2JcKa3Aiq1kySuaMx9RxtuLtAJFwQ+3+HtbQO+WoK4OORlvN51lRdcXAj7UEIZvLW575riwxbg/ZaJZaERuGBJcD6AJZ6QI5OIQdSVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UspMwV8E; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6jUkBzHiAT9bXjlf+KGNc02ub5p+yihLBXghD8K9+AE=; b=UspMwV8EMl3KqdG2EQFU4nQHhp
+	IOFAFcNa5ZWeGp425gwuzFEh+6em5oN7J48sv/ATxr6R0WdAOTIuyEmLowN7CEhiAV8gYGqApmBTh
+	DrsTToyWFqZFo2nBMN4pRNtfTyAgLEhdSxOYbSnfbQo8b/mqLHiwJSKcC11jJLDccRKs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sRApQ-0028zp-Ek; Tue, 09 Jul 2024 15:24:20 +0200
+Date: Tue, 9 Jul 2024 15:24:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1 2/7] net: stmmac: gmac4: drop FPE
+ implementation for refactoring
+Message-ID: <bb6398ca-9e03-486f-bcec-5b7a07367261@lunn.ch>
+References: <cover.1720512888.git.0x1207@gmail.com>
+ <98183e72d59cc8ce71dd9fd25a65983ff69dfcd1.1720512888.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98183e72d59cc8ce71dd9fd25a65983ff69dfcd1.1720512888.git.0x1207@gmail.com>
 
-On Mon, 8 Jul 2024 11:33:00 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Tue, Jul 09, 2024 at 04:21:20PM +0800, Furong Xu wrote:
+> The FPE support for gmac4 is complete, still drop it temporarily.
+> Once FPE implementation is refactored, gmac4 support will be added.
 
-> On Mon, 8 Jul 2024 11:38:46 +0200 Kory Maincent wrote:
->  [...] =20
->  [...] =20
->=20
-> Don't worry I understand the code well enough to resolve any conflicts
-> (famous last words?). And if we fix as part of ethnl_set_pse_validate()
-> then there's no conflict, AFAICT.
+So you say this implementation does work. So sorry, no.
 
-As you can see in the patch I just sent
-https://lore.kernel.org/netdev/20240709131201.166421-1-kory.maincent@bootli=
-n.com/T/#u
-the fix is not in set_pse_validate() therefore you will have a merge confli=
-ct.
+NACK.
 
-You could do this to solve the merge conflict:
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -256,6 +256,7 @@ static int
- ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
- {
-        struct net_device *dev =3D req_info->dev;
-+       struct pse_control_config config =3D {};
-        struct nlattr **tb =3D info->attrs;
-        struct phy_device *phydev;
-        int ret =3D 0;
-@@ -273,15 +274,13 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct=
- genl_info *info)
-        }
-=20
-        /* These values are already validated by the ethnl_pse_set_policy */
-+       if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL])
-+               config.podl_admin_control =3D nla_get_u32(tb[ETHTOOL_A_PODL=
-_PSE_ADMIN_CONTROL]);
-+       if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
-+               config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL_A_C33_P=
-SE_ADMIN_CONTROL]);
-+
-        if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
-            tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
--               struct pse_control_config config =3D {};
--
--               if (pse_has_podl(phydev->psec))
--                       config.podl_admin_control =3D nla_get_u32(tb[ETHTOO=
-L_A_PODL_PSE_ADMIN_CONTROL]);
--               if (pse_has_c33(phydev->psec))
--                       config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL=
-_A_C33_PSE_ADMIN_CONTROL]);
--
-                ret =3D pse_ethtool_set_config(phydev->psec, info->extack,
-                                             &config);
-                if (ret)
+What we want is lots of small patches which are obviously correct. If
+this code is correct, you could simply move it to a shared
+location. Code which disappears from one file and reappears in another
+file, no other changes, is obviously correct. You can make this clear
+in the commit message: Moving code into a shared location. No
+functional changes intended.
 
+Once moved, you can then do refactoring changes, which when combined
+with a good commit message should be obviously correct.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+In linux, you do not throw code away and replace it with a new
+implementation. You step by step transform it.
+
+	Andrew
+
+---
+pw-bot: cr
 
