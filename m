@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-110348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38EC892C0EE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:48:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C1992C10D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9C76285CAA
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:47:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13591F2264A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253E018D4CB;
-	Tue,  9 Jul 2024 16:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FD2193472;
+	Tue,  9 Jul 2024 16:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ctIWyDtd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bH+ZqLSJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE6B18D4C8;
-	Tue,  9 Jul 2024 16:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F86193469;
+	Tue,  9 Jul 2024 16:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720542336; cv=none; b=ME00a16amfCkns+Cf6K6Z3FX/yYU83p+HmVyBPsUkSzRHBjpszpYj+gmUJJsJsvuvZ/b8rHGQhdhvYidDKmTGfAZBHypEItpwuN3GrjZ6LLunD30C5WsksDgcf+MnDu+qHwRa5nrppNcZ3RG4fsXqv/3URO0jFi31UDpcSDeaAk=
+	t=1720542358; cv=none; b=BmUnT++AylNI1RwadyhKlWcxYJpBCXW8+3+5+oDjzZRZqpyCHgDnuLBNsiRe+KhNdXDswCB6Q5xLpbNe4PwlgLPpo/SLFzQ1Rhyugw4SuHS93P0bXqC6e15UlJXPZebC8ZWwe4OYxjnPgGKj+ARzZ/KZqdOYrPOHLrThfX4sK5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720542336; c=relaxed/simple;
-	bh=k9LrWFVxAszloHBi6WEwLha/Pfjh2z2Rh6fnIf+ZWCc=;
+	s=arc-20240116; t=1720542358; c=relaxed/simple;
+	bh=i8IsKyXwm7IP3wI40Tk7QW5F3dm2CunHoiMRxtOLZpg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L1LejM46HoyHdptGExtgCKE5qFhvsP+B5SnabzRCYehndWxg3ZjWbHpSTfTh27RRzoyHdZQ69tuU3cDZbYj6bc/KuOEG2cF9RP5LqJjGbcJKOzhembZsGC5u4HDuNhde8U8/3isFUWVKkLdemlMVpxiNlFvdT79kycUX3Pf5eZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ctIWyDtd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25411C32782;
-	Tue,  9 Jul 2024 16:25:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PdvvBTGslTD2UAMtBlBnv478KJ+d7ly4IKYqHfdFHdNokgX00wh6j4dksySjBR8l+VoTA9j6Gm4X20QeY0eruTF7rhnMqrKkx2Y1y8AzgI1DY8L7w0eL4us64/vSLKIiOr4AW51qQOxl+shUeuc9Y5LR43ORVwlxHIL1YURYh7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bH+ZqLSJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 545D6C32786;
+	Tue,  9 Jul 2024 16:25:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720542335;
-	bh=k9LrWFVxAszloHBi6WEwLha/Pfjh2z2Rh6fnIf+ZWCc=;
+	s=k20201202; t=1720542357;
+	bh=i8IsKyXwm7IP3wI40Tk7QW5F3dm2CunHoiMRxtOLZpg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ctIWyDtd9gP2lhbkJo/wJbHiTXlF99xjHPWL60GChl5A/pgYXnfW1zwxHm6f0tll4
-	 P1tvnIIznYi1ww+Iu8t3MVSBksC5PiZpIKFgCmTT13NCB2I07CaVV5SUhLjbRdsemV
-	 cUJPD+OwmuEhK17a6tuagQaUCtmFypsc9JWTVLNs25YSnyo088jwyRima6zIOtKeZg
-	 90HfOqrj8guZl3++uNd9ARyRD9yZ0qx8TjC0VnUR2+q7wpoHH9TkG5fxNU8Zc//eoq
-	 pZ1RmJSpsgQLdvvvjFQmDMqt4ndytaaqw7Z+9cCW5TiglINudLdchW0zAY1S7bfZfW
-	 UFFniOAcMcYcQ==
+	b=bH+ZqLSJe3cTwPddme/y7UPEtCEeilCCi9im/wsPnj4+yQwI/W/yPbT4q9yAK4eHT
+	 0HnAVkybRBdUii5WKbeXR0s3I0U8lRpxFXJ1l4gPCnEtfItGTy4i7olBYY21nBQxV3
+	 Gl4NHGZf07GGmZUM2usGdqdPkRgYU/rQ9+Za5nWMiMlLDt7Ms6tx1JHmmFn7H57Z/Y
+	 zLvbJEXerZE+ftGBpLiuBHBMgot2x2oQPcA13nqc5Pxfqhe31Ympsgy5juBkBZaf1S
+	 zTkptvbi0Lo+Yex32YmSTEtMjUDMhe+9n/AoZyy1icxaT8sZKv55VlRY312qxHaChW
+	 mLCJvh7z6I4hQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Chen Ni <nichen@iscas.ac.cn>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
+Cc: Daniele Palmas <dnlplm@gmail.com>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mailhol.vincent@wanadoo.fr,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	extja@kvaser.com,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 07/17] can: kvaser_usb: fix return value for hif_usb_send_regout
-Date: Tue,  9 Jul 2024 12:24:51 -0400
-Message-ID: <20240709162517.32584-7-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 17/17] net: usb: qmi_wwan: add Telit FN912 compositions
+Date: Tue,  9 Jul 2024 12:25:01 -0400
+Message-ID: <20240709162517.32584-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240709162517.32584-1-sashal@kernel.org>
 References: <20240709162517.32584-1-sashal@kernel.org>
@@ -67,39 +65,89 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.162
 Content-Transfer-Encoding: 8bit
 
-From: Chen Ni <nichen@iscas.ac.cn>
+From: Daniele Palmas <dnlplm@gmail.com>
 
-[ Upstream commit 0d34d8163fd87978a6abd792e2d8ad849f4c3d57 ]
+[ Upstream commit 77453e2b015b5ced5b3f45364dd5a72dfc3bdecb ]
 
-As the potential failure of usb_submit_urb(), it should be better to
-return the err variable to catch the error.
+Add the following Telit FN912 compositions:
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-Link: https://lore.kernel.org/all/20240521041020.1519416-1-nichen@iscas.ac.cn
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+0x3000: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
+T:  Bus=03 Lev=01 Prnt=03 Port=07 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=3000 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN912
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
+0x3001: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
+T:  Bus=03 Lev=01 Prnt=03 Port=07 Cnt=01 Dev#=  7 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=3001 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN912
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
+Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
+Acked-by: Bjørn Mork <bjorn@mork.no>
+Link: https://patch.msgid.link/20240625102236.69539-1-dnlplm@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/usb/qmi_wwan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-index 09dbc51347d70..41594cac54966 100644
---- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-+++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-@@ -292,7 +292,7 @@ int kvaser_usb_send_cmd_async(struct kvaser_usb_net_priv *priv, void *cmd,
- 	}
- 	usb_free_urb(urb);
- 
--	return 0;
-+	return err;
- }
- 
- int kvaser_usb_can_rx_over_error(struct net_device *netdev)
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 9bd145732e58b..fb09e95cbc258 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1373,6 +1373,8 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1260, 2)},	/* Telit LE910Cx */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1261, 2)},	/* Telit LE910Cx */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1900, 1)},	/* Telit LN940 series */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x3000, 0)},	/* Telit FN912 series */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x3001, 0)},	/* Telit FN912 series */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9801, 3)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9803, 4)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9b01, 3)},	/* XS Stick W100-2 from 4G Systems */
 -- 
 2.43.0
 
