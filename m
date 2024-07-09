@@ -1,247 +1,273 @@
-Return-Path: <netdev+bounces-110334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC28B92BF13
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:06:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA22092BF23
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70828286975
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:06:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59DFE1F254A6
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E6F19DF6B;
-	Tue,  9 Jul 2024 16:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3367E19F468;
+	Tue,  9 Jul 2024 16:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dNxL2flB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXIyipxv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF904A02;
-	Tue,  9 Jul 2024 16:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A56B19F461;
+	Tue,  9 Jul 2024 16:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720541160; cv=none; b=hGa+6E2GshQ9ufnaGZ7Y9eyGAMSUUzliXELpjqPfSYXxSWLWklw8WUCzGWkiL4kSPWJdEA8734a4v9uPNlbT0K1NUICFGhGr06QcEeRbmVVukCMbm+1EkFMx0p7h6Y3wI4fhHpdbCHBtPL1jbkL+HkXvqG+KjOFolNB2J9QQgak=
+	t=1720541213; cv=none; b=kiODDIKuowPWPGPZOdwHfUbJIpcnhJDE6WCgZv6doLCLZdk0S5tlaI0Cced38/UszOQXHLudNVtrC3BrUb7wYDdXQIMCFpiGfEvuvaNV244t6aZ4y97FJz0I3r/CqDl/8NZIhHvyv6IS+tr3MFeKXD6W5oNKI4jWGdDFbrB9oTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720541160; c=relaxed/simple;
-	bh=nWTLXY9HN+du1MWjpjzvNyHlVCQplXKA4/1rwWPWQ6Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sFdTSDMMwBGogYW8L7B7+WxhnHCfNTSuwIuwNg2MgfDwx5eGzisHYVZQdgrR/hBuRMICAws+FXHLt2MImgIlet+/clsEmm/pHD+Wv64T5k+cLLg80niVGyVYe0OE4UVDmxv+qrx24W8TtP1Kj4ysUpO5wYHoPH/x/W0ajjALzEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dNxL2flB; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1720541153; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=Gef74ZFkoHmeg+9wnPO3M4CLYopK0Jl9u0mSEnTR2IY=;
-	b=dNxL2flBUz1RtKAZCaPQgwzk/6P+bCex9N/gPqcglcC9d/iLFBohF/rAFQ+drw1eokAfZjwGDWicWoxSveu8fdeS6vq60ijCoiL7qv2TibmFbGLn8WSTBwgqWPv8HJ+d4ySwbD+hmIEB9YFRs6BVd1hNA3gBLKQMt7yKXLrVUj4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WACV18d_1720541151;
-Received: from 192.168.0.111(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WACV18d_1720541151)
-          by smtp.aliyun-inc.com;
-          Wed, 10 Jul 2024 00:05:53 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net/smc: introduce autosplit for smc
-Date: Wed, 10 Jul 2024 00:05:51 +0800
-Message-Id: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+	s=arc-20240116; t=1720541213; c=relaxed/simple;
+	bh=CC2PHQNnrsdYgFYaV6OamdCWY/YV/JF9+Qkm60FkWTM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AXTHRsjhbNjvfCH4hOUx0p0yNi+jasi7rrITGVdFXQulsIPXKSHCw0L/BKzmf1vOymRuWjxzv1L0biOWt4wIm8a9mNd9a9AtroXsy45YmdTVYKsBY38MYaXrMhjVs/28JlEvsRLnnV5Ms4Ju+oP1w77ndUY6HKAx5Lr6OGSbCW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXIyipxv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96083C3277B;
+	Tue,  9 Jul 2024 16:06:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720541212;
+	bh=CC2PHQNnrsdYgFYaV6OamdCWY/YV/JF9+Qkm60FkWTM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cXIyipxv1ymkxMtR9Mf1qaTzVQ4H57kdVUmNyJLKn8fq8Xq0fpLs3LEx/NRaMh+S+
+	 A3r5nTaBKBdndAXz5A4dtKWCIrdzumsifF9AlSsfwKHbJGLY9Z1EXLTN5k0kpNlNaR
+	 BU0NKE//YStAqDboENA4Vt4eHIxUGTmzM+lIMtbGo8hMQUWXLhDZdV6y5RIBPHSRNv
+	 6esWX+gFcDD7CumrbfBy9XZE/5xjMN7FYlZPpzihNyfqidpshcUFQjTUjOong30V/v
+	 rHVdrzgVNr/ScNQLeJpv27JXTuay6yjsRzWwITsaC/GoenSHyb5wk9yWePwAPAz03J
+	 W0TOy8q7NkuZQ==
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-25e14bf05e5so199615fac.1;
+        Tue, 09 Jul 2024 09:06:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUUZV776I2PuZqgGXST6QjkXmaYdr2hgErLDG/45iyPZyrYtNZw5cO2pzeODZstoMi/OBtB9l5Bja5WYUG3xV7fQRNHkDkfd7ZvGu512XbhfTpRNBFshRnTL9iLW/cGST4=
+X-Gm-Message-State: AOJu0YwCTsnjgSktxnyzqOXXVs4lz9bnc9bKRDLgfol7hhuN4tRWmTsl
+	RDjk9LlE/vidg0Z0VjT1Zb475JC58s554jDky5tJu+ieyMbhoAH+6hSOHPPBSX3/A4VzxYJZJvA
+	ReKwqd8kuTpMioKKTLt0iXwV9xcE=
+X-Google-Smtp-Source: AGHT+IFqiW5QZHZ9ZUza/Bt2hsVzHJKzpK259ONyXwKp9f5S4cEObEvF7s+/kF8vvJ1iTZfp8Qop48dz9aT1ch/wwcU=
+X-Received: by 2002:a05:6871:24da:b0:25e:2624:eb5f with SMTP id
+ 586e51a60fabf-25eae764acbmr2293933fac.1.1720541211853; Tue, 09 Jul 2024
+ 09:06:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1719849427.git.petrm@nvidia.com> <a9b97ecf80c722b42eceac1800f78ba57027af48.1719849427.git.petrm@nvidia.com>
+In-Reply-To: <a9b97ecf80c722b42eceac1800f78ba57027af48.1719849427.git.petrm@nvidia.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 9 Jul 2024 18:06:40 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0hAN0Csd6Qnc=2hNGafpbEGRVGX41LC8qrmUkoCk=whrw@mail.gmail.com>
+Message-ID: <CAJZ5v0hAN0Csd6Qnc=2hNGafpbEGRVGX41LC8qrmUkoCk=whrw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] mlxsw: core_thermal: Report valid current
+ state during cooling device registration
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com, linux-pm@vger.kernel.org, 
+	Vadim Pasternak <vadimp@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When sending large size data in TCP, the data will be split into
-several segments(packets) to transfer due to MTU config. And in
-the receive side, application can be woken up to recv data every
-packet arrived, the data transmission and data recv copy are
-pipelined.
+On Mon, Jul 1, 2024 at 6:45=E2=80=AFPM Petr Machata <petrm@nvidia.com> wrot=
+e:
+>
+> From: Ido Schimmel <idosch@nvidia.com>
+>
+> Commit 31a0fa0019b0 ("thermal/debugfs: Pass cooling device state to
+> thermal_debug_cdev_add()") changed the thermal core to read the current
+> state of the cooling device as part of the cooling device's
+> registration. This is incompatible with the current implementation of
+> the cooling device operations in mlxsw, leading to initialization
+> failure with errors such as:
+>
+> mlxsw_spectrum 0000:01:00.0: Failed to register cooling device
+> mlxsw_spectrum 0000:01:00.0: cannot register bus device
+>
+> The reason for the failure is that when the get current state operation
+> is invoked the driver tries to derive the index of the cooling device by
+> walking a per thermal zone array and looking for the matching cooling
+> device pointer. However, the pointer is returned from the registration
+> function and therefore only set in the array after the registration.
+>
+> The issue was later fixed by commit 1af89dedc8a5 ("thermal: core: Do not
+> fail cdev registration because of invalid initial state") by not failing
+> the registration of the cooling device if it cannot report a valid
+> current state during registration, although drivers are responsible for
+> ensuring that this will not happen.
+>
+> Therefore, make sure the driver is able to report a valid current state
+> for the cooling device during registration by passing to the
+> registration function a per cooling device private data that already has
+> the cooling device index populated.
+>
+> Cc: linux-pm@vger.kernel.org
+> Reviewed-by: Vadim Pasternak <vadimp@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 
-But for SMC-R, it will transmit as many data as possible in one
-RDMA WRITE and a CDC msg follows the RDMA WRITE, in the receive
-size, the application only be woken up to recv data when all RDMA
-WRITE data and the followed CDC msg arrived. The data transmission
-and data recv copy are sequential.
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 
-This patch introduce autosplit for SMC, which can automatic split
-data into several segments and every segment transmitted by one RDMA
-WRITE when sending large size data in SMC. Because of the split, the
-data transmission and data send copy can be pipelined in the send side,
-and the data transmission and data recv copy can be pipelined in the
-receive side. Thus autosplit helps improving latency performance when
-sending large size data. The autosplit also works for SMC-D.
-
-This patch also introduce a sysctl names autosplit_size for configure
-the max size of the split segment, whose default value is 128KiB
-(128KiB perform best in my environment).
-
-The sockperf benchmark shows 17%-28% latency improvement when msgsize
->= 256KB for SMC-R, 15%-32% latency improvement when msgsize >= 256KB
-for SMC-D with smc-loopback.
-
-Test command:
-sockperf sr --tcp -m 1048575
-sockperf pp --tcp -i <server ip> -m <msgsize> -t 20
-
-Test config:
-sysctl -w net.smc.wmem=524288
-sysctl -w net.smc.rmem=524288
-
-Test results:
-SMC-R
-msgsize   noautosplit    autosplit
-128KB       55.546 us     55.763 us
-256KB       83.537 us     69.743 us (17% improve)
-512KB      138.306 us    100.313 us (28% improve)
-1MB        273.702 us    197.222 us (28% improve)
-
-SMC-D with smc-loopback
-msgsize   noautosplit    autosplit
-128KB       14.672 us     14.690 us
-256KB       28.277 us     23.958 us (15% improve)
-512KB       63.047 us     45.339 us (28% improve)
-1MB        129.306 us     87.278 us (32% improve)
-
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
----
- Documentation/networking/smc-sysctl.rst | 11 +++++++++++
- include/net/netns/smc.h                 |  1 +
- net/smc/smc_sysctl.c                    | 12 ++++++++++++
- net/smc/smc_tx.c                        | 19 ++++++++++++++++++-
- 4 files changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-index a874d007f2db..81b5296d79f4 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -71,3 +71,14 @@ smcr_max_conns_per_lgr - INTEGER
- 	acceptable value ranges from 16 to 255. Only for SMC-R v2.1 and later.
- 
- 	Default: 255
-+
-+autosplit_size - INTEGER
-+	Setting SMC autosplit size. Autosplit is used to split sending data into
-+	several segments when application sending data and the data size is larger
-+	than autosplit size. Autosplit helps performing pipeline sending and pipeline
-+	receiving for better latency performance when sending/receiving large size
-+	data.
-+	Autosplit_size ranges from 32KiB to 512MiB. Set autosplit_size to 512MiB means
-+	disable autosplit.
-+
-+	Default: 128KiB
-diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
-index fc752a50f91b..26c7edeb71a3 100644
---- a/include/net/netns/smc.h
-+++ b/include/net/netns/smc.h
-@@ -24,5 +24,6 @@ struct netns_smc {
- 	int				sysctl_rmem;
- 	int				sysctl_max_links_per_lgr;
- 	int				sysctl_max_conns_per_lgr;
-+	unsigned int			sysctl_autosplit_size;
- };
- #endif
-diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-index 13f2bc092db1..2aaf402acc11 100644
---- a/net/smc/smc_sysctl.c
-+++ b/net/smc/smc_sysctl.c
-@@ -29,6 +29,8 @@ static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
- static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
- static int conns_per_lgr_min = SMC_CONN_PER_LGR_MIN;
- static int conns_per_lgr_max = SMC_CONN_PER_LGR_MAX;
-+static unsigned int autosplit_size_min = SZ_32K;
-+static unsigned int autosplit_size_max = SZ_512M; /* max size of snd/recv buffer */
- 
- static struct ctl_table smc_table[] = {
- 	{
-@@ -90,6 +92,15 @@ static struct ctl_table smc_table[] = {
- 		.extra1		= &conns_per_lgr_min,
- 		.extra2		= &conns_per_lgr_max,
- 	},
-+	{
-+		.procname	= "autosplit_size",
-+		.data		= &init_net.smc.sysctl_autosplit_size,
-+		.maxlen		= sizeof(unsigned int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_douintvec_minmax,
-+		.extra1		= &autosplit_size_min,
-+		.extra2		= &autosplit_size_max,
-+	},
- };
- 
- int __net_init smc_sysctl_net_init(struct net *net)
-@@ -121,6 +132,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
- 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
- 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
- 	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-+	net->smc.sysctl_autosplit_size = SZ_128K;
- 
- 	return 0;
- 
-diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
-index 214ac3cbcf9a..331ce4ff7c6e 100644
---- a/net/smc/smc_tx.c
-+++ b/net/smc/smc_tx.c
-@@ -175,6 +175,21 @@ static bool smc_tx_should_cork(struct smc_sock *smc, struct msghdr *msg)
- 	return false;
- }
- 
-+static inline bool smc_tx_should_split(struct smc_sock *smc, size_t *len)
-+{
-+	size_t split_size = sock_net(&smc->sk)->smc.sysctl_autosplit_size;
-+
-+	/* only split when len >= sysctl_autosplit_size * 1.3,
-+	 * in case of a following tiny size xmit.
-+	 */
-+	if (*len >= (split_size * 4 / 3)) {
-+		*len = split_size;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /* sndbuf producer: main API called by socket layer.
-  * called under sock lock.
-  */
-@@ -185,6 +200,7 @@ int smc_tx_sendmsg(struct smc_sock *smc, struct msghdr *msg, size_t len)
- 	struct smc_connection *conn = &smc->conn;
- 	union smc_host_cursor prep;
- 	struct sock *sk = &smc->sk;
-+	bool is_split = false;
- 	char *sndbuf_base;
- 	int tx_cnt_prep;
- 	int writespace;
-@@ -235,6 +251,7 @@ int smc_tx_sendmsg(struct smc_sock *smc, struct msghdr *msg, size_t len)
- 		writespace = atomic_read(&conn->sndbuf_space);
- 		/* not more than what user space asked for */
- 		copylen = min_t(size_t, send_remaining, writespace);
-+		is_split = smc_tx_should_split(smc, &copylen);
- 		/* determine start of sndbuf */
- 		sndbuf_base = conn->sndbuf_desc->cpu_addr;
- 		smc_curs_copy(&prep, &conn->tx_curs_prep, conn);
-@@ -281,7 +298,7 @@ int smc_tx_sendmsg(struct smc_sock *smc, struct msghdr *msg, size_t len)
- 		/* If we need to cork, do nothing and wait for the next
- 		 * sendmsg() call or push on tx completion
- 		 */
--		if (!smc_tx_should_cork(smc, msg))
-+		if (is_split || !smc_tx_should_cork(smc, msg))
- 			smc_tx_sndbuf_nonempty(conn);
- 
- 		trace_smc_tx_sendmsg(smc, copylen);
--- 
-2.24.3 (Apple Git-128)
-
+> ---
+>  .../ethernet/mellanox/mlxsw/core_thermal.c    | 50 ++++++++++---------
+>  1 file changed, 26 insertions(+), 24 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c b/drivers=
+/net/ethernet/mellanox/mlxsw/core_thermal.c
+> index 5c511e1a8efa..eee3e37983ca 100644
+> --- a/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+> +++ b/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+> @@ -100,6 +100,12 @@ static const struct mlxsw_cooling_states default_coo=
+ling_states[] =3D {
+>
+>  struct mlxsw_thermal;
+>
+> +struct mlxsw_thermal_cooling_device {
+> +       struct mlxsw_thermal *thermal;
+> +       struct thermal_cooling_device *cdev;
+> +       unsigned int idx;
+> +};
+> +
+>  struct mlxsw_thermal_module {
+>         struct mlxsw_thermal *parent;
+>         struct thermal_zone_device *tzdev;
+> @@ -123,7 +129,7 @@ struct mlxsw_thermal {
+>         const struct mlxsw_bus_info *bus_info;
+>         struct thermal_zone_device *tzdev;
+>         int polling_delay;
+> -       struct thermal_cooling_device *cdevs[MLXSW_MFCR_PWMS_MAX];
+> +       struct mlxsw_thermal_cooling_device cdevs[MLXSW_MFCR_PWMS_MAX];
+>         struct thermal_trip trips[MLXSW_THERMAL_NUM_TRIPS];
+>         struct mlxsw_cooling_states cooling_states[MLXSW_THERMAL_NUM_TRIP=
+S];
+>         struct mlxsw_thermal_area line_cards[];
+> @@ -147,7 +153,7 @@ static int mlxsw_get_cooling_device_idx(struct mlxsw_=
+thermal *thermal,
+>         int i;
+>
+>         for (i =3D 0; i < MLXSW_MFCR_PWMS_MAX; i++)
+> -               if (thermal->cdevs[i] =3D=3D cdev)
+> +               if (thermal->cdevs[i].cdev =3D=3D cdev)
+>                         return i;
+>
+>         /* Allow mlxsw thermal zone binding to an external cooling device=
+ */
+> @@ -352,17 +358,14 @@ static int mlxsw_thermal_get_cur_state(struct therm=
+al_cooling_device *cdev,
+>                                        unsigned long *p_state)
+>
+>  {
+> -       struct mlxsw_thermal *thermal =3D cdev->devdata;
+> +       struct mlxsw_thermal_cooling_device *mlxsw_cdev =3D cdev->devdata=
+;
+> +       struct mlxsw_thermal *thermal =3D mlxsw_cdev->thermal;
+>         struct device *dev =3D thermal->bus_info->dev;
+>         char mfsc_pl[MLXSW_REG_MFSC_LEN];
+> -       int err, idx;
+>         u8 duty;
+> +       int err;
+>
+> -       idx =3D mlxsw_get_cooling_device_idx(thermal, cdev);
+> -       if (idx < 0)
+> -               return idx;
+> -
+> -       mlxsw_reg_mfsc_pack(mfsc_pl, idx, 0);
+> +       mlxsw_reg_mfsc_pack(mfsc_pl, mlxsw_cdev->idx, 0);
+>         err =3D mlxsw_reg_query(thermal->core, MLXSW_REG(mfsc), mfsc_pl);
+>         if (err) {
+>                 dev_err(dev, "Failed to query PWM duty\n");
+> @@ -378,22 +381,19 @@ static int mlxsw_thermal_set_cur_state(struct therm=
+al_cooling_device *cdev,
+>                                        unsigned long state)
+>
+>  {
+> -       struct mlxsw_thermal *thermal =3D cdev->devdata;
+> +       struct mlxsw_thermal_cooling_device *mlxsw_cdev =3D cdev->devdata=
+;
+> +       struct mlxsw_thermal *thermal =3D mlxsw_cdev->thermal;
+>         struct device *dev =3D thermal->bus_info->dev;
+>         char mfsc_pl[MLXSW_REG_MFSC_LEN];
+> -       int idx;
+>         int err;
+>
+>         if (state > MLXSW_THERMAL_MAX_STATE)
+>                 return -EINVAL;
+>
+> -       idx =3D mlxsw_get_cooling_device_idx(thermal, cdev);
+> -       if (idx < 0)
+> -               return idx;
+> -
+>         /* Normalize the state to the valid speed range. */
+>         state =3D max_t(unsigned long, MLXSW_THERMAL_MIN_STATE, state);
+> -       mlxsw_reg_mfsc_pack(mfsc_pl, idx, mlxsw_state_to_duty(state));
+> +       mlxsw_reg_mfsc_pack(mfsc_pl, mlxsw_cdev->idx,
+> +                           mlxsw_state_to_duty(state));
+>         err =3D mlxsw_reg_write(thermal->core, MLXSW_REG(mfsc), mfsc_pl);
+>         if (err) {
+>                 dev_err(dev, "Failed to write PWM duty\n");
+> @@ -753,17 +753,21 @@ int mlxsw_thermal_init(struct mlxsw_core *core,
+>         }
+>         for (i =3D 0; i < MLXSW_MFCR_PWMS_MAX; i++) {
+>                 if (pwm_active & BIT(i)) {
+> +                       struct mlxsw_thermal_cooling_device *mlxsw_cdev;
+>                         struct thermal_cooling_device *cdev;
+>
+> +                       mlxsw_cdev =3D &thermal->cdevs[i];
+> +                       mlxsw_cdev->thermal =3D thermal;
+> +                       mlxsw_cdev->idx =3D i;
+>                         cdev =3D thermal_cooling_device_register("mlxsw_f=
+an",
+> -                                                              thermal,
+> +                                                              mlxsw_cdev=
+,
+>                                                                &mlxsw_coo=
+ling_ops);
+>                         if (IS_ERR(cdev)) {
+>                                 err =3D PTR_ERR(cdev);
+>                                 dev_err(dev, "Failed to register cooling =
+device\n");
+>                                 goto err_thermal_cooling_device_register;
+>                         }
+> -                       thermal->cdevs[i] =3D cdev;
+> +                       mlxsw_cdev->cdev =3D cdev;
+>                 }
+>         }
+>
+> @@ -824,8 +828,8 @@ int mlxsw_thermal_init(struct mlxsw_core *core,
+>  err_thermal_zone_device_register:
+>  err_thermal_cooling_device_register:
+>         for (i =3D 0; i < MLXSW_MFCR_PWMS_MAX; i++)
+> -               if (thermal->cdevs[i])
+> -                       thermal_cooling_device_unregister(thermal->cdevs[=
+i]);
+> +               if (thermal->cdevs[i].cdev)
+> +                       thermal_cooling_device_unregister(thermal->cdevs[=
+i].cdev);
+>  err_reg_write:
+>  err_reg_query:
+>         kfree(thermal);
+> @@ -848,10 +852,8 @@ void mlxsw_thermal_fini(struct mlxsw_thermal *therma=
+l)
+>         }
+>
+>         for (i =3D 0; i < MLXSW_MFCR_PWMS_MAX; i++) {
+> -               if (thermal->cdevs[i]) {
+> -                       thermal_cooling_device_unregister(thermal->cdevs[=
+i]);
+> -                       thermal->cdevs[i] =3D NULL;
+> -               }
+> +               if (thermal->cdevs[i].cdev)
+> +                       thermal_cooling_device_unregister(thermal->cdevs[=
+i].cdev);
+>         }
+>
+>         kfree(thermal);
+> --
+> 2.45.0
+>
+>
 
