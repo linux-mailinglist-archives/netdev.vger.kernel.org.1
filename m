@@ -1,220 +1,138 @@
-Return-Path: <netdev+bounces-110068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E7892ADC5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 03:24:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C294B92ADF0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 03:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00061F22306
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 01:24:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77FB51F21F48
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 01:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E33E28366;
-	Tue,  9 Jul 2024 01:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D081F2772A;
+	Tue,  9 Jul 2024 01:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kW0u2twX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBSZBzTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9231FA1;
-	Tue,  9 Jul 2024 01:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843B04A05
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 01:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720488253; cv=none; b=jMm+alZiy2GiMWbXtEkeknlwWNZO0mQUpxNncqxTwf5tfx7BYqkiWydnuEFRtBP6uUulTk1Rf+sqDFlRdcMnFeXOQrcCla9A4mLfgntMvzXK9Cp1dpiULHFkW7eGeCNJ4jWcxPn0zBYMHRIjkK2YxhSTvyeEY1vO2PJem6+vo+0=
+	t=1720489808; cv=none; b=gofMf0i1AzM7Wb0YAcpV9UJ65OAFkCfslb5EkVh0XyIN1wf5IR0kucRI5tSdTgyUI5pwZp8bQT4LPLD2pXqqIMWOjoaIL+c21+TWJhK+3nTA7puKQSOhn+20VURw08TEJIDNICvW9W7DbNa/lLcKdc4VPfdkYlnySLsq/bjJL9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720488253; c=relaxed/simple;
-	bh=lEtixa07+RUJAtKBJsg+gVwNeRwl/kAxLHxDaZOtyBc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=GT02zNLhLL4LyT1D/j0cAXqsZrZ7afNODIlBuzqTXLeuGQ/e4F01B2VInvd8b6LW33a/wDzTaRLhk82ybfYQTBiH6Gw9PwsAyhnX3pOOAaSsE1FyOZRNgMbKkBuNTe7syUkcUEYqAi9+QGieF+HTcBpcXBvCfIuKRdqtre5kQ2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kW0u2twX; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1720489808; c=relaxed/simple;
+	bh=VoXf/9poBzUyaZb5yvcIIvLKQFMTcMA03K/Nl/s86f8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gDeq+ERkk80261tjCmTn+6j7DuI5HIEk5spqXHGJSab3TFle/a4TBMVCONBWm5Qwv7IXUTt2bpRD0FF6sd+nsJ+zkQvxyVQjw7n59lVA/N+2cHEk1wpA4M3p382Zx8sieugxsNQOnjHsxu0fh8rOC5C4GraxgVHEsFB6mjiXx+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EBSZBzTD; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb3e9e32ffso18655905ad.0;
-        Mon, 08 Jul 2024 18:24:11 -0700 (PDT)
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-380bfd7cdbfso22122325ab.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 18:50:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720488250; x=1721093050; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1720489805; x=1721094605; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j32VYAlsuK3/jNbvHCaSgNRDqiz9cqS48fKSFKyyisg=;
-        b=kW0u2twX+VFqsTFO15BewePKAqaLuWCifmH8wS6Wy/cdkidOocsgFZTo1NhDZS5sbX
-         +oXsP3dIVHXHMuGKJGQ2agj3cuL+ULBSWx1JnvykihLei/pY4MVbPYWwR87wgzoAC/VE
-         EJNqR8nLZqSXSeAKhtSvuvL7iG/DXFVNrf1ez6EBVEtbB2r3KIwmpl9V2shuI30HZOmm
-         GucHQxLmvqN4NnEZyUCFLyRVzM2naFaiI7rqEhfXAF433FXXCgbH3fFYf03H/yb3PlcU
-         ECQ5ue2AGcSlGep1sR4Xl2coKbXzMygqXEMIjaf1KXqdUwuFymHWFgwfE7cvEJ+IS+5u
-         HUDg==
+        bh=95X+KQjG1EcAF+s4nXnBBH4JFb1AoTt7PneQ/KBaA0s=;
+        b=EBSZBzTDzXBUIelsli55Ph7whBkm61wysfL819iF3UdnFblkVEoDp2OsJguER06qSY
+         o1WuZlr5lTWCiy97r/2vA2CclcbueiOgAsARIcn/mwrFnQfEZlz8feGTetAhGYH6Hz7E
+         +9UP5DhnaJJTVqf6LEcELqq0rrbwvliHiQB7yMLFkLX7wwW1uQnorTSTDmh62JDwS4PA
+         bM+WtHoAgUlqOy6ik9+mpV3Rf+Q/exiXFMOkT5Ayp9IfAdaQ2nCqd4gOw2yydHQYv/ku
+         M7VkoxyqDpBQNsouk0awxqAhHnvWCLxanqmFr6bSZ72OPG561sduBSrzXZts/Cqxu0cR
+         3unA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720488250; x=1721093050;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=j32VYAlsuK3/jNbvHCaSgNRDqiz9cqS48fKSFKyyisg=;
-        b=Y/ePHyrMtN591MEapUfjDK6/ETFUcqymRBA7Xrwuwbwo4OYpocRSILdb+PhNV2of7P
-         XM85+a3PYZI6TJWBz/C3OL/KS4x00iCIxtYYXHJ/SnHunMvSeBhUueBHzD5CGDu3Boa1
-         tkmQSGF9ZndLwGlyEJL0GYJq9ada0kPp76KtBzxiq1hKgdG4GBVOglgjboLEmPapGsWM
-         8evKcp/ZQe13yCiWFFE5Jy9JwRHZGVPOzkxwHibw9E6OdwTY9apknL392uTB/OGxvj5M
-         rR3+Ya2JwdKhORk80LK82QUz8PIQuTNpN2sy4A6OH7K2O2Scg/pTM+Y7ZvB3UP/3dooX
-         QLAA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEqyYE5fqbSvyhy261tLkU/sctONqYGys3ObRxI3X3Q3Oa6SwlXowO8KljL8IcaPDt8ggJ8ku6GRLMY0FeuqWfN6LY4UQEEQfGtzIqLkhenanZjguD88Sro9p8
-X-Gm-Message-State: AOJu0Yyn+RL8ubd5mEKsR61zBclfOUOvfVJhR7orEz4QcfU4bFod/3oW
-	yVWRco00IdsD/mlM+XefkYcS1ose62dvwYi01r9te1841S2LnNXZRCcoMQ==
-X-Google-Smtp-Source: AGHT+IGd9SsKvaiwytVNuNwMiS1lxE3xnM6kDjIqPA7QoodzrYTEMUqV6/sjV5+BiL4ED9bplPS4nQ==
-X-Received: by 2002:a17:903:11d1:b0:1fa:2760:c3f3 with SMTP id d9443c01a7336-1fbb6d252a9mr9620375ad.13.1720488250411;
-        Mon, 08 Jul 2024 18:24:10 -0700 (PDT)
-Received: from localhost ([98.97.32.172])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a28f8esm4814595ad.64.2024.07.08.18.24.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 18:24:08 -0700 (PDT)
-Date: Mon, 08 Jul 2024 18:24:02 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- mhal@rbox.co
-Cc: Rao.Shoaib@oracle.com, 
- bpf@vger.kernel.org, 
- cong.wang@bytedance.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- jakub@cloudflare.com, 
- john.fastabend@gmail.com, 
- kuba@kernel.org, 
- kuniyu@amazon.com, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com
-Message-ID: <668c9132195f6_d7720840@john.notmuch>
-In-Reply-To: <20240708193820.3392-1-kuniyu@amazon.com>
-References: <20240707222842.4119416-2-mhal@rbox.co>
- <20240708193820.3392-1-kuniyu@amazon.com>
-Subject: Re: [PATCH bpf v3 1/4] af_unix: Disable MSG_OOB handling for sockets
- in sockmap/sockhash
+        d=1e100.net; s=20230601; t=1720489805; x=1721094605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=95X+KQjG1EcAF+s4nXnBBH4JFb1AoTt7PneQ/KBaA0s=;
+        b=Dw8qAV6Xu/B2i02AbPahjcp1lkKqVOREAtRKriy4LQgKe3CjUk0bj8s1jU67KqIjQ9
+         bq2td5US4xEcD23Chj3Os33D4D3iRhMrcFXbU6BGtk+VQsQY3UGAM8asKifNTjO9ylkH
+         /SHcj7+FoE49J6XaN7MPi+i0dvhSNicsT9tygOOZTjl+9sJPr23KA2tBrKkrokrGtSTN
+         kxHqX3X5RHg1Nviq7CSR+f/zC5Ht6F6Kt7sCucAdzQaTK8+VOaL9MolsBn/vThYLnDJt
+         ZAtiUl5i0fN7gouLtOxHRKAy9bNYjnWa0+EJVXAxVXfA4NoDPxdHplNr7y6GdcmfE6LN
+         lqTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXqSYSzzEKQlmy1qG80kjHpkvJznfBwpLq/iBou3SgdRaMEwltW0qMUfz+TmoxzREZMw21iMAQQOEr1FAMBvjHYZafDVyD
+X-Gm-Message-State: AOJu0Yy9rE0mrxCyQ56QnL0KGp5dNLJcpxPR/BW+JzYfkyJdgsQkdEMO
+	s2qGafkFZhIHCqvGSwAhVxDdJylSI18Q3EFGnCORosHZFiEJUgHIsXG6Ea5J8LOT1ZLXkWeNRQl
+	CvtRMI1j2Wgh4byUbHR82xN5vfZ0=
+X-Google-Smtp-Source: AGHT+IHC/D/Cj23tJjAFI6Ojkg9Ke4fMQwk+1Mzoacdllj+Tyv4TORkURzbEuMZ558ZsAwh5iePg5vSxV6zB/h0SS0w=
+X-Received: by 2002:a05:6e02:1c22:b0:375:a185:f00f with SMTP id
+ e9e14a558f8ab-38a5910a99bmr14794515ab.22.1720489805627; Mon, 08 Jul 2024
+ 18:50:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <5a9886fd-cdd7-4aa2-880f-5664288d5f25@ovn.org> <619f9212-fa90-44d2-9951-800523413c8d@ovn.org>
+ <CADvbK_cFvGT--MVJQ=tGa4bugJ5MeeVbbTqJwNw-Aa0Tf8ppiA@mail.gmail.com>
+ <e42d36d5-1395-4276-a3ed-5b914bb9d9d0@ovn.org> <CADvbK_dWpZd6RyqRdiHvWP9SrG1Otfi4h5Ae=yhErLc+DhLkaw@mail.gmail.com>
+ <20240619201959.GA1513@breakpoint.cc> <CADvbK_dAB3iHmM=nkbxGJca2c_1J-NK3R4241b3RAvV8Q9Q+QQ@mail.gmail.com>
+ <20240619212030.GB1513@breakpoint.cc> <CADvbK_dPyPP3wwjLB4pD2o_AqpXEprkn70M7e=8aVoan+vTDGg@mail.gmail.com>
+ <CADvbK_fqi=m99e5+5pkHZTuRz7kKWFLZ8CFG3q=mUEtaaKm2hQ@mail.gmail.com> <20240708223839.GA18283@breakpoint.cc>
+In-Reply-To: <20240708223839.GA18283@breakpoint.cc>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 8 Jul 2024 21:49:54 -0400
+Message-ID: <CADvbK_cYpB07dvyMSGOU3XsAJmZV_feb76hVg9tCJeFjs5iuxA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] openvswitch: set IPS_CONFIRMED in tmpl
+ status only when commit is set in conntrack
+To: Florian Westphal <fw@strlen.de>
+Cc: Ilya Maximets <i.maximets@ovn.org>, network dev <netdev@vger.kernel.org>, dev@openvswitch.org, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Davide Caratti <dcaratti@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, kuba@kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Aaron Conole <aconole@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Kuniyuki Iwashima wrote:
-> From: Michal Luczaj <mhal@rbox.co>
-> Date: Sun,  7 Jul 2024 23:28:22 +0200
-> > AF_UNIX socket tracks the most recent OOB packet (in its receive queue)
-> > with an `oob_skb` pointer. BPF redirecting does not account for that: when
-> > an OOB packet is moved between sockets, `oob_skb` is left outdated. This
-> > results in a single skb that may be accessed from two different sockets.
-> > 
-> > Take the easy way out: silently drop MSG_OOB data targeting any socket that
-> > is in a sockmap or a sockhash. Note that such silent drop is akin to the
-> > fate of redirected skb's scm_fp_list (SCM_RIGHTS, SCM_CREDENTIALS).
-> > 
-> > For symmetry, forbid MSG_OOB in unix_bpf_recvmsg().
-> > 
-> > Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> 
+On Mon, Jul 8, 2024 at 6:38=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
+e:
+>
+> Xin Long <lucien.xin@gmail.com> wrote:
+> > I can avoid this warning by not allocating ext for commit ct in ovs:
+> >
+> > @@ -426,7 +426,7 @@ static int ovs_ct_set_labels(struct nf_conn *ct,
+> > struct sw_flow_key *key,
+> >         struct nf_conn_labels *cl;
+> >         int err;
+> >
+> > -       cl =3D ovs_ct_get_conn_labels(ct);
+> > +       cl =3D nf_ct_labels_find(ct);
+> >         if (!cl)
+> >                 return -ENOSPC;
+ovs_ct_get_conn_labels() must be replaced with nf_ct_labels_find() in here
+anyway, thinking that the confirmed ct without labels was created in other
+places (not by OVS conntrack), the warning may still be triggered when
+trying to set labels in OVS after.
 
-Why does af_unix put the oob data on the sk_receive_queue()? Wouldn't it
-be enough to just have the ousk->oob_skb hold the reference to the skb?
+> >
+> > However, the test case would fail, although the failure can be worked a=
+round
+> > by setting ct_label in the 1st rule:
+> >
+> >   table=3D0,priority=3D30,in_port=3D1,ip,nw_dst=3D172.1.1.2,actions=3Dc=
+t(commit,nat(dst=3D10.1.1.2:80),exec(set_field:0x01->ct_label),table=3D1)
+> >
+> > So I'm worrying our change may break some existing OVS user cases.
+>
+> Then ovs_ct_limit_init() and nf_connlabels_get() need to be called
+> once on the first conntrack operatation, regardless if labels are asked
+> for or not.
+>
+> Not nice but still better than current state.
+Right, not nice, it undermines the bits check against NF_CT_LABELS_MAX_SIZE=
+.
 
-I think for TCP/UDP at least I'll want to handle MSG_OOB data correctly.
-For redirect its probably fine to just drop or skip it, but when we are
-just reading recv msgs and parsing/observing it would be nice to not change
-how the application works. In practice I don't recall anyone reporting
-issues on TCP side though from incorrectly handling URG data.
-
-From TCP side I believe we can fix the OOB case by checking the oob queue
-before doing the recvmsg handling. If the urg data wasn't on the general
-sk_receive_queue we could do similar here for af_unix? My argument for
-URG not working for redirect would be to let userspace handle it if they
-cared.
-
-Thanks.
-
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-> Thanks!
-> 
-> 
-> > ---
-> >  net/unix/af_unix.c  | 41 ++++++++++++++++++++++++++++++++++++++++-
-> >  net/unix/unix_bpf.c |  3 +++
-> >  2 files changed, 43 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index 142f56770b77..11cb5badafb6 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -2667,10 +2667,49 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
-> >  
-> >  static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
-> >  {
-> > +	struct unix_sock *u = unix_sk(sk);
-> > +	struct sk_buff *skb;
-> > +	int err;
-> > +
-> >  	if (unlikely(READ_ONCE(sk->sk_state) != TCP_ESTABLISHED))
-> >  		return -ENOTCONN;
-> >  
-> > -	return unix_read_skb(sk, recv_actor);
-> > +	mutex_lock(&u->iolock);
-> > +	skb = skb_recv_datagram(sk, MSG_DONTWAIT, &err);
-> > +	mutex_unlock(&u->iolock);
-> > +	if (!skb)
-> > +		return err;
-> > +
-> > +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-> > +	if (unlikely(skb == READ_ONCE(u->oob_skb))) {
-> > +		bool drop = false;
-> > +
-> > +		unix_state_lock(sk);
-> > +
-> > +		if (sock_flag(sk, SOCK_DEAD)) {
-> > +			unix_state_unlock(sk);
-> > +			kfree_skb(skb);
-> > +			return -ECONNRESET;
-> > +		}
-> > +
-> > +		spin_lock(&sk->sk_receive_queue.lock);
-> > +		if (likely(skb == u->oob_skb)) {
-> > +			WRITE_ONCE(u->oob_skb, NULL);
-> > +			drop = true;
-> > +		}
-> > +		spin_unlock(&sk->sk_receive_queue.lock);
-> > +
-> > +		unix_state_unlock(sk);
-> > +
-> > +		if (drop) {
-> > +			WARN_ON_ONCE(skb_unref(skb));
-> > +			kfree_skb(skb);
-> > +			return -EAGAIN;
-> > +		}
-> > +	}
-> > +#endif
-> > +
-> > +	return recv_actor(sk, skb);
-> >  }
-> >  
-> >  static int unix_stream_read_generic(struct unix_stream_read_state *state,
-> > diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
-> > index bd84785bf8d6..bca2d86ba97d 100644
-> > --- a/net/unix/unix_bpf.c
-> > +++ b/net/unix/unix_bpf.c
-> > @@ -54,6 +54,9 @@ static int unix_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
-> >  	struct sk_psock *psock;
-> >  	int copied;
-> >  
-> > +	if (flags & MSG_OOB)
-> > +		return -EOPNOTSUPP;
-> > +
-> >  	if (!len)
-> >  		return 0;
-> >  
-> > -- 
-> > 2.45.2
-
-
+>
+> ovs_ct_execute() perhaps?
+ovs_ct_execute() is in the hot path, and a better place would be
+ovs_ct_copy_action() where the ct for an ovs flow is added.
 
