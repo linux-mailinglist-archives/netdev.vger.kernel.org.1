@@ -1,172 +1,133 @@
-Return-Path: <netdev+bounces-110178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C343892B390
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:20:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E2E492B39F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 004331C21D54
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:20:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0367B22592
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF9C154458;
-	Tue,  9 Jul 2024 09:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63E0154C0F;
+	Tue,  9 Jul 2024 09:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzwClH18"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9J5cey7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F08154434;
-	Tue,  9 Jul 2024 09:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBF2154BE0;
+	Tue,  9 Jul 2024 09:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720516795; cv=none; b=SsqafzTDJRbS5jj6ENubLCQaLsEObLm8IPWjQpB97+BgWLcW3Vts+cY4t7I5dqlqc/wgRNKuu0OJ7G+tEG7J3VVQUKuvW/bNpZjNVTFWCjXRSfbkcMyuUPyy8mijmzq7PmPxIfdZZCO+egDvphFLxKLjozL+C2hlFZcx9vWQBJI=
+	t=1720517001; cv=none; b=KVs91YidCW74O/XOBLgkhZDUdKFhF9ILJ/LErJayId7LSn2O15PbgUJmgVIpXBbjLoTNmW7/Ovd6sQgNjyTRTTDsIv+tSVXSajc0o9RU30XWkHDN9aixgFQW9FNAtyxhbeBIfst8NMImtuMT1zh/lSPyI99AFAYxQdLMg8lopvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720516795; c=relaxed/simple;
-	bh=C5LaxZmJe3hgAAtn7Gpmwp0uINpw4vV2fjMcNKJkXSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hLb0LUbaf6sBwmLIQIS/4hHyQQjX2hYi2x3IR7zTKipW2gESGFDmhacOgApwC+XmIPQUfROS12ysx0Mgp/v8D3khF1q6xKCkAIDPJSevfpbxe8JptGUzi0fgPJnWv0VZm1omJ275rASTlDBZsPxRXMFZXnyYuRlgpt/f7jpGCwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzwClH18; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9EDC3277B;
-	Tue,  9 Jul 2024 09:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720516794;
-	bh=C5LaxZmJe3hgAAtn7Gpmwp0uINpw4vV2fjMcNKJkXSg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lzwClH18GW+BOKoOdoysjRyNnPrJhMpU+14WHzzR3y72OF6yRptAs8o0v0/6PGgyv
-	 rUBBEC0/dHiLChlJZHXbyS3vXcV0ET/A2sF+bvFJUjORRXNPZBHrpOav8kF3jW2VtX
-	 jlXNXx+h71idWxkVLCKUzLgttUdwDRg3ZHeP3xL0l//jjRp04oyU/W+D9do+cctMSb
-	 pa2EaNcB3w/GC/i85QJpcBLPi4M8rzC4bIyIMvhfUHrhgAl/gfWvW+b8712rSBJBGL
-	 UXpE9v+4DlZ3rFzcnlhrUemTDkqIour8vzu9HJLSidP/JSRC4zTMpNYhcf9g4Gx04r
-	 2u4x+berVOsDQ==
-Date: Tue, 9 Jul 2024 10:19:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: zijianzhang@bytedance.com
-Cc: netdev@vger.kernel.org, edumazet@google.com,
-	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
-	xiaochun.lu@bytedance.com, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v7 3/3] selftests: add MSG_ZEROCOPY msg_control
- notification test
-Message-ID: <20240709091950.GF346094@kernel.org>
-References: <20240708210405.870930-1-zijianzhang@bytedance.com>
- <20240708210405.870930-4-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1720517001; c=relaxed/simple;
+	bh=gL3UbFjJe1IWH4tlBHletviXN5EpoqVoA1JKkBjrMLw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rDqIdC1nS0GiLRIZA8FBXBZG8HvLAX1T3e7nwUjwH9FDbF3MFzydZYosJRQbli15aVUGlEnXWtwbAS2MKFAghInX+KCXmpNGCwrfjA220TwdonCD33jLVO0HTxSh8BbG32WtNxHJ/qVTVCuzTNg1GNoosT187QnI7nxDDEwLwaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9J5cey7; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-446654617f8so1771341cf.3;
+        Tue, 09 Jul 2024 02:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720516999; x=1721121799; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+IB7H3a9ahn1e0BjbmW8xDTsOIOiquV1t1pK9fhKvE=;
+        b=N9J5cey7Q1DqgpwhRnmsdLmfQyXiN9z4Twivbh0oqrMu8X6ZlKu7UF2tBhThfTTfUd
+         /QXmBHvNnONCOutbIXs9mPmWG5YGP4HxplBffGNXm7b2nrSlz+GzfObBEcVl/ZEa3MRP
+         rYaPKjjVNmk6K0lajONjt7n8SLHYU29xrwLfylDJbkhvnW0FxUCtnQY6Az/voCWRXvcK
+         9YYNOnb0mZGNkWoagXQDbCclnurgyoDGU9sf7faHSV0N2/lWa89j9buK+H/a5AhZxid0
+         WZPGGACvjDgwfoU+/b4Ykiq11Rli8XjSznJCcQQy0KTuSF26QbrFX6B3JF8+V+WCGm81
+         ZCCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720516999; x=1721121799;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u+IB7H3a9ahn1e0BjbmW8xDTsOIOiquV1t1pK9fhKvE=;
+        b=kspHYfRACmdnqm5sG8qZ70aDEMnAr0dQSUa7rGHgaN6nIbjJgx4Yo/+x0543ocAV5I
+         r5wnslM3hQcLjcB+v9960WqF5OZ1Yxz3nxKfKHrKgvqjhTU51WJ07Pd7TTcjP8hNwWpb
+         LPvA8kHdJYa38NXjwOANUswOOplrup4b3SdkJpGyV1nYeL2/ZQUKRkR3TezAYp83fG7O
+         1MU1v7lN61dIr86/Zu8clXxy4j6o82Of7ldVnekPUlPIDfqW3WC42y0ccNNVCGmIQUnh
+         /CMku8vr4J2BC7a3gGFyF5/hF+UnmS2SVhanDp10CXu5SQSqZuvj8COqVIozqeq9gcwH
+         KRdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWtYZkHC3oFgqrIxLmr7PeZKsvOrndWFXWPtTzM+7lsFC/bS4DDoI7hgDAxsyUws4WDLTy7A6FOq5O83JdLfhznbGTCaUyT
+X-Gm-Message-State: AOJu0Yydiqguh4IVd1yjIUD0VAebgLy9awQwPMpR2XxqCnUlmyVBa/hE
+	37lADjHmVMuerSik/iLnYxS1coIyXPM6t008tg2LNbd1b9JZuVbJZaP44W+UOTJ1BGRkAZzbTdj
+	Fdemz+BclRI/WZztTwqJlDcls9HiPfmhNDnxxrg==
+X-Google-Smtp-Source: AGHT+IGBe7xsI82jVqQDroZhlI0ftBglhsQWHCjoICqMmX+krbPU5b+HhdtdBHC9RzU2nKFIeDLYh4qLl9YVfj+ZbVo=
+X-Received: by 2002:a0c:f752:0:b0:6b5:600:acc8 with SMTP id
+ 6a1803df08f44-6b61bc7fa26mr21754276d6.1.1720516998911; Tue, 09 Jul 2024
+ 02:23:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708210405.870930-4-zijianzhang@bytedance.com>
+References: <2d6ff64a-5e2c-4078-a8d1-84f1ff3361ce@arctic-alpaca.de>
+In-Reply-To: <2d6ff64a-5e2c-4078-a8d1-84f1ff3361ce@arctic-alpaca.de>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 9 Jul 2024 11:23:07 +0200
+Message-ID: <CAJ8uoz0w9RhAk2v4G-FSzjOCqitCPhEXOC6c_PcOFr7PxTjbWg@mail.gmail.com>
+Subject: Re: xdp/xsk.c: Possible bug in xdp_umem_reg version check
+To: Julian Schindel <mail@arctic-alpaca.de>
+Cc: bpf@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev <sdf@google.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-+ Dave Miller, Jakub Kicinski, Paolo Abeni, Shuah Khan,
-  linux-kselftest@vger.kernel.org
+On Sun, 7 Jul 2024 at 17:06, Julian Schindel <mail@arctic-alpaca.de> wrote:
+>
+> Hi,
+>
+> I hope this is the correct way to ask about this issue, I haven't used
+> the kernel mailing list before.
+>
+> Between different compilations of an AF_XDP project, I encountered
+> "random" EINVAL errors when calling setsockopt XDP_UMEM_REG with the
+> same parameter.
+>
+> I think this might be caused by this patch:
+> https://lore.kernel.org/all/20231127190319.1190813-2-sdf@google.com/
+> It added "tx_metadata_len" to the "xdp_umem_reg" struct.
+> In the  "xsk_setsockopt" code in xdp/xsk.c, the provided "optlen" is
+> checked against the length of "xdp_umem_reg_v2" and "xdp_umem_reg" to
+> check which version of "xdp_umem_reg", the user supplied.
+>
+> At least on my machine (x86_64, Fedora 40, 6.9.7), these two structs
+> have the same size (32 bytes) due to the compiler adding padding to
+> "xdp_umem_reg_v2". This means if the user supplies "xdp_umem_reg_v2", it
+> is falsely treated as "xdp_umem_reg".
+>
+> I'm not sure whether there is some implicit struct packing happening or
+> whether this is indeed a bug.
 
-On Mon, Jul 08, 2024 at 09:04:05PM +0000, zijianzhang@bytedance.com wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> We update selftests/net/msg_zerocopy.c to accommodate the new mechanism,
-> cfg_notification_limit has the same semantics for both methods. Test
-> results are as follows, we update skb_orphan_frags_rx to the same as
-> skb_orphan_frags to support zerocopy in the localhost test.
-> 
-> cfg_notification_limit = 1, both method get notifications after 1 calling
-> of sendmsg. In this case, the new method has around 17% cpu savings in TCP
-> and 23% cpu savings in UDP.
-> +---------------------+---------+---------+---------+---------+
-> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> +---------------------+---------+---------+---------+---------+
-> | ZCopy (MB)          | 7523    | 7706    | 7489    | 7304    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy (MB)      | 8834    | 8993    | 9053    | 9228    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy / ZCopy   | 117.42% | 116.70% | 120.88% | 126.34% |
-> +---------------------+---------+---------+---------+---------+
-> 
-> cfg_notification_limit = 32, both get notifications after 32 calling of
-> sendmsg, which means more chances to coalesce notifications, and less
-> overhead of poll + recvmsg for the original method. In this case, the new
-> method has around 7% cpu savings in TCP and slightly better cpu usage in
-> UDP. In the context of selftest, notifications of TCP are more likely to
-> out of order than UDP, it's easier to coalesce more notifications in UDP.
-> The original method can get one notification with range of 32 in a recvmsg
-> most of the time. In TCP, most notifications' range is around 2, so the
-> original method needs around 16 recvmsgs to get notified in one round.
-> That's the reason for the "New ZCopy / ZCopy" diff in TCP and UDP here.
-> +---------------------+---------+---------+---------+---------+
-> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> +---------------------+---------+---------+---------+---------+
-> | ZCopy (MB)          | 8842    | 8735    | 10072   | 9380    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy (MB)      | 9366    | 9477    | 10108   | 9385    |
-> +---------------------+---------+---------+---------+---------+
-> | New ZCopy / ZCopy   | 106.00% | 108.28% | 100.31% | 100.01% |
-> +---------------------+---------+---------+---------+---------+
-> 
-> In conclusion, when notification interval is small or notifications are
-> hard to be coalesced, the new mechanism is highly recommended. Otherwise,
-> the performance gain from the new mechanism is very limited.
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> ---
->  tools/testing/selftests/net/msg_zerocopy.c  | 111 ++++++++++++++++++--
->  tools/testing/selftests/net/msg_zerocopy.sh |   1 +
->  2 files changed, 105 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
+Thank you for reporting this Julian. This seems to be a bug. If I
+check the value of sizeof(struct xdp_umem_reg_v2), I get 32 bytes too
+on my system, compiling with gcc 11.4. I am not a compiler guy so do
+not know what the rules are for padding structs, but I read the
+following from [0]:
 
-...
+"Pad the entire struct to a multiple of 64-bits if the structure
+contains 64-bit types - the structure size will otherwise differ on
+32-bit versus 64-bit. Having a different structure size hurts when
+passing arrays of structures to the kernel, or if the kernel checks
+the structure size, which e.g. the drm core does."
 
-> @@ -466,6 +504,44 @@ static void do_recv_completions(int fd, int domain)
->  	sends_since_notify = 0;
->  }
->  
-> +static void do_recv_completions2(void)
-> +{
-> +	struct cmsghdr *cm = (struct cmsghdr *)zc_ckbuf;
-> +	struct zc_info *zc_info;
-> +	__u32 hi, lo, range;
-> +	__u8 zerocopy;
-> +	int i;
-> +
-> +	zc_info = (struct zc_info *)CMSG_DATA(cm);
-> +	for (i = 0; i < zc_info->size; i++) {
-> +		hi = zc_info->arr[i].hi;
-> +		lo = zc_info->arr[i].lo;
-> +		zerocopy = zc_info->arr[i].zerocopy;
-> +		range = hi - lo + 1;
-> +
-> +		if (cfg_verbose && lo != next_completion)
-> +			fprintf(stderr, "gap: %u..%u does not append to %u\n",
-> +				lo, hi, next_completion);
-> +		next_completion = hi + 1;
-> +
-> +		if (zerocopied == -1)
-> +			zerocopied = zerocopy;
-> +		else if (zerocopied != zerocopy) {
-> +			fprintf(stderr, "serr: inconsistent\n");
-> +			zerocopied = zerocopy;
-> +		}
+I compiled for 64-bits and I believe you did too, but we still get
+this padding. What is sizeof(struct xdp_umem_reg) for you before the
+patch that added tx_metadata_len?
 
-nit: If any arms of a conditional have {}, then all arms should have them
+[0]: https://www.kernel.org/doc/html/v5.4/ioctl/botching-up-ioctls.html
 
-> +
-> +		completions += range;
-> +
-> +		if (cfg_verbose >= 2)
-> +			fprintf(stderr, "completed: %u (h=%u l=%u)\n",
-> +				range, hi, lo);
-> +	}
-> +
-> +	sends_since_notify = 0;
-> +	added_zcopy_info = false;
-> +}
-
-...
+> Best regards,
+> Julian
+>
+>
 
