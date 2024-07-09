@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-110421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B773C92C462
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 22:19:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0204A92C469
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 22:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B46F1F235D9
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 20:19:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACD38B21E68
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 20:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9460214AD03;
-	Tue,  9 Jul 2024 20:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0790818003B;
+	Tue,  9 Jul 2024 20:22:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C061B86E2;
-	Tue,  9 Jul 2024 20:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAC01B86DC;
+	Tue,  9 Jul 2024 20:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720556394; cv=none; b=IzB39szuMJr4Vy9Bzp/OHPZKOQpZQMqNchUY7dhnfGibOIUwEmJqn7DzhdxlTOQR8cuUYAGIss7HAuc+ZRlgiGEavqLmyU1SyVOCCv0ZXMKO8Kb4LCGN6zhVSPiBmbjZySBGmqtlmDM/+DdJWrd0JnRL8VhARDCTq5CrSwpSb9A=
+	t=1720556526; cv=none; b=J9bhvDLi+y7GBuJlNK7HKWo3ccWcTvcOrT6suPnoLx58sGluzj7R//kkRhuM6w4P9PsEq7lPNykrD7mLNp8irabXHxqpaPaaNimfOplcsW6NuSc4CyGHPQcEjdvGGCdsBulLKk3FllS7kD7NSDO68OzaQYkaBPOTIL8QeSGAiek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720556394; c=relaxed/simple;
-	bh=xEnkJp0gArq0WuiIGLrWX7kpveK7Rf68JlO+T6b+QWw=;
+	s=arc-20240116; t=1720556526; c=relaxed/simple;
+	bh=RGmSQUGbWLYnF/rlMB7F8Gre8jpeZnVMx52cnn9GY6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYth/0N561HhcaH05Sn/mRtIVQAznPBNo7IJnCmWUWWsQQbsyRT38teYXFVkuRjAv8shocGp518iHx7JB+z0x4bGO9f8k5aX9iAXfN+Cllx2Xn3BVk/OS80Pig3/i7zs1rUKvezqcOXuVb0EB/xwWkqGWesR30aTR8MLlj7Ym5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=YbxfFvDF2LC0SLgKpgj1W+oFoy9aPve9rMjMHvCIwpdWUpdNFP3Z8aaCqN5ca+OjHF92MEYeBhDzP4hjaMC91H6/4Yc/OSzPiQEjwuRYS+dAStomsi1IAZdG4G0U1P4rwNQX71s1x1fViFjBLeDbPfYw6acTZ2MXP/P6SpdkSQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a77e7420697so449393266b.1;
-        Tue, 09 Jul 2024 13:19:52 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-595712c49ebso1254433a12.0;
+        Tue, 09 Jul 2024 13:22:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720556391; x=1721161191;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0QdwLBn0J0GvcOGX8RCaus4UscnHhqmUU5ndiMC5O8g=;
-        b=eoNWSzVEtdlcsVSp5dilNzqBS39mFvrnTJKNe8JfaLPv8kIWPgecKNubfgwSUqgNCk
-         x4q4gdI+r8DuZNFu/KKHN7AMGFXggRfdDicKdfkFSIbG6h+IfW0Eu+DzfA9MmWfFWlsf
-         +Do1xqeJhA+dT+bF6ENoZAfA+dpMSr65Sg+kT6CThFCPJGRnnSvnr8ojzfJ1pw/yfEZw
-         0g8y2uJRS1oJLUan7yA6W/ELdy675hQN9zfsaKDZhrlP4Jm88LUvZz9xceYkI53Y2Rae
-         61nkzfTQo3G82xOszhSDcDjT3oTRvjsOHpmpxIEVIQJd/vDbOj9uGd1HSdXfbXCKUPuB
-         JsKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFahAfbDtiSliKqzi8Vlz0LSK4PPe6LTu1COO5WUQF+1+U2bay7OaWQudl5B2/cAf2pYxQ/vGGQAs65g2yg/Fm82VpoNhJtOMK8wzn+4Z+E4NIUUV1oLHwt6f11Cuf4+9p/VqcWy5GGkyBoTk4Fx7aXbcFLdmP/qW2uoTJiJNILxSQF2SV
-X-Gm-Message-State: AOJu0YxXRJFcs6aCT8yBqyT+aL7eytWpUGlbqUf6wWqiF1t6qvFFzmH8
-	hKq48Yg6qLQXTVhxPJebAOaSG9j0u62YsU5Tb4A38bPR7NCZ6A62
-X-Google-Smtp-Source: AGHT+IFTuzuG2o8aRh8UmWLGLFL1aRSNIl6PJfXxcZm/FrqMW/4oTQzx4CkvKw7vlTSzm0wmrSLi2w==
-X-Received: by 2002:a17:906:4a54:b0:a77:f2c5:84bf with SMTP id a640c23a62f3a-a780b6881ecmr186015466b.2.1720556387362;
-        Tue, 09 Jul 2024 13:19:47 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a8720f9sm103530966b.220.2024.07.09.13.19.46
+        d=1e100.net; s=20230601; t=1720556524; x=1721161324;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvRIuRA8Q0ILQxQtGh1N00X9AsqI+8Alg4FEVLSH3uQ=;
+        b=Lus1Yj2k85MlCxtWTR9+HlwU3KO/AWPP2oP2NMlJzE8DSDv8RQ0YTJOh16KRgiXV7Y
+         Rb7pmilR2ZAlNwrMLJyjZfpC6LbppdNbSG3aY1ewbqMX27YzgXOcnNgyXoB04bSyn/zL
+         beIXC4pXDkGK1c2FKFnh58U5dTa3e5cKsJecjjmircCbplANjBQ6PdAYiYjfQgcp4RoS
+         EplSKw5A2W6Dp1huMxGmBF9Ie3rWu9cWwdH15fRDuPIs64JjcFDtWMVH1ZjplLOW/vwG
+         ogonjGHKxvPzrYrLSu8IcAKVX461JS//EfuR/R+4DRvO6Gfl2E2zvqISlmaqMpnVO01X
+         nzLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXq3alDlNxDzWSfR8gF/Dy+WcMSmdUbZtVRHi7K8TKS3+5mCrWRGPbPxrX7vE2XkedSWY53nR+Lz7zeFqm7yVJFGG/l7B9TVoUp81vmZHh+qSL8EoV7n+LcHxA0n8+heLXqhepRKLRfbl3ZlYtdrGIYVQjHlD89qrYzEYQx3Gt3V/1gurej
+X-Gm-Message-State: AOJu0YwY+3T/hzftJrqV3qD5hJpxypKXdgcROHM0oDos5dz0kB03GP68
+	FtDhY83rpoNs/LFnxhEIwQMhGG/9PDQLcqtumU6nlAsf6+C7TupsvIv6Xw==
+X-Google-Smtp-Source: AGHT+IGcKzyE8EOMfQ3OoW0Ujo4qjw7hNTfIbEERwMkINzHm41RRGPA3WbgjNLiDaSnmLTq5IifRmw==
+X-Received: by 2002:a17:907:724a:b0:a72:5a8c:87c6 with SMTP id a640c23a62f3a-a780b68a9d5mr252708166b.10.1720556523516;
+        Tue, 09 Jul 2024 13:22:03 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6bcd09sm104633666b.19.2024.07.09.13.22.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 13:19:47 -0700 (PDT)
-Date: Tue, 9 Jul 2024 13:19:44 -0700
+        Tue, 09 Jul 2024 13:22:03 -0700 (PDT)
+Date: Tue, 9 Jul 2024 13:22:00 -0700
 From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Kees Cook <kees@kernel.org>,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	keescook@chromium.org, nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	keescook@chromium.org, horms@kernel.org,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	linux-hardening@vger.kernel.org,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -75,58 +75,39 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	open list <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH net-next v2] netdevice: define and allocate &net_device
  _properly_
-Message-ID: <Zo2bYCAVQaViN6z8@gmail.com>
+Message-ID: <Zo2b6DJDMXLm/dBK@gmail.com>
 References: <20240709125433.4026177-1-leitao@debian.org>
- <20240709181128.GO346094@kernel.org>
+ <CANn89iJSUg8LJkpRrT0BWWMTiHixJVo1hSpt2-2kBw7BzB8Mqg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240709181128.GO346094@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJSUg8LJkpRrT0BWWMTiHixJVo1hSpt2-2kBw7BzB8Mqg@mail.gmail.com>
 
-On Tue, Jul 09, 2024 at 07:11:28PM +0100, Simon Horman wrote:
-> On Tue, Jul 09, 2024 at 05:54:25AM -0700, Breno Leitao wrote:
-> > From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > 
-> > In fact, this structure contains a flexible array at the end, but
-> > historically its size, alignment etc., is calculated manually.
-> > There are several instances of the structure embedded into other
-> > structures, but also there's ongoing effort to remove them and we
-> > could in the meantime declare &net_device properly.
-> > Declare the array explicitly, use struct_size() and store the array
-> > size inside the structure, so that __counted_by() can be applied.
-> > Don't use PTR_ALIGN(), as SLUB itself tries its best to ensure the
-> > allocated buffer is aligned to what the user expects.
-> > Also, change its alignment from %NETDEV_ALIGN to the cacheline size
-> > as per several suggestions on the netdev ML.
-> > 
-> > bloat-o-meter for vmlinux:
-> > 
-> > free_netdev                                  445     440      -5
-> > netdev_freemem                                24       -     -24
-> > alloc_netdev_mqs                            1481    1450     -31
-> > 
-> > On x86_64 with several NICs of different vendors, I was never able to
-> > get a &net_device pointer not aligned to the cacheline size after the
-> > change.
-> > 
-> > Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> Hi Breno,
-> 
-> Some kernel doc warnings from my side.
+On Tue, Jul 09, 2024 at 08:27:45AM -0700, Eric Dumazet wrote:
+> On Tue, Jul 9, 2024 at 5:54 AM Breno Leitao <leitao@debian.org> wrote:
 
-Thanks. I will send a v3 with the fixes.
+> > @@ -2596,7 +2599,7 @@ void dev_net_set(struct net_device *dev, struct net *net)
+> >   */
+> >  static inline void *netdev_priv(const struct net_device *dev)
+> >  {
+> > -       return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
+> > +       return (void *)dev->priv;
 
-> Flagged by: kernel-doc -none
+> Minor remark : the cast is not needed, but this is fine.
 
-How do you run this test exactly? I would like to add to my workflow.
+Thanks. I will fix it in a v3, which needs to be done to address some
+kernel-doc warnings identified by Simon..
 
-Thanks!
+> It would be great to get rid of NETDEV_ALIGN eventually.
+
+Would you mind sharing what do you have in mind? What do you use as a
+replacement?
+
+Thanks
 
