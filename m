@@ -1,103 +1,139 @@
-Return-Path: <netdev+bounces-110429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966B992C49F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 22:37:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43CE292C550
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 23:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33934B21B25
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 20:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F22ED2829EA
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 21:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2A614F9C5;
-	Tue,  9 Jul 2024 20:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88839187847;
+	Tue,  9 Jul 2024 21:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9DtBC9s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0hnsDq7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E2A13C8EA;
-	Tue,  9 Jul 2024 20:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1620C17B05F;
+	Tue,  9 Jul 2024 21:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720557445; cv=none; b=B3nUdFTF/sLWU+fxmtEM9sBUOVo6536HgxBlLqVY4OayFVPJHdoFaIgSPQLYuPegEP0+QTjPQ92k0oHrvDZstyvcfZBGz+3eOf/y9HZP9B5NWbqz4Tdy08+Dp3cTD4Apq1nVAA+ao0ZE+LrhkTgYpOiP3TKanu1PzPgDSEkPWgw=
+	t=1720560603; cv=none; b=anp6mkBMYVGuvSKh0yCHbDB89/HovgvfZCmYZ1jG7YEskVtWgDrVUCzh1YUTvymxkZGUUdF0OI8Z/qPVKlMxQDrxwPqV0Xb0d1gSnxtAAIK0/OpUU9tsDdky0J3hxBwTPuo+R1h9was+TVox63SWwWVNv/3g9LP3ytXTRwL69G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720557445; c=relaxed/simple;
-	bh=eK+ElAZ3HYE+YOrVt86IwYpztcjk8MJ4RaWg/ldd9Cs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DiKZh2pzF018ePYYCGqwr7NW6YMB6FN5+gmVQzbPELU6544QZXyQVZZc7wfPucnqYWuHWHnx+g9Xg7NXBlkSvJ5h7Rvxq0RnGduMimY313TIdTQ604PbKxauCwy1O53ZEV1P5XD6Ya5qLDe5k5EwpLqDcTUe2uD4V2zv00N2ldU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U9DtBC9s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4B87C3277B;
-	Tue,  9 Jul 2024 20:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720557443;
-	bh=eK+ElAZ3HYE+YOrVt86IwYpztcjk8MJ4RaWg/ldd9Cs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U9DtBC9srjnRK0WtbLFP7KzD/PxN/xKQOSTV0VrYbYP57KmGsPBmsqSDhak0Mc+bC
-	 LQbkUnQAiW6aicKldsxTDDpncBMP8lsjiLvi8cK7t/Rrsugam4nZV1oOCNhjnM1uYj
-	 RljnWAlgEH1wTb7t4xHNyXX4OD5gcl9augH+y6JWEW7JF7SDYMLgn32H6CSvFSq4cW
-	 RkPMvBbPy/RqK2EarHe+gk9/w1/bu9XWu5fmgunD64hJzqDgskHA3djuBeuE2HJgLV
-	 1q7Rb/njZnhbths+sxqiiJH+ynPiS2zTo9sVfSKrnpIQsxjDy5NrQcejJzG2dTgzHJ
-	 84BfqBGl+MKKA==
-Date: Tue, 9 Jul 2024 13:37:23 -0700
-From: Kees Cook <kees@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	linux-hardening@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] netdevice: define and allocate &net_device
- _properly_
-Message-ID: <202407091334.A7BAB27@keescook>
-References: <20240709125433.4026177-1-leitao@debian.org>
- <20240709181128.GO346094@kernel.org>
- <Zo2bYCAVQaViN6z8@gmail.com>
+	s=arc-20240116; t=1720560603; c=relaxed/simple;
+	bh=NwcHMJbDrE9soGYhklNbRSR1jDwfxWXbqa6zKAsFC2o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=baOyjCg25qydGzPjATyLdlv8RwEEn5Gb8fG/uiQiHvZsux8UzSRk6IkdqxD5mGzfKaQSqhWWNW/SveagjfIn3epURnTk7JpRzQCuRcTW3SJrH+yqSFPJVsbRgKCQZI7oKjg7rj8dt4DGO9yfpXudTFbQJJSji5g4nYOfgx3Gq9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0hnsDq7; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-64f4fb6ce65so48133477b3.2;
+        Tue, 09 Jul 2024 14:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720560601; x=1721165401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKz3aaHbTh5s5ue20BmsZpd/R0LLlhTOaVxDAJ/1Gog=;
+        b=R0hnsDq7O85DB6i2JOC6YPfvi3Hlqbd55STv3C2tYzxtF+5BE0HifScY6X5MBzx6CH
+         XMFLWDZwYlLbVaGFg+kDSntpyBH/X1eJHELANCI6fBpAkFFtkSQDSi6k0VPIGBR9TiPU
+         Dj0yYgACe0Zh3Y2AL87qFxIoeR/cXQn/lVKCoZARxeg2+vCAjW6G61+YsbT8zzaOUCUU
+         NCbw95HXk9dvv5y1Bb/xNf3uYF+bwRZ7GTqW6IzoowrVeZaaWUqZQSivlpyVhvN6tIhE
+         LhYuwcDifKyfy62a7QXxSR3oD69VvXSa7Zr5lgeSsKx33iYzT+n6TNEmyjiweBQfkGqi
+         9dng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720560601; x=1721165401;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mKz3aaHbTh5s5ue20BmsZpd/R0LLlhTOaVxDAJ/1Gog=;
+        b=Mgoer/gSSTBS908J51vhErNBjg5he/HWdNRX3iVWIyBhtvz68RGry7/WSoYk3YhUV9
+         JCwb4XfY5UzSaEtT6Rrb/HXEAx3aUyn1NoGv322W9ZQcJuYfdd2ebY4sDXRXqPPWJkb3
+         MI5klNHKYIv72s18caiKzZiULahkVufAcLVZzZ5CLjp9TMU5tbRx3eeTku1GwFSWkGsy
+         OZ6uo5HcWC4c/CnXuok6gvr5nXsbLI365st3DfGRgLza3zVoNPFQwB+qHmg2B+yi+20a
+         vxaYvJpUF8vIvjUIWEN1JvsQJO5GIkdS2WsML8aMlE/bF+EeqpP11nsfpsO9cG1MUlWd
+         TD2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXvIs1AsnqtbIdvAYxNlyvCgKvSZ25BmY8tQbLB9RbnJTgV4rm14dbIqFhedIbleeVcCLr0cwpoxaD4jPvyHx9ji2MaELTVLP3n/y9LkE+rn/7DkuK6Q+Rr215t/xhw7xtRHPTZ9qQKUlJCIhrvxcPqoREqgdEYtp84
+X-Gm-Message-State: AOJu0YzXf7hHwTAe4BCDAH6GUPnJ9QPhPgKRHNe8N6aBu4k2z8eYamRC
+	/Y1IKj6ZcoqgYgIZ00SLwb9uqsCcQIZegattdg5BxZMRha0y0DVq
+X-Google-Smtp-Source: AGHT+IHPgmrIrWc+akDsVCRw/o70dfEXyctNlGAFU6XNW8HLCynReHCIx9+9XFyceGpSaMFMYRXL+g==
+X-Received: by 2002:a81:770a:0:b0:62c:fcba:cfeb with SMTP id 00721157ae682-658f02f5e93mr42238597b3.34.1720560600845;
+        Tue, 09 Jul 2024 14:30:00 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f1908ae8csm134094785a.88.2024.07.09.14.30.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 14:30:00 -0700 (PDT)
+Date: Tue, 09 Jul 2024 17:29:59 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Fred Li <dracodingfly@gmail.com>, 
+ aleksander.lobakin@intel.com, 
+ andrii@kernel.org, 
+ ast@kernel.org, 
+ bpf@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ haoluo@google.com, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ jolsa@kernel.org, 
+ kpsingh@kernel.org, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux@weissschuh.net, 
+ martin.lau@linux.dev, 
+ mkhalfella@purestorage.com, 
+ nbd@nbd.name, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ sashal@kernel.org, 
+ sdf@google.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev
+Message-ID: <668dabd7e7066_1ce27f29435@willemb.c.googlers.com.notmuch>
+In-Reply-To: <Zo2auA2r/hkJWWcs@gondor.apana.org.au>
+References: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
+ <20240708143128.49949-1-dracodingfly@gmail.com>
+ <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
+ <Zo2auA2r/hkJWWcs@gondor.apana.org.au>
+Subject: Re: [PATCH] net: linearizing skb when downgrade gso_size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zo2bYCAVQaViN6z8@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 09, 2024 at 01:19:44PM -0700, Breno Leitao wrote:
-> On Tue, Jul 09, 2024 at 07:11:28PM +0100, Simon Horman wrote:
-> > Flagged by: kernel-doc -none
+Herbert Xu wrote:
+> On Tue, Jul 09, 2024 at 11:53:21AM -0400, Willem de Bruijn wrote:
+> >
+> > > +		/* Due to header grow, MSS needs to be downgraded.
+> > > +		 * There is BUG_ON When segment the frag_list with
+> > > +		 * head_frag true so linearize skb after downgrade
+> > > +		 * the MSS.
+> > > +		 */
 > 
-> How do you run this test exactly? I would like to add to my workflow.
+> This sounds completely wrong.  You should never grow the TCP header
+> by changing gso_size.  What is the usage-scenario for this?
+> 
+> Think about it, if a router forwards a TCP packet, and ends up
+> growing its TCP header and then splits the packet into two, then
+> this router is brain-dead.
 
-Details here:
-https://docs.kernel.org/doc-guide/kernel-doc.html
+This is an unfortunate feature, but already exists.
 
-But basically, either:
+It decreases gso_size to account for tunnel headers.
 
-$ ./scripts/kernel-doc -none include/linux/netdevice.h
-include/linux/netdevice.h:2404: warning: ...
+For USO, we added BPF_F_ADJ_ROOM_FIXED_GSO to avoid this in better,
+newer users.
 
-or:
-
-$ make ... W=n
-...
-../drivers/firewire/init_ohci1394_dma.c:178: warning: Function parameter or struct member 'ohci' not described in 'init_ohci1394_wait_for_busresets'
-...
-
--- 
-Kees Cook
 
