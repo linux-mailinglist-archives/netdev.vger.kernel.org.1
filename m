@@ -1,124 +1,359 @@
-Return-Path: <netdev+bounces-110202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA80F92B46C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:52:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 328E092B491
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 944DE2844C0
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:52:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 560731C218EF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03422155A53;
-	Tue,  9 Jul 2024 09:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B64155382;
+	Tue,  9 Jul 2024 09:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eoHZbaEF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488BE155A26;
-	Tue,  9 Jul 2024 09:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E8E1553A7
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 09:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720518743; cv=none; b=dR5N2Oi/XrBHCLaRp260RWIv7TCBiVa3e1W0uguIBoMcUQCd2igf5EBYF1P7nzs6n52OWMnQfg7vFALsGeZCLuU3hEaLutmTEIoLgPk4N5xW6HcrJ3vLamtjycJDzLTsSO6YBT6faAx7fm/i7lowVAFHRqz9tSTwm+cDbpf+KGY=
+	t=1720519193; cv=none; b=jLRLrp42vjtyO3b0VC5yxCyibNHKhGQXmW0mblS52p2Cstw1Pm+w0wnjd2Pq9sMzJ/9F28Umz9er1zYETTy87JSQquhYQVeYDF+pTU7UHCnjurO1xUN8CX5ipnoR7vi8D7vXL7BjFzdh/WMZEk2tY7pIPrDbvyM9SsabLOns6yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720518743; c=relaxed/simple;
-	bh=PqQ4ueVIFosN7qzIDNxoq5cnPev0B8p3RjSPH63gS64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EpwbQwL2+LIkTGzjd7Cicj/7NNM/m9z8Ncgt5+PkH4EAVxq1X+N9sitHEaK3PlXLaFvsk+nZcZ8rosCCEdFXU+Gxro2PonYMb10rJ1fuF8vp4ym9Jlu/NTMweTyAmOa6OwcLgL7gs6FK+zQL2I043v1uOTWaOwKmGTd86LjaHkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3CE0261E40617;
-	Tue,  9 Jul 2024 11:51:00 +0200 (CEST)
-Message-ID: <56160e13-662d-4f7e-86d3-1a88716f01d9@molgen.mpg.de>
-Date: Tue, 9 Jul 2024 11:50:59 +0200
+	s=arc-20240116; t=1720519193; c=relaxed/simple;
+	bh=NYKNdJdc/lZVLV2pn+pNgiMZvOILUE/EnM47Fr5AmTs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hpFdfdA4nEDLp5brIMt9GowR1I58WRfA1Tm06XFQyJfAbwKvZhiXTEGVsnpkOgibyYz8lJzkZhBazfD/247qUQri6DLLfLF3MeN5n51UxHXreAF3K4HTFNgmQyoNnW0UdtoSdsKdCBbz7IvEsMn+XocnElkwi+JvRdXZSB55gc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eoHZbaEF; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a77ec5d3b0dso287596266b.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 02:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1720519189; x=1721123989; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rcD8IiviBrT+0oztaFyghNbmv+g7vuHTxEmeSG/j8ic=;
+        b=eoHZbaEFEk2fvgJ6OOsCsbbD3Xg/jdWGzNwrNMTsGKRItaytyMe1weufB4p+KYc+VC
+         3t2lr6EAQi+ehS3Sd+NnH3E4I7dDhgcuCknbE8ILb9c7qMmh5csfM9HmZiYqVoyluuD0
+         tkLDkY0OXJHUlO2zgigmRTakrmKVVYGlg4/+L7hUCJaA3ZbqnuPqmA0J3lxLFf6lEP6W
+         D2ebrM4tu5pAxStpBu5QTICFNEapKJz0Pf38KHPoLgMJM4n5aA4dZCNjAoztt7FB9HyJ
+         4ey1CB/kObXHvlF9f8FFdLuSsTWDeJWHjV9RGFSJoIHCh9iiVGJrcDwyXfQ23YBpmKSb
+         ws0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720519189; x=1721123989;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rcD8IiviBrT+0oztaFyghNbmv+g7vuHTxEmeSG/j8ic=;
+        b=w/3R6862A7GD1YQYsiJRGPAv2ozszVjFi7tFRK8RDkV8kuB36o9ytXbWZHh0uhtHvc
+         c9WQKvN83fyUYzrDV2rJk3WXKEd7+hYggRjfL3uRZB3npX8s3NGFEyB3lrWUWEmYqZ8A
+         2QcmUsnJ5j1yhL03C7iGRtqWgypx5MMPLHFjulzdcsOv76Wl7CGy0yK75IWw5NThk8R7
+         I/xpzYeZRoF0DVh2TZ+tQVPUL/9PpgERNnMYgDHN5/Np0BMvyCumNCJFxCCvloa7hZ1T
+         aNmoka3E4CWYDyLjH7EK/CraBez58p3gxlSCjJ8tMZp/7EDP3x3GvDzJYtkKC3UUSTso
+         YteQ==
+X-Gm-Message-State: AOJu0YxBSQe2ZAjagSoH3AVxdWV5DVf6teXaNvyxMAMluPIZwBJdhEaD
+	IDIZZ60elKEvA6ruhNnrZH9/KWj389JazQnAiWpz3dMrUtVww4/KDHU9FvC8PLI=
+X-Google-Smtp-Source: AGHT+IE1+l9EmjvSnLSLzCGBF09SHnOeH3tWxkex3R9jdYD71WyMVlNoI9/SbJj8r8GrnlCZMMSlwg==
+X-Received: by 2002:a17:907:9720:b0:a75:3d6f:e4ea with SMTP id a640c23a62f3a-a780b6b3a7amr162169066b.27.1720519188727;
+        Tue, 09 Jul 2024 02:59:48 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:45])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a871f57sm63223766b.206.2024.07.09.02.59.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 02:59:48 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
+  cong.wang@bytedance.com
+Subject: Re: [PATCH bpf v3 3/4] selftest/bpf: Parametrize AF_UNIX redir
+ functions to accept send() flags
+In-Reply-To: <20240707222842.4119416-4-mhal@rbox.co> (Michal Luczaj's message
+	of "Sun, 7 Jul 2024 23:28:24 +0200")
+References: <20240707222842.4119416-1-mhal@rbox.co>
+	<20240707222842.4119416-4-mhal@rbox.co>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Tue, 09 Jul 2024 11:59:47 +0200
+Message-ID: <87v81enawc.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ice: Adjust over allocation
- of memory in ice_sched_add_root_node() and ice_sched_add_node()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Aleksandr Mishin <amishin@t-argos.ru>
-Cc: lvc-project@linuxtesting.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org,
- Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20240708182736.8514-1-amishin@t-argos.ru>
- <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
- <23d2e91c-4215-4ea5-8b3c-4dd58a1062af@molgen.mpg.de>
- <190d0cdc-d6de-4526-b235-91b25b50c905@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <190d0cdc-d6de-4526-b235-91b25b50c905@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Dear Przemek,
+On Sun, Jul 07, 2024 at 11:28 PM +02, Michal Luczaj wrote:
+> Extend pairs_redir_to_connected() and unix_inet_redir_to_connected() with a
+> send_flags parameter. Replace write() with send() allowing packets to be
+> sent as MSG_OOB.
+>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>  .../selftests/bpf/prog_tests/sockmap_listen.c | 40 +++++++++++++------
+>  1 file changed, 27 insertions(+), 13 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> index c075d376fcab..59e16f8f2090 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> @@ -1374,9 +1374,10 @@ static void test_redir(struct test_sockmap_listen *skel, struct bpf_map *map,
+>  	}
+>  }
+>  
+> -static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+> -				     int sock_mapfd, int nop_mapfd,
+> -				     int verd_mapfd, enum redir_mode mode)
+> +static void __pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+> +				       int sock_mapfd, int nop_mapfd,
+> +				       int verd_mapfd, enum redir_mode mode,
+> +				       int send_flags)
+>  {
+>  	const char *log_prefix = redir_mode_str(mode);
+>  	unsigned int pass;
+> @@ -1396,11 +1397,9 @@ static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+>  			return;
+>  	}
+>  
+> -	n = write(cli1, "a", 1);
+> -	if (n < 0)
+> -		FAIL_ERRNO("%s: write", log_prefix);
+> +	n = xsend(cli1, "a", 1, send_flags);
+>  	if (n == 0)
+> -		FAIL("%s: incomplete write", log_prefix);
+> +		FAIL("%s: incomplete send", log_prefix);
+>  	if (n < 1)
+>  		return;
+>  
+> @@ -1418,6 +1417,14 @@ static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+>  		FAIL("%s: incomplete recv", log_prefix);
+>  }
+>  
+> +static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+> +				     int sock_mapfd, int nop_mapfd,
+> +				     int verd_mapfd, enum redir_mode mode)
+> +{
+> +	__pairs_redir_to_connected(cli0, peer0, cli1, peer1, sock_mapfd,
+> +				   nop_mapfd, verd_mapfd, mode, 0);
+> +}
+> +
+>  static void unix_redir_to_connected(int sotype, int sock_mapfd,
+>  			       int verd_mapfd, enum redir_mode mode)
+>  {
+> @@ -1815,10 +1822,9 @@ static void inet_unix_skb_redir_to_connected(struct test_sockmap_listen *skel,
+>  	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
+>  }
+>  
+> -static void unix_inet_redir_to_connected(int family, int type,
+> -					int sock_mapfd, int nop_mapfd,
+> -					int verd_mapfd,
+> -					enum redir_mode mode)
+> +static void __unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+> +					   int nop_mapfd, int verd_mapfd,
+> +					   enum redir_mode mode, int send_flags)
+>  {
+>  	int c0, c1, p0, p1;
+>  	int sfd[2];
+> @@ -1832,8 +1838,8 @@ static void unix_inet_redir_to_connected(int family, int type,
+>  		goto close_cli0;
+>  	c1 = sfd[0], p1 = sfd[1];
+>  
+> -	pairs_redir_to_connected(c0, p0, c1, p1,
+> -				 sock_mapfd, nop_mapfd, verd_mapfd, mode);
+> +	__pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, nop_mapfd,
+> +				   verd_mapfd, mode, send_flags);
+>  
+>  	xclose(c1);
+>  	xclose(p1);
+> @@ -1842,6 +1848,14 @@ static void unix_inet_redir_to_connected(int family, int type,
+>  	xclose(p0);
+>  }
+>  
+> +static void unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+> +					 int nop_mapfd, int verd_mapfd,
+> +					 enum redir_mode mode)
+> +{
+> +	__unix_inet_redir_to_connected(family, type, sock_mapfd, nop_mapfd,
+> +				       verd_mapfd, mode, 0);
+> +}
+> +
+>  static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
+>  					    struct bpf_map *inner_map, int family)
+>  {
 
+I've got some cosmetic suggestions.
 
-Thank you for your quick reply.
+Instead of having two helper variants - with and without send_flags - we
+could stick to just one and always pass send_flags. For readability I'd
+use a constant for "no flags".
 
+This way we keep the path open to convert
+unix_inet_skb_redir_to_connected() to to a loop over a parameter
+combination matrix, instead of open-coding multiple calls to
+unix_inet_redir_to_connected() for each argument combination.
 
-Am 09.07.24 um 11:11 schrieb Przemek Kitszel:
-> On 7/9/24 10:54, Paul Menzel wrote:
->> [Cc: -anirudh.venkataramanan@intel.com (Address rejected)]
->>
->> Am 09.07.24 um 10:49 schrieb Paul Menzel:
+It seems doing it the current way, it is way too easy to miss
+typos. Pretty sure we have another typo at [1], looks like should be
+s/SOCK_DGRAM/SOCK_STREAM/.
 
->>> Am 08.07.24 um 20:27 schrieb Aleksandr Mishin:
->>>> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
->>>> devm_kcalloc() in order to allocate memory for array of pointers to
->>>> 'ice_sched_node' structure. But incorrect types are used as sizeof()
->>>> arguments in these calls (structures instead of pointers) which leads to
->>>> over allocation of memory.
->>>
->>> If you have the explicit size at hand, it’d be great if you added 
->>> those to the commit message.
->>>
->>>> Adjust over allocation of memory by correcting types in devm_kcalloc()
->>>> sizeof() arguments.
->>>>
->>>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->>>
->>> Maybe mention, that Coverity found that too, and the warning was 
->>> disabled, and use that commit in Fixes: tag? That’d be commit 
->>> b36c598c999c (ice: Updates to Tx scheduler code), different from the 
->>> one you used.
-> 
-> this version does not have any SHA mentioned :)
+[1]
+https://elixir.bootlin.com/linux/v6.10-rc7/source/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c#L1863
 
-Sorry, I don’t understand your answer. What SHA do you mean?
+See below for what I have in mind.
 
->>> `Documentation/process/submitting-patches.rst` says:
->>>
->>>> A Fixes: tag indicates that the patch fixes an issue in a previous
->>>> commit. It is used to make it easy to determine where a bug
->>>> originated, which can help review a bug fix. This tag also assists
->>>> the stable kernel team in determining which stable kernel versions
->>>> should receive your fix. This is the preferred method for indicating
->>>> a bug fixed by the patch.
-> 
-> so, this is not a "fix" per definition of a fix: "your patch changes
-> observable misbehavior"
-> If the over-allocation would be counted in megabytes, then it will
-> be a different case.
-
-The quoted text just talks about “an issue”. What definition do you 
-refer to?
-
-
-Kind regards,
-
-Paul
+--8<--
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+index 59e16f8f2090..3ddffaead2cd 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+@@ -29,6 +29,8 @@
+ 
+ #include "sockmap_helpers.h"
+ 
++#define NO_FLAGS 0
++
+ static void test_insert_invalid(struct test_sockmap_listen *skel __always_unused,
+ 				int family, int sotype, int mapfd)
+ {
+@@ -1374,10 +1376,10 @@ static void test_redir(struct test_sockmap_listen *skel, struct bpf_map *map,
+ 	}
+ }
+ 
+-static void __pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+-				       int sock_mapfd, int nop_mapfd,
+-				       int verd_mapfd, enum redir_mode mode,
+-				       int send_flags)
++static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
++				     int sock_mapfd, int nop_mapfd,
++				     int verd_mapfd, enum redir_mode mode,
++				     int send_flags)
+ {
+ 	const char *log_prefix = redir_mode_str(mode);
+ 	unsigned int pass;
+@@ -1417,14 +1419,6 @@ static void __pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+ 		FAIL("%s: incomplete recv", log_prefix);
+ }
+ 
+-static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
+-				     int sock_mapfd, int nop_mapfd,
+-				     int verd_mapfd, enum redir_mode mode)
+-{
+-	__pairs_redir_to_connected(cli0, peer0, cli1, peer1, sock_mapfd,
+-				   nop_mapfd, verd_mapfd, mode, 0);
+-}
+-
+ static void unix_redir_to_connected(int sotype, int sock_mapfd,
+ 			       int verd_mapfd, enum redir_mode mode)
+ {
+@@ -1439,7 +1433,7 @@ static void unix_redir_to_connected(int sotype, int sock_mapfd,
+ 		goto close0;
+ 	c1 = sfd[0], p1 = sfd[1];
+ 
+-	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode);
++	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode, NO_FLAGS);
+ 
+ 	xclose(c1);
+ 	xclose(p1);
+@@ -1729,7 +1723,7 @@ static void udp_redir_to_connected(int family, int sock_mapfd, int verd_mapfd,
+ 	if (err)
+ 		goto close_cli0;
+ 
+-	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode);
++	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode, NO_FLAGS);
+ 
+ 	xclose(c1);
+ 	xclose(p1);
+@@ -1787,7 +1781,7 @@ static void inet_unix_redir_to_connected(int family, int type, int sock_mapfd,
+ 	if (err)
+ 		goto close;
+ 
+-	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode);
++	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, -1, verd_mapfd, mode, NO_FLAGS);
+ 
+ 	xclose(c1);
+ 	xclose(p1);
+@@ -1822,9 +1816,9 @@ static void inet_unix_skb_redir_to_connected(struct test_sockmap_listen *skel,
+ 	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
+ }
+ 
+-static void __unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+-					   int nop_mapfd, int verd_mapfd,
+-					   enum redir_mode mode, int send_flags)
++static void unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
++					 int nop_mapfd, int verd_mapfd,
++					 enum redir_mode mode, int send_flags)
+ {
+ 	int c0, c1, p0, p1;
+ 	int sfd[2];
+@@ -1838,8 +1832,8 @@ static void __unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+ 		goto close_cli0;
+ 	c1 = sfd[0], p1 = sfd[1];
+ 
+-	__pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, nop_mapfd,
+-				   verd_mapfd, mode, send_flags);
++	pairs_redir_to_connected(c0, p0, c1, p1, sock_mapfd, nop_mapfd,
++				 verd_mapfd, mode, send_flags);
+ 
+ 	xclose(c1);
+ 	xclose(p1);
+@@ -1848,14 +1842,6 @@ static void __unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+ 	xclose(p0);
+ }
+ 
+-static void unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
+-					 int nop_mapfd, int verd_mapfd,
+-					 enum redir_mode mode)
+-{
+-	__unix_inet_redir_to_connected(family, type, sock_mapfd, nop_mapfd,
+-				       verd_mapfd, mode, 0);
+-}
+-
+ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
+ 					    struct bpf_map *inner_map, int family)
+ {
+@@ -1872,31 +1858,31 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
+ 	skel->bss->test_ingress = false;
+ 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
+ 				     sock_map, -1, verdict_map,
+-				     REDIR_EGRESS);
++				     REDIR_EGRESS, NO_FLAGS);
+ 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
+ 				     sock_map, -1, verdict_map,
+-				     REDIR_EGRESS);
++				     REDIR_EGRESS, NO_FLAGS);
+ 
+ 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
+ 				     sock_map, nop_map, verdict_map,
+-				     REDIR_EGRESS);
++				     REDIR_EGRESS, NO_FLAGS);
+ 	unix_inet_redir_to_connected(family, SOCK_STREAM,
+ 				     sock_map, nop_map, verdict_map,
+-				     REDIR_EGRESS);
++				     REDIR_EGRESS, NO_FLAGS);
+ 	skel->bss->test_ingress = true;
+ 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
+ 				     sock_map, -1, verdict_map,
+-				     REDIR_INGRESS);
++				     REDIR_INGRESS, NO_FLAGS);
+ 	unix_inet_redir_to_connected(family, SOCK_STREAM,
+ 				     sock_map, -1, verdict_map,
+-				     REDIR_INGRESS);
++				     REDIR_INGRESS, NO_FLAGS);
+ 
+ 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
+ 				     sock_map, nop_map, verdict_map,
+-				     REDIR_INGRESS);
++				     REDIR_INGRESS, NO_FLAGS);
+ 	unix_inet_redir_to_connected(family, SOCK_STREAM,
+ 				     sock_map, nop_map, verdict_map,
+-				     REDIR_INGRESS);
++				     REDIR_INGRESS, NO_FLAGS);
+ 
+ 	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
+ }
 
