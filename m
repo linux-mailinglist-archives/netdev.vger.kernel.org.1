@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-110171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F8492B2D7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:58:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A483B92B2E6
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:01:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 201F91C22353
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:58:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FCEC280E82
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299F415380B;
-	Tue,  9 Jul 2024 08:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE132AF18;
+	Tue,  9 Jul 2024 09:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4MxdI37"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SgstDfiF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACFC153512;
-	Tue,  9 Jul 2024 08:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719F61F956;
+	Tue,  9 Jul 2024 09:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720515507; cv=none; b=jgN7UVk+js/Gvs48cuudVB7pHFpkaEC0GGL9AHVSm3NJbRROuWhvj92VU9QuPi40y2BbVwWc4fHg0epP4hTVt0eu1WN6++uevZyxwR2Ig8bvmvIOf6KSF6yXsfOxBQHVCAn5YtET+sCfOcvG1NeK26Uq1XF4HAtnbgyJVBRBbiY=
+	t=1720515689; cv=none; b=VX/0h9j158WVM4rYjMhqCCQVpLB/N8pGfH0Nom39RFH1wirdTw/fZAVwQz68hCGu1j8ZGitdCygriiwA39y+z9IVpxWogIReOtPqcN4abnSW+MKG6ApOLL/dseKMvuLaT8eRpImMYZ9K98q1VeFDV+MNvSNDtXtG3DhnK2Zhv1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720515507; c=relaxed/simple;
-	bh=b2Wfb3kOckWDMuESImkDZ+giZ/cFZ5g5ADwWWpBn08A=;
+	s=arc-20240116; t=1720515689; c=relaxed/simple;
+	bh=3mqWs8nQyYoabylSX+RsikAuNp/7+mD5UuaBz7xlLG8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hEPungPPpeqqUuybXMsngZah0bXvh6TkHYWUIC2r/LsihlEh+aQ8khUJC/ufYwo/pL2f74yeI1gqJ7DHoQM1cbz0GYiFZ2aHwh5MwkWD8Ve+SrvA7Bnsxma/PBY8S6DK3bj/m03O1XowtgkhFheAmSZKjVoFn9jJCi1PIllJJHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4MxdI37; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D5F4C3277B;
-	Tue,  9 Jul 2024 08:58:19 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=q1PigrEvJEILLQNLjpFenLPu53AbEvJqL1Jkp48SBRKHmbBv/2tajVZGQxktMhnJlrdbZIBIlcpBf2xOHjUus3zFfbF8VN38Qd4oj8KeHXS2xehJZ6Z4xhoFXSmBmQGLRisIVivF3ITqCG06MOmQQxXMVr6Jg/szZpoTmDpFaiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SgstDfiF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A35FEC3277B;
+	Tue,  9 Jul 2024 09:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720515506;
-	bh=b2Wfb3kOckWDMuESImkDZ+giZ/cFZ5g5ADwWWpBn08A=;
+	s=k20201202; t=1720515689;
+	bh=3mqWs8nQyYoabylSX+RsikAuNp/7+mD5UuaBz7xlLG8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=p4MxdI376o+n7vsoiq3K2I7WOj3XJQZ1+j9Li9yGDf1I4YSwgXHb430aIV7HFaU9T
-	 LcNAJ9eYrE9+cPwUtZN7jV6swLDE8LCmd0zs0rsCATaNb9D9VDpt3jRoktPh/ff8lS
-	 AzPw7ey4mOkH0T0yJ15sL7qNPyCJRd7J0eQoKVYI0gJwhqpcbCraOhrZbaV4Ka4SYn
-	 yWmNtUhtnHlR06QyrjVGQURToXtIG3w3ankcDltO92pfoJg+F6VT6iPXNq7TzHdXzJ
-	 zTRbdofz51zlchLsmP7Os7gDXnTovQDyH6L+fR3a8fGlkou+bYG+aNJ20m8x8mMMGC
-	 4llHgd3pg4Yfw==
-Message-ID: <becdf6b3-6eaf-497d-a7c3-d4783b7683b4@kernel.org>
-Date: Tue, 9 Jul 2024 10:58:16 +0200
+	b=SgstDfiFU8ITWJRt8kH9DE28CID85bDLsXEewovRqoef9bdULdP6Or9anaQVg8miy
+	 SYbchbMYbseQpWqiluWxP4HDS6Ko+B6PfCcwZwN32Xe2Qx+BaW6nIvb/Jz1ZytiRJ1
+	 gWiwTpK0oE8CPPsXCjEEZx+0UIuKhY5yFwhI6J577UKsReHhtw6GngRHIJYqAr4wcv
+	 8LgPIYyOJuDOAgzBSU2R3WAEhcLxhUXPTk081avrWm4K0mz/soWnTjl1oszICO+mjl
+	 354IvTr2Y5qd2yFInr66l9B+SBlzKBHFwIKqHizGynmtX4IUj6pNWc/0eVmk4n0V9D
+	 x+3/KJFf4tV3g==
+Message-ID: <2ba9b185-e9dc-4594-9b2d-983c74b0c55a@kernel.org>
+Date: Tue, 9 Jul 2024 11:01:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,23 +50,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] Add interconnect support for stmmac driver.
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
- Vinod Koul <vkoul@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc: kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+Subject: Re: [net-next,PATCH] dt-bindings: net: realtek,rtl82xx: Document
+ RTL8211F LED support
+To: Marek Vasut <marex@denx.de>, Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, kernel@dh-electronics.com,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  devicetree@vger.kernel.org
-References: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
+References: <20240705215207.256863-1-marex@denx.de>
+ <20240708205856.GA3874098-robh@kernel.org>
+ <40249f5c-f034-41a5-8088-8b4c298ab6c6@denx.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -112,33 +108,36 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
+In-Reply-To: <40249f5c-f034-41a5-8088-8b4c298ab6c6@denx.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/07/2024 23:29, Sagar Cheluvegowda wrote:
-> Interconnect is a software framework to access NOC bus topology
-> of the system, this framework is designed to provide a standard
-> kernel interface to control the settings of the interconnects on
-> an SoC.
-> The interconnect support is now being added to the stmmac driver
-> so that any vendors who wants to use this feature can just
-> define corresponging dtsi properties according to their
-> NOC bus topologies.
+On 08/07/2024 23:01, Marek Vasut wrote:
+>>>   
+>>> +allOf:
+>>> +  - $ref: ethernet-phy.yaml#
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            const: ethernet-phy-id001c.c916
+>>> +    then:
+>>> +      properties:
+>>> +        leds: true
+>>
+>> This has no effect. 'leds' node is already allowed with the ref to
+>> ethernet-phy.yaml. I suppose you could negate the if and then, but I'm
+>> not really that worried if someone defines LEDs for a device with no
+>> LEDs.
 > 
-> here is a patch series which is enabling interconnect support
-> for ethernet node of SA8775P
-> https://lore.kernel.org/all/20240708-icc_bw_voting_emac_dtsi-v1-1-4b091b3150c0@quicinc.com/ 
+> So shall I simply do:
 > 
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> ---
-> Changes in v4:
-> - Add reference to the series which is enabling interconnect-properties defined in this series
-> - Link to v3: https://lore.kernel.org/r/20240703-icc_bw_voting_from_ethqos-v3-0-8f9148ac60a3@quicinc.com
+> leds: true
+> 
+> and by done with it, as the easier way out ?
 
-You got two or three times review, but you keep ignoring it. You are
-expecting the community to keep doing the same work, which is waste of
-our time and resources.
+No, you should not have to do anything. Do you see any dtbs_check error
+without this patch?
 
 Best regards,
 Krzysztof
