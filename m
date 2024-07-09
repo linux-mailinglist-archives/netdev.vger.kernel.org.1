@@ -1,258 +1,207 @@
-Return-Path: <netdev+bounces-110300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56F292BC44
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:59:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 493C792BC57
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:00:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26FE0B27A8E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:59:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 963E8B27F55
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 14:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A749B18EFCB;
-	Tue,  9 Jul 2024 13:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6387318EFD3;
+	Tue,  9 Jul 2024 13:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXZxmi7+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OMBqYN+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E4518E779;
-	Tue,  9 Jul 2024 13:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03449156238;
+	Tue,  9 Jul 2024 13:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720533498; cv=none; b=HubpQ6kRSnzN3TxW/JLIFQ8Cxw9YOno89s0CjMfb36FtueXt1sdR3niJ0oXwHA7oZpAOlu7+vVLRk+SAv9Y5t3xG/1kGgUedJRzTf46ZrP+GQzn5a7sYaHpNzsypkTAu4ORpXzoKJ873xqSxbLPgh2fvZSRRQ7Q7q5Oi120yfLM=
+	t=1720533558; cv=none; b=RKUbZauoGGW8FSckwhRb83B3UWNbeBEbVdQF2HVxIl9UnJU23ZCc/WeUekGQV+3YIDFO5dSfJZXJvkuu3ENw5jog+tOR0Ago34V1t/5aGrFwF5hAxcOBtU+cNmfKXrT16K7fieGiTU9sPm1dL4g2OZzV6NgSmkUdutAsb4u7bvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720533498; c=relaxed/simple;
-	bh=O5vT/WAVEi3I/1zZ1e6X9bF4G+TvWPZVtYQUS4pdoF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJxpIAJsPhWW0yG3XVAb6iFAWcvIhiAF5LW62l65JUHPhu5/TVGRlpeSYKwZtJraS+hR9EJbVs8HuDgJ35FIAdbg7DTjFiMUjCRCEJf10YUSv6ltkIQ2qWO/5UFgfjSsPTVVTPyESfxJIH94CcXQlUwqqr4v+LNYDbVkE7XtVtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXZxmi7+; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-367940c57ddso3401641f8f.3;
-        Tue, 09 Jul 2024 06:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720533495; x=1721138295; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TbYmgVACDAtRDSTL3B4NejRqBxXknmHxVQadZf89uHw=;
-        b=KXZxmi7+OTJN285NjyW0YP02AFRw6CHjcruRjCM5T95WKBeENgBH6i6/5Qvtok1sj6
-         J7MtCvB5DYxDWcGfVOUIBqFFW34XhNXRUNh5EsESilpUbvbk8uyvke6PYUMTLulk9556
-         AMY6848AtvhghX74MXEIfPq1mqCRHBWlW8q/6k2cUBFlcGl2OUF7R4+aDy7ivzy+ZzJw
-         2FTUomNh5UCoO7j/0kB8cP26CBabUOIg+6KVj6KgTNEBqznuLdkNZSgKQ+cy5Uq6lXRR
-         +MNtXUYE1dOpSkx1dr5/Ap3n5Wc34nXEapLzLAWRiJW184Vj1GJEMQXKw246tDbwljZX
-         Bx6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720533495; x=1721138295;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TbYmgVACDAtRDSTL3B4NejRqBxXknmHxVQadZf89uHw=;
-        b=wXSShomtjY9auuI3E4QHRcJ1zEc7ivys/Q6fZZnysxVrjuPIl5ZKKqryrAhvoYNgSA
-         nQqkCMYU6iCTcQWZss31s1FZ3SWZg4koJVz/wZeShgXRMQeEYBEXSRPHZozyB6XZchPi
-         j1P2cq88WB3rt/o4367E/BiPBnvKh8BjSWGAIEqpQRyLV7Ju8amDtyObEBjIa8dvT1Ig
-         e1W4k71eUG+ru21eyH1+nBY7i8C5v1Tp2+CXenJJ2YcLtkfau/JPWcNu+usM6P+qsEFt
-         RPYKW+1FZPz5ihwvddHhPpsv2oFEKjfLys7614+1x020KGbgqJYFw8KvP48wpRB6GQWv
-         4oAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvqaKdXsh4wAG+JtNEzPK4OCt8MeIyyJOSxZ7qYk7KNDXQqWhq4RJMBydi1gjIz0Y4gHGwm/lrsnjyrI/WqAglshrh7+0LfEqdI2o0z4IO/qLgvxf0Ew5GK/GByo4Q26qbYJHq
-X-Gm-Message-State: AOJu0Yz7L0ZBjTrJ9fIbwjrqjxWM1sDUuKpNb7yLT/0ndnDS6GQUF6f0
-	l1osy4Pl0HRW/9RsUVX0s2KXxwpffZlIv0V01xFoRk7DTgTem68DA0XYx9do
-X-Google-Smtp-Source: AGHT+IFhR6wXKYVJPy9dz+zWqOXpE2lauzhnAJp1D41g6UvLG42BZPLhgq5ODjo9utaXK51miT15Dw==
-X-Received: by 2002:adf:ffcd:0:b0:367:9791:2939 with SMTP id ffacd0b85a97d-367cea6b804mr1603691f8f.21.1720533494785;
-        Tue, 09 Jul 2024 06:58:14 -0700 (PDT)
-Received: from skbuf ([188.25.110.57])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4264a1d16b0sm206311405e9.7.2024.07.09.06.58.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 06:58:14 -0700 (PDT)
-Date: Tue, 9 Jul 2024 16:58:11 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kernel test robot <lkp@intel.com>, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kuba@kernel.org, horms@kernel.org, Roy.Pledge@nxp.com,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/4] soc: fsl: qbman: FSL_DPAA depends on COMPILE_TEST
-Message-ID: <20240709135811.c7tqh3ocfumg6ctt@skbuf>
-References: <20240624162128.1665620-1-leitao@debian.org>
- <202406261920.l5pzM1rj-lkp@intel.com>
- <20240626140623.7ebsspddqwc24ne4@skbuf>
- <Zn2yGBuwiW/BYvQ7@gmail.com>
- <20240708133746.ea62kkeq2inzcos5@skbuf>
- <Zow5FUmOADrqUpM9@gmail.com>
+	s=arc-20240116; t=1720533558; c=relaxed/simple;
+	bh=lOu/lBsHlc0T260klipFJ3eC1pkfxWiSQhwcmOXWsVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DefYaAggZ2odaY+zuIYmsTmGcqk91GNdgl4+Hm6F3f7VL66noiUxRE3riGtI2yXyeT2nf1/dNdVjNu5LYr1IbOTeIU1zkoVR+OOKih00Lim10iYLke92g7EGhmwv9cPZdwxLdcXWxVcWvz9N1D3xEvo0tknOMDaUj5f8zDpo/hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OMBqYN+u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EADAC3277B;
+	Tue,  9 Jul 2024 13:59:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720533557;
+	bh=lOu/lBsHlc0T260klipFJ3eC1pkfxWiSQhwcmOXWsVc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=OMBqYN+uslxW2al/s9+gRrrahqmKqVwbxAMJYDtN8CWX81snbPwX15dfdtn8Pz0Bb
+	 +IovT5mqe8Psr+vz6GaBBc8o9RtQfYU6M4S+2Gx+NUUbpGA/HK3Z8knXugNYi3p6+U
+	 78qpneNgjjFgQAu76HOpnjtMqWno1vSL98EX4VAp2LPz4j5pT0E+/44KPIi32WwZPu
+	 tjNTXmY9EyO8A+MLcG62SSxJozhu8leZy8nJpLXGcyGV7LP2vcOGKrl4bJWU0XsFYT
+	 kF6bpZbhgYDo9J/AqwU/6ppB7azQQTD2wdfdk7DA15FIUWikczGZ3sHsmu1spFGXbn
+	 HqYrIHjyJ7isQ==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ee9b098bd5so44988711fa.0;
+        Tue, 09 Jul 2024 06:59:17 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVAyEeb3sQHe3oJ3e/h9Hpw32fiOTPSOrfTy1gBySlhPuLQIrxAcKGou+f3N8RhC6dSlW1TbZr/WaSTtYwVSW0yA0Bd95WCcCL4CK9vUiPNHs79Alv1aSqynoCAnJuim8sZ79biPjHwtrMf/xYLXbDL7XaGaK/k+QjkJJF3dosurXNjoxqf1jlqOcTKtAzowJIqVFsTfSloEk1YQ/5sfayaci55XynoHRgJZLSdvk/6uEMFJoRkIO9kOFXzn0YMwokp/gE/SPwe68xfZ1Knvuu1tEWOvjNTSBRlA6hmQPA1CHNbYrHsmJ5tKYTokTVps0yyPgtV3FsdzbxtuvFQheeB22Aucckz3nVmK4Jj1vyxzSNdd7l1c6C9arHDmaa2v9RjyzopJkkJ9A31zBLazXbRXmEInLmRjSJQOAHjQ7WkUeheBxoZJXjVGdKJhWArkIoT57bF2cE+IfXtl6grsDhd52hqL6MLcSPnQGvEIONu256ION0jlth4VqCRMPJ3tnXgNoQnj3gBe6LV9M/wmppRCHK+3MVmrg==
+X-Gm-Message-State: AOJu0YytM8xAoMl+LSShIku3CScUPdwzUdVwjr7hpEkoc7pu7XvpMzYY
+	acQDuA8rlt2xadE9VxfjhCjQzB1gIrvVYn4SW6ig3Eo35qjs9bPA/uXCXY3BL+r5Z3DtejIW//0
+	8Oi9f1cvz5Z7ZCUn3Yv0ICrjbHg==
+X-Google-Smtp-Source: AGHT+IGMENhIgXoK8usdNd4oA5p2Oya5uy5180V2zPL6MX5LWDNpdwwwQ6+gVbUVi74o5Dj052FJFnlAxOODOirsQJA=
+X-Received: by 2002:a05:6512:3c8c:b0:52e:9951:7881 with SMTP id
+ 2adb3069b0e04-52eb99d20b8mr2282487e87.52.1720533535249; Tue, 09 Jul 2024
+ 06:58:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="hpogfizkbgtmf2d4"
-Content-Disposition: inline
-In-Reply-To: <Zow5FUmOADrqUpM9@gmail.com>
+References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
+ <CAHp75VfSC9gAD9ipeWRPdQOxUp4FXqYYei-cJTs38nbz0cHpkg@mail.gmail.com>
+ <48c242838c77034485a9e667dc0e867207c5beed.camel@maquefel.me>
+ <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me> <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+In-Reply-To: <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 9 Jul 2024 07:58:42 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+9Jk90HovH8bwzgCHwwh9j4mBm_Aaiq+EOj1HT3R17_Q@mail.gmail.com>
+Message-ID: <CAL_Jsq+9Jk90HovH8bwzgCHwwh9j4mBm_Aaiq+EOj1HT3R17_Q@mail.gmail.com>
+Subject: Re: [PATCH v10 00/38] ep93xx device tree conversion
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Nikita Shubin <nikita.shubin@maquefel.me>, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@kernel.org>, 
+	Hartley Sweeten <hsweeten@visionengravers.com>, 
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Sebastian Reichel <sre@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Thierry Reding <thierry.reding@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
+	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Vinod Koul <vkoul@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jul 5, 2024 at 3:21=E2=80=AFAM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@baylibre.com> wrote:
+>
+> Hello,
+>
+> On Thu, Jun 27, 2024 at 11:29:44AM +0300, Nikita Shubin wrote:
+> > On Tue, 2024-06-18 at 19:20 +0300, Nikita Shubin wrote:
+> > > Hello Andy!
+> > > On Mon, 2024-06-17 at 12:58 +0200, Andy Shevchenko wrote:
+> > > > On Mon, Jun 17, 2024 at 11:38=E2=80=AFAM Nikita Shubin via B4 Relay
+> > > > <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+> > > > >
+> > > > > The goal is to recieve ACKs for all patches in series to merge it
+> > > > > via Arnd branch.
+> > > >
+> > > > 'receive'
+> > > >
+> > > > > Unfortunately, CLK subsystem suddenly went silent on clk portion
+> > > > > of
+> > > > > series V2 reroll,
+> > > > > tried to ping them for about a month but no luck.
+> > > > >
+> > > > > Link:
+> > > > > https://lore.kernel.org/r/20240408-ep93xx-clk-v2-1-adcd68c13753@m=
+aquefel.me
+> > > > >
+> > > > > Some changes since last version (v9) - see "Changes in v10",
+> > > > > mostly
+> > > > > cosmetic.
+> > > >
+> > > > ...
+> > > >
+> > > > > Patches should be formated with '--histogram'
+> > > >
+> > > > 'formatted'
+> > > >
+> > > > ...
+> > > >
+> > > > > Changes in v10:
+> > > > >
+> > > > > Reordered SoB tags to make sure they appear before Rb and Acked
+> > > > > tags.
+> > > >
+> > > > This is not required. The importance is only the order of SoBs
+> > > > themselves. If they are interleaved with other tags, it's fine.
+> > >
+> > > Ah - ok. Just saw someone was complaining about b4 reordering them.
+> > >
+> > > >
+> > > > ...
+> > > >
+> > > >
+> > > > Hopefully to see this series being eventually applied soon.
+> > > > Arnd? (Do we have all necessary subsystem maintainers' tags, btw?)
+> > > >
+> > > >
+> > >
+> > > As i see from my perspective only three left:
+> > >
+> > > Clk subsystem:
+> > >
+> > > - clk: ep93xx: add DT support for Cirrus EP93xx
+> > >
+> > > DMA subsystem (but the only request from Vinod, as far as i remember,
+> > > was fixing commits titles):
+> > >
+> > > - dmaengine: cirrus: Convert to DT for Cirrus EP93xx
+> > > - dmaengine: cirrus: remove platform code
+> > >
+> > > Beside that tags missing on platform code removal (which can be Acked
+> > > by Arnd himself i believe) and dtsi/dts files (same ?).
+> >
+> > Vinod acked the above two patches:
+> >
+> > https://lore.kernel.org/all/ZnkIp8bOcZK3yVKP@matsya/
+> > https://lore.kernel.org/all/ZnkImp8BtTdxl7O3@matsya/
+> >
+> > so only:
+> >
+> > - clk: ep93xx: add DT support for Cirrus EP93xx
+> >
+> > https://lore.kernel.org/all/20240617-ep93xx-v10-3-662e640ed811@maquefel=
+.me/
+> >
+> > left.
+> >
+> > Hope Stephen will find some time for this one.
+>
+> As we're approaching the merge window and this is still unclear, I
+> applied the pwm bits (i.e. patches 12, 13). If I understand correctly,
+> patch 33 isn't suitable for application yet as it has a dependency on
+> pinctrl changes in that series.
 
---hpogfizkbgtmf2d4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Now causing an error in linux-next:
 
-Hi Breno,
-
-On Mon, Jul 08, 2024 at 12:08:05PM -0700, Breno Leitao wrote:
-> I thought about a patch like the following (compile tested only). What
-> do you think?
-
-To be honest, there are several things I don't really like about this
-patch.
-
-- I really struggled with applying it in the current format. Could you
-  please post the output of git format-patch in the future?
-- You addressed dpaa_set_coalesce() but not also dpaa_fq_setup()
-- You misrepresented the patch content by saying you only allocate size
-  for online CPUs in the commit message. But you allocate for all
-  possible CPUs.
-- You only kfree(needs_revert) in the error (revert_values) case, but
-  not in the normal (return 0) case.
-- The netdev coding style is to sort the lines with variable
-  declarations in reverse order of line length (they call this "reverse
-  Christmas tree"). Your patch broke that order.
-- You should use kcalloc() instead of kmalloc_array() + memset()
-
-I have prepared and tested the attached alternative patch on a board and
-I am preparing to submit it myself, if you don't have any objection.
-
-Thanks,
-Vladimir
-
---hpogfizkbgtmf2d4
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-net-dpaa-avoid-on-stack-arrays-of-NR_CPUS-elements.patch"
-
-From 00b942829ee283baa602011a05b02d18c6988171 Mon Sep 17 00:00:00 2001
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Mon, 8 Jul 2024 11:57:33 -0700
-Subject: [PATCH] net: dpaa: avoid on-stack arrays of NR_CPUS elements
-
-The dpaa-eth driver is written for PowerPC and Arm SoCs which have 1-24
-CPUs. It depends on CONFIG_NR_CPUS having a reasonably small value in
-Kconfig. Otherwise, there are 2 functions which allocate on-stack arrays
-of NR_CPUS elements, and these can quickly explode in size, leading to
-warnings such as:
-
-  drivers/net/ethernet/freescale/dpaa/dpaa_eth.c:3280:12: warning:
-  stack frame size (16664) exceeds limit (2048) in 'dpaa_eth_probe' [-Wframe-larger-than]
-
-The problem is twofold:
-- Reducing the array size to the boot-time num_possible_cpus() (rather
-  than the compile-time NR_CPUS) creates a variable-length array,
-  avoidable in the Linux kernel.
-- Using NR_CPUS as an array size makes the driver blow up in stack
-  consumption with generic, as opposed to hand-crafted, .config files.
-
-A simple solution is to use dynamic allocation for num_possible_cpus()
-elements (aka a small number determined at runtime).
-
-Link: https://lore.kernel.org/all/202406261920.l5pzM1rj-lkp@intel.com/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- .../net/ethernet/freescale/dpaa/dpaa_eth.c    | 20 ++++++++++++++-----
- .../ethernet/freescale/dpaa/dpaa_ethtool.c    | 10 +++++++++-
- 2 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index ddeb0a5f2317..c856b556929d 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -931,14 +931,18 @@ static inline void dpaa_setup_egress(const struct dpaa_priv *priv,
- 	}
- }
- 
--static void dpaa_fq_setup(struct dpaa_priv *priv,
--			  const struct dpaa_fq_cbs *fq_cbs,
--			  struct fman_port *tx_port)
-+static int dpaa_fq_setup(struct dpaa_priv *priv,
-+			 const struct dpaa_fq_cbs *fq_cbs,
-+			 struct fman_port *tx_port)
- {
- 	int egress_cnt = 0, conf_cnt = 0, num_portals = 0, portal_cnt = 0, cpu;
- 	const cpumask_t *affine_cpus = qman_affine_cpus();
--	u16 channels[NR_CPUS];
- 	struct dpaa_fq *fq;
-+	u16 *channels;
-+
-+	channels = kcalloc(num_possible_cpus(), sizeof(u16), GFP_KERNEL);
-+	if (!channels)
-+		return -ENOMEM;
- 
- 	for_each_cpu_and(cpu, affine_cpus, cpu_online_mask)
- 		channels[num_portals++] = qman_affine_channel(cpu);
-@@ -997,6 +1001,10 @@ static void dpaa_fq_setup(struct dpaa_priv *priv,
- 				break;
- 		}
- 	}
-+
-+	kfree(channels);
-+
-+	return 0;
- }
- 
- static inline int dpaa_tx_fq_to_id(const struct dpaa_priv *priv,
-@@ -3416,7 +3424,9 @@ static int dpaa_eth_probe(struct platform_device *pdev)
- 	 */
- 	dpaa_eth_add_channel(priv->channel, &pdev->dev);
- 
--	dpaa_fq_setup(priv, &dpaa_fq_cbs, priv->mac_dev->port[TX]);
-+	err = dpaa_fq_setup(priv, &dpaa_fq_cbs, priv->mac_dev->port[TX]);
-+	if (err)
-+		goto free_dpaa_bps;
- 
- 	/* Create a congestion group for this netdev, with
- 	 * dynamically-allocated CGR ID.
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-index 5bd0b36d1feb..3f8cd4a7d845 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
-@@ -457,12 +457,16 @@ static int dpaa_set_coalesce(struct net_device *dev,
- 			     struct netlink_ext_ack *extack)
- {
- 	const cpumask_t *cpus = qman_affine_cpus();
--	bool needs_revert[NR_CPUS] = {false};
- 	struct qman_portal *portal;
- 	u32 period, prev_period;
- 	u8 thresh, prev_thresh;
-+	bool *needs_revert;
- 	int cpu, res;
- 
-+	needs_revert = kcalloc(num_possible_cpus(), sizeof(bool), GFP_KERNEL);
-+	if (!needs_revert)
-+		return -ENOMEM;
-+
- 	period = c->rx_coalesce_usecs;
- 	thresh = c->rx_max_coalesced_frames;
- 
-@@ -485,6 +489,8 @@ static int dpaa_set_coalesce(struct net_device *dev,
- 		needs_revert[cpu] = true;
- 	}
- 
-+	kfree(needs_revert);
-+
- 	return 0;
- 
- revert_values:
-@@ -498,6 +504,8 @@ static int dpaa_set_coalesce(struct net_device *dev,
- 		qman_dqrr_set_ithresh(portal, prev_thresh);
- 	}
- 
-+	kfree(needs_revert);
-+
- 	return res;
- }
- 
--- 
-2.34.1
-
-
---hpogfizkbgtmf2d4--
+Documentation/devicetree/bindings/pwm/cirrus,ep9301-pwm.example.dts:18:18:
+fatal error: dt-bindings/clock/cirrus,ep9301-syscon.h: No such file or
+directory
+   18 |         #include <dt-bindings/clock/cirrus,ep9301-syscon.h>
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [scripts/Makefile.lib:442:
+Documentation/devicetree/bindings/pwm/cirrus,ep9301-pwm.example.dtb]
+Error 1
 
