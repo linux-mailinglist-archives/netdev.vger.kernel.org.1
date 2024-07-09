@@ -1,260 +1,107 @@
-Return-Path: <netdev+bounces-110206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A60D92B4C2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 12:08:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D1692B503
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 12:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A50081C21DCB
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:08:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF74B1C22850
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA7B156236;
-	Tue,  9 Jul 2024 10:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D18A154C04;
+	Tue,  9 Jul 2024 10:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PDq3b3lB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NHR8jP9k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A136155CB3
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 10:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37D213C699
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 10:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720519701; cv=none; b=jtuZKvVq35j654ePwPHQ+PqUjdFK5joEo2RrDDv2sjlqTy9jxwxX4jU8drG6nPlYkjzpQ5NdCVu9EttrUMjAMQYby7VZQnipnx3TYVCvaRIhN67RPhr6R7srMFLJ2o+/OFRdcXrrBLYo40mvUz7SE96BirWQv0VVKDRTdR+mmIA=
+	t=1720520397; cv=none; b=VX1flTs/uBzsDHeX1zTDwmJlYEb5pLkxaghoeBNBhABbIwwttaFXhRRtGlsd1AGj5LpQswtV6ArwsIaH59yJZzVf3aO0yojeonyagcNsNz9BUZJ1p5PecT0ypiR39qRoitbl00heYq4b2zxXnoL5eHhTHGOYaZX6Mt1o18o1o0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720519701; c=relaxed/simple;
-	bh=nlWBh+HiRCCPt7rYeGi26dv5u49PciqG6bZqmNZR4zo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GkILWSzSSsLiNXZ4f63guriFNPKSMJi0vYzMZipfMQxG+tTJIFzFQfaAQ6+R7NKo9KCI5Xp76yNLO4ZEVCK8EIi9bliErudhbPr5w+C9yOmm810lPrCYLYh4dLcaEy47eDue9/2QdOS7ubJgkM9Lz0i0j2M+CUySCI5Q+a674ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PDq3b3lB; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58d24201934so7764154a12.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 03:08:19 -0700 (PDT)
+	s=arc-20240116; t=1720520397; c=relaxed/simple;
+	bh=7l7Gnx36n7yyUlfPBXRvLQSU/1+kcr0OdNm2VCuznG8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=kR5JyILqmtzXkev59fdTu3vU7Zm0L/95SMUKCx/S8zbwpyrECgARdEuXPL8hrimEeTGv2mzKo6Clf9NRSjGoowfkNyAYQC+bKDAY9JADPO+mqdtNLzXhAG62f0zTWERuSKVfb8vLPOJYWXrWQl61d3WZ0JKiOp7DxVmhyReL4IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NHR8jP9k; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70b04cb28acso3320659b3a.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 03:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1720519698; x=1721124498; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=urg/kKbqTlzOjHbwi9GFRUX7vnBQ0SVMjT61eb2f/Zc=;
-        b=PDq3b3lBD3Ei27W6hhm3Qxot9nvZ9e21M0DTtXEvjkUmr1MXL0TfLVDNU1uIKw9cCr
-         +P6gSy/GZpIuPkxW9wp/BZfxWuJEFARQX2jTZgO6FiOA94fUqOYN2Sdf0zzUbLvN0gBM
-         Tj7iXjCDHZWQXOG/Z7yFQq/KZOh/FTVr4zkyZVipSLmIzjQQxUNLE8Av1ONBzob28zSE
-         BTYJLdHjq8//iKkWzSmSheVAtpoMnvJxB/MDD9eKbUGh75ZhhvkEx5VMJ463OxGrjYsD
-         r2N+RctH1gGYykyOUAZV+ZLnZLQLCIuAxH6uUpGHi2SRgTzGa4N9BVa8+/Yy8Iv1EvGl
-         +s8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720519698; x=1721124498;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=broadcom.com; s=google; t=1720520395; x=1721125195; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=urg/kKbqTlzOjHbwi9GFRUX7vnBQ0SVMjT61eb2f/Zc=;
-        b=YdmKHN4/Tu/x20tDZs3a0wzFX4nMBg+RRSMF/UiIvSEpV4t+FnXiSTRn7ns2bFvPNT
-         NtUG+Yk/H/O37F/6i0mh4N7FSPWWhzspVPjrwrROJp4y2+l1chkHp6ogJnFntRox4m+i
-         yh5M+/HeGRhdf1I4iq4pi4tnqfVBcZVjM2ZAF5Mur8F2e+mWUI9MuBZiJ274HNKUq39I
-         ooi7Jgi++uoDJFuU78zjr8LRc3KBaIKtEZFsks5fxtNN7C1AM7z9U5BQgGgoX3FQ4eGR
-         1huE6AemkxGMvSbZLwGbB/c3lv0/HxntoKfniAtzd+mvWiuTHXrDreQFEumpn+YFPOPX
-         CHbA==
-X-Gm-Message-State: AOJu0YxMZiWJstjwisbEgtp6lFmfs7iPB6w9v+pX82GPJuM7HNRYM6Eg
-	3GH9ERWMyRQmzXX/DMTJWDUh6tczGb0YWr2YrJ15qnEWRBmF6yzuCH9eajya5ns=
-X-Google-Smtp-Source: AGHT+IG9bB1uYyRNuvz6/mRdfTjeHsoNzr9dvTCxUOMZ4pg4+qCUwR/sHC+FiDXZ3RXQL614f2WG0Q==
-X-Received: by 2002:a05:6402:2297:b0:582:7394:a83d with SMTP id 4fb4d7f45d1cf-594dcf6f438mr1363280a12.12.1720519697544;
-        Tue, 09 Jul 2024 03:08:17 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:45])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bc7c9e78sm884010a12.57.2024.07.09.03.08.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 03:08:16 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
-  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
-  john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
-  cong.wang@bytedance.com
-Subject: Re: [PATCH bpf v3 4/4] selftest/bpf: Test sockmap redirect for
- AF_UNIX MSG_OOB
-In-Reply-To: <20240707222842.4119416-5-mhal@rbox.co> (Michal Luczaj's message
-	of "Sun, 7 Jul 2024 23:28:25 +0200")
-References: <20240707222842.4119416-1-mhal@rbox.co>
-	<20240707222842.4119416-5-mhal@rbox.co>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Tue, 09 Jul 2024 12:08:15 +0200
-Message-ID: <87r0c2nai8.fsf@cloudflare.com>
+        bh=11ioL6MkBuE1i6Mzb5KKuPr/JiRiwhzn3IC3btu4k64=;
+        b=NHR8jP9klbFKVbHfTCILManHrRVxQ9VKS6YbARdF743JVNLbGP85UF4njgVQN5QyoT
+         +RfAt4YD0G4QlDA1cKaOaEohPAZhCRXF8BAuLfGoU8/tUAAAy9/PTLhgR9NoKu0zsHMZ
+         nk1uKh4a21rZHUfatUb0Fjdu6nvfGIBlD4VQI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720520395; x=1721125195;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=11ioL6MkBuE1i6Mzb5KKuPr/JiRiwhzn3IC3btu4k64=;
+        b=Uqg2Lr1+dbQ+/MRpo5radCobN68o+yM/MlnSCFJcccL7qRiq2V1oyealS83ZCA0+/A
+         DPI0H/KZNT/UPwj6xyf+YqgWNNE0EWnp404s+ukBYIHh666uPmDBHDv0lgjuYljydkFf
+         nS90tRfa+sAx79jO2Vk/7ppkE8QSGJP6RaqVictUccKzduqJBwAQ0+IRANbQkIXV3plc
+         Gs1eU/Qz0v/IvBK6fVhpWGstnWTgGByG3UaA9EApcBgfh+6Mle3aQ06aWPrcS9XYXOVW
+         F7EK7N21AAdqvD5y0IRoxG3dMwryW6YXCZzVJlIx17fqa21G18Dvz2VCZYOBBmScgUMN
+         rRvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrIrwhAr5/vww2+cMP40SefX4OSIYEjDOfqCS91ta7rQQ4g1Zvj4zCdH8lMkA6eatvqY2Qp7W4WnLWMKgamZYWu7mYov54
+X-Gm-Message-State: AOJu0YxfWXkda+tne7W9NPqM3XAyQW+REqxgV8AZgLbMHTV7qEi2Mgak
+	E36ovwhAfbEIfEjBeIgVAqNacZ3Vkd0O8Tjufel1R5H9jGdtY1ogkrgAG0viiQ==
+X-Google-Smtp-Source: AGHT+IGgmqH7UQ62MCOmx/bF5fNPuls7Idvh3gTEMJN+4xl6ri7+bXz1HtPde01qGp0e8dNnIi9M+Q==
+X-Received: by 2002:a05:6a00:18a3:b0:70a:f001:d22c with SMTP id d2e1a72fcca58-70b44d4474dmr2944949b3a.4.1720520394971;
+        Tue, 09 Jul 2024 03:19:54 -0700 (PDT)
+Received: from kashwindayan-virtual-machine.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b43967345sm1426016b3a.112.2024.07.09.03.19.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Jul 2024 03:19:54 -0700 (PDT)
+From: Ashwin Kamat <ashwin.kamat@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	davem@davemloft.net,
+	yoshfuji@linux-ipv6.org,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	florian.fainelli@broadcom.com,
+	ajay.kaher@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	tapas.kundu@broadcom.com,
+	ashwin.kamat@broadcom.com
+Subject: [PATCH v5.15 0/2] Fix for CVE-2024-36901
+Date: Tue,  9 Jul 2024 15:49:42 +0530
+Message-Id: <1720520384-9690-1-git-send-email-ashwin.kamat@broadcom.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
 
-On Sun, Jul 07, 2024 at 11:28 PM +02, Michal Luczaj wrote:
-> Verify that out-of-band packets are silently dropped before they reach the
-> redirection logic. Attempt to recv() stale data that might have been
-> erroneously left reachable from the original socket.
->
-> The idea is to test with a 2 byte long send(). Should a MSG_OOB flag be in
-> use, only the last byte will be treated as out-of-band. Test fails if
-> verd_mapfd indicates a wrong number of packets processed (e.g. if OOB data
-> wasn't dropped at the source) or if it was still somehow possble to recv()
+From: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
 
-Nit: typo s/possble/possible
+net/ipv6: annotate data-races around cnf.disable_ipv6 
+       disable_ipv6 is read locklessly, add appropriate READ_ONCE() and WRITE_ONCE() annotations.
 
-Something like below will catch these for you:
+net/ipv6: prevent NULL dereference in ip6_output()
+       Fix for CVE-2024-36901
 
-$ cat ~/src/linux/.git/hooks/post-commit
-exec git show --format=email HEAD | ./scripts/checkpatch.pl --strict --codespell
+Ashwin Dayanand Kamat (2):
+       net/ipv6: annotate data-races around cnf.disable_ipv6
+       net/ipv6: prevent NULL dereference in ip6_output()
 
-> OOB from the mapped socket.
->
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->  .../selftests/bpf/prog_tests/sockmap_listen.c | 26 ++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> index 59e16f8f2090..878fcca36a55 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> @@ -1397,10 +1397,10 @@ static void __pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
->  			return;
->  	}
->  
-> -	n = xsend(cli1, "a", 1, send_flags);
-> -	if (n == 0)
-> +	n = xsend(cli1, "ab", 2, send_flags);
-> +	if (n >= 0 && n < 2)
->  		FAIL("%s: incomplete send", log_prefix);
-> -	if (n < 1)
-> +	if (n < 2)
->  		return;
->  
->  	key = SK_PASS;
-> @@ -1415,6 +1415,19 @@ static void __pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
->  		FAIL_ERRNO("%s: recv_timeout", log_prefix);
->  	if (n == 0)
->  		FAIL("%s: incomplete recv", log_prefix);
-> +
-> +	if (send_flags & MSG_OOB) {
-> +		key = 0;
-> +		xbpf_map_delete_elem(sock_mapfd, &key);
-> +		key = 1;
-> +		xbpf_map_delete_elem(sock_mapfd, &key);
-> +
-> +		n = recv(peer1, &b, 1, MSG_OOB | MSG_DONTWAIT);
-> +		if (n > 0)
-> +			FAIL("%s: recv(MSG_OOB) succeeded", log_prefix);
-> +		if (n == 0)
-> +			FAIL("%s: recv(MSG_OOB) returned 0", log_prefix);
-> +	}
->  }
->  
->  static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
-> @@ -1883,6 +1896,10 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
->  	unix_inet_redir_to_connected(family, SOCK_STREAM,
->  				     sock_map, nop_map, verdict_map,
->  				     REDIR_EGRESS);
-> +	__unix_inet_redir_to_connected(family, SOCK_STREAM,
-> +				       sock_map, nop_map, verdict_map,
-> +				       REDIR_EGRESS, MSG_OOB);
-> +
->  	skel->bss->test_ingress = true;
->  	unix_inet_redir_to_connected(family, SOCK_DGRAM,
->  				     sock_map, -1, verdict_map,
-> @@ -1897,6 +1914,9 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
->  	unix_inet_redir_to_connected(family, SOCK_STREAM,
->  				     sock_map, nop_map, verdict_map,
->  				     REDIR_INGRESS);
-> +	__unix_inet_redir_to_connected(family, SOCK_STREAM,
-> +				       sock_map, nop_map, verdict_map,
-> +				       REDIR_INGRESS, MSG_OOB);
->  
->  	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
->  }
+ net/ipv6/addrconf.c   | 9 +++++----
+ net/ipv6/ip6_input.c  | 2 +-
+ net/ipv6/ip6_output.c | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-This AF_UNIX MSG_OOB use case is super exotic, IMO. TBH, I've just
-learned about it. Hence, I think we could use some more comments for the
-future readers.
+-- 
+2.7.4
 
-Also, it seems like we only need to remove peer1 from sockmap to test
-the behavior. If so, I'd stick to just what is needed to set up the
-test. Extra stuff makes you wonder what was the authors intention.
-
-I'd also be more direct about checking return value & error. These
-selftests often serve as the only example / API documentation out there.
-
---8<--
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-index 25938e66a3c1..1e30e6861805 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-@@ -1399,6 +1399,7 @@ static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
- 			return;
- 	}
- 
-+	/* Last byte is OOB data when send_flags has MSG_OOB bit set */
- 	n = xsend(cli1, "ab", 2, send_flags);
- 	if (n >= 0 && n < 2)
- 		FAIL("%s: incomplete send", log_prefix);
-@@ -1419,16 +1420,22 @@ static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
- 		FAIL("%s: incomplete recv", log_prefix);
- 
- 	if (send_flags & MSG_OOB) {
--		key = 0;
--		xbpf_map_delete_elem(sock_mapfd, &key);
--		key = 1;
--		xbpf_map_delete_elem(sock_mapfd, &key);
-+		/* Check that we can't read OOB while in sockmap */
-+		errno = 0;
-+		n = recv(peer1, &b, 1, MSG_OOB | MSG_DONTWAIT);
-+		if (n != -1 || errno != EOPNOTSUPP)
-+			FAIL("%s: recv(MSG_OOB): expected EOPNOTSUPP: retval=%d errno=%d",
-+			     log_prefix, n, errno);
-+
-+		/* Remove peer1 from sockmap */
-+		xbpf_map_delete_elem(sock_mapfd, &(int){ 1 });
- 
-+		/* Check that OOB was dropped on redirect */
-+		errno = 0;
- 		n = recv(peer1, &b, 1, MSG_OOB | MSG_DONTWAIT);
--		if (n > 0)
--			FAIL("%s: recv(MSG_OOB) succeeded", log_prefix);
--		if (n == 0)
--			FAIL("%s: recv(MSG_OOB) returned 0", log_prefix);
-+		if (n != -1 || errno != EINVAL)
-+			FAIL("%s: recv(MSG_OOB): expected EINVAL: retval=%d errno=%d",
-+			     log_prefix, n, errno);
- 	}
- }
- 
-@@ -1882,9 +1889,11 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
- 	unix_inet_redir_to_connected(family, SOCK_STREAM,
- 				     sock_map, nop_map, verdict_map,
- 				     REDIR_EGRESS, NO_FLAGS);
--	__unix_inet_redir_to_connected(family, SOCK_STREAM,
--				       sock_map, nop_map, verdict_map,
--				       REDIR_EGRESS, MSG_OOB);
-+
-+	/* MSG_OOB not supported by AF_UNIX SOCK_DGRAM */
-+	unix_inet_redir_to_connected(family, SOCK_STREAM,
-+				     sock_map, nop_map, verdict_map,
-+				     REDIR_EGRESS, MSG_OOB);
- 
- 	skel->bss->test_ingress = true;
- 	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-@@ -1900,9 +1909,11 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
- 	unix_inet_redir_to_connected(family, SOCK_STREAM,
- 				     sock_map, nop_map, verdict_map,
- 				     REDIR_INGRESS, NO_FLAGS);
--	__unix_inet_redir_to_connected(family, SOCK_STREAM,
--				       sock_map, nop_map, verdict_map,
--				       REDIR_INGRESS, MSG_OOB);
-+
-+	/* MSG_OOB not supported by AF_UNIX SOCK_DGRAM */
-+	unix_inet_redir_to_connected(family, SOCK_STREAM,
-+				     sock_map, nop_map, verdict_map,
-+				     REDIR_INGRESS, MSG_OOB);
- 
- 	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
- }
 
