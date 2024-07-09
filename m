@@ -1,191 +1,136 @@
-Return-Path: <netdev+bounces-110124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D0592B074
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:43:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A2292B0B3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4CDA1C20C40
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BB02281F7B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CACD13BC30;
-	Tue,  9 Jul 2024 06:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pbhpIKN0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45BD13E40D;
+	Tue,  9 Jul 2024 06:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7632BD05
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 06:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932A613DBA2;
+	Tue,  9 Jul 2024 06:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720507411; cv=none; b=L4eyMrjs4wa3F/VqHz50UCigpDXYh+e6Bbk0ZppsYO8TmYoz5seE9+yqoN7iBshT8HdazudvH12xH8U4J7pXXYiS4gRL0nok8JHTssOpIKMdaHtIcKT0JQaAxcSzLXDIJyYo6xQjvPLnkdGBG7MzeLHUjRI7z//GZGVXRfI4MxA=
+	t=1720508292; cv=none; b=jkmtHcbTe5mQK3P6oKaC6UTeOKFxS+a7GbIhtf4+GH1BGSRR2OrFX9i6JY0vfd4klZsapH60784o/yW6WEpP4YY9o3YQIUF4iDx8wMmnCrFMZzPdPAGl+cZVIA5hAp5hnIHXDvio7G6MF+XA9K0Wi5ORqn11YDHTnh92bSHDfWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720507411; c=relaxed/simple;
-	bh=krJMRwyHuvxUsc/WM0jQ0lstmfJcYEtT9EO5RgtMfTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dSvIQC4y0iY4/btzXLgBgDLWaE+0EZXqnHnN/KoKAEwiB2ka4pC3UFi5sXD4hDm2xjqMwIJHwsPHg7IFwMtomlshgTClnziYFy7p5PuG1nmYTsycdhHdzAbQ+0A+tbAiSseiaEK9k2LhHTQoO6GeyFpvfz/XzIC0PavK2D1UcO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pbhpIKN0; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a77c7d3e8bcso462767466b.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 23:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720507408; x=1721112208; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cmc0f4LcG7MrB8GBVrWkEPg/dPxD0VDSCj6GZR2bPX8=;
-        b=pbhpIKN0hnz2n1avrLEXGRy+0k627MWynR4v7rEw/q27Or15/n9/n+Ogt1uX18HXMs
-         kXo3OghHiA5UPvb3l+hr0VXymauzbCOGr47zaW9V1wR9e4EbruREQjDVR91JSzjK3c/Q
-         hwPJHkmnwuIdCnXoDqY0edHXLlx3rlK3FUFxsOGQwIsXChe1uJ7YPlB33QwOpI/hYm28
-         au+D8lCy2i6xS0f06BnrxZBpZ3IUjNa7SGExhw/Z/R2XnXp9YOeOMpsUDZpDn20KJQOM
-         m9edqHlLDFCxsx4Nb+TxuMD9fjIagA8hZGzpxCHsTTwTa3Hp8YmYPuz5qnAzjvsdRkfK
-         2iHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720507408; x=1721112208;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cmc0f4LcG7MrB8GBVrWkEPg/dPxD0VDSCj6GZR2bPX8=;
-        b=BD7HduNJrmdw1dB8uki02aB2jNg5yubdExopgEQbmqxjaKE9C32orZRx1nboGGf28C
-         rGG3tLybyul8ReHmio7OlHY1WBxytrEbwkOqF1230YQ+pAWlYXnIzA2eDgiBv8Z96jv7
-         /RVLGA2Pnwvl0vy3K3ECHuY7233bEsnmZdANZgWokyOtxwb8NAd8T/0OVwkac2v/SUnp
-         vQK80vtGY5L81Ya6+WK9Ox16+OCbFScxMYwhJcEMv+WGrYCEhA34PSfimcIWr3byAnXD
-         YQXQS9QIevXZC297eUDJkuWTwJ48joc7uyrlatweWO3SZOV31C23lfw7RM8UV6EkZ1Hm
-         Cdmg==
-X-Gm-Message-State: AOJu0YzDzSHT4FTXf5wk2j/YZoBmiy/KmV/fnR+atbi20ZowKeadEp2R
-	cO7qhzhYF/wRicDl5CeIzPGqyHdVpDXz2O6QoGXfNE4rKxTNYdxKpyRHM9Awz4mdE8iYrVUUa+m
-	xuzyngKLczxPgzGzyPpbFoaYCUP2wsSbjjQED
-X-Google-Smtp-Source: AGHT+IHRHUTg1JfJuwSdrBECyTgds3MyQMwDxeIReZmX1QJOfx99WMUOnu4d5gn16zJgvv+Qa8h+K5g5od7kgS27rPE=
-X-Received: by 2002:a17:907:986f:b0:a77:eb34:3b49 with SMTP id
- a640c23a62f3a-a780b705114mr100211366b.37.1720507407653; Mon, 08 Jul 2024
- 23:43:27 -0700 (PDT)
+	s=arc-20240116; t=1720508292; c=relaxed/simple;
+	bh=dB5OLaUU1vnf+HXn6ajIikCkxqoPen39u8scohwcq/0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=T/a97RZX0oDTCGq623frSgGD+c/Y9Hxep4M9yPc4PmC1aSq9mpCukShvV4hFRH7vH5HVJTsjWePTcFDBvxIGNdKve3mqJZzWTVcvpXhpqpPivhRJbTgJx2BGbyRstfUcLDxSZFsPh9Veh/8gU0lVdX7HhOqWet/VBmW+0jKVjLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WJBXH2YMszwWYR;
+	Tue,  9 Jul 2024 14:53:19 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 85476180064;
+	Tue,  9 Jul 2024 14:58:00 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemf200006.china.huawei.com
+ (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 9 Jul
+ 2024 14:58:00 +0800
+Subject: Re: [PATCH net-next v9 10/13] mm: page_frag: introduce
+ prepare/probe/commit API
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Yunsheng Lin <yunshenglin0825@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	<linux-mm@kvack.org>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-11-linyunsheng@huawei.com>
+ <33c3c7fc00d2385e741dc6c9be0eade26c30bd12.camel@gmail.com>
+ <38da183b-92ba-ce9d-5472-def199854563@huawei.com>
+ <CAKgT0Ueg1u2S5LJuo0Ecs9dAPPDujtJ0GLcm8BTsfDx9LpJZVg@mail.gmail.com>
+ <0a80e362-1eb7-40b0-b1b9-07ec5a6506ea@gmail.com>
+ <CAKgT0UcRbpT6UFCSq0Wd9OHrCqOGR=BQ063-zNBZ4cVNmduZGw@mail.gmail.com>
+ <15623dac-9358-4597-b3ee-3694a5956920@gmail.com>
+ <200ee8ff-557f-e17b-e71f-645267a49831@huawei.com>
+ <CAKgT0UcpLBtkX9qrngJAtpnnxT-YRqLFc+J4oMMVnTCPG5sMug@mail.gmail.com>
+ <83cf5a36-055a-f590-9d41-59c45f93e7c5@huawei.com>
+ <CAKgT0UdH1yD=LSCXFJ=YM_aiA4OomD-2wXykO42bizaWMt_HOA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <2b7ecaca-9a17-e057-8897-d0684b31591d@huawei.com>
+Date: Tue, 9 Jul 2024 14:57:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240702084452.2259237-1-yumike@google.com> <20240702084452.2259237-5-yumike@google.com>
- <ZovNzu58oGJv1plS@gauss3.secunet.de>
-In-Reply-To: <ZovNzu58oGJv1plS@gauss3.secunet.de>
-From: Mike Yu <yumike@google.com>
-Date: Tue, 9 Jul 2024 14:43:11 +0800
-Message-ID: <CAHktDpMAms8-Vx=XT-fMJgd1ZXCvvy0wLp0GFw4q3e+ekHtdvQ@mail.gmail.com>
-Subject: Re: [PATCH ipsec 4/4] xfrm: Support crypto offload for outbound IPv4
- UDP-encapsulated ESP packet
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: netdev@vger.kernel.org, stanleyjhu@google.com, martinwu@google.com, 
-	chiachangwang@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAKgT0UdH1yD=LSCXFJ=YM_aiA4OomD-2wXykO42bizaWMt_HOA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Fixed the comment style and sent v2 patchset.
+On 2024/7/8 22:30, Alexander Duyck wrote:
+> On Mon, Jul 8, 2024 at 3:58 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/7/8 1:12, Alexander Duyck wrote:
+>>
+>> ...
+>>
+>>> The issue is the dependency mess that has been created with patch 11
+>>> in the set. Again you are conflating patches which makes this really
+>>> hard to debug or discuss as I make suggestions on one patch and you
+>>> claim it breaks things that are really due to issues in another patch.
+>>> So the issue is you included this header into include/linux/sched.h
+>>> which is included in linux/mm_types.h. So what happens then is that
+>>> you have to include page_frag_cache.h *before* you can include the
+>>> bits from mm_types.h
+>>>
+>>> What might make more sense to solve this is to look at just moving the
+>>> page_frag_cache into mm_types_task.h and then having it replace the
+>>> page_frag struct there since mm_types.h will pull that in anyway. That
+>>> way sched.h can avoid having to pull in page_frag_cache.h.
+>>
+>> It seems the above didn't work either, as asm-offsets.c does depend on
+>> mm_types_task.h too.
+>>
+>> In file included from ./include/linux/mm.h:16,
+>>                  from ./include/linux/page_frag_cache.h:10,
+>>                  from ./include/linux/mm_types_task.h:11,
+>>                  from ./include/linux/mm_types.h:5,
+>>                  from ./include/linux/mmzone.h:22,
+>>                  from ./include/linux/gfp.h:7,
+>>                  from ./include/linux/slab.h:16,
+>>                  from ./include/linux/resource_ext.h:11,
+>>                  from ./include/linux/acpi.h:13,
+>>                  from ./include/acpi/apei.h:9,
+>>                  from ./include/acpi/ghes.h:5,
+>>                  from ./include/linux/arm_sdei.h:8,
+>>                  from arch/arm64/kernel/asm-offsets.c:10:
+>> ./include/linux/mmap_lock.h: In function ‘mmap_assert_locked’:
+>> ./include/linux/mmap_lock.h:65:23: error: invalid use of undefined type ‘const struct mm_struct’
+>>    65 |  rwsem_assert_held(&mm->mmap_lock);
+> 
+> Do not include page_frag_cache.h in mm_types_task.h. Just move the
+> struct page_frag_cache there to replace struct page_frag.
 
+The above does seem a clever idea, but doesn't doing above also seem to
+defeat some purpose of patch 1? Anyway, it seems workable for trying
+to avoid adding a new header for a single struct.
 
-Mike
+About the 'replace' part, as mentioned in [1], the 'struct page_frag'
+is still needed as this patchset is large enough that replacing is only
+done for sk_page_frag(), there are still other places using page_frag
+that can be replaced by page_frag_cache in the following patchset.
 
-Mike
+1. https://lore.kernel.org/all/b200a609-2f30-ec37-39b6-f37ed8092f41@huawei.com/
 
-
-On Mon, Jul 8, 2024 at 7:30=E2=80=AFPM Steffen Klassert
-<steffen.klassert@secunet.com> wrote:
->
-> On Tue, Jul 02, 2024 at 04:44:51PM +0800, Mike Yu wrote:
-> > esp_xmit() is already able to handle UDP encapsulation through the call=
- to
-> > esp_output_head(). The missing part in esp_xmit() is to correct the out=
-er
-> > IP header.
-> >
-> > Test: Enabled both dir=3Din/out IPsec crypto offload, and verified IPv4
-> >       UDP-encapsulated ESP packets on both wifi/cellular network
-> > Signed-off-by: Mike Yu <yumike@google.com>
-> > ---
-> >  net/ipv4/esp4.c         |  7 ++++++-
-> >  net/ipv4/esp4_offload.c | 14 +++++++++++++-
-> >  2 files changed, 19 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-> > index 3968d3f98e08..cd4b52e131ce 100644
-> > --- a/net/ipv4/esp4.c
-> > +++ b/net/ipv4/esp4.c
-> > @@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(stru=
-ct sk_buff *skb,
-> >  {
-> >       struct udphdr *uh;
-> >       unsigned int len;
-> > +     struct xfrm_offload *xo =3D xfrm_offload(skb);
-> >
-> >       len =3D skb->len + esp->tailen - skb_transport_offset(skb);
-> >       if (len + sizeof(struct iphdr) > IP_MAX_MTU)
-> > @@ -360,7 +361,11 @@ static struct ip_esp_hdr *esp_output_udp_encap(str=
-uct sk_buff *skb,
-> >       uh->len =3D htons(len);
-> >       uh->check =3D 0;
-> >
-> > -     *skb_mac_header(skb) =3D IPPROTO_UDP;
-> > +     // For IPv4 ESP with UDP encapsulation, if xo is not null, the sk=
-b is in the crypto offload
-> > +     // data path, which means that esp_output_udp_encap is called out=
-side of the XFRM stack.
-> > +     // In this case, the mac header doesn't point to the IPv4 protoco=
-l field, so don't set it.
->
-> Please use networking style comments.
->
-> > +     if (!xo || encap_type !=3D UDP_ENCAP_ESPINUDP)
-> > +             *skb_mac_header(skb) =3D IPPROTO_UDP;
-> >
-> >       return (struct ip_esp_hdr *)(uh + 1);
-> >  }
-> > diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-> > index b3271957ad9a..ccfc466ddf6c 100644
-> > --- a/net/ipv4/esp4_offload.c
-> > +++ b/net/ipv4/esp4_offload.c
-> > @@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk=
-_buff *skb,  netdev_features_
-> >       struct esp_info esp;
-> >       bool hw_offload =3D true;
-> >       __u32 seq;
-> > +     int encap_type =3D 0;
-> >
-> >       esp.inplace =3D true;
-> >
-> > @@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct s=
-k_buff *skb,  netdev_features_
-> >
-> >       esp.esph =3D ip_esp_hdr(skb);
-> >
-> > +     if (x->encap)
-> > +             encap_type =3D x->encap->encap_type;
-> >
-> > -     if (!hw_offload || !skb_is_gso(skb)) {
-> > +     if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type =
-=3D=3D UDP_ENCAP_ESPINUDP)) {
-> >               esp.nfrags =3D esp_output_head(x, skb, &esp);
-> >               if (esp.nfrags < 0)
-> >                       return esp.nfrags;
-> > @@ -324,6 +327,15 @@ static int esp_xmit(struct xfrm_state *x, struct s=
-k_buff *skb,  netdev_features_
-> >
-> >       esp.seqno =3D cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
-> >
-> > +     if (hw_offload && encap_type =3D=3D UDP_ENCAP_ESPINUDP) {
-> > +             // In the XFRM stack, the encapsulation protocol is set t=
-o iphdr->protocol by
-> > +             // setting *skb_mac_header(skb) (see esp_output_udp_encap=
-()) where skb->mac_header
-> > +             // points to iphdr->protocol (see xfrm4_tunnel_encap_add(=
-)).
-> > +             // However, in esp_xmit(), skb->mac_header doesn't point =
-to iphdr->protocol.
-> > +             // Therefore, the protocol field needs to be corrected.
->
-> Same here.
->
+> .
+> 
 
