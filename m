@@ -1,184 +1,168 @@
-Return-Path: <netdev+bounces-110064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B2392ACDE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:04:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F38292AD0A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D73B61C20B05
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:04:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F21F41F222A5
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ED5195;
-	Tue,  9 Jul 2024 00:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F27917C9;
+	Tue,  9 Jul 2024 00:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AoS4ft1p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7BGrzLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9872BAE3
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 00:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039D0286A6;
+	Tue,  9 Jul 2024 00:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720483453; cv=none; b=ZW16CGo8x1YbsKyW49VUCKPQClPr/qEU9kUm5lksRmgkj06IazUiSRlrJ5YCNpubY6J4ap3vWG+LynjDosMHoxycuQE2T/uw/EWsF8j/gXGO9Q7Lp3m6iBGLNtqZoXx+d9lycsLcNKLLCdfKH15fYLJYkp1A70OLXxQeMUB8+cw=
+	t=1720484475; cv=none; b=KaWk23SuIyoEjp6MhcINNCndnu2f65A3GWpRoaGBsJ6WgKpeg6i/wZM0pAf6F0e3dwwns+uFsorebD5eEWZQoye6u5g7GmEHat9Ilvklwy1eo0DSMG0kFl+pJSUoW6HOXQ8nd1vblK0X4Qw//1QvO35dYtbEBZXcLuNTt2pL+Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720483453; c=relaxed/simple;
-	bh=D1T3vzfM90DlsQPTel3t1UsNl07+U2CyLWc2quFay6k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jmMrI8ZgV1HWUevYOqLMAGFoiJka2dS8iznlZ+EMI3ZWQaRI5s3GwKRkCwbVgiVjj5b/Q0L/nJxh7UE7nMl/BpNp7G2Gev/fsvEcBOfS0vneJpeHZY1mAXY3iDOwbRHUIEEKzu6jtrzUjZqtKFYb3F9G79pKfZLinCo/uIizZZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AoS4ft1p; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: bigeasy@linutronix.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1720483449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+vJ/5Uao0pdtVebeKV6kCXGjNtbGqBZuoy052SVeswE=;
-	b=AoS4ft1pm0N+3AVfcq1YPYQdqb8WJESmIUQt/ITtKa71LugBFglvFcAg72ArssQwqm3izw
-	b3CAqUG8MUy71BjltEyaB70vKCSU90XNoRs8s4gm4VONUscyfx4/xdpeL7D+t9GQc0+hQS
-	hPSQHTIqXE+aZ9VyzyCTpJMDoXjoswE=
-X-Envelope-To: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: bpf@vger.kernel.org
-X-Envelope-To: andrii@kernel.org
-X-Envelope-To: ast@kernel.org
-X-Envelope-To: daniel@iogearbox.net
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: dsahern@kernel.org
-X-Envelope-To: eddyz87@gmail.com
-X-Envelope-To: edumazet@google.com
-X-Envelope-To: haoluo@google.com
-X-Envelope-To: john.fastabend@gmail.com
-X-Envelope-To: jolsa@kernel.org
-X-Envelope-To: kpsingh@kernel.org
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: sdf@fomichev.me
-X-Envelope-To: sdf@google.com
-X-Envelope-To: song@kernel.org
-X-Envelope-To: syzkaller-bugs@googlegroups.com
-X-Envelope-To: yonghong.song@linux.dev
-X-Envelope-To: tglx@linutronix.de
-Message-ID: <82c77e30-6e9d-44c3-bdcd-7da17654fa81@linux.dev>
-Date: Mon, 8 Jul 2024 17:03:58 -0700
+	s=arc-20240116; t=1720484475; c=relaxed/simple;
+	bh=Xo3+QFBXpqmBlMplzfz/hdxkkPdt/5SCumC7QBHHisM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=na1KymeaXp/HEb233c4upnNAA/K1BgDpCb5CBXsv5Sotpo43biPnUswFGxX3d32icmLurZWYht4I4Ry1z7BcmT32mX+6GsceYaMbPg5+YHOa/tqSRofYgmhrdV9vFr3f12PKbudMN8zX+TAnS3rbMn8eT7jJBFlV5R5BtN5OLSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a7BGrzLH; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70af0684c2bso2787510b3a.0;
+        Mon, 08 Jul 2024 17:21:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720484473; x=1721089273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R/SwctyraUjLIa9K94QJwveOwyBiR6rakJmgf688vGc=;
+        b=a7BGrzLHMQVphT/D1vHngMH9FxcP69mCIgNYigQJRzR/NVDOi4Plo/v0Nq4gwVU85c
+         x1BMuaZQSNauHbWAvqn1SEYKa9rMxdMn6LNMt8n3QWBP27zXAN5yvZn9dnVKzdF2qdiq
+         1Wc6ubxEbfg2Bxt6akrUNpDWrjBjv9VGLlKnC2RoLC+gmJlGcHdZtfAd9cqq+Kq8AEwz
+         J/mYnq2w9BpWvDs8thkE71bHX0u8k2Z5cGrOwTDgov6z65z546eASwQIrTwdOlX8eh8S
+         7Ay+wJjb8V+C4bjs+e4LXJAladwI6NfvIj+WXZ8METuFqFNa+hDix9lE2lbWpNeeKoIS
+         JIFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720484473; x=1721089273;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=R/SwctyraUjLIa9K94QJwveOwyBiR6rakJmgf688vGc=;
+        b=Zj7nCE6C5uu/rp7tT++N6VxouLVe9v+4dTIWycwKe3qj3vEc1SmYOeevEcBlAGC3pk
+         48wD0oYl6mHJiLGjn5QluHIf2xfgKsXm2+OkY4M0XCDVX4DYVCH6jA3AZcgoGK38ZFDd
+         LxWXTLhLht2Nl3syj6aPM/hWEa5tZOj6wL47GebdZdd2N+YxjzVKS9QViZQPS6bCfjwt
+         ZvCUrUHlSi50mhD60+x7ZzMpB0un67/mb7chH7Vpj3DFycvQtLEW+0ucbFZw2ZFYRmHu
+         F6LARAD81tKxo5F5Aq4WbQmnpCfLXYD6TjyXDd7tK9mshH5iZx/DqTpWiJwFXqAk7aS/
+         5DRw==
+X-Forwarded-Encrypted: i=1; AJvYcCU402GGVmzc9MnHeJqo3BxFr+/9twNbj4HJp5kbKIUYbhEpG3cM0NcBeWkBL33t3NwQkOgcJYRfzjxbjZHDdTIFfFL8Pkdj
+X-Gm-Message-State: AOJu0YzCsvowPY7Eg/Dl0hXRdYY2LKMYVjP1K0WF1sM889wvxDjWVN1X
+	UR5bh16XHryBvn55VndlrDbUfjOBhcwaF6OtY9zJ5cgDjD4ddoAGzwte4g==
+X-Google-Smtp-Source: AGHT+IEbeu0fPSJxg2Hdz6MG/eLE6DApOHWfSyQU5j2n6d2tbjX6V5EDFVjtF97Qysp7dh2y/FY6YA==
+X-Received: by 2002:a05:6a00:999:b0:705:cade:1f50 with SMTP id d2e1a72fcca58-70b436875bbmr1347241b3a.34.1720484473048;
+        Mon, 08 Jul 2024 17:21:13 -0700 (PDT)
+Received: from localhost ([98.97.32.172])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b439b30b9sm487946b3a.178.2024.07.08.17.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 17:21:12 -0700 (PDT)
+Date: Mon, 08 Jul 2024 17:21:12 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, 
+ martin.lau@kernel.org
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Pedro Pinto <xten@osec.io>, 
+ Hyunwoo Kim <v4bel@theori.io>, 
+ Wongi Lee <qwerty@theori.io>
+Message-ID: <668c82787f16_d77208e0@john.notmuch>
+In-Reply-To: <20240708133130.11609-1-daniel@iogearbox.net>
+References: <20240708133130.11609-1-daniel@iogearbox.net>
+Subject: RE: [PATCH bpf 1/2] bpf: Fix too early release of tcx_entry
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] seg6: Ensure that seg6_bpf_srh_states can only
- be accessed from input_action_end_bpf()
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: syzbot <syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- dsahern@kernel.org, eddyz87@gmail.com, edumazet@google.com,
- haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
- kpsingh@kernel.org, kuba@kernel.org, pabeni@redhat.com, sdf@fomichev.me,
- sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
- yonghong.song@linux.dev, Thomas Gleixner <tglx@linutronix.de>
-References: <000000000000571681061bb9b5ad@google.com>
- <20240705104133.NU9AwKDS@linutronix.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240705104133.NU9AwKDS@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 7/5/24 3:41 AM, Sebastian Andrzej Siewior wrote:
-> Initially I assumed that the per-CPU variable is `seg6_bpf_srh_states'
-> is first initialized in input_action_end_bpf() and then accessed during
-> the bpf_prog_run_save_cb() invocation by the eBPF via the BPF callbacks.
-> syzbot demonstrated that is possible to invoke the BPF callbacks (and
-> access `seg6_bpf_srh_states') without entering input_action_end_bpf()
-> first.
+Daniel Borkmann wrote:
+> Pedro Pinto and later independently also Hyunwoo Kim and Wongi Lee reported
+> an issue that the tcx_entry can be released too early leading to a use
+> after free (UAF) when an active old-style ingress or clsact qdisc with a
+> shared tc block is later replaced by another ingress or clsact instance.
 > 
-> The valid path via input_action_end_bpf() is invoked within NAPI
-> context which means it has bpf_net_context set. This can be used to
-> identify the "valid" calling path.
+> Essentially, the sequence to trigger the UAF (one example) can be as follows:
 > 
-> Set in input_action_end_bpf() the BPF_RI_F_SEG6_STATE bit to signal the
-> valid calling path and clear it at the end. Check for the context and
-> the bit in bpf_lwt_seg6.*() and abort if missing.
+>   1. A network namespace is created
+>   2. An ingress qdisc is created. This allocates a tcx_entry, and
+>      &tcx_entry->miniq is stored in the qdisc's miniqp->p_miniq. At the
+>      same time, a tcf block with index 1 is created.
+>   3. chain0 is attached to the tcf block. chain0 must be connected to
+>      the block linked to the ingress qdisc to later reach the function
+>      tcf_chain0_head_change_cb_del() which triggers the UAF.
+>   4. Create and graft a clsact qdisc. This causes the ingress qdisc
+>      created in step 1 to be removed, thus freeing the previously linked
+>      tcx_entry:
 > 
-> Reported-by: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
-> Fixes: d1542d4ae4dfd ("seg6: Use nested-BH locking for seg6_bpf_srh_states.")
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+>      rtnetlink_rcv_msg()
+>        => tc_modify_qdisc()
+>          => qdisc_create()
+>            => clsact_init() [a]
+>          => qdisc_graft()
+>            => qdisc_destroy()
+>              => __qdisc_destroy()
+>                => ingress_destroy() [b]
+>                  => tcx_entry_free()
+>                    => kfree_rcu() // tcx_entry freed
+> 
+>   5. Finally, the network namespace is closed. This registers the
+>      cleanup_net worker, and during the process of releasing the
+>      remaining clsact qdisc, it accesses the tcx_entry that was
+>      already freed in step 4, causing the UAF to occur:
+> 
+>      cleanup_net()
+>        => ops_exit_list()
+>          => default_device_exit_batch()
+>            => unregister_netdevice_many()
+>              => unregister_netdevice_many_notify()
+>                => dev_shutdown()
+>                  => qdisc_put()
+>                    => clsact_destroy() [c]
+>                      => tcf_block_put_ext()
+>                        => tcf_chain0_head_change_cb_del()
+>                          => tcf_chain_head_change_item()
+>                            => clsact_chain_head_change()
+>                              => mini_qdisc_pair_swap() // UAF
+> 
+> There are also other variants, the gist is to add an ingress (or clsact)
+> qdisc with a specific shared block, then to replace that qdisc, waiting
+> for the tcx_entry kfree_rcu() to be executed and subsequently accessing
+> the current active qdisc's miniq one way or another.
+> 
+> The correct fix is to turn the miniq_active boolean into a counter. What
+> can be observed, at step 2 above, the counter transitions from 0->1, at
+> step [a] from 1->2 (in order for the miniq object to remain active during
+> the replacement), then in [b] from 2->1 and finally [c] 1->0 with the
+> eventual release. The reference counter in general ranges from [0,2] and
+> it does not need to be atomic since all access to the counter is protected
+> by the rtnl mutex. With this in place, there is no longer a UAF happening
+> and the tcx_entry is freed at the correct time.
+> 
+> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
+> Reported-by: Pedro Pinto <xten@osec.io>
+> Co-developed-by: Pedro Pinto <xten@osec.io>
+> Signed-off-by: Pedro Pinto <xten@osec.io>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Hyunwoo Kim <v4bel@theori.io>
+> Cc: Wongi Lee <qwerty@theori.io>
+> Cc: Martin KaFai Lau <martin.lau@kernel.org>
 > ---
->   include/linux/filter.h | 24 ++++++++++++++++++++++++
->   net/core/filter.c      |  6 ++++++
->   net/ipv6/seg6_local.c  |  3 +++
->   3 files changed, 33 insertions(+)
-> 
-> diff --git a/include/linux/filter.h b/include/linux/filter.h
-> index 0bbd2585e6def..cadddb25ff4db 100644
-> --- a/include/linux/filter.h
-> +++ b/include/linux/filter.h
-> @@ -739,6 +739,7 @@ struct bpf_nh_params {
->   #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
->   #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
->   #define BPF_RI_F_XSK_MAP_INIT	BIT(4)
-> +#define BPF_RI_F_SEG6_STATE	BIT(5)
->   
->   struct bpf_redirect_info {
->   	u64 tgt_index;
-> @@ -856,6 +857,29 @@ static inline void bpf_net_ctx_get_all_used_flush_lists(struct list_head **lh_ma
->   		*lh_xsk = lh;
->   }
->   
-> +static inline bool bpf_net_ctx_seg6_state_avail(void)
-> +{
-> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-> +
-> +	if (!bpf_net_ctx)
-> +		return false;
-> +	return bpf_net_ctx->ri.kern_flags & BPF_RI_F_SEG6_STATE;
-> +}
-> +
-> +static inline void bpf_net_ctx_seg6_state_set(void)
-> +{
-> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-> +
-> +	bpf_net_ctx->ri.kern_flags |= BPF_RI_F_SEG6_STATE;
-> +}
-> +
-> +static inline void bpf_net_ctx_seg6_state_clr(void)
-> +{
-> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
-> +
-> +	bpf_net_ctx->ri.kern_flags &= ~BPF_RI_F_SEG6_STATE;
-> +}
-> +
->   /* Compute the linear packet data range [data, data_end) which
->    * will be accessed by various program types (cls_bpf, act_bpf,
->    * lwt, ...). Subsystems allowing direct data access must (!)
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 403d23faf22e1..ea5bc4a4a6a23 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6459,6 +6459,8 @@ BPF_CALL_4(bpf_lwt_seg6_store_bytes, struct sk_buff *, skb, u32, offset,
->   	void *srh_tlvs, *srh_end, *ptr;
->   	int srhoff = 0;
->   
-> +	if (!bpf_net_ctx_seg6_state_avail())
-> +		return -EINVAL;
 
-The syzbot stack shows that the seg6local bpf_prog can be run by test_run like: 
-bpf_prog_test_run_skb() => bpf_test_run(). "return -EINVAL;" will reject and 
-break the existing bpf prog doing test with test_run.
-
-bpf_test_run() has already done the local_bh_disable() and bpf_net_ctx_set(). 
-How about doing the local_[un]lock_nested_bh(&seg6_bpf_srh_states.bh_lock) in 
-bpf_test_run() when the prog->type == BPF_PROG_TYPE_LWT_SEG6LOCAL?
-
-pw-bot: cr
-
+Acked-by: John Fastabend <john.fastabend@gmail.com>
 
