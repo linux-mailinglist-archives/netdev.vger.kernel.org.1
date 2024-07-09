@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-110382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E7A92C271
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:28:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669F892C272
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F28FDB22345
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:28:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCF2286C3B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D3C7F476;
-	Tue,  9 Jul 2024 17:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D11717B02D;
+	Tue,  9 Jul 2024 17:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSSLCmfE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VS0zfWcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179DD1B86C5
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 17:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50F21B86C5
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 17:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720546122; cv=none; b=PZeMrJmIvt3E6/ObsNBOwtWoffGvKyYvZIeCk6hJH6Fdh/7+O76fyH3BwLWy2wjykRp809+/zfurogiSNj1DCn1gPVLMR8FHxYdfH98Ok0rJqSJIxAJTy28pT/5wVm3NUU4d8qttEEHBhfwekisGxx2hm91hpEoJBMXnmBlWrUk=
+	t=1720546126; cv=none; b=e+OPL1RK5hgNggNSfqn4BiEI4WIVi+7CwyjIeKNuqq3svbCZncFG+Hf/hRCwg4YkjVDfAMhXspl0cqurOCp/hmJUJKfQSnOe2O66Qe2w4e0wuX9PfsLk0cRzVifJJzFgi4dCpym3I7cw3l9/u1mo4dmNCqGSshnmNWVdSO2vrU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720546122; c=relaxed/simple;
-	bh=8LVr6uOrCQ2rccZcEDYZnHVRdHUFcvEWzRogI6b8/no=;
+	s=arc-20240116; t=1720546126; c=relaxed/simple;
+	bh=GXPb0s/rPhqQdfh4kE7BtRNSNw1WkBTvpFQkPAM1Af8=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZmCP4OPv4SmfftkVKRgpNuSTDKfEK1ZzWJYF6DBKb9sqkTdqnRCil7QzRrYVc6lfxgRgsctqOWA44OdyH+Wnhh4ozkQBUrDzDoiGmxxyQbwNIzZasDF4SG29D3izdL5zfPUv/GpZUgn6jLQNJBkLMoar86vLhwZUwioPvi+JiOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSSLCmfE; arc=none smtp.client-ip=209.85.215.173
+	 MIME-Version:Content-Type; b=sB+s1nKK+4JRIOxrqXpw1cwLgU/ZGMdvQSqasMqd+WhqOKC0ekFRlMKlwFuyVyRi+8Y6o+D5YCmXR6AQiUfKb4JkW+MkAbRcU/pvQgMJ/C8LVBC6LJODanCwfFwJJkUhL/KdezIYKpsRggaeyyvoLTnUfmtbvlZzvk9SlTolvAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VS0zfWcy; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-707040e3018so3592542a12.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 10:28:40 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2c980b55741so3293249a91.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 10:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720546120; x=1721150920; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720546124; x=1721150924; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=oWs+hC4T9yde9lLxyDN8OKcby3qV3/MMaRl+Vr/ItiU=;
-        b=SSSLCmfETnXaJmmwnrGiyfcAthyC4vdq4/k55EJvNtpLN6re+ldEef2EYDxbgzzwvq
-         hsqbsJSgfaVAYpl+J4XSWmvBL5Y0ZW/0TCebecEKdwO7clvRy6Ccm5MakGWMsOjJ/Qbb
-         4WzdafYfPIJcA7z8L4sjN66VWo42jpTur0qk6yXsUKzj7xv8ukc6G+u0lLYzw1nWRABa
-         Ja5deiTbZW4xrTftJxgNZbvZ/VPBc2IObALEyqfEV/qkdKqIIj/EnEA4h208YnCTbWUI
-         S68vQB6uFctQO0oufXMguQ3IR8+JqGps+IZRGX7xnfIjOcYL6ZtHntzw/O1waR/08dTs
-         pVtQ==
+        bh=ADwdqKh3ZFcDZ6A193tHnjr1PVJmWFMfp50CKcLcnXw=;
+        b=VS0zfWcyeCjxg2+ba4nrfCxU4idmxBPQrxcaKDuJzsHPGJXZAdjImlCTV3yw6fOM5P
+         +SETJP3wrqGLv6qMkD/DqGniGaqZ59FueX/sVlTNY9jA4+6Lmhv/8GzwBm5tdf+a5QwG
+         etUHgGXioKGYT3VIIMoTYQtcfOkuNw2xPm1GXEwwE/bxf0PzTo7ZvX3+J3PX1XQc46aH
+         NWzwx8jY3jRKIn7X0pjSrnq5A7ldrMy97c3B6xqk5FQdJmgZNnPhX4mo45dVjNI1xal+
+         YO+RYwQDx0lIxKTOagvglNXX2g922uPWbIbwrmnZYGd4guMirkv7OVOIL5lg2lFKi9/3
+         IUQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720546120; x=1721150920;
+        d=1e100.net; s=20230601; t=1720546124; x=1721150924;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=oWs+hC4T9yde9lLxyDN8OKcby3qV3/MMaRl+Vr/ItiU=;
-        b=KuHjh6ILinpHcBelenG/ic4fDEb35+DCoj3CgMy26oad4IAF3o3BY0P6mpxyP3tT3N
-         BILVo03x+SE9hRi5lCFSAR8gH7IUtIeuKMaLJ0GRMXNQyWayFKtHqm9MSZWk2VmvvUiR
-         dU/AabV9e0dT3+3S7ySAZjfAcvM/mXhxt/Ckd17CiwMfqK7I4kNhRbcfCLye/njgY9fd
-         GR+UE3JvWpCyAQzIsw6YmlCo02Dz/+obrEN4xE+Ri0x2Ixk07h+FzS9IIVXLh5U+GwJt
-         nwU91aOy9+dznR0UepQAsRdFP+m7uFoPbqow+piS9BTl4MWg1nyeXRJdsZW5nSNLqOJS
-         8fGg==
-X-Gm-Message-State: AOJu0Yw5VPfJY8xdAW2oRC/PsXGLGFYuOQWUer+YOXCsc/R/UEsa7Lic
-	ntZAyceqFLnAgjQugIy5iWwbj2XyYASfM30qgtubcbfOSQkA7D3QWfzK5w==
-X-Google-Smtp-Source: AGHT+IG72HS/EhG/+U+xe3wqWlWiTCZxQ4bVJtjtvMabGlAKVTayCh0oMRk9I+jy6ns8ACARd0h4Lw==
-X-Received: by 2002:a05:6a20:2452:b0:1be:c6f8:c530 with SMTP id adf61e73a8af0-1c29821d97emr3846819637.26.1720546120149;
-        Tue, 09 Jul 2024 10:28:40 -0700 (PDT)
+        bh=ADwdqKh3ZFcDZ6A193tHnjr1PVJmWFMfp50CKcLcnXw=;
+        b=DL8O/BCdEyOw9dpKh/UcBKJka0OLAQtlmH8fV0t1aVCT1HPyXAxkq4rvV82wsz6l/6
+         jzCM6WK0D8v+OeSIHK+g1oP1Zdbpc6RkeBij0bvptXFsg1Mu6qwspawUyUfa8LY2NZG4
+         9sAn8HhwF3TptTGICAJfP8PoSavwd/4bf/t3gpPIB4s07Wp38IApCTNTrmSzh9a2eEPs
+         a3k4VntG53ozuk1ZmQqIE+78JK9NItrR9VvIkCVQv9k4TIfviJ8hQds0Pd+hW/EDWi57
+         kyBgnxh64fQyoGkV1pa4d3LFeIRYGlSSR0hqvF3F+yQljKToStKbIETyta+ORt0pMArq
+         1DQQ==
+X-Gm-Message-State: AOJu0YxpS+ieey/nrGll7Y+6FFvSEuw4SF+y4V+qkH0Ftbm5BxFvtBUN
+	flLSYMdxJKqsBUv9kkUiIwBkCb/JP9GBEBC4TmHiQmY0HPCxvRtk
+X-Google-Smtp-Source: AGHT+IFf3W0+gCWJ/QEJxmhZG8z+tBFzVRHjslplU1fr1uExhhFedLDdKBVR52gSWdE6q6EUxnSe+Q==
+X-Received: by 2002:a17:90a:1697:b0:2c9:5c7a:ce7b with SMTP id 98e67ed59e1d1-2ca35be7ed1mr2851811a91.6.1720546123882;
+        Tue, 09 Jul 2024 10:28:43 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([98.97.103.43])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a2a30dsm18805375ad.68.2024.07.09.10.28.39
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ca34e88bcasm2196313a91.28.2024.07.09.10.28.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 10:28:39 -0700 (PDT)
-Subject: [net-next PATCH v4 02/15] eth: fbnic: Add scaffolding for Meta's NIC
- driver
+        Tue, 09 Jul 2024 10:28:43 -0700 (PDT)
+Subject: [net-next PATCH v4 03/15] eth: fbnic: Allocate core device specific
+ structures and devlink interface
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org,
  davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
  kernel-team@meta.com
-Date: Tue, 09 Jul 2024 10:28:38 -0700
+Date: Tue, 09 Jul 2024 10:28:42 -0700
 Message-ID: 
- <172054611856.1305884.17031259674853513408.stgit@ahduyck-xeon-server.home.arpa>
+ <172054612235.1305884.5791448806972122172.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <172054602727.1305884.10973465571854855750.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -92,394 +92,337 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-Create a bare-bones PCI driver for Meta's NIC.
-Subsequent changes will flesh it out.
+At the core of the fbnic device will be the devlink interface. This
+interface will eventually provide basic functionality in the event that
+there are any issues with the network interface.
+
+Add support for allocating the MSI-X vectors and setting up the BAR
+mapping. With this we can start enabling various subsystems and start
+brining up additional interfaces such the AXI fabric and the firmware
+mailbox.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- MAINTAINERS                                     |    7 +
- drivers/net/ethernet/Kconfig                    |    1 
- drivers/net/ethernet/Makefile                   |    1 
- drivers/net/ethernet/meta/Kconfig               |   30 +++
- drivers/net/ethernet/meta/Makefile              |    6 +
- drivers/net/ethernet/meta/fbnic/Makefile        |   10 +
- drivers/net/ethernet/meta/fbnic/fbnic.h         |   19 ++
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h     |    9 +
- drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h |    5 +
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c     |  201 +++++++++++++++++++++++
- 10 files changed, 289 insertions(+)
- create mode 100644 drivers/net/ethernet/meta/Kconfig
- create mode 100644 drivers/net/ethernet/meta/Makefile
- create mode 100644 drivers/net/ethernet/meta/fbnic/Makefile
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic.h
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_csr.h
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+ drivers/net/ethernet/meta/fbnic/Makefile        |    4 +
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |   27 +++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_devlink.c |   84 +++++++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |   39 +++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c     |   70 +++++++++++++++++++
+ 5 files changed, 222 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_irq.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e0f28278e504..874848085248 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14569,6 +14569,13 @@ T:	git git://linuxtv.org/media_tree.git
- F:	Documentation/devicetree/bindings/media/amlogic,gx-vdec.yaml
- F:	drivers/staging/media/meson/vdec/
- 
-+META ETHERNET DRIVERS
-+M:	Alexander Duyck <alexanderduyck@fb.com>
-+M:	Jakub Kicinski <kuba@kernel.org>
-+R:	kernel-team@meta.com
-+S:	Supported
-+F:	drivers/net/ethernet/meta/
-+
- METHODE UDPU SUPPORT
- M:	Robert Marko <robert.marko@sartura.hr>
- S:	Maintained
-diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-index 6a19b5393ed1..0baac25db4f8 100644
---- a/drivers/net/ethernet/Kconfig
-+++ b/drivers/net/ethernet/Kconfig
-@@ -122,6 +122,7 @@ source "drivers/net/ethernet/litex/Kconfig"
- source "drivers/net/ethernet/marvell/Kconfig"
- source "drivers/net/ethernet/mediatek/Kconfig"
- source "drivers/net/ethernet/mellanox/Kconfig"
-+source "drivers/net/ethernet/meta/Kconfig"
- source "drivers/net/ethernet/micrel/Kconfig"
- source "drivers/net/ethernet/microchip/Kconfig"
- source "drivers/net/ethernet/mscc/Kconfig"
-diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-index 0d872d4efcd1..c03203439c0e 100644
---- a/drivers/net/ethernet/Makefile
-+++ b/drivers/net/ethernet/Makefile
-@@ -59,6 +59,7 @@ obj-$(CONFIG_NET_VENDOR_LITEX) += litex/
- obj-$(CONFIG_NET_VENDOR_MARVELL) += marvell/
- obj-$(CONFIG_NET_VENDOR_MEDIATEK) += mediatek/
- obj-$(CONFIG_NET_VENDOR_MELLANOX) += mellanox/
-+obj-$(CONFIG_NET_VENDOR_META) += meta/
- obj-$(CONFIG_NET_VENDOR_MICREL) += micrel/
- obj-$(CONFIG_NET_VENDOR_MICROCHIP) += microchip/
- obj-$(CONFIG_NET_VENDOR_MICROSEMI) += mscc/
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-new file mode 100644
-index 000000000000..fbbc38e7e507
---- /dev/null
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -0,0 +1,30 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Meta Platforms network device configuration
-+#
-+
-+config NET_VENDOR_META
-+	bool "Meta Platforms devices"
-+	default y
-+	help
-+	  If you have a network (Ethernet) card designed by Meta, say Y.
-+	  That's Meta as in the parent company of Facebook.
-+
-+	  Note that the answer to this question doesn't directly affect the
-+	  kernel: saying N will just cause the configurator to skip all
-+	  the questions about Meta cards. If you say Y, you will be asked for
-+	  your specific card in the following questions.
-+
-+if NET_VENDOR_META
-+
-+config FBNIC
-+	tristate "Meta Platforms Host Network Interface"
-+	depends on X86_64 || COMPILE_TEST
-+	depends on PCI_MSI
-+	help
-+	  This driver supports Meta Platforms Host Network Interface.
-+
-+	  To compile this driver as a module, choose M here. The module
-+	  will be called fbnic.  MSI-X interrupt support is required.
-+
-+endif # NET_VENDOR_META
-diff --git a/drivers/net/ethernet/meta/Makefile b/drivers/net/ethernet/meta/Makefile
-new file mode 100644
-index 000000000000..88804f3de963
---- /dev/null
-+++ b/drivers/net/ethernet/meta/Makefile
-@@ -0,0 +1,6 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for the Meta Platforms network device drivers.
-+#
-+
-+obj-$(CONFIG_FBNIC) += fbnic/
 diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-new file mode 100644
-index 000000000000..ce277fec875f
---- /dev/null
+index ce277fec875f..c06041e70bc5 100644
+--- a/drivers/net/ethernet/meta/fbnic/Makefile
 +++ b/drivers/net/ethernet/meta/fbnic/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (c) Meta Platforms, Inc. and affiliates.
-+
-+#
-+# Makefile for the Meta(R) Host Network Interface
-+#
-+
-+obj-$(CONFIG_FBNIC) += fbnic.o
-+
-+fbnic-y := fbnic_pci.o
+@@ -7,4 +7,6 @@
+ 
+ obj-$(CONFIG_FBNIC) += fbnic.o
+ 
+-fbnic-y := fbnic_pci.o
++fbnic-y := fbnic_devlink.o \
++	   fbnic_irq.o \
++	   fbnic_pci.o
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-new file mode 100644
-index 000000000000..25702dab8d66
---- /dev/null
+index 25702dab8d66..db85b04e9b80 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
+@@ -6,8 +6,35 @@
+ 
+ #include "fbnic_csr.h"
+ 
++struct fbnic_dev {
++	struct device *dev;
 +
-+#ifndef _FBNIC_H_
-+#define _FBNIC_H_
++	u32 __iomem *uc_addr0;
++	u32 __iomem *uc_addr4;
++	unsigned short num_irqs;
 +
-+#include "fbnic_csr.h"
-+
-+extern char fbnic_driver_name[];
-+
-+enum fbnic_boards {
-+	fbnic_board_asic
++	u64 dsn;
 +};
 +
-+struct fbnic_info {
-+	unsigned int bar_mask;
++/* Reserve entry 0 in the MSI-X "others" array until we have filled all
++ * 32 of the possible interrupt slots. By doing this we can avoid any
++ * potential conflicts should we need to enable one of the debug interrupt
++ * causes later.
++ */
++enum {
++	FBNIC_NON_NAPI_VECTORS
 +};
 +
-+#endif /* _FBNIC_H_ */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+ extern char fbnic_driver_name[];
+ 
++void fbnic_devlink_free(struct fbnic_dev *fbd);
++struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev);
++void fbnic_devlink_register(struct fbnic_dev *fbd);
++void fbnic_devlink_unregister(struct fbnic_dev *fbd);
++
++void fbnic_free_irqs(struct fbnic_dev *fbd);
++int fbnic_alloc_irqs(struct fbnic_dev *fbd);
++
+ enum fbnic_boards {
+ 	fbnic_board_asic
+ };
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
 new file mode 100644
-index 000000000000..72e89c07bf54
+index 000000000000..91e8135410df
 --- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -0,0 +1,9 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#ifndef _FBNIC_CSR_H_
-+#define _FBNIC_CSR_H_
-+
-+#define PCI_DEVICE_ID_META_FBNIC_ASIC		0x0013
-+
-+#endif /* _FBNIC_CSR_H_ */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h b/drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h
-new file mode 100644
-index 000000000000..809ba6729442
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_drvinfo.h
-@@ -0,0 +1,5 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#define DRV_NAME "fbnic"
-+#define DRV_SUMMARY "Meta(R) Host Network Interface Driver"
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-new file mode 100644
-index 000000000000..aff031e74344
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -0,0 +1,201 @@
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -0,0 +1,84 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Copyright (c) Meta Platforms, Inc. and affiliates. */
 +
-+#include <linux/init.h>
-+#include <linux/module.h>
++#include <asm/unaligned.h>
++#include <linux/pci.h>
++#include <linux/types.h>
++#include <net/devlink.h>
++
++#include "fbnic.h"
++
++#define FBNIC_SN_STR_LEN	24
++
++static int fbnic_devlink_info_get(struct devlink *devlink,
++				  struct devlink_info_req *req,
++				  struct netlink_ext_ack *extack)
++{
++	struct fbnic_dev *fbd = devlink_priv(devlink);
++	int err;
++
++	if (fbd->dsn) {
++		unsigned char serial[FBNIC_SN_STR_LEN];
++		u8 dsn[8];
++
++		put_unaligned_be64(fbd->dsn, dsn);
++		err = snprintf(serial, FBNIC_SN_STR_LEN, "%8phD", dsn);
++		if (err < 0)
++			return err;
++
++		err = devlink_info_serial_number_put(req, serial);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static const struct devlink_ops fbnic_devlink_ops = {
++	.info_get = fbnic_devlink_info_get,
++};
++
++void fbnic_devlink_free(struct fbnic_dev *fbd)
++{
++	struct devlink *devlink = priv_to_devlink(fbd);
++
++	devlink_free(devlink);
++}
++
++struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev)
++{
++	void __iomem * const *iomap_table;
++	struct devlink *devlink;
++	struct fbnic_dev *fbd;
++
++	devlink = devlink_alloc(&fbnic_devlink_ops, sizeof(struct fbnic_dev),
++				&pdev->dev);
++	if (!devlink)
++		return NULL;
++
++	fbd = devlink_priv(devlink);
++	pci_set_drvdata(pdev, fbd);
++	fbd->dev = &pdev->dev;
++
++	iomap_table = pcim_iomap_table(pdev);
++	fbd->uc_addr0 = iomap_table[0];
++	fbd->uc_addr4 = iomap_table[4];
++
++	fbd->dsn = pci_get_dsn(pdev);
++
++	return fbd;
++}
++
++void fbnic_devlink_register(struct fbnic_dev *fbd)
++{
++	struct devlink *devlink = priv_to_devlink(fbd);
++
++	devlink_register(devlink);
++}
++
++void fbnic_devlink_unregister(struct fbnic_dev *fbd)
++{
++	struct devlink *devlink = priv_to_devlink(fbd);
++
++	devlink_unregister(devlink);
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+new file mode 100644
+index 000000000000..7d1475750b64
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+@@ -0,0 +1,39 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
 +#include <linux/pci.h>
 +#include <linux/types.h>
 +
 +#include "fbnic.h"
-+#include "fbnic_drvinfo.h"
 +
-+char fbnic_driver_name[] = DRV_NAME;
-+
-+MODULE_DESCRIPTION(DRV_SUMMARY);
-+MODULE_LICENSE("GPL");
-+
-+static const struct fbnic_info fbnic_asic_info = {
-+	.bar_mask = BIT(0) | BIT(4)
-+};
-+
-+static const struct fbnic_info *fbnic_info_tbl[] = {
-+	[fbnic_board_asic] = &fbnic_asic_info,
-+};
-+
-+static const struct pci_device_id fbnic_pci_tbl[] = {
-+	{ PCI_DEVICE_DATA(META, FBNIC_ASIC, fbnic_board_asic) },
-+	/* Required last entry */
-+	{0, }
-+};
-+MODULE_DEVICE_TABLE(pci, fbnic_pci_tbl);
-+
-+/**
-+ * fbnic_probe - Device Initialization Routine
-+ * @pdev: PCI device information struct
-+ * @ent: entry in fbnic_pci_tbl
-+ *
-+ * Initializes a PCI device identified by a pci_dev structure.
-+ * The OS initialization, configuring of the adapter private structure,
-+ * and a hardware reset occur.
-+ *
-+ * Return: 0 on success, negative on failure
-+ **/
-+static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++void fbnic_free_irqs(struct fbnic_dev *fbd)
 +{
-+	const struct fbnic_info *info = fbnic_info_tbl[ent->driver_data];
-+	int err;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
 +
-+	if (pdev->error_state != pci_channel_io_normal) {
-+		dev_err(&pdev->dev,
-+			"PCI device still in an error state. Unable to load...\n");
-+		return -EIO;
++	fbd->num_irqs = 0;
++
++	pci_free_irq_vectors(pdev);
++}
++
++int fbnic_alloc_irqs(struct fbnic_dev *fbd)
++{
++	unsigned int wanted_irqs = FBNIC_NON_NAPI_VECTORS;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
++	int num_irqs;
++
++	wanted_irqs += 1;
++	num_irqs = pci_alloc_irq_vectors(pdev, FBNIC_NON_NAPI_VECTORS + 1,
++					 wanted_irqs, PCI_IRQ_MSIX);
++	if (num_irqs < 0) {
++		dev_err(fbd->dev, "Failed to allocate MSI-X entries\n");
++		return num_irqs;
 +	}
 +
-+	err = pcim_enable_device(pdev);
-+	if (err) {
-+		dev_err(&pdev->dev, "PCI enable device failed: %d\n", err);
-+		return err;
-+	}
++	if (num_irqs < wanted_irqs)
++		dev_warn(fbd->dev, "Allocated %d IRQs, expected %d\n",
++			 num_irqs, wanted_irqs);
 +
-+	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(46));
-+	if (err)
-+		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+	if (err) {
-+		dev_err(&pdev->dev, "DMA configuration failed: %d\n", err);
-+		return err;
-+	}
-+
-+	err = pcim_iomap_regions(pdev, info->bar_mask, fbnic_driver_name);
-+	if (err) {
-+		dev_err(&pdev->dev,
-+			"pci_request_selected_regions failed: %d\n", err);
-+		return err;
-+	}
-+
-+	pci_set_master(pdev);
-+	pci_save_state(pdev);
++	fbd->num_irqs = num_irqs;
 +
 +	return 0;
 +}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index aff031e74344..fffe8a7cc96e 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -43,6 +43,7 @@ MODULE_DEVICE_TABLE(pci, fbnic_pci_tbl);
+ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
+ 	const struct fbnic_info *info = fbnic_info_tbl[ent->driver_data];
++	struct fbnic_dev *fbd;
+ 	int err;
+ 
+ 	if (pdev->error_state != pci_channel_io_normal) {
+@@ -72,10 +73,39 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		return err;
+ 	}
+ 
++	fbd = fbnic_devlink_alloc(pdev);
++	if (!fbd) {
++		dev_err(&pdev->dev, "Devlink allocation failed\n");
++		return -ENOMEM;
++	}
 +
-+/**
-+ * fbnic_remove - Device Removal Routine
-+ * @pdev: PCI device information struct
-+ *
-+ * Called by the PCI subsystem to alert the driver that it should release
-+ * a PCI device.  The could be caused by a Hot-Plug event, or because the
-+ * driver is going to be removed from memory.
-+ **/
-+static void fbnic_remove(struct pci_dev *pdev)
-+{
+ 	pci_set_master(pdev);
+ 	pci_save_state(pdev);
+ 
++	err = fbnic_alloc_irqs(fbd);
++	if (err)
++		goto free_fbd;
++
++	fbnic_devlink_register(fbd);
++
++	if (!fbd->dsn) {
++		dev_warn(&pdev->dev, "Reading serial number failed\n");
++		goto init_failure_mode;
++	}
++
+ 	return 0;
++
++init_failure_mode:
++	dev_warn(&pdev->dev, "Probe error encountered, entering init failure mode. Normal networking functionality will not be available.\n");
++	 /* Always return 0 even on error so devlink is registered to allow
++	  * firmware updates for fixes.
++	  */
++	return 0;
++free_fbd:
 +	pci_disable_device(pdev);
-+}
-+
-+static int fbnic_pm_suspend(struct device *dev)
-+{
-+	return 0;
-+}
-+
-+static int __fbnic_pm_resume(struct device *dev)
-+{
-+	return 0;
-+}
-+
-+static int __maybe_unused fbnic_pm_resume(struct device *dev)
-+{
-+	int err;
-+
-+	err = __fbnic_pm_resume(dev);
++	fbnic_devlink_free(fbd);
 +
 +	return err;
-+}
+ }
+ 
+ /**
+@@ -88,17 +118,50 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+  **/
+ static void fbnic_remove(struct pci_dev *pdev)
+ {
++	struct fbnic_dev *fbd = pci_get_drvdata(pdev);
 +
-+static const struct dev_pm_ops fbnic_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(fbnic_pm_suspend, fbnic_pm_resume)
-+};
++	fbnic_devlink_unregister(fbd);
++	fbnic_free_irqs(fbd);
 +
-+static void fbnic_shutdown(struct pci_dev *pdev)
-+{
-+	fbnic_pm_suspend(&pdev->dev);
-+}
+ 	pci_disable_device(pdev);
++	fbnic_devlink_free(fbd);
+ }
+ 
+ static int fbnic_pm_suspend(struct device *dev)
+ {
++	struct fbnic_dev *fbd = dev_get_drvdata(dev);
 +
-+static pci_ers_result_t fbnic_err_error_detected(struct pci_dev *pdev,
-+						 pci_channel_state_t state)
-+{
-+	/* Disconnect device if failure is not recoverable via reset */
-+	if (state == pci_channel_io_perm_failure)
-+		return PCI_ERS_RESULT_DISCONNECT;
++	/* Free the IRQs so they aren't trying to occupy sleeping CPUs */
++	fbnic_free_irqs(fbd);
 +
-+	fbnic_pm_suspend(&pdev->dev);
++	/* Hardware is about to go away, so switch off MMIO access internally */
++	WRITE_ONCE(fbd->uc_addr0, NULL);
++	WRITE_ONCE(fbd->uc_addr4, NULL);
 +
-+	/* Request a slot reset */
-+	return PCI_ERS_RESULT_NEED_RESET;
-+}
-+
-+static pci_ers_result_t fbnic_err_slot_reset(struct pci_dev *pdev)
-+{
-+	pci_set_power_state(pdev, PCI_D0);
-+	pci_restore_state(pdev);
-+	pci_save_state(pdev);
-+
-+	if (pci_enable_device_mem(pdev)) {
-+		dev_err(&pdev->dev,
-+			"Cannot re-enable PCI device after reset.\n");
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	return PCI_ERS_RESULT_RECOVERED;
-+}
-+
-+static void fbnic_err_resume(struct pci_dev *pdev)
-+{
-+}
-+
-+static const struct pci_error_handlers fbnic_err_handler = {
-+	.error_detected	= fbnic_err_error_detected,
-+	.slot_reset	= fbnic_err_slot_reset,
-+	.resume		= fbnic_err_resume,
-+};
-+
-+static struct pci_driver fbnic_driver = {
-+	.name		= fbnic_driver_name,
-+	.id_table	= fbnic_pci_tbl,
-+	.probe		= fbnic_probe,
-+	.remove		= fbnic_remove,
-+	.driver.pm	= &fbnic_pm_ops,
-+	.shutdown	= fbnic_shutdown,
-+	.err_handler	= &fbnic_err_handler,
-+};
-+
-+/**
-+ * fbnic_init_module - Driver Registration Routine
-+ *
-+ * The first routine called when the driver is loaded.  All it does is
-+ * register with the PCI subsystem.
-+ *
-+ * Return: 0 on success, negative on failure
-+ **/
-+static int __init fbnic_init_module(void)
-+{
+ 	return 0;
+ }
+ 
+ static int __fbnic_pm_resume(struct device *dev)
+ {
++	struct fbnic_dev *fbd = dev_get_drvdata(dev);
++	void __iomem * const *iomap_table;
 +	int err;
 +
-+	err = pci_register_driver(&fbnic_driver);
++	/* Restore MMIO access */
++	iomap_table = pcim_iomap_table(to_pci_dev(dev));
++	fbd->uc_addr0 = iomap_table[0];
++	fbd->uc_addr4 = iomap_table[4];
++
++	/* Rerequest the IRQs */
++	err = fbnic_alloc_irqs(fbd);
 +	if (err)
-+		goto out;
++		goto err_invalidate_uc_addr;
 +
-+	pr_info(DRV_SUMMARY " (%s)", fbnic_driver.name);
-+out:
+ 	return 0;
++err_invalidate_uc_addr:
++	WRITE_ONCE(fbd->uc_addr0, NULL);
++	WRITE_ONCE(fbd->uc_addr4, NULL);
 +	return err;
-+}
-+module_init(fbnic_init_module);
+ }
+ 
+ static int __maybe_unused fbnic_pm_resume(struct device *dev)
+@@ -134,6 +197,8 @@ static pci_ers_result_t fbnic_err_error_detected(struct pci_dev *pdev,
+ 
+ static pci_ers_result_t fbnic_err_slot_reset(struct pci_dev *pdev)
+ {
++	int err;
 +
-+/**
-+ * fbnic_exit_module - Driver Exit Cleanup Routine
-+ *
-+ * Called just before the driver is removed from memory.
-+ **/
-+static void __exit fbnic_exit_module(void)
-+{
-+	pci_unregister_driver(&fbnic_driver);
-+}
-+module_exit(fbnic_exit_module);
+ 	pci_set_power_state(pdev, PCI_D0);
+ 	pci_restore_state(pdev);
+ 	pci_save_state(pdev);
+@@ -144,7 +209,10 @@ static pci_ers_result_t fbnic_err_slot_reset(struct pci_dev *pdev)
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
+ 
+-	return PCI_ERS_RESULT_RECOVERED;
++	/* Restore device to previous state */
++	err = __fbnic_pm_resume(&pdev->dev);
++
++	return err ? PCI_ERS_RESULT_DISCONNECT : PCI_ERS_RESULT_RECOVERED;
+ }
+ 
+ static void fbnic_err_resume(struct pci_dev *pdev)
 
 
 
