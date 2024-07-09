@@ -1,206 +1,184 @@
-Return-Path: <netdev+bounces-110062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E7E92AC67
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 01:08:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B2392ACDE
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2E15282BE7
-	for <lists+netdev@lfdr.de>; Mon,  8 Jul 2024 23:08:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D73B61C20B05
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542E81527B8;
-	Mon,  8 Jul 2024 23:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ED5195;
+	Tue,  9 Jul 2024 00:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BV6r4vkO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AoS4ft1p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB701514F6;
-	Mon,  8 Jul 2024 23:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9872BAE3
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 00:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720480082; cv=none; b=RyvYe8NUlWBWJmTp1kVQ+OS/FyR9CzV0gERpSBwBgU+mzxSY8IJIe9HFlIQnO4u93flUfG26OAfCQWXCC3pbjSL6exqUmKi98DZD2YsIehz56LP0G0199C5hN+UB+IcVhv8MKXCVUibVZn8k8uu2MTFn9XwitfBqYPJrosQzfC8=
+	t=1720483453; cv=none; b=ZW16CGo8x1YbsKyW49VUCKPQClPr/qEU9kUm5lksRmgkj06IazUiSRlrJ5YCNpubY6J4ap3vWG+LynjDosMHoxycuQE2T/uw/EWsF8j/gXGO9Q7Lp3m6iBGLNtqZoXx+d9lycsLcNKLLCdfKH15fYLJYkp1A70OLXxQeMUB8+cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720480082; c=relaxed/simple;
-	bh=sQxv7teCO1hbAAxVG0Cg2IVIt2j1aE8dnopocu70pcQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bUQT1YEmivcIkTU0wiQRnwpi4WlUEFC8URcYspzyuJF+XUM6niA6ZZoDQtcXpVT4PiClc/12jo6Wq0lQXNPW6MhUgj75E4PifPHMvYIicb5A6znovaD8Ra9Njr73y5e5QUN9ZIdv1JDIO15nO3WB2s+zVLtSvZAzCplH89mLN6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BV6r4vkO; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720480080; x=1752016080;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=sQxv7teCO1hbAAxVG0Cg2IVIt2j1aE8dnopocu70pcQ=;
-  b=BV6r4vkOOfgW1ie0J9nQ2EVTXys0jR+gWX1ydRDuzR8ysguS/6vdUH29
-   R2nPrWb++1R45K1DJ4scB59E9Z/PWWN4RBEMDcU+I4bJnrPkocKyir4Wh
-   sp506oWHcU6hc90tRAta9pPtwjPKmQ0bGOXuj3ktuxBBgmyIpixAfe5AH
-   RZoUwvhOLKSPtK/07hoPpoa1SMm82pLpAicAQzJCy/3VWQ1zL2Fi1N7m+
-   WxGVFksmFabntm3laoRZnYI20krqMXRFKhoZIqiPMnbeLA3p4SnJ2GIyv
-   vslScYLmSuHjr12YhPHAHm0jtQX9QW15R+KnNHnDDQfPQotmJZY+JOOwX
-   A==;
-X-CSE-ConnectionGUID: +Q1H78u+SM6NxMYpJR8OAw==
-X-CSE-MsgGUID: nXPZUtRkR6yPeWS7Ug4nsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11127"; a="17540093"
-X-IronPort-AV: E=Sophos;i="6.09,193,1716274800"; 
-   d="scan'208";a="17540093"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2024 16:08:00 -0700
-X-CSE-ConnectionGUID: oeg7xK9wR4uTwqtl8Bh/pw==
-X-CSE-MsgGUID: NCjnMFRyTlSv4tHkNu4xQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,193,1716274800"; 
-   d="scan'208";a="85189019"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 08 Jul 2024 16:07:59 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Michal Kubiak <michal.kubiak@intel.com>,
-	anthony.l.nguyen@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net] i40e: Fix XDP program unloading while removing the driver
-Date: Mon,  8 Jul 2024 16:07:49 -0700
-Message-ID: <20240708230750.625986-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1720483453; c=relaxed/simple;
+	bh=D1T3vzfM90DlsQPTel3t1UsNl07+U2CyLWc2quFay6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jmMrI8ZgV1HWUevYOqLMAGFoiJka2dS8iznlZ+EMI3ZWQaRI5s3GwKRkCwbVgiVjj5b/Q0L/nJxh7UE7nMl/BpNp7G2Gev/fsvEcBOfS0vneJpeHZY1mAXY3iDOwbRHUIEEKzu6jtrzUjZqtKFYb3F9G79pKfZLinCo/uIizZZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AoS4ft1p; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: bigeasy@linutronix.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1720483449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+vJ/5Uao0pdtVebeKV6kCXGjNtbGqBZuoy052SVeswE=;
+	b=AoS4ft1pm0N+3AVfcq1YPYQdqb8WJESmIUQt/ITtKa71LugBFglvFcAg72ArssQwqm3izw
+	b3CAqUG8MUy71BjltEyaB70vKCSU90XNoRs8s4gm4VONUscyfx4/xdpeL7D+t9GQc0+hQS
+	hPSQHTIqXE+aZ9VyzyCTpJMDoXjoswE=
+X-Envelope-To: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: bpf@vger.kernel.org
+X-Envelope-To: andrii@kernel.org
+X-Envelope-To: ast@kernel.org
+X-Envelope-To: daniel@iogearbox.net
+X-Envelope-To: davem@davemloft.net
+X-Envelope-To: dsahern@kernel.org
+X-Envelope-To: eddyz87@gmail.com
+X-Envelope-To: edumazet@google.com
+X-Envelope-To: haoluo@google.com
+X-Envelope-To: john.fastabend@gmail.com
+X-Envelope-To: jolsa@kernel.org
+X-Envelope-To: kpsingh@kernel.org
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: pabeni@redhat.com
+X-Envelope-To: sdf@fomichev.me
+X-Envelope-To: sdf@google.com
+X-Envelope-To: song@kernel.org
+X-Envelope-To: syzkaller-bugs@googlegroups.com
+X-Envelope-To: yonghong.song@linux.dev
+X-Envelope-To: tglx@linutronix.de
+Message-ID: <82c77e30-6e9d-44c3-bdcd-7da17654fa81@linux.dev>
+Date: Mon, 8 Jul 2024 17:03:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] seg6: Ensure that seg6_bpf_srh_states can only
+ be accessed from input_action_end_bpf()
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: syzbot <syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ dsahern@kernel.org, eddyz87@gmail.com, edumazet@google.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, pabeni@redhat.com, sdf@fomichev.me,
+ sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
+ yonghong.song@linux.dev, Thomas Gleixner <tglx@linutronix.de>
+References: <000000000000571681061bb9b5ad@google.com>
+ <20240705104133.NU9AwKDS@linutronix.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240705104133.NU9AwKDS@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Michal Kubiak <michal.kubiak@intel.com>
+On 7/5/24 3:41 AM, Sebastian Andrzej Siewior wrote:
+> Initially I assumed that the per-CPU variable is `seg6_bpf_srh_states'
+> is first initialized in input_action_end_bpf() and then accessed during
+> the bpf_prog_run_save_cb() invocation by the eBPF via the BPF callbacks.
+> syzbot demonstrated that is possible to invoke the BPF callbacks (and
+> access `seg6_bpf_srh_states') without entering input_action_end_bpf()
+> first.
+> 
+> The valid path via input_action_end_bpf() is invoked within NAPI
+> context which means it has bpf_net_context set. This can be used to
+> identify the "valid" calling path.
+> 
+> Set in input_action_end_bpf() the BPF_RI_F_SEG6_STATE bit to signal the
+> valid calling path and clear it at the end. Check for the context and
+> the bit in bpf_lwt_seg6.*() and abort if missing.
+> 
+> Reported-by: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
+> Fixes: d1542d4ae4dfd ("seg6: Use nested-BH locking for seg6_bpf_srh_states.")
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>   include/linux/filter.h | 24 ++++++++++++++++++++++++
+>   net/core/filter.c      |  6 ++++++
+>   net/ipv6/seg6_local.c  |  3 +++
+>   3 files changed, 33 insertions(+)
+> 
+> diff --git a/include/linux/filter.h b/include/linux/filter.h
+> index 0bbd2585e6def..cadddb25ff4db 100644
+> --- a/include/linux/filter.h
+> +++ b/include/linux/filter.h
+> @@ -739,6 +739,7 @@ struct bpf_nh_params {
+>   #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
+>   #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
+>   #define BPF_RI_F_XSK_MAP_INIT	BIT(4)
+> +#define BPF_RI_F_SEG6_STATE	BIT(5)
+>   
+>   struct bpf_redirect_info {
+>   	u64 tgt_index;
+> @@ -856,6 +857,29 @@ static inline void bpf_net_ctx_get_all_used_flush_lists(struct list_head **lh_ma
+>   		*lh_xsk = lh;
+>   }
+>   
+> +static inline bool bpf_net_ctx_seg6_state_avail(void)
+> +{
+> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> +
+> +	if (!bpf_net_ctx)
+> +		return false;
+> +	return bpf_net_ctx->ri.kern_flags & BPF_RI_F_SEG6_STATE;
+> +}
+> +
+> +static inline void bpf_net_ctx_seg6_state_set(void)
+> +{
+> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> +
+> +	bpf_net_ctx->ri.kern_flags |= BPF_RI_F_SEG6_STATE;
+> +}
+> +
+> +static inline void bpf_net_ctx_seg6_state_clr(void)
+> +{
+> +	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> +
+> +	bpf_net_ctx->ri.kern_flags &= ~BPF_RI_F_SEG6_STATE;
+> +}
+> +
+>   /* Compute the linear packet data range [data, data_end) which
+>    * will be accessed by various program types (cls_bpf, act_bpf,
+>    * lwt, ...). Subsystems allowing direct data access must (!)
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 403d23faf22e1..ea5bc4a4a6a23 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -6459,6 +6459,8 @@ BPF_CALL_4(bpf_lwt_seg6_store_bytes, struct sk_buff *, skb, u32, offset,
+>   	void *srh_tlvs, *srh_end, *ptr;
+>   	int srhoff = 0;
+>   
+> +	if (!bpf_net_ctx_seg6_state_avail())
+> +		return -EINVAL;
 
-The commit 6533e558c650 ("i40e: Fix reset path while removing
-the driver") introduced a new PF state "__I40E_IN_REMOVE" to block
-modifying the XDP program while the driver is being removed.
-Unfortunately, such a change is useful only if the ".ndo_bpf()"
-callback was called out of the rmmod context because unloading the
-existing XDP program is also a part of driver removing procedure.
-In other words, from the rmmod context the driver is expected to
-unload the XDP program without reporting any errors. Otherwise,
-the kernel warning with callstack is printed out to dmesg.
+The syzbot stack shows that the seg6local bpf_prog can be run by test_run like: 
+bpf_prog_test_run_skb() => bpf_test_run(). "return -EINVAL;" will reject and 
+break the existing bpf prog doing test with test_run.
 
-Example failing scenario:
- 1. Load the i40e driver.
- 2. Load the XDP program.
- 3. Unload the i40e driver (using "rmmod" command).
+bpf_test_run() has already done the local_bh_disable() and bpf_net_ctx_set(). 
+How about doing the local_[un]lock_nested_bh(&seg6_bpf_srh_states.bh_lock) in 
+bpf_test_run() when the prog->type == BPF_PROG_TYPE_LWT_SEG6LOCAL?
 
-The example kernel warning log:
-
-[  +0.004646] WARNING: CPU: 94 PID: 10395 at net/core/dev.c:9290 unregister_netdevice_many_notify+0x7a9/0x870
-[...]
-[  +0.010959] RIP: 0010:unregister_netdevice_many_notify+0x7a9/0x870
-[...]
-[  +0.002726] Call Trace:
-[  +0.002457]  <TASK>
-[  +0.002119]  ? __warn+0x80/0x120
-[  +0.003245]  ? unregister_netdevice_many_notify+0x7a9/0x870
-[  +0.005586]  ? report_bug+0x164/0x190
-[  +0.003678]  ? handle_bug+0x3c/0x80
-[  +0.003503]  ? exc_invalid_op+0x17/0x70
-[  +0.003846]  ? asm_exc_invalid_op+0x1a/0x20
-[  +0.004200]  ? unregister_netdevice_many_notify+0x7a9/0x870
-[  +0.005579]  ? unregister_netdevice_many_notify+0x3cc/0x870
-[  +0.005586]  unregister_netdevice_queue+0xf7/0x140
-[  +0.004806]  unregister_netdev+0x1c/0x30
-[  +0.003933]  i40e_vsi_release+0x87/0x2f0 [i40e]
-[  +0.004604]  i40e_remove+0x1a1/0x420 [i40e]
-[  +0.004220]  pci_device_remove+0x3f/0xb0
-[  +0.003943]  device_release_driver_internal+0x19f/0x200
-[  +0.005243]  driver_detach+0x48/0x90
-[  +0.003586]  bus_remove_driver+0x6d/0xf0
-[  +0.003939]  pci_unregister_driver+0x2e/0xb0
-[  +0.004278]  i40e_exit_module+0x10/0x5f0 [i40e]
-[  +0.004570]  __do_sys_delete_module.isra.0+0x197/0x310
-[  +0.005153]  do_syscall_64+0x85/0x170
-[  +0.003684]  ? syscall_exit_to_user_mode+0x69/0x220
-[  +0.004886]  ? do_syscall_64+0x95/0x170
-[  +0.003851]  ? exc_page_fault+0x7e/0x180
-[  +0.003932]  entry_SYSCALL_64_after_hwframe+0x71/0x79
-[  +0.005064] RIP: 0033:0x7f59dc9347cb
-[  +0.003648] Code: 73 01 c3 48 8b 0d 65 16 0c 00 f7 d8 64 89 01 48 83
-c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f
-05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 35 16 0c 00 f7 d8 64 89 01 48
-[  +0.018753] RSP: 002b:00007ffffac99048 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-[  +0.007577] RAX: ffffffffffffffda RBX: 0000559b9bb2f6e0 RCX: 00007f59dc9347cb
-[  +0.007140] RDX: 0000000000000000 RSI: 0000000000000800 RDI: 0000559b9bb2f748
-[  +0.007146] RBP: 00007ffffac99070 R08: 1999999999999999 R09: 0000000000000000
-[  +0.007133] R10: 00007f59dc9a5ac0 R11: 0000000000000206 R12: 0000000000000000
-[  +0.007141] R13: 00007ffffac992d8 R14: 0000559b9bb2f6e0 R15: 0000000000000000
-[  +0.007151]  </TASK>
-[  +0.002204] ---[ end trace 0000000000000000 ]---
-
-Fix this by checking if the XDP program is being loaded or unloaded.
-Then, block only loading a new program while "__I40E_IN_REMOVE" is set.
-Also, move testing "__I40E_IN_REMOVE" flag to the beginning of XDP_SETUP
-callback to avoid unnecessary operations and checks.
-
-Fixes: 6533e558c650 ("i40e: Fix reset path while removing the driver")
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
-Originally from: https://lore.kernel.org/netdev/20240611184239.1518418-2-anthony.l.nguyen@intel.com/#t
-
-Changes:
-- simplify the fix according to Kuba's suggestions, i.e. remove
-  checking 'NETREG_UNREGISTERING' flag directly from ndo_bpf
-  and remove a separate handling for 'unregister' context.
-- update the commit message accordingly
-- add an example of the kernel warning for the issue being fixed.
-
- drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 284c3fad5a6e..310513d9321b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -13293,6 +13293,10 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 	bool need_reset;
- 	int i;
- 
-+	/* VSI shall be deleted in a moment, block loading new programs */
-+	if (prog && test_bit(__I40E_IN_REMOVE, pf->state))
-+		return -EINVAL;
-+
- 	/* Don't allow frames that span over multiple buffers */
- 	if (vsi->netdev->mtu > frame_size - I40E_PACKET_HDR_PAD) {
- 		NL_SET_ERR_MSG_MOD(extack, "MTU too large for linear frames and XDP prog does not support frags");
-@@ -13301,14 +13305,9 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
- 
- 	/* When turning XDP on->off/off->on we reset and rebuild the rings. */
- 	need_reset = (i40e_enabled_xdp_vsi(vsi) != !!prog);
--
- 	if (need_reset)
- 		i40e_prep_for_reset(pf);
- 
--	/* VSI shall be deleted in a moment, just return EINVAL */
--	if (test_bit(__I40E_IN_REMOVE, pf->state))
--		return -EINVAL;
--
- 	old_prog = xchg(&vsi->xdp_prog, prog);
- 
- 	if (need_reset) {
--- 
-2.41.0
+pw-bot: cr
 
 
