@@ -1,89 +1,247 @@
-Return-Path: <netdev+bounces-110330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA0592BECC
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:52:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9CA592BEDA
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCA981C21AB6
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:52:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED5731C21B9B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EF719CCEF;
-	Tue,  9 Jul 2024 15:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADE019D889;
+	Tue,  9 Jul 2024 15:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ft/++sUM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9iv6GQE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A97015C9;
-	Tue,  9 Jul 2024 15:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F9D19CCEF;
+	Tue,  9 Jul 2024 15:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720540327; cv=none; b=Rpw5a7Nm5wLxMySvzthhwotHNPdoH3UmTqDA9ySo+WP8t3YfblRUGiIuC6NkGNS+aJ6luurXo9LdF9Z/SseuX7DVYk7UFuPcExAZjRpioHGWIR+nGVNIuXunlvxfID+5i7cb/Coihech2N3rn1Gk2W2BFuB5W0QnlYbdMUiXMjI=
+	t=1720540405; cv=none; b=eZL19t8cxxcU4XcW7CvhXzse4tr6KrZ9x3kFcbpQtMklSmlzqBBbyBdaO/0/eHs0SjR6vb5J2jYzljrTE+Y8w4HWsuZLGRViHonTKutbjTe/6vooC3aDJ1djkOYzRDFDdyVpEm0afBGwRcCetuQtitUwwPHw4ioUzjpszvyaHmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720540327; c=relaxed/simple;
-	bh=PezZkk89/XVZldgPdH43PX9xhp3+ZRAaKkQqpa+Q9VY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=feo9fQiGqYijZE4ekulPkXk4OxBqqnf/VAvPedbSrOAvYAB8M3HuoJvNwQAZ8Vz4v14qdgZVtk+41mV+fn/K7f5LqkpricdQSwipZSyXxNQe2vrgzQvtjiXGdtD1lPrnLsRyn4WP82X9zeWlfM9Q6MHXBO2we22up25rJ0kD9DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ft/++sUM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB90C4AF07;
-	Tue,  9 Jul 2024 15:52:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720540327;
-	bh=PezZkk89/XVZldgPdH43PX9xhp3+ZRAaKkQqpa+Q9VY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ft/++sUMgRk/zE5Ct8La4GzHH0t9d/O5CNCvqSR3KmVj679Uxb7tb5r9D0TUaNgNR
-	 2Ce5R+Htivyp7lX0LFW1LwSD+0fi7Dns/4eGK6brxXKwsafPlf1YCf+agGTxJOwVwx
-	 Mu7GOcYm1tXX7FC+vDKXargibhH4qkRBjPOojAuAutn4u+5iiAsCtxroyg5CD12O9L
-	 y0MHxByXRN8lkzchYO0TVvvLQJGV23NaTigSyaOCoxqStrtAquHLM8lfHqq1wwcy58
-	 z1KZOCydKSysKhuCTvoO8emLxtRpvLdpF+WZWVzpNUec6loC7KdZ2jfc18YT/OVq8c
-	 tFMNHaUe3mPbw==
-Date: Tue, 9 Jul 2024 08:52:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
- thomas.petazzoni@bootlin.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: ethtool: pse-pd: Fix possible null-deref
-Message-ID: <20240709085205.0fa41f8f@kernel.org>
-In-Reply-To: <20240709164305.695e5612@kmaincent-XPS-13-7390>
-References: <20240709131201.166421-1-kory.maincent@bootlin.com>
-	<20240709071846.7b113db7@kernel.org>
-	<20240709164305.695e5612@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1720540405; c=relaxed/simple;
+	bh=SKSlJoE4caZrBNWB9BQBC1IdudklWV8ccmjKdXCVS+g=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pFqeMIMa36Sw3VEXJabik4JZ7MedNmEyCMzhE9j4iOxIsJsPjPOovUP45xzLzz79ZIbUw9K05aN/MNQbQRkkBpDG70zfKpcyrScttrufKCVorja440uXRYlllSXMy+LEFA5ozdiS5Gqt2TaW7FBeHKD9UHnzBiqRmKPgO3zq2+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B9iv6GQE; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6b5f3348f05so23303566d6.0;
+        Tue, 09 Jul 2024 08:53:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720540403; x=1721145203; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qWnAKMwNVbrEF4g9KJLYzg7AqLAcv1Oom2u6uWGj45M=;
+        b=B9iv6GQEBQEn4BqiAGkb4X5dg5C8a9lyuLuC3DXpbJIKPw0nGMNOVKIvMv+lKukQUA
+         xVUrEY0MZ9pP+eLENlaoQmH4wlFfG8l3f1kLXcq3ZIDM7SYfuFtIrUHNLkyuRzKhhdHw
+         zJgn8gPe1iYuusbouMxqo41+RrrkT6KcYrDXw6yXupW5ycNReTtAP8WLWN6aeTQTBCej
+         gOn2x/r/x1+Ku3RYsHLdTntCsF21yWrHYmc6qKerKcjGVX/6Rzm8ucoYnZeodsTWomNS
+         YiotUVhbYII85vmFvXkWp05rG/8+WIgIR2g+gW66ZTf4T+PhEnTgec6/wxWSMXt9UQEh
+         9Plw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720540403; x=1721145203;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qWnAKMwNVbrEF4g9KJLYzg7AqLAcv1Oom2u6uWGj45M=;
+        b=vE+qDIrRH/xnMpOgKk0c2vJ/Cvvn/xCLSbnxAfpP4feJh95cCCEeo1eHKIfQmatejH
+         +6yJS9zaRaYyxUe+Ywwi+iw+jZ7A+coq+0P6ZSE78ntUthdAeMqSJBJjBsIRdWru/4J8
+         x4Vtm8n/oC6FefobCE7muO8hCbhj41H4TwaVMtOdnC4XCqIlb3bG4pHo6yEIt3EYQTR0
+         WdnTrwHncitNFyVOb1FwAylVddBBScnzAY+an6DYtdqE+9wGqdItQ5WwqrEQHf7pYza2
+         75dU4fKis7WKDeUt6mv/HCr80IG4cjUHMgCbGr8E6wAb9RQgW1yXR6GB01jYHs1r/cOD
+         gWOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOmueW46cK27QCyBIqYfskSsl437PXg+A2h/+GN64BRVgZ5fXXZK+rIleDkp9UAwo8MrgnrxWR1mzde1YPkPQK6J/Gu39YC6ZVZF0QWocwaXNHfrCiMeX9oXJTcE7Z7Zt66brQ8Yd/bkH+Xr77i1FMiXhiQsgqQZRF
+X-Gm-Message-State: AOJu0YxBUmrXskJkoVVNmxc3XCgySwuqII5HW3bS1T3NEc6tCYzkL7y4
+	2x6QXkOhi0TLOts5f8J1u5ykLARgBJ0/ulwJP559T69rOoHJLAvm
+X-Google-Smtp-Source: AGHT+IFWBPefgvh3ow4GfzEOH9QSIJyF1g+c0ssiefWaA/3s0uMkYOmWOYkqHCVrpMuylMX7YlGrAw==
+X-Received: by 2002:a05:6214:f6c:b0:6b5:d94f:cf53 with SMTP id 6a1803df08f44-6b61bca398emr39121116d6.22.1720540402978;
+        Tue, 09 Jul 2024 08:53:22 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61b9c4f67sm9830846d6.10.2024.07.09.08.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 08:53:22 -0700 (PDT)
+Date: Tue, 09 Jul 2024 11:53:21 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Fred Li <dracodingfly@gmail.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: aleksander.lobakin@intel.com, 
+ andrii@kernel.org, 
+ ast@kernel.org, 
+ bpf@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ dracodingfly@gmail.com, 
+ edumazet@google.com, 
+ haoluo@google.com, 
+ hawk@kernel.org, 
+ herbert@gondor.apana.org.au, 
+ john.fastabend@gmail.com, 
+ jolsa@kernel.org, 
+ kpsingh@kernel.org, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux@weissschuh.net, 
+ martin.lau@linux.dev, 
+ mkhalfella@purestorage.com, 
+ nbd@nbd.name, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ sashal@kernel.org, 
+ sdf@google.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev
+Message-ID: <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240708143128.49949-1-dracodingfly@gmail.com>
+References: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
+ <20240708143128.49949-1-dracodingfly@gmail.com>
+Subject: Re: [PATCH] net: linearizing skb when downgrade gso_size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 9 Jul 2024 16:43:05 +0200 Kory Maincent wrote:
-> > Normal ethtool flow is to first fill in the data with a ->get() then
-> > modify what user wants to change.
-> > 
-> > Either we need:
-> >  - an explanation in the commit message how this keeps old config; or
-> >  - a ->get() to keep the previous values; or
-> >  - just reject setting one value but not the other in
-> >    ethnl_set_pse_validate() (assuming it never worked, anyway).  
+Fred Li wrote:
+> Here is a patch that linearizing skb when downgrade
+> gso_size and sg should disabled, If there are no issues,
+> I will submit a formal patch shortly.
+
+Target bpf.
+
+Probably does not need quite as many direct CCs. 
+ 
+> Signed-off-by: Fred Li <dracodingfly@gmail.com>
+> ---
+>  include/linux/skbuff.h | 22 ++++++++++++++++++++++
+>  net/core/filter.c      | 16 ++++++++++++----
+>  net/core/skbuff.c      | 19 ++-----------------
+>  3 files changed, 36 insertions(+), 21 deletions(-)
 > 
-> In fact it is the contrary we can't set both value at the same time because a
-> PSE port can't be a PoE and a PoDL power interface at the same time.
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 5f11f9873341..99b7fc1e826a 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -2400,6 +2400,28 @@ static inline unsigned int skb_headlen(const struct sk_buff *skb)
+>  	return skb->len - skb->data_len;
+>  }
+>  
+> +static inline bool skb_is_nonsg(const struct sk_buff *skb)
+> +{
 
-In that case maybe we should have an inverse condition in validate, too?
-Something like:
+is_nonsg does not cover the functionality, which is fairly subtle.
+But maybe we don't need this function at all, see below..
 
-	if ((pse_has_podl(phydev->psec) &&
-	     GENL_REQ_ATTR_CHECK(info, ETHTOOL_A_PODL_PSE_ADMIN_CONTROL)) ||
-	    (pse_has_c33(phydev->psec) &&
-	     GENL_REQ_ATTR_CHECK(info, ETHTOOL_A_C33_PSE_ADMIN_CONTROL)))
-		return -EINVAL;
+> +	struct sk_buff *list_skb = skb_shinfo(skb)->frag_list;
+> +	struct sk_buff *check_skb;
 
-GENL_REQ_ATTR_CHECK will set the extack for us.
+No need for separate check_skb
+
+> +	for (check_skb = list_skb; check_skb; check_skb = check_skb->next) {
+> +		if (skb_headlen(check_skb) && !check_skb->head_frag) {
+> +			/* gso_size is untrusted, and we have a frag_list with
+> +                         * a linear non head_frag item.
+> +                         *
+> +                         * If head_skb's headlen does not fit requested gso_size,
+> +                         * it means that the frag_list members do NOT terminate
+> +                         * on exact gso_size boundaries. Hence we cannot perform
+> +                         * skb_frag_t page sharing. Therefore we must fallback to
+> +                         * copying the frag_list skbs; we do so by disabling SG.
+> +                         */
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  static inline unsigned int __skb_pagelen(const struct sk_buff *skb)
+>  {
+>  	unsigned int i, len = 0;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index df4578219e82..c0e6e7f28635 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3525,13 +3525,21 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+>  	if (skb_is_gso(skb)) {
+>  		struct skb_shared_info *shinfo = skb_shinfo(skb);
+>  
+> -		/* Due to header grow, MSS needs to be downgraded. */
+> -		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+> -			skb_decrease_gso_size(shinfo, len_diff);
+> -
+>  		/* Header must be checked, and gso_segs recomputed. */
+>  		shinfo->gso_type |= gso_type;
+>  		shinfo->gso_segs = 0;
+> +
+> +		/* Due to header grow, MSS needs to be downgraded.
+> +		 * There is BUG_ON When segment the frag_list with
+> +		 * head_frag true so linearize skb after downgrade
+> +		 * the MSS.
+> +		 */
+> +		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO)) {
+> +			skb_decrease_gso_size(shinfo, len_diff);
+> +			if (skb_is_nonsg(skb))
+> +				return skb_linearize(skb) ? : 0;
+> +		}
+> +
+
+No need for ternary statement.
+
+Instead of the complex test in skb_is_nonsg, can we just assume that
+alignment will be off if having frag_list and changing gso_size.
+
+The same will apply to bpf_skb_net_shrink too.
+
+Not sure that it is okay to linearize inside a BPF helper function.
+Hopefully bpf experts can chime in on that.
+
+>  	}
+>  
+>  	return 0;
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index b1dab1b071fc..81e018185527 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4458,23 +4458,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+>  
+>  	if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
+>  	    mss != GSO_BY_FRAGS && mss != skb_headlen(head_skb)) {
+> -		struct sk_buff *check_skb;
+> -
+> -		for (check_skb = list_skb; check_skb; check_skb = check_skb->next) {
+> -			if (skb_headlen(check_skb) && !check_skb->head_frag) {
+> -				/* gso_size is untrusted, and we have a frag_list with
+> -				 * a linear non head_frag item.
+> -				 *
+> -				 * If head_skb's headlen does not fit requested gso_size,
+> -				 * it means that the frag_list members do NOT terminate
+> -				 * on exact gso_size boundaries. Hence we cannot perform
+> -				 * skb_frag_t page sharing. Therefore we must fallback to
+> -				 * copying the frag_list skbs; we do so by disabling SG.
+> -				 */
+> -				features &= ~NETIF_F_SG;
+> -				break;
+> -			}
+> -		}
+> +		if (skb_is_nonsg(head_skb))
+> +			features &= ~NETIF_F_SG;
+>  	}
+>  
+>  	__skb_push(head_skb, doffset);
+> -- 
+> 2.33.0
+> 
+
+
 
