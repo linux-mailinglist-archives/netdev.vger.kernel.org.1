@@ -1,244 +1,93 @@
-Return-Path: <netdev+bounces-110197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABB092B411
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:40:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD6E92B420
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:41:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDE8E1C20940
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A98801F2355A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE761553B7;
-	Tue,  9 Jul 2024 09:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF035155A21;
+	Tue,  9 Jul 2024 09:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="A0xAch9H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPPo5X/b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FAD13C687;
-	Tue,  9 Jul 2024 09:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27C9155753;
+	Tue,  9 Jul 2024 09:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720517998; cv=none; b=T/wttiRPwAEtjYoMUCUknUEpnATYiMyhRXHjnVA3SKXaFyN1zGKuJUcf94eqooDuoMIXk8A+ByyblB/NnoAHizz/MqzdLQoPJduAI7ZktB36ABK2fLjXvO9KTNsJ4rYrIy00MteHMbFdkvC35xsxWfLsVqSIG6TsIUv3IWZ4K7I=
+	t=1720518031; cv=none; b=Omp1agKuKjoEXdFOSpcgFrwSa6m1ED9Gq7lEmhVBkK0t5RcQtvsNT/lTahpQxzBvon3YpogufiWWV7Al+gHtARHI1HK9VOzHF7Q/1TIEABDe9LNQHapqhjK8C13zbk/JPbHnDoSsPoPYIvJkYKbdF5bDprCIwJEmL1k8dpyCtGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720517998; c=relaxed/simple;
-	bh=YLLKXO9LQyBdruxsLrFG2iexGd+6cQarJN2FYHNbX38=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXoHrfhRdf1RRmaNFgrH+vd13uxYrPZ+mjZ/PYX8+ghTUtO7L90URrBEvVlEXdzGy3VAxdHFgm27aBxyCpRW9141fZILeS2raySdkj+9Xvof4P0Qe1VtQfv/CumNNsFxVj6TPLILzmMnBny9odSa/6z2/huE5l6xSegY5znhJGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=A0xAch9H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F152AC3277B;
-	Tue,  9 Jul 2024 09:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720517998;
-	bh=YLLKXO9LQyBdruxsLrFG2iexGd+6cQarJN2FYHNbX38=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A0xAch9HsB+cVsJef7JG/fDYr42ZEaIKrFRNruViCD5ylCrIiteelaBz2b8FedJ8p
-	 NipKOtQN5ToBUmNA6d4AsMNKBDv6T8ZDJGIx2sKFmG2iihW9J6R2wC2cVhXT7+JMPV
-	 2J4gVGdws9ioh2PbFbGo4yczJ+mRLATvUN1CTBKU=
-Date: Tue, 9 Jul 2024 11:39:54 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: LEROY Christophe <christophe.leroy2@cs-soprasteria.com>
-Cc: WangYuli <wangyuli@uniontech.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"sashal@kernel.org" <sashal@kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"song@kernel.org" <song@kernel.org>,
-	"puranjay12@gmail.com" <puranjay12@gmail.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"andrii@kernel.org" <andrii@kernel.org>,
-	"martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"kpsingh@kernel.org" <kpsingh@kernel.org>,
-	"sdf@google.com" <sdf@google.com>,
-	"haoluo@google.com" <haoluo@google.com>,
-	"jolsa@kernel.org" <jolsa@kernel.org>,
-	"illusionist.neo@gmail.com" <illusionist.neo@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"johan.almbladh@anyfinetworks.com" <johan.almbladh@anyfinetworks.com>,
-	"paulburton@kernel.org" <paulburton@kernel.org>,
-	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-	"deller@gmx.de" <deller@gmx.de>,
-	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-	"iii@linux.ibm.com" <iii@linux.ibm.com>,
-	"hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"gor@linux.ibm.com" <gor@linux.ibm.com>,
-	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"guanwentao@uniontech.com" <guanwentao@uniontech.com>,
-	"baimingcong@uniontech.com" <baimingcong@uniontech.com>
-Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()" for linux-6.6.37
-Message-ID: <2024070953-sepia-protozoan-86a0@gregkh>
-References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
- <2024070631-unrivaled-fever-8548@gregkh>
- <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
- <2024070815-udder-charging-7f75@gregkh>
- <a1dac525-4e6d-4d28-87ee-63723abbafad@cs-soprasteria.com>
- <2024070908-glade-granny-1137@gregkh>
- <4d07cfa3-031c-45f4-aec1-9f0a54dd22b2@cs-soprasteria.com>
+	s=arc-20240116; t=1720518031; c=relaxed/simple;
+	bh=5TIaHQ1h+ppVKyq5g+uP5cTKU9LcAIWcDNPYXCulD7g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=X/xH+sAsbTML/SW7TiUAMi8rgdT101tmXoc6ynFw+i/eZ0mXTkjpBQsg+b2/rb10SXnA1ZGfe4CG12ro0yzulfN27RB5wetQoGBvoCfHs4lMg2l1p1cssdRyzeeW9VXh4ip8nTJS+ibt10aCAIkL+jHTTVtPeeydVQti/Ep9Aos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPPo5X/b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 22348C32786;
+	Tue,  9 Jul 2024 09:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720518031;
+	bh=5TIaHQ1h+ppVKyq5g+uP5cTKU9LcAIWcDNPYXCulD7g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SPPo5X/bCtv3Mi1LdAJlKQ1K8op5SsPFs1QeUOSihKjA1ELyFoCCqNXxDVlK1W8E4
+	 GyPOcwgApIP4s7KxpDIQRs/uZ1tw2uDn5A6jixd77GyypWBtw3znpszVN6Sizy4ykv
+	 lcIRVHGPxGesMxRvFERH+9Zrq7eiSn6SIoBEUqxAGHNtm9izL4mJgA+7c8sxy/1YVf
+	 oM5vmp5IqLupI7ZmCoavt4v13BYgdd1wg1/vhZCCz+BKu6fMI8l4zO0qYEz6zttOPs
+	 A3l6D//cViNp9hRVyZbQw3bS6wNcAv23xjKyYS0qMVROYareEA/9QU44uIvLiqn32m
+	 hqoH5PqQ8Vr3w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 109D2DF370E;
+	Tue,  9 Jul 2024 09:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4d07cfa3-031c-45f4-aec1-9f0a54dd22b2@cs-soprasteria.com>
+Subject: Re: [PATCH net-next] sctp: Fix typos and improve comments
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172051803106.11180.11030029705775228284.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jul 2024 09:40:31 +0000
+References: <20240704202558.62704-2-thorsten.blum@toblux.com>
+In-Reply-To: <20240704202558.62704-2-thorsten.blum@toblux.com>
+To: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, Jul 09, 2024 at 09:24:54AM +0000, LEROY Christophe wrote:
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu,  4 Jul 2024 22:25:59 +0200 you wrote:
+> Fix typos s/steam/stream/ and spell out Schedule/Unschedule in the
+> comments.
 > 
+> Compile-tested only.
 > 
-> Le 09/07/2024 à 11:15, Greg KH a écrit :
-> > On Mon, Jul 08, 2024 at 03:12:55PM +0000, LEROY Christophe wrote:
-> >>
-> >>
-> >> Le 08/07/2024 à 14:36, Greg KH a écrit :
-> >>> On Sun, Jul 07, 2024 at 03:34:15PM +0800, WangYuli wrote:
-> >>>>
-> >>>> On 2024/7/6 17:30, Greg KH wrote:
-> >>>>> This makes it sound like you are reverting this because of a build
-> >>>>> error, which is not the case here, right?  Isn't this because of the
-> >>>>> powerpc issue reported here:
-> >>>>>      https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
-> >>>>> ?
-> >>>>
-> >>>> No, it only occurs on ARM64 architecture. The reason is that before being
-> >>>> modified, the function
-> >>>>
-> >>>> bpf_jit_binary_lock_ro() in arch/arm64/net/bpf_jit_comp.c +1651
-> >>>>
-> >>>> was introduced with __must_check, which is defined as
-> >>>> __attribute__((__warn_unused_result__)).
-> >>>>
-> >>>>
-> >>>> However, at this point, calling bpf_jit_binary_lock_ro(header)
-> >>>> coincidentally results in an unused-result
-> >>>>
-> >>>> warning.
-> >>>
-> >>> Ok, thanks, but why is no one else seeing this in their testing?
-> >>
-> >> Probably the configs used by robots do not activate BPF JIT ?
-> >>
-> >>>
-> >>>>> If not, why not just backport the single missing arm64 commit,
-> >>>>
-> >>>> Upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory
-> >>>> management") is part of
-> >>>>
-> >>>> a larger change that involves multiple commits. It's not an isolated commit.
-> >>>>
-> >>>>
-> >>>> We could certainly backport all of them to solve this problem, buthas it's not
-> >>>> the simplest solution.
-> >>>
-> >>> reverting the change feels wrong in that you will still have the bug
-> >>> present that it was trying to solve, right?  If so, can you then provide
-> >>> a working version?
-> >>
-> >> Indeed, by reverting the change you "punish" all architectures because
-> >> arm64 hasn't properly been backported, is it fair ?
-> >>
-> >> In fact, when I implemented commit e60adf513275 ("bpf: Take return from
-> >> set_memory_rox() into account with bpf_jit_binary_lock_ro()"), we had
-> >> the following users for function bpf_jit_binary_lock_ro() :
-> >>
-> >> $ git grep bpf_jit_binary_lock_ro e60adf513275~
-> >> e60adf513275~:arch/arm/net/bpf_jit_32.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:arch/loongarch/net/bpf_jit.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:arch/mips/net/bpf_jit_comp.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:arch/parisc/net/bpf_jit_core.c:
-> >> bpf_jit_binary_lock_ro(jit_data->header);
-> >> e60adf513275~:arch/s390/net/bpf_jit_comp.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:arch/sparc/net/bpf_jit_comp_64.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:arch/x86/net/bpf_jit_comp32.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> e60adf513275~:include/linux/filter.h:static inline void
-> >> bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-> >>
-> >> But when commit 08f6c05feb1d ("bpf: Take return from set_memory_rox()
-> >> into account with bpf_jit_binary_lock_ro()") was applied, we had one
-> >> more user which is arm64:
-> >>
-> >> $ git grep bpf_jit_binary_lock_ro 08f6c05feb1d~
-> >> 08f6c05feb1d~:arch/arm/net/bpf_jit_32.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/arm64/net/bpf_jit_comp.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/loongarch/net/bpf_jit.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/mips/net/bpf_jit_comp.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/parisc/net/bpf_jit_core.c:
-> >> bpf_jit_binary_lock_ro(jit_data->header);
-> >> 08f6c05feb1d~:arch/s390/net/bpf_jit_comp.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/sparc/net/bpf_jit_comp_64.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:arch/x86/net/bpf_jit_comp32.c:
-> >> bpf_jit_binary_lock_ro(header);
-> >> 08f6c05feb1d~:include/linux/filter.h:static inline void
-> >> bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-> >>
-> >> Therefore, commit 08f6c05feb1d should have included a backport for arm64.
-> >>
-> >> So yes, I agree with Greg, the correct fix should be to backport to
-> >> ARM64 the changes done on other architectures in order to properly
-> >> handle return of set_memory_rox() in bpf_jit_binary_lock_ro().
-> >
-> > Ok, but it looks like due to this series, the powerpc tree is crashing
-> > at the first bpf load, so something went wrong.  Let me go revert these
-> > 4 patches for now, and then I will be glad to queue them up if you can
-> > provide a working series for all arches.
-> >
+> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
 > 
-> Fair enough, indeed I think for powerpc it probably also relies on more
-> changes, so both ARM and POWERPC need a carefull backport.
-> 
-> I can look at it, but can you tell why it was decided to apply that
-> commit on stable at the first place ? Is there a particular need ?
+> [...]
 
-Based on the changelog text itself, it fixes an issue and was flagged as
-something to be backported.
+Here is the summary with links:
+  - [net-next] sctp: Fix typos and improve comments
+    https://git.kernel.org/netdev/net-next/c/417d88189ccf
 
-If this isn't needed in 6.6.y, then no worries at all, we can just drop
-them and be happy :)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-thanks,
 
-greg k-h
 
