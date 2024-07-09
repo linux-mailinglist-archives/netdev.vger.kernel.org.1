@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-110370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6455392C1D7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:09:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1315892C1D2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85EB61C235C5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:09:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCBC91F2390E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5ED1C2DDC;
-	Tue,  9 Jul 2024 16:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6690D1C2322;
+	Tue,  9 Jul 2024 16:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="qQt1IxO3"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="GUUpNUV4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183B61C0DC7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7596B1C0944;
 	Tue,  9 Jul 2024 16:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720543127; cv=none; b=sxCBMcO1cCXo+KAyjqzRbBzasa7gjF8D8HcSOpCXws+pjTGD7ib9vavCXb86lehAUs2RPeDA1DTwIGahYtL3e2GOXuzduQmGanmDaev08V9nw6fiYpa9b+flE/GlGHQXz98brLu4IpHBNRyY8BhUNkYD6CJ27DZr8Ez7aboc2Vw=
+	t=1720543126; cv=none; b=gdcLjZJb9ojKKoWQ1Ma5AePYAbQ7Hn3mza3HmBulIUfjJofy5A7ZLtFRlBmkj/WG1sIwTKJVuTvi4Wjhlgh3bPMJ/bs9W7zAypddUJeEBQ8tC+/q3URMvJteoZ3H/DEKSunyFwI+FmFS27fxaTohTKTBrCJkX7SXB80rw/PoJOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720543127; c=relaxed/simple;
-	bh=U8fAUnOXpGztA1trUTv5zEWA4jw7bK7vWDTmwvAnmjg=;
+	s=arc-20240116; t=1720543126; c=relaxed/simple;
+	bh=LOODhtsR95I0F9IFBdCOwy9wo67VLpNk6PUcw7BPFec=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uIPYDObbxY9X5s9KYpGhHBrZv0djlKvKcAKbdKYfzwa6PpLoQq71b+vIen0gvphJbh4mMhwDWabXlduC4duAjhiYrnBwbfcw2fsosSGkSvXCHf4M0oYe5wPNOmEOtvs5sBR2uw1zTJtuyBF3jdXHcdAPtI1/LNgGOrF4Xf6LfVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=qQt1IxO3; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=IHfpEd+ue6mEdWT7RgrgzgU3iMl2XKjCeJFdgj7dJWqDJ4Z0K6I2m5JAMeAtkndezYoUKx/9fFicvmrTeCX7c+vUqoxMum6JdNZHjo93hbUnGNrI7GkM6lBz5C+sOTaF4YFa4TcGlvS6wkLlmsy4cbKGpcZX/KJcUUMZGshhJq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=GUUpNUV4; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1720543114;
-	bh=U8fAUnOXpGztA1trUTv5zEWA4jw7bK7vWDTmwvAnmjg=;
+	s=202008; t=1720543112;
+	bh=LOODhtsR95I0F9IFBdCOwy9wo67VLpNk6PUcw7BPFec=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qQt1IxO3f/rjy1PwKcvK59swcIowFenYxaH6gUJVnWG/cpTLFdeoLQGpz1pyyscDz
-	 J8KS2hQQd7nEPb2apR98uHqMLxYFKj84Qj9e1lZjOTe4bZArhIza7p2VSsALcQKcZn
-	 oKyagItEgTidkh4QsteOxTyFWecNLinIvyOngT8D396540dkVzv4KZDB141Fbsu+jy
-	 va4sNueDdEDOliT7YxFtKFyXJ1VtvQueLaB5bVrWP3glTTv8uckYxMrilruiLc2QBU
-	 WPveVP4DdFMzVGswvIz8s84whJ1kO5bVglw7X1mdJRhkrnWI0wg6FntI5VxyG1E/3E
-	 XA0E6JLK5Jchw==
+	b=GUUpNUV4ShaBuqFgQBidpVALwVNWRKk2fJcqzIIo3CIfpkUKfcHZAGVDZcWf8gfUC
+	 gKxElQ3sw+kldM9W4xamYHG5o4NnP5zdbcnOtXEUDkexzff4LVjeMzpE0N9I8879QT
+	 u+olokv98Eg2Rv0khwGZJ2y6HqhAEMFyHI5VkmEa4jR6D8qEQc1aupyvAeFskxDiu9
+	 N8R3NbdtFtYvXoh7pRdNRznIg6a5+yvfsQh4qp3D42xNClT2WfRsmAfBA/EN1BVix+
+	 2mBhnShtV6wPCzdttx7u2KgIFzh+p1NWy56buJmu9xh781GwdwJZ5AZgEsIAFh+h8p
+	 SiRbVQJiLomxQ==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 665F3600A2;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 06D076008B;
 	Tue,  9 Jul 2024 16:38:32 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 122C620474A; Tue, 09 Jul 2024 16:38:26 +0000 (UTC)
+	id 244972047B1; Tue, 09 Jul 2024 16:38:26 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -64,9 +64,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Florian Westphal <fw@strlen.de>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 01/10] net/sched: flower: refactor control flag definitions
-Date: Tue,  9 Jul 2024 16:38:15 +0000
-Message-ID: <20240709163825.1210046-2-ast@fiberby.net>
+Subject: [PATCH net-next v3 02/10] net/sched: flower: define new tunnel flags
+Date: Tue,  9 Jul 2024 16:38:16 +0000
+Message-ID: <20240709163825.1210046-3-ast@fiberby.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240709163825.1210046-1-ast@fiberby.net>
 References: <20240709163825.1210046-1-ast@fiberby.net>
@@ -79,74 +79,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Redefine the flower control flags as an enum, so they are
-included in BTF info.
+Define new TCA_FLOWER_KEY_FLAGS_* flags for use in struct
+flow_dissector_key_control, covering the same flags as
+currently exposed through TCA_FLOWER_KEY_ENC_FLAGS.
 
-Make the kernel-side enum a more explicit superset of
-TCA_FLOWER_KEY_FLAGS_*, new flags still need to be added to
-both enums, but at least the bit position only has to be
-defined once.
+Put the new flags under FLOW_DIS_F_*. The idea is that we can
+later, move the existing flags under FLOW_DIS_F_* as well.
 
-FLOW_DIS_ENCAPSULATION is never set for mask, so it can't be
-exposed to userspace in an unsupported flags mask error message,
-so it will be placed one bit position above the last uAPI flag.
-
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- include/net/flow_dissector.h | 14 +++++++++++---
- include/uapi/linux/pkt_cls.h |  3 +++
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ include/net/flow_dissector.h | 7 ++++++-
+ include/uapi/linux/pkt_cls.h | 4 ++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
-index 3e47e123934d4..c3fce070b9129 100644
+index c3fce070b9129..460ea65b9e592 100644
 --- a/include/net/flow_dissector.h
 +++ b/include/net/flow_dissector.h
-@@ -7,6 +7,7 @@
- #include <linux/siphash.h>
- #include <linux/string.h>
- #include <uapi/linux/if_ether.h>
-+#include <uapi/linux/pkt_cls.h>
+@@ -17,7 +17,8 @@ struct sk_buff;
+  * struct flow_dissector_key_control:
+  * @thoff:     Transport header offset
+  * @addr_type: Type of key. One of FLOW_DISSECTOR_KEY_*
+- * @flags:     Key flags. Any of FLOW_DIS_(IS_FRAGMENT|FIRST_FRAGENCAPSULATION)
++ * @flags:     Key flags.
++ *             Any of FLOW_DIS_(IS_FRAGMENT|FIRST_FRAG|ENCAPSULATION|F_*)
+  */
+ struct flow_dissector_key_control {
+ 	u16	thoff;
+@@ -31,6 +32,10 @@ struct flow_dissector_key_control {
+ enum flow_dissector_ctrl_flags {
+ 	FLOW_DIS_IS_FRAGMENT		= TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT,
+ 	FLOW_DIS_FIRST_FRAG		= TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
++	FLOW_DIS_F_TUNNEL_CSUM		= TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM,
++	FLOW_DIS_F_TUNNEL_DONT_FRAGMENT	= TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT,
++	FLOW_DIS_F_TUNNEL_OAM		= TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM,
++	FLOW_DIS_F_TUNNEL_CRIT_OPT	= TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT,
  
- struct bpf_prog;
- struct net;
-@@ -24,9 +25,16 @@ struct flow_dissector_key_control {
- 	u32	flags;
- };
- 
--#define FLOW_DIS_IS_FRAGMENT	BIT(0)
--#define FLOW_DIS_FIRST_FRAG	BIT(1)
--#define FLOW_DIS_ENCAPSULATION	BIT(2)
-+/* The control flags are kept in sync with TCA_FLOWER_KEY_FLAGS_*, as those
-+ * flags are exposed to userspace in some error paths, ie. unsupported flags.
-+ */
-+enum flow_dissector_ctrl_flags {
-+	FLOW_DIS_IS_FRAGMENT		= TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT,
-+	FLOW_DIS_FIRST_FRAG		= TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
-+
-+	/* These flags are internal to the kernel */
-+	FLOW_DIS_ENCAPSULATION		= (TCA_FLOWER_KEY_FLAGS_MAX << 1),
-+};
- 
- enum flow_dissect_ret {
- 	FLOW_DISSECT_RET_OUT_GOOD,
+ 	/* These flags are internal to the kernel */
+ 	FLOW_DIS_ENCAPSULATION		= (TCA_FLOWER_KEY_FLAGS_MAX << 1),
 diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index b6d38f5fd7c05..12db276f0c11e 100644
+index 12db276f0c11e..3dc4388e944cb 100644
 --- a/include/uapi/linux/pkt_cls.h
 +++ b/include/uapi/linux/pkt_cls.h
-@@ -677,8 +677,11 @@ enum {
+@@ -677,6 +677,10 @@ enum {
  enum {
  	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
  	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
-+	__TCA_FLOWER_KEY_FLAGS_MAX,
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM = (1 << 2),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT = (1 << 3),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM = (1 << 4),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT = (1 << 5),
+ 	__TCA_FLOWER_KEY_FLAGS_MAX,
  };
  
-+#define TCA_FLOWER_KEY_FLAGS_MAX (__TCA_FLOWER_KEY_FLAGS_MAX - 1)
-+
- enum {
- 	TCA_FLOWER_KEY_CFM_OPT_UNSPEC,
- 	TCA_FLOWER_KEY_CFM_MD_LEVEL,
 -- 
 2.45.2
 
