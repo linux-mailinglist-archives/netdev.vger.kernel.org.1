@@ -1,76 +1,150 @@
-Return-Path: <netdev+bounces-110400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A44492C2F4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:58:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E295F92C303
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 20:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E83681F23D66
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:58:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D8DB1F23EB2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B122D180047;
-	Tue,  9 Jul 2024 17:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C643517B053;
+	Tue,  9 Jul 2024 18:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1j4B+I4"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gQ0g/0fx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C50318002D
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 17:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0924C6F2E6;
+	Tue,  9 Jul 2024 18:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720547919; cv=none; b=dwaOPJom7TL0RXqoYIG3QG8x32IlTVjJj5iWnAmZw0+wIg2/XPc4IeaIlNy4cDczeGH9D6D+76UtwTFyvd+AQKVRTtyteNufSQ5sAkaUBXdomuiLl+4aEX2ic+ICZG1W1IOZCs0j9HE4Qyu+INXCUoSl4rDT8u2Csg/vL2U9dVs=
+	t=1720548094; cv=none; b=l1hlHR93KckT9o6elgfXFc//W2ytUA/9E7pZ+OZzU0T8VS5s1vih1ymwZoNH+JKoH90Gdl8Lyg1KtlMo9VCULk4a8G4kMO4uGsQRKilqRTe7TO8yVo6fqjknQTonHlP7fg2eUFljkBDUYDfngKSRMt/ICfB+iDLknMoeJBYSEQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720547919; c=relaxed/simple;
-	bh=oxP/OVI152Z02wAJjJUnLdmTewhBFJmUlT/vlYIfvac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J/90E5VfY+Pj+rObazc0O790kh+FhbkPH/xRLQlZbbOfFl6soyAX54ZXOQUrmamuGaPBp9QSk18JtjRrOfyqwLmr2UxR2jMFrkGBkNP1TfKTRN2lOltltQqQ0ZmFq1QnYY3nPbNb8kF7i9rcWDpVET32TReYdPLmReqKCRE/lAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1j4B+I4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 375B9C32786;
-	Tue,  9 Jul 2024 17:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720547919;
-	bh=oxP/OVI152Z02wAJjJUnLdmTewhBFJmUlT/vlYIfvac=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b1j4B+I4pQHbuV8vJ94r6T0lZCWwtT5N/OHrwPwvhf0nArSXDcULemlvIcsABK4jk
-	 1bDmLFVrBkt8oSyVg4hq2CTdrZovOk6XdDDhR68UVwX7pOSCZ1x1E4Nohb1fEc1Hpx
-	 IkEsz9+ga1cDn+S5Yftvi8NpZWaE+hrgrte5QtBaCiN+FzFN+VyXtY538cotm8zIL/
-	 5vjL+stUOLw4GgFZnmSzGjIPe6umTJWwTlJoJ7Wk8kpRH0oulYwWs+PLrm57KVQcVj
-	 htzb92Inhs+oWB5rRli/Rqy0ysxAGS6vgGhIROE3LvsYlOKK2brBKlo1eOnpP9Dzfo
-	 AUzANfKBtPT6A==
-Date: Tue, 9 Jul 2024 18:58:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gaosheng Cui <cuigaosheng1@huawei.com>
-Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-afs@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH -next] rxrpc: Fix the error handling path in
- rxkad_init_connection_security
-Message-ID: <20240709175834.GN346094@kernel.org>
-References: <20240709104910.3397496-1-cuigaosheng1@huawei.com>
+	s=arc-20240116; t=1720548094; c=relaxed/simple;
+	bh=Ie/cA6P/3uKrFYB6QT8wxFA2AMrE4qFcEz3hTHvYjAM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ofB3LjTCUKwEWlv0a+adMdNICGrO8ekyGd18OU+OGj9Rj0giPT2UylPsaCghxpRoVYxsY8zxFdIWmECdU3fpDpxFh1JvTOzgfyhEnnSEqPU4n7ZAVOJEFdXniXswxrGy5JrE+3BJB1JPt4i4hVM7qeIs6c6F7nnojMkMy8so8YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gQ0g/0fx; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 469AClT8015045;
+	Tue, 9 Jul 2024 18:01:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ckbc1aApQyQvJVHtxNFftIi/hYatRS4haFz7C8Uy4PI=; b=gQ0g/0fxCV2ZsAez
+	+I6iPHngo+babc30b+t7QNxBDdq/a2Sb7IWonSJkLCpwhia0//vT8QQ3740y+Fq2
+	yrufpFv4lPl5t//0JepkJP9S73hPNC+yL+VCdDoP1q/jhhNxXl8yX0jzRpgdxNjK
+	CxacFfJGWJrLlHP4aA7//IHnQQWMfW4CRtt7sSPJkUBGrT0FVdEEJHMuygu0Ip6c
+	45+ynpYeCPBPTv7Aiwn52fCuVhFAODkENCfMEBCLBkv+iMqsd4498dELwN0W55yH
+	gyoK3PMoGYm1oWtSMgiQ+8GFKzgSienTQ08XwO4bdU50OgLi4rWBbZw42KJlEl/b
+	p7vsaw==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406x0t7fts-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jul 2024 18:01:07 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 469I15O5020027
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 9 Jul 2024 18:01:05 GMT
+Received: from [10.110.47.59] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 9 Jul 2024
+ 11:01:02 -0700
+Message-ID: <f8ea46eb-61dc-4869-843c-a7fe9a37881e@quicinc.com>
+Date: Tue, 9 Jul 2024 11:01:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240709104910.3397496-1-cuigaosheng1@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: qcom: ethernet: Add interconnect
+ properties
+To: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        "Russell
+ King" <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Bhupesh
+ Sharma" <bhupesh.sharma@linaro.org>
+CC: <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>,
+        Andrew Lunn
+	<andrew@lunn.ch>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>
+References: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
+ <20240708-icc_bw_voting_from_ethqos-v4-1-c6bc3db86071@quicinc.com>
+ <3ba8bcde-496c-4084-8941-397b4dd7f55f@kernel.org>
+Content-Language: en-US
+From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+In-Reply-To: <3ba8bcde-496c-4084-8941-397b4dd7f55f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: yDvVNb0LXaXMTeKNf3sPdFREp4zrUFxu
+X-Proofpoint-ORIG-GUID: yDvVNb0LXaXMTeKNf3sPdFREp4zrUFxu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-09_07,2024-07-09_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407090121
 
-On Tue, Jul 09, 2024 at 06:49:10PM +0800, Gaosheng Cui wrote:
-> If security_level of rxrpc_connection is invalid, ci should be freed
-> by crypto_free_sync_skcipher, replace error with error_ci to fix the
-> memory leak.
+
+
+On 7/9/2024 1:56 AM, Krzysztof Kozlowski wrote:
+> On 08/07/2024 23:30, Sagar Cheluvegowda wrote:
+>> Add documentation for the interconnect and interconnect-names
+>> properties required when voting for AHB and AXI buses.
+>>
+>> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
+>> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
 > 
-> Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> <form letter>
+> This is a friendly reminder during the review process.
+> 
+> It looks like you received a tag and forgot to add it.
+> 
+> If you do not know the process, here is a short explanation:
+> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+> versions, under or above your Signed-off-by tag. Tag is "received", when
+> provided in a message replied to you on the mailing list. Tools like b4
+> can help here. However, there's no need to repost patches *only* to add
+> the tags. The upstream maintainer will do that for tags received on the
+> version they apply.
+> 
+> https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
+> 
+> If a tag was not added on purpose, please state why and what changed.
+> </form letter>
+> 
+> Best regards,
+> Krzysztof
+> 
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 
-As an aside, the BUG() in the middle of rxkad_init_connection_security()
-is a bit of a surprise.
+Thanks Krzysztof for the explanation, i will make a note of it.
 
