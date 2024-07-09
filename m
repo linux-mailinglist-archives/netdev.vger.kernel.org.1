@@ -1,150 +1,220 @@
-Return-Path: <netdev+bounces-110067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BD592AD27
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:36:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E7892ADC5
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 03:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01A04B215FE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:36:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00061F22306
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 01:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065CC1EA80;
-	Tue,  9 Jul 2024 00:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E33E28366;
+	Tue,  9 Jul 2024 01:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kW0u2twX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108F4A05
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 00:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9231FA1;
+	Tue,  9 Jul 2024 01:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720485383; cv=none; b=ZQm2bwD00nPq2ZZ/IgdxcFXQoL1llqJ7EHudXCXmBMzAX+i1djr1pJPS6Xig4EjgmVzxnILnT/TfN4PDVhG9RwzTpPB2My4/zL1/vZXgAj6A8marUm//hTQ544nK7fcja7F4PzWAoZxi7RiGvcFwzJc5WQ/PJETggN/OOZEgC0M=
+	t=1720488253; cv=none; b=jMm+alZiy2GiMWbXtEkeknlwWNZO0mQUpxNncqxTwf5tfx7BYqkiWydnuEFRtBP6uUulTk1Rf+sqDFlRdcMnFeXOQrcCla9A4mLfgntMvzXK9Cp1dpiULHFkW7eGeCNJ4jWcxPn0zBYMHRIjkK2YxhSTvyeEY1vO2PJem6+vo+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720485383; c=relaxed/simple;
-	bh=8otHiJbE/VSdOupQC/73La9rg+QB5+G8BfHl1T3pUxg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=K6FoGKR70tsRbP2pjjM7c2a0OmaTNaX+gERYl41hoQrYCNgKs/5q/Ci7bfpdS7Pw9+/fuRAdoGonwuCNSFVMPIb6tDo0JpKFV8cWtU4LWk1oVuaKnAAlhk+TqUGoevZJpGVsHJAouYmsBP5gT+nlrw85RBQ4aj1tUXlqxfwQrBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3835285561fso51321775ab.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 17:36:22 -0700 (PDT)
+	s=arc-20240116; t=1720488253; c=relaxed/simple;
+	bh=lEtixa07+RUJAtKBJsg+gVwNeRwl/kAxLHxDaZOtyBc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GT02zNLhLL4LyT1D/j0cAXqsZrZ7afNODIlBuzqTXLeuGQ/e4F01B2VInvd8b6LW33a/wDzTaRLhk82ybfYQTBiH6Gw9PwsAyhnX3pOOAaSsE1FyOZRNgMbKkBuNTe7syUkcUEYqAi9+QGieF+HTcBpcXBvCfIuKRdqtre5kQ2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kW0u2twX; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb3e9e32ffso18655905ad.0;
+        Mon, 08 Jul 2024 18:24:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720488250; x=1721093050; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j32VYAlsuK3/jNbvHCaSgNRDqiz9cqS48fKSFKyyisg=;
+        b=kW0u2twX+VFqsTFO15BewePKAqaLuWCifmH8wS6Wy/cdkidOocsgFZTo1NhDZS5sbX
+         +oXsP3dIVHXHMuGKJGQ2agj3cuL+ULBSWx1JnvykihLei/pY4MVbPYWwR87wgzoAC/VE
+         EJNqR8nLZqSXSeAKhtSvuvL7iG/DXFVNrf1ez6EBVEtbB2r3KIwmpl9V2shuI30HZOmm
+         GucHQxLmvqN4NnEZyUCFLyRVzM2naFaiI7rqEhfXAF433FXXCgbH3fFYf03H/yb3PlcU
+         ECQ5ue2AGcSlGep1sR4Xl2coKbXzMygqXEMIjaf1KXqdUwuFymHWFgwfE7cvEJ+IS+5u
+         HUDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720485381; x=1721090181;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NQ38Bd0kst9MLbWT6jyPb0KQ10UtFUksZmt6kSW4+Lc=;
-        b=LfahUHQItc+pxoYxDu+FclSEtzxXcyP/zcEqMEF0DEoAq3bhtyF1V/cx3D5paqaDwL
-         gqhDveg62zWxReJu+lYtXNMnkWzpzL8+mYYkUKQ6vuMLxpXm4Kqe15OR9P+jraftSuAG
-         z9qTANwsB9uB9qLjN5qBInfddl1lZn2aK9F1KKHKblZADhWjpmoCj9WvlYK3r2RQIdZ6
-         e9VDN8KEB00qwTmpSml55mbJr68hejWIUOg9aTndcvltp4NAMZSj7H6w0YNDtpyVFJJm
-         7ZAcugAY33SGlLqZNLpnxuNDp7N62+IYliImE1aWOHo2sttoFOnhsmrKoZqPbYUEaN7W
-         Dk7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUwyR6qAMXmo9ZG8QiRWPa+/tR2kbWdVYz8Mm0dFBPGK7xkTmYn7vIpARlDgiM285/hexIk3x5cgF3JuBzPWkZRrYIxrMVp
-X-Gm-Message-State: AOJu0Yxr28e0+Z9UjoGmMHhSOO8KfrYBgeAxFOozWAlDqGKPtGD+WRaD
-	CW+kiuwNXvR7xhttIFHIxYAkuM97V4v0IBEPmSusYgeGlkVh0JG3QZnw5waNvsepkHwHRinPujZ
-	LXR1N/ict2yoiY7WrDA9+MwRGqF5sFx5E8+TtKkHEds//OWPLAtEq2Hw=
-X-Google-Smtp-Source: AGHT+IF3SCdXTva0hGfrZCvmsu/5C2j5yWo0gBbzwdfD++/P47knw+V10pjexYLsUjE8W9HmOuw485812n30qHjjvBMYpeQhicIh
+        d=1e100.net; s=20230601; t=1720488250; x=1721093050;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=j32VYAlsuK3/jNbvHCaSgNRDqiz9cqS48fKSFKyyisg=;
+        b=Y/ePHyrMtN591MEapUfjDK6/ETFUcqymRBA7Xrwuwbwo4OYpocRSILdb+PhNV2of7P
+         XM85+a3PYZI6TJWBz/C3OL/KS4x00iCIxtYYXHJ/SnHunMvSeBhUueBHzD5CGDu3Boa1
+         tkmQSGF9ZndLwGlyEJL0GYJq9ada0kPp76KtBzxiq1hKgdG4GBVOglgjboLEmPapGsWM
+         8evKcp/ZQe13yCiWFFE5Jy9JwRHZGVPOzkxwHibw9E6OdwTY9apknL392uTB/OGxvj5M
+         rR3+Ya2JwdKhORk80LK82QUz8PIQuTNpN2sy4A6OH7K2O2Scg/pTM+Y7ZvB3UP/3dooX
+         QLAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEqyYE5fqbSvyhy261tLkU/sctONqYGys3ObRxI3X3Q3Oa6SwlXowO8KljL8IcaPDt8ggJ8ku6GRLMY0FeuqWfN6LY4UQEEQfGtzIqLkhenanZjguD88Sro9p8
+X-Gm-Message-State: AOJu0Yyn+RL8ubd5mEKsR61zBclfOUOvfVJhR7orEz4QcfU4bFod/3oW
+	yVWRco00IdsD/mlM+XefkYcS1ose62dvwYi01r9te1841S2LnNXZRCcoMQ==
+X-Google-Smtp-Source: AGHT+IGd9SsKvaiwytVNuNwMiS1lxE3xnM6kDjIqPA7QoodzrYTEMUqV6/sjV5+BiL4ED9bplPS4nQ==
+X-Received: by 2002:a17:903:11d1:b0:1fa:2760:c3f3 with SMTP id d9443c01a7336-1fbb6d252a9mr9620375ad.13.1720488250411;
+        Mon, 08 Jul 2024 18:24:10 -0700 (PDT)
+Received: from localhost ([98.97.32.172])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a28f8esm4814595ad.64.2024.07.08.18.24.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 18:24:08 -0700 (PDT)
+Date: Mon, 08 Jul 2024 18:24:02 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ mhal@rbox.co
+Cc: Rao.Shoaib@oracle.com, 
+ bpf@vger.kernel.org, 
+ cong.wang@bytedance.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ jakub@cloudflare.com, 
+ john.fastabend@gmail.com, 
+ kuba@kernel.org, 
+ kuniyu@amazon.com, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <668c9132195f6_d7720840@john.notmuch>
+In-Reply-To: <20240708193820.3392-1-kuniyu@amazon.com>
+References: <20240707222842.4119416-2-mhal@rbox.co>
+ <20240708193820.3392-1-kuniyu@amazon.com>
+Subject: Re: [PATCH bpf v3 1/4] af_unix: Disable MSG_OOB handling for sockets
+ in sockmap/sockhash
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a92:d347:0:b0:381:7075:6911 with SMTP id
- e9e14a558f8ab-38a56e0e95dmr147685ab.1.1720485381618; Mon, 08 Jul 2024
- 17:36:21 -0700 (PDT)
-Date: Mon, 08 Jul 2024 17:36:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000346a6061cc5b897@google.com>
-Subject: [syzbot] [wireless?] WARNING in __cfg80211_bss_update (2)
-From: syzbot <syzbot+1a797e1c81be78a2ace7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Kuniyuki Iwashima wrote:
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Sun,  7 Jul 2024 23:28:22 +0200
+> > AF_UNIX socket tracks the most recent OOB packet (in its receive queue)
+> > with an `oob_skb` pointer. BPF redirecting does not account for that: when
+> > an OOB packet is moved between sockets, `oob_skb` is left outdated. This
+> > results in a single skb that may be accessed from two different sockets.
+> > 
+> > Take the easy way out: silently drop MSG_OOB data targeting any socket that
+> > is in a sockmap or a sockhash. Note that such silent drop is akin to the
+> > fate of redirected skb's scm_fp_list (SCM_RIGHTS, SCM_CREDENTIALS).
+> > 
+> > For symmetry, forbid MSG_OOB in unix_bpf_recvmsg().
+> > 
+> > Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> 
 
-syzbot found the following issue on:
+Why does af_unix put the oob data on the sk_receive_queue()? Wouldn't it
+be enough to just have the ousk->oob_skb hold the reference to the skb?
 
-HEAD commit:    d270dd21bee0 Merge tag 'pci-v6.10-fixes-2' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=123cc8a5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=864caee5f78cab51
-dashboard link: https://syzkaller.appspot.com/bug?extid=1a797e1c81be78a2ace7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+I think for TCP/UDP at least I'll want to handle MSG_OOB data correctly.
+For redirect its probably fine to just drop or skip it, but when we are
+just reading recv msgs and parsing/observing it would be nice to not change
+how the application works. In practice I don't recall anyone reporting
+issues on TCP side though from incorrectly handling URG data.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+From TCP side I believe we can fix the OOB case by checking the oob queue
+before doing the recvmsg handling. If the urg data wasn't on the general
+sk_receive_queue we could do similar here for af_unix? My argument for
+URG not working for redirect would be to let userspace handle it if they
+cared.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/987e45087f46/disk-d270dd21.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/072b7b491dd1/vmlinux-d270dd21.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e0ddb6b56277/bzImage-d270dd21.xz
+Thanks.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1a797e1c81be78a2ace7@syzkaller.appspotmail.com
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> Thanks!
+> 
+> 
+> > ---
+> >  net/unix/af_unix.c  | 41 ++++++++++++++++++++++++++++++++++++++++-
+> >  net/unix/unix_bpf.c |  3 +++
+> >  2 files changed, 43 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 142f56770b77..11cb5badafb6 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -2667,10 +2667,49 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+> >  
+> >  static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+> >  {
+> > +	struct unix_sock *u = unix_sk(sk);
+> > +	struct sk_buff *skb;
+> > +	int err;
+> > +
+> >  	if (unlikely(READ_ONCE(sk->sk_state) != TCP_ESTABLISHED))
+> >  		return -ENOTCONN;
+> >  
+> > -	return unix_read_skb(sk, recv_actor);
+> > +	mutex_lock(&u->iolock);
+> > +	skb = skb_recv_datagram(sk, MSG_DONTWAIT, &err);
+> > +	mutex_unlock(&u->iolock);
+> > +	if (!skb)
+> > +		return err;
+> > +
+> > +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> > +	if (unlikely(skb == READ_ONCE(u->oob_skb))) {
+> > +		bool drop = false;
+> > +
+> > +		unix_state_lock(sk);
+> > +
+> > +		if (sock_flag(sk, SOCK_DEAD)) {
+> > +			unix_state_unlock(sk);
+> > +			kfree_skb(skb);
+> > +			return -ECONNRESET;
+> > +		}
+> > +
+> > +		spin_lock(&sk->sk_receive_queue.lock);
+> > +		if (likely(skb == u->oob_skb)) {
+> > +			WRITE_ONCE(u->oob_skb, NULL);
+> > +			drop = true;
+> > +		}
+> > +		spin_unlock(&sk->sk_receive_queue.lock);
+> > +
+> > +		unix_state_unlock(sk);
+> > +
+> > +		if (drop) {
+> > +			WARN_ON_ONCE(skb_unref(skb));
+> > +			kfree_skb(skb);
+> > +			return -EAGAIN;
+> > +		}
+> > +	}
+> > +#endif
+> > +
+> > +	return recv_actor(sk, skb);
+> >  }
+> >  
+> >  static int unix_stream_read_generic(struct unix_stream_read_state *state,
+> > diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> > index bd84785bf8d6..bca2d86ba97d 100644
+> > --- a/net/unix/unix_bpf.c
+> > +++ b/net/unix/unix_bpf.c
+> > @@ -54,6 +54,9 @@ static int unix_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> >  	struct sk_psock *psock;
+> >  	int copied;
+> >  
+> > +	if (flags & MSG_OOB)
+> > +		return -EOPNOTSUPP;
+> > +
+> >  	if (!len)
+> >  		return 0;
+> >  
+> > -- 
+> > 2.45.2
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 19045 at net/wireless/scan.c:1714 cfg80211_combine_bsses net/wireless/scan.c:1714 [inline]
-WARNING: CPU: 1 PID: 19045 at net/wireless/scan.c:1714 __cfg80211_bss_update+0x114a/0x20c0 net/wireless/scan.c:1954
-Modules linked in:
-CPU: 1 PID: 19045 Comm: kworker/u8:9 Not tainted 6.10.0-rc6-syzkaller-00210-gd270dd21bee0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:cfg80211_combine_bsses net/wireless/scan.c:1714 [inline]
-RIP: 0010:__cfg80211_bss_update+0x114a/0x20c0 net/wireless/scan.c:1954
-Code: e1 07 fe c1 38 c1 0f 8c 49 fb ff ff 48 8b 7c 24 68 e8 aa fb 26 f7 e9 3a fb ff ff e8 e0 46 c1 f6 90 0f 0b 90 e9 c0 fb ff ff 90 <0f> 0b 90 48 89 ef e8 9b 99 e1 f9 84 c0 0f 84 9f 00 00 00 e8 be 46
-RSP: 0018:ffffc9000315ee98 EFLAGS: 00010206
-RAX: ffff88806d6fec10 RBX: ffff88802b936488 RCX: dffffc0000000000
-RDX: ffff88805e953c00 RSI: 0000000000000000 RDI: 0000000000000006
-RBP: ffff88802b936410 R08: ffffffff8ad4de30 R09: 00000010fffff448
-R10: 0000505050505050 R11: 0003000000000000 R12: ffff88802b936400
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88805ca01800
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f00aee80836 CR3: 0000000021fd0000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- cfg80211_inform_single_bss_data+0xfd6/0x2360 net/wireless/scan.c:2289
- cfg80211_inform_bss_data+0x3dd/0x5a70 net/wireless/scan.c:3117
- cfg80211_inform_bss_frame_data+0x3bc/0x720 net/wireless/scan.c:3207
- ieee80211_bss_info_update+0x8a7/0xbc0 net/mac80211/scan.c:226
- ieee80211_rx_bss_info net/mac80211/ibss.c:1099 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1578 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x1962/0x2d70 net/mac80211/ibss.c:1605
- ieee80211_iface_process_skb net/mac80211/iface.c:1603 [inline]
- ieee80211_iface_work+0x8a3/0xf10 net/mac80211/iface.c:1657
- cfg80211_wiphy_work+0x221/0x260 net/wireless/core.c:437
- process_one_work kernel/workqueue.c:3248 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3329
- worker_thread+0x86d/0xd50 kernel/workqueue.c:3409
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
