@@ -1,240 +1,191 @@
-Return-Path: <netdev+bounces-110123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B501192B04A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:37:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D0592B074
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4098C1F23F50
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:37:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4CDA1C20C40
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDDB13C3CA;
-	Tue,  9 Jul 2024 06:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CACD13BC30;
+	Tue,  9 Jul 2024 06:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F33aXuJ9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pbhpIKN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AB66138
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 06:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7632BD05
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 06:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720506914; cv=none; b=A4MSxJZ5c/HujBZGALLoV0HHqVErn1mRj7MvZ2MUvz+xS0yoOCPredE6yb7zNQVgZjqw3xoEfpQnyx5McBvtLll+BprTYOpMKXLua52DagxCO1qF4ffX/tuRvUAbQcijZcp2W31SX/Er2qH4CQXPlbi7JUpPYbHO1y4iT69lgQ8=
+	t=1720507411; cv=none; b=L4eyMrjs4wa3F/VqHz50UCigpDXYh+e6Bbk0ZppsYO8TmYoz5seE9+yqoN7iBshT8HdazudvH12xH8U4J7pXXYiS4gRL0nok8JHTssOpIKMdaHtIcKT0JQaAxcSzLXDIJyYo6xQjvPLnkdGBG7MzeLHUjRI7z//GZGVXRfI4MxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720506914; c=relaxed/simple;
-	bh=V7pD2vmuldEKTKHZ2bVYOa+O+0Nta1zIdwFNmZG0UKQ=;
+	s=arc-20240116; t=1720507411; c=relaxed/simple;
+	bh=krJMRwyHuvxUsc/WM0jQ0lstmfJcYEtT9EO5RgtMfTI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m4C/plHGw/wmIvDPyiYK0veqUsuygp5P8aDbS5nA09ZPjRelw0y5aPgo5VXlzmokj5EsAt0hZijpHCE8Tl/1SEmFuDZaoG547JATVpHLp18QMh2tmhstoho+xAE42mb+S1OSZDzPt5XvpLCr93SbWChF6O97VSdsIuY7uRZjF90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F33aXuJ9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720506911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4KGMFtZiTPlZMWNRBpD66CxKVVOshfXpDleLTuP8bLc=;
-	b=F33aXuJ9ahKLcrhlw1pcK7FNM5BcSVkMjVTGwc8KPnljwLapAmjagdWHQ0s3q/wFmYrm9x
-	8dHvB64ZQFsJWrmWrv3iyEThD9OEQWbhLsLcyXs7HEG+4cB3BMkTeExn1IoEl59dQnAHnA
-	UnXWhPH95xMbU9o2TdqEh4zeh5q3Sb4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-qWPK9LREOZqUC2NGXPp55Q-1; Tue, 09 Jul 2024 02:35:09 -0400
-X-MC-Unique: qWPK9LREOZqUC2NGXPp55Q-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-58b1cfea1f4so4274213a12.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 23:35:09 -0700 (PDT)
+	 To:Cc:Content-Type; b=dSvIQC4y0iY4/btzXLgBgDLWaE+0EZXqnHnN/KoKAEwiB2ka4pC3UFi5sXD4hDm2xjqMwIJHwsPHg7IFwMtomlshgTClnziYFy7p5PuG1nmYTsycdhHdzAbQ+0A+tbAiSseiaEK9k2LhHTQoO6GeyFpvfz/XzIC0PavK2D1UcO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pbhpIKN0; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a77c7d3e8bcso462767466b.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 23:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720507408; x=1721112208; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cmc0f4LcG7MrB8GBVrWkEPg/dPxD0VDSCj6GZR2bPX8=;
+        b=pbhpIKN0hnz2n1avrLEXGRy+0k627MWynR4v7rEw/q27Or15/n9/n+Ogt1uX18HXMs
+         kXo3OghHiA5UPvb3l+hr0VXymauzbCOGr47zaW9V1wR9e4EbruREQjDVR91JSzjK3c/Q
+         hwPJHkmnwuIdCnXoDqY0edHXLlx3rlK3FUFxsOGQwIsXChe1uJ7YPlB33QwOpI/hYm28
+         au+D8lCy2i6xS0f06BnrxZBpZ3IUjNa7SGExhw/Z/R2XnXp9YOeOMpsUDZpDn20KJQOM
+         m9edqHlLDFCxsx4Nb+TxuMD9fjIagA8hZGzpxCHsTTwTa3Hp8YmYPuz5qnAzjvsdRkfK
+         2iHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720506908; x=1721111708;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4KGMFtZiTPlZMWNRBpD66CxKVVOshfXpDleLTuP8bLc=;
-        b=bGfh8TeLRUUcX1C0dEGv6NfVkfVU7FLu5v5g07BOsTq7QcM3aHT9jy/XoED3te9R3Y
-         VTXOU+hEErJRqUXEIsleuRHhBwMQ6E5Vg3tt/S/uscRVfIkN/srqtX5WUzxwMrBESdI4
-         cOe44SncUJ/rjAGZBOgRtfacV52aiuuBxOYBUzWW64wL69SR8Kvt11NJ2RFn+/vkrZFK
-         MaOLa12KfAn0Iao7dmdp3TFjF/cXV+q8X/hfDH+Dbv38LUmKyBAEssgLxGYzwt31W9Ob
-         jx4EqIsnikvpUAAto7rsyvd4Qz8fjQ4jb2rQEzuSdY4nX5uRNWu7VqklpA3qNQW4vQ8k
-         zJXw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVKq4TD8hCmWk+MccGXFK0jIy4G1xaApoUMkQBpSkM8hsUEyL56sgpLjMl/6HcMIIzN+VPBurpFtSr40Nbr9bwFojJsiaj
-X-Gm-Message-State: AOJu0YzDzdVwChuHiCNyIq+iKHO+g2Pup92dS30NAuIm7/uNzdvrBpG6
-	L+a58stlQYwgAM6U0NFEv20QBgOBkJouOVyTxk8ksZhBN+V1DtsGenBsiVAx3rav3xOEhN9yA/l
-	f+fZexYe8BPgkdxi8wwHzGBTdNXvufGCd2ucW9f0mgVZ2DyqAlVKfwvPS6Df+eBIBWzIA1pLz68
-	S8oVSvykoojZssCu7w1iHr6Hif4ZJC
-X-Received: by 2002:a05:6402:5112:b0:57c:6afc:d2b0 with SMTP id 4fb4d7f45d1cf-594ba9974e2mr1097013a12.1.1720506908111;
-        Mon, 08 Jul 2024 23:35:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGklY1mGOFGiDZwpHaWT9IT9TQeoX0W760teltoi5merFq8TGERjX1sy6/WkO2BJsAegPRTi9zGorlxlL/sxow=
-X-Received: by 2002:a05:6402:5112:b0:57c:6afc:d2b0 with SMTP id
- 4fb4d7f45d1cf-594ba9974e2mr1096995a12.1.1720506907584; Mon, 08 Jul 2024
- 23:35:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720507408; x=1721112208;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cmc0f4LcG7MrB8GBVrWkEPg/dPxD0VDSCj6GZR2bPX8=;
+        b=BD7HduNJrmdw1dB8uki02aB2jNg5yubdExopgEQbmqxjaKE9C32orZRx1nboGGf28C
+         rGG3tLybyul8ReHmio7OlHY1WBxytrEbwkOqF1230YQ+pAWlYXnIzA2eDgiBv8Z96jv7
+         /RVLGA2Pnwvl0vy3K3ECHuY7233bEsnmZdANZgWokyOtxwb8NAd8T/0OVwkac2v/SUnp
+         vQK80vtGY5L81Ya6+WK9Ox16+OCbFScxMYwhJcEMv+WGrYCEhA34PSfimcIWr3byAnXD
+         YQXQS9QIevXZC297eUDJkuWTwJ48joc7uyrlatweWO3SZOV31C23lfw7RM8UV6EkZ1Hm
+         Cdmg==
+X-Gm-Message-State: AOJu0YzDzSHT4FTXf5wk2j/YZoBmiy/KmV/fnR+atbi20ZowKeadEp2R
+	cO7qhzhYF/wRicDl5CeIzPGqyHdVpDXz2O6QoGXfNE4rKxTNYdxKpyRHM9Awz4mdE8iYrVUUa+m
+	xuzyngKLczxPgzGzyPpbFoaYCUP2wsSbjjQED
+X-Google-Smtp-Source: AGHT+IHRHUTg1JfJuwSdrBECyTgds3MyQMwDxeIReZmX1QJOfx99WMUOnu4d5gn16zJgvv+Qa8h+K5g5od7kgS27rPE=
+X-Received: by 2002:a17:907:986f:b0:a77:eb34:3b49 with SMTP id
+ a640c23a62f3a-a780b705114mr100211366b.37.1720507407653; Mon, 08 Jul 2024
+ 23:43:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240709032326.581242-1-lulu@redhat.com> <PH0PR12MB54814BEA4DD2E8CFD434DF4BDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
-In-Reply-To: <PH0PR12MB54814BEA4DD2E8CFD434DF4BDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 9 Jul 2024 14:34:30 +0800
-Message-ID: <CACLfguUw2KaryX=72jg_N9wqEeKtSPQR+KkmzW=PRReUd9minA@mail.gmail.com>
-Subject: Re: [PATH v2] vdpa: add the support to set mac address and MTU
-To: Parav Pandit <parav@nvidia.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "mst@redhat.com" <mst@redhat.com>, 
-	"jasowang@redhat.com" <jasowang@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240702084452.2259237-1-yumike@google.com> <20240702084452.2259237-5-yumike@google.com>
+ <ZovNzu58oGJv1plS@gauss3.secunet.de>
+In-Reply-To: <ZovNzu58oGJv1plS@gauss3.secunet.de>
+From: Mike Yu <yumike@google.com>
+Date: Tue, 9 Jul 2024 14:43:11 +0800
+Message-ID: <CAHktDpMAms8-Vx=XT-fMJgd1ZXCvvy0wLp0GFw4q3e+ekHtdvQ@mail.gmail.com>
+Subject: Re: [PATCH ipsec 4/4] xfrm: Support crypto offload for outbound IPv4
+ UDP-encapsulated ESP packet
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: netdev@vger.kernel.org, stanleyjhu@google.com, martinwu@google.com, 
+	chiachangwang@google.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 9 Jul 2024 at 12:01, Parav Pandit <parav@nvidia.com> wrote:
+Fixed the comment style and sent v2 patchset.
+
+
+Mike
+
+Mike
+
+
+On Mon, Jul 8, 2024 at 7:30=E2=80=AFPM Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
 >
->
->
-> > From: Cindy Lu <lulu@redhat.com>
-> > Sent: Tuesday, July 9, 2024 8:53 AM
-> > Subject: [PATH v2] vdpa: add the support to set mac address and MTU
+> On Tue, Jul 02, 2024 at 04:44:51PM +0800, Mike Yu wrote:
+> > esp_xmit() is already able to handle UDP encapsulation through the call=
+ to
+> > esp_output_head(). The missing part in esp_xmit() is to correct the out=
+er
+> > IP header.
 > >
-> Please fix PATH to PATCH.
->
-> > Add new function to support the MAC address and MTU from VDPA tool.
-> > The kernel now only supports setting the MAC address.
-> >
-> Please include only mac address setting for now in the example and documentation.
-> In the future when kernel supports setting the mtu, please extend vdpa tool at that point to add the option.
->
-> > The usage is vdpa dev set name vdpa_name mac **:**:**:**:**
-> >
-> > here is sample:
-> > root@L1# vdpa -jp dev config show vdpa0
-> > {
-> >     "config": {
-> >         "vdpa0": {
-> >             "mac": "82:4d:e9:5d:d7:e6",
-> >             "link ": "up",
-> >             "link_announce ": false,
-> >             "mtu": 1500
-> >         }
-> >     }
-> > }
-> >
-> > root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
-> >
-> > root@L1# vdpa -jp dev config show vdpa0
-> > {
-> >     "config": {
-> >         "vdpa0": {
-> >             "mac": "00:11:22:33:44:55",
-> >             "link ": "up",
-> >             "link_announce ": false,
-> >             "mtu": 1500
-> >         }
-> >     }
-> > }
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > Test: Enabled both dir=3Din/out IPsec crypto offload, and verified IPv4
+> >       UDP-encapsulated ESP packets on both wifi/cellular network
+> > Signed-off-by: Mike Yu <yumike@google.com>
 > > ---
-> >  man/man8/vdpa-dev.8            | 20 ++++++++++++++++++++
-> >  vdpa/include/uapi/linux/vdpa.h |  1 +
-> >  vdpa/vdpa.c                    | 19 +++++++++++++++++++
-> >  3 files changed, 40 insertions(+)
+> >  net/ipv4/esp4.c         |  7 ++++++-
+> >  net/ipv4/esp4_offload.c | 14 +++++++++++++-
+> >  2 files changed, 19 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/man/man8/vdpa-dev.8 b/man/man8/vdpa-dev.8 index
-> > 43e5bf48..718f40b2 100644
-> > --- a/man/man8/vdpa-dev.8
-> > +++ b/man/man8/vdpa-dev.8
-> > @@ -50,6 +50,12 @@ vdpa-dev \- vdpa device configuration  .B qidx  .I
-> > QUEUE_INDEX
+> > diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> > index 3968d3f98e08..cd4b52e131ce 100644
+> > --- a/net/ipv4/esp4.c
+> > +++ b/net/ipv4/esp4.c
+> > @@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(stru=
+ct sk_buff *skb,
+> >  {
+> >       struct udphdr *uh;
+> >       unsigned int len;
+> > +     struct xfrm_offload *xo =3D xfrm_offload(skb);
 > >
-> > +.ti -8
-> > +.B vdpa dev set
-> > +.B name
-> > +.I NAME
-> > +.B mac
-> > +.RI "[ " MACADDR " ]"
+> >       len =3D skb->len + esp->tailen - skb_transport_offset(skb);
+> >       if (len + sizeof(struct iphdr) > IP_MAX_MTU)
+> > @@ -360,7 +361,11 @@ static struct ip_esp_hdr *esp_output_udp_encap(str=
+uct sk_buff *skb,
+> >       uh->len =3D htons(len);
+> >       uh->check =3D 0;
 > >
-> >  .SH "DESCRIPTION"
-> >  .SS vdpa dev show - display vdpa device attributes @@ -120,6 +126,15 @@
-> > VDPA_DEVICE_NAME  .BI qidx " QUEUE_INDEX"
-> >  - specifies the virtqueue index to query
-> >
-> > +.SS vdpa dev set - set the configuration to the vdpa device.
-> > +
-> > +.BI name " NAME"
-> > +-Name of the vdpa device to configure.
-> > +
-> > +.BI mac " MACADDR"
-> > +- specifies the mac address for the vdpa device.
-> > +This is applicable only for the network type of vdpa device.
-> > +
-> >  .SH "EXAMPLES"
-> >  .PP
-> >  vdpa dev show
-> > @@ -171,6 +186,11 @@ vdpa dev vstats show vdpa0 qidx 1  .RS 4  Shows
-> > vendor specific statistics information for vdpa device vdpa0 and virtqueue
-> > index 1  .RE
-> > +.PP
-> > +vdpa dev set name vdpa0 mac 00:11:22:33:44:55 .RS 4 Set a specific MAC
-> > +address to vdpa device vdpa0 .RE
-> >
-> >  .SH SEE ALSO
-> >  .BR vdpa (8),
-> > diff --git a/vdpa/include/uapi/linux/vdpa.h b/vdpa/include/uapi/linux/vdpa.h
-> > index 8586bd17..bc23c731 100644
-> > --- a/vdpa/include/uapi/linux/vdpa.h
-> > +++ b/vdpa/include/uapi/linux/vdpa.h
-> > @@ -19,6 +19,7 @@ enum vdpa_command {
-> >       VDPA_CMD_DEV_GET,               /* can dump */
-> >       VDPA_CMD_DEV_CONFIG_GET,        /* can dump */
-> >       VDPA_CMD_DEV_VSTATS_GET,
-> > +     VDPA_CMD_DEV_ATTR_SET,
-> >  };
-> >
-> >  enum vdpa_attr {
-> > diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
-> > index 6e4a9c11..4b444b6a 100644
-> > --- a/vdpa/vdpa.c
-> > +++ b/vdpa/vdpa.c
-> > @@ -758,6 +758,22 @@ static int cmd_dev_del(struct vdpa *vdpa,  int argc,
-> > char **argv)
-> >       return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL);  }
-> >
-> > +static int cmd_dev_set(struct vdpa *vdpa, int argc, char **argv) {
-> > +     struct nlmsghdr *nlh;
-> > +     int err;
-> > +
-> > +     nlh = mnlu_gen_socket_cmd_prepare(&vdpa->nlg,
-> > VDPA_CMD_DEV_ATTR_SET,
-> > +                                       NLM_F_REQUEST | NLM_F_ACK);
-> > +     err = vdpa_argv_parse_put(nlh, vdpa, argc, argv,
-> > +                               VDPA_OPT_VDEV_NAME,
-> > +
-> > VDPA_OPT_VDEV_MAC|VDPA_OPT_VDEV_MTU);
-> > +     if (err)
-> > +             return err;
-> > +
-> > +     return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL); }
-> > +
-> >  static void pr_out_dev_net_config(struct vdpa *vdpa, struct nlattr **tb)  {
-> >       SPRINT_BUF(macaddr);
-> > @@ -1028,6 +1044,9 @@ static int cmd_dev(struct vdpa *vdpa, int argc, char
-> > **argv)
-> >       } else if (!strcmp(*argv, "vstats")) {
-> >               return cmd_dev_vstats(vdpa, argc - 1, argv + 1);
-> >       }
-> > +     else if (!strcmp(*argv, "set")) {
-> > +             return cmd_dev_set(vdpa, argc - 1, argv + 1);
-> > +     }
-> Else if can be in the previous line.
+> > -     *skb_mac_header(skb) =3D IPPROTO_UDP;
+> > +     // For IPv4 ESP with UDP encapsulation, if xo is not null, the sk=
+b is in the crypto offload
+> > +     // data path, which means that esp_output_udp_encap is called out=
+side of the XFRM stack.
+> > +     // In this case, the mac header doesn't point to the IPv4 protoco=
+l field, so don't set it.
 >
-Thanks will fix this
-Thanks
-Cindy
-> >       fprintf(stderr, "Command \"%s\" not found\n", *argv);
-> >       return -ENOENT;
+> Please use networking style comments.
+>
+> > +     if (!xo || encap_type !=3D UDP_ENCAP_ESPINUDP)
+> > +             *skb_mac_header(skb) =3D IPPROTO_UDP;
+> >
+> >       return (struct ip_esp_hdr *)(uh + 1);
 > >  }
-> > --
-> > 2.45.0
+> > diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
+> > index b3271957ad9a..ccfc466ddf6c 100644
+> > --- a/net/ipv4/esp4_offload.c
+> > +++ b/net/ipv4/esp4_offload.c
+> > @@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk=
+_buff *skb,  netdev_features_
+> >       struct esp_info esp;
+> >       bool hw_offload =3D true;
+> >       __u32 seq;
+> > +     int encap_type =3D 0;
+> >
+> >       esp.inplace =3D true;
+> >
+> > @@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct s=
+k_buff *skb,  netdev_features_
+> >
+> >       esp.esph =3D ip_esp_hdr(skb);
+> >
+> > +     if (x->encap)
+> > +             encap_type =3D x->encap->encap_type;
+> >
+> > -     if (!hw_offload || !skb_is_gso(skb)) {
+> > +     if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type =
+=3D=3D UDP_ENCAP_ESPINUDP)) {
+> >               esp.nfrags =3D esp_output_head(x, skb, &esp);
+> >               if (esp.nfrags < 0)
+> >                       return esp.nfrags;
+> > @@ -324,6 +327,15 @@ static int esp_xmit(struct xfrm_state *x, struct s=
+k_buff *skb,  netdev_features_
+> >
+> >       esp.seqno =3D cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
+> >
+> > +     if (hw_offload && encap_type =3D=3D UDP_ENCAP_ESPINUDP) {
+> > +             // In the XFRM stack, the encapsulation protocol is set t=
+o iphdr->protocol by
+> > +             // setting *skb_mac_header(skb) (see esp_output_udp_encap=
+()) where skb->mac_header
+> > +             // points to iphdr->protocol (see xfrm4_tunnel_encap_add(=
+)).
+> > +             // However, in esp_xmit(), skb->mac_header doesn't point =
+to iphdr->protocol.
+> > +             // Therefore, the protocol field needs to be corrected.
 >
-
+> Same here.
+>
 
