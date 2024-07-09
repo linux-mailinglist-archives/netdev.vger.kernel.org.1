@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-110160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B04BB92B215
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3146192B217
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B6CA28256C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:24:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB00B28289E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C28E153567;
-	Tue,  9 Jul 2024 08:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39F515358F;
+	Tue,  9 Jul 2024 08:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6njLnKa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOhYVyN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A131527AA;
-	Tue,  9 Jul 2024 08:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEBD1527AA;
+	Tue,  9 Jul 2024 08:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720513405; cv=none; b=cHvHNQeOnOcbRvUxLKOis2dwIYlWbLQD6dLI3JVwW6vBh2b4K9H71z3jddeIre7uBoWv5B5p35gBKC61MNPB3umQKlv/NGnLLqR26utQZHUaKa2gBMmYHxo1WERrv3BkPUyJw8YEVawLzNq34GUZnxl+10xK96XulDzRHIhmn7E=
+	t=1720513415; cv=none; b=YmkhufpDP5B90p0CNJfvD+9Xo8tcHe/3PwmejhvOjbcJcnbcbW8sOZv9mi8qv6igb+s7UfRsz0jvzK+AmT918LlSd/Na7K/W+1IHbjpq44dOBXZD8JfsA/O/oWPKqS0O4Ov/wSZzL5Ly4XaRNbRZ62YLExKbUV85J+h4mFCzrPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720513405; c=relaxed/simple;
-	bh=oEiQb2bvaGSOSuz6qMe7NADDXyIGC4xctDpoDBC1Ibw=;
+	s=arc-20240116; t=1720513415; c=relaxed/simple;
+	bh=sOT4iTDzWIfLs9UA0R4XOev6spnQG9gjkKs4PSXQU0o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TbnxZOG3CjLWjfnIUAndfBbya6CFZkM1igLNMH6pqC1CdqzCwze4IaOCg2KVnh9WbbSuMCNfjI3EF6IEMC6adGDpP49YqBvp+da0A18lOazacY8aq6Jf5x7uZrm2fP2ED/EwXr3vJAaSCf3YJbu132tTJRPx7S4I9fu90dwPHwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6njLnKa; arc=none smtp.client-ip=209.85.215.169
+	 MIME-Version; b=NHqdjgS2eCYr7fTajly0NydcasqGdwBahs+/UUqUHy5JgKk0/70UKDYc0UCuu71YdQFi3Dmos44cNEGmrgDDwPwOmQTcZc37oPDUqIl0MNtLvcoTWHAgJe5WfMavx/HiFsjXUXRNurHGIDrmA4qsXa5Qdx7DblE57g1w4nvYe8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOhYVyN4; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-75c3afd7a50so2442912a12.2;
-        Tue, 09 Jul 2024 01:23:23 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2c95ca60719so2862087a91.3;
+        Tue, 09 Jul 2024 01:23:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720513403; x=1721118203; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720513413; x=1721118213; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P8/7znqqkBhNFJlanRTa4ag0D5o5jL152q+Urfiz2A8=;
-        b=H6njLnKaala6TMtivNJ84MY6f/hJF9FuKR7XGwwXZ5HgRBEIbmBjnoansBY7SvluwM
-         ZhVkblaUSB0a6vGTVX1qvGNgrdouPVAT2awATsgjy8bNnmEVXKMHF+BoUn77aJNmayV1
-         z1kBO6LPWW9pTXHQri7Q+v/HqZT//B4ApJQ4bP+PmwVQM5JSeZsn6kdUcgZQYl8PB0f5
-         9BUrZoMAjvTy+kQ7rTESG/IbIH4RhoNfEJtjNdz6vBnR5ftKAmcI73piNwo0piRqFAdd
-         9caQIHIk4Q1n5BtPnMEXCU6uIUbyp1X68+l/jYWCbAFlp15cYZUE/J7aPCUQh5RtBO+z
-         g53g==
+        bh=eP0LjrMRjIFsgCTgIBPUz0T81YiHTsFBk9I0t0JMtzc=;
+        b=gOhYVyN4HWShWBlYHn7n1c1X/AqYC7dfJQs4aZ+KOWbnrVzyCbF3iaMbzu7pVkscBl
+         yITWh+9YAATUoRweC52CVrPU2S43glCdep2vdjA+MhMrWXIroY4I2TSa/X3lLjFu0ZwR
+         4DqluLUSeT5gp/2Sz8l/IrgMAcLipLjvi0c/qKBkwVgiS6tw4dN5UFyAyEqxpKuWGSRb
+         48w3Ikgz2iEwW+lJVU92oD3qUhxZKSxdP42h7pmWiSiwqAKNJyb4F9vALb64IkPu6285
+         e0KbwUxWiMlLvOQk4YCmgrrGO8cWHOK+pIjOU0DUlLRSjf3Tkiq2UWPwzHbMRi16fyzx
+         XwuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720513403; x=1721118203;
+        d=1e100.net; s=20230601; t=1720513413; x=1721118213;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=P8/7znqqkBhNFJlanRTa4ag0D5o5jL152q+Urfiz2A8=;
-        b=vPum1uvzil70c1vHVBbeX5e4NpxX6p8+qUaxBQEQc0VwmGJ7jIWJTQXXTOU6I8mhQn
-         xeo+XbZXIHyjxhZ/0IJaI/dqRhsjfSw4Ub+Pz4g17PosatxIA+4v694B5ENeRbdG4niJ
-         eR7dy6dhoWsTKlg+69aQPXeP/avsO4/vlGHEtKjY+yAx+RFn5xfvedIJcOFBkQOHYTm1
-         ixZybNOvCibK+ch7XXKCrwlkuJdcGlzoYddP8nGGaP1T72ZEFDZUpFJe7dVJWFqywIny
-         09tZlBMDCPurJ7OY7koRf3R4Bu0obw7bI4SWNOz+jPdrtU+/ANo6ES4QKh+KW8GStkah
-         4olQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnbcp+qzWC8kb2FO2Y1sIgLGduEqlMcY1i7QCTcLC1crbPzz/af2rshlYjDtMH9o8llY13epsFUGMKmt4iHALq4WGqxthCxXRxK1NW
-X-Gm-Message-State: AOJu0YwE2rl+T2AyoTPBzV57xXNhfSF7JcFlnKs1iLQWuDngtEFvAqMf
-	0wt/EJGIaWUy/N+amoxJMjtAW7MCs80DTY+bXpuKKnjcsN37TDAf
-X-Google-Smtp-Source: AGHT+IHsqtsn6gyOtXLL7y6Rzws8PcIlR1wfJvphBhSBBRCCn9DI8cbMl/kEnHnZ4m8DDm7Ae1Wzhg==
-X-Received: by 2002:a05:6a20:2588:b0:1be:ffe4:b2a2 with SMTP id adf61e73a8af0-1c298203941mr1960899637.7.1720513403354;
-        Tue, 09 Jul 2024 01:23:23 -0700 (PDT)
+        bh=eP0LjrMRjIFsgCTgIBPUz0T81YiHTsFBk9I0t0JMtzc=;
+        b=tC8D9fm5nX25M2uh74HuIl9tZdR/hcsd/A/FF2KoL6BON3zNGDYIomI4QDLBCf0+ZN
+         QXsnOleErvgZpALNuWziyoZNU4VE9CxGk/iGciHgLdYjOQobNRPG7uVuYK5iwiEpyiOw
+         F2HcxRQqrU0H4iX14+R6JnIy4i7diFtZw/yA+O/0pLx0qp5YitO6Rm3/MPp5OGnyyFXl
+         V8zwH8V/rq3dajdgePi9MuzJmjjJfhcw3Qzr1+4OaTDw2LH2iK+aYy/skoku34RRgplH
+         vGvUK7GeATNMBBoNe2wNtiSclLQuwLPYQYfgSuA/5+vT42FfKshpIGoZJ3H8gZi0/yxD
+         zH9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXadAVlQuKuJlXOvwAWdkIiywlaauEK1nsEyztXSdngX9QyL7VWr9+ilKeDfRbwtW74U8Qo6EImqb0Hihas7uRDydnZa/Jcd6eka58Z
+X-Gm-Message-State: AOJu0Yy8kcpNe17bAPQZccCEMBDb+NE7wfOFPnBJ5jkRKZbb7H9kcfP3
+	cfhy90InjL9edrcWJRTISxspMPhx8rlBNFXVd/RausCpQ95uyOxo
+X-Google-Smtp-Source: AGHT+IEsA/J8BKGkc+qhPKYByQIdxwFS8gpklEmLtJM7nUypk4CDvh/2Q/FxDq9p43lqdv9itrHpzw==
+X-Received: by 2002:a17:90a:db58:b0:2c9:8d5d:d175 with SMTP id 98e67ed59e1d1-2ca35d59cedmr1492273a91.48.1720513413478;
+        Tue, 09 Jul 2024 01:23:33 -0700 (PDT)
 Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c99a92a430sm9588929a91.4.2024.07.09.01.23.14
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c99a92a430sm9588929a91.4.2024.07.09.01.23.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 01:23:22 -0700 (PDT)
+        Tue, 09 Jul 2024 01:23:33 -0700 (PDT)
 From: Furong Xu <0x1207@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -84,9 +84,9 @@ Cc: netdev@vger.kernel.org,
 	xfr@outlook.com,
 	rock.xu@nio.com,
 	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1 5/7] net: stmmac: xgmac: rename XGMAC_RQ to XGMAC_FPRQ
-Date: Tue,  9 Jul 2024 16:21:23 +0800
-Message-Id: <8e719b6c4c1fad64eedb0faad15d7920f708b736.1720512888.git.0x1207@gmail.com>
+Subject: [PATCH net-next v1 6/7] net: stmmac: xgmac: complete FPE support
+Date: Tue,  9 Jul 2024 16:21:24 +0800
+Message-Id: <36336e43ee530596d77b15b80e3afac7bfd3319a.1720512888.git.0x1207@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1720512888.git.0x1207@gmail.com>
 References: <cover.1720512888.git.0x1207@gmail.com>
@@ -98,31 +98,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Synopsys XGMAC Databook defines MAC_RxQ_Ctrl1 register:
-RQ: Frame Preemption Residue Queue
+FPE implementation for DWMAC4 and DWXGMAC differs only for:
+1) Offset address of MAC_FPE_CTRL_STS
+2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
 
-XGMAC_FPRQ is more readable and more consistent with GMAC4.
+Introduce dwxgmac_fpe_ops to complete the FPE implementation for DWXGMAC.
 
 Signed-off-by: Furong Xu <0x1207@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  2 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 37 +++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |  1 +
+ 4 files changed, 41 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 917796293c26..c66fa6040672 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -84,8 +84,8 @@
- #define XGMAC_MCBCQEN			BIT(15)
- #define XGMAC_MCBCQ			GENMASK(11, 8)
- #define XGMAC_MCBCQ_SHIFT		8
--#define XGMAC_RQ			GENMASK(7, 4)
--#define XGMAC_RQ_SHIFT			4
-+#define XGMAC_FPRQ			GENMASK(7, 4)
-+#define XGMAC_FPRQ_SHIFT		4
- #define XGMAC_UPQ			GENMASK(3, 0)
- #define XGMAC_UPQ_SHIFT			0
- #define XGMAC_RXQ_CTRL2			0x000000a8
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index 655012ffbc0a..f13ed91b498f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -259,6 +259,7 @@ static const struct stmmac_hwif_entry {
+ 		.tc = &dwmac510_tc_ops,
+ 		.mmc = &dwxgmac_mmc_ops,
+ 		.est = &dwmac510_est_ops,
++		.fpe = &dwxgmac_fpe_ops,
+ 		.setup = dwxgmac2_setup,
+ 		.quirks = NULL,
+ 	}, {
+@@ -280,6 +281,7 @@ static const struct stmmac_hwif_entry {
+ 		.tc = &dwmac510_tc_ops,
+ 		.mmc = &dwxgmac_mmc_ops,
+ 		.est = &dwmac510_est_ops,
++		.fpe = &dwxgmac_fpe_ops,
+ 		.setup = dwxlgmac2_setup,
+ 		.quirks = stmmac_dwxlgmac_quirks,
+ 	},
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 7b19614c611d..81ce8ede2641 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -686,6 +686,7 @@ extern const struct stmmac_mmc_ops dwmac_mmc_ops;
+ extern const struct stmmac_mmc_ops dwxgmac_mmc_ops;
+ extern const struct stmmac_est_ops dwmac510_est_ops;
+ extern const struct stmmac_fpe_ops dwmac4_fpe_ops;
++extern const struct stmmac_fpe_ops dwxgmac_fpe_ops;
+ 
+ #define GMAC_VERSION		0x00000020	/* GMAC CORE Version */
+ #define GMAC4_VERSION		0x00000110	/* GMAC4+ CORE Version */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+index 97e404fac56a..c6894d5263c9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+@@ -7,6 +7,7 @@
+ #include "stmmac.h"
+ #include "stmmac_fpe.h"
+ #include "dwmac4.h"
++#include "dwxgmac2.h"
+ 
+ static int __fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
+ {
+@@ -92,3 +93,39 @@ const struct stmmac_fpe_ops dwmac4_fpe_ops = {
+ 	.irq_status = dwmac4_fpe_irq_status,
+ 	.send_mpacket = dwmac4_fpe_send_mpacket,
+ };
++
++static void dwxgmac_fpe_configure(void __iomem *ioaddr,
++				  struct stmmac_fpe_cfg *cfg,
++				  u32 num_txq, u32 num_rxq, bool enable)
++{
++	u32 value;
++
++	if (enable) {
++		cfg->fpe_csr = FPE_CTRL_STS_EFPE;
++		value = readl(ioaddr + XGMAC_RXQ_CTRL1);
++		value &= ~XGMAC_FPRQ;
++		value |= (num_rxq - 1) << XGMAC_FPRQ_SHIFT;
++		writel(value, ioaddr + XGMAC_RXQ_CTRL1);
++	} else {
++		cfg->fpe_csr = 0;
++	}
++
++	writel(cfg->fpe_csr, ioaddr + FPE_CTRL_STS_XGMAC_OFFSET);
++}
++
++static int dwxgmac_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
++{
++	return __fpe_irq_status(ioaddr + FPE_CTRL_STS_XGMAC_OFFSET, dev);
++}
++
++static void dwxgmac_fpe_send_mpacket(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
++				     enum stmmac_mpacket_type type)
++{
++	__fpe_send_mpacket(ioaddr + FPE_CTRL_STS_XGMAC_OFFSET, cfg, type);
++}
++
++const struct stmmac_fpe_ops dwxgmac_fpe_ops = {
++	.configure = dwxgmac_fpe_configure,
++	.irq_status = dwxgmac_fpe_irq_status,
++	.send_mpacket = dwxgmac_fpe_send_mpacket,
++};
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+index efdb5536e856..b74cf8f2c2f2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+@@ -5,6 +5,7 @@
+  */
+ 
+ #define FPE_CTRL_STS_GMAC4_OFFSET	0x00000234
++#define FPE_CTRL_STS_XGMAC_OFFSET	0x00000280
+ 
+ #define FPE_CTRL_STS_TRSP		BIT(19)
+ #define FPE_CTRL_STS_TVER		BIT(18)
 -- 
 2.34.1
 
