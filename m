@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-110316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C4492BD4F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:44:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22AFA92BD53
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B0F628C557
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 14:44:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39DC1B2889D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 14:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED72D19D066;
-	Tue,  9 Jul 2024 14:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1A119D08E;
+	Tue,  9 Jul 2024 14:44:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4885C19CD08;
-	Tue,  9 Jul 2024 14:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49A219CCF6;
+	Tue,  9 Jul 2024 14:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720536257; cv=none; b=TVijsalVzo1/pAwrv30PQgVLyYYfsC91MV7sg2v5SKNUrasj6ILPaOhfO9n0YUjlq9204Pp1d7lP313BdZOP5XkqRBArvDwLtcDUxZbvjQ3y8/tDCu0ZyOtH1h4bHNCCn4fX7EHQDiS7bEMn19qZLQFyJNYUZohgGP7yQs7I54s=
+	t=1720536259; cv=none; b=GwWgrM+treaIEni6mVAiDitUqxIhDSEC/byyhyoanmbgHAOw7hqPzyB1sRJSMtN1/G85aWw0+9leQObeZogl5dl7EnuDaiKhmx3wKiB0KcX7bbICmUUPi5xfWvpNEj6JqbLO32izlMhwdeQ61iUvaPjnrLt0fukSosK0Nhkn9Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720536257; c=relaxed/simple;
-	bh=W6yMqaE41OlDBEIgiNxvVuVTPZrqwpqbKz79y1d9LiE=;
+	s=arc-20240116; t=1720536259; c=relaxed/simple;
+	bh=Tvqxjf0N6l3GTpWFwGge2xMlKhD/CeT33iKWyPokJzM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qTvjtmtpfs7IptwppQWgbsumhToayKelXjQ8tfmDedSr2TDl0xpejhL4EhFB6GUwiX+3F4UGumgCaAhvRhFaAAOOZFzXJjrfJN2kROOKTPGjkCAq5XheE8oUmRtFIwvWLBQe67qvL4TCtHdEEIjlDZ0ETcq+bjHdDfrScmIriUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.43
+	 MIME-Version; b=oTXy6EPr+ABQePLMPGsk5REOD0oXQIE3JORWoP+f1CyCHZ49bs8+oBfxVK8oowLNHGZxmAlIBGPD+ehBkbAR2onMR2ktjaYougOZtOoOyNCReqzkunlEv1mCIJwuvhJ6HnWtJN36PJjpvl6dOSh04Ri7SKK3VKsgIlW+SnK0LH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52ea929ea56so6735677e87.0;
-        Tue, 09 Jul 2024 07:44:15 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a77e7420697so401098966b.1;
+        Tue, 09 Jul 2024 07:44:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720536254; x=1721141054;
+        d=1e100.net; s=20230601; t=1720536256; x=1721141056;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=53Fo5RNi03TqYv7uPWkY+kGMfarDzeZ7ETXCPaSupjU=;
-        b=q+qkz5zvd0NpXbqDMOOurucf9dZ4GbeMKtgZYqhBDXGtgeRoEmNtBNKujlyvpisPJT
-         CpP8c7Mah3y2LxhS+jlA6n4l+IX1qmXyTSwzCXonmlRP6v992Hdxn9gczftX8SvLhUXl
-         qjDC1iAJAjsd+wGqsoTqvxZxS02MlunvYcS4b3DFk/jJYvbuFFttXRKTeEsM4kmNBm8n
-         /rlrhWW3LTBomqEFE/b/AsCq1xIdFvVLhLSGKK6mQyruM+8R4NRP6i8Vgw28pDnSM0UD
-         kK4YGiuW1JHFS2OfUFF0GkJF7imU3GO3U8MA/4eymSZEYjuZEPfzqlawk3ieCrIyabaG
-         XbzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0brtYC6icFlmfOB8fHQiUeN/b/2TcvOnv3CckDGXG7iom+TjszfR9X4H2TiRWBbcVrx12NYd6rGVHvcUwm7WD5Xs4zgQZYIdwCB+taCRfk0lv8k4E+b72rWCaEWwlfTGkaxXY
-X-Gm-Message-State: AOJu0YwQp2fejaExoKzyGN/7cixx/NLCkuujpz/Ns+0BLOQe3DJOGZBQ
-	M92JszoPGGYGfIWKcNQj4Rkps5YAdqLxwUIQFBhU+dM9Srqc2vCQ
-X-Google-Smtp-Source: AGHT+IFfIk+h8GEmouVc0xm9avRwo62OFN2pEtBtFACYaLeOQkZmii+MMY9mAZqIWoK5/oKaqEzSEw==
-X-Received: by 2002:a05:6512:1247:b0:52e:716a:1898 with SMTP id 2adb3069b0e04-52eb99d5ff5mr2275785e87.58.1720536254051;
-        Tue, 09 Jul 2024 07:44:14 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a7fef4esm83003766b.121.2024.07.09.07.44.13
+        bh=ewtc0gkqH+Jh23Mk4mdXNAHA8fX0PKQF6/iY8Gy51x0=;
+        b=VLEY437Df8jH5B7r4sp1KzWEHZZeCOCIJcwZqzaqcCSoT6xBuKOzVlcLEbMuDkQJGt
+         sBnwA/lGe7IzkCINpw0TOOkJiCeO4B1qBHaGud22wUjyWD1a+/S12H25qFKHcvHKpYf0
+         RkJK5OkruRzRJIjbtBabsp3b4/Fhjq9StIXZStxClo4iUa3FUuQOTRUjj2qH6ZnpjETe
+         eyMZ5ztL264jjDwe5y4j1DBBYVdtfIjJ/ELENNcgM3X3Rlw4pgyMZppitgL9TCTbDH6V
+         5l0GpLwCiBtP7pZidWxEsg5hNTg9fdC5EKNG9sLMvLioP+Lzife7hMzTROXJrdIvqbrp
+         nbxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSPkP6WQCiVMEG9oLi8aaX07xaqSuyeXnzuQ73y1Gzogjeq/ZICb0Ip+bmxIghcY9e+NeZF71BDS+3SKRth7dJHsKZr3UkGsvb4DNacOmLB01howLehtM0DeVHtUHytwViVC1F
+X-Gm-Message-State: AOJu0YxX5/4QriQmIhqfmRgmS0+1prEw6ojB12cMA4hts9QtsXugrGPB
+	5f8hZKQ/fBSqHim7MKsZQ9y5ETybSgS+/jpjIO0xfOHOTN1BZ+LC
+X-Google-Smtp-Source: AGHT+IHnAkfL/ucgW+6bWaBiym6Ym73TFBQDhJUkVFcISYrYyuQQ03BI425zsHWpM/lZeyATW5GmTg==
+X-Received: by 2002:a17:906:36d3:b0:a6f:b58f:ae3c with SMTP id a640c23a62f3a-a780b6b1b96mr179372366b.26.1720536255954;
+        Tue, 09 Jul 2024 07:44:15 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a7ff7aesm82149866b.102.2024.07.09.07.44.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 07:44:13 -0700 (PDT)
+        Tue, 09 Jul 2024 07:44:15 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -63,9 +63,9 @@ Cc: thepacketgeek@gmail.com,
 	horms@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/3] net: netconsole: Remove unnecessary cast from bool
-Date: Tue,  9 Jul 2024 07:43:59 -0700
-Message-ID: <20240709144403.544099-2-leitao@debian.org>
+Subject: [PATCH net-next 2/3] net: netconsole: Eliminate redundant setting of enabled field
+Date: Tue,  9 Jul 2024 07:44:00 -0700
+Message-ID: <20240709144403.544099-3-leitao@debian.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240709144403.544099-1-leitao@debian.org>
 References: <20240709144403.544099-1-leitao@debian.org>
@@ -77,30 +77,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The 'enabled' variable is already a bool, so casting it to its value
-is redundant.
+When disabling a netconsole target, enabled_store() is called with
+enabled=false. Currently, this results in updating the nt->enabled
+field twice:
 
-Remove the superfluous cast, improving code clarity without changing
-functionality.
+1. Inside the if/else block, with the target_list_lock spinlock held
+2. Later, without the target_list_lock
+
+This patch eliminates the redundancy by setting the field only once,
+improving efficiency and reducing potential race conditions.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/netconsole.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index ab8a0623b1a1..de0d89e4e4e2 100644
+index de0d89e4e4e2..5ef680cf994a 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -344,7 +344,7 @@ static ssize_t enabled_store(struct config_item *item,
- 		goto out_unlock;
+@@ -369,6 +369,7 @@ static ssize_t enabled_store(struct config_item *item,
+ 		if (err)
+ 			goto out_unlock;
  
- 	err = -EINVAL;
--	if ((bool)enabled == nt->enabled) {
-+	if (enabled == nt->enabled) {
- 		pr_info("network logging has already %s\n",
- 			nt->enabled ? "started" : "stopped");
- 		goto out_unlock;
++		nt->enabled = true;
+ 		pr_info("network logging started\n");
+ 	} else {	/* false */
+ 		/* We need to disable the netconsole before cleaning it up
+@@ -381,8 +382,6 @@ static ssize_t enabled_store(struct config_item *item,
+ 		netpoll_cleanup(&nt->np);
+ 	}
+ 
+-	nt->enabled = enabled;
+-
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+ 	return strnlen(buf, count);
+ out_unlock:
 -- 
 2.43.0
 
