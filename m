@@ -1,268 +1,240 @@
-Return-Path: <netdev+bounces-110122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E058C92B03B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:35:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B501192B04A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1011C1C21483
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:35:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4098C1F23F50
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07346156880;
-	Tue,  9 Jul 2024 06:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDDB13C3CA;
+	Tue,  9 Jul 2024 06:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HOqKTsdV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F33aXuJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2FD155CA9;
-	Tue,  9 Jul 2024 06:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AB66138
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 06:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720506668; cv=none; b=UkZ/VhYVfF9RwcxgXp5M/a6yUICvRv+MD6epu+tqcx7NnsB75CgCF4bSGWORqMCk6azzyut7Pm3yw7hNlFlzLjZoXTRJs/qmo72kWLm658veTDmT6Ge9aHEvaTKaQ4i6GLe1xce+W1mCT0Uh1DUw5N6c8kUD5JAmc+QDtpNXJHg=
+	t=1720506914; cv=none; b=A4MSxJZ5c/HujBZGALLoV0HHqVErn1mRj7MvZ2MUvz+xS0yoOCPredE6yb7zNQVgZjqw3xoEfpQnyx5McBvtLll+BprTYOpMKXLua52DagxCO1qF4ffX/tuRvUAbQcijZcp2W31SX/Er2qH4CQXPlbi7JUpPYbHO1y4iT69lgQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720506668; c=relaxed/simple;
-	bh=xhS5/zRmDI/A1aV/sGTISRv98gl+ovzuBwnz8Nll2/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pA2BVKEruxlQkj1dia3c/OlJCiNpp/RZgEhGbbCGxHjtTWCuQetmorif3J84MRwd+7QjmsttaPV3Z/ZmQLVd341U/x5RHR6SOP0Oa1eAvtgBKILIr4d1JXg9qUJxtf1ScSe5686HF9U3QxHpD1+DEKjsnKWMStmHnXSrIzLyf+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HOqKTsdV; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C24B21BF20C;
-	Tue,  9 Jul 2024 06:31:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720506665;
+	s=arc-20240116; t=1720506914; c=relaxed/simple;
+	bh=V7pD2vmuldEKTKHZ2bVYOa+O+0Nta1zIdwFNmZG0UKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m4C/plHGw/wmIvDPyiYK0veqUsuygp5P8aDbS5nA09ZPjRelw0y5aPgo5VXlzmokj5EsAt0hZijpHCE8Tl/1SEmFuDZaoG547JATVpHLp18QMh2tmhstoho+xAE42mb+S1OSZDzPt5XvpLCr93SbWChF6O97VSdsIuY7uRZjF90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F33aXuJ9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720506911;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PxZwf90oSmqa2Y6+v9YbmDAgIqnXOP6V17TxdbG7UnA=;
-	b=HOqKTsdVp+CVwIodj8Nm0Uu5CBkYegxuHfgmkMLFzzY+k115hf8PgFePur61xpYnTdl8fK
-	L2q/HNdHOeCNufJuI95NGDu1TLU/19iHXhNILYabBjGv3VQS0XL6ZEumFkuY6PXBCeGF/4
-	hVN/G+lvx3WfZMFC2bMWEQXnLdIaK7zAafZeDSdBT6XFKxOB8Y5F8xzbk+wq5Lx+BiJLOr
-	IbgDl6O8mcU9aHTziOIiqVsGpT+/UWXmXZ8r3Gnt1Qz0JzKZdv3WKXdyozhhE8hGcf9yg8
-	oOEBCqokHkBuD/nK9MawrGO66BsrbvN66VsKwRz9TaQKL35qurn/sWW72XrPag==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v17 14/14] Documentation: networking: document phy_link_topology
-Date: Tue,  9 Jul 2024 08:30:37 +0200
-Message-ID: <20240709063039.2909536-15-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
-References: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
+	bh=4KGMFtZiTPlZMWNRBpD66CxKVVOshfXpDleLTuP8bLc=;
+	b=F33aXuJ9ahKLcrhlw1pcK7FNM5BcSVkMjVTGwc8KPnljwLapAmjagdWHQ0s3q/wFmYrm9x
+	8dHvB64ZQFsJWrmWrv3iyEThD9OEQWbhLsLcyXs7HEG+4cB3BMkTeExn1IoEl59dQnAHnA
+	UnXWhPH95xMbU9o2TdqEh4zeh5q3Sb4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-363-qWPK9LREOZqUC2NGXPp55Q-1; Tue, 09 Jul 2024 02:35:09 -0400
+X-MC-Unique: qWPK9LREOZqUC2NGXPp55Q-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-58b1cfea1f4so4274213a12.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 23:35:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720506908; x=1721111708;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4KGMFtZiTPlZMWNRBpD66CxKVVOshfXpDleLTuP8bLc=;
+        b=bGfh8TeLRUUcX1C0dEGv6NfVkfVU7FLu5v5g07BOsTq7QcM3aHT9jy/XoED3te9R3Y
+         VTXOU+hEErJRqUXEIsleuRHhBwMQ6E5Vg3tt/S/uscRVfIkN/srqtX5WUzxwMrBESdI4
+         cOe44SncUJ/rjAGZBOgRtfacV52aiuuBxOYBUzWW64wL69SR8Kvt11NJ2RFn+/vkrZFK
+         MaOLa12KfAn0Iao7dmdp3TFjF/cXV+q8X/hfDH+Dbv38LUmKyBAEssgLxGYzwt31W9Ob
+         jx4EqIsnikvpUAAto7rsyvd4Qz8fjQ4jb2rQEzuSdY4nX5uRNWu7VqklpA3qNQW4vQ8k
+         zJXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWVKq4TD8hCmWk+MccGXFK0jIy4G1xaApoUMkQBpSkM8hsUEyL56sgpLjMl/6HcMIIzN+VPBurpFtSr40Nbr9bwFojJsiaj
+X-Gm-Message-State: AOJu0YzDzdVwChuHiCNyIq+iKHO+g2Pup92dS30NAuIm7/uNzdvrBpG6
+	L+a58stlQYwgAM6U0NFEv20QBgOBkJouOVyTxk8ksZhBN+V1DtsGenBsiVAx3rav3xOEhN9yA/l
+	f+fZexYe8BPgkdxi8wwHzGBTdNXvufGCd2ucW9f0mgVZ2DyqAlVKfwvPS6Df+eBIBWzIA1pLz68
+	S8oVSvykoojZssCu7w1iHr6Hif4ZJC
+X-Received: by 2002:a05:6402:5112:b0:57c:6afc:d2b0 with SMTP id 4fb4d7f45d1cf-594ba9974e2mr1097013a12.1.1720506908111;
+        Mon, 08 Jul 2024 23:35:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGklY1mGOFGiDZwpHaWT9IT9TQeoX0W760teltoi5merFq8TGERjX1sy6/WkO2BJsAegPRTi9zGorlxlL/sxow=
+X-Received: by 2002:a05:6402:5112:b0:57c:6afc:d2b0 with SMTP id
+ 4fb4d7f45d1cf-594ba9974e2mr1096995a12.1.1720506907584; Mon, 08 Jul 2024
+ 23:35:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20240709032326.581242-1-lulu@redhat.com> <PH0PR12MB54814BEA4DD2E8CFD434DF4BDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB54814BEA4DD2E8CFD434DF4BDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 9 Jul 2024 14:34:30 +0800
+Message-ID: <CACLfguUw2KaryX=72jg_N9wqEeKtSPQR+KkmzW=PRReUd9minA@mail.gmail.com>
+Subject: Re: [PATH v2] vdpa: add the support to set mac address and MTU
+To: Parav Pandit <parav@nvidia.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "mst@redhat.com" <mst@redhat.com>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The newly introduced phy_link_topology tracks all ethernet PHYs that are
-attached to a netdevice. Document the base principle, internal and
-external APIs. As the phy_link_topology is expected to be extended, this
-documentation will hold any further improvements and additions made
-relative to topology handling.
-
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- Documentation/networking/ethtool-netlink.rst  |   3 +
- Documentation/networking/index.rst            |   1 +
- .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
- 3 files changed, 125 insertions(+)
- create mode 100644 Documentation/networking/phy-link-topology.rst
-
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index d9f0c0dba1e5..81ddb750c1f9 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -2189,10 +2189,13 @@ Retrieve information about a given Ethernet PHY sitting on the link. The DO
- operation returns all available information about dev->phydev. User can also
- specify a PHY_INDEX, in which case the DO request returns information about that
- specific PHY.
-+
- As there can be more than one PHY, the DUMP operation can be used to list the PHYs
- present on a given interface, by passing an interface index or name in
- the dump request.
- 
-+For more information, refer to :ref:`phy_link_topology`
-+
- Request contents:
- 
-   ====================================  ======  ==========================
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index d1af04b952f8..c71b87346178 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -91,6 +91,7 @@ Contents:
-    operstates
-    packet_mmap
-    phonet
-+   phy-link-topology
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
-new file mode 100644
-index 000000000000..4dec5d7d6513
---- /dev/null
-+++ b/Documentation/networking/phy-link-topology.rst
-@@ -0,0 +1,121 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _phy_link_topology:
-+
-+=================
-+PHY link topology
-+=================
-+
-+Overview
-+========
-+
-+The PHY link topology representation in the networking stack aims at representing
-+the hardware layout for any given Ethernet link.
-+
-+An Ethernet interface from userspace's point of view is nothing but a
-+:c:type:`struct net_device <net_device>`, which exposes configuration options
-+through the legacy ioctls and the ethtool netlink commands. The base assumption
-+when designing these configuration APIs were that the link looks something like ::
-+
-+  +-----------------------+        +----------+      +--------------+
-+  | Ethernet Controller / |        | Ethernet |      | Connector /  |
-+  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
-+  +-----------------------+        +----------+      +--------------+
-+  struct net_device               struct phy_device
-+
-+Commands that needs to configure the PHY will go through the net_device.phydev
-+field to reach the PHY and perform the relevant configuration.
-+
-+This assumption falls apart in more complex topologies that can arise when,
-+for example, using SFP transceivers (although that's not the only specific case).
-+
-+Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
-+interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
-+10GBaseR, etc.
-+
-+The link topology then looks like this (when an SFP module is inserted) ::
-+
-+  +-----+  SGMII  +------------+
-+  | MAC | ------- | SFP Module |
-+  +-----+         +------------+
-+
-+Knowing that some modules embed a PHY, the actual link is more like ::
-+
-+  +-----+  SGMII   +--------------+
-+  | MAC | -------- | PHY (on SFP) |
-+  +-----+          +--------------+
-+
-+In this case, the SFP PHY is handled by phylib, and registered by phylink through
-+its SFP upstream ops.
-+
-+Now some Ethernet controllers aren't able to output a serialized interface, so
-+we can't directly connect them to an SFP cage. However, some PHYs can be used
-+as media-converters, to translate the non-serialized MAC MII interface to a
-+serialized MII interface fed to the SFP ::
-+
-+  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
-+  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
-+  +-----+         +-----------------------+         +--------------+
-+
-+This is where the model of having a single net_device.phydev pointer shows its
-+limitations, as we now have 2 PHYs on the link.
-+
-+The phy_link topology framework aims at providing a way to keep track of every
-+PHY on the link, for use by both kernel drivers and subsystems, but also to
-+report the topology to userspace, allowing to target individual PHYs in configuration
-+commands.
-+
-+API
-+===
-+
-+The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
-+resource, that gets initialized at netdevice creation. Once it's initialized,
-+it is then possible to register PHYs to the topology through :
-+
-+:c:func:`phy_link_topo_add_phy`
-+
-+Besides registering the PHY to the topology, this call will also assign a unique
-+index to the PHY, which can then be reported to userspace to refer to this PHY
-+(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
-+0 is reserved to indicate the PHY doesn't belong to any topology yet.
-+
-+The PHY can then be removed from the topology through
-+
-+:c:func:`phy_link_topo_del_phy`
-+
-+These function are already hooked into the phylib subsystem, so all PHYs that
-+are linked to a net_device through :c:func:`phy_attach_direct` will automatically
-+join the netdev's topology.
-+
-+PHYs that are on a SFP module will also be automatically registered IF the SFP
-+upstream is phylink (so, no media-converter).
-+
-+PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
-+and :c:func:`phy_sfp_detach_phy`, which can be used as a
-+.attach_phy / .detach_phy implementation for the
-+:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
-+
-+UAPI
-+====
-+
-+There exist a set of netlink commands to query the link topology from userspace,
-+see ``Documentation/networking/ethtool-netlink.rst``.
-+
-+The whole point of having a topology representation is to assign the phyindex
-+field in :c:type:`struct phy_device <phy_device>`. This index is reported to
-+userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
-+will result in all PHYs from all net_device being listed. The DUMP command
-+accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
-+to be passed in the request to filter the DUMP to a single net_device.
-+
-+The retrieved index can then be passed as a request parameter using the
-+``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
-+
-+* ``ETHTOOL_MSG_STRSET_GET`` to get the stats string set from a given PHY
-+* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
-+  cable testing on a given PHY on the link (most likely the outermost PHY)
-+* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
-+* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
-+  to set the PLCA (Physical Layer Collision Avoidance) parameters
-+
-+Note that the PHY index can be passed to other requests, which will silently
-+ignore it if present and irrelevant.
--- 
-2.45.1
+On Tue, 9 Jul 2024 at 12:01, Parav Pandit <parav@nvidia.com> wrote:
+>
+>
+>
+> > From: Cindy Lu <lulu@redhat.com>
+> > Sent: Tuesday, July 9, 2024 8:53 AM
+> > Subject: [PATH v2] vdpa: add the support to set mac address and MTU
+> >
+> Please fix PATH to PATCH.
+>
+> > Add new function to support the MAC address and MTU from VDPA tool.
+> > The kernel now only supports setting the MAC address.
+> >
+> Please include only mac address setting for now in the example and documentation.
+> In the future when kernel supports setting the mtu, please extend vdpa tool at that point to add the option.
+>
+> > The usage is vdpa dev set name vdpa_name mac **:**:**:**:**
+> >
+> > here is sample:
+> > root@L1# vdpa -jp dev config show vdpa0
+> > {
+> >     "config": {
+> >         "vdpa0": {
+> >             "mac": "82:4d:e9:5d:d7:e6",
+> >             "link ": "up",
+> >             "link_announce ": false,
+> >             "mtu": 1500
+> >         }
+> >     }
+> > }
+> >
+> > root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
+> >
+> > root@L1# vdpa -jp dev config show vdpa0
+> > {
+> >     "config": {
+> >         "vdpa0": {
+> >             "mac": "00:11:22:33:44:55",
+> >             "link ": "up",
+> >             "link_announce ": false,
+> >             "mtu": 1500
+> >         }
+> >     }
+> > }
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  man/man8/vdpa-dev.8            | 20 ++++++++++++++++++++
+> >  vdpa/include/uapi/linux/vdpa.h |  1 +
+> >  vdpa/vdpa.c                    | 19 +++++++++++++++++++
+> >  3 files changed, 40 insertions(+)
+> >
+> > diff --git a/man/man8/vdpa-dev.8 b/man/man8/vdpa-dev.8 index
+> > 43e5bf48..718f40b2 100644
+> > --- a/man/man8/vdpa-dev.8
+> > +++ b/man/man8/vdpa-dev.8
+> > @@ -50,6 +50,12 @@ vdpa-dev \- vdpa device configuration  .B qidx  .I
+> > QUEUE_INDEX
+> >
+> > +.ti -8
+> > +.B vdpa dev set
+> > +.B name
+> > +.I NAME
+> > +.B mac
+> > +.RI "[ " MACADDR " ]"
+> >
+> >  .SH "DESCRIPTION"
+> >  .SS vdpa dev show - display vdpa device attributes @@ -120,6 +126,15 @@
+> > VDPA_DEVICE_NAME  .BI qidx " QUEUE_INDEX"
+> >  - specifies the virtqueue index to query
+> >
+> > +.SS vdpa dev set - set the configuration to the vdpa device.
+> > +
+> > +.BI name " NAME"
+> > +-Name of the vdpa device to configure.
+> > +
+> > +.BI mac " MACADDR"
+> > +- specifies the mac address for the vdpa device.
+> > +This is applicable only for the network type of vdpa device.
+> > +
+> >  .SH "EXAMPLES"
+> >  .PP
+> >  vdpa dev show
+> > @@ -171,6 +186,11 @@ vdpa dev vstats show vdpa0 qidx 1  .RS 4  Shows
+> > vendor specific statistics information for vdpa device vdpa0 and virtqueue
+> > index 1  .RE
+> > +.PP
+> > +vdpa dev set name vdpa0 mac 00:11:22:33:44:55 .RS 4 Set a specific MAC
+> > +address to vdpa device vdpa0 .RE
+> >
+> >  .SH SEE ALSO
+> >  .BR vdpa (8),
+> > diff --git a/vdpa/include/uapi/linux/vdpa.h b/vdpa/include/uapi/linux/vdpa.h
+> > index 8586bd17..bc23c731 100644
+> > --- a/vdpa/include/uapi/linux/vdpa.h
+> > +++ b/vdpa/include/uapi/linux/vdpa.h
+> > @@ -19,6 +19,7 @@ enum vdpa_command {
+> >       VDPA_CMD_DEV_GET,               /* can dump */
+> >       VDPA_CMD_DEV_CONFIG_GET,        /* can dump */
+> >       VDPA_CMD_DEV_VSTATS_GET,
+> > +     VDPA_CMD_DEV_ATTR_SET,
+> >  };
+> >
+> >  enum vdpa_attr {
+> > diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
+> > index 6e4a9c11..4b444b6a 100644
+> > --- a/vdpa/vdpa.c
+> > +++ b/vdpa/vdpa.c
+> > @@ -758,6 +758,22 @@ static int cmd_dev_del(struct vdpa *vdpa,  int argc,
+> > char **argv)
+> >       return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL);  }
+> >
+> > +static int cmd_dev_set(struct vdpa *vdpa, int argc, char **argv) {
+> > +     struct nlmsghdr *nlh;
+> > +     int err;
+> > +
+> > +     nlh = mnlu_gen_socket_cmd_prepare(&vdpa->nlg,
+> > VDPA_CMD_DEV_ATTR_SET,
+> > +                                       NLM_F_REQUEST | NLM_F_ACK);
+> > +     err = vdpa_argv_parse_put(nlh, vdpa, argc, argv,
+> > +                               VDPA_OPT_VDEV_NAME,
+> > +
+> > VDPA_OPT_VDEV_MAC|VDPA_OPT_VDEV_MTU);
+> > +     if (err)
+> > +             return err;
+> > +
+> > +     return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL); }
+> > +
+> >  static void pr_out_dev_net_config(struct vdpa *vdpa, struct nlattr **tb)  {
+> >       SPRINT_BUF(macaddr);
+> > @@ -1028,6 +1044,9 @@ static int cmd_dev(struct vdpa *vdpa, int argc, char
+> > **argv)
+> >       } else if (!strcmp(*argv, "vstats")) {
+> >               return cmd_dev_vstats(vdpa, argc - 1, argv + 1);
+> >       }
+> > +     else if (!strcmp(*argv, "set")) {
+> > +             return cmd_dev_set(vdpa, argc - 1, argv + 1);
+> > +     }
+> Else if can be in the previous line.
+>
+Thanks will fix this
+Thanks
+Cindy
+> >       fprintf(stderr, "Command \"%s\" not found\n", *argv);
+> >       return -ENOENT;
+> >  }
+> > --
+> > 2.45.0
+>
 
 
