@@ -1,102 +1,90 @@
-Return-Path: <netdev+bounces-110281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC86092BB66
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:35:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EED92BB6A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D58391C23FCF
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:35:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17F891F27693
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAA717C232;
-	Tue,  9 Jul 2024 13:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2574617C9EB;
+	Tue,  9 Jul 2024 13:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2f+Eujxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1B317C203;
-	Tue,  9 Jul 2024 13:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931817C7DB;
+	Tue,  9 Jul 2024 13:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531896; cv=none; b=pyKpH2G+i2gQTgVbmPfQM/9O+heHnxYwIW1B9uRM3ZGsir2LrcopQkT/YMLRttf2eR77YUU9NMUEuVgKAXL1/klil8gOszj2cy8HD9Ca9pdort0AHImrlKyedxgSujCzDcT0fCgAPsYFsMc4oo19kwlKwbKa21s3L9bBnVjJdvM=
+	t=1720531900; cv=none; b=NfaCEztK65MyaJOzy2EIYemObm6DyLSi+TN8zv4rjp2hkpiei76jbr5ddR3ArYMks+K4YNFEsG+d72BWRKs+eQ5CH3n8UL3s8SA1vhruGVxY+urMN3jcbhbE6otZwKuFodcJ3u4L7d2q6sPtcCiCls3OkKc6RWCNkjG98VySqNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531896; c=relaxed/simple;
-	bh=nURqjr0y22PZq9mDv1AIDyr6uBDPyReNc1hDax4d9UQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZR1zbd/eK3F4q8EmAvp2mMG6tUPnd/18Yjo4gziR9R96O8jvrK2CoOAjhZvuXWAjHgjn+Kn54JB4UeEc3IeOub7WsEw2sgAPrBgP5Afh2ZcUh8JF+6Ps3HOm4n6TZ3+AVgKDm4dKg+gEproLoygpl/cIxl6NndLvgTWBYueB6Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WJMJz2MMZz1HF78;
-	Tue,  9 Jul 2024 21:29:07 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 28A251A0188;
-	Tue,  9 Jul 2024 21:31:32 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 9 Jul 2024 21:31:31 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>
-Subject: [PATCH net-next v10 15/15] mm: page_frag: add a entry in MAINTAINERS for page_frag
-Date: Tue, 9 Jul 2024 21:27:40 +0800
-Message-ID: <20240709132741.47751-16-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240709132741.47751-1-linyunsheng@huawei.com>
-References: <20240709132741.47751-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1720531900; c=relaxed/simple;
+	bh=4WP+WQ9nQvGm3F9qQzb3JcVtkEtMk1y8Lok9QkQkdaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SqufbVOOumHFYxEHgZZ5oT7z8GV2mYlB3rIdiWcr+RkzF/ggvXJC7luBmUvLafZjOxxRwM5pJ7TbTXi+K7oYzOUZOEPGo3dQObRFMhNufe0H9ApOtnmbkOo7zafvEwv9kA3qFrlToYJABOAlDohjb/DZhtH8Jw4NV9Cz5fU1mtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2f+Eujxf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Zre5YSHteeLdEYtuTx/X+RGnWx775ASLQOdTxRDdE1M=; b=2f+Eujxf0jG9ADlgV4JEjThm70
+	ijEtLEUs5PC2z37RnVaF0M08Hvl0ZPDHZ7WYUK7azsyd9E/0uohZwhiEnMtmvjay5hIurMagJv5ZG
+	BcvftJrTYNWO2BWi3y5juufyiUQ/mBqiSNv4FVLHqS/qv0gY5OurErVfDUE9+ixx5QjY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sRAwD-002945-K6; Tue, 09 Jul 2024 15:31:21 +0200
+Date: Tue, 9 Jul 2024 15:31:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1 7/7] net: stmmac: xgmac: enable Frame
+ Preemption Interrupt by default
+Message-ID: <28ddf3e2-be4e-437a-b872-5ba07659e40e@lunn.ch>
+References: <cover.1720512888.git.0x1207@gmail.com>
+ <fc69b94aad4bbe568dcf9ef7aa73f9bac685142c.1720512888.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fc69b94aad4bbe568dcf9ef7aa73f9bac685142c.1720512888.git.0x1207@gmail.com>
 
-After this patchset, page_frag is a small subsystem/library
-on its own, so add a entry in MAINTAINERS for to indicate
-the new subsystem/library's maintainer, maillist, status and
-file lists of page_frag.
+On Tue, Jul 09, 2024 at 04:21:25PM +0800, Furong Xu wrote:
+> Frame Preemption Interrupt is required to finish FPE handshake.
+> 
+> XGMAC_FPEIE is read-only reserved if FPE is not supported by HW.
+> There is no harm that we always set XGMAC_FPEIE bit.
 
-Alexander is the orginal author of page_frag, add him in the
-MAINTAINERS too.
+This is better, it explains what is going on, why the change is being
+made. But when i see this, i think about the interrupt handler. You
+don't just enable a new interrupt, you also need to handle the
+interrupt. Where is that handler code?
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+The commit message is the place you try to answer the questions
+reviewers are going to ask. So if the interrupt handler already looks
+for this interrupt cause and handles it, add a statement to the commit
+message explaining it.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e0f28278e504..693361aaf155 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16951,6 +16951,17 @@ F:	mm/page-writeback.c
- F:	mm/readahead.c
- F:	mm/truncate.c
- 
-+PAGE FRAG
-+M:	Alexander Duyck <alexander.duyck@gmail.com>
-+M:	Yunsheng Lin <linyunsheng@huawei.com>
-+L:	linux-mm@kvack.org
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/mm/page_frags.rst
-+F:	include/linux/page_frag_cache.h
-+F:	mm/page_frag_cache.c
-+F:	mm/page_frag_test.c
-+
- PAGE POOL
- M:	Jesper Dangaard Brouer <hawk@kernel.org>
- M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
--- 
-2.33.0
-
+	Andrew
 
