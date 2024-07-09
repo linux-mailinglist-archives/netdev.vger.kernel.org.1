@@ -1,168 +1,284 @@
-Return-Path: <netdev+bounces-110213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F65892B523
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 12:23:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C27E892B52A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 12:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5BFA1F22F2A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78B07285311
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14524156F40;
-	Tue,  9 Jul 2024 10:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED322156C7B;
+	Tue,  9 Jul 2024 10:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IdPRZXHo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MhQKY5Eu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D75F15698B
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 10:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720520584; cv=none; b=HVGrCfxWxBaLGiSTo/TDTU5OyadqSNZjPFKFqeco4nVRZpAfnNjKx51Pouap4e+i8pDk+ZO8gW+MVorSmtwHbyKJjbmVeOqGs37rhPY8ZXYRWzU+p+05bZuusOSuuetzQ9UUzwwtU5wdrNu2VpcH692P8jYNMEj0E86dkUaFHtw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720520584; c=relaxed/simple;
-	bh=shZBn9O6tDZqsTAj9UATwUocjlYxEwemiZOAFeghCdY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=tmFZyVLZw/7KHUlr6eCDcfjYVi04tDPWV4SfHbVl+2y7IXisUIZIDhDVTxBVQVzL5cYQi/4cCZUho6s/l3IUWelfE3pB3ksq5hN57Q2KMpQ/LBRldYevpD/0WQBCoAmawxDqLsC1CTi4v/t/VYlNzOXBxqQ9h2QfQAo6OQn+bQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=IdPRZXHo; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1fb3b7d0d3aso26790055ad.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 03:23:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720520582; x=1721125382; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TjUlVhcBSrZG9pW+ab6mrCPR/9xRt4gi/qaCx2Wysw8=;
-        b=IdPRZXHo0HryBOkipJ8My5DrG7sYuMS/KnPFkCQckWQrh2ljnCG3JP+tWZeq0pt5Wl
-         cjuNPPhrIKc3cpI5sFBW771MSmB0J++RjKEoCmdHHEn8EkYrqSAmbdwV8/9qRPSs5Cd6
-         yKjlRZhFgYk74h6b2iVVCgZkRTWO8/jZIXFnc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720520582; x=1721125382;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TjUlVhcBSrZG9pW+ab6mrCPR/9xRt4gi/qaCx2Wysw8=;
-        b=bPhBA9Koa22NTX+bTUze3h+Sri16ZHxzP6Yb/g2xKLEKokWZE8nTwyqw+1dhSNmD0I
-         UA7ajNM1mutnu0HfHkqTWNJ5Qm4K9xM61VOIsn2Hc089xeeinkBMx4vT8Rm3t44N9vud
-         /1B+LFujJ8Dxt7sCB9B6McVroA2WLqeR12IyiW0W7CTGNpgk63x3ZgM6dq3ophBaWBlK
-         IjJh1ZGuGidLqQDrE2NfkvLCdMEJS3mvjHbKFdUHnKS386Kw6y4d/g2S1EwRnNr5Msgb
-         F9iZ+ZtshVbuC3hXeti5i14wDaUMUnWNybxq5fDcbj8YCjCbO8cmDvRMjKxGmnGMcEY8
-         hDAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuCOfGwJNZnryHXPOjiVTJMflmOI0g406LMFNXSnInpTQg2ASrFXzxqXD3FZIVl9eIIlBrvChI+ov+y4ixJjo4gv1ZvM1P
-X-Gm-Message-State: AOJu0Yz5Hfrv1F7ejAcU7i3nKwrRbsdWIpLQ9XoW9yguapvndUzv2v4E
-	+pF+ssb4ZRJGbfFy3nFPduFW/7q8spnXdLQ/975iL70d+pfy2bzDcs9WIKxcCQ==
-X-Google-Smtp-Source: AGHT+IHHhfYP/usTymLr9Nc0xnCzRg4Vr9DrYxFrPK0z+o/YRUvUx7r46S2Nxb/v+kszqDPCfjsdjw==
-X-Received: by 2002:a17:903:984:b0:1fb:72ea:376 with SMTP id d9443c01a7336-1fbb6e87fc5mr17619895ad.65.1720520581773;
-        Tue, 09 Jul 2024 03:23:01 -0700 (PDT)
-Received: from kashwindayan-virtual-machine.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a11757sm12832525ad.35.2024.07.09.03.23.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2024 03:23:01 -0700 (PDT)
-From: Ashwin Kamat <ashwin.kamat@broadcom.com>
-To: linux-kernel@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	davem@davemloft.net,
-	yoshfuji@linux-ipv6.org,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	florian.fainelli@broadcom.com,
-	ajay.kaher@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	tapas.kundu@broadcom.com,
-	ashwin.kamat@broadcom.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH v5.10 2/2] net/ipv6: prevent NULL dereference in ip6_output()
-Date: Tue,  9 Jul 2024 15:52:50 +0530
-Message-Id: <1720520570-9904-3-git-send-email-ashwin.kamat@broadcom.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1720520570-9904-1-git-send-email-ashwin.kamat@broadcom.com>
-References: <1720520570-9904-1-git-send-email-ashwin.kamat@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEA9156967;
+	Tue,  9 Jul 2024 10:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720520733; cv=fail; b=bDYV+i/NP+BCnJ3aXu2Zp4z/VyQWVOwr/uyIyRZfmf5PietfERxi83ZLo3ojrTGasfyqdEsRRa15aUx30lke1eCWOx0cFlsq9EXxGSbQTFJmEJKM3oVBNKli7LIxCC9GjjGzJJ3Pud+UfsMSXSmNdlW4mleTETQmJU1X8K73Q7M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720520733; c=relaxed/simple;
+	bh=h5oT/5OWumgylFAtpKA2wxE+SJRLNBwgsPTxL+U8zkk=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Lvs5Apad0dN6XZBLNnvjCQ4Olaueg14TWDAqPF/ZtDohWkaqTB5diEdgsIjxOgiqtf/BYM+sZXO038rNKVX5oz505SHqnKzf8KIRzeR9Kz4Z70JRYVjtq+rILh7Z2RnvezklmRmThFV+Pk/43XDuvAZvfXhtV++gk8x3AFzGiso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MhQKY5Eu; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720520732; x=1752056732;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=h5oT/5OWumgylFAtpKA2wxE+SJRLNBwgsPTxL+U8zkk=;
+  b=MhQKY5EueQRgDN0lkuOknoKXD4OD0Xs1M6mP01LHSbvG9UoVthmd0t21
+   LRjIDny2HoA6VTbEmNelnXEmoOpcwBqN31iESGRA4lk4PkKefarF+jvf2
+   vyIBdspJDwvTC5WcmFwfnQY40hOxH5EuBiAlum9Hny4jDGmK0kPqtTbV9
+   8MJ4deoI3RB1MzCj7DFtiRxDMNlBPwvDGqVV4CJOWeaMdurgx3OX485zX
+   +rnRmwzT7wF7fNp0106YeC3c0ENcpJBT0nKueT0Q/ztzY3haSFHff8Qgt
+   FrUHbUIQAYSIMC5IoK/H9KSNAp8J0XlXaFT5dET1WwLN7Ed2Sgn1QY3oE
+   g==;
+X-CSE-ConnectionGUID: h27O2x0OSB6ZHAvNQMJDDg==
+X-CSE-MsgGUID: CGUIPWt8ToW1uXm5g5TrPw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11127"; a="12449504"
+X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
+   d="scan'208";a="12449504"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 03:25:31 -0700
+X-CSE-ConnectionGUID: Z1dPl0EyT22ovXhD/ZD2Cg==
+X-CSE-MsgGUID: 35dsVVFmTfOPEQUAu0xNmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
+   d="scan'208";a="52214625"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Jul 2024 03:25:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 9 Jul 2024 03:25:30 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 9 Jul 2024 03:25:30 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 9 Jul 2024 03:25:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dQXg/lGeSa9/Ypg1vCJMXbniGnnUaoVbNg1wdXyfTqIcxh/oemgsvwbQtmqUsaa033M3GTCNv5A89uw99khJQ6YDNeIXc7oyZnuuucOtuxmu+oKPHdkIuO9VAsDtypJHHVouB+Gk9j5oJV/TpTGut52lKgmfAl6bTuEO4I0qAVlEbJeQigkJ2rBzGtP2Q1YsXeyBbllP0dWdzVFZ8PMbk8v5XHXfKsFzKVS1Ye6Vlkh8cGdQLVNTe5RzvBBKZvT6KnK82NdXdJRrfG6Vm7bafuvgDC1elt2GYKK4pvIs4P62wQTexSxe0/V0iz9RAx9qAW0c6FWTOH090+IfvmW0+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xHHBxw5/6sTKRREWK/j8yEaXVOSrEz/CiG0vRJ3e+mA=;
+ b=A9k3l1C1XOetM/bqSIXF4uepll0icOJ01TWXNeE3KDR9WcVxN2bSs9bowcSJqRSyqczGqVXwSBVCWtNQ2E8MU2rYmFA266f9vdroIvtrWPxC+Vu9UMQ1WHoBsT8XgZnQgMOg0yVYF2Zcdz7bB91rkzgYP0QstKWS3EPKfihgGEZJFDftikR6XIjSs6YBtAt4Fg9bGGhWPNYVbNG/rVNPy+afIJJ4OzplhcwT+jPNtfoSqLNfNiR7zMKGMtNhZoOAaHVLrvwtFjH4ZUwGplGOXNuhQGzqOE+HymQRhj4EId8oJvp/hz580M0RWVqcrSwlmbHJ9wr9jcpMX6wO5jeuRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by LV3PR11MB8508.namprd11.prod.outlook.com (2603:10b6:408:1b4::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Tue, 9 Jul
+ 2024 10:25:23 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
+ 10:25:23 +0000
+Message-ID: <14683709-212b-43cb-a110-bb184fcff775@intel.com>
+Date: Tue, 9 Jul 2024 12:25:16 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ice: Adjust over allocation
+ of memory in ice_sched_add_root_node() and ice_sched_add_node()
+To: Paul Menzel <pmenzel@molgen.mpg.de>, Aleksandr Mishin <amishin@t-argos.ru>
+CC: <lvc-project@linuxtesting.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, <intel-wired-lan@lists.osuosl.org>, Simon Horman
+	<horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+References: <20240708182736.8514-1-amishin@t-argos.ru>
+ <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
+ <23d2e91c-4215-4ea5-8b3c-4dd58a1062af@molgen.mpg.de>
+ <190d0cdc-d6de-4526-b235-91b25b50c905@intel.com>
+ <56160e13-662d-4f7e-86d3-1a88716f01d9@molgen.mpg.de>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <56160e13-662d-4f7e-86d3-1a88716f01d9@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR07CA0213.eurprd07.prod.outlook.com
+ (2603:10a6:802:58::16) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|LV3PR11MB8508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 248c2df6-e3db-4500-c251-08dca00170de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cmREMmlnL3AxVm5hblV0STBJSlc4SlNFVm9WZDFBViswUzVmcVBqeWpZSG9U?=
+ =?utf-8?B?dFczRmhmLzVldmdxZzV5bnlJOW5ZVWF2VzJNY1BKL29qLzFxMUhqMmdja1hR?=
+ =?utf-8?B?bkxyQXY3WDRyUjR6Um1NaVFYRlNoanF2UUo2U0xZM2FlSTdOUHE2WGoxRjRZ?=
+ =?utf-8?B?MkVNRWtMM0svV1FLSHJPS3hiMllsQ0E1bWZXbUVCbnRNdUM0ZThheXZ6cXhV?=
+ =?utf-8?B?Umt6dEFzcmMwczFRQTlTd0xuTWg2R3RVa0x0UnVCcmlPU28yV1Jpc2YrMkFs?=
+ =?utf-8?B?Sy9NL3dBeGF3eGxxYkxYWEJ3cVo2cmFaSG5rY082aklIR05QR1RuT3pDVmhC?=
+ =?utf-8?B?RjhDRkFLWXdYb1ZBTGN3VFQrOFAwUEsrNXZ5ZVlKYkJWd2Q2RlpBUENPVDRt?=
+ =?utf-8?B?MUlUY3NVSXZxSjVuYmZ6aWQ2bG01TDhSV2Z1WG5FNllaR2RDQk9TVFdmV0pN?=
+ =?utf-8?B?V1gyU0dQSjRjUkY3cGg5ZWtJcHg4UVlZL25zblZwcUdSMk5uL2JQNFYraVV6?=
+ =?utf-8?B?UFZxUmp1SWRaSklJL25jb08wTTNmMytoczdYbXlhU3I5ZHZQYkZmMkRvK24z?=
+ =?utf-8?B?aXJPazhzblF1RDJiVC9WMnBXbnNqQ3I5ZVNsV2pnRHprMGpNc3BkeDRUdGgx?=
+ =?utf-8?B?alk4MWczOEU1TlJONVhIVzBUTjJKRjZHRlhMdXVIc3BYM3VpS1BiMEgzT09r?=
+ =?utf-8?B?UWZEdVhDMk5Wdm94MzhyUDViNGFub3htR01ESXhrOTlkNlM4d2xmbUFieUds?=
+ =?utf-8?B?NkV6MGNFMzBxVURXNUdjSUhlRGxhK0tVcGZTZG8yek5UZ1lIS3pDcHVQYlpX?=
+ =?utf-8?B?V1Q4ZzFDQlVuc0NBQkpTeUxhY2FUMStoYXNJbExFbWdrc0lncFNCaW05SW9N?=
+ =?utf-8?B?b2w0OTIwUkpzUW1yd2NTQlBxTDAyN2JXNzdaTUhmbU5yWHZ5WUN1QWwwOVNa?=
+ =?utf-8?B?ajlWUWVSVzBqQWlsb1BiWGtxaEFtbHhIVzhxdlRBMFRnWTdjWU5CTmE5eEdK?=
+ =?utf-8?B?NmxIQTNhaFhkdlh1YW4rNHJSVDg0TkxMWVRVRkNEbzh0UkxtVW9sa1lxMk42?=
+ =?utf-8?B?Um1yOE9FZFBoOGp3NHg5QnorK2xkbFlYYXZHanFFbHlTaGhFYW9RVDdMNCtu?=
+ =?utf-8?B?RG8rd2kyZ3ZHbWRMbXJiNXYwQzZmVUhiU2lUOHpJTnAxdUZvejBHRU9PNm9q?=
+ =?utf-8?B?blFTOGEzVkkvRHlwakZIQUlTckQzSUVlUzIwdFFudGpJQnBzL1cvSGV6Q1BS?=
+ =?utf-8?B?dVA0ZFFnZmh1ZHdDcWlOTUpmSWcvT21XdFZjTWhBcWVrL0w5WUZhRFFKV0hl?=
+ =?utf-8?B?V0g3UXhyNHpGQUEveEVhdlprV0l4cjljcURUTnI1SzRndnp3WmF2djRDb3Y3?=
+ =?utf-8?B?Y3ptYzV2djlGKzkxWHRmaEpBbzdOTitJWkg5TDRhYUprYnlMQUE4MERRcG5G?=
+ =?utf-8?B?SHlIZTlDYzJUa2NYNTI3eEtzVFJuNzB5Y2g5Y2RRYXlUdy91a2VIZTBNUldr?=
+ =?utf-8?B?d0FoZGVLQUpJSHpWdFZjSGUwMFZWNW5rM0Qza0xvcUdRS21MUkVxRzhTOUpy?=
+ =?utf-8?B?TzQvNm41ZnpjdEllTnhBd3p0N1B3Y3ZMZWNhaDJqUkxCMmliWjQxSHRqZkZm?=
+ =?utf-8?B?alYxbXN3VXZyTmIrU2dWamFHT25PUngwczBhWEhyQU5LSXRmU0lOSVBHYVNn?=
+ =?utf-8?B?WFpWaE1FaDJUaUdJYkpUTUlxM2FORmM1V243QTd0L2lWZGVnMUpzMnNIZVg2?=
+ =?utf-8?Q?Z3xDhWy8yJ2j+6zwg4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mm1McHpxaDM0UHlzRVc2NGZkd2xQanhXcEIxNXQxUkoyZnJqc1JoVWptVDV1?=
+ =?utf-8?B?NUFnVWVzUzJud25Idi9DY0NubjVHMUJQN2VGMi9iRTIrRndPc3FTSGlxWU9m?=
+ =?utf-8?B?a0tvMXF3Ujl2d3UxczBvUTN4NFYyYU40SG9FNnVxSDNTSUp6bWNPWVIyRHIz?=
+ =?utf-8?B?b3NhTmNpZDV4R3pqNlFIczFiMllyaWl2TjliTjhoTFh2enQ3Skl6MWV1NGpx?=
+ =?utf-8?B?dU5wQ2hBUWFJSXJxUHduUTlxNXBVRTJSckhDeVp0M210ZGJ3UG12ZmpXV2hx?=
+ =?utf-8?B?RkJvc2NKMkVMWTdmY0RRZXF3WWc0Ulh3WmQvTitMMmhRUmtPNVdBNnBZWHdk?=
+ =?utf-8?B?aW8wYzhtNUpwK252STNlOTZrZS9adnk0SXBQQ2tlWDM3dFNqNGYxbXZETGRL?=
+ =?utf-8?B?c0JFajZaQVNCM2pETFRqUzFQSklRdmtkRlRnV0FzdCtzLy9NSmFuOW1sQktL?=
+ =?utf-8?B?VVJGeHMyb0ExcHVNRWVYYldBQ2pqbFFKcjVaYUQ1eWJPTDd3UlNiM3VUUVJu?=
+ =?utf-8?B?OTZJWVJVZ3Vlcm55VHJhUysxMWNXRmN1OCs3VWo5NnM0Rkc0ZW5oR0ZKVHJL?=
+ =?utf-8?B?WldKRERoMnJUQ0RNTytGRThnaCtyVmxpaWtCdU04R3RLYVIrRHVaRzhSbUxz?=
+ =?utf-8?B?bDJiU3VXRjVJSFM0K3FwUllBZEJOZXRaaXpOYUkyekRUME4raG9GWmM3UU1J?=
+ =?utf-8?B?REdLWUo5c0hNbXV5emdmWWxJSzd6WVp2WXlVWXpESE9EWEJtZWVlY2lPRDVS?=
+ =?utf-8?B?YTFxbWlkczQvbnlxdENOMUlBRThSU1VpaFRzUDlzb1ZUcjFFZitiSG5aaDh3?=
+ =?utf-8?B?VHgrNEc2ZjdoNFBjaXBWZldtRG9kaUdBOFlTMkZGVVlzWDk3Z05zZzRGcjhr?=
+ =?utf-8?B?Z1JBeFJrdi9vUi9XUHNWYktNbXRWNVA4YUxwNnBTdUZYRzlDN0tacVU2RUM0?=
+ =?utf-8?B?ekFyN1M2R1FKU0xMMlJrbTBtbjgrVTJzUlRqQmpNSXMyZnJBZkQvRlJCUWZG?=
+ =?utf-8?B?T3phTkg0WTROV2xkWkNDZkhsKzZnTTJUbHplQ0VwMklMWHJpQXE3NjZFbi9j?=
+ =?utf-8?B?Vm9jSjdValZJajlrM0xLM29GWDBrdHdqQTJ3a3RCUks5ZEQvaGg0OWdVb3NW?=
+ =?utf-8?B?YnUrSWxkR1R5ZTJWU3pWY25zWVp0U3JCY2pVWXJwZzBhVnA4SDNCVWUzTGFK?=
+ =?utf-8?B?Rjh3a3FWYU4rbXZxT3BJZ0ZxczY5RGtXVkxlbUpVaGxHalpkeFpHNTdvRnFF?=
+ =?utf-8?B?Z1VxaFluQVpaUkw3b291UVFGeWFMTU5HNTUrYnNkb2RrL0FsWVlwb3BUNS9R?=
+ =?utf-8?B?cVFXanh5RU5OTmhoUTlacU05QityQmlGcWZuUGczQ2hRajlZUHVKb2U1OFp6?=
+ =?utf-8?B?Tm9rRUxtVGxpaWRnQVE2bm1KV0tjcUNHYUdkSlFlWFExdnNabFdTMDBjQWhD?=
+ =?utf-8?B?bGxKdkdZTlVEYXc3NmhuaThrRjV4WnNWb012ZUU5RFA0TzNuQXVpZTcrNC9U?=
+ =?utf-8?B?a0F4bzFtMlpWRWlxVUVTcU93Nld0eXF2VE5BbUhJSkJ0My8rc3Q4UFFnZEhi?=
+ =?utf-8?B?d29sL1FhTTRTcTlLMkpRUGZYYk5HU241aGFOQlB3MktJR2NSWEVyWkJWNjRi?=
+ =?utf-8?B?MG0ra2FNdVg4dDVYbnlpYS9pZ1V0UC93NU1pcXRaTUUvZFpPbGxIdmR2TUJS?=
+ =?utf-8?B?SWZIUFg0dkdpR3YwM1MxZStFL1BzdjNsWTY4dlpjOVVPL3VPQUJPNThWTmlL?=
+ =?utf-8?B?OEsxRXI1STVmd0ZtQWdSNFlsZEhHeSszRUVNdFhjczVhcWc1YXMvaDFKOXRG?=
+ =?utf-8?B?K2E5Sy85Y24ySXBleHhxWDF6Y3puNEorWnN1V0o2bDFISHBxN1phc01ZNGJM?=
+ =?utf-8?B?cldTSHlqWGFTQWVFMnlUMW5lT0s2cjJJeTJDRkpUeDU4ZDZielZpZ2NKQWlR?=
+ =?utf-8?B?RnNtMlQ1OGoxdEozRzBjZ1JwaWtwQklwWTFRekgxNzB2YXhhTVlGTzVQaHph?=
+ =?utf-8?B?ZHlrZS9lVUJUUDdTS00yWnRYSFNGeXFsd1RhSDZxTDdMTkdnNFhoL2U1S1JS?=
+ =?utf-8?B?Q3VGc28yNUZnc1BQMUErRHRDU0paQjlPRk9UVlRxSEVnanQwZFAvOWt5elB1?=
+ =?utf-8?B?V1lLYjAyYzhYSW5aVXlxSHpBVnVXR1JjY2ZpUkxYQ05HUkFDZS85Ly84T1pr?=
+ =?utf-8?B?RGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 248c2df6-e3db-4500-c251-08dca00170de
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2024 10:25:23.0931
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x92bSsg0gEVm11QBfDOSfEB7HAp4uhC9CBic6ccbIobe58NufHsTZ4vu3SuY29lGU8c+0M0GgPlnmKlYZKYTfrn2JEunDsCc2V0H12GKt7k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8508
+X-OriginatorOrg: intel.com
 
-From: Eric Dumazet <edumazet@google.com>
+On 7/9/24 11:50, Paul Menzel wrote:
+> Dear Przemek,
+> 
+> 
+> Thank you for your quick reply.
+> 
+> 
+> Am 09.07.24 um 11:11 schrieb Przemek Kitszel:
+>> On 7/9/24 10:54, Paul Menzel wrote:
+>>> [Cc: -anirudh.venkataramanan@intel.com (Address rejected)]
+>>>
+>>> Am 09.07.24 um 10:49 schrieb Paul Menzel:
+> 
+>>>> Am 08.07.24 um 20:27 schrieb Aleksandr Mishin:
+>>>>> In ice_sched_add_root_node() and ice_sched_add_node() there are 
+>>>>> calls to
+>>>>> devm_kcalloc() in order to allocate memory for array of pointers to
+>>>>> 'ice_sched_node' structure. But incorrect types are used as sizeof()
+>>>>> arguments in these calls (structures instead of pointers) which 
+>>>>> leads to
+>>>>> over allocation of memory.
+>>>>
+>>>> If you have the explicit size at hand, it’d be great if you added 
+>>>> those to the commit message.
+>>>>
+>>>>> Adjust over allocation of memory by correcting types in devm_kcalloc()
+>>>>> sizeof() arguments.
+>>>>>
+>>>>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>>>>
+>>>> Maybe mention, that Coverity found that too, and the warning was 
+>>>> disabled, and use that commit in Fixes: tag? That’d be commit 
+>>>> b36c598c999c (ice: Updates to Tx scheduler code), different from the 
+>>>> one you used.
+>>
+>> this version does not have any SHA mentioned :)
+> 
+> Sorry, I don’t understand your answer. What SHA do you mean?
 
-[Upstream commit 4db783d68b9b39a411a96096c10828ff5dfada7a]
+there is no commit cited by Aleksandr in v3, IIRC there was one in v1
 
-According to syzbot, there is a chance that ip6_dst_idev()
-returns NULL in ip6_output(). Most places in IPv6 stack
-deal with a NULL idev just fine, but not here.
+I agree that mention would be valuable, and we still want v4 with my
+Suggested-by dropped anyway :)
 
-syzbot reported:
+> 
+>>>> `Documentation/process/submitting-patches.rst` says:
+>>>>
+>>>>> A Fixes: tag indicates that the patch fixes an issue in a previous
+>>>>> commit. It is used to make it easy to determine where a bug
+>>>>> originated, which can help review a bug fix. This tag also assists
+>>>>> the stable kernel team in determining which stable kernel versions
+>>>>> should receive your fix. This is the preferred method for indicating
+>>>>> a bug fixed by the patch.
+>>
+>> so, this is not a "fix" per definition of a fix: "your patch changes
+>> observable misbehavior"
+>> If the over-allocation would be counted in megabytes, then it will
+>> be a different case.
+> 
+> The quoted text just talks about “an issue”. What definition do you 
+> refer to?
 
-general protection fault, probably for non-canonical address 0xdffffc00000000bc: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x00000000000005e0-0x00000000000005e7]
-CPU: 0 PID: 9775 Comm: syz-executor.4 Not tainted 6.9.0-rc5-syzkaller-00157-g6a30653b604a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
- RIP: 0010:ip6_output+0x231/0x3f0 net/ipv6/ip6_output.c:237
-Code: 3c 1e 00 49 89 df 74 08 4c 89 ef e8 19 58 db f7 48 8b 44 24 20 49 89 45 00 49 89 c5 48 8d 9d e0 05 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 4c 8b 74 24 28 0f 85 61 01 00 00 8b 1b 31 ff                                              RSP: 0018:ffffc9000927f0d8 EFLAGS: 00010202
-RAX: 00000000000000bc RBX: 00000000000005e0 RCX: 0000000000040000
-RDX: ffffc900131f9000 RSI: 0000000000004f47 RDI: 0000000000004f48
-RBP: 0000000000000000 R08: ffffffff8a1f0b9a R09: 1ffffffff1f51fad
-R10: dffffc0000000000 R11: fffffbfff1f51fae R12: ffff8880293ec8c0
-R13: ffff88805d7fc000 R14: 1ffff1100527d91a R15: dffffc0000000000
-FS:  00007f135c6856c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000080 CR3: 0000000064096000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip6_xmit+0xefe/0x17f0 net/ipv6/ip6_output.c:358
-  sctp_v6_xmit+0x9f2/0x13f0 net/sctp/ipv6.c:248
-  sctp_packet_transmit+0x26ad/0x2ca0 net/sctp/output.c:653
-  sctp_packet_singleton+0x22c/0x320 net/sctp/outqueue.c:783
-  sctp_outq_flush_ctrl net/sctp/outqueue.c:914 [inline]
-  sctp_outq_flush+0x6d5/0x3e20 net/sctp/outqueue.c:1212
-  sctp_side_effects net/sctp/sm_sideeffect.c:1198 [inline]
-  sctp_do_sm+0x59cc/0x60c0 net/sctp/sm_sideeffect.c:1169
-  sctp_primitive_ASSOCIATE+0x95/0xc0 net/sctp/primitive.c:73
-  __sctp_connect+0x9cd/0xe30 net/sctp/socket.c:1234
-  sctp_connect net/sctp/socket.c:4819 [inline]
-  sctp_inet_connect+0x149/0x1f0 net/sctp/socket.c:4834
-  __sys_connect_file net/socket.c:2048 [inline]
-  __sys_connect+0x2df/0x310 net/socket.c:2065
-  __do_sys_connect net/socket.c:2075 [inline]
-  __se_sys_connect net/socket.c:2072 [inline]
-  __x64_sys_connect+0x7a/0x90 net/socket.c:2072
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+I mean that there is no issue (for the users), thus no fix.
+Example of recently merged "not fix", with more links to other "non-
+fixes":
+https://lore.kernel.org/all/b836eb8ca8abf2f64478da48d250405bb1d90ad5.camel@sipsolutions.net/T/
 
-Fixes: 778d80be5269 ("ipv6: Add disable_ipv6 sysctl to disable IPv6 operaion on specific interface.")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Link: https://lore.kernel.org/r/20240507161842.773961-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[Ashwin: Regenerated the Patch for v5.10]
-Signed-off-by: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
----
- net/ipv6/ip6_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 2b55bf0d3..32512b8ca 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -240,7 +240,7 @@ int ip6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	skb->protocol = htons(ETH_P_IPV6);
- 	skb->dev = dev;
- 
--	if (unlikely(READ_ONCE(idev->cnf.disable_ipv6))) {
-+	if (unlikely(!idev || READ_ONCE(idev->cnf.disable_ipv6))) {
- 		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
- 		kfree_skb(skb);
- 		return 0;
--- 
-2.45.1
+> 
+> 
+> Kind regards,
+> 
+> Paul
 
 
