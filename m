@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-110291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EFFA92BC1D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE6692BC22
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 813961F220EA
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:55:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CD1F1F22AB3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEAA190065;
-	Tue,  9 Jul 2024 13:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D622190486;
+	Tue,  9 Jul 2024 13:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hISbiTjz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LjTo6IzV"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D35418FDD7;
-	Tue,  9 Jul 2024 13:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C09190075;
+	Tue,  9 Jul 2024 13:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720533250; cv=none; b=cHM/UKTbXZyq1D51NDRtC2rXGMuKJ7uE04i6E2pN73nUUb/6B1IY9L8I15G7DNG0BRgWSbNbSeZ6CkZ3QbJ8R52ewaFivkL+5D3ARPc+aNEjxoXGTJpsnt+KAmbk/xZKkrIIzpqeJ0ElVV7k5tIPvDj5GbSDeZH7llTSn7+Oj10=
+	t=1720533255; cv=none; b=BamZ4aXcYW0+XRhVcTYxATAD4eAEme5rHD8arTp3ZP+oHrFu74KY4m0YfAD3ZwXr/vAR0Wc05XUMFAR80l0CRol+qFy/IvQnw49GzaalT68/gVt65To8Y82rOjc/KA7ylZRSnY+IUlVBCIF9KS2SXxi+BFMUMHyPynynGiNaKm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720533250; c=relaxed/simple;
-	bh=zHUPZZHW+ZEur32yOu9bNVrl2FFhAMVvCk/Q3HSZ+HY=;
+	s=arc-20240116; t=1720533255; c=relaxed/simple;
+	bh=zxqgQ6Vs+86Eh3h50dtc/Unx4WJMtsjrr83itZrYaGE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LRqN/Zto7JcnFYeUdQKR8MttKolnT5onwO53OWwPdmL21HpbW7JbWJidv9faS9OYGOKGY7Md5CYvciyAtJDT2LIHNsufJUEjueQ/ubDjNd7+OQlodYZIgfmz6FOh2P+DB6Ju/MNKjpKThCVQgT+6L6CSIYhV/u2K0U3pTKKl8WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hISbiTjz; arc=none smtp.client-ip=217.70.183.201
+	 In-Reply-To:To:Cc; b=JsxPNtmGaKFjS/ULpC/THHbgKLjTedmCceJp5HZM723Jlt6F//NBOgL9Go7bX4hrzxneKIZLnjgRlBrTXCGwP+kjs7yT4M6W+ynRgZZkMOFKY45PsJf1CD9Jqd4fKfSllyXlkvS5ypTMlebob3cocrQpBstpJnHyUrGBKemk6Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LjTo6IzV; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D5FB1BF218;
-	Tue,  9 Jul 2024 13:54:05 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1ACE61BF219;
+	Tue,  9 Jul 2024 13:54:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720533247;
+	t=1720533248;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/akqxQ8ZFvPLOMVKUlPKOLHsqv0rRfnwElZnZGMC46k=;
-	b=hISbiTjzrYqxngR+Kjs0NqZ8c8J+Yevjvvxgp1E3M0ua3yIIInRDKj2pG80IGapfdgb8Rv
-	Aezgz9Ev9Ae2JGX0SDRlNyU//oPWvFv6Uip4zwXViUxYE1l0Il3w1oDeNhkJWUyQZ+W0QQ
-	qKzD7h95Xv6R5mkYPWj9/ItY+MKIOaoZKVlI894mJ+9P2zm0xZnCvvVw+sjGrqZgzwilzD
-	RGqYZkgy9XM4jtwsc0SI6FUuWUTxV/NblEGOMYWZLC27OadyywYV6AXkKCcI3qBtErR5jB
-	FKRzuKBSrlLE8sAN7DKTPSVML4f6DAeDsFLfEhKF1B+XuAG3knqhjIzBTd/VuA==
+	bh=VLURsRiTiRR57FM31CRHAv3oVqTfnYmA42jSKgbnYok=;
+	b=LjTo6IzVdxskBwRGLh2ud6ettDpCIBZle24GG0uun2/lrEKfH0beKVzA0oEywbpXnB5ans
+	N3NCAd82SbIFCfaBt/2tt2oDtQZ5IjIci41aQocg6SCeIbarITgK5oNvODvQXyJxdmoBuJ
+	eb274D61sIo1qZP1MhmPqk0K5zv1GIXul7ih9Iq8N6TRS5DwXWODbmO1nLadPLIl2p7txQ
+	KpZSBdQrCDJN1Uc3gq8uYmEUQSnWXwEq01DXtwGckfbur3ZXXkumFSQ+vO3+Gp7NMLu832
+	nIviuutlZJyRjeBHaYJmWwGUCYIPf6mWFb2N9DAOdC48hKpBJw6CUjGZvFn69w==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 09 Jul 2024 15:53:39 +0200
-Subject: [PATCH net-next v17 07/14] ptp: Add phc source and helpers to
- register specific PTP clock or get information
+Date: Tue, 09 Jul 2024 15:53:40 +0200
+Subject: [PATCH net-next v17 08/14] net: Add the possibility to support a
+ selected hwtstamp in netdevice
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240709-feature_ptp_netnext-v17-7-b5317f50df2a@bootlin.com>
+Message-Id: <20240709-feature_ptp_netnext-v17-8-b5317f50df2a@bootlin.com>
 References: <20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com>
 In-Reply-To: <20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>, 
@@ -88,396 +88,389 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.13.0
 X-GND-Sasl: kory.maincent@bootlin.com
 
-Prepare for future hardware timestamp selection by adding source and
-corresponding pointers to ptp_clock structure.
-Additionally, introduce helpers for registering specific phydev or netdev
-PTP clocks, retrieving PTP clock information such as hwtstamp source or
-phydev/netdev pointers, and obtaining the ptp_clock structure from the
-phc index.
-These helpers are added to a new ptp_clock_consumer.c file, built as
-builtin. This is necessary because these helpers will be called by
-ethtool or net timestamping, which are builtin code.
+Introduce the description of a hwtstamp provider, mainly defined with a
+ptp_clock pointer and a qualifier value.
+
+Add a hwtstamp provider description within the netdev structure to
+allow saving the hwtstamp we want to use. This prepares for future
+support of an ethtool netlink command to select the desired hwtstamp
+provider. By default, the old API that does not support hwtstamp
+selectability is used, meaning the hwtstamp ptp_clock pointer is unset.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
 Change in v8:
-- New patch.
+- New patch
 
 Change in v10:
-- Add get and put function to avoid unregistering a ptp clock object used.
-- Fix kdoc issues.
-
-Change in v11:
-- Remove useless extern.
-
-Change in v12:
-- Add missing return description in the kdoc.
+- Set hwtstamp in netdevice as a pointer for future use of rcu lock.
+- Fix a nit in teh order of setting phydev pointer.
+- Add a missing kdoc description.
 
 Change in v13:
-- Remove a semicolon which bring errors while not building PTP driver.
-- Remove few useless EXPORT_SYMBOL().
-- Separate PTP consumer symbole which are builtin from PTP provider.
+- Remove an include from netdevices.h.
 
-Change in v14:
-- Add back missing EXPORT_SYMBOL().
+Change in v16:
+- Import the part of the patch 12 which belong to the hwtstamp provider
+  selectability of net core.
 ---
- drivers/ptp/Makefile             |   5 ++
- drivers/ptp/ptp_clock.c          |  33 ++++++++++-
- drivers/ptp/ptp_clock_consumer.c | 100 +++++++++++++++++++++++++++++++
- drivers/ptp/ptp_private.h        |   7 +++
- include/linux/ptp_clock_kernel.h | 125 +++++++++++++++++++++++++++++++++++++++
- 5 files changed, 269 insertions(+), 1 deletion(-)
+ drivers/net/phy/phy_device.c     | 11 +++++++++
+ drivers/ptp/ptp_clock_consumer.c | 10 ++++++++
+ include/linux/net_tstamp.h       | 18 +++++++++++++++
+ include/linux/netdevice.h        |  5 ++++
+ include/linux/ptp_clock_kernel.h | 10 ++++++++
+ include/uapi/linux/net_tstamp.h  | 11 +++++++++
+ net/core/dev_ioctl.c             | 43 ++++++++++++++++++++++++++++++++--
+ net/core/timestamping.c          | 50 ++++++++++++++++++++++++++++++++++++----
+ 8 files changed, 151 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-index 68bf02078053..9d7226b995cf 100644
---- a/drivers/ptp/Makefile
-+++ b/drivers/ptp/Makefile
-@@ -3,6 +3,11 @@
- # Makefile for PTP 1588 clock support.
- #
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 70b07e621fb2..57a9943bb1c1 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -31,6 +31,7 @@
+ #include <linux/phy_led_triggers.h>
+ #include <linux/pse-pd/pse.h>
+ #include <linux/property.h>
++#include <linux/ptp_clock_kernel.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/sfp.h>
+ #include <linux/skbuff.h>
+@@ -1936,6 +1937,16 @@ void phy_detach(struct phy_device *phydev)
  
-+ifdef CONFIG_PTP_1588_CLOCK
-+# The ptp_clock consumer is built-in whenever PTP_1588_CLOCK is built-in
-+# or module
-+obj-y					:= ptp_clock_consumer.o
-+endif
- ptp-y					:= ptp_clock.o ptp_chardev.o ptp_sysfs.o ptp_vclock.o
- ptp_kvm-$(CONFIG_X86)			:= ptp_kvm_x86.o ptp_kvm_common.o
- ptp_kvm-$(CONFIG_HAVE_ARM_SMCCC)	:= ptp_kvm_arm.o ptp_kvm_common.o
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index c56cd0f63909..593b5c906314 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -34,7 +34,6 @@ const struct class ptp_class = {
- 
- static dev_t ptp_devt;
- 
--static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
- 
- /* time stamp event queue operations */
- 
-@@ -512,6 +511,38 @@ void ptp_cancel_worker_sync(struct ptp_clock *ptp)
- }
- EXPORT_SYMBOL(ptp_cancel_worker_sync);
- 
-+struct ptp_clock *netdev_ptp_clock_register(struct ptp_clock_info *info,
-+					    struct net_device *dev)
-+{
-+	struct ptp_clock *ptp;
+ 	phy_suspend(phydev);
+ 	if (dev) {
++		struct hwtstamp_provider *hwtstamp;
 +
-+	ptp = ptp_clock_register(info, &dev->dev);
-+	if (IS_ERR(ptp))
-+		return ptp;
++		hwtstamp = rtnl_dereference(dev->hwtstamp);
++		/* Disable timestamp if selected */
++		if (hwtstamp && ptp_clock_phydev(hwtstamp->ptp) == phydev) {
++			rcu_assign_pointer(dev->hwtstamp, NULL);
++			call_rcu(&hwtstamp->rcu_head,
++				 remove_hwtstamp_provider);
++		}
 +
-+	ptp->phc_source = HWTSTAMP_SOURCE_NETDEV;
-+	ptp->netdev = dev;
-+
-+	return ptp;
-+}
-+EXPORT_SYMBOL(netdev_ptp_clock_register);
-+
-+struct ptp_clock *phydev_ptp_clock_register(struct ptp_clock_info *info,
-+					    struct phy_device *phydev)
-+{
-+	struct ptp_clock *ptp;
-+
-+	ptp = ptp_clock_register(info, &phydev->mdio.dev);
-+	if (IS_ERR(ptp))
-+		return ptp;
-+
-+	ptp->phc_source = HWTSTAMP_SOURCE_PHYLIB;
-+	ptp->phydev = phydev;
-+
-+	return ptp;
-+}
-+EXPORT_SYMBOL(phydev_ptp_clock_register);
-+
- /* module operations */
- 
- static void __exit ptp_exit(void)
+ 		phydev->attached_dev->phydev = NULL;
+ 		phydev->attached_dev = NULL;
+ 	}
 diff --git a/drivers/ptp/ptp_clock_consumer.c b/drivers/ptp/ptp_clock_consumer.c
-new file mode 100644
-index 000000000000..58b0c8948fc8
---- /dev/null
+index 58b0c8948fc8..f5fab1c14b47 100644
+--- a/drivers/ptp/ptp_clock_consumer.c
 +++ b/drivers/ptp/ptp_clock_consumer.c
-@@ -0,0 +1,100 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * PTP 1588 clock support
-+ *
-+ * Copyright (C) 2010 OMICRON electronics GmbH
-+ */
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/posix-clock.h>
-+#include <linux/pps_kernel.h>
-+#include <linux/slab.h>
-+#include <linux/syscalls.h>
-+#include <linux/uaccess.h>
-+#include <linux/debugfs.h>
-+#include <linux/xarray.h>
-+#include <uapi/linux/sched/types.h>
+@@ -98,3 +98,13 @@ void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
+ 	put_device(&ptp->dev);
+ 	module_put(ptp->info->owner);
+ }
 +
-+#include "ptp_private.h"
-+
-+DEFINE_XARRAY_ALLOC(ptp_clocks_map);
-+EXPORT_SYMBOL(ptp_clocks_map);
-+
-+bool ptp_clock_from_phylib(struct ptp_clock *ptp)
++void remove_hwtstamp_provider(struct rcu_head *rcu_head)
 +{
-+	return ptp->phc_source == HWTSTAMP_SOURCE_PHYLIB;
++	struct hwtstamp_provider *hwtstamp;
++
++	hwtstamp = container_of(rcu_head, struct hwtstamp_provider, rcu_head);
++	ptp_clock_put(hwtstamp->dev, hwtstamp->ptp);
++	kfree(hwtstamp);
 +}
-+
-+bool ptp_clock_from_netdev(struct ptp_clock *ptp)
-+{
-+	return ptp->phc_source == HWTSTAMP_SOURCE_NETDEV;
-+}
-+
-+struct net_device *ptp_clock_netdev(struct ptp_clock *ptp)
-+{
-+	if (ptp->phc_source != HWTSTAMP_SOURCE_NETDEV)
-+		return NULL;
-+
-+	return ptp->netdev;
-+}
-+
-+struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp)
-+{
-+	if (ptp->phc_source != HWTSTAMP_SOURCE_PHYLIB)
-+		return NULL;
-+
-+	return ptp->phydev;
-+}
-+EXPORT_SYMBOL(ptp_clock_phydev);
-+
-+int ptp_clock_get(struct device *dev, struct ptp_clock *ptp)
-+{
-+	struct device_link *link;
-+
-+	if (!ptp)
-+		return 0;
-+
-+	if (!try_module_get(ptp->info->owner))
-+		return -EPROBE_DEFER;
-+
-+	get_device(&ptp->dev);
-+
-+	link = device_link_add(dev, &ptp->dev, DL_FLAG_STATELESS);
-+	if (!link)
-+		dev_warn(dev, "failed to create device link to %s\n",
-+			 dev_name(&ptp->dev));
-+
-+	return 0;
-+}
-+
-+struct ptp_clock *ptp_clock_get_by_index(struct device *dev, int index)
-+{
-+	struct ptp_clock *ptp;
-+	int ret;
-+
-+	if (index < 0)
-+		return NULL;
-+
-+	ptp = xa_load(&ptp_clocks_map, (unsigned long)index);
-+	if (IS_ERR_OR_NULL(ptp))
-+		return ptp;
-+
-+	ret = ptp_clock_get(dev, ptp);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	return ptp;
-+}
-+
-+void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
-+{
-+	if (!ptp)
-+		return;
-+
-+	device_link_remove(dev, &ptp->dev);
-+	put_device(&ptp->dev);
-+	module_put(ptp->info->owner);
-+}
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index 18934e28469e..6a306e6e34c2 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -24,6 +24,8 @@
- #define PTP_DEFAULT_MAX_VCLOCKS 20
- #define PTP_MAX_CHANNELS 2048
++EXPORT_SYMBOL(remove_hwtstamp_provider);
+diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
+index 662074b08c94..077037f9ad0f 100644
+--- a/include/linux/net_tstamp.h
++++ b/include/linux/net_tstamp.h
+@@ -19,6 +19,22 @@ enum hwtstamp_source {
+ 	HWTSTAMP_SOURCE_PHYLIB,
+ };
  
-+extern struct xarray ptp_clocks_map;
++/**
++ * struct hwtstamp_provider - Description of a hwtstamp provider object
++ *
++ * @rcu_head: RCU callback used to free the struct.
++ * @dev: device attached to the hwtstamp provider used to put the ptp clock.
++ * @ptp: PTP clock pointer of the hwtstamp provider.
++ * @qualifier: hwtstamp provider qualifier.
++ */
 +
- struct timestamp_event_queue {
- 	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
- 	int head;
-@@ -41,6 +43,11 @@ struct ptp_clock {
- 	struct ptp_clock_info *info;
- 	dev_t devid;
- 	int index; /* index into clocks.map */
-+	enum hwtstamp_source phc_source;
-+	union { /* Pointer of the phc_source device */
-+		struct net_device *netdev;
-+		struct phy_device *phydev;
-+	};
- 	struct pps_device *pps_source;
- 	long dialed_frequency; /* remembers the frequency adjustment */
- 	struct list_head tsevqs; /* timestamp fifo list */
++struct hwtstamp_provider {
++	struct rcu_head rcu_head;
++	struct device *dev;
++	struct ptp_clock *ptp;
++	enum hwtstamp_provider_qualifier qualifier;
++};
++
+ /**
+  * struct kernel_hwtstamp_config - Kernel copy of struct hwtstamp_config
+  *
+@@ -31,6 +47,7 @@ enum hwtstamp_source {
+  *	copied the ioctl request back to user space
+  * @source: indication whether timestamps should come from the netdev or from
+  *	an attached phylib PHY
++ * @qualifier: qualifier of the hwtstamp provider
+  *
+  * Prefer using this structure for in-kernel processing of hardware
+  * timestamping configuration, over the inextensible struct hwtstamp_config
+@@ -43,6 +60,7 @@ struct kernel_hwtstamp_config {
+ 	struct ifreq *ifr;
+ 	bool copied_to_user;
+ 	enum hwtstamp_source source;
++	enum hwtstamp_provider_qualifier qualifier;
+ };
+ 
+ static inline void hwtstamp_config_to_kernel(struct kernel_hwtstamp_config *kernel_cfg,
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 93558645c6d0..c18761c36455 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -81,6 +81,7 @@ struct xdp_frame;
+ struct xdp_metadata_ops;
+ struct xdp_md;
+ struct ethtool_netdev_state;
++struct hwtstamp_provider;
+ 
+ typedef u32 xdp_features_t;
+ 
+@@ -2027,6 +2028,8 @@ enum netdev_reg_state {
+  *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
+  *		   where the clock is recovered.
+  *
++ *	@hwtstamp: Tracks which PTP performs hardware packet time stamping.
++ *
+  *	FIXME: cleanup struct net_device such that network protocol info
+  *	moves out.
+  */
+@@ -2406,6 +2409,8 @@ struct net_device {
+ 
+ 	/** @irq_moder: dim parameters used if IS_ENABLED(CONFIG_DIMLIB). */
+ 	struct dim_irq_moder	*irq_moder;
++
++	struct hwtstamp_provider __rcu	*hwtstamp;
+ };
+ #define to_net_dev(d) container_of(d, struct net_device, dev)
+ 
 diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
-index 6e4b8206c7d0..860c1e293a62 100644
+index 860c1e293a62..6d9e6cd5c832 100644
 --- a/include/linux/ptp_clock_kernel.h
 +++ b/include/linux/ptp_clock_kernel.h
-@@ -9,7 +9,9 @@
- #define _PTP_CLOCK_KERNEL_H_
+@@ -442,6 +442,14 @@ struct ptp_clock *ptp_clock_get_by_index(struct device *dev, int index);
  
- #include <linux/device.h>
-+#include <linux/netdevice.h>
- #include <linux/pps_kernel.h>
-+#include <linux/phy.h>
- #include <linux/ptp_clock.h>
- #include <linux/timecounter.h>
- #include <linux/skbuff.h>
-@@ -340,6 +342,106 @@ extern void ptp_clock_event(struct ptp_clock *ptp,
- 
- extern int ptp_clock_index(struct ptp_clock *ptp);
+ void ptp_clock_put(struct device *dev, struct ptp_clock *ptp);
  
 +/**
-+ * netdev_ptp_clock_register() - Register a PTP hardware clock driver for
-+ *				 a net device
++ * remove_hwtstamp_provider() - Put and free the hwtstamp provider
 + *
-+ * @info: Structure describing the new clock.
-+ * @dev:  Pointer of the net device.
-+ *
-+ * Return: Pointer of the PTP clock, error pointer otherwise.
++ * @rcu_head:  RCU callback head.
 + */
 +
-+struct ptp_clock *
-+netdev_ptp_clock_register(struct ptp_clock_info *info,
-+			  struct net_device *dev);
-+
-+/**
-+ * phydev_ptp_clock_register() - Register a PTP hardware clock driver for
-+ *				 a phy device
-+ *
-+ * @info:   Structure describing the new clock.
-+ * @phydev:  Pointer of the phy device.
-+ *
-+ * Return: Pointer of the PTP clock, error pointer otherwise.
-+ */
-+
-+struct ptp_clock *
-+phydev_ptp_clock_register(struct ptp_clock_info *info,
-+			  struct phy_device *phydev);
-+
-+/**
-+ * ptp_clock_from_phylib() - Does the PTP clock comes from phylib
-+ *
-+ * @ptp:  The clock obtained from net/phy_ptp_clock_register().
-+ *
-+ * Return: True if the PTP clock comes from phylib, false otherwise.
-+ */
-+
-+bool ptp_clock_from_phylib(struct ptp_clock *ptp);
-+
-+/**
-+ * ptp_clock_from_netdev() - Does the PTP clock comes from netdev
-+ *
-+ * @ptp:  The clock obtained from net/phy_ptp_clock_register().
-+ *
-+ * Return: True if the PTP clock comes from netdev, false otherwise.
-+ */
-+
-+bool ptp_clock_from_netdev(struct ptp_clock *ptp);
-+
-+/**
-+ * ptp_clock_netdev() - Obtain the net_device reference of PTP clock
-+ *
-+ * @ptp:  The clock obtained from netdev_ptp_clock_register().
-+ *
-+ * Return: Pointer of the net device, NULL otherwise.
-+ */
-+
-+struct net_device *ptp_clock_netdev(struct ptp_clock *ptp);
-+
-+/**
-+ * ptp_clock_phydev() - Obtain the phy_device reference of a PTP clock
-+ *
-+ * @ptp:  The clock obtained from phydev_ptp_clock_register().
-+ *
-+ * Return: Pointer of the phy device, NULL otherwise.
-+ */
-+
-+struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp);
-+
-+/**
-+ * ptp_clock_get() - Increment refcount of the PTP clock
-+ *
-+ * @dev:  The device which get the PTP clock.
-+ * @ptp:  Pointer of a PTP clock.
-+ *
-+ * Return: 0 in case of success, error otherwise.
-+ */
-+
-+int ptp_clock_get(struct device *dev, struct ptp_clock *ptp);
-+
-+/**
-+ * ptp_clock_get_by_index() - Obtain the PTP clock reference from a given
-+ *			      PHC index
-+ *
-+ * @dev:  The device which get the PTP clock.
-+ * @index:  The device index of a PTP clock.
-+ *
-+ * Return: Pointer of the PTP clock, error pointer otherwise.
-+ */
-+
-+struct ptp_clock *ptp_clock_get_by_index(struct device *dev, int index);
-+
-+/**
-+ * ptp_clock_put() - decrement refcount of the PTP clock
-+ *
-+ * @dev:  The device which get the PTP clock.
-+ * @ptp:  Pointer of a PTP clock.
-+ */
-+
-+void ptp_clock_put(struct device *dev, struct ptp_clock *ptp);
++void remove_hwtstamp_provider(struct rcu_head *rcu_head);
 +
  /**
   * ptp_find_pin() - obtain the pin index of a given auxiliary function
   *
-@@ -405,6 +507,29 @@ static inline void ptp_clock_event(struct ptp_clock *ptp,
- { }
- static inline int ptp_clock_index(struct ptp_clock *ptp)
- { return -1; }
-+static inline struct ptp_clock *
-+netdev_ptp_clock_register(struct ptp_clock_info *info,
-+			  struct net_device *dev)
-+{ return NULL; }
-+static inline struct ptp_clock *
-+phydev_ptp_clock_register(struct ptp_clock_info *info,
-+			  struct phy_device *phydev)
-+{ return NULL; }
-+static inline bool ptp_clock_from_phylib(struct ptp_clock *ptp)
-+{ return false; }
-+static inline bool ptp_clock_from_netdev(struct ptp_clock *ptp)
-+{ return false; }
-+static inline struct net_device *ptp_clock_netdev(struct ptp_clock *ptp)
-+{ return NULL; }
-+static inline struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp)
-+{ return NULL; }
-+static inline int ptp_clock_get(struct device *dev, struct ptp_clock *ptp)
-+{ return -ENODEV; }
-+static inline void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
-+{ }
-+static inline struct ptp_clock *ptp_clock_get_by_index(struct device *dev,
-+						       int index)
-+{ return NULL; }
+@@ -530,6 +538,8 @@ static inline void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
+ static inline struct ptp_clock *ptp_clock_get_by_index(struct device *dev,
+ 						       int index)
+ { return NULL; }
++static inline void remove_hwtstamp_provider(struct rcu_head *rcu_head)
++{ return; }
  static inline int ptp_find_pin(struct ptp_clock *ptp,
  			       enum ptp_pin_function func, unsigned int chan)
  { return -1; }
+diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+index a2c66b3d7f0f..a9ed48ee8fc7 100644
+--- a/include/uapi/linux/net_tstamp.h
++++ b/include/uapi/linux/net_tstamp.h
+@@ -13,6 +13,17 @@
+ #include <linux/types.h>
+ #include <linux/socket.h>   /* for SO_TIMESTAMPING */
+ 
++/*
++ * Possible type of htstamp provider. Mainly "precise" the default one
++ * is for IEEE 1588 quality and "approx" is for NICs DMA point.
++ */
++enum hwtstamp_provider_qualifier {
++	HWTSTAMP_PROVIDER_QUALIFIER_PRECISE,
++	HWTSTAMP_PROVIDER_QUALIFIER_APPROX,
++
++	HWTSTAMP_PROVIDER_QUALIFIER_CNT,
++};
++
+ /* SO_TIMESTAMPING flags */
+ enum {
+ 	SOF_TIMESTAMPING_TX_HARDWARE = (1<<0),
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index 36cea843381f..350d123c09c9 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -6,6 +6,7 @@
+ #include <linux/rtnetlink.h>
+ #include <linux/net_tstamp.h>
+ #include <linux/phylib_stubs.h>
++#include <linux/ptp_clock_kernel.h>
+ #include <linux/wireless.h>
+ #include <linux/if_bridge.h>
+ #include <net/dsa_stubs.h>
+@@ -269,6 +270,22 @@ static int dev_eth_ioctl(struct net_device *dev,
+ int dev_get_hwtstamp_phylib(struct net_device *dev,
+ 			    struct kernel_hwtstamp_config *cfg)
+ {
++	struct hwtstamp_provider *hwtstamp;
++
++	hwtstamp = rtnl_dereference(dev->hwtstamp);
++	if (hwtstamp) {
++		struct ptp_clock *ptp = hwtstamp->ptp;
++
++		cfg->qualifier = hwtstamp->qualifier;
++		if (ptp_clock_from_phylib(ptp))
++			return phy_hwtstamp_get(ptp_clock_phydev(ptp), cfg);
++
++		if (ptp_clock_from_netdev(ptp))
++			return dev->netdev_ops->ndo_hwtstamp_get(dev, cfg);
++
++		return -EOPNOTSUPP;
++	}
++
+ 	if (phy_is_default_hwtstamp(dev->phydev))
+ 		return phy_hwtstamp_get(dev->phydev, cfg);
+ 
+@@ -325,11 +342,33 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 			    struct netlink_ext_ack *extack)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
+-	bool phy_ts = phy_is_default_hwtstamp(dev->phydev);
+ 	struct kernel_hwtstamp_config old_cfg = {};
++	struct hwtstamp_provider *hwtstamp;
++	struct phy_device *phydev;
+ 	bool changed = false;
++	bool phy_ts;
+ 	int err;
+ 
++	hwtstamp = rtnl_dereference(dev->hwtstamp);
++	if (hwtstamp) {
++		struct ptp_clock *ptp = hwtstamp->ptp;
++
++		if (ptp_clock_from_phylib(ptp)) {
++			phy_ts = true;
++			phydev = ptp_clock_phydev(ptp);
++		} else if (ptp_clock_from_netdev(ptp)) {
++			phy_ts = false;
++		} else {
++			return -EOPNOTSUPP;
++		}
++
++		cfg->qualifier = hwtstamp->qualifier;
++	} else {
++		phy_ts = phy_is_default_hwtstamp(dev->phydev);
++		if (phy_ts)
++			phydev = dev->phydev;
++	}
++
+ 	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
+ 
+ 	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
+@@ -351,7 +390,7 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 		changed = kernel_hwtstamp_config_changed(&old_cfg, cfg);
+ 
+ 	if (phy_ts) {
+-		err = phy_hwtstamp_set(dev->phydev, cfg, extack);
++		err = phy_hwtstamp_set(phydev, cfg, extack);
+ 		if (err) {
+ 			if (changed)
+ 				ops->ndo_hwtstamp_set(dev, &old_cfg, NULL);
+diff --git a/net/core/timestamping.c b/net/core/timestamping.c
+index 3717fb152ecc..f8522fefd468 100644
+--- a/net/core/timestamping.c
++++ b/net/core/timestamping.c
+@@ -9,6 +9,7 @@
+ #include <linux/ptp_classify.h>
+ #include <linux/skbuff.h>
+ #include <linux/export.h>
++#include <linux/ptp_clock_kernel.h>
+ 
+ static unsigned int classify(const struct sk_buff *skb)
+ {
+@@ -21,19 +22,38 @@ static unsigned int classify(const struct sk_buff *skb)
+ 
+ void skb_clone_tx_timestamp(struct sk_buff *skb)
+ {
++	struct hwtstamp_provider *hwtstamp;
+ 	struct mii_timestamper *mii_ts;
++	struct phy_device *phydev;
+ 	struct sk_buff *clone;
+ 	unsigned int type;
+ 
+-	if (!skb->sk || !skb->dev ||
+-	    !phy_is_default_hwtstamp(skb->dev->phydev))
++	if (!skb->sk || !skb->dev)
+ 		return;
+ 
++	rcu_read_lock();
++	hwtstamp = rcu_dereference(skb->dev->hwtstamp);
++	if (hwtstamp) {
++		if (!ptp_clock_from_phylib(hwtstamp->ptp)) {
++			rcu_read_unlock();
++			return;
++		}
++
++		phydev = ptp_clock_phydev(hwtstamp->ptp);
++	} else {
++		phydev = skb->dev->phydev;
++		if (!phy_is_default_hwtstamp(phydev)) {
++			rcu_read_unlock();
++			return;
++		}
++	}
++	rcu_read_unlock();
++
+ 	type = classify(skb);
+ 	if (type == PTP_CLASS_NONE)
+ 		return;
+ 
+-	mii_ts = skb->dev->phydev->mii_ts;
++	mii_ts = phydev->mii_ts;
+ 	if (likely(mii_ts->txtstamp)) {
+ 		clone = skb_clone_sk(skb);
+ 		if (!clone)
+@@ -45,12 +65,32 @@ EXPORT_SYMBOL_GPL(skb_clone_tx_timestamp);
+ 
+ bool skb_defer_rx_timestamp(struct sk_buff *skb)
+ {
++	struct hwtstamp_provider *hwtstamp;
+ 	struct mii_timestamper *mii_ts;
++	struct phy_device *phydev;
+ 	unsigned int type;
+ 
+-	if (!skb->dev || !phy_is_default_hwtstamp(skb->dev->phydev))
++	if (!skb->dev)
+ 		return false;
+ 
++	rcu_read_lock();
++	hwtstamp = rcu_dereference(skb->dev->hwtstamp);
++	if (hwtstamp) {
++		if (!ptp_clock_from_phylib(hwtstamp->ptp)) {
++			rcu_read_unlock();
++			return false;
++		}
++
++		phydev = ptp_clock_phydev(hwtstamp->ptp);
++	} else {
++		phydev = skb->dev->phydev;
++		if (!phy_is_default_hwtstamp(phydev)) {
++			rcu_read_unlock();
++			return false;
++		}
++	}
++	rcu_read_unlock();
++
+ 	if (skb_headroom(skb) < ETH_HLEN)
+ 		return false;
+ 
+@@ -63,7 +103,7 @@ bool skb_defer_rx_timestamp(struct sk_buff *skb)
+ 	if (type == PTP_CLASS_NONE)
+ 		return false;
+ 
+-	mii_ts = skb->dev->phydev->mii_ts;
++	mii_ts = phydev->mii_ts;
+ 	if (likely(mii_ts->rxtstamp))
+ 		return mii_ts->rxtstamp(mii_ts, skb, type);
+ 
 
 -- 
 2.34.1
