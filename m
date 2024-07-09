@@ -1,76 +1,72 @@
-Return-Path: <netdev+bounces-110086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA9DF92AEE3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 05:59:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B1192AEEA
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 720582823D4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 03:59:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA2361C20E5A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 04:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326AD537FF;
-	Tue,  9 Jul 2024 03:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03262BD05;
+	Tue,  9 Jul 2024 04:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bY8+JguY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KnciCvNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2047.outbound.protection.outlook.com [40.107.96.47])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2088.outbound.protection.outlook.com [40.107.96.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462C440855;
-	Tue,  9 Jul 2024 03:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7BE639
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 04:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720497576; cv=fail; b=S1TQsQdXwcjGMuBC/7GR4OgbHYBWT7gLrch5PtHJocsYVA0E/a6zv3m3ogc5BVj1TvKk3TkxSvrmdebojhMNB/RENcMDIhmksfHxU0yboxWH+SKkTV3gLCKdKF3aP97DNJTPSijd+v9lz30hj9OW0iiVFwa4ju7EDLFc5X2I+F0=
+	t=1720497659; cv=fail; b=nl3irdAylnfCqFWf5Tnu6KsRtKeenS7RNop/XHJ2e2BMZcwbAqywf9XmtcVzpabLoMteCBTf+xhFce6RyV34eiC/6w4FbPwqfuRxJ/ablCLE5HSxvIBpBCyNUcXj8dpWj6PqZJeo22H2D8XybdUQuhZN2OGZyeLoLEVe+FWUqh8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720497576; c=relaxed/simple;
-	bh=7O77MddLXyds9Ni+3QOQ35m39LKOR42DIgHwb4NFocA=;
+	s=arc-20240116; t=1720497659; c=relaxed/simple;
+	bh=IsXWWykmWo4vzR/npWht+wELlY+fACc9A2utkbW8Uyk=;
 	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=as4DEZTlnJYjX5uimY/hmk01Yfj/je0gJKYLNuxjOBP1c3x53jH34eW0gwIqxqDGFeuPRXIwf0LLKLxSMelj3ZF/4BySS+FmxVVXZ2Ugnp8BpdSip/kImBPQFB4y7cOn1kgdhPWuuZnre+k+c8jVviZfI1vBY5f7YBQROp3ZvBw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bY8+JguY; arc=fail smtp.client-ip=40.107.96.47
+	 Content-Type:MIME-Version; b=ek+SiD+ui6sR7VoFjxL0h+NT4t5gdVM8KUEfsIpwmzbc0huYnhE9/xuMQOehQUDZ55dKnWIT9Ninp+VvfjSg147D1o8fdxSKW6uKFQL7mKYe8MsSpFg/1GOBCCcMOCnYZWm+dPzjlmewy4uu6DOiZ/I0SDNh65a37hJRdptGG7E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KnciCvNq; arc=fail smtp.client-ip=40.107.96.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=at6Re1XWrvIIGJ/A+UOdaFQuW+ECntJ4H87i3ekcuPdz7Rb6Rq51sAxBj0aBGKhV1bywfTkrnHBMo30QUQek1g2rsAIwrpR6VUymD9KVGnU7RydMfMchJbUDuXQrC5uNi1RaoVW2zJAh97WFgfmS6Y7TqPGZXnHisTSjVDXkFRqZeF6K0gb0R29Si2qnYHdmASPzfws/rs4SadN3loFq2DyYXVd1FjqqYfFDAV4fcGGaOg8umyLHJLZ27WhwQyc8GQLAjzTcAq85NLjPORxsBquQL31NZA2q6ZE3jCRFAyZP98KoyM1GnFyN7c1RdRtKsxkp3hhUxZrWvLRhLNLG5w==
+ b=HtewXcwBpJr/MrRoR++WrbpKozgdx20ma7WadFnv99vu7N6JG72RxL2KtKUV5ja2hI+n70dIQ1St60gm7KnxcbFwltKwG3rgWFV3clCqiQeeaJodXNivtMWv7ONHg9LrVNQabPahbLvW62agn+S2X3CJUI4kFw+ywy6/5wAflENd3Z1R3XuQaZt7EkUh/YnE+XmYRl1tj2S2hhZmwvOumSTf9Knn049UgM648Gly0lSxNKO+mMPqBSi+30+QHQx49JF1a+kg6Lx1Q3Z4rTwGv/lvyWTDB1xj9OuLRbI6sEw8SEbthvliCs6sTiws/oRRku6DEXvKTRvycWRa70yt2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ssfiDNbN4oYv/qKavVBGJzFarFLpLaVrQS+LkTeaojI=;
- b=lZW38OQ7GY8lZvYsa4hfhkD4atFTSjwfrQT2ub6QY6iQvsLeVVRRme9rgXOsTEyX/sPIFeQWGbL9w3qTVdPA7vknDq56wtVN7xuO3dUMVPjReiZSUuQ9jz8SANABzgsPiXcuFyo70lVfUcLKlKdY+oY3esUe4dkF08yAEeTXNJGCHAG9GnYtvvLDFrcIN3Wt4oy3OQLsG0OWCIcBGYJIih4SGPnHdJeJyp4Xu5s84peHxxw4kuJuKJJWwJXgPcIT6N7mBr4AjkWT00gIc6GhRk+kHoaClyQhq2C/G1E3mOAyhpDFkXdvnOH7BPpShIbWhijIiQD1pJX0KC/DVzICbw==
+ bh=LkBqeRFGHjcdiKSmgbaRDQdG/oht4ktqO4o4onUBHsY=;
+ b=Q6k6pRIFprx2O5w4SMdYmV7IYSiqI+SVmv6vAHrvg/NNuiUBqul32KZL6i9OsHQjh5lmsj4FGNoOF5z0sKTb13EIfSOMeThS642BVS27ZLJtiFVSzaxRdeESyfJGdRUPRFfUtLWyl23ySCtBOBXPaHnnYWv4sOO9iIWMn59f2w3G6zWojofzxv2iG/z5LTMgAO91GDaRb5irNf00TKrSA8tBK10nAZhzqUGui6uqnDPHmYs0YDxn28IezhNE7ILwBnuZJdFJms1VfsZBCiaboginO2g/Oh23udLWDMQAfvkX5NUJs4c13y4I6WZ3qtK1fNcnlbjrNZ/nOPGsnzq93A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ssfiDNbN4oYv/qKavVBGJzFarFLpLaVrQS+LkTeaojI=;
- b=bY8+JguYmDeFRHRk+0KKxNH82DcLkbWdJidnj6Tybl4TX469zaaxN6kR1SqTatCQpcNszAQWMG5nBKaUUDkdN4CpjWCN1f8wSLgxbDw7Y372fzvM32RazbgP5/CmtlT/8MgP2oiaLq9WMlzi08j4fnsjgx3NAw32FjjYBv46egRh67WoayQgxZyfeUyZv5d89ecr2L5JlmFKChoG09Vnh15Q02r7G857etZamTth1iM1znybTEACUeRCiFNmwT4Yb+0Y3u7yzCxKRcaHqIY0cutyyTPTTp10qyNxIyoVFIdUOVQhZgUiXr/ylDSBDjwJMnimOzXL2t0pDQLmq43ybw==
+ bh=LkBqeRFGHjcdiKSmgbaRDQdG/oht4ktqO4o4onUBHsY=;
+ b=KnciCvNqIi0em26iP4czYMYLu4Eql97CIgVkT/nw4qI7FhuWhI1DDmBKTTwUe922kTvmeZXjzFDfZc/J7XfT4lj3Wm/B29n9ryAQa65aqAufk46v2A2ULu4mpjJpntiY/6bqayYuATPwyvolfHAASVQFRL+qSyFvuAUk2NgUfp8d2P3kFyf+bxHYwH5A1CkdglixppPhxErudMQQ6Qs3CsshK2/TUpFRSAejKDgIEdrdZYKL1Bjw2f0eJhfpw1H6upI/PPdF7kwQxDUxYDc6w5N9engQ1OMeqc7aDs2HeNI4TI13MRyg+aemEQpZJrN1KJu8UhnYc13elBBzazafpQ==
 Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
  by SJ0PR12MB7082.namprd12.prod.outlook.com (2603:10b6:a03:4ae::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Tue, 9 Jul
- 2024 03:59:31 +0000
+ 2024 04:00:54 +0000
 Received: from PH0PR12MB5481.namprd12.prod.outlook.com
  ([fe80::361d:c9dd:4cf:7ffd]) by PH0PR12MB5481.namprd12.prod.outlook.com
  ([fe80::361d:c9dd:4cf:7ffd%4]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
- 03:59:31 +0000
+ 04:00:54 +0000
 From: Parav Pandit <parav@nvidia.com>
 To: Cindy Lu <lulu@redhat.com>, Dragos Tatulea <dtatulea@nvidia.com>,
 	"mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
-Thread-Topic: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
-Thread-Index: AQHa0QLfS7FXUVdqN0KzwFRlOGkqFbHtxbfw
-Date: Tue, 9 Jul 2024 03:59:31 +0000
+	<jasowang@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATH v2] vdpa: add the support to set mac address and MTU
+Thread-Topic: [PATH v2] vdpa: add the support to set mac address and MTU
+Thread-Index: AQHa0a9mvf6pW1H6A0u8aW3WMiCvKbHtwEjg
+Date: Tue, 9 Jul 2024 04:00:54 +0000
 Message-ID:
- <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
-References: <20240708064820.88955-1-lulu@redhat.com>
-In-Reply-To: <20240708064820.88955-1-lulu@redhat.com>
+ <PH0PR12MB54814BEA4DD2E8CFD434DF4BDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+References: <20240709032326.581242-1-lulu@redhat.com>
+In-Reply-To: <20240709032326.581242-1-lulu@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -79,66 +75,66 @@ authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|SJ0PR12MB7082:EE_
-x-ms-office365-filtering-correlation-id: 6e1d1a75-5cfe-4670-6bad-08dc9fcb896c
+x-ms-office365-filtering-correlation-id: 41e34f53-2580-4a9a-4407-08dc9fcbbb38
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?8Ka0/X6fxHdtlH9Grnq5++/2efZrslPqYIN/Iazn776AOiUOVtuiIeErCsLC?=
- =?us-ascii?Q?EZ9V43KkaSsAs3bkBsYBDK/gwE+mTJFAupGKu5hHTKLaGRJvE/2JVjzOXciS?=
- =?us-ascii?Q?cLnYqPINqbgt/9c2EQPCpn1WEXM7obAmqL8aRSgoourdpni3bsVYIoDGtshC?=
- =?us-ascii?Q?6ezrUFnT9qFWSX+IRRvG8NLRmxsjZSE1U22u0pOt2DliWO+LecJIW7MnBZTh?=
- =?us-ascii?Q?0aZcesXxy2TcSoju7lpEgyxbncapZCWrJd6ji8s5tsutyY/KZ0UN2hql+fol?=
- =?us-ascii?Q?rO/SDD/lXdWAcL8pJ54VAkBKKUBgD4hcLQ0fwn8PFbn6wFrYBcCKA4KpId5Q?=
- =?us-ascii?Q?OE2Fxkgl9FQ0bllgfaKyWKnMFc42JQHXc3NZE3Ol1NperbzSfVYu4qnU66+g?=
- =?us-ascii?Q?ePWtp/WRWAJOlN+VHePG0egOkrvhlaDXEmYP6qdJlOtaLEcNUY6RoCS8ANU8?=
- =?us-ascii?Q?h3boUbAx958OIuCAWtajNPCF5usDA9HAgAqs0bK5w3UJalKNc2rtF8dtKyN5?=
- =?us-ascii?Q?k24JLmjo1O5KEjPeR8ik9D9dQgn6JHPhutp7iGGFhVRQTvosG2tHck9nIqvX?=
- =?us-ascii?Q?TqAOrzmaDGCmTa89utcmSLx37hiktz+VCRF2G82os9QRdSjts3l12cAEatI3?=
- =?us-ascii?Q?5T26DmfRi3OM7mokT1vnuM/j8nOHV37CSQb6cbePQlajf0ZNqUkfuIxbdbK1?=
- =?us-ascii?Q?vr4aQqxJgkwPYfFG4RTHvD/OFfji4zw8iLq2kyp06vnTu63jLPB8zatnfGVI?=
- =?us-ascii?Q?U+EhC15WID103uAKDcBg/fFJBpDkVYiM7JFUE5CMOHVKFmaYMGe2I0p3Cul1?=
- =?us-ascii?Q?k3aiUnQysYZC1nV6nCgm7lRouviBW4yOafQXIyRK686E5pSfgLkxKktB776Q?=
- =?us-ascii?Q?rq5IjbHZrG4BvCl5IGWCG062Yg9NJFPMUbv11XPRODbEvYqZcX7JTLP0a1ho?=
- =?us-ascii?Q?QEqx+eNoVv9+m3VM2Sp3j7l1trIA7SpHEnrSrxwCz6KCNFhyA+PFEgpzxWwS?=
- =?us-ascii?Q?lPPgi3TXYbTLtEgdvNOykSw/FLF81IpGWrsgREutVwLnBuBF4PSER3A2YYAR?=
- =?us-ascii?Q?e1qO3QNFOeLTU/7pMNvjwg/1nFvX5r6plytjttF4xcNNMjK5aO1GR0GHweg4?=
- =?us-ascii?Q?3hA0nc5DaI34C0UvSOpBV8VwLaeidwDgyXDdA2y8fxBu7Px+C2SeDunniwo+?=
- =?us-ascii?Q?XYAdMadBVNDFK8FLh9s5tnYrO7ngQQLZWSbs81Dw4TgKBAZ/lBkr6EWuWaZZ?=
- =?us-ascii?Q?B/rGTn8DxX1vV8EJW6c3VLqJt8R7a5HLsO+ZKuJv+kXV6r+vtcv590fBgXVR?=
- =?us-ascii?Q?XtB6P89JVvzJTAudQzqvCY6++IKdvf21ksduiIkMZbDdOmYuJNFJXPi1/kqy?=
- =?us-ascii?Q?pUEo4aGeV7lqXW8GFrynKCOvECLhLC4Zlbp2spNpLdzpqGAVdw=3D=3D?=
+ =?us-ascii?Q?h6pCVTXxktTcOdGt1x2+G4q1R3J0sM+SaOLIqYUKnaIab8icJrwPK3tWL4mb?=
+ =?us-ascii?Q?OI+VygBQ3WOsQfdRD6BUWnQSw/rQdE36hyYAkSA+lDx4c3sImq30kFcSzPBM?=
+ =?us-ascii?Q?nCnPM7zuQh0BYMmu82pajG6d2ZrUBE4GCMgPYTD9UGDocZDN5L5seQT1AVyj?=
+ =?us-ascii?Q?LAlCqF9yD+nR5cm3g7OEE9zCau6V5q9sJr3+RxkuUMmaKZa3Gcgg0USnflba?=
+ =?us-ascii?Q?WskX5Ni8ggQpQ8d3jC8dxQ8bQWAXM9WXZ0+HV1y/kUh/rrnmnYDxow6Ts8rI?=
+ =?us-ascii?Q?IdAroQ93NNSXmT7d65E3UubZuELviCkmY9voKT8LnphgagBmRtVQtZoUWntj?=
+ =?us-ascii?Q?CF3LsvT8nqUu6+wEwGnLhNQnyXmhDdkhf92r8AuUsQwYR+0TCrN9VU4w3PCT?=
+ =?us-ascii?Q?VxOmBM3XfmsfUOtOlRm/crI81oJfagOgQOJjwDg86uNn0pusZQYUeUtBdL2E?=
+ =?us-ascii?Q?f9jdmUqd2+8KFhp1tKM46+o7NJoi08pyZR+hUDm28Zh2KGQZ4+HoF+bZb2TT?=
+ =?us-ascii?Q?EiFMmSD6nHmDmxBqodUh5IESfkBKf4fPWtkXRKIVpV0OPQGkjkgBBdg/WWlH?=
+ =?us-ascii?Q?Ao+AAtcrD6R/NeoayQ8WO1Nt/JlZqNgP83LeXvj/3tQ7PrvEuXTZ0idXgT7N?=
+ =?us-ascii?Q?B8sKNLd/jJ/46HiuuOvDqn2paIFFBGCZxZsLEgOoyqv4N4L9DXDIo4LyOPv9?=
+ =?us-ascii?Q?CWedOKQ2ajT5cwsYry43dAknhhvN//RHeYNSIdx5eKjJQVv1ieJcejY1BvrI?=
+ =?us-ascii?Q?HkAbfgtVRry8apPKxUqKz+wT82N6h9GHU3uAlx6CxpQi4dQNclM/0LY3SHFn?=
+ =?us-ascii?Q?aMZHPhPPHkoHrZFBVVwIAnQeJSBVe4OayV/tCfrYAmvfxqOE/iQdaxl7O9X8?=
+ =?us-ascii?Q?1MpBBmijM+//VGQKvLPZYRWrqtN3ud+wSc9okwvLGrV37OhfB9/1mr5gpZoU?=
+ =?us-ascii?Q?dr31Ct4k2tSwUdc81tDx3gvwkLAWBla8G6mIDxoiGmyKalr7h4lyzqkRTZ3L?=
+ =?us-ascii?Q?0HfY0jRpfcIhBrv/FaSJPcLwHQvo+brqxKf23Qx5EQ2/DB+hJVqsgBa0kjzu?=
+ =?us-ascii?Q?6jy7N6S0AGSqSJBT9WBb329KvKtPBUeqGWjcV2AwPhemAM61WaGjJTfOh2ok?=
+ =?us-ascii?Q?6EqU5Al+VCyiOlkw6scW/ULbvFkuC5SC5oXA1x+EHid4UMlnuUMIF5ZC+Tti?=
+ =?us-ascii?Q?9hCWLFqoilEPsnaF5y+heWyhKPfOkG2slysQhspk4OtxmrqidXIf9pq8BiCX?=
+ =?us-ascii?Q?xmY3zVoAe22eOKKuRnDg9XBVDyIkQ6xGls+Y0FWMqBouhh9uv6d9vV/jYqrJ?=
+ =?us-ascii?Q?s/aThHDNDZf9609sPVP21lWrAgPcJJEawOo49sVcosegCXp7TBR8hsoqqBp3?=
+ =?us-ascii?Q?cPtAq6H/Gu2oRZO8uEtdNRoZEF2IXNSn/qatrcn2+Lmr5Wz5qw=3D=3D?=
 x-forefront-antispam-report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?4E0S+aURN/pVqvBJ9l77elgc/q+1VH8+TwbeECP8YT9n5d6ymNBtebKtUbVF?=
- =?us-ascii?Q?0Hobm0kn4T1SZSCuYzSRs2QgnL5eV50KV7/whq+gzxCSkTo26jivOvxYjBUJ?=
- =?us-ascii?Q?GkPjBCvBv73mtzEBeoYNY1LJsqvNg99rXA8zs92Nb+HvBEDhC2UFOFOOVSqY?=
- =?us-ascii?Q?/F1Kc1YSe7c0t2CgTp5+zGuLY2fH8/ELK3NVuMhjAmsG/BMOZPnzySKHHwVX?=
- =?us-ascii?Q?37yAgWNUOiNIPj+pp8RFMWMEz5/fY+wzE4QUb6lMc76WX77hwSQt9GzVu+Ci?=
- =?us-ascii?Q?GEAUftMkss0Ae6XflgYCWZOvf8eQrQezmL+YV0XL391PLwGoJoRRvqL2YmRV?=
- =?us-ascii?Q?RCidADFvQ7rDpwTRUA4pDmJ7pnKlUTcWJk1tTS2cyutDbaUZUozRmdEoAzL0?=
- =?us-ascii?Q?vlGFo+1lcK3oT5HO/hlqFdVif82u4jA9Y2Sxp5zxmLo+uIW+e3uERdAxrZcx?=
- =?us-ascii?Q?3KtMJ5b+qJmdzeMay0CbucKezbCBSDJehbUz5nSjP6vcn2xR14ICx1pGK+aE?=
- =?us-ascii?Q?5e/3vlD+rKbxqymxm+/Vg6eBMn0R8rQ6rDBr9qVnUv3kwVf9TllLjlv0SwQJ?=
- =?us-ascii?Q?ew3OAK1X3Y7zfLrjI7iE39EwtQwL85jNW5P+UYLeP6gMXpJnpi0J3mb91agp?=
- =?us-ascii?Q?RMWff4sRmNfC+wSOKMh6oQGiOUjRpr4XKztC3b5+De83d7cCngX7hf8tAD5/?=
- =?us-ascii?Q?4RM0gUvuJ+/hk5ovc0cN1r6kgML5+tJfpFoFhWU4vLEjOAcafiJLaFm2K2dR?=
- =?us-ascii?Q?iCjLnI3WAJEr1IapSyNanRNIAUgOXqlDws1XbIkz8Ihno/XUcqUi3JBwbY+6?=
- =?us-ascii?Q?a7fxr3S0E8rQ5LXOoB3iKHF5x9oZEz/hAHUb0OMLeQxNMJzVGQu5yV/avtC5?=
- =?us-ascii?Q?h8wa5rDXjKqLBkHSH5ONbkUTw3Z4zGsxVOF7HgM+qgqzxFofSIvZPAJhMaRj?=
- =?us-ascii?Q?fz2vZwrtFHpY4gacfwHakQp1t7g3809kZGo8abMTo3+EMieE4aZ2yMKJyQrr?=
- =?us-ascii?Q?M9uQci3BhrAJnstqzc+2sb8PBMsK+ca36fwrJNHsVDb4VGHyTtubBzsvETPw?=
- =?us-ascii?Q?YnQ0zv9dg4KbuHwmjrRUP5YGTy2JF9QPDeArAHsgQfhQZ6Pzt6qhmfOUS0P3?=
- =?us-ascii?Q?21XmOsH6jqPBqoX2oKrdBYoU3rUgnQLaBdsSyusRGxyFTCr73pwJyKcnlaUP?=
- =?us-ascii?Q?uLpv0GhJ8M7b9SwbDlwwi1GV+oEXtvbJgaWPqN2R6DMVQTmKrCSeW6HhRAxB?=
- =?us-ascii?Q?Tkw5+1heY7fshPHlRzmbw7RzfWno/qzvkhrBUUjTPwLFNWAg0iGxek69N72N?=
- =?us-ascii?Q?B1GHdy1YNVO+kCQyuiM01eHaPYUBYuXbp3SIO8mhtVjXbYiwU2qjdutFings?=
- =?us-ascii?Q?clOz244jjHjh9CYo09nMYSRl36748WIk30LSDLUStgn9l+B/dGhS0oq3LFt1?=
- =?us-ascii?Q?BBSm/q+yXAYdFEpSvlyxK278UCN1NGJRs0YCv5+E+AQMxCBybFWPNSzK9sGX?=
- =?us-ascii?Q?Sp78eZ7SRi0iweS/uXqDzonmmfdlC9kKQFbiDhtbY8d4tR+Z5/O/9vnuBx+C?=
- =?us-ascii?Q?Zd112Siim3Bo5vtOp0c=3D?=
+ =?us-ascii?Q?di+nkUINlpAWS2Gwh0QmeY8ZroVCPtgyMakToE6eADstM/H932pIs/c0Tc6W?=
+ =?us-ascii?Q?5Hi2WQh029FjOUPo38LE2i0UA+a/j/RR4BMC9fMQUYVEzsikpKxPFXtswRQT?=
+ =?us-ascii?Q?4xSknDPYbKeETNKcz4jytbLMG1JUSSSaJMVxHC4HH7d9n2IQn6yL0mlMGUM3?=
+ =?us-ascii?Q?WFJFifSn2yji0wjVucoc3RZLdEGm3H2QrEYqqpK3rW5z965Xu2IbyhUM55RE?=
+ =?us-ascii?Q?3OMLVvJeZ4+MZTaXRGRNt0TrLIAcIJJwi4+Pk+zLSk0OqKHxJjNe5iUbxIZD?=
+ =?us-ascii?Q?F4CMlF3hoDGQVwWMk9J+TiFXe9j+2of9hi6ZZvPyTKpdmAW/YttMzTTt3ChN?=
+ =?us-ascii?Q?VsGKyioONeJBW2xRCM4Y4KrB5iVEALpHWfdodLe8Su8EhGKQauxYhD+O6f5P?=
+ =?us-ascii?Q?7KddBai/9tlm8G73PLUlPTzS/5wN9mG6SiEDE238KZaLe+QTcMgwMZHPk5Zl?=
+ =?us-ascii?Q?OA4T+SP/AjtUAcDHzD+NCgchB7CJo7gZl23fB8ufkQ+/L6iCsJxqvfXF15YE?=
+ =?us-ascii?Q?IjBK3VPcEQYfWYFpBeWHLYSr4b9rIhjkbUKSrn5fh3Nx0Pf74HOFQvt2JlgB?=
+ =?us-ascii?Q?KAVpljQu7T9836YwQMTPYZXTldlg900feex9uhf41B6uFlgl7kyopIN69U8b?=
+ =?us-ascii?Q?kcAgjeKVLhaOOO04Bv7dp7A5h6pTr6Jr8r/fZjKWsFXdOJFdfFBZNbxIf3nv?=
+ =?us-ascii?Q?3XFntKjnz6UkN9J2VeyNJWC7fgs1PT3r156wZTw1NACNsOOaBd7SDdsW5WkC?=
+ =?us-ascii?Q?PYnbU03NO6z2X27DFZ1rNUzSob+k73zNhgluc2oCjixQaWfyTPoIYDqycrP+?=
+ =?us-ascii?Q?kALj9rsxZbyJPaDa+V/iSmO+bNKZdJPjcJHGjZNVA5h4IgZ97vO/N1u6E5l5?=
+ =?us-ascii?Q?sF/delMRYWhit6mocH72rRCz2M4630FwivGL6ENif1hJl4MIeKg3hgY+h4Nd?=
+ =?us-ascii?Q?kTNi7W+gMfLkjLU6MH/+1AOzQ5h0jVL5lpyAs2ZIjbQtx7ckn/0Gj6jIXQJ4?=
+ =?us-ascii?Q?Z8/yYon3892kSXLpy3Ci2hoJppcZ19I4tqCKLnfon4p5HlpwBTG0hlQcO1sR?=
+ =?us-ascii?Q?x7cE2egP4VwKNQITIXD4Z6L/3nZPG1PWKUKKEq1SBuEa5JqAOOZO6M+Burbr?=
+ =?us-ascii?Q?IhVLNpo/0shky1Si4Km09v/VzAa4BGw45UWTbeO0KO2JC34oxbulfv2pKpke?=
+ =?us-ascii?Q?R8cTgYpAEfniH8CjOXzNCctQeg/SmZUCoSoRRIsgYaUtCkC+2FsLg2zr2k97?=
+ =?us-ascii?Q?PLcR0Iw5CodnNfoxu2YhOLmk/YuNC1yRmoehqUeHzlmPeE1kzLif6U5/+Hi/?=
+ =?us-ascii?Q?wdudoXAnxFCRGBvWqQY/AN+fSyYVei+HRzCjzJE4U+XTJgwFw47GEVKZ6vAy?=
+ =?us-ascii?Q?2E6LmJ1U6+Eh/WMnF0ZMnuuz3sittnJrXXpR41TsqZx9Pq0W3gPJW0vxfHEj?=
+ =?us-ascii?Q?GKgPBdPF+8d2dO1HLIUXZubBhnwNNv6vUTwtmLb2snPZziopnWctmCjEBkoP?=
+ =?us-ascii?Q?G773iOXcCsVncpyyWdmINBrunGKSnxiMHjNKBAld6aChxLpJoDtKbeoAUJTm?=
+ =?us-ascii?Q?frg+PUrjUctHwpNRbpg=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -150,67 +146,163 @@ MIME-Version: 1.0
 X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e1d1a75-5cfe-4670-6bad-08dc9fcb896c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2024 03:59:31.2153
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41e34f53-2580-4a9a-4407-08dc9fcbbb38
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2024 04:00:54.7712
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jKfW44wxxdPadCsA7RENvZ0WJspnucZ8ZWJT2iicpEU3NmpMxaAM1XUJWx630j0JzcDL+cL72HARrZWuAeBiRw==
+X-MS-Exchange-CrossTenant-userprincipalname: T9K9kvU8OLAaWqhYYD9465/9mUmPTbc0Y4FxzxaRt7975J6WWhpz5KrL9ZtMPDUfRgn8WfiZkCU4ayezdxaoxQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7082
 
-Hi Cindy,
+
 
 > From: Cindy Lu <lulu@redhat.com>
-> Sent: Monday, July 8, 2024 12:17 PM
+> Sent: Tuesday, July 9, 2024 8:53 AM
+> Subject: [PATH v2] vdpa: add the support to set mac address and MTU
+>
+Please fix PATH to PATCH.
+=20
+> Add new function to support the MAC address and MTU from VDPA tool.
+> The kernel now only supports setting the MAC address.
+>
+Please include only mac address setting for now in the example and document=
+ation.
+In the future when kernel supports setting the mtu, please extend vdpa tool=
+ at that point to add the option.
+=20
+> The usage is vdpa dev set name vdpa_name mac **:**:**:**:**
 >=20
-> Add support for setting the MAC address using the VDPA tool.
-> This feature will allow setting the MAC address using the VDPA tool.
-> For example, in vdpa_sim_net, the implementation sets the MAC address to
-> the config space. However, for other drivers, they can implement their ow=
-n
-> function, not limited to the config space.
+> here is sample:
+> root@L1# vdpa -jp dev config show vdpa0
+> {
+>     "config": {
+>         "vdpa0": {
+>             "mac": "82:4d:e9:5d:d7:e6",
+>             "link ": "up",
+>             "link_announce ": false,
+>             "mtu": 1500
+>         }
+>     }
+> }
 >=20
-> Changelog v2
->  - Changed the function name to prevent misunderstanding
->  - Added check for blk device
->  - Addressed the comments
-> Changelog v3
->  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doi=
-t
->  - Add a lock for the network device's dev_set_attr operation
->  - Address the comments
+> root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
 >=20
-> Cindy Lu (2):
->   vdpa: support set mac address from vdpa tool
->   vdpa_sim_net: Add the support of set mac address
+> root@L1# vdpa -jp dev config show vdpa0
+> {
+>     "config": {
+>         "vdpa0": {
+>             "mac": "00:11:22:33:44:55",
+>             "link ": "up",
+>             "link_announce ": false,
+>             "mtu": 1500
+>         }
+>     }
+> }
 >=20
->  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++++++++++++
->  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
->  include/linux/vdpa.h                 |  9 ++++
->  include/uapi/linux/vdpa.h            |  1 +
->  4 files changed, 109 insertions(+), 1 deletion(-)
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  man/man8/vdpa-dev.8            | 20 ++++++++++++++++++++
+>  vdpa/include/uapi/linux/vdpa.h |  1 +
+>  vdpa/vdpa.c                    | 19 +++++++++++++++++++
+>  3 files changed, 40 insertions(+)
 >=20
+> diff --git a/man/man8/vdpa-dev.8 b/man/man8/vdpa-dev.8 index
+> 43e5bf48..718f40b2 100644
+> --- a/man/man8/vdpa-dev.8
+> +++ b/man/man8/vdpa-dev.8
+> @@ -50,6 +50,12 @@ vdpa-dev \- vdpa device configuration  .B qidx  .I
+> QUEUE_INDEX
+>=20
+> +.ti -8
+> +.B vdpa dev set
+> +.B name
+> +.I NAME
+> +.B mac
+> +.RI "[ " MACADDR " ]"
+>=20
+>  .SH "DESCRIPTION"
+>  .SS vdpa dev show - display vdpa device attributes @@ -120,6 +126,15 @@
+> VDPA_DEVICE_NAME  .BI qidx " QUEUE_INDEX"
+>  - specifies the virtqueue index to query
+>=20
+> +.SS vdpa dev set - set the configuration to the vdpa device.
+> +
+> +.BI name " NAME"
+> +-Name of the vdpa device to configure.
+> +
+> +.BI mac " MACADDR"
+> +- specifies the mac address for the vdpa device.
+> +This is applicable only for the network type of vdpa device.
+> +
+>  .SH "EXAMPLES"
+>  .PP
+>  vdpa dev show
+> @@ -171,6 +186,11 @@ vdpa dev vstats show vdpa0 qidx 1  .RS 4  Shows
+> vendor specific statistics information for vdpa device vdpa0 and virtqueu=
+e
+> index 1  .RE
+> +.PP
+> +vdpa dev set name vdpa0 mac 00:11:22:33:44:55 .RS 4 Set a specific MAC
+> +address to vdpa device vdpa0 .RE
+>=20
+>  .SH SEE ALSO
+>  .BR vdpa (8),
+> diff --git a/vdpa/include/uapi/linux/vdpa.h b/vdpa/include/uapi/linux/vdp=
+a.h
+> index 8586bd17..bc23c731 100644
+> --- a/vdpa/include/uapi/linux/vdpa.h
+> +++ b/vdpa/include/uapi/linux/vdpa.h
+> @@ -19,6 +19,7 @@ enum vdpa_command {
+>  	VDPA_CMD_DEV_GET,		/* can dump */
+>  	VDPA_CMD_DEV_CONFIG_GET,	/* can dump */
+>  	VDPA_CMD_DEV_VSTATS_GET,
+> +	VDPA_CMD_DEV_ATTR_SET,
+>  };
+>=20
+>  enum vdpa_attr {
+> diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
+> index 6e4a9c11..4b444b6a 100644
+> --- a/vdpa/vdpa.c
+> +++ b/vdpa/vdpa.c
+> @@ -758,6 +758,22 @@ static int cmd_dev_del(struct vdpa *vdpa,  int argc,
+> char **argv)
+>  	return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL);  }
+>=20
+> +static int cmd_dev_set(struct vdpa *vdpa, int argc, char **argv) {
+> +	struct nlmsghdr *nlh;
+> +	int err;
+> +
+> +	nlh =3D mnlu_gen_socket_cmd_prepare(&vdpa->nlg,
+> VDPA_CMD_DEV_ATTR_SET,
+> +					  NLM_F_REQUEST | NLM_F_ACK);
+> +	err =3D vdpa_argv_parse_put(nlh, vdpa, argc, argv,
+> +				  VDPA_OPT_VDEV_NAME,
+> +
+> VDPA_OPT_VDEV_MAC|VDPA_OPT_VDEV_MTU);
+> +	if (err)
+> +		return err;
+> +
+> +	return mnlu_gen_socket_sndrcv(&vdpa->nlg, nlh, NULL, NULL); }
+> +
+>  static void pr_out_dev_net_config(struct vdpa *vdpa, struct nlattr **tb)=
+  {
+>  	SPRINT_BUF(macaddr);
+> @@ -1028,6 +1044,9 @@ static int cmd_dev(struct vdpa *vdpa, int argc, cha=
+r
+> **argv)
+>  	} else if (!strcmp(*argv, "vstats")) {
+>  		return cmd_dev_vstats(vdpa, argc - 1, argv + 1);
+>  	}
+> +	else if (!strcmp(*argv, "set")) {
+> +		return cmd_dev_set(vdpa, argc - 1, argv + 1);
+> +	}
+Else if can be in the previous line.
+
+>  	fprintf(stderr, "Command \"%s\" not found\n", *argv);
+>  	return -ENOENT;
+>  }
 > --
 > 2.45.0
-
-Mlx5 device already allows setting the mac and mtu during the vdpa device c=
-reation time.
-Once the vdpa device is created, it binds to vdpa bus and other driver vhos=
-t_vdpa etc bind to it.
-So there was no good reason in the past to support explicit config after de=
-vice add complicate the flow for synchronizing this.
-
-The user who wants a device with new attributes, as well destroy and recrea=
-te the vdpa device with new desired attributes.
-
-vdpa_sim_net can also be extended for similar way when adding the vdpa devi=
-ce.
-
-Have you considered using the existing tool and kernel in place since 2021?
-Such as commit d8ca2fa5be1.
-
-An example of it is,=20
-$ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:55 mtu 9000
 
 
