@@ -1,125 +1,147 @@
-Return-Path: <netdev+bounces-110165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4059092B262
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:42:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5351892B29B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE047284071
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:42:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF9DF1F225D9
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6456153BFC;
-	Tue,  9 Jul 2024 08:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwQg1hoD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C15152E0D;
+	Tue,  9 Jul 2024 08:51:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA008153BC3;
-	Tue,  9 Jul 2024 08:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29089146D6D;
+	Tue,  9 Jul 2024 08:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720514431; cv=none; b=G+morYonmuBEFeNpMEk80zGJ5YF/YHpI6fUtVAvwqlp6iXTjqulAbOPuKq5+mNlVKhohwCJ/m71xif0F5VmCfxQYRbVOaP66lY2Zf1x/IrSCdit9ZPTKnBnO5D0uPcqn0Je7YWeUg3/RUNG89nuxIyMkZ178/gXAFlUhnyZcX0s=
+	t=1720515087; cv=none; b=vA/raACPiqCM1tt8dJaQQvmJMao3zCgM9aPuz0c/pTDkakb3v6TrB6RbR8W5UKzncOv/ny9UU5LInktUzPbxlPAMWrfaiXgRGR35CkqDn1gMSZCzL8ffZdF18L+cfoijNMLyKrIAwhFcTWWIlrRhQKg06+f/RU2u59kl3WIh93c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720514431; c=relaxed/simple;
-	bh=bBCdOwfQpMWDpEE7nDbKjEd17zz9lTJd8l+UG3C2kB0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FpMwnTU8oCdNzuO20YdBtF2EcLf5EMEQ2NcVkeK583tmSODTHVPDv40D5xXarPDJBHxNjTh+kdiay1eyBOOb4VnsOGlSB+IC9Tr27KCy091W+9g1ihpPqGJ+P9WNwyKIkuxIRws8j0nqTBl3L4m4MGRrLodSDcIdhdgQ74dgPQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwQg1hoD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C1F6C4AF0A;
-	Tue,  9 Jul 2024 08:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720514430;
-	bh=bBCdOwfQpMWDpEE7nDbKjEd17zz9lTJd8l+UG3C2kB0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dwQg1hoDCEKSN6VZgQZIUrleFP7jePs20Uhn01giOPCMZTNllUgssPBA+gO8Op6gL
-	 2UvLETrifavSaIC7dUDY4tSTF0W1RfxxSMVJ5q2S8JU+zXnFLtTrVoEU6OKxA2z3QS
-	 w1Ifo3bV3CqVSYn0zlbd4J37m/RI+nuFS8TKPTtEz+Gg5q+YZJnM8SRKTjXp1NRDoA
-	 Hg+mzk61ne7U49NlNL/qfPSFFYUrV5+mKWlH1EJM73jbzwP0VguMx5N6YOwovCiF1y
-	 v11Y7P7vDvmWq9ZUQkCTyRx7MJTjxjQpAl98f4+Y05OIjTaDby/99jBsfQrw/sj66j
-	 RpFoa9er3Llww==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88D4AC4332E;
-	Tue,  9 Jul 2024 08:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720515087; c=relaxed/simple;
+	bh=LD1/f+QGXtsINrfK/x9B1DLA2J3EdBZ8CD+2frlVZt4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SgvFK34b3FN4XdR2PHBvZm0/NJRa6LdIojp76aXhP4dDWcJAjkW0TQdPfHzqhOa+Rn2bh6aj52nlL9adMSCu7FEduec4ARx4SlJhaBLJR8bGUTGsIUZBNWRECsovpWf1NwBcF5CKT+wOXrBt2tkR0hOk5LtW3EmpF9JqutAEBd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C410161E40617;
+	Tue,  9 Jul 2024 10:49:57 +0200 (CEST)
+Message-ID: <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
+Date: Tue, 9 Jul 2024 10:49:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ice: Adjust over allocation
+ of memory in ice_sched_add_root_node() and ice_sched_add_node()
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>,
+ lvc-project@linuxtesting.org, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Eric Dumazet <edumazet@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Simon Horman <horms@kernel.org>
+References: <20240708182736.8514-1-amishin@t-argos.ru>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240708182736.8514-1-amishin@t-argos.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] skmsg: skip zero length skb in sk_msg_recvmsg
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172051443055.11402.15346056734858431642.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jul 2024 08:40:30 +0000
-References: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
-In-Reply-To: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
-To: Geliang Tang <geliang@kernel.org>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, tanggeliang@kylinos.cn, dsahern@kernel.org,
- eddyz87@gmail.com, mykolal@fb.com, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, yatsenko@meta.com,
- miaxu@meta.com, yuran.pereira@hotmail.com, chenhuacai@kernel.org,
- yangtiezhu@loongson.cn, alibuda@linux.alibaba.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-Hello:
+Dear Aleksandr,
 
-This patch was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
 
-On Wed,  3 Jul 2024 16:39:31 +0800 you wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
+Thank you for your patch.
+
+
+Am 08.07.24 um 20:27 schrieb Aleksandr Mishin:
+> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
+> devm_kcalloc() in order to allocate memory for array of pointers to
+> 'ice_sched_node' structure. But incorrect types are used as sizeof()
+> arguments in these calls (structures instead of pointers) which leads to
+> over allocation of memory.
+
+If you have the explicit size at hand, it’d be great if you added those 
+to the commit message.
+
+> Adjust over allocation of memory by correcting types in devm_kcalloc()
+> sizeof() arguments.
 > 
-> Run this BPF selftests (./test_progs -t sockmap_basic) on a Loongarch
-> platform, a kernel panic occurs:
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Maybe mention, that Coverity found that too, and the warning was 
+disabled, and use that commit in Fixes: tag? That’d be commit 
+b36c598c999c (ice: Updates to Tx scheduler code), different from the one 
+you used.
+
+`Documentation/process/submitting-patches.rst` says:
+
+> A Fixes: tag indicates that the patch fixes an issue in a previous
+> commit. It is used to make it easy to determine where a bug
+> originated, which can help review a bug fix. This tag also assists
+> the stable kernel team in determining which stable kernel versions
+> should receive your fix. This is the preferred method for indicating
+> a bug fixed by the patch.
+
+
+> Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+> ---
+> v3:
+>    - Update comment and use the correct entities as suggested by Przemek
+> v2: https://lore.kernel.org/all/20240706140518.9214-1-amishin@t-argos.ru/
+>    - Update comment, remove 'Fixes' tag and change the tree from 'net' to
+>      'net-next' as suggested by Simon
+>      (https://lore.kernel.org/all/20240706095258.GB1481495@kernel.org/)
+> v1: https://lore.kernel.org/all/20240705163620.12429-1-amishin@t-argos.ru/
 > 
-> '''
-> Oops[#1]:
-> CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE  6.10.0-rc2+ #18
-> Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK2018
->    ... ...
->    ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
->   ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
->  CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=CC DACM=CC -WE)
->  PRMD: 0000000c (PPLV0 +PIE +PWE)
->  EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
->  ECFG: 00071c1d (LIE=0,2-4,10-12 VS=7)
-> ESTAT: 00010000 [PIL] (IS= ECode=1 EsubCode=0)
->  BADV: 0000000000000040
->  PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
-> Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrack
-> Process test_progs (pid: 2824, threadinfo=0000000000863a31, task=...)
-> Stack : ...
->         ...
-> Call Trace:
-> [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
-> [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
-> [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
-> [<90000000049aae34>] inet_recvmsg+0x54/0x100
-> [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
-> [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
-> [<900000000481e27c>] sys_recvfrom+0x1c/0x40
-> [<9000000004c076ec>] do_syscall+0x8c/0xc0
-> [<9000000003731da4>] handle_syscall+0xc4/0x160
+>   drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> [...]
+> diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+> index ecf8f5d60292..6ca13c5dcb14 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_sched.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+> @@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
+>   	if (!root)
+>   		return -ENOMEM;
+>   
+> -	/* coverity[suspicious_sizeof] */
+>   	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
+> -				      sizeof(*root), GFP_KERNEL);
+> +				      sizeof(*root->children), GFP_KERNEL);
+>   	if (!root->children) {
+>   		devm_kfree(ice_hw_to_dev(hw), root);
+>   		return -ENOMEM;
+> @@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
+>   	if (!node)
+>   		return -ENOMEM;
+>   	if (hw->max_children[layer]) {
+> -		/* coverity[suspicious_sizeof] */
+>   		node->children = devm_kcalloc(ice_hw_to_dev(hw),
+>   					      hw->max_children[layer],
+> -					      sizeof(*node), GFP_KERNEL);
+> +					      sizeof(*node->children), GFP_KERNEL);
+>   		if (!node->children) {
+>   			devm_kfree(ice_hw_to_dev(hw), node);
+>   			return -ENOMEM;
 
-Here is the summary with links:
-  - [net,v5] skmsg: skip zero length skb in sk_msg_recvmsg
-    https://git.kernel.org/bpf/bpf/c/f0c180256937
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Kind regards,
 
-
+Paul
 
