@@ -1,129 +1,168 @@
-Return-Path: <netdev+bounces-110322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E556192BE0D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:19:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA04792BE31
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 228A11C227CB
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:19:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 673EEB2437A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B5C19D079;
-	Tue,  9 Jul 2024 15:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B313919D889;
+	Tue,  9 Jul 2024 15:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1RPpgbzI"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="EkV/fz5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABAD158856
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 15:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8244819D079
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 15:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720538342; cv=none; b=ldGGZfo6qNSWxOGDQQHWHUWcjKjxuQysxFJgGFSu7m8dqtvP2y6HpkUxznP5Bb+0f+yZ9AqjtoIthgXhQCtCsiP9mBYr6tcUmnzZxJgcSBT814NYNXLHzzMSIQ64YkUl7bM+HeduDg0tUtKlbnbPlcMfiNrr3rWdiA7yxnUZplI=
+	t=1720538532; cv=none; b=KvowYm8mRtAlirTp/JTcbFGNMwXK2obi2yS6VcQH5E8+JmJt5cKI8e4kcbjJ/DeaWSidz1PMatSpJJaNZAM6yBgxM2y5Glk6//kwxjxyxsZCnYbnoMeEA0p8uqGobqHUvC9mVr/giFus6cyh7KtFLHsDGg32OXrOvVRQQZSZDps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720538342; c=relaxed/simple;
-	bh=ojN2JmcT7kvuAEXfKcAoFG86zqUA6Rqq1vkhBEhguOg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oNIQbJewxpro7WSvkfc9BgXFMGTKs5gSHdQIfFsarLsZa8kmhQW8rY0CLkkdlpJBREAEBWKJhOJmUTT802FMdXO7IPC3FxQ0G21twzCMHJdqZWcorxUiAQvcjQOZDVzAJ/eveqnk3vNy9LlMiFcAFxGBezZAruT5pYdVF02Flrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1RPpgbzI; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-653306993a8so75998277b3.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 08:19:00 -0700 (PDT)
+	s=arc-20240116; t=1720538532; c=relaxed/simple;
+	bh=JWAQLFqZkuWOfZpZyTRyc8jygVtPln2o1M5TZCpyi7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UlQJV4dwEe1ZivLocnzbiaZU3K8zwPqnoSXSxkXDc6rXvyUtYmKbmaUXxLuROfNBziGuBSf+41L6uofEbfstCD5KcCXOColQ0Ko/kvIF+YMcUDLpSDoWnHTt3gzXqfP9tKSW00WDaGh+wQhetERcwU79jiH/m/CUP1vCWXBMYYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=EkV/fz5J; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-426717a2d12so6760105e9.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 08:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720538340; x=1721143140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WFa9c2fe6FXvwC1bTAk+U1J7rwHtRLarFBf2iyFVXFo=;
-        b=1RPpgbzIGzHo3yWZJf4MsJNhfbVGOR5W46lwsH9F7sdjsJc/Q64O2ZOHjRg5AXOjur
-         TjOk7MRSlsyr6otXso+gw4UZ4IxGZ7p8XdG0bdRuh/agGo+4nuNkxkz/3jGUxkutCx2P
-         EPlgZbQgRmvW1vFhiTocAtPbl3fAiivnzqFDJkp1njpS9tkhLMsBtjCvu8VFdy18ttZo
-         W3vkT6Rp+puih+IBWSyrijQ6vyf2+2gitNeYtZUWxptbb5xUnJ6UU9jCzlh3dTllU0xC
-         JtQ6UU/Ra3HHthOAtekVePEixR1y9ZrKPzlHTJP0lnlqn9zb8hzgvblHGyEsz2xcBzfH
-         F+PA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1720538529; x=1721143329; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jfUB9ZJ69EL9GipUtbkxGBaJaIV82ecNhY+j5SzQ2gM=;
+        b=EkV/fz5JvvHmnnNHgq4YBGewGglZkbZNa2fXIL2HdY63vneGnl6IzcUIQrksC9fkk/
+         6v3opD75UBPoSNI/KtCHYFOEnw7OgYVBWRREW/oIUtl7vaXPOkkMmG9HZrakDH/E3/wT
+         AAv5y0kbebSyBPwOHK3auUFmOBjVElMRxmQ91soA6aOy2DUPXRqvytsQX5MU+1TW6s1D
+         ee+F6JjwCPNJlKf4yhsjIkNAGD3mQRc9B/V3TXOGssh95SVNZ1cDJ3rn+/xui/u2Y0kz
+         9RD6hXVj8Y3GfLtcRuwI/NQRz+mArYfTC2pAnm41DrP7QwtFEOb6h1OlYfXR4LF6/q50
+         TgEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720538340; x=1721143140;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WFa9c2fe6FXvwC1bTAk+U1J7rwHtRLarFBf2iyFVXFo=;
-        b=e/S7011SRjt92x+rb8+CUH4qGhRRaACqS7m+/M3jUWNF1/1fDcpcxTHn3VgEGI9ndT
-         jC589pN2jatAgSfM8u5Hdr1+Rjjo19I/jUHljTUfagXoRBpGDHtga86+jTRXbegFXfsT
-         YbmQL4jZtrZjcxxVP/injouTnxP9baN0TF9tz151rhXgWz7F8Ys/baRP1CMpArTwOmd7
-         /vVZqjDccyTkXolDu2naebZL7XTTeSC8S9zI/I94UwNJOPv6maUYOAN98hEPP23FqU9F
-         RTLqe1L+Q16sXRebDKAF59HoP0XYqu+ZTREp1vUGpLZN8djtbqziOyvuIeeuOA7ESKjl
-         p4aw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1RFUrWzzHPd1+Psl65VKGv7jl0bw9z5/pkIKtZMlVvnWZsYX3p4wvrbb8uDQphKwS0Wg6aQxYkQAHuFeQVHQbBBLhbDEf
-X-Gm-Message-State: AOJu0YzjDkYmPhxLPHQG5mQ0cjAmqm31Nj9TTQ6AzVzCBQ14zIAWILe6
-	cxsXZr+JO+5+jJz1p/3/gBY11gsOQDrHUlN10sNccc7KVJwwQPIL6T8VTWH1ViZvPPhtzX76CBj
-	fvw==
-X-Google-Smtp-Source: AGHT+IG6s2DL4z5jJ3caJ1nyKbichgc+9treufuJXMxHE5/JSZIsXGqVg7GvHDIihpvMghDuHrXil7HRN0A=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:690c:46c8:b0:62c:de05:5a78 with SMTP id
- 00721157ae682-658f01fd061mr279197b3.6.1720538339849; Tue, 09 Jul 2024
- 08:18:59 -0700 (PDT)
-Date: Tue, 9 Jul 2024 17:18:57 +0200
-In-Reply-To: <70756a7b4ed5bd32f2d881aa1a0d1e7760ce4215.1720213293.git.fahimitahera@gmail.com>
+        d=1e100.net; s=20230601; t=1720538529; x=1721143329;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jfUB9ZJ69EL9GipUtbkxGBaJaIV82ecNhY+j5SzQ2gM=;
+        b=hCwKwHLdSIRqWfuehGPWJaYDE19ogw4XVCWgZBeHxCSP/U+lNx9GePmoTIMVnptXH1
+         gBmQSQwCq0A646ft662go4CLfDFMkL+Dulaw4vRct5X7fdwXs0/cfLW0Nab/V8x1JG69
+         klR0yQ9o2KPIFlNfxMhscnhXw9x+Szv2Mx23uB5Uel5UjKk/hCo7gI3GIRjLtTkmp8kP
+         k1p38cq9XEUz7o9a+Ls4i++tDFb8M2yQLyIiM47jqolybEypMpBX3N2Yh+8BJMojw5vZ
+         Louy9XKdEjA+f1mfClHO5r1P9HXY1tgi1QIrClYgySHNEScgV+XrX7kxy6SufVF6PtEV
+         vlHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULWLcsZfX8R2YQFIc0LOJZahwObRliofCjAmtPqFBtV21ftMYKrBEmrBDt9S3a146PsnAETYGHts/KFfKGpI2hipNEj67S
+X-Gm-Message-State: AOJu0Yxn2ZiKR7wv07SvBGSUkAWyFrGYfkYxPfGKI+ztGZNpwn+nuqPS
+	YA1LiyFpa7FbFo0o6PQbuSmnQl53+1JiAIW2mZiX+A0VVaK9yIS26nwWEK+cYMw=
+X-Google-Smtp-Source: AGHT+IFKyuCi8F65Rnjy2ONu9WDc7c8zSBudZGwZQkQFlY9b9EBnNysV/fwsOhCmIH3gVuNNKX3o0A==
+X-Received: by 2002:a05:600c:4ba4:b0:424:aa83:ef27 with SMTP id 5b1f17b1804b1-426722c11a1mr22876765e9.1.1720538528867;
+        Tue, 09 Jul 2024 08:22:08 -0700 (PDT)
+Received: from localhost (p50915e7b.dip0.t-ipconnect.de. [80.145.94.123])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266f6f5f51sm46910255e9.25.2024.07.09.08.22.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 08:22:08 -0700 (PDT)
+Date: Tue, 9 Jul 2024 17:22:07 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Rob Herring <robh+dt@kernel.org>
+Cc: Nikita Shubin <nikita.shubin@maquefel.me>, 
+	Andy Shevchenko <andy.shevchenko@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@kernel.org>, 
+	Hartley Sweeten <hsweeten@visionengravers.com>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, 
+	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Andy Shevchenko <andy@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Sebastian Reichel <sre@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
+	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-ide@vger.kernel.org, linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH v10 00/38] ep93xx device tree conversion
+Message-ID: <fjbvn3p7nqtvllcohtmcwlyv45blulb47t62gz3xey37wrbie5@ke6xcrfq2ztq>
+References: <20240617-ep93xx-v10-0-662e640ed811@maquefel.me>
+ <CAHp75VfSC9gAD9ipeWRPdQOxUp4FXqYYei-cJTs38nbz0cHpkg@mail.gmail.com>
+ <48c242838c77034485a9e667dc0e867207c5beed.camel@maquefel.me>
+ <241a4cf9830b0118f01e8fcf2853c62527636049.camel@maquefel.me>
+ <jyvlqfvqn5bp3jmvxvwyrcqmihjohuq3o757mfph7x37kbwvtq@gtgyh4fca4fq>
+ <CAL_Jsq+9Jk90HovH8bwzgCHwwh9j4mBm_Aaiq+EOj1HT3R17_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <36958dbc486e1f975f4d4ecdfa51ae65c2c4ced0.1720213293.git.fahimitahera@gmail.com>
- <70756a7b4ed5bd32f2d881aa1a0d1e7760ce4215.1720213293.git.fahimitahera@gmail.com>
-Message-ID: <Zo1U4dX-kGcm0hHA@google.com>
-Subject: Re: [PATCH v1 2/2] Landlock: Signal scoping tests
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: mic@digikod.net, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn3_gh@protonmail.com, jannh@google.com, outreachy@lists.linux.dev, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="piveefpjjxp5n6ob"
+Content-Disposition: inline
+In-Reply-To: <CAL_Jsq+9Jk90HovH8bwzgCHwwh9j4mBm_Aaiq+EOj1HT3R17_Q@mail.gmail.com>
+
+
+--piveefpjjxp5n6ob
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 05, 2024 at 03:21:43PM -0600, Tahera Fahimi wrote:
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
->  .../testing/selftests/landlock/ptrace_test.c  | 216 ++++++++++++++++++
->  1 file changed, 216 insertions(+)
+Hello Rob,
+
+On Tue, Jul 09, 2024 at 07:58:42AM -0600, Rob Herring wrote:
+> On Fri, Jul 5, 2024 at 3:21=E2=80=AFAM Uwe Kleine-K=C3=B6nig
+> <u.kleine-koenig@baylibre.com> wrote:
+> > As we're approaching the merge window and this is still unclear, I
+> > applied the pwm bits (i.e. patches 12, 13). If I understand correctly,
+> > patch 33 isn't suitable for application yet as it has a dependency on
+> > pinctrl changes in that series.
 >=20
-> diff --git a/tools/testing/selftests/landlock/ptrace_test.c b/tools/testi=
-ng/selftests/landlock/ptrace_test.c
-> index a19db4d0b3bd..e092b67f8b67 100644
-> --- a/tools/testing/selftests/landlock/ptrace_test.c
-> +++ b/tools/testing/selftests/landlock/ptrace_test.c
-> [...]
+> Now causing an error in linux-next:
+>=20
+> Documentation/devicetree/bindings/pwm/cirrus,ep9301-pwm.example.dts:18:18:
+> fatal error: dt-bindings/clock/cirrus,ep9301-syscon.h: No such file or
+> directory
+>    18 |         #include <dt-bindings/clock/cirrus,ep9301-syscon.h>
+>       |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> make[2]: *** [scripts/Makefile.lib:442:
+> Documentation/devicetree/bindings/pwm/cirrus,ep9301-pwm.example.dtb]
+> Error 1
 
-> +static void scope_signal_handler(int sig, siginfo_t *info, void *ucontex=
-t)
-> +{
-> +	if (sig =3D=3D SIGHUP || sig =3D=3D SIGURG || sig =3D=3D SIGTSTP || sig=
- =3D=3D SIGTRAP)
-> +		signaled =3D 1;
-> +
-> +	// signal process group
-> +	//kill(-(t->pid), SIGKILL);
+Oh, I thought I had tested that, but obviously I didn't. I'll drop them
+again.
 
-There is commented-out code like this in various places in this patch.
+Thanks for letting me know.
 
-I am pretty sure that scripts/checkpatch.pl should flag that.
-See https://docs.kernel.org/dev-tools/checkpatch.html
-and https://docs.kernel.org/process/submitting-patches.html#style-check-you=
-r-changes
+Best regards
+Uwe
 
-I personally just keep a checklist of things to remember before sending a p=
-atch.
-(rebase as needed, clang-format -i (for Landlock files), run tests, check c=
-ommit
-metadata, git format-patch with -v and --cover-letter, scripts/checkpatch.p=
-l,
-edit cover letter, git send-email)
+--piveefpjjxp5n6ob
+Content-Type: application/pgp-signature; name="signature.asc"
 
-=E2=80=94G=C3=BCnther
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmaNVZwACgkQj4D7WH0S
+/k4myggAuVPCnTKtBso6CgCuYoUSZB8cGFx1+fM36OQ0B75EHfb+T+oujbdiO1op
+Q/3NTb3vIUE2+lHn6n/WxHLdeKE1vhmOgiaHW3UabNSZZyT360OZNjin7rLPlQEy
+r1DW1w3QOUIS4g8P/v7skKSis2rOiAkICHLcRdDbW5K5dHLInEshegSKVLo+4McU
+8SqKoYP4acYJFTxAC+gPkDS663k7UCsJbnbHDLstfUnuxPbtKpbDx2z8zB9IXh89
+DMwNeZq7tszOWVZ3i0QEX9fZ/DBoFWY+lSL62ZKsQgh3fJucnwXkwqCdLWahNY0k
+Wth32xU/Xhmh//FAw+1Q2VDgLI37Kw==
+=z8zY
+-----END PGP SIGNATURE-----
+
+--piveefpjjxp5n6ob--
 
