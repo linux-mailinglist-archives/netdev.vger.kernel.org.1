@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-110346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B780C92C10C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:50:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EF592C111
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 18:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EA1EB28937
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:44:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B2ADB28EF3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 16:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A86F182A45;
-	Tue,  9 Jul 2024 16:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5BF189F46;
+	Tue,  9 Jul 2024 16:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTzHYYcY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8NEyM9Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8CB180043;
-	Tue,  9 Jul 2024 16:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD610189F3E;
+	Tue,  9 Jul 2024 16:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720542283; cv=none; b=Usy2n7EKGLAqdjgd+tOttDrD2HDJNl5ECurxInjG3xmSM9eqSSLx/8MstZImbK+L8hTb2d4SRAsbwMyN+aNQMmNUPpxi6ICv7CWkBK/HlD4AT7cXO9yeR3znyP3o5JiNradG/2Sk0OgHU9RxPlFTlGn6IHkuiQ/gUTufEYn7BlE=
+	t=1720542300; cv=none; b=p5IhGisRzSEWnfvlUglac0KjCXptGCUCv7MU/UDG+nSS/BHKCuaw9rtH4w7ho/UP9KNeVaNipqCT4d6RPM11jKeuv0VtBshtDVrrJEVeQF4juFK16i+BZZ5B4uje3nT+0eaP5dg5rZxGZt7yD2pdM6OhvJZd2TGdIoQ23G3b3d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720542283; c=relaxed/simple;
-	bh=7lRbEQCqQpMupPQ3Pa0KTmdnCD+aCGyVQE+QHBlxQ7c=;
+	s=arc-20240116; t=1720542300; c=relaxed/simple;
+	bh=Xw/DE9j2UUP3n2jzVwO6mxZ9mi62BzvSjZx9mD76Byg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CK0p1e4zBa+jchGhmFZVUPhRjESIs0If6ygL+4NGgEn8F2sEwF6JPPnOinaPdmHxFfLcjBCVD2a8KYH2lnQSkBMiqZHnUmt2hE6i429fz6IcRnzigSeGDwO4RZ6K7hUo0Uh4F0v49EtjTN2POYtLUQ0r96vFhFACFqckTb3NdEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTzHYYcY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC171C3277B;
-	Tue,  9 Jul 2024 16:24:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=n4hWr0cYgvL9Rrukv0mUnzpkxDR6UjsNxKXrcVHw7Ts6XWE/Q/zoSowOtFetcXaHONIq9bufh9+CK56380hg8Mz1V4/KxeWDszVJzG6RlLRnSgxyKCC/PuwPaK3fARSy8tKxDi3AXjzgKmyERWDh93DxTG8tGdQCVt8xVZWperA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8NEyM9Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25838C3277B;
+	Tue,  9 Jul 2024 16:24:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720542283;
-	bh=7lRbEQCqQpMupPQ3Pa0KTmdnCD+aCGyVQE+QHBlxQ7c=;
+	s=k20201202; t=1720542300;
+	bh=Xw/DE9j2UUP3n2jzVwO6mxZ9mi62BzvSjZx9mD76Byg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pTzHYYcYW4IvhVVA06cYBtDd845D/RjRnAHwKWIHi5LbZuQo1L6GAVyl50Z95gPKb
-	 na8uGCjEhw70+xDpcVJbim/QZ9y6vvffHzmSVuH/RdY14d6ApiqsndjBkji8x5es8k
-	 QO2CN3l//NOYWM3DIKUk+q3yIKez3dDDhHSyEwMN8ebVB9arKwvj6+vIQzkS/CBfJZ
-	 b4zkPq9bztSptL2apFKBz28wcraRY8qNu01mQMP8d8rntR0ccZn4QnSt23eWu8Cf3b
-	 gi0k10LLtJGmqPuYHVj17riULLF3yGmo2MCLoYpkc9uQlpa2s6NPgNCPSjPcjTc3bD
-	 /hF/OI7B+6Lgw==
+	b=s8NEyM9Z1AAgWxsrocvC6kvuy9CoeNf3sDWS6vUZhr1YclrbScpNF1xvd0zzXpLFm
+	 tuJ3+CzZ97VOIY5KGGVYfCerfY+kobCNq/LnpB+oP4sexXtYCrTLc05tRNCOV27IsU
+	 x5my8T21rXI66MVWo9uCemJZ2wPR1wfCOYKYaBMvuqABxJZHhQDu57ww4yOGXmnn6A
+	 HcU0GNBU46KKGSrUhpSjdDiMfLJwXpByWva2uPm/NWntTOujcyVo+1T6SiXhVgpEiv
+	 VEipgtm0hGqTzHEH/aZ7pxKN3ouutaQ3r9tXRdS6I3kC2oWEP5MPOt7GygT6Nu28hR
+	 O9goqGeeI5CiA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Nick Child <nnac123@linux.ibm.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Daniele Palmas <dnlplm@gmail.com>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mpe@ellerman.id.au,
-	haren@linux.ibm.com,
-	ricklind@linux.ibm.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 21/27] ibmvnic: Add tx check to prevent skb leak
-Date: Tue,  9 Jul 2024 12:23:35 -0400
-Message-ID: <20240709162401.31946-21-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 27/27] net: usb: qmi_wwan: add Telit FN912 compositions
+Date: Tue,  9 Jul 2024 12:23:41 -0400
+Message-ID: <20240709162401.31946-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240709162401.31946-1-sashal@kernel.org>
 References: <20240709162401.31946-1-sashal@kernel.org>
@@ -67,66 +65,89 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.97
 Content-Transfer-Encoding: 8bit
 
-From: Nick Child <nnac123@linux.ibm.com>
+From: Daniele Palmas <dnlplm@gmail.com>
 
-[ Upstream commit 0983d288caf984de0202c66641577b739caad561 ]
+[ Upstream commit 77453e2b015b5ced5b3f45364dd5a72dfc3bdecb ]
 
-Below is a summary of how the driver stores a reference to an skb during
-transmit:
-    tx_buff[free_map[consumer_index]]->skb = new_skb;
-    free_map[consumer_index] = IBMVNIC_INVALID_MAP;
-    consumer_index ++;
-Where variable data looks like this:
-    free_map == [4, IBMVNIC_INVALID_MAP, IBMVNIC_INVALID_MAP, 0, 3]
-                                               	consumer_index^
-    tx_buff == [skb=null, skb=<ptr>, skb=<ptr>, skb=null, skb=null]
+Add the following Telit FN912 compositions:
 
-The driver has checks to ensure that free_map[consumer_index] pointed to
-a valid index but there was no check to ensure that this index pointed
-to an unused/null skb address. So, if, by some chance, our free_map and
-tx_buff lists become out of sync then we were previously risking an
-skb memory leak. This could then cause tcp congestion control to stop
-sending packets, eventually leading to ETIMEDOUT.
+0x3000: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
+T:  Bus=03 Lev=01 Prnt=03 Port=07 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=3000 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN912
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-Therefore, add a conditional to ensure that the skb address is null. If
-not then warn the user (because this is still a bug that should be
-patched) and free the old pointer to prevent memleak/tcp problems.
+0x3001: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
+T:  Bus=03 Lev=01 Prnt=03 Port=07 Cnt=01 Dev#=  7 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1bc7 ProdID=3001 Rev=05.15
+S:  Manufacturer=Telit Cinterion
+S:  Product=FN912
+S:  SerialNumber=92c4c4d8
+C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
+Acked-by: Bjørn Mork <bjorn@mork.no>
+Link: https://patch.msgid.link/20240625102236.69539-1-dnlplm@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/ibm/ibmvnic.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/net/usb/qmi_wwan.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 157be4e9be4b7..977116a1b3158 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -2288,6 +2288,18 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	    (tx_pool->consumer_index + 1) % tx_pool->num_buffers;
- 
- 	tx_buff = &tx_pool->tx_buff[bufidx];
-+
-+	/* Sanity checks on our free map to make sure it points to an index
-+	 * that is not being occupied by another skb. If skb memory is
-+	 * not freed then we see congestion control kick in and halt tx.
-+	 */
-+	if (unlikely(tx_buff->skb)) {
-+		dev_warn_ratelimited(dev, "TX free map points to untracked skb (%s %d idx=%d)\n",
-+				     skb_is_gso(skb) ? "tso_pool" : "tx_pool",
-+				     queue_num, bufidx);
-+		dev_kfree_skb_any(tx_buff->skb);
-+	}
-+
- 	tx_buff->skb = skb;
- 	tx_buff->index = bufidx;
- 	tx_buff->pool_index = queue_num;
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index d22ba63160b8d..46e0e1f1c20e0 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1379,6 +1379,8 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1260, 2)},	/* Telit LE910Cx */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1261, 2)},	/* Telit LE910Cx */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1900, 1)},	/* Telit LN940 series */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x3000, 0)},	/* Telit FN912 series */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x3001, 0)},	/* Telit FN912 series */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9801, 3)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9803, 4)},	/* Telewell TW-3G HSPA+ */
+ 	{QMI_FIXED_INTF(0x1c9e, 0x9b01, 3)},	/* XS Stick W100-2 from 4G Systems */
 -- 
 2.43.0
 
