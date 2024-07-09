@@ -1,86 +1,108 @@
-Return-Path: <netdev+bounces-110065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F38292AD0A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:21:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DE292AD21
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 02:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F21F41F222A5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:21:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9EA61C215F2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 00:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F27917C9;
-	Tue,  9 Jul 2024 00:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF134A15;
+	Tue,  9 Jul 2024 00:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7BGrzLH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuaLewx/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039D0286A6;
-	Tue,  9 Jul 2024 00:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FCF15BB;
+	Tue,  9 Jul 2024 00:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720484475; cv=none; b=KaWk23SuIyoEjp6MhcINNCndnu2f65A3GWpRoaGBsJ6WgKpeg6i/wZM0pAf6F0e3dwwns+uFsorebD5eEWZQoye6u5g7GmEHat9Ilvklwy1eo0DSMG0kFl+pJSUoW6HOXQ8nd1vblK0X4Qw//1QvO35dYtbEBZXcLuNTt2pL+Eo=
+	t=1720485184; cv=none; b=e8N7XRYHWchO5a6avN13/FxwtLDvELtcOqfjEgiwSBUZaGr74ZM3nFrUfH6gWBe2sVbHap8n6UuectW3R6diKlrKMp68XC+JUfH+kSZ9E5e3DE4oW1hh1u8VNzIkyrPGGegpck+r02lOuk4t257hc0sTF6KsDd6cSj0UJFjqMs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720484475; c=relaxed/simple;
-	bh=Xo3+QFBXpqmBlMplzfz/hdxkkPdt/5SCumC7QBHHisM=;
+	s=arc-20240116; t=1720485184; c=relaxed/simple;
+	bh=k3/zS10JtPOCVxvS3f37FDn+IqhfPWXVJ3N/zYrYDJ0=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=na1KymeaXp/HEb233c4upnNAA/K1BgDpCb5CBXsv5Sotpo43biPnUswFGxX3d32icmLurZWYht4I4Ry1z7BcmT32mX+6GsceYaMbPg5+YHOa/tqSRofYgmhrdV9vFr3f12PKbudMN8zX+TAnS3rbMn8eT7jJBFlV5R5BtN5OLSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a7BGrzLH; arc=none smtp.client-ip=209.85.210.169
+	 Mime-Version:Content-Type; b=THc5Dqzai8yH825L6ei5UNF2qK/Lnig20QMIyBk8i1mBrJ1JEIsCnwv4VkgNRNOEqBuTzXXxw5OdKGn8hFT6Z7T9Xa+EKpbUyXu0Te+vFkB7HqvmvRHc2wP6ZQ75aOCPWZkTNLIF5S/2I17OpzwBJ3YZ+L7lAtYA+tafqZrYskY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HuaLewx/; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70af0684c2bso2787510b3a.0;
-        Mon, 08 Jul 2024 17:21:13 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-6eab07ae82bso2348357a12.3;
+        Mon, 08 Jul 2024 17:33:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720484473; x=1721089273; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720485182; x=1721089982; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R/SwctyraUjLIa9K94QJwveOwyBiR6rakJmgf688vGc=;
-        b=a7BGrzLHMQVphT/D1vHngMH9FxcP69mCIgNYigQJRzR/NVDOi4Plo/v0Nq4gwVU85c
-         x1BMuaZQSNauHbWAvqn1SEYKa9rMxdMn6LNMt8n3QWBP27zXAN5yvZn9dnVKzdF2qdiq
-         1Wc6ubxEbfg2Bxt6akrUNpDWrjBjv9VGLlKnC2RoLC+gmJlGcHdZtfAd9cqq+Kq8AEwz
-         J/mYnq2w9BpWvDs8thkE71bHX0u8k2Z5cGrOwTDgov6z65z546eASwQIrTwdOlX8eh8S
-         7Ay+wJjb8V+C4bjs+e4LXJAladwI6NfvIj+WXZ8METuFqFNa+hDix9lE2lbWpNeeKoIS
-         JIFA==
+        bh=gbmTmpGl9LGWIehww80/zM7iEVzfhtY6yCT6eHjeVS8=;
+        b=HuaLewx/eQSod4JtyPVha+62O+HQ2sS4CF1SEKz6LQrfI5GbNGIHyeAb/gPxR2fJ1L
+         tbDcq8Zkbxb6G1OfstfyvO1QEAj9MEzwpcbY3m5zKydrncXCAW2kz4GOOEyOivc9SKH3
+         4x7nrzMF3wlyHBkMmoaRtRMdbl4+LsDvn3SCNngMXNJPBuxlprurI3ll510qGCwGijnW
+         juDjrvQSoluR0r+swHm7h9rM/DHhUvqqEdFrsILCr5JRt+fpAP7GPyfc2iBh99FmaGzi
+         Q2kQAvvikKm+5PyzfSjbFxNpqDUigu2WZMPX7lQnPG1Al6G+P+GTG4V4U62GCmcB8KgN
+         gAnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720484473; x=1721089273;
+        d=1e100.net; s=20230601; t=1720485182; x=1721089982;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=R/SwctyraUjLIa9K94QJwveOwyBiR6rakJmgf688vGc=;
-        b=Zj7nCE6C5uu/rp7tT++N6VxouLVe9v+4dTIWycwKe3qj3vEc1SmYOeevEcBlAGC3pk
-         48wD0oYl6mHJiLGjn5QluHIf2xfgKsXm2+OkY4M0XCDVX4DYVCH6jA3AZcgoGK38ZFDd
-         LxWXTLhLht2Nl3syj6aPM/hWEa5tZOj6wL47GebdZdd2N+YxjzVKS9QViZQPS6bCfjwt
-         ZvCUrUHlSi50mhD60+x7ZzMpB0un67/mb7chH7Vpj3DFycvQtLEW+0ucbFZw2ZFYRmHu
-         F6LARAD81tKxo5F5Aq4WbQmnpCfLXYD6TjyXDd7tK9mshH5iZx/DqTpWiJwFXqAk7aS/
-         5DRw==
-X-Forwarded-Encrypted: i=1; AJvYcCU402GGVmzc9MnHeJqo3BxFr+/9twNbj4HJp5kbKIUYbhEpG3cM0NcBeWkBL33t3NwQkOgcJYRfzjxbjZHDdTIFfFL8Pkdj
-X-Gm-Message-State: AOJu0YzCsvowPY7Eg/Dl0hXRdYY2LKMYVjP1K0WF1sM889wvxDjWVN1X
-	UR5bh16XHryBvn55VndlrDbUfjOBhcwaF6OtY9zJ5cgDjD4ddoAGzwte4g==
-X-Google-Smtp-Source: AGHT+IEbeu0fPSJxg2Hdz6MG/eLE6DApOHWfSyQU5j2n6d2tbjX6V5EDFVjtF97Qysp7dh2y/FY6YA==
-X-Received: by 2002:a05:6a00:999:b0:705:cade:1f50 with SMTP id d2e1a72fcca58-70b436875bbmr1347241b3a.34.1720484473048;
-        Mon, 08 Jul 2024 17:21:13 -0700 (PDT)
+        bh=gbmTmpGl9LGWIehww80/zM7iEVzfhtY6yCT6eHjeVS8=;
+        b=HuqurRBz/0UZk4klxir+9wPzj3FKfotgKbQb0Z1N+eNotVZhFp/n9I/PWVgQu/5b05
+         29RMQstrpfxOQLteM/aEy2NZDZNYTILQfeJMU/fHSGBzdgggXY5uNSozR1d24Dr4+O03
+         9cMHm+/XYsXHt4VMNdhfLk6LzlTrgcGbh6XGa8Jpt1/hgU0uKYcSd2KuAvOLYyO7zbeW
+         8njrEHvBDm3fZ7hqdKJHwd4n/WHOXio4HOfUXOrwBLh48zddKwy+PeLon7/GyY30naRv
+         mBuNVtxW7PoBkdwxd8tVkK9iVLoeaaBYRL7PBW/y0ytXUkaUI0YZsk5gDIg+zFUcNjPJ
+         Gu8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUc26Cy+pNj+h1ROzG3ue4SDHgmyVIALl5n8kGxj9vqxVque5xIQB27vZf0otYjG9dotT/CNkWVZyHZXzBOREF+uCgnMEl4smov9MCzZMDkQkqylEEb3lWT7di5o1qVs4YKgulS07napQzkY7ul5/TotgtooBukC4zSsmMt
+X-Gm-Message-State: AOJu0YzyA6+65eLgjFub7L4RtsIy748kyo5inZiJPyaQQEG3UGOkDkOq
+	x4agzlPeKr2PqQGZrt3EZxzRCi3/qL3vSoxHTGP60u036XR+b5dB
+X-Google-Smtp-Source: AGHT+IERW/eDq4h5+NOdDSAyiBCa54iY/xmob/DozhAnYntCHQ3fG5yPiIkvES8ODeOBUw9oOuq4LA==
+X-Received: by 2002:a05:6a20:918d:b0:1be:c5ab:7388 with SMTP id adf61e73a8af0-1c298220a18mr1216126637.25.1720485181955;
+        Mon, 08 Jul 2024 17:33:01 -0700 (PDT)
 Received: from localhost ([98.97.32.172])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b439b30b9sm487946b3a.178.2024.07.08.17.21.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ac7921sm4363165ad.232.2024.07.08.17.33.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 17:21:12 -0700 (PDT)
-Date: Mon, 08 Jul 2024 17:21:12 -0700
+        Mon, 08 Jul 2024 17:33:01 -0700 (PDT)
+Date: Mon, 08 Jul 2024 17:33:00 -0700
 From: John Fastabend <john.fastabend@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, 
- martin.lau@kernel.org
-Cc: bpf@vger.kernel.org, 
+To: Geliang Tang <geliang@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: Geliang Tang <tanggeliang@kylinos.cn>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@google.com>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Mykyta Yatsenko <yatsenko@meta.com>, 
+ Miao Xu <miaxu@meta.com>, 
+ Yuran Pereira <yuran.pereira@hotmail.com>, 
+ Huacai Chen <chenhuacai@kernel.org>, 
+ Tiezhu Yang <yangtiezhu@loongson.cn>, 
+ "D . Wythe" <alibuda@linux.alibaba.com>, 
  netdev@vger.kernel.org, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Pedro Pinto <xten@osec.io>, 
- Hyunwoo Kim <v4bel@theori.io>, 
- Wongi Lee <qwerty@theori.io>
-Message-ID: <668c82787f16_d77208e0@john.notmuch>
-In-Reply-To: <20240708133130.11609-1-daniel@iogearbox.net>
-References: <20240708133130.11609-1-daniel@iogearbox.net>
-Subject: RE: [PATCH bpf 1/2] bpf: Fix too early release of tcx_entry
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <668c853cc8820_d7720867@john.notmuch>
+In-Reply-To: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
+References: <e3a16eacdc6740658ee02a33489b1b9d4912f378.1719992715.git.tanggeliang@kylinos.cn>
+Subject: RE: [PATCH net v5] skmsg: skip zero length skb in sk_msg_recvmsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,78 +113,102 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Daniel Borkmann wrote:
-> Pedro Pinto and later independently also Hyunwoo Kim and Wongi Lee reported
-> an issue that the tcx_entry can be released too early leading to a use
-> after free (UAF) when an active old-style ingress or clsact qdisc with a
-> shared tc block is later replaced by another ingress or clsact instance.
+Geliang Tang wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
 > 
-> Essentially, the sequence to trigger the UAF (one example) can be as follows:
+> Run this BPF selftests (./test_progs -t sockmap_basic) on a Loongarch
+> platform, a kernel panic occurs:
 > 
->   1. A network namespace is created
->   2. An ingress qdisc is created. This allocates a tcx_entry, and
->      &tcx_entry->miniq is stored in the qdisc's miniqp->p_miniq. At the
->      same time, a tcf block with index 1 is created.
->   3. chain0 is attached to the tcf block. chain0 must be connected to
->      the block linked to the ingress qdisc to later reach the function
->      tcf_chain0_head_change_cb_del() which triggers the UAF.
->   4. Create and graft a clsact qdisc. This causes the ingress qdisc
->      created in step 1 to be removed, thus freeing the previously linked
->      tcx_entry:
+> '''
+> Oops[#1]:
+> CPU: 22 PID: 2824 Comm: test_progs Tainted: G           OE  6.10.0-rc2+ #18
+> Hardware name: LOONGSON Dabieshan/Loongson-TC542F0, BIOS Loongson-UDK2018
+>    ... ...
+>    ra: 90000000048bf6c0 sk_msg_recvmsg+0x120/0x560
+>   ERA: 9000000004162774 copy_page_to_iter+0x74/0x1c0
+>  CRMD: 000000b0 (PLV0 -IE -DA +PG DACF=CC DACM=CC -WE)
+>  PRMD: 0000000c (PPLV0 +PIE +PWE)
+>  EUEN: 00000007 (+FPE +SXE +ASXE -BTE)
+>  ECFG: 00071c1d (LIE=0,2-4,10-12 VS=7)
+> ESTAT: 00010000 [PIL] (IS= ECode=1 EsubCode=0)
+>  BADV: 0000000000000040
+>  PRID: 0014c011 (Loongson-64bit, Loongson-3C5000)
+> Modules linked in: bpf_testmod(OE) xt_CHECKSUM xt_MASQUERADE xt_conntrack
+> Process test_progs (pid: 2824, threadinfo=0000000000863a31, task=...)
+> Stack : ...
+>         ...
+> Call Trace:
+> [<9000000004162774>] copy_page_to_iter+0x74/0x1c0
+> [<90000000048bf6c0>] sk_msg_recvmsg+0x120/0x560
+> [<90000000049f2b90>] tcp_bpf_recvmsg_parser+0x170/0x4e0
+> [<90000000049aae34>] inet_recvmsg+0x54/0x100
+> [<900000000481ad5c>] sock_recvmsg+0x7c/0xe0
+> [<900000000481e1a8>] __sys_recvfrom+0x108/0x1c0
+> [<900000000481e27c>] sys_recvfrom+0x1c/0x40
+> [<9000000004c076ec>] do_syscall+0x8c/0xc0
+> [<9000000003731da4>] handle_syscall+0xc4/0x160
 > 
->      rtnetlink_rcv_msg()
->        => tc_modify_qdisc()
->          => qdisc_create()
->            => clsact_init() [a]
->          => qdisc_graft()
->            => qdisc_destroy()
->              => __qdisc_destroy()
->                => ingress_destroy() [b]
->                  => tcx_entry_free()
->                    => kfree_rcu() // tcx_entry freed
+> Code: ...
 > 
->   5. Finally, the network namespace is closed. This registers the
->      cleanup_net worker, and during the process of releasing the
->      remaining clsact qdisc, it accesses the tcx_entry that was
->      already freed in step 4, causing the UAF to occur:
+> ---[ end trace 0000000000000000 ]---
+> Kernel panic - not syncing: Fatal exception
+> Kernel relocated by 0x3510000
+>  .text @ 0x9000000003710000
+>  .data @ 0x9000000004d70000
+>  .bss  @ 0x9000000006469400
+> ---[ end Kernel panic - not syncing: Fatal exception ]---
+> '''
 > 
->      cleanup_net()
->        => ops_exit_list()
->          => default_device_exit_batch()
->            => unregister_netdevice_many()
->              => unregister_netdevice_many_notify()
->                => dev_shutdown()
->                  => qdisc_put()
->                    => clsact_destroy() [c]
->                      => tcf_block_put_ext()
->                        => tcf_chain0_head_change_cb_del()
->                          => tcf_chain_head_change_item()
->                            => clsact_chain_head_change()
->                              => mini_qdisc_pair_swap() // UAF
+> This crash happens every time when running sockmap_skb_verdict_shutdown
+> subtest in sockmap_basic.
 > 
-> There are also other variants, the gist is to add an ingress (or clsact)
-> qdisc with a specific shared block, then to replace that qdisc, waiting
-> for the tcx_entry kfree_rcu() to be executed and subsequently accessing
-> the current active qdisc's miniq one way or another.
+> This crash is because a NULL pointer is passed to page_address() in
+> sk_msg_recvmsg(). Due to the difference implementations depending on the
+> architecture, page_address(NULL) will trigger a panic on Loongarch
+> platform but not on X86 platform. So this bug was hidden on X86 platform
+> for a while, but now it is exposed on Loongarch platform.
 > 
-> The correct fix is to turn the miniq_active boolean into a counter. What
-> can be observed, at step 2 above, the counter transitions from 0->1, at
-> step [a] from 1->2 (in order for the miniq object to remain active during
-> the replacement), then in [b] from 2->1 and finally [c] 1->0 with the
-> eventual release. The reference counter in general ranges from [0,2] and
-> it does not need to be atomic since all access to the counter is protected
-> by the rtnl mutex. With this in place, there is no longer a UAF happening
-> and the tcx_entry is freed at the correct time.
+> The root cause is a zero length skb (skb->len == 0) is put on the queue.
 > 
-> Fixes: e420bed02507 ("bpf: Add fd-based tcx multi-prog infra with link support")
-> Reported-by: Pedro Pinto <xten@osec.io>
-> Co-developed-by: Pedro Pinto <xten@osec.io>
-> Signed-off-by: Pedro Pinto <xten@osec.io>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Hyunwoo Kim <v4bel@theori.io>
-> Cc: Wongi Lee <qwerty@theori.io>
-> Cc: Martin KaFai Lau <martin.lau@kernel.org>
+> This zero length skb is a TCP FIN packet, which is sent by shutdown(),
+> invoked in test_sockmap_skb_verdict_shutdown():
+> 
+> 	shutdown(p1, SHUT_WR);
+> 
+> In this case, in sk_psock_skb_ingress_enqueue(), num_sge is zero, and no
+> page is put to this sge (see sg_set_page in sg_set_page), but this empty
+> sge is queued into ingress_msg list.
+> 
+> And in sk_msg_recvmsg(), this empty sge is used, and a NULL page is got by
+> sg_page(sge). Pass this NULL page to copy_page_to_iter(), which passes it
+> to kmap_local_page() and to page_address(), then kernel panics.
+> 
+> To solve this, we should skip this zero length skb. So in sk_msg_recvmsg(),
+> if copy is zero, that means it's a zero length skb, skip invoking
+> copy_page_to_iter(). We are using the EFAULT return triggered by
+> copy_page_to_iter to check for is_fin in tcp_bpf.c.
+> 
+> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+> Suggested-by: John Fastabend <john.fastabend@gmail.com>
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 > ---
+> v5:
+>  - update v5 as John suggested.
+>  - skmsg: skip zero length skb in sk_msg_recvmsg
+> 
+> v4:
+>  - skmsg: skip empty sge in sk_msg_recvmsg
+> 
+> v3:
+>  - skmsg: prevent empty ingress skb from enqueuing
+>    
+> v2:
+>  - skmsg: null check for sg_page in sk_msg_recvmsg
+> ---
+>  net/core/skmsg.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Acked-by: John Fastabend <john.fastabend@gmail.com>
+I don't have any better ideas so lets use this.
+
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
