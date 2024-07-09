@@ -1,225 +1,172 @@
-Return-Path: <netdev+bounces-110177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8022692B367
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:16:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C343892B390
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA3028314D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:16:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 004331C21D54
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0479D1527AF;
-	Tue,  9 Jul 2024 09:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF9C154458;
+	Tue,  9 Jul 2024 09:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="b5CS9d8E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzwClH18"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CED81DA2F;
-	Tue,  9 Jul 2024 09:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F08154434;
+	Tue,  9 Jul 2024 09:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720516560; cv=none; b=o46AuTjU/Oh2+A7B8xHMywvUTEh6lIxPcf6buc8eA1b+UWAgk3i94jb7bL0SvHuviHiq+q4yg2LTkw58Zrf4jOiEjgELNURKxioXlXegFK9Z/24bGlZXv7W3c2qx5YvvtqaFcWr3Qb+OwM5Hf8lCEjW/tfA+wyNSXd0kPEC9KxM=
+	t=1720516795; cv=none; b=SsqafzTDJRbS5jj6ENubLCQaLsEObLm8IPWjQpB97+BgWLcW3Vts+cY4t7I5dqlqc/wgRNKuu0OJ7G+tEG7J3VVQUKuvW/bNpZjNVTFWCjXRSfbkcMyuUPyy8mijmzq7PmPxIfdZZCO+egDvphFLxKLjozL+C2hlFZcx9vWQBJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720516560; c=relaxed/simple;
-	bh=hK2QUQoSLsKZsz2jegmGiISGgACqpgV+13IffX5u+qA=;
+	s=arc-20240116; t=1720516795; c=relaxed/simple;
+	bh=C5LaxZmJe3hgAAtn7Gpmwp0uINpw4vV2fjMcNKJkXSg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hpmhwe9C7pKFype5pMQ3KhGNl+0+F0MqfREeyOD+KduE8idQ3v7UnEEBpGkJ/USUsh04/IenZrDxOqkXoPr6jB97EVzTP+1kG/SjO4XwoJMB6AqYUVIFhw/YflpcyOJ1qKZZrUZTlzAFBELz3L0fNJTaiN/L5CyzI8xVS1G/wk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=b5CS9d8E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E023C3277B;
-	Tue,  9 Jul 2024 09:15:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720516560;
-	bh=hK2QUQoSLsKZsz2jegmGiISGgACqpgV+13IffX5u+qA=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=hLb0LUbaf6sBwmLIQIS/4hHyQQjX2hYi2x3IR7zTKipW2gESGFDmhacOgApwC+XmIPQUfROS12ysx0Mgp/v8D3khF1q6xKCkAIDPJSevfpbxe8JptGUzi0fgPJnWv0VZm1omJ275rASTlDBZsPxRXMFZXnyYuRlgpt/f7jpGCwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzwClH18; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9EDC3277B;
+	Tue,  9 Jul 2024 09:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720516794;
+	bh=C5LaxZmJe3hgAAtn7Gpmwp0uINpw4vV2fjMcNKJkXSg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b5CS9d8EmjYuSh4Oeec2RjoRUGGvRd0pLtlX6LmRJt4hCd5HbYeEb7JcMhMOETUiL
-	 nJGOijZI7omuHyu+1Qf35faihpB0P+eHXoiC/u41ezJKQHr3qA2gW9sxBtTIXizM63
-	 z1FgzWNtkl38ekbRw1GjxAc4UY7Jz4/WW8/AIhfs=
-Date: Tue, 9 Jul 2024 11:15:57 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: LEROY Christophe <christophe.leroy2@cs-soprasteria.com>
-Cc: WangYuli <wangyuli@uniontech.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"sashal@kernel.org" <sashal@kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"song@kernel.org" <song@kernel.org>,
-	"puranjay12@gmail.com" <puranjay12@gmail.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"andrii@kernel.org" <andrii@kernel.org>,
-	"martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"kpsingh@kernel.org" <kpsingh@kernel.org>,
-	"sdf@google.com" <sdf@google.com>,
-	"haoluo@google.com" <haoluo@google.com>,
-	"jolsa@kernel.org" <jolsa@kernel.org>,
-	"illusionist.neo@gmail.com" <illusionist.neo@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"johan.almbladh@anyfinetworks.com" <johan.almbladh@anyfinetworks.com>,
-	"paulburton@kernel.org" <paulburton@kernel.org>,
-	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-	"deller@gmx.de" <deller@gmx.de>,
-	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-	"iii@linux.ibm.com" <iii@linux.ibm.com>,
-	"hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"gor@linux.ibm.com" <gor@linux.ibm.com>,
-	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"guanwentao@uniontech.com" <guanwentao@uniontech.com>,
-	"baimingcong@uniontech.com" <baimingcong@uniontech.com>
-Subject: Re: [PATCH] Revert "bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()" for linux-6.6.37
-Message-ID: <2024070908-glade-granny-1137@gregkh>
-References: <5A29E00D83AB84E3+20240706031101.637601-1-wangyuli@uniontech.com>
- <2024070631-unrivaled-fever-8548@gregkh>
- <B7E3B29557B78CB1+afadbaa6-987e-4db4-96b5-4e4d5465c37b@uniontech.com>
- <2024070815-udder-charging-7f75@gregkh>
- <a1dac525-4e6d-4d28-87ee-63723abbafad@cs-soprasteria.com>
+	b=lzwClH18GW+BOKoOdoysjRyNnPrJhMpU+14WHzzR3y72OF6yRptAs8o0v0/6PGgyv
+	 rUBBEC0/dHiLChlJZHXbyS3vXcV0ET/A2sF+bvFJUjORRXNPZBHrpOav8kF3jW2VtX
+	 jlXNXx+h71idWxkVLCKUzLgttUdwDRg3ZHeP3xL0l//jjRp04oyU/W+D9do+cctMSb
+	 pa2EaNcB3w/GC/i85QJpcBLPi4M8rzC4bIyIMvhfUHrhgAl/gfWvW+b8712rSBJBGL
+	 UXpE9v+4DlZ3rFzcnlhrUemTDkqIour8vzu9HJLSidP/JSRC4zTMpNYhcf9g4Gx04r
+	 2u4x+berVOsDQ==
+Date: Tue, 9 Jul 2024 10:19:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v7 3/3] selftests: add MSG_ZEROCOPY msg_control
+ notification test
+Message-ID: <20240709091950.GF346094@kernel.org>
+References: <20240708210405.870930-1-zijianzhang@bytedance.com>
+ <20240708210405.870930-4-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a1dac525-4e6d-4d28-87ee-63723abbafad@cs-soprasteria.com>
+In-Reply-To: <20240708210405.870930-4-zijianzhang@bytedance.com>
 
-On Mon, Jul 08, 2024 at 03:12:55PM +0000, LEROY Christophe wrote:
-> 
-> 
-> Le 08/07/2024 à 14:36, Greg KH a écrit :
-> > On Sun, Jul 07, 2024 at 03:34:15PM +0800, WangYuli wrote:
-> >>
-> >> On 2024/7/6 17:30, Greg KH wrote:
-> >>> This makes it sound like you are reverting this because of a build
-> >>> error, which is not the case here, right?  Isn't this because of the
-> >>> powerpc issue reported here:
-> >>>     https://lore.kernel.org/r/20240705203413.wbv2nw3747vjeibk@altlinux.org
-> >>> ?
-> >>
-> >> No, it only occurs on ARM64 architecture. The reason is that before being
-> >> modified, the function
-> >>
-> >> bpf_jit_binary_lock_ro() in arch/arm64/net/bpf_jit_comp.c +1651
-> >>
-> >> was introduced with __must_check, which is defined as
-> >> __attribute__((__warn_unused_result__)).
-> >>
-> >>
-> >> However, at this point, calling bpf_jit_binary_lock_ro(header)
-> >> coincidentally results in an unused-result
-> >>
-> >> warning.
-> >
-> > Ok, thanks, but why is no one else seeing this in their testing?
-> 
-> Probably the configs used by robots do not activate BPF JIT ?
-> 
-> >
-> >>> If not, why not just backport the single missing arm64 commit,
-> >>
-> >> Upstream commit 1dad391daef1 ("bpf, arm64: use bpf_prog_pack for memory
-> >> management") is part of
-> >>
-> >> a larger change that involves multiple commits. It's not an isolated commit.
-> >>
-> >>
-> >> We could certainly backport all of them to solve this problem, buthas it's not
-> >> the simplest solution.
-> >
-> > reverting the change feels wrong in that you will still have the bug
-> > present that it was trying to solve, right?  If so, can you then provide
-> > a working version?
-> 
-> Indeed, by reverting the change you "punish" all architectures because
-> arm64 hasn't properly been backported, is it fair ?
-> 
-> In fact, when I implemented commit e60adf513275 ("bpf: Take return from
-> set_memory_rox() into account with bpf_jit_binary_lock_ro()"), we had
-> the following users for function bpf_jit_binary_lock_ro() :
-> 
-> $ git grep bpf_jit_binary_lock_ro e60adf513275~
-> e60adf513275~:arch/arm/net/bpf_jit_32.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:arch/loongarch/net/bpf_jit.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:arch/mips/net/bpf_jit_comp.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:arch/parisc/net/bpf_jit_core.c:
-> bpf_jit_binary_lock_ro(jit_data->header);
-> e60adf513275~:arch/s390/net/bpf_jit_comp.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:arch/sparc/net/bpf_jit_comp_64.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:arch/x86/net/bpf_jit_comp32.c:
-> bpf_jit_binary_lock_ro(header);
-> e60adf513275~:include/linux/filter.h:static inline void
-> bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-> 
-> But when commit 08f6c05feb1d ("bpf: Take return from set_memory_rox()
-> into account with bpf_jit_binary_lock_ro()") was applied, we had one
-> more user which is arm64:
-> 
-> $ git grep bpf_jit_binary_lock_ro 08f6c05feb1d~
-> 08f6c05feb1d~:arch/arm/net/bpf_jit_32.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/arm64/net/bpf_jit_comp.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/loongarch/net/bpf_jit.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/mips/net/bpf_jit_comp.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/parisc/net/bpf_jit_core.c:
-> bpf_jit_binary_lock_ro(jit_data->header);
-> 08f6c05feb1d~:arch/s390/net/bpf_jit_comp.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/sparc/net/bpf_jit_comp_64.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:arch/x86/net/bpf_jit_comp32.c:
-> bpf_jit_binary_lock_ro(header);
-> 08f6c05feb1d~:include/linux/filter.h:static inline void
-> bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
-> 
-> Therefore, commit 08f6c05feb1d should have included a backport for arm64.
-> 
-> So yes, I agree with Greg, the correct fix should be to backport to
-> ARM64 the changes done on other architectures in order to properly
-> handle return of set_memory_rox() in bpf_jit_binary_lock_ro().
++ Dave Miller, Jakub Kicinski, Paolo Abeni, Shuah Khan,
+  linux-kselftest@vger.kernel.org
 
-Ok, but it looks like due to this series, the powerpc tree is crashing
-at the first bpf load, so something went wrong.  Let me go revert these
-4 patches for now, and then I will be glad to queue them up if you can
-provide a working series for all arches.
+On Mon, Jul 08, 2024 at 09:04:05PM +0000, zijianzhang@bytedance.com wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+> 
+> We update selftests/net/msg_zerocopy.c to accommodate the new mechanism,
+> cfg_notification_limit has the same semantics for both methods. Test
+> results are as follows, we update skb_orphan_frags_rx to the same as
+> skb_orphan_frags to support zerocopy in the localhost test.
+> 
+> cfg_notification_limit = 1, both method get notifications after 1 calling
+> of sendmsg. In this case, the new method has around 17% cpu savings in TCP
+> and 23% cpu savings in UDP.
+> +---------------------+---------+---------+---------+---------+
+> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
+> +---------------------+---------+---------+---------+---------+
+> | ZCopy (MB)          | 7523    | 7706    | 7489    | 7304    |
+> +---------------------+---------+---------+---------+---------+
+> | New ZCopy (MB)      | 8834    | 8993    | 9053    | 9228    |
+> +---------------------+---------+---------+---------+---------+
+> | New ZCopy / ZCopy   | 117.42% | 116.70% | 120.88% | 126.34% |
+> +---------------------+---------+---------+---------+---------+
+> 
+> cfg_notification_limit = 32, both get notifications after 32 calling of
+> sendmsg, which means more chances to coalesce notifications, and less
+> overhead of poll + recvmsg for the original method. In this case, the new
+> method has around 7% cpu savings in TCP and slightly better cpu usage in
+> UDP. In the context of selftest, notifications of TCP are more likely to
+> out of order than UDP, it's easier to coalesce more notifications in UDP.
+> The original method can get one notification with range of 32 in a recvmsg
+> most of the time. In TCP, most notifications' range is around 2, so the
+> original method needs around 16 recvmsgs to get notified in one round.
+> That's the reason for the "New ZCopy / ZCopy" diff in TCP and UDP here.
+> +---------------------+---------+---------+---------+---------+
+> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
+> +---------------------+---------+---------+---------+---------+
+> | ZCopy (MB)          | 8842    | 8735    | 10072   | 9380    |
+> +---------------------+---------+---------+---------+---------+
+> | New ZCopy (MB)      | 9366    | 9477    | 10108   | 9385    |
+> +---------------------+---------+---------+---------+---------+
+> | New ZCopy / ZCopy   | 106.00% | 108.28% | 100.31% | 100.01% |
+> +---------------------+---------+---------+---------+---------+
+> 
+> In conclusion, when notification interval is small or notifications are
+> hard to be coalesced, the new mechanism is highly recommended. Otherwise,
+> the performance gain from the new mechanism is very limited.
+> 
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
+> ---
+>  tools/testing/selftests/net/msg_zerocopy.c  | 111 ++++++++++++++++++--
+>  tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+>  2 files changed, 105 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/msg_zerocopy.c b/tools/testing/selftests/net/msg_zerocopy.c
 
-thanks,
+...
 
-greg k-h
+> @@ -466,6 +504,44 @@ static void do_recv_completions(int fd, int domain)
+>  	sends_since_notify = 0;
+>  }
+>  
+> +static void do_recv_completions2(void)
+> +{
+> +	struct cmsghdr *cm = (struct cmsghdr *)zc_ckbuf;
+> +	struct zc_info *zc_info;
+> +	__u32 hi, lo, range;
+> +	__u8 zerocopy;
+> +	int i;
+> +
+> +	zc_info = (struct zc_info *)CMSG_DATA(cm);
+> +	for (i = 0; i < zc_info->size; i++) {
+> +		hi = zc_info->arr[i].hi;
+> +		lo = zc_info->arr[i].lo;
+> +		zerocopy = zc_info->arr[i].zerocopy;
+> +		range = hi - lo + 1;
+> +
+> +		if (cfg_verbose && lo != next_completion)
+> +			fprintf(stderr, "gap: %u..%u does not append to %u\n",
+> +				lo, hi, next_completion);
+> +		next_completion = hi + 1;
+> +
+> +		if (zerocopied == -1)
+> +			zerocopied = zerocopy;
+> +		else if (zerocopied != zerocopy) {
+> +			fprintf(stderr, "serr: inconsistent\n");
+> +			zerocopied = zerocopy;
+> +		}
+
+nit: If any arms of a conditional have {}, then all arms should have them
+
+> +
+> +		completions += range;
+> +
+> +		if (cfg_verbose >= 2)
+> +			fprintf(stderr, "completed: %u (h=%u l=%u)\n",
+> +				range, hi, lo);
+> +	}
+> +
+> +	sends_since_notify = 0;
+> +	added_zcopy_info = false;
+> +}
+
+...
 
