@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-110109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C6E92B01D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:31:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D3492B020
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBA2EB21A69
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:31:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 613A71F21972
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBFC13C3CA;
-	Tue,  9 Jul 2024 06:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7BE13DDCD;
+	Tue,  9 Jul 2024 06:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bjmXh69W"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R8VdnUsS"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A4612C484;
-	Tue,  9 Jul 2024 06:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F58738DFC;
+	Tue,  9 Jul 2024 06:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720506656; cv=none; b=ckvui4ipIR0Hl8U1YcynDi4zK+FnimtuY7jE56a3cG5FHbiaY4qpUAf4di/q0J06AMkc34rHBf2uPth+JSoUK399cdJ/zv/oP0Clh2+v3LC8BCYBHTJSPdqLx+AOfBSNCSnrEUefNcLoM6PvR5XU7mgrwANW1uYH67bqyiBua7c=
+	t=1720506657; cv=none; b=mJug1Wm1B9fzV4MYNfzp+MpGRSW9Yk3WFi+G8jZls9zoE4j7WkjDC33vWN6ACxsfeS09jiWeCugJsYZ/9E1Kx0uboRLI4FhZ98Y7o8D5U/uV3BQ/wWhvm+mOGLjNfJ8dVDv0c/kDQyjyurun6+RpU7s/NSj+//ch4qUgwNOTCeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720506656; c=relaxed/simple;
-	bh=4jjb84nxUMfcmzsvpTB8ZB2fPD3ant4o9/yPwIhqYdI=;
+	s=arc-20240116; t=1720506657; c=relaxed/simple;
+	bh=W5+LuA/aZqt9mYs2A8G42YYZb+ZP3zBw+jTnLIL0nXQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=baeVVpXpqMFTq/5GPl/2984sMJjhWE5YVkIKXEbBOlnHEBxT0h3EjTIJABEEZesbftGu6bfboI0Rd/Kn6Ba4Ir1qfvu1spjeLBPPUpuWwIWQPXF+ihux/ZB32EOo0AoNcnVecv0HEXFAxQt+fGkMO7lYlQ1PYt8xZ0PyuNS+rz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bjmXh69W; arc=none smtp.client-ip=217.70.183.201
+	 MIME-Version; b=g+CL3biBZs58AmeyV2PxSZOM6STZ6dp5rpo4tkGc/Vl+SUnKAZLb+Ovw5i93HiR6BYff0gAuwJ5W+aN5AIl4wyPpWSOk9Hua6ZPPJWlDdVnjvpIzROIoem+3bW4TthuQ4cWSCvkn7vTgVsmMfLeJYnfY3Hp47Ke7U+5UGKfQ5/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R8VdnUsS; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AFF161BF20E;
-	Tue,  9 Jul 2024 06:30:50 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 387661BF20C;
+	Tue,  9 Jul 2024 06:30:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720506652;
+	t=1720506653;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0MqPNV6GqyjGvmQ5At0z3oyGG0ZkxLGkUmaaVdKpFLU=;
-	b=bjmXh69WUHSOPF5TSFh7h1d94fsAFi/Pe3+3DLMMuN+VBF7ATcE3vdKK6odLDM+Yix0DpB
-	q4GjEhqw6Ki/+Y531ikKpAmgRsWjLFi0qsfZEj+O/AhLLijJLTEeVNnRQUhSocS1OlUdFu
-	FQEA3fM9dPJT+irTM6V3HbDZ7dZC0tPUre4dA3KGKax6+vsChYJgCzMqHENPfb4p8aMVkl
-	b8Dp7wB1O1ppsdi1f8jXzlwdcFJGNIxjm8WcjT+YwcRN5kSbUfk8icglNcYtdN9GjgIR1N
-	vxFiq0eeqV2Aj7YivkXBbQGbj5ixydRm5CjmX4wXiGMIBSZy5/U/siVkHunDKw==
+	bh=zGn3SAa2oNlb0g/UrHcq5L+V5J9nhsuHwGCXN8X9B58=;
+	b=R8VdnUsSMv3SGP4BsifReOoOIGkV5LsS9wytHggSxe4lklTYLUik+OeEjcvFf+yr3PHw2N
+	QD5sNwqJN/bxAwXjsuh2OM4agO64RbP9zdGKjaDUj4X3+dBVJHol8zEOI6kDTqUqADYfQJ
+	yzGNXt7DWdzxxppSP+FQubgIJo7kf9O7yw9rWANhqB2se67VCJwfEuWJ65585D4kL4QTVn
+	iIpE/+58CVdtFPjC+extXgHV3ATX00vWqt+N/a9fQwxSMA02BxDqyY5evYwXN3gsfnJP7G
+	xlkqAyrXnRU2bOmE6VIR3od62YbJq478sCNwhpXGthaEX9Qs6DsAnJL2HjwyUQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -75,9 +75,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Dan Carpenter <dan.carpenter@linaro.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v17 05/14] net: ethtool: Allow passing a phy index for some commands
-Date: Tue,  9 Jul 2024 08:30:28 +0200
-Message-ID: <20240709063039.2909536-6-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v17 06/14] netlink: specs: add phy-index as a header parameter
+Date: Tue,  9 Jul 2024 08:30:29 +0200
+Message-ID: <20240709063039.2909536-7-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
 References: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
@@ -90,224 +90,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Some netlink commands are target towards ethernet PHYs, to control some
-of their features. As there's several such commands, add the ability to
-pass a PHY index in the ethnl request, which will populate the generic
-ethnl_req_info with the passed phy_index.
-
-Add a helper that netlink command handlers need to use to grab the
-targeted PHY from the req_info. This helper needs to hold rtnl_lock()
-while interacting with the PHY, as it may be removed at any point.
+Update the spec to take the newly introduced phy-index as a generic
+request parameter.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- Documentation/networking/ethtool-netlink.rst |  7 +++
- include/uapi/linux/ethtool_netlink.h         |  1 +
- net/ethtool/netlink.c                        | 57 +++++++++++++++++++-
- net/ethtool/netlink.h                        | 28 ++++++++++
- 4 files changed, 91 insertions(+), 2 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 3ab423b80e91..a6ea3716315f 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -57,6 +57,7 @@ Structure of this header is
-   ``ETHTOOL_A_HEADER_DEV_INDEX``  u32     device ifindex
-   ``ETHTOOL_A_HEADER_DEV_NAME``   string  device name
-   ``ETHTOOL_A_HEADER_FLAGS``      u32     flags common for all requests
-+  ``ETHTOOL_A_HEADER_PHY_INDEX``  u32     phy device index
-   ==============================  ======  =============================
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 495e35fcfb21..586f1da8eb7b 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -54,6 +54,9 @@ attribute-sets:
+         name: flags
+         type: u32
+         enum: header-flags
++      -
++        name: phy-index
++        type: u32
  
- ``ETHTOOL_A_HEADER_DEV_INDEX`` and ``ETHTOOL_A_HEADER_DEV_NAME`` identify the
-@@ -81,6 +82,12 @@ the behaviour is backward compatible, i.e. requests from old clients not aware
- of the flag should be interpreted the way the client expects. A client must
- not set flags it does not understand.
- 
-+``ETHTOOL_A_HEADER_PHY_INDEX`` identifies the Ethernet PHY the message relates to.
-+As there are numerous commands that are related to PHY configuration, and because
-+there may be more than one PHY on the link, the PHY index can be passed in the
-+request for the commands that needs it. It is, however, not mandatory, and if it
-+is not passed for commands that target a PHY, the net_device.phydev pointer
-+is used.
- 
- Bit sets
- ========
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index 6d5bdcc67631..c5af23139e63 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -134,6 +134,7 @@ enum {
- 	ETHTOOL_A_HEADER_DEV_INDEX,		/* u32 */
- 	ETHTOOL_A_HEADER_DEV_NAME,		/* string */
- 	ETHTOOL_A_HEADER_FLAGS,			/* u32 - ETHTOOL_FLAG_* */
-+	ETHTOOL_A_HEADER_PHY_INDEX,		/* u32 */
- 
- 	/* add new constants above here */
- 	__ETHTOOL_A_HEADER_CNT,
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index cb1eea00e349..7b95571a6efb 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -2,6 +2,7 @@
- 
- #include <net/sock.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/phy_link_topology.h>
- #include <linux/pm_runtime.h>
- #include "netlink.h"
- #include "module_fw.h"
-@@ -31,6 +32,24 @@ const struct nla_policy ethnl_header_policy_stats[] = {
- 							  ETHTOOL_FLAGS_STATS),
- };
- 
-+const struct nla_policy ethnl_header_policy_phy[] = {
-+	[ETHTOOL_A_HEADER_DEV_INDEX]	= { .type = NLA_U32 },
-+	[ETHTOOL_A_HEADER_DEV_NAME]	= { .type = NLA_NUL_STRING,
-+					    .len = ALTIFNAMSIZ - 1 },
-+	[ETHTOOL_A_HEADER_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
-+							  ETHTOOL_FLAGS_BASIC),
-+	[ETHTOOL_A_HEADER_PHY_INDEX]		= NLA_POLICY_MIN(NLA_U32, 1),
-+};
-+
-+const struct nla_policy ethnl_header_policy_phy_stats[] = {
-+	[ETHTOOL_A_HEADER_DEV_INDEX]	= { .type = NLA_U32 },
-+	[ETHTOOL_A_HEADER_DEV_NAME]	= { .type = NLA_NUL_STRING,
-+					    .len = ALTIFNAMSIZ - 1 },
-+	[ETHTOOL_A_HEADER_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
-+							  ETHTOOL_FLAGS_STATS),
-+	[ETHTOOL_A_HEADER_PHY_INDEX]		= NLA_POLICY_MIN(NLA_U32, 1),
-+};
-+
- int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
- 			enum ethnl_sock_type type)
- {
-@@ -119,7 +138,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
- 			       const struct nlattr *header, struct net *net,
- 			       struct netlink_ext_ack *extack, bool require_dev)
- {
--	struct nlattr *tb[ARRAY_SIZE(ethnl_header_policy)];
-+	struct nlattr *tb[ARRAY_SIZE(ethnl_header_policy_phy)];
- 	const struct nlattr *devname_attr;
- 	struct net_device *dev = NULL;
- 	u32 flags = 0;
-@@ -134,7 +153,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
- 	/* No validation here, command policy should have a nested policy set
- 	 * for the header, therefore validation should have already been done.
- 	 */
--	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_header_policy) - 1, header,
-+	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_header_policy_phy) - 1, header,
- 			       NULL, extack);
- 	if (ret < 0)
- 		return ret;
-@@ -175,11 +194,45 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
- 		return -EINVAL;
- 	}
- 
-+	if (tb[ETHTOOL_A_HEADER_PHY_INDEX]) {
-+		if (dev) {
-+			req_info->phy_index = nla_get_u32(tb[ETHTOOL_A_HEADER_PHY_INDEX]);
-+		} else {
-+			NL_SET_ERR_MSG_ATTR(extack, header,
-+					    "phy_index set without a netdev");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	req_info->dev = dev;
- 	req_info->flags = flags;
- 	return 0;
- }
- 
-+struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
-+					const struct nlattr *header,
-+					struct netlink_ext_ack *extack)
-+{
-+	struct phy_device *phydev;
-+
-+	ASSERT_RTNL();
-+
-+	if (!req_info->dev)
-+		return NULL;
-+
-+	if (!req_info->phy_index)
-+		return req_info->dev->phydev;
-+
-+	phydev = phy_link_topo_get_phy(req_info->dev, req_info->phy_index);
-+	if (!phydev) {
-+		NL_SET_ERR_MSG_ATTR(extack, header,
-+				    "no phy matching phyindex");
-+		return ERR_PTR(-ENODEV);
-+	}
-+
-+	return phydev;
-+}
-+
- /**
-  * ethnl_fill_reply_header() - Put common header into a reply message
-  * @skb:      skb with the message
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 46ec273a87c5..4db16048f8d4 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -251,6 +251,9 @@ static inline unsigned int ethnl_reply_header_size(void)
-  * @dev:   network device the request is for (may be null)
-  * @dev_tracker: refcount tracker for @dev reference
-  * @flags: request flags common for all request types
-+ * @phy_index: phy_device index connected to @dev this request is for. Can be
-+ *	       0 if the request doesn't target a phy, or if the @dev's attached
-+ *	       phy is targeted.
-  *
-  * This is a common base for request specific structures holding data from
-  * parsed userspace request. These always embed struct ethnl_req_info at
-@@ -260,6 +263,7 @@ struct ethnl_req_info {
- 	struct net_device	*dev;
- 	netdevice_tracker	dev_tracker;
- 	u32			flags;
-+	u32			phy_index;
- };
- 
- static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
-@@ -267,6 +271,27 @@ static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
- 	netdev_put(req_info->dev, &req_info->dev_tracker);
- }
- 
-+/**
-+ * ethnl_req_get_phydev() - Gets the phy_device targeted by this request,
-+ *			    if any. Must be called under rntl_lock().
-+ * @req_info:	The ethnl request to get the phy from.
-+ * @header:	The netlink header, used for error reporting.
-+ * @extack:	The netlink extended ACK, for error reporting.
-+ *
-+ * The caller must hold RTNL, until it's done interacting with the returned
-+ * phy_device.
-+ *
-+ * Return: A phy_device pointer corresponding either to the passed phy_index
-+ *	   if one is provided. If not, the phy_device attached to the
-+ *	   net_device targeted by this request is returned. If there's no
-+ *	   targeted net_device, or no phy_device is attached, NULL is
-+ *	   returned. If the provided phy_index is invalid, an error pointer
-+ *	   is returned.
-+ */
-+struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
-+					const struct nlattr *header,
-+					struct netlink_ext_ack *extack);
-+
- /**
-  * struct ethnl_reply_data - base type of reply data for GET requests
-  * @dev:       device for current reply message; in single shot requests it is
-@@ -409,9 +434,12 @@ extern const struct ethnl_request_ops ethnl_rss_request_ops;
- extern const struct ethnl_request_ops ethnl_plca_cfg_request_ops;
- extern const struct ethnl_request_ops ethnl_plca_status_request_ops;
- extern const struct ethnl_request_ops ethnl_mm_request_ops;
-+extern const struct ethnl_request_ops ethnl_phy_request_ops;
- 
- extern const struct nla_policy ethnl_header_policy[ETHTOOL_A_HEADER_FLAGS + 1];
- extern const struct nla_policy ethnl_header_policy_stats[ETHTOOL_A_HEADER_FLAGS + 1];
-+extern const struct nla_policy ethnl_header_policy_phy[ETHTOOL_A_HEADER_PHY_INDEX + 1];
-+extern const struct nla_policy ethnl_header_policy_phy_stats[ETHTOOL_A_HEADER_PHY_INDEX + 1];
- extern const struct nla_policy ethnl_strset_get_policy[ETHTOOL_A_STRSET_COUNTS_ONLY + 1];
- extern const struct nla_policy ethnl_linkinfo_get_policy[ETHTOOL_A_LINKINFO_HEADER + 1];
- extern const struct nla_policy ethnl_linkinfo_set_policy[ETHTOOL_A_LINKINFO_TP_MDIX_CTRL + 1];
+   -
+     name: bitset-bit
 -- 
 2.45.1
 
