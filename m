@@ -1,43 +1,48 @@
-Return-Path: <netdev+bounces-110169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D64D92B2B1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D0892B2C3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47DFB1F22878
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:55:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A80051F2254A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E9F1534FD;
-	Tue,  9 Jul 2024 08:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0653015530D;
+	Tue,  9 Jul 2024 08:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jb1n7ZGx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8D8152E06;
-	Tue,  9 Jul 2024 08:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B80155305;
+	Tue,  9 Jul 2024 08:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720515332; cv=none; b=rMLUamts+lAi6p9YXQwJJ6UwSSOefahd0gnvZgx0IByqkeOeaRxyqxSR+hMPzR1614QUqEEln6Gg+Y0dtDJS/kkSDawUCdvOjHWGxA/BoajTyDOijCP2PJwh13iVdw81PoSDgoXyUShz+iFx9jb4cz2Meyptznrfbz3bWiqSe0A=
+	t=1720515379; cv=none; b=a+0bKMWulmF1bmC5n/XRL9Z2hRZxo0iWMblrDVgCA/xKKSW5w+++KIedPCl82YYonl4cF/ZmKA1H4g7h2ko7EuEupyq5HP968hjcc5OYiCLqWqMeBAvlGB5V3xrULWN00f+tMRgbspRGklkemaMKlQIwlQ3AzVHjYf6EJXPyqBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720515332; c=relaxed/simple;
-	bh=TokFenMbMA9GY5HveERurGCJio7AvHRpXYngC1+kJKg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GxQME5Cx2K62THWu3i0F58mWzZ0C5NxIslE2C0LhCeBZtaQ6TyXvL2LjqCtqwapEU6WkX4FU5I1RmvIkMnJmtm+O6M9VjhIx+u1N5v2oKdaU3sua3TlXNcKYja2gA/fIEhJIqzrR50N67c64j5r9uKsvFMknNL9UfezyGhNvQAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CF0AF61E40617;
-	Tue,  9 Jul 2024 10:54:25 +0200 (CEST)
-Message-ID: <23d2e91c-4215-4ea5-8b3c-4dd58a1062af@molgen.mpg.de>
-Date: Tue, 9 Jul 2024 10:54:25 +0200
+	s=arc-20240116; t=1720515379; c=relaxed/simple;
+	bh=gHc9RSH+e3j/WwdDodJDVWQCYpvtbgRfjF/TXwAZgEg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WT1l2ETpxpQDRonCXvYf6xSgY9Tib6drIMFgqF8zhADOSy/lWdB9yaY3VMFoppY0WJPoexFf/SnoS6PhIKE8v/nfpw1wNvGUn8vsPW9Z+BkMBKhHM4uvoVtrWGZ6uj1FPr0FVW/K69hMfwX+k2LaN+sOcT8NJTGVooPXc0brlHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jb1n7ZGx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89DDBC3277B;
+	Tue,  9 Jul 2024 08:56:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720515379;
+	bh=gHc9RSH+e3j/WwdDodJDVWQCYpvtbgRfjF/TXwAZgEg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jb1n7ZGxpv9+KrBXhgQXw5fcbHJQpIIFgYDRLb5ElDunWbiKLlmIp8N/t6vDHwvjk
+	 cGs+wNWsVKFbaOGibSu+Zid5xTiz7FwP5wyJG3eXtGIne8BLjAV5efIR9+AhIzBOjP
+	 uSoFfm+WPygeeubJawbQcm/M3ey2acAc/gyVvA89sh9fiUqQ2QLOJ2T8GS/FF/pFwB
+	 fr5E9NAvYGgmqnxyIAUjwEs52Pgltz6hGmuXCYZP6xphvdsamLiXBOZiSkFTXxrcNz
+	 1FI0j8xfvw5wvn6Xj75rplujAVSa3Qz4XNnxKUNp1OLq2pq1pQBrcF9pj47mO1CeNJ
+	 6ROYMpiGKrMKA==
+Message-ID: <3ba8bcde-496c-4084-8941-397b4dd7f55f@kernel.org>
+Date: Tue, 9 Jul 2024 10:56:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,109 +50,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ice: Adjust over allocation
- of memory in ice_sched_add_root_node() and ice_sched_add_node()
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: lvc-project@linuxtesting.org,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, intel-wired-lan@lists.osuosl.org,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <20240708182736.8514-1-amishin@t-argos.ru>
- <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: qcom: ethernet: Add interconnect
+ properties
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
+ Vinod Koul <vkoul@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
+ <20240708-icc_bw_voting_from_ethqos-v4-1-c6bc3db86071@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-In-Reply-To: <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20240708-icc_bw_voting_from_ethqos-v4-1-c6bc3db86071@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-[Cc: -anirudh.venkataramanan@intel.com (Address rejected)]
+On 08/07/2024 23:30, Sagar Cheluvegowda wrote:
+> Add documentation for the interconnect and interconnect-names
+> properties required when voting for AHB and AXI buses.
+> 
+> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
+> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
 
-Am 09.07.24 um 10:49 schrieb Paul Menzel:
-> Dear Aleksandr,
-> 
-> 
-> Thank you for your patch.
-> 
-> 
-> Am 08.07.24 um 20:27 schrieb Aleksandr Mishin:
->> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
->> devm_kcalloc() in order to allocate memory for array of pointers to
->> 'ice_sched_node' structure. But incorrect types are used as sizeof()
->> arguments in these calls (structures instead of pointers) which leads to
->> over allocation of memory.
-> 
-> If you have the explicit size at hand, it’d be great if you added those 
-> to the commit message.
-> 
->> Adjust over allocation of memory by correcting types in devm_kcalloc()
->> sizeof() arguments.
->>
->> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Maybe mention, that Coverity found that too, and the warning was 
-> disabled, and use that commit in Fixes: tag? That’d be commit 
-> b36c598c999c (ice: Updates to Tx scheduler code), different from the one 
-> you used.
-> 
-> `Documentation/process/submitting-patches.rst` says:
-> 
->> A Fixes: tag indicates that the patch fixes an issue in a previous
->> commit. It is used to make it easy to determine where a bug
->> originated, which can help review a bug fix. This tag also assists
->> the stable kernel team in determining which stable kernel versions
->> should receive your fix. This is the preferred method for indicating
->> a bug fixed by the patch.
-> 
-> 
->> Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
->> ---
->> v3:
->>    - Update comment and use the correct entities as suggested by Przemek
->> v2: https://lore.kernel.org/all/20240706140518.9214-1-amishin@t-argos.ru/
->>    - Update comment, remove 'Fixes' tag and change the tree from 'net' to
->>      'net-next' as suggested by Simon
->>      (https://lore.kernel.org/all/20240706095258.GB1481495@kernel.org/)
->> v1: 
->> https://lore.kernel.org/all/20240705163620.12429-1-amishin@t-argos.ru/
->>
->>   drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
->>   1 file changed, 2 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c 
->> b/drivers/net/ethernet/intel/ice/ice_sched.c
->> index ecf8f5d60292..6ca13c5dcb14 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_sched.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_sched.c
->> @@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
->>       if (!root)
->>           return -ENOMEM;
->> -    /* coverity[suspicious_sizeof] */
->>       root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
->> -                      sizeof(*root), GFP_KERNEL);
->> +                      sizeof(*root->children), GFP_KERNEL);
->>       if (!root->children) {
->>           devm_kfree(ice_hw_to_dev(hw), root);
->>           return -ENOMEM;
->> @@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 
->> layer,
->>       if (!node)
->>           return -ENOMEM;
->>       if (hw->max_children[layer]) {
->> -        /* coverity[suspicious_sizeof] */
->>           node->children = devm_kcalloc(ice_hw_to_dev(hw),
->>                             hw->max_children[layer],
->> -                          sizeof(*node), GFP_KERNEL);
->> +                          sizeof(*node->children), GFP_KERNEL);
->>           if (!node->children) {
->>               devm_kfree(ice_hw_to_dev(hw), node);
->>               return -ENOMEM;
-> 
-> 
-> Kind regards,
-> 
-> Paul
+<form letter>
+This is a friendly reminder during the review process.
+
+It looks like you received a tag and forgot to add it.
+
+If you do not know the process, here is a short explanation:
+Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+versions, under or above your Signed-off-by tag. Tag is "received", when
+provided in a message replied to you on the mailing list. Tools like b4
+can help here. However, there's no need to repost patches *only* to add
+the tags. The upstream maintainer will do that for tags received on the
+version they apply.
+
+https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
+
+If a tag was not added on purpose, please state why and what changed.
+</form letter>
+
+Best regards,
+Krzysztof
+
 
