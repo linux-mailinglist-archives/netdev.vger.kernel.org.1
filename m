@@ -1,171 +1,213 @@
-Return-Path: <netdev+bounces-110107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B097392B009
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:23:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E615F92B01C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 199C6B20A1C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:23:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E9E91F2199D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 06:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F06D13AA4D;
-	Tue,  9 Jul 2024 06:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D9113211E;
+	Tue,  9 Jul 2024 06:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uw83fab+"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fLPM2flf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912AB137775
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 06:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139C542058;
+	Tue,  9 Jul 2024 06:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720506229; cv=none; b=C+SorTJNVnUeH8FBOYPMJn07TvxIgvspWniY7MAIjayJ0egV8SOvmaRkzwjIAdUg7cpu1i0jnAbSE//qpJtJzTPke5NPeCvCDusg/cBIGtPnosAmYpQuAyjYNXTins+dTJZAUrilbO6DRDt6A4+/bHdVBjTU8xLD0KrJ3L7dIUM=
+	t=1720506655; cv=none; b=BUkmYFE4ywHeh6UKY0bzGfYqA82/SAWAW9AsAj89D4PAstCvRePOB0+0SAf1Mj8Yj7uKfYroYBOQxqovsErBo6RkC2F/kCYjwu4CkIR26Fsi/qqo7NVVw7oz/18zk+7oQurCIF/BQgFkTkDbXy8rktAmoY0kQVumISpmu2YFXuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720506229; c=relaxed/simple;
-	bh=fvpTZTkC0144XgY0xDFgf+dUI0rwkqhzRTfazGyTAg8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c5/mtlQtNeUCg7A5rZWBj4zGvi013dOHilcjV3X+2Epc75q/4LMn02D6PVdaQG0wxOCvEZOdEpwhPnPi5Y1e00YqPU5JGnQG6To+SCh9NNg/fTD0WRjDJKkEHoX85YDG3YXG2TpPFKrBaXzzcwOutlDmPmLQm1Ku65DeqUUIncw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uw83fab+; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0360f8d773so8354760276.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jul 2024 23:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720506226; x=1721111026; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MZHu+GdNMiKtnxtQETzAPgrNeDiM2cwjRzDmck39LRE=;
-        b=uw83fab+qBjCPZ9pnPtM1vup1MG2b6DQoWeCw+k8OnEbEO1xDrZ1tnEyErqU4Y69Hm
-         UUoNHuLXfBdDcF6oTCRmD4AxTF4VmQbogP/eZt4lbfCUAspssKQsGbmApHXSNmso58Ee
-         Ap13LouGdnZQjhCtguC5N4hX9M/BGuNdZtodTHUUWSuaqKDTVaFxfIHXYe/5UePVrNgn
-         ej1GSF87aKmfSjy2JuF2dqKYepEujiJNOyZWTvNKNbTiahq6b1KyvJY7Jh/PpM8NHKAL
-         M2bAgbyw4BVBwy6/RTAFEoHd1jHdlsOxlmXvAcy3WAmLIolBEj25ZjCANwXInagdZLGy
-         DLuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720506226; x=1721111026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MZHu+GdNMiKtnxtQETzAPgrNeDiM2cwjRzDmck39LRE=;
-        b=xGno7AJgj2gpFsvOAbGXDYzSh3H3LxZIt15fTpQmY58MZvokzIWcX2z7w24AHrLIJZ
-         tjWwlKmSHjnGV5P+WL6la/LXbndU0rPWLnB5XNhspla+2Jw7x9LzAr7ks5A7GrDgybev
-         edKtzlcwH9cyM54TRHAKongEmi07VTV+vAbgViEGlEpTHgrrO+DdFey/WSNSjEv2+SbT
-         q/6f4/nsXgozg6GBGg+i3mbXKkgfIwdO4r4sotlXSjWA+ZfFXAQ3h+1iL1AL1Ll/YFtp
-         OKi5X6Sg0XVJULZIKMIfK60EeuCfApmPbEcsI/gsa2BE5lUypK7EuIaIKL1w8J7e6jtP
-         T0gg==
-X-Gm-Message-State: AOJu0YyuxUxx77WP4z59FnUiIKtzRHk9Kn0j5KM19dmeuDRFQDMIr1tA
-	C6tbHwF30vNUShJ3V8N7ne9DtLJUfuzELKO1Py6YfTYkoPgqL2WtEX+hRRNcsWRCMipL5NsUL2Z
-	Otbd7MEjyFXZCqBRAGO0gcNT47R1ODbKYSN55qLSShlI9f0EF8cxbzVBl68ZvMTon/TCln5APSX
-	GxATjpo1liUDXYLmkyouDdiL46qj1vz7gI
-X-Google-Smtp-Source: AGHT+IED3GopilEEe0cFM4fw69eQASb02qJkPFvZd2W9cWpkyzzKNUSEJ33jnzSrdhJkUMw1hhf7n2EOx5c=
-X-Received: from yumike.c.googlers.com ([fda3:e722:ac3:cc00:3:22c1:c0a8:d2d])
- (user=yumike job=sendgmr) by 2002:a05:6902:1007:b0:e03:510d:3b6e with SMTP id
- 3f1490d57ef6-e041b02f9efmr79205276.3.1720506226368; Mon, 08 Jul 2024 23:23:46
- -0700 (PDT)
-Date: Tue,  9 Jul 2024 14:23:26 +0800
-In-Reply-To: <20240709062326.939083-1-yumike@google.com>
+	s=arc-20240116; t=1720506655; c=relaxed/simple;
+	bh=etv6vyELnEAkeQTxSVxz08z5Z5ADc2zisg0lWuBcT5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aSl90O3bGoSIX8Nz5yUdsuyFY+RWYaxl584KKpmXwtThP2p7zPWW+pEIoAN4OUx12H1s5uRoJq6tzgvHdX5TH2BWIqW+/oY04YvL7ze0+7FASIYt4DZ4CPen2V8icOTXnSJXuia1MqbEnSr0xAmpBf7YJ9GwBVO4vFHb1kb1mNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fLPM2flf; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C3261BF20B;
+	Tue,  9 Jul 2024 06:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720506644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+2NQDBxJlcZNc0N2RFHXTEqnJPgJq8y9lK5jTGSMgAI=;
+	b=fLPM2flfk7isQ1jC19u7BvZa5xxYRMkak2S63bJ7YXzI7YzLM2GPvRE5ZImCJkfS+SdVO6
+	lp5NWk1MTN3gCgR3cvjAy4EM66/QI/0Wifm1P6CHhT4SwqEucCT5/obKcXNq11sbtOZrSA
+	aITR+W6aZsI9KWO/Ujr8xZE1vMOTA3W2w2bFGhrdTCaGBS32l3LnI0Wwq947hQ4AZp3qJ9
+	v81Ig9veqyguUbockCrMCFhqpL0eKPQ5GFch3IVpjGEuaUjN5MM/q207599aW4EPlGMk34
+	qm7HsRi9osL0eGds9fX4a6zdqAInlKMEqvzcdFuDhAcJdV+DXpZYh+FNYLqsNA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Nathan Chancellor <nathan@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v17 00/14] Introduce PHY listing and link_topology tracking
+Date: Tue,  9 Jul 2024 08:30:23 +0200
+Message-ID: <20240709063039.2909536-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240709062326.939083-1-yumike@google.com>
-X-Mailer: git-send-email 2.45.2.803.g4e1b14247a-goog
-Message-ID: <20240709062326.939083-5-yumike@google.com>
-Subject: [PATCH ipsec v2 4/4] xfrm: Support crypto offload for outbound IPv4
- UDP-encapsulated ESP packet
-From: Mike Yu <yumike@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com
-Cc: yumike@google.com, stanleyjhu@google.com, martinwu@google.com, 
-	chiachangwang@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-esp_xmit() is already able to handle UDP encapsulation through the call to
-esp_output_head(). The missing part in esp_xmit() is to correct the outer
-IP header.
+Hello everyone,
 
-Test: Enabled both dir=in/out IPsec crypto offload, and verified IPv4
-      UDP-encapsulated ESP packets on both wifi/cellular network
-Signed-off-by: Mike Yu <yumike@google.com>
----
-v1->v2: https://lore.kernel.org/all/20240702084452.2259237-5-yumike@google.com
-- Fix comment style.
----
- net/ipv4/esp4.c         |  8 +++++++-
- net/ipv4/esp4_offload.c | 15 ++++++++++++++-
- 2 files changed, 21 insertions(+), 2 deletions(-)
+This is V17 of the phy_link_topology series, aiming at improving support
+for multiple PHYs being attached to the same MAC.
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 3968d3f98e08..73981595f062 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- {
- 	struct udphdr *uh;
- 	unsigned int len;
-+	struct xfrm_offload *xo = xfrm_offload(skb);
- 
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
- 	if (len + sizeof(struct iphdr) > IP_MAX_MTU)
-@@ -360,7 +361,12 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- 	uh->len = htons(len);
- 	uh->check = 0;
- 
--	*skb_mac_header(skb) = IPPROTO_UDP;
-+	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
-+	 * data path, which means that esp_output_udp_encap is called outside of the XFRM stack.
-+	 * In this case, the mac header doesn't point to the IPv4 protocol field, so don't set it.
-+	 */
-+	if (!xo || encap_type != UDP_ENCAP_ESPINUDP)
-+		*skb_mac_header(skb) = IPPROTO_UDP;
- 
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index b3271957ad9a..60fb58a2e321 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 	struct esp_info esp;
- 	bool hw_offload = true;
- 	__u32 seq;
-+	int encap_type = 0;
- 
- 	esp.inplace = true;
- 
-@@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.esph = ip_esp_hdr(skb);
- 
-+	if (x->encap)
-+		encap_type = x->encap->encap_type;
- 
--	if (!hw_offload || !skb_is_gso(skb)) {
-+	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
- 		esp.nfrags = esp_output_head(x, skb, &esp);
- 		if (esp.nfrags < 0)
- 			return esp.nfrags;
-@@ -324,6 +327,16 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.seqno = cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
- 
-+	if (hw_offload && encap_type == UDP_ENCAP_ESPINUDP) {
-+		/* In the XFRM stack, the encapsulation protocol is set to iphdr->protocol by
-+		 * setting *skb_mac_header(skb) (see esp_output_udp_encap()) where skb->mac_header
-+		 * points to iphdr->protocol (see xfrm4_tunnel_encap_add()).
-+		 * However, in esp_xmit(), skb->mac_header doesn't point to iphdr->protocol.
-+		 * Therefore, the protocol field needs to be corrected.
-+		 */
-+		ip_hdr(skb)->protocol = IPPROTO_UDP;
-+	}
-+
- 	ip_hdr(skb)->tot_len = htons(skb->len);
- 	ip_send_check(ip_hdr(skb));
- 
+V17 is mostly a rebase of V16 on net-next, as the addition of new
+features in the PSE-PD command raised a conflict on the ethtool netlink
+spec, and patch 10 was updated :
+
+	("net: ethtool: pse-pd: Target the command to the requested PHY")
+
+The new code was updated to make use of the new helpers to retrieve the
+PHY from the ethnl request, and an error message was also updated to
+better reflect the fact that we don't only rely on the attached PHY for
+configuration.
+
+As a remainder, here's what the PHY listings would look like :
+ - eth0 has a 88x3310 acting as media converter, and an SFP module with
+   an embedded 88e1111 PHY
+ - eth2 has a 88e1510 PHY
+
+# ethtool --show-phys *
+
+PHY for eth0:
+PHY index: 1
+Driver name: mv88x3310
+PHY device name: f212a600.mdio-mii:00
+Downstream SFP bus name: sfp-eth0
+Upstream type: MAC
+
+PHY for eth0:
+PHY index: 2
+Driver name: Marvell 88E1111
+PHY device name: i2c:sfp-eth0:16
+Upstream type: PHY
+Upstream PHY index: 1
+Upstream SFP name: sfp-eth0
+
+PHY for eth2:
+PHY index: 1
+Driver name: Marvell 88E1510
+PHY device name: f212a200.mdio-mii:00
+Upstream type: MAC
+
+Ethtool patches : https://github.com/minimaxwell/ethtool/tree/mc/topo-v16
+
+Link to V16: https://lore.kernel.org/netdev/20240705132706.13588-1-maxime.chevallier@bootlin.com/
+Link to V15: https://lore.kernel.org/netdev/20240703140806.271938-1-maxime.chevallier@bootlin.com/
+Link to V14: https://lore.kernel.org/netdev/20240701131801.1227740-1-maxime.chevallier@bootlin.com/
+Link to V13: https://lore.kernel.org/netdev/20240607071836.911403-1-maxime.chevallier@bootlin.com/
+Link to v12: https://lore.kernel.org/netdev/20240605124920.720690-1-maxime.chevallier@bootlin.com/
+Link to v11: https://lore.kernel.org/netdev/20240404093004.2552221-1-maxime.chevallier@bootlin.com/
+Link to V10: https://lore.kernel.org/netdev/20240304151011.1610175-1-maxime.chevallier@bootlin.com/
+Link to V9: https://lore.kernel.org/netdev/20240228114728.51861-1-maxime.chevallier@bootlin.com/
+Link to V8: https://lore.kernel.org/netdev/20240220184217.3689988-1-maxime.chevallier@bootlin.com/
+Link to V7: https://lore.kernel.org/netdev/20240213150431.1796171-1-maxime.chevallier@bootlin.com/
+Link to V6: https://lore.kernel.org/netdev/20240126183851.2081418-1-maxime.chevallier@bootlin.com/
+Link to V5: https://lore.kernel.org/netdev/20231221180047.1924733-1-maxime.chevallier@bootlin.com/
+Link to V4: https://lore.kernel.org/netdev/20231215171237.1152563-1-maxime.chevallier@bootlin.com/
+Link to V3: https://lore.kernel.org/netdev/20231201163704.1306431-1-maxime.chevallier@bootlin.com/
+Link to V2: https://lore.kernel.org/netdev/20231117162323.626979-1-maxime.chevallier@bootlin.com/
+Link to V1: https://lore.kernel.org/netdev/20230907092407.647139-1-maxime.chevallier@bootlin.com/
+
+More discussions on specific issues that happened in 6.9-rc:
+
+https://lore.kernel.org/netdev/20240412104615.3779632-1-maxime.chevallier@bootlin.com/
+https://lore.kernel.org/netdev/20240429131008.439231-1-maxime.chevallier@bootlin.com/
+https://lore.kernel.org/netdev/20240507102822.2023826-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (14):
+  net: phy: Introduce ethernet link topology representation
+  net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+  net: phy: add helpers to handle sfp phy connect/disconnect
+  net: sfp: Add helper to return the SFP bus name
+  net: ethtool: Allow passing a phy index for some commands
+  netlink: specs: add phy-index as a header parameter
+  net: ethtool: Introduce a command to list PHYs on an interface
+  netlink: specs: add ethnl PHY_GET command set
+  net: ethtool: plca: Target the command to the requested PHY
+  net: ethtool: pse-pd: Target the command to the requested PHY
+  net: ethtool: cable-test: Target the command to the requested PHY
+  net: ethtool: strset: Remove unnecessary check on genl_info
+  net: ethtool: strset: Allow querying phy stats by index
+  Documentation: networking: document phy_link_topology
+
+ Documentation/netlink/specs/ethtool.yaml      |  58 ++++
+ Documentation/networking/ethtool-netlink.rst  |  51 +++
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 +++++++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/marvell-88x2222.c             |   2 +
+ drivers/net/phy/marvell.c                     |   2 +
+ drivers/net/phy/marvell10g.c                  |   2 +
+ drivers/net/phy/phy_device.c                  |  48 +++
+ drivers/net/phy/phy_link_topology.c           | 105 ++++++
+ drivers/net/phy/phylink.c                     |   3 +-
+ drivers/net/phy/qcom/at803x.c                 |   2 +
+ drivers/net/phy/qcom/qca807x.c                |   2 +
+ drivers/net/phy/sfp-bus.c                     |  26 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  82 +++++
+ include/linux/sfp.h                           |   8 +-
+ include/uapi/linux/ethtool.h                  |  16 +
+ include/uapi/linux/ethtool_netlink.h          |  20 ++
+ net/core/dev.c                                |  15 +
+ net/ethtool/Makefile                          |   3 +-
+ net/ethtool/cabletest.c                       |  35 +-
+ net/ethtool/netlink.c                         |  66 +++-
+ net/ethtool/netlink.h                         |  33 ++
+ net/ethtool/phy.c                             | 308 ++++++++++++++++++
+ net/ethtool/plca.c                            |  30 +-
+ net/ethtool/pse-pd.c                          |  31 +-
+ net/ethtool/strset.c                          |  27 +-
+ 30 files changed, 1057 insertions(+), 53 deletions(-)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
+ create mode 100644 drivers/net/phy/phy_link_topology.c
+ create mode 100644 include/linux/phy_link_topology.h
+ create mode 100644 net/ethtool/phy.c
+
 -- 
-2.45.2.803.g4e1b14247a-goog
+2.45.1
 
 
