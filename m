@@ -1,167 +1,188 @@
-Return-Path: <netdev+bounces-110139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4AD92B14D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:37:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FA792B165
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A736E2823FC
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 07:37:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 727D81C20DE6
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 07:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2888614B97B;
-	Tue,  9 Jul 2024 07:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4A8143752;
+	Tue,  9 Jul 2024 07:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FE05boOJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSVLd1Zf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880EF149C76
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 07:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A26313BC30
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 07:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720510653; cv=none; b=YcglelOeoOIYyPghsMuOJ1tfyyKbQBocoWrPQkaYXCQtRMx5IzSM/3U2ttz26gB228IiH5MOs5ZDS+1ipHhbYcbutKP08IYAkTKfES3Ra1UGBKuMy1E0JFU+CNYlGLBnInNm5sqKur7fM2mrEmbrOwNO/foAVFWnPrkOHt4PEPM=
+	t=1720510954; cv=none; b=sJ8n4USHCQ2JyYwHGbU8B5sDgEthyQiLDlSoHLccPe8N/zaunv5AWzyJQIjSFD7oUKHDhgSlgBmZBXtmBn9vNVRYYqy2fs9U//Rldzhanrx9bQFNeJDAAU4iqbWPbO3HTlPUGcZ0XbynVCK3n26cpJ57Dfcil+kCniRZHyB4S3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720510653; c=relaxed/simple;
-	bh=R6uhElAMm4FTpUU4vkd99nDcZrma70iZDg9k9g3ocDQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jY4es1jBNHdJFYKquTeeUJTb3lmDH3iIhczObIzOj/YI3U6eN3Zavw9BdVfwjLnUeaCmQHmAbyjqelgEhhoSZqgek5lHE3Z49A0IVDpwmLnagtbRDiXXSGwBlcupAXrgP27k8HOu4jpZYE5e750wfNx1Q1FPn8P+ElldMNuXWQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FE05boOJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720510649;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A49qXoXkEsMzgDh5I6lFSA4XYzFZMk+NCFiOV4UimaA=;
-	b=FE05boOJX/W6NVlx6Ba2TZp/l1l44trpUiLIMVTLY80MRDQPyA4wiTb8lYSyP1A2JRaUdS
-	V52DtDDJICmY3/MiDm2Mkx9LLOioC+kfC22UfoczJFHsfwPij8cYresJdS/VIPhxMkvxei
-	XO291EiXPTnDtoMVaecYPVm56EVlC80=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-KNVxhx3UPbCuonW9Wi3TDA-1; Tue, 09 Jul 2024 03:37:27 -0400
-X-MC-Unique: KNVxhx3UPbCuonW9Wi3TDA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-58c7800d03eso2330467a12.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 00:37:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720510646; x=1721115446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A49qXoXkEsMzgDh5I6lFSA4XYzFZMk+NCFiOV4UimaA=;
-        b=iovp01RSlIC2TYtRM8rHOIjfgAee66HkA8tCLDSpgM+397vwZnZA44t/2t5W61Ovk4
-         vZGnuW1uLsnkSFrC3B5yaaqGVYwleR/12PQa9ydT1fgP4d+NaHaH7p9npMK4uGVMWb9+
-         En13RbcOOmdaM2EbTsSG/tDTsnUL47NLda9Tr5OervRJOEq8fbx1MW8gyVbVUCJm/7xk
-         LHA6fTtEN/TGYRIsdO2OEDuZlI8IHnsilPfYQDqqyYQRYYhnUOFVbXzB+pZHdJum6jEC
-         zzIy6mXahAHP7YFjIFRE7gP7dl/2/JZX0DsFeRgzakH1PsmC05Y37xKMCOCKbdN6D64O
-         YPpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnT27WKpl49n3iwJB05kU+MVL3DfW4FkoLILxL3EC7XBQuxrJaIVhFOu3QF+ub7b1uE7A3ji3HNHDl9e1G8AogvVi85iE3
-X-Gm-Message-State: AOJu0YzN5p6fDDpjrqeEVo2eMh2ZA6P9435FT3RsS4ew1QeK5qJMG2ad
-	X1dacCffLeirfbtTSRBT4pgPCR8f91AZT/eM1MaIwN8KyHGgdYum7VuxcBqllfzb3SaGMIQVVZv
-	/R0FAWBtupj9U0Pbnu6orQqlREHVSFnWb77CwSwt5ViR57WZTJY/OxCAI02FIDuN7/rzwmEk5uU
-	CDAZFjSmmSRCrjY08Y0I0cF0m/QQpF
-X-Received: by 2002:a05:6402:430b:b0:58c:3252:3ab8 with SMTP id 4fb4d7f45d1cf-594bcba83fcmr1671348a12.37.1720510645969;
-        Tue, 09 Jul 2024 00:37:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvA5gcFgFWqNy3DfNk26q33q8PtgffuDdwkGspZQpCkB6LI+Z1lBCXYRy9/d//O/OXiMfXxo5/urdnIEt4WlE=
-X-Received: by 2002:a05:6402:430b:b0:58c:3252:3ab8 with SMTP id
- 4fb4d7f45d1cf-594bcba83fcmr1671317a12.37.1720510645548; Tue, 09 Jul 2024
- 00:37:25 -0700 (PDT)
+	s=arc-20240116; t=1720510954; c=relaxed/simple;
+	bh=GBeiqwlDsV0o6ErL7k4rlnz6KPezop0q6y37fiUHMvE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsWsgs8JDzBeXwaHArjrSzV1A0Dzdi0kh5vkJPwH2a5h7MS1bC8TJBX+/rA/eGw/jhijrBaQ0WnjEmlNfPbvbjHUoG0J/bCVGGMYuVEosdl21m9Y+JtxJ81N/7EeObpxMvOeJaWACmCLnKRYQpuK30QQ9vm6sK9kkixWVrNSxoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSVLd1Zf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 917D6C3277B;
+	Tue,  9 Jul 2024 07:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720510953;
+	bh=GBeiqwlDsV0o6ErL7k4rlnz6KPezop0q6y37fiUHMvE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uSVLd1Zf6Tw2tO56UV/zCO9rhYfXQs/UUHdj5anLA8C2OvR/mtn4QZCRbB2V5TWVl
+	 n2/mXtgxY5fy6ssu05acW4dZgOFG8cMnjI5xUnymS+a4khfz+vwxKaqOKp9tmc6Y0J
+	 vctxqnxPtCOVTCMzk1UQic5QRnbocea7WRG7lSPj4KhGBU9mOy3LuZ+dBr/6AsMsk4
+	 8SeG8D+FlQyXu/B14Z1jDnh2MP/VqyAXVlKnJmoD3P2TfIXsxf62nHFhBHRPTzepQv
+	 ymPR6ger9Nah84bmO+9nzo+T1lRJq+u4bz54e8g26PCjzSWrYXnNgWIl2jW/ty7iuy
+	 8M8fIACPQ4ZBw==
+Date: Tue, 9 Jul 2024 08:42:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kang, Kelvin" <kelvin.kang@intel.com>,
+	"Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v5] i40e: fix: remove needless
+ retries of NVM update
+Message-ID: <20240709074230.GC346094@kernel.org>
+References: <20240625184953.621684-1-aleksandr.loktionov@intel.com>
+ <20240627173351.GH3104@kernel.org>
+ <SJ0PR11MB5866CE95533821CC0D31282CE5DA2@SJ0PR11MB5866.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708065549.89422-1-lulu@redhat.com> <34818d378285d011d0e7d73d497ef8d710861adc.camel@nvidia.com>
-In-Reply-To: <34818d378285d011d0e7d73d497ef8d710861adc.camel@nvidia.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 9 Jul 2024 15:36:48 +0800
-Message-ID: <CACLfguV5CXMs9AdWrN9a=st5PjUnT4B1bt2Uua=AYjuC0NwfNg@mail.gmail.com>
-Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Parav Pandit <parav@nvidia.com>, "sgarzare@redhat.com" <sgarzare@redhat.com>, 
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
-	"jasowang@redhat.com" <jasowang@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SJ0PR11MB5866CE95533821CC0D31282CE5DA2@SJ0PR11MB5866.namprd11.prod.outlook.com>
 
-On Mon, 8 Jul 2024 at 15:27, Dragos Tatulea <dtatulea@nvidia.com> wrote:
->
-> On Mon, 2024-07-08 at 14:55 +0800, Cindy Lu wrote:
-> > Add the function to support setting the MAC address.
-> > For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
-> > to set the mac address
-> >
-> > Tested in ConnectX-6 Dx device
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
-> >  1 file changed, 23 insertions(+)
-> >
-> > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/=
-mlx5_vnet.c
-> > index 26ba7da6b410..f78701386690 100644
-> > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_=
-dev *v_mdev, struct vdpa_device *
-> >       destroy_workqueue(wq);
-> >       mgtdev->ndev =3D NULL;
-> >  }
-> > +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
-> > +                               struct vdpa_device *dev,
-> > +                               const struct vdpa_dev_set_config *add_c=
-onfig)
-> > +{
-> > +     struct mlx5_vdpa_dev *mvdev =3D to_mvdev(dev);
-> > +     struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
-> > +     struct mlx5_core_dev *mdev =3D mvdev->mdev;
-> > +     struct virtio_net_config *config =3D &ndev->config;
-> > +     int err;
-> > +     struct mlx5_core_dev *pfmdev;
-> > +
-> You need to take the ndev->reslock.
->
-thanks will change this
-> > +     if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> > +             if (!is_zero_ether_addr(add_config->net.mac)) {
-> > +                     memcpy(config->mac, add_config->net.mac, ETH_ALEN=
-);
-> I would do the memcpy after mlx5_mpfs_add_mac() was called successfully. =
-This
-> way the config gets changed only on success.
->
-thanks Dragos=EF=BC=8C Will fix this
-thanks
-cindy
-> > +                     pfmdev =3D pci_get_drvdata(pci_physfn(mdev->pdev)=
-);
-> > +                     err =3D mlx5_mpfs_add_mac(pfmdev, config->mac);
-> > +                     if (err)
-> > +                             return -1;
-> > +             }
-> > +     }
-> > +     return 0;
-> > +}
-> >
-> >  static const struct vdpa_mgmtdev_ops mdev_ops =3D {
-> >       .dev_add =3D mlx5_vdpa_dev_add,
-> >       .dev_del =3D mlx5_vdpa_dev_del,
-> > +     .dev_set_attr =3D mlx5_vdpa_set_attr_mac,
-> >  };
-> >
-> >  static struct virtio_device_id id_table[] =3D {
->
-> Thanks,
-> Dragos
->
+On Mon, Jul 08, 2024 at 03:38:11PM +0000, Loktionov, Aleksandr wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Simon Horman
+> > Sent: Thursday, June 27, 2024 7:34 PM
+> > To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> > Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kang, Kelvin
+> > <kelvin.kang@intel.com>; Kubalewski, Arkadiusz
+> > <arkadiusz.kubalewski@intel.com>; intel-wired-lan@lists.osuosl.org;
+> > netdev@vger.kernel.org
+> > Subject: Re: [Intel-wired-lan] [PATCH iwl-net v5] i40e: fix: remove
+> > needless retries of NVM update
+> > 
+> > On Tue, Jun 25, 2024 at 08:49:53PM +0200, Aleksandr Loktionov wrote:
+> > > Remove wrong EIO to EGAIN conversion and pass all errors as is.
+> > >
+> > > After commit 230f3d53a547 ("i40e: remove i40e_status"), which should
+> > > only replace F/W specific error codes with Linux kernel generic, all
+> > > EIO errors suddenly started to be converted into EAGAIN which leads
+> > > nvmupdate to retry until it timeouts and sometimes fails after more
+> > > than 20 minutes in the middle of NVM update, so NVM becomes
+> > corrupted.
+> > >
+> > > The bug affects users only at the time when they try to update NVM,
+> > > and only F/W versions that generate errors while nvmupdate. For
+> > > example, X710DA2 with 0x8000ECB7 F/W is affected, but there are
+> > probably more...
+> > >
+> > > Command for reproduction is just NVM update:
+> > >  ./nvmupdate64
+> > >
+> > > In the log instead of:
+> > >  i40e_nvmupd_exec_aq err I40E_ERR_ADMIN_QUEUE_ERROR aq_err
+> > > I40E_AQ_RC_ENOMEM)
+> > > appears:
+> > >  i40e_nvmupd_exec_aq err -EIO aq_err I40E_AQ_RC_ENOMEM
+> > >  i40e: eeprom check failed (-5), Tx/Rx traffic disabled
+> > >
+> > > The problematic code did silently convert EIO into EAGAIN which
+> > forced
+> > > nvmupdate to ignore EAGAIN error and retry the same operation until
+> > timeout.
+> > > That's why NVM update takes 20+ minutes to finish with the fail in
+> > the end.
+> > >
+> > > Fixes: 230f3d53a547 ("i40e: remove i40e_status")
+> > > Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
+> > > Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
+> > > Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> > > Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> > 
+> > Hi Aleksandr,
+> > 
+> > Maybe I'm reading things wrong, I have concerns :(
+> > 
+> > Amongst other things, the cited commit:
+> > 1. Maps a number of different I40E_ERR_* values to -EIO; and 2. Maps
+> > checks on different I40E_ERR_* values to -EIO
+> > 
+> > My concern is that the code may now incorrectly match against -EIO for
+> > cases where it would not have previously matched when more specific
+> > error codes.
+> > 
+> > In the case at hand:
+> > 1. -EIO is returned in place of I40E_ERR_ADMIN_QUEUE_ERROR 2.
+> > i40e_aq_rc_to_posix checks for -EIO in place of
+> > I40E_ERR_ADMIN_QUEUE_TIMEOUT
+> > 
+> > As you point out, we are now in a bad place.
+> > Which your patch addresses.
+> > 
+> > But what about a different case where:
+> > 1. -EIO is returned in place of I40E_ERR_ADMIN_QUEUE_TIMEOUT 2.
+> > i40e_aq_rc_to_posix checks for -EIO in place of
+> > I40E_ERR_ADMIN_QUEUE_TIMEOUT
+> > 
+> > In this scenario the, the code without your patch is correct, and with
+> > your patch it seems incorrect.
+> > 
+> > Perhaps only the scenario you are fixing occurs.
+> > If so, all good. But it's not obvious to me that is the case.
+> > 
+> > I'm likewise concerned by other conditions on -EIO introduced by the
+> > cited commit.
+> 
+> This commit do not introduce -EIO errors.
+> Before 230f3d53a547 ("i40e: remove i40e_status") some specific F/W error codes were
+> converted into -EAGAIN by i40e_aq_rc_to_posix(), but now all error codes are already
+> Linux kernel codes, so there is no way to distinguish special F/W codes and convert
+> them into -EAGAIN.
 
+Right, this last part is the nub of my concern.
+
+> Our validation has been tested regressions of current patch and gave signed off.
+> 
+> Do you propose change 
+> 	if (aq_ret == -EIO)
+> 		return -EAGAIN;
+> into
+> 
+> 	if (aq_ret == -EIO)
+> 		return -EIO;
+> ?
+> 
+> It will require additional testing...
+
+If the problem I described is indeed a problem then a suspect a more
+invasive change is required, to differentiate between the different
+cases previously covered by internal error codes.
+
+However, that is speculation on my part.
+While your patch has been tested.
+
+So I suggest, contrary to my previous email, that this patch moves forwards.
+
+IOW, I am not blocking progress of this patch (anymore).
+
+...
 
