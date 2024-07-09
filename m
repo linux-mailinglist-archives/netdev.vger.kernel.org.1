@@ -1,86 +1,104 @@
-Return-Path: <netdev+bounces-110260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8760092BACE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:17:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B627092BAD5
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 15:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 132A0B20C55
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:17:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF3A281B73
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 13:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48876158D8C;
-	Tue,  9 Jul 2024 13:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AEE158D92;
+	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lfTJcDYt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9vbrFjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35401EA74;
-	Tue,  9 Jul 2024 13:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7BE1EA74;
+	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531018; cv=none; b=rYJV2SDge7k9zdwzZYabEKkUEwO9uep8qctqrI4zVTVAsSap0J9h2kGSVM/ctJnXVMzW6Fnqd4UPHX88ucezpHklgG3f2+uhrnfcGF0chZYAwxE/CrMCGyksrIS9wKPIsMB1MYpUF2u+Sj5XXEWth7JemgTMurRi2aGz1HhZQuY=
+	t=1720531229; cv=none; b=mPgNizJuxUFep3YPA2k1m4Ek90R/5IM3Vo2IPIJ0Uvtgc7gYioV10GhN0KUyTuuV/l3Pe86gWA5MQNuGFjO8ExMWp4ePSnq/EqsyG7PW0CQ5CysezFDx4n3hNAE4AzlTnxEfyESQjpjyalMCTaA1JggKDwFRmCun7x4aoCwrGKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531018; c=relaxed/simple;
-	bh=LBHj/lmAAuRIE/ymNS/ChF/AvZS4COSXWYa+xV7YDIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kTxEI1CmB/1vYlZILXUMGRCiWaO21aS2HUoWTsSQKuAWvEV4wYO5bpK1QvAIQ0kccYasHzD+xL6gN2pfWbrYEN6//eMfran003Lu9RZI8vyTiu7bVNpvpcA8xtMYRL+V65phZVEVIkZdAQUW6ZieZSKYnkIclnqZs84GBn21zdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lfTJcDYt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6qj/7oST3PJtaaqaVrHFeEu7E6uGuuTvs8tcQZzjNoM=; b=lfTJcDYt1nPiS507mjFeon+nBr
-	3O1jub46inJ7gwEzXhbv51zwOVlpAiWACnUqFOZK2x3+crLKr+3gOzxYgU+B0BFcaKcKUVQgFvw2X
-	YnYNPB7NdZXRTSUkIZLRETauhvW/Abqy0oMqcpJa11fASifUaX5joRKv6F6yEvXy4Ycs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sRAhv-0028xm-34; Tue, 09 Jul 2024 15:16:35 +0200
-Date: Tue, 9 Jul 2024 15:16:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net-next v1 1/7] net: stmmac: xgmac: drop incomplete FPE
- implementation
-Message-ID: <b313d570-e3f3-479f-a469-ba2759313ea4@lunn.ch>
-References: <cover.1720512888.git.0x1207@gmail.com>
- <d142b909d0600b67b9ceadc767c4177be216f5bd.1720512888.git.0x1207@gmail.com>
+	s=arc-20240116; t=1720531229; c=relaxed/simple;
+	bh=BgrLyZZ3OPPlPIhvPTNiCSJwn6+2VtS9YFUiTxvLlhM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mbNF7biUChj0m9L8fv9Hf0Xe6KIZdEPkniXOr87AZGcGTAS5zBNCt6KQsMtrAM82OFdxu+8yVfWeV8q+Rc/dIBa5CcLmEcQCoH4fjtj19QBrCHujL0fYLbYcCahdIvWjb7YnUNx0QbCJ/tj3MonWOJmpUWplcuU1UXli0vx8a+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9vbrFjq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3256FC32786;
+	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720531229;
+	bh=BgrLyZZ3OPPlPIhvPTNiCSJwn6+2VtS9YFUiTxvLlhM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t9vbrFjqDuoI9V3g4OuryFAuUakCLvqe8ytCK5KDssSlWdFS9wJrnuNxMNU/61a/w
+	 qH+hcMbzEgIlA3U+yHClg981ZA3e1qBI5zDoJzmTUIt7cI/6q03BNvffq+n2X8ZsBu
+	 G0OlKhRr5DYRwrgxxREsbzgG7JtQDR4Y4vic+XfZHJ+DQTHASNKTi+wp1chMUnbXgB
+	 D5rGimrq5ErgaJyFb2Xr5vTcLJGK7jhSlOLUWquEgf7PoDSABctX3uBso+vRQ7To4v
+	 4k3ifgS7HNLwWSIe7RusZvdjNCg6IbJHptJ4tHzfnHNp0xmsAAGfKUaso1fmxOEAUR
+	 MuVdi/DNBCWTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21B37C4332D;
+	Tue,  9 Jul 2024 13:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d142b909d0600b67b9ceadc767c4177be216f5bd.1720512888.git.0x1207@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 1/1] net: phy: microchip: lan937x: add support for
+ 100BaseTX PHY
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172053122913.19292.3616221576979957912.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jul 2024 13:20:29 +0000
+References: <20240706154201.1456098-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240706154201.1456098-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
+ f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+ woojung.huh@microchip.com, arun.ramadoss@microchip.com, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, yuiko.oshino@microchip.com,
+ florian.fainelli@broadcom.com, michal.kubiak@intel.com,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
-On Tue, Jul 09, 2024 at 04:21:19PM +0800, Furong Xu wrote:
-> The FPE support for xgmac is incomplete, drop it temporarily.
-> Once FPE implementation is refactored, xgmac support will be added.
+Hello:
 
-This is a pretty unusual thing to do. What does the current
-implementation do? Is there enough for it to actually work? If i was
-doing a git bisect and landed on this patch, could i find my
-networking is broken?
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-More normal is to build a new implementation by the side, and then
-swap to it.
+On Sat,  6 Jul 2024 17:42:01 +0200 you wrote:
+> Add support of 100BaseTX PHY build in to LAN9371 and LAN9372 switches.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> ---
+> changes v3:
+> - add function comments
+> - split read_status function
+> - use (ret < 0) instead of (ret)
+> changes v2:
+> - move LAN937X_TX code from microchip_t1.c to microchip.c
+> - add Reviewed-by tags
+> 
+> [...]
 
-	Andrew
+Here is the summary with links:
+  - [net-next,v3,1/1] net: phy: microchip: lan937x: add support for 100BaseTX PHY
+    https://git.kernel.org/netdev/net-next/c/870a1dbcbc2e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
