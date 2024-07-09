@@ -1,105 +1,133 @@
-Return-Path: <netdev+bounces-110152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D32D92B1F0
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB33792B1FF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 10:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2E11C219B5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:18:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E40521C21EE4
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 08:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775D913B2A2;
-	Tue,  9 Jul 2024 08:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D2C152E04;
+	Tue,  9 Jul 2024 08:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y48QhxU8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gi44dWiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67431487C5;
-	Tue,  9 Jul 2024 08:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97CE152790;
+	Tue,  9 Jul 2024 08:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720513109; cv=none; b=m70DF70JpOSHi8kSLslfHK9jMOrKcPjs6418cHOiwnoXItnCD9gAva2gjlusGg7507CSh+sIe5R6aRaSIJUJovPgfusyGuaLAZzmJTesF0Gant9+fY702PS1XC/FPCi1+njuq/TgUxUxlQ5Mib/dgBfJx9MgNugV/6tTAGaAxiI=
+	t=1720513350; cv=none; b=aEzbZep6AI3og2ZaFt/8pomxu0IJiTCKFgeFiQBZ+77VNtR2JlZ08QCRxYxih/0RA/DBob4R5m8KhmJ/92Is3A0Q3vT+fqHppoPTjEp1IBE8WMFkwR7YRjgv0SnBibYc26bSH2OGUvAVH7XTbKVIZLAwdmk0EUTNAYtbydgkU5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720513109; c=relaxed/simple;
-	bh=g6wffX0jQVpxanjymkqV2YgRffLk23pn0cJcQ4v9Qsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZnqTJ/z8QXCSQjlv4EXNYkZJGq1fg2goh1w2Mo1nCX0r/B5FkimhkQrzwi+ya3D7IkcJoQJr8tndTQEJ0FOAoYRRORuHPbdxy0tVMBUI+56rq5uy2/w/iWo65uCkmRnLryHFP8WxcocpfnfDCgOiqc2rAHubkdkGYGGk4YuQ1iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y48QhxU8; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D8844E0006;
-	Tue,  9 Jul 2024 08:18:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720513099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=guBIG0yXjLQF/KGNGw9TE40/iUTMcO24dv9vfa9naio=;
-	b=Y48QhxU8LcqREPrmzfduRlZKoQ4PjfsJza17r49pwbtt5814DF043QS6TUdqB9k9LeV8L4
-	sBPhseCqHXXQqVH+4SSN9Bal8Omu6muNG2m6JlpkUZ7QVC469QQdeGsuqPA8n0NWouwimp
-	0UL+UxcyBY7DjxrLKtBPJm9xHqn+Q69x0eyBN+c8AQfU6zflixPTxv0nbIZuzq5pgBpJjY
-	4NEtXlXkmnRp+ywdqHPVJH0lvUqVsFvbY78Y2WThiH4TZ2+iEm3cSfC6gOoIIGeZyuezCV
-	4xiM+tb69TJOK8LKVAwDYT25lQ2QIG1cpEh78QfLx4urBVdVBp3nfwq0PXIxnw==
-Date: Tue, 9 Jul 2024 10:18:15 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v16 13/14] net: ethtool: Add support for
- tsconfig command to get/set hwtstamp config
-Message-ID: <20240709101815.474eec3b@kmaincent-XPS-13-7390>
-In-Reply-To: <20240708134409.0418e44a@kernel.org>
-References: <20240705-feature_ptp_netnext-v16-0-5d7153914052@bootlin.com>
-	<20240705-feature_ptp_netnext-v16-13-5d7153914052@bootlin.com>
-	<20240707082408.GF1481495@kernel.org>
-	<20240707145523.37fdfeec@kmaincent-XPS-13-7390>
-	<20240708134409.0418e44a@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1720513350; c=relaxed/simple;
+	bh=Wzu/DaEWdpVdgeT+yN7K17zx9JZwRH+Ao0L+fCXoQrQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hlcGmsnBFtoYA1WtHXAs2TA68LOoHivAfbvAQQAc0TBs8oucIO16kT/kYY8oKh8nXCcJcQxeMyZgkweTUin4U9Qcvr/9ZysBQQT7Vj3zTXiav0pgt/fr7HiGpDKsIJadobsJDRxerZOaw2pLftIY5OJwoV7UaZ6OCrA1s3TY4H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gi44dWiQ; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5c1d2f7ab69so2512831eaf.3;
+        Tue, 09 Jul 2024 01:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720513348; x=1721118148; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7XDcGnxl+L+Up+OM7xPAJaHLrc0hSR9f/AUvnRoMTks=;
+        b=Gi44dWiQl41S1NwNnIilOSN4iTWZr2LDIajYoJSOGwoavBp02VTrIk2AFF7Z4cFuQq
+         oxhjitll4yAkswF8qPHdoGZz5wktDu+F8jVUR5blzUIHOEYW3OvK5MSRnI0dAZrXfohj
+         6v0WMu+TSnsG8XFXdImbfuT1zhnRNQHePFIexnTnP6QfNqUJ0/EZy5GrDCzGdm45fDmw
+         xBIiO7BeY+Ow5Ucmndap7VxwKmaX8x4bR3BtvfV9C6FofYL0ZQQLhGwJJy3iEIjqjNVn
+         MJMdbCYS4+2jqlwy5Jzw8bmjEMmOD6qEmpppqt2+KP7rAT5baeVjaf8sfbtEVrjIeTMC
+         2mYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720513348; x=1721118148;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7XDcGnxl+L+Up+OM7xPAJaHLrc0hSR9f/AUvnRoMTks=;
+        b=mUPnT4Qp5ZtgyAFMYwKisHJptCveBoBkc0Whjq1mMmvIH7Xkvr9sxrAUvsTuXhapfp
+         IKnaPChYntQ9dDJKC0zoyf89BA3MffJhSgA9BSn+6811FkW8GYK6dTT7/UjYy/z/jp89
+         4Gt3Zcc30oTPd7teA7s2PxSjDzFbHjSw3LORfiKGRD1ATcqwCDjF73XQ45qlKPlZwlyw
+         B96XzId3s6pQzw/Lj6Z4Fo94KFpgdUuhk41n4khrC+Yp5k9ij1/MsgVVHOLYbh5cZRpP
+         AO1eFhftTHKRDiqXbBhm3f6u/B344aiKzPWApO+HtJTMhOeIaqJH8qWCpL7ZZ14BsC4x
+         V1Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCWNRnGd+qezcxcrgLz4iFCgUyx5legTlHy7uWLYEgVtPAGqsQt7KWCYYjDH6aKt2SgUwfTBSpnJ0Tq77v3drRSTMMGeyef6psDD+g7i
+X-Gm-Message-State: AOJu0YzGKNYBQTQO3b03GdhqdnO1iWJfKic/10izOi5ID5DHKr5OxhcO
+	B7gC18waBHEhg2Yz4jTyq4OaTh8LLhMaEvuYisCT4hQzgzRmy5si
+X-Google-Smtp-Source: AGHT+IFPsJC/yKbPpj0KK2U8xPVQYC1rgQUbrnuG7dcUGRNNy6Kjbw0VGZ2c7DelhGUEXHPww0fMHA==
+X-Received: by 2002:a05:6358:c3a2:b0:1aa:a177:359b with SMTP id e5c5f4694b2df-1aade0810ddmr150867855d.15.1720513347606;
+        Tue, 09 Jul 2024 01:22:27 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2c99a92a430sm9588929a91.4.2024.07.09.01.22.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 01:22:27 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1 0/7] net: stmmac: refactor FPE for gmac4 and xgmac
+Date: Tue,  9 Jul 2024 16:21:18 +0800
+Message-Id: <cover.1720512888.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Mon, 8 Jul 2024 13:44:09 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+Refactor FPE implementation by moving common code for DWMAC4 and
+DWXGMAC into a separate FPE module.
 
-> On Sun, 7 Jul 2024 14:55:23 +0200 Kory Maincent wrote:
->  [...] =20
->  [...] =20
->=20
-> Looks like there's also a new driver to fix :(
+FPE implementation for DWMAC4 and DWXGMAC differs only for:
+1) Offset address of MAC_FPE_CTRL_STS
+2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
 
-Oh indeed sorry.
-I have to check if new MAC drivers appear between each version.
+Tested on DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Furong Xu (7):
+  net: stmmac: xgmac: drop incomplete FPE implementation
+  net: stmmac: gmac4: drop FPE implementation for refactoring
+  net: stmmac: refactor Frame Preemption(FPE) implementation
+  net: stmmac: gmac4: complete FPE support
+  net: stmmac: xgmac: rename XGMAC_RQ to XGMAC_FPRQ
+  net: stmmac: xgmac: complete FPE support
+  net: stmmac: xgmac: enable Frame Preemption Interrupt by default
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |   6 -
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  |  66 ---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  16 ---
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   9 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  27 ----
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   7 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  30 ++--
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 131 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |  16 +++
+ 11 files changed, 177 insertions(+), 134 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+
+-- 
+2.34.1
+
 
