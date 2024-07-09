@@ -1,132 +1,109 @@
-Return-Path: <netdev+bounces-110435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F0B192C65E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 00:57:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0537392C665
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 01:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887871C223F0
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 22:57:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB3972836FE
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 23:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B160155352;
-	Tue,  9 Jul 2024 22:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAECF1420A8;
+	Tue,  9 Jul 2024 23:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="smEcR++M"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E51614D439;
-	Tue,  9 Jul 2024 22:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365FD1FA3
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 23:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720565849; cv=none; b=sIOP7nGGPVYnAwiYPFDgodWEDSRbwtZCO473yJheiXU9ZGxN01O1wm1f/ZFTHUGtP7lI3dWXNFzvOJuqp90Rx+sflqYDGfse8oBsHD+ASThtAE+ZBYB/JgzthG+LfMvvMfZLrH3WGXiYpORwbOpocyp2tFksYZnhPlbLHwSJsN4=
+	t=1720566499; cv=none; b=qdAWRzmeXUAW6n69orXCnqoE1P/Qyyc9Dp8vv8TdTBmEs6JOM5gGJDrDkLjXbbLkAo9cw/eyQQCXid83zEj8V1Rf3d8lG8zJmb9n90z51xA00sfXeCrM84nFhinrc+4R7GOf7UdQy+OZw4e62AMOYNlHfEqsk12txgNs1WVApaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720565849; c=relaxed/simple;
-	bh=ZlVvkF4rShHH25Jo+Nn0Lq8nfyYZGma7UWocSs9ssrk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SIPJEW0BIynRHIJcYuMgT9QR8YIHY+iUfljVLbdGyf95CC0GhhlDhLA/3k7gIAxHfp3AoLpLsYNjC9an8x5jdsXwQeeKb7/d4R66KdbVxEvHgI1HBzVDKxjWY8wTYvvwrJ5P3fxzUyhxQ7eh+LQA7iVNXaLb12nFw0F5UDmE77g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E510840005;
-	Tue,  9 Jul 2024 22:57:15 +0000 (UTC)
-Message-ID: <28d092ae-96c8-4145-b679-399d2f71bf8e@ovn.org>
-Date: Wed, 10 Jul 2024 00:57:14 +0200
+	s=arc-20240116; t=1720566499; c=relaxed/simple;
+	bh=hgdPofEdoHAflWfm4WSlRgDQyArhpO9o/lYqCSP2Jas=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lxZ0y0JiqbNMhSc9w4Ozz0u31q5C2acMTeBzXLSfPogerUhymGwaC/wD2TGuPfW/nIERN4i3nFYbDc5b5KvVBdBeKXfzY/187L5oaXDI/3Xs1PlpmT5cpOLh8Jj8TOtevmfjs/q+JtIGTa+tsP+/km2y5CZWapGhUZaHGZW0wIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=smEcR++M; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-654d96c2bb5so56083717b3.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 16:08:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720566497; x=1721171297; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kVOK31G7VWH7piOOs0JNGXZAr4edRstd8XTkw55aTZI=;
+        b=smEcR++MxUqJLQg0No5tvgdhz7mRyJlX9PkndyQ0S2LWKi+6suoRY2lPprgb4W6hRB
+         d1uKWlbaaIPgkNK9IG+U4/q518OsYrGc29WlU184hX8T5fBJ43i/AjSIA4c60Gzsxxth
+         6l/KZfejQWtCHydISg+n84vaEK94euuhR+jYjz5wmqtJxMivybASsvizmDx9RyZz8maM
+         si73aDXXOS0mQnxczCUHZT4DjcHxXSDAUPo+qcz/zHxFGcd/3oVW+Tf9YS1ktAUjw5Vj
+         GduM1kODbgkQifakNopyX4XXsYscJvuQXkJxow7KxBv0ArHbdR7hAD0lHGRiddBI6aIr
+         +Yjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720566497; x=1721171297;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kVOK31G7VWH7piOOs0JNGXZAr4edRstd8XTkw55aTZI=;
+        b=Cigg7i41yQSyL+zbBXNV5ZFYkuLaXuzQ27pGQaMu/RPwvJfQyJUNyN7uDw2jeVNioq
+         VzsTn36RamjMHTlSpLaPNliEGn2EokFFjdWY8D0DjxAY0PJin1hFLGhDXbxl7g+cy2wD
+         MPv+s+dIgi0s8rszNq2McEqUMjNsV7zAwOagErMzPz3RcYBI+bhbDztHnyrUn3vTJrT6
+         Ms7UZ4WvqvdfLa05OeulHAPo3MtdJs2kQEnmVhZsUeBv0XLNmZePkUoADVGsbUHjID7w
+         pdz7mt1ifhgzW1fbBQ6qO25OMVRqWS3hDE3K1gojoB/SrYGEBw14M2LsndcZfUCp2f3H
+         A3nQ==
+X-Gm-Message-State: AOJu0Yyb8a+9aFmO+tXVKtZ023rejqam2bVX/23IrnX4m+sUhnAHFww8
+	54nEpSxInIAbIoPbheHK3DXlR5zDnem7z7pTm0/tA22YO6sTT+CaIN2Qll9Ng55Dv85cS7T/EIm
+	asRik7WjF5g==
+X-Google-Smtp-Source: AGHT+IH9mEPCNwVdb3sTr3eF4k+2AjRpOPPusryrnrIMn+iwKf8LoSltOMxFKVx2WNJh2JaDfVkIgKL4vsDOmw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2012:b0:e03:62ce:ce87 with SMTP
+ id 3f1490d57ef6-e041b135395mr6871276.9.1720566497115; Tue, 09 Jul 2024
+ 16:08:17 -0700 (PDT)
+Date: Tue,  9 Jul 2024 23:08:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: psample: fix flag being set in wrong skb
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-Cc: Yotam Gigi <yotam.gi@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
- Eelco Chaudron <echaudro@redhat.com>, Aaron Conole <aconole@redhat.com>,
- linux-kernel@vger.kernel.org, i.maximets@ovn.org
-References: <20240709203437.1257952-1-amorenoz@redhat.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240709203437.1257952-1-amorenoz@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240709230815.2717872-1-edumazet@google.com>
+Subject: [PATCH net-next] net: do not inline rtnl_calcit()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/9/24 22:34, Adrian Moreno wrote:
-> A typo makes PSAMPLE_ATTR_SAMPLE_RATE netlink flag be added to the wrong
-> sk_buff.
-> 
-> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  net/psample/psample.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/psample/psample.c b/net/psample/psample.c
-> index f48b5b9cd409..11b7533067b8 100644
-> --- a/net/psample/psample.c
-> +++ b/net/psample/psample.c
-> @@ -498,7 +498,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->  		goto error;
->  
->  	if (md->rate_as_probability)
-> -		nla_put_flag(skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
-> +		nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
->  
->  	genlmsg_end(nl_skb, data);
->  	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+IFLA_MAX is increasing slowly but surely.
 
-Uff.  Nasty.
+Use noinline_for_stack attribute to not inline rtnl_calcit()
+in its unique caller (rtnetlink_rcv_msg()) to save stack space.
 
-I'd say we should change the function argument to 'const' to avoid such
-issues in the future.  There is no reason for this function to modify
-the original packet.  What do you think?
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/rtnetlink.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Best regards, Ilya Maximets.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index eabfc8290f5e29f2ef3e5c1481715ae9056ea689..842d315675d5c749a0a1b62fd67afdc1d8046812 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3969,7 +3969,8 @@ static int rtnl_dellinkprop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	return rtnl_linkprop(RTM_DELLINKPROP, skb, nlh, extack);
+ }
+ 
+-static u32 rtnl_calcit(struct sk_buff *skb, struct nlmsghdr *nlh)
++static noinline_for_stack u32 rtnl_calcit(struct sk_buff *skb,
++					  struct nlmsghdr *nlh)
+ {
+ 	struct net *net = sock_net(skb->sk);
+ 	size_t min_ifinfo_dump_size = 0;
+-- 
+2.45.2.993.g49e7a77208-goog
+
 
