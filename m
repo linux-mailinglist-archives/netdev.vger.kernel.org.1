@@ -1,261 +1,149 @@
-Return-Path: <netdev+bounces-110174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F06EB92B353
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:11:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7847192B35F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 11:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A5F282E25
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EF13282178
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 09:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC797152796;
-	Tue,  9 Jul 2024 09:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A976C153801;
+	Tue,  9 Jul 2024 09:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FySw4aYi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1oBPwKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC74C146016;
-	Tue,  9 Jul 2024 09:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720516306; cv=fail; b=DbfzUhC72XEQxcV/kTEol2cx/pCi8Il6tOoKizzF9KdC4MBQO5Hsy+Q4UMvV1jBKZsZqJHPECO/GYiIgY7tSzKk/3Yf2q8T3D9RJe7mLmNC6RyVIy2dRnotmaKPWRmGq9/mp96m2xsEpyIo4Ca8P9XlsIa9eM8ONNQjAd0KpNho=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720516306; c=relaxed/simple;
-	bh=wHzr5rd6PN/VMcPkB0j9FzybuRYtnnSiSQ8krISy/bs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BuvoQmiAu7SqKDUtqgvBBtEJf9+n4SpzjrLQ2aZ8f+xA7o5N/s52/IFTIzlflIfB48Jh3o5cxrjSIwSry4diTUV/zWNRar5n5ZSpy0PxPDfelIC1n0SU12jAV4C8W/jGelV6YkOnh5LkvGTEsdM7wBdTgS6JV85UBmZtVk7moQ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FySw4aYi; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720516305; x=1752052305;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wHzr5rd6PN/VMcPkB0j9FzybuRYtnnSiSQ8krISy/bs=;
-  b=FySw4aYit+gBP+/HEPYmda5e84OStluzI+eWJRuB2CJehxcvnCGJXKvo
-   +rU3039U1A0S3L9ihvs6795jksuJcR/K65xrDwL1uxnEompev8yk89IM+
-   7iZlFzsRQRrNLJzBnGz6WWN+VhBtIC8bIsqGu04/qpRT6yCrLs+c0VHkC
-   sHpqR8bpKe1crg0bHw4dkbcRXzfhT/cjE9KhjzZPNXO4uzVn7NM1syHXy
-   9CHT68T2qgfuySRll2a5uVPkOOqbmlewd/U4Tmn+mY55bmEJqjwS5DZCD
-   XMJP/vekTfcN/KN0/BgPlWakGq3dOLyS7x3++pD3hE+6viOQvl9tTVaW3
-   A==;
-X-CSE-ConnectionGUID: 9h59Q0JxRtSDSaIvSU4y9A==
-X-CSE-MsgGUID: hlxr2pNOReqSSHDoDLxgLQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11127"; a="35192782"
-X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
-   d="scan'208";a="35192782"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 02:11:45 -0700
-X-CSE-ConnectionGUID: 9enXsxXIS+iZS6Lvv41pnA==
-X-CSE-MsgGUID: CMPwO2KxSAGzhPQ3QTgFkg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
-   d="scan'208";a="52599672"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Jul 2024 02:11:41 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 9 Jul 2024 02:11:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 9 Jul 2024 02:11:40 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 9 Jul 2024 02:11:40 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 9 Jul 2024 02:11:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YfIZcYN+2OI6ssQbFSzLA7w/85DvQPLLb6Hqo3MqBHvP+cafWpMWLDL4JnWqBQJwezOBcty8bidOCsMgARxrHZlXm7/SJ7LYWvIwa5dURb+28f+gjctQ1M8LVevRlwlO1dWUsqm14VCDe87kEIS/qf2ZRhfFKuAsZla8zXy31PsrIR4zWq5BPUg5rrG6qE5lEcqQNn2QG8Fdd+gC8I843yrStAWrNENNRNAPeJ7rO1uWJhBvnIogheEULspMJxhCVuHMl+Tf1b8e97+pWHfX1df6d2I/qhlRrnpULjSqboCO/Gve6ACz+TfrzwW+vr7ElJkgFzBkWxWWT6u/mJpffQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4/dIyaekBJcya+/dVyFL95rx0i/xKMV7ErJ/3LrMoIc=;
- b=a1q2lDSLzmP2CMUSqlqDzjz3K24mQXcAxAoVxOil0IZnxGjkOJElyYT+okES5ELKSJpDu9Devh16ISHxOZZor2vffTn52tbgx9BaVuWHxjkwLixuTne+QnnN9RqsHii8sNFfsAZ6Yl+hfGNnRhYcBVdb9/Bk6lT7xU93rwilehNCwQm5hWJdQ6cwrr6fGgL6pd8dK9DDqSFxqxsZQL3BbgIRSQbI/gEV0YTrDGZUB2/OKykDnfJiYvZSTRpRDjcc9uXvaT5g7U6NGN5QMP6cDVgnFa6XOkqjPFoheeKLb1ASg3FTxEREW9h2jGxy1z/jYjjJqEOyP23nf4zf2h5oLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by IA1PR11MB6321.namprd11.prod.outlook.com (2603:10b6:208:38b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Tue, 9 Jul
- 2024 09:11:38 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
- 09:11:38 +0000
-Message-ID: <190d0cdc-d6de-4526-b235-91b25b50c905@intel.com>
-Date: Tue, 9 Jul 2024 11:11:30 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ice: Adjust over allocation
- of memory in ice_sched_add_root_node() and ice_sched_add_node()
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Aleksandr Mishin <amishin@t-argos.ru>
-CC: <lvc-project@linuxtesting.org>, Eric Dumazet <edumazet@google.com>,
-	<linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, Simon Horman <horms@kernel.org>,
-	<netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Paolo
- Abeni" <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20240708182736.8514-1-amishin@t-argos.ru>
- <033111e2-e743-4523-8c4f-7d5f1c801e65@molgen.mpg.de>
- <23d2e91c-4215-4ea5-8b3c-4dd58a1062af@molgen.mpg.de>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <23d2e91c-4215-4ea5-8b3c-4dd58a1062af@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: VI1PR10CA0091.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:803:28::20) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8418A146016
+	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 09:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720516445; cv=none; b=cHg8H1vZ4mojwVHpQh6X1x3S9Dyq06gtuAXkNzNAarxvJUbQG4/yWC0YikYEOjU9sKCodEmq9XQ9A/V+9rj20C3LbaBgeakDJ6nYj9LjDTvwme32Nxp1cUOFWjsI2pP70AUjPbYcRiPc6gJrhn+cZSqTaiH5cXHR6NFC8MZZ/fI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720516445; c=relaxed/simple;
+	bh=tmK1Vhmamn3/t0ATZ/n0FLraHQ6CFF7vg0IiTG7F1wo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A/Pok5NH/6ynnNOw+f/B21FRWBaMff2H/fhucXdLhbhn5yb/8IFF8OHIkKUuD9xzJVesi8BjFNNPDrki4C23WDc0hi01dsZrbEs86jtpFiV/vgkTj/54jW4XvfyezrmXwBlvN7FUG/vJALKa7b0XSSbHCczpl/COhX5opKrTPTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1oBPwKc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4AC1C32786;
+	Tue,  9 Jul 2024 09:14:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720516445;
+	bh=tmK1Vhmamn3/t0ATZ/n0FLraHQ6CFF7vg0IiTG7F1wo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l1oBPwKc1MRMbsJSAsLVpXTVDkYlxH0dHhgUeVPgWFQuPDi5E16+NkpazkV1ll21l
+	 EVxxYetaOU3oMG1lYc890l0NFEaCir7JS6D+VMzXPyip31eIEYmbZ3OXFLtIbnA48z
+	 5DSDlk/xSPRebB56wD9DUPp2GUpbqcAvCTgknLHYhuBa3uTFnYcXn8WlesTgjrgV5l
+	 sdDuwqdJ8dsdKcaK7OozHPYS1wjlo3aR5F3WqpSZVkwsPKi52VJStLU4HgsVR+3nQq
+	 kjMeZNWVFAwS7ELTl0XFmuDPlrRzMg+FFUn+KAMKgE9T0Lee/WgTlrtwAJOPcVBcrl
+	 aVrOzvViNETew==
+Date: Tue, 9 Jul 2024 10:14:00 +0100
+From: Simon Horman <horms@kernel.org>
+To: zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH net-next v7 1/3] sock: support copying cmsgs to the user
+ space in sendmsg
+Message-ID: <20240709091400.GE346094@kernel.org>
+References: <20240708210405.870930-1-zijianzhang@bytedance.com>
+ <20240708210405.870930-2-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA1PR11MB6321:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3e34143-82e6-4b37-fed1-08dc9ff72356
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QlFyNWRodXpIVnlER3hKRHU5Wld0WGJPTWFvMWVjdkNwYldVbGQyL2RyT3ZN?=
- =?utf-8?B?SkkvS3J2L0tIcVFEVWgzSm9VYklxSlBtQzhGaitNK0ZGaUs4bGpmcklFcnM2?=
- =?utf-8?B?K2JvTmI4ZzJWVkYvY1M5ZlMvRVREY0U0Qm82emZTSlc4VkIrNktVYXVRektO?=
- =?utf-8?B?VVRzRWV4ZEkzUGZJRjB2YkJuak56NmR1V2h4cWp1T1ZUemFpdCtIS1dPdjYr?=
- =?utf-8?B?UUxmVXNFS0dWV25zcTFjenhmVFZqZ09sa0dHQm40RVA2UU1ONFM3cU15ZC8r?=
- =?utf-8?B?YTRCbFBSVTI0UkJkU1pOMkJDUkdERTNzUEJZTHE3WEN6WW1HOHhZVnBmMldh?=
- =?utf-8?B?ZnR6UXp6aFFidURCcUg2MDJZLzdUbWJRU2lzUWV2aVBIMWFSM2YvemRFVmVT?=
- =?utf-8?B?VDJaV3NlV3RkaGg1WnlJQ2JGUUcrZ1BRQnBUNzcyUmRiOXRQcmNWZ1kyckVn?=
- =?utf-8?B?OHJhN1I1Y08xS2NPZk5XOVN6RzUrbkdlZnY2SjI1cWVrckdlOGNyNXpIT2J1?=
- =?utf-8?B?S1pzRmYrSWxxZ0ZuM3E1KzhJT2srNUVoK2NlOE43akFKN1h2WXZaM0pzMitC?=
- =?utf-8?B?N0VOSENXcGxQWUdzNm9YcXFPRWhDSFIzMDJLei9HU2RPSG9zSWovVDFlWmpR?=
- =?utf-8?B?VU02aXRGN1dRZFRLOUs5eDhQcVI4MWxDVjZKMWxIaTBZdndPQ1NBUGdlRTN0?=
- =?utf-8?B?TmtvcUFZM041UERERVFCTEVpRUN4V0pNOWJqMW4xZDlma01Hd3U4bDN3eUsr?=
- =?utf-8?B?NHhzblIydUtlYkhyd3FMdjdyc1VwZUFneTdwM0FyTWpmVlRvclRuUndGU2Vq?=
- =?utf-8?B?YmR1U1RSMVdMYnBNUkgwZGpRZ3ltR2ZkVGxVc2tFRE1KZFJrSmFMT1FIemMz?=
- =?utf-8?B?UXo5RE05eEVOcEM3NS8xN0dLVDZtNHVObWEzN0c0T0d1QVJySEdsckttS2M0?=
- =?utf-8?B?WlBRMnMvYUFIeHRGZlZUM0JzWFNzMUs3N1ZqRjEyc0ZlZ2Qyc1MyL01KM3d5?=
- =?utf-8?B?bVpEU204VTRwWGtDc3c2NTBrK29USjczelhKdFlmbktYSTVxNU1rVGxJc0FJ?=
- =?utf-8?B?ek1OUG1VV2tqLzgzZWM2N2VqbG0zS0diSWpTdlZPQ2ZlRktJV1ViZWUrRmtZ?=
- =?utf-8?B?NHpwMjQ0cTVpSnorNEFnbm5zZStFNHNvYWhOSjFaWmxIU1JnWEJ0NCtnbXlm?=
- =?utf-8?B?dGhOOEpZNlZOVStGZWl5dFh5NkttUHpZT1grU1hzMFJSZjZPTFFQMFpERmdj?=
- =?utf-8?B?YmRsM1Boby91TWRsVFUwcCtmc2k1SUlVMEltUjUvS29YQXYzZEVzK0dsdUVx?=
- =?utf-8?B?eXg2UjRkekRneVN1VGp6ay82QW5LQ05RbTFIQzdyL3h4dzNUZFF4dFBYQml3?=
- =?utf-8?B?QnAvT2k4aTBwZFpzdUxsemtLakFNT3RLZU0yd2hCWUR0QlhCamdpM1cwVkF0?=
- =?utf-8?B?bkRLbDE3TFVzMDVGRXFMZnJxUVUwY2o5Q056NWRMWENrSUdRbDl5K1B1UE9I?=
- =?utf-8?B?Q1BRc0NsalovM3VTSUovYXhsanA5SGVsVy9ZOUUzZXlyd1h0QVRsU0MrREt2?=
- =?utf-8?B?eUJHM2hBek5vb0FwaVplL2JzQmpNTGlZRzNSd3NybnJkNnBjaVhBbmswTFhM?=
- =?utf-8?B?MS9NY2FHQWhsbzJGUnZ2bjJEUDVWY2x5MDNWT2RxVTB1TkFKeWtQU3lPQmVr?=
- =?utf-8?B?VDI1aldQbTZ0aFdpaGpLOFpJZkVncDZWZDNpL0FOUUwvSG1wY3RjakdhUzVq?=
- =?utf-8?B?Vm5rYXppUVBZWWhES0JERVpvN0liNTFad0pJeXVtQUlFWnlXc0gvbmxXZjdM?=
- =?utf-8?B?OUpmSDlaRjNkV0llVW41UT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VVlOaDVWZ1dMY3FkSlp3TjlZcFlQK09UUmhzVmc5RENCcjFVUTQ3SzdKSTRz?=
- =?utf-8?B?bjV0bnlaRjNEc1lVRTd1SVFWOFVSMWhpSU42M2ZRbkEwVWoyb2NTV3RoTjhV?=
- =?utf-8?B?VXFxZnljdXRpTVZISUlqemZ6K2R0cnZzQUdjaUFMb1BVWU1RbzIrZmlZdE04?=
- =?utf-8?B?Nk1tT1lwdGZaT2xWcHorVUcwTEdnVnJ2R1VuYXpjVXZaRVpsVjVHbGlha0s3?=
- =?utf-8?B?N2pNaHBlejA3UWxnbzA4MmV5VEFHSUgxWUxBTEhEaEpGSWZoYkpMUFJEMUlQ?=
- =?utf-8?B?VmIwcDdLc1VYRWFJQ2kzZzlzS2hMWnFyQ0pnQ1lHeXZ5L0xaaGpnblhxVCth?=
- =?utf-8?B?R1dRSDJqeW5JNHhndU5uZHc4RVVxMTJCQUtmRldBeTRIMzZ1Rm1BdmVUTzRE?=
- =?utf-8?B?bEVZVEdpL25oLzBhTjhHOGw4QnVRbndmcFpLRTRkaGtaN29OOExqTzVHMUFm?=
- =?utf-8?B?K1N5OG5lWXhlTUg5TkNPcndsSXkvR096SzJrYnRzV01jdCs0ZEVYN24vcVZG?=
- =?utf-8?B?Y1g1UnZLeVJXYUVIOGEwMEJTVXdFdU84VkpCc3NicUtTRnlWOTR2L292UjZC?=
- =?utf-8?B?NTVPQnZmQTFhR2RwVGU2SnlQdnhEeHoybENEOEF6Y3dmQWxHSFVIbXd2WkUr?=
- =?utf-8?B?OWx3UG9QTkNjajQvNk1hd0lFc1Nrb1hjWlkxVWJJaWE1bm5xWWVhNGZXekNZ?=
- =?utf-8?B?SnhKc2lhTTlhWHIrVVpjZDhOSTNzc0xGRzArOFZOSDZSRWZBS01qc0RpMVdF?=
- =?utf-8?B?eUlFNFdwd1JCdFRSWEcwbStPWDh2Ry9TKzZzNkdzSFd3V0xaSmdyV05UUHZW?=
- =?utf-8?B?aTF4ajBEQU1mSVFOM2FRQTNBK1Y0U2VJSEpOcUtmVzZycnNqb2lKdS9VdkVL?=
- =?utf-8?B?bmxVRjBJV1RnLzVBRFNaTFhyazB2ZFBOV3JWRlRoTVRlODYwRGVWUytiRDZw?=
- =?utf-8?B?THN4TDNhRkE3RHI5cDdpL1FtTUszUmJOTlRSN2tsUkhvaTk1b24wWjYzeDB3?=
- =?utf-8?B?dThCQURURTlDZ2M4WGloLzMrL212bitsSFk1aVJ4cVJ0WWsxbEJkL2cwRmdB?=
- =?utf-8?B?YUhoRG1hby9sUU94WDV5SXVUZzhHQzYxK3NjY2IvZnorOE90MEZSZC82NEhM?=
- =?utf-8?B?Z2hwekwzWXpzTVZJYTVOZjBGVFJiaWRpQ2krekpMVTZZVFNnYkdaZHlzUDBH?=
- =?utf-8?B?MkNDeDFSRVMwSXpEOW1KdDR4RjlrV3RNaUV4THg4WVRFVURQT2lOS2JGTWtK?=
- =?utf-8?B?MEhtRCtpUlpzYTRXa1lGRmJ5aEJYQW5KQTNSM0VFYmZzQVVvWWRuT0kxNTFO?=
- =?utf-8?B?RlZKL1lBU1lxSlhiQmZheGVaNk1IRXpFR3A4SXgyVHRoQzhFRFF6TXAxend6?=
- =?utf-8?B?STVycTVjbWFjYlFaK2N0aTFQQUFKRlFrbnM1OEgzZVczdUs1UnRVbGMyWHRV?=
- =?utf-8?B?OWsvZzBVczJmZGFPSW9GV3RvMTJCVGlIR3ljZXQwZGtRMlorQm1OdmNoSkZ6?=
- =?utf-8?B?UE1yR1JTYTVZS1lKTUs1UDBRcnI5S1lwckFRTFF2ZEh0K2ZNNVNENDRXN1F3?=
- =?utf-8?B?My9sb1VjOEVRV080djBsTERpNUdja2UvbTkrNGZ3WHNkVXIwSmxUY2ZkZ1Vr?=
- =?utf-8?B?VnE3dDVMVkhzS2pLN3ltRVZ3KzdhSGV6ZVU0VjJZcHRyL2plNUprai9memNY?=
- =?utf-8?B?Ymg2NzBXQnNiaGxTUVRYdFVESzltOGJQVjY2R1dwbC9GTUxCV3J0NWk2LzBX?=
- =?utf-8?B?cUVST2h1MllMeUUrOE9hM0hFTTc4WFF3VFNQY05IQkVWSWVCdXJBY2o1RERp?=
- =?utf-8?B?cHlycGpDbzVTRHhjVUJUOTZiUEptaFRpcnVxZGRkNUkwVUIyRjZHWnBZTnlx?=
- =?utf-8?B?VjNBMnltSFVBc0NIUTJPdUo2dnJXcW9IWDVtcTZaaE1xajdLQnFDeXhDUjl1?=
- =?utf-8?B?VnFMREF5Z0IxUC9VTmZCS1NZcDl4ekl3Tnh3QkU5dlpjbWwrTWpmZW56VkFu?=
- =?utf-8?B?cHpFQ2Z5ZlFTZUI2M3hjektvdXA0ZUorZjh2cE9kSEl1VG5wOGlubjNuYUtm?=
- =?utf-8?B?eC9HZkhIdGJCaU5HdXpXYUNiNzEvVVhidHA2ZUxaa2VCMDVQdjVEWVZVelZ3?=
- =?utf-8?B?WVZXWGpXVkthQ0R5N3I5YmhmbzhVaTh0QUthWkZHRTVyNjI2K1FaYnlnNlFR?=
- =?utf-8?Q?eSjLjqyrm0S6+zfHHKzBQRk=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3e34143-82e6-4b37-fed1-08dc9ff72356
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2024 09:11:37.9372
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xU6JL0/J8PEUFm66y4+WK7A4Srwz3C9xjK/GSKLYYTtVAqqv18etLSZzzsGmrrBgID+ju2u8r8UE15G58aqapNf77xyPnxGbYgTaTa7/g/0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6321
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240708210405.870930-2-zijianzhang@bytedance.com>
 
-On 7/9/24 10:54, Paul Menzel wrote:
-> [Cc: -anirudh.venkataramanan@intel.com (Address rejected)]
++ Dave Miller, Jakub Kicinski, Paolo Abeni, David Ahern, and Jens Axboe
+
+  Please generate the CC list Networking for patches using
+  get_maintainer.pl --git-min-percent=25 this.patch
+  but omitting LKML.
+
+
+On Mon, Jul 08, 2024 at 09:04:03PM +0000, zijianzhang@bytedance.com wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
 > 
-> Am 09.07.24 um 10:49 schrieb Paul Menzel:
->> Dear Aleksandr,
->>
->>
->> Thank you for your patch.
->>
->>
->> Am 08.07.24 um 20:27 schrieb Aleksandr Mishin:
->>> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
->>> devm_kcalloc() in order to allocate memory for array of pointers to
->>> 'ice_sched_node' structure. But incorrect types are used as sizeof()
->>> arguments in these calls (structures instead of pointers) which leads to
->>> over allocation of memory.
->>
->> If you have the explicit size at hand, it’d be great if you added 
->> those to the commit message.
->>
->>> Adjust over allocation of memory by correcting types in devm_kcalloc()
->>> sizeof() arguments.
->>>
->>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->>
->> Maybe mention, that Coverity found that too, and the warning was 
->> disabled, and use that commit in Fixes: tag? That’d be commit 
->> b36c598c999c (ice: Updates to Tx scheduler code), different from the 
->> one you used.
+> Users can pass msg_control as a placeholder to recvmsg, and get some info
+> from the kernel upon returning of it, but it's not available for sendmsg.
+> Recvmsg uses put_cmsg to copy info back to the user, while ____sys_sendmsg
+> creates a kernel copy of msg_control and passes that to the callees,
+> put_cmsg in sendmsg path will write into this kernel buffer.
+> 
+> If users want to get info after returning of sendmsg, they typically have
+> to call recvmsg on the ERRMSG_QUEUE of the socket, incurring extra system
+> call overhead. This commit supports copying cmsg from the kernel space to
+> the user space upon returning of sendmsg to mitigate this overhead.
+> 
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
 
-this version does not have any SHA mentioned :)
+...
 
->>
->> `Documentation/process/submitting-patches.rst` says:
->>
->>> A Fixes: tag indicates that the patch fixes an issue in a previous
->>> commit. It is used to make it easy to determine where a bug
->>> originated, which can help review a bug fix. This tag also assists
->>> the stable kernel team in determining which stable kernel versions
->>> should receive your fix. This is the preferred method for indicating
->>> a bug fixed by the patch.
+> diff --git a/net/socket.c b/net/socket.c
+> index e416920e9399..6a9c9e24d781 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -2525,8 +2525,43 @@ static int copy_msghdr_from_user(struct msghdr *kmsg,
+>  	return err < 0 ? err : 0;
+>  }
+>  
+> -static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
+> -			   unsigned int flags, struct used_address *used_address,
+> +static int sendmsg_copy_cmsg_to_user(struct msghdr *msg_sys,
+> +				     struct user_msghdr __user *umsg)
+> +{
+> +	struct compat_msghdr __user *umsg_compat =
+> +				(struct compat_msghdr __user *)umsg;
+> +	unsigned int flags = msg_sys->msg_flags;
+> +	struct msghdr msg_user = *msg_sys;
+> +	unsigned long cmsg_ptr;
+> +	struct cmsghdr *cmsg;
+> +	int err;
+> +
+> +	msg_user.msg_control_is_user = true;
+> +	msg_user.msg_control_user = umsg->msg_control;
 
-so, this is not a "fix" per definition of a fix: "your patch changes
-observable misbehavior"
-If the over-allocation would be counted in megabytes, then it will
-be a different case.
+nit: Sparse seems unhappy about the use of a __user pointer here.
 
+     net/socket.c:2540:37: warning: dereference of noderef expression
+
+> +	cmsg_ptr = (unsigned long)msg_user.msg_control;
+> +	for_each_cmsghdr(cmsg, msg_sys) {
+> +		if (!CMSG_OK(msg_sys, cmsg))
+> +			break;
+> +		if (cmsg_copy_to_user(cmsg))
+> +			put_cmsg(&msg_user, cmsg->cmsg_level, cmsg->cmsg_type,
+> +				 cmsg->cmsg_len - sizeof(*cmsg), CMSG_DATA(cmsg));
+> +	}
+> +
+> +	err = __put_user((msg_sys->msg_flags & ~MSG_CMSG_COMPAT), COMPAT_FLAGS(umsg));
+
+nit: The line above could be trivially line-wrapped so that it is
+     no more than 80 columns wide, as is still preferred in Networking code.
+
+     Flagged by: checkpatch.pl --max-line-length=80
+
+> +	if (err)
+> +		return err;
+> +	if (MSG_CMSG_COMPAT & flags)
+> +		err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+> +				 &umsg_compat->msg_controllen);
+> +	else
+> +		err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+> +				 &umsg->msg_controllen);
+> +	return err;
+> +}
+
+...
 
