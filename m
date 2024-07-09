@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-110396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A0C92C2A2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:39:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B62D92C2AD
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:42:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C15282976
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA7251F261AE
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 17:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB9215886B;
-	Tue,  9 Jul 2024 17:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBA317B023;
+	Tue,  9 Jul 2024 17:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n3/gDoI4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfYEGBbA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727D81B86CC;
-	Tue,  9 Jul 2024 17:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756201B86CC;
+	Tue,  9 Jul 2024 17:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720546775; cv=none; b=XzpzI2bDUcFeCktOKZf7LkL5eXiKj0tiMLerD4r3E7BAppybcPp/10p6LhWbPaprKyjrqCBPVzZ5ixJXTwD+xxteoedUjxqWSPdez8/O3mljT/guE0JczI7sLnhFRVWXSjHiFGYLFTIBZG4iS/8nih+a9ThA9+Oi/JDFyPQLKqw=
+	t=1720546939; cv=none; b=ZJl2yu6/6WKyl+X/rG7pXJsTv/GjCO0Dc6f1YAuhzTOFj75zO6bRb0xyqW2bIIyPQ+AtrTSaYpTrHfOVt18lRqqGNIL/Yr+zqLhgPzSRQQIpunjIvN0qFPgJBu4PBYaSbEpq+FtMdb+nnblFgmjuQUzSvnMJr22yCAi5Gm4on9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720546775; c=relaxed/simple;
-	bh=DUv3vz9bXqK9hhtMIiWDO/zVfmBzgXQ9Viyn5KKdtm0=;
+	s=arc-20240116; t=1720546939; c=relaxed/simple;
+	bh=ebW9j0Or29bAV/OIYS8+7Sgp+Pfi23j95sT/HNjJOEg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ii2u+ouJ2xXsJYatr65ZdfBV/JASoYY2yO+TLUhbv5aYYzOTydWOc9VNiBY258wZuDH9OUx3xt33qRCHEjpoK9pS/oZBOy5gOcwV0HFia3NNL8+m9QdJwK2+VOd34eGOoefohNuUTKcn8X30npAMRspvfVNlvtFboXlgHLLvfD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n3/gDoI4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=88YsXNA6H4EXPft88nvd1iwciO7x20mRHeiX1KkDl1k=; b=n3/gDoI4EZRQFQWrOj1FgLkqN2
-	hDFtbSIRo5HMTCrrgODmSLZWWMx1iBW0UZsVd6FbkGA+DiQtzFKYDFZQBAOYUIx4m7HMgig3EqlFP
-	e6zS9uDvHW6aWlStnIAhLoBMTC9BAya+IlK/u9th7vzT5ZfEPXo+eZa2gQFXc1eEVMFk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sREo4-002AV1-D0; Tue, 09 Jul 2024 19:39:12 +0200
-Date: Tue, 9 Jul 2024 19:39:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu, rkannoth@marvell.com,
-	sgoutham@marvell.com, arnd@arndb.de, horms@kernel.org
-Subject: Re: [PATCH v6 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <68a37d33-6155-4ffc-a0ad-8c5a5b8fed25@lunn.ch>
-References: <cover.1720504637.git.lorenzo@kernel.org>
- <bafc8bcf6c2d8c2b80e6bafebe3661d795ffcbee.1720504637.git.lorenzo@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QyDaNiOxyv04uSc0CGcnCIIUVgUt8iU3JXT8sNqUBqZJhHJOa878O8xsqN0OwBCj2wR3+fVe7bx2SZh1NyBAOFth6VOoNHTWdDL6zoiImWdOAZSckWQnKusuim0KjsBR8vnk5g5JdvRFLLINFGPNl7qY5T+CgfyXz99OxpmCPX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfYEGBbA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E133C3277B;
+	Tue,  9 Jul 2024 17:42:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720546939;
+	bh=ebW9j0Or29bAV/OIYS8+7Sgp+Pfi23j95sT/HNjJOEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rfYEGBbAmynhpSyZHeUQnL2N2IIoI1WBzjnjOUrC8QYYNbT1aAtAjGkmcif4ylXoH
+	 J4ZKX8RcICZpHp/t8deTJ6FeE+2LXMK9qqSpF3r//6DgLQu/iWGc+KDLdSS/lY0xi7
+	 a05sEC041+4R21N+LMTJ4NgQGHpQp6kB4VoXLWrVuO86CmjQJ/XqMUsEyDfuJnfsXn
+	 Zx9MA7VQQlb0UwbiJMh3qaMU+6B9DJN0oxOLNNGa9t4X92OUm3UCr6vQJRDT9S95Vp
+	 exiu0JgErVkBja86lV9E7w7eGAe/tQhDpwWJxmXuARBfHyNepEApKZYNsn6ZJrN/Bd
+	 lwmLIzbMVIi3A==
+Date: Tue, 9 Jul 2024 18:42:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tengfei Fan <quic_tengfan@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, kernel@quicinc.com,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 0/2] net: stmmac: dwmac-qcom-ethqos: Add QCS9100
+ ethqos compatible
+Message-ID: <20240709174212.GM346094@kernel.org>
+References: <20240709-add_qcs9100_ethqos_compatible-v2-0-ba22d1a970ff@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,51 +71,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bafc8bcf6c2d8c2b80e6bafebe3661d795ffcbee.1720504637.git.lorenzo@kernel.org>
+In-Reply-To: <20240709-add_qcs9100_ethqos_compatible-v2-0-ba22d1a970ff@quicinc.com>
 
-> +static int airoha_qdma_init_rx_queue(struct airoha_eth *eth,
-> +				     struct airoha_queue *q, int ndesc)
-> +{
-> +	struct page_pool_params pp_params = {
-> +		.order = 0,
-> +		.pool_size = 256,
-> +		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-> +		.dma_dir = DMA_FROM_DEVICE,
-> +		.max_len = PAGE_SIZE,
-> +		.nid = NUMA_NO_NODE,
-> +		.dev = eth->dev,
-> +		.napi = &q->napi,
-> +	};
+On Tue, Jul 09, 2024 at 10:13:16PM +0800, Tengfei Fan wrote:
+> Introduce support for the QCS9100 SoC device tree (DTSI) and the
+> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
+> While the QCS9100 platform is still in the early design stage, the
+> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
+> mounts the QCS9100 SoC instead of the SA8775p SoC.
+> 
+> The QCS9100 SoC DTSI is directly renamed from the SA8775p SoC DTSI, and
+> all the compatible strings will be updated from "SA8775p" to "QCS9100".
+> The QCS9100 device tree patches will be pushed after all the device tree
+> bindings and device driver patches are reviewed.
+> 
+> The final dtsi will like:
+> https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-3-quic_tengfan@quicinc.com/
+> 
+> The detailed cover letter reference:
+> https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-1-quic_tengfan@quicinc.com/
+> 
+> Signed-off-by: Tengfei Fan <quic_tengfan@quicinc.com>
+> ---
+> Changes in v2:
+>   - Split huge patch series into different patch series according to
+>     subsytems
+>   - Update patch commit message
+> 
+> prevous disscussion here:
+> [1] v1: https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-1-quic_tengfan@quicinc.com/
+> 
+> ---
+> Tengfei Fan (2):
+>       dt-bindings: net: qcom,ethqos: add description for qcs9100
+>       net: stmmac: dwmac-qcom-ethqos: add support for emac4 on qcs9100 platforms
+> 
+>  Documentation/devicetree/bindings/net/qcom,ethqos.yaml  | 1 +
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml   | 2 ++
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 1 +
+>  3 files changed, 4 insertions(+)
+> ---
+> base-commit: 0b58e108042b0ed28a71cd7edf5175999955b233
 
-I think you can make this const.
+I'm assuming that this is a patch for net-next.
+But the commit above is not present in net-next,
+and this series doesn't apply to net-next.
 
-> +static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
-> +{
+Please rebase when preparing v3.
+And please designate the target tree in the subject.
 
-> +	port = netdev_priv(dev);
-> +	mutex_init(&port->stats.mutex);
-> +	port->dev = dev;
-> +	port->eth = eth;
-> +	port->id = id;
-> +
-> +	err = register_netdev(dev);
-> +	if (err)
-> +		return err;
-> +
-> +	eth->ports[index] = port;
+	Subject: [PATCH net-next v3] ...
 
-eth->ports[index] appears to be used in
-airoha_qdma_rx_process(). There is a small race condition here, since
-the interface could be in use before register_netdev() returns,
-e.g. NFS root. It would be better to do the assignment before
-registering the interface.
-
-These are quite minor, so please add to the next version:
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
-
----
-pw-bot: cr
+Thanks!
 
