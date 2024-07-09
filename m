@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-110410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEADE92C395
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 21:02:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99C492C398
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 21:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C3C31C228ED
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:02:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91D60B2195B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 19:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9891213B7BE;
-	Tue,  9 Jul 2024 19:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94128182A58;
+	Tue,  9 Jul 2024 19:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmnULTgH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJFzDerB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA51B86E9;
-	Tue,  9 Jul 2024 19:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B35C182A4A;
+	Tue,  9 Jul 2024 19:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720551721; cv=none; b=DFb37x5ZbS8WN3Ncz05a/j8rW9wDTBttkeurjaLkVFsVdWQHZxjwM9cTnbkBA3FoqMnPW0LYRK0TJg5vnLAw51gftoZajKaOzA4KiDRYVXUvvfSrZfw///E/imiOLkpnmgdnRdwmBAF9T9hBuqC9dyOCZJAoO1Pp5CIhSpQ1b3I=
+	t=1720551722; cv=none; b=W59UMZnwKsQnLT93A0g3MyzLCs6d/Ou2TmzluGQhbzDfzsYvBOiEoSFKCCZr4NKOhkU8eVg46NDEGgU6ir+3ny1wQg/4m2gAkekYB55pE1PIkB+7C7thG+zliblT0Fh9/OuMdEHjQC+e3O0LrJ2otkNIh0BK5MX2k6DRVvz0V+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720551721; c=relaxed/simple;
-	bh=Al2VHrv2XwaTlILHG6XC5ug04hKLUItBwLn9cEtX2WE=;
+	s=arc-20240116; t=1720551722; c=relaxed/simple;
+	bh=3ZZ7DQEKNnruhiUNY73zpvLr0deMx91HrqS4mL+RFKk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=vBwX26lNZy3Q51tPl9ctEmE2XUBvlplSbrGQ+hu3dq6+AzJmdeQJuryR/Vl2/7fTLqVm8G9j2uhUpwX/azQ6E1lVM2+BJd9qpZ6QdRiTmGZ9j1JCUcoJ3d1T8xiq+1MnW4fNLaSYNvuf1Hn2B7GvNUVnWoaSm83fhQYsnvJ3178=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmnULTgH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDB8EC3277B;
-	Tue,  9 Jul 2024 19:02:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nfdZK2K3mU39ysGsqIfshFW4hAfuQiFk3s6r2WFUEEM2rN1sbUfSJ0F/NaIxcW6A28t0cI1YGmPHMKhFqrGY7loq76hAQKKBor3Q7Zx0kbPYXCZd+hGl/MjLoV7bpVAnFF3x+463wsE4v98HOEi6po897VHdZz+fK745X33vqt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJFzDerB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DD1ACC4AF0A;
+	Tue,  9 Jul 2024 19:02:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720551721;
-	bh=Al2VHrv2XwaTlILHG6XC5ug04hKLUItBwLn9cEtX2WE=;
+	bh=3ZZ7DQEKNnruhiUNY73zpvLr0deMx91HrqS4mL+RFKk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PmnULTgHKYDZogKP5WrHSBAGVqJzjYElbbSuO2VQ6M0gwThXxiNalQIC6773vqPIT
-	 iwzrzIQEkBuj7zp5q46xneW3kxs/dgYFKFN0xxEqcEUCet4oZ62s/Y9UbxR16pId8w
-	 Mts93LdnSP1W0O8D26BxgICviOiVGMAtQzykLkHHXF4Ak2T/TX9wpAHvy0dZmFQtBQ
-	 xAedDzD3W2foCgeJD1FYfxP4Ik6G1s4wNYmhQSt7T3iBek+vX5IJ1KM0H0p71fyz6f
-	 zXQG6AUT8yTEK2kICFvBxN6b/BGdp2VAn/J5pGfL/FGsf5DrYIGBvyJL6blhyjsDFJ
-	 AVy3C5nWMTPng==
+	b=nJFzDerB7RWVTBoUS8duP83uuKUWvlPEaIPb/nanYborBpEDO0Hi7yQRxY8wb3Sv0
+	 yBRjMZiUTBQxEcJWfLL5Y5ui0Wcau9z7GQL3WKLEPnkstBaNkxFoOJw2iZI2H9iR3l
+	 QU8R0qBY9TsjmeAJIRfCGO64Pv802Hrcb5YT7waZ4XVl3T84k6DlUOtSAk2u9YgECu
+	 qCR6+VvyVCLA7hkHHhSWXVS+T8iP/JOb1ydKjRzjfMTa4oZqx+rj8mMKK6+bMZgJvx
+	 wEk0yzX9boaNNz2qypPRsZ0uvTIyAHA3MjeFtZf2pLYnygT8x7zDUH58bHVFjTOWDC
+	 HLURNEm6yiiVw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0459C4332C;
-	Tue,  9 Jul 2024 19:02:00 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE605C43468;
+	Tue,  9 Jul 2024 19:02:01 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: add missing deps
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: fsl,fman: allow dma-coherent
+ property
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172055172091.32169.17333506236815187966.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jul 2024 19:02:00 +0000
-References: <20240708-net-deps-v2-1-b22fb74da2a3@baylibre.com>
-In-Reply-To: <20240708-net-deps-v2-1-b22fb74da2a3@baylibre.com>
-To: Guillaume La Roque <glaroque@baylibre.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, danishanwar@ti.com, andrew@lunn.ch,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172055172184.32169.14387199835490742511.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jul 2024 19:02:01 +0000
+References: <20240708180949.1898495-1-Frank.Li@nxp.com>
+In-Reply-To: <20240708180949.1898495-1-Frank.Li@nxp.com>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: robh@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+ devicetree@vger.kernel.org, edumazet@google.com, imx@lists.linux.dev,
+ krzk+dt@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ madalin.bucur@nxp.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ sean.anderson@seco.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 08 Jul 2024 16:31:34 +0200 you wrote:
-> Add missing dependency on NET_SWITCHDEV.
+On Mon,  8 Jul 2024 14:09:48 -0400 you wrote:
+> Add dma-coherent property to fix below warning.
+> arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dtb: fman@1a00000: 'dma-coherent', 'ptimer-handle' do not match any of the regexes: '^ethernet@[a-f0-9]+$', '^mdio@[a-f0-9]+$', '^muram@[a-f0-9]+$', '^phc@[a-f0-9]+$', '^port@[a-f0-9]+$', 'pinctrl-[0-9]+'
+> 	from schema $id: http://devicetree.org/schemas/net/fsl,fman.yaml#
 > 
-> Fixes: abd5576b9c57 ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> ---
-> Changes in v2:
-> - Fixes shaone: put upstream shaone and not internal one.
-> - Link to v1: https://lore.kernel.org/r/20240708-net-deps-v1-1-835915199d88@baylibre.com
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: ti: icssg-prueth: add missing deps
-    https://git.kernel.org/netdev/net-next/c/d69471135574
+  - [v4,1/2] dt-bindings: net: fsl,fman: allow dma-coherent property
+    https://git.kernel.org/netdev/net-next/c/dd84d831ef27
+  - [v4,2/2] dt-bindings: net: fsl,fman: add ptimer-handle property
+    https://git.kernel.org/netdev/net-next/c/5618ced01979
 
 You are awesome, thank you!
 -- 
