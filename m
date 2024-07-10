@@ -1,252 +1,184 @@
-Return-Path: <netdev+bounces-110632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B67592DA06
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15A1092DA13
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 151EDB237C1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:29:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55EA1B23689
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3C7198E85;
-	Wed, 10 Jul 2024 20:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE7B19007C;
+	Wed, 10 Jul 2024 20:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJZxbkmN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q4EEDafw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDD8198A35
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758DA8289A
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720643359; cv=none; b=vCT7xrXr+S0VI+ewrsyCPTkuOKPy/xisBxhF5k6rlzqVzPaYgzrFjCKcJTETI+pMgIKmm7k8QfXBmatHHRvWyQcKqr6Aishtbm2/Ue129WQRv5bOwWXjxLy4ZmJ7AbHXXH1HLI4MrjvBn6EJqJkaRfCIJ08gUXuYITZZv296uV4=
+	t=1720643444; cv=none; b=p/jj1Ejl9sYbXfdNQzxwZbDQdOj10qrhFASaUsexJEHvSfKNRXGPJSriY2P+pCsHwI5GNL4BqIos3PgNZuFC9uLuSs5l2HmCfpwGVzXKGkzcc3lLYFe7AnVdGEoeoFAsvR+GP8qICF/KKg/a3y9bwVhxfmfX0f/mg81QOo9oRQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720643359; c=relaxed/simple;
-	bh=lUBEgBl64OukQYoXw+IzWRxkunsos7uu5wD0WIADxEc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MNWgWy5zfVe0vNkhwbcMvHGbGkusgskRhvGlB8b7kEobWV9gL1aGfE466FfGg6B5XspZ9vgpxMbrdSIJDqz8VJwUOq/IYLtjHA3uwkfOc/QD0zTFJfWTDLuB64L3Flt3PU2pfb11d3Qho7pmoi0uioM1jaygqpRnyCMMOygRzX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJZxbkmN; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7037a208ff5so81640a34.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 13:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720643356; x=1721248156; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ip/0MDOrHp5lX/Irp7UEa2BIGo3LvwiW3nUCmkpVR3o=;
-        b=BJZxbkmNVvsrwsOuaaprwEqVg0CMet2325nHNs5uvMq63SzxrXSfmdtUd5/igfuBB5
-         jgvxXpBg+b5P9K4cSsYXndaGhb9pG6io8fOpsrAVQd6eQbisUPDp5GX2yK3xOT31K+hB
-         rLXwaUbLpXIB9Q8v6gUxwPZvMaiutAxat3yGpdgYDau0bKKtb1PqBwTj9smNTxWa9uqn
-         ZOCLTZyhZ/8hIrlgllUXJArVcKmiCm1dWbpOErCJbkZe5/sFJt4kL9PtuqFW0Ove1CUu
-         Nh8cY4TxxbDibsYnfTcPZ/+y1o+vX+c63l8fC/vydJq0Ce+I40QGkc0fyN+PLM3HKAgI
-         +oSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720643356; x=1721248156;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ip/0MDOrHp5lX/Irp7UEa2BIGo3LvwiW3nUCmkpVR3o=;
-        b=WDd0UnPmbZm/CtA9ub7gYBOtEKr4dIrmrpj4rjUb6SlLvI4L7Gfh1B35JkI8ODlFTg
-         nFAVaCk3XSBclFaCLB8Jngl0Vq+22hVHHLj7Lm4i2friNC9hK3i2gfuJ3D9YjmWApsGz
-         m22bAw00UrrKH1aNoBzd7yAmK1AJr2wWRp8AxKZ3m1Kn9bjakyPmnTBMAHVVTx9UyXBA
-         dafhO+bEIkY3BLgTURNDAfDpKUbsxUR7GsTQ+D8oOs3H7QkO+LM5a6WzsYsYnsc8P8jl
-         5Gvjq3aVQfkhduoeMzb4A+aow6IBMocZaoKRW+4LRF487BA4P0d50Nl17V7Uxix4lQFs
-         576A==
-X-Gm-Message-State: AOJu0YyATE5/HFcqbtxoHbz/N+L5P3Whv4+klFUX4hZ41lVcoG1vxnOI
-	jbOtgJ/pOOJYbHHF8cwvToF/4yRGLEcClpRzj4RbmsP7VjarpmURAS//513+tuQsp0/RpS6RKbi
-	Q2U32AVCRQhfBKKnv9a9DTopyd7gcqbHlJK77
-X-Google-Smtp-Source: AGHT+IFh61JWNinxflrD0b4ZVWkvEczGu6mIg9bnLfCV6X6pe63Th6j/ytHY2kvRgro//9ydMtTk5x6Go2aTaB1/aws=
-X-Received: by 2002:a05:6830:22ed:b0:704:4995:3733 with SMTP id
- 46e09a7af769-704499539f5mr3557560a34.31.1720643355799; Wed, 10 Jul 2024
- 13:29:15 -0700 (PDT)
+	s=arc-20240116; t=1720643444; c=relaxed/simple;
+	bh=XhoJ7YU7632p9mi75mEFLVD2h03O1F1IBn9qV6xOvtc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WHrfh0LVy7qn2tfBmj7njy/l+eZkbNvgAH7sg2OFjaCaQQPZZwZGN4mONTEPDnDcH2a6fMYaxU/ASC5ePFPNSOG0vV0XIhijjiEXnvNctB1CPUGOPl2V9axPR9QwwL3Ogf4trhTBj6fVY6nTzGyjufTWEW9k5n/cc1yIIZlspPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q4EEDafw; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720643442; x=1752179442;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XhoJ7YU7632p9mi75mEFLVD2h03O1F1IBn9qV6xOvtc=;
+  b=Q4EEDafw5ISAkvRrbLm/EGvqDe2VUFpM3yzzdxJJhX+JIkSxBXmikjk3
+   cJ3OzsHnwIoBjaeDkmNrI1zcf34JRnYyZJqa9uZ/Qa7vLmMB0s8M6VXNa
+   KB99zXmr8/iiOREbYYSGmQPsnkhyWx7ioMtWMp5/SI3ZnnfDYufpEs8YP
+   XdG24ngFHsKh2LR9gogU37wC4IHXZtT6JQo+X4GNL6UdT4Vh3s2l0Cab2
+   nJuNFtvQuclUdTrbjBjOQ6yjRMGpS2rcIWqwjipIMt444evj2ywcrHCwE
+   m6RziLcTcKsamJcPbgxWQqg0yClZOAZ1P7/HPQu0mvC5XyPEkvsGoWfbm
+   g==;
+X-CSE-ConnectionGUID: nNaPT6w6TjKEDw6FJzjN/A==
+X-CSE-MsgGUID: UdszTNO4SGS+X9qob3i6GA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483736"
+X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
+   d="scan'208";a="12483736"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:30:41 -0700
+X-CSE-ConnectionGUID: CnTd4yOLS/+wmBBb1YO8eg==
+X-CSE-MsgGUID: z2VoZNqHQp2nlbJpvKx2HQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
+   d="scan'208";a="48223850"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa010.jf.intel.com with ESMTP; 10 Jul 2024 13:30:41 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	aleksander.lobakin@intel.com,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	lihong.yang@intel.com,
+	willemb@google.com,
+	almasrymina@google.com
+Subject: [PATCH net-next 00/14][pull request] idpf: XDP chapter I: convert Rx to libeth
+Date: Wed, 10 Jul 2024 13:30:16 -0700
+Message-ID: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710001749.1388631-1-almasrymina@google.com>
- <20240710001749.1388631-6-almasrymina@google.com> <20240710094900.0f808684@kernel.org>
-In-Reply-To: <20240710094900.0f808684@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 10 Jul 2024 13:29:03 -0700
-Message-ID: <CAHS8izPnFxeEMEQkxq=A9Rp7T8ADJ__3eWfeQmC2hEBYQVzcvw@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 05/13] page_pool: devmem support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
-	Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 10, 2024 at 9:49=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 10 Jul 2024 00:17:38 +0000 Mina Almasry wrote:
-> > @@ -68,17 +107,103 @@ static inline netmem_ref page_to_netmem(struct pa=
-ge *page)
-> >
-> >  static inline int netmem_ref_count(netmem_ref netmem)
-> >  {
-> > +     /* The non-pp refcount of net_iov is always 1. On net_iov, we onl=
-y
-> > +      * support pp refcounting which uses the pp_ref_count field.
-> > +      */
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return 1;
-> > +
-> >       return page_ref_count(netmem_to_page(netmem));
-> >  }
->
-> How can this work if we had to revert the patch which made all of
-> the networking stack take pp-aware refs? Maybe we should add the
-> refcount, and let it be bumped, but WARN() if the net_iov is released
-> with refcount other than 1? Or we need a very solid explanation why
-> the conversion had to be reverted and this is fine.
->
+Alexander Lobakin says:
 
-Right, as you are aware, page refcounting is based on 2 refcounts: pp
-refs and full page refs. To be honest I find the 2-ref flow confusing
-and I made an effort to avoid porting this bit to net_iovs. net_iovs
-just supports 1 refcount, which is the pp-ref.
+XDP for idpf is currently 5 chapters:
+* convert Rx to libeth (this);
+* convert Tx and stats to libeth;
+* generic XDP and XSk code changes, libeth_xdp;
+* actual XDP for idpf via libeth_xdp;
+* XSk for idpf (^).
 
-My intention is that when a reference is needed on a net_iov, we
-obtain the pp-ref, and when we drop a reference on a net_iov, we drop
-the pp_ref. This is able to work for net_iov but not pages, because
-(as you explained to me) pages can be inserted into the net stack with
-full page refs. So when it comes to refcounting pages we need to be
-careful which ref to obtain or drop depending on is_pp_netmem() and
-skb->pp_recycle (as pp_recycle serves as a concurrency check, like you
-explained).
+Part I does the following:
+* splits &idpf_queue into 4 (RQ, SQ, FQ, CQ) and puts them on a diet;
+* ensures optimal cacheline placement, strictly asserts CL sizes;
+* moves currently unused/dead singleq mode out of line;
+* reuses libeth's Rx ptype definitions and helpers;
+* uses libeth's Rx buffer management for both header and payload;
+* eliminates memcpy()s and coherent DMA uses on hotpath, uses
+  napi_build_skb() instead of in-place short skb allocation.
 
-AFAICT, since net_iovs always originate from the net stack, we can
-make the simplification that they're always seeded with 1 pp-ref, and
-never support non-pp-refs. This simplifies the refcounting such that:
+Most idpf patches, except for the queue split, removes more lines
+than adds.
+Expect far better memory utilization and +5-8% on Rx depending on
+the case (+17% on skb XDP_DROP :>).
+---
+IWL history:
+From v1[0]:
+*  *: pick Reviewed-bys from Jake;
+* 01: new, add generic __cacheline_group_{begin,end}_aligned() and
+      a couple more cache macros;
+* 02: new, make use of new macros from 01;
+* 03: use macros from 01 (no more struct_group()), leave only
+      aggressive assertions here;
+* 07: adjust to the changes made in 01 and 03;
+      fix typos in the kdocs;
+* 13: fix typos in the commit message (Jakub);
+* 14: fix possible unhandled null skb (Simon, static checker).
 
-1. net_iov are always is_pp_netmem (they are never disconnected from
-the pp as they never have elevated non-pp refcount), and
-2. net_iov refcounting doesn't need to check skb->pp_recycle for
-refcounting, because we can be sure that the caller always has a
-non-pp ref (since it's the only one supported).
+From RFC[1]:
+*  *: add kdocs where needed and fix the existing ones to build cleanly;
+      fix minor checkpatch and codespell warnings;
+      add RBs from Przemek;
+* 01: fix kdoc script to understand new libeth_cacheline_group() macro;
+      add an additional assert for queue struct alignment;
+* 02: pick RB from Mina;
+* 06: make idpf_chk_linearize() static as it's now used only in one file;
+* 07: rephrase the commitmsg: HW supports it, but never wants;
+* 08: fix crashes on some configurations (Mina);
+* 11: constify header buffer pointer in idpf_rx_hsplit_wa().
 
-Currently, as written, I just realized I did not add net_iov support
-to __skb_frag_ref(). But net_iov does support skb_pp_frag_ref(). So
-there is no way to increment a non-pp ref for net_iov.
+Testing hints: basic Rx regression tests (+ perf and memory usage
+before/after if needed).
 
-If we want to add __skb_frag_ref() support for net_iov I suggest something =
-like:
+[0] https://lore.kernel.org/netdev/20240528134846.148890-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20240510152620.2227312-1-aleksander.lobakin@intel.com
 
-diff --git a/include/linux/skbuff_ref.h b/include/linux/skbuff_ref.h
-index 0f3c58007488a..02f7f4c7d4821 100644
---- a/include/linux/skbuff_ref.h
-+++ b/include/linux/skbuff_ref.h
-@@ -17,7 +17,13 @@
-  */
- static inline void __skb_frag_ref(skb_frag_t *frag)
- {
--       get_page(skb_frag_page(frag));
-+       netmem_ref netmem =3D skb_frag_netmem(frag);
-+
-+       /* netmem always uses pp-refs for refcounting. Never non-pp refs. *=
-/
-+       if (!netmem_is_net_iov(netmem))
-+               get_page(netmem_to_page(netmem));
-+       else
-+               page_pool_ref_netmem(netmem);
- }
+The following are changes since commit ce2f84ebcd857556f5ae9fc2d4ac720df1eb49d1:
+  Merge branch 'aquantia-phy-aqr115c' into main
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
 
-If you don't like the 1 ref simplification, I can definitely add a
-second refcount as you suggest, but AFAICT the simplification is safe
-due to how net_iov are originated, and maybe also because devmem usage
-in the net stack is limited due to all the skb_is_readable() checks,
-and it's possible that the edge cases don't reproduce. I was looking
-to find a concrete bug report with devmem before taking a hammer and
-adding a secondary refcount, rather than do it preemptively, but I'm
-happy to look into it if you insist.
+Alexander Lobakin (14):
+  cache: add __cacheline_group_{begin, end}_aligned() (+ couple more)
+  page_pool: use __cacheline_group_{begin, end}_aligned()
+  libeth: add cacheline / struct layout assertion helpers
+  idpf: stop using macros for accessing queue descriptors
+  idpf: split &idpf_queue into 4 strictly-typed queue structures
+  idpf: avoid bloating &idpf_q_vector with big %NR_CPUS
+  idpf: strictly assert cachelines of queue and queue vector structures
+  idpf: merge singleq and splitq &net_device_ops
+  idpf: compile singleq code only under default-n CONFIG_IDPF_SINGLEQ
+  idpf: reuse libeth's definitions of parsed ptype structures
+  idpf: remove legacy Page Pool Ethtool stats
+  libeth: support different types of buffers for Rx
+  idpf: convert header split mode to libeth + napi_build_skb()
+  idpf: use libeth Rx buffer management for payload buffer
 
-> >  static inline unsigned long netmem_to_pfn(netmem_ref netmem)
-> >  {
-> > +     if (netmem_is_net_iov(netmem))
-> > +             return 0;
-> > +
-> >       return page_to_pfn(netmem_to_page(netmem));
-> >  }
->
-> Can we move this out and rename it to netmem_pfn_trace() ?
-> Silently returning 0 is not generally okay, but since it's only
-> for tracing we don't care.
->
+ drivers/net/ethernet/intel/Kconfig            |   13 +-
+ drivers/net/ethernet/intel/idpf/Kconfig       |   26 +
+ drivers/net/ethernet/intel/idpf/Makefile      |    3 +-
+ drivers/net/ethernet/intel/idpf/idpf.h        |   11 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  152 +-
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |    2 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   88 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |    1 +
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  306 ++--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 1412 +++++++++--------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  734 +++++----
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  178 ++-
+ drivers/net/ethernet/intel/libeth/rx.c        |  132 +-
+ include/linux/cache.h                         |   59 +
+ include/net/libeth/cache.h                    |   66 +
+ include/net/libeth/rx.h                       |   19 +
+ include/net/page_pool/types.h                 |   22 +-
+ net/core/page_pool.c                          |    3 +-
+ 18 files changed, 1824 insertions(+), 1403 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/Kconfig
+ create mode 100644 include/net/libeth/cache.h
 
-Yes, I will do.
+-- 
+2.41.0
 
-> > +static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
-> > +{
-> > +     return (struct net_iov *)((__force unsigned long)netmem & ~NET_IO=
-V);
-> > +}
-> > +
-> > +static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
-> > +{
-> > +     return __netmem_clear_lsb(netmem)->pp_magic;
-> > +}
-> > +
-> > +static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long=
- pp_magic)
-> > +{
-> > +     __netmem_clear_lsb(netmem)->pp_magic |=3D pp_magic;
-> > +}
-> > +
-> > +static inline void netmem_clear_pp_magic(netmem_ref netmem)
-> > +{
-> > +     __netmem_clear_lsb(netmem)->pp_magic =3D 0;
-> > +}
-> > +
-> > +static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
-> > +{
-> > +     return __netmem_clear_lsb(netmem)->pp;
-> > +}
-> > +
-> > +static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *=
-pool)
-> > +{
-> > +     __netmem_clear_lsb(netmem)->pp =3D pool;
-> > +}
->
-> Why is all this stuff in the main header? It's really low level.
-> Please put helpers which are only used by the core in a header
-> under net/core/, like net/core/dev.h
-
-Sorry, will do.
-
---
-Thanks,
-Mina
 
