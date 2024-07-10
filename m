@@ -1,244 +1,184 @@
-Return-Path: <netdev+bounces-110502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92FE192CA63
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:08:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4931292CA68
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E1642854D1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 06:08:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C3381C220C8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 06:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C4054FAD;
-	Wed, 10 Jul 2024 06:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900A052F62;
+	Wed, 10 Jul 2024 06:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YzXK5JG+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvsRFLqV"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E14151C45
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 06:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA8A41C92
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 06:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720591705; cv=none; b=uuAiDZ2rXpx8vqN6pEhmDR6NO7LHy1cjh6oTQl9ZrYedtfqYn/skP+YUJ/D8O0NLfXcTfLvi+a+0j5xPZM8yQsS0JR5sZ3ZBACK1fPK+SDERHZH7oxgDC1PRSG6lNQzvgOJD55JagO+9pJ23AXk+pWcVu6/ucykp3adLftHygvY=
+	t=1720591851; cv=none; b=pDk3rMn98wdH9Lp3NQfOGX0z3bG9TEAIDyNz0bccjo5KHWIpe2gv16a4F57tZtbpFpKeSYkWgcJU2mGmMoOXlfy6gP8pJ3+YU7cDXu5y+oIyzaJ8JJM8nxDioWJ8ijDL1fbo8kUXnGCwdn2wn6bY8mjI5AMg2RhnorveDHx62wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720591705; c=relaxed/simple;
-	bh=0GSnnI2E75/xHcq1KRMe5imkyVdfr9Ns6f6e5UbgkiE=;
+	s=arc-20240116; t=1720591851; c=relaxed/simple;
+	bh=1OteSeEEKH0xI0Oh+CNKtD7aOdOLUK4Wax0gEtG/3rY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGjEHcMnw75xxrAuWZiuHJbr/E89QJGi2BK38+LVqOfU6eCHb9RSaPB2mLbxqf6mMnQqBu+y/1i0BaJCaJvnx10G1f7s/8gpYmAk73mXPw11ieC2mahVN0omYwQFX0B74rm6ahl9e4RpBJMI1KWsWufYqRkXXbtav+dfwX2Q4Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YzXK5JG+; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=te9ZRXR9K3fDu73Ue6atIrQ/hsn7V0B9h/Mw4AlW1nvzDS6md9pexLMI/9aTaxUQzH3rGj+YNQI1eRM6+x0IcKRW6FEqTVhbHU0JXtcA9wEWn06/AN7aIcDfNcRMPPSioDnOjfI5ihD5Y4RYWIupSr/c69cwrE+OokO4ybiGgLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dvsRFLqV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720591702;
+	s=mimecast20190719; t=1720591848;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+a5Bsaje1eJa/kkPg7uCWmicdAXq2GafTFhZCyZDwSc=;
-	b=YzXK5JG+iCS/za/kTeAQPMIF+KrxIeUKnGBEf4DWGl5NEHG+eh299l1IsM70yIWG+DXPZt
-	aoKeR5NLg8oM0uPCzX3Q3CsjHROVRGOtIrMxmI/Hja2q62S9Z/lFNwbCZsELNRU2hziTJV
-	tb2ibkLLuqJWAAMAsr4m4pn+xN/HoEE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=X4MsH1lA4eWc8gvy+b6nRd+irAYUf4vc/vQAj43j3S8=;
+	b=dvsRFLqVVes0doTNK7yYNnH7tlVnP+/H8jWYAtril39/PogA1o2ZJBzQ4viAfpHeZ34jLK
+	mvKdX0iQ6pqbhXBnFOii90Zl3CVtDih3wbROcPNFynFpcrHBDVcUlFvgAfa04W41/EuvLx
+	K+zbjJBh9uN874dj0uFHAaCmNN7mfXo=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-Zl_ulF0kMRWLsymw5u-CzA-1; Wed, 10 Jul 2024 02:08:20 -0400
-X-MC-Unique: Zl_ulF0kMRWLsymw5u-CzA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4265f7f395cso28071955e9.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 23:08:20 -0700 (PDT)
+ us-mta-346-9b-Z5lkuOwemotDq0Potfw-1; Wed, 10 Jul 2024 02:10:47 -0400
+X-MC-Unique: 9b-Z5lkuOwemotDq0Potfw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52ea249d1c9so5619858e87.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 23:10:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720591695; x=1721196495;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+a5Bsaje1eJa/kkPg7uCWmicdAXq2GafTFhZCyZDwSc=;
-        b=tuTDwAByzhK0wsFE4G9RwadF0AI+kX9fzNqqGXakcG4H36vFVcYw0ejQvm6NbPnQHm
-         oAoblcUErZd89bTjCQKByWoGyEaf+qds7m4iN3Ith+Kr3PjPye/PK0hIGPsngywC4b/0
-         7yASZ126afO8cNUpdPHKq0rCE7AAjChA6d0j9n/SNVK8DMJ0RhlA4KZ5lQrUnSfZybEa
-         HCeeYUGEvnj9s/yhTnNIe1jQP/LBDlH1rUF1y7fwKNHIH7tSpUs6Jvie6L+SmC1jB15o
-         4B0HDXK8oG1TFSohK8aCfDY90fk/JS6ORp942aI24eITrZj6z/6GpbOlLAef/Y6cil3p
-         jm3Q==
-X-Gm-Message-State: AOJu0Yxys/xmOnnhZgqCdQ1vNqPhgdjHcJQpIjsO4eZuMAMPyWBZ+vLN
-	nxm16rTQbvjOi5DteL7aZRzf66gixPz19nPl6nlTFRdP/hBSXUxb30+PDAhdkC1/AwHKuLmabnr
-	etKWQocM0bf4PmrFkjbKxAHFZhx+a0yrFN6/M182MDjvQ9esFCMuOJA==
-X-Received: by 2002:a5d:548b:0:b0:362:c7b3:764c with SMTP id ffacd0b85a97d-367ceac47bfmr3031052f8f.48.1720591694648;
-        Tue, 09 Jul 2024 23:08:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHSNewYLXe+QfNePgWKsGj1IbTMsfyHo7p6gwn0lDSCj5oPC4X9trCqnic5Odo00Hvu/C7feg==
-X-Received: by 2002:a5d:548b:0:b0:362:c7b3:764c with SMTP id ffacd0b85a97d-367ceac47bfmr3031020f8f.48.1720591693882;
-        Tue, 09 Jul 2024 23:08:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720591846; x=1721196646;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X4MsH1lA4eWc8gvy+b6nRd+irAYUf4vc/vQAj43j3S8=;
+        b=J4R+9cnYs5f00Cwpxg878OgF+Dit1vZT74o/hvrfyPPBL3mhqgsX7eyLYdi2r5g35s
+         sgR0500ZyFSpqybPcOPT0LxDcL9/nphtGNzJrybRSc2WgTri+fnsLp+HgRt4MwM7XEJr
+         JjyV9TmvMjtLsU5kJAqWfGoDXVXdPFGC19/ZRXjsrDlZm4RwlswfC71cBddefK9K5YU3
+         fuZ3o7EqCuAYuRnSDFG1HhMUQ5jH+arxnoERJFgs5wNDVZW9aGwtSW/cFIY4+hnYK4lO
+         Z4hsDly10Z9dQ9q9QfG5J9lcDcX29BbtZPCgTTjGVvuY2NJVFzq1vG9vOyDpu9RAXuS2
+         7jSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXSXk0LgmqqogFLg2qiVy4ujQWfd1+0In/DFGdp20+0nBR2+KO0rNH4VZvdnbK3FkIKqV2ssiAA4l0wY2PDWtcsWlb/jLN
+X-Gm-Message-State: AOJu0YymO1/IbN5x4P8UoAn8P1VqsGNiYZlIab5d2zXm75OF8feMklCI
+	2a7VQnovVJimjQt+inbjqXG0/ziQp2mYfIvc/Y819Hh9TISAaBE+3bw4gyrRWtkN0yAsp9j9NYb
+	DwNd8P5nZBjdgnbi6d1NtJ0zylcr3FD0AW/OtM7ySu1EzH+ld41X2GA==
+X-Received: by 2002:ac2:42d8:0:b0:52b:b327:9c1c with SMTP id 2adb3069b0e04-52eb99d59e8mr2530503e87.62.1720591845786;
+        Tue, 09 Jul 2024 23:10:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPbauTJ9QFnUJHiEZRXf8cKpY/Ph2hFs+oVaX3YRKAndRpINbHSQxy+Oi4OwHlpwQjmGnGuw==
+X-Received: by 2002:ac2:42d8:0:b0:52b:b327:9c1c with SMTP id 2adb3069b0e04-52eb99d59e8mr2530479e87.62.1720591845031;
+        Tue, 09 Jul 2024 23:10:45 -0700 (PDT)
 Received: from redhat.com ([2a02:14f:174:f6ae:a6e3:8cbc:2cbd:b8ff])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cde848e7sm4291385f8f.44.2024.07.09.23.08.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266b03feecsm101417875e9.10.2024.07.09.23.10.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 23:08:12 -0700 (PDT)
-Date: Wed, 10 Jul 2024 02:08:06 -0400
+        Tue, 09 Jul 2024 23:10:43 -0700 (PDT)
+Date: Wed, 10 Jul 2024 02:10:37 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v8 00/10] virtio-net: support AF_XDP zero copy
-Message-ID: <20240710020746-mutt-send-email-mst@kernel.org>
-References: <20240708112537.96291-1-xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, Parav Pandit <parav@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	"sgarzare@redhat.com" <sgarzare@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Leonardo Milleri <lmilleri@redhat.com>
+Subject: Re: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240710020852-mutt-send-email-mst@kernel.org>
+References: <20240708064820.88955-1-lulu@redhat.com>
+ <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
+ <20240709084109-mutt-send-email-mst@kernel.org>
+ <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240708112537.96291-1-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
 
-On Mon, Jul 08, 2024 at 07:25:27PM +0800, Xuan Zhuo wrote:
-> v8:
->     1. virtnet_add_recvbuf_xsk() always return err, when encounters error
+On Wed, Jul 10, 2024 at 11:05:48AM +0800, Jason Wang wrote:
+> On Tue, Jul 9, 2024 at 8:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jul 09, 2024 at 02:19:19PM +0800, Cindy Lu wrote:
+> > > On Tue, 9 Jul 2024 at 11:59, Parav Pandit <parav@nvidia.com> wrote:
+> > > >
+> > > > Hi Cindy,
+> > > >
+> > > > > From: Cindy Lu <lulu@redhat.com>
+> > > > > Sent: Monday, July 8, 2024 12:17 PM
+> > > > >
+> > > > > Add support for setting the MAC address using the VDPA tool.
+> > > > > This feature will allow setting the MAC address using the VDPA tool.
+> > > > > For example, in vdpa_sim_net, the implementation sets the MAC address to
+> > > > > the config space. However, for other drivers, they can implement their own
+> > > > > function, not limited to the config space.
+> > > > >
+> > > > > Changelog v2
+> > > > >  - Changed the function name to prevent misunderstanding
+> > > > >  - Added check for blk device
+> > > > >  - Addressed the comments
+> > > > > Changelog v3
+> > > > >  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doit
+> > > > >  - Add a lock for the network device's dev_set_attr operation
+> > > > >  - Address the comments
+> > > > >
+> > > > > Cindy Lu (2):
+> > > > >   vdpa: support set mac address from vdpa tool
+> > > > >   vdpa_sim_net: Add the support of set mac address
+> > > > >
+> > > > >  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++++++++++++
+> > > > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
+> > > > >  include/linux/vdpa.h                 |  9 ++++
+> > > > >  include/uapi/linux/vdpa.h            |  1 +
+> > > > >  4 files changed, 109 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > --
+> > > > > 2.45.0
+> > > >
+> > > > Mlx5 device already allows setting the mac and mtu during the vdpa device creation time.
+> > > > Once the vdpa device is created, it binds to vdpa bus and other driver vhost_vdpa etc bind to it.
+> > > > So there was no good reason in the past to support explicit config after device add complicate the flow for synchronizing this.
+> > > >
+> > > > The user who wants a device with new attributes, as well destroy and recreate the vdpa device with new desired attributes.
+> > > >
+> > > > vdpa_sim_net can also be extended for similar way when adding the vdpa device.
+> > > >
+> > > > Have you considered using the existing tool and kernel in place since 2021?
+> > > > Such as commit d8ca2fa5be1.
+> > > >
+> > > > An example of it is,
+> > > > $ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:55 mtu 9000
+> > > >
+> > > Hi Parav
+> > > Really thanks for your comments. The reason for adding this function
+> > > is to support Kubevirt.
+> > > the problem we meet is that kubevirt chooses one random vdpa device
+> > > from the pool and we don't know which one it going to pick. That means
+> > > we can't get to know the Mac address before it is created. So we plan
+> > > to have this function to change the mac address after it is created
+> > > Thanks
+> > > cindy
+> >
+> > Well you will need to change kubevirt to teach it to set
+> > mac address, right?
 > 
-> v7:
->     1. some small fixes
+> That's the plan. Adding Leonardo.
 > 
-> v6:
->     1. start from supporting the rx zerocopy
-> 
-> v5:
->     1. fix the comments of last version
->         http://lore.kernel.org/all/20240611114147.31320-1-xuanzhuo@linux.alibaba.com
-> v4:
->     1. remove the commits that introduce the independent directory
->     2. remove the supporting for the rx merge mode (for limit 15
->        commits of net-next). Let's start with the small mode.
->     3. merge some commits and remove some not important commits
+> Thanks
 
+So given you are going to change kubevirt, can we
+change it to create devices as needed with the
+existing API?
 
-Series:
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ## AF_XDP
-> 
-> XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
-> copy feature of xsk (XDP socket) needs to be supported by the driver. The
-> performance of zero copy is very good. mlx5 and intel ixgbe already support
-> this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
-> feature.
-> 
-> At present, we have completed some preparation:
-> 
-> 1. vq-reset (virtio spec and kernel code)
-> 2. virtio-core premapped dma
-> 3. virtio-net xdp refactor
-> 
-> So it is time for Virtio-Net to complete the support for the XDP Socket
-> Zerocopy.
-> 
-> Virtio-net can not increase the queue num at will, so xsk shares the queue with
-> kernel.
-> 
-> On the other hand, Virtio-Net does not support generate interrupt from driver
-> manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
-> NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
-> is also the local CPU, then we wake up napi directly.
-> 
-> This patch set includes some refactor to the virtio-net to let that to support
-> AF_XDP.
-> 
-> ## Run & Test
-> 
-> Because there are too many commits, the work of virtio net supporting af-xdp is
-> split to rx part and tx part. This patch set is for rx part.
-> 
-> So the flag NETDEV_XDP_ACT_XSK_ZEROCOPY is not added, if someone want to test
-> for af-xdp rx, the flag needs to be adding locally.
-> 
-> ## performance
-> 
-> ENV: Qemu with vhost-user(polling mode).
-> Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-> 
-> ### virtio PMD in guest with testpmd
-> 
-> testpmd> show port stats all
-> 
->  ######################## NIC statistics for port 0 ########################
->  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
->  RX-errors: 0
->  RX-nombuf: 0
->  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
-> 
-> 
->  Throughput (since last show)
->  Rx-pps:   8861574     Rx-bps:  3969985208
->  Tx-pps:   8861493     Tx-bps:  3969962736
->  ############################################################################
-> 
-> ### AF_XDP PMD in guest with testpmd
-> 
-> testpmd> show port stats all
-> 
->   ######################## NIC statistics for port 0  ########################
->   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
->   RX-errors: 0
->   RX-nombuf:  0
->   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
-> 
->   Throughput (since last show)
->   Rx-pps:      6333196          Rx-bps:   2837272088
->   Tx-pps:      6333227          Tx-bps:   2837285936
->   ############################################################################
-> 
-> But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
-> 
-> Please review.
-> 
-> Thanks.
-> 
-> v3
->     1. virtio introduces helpers for virtio-net sq using premapped dma
->     2. xsk has more complete support for merge mode
->     3. fix some problems
-> 
-> v2
->     1. wakeup uses the way of GVE. No send ipi to wakeup napi on remote cpu.
->     2. remove rcu. Because we synchronize all operat, so the rcu is not needed.
->     3. split the commit "move to virtio_net.h" in last patch set. Just move the
->        struct/api to header when we use them.
->     4. add comments for some code
-> 
-> v1:
->     1. remove two virtio commits. Push this patchset to net-next
->     2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
->     3. fix some warnings
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> Xuan Zhuo (10):
->   virtio_net: replace VIRTIO_XDP_HEADROOM by XDP_PACKET_HEADROOM
->   virtio_net: separate virtnet_rx_resize()
->   virtio_net: separate virtnet_tx_resize()
->   virtio_net: separate receive_buf
->   virtio_net: separate receive_mergeable
->   virtio_net: xsk: bind/unbind xsk for rx
->   virtio_net: xsk: support wakeup
->   virtio_net: xsk: rx: support fill with xsk buffer
->   virtio_net: xsk: rx: support recv small mode
->   virtio_net: xsk: rx: support recv merge mode
-> 
->  drivers/net/virtio_net.c | 770 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 676 insertions(+), 94 deletions(-)
-> 
-> --
-> 2.32.0.3.g01195cf9f
+> >
+> > --
+> > MST
+> >
 
 
