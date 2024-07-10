@@ -1,183 +1,148 @@
-Return-Path: <netdev+bounces-110625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCE192D851
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:39:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F4692D925
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 21:30:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9511A1F225D0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:39:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22CC71C20B70
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 19:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D249195F28;
-	Wed, 10 Jul 2024 18:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B67198822;
+	Wed, 10 Jul 2024 19:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpjxA57B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OqZsEAaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0CA257D;
-	Wed, 10 Jul 2024 18:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286078289C
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 19:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720636745; cv=none; b=mnaL9Ahs2nrj7Qz9V5kmNcLpgi22yeUMDezvKS6sItKvvlKeFJgCNYtNESoAQfVevt1CIGwAvQ0YB89zYmvqd24JRIy06A65upkd7MDiyBIxYzonFu8+O43qBYGPBKaVTy7Sn0zLG05CI0GXeI/CZJoBKLgI+CrfSBvBo5ZONlw=
+	t=1720639812; cv=none; b=efTNaVTxI1ZBR+V88HymY12vZvTEZhhHl6ZAIu+lmqUMNpq5mf/CXOCjWi6S/sAKu1GceceO0UBMBLnLtIZaIdCRwuYiENeMr0H5GluAVm5k/fBVQloxarZiL21Z+PpD1iEApPdsRD1sM9C1nd7YmilOpkCpKJ/ji1s6GbWNNUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720636745; c=relaxed/simple;
-	bh=1EoAa/AmhNuclk2x9Yo4mBdL40sJBA6UUazcYZTxKQQ=;
+	s=arc-20240116; t=1720639812; c=relaxed/simple;
+	bh=vBkDVZIJ1rRSVbjZ4GxH5dqIovbWI6t7z6ZQdTM1ZJ4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WZKIj4NJH8P8dWYSpt27Se5z3zm/OM/9VaR31dn4pCAm7FFuXD87R9lzsx3eS6z8qRIV6VfBj+oPsEkhWk3E1vEu6FsLulM+HNm8JIhlbmRfGq1TPdvZiw8QU9prBRGkAPOa30GFKWaljt+z/AHzicf3yUrqZ3r64G24mtIiQOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpjxA57B; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-367b8a60b60so2861599f8f.2;
-        Wed, 10 Jul 2024 11:39:02 -0700 (PDT)
+	 To:Cc:Content-Type; b=OUgANzDytYAtQbY9pGh/+CHdX0a2UCujrsXBBiioZiRjqP4PpvT0F/UzuUcLOoaFW9L58yN3oJhizG2/EyMqN6vdDjJBcpHV6NqyFHZy2PHev3InNldXNL/ualoqLeZpxlfG5qrzdKSHWqyzDFk24d/bKfPp6+434JrLY8WBPb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OqZsEAaa; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6b5def3916bso846026d6.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 12:30:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720636741; x=1721241541; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720639810; x=1721244610; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6+c/uAX+gfaXTN3G9nM1mEmOxMkFaMUwGwxmh1TvO3g=;
-        b=JpjxA57Bnc/MNIG0IwI+9lG5/jH/Q1rMo+Szc9sJBwNXrvsO3WIr5OfgGMiZuq1D+Z
-         XYEd99Avg/5SgFrAEe6FRO/Lgz/fDLfNJ6un3+G140O4V7SZu4o0u3256uZ9HNH3s/y1
-         kZrcHNtJ49zljfjCLI32pKauLZ4OQ5zvl7oCFBNwoVeVc1k92ZpXGvbB9WluGjHC4Tbs
-         0Y4OXKBTJZ6JKllWH5VQNIYVbjU6e18j41+LuI9nmbjSr+HfGR5vXhbBOsx7B0aJVVmO
-         fl8b+uoEuhazj76TpqLf+xV9nyKcYvBDcBTonfq7jbLCSrlnK6zD4hr0bywApqAVa9al
-         g/4Q==
+        bh=TF9673pSKaG/iNj3QtazN19JWkU+6gU585Ojo9AihIY=;
+        b=OqZsEAaa1a5jqFMHFpslkD2j7n7HaqTLG7spVFgAz1qdJZ0JF6PyKAswzdU5e+XPfH
+         yTTt3zL2Mn6yGX/rpyjU0PVv8HmynNWyXLmpTyE0oMvSbkn+mKaW+PTIdCyHMVx7CfJe
+         voSJBUmeMcyAMOgs6Ch5+HIUt6LA7fItUtpKKtw6pqb3ejMSJITTd73AfzpNc68517c3
+         lG7FyrM8M1LFAc6m4jWZEiLfJId7uhyvQ40Ggr/kQqtcXO4JZos+RYZLSd7GgscPB+kT
+         uc4yfor3qNjc32CoYs0f/2oGgNRjl22iySaHo4HpSXKjb4ix1TMsUa+txl3wmrchMpHw
+         wbBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720636741; x=1721241541;
+        d=1e100.net; s=20230601; t=1720639810; x=1721244610;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6+c/uAX+gfaXTN3G9nM1mEmOxMkFaMUwGwxmh1TvO3g=;
-        b=uv8agK8IBI9FNrRIblFX3a17aW1Vs7tD4i4D+jK4cN31cu/RKEH0DZcLWC1WtYdqla
-         YE7j3lo0zuzsYfbguKWSPrr2yQVjAnww6ZENLmRnLiHWEGQP6Po9h4TP/rqAI5Yb4iHl
-         i9iGbCf3i3YxsJo18qKX+TU8lkaLE5nrHqix5K3vsKRklXk515U+WJmGMVNrJeA9nxSq
-         3DF+Q6MUs9bi1M91S/J0IQxv6GE5BoVq0cBQpzN7hJaTXwyFFXT0BrS4/bEHPKzhIlCX
-         mQUKIc9ckF+rjTtPDOhT6aaPvULKs56iZpIlpzhljnmIgEYkoeDmDJHpa1QICJ/C9SC7
-         hKCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRCAtvUlCKGukrKJ+Vr1+a6WxRedKMeDlpvJp01UIfnzjo2gd5EUWj7oFWHZrFX6Oo625p6EV9Eww08Yuoy+0P7G1VjZfmLL3FT4taW4b4Lw7wnOE25LUqBLwYahyynm54dNs8U4nKifOyXhjx+XCdJX/fJdO64LAs
-X-Gm-Message-State: AOJu0YyZ+szd5ikqk496nhyKmZBYgjv67WklRpnZRCPsN46sjGtxcMjr
-	5aNmWxmFckWHNQTUf9ZE9codnjXYDP4OBn4WWxov2uwNkH2cUhPlQCh91htLq4A9gxIFC/MYtxN
-	b5SwfjdZ+jFRbsA/dJKCzO1b0A1g=
-X-Google-Smtp-Source: AGHT+IHsPP8rxAlZIrz6b3npTF1WDVE0RTBSUFNCW6j7UhoywHqT7giMNyX2dg9WJV7T5/7TbXcgdf4Kz62f7Me8m9M=
-X-Received: by 2002:adf:e692:0:b0:366:ec2f:dbc9 with SMTP id
- ffacd0b85a97d-367ceac4ba5mr4214557f8f.51.1720636740515; Wed, 10 Jul 2024
- 11:39:00 -0700 (PDT)
+        bh=TF9673pSKaG/iNj3QtazN19JWkU+6gU585Ojo9AihIY=;
+        b=SHqtDK7Gj7HxV+kHoIiIp68fefn6Nb46AHCJLLBzx894c9+xFWkVQd+5IuLtvYvxRz
+         mSsKVC+klCFET57VdiU2uTm9Rn1rFD/KyfMvGa0cZOorHeINpXCuqnj/JEjiJ6jZ2X0u
+         S/itVSCScu/4w15RA0nGfVwe1TDEPWxyiw9nEuWgBPXgpUXtmGO8dKwLkFqu+xx2tRPP
+         nzAfEm6ilrd+FHcdS0QxGOrL4a6MPxhnjeB8iAwONbXqLhcatYNvjV5QfAMVBxcitLlr
+         f2rkyC8iI+4+RlSh6Y3/4C/upN2PpspfzdBtcJX2r+cTWVz50DO+5QuRpLplQR/YaR8O
+         TsUw==
+X-Gm-Message-State: AOJu0YwzB4GjkAbjMhzaOIeX2uxrqgNyEmmbbvVKZajbf0U2RS5cA8Ov
+	sMpbg8QiM+l9di0hpRvBNrz4bwtuMNtggPlm2K7PdtXdAzIXYMfqcxr+x+jiPObxBcwqNsTOZA5
+	tVRV3QXqb3ypat3vGATv+fdqx/Viy4fk1Pinw
+X-Google-Smtp-Source: AGHT+IEMdp+uG7mJVElTTW/yEL8BYiZ2DRk3V7ywILd2rFJRrtwJG6ibX6vnK3fQMtsopMVC0v6jyUjKFfJoaAWAji4=
+X-Received: by 2002:a05:6214:20a4:b0:6b5:34b:8c02 with SMTP id
+ 6a1803df08f44-6b61bcf32cbmr76578266d6.27.1720639809913; Wed, 10 Jul 2024
+ 12:30:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710084633.2229015-1-michal.switala@infogain.com>
-In-Reply-To: <20240710084633.2229015-1-michal.switala@infogain.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 10 Jul 2024 11:38:49 -0700
-Message-ID: <CAADnVQJPzya3VkAajv02yMEnQLWtXKsHuzjZ1vQ6R19N_BZkTQ@mail.gmail.com>
-Subject: Re: [PATCH] bpf: Ensure BPF programs testing skb context initialization
-To: Michal Switala <michal.switala@infogain.com>
-Cc: Florent Revest <revest@google.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
+References: <20240710001749.1388631-1-almasrymina@google.com>
+ <20240710001749.1388631-5-almasrymina@google.com> <20240710093624.26d22f02@kernel.org>
+In-Reply-To: <20240710093624.26d22f02@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 10 Jul 2024 12:29:58 -0700
+Message-ID: <CAHS8izOoM3YfcQorLJXL4H+t2OL+oJ4fPP5ZBJRhnH5AxsUqfQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 04/13] netdev: netdevice devmem allocator
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 10, 2024 at 4:58=E2=80=AFAM Michal Switala
-<michal.switala@infogain.com> wrote:
+On Wed, Jul 10, 2024 at 9:37=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> This commit addresses an issue where a netdevice was found to be uninitia=
-lized.
-> To mitigate this case, the change ensures that BPF programs designed to t=
-est
-> skb context initialization thoroughly verify the availability of a fully
-> initialized context before execution.The root cause of a NULL ctx stems f=
-rom
-> the initialization process in bpf_ctx_init(). This function returns NULL =
-if
-> the user initializes the bpf_attr variables ctx_in and ctx_out with inval=
-id
-> pointers or sets them to NULL. These variables are directly controlled by=
- user
-> input, and if both are NULL, the context cannot be initialized, resulting=
- in a
-> NULL ctx.
+> On Wed, 10 Jul 2024 00:17:37 +0000 Mina Almasry wrote:
+> > +     net_devmem_dmabuf_binding_get(binding);
 >
-> Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Dcca39e6e84a367a7e6f6
-> Link: https://lore.kernel.org/all/000000000000b95d41061cbf302a@google.com=
-/
+> Why does every iov need to hold a ref? pp holds a ref and does its own
+> accounting, so it won't disappear unless all the pages are returned.
 
-Something doesn't add up.
-This syzbot report is about:
+I guess it doesn't really need to, but this is the design/approach I
+went with, and I actually prefer it a bit. The design is borrowed from
+how struct dev_pagemap does this, IIRC. Every page allocated from the
+pgmap holds a reference to the pgmap to ensure the pgmap doesn't go
+away while some page that originated from it is out in the wild, and
+similarly I did so in the binding here.
 
-dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
-__xdp_do_redirect_frame net/core/filter.c:4397 [inline]
-bpf_prog_test_run_xdp
+We could assume that the page_pool is accounting iovs for us, but that
+is not always true, right? page_pool_return_page() disconnects a
+netmem from the page_pool and AFAIU the page_pool can go away while
+there is such a netmem still in use in the net stack. Currently this
+can't happen with iovs because I currently don't support non-pp
+refcounting for iovs (so they're always recyclable), but you have a
+comment on the other patch asking why that works; depending on how we
+converge on that conversation, the details of how the pp refcounting
+could change.
 
-while you're fixing bpf_prog_test_run_skb ?
+It's nice to know that the binding refcounting will work regardless of
+the details of how the pp refcounting works. IMHO having the binding
+rely on the pp refcounting to ensure all the iovs are freed introduces
+some fragility.
 
-pw-bot: cr
+Additionally IMO the net_devmem_dmabuf_binding_get/put aren't so
+expensive to want to optimize out, right? The allocation is a slow
+path anyway and the fast path recycles netmem.
 
-> Signed-off-by: Michal Switala <michal.switala@infogain.com>
-> ---
->  net/bpf/test_run.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 36ae54f57bf5..8b2efcee059f 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -970,7 +970,7 @@ static struct proto bpf_dummy_proto =3D {
->  int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *k=
-attr,
->                           union bpf_attr __user *uattr)
->  {
-> -       bool is_l2 =3D false, is_direct_pkt_access =3D false;
-> +       bool is_l2 =3D false, is_direct_pkt_access =3D false, ctx_needed =
-=3D false;
->         struct net *net =3D current->nsproxy->net_ns;
->         struct net_device *dev =3D net->loopback_dev;
->         u32 size =3D kattr->test.data_size_in;
-> @@ -998,6 +998,34 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, con=
-st union bpf_attr *kattr,
->                 return PTR_ERR(ctx);
->         }
->
-> +       switch (prog->type) {
-> +       case BPF_PROG_TYPE_SOCKET_FILTER:
-> +       case BPF_PROG_TYPE_SCHED_CLS:
-> +       case BPF_PROG_TYPE_SCHED_ACT:
-> +       case BPF_PROG_TYPE_XDP:
-> +       case BPF_PROG_TYPE_CGROUP_SKB:
-> +       case BPF_PROG_TYPE_CGROUP_SOCK:
-> +       case BPF_PROG_TYPE_SOCK_OPS:
-> +       case BPF_PROG_TYPE_SK_SKB:
-> +       case BPF_PROG_TYPE_SK_MSG:
-> +       case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
-> +       case BPF_PROG_TYPE_LWT_SEG6LOCAL:
-> +       case BPF_PROG_TYPE_SK_REUSEPORT:
-> +       case BPF_PROG_TYPE_NETFILTER:
-> +       case BPF_PROG_TYPE_LWT_IN:
-> +       case BPF_PROG_TYPE_LWT_OUT:
-> +       case BPF_PROG_TYPE_LWT_XMIT:
-> +               ctx_needed =3D true;
-> +               break;
-> +       default:
-> +               break;
-> +       }
-> +
-> +       if (!ctx && ctx_needed) {
-> +               kfree(data);
-> +               return -EINVAL;
-> +       }
-> +
->         switch (prog->type) {
->         case BPF_PROG_TYPE_SCHED_CLS:
->         case BPF_PROG_TYPE_SCHED_ACT:
-> --
-> 2.43.0
->
->
+--
+Thanks,
+Mina
 
