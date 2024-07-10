@@ -1,59 +1,99 @@
-Return-Path: <netdev+bounces-110539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1D492CF19
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 12:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F0A92CF29
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 12:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 405BFB276C4
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECC66B2813C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B9118FDD2;
-	Wed, 10 Jul 2024 10:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B1A19006B;
+	Wed, 10 Jul 2024 10:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FVCSFrDq"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="MoKCsSlN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ag2jSf4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow7-smtp.messagingengine.com (flow7-smtp.messagingengine.com [103.168.172.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EDB18FDD0
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 10:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79DC190068;
+	Wed, 10 Jul 2024 10:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720606862; cv=none; b=JxkO6ht5Qx8+KMYh4G0ZnDUKGRu59EW1b7UsFx7TaXmIbkldL+vt0FRFcR+UL+gmK2LIkYpPAx0edozTHrbJ5tLh9OcRFaRCB05+AAZnZDt6TeNWXrHnJlc3T+E0YEKe9jJ8pe3ZFPKn4wbpFbyacu4CMTAQ2WrdicMWhf7A2gQ=
+	t=1720607102; cv=none; b=ItHXInvVZ9FFSI4q7Urjkz/EYWxo4AOLsHJrkZepzkF4DKMCd7552B/5Xi2Ue5po9iJvVkMk4Jqv2/LWE+INbUx9652Ld0X3pZmsSlspeL44bCV78Xed8ARfIZ6l7KfShblphTrDgsiWobQ3t05+4+hSc0ErVIwwNLvc+CanQlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720606862; c=relaxed/simple;
-	bh=WiNvkVpIVCRRM3eZpny0hs14S0obVT62r3YQoIJJIqw=;
+	s=arc-20240116; t=1720607102; c=relaxed/simple;
+	bh=FC04BLdIs8tuiDfvf/c1ZzpMpSeOaRa/C5ZTu2v8tNw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hctjQzL3uNZg/dSx5UI3PiappJe+ssf4wOpiOffSUABOWbjRX4AWZTCMPw1Uc4R3if0jeIhCPdpBMojeo+ZoSfNyyW0Z1H2AAf1Rl9UtozzXi7OMUgcpDItbijxrhFaHqiL+crjfj9T+R7eCOlktQ4AtI3J43n63Epm1pHahcOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FVCSFrDq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05815C32781;
-	Wed, 10 Jul 2024 10:20:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720606862;
-	bh=WiNvkVpIVCRRM3eZpny0hs14S0obVT62r3YQoIJJIqw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FVCSFrDqh/qJ+umBn6cB9JxHYphWCeMIg7zoJCIJuvfWLEqktgqzYWe5C82w7Acur
-	 NwY6D1Xzba4a/SnmGKZa3lUSJ/uSD1xAqZMxcpaQdl9ZSX775xxsM+buKzFOQxKSZn
-	 4Jzg/FW4RwSatcfhfz+m7ajybgklNSvyb4p3rW98j5ankDhzyA+2u2OBUq5D/NSdz3
-	 jXqMhMe0jOujW0q9VZhknH3xaNV0/0mVC1V8DnN29c/dLzCpwe/FaeB86xXewklj/Z
-	 g0o8lYkaIoh9a9sIdDQbdjSgKzSTGzVNPv+YSRmHN9lSlxaKAPTj6u/VYdEpUT0gZn
-	 Oq6pS/oONYR0A==
-Date: Wed, 10 Jul 2024 11:20:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>, sasha.neftin@intel.com,
-	hui.wang@canonical.com, pmenzel@molgen.mpg.de,
-	Todd Brandt <todd.e.brandt@intel.com>,
-	Dieter Mummenschanz <dmummenschanz@web.de>,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: Re: [PATCH net] e1000e: fix force smbus during suspend flow
-Message-ID: <20240710102057.GS346094@kernel.org>
-References: <20240709203123.2103296-1-anthony.l.nguyen@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sMZfBsM7AyZ9yXEd9zjroety0vBtDGqDI33UMr8+XU5x/2IbUwhGtA9eIa5DCiEe6AZJ+h8y2tqIGDj5eHvXJ+YxvnZ8rEE2p3eyNiDq2UzrqDOqKkRsL5Td4YhsCa/604IWOtgbQ1D+xZ8vuWaWyWKa/RfYcJdUV0I0n+sTStw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=MoKCsSlN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ag2jSf4s; arc=none smtp.client-ip=103.168.172.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailflow.nyi.internal (Postfix) with ESMTP id BCD602004B2;
+	Wed, 10 Jul 2024 06:24:59 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Wed, 10 Jul 2024 06:24:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1720607099; x=1720614299; bh=VVZAdYDgdn
+	sfeF4pUTyu7FXWVOGM6tvVCvnnRo6O8PU=; b=MoKCsSlNBy6bgouajIyVgN/zhj
+	Er7/Rk9QqGPtZr/wVKqy44VGRa6XWubW2QuWxhsDYV4h0Z3WPhWkAmNTW4YvAXdf
+	BrGZBFhqVq8HJx1ld5AkVqGCYjiSewKpNW/3OBqJPA5Cd20v3vWVU+2+Lhp6aMg7
+	2eMaCLJtFGuVQvIOHqjx7ObNeIuLHPOwc6Km/27ctjP3DEJEcMISrDlrKRSqneb0
+	uUBiRxFIuKrOdoDWy0ECYxuvSF1jNCmBJXWPNKrQM30SJ7y5c7jLDDjV7QhCYmse
+	YT4qiCzCy+4R7CKjFIf1pzZd+e0jo3DXp66qz6+xVmlyLevuDgIoxJyiTYFg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1720607099; x=1720614299; bh=VVZAdYDgdnsfeF4pUTyu7FXWVOGM
+	6tvVCvnnRo6O8PU=; b=ag2jSf4sQ+V5anT5AGga62piqqrUy5vQAjmyDo75xrTz
+	Yxs0Oq/RKG9xLEJL0fQRszct7rYSaCbAAteXH/FQ+57huUJFbQ3IDaGpYeycTDTp
+	Wlg5RU5Ve9q+8ifuFbDNfqsjJOwIh4LiWWvsy9wGMCFREXiriucmzNoeR6un1mEW
+	+6ngYPUBMjTAbg1OB1g+zvNtog5AQVnx5d+sD5mZsz0XZO2xaSediZ5aJs7SgAci
+	zQ/MN3WXXaK4lhcb7V1IrRlhyXntWHx6tsMROhlDxCeBo0eBXbNCqssk/uE6rWzg
+	rw5xyNnyCnCGff9fNch2nTMO4eKLo/92biOxz7SqlQ==
+X-ME-Sender: <xms:emGOZhCzlwAQMgOIgSRZj_TKljUCaVaRn0Ep7wT4-xKAgvlyL1F9Tg>
+    <xme:emGOZvi5Lcbtxunsa--WqRb0XHSO5g9cv8cpDF5ZZLAerxVMHHSisT4JdhXSp_4Yt
+    bLivpSjT7upFQ>
+X-ME-Received: <xmr:emGOZslWje7kWkXLR-vBIkn4Uc39s9QXHQ04o_CACiq0zuNTW8QbaysCfkU-KKI1NNspPExXyWtwP0N0EJsM5zS6x459NZtrqzFzbA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrfedugddvkecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvve
+    dvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushht
+    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
+    drtghomh
+X-ME-Proxy: <xmx:emGOZrz1VSKtafnVU48h05mD3oRW2dWTfUYDWZZ3fJLhqv-PLInS7A>
+    <xmx:emGOZmRN9Ka7NH62KKB45QopZVxAox0ticbPIDcJBGco3OEhxw_WPg>
+    <xmx:emGOZuZnoyRUi504xvKURnDneeQUWCSzP54FNASIZ39EiuYB3WLmPA>
+    <xmx:emGOZnRykRfpY-YtacHi3j_hT7bSB81dyp6D6VryvQnMUqhs8sgoVA>
+    <xmx:e2GOZqoJ7wn4xbIhpqX5LKMGZweVNa2GpKq2oBtncNWlVDYwA4AK4hQy>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Jul 2024 06:24:57 -0400 (EDT)
+Date: Wed, 10 Jul 2024 12:24:55 +0200
+From: Greg KH <greg@kroah.com>
+To: Pavel Machek <pavel@denx.de>
+Cc: Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+253cd2d2491df77c93ac@syzkaller.appspotmail.com,
+	Johannes Berg <johannes.berg@intel.com>, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 4.19] wifi: cfg80211: wext: add extra SIOCSIWSCAN
+ data check
+Message-ID: <2024071033-geologic-emerald-f6a2@gregkh>
+References: <20240701001526.2921645-1-sashal@kernel.org>
+ <Zo5cn37w8NjVyZdj@duo.ucw.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,33 +102,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240709203123.2103296-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <Zo5cn37w8NjVyZdj@duo.ucw.cz>
 
-On Tue, Jul 09, 2024 at 01:31:22PM -0700, Tony Nguyen wrote:
-> From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Wed, Jul 10, 2024 at 12:04:15PM +0200, Pavel Machek wrote:
+> Hi!
 > 
-> Commit 861e8086029e ("e1000e: move force SMBUS from enable ulp function
-> to avoid PHY loss issue") resolved a PHY access loss during suspend on
-> Meteor Lake consumer platforms, but it affected corporate systems
-> incorrectly.
+> > [ Upstream commit 6ef09cdc5ba0f93826c09d810c141a8d103a80fc ]
+> > 
+> > In 'cfg80211_wext_siwscan()', add extra check whether number of
+> > channels passed via 'ioctl(sock, SIOCSIWSCAN, ...)' doesn't exceed
+> > IW_MAX_FREQUENCIES and reject invalid request with -EINVAL otherwise.
 > 
-> A better fix, working for both consumer and corporate systems, was
-> proposed in commit bfd546a552e1 ("e1000e: move force SMBUS near the end
-> of enable_ulp function"). However, it introduced a regression on older
-> devices, such as [8086:15B8], [8086:15F9], [8086:15BE].
-> 
-> This patch aims to fix the secondary regression, by limiting the scope of
-> the changes to Meteor Lake platforms only.
-> 
-> Fixes: bfd546a552e1 ("e1000e: move force SMBUS near the end of enable_ulp function")
-> Reported-by: Todd Brandt <todd.e.brandt@intel.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218940
-> Reported-by: Dieter Mummenschanz <dmummenschanz@web.de>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218936
-> Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com> (A Contingent Worker at Intel)
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> This results in very confusing code in 4.19 at least. It should goto
+> out for consistency, exploting kfree(NULL) to be nop. Ok, not sure we
+> care...
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+kfree(NULL) is always supposed to be a nop, we have relied on that for
+decades, that's not an issue anywhere.
 
+greg k-h
 
