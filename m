@@ -1,75 +1,90 @@
-Return-Path: <netdev+bounces-110464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B766392C82A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 03:58:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF5792C82F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 04:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7C431C22079
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 01:58:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3B041F2451C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 02:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35A66FBF;
-	Wed, 10 Jul 2024 01:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIN2HJC4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5648C1E;
+	Wed, 10 Jul 2024 02:01:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC15B660
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 01:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9241443D
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 02:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720576729; cv=none; b=IRm2KmVS8GHlI1tgnCvmyDkfxNhrT49FcnEOsVkK6JzpFuzP0T3otWxgRDcoQlYFnpTF92AYHSo1BqZgi0RBGPmfCA6csFVoHvDKlO0K8Ef+OVdG/5y4V6LSZle9wmkI+QXRVnezcY4bQvbrSGAM1NDDmNqcn253r9uRCQrQxgs=
+	t=1720576860; cv=none; b=RmnEl7bYHE2tqlFLHgeg1LipDX5GqKtkV2Hwyu2rsKcV2EJ4pnnKnRG23C3IsJiWKD5iC1Ofo17caEnNeJ1WBAAh4cdJRtgBosWJhG3gKYLsjKPZvg/R9mtCKWmNb1ZlAvXHI1dK7CDYX2ZDFAQyJGlowaOxHTQ078z71EzVhtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720576729; c=relaxed/simple;
-	bh=3tNPM5VQKRyAzfZV4Eo973br6f+kSN9e8szuzcQACs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BfucUCBzfm9yhwoJWj/fK2YptAr7z5/1nvQe/VBr89WtzuMxAPf2dDhpT/p3/DjKcFo51xF1Il0vy0Rt0dg4WxW0jvI50nm0asTFjS9H0AqBrXPo0N+9gUIIrwkVkOOc0Bpz+HU4HOjXBnvhUrbNYv24bUOP1/AzmKIQCHRC/U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIN2HJC4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C18EC3277B;
-	Wed, 10 Jul 2024 01:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720576729;
-	bh=3tNPM5VQKRyAzfZV4Eo973br6f+kSN9e8szuzcQACs8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SIN2HJC4sY4ho9FmXCRATEcIOhbx4rbHUOnfNRoYU1WaJvdu8c2cbyIrN23LEzjnZ
-	 8h/9sZii0DTLXHSzSmpHbSvqax/fZLFOZ8Hi2/rJMqIH8Xp9DKaiggJqmtZIXJsNwA
-	 p1yd/l1sIZuwi58I/WJ8rxcV7yONR+SRrBRP1PTlNtHbEh3W5C/LkO+ZhJw0W+1ADV
-	 5/N05Tq4brO1+rRY4k9FV0VGBJBiZvjUyyTmo15meoiamwJP/HkoLJnLnoGeCEUjBG
-	 Ggex7PbK0mPvi/ng1jfZ3EU2iV+doRRNI+AnYpHtz41zwsqZ9HoQE5+Dp4rxGeNliV
-	 QwBQpjsNF5W7Q==
-Date: Tue, 9 Jul 2024 18:58:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Rahul Rameshbabu
- <rrameshbabu@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next V2 07/10] net/mlx5: Implement PTM cross
- timestamping support
-Message-ID: <20240709185847.41c15b60@kernel.org>
-In-Reply-To: <20240708080025.1593555-8-tariqt@nvidia.com>
-References: <20240708080025.1593555-1-tariqt@nvidia.com>
-	<20240708080025.1593555-8-tariqt@nvidia.com>
+	s=arc-20240116; t=1720576860; c=relaxed/simple;
+	bh=LDtYRLFV00IHIZrhFOYj5A7kohAV6yxrkjRiyud830g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OEw4ObyD3ODYnKmvKtX1bSmP30o08NgbFy+wn/3MHdWy/xGwqvrC3cSC8mhKKChGycyrt4foseGZPbzIuTNXK4o8KiO/HBovjxcdyYzg2/4FCqzMyOqeqYiEadrsD7oc1VLZH5Ac7ZghX+G++zrTwGlbTnhoBY+FOGnS+S443Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WJgv94672zxVvZ;
+	Wed, 10 Jul 2024 09:56:21 +0800 (CST)
+Received: from kwepemd200011.china.huawei.com (unknown [7.221.188.251])
+	by mail.maildlp.com (Postfix) with ESMTPS id 57659180088;
+	Wed, 10 Jul 2024 10:00:56 +0800 (CST)
+Received: from cgs.huawei.com (10.244.148.83) by
+ kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 10 Jul 2024 10:00:55 +0800
+From: Gaosheng Cui <cuigaosheng1@huawei.com>
+To: <dhowells@redhat.com>, <marc.dionne@auristor.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<cuigaosheng1@huawei.com>
+CC: <linux-afs@lists.infradead.org>, <netdev@vger.kernel.org>
+Subject: [PATCH -next] rxrpc: Remove the BUG in rxkad_init_connection_security
+Date: Wed, 10 Jul 2024 10:00:55 +0800
+Message-ID: <20240710020055.4116034-1-cuigaosheng1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd200011.china.huawei.com (7.221.188.251)
 
-On Mon, 8 Jul 2024 11:00:22 +0300 Tariq Toukan wrote:
-> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> 
-> Expose Precision Time Measurement support through related PTP ioctl.
+If crypto_sync_skcipher_setkey fails, we only need to return the
+error code, It is not necessary to trigger the BUG directly.
 
-Please repost the PTM patches separately and CC the timing, pci and x86
-people. Looks fairly reasonable, but IDK what the latest is on cross
-timestamping.
+Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+---
+ net/rxrpc/rxkad.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 104bb1ec9002..75d291ada9e8 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -114,9 +114,10 @@ static int rxkad_init_connection_security(struct rxrpc_connection *conn,
+ 		goto error;
+ 	}
+ 
+-	if (crypto_sync_skcipher_setkey(ci, token->kad->session_key,
+-				   sizeof(token->kad->session_key)) < 0)
+-		BUG();
++	ret = crypto_sync_skcipher_setkey(ci, token->kad->session_key,
++					  sizeof(token->kad->session_key));
++	if (ret < 0)
++		goto error_ci;
+ 
+ 	switch (conn->security_level) {
+ 	case RXRPC_SECURITY_PLAIN:
+-- 
+2.25.1
+
 
