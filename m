@@ -1,155 +1,97 @@
-Return-Path: <netdev+bounces-110468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4A092C845
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 04:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB20192C846
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 04:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 357821F232D4
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 02:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57893282E73
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 02:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A78847B;
-	Wed, 10 Jul 2024 02:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119FFAD5B;
+	Wed, 10 Jul 2024 02:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D08XuWPk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AwbkXmlq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAFB8C1E
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 02:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7938C1E;
+	Wed, 10 Jul 2024 02:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720577413; cv=none; b=o0+xC7gebR0EryV1e4XOxWE2UCZCP1KZAz6ZoQk2+l5kqpzn0VS2tJpHUcVbjlszn7/alYGrwFgCwDw4dEjIWM4Wxaa7B91XKypT5Quo/O7S3AfTx3AEpXBrV3ZU91FmaUF7/CFwXIeqUEgcUuSBvHt3itnkodZRNLgdJtnzsDg=
+	t=1720577433; cv=none; b=IVs8Uk0cONwwBEEM5FuN7/hr5HKEiSxd/7bHfuy6jSNskpdS9bWbCa5zK4ZOlMRlMnl5vyG6x5GkPz6o0XJHjE5rpT7UeH1HhisECGGL0TaneA2+Wo+msrP26xnXfRoU4mymGoU6lMhrXjWgl3WqEraM9SyUa7LTh838CaIjO+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720577413; c=relaxed/simple;
-	bh=GX0piPL1MhZFWw68yikqzdDPxogqYxYWm4WTbQUMit8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZfW5PTym+hWHt/vOqX5KCvo1fPDdJObw2K2Uo+a1jYzkS6pY2I71v1+t0JAqG6pb6HgTdpNyTqXTTc9AP7/quIxcg/vKx4dfxP9o02fct6fcvva/LFTKDWJv8O/DUKj6+W4SnJ49obnTB0NOhck4sKWcL5RS6TVb30IaMK+y1vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D08XuWPk; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7ebde93bf79so239391739f.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 19:10:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720577411; x=1721182211; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RFdAWBWmRXyhXvst2JC/tMDmpEOZUJN/A6nE2DsG/0s=;
-        b=D08XuWPk23Lj1IvnILnsqRJ+n1uAdtUJzFu66201KsNcUvELlZ8cMvba3zE451/dAA
-         TO7JycuIMCWjEV6xRhxIKuoEjt2hhBN7EjFsOAEVVOSEbs3cKo+CFubnVSB2ad/DvA9Q
-         ekGnbNPSqrPF3UqAP2bH/SUbV7MKGORzztYR/V/UmdQ4bquMvjihg8nsqaGqt0XWF7fN
-         rBgmtW0J7OZMkKJ34W27dZD26otRV/Ajx58S639US77I52LBufgd1TCc1CgAiaIJfBJ9
-         iJ5BgrdNX0E5nCnqy5RYAOZt+FbF2MJuAqchM6FkZ8sbchLfLdrNrxgE65rpfvpSTh3/
-         S/mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720577411; x=1721182211;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RFdAWBWmRXyhXvst2JC/tMDmpEOZUJN/A6nE2DsG/0s=;
-        b=R2xyTB/Iid5t/VhkPvy7LV3nJ2+gM4InFGbU+X5Buu7mpFCDA0BRtBeReaCtVV8tLi
-         c3E8helGBJUPRx2ETnVmHC3p9R4aTuPDQi/1xBH1AnL0NZQBpEfAkZv/fIM8jj3AUYjl
-         rSb2Kkmf9dReFrYNtxE2+CeOL72eUrj5Zt93QXPQqhet7MnbPRoYYDDl16r2ZdsWY20y
-         6rk2ryBjuUvowMKxasiwoinT/9ZkbzO9lNpezgdjphGmaMK7MXyEDIt8o+YuVxkZuUhv
-         z4SC+vpLYu2kzQoIwgNE4NGZLjif7hkPlSZPy9zOSf67lUfRWPD/oDhZNzDmVI5vRnU3
-         KGSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGkag8eZOll6jFcpVGrbND+H/XhcYGk5c5bpH4REneCfL1T/bTW9KmUYZ7aQDAz0VP2impNu+6qT3vXUsmgKrjNYRvmAZ+
-X-Gm-Message-State: AOJu0YwY8rc47Ls71wutBv6T/DbLBSuq3/8SvGlOfQe8jFQJO3G0i+Ln
-	g8rbYQTKgrPwf9TrX1sob7U7DtmQt7RjcmVmjoV17MQDzl6cJ38m
-X-Google-Smtp-Source: AGHT+IEm34C0OKzHyyhlivQ9xREA7QrGM616BdLXbo497xpDmI36AARulFJyb6f93jGsL7JeklNSIQ==
-X-Received: by 2002:a05:6602:6d13:b0:7f6:8282:f4a9 with SMTP id ca18e2360f4ac-80002e40f62mr513825339f.20.1720577411354;
-        Tue, 09 Jul 2024 19:10:11 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:8da3:78f8:d573:7ac? ([2601:282:1e02:1040:8da3:78f8:d573:7ac])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4c0b1bf7b73sm842084173.101.2024.07.09.19.10.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jul 2024 19:10:10 -0700 (PDT)
-Message-ID: <5efc180e-b719-4945-bd11-2ca392bde4a8@gmail.com>
-Date: Tue, 9 Jul 2024 20:10:09 -0600
+	s=arc-20240116; t=1720577433; c=relaxed/simple;
+	bh=m+5VXtYPcORUmfhv3b7HNMH2rq1aWbV56Jpp9Q43i0o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lzo5H8o4J1MO3uwU6gIBFfPx1bDugxp+bXY8SKvNfmCtp1E56GHfXGFaO+RnvTulywlV1RmaS/OKJ4nGj9wqyetl2YRHu71yhQL5mwH0U/W4MQYiRi/NzYrsPDFizsw49SK/xg5vSa9SZcViASvy/WMOfbsjMZm+zy9JK7PVPkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwbkXmlq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5DE98C4AF10;
+	Wed, 10 Jul 2024 02:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720577431;
+	bh=m+5VXtYPcORUmfhv3b7HNMH2rq1aWbV56Jpp9Q43i0o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AwbkXmlq4h2GHT2JhUM2yoaUT2rTasjRDzS0XtVghw/Act9kv1da/0PD2LqxvEO2B
+	 2+v+znIWT1H1zMGRK2ga+uIsW6jgmIRIZdWaEs8J2EZNiYm8NTCw40GSngG3KuYJDx
+	 N98bWrecXDSpULM1WZoT882kQ10lWk9W6370BPYvRBQDeQerCZJ0/FaXV7mRmYeicL
+	 eM9XvVMZtroJOIoTP8tG5mKhGvpVhAbV6mTqtrPRATXr1URrydX409bd6GtT4wYKvc
+	 GVc4acazQwMXM27M1bJwuCOYiyfaK3flYzbtqGK2HeOIqRJDxmqk379weQHE46OrOo
+	 dJIthmNQKzWLA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4EEF9C4332D;
+	Wed, 10 Jul 2024 02:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/ipv6: Fix soft lockups in fib6_select_path under
- high next hop churn
-Content-Language: en-US
-To: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
- netdev@vger.kernel.org
-Cc: adrian.oliver@menlosecurity.com, Ido Schimmel <idosch@nvidia.com>
-References: <20240709153728.4139640-1-omid.ehtemamhaghighi@menlosecurity.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240709153728.4139640-1-omid.ehtemamhaghighi@menlosecurity.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: ethernet: lantiq_etop: fix double free in detach
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172057743132.1917.14294482519163349153.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Jul 2024 02:10:31 +0000
+References: <20240708205826.5176-1-olek2@wp.pl>
+In-Reply-To: <20240708205826.5176-1-olek2@wp.pl>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jacob.e.keller@intel.com, shannon.nelson@amd.com,
+ horms@kernel.org, sd@queasysnail.net, u.kleine-koenig@pengutronix.de,
+ ralf@linux-mips.org, ralph.hempel@lantiq.com, john@phrozen.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, joe@perches.com,
+ andrew@lunn.ch
 
-On 7/9/24 9:37 AM, Omid Ehtemam-Haghighi wrote:
-> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-> index 83e4f9855ae1..6202575b2c20 100644
-> --- a/net/ipv6/ip6_fib.c
-> +++ b/net/ipv6/ip6_fib.c
-> @@ -540,10 +540,16 @@ static int fib6_dump_node(struct fib6_walker *w)
->  		 * last sibling of this route (no need to dump the
->  		 * sibling routes again)
->  		 */
-> -		if (rt->fib6_nsiblings)
-> -			rt = list_last_entry(&rt->fib6_siblings,
-> -					     struct fib6_info,
-> -					     fib6_siblings);
-> +		rcu_read_lock();
-> +		if (rt->fib6_nsiblings) {
-> +			last_sibling = rt;
-> +			list_for_each_entry_rcu(sibling, &rt->fib6_siblings,
-> +						fib6_siblings)
-> +				last_sibling = sibling;
-> +
-> +			rt = last_sibling;
-> +		}
-> +		rcu_read_unlock();
+Hello:
 
-as Eric noted fib6_dump_node is already called under rcu_read_lock().
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  	}
->  	w->leaf = NULL;
->  	return 0;
+On Mon,  8 Jul 2024 22:58:26 +0200 you wrote:
+> The number of the currently released descriptor is never incremented
+> which results in the same skb being released multiple times.
+> 
+> Fixes: 504d4721ee8e ("MIPS: Lantiq: Add ethernet driver")
+> Reported-by: Joe Perches <joe@perches.com>
+> Closes: https://lore.kernel.org/all/fc1bf93d92bb5b2f99c6c62745507cc22f3a7b2d.camel@perches.com/
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+> [...]
 
+Here is the summary with links:
+  - [net,v3] net: ethernet: lantiq_etop: fix double free in detach
+    https://git.kernel.org/netdev/net/c/e1533b6319ab
 
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 8d72ca0b086d..4bca06dce176 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -415,7 +415,7 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
->  		      struct flowi6 *fl6, int oif, bool have_oif_match,
->  		      const struct sk_buff *skb, int strict)
->  {
-> -	struct fib6_info *sibling, *next_sibling;
-> +	struct fib6_info *sibling;
->  	struct fib6_info *match = res->f6i;
->  
->  	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
-> @@ -442,8 +442,9 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
->  	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
->  		goto out;
->  
-> -	list_for_each_entry_safe(sibling, next_sibling, &match->fib6_siblings,
-> -				 fib6_siblings) {
-> +	rcu_read_lock();
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-put a newline after rcu_read_lock() and before _unlock(). Personally, I
-like locking calls to 'pop' in the sense they are separate with
-whitespace and not run together with other logic. Comment applies here
-and other places since you need to respin.
-
-overall, nothing else caught my eye. Added Ido to put this patch on his
-radar as well.
-
-> diff --git a/tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh b/tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh
-
-thanks for the test case.
 
 
