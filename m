@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-110695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097A692DC5B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 01:09:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1B4C92DC6B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 01:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B0C4B25AEA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 931F71F23F07
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8762014D2B1;
-	Wed, 10 Jul 2024 23:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848D614B95A;
+	Wed, 10 Jul 2024 23:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XKD0ji9T"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="wOsnuped"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4917B143732
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 23:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B484D12
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 23:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720652937; cv=none; b=iVaHPvBx6l3IXMgzc6dK9CEqX8JpqKBmY/vQzRC4jmn655MiOEcZc8Hb9znF+u51O96TVv7HHTO6t+xSF5OjTD04K1GQuXj0MQyBFmOxeUfgKNaR+43KhYbZYT4BaS9Xp4ZAUumcMRt1SM/APD4mdrnQgV7HozOetfckG94tImg=
+	t=1720653103; cv=none; b=BQCXJHnrePpkv99UbEd71cAmgj0uvrfilA+/csyfcu9HyrE3ajotkW99xjAcJhbP5ot5qCp40v2RiIZiFHLsI0COraTn3ZVI+8lOgnSsJP6V8Ilv5SLYUGTSLTH84syeSpOqfBXbTr8DA7LVCeiI4vYlL5ymflRW9XfOvAEIDeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720652937; c=relaxed/simple;
-	bh=wwHwsoCzTsglQ+b6bxuXxs8fA64M/vk9hY6q/LKLBys=;
+	s=arc-20240116; t=1720653103; c=relaxed/simple;
+	bh=qs45M/3+XXU+AAjfRPGzt0CFvZYZ73DiDWgnyrBHn0g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ktt0ikRy32mlR6usA/zzstW2Yp5b/xob4wE3HDf3GckXg8fu2EE8wHnAc9WhnhwiImwYfYrX4LeZZBQaviifu1eT6qQBj0+1kNfDcprG+8OfxthlJ3ow/hmFMPI1w77PAAPaT49M0bmKE/lMII1SWEyMNVli4E4O3apy7ULQkoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XKD0ji9T; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version:Content-Type; b=Q7Sasui/FUuPNHoqibVuLV0/7lxRYeXJ5p8y9tpQlx5xrQFj44TuZw/7WKNQAdDVOrQuRXLO35lu+6RxdpwZPdt3gj+JYbTtVHUhweFOjU0GyOXdq1XGkPHuy8lI4zevz9h4mr0Ru89qX73gWPzNuQK/MqQeIZGLeEKiCkDvLHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=wOsnuped; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70af5fbf0d5so214254b3a.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:08:54 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-77d3f00778cso168192a12.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720652934; x=1721257734; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720653101; x=1721257901; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mqJS7VrqZOjg+4uCH/J/AhoWd6gznwt4tFXOXS0Dgao=;
-        b=XKD0ji9TV7vQHSPh8rcvTVudCzxre6r4IegDLUTfkU82cspBjFY4w7oYqgWHdlW1pY
-         RZPvqJjVc6BAkuKOz+k4oUHbRasIKdJQkHnTjHodYPn+IWYpzL8rlSEYz/UVWJfZef8I
-         CI3ewpenVt3BQFazplv0hgJoVpi5zkGQ4tv+S7vW/s+6aHdJOVIN1uVq5TaB8zI+A02Q
-         6gOOP+mC1/+NDMmpkyTCN53mUuDeipyRgbIGa+TZwfYr5qyEuZEPF6t1sV9/CSKAkulK
-         eWB8ciCNp5bOqQdjr767/66TaT5JqCx2P+XF45/CvlLO/JgPcSdTsWlDgWpR8h1tcQR9
-         N2lQ==
+        bh=VEhCvn/GX7ZGrfff/9by/aKOGF9XNJ6WAIBe9Hc6X/o=;
+        b=wOsnuped355FbpfCJPOODmeoQbUsn36HSGf20S5t3RHU4b7DxOz7rdxo0Ads+6MSFf
+         Sm4B+/GHbOb06NVj/bUQSYYLBVEj+MLa4GXdKAiFZgB4jsF5e/hsMYSiz48ec55tletX
+         dNJG/dAd9quM6OLNZEBxy2Vxo935b14/ajHCg+x3ZK93puA1iPdGvrzVOWr33bijrMJv
+         kIYUjSNC4PfxcA1+cQxUpw840eskaXd2XyTdh0wHGIkJOR4Qu++6S/j6epD9jFzdVFsS
+         7mvc+u0MgM/Q7+cBxVE1p0t/tZz/xvxBs5ZSuPktnFJ65PXbE1ycjwGMkRp0nv3Zfzyp
+         +itg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720652934; x=1721257734;
+        d=1e100.net; s=20230601; t=1720653101; x=1721257901;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mqJS7VrqZOjg+4uCH/J/AhoWd6gznwt4tFXOXS0Dgao=;
-        b=KvqzAyo7TkhRd38F4w4PeZL97M4HiaHhkdm+OtxZ/dWW89p6jNlW4uqxcIQvyhS8eH
-         5DF87Wl6Ys5vubBoJ25uJ052o5fjwFGJjGWlwnEE2MYuq0UVTy2JDa29YUtW9Qc0MO8X
-         IUBd67JIavo2oQUCbN1qmIOLOXLwvj6Wag8P/Di6OyWNG9Zsnvz+yFsm4m0wdHFUr0jW
-         eUEcHbwnQP37BEeNvOikFELLDkIFUZOKgZxQs8pbyIKo6E5RjJhdnMq0fwDcyPLrGTx7
-         4Lk0paVTO/PaMsKci5KbmgmxGBBsVfqKxFtcNy5yUtsSXwtqaE/xM6qr/s1otCgqszRM
-         /HKA==
-X-Gm-Message-State: AOJu0YxWY2Pr2cWBiYCxdgoemE5LACMwesFXt4SVMzUG0mOlECC4xpO1
-	U+7+Qo0GK6cMC7+EMw4eyJ5LR2p95ohu12o5EDgIX3uxRciXxx7148sjjRjvlPYjoBw2Nd6Oh2T
-	W
-X-Google-Smtp-Source: AGHT+IEzEAXadz1EhFaR6DD837GGGk6cSQZQAJ+0byJxPiIIFU1ujKJqA2zCcC+3se68vXphDVtO0A==
-X-Received: by 2002:aa7:88c5:0:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-70b5de18d73mr1279571b3a.8.1720652934414;
-        Wed, 10 Jul 2024 16:08:54 -0700 (PDT)
+        bh=VEhCvn/GX7ZGrfff/9by/aKOGF9XNJ6WAIBe9Hc6X/o=;
+        b=ryUGkhmRO+VNImGBlp/9WqO/XbXF5oMtl9kyma/E6h92EqnmW6uTkuIxRrkwPDnHzx
+         rxXopaL15MnKFIMTtenQoDE6JZwg5+5dglVwVX9psB4d5mVOo+QzFHz2dVmxLwDEeny0
+         LNOfITaXxVr7vmtDOV0oHTkuTW0uNUQRtteuoHFcAgokCManVHzO6td+00g8bm09K9K5
+         6RYfmKPxsH0XovET9f20w0Ai0hzM8f6GBDz2jgu6RLesRNlHm0k2kNIOYHLc+IHCJqRV
+         vbVD7TOCuyFVzsN76Kc0UBZN2m9cq17Acz1olAuIlFmHHHOEtIE9QuZThCzzG8Vp5WEN
+         jGYQ==
+X-Gm-Message-State: AOJu0YwJhf8rMYF+tIUTJ01rsSitEuY1zpvZO82alWLU8/vFNm30NyIN
+	Py7pao87JjI3HA1mON6nGdMVzpDzRWSuLrrCzTP0Kc+DXeJgDH1OaLBhE+j4bWk=
+X-Google-Smtp-Source: AGHT+IExmycMLvnDFaXZEThvlqZBHKo7LE+i/q6ctG2s0tW1dLWywzdcAgXNz50GUiKm/bmhQw3BxQ==
+X-Received: by 2002:a05:6a21:9997:b0:1c0:f288:4903 with SMTP id adf61e73a8af0-1c2982232b7mr8554735637.17.1720653101016;
+        Wed, 10 Jul 2024 16:11:41 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b438c0996sm4346874b3a.60.2024.07.10.16.08.53
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b4397c50csm4458126b3a.147.2024.07.10.16.11.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 16:08:54 -0700 (PDT)
-Date: Wed, 10 Jul 2024 16:08:52 -0700
+        Wed, 10 Jul 2024 16:11:40 -0700 (PDT)
+Date: Wed, 10 Jul 2024 16:11:39 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maks Mishin <maks.mishinfz@gmail.com>
+To: Maks Mishin <maks.mishinfz@gmail.com>, Guillaume Nault
+ <gnault@redhat.com>
 Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] q_tbf: Fix potential static-overflow in tbf_print_opt
-Message-ID: <20240710160852.2e8e0177@hermes.local>
-In-Reply-To: <20240707175538.1245-1-maks.mishinFZ@gmail.com>
-References: <20240707175538.1245-1-maks.mishinFZ@gmail.com>
+Subject: Re: [PATCH] f_flower: Remove always zero checks
+Message-ID: <20240710161139.578d20dc@hermes.local>
+In-Reply-To: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
+References: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,43 +84,43 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun,  7 Jul 2024 20:55:38 +0300
+On Sun,  7 Jul 2024 20:27:41 +0300
 Maks Mishin <maks.mishinfz@gmail.com> wrote:
 
-> An element of array '&b1[0]' of size 64, declared at q_tbf.c:257,
-> is accessed by an index with values in [0, 74] at q_tbf.c:279,
-> which may lead to a buffer overflow.
-> 
-> Details: Format string: '%s/%u'. Size of buffer parameter is 63;
-> Specifier '%u': min value '-2147483647' requires 10 character(s),
-> max value '2147483647' requires 10 character(s), so the buffer needs
-> enough space to receive 10 character(s).
-> Size of the string except for specifiers is 1; Total maximum size is 74.
+> Expression 'ttl & ~(255 >> 0)' is always zero, because right operand
+> has 8 trailing zero bits, which is greater or equal than the size
+> of the left operand == 8 bits.
 > 
 > Found by RASU JSC.
 > 
 > Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 > ---
->  tc/q_tbf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tc/f_flower.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tc/q_tbf.c b/tc/q_tbf.c
-> index 9356dfd2..b9f4191c 100644
-> --- a/tc/q_tbf.c
-> +++ b/tc/q_tbf.c
-> @@ -254,7 +254,7 @@ static int tbf_print_opt(const struct qdisc_util *qu, FILE *f, struct rtattr *op
->  	double latency, lat2;
->  	__u64 rate64 = 0, prate64 = 0;
+> diff --git a/tc/f_flower.c b/tc/f_flower.c
+> index 08c1001a..244f0f7e 100644
+> --- a/tc/f_flower.c
+> +++ b/tc/f_flower.c
+> @@ -1523,7 +1523,7 @@ static int flower_parse_mpls_lse(int *argc_p, char ***argv_p,
 >  
-> -	SPRINT_BUF(b1);
-> +	char b1[74];
+>  			NEXT_ARG();
+>  			ret = get_u8(&ttl, *argv, 10);
+> -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> +			if (ret < 0) {
+>  				fprintf(stderr, "Illegal \"ttl\"\n");
+>  				return -1;
+>  			}
+> @@ -1936,7 +1936,7 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
+>  			}
+>  			mpls_format_old = true;
+>  			ret = get_u8(&ttl, *argv, 10);
+> -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> +			if (ret < 0) {
+>  				fprintf(stderr, "Illegal \"mpls_ttl\"\n");
+>  				return -1;
+>  			}
 
-Looks correct, but wonder about other alternatives here.
-  * printing buffer and cell log as combined value was a mistake.
-    ideally, json should be one value per key, not something like "10K/4"
-  * not sure how sprint_size() could ever get large enough with any realistic input.
-    that makes this a theoretical problem.
-  * the use of sprintf() in q_tbf.c is leftover historical bad C practice. Should be using snprintf always.
-  * do not like introducing magic constant 74 here, why not just 2*SPRINT_BSIZE (ie 128)
-
+That is correct mathematically, but perhaps the original author had different idea.
+Could we have review from someone familiar with MPLS support please.
 
