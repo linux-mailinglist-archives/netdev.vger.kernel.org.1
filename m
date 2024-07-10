@@ -1,154 +1,272 @@
-Return-Path: <netdev+bounces-110507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48DB592CBFA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 09:35:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541BA92CC2E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 09:46:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF48AB23582
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 07:34:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF817282F3F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 07:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCCC84A28;
-	Wed, 10 Jul 2024 07:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BE579B7E;
+	Wed, 10 Jul 2024 07:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ubq8fPvW"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="opPjPT1V";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="G6+JlULH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BAF83CD5
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 07:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D68D535;
+	Wed, 10 Jul 2024 07:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720596892; cv=none; b=Z7IGeXQx6ctyuZMUwuIKvMI0kfl++YoBYzjzSdMsasREGc9R3Ja+MDfpjQBNcJ/ccM9BJF6bIl8DjhTvBFtcOj00vRZg9un8Vr8ia7Q0xdlkjGKUQwGU9TSU3NGqwAMJbHFC01eANO1MnaNr2ZOSOZ0b7Mrw1p55XjKZ6Ju5/fc=
+	t=1720597596; cv=none; b=ksyQgXPmespgOJmEu2tkN1KurHalmuqoRt/zMj2wCYTPlkyk74k1BppqJ2dABIl1aI64Ph7KZkybP/GV7bqBJyFREKhzAolBuxHaM/Il8kVZlIDbHfgTz7n84b+C+cD4kqJnMLZsgcecJYN1ha2GROWGXn9R0eqVbZ53bmTSIow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720596892; c=relaxed/simple;
-	bh=NfrfV5Vy+VM7vSghradxFkPpeufS31T/y1I2gyDTmrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uA++GRVX8d6KmeZAaLy1gmC2ALSZ8dl2+GE1Vgw31L4rv62+DTfMf9KhwGuCVpTB9WjksnSKgNgs47jJk9iJyTXlvmEL5lpVNdo3EaZTq/382MOV/b7Lv7HFlEJWbOAkuKuof5bnFoiWieYcMUf4Scd3/iJws+pZXhFx2Ok61Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ubq8fPvW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720596887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D2M3DvwDrSJcyOfWVtdeker8I2MWaBFXWRzk+di5ddk=;
-	b=Ubq8fPvWJB1PnPVejWBJ+vE1Hd6B7K9x4Bfg8ZAh0XaUKQVkFJGqXRHKyy+vHTec7v8ibq
-	afoYdAqvAzLDpoi3HrmN+JTFmZ3x37f2UGmoj26nW/zcA143DPV7c74upZGRadRbu+Froz
-	VIIplRTvaaOpojzJOaa+U8qrY1sL0Fc=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628--2Yqh6baNd-D8OesKSSG3w-1; Wed, 10 Jul 2024 03:34:46 -0400
-X-MC-Unique: -2Yqh6baNd-D8OesKSSG3w-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-58bee115291so5806120a12.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 00:34:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720596885; x=1721201685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D2M3DvwDrSJcyOfWVtdeker8I2MWaBFXWRzk+di5ddk=;
-        b=ggQhv2bZ6KiZeIHJTIpQ06iLudWBeeePgrHZ90cOyJTvsMeeAceByV2JWsaLAfTDNl
-         rngtE2p3I/f4FM5UVQqp9OezXx6KiqXk/h6G7KcbZhy5ORjtFHi56m4FEic5kyl7Fu0t
-         44b8jqG+KTIN+6AG4cy7/Jcu0NGymNzBkO0sTIvmwGX0zS/7A3D3ty2z1Fqn822Gy4o4
-         zcxBj1uaZBFxLXKhLZ5vrvTuyUp89dLm/TQv+49leX47ZencaPWTkdplHZ3xt83xqfYD
-         aeoSeB9JSU6noCOdBrQb5PJTbDst4JACmWz+UILJnvJI2HISk961LHFqo9+XYrQuD5v2
-         4duA==
-X-Forwarded-Encrypted: i=1; AJvYcCXPUBwCcahA9wNVoblnsCbbystOOSRpyFL9L/MfhN3NH1zPM+ZsOWe6O6Ua8W1rNKGBLQ3WX4q+OoM6IKHBt3OL/BRdusrO
-X-Gm-Message-State: AOJu0YxCjrFghRwgY2fOH0JdShFbJKPyW/f5U6Yx5r0sKYWchNouEEKm
-	jihw1Id5EoSQERAE/fchdE0SHFzeG/57EtKlykZuithgJSgUgy61xO7OO9dlXuNEUbqDw6lHpES
-	xPvuqZwaYjQ7NVkQKaESC8Yv/D6RZ3Ur2wINIQ7jQ135mVM9GtEqJRb4iRFwIYw==
-X-Received: by 2002:a17:906:d925:b0:a77:c364:c4f2 with SMTP id a640c23a62f3a-a780b883457mr263385666b.52.1720596884833;
-        Wed, 10 Jul 2024 00:34:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFdCK3sPHoX5ymCLdtTzOFCG6cqJ6FCKNdOKjpgNsX4y+qO5d6Ij6ITF6psUTIa6WmxdNi7Pw==
-X-Received: by 2002:a17:906:d925:b0:a77:c364:c4f2 with SMTP id a640c23a62f3a-a780b883457mr263384166b.52.1720596884237;
-        Wed, 10 Jul 2024 00:34:44 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-153.retail.telecomitalia.it. [82.57.51.153])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6dc520sm136516266b.51.2024.07.10.00.34.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 00:34:43 -0700 (PDT)
-Date: Wed, 10 Jul 2024 09:34:40 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Peng Fan <peng.fan@nxp.com>
-Subject: Re: [PATCH] test/vsock: add install target
-Message-ID: <twxr5pyfntg6igr4mznbljf6kmukxeqwsd222rhiisxonjst2p@suum7sgl5tss>
-References: <20240709135051.3152502-1-peng.fan@oss.nxp.com>
+	s=arc-20240116; t=1720597596; c=relaxed/simple;
+	bh=jL9QRqaslQ4cEHAQYLLzFk0VWk2T4B6GOv5rS797vwU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VIZoYvIksbkao/Qp1YFuTic1hZhVmJKnczWVgc/+049Jbyf7Qc2e2FQZ+7ZXmjEvZTPfng1G1XvpESbyd2NjSPVBp1/q5tlYp+mgUtMxsJX3TwE+bDlxhXZwLBRD/0l7hBKnJN4F6vhn/j9B7awmJURt/XfLYQUle2Y7XmUpD+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=opPjPT1V; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=G6+JlULH reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1720597593; x=1752133593;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=jL9QRqaslQ4cEHAQYLLzFk0VWk2T4B6GOv5rS797vwU=;
+  b=opPjPT1V32E+iz/61tSnxKU9yQuTCaQNRa2vmdoaixbKru7CGzj+dYZe
+   HqXNaZlEds4xH2N8tzQUVy+CHEGIvT3FK435n8X/r6UxBcUIj9zUgshvw
+   FCd5YGBDGPuF95nA6PaQptvTzM7KSaOQipjIb55j1xqsqhzXObRLDcZ1F
+   JhlGlEpBOUp5ulbGnZFpA1EYkVo3vkibibGTm2PkG5LMyLoNxcTr4Zwj8
+   k8koMEmqTD8wu8KdXiB0ety9YY6tFp/RpA3UNXG5sdVM9bHBi6/bR397g
+   qokjUEaj0GHOPlVxl56pJJtPOMbPGkBy5ROR2sxTU9++uo/WeQySleS6p
+   Q==;
+X-CSE-ConnectionGUID: 64uWWlOzSQuI3t/PZnqU+A==
+X-CSE-MsgGUID: y01Ja1aVQpeS9GgMNhflVw==
+X-IronPort-AV: E=Sophos;i="6.09,197,1716242400"; 
+   d="scan'208";a="37832087"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 10 Jul 2024 09:46:30 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 92D67161586;
+	Wed, 10 Jul 2024 09:46:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1720597586;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=jL9QRqaslQ4cEHAQYLLzFk0VWk2T4B6GOv5rS797vwU=;
+	b=G6+JlULHlgxjKBkO66J+9gmPBqq8KA3KCBjgbtlBQDdeUi7Z3GVeK/c92zYk+W8xGqmwZI
+	/mFRTfXaHvEifEGzefycU3tTEF9lErB89f8Be0+zN1B/IH62Yd+MY0IT2kXqJ1PGSsIn1M
+	j1LPn/548m9C9V8CoQoSyR2T4rZVfjWuQmU94BmrRjSQQZfDKTgcKKdAyXdK3dCmg7rBAu
+	SixBSOo2MahFucnMVJPvDQrOuwd3t/RSuAGJFTTxHzVxfkwiDnBjQoRTGII9hUhuhWORHQ
+	Z1URs5RUU30cNhAAZ9AjNBwXTRZyldYb/j/nk9XlXl6Eo8X3jc/uVDRx9y36jA==
+Message-ID: <945b275d60c37b6d4db631c10973f04cca2b5182.camel@ew.tq-group.com>
+Subject: Re: Kernel hang caused by commit "can: m_can: Start/Cancel polling
+ timer together with interrupts"
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Chandrasekar Ramakrishnan
+ <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Tony Lindgren
+ <tony@atomide.com>, Judith Mendez <jm@ti.com>,  linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux@ew.tq-group.com, Linux regressions mailing list
+ <regressions@lists.linux.dev>
+Date: Wed, 10 Jul 2024 09:46:23 +0200
+In-Reply-To: <tyq2h55iyfxmebysxbdv352vops7i5fhi3avs6u7h6yinwv75j@m6wicydoobbp>
+References: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
+	 <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
+	 <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
+	 <08aabeaf-6a81-48a9-9c5b-82a69b071faa@leemhuis.info>
+	 <734a29a87613b9052fc795d56a30690833e4aba9.camel@ew.tq-group.com>
+	 <76faeb323353b584b310f2f1b53e9b2745d2f12c.camel@ew.tq-group.com>
+	 <tyq2h55iyfxmebysxbdv352vops7i5fhi3avs6u7h6yinwv75j@m6wicydoobbp>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240709135051.3152502-1-peng.fan@oss.nxp.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Jul 09, 2024 at 09:50:51PM GMT, Peng Fan (OSS) wrote:
->From: Peng Fan <peng.fan@nxp.com>
->
->Add install target for vsock to make Yocto easy to install the images.
->
->Signed-off-by: Peng Fan <peng.fan@nxp.com>
->---
-> tools/testing/vsock/Makefile | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
->
->diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->index a7f56a09ca9f..5c8442fa9460 100644
->--- a/tools/testing/vsock/Makefile
->+++ b/tools/testing/vsock/Makefile
->@@ -8,8 +8,20 @@ vsock_perf: vsock_perf.o msg_zerocopy_common.o
-> vsock_uring_test: LDLIBS = -luring
-> vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o msg_zerocopy_common.o
->
->+VSOCK_INSTALL_PATH ?= $(abspath .)
->+# Avoid changing the rest of the logic here and lib.mk.
->+INSTALL_PATH := $(VSOCK_INSTALL_PATH)
->+
-> CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
-> .PHONY: all test clean
-> clean:
-> 	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf vsock_uring_test
-> -include *.d
->+
->+install: all
->+	@# Ask all targets to install their files
->+	mkdir -p $(INSTALL_PATH)/vsock
+On Tue, 2024-07-09 at 14:23 +0200, Markus Schneider-Pargmann wrote:
+>=20
+>=20
+> Hi,
+>=20
+> On Wed, Jul 03, 2024 at 02:50:04PM GMT, Matthias Schiffer wrote:
+> > On Tue, 2024-07-02 at 12:03 +0200, Matthias Schiffer wrote:
+> > > On Tue, 2024-07-02 at 07:37 +0200, Linux regression tracking (Thorste=
+n Leemhuis) wrote:
+> > > >=20
+> > > >=20
+> > > > On 01.07.24 16:34, Markus Schneider-Pargmann wrote:
+> > > > > On Mon, Jul 01, 2024 at 02:12:55PM GMT, Linux regression tracking=
+ (Thorsten Leemhuis) wrote:
+> > > > > > [CCing the regression list, as it should be in the loop for reg=
+ressions:
+> > > > > > https://docs.kernel.org/admin-guide/reporting-regressions.html]
+> > > > > >=20
+> > > > > > Hi, Thorsten here, the Linux kernel's regression tracker. Top-p=
+osting
+> > > > > > for once, to make this easily accessible to everyone.
+> > > > > >=20
+> > > > > > Hmm, looks like there was not even a single reply to below regr=
+ession
+> > > > > > report. But also seens Markus hasn't posted anything archived o=
+n Lore
+> > > > > > since about three weeks now, so he might be on vacation.
+> > > > > >=20
+> > > > > > Marc, do you might have an idea what's wrong with the culprit? =
+Or do we
+> > > > > > expected Markus to be back in action soon?
+> > > > >=20
+> > > > > Great, ping here.
+> > > >=20
+> > > > Thx for replying!
+> > > >=20
+> > > > > @Matthias: Thanks for debugging and sorry for breaking it. If you=
+ have a
+> > > > > fix for this, let me know. I have a lot of work right now, so I a=
+m not
+> > > > > sure when I will have a proper fix ready. But it is on my todo li=
+st.
+> > > >=20
+> > > > Thx. This made me wonder: is "revert the culprit to resolve this qu=
+ickly
+> > > > and reapply it later together with a fix" something that we should
+> > > > consider if a proper fix takes some time? Or is this not worth it i=
+n
+> > > > this case or extremely hard? Or would it cause a regression on it's=
+ own
+> > > > for users of 6.9?
+> > > >=20
+> > > > Ciao, Thorsten
+> > >=20
+> > > Hi,
+> > >=20
+> > > I think on 6.9 a revert is not easily possible (without reverting sev=
+eral other commits adding new
+> > > features), but it should be considered for 6.6.
+> > >=20
+> > > I don't think further regressions are possible by reverting, as on 6.=
+6 the timer is only used for
+> > > platforms without an m_can IRQ, and on these platforms the current be=
+havior is "the kernel
+> > > reproducibly deadlocks in atomic context", so there is not much room =
+for making it worse.
+> > >=20
+> > > Like Markus, I have writing a proper fix for this on my TODO list, bu=
+t I'm not sure when I can get
+> > > to it - hopefully next week.
+> > >=20
+> > > Best regards,
+> > > Matthias
+> >=20
+> > A small update from my side:
+> >=20
+> > I had a short look into the issue today, but I've found that I don't qu=
+ite grasp the (lack of)
+> > locking in the m_can driver. The m_can_classdev fields active_interrupt=
+s and irqstatus are accessed
+> > from a number of=C2=A0different contexts:
+> >=20
+> > - active_interrupts is *mostly* read and written from the ISR/hrtimer c=
+allback, but also from
+> > m_can_start()/m_can_stop() and (in error paths) indirectly from m_can_p=
+oll() (NAPI callback). It is
+> > not clear to me whether start/stop/poll could race with the ISR on a di=
+fferent CPU. Besides being
+> > used for ndo_open/stop, m_can_start/stop also happen from PM callbacks.
+> > - irqstatus is written from the ISR (or hrtimer callback) and read from=
+ m_can_poll() (NAPI callback)
+> >=20
+> > Is this correct without explicit sychronization, or should there be som=
+e locking or atomic for these
+> > accesses?
+>=20
+> Thanks for pointing these out. I started creating some fixes for some of
+> the patches. Not done yet, but I am working on it.
+>=20
+> Best,
+> Markus
 
-why using the "vsock" subdir?
+Hi Markus,
 
-IIUC you were inspired by selftests/Makefile, but it installs under 
-$(INSTALL_PATH)/kselftest/ the scripts used by the main one 
-`run_kselftest.sh`, which is installed in $(INSTALL_PATH instead.
-So in this case I would install everything in $(INSTALL_PATH).
+thanks for the update. I'm going to be out of office from Jul 12-26, so I w=
+ill only be able to test
+fixes when I'm back.
 
-WDYT?
+Best regards,
+Matthias
 
->+	install -m 744 vsock_test $(INSTALL_PATH)/vsock/
->+	install -m 744 vsock_perf $(INSTALL_PATH)/vsock/
->+	install -m 744 vsock_diag_test $(INSTALL_PATH)/vsock/
->+	install -m 744 vsock_uring_test $(INSTALL_PATH)/vsock/
 
-Also from selftests/Makefile, what about using the ifdef instead of 
-using $(abspath .) as default place?
 
-I mean this:
+>=20
+> >=20
+> > Best regards,
+> > Matthias
+> >=20
+> >=20
+> >=20
+> > >=20
+> > >=20
+> > >=20
+> > > >=20
+> > > > > > On 18.06.24 18:12, Matthias Schiffer wrote:
+> > > > > > > Hi Markus,
+> > > > > > >=20
+> > > > > > > we've found that recent kernels hang on the TI AM62x SoC (whe=
+re no m_can interrupt is available and
+> > > > > > > thus the polling timer is used), always a few seconds after t=
+he CAN interfaces are set up.
+> > > > > > >=20
+> > > > > > > I have bisected the issue to commit a163c5761019b ("can: m_ca=
+n: Start/Cancel polling timer together
+> > > > > > > with interrupts"). Both master and 6.6 stable (which received=
+ a backport of the commit) are
+> > > > > > > affected. On 6.6 the commit is easy to revert, but on master =
+a lot has happened on top of that
+> > > > > > > change.
+> > > > > > >=20
+> > > > > > > As far as I can tell, the reason is that hrtimer_cancel() tri=
+es to cancel the timer synchronously,
+> > > > > > > which will deadlock when called from the hrtimer callback its=
+elf (hrtimer_callback -> m_can_isr ->
+> > > > > > > m_can_disable_all_interrupts -> hrtimer_cancel).
+> > > > > > >=20
+> > > > > > > I can try to come up with a fix, but I think you are much mor=
+e familiar with the driver code. Please
+> > > > > > > let me know if you need any more information.
+> > > > > > >=20
+> > > > > > > Best regards,
+> > > > > > > Matthias
+> > > > > > >=20
+> > > > > > >=20
+> > > > >=20
+> > > > >=20
+> > >=20
+> >=20
+> > --=20
+> > TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, =
+Germany
+> > Amtsgericht M=C3=BCnchen, HRB 105018
+> > Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan=
+ Schneider
+> > https://www.tq-group.com/
 
-install: all
-ifdef INSTALL_PATH
-   ...
-else
-	$(error Error: set INSTALL_PATH to use install)
-endif
-
-Thanks,
-Stefano
-
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
