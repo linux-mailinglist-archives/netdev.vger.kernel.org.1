@@ -1,119 +1,119 @@
-Return-Path: <netdev+bounces-110605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5F392D6F8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:58:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A1592D6D2
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B432B2E35F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:40:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAEFB2810A7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAE0198E91;
-	Wed, 10 Jul 2024 16:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F5218FC93;
+	Wed, 10 Jul 2024 16:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BSkFg4V5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ESGdkA3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A9F198E79
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B81189F54
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720629422; cv=none; b=IHx2oY+2nDzTqWDrKM2LiMlh0XLBy63tJGatciw7sz1lSALHByqqPBmqVBLtkhVbHxZTRm3dNqbXoVZTnUzneGSre8Fyo+CptyjCFYCzaktjBB+Dld7syS4Elx9+HRn+67PG4jbPDaJ8Cnyx2YdVJTr0Rj1PTUF4xpcDmfQa0gU=
+	t=1720630080; cv=none; b=q4xXDXLsFbBVgIkyKVqHBoSwBS4PT5Lj0Eu+CfgJbXZnCqD7+5MBKu4SerHM6sThzxhzf9gwblnnSHTrNVcoWVuHEj0VujxTJZ+Wizu2lc+KQHDlCa+j+b2K8Y65eXBhxoWwEhhXYQm68CFw0UFE+uogepxeWsz4+4zFVkd1s9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720629422; c=relaxed/simple;
-	bh=+9WXWxoYOKWamD+vE5uwNUduTJzyXrMb8PWgNp0n1rI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=banJNbojIotz+iHi2lm90wvhB1FORA22Ahzml0VFb8AEsgUbO0EXjpp6slnjlDDdiZu9NQo7TyH0l5XGD7E65qbJHbpxWwn/xqU95lZ7Nj27jLhWxBZyBjCBPaSYOV81Q1i5MgdVAvwERh1OJDnly+GachxwhQODIhGPx7JfFBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BSkFg4V5; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e03a63ec15eso6074860276.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 09:37:00 -0700 (PDT)
+	s=arc-20240116; t=1720630080; c=relaxed/simple;
+	bh=RiCPr+tWg6vpr3zycp2rkAOQ3u/ZSnyNDx1+AHEcWMg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ravePTn1kfcqIafu/L72yi4XqAp/djPZr73a92U9Gn6noY98rtEVhIAMMTwFqkxjFNcXUp8S88TKBXy9JceCmMGzkjmWUo4HfqtcgufUBNvK38KEVYZ0f9bwFCfCxLHBcLqoifY+P2BPpCu/RBy8H1PMgB41Kx0TSViFXWTR8fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ESGdkA3Q; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720629420; x=1721234220; darn=vger.kernel.org;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdEk/xS42cer+nsNbr3GxVg6aR55CredoMdTWrvWjPQ=;
-        b=BSkFg4V5bFLsMqmzBCoWeyfGKxM4GEjv10v0uDp7Xpz0Htq7tTZMJSqJwFKL0nOaEU
-         z6hAlWW9F5YivMz50UtlcQLQ4Lxmhv+Kk83Y2528Aazpp/JdYaVPQJpcYSb8r2Wvo4wM
-         rMO1vWqhxGHFeRRvoNXj7QiSCMlBYFVClfx1szf0QwAkxhB1tTLTvEeN9svb6/PIHgEK
-         +eM7TfZk9bY4qoS9ZYqeN3N7VX/yUpO1MAAvDtb2JzLaNdCW2BcFBPmMbB7C6lIq3Qb2
-         pQiK3KzAfJUhsV1Aqk2cO5ZNwFmBVRIFQx0GjwTC9p3pWLsUKy35kHf+qEs9UN4VyK+a
-         hS1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720629420; x=1721234220;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdEk/xS42cer+nsNbr3GxVg6aR55CredoMdTWrvWjPQ=;
-        b=QeOd7O+j7loey0TPn56aHVYUV26sb38bjxoMvIt7vueeUU+7KncTOZEyUk6UrkHjtp
-         pQl+W63Lkh+aeR7v/JeAyNzayL6ceFJpEPa64icEX988esCaTMShqIYyBXrCnzMJwjGU
-         M91FSCi37SCSm+T3RsA9RNA/yobuT24WDAHIQXktJS8oC7bWBFYz6keJgMCbnGx8L//i
-         EDFTY+iZ7sfgszQxQwv0Zthk2tlcv64fDMPSk/vFip1+uLH0vglB6Oq7js41HB8wXVpu
-         Dkog9a47/KYs1vLHASYtX4rlErCSxMaMfIWfhrZv602YwnoT3OebS7s1r4Dj39AhAdyQ
-         zR+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVcT7TcBc4n/ZE2EZmHd4/ixBfu0/RAotUc6/jaOTlYVXDOJpcFyZN4v8oAhrM6G4JvJwIM5azpZRBOnsFOJXmXLtOfzINX
-X-Gm-Message-State: AOJu0Yzi6rPdnsV9H8kqwThIg+kZ9dqYAHXmizUQ1ajQ/v6kH+589GeT
-	DCghHsHNpr5TbrOxnMipWBI3OXe6SwTiw6i2IkCAivdzNUDlpAVg+zOKBkHO6Q==
-X-Google-Smtp-Source: AGHT+IHmlzxMBt1I02mYgCVVFfyZwoIJo3cnM1aEwxkR/fsMcy2EzuwB+V0Pzq8JtvZgB7eiWJDgSg==
-X-Received: by 2002:a25:6808:0:b0:df7:8dca:1ef2 with SMTP id 3f1490d57ef6-e041b0788b3mr7334664276.34.1720629419734;
-        Wed, 10 Jul 2024 09:36:59 -0700 (PDT)
-Received: from darker.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e041a99e948sm655418276.63.2024.07.10.09.36.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 09:36:59 -0700 (PDT)
-Date: Wed, 10 Jul 2024 09:36:48 -0700 (PDT)
-From: Hugh Dickins <hughd@google.com>
-To: Paolo Abeni <pabeni@redhat.com>
-cc: Hugh Dickins <hughd@google.com>, Sagi Grimberg <sagi@grimberg.me>, 
-    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-    Thorsten Leemhuis <regressions@leemhuis.info>, regressions@lists.linux.dev, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v3] net: fix rc7's __skb_datagram_iter()
-In-Reply-To: <934ac0b8491ec56dd35b9f0ab7422daa1926c4df.camel@redhat.com>
-Message-ID: <1c72ac52-9830-c2f9-5a14-d1487da8fabf@google.com>
-References: <58ad4867-6178-54bd-7e49-e35875d012f9@google.com> <ae4e55df-6fe6-4cab-ac44-3ed10a63bfbe@grimberg.me> <fef352e8-b89a-da51-f8ce-04bc39ee6481@google.com> <51b9cb9c-cf7d-47b3-ab08-c9efbdb1b883@grimberg.me> <66e53f14-bfca-6b1a-d9db-9b1c0786d07a@google.com>
- <934ac0b8491ec56dd35b9f0ab7422daa1926c4df.camel@redhat.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720630079; x=1752166079;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DwacjsFj4vQ0goPNtUhs2YfiNLTdBry9WX0OZRJCji8=;
+  b=ESGdkA3Qx+Y7Fdio02jHI3fJOHULSlhPzdlxjUeFCBtsiGJ3Tarf0W+V
+   5oCTtUZPptKWpAmDd6KHK+3oxCRV7s1uo6witwq/5V4awUqYh6hgLq/3h
+   WMoYrH9obcrliLxpXxy6SmvhjlhSLqLKe5bDzpKtsE0BR5uq83C3cqcsG
+   E=;
+X-IronPort-AV: E=Sophos;i="6.09,198,1716249600"; 
+   d="scan'208";a="645130028"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 16:47:52 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:47392]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.52:2525] with esmtp (Farcaster)
+ id e1b777d8-6fa9-4955-8f97-ef02cea444db; Wed, 10 Jul 2024 16:47:51 +0000 (UTC)
+X-Farcaster-Flow-ID: e1b777d8-6fa9-4955-8f97-ef02cea444db
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 16:47:50 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 16:47:48 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <dima@arista.com>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next 0/2] tcp: Make simultaneous connect() RFC-compliant.
+Date: Wed, 10 Jul 2024 09:47:40 -0700
+Message-ID: <20240710164740.85061-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240710014456.77159-1-kuniyu@amazon.com>
+References: <20240710014456.77159-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, 10 Jul 2024, Paolo Abeni wrote:
-> On Wed, 2024-07-10 at 08:36 -0700, Hugh Dickins wrote:
-> > X would not start in my old 32-bit partition (and the "n"-handling looks
-> > just as wrong on 64-bit, but for whatever reason did not show up there):
-> > "n" must be accumulated over all pages before it's added to "offset" and
-> > compared with "copy", immediately after the skb_frag_foreach_page() loop.
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Tue, 9 Jul 2024 18:44:55 -0700
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Tue, 9 Jul 2024 12:52:09 -0700
+> > On Mon, 8 Jul 2024 11:08:50 -0700 Kuniyuki Iwashima wrote:
+> > >   * Add patch 2
 > > 
-> > Fixes: d2d30a376d9c ("net: allow skb_datagram_iter to be called from any context")
-> > Signed-off-by: Hugh Dickins <hughd@google.com>
-> > Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> > ---
-> > v3: added reviewed-by Sagi, try sending direct to Linus
+> > Hi Kuniyuki!
+> > 
+> > Looks like it also makes BPF CI fail. All of these:
+> > https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-07-09--15-00&executor=gh-bpf-ci&pw-n=0
+> > But it builds down to the reuseport test on various platforms.
 > 
-> V2 is already applied to the 'net' tree and will be included in our
-> next 'net' PR, coming tomorrow.
+> Oh, thanks for catching!
 > 
-> It looks like the netdev bot decided it needed an holiday (or was
-> fooled by the threaded submission for v2), so no notification landed on
-> the ML.
-> 
-> @Hugh: next time please check the current tree status or patchwork
-> before submitting a new revision. And please avoid submitting the new
-> version in reply to a previous one, it makes things difficult for our
-> CI.
+> It seems the test is using TFO, and somehow fastopen_rsk is cleared,
+> but a packet is processed later in SYN_RECV state...
 
-Ah, great, thanks. Yes, I'd heard only silence (and was worried because,
-although I only saw the effect of this on 32-bit, suspect it could cause
-lots of obscure trouble more generally).
+The test used MSG_FASTOPEN but TFO always failed due to lack of
+proper configuration, this should be fixed.
 
-Hugh
+IP 127.0.0.1.36477 > 127.0.0.1.53357: Flags [S], seq 2263448885:2263448893, win 65495, options [mss 65495,sackOK,TS val 2871616407 ecr 0,nop,wscale 7], length 8
+IP 127.0.0.1.53357 > 127.0.0.1.36477: Flags [S.], seq 3767023264, ack 2263448886, win 65483, options [mss 65495,sackOK,TS val 2871616407 ecr 2871616407,nop,wscale 7], length 0
+
+But this wasn't related, just red-herring.
+
+I just missed that the ACK of 3WHS was also processed by newly created
+SYN_RECV sk in tcp_rcv_state_process() called from tcp_child_process().
+
+So, (sk->sk_state == TCP_SYN_RECV && !tp->fastopen_rsk) cannot deduce
+the cross SYN+ACK case.
+
+We need to use (sk->sk_state == TCP_SYN_RECV && sk->sk_socket).
+
+Will post v3.
+
+Thanks!
 
