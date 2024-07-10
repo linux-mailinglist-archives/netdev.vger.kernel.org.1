@@ -1,100 +1,143 @@
-Return-Path: <netdev+bounces-110441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F53892C6B7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 01:40:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E7D92C6F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 02:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C221F22F7C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jul 2024 23:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 430D928369F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 00:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EED189F39;
-	Tue,  9 Jul 2024 23:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2FDA32;
+	Wed, 10 Jul 2024 00:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggVGNfxZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wzBkKJJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC1F185627
-	for <netdev@vger.kernel.org>; Tue,  9 Jul 2024 23:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17020A35
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 00:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720568435; cv=none; b=rxkJQBAIe8t3zJeVPVFpZNryNCXoo75mwVwpfYXYrv0GNmVQFEJJVZv1bjFySJQ/oxOs+eN1bhiL/245NYwzmCIFhsUdOB/xiksGQbsB5Dy1GwHoT0f251tljPfpyB3bukAIbDXCivHROzPnn/bc1i4U0vvGDEv2NO9mKLoEA/8=
+	t=1720570449; cv=none; b=hizq+g0GcXryrNMDtbZntrHUqDBrke8RaeE6ycCDBgQcmt9Ed1MyX4FQ5w1KV7yN9dSaV9HBpCdXmT1dBbClCcFj7gL2jeWD1P0OQKm4oliks+DO5fiXNRgmkeVti4pFgMrSnLz8Hy6+vSjRdSmCRX/qnzBaBF8rfdww1Jzfk4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720568435; c=relaxed/simple;
-	bh=40Xj0jCf2OH5VS1a6pPIawp/csNBg4CVtaYU1D0WjIA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jNaFiLZgIRFNg+G1sdtn1A7o0M0bvd4UCDwr0ahFdcCxfqsg2VL+fGSvu0TDrBNM1OWL/VLMTngurUL4viIbyWs/F+Y9l/v2NKzDC4AHEJVwFcr6phn6TVSVvpymiQjGPz730r9rUP505jY3mv3ieyitphH/vVBArO9CtUF7vkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggVGNfxZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DF41C32786;
-	Tue,  9 Jul 2024 23:40:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720568435;
-	bh=40Xj0jCf2OH5VS1a6pPIawp/csNBg4CVtaYU1D0WjIA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ggVGNfxZnmJdPZVMQxBOZWLrwqnTarJeHZVvDYPMzQLVZyJxwGGJLrduUseqmPNEx
-	 lPwmnjmMqMmz0qfczWeZnowNhh3QowGQtTFFDmBxj9HPs/lApu6TS54jMPzyQKunVn
-	 UVhLPIEl8PwuQjaDmCSnlmpywmrHc7hdWLFix8jBrYHFPKFlkcdaCpF+Ft++CewiNu
-	 Ucxj9MBledryBs2GNbckw72uRUkW6zX6nnVaO5ktDAh9oQ/wzHwmYDbjkutPYlSHqq
-	 3agk5HpOaSf7UcHddQbed4etNrobXd6kw+5eB/yK8JN193brQ5aTPTQuwvwkt4S2jA
-	 BSmei1cCTVTwg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0B786C43468;
-	Tue,  9 Jul 2024 23:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720570449; c=relaxed/simple;
+	bh=qaY1vmzkDjES1bdhMdWge2zCsIzcnjH6gaqssbsHXt8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EfQBlgM9jFa2uVMj3kCzlVT448Qi1xbg7LtTF65eHaw0R90XviVQ197iQ9X5YUcsB2Ih9m0JNQAalciasuZQwpxN4BjhiCIB/gSdHymVbPoRcDvQi0RllA5IWK3HA6gw3+pCPrypV5Bxpn1RsjZuCaFAjLZ3HLRY3wSGdB/LKUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wzBkKJJF; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6b5a5e78dd8so5144176d6.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 17:14:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720570447; x=1721175247; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3/AVlMzbcZLPmvYzmk46Bfuh1PRmVGTfNxlitome9iE=;
+        b=wzBkKJJFojl5rpvB/8T8++hlfOct1OOtBdMUT4VNmJUCOCnVp57HtA+GJ0vDL9Gekj
+         3DNr6jHk8PKPs77g2dzhWHVzPUviMR7hoWoG/QSj0yjrnG0dG1fmY8cYCM9BldoA1kOu
+         eUnnyA5MLLRt24QzgaaBWjOImS5DM/TzMy9JJTcGSGJESji1Yn9MT6zclGeloSJ7xM8C
+         kHGFiW955CsDktszxObfU0xAMWAMBWlJUgQZNNI9OaksK2jtW9l7lFsiSflSRYL+bL6R
+         B2unhq1P2vkXx9XZl7jdBeifmoTtsszmGIUspdvOz/FwlwFwMsROFEapGJHqnwiS7M22
+         A1cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720570447; x=1721175247;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3/AVlMzbcZLPmvYzmk46Bfuh1PRmVGTfNxlitome9iE=;
+        b=F+nWJ9TQWiP2Hym8wd3i7qNMgJOv7A11OYFIA/qKAn2/K7MUUDRuaIOooxQBUG4FKs
+         dav2cNm4igNDRpDZFQtVecFIhCS81/2kX/DXCbmib96DnarKNuDyzNdvQafy2idqi1az
+         XXEkjtEQWjyCBZX+ma7uzKK7TEI56cT7OnKrKNMe2emD49bE8VohWpfzr5sx2rN/7H+D
+         GAnA6bhUzKaZoG8aWCgEXvqi0VdwTz8mD9iBuYMdbcRZ2oO8of5WQ/HqvErpn1S+ABYo
+         dO/NlJOBw4EVybkgvaII5zu7Sd2Bm5FfzRpEPbUkq1uWgJmdJWCJDQnFZPxhP4exKYcX
+         xTAQ==
+X-Gm-Message-State: AOJu0Yy3dJpixamm3BX6n4VcjulUX/YmOYB6WF76WvgCyab8PXPnogn0
+	dblnuqVfg5DfrzzT+LncK8ixsbLaicNZOiHy+DEW7NkUKluYv2IrX9kLxZICg5rWXqsbFzZQu2M
+	NrDKUczsY/g==
+X-Google-Smtp-Source: AGHT+IGE4sESoSO7d1aiFZd77RbLHjpHZRFcOBQ6jKvwm/MjBKaJ9P32X2Ai8mBPTA0bE7PqVs0IQzxYs5c+LA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6214:250c:b0:6b5:3747:236d with SMTP
+ id 6a1803df08f44-6b61d7b8de4mr2644666d6.2.1720570447032; Tue, 09 Jul 2024
+ 17:14:07 -0700 (PDT)
+Date: Wed, 10 Jul 2024 00:14:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] selftests: drv-net: rss_ctx: more tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172056843504.21813.18385048538140587791.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jul 2024 23:40:35 +0000
-References: <20240708213627.226025-1-kuba@kernel.org>
-In-Reply-To: <20240708213627.226025-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, willemdebruijn.kernel@gmail.com, petrm@nvidia.com,
- przemyslaw.kitszel@intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240710001402.2758273-1-edumazet@google.com>
+Subject: [PATCH net] tcp: avoid too many retransmit packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Jon Maxwell <jmaxwell37@gmail.com>, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+If a TCP socket is using TCP_USER_TIMEOUT, and the other peer
+retracted its window to zero, tcp_retransmit_timer() can
+retransmit a packet every two jiffies (2 ms for HZ=1000),
+for about 4 minutes after TCP_USER_TIMEOUT has 'expired'.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The fix is to make sure tcp_rtx_probe0_timed_out() takes
+icsk->icsk_user_timeout into account.
 
-On Mon,  8 Jul 2024 14:36:22 -0700 you wrote:
-> Add a few more tests for RSS.
-> 
-> v2:
->  - update the commit messages
->  - add a comment in patch 2
-> v1: https://lore.kernel.org/all/20240705015725.680275-1-kuba@kernel.org/
-> 
-> [...]
+Before blamed commit, the socket would not timeout after
+icsk->icsk_user_timeout, but would use standard exponential
+backoff for the retransmits.
 
-Here is the summary with links:
-  - [net-next,v2,1/5] selftests: drv-net: rss_ctx: fix cleanup in the basic test
-    https://git.kernel.org/netdev/net-next/c/a0aab7d7c860
-  - [net-next,v2,2/5] selftests: drv-net: rss_ctx: factor out send traffic and check
-    https://git.kernel.org/netdev/net-next/c/847aa551fa78
-  - [net-next,v2,3/5] selftests: drv-net: rss_ctx: test queue changes vs user RSS config
-    https://git.kernel.org/netdev/net-next/c/e2c9703d424e
-  - [net-next,v2,4/5] selftests: drv-net: rss_ctx: check behavior of indirection table resizing
-    https://git.kernel.org/netdev/net-next/c/7e3e5b0bc51d
-  - [net-next,v2,5/5] selftests: drv-net: rss_ctx: test flow rehashing without impacting traffic
-    https://git.kernel.org/netdev/net-next/c/933048fec4dd
+Also worth noting that before commit e89688e3e978 ("net: tcp:
+fix unexcepted socket die when snd_wnd is 0"), the issue
+would last 2 minutes instead of 4.
 
-You are awesome, thank you!
+Fixes: b701a99e431d ("tcp: Add tcp_clamp_rto_to_user_timeout() helper to improve accuracy")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jon Maxwell <jmaxwell37@gmail.com>
+Cc: Neal Cardwell <ncardwell@google.com>
+---
+ net/ipv4/tcp_timer.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index db9d826560e57caf8274d1b7253c7af4dd7821a0..892c86657fbc243ce53a939157b77f1fe0410097 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -483,15 +483,26 @@ static bool tcp_rtx_probe0_timed_out(const struct sock *sk,
+ 				     const struct sk_buff *skb,
+ 				     u32 rtx_delta)
+ {
++	const struct inet_connection_sock *icsk = inet_csk(sk);
++	u32 user_timeout = READ_ONCE(icsk->icsk_user_timeout);
+ 	const struct tcp_sock *tp = tcp_sk(sk);
+-	const int timeout = TCP_RTO_MAX * 2;
++	int timeout = TCP_RTO_MAX * 2;
+ 	s32 rcv_delta;
+ 
++	if (user_timeout) {
++		/* If user application specified a TCP_USER_TIMEOUT,
++		 * it does not want win 0 packets to 'reset the timer'
++		 * while retransmits are not making progress.
++		 */
++		if (rtx_delta > user_timeout)
++			return true;
++		timeout = min_t(u32, timeout, msecs_to_jiffies(user_timeout));
++	}
+ 	/* Note: timer interrupt might have been delayed by at least one jiffy,
+ 	 * and tp->rcv_tstamp might very well have been written recently.
+ 	 * rcv_delta can thus be negative.
+ 	 */
+-	rcv_delta = inet_csk(sk)->icsk_timeout - tp->rcv_tstamp;
++	rcv_delta = icsk->icsk_timeout - tp->rcv_tstamp;
+ 	if (rcv_delta <= timeout)
+ 		return false;
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2.993.g49e7a77208-goog
 
 
