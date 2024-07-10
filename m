@@ -1,222 +1,111 @@
-Return-Path: <netdev+bounces-110620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D449792D7C9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 19:55:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5819592D80E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:11:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A13EB20BA9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 17:55:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E563CB24C3F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A26194C88;
-	Wed, 10 Jul 2024 17:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD53819581F;
+	Wed, 10 Jul 2024 18:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nn9Vks/Q"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fKqeCeoh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114911946C0
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 17:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AB719580B;
+	Wed, 10 Jul 2024 18:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720634113; cv=none; b=fQA5Ub25FVfz4xCIMkumD8GEu8Hil9cjERzlY3W/DGYbeFTPmF5SGszs9KWg/6aKFJgnlR8SJwCbj3n3A9rrBt50jpxjg5SsyYmXmBb2FPUDyLhid5nqhhExiOz5gXUe3jNfTZK4JeeqGiLabDMjzlBBmDUKLErOUl8nqX8hH1M=
+	t=1720635069; cv=none; b=dHA0lkOX3cN96qYJKQXGSwXeA+tXakLIsbNDy0579C+PnZgRy539djNx6X0GdMx432T0rjEtWs7WDWxXni9gvA8plbAgg9kXI8eqPbiXteJeP35NoUjpW44Ru3byh1DrgF82e28980u6E9SrS7aiP2GuyLqDXwxSxiB18NiHtlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720634113; c=relaxed/simple;
-	bh=RnQIyL9J/i5rGME6ulMv1Yko2uKIA5s3jG9I7hKGlBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SF114MqZub0Tpj2yo1l1jcNo2J4nf7h+91RKLExgKg6UCoelxBXDaSgC8Hp1qkQK5tcy4IyPvmAdKh1kJtLjU9nWEzRmwqFu2M6kphcdEX6lBVSZIXUiBbOe1XsNJXUQsbK9eyAuJFg+VetIE4ukiRaduPkyxiA7a7Gcuqr3/ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nn9Vks/Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34323C32781;
-	Wed, 10 Jul 2024 17:55:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720634112;
-	bh=RnQIyL9J/i5rGME6ulMv1Yko2uKIA5s3jG9I7hKGlBo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=nn9Vks/QI7mJ007vtFcTsPZNl2zpu94yZqS5qYZLVwXsN+xvBWMBHHu4ta09Ir2Ts
-	 MBUKxzOB41rEHqAiOsebe6TyS5JUBSFuMoLuMlL27AxIty0lEYL7CR622pmMPbyGFT
-	 oi2AvxaUL1721k2mKSaNnsEnljw36gvDpbFIR/e2jXIVQc9bVSKialAvtTAld6i1DO
-	 xW671ym55Mq9b0oRB4bPbrM9Rkb1IkMHBsfc5bkHuzdy976PfMcmR0l57w8q/jwxuE
-	 q9CdcaPJP+45Jfuec9SnoQUGpLeiEjoYgxearpNUAgeHLBIMTVWJ2VQSpbvypUExaI
-	 oy3WKIAx+j7/g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	tariqt@nvidia.com,
-	rrameshbabu@nvidia.com,
-	saeedm@nvidia.com,
-	yuehaibing@huawei.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	afaris@nvidia.com
-Subject: [PATCH net-next] eth: mlx5: let NETIF_F_NTUPLE float when ARFS is not enabled
-Date: Wed, 10 Jul 2024 10:55:02 -0700
-Message-ID: <20240710175502.760194-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1720635069; c=relaxed/simple;
+	bh=NH51Gm1ebO405FZGc6l9wG2SFCxWaOHSn18QhugIZZQ=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=hcO6iCgK3wduuU/IpaBe62nLXVX0lwtv1XtpRxjrb5Qphr4Yq8n4T4slOrsDYWSUqneofQ5GgAyJNyfZWq4jPlDZ82GTNDetOBjq2HxqHESSELEfyfY51QSwqPsW8xqEK6vWLqb74WdOXu9/kXYdbHiIl6E3t1Cpq2t4sXRjcCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fKqeCeoh; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46A9WJh8028685;
+	Wed, 10 Jul 2024 18:10:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=usBp91UXvjAj150cjj8l6p
+	Ff5frheSfqpKqhqAsv8lQ=; b=fKqeCeohz+MF5v3aUEEfLsV80qfh3QWM/Dl5av
+	pe2lIeYatdrzrSPPBP2RXzZ0wufXwMKUHIFFxI6/gV6bI+nPZ8InmWxaJcjOcoh/
+	GWcH519zRHS8po7lEMhBhLNm1X0UI8UBobGSQsMEzhFJYfO072KCvKO/QYKCgl73
+	tCju0EFXfIeYAgF48Fjb/73ga8FZ5SanlFnTe4RsSnQQLyru9nLkdi+HDKsJDTod
+	buD1BDjT0L41iJs8EuA2LP0goJ1+PRroAKhXmYgKL54JmDdIVgw/5ALaHwXZOz9b
+	KaX/qKHyCI2vO4t/I69SS3QANsexPomyNymhlvEDfJbA+dqw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406we920se-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jul 2024 18:10:53 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46AIACfC006468
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jul 2024 18:10:12 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 10 Jul
+ 2024 11:10:12 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Subject: [PATCH net-next 0/2] libceph: fix kernel-doc warnings
+Date: Wed, 10 Jul 2024 11:10:02 -0700
+Message-ID: <20240710-kd-crush_choose_indep-v1-0-fe2b85f322c6@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHrOjmYC/x2MUQqDMBAFryL73YUo0mKvUorE+GyWtqtkVQTx7
+ k39HIaZnQxJYHQvdkpYxWTUDOWloBC9vsDSZ6bKVbW7lY7fPYe0WGxDHEdDK9pjYlf5ZmjcFQN
+ qyu2UMMh2fh+kmFmxzfTMpvMG7pLXEP/fj+iynZa/3mYkOo4fhvjTdJUAAAA=
+To: Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <ceph-devel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.14.0
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: QA4s98LEogaza9TrzQDAWY2QNNHl5D1V
+X-Proofpoint-GUID: QA4s98LEogaza9TrzQDAWY2QNNHl5D1V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-10_13,2024-07-10_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ bulkscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 mlxlogscore=858 malwarescore=0 mlxscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2407100128
 
-ARFS depends on NTUPLE filters, but the inverse is not true.
-Drivers which don't support ARFS commonly still support NTUPLE
-filtering. mlx5 has a Kconfig option to disable ARFS (MLX5_EN_ARFS)
-and does not advertise NTUPLE filters as a feature at all when ARFS
-is compiled out. That's not correct, ntuple filters indeed still work
-just fine (as long as MLX5_EN_RXNFC is enabled).
+I split this into two patches due to the nature of the two fixes.
+Let me know if you prefer them to be squashed.
 
-This is needed to make the RSS test not skip all RSS context
-related testing.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: tariqt@nvidia.com
-CC: rrameshbabu@nvidia.com
-CC: saeedm@nvidia.com
-CC: yuehaibing@huawei.com
-CC: horms@kernel.org
-CC: jacob.e.keller@intel.com
-CC: afaris@nvidia.com
----
- drivers/net/ethernet/mellanox/mlx5/core/en/fs.h     | 13 +++++++++++++
- .../net/ethernet/mellanox/mlx5/core/en_ethtool.c    |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_fs.c     |  5 ++---
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c   |  6 +++---
- .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c   |  8 +++-----
- 5 files changed, 22 insertions(+), 12 deletions(-)
+Jeff Johnson (2):
+      libceph: suppress crush_choose_indep() kernel-doc warnings
+      libceph: fix crush_choose_firstn() kernel-doc warnings
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-index 4d6225e0eec7..1e8b7d330701 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
-@@ -154,6 +154,19 @@ struct mlx5e_tc_table *mlx5e_fs_get_tc(struct mlx5e_flow_steering *fs);
- struct mlx5e_l2_table *mlx5e_fs_get_l2(struct mlx5e_flow_steering *fs);
- struct mlx5_flow_namespace *mlx5e_fs_get_ns(struct mlx5e_flow_steering *fs, bool egress);
- void mlx5e_fs_set_ns(struct mlx5e_flow_steering *fs, struct mlx5_flow_namespace *ns, bool egress);
-+
-+static inline bool mlx5e_fs_has_arfs(struct net_device *netdev)
-+{
-+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
-+		netdev->hw_features & NETIF_F_NTUPLE;
-+}
-+
-+static inline bool mlx5e_fs_want_arfs(struct net_device *netdev)
-+{
-+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
-+		netdev->features & NETIF_F_NTUPLE;
-+}
-+
- #ifdef CONFIG_MLX5_EN_RXNFC
- struct mlx5e_ethtool_steering *mlx5e_fs_get_ethtool(struct mlx5e_flow_steering *fs);
- #endif
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index 3320f12ba2db..5582c93a62f1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -525,7 +525,7 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
- 
- 	opened = test_bit(MLX5E_STATE_OPENED, &priv->state);
- 
--	arfs_enabled = opened && (priv->netdev->features & NETIF_F_NTUPLE);
-+	arfs_enabled = opened && mlx5e_fs_want_arfs(priv->netdev);
- 	if (arfs_enabled)
- 		mlx5e_arfs_disable(priv->fs);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-index 8c5b291a171f..05058710d2c7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-@@ -1307,8 +1307,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
- 		return -EOPNOTSUPP;
- 
- 	mlx5e_fs_set_ns(fs, ns, false);
--	err = mlx5e_arfs_create_tables(fs, rx_res,
--				       !!(netdev->hw_features & NETIF_F_NTUPLE));
-+	err = mlx5e_arfs_create_tables(fs, rx_res, mlx5e_fs_has_arfs(netdev));
- 	if (err) {
- 		fs_err(fs, "Failed to create arfs tables, err=%d\n", err);
- 		netdev->hw_features &= ~NETIF_F_NTUPLE;
-@@ -1355,7 +1354,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
- err_destroy_inner_ttc_table:
- 	mlx5e_destroy_inner_ttc_table(fs);
- err_destroy_arfs_tables:
--	mlx5e_arfs_destroy_tables(fs, !!(netdev->hw_features & NETIF_F_NTUPLE));
-+	mlx5e_arfs_destroy_tables(fs, mlx5e_fs_has_arfs(netdev));
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ff335527c10a..c2c56ffc08d5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5556,7 +5556,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- #if IS_ENABLED(CONFIG_MLX5_CLS_ACT)
- 		netdev->hw_features      |= NETIF_F_HW_TC;
- #endif
--#ifdef CONFIG_MLX5_EN_ARFS
-+#if IS_ENABLED(CONFIG_MLX5_EN_ARFS) || IS_ENABLED(CONFIG_MLX5_EN_RXNFC)
- 		netdev->hw_features	 |= NETIF_F_NTUPLE;
- #endif
- 	}
-@@ -5731,7 +5731,7 @@ static int mlx5e_init_nic_rx(struct mlx5e_priv *priv)
- err_tc_nic_cleanup:
- 	mlx5e_tc_nic_cleanup(priv);
- err_destroy_flow_steering:
--	mlx5e_destroy_flow_steering(priv->fs, !!(priv->netdev->hw_features & NETIF_F_NTUPLE),
-+	mlx5e_destroy_flow_steering(priv->fs, mlx5e_fs_has_arfs(priv->netdev),
- 				    priv->profile);
- err_destroy_rx_res:
- 	mlx5e_rx_res_destroy(priv->rx_res);
-@@ -5747,7 +5747,7 @@ static void mlx5e_cleanup_nic_rx(struct mlx5e_priv *priv)
- {
- 	mlx5e_accel_cleanup_rx(priv);
- 	mlx5e_tc_nic_cleanup(priv);
--	mlx5e_destroy_flow_steering(priv->fs, !!(priv->netdev->hw_features & NETIF_F_NTUPLE),
-+	mlx5e_destroy_flow_steering(priv->fs, mlx5e_fs_has_arfs(priv->netdev),
- 				    priv->profile);
- 	mlx5e_rx_res_destroy(priv->rx_res);
- 	priv->rx_res = NULL;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-index 8e0404c0d1ca..0979d672d47f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-@@ -372,7 +372,7 @@ static int mlx5i_create_flow_steering(struct mlx5e_priv *priv)
- 
- 	mlx5e_fs_set_ns(priv->fs, ns, false);
- 	err = mlx5e_arfs_create_tables(priv->fs, priv->rx_res,
--				       !!(priv->netdev->hw_features & NETIF_F_NTUPLE));
-+				       mlx5e_fs_has_arfs(priv->netdev));
- 	if (err) {
- 		netdev_err(priv->netdev, "Failed to create arfs tables, err=%d\n",
- 			   err);
-@@ -391,8 +391,7 @@ static int mlx5i_create_flow_steering(struct mlx5e_priv *priv)
- 	return 0;
- 
- err_destroy_arfs_tables:
--	mlx5e_arfs_destroy_tables(priv->fs,
--				  !!(priv->netdev->hw_features & NETIF_F_NTUPLE));
-+	mlx5e_arfs_destroy_tables(priv->fs, mlx5e_fs_has_arfs(priv->netdev));
- 
- 	return err;
- }
-@@ -400,8 +399,7 @@ static int mlx5i_create_flow_steering(struct mlx5e_priv *priv)
- static void mlx5i_destroy_flow_steering(struct mlx5e_priv *priv)
- {
- 	mlx5e_destroy_ttc_table(priv->fs);
--	mlx5e_arfs_destroy_tables(priv->fs,
--				  !!(priv->netdev->hw_features & NETIF_F_NTUPLE));
-+	mlx5e_arfs_destroy_tables(priv->fs, mlx5e_fs_has_arfs(priv->netdev));
- 	mlx5e_ethtool_cleanup_steering(priv->fs);
- }
- 
--- 
-2.45.2
+ net/ceph/crush/mapper.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+---
+base-commit: 523b23f0bee3014a7a752c9bb9f5c54f0eddae88
+change-id: 20240710-kd-crush_choose_indep-02a9f906efe4
 
 
