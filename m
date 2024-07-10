@@ -1,184 +1,176 @@
-Return-Path: <netdev+bounces-110503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4931292CA68
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:10:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB0292CB24
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C3381C220C8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 06:10:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E0EE281CCA
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 06:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900A052F62;
-	Wed, 10 Jul 2024 06:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B2357CBC;
+	Wed, 10 Jul 2024 06:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvsRFLqV"
+	dkim=pass (2048-bit key) header.d=arctic-alpaca.de header.i=@arctic-alpaca.de header.b="ff0uhAB+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA8A41C92
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 06:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C87B77F1B;
+	Wed, 10 Jul 2024 06:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720591851; cv=none; b=pDk3rMn98wdH9Lp3NQfOGX0z3bG9TEAIDyNz0bccjo5KHWIpe2gv16a4F57tZtbpFpKeSYkWgcJU2mGmMoOXlfy6gP8pJ3+YU7cDXu5y+oIyzaJ8JJM8nxDioWJ8ijDL1fbo8kUXnGCwdn2wn6bY8mjI5AMg2RhnorveDHx62wc=
+	t=1720593156; cv=none; b=JMtJSWBdufTwi3rJQj8Rf+x7aWZJZmVta5ZkjlaWE7K4mK5Sga29UP/zwDKCtxTQA1CPL26RmIj24+KFQ3s6l4O7/ZlTcyujSlt7R9BaIS8whNRTX/W3eh0vepZye521bbV9C/u6EPnTc+dXvU1hrWTmw8zdTftV+mKcgL6fRcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720591851; c=relaxed/simple;
-	bh=1OteSeEEKH0xI0Oh+CNKtD7aOdOLUK4Wax0gEtG/3rY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=te9ZRXR9K3fDu73Ue6atIrQ/hsn7V0B9h/Mw4AlW1nvzDS6md9pexLMI/9aTaxUQzH3rGj+YNQI1eRM6+x0IcKRW6FEqTVhbHU0JXtcA9wEWn06/AN7aIcDfNcRMPPSioDnOjfI5ihD5Y4RYWIupSr/c69cwrE+OokO4ybiGgLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dvsRFLqV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720591848;
+	s=arc-20240116; t=1720593156; c=relaxed/simple;
+	bh=LQ2JpUcAC3pB6JkyF7iicHvOIHyzAj/bhmdPGKPqdL8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pW7OEpSiI+reZFc2yGkbhvhO08nL6LCQBEBzRASMkNCVo9rV9r47JjbjNm4S7XvGdo06cgQc1ggq/eL+rxE5Ds37W6rF7Ysk3iQY5rtUE4x8HtjvLy603HgNtUrOvEkfFwrjNOgJCzqTotpAYMcAon+8yQ9fimsGJluDkkS0PyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arctic-alpaca.de; spf=pass smtp.mailfrom=arctic-alpaca.de; dkim=pass (2048-bit key) header.d=arctic-alpaca.de header.i=@arctic-alpaca.de header.b=ff0uhAB+; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arctic-alpaca.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arctic-alpaca.de
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4WJp1d0jQCz9sWG;
+	Wed, 10 Jul 2024 08:32:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arctic-alpaca.de;
+	s=MBO0001; t=1720593141;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X4MsH1lA4eWc8gvy+b6nRd+irAYUf4vc/vQAj43j3S8=;
-	b=dvsRFLqVVes0doTNK7yYNnH7tlVnP+/H8jWYAtril39/PogA1o2ZJBzQ4viAfpHeZ34jLK
-	mvKdX0iQ6pqbhXBnFOii90Zl3CVtDih3wbROcPNFynFpcrHBDVcUlFvgAfa04W41/EuvLx
-	K+zbjJBh9uN874dj0uFHAaCmNN7mfXo=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-9b-Z5lkuOwemotDq0Potfw-1; Wed, 10 Jul 2024 02:10:47 -0400
-X-MC-Unique: 9b-Z5lkuOwemotDq0Potfw-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52ea249d1c9so5619858e87.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jul 2024 23:10:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720591846; x=1721196646;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X4MsH1lA4eWc8gvy+b6nRd+irAYUf4vc/vQAj43j3S8=;
-        b=J4R+9cnYs5f00Cwpxg878OgF+Dit1vZT74o/hvrfyPPBL3mhqgsX7eyLYdi2r5g35s
-         sgR0500ZyFSpqybPcOPT0LxDcL9/nphtGNzJrybRSc2WgTri+fnsLp+HgRt4MwM7XEJr
-         JjyV9TmvMjtLsU5kJAqWfGoDXVXdPFGC19/ZRXjsrDlZm4RwlswfC71cBddefK9K5YU3
-         fuZ3o7EqCuAYuRnSDFG1HhMUQ5jH+arxnoERJFgs5wNDVZW9aGwtSW/cFIY4+hnYK4lO
-         Z4hsDly10Z9dQ9q9QfG5J9lcDcX29BbtZPCgTTjGVvuY2NJVFzq1vG9vOyDpu9RAXuS2
-         7jSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXSXk0LgmqqogFLg2qiVy4ujQWfd1+0In/DFGdp20+0nBR2+KO0rNH4VZvdnbK3FkIKqV2ssiAA4l0wY2PDWtcsWlb/jLN
-X-Gm-Message-State: AOJu0YymO1/IbN5x4P8UoAn8P1VqsGNiYZlIab5d2zXm75OF8feMklCI
-	2a7VQnovVJimjQt+inbjqXG0/ziQp2mYfIvc/Y819Hh9TISAaBE+3bw4gyrRWtkN0yAsp9j9NYb
-	DwNd8P5nZBjdgnbi6d1NtJ0zylcr3FD0AW/OtM7ySu1EzH+ld41X2GA==
-X-Received: by 2002:ac2:42d8:0:b0:52b:b327:9c1c with SMTP id 2adb3069b0e04-52eb99d59e8mr2530503e87.62.1720591845786;
-        Tue, 09 Jul 2024 23:10:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPbauTJ9QFnUJHiEZRXf8cKpY/Ph2hFs+oVaX3YRKAndRpINbHSQxy+Oi4OwHlpwQjmGnGuw==
-X-Received: by 2002:ac2:42d8:0:b0:52b:b327:9c1c with SMTP id 2adb3069b0e04-52eb99d59e8mr2530479e87.62.1720591845031;
-        Tue, 09 Jul 2024 23:10:45 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:174:f6ae:a6e3:8cbc:2cbd:b8ff])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266b03feecsm101417875e9.10.2024.07.09.23.10.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 23:10:43 -0700 (PDT)
-Date: Wed, 10 Jul 2024 02:10:37 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Cindy Lu <lulu@redhat.com>, Parav Pandit <parav@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	"sgarzare@redhat.com" <sgarzare@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Leonardo Milleri <lmilleri@redhat.com>
-Subject: Re: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240710020852-mutt-send-email-mst@kernel.org>
-References: <20240708064820.88955-1-lulu@redhat.com>
- <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
- <20240709084109-mutt-send-email-mst@kernel.org>
- <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
+	bh=GgCGBRu/t9wGdUUXWMt25SHv2GpAThCMso2wLXxw/SY=;
+	b=ff0uhAB+IOozMPSHCmOhlhh12iq/8mCYlK3EDS4cULm+ZrZ2IN6Imbbf7m8DMLa7e4N/jH
+	gNJS0h/p6GUsrPilNiSlB8p0+14kpsMXtAaMeBeKF1blB6uGVoUUa3FX/7Q+0YU/OzieOd
+	KRMtgH5uwq+t6/HAt1v1Kr1YG8BceDl381asnPfqSCr4yQTcQRgf9BsoNfIu3gACEwD9E2
+	HNTlG6hGwH+hxMVRHI40rkhHUoyX3kk/HMU+ly+X4OK9To+eY048QsCFE4UL0kH7GOaNUG
+	hoc7XyKA6SmagekH9w73GOhtPLSvILTx9gqlE5ZIIJ1dYwWGN98FapBRG7UV1A==
+Message-ID: <9f464c87-b211-4aa6-a77f-c0d6ea1c025f@arctic-alpaca.de>
+Date: Wed, 10 Jul 2024 08:32:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: xdp/xsk.c: Possible bug in xdp_umem_reg version check
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, bpf@vger.kernel.org,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@google.com>, netdev@vger.kernel.org
+References: <2d6ff64a-5e2c-4078-a8d1-84f1ff3361ce@arctic-alpaca.de>
+ <CAJ8uoz0w9RhAk2v4G-FSzjOCqitCPhEXOC6c_PcOFr7PxTjbWg@mail.gmail.com>
+ <485c0bfb-8202-4520-92e9-e2bbbf6ac89b@arctic-alpaca.de>
+ <Zo4R22FQeu_Ou7Gd@mini-arch>
+Content-Language: de-DE, en-US
+From: Julian Schindel <mail@arctic-alpaca.de>
+In-Reply-To: <Zo4R22FQeu_Ou7Gd@mini-arch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
 
-On Wed, Jul 10, 2024 at 11:05:48AM +0800, Jason Wang wrote:
-> On Tue, Jul 9, 2024 at 8:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Jul 09, 2024 at 02:19:19PM +0800, Cindy Lu wrote:
-> > > On Tue, 9 Jul 2024 at 11:59, Parav Pandit <parav@nvidia.com> wrote:
-> > > >
-> > > > Hi Cindy,
-> > > >
-> > > > > From: Cindy Lu <lulu@redhat.com>
-> > > > > Sent: Monday, July 8, 2024 12:17 PM
-> > > > >
-> > > > > Add support for setting the MAC address using the VDPA tool.
-> > > > > This feature will allow setting the MAC address using the VDPA tool.
-> > > > > For example, in vdpa_sim_net, the implementation sets the MAC address to
-> > > > > the config space. However, for other drivers, they can implement their own
-> > > > > function, not limited to the config space.
-> > > > >
-> > > > > Changelog v2
-> > > > >  - Changed the function name to prevent misunderstanding
-> > > > >  - Added check for blk device
-> > > > >  - Addressed the comments
-> > > > > Changelog v3
-> > > > >  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doit
-> > > > >  - Add a lock for the network device's dev_set_attr operation
-> > > > >  - Address the comments
-> > > > >
-> > > > > Cindy Lu (2):
-> > > > >   vdpa: support set mac address from vdpa tool
-> > > > >   vdpa_sim_net: Add the support of set mac address
-> > > > >
-> > > > >  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++++++++++++
-> > > > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
-> > > > >  include/linux/vdpa.h                 |  9 ++++
-> > > > >  include/uapi/linux/vdpa.h            |  1 +
-> > > > >  4 files changed, 109 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > --
-> > > > > 2.45.0
-> > > >
-> > > > Mlx5 device already allows setting the mac and mtu during the vdpa device creation time.
-> > > > Once the vdpa device is created, it binds to vdpa bus and other driver vhost_vdpa etc bind to it.
-> > > > So there was no good reason in the past to support explicit config after device add complicate the flow for synchronizing this.
-> > > >
-> > > > The user who wants a device with new attributes, as well destroy and recreate the vdpa device with new desired attributes.
-> > > >
-> > > > vdpa_sim_net can also be extended for similar way when adding the vdpa device.
-> > > >
-> > > > Have you considered using the existing tool and kernel in place since 2021?
-> > > > Such as commit d8ca2fa5be1.
-> > > >
-> > > > An example of it is,
-> > > > $ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:55 mtu 9000
-> > > >
-> > > Hi Parav
-> > > Really thanks for your comments. The reason for adding this function
-> > > is to support Kubevirt.
-> > > the problem we meet is that kubevirt chooses one random vdpa device
-> > > from the pool and we don't know which one it going to pick. That means
-> > > we can't get to know the Mac address before it is created. So we plan
-> > > to have this function to change the mac address after it is created
-> > > Thanks
-> > > cindy
-> >
-> > Well you will need to change kubevirt to teach it to set
-> > mac address, right?
-> 
-> That's the plan. Adding Leonardo.
-> 
-> Thanks
+On 10.07.24 06:45, Stanislav Fomichev wrote:
+> On 07/09, Julian Schindel wrote:
+>> On 09.07.24 11:23, Magnus Karlsson wrote:
+>>> On Sun, 7 Jul 2024 at 17:06, Julian Schindel <mail@arctic-alpaca.de> wrote:
+>>>> Hi,
+>>>>
+>>>> [...]
+>>> Thank you for reporting this Julian. This seems to be a bug. If I
+>>> check the value of sizeof(struct xdp_umem_reg_v2), I get 32 bytes too
+>>> on my system, compiling with gcc 11.4. I am not a compiler guy so do
+>>> not know what the rules are for padding structs, but I read the
+>>> following from [0]:
+>>>
+>>> "Pad the entire struct to a multiple of 64-bits if the structure
+>>> contains 64-bit types - the structure size will otherwise differ on
+>>> 32-bit versus 64-bit. Having a different structure size hurts when
+>>> passing arrays of structures to the kernel, or if the kernel checks
+>>> the structure size, which e.g. the drm core does."
+>>>
+>>> I compiled for 64-bits and I believe you did too, but we still get
+>>> this padding. 
+>> Yes, I did also compile for 64-bits. If I understood the resource you
+>> linked correctly, the compiler automatically adding padding to align to
+>> 64-bit boundaries is expected for 64-bit platforms:
+>>
+>> "[...] 32-bit platforms don’t necessarily align 64-bit values to 64-bit
+>> boundaries, but 64-bit platforms do. So we always need padding to the
+>> natural size to get this right."
+>>> What is sizeof(struct xdp_umem_reg) for you before the
+>>> patch that added tx_metadata_len?
+>> I would expect this to be the same as sizeof(struct xdp_umem_reg_v2)
+>> after the patch. I'm not sure how to check this with different kernel
+>> versions.
+>>
+>> Maybe the following code helps show all the sizes
+>> of xdp_umem_reg[_v1/_v2] on my system (compiled with "gcc test.c -o
+>> test" using gcc 14.1.1):
+>>
+>> #include <stdio.h>
+>> #include <sys/types.h>
+>>
+>> typedef __uint32_t __u32;
+>> typedef __uint64_t __u64;
+>>
+>> struct xdp_umem_reg_v1  {
+>>     __u64 addr; /* Start of packet data area */
+>>     __u64 len; /* Length of packet data area */
+>>     __u32 chunk_size;
+>>     __u32 headroom;
+>> };
+>>
+>> struct xdp_umem_reg_v2 {
+>>     __u64 addr; /* Start of packet data area */
+>>     __u64 len; /* Length of packet data area */
+>>     __u32 chunk_size;
+>>     __u32 headroom;
+>>     __u32 flags;
+>> };
+>>
+>> struct xdp_umem_reg {
+>>     __u64 addr; /* Start of packet data area */
+>>     __u64 len; /* Length of packet data area */
+>>     __u32 chunk_size;
+>>     __u32 headroom;
+>>     __u32 flags;
+>>     __u32 tx_metadata_len;
+>> };
+>>
+>> int main() {
+>>     printf("__u32: \t\t\t %lu\n", sizeof(__u32));
+>>     printf("__u64: \t\t\t %lu\n", sizeof(__u64));
+>>     printf("xdp_umem_reg_v1: \t %lu\n", sizeof(struct xdp_umem_reg_v1));
+>>     printf("xdp_umem_reg_v2: \t %lu\n", sizeof(struct xdp_umem_reg_v2));
+>>     printf("xdp_umem_reg: \t\t %lu\n", sizeof(struct xdp_umem_reg));
+>> }
+>>
+>> Running "./test" produced this output:
+>>
+>> __u32:                   4
+>> __u64:                   8
+>> xdp_umem_reg_v1:         24
+>> xdp_umem_reg_v2:         32
+>> xdp_umem_reg:            32
+>>> [0]: https://www.kernel.org/doc/html/v5.4/ioctl/botching-up-ioctls.html
+> Hmm, true, this means our version check won't really work :-/ I don't
+> see a good way to solve it without breaking the uapi. We can either
+> add some new padding field to xdp_umem_reg to make it larger than _v2.
+> Or we can add a new flag to signify the presence of tx_metadata_len
+> and do the validation based on that.
+>
+> Btw, what are you using to setup umem? Looking at libxsk, it does
+> `memset(&mr, 0, sizeof(mr));` which should clear the padding as well.
 
-So given you are going to change kubevirt, can we
-change it to create devices as needed with the
-existing API?
+I'm using "setsockopt" directly with Rust bindings and the C
+representation of Rust structs [1]. I'm guessing the compiler is not
+zeroing the padding, which is why I encountered the issue.
 
-> >
-> > --
-> > MST
-> >
-
+[1]:
+https://doc.rust-lang.org/reference/type-layout.html#the-c-representation
 
