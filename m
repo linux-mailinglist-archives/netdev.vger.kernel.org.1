@@ -1,126 +1,161 @@
-Return-Path: <netdev+bounces-110696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B4C92DC6B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 01:11:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CC092DCC2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 01:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 931F71F23F07
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:11:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8983B22846
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848D614B95A;
-	Wed, 10 Jul 2024 23:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAEE158A07;
+	Wed, 10 Jul 2024 23:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="wOsnuped"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dWrM/6qT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B484D12
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 23:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D35D156968
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 23:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720653103; cv=none; b=BQCXJHnrePpkv99UbEd71cAmgj0uvrfilA+/csyfcu9HyrE3ajotkW99xjAcJhbP5ot5qCp40v2RiIZiFHLsI0COraTn3ZVI+8lOgnSsJP6V8Ilv5SLYUGTSLTH84syeSpOqfBXbTr8DA7LVCeiI4vYlL5ymflRW9XfOvAEIDeE=
+	t=1720654939; cv=none; b=DyN3jw0nk2xOKIo0+lQgEDP0zp2AuwM4IG7OIlmA9QEgPPcYKplkbh3Kk1Cr03/fwvrw4hT//SjBPfS0F6XPX6fEMSWi/qMuz6Xwx4GYXGzN+XMrfi+bLfEwGadPZ8gvgSSvFCcxaE/e/IIhD1bM8TyLmBsWp8E456rj2N9WdKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720653103; c=relaxed/simple;
-	bh=qs45M/3+XXU+AAjfRPGzt0CFvZYZ73DiDWgnyrBHn0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q7Sasui/FUuPNHoqibVuLV0/7lxRYeXJ5p8y9tpQlx5xrQFj44TuZw/7WKNQAdDVOrQuRXLO35lu+6RxdpwZPdt3gj+JYbTtVHUhweFOjU0GyOXdq1XGkPHuy8lI4zevz9h4mr0Ru89qX73gWPzNuQK/MqQeIZGLeEKiCkDvLHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=wOsnuped; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-77d3f00778cso168192a12.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:11:41 -0700 (PDT)
+	s=arc-20240116; t=1720654939; c=relaxed/simple;
+	bh=WmCXshM9BwamSUxd01N4bO9J01nXQuiD7Ah98aEMfxw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PC1SqTulYesxzwUZbEvZ16mfqQmnFDluSWFB6goJZ5KDKNhU6v3gXkIrv0F7s1kDn0v++LTXWiWP5tVvdj+JjP/Y1HDJIzHq1GSr0+AUGRZZYTbaRdjBqkQ1pSquIDf9nTuXE94ufDWCYuN/toczn8p+fAwNUWN96s1twjUM1F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dWrM/6qT; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6b613921035so2081386d6.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:42:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720653101; x=1721257901; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1720654936; x=1721259736; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VEhCvn/GX7ZGrfff/9by/aKOGF9XNJ6WAIBe9Hc6X/o=;
-        b=wOsnuped355FbpfCJPOODmeoQbUsn36HSGf20S5t3RHU4b7DxOz7rdxo0Ads+6MSFf
-         Sm4B+/GHbOb06NVj/bUQSYYLBVEj+MLa4GXdKAiFZgB4jsF5e/hsMYSiz48ec55tletX
-         dNJG/dAd9quM6OLNZEBxy2Vxo935b14/ajHCg+x3ZK93puA1iPdGvrzVOWr33bijrMJv
-         kIYUjSNC4PfxcA1+cQxUpw840eskaXd2XyTdh0wHGIkJOR4Qu++6S/j6epD9jFzdVFsS
-         7mvc+u0MgM/Q7+cBxVE1p0t/tZz/xvxBs5ZSuPktnFJ65PXbE1ycjwGMkRp0nv3Zfzyp
-         +itg==
+        bh=xw22ZH4c8gyTKnFajh7vcYEJsOdrHlsxvg9OLt0kZtA=;
+        b=dWrM/6qT8jNEjecjc9s08cKSX4h+fb6bTc35XK4KJuziyKO+fD/7CbRZJ4UwApGsfl
+         1W71iFYoXZAhm3NUXU7xD7Et5TuKbhgYB9RICTMsmQqsulI9HWNXvdCZHwLpiCf52//6
+         G0IPDLquKspE/p1oSvCYSjr7fUwxb4l6eRxqgiHh75JUIw5D2hPSiYm8K+UJe5eH7SRd
+         /dF+ZtLkEny2rN/U/siaCZX8u0XTToiPx05I65KGy53ugYyndbw8ILn+iDK4dSayMnmE
+         xi0fKa2ZiL0jp2pJtdOoi+Vg+Muzkoc1dZnbx7V4UDdtpTsUIEoFy1CaPVb9D9iyk86J
+         c36A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720653101; x=1721257901;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1720654936; x=1721259736;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VEhCvn/GX7ZGrfff/9by/aKOGF9XNJ6WAIBe9Hc6X/o=;
-        b=ryUGkhmRO+VNImGBlp/9WqO/XbXF5oMtl9kyma/E6h92EqnmW6uTkuIxRrkwPDnHzx
-         rxXopaL15MnKFIMTtenQoDE6JZwg5+5dglVwVX9psB4d5mVOo+QzFHz2dVmxLwDEeny0
-         LNOfITaXxVr7vmtDOV0oHTkuTW0uNUQRtteuoHFcAgokCManVHzO6td+00g8bm09K9K5
-         6RYfmKPxsH0XovET9f20w0Ai0hzM8f6GBDz2jgu6RLesRNlHm0k2kNIOYHLc+IHCJqRV
-         vbVD7TOCuyFVzsN76Kc0UBZN2m9cq17Acz1olAuIlFmHHHOEtIE9QuZThCzzG8Vp5WEN
-         jGYQ==
-X-Gm-Message-State: AOJu0YwJhf8rMYF+tIUTJ01rsSitEuY1zpvZO82alWLU8/vFNm30NyIN
-	Py7pao87JjI3HA1mON6nGdMVzpDzRWSuLrrCzTP0Kc+DXeJgDH1OaLBhE+j4bWk=
-X-Google-Smtp-Source: AGHT+IExmycMLvnDFaXZEThvlqZBHKo7LE+i/q6ctG2s0tW1dLWywzdcAgXNz50GUiKm/bmhQw3BxQ==
-X-Received: by 2002:a05:6a21:9997:b0:1c0:f288:4903 with SMTP id adf61e73a8af0-1c2982232b7mr8554735637.17.1720653101016;
-        Wed, 10 Jul 2024 16:11:41 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b4397c50csm4458126b3a.147.2024.07.10.16.11.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 16:11:40 -0700 (PDT)
-Date: Wed, 10 Jul 2024 16:11:39 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maks Mishin <maks.mishinfz@gmail.com>, Guillaume Nault
- <gnault@redhat.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] f_flower: Remove always zero checks
-Message-ID: <20240710161139.578d20dc@hermes.local>
-In-Reply-To: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
-References: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
+        bh=xw22ZH4c8gyTKnFajh7vcYEJsOdrHlsxvg9OLt0kZtA=;
+        b=kqjb1BXa8VET/ioy7q3D+RHrR9XllxkSxe+YFKySxjUlIsAUYTGxFUQYkJMFw1XBl8
+         JDXvNgvOZ7Dm+xzkaX9anbW797bWX06ASM/fq7c9+GXd6ALNCT4O86vVxvdk7LJvjwxG
+         3Lh4JHmR4uzsm/KGTemRKi8joaR5pM0DfkKqjEh5bIcH/UzQoPALaKfG2xLB65UiIwgx
+         TECcby0RbBhROZT6PYHtM+/OjBHaa1X8XazGkq/l4A+apYxur3zc654pomHGvOVwWbNK
+         AjRy/GqwT01l9+tokY6n+kSaLPibF/BujZC2qbhDfnlYvw0tT5GE+AbpPdhC95NnxpKN
+         dUug==
+X-Gm-Message-State: AOJu0Yxr2RqaB/u+alz9ZwvkfL/KgrQTmUgqXR3J5cXaQ+QuSg83tgcU
+	vXJh6t38nNLqyMyKgiU9+e38iepuiKp2/Pec6iKKT4beg2TRrUkexMWBOLWiIf1IRV69W88Z0bV
+	KG9eg64vHsDC+i7VkIvnntp8zn15ivZgcK+AG
+X-Google-Smtp-Source: AGHT+IGOLOQ6K3/3da49V2eHyCz+KQjRCyIEiAYnB4b8F1iCu2D4bkJxhlzGFfxvSjmRGC6gzv7EI1OWCLflWXtCr4A=
+X-Received: by 2002:a05:6214:20e2:b0:6b5:9c9c:7baf with SMTP id
+ 6a1803df08f44-6b61bca896amr97392016d6.23.1720654936406; Wed, 10 Jul 2024
+ 16:42:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240710001749.1388631-1-almasrymina@google.com>
+ <20240710001749.1388631-6-almasrymina@google.com> <20240710094900.0f808684@kernel.org>
+In-Reply-To: <20240710094900.0f808684@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 10 Jul 2024 16:42:04 -0700
+Message-ID: <CAHS8izPTqsNQnQWKpDPTxULTFL4vr4k6j9Zw8TQzJVDBMXWMaA@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 05/13] page_pool: devmem support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
+	Matthew Wilcox <willy@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun,  7 Jul 2024 20:27:41 +0300
-Maks Mishin <maks.mishinfz@gmail.com> wrote:
+On Wed, Jul 10, 2024 at 9:49=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 10 Jul 2024 00:17:38 +0000 Mina Almasry wrote:
+> > +static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> > +{
+> > +     return (struct net_iov *)((__force unsigned long)netmem & ~NET_IO=
+V);
+> > +}
+> > +
+> > +static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
+> > +{
+> > +     return __netmem_clear_lsb(netmem)->pp_magic;
+> > +}
+> > +
+> > +static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long=
+ pp_magic)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp_magic |=3D pp_magic;
+> > +}
+> > +
+> > +static inline void netmem_clear_pp_magic(netmem_ref netmem)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp_magic =3D 0;
+> > +}
+> > +
+> > +static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+> > +{
+> > +     return __netmem_clear_lsb(netmem)->pp;
+> > +}
+> > +
+> > +static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *=
+pool)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp =3D pool;
+> > +}
+>
+> Why is all this stuff in the main header? It's really low level.
+> Please put helpers which are only used by the core in a header
+> under net/core/, like net/core/dev.h
 
-> Expression 'ttl & ~(255 >> 0)' is always zero, because right operand
-> has 8 trailing zero bits, which is greater or equal than the size
-> of the left operand == 8 bits.
-> 
-> Found by RASU JSC.
-> 
-> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
-> ---
->  tc/f_flower.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tc/f_flower.c b/tc/f_flower.c
-> index 08c1001a..244f0f7e 100644
-> --- a/tc/f_flower.c
-> +++ b/tc/f_flower.c
-> @@ -1523,7 +1523,7 @@ static int flower_parse_mpls_lse(int *argc_p, char ***argv_p,
->  
->  			NEXT_ARG();
->  			ret = get_u8(&ttl, *argv, 10);
-> -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
-> +			if (ret < 0) {
->  				fprintf(stderr, "Illegal \"ttl\"\n");
->  				return -1;
->  			}
-> @@ -1936,7 +1936,7 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
->  			}
->  			mpls_format_old = true;
->  			ret = get_u8(&ttl, *argv, 10);
-> -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
-> +			if (ret < 0) {
->  				fprintf(stderr, "Illegal \"mpls_ttl\"\n");
->  				return -1;
->  			}
+Sorry none of those are only used by net/core/*. Pretty much all of
+these are used by include/net/page_pool/helpers.h, and some have
+callers in net/core/devmem.c or net/core/skbuff.c
 
-That is correct mathematically, but perhaps the original author had different idea.
-Could we have review from someone familiar with MPLS support please.
+Would you like me to move these pp specific looking ones to
+include/net/page_pool/netmem.h or something similar?
+
+--=20
+Thanks,
+Mina
 
