@@ -1,225 +1,252 @@
-Return-Path: <netdev+bounces-110631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0695092D9EA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:15:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B67592DA06
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2892B1C21253
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:15:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 151EDB237C1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E49018FA17;
-	Wed, 10 Jul 2024 20:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3C7198E85;
+	Wed, 10 Jul 2024 20:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AnisRtVn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJZxbkmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C826198A24
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720642508; cv=fail; b=dWobKzEt9SZhFCCHlcGKj9VAxMNTu9178A9AOXHUgff3+NPgJXyAhJYE7DbuNTr4YPbLfYwVlTkHjFWAsHkRkIqTLmsDKtEnvp0D1aKuCP8Evf8rrL4NDINSJNtCW8T0W3Lam/ohQGa8Zd5hIPvjZIiHKqdjlG5WuVdtS4e2LzI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720642508; c=relaxed/simple;
-	bh=jYTmwbGj3DCc074WWfUp0HN3khtSyJiLjXKmyB8A5r8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ELnAB0tZ8Hwy9/mP0t9s/s4U7iOEEpx5dQt+ZvlRrobnFcASsydurvU09yG/wl54XyRmwkDPj9S9O3lTTVhG2uobTeDtLSP3YbX62d+6vcbodCPMReKfSAaimkLCnrlRo34eaXVvR/IuET+VZacsf3vie+Q4/0F4NqSSt2gW440=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AnisRtVn; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720642507; x=1752178507;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jYTmwbGj3DCc074WWfUp0HN3khtSyJiLjXKmyB8A5r8=;
-  b=AnisRtVnHnXf3so0vPK2CVZEQ1o9p1ETJWQUcqyHkrMDeqiiRlI5mpH9
-   xZ0Jh1ml2e+K206HMw21owEbAvpxE/ixflDPWnaltJy1OfldpAPpak0lb
-   GF6A5RREYSIuItaSPZ1fSoatV0jMFjGEqTExNcWHYOfogsVwiO8u0kN/k
-   Mt/jwSo5sgGSLvJF61gYMB4MiuK5gKHlwpIDa37wVl6hhLwkhAMwjUIOE
-   LdkkmeRwL94FyWqoZc+GlZafaem0kpoq+E8JwyDom8XE69V8hiAl0GWBN
-   oBMaYT95IOdqLvv+MFKh7W+pilDmINNzFTOUeFJxLZ+74ACgjhLzVJ2SK
-   w==;
-X-CSE-ConnectionGUID: nZMGYj8QTzGg3J6TledJ9A==
-X-CSE-MsgGUID: ApReL+DzSDaDJuzmh+PoOQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="35425261"
-X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="35425261"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:15:06 -0700
-X-CSE-ConnectionGUID: ao8pzNgbSQeBuJkJ6FDdTA==
-X-CSE-MsgGUID: K/qdvSkvT4iGxT5CPL2RsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="53274208"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Jul 2024 13:15:05 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 10 Jul 2024 13:15:05 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 10 Jul 2024 13:15:05 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 10 Jul 2024 13:15:05 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 10 Jul 2024 13:15:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EODZMryprlh6G2XB5UI4ZJBNR0PW8jjYZG93NEE6qQe45uedMJByZHrrSb1zFgVOWXkMHszViLXuY4LHa7QVkNb/otj4/GFtFb7GKTQB6Db+YWsNrWy6P2AH2VdSDpqS95xMsFbvs6dTnsLzWMrFqoOh7jJklZi2hOAJevVLTPtSFKvv1zb7DRuuF8A2RCSu0fyJro9w0vCq9ZS3dKUyOEULlv22YJcFd1oh682MqlMzFG8PRrUu1olww5gNKuTqlqpK9Puq0XFMpNJT11HPm6Crw7xVTHkcD+OjqdyFo9n8Xblhgb/T9vRFtMQpG2bWwInVhdQvQa4q7GxXitMNNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WqcvaXFmYGqBBhqHIkWB6gW1mjlg5RYNWirkYaGTtAU=;
- b=d2COS04sh5zyFsTgfVKX0cLyQ+xYli733HSF2OjyGSK8cln0TdVldpXnRknzYoLyMLPQmgnL7poCMlE/tXDRGi8MmXCi63hPvQKU+EmLuSF7FZH8Lsbni6HZ6qVysR24k3DhflZH5sAFZlOMpiySLLe5+znE4IPeeSCMam1/eYzN9kWMk0pZADfj6UAdrMq+U8yyN70nBB96TOkaz3IAcLVHf1ZM8D2eDQVQNudaA/BJ4bWDc2gmpIW4LG12fpKTBgOYXBACmL1a1e0fMDjKV3l6XUiQnd73p61s1iwzSg0/BDNL5PW8oy8FFwTJpSIW2XRO/ekoH936wxakPwZVeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH0PR11MB5080.namprd11.prod.outlook.com (2603:10b6:510:3f::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.36; Wed, 10 Jul
- 2024 20:14:58 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7762.016; Wed, 10 Jul 2024
- 20:14:58 +0000
-Message-ID: <f1673a26-6379-49ff-81de-0b703a6fa3e5@intel.com>
-Date: Wed, 10 Jul 2024 13:14:56 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] ethtool: use the rss context XArray in ring
- deactivation safety-check
-To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <ecree.xilinx@gmail.com>
-References: <20240710174043.754664-1-kuba@kernel.org>
- <20240710174043.754664-3-kuba@kernel.org>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20240710174043.754664-3-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0311.namprd03.prod.outlook.com
- (2603:10b6:303:dd::16) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDD8198A35
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720643359; cv=none; b=vCT7xrXr+S0VI+ewrsyCPTkuOKPy/xisBxhF5k6rlzqVzPaYgzrFjCKcJTETI+pMgIKmm7k8QfXBmatHHRvWyQcKqr6Aishtbm2/Ue129WQRv5bOwWXjxLy4ZmJ7AbHXXH1HLI4MrjvBn6EJqJkaRfCIJ08gUXuYITZZv296uV4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720643359; c=relaxed/simple;
+	bh=lUBEgBl64OukQYoXw+IzWRxkunsos7uu5wD0WIADxEc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MNWgWy5zfVe0vNkhwbcMvHGbGkusgskRhvGlB8b7kEobWV9gL1aGfE466FfGg6B5XspZ9vgpxMbrdSIJDqz8VJwUOq/IYLtjHA3uwkfOc/QD0zTFJfWTDLuB64L3Flt3PU2pfb11d3Qho7pmoi0uioM1jaygqpRnyCMMOygRzX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJZxbkmN; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7037a208ff5so81640a34.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 13:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720643356; x=1721248156; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ip/0MDOrHp5lX/Irp7UEa2BIGo3LvwiW3nUCmkpVR3o=;
+        b=BJZxbkmNVvsrwsOuaaprwEqVg0CMet2325nHNs5uvMq63SzxrXSfmdtUd5/igfuBB5
+         jgvxXpBg+b5P9K4cSsYXndaGhb9pG6io8fOpsrAVQd6eQbisUPDp5GX2yK3xOT31K+hB
+         rLXwaUbLpXIB9Q8v6gUxwPZvMaiutAxat3yGpdgYDau0bKKtb1PqBwTj9smNTxWa9uqn
+         ZOCLTZyhZ/8hIrlgllUXJArVcKmiCm1dWbpOErCJbkZe5/sFJt4kL9PtuqFW0Ove1CUu
+         Nh8cY4TxxbDibsYnfTcPZ/+y1o+vX+c63l8fC/vydJq0Ce+I40QGkc0fyN+PLM3HKAgI
+         +oSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720643356; x=1721248156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ip/0MDOrHp5lX/Irp7UEa2BIGo3LvwiW3nUCmkpVR3o=;
+        b=WDd0UnPmbZm/CtA9ub7gYBOtEKr4dIrmrpj4rjUb6SlLvI4L7Gfh1B35JkI8ODlFTg
+         nFAVaCk3XSBclFaCLB8Jngl0Vq+22hVHHLj7Lm4i2friNC9hK3i2gfuJ3D9YjmWApsGz
+         m22bAw00UrrKH1aNoBzd7yAmK1AJr2wWRp8AxKZ3m1Kn9bjakyPmnTBMAHVVTx9UyXBA
+         dafhO+bEIkY3BLgTURNDAfDpKUbsxUR7GsTQ+D8oOs3H7QkO+LM5a6WzsYsYnsc8P8jl
+         5Gvjq3aVQfkhduoeMzb4A+aow6IBMocZaoKRW+4LRF487BA4P0d50Nl17V7Uxix4lQFs
+         576A==
+X-Gm-Message-State: AOJu0YyATE5/HFcqbtxoHbz/N+L5P3Whv4+klFUX4hZ41lVcoG1vxnOI
+	jbOtgJ/pOOJYbHHF8cwvToF/4yRGLEcClpRzj4RbmsP7VjarpmURAS//513+tuQsp0/RpS6RKbi
+	Q2U32AVCRQhfBKKnv9a9DTopyd7gcqbHlJK77
+X-Google-Smtp-Source: AGHT+IFh61JWNinxflrD0b4ZVWkvEczGu6mIg9bnLfCV6X6pe63Th6j/ytHY2kvRgro//9ydMtTk5x6Go2aTaB1/aws=
+X-Received: by 2002:a05:6830:22ed:b0:704:4995:3733 with SMTP id
+ 46e09a7af769-704499539f5mr3557560a34.31.1720643355799; Wed, 10 Jul 2024
+ 13:29:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB5080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54ea5250-b3ff-41aa-7e40-08dca11cf86f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VW5ySWhMeWQxOVFTWjNjQVoya2JBSGs3WFV3dUpoRm55cit5eCtjbXdSd2ow?=
- =?utf-8?B?SXdhZE9sUTZwWU1zOUU0Z1grQ2hKd0ZhWDVEWFMzSXo1RDVYcTAzMTdaaHEw?=
- =?utf-8?B?Nlc3YjN2cVZJc0M4bHJHaURyWDVLMDBPaXFCR2F6SU13dWpSam9QeWRaQ2hP?=
- =?utf-8?B?S3B1MjZ6TSt6UFZvdnNaN2I0ZzQ5MVhyS1dHYisyUFV5c2tIWGxRbTdzMWhW?=
- =?utf-8?B?VlF0K3M1L0ZzekoxcXVncklTbzkxOTZMZHNtVGhyUzg5WEhKS2FibElCWWxu?=
- =?utf-8?B?R0wrOCs5QmpIbUkzUHpMOFcvZ0FOeVBiQmNJd3hLQm9TK2ExWGJ0YVIrVjFO?=
- =?utf-8?B?VEZuT0VoYnl0MFN6RjhxSzhoNDNGR3pxMGl2UDZ0YlJ3Znc2RVhnMzZ0Vkha?=
- =?utf-8?B?UzhQZnZPejQzdDNpYWJ1allhY21pNy9ObGtkOXdvM2wxOVl0aXkzbWJqMC9M?=
- =?utf-8?B?d1lFa3ZKQ1RrWnRBRnIwbjFmQ3JpWW95VmtQSkhaUE1OTGEyU3M2dDJNMmli?=
- =?utf-8?B?b0hCZXNvV0oxUHFFQllxOS9TTVptUVBZRE9HQU9yOUhxVDdEOC9mY0NsYlJ5?=
- =?utf-8?B?UGk2V0Rwa0U2VEkxRWtpa001SG9lZHJ4NWU3WGNEY0dJNHJPeGZoYklWd3ow?=
- =?utf-8?B?TkNrSUJmcTJqcU5UL0REUlJXTjVxdmxTSHhLUXdGNHphd2NIbFFxZzRsZlAr?=
- =?utf-8?B?VExlYkZ4WVFjUFFVZVJmS1hwam5SV2trd0dVbklZNUdXSDBsdHl5bEdpK0Ir?=
- =?utf-8?B?ckhscW5ZNXN2QXhETUx5cjZlWDhpUnZMUUVGQ3k5YU0xTzRJaGdseXFIN2wy?=
- =?utf-8?B?TjJtNkt5UXJlQmZFRUhidDZlRUs0cC9YRnhYRndSZ3ZRNHlieFpHWExNRTk1?=
- =?utf-8?B?Zncrd3ZYODdXTlJyYTBPMnhrRVRGVVV0d0Q0aXpzaVZJbURoNUFVOVZBaXAw?=
- =?utf-8?B?V3NqMzVQZmVFMUY2TWZMLy92VldUZDRSdnd3azVlWGMvb3p5ZWFFOVVSYXZR?=
- =?utf-8?B?Y3pUU3hKVG52LzFxWnByaVdzVTNwTFlid1hVRUdPb1hNNkt3UTBzeFo5WklZ?=
- =?utf-8?B?ZGx5WTljZitIYzhPNG5NaW4yRVgvVXBzRTd5ZXpPZk9XSG1ySHdDd3BCSVpY?=
- =?utf-8?B?VERyQ29oMUtYMVk5aS9ROTIrZ2hHa1AzbnloTk5aS3RSaC9HYWxabjJScHAr?=
- =?utf-8?B?eWxESnBoM2sxd1VmZENSS3BSOExXajB4ZXY1VVdZb2MyYWszdEJDYytRTU9i?=
- =?utf-8?B?cnRJRWw4Y3VlWFA2TDFrSlZqemROZlhkN1l2MzZwbFBtSGZKb0lQRm5MQVhT?=
- =?utf-8?B?NmNqMm43cjBhMThjanNvdGVhTUUrY3ZCMnFDdmRnclBzSVIwTUZkTTEwVWtp?=
- =?utf-8?B?WkpuS0xUVDJjNENINXpjcUxtNUhXWXNac0pvMk5QeWRDQjRBbjJSY2d4WURY?=
- =?utf-8?B?R1B5NUgzOWpDRDdodFhDL1JvTUJTRlc4TytIWnRKM3VhM01ERGVWbUp3OWdM?=
- =?utf-8?B?VVJncWowVHRPRUwxT3VhSDZuSk13S05lOG5QN1VvZ3d1d3dJQzJhN0dUZThy?=
- =?utf-8?B?enVtZXl4ZTF6dTVlSEw3MUt6NzZTaHFKeEEvNzVhaVFBdGJHdXlMVDJYRFNw?=
- =?utf-8?B?ZXR3NmRSRklrN0FDa3ZUdE83K1FnSFBaSWJMNThTQTN4OW9Hb254OFZrMG1O?=
- =?utf-8?B?SUhtbDFmODEyZkZib1A0a28zQ0FNd0x1TUxNRGhvNG9mUVI4RHJ2Q2RvZTM2?=
- =?utf-8?B?S2tnaVNVM2FyTFQ4M0hGZHBtWVNHbFZwMmFvKzVETXVrL01ldDlGTUNBdEpN?=
- =?utf-8?B?QUxJTkdKTmR4ZENDYjVhUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VEg0NUxudW5YUlAvV3Q4QlRtam8xRGltL0R2L0VoUFY2V1N2ajFzN1JTN0pB?=
- =?utf-8?B?OU9CbkxvOC95RGVHckVURlYrQUdOZWE0RWtGcHFXZWQ3S09vaFNsUG1TZHNC?=
- =?utf-8?B?YW9iNVdwdFk2UUNhUVIrdy9OV0JZZjczc0JoU0d0V3NwRTlFTFZZMEJKOVov?=
- =?utf-8?B?bDJiNm9BeWUrQnBNS3FCNXlsYW5FZlpuN1VpMVRKd0hiSDJmN2UwZ3hOeExI?=
- =?utf-8?B?WEVqdWt4SlJSaXR1QUE3NEZ3aHQzUk9SOEJkUHBiN2V4V1d5V2hHODdTNmlx?=
- =?utf-8?B?cnRLQk9rcUFLSURmT1Z0QlJCZGptNFRqWTY0Ry9PcWNoODNHMHBrNk51d2ZE?=
- =?utf-8?B?M1J4dTN1MFZ4M2Qwb1V4cURoUi84MndTNXJIa2FNWlViL2VWcGs2b3BNLzl0?=
- =?utf-8?B?dXFEVEZkRVV2b1ZPcmJOU1lVdis4SklGNmJMejh4SlNkSmF5YjlBOUhHSUJ1?=
- =?utf-8?B?YWVBWXpNWlpFMGE4TitxUE5mV2VneVBUSS9WQUFrU3hNWTV1ZUdOM01BaEt0?=
- =?utf-8?B?ODVHVzEzZEZpbTdTcFk5cmNUMDh2SlFyNnRKUyt6MGJJS3g1TkpFU0RsbTRS?=
- =?utf-8?B?aFhNS1hyRE9lNFJVR1VLN3ZXSDlkYXVseTRYVzhUWWdOaExYa1U5OGxjSzVu?=
- =?utf-8?B?OGpaWWVjdCs1WjlUTlc0VlJZNFFIUFEyakxPT3FaTU00SUxWcy9CMkFWRlpy?=
- =?utf-8?B?Zi9UYmRDekx0RmxHNHJ6WnhrRExMdXZUU3NnMFN5U3RDdE5nQ1h0T3g5dzZJ?=
- =?utf-8?B?eThBSTFycVJLZ1NHY0dOTVE3MWUzZU1aSU50MFhXcVVUVnAvaEc4dElNcG5m?=
- =?utf-8?B?SVA4RHZNVDNrSWNnSWhlN3RycmxyQWhuVzhPVnJEY0xYL2Y5azgvMy9lK0RK?=
- =?utf-8?B?TTNWekVzWjM3QjJaV1hheEFMUUI3cWc2RWIvMUozbkkwcklYRXUzYjlQNGhY?=
- =?utf-8?B?RklxMk5PVGkwUk1MZG5VazYxbnFxcnRLNXlySnk0WVoyR3UxczlXa1RIdGFX?=
- =?utf-8?B?NjZaSmVyVU1BdHpGc3piWmJJRlVGUWxOcDRxbHdhYXFvckxYdFNxNm05MGhm?=
- =?utf-8?B?VnBOcTFJbjcvRWxwcHhDd0R3Mlg0T2tDZ2RmTEtHYXhBSVFVT0FCTlZmblFN?=
- =?utf-8?B?Q0gzcXYxbkh3bmNqUDlyenZyNXIzdW1oM0s5SmlVZENBTmx6cy84dzVEeTcx?=
- =?utf-8?B?OG1XNUhvcFhWL1IrVlExRWZpSXlldm5udVlhdkRZUTU5WStQRGswb3A4VUtu?=
- =?utf-8?B?V0FHMmh1M2IvWHBDL2hGTFl4WmtPc1poeUpZUTdvNHVjZXlFMk1DMWQwSDQy?=
- =?utf-8?B?bDhueUlhM1AvMmdhU2p1NkI5dy9lM25CSC9uclMvUFlkUGUrWjlFSzB0WGx1?=
- =?utf-8?B?alNCaHZuR2ovbXM0cW4zRS9tWG9oMUQrRHFNRnd1N1ErU3duUWRPbE1aaGhw?=
- =?utf-8?B?SzVXbTl6NlRuaXQxbHU4WDZhU1dseUp0NS9sMFFnSjZVd3J2N3pNdjMwdFgw?=
- =?utf-8?B?Tm01RWNONUxBVjBTZmdEeUx1SGxHYnNoMVR1eVlLdVdvU1dtcm96Vzd5MlI0?=
- =?utf-8?B?U1pqdDh6cEZNWEtBY1RVUUlTRmtNL003TVdpcG1zSnR3amM4SUpwcjVxNHVQ?=
- =?utf-8?B?OXlPK2RHZXRMZ1c5b09TaEV5OHlEWDkyako3V0pHSHFmQUh3dW1Ja00xYmsx?=
- =?utf-8?B?SENYZldDVCtDcUxhUzNmSnNpNEliZW41YXJmSmdyYTFtbDBNY0RSOEh1eXQx?=
- =?utf-8?B?a0VaNWZqUmd2OEpJQzM2QlJOSFJNTXBkRkJtYUU2amlOcjlJcEg0Tk9rZWFw?=
- =?utf-8?B?enNXMmMzRTlXT0FFNFc3ZUVVZHJMbGpmZFJXWWV5SEdSSnM0UFVtaW9QUXdE?=
- =?utf-8?B?R1pMdTB4OFBLSjNjdXRVa005cXlxS0I4d2VUTVd1WEoxVHBvSWd6YllSeGpa?=
- =?utf-8?B?M2VrcVBTWVpHT2pCemVUM3czdWdRZlczcGVldnpJajRISG1oSTk4R3lkWHJW?=
- =?utf-8?B?bEdpUzlWcWNEY3pZbERwdTBFaWJEZFJvLzZvOVpnbXFXcUF1TWdibzlMNEtF?=
- =?utf-8?B?YS9aUWZtci9zbnNJbDNyYlhGNzNBNXBGSVFWWWFlaUZDRGpEUjNxT2swL0JM?=
- =?utf-8?B?eDhnQzhOYnBzeXhOQ1NKWWpXWnF0Sjg1NHgzdHcvMzFWbHhJOXUxLzdDZU1y?=
- =?utf-8?B?dkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54ea5250-b3ff-41aa-7e40-08dca11cf86f
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2024 20:14:57.9826
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZDaikHeqqvlOf/+S+HY0YouHdpBd4NbXgLCiYSb/FgMUWh8MKJhqKw5pfvbdwgGWXIKagAdd7uYeZs4l2JBj9CyB8mfvE2X/ryBFq3wlMDg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5080
-X-OriginatorOrg: intel.com
+References: <20240710001749.1388631-1-almasrymina@google.com>
+ <20240710001749.1388631-6-almasrymina@google.com> <20240710094900.0f808684@kernel.org>
+In-Reply-To: <20240710094900.0f808684@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 10 Jul 2024 13:29:03 -0700
+Message-ID: <CAHS8izPnFxeEMEQkxq=A9Rp7T8ADJ__3eWfeQmC2hEBYQVzcvw@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 05/13] page_pool: devmem support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, linux-mm@kvack.org, 
+	Matthew Wilcox <willy@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 10, 2024 at 9:49=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 10 Jul 2024 00:17:38 +0000 Mina Almasry wrote:
+> > @@ -68,17 +107,103 @@ static inline netmem_ref page_to_netmem(struct pa=
+ge *page)
+> >
+> >  static inline int netmem_ref_count(netmem_ref netmem)
+> >  {
+> > +     /* The non-pp refcount of net_iov is always 1. On net_iov, we onl=
+y
+> > +      * support pp refcounting which uses the pp_ref_count field.
+> > +      */
+> > +     if (netmem_is_net_iov(netmem))
+> > +             return 1;
+> > +
+> >       return page_ref_count(netmem_to_page(netmem));
+> >  }
+>
+> How can this work if we had to revert the patch which made all of
+> the networking stack take pp-aware refs? Maybe we should add the
+> refcount, and let it be bumped, but WARN() if the net_iov is released
+> with refcount other than 1? Or we need a very solid explanation why
+> the conversion had to be reverted and this is fine.
+>
 
+Right, as you are aware, page refcounting is based on 2 refcounts: pp
+refs and full page refs. To be honest I find the 2-ref flow confusing
+and I made an effort to avoid porting this bit to net_iovs. net_iovs
+just supports 1 refcount, which is the pp-ref.
 
-On 7/10/2024 10:40 AM, Jakub Kicinski wrote:
-> ethtool_get_max_rxfh_channel() gets called when user requests
-> deactivating Rx channels. Check the additional RSS contexts, too.
-> 
-> While we do track whether RSS context has an indirection
-> table explicitly set by the user, no driver looks at that bit.
-> Assume drivers won't auto-regenerate the additional tables,
-> to be safe.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
+My intention is that when a reference is needed on a net_iov, we
+obtain the pp-ref, and when we drop a reference on a net_iov, we drop
+the pp_ref. This is able to work for net_iov but not pages, because
+(as you explained to me) pages can be inserted into the net stack with
+full page refs. So when it comes to refcounting pages we need to be
+careful which ref to obtain or drop depending on is_pp_netmem() and
+skb->pp_recycle (as pp_recycle serves as a concurrency check, like you
+explained).
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+AFAICT, since net_iovs always originate from the net stack, we can
+make the simplification that they're always seeded with 1 pp-ref, and
+never support non-pp-refs. This simplifies the refcounting such that:
+
+1. net_iov are always is_pp_netmem (they are never disconnected from
+the pp as they never have elevated non-pp refcount), and
+2. net_iov refcounting doesn't need to check skb->pp_recycle for
+refcounting, because we can be sure that the caller always has a
+non-pp ref (since it's the only one supported).
+
+Currently, as written, I just realized I did not add net_iov support
+to __skb_frag_ref(). But net_iov does support skb_pp_frag_ref(). So
+there is no way to increment a non-pp ref for net_iov.
+
+If we want to add __skb_frag_ref() support for net_iov I suggest something =
+like:
+
+diff --git a/include/linux/skbuff_ref.h b/include/linux/skbuff_ref.h
+index 0f3c58007488a..02f7f4c7d4821 100644
+--- a/include/linux/skbuff_ref.h
++++ b/include/linux/skbuff_ref.h
+@@ -17,7 +17,13 @@
+  */
+ static inline void __skb_frag_ref(skb_frag_t *frag)
+ {
+-       get_page(skb_frag_page(frag));
++       netmem_ref netmem =3D skb_frag_netmem(frag);
++
++       /* netmem always uses pp-refs for refcounting. Never non-pp refs. *=
+/
++       if (!netmem_is_net_iov(netmem))
++               get_page(netmem_to_page(netmem));
++       else
++               page_pool_ref_netmem(netmem);
+ }
+
+If you don't like the 1 ref simplification, I can definitely add a
+second refcount as you suggest, but AFAICT the simplification is safe
+due to how net_iov are originated, and maybe also because devmem usage
+in the net stack is limited due to all the skb_is_readable() checks,
+and it's possible that the edge cases don't reproduce. I was looking
+to find a concrete bug report with devmem before taking a hammer and
+adding a secondary refcount, rather than do it preemptively, but I'm
+happy to look into it if you insist.
+
+> >  static inline unsigned long netmem_to_pfn(netmem_ref netmem)
+> >  {
+> > +     if (netmem_is_net_iov(netmem))
+> > +             return 0;
+> > +
+> >       return page_to_pfn(netmem_to_page(netmem));
+> >  }
+>
+> Can we move this out and rename it to netmem_pfn_trace() ?
+> Silently returning 0 is not generally okay, but since it's only
+> for tracing we don't care.
+>
+
+Yes, I will do.
+
+> > +static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> > +{
+> > +     return (struct net_iov *)((__force unsigned long)netmem & ~NET_IO=
+V);
+> > +}
+> > +
+> > +static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
+> > +{
+> > +     return __netmem_clear_lsb(netmem)->pp_magic;
+> > +}
+> > +
+> > +static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long=
+ pp_magic)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp_magic |=3D pp_magic;
+> > +}
+> > +
+> > +static inline void netmem_clear_pp_magic(netmem_ref netmem)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp_magic =3D 0;
+> > +}
+> > +
+> > +static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+> > +{
+> > +     return __netmem_clear_lsb(netmem)->pp;
+> > +}
+> > +
+> > +static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *=
+pool)
+> > +{
+> > +     __netmem_clear_lsb(netmem)->pp =3D pool;
+> > +}
+>
+> Why is all this stuff in the main header? It's really low level.
+> Please put helpers which are only used by the core in a header
+> under net/core/, like net/core/dev.h
+
+Sorry, will do.
+
+--
+Thanks,
+Mina
 
