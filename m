@@ -1,123 +1,96 @@
-Return-Path: <netdev+bounces-110603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E170392D68A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:34:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D511C92D6CD
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A120B2871C2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:34:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCA22B2DE82
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B28194C86;
-	Wed, 10 Jul 2024 16:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5291198A24;
+	Wed, 10 Jul 2024 16:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEGi+sto"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOB39CZJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC921194C7D;
-	Wed, 10 Jul 2024 16:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839DF198A06;
+	Wed, 10 Jul 2024 16:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720628988; cv=none; b=fXKpTBWjA6c4ppbrrI1CsACCRe+suKxsXEEBzgWnwDMx5WSlrkXF2J3gbJcnM3COifl5hpH7zBBU4s+ejhe663ZWYj8ff4IP59YaBGk/0bs/wPvuow1UJnbTHKpLYv4uHRDhSBrBYA6Jv7tYGzVOx9QPBZIPp+lBoGehzAyswwU=
+	t=1720629387; cv=none; b=u/dlIfjXtGytyJgLOOCFnjXURJ+72mBWir/zeIc6u6VBGnLp9p4KzMbfzpTgrZ/c5r1sbSAL7fWx7FqMpkli0HFzOITUlrMc8Gh6qeFxvtYGhYO24GK1nC+Cs/5YFx+47ZkVGojTEkLrVH3ujfPoG12AnOWkw2IM9W41YaPgjWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720628988; c=relaxed/simple;
-	bh=bx9D8NKwTdRINZb3r2LnlQ1Wd7RT9h4+RBDqcerlajk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kj8hJK1JHvwvt4B06thB3/PLkVVAQxv2txlH3BdFewBg/xLP2AaJ+MorMfINCgJkmNlJr3niHnWO0j0i2/et1czqx+5pegMfnHmx2OtJRvwz8HJTPkaiGnrjJ1Cr8nwGMVft7AoCsulxCRrG7UyIUYuXWLgRyQgbYtgX+37MQrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEGi+sto; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66CAAC32781;
-	Wed, 10 Jul 2024 16:29:47 +0000 (UTC)
+	s=arc-20240116; t=1720629387; c=relaxed/simple;
+	bh=VOEQami4KT93qBtaeJsQ3QrGdn1x7XmqJH9KjXDTUok=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YOQgTXVT5Mk+UUvrf7bx0Am8Ni026QrPub4DJP/2ixizPphjjbcILbWJK+zQkLUVToOJ3PbeM0uCXjdzbNSGfuIUXDQmK/LjGPhuI3Wm4Ewb7iojAAXERTJcJ1689SQg4EprXjIBvdyWrubmNaLla5v+raW2SRsYtKnDXX0mrmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOB39CZJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D988C4AF0E;
+	Wed, 10 Jul 2024 16:36:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720628987;
-	bh=bx9D8NKwTdRINZb3r2LnlQ1Wd7RT9h4+RBDqcerlajk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OEGi+stov8aPkMbYfVULNzrQjikFEyCT3EM9gGTyjbSuUAphaNf3gCpn3ouKGyqcT
-	 hNkWbmQD+qJdAxpxMTsxKFFTMZntrG3Ugcr6uGKzyWLWCiIOE0By3uvVtxecA7+MWP
-	 5T2SPF9cSxrnjJ7jk9AJved5hoS9CPaA4oOP6pHuJlZSPfunbN5Z17FR9J/oUE+c1F
-	 bTF+mPfyhTwMpMK9GG3QRb10j0hjziso00LbfCyI90ksnaHRI55dX0il9kFM+nZ9MI
-	 OEW3OCRzNZQaKNYPpkTo46plPVDtbtR9SRtQnyFPGHM7dWgXAIFpNprL7wxRa4MxGU
-	 1LaiYSmqiKfeg==
-Date: Wed, 10 Jul 2024 09:29:46 -0700
-From: Kees Cook <kees@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Breno Leitao <leitao@debian.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, horms@kernel.org,
-	linux-hardening@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] netdevice: define and allocate &net_device
- _properly_
-Message-ID: <202407100927.3CA9DE888A@keescook>
-References: <20240710113036.2125584-1-leitao@debian.org>
- <0664910d-026d-49b8-8b70-a5c881888761@intel.com>
+	s=k20201202; t=1720629387;
+	bh=VOEQami4KT93qBtaeJsQ3QrGdn1x7XmqJH9KjXDTUok=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aOB39CZJyMSyw1K+rruCMig4enLLpVwC4wmcFjrJNki6A1jlaMJwosJ9qi8gRob9s
+	 z7kFdpwuqr9jEMtf/y6F9JBirzQmzNumlVlD4b5l1/DcvZl1p0vOnft2M9nqMidkg2
+	 fMeKFVzWzpdKvcOJw8T8tVAueyIBUoE5fy6eFWwP05DhpQeDO1LP4UgyB2r6dI3IcB
+	 VwAb4piQ8k8z2t0MaNbM+KdSE042QTqyYizf8pBU/ymZjtyw0F38O1P7ZzGOvlO5KG
+	 spFlwBsXz0iOlmIq8Tsu0Zw/Wqy210Von3cqCm6mraFQxJZhjqMZtEzBl7xdBYwb2m
+	 CVueEk61o919A==
+Date: Wed, 10 Jul 2024 09:36:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
+ Zhang <kaiyuanz@google.com>
+Subject: Re: [PATCH net-next v16 04/13] netdev: netdevice devmem allocator
+Message-ID: <20240710093624.26d22f02@kernel.org>
+In-Reply-To: <20240710001749.1388631-5-almasrymina@google.com>
+References: <20240710001749.1388631-1-almasrymina@google.com>
+	<20240710001749.1388631-5-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0664910d-026d-49b8-8b70-a5c881888761@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 10, 2024 at 04:01:35PM +0200, Alexander Lobakin wrote:
-> From: Breno Leitao <leitao@debian.org>
-> Date: Wed, 10 Jul 2024 04:30:28 -0700
-> 
-> > From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > 
-> > In fact, this structure contains a flexible array at the end, but
-> > historically its size, alignment etc., is calculated manually.
-> > There are several instances of the structure embedded into other
-> > structures, but also there's ongoing effort to remove them and we
-> > could in the meantime declare &net_device properly.
-> > Declare the array explicitly, use struct_size() and store the array
-> > size inside the structure, so that __counted_by() can be applied.
-> > Don't use PTR_ALIGN(), as SLUB itself tries its best to ensure the
-> > allocated buffer is aligned to what the user expects.
-> > Also, change its alignment from %NETDEV_ALIGN to the cacheline size
-> > as per several suggestions on the netdev ML.
-> > 
-> > bloat-o-meter for vmlinux:
-> > 
-> > free_netdev                                  445     440      -5
-> > netdev_freemem                                24       -     -24
-> > alloc_netdev_mqs                            1481    1450     -31
-> > 
-> > On x86_64 with several NICs of different vendors, I was never able to
-> > get a &net_device pointer not aligned to the cacheline size after the
-> > change.
-> > 
-> > Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> > Reviewed-by: Kees Cook <kees@kernel.org>
-> 
-> You did a great job converting embedded &net_devices, thanks a lot!
-> 
-> I hope SLUB won't return you a non-cacheline-aligned pointer after that
-> you removed SMP_CACHE_ALIGN(sizeof_priv), right?
+On Wed, 10 Jul 2024 00:17:37 +0000 Mina Almasry wrote:
+> +	net_devmem_dmabuf_binding_get(binding);
 
-Currently the slab will do power-of-2 alignment (i.e. aligned to the
-bucket size), so this should be fine. In the future I'm trying to make
-the slab more aware of the required alignments so that it can still
-provide needed alignment without having to do maximal (power-of-2)
-alignments.
-
--- 
-Kees Cook
+Why does every iov need to hold a ref? pp holds a ref and does its own
+accounting, so it won't disappear unless all the pages are returned.
 
