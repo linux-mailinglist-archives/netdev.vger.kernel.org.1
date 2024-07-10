@@ -1,119 +1,156 @@
-Return-Path: <netdev+bounces-110606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A1592D6D2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:48:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE9BB92D6DE
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAEFB2810A7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:48:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73B7528154E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F5218FC93;
-	Wed, 10 Jul 2024 16:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7C91953BA;
+	Wed, 10 Jul 2024 16:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ESGdkA3Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GeE9psM3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B81189F54
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F49194C73;
+	Wed, 10 Jul 2024 16:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720630080; cv=none; b=q4xXDXLsFbBVgIkyKVqHBoSwBS4PT5Lj0Eu+CfgJbXZnCqD7+5MBKu4SerHM6sThzxhzf9gwblnnSHTrNVcoWVuHEj0VujxTJZ+Wizu2lc+KQHDlCa+j+b2K8Y65eXBhxoWwEhhXYQm68CFw0UFE+uogepxeWsz4+4zFVkd1s9g=
+	t=1720630143; cv=none; b=YD3lAAgDBKpuSJh4FPdaUHZeUP8bMn34H6FQmmmHWuKiCg3QYTC3qbcpRHHO2KV69AWXvoAp5yVoBJWCIv2l37pCwdMthDRUCsShZFEtKggyz7vjm4Kp3TyL3+yd5VidK1ry//W3DsPZ+fc8518dSKJ5JyLJDC1vUf2V5R3SXUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720630080; c=relaxed/simple;
-	bh=RiCPr+tWg6vpr3zycp2rkAOQ3u/ZSnyNDx1+AHEcWMg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ravePTn1kfcqIafu/L72yi4XqAp/djPZr73a92U9Gn6noY98rtEVhIAMMTwFqkxjFNcXUp8S88TKBXy9JceCmMGzkjmWUo4HfqtcgufUBNvK38KEVYZ0f9bwFCfCxLHBcLqoifY+P2BPpCu/RBy8H1PMgB41Kx0TSViFXWTR8fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ESGdkA3Q; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1720630079; x=1752166079;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DwacjsFj4vQ0goPNtUhs2YfiNLTdBry9WX0OZRJCji8=;
-  b=ESGdkA3Qx+Y7Fdio02jHI3fJOHULSlhPzdlxjUeFCBtsiGJ3Tarf0W+V
-   5oCTtUZPptKWpAmDd6KHK+3oxCRV7s1uo6witwq/5V4awUqYh6hgLq/3h
-   WMoYrH9obcrliLxpXxy6SmvhjlhSLqLKe5bDzpKtsE0BR5uq83C3cqcsG
-   E=;
-X-IronPort-AV: E=Sophos;i="6.09,198,1716249600"; 
-   d="scan'208";a="645130028"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 16:47:52 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:47392]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.52:2525] with esmtp (Farcaster)
- id e1b777d8-6fa9-4955-8f97-ef02cea444db; Wed, 10 Jul 2024 16:47:51 +0000 (UTC)
-X-Farcaster-Flow-ID: e1b777d8-6fa9-4955-8f97-ef02cea444db
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 10 Jul 2024 16:47:50 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.41) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 10 Jul 2024 16:47:48 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <dima@arista.com>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net-next 0/2] tcp: Make simultaneous connect() RFC-compliant.
-Date: Wed, 10 Jul 2024 09:47:40 -0700
-Message-ID: <20240710164740.85061-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240710014456.77159-1-kuniyu@amazon.com>
-References: <20240710014456.77159-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1720630143; c=relaxed/simple;
+	bh=eS/RMGP4VxRIFbhmXWkCrFvxioDBvmLiKkBEAODdwGU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pCQ/7SSA2jPsUE9Nfax8t0rFtnFMzk6fWwhRqHFXxXe80js3uuqxMmIx7qjPIBXJvi1KybvFljiZsftFo/KWB5XYWPMWFnZwzrK6VEY0S709HDCs//wv87SQAKEbZtYt0L5QIam5uBo4tW70RAFEh1rPiNYyvrW7tJH9hIQSvb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GeE9psM3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24C51C32781;
+	Wed, 10 Jul 2024 16:49:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720630142;
+	bh=eS/RMGP4VxRIFbhmXWkCrFvxioDBvmLiKkBEAODdwGU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GeE9psM35dHGvAUo79TtOnu4kq5cY9EUrGF2ghylZhRExsJfxInrnrbzIGYTRdEyP
+	 JuNUksWFVoX99WDJK0OYBlsaXy6q6YA4gtH9ruZmomvqVAnZKrQ5V0cyaDEK1nrfmj
+	 TYzIOxglnzs0uEzQL7xFLg0IgYd2T3xSZ3m9tEEYvl2XCdOAvnosGa5j4fJc/Yy95m
+	 Fc5KKtoP2fmuVTazyDqaAh0RTuL+2gSo3Q0QXNcq8mXWHgnju0cDM5kOaxJGJVc4MU
+	 IX9XFPAHEsGhG08l+UfVEIDuPwq1AH3mfKgmvCy5HzZT6Og5qbJjr0Ohj8oZTpGXx8
+	 z5HtdpFuugVEQ==
+Date: Wed, 10 Jul 2024 09:49:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
+ Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
+ <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, linux-mm@kvack.org, Matthew Wilcox
+ <willy@infradead.org>
+Subject: Re: [PATCH net-next v16 05/13] page_pool: devmem support
+Message-ID: <20240710094900.0f808684@kernel.org>
+In-Reply-To: <20240710001749.1388631-6-almasrymina@google.com>
+References: <20240710001749.1388631-1-almasrymina@google.com>
+	<20240710001749.1388631-6-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 9 Jul 2024 18:44:55 -0700
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Tue, 9 Jul 2024 12:52:09 -0700
-> > On Mon, 8 Jul 2024 11:08:50 -0700 Kuniyuki Iwashima wrote:
-> > >   * Add patch 2
-> > 
-> > Hi Kuniyuki!
-> > 
-> > Looks like it also makes BPF CI fail. All of these:
-> > https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-07-09--15-00&executor=gh-bpf-ci&pw-n=0
-> > But it builds down to the reuseport test on various platforms.
-> 
-> Oh, thanks for catching!
-> 
-> It seems the test is using TFO, and somehow fastopen_rsk is cleared,
-> but a packet is processed later in SYN_RECV state...
+On Wed, 10 Jul 2024 00:17:38 +0000 Mina Almasry wrote:
+> @@ -68,17 +107,103 @@ static inline netmem_ref page_to_netmem(struct page *page)
+>  
+>  static inline int netmem_ref_count(netmem_ref netmem)
+>  {
+> +	/* The non-pp refcount of net_iov is always 1. On net_iov, we only
+> +	 * support pp refcounting which uses the pp_ref_count field.
+> +	 */
+> +	if (netmem_is_net_iov(netmem))
+> +		return 1;
+> +
+>  	return page_ref_count(netmem_to_page(netmem));
+>  }
 
-The test used MSG_FASTOPEN but TFO always failed due to lack of
-proper configuration, this should be fixed.
+How can this work if we had to revert the patch which made all of
+the networking stack take pp-aware refs? Maybe we should add the
+refcount, and let it be bumped, but WARN() if the net_iov is released
+with refcount other than 1? Or we need a very solid explanation why
+the conversion had to be reverted and this is fine.
 
-IP 127.0.0.1.36477 > 127.0.0.1.53357: Flags [S], seq 2263448885:2263448893, win 65495, options [mss 65495,sackOK,TS val 2871616407 ecr 0,nop,wscale 7], length 8
-IP 127.0.0.1.53357 > 127.0.0.1.36477: Flags [S.], seq 3767023264, ack 2263448886, win 65483, options [mss 65495,sackOK,TS val 2871616407 ecr 2871616407,nop,wscale 7], length 0
+>  static inline unsigned long netmem_to_pfn(netmem_ref netmem)
+>  {
+> +	if (netmem_is_net_iov(netmem))
+> +		return 0;
+> +
+>  	return page_to_pfn(netmem_to_page(netmem));
+>  }
 
-But this wasn't related, just red-herring.
+Can we move this out and rename it to netmem_pfn_trace() ?
+Silently returning 0 is not generally okay, but since it's only 
+for tracing we don't care.
 
-I just missed that the ACK of 3WHS was also processed by newly created
-SYN_RECV sk in tcp_rcv_state_process() called from tcp_child_process().
+> +static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> +{
+> +	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
+> +}
+> +
+> +static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
+> +{
+> +	return __netmem_clear_lsb(netmem)->pp_magic;
+> +}
+> +
+> +static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
+> +{
+> +	__netmem_clear_lsb(netmem)->pp_magic |= pp_magic;
+> +}
+> +
+> +static inline void netmem_clear_pp_magic(netmem_ref netmem)
+> +{
+> +	__netmem_clear_lsb(netmem)->pp_magic = 0;
+> +}
+> +
+> +static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+> +{
+> +	return __netmem_clear_lsb(netmem)->pp;
+> +}
+> +
+> +static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
+> +{
+> +	__netmem_clear_lsb(netmem)->pp = pool;
+> +}
 
-So, (sk->sk_state == TCP_SYN_RECV && !tp->fastopen_rsk) cannot deduce
-the cross SYN+ACK case.
-
-We need to use (sk->sk_state == TCP_SYN_RECV && sk->sk_socket).
-
-Will post v3.
-
-Thanks!
+Why is all this stuff in the main header? It's really low level.
+Please put helpers which are only used by the core in a header
+under net/core/, like net/core/dev.h
 
