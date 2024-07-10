@@ -1,234 +1,262 @@
-Return-Path: <netdev+bounces-110664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8868092DA9E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:17:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F4092DAAE
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 23:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC0BB1C2107A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 21:17:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267E51F23928
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 21:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8886384D04;
-	Wed, 10 Jul 2024 21:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F392A12FB31;
+	Wed, 10 Jul 2024 21:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeXW9fOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED10839F3
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 21:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416094206C;
+	Wed, 10 Jul 2024 21:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720646244; cv=none; b=csMCABmehhkZQqfMaXRN+l1w9ndIzR36slkrAYJ1lMO4ARJUOstYocDKpb0njSQYR/thBBmVE7E1j0c3SBUqStER/+Zm9QpxNzu//4FKthttvLGhNqjDD5ntxWDCoI6CVNIZ6eyxv3Z+kJwA4WRwc7lYd3alWTFImy1g3B9urVI=
+	t=1720646758; cv=none; b=ojRsSx+4XWRqBUSwJf3viBi6l3uE8qPB8N97+4WTVgsF11yilnV7ZPhThC7JkQrZAwMlaECLO5WktpnRBvor/oSSIX0vPT2yZaorzXA9kH6uKqi9gj405gsc1bgxk6Jslv7u0TqUoEzoLHmXCGvT8HCkkFjVwtJUAXMFp1UWADI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720646244; c=relaxed/simple;
-	bh=gJYJBB0NsyzzqMUK7KfgIhOcbcB8cneMSWttlzudC2Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A6fPyL3xXSzW4nlFL/x4UnnOhZl1RiDtW4S4rDWt++dkLBTpQxboPOyGo/xVm88dMc3jLMTgB5ikvVw71J6eXDEnRC5wA9jyMB5WtVTXVeH6hNhniqBXKs5i7m+bhyu7KVxgEQu8hK4L8wcWa8F9boGzzs/5oSTTL+nUODbZmJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7f92912a614so21256639f.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 14:17:22 -0700 (PDT)
+	s=arc-20240116; t=1720646758; c=relaxed/simple;
+	bh=IRtZNpuJNMmXPtNDOFUO3vtkI4/OVSZb2YHRY1Upuy4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IDTfXJMzc5em7kq2BquCthtQVZhGtedaKIPG8sC3bAlNX3+OZK04wcAof5JbOo1F2fUQGjWYgmeReQaszlFKld73F8pOzFuEUWzI4mLM4ZuN+MP3t6oP6NURt6kROQDc+c9dtivl3KKqeL/GUcMSg9vBp6swXEOj6xau2ifLPG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeXW9fOL; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79f15e7c879so15792085a.1;
+        Wed, 10 Jul 2024 14:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720646756; x=1721251556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QbggaOSaHuCesi2CRg2wXU+q+eIk0OlAl3CaZ0eNZU8=;
+        b=WeXW9fOLNarLuuBjZtX9MBBk6hIIXzviPv0H5Fjxf4aZNiOI0wZYCi1v1SwqW0p1S7
+         PzbHP3Xni/WrsbAm5GEX1qTY27OKTnXYqk1wL0vV0yrgfDOSNlQH5sGMJvZrETDzzzDc
+         2hb9lEVx0+nUveHDZCBepezBvvf5R3Zyj6R2zUB61lX/zKjQ1+ff8aErUm+UBZky0uSM
+         6hI4x0VJXCxU49kToiivbLawfd8lPVYy+sLi5m8IMbXgwP2UxVLjcYeJWHABGfEthCrU
+         yKOyblLK5QZbBcXcY0j01kfqq0MHVB/xb5PbLqni7LKTRERHe5tfbIF3UcA2P+8LFSLq
+         RTow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720646242; x=1721251042;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7CMc7XLzacg8kfKZlW0Mj3vytwn0Qj3S+42+6j7j+dE=;
-        b=ifECBbRPiWo100otqoAlhzv6MrXsshsLInQZGpNhfQWITub4hIybUoj7L61EVbM0AI
-         Q37mHVzr9f3XAOHRFZ57R79NS/+d2cBkNVSUlFYiBaQipxvSxgzAuR5xn6jAKKnK4z2+
-         aJlxOk1xbdFBW8LXU2ken+PYdmZBYQxjznLbyPlIrWjjNHq/aGSVJAnFsrnbOoARq7Wo
-         3mkybqIj0TuA0Nnnm/qW0LX8gj6oKJsaE6kdzDhljJm0yd2KV7IQjnynoCXkZnZ++0YF
-         xvIkn0a+V8EmIOUvwGrCTXXcJ9RH4YbSV0KYRxXUQYD3D3kQKnI521w25Yg4OZ0rHpnp
-         V4MA==
-X-Forwarded-Encrypted: i=1; AJvYcCXviECpuHMp+0+cEmmEXJTMEzIrtvuEWfzWSXx9WEnYeDhkocWNGospqUQHoObp55BSZ7OkWFB80gi/WglXqEGi962Ewjed
-X-Gm-Message-State: AOJu0YzA7nqc9vrQ44PYzXopX16wZ0tbmCjVGkQ3/ee5TqbvDXaq/k1E
-	1pNZu6ROQAV3iy13QmF7aExUuzHCDKTg14WytPZ1nOlCt4CzgIP4Fom3qM7CkE+mLX61bP0JVwz
-	a1EL8q79oCzan5nLrQpz/Q+aNYvXWV/8SwgowOBhfj3NaEpQrlDAy5KY=
-X-Google-Smtp-Source: AGHT+IFt9WpGMIVtdYuPIEYdZiSbqTU9SeqhxXTf69jeA/Soe1gQamKv+CmmpopZeIVr1MOyLppV4+AGD65aDUwcf0IGoTJSzAXm
+        d=1e100.net; s=20230601; t=1720646756; x=1721251556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QbggaOSaHuCesi2CRg2wXU+q+eIk0OlAl3CaZ0eNZU8=;
+        b=nsSRpM/FmJCX0f/QEbghApz+Rr5mQFQ+ChnXJwsYkRh0YpXPFJ3LdLPgrfGEg4tz9/
+         kQXwdKCDYKIYRTZgFVgvfJTZfEij+yXPIYoRC4BwvsOxAAoggs8sxt+IQ1bBgyMPHBhI
+         4szDtRWv2bHgviDjqAhxEwQdH9M/s212yP3m0tCVrpc9LSnnK+kY2bY3nkC3z5H03e9m
+         16ytQJ2Cy2wDLlGN7wn7CUmdosd0nbP0a2SZVaswdqqPPMZPf+NH3H0cwY7FNjEMHU5g
+         0KYsEktYKyaIii0doocfnZRPVXctLluqkjqFq9uP9sZx2c9BwgbadwOVs+BrTxoRkhNu
+         lTrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmQ2Pj4aNfeEVzZnOVRsl906efEod7gggTeHC9yrjp0NWs5FVJ9e1UrWdSdQ6KlS+NjvN05FlqXiI7Uf/OmDMofd6liPTI1fi8e6hPMV2wgNg/ly6hXtaOv13QyYibxF7FoNWRyDcx63BA1ALhWThjnOTFNw//K79QRhQYUqJaF28dDDnAq7MuG05OegCZmJYP+AjNthiTh3pfob9VJRxtEeehETs0ISKc4MzG
+X-Gm-Message-State: AOJu0Yzwq2tZv31UrBaFScpyIukx2xPmHOfTZ3FqsgCdUz+CbOCXrTOD
+	yZ1bU+ANx10kmu2za261S8UYBn5i5yTcWswQtRIq/0QFwYmpo/po
+X-Google-Smtp-Source: AGHT+IFe0i7wU8rrpD+HqlfKPUEgBWA6vsqjfMceJ75v21AkhfrEYglh+zMZJB1mRaN1tBQCuxzMAw==
+X-Received: by 2002:a05:620a:44d4:b0:7a1:41df:cca6 with SMTP id af79cd13be357-7a141dfcf26mr277624185a.23.1720646756076;
+        Wed, 10 Jul 2024 14:25:56 -0700 (PDT)
+Received: from n36-183-057.byted.org ([130.44.215.118])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jul 2024 14:25:55 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
+To: stefanha@redhat.com,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	bryantan@vmware.com,
+	vdasa@vmware.com,
+	pv-drivers@vmware.com
+Cc: dan.carpenter@linaro.org,
+	simon.horman@corigine.com,
+	oxffffaa@gmail.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	bpf@vger.kernel.org,
+	bobby.eshleman@bytedance.com,
+	jiang.wang@bytedance.com,
+	amery.hung@bytedance.com,
+	ameryhung@gmail.com,
+	xiyou.wangcong@gmail.com
+Subject: [RFC PATCH net-next v6 00/14] virtio/vsock: support datagrams
+Date: Wed, 10 Jul 2024 21:25:41 +0000
+Message-Id: <20240710212555.1617795-1-amery.hung@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:831e:b0:4c0:73d0:3d77 with SMTP id
- 8926c6da1cb9f-4c0b2b6b9damr514464173.5.1720646241959; Wed, 10 Jul 2024
- 14:17:21 -0700 (PDT)
-Date: Wed, 10 Jul 2024 14:17:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000955a0061ceb2c38@google.com>
-Subject: [syzbot] [net?] possible deadlock in do_ip_getsockopt (3)
-From: syzbot <syzbot+aa5e39930997b0fe3dba@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Hey all!
 
-syzbot found the following issue on:
+This series introduces support for datagrams to virtio/vsock.
 
-HEAD commit:    0b58e108042b Add linux-next specific files for 20240703
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=171d06e1980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ed034204f2e40e53
-dashboard link: https://syzkaller.appspot.com/bug?extid=aa5e39930997b0fe3dba
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+It is a spin-off (and smaller version) of this series from the summer:
+  https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Please note that this is an RFC and should not be merged until
+associated changes are made to the virtio specification, which will
+follow after discussion from this series.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1d079762feae/disk-0b58e108.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e53996c8d8c2/vmlinux-0b58e108.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a0bf21cdd844/bzImage-0b58e108.xz
+Another aside, the v4 of the series has only been mildly tested with a
+run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
+up, but I'm hoping to get some of the design choices agreed upon before
+spending too much time making it pretty.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+aa5e39930997b0fe3dba@syzkaller.appspotmail.com
+This series first supports datagrams in a basic form for virtio, and
+then optimizes the sendpath for all datagram transports.
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc6-next-20240703-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.4.2164/18168 is trying to acquire lock:
-ffffffff8f5ff788 (rtnl_mutex){+.+.}-{3:3}, at: do_ip_getsockopt+0x10f5/0x2940 net/ipv4/ip_sockglue.c:1702
+The result is a very fast datagram communication protocol that
+outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
+of multi-threaded workload samples.
 
-but task is already holding lock:
-ffff88807ce84c50 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_getsockopt+0x144/0x3e0 net/smc/af_smc.c:3144
+For those that are curious, some summary data comparing UDP and VSOCK
+DGRAM (N=5):
 
-which lock already depends on the new lock.
+	vCPUS: 16
+	virtio-net queues: 16
+	payload size: 4KB
+	Setup: bare metal + vm (non-nested)
 
+	UDP: 287.59 MB/s
+	VSOCK DGRAM: 509.2 MB/s
 
-the existing dependency chain (in reverse order) is:
+Some notes about the implementation...
 
--> #2 (&smc->clcsock_release_lock){+.+.}-{3:3}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5816
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       smc_switch_to_fallback+0x35/0xd00 net/smc/af_smc.c:902
-       smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2779
-       sock_sendmsg_nosec net/socket.c:730 [inline]
-       __sock_sendmsg+0x221/0x270 net/socket.c:745
-       __sys_sendto+0x3a4/0x4f0 net/socket.c:2204
-       __do_sys_sendto net/socket.c:2216 [inline]
-       __se_sys_sendto net/socket.c:2212 [inline]
-       __x64_sys_sendto+0xde/0x100 net/socket.c:2212
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+This datagram implementation forces datagrams to self-throttle according
+to the threshold set by sk_sndbuf. It behaves similar to the credits
+used by streams in its effect on throughput and memory consumption, but
+it is not influenced by the receiving socket as credits are.
 
--> #1 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5816
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3543
-       do_ip_setsockopt+0x1a2d/0x3cd0 net/ipv4/ip_sockglue.c:1078
-       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2324
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2347
-       __do_sys_setsockopt net/socket.c:2356 [inline]
-       __se_sys_setsockopt net/socket.c:2353 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2353
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+The device drops packets silently.
 
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3158 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3277 [inline]
-       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3901
-       __lock_acquire+0x1359/0x2000 kernel/locking/lockdep.c:5193
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5816
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       do_ip_getsockopt+0x10f5/0x2940 net/ipv4/ip_sockglue.c:1702
-       ip_getsockopt+0xed/0x2e0 net/ipv4/ip_sockglue.c:1765
-       tcp_getsockopt+0x163/0x1c0 net/ipv4/tcp.c:4409
-       smc_getsockopt+0x1d9/0x3e0 net/smc/af_smc.c:3154
-       do_sock_getsockopt+0x373/0x850 net/socket.c:2386
-       __sys_getsockopt+0x271/0x330 net/socket.c:2415
-       __do_sys_getsockopt net/socket.c:2425 [inline]
-       __se_sys_getsockopt net/socket.c:2422 [inline]
-       __x64_sys_getsockopt+0xb5/0xd0 net/socket.c:2422
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+As discussed previously, this series introduces datagrams and defers
+fairness to future work. See discussion in v2 for more context around
+datagrams, fairness, and this implementation.
 
-other info that might help us debug this:
-
-Chain exists of:
-  rtnl_mutex --> sk_lock-AF_INET --> &smc->clcsock_release_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&smc->clcsock_release_lock);
-                               lock(sk_lock-AF_INET);
-                               lock(&smc->clcsock_release_lock);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz.4.2164/18168:
- #0: ffff88807ce84c50 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_getsockopt+0x144/0x3e0 net/smc/af_smc.c:3144
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 18168 Comm: syz.4.2164 Not tainted 6.10.0-rc6-next-20240703-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2203
- check_prev_add kernel/locking/lockdep.c:3158 [inline]
- check_prevs_add kernel/locking/lockdep.c:3277 [inline]
- validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3901
- __lock_acquire+0x1359/0x2000 kernel/locking/lockdep.c:5193
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5816
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
- do_ip_getsockopt+0x10f5/0x2940 net/ipv4/ip_sockglue.c:1702
- ip_getsockopt+0xed/0x2e0 net/ipv4/ip_sockglue.c:1765
- tcp_getsockopt+0x163/0x1c0 net/ipv4/tcp.c:4409
- smc_getsockopt+0x1d9/0x3e0 net/smc/af_smc.c:3154
- do_sock_getsockopt+0x373/0x850 net/socket.c:2386
- __sys_getsockopt+0x271/0x330 net/socket.c:2415
- __do_sys_getsockopt net/socket.c:2425 [inline]
- __se_sys_getsockopt net/socket.c:2422 [inline]
- __x64_sys_getsockopt+0xb5/0xd0 net/socket.c:2422
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa7f3175bd9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa7f2bff048 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00007fa7f3303f60 RCX: 00007fa7f3175bd9
-RDX: 0000000000000029 RSI: 0000000000000000 RDI: 0000000000000005
-RBP: 00007fa7f31e4aa1 R08: 00000000200000c0 R09: 0000000000000000
-R10: 0000000020000080 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fa7f3303f60 R15: 00007fffb5a9a058
- </TASK>
-
-
+Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+Signed-off-by: Amery Hung <amery.hung@bytedance.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v6:
+- allow empty transport in datagram vsock
+- add empty transport checks in various paths
+- transport layer now saves source cid and port to control buffer of skb
+  to remove the dependency of transport in recvmsg()
+- fix virtio dgram_enqueue() by looking up the transport to be used when
+  using sendto(2)
+- fix skb memory leaks in two places
+- add dgram auto-bind test
+- Link to v5: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Changes in v5:
+- teach vhost to drop dgram when a datagram exceeds the receive buffer
+  - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
+	"vsock: read from socket's error queue"
+- replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
+  callback
+- refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy series
+- add _fallback/_FALLBACK suffix to dgram transport variables/macros
+- add WARN_ONCE() for table_size / VSOCK_HASH issue
+- add static to vsock_find_bound_socket_common
+- dedupe code in vsock_dgram_sendmsg() using module_got var
+- drop concurrent sendmsg() for dgram and defer to future series
+- Add more tests
+  - test EHOSTUNREACH in errqueue
+  - test stream + dgram address collision
+- improve clarity of dgram msg bounds test code
+- Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes in v4:
+- style changes
+  - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
+    &sk->vsk
+  - vsock: fix xmas tree declaration
+  - vsock: fix spacing issues
+  - virtio/vsock: virtio_transport_recv_dgram returns void because err
+    unused
+- sparse analysis warnings/errors
+  - virtio/vsock: fix unitialized skerr on destroy
+  - virtio/vsock: fix uninitialized err var on goto out
+  - vsock: fix declarations that need static
+  - vsock: fix __rcu annotation order
+- bugs
+  - vsock: fix null ptr in remote_info code
+  - vsock/dgram: make transport_dgram a fallback instead of first
+    priority
+  - vsock: remove redundant rcu read lock acquire in getname()
+- tests
+  - add more tests (message bounds and more)
+  - add vsock_dgram_bind() helper
+  - add vsock_dgram_connect() helper
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Changes in v3:
+- Support multi-transport dgram, changing logic in connect/bind
+  to support VMCI case
+- Support per-pkt transport lookup for sendto() case
+- Fix dgram_allow() implementation
+- Fix dgram feature bit number (now it is 3)
+- Fix binding so dgram and connectible (cid,port) spaces are
+  non-overlapping
+- RCU protect transport ptr so connect() calls never leave
+  a lockless read of the transport and remote_addr are always
+  in sync
+- Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
 
-If you want to undo deduplication, reply with:
-#syz undup
+Bobby Eshleman (14):
+  af_vsock: generalize vsock_dgram_recvmsg() to all transports
+  af_vsock: refactor transport lookup code
+  af_vsock: support multi-transport datagrams
+  af_vsock: generalize bind table functions
+  af_vsock: use a separate dgram bind table
+  virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
+  virtio/vsock: add common datagram send path
+  af_vsock: add vsock_find_bound_dgram_socket()
+  virtio/vsock: add common datagram recv path
+  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+  vhost/vsock: implement datagram support
+  vsock/loopback: implement datagram support
+  virtio/vsock: implement datagram support
+  test/vsock: add vsock dgram tests
+
+ drivers/vhost/vsock.c                   |   62 +-
+ include/linux/virtio_vsock.h            |    9 +-
+ include/net/af_vsock.h                  |   24 +-
+ include/uapi/linux/virtio_vsock.h       |    2 +
+ net/vmw_vsock/af_vsock.c                |  343 ++++++--
+ net/vmw_vsock/hyperv_transport.c        |   13 -
+ net/vmw_vsock/virtio_transport.c        |   24 +-
+ net/vmw_vsock/virtio_transport_common.c |  188 ++++-
+ net/vmw_vsock/vmci_transport.c          |   61 +-
+ net/vmw_vsock/vsock_loopback.c          |    9 +-
+ tools/testing/vsock/util.c              |  177 +++-
+ tools/testing/vsock/util.h              |   10 +
+ tools/testing/vsock/vsock_test.c        | 1032 ++++++++++++++++++++---
+ 13 files changed, 1638 insertions(+), 316 deletions(-)
+
+-- 
+2.20.1
+
 
