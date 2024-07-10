@@ -1,76 +1,114 @@
-Return-Path: <netdev+bounces-110572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DAB92D2F9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:40:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D214B92D341
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DE7AB226F1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 875BC1F24772
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AF61922FE;
-	Wed, 10 Jul 2024 13:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B34193450;
+	Wed, 10 Jul 2024 13:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m33srKBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay164.nicmail.ru (relay164.nicmail.ru [91.189.117.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB491DDC5;
-	Wed, 10 Jul 2024 13:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.189.117.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EBD192B98;
+	Wed, 10 Jul 2024 13:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720618800; cv=none; b=MLaBdMgbFVAj2xic3J9AqtgtrXoI5lBwL/IqvUGa/XZbMyD4ldOCadbL8pWpdjc/KORcIBbOUO1a1ZDya8q/zWn3JmAoxv45Vwq9OfaJ+OY07EPdmm/CoqNOleo2JF4r/lKVguAhDRHaNNdfNzxIFkDKM13Wo1oaR23DyilBoe8=
+	t=1720619062; cv=none; b=bGJCJnBELEuKsJPuBeOQKCylMCeQVV7ESfcmM9A7esgFA1za/Qx/EYieYOrMi8EkEJ/eWegXsgkAO27M8niMlKHFQSa78THsm9O5KD5WS9PiWidnkSc8UMwZUfZUt74AboOBWbMPrfr0CYUvIXtJptym9notOqNvtKxcgpIAijg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720618800; c=relaxed/simple;
-	bh=zDyx6B8RGymWfBCosR9zXsoz0W7HJYiHuVuHXLWVBB0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wj4oS979Fk7W9tuVIYt47mYP3mKNgAqcY0v9yk+Kt0RPARkDvEjqBVp37w+pnz++53h3GXmdR29kB2vTSmHw/IBe7XSu56c5y/p3BHzCNGegBGeNBj41dwkFKa4trNj3D7KuZC/N7q93w5YG16y9yTTADzBPM8KOY/jNFHtpNwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru; spf=pass smtp.mailfrom=ancud.ru; arc=none smtp.client-ip=91.189.117.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ancud.ru
-Received: from [10.28.138.152] (port=10572 helo=[192.168.95.111])
-	by relay.hosting.mail.nic.ru with esmtp (Exim 5.55)
-	(envelope-from <kiryushin@ancud.ru>)
-	id 1sRXS2-0005lu-EZ;
-	Wed, 10 Jul 2024 16:33:42 +0300
-Received: from [87.245.155.195] (account kiryushin@ancud.ru HELO [192.168.95.111])
-	by incarp1104.mail.hosting.nic.ru (Exim 5.55)
-	with id 1sRXS2-0056Eo-1L;
-	Wed, 10 Jul 2024 16:33:42 +0300
-Message-ID: <c5601e9d-e020-483f-a984-886f1aaf3207@ancud.ru>
-Date: Wed, 10 Jul 2024 16:33:40 +0300
+	s=arc-20240116; t=1720619062; c=relaxed/simple;
+	bh=YLWNJAMBEj6wuEjbKu2MzzNMNoT+GkqatSDHG9Byrc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ir/ATMYLlLFffguBectn9pCsA6RftzIhrf5q0Dmhp5vC/Cf5li/7SX0b8LJZ4zeFt/wRjVupx+HCq1q6gZQ3StYqaDggKdm8r/peNn5WjEroR1xIngoyVy8iBrUV3hsFd5hyxD331cqv+3d2F4zEXQz5cbsNVNn/L8mm2P12KTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m33srKBc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F5BC32781;
+	Wed, 10 Jul 2024 13:44:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720619062;
+	bh=YLWNJAMBEj6wuEjbKu2MzzNMNoT+GkqatSDHG9Byrc4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m33srKBcRZK1Q5vXVsDRTMGtm+UM9DyOxNZR/f+uMA+1wDcgKxieAiKLB5g8UQvAH
+	 6vUE/q4io+Udiy3avskC6Py3Ypss1vGlzKmqq474M0aGTKYaWz8FV77Y+5A9nPVXKX
+	 GSzhGtTneElcSrkAIa2Hpi2P7yjl9WOkqp7Xsh8WtRA73uK62RSJ2fft2vf2qdkspk
+	 drvzsrLg/DQWxPI17CIG1urfR347QQCGps7OuZ4lyw0gCmi+8BNCI6KapJiX7fji97
+	 RrBv9QVvtAlF3HyM+QkSUPN0vUBM6R0SccMl63X9J2Ug0RFguHS+H5sRdywfpRvhb5
+	 ASRKe20xOoPlw==
+Date: Wed, 10 Jul 2024 14:44:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	keescook@chromium.org, linux-hardening@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3] netdevice: define and allocate &net_device
+ _properly_
+Message-ID: <20240710134416.GT346094@kernel.org>
+References: <20240710113036.2125584-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] tg3: Remove residual error handling in
- tg3_suspend
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: Michael Chan <mchan@broadcom.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Rafael J. Wysocki" <rjw@rjwysocki.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- Michael Chan <michael.chan@broadcom.com>
-References: <20240709165410.11507-1-kiryushin@ancud.ru>
- <CALs4sv20_K0P_Ach=_kZ1jDZHKXvvcNBxatF9sP0iHRNku2OMQ@mail.gmail.com>
-Content-Language: en-US
-From: Nikita Kiryushin <kiryushin@ancud.ru>
-In-Reply-To: <CALs4sv20_K0P_Ach=_kZ1jDZHKXvvcNBxatF9sP0iHRNku2OMQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MS-Exchange-Organization-SCL: -1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240710113036.2125584-1-leitao@debian.org>
 
-Right. Last time it was applied to a wrong tree (net instead of net-next) and then
-reverted because of this. As I understand, it was meant to be re-applied to net-next (https://lore.kernel.org/lkml/4726fefd2a710cbee0d1a7fb15e361564915e955.camel@redhat.com/),
-but it seemed to get lost in process, so I decided to resubmit.
+On Wed, Jul 10, 2024 at 04:30:28AM -0700, Breno Leitao wrote:
+> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+> 
+> In fact, this structure contains a flexible array at the end, but
+> historically its size, alignment etc., is calculated manually.
+> There are several instances of the structure embedded into other
+> structures, but also there's ongoing effort to remove them and we
+> could in the meantime declare &net_device properly.
+> Declare the array explicitly, use struct_size() and store the array
+> size inside the structure, so that __counted_by() can be applied.
+> Don't use PTR_ALIGN(), as SLUB itself tries its best to ensure the
+> allocated buffer is aligned to what the user expects.
+> Also, change its alignment from %NETDEV_ALIGN to the cacheline size
+> as per several suggestions on the netdev ML.
+> 
+> bloat-o-meter for vmlinux:
+> 
+> free_netdev                                  445     440      -5
+> netdev_freemem                                24       -     -24
+> alloc_netdev_mqs                            1481    1450     -31
+> 
+> On x86_64 with several NICs of different vendors, I was never able to
+> get a &net_device pointer not aligned to the cacheline size after the
+> change.
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Kees Cook <kees@kernel.org>
+> 
+> ---
+> Changelog
+> 
+> v3:
+>  * Fix kernel-doc documentation for the new fields (Simon)
 
-On 7/10/24 07:53, Pavan Chebbi wrote:
-> I am not sure I understand this patch, commit d72b735712e65, which is
-> the same patch, is already applied, right?
-
+Thanks for the update, LGTM.
 
