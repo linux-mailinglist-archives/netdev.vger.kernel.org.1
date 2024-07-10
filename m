@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-110472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EECC92C849
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 04:10:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C4792C84A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 04:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A17F282C02
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41C2282C47
 	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 02:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4997FC8E0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD7DD534;
 	Wed, 10 Jul 2024 02:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyWjwyNi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfG7O7he"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ECDB663
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BE2B660
 	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 02:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720577433; cv=none; b=TQHpTJlhndSWqte6+wJDjhV9YpQFEQF2K3elrlb49U2Ynnhgtf5Q4mI8NYfrr+aGvtaycTSIQX27MUaoSalHuwW/tr6K3yqyGbMcjiWS1JvFuiE2AHhxraD4s/SQBAv+6hfrmvrMLDNy6bndYe9PZ4dha7x3oNOczk39aVL5Y1M=
+	t=1720577433; cv=none; b=Y5YrfvZX4eh5sPH4bG6xcSw4JZI9YxahApcH9/ZP4PyMnNZjvbg7VCpRs1sRRixD+XH7UYP6rLhGKVndcua5tEtzQLiIHyF86tyNGrhC5+Bpr0h6WKERn0b6u8nWJFNsP3zdfopakJCm0RvdL5hTZKP/kUZlzirbIX23GGAEUFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720577433; c=relaxed/simple;
-	bh=Y5FMNRvVPU+pYx/0/KpfVB1NqWL4sHIfLFCHuIeotzo=;
+	bh=BkutZPX7OvRbUXyLt4dyO4F6UqWVhC+PWnZzTx0Evu0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=C9S1RHtl0ct+VrrK/DluQjsqfO3ZbtUSNLRuHIB4M2we9VsythPz6jh+tipr6Yhwbxa36DKpdaHd8vg45qraOh/1JAaYc/VN28uvqdNuSaShsMdfYm5qUjbuSPW/+wqRRhdTuyHpn2AnbgD0HcZrf1RvNxOQvfreymHtC0ySLkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyWjwyNi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CCC39C4AF0A;
+	 In-Reply-To:To:Cc; b=uzIkIhc+55sOu4DvCvKAmluUJMtsLTWtGs4Q2HdwnBtO19aemhNydU8zpYC0kivM6d8JftiJ39WAQ35j5KLUyT8+rJjPlexMzyE8crE1RsdiaARtOyy4HgqaNUOmUlz9NQkOdEWQkWv90YIUmbEkLhWwbMTq504Y73AQegGAVqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfG7O7he; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BA535C32786;
 	Wed, 10 Jul 2024 02:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720577432;
-	bh=Y5FMNRvVPU+pYx/0/KpfVB1NqWL4sHIfLFCHuIeotzo=;
+	bh=BkutZPX7OvRbUXyLt4dyO4F6UqWVhC+PWnZzTx0Evu0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WyWjwyNi++3ApJKfriW3KnXMmLBKbVkiVLTSscWLLvGTQ+UndwdUzII4h7HkR38h5
-	 UhH+bVPEoj/mrSQctu2SPn7N/l7zi2U0yEFmP8pthAU84PSNBTfBHVXrRz6CtIKR4W
-	 n1OeHW1sXIGMKM9bDGLK9n9jOE1cE32g2gzpR1gLjBUwJEwiC8WxCS2P26Bm7zKans
-	 nXzL5dLROiITchYaylhMbVh6Jv+oyooxm9sdgFgKot71EbcebGMrooC4ZkIqG3VRa2
-	 zlV9r27LTkKNGVJGnzQXGgDbFi4G5zxiQTStUzYg9Gv1PNF7OZDXApJMT9kN6dsCeB
-	 gUtzgqiU7MIYg==
+	b=TfG7O7heUi8DaKcmHGTW0ojFUZMEsREq0yH2ZKPQ8TfvOR/7XrgmHUtOno82GeNE5
+	 vnFHYTH9VxDnm3MmyHM3KMwfromS44yNeqh5lWm/AtzG2SgB36uPE7TvDCg19bCOQ2
+	 HvaItO4HFP2BFd9E8WcSW2P85HHoS2yynRwpaucyL52BUnZVCO4R48HBN5LVZMOqiE
+	 kmiBkcwqLgQyyCigR60NTPaBDEW5WPpt9JHEh8+tvamaOCOFq3yMk6l0Ld4cyNF7x9
+	 DgywHCxgHcFtVTgGVol6MpK7wwp6ekSrA7cOR1nAcnaUxu9NSTEUuovMI3/6J7jgaW
+	 rfHjvPO7OnLyQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BD911C4332C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE0DEC4332D;
 	Wed, 10 Jul 2024 02:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,46 +52,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] mlxsw: Improvements
+Subject: Re: [PATCH net-next V2 00/10] mlx5 misc patches 2023-07-08
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172057743277.1917.11660224520323271282.git-patchwork-notify@kernel.org>
+ <172057743270.1917.6200807747301952478.git-patchwork-notify@kernel.org>
 Date: Wed, 10 Jul 2024 02:10:32 +0000
-References: <cover.1720447210.git.petrm@nvidia.com>
-In-Reply-To: <cover.1720447210.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
- mlxsw@nvidia.com
+References: <20240708080025.1593555-1-tariqt@nvidia.com>
+In-Reply-To: <20240708080025.1593555-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 8 Jul 2024 16:23:39 +0200 you wrote:
-> This patchset contains assortments of improvements to the mlxsw driver.
-> Please see individual patches for details.
+On Mon, 8 Jul 2024 11:00:15 +0300 you wrote:
+> Hi,
 > 
-> v2:
-> - Patch #1:
->     - changed to WARN_ONCE() with some prints
-> - Patch #2:
->     - call thermal_cooling_device_unregister() unconditionally and mention
->       it in the commit message
-> - Patch #3:
->     - reword the commit message to reflect the fact that the change both
->       suppresses a warning and avoid concurrent access
+> This patchset contains features and small enhancements from the team to
+> the mlx5 core and Eth drivers.
+> 
+> In patches 1-4, Dan completes the max_num_eqs logic of the SF.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/3] mlxsw: Warn about invalid accesses to array fields
-    https://git.kernel.org/netdev/net-next/c/b45c76e5f43f
-  - [net-next,v2,2/3] mlxsw: core_thermal: Report valid current state during cooling device registration
-    https://git.kernel.org/netdev/net-next/c/a22f3bc80075
-  - [net-next,v2,3/3] mlxsw: pci: Lock configuration space of upstream bridge during reset
-    https://git.kernel.org/netdev/net-next/c/0970836c348b
+  - [net-next,V2,01/10] net/mlx5: IFC updates for SF max IO EQs
+    (no matching commit)
+  - [net-next,V2,02/10] net/mlx5: Set sf_eq_usage for SF max EQs
+    (no matching commit)
+  - [net-next,V2,03/10] net/mlx5: Set default max eqs for SFs
+    (no matching commit)
+  - [net-next,V2,04/10] net/mlx5: Use set number of max EQs
+    (no matching commit)
+  - [net-next,V2,05/10] net/mlx5: Add support for MTPTM and MTCTR registers
+    (no matching commit)
+  - [net-next,V2,06/10] net/mlx5: Add support for enabling PTM PCI capability
+    (no matching commit)
+  - [net-next,V2,07/10] net/mlx5: Implement PTM cross timestamping support
+    (no matching commit)
+  - [net-next,V2,08/10] net/mlx5: DR, Remove definer functions from SW Steering API
+    https://git.kernel.org/netdev/net-next/c/e829a331ec28
+  - [net-next,V2,09/10] net/mlx5e: SHAMPO, Add missing aggregate counter
+    https://git.kernel.org/netdev/net-next/c/7204730b3304
+  - [net-next,V2,10/10] net/mlx5e: CT: Initialize err to 0 to avoid warning
+    https://git.kernel.org/netdev/net-next/c/f1ac0b7dcd49
 
 You are awesome, thank you!
 -- 
