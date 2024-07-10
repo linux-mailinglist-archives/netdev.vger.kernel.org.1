@@ -1,138 +1,145 @@
-Return-Path: <netdev+bounces-110569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B22092D2AC
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:22:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7099092D2D5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E5DEB243E8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:22:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33320284272
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90E8193060;
-	Wed, 10 Jul 2024 13:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06F7194093;
+	Wed, 10 Jul 2024 13:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l13m+4+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF65B192B97;
-	Wed, 10 Jul 2024 13:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B765A192B91;
+	Wed, 10 Jul 2024 13:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720617765; cv=none; b=D8QWkCgqntNw24tDbeUKvl4nsKSeko2durP2r8c1YlF9mCAomA1Ui7nVbX4fgQ3f96yOQHf7FxJS23iy8F2f3fOTp2MKh6mlpI3AytvNfomlHH7Q2TK1oYvNa4ho1XBb3kmIVsNdfrOmyn2sXWYJ8fM82kJGYqQVEru4pWxBb6g=
+	t=1720618218; cv=none; b=tpC29uQE805y50Wb8bWqEb90HEVCHeOZ7B1Z3Ez8atv2SKOVVcAddZlv/7n0BBpkAaFivi9dio6OpR9tHrvN1lkxlVChn2BC/wH0cWn4lpcKrfzB6RCmJDaEoYlytUrA9cgNOymZbga69QWJ2sdJ6IFeOWJZdlu9VYCDcpV8DiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720617765; c=relaxed/simple;
-	bh=YIkn0y6FEiK+f/vFbGpK+1hsyO7LvjsSxFuxA7mItqA=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t/RXE2/bTYOwgDy+4pezO9BWCmcCLxgGA7OWvBNh95pJoZ3Xo7oFiTE64yusbqmxCwnMWnxcbdCG68gKic+Ujo/z/F7FLT52rFUbg66UI+qgOrQ7IUgCdnK/rEtfsmX//AgglP824fhmvEBSNGrOaAbAofrDylRO9yxAne9JSXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WJz5Q0VZNz689PV;
-	Wed, 10 Jul 2024 21:21:14 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id A4BA41400DD;
-	Wed, 10 Jul 2024 21:22:39 +0800 (CST)
-Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 10 Jul
- 2024 14:22:39 +0100
-Date: Wed, 10 Jul 2024 14:22:38 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dan Williams <dan.j.williams@intel.com>
-CC: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	<ksummit@lists.linux.dev>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240710142238.00007295@Huawei.com>
-In-Reply-To: <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	<3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
-	<668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1720618218; c=relaxed/simple;
+	bh=WnmHFbV9qGDjAcF91zk+1or9P4/JEgGUFqWbs8nvKw8=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=TASGdFg5uDOr3ev3R17w5tWZgr+2DQ4t66afYxv3lwpLyjwhc41/vXdqtK76pDfoB2uLxjUsGaiwNoPQs0jOQYEtd79ilMtSqC6v5IE1dk+AunbUj7KLZRnVgEzfbvs6wBJCp/GK8xrYfKGRTweYsHJzEqaalDtEzo7gSc+Mkt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l13m+4+5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D98C32781;
+	Wed, 10 Jul 2024 13:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720618218;
+	bh=WnmHFbV9qGDjAcF91zk+1or9P4/JEgGUFqWbs8nvKw8=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=l13m+4+5zjvjn3m1cCI2exo5SU7UHQYQOvj1oeEADWbO04p+MN2XDFgvZ11xxGFtv
+	 8HRjuhCtNEQKHoqL26rC7hBK0DawUoXLFPnT52uACqfi6yIuVbmqmYj/fMcucBSvs8
+	 SRjMn5oEsIkhvKQGfYqEeLDJgFxl8IqDb1z+Y4CdEGMA23CWOHzvpvyqYmW2vxPqF5
+	 OLWk4A12HLbWvDlNKQjvODfh2WlWqP07oFvqc7ON9UoPCF8KUr3XHAj6X81ZioYMLz
+	 UWFhFUOlflbdkIOafZM9fK4xjAWfKSPoa5dzL4/YKCrYkwOTjNWU+WJWWGyVQ9PPdg
+	 /kljNrsYdcoSA==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240710090742.1657606-1-amorenoz@redhat.com>
+References: <20240710090742.1657606-1-amorenoz@redhat.com>
+Subject: Re: [PATCH net-next v2] net: psample: fix flag being set in wrong skb
+From: Antoine Tenart <atenart@kernel.org>
+Cc: Adrian Moreno <amorenoz@redhat.com>, Yotam Gigi <yotam.gi@gmail.com>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, Eelco Chaudron <echaudro@redhat.com>, Aaron Conole <aconole@redhat.com>, linux-kernel@vger.kernel.org
+To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
+Date: Wed, 10 Jul 2024 15:30:14 +0200
+Message-ID: <172061821475.5582.9226948763101271068@kwain.local>
 
-On Tue, 9 Jul 2024 15:15:13 -0700
-Dan Williams <dan.j.williams@intel.com> wrote:
+Hi Adri=C3=A1n,
 
-> James Bottomley wrote:
-> > > The upstream discussion has yielded the full spectrum of positions on
-> > > device specific functionality, and it is a topic that needs cross-
-> > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > concerns. Please consider it for a Maintainers Summit discussion.  
-> > 
-> > I'm with Greg on this ... can you point to some of the contrary
-> > positions?  
-> 
-> This thread has that discussion:
-> 
-> http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> 
-> I do not want to speak for others on the saliency of their points, all I
-> can say is that the contrary positions have so far not moved me to drop
-> consideration of fwctl for CXL.
+Quoting Adrian Moreno (2024-07-10 11:07:42)
+> A typo makes PSAMPLE_ATTR_SAMPLE_RATE netlink flag be added to the wrong
+> sk_buff.
+>=20
+> Fix the error and make the input sk_buff pointer "const" so that it
+> doesn't happen again.
+>=20
+> Also modify OVS psample test to verify the flag is properly emitted.
 
-I was resisting rat holing. Oh well...
+I don't see that part; although it can be sent as a follow-up and not
+part of the fix.
 
-For a 'subset' of CXL.  There are a wide range of controls that are highly
-destructive, potentially to other hosts (simplest one is a command that
-will surprise remove someone else's memory). For those I'm not sure
-fwctl gets us anywhere - but we still need a solution (Subject to
-config gates etc as typically this is BMCs not hosts).
-Maybe fwctl eventually ends up with levels of 'safety' (beyond the
-current read vs write vs write_full, or maybe those are enough).
+Thanks,
+Antoine
 
-Complexities such as message tunneling to multiple components are also
-going to be fun, but we want the non destructive bits of those to work
-as part of the safe set, so we can get telemetry from downstream devices.
-
-Good to cover the debug and telemetry usecase, but it still leaves us with
-gaping holes were we need to solve the permissions problem, perhaps that
-is layered on top of fwctl, perhaps something else is needed.
-
-So if fwctl is adopted, I do want the means to use it for the highly
-destructive stuff as well!  Maybe that's a future discussion.
-
-
-> 
-> Where CXL has a Command Effects Log that is a reasonable protocol for
-> making decisions about opaque command codes, and that CXL already has a
-> few years of experience with the commands that *do* need a Linux-command
-> wrapper.
-
-Worth asking if this will incorporate unknown but not vendor defined
-commands.  There is a long tail of stuff in the spec we haven't caught up
-with yet.  Or you thinking keep this for the strictly vendor defined stuff?
-
-> 
-> Some open questions from that thread are: what does it mean for the fate
-> of a proposal if one subsystem Acks the ABI and another Naks it for a
-> device that crosses subsystem functionality? Would a cynical hardware
-> response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> get device-specific commands past another subsystem's objection?
-> 
-> My reconsideration of the "debug-build only" policy for CXL
-> device-specific commands was influenced by a conversation with a distro
-> developer where they asserted, paraphrasing: "at what point is a device
-> vendor incentivized to ship an out-of-tree module just to restore their
-> passthrough functionality?. At that point upstream has lost out on
-> collaboration and distro kernel ABI has gained another out-of-tree
-> consumer."
-> 
-> So the tension is healthy, but it has diminishing returns past a certain
-> point.
-> 
-
+> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
+>  include/net/psample.h | 8 +++++---
+>  net/psample/psample.c | 7 ++++---
+>  2 files changed, 9 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/include/net/psample.h b/include/net/psample.h
+> index c52e9ebd88dd..5071b5fc2b59 100644
+> --- a/include/net/psample.h
+> +++ b/include/net/psample.h
+> @@ -38,13 +38,15 @@ struct sk_buff;
+> =20
+>  #if IS_ENABLED(CONFIG_PSAMPLE)
+> =20
+> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
+skb,
+> -                          u32 sample_rate, const struct psample_metadata=
+ *md);
+> +void psample_sample_packet(struct psample_group *group,
+> +                          const struct sk_buff *skb, u32 sample_rate,
+> +                          const struct psample_metadata *md);
+> =20
+>  #else
+> =20
+>  static inline void psample_sample_packet(struct psample_group *group,
+> -                                        struct sk_buff *skb, u32 sample_=
+rate,
+> +                                        const struct sk_buff *skb,
+> +                                        u32 sample_rate,
+>                                          const struct psample_metadata *m=
+d)
+>  {
+>  }
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index f48b5b9cd409..a0ddae8a65f9 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -360,8 +360,9 @@ static int psample_tunnel_meta_len(struct ip_tunnel_i=
+nfo *tun_info)
+>  }
+>  #endif
+> =20
+> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
+skb,
+> -                          u32 sample_rate, const struct psample_metadata=
+ *md)
+> +void psample_sample_packet(struct psample_group *group,
+> +                          const struct sk_buff *skb, u32 sample_rate,
+> +                          const struct psample_metadata *md)
+>  {
+>         ktime_t tstamp =3D ktime_get_real();
+>         int out_ifindex =3D md->out_ifindex;
+> @@ -498,7 +499,7 @@ void psample_sample_packet(struct psample_group *grou=
+p, struct sk_buff *skb,
+>                 goto error;
+> =20
+>         if (md->rate_as_probability)
+> -               nla_put_flag(skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
+> +               nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
+> =20
+>         genlmsg_end(nl_skb, data);
+>         genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+> --=20
+> 2.45.2
+>=20
+>
 
