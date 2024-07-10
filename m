@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-110640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F5392DA1A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:31:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0BE92DA1B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03A031F24366
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:31:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 904961C2036D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF0198E92;
-	Wed, 10 Jul 2024 20:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553931974EA;
+	Wed, 10 Jul 2024 20:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JtwYcfVO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MdBYGZjj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52AE198A34
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9261C198A01
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720643449; cv=none; b=hit9c4/BhBzAUSkOkXjV3JohUToVTmkXYEw2/Q2u/lRgZ1hQDqiMWB9nkmUG12A24igKeznGM3sNM+lFyAsFaaNM7dsyVM7cKlljQoDesDeoCuNRE+9GFYzqOOf5godeyo4Gp4lXo9qkrvqJ9HavGPx+pxXuSQb8jeuB0Hg078Q=
+	t=1720643451; cv=none; b=Go5r2C9kGz+W1TEBLURQN+mdEzwEsz6t1R7HbR+NFOfn8tkitkaR6cSInh2guGxRITw/GRwhmdyFoMp3pSLYCp49ZPzpQyCpWYSHKjKo1pPDHtmc49T//GFcd9Vs4bcL6XGdd0fX+q8dN4iuJgWJDnt/+ALQ+uTvLSKmMBYTHvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720643449; c=relaxed/simple;
-	bh=l3jR3ECOBod60Q3Qfoepi9LIxyXvv9mvsrrJ3pz5ios=;
+	s=arc-20240116; t=1720643451; c=relaxed/simple;
+	bh=M3zxxtGs2QEeWOrKrWfT89da8703fHMayqOOEE7dxNU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bzcW0MT1Zuo287LpM9i0cHWc+tkMSyhITNkMNCRzg3RH7ZoIYrdBOdxoI9HE7nXmyaXfD4h6ANHKm4669fNEwfNCNcSOX3MT/40VAzSNtUjYplr/0Cu6UF3zjbGXxZfRM2idgsxDm8VmuJgdF+7dkQPmuGGyOaElXA08kRNhZyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JtwYcfVO; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=ZNot0sDaFiL/4P6vzoPGHTY/OelwQQMokfIyBI7RnZdURQDBbVpxE94kU00wvJEnqJ5L8Hks8FiVvBl9jk+uIV3TR6ppORZakfPRRFMeDQWk/12n3OBpGLjGW4t6G462IQ/WkNN146M0mb+blmQvzquRicIRm1aD8EaW4lj6PTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MdBYGZjj; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720643448; x=1752179448;
+  t=1720643449; x=1752179449;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=l3jR3ECOBod60Q3Qfoepi9LIxyXvv9mvsrrJ3pz5ios=;
-  b=JtwYcfVOqaRf46Qv72FNblwBCsm4Qiqf4IpXEW4AQCmvvKNNNoNpaRmz
-   oPycqHgM+DH44X59bPTblFsBBG7dWp4lFl+T92WkzmEJpMwhg5q4HR/aU
-   oD1ViGkYfqAR4guKOW32T0lO4PJkT5OehIito4IAQB3C+TqFMNmvQ5zLb
-   WB9xPQdVaZJfodao97QnErrIotOdHIegIIbvD5nTRg+1UYqOLdmIKLOM5
-   U5eT3WI6XBBU2elZtu20gY3nXOSahq7RneSlZL7G+NqfW7QpwqsIcLsZx
-   hTPmWZRsBszk8s0TdpZKDqLTJ3iEIZHx/vOrircJGvJdw/ww24t2vXUXo
+  bh=M3zxxtGs2QEeWOrKrWfT89da8703fHMayqOOEE7dxNU=;
+  b=MdBYGZjjzhp3Z7mKOMwXXfAiN0LDtHClPPL1XyZZA78bnqLSouV2GjOc
+   +vQWXJQyRm8ZiG7dczP1GAHP9bppDcRSbjpfFaENLNb/4ZUFNQf7s3z7S
+   Wq7d57jYE+1vKn2DDMg/SNUPnCP0forByKIAv1AdgrgZGDPFgz64+AbsC
+   RE8FGoItWWMssZgHpxjqIwywS5WZfDk8+2PqdwFnM6nnmhIWjyV2eY8hj
+   Q5bVfCWy/YplQjjH0O2/hfzGAHa84OX+JE3tE6+x25gzjy9JoN1BnkHUt
+   P81HEbCVYpNeb7vkf7+uaWgURYo7aUDxhIAGYtKX4SOsTn12pqTSSXKKw
    w==;
-X-CSE-ConnectionGUID: hBDM9jaNSHqiRE48iP0avw==
-X-CSE-MsgGUID: WoyBPaNERRCL6+0GgFmpOA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483773"
+X-CSE-ConnectionGUID: iEg49uTQSOuNfnP20Ejgcw==
+X-CSE-MsgGUID: cuC5mKnLQTGEA25PKvQzFw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483775"
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="12483773"
+   d="scan'208";a="12483775"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:30:43 -0700
-X-CSE-ConnectionGUID: Mht+fLmbRJmhtzPUEksHvw==
-X-CSE-MsgGUID: jLbRCrxYRu2DTj7uR+tdhw==
+X-CSE-ConnectionGUID: /R/nsVKrQoOPGrKQvGRUAQ==
+X-CSE-MsgGUID: VGYnlZ08Tmigsc15Ky6ksg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="48223876"
+   d="scan'208";a="48223879"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa010.jf.intel.com with ESMTP; 10 Jul 2024 13:30:42 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -72,9 +72,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	almasrymina@google.com,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 07/14] idpf: strictly assert cachelines of queue and queue vector structures
-Date: Wed, 10 Jul 2024 13:30:23 -0700
-Message-ID: <20240710203031.188081-8-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 08/14] idpf: merge singleq and splitq &net_device_ops
+Date: Wed, 10 Jul 2024 13:30:24 -0700
+Message-ID: <20240710203031.188081-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
 References: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
@@ -88,413 +88,203 @@ Content-Transfer-Encoding: 8bit
 
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Now that the queue and queue vector structures are separated and laid
-out optimally, group the fields as read-mostly, read-write, and cold
-cachelines and add size assertions to make sure new features won't push
-something out of its place and provoke perf regression.
-Despite looking innocent, this gives up to 2% of perf bump on Rx.
+It makes no sense to have a second &net_device_ops struct (800 bytes of
+rodata) with only one difference in .ndo_start_xmit, which can easily
+be just one `if`. This `if` is a drop in the ocean and you won't see
+any difference.
+Define unified idpf_xmit_start(). The preparation for sending is the
+same, just call either idpf_tx_splitq_frame() or idpf_tx_singleq_frame()
+depending on the active model to actually map and send the skb.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.h | 185 +++++++++++++-------
- 1 file changed, 118 insertions(+), 67 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 26 +++-------------
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 31 ++-----------------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 17 ++++++----
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  9 ++----
+ 4 files changed, 20 insertions(+), 63 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index fafd279127a3..56fdbb2b6fbc 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -4,8 +4,7 @@
+ #include "idpf.h"
+ #include "idpf_virtchnl.h"
+ 
+-static const struct net_device_ops idpf_netdev_ops_splitq;
+-static const struct net_device_ops idpf_netdev_ops_singleq;
++static const struct net_device_ops idpf_netdev_ops;
+ 
+ /**
+  * idpf_init_vector_stack - Fill the MSIX vector stack with vector index
+@@ -764,10 +763,7 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+ 	}
+ 
+ 	/* assign netdev_ops */
+-	if (idpf_is_queue_model_split(vport->txq_model))
+-		netdev->netdev_ops = &idpf_netdev_ops_splitq;
+-	else
+-		netdev->netdev_ops = &idpf_netdev_ops_singleq;
++	netdev->netdev_ops = &idpf_netdev_ops;
+ 
+ 	/* setup watchdog timeout value to be 5 second */
+ 	netdev->watchdog_timeo = 5 * HZ;
+@@ -2352,24 +2348,10 @@ void idpf_free_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem)
+ 	mem->pa = 0;
+ }
+ 
+-static const struct net_device_ops idpf_netdev_ops_splitq = {
+-	.ndo_open = idpf_open,
+-	.ndo_stop = idpf_stop,
+-	.ndo_start_xmit = idpf_tx_splitq_start,
+-	.ndo_features_check = idpf_features_check,
+-	.ndo_set_rx_mode = idpf_set_rx_mode,
+-	.ndo_validate_addr = eth_validate_addr,
+-	.ndo_set_mac_address = idpf_set_mac,
+-	.ndo_change_mtu = idpf_change_mtu,
+-	.ndo_get_stats64 = idpf_get_stats64,
+-	.ndo_set_features = idpf_set_features,
+-	.ndo_tx_timeout = idpf_tx_timeout,
+-};
+-
+-static const struct net_device_ops idpf_netdev_ops_singleq = {
++static const struct net_device_ops idpf_netdev_ops = {
+ 	.ndo_open = idpf_open,
+ 	.ndo_stop = idpf_stop,
+-	.ndo_start_xmit = idpf_tx_singleq_start,
++	.ndo_start_xmit = idpf_tx_start,
+ 	.ndo_features_check = idpf_features_check,
+ 	.ndo_set_rx_mode = idpf_set_rx_mode,
+ 	.ndo_validate_addr = eth_validate_addr,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index 9864a3992f0c..8630db24f63a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -351,8 +351,8 @@ static void idpf_tx_singleq_build_ctx_desc(struct idpf_tx_queue *txq,
+  *
+  * Returns NETDEV_TX_OK if sent, else an error code
+  */
+-static netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
+-					 struct idpf_tx_queue *tx_q)
++netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
++				  struct idpf_tx_queue *tx_q)
+ {
+ 	struct idpf_tx_offload_params offload = { };
+ 	struct idpf_tx_buf *first;
+@@ -408,33 +408,6 @@ static netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
+ 	return idpf_tx_drop_skb(tx_q, skb);
+ }
+ 
+-/**
+- * idpf_tx_singleq_start - Selects the right Tx queue to send buffer
+- * @skb: send buffer
+- * @netdev: network interface device structure
+- *
+- * Returns NETDEV_TX_OK if sent, else an error code
+- */
+-netdev_tx_t idpf_tx_singleq_start(struct sk_buff *skb,
+-				  struct net_device *netdev)
+-{
+-	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
+-	struct idpf_tx_queue *tx_q;
+-
+-	tx_q = vport->txqs[skb_get_queue_mapping(skb)];
+-
+-	/* hardware can't handle really short frames, hardware padding works
+-	 * beyond this point
+-	 */
+-	if (skb_put_padto(skb, IDPF_TX_MIN_PKT_LEN)) {
+-		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
+-
+-		return NETDEV_TX_OK;
+-	}
+-
+-	return idpf_tx_singleq_frame(skb, tx_q);
+-}
+-
+ /**
+  * idpf_tx_singleq_clean - Reclaim resources from queue
+  * @tx_q: Tx queue to clean
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index f569ea389b04..5dd1b1a9e624 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -4,6 +4,9 @@
+ #include "idpf.h"
+ #include "idpf_virtchnl.h"
+ 
++static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
++			       unsigned int count);
++
+ /**
+  * idpf_buf_lifo_push - push a buffer pointer onto stack
+  * @stack: pointer to stack struct
+@@ -2702,8 +2705,8 @@ static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
+  * E.g.: a packet with 7 fragments can require 9 DMA transactions; 1 for TSO
+  * header, 1 for segment payload, and then 7 for the fragments.
+  */
+-bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
+-			unsigned int count)
++static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
++			       unsigned int count)
+ {
+ 	if (likely(count < max_bufs))
+ 		return false;
+@@ -2849,14 +2852,13 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
+ }
+ 
+ /**
+- * idpf_tx_splitq_start - Selects the right Tx queue to send buffer
++ * idpf_tx_start - Selects the right Tx queue to send buffer
+  * @skb: send buffer
+  * @netdev: network interface device structure
+  *
+  * Returns NETDEV_TX_OK if sent, else an error code
+  */
+-netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
+-				 struct net_device *netdev)
++netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	struct idpf_vport *vport = idpf_netdev_to_vport(netdev);
+ 	struct idpf_tx_queue *tx_q;
+@@ -2878,7 +2880,10 @@ netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
+ 		return NETDEV_TX_OK;
+ 	}
+ 
+-	return idpf_tx_splitq_frame(skb, tx_q);
++	if (idpf_is_queue_model_split(vport->txq_model))
++		return idpf_tx_splitq_frame(skb, tx_q);
++	else
++		return idpf_tx_singleq_frame(skb, tx_q);
+ }
+ 
+ /**
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 5daa8f905f86..c7ae20ab567b 100644
+index c7ae20ab567b..b2bf58146484 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
 +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -6,6 +6,7 @@
- 
- #include <linux/dim.h>
- 
-+#include <net/libeth/cache.h>
- #include <net/page_pool/helpers.h>
- #include <net/tcp.h>
- #include <net/netdev_queues.h>
-@@ -505,58 +506,68 @@ struct idpf_intr_reg {
- /**
-  * struct idpf_q_vector
-  * @vport: Vport back pointer
-- * @napi: napi handler
-- * @v_idx: Vector index
-- * @intr_reg: See struct idpf_intr_reg
-+ * @num_rxq: Number of RX queues
-  * @num_txq: Number of TX queues
-+ * @num_bufq: Number of buffer queues
-  * @num_complq: number of completion queues
-+ * @rx: Array of RX queues to service
-  * @tx: Array of TX queues to service
-+ * @bufq: Array of buffer queues to service
-  * @complq: array of completion queues
-+ * @intr_reg: See struct idpf_intr_reg
-+ * @napi: napi handler
-+ * @total_events: Number of interrupts processed
-  * @tx_dim: Data for TX net_dim algorithm
-  * @tx_itr_value: TX interrupt throttling rate
-  * @tx_intr_mode: Dynamic ITR or not
-  * @tx_itr_idx: TX ITR index
-- * @num_rxq: Number of RX queues
-- * @rx: Array of RX queues to service
-  * @rx_dim: Data for RX net_dim algorithm
-  * @rx_itr_value: RX interrupt throttling rate
-  * @rx_intr_mode: Dynamic ITR or not
-  * @rx_itr_idx: RX ITR index
-- * @num_bufq: Number of buffer queues
-- * @bufq: Array of buffer queues to service
-- * @total_events: Number of interrupts processed
-+ * @v_idx: Vector index
-  * @affinity_mask: CPU affinity mask
-  */
- struct idpf_q_vector {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	struct idpf_vport *vport;
--	struct napi_struct napi;
--	u16 v_idx;
--	struct idpf_intr_reg intr_reg;
- 
-+	u16 num_rxq;
- 	u16 num_txq;
-+	u16 num_bufq;
- 	u16 num_complq;
-+	struct idpf_rx_queue **rx;
- 	struct idpf_tx_queue **tx;
-+	struct idpf_buf_queue **bufq;
- 	struct idpf_compl_queue **complq;
- 
-+	struct idpf_intr_reg intr_reg;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
-+	struct napi_struct napi;
-+	u16 total_events;
-+
- 	struct dim tx_dim;
- 	u16 tx_itr_value;
- 	bool tx_intr_mode;
- 	u32 tx_itr_idx;
- 
--	u16 num_rxq;
--	struct idpf_rx_queue **rx;
- 	struct dim rx_dim;
- 	u16 rx_itr_value;
- 	bool rx_intr_mode;
- 	u32 rx_itr_idx;
-+	__cacheline_group_end_aligned(read_write);
- 
--	u16 num_bufq;
--	struct idpf_buf_queue **bufq;
--
--	u16 total_events;
-+	__cacheline_group_begin_aligned(cold);
-+	u16 v_idx;
- 
- 	cpumask_var_t affinity_mask;
-+	__cacheline_group_end_aligned(cold);
- };
-+libeth_cacheline_set_assert(struct idpf_q_vector, 104,
-+			    424 + 2 * sizeof(struct dim),
-+			    8 + sizeof(cpumask_var_t));
- 
- struct idpf_rx_queue_stats {
- 	u64_stats_t packets;
-@@ -623,11 +634,11 @@ struct idpf_txq_stash {
-  * @idx: For RX queue, it is used to index to total RX queue across groups and
-  *	 used for skb reporting.
-  * @desc_count: Number of descriptors
-+ * @rxdids: Supported RX descriptor ids
-+ * @rx_ptype_lkup: LUT of Rx ptypes
-  * @next_to_use: Next descriptor to use
-  * @next_to_clean: Next descriptor to clean
-  * @next_to_alloc: RX buffer to allocate at
-- * @rxdids: Supported RX descriptor ids
-- * @rx_ptype_lkup: LUT of Rx ptypes
-  * @skb: Pointer to the skb
-  * @stats_sync: See struct u64_stats_sync
-  * @q_stats: See union idpf_rx_queue_stats
-@@ -641,6 +652,7 @@ struct idpf_txq_stash {
-  * @rx_max_pkt_size: RX max packet size
-  */
- struct idpf_rx_queue {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	union {
- 		union virtchnl2_rx_desc *rx;
- 		struct virtchnl2_singleq_rx_buf_desc *single_buf;
-@@ -663,19 +675,23 @@ struct idpf_rx_queue {
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
- 	u16 idx;
- 	u16 desc_count;
-+
-+	u32 rxdids;
-+	const struct idpf_rx_ptype_decoded *rx_ptype_lkup;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
- 	u16 next_to_use;
- 	u16 next_to_clean;
- 	u16 next_to_alloc;
- 
--	u32 rxdids;
--
--	const struct idpf_rx_ptype_decoded *rx_ptype_lkup;
- 	struct sk_buff *skb;
- 
- 	struct u64_stats_sync stats_sync;
- 	struct idpf_rx_queue_stats q_stats;
-+	__cacheline_group_end_aligned(read_write);
- 
--	/* Slowpath */
-+	__cacheline_group_begin_aligned(cold);
- 	u32 q_id;
- 	u32 size;
- 	dma_addr_t dma;
-@@ -686,7 +702,11 @@ struct idpf_rx_queue {
- 	u16 rx_hbuf_size;
- 	u16 rx_buf_size;
- 	u16 rx_max_pkt_size;
--} ____cacheline_aligned;
-+	__cacheline_group_end_aligned(cold);
-+};
-+libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
-+			    72 + sizeof(struct u64_stats_sync),
-+			    32);
- 
- /**
-  * struct idpf_tx_queue - software structure representing a transmit queue
-@@ -703,22 +723,7 @@ struct idpf_rx_queue {
-  * @idx: For TX queue, it is used as index to map between TX queue group and
-  *	 hot path TX pointers stored in vport. Used in both singleq/splitq.
-  * @desc_count: Number of descriptors
-- * @next_to_use: Next descriptor to use
-- * @next_to_clean: Next descriptor to clean
-- * @netdev: &net_device corresponding to this queue
-- * @cleaned_bytes: Splitq only, TXQ only: When a TX completion is received on
-- *		   the TX completion queue, it can be for any TXQ associated
-- *		   with that completion queue. This means we can clean up to
-- *		   N TXQs during a single call to clean the completion queue.
-- *		   cleaned_bytes|pkts tracks the clean stats per TXQ during
-- *		   that single call to clean the completion queue. By doing so,
-- *		   we can update BQL with aggregate cleaned stats for each TXQ
-- *		   only once at the end of the cleaning routine.
-- * @clean_budget: singleq only, queue cleaning budget
-- * @cleaned_pkts: Number of packets cleaned for the above said case
-- * @tx_max_bufs: Max buffers that can be transmitted with scatter-gather
-  * @tx_min_pkt_len: Min supported packet length
-- * @compl_tag_bufid_m: Completion tag buffer id mask
-  * @compl_tag_gen_s: Completion tag generation bit
-  *	The format of the completion tag will change based on the TXQ
-  *	descriptor ring size so that we can maintain roughly the same level
-@@ -739,9 +744,24 @@ struct idpf_rx_queue {
-  *	--------------------------------
-  *
-  *	This gives us 8*8160 = 65280 possible unique values.
-+ * @netdev: &net_device corresponding to this queue
-+ * @next_to_use: Next descriptor to use
-+ * @next_to_clean: Next descriptor to clean
-+ * @cleaned_bytes: Splitq only, TXQ only: When a TX completion is received on
-+ *		   the TX completion queue, it can be for any TXQ associated
-+ *		   with that completion queue. This means we can clean up to
-+ *		   N TXQs during a single call to clean the completion queue.
-+ *		   cleaned_bytes|pkts tracks the clean stats per TXQ during
-+ *		   that single call to clean the completion queue. By doing so,
-+ *		   we can update BQL with aggregate cleaned stats for each TXQ
-+ *		   only once at the end of the cleaning routine.
-+ * @clean_budget: singleq only, queue cleaning budget
-+ * @cleaned_pkts: Number of packets cleaned for the above said case
-+ * @tx_max_bufs: Max buffers that can be transmitted with scatter-gather
-+ * @stash: Tx buffer stash for Flow-based scheduling mode
-+ * @compl_tag_bufid_m: Completion tag buffer id mask
-  * @compl_tag_cur_gen: Used to keep track of current completion tag generation
-  * @compl_tag_gen_max: To determine when compl_tag_cur_gen should be reset
-- * @stash: Tx buffer stash for Flow-based scheduling mode
-  * @stats_sync: See struct u64_stats_sync
-  * @q_stats: See union idpf_tx_queue_stats
-  * @q_id: Queue id
-@@ -750,6 +770,7 @@ struct idpf_rx_queue {
-  * @q_vector: Backreference to associated vector
-  */
- struct idpf_tx_queue {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	union {
- 		struct idpf_base_tx_desc *base_tx;
- 		struct idpf_base_tx_ctx_desc *base_ctx;
-@@ -766,10 +787,16 @@ struct idpf_tx_queue {
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
- 	u16 idx;
- 	u16 desc_count;
--	u16 next_to_use;
--	u16 next_to_clean;
-+
-+	u16 tx_min_pkt_len;
-+	u16 compl_tag_gen_s;
- 
- 	struct net_device *netdev;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
-+	u16 next_to_use;
-+	u16 next_to_clean;
- 
- 	union {
- 		u32 cleaned_bytes;
-@@ -778,26 +805,27 @@ struct idpf_tx_queue {
- 	u16 cleaned_pkts;
- 
- 	u16 tx_max_bufs;
--	u16 tx_min_pkt_len;
-+	struct idpf_txq_stash *stash;
- 
- 	u16 compl_tag_bufid_m;
--	u16 compl_tag_gen_s;
--
- 	u16 compl_tag_cur_gen;
- 	u16 compl_tag_gen_max;
- 
--	struct idpf_txq_stash *stash;
--
- 	struct u64_stats_sync stats_sync;
- 	struct idpf_tx_queue_stats q_stats;
-+	__cacheline_group_end_aligned(read_write);
- 
--	/* Slowpath */
-+	__cacheline_group_begin_aligned(cold);
- 	u32 q_id;
- 	u32 size;
- 	dma_addr_t dma;
- 
- 	struct idpf_q_vector *q_vector;
--} ____cacheline_aligned;
-+	__cacheline_group_end_aligned(cold);
-+};
-+libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
-+			    88 + sizeof(struct u64_stats_sync),
-+			    24);
- 
- /**
-  * struct idpf_buf_queue - software structure representing a buffer queue
-@@ -822,6 +850,7 @@ struct idpf_tx_queue {
-  * @rx_buf_size: Buffer size
-  */
- struct idpf_buf_queue {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	struct virtchnl2_splitq_rx_buf_desc *split_buf;
- 	struct {
- 		struct idpf_rx_buf *buf;
-@@ -832,12 +861,16 @@ struct idpf_buf_queue {
- 	void __iomem *tail;
- 
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
--	u16 desc_count;
--	u16 next_to_use;
--	u16 next_to_clean;
--	u16 next_to_alloc;
-+	u32 desc_count;
-+	__cacheline_group_end_aligned(read_mostly);
- 
--	/* Slowpath */
-+	__cacheline_group_begin_aligned(read_write);
-+	u32 next_to_use;
-+	u32 next_to_clean;
-+	u32 next_to_alloc;
-+	__cacheline_group_end_aligned(read_write);
-+
-+	__cacheline_group_begin_aligned(cold);
- 	u32 q_id;
- 	u32 size;
- 	dma_addr_t dma;
-@@ -847,7 +880,9 @@ struct idpf_buf_queue {
- 	u16 rx_buffer_low_watermark;
- 	u16 rx_hbuf_size;
- 	u16 rx_buf_size;
--} ____cacheline_aligned;
-+	__cacheline_group_end_aligned(cold);
-+};
-+libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 16, 32);
- 
- /**
-  * struct idpf_compl_queue - software structure representing a completion queue
-@@ -855,11 +890,11 @@ struct idpf_buf_queue {
-  * @txq_grp: See struct idpf_txq_group
-  * @flags: See enum idpf_queue_flags_t
-  * @desc_count: Number of descriptors
-+ * @clean_budget: queue cleaning budget
-+ * @netdev: &net_device corresponding to this queue
-  * @next_to_use: Next descriptor to use. Relevant in both split & single txq
-  *		 and bufq.
-  * @next_to_clean: Next descriptor to clean
-- * @netdev: &net_device corresponding to this queue
-- * @clean_budget: queue cleaning budget
-  * @num_completions: Only relevant for TX completion queue. It tracks the
-  *		     number of completions received to compare against the
-  *		     number of completions pending, as accumulated by the
-@@ -870,25 +905,33 @@ struct idpf_buf_queue {
-  * @q_vector: Backreference to associated vector
-  */
- struct idpf_compl_queue {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	struct idpf_splitq_tx_compl_desc *comp;
- 	struct idpf_txq_group *txq_grp;
- 
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
--	u16 desc_count;
--	u16 next_to_use;
--	u16 next_to_clean;
-+	u32 desc_count;
- 
--	struct net_device *netdev;
- 	u32 clean_budget;
-+	struct net_device *netdev;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
-+	u32 next_to_use;
-+	u32 next_to_clean;
-+
- 	u32 num_completions;
-+	__cacheline_group_end_aligned(read_write);
- 
--	/* Slowpath */
-+	__cacheline_group_begin_aligned(cold);
- 	u32 q_id;
- 	u32 size;
- 	dma_addr_t dma;
- 
- 	struct idpf_q_vector *q_vector;
--} ____cacheline_aligned;
-+	__cacheline_group_end_aligned(cold);
-+};
-+libeth_cacheline_set_assert(struct idpf_compl_queue, 40, 16, 24);
- 
- /**
-  * struct idpf_sw_queue
-@@ -903,13 +946,21 @@ struct idpf_compl_queue {
-  * lockless buffer management system and are strictly software only constructs.
-  */
- struct idpf_sw_queue {
-+	__cacheline_group_begin_aligned(read_mostly);
- 	u32 *ring;
- 
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
--	u16 desc_count;
--	u16 next_to_use;
--	u16 next_to_clean;
--} ____cacheline_aligned;
-+	u32 desc_count;
-+	__cacheline_group_end_aligned(read_mostly);
-+
-+	__cacheline_group_begin_aligned(read_write);
-+	u32 next_to_use;
-+	u32 next_to_clean;
-+	__cacheline_group_end_aligned(read_write);
-+};
-+libeth_cacheline_group_assert(struct idpf_sw_queue, read_mostly, 24);
-+libeth_cacheline_group_assert(struct idpf_sw_queue, read_write, 8);
-+libeth_cacheline_struct_assert(struct idpf_sw_queue, 24, 8);
- 
- /**
-  * struct idpf_rxq_set
+@@ -1198,14 +1198,11 @@ void idpf_tx_dma_map_error(struct idpf_tx_queue *txq, struct sk_buff *skb,
+ 			   struct idpf_tx_buf *first, u16 ring_idx);
+ unsigned int idpf_tx_desc_count_required(struct idpf_tx_queue *txq,
+ 					 struct sk_buff *skb);
+-bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
+-			unsigned int count);
+ int idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q, unsigned int size);
+ void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue);
+-netdev_tx_t idpf_tx_splitq_start(struct sk_buff *skb,
+-				 struct net_device *netdev);
+-netdev_tx_t idpf_tx_singleq_start(struct sk_buff *skb,
+-				  struct net_device *netdev);
++netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
++				  struct idpf_tx_queue *tx_q);
++netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev);
+ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rxq,
+ 				      u16 cleaned_count);
+ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off);
 -- 
 2.41.0
 
