@@ -1,231 +1,183 @@
-Return-Path: <netdev+bounces-110599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A3E92D5AD
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:04:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C3D92D5B3
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 18:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172D728A3F0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:04:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D35F6B24602
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 16:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAC2194A74;
-	Wed, 10 Jul 2024 16:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A877189F54;
+	Wed, 10 Jul 2024 16:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sUeFMyQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2062.outbound.protection.outlook.com [40.107.237.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2881946AD
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 16:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720627464; cv=none; b=o71GaelMqy1hArbJyKI6TbZLFKi9paF5QvKLNCCALamrZIKEN3AhJhAvPCP7sIScxmxeyto5Im9zw1NtabBT09yA1Xo+Q7f2eDWy/Pr8RqPH1KGXNpgduOcgQB8sAFZmy4H5ySXU8Sv7oa0NyheASvdzVoQ6CBQL7io5nQpRGgM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720627464; c=relaxed/simple;
-	bh=LllsL5iYL2EuD5shk7/hyUf2cxUJt4WRXYOZLUohAaA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Vlv8m7SIC3/Z/O6ALrjoErG8pI61c+LnQEWpjGDYTXsXkTh/GXcP1cWzdyHMOETSQw/UKeuWpe6dcKIk2QK/55LW11gdgCuXrNOwpSrK2UIxmlPBp9B9Sh++1ONfI15ZUMsJa4d8M01CrFfWV70/u86DxA67bWb3oeNqpNZ0ccg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-80376d9cf1eso202154639f.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 09:04:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720627462; x=1721232262;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/9VI5ReAEScG64yj2PchZYwPJ7ZyvHev/6hwoti15ec=;
-        b=MvfJTd42jPphDoXPBRIcdeURr08olviCyz3DnAxdVuh2oWvqPEH2Cw4FAdp53gQONj
-         nUT4hyBF0DIKIwCzLokUGM1bUxuidkTlufYCWeujkzoAQivZ9i13LEnhIMAChTa2SKBu
-         esU0EkRMavy1tnl32BumJF3XtRpUK+VKZAS0l6leRCsqubgpoRhYCyfAD8UUt5DJWLD/
-         SLje6iQ/wQpfGgYhy2o5a9a/LAfM2V3wBySAWI8FJReE8My+h5m/LrhkhuVPcLG/2S4P
-         mjGgPrODibVLKFiWBIZIWpAEUMyNc1NAAbqmN3NPPUCNY1uXaCiEOrbkm12VaX+v8UvC
-         9pvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfOwuOs7Uo6ODiTrTS0KE6c5ywM+5xGmgCltxFYHk/cjC3qjnmh69aq1eEbgUjGm6vCae3qfU51Ha0u9Lr1VLOcLxcSMbW
-X-Gm-Message-State: AOJu0YykOepjI6Dz6lojIwwDDviiq/rGmozov/LGlKidF8wyFOIbFZsm
-	vmCDG53I8uZ57gbdS6M/Oo4ipbEc9P5WF7y8ypVQ+Fa9zkzu4UIvlJz0OTVMWcsr5LhziUc70R9
-	ArXvHu3OskycZqJUZvO3SHLtv7f01U5N2s+6O2FVqPzfQ+RWW87+z5us=
-X-Google-Smtp-Source: AGHT+IG8GZ1mBJjhadsEO7HVWPtK+WeixWhH3S7AdIRZ5AsYP0f9Q5iJj6vITVB2HJGsjJBzOV+FuIFoOjymBQy3z0NYHvsBFu7Y
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20F9194A77;
+	Wed, 10 Jul 2024 16:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720627485; cv=fail; b=GGZN4OQBNOUkDkDx89zNJ8qOU3g6BU1YqNtWrF2IsRV1i0/lGFtE242KEE+AonloWIrZODCsJZFsnTsdlE4yN6SSN6jz9wXMKvKv4KbXTzqXfL+X0+HKPLEr7We3oooJtaqNZNpRxxqsRzngmsFxIRWjZW6XbwXKsIE3lKR0fGo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720627485; c=relaxed/simple;
+	bh=QYN42wATGl/eGzmF1LurJG+61Y3gmhxbznDc8VhOD8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=RU1ESfqXjP2jgKAPsZNfrS1R0Fbn4zhZrnoHKKB75vdCC9Ytl3NuQfdeP4LwVKuavfecI9OpEcjaOyQ1/X0DxwPWb76kgFqfKgACsReKGh0t3cZLwH6i4/IVbWKre5OsvtNPzIc2lfYd6KZYIrXkzG53xRV9S9aKD9b9V5DSeW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sUeFMyQ7; arc=fail smtp.client-ip=40.107.237.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mgY5juKOaV0QmgV2j+SDRva54Yw/HndyELuDPVUmmdpw/DKaKiKmzhPeG2TlrL+xmOqSIw9z6S+ReOUuRiwGpcJTSSKu1o9mGa/NU0/sZWIg6NBnCM+ocCDbmVCgWvaGV6CYZN0YsHCBYjlnDv4kU2inlCGpS7PHeBGjpODiFRzX44FNOBmFREwwFfX5KDce9K4itY3t+d6h7hfQtbkuaSWd4Pc/rki/k8prhwTrBHiDT4L4LKiCi9MDcHPHyQu+sHvOjkDfz2bYqJ2y/EBE3WGqrIyj9FyHbDrkwThrBsbkOrtwF4BE3KqGnfgvLvdlxEA2ulDs0CVRbxnD6dZLaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cvYcWW9xn6XxgOfFu+1G3E+1tRHOVhY3SMP2299jZpc=;
+ b=cTHc7yp7EwmvO7LrjhV0RsBCuAqxVa7ABmCxx/ima3Jp2zg40Me85QzrbmUCXQlvIE/IfHRpdL5ZCDQlFRY7DvsKYEJNvqjQLU6kvAgXhmxmV5Z4JhSesouqnOPG2ovoiECqqEUaujg70FRJihCV9x8NZLpCiv6c/o4Za1StgJqWuHpTurqPtblotMx18e3dXHy7iXVLD8YZoQiE6Q5ahzXOEMpaoHpBWnVWHc03w7bjwvTQG/4YhHHPthTfdZd1t6+Yse2xvnI0T0xyb/ckSMdpZaKsZ6lImNKmKe804mgjXKwt5D0hKxgVOEkY+wdaxZe03wAq0p7WMQTHgJ+A/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cvYcWW9xn6XxgOfFu+1G3E+1tRHOVhY3SMP2299jZpc=;
+ b=sUeFMyQ7c5WUe/uALjsVjeY/7e+b9lTVwxfeso/ioN08Qo55tvOHu/VkUsvcY9gMMUb/RvSofKqtN8TPk3UuJPLntw6WjsDyLxRW6TQFZckvQzv7T1m1XqGg19pyhZezMBOROUEF/s65iqd+s11AsrN34bXcH+9jBxW2tImpQt2I684WAOXav/S3N+gUnDy0WBl/4cI5Z6cnw/zddM1OkLvj7xzPyWdviqn5iU3n6JEImbfZMsQcsRE4MV5fNZxW81bu8bMQUWpU82qsG01O36AwHYKRxE3+9KvmwIWUey0L8CpQAPj5T92Hbb9lpxgV8UDCzjZzwNK6C4WiXMpykg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by SJ0PR12MB7082.namprd12.prod.outlook.com (2603:10b6:a03:4ae::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Wed, 10 Jul
+ 2024 16:04:33 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%5]) with mapi id 15.20.7741.033; Wed, 10 Jul 2024
+ 16:04:27 +0000
+Date: Wed, 10 Jul 2024 13:04:24 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH v2 4/8] taint: Add TAINT_FWCTL
+Message-ID: <20240710160424.GB1482543@nvidia.com>
+References: <4-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+ <0120d73a-0d15-440f-99bd-4c3e0a925183@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0120d73a-0d15-440f-99bd-4c3e0a925183@infradead.org>
+X-ClientProxiedBy: MN2PR07CA0025.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::35) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:9827:b0:4b7:c9b5:675c with SMTP id
- 8926c6da1cb9f-4c0b2b907f6mr396660173.6.1720627461875; Wed, 10 Jul 2024
- 09:04:21 -0700 (PDT)
-Date: Wed, 10 Jul 2024 09:04:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a7fb55061ce6cc5a@google.com>
-Subject: [syzbot] [net?] possible deadlock in do_ipv6_setsockopt (4)
-From: syzbot <syzbot+3433b5cb8b2b70933f8d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SJ0PR12MB7082:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6706e759-bf75-403c-f11d-08dca0f9f944
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uF2j2hQlNZK8BDFDDGhfok4Q1bOKy3lFLQnQFCX9u6U47AQU0hJXPtlaIbDd?=
+ =?us-ascii?Q?zFVOs+JY0V3bSOyoRjRa+OEMtEAygYbcwdLEEHRJmDB3W2nb/L5wn4B2VDIh?=
+ =?us-ascii?Q?nNdR7IX3FTqrwaXioP0jsR1v4ab1jJx0ChTYK3H0N5z2A0yp5WuUJhiqu2lh?=
+ =?us-ascii?Q?v2nfiiQR2S23O8eV6RUkzZ+LQN8oYEkwROfnI/pdYCbsI8hv2v3fbioc0b8m?=
+ =?us-ascii?Q?/Tnw3YLNh9TPxtuxFnl+qj6GZgNrang0uoNZS6azBieu7BbNrLodbqpcXFNB?=
+ =?us-ascii?Q?MSX30voaWap1o5529Tn/4znyFMvSf+j9IKKqqfNwqqKwA83TXL/yLmKeI1fb?=
+ =?us-ascii?Q?4om5SSwLz9D9j7P7ZWgeMsLqIK97H4foi1RODFtJh4r7pdOBChuF5SIXaNps?=
+ =?us-ascii?Q?uqSCaOYQrBYa66a26zhphkpEusN48gw4f9BgkDb4QpDrbQ8YptZ427s/1s3l?=
+ =?us-ascii?Q?k4TMHX6KLsdhrMSiajbLGWUJprqDtfTNTtX5jZej+G/DqQ+Rw34FqDzLLFxf?=
+ =?us-ascii?Q?5srnoMD9dQuzxJ1jUXXAH7ep5yxivwRBfyjBXUhOIEKLTeuE0jkT42TBmG4g?=
+ =?us-ascii?Q?QQrQF756AMSRiCgqpfCvTBZPwP16j/LKcJaQ+WXP4/EZQQjHvXqY5ivFoiLE?=
+ =?us-ascii?Q?8cgY/BWdTXlyzKhDEtXHx7XhDzTaVLAyRZDm88P85EYYP/e9Khhm5SC/fg4O?=
+ =?us-ascii?Q?p7bQeRRL24NNwlPolukQGcxMqUCk3uLT6K6YX03Pg6CHFViKQLjS/HTHMkKB?=
+ =?us-ascii?Q?YDKNyzqqYbKYHWHpEiygozGO0rcu/WtlrQhOdXG/JrgxeCvyGB1yQ7leMlDx?=
+ =?us-ascii?Q?9K9YVCkQShC/VTX6rzLHbz1bbVNOyc/R6POe4KSv+ITcljLG4ZD7DaQ+Db6c?=
+ =?us-ascii?Q?D337K0DNJYZH4lRpOk654w5Lwli6dqGYWCkz7Ma8rA6IdG8vG2lsQInUiOus?=
+ =?us-ascii?Q?xk4v7fwguWIIMw5gj/yWyWoGBuUw0xfs7N9fpI3oP0+aSZKc5pl5SSeKpVq+?=
+ =?us-ascii?Q?QtXwMFJC5EZh9EpGmpIZ/7HL/Bqwq+LJrq+eWMMkPp4oDeYs9geGufPrpLJj?=
+ =?us-ascii?Q?yiXcHGLj6EbwFicLSV4/w6vKQxYb1smmMl3N4AteJw8rV3+16dYJdeOeGN1H?=
+ =?us-ascii?Q?4jA5+NAmkJ5ofYWxWJI0cJCckepppO4qWIzK2k+QVGxr7uhQvrO8aw/TiXXh?=
+ =?us-ascii?Q?Jd7XSqFFR680PHzTfAyRi6SCRYpJVG7rQOkDYdynxsx7J8H/f/1AASAcJJYx?=
+ =?us-ascii?Q?W9ie5y3F5bbLpBvW5gE8CiTBkd+KsyHKy+IMpStM5RpyFuPJmKaBx5eJXajU?=
+ =?us-ascii?Q?WTCoZNyHTok2cH8wPjwLiQlTe2ZIGb7YaOZGuwP54/+aLw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?VzuU8qN5dJz91eS/RVnzXpAnTqS/n/UXhKPcVEk/Ctbr/avGOT28oAJ7kwIU?=
+ =?us-ascii?Q?NC/XC8XBrvIU0BFo+sI5FKKUtYv3jDgLIsDx4HSoJ5Y0fjAVPfmBBsNENOi8?=
+ =?us-ascii?Q?4cDpPulEb1qwN3BatuYGuR21V3Amc0DVUvwvST4JCHrb0dUN1ZjoTZhTiHJS?=
+ =?us-ascii?Q?J1CVYQjXLATZCZAdMNKSTxmnznNTCn4GikU8gO1h/mpmU6fhC24BkNMcOWqk?=
+ =?us-ascii?Q?HiWXJFH3cuRJbGN4cNiAEItkH7QDgRZ/oghq5ZdkF3uDTDuVzac6T8JUfM0P?=
+ =?us-ascii?Q?qMXcK0GWHNm70o++a/PjWw4MVTNewuNZqFfpFlIQeFx7p6KwNY97DQZSEJ9M?=
+ =?us-ascii?Q?4dBj7vpSyIq25I67EgG6ydwxEm0JusrNO6PFzytVxBPs5QI49jYLneGyEKzZ?=
+ =?us-ascii?Q?N68uC4ilDaqHonkd/Lc/9ExkmIIkEMGr5JlUFsJxwVLoqtXjxqdE4Y5yQX5r?=
+ =?us-ascii?Q?W90iEFjNwTkeNncjwxAz17WZ+6LVVkf9483RlnU3YPn+euTDGZa+52j+3/WF?=
+ =?us-ascii?Q?7H7dxcDuVE2mAtU+0j3pO4WK6RZanYQj2xLPwK/+J2MZK29oXjZIYfxrpXbi?=
+ =?us-ascii?Q?quOQB4qUbQbvjv69Ri099SRvt4UcDjO2nWYJsydsqQmNGubMVd80nPWfUun7?=
+ =?us-ascii?Q?VKeKjxAIl0fO61JcX2OvNbltF4NSESS8RWAcn1FnEgAE8rOXKeX5/BKRPl3v?=
+ =?us-ascii?Q?Y4QFNBYHdTkYQR9oDVsWT+7l4B8gTjNSJXTBYaTuDTeRkXKWTx+1Ay8rwLst?=
+ =?us-ascii?Q?eB3F0jzPEA/NKDdGuRvIkWFKWl2SXrxhqFttV1yPJcBFm/+QipgbSZPVZTlW?=
+ =?us-ascii?Q?eln2e4KS+qPbITvD5qJy1JXybIm9GL5M5E+eWC3ojfHRX0ZQr2x2kBqLxwNW?=
+ =?us-ascii?Q?2LN0nDFmzqgk8cFmlzh/b1Iahn17sgTPCGbTPT8F1aB9ZU5FrZG4WOu1dmXP?=
+ =?us-ascii?Q?FkNWcoO0PXOsb9xdz3OztaX64t636A5awWHYf2G2YMbil4zmAT5bIh5yWMXA?=
+ =?us-ascii?Q?bvriGNdtD6LhN8S9iCvlq948fmSGHW25QhdJ0Aj6Z0JXaS1RGDsRWpjC7qkF?=
+ =?us-ascii?Q?ANHohIrkwLb38zIxW4OBw7+mxx+6jwnizW4fabdI4TqxaeNXQWTvAp1uGxdd?=
+ =?us-ascii?Q?n9f1uxx6FdbCCncBuDDfC0SsxE+DQZbbblFTW7c26jeb4dwYQcrk9z73psP7?=
+ =?us-ascii?Q?a3ojd+1eUwsGhysZBceyFGQKpbPUtGjtGa1YUSORcIUPPMBNffnWTEkOuJUi?=
+ =?us-ascii?Q?cwwRF5jTpKKFpua3xzsCU/xoIzW1f+zcg3YtX/0L4zem09ateeZtR9lVuWD2?=
+ =?us-ascii?Q?CwgODyGFk1apghqvoW3tC/yQeROXoHFuZSWSNEJMJobFrMLeOUo64JltCMso?=
+ =?us-ascii?Q?VfvC4gt3JPwoon4d9dY8rc+tXYXWMh7vo8N7/epz3CwGwDcZF6KAG45eqiRb?=
+ =?us-ascii?Q?iTW65EDRdPNyqH03Ma+8W0gTI/9Kaakg6pKDX4qbjJPuJ6aPT2tLLLIkHWud?=
+ =?us-ascii?Q?XLV3tMz2Nui6rTE+D5PLOev6321T3Dw8d+jTyZtHB+AuIgJDLejXZ5MkI5Yw?=
+ =?us-ascii?Q?nyK6afnWHEGKoTrSKSQCyB3l7tbcexA5hLPdT/Hb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6706e759-bf75-403c-f11d-08dca0f9f944
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2024 16:04:27.0660
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gWJwpZksjP33Yqk/ecQivEz2U72ir3zQg5CM7T7vCyuDHYdaoNjBw5vo/WaOBpdX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7082
 
-Hello,
+On Tue, Jun 25, 2024 at 12:03:35PM -0700, Randy Dunlap wrote:
+> 
+> 
+> On 6/24/24 3:47 PM, Jason Gunthorpe wrote:
+> > Requesting a fwctl scope of access that includes mutating device debug
+> > data will cause the kernel to be tainted. Changing the device operation
+> > through things in the debug scope may cause the device to malfunction in
+> > undefined ways. This should be reflected in the TAINT flags to help any
+> > debuggers understand that something has been done.
+> > 
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> Please also update tools/debugging/kernel-chktaint.
 
-syzbot found the following issue on:
+Got it, thanks
 
-HEAD commit:    2f5e6395714d Merge branch 'net-pse-pd-add-new-pse-c33-feat..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f7e781980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=db697e01efa9d1d7
-dashboard link: https://syzkaller.appspot.com/bug?extid=3433b5cb8b2b70933f8d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/44296878e8d6/disk-2f5e6395.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a3f8523e4843/vmlinux-2f5e6395.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c40a60a2869f/bzImage-2f5e6395.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3433b5cb8b2b70933f8d@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc6-syzkaller-01258-g2f5e6395714d #0 Not tainted
-------------------------------------------------------
-syz.4.1060/8537 is trying to acquire lock:
-ffffffff8f5e7f48 (rtnl_mutex){+.+.}-{3:3}, at: do_ipv6_setsockopt+0x9e4/0x3630 net/ipv6/ipv6_sockglue.c:566
-
-but task is already holding lock:
-ffff88807b8c0a50 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&smc->clcsock_release_lock){+.+.}-{3:3}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       smc_switch_to_fallback+0x35/0xd00 net/smc/af_smc.c:902
-       smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2779
-       sock_sendmsg_nosec net/socket.c:730 [inline]
-       __sock_sendmsg+0x221/0x270 net/socket.c:745
-       __sys_sendto+0x3a4/0x4f0 net/socket.c:2192
-       __do_sys_sendto net/socket.c:2204 [inline]
-       __se_sys_sendto net/socket.c:2200 [inline]
-       __x64_sys_sendto+0xde/0x100 net/socket.c:2200
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3543
-       do_ip_setsockopt+0x1a2d/0x3cd0 net/ipv4/ip_sockglue.c:1078
-       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
-       do_ipv6_setsockopt+0x9e4/0x3630 net/ipv6/ipv6_sockglue.c:566
-       ipv6_setsockopt+0x5c/0x1a0 net/ipv6/ipv6_sockglue.c:993
-       smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
-       do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
-       __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
-       __do_sys_setsockopt net/socket.c:2344 [inline]
-       __se_sys_setsockopt net/socket.c:2341 [inline]
-       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  rtnl_mutex --> sk_lock-AF_INET --> &smc->clcsock_release_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&smc->clcsock_release_lock);
-                               lock(sk_lock-AF_INET);
-                               lock(&smc->clcsock_release_lock);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz.4.1060/8537:
- #0: ffff88807b8c0a50 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3064
-
-stack backtrace:
-CPU: 1 PID: 8537 Comm: syz.4.1060 Not tainted 6.10.0-rc6-syzkaller-01258-g2f5e6395714d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
- do_ipv6_setsockopt+0x9e4/0x3630 net/ipv6/ipv6_sockglue.c:566
- ipv6_setsockopt+0x5c/0x1a0 net/ipv6/ipv6_sockglue.c:993
- smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3072
- do_sock_setsockopt+0x3af/0x720 net/socket.c:2312
- __sys_setsockopt+0x1ae/0x250 net/socket.c:2335
- __do_sys_setsockopt net/socket.c:2344 [inline]
- __se_sys_setsockopt net/socket.c:2341 [inline]
- __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2341
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0383b75bd9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0384934048 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007f0383d03f60 RCX: 00007f0383b75bd9
-RDX: 0000000000000001 RSI: 0000000000000029 RDI: 0000000000000007
-RBP: 00007f0383be4aa1 R08: 0000000000000004 R09: 0000000000000000
-R10: 0000000020000080 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0383d03f60 R15: 00007ffd8c5ba008
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Jason
 
