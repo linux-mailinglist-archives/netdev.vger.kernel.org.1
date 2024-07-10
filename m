@@ -1,88 +1,94 @@
-Return-Path: <netdev+bounces-110519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DBD992CCA1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:15:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F36C392CCA0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D88FB213BE
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:15:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CEE41F21256
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811DE85654;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F4585931;
 	Wed, 10 Jul 2024 08:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="WnH3Mf7j"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="DnXLFb9h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
+Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DB983CBA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E4284D29
 	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 08:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720599327; cv=none; b=p/On7I66wqP3MQkaSVjNZPgVH/7bh7nXkBr23A9kcSrLLcBcXzv2K5Ag80bAwgW7jWnmS/62GmQPY8Lqh4RqHtnswNGVV8FGOeK7258giLEZg3MbxbNw+EKoVcN17UP33w4tr6vosfUZ82BftiHTINEoqFJCk6yxVXtBHcRBZ88=
+	t=1720599327; cv=none; b=Jfs0vSRnf32LR7bNZXJbzm/BOgjRWYpFdWPSCZVoJGibr7UNJhBt/XgkiC0BA5pOm0dosragzKHlP5fSWi3GGL/j7+/1ELk2ZeNafMgnao2NbQtQ1AKVd5aWo/xNxsRDCvisrEzx6Gz48hXpJVHky74fdS39YiqCGwIOB/HjizI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720599327; c=relaxed/simple;
-	bh=57B8Y6owy+vWSbDil1WMNBKbvM+cAjEwnrgsJKliVYU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pa9dS0nKGzMbzHpC78MdSN5HfjMjQjlGo3TI+RI65dT3D1X/UmQwjayK13K5lQ2iRMdjFs6fXmBlZW7bbo593I3duIn1BwrE2SocuTRK1uvFr8ykT/HKsnUXjYlCFN+1h8EVXEO/39ch1copEqT1N2y0NqrN/Z9vX3nIf1PJ/hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=WnH3Mf7j; arc=none smtp.client-ip=209.85.167.98
+	bh=L9cYX0FZOqsEWUS6Dl4jXBnuh+p+V+nVGgMuCjsSSHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=V4yEJzuiWAITxyJ1DlU9lLCmgMV+UL8ixUBsa82Kgoh4YYuoUzHQS7Q/Vg6/AOx0+otWdQmMIpdBKxzixbznkd0W/PatddiUwJDBDwkB5cxS2CgAAOweFE7ITckIXxU7kT39BcSll5nnBSIXE3PJ6WmzKJDYlpJcrz3pPVTMupM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=DnXLFb9h; arc=none smtp.client-ip=209.85.167.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-52ea2ce7abaso8236207e87.0
+Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-52ea5dc3c66so8517410e87.3
         for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 01:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1720599324; x=1721204124; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jsrq20ArRlBG0ztM3gYJh4L7fx5rkCI7EzZlzuc+aZw=;
-        b=WnH3Mf7jRMG00IcVWEdpK+6GHUM73BG/XZnduSsG6QanfMghIHKyGxHhBWBz/qLShp
-         GFXkl5KZ1dn2PjE2ngOnW8twjvd0IvPyHJHLmwgJaNIzCGliuaiCC0M/mVFUgAnAkmDv
-         xw0BB+Fob5OKDuvRS+K+FyFblqkm5CbHLA2RhXtY9cRgRN8MqUVT8TkTiqP7Y/NESyH4
-         DEdhowo6gu53c1fr1CNxPH0bjwhC+fip8aS0QGfKEBSLYlIZvm9HDJykki2K6sc2SLsQ
-         A7TQeyci9QL8hbrH4Ytf8ggBx538a0EvLJ9Yu0BuScjxqOspaR+ZNw+NsHHIQHBE7SVA
-         fiaQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vHfy2kRUgaVp+I9p+R/nnBTbFpFOafOVt67JpL5cYvA=;
+        b=DnXLFb9hPzDzRKcgU99mfhzZSYxsMYGUzKisZIt7nrzvimLnw38chgqDdyh9cCGgFN
+         FUSMf6HM27LEZ7ICZoFxyhb4S1gXwN9FMTaWsME6AWPLWFPeTyw+WCduODLnqRWuevnt
+         D+MmyInXNi/E5ZfhiedGhWpZu5YQIFj7QHrvoijcWz/5mON+MI3dBCBv6fuO2efF5oXn
+         ezbMr5BV5L1cXQ9ix3Goi8DGEZUDts6ZHwPCzvldKjewHXJjpZQZJ2rupD7CnBFgHi4s
+         TzrqwVOxUjJv2cfb74F+WiG9yTOZQLtb7rTrGCt5DKLQ0eArxImE3kfbIxrkYp2sVejw
+         dm6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1720599324; x=1721204124;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jsrq20ArRlBG0ztM3gYJh4L7fx5rkCI7EzZlzuc+aZw=;
-        b=gCL4+1GVHAkIRYROiN0r37tA1NS+Xy7GlhN6SmDGckjqQv9o8edrNTXz/Z7rCSsmXr
-         Y2nX8VPuPGVQ70DQboVZ7lskeG70kbQCN73YxTDvvWiNcDXrc18VOvo2ob8omuot1rhP
-         iGSHrMKTDt9RSAPV7iuqYRg88KXH9Ze28hBRptOG9jxqjKmcazNK8a4lARbKb1uDjxLo
-         guHyL+aZNHCq4OzHMgdrISjGFGyk3mfYFU6uJZ84aC96tjqgqMIroJuFuXM4QQc24yKj
-         ZDoDgsnRARHLGKgO32R3cvTsSLWL03/GDX361OsYglVIVaNM+rhKc+JE80JJTlpsBKuC
-         Ribw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/q6O0mcJEoFMx7Pdz288lCQnyDOXW3TD7JrmADhjf7BBadKNoH/e7buiMPXjpadMK0cmeXyL9XRSBWAbjCH/QPN2m6fuJ
-X-Gm-Message-State: AOJu0YyL376E3X3IYgheajhZj8ErhoSoHkmBDJdi1j5mJw0kZnkzzG7G
-	nXPXLk54BjNj8UdMMN9BYdQIZTBhxndonO7vz1a9DSgcARvDmCHzFiRzzR2PsOuL4NCblXs2Ngx
-	dLWcK8gDutbWXe2NK6nk5wbvxQJWDtrSi
-X-Google-Smtp-Source: AGHT+IE3+KjILt++j2BLqudhfhl2a1nlppRX59WUkTuppe3puVVLXX0/ElKIRoExASb8LUjr+4m6WHOlQbdU
-X-Received: by 2002:a05:6512:10ce:b0:52c:842b:c276 with SMTP id 2adb3069b0e04-52eb99d1ff7mr3886357e87.53.1720599323914;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vHfy2kRUgaVp+I9p+R/nnBTbFpFOafOVt67JpL5cYvA=;
+        b=ZqIlYFzQZeXW9bQwtllIb2c0SUtJBNNhsgxFUzBjZnhu5Xvi4+QBF3G1c+2aqB4g+x
+         VaMJxJVffSAVRv+bexE7BGkbyqkTtk+Ncj53JTQAeyS9/86d+0axBL1dpj5MmFWkMi7U
+         5y0aJr3BSWXQPyJYSLVscJy/3PisO6O4TVmN6oU5iVx3W6VRC25DnWunbYPHZDzMaIR7
+         7+xv3ou4LkpmM7+k3Nl+1zfCB3UANzYQ+LUTRsX4uhS16tnaxjlPL5L9bOFJwmG9OWKs
+         LTGo/R20BRTGxy6Ed7m2K/ap4rAp7FvgyAIdtlHdBp2grvE3SUuY7TqnxSnmbKtVy9KX
+         pdew==
+X-Forwarded-Encrypted: i=1; AJvYcCUePM/Kfl9NaHA7IoHLQPLznkT2ZpzBe9kxV9yiTR6i6/o9zAHDiRumwfa8uPYlosqWc+Pxvft082q1cuB7J593MABlu0yr
+X-Gm-Message-State: AOJu0YwPDFBedh4geMp3Qft6/MOXaCCnA9ak9VnC0+JUG3LAtBgTTSYd
+	ZdE8GRoPapYFV9X9wmVIwf0bi1cPCEPI6taWRomqT9WM4kMtLXcDxLNH08MnGRXxkMospX1a2z1
+	5AQdT9mVnWtfMnf88iFTaOBuilQJP0fZS
+X-Google-Smtp-Source: AGHT+IHtfnocm4ldsA4+yF3b0rhj3hqvP8B6rA8W27iPtRI7FPGB+HWm8fxx1/B2ysSk2iRIP5gO/ySptU45
+X-Received: by 2002:a05:6512:3b90:b0:52c:76ac:329b with SMTP id 2adb3069b0e04-52eb99a35dfmr3905436e87.35.1720599323983;
         Wed, 10 Jul 2024 01:15:23 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 5b1f17b1804b1-4266f6f08afsm1145685e9.17.2024.07.10.01.15.23;
+        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-a780a8535a1sm694966b.224.2024.07.10.01.15.23;
         Wed, 10 Jul 2024 01:15:23 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 7F4636002D;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 8228560117;
 	Wed, 10 Jul 2024 10:15:23 +0200 (CEST)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1sRSTz-00Fz6u-6v; Wed, 10 Jul 2024 10:15:23 +0200
+	id 1sRSTz-00Fz6w-7h; Wed, 10 Jul 2024 10:15:23 +0200
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>
 Cc: David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net v4 0/4] vrf: fix source address selection with route leak
-Date: Wed, 10 Jul 2024 10:14:26 +0200
-Message-ID: <20240710081521.3809742-1-nicolas.dichtel@6wind.com>
+	netdev@vger.kernel.org,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v4 1/4] ipv4: fix source address selection with route leak
+Date: Wed, 10 Jul 2024 10:14:27 +0200
+Message-ID: <20240710081521.3809742-2-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.43.1
+In-Reply-To: <20240710081521.3809742-1-nicolas.dichtel@6wind.com>
+References: <20240710081521.3809742-1-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,32 +97,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For patch 1 and 2, I didn't find the exact commit that introduced this bug, but
-I suspect it has been here since the first version. I arbitrarily choose one.
+By default, an address assigned to the output interface is selected when
+the source address is not specified. This is problematic when a route,
+configured in a vrf, uses an interface from another vrf (aka route leak).
+The original vrf does not own the selected source address.
 
-v3 -> v4:
- patch 2: set 'dev' only when needed
+Let's add a check against the output interface and call the appropriate
+function to select the source address.
 
-v2 -> v3:
- patch 1: enforce 80 columns limit
- patch 2: fix coding style
- patch 4: add tcp and udp tests
+CC: stable@vger.kernel.org
+Fixes: 8cbb512c923d ("net: Add source address lookup op for VRF")
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+---
+ net/ipv4/fib_semantics.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-v1 -> v2:
- patch 2: Fix 'same_vrf' calculation in patch
- patch 4: remove test about the topology type (only symmetric topology is
-          supported now).
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index f669da98d11d..8956026bc0a2 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -2270,6 +2270,15 @@ void fib_select_path(struct net *net, struct fib_result *res,
+ 		fib_select_default(fl4, res);
+ 
+ check_saddr:
+-	if (!fl4->saddr)
+-		fl4->saddr = fib_result_prefsrc(net, res);
++	if (!fl4->saddr) {
++		struct net_device *l3mdev;
++
++		l3mdev = dev_get_by_index_rcu(net, fl4->flowi4_l3mdev);
++
++		if (!l3mdev ||
++		    l3mdev_master_dev_rcu(FIB_RES_DEV(*res)) == l3mdev)
++			fl4->saddr = fib_result_prefsrc(net, res);
++		else
++			fl4->saddr = inet_select_addr(l3mdev, 0, RT_SCOPE_LINK);
++	}
+ }
+-- 
+2.43.1
 
- include/net/ip6_route.h                          | 22 ++++--
- net/ipv4/fib_semantics.c                         | 13 +++-
- net/ipv6/addrconf.c                              |  3 +-
- net/ipv6/ip6_output.c                            |  1 +
- net/ipv6/route.c                                 |  2 +-
- tools/testing/selftests/net/vrf_route_leaking.sh | 93 +++++++++++++++++++++++-
- 6 files changed, 121 insertions(+), 13 deletions(-)
-
-Comments are welcome.
-
-Regards,
-Nicolas
 
