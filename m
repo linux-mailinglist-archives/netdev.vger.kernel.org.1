@@ -1,881 +1,172 @@
-Return-Path: <netdev+bounces-110645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DCF392DA20
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:31:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D353192DA36
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6AEE1F23BD5
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:31:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A2561F238E0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D591991B8;
-	Wed, 10 Jul 2024 20:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D45B195F3A;
+	Wed, 10 Jul 2024 20:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hXjbX/Q9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hkBsqw/t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9761990BD
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8CF82D69
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720643454; cv=none; b=foGJ3yu/B89VWZrZwKKlte6oA1edcZje/1XrMt19UW5BF4ExWzgW3mmuNqK5TGm8T4j87mO80xZahwTtkus9GPoMKPqkTGyDgFw6ynDXLLsaRYGVTu8lO+kQHWl5RkJ0HVoQ6dZbt7ytO9sdDmNM4Id8KwGoQ4E0CNbBQZFPl5M=
+	t=1720644030; cv=none; b=A+NPoC//P3TaM7S/CQ/zgZ74SiyvNpHrdojzWdq4ku8uJLR4oS17p3gg2c/K8p5CWnu0+2Zb+w34VHlaTARvwuAN21mhiWMtL3PFTYSg74NG8kZWw89SgTwCfVo3OR86oQE/C5/6at/YkgRw8v2uPg2ABTeKgeKGOSBzlkG/ofM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720643454; c=relaxed/simple;
-	bh=XVps0M/D58Ih/DOgdmEW6AD3Cml9xNdD0mKCol6FrSY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I5vxQg/Gm0fON2rH2HBOAeIkKdPFj0InxPbahI34c0JZhBIsIzvUT5Tze4e7ZQik/+dYoJb74GS0MN6UCxtWj0XXqXLjS7ho81Vq8gZsY8XSQBlQogmqR/uW5OTqM0A4cGgWpmZO5aQJzAtv8/r31DchL8ppHNi4BY3QGgTYqys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hXjbX/Q9; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1720644030; c=relaxed/simple;
+	bh=9bph5gzLgIIBD2qhi3TPTyP9potYaqXrVxQccxz4HH0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UgSUyuR2S0UvZVSJ+qGFS5IXWmmqDACyopHIscaMyjr/e6S4sWZfuFQGB7J2KCeRNq3oG2S4wFiL50mPfRgPCXeArtPJD2T7mxg167nWLqR3BaDyeRgk8cGzOleE9VPrO0uH6A1O4qtrQoVjt4XGoqbTwPP9dsj085pLjOKy4qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hkBsqw/t; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720643452; x=1752179452;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XVps0M/D58Ih/DOgdmEW6AD3Cml9xNdD0mKCol6FrSY=;
-  b=hXjbX/Q9QlPhL8U9+XGe+1FPfqo5AwhAnaZo9uL6lrcdEm54QnZeJNCx
-   HT105Jm+MTdjrf8n0itgszfNpR+91Givn6WpLZBy8eFYg4exs7LmoelCz
-   +FA8G44cxtfGuBftuXpjj4QandB1XEl2wrn0qRPBGZDb5Ak0sc9GUOBCf
-   /o+F53jz+WQofg0fqQ9vTXXOWBuA6kQkoLYtAcvP2bgnzWK7QFL4Uq4Fa
-   ALAhFpPQWrRbAy9gMC62BnP0KUckfD1f2vSsPqUnCyJbNoVgDIfx5G9Y5
-   Ji7aetn8RXpo3OmhruoqlSzCJOgCqb+wU+xXcKFX1BY2y3zetDEfBAC4J
+  t=1720644029; x=1752180029;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9bph5gzLgIIBD2qhi3TPTyP9potYaqXrVxQccxz4HH0=;
+  b=hkBsqw/t0zPl9JVDOPzGiBiFrB+Bq/PRIiT9Udk4RuUKpHlmmbU1A2P6
+   Qcgrz+LuwcIGHSIYJQMkRvpRZBS3xJDFTjSKqtZbz2cASAi9kkyhVgfP4
+   rZf5pL0PBbwswUMjx0jlUf+/ckbGxsUCnZcqKwuG18UOYG191ppvaDMul
+   kWJVYGChVI93Hth9Jfk8Qg8X190CMnH59fPiBweG+p9M9xSmCbDD1nKSq
+   6YBcE+Bz2CQ9LPHKtlqcNklevy60kccF3DnYm8FGyFTeUPWeyZlXp0Ycu
+   k3D+8pVygagY0ytrjoO2mODdGYeIOWzzYCsSOuhzb5xA6Hpdg4Pi4XuRg
    A==;
-X-CSE-ConnectionGUID: UQfPklkJQGm0STVNaw7fOg==
-X-CSE-MsgGUID: hGiL74n0Rc6oBJYZ0VsoVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483800"
+X-CSE-ConnectionGUID: qAWar9BBTv2iSXzswa5Etw==
+X-CSE-MsgGUID: ePxZiqvsSzOFCLo41FyIvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="29153190"
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="12483800"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:30:43 -0700
-X-CSE-ConnectionGUID: ib+JEJ5kR2asBeiMjGcxcA==
-X-CSE-MsgGUID: dudhdMAXS2m5fUk3/7OIbQ==
+   d="scan'208";a="29153190"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:40:28 -0700
+X-CSE-ConnectionGUID: eUyphcNhRDyVvOnfq7k+pA==
+X-CSE-MsgGUID: KJ5eS+4fTDu13v8aN4s8xw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="48223898"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa010.jf.intel.com with ESMTP; 10 Jul 2024 13:30:43 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+   d="scan'208";a="48301022"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.245.246.184])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:40:25 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	lihong.yang@intel.com,
-	willemb@google.com,
-	almasrymina@google.com
-Subject: [PATCH net-next 14/14] idpf: use libeth Rx buffer management for payload buffer
-Date: Wed, 10 Jul 2024 13:30:30 -0700
-Message-ID: <20240710203031.188081-15-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
-References: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
+	horms@kernel.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH iwl-next v3 00/13] ice: iavf: add support for TC U32 filters on VFs
+Date: Wed, 10 Jul 2024 14:40:02 -0600
+Message-ID: <20240710204015.124233-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+The Intel® Ethernet 800 Series is designed with a pipeline that has
+an on-chip programmable capability called Dynamic Device Personalization
+(DDP). A DDP package is loaded by the driver during probe time. The DDP
+package programs functionality in both the parser and switching blocks in
+the pipeline, allowing dynamic support for new and existing protocols.
+Once the pipeline is configured, the driver can identify the protocol and
+apply any HW action in different stages, for example, direct packets to
+desired hardware queues (flow director), queue groups or drop.  
 
-idpf uses Page Pool for data buffers with hardcoded buffer lengths of
-4k for "classic" buffers and 2k for "short" ones. This is not flexible
-and does not ensure optimal memory usage. Why would you need 4k buffers
-when the MTU is 1500?
-Use libeth for the data buffers and don't hardcode any buffer sizes. Let
-them be calculated from the MTU for "classics" and then divide the
-truesize by 2 for "short" ones. The memory usage is now greatly reduced
-and 2 buffer queues starts make sense: on frames <= 1024, you'll recycle
-(and resync) a page only after 4 HW writes rather than two.
+Patches 1-8 introduce a DDP package parser API that enables different
+pipeline stages in the driver to learn the HW parser capabilities from 
+the DDP package that is downloaded to HW. The parser library takes raw
+packet patterns and masks (in binary) indicating the packet protocol fields
+to be matched and generates the final HW profiles that can be applied at
+the required stage. With this API, raw flow filtering for FDIR or RSS
+could be done on new protocols or headers without any driver or Kernel
+updates (only need to update the DDP package). These patches were submitted
+before [1] but were not accepted mainly due to lack of a user.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Patches 9-11 extend the virtchnl support to allow the VF to request raw
+flow director filters. Upon receiving the raw FDIR filter request, the PF
+driver allocates and runs a parser lib instance and generates the hardware
+profile definitions required to program the FDIR stage. These were also
+submitted before [2].
+
+Finally, patches 12 and 13 add TC U32 filter support to the iavf driver.
+Using the parser API, the ice driver runs the raw patterns sent by the
+user and then adds a new profile to the FDIR stage associated with the VF's
+VSI. Refer to examples in patch 13 commit message.
+
+[1]: Link: https://lore.kernel.org/netdev/20230904021455.3944605-1-junfeng.guo@intel.com/
+[2]: Link: https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20230814/036333.html 
+
 ---
- drivers/net/ethernet/intel/idpf/Kconfig       |   1 -
- drivers/net/ethernet/intel/idpf/idpf.h        |   2 -
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  27 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 242 ++++++------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  86 +------
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   |   8 +-
- 6 files changed, 120 insertions(+), 246 deletions(-)
+v3:
+  - Remove header inclusion re-order in ice_vf_lib.c (patch 11).
+  - Fix couple of errors reported by smatch:
+      - https://lore.kernel.org/all/202407070634.aTz9Naa1-lkp@intel.com/
+      - https://lore.kernel.org/all/202406100753.38qaQzo9-lkp@intel.com/
+  - Add "Return:" description in kernel-docs for all new functions.
+  - Use new macro ICE_MI_GBDM_GENMASK_ULL for better readability (patch 2)
+  - Remove unnecessary casts in ice_parser.c and ice_parser_rt.c. 
 
-diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
-index 1f071143d992..1addd663acad 100644
---- a/drivers/net/ethernet/intel/idpf/Kconfig
-+++ b/drivers/net/ethernet/intel/idpf/Kconfig
-@@ -6,7 +6,6 @@ config IDPF
- 	depends on PCI_MSI
- 	select DIMLIB
- 	select LIBETH
--	select PAGE_POOL
- 	help
- 	  This driver supports Intel(R) Infrastructure Data Path Function
- 	  devices.
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 078340a01757..2c31ad87587a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -264,7 +264,6 @@ struct idpf_port_stats {
-  *		    the worst case.
-  * @num_bufqs_per_qgrp: Buffer queues per RX queue in a given grouping
-  * @bufq_desc_count: Buffer queue descriptor count
-- * @bufq_size: Size of buffers in ring (e.g. 2K, 4K, etc)
-  * @num_rxq_grp: Number of RX queues in a group
-  * @rxq_grps: Total number of RX groups. Number of groups * number of RX per
-  *	      group will yield total number of RX queues.
-@@ -308,7 +307,6 @@ struct idpf_vport {
- 	u32 rxq_desc_count;
- 	u8 num_bufqs_per_qgrp;
- 	u32 bufq_desc_count[IDPF_MAX_BUFQS_PER_RXQ_GRP];
--	u32 bufq_size[IDPF_MAX_BUFQS_PER_RXQ_GRP];
- 	u16 num_rxq_grp;
- 	struct idpf_rxq_group *rxq_grps;
- 	u32 rxq_model;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index ced1fdf7a1fb..fe64febf7436 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -857,20 +857,24 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
- 				      u16 cleaned_count)
- {
- 	struct virtchnl2_singleq_rx_buf_desc *desc;
-+	const struct libeth_fq_fp fq = {
-+		.pp		= rx_q->pp,
-+		.fqes		= rx_q->rx_buf,
-+		.truesize	= rx_q->truesize,
-+		.count		= rx_q->desc_count,
-+	};
- 	u16 nta = rx_q->next_to_alloc;
--	struct idpf_rx_buf *buf;
- 
- 	if (!cleaned_count)
- 		return false;
- 
- 	desc = &rx_q->single_buf[nta];
--	buf = &rx_q->rx_buf[nta];
- 
- 	do {
- 		dma_addr_t addr;
- 
--		addr = idpf_alloc_page(rx_q->pp, buf, rx_q->rx_buf_size);
--		if (unlikely(addr == DMA_MAPPING_ERROR))
-+		addr = libeth_rx_alloc(&fq, nta);
-+		if (addr == DMA_MAPPING_ERROR)
- 			break;
- 
- 		/* Refresh the desc even if buffer_addrs didn't change
-@@ -880,11 +884,9 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
- 		desc->hdr_addr = 0;
- 		desc++;
- 
--		buf++;
- 		nta++;
- 		if (unlikely(nta == rx_q->desc_count)) {
- 			desc = &rx_q->single_buf[0];
--			buf = rx_q->rx_buf;
- 			nta = 0;
- 		}
- 
-@@ -1004,28 +1006,26 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields);
- 
- 		rx_buf = &rx_q->rx_buf[ntc];
--		if (!fields.size) {
--			idpf_rx_put_page(rx_buf);
-+		if (!libeth_rx_sync_for_cpu(rx_buf, fields.size))
- 			goto skip_data;
--		}
- 
--		idpf_rx_sync_for_cpu(rx_buf, fields.size);
- 		if (skb)
- 			idpf_rx_add_frag(rx_buf, skb, fields.size);
- 		else
--			skb = idpf_rx_construct_skb(rx_q, rx_buf, fields.size);
-+			skb = idpf_rx_build_skb(rx_buf, fields.size);
- 
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb)
- 			break;
- 
- skip_data:
--		IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
-+		rx_buf->page = NULL;
- 
-+		IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
- 		cleaned_count++;
- 
- 		/* skip if it is non EOP desc */
--		if (idpf_rx_singleq_is_non_eop(rx_desc))
-+		if (idpf_rx_singleq_is_non_eop(rx_desc) || unlikely(!skb))
- 			continue;
- 
- #define IDPF_RXD_ERR_S FIELD_PREP(VIRTCHNL2_RX_BASE_DESC_QW1_ERROR_M, \
-@@ -1062,6 +1062,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 
- 	rx_q->next_to_clean = ntc;
- 
-+	page_pool_nid_changed(rx_q->pp, numa_mem_id());
- 	if (cleaned_count)
- 		failure = idpf_rx_singleq_buf_hw_alloc_all(rx_q, cleaned_count);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index ec4a9501d19f..af2879f03b8d 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -417,6 +417,11 @@ static void idpf_rx_hdr_buf_rel_all(struct idpf_buf_queue *bufq)
-  */
- static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
- {
-+	struct libeth_fq fq = {
-+		.fqes	= bufq->buf,
-+		.pp	= bufq->pp,
-+	};
-+
- 	/* queue already cleared, nothing to do */
- 	if (!bufq->buf)
- 		return;
-@@ -428,11 +433,9 @@ static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
- 	if (idpf_queue_has(HSPLIT_EN, bufq))
- 		idpf_rx_hdr_buf_rel_all(bufq);
- 
--	page_pool_destroy(bufq->pp);
--	bufq->pp = NULL;
--
--	kfree(bufq->buf);
-+	libeth_rx_fq_destroy(&fq);
- 	bufq->buf = NULL;
-+	bufq->pp = NULL;
- }
- 
- /**
-@@ -441,17 +444,20 @@ static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
-  */
- static void idpf_rx_buf_rel_all(struct idpf_rx_queue *rxq)
- {
-+	struct libeth_fq fq = {
-+		.fqes	= rxq->rx_buf,
-+		.pp	= rxq->pp,
-+	};
-+
- 	if (!rxq->rx_buf)
- 		return;
- 
- 	for (u32 i = 0; i < rxq->desc_count; i++)
- 		idpf_rx_page_rel(&rxq->rx_buf[i]);
- 
--	page_pool_destroy(rxq->pp);
--	rxq->pp = NULL;
--
--	kfree(rxq->rx_buf);
-+	libeth_rx_fq_destroy(&fq);
- 	rxq->rx_buf = NULL;
-+	rxq->pp = NULL;
- }
- 
- /**
-@@ -633,11 +639,9 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
- 		.count	= bufq->desc_count,
- 	};
- 	u16 nta = bufq->next_to_alloc;
--	struct idpf_rx_buf *buf;
- 	dma_addr_t addr;
- 
- 	splitq_rx_desc = &bufq->split_buf[nta];
--	buf = &bufq->buf[buf_id];
- 
- 	if (idpf_queue_has(HSPLIT_EN, bufq)) {
- 		fq.pp = bufq->hdr_pp;
-@@ -651,8 +655,12 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
- 		splitq_rx_desc->hdr_addr = cpu_to_le64(addr);
- 	}
- 
--	addr = idpf_alloc_page(bufq->pp, buf, bufq->rx_buf_size);
--	if (unlikely(addr == DMA_MAPPING_ERROR))
-+	fq.pp = bufq->pp;
-+	fq.fqes = bufq->buf;
-+	fq.truesize = bufq->truesize;
-+
-+	addr = libeth_rx_alloc(&fq, buf_id);
-+	if (addr == DMA_MAPPING_ERROR)
- 		return false;
- 
- 	splitq_rx_desc->pkt_addr = cpu_to_le64(addr);
-@@ -689,30 +697,6 @@ static bool idpf_rx_post_init_bufs(struct idpf_buf_queue *bufq,
- 	return true;
- }
- 
--/**
-- * idpf_rx_create_page_pool - Create a page pool
-- * @napi: NAPI of the associated queue vector
-- * @count: queue descriptor count
-- *
-- * Returns &page_pool on success, casted -errno on failure
-- */
--static struct page_pool *idpf_rx_create_page_pool(struct napi_struct *napi,
--						  u32 count)
--{
--	struct page_pool_params pp = {
--		.flags		= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
--		.order		= 0,
--		.pool_size	= count,
--		.nid		= NUMA_NO_NODE,
--		.dev		= napi->dev->dev.parent,
--		.max_len	= PAGE_SIZE,
--		.dma_dir	= DMA_FROM_DEVICE,
--		.offset		= 0,
--	};
--
--	return page_pool_create(&pp);
--}
--
- /**
-  * idpf_rx_buf_alloc_singleq - Allocate memory for all buffer resources
-  * @rxq: queue for which the buffers are allocated
-@@ -721,11 +705,6 @@ static struct page_pool *idpf_rx_create_page_pool(struct napi_struct *napi,
-  */
- static int idpf_rx_buf_alloc_singleq(struct idpf_rx_queue *rxq)
- {
--	rxq->rx_buf = kcalloc(rxq->desc_count, sizeof(*rxq->rx_buf),
--			      GFP_KERNEL);
--	if (!rxq->rx_buf)
--		return -ENOMEM;
--
- 	if (idpf_rx_singleq_buf_hw_alloc_all(rxq, rxq->desc_count - 1))
- 		goto err;
- 
-@@ -745,13 +724,21 @@ static int idpf_rx_buf_alloc_singleq(struct idpf_rx_queue *rxq)
-  */
- static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
- {
--	struct page_pool *pool;
-+	struct libeth_fq fq = {
-+		.count	= rxq->desc_count,
-+		.type	= LIBETH_FQE_MTU,
-+		.nid	= idpf_q_vector_to_mem(rxq->q_vector),
-+	};
-+	int ret;
- 
--	pool = idpf_rx_create_page_pool(&rxq->q_vector->napi, rxq->desc_count);
--	if (IS_ERR(pool))
--		return PTR_ERR(pool);
-+	ret = libeth_rx_fq_create(&fq, &rxq->q_vector->napi);
-+	if (ret)
-+		return ret;
- 
--	rxq->pp = pool;
-+	rxq->pp = fq.pp;
-+	rxq->rx_buf = fq.fqes;
-+	rxq->truesize = fq.truesize;
-+	rxq->rx_buf_size = fq.buf_len;
- 
- 	return idpf_rx_buf_alloc_singleq(rxq);
- }
-@@ -766,14 +753,6 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
- {
- 	int err = 0;
- 
--	/* Allocate book keeping buffers */
--	rxbufq->buf = kcalloc(rxbufq->desc_count, sizeof(*rxbufq->buf),
--			      GFP_KERNEL);
--	if (!rxbufq->buf) {
--		err = -ENOMEM;
--		goto rx_buf_alloc_all_out;
--	}
--
- 	if (idpf_queue_has(HSPLIT_EN, rxbufq)) {
- 		err = idpf_rx_hdr_buf_alloc_all(rxbufq);
- 		if (err)
-@@ -794,19 +773,30 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
- /**
-  * idpf_rx_bufs_init - Initialize page pool, allocate rx bufs, and post to HW
-  * @bufq: buffer queue to create page pool for
-+ * @type: type of Rx buffers to allocate
-  *
-  * Returns 0 on success, negative on failure
-  */
--static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq)
-+static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
-+			     enum libeth_fqe_type type)
- {
--	struct page_pool *pool;
-+	struct libeth_fq fq = {
-+		.truesize	= bufq->truesize,
-+		.count		= bufq->desc_count,
-+		.type		= type,
-+		.hsplit		= idpf_queue_has(HSPLIT_EN, bufq),
-+		.nid		= idpf_q_vector_to_mem(bufq->q_vector),
-+	};
-+	int ret;
- 
--	pool = idpf_rx_create_page_pool(&bufq->q_vector->napi,
--					bufq->desc_count);
--	if (IS_ERR(pool))
--		return PTR_ERR(pool);
-+	ret = libeth_rx_fq_create(&fq, &bufq->q_vector->napi);
-+	if (ret)
-+		return ret;
- 
--	bufq->pp = pool;
-+	bufq->pp = fq.pp;
-+	bufq->buf = fq.fqes;
-+	bufq->truesize = fq.truesize;
-+	bufq->rx_buf_size = fq.buf_len;
- 
- 	return idpf_rx_buf_alloc_all(bufq);
- }
-@@ -819,14 +809,15 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq)
-  */
- int idpf_rx_bufs_init_all(struct idpf_vport *vport)
- {
--	struct idpf_rxq_group *rx_qgrp;
-+	bool split = idpf_is_queue_model_split(vport->rxq_model);
- 	int i, j, err;
- 
- 	for (i = 0; i < vport->num_rxq_grp; i++) {
--		rx_qgrp = &vport->rxq_grps[i];
-+		struct idpf_rxq_group *rx_qgrp = &vport->rxq_grps[i];
-+		u32 truesize = 0;
- 
- 		/* Allocate bufs for the rxq itself in singleq */
--		if (!idpf_is_queue_model_split(vport->rxq_model)) {
-+		if (!split) {
- 			int num_rxq = rx_qgrp->singleq.num_rxq;
- 
- 			for (j = 0; j < num_rxq; j++) {
-@@ -843,12 +834,19 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
- 
- 		/* Otherwise, allocate bufs for the buffer queues */
- 		for (j = 0; j < vport->num_bufqs_per_qgrp; j++) {
-+			enum libeth_fqe_type type;
- 			struct idpf_buf_queue *q;
- 
- 			q = &rx_qgrp->splitq.bufq_sets[j].bufq;
--			err = idpf_rx_bufs_init(q);
-+			q->truesize = truesize;
-+
-+			type = truesize ? LIBETH_FQE_SHORT : LIBETH_FQE_MTU;
-+
-+			err = idpf_rx_bufs_init(q, type);
- 			if (err)
- 				return err;
-+
-+			truesize = q->truesize >> 1;
- 		}
- 	}
- 
-@@ -1160,17 +1158,11 @@ void idpf_vport_init_num_qs(struct idpf_vport *vport,
- 	/* Adjust number of buffer queues per Rx queue group. */
- 	if (!idpf_is_queue_model_split(vport->rxq_model)) {
- 		vport->num_bufqs_per_qgrp = 0;
--		vport->bufq_size[0] = IDPF_RX_BUF_2048;
- 
- 		return;
- 	}
- 
- 	vport->num_bufqs_per_qgrp = IDPF_MAX_BUFQS_PER_RXQ_GRP;
--	/* Bufq[0] default buffer size is 4K
--	 * Bufq[1] default buffer size is 2K
--	 */
--	vport->bufq_size[0] = IDPF_RX_BUF_4096;
--	vport->bufq_size[1] = IDPF_RX_BUF_2048;
- }
- 
- /**
-@@ -1507,7 +1499,6 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- 
- 			q = &rx_qgrp->splitq.bufq_sets[j].bufq;
- 			q->desc_count = vport->bufq_desc_count[j];
--			q->rx_buf_size = vport->bufq_size[j];
- 			q->rx_buffer_low_watermark = IDPF_LOW_WATERMARK;
- 
- 			idpf_queue_assign(HSPLIT_EN, q, hs);
-@@ -1560,14 +1551,9 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- 			q->netdev = vport->netdev;
- 			q->bufq_sets = rx_qgrp->splitq.bufq_sets;
- 			q->idx = (i * num_rxq) + j;
--			/* In splitq mode, RXQ buffer size should be
--			 * set to that of the first buffer queue
--			 * associated with this RXQ
--			 */
--			q->rx_buf_size = vport->bufq_size[0];
- 			q->rx_buffer_low_watermark = IDPF_LOW_WATERMARK;
- 			q->rx_max_pkt_size = vport->netdev->mtu +
--							IDPF_PACKET_HDR_PAD;
-+							LIBETH_RX_LL_LEN;
- 			idpf_rxq_set_descids(vport, q);
- 		}
- 	}
-@@ -3145,69 +3131,10 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
- 		      unsigned int size)
- {
--	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buf->page,
--			rx_buf->offset, size, rx_buf->truesize);
--
--	rx_buf->page = NULL;
--}
--
--/**
-- * idpf_rx_construct_skb - Allocate skb and populate it
-- * @rxq: Rx descriptor queue
-- * @rx_buf: Rx buffer to pull data from
-- * @size: the length of the packet
-- *
-- * This function allocates an skb. It then populates it with the page
-- * data from the current receive descriptor, taking care to set up the
-- * skb correctly.
-- */
--struct sk_buff *idpf_rx_construct_skb(const struct idpf_rx_queue *rxq,
--				      struct idpf_rx_buf *rx_buf,
--				      unsigned int size)
--{
--	unsigned int headlen;
--	struct sk_buff *skb;
--	void *va;
--
--	va = page_address(rx_buf->page) + rx_buf->offset;
--
--	/* prefetch first cache line of first page */
--	net_prefetch(va);
--	/* allocate a skb to store the frags */
--	skb = napi_alloc_skb(rxq->napi, IDPF_RX_HDR_SIZE);
--	if (unlikely(!skb)) {
--		idpf_rx_put_page(rx_buf);
--
--		return NULL;
--	}
-+	u32 hr = rx_buf->page->pp->p.offset;
- 
--	skb_mark_for_recycle(skb);
--
--	/* Determine available headroom for copy */
--	headlen = size;
--	if (headlen > IDPF_RX_HDR_SIZE)
--		headlen = eth_get_headlen(skb->dev, va, IDPF_RX_HDR_SIZE);
--
--	/* align pull length to size of long to optimize memcpy performance */
--	memcpy(__skb_put(skb, headlen), va, ALIGN(headlen, sizeof(long)));
--
--	/* if we exhaust the linear part then add what is left as a frag */
--	size -= headlen;
--	if (!size) {
--		idpf_rx_put_page(rx_buf);
--
--		return skb;
--	}
--
--	skb_add_rx_frag(skb, 0, rx_buf->page, rx_buf->offset + headlen,
--			size, rx_buf->truesize);
--
--	/* Since we're giving the page to the stack, clear our reference to it.
--	 * We'll get a new one during buffer posting.
--	 */
--	rx_buf->page = NULL;
--
--	return skb;
-+	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buf->page,
-+			rx_buf->offset + hr, size, rx_buf->truesize);
- }
- 
- /**
-@@ -3413,26 +3340,26 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
- 		hdr->page = NULL;
- 
- payload:
--		if (pkt_len) {
--			idpf_rx_sync_for_cpu(rx_buf, pkt_len);
--			if (skb)
--				idpf_rx_add_frag(rx_buf, skb, pkt_len);
--			else
--				skb = idpf_rx_construct_skb(rxq, rx_buf,
--							    pkt_len);
--		} else {
--			idpf_rx_put_page(rx_buf);
--		}
-+		if (!libeth_rx_sync_for_cpu(rx_buf, pkt_len))
-+			goto skip_data;
-+
-+		if (skb)
-+			idpf_rx_add_frag(rx_buf, skb, pkt_len);
-+		else
-+			skb = idpf_rx_build_skb(rx_buf, pkt_len);
- 
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb)
- 			break;
- 
--		idpf_rx_post_buf_refill(refillq, buf_id);
-+skip_data:
-+		rx_buf->page = NULL;
- 
-+		idpf_rx_post_buf_refill(refillq, buf_id);
- 		IDPF_RX_BUMP_NTC(rxq, ntc);
-+
- 		/* skip if it is non EOP desc */
--		if (!idpf_rx_splitq_is_eop(rx_desc))
-+		if (!idpf_rx_splitq_is_eop(rx_desc) || unlikely(!skb))
- 			continue;
- 
- 		/* pad skb if needed (to make valid ethernet frame) */
-@@ -3483,15 +3410,15 @@ static int idpf_rx_update_bufq_desc(struct idpf_buf_queue *bufq, u32 buf_id,
- 				    struct virtchnl2_splitq_rx_buf_desc *buf_desc)
- {
- 	struct libeth_fq_fp fq = {
-+		.pp		= bufq->pp,
-+		.fqes		= bufq->buf,
-+		.truesize	= bufq->truesize,
- 		.count		= bufq->desc_count,
- 	};
--	struct idpf_rx_buf *buf;
- 	dma_addr_t addr;
- 
--	buf = &bufq->buf[buf_id];
--
--	addr = idpf_alloc_page(bufq->pp, buf, bufq->rx_buf_size);
--	if (unlikely(addr == DMA_MAPPING_ERROR))
-+	addr = libeth_rx_alloc(&fq, buf_id);
-+	if (addr == DMA_MAPPING_ERROR)
- 		return -ENOMEM;
- 
- 	buf_desc->pkt_addr = cpu_to_le64(addr);
-@@ -3590,6 +3517,7 @@ static void idpf_rx_clean_refillq_all(struct idpf_buf_queue *bufq, int nid)
- 	struct idpf_bufq_set *bufq_set;
- 	int i;
- 
-+	page_pool_nid_changed(bufq->pp, nid);
- 	if (bufq->hdr_pp)
- 		page_pool_nid_changed(bufq->hdr_pp, nid);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 47d70ad0d6b4..6215dbee5546 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -7,7 +7,6 @@
- #include <linux/dim.h>
- 
- #include <net/libeth/cache.h>
--#include <net/libeth/rx.h>
- #include <net/tcp.h>
- #include <net/netdev_queues.h>
- 
-@@ -97,14 +96,10 @@ do {								\
- 		idx = 0;					\
- } while (0)
- 
--#define IDPF_RX_HDR_SIZE			256
--#define IDPF_RX_BUF_2048			2048
--#define IDPF_RX_BUF_4096			4096
- #define IDPF_RX_BUF_STRIDE			32
- #define IDPF_RX_BUF_POST_STRIDE			16
- #define IDPF_LOW_WATERMARK			64
--#define IDPF_PACKET_HDR_PAD	\
--	(ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN * 2)
-+
- #define IDPF_TX_TSO_MIN_MSS			88
- 
- /* Minimum number of descriptors between 2 descriptors with the RE bit set;
-@@ -538,7 +533,7 @@ struct idpf_txq_stash {
-  * @desc_ring: virtual descriptor ring address
-  * @bufq_sets: Pointer to the array of buffer queues in splitq mode
-  * @napi: NAPI instance corresponding to this queue (splitq)
-- * @rx_buf: See struct idpf_rx_buf
-+ * @rx_buf: See struct &libeth_fqe
-  * @pp: Page pool pointer in singleq mode
-  * @netdev: &net_device corresponding to this queue
-  * @tail: Tail offset. Used for both queue models single and split.
-@@ -552,6 +547,7 @@ struct idpf_txq_stash {
-  * @next_to_clean: Next descriptor to clean
-  * @next_to_alloc: RX buffer to allocate at
-  * @skb: Pointer to the skb
-+ * @truesize: data buffer truesize in singleq
-  * @stats_sync: See struct u64_stats_sync
-  * @q_stats: See union idpf_rx_queue_stats
-  * @q_id: Queue id
-@@ -577,7 +573,7 @@ struct idpf_rx_queue {
- 			struct napi_struct *napi;
- 		};
- 		struct {
--			struct idpf_rx_buf *rx_buf;
-+			struct libeth_fqe *rx_buf;
- 			struct page_pool *pp;
- 		};
- 	};
-@@ -598,6 +594,7 @@ struct idpf_rx_queue {
- 	u16 next_to_alloc;
- 
- 	struct sk_buff *skb;
-+	u32 truesize;
- 
- 	struct u64_stats_sync stats_sync;
- 	struct idpf_rx_queue_stats q_stats;
-@@ -617,7 +614,7 @@ struct idpf_rx_queue {
- 	__cacheline_group_end_aligned(cold);
- };
- libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
--			    72 + sizeof(struct u64_stats_sync),
-+			    80 + sizeof(struct u64_stats_sync),
- 			    32);
- 
- /**
-@@ -744,15 +741,16 @@ libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
-  * @split_buf: buffer descriptor array
-  * @hdr_buf: &libeth_fqe for header buffers
-  * @hdr_pp: &page_pool for header buffers
-- * @buf: &idpf_rx_buf for data buffers
-+ * @buf: &libeth_fqe for data buffers
-  * @pp: &page_pool for data buffers
-  * @tail: Tail offset
-  * @flags: See enum idpf_queue_flags_t
-  * @desc_count: Number of descriptors
-- * @hdr_truesize: truesize for buffer headers
-  * @next_to_use: Next descriptor to use
-  * @next_to_clean: Next descriptor to clean
-  * @next_to_alloc: RX buffer to allocate at
-+ * @hdr_truesize: truesize for buffer headers
-+ * @truesize: truesize for data buffers
-  * @q_id: Queue id
-  * @size: Length of descriptor ring in bytes
-  * @dma: Physical address of ring
-@@ -766,20 +764,21 @@ struct idpf_buf_queue {
- 	struct virtchnl2_splitq_rx_buf_desc *split_buf;
- 	struct libeth_fqe *hdr_buf;
- 	struct page_pool *hdr_pp;
--	struct idpf_rx_buf *buf;
-+	struct libeth_fqe *buf;
- 	struct page_pool *pp;
- 	void __iomem *tail;
- 
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
- 	u32 desc_count;
--
--	u32 hdr_truesize;
- 	__cacheline_group_end_aligned(read_mostly);
- 
- 	__cacheline_group_begin_aligned(read_write);
- 	u32 next_to_use;
- 	u32 next_to_clean;
- 	u32 next_to_alloc;
-+
-+	u32 hdr_truesize;
-+	u32 truesize;
- 	__cacheline_group_end_aligned(read_write);
- 
- 	__cacheline_group_begin_aligned(cold);
-@@ -794,7 +793,7 @@ struct idpf_buf_queue {
- 	u16 rx_buf_size;
- 	__cacheline_group_end_aligned(cold);
- };
--libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 16, 32);
-+libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 24, 32);
- 
- /**
-  * struct idpf_compl_queue - software structure representing a completion queue
-@@ -1034,60 +1033,6 @@ static inline void idpf_tx_splitq_build_desc(union idpf_tx_flex_desc *desc,
- 		idpf_tx_splitq_build_flow_desc(desc, params, td_cmd, size);
- }
- 
--/**
-- * idpf_alloc_page - Allocate a new RX buffer from the page pool
-- * @pool: page_pool to allocate from
-- * @buf: metadata struct to populate with page info
-- * @buf_size: 2K or 4K
-- *
-- * Returns &dma_addr_t to be passed to HW for Rx, %DMA_MAPPING_ERROR otherwise.
-- */
--static inline dma_addr_t idpf_alloc_page(struct page_pool *pool,
--					 struct idpf_rx_buf *buf,
--					 unsigned int buf_size)
--{
--	if (buf_size == IDPF_RX_BUF_2048)
--		buf->page = page_pool_dev_alloc_frag(pool, &buf->offset,
--						     buf_size);
--	else
--		buf->page = page_pool_dev_alloc_pages(pool);
--
--	if (!buf->page)
--		return DMA_MAPPING_ERROR;
--
--	buf->truesize = buf_size;
--
--	return page_pool_get_dma_addr(buf->page) + buf->offset +
--	       pool->p.offset;
--}
--
--/**
-- * idpf_rx_put_page - Return RX buffer page to pool
-- * @rx_buf: RX buffer metadata struct
-- */
--static inline void idpf_rx_put_page(struct idpf_rx_buf *rx_buf)
--{
--	page_pool_put_page(rx_buf->page->pp, rx_buf->page,
--			   rx_buf->truesize, true);
--	rx_buf->page = NULL;
--}
--
--/**
-- * idpf_rx_sync_for_cpu - Synchronize DMA buffer
-- * @rx_buf: RX buffer metadata struct
-- * @len: frame length from descriptor
-- */
--static inline void idpf_rx_sync_for_cpu(struct idpf_rx_buf *rx_buf, u32 len)
--{
--	struct page *page = rx_buf->page;
--	struct page_pool *pp = page->pp;
--
--	dma_sync_single_range_for_cpu(pp->p.dev,
--				      page_pool_get_dma_addr(page),
--				      rx_buf->offset + pp->p.offset, len,
--				      page_pool_get_dma_dir(pp));
--}
--
- int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
- void idpf_vport_init_num_qs(struct idpf_vport *vport,
- 			    struct virtchnl2_create_vport *vport_msg);
-@@ -1110,9 +1055,6 @@ void idpf_deinit_rss(struct idpf_vport *vport);
- int idpf_rx_bufs_init_all(struct idpf_vport *vport);
- void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
- 		      unsigned int size);
--struct sk_buff *idpf_rx_construct_skb(const struct idpf_rx_queue *rxq,
--				      struct idpf_rx_buf *rx_buf,
--				      unsigned int size);
- struct sk_buff *idpf_rx_build_skb(const struct libeth_fqe *buf, u32 size);
- void idpf_tx_buf_hw_update(struct idpf_tx_queue *tx_q, u32 val,
- 			   bool xmit_more);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 50dcb3ab02b1..70986e12da28 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1615,6 +1615,12 @@ static int idpf_send_config_rx_queues_msg(struct idpf_vport *vport)
- 			rxq = &rx_qgrp->splitq.rxq_sets[j]->rxq;
- 			sets = rxq->bufq_sets;
- 
-+			/* In splitq mode, RXQ buffer size should be
-+			 * set to that of the first buffer queue
-+			 * associated with this RXQ.
-+			 */
-+			rxq->rx_buf_size = sets[0].bufq.rx_buf_size;
-+
- 			qi[k].rx_bufq1_id = cpu_to_le16(sets[0].bufq.q_id);
- 			if (vport->num_bufqs_per_qgrp > IDPF_SINGLE_BUFQ_PER_RXQ_GRP) {
- 				qi[k].bufq2_ena = IDPF_BUFQ2_ENA;
-@@ -3167,7 +3173,7 @@ void idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q)
- 	rss_data->rss_lut_size = le16_to_cpu(vport_msg->rss_lut_size);
- 
- 	ether_addr_copy(vport->default_mac_addr, vport_msg->default_mac_addr);
--	vport->max_mtu = le16_to_cpu(vport_msg->max_mtu) - IDPF_PACKET_HDR_PAD;
-+	vport->max_mtu = le16_to_cpu(vport_msg->max_mtu) - LIBETH_RX_LL_LEN;
- 
- 	/* Initialize Tx and Rx profiles for Dynamic Interrupt Moderation */
- 	memcpy(vport->rx_itr_profile, rx_itr, IDPF_DIM_PROFILE_SLOTS);
+v2:
+  - No changes, just cc netdev
+
+Ahmed Zaki (2):
+  iavf: refactor add/del FDIR filters
+  iavf: add support for offloading tc U32 cls filters
+
+Junfeng Guo (11):
+  ice: add parser create and destroy skeleton
+  ice: parse and init various DDP parser sections
+  ice: add debugging functions for the parser sections
+  ice: add parser internal helper functions
+  ice: add parser execution main loop
+  ice: support turning on/off the parser's double vlan mode
+  ice: add UDP tunnels support to the parser
+  ice: add API for parser profile initialization
+  virtchnl: support raw packet in protocol header
+  ice: add method to disable FDIR SWAP option
+  ice: enable FDIR filters from raw binary patterns for VFs
+
+ drivers/net/ethernet/intel/iavf/iavf.h        |   30 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   59 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   89 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.h   |   13 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  148 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   25 +-
+ drivers/net/ethernet/intel/ice/Makefile       |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |    1 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   13 +
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |  100 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    7 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  108 +-
+ drivers/net/ethernet/intel/ice/ice_flow.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 2440 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   |  540 ++++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    |  862 ++++++
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |    4 +
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  404 ++-
+ include/linux/avf/virtchnl.h                  |   13 +-
+ 22 files changed, 4792 insertions(+), 90 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
+
 -- 
-2.41.0
+2.43.0
 
 
