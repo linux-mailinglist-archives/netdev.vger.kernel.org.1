@@ -1,135 +1,152 @@
-Return-Path: <netdev+bounces-110514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A621A92CC49
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 09:54:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D77E992CC57
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 09:57:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 379391F211E9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 07:54:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15982861EE
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 07:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9D386AE3;
-	Wed, 10 Jul 2024 07:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3E584A27;
+	Wed, 10 Jul 2024 07:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iavt2zUh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpkaeFse"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA928563E;
-	Wed, 10 Jul 2024 07:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0817BB17;
+	Wed, 10 Jul 2024 07:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720598026; cv=none; b=JofqR9QJeSUFd/lfVuz9oFmRGQStXMPWmDfConPy+mB7SDfMOLkcgvVVht3Yb3R6GnqsNhoAUt5GbWv8j8QWXa68HZqzxIofz4jUSsP0HiiMsd23dq7eWUMzB4yAlNNjfrhJY+9ajfL3TyWzUts8bTawlWdKN977p4WIaCGvWxs=
+	t=1720598250; cv=none; b=q0kqy13tACOeF5rq7Qwm84rO+hubI7Iir+/AYz4v7FgeOiO+gZqFvYm9HH3SCjjzU6RL394GCAoyNrjTYzrE8dDIGjQKpHFn6y8NXFw1l/ISqCPRuSbBeIQXzMftZxGuxgXx8uAfVirtAhx3ysnrHFVfxY8ImD9ivrASSBraxtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720598026; c=relaxed/simple;
-	bh=2tNka/XCqF1S0Kd3D2qMLaGepB8cZWlWto0t3iWI0fc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SmTWEF6DfB2BP8RcyvNP0THtCZasSyndsU2lP+UkHBtjH5Oimp0e79v+U22/VYSaH3VVM2i1/kflwPNEqXrivmLljonq7Yu2QyPO6hlXUrcq3cItPeLBj+IYiPAwpFIVhP5fx3y6TKE2Us0eZliWGryZQ/KQfFVDhLFBUkd8kYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iavt2zUh; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 469MPZGY021946;
-	Wed, 10 Jul 2024 00:53:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=E
-	OQPGU4QRB4TebF7CqTQwipvo1iFyJ4qNEXfA5XULdQ=; b=iavt2zUhuECBNMoBv
-	EjOZiOoc5FwIC8MiShqhxZCjIy7pebms++6YPgP+lvAHyQfkZdyeV1xZK9DOYqYG
-	/oHtiDu2W53SffdET3gnPWO170u36JoeYts7ICl4dH1I8ydhXuDnm59Ul6ur8tUD
-	9Dp8Mug9wo18qbYX6sKUcVtuDs/jWM+QIFsissv7++hN9dCZtUEBPw2GOzkrvUV3
-	FKTUVXYkB1frxr3vfFVGsHCxWQ1SqenEdqpe8kz/dIhGT3p2OJVJAFU4DeCVPvY+
-	PTjziNYr8RPI3HH9UY99pPz6Suop33TJACvnReWVkki3bvG4ApC4HqRXoTVH8RtC
-	GbtVg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 409e061p7r-9
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jul 2024 00:53:39 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 10 Jul 2024 00:51:57 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 10 Jul 2024 00:51:57 -0700
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id 6B6A23F7053;
-	Wed, 10 Jul 2024 00:51:51 -0700 (PDT)
-From: Srujana Challa <schalla@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <hkelam@marvell.com>,
-        <sbhatta@marvell.com>, <ndabilpuram@marvell.com>,
-        <schalla@marvell.com>, Satheesh Paul <psatheesh@marvell.com>
-Subject: [PATCH net,v2,5/5] octeontx2-af: fix issue with IPv4 match for RSS
-Date: Wed, 10 Jul 2024 13:21:27 +0530
-Message-ID: <20240710075127.2274582-6-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240710075127.2274582-1-schalla@marvell.com>
-References: <20240710075127.2274582-1-schalla@marvell.com>
+	s=arc-20240116; t=1720598250; c=relaxed/simple;
+	bh=i42cyECbHzlN26RdEGKZmFhzW0fNAKgkRQXnsJsIEEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L7cxgulSGLczDQJ1N0kYicMNQG/KZEftiPDIEHL8yjGDx+7BCaeph7kqVPeNZkli4yS7dULhsScVxKrz00ix0C5iuHyDwugeioUpwnhT62d9rsIX3p1bDmOfwrTfJGy5/uSKD6OxO58LNt2+oc2iUmszzGItvc+0eoWAf5c/maI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LpkaeFse; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fb0d88fd25so3664065ad.0;
+        Wed, 10 Jul 2024 00:57:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720598248; x=1721203048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jL3xB5qZUeDvQW0Bt9eHIWR5Sgy7Fo6pxuuDb821234=;
+        b=LpkaeFseIh20YLaDxEVbONEG1D9v17osqvud3CAhqBbNbjv5BjBinJOyMnekOhhhAX
+         gaW4S47t0/ADuOiEQ4DyH92f/W1lh76qa9kAkPX9KmK9rTw7QWzIcwF+KdqxuI8xTrP2
+         AIpwv1ueJUsX+mNEBmhcy3DkLS5rx/bLGuwsi0KuW7zX9GWEL8X/0nA88RH+VPJncWGY
+         neOMGavYWmjvTeDXkzTkZcnKVAFaTUSuCfVj3RyB+MnqWVNGRzwcGJekTG9JaxSpC/Wh
+         1eSX1iKTmg7XZ6N/2iflUze9FaPZcMKFjoX9Z48/dvOky2ntsd8QZ6qvZnyi57u8EWEc
+         nE3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720598248; x=1721203048;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jL3xB5qZUeDvQW0Bt9eHIWR5Sgy7Fo6pxuuDb821234=;
+        b=LzUs6y2Ej9aC8IApbqCBvIvhfK1GuThv0xJ1UIfiRID802eZCTSjxXIKcgJpX+qaUG
+         wZW+B8pjDIL6+Jry2ScTAGMvRE+bvvo7hHGUNc+BwqKFH35ksgnZK1/+h0fC1dNeqbdY
+         9CVsGjv5n7Yg7bO6NzLKZBSyTxsLgN5PRUaO3aTwR715gUQUXTESP6a21PfMBtEbZ9fD
+         MmqqR6TOwwIswgfl5cMR0XXqUmDcDJRJckjjf990TWgXMUyNl7inYWLxyQDYMc7WdSAA
+         dfr75aWPnPEi3nZObclUYIYwqBeYycUjH5P26IC3Y1ZUlrcQ0EqkWXAIHtqEs6Vijk0J
+         opXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTFpR4Uvw5pK6UVwHw38YSweoQgiG6lGF4nhw8vKDZambKRJzXs6TX5P3PaoErip6Mf6czQwxXzJXcS6fms9LCORacKi+NTeFyUgV6TAMvziCLlnjKyFK9nM54f6XOUWEVTcpO
+X-Gm-Message-State: AOJu0YyN38sMrVRbeZ41zAFymj21IO/VDwILBtQNQJzhFmmGdIG4Chdn
+	bRAVR2cPrXcKD9sPqKpINE8JW3bXr4wptkwJ6ZlqHeoEvNGgqJZk
+X-Google-Smtp-Source: AGHT+IEuKjHd15gR0P5vFk2U3b61+gsTLHqlQVreOnbUjVAf1fwZQtG7Ac4RBBngQ0FVGYThZcZ7bA==
+X-Received: by 2002:a17:902:f141:b0:1f7:1bf3:db10 with SMTP id d9443c01a7336-1fbb8015510mr44928735ad.20.1720598247862;
+        Wed, 10 Jul 2024 00:57:27 -0700 (PDT)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6b31977sm27555975ad.287.2024.07.10.00.57.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jul 2024 00:57:27 -0700 (PDT)
+Date: Wed, 10 Jul 2024 15:57:14 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jianheng Zhang
+ <Jianheng.Zhang@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1 1/7] net: stmmac: xgmac: drop incomplete FPE
+ implementation
+Message-ID: <20240710155714.000010cb@gmail.com>
+In-Reply-To: <20240709171018.7tifdirqjhq6cohy@skbuf>
+References: <cover.1720512888.git.0x1207@gmail.com>
+	<d142b909d0600b67b9ceadc767c4177be216f5bd.1720512888.git.0x1207@gmail.com>
+	<b313d570-e3f3-479f-a469-ba2759313ea4@lunn.ch>
+	<20240709171018.7tifdirqjhq6cohy@skbuf>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: PP3nT04FHlwXzp4lWtaSAOmLMA3tpGX8
-X-Proofpoint-GUID: PP3nT04FHlwXzp4lWtaSAOmLMA3tpGX8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-10_04,2024-07-09_01,2024-05-17_01
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Satheesh Paul <psatheesh@marvell.com>
+Hi Vladimir
 
-While performing RSS based on IPv4, packets with
-IPv4 options are not being considered. Adding changes
-to match both plain IPv4 and IPv4 with option header.
+On Tue, 9 Jul 2024 20:10:18 +0300, Vladimir Oltean <olteanv@gmail.com> wrote:
+> Hi Andrew, Furong,
+> 
+> On Tue, Jul 09, 2024 at 03:16:35PM +0200, Andrew Lunn wrote:
+> > On Tue, Jul 09, 2024 at 04:21:19PM +0800, Furong Xu wrote:  
+> > > The FPE support for xgmac is incomplete, drop it temporarily.
+> > > Once FPE implementation is refactored, xgmac support will be added.  
+> > 
+> > This is a pretty unusual thing to do. What does the current
+> > implementation do? Is there enough for it to actually work? If i was
+> > doing a git bisect and landed on this patch, could i find my
+> > networking is broken?
+> > 
+> > More normal is to build a new implementation by the side, and then
+> > swap to it.
+> > 
+> > 	Andrew
+> >   
+> 
+> There were 2 earlier attempts from Jianheng Zhang @ Synopsys to add FPE
+> support to new hardware.
+> 
+> I told him that the #1 priority should be to move the stmmac driver over
+> to the new standard API which uses ethtool + tc.
+> https://lore.kernel.org/netdev/CY5PR12MB63726FED738099761A9B81E7BF8FA@CY5PR12MB6372.namprd12.prod.outlook.com/
+> https://lore.kernel.org/netdev/CY5PR12MB63727C24923AE855CFF0D425BF8EA@CY5PR12MB6372.namprd12.prod.outlook.com/
+> 
+> I'm not sure what happened in the meantime. Jianheng must have faced
+> some issue, because he never came back.
+> 
+> I did comment this at the time:
+> 
+> | Even this very patch is slightly strange - it is not brand new hardware
+> | support, but it fills in some more FPE ops in dwxlgmac2_ops - when
+> | dwxgmac3_fpe_configure() was already there. So this suggests the
+> | existing support was incomplete. How complete is it now? No way to tell.
+> | There is a selftest to tell, but we can't run it because the driver
+> | doesn't integrate with those kernel APIs.
+> 
+> So it is relatively known that the support is incomplete. But I still
+> think we should push for more reviewer insight into this driver by
+> having access to a selftest to get a clearer picture of how it behaves.
+> For that, we need the compliance to the common API.
+> 
 
-Fixes: 41a7aa7b800d ("octeontx2-af: NIX Rx flowkey configuration for RSS")
-Signed-off-by: Satheesh Paul <psatheesh@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 19fe3ed5c0ee..3dc828cf6c5a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -3866,6 +3866,8 @@ static int get_flowkey_alg_idx(struct nix_hw *nix_hw, u32 flow_cfg)
- 
- /* Mask to match ipv6(NPC_LT_LC_IP6) and ipv6 ext(NPC_LT_LC_IP6_EXT) */
- #define NPC_LT_LC_IP6_MATCH_MSK ((~(NPC_LT_LC_IP6 ^ NPC_LT_LC_IP6_EXT)) & 0xf)
-+/* Mask to match both ipv4(NPC_LT_LC_IP) and ipv4 ext(NPC_LT_LC_IP_OPT) */
-+#define NPC_LT_LC_IP_MATCH_MSK  ((~(NPC_LT_LC_IP ^ NPC_LT_LC_IP_OPT)) & 0xf)
- 
- static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
- {
-@@ -3936,7 +3938,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
- 			field->hdr_offset = 9; /* offset */
- 			field->bytesm1 = 0; /* 1 byte */
- 			field->ltype_match = NPC_LT_LC_IP;
--			field->ltype_mask = 0xF;
-+			field->ltype_mask = NPC_LT_LC_IP_MATCH_MSK;
- 			break;
- 		case NIX_FLOW_KEY_TYPE_IPV4:
- 		case NIX_FLOW_KEY_TYPE_INNR_IPV4:
-@@ -3963,8 +3965,7 @@ static int set_flowkey_fields(struct nix_rx_flowkey_alg *alg, u32 flow_cfg)
- 					field->bytesm1 = 3; /* DIP, 4 bytes */
- 				}
- 			}
--
--			field->ltype_mask = 0xF; /* Match only IPv4 */
-+			field->ltype_mask = NPC_LT_LC_IP_MATCH_MSK;
- 			keyoff_marker = false;
- 			break;
- 		case NIX_FLOW_KEY_TYPE_IPV6:
--- 
-2.25.1
-
+After some searching and learning about your commits for FPE using the
+generic framework, I think it is clear enough to me to implement the new
+standard driver interface which uses ethtool + tc, and then the refactor
+of low level FPE function can follow.
+Thanks.
 
