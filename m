@@ -1,50 +1,71 @@
-Return-Path: <netdev+bounces-110610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5FAF92D731
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 19:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884F592D743
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 19:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 868C0281E29
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 17:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9F571C20D4F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 17:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8696C194C73;
-	Wed, 10 Jul 2024 17:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD653194C73;
+	Wed, 10 Jul 2024 17:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfk5E46K"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rWuSWWPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D14E1946DE;
-	Wed, 10 Jul 2024 17:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A505194A59
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 17:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720631432; cv=none; b=oGn/9388R92YcsBFGQFg/7aALCYmgGbN3BpBoZ07gEC9pUgkCml8i8i6FPyXg26QNbiWAOpA71grB7+kD9ldcRXHytP/rrqkWiMzizRV+QS9s08HXsi53g0wbGsVOTgs6ydU+LIcykWvrp/bjsHRmB2taFfRnjZJMAtyzuFR5dc=
+	t=1720631591; cv=none; b=ubSsbDoEfj4c0PEqcKwfcs3J++zIWkQ3myPWURGaTKsP5RvRD14IwmUJ7oz3Z+fPLJAqvNMqZUiWsT0/gZ4qse9QIk2e7Cknh7hhjnGq6VQknIpeERD161ONGOCfTqDJ6hnaof68Wce6mb+355Go6iNKunxkmnC9XGX5HCfrfhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720631432; c=relaxed/simple;
-	bh=Xu4+M3G64FIzVDig1Z9pDCa4msV18et3mszNDByFIew=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t2my+XzdWHC9dD1rBnO0w4/1tE4VMxIVOAUx8tkdHswOEWday7qFAcj+q3Zc8ZKI2+xP2Rlj3tT1IsKSBHHaKE51vGJpgaOzF8CkcwRaRCu9l4WySDgUdbrdZvajio/QlGMxlplKvYYYQdbq+wSe9sT6kb+SKCN1dSF0aebt0V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfk5E46K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DEC2DC4AF07;
-	Wed, 10 Jul 2024 17:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720631431;
-	bh=Xu4+M3G64FIzVDig1Z9pDCa4msV18et3mszNDByFIew=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kfk5E46KuNOaMGYC+/EDr5//NuqsVGj4HKXsNBYVA6fyNNM2Eyy0YVQR1YPD3gSCk
-	 2gttbxoO8ABYfCkg6LV7b68DBDXWjaarpF+ntaffevTwBDmsadPxwurpKzV0oeKcdm
-	 h3Qb4SAKa7FkFauFvcIrgPo30QxwbvVXoTStkbAf6bJGxlqjMhBUPRj+cMRwWQr/7r
-	 GJbv3BA/VI9Ic88VRCU6E71BxGNIDhj6UtFegECKcAQTB5ygFIVZhM3O+nbuC7DId5
-	 EaS7l/yc3sU49upgnngYJbbcu0SQWVAxNYvbST9QzCh2lBbdBMG8qTUZ2ycMOEy852
-	 aW20rrfyBSPJQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA41DDAE95B;
-	Wed, 10 Jul 2024 17:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720631591; c=relaxed/simple;
+	bh=v2158gz0UIe+Ub7n+NdQNNpCbKM1NJd5UGcsa2rIMp8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EJ4TpS1qhNQPyqlBLu65kjUxwyV3l1wUscdlZ+tQbWEv/NUg2xmrdN8cLaqFh3DjW229L8Ld/FfW2l2Rdw1WT0/mxBR82z/wUMavsNbBBXtoNz7oe7YkSFRpP5JN9aYqFhCYiBRGLaMcZUGGS5//32EBMt/M3AYw2uNxHQNx1Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rWuSWWPe; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720631591; x=1752167591;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yGRMgZvvoYpj89deXlRWBrkSTqIrD7aSHBk06K60xAc=;
+  b=rWuSWWPevmWh3i1udS+MS/daculqvKAKH41eusqCfIdL+0iPeHD1wpLX
+   uy9Y6hRDFTLBkwSg1KAKPv2Bd0PEFumtrVcH+6AbrPysqjc27NiIrskZV
+   HarM3nSElBHJDlxmS9baSkhvfVgipwetX4aW77EtpPNoDlY0cwN2PutaV
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.09,198,1716249600"; 
+   d="scan'208";a="740595359"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 17:13:04 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:28548]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.144:2525] with esmtp (Farcaster)
+ id e96253d2-36ed-4d07-a3dc-3789edb18a7e; Wed, 10 Jul 2024 17:13:03 +0000 (UTC)
+X-Farcaster-Flow-ID: e96253d2-36ed-4d07-a3dc-3789edb18a7e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 17:13:03 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 17:13:00 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/2] tcp: Make simultaneous connect() RFC-compliant.
+Date: Wed, 10 Jul 2024 10:12:44 -0700
+Message-ID: <20240710171246.87533-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,51 +73,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next] bpf: Remove tst_run from lwt_seg6local_prog_ops.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172063143182.19190.6752940637516779571.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Jul 2024 17:10:31 +0000
-References: <20240710141631.FbmHcQaX@linutronix.de>
-In-Reply-To: <20240710141631.FbmHcQaX@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: martin.lau@linux.dev,
- syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- dsahern@kernel.org, eddyz87@gmail.com, edumazet@google.com,
- haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
- kpsingh@kernel.org, kuba@kernel.org, pabeni@redhat.com, sdf@fomichev.me,
- sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com,
- yonghong.song@linux.dev, tglx@linutronix.de, m.xhonneux@gmail.com,
- dlebrun@google.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
+Patch 1 fixes an issue that BPF TCP option parser is triggered for ACK
+instead of SYN+ACK in the case of simultaneous connect().
 
-This patch was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+Patch 2 removes an wrong assumption in tcp_ao/self-connnect tests.
 
-On Wed, 10 Jul 2024 16:16:31 +0200 you wrote:
-> The syzbot reported that the lwt_seg6 related BPF ops can be invoked
-> via bpf_test_run() without without entering input_action_end_bpf()
-> first.
-> 
-> Martin KaFai Lau said that self test for BPF_PROG_TYPE_LWT_SEG6LOCAL
-> probably didn't work since it was introduced in commit 04d4b274e2a
-> ("ipv6: sr: Add seg6local action End.BPF"). The reason is that the
-> per-CPU variable seg6_bpf_srh_states::srh is never assigned in the self
-> test case but each BPF function expects it.
-> 
-> [...]
+v3:
+  * Use (sk->sk_state == TCP_SYN_RECV && sk->sk_socket) to detect cross SYN case
 
-Here is the summary with links:
-  - [bpf-next] bpf: Remove tst_run from lwt_seg6local_prog_ops.
-    https://git.kernel.org/bpf/bpf-next/c/c13fda93aca1
+v2: https://lore.kernel.org/netdev/20240708180852.92919-1-kuniyu@amazon.com/
+  * Target net-next and remove Fixes: tag
+  * Don't skip bpf_skops_parse_hdr() to centralise sk_state check
+  * Remove unnecessary ACK after SYN+ACK
+  * Add patch 2
 
-You are awesome, thank you!
+v1: https://lore.kernel.org/netdev/20240704035703.95065-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (2):
+  tcp: Don't drop SYN+ACK for simultaneous connect().
+  selftests: tcp: Remove broken SNMP assumptions for TCP AO self-connect
+    tests.
+
+ net/ipv4/tcp_input.c                           |  9 +++++++++
+ .../selftests/net/tcp_ao/self-connect.c        | 18 ------------------
+ 2 files changed, 9 insertions(+), 18 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.2
 
 
