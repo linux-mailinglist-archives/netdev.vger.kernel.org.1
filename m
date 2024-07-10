@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-110521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCD592CCA2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:15:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11DF192CC9E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 225CB1C22558
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:15:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 651471F21A8B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9AA86AE3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCA98526A;
 	Wed, 10 Jul 2024 08:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="T/metDuA"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Sjhw1Bny"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f97.google.com (mail-ej1-f97.google.com [209.85.218.97])
+Received: from mail-ed1-f99.google.com (mail-ed1-f99.google.com [209.85.208.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B469D5464A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68C38287E
 	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 08:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.97
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720599327; cv=none; b=Rafc/KlH4tQ61/VVRZnFbkKBrIo751SUcHOubdavuEON5O13m4WxuP1q4wM1kiNkBk7QK+LcANxyYuaGijyUXqS0dZ8wbjcocbhkaOZYQohAWQ1Fmw4VYsoA+ZxV6IIIB8nmoPvtupBUNDmtdM53C2FnM7ZKSsQHnMzYAJwFcuE=
+	t=1720599327; cv=none; b=lT3gkCdRIilSCxACeITrPt9e8if5K+cCEsKFTRuBRE8qxnuVN8k9WjNHB3ZjyAL7TZRr5ZenMgIy56JaYYPoAe/FBhmDFZ/YmYj+TtZDVQOGCQTC/NlHJpt0XytnhzpKjVZ6a9tzFOKzQGZ4l+Mz9i76hXZSUxqkm8rMBuImhqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720599327; c=relaxed/simple;
-	bh=ibX4c5HkiZ3iw5b7jPJhH6vG8JD5H5pnTuVXtda0FQA=;
+	bh=1JzfSMHUDYGHzQLy8AlMX+aaizG8MdTX6YEZHk00ckE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ePNfsj37lsC8xzErgkzueuaIAInY7LIdGsZGrk+zeRzCH0VEDRQpvKmfK8vDqzy68ZHIaMr+Q80qh6avOx2tg3B63U8etwCcbxReksnD4HjPmfYP9ZNAcLH83L7UR7GEqJBBIn617ftNi4mtwrkxks46j2iicagbcls0WpFaaSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=T/metDuA; arc=none smtp.client-ip=209.85.218.97
+	 MIME-Version; b=U6Qv2XKXvQ/ByTyoyrFjDV6HqdfhY0tR2pvGI1OoC9olvMYTpKyxScawnKApuHsWw6wGUM0eKDiTmnrCehfpxVMRmqbjo/jKDVgYQoBhqYA4QImBnTGPa1uD8KkWh0TTNPk/cpiiWOjPEqaEySNUe1wHj5LAB5dSc9Twuj+Vd2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Sjhw1Bny; arc=none smtp.client-ip=209.85.208.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f97.google.com with SMTP id a640c23a62f3a-a77bf336171so103121366b.1
+Received: by mail-ed1-f99.google.com with SMTP id 4fb4d7f45d1cf-58c2e5e8649so868218a12.1
         for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 01:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1720599324; x=1721204124; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A+/8q0n9zIZuPd8v8xe46w2FL6quvs2/a1bhvxAdF2Y=;
-        b=T/metDuAkdYsaCBjHaBokk/YlHcnYu5CvlQzpOP7OCfeyKkqhNDkvJWf2AWHa0vkxv
-         3hKis11NwAwgJ0AgPGlQ89okk0faJluhfQXzhZVHxQZKH6L0VeKJrzj2DepUB4HcPOZz
-         UAtNL7QYBxW6cApA+aSCEP2cIxu5EhYtNa6QZK8ifaJQbob1WojsA6w6OVDw+ieHVfd5
-         gZ+O8K4h+Bgenz0axGti4Mgf0TPGamAZC4KDMgFBgX2zBMs5Qv+lf4SXBR5vfQ5BE2U0
-         1moePgBzxAdvE0GFKsYdBaWTmo1oPnznenpTo04NmY2w6otMNugH9c7dtu2gtNOTfdRA
-         +jug==
+        bh=AE5Dx4qup9WtpzmHI/wzoD5SSmj6JOH4d2YLtDw7nBQ=;
+        b=Sjhw1BnyUMImW4M1a3Yfr71ZSECD1inSDYPZNDDwkLzUpEe5w2AJ97eFpQuEqKYBKn
+         nId4YzyZcRPJe79pDHiR27hZA95NWU8DtKRQarT+JMCNqJ3PdDcFz8hdfwnGMqU9k3ls
+         a8boC8J856pOfSpTxRyLsvqIv96uCVYabY27TKX5AiSoK+kEsLyHWZrOew4fK4A/PjY7
+         xfY8cAAlT14+xlhrni2llIzoMAeDwk7CqhMt8cP33XCouHTNZou7HQoJ7Uz1cFLFF4Il
+         E/cwflf1DcgGt+1d2tdBzAB4sMeQYF+YcUcNGh04CYIU6ftOudicqHEtmlbkwqtrolZp
+         zASQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1720599324; x=1721204124;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A+/8q0n9zIZuPd8v8xe46w2FL6quvs2/a1bhvxAdF2Y=;
-        b=FAvdW7Ue78H3X2DH3X+IvRg/w1pbjqQL1zQJ+p6eamOtmdPARkth2Ii5wRA/+164lL
-         MGz4TDqqczrmFk+QNzwvhSZop5GGTIcmNbhiJGOJWfyrKjWJSoYNK2SKWXex5ZF2PxlT
-         wI3vM0XmFkrMA5yT0LJKyeTxo7PTOV/8zEk9AfwdD55XLZzu4/onLeb1+SXbLLAfLNIs
-         wuHbigPNH7FhCzus1cSGpN02OG0IiK60PKH9AhLp+8oCc9R9hozEXkHZxwM5gUOeqtwM
-         fth0d14kiPrhPB5NUXHXdCfbskbziZAD8xBnwr1MR0PGtt7X9czh0AIrqa2xYjFX8+F8
-         duWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXnelfUUHh5XvrZP2oOlHwUr5Z0IYICl5e/uyIKBppUbVBnCt2HV8x14nQaBjJn+mbDudPgO4FjBtQzbYxHD52i6HxXUFB7
-X-Gm-Message-State: AOJu0YxE8KioFqfJQomKDsSJrxmNuw4YcR+j+HWmk+oSuIQFk7T5TT1F
-	2tHsLhSDiQy6cEuum9jccGj9PK51soSsJDozgDFoVhQzssdF2ZXX791pEb/z5F+QTQsshrukhAU
-	wkyNmMH/jkl3R1OXA15Zd+ILdQJPkBbU9
-X-Google-Smtp-Source: AGHT+IFsldb2fu9x0xbmMVclMdscPmCxu5if7Io4zRFog8YBq09ulvZ48ZpidT+5sDJQbv+HPV2iFLgMWMoi
-X-Received: by 2002:a17:906:4e89:b0:a77:d40e:7b2a with SMTP id a640c23a62f3a-a780d3f441fmr250384766b.37.1720599323967;
-        Wed, 10 Jul 2024 01:15:23 -0700 (PDT)
+        bh=AE5Dx4qup9WtpzmHI/wzoD5SSmj6JOH4d2YLtDw7nBQ=;
+        b=Wwy5LELYsqNUHrmQes5Uxcxxau6TjE83WFt9nGTOjCStu2g9+m4jARFvIR90tzCaot
+         L2bkTTcKOiwbtd4u1mrpx3T6LqsN7p0Yug6dt2UzVO8zIRFJVS7fYgdqn/ZerZ1V+wqi
+         P0pGWJs9iYVJAK6A0CTDBmRzbghkqKOOSn6YrwR0qXTl8fdsAnlMw3DJT2lbnCXL5twL
+         13YGuNbAu2bV4GckcGuzmgiJhmEwF492W3W9AueGsKQBbFGRoFAJ0P/39hGcNaOWcR1w
+         MJNHgwwIi63hKnmCB2BzKGZBC0Qp5kwNmlrUphtqgSI5yvznisy9vbWZLZK2FnruRgse
+         e1ng==
+X-Forwarded-Encrypted: i=1; AJvYcCUeXqMpBI7FXImqIutgltlX68ompzv9Icuo0yUrx0P8YsbsboQc0cRFqYD7qXKPdnYG1k+TPRfNqQUitl2bBiZshCkqwxCM
+X-Gm-Message-State: AOJu0YwNVr28nOEKV/fryvDb22/JQyqyzFfws8KKOmr1p+/EXUQyeNll
+	zvfIzD33ou2H+QuLYjwJhFtOdb1LMYqDaXJxdvUvwXJsXekKk/6+6YUnnCh68T7ZnBVeO1viEIB
+	sV4/VPXiLVOwKhs1SpjJGid6dedUhS39T
+X-Google-Smtp-Source: AGHT+IHN2DiWCkYusAIPa1JSTEHycI+A+8qxR4Dg716keCPFslHPmvd6aKnmLgt3kfBkd3wPijvKlR7UvqXd
+X-Received: by 2002:a05:6402:696:b0:595:7779:1f7 with SMTP id 4fb4d7f45d1cf-5957779030cmr2730557a12.16.1720599324002;
+        Wed, 10 Jul 2024 01:15:24 -0700 (PDT)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-a780a6dc788sm632466b.101.2024.07.10.01.15.23;
+        by smtp-relay.gmail.com with ESMTP id 4fb4d7f45d1cf-594bba54bebsm54406a12.3.2024.07.10.01.15.23;
         Wed, 10 Jul 2024 01:15:23 -0700 (PDT)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 8E6FA60466;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 941C96047E;
 	Wed, 10 Jul 2024 10:15:23 +0200 (CEST)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1sRSTz-00Fz72-8k; Wed, 10 Jul 2024 10:15:23 +0200
+	id 1sRSTz-00Fz75-9L; Wed, 10 Jul 2024 10:15:23 +0200
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -81,11 +81,10 @@ To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: David Ahern <dsahern@kernel.org>,
 	netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v4 3/4] ipv6: take care of scope when choosing the src addr
-Date: Wed, 10 Jul 2024 10:14:29 +0200
-Message-ID: <20240710081521.3809742-4-nicolas.dichtel@6wind.com>
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net v4 4/4] selftests: vrf_route_leaking: add local test
+Date: Wed, 10 Jul 2024 10:14:30 +0200
+Message-ID: <20240710081521.3809742-5-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.43.1
 In-Reply-To: <20240710081521.3809742-1-nicolas.dichtel@6wind.com>
 References: <20240710081521.3809742-1-nicolas.dichtel@6wind.com>
@@ -97,32 +96,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the source address is selected, the scope must be checked. For
-example, if a loopback address is assigned to the vrf device, it must not
-be chosen for packets sent outside.
+The goal is to check that the source address selected by the kernel is
+routable when a leaking route is used. ICMP, TCP and UDP connections are
+tested.
+The symmetric topology is enough for this test.
 
-CC: stable@vger.kernel.org
-Fixes: afbac6010aec ("net: ipv6: Address selection needs to consider L3 domains")
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- net/ipv6/addrconf.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .../selftests/net/vrf_route_leaking.sh        | 93 ++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 5c424a0e7232..4f2c5cc31015 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1873,7 +1873,8 @@ int ipv6_dev_get_saddr(struct net *net, const struct net_device *dst_dev,
- 							    master, &dst,
- 							    scores, hiscore_idx);
+diff --git a/tools/testing/selftests/net/vrf_route_leaking.sh b/tools/testing/selftests/net/vrf_route_leaking.sh
+index 2da32f4c479b..152171fb1fc8 100755
+--- a/tools/testing/selftests/net/vrf_route_leaking.sh
++++ b/tools/testing/selftests/net/vrf_route_leaking.sh
+@@ -59,6 +59,7 @@
+ # while it is forwarded between different vrfs.
  
--			if (scores[hiscore_idx].ifa)
-+			if (scores[hiscore_idx].ifa &&
-+			    scores[hiscore_idx].scopedist >= 0)
- 				goto out;
- 		}
+ source lib.sh
++PATH=$PWD:$PWD/tools/testing/selftests/net:$PATH
+ VERBOSE=0
+ PAUSE_ON_FAIL=no
+ DEFAULT_TTYPE=sym
+@@ -533,6 +534,86 @@ ipv6_ping_frag_asym()
+ 	ipv6_ping_frag asym
+ }
  
++ipv4_ping_local()
++{
++	log_section "IPv4 (sym route): VRF ICMP local error route lookup ping"
++
++	setup_sym
++
++	check_connectivity || return
++
++	run_cmd ip netns exec $r1 ip vrf exec blue ping -c1 -w1 ${H2_N2_IP}
++	log_test $? 0 "VRF ICMP local IPv4"
++}
++
++ipv4_tcp_local()
++{
++	log_section "IPv4 (sym route): VRF tcp local connection"
++
++	setup_sym
++
++	check_connectivity || return
++
++	run_cmd nettest -s -O "$h2" -l ${H2_N2_IP} -I eth0 -3 eth0 &
++	sleep 1
++	run_cmd nettest -N "$r1" -d blue -r ${H2_N2_IP}
++	log_test $? 0 "VRF tcp local connection IPv4"
++}
++
++ipv4_udp_local()
++{
++	log_section "IPv4 (sym route): VRF udp local connection"
++
++	setup_sym
++
++	check_connectivity || return
++
++	run_cmd nettest -s -D -O "$h2" -l ${H2_N2_IP} -I eth0 -3 eth0 &
++	sleep 1
++	run_cmd nettest -D -N "$r1" -d blue -r ${H2_N2_IP}
++	log_test $? 0 "VRF udp local connection IPv4"
++}
++
++ipv6_ping_local()
++{
++	log_section "IPv6 (sym route): VRF ICMP local error route lookup ping"
++
++	setup_sym
++
++	check_connectivity6 || return
++
++	run_cmd ip netns exec $r1 ip vrf exec blue ${ping6} -c1 -w1 ${H2_N2_IP6}
++	log_test $? 0 "VRF ICMP local IPv6"
++}
++
++ipv6_tcp_local()
++{
++	log_section "IPv6 (sym route): VRF tcp local connection"
++
++	setup_sym
++
++	check_connectivity6 || return
++
++	run_cmd nettest -s -6 -O "$h2" -l ${H2_N2_IP6} -I eth0 -3 eth0 &
++	sleep 1
++	run_cmd nettest -6 -N "$r1" -d blue -r ${H2_N2_IP6}
++	log_test $? 0 "VRF tcp local connection IPv6"
++}
++
++ipv6_udp_local()
++{
++	log_section "IPv6 (sym route): VRF udp local connection"
++
++	setup_sym
++
++	check_connectivity6 || return
++
++	run_cmd nettest -s -6 -D -O "$h2" -l ${H2_N2_IP6} -I eth0 -3 eth0 &
++	sleep 1
++	run_cmd nettest -6 -D -N "$r1" -d blue -r ${H2_N2_IP6}
++	log_test $? 0 "VRF udp local connection IPv6"
++}
++
+ ################################################################################
+ # usage
+ 
+@@ -555,8 +636,10 @@ EOF
+ # Some systems don't have a ping6 binary anymore
+ command -v ping6 > /dev/null 2>&1 && ping6=$(command -v ping6) || ping6=$(command -v ping)
+ 
+-TESTS_IPV4="ipv4_ping_ttl ipv4_traceroute ipv4_ping_frag ipv4_ping_ttl_asym ipv4_traceroute_asym"
+-TESTS_IPV6="ipv6_ping_ttl ipv6_traceroute ipv6_ping_ttl_asym ipv6_traceroute_asym"
++TESTS_IPV4="ipv4_ping_ttl ipv4_traceroute ipv4_ping_frag ipv4_ping_local ipv4_tcp_local
++ipv4_udp_local ipv4_ping_ttl_asym ipv4_traceroute_asym"
++TESTS_IPV6="ipv6_ping_ttl ipv6_traceroute ipv6_ping_local ipv6_tcp_local ipv6_udp_local
++ipv6_ping_ttl_asym ipv6_traceroute_asym"
+ 
+ ret=0
+ nsuccess=0
+@@ -594,12 +677,18 @@ do
+ 	ipv4_traceroute|traceroute)      ipv4_traceroute;;&
+ 	ipv4_traceroute_asym|traceroute) ipv4_traceroute_asym;;&
+ 	ipv4_ping_frag|ping)             ipv4_ping_frag;;&
++	ipv4_ping_local|ping)            ipv4_ping_local;;&
++	ipv4_tcp_local)                  ipv4_tcp_local;;&
++	ipv4_udp_local)                  ipv4_udp_local;;&
+ 
+ 	ipv6_ping_ttl|ping)              ipv6_ping_ttl;;&
+ 	ipv6_ping_ttl_asym|ping)         ipv6_ping_ttl_asym;;&
+ 	ipv6_traceroute|traceroute)      ipv6_traceroute;;&
+ 	ipv6_traceroute_asym|traceroute) ipv6_traceroute_asym;;&
+ 	ipv6_ping_frag|ping)             ipv6_ping_frag;;&
++	ipv6_ping_local|ping)            ipv6_ping_local;;&
++	ipv6_tcp_local)                  ipv6_tcp_local;;&
++	ipv6_udp_local)                  ipv6_udp_local;;&
+ 
+ 	# setup namespaces and config, but do not run any tests
+ 	setup_sym|setup)                 setup_sym; exit 0;;
 -- 
 2.43.1
 
