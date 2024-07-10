@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-110633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A1092DA13
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:30:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C7292DA14
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 22:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55EA1B23689
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:30:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28850B236DF
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 20:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE7B19007C;
-	Wed, 10 Jul 2024 20:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41F3198821;
+	Wed, 10 Jul 2024 20:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q4EEDafw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jh+kMcIV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758DA8289A
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FFD83CD9
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 20:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720643444; cv=none; b=p/jj1Ejl9sYbXfdNQzxwZbDQdOj10qrhFASaUsexJEHvSfKNRXGPJSriY2P+pCsHwI5GNL4BqIos3PgNZuFC9uLuSs5l2HmCfpwGVzXKGkzcc3lLYFe7AnVdGEoeoFAsvR+GP8qICF/KKg/a3y9bwVhxfmfX0f/mg81QOo9oRQ0=
+	t=1720643445; cv=none; b=KblVn1JOvjQkcRp0nMvHHGZdY5PGu6bLhbtAzmNaoQXygmvnxefV6x8losyse3PwMz6pcpBudt4mHjp8b0NWn/CWppvCYBgyTQTsqQp/nH3M4ZU5+YUSr9lm2EVL0FOFluIBmH6uZeq12moJMsy5OfOakADbMvaHlx37rJwLfWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720643444; c=relaxed/simple;
-	bh=XhoJ7YU7632p9mi75mEFLVD2h03O1F1IBn9qV6xOvtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WHrfh0LVy7qn2tfBmj7njy/l+eZkbNvgAH7sg2OFjaCaQQPZZwZGN4mONTEPDnDcH2a6fMYaxU/ASC5ePFPNSOG0vV0XIhijjiEXnvNctB1CPUGOPl2V9axPR9QwwL3Ogf4trhTBj6fVY6nTzGyjufTWEW9k5n/cc1yIIZlspPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q4EEDafw; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1720643445; c=relaxed/simple;
+	bh=N/PGrC4RYmmcG32rCF81s6jTdoAJjjMnjUgsuLoubjg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jDGXJlHpMIi3T44dSuXN6TvJJkay0uCDyfiYCp5VL6/4wMbnKYTS886agvF1JQf0ugN4VsnK9Qo13xifMlgBF+WiprtaDU6ttcbnS1S7NPQOKul3H6zCsb88TTtKnt/GfsWCzz8F3dC5iCgrK1P+mlyHEEJYAWB1RBgw8yVgHFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jh+kMcIV; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720643442; x=1752179442;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XhoJ7YU7632p9mi75mEFLVD2h03O1F1IBn9qV6xOvtc=;
-  b=Q4EEDafw5ISAkvRrbLm/EGvqDe2VUFpM3yzzdxJJhX+JIkSxBXmikjk3
-   cJ3OzsHnwIoBjaeDkmNrI1zcf34JRnYyZJqa9uZ/Qa7vLmMB0s8M6VXNa
-   KB99zXmr8/iiOREbYYSGmQPsnkhyWx7ioMtWMp5/SI3ZnnfDYufpEs8YP
-   XdG24ngFHsKh2LR9gogU37wC4IHXZtT6JQo+X4GNL6UdT4Vh3s2l0Cab2
-   nJuNFtvQuclUdTrbjBjOQ6yjRMGpS2rcIWqwjipIMt444evj2ywcrHCwE
-   m6RziLcTcKsamJcPbgxWQqg0yClZOAZ1P7/HPQu0mvC5XyPEkvsGoWfbm
-   g==;
-X-CSE-ConnectionGUID: nNaPT6w6TjKEDw6FJzjN/A==
-X-CSE-MsgGUID: UdszTNO4SGS+X9qob3i6GA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483736"
+  t=1720643443; x=1752179443;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=N/PGrC4RYmmcG32rCF81s6jTdoAJjjMnjUgsuLoubjg=;
+  b=jh+kMcIVqxw2OzB/uWQHc+f9SyJIwDHRx1ay9Adlzi6kvyNn/7QspPaF
+   otOidVwRXcdb4gofJigDt/IuunR3QFepT4d54L7TONr/0Ua4cU5HD8GwK
+   mpPXT+r3ob3Y6Dj+mK7pwjRAqJqwOh3Vp5tRFFWAcAZg9qMCrxi/SHus6
+   BpME6B9besID8nTR7S1ZKI1CiMOF19tPDBd4Oc6UMJEuB2HU95n/YP9mR
+   ngZCwW8E+rjSLYIZVdWLzx8eFE6ibWD68AKrdIPk9sCqpqhvGLze9Fp0Y
+   y2cluLYtNDj0MsxAwtCLvOm6e8qQXOJpSRXEGnSELT7PMxCdYKMaswUZ9
+   A==;
+X-CSE-ConnectionGUID: B5auMUG1QlONEws4IaG/5g==
+X-CSE-MsgGUID: iQ8IVneBTayMwUDxZJeFeA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="12483741"
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="12483736"
+   d="scan'208";a="12483741"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:30:41 -0700
-X-CSE-ConnectionGUID: CnTd4yOLS/+wmBBb1YO8eg==
-X-CSE-MsgGUID: z2VoZNqHQp2nlbJpvKx2HQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 13:30:42 -0700
+X-CSE-ConnectionGUID: kLYMAv4fRSWzyyizlbzogA==
+X-CSE-MsgGUID: kmyA5gJISYOTGOFfw0dwpw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,198,1716274800"; 
-   d="scan'208";a="48223850"
+   d="scan'208";a="48223853"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa010.jf.intel.com with ESMTP; 10 Jul 2024 13:30:41 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,16 +64,19 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	aleksander.lobakin@intel.com,
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	anthony.l.nguyen@intel.com,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	lihong.yang@intel.com,
 	willemb@google.com,
-	almasrymina@google.com
-Subject: [PATCH net-next 00/14][pull request] idpf: XDP chapter I: convert Rx to libeth
-Date: Wed, 10 Jul 2024 13:30:16 -0700
-Message-ID: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
+	almasrymina@google.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next 01/14] cache: add __cacheline_group_{begin, end}_aligned() (+ couple more)
+Date: Wed, 10 Jul 2024 13:30:17 -0700
+Message-ID: <20240710203031.188081-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
+References: <20240710203031.188081-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,103 +85,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Alexander Lobakin says:
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-XDP for idpf is currently 5 chapters:
-* convert Rx to libeth (this);
-* convert Tx and stats to libeth;
-* generic XDP and XSk code changes, libeth_xdp;
-* actual XDP for idpf via libeth_xdp;
-* XSk for idpf (^).
+__cacheline_group_begin(), unfortunately, doesn't align the group
+anyhow. If it is wanted, then you need to do something like
 
-Part I does the following:
-* splits &idpf_queue into 4 (RQ, SQ, FQ, CQ) and puts them on a diet;
-* ensures optimal cacheline placement, strictly asserts CL sizes;
-* moves currently unused/dead singleq mode out of line;
-* reuses libeth's Rx ptype definitions and helpers;
-* uses libeth's Rx buffer management for both header and payload;
-* eliminates memcpy()s and coherent DMA uses on hotpath, uses
-  napi_build_skb() instead of in-place short skb allocation.
+__cacheline_group_begin(grp) __aligned(ALIGN)
 
-Most idpf patches, except for the queue split, removes more lines
-than adds.
-Expect far better memory utilization and +5-8% on Rx depending on
-the case (+17% on skb XDP_DROP :>).
+which isn't really convenient nor compact.
+Add the _aligned() counterparts to align the groups automatically to
+either the specified alignment (optional) or ``SMP_CACHE_BYTES``.
+Note that the actual struct layout will then be (on x64 with 64-byte CL):
+
+struct x {
+	u32 y;				// offset 0, size 4, padding 56
+	__cacheline_group_begin__grp;	// offset 64, size 0
+	u32 z;				// offset 64, size 4, padding 4
+	__cacheline_group_end__grp;	// offset 72, size 0
+	__cacheline_group_pad__grp;	// offset 72, size 0, padding 56
+	u32 w;				// offset 128
+};
+
+The end marker is aligned to long, so that you can assert the struct
+size more strictly, but the offset of the next field in the structure
+will be aligned to the group alignment, so that the next field won't
+fall into the group it's not intended to.
+
+Add __LARGEST_ALIGN definition and LARGEST_ALIGN() macro.
+__LARGEST_ALIGN is the value to which the compilers align fields when
+__aligned_largest is specified. Sometimes, it might be needed to get
+this value outside of variable definitions. LARGEST_ALIGN() is macro
+which just aligns a value to __LARGEST_ALIGN.
+Also add SMP_CACHE_ALIGN(), similar to L1_CACHE_ALIGN(), but using
+``SMP_CACHE_BYTES`` instead of ``L1_CACHE_BYTES`` as the former
+also accounts L2, needed in some cases.
+
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-IWL history:
-From v1[0]:
-*  *: pick Reviewed-bys from Jake;
-* 01: new, add generic __cacheline_group_{begin,end}_aligned() and
-      a couple more cache macros;
-* 02: new, make use of new macros from 01;
-* 03: use macros from 01 (no more struct_group()), leave only
-      aggressive assertions here;
-* 07: adjust to the changes made in 01 and 03;
-      fix typos in the kdocs;
-* 13: fix typos in the commit message (Jakub);
-* 14: fix possible unhandled null skb (Simon, static checker).
+ include/linux/cache.h | 59 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-From RFC[1]:
-*  *: add kdocs where needed and fix the existing ones to build cleanly;
-      fix minor checkpatch and codespell warnings;
-      add RBs from Przemek;
-* 01: fix kdoc script to understand new libeth_cacheline_group() macro;
-      add an additional assert for queue struct alignment;
-* 02: pick RB from Mina;
-* 06: make idpf_chk_linearize() static as it's now used only in one file;
-* 07: rephrase the commitmsg: HW supports it, but never wants;
-* 08: fix crashes on some configurations (Mina);
-* 11: constify header buffer pointer in idpf_rx_hsplit_wa().
-
-Testing hints: basic Rx regression tests (+ perf and memory usage
-before/after if needed).
-
-[0] https://lore.kernel.org/netdev/20240528134846.148890-1-aleksander.lobakin@intel.com
-[1] https://lore.kernel.org/netdev/20240510152620.2227312-1-aleksander.lobakin@intel.com
-
-The following are changes since commit ce2f84ebcd857556f5ae9fc2d4ac720df1eb49d1:
-  Merge branch 'aquantia-phy-aqr115c' into main
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
-
-Alexander Lobakin (14):
-  cache: add __cacheline_group_{begin, end}_aligned() (+ couple more)
-  page_pool: use __cacheline_group_{begin, end}_aligned()
-  libeth: add cacheline / struct layout assertion helpers
-  idpf: stop using macros for accessing queue descriptors
-  idpf: split &idpf_queue into 4 strictly-typed queue structures
-  idpf: avoid bloating &idpf_q_vector with big %NR_CPUS
-  idpf: strictly assert cachelines of queue and queue vector structures
-  idpf: merge singleq and splitq &net_device_ops
-  idpf: compile singleq code only under default-n CONFIG_IDPF_SINGLEQ
-  idpf: reuse libeth's definitions of parsed ptype structures
-  idpf: remove legacy Page Pool Ethtool stats
-  libeth: support different types of buffers for Rx
-  idpf: convert header split mode to libeth + napi_build_skb()
-  idpf: use libeth Rx buffer management for payload buffer
-
- drivers/net/ethernet/intel/Kconfig            |   13 +-
- drivers/net/ethernet/intel/idpf/Kconfig       |   26 +
- drivers/net/ethernet/intel/idpf/Makefile      |    3 +-
- drivers/net/ethernet/intel/idpf/idpf.h        |   11 +-
- .../net/ethernet/intel/idpf/idpf_ethtool.c    |  152 +-
- .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |    2 +
- drivers/net/ethernet/intel/idpf/idpf_lib.c    |   88 +-
- drivers/net/ethernet/intel/idpf/idpf_main.c   |    1 +
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  306 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 1412 +++++++++--------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  734 +++++----
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  178 ++-
- drivers/net/ethernet/intel/libeth/rx.c        |  132 +-
- include/linux/cache.h                         |   59 +
- include/net/libeth/cache.h                    |   66 +
- include/net/libeth/rx.h                       |   19 +
- include/net/page_pool/types.h                 |   22 +-
- net/core/page_pool.c                          |    3 +-
- 18 files changed, 1824 insertions(+), 1403 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/idpf/Kconfig
- create mode 100644 include/net/libeth/cache.h
-
+diff --git a/include/linux/cache.h b/include/linux/cache.h
+index 0ecb17bb6883..ca2a05682a54 100644
+--- a/include/linux/cache.h
++++ b/include/linux/cache.h
+@@ -13,6 +13,32 @@
+ #define SMP_CACHE_BYTES L1_CACHE_BYTES
+ #endif
+ 
++/**
++ * SMP_CACHE_ALIGN - align a value to the L2 cacheline size
++ * @x: value to align
++ *
++ * On some architectures, L2 ("SMP") CL size is bigger than L1, and sometimes,
++ * this needs to be accounted.
++ *
++ * Return: aligned value.
++ */
++#ifndef SMP_CACHE_ALIGN
++#define SMP_CACHE_ALIGN(x)	ALIGN(x, SMP_CACHE_BYTES)
++#endif
++
++/*
++ * ``__aligned_largest`` aligns a field to the value most optimal for the
++ * target architecture to perform memory operations. Get the actual value
++ * to be able to use it anywhere else.
++ */
++#ifndef __LARGEST_ALIGN
++#define __LARGEST_ALIGN		sizeof(struct { long x; } __aligned_largest)
++#endif
++
++#ifndef LARGEST_ALIGN
++#define LARGEST_ALIGN(x)	ALIGN(x, __LARGEST_ALIGN)
++#endif
++
+ /*
+  * __read_mostly is used to keep rarely changing variables out of frequently
+  * updated cachelines. Its use should be reserved for data that is used
+@@ -95,6 +121,39 @@
+ 	__u8 __cacheline_group_end__##GROUP[0]
+ #endif
+ 
++/**
++ * __cacheline_group_begin_aligned - declare an aligned group start
++ * @GROUP: name of the group
++ * @...: optional group alignment
++ *
++ * The following block inside a struct:
++ *
++ *	__cacheline_group_begin_aligned(grp);
++ *	field a;
++ *	field b;
++ *	__cacheline_group_end_aligned(grp);
++ *
++ * will always be aligned to either the specified alignment or
++ * ``SMP_CACHE_BYTES``.
++ */
++#define __cacheline_group_begin_aligned(GROUP, ...)		\
++	__cacheline_group_begin(GROUP)				\
++	__aligned((__VA_ARGS__ + 0) ? : SMP_CACHE_BYTES)
++
++/**
++ * __cacheline_group_end_aligned - declare an aligned group end
++ * @GROUP: name of the group
++ * @...: optional alignment (same as was in __cacheline_group_begin_aligned())
++ *
++ * Note that the end marker is aligned to sizeof(long) to allow more precise
++ * size assertion. It also declares a padding at the end to avoid next field
++ * falling into this cacheline.
++ */
++#define __cacheline_group_end_aligned(GROUP, ...)		\
++	__cacheline_group_end(GROUP) __aligned(sizeof(long));	\
++	struct { } __cacheline_group_pad__##GROUP		\
++	__aligned((__VA_ARGS__ + 0) ? : SMP_CACHE_BYTES)
++
+ #ifndef CACHELINE_ASSERT_GROUP_MEMBER
+ #define CACHELINE_ASSERT_GROUP_MEMBER(TYPE, GROUP, MEMBER) \
+ 	BUILD_BUG_ON(!(offsetof(TYPE, MEMBER) >= \
 -- 
 2.41.0
 
