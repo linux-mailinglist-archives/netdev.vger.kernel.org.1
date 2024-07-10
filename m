@@ -1,270 +1,287 @@
-Return-Path: <netdev+bounces-110553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B5892D0BF
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:34:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 992A292D0C7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 13:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6745B216A9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 11:34:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B2F9289227
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 11:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E050C190473;
-	Wed, 10 Jul 2024 11:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824F7190486;
+	Wed, 10 Jul 2024 11:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="IDFCzzwd"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="MVLpnQ6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2045.outbound.protection.outlook.com [40.107.103.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A507D412;
-	Wed, 10 Jul 2024 11:34:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720611251; cv=fail; b=gAxBoadpFWkPfwWhe8/2qkI+Uw06bnCAEqMOmIA+S4eNo89gm6iu1rUdr1f+L4PwF4lbPi4gWX5AYMHQ3zDtQAowgVjNyREb6skCBn4haQa3KwYWY6CyrJonFk2QRgo7w4pu4Vh++HEi4N2E6d0X/MLW5+A/Wrh9/gSgahO/8mc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720611251; c=relaxed/simple;
-	bh=cw9qcLJzPqlECRGiBT8wBOjJdozv+Ew5w1FaYYf/MGw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Gr5lAh4+tNAR8TX/oE4z/E2dSg492rGqR6utZvmYZtJrMJAhjd13Y/Bc8M4qoFjvIVxdYtY/YtUvTyZZirkDoOqxWLQh/FImG51x3tWn1cYQr3VOFC2ecS2Qm/rw+mqIXBQgBLCgF2ixfKM0tGxT+d5QvcNXUQwUlLnfjletFDI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=IDFCzzwd; arc=fail smtp.client-ip=40.107.103.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VDQ9x1W2yFeEJ3iQGqJIy/iUYDwGBCGdWDcoMhoIOBwWUinFJ4vHI2EXqrMdy69++bepJQyCTbS/Ld1I6BMPyXf/BBDnVmbXRLN58k/at9E9D41MdJUH6lixq3S3e3FAsNkSu5AITKxlKUCtKQ25GQB81OLe8c6235D/B5i6Y5UhlO2HtrqGpUhNUESE8F7X5ymzoT1ZvAg4OdZ5K5k0jotxkEsLmNn93pxKPRAPOVsP5mKAlAQfbwiCoAslZn15YXVxu3f/TC1hf239RhVGgkfkb5/mVSgXZcB5fbwGXVDC8kT6vKShpFAzz7QC7p5K7GGXRafttKX3EU84GVVX1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LAgjF1+cjjBXJQfPo31OI4wDoKDNFbU5Izw3Y0T1Aag=;
- b=UMwvbL8NssrJzK8biEaeX4JXatio9TcrTQv89wS84a39KBBs8Lw8tXKWJ/lyE2cz/ZNzKC8T/+dLhCxtz+EsxkL5q6IyEsueE7C8bE/hfVnnkJJZ/glM9o+nKajPQ3DqNv0c60kn25/06ZeZ9z8GiXukewiMeS/x8PabsYg9+GR0D33I8OAtxi6cAmNQoXyS/7WYrdKfdEOJnqdQ3e4bNRqM9+c546D9DRzRYgdnz8Sj3j9pngHgQrp/LVHJnYCSLlqfDQeasrJYS+bcYSTgXCKM+0ObLo3sU0Xzg0NL8gpJniMQ8Vcq66lU26bTO+hiuyfwKr+nVAzLpq1p1hvqTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LAgjF1+cjjBXJQfPo31OI4wDoKDNFbU5Izw3Y0T1Aag=;
- b=IDFCzzwdf4d82HwMpkDpGjtfrEiq7VpKnxJGNJ/Wx+rRzZEKFWxEBsd5yKWZszcQqyoxfj3/EMSA++Wfgz9vRiZpS7PV/+5CCaY0cxNZjYWlE6qpZOvz3AQzoZrqq9eSNAocSXcWr7ouJ9SXRyx7KfXw4WWE8uXipeXtwFIWM+4=
-Received: from PAXPR04MB8459.eurprd04.prod.outlook.com (2603:10a6:102:1da::15)
- by AS8PR04MB9077.eurprd04.prod.outlook.com (2603:10a6:20b:444::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.20; Wed, 10 Jul
- 2024 11:34:05 +0000
-Received: from PAXPR04MB8459.eurprd04.prod.outlook.com
- ([fe80::165a:30a2:5835:9630]) by PAXPR04MB8459.eurprd04.prod.outlook.com
- ([fe80::165a:30a2:5835:9630%4]) with mapi id 15.20.7762.016; Wed, 10 Jul 2024
- 11:34:05 +0000
-From: Peng Fan <peng.fan@nxp.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] test/vsock: add install target
-Thread-Topic: [PATCH] test/vsock: add install target
-Thread-Index: AQHa0gXDNBM9iTbnZU+dNaZg6A0BnrHvkzMAgAACM/CAABi7gIAAJ5Cg
-Date: Wed, 10 Jul 2024 11:34:05 +0000
-Message-ID:
- <PAXPR04MB845955C754284163737BECE788A42@PAXPR04MB8459.eurprd04.prod.outlook.com>
-References: <20240709135051.3152502-1-peng.fan@oss.nxp.com>
- <twxr5pyfntg6igr4mznbljf6kmukxeqwsd222rhiisxonjst2p@suum7sgl5tss>
- <PAXPR04MB845959D5F558BCC2AB46575788A42@PAXPR04MB8459.eurprd04.prod.outlook.com>
- <pugaghoxmegwtlzcmdaqhi5j77dvqpwg4qiu46knvdfu3bx7vt@cnqycuxo5pjb>
-In-Reply-To: <pugaghoxmegwtlzcmdaqhi5j77dvqpwg4qiu46knvdfu3bx7vt@cnqycuxo5pjb>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8459:EE_|AS8PR04MB9077:EE_
-x-ms-office365-filtering-correlation-id: e7ec62b9-7a72-4d47-b5f8-08dca0d43459
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?wJW5fkts55WVPWhLaKmZq6Ej4hDFVotG/iF204rXRQIvkli9tHxIvMtQ64U+?=
- =?us-ascii?Q?tEeHe435IbcV/XcRZeUFmM5N0fgJvPCio3+Wbs8DkiCzDcBEyLJ88nlDye1N?=
- =?us-ascii?Q?01K815fn8+JShcwe773RPbD1bmr5YpztceIwmJ0kaUYcLukFRW67rXbUVb8B?=
- =?us-ascii?Q?eiu2XdgFtQuQM08w3U7m7DtuUw3bxOxbZnnX4pWiouu3GHFzEAJRzMCZmyNq?=
- =?us-ascii?Q?9nKRnoMuQ/IBXvQh0ei3K7oEL5xSsiOcpP7D/7UFMATUa7sawNOFgD8R0oGB?=
- =?us-ascii?Q?VYdcPyoWxzU+C9zYHL1HJg4MzcNx3+Ba4T0s4b+/Ux018siHBlCMi8sT/mCA?=
- =?us-ascii?Q?JzrYCkflSDeKYJ7Ol7XPRjanrJcJYXnF0QzHOmmtpvnQjNeVTlLvXSAc4DCk?=
- =?us-ascii?Q?KxYj3cYj5SeECbdJMNKjZexZo+e1dbRsZ/8Uq4ZKLKg8m7z+dgoo8k3o9A7c?=
- =?us-ascii?Q?3M2LCWL0O2HxbSGyx54dskVMGD6OIjxS1MXb1+8pAM2VTnx2BxbAPiGh7Epu?=
- =?us-ascii?Q?5QeZMSw+R5cUiKM8ALd040HXA46/x7WE3JMoMSQRNjbcW3H/c+TBeTM1v9XX?=
- =?us-ascii?Q?aS9Vtj8gPmUSOM1g/elcEiaQXO8FwQGvaMP+lwvpBeev/zc16i0jbU3KBpZf?=
- =?us-ascii?Q?D329lZsMVvrzV9+ymU/OOqki0prMCA8gB7cNJy3TdEkxloqYKOWAYfF7XVur?=
- =?us-ascii?Q?NxXwZtBYe0bvRJeL4MHJyBXvuWPwFpvMcwll2oiGIIGCVVJk+uWzYCCjgDtF?=
- =?us-ascii?Q?UDT61kogdRUNDypI9+7NS4g6bWg24Vn8YfBWMHtHkoLcZdf/mtghkd0JS8Wq?=
- =?us-ascii?Q?s+PV/9T/ogeo2YsHIXszEvfaYNVdttO7kt1QNU5LVRJ3NzUfXxTCcU5nUvVj?=
- =?us-ascii?Q?W3OfuYYWFLQPK89j0GE5+Nn0TJjiF4Sj9ALOmGuwYB4ntpAKIMhmATrFAwm6?=
- =?us-ascii?Q?Rn8gspIAJaoXCV/MZbr99ILu5bR1v5IUWfgDXGBhBUIY+XiW5kkL0BnbJ4qC?=
- =?us-ascii?Q?qlAGa10Vnqdp6/SxbryUMr9mPNR9+0IggJxOWUVZWYrkvumTLLVEzzn/M40N?=
- =?us-ascii?Q?MSpJY2wTMpZYbyToEMz5cEqsII7XssAW4VC31l8FUNEITPwF743TmTTXhsFa?=
- =?us-ascii?Q?D0ouDDidJknz+zNXn37AzkFIjJpxEhp58CFdysgAtQy0DF4Xl5qKLlW6eFAf?=
- =?us-ascii?Q?lVmKFb61oARoDpYDGXkXuQNlBkFS57BUoLcwwf1MbQFIgjQVQrIWA85I28sj?=
- =?us-ascii?Q?lt4sq5gyTb/2RC9sMYUtUXUgb1gJy8/A83YohHJmyo2Del+yJO68lKQWkslL?=
- =?us-ascii?Q?goaVxgwAa6SnoQyWEoOhnWx5N/pcnXV3o3LDdQLNh5XFtgpU6NmGt4Aijaux?=
- =?us-ascii?Q?h1d2un6dDl/TDyiCRvEBi6r5RVNGkAHXKUQcAyVG4Y4mWEm2Jg=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8459.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?SZwCiPQH/y/GjoQKhERC7o4TdhgwEloeAb5h30HixxhBOiJVOhNgNyMUfg/i?=
- =?us-ascii?Q?89rUAkf0cD8OTnr03mwCkNvvPdia2/S902mCIRovQkTXM6udKx3q0y3dZUUg?=
- =?us-ascii?Q?OipKdBCghWAareXjW7H7qhzZqVZSQ5PPyQn36abVpPRFT3rE/AlBXg+h132V?=
- =?us-ascii?Q?vgpOmP+tzoqxCjxTqa3CBvlvoZ7MAqU4T0P45MeDl8Fv40T05PGgohFO+j1i?=
- =?us-ascii?Q?onWRYzaopCFvnyL0ueddT6u9yfqNUWl8fzUZ/RSvIyVP8ZvV8b2YP/SnN6xT?=
- =?us-ascii?Q?MswFXjtLJtVoUU0suKXN9UTH7o+UjpvlIs6trS2KcHVfsjcmNxNFJfjg4p0m?=
- =?us-ascii?Q?GC7MlvailpTLMqlls02JjI7K4Uizf1QVp4M2pyMAwMxNSMeatDYJi6iJa5cJ?=
- =?us-ascii?Q?mUuK68aCxDtWiXcP6OtHjSyHdq9WpQXIpZh8m6SrGb9u1JoZc1hP63RvF28B?=
- =?us-ascii?Q?4ViXR6dn94xpKXK5J96OGpDMT01PEU4Gp6ZSVmMK7il4b9TZZjlGnywO2dkE?=
- =?us-ascii?Q?qq9Ynj4leK2frgXpuWUGgHso+xZtii341Z4AJg5ZsOYk4Rji0893KUGarE5j?=
- =?us-ascii?Q?11lqBXanB/FUQ0XFGQk8oqkz1/poYp98Ntm3F24dbD4RRj069q6ng/u/9uKO?=
- =?us-ascii?Q?5Mwrx8d8tq8bSd+zPXMItkWNwV1L6sXljfAnO6ezL8qOlE1OJCWklHPONM4x?=
- =?us-ascii?Q?6FwwDKtzK8rrj0L5eIYf1gFLxeMXhlxOdT02mB03bsw3O7eBhCFowscxoHoE?=
- =?us-ascii?Q?ILkwd4XEeJyF/4jNpdzxKPFHyPSkYMslwEie9MT3wE0lbrOuW2YpJaDihzV+?=
- =?us-ascii?Q?SSMvtxZ4GPAXeIUAIkWTktvTSxqrK8aRhZzcuJ/V4NvhrMThgZX/W0zepBDW?=
- =?us-ascii?Q?ZvWEp37r20hhh9acfbdcF7m5tSUcW8wfJ4XWybGlPBkqTLBF2NnUAeSqkyRS?=
- =?us-ascii?Q?0qpFknRSoYenoZ8F0mJcoZXFxtEiYQ9zb/BinIKu0tsNPt1giFin7/wAFYW7?=
- =?us-ascii?Q?sENDps56aaj3XUC89lcyncaD2KVquLHIIeyRa6Z6ofkDvs1zdFLOmy5GJek9?=
- =?us-ascii?Q?Prc7WI+vc7Q6dsnsFbGjhtfJ6WjxNWJIRPFxS1gUxbVHP8QTsdVZwyVZ0Ze2?=
- =?us-ascii?Q?x4PEvj+fXfMJyEhq5QUtPOb2Jx9q0xKaBN653kCIELS8csfnPjo0kVEDiW5p?=
- =?us-ascii?Q?aNCy7WqOvPATxHCVJohf9yuPNx9CB2zuYLiBnxxh3Prql45mi2eWBtD0hXBC?=
- =?us-ascii?Q?PnuyZijM7IkkQQWWNQeBnnN7KL97ojgVVgfQI6rH7NY6DhrL+KDpwdlzLRgz?=
- =?us-ascii?Q?QEQA03Ys8VSc0PgureH4xI4rclGZQrfu1odJTZr3qZ1qUhbRED/Ui9zKo18T?=
- =?us-ascii?Q?ULyhIbj8OtjKqSdbe8vohRmRIRq4vZY3JFPssxNu/OTq7s9fZu8ngTfiz8wi?=
- =?us-ascii?Q?2dyVCfReLZfYQHKSNA1TWw8rBPd4FMEi4pJTsBsSa8sMYsjeo0Y6RDTHBc6f?=
- =?us-ascii?Q?niFAQ0Y7GYSdTrZqSZxUFZwKWQRyJsVE/1DjeB2ey2Atvn2/zWb42KfJkmjh?=
- =?us-ascii?Q?KTo13LFwReh9XJKD3zg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5807D412
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 11:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720611397; cv=none; b=fizh/ea4MKeSKfmJX2MecVYJhUbTfXlluMa8Lc4yz8xi2XrJtQFNBo9xuGRAnV+jMB/xRQV5T/axahSDHKAARG2PmyeQdCdMwAeW+lTf+hgqq/428DngHLK0EDTUivJeH1tjkv3xctAaverrj4SDBH8aVUvpaMAAmu9t31rdxFs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720611397; c=relaxed/simple;
+	bh=pf4nazwilOKu8jf65C5CXW9gEBzuk9C71Q+ZSsdxP28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FZfpOZ+76gkP94+gWq2gY+KWy9SkKj3u6VEy+1eVXUSgb9oV7X4TCmJSS9IFVATsbEYn0VZtTBdxjWIQE190J/HQdZDuJvWorwE8prjGupKh/xXelGW96XXaYLcauG41srz0XaKFIbIx/bHOCsDCO8g6sDr7lkOnK978eRHnhfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=MVLpnQ6y; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a77e7420697so547144766b.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 04:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1720611393; x=1721216193; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=thK62u9jcQ43Rg6t9uNsJ9x5mZZUz73vhYa6GguoI5A=;
+        b=MVLpnQ6y6XnUDmSAK6D5UA18E7IPx5hoMriq/EmmbaQZa4Sy+USgxPxSTR+VAoC+Nu
+         GHyYNZy6rPtN+Q3zZkGdJIFzHdvXA5FUbX9HunKoqlSNdZtgIQ9eyFIBMoo3WTFvY83A
+         ROQIK66YNfFcS272r9Fm6Y9E2KKZdxBBOdmGQjP/j6IREbTwp/jYybNJlUoMYKwso8Rg
+         iQasvoQtPsqwwSOXuvAtTkLK5c4a9j+dJ8NxUDl5YgI2JokDvDGsmcMDLx10KIAkCL3x
+         mqkfPtE0SH+6da2Onw/PepC6/8+V4Pz3zWNMWcE05H3urxuXqIvtczEuxIkir0B3gtLC
+         Ts9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720611393; x=1721216193;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=thK62u9jcQ43Rg6t9uNsJ9x5mZZUz73vhYa6GguoI5A=;
+        b=k+wMF4hT+sZdy1IELXggiKw+hLLavbk5oAXEk6pivVqdP9SGtnMi4NQgIQf8J3BYQs
+         NMXkcVzdOQP1ilq8QYQ1Ie9X8bIfW1pCW7dD835tI4RmBP17y/XkcQ/4vV5p+UGSicrE
+         Uw4pq4Jtsom/rXvCx362w6o5kQ328DfsFYXngWLZd3lHcoekE6an8yJlu1uZuLOtVDZZ
+         P7WS+/bMv0kP6fDEmPmM7e5hMM2zN+nz033uluy7Ic2dpmZZwLzsAIWekPp57OIcWE6b
+         /AsSkA8+YL/Dpugt8MYxIymcwrWAOE8d6196SsmdpOSBlHguTWE6c0cufnIEf47fbg0W
+         io2Q==
+X-Gm-Message-State: AOJu0Yy4YzufJzaB/7LnMY4p+OVh30r/qP7RWZu8Dc+JZmeHqYn953/1
+	23+J9O9yyLXR2XctIpz2Lgdp3uY3rHi4XkYGBGB59SReJ6xYnHfqXo0isZt6QsI=
+X-Google-Smtp-Source: AGHT+IEUqMsJYmLK3gPDy/dswZkdfQ30Yz9PKsa9a67BYwKcz1vsEqWu2oaq7bUFyUyTtEGl/G65dA==
+X-Received: by 2002:a17:907:3f97:b0:a79:8290:ab with SMTP id a640c23a62f3a-a7982900482mr69452666b.15.1720611393301;
+        Wed, 10 Jul 2024 04:36:33 -0700 (PDT)
+Received: from [192.168.182.20] ([185.242.181.163])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6e17b1sm152844666b.83.2024.07.10.04.36.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jul 2024 04:36:32 -0700 (PDT)
+Message-ID: <9bcdabb0-7682-4723-aa2f-ca64f1b8202a@openvpn.net>
+Date: Wed, 10 Jul 2024 13:38:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8459.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7ec62b9-7a72-4d47-b5f8-08dca0d43459
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2024 11:34:05.1437
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MKKl98fqrVKDIpla1C3wq9XOPWyUY8GVgRe1tProGSkJeV5t/PyIB05veb6DSZTn7yH9OyCmgrFuRJT8zNQ0rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9077
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 12/25] ovpn: implement packet processing
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+ pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-13-antonio@openvpn.net> <Zoz6FdiZ64bQhU0c@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Zoz6FdiZ64bQhU0c@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Subject: Re: [PATCH] test/vsock: add install target
->=20
-> On Wed, Jul 10, 2024 at 08:11:32AM GMT, Peng Fan wrote:
-> >> Subject: Re: [PATCH] test/vsock: add install target
-> >>
-> >> On Tue, Jul 09, 2024 at 09:50:51PM GMT, Peng Fan (OSS) wrote:
-> >> >From: Peng Fan <peng.fan@nxp.com>
-> >> >
-> >> >Add install target for vsock to make Yocto easy to install the
-> images.
-> >> >
-> >> >Signed-off-by: Peng Fan <peng.fan@nxp.com>
-> >> >---
-> >> > tools/testing/vsock/Makefile | 12 ++++++++++++
-> >> > 1 file changed, 12 insertions(+)
-> >> >
-> >> >diff --git a/tools/testing/vsock/Makefile
-> >> >b/tools/testing/vsock/Makefile index a7f56a09ca9f..5c8442fa9460
-> >> 100644
-> >> >--- a/tools/testing/vsock/Makefile
-> >> >+++ b/tools/testing/vsock/Makefile
-> >> >@@ -8,8 +8,20 @@ vsock_perf: vsock_perf.o
-> >> msg_zerocopy_common.o
-> >> > vsock_uring_test: LDLIBS =3D -luring
-> >> > vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
-> >> >msg_zerocopy_common.o
-> >> >
-> >> >+VSOCK_INSTALL_PATH ?=3D $(abspath .)
-> >> >+# Avoid changing the rest of the logic here and lib.mk.
-> >> >+INSTALL_PATH :=3D $(VSOCK_INSTALL_PATH)
-> >> >+
-> >> > CFLAGS +=3D -g -O2 -Werror -Wall -I. -I../../include
-> >> > -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow
-> >> > -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -
-> >> D_GNU_SOURCE
-> >> > .PHONY: all test clean
-> >> > clean:
-> >> > 	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf
-> >> vsock_uring_test
-> >> > -include *.d
-> >> >+
-> >> >+install: all
-> >> >+	@# Ask all targets to install their files
-> >> >+	mkdir -p $(INSTALL_PATH)/vsock
-> >>
-> >> why using the "vsock" subdir?
-> >>
-> >> IIUC you were inspired by selftests/Makefile, but it installs under
-> >> $(INSTALL_PATH)/kselftest/ the scripts used by the main one
-> >> `run_kselftest.sh`, which is installed in $(INSTALL_PATH instead.
-> >> So in this case I would install everything in $(INSTALL_PATH).
-> >>
-> >> WDYT?
-> >
-> >I agree.
-> >
-> >>
-> >> >+	install -m 744 vsock_test $(INSTALL_PATH)/vsock/
-> >> >+	install -m 744 vsock_perf $(INSTALL_PATH)/vsock/
-> >> >+	install -m 744 vsock_diag_test $(INSTALL_PATH)/vsock/
-> >> >+	install -m 744 vsock_uring_test $(INSTALL_PATH)/vsock/
-> >>
-> >> Also from selftests/Makefile, what about using the ifdef instead of
-> >> using $(abspath .) as default place?
-> >>
-> >> I mean this:
-> >>
-> >> install: all
-> >> ifdef INSTALL_PATH
-> >>    ...
-> >> else
-> >> 	$(error Error: set INSTALL_PATH to use install) endif
-> >
-> >Is the following looks good to you?
-> >
-> ># Avoid conflict with INSTALL_PATH set by the main Makefile
-> >VSOCK_INSTALL_PATH ?=3D INSTALL_PATH :=3D $(VSOCK_INSTALL_PATH)
->=20
-> I'm not a super Makefile expert, but why do we need both
-> VSOCK_INSTALL_PATH and INSTALL_PATH?
+Hi,
 
-INSTALL_PATH is exported by kernel root directory makefile.
-So to user, we need to avoid export INSTALL_PATH here.
-So I just follow selftests/Makefile using KSFT_INSTALL_PATH
+On 09/07/2024 10:51, Sabrina Dubroca wrote:
+> 2024-06-27, 15:08:30 +0200, Antonio Quartulli wrote:
+>> +/* removes the primary key from the crypto context */
+>> +void ovpn_crypto_kill_primary(struct ovpn_crypto_state *cs)
+>> +{
+>> +	struct ovpn_crypto_key_slot *ks;
+>> +
+>> +	mutex_lock(&cs->mutex);
+>> +	ks = rcu_replace_pointer(cs->primary, NULL,
+>> +				 lockdep_is_held(&cs->mutex));
+> 
+> Should there be a check that we're killing the key that has expired
+> and not some other key?  I'm wondering if this could happen:
+> 
+> ovpn_encrypt_one
+>      ovpn_aead_encrypt
+>          ovpn_pktid_xmit_next
+>              seq_num reaches threshold
+>              returns -ERANGE
+>          returns -ERANGE
+> 
+>                                              ovpn_crypto_key_slots_swap
+>                                                  replaces cs->primary with cs->secondary
+> 
+>      ovpn_encrypt_post
+>          ret = -ERANGE
+>          ovpn_crypto_kill_primary
+>              kills the freshly installed primary key
+> 
+>> +	ovpn_crypto_key_slot_put(ks);
+>> +	mutex_unlock(&cs->mutex);
+>> +}
 
-Regards,
-Peng.
+hm I think you're right.
 
->=20
-> Stefano
->=20
-> >
-> >install: all
-> >ifdef INSTALL_PATH
-> >        mkdir -p $(INSTALL_PATH)
-> >        install -m 744 vsock_test $(INSTALL_PATH)
-> >        install -m 744 vsock_perf $(INSTALL_PATH)
-> >        install -m 744 vsock_diag_test $(INSTALL_PATH)
-> >        install -m 744 vsock_uring_test $(INSTALL_PATH) else
-> >        $(error Error: set INSTALL_PATH to use install) Endif
-> >
-> >Thanks,
-> >Peng.
-> >>
-> >> Thanks,
-> >> Stefano
-> >
+This is theoretically possible...
+Userspace might be reneweing the key exactly when the primary key is 
+expiring..
 
+We need to specify the key_id and kill exactly that key.
+
+
+>> +
+> 
+> [...]
+>> +static void ovpn_aead_encrypt_done(void *data, int ret)
+>> +{
+>> +	struct sk_buff *skb = data;
+>> +
+>> +	aead_request_free(ovpn_skb_cb(skb)->req);
+>> +	ovpn_encrypt_post(skb, ret);
+>> +}
+>> +
+>> +int ovpn_aead_encrypt(struct ovpn_crypto_key_slot *ks, struct sk_buff *skb,
+>> +		      u32 peer_id)
+>> +{
+>> +	const unsigned int tag_size = crypto_aead_authsize(ks->encrypt);
+>> +	const unsigned int head_size = ovpn_aead_encap_overhead(ks);
+>> +	struct scatterlist sg[MAX_SKB_FRAGS + 2];
+>> +	DECLARE_CRYPTO_WAIT(wait);
+> 
+> unused? (also in _decrypt)
+
+Right. Leftover from the sync crypto approach. Will drop it.
+
+> 
+> [...]
+>> +
+>> +	req = aead_request_alloc(ks->encrypt, GFP_ATOMIC);
+>> +	if (unlikely(!req))
+>> +		return -ENOMEM;
+>> +
+>> +	/* setup async crypto operation */
+>> +	aead_request_set_tfm(req, ks->encrypt);
+>> +	aead_request_set_callback(req, 0, ovpn_aead_encrypt_done, NULL);
+> 
+> NULL? That should be skb, ovpn_aead_encrypt_done needs it (same for
+> decrypt).
+
+Ouch
+
+> 
+> I suspect you haven't triggered the async path in testing. For that,
+> you can use crconf:
+
+Yeah, I doubt I did, although I tried pumping as much traffic as 
+possible (but it may not have been enough to trigger the needed conditions).
+
+> 
+> git clone https://git.code.sf.net/p/crconf/code
+> cd code && make
+> ./src/crconf add driver 'pcrypt(generic-gcm-aesni)' type 3  priority 10000
+> 
+> Then all packets encrypted with gcm(aes) should go through the async
+> code.
+
+Amazing! Thanks! Will give it a go.
+
+> 
+>> +	aead_request_set_crypt(req, sg, sg, skb->len - head_size, iv);
+>> +	aead_request_set_ad(req, OVPN_OP_SIZE_V2 + NONCE_WIRE_SIZE);
+>> +
+>> +	ovpn_skb_cb(skb)->req = req;
+>> +	ovpn_skb_cb(skb)->ks = ks;
+>> +
+>> +	/* encrypt it */
+>> +	return crypto_aead_encrypt(req);
+>> +}
+> 
+> [...]
+>> @@ -77,14 +133,45 @@ static void ovpn_decrypt_post(struct sk_buff *skb, int ret)
+>>   /* pick next packet from RX queue, decrypt and forward it to the device */
+>>   void ovpn_recv(struct ovpn_peer *peer, struct sk_buff *skb)
+>>   {
+>> +	struct ovpn_crypto_key_slot *ks;
+>> +	u8 key_id;
+>> +
+>> +	/* get the key slot matching the key ID in the received packet */
+>> +	key_id = ovpn_key_id_from_skb(skb);
+>> +	ks = ovpn_crypto_key_id_to_slot(&peer->crypto, key_id);
+> 
+> This takes a reference on the keyslot (ovpn_crypto_key_slot_hold), but
+> I don't see it getting released in ovpn_decrypt_post. In
+> ovpn_encrypt_post you're adding a ovpn_crypto_key_slot_put (to match
+> ovpn_crypto_key_slot_primary), but nothing equivalent in
+> ovpn_decrypt_post?
+
+good catch! I don't think it triggered any critical side effect (Except 
+from the leak) hence it went unnoticed.
+
+Will add the ovpn_crypto_key_slot_put in the exit path.
+
+
+Thanks!
+
+
+> 
+>> +	if (unlikely(!ks)) {
+>> +		net_info_ratelimited("%s: no available key for peer %u, key-id: %u\n",
+>> +				     peer->ovpn->dev->name, peer->id, key_id);
+>> +		dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
+>> +		kfree_skb(skb);
+>> +		return;
+>> +	}
+>> +
+>>   	ovpn_skb_cb(skb)->peer = peer;
+>> -	ovpn_decrypt_post(skb, 0);
+>> +	ovpn_decrypt_post(skb, ovpn_aead_decrypt(ks, skb));
+>>   }
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
