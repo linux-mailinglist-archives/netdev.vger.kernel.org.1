@@ -1,111 +1,138 @@
-Return-Path: <netdev+bounces-110587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80DE92D4C9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 17:16:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B55792D4D2
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 17:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52A981F23CE8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:16:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C6291C2312E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 15:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07C2194131;
-	Wed, 10 Jul 2024 15:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028DE192B8F;
+	Wed, 10 Jul 2024 15:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="e0b2D8a1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="efgbkzUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA57F19247B;
-	Wed, 10 Jul 2024 15:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B39818FA14
+	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 15:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720624577; cv=none; b=rGxBZS8bMuGhwYdqVeDhK0zEcGjVlyz8AyT20HqL4g2bFr0yhsScjztEhAIxtBGOibv7pEl0LqHJ/BaTkp1KtUQPOxRY68YJ+gbpEts57LPLHOhOdD4yfyyhjB2I69IA28T4E0egTLQoztFJZvHF48MgAU4FcY/MLSJ0VdUXkss=
+	t=1720624617; cv=none; b=shSH7Hc6A/zUN1RhdPuaI1Ty6i0oowd0WnuFkexRci0f1VowwMukNIp/uPswu2tQbeE7VBAPw4HGIT8gAnipv0glvHI9g+lh1pmoEsywLX9Lr6nOX5l/cV1JFtB1Zn9pqsk7qQZGlnUmNPIqoWe2lD6+5P942A00g8TCEbiiOcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720624577; c=relaxed/simple;
-	bh=orYW0Rx/mRR7mRC86YbmqQ/XEF+I1e/zQ66SthK/9Mw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BeC3lF4Y4I/vfd/AD0MLDQMYEtIDnLKAYxzECmlUSDEIV8Gajnho428ZuNmNQAFP3I/nCZZeB3sDUbqyNn0O+k15cXx6LIZ+rMIcqvNP+qBkY1e6e5+aPC/slVniDoPhoCnLyBqrTBNgqVJ+FpBJtBudOlMG3YRiGBX+wDQzHOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=e0b2D8a1; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=aEkO7cacsxq7W9bkSWPya+FIrxQc5cVsrMRiMFr+KPk=; b=e0b2D8a1qhHPLaqzZFy4hYS5jj
-	mfOONLgg0rTQ2MlZbl9V+Ssazk/9avpT9EG5YdM6me80cdkQ9fkDGN84c5Z1Gp0ys0C5JeWBVGam7
-	CuduL2ExpKyot9TdBjGW0l/lTArYFq0kHmlY0P+B5EH3sRzPiCMFHljgjCsjYgqZIlYj7pBmwbDeb
-	xlL0GTzImqCp8PjwtKA9zSxPUDd6TnnoPTmx3GRpky4oFA/dWNW9VLXnkfVPLQBKmlPjaD8tKTMFC
-	J85nhjbYWKaRPdQw/SWx7knTDqYZHYDCbjcdFxDgg/SbXq/ayX60bQPCzK2MQ+GXelK7jiT3uAK6Q
-	XK+seVrg==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sRZ34-0003PM-KS; Wed, 10 Jul 2024 17:16:02 +0200
-Received: from [178.197.248.35] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sRZ32-000A3w-2d;
-	Wed, 10 Jul 2024 17:16:01 +0200
-Subject: Re: [PATCH bpf-next] bpf: Remove tst_run from lwt_seg6local_prog_ops.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: syzbot <syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, andrii@kernel.org,
- ast@kernel.org, davem@davemloft.net, dsahern@kernel.org, eddyz87@gmail.com,
- edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- sdf@fomichev.me, sdf@google.com, song@kernel.org,
- syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev,
- Thomas Gleixner <tglx@linutronix.de>, Mathieu Xhonneux
- <m.xhonneux@gmail.com>, David Lebrun <dlebrun@google.com>
-References: <20240710141631.FbmHcQaX@linutronix.de>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <cb5d07ac-2224-6ac7-d2b2-cdc5db918106@iogearbox.net>
-Date: Wed, 10 Jul 2024 17:16:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1720624617; c=relaxed/simple;
+	bh=qSB28iDkP8YascThZXPoDoYJir7wMRxeXaIqM56AYyU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dd9YfyeY8jQEu/kpNkMLwk+nXuR61nMjN/SAyZTERKtzX64UZmqiBpKX3G1iPK0iLk9cyAGuLgBWRdEEF8PpjkDFx2g6kT799/uzwe3ugb4CJNgaH51y2zhOGjrqgs+v3rv0EQ6ndZ6N90kFBr+bZQ1g8rIxJo+3ax0pinI1Hns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=efgbkzUR; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-79f0283223eso649544685a.2
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 08:16:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720624615; x=1721229415; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZHS1QFsZTjqrHkA8tGsX6273RP9+w+12s3zy+y+UPUs=;
+        b=efgbkzUR3gymnR1QGJaCk2TXTiRkFGuJy6DlRRmvnfYmtwBNxku3B9IISHltrhomTr
+         xY2Z6lmcysjjHWiI4OJhFMMyUsY8OdRvpU5EwuGJmph2PSju6X/dx+wV54x801XWUzQy
+         BJoQVcAw4NDkeJo0c7oq6zclCQ+Mx1djvbw2Kv0L4GPIPqWbybG4yWYwivMWBbVFcP1U
+         3oF3Ft9HQDOgrB4u3jx8MA80pskFFqD+dnbi4nVQE12QXp/mhQM1nRPzKOEuyvO0aO3U
+         dcBLQi16GjDgZNUjj3wS47ciAuhyT2dG7ehD5d93fvANIyyQN9scfkWBsk42NMwNmhJo
+         v+YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720624615; x=1721229415;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHS1QFsZTjqrHkA8tGsX6273RP9+w+12s3zy+y+UPUs=;
+        b=V45mbKRPrCqI+OMbDtQnbBNegJ17UCnlJhP/QimOyJCUCMmmyasBjiuOoZHh9qeNr8
+         pQY+IqW9ZcNA1/umK1Cmf8SgNT62ga6cS787ae9EuL7eRRP5gPaZHhR1f2LMPEXu8Nd9
+         Uk9d6mfACYje70A9KbDCpeBF2syKstEeA056ZH1BaKF6fomvXaDInS0FiK11hfGhv4L3
+         tkBVug3sjfwdtFSaVkPEL2JYPipcGQr1P1sQ3no0E26s4tScsmvdlij/y+31++kkg7Uz
+         J06E3WU5aJ2VgdpEZEIF2xCx7XWCLLI8rKypnunpCBgOGPctELenXcBm2QIiNhf/BJjU
+         92Hg==
+X-Gm-Message-State: AOJu0YxWk9fQVGG7PeZdzT8mh68Kl6ilIjhvY96SLY3fy7DpGPpo0HS+
+	+VXodQemZYucQuJoekbyAmXWH7wNxsaujA9kxO/9sjzdyMrQRYaFzBtW7ckZHsOs7icWYmHXUfw
+	ovQ45zp9R4A==
+X-Google-Smtp-Source: AGHT+IG92PO78IuiEjOcRTOiTEfJfsMjI2kXGhQfKIl8B2Q+Mte/HiR0NSD60+3K42vuGv1g8Xo2nGp8cLUMHQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6214:29e1:b0:6b0:7c57:26da with SMTP
+ id 6a1803df08f44-6b61bc7e1f4mr3999386d6.3.1720624615110; Wed, 10 Jul 2024
+ 08:16:55 -0700 (PDT)
+Date: Wed, 10 Jul 2024 15:16:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20240710141631.FbmHcQaX@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27332/Wed Jul 10 10:36:46 2024)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240710151653.3786604-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] net: reduce rtnetlink_rcv_msg() stack usage
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/10/24 4:16 PM, Sebastian Andrzej Siewior wrote:
-> The syzbot reported that the lwt_seg6 related BPF ops can be invoked
-> via bpf_test_run() without without entering input_action_end_bpf()
-> first.
-> 
-> Martin KaFai Lau said that self test for BPF_PROG_TYPE_LWT_SEG6LOCAL
-> probably didn't work since it was introduced in commit 04d4b274e2a
-> ("ipv6: sr: Add seg6local action End.BPF"). The reason is that the
-> per-CPU variable seg6_bpf_srh_states::srh is never assigned in the self
-> test case but each BPF function expects it.
-> 
-> Remove test_run for BPF_PROG_TYPE_LWT_SEG6LOCAL.
-> 
-> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
-> Reported-by: syzbot+608a2acde8c5a101d07d@syzkaller.appspotmail.com
-> Fixes: d1542d4ae4df ("seg6: Use nested-BH locking for seg6_bpf_srh_states.")
+IFLA_MAX is increasing slowly but surely.
 
-We can also add in addition for reference:
+Some compilers use more than 512 bytes of stack in rtnetlink_rcv_msg()
+because it calls rtnl_calcit() for RTM_GETLINK message.
 
-Fixes: 004d4b274e2a ("ipv6: sr: Add seg6local action End.BPF")
+Use noinline_for_stack attribute to not inline rtnl_calcit(),
+and directly use nla_for_each_attr_type() (Jakub suggestion)
+because we only care about IFLA_EXT_MASK at this stage.
 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/rtnetlink.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index eabfc8290f5e29f2ef3e5c1481715ae9056ea689..87e67194f24046a8420bbb51c19fb0a686b9b06b 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3969,22 +3969,28 @@ static int rtnl_dellinkprop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	return rtnl_linkprop(RTM_DELLINKPROP, skb, nlh, extack);
+ }
+ 
+-static u32 rtnl_calcit(struct sk_buff *skb, struct nlmsghdr *nlh)
++static noinline_for_stack u32 rtnl_calcit(struct sk_buff *skb,
++					  struct nlmsghdr *nlh)
+ {
+ 	struct net *net = sock_net(skb->sk);
+ 	size_t min_ifinfo_dump_size = 0;
+-	struct nlattr *tb[IFLA_MAX+1];
+ 	u32 ext_filter_mask = 0;
+ 	struct net_device *dev;
+-	int hdrlen;
++	struct nlattr *nla;
++	int hdrlen, rem;
+ 
+ 	/* Same kernel<->userspace interface hack as in rtnl_dump_ifinfo. */
+ 	hdrlen = nlmsg_len(nlh) < sizeof(struct ifinfomsg) ?
+ 		 sizeof(struct rtgenmsg) : sizeof(struct ifinfomsg);
+ 
+-	if (nlmsg_parse_deprecated(nlh, hdrlen, tb, IFLA_MAX, ifla_policy, NULL) >= 0) {
+-		if (tb[IFLA_EXT_MASK])
+-			ext_filter_mask = nla_get_u32(tb[IFLA_EXT_MASK]);
++	if (nlh->nlmsg_len < nlmsg_msg_size(hdrlen))
++		return NLMSG_GOODSIZE;
++
++	nla_for_each_attr_type(nla, IFLA_EXT_MASK,
++			       nlmsg_attrdata(nlh, hdrlen),
++			       nlmsg_attrlen(nlh, hdrlen), rem) {
++		if (nla_len(nla) == sizeof(u32))
++			ext_filter_mask = nla_get_u32(nla);
+ 	}
+ 
+ 	if (!ext_filter_mask)
+-- 
+2.45.2.993.g49e7a77208-goog
+
 
