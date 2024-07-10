@@ -1,81 +1,73 @@
-Return-Path: <netdev+bounces-110523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DB292CD68
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:47:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3521792CD79
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 10:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 333E1B219F7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:47:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDDC11F24C93
+	for <lists+netdev@lfdr.de>; Wed, 10 Jul 2024 08:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D16013C908;
-	Wed, 10 Jul 2024 08:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DE315D5D8;
+	Wed, 10 Jul 2024 08:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infogain-com.20230601.gappssmtp.com header.i=@infogain-com.20230601.gappssmtp.com header.b="CxiB+YLI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ONv8H2w7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7DB12DD9B
-	for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 08:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE3016DEBB;
+	Wed, 10 Jul 2024 08:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720601235; cv=none; b=CH6YLkjBn8cQEbpYI1KHAsljuj0cSgQ1BkwHzx37+K0wthecWjGcBA5pJbDINc3Hsj2hSYKoWZHwkfB6ojxugJcmyYfcCsDZZqUthhLqwHFjxM0MDyEw4e2JIOhB3uViCpM63/gu+rt7jrjJDdZiZOd8DcgMXfrkbuwF+S/ZbEY=
+	t=1720601302; cv=none; b=XtS2zZHgwNo3siRIlaa9VFXTD8dDINvVL5FJ7/gfWKdyVoZ/VM8vL7vDrSvsVVJC8fXa+N2mSJ1e6HU2DzAh7bSFwzt0JVg1kZucAvEeFJ+320ojd7UPGTJmrGGHc6TieQWHbKRsf9Mth8Wl2xmbGCBTMKqCw6y48iO9AJ089mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720601235; c=relaxed/simple;
-	bh=h7wPKwl9gyLl5ae6rikweGiUuq0RojGxlMGVvH0VlDc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TScjketdEqBFSqrzK//8pNocVORLdDaKckYS4ojDDL83pIy5PunQNd0BhjebetAFYWUCXkd0NsTWpvTGbeJWjLzdimAipCKFwjVmZY7rwQKrlhJX9y4574OQUIoztmCW5vEUwReDMOqLPK54M96DKyE0BVxnSTBOR7SaSpKWb9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=infogain.com; spf=fail smtp.mailfrom=infogain.com; dkim=pass (2048-bit key) header.d=infogain-com.20230601.gappssmtp.com header.i=@infogain-com.20230601.gappssmtp.com header.b=CxiB+YLI; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=infogain.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=infogain.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5957040e32aso1081476a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 01:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=infogain-com.20230601.gappssmtp.com; s=20230601; t=1720601230; x=1721206030; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X8FqtNzO0keF9wcj5E753g+Uz3zdkp3wogKQchcCmCQ=;
-        b=CxiB+YLIldaAXdQ9zsqasj3fWMS1rCjBKhjWez8aQ7+KTANOp5b1kmgPmQLyMJ9Cq1
-         VJksRj2FaQxPq5iQES1BubkcH8TG8w6kquoVLYruhxGng5t5NOGq9S/HmoyqzSWV/LYD
-         h8HIwdL20ctBRmgm4vZ0Jii4eCanC2C5kShnlZp0jhXBTZlCbjVJVqbQvZWnBoDrS9Xr
-         Z4hkUijyQG6gE41VXENYLjhUxUS/mM/iXYFAAsTwSMkClO3z4d//7U8DrDuxddxwne8o
-         5U+tGlSwYZ+P3YAJh+fYG/YediM3PN25k0ZY7zwXa6wGhLOzoKyGUm7YX9/P+1Sujys2
-         uyHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720601230; x=1721206030;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X8FqtNzO0keF9wcj5E753g+Uz3zdkp3wogKQchcCmCQ=;
-        b=MO8e/8k8NDmyieeEhxITzdGDQJX1E1IlNz4KWTHU3eyrOQzOFjqjWOHm0p1Ep4Lx5E
-         Zvli4QiT8WU4l5LwGxcA2rdMBIHKvIuHgPwzQJaSGOe3K/ng5yoQNfPKuTtz5vBNw8Vb
-         SP7w6G1CW1if1ArUjwNEEvGdYA9Dot84gkMJpCmrF+alUhKxHMmopqzYsA1AzqwznDps
-         yY9TozS/Hhtr+sq02CL0rR2ozNLr0obAwASMYXke6ZKeYbZWZOK9/3yCwezB1h/NBZXx
-         ferYZvmfd+7enXM++K3TpEr50JZCxq+NiL3Q1UhYX/DKlES8Gl5AxqBhVGO6BgxiQwxe
-         yaQg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfGxNhOL1WQHe1XJL77YnXyT2c45HlgrjjWNs6mEZUcConapOsmR9jYXk+mC9mn5UnPmbUqKvK/djXBxf7W0NR1+Cfbz2j
-X-Gm-Message-State: AOJu0YxOvI5UdJhp/Ifyle/4d3yqbPmh2plu7chfCLCG6yPSvE7AfKUd
-	QoB3ifAGfsBwVxgZuQ28zLtp86sI1CCVfRf44IUCv4CPOMiHoAdvA3H4uHfCpZE=
-X-Google-Smtp-Source: AGHT+IFuVw53kf5KJm2tlhyO0sC/jRbJo31a1h3ervkGuYBYOrwF7JQYUZyHDLWOXwdlUWZj3VYpxA==
-X-Received: by 2002:a05:6402:1a2f:b0:57c:71ca:f651 with SMTP id 4fb4d7f45d1cf-594bb67f240mr3758414a12.20.1720601230017;
-        Wed, 10 Jul 2024 01:47:10 -0700 (PDT)
-Received: from michal-Latitude-5420.. ([88.220.73.114])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bd45a16esm1967497a12.75.2024.07.10.01.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 01:47:09 -0700 (PDT)
-From: Michal Switala <michal.switala@infogain.com>
-To: revest@google.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Michal Switala <michal.switala@infogain.com>,
-	syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
-Subject: [PATCH] bpf: Ensure BPF programs testing skb context initialization
-Date: Wed, 10 Jul 2024 10:46:33 +0200
-Message-ID: <20240710084633.2229015-1-michal.switala@infogain.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1720601302; c=relaxed/simple;
+	bh=zQ/TiuB8t18dWU8pWhwlwsO0XHGfzZxYLg1qX75VWhA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kxmRFvZaLwVDhcpum81QQ9kNVpRhftbgz+iL85yuP5CG+K2C/GU/9xlFjMbEzaBFvQZOSaOt7RldJDMghK62UYzcQWWhEen0zB9WYJjQ5IrJi40N+hh2ynvutGNImiei6oO4RNGVxFZwPREHRX+oL8nszIB21zNdzT/qiD0IQH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ONv8H2w7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC41C32781;
+	Wed, 10 Jul 2024 08:48:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720601300;
+	bh=zQ/TiuB8t18dWU8pWhwlwsO0XHGfzZxYLg1qX75VWhA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ONv8H2w7xj6WuoGYeuZ4q2sKGVfujpD1yPRYjpK2TZ26ENPqiMfBest72vNJ+jlpu
+	 6sdkIHpEnM0KQsmy5gbcVINlst53gN4sCmBm8wI/sRsySxDzLcTgw3h1jjE5Q/W+oE
+	 S4eBlWWhw4lVfy41p92hZ6cJIYle4hYdwaObS5/rkRN5vJpfZ0lAqzYsJhxKYZc30p
+	 VjLyXxWoTobXIUqQ7Kyp/FmG1Z5tMzYkq51pukDYUm1nH+wKRq7Fj1ho/CkLZ6+Kyp
+	 K8CHrsSaLSwJ9AbxLToZf9eN/O119NESLKxOSl2/Yaknq69Ud07d/2+/PU0iufuJba
+	 tLm84MJD2c9+g==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: nbd@nbd.name,
+	lorenzo.bianconi83@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	conor@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu,
+	rkannoth@marvell.com,
+	sgoutham@marvell.com,
+	andrew@lunn.ch,
+	arnd@arndb.de,
+	horms@kernel.org
+Subject: [PATCH v7 net-next 0/2] Introduce EN7581 ethernet support
+Date: Wed, 10 Jul 2024 10:47:39 +0200
+Message-ID: <cover.1720600905.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,73 +76,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit addresses an issue where a netdevice was found to be uninitialized.
-To mitigate this case, the change ensures that BPF programs designed to test
-skb context initialization thoroughly verify the availability of a fully
-initialized context before execution.The root cause of a NULL ctx stems from
-the initialization process in bpf_ctx_init(). This function returns NULL if
-the user initializes the bpf_attr variables ctx_in and ctx_out with invalid
-pointers or sets them to NULL. These variables are directly controlled by user
-input, and if both are NULL, the context cannot be initialized, resulting in a
-NULL ctx.
+Add airoha_eth driver in order to introduce ethernet support for
+Airoha EN7581 SoC available on EN7581 development board.
+EN7581 mac controller is mainly composed by Frame Engine (FE) and
+QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
+functionalities are supported now) while QDMA is used for DMA operation
+and QOS functionalities between mac layer and the dsa switch (hw QoS is
+not available yet and it will be added in the future).
+Currently only hw lan features are available, hw wan will be added with
+subsequent patches.
 
-Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
-Link: https://lore.kernel.org/all/000000000000b95d41061cbf302a@google.com/
-Signed-off-by: Michal Switala <michal.switala@infogain.com>
----
- net/bpf/test_run.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+Changes since v6:
+- set eth->ports[] before registering netdevice
+- make page_pool_params const
+Changes since v5:
+- implement .ndo_get_stats64() callback and remove duplicated ethtool entries
+- remove "ethernet-controller.yaml#" from parent node in device tree binding
+- rename child node from "mac" to "ethernet" in device tree binding
+- fix checkpatch errors
+Changes since v4:
+- fix compilation warnings
+- use airoha_qdma_rr() and not airoha_rr() in airoha_qdma_set_irqmask()
+- add missing descriptions in dt-binding
+- remove mdio node in binding example
+Changes since v3:
+- rework architecture to allow future gdm{1,4} support
+- read REG_INT_ENABLE() register in airoha_qdma_set_irqmask() to guarantee
+  airoha_qdma_wr() complete in the spinlock critical section - thx Arnd for
+  the clarification
+- remove unnecessary wmb()
+- remove debugfs
+- move register definitions in .c and remove .h
+- fix warnings
+- enable NAPI thread by default
+Changes since v2:
+- rename airoha,en7581.yaml in airoha,en7581-eth.yaml
+- remove reset dependency in airoha,en7581-eth.yaml
+- remove airoha_dev_change_mtu() callback
+Changes since v1:
+- drop patch 2/3
+- remove queue lock for rx queues
+- add bql support
+- add ethtool stats support
+- fix possible infinite loop in airoha_qdma_rx_process routine
+- always destroy page_pool in case of error during initialization
+- cosmetics
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 36ae54f57bf5..8b2efcee059f 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -970,7 +970,7 @@ static struct proto bpf_dummy_proto = {
- int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 			  union bpf_attr __user *uattr)
- {
--	bool is_l2 = false, is_direct_pkt_access = false;
-+	bool is_l2 = false, is_direct_pkt_access = false, ctx_needed = false;
- 	struct net *net = current->nsproxy->net_ns;
- 	struct net_device *dev = net->loopback_dev;
- 	u32 size = kattr->test.data_size_in;
-@@ -998,6 +998,34 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 		return PTR_ERR(ctx);
- 	}
- 
-+	switch (prog->type) {
-+	case BPF_PROG_TYPE_SOCKET_FILTER:
-+	case BPF_PROG_TYPE_SCHED_CLS:
-+	case BPF_PROG_TYPE_SCHED_ACT:
-+	case BPF_PROG_TYPE_XDP:
-+	case BPF_PROG_TYPE_CGROUP_SKB:
-+	case BPF_PROG_TYPE_CGROUP_SOCK:
-+	case BPF_PROG_TYPE_SOCK_OPS:
-+	case BPF_PROG_TYPE_SK_SKB:
-+	case BPF_PROG_TYPE_SK_MSG:
-+	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
-+	case BPF_PROG_TYPE_LWT_SEG6LOCAL:
-+	case BPF_PROG_TYPE_SK_REUSEPORT:
-+	case BPF_PROG_TYPE_NETFILTER:
-+	case BPF_PROG_TYPE_LWT_IN:
-+	case BPF_PROG_TYPE_LWT_OUT:
-+	case BPF_PROG_TYPE_LWT_XMIT:
-+		ctx_needed = true;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	if (!ctx && ctx_needed) {
-+		kfree(data);
-+		return -EINVAL;
-+	}
-+
- 	switch (prog->type) {
- 	case BPF_PROG_TYPE_SCHED_CLS:
- 	case BPF_PROG_TYPE_SCHED_ACT:
+Lorenzo Bianconi (2):
+  dt-bindings: net: airoha: Add EN7581 ethernet controller
+  net: airoha: Introduce ethernet support for EN7581 SoC
+
+ .../bindings/net/airoha,en7581-eth.yaml       |  143 +
+ MAINTAINERS                                   |    9 +
+ drivers/net/ethernet/mediatek/Kconfig         |   11 +-
+ drivers/net/ethernet/mediatek/Makefile        |    1 +
+ drivers/net/ethernet/mediatek/airoha_eth.c    | 2768 +++++++++++++++++
+ 5 files changed, 2931 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+ create mode 100644 drivers/net/ethernet/mediatek/airoha_eth.c
+
 -- 
-2.43.0
+2.45.2
 
 
