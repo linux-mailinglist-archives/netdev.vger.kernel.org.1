@@ -1,404 +1,201 @@
-Return-Path: <netdev+bounces-110717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D2392DE5F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 04:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FED92DE63
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 04:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA941F21E2D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62950281F25
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E0FC129;
-	Thu, 11 Jul 2024 02:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB75C129;
+	Thu, 11 Jul 2024 02:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="L613fLYY"
+	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="uqWF7hIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2138.outbound.protection.outlook.com [40.107.117.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E838D512
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 02:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720665245; cv=none; b=LrDGPWbETvMdSO7e87pqr0/x2Zx//v9bLC26PFCJoXYnCcMvu6AlS1CA2+JVNIWTmCIb6MqKP+/6iM4es5j5BD7Wq+8Tvy7/uTplOBd/CqM5LfOtc+v1r0OZE39sE0jlIJe/DQY4dMAetCcDBhu7jeS9S0rQXGTXcP+VaCNv3RY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720665245; c=relaxed/simple;
-	bh=Zza7HMru+afXnNzFQ89OfFXWt0Dm/KHqgl5j9g8x40Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Lam37KbrL8377NvzXfk65mB781MIWHoCxHTqx2e6tg4HgCF/NMKl9jIBA6vOJKKcAEv8rKisYrPQg1TnRYABrHSt4ZMWk1bk26lNgurHbJcDXiOXPME0iPw8mKJdxMxCkBwclj6p+Hzs4sVA56lvR4mFVUZ8jUu/lRjeTI0M7qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=L613fLYY; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id E58173F42E
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 02:33:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1720665238;
-	bh=qtD7p00bOLCnUQsPR58KZ6QvTu7RksJRr8D5W3n7NiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=L613fLYYlgeJssAYaY9yV+D2MbZ+BDxB6Wp9wDsRUnnTBc4Ig9kogN9cgd6x9sIXK
-	 8UKorvJgahWmJTiVpaORH0pOLb26QjDV3Yp8ZM7kRNOfolf7aLSI1MpmlWqNxNgu8V
-	 u37gyGWrXpRzk8SCgAjtkyvs5xKsFnZZhmJm4HvZk1Xv0bWYgIKqQj0fLXkAwYYCRR
-	 qC0k2HsFas3G8xsCMX82FqCIk3d8L3/HqaJrV08fdynOqs/t9R48IH6MHw4pCPN7s2
-	 Lq0T6fKAnBSTEntd/cD+bPAy9YLUawQ0AJj2kyYrjQ+/UcNCgxhXmThzbkPRLACsHs
-	 mJlt9bwPeoVJg==
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a77de2c6583so24387966b.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 19:33:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720665238; x=1721270038;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qtD7p00bOLCnUQsPR58KZ6QvTu7RksJRr8D5W3n7NiY=;
-        b=OzI7kS0mZjacvENRgrIjng2zpMT4tszDs91IgaC+A7UOQHh3Z2COqj+awS5mmS4Usy
-         nLDXkixv9WHtQ5w2z/5xzmdlPo8HxC9MIuHRXDRq6P801l0+wCqv05JBYy/jdL19qS6L
-         feFSbDaiFZii/lvkznR1iPeKH1E3fhzQ4inuiPR/FfzyWv+ouyOScAf4uqgv736Z+ENK
-         pjFiV9AHHilTpVeba8e2TQdu1YO1P4HXDnPKSe0ztElH9pGTdT4yxMnCT+e8TR//RXtO
-         Zkgtf2xh7EbIaqlCIU1gcGPplUh7aWwl5BQkL43LLu4n4aI0IZTKhfDLgGRIzEi+Msx0
-         X6dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCIhWlGevxkmQvaHlmXmNdFmvGO1ffXdR5MvEAR8ICPyvKj6zW3RER2TiXc5r+ob3J5na3fDuIlnMdmxEvz4na0x+vJgsk
-X-Gm-Message-State: AOJu0YwvZQKotnx5K6QalD0wvRIf1EGoBOdpBNzdyAQuz7LjWdpk80Re
-	LdRlspiIsGQmJx6X2PqvG2oiCxNhvF/yshjmZaLezVRHnE+pVc+AKLq/J29/fmDsdfio3oTRThP
-	DW2VTQzip+pIQJD50+T4bITtVRwtt1VpPRidMZW5G1HNWssQ5nEAVQH5D9KrLNVNfxijh3gqRbn
-	r5ihwLdnkNQoJ5LYzluVQjYjj6ZEnh9YXa7MOIxoWugw1R
-X-Received: by 2002:a17:906:4c57:b0:a6f:ab9c:7778 with SMTP id a640c23a62f3a-a780b6fd1e3mr459595366b.34.1720665238113;
-        Wed, 10 Jul 2024 19:33:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEICvsPD94BhayUA82kagKaGmrWFaOQeS+h4xhHQxr08gVMcrERmVAZtimTn5i5m+2OIvmBtqiwgLOiJLW4zfw=
-X-Received: by 2002:a17:906:4c57:b0:a6f:ab9c:7778 with SMTP id
- a640c23a62f3a-a780b6fd1e3mr459593666b.34.1720665237669; Wed, 10 Jul 2024
- 19:33:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53D68F4E;
+	Thu, 11 Jul 2024 02:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.138
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720665324; cv=fail; b=COZysZVyG2RKhbdBHLIIqOQYgkWDBqYNel8C5ustAasOWwSkZA/qO7IZQNlZiOIFXCQLT7OGgXOEQeCC/YqqbpqoRYPk/Qzp8KVuj7+wXIX9+nw47VfQZL5Vm0JoyzDMQWqlNg3WPTqMtFHS4aAw558G/ojTGH22PLxp68E/Il4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720665324; c=relaxed/simple;
+	bh=YKRFrflXlBJ4GiQ8A3L6pCOCcEJceq+41xW0ZEF8hl4=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=s2zZgcuOc71hL5APUL0qcHUgYDltPvxw7IHLyXNjM02XgQwVzGubqKzrPAicnfhwRbL//AgRBoK8S3k8EN7fh79YihLDTkFYFoAKOFxEl/zA0X9Nz2RHIyxJjM6ki/RSr0searTqfy/LCiisXjYu7sSR2mf3ojk8dZa+spVxvjk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=uqWF7hIb; arc=fail smtp.client-ip=40.107.117.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fibocom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LkbS8WlFetkWyOxih4LCiCEjmKOmoMiV5MqvR7L0yiIK0DuXfO0Ac+z/Dv53k/Ifz7JtRbuUSfRz3M9jmioXPqUjxv8ZvU23okFd/P2JPgFh2CYC/1Y4iFO6PP+9DXWxmLHZi41WUm1uKA5aYuv3wXafJ61UjdN0W3505gSDhR4/Z6Bh6qxJkaH1M0/XnCotfg63IEXPwEmmujDhbmcmdQ+9F+BZLzFMl3QascMV1fBt+JDhm7QNXrfqh6SvZFcYebXb/EIWadHWDXvs79+9REK5Qz/KxUrFwMpWy7WOkz6zKcBct77QTusn0+yXhApPETjfkNOBUVTNevgKc1vyfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=60c8ldv8Gtq05aGi/r8oign4rTfAuTYPALNPyBHGn0k=;
+ b=bPo4fXsaZzxhWkylgVCm0qvJfwa0XCNlzhMllabAZSpzkMisWWoL9xAKhHmtb2mnKepgSID9eVYW34W2O6JCZtGsdK8B8sGzr61pt4Mk1Job3glFtndb1aRGzdzbRYRHulIaoBx4WY8cqwx6ImNgCBIQTD8/TnvSfHXy6PiXiE05wG3LZt/GWC9nZoK8Wwzwmym8y2FJAXoNXysw/cnRoWpInVbwtqXIXJyJeo2l1v4J3zSBhp8LFsP8lAk6rwaVTW0VP0a67kkbovkNjMEz4i+g6KSI90pIneDMYBDbYRJRFscZ+IjhCX8ucziXQXbjNDI9W2ApBAKb696CDRvoYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
+ dkim=pass header.d=fibocom.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=60c8ldv8Gtq05aGi/r8oign4rTfAuTYPALNPyBHGn0k=;
+ b=uqWF7hIbroaPy05LnbZJ0NtAds261JGYZE1lu6Mhe+36k5xoRSqlRPPasBYGgCLszw8d8kLVUgLNRLjd7wjpJznnodmf4jE9J+KQ8uMu2An0ygOaHfEIllSCvceOPgDZhr5zaq4ihco/phq+1ylvG/kBx3rtY/tlA/J9D+ugmis=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fibocom.com;
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
+ by TYZPR02MB5713.apcprd02.prod.outlook.com (2603:1096:400:1c2::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Thu, 11 Jul
+ 2024 02:35:16 +0000
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b%7]) with mapi id 15.20.7741.033; Thu, 11 Jul 2024
+ 02:35:16 +0000
+From: Jinjian Song <jinjian.song@fibocom.com>
+To: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-arm-kernel@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	corbet@lwn.net,
+	linux-mediatek@lists.infradead.org,
+	Jinjian Song <jinjian.song@fibocom.com>
+Subject: [net-next v5 0/2] net: wwan: t7xx: Add t7xx debug port 
+Date: Thu, 11 Jul 2024 10:34:58 +0800
+Message-Id: <20240711023500.6972-1-jinjian.song@fibocom.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYAPR01CA0175.jpnprd01.prod.outlook.com
+ (2603:1096:404:ba::19) To TY0PR02MB5766.apcprd02.prod.outlook.com
+ (2603:1096:400:1b5::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617054514.127961-1-chengen.du@canonical.com>
- <ZnAdiDjI_unrELB8@nanopsycho.orion> <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
- <ZnEmiIhs5K4ehcYH@nanopsycho.orion> <66715247c147c_23a4e7294a7@willemb.c.googlers.com.notmuch>
- <CAPza5qfQtPZ-UPF97CG+zEwoQunbzg8F8kX0Q1y5Fzt4Zoc=4w@mail.gmail.com>
- <6673dc0ee45dd_2a03042941e@willemb.c.googlers.com.notmuch>
- <CAPza5qfqoJeSe3=nEuMAhWygiu0+N3v2Qe1TPB1eywMEyfGLrw@mail.gmail.com> <66794d8c1d425_3637da294d8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66794d8c1d425_3637da294d8@willemb.c.googlers.com.notmuch>
-From: Chengen Du <chengen.du@canonical.com>
-Date: Thu, 11 Jul 2024 10:33:46 +0800
-Message-ID: <CAPza5qeh+vDAv_Xe5Duz53GFDef2UNxSdPAbgivk=XmdVkJbMQ@mail.gmail.com>
-Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
- hardware offloading
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|TYZPR02MB5713:EE_
+X-MS-Office365-Filtering-Correlation-Id: f0ffc7d9-7c56-4d40-bd82-08dca1521929
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|52116014|366016|7416014|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?IANn1ypzf6L8ddVNyJVou0Em+ReHSM3YcgqPDN49kFcSfKTVchSn0b8pvuCA?=
+ =?us-ascii?Q?P07AbqJdGQ+DxOxS1MWwP0BVEv2JWlYgbFeYfs9s0XKSzESnbtmM2A0mWukO?=
+ =?us-ascii?Q?NfxI+2xbYVZil88wTPCGBXRWYQivpKbcmr4D4AIB/fn7GdTLFiR6z5cLZ4kL?=
+ =?us-ascii?Q?4MgM9gQM5yROmkXnQZ7erIJthHmp6XVdVCO4ttbeFkIDCtLH/rD29iIf7jb+?=
+ =?us-ascii?Q?0M2qESc2B/Y30DdWqhX8YUMUvY1YL/lh65mTSq+/ofF5kJQSEErBuIY7+c2n?=
+ =?us-ascii?Q?n/wRRD5P0qkBNEeHWZ0/j7zPNTo1VfBXNs8eNiIH/6o9SQFkgQYDsi+DsWaD?=
+ =?us-ascii?Q?ViB566LYued2FaslEdiJzLWxrvknCE5wSviK9Hpms5eiC5Y6YGejAOu2yG4P?=
+ =?us-ascii?Q?eHhB2lWC5wmizRYHtQWDHdu8gqti36gDI+3EvRQj7XgwP0n1Xt7erjBlcxZB?=
+ =?us-ascii?Q?wgKiVi/WL6ayo31FxJI1frZBul0RWtFPzKa7Teq0Yup8VmHZVslj8qCdaxD2?=
+ =?us-ascii?Q?E7DrDajDevgKl0CUsrvDh2G4Rwy1kOBdzMToLo8D2lnmewn2eo/3L2aLp53E?=
+ =?us-ascii?Q?D1a1/Y6OVXhWy8PXCc21YEOLnuukRJCCY8ncOzUmwXdehhXZZgxK2XEJrGVH?=
+ =?us-ascii?Q?9epxxNq3SCa3EJyHrXqMPxnd20kQmKiKvd1AKpTrGXDYO4j45rxx4ctF71U3?=
+ =?us-ascii?Q?FH4D0RuEcQvxzjGvrAyfZPY6IXpRB7pQe/aUDFUGDpcfZMrBiTk8lcmLYsh9?=
+ =?us-ascii?Q?uV4m0Ol39QqiqwTD/KalsdxeUKE1kuB5QGiIWP6LJqUj9mPe+fy4+dpHiyb9?=
+ =?us-ascii?Q?JFWak9yUDJT5+rpgKpc4oF+6ltcF8uajQjGt0wanz50+jcieWYnZWsYCg1+Q?=
+ =?us-ascii?Q?JqXv3uzircyDkiCLjZeOaK72OHtvxsQrvGCm9H968jLeHuNyKCmeAGyZEPQl?=
+ =?us-ascii?Q?4/8OqPa/kXg2HFoxS4j8qk0Xi3TkC4l5ggG0Zt3VV9gfYfWkwZvQlnywpuSl?=
+ =?us-ascii?Q?JqKf4LSjjjHtBJZcvqwLSjzsKOryYSIiHUO38khUsHMa7oU35cGhkCfFmo8B?=
+ =?us-ascii?Q?c+l31uIYkWa88HAUODYnGSEjMgHDSiFdlTs/wMISuRbFbD3OoWXTiKLw5lel?=
+ =?us-ascii?Q?r5Qbs1q/7OgVTpclsM416CBMfmGnaPSx5GEoHdJUifjgCzYTBmIE2/YdCadH?=
+ =?us-ascii?Q?aNV5zb6A1uDgY/XY+5RzWHnf2Aub1ZF0hITCIwnenqDuekl6+kOWwv49yf5I?=
+ =?us-ascii?Q?VBAEFhq0myXdoGvNkcs6m8VsGPYsEMOTnh4NH8hJ4xxNM64nxeDC0KQYbesy?=
+ =?us-ascii?Q?z/TfiMPAz4pujsW9AwxiMMajXLHZAl1YuOpzIhXW4Hm7uqStKdRo/E3eLXMA?=
+ =?us-ascii?Q?IkModnjgVGNKMy/5/Kgto9Iy91BXFOzQFYAzo7oR7nDk4G8fP95ylvZOnZNa?=
+ =?us-ascii?Q?6xmtuzn0f7k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(52116014)(366016)(7416014)(38350700014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?b4kDI+jEDTw/pBnhMTI/ZGWoYv/vbTaJ+WB/a+t0vvvD4bo5jbcYC7Pbc0Cy?=
+ =?us-ascii?Q?W32xqNG4ehKhRaea7/UoJWieh+3hex1DaqYTMa+lY1jSIpFD0R+v9DSrOfIt?=
+ =?us-ascii?Q?tKUKlUuPKfbuFZexye2vT5HcvKgppB7bH7wdV4j7OcJjhRcCCEWDN5g1Hhk7?=
+ =?us-ascii?Q?uTjGujM1fhOGSD3c6GkWMJJQOV/YdBTAdOfaHC3Jj7ssmewqSvLYTO7iau57?=
+ =?us-ascii?Q?WLGdd20mu+LnNbRpIQyYOIMY1hfMJUbq19GhFaPSS2xCQIyMh+DaIHol8Rxj?=
+ =?us-ascii?Q?OpCLAsgxTgLgqAQknKqobF7klJdRzPmgT66Ly/bCdm+TUZ0131UtHN9bNVBA?=
+ =?us-ascii?Q?dEuHtbRi6az68y+ALVuhhQmJNhcSSvR6RuEqFt5jw+gf4GsTZl8veqNWxRTs?=
+ =?us-ascii?Q?xQ4hhqABiAHNir0Uy1/MRbi2SEPWxGLtkSbcwJ9mrj6BW9K4CODpMweKyG9i?=
+ =?us-ascii?Q?BiJvaeGlArVZYo3ziHHBmiQgZIXHbFcWZ6JYM6tfl+uUuKhAC9M8bLjfAfz3?=
+ =?us-ascii?Q?0Be+P4oxKzsOlnlb5ekAeHu38NWFbxZcKly6MxcbFflT4pT15jFsA/eRIqj1?=
+ =?us-ascii?Q?ks7jrL9YoSRD2lwK8h3miUB6sjEszCGY+oATI6eEj/wQSQhfOgGikJWhtrgE?=
+ =?us-ascii?Q?JhU1tFdC3cfvGL7vR4Ag/nlGP5uSrLRkGUkQkyEjoTMKmvP5TNBiC8qqm+Uo?=
+ =?us-ascii?Q?PKzGFeiX7mEkHW6XCUUJLD+H27idWvHKybC8HDUf5nzNdhUvZxsN2FaJnbMr?=
+ =?us-ascii?Q?Qf/7RekcyBA4OfvNQVsywkY4hDfya847hQFyb/GdoCKHIfPwVYdF7S/lBcyN?=
+ =?us-ascii?Q?U1bnaUNr6XIABhr1ViheW6vMqXe8fliS2s/wfQ+HJ+xaEb4c7hzhcDwbC9OE?=
+ =?us-ascii?Q?xgdeTmMQj8y5nGhEL2KIb8QRcL882prF+OkTE+jKa/zZKjWBpXUYigOj6Gsn?=
+ =?us-ascii?Q?TKKpJH2DqcRpSQavmJ6cgYezooJO/WWml4bAVE6vA7Jxd5EwF5QlJAjhthlc?=
+ =?us-ascii?Q?6XRAS+lphj4h2OQN0NLqTY8dT75tmnZnIQQWC/kOgpACW6jTwMR6Cf91sVRj?=
+ =?us-ascii?Q?B0yTWTz0oOVUJSrytrUkgWYQAMxxwzjtN2BtOZSD0Uk5qRrrVVTQIonp8/kx?=
+ =?us-ascii?Q?oVW6PtzV3S2Snq4TI+CufVzuSXz8XjJxDLBp5Z6KYzNWUt3727UL60+U0nHg?=
+ =?us-ascii?Q?GqgLrToY9u50PAMq5DDDtJzxBxP7zRKQ6/76GjIuWQNt08XpLcxkI5KJgBna?=
+ =?us-ascii?Q?BFx0SYLRpPqqODgMgqB8jgKRuwdbfWHaFQ1wjmf+LiGZ/Iin1grGP5wlBqGw?=
+ =?us-ascii?Q?icMxzWRvPwlRVx3l8PsHlw5eOobxi3xvpmaTZlVGaZe8ldKqSBetxRI3Paph?=
+ =?us-ascii?Q?1wsLQu23qZfzOs057wCdbNAAArpz3Gxny3/dfgOMYkteVmssgX7oRipuSCjP?=
+ =?us-ascii?Q?JhkiKdeZzhPzkiD7rwJTTaAD4LJewOIPBy7oLrvtAZK8F6a1SknhijFxXQOj?=
+ =?us-ascii?Q?vCr8KlTbyFkAsssJptqev9BD6J9HNlYEZx99wJbwdfGm0TrArhcaiEL0o/cY?=
+ =?us-ascii?Q?2y2Zdqy4KQzXQVZcwZG5eNg5MP7hZx3aIDQrXiYvgsl4wReu8mdZ1ZmcMEL5?=
+ =?us-ascii?Q?gQ=3D=3D?=
+X-OriginatorOrg: fibocom.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0ffc7d9-7c56-4d40-bd82-08dca1521929
+X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2024 02:35:16.4018
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: L/Qhg8wA6Q7/6RMfA4YiFKRZGi8MZb5cbHYzDiRkFrB5N8A9X6iqfWcKjpw3RiKazhjkugyFGz/iLT3z5cA+9W0O1hSeFjctm5q0ohNS7e8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR02MB5713
 
-On Mon, Jun 24, 2024 at 6:42=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Chengen Du wrote:
-> > On Thu, Jun 20, 2024 at 3:36=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Chengen Du wrote:
-> > > > On Tue, Jun 18, 2024 at 5:24=E2=80=AFPM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Jiri Pirko wrote:
-> > > > > > Mon, Jun 17, 2024 at 09:07:58PM CEST, willemdebruijn.kernel@gma=
-il.com wrote:
-> > > > > > >Jiri Pirko wrote:
-> > > > > > >> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical.c=
-om wrote:
-> > > > > > >> >The issue initially stems from libpcap. The ethertype will =
-be overwritten
-> > > > > > >> >as the VLAN TPID if the network interface lacks hardware VL=
-AN offloading.
-> > > > > > >> >In the outbound packet path, if hardware VLAN offloading is=
- unavailable,
-> > > > > > >> >the VLAN tag is inserted into the payload but then cleared =
-from the sk_buff
-> > > > > > >> >struct. Consequently, this can lead to a false negative whe=
-n checking for
-> > > > > > >> >the presence of a VLAN tag, causing the packet sniffing out=
-come to lack
-> > > > > > >> >VLAN tag information (i.e., TCI-TPID). As a result, the pac=
-ket capturing
-> > > > > > >> >tool may be unable to parse packets as expected.
-> > > > > > >> >
-> > > > > > >> >The TCI-TPID is missing because the prb_fill_vlan_info() fu=
-nction does not
-> > > > > > >> >modify the tp_vlan_tci/tp_vlan_tpid values, as the informat=
-ion is in the
-> > > > > > >> >payload and not in the sk_buff struct. The skb_vlan_tag_pre=
-sent() function
-> > > > > > >> >only checks vlan_all in the sk_buff struct. In cooked mode,=
- the L2 header
-> > > > > > >> >is stripped, preventing the packet capturing tool from dete=
-rmining the
-> > > > > > >> >correct TCI-TPID value. Additionally, the protocol in SLL i=
-s incorrect,
-> > > > > > >> >which means the packet capturing tool cannot parse the L3 h=
-eader correctly.
-> > > > > > >> >
-> > > > > > >> >Link: https://github.com/the-tcpdump-group/libpcap/issues/1=
-105
-> > > > > > >> >Link: https://lore.kernel.org/netdev/20240520070348.26725-1=
--chengen.du@canonical.com/T/#u
-> > > > > > >> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace=
-")
-> > > > > > >> >Cc: stable@vger.kernel.org
-> > > > > > >> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> > > > > > >> >---
-> > > > > > >> > net/packet/af_packet.c | 86 ++++++++++++++++++++++++++++++=
-+++++++++++-
-> > > > > > >> > 1 file changed, 84 insertions(+), 2 deletions(-)
-> > > > > > >> >
-> > > > > > >> >diff --git a/net/packet/af_packet.c b/net/packet/af_packet.=
-c
-> > > > > > >> >index ea3ebc160e25..84e8884a77e3 100644
-> > > > > > >> >--- a/net/packet/af_packet.c
-> > > > > > >> >+++ b/net/packet/af_packet.c
-> > > > > > >> >@@ -538,6 +538,61 @@ static void *packet_current_frame(stru=
-ct packet_sock *po,
-> > > > > > >> >  return packet_lookup_frame(po, rb, rb->head, status);
-> > > > > > >> > }
-> > > > > > >> >
-> > > > > > >> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_de=
-vice *dev)
-> > > > > > >> >+{
-> > > > > > >> >+ struct vlan_hdr vhdr, *vh;
-> > > > > > >> >+ u8 *skb_orig_data =3D skb->data;
-> > > > > > >> >+ int skb_orig_len =3D skb->len;
-> > > > > > >> >+ unsigned int header_len;
-> > > > > > >> >+
-> > > > > > >> >+ if (!dev)
-> > > > > > >> >+         return 0;
-> > > > > > >> >+
-> > > > > > >> >+ /* In the SOCK_DGRAM scenario, skb data starts at the net=
-work
-> > > > > > >> >+  * protocol, which is after the VLAN headers. The outer V=
-LAN
-> > > > > > >> >+  * header is at the hard_header_len offset in non-variabl=
-e
-> > > > > > >> >+  * length link layer headers. If it's a VLAN device, the
-> > > > > > >> >+  * min_header_len should be used to exclude the VLAN head=
-er
-> > > > > > >> >+  * size.
-> > > > > > >> >+  */
-> > > > > > >> >+ if (dev->min_header_len =3D=3D dev->hard_header_len)
-> > > > > > >> >+         header_len =3D dev->hard_header_len;
-> > > > > > >> >+ else if (is_vlan_dev(dev))
-> > > > > > >> >+         header_len =3D dev->min_header_len;
-> > > > > > >> >+ else
-> > > > > > >> >+         return 0;
-> > > > > > >> >+
-> > > > > > >> >+ skb_push(skb, skb->data - skb_mac_header(skb));
-> > > > > > >> >+ vh =3D skb_header_pointer(skb, header_len, sizeof(vhdr), =
-&vhdr);
-> > > > > > >> >+ if (skb_orig_data !=3D skb->data) {
-> > > > > > >> >+         skb->data =3D skb_orig_data;
-> > > > > > >> >+         skb->len =3D skb_orig_len;
-> > > > > > >> >+ }
-> > > > > > >> >+ if (unlikely(!vh))
-> > > > > > >> >+         return 0;
-> > > > > > >> >+
-> > > > > > >> >+ return ntohs(vh->h_vlan_TCI);
-> > > > > > >> >+}
-> > > > > > >> >+
-> > > > > > >> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
-> > > > > > >> >+{
-> > > > > > >> >+ __be16 proto =3D skb->protocol;
-> > > > > > >> >+
-> > > > > > >> >+ if (unlikely(eth_type_vlan(proto))) {
-> > > > > > >> >+         u8 *skb_orig_data =3D skb->data;
-> > > > > > >> >+         int skb_orig_len =3D skb->len;
-> > > > > > >> >+
-> > > > > > >> >+         skb_push(skb, skb->data - skb_mac_header(skb));
-> > > > > > >> >+         proto =3D __vlan_get_protocol(skb, proto, NULL);
-> > > > > > >> >+         if (skb_orig_data !=3D skb->data) {
-> > > > > > >> >+                 skb->data =3D skb_orig_data;
-> > > > > > >> >+                 skb->len =3D skb_orig_len;
-> > > > > > >> >+         }
-> > > > > > >> >+ }
-> > > > > > >> >+
-> > > > > > >> >+ return proto;
-> > > > > > >> >+}
-> > > > > > >> >+
-> > > > > > >> > static void prb_del_retire_blk_timer(struct tpacket_kbdq_c=
-ore *pkc)
-> > > > > > >> > {
-> > > > > > >> >  del_timer_sync(&pkc->retire_blk_timer);
-> > > > > > >> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct=
- tpacket_kbdq_core *pkc,
-> > > > > > >> > static void prb_fill_vlan_info(struct tpacket_kbdq_core *p=
-kc,
-> > > > > > >> >                  struct tpacket3_hdr *ppd)
-> > > > > > >> > {
-> > > > > > >> >+ struct packet_sock *po =3D container_of(pkc, struct packe=
-t_sock, rx_ring.prb_bdqc);
-> > > > > > >> >+
-> > > > > > >> >  if (skb_vlan_tag_present(pkc->skb)) {
-> > > > > > >> >          ppd->hv1.tp_vlan_tci =3D skb_vlan_tag_get(pkc->sk=
-b);
-> > > > > > >> >          ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->vlan_pr=
-oto);
-> > > > > > >> >          ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_STAT=
-US_VLAN_TPID_VALID;
-> > > > > > >> >+ } else if (unlikely(po->sk.sk_type =3D=3D SOCK_DGRAM && e=
-th_type_vlan(pkc->skb->protocol))) {
-> > > > > > >> >+         ppd->hv1.tp_vlan_tci =3D vlan_get_tci(pkc->skb, p=
-kc->skb->dev);
-> > > > > > >> >+         ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->protoco=
-l);
-> > > > > > >> >+         ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_STAT=
-US_VLAN_TPID_VALID;
-> > > > > > >> >  } else {
-> > > > > > >> >          ppd->hv1.tp_vlan_tci =3D 0;
-> > > > > > >> >          ppd->hv1.tp_vlan_tpid =3D 0;
-> > > > > > >> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buf=
-f *skb, struct net_device *dev,
-> > > > > > >> >                  h.h2->tp_vlan_tci =3D skb_vlan_tag_get(sk=
-b);
-> > > > > > >> >                  h.h2->tp_vlan_tpid =3D ntohs(skb->vlan_pr=
-oto);
-> > > > > > >> >                  status |=3D TP_STATUS_VLAN_VALID | TP_STA=
-TUS_VLAN_TPID_VALID;
-> > > > > > >> >+         } else if (unlikely(sk->sk_type =3D=3D SOCK_DGRAM=
- && eth_type_vlan(skb->protocol))) {
-> > > > > > >> >+                 h.h2->tp_vlan_tci =3D vlan_get_tci(skb, s=
-kb->dev);
-> > > > > > >> >+                 h.h2->tp_vlan_tpid =3D ntohs(skb->protoco=
-l);
-> > > > > > >> >+                 status |=3D TP_STATUS_VLAN_VALID | TP_STA=
-TUS_VLAN_TPID_VALID;
-> > > > > > >> >          } else {
-> > > > > > >> >                  h.h2->tp_vlan_tci =3D 0;
-> > > > > > >> >                  h.h2->tp_vlan_tpid =3D 0;
-> > > > > > >> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff=
- *skb, struct net_device *dev,
-> > > > > > >> >  sll->sll_halen =3D dev_parse_header(skb, sll->sll_addr);
-> > > > > > >> >  sll->sll_family =3D AF_PACKET;
-> > > > > > >> >  sll->sll_hatype =3D dev->type;
-> > > > > > >> >- sll->sll_protocol =3D skb->protocol;
-> > > > > > >> >+ sll->sll_protocol =3D (sk->sk_type =3D=3D SOCK_DGRAM) ?
-> > > > > > >> >+         vlan_get_protocol_dgram(skb) : skb->protocol;
-> > > > > > >> >  sll->sll_pkttype =3D skb->pkt_type;
-> > > > > > >> >  if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
-> > > > > > >> >          sll->sll_ifindex =3D orig_dev->ifindex;
-> > > > > > >> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct sock=
-et *sock, struct msghdr *msg, size_t len,
-> > > > > > >> >          /* Original length was stored in sockaddr_ll fiel=
-ds */
-> > > > > > >> >          origlen =3D PACKET_SKB_CB(skb)->sa.origlen;
-> > > > > > >> >          sll->sll_family =3D AF_PACKET;
-> > > > > > >> >-         sll->sll_protocol =3D skb->protocol;
-> > > > > > >> >+         sll->sll_protocol =3D (sock->type =3D=3D SOCK_DGR=
-AM) ?
-> > > > > > >> >+                 vlan_get_protocol_dgram(skb) : skb->proto=
-col;
-> > > > > > >> >  }
-> > > > > > >> >
-> > > > > > >> >  sock_recv_cmsgs(msg, sk, skb);
-> > > > > > >> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct soc=
-ket *sock, struct msghdr *msg, size_t len,
-> > > > > > >> >                  aux.tp_vlan_tci =3D skb_vlan_tag_get(skb)=
-;
-> > > > > > >> >                  aux.tp_vlan_tpid =3D ntohs(skb->vlan_prot=
-o);
-> > > > > > >> >                  aux.tp_status |=3D TP_STATUS_VLAN_VALID |=
- TP_STATUS_VLAN_TPID_VALID;
-> > > > > > >> >+         } else if (unlikely(sock->type =3D=3D SOCK_DGRAM =
-&& eth_type_vlan(skb->protocol))) {
-> > > > > > >>
-> > > > > > >> I don't understand why this would be needed here. We spent q=
-uite a bit
-> > > > > > >> of efford in the past to make sure vlan header is always str=
-ipped.
-> > > > > > >> Could you fix that in tx path to fulfill the expectation?
-> > > > > > >
-> > > > > > >Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
-> > > > > > >
-> > > > > > >I also wondered whether we should just convert the skb for thi=
-s case
-> > > > > > >with skb_vlan_untag, to avoid needing new PF_PACKET logic to h=
-andle
-> > > > > > >unstripped tags in the packet socket code. But it seems equall=
-y
-> > > > > > >complex.
-> > > > > >
-> > > > > > Correct. skb_vlan_untag() as a preparation of skb before this f=
-unction
-> > > > > > is called is exactly what I was suggesting.
-> > > > >
-> > > > > It's not necessarily simpler, as that function expects skb->data =
-to
-> > > > > point to the (outer) VLAN header.
-> > > > >
-> > > > > It will pull that one, but not any subsequent ones.
-> > > > >
-> > > > > SOCK_DGRAM expects skb->data to point to the network layer header=
-.
-> > > > > And we only want to make this change for SOCK_DGRAM and if auxdat=
-a is
-> > > > > requested.
-> > > > >
-> > > > > Not sure that it will be simpler. But worth a look at least.
-> > > >
-> > > > Thank you for your suggestion.
-> > > >
-> > > > I have analyzed the code and considered a feasible approach. We cou=
-ld
-> > > > call skb_vlan_untag() in packet_rcv before pushing skb into
-> > > > sk->sk_receive_queue.
-> > >
-> > > Only for SOCK_DGRAM.
-> > >
-> > > And there is some user risk, as they will see different packets on
-> > > the same devices as before. A robust program should work for both
-> > > vlan stripped and unstripped, and the unstripped case is already
-> > > broken wrt sll_protocol returned, so I suppose this is acceptable.
-> > >
-> > > > We would also need to determine if auxdata is
-> > > > required to maintain performance, which might cause the logic of
-> > > > judging PACKET_SOCK_AUXDATA to be spread across both the packet_rcv=
-()
-> > > > and packet_recvmsg() functions.
-> > >
-> > > You mean to only make the above change if SOCK_DGRAM and auxdata is
-> > > requested?
-> >
-> > Yes, we can constrain the performance overhead to specific scenarios th=
-is way.
-> >
-> > >
-> > > Btw, also tpacket_rcv, where auxdata is always returned.
-> > >
-> > > > The skb_vlan_untag() function handles VLANs in a more comprehensive
-> > > > way, but it seems to have a greater performance impact compared to =
-our
-> > > > current approach.
-> > >
-> > > I was afraid of that too. The skb_share_check is fine, as this also
-> > > exists in packet_rcv, before we would call skb_vlan_untag.
-> > >
-> > > A bigger issue: this only pulls the outer tag. So we still need to
-> > > handle the vlan stacking case correctly manually.
-> >
-> > It seems we are on the same page. The need to manually handle VLAN
-> > stacking is a significant concern. Since the code is in the critical
-> > path, we must carefully manage the performance overhead. Given that
-> > the current method is more efficient than calling skb_vlan_untag(), I
-> > propose retaining the patch as is. Please let me know if there are any
-> > other concerns.
->
-> I agree.
+Add support for t7xx WWAN device to debug by ADB (Android Debug Bridge)
+port and MTK MIPCi (Modem Information Process Center) port.
 
-I apologize for any inconvenience. May I ask when this patch will be
-merged? Or is there anything I need to do to help the patch proceed?
+Application can use ADB (Android Debg Bridge) port to implement
+functions (shell, pull, push ...) by ADB protocol commands.
+
+Application can use MIPC (Modem Information Process Center) port
+to debug antenna tunner or noise profiling through this MTK modem
+diagnostic interface.
+
+Jinjian Song (2):
+  wwan: core: Add WWAN ADB and MIPC port type
+  net: wwan: t7xx: Add debug port
+
+ .../networking/device_drivers/wwan/t7xx.rst   | 47 +++++++++++++
+ drivers/net/wwan/t7xx/t7xx_pci.c              | 67 +++++++++++++++++--
+ drivers/net/wwan/t7xx/t7xx_pci.h              |  7 ++
+ drivers/net/wwan/t7xx/t7xx_port.h             |  3 +
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c       | 45 ++++++++++++-
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h       |  1 +
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c        |  8 ++-
+ drivers/net/wwan/wwan_core.c                  |  8 +++
+ include/linux/wwan.h                          |  4 ++
+ 9 files changed, 180 insertions(+), 10 deletions(-)
+
+-- 
+2.34.1
+
 
