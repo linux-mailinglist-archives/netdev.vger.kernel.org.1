@@ -1,231 +1,200 @@
-Return-Path: <netdev+bounces-110725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9890392DF44
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4325692DF67
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EACF6B21FA9
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:00:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA7BCB217F8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6C0101E4;
-	Thu, 11 Jul 2024 05:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CA158AA5;
+	Thu, 11 Jul 2024 05:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arctic-alpaca.de header.i=@arctic-alpaca.de header.b="w4l+n0Lm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5CD20312
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 05:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF911C3D;
+	Thu, 11 Jul 2024 05:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720674022; cv=none; b=qpuBGlrZSxQ6lwC76wQF1CuC3RmD6/CjBd5zfogLsRuWgFXqN7jamYS25nkMwnYrf5+XUVJuSX2G2dK9UYxrxEKQ1kPpcXGWwiJB7dRlYW3YyvA4EV8f8dh1pD0F32wVqdae36q+eZLiNFrtaw1/9lJ5RimoCGKz+c/b+7N44uU=
+	t=1720675398; cv=none; b=MLdeETwAqXwDbKFK2033k91/exBbIYXFq5MgdaHWvAQLjJ2sMTDMmiC8DsWyLZyVhnxWNQeKigFqi3mVB2FeIUpt6m71NY03480mGPDupMwO6XYRULNWHcKK8QzReWk7vMz4imYYgk/3U2mnn8p5IVTGuu1B9zOoX0KEnqmtJOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720674022; c=relaxed/simple;
-	bh=Ju3XI7m5dWN8Ee91J2zjjYNo5yFJLecnNkNFZKoniUk=;
+	s=arc-20240116; t=1720675398; c=relaxed/simple;
+	bh=/BAq8GeYl0f8uRjyRxKchiS4fHmoZyohGvOCnZLqUpY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o/9PKnqh9QaeE6OseG1SW6NaSqhsP3dIxUM91gxFGEaXsEk3Yyg8gMTkESyqHEN5WXGNVOzV9ipfUVbhntORQD9r7jGs2TMNLDNwkgxWEzBNPFP5ogmRqzmMSNUn8+F1qfokrPaf24LpatnDcGoG1bxN36tgn7WOB0pI5GsRJO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af435.dynamic.kabel-deutschland.de [95.90.244.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 In-Reply-To:Content-Type; b=Xt401i20xuGYxWsiWORtIizdGrAU3GFBjgMa7JbacETUOfaaGAzWhWayJLCcP0Z0W96NJeLleJXM2z7bTZYeLE5/ucTzzLV+w/1bLRn+iZ0N2xrnes1pHjFT7iH4TxL5utBc+K0rK32tFaR3KjztYV1qVf/N5IynOmKAvyAm74E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arctic-alpaca.de; spf=pass smtp.mailfrom=arctic-alpaca.de; dkim=pass (2048-bit key) header.d=arctic-alpaca.de header.i=@arctic-alpaca.de header.b=w4l+n0Lm; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arctic-alpaca.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arctic-alpaca.de
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A9F4861E4050B;
-	Thu, 11 Jul 2024 06:59:46 +0200 (CEST)
-Message-ID: <b0a70c97-2a25-4dca-9db1-aca64206a53c@molgen.mpg.de>
-Date: Thu, 11 Jul 2024 06:59:46 +0200
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4WKNRB56fnz9sdP;
+	Thu, 11 Jul 2024 07:23:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arctic-alpaca.de;
+	s=MBO0001; t=1720675382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vxdp8bD7n13IR48G3OzaEyi5Mam7ihLD4sdP+q1Ew2w=;
+	b=w4l+n0LmLn9ahUSGYqaB/lcc/hwGxt+Q042pa1I+e3lpFRtyW5rEqgYsY7bht6Imj+qYF2
+	Fpu2eZQq26T3DBpgBRuIw/OpjB0+1+q89gx7JtVQyF/6zoUAMrsV3NB0vmY/33z7zQg+N9
+	GMtmnAfG0rRmKygDjhNjgE2AIGbr4KVku2Khw1KnPl81zvFS956MDHc+1tcJRlR9KYUHg7
+	PmDbJEd1/3CFAiTxu/VDzPRk9OqAhypta0ZPNJbQ2089SpRak2Fx1ryldNZ74Rm5wbvNx8
+	aDgXwJ/qsKcYY+Q7kde8g/VWLQGDFpmcjzKufwbYJfboWHXpLZ4MWmluLsw7bA==
+Message-ID: <8a527e65-8677-43be-8c8d-ffc5d351f8fb@arctic-alpaca.de>
+Date: Thu, 11 Jul 2024 07:23:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 10/13] ice: add method to
- disable FDIR SWAP option
-To: Ahmed Zaki <ahmed.zaki@intel.com>, Junfeng Guo <junfeng.guo@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Marcin Szycik <marcin.szycik@linux.intel.com>, anthony.l.nguyen@intel.com,
- horms@kernel.org
-References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-11-ahmed.zaki@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240710204015.124233-11-ahmed.zaki@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: xdp/xsk.c: Possible bug in xdp_umem_reg version check
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, bpf@vger.kernel.org,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@google.com>, netdev@vger.kernel.org
+References: <2d6ff64a-5e2c-4078-a8d1-84f1ff3361ce@arctic-alpaca.de>
+ <CAJ8uoz0w9RhAk2v4G-FSzjOCqitCPhEXOC6c_PcOFr7PxTjbWg@mail.gmail.com>
+ <485c0bfb-8202-4520-92e9-e2bbbf6ac89b@arctic-alpaca.de>
+ <Zo4R22FQeu_Ou7Gd@mini-arch>
+ <9f464c87-b211-4aa6-a77f-c0d6ea1c025f@arctic-alpaca.de>
+ <Zo9WCnMFSs775MSd@mini-arch>
+Content-Language: de-DE, en-US
+From: Julian Schindel <mail@arctic-alpaca.de>
+In-Reply-To: <Zo9WCnMFSs775MSd@mini-arch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4WKNRB56fnz9sdP
 
-Dear Ahmed, dear Junfeng,
+On 11.07.24 05:48, Stanislav Fomichev wrote:
+> On 07/10, Julian Schindel wrote:
+>> On 10.07.24 06:45, Stanislav Fomichev wrote:
+>>> On 07/09, Julian Schindel wrote:
+>>>> On 09.07.24 11:23, Magnus Karlsson wrote:
+>>>>> On Sun, 7 Jul 2024 at 17:06, Julian Schindel <mail@arctic-alpaca.de> wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> [...]
+>>>>> Thank you for reporting this Julian. This seems to be a bug. If I
+>>>>> check the value of sizeof(struct xdp_umem_reg_v2), I get 32 bytes too
+>>>>> on my system, compiling with gcc 11.4. I am not a compiler guy so do
+>>>>> not know what the rules are for padding structs, but I read the
+>>>>> following from [0]:
+>>>>>
+>>>>> "Pad the entire struct to a multiple of 64-bits if the structure
+>>>>> contains 64-bit types - the structure size will otherwise differ on
+>>>>> 32-bit versus 64-bit. Having a different structure size hurts when
+>>>>> passing arrays of structures to the kernel, or if the kernel checks
+>>>>> the structure size, which e.g. the drm core does."
+>>>>>
+>>>>> I compiled for 64-bits and I believe you did too, but we still get
+>>>>> this padding. 
+>>>> Yes, I did also compile for 64-bits. If I understood the resource you
+>>>> linked correctly, the compiler automatically adding padding to align to
+>>>> 64-bit boundaries is expected for 64-bit platforms:
+>>>>
+>>>> "[...] 32-bit platforms don’t necessarily align 64-bit values to 64-bit
+>>>> boundaries, but 64-bit platforms do. So we always need padding to the
+>>>> natural size to get this right."
+>>>>> What is sizeof(struct xdp_umem_reg) for you before the
+>>>>> patch that added tx_metadata_len?
+>>>> I would expect this to be the same as sizeof(struct xdp_umem_reg_v2)
+>>>> after the patch. I'm not sure how to check this with different kernel
+>>>> versions.
+>>>>
+>>>> Maybe the following code helps show all the sizes
+>>>> of xdp_umem_reg[_v1/_v2] on my system (compiled with "gcc test.c -o
+>>>> test" using gcc 14.1.1):
+>>>>
+>>>> #include <stdio.h>
+>>>> #include <sys/types.h>
+>>>>
+>>>> typedef __uint32_t __u32;
+>>>> typedef __uint64_t __u64;
+>>>>
+>>>> struct xdp_umem_reg_v1  {
+>>>>     __u64 addr; /* Start of packet data area */
+>>>>     __u64 len; /* Length of packet data area */
+>>>>     __u32 chunk_size;
+>>>>     __u32 headroom;
+>>>> };
+>>>>
+>>>> struct xdp_umem_reg_v2 {
+>>>>     __u64 addr; /* Start of packet data area */
+>>>>     __u64 len; /* Length of packet data area */
+>>>>     __u32 chunk_size;
+>>>>     __u32 headroom;
+>>>>     __u32 flags;
+>>>> };
+>>>>
+>>>> struct xdp_umem_reg {
+>>>>     __u64 addr; /* Start of packet data area */
+>>>>     __u64 len; /* Length of packet data area */
+>>>>     __u32 chunk_size;
+>>>>     __u32 headroom;
+>>>>     __u32 flags;
+>>>>     __u32 tx_metadata_len;
+>>>> };
+>>>>
+>>>> int main() {
+>>>>     printf("__u32: \t\t\t %lu\n", sizeof(__u32));
+>>>>     printf("__u64: \t\t\t %lu\n", sizeof(__u64));
+>>>>     printf("xdp_umem_reg_v1: \t %lu\n", sizeof(struct xdp_umem_reg_v1));
+>>>>     printf("xdp_umem_reg_v2: \t %lu\n", sizeof(struct xdp_umem_reg_v2));
+>>>>     printf("xdp_umem_reg: \t\t %lu\n", sizeof(struct xdp_umem_reg));
+>>>> }
+>>>>
+>>>> Running "./test" produced this output:
+>>>>
+>>>> __u32:                   4
+>>>> __u64:                   8
+>>>> xdp_umem_reg_v1:         24
+>>>> xdp_umem_reg_v2:         32
+>>>> xdp_umem_reg:            32
+>>>>> [0]: https://www.kernel.org/doc/html/v5.4/ioctl/botching-up-ioctls.html
+>>> Hmm, true, this means our version check won't really work :-/ I don't
+>>> see a good way to solve it without breaking the uapi. We can either
+>>> add some new padding field to xdp_umem_reg to make it larger than _v2.
+>>> Or we can add a new flag to signify the presence of tx_metadata_len
+>>> and do the validation based on that.
+>>>
+>>> Btw, what are you using to setup umem? Looking at libxsk, it does
+>>> `memset(&mr, 0, sizeof(mr));` which should clear the padding as well.
+>> I'm using "setsockopt" directly with Rust bindings and the C
+>> representation of Rust structs [1]. I'm guessing the compiler is not
+>> zeroing the padding, which is why I encountered the issue.
+>>
+>> [1]:
+>> https://doc.rust-lang.org/reference/type-layout.html#the-c-representation
+> Awesome, thanks for confirming! I guess for now you can work it around
+> by having an explicit padding field and setting it to zero?
 
+Yes,the issue isn't blocking for me.
+> For a long-term fix, I'm leaning towards adding new umem flag as
+> a signal to the kernel to interpret this as a tx_metadata_len. But
+> this is gonna break any existing users that set this value. Hopefully
+> should not be a lot of them since it is a pretty recent functionality.
+>
+> I'm also gonna sprinkle some compile time asserts to make sure we can extend
+> xdp_umem_reg in the future without hitting the same issue again. I'm a
+> bit spoiled by sys_bpf which takes care of enforcing the padding being
+> zero.
 
-Thank you for the patch.
+Sounds good to me, I cannot think of any non-breaking solution.
+Thank you for taking care of the issue!
 
+>
+> Magnus, any better ideas?
 
-Am 10.07.24 um 22:40 schrieb Ahmed Zaki:
-> From: Junfeng Guo <junfeng.guo@intel.com>
-> 
-> The SWAP Flag in the FDIR Programming Descriptor doesn't work properly,
-> it is always set and cannot be unset (hardware bug).
-
-Please document the datasheet/errata.
-
-> Thus, add a method
-> to effectively disable the FDIR SWAP option by setting the FDSWAP instead
-> of FDINSET registers.
-
-Please paste the new debug messages.
-
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
->   .../net/ethernet/intel/ice/ice_flex_pipe.c    | 52 ++++++++++++++++++-
->   .../net/ethernet/intel/ice/ice_flex_pipe.h    |  4 +-
->   drivers/net/ethernet/intel/ice/ice_flow.c     |  2 +-
->   3 files changed, 54 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> index 20d5db88c99f..a750d7e1edd8 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> @@ -2981,6 +2981,51 @@ ice_add_prof_attrib(struct ice_prof_map *prof, u8 ptg, u16 ptype,
->   }
->   
->   /**
-> + * ice_disable_fd_swap - set register appropriately to disable FD swap
-
-Below you write SWAP all uppercase.
-
-> + * @hw: pointer to the HW struct
-> + * @prof_id: profile ID
-> + *
-> + * Return: Void.
-> + */
-> +static void
-> +ice_disable_fd_swap(struct ice_hw *hw, u8 prof_id)
-> +{
-> +	u16 swap_val, i, fvw_num;
-
-Try to use non-fixed-width types, where possible.
-
-> +
-> +	swap_val = ICE_SWAP_VALID;
-> +	fvw_num = hw->blk[ICE_BLK_FD].es.fvw / ICE_FDIR_REG_SET_SIZE;
-> +
-> +	/* Since the SWAP Flag in the Programming Desc doesn't work,
-> +	 * here add method to disable the SWAP Option via setting
-> +	 * certain SWAP and INSET register sets.
-> +	 */
-> +	for (i = 0; i < fvw_num ; i++) {
-> +		u32 raw_swap, raw_in;
-> +		u8 j;
-
-unsigned int
-
-> +
-> +		raw_swap = 0;
-> +		raw_in = 0;
-> +
-> +		for (j = 0; j < ICE_FDIR_REG_SET_SIZE; j++) {
-> +			raw_swap |= (swap_val++) << (j * BITS_PER_BYTE);
-> +			raw_in |= ICE_INSET_DFLT << (j * BITS_PER_BYTE);
-> +		}
-> +
-> +		/* write the FDIR swap register set */
-> +		wr32(hw, GLQF_FDSWAP(prof_id, i), raw_swap);
-> +
-> +		ice_debug(hw, ICE_DBG_INIT, "swap wr(%d, %d): 0x%x = 0x%08x\n",
-> +			  prof_id, i, GLQF_FDSWAP(prof_id, i), raw_swap);
-> +
-> +		/* write the FDIR inset register set */
-> +		wr32(hw, GLQF_FDINSET(prof_id, i), raw_in);
-> +
-> +		ice_debug(hw, ICE_DBG_INIT, "inset wr(%d, %d): 0x%x = 0x%08x\n",
-> +			  prof_id, i, GLQF_FDINSET(prof_id, i), raw_in);
-> +	}
-> +}
-> +
-> +/*
->    * ice_add_prof - add profile
->    * @hw: pointer to the HW struct
->    * @blk: hardware block
-> @@ -2991,6 +3036,7 @@ ice_add_prof_attrib(struct ice_prof_map *prof, u8 ptg, u16 ptype,
->    * @es: extraction sequence (length of array is determined by the block)
->    * @masks: mask for extraction sequence
->    * @symm: symmetric setting for RSS profiles
-> + * @fd_swap: enable/disable FDIR paired src/dst fields swap option
->    *
->    * This function registers a profile, which matches a set of PTYPES with a
->    * particular extraction sequence. While the hardware profile is allocated
-> @@ -3000,7 +3046,7 @@ ice_add_prof_attrib(struct ice_prof_map *prof, u8 ptg, u16 ptype,
->   int
->   ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
->   	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
-> -	     struct ice_fv_word *es, u16 *masks, bool symm)
-> +	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap)
->   {
->   	u32 bytes = DIV_ROUND_UP(ICE_FLOW_PTYPE_MAX, BITS_PER_BYTE);
->   	DECLARE_BITMAP(ptgs_used, ICE_XLT1_CNT);
-> @@ -3020,7 +3066,7 @@ ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
->   		status = ice_alloc_prof_id(hw, blk, &prof_id);
->   		if (status)
->   			goto err_ice_add_prof;
-> -		if (blk == ICE_BLK_FD) {
-> +		if (blk == ICE_BLK_FD && fd_swap) {
->   			/* For Flow Director block, the extraction sequence may
->   			 * need to be altered in the case where there are paired
->   			 * fields that have no match. This is necessary because
-> @@ -3031,6 +3077,8 @@ ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
->   			status = ice_update_fd_swap(hw, prof_id, es);
->   			if (status)
->   				goto err_ice_add_prof;
-> +		} else if (blk == ICE_BLK_FD) {
-> +			ice_disable_fd_swap(hw, prof_id);
->   		}
->   		status = ice_update_prof_masking(hw, blk, prof_id, masks);
->   		if (status)
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> index b39d7cdc381f..7c66652dadd6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> @@ -6,6 +6,8 @@
->   
->   #include "ice_type.h"
->   
-> +#define ICE_FDIR_REG_SET_SIZE	4
-> +
->   int
->   ice_acquire_change_lock(struct ice_hw *hw, enum ice_aq_res_access_type access);
->   void ice_release_change_lock(struct ice_hw *hw);
-> @@ -42,7 +44,7 @@ bool ice_hw_ptype_ena(struct ice_hw *hw, u16 ptype);
->   int
->   ice_add_prof(struct ice_hw *hw, enum ice_block blk, u64 id, u8 ptypes[],
->   	     const struct ice_ptype_attributes *attr, u16 attr_cnt,
-> -	     struct ice_fv_word *es, u16 *masks, bool symm);
-> +	     struct ice_fv_word *es, u16 *masks, bool symm, bool fd_swap);
->   struct ice_prof_map *
->   ice_search_prof_id(struct ice_hw *hw, enum ice_block blk, u64 id);
->   int
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-> index fc2b58f56279..79106503194b 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flow.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-> @@ -1400,7 +1400,7 @@ ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
->   	/* Add a HW profile for this flow profile */
->   	status = ice_add_prof(hw, blk, prof_id, (u8 *)params->ptypes,
->   			      params->attr, params->attr_cnt, params->es,
-> -			      params->mask, symm);
-> +			      params->mask, symm, true);
->   	if (status) {
->   		ice_debug(hw, ICE_DBG_FLOW, "Error adding a HW flow profile\n");
->   		goto out;
-
-
-Kind regards,
-
-Paul
 
