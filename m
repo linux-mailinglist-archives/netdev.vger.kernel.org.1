@@ -1,46 +1,50 @@
-Return-Path: <netdev+bounces-110767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7831192E398
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:40:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B63792E399
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBFC11F22661
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:40:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA716283573
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BBA157E6C;
-	Thu, 11 Jul 2024 09:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C517156C78;
+	Thu, 11 Jul 2024 09:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Br90p5AJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A985156C6A;
-	Thu, 11 Jul 2024 09:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6A613AA35
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720690813; cv=none; b=PjMORoiji+PL2zlJej/nve/FR9U48z993wJWKjfB+kELxKZBiQWBH5XQOJOJJIoE6biIfSIyElK6drDbhpD+/FXOJUvRSLIXb9l5f2fryI+Kgq+8xECkgeRXEHZsWMDuK1s7QEo6BzEzYu4BstkbRcCaLo/u6J/JNEUadbrpg8o=
+	t=1720690831; cv=none; b=O6oTDKG+q/IkRJnb49H5m4nTLHEg+kYvwXW3wZAgdo1nTf7rrhpy9/Fe+2z9IzcEqFa080ZCgeWpu0Z01BqkWBuDAw+t7yW2HLK/ntfrV94Xtw/Oxo0XifHbaBnmbtkN47xu3sn3MgR7+a8y2rBhGpw1hLeAjvc8gEIAL4lw7gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720690813; c=relaxed/simple;
-	bh=nmAQtcYg+BfBr+aYRUK8g+rK4FtLji+UyAB6smV50FQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RitXP6YsDdPV+eAIYipjqOdcc9xNuGlNtXPR10jV5qWV7TQmV7Y92mEE5Fp96stQ8TUOIWTPJ8P6vZ9e+qeK+QcdK4y8ZJKPUZgtgM7NVcJ30pDhYztPQwxbGGr3CvvSjmsNWSJcm8I6OrfG0+0jnuLO3yAZt/0xu0VhQArnV1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 2/2] netfilter: nf_tables: prefer nft_chain_validate
-Date: Thu, 11 Jul 2024 11:39:48 +0200
-Message-Id: <20240711093948.3816-3-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240711093948.3816-1-pablo@netfilter.org>
-References: <20240711093948.3816-1-pablo@netfilter.org>
+	s=arc-20240116; t=1720690831; c=relaxed/simple;
+	bh=W2568hclen+GOavVHJmTykZ8f++EWk/s13b3rkwUfOg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=f31ZVUksOIr/TTVaBM3Fg5NV235RaWIxBf6xVJbPEYrDXMZxW+tSY+Xmwet8UURDAd87tnsCTou0az6v0n1GtuLCUa5N1mQcfEmALPMBt1DrCEDzn2ZF9g6ikqdd9D/KD5Lg7nGRCOIuEUHLjglcV3IVnl/dNzkoJYqLTABfm2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Br90p5AJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1889FC32786;
+	Thu, 11 Jul 2024 09:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720690831;
+	bh=W2568hclen+GOavVHJmTykZ8f++EWk/s13b3rkwUfOg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Br90p5AJgWcIHGbME9fL1NeXhmKeP/bksy6duuchbmgxew8OvitSvlEYtoMbhpml4
+	 LLvzYn/CSDVkXTFdsV4L2hjijAMGeiWWPSk3sVzv1CoUgjBV7Fpl5YpkkdxdSrKe4H
+	 wmR41fgCFRwLlgGJFQ+TZBa3W2iBgb16voqFBaoxpnYGohBglGysN8vElJXn+a3e7x
+	 OW3l/yBmVU7f/eLy7MOmuRwdlxGy65zHKqc115iBSkbPxvULShUwY4Jzc3IgWBNE3t
+	 jEA3HW8IXK9iWDLXRlBnuqc6JxZSsBstPj8TSp2KNZ7qZqqun3qQE39+B2PLlpC7TC
+	 IQujQj3nnj6uw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0402DDAE95C;
+	Thu, 11 Jul 2024 09:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,234 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] udp: Set SOCK_RCU_FREE earlier in udp_lib_get_port().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172069083101.19088.6448598444769939054.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jul 2024 09:40:31 +0000
+References: <20240709191356.24010-1-kuniyu@amazon.com>
+In-Reply-To: <20240709191356.24010-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, willemdebruijn.kernel@gmail.com, dsahern@kernel.org,
+ joe@wand.net.nz, kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzkaller@googlegroups.com
 
-From: Florian Westphal <fw@strlen.de>
+Hello:
 
-nft_chain_validate already performs loop detection because a cycle will
-result in a call stack overflow (ctx->level >= NFT_JUMP_STACK_SIZE).
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-It also follows maps via ->validate callback in nft_lookup, so there
-appears no reason to iterate the maps again.
+On Tue, 9 Jul 2024 12:13:56 -0700 you wrote:
+> syzkaller triggered the warning [0] in udp_v4_early_demux().
+> 
+> In udp_v[46]_early_demux() and sk_lookup(), we do not touch the refcount
+> of the looked-up sk and use sock_pfree() as skb->destructor, so we check
+> SOCK_RCU_FREE to ensure that the sk is safe to access during the RCU grace
+> period.
+> 
+> [...]
 
-nf_tables_check_loops() and all its helper functions can be removed.
-This improves ruleset load time significantly, from 23s down to 12s.
+Here is the summary with links:
+  - [v2,net] udp: Set SOCK_RCU_FREE earlier in udp_lib_get_port().
+    https://git.kernel.org/netdev/net/c/5c0b485a8c61
 
-This also fixes a crash bug. Old loop detection code can result in
-unbounded recursion:
-
-BUG: TASK stack guard page was hit at ....
-Oops: stack guard page: 0000 [#1] PREEMPT SMP KASAN
-CPU: 4 PID: 1539 Comm: nft Not tainted 6.10.0-rc5+ #1
-[..]
-
-with a suitable ruleset during validation of register stores.
-
-I can't see any actual reason to attempt to check for this from
-nft_validate_register_store(), at this point the transaction is still in
-progress, so we don't have a full picture of the rule graph.
-
-For nf-next it might make sense to either remove it or make this depend
-on table->validate_state in case we could catch an error earlier
-(for improved error reporting to userspace).
-
-Fixes: 20a69341f2d0 ("netfilter: nf_tables: add netlink set API")
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 158 +++-------------------------------
- 1 file changed, 13 insertions(+), 145 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 081c08536d0f..91cc3a81ba8f 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3823,6 +3823,15 @@ static void nf_tables_rule_release(const struct nft_ctx *ctx, struct nft_rule *r
- 	nf_tables_rule_destroy(ctx, rule);
- }
- 
-+/** nft_chain_validate - loop detection and hook validation
-+ *
-+ * @ctx: context containing call depth and base chain
-+ * @chain: chain to validate
-+ *
-+ * Walk through the rules of the given chain and chase all jumps/gotos
-+ * and set lookups until either the jump limit is hit or all reachable
-+ * chains have been validated.
-+ */
- int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
- {
- 	struct nft_expr *expr, *last;
-@@ -3844,6 +3853,9 @@ int nft_chain_validate(const struct nft_ctx *ctx, const struct nft_chain *chain)
- 			if (!expr->ops->validate)
- 				continue;
- 
-+			/* This may call nft_chain_validate() recursively,
-+			 * callers that do so must increment ctx->level.
-+			 */
- 			err = expr->ops->validate(ctx, expr, &data);
- 			if (err < 0)
- 				return err;
-@@ -10809,150 +10821,6 @@ int nft_chain_validate_hooks(const struct nft_chain *chain,
- }
- EXPORT_SYMBOL_GPL(nft_chain_validate_hooks);
- 
--/*
-- * Loop detection - walk through the ruleset beginning at the destination chain
-- * of a new jump until either the source chain is reached (loop) or all
-- * reachable chains have been traversed.
-- *
-- * The loop check is performed whenever a new jump verdict is added to an
-- * expression or verdict map or a verdict map is bound to a new chain.
-- */
--
--static int nf_tables_check_loops(const struct nft_ctx *ctx,
--				 const struct nft_chain *chain);
--
--static int nft_check_loops(const struct nft_ctx *ctx,
--			   const struct nft_set_ext *ext)
--{
--	const struct nft_data *data;
--	int ret;
--
--	data = nft_set_ext_data(ext);
--	switch (data->verdict.code) {
--	case NFT_JUMP:
--	case NFT_GOTO:
--		ret = nf_tables_check_loops(ctx, data->verdict.chain);
--		break;
--	default:
--		ret = 0;
--		break;
--	}
--
--	return ret;
--}
--
--static int nf_tables_loop_check_setelem(const struct nft_ctx *ctx,
--					struct nft_set *set,
--					const struct nft_set_iter *iter,
--					struct nft_elem_priv *elem_priv)
--{
--	const struct nft_set_ext *ext = nft_set_elem_ext(set, elem_priv);
--
--	if (!nft_set_elem_active(ext, iter->genmask))
--		return 0;
--
--	if (nft_set_ext_exists(ext, NFT_SET_EXT_FLAGS) &&
--	    *nft_set_ext_flags(ext) & NFT_SET_ELEM_INTERVAL_END)
--		return 0;
--
--	return nft_check_loops(ctx, ext);
--}
--
--static int nft_set_catchall_loops(const struct nft_ctx *ctx,
--				  struct nft_set *set)
--{
--	u8 genmask = nft_genmask_next(ctx->net);
--	struct nft_set_elem_catchall *catchall;
--	struct nft_set_ext *ext;
--	int ret = 0;
--
--	list_for_each_entry_rcu(catchall, &set->catchall_list, list) {
--		ext = nft_set_elem_ext(set, catchall->elem);
--		if (!nft_set_elem_active(ext, genmask))
--			continue;
--
--		ret = nft_check_loops(ctx, ext);
--		if (ret < 0)
--			return ret;
--	}
--
--	return ret;
--}
--
--static int nf_tables_check_loops(const struct nft_ctx *ctx,
--				 const struct nft_chain *chain)
--{
--	const struct nft_rule *rule;
--	const struct nft_expr *expr, *last;
--	struct nft_set *set;
--	struct nft_set_binding *binding;
--	struct nft_set_iter iter;
--
--	if (ctx->chain == chain)
--		return -ELOOP;
--
--	if (fatal_signal_pending(current))
--		return -EINTR;
--
--	list_for_each_entry(rule, &chain->rules, list) {
--		nft_rule_for_each_expr(expr, last, rule) {
--			struct nft_immediate_expr *priv;
--			const struct nft_data *data;
--			int err;
--
--			if (strcmp(expr->ops->type->name, "immediate"))
--				continue;
--
--			priv = nft_expr_priv(expr);
--			if (priv->dreg != NFT_REG_VERDICT)
--				continue;
--
--			data = &priv->data;
--			switch (data->verdict.code) {
--			case NFT_JUMP:
--			case NFT_GOTO:
--				err = nf_tables_check_loops(ctx,
--							data->verdict.chain);
--				if (err < 0)
--					return err;
--				break;
--			default:
--				break;
--			}
--		}
--	}
--
--	list_for_each_entry(set, &ctx->table->sets, list) {
--		if (!nft_is_active_next(ctx->net, set))
--			continue;
--		if (!(set->flags & NFT_SET_MAP) ||
--		    set->dtype != NFT_DATA_VERDICT)
--			continue;
--
--		list_for_each_entry(binding, &set->bindings, list) {
--			if (!(binding->flags & NFT_SET_MAP) ||
--			    binding->chain != chain)
--				continue;
--
--			iter.genmask	= nft_genmask_next(ctx->net);
--			iter.type	= NFT_ITER_UPDATE;
--			iter.skip 	= 0;
--			iter.count	= 0;
--			iter.err	= 0;
--			iter.fn		= nf_tables_loop_check_setelem;
--
--			set->ops->walk(ctx, set, &iter);
--			if (!iter.err)
--				iter.err = nft_set_catchall_loops(ctx, set);
--
--			if (iter.err < 0)
--				return iter.err;
--		}
--	}
--
--	return 0;
--}
--
- /**
-  *	nft_parse_u32_check - fetch u32 attribute and check for maximum value
-  *
-@@ -11065,7 +10933,7 @@ static int nft_validate_register_store(const struct nft_ctx *ctx,
- 		if (data != NULL &&
- 		    (data->verdict.code == NFT_GOTO ||
- 		     data->verdict.code == NFT_JUMP)) {
--			err = nf_tables_check_loops(ctx, data->verdict.chain);
-+			err = nft_chain_validate(ctx, data->verdict.chain);
- 			if (err < 0)
- 				return err;
- 		}
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
