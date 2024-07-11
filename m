@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-110715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045AB92DE51
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 04:20:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7A592DE52
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 04:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D001B21CCB
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:20:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97D40281512
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826D2F9F0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04CB12E7C;
 	Thu, 11 Jul 2024 02:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dxcj3vyU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drZLdtkT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D43E572;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856D4FBFD;
 	Thu, 11 Jul 2024 02:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720664433; cv=none; b=Qq0kTZqEKGrrYYq1dIskj17fDirC7hPWoCGj4VTWRyDQshvMD7JfLF+x14mGbkKG3YMPDvHpcHMuHDkLIb8WwDEo7u6pu8Xg+Lpvc71pUhmVW1lppulBslWpaGjlBD5082jJ6DNai8YA0YGaTULWkYk2M0Hsk0+cWhSnE7+HXzI=
+	t=1720664433; cv=none; b=EuRs0889LVMzm63fWKYR9n48dhItgKDzCe8kYoIuRd2K74ApZJPWg/G9ifvF0porIfdMI8WG3cr3t5H1FreTESHSVBnYWWt883qebS2dm7L51IP95GRYoCmSbupQECEwQEPMHiMfw+uPxuHq72deqpIVKxf9H/3rmYGiwUfNVW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720664433; c=relaxed/simple;
-	bh=91a5G059o+c7SEd6rEUFbfqFaetOrMp/p5CAtHhbnww=;
+	bh=8bd7pPPOOm3ktRcZKp3/W4c8geokWqw90NdNwTWwkoA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W5dS/KO+gc3r5+fb5gehq0QdqlOUubl2+mQN4/c4kL163Q/KaU4/ArUobMt2TVADzpOodh+09kHpNyLx4Bl4K4L8+pdyBFXHe9NtsUijVltVSUlrX5edmCqv/hzD7RhCcAR8exP9yXcyT+cybrTySs0DbXYldantjj1Ne0Z3WVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dxcj3vyU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 01768C32781;
+	 In-Reply-To:To:Cc; b=dxCHqw5mOOHR/yx0MsvgBHZ+vjDaym1kh/DlT1EUIU3/kNbHRn+v0A8Acn96zDDnYXTv6vw7kuUZT85YBMZBhFt5YQMfSlrOv3rHF6XmSOh3znQoi2/MEr7kUoMpS3+rkFFROXHWm0zasnZyhzZtcIFtuowh/+0NZB70HTRaCUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drZLdtkT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 188F2C4AF0A;
 	Thu, 11 Jul 2024 02:20:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720664433;
-	bh=91a5G059o+c7SEd6rEUFbfqFaetOrMp/p5CAtHhbnww=;
+	bh=8bd7pPPOOm3ktRcZKp3/W4c8geokWqw90NdNwTWwkoA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dxcj3vyUM04aIJyPdBc4QckQKuS6m2FlisWvuZFo5GsQYTErFgTYbrqwDDGPrXwyj
-	 +YyTcq9GH0rbISEhmfXILoK2q1VPPsL0gYwbGEKLykRWdHmSqO8LQX1qo6HaQViBI7
-	 CjxKQdp3dBp7QgSbRZTxSEq57wPgWhD+M/UZTXYBAMcJZ5CRo1ae6pulPXToBJwUKY
-	 jqDUrc2PTV9dJC2EhOY10JDy/olQ6pdkaqgcJb0bDrSQEBhZ+eATMaLyrbCsPfSmlt
-	 0pwDtx/Lm8FddwwOYNNTkxrNn0fm4mcJZ1fVFGBrZePu8j4OjTu8y++Lozwa/q+2iz
-	 jpHCgn3CQ26Sw==
+	b=drZLdtkTtUdUhL5o+n21HDGYZz09dRQbHOkQO5jPmNd8qtLTqjALYzdIA0iRYtami
+	 2355kMbgJ94GODLzr6aqJY0mIa3KxT/LnY9x+3nii74vV6S8xWQ92tCumTvgRsdee6
+	 NbTgPMBYo+6fJROsDg5ILp4q6O5QvvwJYiv3Oj49m1WlrcBTTp3gnvkh3iUk8Na1jF
+	 vXC2bR2vUJtQ0KeP0bJOftvUWn/r7GO9epynswJ6he7cmHzepS4+DEW5dPpHfhNU8G
+	 xqyjNcchO2uVDi9wU26AWQDs2GHW+WCHhOKBhTa6xbffhlmwzFjONGI+yI4rHeTJqs
+	 0DTYBdgWFbpZw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E9CA7DAE95B;
-	Thu, 11 Jul 2024 02:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0B009C4332E;
+	Thu, 11 Jul 2024 02:20:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 1/1] dt-bindings: net: convert enetc to yaml
+Subject: Re: [net-next,PATCH v2] dt-bindings: net: realtek,rtl82xx: Document
+ RTL8211F LED support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172066443295.28307.4062455810710183011.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jul 2024 02:20:32 +0000
-References: <20240709214841.570154-1-Frank.Li@nxp.com>
-In-Reply-To: <20240709214841.570154-1-Frank.Li@nxp.com>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: robh@kernel.org, Frank.li@nxp.com, conor+dt@kernel.org,
- davem@davemloft.net, devicetree@vger.kernel.org, edumazet@google.com,
- imx@lists.linux.dev, krzk+dt@kernel.org, krzk@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+ <172066443304.28307.1632369692721041060.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jul 2024 02:20:33 +0000
+References: <20240708211649.165793-1-marex@denx.de>
+In-Reply-To: <20240708211649.165793-1-marex@denx.de>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, kernel@dh-electronics.com, davem@davemloft.net,
+ andrew@lunn.ch, conor+dt@kernel.org, edumazet@google.com,
+ f.fainelli@gmail.com, hkallweit1@gmail.com, kuba@kernel.org,
+ krzk+dt@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ devicetree@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Jul 2024 17:48:41 -0400 you wrote:
-> Convert enetc device binding file to yaml. Split to 3 yaml files,
-> 'fsl,enetc.yaml', 'fsl,enetc-mdio.yaml', 'fsl,enetc-ierb.yaml'.
+On Mon,  8 Jul 2024 23:16:29 +0200 you wrote:
+> The RTL8211F PHY does support LED configuration, document support
+> for LEDs in the binding document.
 > 
-> Additional Changes:
-> - Add pci<vendor id>,<production id> in compatible string.
-> - Ref to common ethernet-controller.yaml and mdio.yaml.
-> - Add Wei fang, Vladimir and Claudiu as maintainer.
-> - Update ENETC description.
-> - Remove fixed-link part.
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: devicetree@vger.kernel.org
+> Cc: netdev@vger.kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/1] dt-bindings: net: convert enetc to yaml
-    https://git.kernel.org/netdev/net-next/c/d00ba1d734f7
+  - [net-next,v2] dt-bindings: net: realtek,rtl82xx: Document RTL8211F LED support
+    https://git.kernel.org/netdev/net-next/c/ab896aa62e30
 
 You are awesome, thank you!
 -- 
