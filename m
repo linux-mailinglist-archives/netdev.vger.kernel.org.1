@@ -1,546 +1,150 @@
-Return-Path: <netdev+bounces-110727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99AA92DF84
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 555EE92DFB0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7023C283A4B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:29:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10C5B28360F
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6607E792;
-	Thu, 11 Jul 2024 05:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E4A6BB33;
+	Thu, 11 Jul 2024 05:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="uNwFtapn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1748074047
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 05:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FF176F17
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 05:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720675737; cv=none; b=J+G6Y9YeP2JVcNyoUkBaPKJoJmpGJqjHKMUcEjMbXE2RrEpMY8oUwczvEfRkPs3Ap9yPrKfQQdhkbW3fYvxEzeAXY0qkOEXxcwsIsGo2kYLBNd2ZlPSPFwY8/Q8qkICxxAt3jjNBwWSZ/gwX8NhnmkI5isGp1FkeOFUV1VjVx6o=
+	t=1720676418; cv=none; b=Pea4DHnWDDXwQN030w2em44Df7UFUg9+ZTVv87EdmIsCPauyuKpvzGvuZS4cVi66p4iB417cb12LUVbfMFb4j0ttJ/eiLfaJHO9hs6wk0qAYluTYDNUooKpB/JKGo0rZz+B9rx2A5TOx21ZD01UYocuv0bNf97ISr9n30SJ9As8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720675737; c=relaxed/simple;
-	bh=gAjIWdpXPGSB0Pj/3BGXvMQx4dRMT9XfelZxiPGaZcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i+rnZRYSQtV/M5UbtgwkvI7gTYeZ9xI20AOpXr4aWUozuh48rKQYEFh1tCK4CfWpGYF4nh78CVM10SBRTI0lIaJeta0BwE5j2ff2yDrLUEY6VMgVBJPnSoU82axkrb050rcnQX/cfUNHv/ylsy3rX5odLES97AEF7gbSPcrUbSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af435.dynamic.kabel-deutschland.de [95.90.244.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D134061E4050B;
-	Thu, 11 Jul 2024 07:28:26 +0200 (CEST)
-Message-ID: <ff7bb882-5285-49c7-bba7-0630be1abf22@molgen.mpg.de>
-Date: Thu, 11 Jul 2024 07:28:26 +0200
+	s=arc-20240116; t=1720676418; c=relaxed/simple;
+	bh=er2u/C0ayZ13lixi8pV/7AwVK//BH86gyj62gEdZx1I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XSL1rXTG9ckmHHN+Xo8DrzmUs+LMWPZuL7Nx4zn66G57rYrVSBf4cWqa29WjB5FDZ9N/VBmVByHktq+eXucxR1dmRxIU+7HOqZiuZbBG8V/E/jPbetXD0UcNpPf5YgoEXAmCvwvgwBYNzlsJVhXAJWACAz+UJ/H6xiZhr1FJCeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=uNwFtapn; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52ea929ea56so939046e87.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jul 2024 22:40:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1720676415; x=1721281215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DtQfbSYXmPmFxIghTAuaXxtKY59+oSbNVAa06oAvgE8=;
+        b=uNwFtapna79wdTJKkHWqopN+thTpQZnZjgTuOPCM8QpZaYpNuSWFiosCRNIOvCBdWR
+         XUfoggw+CZ+8DS4HCLGPiJVnNRFM7/Yz1HeYhON0Re3/UXVLFRzRmiE68FUNkbMBWyEL
+         S01597pyjPBHeYZYnTvTY6ojpmuHeA3QwALvp7WMn70jsGebKTSs1djASJrSh2xskf1v
+         HOFLKQLb8bQdiQkWAZBeDlDtlTYYNic6uGlVTj5P3FXkPsxh+MfxnEkODIFvh0ZfpKjW
+         r/8O5QwKg3WDk7clFIs4FPBTx/XmmnGf8xheixKOx2fWPED+SYV9IH/Htus/XYRmCgsD
+         As5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720676415; x=1721281215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DtQfbSYXmPmFxIghTAuaXxtKY59+oSbNVAa06oAvgE8=;
+        b=jbkZFth6br6OfGleIZBP24z0ZqDz40SMFqv/vHQOIvacXBDJfmyFDGwAqho87s4BGd
+         TpbTlDUbg/lS5YHLkEKVZqPBKcSuyCkBz0TF9dd5Y0uowMm0MosnkeIBuOuuDrNR1gKs
+         kGNBSULL8+BJWp7AwyhPgLZYOqifkzHg/Mb/4P9Ds9dJGonK9P3S8EaGpY3kmSdodidG
+         QFVSDLVnDRdSTC5nf348Iytjbem8pt4vDDrE9xjQFVCjtROzdQKar1cXh36l/cJ2i6+1
+         jHlwodoQ3SK0+b9beioN/wUvztetI5pqc16Z2GuTeMXBua1+gJxNd9MLvgyrAB10r3Lw
+         namQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWo7e/KF1Y4cBIJv46BC6m8nGWo1h7IG9e3fhGb2YXZZXHxDSL8zatfcMo9z0XCBjVBeVBs5HDQWrHp04Tcv7rqGtEKawuL
+X-Gm-Message-State: AOJu0YwGP2oiNpx1jHoT2q8OBpt2AiD0LV+a5pEtwMRT2lC0qJmkWQZo
+	v8lzl4GJmUMgtYz1cbJE5/fqI25LvK0wxf7GBBr3cej4Bwhk1Mufa1+mB8rQo2ZKhnsFwQzjoEI
+	NtIMtW3aY09PHPcvUw8PPkeLgNFIvQythGAopsA==
+X-Google-Smtp-Source: AGHT+IF+BKDpNJnivyTpTW415g8VRESZbb/7e56pM3pMEuHmh9WnGF7mjq0NVvmuJHBA9fsXR2GqhBai5y9XkJzcVSA=
+X-Received: by 2002:ac2:5544:0:b0:52e:751a:a172 with SMTP id
+ 2adb3069b0e04-52eb99d288dmr5355776e87.49.1720676413776; Wed, 10 Jul 2024
+ 22:40:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 02/13] ice: parse and init
- various DDP parser sections
-To: Ahmed Zaki <ahmed.zaki@intel.com>, Junfeng Guo <junfeng.guo@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Marcin Szycik <marcin.szycik@linux.intel.com>, anthony.l.nguyen@intel.com,
- horms@kernel.org
-References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-3-ahmed.zaki@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240710204015.124233-3-ahmed.zaki@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240620113527.7789-1-changliang.wu@smartx.com>
+In-Reply-To: <20240620113527.7789-1-changliang.wu@smartx.com>
+From: Changliang Wu <changliang.wu@smartx.com>
+Date: Thu, 11 Jul 2024 13:40:02 +0800
+Message-ID: <CALHBjYFn_qB=Oo3TTg0znOnNz9rX5jP+eYSZbatAN94ys8Tzmw@mail.gmail.com>
+Subject: Re: [PATCH] netfilter: ctnetlink: support CTA_FILTER for flush
+To: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Ahmed, dear Junfeng,
+PING
 
 
-Thank you for this patch.
-
-
-Am 10.07.24 um 22:40 schrieb Ahmed Zaki:
-> From: Junfeng Guo <junfeng.guo@intel.com>
-> 
-> Parse the following DDP sections:
->   - ICE_SID_RXPARSER_IMEM into an array of struct ice_imem_item
->   - ICE_SID_RXPARSER_METADATA_INIT into an array of struct ice_metainit_item
->   - ICE_SID_RXPARSER_CAM or ICE_SID_RXPARSER_PG_SPILL into an array of
->     struct ice_pg_cam_item
->   - ICE_SID_RXPARSER_NOMATCH_CAM or ICE_SID_RXPARSER_NOMATCH_SPILL into an
->     array of struct ice_pg_nm_cam_item
->   - ICE_SID_RXPARSER_CAM into an array of ice_bst_tcam_item
->   - ICE_SID_LBL_RXPARSER_TMEM into an array of ice_lbl_item
->   - ICE_SID_RXPARSER_MARKER_PTYPE into an array of ice_ptype_mk_tcam_item
->   - ICE_SID_RXPARSER_MARKER_GRP into an array of ice_mk_grp_item
->   - ICE_SID_RXPARSER_PROTO_GRP into an array of ice_proto_grp_item
->   - ICE_SID_RXPARSER_FLAG_REDIR into an array of ice_flg_rd_item
->   - ICE_SID_XLT_KEY_BUILDER_SW, ICE_SID_XLT_KEY_BUILDER_ACL,
->     ICE_SID_XLT_KEY_BUILDER_FD and ICE_SID_XLT_KEY_BUILDER_RSS into
->     struct ice_xlt_kb
-
-Did you write this from hand, or do you have some scripts to convert it 
-from some datasheet into code?
-
-As the parser is new infrastructure, are you planing on adding some 
-tests for the parser?
-
-Could you also go into more detail on how to debug possible problems, 
-that means, how to make sure, that the parser works correctly and how to 
-debug it in case one suspects the parser has a problem.
-
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
-> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
-> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Changliang Wu <changliang.wu@smartx.com> =E4=BA=8E2024=E5=B9=B46=E6=9C=8820=
+=E6=97=A5=E5=91=A8=E5=9B=9B 19:35=E5=86=99=E9=81=93=EF=BC=9A
+>
+> From cb8aa9a, we can use kernel side filtering for dump, but
+> this capability is not available for flush.
+>
+> This Patch allows advanced filter with CTA_FILTER for flush
+>
+> Performace
+> 1048576 ct flows in total, delete 50,000 flows by origin src ip
+> 3.06s -> dump all, compare and delete
+> 584ms -> directly flush with filter
+>
+> Signed-off-by: Changliang Wu <changliang.wu@smartx.com>
 > ---
->   drivers/net/ethernet/intel/ice/ice_ddp.c    |   10 +-
->   drivers/net/ethernet/intel/ice/ice_ddp.h    |   13 +
->   drivers/net/ethernet/intel/ice/ice_parser.c | 1396 +++++++++++++++++++
->   drivers/net/ethernet/intel/ice/ice_parser.h |  357 +++++
->   drivers/net/ethernet/intel/ice/ice_type.h   |    1 +
->   5 files changed, 1772 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-> index f182179529b7..953262b88a58 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-> @@ -289,11 +289,11 @@ void *ice_pkg_enum_section(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
->    * indicates a base offset of 10, and the index for the entry is 2, then
->    * section handler function should set the offset to 10 + 2 = 12.
->    */
-> -static void *ice_pkg_enum_entry(struct ice_seg *ice_seg,
-> -				struct ice_pkg_enum *state, u32 sect_type,
-> -				u32 *offset,
-> -				void *(*handler)(u32 sect_type, void *section,
-> -						 u32 index, u32 *offset))
-> +void *ice_pkg_enum_entry(struct ice_seg *ice_seg,
-> +			 struct ice_pkg_enum *state, u32 sect_type,
-> +			 u32 *offset,
-> +			 void *(*handler)(u32 sect_type, void *section,
-> +					  u32 index, u32 *offset))
->   {
->   	void *entry;
->   
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.h b/drivers/net/ethernet/intel/ice/ice_ddp.h
-> index 622543f08b43..97f272317475 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ddp.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.h
-> @@ -261,10 +261,17 @@ struct ice_meta_sect {
->   #define ICE_SID_CDID_KEY_BUILDER_RSS 47
->   #define ICE_SID_CDID_REDIR_RSS 48
->   
-> +#define ICE_SID_RXPARSER_CAM           50
-> +#define ICE_SID_RXPARSER_NOMATCH_CAM   51
-> +#define ICE_SID_RXPARSER_IMEM          52
->   #define ICE_SID_RXPARSER_MARKER_PTYPE 55
->   #define ICE_SID_RXPARSER_BOOST_TCAM 56
-> +#define ICE_SID_RXPARSER_PROTO_GRP     57
->   #define ICE_SID_RXPARSER_METADATA_INIT 58
->   #define ICE_SID_TXPARSER_BOOST_TCAM 66
-> +#define ICE_SID_RXPARSER_MARKER_GRP    72
-> +#define ICE_SID_RXPARSER_PG_SPILL      76
-> +#define ICE_SID_RXPARSER_NOMATCH_SPILL 78
->   
->   #define ICE_SID_XLT0_PE 80
->   #define ICE_SID_XLT_KEY_BUILDER_PE 81
-> @@ -276,6 +283,7 @@ struct ice_meta_sect {
->   #define ICE_SID_CDID_KEY_BUILDER_PE 87
->   #define ICE_SID_CDID_REDIR_PE 88
->   
-> +#define ICE_SID_RXPARSER_FLAG_REDIR	97
->   /* Label Metadata section IDs */
->   #define ICE_SID_LBL_FIRST 0x80000010
->   #define ICE_SID_LBL_RXPARSER_TMEM 0x80000018
-> @@ -451,6 +459,11 @@ int ice_update_pkg(struct ice_hw *hw, struct ice_buf *bufs, u32 count);
->   
->   int ice_pkg_buf_reserve_section(struct ice_buf_build *bld, u16 count);
->   u16 ice_pkg_buf_get_active_sections(struct ice_buf_build *bld);
-> +void *
-> +ice_pkg_enum_entry(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
-> +		   u32 sect_type, u32 *offset,
-> +		   void *(*handler)(u32 sect_type, void *section,
-> +				    u32 index, u32 *offset));
->   void *ice_pkg_enum_section(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
->   			   u32 sect_type);
->   
-> diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
-> index 6c50164efae0..1f1a5a87f089 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_parser.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_parser.c
-> @@ -3,6 +3,1284 @@
->   
->   #include "ice_common.h"
->   
-> +struct ice_pkg_sect_hdr {
-> +	__le16 count;
-> +	__le16 offset;
-> +};
-> +
-> +/**
-> + * ice_parser_sect_item_get - parse a item from a section
-
-a*n* item
-
-> + * @sect_type: section type
-> + * @section: section object
-> + * @index: index of the item to get
-> + * @offset: dummy as prototype of ice_pkg_enum_entry's last parameter
-> + *
-> + * Return: a pointer to the item or NULL.
-> + */
-> +static void *ice_parser_sect_item_get(u32 sect_type, void *section,
-> +				      u32 index, u32 __maybe_unused *offset)
-> +{
-> +	size_t data_off = ICE_SEC_DATA_OFFSET;
-> +	struct ice_pkg_sect_hdr *hdr;
-> +	size_t size;
-> +
-> +	if (!section)
-> +		return NULL;
-> +
-> +	switch (sect_type) {
-> +	case ICE_SID_RXPARSER_IMEM:
-> +		size = ICE_SID_RXPARSER_IMEM_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_METADATA_INIT:
-> +		size = ICE_SID_RXPARSER_METADATA_INIT_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_CAM:
-> +		size = ICE_SID_RXPARSER_CAM_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_PG_SPILL:
-> +		size = ICE_SID_RXPARSER_PG_SPILL_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_NOMATCH_CAM:
-> +		size = ICE_SID_RXPARSER_NOMATCH_CAM_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_NOMATCH_SPILL:
-> +		size = ICE_SID_RXPARSER_NOMATCH_SPILL_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_BOOST_TCAM:
-> +		size = ICE_SID_RXPARSER_BOOST_TCAM_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_LBL_RXPARSER_TMEM:
-> +		data_off = ICE_SEC_LBL_DATA_OFFSET;
-> +		size = ICE_SID_LBL_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_MARKER_PTYPE:
-> +		size = ICE_SID_RXPARSER_MARKER_TYPE_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_MARKER_GRP:
-> +		size = ICE_SID_RXPARSER_MARKER_GRP_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_PROTO_GRP:
-> +		size = ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE;
-> +		break;
-> +	case ICE_SID_RXPARSER_FLAG_REDIR:
-> +		size = ICE_SID_RXPARSER_FLAG_REDIR_ENTRY_SIZE;
-> +		break;
-> +	default:
-> +		return NULL;
-> +	}
-> +
-> +	hdr = section;
-> +	if (index >= le16_to_cpu(hdr->count))
-> +		return NULL;
-> +
-> +	return section + data_off + index * size;
-> +}
-> +
-> +/**
-> + * ice_parser_create_table - create an item table from a section
-> + * @hw: pointer to the hardware structure
-> + * @sect_type: section type
-> + * @item_size: item size in byte
-
-in byte*s*
-
-> + * @length: number of items in the table to create
-> + * @parse_item: the function to parse the item
-> + * @no_offset: ignore header offset, calculate index from 0
-> + *
-> + * Return: a pointer to the allocated table or ERR_PTR.
-> + */
-> +static
-> +void *ice_parser_create_table(struct ice_hw *hw, u32 sect_type,
-> +			      u32 item_size, u32 length,
-> +			      void (*parse_item)(struct ice_hw *hw, u16 idx,
-> +						 void *item, void *data,
-> +						 int size),
-> +			      bool no_offset)
-> +{
-> +	struct ice_pkg_enum state = {};
-> +	struct ice_seg *seg = hw->seg;
-> +	void *table, *data, *item;
-> +	u16 idx = U16_MAX;
-> +
-> +	if (!seg)
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	table = kzalloc(item_size * length, GFP_KERNEL);
-> +	if (!table)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	do {
-> +		data = ice_pkg_enum_entry(seg, &state, sect_type, NULL,
-> +					  ice_parser_sect_item_get);
-> +		seg = NULL;
-> +		if (data) {
-> +			struct ice_pkg_sect_hdr *hdr =
-> +				(struct ice_pkg_sect_hdr *)state.sect;
-> +
-> +			if (no_offset)
-> +				idx++;
-
-Can’t `idx` initialized with `U16_MAX` now overflow?
-
-> +			else
-> +				idx = le16_to_cpu(hdr->offset) +
-> +					state.entry_idx;
-> +
-> +			item = (void *)((uintptr_t)table + idx * item_size);
-> +			parse_item(hw, idx, item, data, item_size);
-> +		}
-> +	} while (data);
-> +
-> +	return table;
-> +}
-> +
-> +/*** ICE_SID_RXPARSER_IMEM section ***/
-> +#define ICE_IM_BM_ALU0		BIT(0)
-> +#define ICE_IM_BM_ALU1		BIT(1)
-> +#define ICE_IM_BM_ALU2		BIT(2)
-> +#define ICE_IM_BM_PG		BIT(3)
-> +
-> +/**
-> + * ice_imem_bm_init - parse 4 bits of Boost Main
-> + * @bm: pointer to the Boost Main structure
-> + * @data: Boost Main data to be parsed
-
-Excuse my ignorance, as you use `data` in `FIELD_GET()` is `data` the 
-right name? The `FIELD_GET()` example in `include/linux/bitfield.h` uses 
-`reg`. How do I know the valid values of `data`?
-
-> + */
-> +static void ice_imem_bm_init(struct ice_bst_main *bm, u8 data)
-> +{
-> +	bm->alu0	= FIELD_GET(ICE_IM_BM_ALU0, data);
-> +	bm->alu1	= FIELD_GET(ICE_IM_BM_ALU1, data);
-> +	bm->alu2	= FIELD_GET(ICE_IM_BM_ALU2, data);
-> +	bm->pg		= FIELD_GET(ICE_IM_BM_PG, data);
-> +}
-> +
-> +#define ICE_IM_BKB_PRIO		GENMASK(7, 0)
-> +#define ICE_IM_BKB_TSR_CTRL	BIT(8)
-
-[…]
-
-> +
-> +/**
-> + * ice_imem_bkb_init - parse 10 bits of Boost Main Build
-> + * @bkb: pointer to the Boost Main Build structure
-> + * @data: Boost Main Build data to be parsed
-> + */
-> +static void ice_imem_bkb_init(struct ice_bst_keybuilder *bkb, u16 data)
-> +{
-> +	bkb->prio	= FIELD_GET(ICE_IM_BKB_PRIO, data);
-> +	bkb->tsr_ctrl	= FIELD_GET(ICE_IM_BKB_TSR_CTRL, data);
-> +}
-> +
-> +#define ICE_IM_NPKB_OPC		GENMASK(1, 0)
-> +#define ICE_IM_NPKB_S_R0	GENMASK(9, 2)
-> +#define ICE_IM_NPKB_L_R1	GENMASK(17, 10)
-> +
-> +/**
-> + * ice_imem_npkb_init - parse 18 bits of Next Protocol Key Build
-> + * @kb: pointer to the Next Protocol Key Build structure
-> + * @data: Next Protocol Key Build data to be parsed
-> + */
-> +static void ice_imem_npkb_init(struct ice_np_keybuilder *kb, u32 data)
-> +{
-> +	kb->opc		= FIELD_GET(ICE_IM_NPKB_OPC, data);
-> +	kb->start_reg0	= FIELD_GET(ICE_IM_NPKB_S_R0, data);
-> +	kb->len_reg1	= FIELD_GET(ICE_IM_NPKB_L_R1, data);
-> +}
-> +
-> +#define ICE_IM_PGKB_F0_ENA	BIT_ULL(0)
-> +#define ICE_IM_PGKB_F0_IDX	GENMASK_ULL(6, 1)
-> +#define ICE_IM_PGKB_F1_ENA	BIT_ULL(7)
-> +#define ICE_IM_PGKB_F1_IDX	GENMASK_ULL(13, 8)
-> +#define ICE_IM_PGKB_F2_ENA	BIT_ULL(14)
-> +#define ICE_IM_PGKB_F2_IDX	GENMASK_ULL(20, 15)
-> +#define ICE_IM_PGKB_F3_ENA	BIT_ULL(21)
-> +#define ICE_IM_PGKB_F3_IDX	GENMASK_ULL(27, 22)
-> +#define ICE_IM_PGKB_AR_IDX	GENMASK_ULL(34, 28)
-> +
-> +/**
-> + * ice_imem_pgkb_init - parse 35 bits of Parse Graph Key Build
-> + * @kb: pointer to the Parse Graph Key Build structure
-> + * @data: Parse Graph Key Build data to be parsed
-> + */
-> +static void ice_imem_pgkb_init(struct ice_pg_keybuilder *kb, u64 data)
-> +{
-> +	kb->flag0_ena	= FIELD_GET(ICE_IM_PGKB_F0_ENA, data);
-> +	kb->flag0_idx	= FIELD_GET(ICE_IM_PGKB_F0_IDX, data);
-> +	kb->flag1_ena	= FIELD_GET(ICE_IM_PGKB_F1_ENA, data);
-> +	kb->flag1_idx	= FIELD_GET(ICE_IM_PGKB_F1_IDX, data);
-> +	kb->flag2_ena	= FIELD_GET(ICE_IM_PGKB_F2_ENA, data);
-> +	kb->flag2_idx	= FIELD_GET(ICE_IM_PGKB_F2_IDX, data);
-> +	kb->flag3_ena	= FIELD_GET(ICE_IM_PGKB_F3_ENA, data);
-> +	kb->flag3_idx	= FIELD_GET(ICE_IM_PGKB_F3_IDX, data);
-> +	kb->alu_reg_idx	= FIELD_GET(ICE_IM_PGKB_AR_IDX, data);
-> +}
-> +
-> +#define ICE_IM_ALU_OPC		GENMASK_ULL(5, 0)
-> +#define ICE_IM_ALU_SS		GENMASK_ULL(13, 6)
-> +#define ICE_IM_ALU_SL		GENMASK_ULL(18, 14)
-> +#define ICE_IM_ALU_SXS		BIT_ULL(19)
-> +#define ICE_IM_ALU_SXK		GENMASK_ULL(23, 20)
-> +#define ICE_IM_ALU_SRID		GENMASK_ULL(30, 24)
-> +#define ICE_IM_ALU_DRID		GENMASK_ULL(37, 31)
-> +#define ICE_IM_ALU_INC0		BIT_ULL(38)
-> +#define ICE_IM_ALU_INC1		BIT_ULL(39)
-> +#define ICE_IM_ALU_POO		GENMASK_ULL(41, 40)
-> +#define ICE_IM_ALU_PO		GENMASK_ULL(49, 42)
-> +#define ICE_IM_ALU_BA_S		50	/* offset for the 2nd 64-bits field */
-> +#define ICE_IM_ALU_BA		GENMASK_ULL(57 - ICE_IM_ALU_BA_S, \
-> +					    50 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_IMM		GENMASK_ULL(73 - ICE_IM_ALU_BA_S, \
-> +					    58 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_DFE		BIT_ULL(74 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_DS		GENMASK_ULL(80 - ICE_IM_ALU_BA_S, \
-> +					    75 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_DL		GENMASK_ULL(86 - ICE_IM_ALU_BA_S, \
-> +					    81 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_FEI		BIT_ULL(87 - ICE_IM_ALU_BA_S)
-> +#define ICE_IM_ALU_FSI		GENMASK_ULL(95 - ICE_IM_ALU_BA_S, \
-> +					    88 - ICE_IM_ALU_BA_S)
-> +
-> +/**
-> + * ice_imem_alu_init - parse 96 bits of ALU entry
-> + * @alu: pointer to the ALU entry structure
-> + * @data: ALU entry data to be parsed
-> + * @off: offset of the ALU entry data
-> + */
-> +static void ice_imem_alu_init(struct ice_alu *alu, u8 *data, u8 off)
-> +{
-> +	u64 d64;
-> +	u8 idd;
-> +
-> +	d64 = *((u64 *)data) >> off;
-> +
-> +	alu->opc		= FIELD_GET(ICE_IM_ALU_OPC, d64);
-> +	alu->src_start		= FIELD_GET(ICE_IM_ALU_SS, d64);
-> +	alu->src_len		= FIELD_GET(ICE_IM_ALU_SL, d64);
-> +	alu->shift_xlate_sel	= FIELD_GET(ICE_IM_ALU_SXS, d64);
-> +	alu->shift_xlate_key	= FIELD_GET(ICE_IM_ALU_SXK, d64);
-> +	alu->src_reg_id		= FIELD_GET(ICE_IM_ALU_SRID, d64);
-> +	alu->dst_reg_id		= FIELD_GET(ICE_IM_ALU_DRID, d64);
-> +	alu->inc0		= FIELD_GET(ICE_IM_ALU_INC0, d64);
-> +	alu->inc1		= FIELD_GET(ICE_IM_ALU_INC1, d64);
-> +	alu->proto_offset_opc	= FIELD_GET(ICE_IM_ALU_POO, d64);
-> +	alu->proto_offset	= FIELD_GET(ICE_IM_ALU_PO, d64);
-> +
-> +	idd = (ICE_IM_ALU_BA_S + off) / BITS_PER_BYTE;
-> +	off = (ICE_IM_ALU_BA_S + off) % BITS_PER_BYTE;
-> +	d64 = *((u64 *)(&data[idd])) >> off;
-> +
-> +	alu->branch_addr	= FIELD_GET(ICE_IM_ALU_BA, d64);
-> +	alu->imm		= FIELD_GET(ICE_IM_ALU_IMM, d64);
-> +	alu->dedicate_flags_ena	= FIELD_GET(ICE_IM_ALU_DFE, d64);
-> +	alu->dst_start		= FIELD_GET(ICE_IM_ALU_DS, d64);
-> +	alu->dst_len		= FIELD_GET(ICE_IM_ALU_DL, d64);
-> +	alu->flags_extr_imm	= FIELD_GET(ICE_IM_ALU_FEI, d64);
-> +	alu->flags_start_imm	= FIELD_GET(ICE_IM_ALU_FSI, d64);
-> +}
-> +
-> +#define ICE_IMEM_BM_S		0
-> +#define ICE_IMEM_BKB_S		4
-> +#define ICE_IMEM_BKB_IDD	(ICE_IMEM_BKB_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_BKB_OFF	(ICE_IMEM_BKB_S % BITS_PER_BYTE)
-> +#define ICE_IMEM_PGP		GENMASK(15, 14)
-> +#define ICE_IMEM_NPKB_S		16
-> +#define ICE_IMEM_NPKB_IDD	(ICE_IMEM_NPKB_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_NPKB_OFF	(ICE_IMEM_NPKB_S % BITS_PER_BYTE)
-> +#define ICE_IMEM_PGKB_S		34
-> +#define ICE_IMEM_PGKB_IDD	(ICE_IMEM_PGKB_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_PGKB_OFF	(ICE_IMEM_PGKB_S % BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU0_S		69
-> +#define ICE_IMEM_ALU0_IDD	(ICE_IMEM_ALU0_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU0_OFF	(ICE_IMEM_ALU0_S % BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU1_S		165
-> +#define ICE_IMEM_ALU1_IDD	(ICE_IMEM_ALU1_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU1_OFF	(ICE_IMEM_ALU1_S % BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU2_S		357
-> +#define ICE_IMEM_ALU2_IDD	(ICE_IMEM_ALU2_S / BITS_PER_BYTE)
-> +#define ICE_IMEM_ALU2_OFF	(ICE_IMEM_ALU2_S % BITS_PER_BYTE)
-> +
-> +/**
-> + * ice_imem_parse_item - parse 384 bits of IMEM entry
-> + * @hw: pointer to the hardware structure
-> + * @idx: index of IMEM entry
-> + * @item: item of IMEM entry
-> + * @data: IMEM entry data to be parsed
-
-[…]
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_parser.h b/drivers/net/ethernet/intel/ice/ice_parser.h
-> index 09ed380eee32..26468b16202c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_parser.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_parser.h
-> @@ -4,8 +4,365 @@
->   #ifndef _ICE_PARSER_H_
->   #define _ICE_PARSER_H_
->   
-> +#define ICE_SEC_DATA_OFFSET				4
-> +#define ICE_SID_RXPARSER_IMEM_ENTRY_SIZE		48
-> +#define ICE_SID_RXPARSER_METADATA_INIT_ENTRY_SIZE	24
-> +#define ICE_SID_RXPARSER_CAM_ENTRY_SIZE			16
-> +#define ICE_SID_RXPARSER_PG_SPILL_ENTRY_SIZE		17
-> +#define ICE_SID_RXPARSER_NOMATCH_CAM_ENTRY_SIZE		12
-> +#define ICE_SID_RXPARSER_NOMATCH_SPILL_ENTRY_SIZE	13
-> +#define ICE_SID_RXPARSER_BOOST_TCAM_ENTRY_SIZE		88
-> +#define ICE_SID_RXPARSER_MARKER_TYPE_ENTRY_SIZE		24
-> +#define ICE_SID_RXPARSER_MARKER_GRP_ENTRY_SIZE		8
-> +#define ICE_SID_RXPARSER_PROTO_GRP_ENTRY_SIZE		24
-> +#define ICE_SID_RXPARSER_FLAG_REDIR_ENTRY_SIZE		1
-> +
-> +#define ICE_SEC_LBL_DATA_OFFSET				2
-> +#define ICE_SID_LBL_ENTRY_SIZE				66
-> +
-> +/*** ICE_SID_RXPARSER_IMEM section ***/
-> +#define ICE_IMEM_TABLE_SIZE		192
-> +
-> +/* TCAM boost Master; if bit is set, and TCAM hit, TCAM output overrides iMEM
-> + * output.
-> + */
-> +struct ice_bst_main {
-> +	bool alu0;
-> +	bool alu1;
-> +	bool alu2;
-> +	bool pg;
-> +};
-> +
-> +struct ice_bst_keybuilder {
-> +	u8 prio;
-
-Add a comment, what `prio` is and what values are allowed?
-
-> +	bool tsr_ctrl;	/* TCAM Search Register control */
-> +};
-
-[…]
-
-
-Kind regards,
-
-Paul
+>  net/netfilter/nf_conntrack_netlink.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conn=
+track_netlink.c
+> index 3b846cbdc..93afe57d9 100644
+> --- a/net/netfilter/nf_conntrack_netlink.c
+> +++ b/net/netfilter/nf_conntrack_netlink.c
+> @@ -1579,9 +1579,6 @@ static int ctnetlink_flush_conntrack(struct net *ne=
+t,
+>         };
+>
+>         if (ctnetlink_needs_filter(family, cda)) {
+> -               if (cda[CTA_FILTER])
+> -                       return -EOPNOTSUPP;
+> -
+>                 filter =3D ctnetlink_alloc_filter(cda, family);
+>                 if (IS_ERR(filter))
+>                         return PTR_ERR(filter);
+> @@ -1610,14 +1607,14 @@ static int ctnetlink_del_conntrack(struct sk_buff=
+ *skb,
+>         if (err < 0)
+>                 return err;
+>
+> -       if (cda[CTA_TUPLE_ORIG])
+> +       if (cda[CTA_TUPLE_ORIG] && !cda[CTA_FILTER])
+>                 err =3D ctnetlink_parse_tuple(cda, &tuple, CTA_TUPLE_ORIG=
+,
+>                                             family, &zone);
+> -       else if (cda[CTA_TUPLE_REPLY])
+> +       else if (cda[CTA_TUPLE_REPLY] && !cda[CTA_FILTER])
+>                 err =3D ctnetlink_parse_tuple(cda, &tuple, CTA_TUPLE_REPL=
+Y,
+>                                             family, &zone);
+>         else {
+> -               u_int8_t u3 =3D info->nfmsg->version ? family : AF_UNSPEC=
+;
+> +               u8 u3 =3D info->nfmsg->version || cda[CTA_FILTER] ? famil=
+y : AF_UNSPEC;
+>
+>                 return ctnetlink_flush_conntrack(info->net, cda,
+>                                                  NETLINK_CB(skb).portid,
+> --
+> 2.43.0
+>
 
