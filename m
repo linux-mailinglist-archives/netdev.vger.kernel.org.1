@@ -1,79 +1,140 @@
-Return-Path: <netdev+bounces-110929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80BE92EF97
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 21:24:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B35B92F036
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 629C0281FF5
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:24:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97A351C20A6C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A7C16E88B;
-	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CACA16D4CA;
+	Thu, 11 Jul 2024 20:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9FSbHxY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fl9eliLD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93D51EA85;
-	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F70914D431
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 20:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720725872; cv=none; b=N2POsGkPsnosfqh8KXEPQ3W2ZPpNIxSjq2zc9U30DwZ4ABnJAm1Cwv5QCsqUecG2F5CUeWC8APcKjfiM8eASTQdTR4TiuJuENZUrWWa9TRjbcfEtZIHXaC12yJXpWx12csE08hRjJss9OK93Sm/NDigpyazWmlZMWg+Mbf0xyws=
+	t=1720729179; cv=none; b=mIP0Dt7LkK8I3qtOrUR+2ZwqCxHFnxCrx2bVz9bm5LhAMJJumBI9c9NpGIEnuDvhmyBpFxc+pJxczIFCiPB06JokBMtA95Nx/PoQBvbRfKe/E4+vhRSYPL5vMtVWVYtmCm+YAfBUYKqtMt2KYRBT5CIx81iY4hXaZ3bvFR/jpgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720725872; c=relaxed/simple;
-	bh=xy99/kDWGgxvByUfnPwWGMstPjslgJNjta3z5Vf531Y=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mqRuSRgK9m94hcj1L/DCG67tr4Zm0QtrharISb1NsMr83ScruOD/EOnB3XCnFK1hyZM3JITjRHpRx/LBWon4U/RX4b1gr2yGEiguE6TskXatf9G3yaQyyi1PkREpY99ADprm/070CW0nMN2hTsE42Gpzn/ndHSbPq1cNPZGdOBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9FSbHxY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 81DECC116B1;
-	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720725872;
-	bh=xy99/kDWGgxvByUfnPwWGMstPjslgJNjta3z5Vf531Y=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=W9FSbHxYBcqvTMNl8HP35HGE87RXvZeDRclx9hM9SPNGgOY0qcuG+a2mwfbaGsU6t
-	 OeDoBg4DcAmbXvYb7Q0BjC4laH+f6bHjnG7AeHJVgyzk/+sT6i/H/adGbN08R+b0Fz
-	 oEviajrBttMDlIeIOgXnevl5yUzllh6ytW/Uj7DQQXL21g1DLFcykL5QJmasVHIdqO
-	 zpbtZ0akTFdo/gUXfKaqXyjDVPnKy6twjH6Ye5GvcfyV+ihbH3uUrt2TAHhlR3rNau
-	 KA7USARLS3MbC4LTsBsk1REVkiFWGkdS0zO71ZnFPLjdUl1XHt7pNXiihLPaXBocf+
-	 rYWBcC6V9OOMQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75E01C43468;
-	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.10-rc8
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240711134137.108857-1-pabeni@redhat.com>
-References: <20240711134137.108857-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240711134137.108857-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc8
-X-PR-Tracked-Commit-Id: d7c199e77ef2fe259ad5b1beca5ddd6c951fcba2
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 51df8e0cbaefd432f7029dde94e6c7e4e5b19465
-Message-Id: <172072587246.27993.6082265630190170856.pr-tracker-bot@kernel.org>
-Date: Thu, 11 Jul 2024 19:24:32 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1720729179; c=relaxed/simple;
+	bh=2Q/OHXb6B60UW1xeJH/nSvAwFA7/2AeW/Umhsf9WCy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QTzPiPTq4adlqY8HTzcUOVNu6Zj39J8z4q214yiInlHZWMWypIG34Y3VHK2xfKl66Rb5FpSXyPpRYCI6jwcxAcAUuVZFYSWpYSiEsDy3ktVNWl4BU5Q5o8ntdsjIX9Yx8DVo2h0lz7jxETkxe3Z3qi6OWupKrFnpQCsz7AMdioY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fl9eliLD; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720729177; x=1752265177;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2Q/OHXb6B60UW1xeJH/nSvAwFA7/2AeW/Umhsf9WCy8=;
+  b=Fl9eliLDL9gLwkIoJzd7UdS81Ee/1lwBHV1eKwLx08tS4WVdv333+DAm
+   UbXIsjFKJm/7FuPeSr3g0mh92zF3YTqjVy4lxLFhZtUqrXiuj/tiFWok+
+   0dZUw+w0co+lrZozWmKfcoVEoUzKJkZqjzrp/qcnfi9tfSqDOA6qPOy+B
+   0ESPlhzmte3yTRvINVkzejBy4Fl4WTB+FL8rPM9C2bzF3tMc1JoPSyoR/
+   CK0L/w0YJMsNhhd8dOzNigbYW++kjXJiMig8FrDkqPmhhHaJ+p+zY9ftZ
+   VihsQiZPWydqgIbuauM8QHnqyVLYNmh3lOG1lWrGvjnAYzjqWrR0TwcUJ
+   A==;
+X-CSE-ConnectionGUID: uHxJx6K5Q6aMnGDWoP9p9Q==
+X-CSE-MsgGUID: mtA613wgQRKlFsSpVHIp3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11130"; a="12508382"
+X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
+   d="scan'208";a="12508382"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 13:19:37 -0700
+X-CSE-ConnectionGUID: zvFOni81QTWlA/JF26wMQw==
+X-CSE-MsgGUID: CAjni4iwQLai+9E1rnaHXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
+   d="scan'208";a="71887398"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa002.fm.intel.com with ESMTP; 11 Jul 2024 13:19:36 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/5][pull request] Intel Wired LAN Driver Updates 2024-07-11 (net/intel)
+Date: Thu, 11 Jul 2024 13:19:25 -0700
+Message-ID: <20240711201932.2019925-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Thu, 11 Jul 2024 15:41:37 +0200:
+This series contains updates to most Intel network drivers.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc8
+Tony removes MODULE_AUTHOR from drivers containing the entry.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/51df8e0cbaefd432f7029dde94e6c7e4e5b19465
+Simon Horman corrects a kdoc entry for i40e.
 
-Thank you!
+Pawel adds implementation for devlink param "local_forwarding" on ice.
+
+Michal removes unneeded call, and code, for eswitch rebuild for ice.
+
+Sasha removed a no longer used field from igc.
+
+The following are changes since commit 58f9416d413aa2c20b2515233ce450a1607ef843:
+  Merge branch 'ice-support-to-dump-phy-config-fec'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+
+Michal Swiatkowski (1):
+  ice: remove eswitch rebuild
+
+Pawel Kaminski (1):
+  ice: Add support for devlink local_forwarding param
+
+Sasha Neftin (1):
+  igc: Remove the internal 'eee_advert' field
+
+Simon Horman (1):
+  i40e: correct i40e_addr_to_hkey() name in kdoc
+
+Tony Nguyen (1):
+  net: intel: Remove MODULE_AUTHORs
+
+ Documentation/networking/devlink/ice.rst      |  25 ++++
+ drivers/net/ethernet/intel/e100.c             |   1 -
+ drivers/net/ethernet/intel/e1000/e1000_main.c |   1 -
+ drivers/net/ethernet/intel/e1000e/netdev.c    |   1 -
+ drivers/net/ethernet/intel/fm10k/fm10k_main.c |   1 -
+ drivers/net/ethernet/intel/i40e/i40e.h        |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   1 -
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |   1 -
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 126 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   4 +
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  |  16 ---
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  |   6 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |   3 -
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/igb/igb_main.c     |   1 -
+ drivers/net/ethernet/intel/igbvf/netdev.c     |   1 -
+ drivers/net/ethernet/intel/igc/igc.h          |   1 -
+ drivers/net/ethernet/intel/igc/igc_ethtool.c  |   6 -
+ drivers/net/ethernet/intel/igc/igc_main.c     |   4 -
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   1 -
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |   1 -
+ drivers/net/ethernet/intel/libeth/rx.c        |   1 -
+ drivers/net/ethernet/intel/libie/rx.c         |   1 -
+ 24 files changed, 167 insertions(+), 50 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.41.0
+
 
