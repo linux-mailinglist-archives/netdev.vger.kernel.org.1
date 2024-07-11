@@ -1,91 +1,116 @@
-Return-Path: <netdev+bounces-110970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9182B92F283
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:16:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF97F92F2CB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C7CE1F2289F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:16:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 040801C219AF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63ECE14B061;
-	Thu, 11 Jul 2024 23:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0539C160865;
+	Thu, 11 Jul 2024 23:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7nJXiQL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTzQaDsv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407E44F1E2
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 23:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223086EB7C;
+	Thu, 11 Jul 2024 23:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720739777; cv=none; b=fGy0gteq2JyhrkL6amWIKK+KsJgWB0O8tzyfsGgMdnV7t1FaCLR2rZUET9aVxGwGLbY3m3RlLzXIkrI6fyBsJjycaGhHXcTMfCpU8S6qIeD9fHEB69ER/EIJ5pwCCapJjvUo6nblhWvSbtXPW/otpgYRugZb2wlGJnEkPn4QezU=
+	t=1720741903; cv=none; b=LPVlO96Ya3QC9wUx1xNJuB/7pyFrxGT0+4Bk6r30fgBWx8K/Yzt7x2kNma/+K5WOdiazxplU41Z8byUohaSPUd3myvH+wkhlwgkJW+j2UBnmqKpXK9TRA4zPBFdvGvITA5md2g3tnuZIgBzXdfwKE4j7i9G+AzgTpQNboKaMKRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720739777; c=relaxed/simple;
-	bh=/G5jebomNoSeuOtYnQw1FhFYniU7G76DtNIt1eKT6tE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GRmeqKTLoV9iqZczHqYczlJFC2M2x/KAMetuwzcoqzW1uDXTMNlN4aZvodTP/2bZDpYm1Pg7wPgxNEYbCaaCh8IUmqrylpZb27t3IgczKef1ZdOjlT6znIVhHiQMyetp4VZALkw58QDdynikmDmnnWG311gZJpVBgavfuSqCdx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7nJXiQL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A06CC116B1;
-	Thu, 11 Jul 2024 23:16:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720739776;
-	bh=/G5jebomNoSeuOtYnQw1FhFYniU7G76DtNIt1eKT6tE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m7nJXiQLhvvgk1nT0wj2QTfjO2osO/fCUD3XWtLB1g3FW6YZTFJh7s9HEVMC2eDou
-	 +smTbz2Pw5KenXOPT0zKOptkDq7JCWqhEZBUKLdovGMb9bYO88hl3a4DRgvm6wiHsl
-	 9Frnx9yd7hBjlREUkneCrBzGaibGDOCPEomCGeKWU4MLdDc4Xc6WFL0jsTJ+pmRvLe
-	 1ip+QYcXyBYGN8QZhsBFOiA7+k4DpK7XDbYXiAuQTGaC9pXrNaV9RX8ovuK8CrM70H
-	 /7f7sRosWYxYA/qeaz1OyWCNcXCynzQagOJvsJXSIZZGjSmcbhf2wyuAeVRQm6kG0a
-	 Sn7Sga3Ee5LGg==
-Date: Thu, 11 Jul 2024 16:16:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, tariqt@nvidia.com, rrameshbabu@nvidia.com,
- saeedm@nvidia.com, yuehaibing@huawei.com, horms@kernel.org,
- jacob.e.keller@intel.com, afaris@nvidia.com
-Subject: Re: [PATCH net-next v2] eth: mlx5: expose NETIF_F_NTUPLE when ARFS
- is compiled out
-Message-ID: <20240711161615.123a5008@kernel.org>
-In-Reply-To: <ZpBlOWzyihXUad_V@x130>
-References: <20240711223722.297676-1-kuba@kernel.org>
-	<ZpBlOWzyihXUad_V@x130>
+	s=arc-20240116; t=1720741903; c=relaxed/simple;
+	bh=yLuenXi7mNTZLGlPoQmf3M2TZQJUdq3ySkuvd61rF2s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p5TNySFunyaghGpHVzVC2s3Tgjct4WIopHWTmt2cUTSjP5mI+i99YluHVwMmpGkHyscAFOa7JaoyNkv0PmjCwWMzLdUV4NMjTZcGkY3J+0XwntFKUyRcrAMCFdbiKuMvUgbtRoJl7YYQ+lbZaxj0P7BErDWTEMOCbQ1AhkoZpC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTzQaDsv; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4279c924ca6so4856925e9.0;
+        Thu, 11 Jul 2024 16:51:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720741900; x=1721346700; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5rNOkKqKSlXdOxVSuCJmj91KdmRmhTrpa/Yg8kLQxJg=;
+        b=PTzQaDsvpxiKLgA2sTFYuydEsWznDjJzNR68+i+XXBhm5OsPH43P7UEDkloF5gs0C/
+         6MuIT/fHIQuNwZ4f9DfHPx+25UAC3ZxoOIoo3lRVHi6ZIsJmQ7/9s9Vgj5vkjHSRi9NA
+         yU1BR77EreYQHaB0uIhM0HCPlVcTmYrc2g8sfBCWQRi1NR/C1A9ThxdjAmHalarVyokQ
+         i9LOUmb8frg+o4c9GsNyh82FACPO3P9c03poU2Ln3eKiEkWhPtxCNnBodknw2TN9/XDY
+         V/AcrFJsKuyr/vIRZuRb/S2sRughH65m5VkWVUwwh+sIxO2/wehsaTzO5HZZ/AE0ama3
+         SkhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720741900; x=1721346700;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5rNOkKqKSlXdOxVSuCJmj91KdmRmhTrpa/Yg8kLQxJg=;
+        b=pPAfDYb4YuR2/8Ba4bickuejoqA6sZl8b4jmQhZolLwIOCK20HVdlhbjd1ED3sqfda
+         jWAmN+Svy1icNs2hrNwBYV3J37vUEq8RRPYl6D7JOMb6lBdfOgq9UZ0HCf78UJF135yI
+         1fEvDMDqHuD58dD9i4EykfZpX5H7LeMm8stBYGJD5fI+2/LfiUnZBWPdv8O5E85JseUU
+         ayOPkYRROe60Q+9eqTzNzLt/2+PyPsKeEKRTa/RZnoqgUYX3SoPYR9ft9dKdBKsto91k
+         MaufzLsqKxta2aaw33QzSdM5d+qBSnAokZqGkSqIy9TNZ53H98PBk/mhMsBJZxQDMuia
+         WtSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvdHv5d0V3N96gj+Eyu70uWTq3wggZ9mqX5O74S3v5vzCU8w+ds8/Vf7gI6evrzQ5j5PfmM1sQf0X79gAlLHbuiq2S8ByEQ4jOSHZ9jCenzg8ZaV84AfhH1dZhhhGLzBkVLQchwopFNXw5o8ghIOPITuNEJ+8uzUgGNgSZcfDYbdU+Oh8i2wdkOky6xTgaTTwGqRvzig==
+X-Gm-Message-State: AOJu0YzlvCaCAXI9ilVhC3Sn7jCPwwTYtD9KjweDucQbWOU7AAnf4B1s
+	/bMTeoM4X+Z0HaOFx2yt4ZmZriXp6rejamNo4TcqPOxRLyqB+vFqMrl2QLzHWjLpvSNhV8OZHQk
+	bEpzH/8JahKLyiRa7X3Y+M7iinVjicmEF
+X-Google-Smtp-Source: AGHT+IFrtwMZGSser2pdLEMHu9/BZwtIElLY0d4iYbH3J9P9LMSwb1QRp/owr34MzeIK2Dss6VDWbjorwxkpYt37c8M=
+X-Received: by 2002:a05:6000:1887:b0:367:89fc:bc11 with SMTP id
+ ffacd0b85a97d-367cea4625emr9022935f8f.10.1720741900251; Thu, 11 Jul 2024
+ 16:51:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240712083603.10cbdec3@canb.auug.org.au>
+In-Reply-To: <20240712083603.10cbdec3@canb.auug.org.au>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 11 Jul 2024 16:51:28 -0700
+Message-ID: <CAADnVQKVC4NGsEU0X3XJmmCot40Vvik-9KNFU07F=VBF-4UVRQ@mail.gmail.com>
+Subject: Re: linux-next: duplicate patch in the bpf-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 11 Jul 2024 16:05:29 -0700 Saeed Mahameed wrote:
-> >+#if IS_ENABLED(CONFIG_MLX5_EN_ARFS)
-> > 		netdev->hw_features	 |= NETIF_F_NTUPLE;
-> >+#elif IS_ENABLED(CONFIG_MLX5_EN_RXNFC)
-> >+		netdev->features	 |= NETIF_F_NTUPLE;  
-> 
-> Why default ON when RXNFC and OFF when ARFS ?
-> Default should be off always, and this needs to be advertised in 
-> hw_features in both cases.
-> 
-> I think this should be
-> #if IS_ENABLED(ARFS) || IS_ENABLED(RXFNC)
-> 	netdev->hw_features |= NTUPLE;
+On Thu, Jul 11, 2024 at 3:36=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> The following commit is also in the net tree as a different commit
+> (but the same patch):
+>
+>   6f130e4d4a5f ("bpf: Fix order of args in call to bpf_map_kvcalloc")
+>
+> This is commit
+>
+>   af253aef183a ("bpf: fix order of args in call to bpf_map_kvcalloc")
+>
+> in the net tree.
 
-That's what I thought, but on reflection since the filters can be
-added, and disable doesn't actually do anything - "fixed on" started
-to sound more appropriate. The additional "[fixed]" could also be useful
-for troubleshooting, to signal that this is a different situation than
-ARFS=y. No hard preference tho.
+Argh.
+So the fix was applied to bpf-next back in May and the same people
+come back to complain in July that it's somehow still broken and must be
+fixed in Linus's tree.
+So the new patch was applied to bpf and pulled to net
+and on the way to Linus now.
 
-> Otherwise LGTM
-> 
-> Acked-by: Saeed Mahameed <saeedm@nvidia.com>
-
-Thanks!
+We will ffwd bpf-next in a day or so, if git cannot handle it,
+we will revert from bpf-next.
+Sigh.
 
