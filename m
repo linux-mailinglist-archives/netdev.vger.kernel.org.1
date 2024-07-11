@@ -1,50 +1,66 @@
-Return-Path: <netdev+bounces-110750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E9C92E266
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:33:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D2792E28F
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54CE6286EC2
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:33:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44DD28B067
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A10152189;
-	Thu, 11 Jul 2024 08:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841FC13B59F;
+	Thu, 11 Jul 2024 08:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKe0I392"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="QyBv1DEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38811155A34;
-	Thu, 11 Jul 2024 08:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014FB78283;
+	Thu, 11 Jul 2024 08:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720686674; cv=none; b=FWlA8EfDBw32/UnbkcBy8w5b5uxamO7IHk6l5yA/S9ctjtvpyn2ixa2/bxl7y0MU+OqFZ7dvL0g2eA+IBJX0+OfnT3JvGZuViYQxc4FhPswCIBUUY7vUDZxhuekdOgXK8X6o7IdziMDOhtTaR9k2NZ0h8e+WLHSsb9rax/smbvU=
+	t=1720687223; cv=none; b=reF70/FtDFdr+M4Jcq9FrmfVwIJ1FKUvk0EFsezlS5kJXfZzvXa9bo5kjr4DT0ZwellRFqUYz6j5y4YmJsAW9j6h1pZZU8RvcFnjFGzWrkkcvKCyh010NWyADXKjQnBBee9HZoxaOIpWvn3kojoT1rl/Tk4LGp9YszXJy5bzCEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720686674; c=relaxed/simple;
-	bh=aC3Xr9tS22ND23vxAONRN3pa/zO5+j1Y/oCN8be4Ids=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=phSEfK3tk+vrwtA/ujSIzxf7dzh427drR6p7OzuT3Q2fptvV8yRRsHRleIKkLo9TyZou2k4aK6heuinnij50vmewONzl1MD0321yUEZQ/UZvon8arPpVGwwGZhFdbq2UBjg4rQcDU1PXsgp7ZrmNPB+wW6RYvVFsPqYuvUBCIjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKe0I392; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A5D0FC4AF0A;
-	Thu, 11 Jul 2024 08:31:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720686673;
-	bh=aC3Xr9tS22ND23vxAONRN3pa/zO5+j1Y/oCN8be4Ids=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KKe0I3923FdDqHvWUh6oX1FOOD0dAUqy3ws6sX7bdqT35X6RXXENDNezfvhpMpy1f
-	 l3wQILHmbnyV+LlHM/enz2pMHEiuPFzgKF/Lz0ai3Y7hFXbjeELAdIzf00WVueKWWX
-	 bQyxoAObhQDriQ/U+8dAQ695ia3III3rJZwJ/3bBEmc4jlJUcgT0mjt9CkdemnqKWw
-	 Nen4ezEB1djRqweqe/S/tLmZ6zj8NnjsezDXXgvK245mjiCoSBCF/EZdjGOx3gw5a/
-	 hrP2rkD/32xnFY4XRHDVDdOGpTKyJB+5vrAqeZ1pGKUX/jwhDn1z4RaxnK8Eq60elK
-	 fN4xRQX0lqubQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9200BC433E9;
-	Thu, 11 Jul 2024 08:31:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720687223; c=relaxed/simple;
+	bh=mc9w5NzDBPnS0TnM2ITAqGZMns2hnTzukvho8kud2gs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F/oYIKUih84c/5u5nKp0zspP9UC8swXINWisWWFNeiXn/7zgkhl9NjcDDxoEAPWGHj8qeQU9LEXc+0Hdft/hIxzslHfCcWp8YtXCyHlh00a/PlI0HLNvoGnBvSOz3GXeDZyCA6G+fE6GQCcmLKK3oYz7DoUceRmnDOnoraSujfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=QyBv1DEb; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=rDyhdwH0D6qoj4ubPy7FV55fYiDYuk1Ur9NfVUnV98Y=; b=QyBv1DEb+fKpwtYAycR0BRXF9T
+	UHD/eU9E+gOYmUXF+fI5vwr9IvZAKUc+uGR2R9uzgEzoD/ZLwShIYv6r4DbH1da2XmwRdCvoH4hGP
+	AU80hVZ7Nx2eLKOkhnMG5zLNxxFXRrw9QfiC4rVXNrGkL53+Nt4dS2nKzifjROafWcx9AzNqcmgJ9
+	LKHoAX50TYSR28UKCsHNG7m11l9vG6UY2DWZ5b4t7aBQTbp5BNyq/ni2t4bO2Af8LEXX6oaxdMDG3
+	bLB494Ek+9f9QLM/rv16S/WASqf/flFQ/gdHNE2AhyYgd+Oc5KlHnxXIP7EXZq9IQlk4qO8/ZwYZN
+	jh8DTUaQ==;
+Received: from 35.248.197.178.dynamic.cust.swisscom.net ([178.197.248.35] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sRpLd-000HDK-Mm; Thu, 11 Jul 2024 10:40:17 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-07-11
+Date: Thu, 11 Jul 2024 10:40:16 +0200
+Message-Id: <20240711084016.25757-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,46 +68,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: ethernet: mtk-star-emac: set mac_managed_pm when
- probing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172068667359.28697.10752199531087262735.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jul 2024 08:31:13 +0000
-References: <20240708065210.4178980-1-jianhui.lee@canonical.com>
-In-Reply-To: <20240708065210.4178980-1-jianhui.lee@canonical.com>
-To: Jian Hui Lee <jianhui.lee@canonical.com>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, f.fainelli@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27332/Wed Jul 10 10:36:46 2024)
 
-Hello:
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The following pull-request contains BPF updates for your *net* tree.
 
-On Mon,  8 Jul 2024 14:52:09 +0800 you wrote:
-> The below commit introduced a warning message when phy state is not in
-> the states: PHY_HALTED, PHY_READY, and PHY_UP.
-> commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
-> 
-> mtk-star-emac doesn't need mdiobus suspend/resume. To fix the warning
-> message during resume, indicate the phy resume/suspend is managed by the
-> mac when probing.
-> 
-> [...]
+We've added 4 non-merge commits during the last 2 day(s) which contain
+a total of 4 files changed, 262 insertions(+), 19 deletions(-).
 
-Here is the summary with links:
-  - [v2,net] net: ethernet: mtk-star-emac: set mac_managed_pm when probing
-    https://git.kernel.org/netdev/net/c/8c6790b5c25d
+The main changes are:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1) Fixes for a BPF timer lockup and a use-after-free scenario when timers
+   are used concurrently, from Kumar Kartikeya Dwivedi.
 
+2) Fix the argument order in the call to bpf_map_kvcalloc() which could
+   otherwise lead to a compilation error, from Mohammad Shehar Yaar Tausif.
 
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Andrii Nakryiko, Christian Kujau, Dohyun Kim, Neel Natu
+
+----------------------------------------------------------------
+
+The following changes since commit e1533b6319ab9c3a97dad314dd88b3783bc41b69:
+
+  net: ethernet: lantiq_etop: fix double free in detach (2024-07-09 19:02:07 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 50bd5a0c658d132507673c4d59347c025dd149ed:
+
+  selftests/bpf: Add timer lockup selftest (2024-07-11 10:18:31 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'fixes-for-bpf-timer-lockup-and-uaf'
+
+Kumar Kartikeya Dwivedi (3):
+      bpf: Fail bpf_timer_cancel when callback is being cancelled
+      bpf: Defer work in bpf_timer_cancel_and_free
+      selftests/bpf: Add timer lockup selftest
+
+Mohammad Shehar Yaar Tausif (1):
+      bpf: fix order of args in call to bpf_map_kvcalloc
+
+ kernel/bpf/bpf_local_storage.c                     |  4 +-
+ kernel/bpf/helpers.c                               | 99 ++++++++++++++++++----
+ .../selftests/bpf/prog_tests/timer_lockup.c        | 91 ++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/timer_lockup.c   | 87 +++++++++++++++++++
+ 4 files changed, 262 insertions(+), 19 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/timer_lockup.c
+ create mode 100644 tools/testing/selftests/bpf/progs/timer_lockup.c
 
