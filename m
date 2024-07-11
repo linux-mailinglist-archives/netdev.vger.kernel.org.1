@@ -1,153 +1,101 @@
-Return-Path: <netdev+bounces-110935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 577D392F03C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:20:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5315F92F061
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A1BD1C215E1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:20:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B140FB22EF8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0329B19EEDD;
-	Thu, 11 Jul 2024 20:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100A519F49E;
+	Thu, 11 Jul 2024 20:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WEWgByBw"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="foTghpf5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E8019EEBB
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 20:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C57151004
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 20:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720729182; cv=none; b=gcJLrT7xfgULnpb/E5gVK1JJyG2Xc3gE5GpOoz3OvBGDp8aI+SMjdNBMrL3LmpHJlm3irzG1thjMgviuaqxnz6HE8Ow50VJ/WxOLlgtAQfPIgAKg88JfAB9erNiVzWIDNemVsjq5rB+8UNDt6Qas+EYK37l9JyzBXKvYNtPMNRI=
+	t=1720730026; cv=none; b=Yl6mONJbyAlRi8Q4lxv/p05EpsJIBZn+rvh3XbbpX//G8ntuah6k+6Ke1yVwJ2023OmOGCqMra61b3D3Zg0+aPq3KDwIOh0uhOxbpqXdFl8aCz/Ibl4W5CwsRR4U9hgRLgoFPdxXJOAvcecgSJHxBDFMtcHAz4anZVVBhyaddzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720729182; c=relaxed/simple;
-	bh=X+8JKyy8qpnkW0bAtQjvBGoi4ccMcR5vuw6AThdzJ1U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sz2oLWyhU78HRv88CeWkZQescFL+QKAVxbLnIeIUnYhhAvJ3I0RXA93TzrUhr9DM0KbKjcaUZYeG8le1D9GflhLmm2RZjAu59sseWtx82k29LznOUSvVomefSJqFniF3P1VKXfKyuE6SdeKUUxe3ZAyYm9SBRZeLvnpIwiFKIw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WEWgByBw; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720729181; x=1752265181;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=X+8JKyy8qpnkW0bAtQjvBGoi4ccMcR5vuw6AThdzJ1U=;
-  b=WEWgByBw4ctIeIFRt/AJdRpVZ1KRDrkN62wI5PXnfwb8rd5vKEQ/plp1
-   FxvvsZU/Szeb0ktzYs49NMK6u09p7evFNGICIBNAUkrugS+xsm+4ozdyK
-   GMl+1/lTf0TbyCsvlSfFH3dQBFbm87QV6uOYxL6NqX8nhdAz2NkI78Emn
-   LaDfzfpaEResNh6UZJQ6ER1zxjffgrf6YxGhYU5hKtjDEDApC3n/mBkxF
-   00j0a1fOEo6yXlF8OEQ9Tvdna2jbxRBVxoTPam2REWPv6B0c0CO2Xrzeo
-   D79/u0LdmCqoXWgh7TH2jpgtW5GHcez5S0qj6Msc2dX7hRAniNMBXVILP
-   w==;
-X-CSE-ConnectionGUID: CppfrKGfSdeEM0dbE+lSpQ==
-X-CSE-MsgGUID: DaPhDZQfSu2K0HDCpuY9MQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11130"; a="12508411"
-X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
-   d="scan'208";a="12508411"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 13:19:39 -0700
-X-CSE-ConnectionGUID: ezdGeDgOTd2sH+eGx3Zi8w==
-X-CSE-MsgGUID: jrwLOEQHRPSChB1n3cJemg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
-   d="scan'208";a="71887421"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 11 Jul 2024 13:19:38 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Sasha Neftin <sasha.neftin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net-next 5/5] igc: Remove the internal 'eee_advert' field
-Date: Thu, 11 Jul 2024 13:19:30 -0700
-Message-ID: <20240711201932.2019925-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240711201932.2019925-1-anthony.l.nguyen@intel.com>
-References: <20240711201932.2019925-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1720730026; c=relaxed/simple;
+	bh=1ntlBVZaA6nIqfQ0L6ZAA5wpv5JsM6PuyIdSwyncDKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LJwfU8JYQUeaSgaccwbN+3byqDrReZ4yv09w40pTfiNYRVUz617aIlgGdz66JPbK/MggC+n8ysXCbA4ZV4o3+y6bnyp5l6Q2K7bgFfcGlYMuEm4J+7DMnhHnauzH+kCSuznB2sd4NNdCgfkUMsIK7D/7ZY/cyyaNXUpt/LWIcqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=foTghpf5; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sS0Tq-007vsi-GH; Thu, 11 Jul 2024 22:33:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=9cd/vhXK716SREp7Lhm7dFiIgMHnwk6lJItzbpojeQ0=; b=foTghpf5CilnhUDxC5iGhBSmqg
+	OodOA0hxXaHVQrEpLvRmD88XlQyOK+oqBNNp7KdrVZSThuLStK+ob67onrxQ7XyH7HCkGxLK4DuHU
+	mqqmUo07XsiX6p3W4gWb5kn5T1lRbE0lS8j/OKLLj5JfXvXOjvaGR2iW/G5Y++tpzgIMtUewyRrao
+	NEebImQj5M0zamHntkkf5Gu47CRbQi+PlquZH38HUTwCQcoomN9al/YDd+F2VsifcioAXdxSfK8Nk
+	OC1gjybKKFbYr2iU/en+p93xdU2QZQcVI2RzyKLx9wFajB8KVCLVi/AmpJcWczixOTYJuJuN0DJzu
+	0hx966NA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sS0Tp-0000EC-6g; Thu, 11 Jul 2024 22:33:29 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sS0Tf-002COC-Di; Thu, 11 Jul 2024 22:33:19 +0200
+Message-ID: <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
+Date: Thu, 11 Jul 2024 22:33:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
+ unix_inet_redir_to_connected()
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ john.fastabend@gmail.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
+ cong.wang@bytedance.com
+References: <20240707222842.4119416-1-mhal@rbox.co>
+ <20240707222842.4119416-3-mhal@rbox.co> <87zfqqnbex.fsf@cloudflare.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <87zfqqnbex.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Sasha Neftin <sasha.neftin@intel.com>
+On 7/9/24 11:48, Jakub Sitnicki wrote:
+> On Sun, Jul 07, 2024 at 11:28 PM +02, Michal Luczaj wrote:
+>> Function ignores the AF_INET socket type argument, SOCK_DGRAM is hardcoded.
+>> Fix to respect the argument provided.
+>>
+>> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+> 
+> Thanks for the fixup.
+> 
+> Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-Since the kernel's 'ethtool_keee' structure is in use, the internal
-'eee_advert' field becomes pointless and can be removed.
+Ugh, my commit message is wrong. Change is for socketpair(AF_UNIX), not
+inet_socketpair(). Sorry, will fix.
 
-This patch comes to clean up this redundant code.
+Speaking of fixups, do you want it tagged with Fixes: 75e0e27db6cf
+("selftest/bpf: Change udp to inet in some function names")? And looking at
+that commit[1], inet_unix_redir_to_connected() has its @type ignored, too.
+Same treatment?
 
-Signed-off-by: Sasha Neftin <sasha.neftin@intel.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com> (A Contingent Worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc.h         | 1 -
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 6 ------
- drivers/net/ethernet/intel/igc/igc_main.c    | 3 ---
- 3 files changed, 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 8b14c029eda1..c38b4d0f00ce 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -202,7 +202,6 @@ struct igc_adapter {
- 	struct net_device *netdev;
- 
- 	struct ethtool_keee eee;
--	u16 eee_advert;
- 
- 	unsigned long state;
- 	unsigned int flags;
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 0cd2bd695db1..ab17170fe7e6 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1636,10 +1636,6 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
- 			 edata->supported);
- 
--	if (hw->dev_spec._base.eee_enable)
--		mii_eee_cap1_mod_linkmode_t(edata->advertised,
--					    adapter->eee_advert);
--
- 	eeer = rd32(IGC_EEER);
- 
- 	/* EEE status on negotiated link */
-@@ -1700,8 +1696,6 @@ static int igc_ethtool_set_eee(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	adapter->eee_advert = linkmode_to_mii_eee_cap1_t(edata->advertised);
--
- 	if (hw->dev_spec._base.eee_enable != edata->eee_enabled) {
- 		hw->dev_spec._base.eee_enable = edata->eee_enabled;
- 		adapter->flags |= IGC_FLAG_EEE;
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 7a7cbed237d3..cb5c7b09e8a0 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -4975,9 +4975,6 @@ void igc_up(struct igc_adapter *adapter)
- 	/* start the watchdog. */
- 	hw->mac.get_link_status = true;
- 	schedule_work(&adapter->watchdog_task);
--
--	adapter->eee_advert = MDIO_EEE_100TX | MDIO_EEE_1000T |
--			      MDIO_EEE_2_5GT;
- }
- 
- /**
--- 
-2.41.0
-
+[1] https://lore.kernel.org/netdev/20210816190327.2739291-5-jiang.wang@bytedance.com/
 
