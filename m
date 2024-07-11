@@ -1,232 +1,231 @@
-Return-Path: <netdev+bounces-110844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E29B92E921
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:18:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E8892E973
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A3531F2321B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:18:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EBAA1F22DED
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D84015AAD3;
-	Thu, 11 Jul 2024 13:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE1015FD1B;
+	Thu, 11 Jul 2024 13:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HKEgbC9Y"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="UgDxiQPB"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013061.outbound.protection.outlook.com [52.101.67.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA5814A601
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 13:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720703933; cv=none; b=O0JpbO/hAdO7T0JGjPQShXedDVaof4y8xst0D/tYL/kltiMj4H6JkZk7QUrdTowO1ikoDNqETqVGOnViKT47iMFyxl7ojL1yl7hoUGtLCZMGQlaBbQaKHZz12vGWEPsGbc7N014m9bPjjAu9DZEvKAwf3EcQpMyOx0cDEoR1PMQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720703933; c=relaxed/simple;
-	bh=bT3VHDsQRTb1ak0ThO8qg0IVMErf02GTkWZBQAjTOVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7tr7Ts/c//EnpXhPmfJ95XmzHtek6V3zzCYDDe1N0W46F/kp0imqdrDOzb+qPheDeZsONYbswEZxNNlDBMrdKjR68sjVOJ7YE23sxOqedhbyGa8zcZAW5VjXVPbklv7R4Q3h97z/7IqZrNxSuBFgDcgpg8nUbYCTd+J4gDnlo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HKEgbC9Y; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 804151140DFA;
-	Thu, 11 Jul 2024 09:18:50 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Thu, 11 Jul 2024 09:18:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1720703930; x=
-	1720790330; bh=NBKtKtydpdjQVe/+6Oi5w/AwibY1nYGlm7vTb6dxYJY=; b=H
-	KEgbC9Y9lvHQfa8rf66ys9z0qv8zsL7zx9sDDaKu2I8EvfZMhogkocXqAF+2rcgX
-	vucbbopp5v6tGLemiQ5rHfnw+YNRBDcNDJMUoU9dkGru1676unaOIWX0FtS29tIm
-	dvr/wYRKhEvtUshJBWO9NP4J06EGll3EP9OWJbRWH1uiHySszspO54NkakX4mHoP
-	VvWemfi1agWTChNijuYFNF5pn62g5bni261V14JR37TOaW62OxeAeHVW2kuKyp2f
-	Y+VwNUkyZwyng9YUoudiMg/XkeQikbgw+8y6+Bw4gS7h791RYnoPEiWe9F7v7h/x
-	4PXfUXUDhaEtzt1uwXq+Q==
-X-ME-Sender: <xms:utuPZnLS8k7e2b6t6l8BZyKlDf1GhvM7oqZj7RKyLWIy6o7WFvx8YA>
-    <xme:utuPZrIihOuHoceRAZMoct4oLZJ7gNbWdRxfpj8QLUyFTS9IBGxYiRGBqoGiUR3TJ
-    7P_P-3U5Xlh4dI>
-X-ME-Received: <xmr:utuPZvsJ501rEGA_dcxLNmeFrkjw_E7cbQrHGnfzXnn17yz09hKGJEsBwT0K>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrfeeggdeifecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepgfdvkedugfegiedtfeefgeeuhedvieeffeefgfelvdetueffgedtjeelgedv
-    ffeunecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:utuPZgYunuDLnoIWDehliuEo0zbSaZ3hCJtTD_S-6wEx2lxE5pzC1Q>
-    <xmx:utuPZubAfp7BTosviu9y0KT1XrdWW-otiIBYilg3391AJzHdi-8jsQ>
-    <xmx:utuPZkBiNSaEF-JL9B7NZ8hKCGxpOskcxQNj1jmI3wNBl3Horxl4Pw>
-    <xmx:utuPZsbmncBuqemce-P5O10hzQobAN1AcXW7e0_bLFFKu_Pdd9sCdg>
-    <xmx:utuPZtnELqBcYcBiQvoqth6qrZMAhyA3r_48AO5ntjnpqm5kA_TBA8-g>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 11 Jul 2024 09:18:49 -0400 (EDT)
-Date: Thu, 11 Jul 2024 16:18:40 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Jason Zhou <jasonzhou@x.com>
-Cc: netdev@vger.kernel.org, Benjamin Mahler <bmahler@x.com>
-Subject: Re: PROBLEM: Issue with setting veth MAC address being unreliable.
-Message-ID: <Zo_bsLPrRHHiVMPd@shredder.mtl.com>
-References: <CAHXsExy+zm+twpC9Qrs9myBre+5s_ApGzOYU45Pt=sw-FyOn1w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2A915EFD0;
+	Thu, 11 Jul 2024 13:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720704304; cv=fail; b=rMJdPRVOlt4r1k+C7YY53wB9w1KEkVNbUwY4tCmcxteW1t00T/D2BDU8hPocuwvTSBbJQRClRiUhWU5ORKDRURDcKHpUSKO3VkPDx0hAnV0Z6KjpGO280bt7ntESFQaRbKGkhypLraZJTF+xGs4Du6kvoZvuvAngN1nhJ3UyWes=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720704304; c=relaxed/simple;
+	bh=17R0fAmK2eeF37dunxujFPuYZAw9c4zn/xoLoXIQ5pw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qHXmD0SVZowgSgnacaajTh3dp1QgzlAiRY4XDBJJ/UGuitp6RPQNb+utsaR/M3985YOnqmuqPeV8XHWd6okKw9sv5Jmt6oC/p+HzDK0YPHUF0iza2KuNm36pgEKE/EGVT09lH9t/Yu4Ikjn6YSNOJTIdgxkbHe2f4v3nm/tNPEo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=UgDxiQPB; arc=fail smtp.client-ip=52.101.67.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qWO0lBrOsD+UMXzxHDKh3HFNeQGqHf/oPLI3IkPq+yrQk1a0+i792qvp4Y352xrxJ3b8QMLM0P9l07210PLIsFapfY179dedjbEoUsgg8lwL1jsgU1s8aQHIFXHiyhecAekybfQOtMt5iuJFqO49I6enNIqgfUB9l8buQEnq6MfrJKjb3+4d1IJaCzvnVL3M7FmKl2lEnwR7Hp8Or+4H48yAKbth373DMMsMwSkM2ePlTsBeqYy6iWSfRj7DICQDqoMXH3kyv9tYF510UWMBriL/910cO0VKEsJWMDbt3Zp8G1749LvwO7/vMeu7P6C1ZG41PLu+pkDm8nMjKbVVKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aqUA3wjYeDilgJqc9hq0LR10xrF4Se59Vj+gkNzPvxE=;
+ b=d10r+X3qPVBtCmaWw7caZ5tKNM5EbmNyqxm/WgaHtoBYS0W+qySGZfrDn7QNOGn3sEFl7SofxhvGosWITMoNDufoa9rgA3aQMEg9gLuVcgmu0YBXNigbCaFCwxIaX1bQS7SATSraQpHOSWgOIUSY1IQg6Fp0bBtz1QTXafY98E9Waop+EOuJ/F0O0LBuyB9VauWhovjLQs72f9FsAUWdlVqHWKn3YT/f84dds99MRHY07aAlpJFRR5VD4jximHvP36rYCRNpBJtAqZ3ftMtJub8gA46zf1z8L0YcpT2ZTGZOA8pK0H8SfQJVNUzUUi5eNtxnZa3WBE2/UsEf1FkPEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aqUA3wjYeDilgJqc9hq0LR10xrF4Se59Vj+gkNzPvxE=;
+ b=UgDxiQPB6W0R5w0q4sTf3XK9pwg/eFh0MGFj1HrYh9mM4tyYRqEGJSRJg2wQDPB5Gf7MsxhmIocsPrp8Qa4BOXvY32uZt01nadvzONUQAKwm+m4HvbUhfRFFbYLhsbeivVldDRKk7D+FKf72KkrniLIEhJATzNDL5M3RGluZcqI=
+Received: from DB9PR04MB8185.eurprd04.prod.outlook.com (2603:10a6:10:240::22)
+ by AM7PR04MB6936.eurprd04.prod.outlook.com (2603:10a6:20b:106::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.22; Thu, 11 Jul
+ 2024 13:23:54 +0000
+Received: from DB9PR04MB8185.eurprd04.prod.outlook.com
+ ([fe80::7cbd:347b:1bfd:fb35]) by DB9PR04MB8185.eurprd04.prod.outlook.com
+ ([fe80::7cbd:347b:1bfd:fb35%5]) with mapi id 15.20.7741.033; Thu, 11 Jul 2024
+ 13:23:53 +0000
+From: "Madalin Bucur (OSS)" <madalin.bucur@oss.nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Breno Leitao <leitao@debian.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH net-next 0/5] Eliminate CONFIG_NR_CPUS dependency in
+ dpaa-eth and enable COMPILE_TEST in fsl_qbman
+Thread-Topic: [PATCH net-next 0/5] Eliminate CONFIG_NR_CPUS dependency in
+ dpaa-eth and enable COMPILE_TEST in fsl_qbman
+Thread-Index: AQHa0x0der10ldsDfUGubdQCvalI0rHxhJZg
+Date: Thu, 11 Jul 2024 13:23:53 +0000
+Message-ID:
+ <DB9PR04MB81850CAA8C2AD7CA03D9E76BECA52@DB9PR04MB8185.eurprd04.prod.outlook.com>
+References: <20240710230025.46487-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240710230025.46487-1-vladimir.oltean@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB8185:EE_|AM7PR04MB6936:EE_
+x-ms-office365-filtering-correlation-id: dfe02133-e6ab-4273-815f-08dca1acb59f
+x-ms-exchange-sharedmailbox-routingagent-processed: True
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?gU+PcZ+CSWW8g3xd1xkX2mqtQJPXWWzbGHo8a/GfoEaKz83tXTuTk8IJ2igz?=
+ =?us-ascii?Q?FXVsWLp4mqQuOO8tvszg0mRAqL7fFe5U8hZSlt+nSo9tWDy5WFYUOb3OI+Ni?=
+ =?us-ascii?Q?dDuT1khjZr7mtiodKg/4ok2iVr/oeHPLdDsBrOiwruFkvzg0tY3OfzyRLOAB?=
+ =?us-ascii?Q?kqmgzq7o8dKm/5FH92TGapmLJeXhzoGkf+Hx/gQCbJVtLFrdIL3kCxjnruiN?=
+ =?us-ascii?Q?jhxY32J3ruO7A59HJ1IoRAvbSVxGBmOBO5maKLJTsNEpYY4p9zulIL4zzq7Z?=
+ =?us-ascii?Q?haVjyZj1o93vbnTC0pmwsbtHx2RZgx6+IeZB9slqsN4+b5dH7ErmGQE6DjHX?=
+ =?us-ascii?Q?IZtdqz/zU2uT8DUF2UPYknE0zUXAJRlMg18ZSzwfTTitwpF2U1jGcrFcJN/P?=
+ =?us-ascii?Q?LmX5dSBYQ/aQ8UqvewH43YdPkGsiSHmZwxq1bman8rKN2QUueLULM1soIsd4?=
+ =?us-ascii?Q?mo9N6eXvsfvjkvpAOcmmx+42Z1wvtSGWTgUOywoTahsM/FRYZICNSiqV3KD0?=
+ =?us-ascii?Q?7t7yss/qldTNAgrKbC43zys6OO3H7zESTZed221vfs0K5dG5rr1r8LdY09Lk?=
+ =?us-ascii?Q?E97j+lolCwra9DEopOs9g1sLkXPV3ONQ/Ne0EX9cQESvF6OMGBASN8d2JMWq?=
+ =?us-ascii?Q?gQeCgyZvjeB9S0O2QpFw1pUOs2Fx6lEd6QeliPtBgPqvsj1mYwHXJTJwxt9n?=
+ =?us-ascii?Q?jpzKoArH77OGlRPuZidH0cxFJbHAhJDJbq9h49KLhMhMvr01FZvo/QINCWB7?=
+ =?us-ascii?Q?LdcM1y7kPIetnNAwBjoM6iGVRcJ+2+E0lQ40PDZmEb5YRzo+poqiDBTRisqs?=
+ =?us-ascii?Q?MenenYayRnyi9MyU3mqZctrZCV77CFMLPL2oB1R/HCXr0G7n37WpQMBZsQuv?=
+ =?us-ascii?Q?6bqFpXEaK/09DG+sMhePPLo6tAW7mFc4sUBPKpPzJZMeH4NNkNNJJ760NoqR?=
+ =?us-ascii?Q?uP2UIQMRvOUnSG4+Bsu6bWierVFLyzXzvmmRE2h0cC4IwpJLehdHC+OQ1JHN?=
+ =?us-ascii?Q?4LpJBkar4Fd6vgK7FwRdwiq16Ut427mFUzCtMoGHG+tVOeXMMa8VNX3gT9QW?=
+ =?us-ascii?Q?e/xhbAHJP7RCxXqU66mwX5GetaIP+rUTVUk+aJEtLQQcm3jxJEppcFQyYro9?=
+ =?us-ascii?Q?7HQIR6RCjQZw9WDstcnz2o47Oi163eMRwgs5289LRg5lDCEIbGeJ8vnIF3Gx?=
+ =?us-ascii?Q?JmD+jds9FzyRBXuy8XoFK8wm8IKhh8BoJl/oiwRRj1owTETFMtw2+wdj167H?=
+ =?us-ascii?Q?ZF/uPEGghz+bNe8l0MK/o4ptMKAXqPj1VPj3a7X+kkJMAzL8FqaB7DRhkQM3?=
+ =?us-ascii?Q?5YilJN+ehFXF5i9OWO4PRfgzI4U1i8jWXJiTuTK3a39bApUWKd3eVfKi9txu?=
+ =?us-ascii?Q?Sfo9F1A=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8185.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?hot9YoOwdTDQNY+Cj8aXooDOSRnKT3E3NMgfRDn9ncBxXI0+MLtLpX1Cptni?=
+ =?us-ascii?Q?WvZy2bArT7q+yiAxEag6hsyrxrSAvlIPA8+4h0Ct5ojDk5KTeWRp2O5RYWC7?=
+ =?us-ascii?Q?gxabpxE0miE/bhByH4SZGQhnOpBvmp4Q6fWGd0LUUtVJnp70KjYO+hwnZd/6?=
+ =?us-ascii?Q?Y7n9u6ccxJdw3nsgNcfgjDuEPR+6JAm3QTzP5ABSAgqdK9wkYanmEFDAZlXh?=
+ =?us-ascii?Q?U7U4TNQy4g4RWpWo67t/hCjOOYX4u4IayyJT0l/hoDTnKS0SQ2/5lcQ5VSDF?=
+ =?us-ascii?Q?5wFpBLzsKUjkUpWx9NWMP9fibpeu9TQhBhyoYid9zMWZG6CI7+vadY0ItXuF?=
+ =?us-ascii?Q?JfKALvdmy6MqdIJbLeEgfb/CYYdEoj6dJnLQy6SXvJbM31Y8g1PQNHKy6TmT?=
+ =?us-ascii?Q?iPHokMRzUPxh8KS+7oxdxDLzQw3udBeoKDzTqmmnZ4CunOpOmbF6x/PAHr5A?=
+ =?us-ascii?Q?4gVsN4DxBrPVvpZnY+ulQpIzxSoZQ3P3rZPYTOi5UUXW8eDeFxjwXsfCIM06?=
+ =?us-ascii?Q?gZP2+7ZsKTUY+yspxgtPtzYaf80/V4PeWjbrxoOF3RdUPXSkn4M4/9qSMr1M?=
+ =?us-ascii?Q?KUqZEZZiLc0T9X1BzCpbbnG+SVMM/RDZRoAT49saUeDdoOYxJYCVL3HLZoDt?=
+ =?us-ascii?Q?1vHJrQxugexOISK6Pu+KrfYniwCeRih1Pw1Eqt4tr8L+UY6DO100PRXOAP3b?=
+ =?us-ascii?Q?sMGagvTnnaIP5zaFPVRonjKkMEb++P9xgU0EFOuTAqOtItXc4OQUmgJs7ezH?=
+ =?us-ascii?Q?ePG/gm1Zv4dqeQAdVNTq0Nlt29X+r9z/C8c7HxLZk7gSbXULTetq9SlNToDv?=
+ =?us-ascii?Q?Kki3IhfRc3W8+sMVn7mofjQD+iQFIcy75bchPRFSQTiEARhEzcQeQijt/jvl?=
+ =?us-ascii?Q?XevzyWjHOP9n80xLe+45oLJWCA0QExYl8E31Ojbo5ntXFfYKbfTiPVhsTNa8?=
+ =?us-ascii?Q?/Fxoszqq16Ba8zbd9V9VyWly0Y/s7QICdMQRve9IH+TrrrbcHTE9d1CXSOCZ?=
+ =?us-ascii?Q?RQe81utR3/3faKxwvLh/OGuthMJ5m4vIrq4j54nX/YXaQ8b/Pb3KmIR6rIv4?=
+ =?us-ascii?Q?XLdfP6SkTEvHFoIECKQ0k6BBm1146vaPLKP3wjqtI2Y24PQcfDnz9BL5otVg?=
+ =?us-ascii?Q?sOiuOVY+/8ALVp+RiT/CBacfEbhd8i//zYMSPdILOJ+kEVYaeqU7cJa9XIik?=
+ =?us-ascii?Q?kdMq4RqwCFoVzvGeydxEDIq7vnT4/spT3ruQc2HIw8nOPHom1tk4sSXrZm7x?=
+ =?us-ascii?Q?U50Y6BBsQAACI7VezszAVArfgd4aZIvjfrTTICU4q6M0cYPjnISElSQIKv/t?=
+ =?us-ascii?Q?gqPb2SwNulEcVgIe2RJlu7elK+soWdZxDGi/2DO+1cmDyXhnoU0lVXY0prQ7?=
+ =?us-ascii?Q?iU1T4P+gyUADL27Fy+CPs+yaWLFEtkoRDukyubDNDIy6DzCg35lsACvi/d28?=
+ =?us-ascii?Q?QD268rWIdjVqfLw7k6QyRfaaBTascCw/Ut8qOlhb+KAgYyHu5kcKjoprvgJH?=
+ =?us-ascii?Q?B+0QunK0BOLP3Ktmw1ndj3FXV4PxrlFpdN0QSam2C+RcX1EqViFzOpdcv0ok?=
+ =?us-ascii?Q?8ts6iIwrDFuOyV5J8KHzQiV0IaL3M1y6/m3J5FJ8?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHXsExy+zm+twpC9Qrs9myBre+5s_ApGzOYU45Pt=sw-FyOn1w@mail.gmail.com>
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8185.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfe02133-e6ab-4273-815f-08dca1acb59f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2024 13:23:53.3187
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dM/RVcbmp/cDkkAbh4rFOT7h8aoNShf2xIACPB6iLdCRt3/xhse3JSqb/y4iVfnsxiLtHJd+xUv7ElOU5gxSEg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6936
 
-On Wed, Jul 10, 2024 at 04:45:55PM -0400, Jason Zhou wrote:
-> [1.] One line summary of the problem:
-> 
-> Issue with setting veth address being unreliable.
-> 
-> [2.] Full description of the problem/report:
-> 
-> Hello!
-> 
-> We have been investigating a strange behavior within Apache Mesos
-> where after setting the MAC address on a veth device to the same
-> address as our eth0 MAC address, the change is sometimes not reflected
-> appropriately despite the ioctl call succeeding (~4% of the time in
-> our testing). Note that we also tried using libnl to set the MAC
-> address but the issue still persists.
-> 
-> Included below is the github link to the section where we set the veth
-> address, to clarify what we were trying to do. We first create the
-> veth pair [1] using a libnl function [2], then we set the veth device
-> MAC addresses to that of our host public interface (eth0) [3] using a
-> function called setMAC. Inside the setMAC [4] is where we are
-> observing the aforementioned issue with unreliable setting of veth
-> addresses..
-> 
-> This behavior was observed when re-fetching the MAC address on said
-> veth device after we made the function call to set its MAC address. We
-> have observed this issue on CentOS 9 only, but not on CentOS 7. We
-> have tried Linux kernels 5.15.147, 5.15.160 & 5.15.161 for CentOS 9,
-> CentOS 7 was using 5.10, but we also tried upgrading the Centos 7 host
-> to 5.15.160 but could not reproduce the bug.
+> -----Original Message-----
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Sent: Thursday, July 11, 2024 2:00 AM
+> To: netdev@vger.kernel.org
+> Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Breno Leitao <leitao@debian.org>; Herbert Xu
+> <herbert@gondor.apana.org.au>; Madalin Bucur <madalin.bucur@nxp.com>;
+> linux-kernel@vger.kernel.org; linuxppc-dev@lists.ozlabs.org; linux-arm-
+> kernel@lists.infradead.org
+> Subject: [PATCH net-next 0/5] Eliminate CONFIG_NR_CPUS dependency in dpaa=
+-
+> eth and enable COMPILE_TEST in fsl_qbman
+>=20
+> Breno's previous attempt at enabling COMPILE_TEST for the fsl_qbman
+> driver (now included here as patch 5/5) triggered compilation warnings
+> for large CONFIG_NR_CPUS values:
+> https://lore.kernel.org/all/202406261920.l5pzM1rj-lkp@intel.com/
+>=20
+> Patch 1/5 switches two NR_CPUS arrays in the dpaa-eth driver to dynamic
+> allocation to avoid that warning. There is more NR_CPUS usage in the
+> fsl-qbman driver, but that looks relatively harmless and I couldn't find
+> a good reason to change it.
+>=20
+> I noticed, while testing, that the driver doesn't actually work properly
+> with high CONFIG_NR_CPUS values, and patch 2/5 addresses that.
+>=20
+> During code analysis, I have identified two places which treat
+> conditions that can never happen. Patches 4/5 and 5/5 simplify the
+> probing code - dpaa_fq_setup() - just a little bit.
+>=20
+> Finally we have at 5/5 the patch that triggered all of this. There is
+> an okay from Herbert to take it via netdev, despite it being on soc/qbman=
+:
+> https://lore.kernel.org/all/Zns%2FeVVBc7pdv0yM@gondor.apana.org.au/
+>=20
+> Breno Leitao (1):
+>   soc: fsl: qbman: FSL_DPAA depends on COMPILE_TEST
+>=20
+> Vladimir Oltean (4):
+>   net: dpaa: avoid on-stack arrays of NR_CPUS elements
+>   net: dpaa: eliminate NR_CPUS dependency in egress_fqs[] and conf_fqs[]
+>   net: dpaa: stop ignoring TX queues past the number of CPUs
+>   net: dpaa: no need to make sure all CPUs receive a corresponding Tx
+>     queue
+>=20
+>  .../net/ethernet/freescale/dpaa/dpaa_eth.c    | 72 +++++++++++--------
+>  .../net/ethernet/freescale/dpaa/dpaa_eth.h    | 20 ++++--
+>  .../ethernet/freescale/dpaa/dpaa_ethtool.c    | 10 ++-
+>  drivers/soc/fsl/qbman/Kconfig                 |  2 +-
+>  4 files changed, 65 insertions(+), 39 deletions(-)
+>=20
+> --
+> 2.34.1
 
-This suggests that the change in behavior is due to a change in user
-space and an obvious suspect is systemd / udev. AFAICT, CentOS 7 is
-using systemd 219 whereas CentOS 9 is using systemd 252. In version 242
-systemd started setting a persistent MAC address on virtual interfaces.
-See:
 
-https://github.com/Mellanox/mlxsw/wiki/Persistent-Configuration#required-changes-to-macaddresspolicy
+For the series,
 
-If that is the issue, then you can either change MACAddressPolicy or
-modify your code to create the veth pair with the correct MAC address
-from the start.
+Acked-by: Madalin Bucur <madalin.bucur@oss.nxp.com>
 
-As I understand it, a possible explanation for the race is that your
-program is racing with udev. Udev receives an event about a new device
-and reads "addr_assign_type" from sysfs. If your program changed the MAC
-address before udev read the file, then udev will read 3 (NET_ADDR_SET)
-and will not try to change the MAC address. Otherwise, both your program
-and udev will try to change the MAC address.
-
-If it is not udev that is changing the MAC address, then you can run the
-following bpftrace script in a different terminal and check which
-processes try to change the address:
-
-bpftrace -e 'k:dev_set_mac_address_user { @[comm] = count(); }'
-
-It is only a theory. Actual issue might be entirely different.
-
-> 
-> We were re-fetching the addresses via the ioctl SIOCGIFHWADDR syscall
-> as well as via getifaddr (which appears to use netlink under the
-> covers), and, in problematic cases, both functions reported
-> discrepancies from the target MAC address we were initially setting
-> to. We also performed a fetch before we set the MAC addresses and
-> found that there are instances where getifaddr and ioctl results do
-> not match for our veth device *even before we perform any setting of
-> the MAC address*. It's also worth noting that after setting the MAC
-> address: there are no cases where ioctl or getifaddr come back with
-> the same MAC address as before we set the address. So, the set
-> operation always seems to have an effect.
-> 
-> Observed scenarios with incorrectly assigned MAC addresses:
-> 
-> (1) After setting the mac address: ioctl returns the correct MAC
-> address, but the results from getifaddr, returns an incorrect MAC
-> address (different from the original value before setting as well!)
-> 
-> (2) After setting the MAC address: both ioctl and getifaddr return the
-> same MAC address, but are both wrong (and different from the original
-> one!)
-> 
-> (3) There is a possibility that the MAC address we set ends up
-> overwritten by a garbage value *after* we have already updated the MAC
-> address, and checked that the MAC address was set correctly. Since
-> this error happens after this function has finished, we cannot log nor
-> detect it in the function where we set the MAC address because we have
-> not yet studied at what point this late overwriting of MAC address
-> occurs. It’s worth noting that this is the rarest scenario that we
-> have encountered, and we were only able to reproduce it in our testing
-> cluster machine, not in any of the production cluster machines.
-> 
-> [3.] Keywords:
-> 
-> networking, veth, kernel, MAC, netlink
-> 
-> [X.] Other notes, patches, fixes, workarounds:
-> 
-> Notes:
-> 
-> More specific kernel and environment information will be available on
-> request for security reasons, please let us know if you are interested
-> and we will be happy to provide you with the necessary information.
-> 
-> We have observed this behavior only on CentOS 9 systems at the moment,
-> CentOS 7 systems under various kernels do not seem to have the issue
-> (which is quite strange if this was purely a kernel bug).
-> 
-> We have tried kernels 5.15.147, 5.15.160, 5.15.161, all of these have
-> this issue on CentOS 9.
-> 
-> We have also tried rewriting our function for setting MAC address to
-> use libnl rather than ioctl to perform the MAC address setting, but it
-> did not eliminate the issue.
-> 
-> To work around this bug, we checked that the MAC address is set
-> correctly after the ioctl set call, and retry the address setting if
-> necessary. In our testing, this workaround appears to remedy scenarios
-> (1) and (2) above, but it does not address scenario (3).  You can see
-> it here:
-> 
-> https://github.com/apache/mesos/commit/8b202bbebdc89429ad82c6983aa1c514eb1b8d95
-> 
-> We would greatly appreciate any insights or guidance on this matter.
-> Please let me know if you need further information or if there are any
-> specific tests we should run to assist in diagnosing the issue. Again,
-> specific details for the production machines on which we encountered
-> this error can be provided upon request, so please let us know if
-> there is anything we can provide to help.
-> 
-> Thank you for your time and assistance.
-> 
-> Best regards,
-> Jason Zhou
-> Software Engineering Intern
-> jasonzhou@x.com
-> 
-> embedded links:
-> [1] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/slave/containerizer/mesos/isolators/network/port_mapping.cpp#L3599
-> [2] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/linux/routing/link/veth.cpp#L45
-> [3] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/slave/containerizer/mesos/isolators/network/port_mapping.cpp#L3628
-> [4] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/linux/routing/link/link.cpp#L283
-> 
+Thanks,
+Madalin
 
