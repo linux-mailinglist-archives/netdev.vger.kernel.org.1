@@ -1,164 +1,92 @@
-Return-Path: <netdev+bounces-110787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BEA92E556
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF0992E554
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F1F31F22F3B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:00:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4D9A1F22872
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6994B158DCE;
-	Thu, 11 Jul 2024 11:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF0F15A851;
+	Thu, 11 Jul 2024 11:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eiYzJANu"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8969C15A4B7;
-	Thu, 11 Jul 2024 11:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0048715990C;
+	Thu, 11 Jul 2024 11:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720695639; cv=none; b=aowg6z5kBqQ8qRp0xlIzFimn91DgC4yORKLyoDS2qIx2E5uvRk+QvZEULT7pv5/Vj1bawqc09dY1BHsQmGKt/FWjx2iPOQn5J5lIZOcOzsuJghRfENTddYGixWYNQ62fnyco6S5KUnUPQv/nZaZU3TcOGtL4JwP/lBl89ZTqSUQ=
+	t=1720695633; cv=none; b=Cgj4TG+ct2djKlfClDqGx92NxawTz1JgIMJwKx3BHIa1tAAGH1jvFTYQL9Daz2Cv8ZtPh6mkV5YiDEcybl8/ZNSpAQTXon7k6uW/xSf/5ZelcymDVUhPBwpebLQCbhkQzFdAyaRkVBoIyb9c0jl9PP1E1N332EyvQOjJr/mzT6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720695639; c=relaxed/simple;
-	bh=d+wMvdLVf+YR9DIyh4LVaJL8/YmjqFApmIjGfxbQ41E=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BVNam3T+Qsz2Fw7SlMfMSpfftKS3chNSsRRSc9kwB6GYrejNWsGMrtYpxQPrb4BOar5UIh5H+hmxFZIN6Zh07LbBrVnYQRACAmHxcd2fV3r37kzv65mRfI0KUx/l+Bhb/duCLNKLJykpY7FIIu0qEIANT6BUWavKgPLCsL4cxyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WKWt71LLrz67Q86;
-	Thu, 11 Jul 2024 18:58:23 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6E8AB1400C9;
-	Thu, 11 Jul 2024 19:00:28 +0800 (CST)
-Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 11 Jul
- 2024 12:00:27 +0100
-Date: Thu, 11 Jul 2024 12:00:27 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dan Williams <dan.j.williams@intel.com>
-CC: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	<ksummit@lists.linux.dev>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
-	<admiyo@os.amperecomputing.com>, Jeremy Kerr <jk@codeconstruct.com.au>, "Matt
- Johnston" <matt@codeconstruct.com.au>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240711120027.000079b2@Huawei.com>
-In-Reply-To: <20240710142238.00007295@Huawei.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	<3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
-	<668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
-	<20240710142238.00007295@Huawei.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1720695633; c=relaxed/simple;
+	bh=RlHTcxGd5rW8WE6M958jTC0e6O1Ik2Mwo+BJCnyqjUI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cfTuvDZQ/W3c0DiuHKtyBLqmnLRFFjL6aqYvfv+f29K7gfJn+JmYylsyOWqLgeFAGo7P98PwymUf2A91OLSaQ1x1CtOFwoUsEmnggUzjf3eRyQDLZAO/2aQ4fqVnmOVSZaUeP4W3MXBsOeenWbAeudsCOPrys8SmT/GfBw1UWMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eiYzJANu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95C54C4AF0D;
+	Thu, 11 Jul 2024 11:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720695632;
+	bh=RlHTcxGd5rW8WE6M958jTC0e6O1Ik2Mwo+BJCnyqjUI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eiYzJANuSV3Y+98k7XI4lH+zGQuZTcyFog9RpctDXoj8mOJ9F5qkQUkfU+5MVJdyD
+	 DsfUF+XUrmgXOfBvarkWu08neXXGDRb2N1V1U7CEbyfeF7ZOMSbmpmGQ5tX9uymwQ2
+	 I6uL4CtOFb/fKh8bxlkYFV1O7V0qFHIG8pdt1Sd2vIhrL6DWs8+atiq45TJYUxlbc5
+	 K0lZTGiPljKXYbmBmqfhQFcizieEOjkGaIMeqnlTx/Y682AhTcDZ+r/tF/Whc3XK05
+	 nl3EFg7By2TWNweG0DDQWqydLGWC6/laIhtuYbEhb9Zeb+0l0In6svu64e3SE4bPEf
+	 43rsh296dqOew==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7C25ADAE95C;
+	Thu, 11 Jul 2024 11:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf 2024-07-11
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172069563250.3305.13137128961553013824.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jul 2024 11:00:32 +0000
+References: <20240711084016.25757-1-daniel@iogearbox.net>
+In-Reply-To: <20240711084016.25757-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Wed, 10 Jul 2024 14:22:38 +0100
-Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+Hello:
 
-> On Tue, 9 Jul 2024 15:15:13 -0700
-> Dan Williams <dan.j.williams@intel.com> wrote:
-> 
-> > James Bottomley wrote:  
-> > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > device specific functionality, and it is a topic that needs cross-
-> > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > concerns. Please consider it for a Maintainers Summit discussion.    
-> > > 
-> > > I'm with Greg on this ... can you point to some of the contrary
-> > > positions?    
-> > 
-> > This thread has that discussion:
-> > 
-> > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > 
-> > I do not want to speak for others on the saliency of their points, all I
-> > can say is that the contrary positions have so far not moved me to drop
-> > consideration of fwctl for CXL.  
-> 
-> I was resisting rat holing. Oh well...
+This pull request was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-To throw another 'fun' one in there.  For anything integrated with the host
-there is a proposal to provide a MCTP via PCC (ACPI described mailbox). [1]
-I don't think it makes sense to rule that out as it's logically no
-different from MCTP in general (e.g. a host controller for PCI VDM, or
-I2C etc)
+On Thu, 11 Jul 2024 10:40:16 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 4 non-merge commits during the last 2 day(s) which contain
+> a total of 4 files changed, 262 insertions(+), 19 deletions(-).
+> 
+> [...]
 
-Anyone who has a suitable firmware can do whatever they like with that
-and the interfaces is exposed directly to userspace. Adam, perhaps you can
-describe your use case a little?  Is it applicable to general server distros?
+Here is the summary with links:
+  - pull-request: bpf 2024-07-11
+    https://git.kernel.org/netdev/net/c/a819ff0cf9fa
 
-We might suggest distributions don't enable MCTP but does that
-actually get us anywhere?  Anyhow, I suspect there are other similar routes, but
-this one happens to be under review at the moment.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-[1] https://lore.kernel.org/all/20240702225845.322234-1-admiyo@os.amperecomputing.com/
-
-> 
-> For a 'subset' of CXL.  There are a wide range of controls that are highly
-> destructive, potentially to other hosts (simplest one is a command that
-> will surprise remove someone else's memory). For those I'm not sure
-> fwctl gets us anywhere - but we still need a solution (Subject to
-> config gates etc as typically this is BMCs not hosts).
-> Maybe fwctl eventually ends up with levels of 'safety' (beyond the
-> current read vs write vs write_full, or maybe those are enough).
-> 
-> Complexities such as message tunneling to multiple components are also
-> going to be fun, but we want the non destructive bits of those to work
-> as part of the safe set, so we can get telemetry from downstream devices.
-> 
-> Good to cover the debug and telemetry usecase, but it still leaves us with
-> gaping holes were we need to solve the permissions problem, perhaps that
-> is layered on top of fwctl, perhaps something else is needed.
-> 
-> So if fwctl is adopted, I do want the means to use it for the highly
-> destructive stuff as well!  Maybe that's a future discussion.
-> 
-> 
-> > 
-> > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > making decisions about opaque command codes, and that CXL already has a
-> > few years of experience with the commands that *do* need a Linux-command
-> > wrapper.  
-> 
-> Worth asking if this will incorporate unknown but not vendor defined
-> commands.  There is a long tail of stuff in the spec we haven't caught up
-> with yet.  Or you thinking keep this for the strictly vendor defined stuff?
-> 
-> > 
-> > Some open questions from that thread are: what does it mean for the fate
-> > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > device that crosses subsystem functionality? Would a cynical hardware
-> > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > get device-specific commands past another subsystem's objection?
-> > 
-> > My reconsideration of the "debug-build only" policy for CXL
-> > device-specific commands was influenced by a conversation with a distro
-> > developer where they asserted, paraphrasing: "at what point is a device
-> > vendor incentivized to ship an out-of-tree module just to restore their
-> > passthrough functionality?. At that point upstream has lost out on
-> > collaboration and distro kernel ABI has gained another out-of-tree
-> > consumer."
-> > 
-> > So the tension is healthy, but it has diminishing returns past a certain
-> > point.
-> >   
-> 
-> 
-> 
 
 
