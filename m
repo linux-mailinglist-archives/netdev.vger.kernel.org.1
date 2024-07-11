@@ -1,261 +1,238 @@
-Return-Path: <netdev+bounces-110925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0EA392EEF8
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:35:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3592F92EF47
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 21:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8579A28225C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 18:35:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBEC4282AD9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DB016E876;
-	Thu, 11 Jul 2024 18:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4343C16E895;
+	Thu, 11 Jul 2024 19:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aLqSaHR2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="38RwiT9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2071.outbound.protection.outlook.com [40.107.100.71])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F4554657;
-	Thu, 11 Jul 2024 18:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720722935; cv=fail; b=k/8KdOeGmBPWm8TMONUaheeBmR3QqcpbyP1FTlk5TzT1CE3Q2B35V0Pq3OP3C/bCHlJiOAITlx/gJHWplB9du3qCcUSKi9kwLBqaNUwZu1K3M504+YxjXKCZ+OgjVwq8vIMnx9mBYi2lCorlKWtLBL3raeH2BeD8P9P1A1KiFfc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720722935; c=relaxed/simple;
-	bh=xmcNSETvlB6lMnYHfj3R5xKZoxYPzefEjbDtx41k4bM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CsbgIvHp6Ga230nGEOmzSBi3EFN11aG4IbtCYvH8n8zxfZo5x+880kPffl1b5JIu59qtJnVv4sRMpCoV9OWZDIhoTaOgblKRMgqsXryQnr2KrEepdTWWIzymUOOd+1oHg0OVmlyHHgMiyTdZNDx32DsON6w8PXMOU9EqYHLBibE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aLqSaHR2; arc=fail smtp.client-ip=40.107.100.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FRRUOAvbTn8BqgGCrXFYPnyXa5uDo/xoijx961R10y4aberRmNIv9Gze9BDpJ4ojOS6ZfwOgZn4SwzY+B6Ki5+91Xox7SzxSG4Onu3VA6zM8AEM+Qtl7kHhZFj0w2Shd2I+31eC0BtjvbnrKBQZgpz5kw+GbGPQPNZD2XsE8HfWCYgpAmogbm+QDALvJtclvuWszMKwsgZe9sy0tO9kvKWTYeVkOqIJcAuULJmoclIgijzAamu5bJHjNSxkUhaeaS2+w/v57R1Ci0EC2OYWGM+h5KQcoKZT0M+7CcIh9jkvATUkOWX40iccJyoS/LGeCJRszRKk/Ce23eqqzf9J++A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/2aTVP5HqZEYukCPHiP+CDzDDZm8/MsCjqfI9zyspRY=;
- b=zDOie5fllopjwztU8TLzTgYWV+iM0XXJkgUcOL9c29yGzhNyCOI7iW756k3zR+KUou02OomHEdSN2Mule8PZ/JLDJGd8ut3NxKGc0BOGe6rW9EVPTqXYiQ8+S2yMgOuW4RDbm2LqdKlgYyM7Lqar3SN0rqiLX9W4YAT2P5Q4StM5yjVIQADdzte4j722x57Uepp9m0fJsP1YHs+Q8Bxt6XduLH+ZbaLbf9UPW0ux5cTNuFTpWFIY5vPZ3+zZ6peix8BARoQAW4h0gq8/g1Oef7CWMOs2UleqFCG8FneXpidl2zd1lMag4vTQDvhgqEoGhzWlfjKNl7QHxSQGlB9TPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/2aTVP5HqZEYukCPHiP+CDzDDZm8/MsCjqfI9zyspRY=;
- b=aLqSaHR2qNzbQMrIJex9xjeVXVoGQl2m2pEstSVkK55C6JYA8XIsPhqyDNYQMLLFmfwc9ThRKD/JaZWf7IR5/AiuWIh2xfVonHYm6aqUJiBVHfxLLhfu2jDhFrETa6jvRk+xOgYTPssmbPFug3hoNIg7X+SaWrcV9A13T7gRbdvC3qsvp7s/h/qTDvzK3tgxgiivD9mUBq5e74zUhx/otic0q32SCTS7ypJgLROz0xhl/PY250RYBoalcnyG4/yhwez5XDuf4EZ9jeQgERgi+A+S87MTFJ+qipEZzdUa4Wj4gYo3+W1OITZ9F3hPbkuUXuyfDM12V+7AzT51j87zug==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by SA3PR12MB7997.namprd12.prod.outlook.com (2603:10b6:806:307::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Thu, 11 Jul
- 2024 18:35:28 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::2cf4:5198:354a:cd07%2]) with mapi id 15.20.7762.016; Thu, 11 Jul 2024
- 18:35:28 +0000
-Message-ID: <0be43301-9df7-4b7f-9932-b820841712e3@nvidia.com>
-Date: Thu, 11 Jul 2024 11:34:32 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v16 12/13] selftests: add ncdevmem, netcat for
- devmem TCP
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>,
- Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
- Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Stanislav Fomichev <sdf@google.com>
-References: <20240710001749.1388631-1-almasrymina@google.com>
- <20240710001749.1388631-13-almasrymina@google.com>
- <4b0479b0-1e0f-43db-8333-26b7a1fd791c@nvidia.com>
- <CAHS8izOc4gZUP-aS747OVf3uyn8KAyfeBcYDx2CQc-L9RnvrXA@mail.gmail.com>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <CAHS8izOc4gZUP-aS747OVf3uyn8KAyfeBcYDx2CQc-L9RnvrXA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0175.namprd03.prod.outlook.com
- (2603:10b6:a03:338::30) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A1E1EEF8;
+	Thu, 11 Jul 2024 19:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720724527; cv=none; b=aTECLNGs9rXJSuw+fMDhM1PuzgxDhQ0+BDCcLhX1T/I9UBAxZ0OfMEq2j2T9RH3RdF52Y5FBZpcGmCvuOafsK2m2aLRBjXTngdetSLYlOSuMNTdmptAGQhtS+0aJNoaoJEnnE4PhBMVij1qRAUsUz/ErEigL7poxsxkuPAlzQiQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720724527; c=relaxed/simple;
+	bh=T5ur6kTMiFkf6ydxqgDppTo0id0QsIx/TC9h4lnYQlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u3osi+7dbOnJNMFet7fRoqNNtMiEWiodt+wRPczuBxE5i06e/lbQK6pUVQWTKHytrsNKBqAEM02NXZArGgYadsx+UkV4eq6xa8Ej9scQFkxBFQChP5SdlV0az/lJBdXhOFGwY2T4dhSzYFItsXMxMo/69IBneWo76dIsqvGVDmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=38RwiT9X; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oICfSKcVVEwr9lphhag1D//hdbq9wT1yKGoVIaAkzZM=; b=38RwiT9Xpuk8RpGPbWTjeK8nSv
+	Eb5BgasInFjvbdq/uyC7f6aRNrJYcawfB5gZMCPGJyQZPOfWiq89IbbPmLIk9GQWOhhsT/XxW+cSj
+	Us21iANKJpy8Oazhd6O1A6qfEBojrdrlpMkEDqmvZa9XrDBGCvysiJcamxBjIInX6jU8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sRz3E-002LP6-G2; Thu, 11 Jul 2024 21:01:56 +0200
+Date: Thu, 11 Jul 2024 21:01:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 4/4] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
+Message-ID: <885eec03-b4d0-4bd1-869f-c334bb22888c@lunn.ch>
+References: <20240708102716.1246571-1-kamilh@axis.com>
+ <20240708102716.1246571-5-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|SA3PR12MB7997:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9e110b21-7099-4809-57c6-08dca1d83c9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RTdoWE9Qdmo2ZWxoZWcrdkxMd1VIWVkwV2JGNnZ0UTVxTFBlR3ZCcnFNMWps?=
- =?utf-8?B?Mk9XNnZuWCtTRksyUzFuUUJWT0F2bDI0ZTNud2JEa1dNdjN1UENNSlpEL0VJ?=
- =?utf-8?B?a0sxZ0RucVFIMmtUTFhQekNQSHNTckZtUFNWSjYwN1IySGV1UnVXYkY5NXF4?=
- =?utf-8?B?eis2Q1J5WStxVDFzQXRJRmNFTHR5M1kwL1owYnIzK095ZUx3SEJrekxJTUpL?=
- =?utf-8?B?cStTMExqY0RnTnZCQnlySnp2QUdYUVltUHY4WnMrSlRjN25YYW0xanpuOE00?=
- =?utf-8?B?Ym5tWFFJZUJQbmZIdzZJd2x3TVgxWVJoNGtpeVA0WXFKcU9CYVlnWCtxY1Ay?=
- =?utf-8?B?c0kxMTBBQ2ErTDZ3UVFkcDFXWVQyRjdjRE9kT0lWUldCd3VyUGx5LzZueTdu?=
- =?utf-8?B?VHNaaExCU0VleVE3WGtIUkNrSHA2MzNrNWk5NnMzc1l3blowQ212SHpjVE1X?=
- =?utf-8?B?Q0FkNGZscGlSZXVaT3FPak1wSjZKWnYzNm03dkRjOHA5Yno4MGt6c3VQWGdI?=
- =?utf-8?B?dkg5bWhzKzVzdkkyMFRleGFEOHVoS2xCN2JlR2VNUEE2YWNvM1JsWXlHdEFG?=
- =?utf-8?B?UkRYdEltNnM2eE9VR0crYWJObkRIWHNhRjdCQXNGRUJZTGJmd0lWbU1XK3N3?=
- =?utf-8?B?M2NwSnd2dHlqWThSaGFGMUhkMnd6MlVvb1Y1czZ5UTZOOGk3dE50YjQxTmxa?=
- =?utf-8?B?SkFJNndicXhoUS8zeDNCVDRGdENMa2dGYkFqUGY1SUpaM2hRTk10S2djNjZy?=
- =?utf-8?B?ZkdJc3hxT0d3L0hWRHl6a0dtNjdhejNGRVNFMTE4aGFvZ3Q3OW1SOEJPaTRU?=
- =?utf-8?B?UlR3RE85N3U3Ump1Ui96dERLM2VBam9CNjBwS2pVWVZqMnpJYjdsWUFvVUxD?=
- =?utf-8?B?TFJaeURPb3ZMUTdUZU1YUnVBZGptT0tJdW1kdE9rTUJPajdEK2t0THVrRjJq?=
- =?utf-8?B?WDRrbVhZSW1ka2N1cUtDQWw4L2c5ak9pK1A1WFRwZVJRc2xYUVpqcU9aSDMz?=
- =?utf-8?B?K0Y3ZjVSK3V2ZjBNcXUxa2IxcFRpNVI0bVFNR1hYS0lTZWlmb0ttTkRPakFj?=
- =?utf-8?B?L0N5Uzl1ZVhDaEJPcHNrT3JFRm1nRmJFS1lPbmE4OEY5aXBuZFZQQzROY3M5?=
- =?utf-8?B?STAwSW5pT0NtZjRRamJwS2QzUjhCcHI5MnBmS0d0cUNnMi9kOFZlZ3F4akFN?=
- =?utf-8?B?OGpnMkFJKzdaWmxISkF5dXllTVFNWUtLU3doSUFCalU2bkpPZXRSMDVjbUFp?=
- =?utf-8?B?YkJkTWF0Q3EvNk9ma1JVQm5jdnluTkFCNGc5SFdLb2k5OEcwb2tYT01FaHZC?=
- =?utf-8?B?a0NyVVkwR3MycEw0YTNDdzhnTDhxaGJLR0wvSUQwUHY5bUROd2JubjgxU093?=
- =?utf-8?B?ODVaYnhEOVdhZjRjY3lqSDdQaUVsM1I1M1F2UjgwaGMzZ0NuU0l1VlBKeG02?=
- =?utf-8?B?TUF4QmJvTi9GQmxzOFFnVXdVbmpFU1lZOXY4Q0VCU1UxVXllZTNkT2FSeTQz?=
- =?utf-8?B?ZTBNa0Q5bFV6MEpyaFhRaEgzdzFlZ0VFNmd0WVpiUm82RFlQYXM5QTQrV1VS?=
- =?utf-8?B?SmRDVmc5dFNXbG1xOU9xdlJOYmF6M2tHVHlJdlFGUk1NeTBLM3JkLzhhRWZ4?=
- =?utf-8?B?Qm0xZUVIaUE1QXlLcFU3RGdqTjFuUjBGMmJoclFzSTBmOE9jNzFxQmpiMGxG?=
- =?utf-8?B?ZElTUUg1Z0ErK3MyWUkxUnJLcDl6N3N3aDMzR01SZjFkQnoyZ1dMdFdYaVVP?=
- =?utf-8?B?YXVJcWYvUlVWeG1kcXQwaXVrV3BhMlIvUlRvbXN2OThNKzB0SERGWXp0WWhS?=
- =?utf-8?Q?6SukEokheH7eSmtNehzvPrabUKcxEPaQlF0dc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZW8zVUppOWkrM0JvQXNvR0xFMG9NRkZZa29hT21oanRRMDJNenBuR1ptcCtD?=
- =?utf-8?B?TzcxeWhSZGFMeG54aCt4Z1Z3MWd4c1l3ckFSRS95cTRrK1RBYVB0UGRQaGdD?=
- =?utf-8?B?UlRCZHMyYXJnV3VuVmk2Z0NpN2I0MEtpa1Buak5QeVRnNEU5eURvM3dLYmV6?=
- =?utf-8?B?Q1VHVExkYmZEb1VEblJLSXlUVzBDMjJYQ25zUWNvaUlwTWRHOXd6WlFzazRk?=
- =?utf-8?B?VnJtTTJSRkpncGhWOHZjbDM3MHR6VWRkOTJPNkhIYkZ3QlJKeHVCdDJDUlV3?=
- =?utf-8?B?RVU2Y0M3Tjg1SzNnMmsvT3NodDFEakdBL2lOdkFiQXRzYjRnT1MrcnpjN1kr?=
- =?utf-8?B?bncxY3VEN0RHaFc0Vm11NnJpdWZ5djQzZnRuMHN6TTZpQ214YjJid3EzR0NQ?=
- =?utf-8?B?cXY4bjFlS2pVdVdLRURVcmFQNWcwRnk1bUJJTWtPcEFoTVNpZVBsQTZhQ01L?=
- =?utf-8?B?SjVWbC9iRDNDYW41dEFpMG9DTEFlOUJHK2t3M1hOd0NvWHYxMEhiWDd1WXls?=
- =?utf-8?B?NjNnWTUyRFd4QldsSjRERStOZHFmVDhScWo5a1Z4cTFzSm1ZZUh3L3krSFNj?=
- =?utf-8?B?RElETlBQUVRaNDFBanovcmsrTXJUUlBwSU5tZzBSYjZDOUVNSTlDUUh6SHJT?=
- =?utf-8?B?Ujd0ZUNnazQycERhZ1lHL1QvUmJWQWlpVGhaU1FUclNLbGlkVjFIQTQxZkpl?=
- =?utf-8?B?UEFQbU1wSkVwRHdNbmJGWk9qMUpsRFdYUE1zTld2K1hNZWdxMExpN0wzOXpK?=
- =?utf-8?B?QUtJb0FITkw1cmIwRklvVTdhN294Z1I0RnVWYTJOcVdZZmxWeGI3WldFUXFk?=
- =?utf-8?B?dmlTRFlvbUFZZFI4eGl4bHByclBCdkZ2Q0RabUR3dTR6clpHblBUWFFlb0Fl?=
- =?utf-8?B?SEhBK2YvTGkyTS9OVS9tVzA0MzJ4amlUMUlVR3lIclA5cWs4WlRhKzlPcGV4?=
- =?utf-8?B?U1NjbVVRc0tCWUdPcjlldVV3V09wNG9NT05EaTFmeEsxTGFMbjBkZjFpaU91?=
- =?utf-8?B?bjZXTjJSK3FWUCs1Ny8xcVR2N2NXeFlzUUdPUHNYZm0xcDVYZSt2MG9scUZ2?=
- =?utf-8?B?dDdYeEp1TXZjNVpoTk0zeVFtbmx2V09yNnoxMDZHeml5cDllNGlTTmFDalR6?=
- =?utf-8?B?SStBTEtia1VORVROTk43Y1pSSFhPM2ZJaDNNdUpOSUs2TmFZMVJDSGRIdmZB?=
- =?utf-8?B?OHlOTzZXZEFMMWs5TWJhb3ZwOUtDdHRIN3JxaXZYUmh6RHNDRGZWNU9LdGxF?=
- =?utf-8?B?U1B4dUpxL2EvdUEzWDVGY3FSM00vanZLNEczM2creTY5U1IvMFdaeGcwMERs?=
- =?utf-8?B?ZHZQRTVIblNGOHRhbjQ3VmVVNHZNa1FzY0dSVWs2dklWZTJIbFRZZ0RCbDh5?=
- =?utf-8?B?Wmw4QWxvSEZkM1ZuQ0xjeHNidmZEdXJ4VUdPYVIxN3U3NXNqai9pTUtkRTFr?=
- =?utf-8?B?bHZaZlVHSTRna3lRMWFxb3FIRUdIRFZZYWYvWU1qRUZnbGRTdlRwaUcwRFYz?=
- =?utf-8?B?Vno1RklBcmhPSDVOSDViVDJveXI3YWJxVlhCcFdGa1gwemhrK2Ryb1pYR1gy?=
- =?utf-8?B?dHNEa1F0Yzk2eVNSOFJFK3NqcnYycDliQlAzZ1N1a21YdWY1UjRJK1Rwc0xo?=
- =?utf-8?B?U21SMmh2VzJUOHY5NDdSWElCUVpCRFN0NG02cUlZR2VOZGpFN0NBMHNyTUF4?=
- =?utf-8?B?bDhWaTBsYjVzY2dVbGFNNjd0Y0NzWmFXc3dEZG53OWdTMlhjMVY1UW5IbWp6?=
- =?utf-8?B?TnJPdHM5U0lzTTh3ckRCNFlCZ0RDVE5wR2pGWDBwUnBZMG1VNUxtcWNjcVRn?=
- =?utf-8?B?NWlhUUxNOHdBR2Z2c016bGoxd0xrTmdERmxtY0RBNVhISFhUNm1WcTcwOFZy?=
- =?utf-8?B?MFBDamE2L1h3YVA0VnY5UU5lN2lFc3hyYjVKMkMrV3ZWQkhtS0JGdVJ5d2tU?=
- =?utf-8?B?Q1hZVXlNanAzcDlrTm9PSVhBaFE1WStHS29yNmgvMWduYnZUYWxKK1FsKzVZ?=
- =?utf-8?B?OXY0MzNWRDlMRGRwZlk4aGhMLzJtR0dOMFpDZytvM295V1I4eHBQcVVKUmlq?=
- =?utf-8?B?TVJXQjQwWTJwRWJFVFV0Z2QyMUtFK1ZEaGIvN1RJVStvSlNCakl2Y0pNVGxw?=
- =?utf-8?B?TkU3R1l5NUxScTRaWXBVTEtiTUp2VEFYOWNKV1gwRUpWMGdiMUcyMGNWeTRI?=
- =?utf-8?B?SkE9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e110b21-7099-4809-57c6-08dca1d83c9b
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2024 18:35:28.2807
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JS5zr7wGl/ysgVSy/CiOlTb7Eh7xhql/9CYf3kYn11Kb7lF0YjuEZyCoAVA/yghpzJ6u/V34ovDSe41lB/5ijg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7997
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240708102716.1246571-5-kamilh@axis.com>
 
-On 7/11/24 8:28 AM, Mina Almasry wrote:
-> On Wed, Jul 10, 2024 at 5:44 PM John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> On 7/9/24 5:17 PM, Mina Almasry wrote:
->> ...
->>> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
->>> index bc3925200637c..39420a6e86b7f 100644
->>> --- a/tools/testing/selftests/net/Makefile
->>> +++ b/tools/testing/selftests/net/Makefile
->>> @@ -95,6 +95,11 @@ TEST_PROGS += fq_band_pktlimit.sh
->>>    TEST_PROGS += vlan_hw_filter.sh
->>>    TEST_PROGS += bpf_offload.py
->>>
->>> +# YNL files, must be before "include ..lib.mk"
->>> +EXTRA_CLEAN += $(OUTPUT)/libynl.a
->>> +YNL_GEN_FILES := ncdevmem
->>> +TEST_GEN_FILES += $(YNL_GEN_FILES)
->>> +
->>>    TEST_FILES := settings
->>>    TEST_FILES += in_netns.sh lib.sh net_helper.sh setup_loopback.sh setup_veth.sh
->>>
->>> @@ -104,6 +109,10 @@ TEST_INCLUDES := forwarding/lib.sh
->>>
->>>    include ../lib.mk
->>>
->>> +# YNL build
->>> +YNL_GENS := netdev
->>> +include ynl.mk
->>
->> This seems to be missing a rule to generate ynl.mk, right?
->>
-> 
-> Hi John,
-> 
-> tools/testing/selftests/net/ynl.mk was merged as part of this patch a
-> few days ago:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240628003253.1694510-14-almasrymina@google.com/
-> 
-> Is it not working for you by any chance?
-> 
+> +static int bcm5481x_get_brrmode(struct phy_device *phydev, u8 *data)
+>  {
+> -	int err, reg;
+> +	int reg;
+>  
+> -	/* Disable BroadR-Reach function. */
+>  	reg = bcm_phy_read_exp(phydev, BCM54810_EXP_BROADREACH_LRE_MISC_CTL);
+> -	reg &= ~BCM54810_EXP_BROADREACH_LRE_MISC_CTL_EN;
+> -	err = bcm_phy_write_exp(phydev, BCM54810_EXP_BROADREACH_LRE_MISC_CTL,
+> -				reg);
+> -	if (err < 0)
 
-Aha, I'm just not using the right tree, then. Thanks for clearing that up.
+bcm_phy_read_exp() could fail. So you should keep the test. Also, the
+caller of this function does look at the return value.
 
-I was attempting this against mainline Linux, just for a quick look at the
-selftests part, and that Doesn't Work. :)
+> +/**
+> + * bcm5481x_read_abilities - read PHY abilities from LRESR or Clause 22
+> + * (BMSR) registers, based on whether the PHY is in BroadR-Reach or IEEE mode
+> + * @phydev: target phy_device struct
+> + *
+> + * Description: Reads the PHY's abilities and populates
+> + * phydev->supported accordingly. The register to read the abilities from is
+> + * determined by current brr mode setting of the PHY.
+> + * Note that the LRE and IEEE sets of abilities are disjunct.
+> + *
+> + * Returns: 0 on success, < 0 on failure
+> + */
+> +static int bcm5481x_read_abilities(struct phy_device *phydev)
+> +{
+> +	int i, val, err;
+> +	u8 brr_mode;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(bcm54811_linkmodes); i++)
+> +		linkmode_clear_bit(bcm54811_linkmodes[i], phydev->supported);
+> +
+> +	err = bcm5481x_get_brrmode(phydev, &brr_mode);
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+> +static int bcm5481x_set_brrmode(struct phy_device *phydev, bool on)
+> +{
+> +	int reg;
+> +	int err;
+> +	u16 val;
+> +
+> +	reg = bcm_phy_read_exp(phydev, BCM54810_EXP_BROADREACH_LRE_MISC_CTL);
+> +
+> +	if (on)
+> +		reg |= BCM54810_EXP_BROADREACH_LRE_MISC_CTL_EN;
+> +	else
+> +		reg &= ~BCM54810_EXP_BROADREACH_LRE_MISC_CTL_EN;
+> +
 
+> +static int bcm54811_config_init(struct phy_device *phydev)
+> +{
+> +	struct device_node *np = phydev->mdio.dev.of_node;
+> +	bool brr = false;
+> +	int err, reg;
+> +
+>  	err = bcm54xx_config_init(phydev);
+>  
+>  	/* Enable CLK125 MUX on LED4 if ref clock is enabled. */
+> @@ -576,29 +687,80 @@ static int bcm54811_config_init(struct phy_device *phydev)
+>  			return err;
+>  	}
+>  
+> -	return err;
+> +	/* Configure BroadR-Reach function. */
+> +	brr = of_property_read_bool(np, "brr-mode");
+> +
+> +	/* With BCM54811, BroadR-Reach implies no autoneg */
+> +	if (brr)
+> +		phydev->autoneg = 0;
+> +
+> +	return bcm5481x_set_brrmode(phydev, brr);
+>  }
+
+The ordering seems a bit strange here.
+
+phy_probe() will call phydrv->get_features. At this point, the PHY is
+in whatever mode it resets to, or maybe what it is strapped
+to. phydev->supported could thus be set to standard IEEE modes,
+despite the board design is actually for BroadR-Reach.
+
+Sometime later, when the MAC is connected to the PHY config_init() is
+called. At that point, you poke around in DT and find how the PHY is
+connected to the cable. At that point, you set the PHY mode, and
+change phydev->supported to reflect reality.
+
+I really think that reading DT should be done much earlier, maybe in
+the driver probe function, or maybe get_features. get_features should
+always return the correct values from the board.
+
+> +static int bcm5481_config_aneg(struct phy_device *phydev)
+> +{
+> +	u8 brr_mode;
+> +	int ret;
+> +
+> +	ret = bcm5481x_get_brrmode(phydev, &brr_mode);
+
+Rather than read it from the hardware every single time, could you
+store the DT value in bcm54xx_phy_priv ?
+
+> +/* Read LDS Link Partner Ability in BroadR-Reach mode */
+> +static int bcm_read_lpa(struct phy_device *phydev)
+
+This function seems to be missing an lds or lre prefix.
+
+> +static int bcm_read_status_fixed(struct phy_device *phydev)
+
+and here. Please make sure the naming is consistent. Anything which
+only accesses lre or lds registers should make that clear in its name.
+
+> +static int bcm54811_read_status(struct phy_device *phydev)
+> +{
+> +	u8 brr_mode;
+> +	int err;
+> +
+> +	err = bcm5481x_get_brrmode(phydev, &brr_mode);
+> +
+> +	if (err)
+> +		return err;
+> +
+> +	if (brr_mode) {
+> +		/* Get the status in BroadRReach mode just like
+> +		 *   genphy_read_status does in normal mode
+> +		 */
+> +
+> +		int err, old_link = phydev->link;
+> +
+> +		/* Update the link, but return if there was an error */
+> +
+> +		err = lre_update_link(phydev);
+> +		if (err)
+> +			return err;
+> +
+> +		/* why bother the PHY if nothing can have changed */
+> +		if (phydev->autoneg ==
+> +		    AUTONEG_ENABLE && old_link && phydev->link)
+> +			return 0;
+> +
+> +		phydev->speed = SPEED_UNKNOWN;
+> +		phydev->duplex = DUPLEX_UNKNOWN;
+> +		phydev->pause = 0;
+> +		phydev->asym_pause = 0;
+> +
+> +		err = bcm_read_master_slave(phydev);
+> +		if (err < 0)
+> +			return err;
+> +
+> +		/* Read LDS Link Partner Ability */
+> +		err = bcm_read_lpa(phydev);
+> +		if (err < 0)
+> +			return err;
+> +
+> +		if (phydev->autoneg ==
+> +		    AUTONEG_ENABLE && phydev->autoneg_complete) {
+> +			phy_resolve_aneg_linkmode(phydev);
+> +		} else if (phydev->autoneg == AUTONEG_DISABLE) {
+> +			err = bcm_read_status_fixed(phydev);
+> +			if (err < 0)
+> +				return err;
+> +		}
+
+This would probably look better if you pulled this code out into a
+helper bcm54811_lre_read_status().
+
+    Andrew
+
+---
+pw-bot: cr
 
