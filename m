@@ -1,174 +1,129 @@
-Return-Path: <netdev+bounces-110899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C2892ED61
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:01:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9906192ED75
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3ED51C21773
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 17:01:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3525EB20B75
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 17:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07C016CD39;
-	Thu, 11 Jul 2024 17:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A7416D4F1;
+	Thu, 11 Jul 2024 17:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npMBJKAK"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B7220317;
-	Thu, 11 Jul 2024 17:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E6A450FA;
+	Thu, 11 Jul 2024 17:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720717267; cv=none; b=F1vXlxlNrMeM0ommOspcsdGMfr1exn8iWbg08XvEYM8+RtvzX2XYm5CXd0so/yn9qcg1h13ywrgmJUr3fV02nw/v4fXah1dp3xOyjnqYqJRmarv7LCGWoArgQViEcaEeDMx2UA5bJbRCgRGVtgxTx7kuoocOEWQ0FMHb+Bh6PpY=
+	t=1720717760; cv=none; b=AshVg+WkTIP4hmp+l5XC+48fVfQfxHcMIWpfitpRxS3bJxFAuPgKFoOPswVaUWX3KTvUCgKTGzYus3CrIDTk8tODK9Bv/5OaKEH8vaRxhhYANWQrtfX1l8q/PHpU+k9u2fYtjImkdkosPHUig9QNcViBCSokVwpIMSPRDc77N+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720717267; c=relaxed/simple;
-	bh=TJqqmH2f1xidSJ79t4DedVf877VvyONDb9Qm3RqAPsw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a0BtpnEKYgI55l7Kb69wTgcA9c7NMrlt7OmrMq6+46MaZ8N3abwalaPPtko1gjdOX2D+N4u+8YSFusQr6mo92Nc/lRFyA4CfvR2DA1btxfB5JrzFDUELDm71VIi7JXmCu7FFNs1zhlQ0zHy2HOe5iBJWIZWI1sZoNBKKVyjrLi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WKgvN40pbz6J9qG;
-	Fri, 12 Jul 2024 01:00:00 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5AA52140B2A;
-	Fri, 12 Jul 2024 01:01:02 +0800 (CST)
-Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 11 Jul
- 2024 18:01:01 +0100
-Date: Thu, 11 Jul 2024 18:01:00 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Dan Williams <dan.j.williams@intel.com>, James Bottomley
-	<James.Bottomley@hansenpartnership.com>, <ksummit@lists.linux.dev>,
-	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240711180100.00006b96@Huawei.com>
-In-Reply-To: <20240711150559.GF1482543@nvidia.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	<3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
-	<668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
-	<20240710142238.00007295@Huawei.com>
-	<20240711150559.GF1482543@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1720717760; c=relaxed/simple;
+	bh=4AsmtB1c0/haUg/T+xK8LCVjZIWcIFk1GR+agnIeol0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fpbU9eEF5zr1N9qaNnnqHQqXoZxNh8pj0gMg7htuGhDJfnghrjM2uxVG5sF57HKbIl785aJv/1R+dSFlkZL4+YHSJyEl5/OoUt2Wr9Mr2MO7aTDPszsUYm2yCWjMi3xeN4xLshBkBCZmfqMpmApazpmisFyospbeLeqVX3vH2Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npMBJKAK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF51C116B1;
+	Thu, 11 Jul 2024 17:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720717759;
+	bh=4AsmtB1c0/haUg/T+xK8LCVjZIWcIFk1GR+agnIeol0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=npMBJKAK7s69Z/WDXZvryOrC1AXCklNKsLLxOCs3gsJfApoz0/Ox9lYee1sJ6JwFC
+	 lzx5PgO1lGRj2EKUh3icE9RHKreJLdJFw+BKutxdCPSHRfth/k1X0ATH8iFfNL9fcK
+	 AI83yw0uN4QfyYXRNmqakAMB+ri/2WvgtUJy8Mjvte/exqSdq9GP9l6B0P7O2MzXBy
+	 YOUJ1fOXUHj22VvxXuP2nytibhRZMRTAMgjS3uLsA1nwarmZ1yF+vWOcbIiKCKhuJR
+	 dY8lY7THLhQ9ec1bS3ImuG5ExziA3ve8s3lT6skT1KkhFWulvX1K9EsKrDDU/OQ5Bc
+	 qrs9k3Yd9wRMQ==
+Date: Thu, 11 Jul 2024 18:09:10 +0100
+From: Lee Jones <lee@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	devicetree@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	linux-arm-kernel@lists.infradead.org,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bjorn Helgaas <bhelgaas@google.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 1/7] mfd: syscon: Add reference counting and device
+ managed support
+Message-ID: <20240711170910.GN501857@google.com>
+References: <20240627091137.370572-2-herve.codina@bootlin.com>
+ <91cfc410-744f-49f8-8331-733c41a43121@web.de>
+ <20240711182528.1402892d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240711182528.1402892d@bootlin.com>
 
-On Thu, 11 Jul 2024 12:05:59 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, 11 Jul 2024, Herve Codina wrote:
 
-> On Wed, Jul 10, 2024 at 02:22:38PM +0100, Jonathan Cameron wrote:
-> > On Tue, 9 Jul 2024 15:15:13 -0700
-> > Dan Williams <dan.j.williams@intel.com> wrote:
-> >   
-> > > James Bottomley wrote:  
-> > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > concerns. Please consider it for a Maintainers Summit discussion.    
-> > > > 
-> > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > positions?    
-> > > 
-> > > This thread has that discussion:
-> > > 
-> > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > > 
-> > > I do not want to speak for others on the saliency of their points, all I
-> > > can say is that the contrary positions have so far not moved me to drop
-> > > consideration of fwctl for CXL.  
+> Hi Markus,
+> 
+> On Thu, 11 Jul 2024 18:09:26 +0200
+> Markus Elfring <Markus.Elfring@web.de> wrote:
+> 
+> > …
+> > > +++ b/drivers/mfd/syscon.c  
+> > …
+> > > +static struct syscon *syscon_from_regmap(struct regmap *regmap)  
+> > +{
+> > > +	struct syscon *entry, *syscon = NULL;
+> > > +
+> > > +	spin_lock(&syscon_list_slock);
+> > > +
+> > > +	list_for_each_entry(entry, &syscon_list, list)  
+> > …
+> > > +	spin_unlock(&syscon_list_slock);
+> > > +
+> > > +	return syscon;
+> > > +}  
+> > …
 > > 
-> > I was resisting rat holing. Oh well...
+> > Under which circumstances would you become interested to apply a statement
+> > like “guard(spinlock)(&syscon_list_slock);”?
+> > https://elixir.bootlin.com/linux/v6.10-rc7/source/include/linux/spinlock.h#L561
 > > 
-> > For a 'subset' of CXL.  There are a wide range of controls that are highly
-> > destructive, potentially to other hosts (simplest one is a command that
-> > will surprise remove someone else's memory).  
 > 
-> I don't know alot of CXL, but from talking with Dan and reading these
-> posts it seems to me that CXL turn into a network, with switches and
-> multi-node and then somehow hid some kind of 'raw packet' interface to
-> communicate node-to-node. But never added any kind of node level
-> authorization? ie trust the nodes not to hurt each other?
-
-You can't actually communicate node to node in the sense of host
-to host.  You can just unplug stuff on another other host
-(I guess that's a low bandwith comms channel...)
-Data access should not be possible in general (ignoring shared
-memory which is unrelated to the control path).
-Control plane for the nasty stuff should all be in control
-of one entity in the system - termed a fabric manager.
-
+> I used the spin_{lock,unlock}() pattern call already present in syscon.c.
+> Of course, I can add a new patch in this series converting syscon.c to
+> the guard() family and use guard() in my introduced lock/unlock.
 > 
-> Sounds sketchy to me :)
+> Lee, any opinion ?
 
-Yes. The model is with the intent that this is only exposed by
-hardware to a BMC / Fabric Manager - so security is by wiring.
-The reason it's exposed on a PCI upstream port on a switch is that
-there are designs where the Fabric manager is 'just another host'.
-It's probably not running general software but that Fabric Manager
-is running Linux too.  This isn't hugely different to not wiring
-your MCTP management interface directly to the host such that the
-OS can mess with it.
+I'm intentionally leaving this one for Arnd.
 
-> 
-> > So if fwctl is adopted, I do want the means to use it for the highly
-> > destructive stuff as well!  Maybe that's a future discussion.  
-> 
-> With that kind of security model you probably have to trust the
-> userspace, even in a lockdown kernel.
-
-Agreed - but if we put infrastructure in place I want it to support
-this as well.
-
-> 
-> ie can userspace replace the CXL HW that has the command interface
-> with VFIO and then do anything with nothing more than CAP_SYS_ADMIN
-> and root?
-
-Yes if the wiring put that special PCI function on your PCI hierarchy.
-
-> 
-> If so it is not unreasonable that a fwctl interface has a similar
-> level of protection.
-> 
-> > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > making decisions about opaque command codes, and that CXL already has a
-> > > few years of experience with the commands that *do* need a Linux-command
-> > > wrapper.  
-> > 
-> > Worth asking if this will incorporate unknown but not vendor defined
-> > commands.  There is a long tail of stuff in the spec we haven't caught up
-> > with yet.  Or you thinking keep this for the strictly vendor defined stuff?  
-> 
-> I would allow as much as possible in fwctl that meets the defined
-> functional limitations and security model.
-> 
-> There is security merit in saying userspace will run, parse and
-> convert to output complex commands if it can safely do so. From an end
-> user perspective running a common tool to view the output is generally
-> always preferred anyhow, and the typical user doesn't really care if
-> the tool trundles through sysfs or does something else.
-
-Fair enough.  A bit of potential duplication won't be too painful
-(fwctl vs stuff that we know is safe enough for a 'normal' interface).
-
-Thanks,
-
-Jonathan
-> 
-> Jason
-
+-- 
+Lee Jones [李琼斯]
 
