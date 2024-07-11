@@ -1,100 +1,129 @@
-Return-Path: <netdev+bounces-110754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC0692E2B5
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E01792E2CB
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC321C214C2
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:49:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02571C22BE3
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3CB12EBF3;
-	Thu, 11 Jul 2024 08:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443081527A1;
+	Thu, 11 Jul 2024 08:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fR0alzbS"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AA3gJ1fY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B3B78283;
-	Thu, 11 Jul 2024 08:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF53128372;
+	Thu, 11 Jul 2024 08:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720687741; cv=none; b=jQTVVpUqZ23WSSiVsitVA2aqmj82AQTxnPyOgzQCGejybvb0kC3JfZ/Xgk9uIj34mIzXAaxLTUuGgj7XE9df4VRU+oXCAbV8TJAFIjcwTCCM7lqs4JCfXJFG4qPnwx5V5UiWNQp0Qh1vXAt7I+qsSC/AsUaO10ajNwoxGAYSNa4=
+	t=1720688059; cv=none; b=RAkxC7l36YmJRGzy56Sxzb8jWw56syA02DDrDBzRncNsAhz3dVcpwtohyuuq3zG4WqPjkuU9juoCsvUuI9B9YK0yGVSSbAyTo3ujP8Nv4y5AtFF8J5ccK0kJqDrwlMk7RiWDx4lQrrYpqUC0cC9T3aD/Z2qtdGyrWcaXsB82T+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720687741; c=relaxed/simple;
-	bh=KvSh6XeA52JyOMfHv09Hn8dqnlUTpUE6bi2Cxcgc3ZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKekRMXM3SIGztfhJOuk7+2RFnR/aT+Wzpuv3pm+qZZU1gqsW4W5oOsdoJISqv5C3YoU6ifEo5FnPTR+cWy04K/ZOnPNKl1wdfmFBzz+sLGzGj76Mg4jjjHzacALaO9QEIFxzoW83nRpv9JN3GIecrBmegsMBApbnvBpTdhA+5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fR0alzbS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78717C116B1;
-	Thu, 11 Jul 2024 08:48:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720687741;
-	bh=KvSh6XeA52JyOMfHv09Hn8dqnlUTpUE6bi2Cxcgc3ZM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fR0alzbSMLlG8PEUDZzG2UHxWzI1XW8DEVXqg8wuYWbTmYJgOTfK3FLogTE/gLZuQ
-	 QP6mzkZ8VHIIRsXcca6bekX7QPUBWeWSWe84TBbS0SOwHAFSu/T7OdI2w8R57Y/Pg7
-	 1/OMdzHb18YgPUu7om/UqQX9AliwDgssniukFsjwTV0xVnjulCZcDJ8WnmKsuqYp2y
-	 tLi/VzXIfgJBDxmJuxk7lOWB2Oe68ETEeD5wI3uXv7ba/4xtvgh3VLyPpNKsj1gI/a
-	 YKNPGt1TwC0CDz2mUNKnmBfAvZAw+cZYHVdcwla7lc1+/nK6utb3Qu17L7Bw506F88
-	 qi1iMdZ9wFgDw==
-Date: Thu, 11 Jul 2024 09:48:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next v4] ice: Adjust over allocation of memory in
- ice_sched_add_root_node() and ice_sched_add_node()
-Message-ID: <20240711084856.GB8788@kernel.org>
-References: <20240710123949.9265-1-amishin@t-argos.ru>
+	s=arc-20240116; t=1720688059; c=relaxed/simple;
+	bh=D+QQsXFMRvw9K/Ga6VQddVnwvaukbDA+lgAqpvT47JE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hW2tqszfllNgblZZw5PssC2P6ood77fAuS+tMf2/2U6KYuSYIIPTG8ueqdfcemXi020o8mz6idk/pZPvDkUcatlMI0nnxOmjlTLrjg+n8vZ/JEiTdTR8TnGZ/dKZQv8h1eHecoD609XN5D6GBvX5sjIUpz18r3SIdWQ/uvsmruY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AA3gJ1fY; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay6-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::226])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 7B8A2C6F9D;
+	Thu, 11 Jul 2024 08:53:37 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CCC0C0004;
+	Thu, 11 Jul 2024 08:53:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720688010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=llx+XP6JadpR4EDUDeetmhDEqpsogxmUXPt4IRV6jhY=;
+	b=AA3gJ1fYpAWXhsN7u788NnDZ/v0vX7dvLEo/dMkPVF5FqXQ24pJWrLa4tMsc3P88ymKrBq
+	6/k6Mvok52jqLwLGDrDHBqpORhVYkPhxEmvcpegNa3p8uJIaugUhdix2M2aDmKhsj4dBIx
+	2JJCKR3Iqw7LHGWBqkX0rYIOoLQBa2KXf0+b54pVu58xPJUh4LNQMBGFoMCZrmavp3FOLR
+	0seHoFINGYwQExywKl2/xoA8PJJVlRzRCpV2v3wRe5i7aKRjYuIAYHWV5yVJQ8klKNcm3E
+	e6mFtzIssZXgr2v+afFUXJb1SrbMP+grMQlia8iERqyPY67fv92Y2SIY6KmeIg==
+Date: Thu, 11 Jul 2024 10:53:26 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 1/2] net: pse-pd: Do not return EOPNOSUPP if config
+ is null
+Message-ID: <20240711105326.1a5b6b0b@kmaincent-XPS-13-7390>
+In-Reply-To: <20240711084300.GA8788@kernel.org>
+References: <20240710114232.257190-1-kory.maincent@bootlin.com>
+	<20240711084300.GA8788@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240710123949.9265-1-amishin@t-argos.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, Jul 10, 2024 at 03:39:49PM +0300, Aleksandr Mishin wrote:
-> In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
-> devm_kcalloc() in order to allocate memory for array of pointers to
-> 'ice_sched_node' structure. But incorrect types are used as sizeof()
-> arguments in these calls (structures instead of pointers) which leads to
-> over allocation of memory.
-> 
-> Adjust over allocation of memory by correcting types in devm_kcalloc()
-> sizeof() arguments.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-> ---
-> v4:
->   - Remove Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->   - Add Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->     (https://lore.kernel.org/all/6d8ac0cf-b954-4c12-8b5b-e172c850e529@intel.com/)
-> v3: https://lore.kernel.org/all/20240708182736.8514-1-amishin@t-argos.ru/
->   - Update comment and use the correct entities as suggested by Przemek
-> v2: https://lore.kernel.org/all/20240706140518.9214-1-amishin@t-argos.ru/
->   - Update comment, remove 'Fixes' tag and change the tree from 'net' to
->     'net-next' as suggested by Simon
->     (https://lore.kernel.org/all/20240706095258.GB1481495@kernel.org/)
-> v1: https://lore.kernel.org/all/20240705163620.12429-1-amishin@t-argos.ru/
+On Thu, 11 Jul 2024 09:43:00 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-Thanks for your persistence, this version looks good to me.
+> On Wed, Jul 10, 2024 at 01:42:30PM +0200, Kory Maincent wrote:
+> > For a PSE supporting both c33 and PoDL, setting config for one type of =
+PoE
+> > leaves the other type's config null. Currently, this case returns
+> > EOPNOTSUPP, which is incorrect. Instead, we should do nothing if the
+> > configuration is empty.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE
+> > framework") ---
+> >=20
+> > Changes in v2:
+> > - New patch to fix dealing with a null config. =20
+>=20
+> Hi Kory,
+>=20
+> A few thing from a process perspective:
+>=20
+> 1. As fixes, with fixes tags (good!), this patchset seems like it is
+>    appropriate for net rather than net-next. And indeed it applies
+>    to net but not net-next. However, the absence of a target tree
+>    confuses our CI which failed to apply the patchset to net-next.
+>=20
+>    Probably this means it should be reposted, targeted at net.
+>=20
+>    Subject: [Patch v3 net x/y] ...
+>=20
+>    See: https://docs.kernel.org/process/maintainer-netdev.html
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Oops indeed sorry, forgot to add the net prefix.
+
+> 2. Please provide a cover letter for patch sets with more than one
+>    (but not just one) patch. That provides an overview of how
+>    the patches relate to each other. And a convenient anchor for
+>    feedback such as point 1 above.
+>=20
+> ...
+
+As my first version contained only one patch I did not thought of adding a
+cover letter for the 2nd version but indeed I should. Sorry.
+
+Thanks for the reminder I will try to not have my head in the cloud next ti=
+me.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
