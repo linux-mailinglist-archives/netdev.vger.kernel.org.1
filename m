@@ -1,413 +1,230 @@
-Return-Path: <netdev+bounces-110869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03EE692EACF
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 16:34:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04AC92EAC7
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 16:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CD85B2299A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 14:34:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B40281D11
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 14:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267BA166317;
-	Thu, 11 Jul 2024 14:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BuW7zRsI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B9B166317;
+	Thu, 11 Jul 2024 14:32:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267F3158DA8;
-	Thu, 11 Jul 2024 14:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7149A1EB26;
+	Thu, 11 Jul 2024 14:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720708443; cv=none; b=Km9XDe+1W77AVhqNk5QN+2GkR+oF5qArmF2YiZ7oUm3CrHhGRyqJAcBqJRtZaDkL61BZc2trCXac2c0pClhPWXupks1QCahUFypKhuUFM8WR5R1+2LCCV3TtA3TfATS1LBsu4Pxcy/XNoVBVPTr1PH6yNd22VzU/Ppf87LW8KUY=
+	t=1720708341; cv=none; b=Ff/MpA4ZKFEPDe9XjwaNBHu7872HDvq87LpZPqxfH2bSrqvh9gcKehW5X5cwR6WpNhZJ37T/JerBS92P5+0P77J2tGDHOOgWHMjotZpQeZk+d0Biv8fMgSsuvD8sMLnXcvsyBF/LQnmo4JHd5+R++c8Gp9mnuFQEfm6FV2xq1t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720708443; c=relaxed/simple;
-	bh=0cOmxcRk0+/3AKFnowBw/+Y1brcE83Kk9E2BC4J0KHE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eBMV1xlcQPttlK+VRW0r4BYg8727fJk9JdB5n7ovH8Gv3u3ofTbd0OO0FeWIjSOmDzaaLz2dorXklqxW6PjnjwcOC3Nx7fJfpVcixL51nPQDpOpQmEEFKUnXLW3J9fAAcmVkXmHq8YWaJEC8KZrrFDvWoL3aAsZ0VNKPzXitoOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BuW7zRsI; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-810197638fcso313622241.1;
-        Thu, 11 Jul 2024 07:34:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720708440; x=1721313240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BM09hnKVB1kESbZILffmOawcWcc5pMVTZevNuy1bqkk=;
-        b=BuW7zRsIkKzAvyb/JPNVcPGYjVA4iOo/+dLkH1OXEsSk/KyxSKWRgTRmd14tnl0139
-         vjnt65xrFV/L463hGrdHH2XLR8PEca0MbZU95ZCpzGfMYg5CAaTuZUYLAedx5QPnU7Lj
-         cOUtiy4c56EFmUDSVTMIJIf0Fo6xHc39lMMojKSKtluL1XqB/YZ+BLdoGLHQRAPpqoqf
-         z4WQftKoKvl7vMOL3sJD6xSsorNvDcvk0mR35ul0i2/0b8SQykqr8mqbC75h/rJ6SzwJ
-         EQVzLKVg9Rg6Mst5E71r+6R3gpZx7drND1AUP6YrKj8SLRa8hZBI3W27t15SrT+c7Q8X
-         ilTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720708440; x=1721313240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BM09hnKVB1kESbZILffmOawcWcc5pMVTZevNuy1bqkk=;
-        b=Dru+3g7oxjUqg4XFe2mvul3L0jkUMSsu7Csrmmz5AE3X6Zo+Mn2wQaBFAEdwSwyklb
-         LojOj3za+h6VC6Oc/5F896Xh7ovRq4WLLR5iZ0euFAIlerKOofAIOUVF2o7kaEmcXKnB
-         dnXo6IsYa6w3XvkGkuWYfarnqYiTXlt4OQ0CrX6V0Ni7d8yL5k9Ua9fHpUB7scCSmdMj
-         c3Lwd3Erz1LHrA6HAlaQSXZ85XiRZq1xWY39KVYwvxCHKavsE0QZ99Xc0aKRKPZk9T7c
-         3vVUnxvSqoxWA5Og+F/cfvirK0SEfejvpGo6iyNyONgNUBL6ODKUhHS4fsW7tjllwC1b
-         8a0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVyK6XssFd+MohnM13hXWfr5LbJU9M3/bZb1kcvuahBK3xIBR+pJ7frZwQwoFMKOq3+8QjDXJI5jxJUs9nRkkkpms85XoAJGLGSBOwwMWzI06tUQqJIKc9fa5CiUOBaA2Oj1excLKabagCPqncpHwqzyT+r3pPKGFce2Lov
-X-Gm-Message-State: AOJu0YwyVJPwczpwVmBpQKdP0TeakwIhai+F8zvF9KkVb4SSPictm/Y2
-	OnTW/Ji/Luqnu8WeNGZZZuhYAnBmoSt1ey+NnOAu67MUCTH9xhgbdqmYdo/FldQhC2VT0OYx+IT
-	3gGkJT8aDtfJkIKvNbDaG3vPO5e4=
-X-Google-Smtp-Source: AGHT+IG+32pOzsD1Wpd/m/yDdX5729UAhjArzwR66VTPZ3h+eIPc2EMF9lsGy46gmKbhU4yaab9TtAr8Zg0w00fRAds=
-X-Received: by 2002:a05:6122:21ac:b0:4ef:52e2:6763 with SMTP id
- 71dfb90a1353d-4f33f318833mr9932911e0c.13.1720708439701; Thu, 11 Jul 2024
- 07:33:59 -0700 (PDT)
+	s=arc-20240116; t=1720708341; c=relaxed/simple;
+	bh=up6W1K9mpxjGZ1T7a2dLYu/IsvtphCU8x2Vb6BTu6Zk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sWzZ+Kf7q7kK24gD82ASCYCPwn9zsWjyCWIsfG2+g7cRZGOtlmgoyHqjVt0BxyqAOVE3cROPb23D8Cw3i29h4yz42sHYU8vdyYanmIU6Uz2b9OtJLXE9ja5ADPFnSDjQoEO7XMlGKe1z/owrrwth0j3ZOrqm6zMnx6PLPFk1JGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92796C116B1;
+	Thu, 11 Jul 2024 14:32:19 +0000 (UTC)
+Date: Thu, 11 Jul 2024 10:33:41 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: syzbot <syzbot+16b6ab88e66b34d09014@syzkaller.appspotmail.com>,
+ akpm@linux-foundation.org, cgroups@vger.kernel.org, hannes@cmpxchg.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org, lizefan.x@bytedance.com,
+ mathieu.desnoyers@efficios.com, mhiramat@kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org
+Subject: Re: [syzbot] [mm?] possible deadlock in
+ __mmap_lock_do_trace_released
+Message-ID: <20240711103341.18a4eb4e@gandalf.local.home>
+In-Reply-To: <95930836-5b56-4c40-b2a0-2ddd4a59ae74@kernel.org>
+References: <0000000000002be09b061c483ea1@google.com>
+	<95930836-5b56-4c40-b2a0-2ddd4a59ae74@kernel.org>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240617054514.127961-1-chengen.du@canonical.com>
- <ZnAdiDjI_unrELB8@nanopsycho.orion> <6670898e1ca78_21d16f2946f@willemb.c.googlers.com.notmuch>
- <ZnEmiIhs5K4ehcYH@nanopsycho.orion> <66715247c147c_23a4e7294a7@willemb.c.googlers.com.notmuch>
- <CAPza5qfQtPZ-UPF97CG+zEwoQunbzg8F8kX0Q1y5Fzt4Zoc=4w@mail.gmail.com>
- <6673dc0ee45dd_2a03042941e@willemb.c.googlers.com.notmuch>
- <CAPza5qfqoJeSe3=nEuMAhWygiu0+N3v2Qe1TPB1eywMEyfGLrw@mail.gmail.com>
- <66794d8c1d425_3637da294d8@willemb.c.googlers.com.notmuch> <CAPza5qeh+vDAv_Xe5Duz53GFDef2UNxSdPAbgivk=XmdVkJbMQ@mail.gmail.com>
-In-Reply-To: <CAPza5qeh+vDAv_Xe5Duz53GFDef2UNxSdPAbgivk=XmdVkJbMQ@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 11 Jul 2024 10:33:23 -0400
-Message-ID: <CAF=yD-+9m9MVTsmidD3wheBCWu6EZGmYEqB6a=jpY0GT74r6fA@mail.gmail.com>
-Subject: Re: [PATCH v8] af_packet: Handle outgoing VLAN packets without
- hardware offloading
-To: Chengen Du <chengen.du@canonical.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 10, 2024 at 10:34=E2=80=AFPM Chengen Du <chengen.du@canonical.c=
-om> wrote:
->
-> On Mon, Jun 24, 2024 at 6:42=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Chengen Du wrote:
-> > > On Thu, Jun 20, 2024 at 3:36=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Chengen Du wrote:
-> > > > > On Tue, Jun 18, 2024 at 5:24=E2=80=AFPM Willem de Bruijn
-> > > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > > >
-> > > > > > Jiri Pirko wrote:
-> > > > > > > Mon, Jun 17, 2024 at 09:07:58PM CEST, willemdebruijn.kernel@g=
-mail.com wrote:
-> > > > > > > >Jiri Pirko wrote:
-> > > > > > > >> Mon, Jun 17, 2024 at 07:45:14AM CEST, chengen.du@canonical=
-.com wrote:
-> > > > > > > >> >The issue initially stems from libpcap. The ethertype wil=
-l be overwritten
-> > > > > > > >> >as the VLAN TPID if the network interface lacks hardware =
-VLAN offloading.
-> > > > > > > >> >In the outbound packet path, if hardware VLAN offloading =
-is unavailable,
-> > > > > > > >> >the VLAN tag is inserted into the payload but then cleare=
-d from the sk_buff
-> > > > > > > >> >struct. Consequently, this can lead to a false negative w=
-hen checking for
-> > > > > > > >> >the presence of a VLAN tag, causing the packet sniffing o=
-utcome to lack
-> > > > > > > >> >VLAN tag information (i.e., TCI-TPID). As a result, the p=
-acket capturing
-> > > > > > > >> >tool may be unable to parse packets as expected.
-> > > > > > > >> >
-> > > > > > > >> >The TCI-TPID is missing because the prb_fill_vlan_info() =
-function does not
-> > > > > > > >> >modify the tp_vlan_tci/tp_vlan_tpid values, as the inform=
-ation is in the
-> > > > > > > >> >payload and not in the sk_buff struct. The skb_vlan_tag_p=
-resent() function
-> > > > > > > >> >only checks vlan_all in the sk_buff struct. In cooked mod=
-e, the L2 header
-> > > > > > > >> >is stripped, preventing the packet capturing tool from de=
-termining the
-> > > > > > > >> >correct TCI-TPID value. Additionally, the protocol in SLL=
- is incorrect,
-> > > > > > > >> >which means the packet capturing tool cannot parse the L3=
- header correctly.
-> > > > > > > >> >
-> > > > > > > >> >Link: https://github.com/the-tcpdump-group/libpcap/issues=
-/1105
-> > > > > > > >> >Link: https://lore.kernel.org/netdev/20240520070348.26725=
--1-chengen.du@canonical.com/T/#u
-> > > > > > > >> >Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspa=
-ce")
-> > > > > > > >> >Cc: stable@vger.kernel.org
-> > > > > > > >> >Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> > > > > > > >> >---
-> > > > > > > >> > net/packet/af_packet.c | 86 ++++++++++++++++++++++++++++=
-+++++++++++++-
-> > > > > > > >> > 1 file changed, 84 insertions(+), 2 deletions(-)
-> > > > > > > >> >
-> > > > > > > >> >diff --git a/net/packet/af_packet.c b/net/packet/af_packe=
-t.c
-> > > > > > > >> >index ea3ebc160e25..84e8884a77e3 100644
-> > > > > > > >> >--- a/net/packet/af_packet.c
-> > > > > > > >> >+++ b/net/packet/af_packet.c
-> > > > > > > >> >@@ -538,6 +538,61 @@ static void *packet_current_frame(st=
-ruct packet_sock *po,
-> > > > > > > >> >  return packet_lookup_frame(po, rb, rb->head, status);
-> > > > > > > >> > }
-> > > > > > > >> >
-> > > > > > > >> >+static u16 vlan_get_tci(struct sk_buff *skb, struct net_=
-device *dev)
-> > > > > > > >> >+{
-> > > > > > > >> >+ struct vlan_hdr vhdr, *vh;
-> > > > > > > >> >+ u8 *skb_orig_data =3D skb->data;
-> > > > > > > >> >+ int skb_orig_len =3D skb->len;
-> > > > > > > >> >+ unsigned int header_len;
-> > > > > > > >> >+
-> > > > > > > >> >+ if (!dev)
-> > > > > > > >> >+         return 0;
-> > > > > > > >> >+
-> > > > > > > >> >+ /* In the SOCK_DGRAM scenario, skb data starts at the n=
-etwork
-> > > > > > > >> >+  * protocol, which is after the VLAN headers. The outer=
- VLAN
-> > > > > > > >> >+  * header is at the hard_header_len offset in non-varia=
-ble
-> > > > > > > >> >+  * length link layer headers. If it's a VLAN device, th=
-e
-> > > > > > > >> >+  * min_header_len should be used to exclude the VLAN he=
-ader
-> > > > > > > >> >+  * size.
-> > > > > > > >> >+  */
-> > > > > > > >> >+ if (dev->min_header_len =3D=3D dev->hard_header_len)
-> > > > > > > >> >+         header_len =3D dev->hard_header_len;
-> > > > > > > >> >+ else if (is_vlan_dev(dev))
-> > > > > > > >> >+         header_len =3D dev->min_header_len;
-> > > > > > > >> >+ else
-> > > > > > > >> >+         return 0;
-> > > > > > > >> >+
-> > > > > > > >> >+ skb_push(skb, skb->data - skb_mac_header(skb));
-> > > > > > > >> >+ vh =3D skb_header_pointer(skb, header_len, sizeof(vhdr)=
-, &vhdr);
-> > > > > > > >> >+ if (skb_orig_data !=3D skb->data) {
-> > > > > > > >> >+         skb->data =3D skb_orig_data;
-> > > > > > > >> >+         skb->len =3D skb_orig_len;
-> > > > > > > >> >+ }
-> > > > > > > >> >+ if (unlikely(!vh))
-> > > > > > > >> >+         return 0;
-> > > > > > > >> >+
-> > > > > > > >> >+ return ntohs(vh->h_vlan_TCI);
-> > > > > > > >> >+}
-> > > > > > > >> >+
-> > > > > > > >> >+static __be16 vlan_get_protocol_dgram(struct sk_buff *sk=
-b)
-> > > > > > > >> >+{
-> > > > > > > >> >+ __be16 proto =3D skb->protocol;
-> > > > > > > >> >+
-> > > > > > > >> >+ if (unlikely(eth_type_vlan(proto))) {
-> > > > > > > >> >+         u8 *skb_orig_data =3D skb->data;
-> > > > > > > >> >+         int skb_orig_len =3D skb->len;
-> > > > > > > >> >+
-> > > > > > > >> >+         skb_push(skb, skb->data - skb_mac_header(skb));
-> > > > > > > >> >+         proto =3D __vlan_get_protocol(skb, proto, NULL)=
-;
-> > > > > > > >> >+         if (skb_orig_data !=3D skb->data) {
-> > > > > > > >> >+                 skb->data =3D skb_orig_data;
-> > > > > > > >> >+                 skb->len =3D skb_orig_len;
-> > > > > > > >> >+         }
-> > > > > > > >> >+ }
-> > > > > > > >> >+
-> > > > > > > >> >+ return proto;
-> > > > > > > >> >+}
-> > > > > > > >> >+
-> > > > > > > >> > static void prb_del_retire_blk_timer(struct tpacket_kbdq=
-_core *pkc)
-> > > > > > > >> > {
-> > > > > > > >> >  del_timer_sync(&pkc->retire_blk_timer);
-> > > > > > > >> >@@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(stru=
-ct tpacket_kbdq_core *pkc,
-> > > > > > > >> > static void prb_fill_vlan_info(struct tpacket_kbdq_core =
-*pkc,
-> > > > > > > >> >                  struct tpacket3_hdr *ppd)
-> > > > > > > >> > {
-> > > > > > > >> >+ struct packet_sock *po =3D container_of(pkc, struct pac=
-ket_sock, rx_ring.prb_bdqc);
-> > > > > > > >> >+
-> > > > > > > >> >  if (skb_vlan_tag_present(pkc->skb)) {
-> > > > > > > >> >          ppd->hv1.tp_vlan_tci =3D skb_vlan_tag_get(pkc->=
-skb);
-> > > > > > > >> >          ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->vlan_=
-proto);
-> > > > > > > >> >          ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_ST=
-ATUS_VLAN_TPID_VALID;
-> > > > > > > >> >+ } else if (unlikely(po->sk.sk_type =3D=3D SOCK_DGRAM &&=
- eth_type_vlan(pkc->skb->protocol))) {
-> > > > > > > >> >+         ppd->hv1.tp_vlan_tci =3D vlan_get_tci(pkc->skb,=
- pkc->skb->dev);
-> > > > > > > >> >+         ppd->hv1.tp_vlan_tpid =3D ntohs(pkc->skb->proto=
-col);
-> > > > > > > >> >+         ppd->tp_status =3D TP_STATUS_VLAN_VALID | TP_ST=
-ATUS_VLAN_TPID_VALID;
-> > > > > > > >> >  } else {
-> > > > > > > >> >          ppd->hv1.tp_vlan_tci =3D 0;
-> > > > > > > >> >          ppd->hv1.tp_vlan_tpid =3D 0;
-> > > > > > > >> >@@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_b=
-uff *skb, struct net_device *dev,
-> > > > > > > >> >                  h.h2->tp_vlan_tci =3D skb_vlan_tag_get(=
-skb);
-> > > > > > > >> >                  h.h2->tp_vlan_tpid =3D ntohs(skb->vlan_=
-proto);
-> > > > > > > >> >                  status |=3D TP_STATUS_VLAN_VALID | TP_S=
-TATUS_VLAN_TPID_VALID;
-> > > > > > > >> >+         } else if (unlikely(sk->sk_type =3D=3D SOCK_DGR=
-AM && eth_type_vlan(skb->protocol))) {
-> > > > > > > >> >+                 h.h2->tp_vlan_tci =3D vlan_get_tci(skb,=
- skb->dev);
-> > > > > > > >> >+                 h.h2->tp_vlan_tpid =3D ntohs(skb->proto=
-col);
-> > > > > > > >> >+                 status |=3D TP_STATUS_VLAN_VALID | TP_S=
-TATUS_VLAN_TPID_VALID;
-> > > > > > > >> >          } else {
-> > > > > > > >> >                  h.h2->tp_vlan_tci =3D 0;
-> > > > > > > >> >                  h.h2->tp_vlan_tpid =3D 0;
-> > > > > > > >> >@@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_bu=
-ff *skb, struct net_device *dev,
-> > > > > > > >> >  sll->sll_halen =3D dev_parse_header(skb, sll->sll_addr)=
-;
-> > > > > > > >> >  sll->sll_family =3D AF_PACKET;
-> > > > > > > >> >  sll->sll_hatype =3D dev->type;
-> > > > > > > >> >- sll->sll_protocol =3D skb->protocol;
-> > > > > > > >> >+ sll->sll_protocol =3D (sk->sk_type =3D=3D SOCK_DGRAM) ?
-> > > > > > > >> >+         vlan_get_protocol_dgram(skb) : skb->protocol;
-> > > > > > > >> >  sll->sll_pkttype =3D skb->pkt_type;
-> > > > > > > >> >  if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV))=
-)
-> > > > > > > >> >          sll->sll_ifindex =3D orig_dev->ifindex;
-> > > > > > > >> >@@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct so=
-cket *sock, struct msghdr *msg, size_t len,
-> > > > > > > >> >          /* Original length was stored in sockaddr_ll fi=
-elds */
-> > > > > > > >> >          origlen =3D PACKET_SKB_CB(skb)->sa.origlen;
-> > > > > > > >> >          sll->sll_family =3D AF_PACKET;
-> > > > > > > >> >-         sll->sll_protocol =3D skb->protocol;
-> > > > > > > >> >+         sll->sll_protocol =3D (sock->type =3D=3D SOCK_D=
-GRAM) ?
-> > > > > > > >> >+                 vlan_get_protocol_dgram(skb) : skb->pro=
-tocol;
-> > > > > > > >> >  }
-> > > > > > > >> >
-> > > > > > > >> >  sock_recv_cmsgs(msg, sk, skb);
-> > > > > > > >> >@@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct s=
-ocket *sock, struct msghdr *msg, size_t len,
-> > > > > > > >> >                  aux.tp_vlan_tci =3D skb_vlan_tag_get(sk=
-b);
-> > > > > > > >> >                  aux.tp_vlan_tpid =3D ntohs(skb->vlan_pr=
-oto);
-> > > > > > > >> >                  aux.tp_status |=3D TP_STATUS_VLAN_VALID=
- | TP_STATUS_VLAN_TPID_VALID;
-> > > > > > > >> >+         } else if (unlikely(sock->type =3D=3D SOCK_DGRA=
-M && eth_type_vlan(skb->protocol))) {
-> > > > > > > >>
-> > > > > > > >> I don't understand why this would be needed here. We spent=
- quite a bit
-> > > > > > > >> of efford in the past to make sure vlan header is always s=
-tripped.
-> > > > > > > >> Could you fix that in tx path to fulfill the expectation?
-> > > > > > > >
-> > > > > > > >Doesn't that require NETIF_F_HW_VLAN_CTAG_TX?
-> > > > > > > >
-> > > > > > > >I also wondered whether we should just convert the skb for t=
-his case
-> > > > > > > >with skb_vlan_untag, to avoid needing new PF_PACKET logic to=
- handle
-> > > > > > > >unstripped tags in the packet socket code. But it seems equa=
-lly
-> > > > > > > >complex.
-> > > > > > >
-> > > > > > > Correct. skb_vlan_untag() as a preparation of skb before this=
- function
-> > > > > > > is called is exactly what I was suggesting.
-> > > > > >
-> > > > > > It's not necessarily simpler, as that function expects skb->dat=
-a to
-> > > > > > point to the (outer) VLAN header.
-> > > > > >
-> > > > > > It will pull that one, but not any subsequent ones.
-> > > > > >
-> > > > > > SOCK_DGRAM expects skb->data to point to the network layer head=
-er.
-> > > > > > And we only want to make this change for SOCK_DGRAM and if auxd=
-ata is
-> > > > > > requested.
-> > > > > >
-> > > > > > Not sure that it will be simpler. But worth a look at least.
-> > > > >
-> > > > > Thank you for your suggestion.
-> > > > >
-> > > > > I have analyzed the code and considered a feasible approach. We c=
-ould
-> > > > > call skb_vlan_untag() in packet_rcv before pushing skb into
-> > > > > sk->sk_receive_queue.
-> > > >
-> > > > Only for SOCK_DGRAM.
-> > > >
-> > > > And there is some user risk, as they will see different packets on
-> > > > the same devices as before. A robust program should work for both
-> > > > vlan stripped and unstripped, and the unstripped case is already
-> > > > broken wrt sll_protocol returned, so I suppose this is acceptable.
-> > > >
-> > > > > We would also need to determine if auxdata is
-> > > > > required to maintain performance, which might cause the logic of
-> > > > > judging PACKET_SOCK_AUXDATA to be spread across both the packet_r=
-cv()
-> > > > > and packet_recvmsg() functions.
-> > > >
-> > > > You mean to only make the above change if SOCK_DGRAM and auxdata is
-> > > > requested?
-> > >
-> > > Yes, we can constrain the performance overhead to specific scenarios =
-this way.
-> > >
-> > > >
-> > > > Btw, also tpacket_rcv, where auxdata is always returned.
-> > > >
-> > > > > The skb_vlan_untag() function handles VLANs in a more comprehensi=
-ve
-> > > > > way, but it seems to have a greater performance impact compared t=
-o our
-> > > > > current approach.
-> > > >
-> > > > I was afraid of that too. The skb_share_check is fine, as this also
-> > > > exists in packet_rcv, before we would call skb_vlan_untag.
-> > > >
-> > > > A bigger issue: this only pulls the outer tag. So we still need to
-> > > > handle the vlan stacking case correctly manually.
-> > >
-> > > It seems we are on the same page. The need to manually handle VLAN
-> > > stacking is a significant concern. Since the code is in the critical
-> > > path, we must carefully manage the performance overhead. Given that
-> > > the current method is more efficient than calling skb_vlan_untag(), I
-> > > propose retaining the patch as is. Please let me know if there are an=
-y
-> > > other concerns.
-> >
-> > I agree.
->
-> I apologize for any inconvenience. May I ask when this patch will be
-> merged? Or is there anything I need to do to help the patch proceed?
+On Thu, 4 Jul 2024 22:12:45 +0200
+Jesper Dangaard Brouer <hawk@kernel.org> wrote:
 
-Please rebase and resubmit.
+> > ============================================
+> > WARNING: possible recursive locking detected
+> > 6.10.0-rc2-syzkaller-00797-ga12978712d90 #0 Not tainted
+> > --------------------------------------------
+> > syz-executor646/5097 is trying to acquire lock:
+> > ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+> > ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_released+0x83/0x620 mm/mmap_lock.c:243
+> > 
+> > but task is already holding lock:
+> > ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+> > ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_released+0x83/0x620 mm/mmap_lock.c:243
+> > 
+> > other info that might help us debug this:
+> >   Possible unsafe locking scenario:
+> > 
+> >         CPU0
+> >         ----
+> >    lock(lock#9);
+> >    lock(lock#9);
+> > 
+> >   *** DEADLOCK ***
 
-For details, see also
-https://kernel.org/doc/html/latest/process/maintainer-netdev.html#patch-sta=
-tus
+Looks like it's trying to take the rwsem mm->mmap_lock recursively. And
+rwsems are *not* allowed to be recursively taken, as once there's a writer,
+all new acquires of the reader will block. Then you can have:
+
+   CPU0				    CPU1
+   ----				    ----
+  down_read(lockA);
+				down_write(lockA); // blocks
+  down_read(lockA); //blocks
+
+DEADLOCK!
+
+
+> > 
+> >   May be due to missing lock nesting notation
+> >   
+> 
+> To me, this looks like a lockdep false-positive, but I might be wrong.
+> 
+> Could someone with more LOCKDEP knowledge give their interpretation?
+> 
+> The commit[1] adds a fairly standard trylock scheme.
+> Do I need to lockdep annotate trylock's in some special way?
+> 
+>   [1] https://git.kernel.org/torvalds/c/21c38a3bd4ee3fb733
+> 
+> Also notice change uses raw_spin_lock, which might be harder for lockdep?
+> So, I also enabled CONFIG_PROVE_RAW_LOCK_NESTING in my testlab to help
+> with this, and CONFIG_PROVE_LOCKING.
+> (And obviously I also enabled LOCKDEP*)
+> 
+> --Jesper
+> 
+> > 5 locks held by syz-executor646/5097:
+> >   #0: ffff8880182eb118 (&mm->mmap_lock){++++}-{3:3}, at: mmap_read_lock include/linux/mmap_lock.h:144 [inline]
+> >   #0: ffff8880182eb118 (&mm->mmap_lock){++++}-{3:3}, at: acct_collect+0x1cf/0x830 kernel/acct.c:563
+> >   #1: ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+> >   #1: ffff8880b94387e8 (lock#9){+.+.}-{2:2}, at: __mmap_lock_do_trace_released+0x83/0x620 mm/mmap_lock.c:243
+> >   #2: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+> >   #2: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+> >   #2: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: get_memcg_path_buf mm/mmap_lock.c:139 [inline]
+> >   #2: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: get_mm_memcg_path+0xb1/0x600 mm/mmap_lock.c:209
+> >   #3: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: trace_call_bpf+0xbc/0x8a0
+> >   #4: ffff8880182eb118 (&mm->mmap_lock){++++}-{3:3}, at: mmap_read_trylock include/linux/mmap_lock.h:163 [inline]
+> >   #4: ffff8880182eb118 (&mm->mmap_lock){++++}-{3:3}, at: stack_map_get_build_id_offset+0x237/0x9d0 kernel/bpf/stackmap.c:141
+> > 
+> > stack backtrace:
+> > CPU: 0 PID: 5097 Comm: syz-executor646 Not tainted 6.10.0-rc2-syzkaller-00797-ga12978712d90 #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+> > Call Trace:
+> >   <TASK>
+> >   __dump_stack lib/dump_stack.c:88 [inline]
+> >   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+> >   check_deadlock kernel/locking/lockdep.c:3062 [inline]
+> >   validate_chain+0x15d3/0x5900 kernel/locking/lockdep.c:3856
+> >   __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+> >   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+> >   local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+> >   __mmap_lock_do_trace_released+0x9c/0x620 mm/mmap_lock.c:243
+
+Here we have:
+
+  static inline void mmap_read_lock(struct mm_struct *mm)
+  {
+        __mmap_lock_trace_start_locking(mm, false);
+        down_read(&mm->mmap_lock);
+        __mmap_lock_trace_acquire_returned(mm, false, true);
+  }
+
+Which is taking the mm->mmap_lock for read.
+
+> >   __mmap_lock_trace_released include/linux/mmap_lock.h:42 [inline]
+> >   mmap_read_unlock include/linux/mmap_lock.h:170 [inline]
+> >   bpf_mmap_unlock_mm kernel/bpf/mmap_unlock_work.h:52 [inline]
+> >   stack_map_get_build_id_offset+0x9c7/0x9d0 kernel/bpf/stackmap.c:173
+> >   __bpf_get_stack+0x4ad/0x5a0 kernel/bpf/stackmap.c:449
+> >   bpf_prog_e6cf5f9c69743609+0x42/0x46
+> >   bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
+> >   __bpf_prog_run include/linux/filter.h:691 [inline]
+> >   bpf_prog_run include/linux/filter.h:698 [inline]
+> >   bpf_prog_run_array include/linux/bpf.h:2104 [inline]
+> >   trace_call_bpf+0x369/0x8a0 kernel/trace/bpf_trace.c:147
+> >   perf_trace_run_bpf_submit+0x7c/0x1d0 kernel/events/core.c:10269
+> >   perf_trace_mmap_lock+0x3d7/0x510 include/trace/events/mmap_lock.h:16
+
+I'm guessing a bpf program attached to something within the same code:
+
+> >   trace_mmap_lock_released include/trace/events/mmap_lock.h:50 [inline]
+> >   __mmap_lock_do_trace_released+0x5bb/0x620 mm/mmap_lock.c:243
+
+Here is the same function as above where it took the mm->mmap_lock.
+
+My guess is the bpf program that attached to this event ends up calling the
+same function and it tries to take the rwsem again, and that poses a risk
+for deadlock.
+
+-- Steve
+
+> >   __mmap_lock_trace_released include/linux/mmap_lock.h:42 [inline]
+> >   mmap_read_unlock include/linux/mmap_lock.h:170 [inline]
+> >   acct_collect+0x81d/0x830 kernel/acct.c:566
+> >   do_exit+0x936/0x27e0 kernel/exit.c:853
+> >   do_group_exit+0x207/0x2c0 kernel/exit.c:1023
+> >   __do_sys_exit_group kernel/exit.c:1034 [inline]
+> >   __se_sys_exit_group kernel/exit.c:1032 [inline]
+> >   __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1032
+> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7f8fac26d039
+> > Code: 90 49 c7 c0 b8 ff ff ff be e7 00 00 00 ba 3c 00 00 00 eb 12 0f 1f
+> > 44 00 00 89 d0 0f 05 48 3d 00 f0 ff ff 77 1c f4 89 f0 0f 05 <48> 3d 00
+> > f0 ff ff 76 e7 f7 d8 64 41 89 00 eb df 0f 1f 80 00 00 00 RSP:
+> > 002b:00007ffd95d56e68 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7 RAX:
+> > ffffffffffffffda RBX: 0000000000000000 RCX: 00007f8fac26d039 RDX:
+> > 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000 RBP:
+> > 00007f8fac2e82b0 R08: ffffffffffffffb8 R09: 00000000000000a0 R10:
+> > 0000000000000000 R11: 0000000000000246 R12: 00007f8fac2e82b0 R13:
+> > 0000000000000000 R14: 00007f8fac2e8d20 R15: 00007f8fac23e1e0 </TASK>
+> > 
+> > 
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> > 
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> > For information about bisection process
+> > see: https://goo.gl/tpsmEJ#bisection
+> > 
+> > If the report is already addressed, let syzbot know by replying with:
+> > #syz fix: exact-commit-title
+> > 
+> > If you want syzbot to run the reproducer, reply with:
+> > #syz test: git://repo/address.git branch-or-commit-hash
+> > If you attach or paste a git patch, syzbot will apply it before testing.
+> > 
+> > If you want to overwrite report's subsystems, reply with:
+> > #syz set subsystems: new-subsystem
+> > (See the list of subsystem names on the web dashboard)
+> > 
+> > If the report is a duplicate of another one, reply with:
+> > #syz dup: exact-subject-of-another-report
+> > 
+> > If you want to undo deduplication, reply with:
+> > #syz undup  
+
 
