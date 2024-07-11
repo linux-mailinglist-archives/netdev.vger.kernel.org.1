@@ -1,111 +1,95 @@
-Return-Path: <netdev+bounces-110939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1123392F06B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:36:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8A6992F070
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:43:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 439811C22312
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:36:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77C7D1F2261E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 20:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3EF19E7FB;
-	Thu, 11 Jul 2024 20:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD89B16F0E7;
+	Thu, 11 Jul 2024 20:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="LALj4Hv1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTHAyPFJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DA171B51;
-	Thu, 11 Jul 2024 20:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918EF38DD9;
+	Thu, 11 Jul 2024 20:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720730181; cv=none; b=b3XcGM2f2dcFOeN17IH++4vo7bVM8IPNAesi0hqmmrwu1qIoYpmRsCEB4zDoarvIeTUrWvpyco/mKdLBI0epKcviulV2Wt28T/MB0pJ4jCIqj4PYQ3NvUWhha8mTd9RQAVcNhVavYgtSbmkfsqTel+ZOC0Kkbl03aOdF/Hmsgwg=
+	t=1720730582; cv=none; b=OemG2XFiwSURY6n7j3DH6GOmaYNREJy3GX90cOEldIwYOl3K4JGpUrpzS6HeccMKDqoij/ZeTkvyMDPMBzuAP3Pt9tnKK0rToY3A6XoAHb9cnQjQpxbKj4CLjVBsEtFHdM5lZ0qfoq+RGRRX3sBRfMLzeXZNt08WjjysEto3s9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720730181; c=relaxed/simple;
-	bh=DxYtzJNa0Vh9cYgQrJR+0cbJ+C9lIGfdZkLuHzygzVA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TWZoGXACJyLu0C/trf6LZZJIj3Ttme/ivXiL4EywcaLGdppi7CWswrG4FhGwQPwteJ4VsSYnbbxNP3L/4B4UFylCFQdRXOsqcUHut+lbtFyMg0AJedwgH7nrhGk8hvd3uOy2xWb2s7C7qWfnlhNc9ivBqABxawXbI5GO0RtQAVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=LALj4Hv1; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sS0WW-007wCr-4l; Thu, 11 Jul 2024 22:36:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=7caZyj7OhOb5yW9FtafaXqMJoVVT/luE6lCAvdfivpg=; b=LALj4Hv1VcrIHJorno/NaOVkst
-	QtxYgplrKlKxOjujZyaIBOwt0YpeXuYJ0MzLNUwtP+SHdIoybbFVlww2YBJCIT0iJbNd3KRIOy7HV
-	ehBjdsLUjFcBGG2tbJRGR4eRgY9edE2IMNtdV5QbpH5xzu7o+JLeeCtTqTaBabVjWn771ORTLYQLS
-	uScxbVoOb0lF7UQeUiejVhca+/MJWbnt1WbEjihRWqGJf/bAUfmRRFlSiQXdoluiLVpzlo57O2TzA
-	BbHKgka5hhaBgHQYyVAlEUwpkgHgee6kaP8zdSxc9cRIJMN1MpTuWFoj1Yai47LRdLNSCjjBwBY/I
-	w5iNvxsw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sS0WP-0000YV-Tb; Thu, 11 Jul 2024 22:36:10 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sS0W6-002DDM-9W; Thu, 11 Jul 2024 22:35:50 +0200
-Message-ID: <c8e083de-0084-4f88-8ee6-f2d4eaab6c8b@rbox.co>
-Date: Thu, 11 Jul 2024 22:35:49 +0200
+	s=arc-20240116; t=1720730582; c=relaxed/simple;
+	bh=khOfbfPVVqPE4ywntfX+gbv4nMJuiXVC/C7VYAP4hVI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hY9PHCWwQjZJyeb7jR371TefLfJEBse5GUW+rbJugJ+yLw7bhUHUoqkW5/LXp1c4FHDafu4nhjtNFwO/M1LrOmJAzffm22r7kZagoj/eyMIlfCdC+6NIrOZm8Q4ltfQnRqOKrYASqOEsSnBUBUbs7lsy5uplNjCOOFR5ZSqHANU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTHAyPFJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F7C1C116B1;
+	Thu, 11 Jul 2024 20:43:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720730582;
+	bh=khOfbfPVVqPE4ywntfX+gbv4nMJuiXVC/C7VYAP4hVI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DTHAyPFJwuS49r+kexOhoopnvA8HoscwV4rNhGO3Ro51mOyN48vm/NOxSnhps/dHN
+	 a3S1mXtICQR7dp6Xwzgkfrhh4EMeNH6tFrRarRIawbSkSMi+HrSMeN6uqx7i29VaRB
+	 0DBUQ2QEHtGkF/2c/Cj5LLrTMLgifSZeorMFgzzq9q4Xc6Fs0pbnRlBqchswhcSqOd
+	 nasQ8Mm4dWWSTy/6wA6z8wjBhoy5DzOMWcNiJYXSbNjEIurHMn1jEXBP29acGUy/ZM
+	 9ORcVYtqBvd0ZdAILE9O+TPz7CS870DHkWS0+MM1ubayZqgb8/mppVCyMEppml+SED
+	 R+/OmaxIsaRVA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3BB7C433E9;
+	Thu, 11 Jul 2024 20:43:01 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v3 4/4] selftest/bpf: Test sockmap redirect for
- AF_UNIX MSG_OOB
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- john.fastabend@gmail.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
- cong.wang@bytedance.com
-References: <20240707222842.4119416-1-mhal@rbox.co>
- <20240707222842.4119416-5-mhal@rbox.co> <87r0c2nai8.fsf@cloudflare.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <87r0c2nai8.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] net: fix rc7's __skb_datagram_iter()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172073058198.5052.14456309995810548001.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jul 2024 20:43:01 +0000
+References: <66e53f14-bfca-6b1a-d9db-9b1c0786d07a@google.com>
+In-Reply-To: <66e53f14-bfca-6b1a-d9db-9b1c0786d07a@google.com>
+To: Hugh Dickins <hughd@google.com>
+Cc: torvalds@linux-foundation.org, sagi@grimberg.me, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, regressions@leemhuis.info,
+ regressions@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On 7/9/24 12:08, Jakub Sitnicki wrote:
-> On Sun, Jul 07, 2024 at 11:28 PM +02, Michal Luczaj wrote:
->> Verify that out-of-band packets are silently dropped before they reach the
->> redirection logic. Attempt to recv() stale data that might have been
->> erroneously left reachable from the original socket.
->>
->> The idea is to test with a 2 byte long send(). Should a MSG_OOB flag be in
->> use, only the last byte will be treated as out-of-band. Test fails if
->> verd_mapfd indicates a wrong number of packets processed (e.g. if OOB data
->> wasn't dropped at the source) or if it was still somehow possble to recv()
-> 
-> Nit: typo s/possble/possible
-> 
-> Something like below will catch these for you:
-> 
-> $ cat ~/src/linux/.git/hooks/post-commit
-> exec git show --format=email HEAD | ./scripts/checkpatch.pl --strict --codespell
+Hello:
 
-Heh, I have it. Just not in the right repo :) Will fix.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> This AF_UNIX MSG_OOB use case is super exotic, IMO. TBH, I've just
-> learned about it. Hence, I think we could use some more comments for the
-> future readers.
+On Wed, 10 Jul 2024 08:36:54 -0700 (PDT) you wrote:
+> X would not start in my old 32-bit partition (and the "n"-handling looks
+> just as wrong on 64-bit, but for whatever reason did not show up there):
+> "n" must be accumulated over all pages before it's added to "offset" and
+> compared with "copy", immediately after the skb_frag_foreach_page() loop.
 > 
-> Also, it seems like we only need to remove peer1 from sockmap to test
-> the behavior. If so, I'd stick to just what is needed to set up the
-> test. Extra stuff makes you wonder what was the authors intention.
+> Fixes: d2d30a376d9c ("net: allow skb_datagram_iter to be called from any context")
+> Signed-off-by: Hugh Dickins <hughd@google.com>
+> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 > 
-> I'd also be more direct about checking return value & error. These
-> selftests often serve as the only example / API documentation out there.
+> [...]
 
-Yeah, all fair points. Thanks.
+Here is the summary with links:
+  - [v3] net: fix rc7's __skb_datagram_iter()
+    https://git.kernel.org/netdev/net-next/c/f153831097b4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
