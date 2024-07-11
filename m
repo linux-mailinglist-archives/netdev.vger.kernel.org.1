@@ -1,112 +1,79 @@
-Return-Path: <netdev+bounces-110928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0A392EF55
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 21:09:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A80BE92EF97
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 21:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72446B2220F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:09:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 629C0281FF5
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA43316EB5E;
-	Thu, 11 Jul 2024 19:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A7C16E88B;
+	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XihkwQLB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9FSbHxY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5989B288B5;
-	Thu, 11 Jul 2024 19:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93D51EA85;
+	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720724934; cv=none; b=rYZlwtKnsSVXyjutyr/T5fmNF/tJtDjw+2EAjVLBG8JqiOS/s+hCEZlEzA7iukttqduPaVVj+oB6SwteIbfMSHMsyt6xa5nnJzzfvTjHgfMvz+RZMiIC2k6Rc6T8iSRnE0k3beUayhNZ0JfGKvvgRRV3Qj+o6t3uYyOCozuATF0=
+	t=1720725872; cv=none; b=N2POsGkPsnosfqh8KXEPQ3W2ZPpNIxSjq2zc9U30DwZ4ABnJAm1Cwv5QCsqUecG2F5CUeWC8APcKjfiM8eASTQdTR4TiuJuENZUrWWa9TRjbcfEtZIHXaC12yJXpWx12csE08hRjJss9OK93Sm/NDigpyazWmlZMWg+Mbf0xyws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720724934; c=relaxed/simple;
-	bh=PkPQTbw7deeaqSIA2QxrV/rg07ycTK/FjG1yjB7MJ2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q6T6XHaTaAmN8dCnEBXO3T6pJwL2gKE9BufpShEagyvdSLL8yr0ms4J3eRP+Q+YCVMKTndotpL0m//QMiNdK6/3QF55N2/WS7AvXAnUReGMaTWDmuHk4v9k3yoGjKuu81i9YoIZVqZgPqTglgLezFFxRKXKLQVh+NXUWPFuvUJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XihkwQLB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 484EBC116B1;
-	Thu, 11 Jul 2024 19:08:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1720724933;
-	bh=PkPQTbw7deeaqSIA2QxrV/rg07ycTK/FjG1yjB7MJ2g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XihkwQLBuUN2nyJf4R0G/cEvacuTpXd+vUa2F/roD3Dxy54MUdghDUrbpTAs0Hxot
-	 28l0OAiwgRxbtCcyAL0H/FetkhAJEJNM8ViyiyhqwFF0/TNwUUpVqb+scSxRml2WqU
-	 ZyuctrXpC7kQZZ65ZVnaDs5hezpPhS3HqJxIEHFE=
-Date: Thu, 11 Jul 2024 21:08:48 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Lee Jones <lee@kernel.org>, Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	UNGLinuxDriver@microchip.com,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
-Message-ID: <2024071113-motocross-escalator-e034@gregkh>
-References: <20240627091137.370572-1-herve.codina@bootlin.com>
- <20240627091137.370572-7-herve.codina@bootlin.com>
- <20240711152952.GL501857@google.com>
- <20240711184438.65446cc3@bootlin.com>
+	s=arc-20240116; t=1720725872; c=relaxed/simple;
+	bh=xy99/kDWGgxvByUfnPwWGMstPjslgJNjta3z5Vf531Y=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mqRuSRgK9m94hcj1L/DCG67tr4Zm0QtrharISb1NsMr83ScruOD/EOnB3XCnFK1hyZM3JITjRHpRx/LBWon4U/RX4b1gr2yGEiguE6TskXatf9G3yaQyyi1PkREpY99ADprm/070CW0nMN2hTsE42Gpzn/ndHSbPq1cNPZGdOBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9FSbHxY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 81DECC116B1;
+	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720725872;
+	bh=xy99/kDWGgxvByUfnPwWGMstPjslgJNjta3z5Vf531Y=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=W9FSbHxYBcqvTMNl8HP35HGE87RXvZeDRclx9hM9SPNGgOY0qcuG+a2mwfbaGsU6t
+	 OeDoBg4DcAmbXvYb7Q0BjC4laH+f6bHjnG7AeHJVgyzk/+sT6i/H/adGbN08R+b0Fz
+	 oEviajrBttMDlIeIOgXnevl5yUzllh6ytW/Uj7DQQXL21g1DLFcykL5QJmasVHIdqO
+	 zpbtZ0akTFdo/gUXfKaqXyjDVPnKy6twjH6Ye5GvcfyV+ihbH3uUrt2TAHhlR3rNau
+	 KA7USARLS3MbC4LTsBsk1REVkiFWGkdS0zO71ZnFPLjdUl1XHt7pNXiihLPaXBocf+
+	 rYWBcC6V9OOMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75E01C43468;
+	Thu, 11 Jul 2024 19:24:32 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.10-rc8
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240711134137.108857-1-pabeni@redhat.com>
+References: <20240711134137.108857-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240711134137.108857-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc8
+X-PR-Tracked-Commit-Id: d7c199e77ef2fe259ad5b1beca5ddd6c951fcba2
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 51df8e0cbaefd432f7029dde94e6c7e4e5b19465
+Message-Id: <172072587246.27993.6082265630190170856.pr-tracker-bot@kernel.org>
+Date: Thu, 11 Jul 2024 19:24:32 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240711184438.65446cc3@bootlin.com>
 
-On Thu, Jul 11, 2024 at 06:44:38PM +0200, Herve Codina wrote:
-> Hi Lee,
-> 
-> On Thu, 11 Jul 2024 16:29:52 +0100
-> Lee Jones <lee@kernel.org> wrote:
-> 
-> > On Thu, 27 Jun 2024, Herve Codina wrote:
-> > 
-> > > Add a PCI driver that handles the LAN966x PCI device using a device-tree
-> > > overlay. This overlay is applied to the PCI device DT node and allows to
-> > > describe components that are present in the device.
-> > > 
-> > > The memory from the device-tree is remapped to the BAR memory thanks to
-> > > "ranges" properties computed at runtime by the PCI core during the PCI
-> > > enumeration.
-> > > 
-> > > The PCI device itself acts as an interrupt controller and is used as the
-> > > parent of the internal LAN966x interrupt controller to route the
-> > > interrupts to the assigned PCI INTx interrupt.  
-> > 
-> > Not entirely sure why this is in MFD.
-> 
-> This PCI driver purpose is to instanciate many other drivers using a DT
-> overlay. I think MFD is the right subsystem.
+The pull request you sent on Thu, 11 Jul 2024 15:41:37 +0200:
 
-Please use the aux bus for that, that is what is was specifically
-designed for, and what it is being used for today.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc8
 
-thanks,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/51df8e0cbaefd432f7029dde94e6c7e4e5b19465
 
-greg k-h
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
