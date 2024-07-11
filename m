@@ -1,82 +1,56 @@
-Return-Path: <netdev+bounces-110887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD7E592EC20
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 17:58:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B366092EC5A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 18:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D144F1C23663
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:58:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FA4A1F22B3B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 16:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB65B16D308;
-	Thu, 11 Jul 2024 15:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6CAC16B392;
+	Thu, 11 Jul 2024 16:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hfU2yAWd"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="rVVHP500"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B6A16C870;
-	Thu, 11 Jul 2024 15:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DA315957E;
+	Thu, 11 Jul 2024 16:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720713495; cv=none; b=Beqb4J7xjB0yafVGJYnZYE2/yLJ9W/TDQ9M6IHP/4Me8oOTRpD+spYFqazcZ0NPeriw8mOeo+rITfXdI4MiLrfPL6+bky+92JxI+WQIc9XWRTGwLphAFSd2jyagukuORuA0rtsflUMOQK7dYne7vRJqM3C7SBbVOilDKKNqSfVk=
+	t=1720714217; cv=none; b=XUUt/G5D6x7HmmXeqQHnqLg9axlZloKs8nRrQCNhnjK8m1t60gLy/yg+B8T8/JHMQRsuDd24tw1an0PjLDzZjb6L39aTESkr9YG+IFNZ1VseUheA9AiP+UeU5AMmOJIOCrhxbHMMnjCfQfBT9x3hgzHvUdwXGxiHEZlb2CleMQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720713495; c=relaxed/simple;
-	bh=rG+rhFqRp+IXWkMK/whHaioY+dau+YVIg0mAS0SkFME=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mg8rrXQ6LBE7/Ss+LisSIwpLAU8/nIW3eDuzXec0ICF1hn42DzHfNA8d//sjWnlFEQVfRPtmGA2ayncRam8vLVxm31zOQ7pEFywv19tSID/5GyzXZZDnKz5ry5VJWa9CQbmsIakb8T86AdEB0rv0UXIGrZa291nUjRZhs/Fyw+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hfU2yAWd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BFSF2L000723;
-	Thu, 11 Jul 2024 15:58:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=s
-	rw9iKFj3XZzXf9us0yVA0qIGq9Hz+UF1sQHulaTChM=; b=hfU2yAWdOEm1ZA3Yp
-	EstnV6q+S01JuBTKtmTaBuHgkwz4ojN6k3L/UUHASAaWI4wyP4Xtww0SZTUc8uIp
-	sNpQi494Nj6XBcas+EOJp8Kgcf+Gsv3oTVcxd7X7CscAdXqC8NDLfje5W7sZREFQ
-	/2D6DLyy7olZdMZXS4YSBaSCrB2X5gVcZK5WxY+CwiF5pLU0W+9Q04cawgc8yXa/
-	scliWSe0nCXv8jhlp4PF+t3IZV3hdkp2nNkeOyUovj1a026PqTYUL4eM9Kj8ZxWc
-	8lQRnenPXbeZoJlzsaNecyXmHkXBb69sAtmnodcfhZcFBDuJvvOs/WylzLE6nJv/
-	6nMVg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40aj2hr2vb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 15:58:07 +0000 (GMT)
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BFw6jr014949;
-	Thu, 11 Jul 2024 15:58:06 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40aj2hr2v7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 15:58:06 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46BDi8HU013992;
-	Thu, 11 Jul 2024 15:58:05 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 407jy3h86m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 15:58:05 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BFw3WR26477138
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Jul 2024 15:58:05 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0941158054;
-	Thu, 11 Jul 2024 15:58:03 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6220D58062;
-	Thu, 11 Jul 2024 15:58:00 +0000 (GMT)
-Received: from [9.171.21.149] (unknown [9.171.21.149])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 11 Jul 2024 15:58:00 +0000 (GMT)
-Message-ID: <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
-Date: Thu, 11 Jul 2024 17:57:59 +0200
+	s=arc-20240116; t=1720714217; c=relaxed/simple;
+	bh=toos/atAMxpoRk1QwVzwIn/xX8NOj8ffSwRiozlKcbQ=;
+	h=Message-ID:Date:MIME-Version:To:References:Subject:From:Cc:
+	 In-Reply-To:Content-Type; b=QlZQ9jCVgFEFIZ5fw0hcJ9oMb6SPOewOg/5KmCC1hI+foJ237eS5SqMtKGNLDE4LXyUwd+Z2wQR+cT0BGyqtowFW0GCAyCfDE99Da/hvfefr4Dv04DoBkR0FoL5vgyjMpQIjXnDQmUHNZMQbklqAYT7GCgN1v2MSJizhZVU1j3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=rVVHP500; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1720714178; x=1721318978; i=markus.elfring@web.de;
+	bh=iCA+wBBrDEg85srNLY95LSkrYDhC1QURR+TnrO0mB7U=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:References:
+	 Subject:From:Cc:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=rVVHP50064H3+NxqWnBBbLlsmJUgKEtW3UUIn0sX6hPrgvYM1R4yuk2oKp7i+Y+5
+	 tyfL1TpDF8L52wT0a3hRXYjVSL1P7ZcSZ7vPvzcfLyS5DEw59Jtw8cIVSRgRVSzlN
+	 CaHhrWpMZ4jNl5i9ed3mzjoYKQ0vqzptTWOvLxoTjTEfCATlR8hVF8yD76z2xC2s0
+	 WVzDHw/TJNhyVHhgYbXYSDWfZp56x6BVyo0ItJ3AYJ77sOTnOdU66ZnP3gO5BHpl1
+	 iYjGfgou8UiPltcWBQPbBV0dTWUdK58OiRCFc87VkdxP4ijB5IyfBJio1AHX5YrPS
+	 1lB0UXOYL3SX1hiGYw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MLzn1-1sjsih2sAD-00M8X2; Thu, 11
+ Jul 2024 18:09:38 +0200
+Message-ID: <91cfc410-744f-49f8-8331-733c41a43121@web.de>
+Date: Thu, 11 Jul 2024 18:09:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,105 +58,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: introduce autosplit for smc
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vQpjI97_zB7F7tl5rsq4ti1R3Ve61A55
-X-Proofpoint-ORIG-GUID: ubPATLYJIH5QSrZKPaZiKGKNCXWhVyUM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-11_11,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 adultscore=0 spamscore=0 mlxlogscore=996
- suspectscore=0 clxscore=1011 impostorscore=0 mlxscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407110111
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Herve Codina <herve.codina@bootlin.com>, devicetree@vger.kernel.org,
+ linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, linux-arm-kernel@lists.infradead.org,
+ Andy Shevchenko <andy.shevchenko@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Bjorn Helgaas <bhelgaas@google.com>, Conor Dooley <conor+dt@kernel.org>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Lars Povlsen <lars.povlsen@microchip.com>, Lee Jones <lee@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
+ Saravana Kannan <saravanak@google.com>, Simon Horman <horms@kernel.org>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>
+References: <20240627091137.370572-2-herve.codina@bootlin.com>
+Subject: Re: [PATCH v3 1/7] mfd: syscon: Add reference counting and device
+ managed support
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Allan Nielsen <allan.nielsen@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Jakub Kicinski <kuba@kernel.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Steen Hegelund <steen.hegelund@microchip.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+In-Reply-To: <20240627091137.370572-2-herve.codina@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:LFxBbBSDsYV2z0yRm6Y6oG29nFJqIo210Cv0lweQhRokoOaMp2c
+ 5IeyRxm67QFt5Y7Kojegg5OSD8tkKd7cq3tnAlbxWNukHx/4YKeDX3rhdrZ/sKghJaq923J
+ O2zNJ9p/wKlhm/m5firh2qWJlH5tKas6Mkctf7fVwpFX3hlLTA6e3Hi5lI7yVgvZQsU50SS
+ b8WAsD4LmYcDCTtg6J2lw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:67zTDbbpL1Y=;r8OJ82Rzrd5kNER/6Bwtek2zluy
+ EEiPx4/efkk2tspOBTpJqtkZJ7zHi47ROcfdLPW9GPGf0mRGZ/QZ8R+5MgQym8MT/SoaHOhGJ
+ VL7y3ItFOn45TFVHkQoKx2MBjG8+vjFle8ksRxHqslQZn4WY1jaBq8gk/smnklDS5XTQNESw4
+ ypOUWNNPNicq+wdJcTdqBEjCXCohmB4JIPSJwCRU5ptM6x6X3FaQKLcWgTb6qX9EDF7zXt3IN
+ GWukiV7uncVinK648zXKgI8gArw+dK2++f7gtpBf0OLCynRSgvcL7E04S2meNm3Tmct1+e4NC
+ CnxyJGxLYkhDm9PPn+4vtArcTJy6jQR+c46dQ+aF7ODGtm6IYKMrhkYdWdMR6UXdyr+EUC0Au
+ uDBprMwxw6s0PXckmi3vbZEh0dmz+HQh6lRzYCJqvu0qezIoGoAx81/Ox9H+nt+vxPqNoGHz7
+ GI5NkRazUiDO2Fc5UbHkSHYTGpoMP9E+iE3npQ6PsGFjWVcX1P/K6Yf6MhS4Z6HX1YmDbDF7v
+ 9Y9nLnh30Zhj9RAtlif45fFXEBUskZA4VY/iBduY4881M/U/+3qUt0djrQvwDWYuX322w1xDo
+ cLG2s3ac7K75p4qFa4XkJBxolm8J7Id5roCQrYoFwLaWklxaWHkfsqLsohgjKhXr+R/k3gNB5
+ 1boR3x1dyK4Ngu0YXXt7ZNIqoaID6pQ0Yh19CBo0dnz0MTHhOB3NGbZ0419d+HD8p0rFbne7t
+ S13hVp+2Rn5u7xt6sInh0J7frMYrJfBE2NUDT8KX2k2riV53B9Vyu4ErhO01Wic5CooymJUOo
+ TRWQsnSINZ3uUaoBpp14nOhg==
 
+=E2=80=A6
+> +++ b/drivers/mfd/syscon.c
+=E2=80=A6
+> +static struct syscon *syscon_from_regmap(struct regmap *regmap)
++{
+> +	struct syscon *entry, *syscon =3D NULL;
+> +
+> +	spin_lock(&syscon_list_slock);
+> +
+> +	list_for_each_entry(entry, &syscon_list, list)
+=E2=80=A6
+> +	spin_unlock(&syscon_list_slock);
+> +
+> +	return syscon;
+> +}
+=E2=80=A6
 
+Under which circumstances would you become interested to apply a statement
+like =E2=80=9Cguard(spinlock)(&syscon_list_slock);=E2=80=9D?
+https://elixir.bootlin.com/linux/v6.10-rc7/source/include/linux/spinlock.h=
+#L561
 
-On 09.07.24 18:05, Guangguan Wang wrote:
-> When sending large size data in TCP, the data will be split into
-> several segments(packets) to transfer due to MTU config. And in
-> the receive side, application can be woken up to recv data every
-> packet arrived, the data transmission and data recv copy are
-> pipelined.
-> 
-> But for SMC-R, it will transmit as many data as possible in one
-> RDMA WRITE and a CDC msg follows the RDMA WRITE, in the receive
-> size, the application only be woken up to recv data when all RDMA
-> WRITE data and the followed CDC msg arrived. The data transmission
-> and data recv copy are sequential.
-> 
-> This patch introduce autosplit for SMC, which can automatic split
-> data into several segments and every segment transmitted by one RDMA
-> WRITE when sending large size data in SMC. Because of the split, the
-> data transmission and data send copy can be pipelined in the send side,
-> and the data transmission and data recv copy can be pipelined in the
-> receive side. Thus autosplit helps improving latency performance when
-> sending large size data. The autosplit also works for SMC-D.
-> 
-> This patch also introduce a sysctl names autosplit_size for configure
-> the max size of the split segment, whose default value is 128KiB
-> (128KiB perform best in my environment).
-> 
-> The sockperf benchmark shows 17%-28% latency improvement when msgsize
->> = 256KB for SMC-R, 15%-32% latency improvement when msgsize >= 256KB
-> for SMC-D with smc-loopback.
-> 
-> Test command:
-> sockperf sr --tcp -m 1048575
-> sockperf pp --tcp -i <server ip> -m <msgsize> -t 20
-> 
-> Test config:
-> sysctl -w net.smc.wmem=524288
-> sysctl -w net.smc.rmem=524288
-> 
-> Test results:
-> SMC-R
-> msgsize   noautosplit    autosplit
-> 128KB       55.546 us     55.763 us
-> 256KB       83.537 us     69.743 us (17% improve)
-> 512KB      138.306 us    100.313 us (28% improve)
-> 1MB        273.702 us    197.222 us (28% improve)
-> 
-> SMC-D with smc-loopback
-> msgsize   noautosplit    autosplit
-> 128KB       14.672 us     14.690 us
-> 256KB       28.277 us     23.958 us (15% improve)
-> 512KB       63.047 us     45.339 us (28% improve)
-> 1MB        129.306 us     87.278 us (32% improve)
-> 
-> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-> ---
->   Documentation/networking/smc-sysctl.rst | 11 +++++++++++
->   include/net/netns/smc.h                 |  1 +
->   net/smc/smc_sysctl.c                    | 12 ++++++++++++
->   net/smc/smc_tx.c                        | 19 ++++++++++++++++++-
->   4 files changed, 42 insertions(+), 1 deletion(-)
-> 
-
-Hi Guangguan,
-
-If I remember correctly, the intention to use one RDMA-write for a 
-possible large data is to reduce possible many partial stores. Since 
-many year has gone, I'm not that sure if it would still be an issue. I 
-need some time to check on it.
-
-BTW, I don't really like the idea to use sysctl to set the 
-autosplit_size in any value at will. That makes no sense to improve the 
-performance.
-
-Thanks,
-Wenjia
+Regards,
+Markus
 
