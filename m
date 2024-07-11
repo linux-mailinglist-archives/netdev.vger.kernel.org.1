@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-110950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EF992F1B3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:07:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0102292F1B4
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC361C22237
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:07:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 236701C22150
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9C19F485;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A154D1A00F7;
 	Thu, 11 Jul 2024 22:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzhMC9Ja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tW8lDLGV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E68F16D4E8
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 22:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBF11A00DF
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 22:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720735641; cv=none; b=FnTH5+PSz32rW333NwncPWMpCtA5YWIis6ewHnfaEqa1NwW0DIVJiEysQmsshTBNBGz2++3WpkxbIOOs72LfekLPL8DUbHfQ3TYXSUonx5FCrGGcWnJz80sDj4Ql+snOp4ILy2i3JVjneZkV0sPbd5TUaSDNSxrdne422tky+mg=
+	t=1720735641; cv=none; b=ZBizuLipgDTNFMnR64cSMxC84ldCCHguN24GtnjbqxKvFEImhHgL0HH4Fpma4ZG61BVr3Hdb5qHvGWgeT8u7w7P6PHsUk8EoCfwzO9O00aYOWsGeIJ/nHVnTd4WdPnk50LCn+AWew4lDMXZAncpkvDU7yRNAYSWZF9x6oGfiwcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720735641; c=relaxed/simple;
-	bh=rFN3QtDXK3m8eiud+YpEXtD0npPICxW3GRAEhZhDVzY=;
+	bh=LnRzQSNxhKhZop4m9SC1mc7SXZX2f7qSaUKClO/ijpw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SLjBmRtb+F8quDu+G46AWmMkevKnajdSNRS7AltI5cIhcXRCSPMpXZgyf9Pp3o02mvSpXderGs04KtCbEema/AJlM7W44pouCHAoHSUMj7ZgHpFba035/fzuHw62gIdNYgBVLEbIEKark1kB+ufD395PobmA9m0RREbJ5g+Lrj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzhMC9Ja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63EABC32782;
+	 MIME-Version; b=JV7HQ8FQBef4aVrSH/2ZLfUKmrALsctfMbYqERRPM4ah9+wf7DObYcNQqcCZwv9XoFPY3pRkDa2/klgGLJ82YYhf+R7WY79RQXjbCQP4Ry7oXR8E7UFgVArHvtTVFhgvemMwiL4zFkR+zm39TnupHG76x2aqzr0Ik2uFmXaXS/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tW8lDLGV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7BEBC4AF0D;
 	Thu, 11 Jul 2024 22:07:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720735640;
-	bh=rFN3QtDXK3m8eiud+YpEXtD0npPICxW3GRAEhZhDVzY=;
+	s=k20201202; t=1720735641;
+	bh=LnRzQSNxhKhZop4m9SC1mc7SXZX2f7qSaUKClO/ijpw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uzhMC9JaOiewIIqCCWDiDPVNr9AcpiBm5rIZlloS5RukkJiFi1cgtlCGrxETd7Kw6
-	 pNApFoQLwyrW75DkCJHkqB40/AG99hxAWGoHAJlDJFjnrloJTaiUjV81ccqpKx7TRJ
-	 +xOeLt6rFLbRCcgJOIQwtjnB2sqGM93dqc5hY7NAkn2bECRhlbGecG4Bn1yLzNnb5B
-	 yhh7nVxDTQSrEnhxYHr/QiFkCPhtkLE9cGUu5OUYUVBw83qYLmrT8F1rq7XnKGQ/Gu
-	 jTnQnWy4ROZeE0xZ+6fXuiXN3iMtAxogdL65LdYAPYa7Z6hXnLJkooLyzQm2S/cY6t
-	 ZV7sfbq0V7msQ==
+	b=tW8lDLGViUahmkcWvCiRjj+3u0cPC6WVMF7dla2tkmFrUQkolFYI1STT3YFIRQkLx
+	 5CUnTqzH1D8X9PAz3kAY76Ew4hPTYFmomUGk2KX14Bh9+jharzK9qvO67RfIIT3/0y
+	 Hivi9Rski9YDiaFGNy8Tk0pj/p5lyX5RdFrPjLdOrHXsZ+T4UJpsX9Qdat7wohTD9O
+	 I6ghv5ukkwOJIY/Pb52V9P5XQWMDMbyiFTeyGjehtA6wIos4zttowKDt2MJHwcqmIq
+	 1udgb0sUt0smu2go8XtcvhYGBGJXVgCliIqOo/V3XxooazyerVkgugruxanNlO3NBy
+	 IJBHZB8M4HelA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 01/11] net: ethtool: let drivers remove lost RSS contexts
-Date: Thu, 11 Jul 2024 15:07:03 -0700
-Message-ID: <20240711220713.283778-2-kuba@kernel.org>
+Subject: [PATCH net-next 02/11] net: ethtool: let drivers declare max size of RSS indir table and key
+Date: Thu, 11 Jul 2024 15:07:04 -0700
+Message-ID: <20240711220713.283778-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240711220713.283778-1-kuba@kernel.org>
 References: <20240711220713.283778-1-kuba@kernel.org>
@@ -66,70 +66,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RSS contexts may get lost from a device, in various extreme circumstances.
-Specifically if the firmware leaks resources and resets, or crashes and
-either recovers in partially working state or the crash causes a
-different FW version to run - creating the context again may fail.
+Some drivers (bnxt but I think also mlx5 from ML discussions) change
+the size of the indirection table depending on the number of Rx rings.
+Decouple the max table size from the size of the currently used table,
+so that we can reserve space in the context for table growth.
 
-Drivers should do their absolute best to prevent this from happening.
-When it does, however, telling user that a context exists, when it can't
-possibly be used any more is counter productive. Add a helper for
-drivers to discard contexts. Print an error, in the future netlink
-notification will also be sent.
-
-More robust approaches were proposed, like keeping the contexts
-but marking them as "dead" (but possibly resurrected by next reset).
-That may be better but it's unclear at this stage whether the
-effort is worth the benefits.
+Static members in ethtool_ops are good enough for now, we can add
+callbacks to read the max size more dynamically if someone needs
+that.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 --
-I'm keeping this patch as is, since this is the simplest solution,
-and nobody has strong opinions.
-
 v2:
- - move to common.c to avoid build problems when ethtool-nl isn't enabled
- - add a note about the counter proposal in the commit message
+ - move key_off to the end, under the private label (hiding from kdoc)
 ---
- include/linux/ethtool.h |  2 ++
- net/ethtool/common.c    | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+ include/linux/ethtool.h | 20 +++++++-----------
+ net/ethtool/ioctl.c     | 46 ++++++++++++++++++++++++++++++++---------
+ 2 files changed, 44 insertions(+), 22 deletions(-)
 
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index e213b5508da6..89da0254ccd4 100644
+index 89da0254ccd4..a1ee76936f53 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -210,6 +210,8 @@ static inline size_t ethtool_rxfh_context_size(u32 indir_size, u32 key_size,
- 	return struct_size_t(struct ethtool_rxfh_context, data, flex_len);
+@@ -181,6 +181,7 @@ struct ethtool_rxfh_context {
+ 	/* private: driver private data, indirection table, and hash key are
+ 	 * stored sequentially in @data area.  Use below helpers to access.
+ 	 */
++	u32 key_off;
+ 	u8 data[] __aligned(sizeof(void *));
+ };
+ 
+@@ -196,18 +197,7 @@ static inline u32 *ethtool_rxfh_context_indir(struct ethtool_rxfh_context *ctx)
+ 
+ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
+ {
+-	return (u8 *)(ethtool_rxfh_context_indir(ctx) + ctx->indir_size);
+-}
+-
+-static inline size_t ethtool_rxfh_context_size(u32 indir_size, u32 key_size,
+-					       u16 priv_size)
+-{
+-	size_t indir_bytes = array_size(indir_size, sizeof(u32));
+-	size_t flex_len;
+-
+-	flex_len = size_add(size_add(indir_bytes, key_size),
+-			    ALIGN(priv_size, sizeof(u32)));
+-	return struct_size_t(struct ethtool_rxfh_context, data, flex_len);
++	return &ctx->data[ctx->key_off];
  }
  
-+void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
-+
- /* declare a link mode bitmap */
- #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
- 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 7bda9600efcf..67d06cd002a5 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -741,3 +741,17 @@ ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
- 	}
+ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
+@@ -723,6 +713,10 @@ struct ethtool_rxfh_param {
+  *	contexts.
+  * @cap_rss_sym_xor_supported: indicates if the driver supports symmetric-xor
+  *	RSS.
++ * @rxfh_indir_space: max size of RSS indirection tables, if indirection table
++ *	size as returned by @get_rxfh_indir_size may change during lifetime
++ *	of the device. Leave as 0 if the table size is constant.
++ * @rxfh_key_space: same as @rxfh_indir_space, but for the key.
+  * @rxfh_priv_size: size of the driver private data area the core should
+  *	allocate for an RSS context (in &struct ethtool_rxfh_context).
+  * @rxfh_max_context_id: maximum (exclusive) supported RSS context ID.  If this
+@@ -940,6 +934,8 @@ struct ethtool_ops {
+ 	u32     cap_link_lanes_supported:1;
+ 	u32     cap_rss_ctx_supported:1;
+ 	u32	cap_rss_sym_xor_supported:1;
++	u32	rxfh_indir_space;
++	u16	rxfh_key_space;
+ 	u16	rxfh_priv_size;
+ 	u32	rxfh_max_context_id;
+ 	u32	supported_coalesce_params;
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 615812ff8974..0732710a4836 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -1290,6 +1290,40 @@ static noinline_for_stack int ethtool_get_rxfh(struct net_device *dev,
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);
-+
-+void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id)
+ 
++static struct ethtool_rxfh_context *
++ethtool_rxfh_ctx_alloc(const struct ethtool_ops *ops,
++		       u32 indir_size, u32 key_size)
 +{
++	size_t indir_bytes, flex_len, key_off, size;
 +	struct ethtool_rxfh_context *ctx;
++	u32 priv_bytes, indir_max;
++	u16 key_max;
 +
-+	WARN_ONCE(!rtnl_is_locked() &&
-+		  !lockdep_is_held_type(&dev->ethtool->rss_lock, -1),
-+		  "RSS context lock assertion failed\n");
++	key_max = max(key_size, ops->rxfh_key_space);
++	indir_max = max(indir_size, ops->rxfh_indir_space);
 +
-+	netdev_err(dev, "device error, RSS context %d lost\n", context_id);
-+	ctx = xa_erase(&dev->ethtool->rss_ctx, context_id);
-+	kfree(ctx);
++	priv_bytes = ALIGN(ops->rxfh_priv_size, sizeof(u32));
++	indir_bytes = array_size(indir_max, sizeof(u32));
++
++	key_off = size_add(priv_bytes, indir_bytes);
++	flex_len = size_add(key_off, key_max);
++	size = struct_size_t(struct ethtool_rxfh_context, data, flex_len);
++
++	ctx = kzalloc(size, GFP_KERNEL_ACCOUNT);
++	if (!ctx)
++		return NULL;
++
++	ctx->indir_size = indir_size;
++	ctx->key_size = key_size;
++	ctx->key_off = key_off;
++	ctx->priv_size = ops->rxfh_priv_size;
++
++	ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
++	ctx->input_xfrm = RXH_XFRM_NO_CHANGE;
++
++	return ctx;
 +}
-+EXPORT_SYMBOL(ethtool_rxfh_context_lost);
++
+ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 					       void __user *useraddr)
+ {
+@@ -1406,20 +1440,12 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
+-		ctx = kzalloc(ethtool_rxfh_context_size(dev_indir_size,
+-							dev_key_size,
+-							ops->rxfh_priv_size),
+-			      GFP_KERNEL_ACCOUNT);
++		ctx = ethtool_rxfh_ctx_alloc(ops, dev_indir_size, dev_key_size);
+ 		if (!ctx) {
+ 			ret = -ENOMEM;
+ 			goto out;
+ 		}
+-		ctx->indir_size = dev_indir_size;
+-		ctx->key_size = dev_key_size;
+-		ctx->priv_size = ops->rxfh_priv_size;
+-		/* Initialise to an empty context */
+-		ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
+-		ctx->input_xfrm = RXH_XFRM_NO_CHANGE;
++
+ 		if (ops->create_rxfh_context) {
+ 			u32 limit = ops->rxfh_max_context_id ?: U32_MAX;
+ 			u32 ctx_id;
 -- 
 2.45.2
 
