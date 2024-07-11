@@ -1,135 +1,136 @@
-Return-Path: <netdev+bounces-110751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D2792E28F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4C492E299
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:42:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44DD28B067
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:40:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B5F7285029
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841FC13B59F;
-	Thu, 11 Jul 2024 08:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F933152E13;
+	Thu, 11 Jul 2024 08:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="QyBv1DEb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7jwt28+"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014FB78283;
-	Thu, 11 Jul 2024 08:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D233A152179
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 08:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720687223; cv=none; b=reF70/FtDFdr+M4Jcq9FrmfVwIJ1FKUvk0EFsezlS5kJXfZzvXa9bo5kjr4DT0ZwellRFqUYz6j5y4YmJsAW9j6h1pZZU8RvcFnjFGzWrkkcvKCyh010NWyADXKjQnBBee9HZoxaOIpWvn3kojoT1rl/Tk4LGp9YszXJy5bzCEw=
+	t=1720687313; cv=none; b=pBO8RRucLLNZd4pj+SkOmUpmtYr/qolBtb5aUb53HV1MtpIciwNWpBoVc6y8D0S6enNSnCe7I9C2BhWFhSblujNePbMdCQ9l7zISWw4Jke7QZoXBjPaw4l/nI2Rbay9QPlRcfRgSP/siTaykOgjpNbx1Q0WhAnXHaY0W5jj4l8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720687223; c=relaxed/simple;
-	bh=mc9w5NzDBPnS0TnM2ITAqGZMns2hnTzukvho8kud2gs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F/oYIKUih84c/5u5nKp0zspP9UC8swXINWisWWFNeiXn/7zgkhl9NjcDDxoEAPWGHj8qeQU9LEXc+0Hdft/hIxzslHfCcWp8YtXCyHlh00a/PlI0HLNvoGnBvSOz3GXeDZyCA6G+fE6GQCcmLKK3oYz7DoUceRmnDOnoraSujfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=QyBv1DEb; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=rDyhdwH0D6qoj4ubPy7FV55fYiDYuk1Ur9NfVUnV98Y=; b=QyBv1DEb+fKpwtYAycR0BRXF9T
-	UHD/eU9E+gOYmUXF+fI5vwr9IvZAKUc+uGR2R9uzgEzoD/ZLwShIYv6r4DbH1da2XmwRdCvoH4hGP
-	AU80hVZ7Nx2eLKOkhnMG5zLNxxFXRrw9QfiC4rVXNrGkL53+Nt4dS2nKzifjROafWcx9AzNqcmgJ9
-	LKHoAX50TYSR28UKCsHNG7m11l9vG6UY2DWZ5b4t7aBQTbp5BNyq/ni2t4bO2Af8LEXX6oaxdMDG3
-	bLB494Ek+9f9QLM/rv16S/WASqf/flFQ/gdHNE2AhyYgd+Oc5KlHnxXIP7EXZq9IQlk4qO8/ZwYZN
-	jh8DTUaQ==;
-Received: from 35.248.197.178.dynamic.cust.swisscom.net ([178.197.248.35] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sRpLd-000HDK-Mm; Thu, 11 Jul 2024 10:40:17 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2024-07-11
-Date: Thu, 11 Jul 2024 10:40:16 +0200
-Message-Id: <20240711084016.25757-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1720687313; c=relaxed/simple;
+	bh=y30Jqp++2IFGTGHZWtjkecjFTK0AQrgd7dn+RTar6po=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aT0GGCHGBWVGqRmn1dd0hj3hDodr2Q+mBDlVeDjR//j0I3N4jWvOVks6AlicnlAa9x7M8Vet0wh150cNXqtR15mlqvQ+LIkSpycY6g+ZyA3Dkegg+DUitbglOXMpdAnHtzsSzt4anUo6nhzjo8UetVtL9zsXU+EQ1vYl5E+Wm3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D7jwt28+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720687310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=y30Jqp++2IFGTGHZWtjkecjFTK0AQrgd7dn+RTar6po=;
+	b=D7jwt28+B8ivRGVxZWTO+8kBOqY5dkpj9xdw7l+0P6VlOLOskKoNyhBHq5NdxYsQBmoQ/h
+	41s9ca13cnK/41OSPvqfTkSUO2MDm3gp1xZfbJJlehQFZvR3t5aGVOX3l2S7PH+VRrO+5Z
+	OCiYoXNAWJ6sMNnz1UN/W6j0Ra60pIQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-dkKBBB9ZNQKFqtBuRtKvHg-1; Thu, 11 Jul 2024 04:41:48 -0400
+X-MC-Unique: dkKBBB9ZNQKFqtBuRtKvHg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4266a2e94e3so1415225e9.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 01:41:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720687307; x=1721292107;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y30Jqp++2IFGTGHZWtjkecjFTK0AQrgd7dn+RTar6po=;
+        b=dCRoMw9lizSdyhkcHx93cRq70rbfalNxLrld6MViBKWYeg3U70O3HO58NIQsmpOK0Z
+         YqDeqTb5x6yYTirtkhm6QFa0eh7RYnXZS8sz7hbB7AQhvM2NrKf6wbvrBmDd5NK2NGLX
+         aGYLA5nWI0AF1f/USyHhPqIKtRsjpn1RBRs0vQbMX9EDdWVRh7B/X7MQ17Do/IJ14Qcw
+         7kmC15HsmipYmBgzM3+WHJ/lUqNLmeLuI9xvr3ltshJCh3h/D70dWVzewdeaXltLMxJ0
+         HESlVdhhgohqIW7aCX9AirHY+yYK3SGa3+0u7WECOe4/krQ1SN/BsMQIKQ1H7gACDJGA
+         /9Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmIHmDUw8BaJJeypMR5iRey08gtBp1Xzk8nAE1VkBRyxX8kFZwCzIRU5OtEbI56p1kggyK4/8mdo3xiD0AanUiX4/fOxyA
+X-Gm-Message-State: AOJu0Yz1u6oUinUloNKEWLW9evGUunPE+6M+Zr+u4Q3EveO8jnH3DiVj
+	zDNWRun9ToEvziU13sYAzoiFByqrGimlhyAQrNwcSCHjtffdBso1vXxpxJdUlbopMqaFLPfsZtR
+	Dj6Yb07pzDDUxzMSPCQ1jN/L2II6kYUe1IFdNlp6kKq/pD2blVVFCRg==
+X-Received: by 2002:a05:600c:3b8c:b0:426:4920:2846 with SMTP id 5b1f17b1804b1-4279834f1e5mr10957845e9.3.1720687307450;
+        Thu, 11 Jul 2024 01:41:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHziNP+eSx3qFkHHfFaQqnwolckTG7DqbWZet5vk53/bk704bnkIgelJp9Anm3RDZbuac+ODw==
+X-Received: by 2002:a05:600c:3b8c:b0:426:4920:2846 with SMTP id 5b1f17b1804b1-4279834f1e5mr10957655e9.3.1720687307027;
+        Thu, 11 Jul 2024 01:41:47 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1710:e810::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266f6f5a27sm107740045e9.23.2024.07.11.01.41.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jul 2024 01:41:46 -0700 (PDT)
+Message-ID: <e572a9447628fc6b6ff511df30d923176e664fec.camel@redhat.com>
+Subject: Re: [PATCH net v2] ppp: reject claimed-as-LCP but actually
+ malformed packets
+From: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, "Ricardo B. Marliere"
+ <ricardo@marliere.net>, Eric Dumazet <edumazet@google.com>, 
+ linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org, 
+ syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com, Guillaume Nault
+ <gnault@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 11 Jul 2024 10:41:45 +0200
+In-Reply-To: <20240709083012.GD346094@kernel.org>
+References: <20240706093545.GA1481495@kernel.org>
+	 <20240708115615.134770-1-dmantipov@yandex.ru>
+	 <20240709083012.GD346094@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27332/Wed Jul 10 10:36:46 2024)
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Tue, 2024-07-09 at 09:30 +0100, Simon Horman wrote:
+> + Guillaume, Jakub
+>=20
+> On Mon, Jul 08, 2024 at 02:56:15PM +0300, Dmitry Antipov wrote:
+> > Since 'ppp_async_encode()' assumes valid LCP packets (with code
+> > from 1 to 7 inclusive), add 'ppp_check_packet()' to ensure that
+> > LCP packet has an actual body beyond PPP_LCP header bytes, and
+> > reject claimed-as-LCP but actually malformed data otherwise.
+> >=20
+> > Reported-by: syzbot+ec0723ba9605678b14bf@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3Dec0723ba9605678b14bf
+> > Fixes: 44073187990d ("ppp: ensure minimum packet size in ppp_write()")
+>=20
+> Sorry for not noticing this earlier.
+>=20
+> I think that the cited commit is not where this problem was introduced.
+> What that commit does is to introduce a length check.
+> And what this patch does is to add another, more specific length check.
+> But the problem fixed by this patch existed before the cited commit.
+>=20
+> I expect that, like the cited commit, this patch:
+>=20
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
-The following pull-request contains BPF updates for your *net* tree.
+No need to resend, I'll update the tag while applying the patch.
 
-We've added 4 non-merge commits during the last 2 day(s) which contain
-a total of 4 files changed, 262 insertions(+), 19 deletions(-).
+Thanks!
 
-The main changes are:
+Paolo
 
-1) Fixes for a BPF timer lockup and a use-after-free scenario when timers
-   are used concurrently, from Kumar Kartikeya Dwivedi.
-
-2) Fix the argument order in the call to bpf_map_kvcalloc() which could
-   otherwise lead to a compilation error, from Mohammad Shehar Yaar Tausif.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Christian Kujau, Dohyun Kim, Neel Natu
-
-----------------------------------------------------------------
-
-The following changes since commit e1533b6319ab9c3a97dad314dd88b3783bc41b69:
-
-  net: ethernet: lantiq_etop: fix double free in detach (2024-07-09 19:02:07 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 50bd5a0c658d132507673c4d59347c025dd149ed:
-
-  selftests/bpf: Add timer lockup selftest (2024-07-11 10:18:31 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'fixes-for-bpf-timer-lockup-and-uaf'
-
-Kumar Kartikeya Dwivedi (3):
-      bpf: Fail bpf_timer_cancel when callback is being cancelled
-      bpf: Defer work in bpf_timer_cancel_and_free
-      selftests/bpf: Add timer lockup selftest
-
-Mohammad Shehar Yaar Tausif (1):
-      bpf: fix order of args in call to bpf_map_kvcalloc
-
- kernel/bpf/bpf_local_storage.c                     |  4 +-
- kernel/bpf/helpers.c                               | 99 ++++++++++++++++++----
- .../selftests/bpf/prog_tests/timer_lockup.c        | 91 ++++++++++++++++++++
- tools/testing/selftests/bpf/progs/timer_lockup.c   | 87 +++++++++++++++++++
- 4 files changed, 262 insertions(+), 19 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/timer_lockup.c
- create mode 100644 tools/testing/selftests/bpf/progs/timer_lockup.c
 
