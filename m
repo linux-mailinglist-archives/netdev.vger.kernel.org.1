@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-110777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB12D92E438
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 12:09:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B851692E439
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 12:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 822A5289340
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:09:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6E3F1C21932
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C1A1581F9;
-	Thu, 11 Jul 2024 10:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74794157E9F;
+	Thu, 11 Jul 2024 10:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="d12HNpnr"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ALNSONpn"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B23157E9F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B641581EE
 	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 10:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720692541; cv=none; b=ler6fZ9R4EkAoDgyw7JsyMR0QNN0cP3M7MBnsvSsELvD7k4bWBONbRsaU6oV7nMcWV2219Z4X310oFJWebtjhd354E89mQKG8YI+UkGYQmbe1RWbPcEbsIvXH3k8k4Gf/gCoVS6Pn/ozpbzUld/IAtvrzarNgvKhPydp7pQUrWM=
+	t=1720692543; cv=none; b=cSfNI1+xZbxP8izobd+v030kxP4nn7q6YeG8HA9ORWlcSh8vFWMTt+/DpRAxse+oou9Vr9eqsEgnS4ufKS8qJPFoZd2Gm3enmBfGA7II09Q9qKGlyAE+PBdkZgHKgw2FpFqz4LblX9n8rxpbL0YGGd/E2yM37UdHOa+huAhks/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720692541; c=relaxed/simple;
-	bh=Rt/UpJMUeOImssfQkgr4GMl6BPXRmjYMf9cVowA5TRg=;
+	s=arc-20240116; t=1720692543; c=relaxed/simple;
+	bh=GXAmLPoyj5/cVbenIa0IUUBlhy0Bxh1oBgGmA9gGSwU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rOeOA1FhETb62GTsvxg2ZGbMHzSwiez6zXwopgpXm/qV8/3F60Yn1Kkl0quLV6ny8f3cGt1hAwdY6KeoyPwyYzGhrj41zVOKuoaa8xTlHktBov0otv9+2b6jrWQlFOQxBrv0MTGjkzExyXoqIioGjo7FF/nPKmnQTUPY+b6kLFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=d12HNpnr; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=NDAsGURL3Ug8feBxN85/jLCklS+UNV83Aup2QRDNlsjO/1zi+NyIrjwpTbq1bjvc2VEsQfxUGDdw2rs8PDMlZq9U5PDCkoktijGxQVdsOt5wrYAxNHliQxyk8Ob48OcOYIKp4+Ukdmw0+yjVEolCeVzuYhe2mYojUC2RyNtaL8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ALNSONpn; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id EB7882084C;
-	Thu, 11 Jul 2024 12:00:32 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id A5BB2207C6;
+	Thu, 11 Jul 2024 12:00:33 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W2Ajt7S8JCrC; Thu, 11 Jul 2024 12:00:32 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	with ESMTP id uoNx0KYK2_L7; Thu, 11 Jul 2024 12:00:32 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 0E9A0207C6;
+	by a.mx.secunet.com (Postfix) with ESMTPS id 2BCB520820;
 	Thu, 11 Jul 2024 12:00:32 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0E9A0207C6
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2BCB520820
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1720692032;
-	bh=fNHF1Aj9l56mIGdRQSObktt1JRejYDTjm8z6Dj2pmmE=;
+	bh=1RJeXbaukPT7Rta++lbb0M1uqv4J3xT+30eB8RF4d3Q=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=d12HNpnrpS+/lzrBl+2+9QVjR/wIA94+RWl6P7ScNcThXfOl4O36SWo7sxFQoQ3m4
-	 4NoeLFZcTNSf5RufYt+4GxAeryjST2PBX9yAoidlzkcJ76KSyOA1yzphb9Ilkp9Hxs
-	 qjWO4bbkbVd3kAnT79BX6lawI1h1aAsE3r1VeLjg3ALxCMVpaSZPEzwjx28D0i4Q1g
-	 DZ6ZGMEr7jU8hjVUQeBG4jjB0San1/7jLzmF5+qJXazFvtJOLzkM8axLf473eBIvN4
-	 KF8i//bdqXos53uxjnkt9C2bTZdqERbyKforqEkv3YfISW4fIcXTf40ttIdxPhCNPl
-	 jMHc8atq/IHVA==
+	b=ALNSONpnpM0dPyuS23MLiaSPMHXhqDB0xwkxE2xBBSZkFoSIxLsdrRg+BmHecUQE3
+	 ZqjhgcWeU6oCo54kQ4Bus8Je8/abFpGXKIvNCUm9xv0xQEYvNYOEaOEJ2a9/6EDsNl
+	 c+nH1mcspJIzZijmzAh14Zw+oIo5hsh3GPB2DunuJFwY39/lVppwoFZdz+m6WuyEPd
+	 F45XIdo/L6U+Vu/cDSg+VmkyvXsQL97CyG8fJfOYz39a7R9/8c9GGdH8+/qqDBj4ac
+	 dN3Ri/wSCCPB/if2q22VqmBeD3JjYuAiOL06wgD1yEgutjbwUcJHAPg3gfQDudQAwM
+	 fUncZ1yc2CBDA==
 Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 0095180004A;
+	by mailout1.secunet.com (Postfix) with ESMTP id 26E9480004A;
 	Thu, 11 Jul 2024 12:00:32 +0200 (CEST)
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
@@ -66,14 +66,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 11 Jul
  2024 12:00:31 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 0B99C3182CA2; Thu, 11 Jul 2024 12:00:31 +0200 (CEST)
+	id 0FCB53182D21; Thu, 11 Jul 2024 12:00:31 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 3/7] xfrm: Log input direction mismatch error in one place
-Date: Thu, 11 Jul 2024 12:00:21 +0200
-Message-ID: <20240711100025.1949454-4-steffen.klassert@secunet.com>
+Subject: [PATCH 4/7] xfrm: Fix unregister netdevice hang on hardware offload.
+Date: Thu, 11 Jul 2024 12:00:22 +0200
+Message-ID: <20240711100025.1949454-5-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240711100025.1949454-1-steffen.klassert@secunet.com>
 References: <20240711100025.1949454-1-steffen.klassert@secunet.com>
@@ -89,82 +89,211 @@ X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Antony Antony <antony.antony@secunet.com>
+When offloading xfrm states to hardware, the offloading
+device is attached to the skbs secpath. If a skb is free
+is deferred, an unregister netdevice hangs because the
+netdevice is still refcounted.
 
-Previously, the offload data path decrypted the packet before checking
-the direction, leading to error logging and packet dropping. However,
-dropped packets wouldn't be visible in tcpdump or audit log.
+Fix this by removing the netdevice from the xfrm states
+when the netdevice is unregistered. To find all xfrm states
+that need to be cleared we add another list where skbs
+linked to that are unlinked from the lists (deleted)
+but not yet freed.
 
-With this fix, the offload path, upon noticing SA direction mismatch,
-will pass the packet to the stack without decrypting it. The L3 layer
-will then log the error, audit, and drop ESP without decrypting or
-decapsulating it.
-
-This also ensures that the slow path records the error and audit log,
-making dropped packets visible in tcpdump.
-
-Fixes: 304b44f0d5a4 ("xfrm: Add dir validation to "in" data path lookup")
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: d77e38e612a0 ("xfrm: Add an IPsec hardware offloading API")
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/ipv4/esp4_offload.c | 7 +++++++
- net/ipv6/esp6_offload.c | 7 +++++++
- net/xfrm/xfrm_input.c   | 5 -----
- 3 files changed, 14 insertions(+), 5 deletions(-)
+ include/net/xfrm.h    | 36 +++++++------------------
+ net/xfrm/xfrm_state.c | 61 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 69 insertions(+), 28 deletions(-)
 
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index b3271957ad9a..3f28ecbdcaef 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -56,6 +56,13 @@ static struct sk_buff *esp4_gro_receive(struct list_head *head,
- 		x = xfrm_state_lookup(dev_net(skb->dev), skb->mark,
- 				      (xfrm_address_t *)&ip_hdr(skb)->daddr,
- 				      spi, IPPROTO_ESP, AF_INET);
-+
-+		if (unlikely(x && x->dir && x->dir != XFRM_SA_DIR_IN)) {
-+			/* non-offload path will record the error and audit log */
-+			xfrm_state_put(x);
-+			x = NULL;
-+		}
-+
- 		if (!x)
- 			goto out_reset;
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 77ebf5bcf0b9..7d4c2235252c 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -178,7 +178,10 @@ struct xfrm_state {
+ 		struct hlist_node	gclist;
+ 		struct hlist_node	bydst;
+ 	};
+-	struct hlist_node	bysrc;
++	union {
++		struct hlist_node	dev_gclist;
++		struct hlist_node	bysrc;
++	};
+ 	struct hlist_node	byspi;
+ 	struct hlist_node	byseq;
  
-diff --git a/net/ipv6/esp6_offload.c b/net/ipv6/esp6_offload.c
-index 527b7caddbc6..919ebfabbe4e 100644
---- a/net/ipv6/esp6_offload.c
-+++ b/net/ipv6/esp6_offload.c
-@@ -83,6 +83,13 @@ static struct sk_buff *esp6_gro_receive(struct list_head *head,
- 		x = xfrm_state_lookup(dev_net(skb->dev), skb->mark,
- 				      (xfrm_address_t *)&ipv6_hdr(skb)->daddr,
- 				      spi, IPPROTO_ESP, AF_INET6);
-+
-+		if (unlikely(x && x->dir && x->dir != XFRM_SA_DIR_IN)) {
-+			/* non-offload path will record the error and audit log */
-+			xfrm_state_put(x);
-+			x = NULL;
-+		}
-+
- 		if (!x)
- 			goto out_reset;
+@@ -1588,7 +1591,7 @@ void xfrm_state_update_stats(struct net *net);
+ static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xso;
+-	struct net_device *dev = xdo->dev;
++	struct net_device *dev = READ_ONCE(xdo->dev);
  
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 63c004103912..e95462b982b0 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -474,11 +474,6 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 	if (encap_type < 0 || (xo && xo->flags & XFRM_GRO)) {
- 		x = xfrm_input_state(skb);
+ 	if (dev && dev->xfrmdev_ops &&
+ 	    dev->xfrmdev_ops->xdo_dev_state_update_stats)
+@@ -1946,13 +1949,16 @@ int xfrm_dev_policy_add(struct net *net, struct xfrm_policy *xp,
+ 			struct xfrm_user_offload *xuo, u8 dir,
+ 			struct netlink_ext_ack *extack);
+ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
++void xfrm_dev_state_delete(struct xfrm_state *x);
++void xfrm_dev_state_free(struct xfrm_state *x);
  
--		if (unlikely(x->dir && x->dir != XFRM_SA_DIR_IN)) {
--			XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEDIRERROR);
--			goto drop;
--		}
+ static inline void xfrm_dev_state_advance_esn(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
+ 
+-	if (xso->dev && xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn)
+-		xso->dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
++	if (dev && dev->xfrmdev_ops->xdo_dev_state_advance_esn)
++		dev->xfrmdev_ops->xdo_dev_state_advance_esn(x);
+ }
+ 
+ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
+@@ -1973,28 +1979,6 @@ static inline bool xfrm_dst_offload_ok(struct dst_entry *dst)
+ 	return false;
+ }
+ 
+-static inline void xfrm_dev_state_delete(struct xfrm_state *x)
+-{
+-	struct xfrm_dev_offload *xso = &x->xso;
 -
- 		if (unlikely(x->km.state != XFRM_STATE_VALID)) {
- 			if (x->km.state == XFRM_STATE_ACQ)
- 				XFRM_INC_STATS(net, LINUX_MIB_XFRMACQUIREERROR);
+-	if (xso->dev)
+-		xso->dev->xfrmdev_ops->xdo_dev_state_delete(x);
+-}
+-
+-static inline void xfrm_dev_state_free(struct xfrm_state *x)
+-{
+-	struct xfrm_dev_offload *xso = &x->xso;
+-	struct net_device *dev = xso->dev;
+-
+-	if (dev && dev->xfrmdev_ops) {
+-		if (dev->xfrmdev_ops->xdo_dev_state_free)
+-			dev->xfrmdev_ops->xdo_dev_state_free(x);
+-		xso->dev = NULL;
+-		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+-		netdev_put(dev, &xso->dev_tracker);
+-	}
+-}
+-
+ static inline void xfrm_dev_policy_delete(struct xfrm_policy *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xdo;
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 649bb739df0d..d531d2a1fae2 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -49,6 +49,7 @@ static struct kmem_cache *xfrm_state_cache __ro_after_init;
+ 
+ static DECLARE_WORK(xfrm_state_gc_work, xfrm_state_gc_task);
+ static HLIST_HEAD(xfrm_state_gc_list);
++static HLIST_HEAD(xfrm_state_dev_gc_list);
+ 
+ static inline bool xfrm_state_hold_rcu(struct xfrm_state __rcu *x)
+ {
+@@ -214,6 +215,7 @@ static DEFINE_SPINLOCK(xfrm_state_afinfo_lock);
+ static struct xfrm_state_afinfo __rcu *xfrm_state_afinfo[NPROTO];
+ 
+ static DEFINE_SPINLOCK(xfrm_state_gc_lock);
++static DEFINE_SPINLOCK(xfrm_state_dev_gc_lock);
+ 
+ int __xfrm_state_delete(struct xfrm_state *x);
+ 
+@@ -683,6 +685,40 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
+ }
+ EXPORT_SYMBOL(xfrm_state_alloc);
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++void xfrm_dev_state_delete(struct xfrm_state *x)
++{
++	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
++
++	if (dev) {
++		dev->xfrmdev_ops->xdo_dev_state_delete(x);
++		spin_lock_bh(&xfrm_state_dev_gc_lock);
++		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
++		spin_unlock_bh(&xfrm_state_dev_gc_lock);
++	}
++}
++
++void xfrm_dev_state_free(struct xfrm_state *x)
++{
++	struct xfrm_dev_offload *xso = &x->xso;
++	struct net_device *dev = READ_ONCE(xso->dev);
++
++	if (dev && dev->xfrmdev_ops) {
++		spin_lock_bh(&xfrm_state_dev_gc_lock);
++		if (!hlist_unhashed(&x->dev_gclist))
++			hlist_del(&x->dev_gclist);
++		spin_unlock_bh(&xfrm_state_dev_gc_lock);
++
++		if (dev->xfrmdev_ops->xdo_dev_state_free)
++			dev->xfrmdev_ops->xdo_dev_state_free(x);
++		WRITE_ONCE(xso->dev, NULL);
++		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
++		netdev_put(dev, &xso->dev_tracker);
++	}
++}
++#endif
++
+ void __xfrm_state_destroy(struct xfrm_state *x, bool sync)
+ {
+ 	WARN_ON(x->km.state != XFRM_STATE_DEAD);
+@@ -848,6 +884,9 @@ EXPORT_SYMBOL(xfrm_state_flush);
+ 
+ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_valid)
+ {
++	struct xfrm_state *x;
++	struct hlist_node *tmp;
++	struct xfrm_dev_offload *xso;
+ 	int i, err = 0, cnt = 0;
+ 
+ 	spin_lock_bh(&net->xfrm.xfrm_state_lock);
+@@ -857,8 +896,6 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 
+ 	err = -ESRCH;
+ 	for (i = 0; i <= net->xfrm.state_hmask; i++) {
+-		struct xfrm_state *x;
+-		struct xfrm_dev_offload *xso;
+ restart:
+ 		hlist_for_each_entry(x, net->xfrm.state_bydst+i, bydst) {
+ 			xso = &x->xso;
+@@ -868,6 +905,8 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 				spin_unlock_bh(&net->xfrm.xfrm_state_lock);
+ 
+ 				err = xfrm_state_delete(x);
++				xfrm_dev_state_free(x);
++
+ 				xfrm_audit_state_delete(x, err ? 0 : 1,
+ 							task_valid);
+ 				xfrm_state_put(x);
+@@ -884,6 +923,24 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
+ 
+ out:
+ 	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
++
++	spin_lock_bh(&xfrm_state_dev_gc_lock);
++restart_gc:
++	hlist_for_each_entry_safe(x, tmp, &xfrm_state_dev_gc_list, dev_gclist) {
++		xso = &x->xso;
++
++		if (xso->dev == dev) {
++			spin_unlock_bh(&xfrm_state_dev_gc_lock);
++			xfrm_dev_state_free(x);
++			spin_lock_bh(&xfrm_state_dev_gc_lock);
++			goto restart_gc;
++		}
++
++	}
++	spin_unlock_bh(&xfrm_state_dev_gc_lock);
++
++	xfrm_flush_gc();
++
+ 	return err;
+ }
+ EXPORT_SYMBOL(xfrm_dev_state_flush);
 -- 
 2.34.1
 
