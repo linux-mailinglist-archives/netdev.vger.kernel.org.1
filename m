@@ -1,141 +1,252 @@
-Return-Path: <netdev+bounces-110756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97A1C92E2E0
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:59:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B82992E324
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C5F1F21083
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:59:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6FB9280DFB
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DD5155A47;
-	Thu, 11 Jul 2024 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D132D02E;
+	Thu, 11 Jul 2024 09:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qYg4H5UN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edW1QDUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D701155A24;
-	Thu, 11 Jul 2024 08:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559611552E7
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720688382; cv=none; b=VNqNLqldQECnL3ngDEzSKNIhHdE1SkmK7lN6QzdqoWtxBf30kVOroLKAPeSzk99AXkUrZ0eURES1zF+Fb6xHA+0aAR8vgGFsi9AG+grnNrYAuhyuCrwEWSAp5e9XPUtrkWDGezFohGe5iTpYougJwc4KY/VzifjxIWHDSMKk8bk=
+	t=1720688916; cv=none; b=Dy3ngJMRuCLAbVoRlouQ/pjtiX3B9WqxNEcIAsKSUJhuKYmTkd+JYudV1qB3wo1IcEW0Jz+XkySOuLV+T9s46LBdnfBnZdZH6UpRDqrRySr0SAA+Ih8v60qolpgJThmuXFknG0z5u1u3CTY3AUzno9ZEgUXGwuZlHgQuY3QLykg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720688382; c=relaxed/simple;
-	bh=qAPsvsx6ujthvgUgIeyjObrCJvC+F+atQvK0TRnobtE=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=CQkkDsmJrXsME0MStchqKOpoYyLUNDf53dUs1HrOD/AOdD8aiMBHzFUwQRd1dBSdQshhf/YI8eSc2DCm51Ee/TsspueZDQJ2hF3P0ZtllcUEFhLJM2HdtpMC3kebGtUYGYAIKT17cxD8Kb4gCO/p8XZcZnaBaBWLR1zkSivSPh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qYg4H5UN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4977C116B1;
-	Thu, 11 Jul 2024 08:59:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720688382;
-	bh=qAPsvsx6ujthvgUgIeyjObrCJvC+F+atQvK0TRnobtE=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=qYg4H5UNGXx0abpiXxr7QNLcnVEZCgJ0uPY0xwdt6THoar8srBitZN0lzPwrxEiN+
-	 rCnlrucXI6YpXoJowLessxsdXV2+Hd60YMuyA9pdZmVzgUlxShSbRDjcWgrthfz8By
-	 FS/16u3l43uGJpUiPvZ3r5/v8R3qFjoPoLbUY0L/Zwrux7+UWllyQ4wJKc9s7zoLQ2
-	 nLHhDrEJ58hVgBBebhO4AWmFPJcvaf1181R9/TvBoqdVlyyLojuX7cFBtRLrA5MuHa
-	 TM+p17a93TLwn5bxAlmmmUcCeQANbQ5iA84RJDLBjWPc4pjzHGplesAITqon804yur
-	 v5K14LXbokrJQ==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720688916; c=relaxed/simple;
+	bh=ljxzkssEHs7PsymbyswJfU5Htuhh01H9EMxCQUsejwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e6HDGQgTHwz6M5LfazkYfPL9m+nz2/4LcWMRu+d6qpN5d/6awT5eoQ77gtZNZpMhCsF29HeZ7k7A+trB4MVO8sHoJA1wPpmhqjQ7CYXLIZRT+jnah/Kq42opLkMG5owV3EYon+T+W7xhUmAH1enoeDfZqz6UletLHfEQ0e9S3zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=edW1QDUI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720688913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z/tGGgMXZufug5VbuEhcEzd7l9HFMjvswmFUFEeaDBA=;
+	b=edW1QDUIcFUJRRiQIL4gj9GFObjD3jZy+F3DsmgKfER3VyfFmSEKXoc3KEfuYa2J/oYf11
+	0d6AhK02uXdZaL0GSHo/kDiCKk5hXo+BSw0p1YIeDadpmUDuaSnKF9gtdTGEdp3zTi6xdw
+	WTKgHNJPQ7V2i22VCrUtbpCRHrKLAyI=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-569-VNtxgIA4Pt6pkkuEJvo2Vw-1; Thu, 11 Jul 2024 05:08:31 -0400
+X-MC-Unique: VNtxgIA4Pt6pkkuEJvo2Vw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2eebcab13f9so5103021fa.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 02:08:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720688910; x=1721293710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z/tGGgMXZufug5VbuEhcEzd7l9HFMjvswmFUFEeaDBA=;
+        b=Ebqga7icVKV7fhiYw+t3t9aq0YSZ6tDSguutIq5UZq2GwYtwmbrtJcOx5AOMAjOmjV
+         JqA8dG+VOdotayzRaBBz20SA2tjC/nBPXEkdGwEmVP+BgoyMtyb9YB8P2b3PdHGEtlYv
+         v5nhLX0Ybj1NAn1sWsbZgusbi9ALJnNt0BxO85d+PhjyRGbnJl3MLeOn0JaHF/G8/Ieg
+         LATFgBN/suzsHELtu9aEYzWRdoMM6S+sGlVJsRTjsYqRfkdvQyXFVy25nYSnZRQzw4ZT
+         t4UW1R0gQrMiwiRM33WP55UkfewLR77Phd1H4/49DTonlsUW54+coQxmOM8NYNQTtxR+
+         LPOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLxc692oD+s3z/+conGKikfetd/Kl3fZbtvX7DgaXxEBADme2Plg9W+LaqdH7YZrogQ7JbyNxDMDk3q2ORG3e5J3LVu1oE
+X-Gm-Message-State: AOJu0YwrGUCExg/pS/hKWaRMsKM1ttwLLMdINh6ksiOTj7oXL1UkiU7o
+	GsHWRk98LlEhXC8T1qM8bFrfGU3XzlOzGQAypEaZ0Miekfgka1wXRbiglkfTPFcBLqrQMOd6XmV
+	2CA4TkaEdxSocwjcXy1IJYD6xO/iFoqej7qmqOWNYgPOeFcO9B52uxkwL1NZgJqF0qhZFTR4v5P
+	qZ35S/geTGw9eiHVd6B03a+1wyWKsV
+X-Received: by 2002:a2e:a7c7:0:b0:2ee:5b64:b471 with SMTP id 38308e7fff4ca-2eeb30fefcdmr62447821fa.30.1720688910123;
+        Thu, 11 Jul 2024 02:08:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE6W3hcev+Z5OBlMg/D7fGaW0A5j3JIOurKm0/vCYKBrpnwOMpohSuAs0Uf+VCxUXTyOZqrGR6A60J2YxKWLD0=
+X-Received: by 2002:a2e:a7c7:0:b0:2ee:5b64:b471 with SMTP id
+ 38308e7fff4ca-2eeb30fefcdmr62447591fa.30.1720688909618; Thu, 11 Jul 2024
+ 02:08:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240708064820.88955-1-lulu@redhat.com> <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
+ <20240709084109-mutt-send-email-mst@kernel.org> <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
+ <20240710020852-mutt-send-email-mst@kernel.org> <CACLfguW0HxPy7ZF7gg7hNzMqFcf5x87asQKBUqZMOJC_S8kSbw@mail.gmail.com>
+In-Reply-To: <CACLfguW0HxPy7ZF7gg7hNzMqFcf5x87asQKBUqZMOJC_S8kSbw@mail.gmail.com>
+From: Leonardo Milleri <lmilleri@redhat.com>
+Date: Thu, 11 Jul 2024 10:08:18 +0100
+Message-ID: <CAD2tU16x1aeZLcQrESroqz-5n=S0nkgh8QTQO31-yYF_7hqB=Q@mail.gmail.com>
+Subject: Re: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
+To: Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Parav Pandit <parav@nvidia.com>
+Cc: Jason Wang <jasowang@redhat.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	"sgarzare@redhat.com" <sgarzare@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240710171004.2164034-1-amorenoz@redhat.com>
-References: <20240710171004.2164034-1-amorenoz@redhat.com>
-Subject: Re: [PATCH net-next v3] net: psample: fix flag being set in wrong skb
-From: Antoine Tenart <atenart@kernel.org>
-Cc: Adrian Moreno <amorenoz@redhat.com>, Eelco Chaudron <echaudro@redhat.com>, Yotam Gigi <yotam.gi@gmail.com>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aaron Conole <aconole@redhat.com>, Ido Schimmel <idosch@nvidia.com>, linux-kernel@vger.kernel.org
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-Date: Thu, 11 Jul 2024 10:59:39 +0200
-Message-ID: <172068837904.3846.3435522780630123273@kwain.local>
 
-Quoting Adrian Moreno (2024-07-10 19:10:04)
-> A typo makes PSAMPLE_ATTR_SAMPLE_RATE netlink flag be added to the wrong
-> sk_buff.
->=20
-> Fix the error and make the input sk_buff pointer "const" so that it
-> doesn't happen again.
->=20
-> Acked-by: Eelco Chaudron <echaudro@redhat.com>
-> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+Sorry for the noise, resending the email in text format
 
-Reviewed-by: Antoine Tenart <atenart@kernel.org>
+Hi All,
 
-Thanks!
+My answers inline below
 
-> ---
->  include/net/psample.h | 8 +++++---
->  net/psample/psample.c | 7 ++++---
->  2 files changed, 9 insertions(+), 6 deletions(-)
->=20
-> diff --git a/include/net/psample.h b/include/net/psample.h
-> index c52e9ebd88dd..5071b5fc2b59 100644
-> --- a/include/net/psample.h
-> +++ b/include/net/psample.h
-> @@ -38,13 +38,15 @@ struct sk_buff;
-> =20
->  #if IS_ENABLED(CONFIG_PSAMPLE)
-> =20
-> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
-skb,
-> -                          u32 sample_rate, const struct psample_metadata=
- *md);
-> +void psample_sample_packet(struct psample_group *group,
-> +                          const struct sk_buff *skb, u32 sample_rate,
-> +                          const struct psample_metadata *md);
-> =20
->  #else
-> =20
->  static inline void psample_sample_packet(struct psample_group *group,
-> -                                        struct sk_buff *skb, u32 sample_=
-rate,
-> +                                        const struct sk_buff *skb,
-> +                                        u32 sample_rate,
->                                          const struct psample_metadata *m=
-d)
->  {
->  }
-> diff --git a/net/psample/psample.c b/net/psample/psample.c
-> index f48b5b9cd409..a0ddae8a65f9 100644
-> --- a/net/psample/psample.c
-> +++ b/net/psample/psample.c
-> @@ -360,8 +360,9 @@ static int psample_tunnel_meta_len(struct ip_tunnel_i=
-nfo *tun_info)
->  }
->  #endif
-> =20
-> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
-skb,
-> -                          u32 sample_rate, const struct psample_metadata=
- *md)
-> +void psample_sample_packet(struct psample_group *group,
-> +                          const struct sk_buff *skb, u32 sample_rate,
-> +                          const struct psample_metadata *md)
->  {
->         ktime_t tstamp =3D ktime_get_real();
->         int out_ifindex =3D md->out_ifindex;
-> @@ -498,7 +499,7 @@ void psample_sample_packet(struct psample_group *grou=
-p, struct sk_buff *skb,
->                 goto error;
-> =20
->         if (md->rate_as_probability)
-> -               nla_put_flag(skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
-> +               nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
-> =20
->         genlmsg_end(nl_skb, data);
->         genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
-> --=20
-> 2.45.2
->=20
+>> Any specific reason to pre-create those large number of vdpa devices of =
+the pool?
+>> I was hoping to create vdpa device with needed attributes, when spawning=
+ a kubevirt instance.
+>> K8s DRA infrastructure [1] can be used to create the needed vdpa device.=
+ Have you considered using the DRA of [1]?
+
+The vhost-vdpa devices are created in the host before spawning the
+kubevirt VM. This is achieved by using:
+- sriov-network-operator: load kernel drivers, create vdpa devices
+(with MAC address), etc
+- sriov-device-plugin: create pool of resources (vdpa devices in this
+case), advertise devices to k8s, allocate devices during pod creation
+(by the way, isn't this mechanism very similar to DRA?)
+
+Then we create the kubevirt VM by defining an interface with the
+following attributes:
+- type:vdpa
+- mac
+- source: vhost-vdpa path
+
+So the issue is, how to make sure the mac in the VM is the same mac of vdpa=
+?
+Two options:
+- ensure kubevirt interface mac is equal to vdpa mac: this is not
+possible because of the device plugin resource pool. You can have a
+few devices in the pool and the device plugin picks one randomly.
+- change vdpa mac address at a later stage, to make sure it is aligned
+with kubevirt interface mac. I don't know if there is already specific
+code in kubevirt to do that or need to be implemented.
+
+Hope this helps to clarify
+
+Thanks
+Leonardo
+
+
+On Wed, Jul 10, 2024 at 10:46=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
 >
+> On Wed, 10 Jul 2024 at 14:10, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Jul 10, 2024 at 11:05:48AM +0800, Jason Wang wrote:
+> > > On Tue, Jul 9, 2024 at 8:42=E2=80=AFPM Michael S. Tsirkin <mst@redhat=
+.com> wrote:
+> > > >
+> > > > On Tue, Jul 09, 2024 at 02:19:19PM +0800, Cindy Lu wrote:
+> > > > > On Tue, 9 Jul 2024 at 11:59, Parav Pandit <parav@nvidia.com> wrot=
+e:
+> > > > > >
+> > > > > > Hi Cindy,
+> > > > > >
+> > > > > > > From: Cindy Lu <lulu@redhat.com>
+> > > > > > > Sent: Monday, July 8, 2024 12:17 PM
+> > > > > > >
+> > > > > > > Add support for setting the MAC address using the VDPA tool.
+> > > > > > > This feature will allow setting the MAC address using the VDP=
+A tool.
+> > > > > > > For example, in vdpa_sim_net, the implementation sets the MAC=
+ address to
+> > > > > > > the config space. However, for other drivers, they can implem=
+ent their own
+> > > > > > > function, not limited to the config space.
+> > > > > > >
+> > > > > > > Changelog v2
+> > > > > > >  - Changed the function name to prevent misunderstanding
+> > > > > > >  - Added check for blk device
+> > > > > > >  - Addressed the comments
+> > > > > > > Changelog v3
+> > > > > > >  - Split the function of the net device from vdpa_nl_cmd_dev_=
+attr_set_doit
+> > > > > > >  - Add a lock for the network device's dev_set_attr operation
+> > > > > > >  - Address the comments
+> > > > > > >
+> > > > > > > Cindy Lu (2):
+> > > > > > >   vdpa: support set mac address from vdpa tool
+> > > > > > >   vdpa_sim_net: Add the support of set mac address
+> > > > > > >
+> > > > > > >  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++=
+++++++++++
+> > > > > > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
+> > > > > > >  include/linux/vdpa.h                 |  9 ++++
+> > > > > > >  include/uapi/linux/vdpa.h            |  1 +
+> > > > > > >  4 files changed, 109 insertions(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > --
+> > > > > > > 2.45.0
+> > > > > >
+> > > > > > Mlx5 device already allows setting the mac and mtu during the v=
+dpa device creation time.
+> > > > > > Once the vdpa device is created, it binds to vdpa bus and other=
+ driver vhost_vdpa etc bind to it.
+> > > > > > So there was no good reason in the past to support explicit con=
+fig after device add complicate the flow for synchronizing this.
+> > > > > >
+> > > > > > The user who wants a device with new attributes, as well destro=
+y and recreate the vdpa device with new desired attributes.
+> > > > > >
+> > > > > > vdpa_sim_net can also be extended for similar way when adding t=
+he vdpa device.
+> > > > > >
+> > > > > > Have you considered using the existing tool and kernel in place=
+ since 2021?
+> > > > > > Such as commit d8ca2fa5be1.
+> > > > > >
+> > > > > > An example of it is,
+> > > > > > $ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:=
+55 mtu 9000
+> > > > > >
+> > > > > Hi Parav
+> > > > > Really thanks for your comments. The reason for adding this funct=
+ion
+> > > > > is to support Kubevirt.
+> > > > > the problem we meet is that kubevirt chooses one random vdpa devi=
+ce
+> > > > > from the pool and we don't know which one it going to pick. That =
+means
+> > > > > we can't get to know the Mac address before it is created. So we =
+plan
+> > > > > to have this function to change the mac address after it is creat=
+ed
+> > > > > Thanks
+> > > > > cindy
+> > > >
+> > > > Well you will need to change kubevirt to teach it to set
+> > > > mac address, right?
+> > >
+> > > That's the plan. Adding Leonardo.
+> > >
+> > > Thanks
+> >
+> > So given you are going to change kubevirt, can we
+> > change it to create devices as needed with the
+> > existing API?
+> >
+> Hi Micheal and Parav,
+> I'm really not familiar with kubevirt, hope Leonardo can help answer
+> these questions
+> Hi @Leonardo Milleri
+> would you help answer these questions?
+>
+> Thanks
+> Cindy
+> > > >
+> > > > --
+> > > > MST
+> > > >
+> >
+>
+
 
