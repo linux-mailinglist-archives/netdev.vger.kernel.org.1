@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-110735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EBE692E08F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:08:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4918A92E090
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:09:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC9D31F2107A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:08:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD69FB2104A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2DC12EBE3;
-	Thu, 11 Jul 2024 07:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4620812FB29;
+	Thu, 11 Jul 2024 07:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YkqMpXKV"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CBofupvq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B35012F386
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 07:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9360212FF71
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 07:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720681728; cv=none; b=ZcOQga6r5Svmcy+jPNXoYUDcAth5QpwzZRfrip0APz+7qgSrvAwG2nms+xHbKIUUyKT0OdZgkGvyQ/YV93oJeQNX7/tHN6xMzdxC0l2e70IM8gjPtadoIHy9Qd96AKeu3usflOlH15AQi4v++4p85sgobh7LhSzqs5oURVUe1yg=
+	t=1720681734; cv=none; b=AdleP71XwiSM2L9gXelCPai9DTBTdazlFbJVP+i9Dx5Nrm1iHKRRqIIyV0ZdS11hWi9S4w5SA75ObuFh8neksKYOhTc6SoEM8GJd/JSKiUp0OAMS9hSrNBTlPZPzYuGSv27AbD3R0uhrV7kAQnCImokQ0Wes6+OMb6S+k4wz1ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720681728; c=relaxed/simple;
-	bh=KGUumUGC7w9rFo3N9lC4m1NP7MQTpbG3Lin9+IoUoKs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=DQvvgG06+tGoLcdStCuD4UWz1/hQ4DMiZV0D/QRoDMZH8FixBorqoLx3+C37Mv0aNdajP6/MlTb5xk6Kl5LMJi1phedRXQDq5jAU0UZx/OWaSugnIW/5PNvt8xNBP1phkP58+nM0+2NK5gdaIJ5wFkRiNY0u1lS/8+5JqXVu3s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YkqMpXKV; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1720681734; c=relaxed/simple;
+	bh=lRJVMCOJV6C2BB1+59lQPrxBIFylkWwSVhJb5SRi6+Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OE25RQ6vQiyIirZpPSllzn/aeFWyWmDh/y21jNqb/iwnnufpw/vya3rMbWvMh17mH5bnXm4YcgB82fUDWx8t5fdmyvy5T1JOwGkJOpxtw77TrJcA6xgOKIu53Dvc5lCer8785Xk+kV/anytYpsqwPQ0DGMZFL3v6zzny9+zTq4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CBofupvq; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6b6199ef089so3341206d6.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 00:08:46 -0700 (PDT)
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-4f48434d70cso258976e0c.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 00:08:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720681724; x=1721286524; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SmUjbyVVSDNMYkoqKB6mASyDtjHtnWE952N7/kTZtfk=;
-        b=YkqMpXKVj9W7qmNu2Yld1WWE618RhoWkIUYdgyzx2dnSWMgygC3dxyYysqd1nNjGxN
-         5vlLLfi7RW16aTEHQeJCsIFYIYRQv20wuo/DkuM/MS01/FiGJy65mnEx5OyxLA9AYVpR
-         8TWA0R3j9/t8xXpRY95AYY5BobVyAp67Bwh5I=
+        d=broadcom.com; s=google; t=1720681731; x=1721286531; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SkaqHRPa8CP74K/DzZdBPq2E/lOLynVEe2WdM/aVYlE=;
+        b=CBofupvqCzRMIVOy94f3xOAizrewOe7cAKqhPqVHcfbrWBS3x4pljnFlCHYhlIbrUr
+         mGx2Wicx1HVVSnGTCuaVqeQFGWLN2QkEtCkaazhHY19N72pjne6WEF4vS5IGpQDPH+xn
+         y5p6iKs1UbepxKP30gXN11g/Qp8KGAMfou/7g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720681724; x=1721286524;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SmUjbyVVSDNMYkoqKB6mASyDtjHtnWE952N7/kTZtfk=;
-        b=rbt4vYqQAEjhZ4bTbYNeGgRq8RgXlsWRz1diqgr3X+Au00DdCY7Cslhy+VqXZ9rpM/
-         Od51QsOAkok2RRqeMzz407kRUnPPGhmgxpti2TFakVnMcs/SwZdnjwsP2U4W9JPTj0EV
-         6qcLb4mCDz8Fg4dgAv251/khtihMDCrTvJyEjSPw2+uVQs/QQft6SSAMdyFLsWW2h3tV
-         OH/4c0LpDZGK1VvqxQ7rAs1Gfc/7MGTzTDVg51X3bA1xd/aDHtufqEjQiUOTfAxOhyIh
-         gXkxhbf7u20gxEV3cn8bYNDwQ9nPsUt1nDvzbePQpuQnZgsivB55CAjNiohXiC5E361X
-         2RXg==
-X-Gm-Message-State: AOJu0YxWT4GEOwafkukLnOUKhd7t7iU9Z71lu98fyPWZ3le864yVxrvv
-	+Fe0nM4q8laSkKz4jgseFfECb1AFRkhC/B5HHIrMKGwNY3EefOSxZWzVgletz2+fuJV7e5xt890
-	X3APZyi9vMAjOBv7rLTh0Qw01Nm+fdGjQG13i8YaGGKWTXrIZodmuuqOb5KJTTqenmjXpQbm0eC
-	KEIpJRa4IsyMscmC5CcXV1BjnCbWzzx8mosW2xDTHCi75ufPM3
-X-Google-Smtp-Source: AGHT+IH3CV6pC/HQcbwAS8scj4Yn5T8eRm0VLsLPUlx9bqk+RNlzzrmenJGvIMcdueIPys0qgJp5Tg==
-X-Received: by 2002:a05:6214:c43:b0:6b7:42bd:99e9 with SMTP id 6a1803df08f44-6b742bd9e21mr38228856d6.35.1720681724499;
-        Thu, 11 Jul 2024 00:08:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720681731; x=1721286531;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SkaqHRPa8CP74K/DzZdBPq2E/lOLynVEe2WdM/aVYlE=;
+        b=tAOlVqbNGjgFZksWRWHiT9WOv7ZwHgBXO513R26n05B3H3mkZqgfWqIIWxsyc/LBVi
+         kWeumpHQJ5+YyaHRyXHFAK7EFGNcIGD5G86vMOY5MmBGt8rIxmn3khQiqCdqARCUJbTr
+         d6pFa41k+UfKgjEWK7yzhcNmukZYchvsVyC8yCd/FkNYf547R8KjrqEqjxlO7siI3sCV
+         c/12p4CKjad+3zBSOBf3A6oNHITX1UwPTTW2+ws+Gtr4jNYUnmet5vNHMhPDCNYhgDti
+         P4k27zAYUi7ScJxDUCQSLSJeLqdvJKWMIX8nxiIyI7vOFpYMv8/VlucE3FsX2uhIJQCz
+         tUfA==
+X-Gm-Message-State: AOJu0YzdKJplhi0U6rkPcQfIJUqMCDHM5SB0TB+zmqPTlV48F3dD3RpG
+	mr/aqmlTuBov8vl3GbXlGwmHBh/PUdwPAsOgkxhYDMP7ZFZChx6smWubm3/VesG/iG+CBLNjS8m
+	btPlbl/k2tcGou+h0OMftgXHukI0ka3G5Ub+ynJ1EPODxDMpHxG0HK/gCrcptWosDXp+Ov+b1MC
+	ZuxuzkZJaJKmf+4b8TLc4pPIj3XQ21zTnFsSKycmM+C2pwy6Kk
+X-Google-Smtp-Source: AGHT+IE9UF++qddERsrGeWMWFt+nq6Z/JG3DqG5FYfAkezvSZI9hR2ZGxfba+VYlZI20BdwVyf9a8w==
+X-Received: by 2002:a05:6122:4682:b0:4ec:f4ea:6495 with SMTP id 71dfb90a1353d-4f33f31ca0cmr9582906e0c.11.1720681730789;
+        Thu, 11 Jul 2024 00:08:50 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.250.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8d86asm23090006d6.125.2024.07.11.00.08.38
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8d86asm23090006d6.125.2024.07.11.00.08.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jul 2024 00:08:43 -0700 (PDT)
+        Thu, 11 Jul 2024 00:08:50 -0700 (PDT)
 From: Boris Sukholitko <boris.sukholitko@broadcom.com>
 To: netdev@vger.kernel.org,
 	Alexei Starovoitov <ast@kernel.org>,
@@ -95,10 +96,12 @@ To: netdev@vger.kernel.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
 Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
-Subject: [PATCH net-next 0/2] tc: adjust network header after second vlan push
-Date: Thu, 11 Jul 2024 10:08:26 +0300
-Message-Id: <20240711070828.2741351-1-boris.sukholitko@broadcom.com>
+Subject: [PATCH net-next 1/2] skb: skb_vlan_push gets VLAN_HLEN as an argument
+Date: Thu, 11 Jul 2024 10:08:27 +0300
+Message-Id: <20240711070828.2741351-2-boris.sukholitko@broadcom.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20240711070828.2741351-1-boris.sukholitko@broadcom.com>
+References: <20240711070828.2741351-1-boris.sukholitko@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,186 +109,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fd21bf061cf36e6a"
+	boundary="0000000000005e7a2e061cf36f1b"
 
---000000000000fd21bf061cf36e6a
+--0000000000005e7a2e061cf36f1b
 Content-Transfer-Encoding: 8bit
 
-<tldr>
-skb network header of the single-tagged vlan packet continues to point the
-vlan payload (e.g. IP) after second vlan tag is pushed by tc act_vlan. This
-causes problem at the dissector which expects double-tagged packet network
-header to point to the inner vlan.
+In case of vlan tagged packet, skb_vlan_push flushes current vlan header
+into skb packet buffer. It also advances skb->mac_len by VLAN_HLEN
+amount.
 
-The fix is to adjust network header in tcf_act_vlan.c but requires minor
-changes to the generic skb_vlan_push function.
-</tldr>
+Some of the callers of skb_vlan_push (e.g. net/sched/act_vlan.c)
+may want to reset skb network header by themselves.
 
-Consider the following shell script snippet configuring TC rules on the
-veth interface:
+To allow this we pass VLAN_HLEN as an argument to skb_vlan_push.
 
-ip link add veth0 type veth peer veth1
-ip link set veth0 up
-ip link set veth1 up
-
-tc qdisc add dev veth0 clsact
-
-tc filter add dev veth0 ingress pref 10 chain 0 flower \
-	num_of_vlans 2 cvlan_ethtype 0x800 action goto chain 5
-tc filter add dev veth0 ingress pref 20 chain 0 flower \
-	num_of_vlans 1 action vlan push id 100 \
-	protocol 0x8100 action goto chain 5
-tc filter add dev veth0 ingress pref 30 chain 5 flower \
-	num_of_vlans 2 cvlan_ethtype 0x800 action simple sdata "success"
-
-Sending double-tagged vlan packet with the IP payload inside:
-
-cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
-0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 64   ..........."...d
-0010  81 00 00 14 08 00 45 04 00 26 04 d2 00 00 7f 11   ......E..&......
-0020  18 ef 0a 00 00 01 14 00 00 02 00 00 00 00 00 12   ................
-0030  e1 c7 00 00 00 00 00 00 00 00 00 00               ............
-ENDS
-
-will match rule 10, goto rule 30 in chain 5 and correctly emit "success" to
-the dmesg.
-
-OTOH, sending single-tagged vlan packet:
-
-cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
-0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 14   ..........."....
-0010  08 00 45 04 00 2a 04 d2 00 00 7f 11 18 eb 0a 00   ..E..*..........
-0020  00 01 14 00 00 02 00 00 00 00 00 16 e1 bf 00 00   ................
-0030  00 00 00 00 00 00 00 00 00 00 00 00               ............
-ENDS
-
-will match rule 20, will push the second vlan tag but will *not* match
-rule 30. IOW, the match at rule 30 fails if the second vlan was freshly
-pushed by the kernel.
-
-Lets look at  __skb_flow_dissect working on the double-tagged vlan packet.
-Here is the relevant code from around net/core/flow_dissector.c:1277
-copy-pasted here for convenience:
-
-	if (dissector_vlan == FLOW_DISSECTOR_KEY_MAX &&
-	    skb && skb_vlan_tag_present(skb)) {
-		proto = skb->protocol;
-	} else {
-		vlan = __skb_header_pointer(skb, nhoff, sizeof(_vlan),
-					    data, hlen, &_vlan);
-		if (!vlan) {
-			fdret = FLOW_DISSECT_RET_OUT_BAD;
-			break;
-		}
-
-		proto = vlan->h_vlan_encapsulated_proto;
-		nhoff += sizeof(*vlan);
-	}
-
-The "else" clause above gets the protocol of the encapsulated packet from
-the skb data at the network header location. printk debugging has showed
-that in the good double-tagged packet case proto is
-htons(0x800 == ETH_P_IP) as expected. However in the single-tagged packet
-case proto is garbage leading to the failure to match tc filter 30.
-
-proto is being set from the skb header pointed by nhoff parameter which is
-defined at the beginning of __skb_flow_dissect
-(net/core/flow_dissector.c:1055 in the current version):
-
-		nhoff = skb_network_offset(skb);
-
-Therefore the culprit seems to be that the skb network offset is different
-between double-tagged packet received from the interface and single-tagged
-packet having its vlan tag pushed by TC.
-
-Lets look at the interesting points of the lifetime of the single/double
-tagged packets as they traverse our packet flow.
-
-Both of them will start at __netif_receive_skb_core where the first vlan
-tag will be stripped:
-
-	if (eth_type_vlan(skb->protocol)) {
-		skb = skb_vlan_untag(skb);
-		if (unlikely(!skb))
-			goto out;
-	}
-
-At this stage in double-tagged case skb->data points to the second vlan tag
-while in single-tagged case skb->data points to the network (eg. IP)
-header.
-
-Looking at TC vlan push action (net/sched/act_vlan.c) we have the following
-code at tcf_vlan_act (interesting points are in square brackets):
-
-	if (skb_at_tc_ingress(skb))
-[1]		skb_push_rcsum(skb, skb->mac_len);
-
-	....
-
-	case TCA_VLAN_ACT_PUSH:
-		err = skb_vlan_push(skb, p->tcfv_push_proto, p->tcfv_push_vid |
-				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
-				    0);
-		if (err)
-			goto drop;
-		break;
-
-	....
-
-out:
-	if (skb_at_tc_ingress(skb))
-[3]		skb_pull_rcsum(skb, skb->mac_len);
-
-And skb_vlan_push (net/core/skbuff.c:6204) function does:
-
-		err = __vlan_insert_tag(skb, skb->vlan_proto,
-					skb_vlan_tag_get(skb));
-		if (err)
-			return err;
-
-		skb->protocol = skb->vlan_proto;
-[2]		skb->mac_len += VLAN_HLEN;
-
-in the case of pushing the second tag. Lets look at what happens with
-skb->data of the single-tagged packet at each of the above points:
-
-1. As a result of the skb_push_rcsum, skb->data is moved back to the start
-   of the packet.
-
-2. First VLAN tag is moved from the skb into packet buffer, skb->mac_len is
-   incremented, skb->data still points to the start of the packet.
-
-3. As a result of the skb_pull_rcsum, skb->data is moved forward by the
-   modified skb->mac_len, thus pointing to the network header again.
-
-Then __skb_flow_dissect will get confused by having double-tagged vlan
-packet with the skb->data at the network header.
-
-Our solution for the bug is to preserve "skb->data at second vlan header"
-semantics in the act_vlan.c. We do this by passing skb->mac_len advancement
-as an argument to skb_vlan_push (first patch in the series). Second patch
-modifies act_vlan.c to disable skb->mac_len increment and do network header
-adjustment by itself.
-
-Thanks,
-Boris.
-
-Boris Sukholitko (2):
-  skb: skb_vlan_push gets VLAN_HLEN as an argument
-  tc vlan: adjust network header in tcf_vlan_act
-
+Signed-off-by: Boris Sukholitko <boris.sukholitko@broadcom.com>
+---
  include/linux/skbuff.h    | 2 +-
  net/core/filter.c         | 2 +-
  net/core/skbuff.c         | 4 ++--
  net/openvswitch/actions.c | 3 ++-
- net/sched/act_vlan.c      | 8 ++++++--
- 5 files changed, 12 insertions(+), 7 deletions(-)
+ net/sched/act_vlan.c      | 3 ++-
+ 5 files changed, 8 insertions(+), 6 deletions(-)
 
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 9c29bdd5596d..e13f44fe33df 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4046,7 +4046,7 @@ int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len);
+ int skb_ensure_writable_head_tail(struct sk_buff *skb, struct net_device *dev);
+ int __skb_vlan_pop(struct sk_buff *skb, u16 *vlan_tci);
+ int skb_vlan_pop(struct sk_buff *skb);
+-int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci);
++int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci, u16 hlen);
+ int skb_eth_pop(struct sk_buff *skb);
+ int skb_eth_push(struct sk_buff *skb, const unsigned char *dst,
+ 		 const unsigned char *src);
+diff --git a/net/core/filter.c b/net/core/filter.c
+index d767880c276d..bb14574422b5 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -3187,7 +3187,7 @@ BPF_CALL_3(bpf_skb_vlan_push, struct sk_buff *, skb, __be16, vlan_proto,
+ 		vlan_proto = htons(ETH_P_8021Q);
+ 
+ 	bpf_push_mac_rcsum(skb);
+-	ret = skb_vlan_push(skb, vlan_proto, vlan_tci);
++	ret = skb_vlan_push(skb, vlan_proto, vlan_tci, VLAN_HLEN);
+ 	bpf_pull_mac_rcsum(skb);
+ 
+ 	bpf_compute_data_pointers(skb);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..9c69c9bff55c 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -6223,7 +6223,7 @@ EXPORT_SYMBOL(skb_vlan_pop);
+ /* Push a vlan tag either into hwaccel or into payload (if hwaccel tag present).
+  * Expects skb->data at mac header.
+  */
+-int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
++int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci, u16 hlen)
+ {
+ 	if (skb_vlan_tag_present(skb)) {
+ 		int offset = skb->data - skb_mac_header(skb);
+@@ -6241,7 +6241,7 @@ int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
+ 			return err;
+ 
+ 		skb->protocol = skb->vlan_proto;
+-		skb->mac_len += VLAN_HLEN;
++		skb->mac_len += hlen;
+ 
+ 		skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
+ 	}
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index 101f9a23792c..34909aca3526 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -244,7 +244,8 @@ static int push_vlan(struct sk_buff *skb, struct sw_flow_key *key,
+ 		key->eth.vlan.tpid = vlan->vlan_tpid;
+ 	}
+ 	return skb_vlan_push(skb, vlan->vlan_tpid,
+-			     ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK);
++			     ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK,
++			     VLAN_HLEN);
+ }
+ 
+ /* 'src' is already properly masked. */
+diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
+index 22f4b1e8ade9..f60cf7062572 100644
+--- a/net/sched/act_vlan.c
++++ b/net/sched/act_vlan.c
+@@ -50,7 +50,8 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
+ 		break;
+ 	case TCA_VLAN_ACT_PUSH:
+ 		err = skb_vlan_push(skb, p->tcfv_push_proto, p->tcfv_push_vid |
+-				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT));
++				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
++				    VLAN_HLEN);
+ 		if (err)
+ 			goto drop;
+ 		break;
 -- 
 2.42.0
 
 
---000000000000fd21bf061cf36e6a
+--0000000000005e7a2e061cf36f1b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -356,15 +283,15 @@ zPffqO2QS6e4oXzmoYuX9sCNfol1TaQgCYgYoC4rexOBLLtYbwdKWi3/ttntZ2PHS1QRaDzrBSuw
 L39zqstTC0LC/YoSKC/cU9igMELugG/Twy9uVlg2XXTY1wUYSWMsYlpydsrVyG18UScp7FlGFbWX
 EWKS7pkxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwA
-ydoyIjshhiv/IkUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOBV5Svxa8/WOGwO
-dqUNswn13pFHwAdIZ0V8xol5NDeqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDcxMTA3MDg0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+ydoyIjshhiv/IkUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMGWvUln2yPPHV3W
+fu01LKUcb0x628eYNdxwX0cXoiiYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDcxMTA3MDg1MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAk8tXYL/aeYtgyKYRS4kRPxgKF6d1vduU6
-lyKhDP/UljX8a2s4BVPpDiMFyD6skPHjyWXyGcV0kG9FoatuTvktveuxXjElxe/BIN8qv3z1+HnI
-E4Xqq8CMYw99fJLkx+M1HeLKmna22lZqgQpiNWNCGuL1EwxKttjAZgly8tKqYJq0+LGYWJIefTmF
-7JtaXYEyBqyivIhKxcf8ROPMYavm9/3u6hX2lGJl9NtV55xQLTt5CTdQIh9Xyd3BEYyEsa3ze4Gh
-BFPGeRF0eNybSyLqovDPY2ant9wS3PTV2lD33DcpPaRJWu40bAAxC/xUNJy3EEnyw5mtZH1WjRLG
-HWYB
---000000000000fd21bf061cf36e6a--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAZjJCIOvrfyh+3hnxVPrTEOfe1jbBp1WRN
+sxiIS16UsoIeDgkj6L36ulr4mJQcuJfiPt42zcGJkPEXBFtbwFCVYANNH49fq3ZvrOTs/3QROZYs
+nCMQ5zWOeYJGDt6gVEfAb5gPGG5xawK9dzIt0F69Qf7vo//z4UulgEyFFl6xXG8FC65WOtQB7cQZ
+BZksAPcIU7VlOMzYEv4BOcUvlFcUADMgGNwMdfRRebe5wf2cd7G5oVeFD9hh5XSeO0MrTU3qTaEm
+6Kb7TKwCBf2D0KJKJicEAKPowttnKI9KhjWMVlG3BFcoJen77Z1KwZGd9TOcOdIKazmpQ4Ch9voY
+LXJS
+--0000000000005e7a2e061cf36f1b--
 
