@@ -1,187 +1,184 @@
-Return-Path: <netdev+bounces-110967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819EE92F270
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:03:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFB192F276
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:05:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A339A1C22939
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:03:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F9E01F21AB1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10AA1A0725;
-	Thu, 11 Jul 2024 23:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57DC16D320;
+	Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="BLYwrL8a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npwL267X"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2081.outbound.protection.outlook.com [40.92.91.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FF916D320;
-	Thu, 11 Jul 2024 23:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720738997; cv=fail; b=bIm0XTWACuR89/rF/ujQeb9vptvDZo/t/Q8kuzD3PsXHuDy1KKjuk+VfY1/84bVXN0DSE56JIXpr400o7l84xxlGKIbmgE8249XFuSB8486Bt1wdlcT0uSqDgFnA1QqfYUlGBI/ijvmsOen9/LbOe3ZSe7/wrh9oWUp/29rUdKc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720738997; c=relaxed/simple;
-	bh=KhdJT6G6cuPSNO6V3YNucSCgvyCeaik8Xnt3mqxFbXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VDR/J/QrsNbXZ0g8ALyKfo5EhrC2kYI8XZIlBrwLP5FO+ljff4Qh20YgG0ECU9CONV2kWOzcos1phKKYPgz1CJXARVUMsYRzOeBSNlhB9gaSa0HFdYut5aGla/jvOU+K4W5FqTnQminTlDdr4/gtKxJNI/46gV5LN4M5yQvwam8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=BLYwrL8a; arc=fail smtp.client-ip=40.92.91.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OvMtcIcTQpaaQ7ke7AOIyO1NARgxA//iNH20PsoiHY6mEB8YzxevIVIuVW1X7ReTvoPY7xYoHLx0XETvrMTxHE6ZiWaPvvoJaH+2o2jjzef098VT+7DgAT9N2etb8jcx5espjMz1C9mqnl/JzxvgjnkewxZQu6Yzae9+M7e/Hd4UQOFYlWSEsil8TzNNBASpoiPDchZBFzIywhi7HmrXw6hCU9Dej6bzfMPQ9p5QK6bOiacFZ8ptArmBPhJ6wXdqWBS2tmw0nqN8AsTp56acHz+EDDHM9D/xazsZkEQ5EKZnEfpPlLLW4vD+s7B0jRTovlGR6XgMAYdIFDP1oPpC4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ey5Pppju13kYq4n671ekdoo5C/aUqFl5pdYMwATPk/0=;
- b=xUR4njevrULupIGJnLzzo20GKAQMFydWX+cFcOHYwkEYJiFiuZXPzEi/L1axxtIwujMa5m36vUAQk0CZ0+ByR3Ex6IzxlaX6tJV3glzE2pbtuqVGhhglRZ3SfoyEdKlw8ugXuFUcy00FwCuxPW0QpumKXE18Ep/s0u3SSB6nesiipHQZL2PkUTLlgrjIEk7dz16WksQdbW3R7dOudb6ws6sCaIrYFS0qJwY4F1E7U2vuXJkA7pXV3NJ2D7p/k7E5sQFSf2nfP5QhX1kDLYYf7AaNv6V0w8JEnzsVpN+EOa8JjBz6cV3iJ1e1FgZjGZDHUPR8sxmPZeSbebVfO+S9/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ey5Pppju13kYq4n671ekdoo5C/aUqFl5pdYMwATPk/0=;
- b=BLYwrL8afnWlc7/9sjvy1cr5KCwToFOyPzS9E7GX2Rlo75Da/Vy/QbT2ret62lBGpS3MTPMmAI5ClRjEFU+Zcr+PlkhmYzVteTQeZwxYL37UeO9qV/4zpWZr5/66TqKbWO/cx2srhKFz50ZQIstBkaYVZdeZbML1/tuFN8PYFDbCKrsr9bZzC1OAXatU5BKOXWTkiteVMKmUjew75smQIcb38bardVbWI6Y1y+IaE2MJBUBEpWhJ2p+8DFIwUHZrK1sqJ6F0E1JUsA+cv3s+ROC5QytBunGK01g1vNdaliioohzvOCNNlxvIL22YJuEEqkghsirhIOH66GpT5TQr7w==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by GV1P194MB2290.EURP194.PROD.OUTLOOK.COM (2603:10a6:150:1c6::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Thu, 11 Jul
- 2024 23:03:12 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7741.033; Thu, 11 Jul 2024
- 23:03:12 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: ameryhung@gmail.com,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc: amery.hung@bytedance.com,
-	bpf@vger.kernel.org,
-	bryantan@vmware.com,
-	dan.carpenter@linaro.org,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	edumazet@google.com,
-	haiyangz@microsoft.com,
-	jasowang@redhat.com,
-	jiang.wang@bytedance.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	kys@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	oxffffaa@gmail.com,
-	pabeni@redhat.com,
-	pv-drivers@vmware.com,
-	sgarzare@redhat.com,
-	simon.horman@corigine.com,
-	stefanha@redhat.com,
-	vdasa@vmware.com,
-	virtualization@lists.linux-foundation.org,
-	wei.liu@kernel.org,
-	xiyou.wangcong@gmail.com,
-	xuanzhuo@linux.alibaba.com,
-	Luigi Leonardi <luigi.leonardi@outlook.com>
-Subject: Re: [RFC PATCH net-next v6 13/14] virtio/vsock: implement datagram support
-Date: Fri, 12 Jul 2024 01:02:00 +0200
-Message-ID:
- <AS2P194MB21709F0B79D6FB686D373B199AA52@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240710212555.1617795-14-amery.hung@bytedance.com>
-References: <20240710212555.1617795-14-amery.hung@bytedance.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [bubQ4t3BhOrcK8ElVNEmwde1g2LjRP5/]
-X-ClientProxiedBy: MI1P293CA0024.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::6)
- To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240711230200.9740-1-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14FC8289C
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720739131; cv=none; b=FzYSsxz42OLA51UXBtafSZ7DT/ZODw7BmFOvW3GRlAgI6ygtMGDFy2XUuH/MDV+DRX5hZlILKqt7kDR3R8jpf62aviEhQbKXNM3tAdXTbSOmsGy8AKJ4eQxkRbq1RAwubWL8FM1BMR90cLMJBkZDqZdgrBdtwbCJmYE9XfnqNjY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720739131; c=relaxed/simple;
+	bh=eWSc1pj6MHWrSSQQMF0RuO15wKaEh58uBsgtWtZgIBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TEkwIfjTl2/fwhbfk2omJVIYaegTgDQicu3lpeASVQ/Nf23lXKDC7j+QctfaztHogMz6Zt0tgRbaw019URSBZm/6bYlevxthHyOXuXcKCIKbq308gxPy3nPlM8OMWFdtqGqe4+Wj73yNlRHnyd7UjF3NY7l1WPogDA158CD8Fic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npwL267X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F488C116B1;
+	Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720739131;
+	bh=eWSc1pj6MHWrSSQQMF0RuO15wKaEh58uBsgtWtZgIBc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=npwL267XH4aBIXmUF2aI75ujgRaWt2Q4fgVeWCdAZ5XoXiYBAVMc3G3d5AKpIZI5N
+	 03Iupu2ctmuoOEfyRPsEjdKuk0o0r1afxKIUp73r+atOPX693Y11S/1IlrZSNOsHpe
+	 9VvXufitD/mBjRDlMd4qAzjGgNLUowIkWHeiAvNFJB8MubWlFNrj3YP9v7dlxnipvA
+	 kZ0Oj854pcRaLlBXZgEyaS3qh4C2w8OG4m0VSrkjKcr5WQpwbR/W7vSWUcYlzZFCBV
+	 wvdjG2oLgquvkUxVTm9V+Llsk3RI+qYRBlp+6vbKBuqWeo1wwAajDWDkeOShFaeUMK
+	 UC077DIjH7q7w==
+Date: Thu, 11 Jul 2024 16:05:29 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, tariqt@nvidia.com, rrameshbabu@nvidia.com,
+	saeedm@nvidia.com, yuehaibing@huawei.com, horms@kernel.org,
+	jacob.e.keller@intel.com, afaris@nvidia.com
+Subject: Re: [PATCH net-next v2] eth: mlx5: expose NETIF_F_NTUPLE when ARFS
+ is compiled out
+Message-ID: <ZpBlOWzyihXUad_V@x130>
+References: <20240711223722.297676-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|GV1P194MB2290:EE_
-X-MS-Office365-Filtering-Correlation-Id: bba13848-c049-441d-a94d-08dca1fda35e
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|8060799006|19110799003|4302099013|440099028|3412199025|1602099012|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	C6lscFQqpIO49xnDKcRYfginOV96xgr5N+evYut+qOQeH6/yzRqqb4ardcx1hA2PS6hxjDfe3kh8S0lcJ5xzidvkFFrOZK6y9z5mdm3g3rp6r1O1yAteJhcEI61slqLASUdxZe0aCGlbOF/pT7KI/dAivncFMpaqgy2aKaRZNQJ0iGqwke3yETOXLgsWrvbgC48mHFvPKEE3QvwWq3cOEFB4/xU/E+yhPRBFHFzf1iEzZaIR/K/mof2IPkGSXp5HjDkmF6IHutjQ8piarEASPxHHfXP5O20ghiLeN4JDl6ENOsllrYIE6LjV3xKpn0Pw0XvInCZovAh48armx+eWOWlb4eYxOLs9JZ2lHzEle+Uh298I8IesdaGtkYcnkivr3L3lb5MVXnvwfzFOimqxzzDpYrakX5DE5c5UhW5KQ4bb/RrkoOtAuCqmt21ukUQ8bX6R4C4y6u/4b/VV56g2ZeC5yXoKoTS7OthSx+VS4a65yhBFVx7GeK91xkUnhsJhYJOz4MZ9eCTkek4ZrIm3c6h8PEMae6wDQKg6xiXkfOCzsGHAvOGIAnenpDOATj1G6UwZ+YyB3ySrcgAOCJc6tiTndhNqsKYII0Zuj2y/l0yq6tKmGXRQF49aRnPSizWj2Nm7ONtzI0mjXMGbAHH4GJFKeHxKOPOtpmmgql67KL7Ev8Po0pxsg79jGkYCh3xDsGvDsoRHrf5737408dKiaUtXRXfCKDu1glJ9J9yScN/AEvYB5fX50skufPUOB+nXW70ADuCGKjJP0XEw0Ng86p4Ud6EUf/VjgJngV+myx2I=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?57858njTtXcLx1ZnQuGgTfUJk4N91jFqcy+BQFihGZOJqtUmb5HSrvO2YVXy?=
- =?us-ascii?Q?o6PTgJlPUvmB1FwB8xzUbnfEAY++ZTHfJwdMRslI0uRPpJcbpihPUgNB+5Ju?=
- =?us-ascii?Q?NwcWxikzWfdACebMorOY3TSL8a9lxz16z4jHUuHBYPPfrNevq84/pKF8pe4x?=
- =?us-ascii?Q?lN8u+Ic/KRDwSDWnJF8r7RbjuI1v5anMgxQAkg0zjAdKseiKSBJpKPXlngHD?=
- =?us-ascii?Q?qXGkhvCdxy516bFKu8skHOCVW36Q3MJunc/04jUM7DxcdJAjQOPUZzqC9K/J?=
- =?us-ascii?Q?w5ygSrME/GxqhgkevQAkz3SekVd19ShNuaQh3jLxg1Cl1o3+xfoIKxRxCO6M?=
- =?us-ascii?Q?kX9+RYsWiZFdMwVoM9D44fBCUiSc4SwvHOuEwdcVUitPDVqyDqGJ8j03QwFm?=
- =?us-ascii?Q?ecyyEna5gvYOWpg544yIycKPwqKkY/41W9eGJGXUVZEBxIAMNCsGlZQLHzHM?=
- =?us-ascii?Q?NZClfy6VSmcpP5/UrO0kq2GxDvBMvKTaRj35p27iWEHzuS30wWToUECm+DGR?=
- =?us-ascii?Q?RYIizdp3EipMHDJR7nZmPLXhTN3rt+HmmgUzF1TAcIHa9CD8E4PsNA5GHy4K?=
- =?us-ascii?Q?5fXjEiRPkLZxNpxPhXgsJ3W1l5ivm0PoecR3an7+S4dc4W1RTYCrMOGhQZij?=
- =?us-ascii?Q?iLtKzfdseklzm63SYxoXDfOQmWJfeC5+9gRp7qDkO9jjA+qyEQadenzEmDR1?=
- =?us-ascii?Q?y62AQKwl9i24AerVFmitwy+hqBys9cMwjShg5HuGw4iFDdA5rpdX6GhuAphg?=
- =?us-ascii?Q?C0+0+IXLto5jrWW9DQ3YYPFtUVs32U5esB53LEpS4SExbdEbkLYK+hSkyGlR?=
- =?us-ascii?Q?qabIjwmOijNgySdB+Rcd0opiocTJ8B0i8xuYHvY/AJXtsEfoX6jh0eLC93Fp?=
- =?us-ascii?Q?7YopXYqBquD/fgu1m3QqG4xiVhSs1z1VUtetr/622TqEzZXt9OoFSekVY6j2?=
- =?us-ascii?Q?fTUBfuD84nRuWuIZpzMYAtS2XwlMsXSrR/MnrWQLkrmSZGkOz9Fc3xK1wLBm?=
- =?us-ascii?Q?AdsdYmx/SAeI47wS8SyBCRDEMOZPBrhO/nl5QD3Kx8jxJLwtq1WeHivOm39Y?=
- =?us-ascii?Q?68zI197PnStsf0LzDOmLeqRd/iJuPsOBwZom5hJknP4G7RWkUQvtuiQLjNZ/?=
- =?us-ascii?Q?J3UiLiQLGTbALVMuDn94T5VLlHflElc2OgZ09r2lYOzAiPxxmGOAWI+NdkNf?=
- =?us-ascii?Q?Pg+0u2b3VuGs98uFCO9Qbly6GJk+NMoHIBccURR8foOgq1uKPk9dloycgD1Y?=
- =?us-ascii?Q?/TYKHqCjC3GjquzHMtKF?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bba13848-c049-441d-a94d-08dca1fda35e
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2024 23:03:12.3078
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1P194MB2290
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240711223722.297676-1-kuba@kernel.org>
 
-Hi Bobby, Amery
+On 11 Jul 15:37, Jakub Kicinski wrote:
+>ARFS depends on NTUPLE filters, but the inverse is not true.
+>Drivers which don't support ARFS commonly still support NTUPLE
+>filtering. mlx5 has a Kconfig option to disable ARFS (MLX5_EN_ARFS)
+>and does not advertise NTUPLE filters as a feature at all when ARFS
+>is compiled out. That's not correct, ntuple filters indeed still work
+>just fine (as long as MLX5_EN_RXNFC is enabled).
+>
+>This is needed to make the RSS test not skip all RSS context
+>related testing.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>---
+>v2:
+> - hard wire to on (not propagating Simon's review because of this)
+>v1: https://lore.kernel.org/20240710175502.760194-1-kuba@kernel.org
+>
+>CC: tariqt@nvidia.com
+>CC: rrameshbabu@nvidia.com
+>CC: saeedm@nvidia.com
+>CC: yuehaibing@huawei.com
+>CC: horms@kernel.org
+>CC: jacob.e.keller@intel.com
+>CC: afaris@nvidia.com
+>---
+> drivers/net/ethernet/mellanox/mlx5/core/en/fs.h     | 13 +++++++++++++
+> .../net/ethernet/mellanox/mlx5/core/en_ethtool.c    |  2 +-
+> drivers/net/ethernet/mellanox/mlx5/core/en_fs.c     |  5 ++---
+> drivers/net/ethernet/mellanox/mlx5/core/en_main.c   |  8 +++++---
+> .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c   |  8 +++-----
+> 5 files changed, 24 insertions(+), 12 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
+>index 4d6225e0eec7..1e8b7d330701 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
+>@@ -154,6 +154,19 @@ struct mlx5e_tc_table *mlx5e_fs_get_tc(struct mlx5e_flow_steering *fs);
+> struct mlx5e_l2_table *mlx5e_fs_get_l2(struct mlx5e_flow_steering *fs);
+> struct mlx5_flow_namespace *mlx5e_fs_get_ns(struct mlx5e_flow_steering *fs, bool egress);
+> void mlx5e_fs_set_ns(struct mlx5e_flow_steering *fs, struct mlx5_flow_namespace *ns, bool egress);
+>+
+>+static inline bool mlx5e_fs_has_arfs(struct net_device *netdev)
+>+{
+>+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
+>+		netdev->hw_features & NETIF_F_NTUPLE;
+>+}
+>+
+>+static inline bool mlx5e_fs_want_arfs(struct net_device *netdev)
+>+{
+>+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
+>+		netdev->features & NETIF_F_NTUPLE;
+>+}
+>+
+> #ifdef CONFIG_MLX5_EN_RXNFC
+> struct mlx5e_ethtool_steering *mlx5e_fs_get_ethtool(struct mlx5e_flow_steering *fs);
+> #endif
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+>index 3320f12ba2db..5582c93a62f1 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+>@@ -525,7 +525,7 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
+>
+> 	opened = test_bit(MLX5E_STATE_OPENED, &priv->state);
+>
+>-	arfs_enabled = opened && (priv->netdev->features & NETIF_F_NTUPLE);
+>+	arfs_enabled = opened && mlx5e_fs_want_arfs(priv->netdev);
+> 	if (arfs_enabled)
+> 		mlx5e_arfs_disable(priv->fs);
+>
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
+>index 8c5b291a171f..05058710d2c7 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
+>@@ -1307,8 +1307,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
+> 		return -EOPNOTSUPP;
+>
+> 	mlx5e_fs_set_ns(fs, ns, false);
+>-	err = mlx5e_arfs_create_tables(fs, rx_res,
+>-				       !!(netdev->hw_features & NETIF_F_NTUPLE));
+>+	err = mlx5e_arfs_create_tables(fs, rx_res, mlx5e_fs_has_arfs(netdev));
+> 	if (err) {
+> 		fs_err(fs, "Failed to create arfs tables, err=%d\n", err);
+> 		netdev->hw_features &= ~NETIF_F_NTUPLE;
+>@@ -1355,7 +1354,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
+> err_destroy_inner_ttc_table:
+> 	mlx5e_destroy_inner_ttc_table(fs);
+> err_destroy_arfs_tables:
+>-	mlx5e_arfs_destroy_tables(fs, !!(netdev->hw_features & NETIF_F_NTUPLE));
+>+	mlx5e_arfs_destroy_tables(fs, mlx5e_fs_has_arfs(netdev));
+>
+> 	return err;
+> }
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>index ff335527c10a..6f686fabed44 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+>@@ -5556,8 +5556,10 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> #if IS_ENABLED(CONFIG_MLX5_CLS_ACT)
+> 		netdev->hw_features      |= NETIF_F_HW_TC;
+> #endif
+>-#ifdef CONFIG_MLX5_EN_ARFS
+>+#if IS_ENABLED(CONFIG_MLX5_EN_ARFS)
+> 		netdev->hw_features	 |= NETIF_F_NTUPLE;
+>+#elif IS_ENABLED(CONFIG_MLX5_EN_RXNFC)
+>+		netdev->features	 |= NETIF_F_NTUPLE;
 
-Thank you for working on this!
+Why default ON when RXNFC and OFF when ARFS ?
+Default should be off always, and this needs to be advertised in 
+hw_features in both cases.
 
-> This commit implements datagram support with a new version of
-> ->dgram_allow().
+I think this should be
+#if IS_ENABLED(ARFS) || IS_ENABLED(RXFNC)
+	netdev->hw_features |= NTUPLE;
 
-Commit messages should be imperative "This commit implements X" -> "Implements X".
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
-This suggestion applies to many of the commits in this series.
+Otherwise LGTM
 
-> +static bool virtio_transport_dgram_allow(u32 cid, u32 port)
-> +{
-> +	struct virtio_vsock *vsock;
-> +	bool dgram_allow;
-> +
-> +	dgram_allow = false;
+Acked-by: Saeed Mahameed <saeedm@nvidia.com>
 
-I think you can initialize the variable in the declaration.
 
-> +	rcu_read_lock();
-> +	vsock = rcu_dereference(the_virtio_vsock);
-> +	if (vsock)
-> +		dgram_allow = vsock->dgram_allow;
-> +	rcu_read_unlock();
-> +
-> +	return dgram_allow;
-> +}
-> +
-
-The rest LGTM.
-
-Thanks,
-Luigi
 
