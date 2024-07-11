@@ -1,349 +1,232 @@
-Return-Path: <netdev+bounces-110843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFE492E906
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:15:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E29B92E921
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95C3B282807
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:15:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A3531F2321B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E720115ECF9;
-	Thu, 11 Jul 2024 13:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D84015AAD3;
+	Thu, 11 Jul 2024 13:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYbSzOLz"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HKEgbC9Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F356A15ECE8;
-	Thu, 11 Jul 2024 13:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA5814A601
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 13:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720703689; cv=none; b=qggWQYItvsSFKieJtTnCbFwqYi9yMYzuUcWSwGVKWtb8sJN8Ryux7qZFqUDxd9wtOQ6aJ0LbadXFmm8U/GqHLVDTbKogP4ddLn2KKj8b5OhUCx3KQG0SQ5Qb3BoLrw0fgXwG8rlSoSl8JohUqZolhTavEVOu2f+aWuA080qavg4=
+	t=1720703933; cv=none; b=O0JpbO/hAdO7T0JGjPQShXedDVaof4y8xst0D/tYL/kltiMj4H6JkZk7QUrdTowO1ikoDNqETqVGOnViKT47iMFyxl7ojL1yl7hoUGtLCZMGQlaBbQaKHZz12vGWEPsGbc7N014m9bPjjAu9DZEvKAwf3EcQpMyOx0cDEoR1PMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720703689; c=relaxed/simple;
-	bh=9G8XS2wtphz43VqzBU1txAKhGgyi2ubX8r62w9fEKo8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MHA48OJvQtcR+3OBZoe3y1dYYALR1XEhDiiISe5SD2/XmYTIlaDgrfSADgwKyY6mhKSRazJZ+1Cvc3KMnL8GJjBHWb5ulSUgvZ+svo6RhVmej5iuv4058goxsWUpyivvwmoZnDmhVuM1Uuu+DGcfo4Xhej9L9+PyTAfYrGujpbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BYbSzOLz; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-367a9ab4d81so447962f8f.1;
-        Thu, 11 Jul 2024 06:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720703686; x=1721308486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kv/MFuHfyCwBSQ9yZ0GUCYIIFHVeU0epX1hLo6SPlh0=;
-        b=BYbSzOLzwNPkcG9KJfh7nq+N4acdZUbhokiWMGZQq/1sxkpM7zd8868X4wdpdiJxO6
-         fddgEHxows0fMjTS7Zb0MD0VGkrQfO8am0u4H6zCumjZqHhQRR0xVeODm9WE45QYj6U2
-         eHybXCzdKo20pxdemCcKAExWvj7WT8a2d6arbU7mNyZGB4/Hf5t38f2EbdD17UONFkyo
-         9f6cZ5YeF9TdARhUy1/abouOAqmrQTN44geHZQkrnui0sDxN9+/QuJLVZtz46miwBupo
-         4w3ErpDJaCjwzK7CY+prK7RTpuU1nny8ZtkUD5Y0mIyYODC4iuONXlXWoVoIbUq1EOdm
-         B2GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720703686; x=1721308486;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kv/MFuHfyCwBSQ9yZ0GUCYIIFHVeU0epX1hLo6SPlh0=;
-        b=DxfOXXX47qVLyChzPPY0VudieHXzf9ZkiwBMF94G3pZlbGqjfNkS3NrKiJqAvDMTKS
-         kQoD2OwmxjihWUYD+f82p4qMmN7o6YDa+2GYCzDjIrMYDAAvkQGmBXZBSjQzEQ44h4mv
-         qHcWbaGzQ8RLAYlTowS+cr4dFsRFNLr6wpm7LEgA30zBG7eoYEo6d+hdI9sR0IIQot/a
-         WLjdimYO5RFVmhrrmw1wkHUOMT3vxi5W1iznZ43lZqXad0m7MMk69FyQjRU0hTNZ4LUD
-         nV9dHqy5mq+R1IWizU1XD3NuEyL2728PpQ3N1LrIYwkaWskV55dzMfd44L2PK4RjimmB
-         Tmeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQKlLhubxH2GjlKZ8k/OyuCvNyM/kRo5Tz93REOpl2KO6lfHMMIjUVqcJYmL7PsQHEQS5vO4Gnzkkbs5uXZGrkTVxxKFdBl7+EPo+Y5PtUVDhw/HcZ87/UO2LkAvKCPucpbIU7
-X-Gm-Message-State: AOJu0YyHi86C+wf8XjQhCd1o+dkx8jnL+jNc0JVk+1d3UDdT9p58jcq7
-	di2tYJTQ23ou+n5icessN/JxwJswnNjW2d15vgak1ndT5aLno6bI
-X-Google-Smtp-Source: AGHT+IG29R1xkG7sO20UM7Bynb3QEWPylGMWz8i2r+kSlQaykhIEXIBYj4BavRXcp/veYVG4yqFpCw==
-X-Received: by 2002:adf:e111:0:b0:363:d980:9a9e with SMTP id ffacd0b85a97d-367ceacab69mr5407151f8f.55.1720703686173;
-        Thu, 11 Jul 2024 06:14:46 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cde7e1b3sm7686616f8f.20.2024.07.11.06.14.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jul 2024 06:14:45 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	idosch@nvidia.com,
-	amcohen@nvidia.com,
-	petrm@nvidia.com,
-	gnault@redhat.com,
-	jbenc@redhat.com,
-	b.galvani@gmail.com,
-	martin.lau@kernel.org,
-	daniel@iogearbox.net,
-	aahila@google.com,
-	liuhangbin@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net-next v3 2/2] net: geneve: enable local address bind for geneve sockets
-Date: Thu, 11 Jul 2024 15:14:11 +0200
-Message-Id: <20240711131411.10439-3-richardbgobert@gmail.com>
-In-Reply-To: <20240711131411.10439-1-richardbgobert@gmail.com>
-References: <20240711131411.10439-1-richardbgobert@gmail.com>
+	s=arc-20240116; t=1720703933; c=relaxed/simple;
+	bh=bT3VHDsQRTb1ak0ThO8qg0IVMErf02GTkWZBQAjTOVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G7tr7Ts/c//EnpXhPmfJ95XmzHtek6V3zzCYDDe1N0W46F/kp0imqdrDOzb+qPheDeZsONYbswEZxNNlDBMrdKjR68sjVOJ7YE23sxOqedhbyGa8zcZAW5VjXVPbklv7R4Q3h97z/7IqZrNxSuBFgDcgpg8nUbYCTd+J4gDnlo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HKEgbC9Y; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 804151140DFA;
+	Thu, 11 Jul 2024 09:18:50 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Thu, 11 Jul 2024 09:18:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1720703930; x=
+	1720790330; bh=NBKtKtydpdjQVe/+6Oi5w/AwibY1nYGlm7vTb6dxYJY=; b=H
+	KEgbC9Y9lvHQfa8rf66ys9z0qv8zsL7zx9sDDaKu2I8EvfZMhogkocXqAF+2rcgX
+	vucbbopp5v6tGLemiQ5rHfnw+YNRBDcNDJMUoU9dkGru1676unaOIWX0FtS29tIm
+	dvr/wYRKhEvtUshJBWO9NP4J06EGll3EP9OWJbRWH1uiHySszspO54NkakX4mHoP
+	VvWemfi1agWTChNijuYFNF5pn62g5bni261V14JR37TOaW62OxeAeHVW2kuKyp2f
+	Y+VwNUkyZwyng9YUoudiMg/XkeQikbgw+8y6+Bw4gS7h791RYnoPEiWe9F7v7h/x
+	4PXfUXUDhaEtzt1uwXq+Q==
+X-ME-Sender: <xms:utuPZnLS8k7e2b6t6l8BZyKlDf1GhvM7oqZj7RKyLWIy6o7WFvx8YA>
+    <xme:utuPZrIihOuHoceRAZMoct4oLZJ7gNbWdRxfpj8QLUyFTS9IBGxYiRGBqoGiUR3TJ
+    7P_P-3U5Xlh4dI>
+X-ME-Received: <xmr:utuPZvsJ501rEGA_dcxLNmeFrkjw_E7cbQrHGnfzXnn17yz09hKGJEsBwT0K>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrfeeggdeifecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepgfdvkedugfegiedtfeefgeeuhedvieeffeefgfelvdetueffgedtjeelgedv
+    ffeunecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:utuPZgYunuDLnoIWDehliuEo0zbSaZ3hCJtTD_S-6wEx2lxE5pzC1Q>
+    <xmx:utuPZubAfp7BTosviu9y0KT1XrdWW-otiIBYilg3391AJzHdi-8jsQ>
+    <xmx:utuPZkBiNSaEF-JL9B7NZ8hKCGxpOskcxQNj1jmI3wNBl3Horxl4Pw>
+    <xmx:utuPZsbmncBuqemce-P5O10hzQobAN1AcXW7e0_bLFFKu_Pdd9sCdg>
+    <xmx:utuPZtnELqBcYcBiQvoqth6qrZMAhyA3r_48AO5ntjnpqm5kA_TBA8-g>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 11 Jul 2024 09:18:49 -0400 (EDT)
+Date: Thu, 11 Jul 2024 16:18:40 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Jason Zhou <jasonzhou@x.com>
+Cc: netdev@vger.kernel.org, Benjamin Mahler <bmahler@x.com>
+Subject: Re: PROBLEM: Issue with setting veth MAC address being unreliable.
+Message-ID: <Zo_bsLPrRHHiVMPd@shredder.mtl.com>
+References: <CAHXsExy+zm+twpC9Qrs9myBre+5s_ApGzOYU45Pt=sw-FyOn1w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHXsExy+zm+twpC9Qrs9myBre+5s_ApGzOYU45Pt=sw-FyOn1w@mail.gmail.com>
 
-This patch adds support for binding to a local address in geneve sockets.
-It achieves this by adding a new netlink local argument and geneve_addr union
-to represent local address to bind to, and copying it to udp_port_cfg in
-geneve_create_sock.
+On Wed, Jul 10, 2024 at 04:45:55PM -0400, Jason Zhou wrote:
+> [1.] One line summary of the problem:
+> 
+> Issue with setting veth address being unreliable.
+> 
+> [2.] Full description of the problem/report:
+> 
+> Hello!
+> 
+> We have been investigating a strange behavior within Apache Mesos
+> where after setting the MAC address on a veth device to the same
+> address as our eth0 MAC address, the change is sometimes not reflected
+> appropriately despite the ioctl call succeeding (~4% of the time in
+> our testing). Note that we also tried using libnl to set the MAC
+> address but the issue still persists.
+> 
+> Included below is the github link to the section where we set the veth
+> address, to clarify what we were trying to do. We first create the
+> veth pair [1] using a libnl function [2], then we set the veth device
+> MAC addresses to that of our host public interface (eth0) [3] using a
+> function called setMAC. Inside the setMAC [4] is where we are
+> observing the aforementioned issue with unreliable setting of veth
+> addresses..
+> 
+> This behavior was observed when re-fetching the MAC address on said
+> veth device after we made the function call to set its MAC address. We
+> have observed this issue on CentOS 9 only, but not on CentOS 7. We
+> have tried Linux kernels 5.15.147, 5.15.160 & 5.15.161 for CentOS 9,
+> CentOS 7 was using 5.10, but we also tried upgrading the Centos 7 host
+> to 5.15.160 but could not reproduce the bug.
 
-Also change geneve_find_sock to search the socket based on listening address.
+This suggests that the change in behavior is due to a change in user
+space and an obvious suspect is systemd / udev. AFAICT, CentOS 7 is
+using systemd 219 whereas CentOS 9 is using systemd 252. In version 242
+systemd started setting a persistent MAC address on virtual interfaces.
+See:
 
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- drivers/net/geneve.c               | 82 +++++++++++++++++++++++++++---
- include/net/geneve.h               |  6 +++
- include/uapi/linux/if_link.h       |  2 +
- tools/include/uapi/linux/if_link.h |  2 +
- 4 files changed, 84 insertions(+), 8 deletions(-)
+https://github.com/Mellanox/mlxsw/wiki/Persistent-Configuration#required-changes-to-macaddresspolicy
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 838e85ddec67..6756851598b7 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -57,6 +57,7 @@ struct geneve_config {
- 	bool			ttl_inherit;
- 	enum ifla_geneve_df	df;
- 	bool			inner_proto_inherit;
-+	union geneve_addr saddr;
- };
- 
- /* Pseudo network device */
-@@ -461,7 +462,8 @@ static int geneve_udp_encap_err_lookup(struct sock *sk, struct sk_buff *skb)
- }
- 
- static struct socket *geneve_create_sock(struct net *net, bool ipv6,
--					 __be16 port, bool ipv6_rx_csum)
-+					 __be16 port, bool ipv6_rx_csum,
-+					 union geneve_addr *local_addr)
- {
- 	struct socket *sock;
- 	struct udp_port_cfg udp_conf;
-@@ -473,9 +475,17 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
- 		udp_conf.family = AF_INET6;
- 		udp_conf.ipv6_v6only = 1;
- 		udp_conf.use_udp6_rx_checksums = ipv6_rx_csum;
-+#if IS_ENABLED(CONFIG_IPV6)
-+		memcpy(&udp_conf.local_ip6,
-+		       &local_addr->sin6.sin6_addr,
-+		       sizeof(local_addr->sin6.sin6_addr));
-+#endif
- 	} else {
- 		udp_conf.family = AF_INET;
- 		udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
-+		memcpy(&udp_conf.local_ip,
-+		       &local_addr->sin.sin_addr,
-+		       sizeof(local_addr->sin.sin_addr));
- 	}
- 
- 	udp_conf.local_udp_port = port;
-@@ -582,7 +592,8 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
- 
- /* Create new listen socket if needed */
- static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
--						bool ipv6, bool ipv6_rx_csum)
-+						bool ipv6, bool ipv6_rx_csum,
-+						union geneve_addr *local_addr)
- {
- 	struct geneve_net *gn = net_generic(net, geneve_net_id);
- 	struct geneve_sock *gs;
-@@ -594,7 +605,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
- 	if (!gs)
- 		return ERR_PTR(-ENOMEM);
- 
--	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
-+	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum, local_addr);
- 	if (IS_ERR(sock)) {
- 		kfree(gs);
- 		return ERR_CAST(sock);
-@@ -653,16 +664,28 @@ static void geneve_sock_release(struct geneve_dev *geneve)
- 
- static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
- 					    sa_family_t family,
--					    __be16 dst_port)
-+					    __be16 dst_port,
-+					    union geneve_addr *saddr)
- {
- 	struct geneve_sock *gs;
- 
- 	list_for_each_entry(gs, &gn->sock_list, list) {
--		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
-+		struct sock *sk = gs->sock->sk;
-+		struct inet_sock *inet = inet_sk(sk);
-+
-+		if (inet->inet_sport == dst_port &&
- 		    geneve_get_sk_family(gs) == family) {
--			return gs;
-+			if (family == AF_INET &&
-+			    inet->inet_rcv_saddr == saddr->sin.sin_addr.s_addr)
-+				return gs;
-+#if IS_ENABLED(CONFIG_IPV6)
-+			else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
-+					       &saddr->sin6.sin6_addr) == 0)
-+				return gs;
-+#endif
- 		}
- 	}
-+
- 	return NULL;
- }
- 
-@@ -675,14 +698,16 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
- 	__u8 vni[3];
- 	__u32 hash;
- 
--	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst);
-+	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET,
-+			      geneve->cfg.info.key.tp_dst, &geneve->cfg.saddr);
- 	if (gs) {
- 		gs->refcnt++;
- 		goto out;
- 	}
- 
- 	gs = geneve_socket_create(net, geneve->cfg.info.key.tp_dst, ipv6,
--				  geneve->cfg.use_udp6_rx_checksums);
-+				  geneve->cfg.use_udp6_rx_checksums,
-+				  &geneve->cfg.saddr);
- 	if (IS_ERR(gs))
- 		return PTR_ERR(gs);
- 
-@@ -1234,6 +1259,8 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
- 	[IFLA_GENEVE_TTL_INHERIT]	= { .type = NLA_U8 },
- 	[IFLA_GENEVE_DF]		= { .type = NLA_U8 },
- 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
-+	[IFLA_GENEVE_LOCAL]	= NLA_POLICY_EXACT_LEN(sizeof_field(struct iphdr, saddr)),
-+	[IFLA_GENEVE_LOCAL6]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- };
- 
- static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -1561,6 +1588,34 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- 		cfg->inner_proto_inherit = true;
- 	}
- 
-+	if (data[IFLA_GENEVE_LOCAL]) {
-+		if (changelink && cfg->saddr.sa.sa_family != AF_INET) {
-+			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL],
-+					    "New local address family does not match old");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		cfg->saddr.sin.sin_addr.s_addr = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
-+		cfg->saddr.sa.sa_family = AF_INET;
-+	}
-+
-+	if (data[IFLA_GENEVE_LOCAL6]) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+		if (changelink && cfg->saddr.sa.sa_family != AF_INET6) {
-+			NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6],
-+					    "New local address family does not match old");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		cfg->saddr.sin6.sin6_addr = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
-+		cfg->saddr.sa.sa_family = AF_INET6;
-+#else
-+		NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6],
-+				    "IPv6 support not enabled in the kernel");
-+		return -EPFNOSUPPORT;
-+#endif
-+	}
-+
- 	return 0;
- change_notsup:
- 	NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
-@@ -1741,6 +1796,7 @@ static size_t geneve_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_UDP_ZERO_CSUM6_RX */
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT */
- 		nla_total_size(0) +	 /* IFLA_GENEVE_INNER_PROTO_INHERIT */
-+		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_LOCAL{6} */
- 		0;
- }
- 
-@@ -1762,6 +1818,11 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		if (nla_put_in_addr(skb, IFLA_GENEVE_REMOTE,
- 				    info->key.u.ipv4.dst))
- 			goto nla_put_failure;
-+
-+		if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-+				    info->key.u.ipv4.src))
-+			goto nla_put_failure;
-+
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_CSUM,
- 			       test_bit(IP_TUNNEL_CSUM_BIT,
- 					info->key.tun_flags)))
-@@ -1772,6 +1833,11 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		if (nla_put_in6_addr(skb, IFLA_GENEVE_REMOTE6,
- 				     &info->key.u.ipv6.dst))
- 			goto nla_put_failure;
-+
-+		if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-+				     &info->key.u.ipv6.src))
-+			goto nla_put_failure;
-+
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_ZERO_CSUM6_TX,
- 			       !test_bit(IP_TUNNEL_CSUM_BIT,
- 					 info->key.tun_flags)))
-diff --git a/include/net/geneve.h b/include/net/geneve.h
-index 5c96827a487e..8dcd7fff2c0f 100644
---- a/include/net/geneve.h
-+++ b/include/net/geneve.h
-@@ -68,6 +68,12 @@ static inline bool netif_is_geneve(const struct net_device *dev)
- 	       !strcmp(dev->rtnl_link_ops->kind, "geneve");
- }
- 
-+union geneve_addr {
-+	struct sockaddr_in sin;
-+	struct sockaddr_in6 sin6;
-+	struct sockaddr sa;
-+};
-+
- #ifdef CONFIG_INET
- struct net_device *geneve_dev_create_fb(struct net *net, const char *name,
- 					u8 name_assign_type, u16 dst_port);
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 6dc258993b17..25ddf4dda47b 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1419,6 +1419,8 @@ enum {
- 	IFLA_GENEVE_TTL_INHERIT,
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index f0d71b2a3f1e..8321c8b32f6e 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -888,6 +888,8 @@ enum {
- 	IFLA_GENEVE_TTL_INHERIT,
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
--- 
-2.36.1
+If that is the issue, then you can either change MACAddressPolicy or
+modify your code to create the veth pair with the correct MAC address
+from the start.
 
+As I understand it, a possible explanation for the race is that your
+program is racing with udev. Udev receives an event about a new device
+and reads "addr_assign_type" from sysfs. If your program changed the MAC
+address before udev read the file, then udev will read 3 (NET_ADDR_SET)
+and will not try to change the MAC address. Otherwise, both your program
+and udev will try to change the MAC address.
+
+If it is not udev that is changing the MAC address, then you can run the
+following bpftrace script in a different terminal and check which
+processes try to change the address:
+
+bpftrace -e 'k:dev_set_mac_address_user { @[comm] = count(); }'
+
+It is only a theory. Actual issue might be entirely different.
+
+> 
+> We were re-fetching the addresses via the ioctl SIOCGIFHWADDR syscall
+> as well as via getifaddr (which appears to use netlink under the
+> covers), and, in problematic cases, both functions reported
+> discrepancies from the target MAC address we were initially setting
+> to. We also performed a fetch before we set the MAC addresses and
+> found that there are instances where getifaddr and ioctl results do
+> not match for our veth device *even before we perform any setting of
+> the MAC address*. It's also worth noting that after setting the MAC
+> address: there are no cases where ioctl or getifaddr come back with
+> the same MAC address as before we set the address. So, the set
+> operation always seems to have an effect.
+> 
+> Observed scenarios with incorrectly assigned MAC addresses:
+> 
+> (1) After setting the mac address: ioctl returns the correct MAC
+> address, but the results from getifaddr, returns an incorrect MAC
+> address (different from the original value before setting as well!)
+> 
+> (2) After setting the MAC address: both ioctl and getifaddr return the
+> same MAC address, but are both wrong (and different from the original
+> one!)
+> 
+> (3) There is a possibility that the MAC address we set ends up
+> overwritten by a garbage value *after* we have already updated the MAC
+> address, and checked that the MAC address was set correctly. Since
+> this error happens after this function has finished, we cannot log nor
+> detect it in the function where we set the MAC address because we have
+> not yet studied at what point this late overwriting of MAC address
+> occurs. It’s worth noting that this is the rarest scenario that we
+> have encountered, and we were only able to reproduce it in our testing
+> cluster machine, not in any of the production cluster machines.
+> 
+> [3.] Keywords:
+> 
+> networking, veth, kernel, MAC, netlink
+> 
+> [X.] Other notes, patches, fixes, workarounds:
+> 
+> Notes:
+> 
+> More specific kernel and environment information will be available on
+> request for security reasons, please let us know if you are interested
+> and we will be happy to provide you with the necessary information.
+> 
+> We have observed this behavior only on CentOS 9 systems at the moment,
+> CentOS 7 systems under various kernels do not seem to have the issue
+> (which is quite strange if this was purely a kernel bug).
+> 
+> We have tried kernels 5.15.147, 5.15.160, 5.15.161, all of these have
+> this issue on CentOS 9.
+> 
+> We have also tried rewriting our function for setting MAC address to
+> use libnl rather than ioctl to perform the MAC address setting, but it
+> did not eliminate the issue.
+> 
+> To work around this bug, we checked that the MAC address is set
+> correctly after the ioctl set call, and retry the address setting if
+> necessary. In our testing, this workaround appears to remedy scenarios
+> (1) and (2) above, but it does not address scenario (3).  You can see
+> it here:
+> 
+> https://github.com/apache/mesos/commit/8b202bbebdc89429ad82c6983aa1c514eb1b8d95
+> 
+> We would greatly appreciate any insights or guidance on this matter.
+> Please let me know if you need further information or if there are any
+> specific tests we should run to assist in diagnosing the issue. Again,
+> specific details for the production machines on which we encountered
+> this error can be provided upon request, so please let us know if
+> there is anything we can provide to help.
+> 
+> Thank you for your time and assistance.
+> 
+> Best regards,
+> Jason Zhou
+> Software Engineering Intern
+> jasonzhou@x.com
+> 
+> embedded links:
+> [1] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/slave/containerizer/mesos/isolators/network/port_mapping.cpp#L3599
+> [2] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/linux/routing/link/veth.cpp#L45
+> [3] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/slave/containerizer/mesos/isolators/network/port_mapping.cpp#L3628
+> [4] https://github.com/apache/mesos/blob/8cf287778371c13ee7e88fa428424b3c0fbc7ff0/src/linux/routing/link/link.cpp#L283
+> 
 
