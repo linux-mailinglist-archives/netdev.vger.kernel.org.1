@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-110949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7974F92F1B2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:07:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79EF992F1B3
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B701F2276D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:07:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC361C22237
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 22:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFCB145B09;
-	Thu, 11 Jul 2024 22:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9C19F485;
+	Thu, 11 Jul 2024 22:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKf2t0GT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzhMC9Ja"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F5C42AB5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E68F16D4E8
 	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 22:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720735640; cv=none; b=i40zHZ1bca6UKjDwCL2GQyQfVHYQZkNHsFJO3mvb1Oji8Ft1AcmrEh9hOOrmoAIBTWd5yV0AeE5SCuisz7JR4hfZIeO0Fmd76+1Cwqmp1SaisjFpD6nIRDL6hzJze0zTKMZUidJFdZrI2pXs44ZWJ3IUfX1iE41bf8yMtbRtwnU=
+	t=1720735641; cv=none; b=FnTH5+PSz32rW333NwncPWMpCtA5YWIis6ewHnfaEqa1NwW0DIVJiEysQmsshTBNBGz2++3WpkxbIOOs72LfekLPL8DUbHfQ3TYXSUonx5FCrGGcWnJz80sDj4Ql+snOp4ILy2i3JVjneZkV0sPbd5TUaSDNSxrdne422tky+mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720735640; c=relaxed/simple;
-	bh=OlpdafalDc48hiWLfH1V+xR+vkDk4s3k3DTKFO7h7UM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CHLon+V1PxeU2RX8XDhLtTGw//YbjUwWoGo+WH4pqJ+b/sdt8wT0Divs8//LSqOSxrKe5+7OwdBt18TIZIN5av2tH1e68EgRPwHxcmnl62JBXOB0bRTaPbfpsDAyoVV5AOnez6VPmcn+cN3VcT0oiUqTWtIFyn1zsR/MOROqhBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKf2t0GT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C56B5C116B1;
-	Thu, 11 Jul 2024 22:07:19 +0000 (UTC)
+	s=arc-20240116; t=1720735641; c=relaxed/simple;
+	bh=rFN3QtDXK3m8eiud+YpEXtD0npPICxW3GRAEhZhDVzY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SLjBmRtb+F8quDu+G46AWmMkevKnajdSNRS7AltI5cIhcXRCSPMpXZgyf9Pp3o02mvSpXderGs04KtCbEema/AJlM7W44pouCHAoHSUMj7ZgHpFba035/fzuHw62gIdNYgBVLEbIEKark1kB+ufD395PobmA9m0RREbJ5g+Lrj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzhMC9Ja; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63EABC32782;
+	Thu, 11 Jul 2024 22:07:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720735640;
-	bh=OlpdafalDc48hiWLfH1V+xR+vkDk4s3k3DTKFO7h7UM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GKf2t0GTWbiU4VbArM2RHDtVq0P6saCxUqozzcpJ2t9oSQs57OcMQRfnpWuUocFst
-	 WQoJxSce7ulxkDaAJ6OnigsyBZTD/gQd7G+9/cwC+038xuB57rPYR5LX0beiQPLdub
-	 Fzjsx5FlBa6ZYsfqIMYHsGj4I++x/2B1IYOiL42ZAxAdRX4rTE09gfh/3UaGj4mWQU
-	 MdmeI3q9zPgjKrxFoqfFWUI7QE8L8BxFnevx2mcRJBKZzvh84E4Jmlf9gM5kShavIO
-	 7WjZ8M/waF2zG5slVWkEbOSwYXhnUPGKSq40FatZIRZmTWjMju5+qcDjVCutBViDzk
-	 AJQaBFqEO0MVA==
+	bh=rFN3QtDXK3m8eiud+YpEXtD0npPICxW3GRAEhZhDVzY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uzhMC9JaOiewIIqCCWDiDPVNr9AcpiBm5rIZlloS5RukkJiFi1cgtlCGrxETd7Kw6
+	 pNApFoQLwyrW75DkCJHkqB40/AG99hxAWGoHAJlDJFjnrloJTaiUjV81ccqpKx7TRJ
+	 +xOeLt6rFLbRCcgJOIQwtjnB2sqGM93dqc5hY7NAkn2bECRhlbGecG4Bn1yLzNnb5B
+	 yhh7nVxDTQSrEnhxYHr/QiFkCPhtkLE9cGUu5OUYUVBw83qYLmrT8F1rq7XnKGQ/Gu
+	 jTnQnWy4ROZeE0xZ+6fXuiXN3iMtAxogdL65LdYAPYa7Z6hXnLJkooLyzQm2S/cY6t
+	 ZV7sfbq0V7msQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,10 +52,12 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 00/11] eth: bnxt: use the new RSS API
-Date: Thu, 11 Jul 2024 15:07:02 -0700
-Message-ID: <20240711220713.283778-1-kuba@kernel.org>
+Subject: [PATCH net-next 01/11] net: ethtool: let drivers remove lost RSS contexts
+Date: Thu, 11 Jul 2024 15:07:03 -0700
+Message-ID: <20240711220713.283778-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240711220713.283778-1-kuba@kernel.org>
+References: <20240711220713.283778-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,56 +66,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert bnxt from using the set_rxfh API to separate create/modify/remove
-callbacks.
+RSS contexts may get lost from a device, in various extreme circumstances.
+Specifically if the firmware leaks resources and resets, or crashes and
+either recovers in partially working state or the crash causes a
+different FW version to run - creating the context again may fail.
 
-Two small extensions to the core APIs are necessary:
- - the ability to discard contexts if for some catastrophic reasons
-   device can no longer provide them;
- - the ability to reserve space in the context for RSS table growth.
+Drivers should do their absolute best to prevent this from happening.
+When it does, however, telling user that a context exists, when it can't
+possibly be used any more is counter productive. Add a helper for
+drivers to discard contexts. Print an error, in the future netlink
+notification will also be sent.
 
-The driver is adjusted to store indirection tables on u32 to make
-it easier to use core structs directly.
+More robust approaches were proposed, like keeping the contexts
+but marking them as "dead" (but possibly resurrected by next reset).
+That may be better but it's unclear at this stage whether the
+effort is worth the benefits.
 
-With that out of the way the conversion is fairly straightforward.
-
-Since the opposition to discarding contexts was relatively mild
-and its what bnxt does already, I'm sticking to that. We may very
-well need to revisit that at a later time.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--
+I'm keeping this patch as is, since this is the simplest solution,
+and nobody has strong opinions.
 
 v2:
- - move "lost context" helper to common.c to avoid build problems
-   when ethtool-nl isn't enabled
+ - move to common.c to avoid build problems when ethtool-nl isn't enabled
  - add a note about the counter proposal in the commit message
- - move key_off to the end, under the private label (hiding from kdoc)
- - remove bnxt_get_max_rss_ctx_ring()
- - switch from sizeof(u32) to sizeof(*indir_tbl)
- - add a sentence to the commit msg
- - store a pointer to struct ethtool_rxfh_param instead of
-   adding the ethtool_rxfh_priv_context() helper
-v1: https://lore.kernel.org/all/20240702234757.4188344-1-kuba@kernel.org/
+---
+ include/linux/ethtool.h |  2 ++
+ net/ethtool/common.c    | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
 
-Jakub Kicinski (11):
-  net: ethtool: let drivers remove lost RSS contexts
-  net: ethtool: let drivers declare max size of RSS indir table and key
-  eth: bnxt: allow deleting RSS contexts when the device is down
-  eth: bnxt: move from .set_rxfh to .create_rxfh_context and friends
-  eth: bnxt: remove rss_ctx_bmap
-  eth: bnxt: depend on core cleaning up RSS contexts
-  eth: bnxt: use context priv for struct bnxt_rss_ctx
-  eth: bnxt: use the RSS context XArray instead of the local list
-  eth: bnxt: pad out the correct indirection table
-  eth: bnxt: bump the entry size in indir tables to u32
-  eth: bnxt: use the indir table from ethtool context
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 126 +++++--------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  17 +-
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 165 ++++++++++--------
- include/linux/ethtool.h                       |  20 +--
- net/ethtool/common.c                          |  14 ++
- net/ethtool/ioctl.c                           |  46 +++--
- 6 files changed, 194 insertions(+), 194 deletions(-)
-
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index e213b5508da6..89da0254ccd4 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -210,6 +210,8 @@ static inline size_t ethtool_rxfh_context_size(u32 indir_size, u32 key_size,
+ 	return struct_size_t(struct ethtool_rxfh_context, data, flex_len);
+ }
+ 
++void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
++
+ /* declare a link mode bitmap */
+ #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+ 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 7bda9600efcf..67d06cd002a5 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -741,3 +741,17 @@ ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);
++
++void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id)
++{
++	struct ethtool_rxfh_context *ctx;
++
++	WARN_ONCE(!rtnl_is_locked() &&
++		  !lockdep_is_held_type(&dev->ethtool->rss_lock, -1),
++		  "RSS context lock assertion failed\n");
++
++	netdev_err(dev, "device error, RSS context %d lost\n", context_id);
++	ctx = xa_erase(&dev->ethtool->rss_ctx, context_id);
++	kfree(ctx);
++}
++EXPORT_SYMBOL(ethtool_rxfh_context_lost);
 -- 
 2.45.2
 
