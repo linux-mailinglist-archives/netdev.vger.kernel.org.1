@@ -1,184 +1,144 @@
-Return-Path: <netdev+bounces-110968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FFB192F276
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:05:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA64B92F279
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:07:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F9E01F21AB1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:05:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A9871F22BDF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 23:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57DC16D320;
-	Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A199E1A0734;
+	Thu, 11 Jul 2024 23:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npwL267X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1VQR3/s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14FC8289C
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206B41DFE3;
+	Thu, 11 Jul 2024 23:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720739131; cv=none; b=FzYSsxz42OLA51UXBtafSZ7DT/ZODw7BmFOvW3GRlAgI6ygtMGDFy2XUuH/MDV+DRX5hZlILKqt7kDR3R8jpf62aviEhQbKXNM3tAdXTbSOmsGy8AKJ4eQxkRbq1RAwubWL8FM1BMR90cLMJBkZDqZdgrBdtwbCJmYE9XfnqNjY=
+	t=1720739249; cv=none; b=jhk6BedNO0W9OUMkog8YltVkN5IDWMw5vKAGUc31pFXwEQEeh4KRcxI1JrU+w+hnGOG0NUfe3wC2bK2mgiPif1Xf3W4VlIZ4EvA7WV0TmZ/bz57C5mnajMzivLAJMvhIDJHgLbar2P32wfyCK37QIPHvzcGirdbpZ4Z0wEfqHmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720739131; c=relaxed/simple;
-	bh=eWSc1pj6MHWrSSQQMF0RuO15wKaEh58uBsgtWtZgIBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TEkwIfjTl2/fwhbfk2omJVIYaegTgDQicu3lpeASVQ/Nf23lXKDC7j+QctfaztHogMz6Zt0tgRbaw019URSBZm/6bYlevxthHyOXuXcKCIKbq308gxPy3nPlM8OMWFdtqGqe4+Wj73yNlRHnyd7UjF3NY7l1WPogDA158CD8Fic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npwL267X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F488C116B1;
-	Thu, 11 Jul 2024 23:05:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720739131;
-	bh=eWSc1pj6MHWrSSQQMF0RuO15wKaEh58uBsgtWtZgIBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=npwL267XH4aBIXmUF2aI75ujgRaWt2Q4fgVeWCdAZ5XoXiYBAVMc3G3d5AKpIZI5N
-	 03Iupu2ctmuoOEfyRPsEjdKuk0o0r1afxKIUp73r+atOPX693Y11S/1IlrZSNOsHpe
-	 9VvXufitD/mBjRDlMd4qAzjGgNLUowIkWHeiAvNFJB8MubWlFNrj3YP9v7dlxnipvA
-	 kZ0Oj854pcRaLlBXZgEyaS3qh4C2w8OG4m0VSrkjKcr5WQpwbR/W7vSWUcYlzZFCBV
-	 wvdjG2oLgquvkUxVTm9V+Llsk3RI+qYRBlp+6vbKBuqWeo1wwAajDWDkeOShFaeUMK
-	 UC077DIjH7q7w==
-Date: Thu, 11 Jul 2024 16:05:29 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, tariqt@nvidia.com, rrameshbabu@nvidia.com,
-	saeedm@nvidia.com, yuehaibing@huawei.com, horms@kernel.org,
-	jacob.e.keller@intel.com, afaris@nvidia.com
-Subject: Re: [PATCH net-next v2] eth: mlx5: expose NETIF_F_NTUPLE when ARFS
- is compiled out
-Message-ID: <ZpBlOWzyihXUad_V@x130>
-References: <20240711223722.297676-1-kuba@kernel.org>
+	s=arc-20240116; t=1720739249; c=relaxed/simple;
+	bh=UcMXaEV7R/bUuyeSozVX/+Hj1QoPeLuD2nEoxOWGzU0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UkxpWzARWiCDnoqtNmlfE+LB7qBteoopMZVqmF/nHK+lyu6kBkDft0rtg6kHrw+dnzzhYEprLWqni8scBaue+q/omS5LqTUUuQNcL2fsrokwfmDHofLGn3V3xbOHeS62BxC24YSaISyE2yKVSBVFfTjl2Ij59zg+2Lodyi6SfUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N1VQR3/s; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e036d1ce4f7so1243581276.0;
+        Thu, 11 Jul 2024 16:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720739247; x=1721344047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i2hBswY+u8xjK1Kzvor9fB+2gLyEPUsUoItxFLjtkvk=;
+        b=N1VQR3/sHgT8Q4fjvFmIc7+JeNQXye92vFyP++/JIcMDdZ/KR6lUA8PKnFaDBKsFKl
+         7ixBPJuIx9C5TUO2afp36X+16cLIkQPu8t8UGpkpALnrCeJCrW6zMGdbcKgUrWmPVxpZ
+         j5TOhNCqe8zbWHTmm1B1rSwjRr0zDeE90ujMRLnMibzg5F4TvdR5hj4Oainazd1Hp1tm
+         a+ILER7dZ0Fks8ey2iMTAbONSuqQcT48aozSBO99R4/rRecbQc+jN0o3GDCl23wCce/M
+         usxC10Plsdl/3r8My3CKsbv1X7omNR8uY4uP5R+MJxl2dnvZWj82VzVojWJNOq55lyJT
+         r6xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720739247; x=1721344047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i2hBswY+u8xjK1Kzvor9fB+2gLyEPUsUoItxFLjtkvk=;
+        b=O+o5Psk5bDiieFzpuUy/2KygDVCHaHiZE0OEgtUhQ65Bx2RmUm3Vi8DZUOTJD98/3j
+         RYCCIue/iYGF9LVuOz0v2pR/a4p5K2C9I1C8paVBmB6AZ/wkJ7EgDi1oveIaCF3FD6rg
+         +EX+QiLC90tarQ3sNAPWSaMLoEA30/xJUrFzFMOb6tkKWYCnfEPQiLGoiJfaXsmJ6B8k
+         Iy8RA+dDhGY0++hbAxgQmkvionreTR9siniBRIKtgLAclDwmlCJcGKaW3yYZcJ/Qm9Aq
+         7cdI/Z8XgL9T2Jgh1+9J5+rlmLs4rc7hQV8XevebUR9laQlZyCtwtZ9y0OxoIWyIIBiX
+         lfoA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5POVrzQMADd0DEy3gTMBCOrXaDTLj+1ZHxeP2ScriAABYJypIextv8qMIS6vQP0eMchJM63eSnP5ykatpdJ/BI7gN7M+fKhr3nlht1tC9DKTqiGGJTxYW0tcXP5V/PBAtNn+yXL2B+i8bz+CUpHIuRJNeR7gPNQ6VcRDrDeY1uhgtlWFJJEeFS19Q3h/NGYT891oiQHzntrENOYPJ8aXRy//tyB90mKIgyfia
+X-Gm-Message-State: AOJu0YwD4lPb+WsZrDzOmESUORbrIBA15Dmho6ZxUsiy+nAoAeMBKv3g
+	K/4BMwohxxUkRI8srt+4PO4UG3olyjvVJCUioNF+qOXDV3UMrQ13zcTHWEzjeWMeLAO7mxH85QR
+	eoJwwKTHZrwB1pD1XajCppi7jHf0=
+X-Google-Smtp-Source: AGHT+IESAzgUImuWHbpxSCeLvNle2lAnCtNiymuxM6do/gswGHb65EvzDJ50dh8SH6D3heE0PgCKfCSwNt2zccYk0iI=
+X-Received: by 2002:a25:4ac6:0:b0:e02:becd:d5eb with SMTP id
+ 3f1490d57ef6-e058a4d4875mr967584276.13.1720739246975; Thu, 11 Jul 2024
+ 16:07:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240711223722.297676-1-kuba@kernel.org>
+References: <20240710212555.1617795-14-amery.hung@bytedance.com> <AS2P194MB21709F0B79D6FB686D373B199AA52@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AS2P194MB21709F0B79D6FB686D373B199AA52@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 11 Jul 2024 16:07:15 -0700
+Message-ID: <CAMB2axMyA2TDZmXaO_BaFHk4Lh3Ri1LgEc7UU7ZoNsBsqANivQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 13/14] virtio/vsock: implement datagram support
+To: Luigi Leonardi <luigi.leonardi@outlook.com>
+Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>, amery.hung@bytedance.com, 
+	bpf@vger.kernel.org, bryantan@vmware.com, dan.carpenter@linaro.org, 
+	davem@davemloft.net, decui@microsoft.com, edumazet@google.com, 
+	haiyangz@microsoft.com, jasowang@redhat.com, jiang.wang@bytedance.com, 
+	kuba@kernel.org, kvm@vger.kernel.org, kys@microsoft.com, 
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, oxffffaa@gmail.com, pabeni@redhat.com, 
+	pv-drivers@vmware.com, sgarzare@redhat.com, simon.horman@corigine.com, 
+	stefanha@redhat.com, vdasa@vmware.com, 
+	virtualization@lists.linux-foundation.org, wei.liu@kernel.org, 
+	xiyou.wangcong@gmail.com, xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11 Jul 15:37, Jakub Kicinski wrote:
->ARFS depends on NTUPLE filters, but the inverse is not true.
->Drivers which don't support ARFS commonly still support NTUPLE
->filtering. mlx5 has a Kconfig option to disable ARFS (MLX5_EN_ARFS)
->and does not advertise NTUPLE filters as a feature at all when ARFS
->is compiled out. That's not correct, ntuple filters indeed still work
->just fine (as long as MLX5_EN_RXNFC is enabled).
+On Thu, Jul 11, 2024 at 4:03=E2=80=AFPM Luigi Leonardi
+<luigi.leonardi@outlook.com> wrote:
 >
->This is needed to make the RSS test not skip all RSS context
->related testing.
+> Hi Bobby, Amery
 >
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->---
->v2:
-> - hard wire to on (not propagating Simon's review because of this)
->v1: https://lore.kernel.org/20240710175502.760194-1-kuba@kernel.org
+> Thank you for working on this!
 >
->CC: tariqt@nvidia.com
->CC: rrameshbabu@nvidia.com
->CC: saeedm@nvidia.com
->CC: yuehaibing@huawei.com
->CC: horms@kernel.org
->CC: jacob.e.keller@intel.com
->CC: afaris@nvidia.com
->---
-> drivers/net/ethernet/mellanox/mlx5/core/en/fs.h     | 13 +++++++++++++
-> .../net/ethernet/mellanox/mlx5/core/en_ethtool.c    |  2 +-
-> drivers/net/ethernet/mellanox/mlx5/core/en_fs.c     |  5 ++---
-> drivers/net/ethernet/mellanox/mlx5/core/en_main.c   |  8 +++++---
-> .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c   |  8 +++-----
-> 5 files changed, 24 insertions(+), 12 deletions(-)
+> > This commit implements datagram support with a new version of
+> > ->dgram_allow().
 >
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
->index 4d6225e0eec7..1e8b7d330701 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs.h
->@@ -154,6 +154,19 @@ struct mlx5e_tc_table *mlx5e_fs_get_tc(struct mlx5e_flow_steering *fs);
-> struct mlx5e_l2_table *mlx5e_fs_get_l2(struct mlx5e_flow_steering *fs);
-> struct mlx5_flow_namespace *mlx5e_fs_get_ns(struct mlx5e_flow_steering *fs, bool egress);
-> void mlx5e_fs_set_ns(struct mlx5e_flow_steering *fs, struct mlx5_flow_namespace *ns, bool egress);
->+
->+static inline bool mlx5e_fs_has_arfs(struct net_device *netdev)
->+{
->+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
->+		netdev->hw_features & NETIF_F_NTUPLE;
->+}
->+
->+static inline bool mlx5e_fs_want_arfs(struct net_device *netdev)
->+{
->+	return IS_ENABLED(CONFIG_MLX5_EN_ARFS) &&
->+		netdev->features & NETIF_F_NTUPLE;
->+}
->+
-> #ifdef CONFIG_MLX5_EN_RXNFC
-> struct mlx5e_ethtool_steering *mlx5e_fs_get_ethtool(struct mlx5e_flow_steering *fs);
-> #endif
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
->index 3320f12ba2db..5582c93a62f1 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
->@@ -525,7 +525,7 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
->
-> 	opened = test_bit(MLX5E_STATE_OPENED, &priv->state);
->
->-	arfs_enabled = opened && (priv->netdev->features & NETIF_F_NTUPLE);
->+	arfs_enabled = opened && mlx5e_fs_want_arfs(priv->netdev);
-> 	if (arfs_enabled)
-> 		mlx5e_arfs_disable(priv->fs);
->
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
->index 8c5b291a171f..05058710d2c7 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
->@@ -1307,8 +1307,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
-> 		return -EOPNOTSUPP;
->
-> 	mlx5e_fs_set_ns(fs, ns, false);
->-	err = mlx5e_arfs_create_tables(fs, rx_res,
->-				       !!(netdev->hw_features & NETIF_F_NTUPLE));
->+	err = mlx5e_arfs_create_tables(fs, rx_res, mlx5e_fs_has_arfs(netdev));
-> 	if (err) {
-> 		fs_err(fs, "Failed to create arfs tables, err=%d\n", err);
-> 		netdev->hw_features &= ~NETIF_F_NTUPLE;
->@@ -1355,7 +1354,7 @@ int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
-> err_destroy_inner_ttc_table:
-> 	mlx5e_destroy_inner_ttc_table(fs);
-> err_destroy_arfs_tables:
->-	mlx5e_arfs_destroy_tables(fs, !!(netdev->hw_features & NETIF_F_NTUPLE));
->+	mlx5e_arfs_destroy_tables(fs, mlx5e_fs_has_arfs(netdev));
->
-> 	return err;
-> }
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->index ff335527c10a..6f686fabed44 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->@@ -5556,8 +5556,10 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
-> #if IS_ENABLED(CONFIG_MLX5_CLS_ACT)
-> 		netdev->hw_features      |= NETIF_F_HW_TC;
-> #endif
->-#ifdef CONFIG_MLX5_EN_ARFS
->+#if IS_ENABLED(CONFIG_MLX5_EN_ARFS)
-> 		netdev->hw_features	 |= NETIF_F_NTUPLE;
->+#elif IS_ENABLED(CONFIG_MLX5_EN_RXNFC)
->+		netdev->features	 |= NETIF_F_NTUPLE;
+> Commit messages should be imperative "This commit implements X" -> "Imple=
+ments X".
+> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#de=
+scribe-your-changes
+> This suggestion applies to many of the commits in this series.
 
-Why default ON when RXNFC and OFF when ARFS ?
-Default should be off always, and this needs to be advertised in 
-hw_features in both cases.
+Thanks for pointing this out. I will change the commit message in the
+next version.
 
-I think this should be
-#if IS_ENABLED(ARFS) || IS_ENABLED(RXFNC)
-	netdev->hw_features |= NTUPLE;
+>
+> > +static bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> > +{
+> > +     struct virtio_vsock *vsock;
+> > +     bool dgram_allow;
+> > +
+> > +     dgram_allow =3D false;
+>
+> I think you can initialize the variable in the declaration.
 
-Otherwise LGTM
+Got it.
 
-Acked-by: Saeed Mahameed <saeedm@nvidia.com>
+Thanks,
+Amery
 
-
+>
+> > +     rcu_read_lock();
+> > +     vsock =3D rcu_dereference(the_virtio_vsock);
+> > +     if (vsock)
+> > +             dgram_allow =3D vsock->dgram_allow;
+> > +     rcu_read_unlock();
+> > +
+> > +     return dgram_allow;
+> > +}
+> > +
+>
+> The rest LGTM.
+>
+> Thanks,
+> Luigi
 
