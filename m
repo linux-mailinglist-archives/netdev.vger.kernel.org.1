@@ -1,246 +1,124 @@
-Return-Path: <netdev+bounces-110769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBC392E39D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:41:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A8492E3C9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65B0B1F21A3D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:41:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DEE1C20E75
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C209156F46;
-	Thu, 11 Jul 2024 09:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1B91553BC;
+	Thu, 11 Jul 2024 09:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPPwTj57"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LSVUouXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82EF2A1D1
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277E5155CA5
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720690874; cv=none; b=dePHzBVO1FY7ftTSCIPm5r298nKUErnLZiLRmCfIUBeO9jSrzxrcWvf3p7UMv5uQJLwIGjAwaEiEdc2BXFiaJyXfz0pRBPxH5ydPS3ziUe+YBTcszbxlJ0UFog5I3bnVZZ9AThxgol9L+nBhCJtzUruC+rjPFCquCjMuLmOIiMQ=
+	t=1720691534; cv=none; b=c7z+n5XmZWwaZI6allcsvuJM8wQl/Mg6S6vdFntTW39gZRM2MklzMsN4G39646EAz8Mekn5HblSy8tKHIMx74kLrWbLEOpiF0pZ8Clki7bXsE4TpVuaxeTCvCGPm0GtYSjA4WOjz4AsZn224nFGegDaqkr1OD3wsrLjNnAPK4IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720690874; c=relaxed/simple;
-	bh=8RUZWpSSsIgoH4i40p6vT8jM5LG/7OmypIyPi6a/9F0=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D36l9u1UWqJ3euQ3U+sarDjVoAlA7PeWOz6WZxo42/PbCKAaus6NrjEGyfFoYyDcaDJCnSgqfTylgReFSLVTR5+JDr51i9ego5N29SnQGtSGfG5ebbtjkbai7DoCgIew3acbCoqbFNsRvziTnSxA6lMa5v8rH6En2OCl201UHP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UPPwTj57; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720690871;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=roMHuw+PALuns3vCWcdFi8XZN8Qqy8eFcMii4s+wTJk=;
-	b=UPPwTj57L7e/oP4KdQQK19B94WuND8+mppKuEzcSv71CFhP/WPj6z0GPiznBGLki3jTDt0
-	//LJSbutLiiT+KBRf6+2NvuS+wPNtJeferJR6mBSQzOXwgn2VN0xNpZKrC8tkpBvX+N4zI
-	Xv/ti7tfrYqfWwf1XY9h2t7M///fP5g=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-107-Fx6O3alLOXuftd5A2Fyumw-1; Thu, 11 Jul 2024 05:41:10 -0400
-X-MC-Unique: Fx6O3alLOXuftd5A2Fyumw-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b5ed8fb791so8992016d6.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 02:41:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720690870; x=1721295670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=roMHuw+PALuns3vCWcdFi8XZN8Qqy8eFcMii4s+wTJk=;
-        b=hWD3vxvYs6S0FSmxHI6B90pKXunEDJ+U6O2IT2WtG0G1KJwbfdwvKzIzxHq/Gw4w6w
-         RI3cfa6dTY1cdTViodCixuPG+BRxA7Dowm9HsiRyNLMM23JCpCRR7dq5S9yodQkEx241
-         eej5NbdWglKeUtS2M9CGgpw6gQVFhV8N/OOhGyDBz3hkgJQ9MvVJ70zT7uhMHMGLwS9n
-         +XHPZ78JR3WUBmrwncGv5x+Wo5kPDWNYsYkgr5E3jJzP2hMFc0TbS2Is6pTmfF0iEd4r
-         SiUE5x8ZN3R7kPuPS/y5NGlypjEfTcp64v7NH5tLoyRrYqN9S5W0fmZzgvyUbA5j72xj
-         7FPA==
-X-Gm-Message-State: AOJu0YygVObAfqQQoHKj/+DbmxktkWRjNXjljB6Uak2MjpQqdky+vK9O
-	OlLON3eqb3fHJdsuAAnc8bVRoORAK6UbebU4m/gkDDRF79Y1RRenErPzHbdy8UGF6hLTh/XKfsM
-	TDKkMMClh1HuCm+Tue5wSyfRnUXS2z/GmxQWzUht19b3UcyAyW1fhK5WRisTUeeG55qijiU38R4
-	q46ZWz+P2NeHspXyZ4PXxprb+LFneXMAgXBmVo
-X-Received: by 2002:ad4:4ea6:0:b0:6b5:e006:11b0 with SMTP id 6a1803df08f44-6b61bca384fmr99044716d6.20.1720690869707;
-        Thu, 11 Jul 2024 02:41:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSRxmewcxMQ/3BL81YZjQF3O+LHKdXdzsEe8HRIH22wz9sWJC8rn/QEPgJD7oQUldO/x36Y6ZPMZhiH0ZPSGE=
-X-Received: by 2002:ad4:4ea6:0:b0:6b5:e006:11b0 with SMTP id
- 6a1803df08f44-6b61bca384fmr99044606d6.20.1720690869382; Thu, 11 Jul 2024
- 02:41:09 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 11 Jul 2024 09:41:08 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240710090500.1655212-1-amorenoz@redhat.com>
+	s=arc-20240116; t=1720691534; c=relaxed/simple;
+	bh=Fu35hxmDR9Gq3xD8lJA5i7ke7At3NG9zw26Lz8MwLCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YpJZ9K5zcQybc0KqIhkea3OmSvtoRkyKaNgkn/qbqU1I22BaDhIIryZUlPEUOqrvHNlrnQmt1WDi+QsiPDqv8QeILfNvkOILFjkD5GkOSJam9S5gtA54FKSML9X4WqXEE9+xu8fUoQYKRuF3ks7mz5Q6dCUwuWTw5y2OKenYwjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LSVUouXE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D3BFC116B1;
+	Thu, 11 Jul 2024 09:52:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720691533;
+	bh=Fu35hxmDR9Gq3xD8lJA5i7ke7At3NG9zw26Lz8MwLCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LSVUouXEYuXgWD50KbxbnQhBPULy5AwIqvwg5rjQsqXXrfgD+4uxIP9KiQwXlbtUE
+	 ENMujl5vk8P28+zjdUxK+tJPpC0QoSSojA66yZdu3upXWeV1qFCnmmhftDigveci+W
+	 WJ+QKq56RfKSF3kUjgr97LHtpFLv1okoINDaunmE+dr9n4/2fL9MVQ8QcVhmNs5vvL
+	 WbSse+Rzr6uVhwk2EucuttUAJze/I2v4amYWP5e7jIeIwaBqPkgBdNPsqOiyHgHolS
+	 ztZVHwyHhvPoJg2IWAfAerbnDxskYjYHwclcQ4aBVlMpyjKc+ZA0HcbNSgRfg4bD09
+	 2eDyEEqDq75OQ==
+Date: Thu, 11 Jul 2024 12:52:08 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: steffen.klassert@secunet.com
+Cc: Mike Yu <yumike@google.com>, netdev@vger.kernel.org,
+	stanleyjhu@google.com, martinwu@google.com,
+	chiachangwang@google.com
+Subject: Re: [PATCH ipsec v3 0/4] Support IPsec crypto offload for IPv6 ESP
+ and IPv4 UDP-encapsulated ESP data paths
+Message-ID: <20240711095208.GN6668@unreal>
+References: <20240710111654.4085575-1-yumike@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240710090500.1655212-1-amorenoz@redhat.com>
-Date: Thu, 11 Jul 2024 09:41:08 +0000
-Message-ID: <CAG=2xmMsgmZosNvuVC-uGjkKGQfSq0kjwpMSgS46jpd5Zbpp7A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] selftests: openvswitch: retry instead of sleep
-To: netdev@vger.kernel.org
-Cc: Pravin B Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, dev@openvswitch.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240710111654.4085575-1-yumike@google.com>
 
-On Wed, Jul 10, 2024 at 11:04:59AM GMT, Adrian Moreno wrote:
-> There are a couple of places where the test script "sleep"s to wait for
-> some external condition to be met.
->
-> This is error prone, specially in slow systems (identified in CI by
-> "KSFT_MACHINE_SLOW=3Dyes").
->
-> To fix this, add a "ovs_wait" function that tries to execute a command
-> a few times until it succeeds. The timeout used is set to 5s for
-> "normal" systems and doubled if a slow CI machine is detected.
->
-> This should make the following work:
->
-> $ vng --build  \
->     --config tools/testing/selftests/net/config \
->     --config kernel/configs/debug.config
->
-> $ vng --run . --user root -- "make -C tools/testing/selftests/ \
->     KSFT_MACHINE_SLOW=3Dyes TARGETS=3Dnet/openvswitch run_tests"
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 45 +++++++++++++++----
->  .../selftests/net/openvswitch/ovs-dpctl.py    |  1 +
->  2 files changed, 38 insertions(+), 8 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/too=
-ls/testing/selftests/net/openvswitch/openvswitch.sh
-> index bc71dbc18b21..cc0bfae2bafa 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -11,6 +11,11 @@ ksft_skip=3D4
->  PAUSE_ON_FAIL=3Dno
->  VERBOSE=3D0
->  TRACING=3D0
-> +WAIT_TIMEOUT=3D5
-> +
-> +if test "X$KSFT_MACHINE_SLOW" =3D=3D "Xyes"; then
-> +	WAIT_TIMEOUT=3D10
-> +fi
->
->  tests=3D"
->  	arp_ping				eth-arp: Basic arp ping between two NS
-> @@ -29,6 +34,30 @@ info() {
->  	[ $VERBOSE =3D 0 ] || echo $*
->  }
->
-> +ovs_wait() {
-> +	info "waiting $WAIT_TIMEOUT s for: $@"
-> +
-> +	if "$@" ; then
-> +		info "wait succeeded immediately"
-> +		return 0
-> +	fi
-> +
-> +	# A quick re-check helps speed up small races in fast systems.
-> +	# However, fractional sleeps might not necessarily work.
-> +	local start=3D0
-> +	sleep 0.1 || { sleep 1; start=3D1; }
-> +
-> +	for (( i=3Dstart; i<WAIT_TIMEOUT; i++ )); do
-> +		if "$@" ; then
-> +			info "wait succeeded after $i seconds"
-> +			return 0
-> +		fi
-> +		sleep 1
-> +	done
-> +	info "wait failed after $i seconds"
-> +	return 1
-> +}
-> +
->  ovs_base=3D`pwd`
->  sbxs=3D
->  sbx_add () {
-> @@ -278,20 +307,19 @@ test_psample() {
->
->  	# Record psample data.
->  	ovs_spawn_daemon "test_psample" python3 $ovs_base/ovs-dpctl.py psample-=
-events
-> +	ovs_wait grep -q "listening for psample events" ${ovs_dir}/stdout
->
->  	# Send a single ping.
-> -	sleep 1
->  	ovs_sbx "test_psample" ip netns exec client ping -I c1 172.31.110.20 -c=
- 1 || return 1
-> -	sleep 1
->
->  	# We should have received one userspace action upcall and 2 psample pac=
-kets.
-> -	grep -E "userspace action command" $ovs_dir/s0.out >/dev/null 2>&1 || r=
-eturn 1
-> +	ovs_wait grep -q "userspace action command" $ovs_dir/s0.out || return 1
->
->  	# client -> server samples should only contain the first 14 bytes of th=
-e packet.
-> -	grep -E "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{28}$" \
-> -			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-> -	grep -E "rate:4294967295,group:2,cookie:eeff0c" \
-> -			 $ovs_dir/stdout >/dev/null 2>&1 || return 1
-> +	ovs_wait grep -qE "rate:4294967295,group:1,cookie:c0ffee data:[0-9a-f]{=
-28}$" \
-> +		$ovs_dir/stdout || return 1
-> +
-> +	ovs_wait grep -q "rate:4294967295,group:2,cookie:eeff0c" $ovs_dir/stdou=
-t || return 1
->
->  	return 0
->  }
-> @@ -711,7 +739,8 @@ test_upcall_interfaces() {
->  	ovs_add_netns_and_veths "test_upcall_interfaces" ui0 upc left0 l0 \
->  	    172.31.110.1/24 -u || return 1
->
-> -	sleep 1
-> +	ovs_wait grep -q "listening on upcall packet handler" ${ovs_dir}/left0.=
-out
-> +
->  	info "sending arping"
->  	ip netns exec upc arping -I l0 172.31.110.20 -c 1 \
->  	    >$ovs_dir/arping.stdout 2>$ovs_dir/arping.stderr
-> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools=
-/testing/selftests/net/openvswitch/ovs-dpctl.py
-> index 1e15b0818074..8a0396bfaf99 100644
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -2520,6 +2520,7 @@ class PsampleEvent(EventSocket):
->      marshal_class =3D psample_msg
->
->      def read_samples(self):
-> +        print("listening for psample events", flush=3DTrue)
->          while True:
->              try:
->                  for msg in self.get():
-> --
-> 2.45.2
->
+On Wed, Jul 10, 2024 at 07:16:50PM +0800, Mike Yu wrote:
+> Currently, IPsec crypto offload is enabled for GRO code path. However, there
+> are other code paths where the XFRM stack is involved; for example, IPv6 ESP
+> packets handled by xfrm6_esp_rcv() in ESP layer, and IPv4 UDP-encapsulated
+> ESP packets handled by udp_rcv() in UDP layer.
+> 
+> This patchset extends the crypto offload support to cover these two cases.
+> This is useful for devices with traffic accounting (e.g., Android), where GRO
+> can lead to inaccurate accounting on the underlying network. For example, VPN
+> traffic might not be counted on the wifi network interface wlan0 if the packets
+> are handled in GRO code path before entering the network stack for accounting.
+> 
+> Below is the RX data path scenario the crypto offload can be applied to.
+> 
+>   +-----------+   +-------+
+>   | HW Driver |-->| wlan0 |--------+
+>   +-----------+   +-------+        |
+>                                    v
+>                              +---------------+   +------+
+>                      +------>| Network Stack |-->| Apps |
+>                      |       +---------------+   +------+
+>                      |             |
+>                      |             v
+>                  +--------+   +------------+
+>                  | ipsec1 |<--| XFRM Stack |
+>                  +--------+   +------------+
+> 
+> v2 -> v3:
+> - Correct ESP seq in esp_xmit().
+> v1 -> v2:
+> - Fix comment style.
+> 
+> Mike Yu (4):
+>   xfrm: Support crypto offload for inbound IPv6 ESP packets not in GRO
+>     path
+>   xfrm: Allow UDP encapsulation in crypto offload control path
+>   xfrm: Support crypto offload for inbound IPv4 UDP-encapsulated ESP
+>     packet
+>   xfrm: Support crypto offload for outbound IPv4 UDP-encapsulated ESP
+>     packet
+> 
+>  net/ipv4/esp4.c         |  8 +++++++-
+>  net/ipv4/esp4_offload.c | 17 ++++++++++++++++-
+>  net/xfrm/xfrm_device.c  |  6 +++---
+>  net/xfrm/xfrm_input.c   |  3 ++-
+>  net/xfrm/xfrm_policy.c  |  5 ++++-
+>  5 files changed, 32 insertions(+), 7 deletions(-)
 
+Steffen,
 
-This patch is supposed to fix openvswitch selftests on "-dbg" machines.
-However, as Simon points out, all recent rounds are failing [1]. I don't
-see this patch being included in the batches and I was wondering why.
+If it helps, we tested v2 version and it didn't break anything for us :).
+But we didn't test this specific functionality.
 
-Also I see a (presumably unrelated) build error netdev/build_32bit.
-Is there anything I can do?
+Thanks
 
-[1]
-https://netdev.bots.linux.dev/contest.html?executor=3Dvmksft-net-dbg&test=
-=3Dopenvswitch-sh
-
-Thanks.
-Adri=C3=A1n
-
+> 
+> -- 
+> 2.45.2.803.g4e1b14247a-goog
+> 
+> 
 
