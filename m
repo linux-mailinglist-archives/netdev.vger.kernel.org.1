@@ -1,125 +1,121 @@
-Return-Path: <netdev+bounces-110779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56C6692E447
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 12:11:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A169E92E462
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 12:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16AF228294A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56FD21F228AB
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F8A15748F;
-	Thu, 11 Jul 2024 10:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404AB158D8B;
+	Thu, 11 Jul 2024 10:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Ng1GEOVE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZ9Bmm+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DF214E2F1
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 10:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A251586D5;
+	Thu, 11 Jul 2024 10:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720692684; cv=none; b=qXzCoU8cCb5vA0z5b83xrxcU3EoAUQuTBkrCgON+J20zswmQu2nbF8LfiUbmAMuBFCxYDyGEqvgLfJDcw0yilhCD8tPkF1WgeCPJdoQpp1f/m24MSuk0p8wXiqkm6PDuj0X3i4wfAmHtIi5+KbCCYzpMyDez19EZblRoBuua2VY=
+	t=1720693230; cv=none; b=oFuluiGp6/zqihi4fNoHLuN4dVVpWnNqZcfYqJVuCyeCUc4IsbRh95CRf8a5N6NHep70pr3RjWToF4dBYkTn7q3FSPwlYONa90RA6CArcdbdApT5ZXZjoRkx7mV0DBLhz0NIbSWaZTgSs/GF38x/ZDLSUEYOVCswgo04cu+tKA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720692684; c=relaxed/simple;
-	bh=q4U8ZW0taWEYvN7i+FHy9cnxKlt2ValwXbb4QmRWgFw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BaRM0ek/QCWc4S6CBiykfQVLnrXPJeA72yEJisAd7dFTr9KD7FRsfgaWF6uZnrCVPl+3Qs8ToM/FipcNolArNd53BnLoTs113TK6VurhNzfRptQv5dIDcZlrLQRSeWbJG+9hrs5YzHqWPrIbdSMeyYh69o1KxuehSMUzgw2dRIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Ng1GEOVE; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id F007D207AC;
-	Thu, 11 Jul 2024 12:11:20 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F8bz9GepqIWX; Thu, 11 Jul 2024 12:11:20 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 6EE13206F0;
-	Thu, 11 Jul 2024 12:11:20 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6EE13206F0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1720692680;
-	bh=WuMx0euj7Ycy5E1NTZ8V2oPXNpWBYrLeX7oL885Dqtg=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Ng1GEOVEALgAbZ42mCkEtkLJeoNaR72qaKrwUNseL8WJi23RqW0OsfmL2IIKWnyXR
-	 gHspj/1C+bHkgAU+SLB1G6unfRlXk6bphhVgnJSitVRpknnoo/DyU68Cp4UyvAOG0G
-	 pgAHcCIIRkGOxW/ydr7hGzxi3d2ICubWGO1DltuPuYm6L0tqnh58tGUdKqJEmY/W9u
-	 TRPTHOb0DaOFoMt15h0nHhbOJQ7bhZKhrvLLtPT/UyQRounZ/3E9Beg3Cg47wsWi8Z
-	 PDRH+H3LAx2r8RUbIQcgAIV6pcXH1pnrmxe51GdxXBxD+aYOqYjNUmlk9Wo/M3Aqic
-	 IcQBFVa85KE5w==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id 6830980004A;
-	Thu, 11 Jul 2024 12:11:20 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 11 Jul 2024 12:11:20 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 11 Jul
- 2024 12:11:19 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 719953182AE6; Thu, 11 Jul 2024 12:11:19 +0200 (CEST)
-Date: Thu, 11 Jul 2024 12:11:19 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Mike Yu <yumike@google.com>, <netdev@vger.kernel.org>,
-	<stanleyjhu@google.com>, <martinwu@google.com>, <chiachangwang@google.com>
-Subject: Re: [PATCH ipsec v3 0/4] Support IPsec crypto offload for IPv6 ESP
- and IPv4 UDP-encapsulated ESP data paths
-Message-ID: <Zo+vx4wS49TNX4fa@gauss3.secunet.de>
-References: <20240710111654.4085575-1-yumike@google.com>
- <20240711095208.GN6668@unreal>
+	s=arc-20240116; t=1720693230; c=relaxed/simple;
+	bh=KuLkmPep0FgB/b9onjhI7XMc1imfQqx3j5EA9FWI9tY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XrkKGi3TWwAde03xsCnXQ4GYP25PDZByLx9+8MHLef/Xe/+GR29LNltrPi0IIo4ip27gmls5b5iXJZGHtXIQ5eEv6eTW9CNT2kB8ybR+Hdce3GBHuXuHJp3f91oPWQ8XqOof38+n7TPEPDaDUw7ppuT982DopgQoyeeMUX7p1JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZ9Bmm+v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3F1AC32786;
+	Thu, 11 Jul 2024 10:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720693229;
+	bh=KuLkmPep0FgB/b9onjhI7XMc1imfQqx3j5EA9FWI9tY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WZ9Bmm+vb36W/NTCnTCuq/j+PDx9P1TZ969KcaxpR/PkSO0pu+nnLnXpBnXSC3FU4
+	 em6I1UMOSt9RhLmaWnrCf76FvfMuO1LKJDqHNF1yjOcWHp3mWNO5IvkzeZRmoI/OT5
+	 AaxV4cdzJlI4cPbuCXX4ngZ4PDCOPr21mdcyM8i94rYCN5MmZD53AL7f5JtVbJp88U
+	 QI6qd00Ob7F9IHNK9p0X41750xmXWyySnUIP2QVKXg4pChcW9+j/3EUBkZzkM9PmaF
+	 sIdRCHm4g+zSKRKEUu1sfvlOndXPCKr6vBq/TA81jetYwILl87p+1KcfVKTo9iNIWb
+	 gNQtiyvdK9r2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9340CC433E9;
+	Thu, 11 Jul 2024 10:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240711095208.GN6668@unreal>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net/sched: Fix UAF when resolving a clash
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172069322959.11889.7076340448823741973.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jul 2024 10:20:29 +0000
+References: <20240710053747.13223-1-chengen.du@canonical.com>
+In-Reply-To: <20240710053747.13223-1-chengen.du@canonical.com>
+To: Chengen Du <chengen.du@canonical.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ozsh@nvidia.com, paulb@nvidia.com, marcelo.leitner@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ gerald.yang@canonical.com
 
-On Thu, Jul 11, 2024 at 12:52:08PM +0300, Leon Romanovsky wrote:
-> On Wed, Jul 10, 2024 at 07:16:50PM +0800, Mike Yu wrote:
-> > 
-> > Mike Yu (4):
-> >   xfrm: Support crypto offload for inbound IPv6 ESP packets not in GRO
-> >     path
-> >   xfrm: Allow UDP encapsulation in crypto offload control path
-> >   xfrm: Support crypto offload for inbound IPv4 UDP-encapsulated ESP
-> >     packet
-> >   xfrm: Support crypto offload for outbound IPv4 UDP-encapsulated ESP
-> >     packet
-> > 
-> >  net/ipv4/esp4.c         |  8 +++++++-
-> >  net/ipv4/esp4_offload.c | 17 ++++++++++++++++-
-> >  net/xfrm/xfrm_device.c  |  6 +++---
-> >  net/xfrm/xfrm_input.c   |  3 ++-
-> >  net/xfrm/xfrm_policy.c  |  5 ++++-
-> >  5 files changed, 32 insertions(+), 7 deletions(-)
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 10 Jul 2024 13:37:47 +0800 you wrote:
+> KASAN reports the following UAF:
 > 
-> Steffen,
+>  BUG: KASAN: slab-use-after-free in tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
+>  Read of size 1 at addr ffff888c07603600 by task handler130/6469
 > 
-> If it helps, we tested v2 version and it didn't break anything for us :).
-> But we didn't test this specific functionality.
+>  Call Trace:
+>   <IRQ>
+>   dump_stack_lvl+0x48/0x70
+>   print_address_description.constprop.0+0x33/0x3d0
+>   print_report+0xc0/0x2b0
+>   kasan_report+0xd0/0x120
+>   __asan_load1+0x6c/0x80
+>   tcf_ct_flow_table_process_conn+0x12b/0x380 [act_ct]
+>   tcf_ct_act+0x886/0x1350 [act_ct]
+>   tcf_action_exec+0xf8/0x1f0
+>   fl_classify+0x355/0x360 [cls_flower]
+>   __tcf_classify+0x1fd/0x330
+>   tcf_classify+0x21c/0x3c0
+>   sch_handle_ingress.constprop.0+0x2c5/0x500
+>   __netif_receive_skb_core.constprop.0+0xb25/0x1510
+>   __netif_receive_skb_list_core+0x220/0x4c0
+>   netif_receive_skb_list_internal+0x446/0x620
+>   napi_complete_done+0x157/0x3d0
+>   gro_cell_poll+0xcf/0x100
+>   __napi_poll+0x65/0x310
+>   net_rx_action+0x30c/0x5c0
+>   __do_softirq+0x14f/0x491
+>   __irq_exit_rcu+0x82/0xc0
+>   irq_exit_rcu+0xe/0x20
+>   common_interrupt+0xa1/0xb0
+>   </IRQ>
+>   <TASK>
+>   asm_common_interrupt+0x27/0x40
 > 
-> Thanks
+> [...]
 
-Thanks for testing it Leon!
+Here is the summary with links:
+  - [net,v3] net/sched: Fix UAF when resolving a clash
+    https://git.kernel.org/netdev/net/c/26488172b029
 
-This is a new feature, so I don't want to apply it to the ipsec
-tree. Mike, can you rebase on top of ipsec-next instead?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks!
+
 
