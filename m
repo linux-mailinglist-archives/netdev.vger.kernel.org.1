@@ -1,43 +1,75 @@
-Return-Path: <netdev+bounces-110730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDAD92DFBB
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:44:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B5992DFC0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 859E11F21B17
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:44:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1512280C83
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 05:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E8C77105;
-	Thu, 11 Jul 2024 05:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2A91C3D;
+	Thu, 11 Jul 2024 05:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNGJ+/jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788A313B597
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 05:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88ED92119;
+	Thu, 11 Jul 2024 05:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720676613; cv=none; b=NT2yyj1ZrAEuWrm68/rkSzXtlobZNsnkKelKPmMnJvP1DeOd8HfL7XE8vFu664U+0qHgw+5RGDmKpbH6/FcgvDq5RlYSGTqcgoeBRID0beNoMlrhO57qVwVr64hmZBQPIolmcLJc/wXbWvjn0NB4hnc+yfiolXddnJ034y7tdJ4=
+	t=1720676743; cv=none; b=hfMORjllAurO1UyZP91O0usuSWX8iW/lxVllwGcGUI08RyD/Nvio3fRGoIssVYmB+1eI/YMexuJlkXmPfkJWADwWR05dXvGRqd/U7I0IdIaUN6lvQEODRf/pfBiI31DqLOhdrEqm69FIoAzNmT4R6ksUh1PCXQA511FZhOvNTNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720676613; c=relaxed/simple;
-	bh=ujzooORsvDqX/uvI+ZN6HrRNY5a1IMUpwn2pVDWpbHY=;
+	s=arc-20240116; t=1720676743; c=relaxed/simple;
+	bh=ELoHEJ2+KbO+wHuoqBpQ70khjf9eHXpu783a8MGEV8I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rkU3FMR/4jiAo+HhOtJFI3n5js1ClZ1tiT6tCtsReL59d461f61bnccd+MGmxdrIU+DJ7pNWk+Rzd7y0KZDbrg93djs/phVZwDOa11Fq1X6kJW0XSQ5PtCnATUg1hlMQkYc3VbASEGQIO0uNklrP0uRaCxWuikPsX5HRENMNGjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af435.dynamic.kabel-deutschland.de [95.90.244.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B2D4161E4050B;
-	Thu, 11 Jul 2024 07:42:52 +0200 (CEST)
-Message-ID: <565ea3da-06a9-481d-b32f-32c8c7240dad@molgen.mpg.de>
-Date: Thu, 11 Jul 2024 07:42:52 +0200
+	 In-Reply-To:Content-Type; b=alyK1qRw/nJFfLXM3chBkWQM76e1hii/x9arkUJLP0BoyvFfU7k58TJpli/EpPxl4CDSuTafW0kWV5gGCj6/Rv4z34kXjPeLN3UBI+XZ5M3chSXdGTdhSQ67Z988hMfbaZ1XNKBe9JvFGIw8JqfSsbBhnlJVEnFPZ69wgKpixj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QNGJ+/jk; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-58e76294858so2826190a12.0;
+        Wed, 10 Jul 2024 22:45:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720676740; x=1721281540; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FB4o4e+0EEgnFpZcz2u80/4PAAOac+hLFukD7y+GNS0=;
+        b=QNGJ+/jkkZoda+VCysqrrImsF+U6YPC5Gy9ISZm4b3jXqzRqaOXC20pabNM21Lr5cn
+         56Cl5XnN5xihfWCjAwF7QFb/F5bOM94qKfoC0VbDyZ2GWlnK7RyiCBvGsRRvdpqipY/w
+         H/Ey2ezh06/Q2707BBaEEf+Gt4HoqVVRcNI6scHwKB5StMD5oIdpjqj4AVlpa13VU+IU
+         rXlk1/Ee03KbfbE7brJ3hcQ7i8+J6jDjZ0i/4ouN1X02lqOKwAwmsMmO9WVhEExT+HSO
+         mgABl2QoxDLLdI8WBUG7C9BA+L71OF7G69BnfyvD6V3hCBE9y2VIk/agU5nBECwSAJZW
+         NvgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720676740; x=1721281540;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FB4o4e+0EEgnFpZcz2u80/4PAAOac+hLFukD7y+GNS0=;
+        b=bcB3f8ElIGMi/csa7QVZFzdi15PoUOjg8uBh9HhaliUIeFSr3oO4yE6HaLKyac4dMx
+         Fg30IUdl+IoIZGk6YfxBbiTAeH/6T9o6VMvv3HmNa8+lUaaJIjgP9cmhI5vfop1sbwPv
+         IB0ybt0yi+EL/3+yYbkZzOK02QH+sfCXuVtE/IYU8uFmk3HN4mEeVYFirDprwf4d7u6Z
+         LKgBMJeHBOclg/6pipiFtMGsXyjFAInDxKjTmYmrPJhG+89Mq3BFf6t8hTnZq+lQog1F
+         CH4ojVlZyRdTCe9gZRxXOalRiPtcCf8+q+8G2Jf6eZGrgs9Y6OFYRmEtAUDeH5Ae6SQF
+         ZycQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNLSBoqLiZk62zWdcG/5ramH11XudLXi6o5nwovWiLe2hvprtjtv7BqgY7DZP3EMCKCYptZpRviHmwcvIkxxvq76cE2fdFt+H4UucLT6RiEe7c1+IrM4+1PVtR0kVnzh/g2FjJM1rOxDn3p9SL/bs2AT1b+HfzjlNV52BkfD+i
+X-Gm-Message-State: AOJu0Ywo+9iEGoFi65GNzQAByRfT3YBXnZNsa0o/cp/yYwNr/69iEQyi
+	OEiPGEw5e7OPzph0WX5SrWeuVeiLQ2WfehEQmZ3hDIi6GFtUnFEb8eyMVQ==
+X-Google-Smtp-Source: AGHT+IHDd0CIJO740tR2d0J+wToPFSwIiOEAmx+JE2OwGEkLe8GK5JkNjCeLsNlyH1fZCa/WXTJ7dg==
+X-Received: by 2002:a17:906:3891:b0:a77:afd5:62aa with SMTP id a640c23a62f3a-a798a48817emr112440166b.23.1720676739581;
+        Wed, 10 Jul 2024 22:45:39 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:958a:400:20d6:5852:848d:41f6? (dynamic-2a02-3100-958a-0400-20d6-5852-848d-41f6.310.pool.telefonica.de. [2a02:3100:958a:400:20d6:5852:848d:41f6])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a780a6bc86bsm223560566b.31.2024.07.10.22.45.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jul 2024 22:45:39 -0700 (PDT)
+Message-ID: <ad0d1201-1fe1-4170-8cfa-d23e74ef8bfd@gmail.com>
+Date: Thu, 11 Jul 2024 07:45:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,838 +77,356 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 11/13] ice: enable FDIR
- filters from raw binary patterns for VFs
-To: Ahmed Zaki <ahmed.zaki@intel.com>, Junfeng Guo <junfeng.guo@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Marcin Szycik <marcin.szycik@linux.intel.com>, anthony.l.nguyen@intel.com,
- horms@kernel.org
-References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-12-ahmed.zaki@intel.com>
+Subject: Re: [PATCH] PCI: r8169: add suspend/resume aspm quirk
+To: George-Daniel Matei <danielgeorgem@chromium.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, nic_swsd@realtek.com, netdev@vger.kernel.org,
+ Bjorn Helgaas <helgaas@kernel.org>
+References: <20240708172339.GA139099@bhelgaas>
+ <e1ed82cb-6d20-4ca8-b047-4a02dde115a8@gmail.com>
+ <CACfW=qpNmSeQVG_qSeYpEdk9pf_RTAEEKp+OiBYrRFd3d6HOXg@mail.gmail.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240710204015.124233-12-ahmed.zaki@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <CACfW=qpNmSeQVG_qSeYpEdk9pf_RTAEEKp+OiBYrRFd3d6HOXg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Dear Ahmed, dear Junfeng,
-
-
-Thank you for the patch.
-
-Am 10.07.24 um 22:40 schrieb Ahmed Zaki:
-> From: Junfeng Guo <junfeng.guo@intel.com>
+On 10.07.2024 17:09, George-Daniel Matei wrote:
+> Hi,
 > 
-> Enable VFs to create FDIR filters from raw binary patterns.
-> The corresponding processes for raw flow are added in the
-> Parse / Create / Destroy stages.
+>>> Added aspm suspend/resume hooks that run
+>>> before and after suspend and resume to change
+>>> the ASPM states of the PCI bus in order to allow
+>>> the system suspend while trying to prevent card hangs
+>>
+>> Why is this needed?  Is there a r8169 defect we're working around?
+>> A BIOS defect?  Is there a problem report you can reference here?
+>>
 > 
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
-> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
->   .../net/ethernet/intel/ice/ice_flex_pipe.c    |  48 +++
->   .../net/ethernet/intel/ice/ice_flex_pipe.h    |   3 +
->   drivers/net/ethernet/intel/ice/ice_flow.c     | 106 +++++
->   drivers/net/ethernet/intel/ice/ice_flow.h     |   5 +
->   drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   8 +
->   .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 404 +++++++++++++++++-
->   6 files changed, 566 insertions(+), 8 deletions(-)
+> We encountered this issue while upgrading from kernel v6.1 to v6.6.
+> The system would not suspend with 6.6. We tracked down the problem to
+> the NIC of the device, mainly that the following code was removed in
+> 6.6:
+>> else if (tp->mac_version >= RTL_GIGA_MAC_VER_46)
+>>         rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);1
+
+With this (older) 6.1 version everything is ok?
+Would mean that L1.1 is active and the system suspends (STR?) properly
+also with L1.1 being active.
+
+Under 6.6 per default L1 (incl. sub-states) is disabled.
+Then you manually enable L1 (incl. L1.1, but not L1.2?) via sysfs,
+and now the system hangs on suspend?
+
+Is this what you're saying? Would be strange because in both cases
+L1.1 is active when suspending.
+
+
+> For the listed devices, ASPM L1 is disabled entirely in 6.6. As for
+> the reason, L1 was observed to cause some problems
+> (https://bugzilla.kernel.org/show_bug.cgi?id=217814). We use a Raptor
+> Lake soc and it won't change residency if the NIC doesn't have L1
+> enabled. I saw in 6.1 the following comment:
+>> Chips from RTL8168h partially have issues with L1.2, but seem
+>> to work fine with L1 and L1.1.
+> I was thinking that disabling/enabling L1.1 on the fly before/after
+> suspend could help mitigate the risk associated with L1/L1.1 . I know
+> that ASPM settings are exposed in sysfs and that this could be done
+> from outside the kernel, that was my first approach, but it was
+> suggested to me that this kind of workaround would be better suited
+> for quirks. I did around 1000 suspend/resume cycles of 16-30 seconds
+> each (correcting the resume dev->bus->self being configured twice
+> mistake) and did not notice any problems. What do you think, is this a
+> good approach ... ?
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> index a750d7e1edd8..51aa6525565c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-> @@ -4146,6 +4146,54 @@ ice_add_prof_id_flow(struct ice_hw *hw, enum ice_block blk, u16 vsi, u64 hdl)
->   	return status;
->   }
->   
-> +/**
-> + * ice_flow_assoc_fdir_prof - add a FDIR profile for main/ctrl VSI
+>>> +             //configure device
+>>> +             pcie_capability_clear_and_set_word(dev, PCI_EXP_LNKCTL,
+>>> +                                                PCI_EXP_LNKCTL_ASPMC, 0);
+>>> +
+>>> +             pci_read_config_word(dev->bus->self,
+>>> +                                  dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>> +                                  &val);
+>>> +             val = val & ~PCI_L1SS_CTL1_L1SS_MASK;
+>>> +             pci_write_config_word(dev->bus->self,
+>>> +                                   dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>> +                                   val);
+>> Updates the parent (dev->bus->self) twice; was the first one supposed
+>> to update the device (dev)?
+> Yes, it was supposed to update the device (dev). It's my first time
+> sending a patch and I messed something up while doing some style
+> changes, I will correct it. I'm sorry for that.
+> 
+>> This doesn't restore the state as it existed before suspend.  Does
+>> this rely on other parts of restore to do that?
+> It operates on the assumption that after driver initialization
+> PCI_EXP_LNKCTL_ASPMC is 0 and that there are no states enabled in
+> CTL1. I did a lspci -vvv dump on the affected devices before and after
+> the quirks ran and saw no difference. This could be improved.
+> 
+>> What is the RTL8168 chip version used on these systems?
+> It should be RTL8111H.
+> 
+>> What's the root cause of the issue?
+>> A silicon bug on the host side?
+> I think it's the ASPM implementation of the soc.
+> 
+>> ASPM L1 is disabled per default in r8169. So why is the patch needed
+>> at all?
+> Leaving it disabled all the time prevents the system from suspending.
+> 
+> Thank you,
+> George-Daniel Matei
+> 
+> 
+> 
+> 
+> 
+> On Tue, Jul 9, 2024 at 12:15 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>
+>> On 08.07.2024 19:23, Bjorn Helgaas wrote:
+>>> [+cc r8169 folks]
+>>>
+>>> On Mon, Jul 08, 2024 at 03:38:15PM +0000, George-Daniel Matei wrote:
+>>>> Added aspm suspend/resume hooks that run
+>>>> before and after suspend and resume to change
+>>>> the ASPM states of the PCI bus in order to allow
+>>>> the system suspend while trying to prevent card hangs
+>>>
+>>> Why is this needed?  Is there a r8169 defect we're working around?
+>>> A BIOS defect?  Is there a problem report you can reference here?
+>>>
+>>
+>> Basically the same question from my side. Apparently such a workaround
+>> isn't needed on any other system. And Realtek NICs can be found on more
+>> or less every consumer system. What's the root cause of the issue?
+>> A silicon bug on the host side?
+>>
+>> What is the RTL8168 chip version used on these systems?
+>>
+>> ASPM L1 is disabled per default in r8169. So why is the patch needed
+>> at all?
+>>
+>>> s/Added/Add/
+>>>
+>>> s/aspm/ASPM/ above
+>>>
+>>> s/PCI bus/device and parent/
+>>>
+>>> Add period at end of sentence.
+>>>
+>>> Rewrap to fill 75 columns.
+>>>
+>>>> Signed-off-by: George-Daniel Matei <danielgeorgem@chromium.org>
+>>>> ---
+>>>>  drivers/pci/quirks.c | 142 +++++++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 142 insertions(+)
+>>>>
+>>>> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+>>>> index dc12d4a06e21..aa3dba2211d3 100644
+>>>> --- a/drivers/pci/quirks.c
+>>>> +++ b/drivers/pci/quirks.c
+>>>> @@ -6189,6 +6189,148 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x56b0, aspm_l1_acceptable_latency
+>>>>  DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x56b1, aspm_l1_acceptable_latency);
+>>>>  DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x56c0, aspm_l1_acceptable_latency);
+>>>>  DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x56c1, aspm_l1_acceptable_latency);
+>>>> +
+>>>> +static const struct dmi_system_id chromebox_match_table[] = {
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Brask"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Aurash"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +            {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Bujia"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Gaelin"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Gladios"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Hahn"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Jeev"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Kinox"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Kuldax"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +            .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Lisbon"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    {
+>>>> +                    .matches = {
+>>>> +                    DMI_MATCH(DMI_PRODUCT_NAME, "Moli"),
+>>>> +                    DMI_MATCH(DMI_BIOS_VENDOR, "coreboot"),
+>>>> +            }
+>>>> +    },
+>>>> +    { }
+>>>> +};
+>>>> +
+>>>> +static void rtl8169_suspend_aspm_settings(struct pci_dev *dev)
+>>>> +{
+>>>> +    u16 val = 0;
+>>>> +
+>>>> +    if (dmi_check_system(chromebox_match_table)) {
+>>>> +            //configure parent
+>>>> +            pcie_capability_clear_and_set_word(dev->bus->self,
+>>>> +                                               PCI_EXP_LNKCTL,
+>>>> +                                               PCI_EXP_LNKCTL_ASPMC,
+>>>> +                                               PCI_EXP_LNKCTL_ASPM_L1);
+>>>> +
+>>>> +            pci_read_config_word(dev->bus->self,
+>>>> +                                 dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                 &val);
+>>>> +            val = (val & ~PCI_L1SS_CTL1_L1SS_MASK) |
+>>>> +                  PCI_L1SS_CTL1_PCIPM_L1_2 | PCI_L1SS_CTL1_PCIPM_L1_2 |
+>>>> +                  PCI_L1SS_CTL1_ASPM_L1_1;
+>>>> +            pci_write_config_word(dev->bus->self,
+>>>> +                                  dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                  val);
+>>>> +
+>>>> +            //configure device
+>>>> +            pcie_capability_clear_and_set_word(dev, PCI_EXP_LNKCTL,
+>>>> +                                               PCI_EXP_LNKCTL_ASPMC,
+>>>> +                                               PCI_EXP_LNKCTL_ASPM_L1);
+>>>> +
+>>>> +            pci_read_config_word(dev, dev->l1ss + PCI_L1SS_CTL1, &val);
+>>>> +            val = (val & ~PCI_L1SS_CTL1_L1SS_MASK) |
+>>>> +                  PCI_L1SS_CTL1_PCIPM_L1_2 | PCI_L1SS_CTL1_PCIPM_L1_2 |
+>>>> +                  PCI_L1SS_CTL1_ASPM_L1_1;
+>>>> +            pci_write_config_word(dev, dev->l1ss + PCI_L1SS_CTL1, val);
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +DECLARE_PCI_FIXUP_SUSPEND(PCI_VENDOR_ID_REALTEK, 0x8168,
+>>>> +                      rtl8169_suspend_aspm_settings);
+>>>> +
+>>>> +static void rtl8169_resume_aspm_settings(struct pci_dev *dev)
+>>>> +{
+>>>> +    u16 val = 0;
+>>>> +
+>>>> +    if (dmi_check_system(chromebox_match_table)) {
+>>>> +            //configure device
+>>>> +            pcie_capability_clear_and_set_word(dev, PCI_EXP_LNKCTL,
+>>>> +                                               PCI_EXP_LNKCTL_ASPMC, 0);
+>>>> +
+>>>> +            pci_read_config_word(dev->bus->self,
+>>>> +                                 dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                 &val);
+>>>> +            val = val & ~PCI_L1SS_CTL1_L1SS_MASK;
+>>>> +            pci_write_config_word(dev->bus->self,
+>>>> +                                  dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                  val);
+>>>> +
+>>>> +            //configure parent
+>>>> +            pcie_capability_clear_and_set_word(dev->bus->self,
+>>>> +                                               PCI_EXP_LNKCTL,
+>>>> +                                               PCI_EXP_LNKCTL_ASPMC, 0);
+>>>> +
+>>>> +            pci_read_config_word(dev->bus->self,
+>>>> +                                 dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                 &val);
+>>>> +            val = val & ~PCI_L1SS_CTL1_L1SS_MASK;
+>>>> +            pci_write_config_word(dev->bus->self,
+>>>> +                                  dev->bus->self->l1ss + PCI_L1SS_CTL1,
+>>>> +                                  val);
+>>>
+>>> Updates the parent (dev->bus->self) twice; was the first one supposed
+>>> to update the device (dev)?
+>>>
+>>> This doesn't restore the state as it existed before suspend.  Does
+>>> this rely on other parts of restore to do that?
+>>>
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +DECLARE_PCI_FIXUP_RESUME(PCI_VENDOR_ID_REALTEK, 0x8168,
+>>>> +                     rtl8169_resume_aspm_settings);
+>>>>  #endif
+>>>>
+>>>>  #ifdef CONFIG_PCIE_DPC
+>>>> --
+>>>> 2.45.2.803.g4e1b14247a-goog
+>>>>
+>>
 
-a*n* FDIR?
-
-> + * @hw: pointer to the HW struct
-> + * @blk: HW block
-> + * @dest_vsi: dest VSI
-> + * @fdir_vsi: fdir programming VSI
-> + * @hdl: profile handle
-> + *
-> + * Update the hardware tables to enable the FDIR profile indicated by @hdl for
-> + * the VSI specified by @dest_vsi. On success, the flow will be enabled.
-> + *
-> + * Return: 0 on success or negative errno on failure.
-> + */
-> +int
-> +ice_flow_assoc_fdir_prof(struct ice_hw *hw, enum ice_block blk,
-> +			 u16 dest_vsi, u16 fdir_vsi, u64 hdl)
-> +{
-> +	int status = 0;
-> +	u16 vsi_num;
-> +
-> +	if (blk != ICE_BLK_FD)
-> +		return -EINVAL;
-> +
-> +	vsi_num = ice_get_hw_vsi_num(hw, dest_vsi);
-> +	status = ice_add_prof_id_flow(hw, blk, vsi_num, hdl);
-> +	if (status) {
-> +		ice_debug(hw, ICE_DBG_FLOW, "HW profile add failed for main VSI flow entry: %d\n",
-
-Maybe: Adding HW profile failed …? (Also below.)
-
-> +			  status);
-> +		return status;
-> +	}
-> +
-> +	vsi_num = ice_get_hw_vsi_num(hw, fdir_vsi);
-> +	status = ice_add_prof_id_flow(hw, blk, vsi_num, hdl);
-> +	if (status) {
-> +		ice_debug(hw, ICE_DBG_FLOW, "HW profile add failed for ctrl VSI flow entry: %d\n",
-> +			  status);
-> +		goto err;
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	vsi_num = ice_get_hw_vsi_num(hw, dest_vsi);
-> +	ice_rem_prof_id_flow(hw, blk, vsi_num, hdl);
-> +
-> +	return status;
-> +}
-> +
->   /**
->    * ice_rem_prof_from_list - remove a profile from list
->    * @hw: pointer to the HW struct
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> index 7c66652dadd6..90b9b0993122 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
-> @@ -51,6 +51,9 @@ int
->   ice_add_prof_id_flow(struct ice_hw *hw, enum ice_block blk, u16 vsi, u64 hdl);
->   int
->   ice_rem_prof_id_flow(struct ice_hw *hw, enum ice_block blk, u16 vsi, u64 hdl);
-> +int
-> +ice_flow_assoc_fdir_prof(struct ice_hw *hw, enum ice_block blk,
-> +			 u16 dest_vsi, u16 fdir_vsi, u64 hdl);
->   enum ice_ddp_state ice_init_pkg(struct ice_hw *hw, u8 *buff, u32 len);
->   enum ice_ddp_state
->   ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf, u32 len);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-> index 79106503194b..99d584f46c23 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flow.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-> @@ -409,6 +409,29 @@ static const u32 ice_ptypes_gtpc_tid[] = {
->   };
->   
->   /* Packet types for GTPU */
-> +static const struct ice_ptype_attributes ice_attr_gtpu_session[] = {
-> +	{ ICE_MAC_IPV4_GTPU_IPV4_FRAG,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV4_PAY,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV4_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV4_TCP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV4_ICMP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV4_FRAG,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV4_PAY,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV4_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV4_TCP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV4_ICMP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV6_FRAG,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV6_PAY,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV6_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV6_TCP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV4_GTPU_IPV6_ICMPV6,  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV6_FRAG,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV6_PAY,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV6_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV6_TCP,	  ICE_PTYPE_ATTR_GTP_SESSION },
-> +	{ ICE_MAC_IPV6_GTPU_IPV6_ICMPV6,  ICE_PTYPE_ATTR_GTP_SESSION },
-> +};
-> +
->   static const struct ice_ptype_attributes ice_attr_gtpu_eh[] = {
->   	{ ICE_MAC_IPV4_GTPU_IPV4_FRAG,	  ICE_PTYPE_ATTR_GTP_PDU_EH },
->   	{ ICE_MAC_IPV4_GTPU_IPV4_PAY,	  ICE_PTYPE_ATTR_GTP_PDU_EH },
-> @@ -1523,6 +1546,89 @@ ice_flow_disassoc_prof(struct ice_hw *hw, enum ice_block blk,
->   	return status;
->   }
->   
-> +#define FLAG_GTP_EH_PDU_LINK	BIT_ULL(13)
-> +#define FLAG_GTP_EH_PDU		BIT_ULL(14)
-> +
-> +#define HI_BYTE_IN_WORD		GENMASK(15, 8)
-> +#define LO_BYTE_IN_WORD		GENMASK(7, 0)
-> +
-> +#define FLAG_GTPU_MSK	\
-> +	(FLAG_GTP_EH_PDU | FLAG_GTP_EH_PDU_LINK)
-> +#define FLAG_GTPU_UP	\
-> +	(FLAG_GTP_EH_PDU | FLAG_GTP_EH_PDU_LINK)
-> +#define FLAG_GTPU_DW	FLAG_GTP_EH_PDU
-> +/**
-> + * ice_flow_set_parser_prof - Set flow profile based on the parsed profile info
-> + * @hw: pointer to the HW struct
-> + * @dest_vsi: dest VSI
-> + * @fdir_vsi: fdir programming VSI
-> + * @prof: stores parsed profile info from raw flow
-> + * @blk: classification blk
-> + *
-> + * Return: 0 on success or negative errno on failure.
-> + */
-> +int
-> +ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
-> +			 struct ice_parser_profile *prof, enum ice_block blk)
-> +{
-> +	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
-> +	struct ice_flow_prof_params *params __free(kfree);
-> +	u8 fv_words = hw->blk[blk].es.fvw;
-> +	int status;
-> +	int i, idx;
-
-Use size_t as it’s used in arrays?
-
-> +
-> +	params = kzalloc(sizeof(*params), GFP_KERNEL);
-> +	if (!params)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < ICE_MAX_FV_WORDS; i++) {
-> +		params->es[i].prot_id = ICE_PROT_INVALID;
-> +		params->es[i].off = ICE_FV_OFFSET_INVAL;
-> +	}
-> +
-> +	for (i = 0; i < prof->fv_num; i++) {
-> +		if (hw->blk[blk].es.reverse)
-> +			idx = fv_words - i - 1;
-> +		else
-> +			idx = i;
-
-Use ternery operator?
-
-> +		params->es[idx].prot_id = prof->fv[i].proto_id;
-> +		params->es[idx].off = prof->fv[i].offset;
-> +		params->mask[idx] = (((prof->fv[i].msk) << BITS_PER_BYTE) &
-> +				      HI_BYTE_IN_WORD) |
-> +				    (((prof->fv[i].msk) >> BITS_PER_BYTE) &
-> +				      LO_BYTE_IN_WORD);
-> +	}
-> +
-> +	switch (prof->flags) {
-> +	case FLAG_GTPU_DW:
-> +		params->attr = ice_attr_gtpu_down;
-> +		params->attr_cnt = ARRAY_SIZE(ice_attr_gtpu_down);
-> +		break;
-> +	case FLAG_GTPU_UP:
-> +		params->attr = ice_attr_gtpu_up;
-> +		params->attr_cnt = ARRAY_SIZE(ice_attr_gtpu_up);
-> +		break;
-> +	default:
-> +		if (prof->flags_msk & FLAG_GTPU_MSK) {
-> +			params->attr = ice_attr_gtpu_session;
-> +			params->attr_cnt = ARRAY_SIZE(ice_attr_gtpu_session);
-> +		}
-> +		break;
-> +	}
-> +
-> +	status = ice_add_prof(hw, blk, id, (u8 *)prof->ptypes,
-> +			      params->attr, params->attr_cnt,
-> +			      params->es, params->mask, false, false);
-> +	if (status)
-> +		return status;
-> +
-> +	status = ice_flow_assoc_fdir_prof(hw, blk, dest_vsi, fdir_vsi, id);
-> +	if (status)
-> +		ice_rem_prof(hw, blk, id);
-> +
-> +	return status;
-> +}
-> +
->   /**
->    * ice_flow_add_prof - Add a flow profile for packet segments and matched fields
->    * @hw: pointer to the HW struct
-> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
-> index 2fd2e0cb483d..6cb7bb879c98 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_flow.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_flow.h
-> @@ -5,6 +5,7 @@
->   #define _ICE_FLOW_H_
->   
->   #include "ice_flex_type.h"
-> +#include "ice_parser.h"
->   
->   #define ICE_FLOW_ENTRY_HANDLE_INVAL	0
->   #define ICE_FLOW_FLD_OFF_INVAL		0xffff
-> @@ -326,6 +327,7 @@ enum ice_rss_cfg_hdr_type {
->   	ICE_RSS_ANY_HEADERS
->   };
->   
-> +struct ice_vsi;
->   struct ice_rss_hash_cfg {
->   	u32 addl_hdrs; /* protocol header fields */
->   	u64 hash_flds; /* hash bit field (ICE_FLOW_HASH_*) to configure */
-> @@ -445,6 +447,9 @@ ice_flow_add_prof(struct ice_hw *hw, enum ice_block blk, enum ice_flow_dir dir,
->   		  bool symm, struct ice_flow_prof **prof);
->   int ice_flow_rem_prof(struct ice_hw *hw, enum ice_block blk, u64 prof_id);
->   int
-> +ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
-> +			 struct ice_parser_profile *prof, enum ice_block blk);
-> +int
->   ice_flow_add_entry(struct ice_hw *hw, enum ice_block blk, u64 prof_id,
->   		   u64 entry_id, u16 vsi, enum ice_flow_priority prio,
->   		   void *data, u64 *entry_h);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> index fec16919ec19..be4266899690 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-> @@ -12,6 +12,7 @@
->   #include <net/devlink.h>
->   #include <linux/avf/virtchnl.h>
->   #include "ice_type.h"
-> +#include "ice_flow.h"
->   #include "ice_virtchnl_fdir.h"
->   #include "ice_vsi_vlan_ops.h"
->   
-> @@ -52,6 +53,12 @@ struct ice_mdd_vf_events {
->   	u16 last_printed;
->   };
->   
-> +/* Structure to store fdir fv entry */
-> +struct ice_fdir_prof_info {
-> +	struct ice_parser_profile prof;
-> +	u64 fdir_active_cnt;
-> +};
-> +
->   /* VF operations */
->   struct ice_vf_ops {
->   	enum ice_disq_rst_src reset_type;
-> @@ -91,6 +98,7 @@ struct ice_vf {
->   	u16 lan_vsi_idx;		/* index into PF struct */
->   	u16 ctrl_vsi_idx;
->   	struct ice_vf_fdir fdir;
-> +	struct ice_fdir_prof_info fdir_prof_info[ICE_MAX_PTGS];
->   	/* first vector index of this VF in the PF space */
->   	int first_vector_idx;
->   	struct ice_sw *vf_sw_id;	/* switch ID the VF VSIs connect to */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-> index b4feb0927687..b9294105b077 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
-> @@ -26,6 +26,15 @@ enum ice_fdir_tunnel_type {
->   	ICE_FDIR_TUNNEL_TYPE_NONE = 0,
->   	ICE_FDIR_TUNNEL_TYPE_GTPU,
->   	ICE_FDIR_TUNNEL_TYPE_GTPU_EH,
-> +	ICE_FDIR_TUNNEL_TYPE_ECPRI,
-> +	ICE_FDIR_TUNNEL_TYPE_GTPU_INNER,
-> +	ICE_FDIR_TUNNEL_TYPE_GTPU_EH_INNER,
-> +	ICE_FDIR_TUNNEL_TYPE_GRE,
-> +	ICE_FDIR_TUNNEL_TYPE_GTPOGRE,
-> +	ICE_FDIR_TUNNEL_TYPE_GTPOGRE_INNER,
-> +	ICE_FDIR_TUNNEL_TYPE_GRE_INNER,
-> +	ICE_FDIR_TUNNEL_TYPE_L2TPV2,
-> +	ICE_FDIR_TUNNEL_TYPE_L2TPV2_INNER,
->   };
->   
->   struct virtchnl_fdir_fltr_conf {
-> @@ -33,6 +42,11 @@ struct virtchnl_fdir_fltr_conf {
->   	enum ice_fdir_tunnel_type ttype;
->   	u64 inset_flag;
->   	u32 flow_id;
-> +
-> +	struct ice_parser_profile *prof;
-> +	bool parser_ena;
-> +	u8 *pkt_buf;
-> +	u8 pkt_len;
->   };
->   
->   struct virtchnl_fdir_inset_map {
-> @@ -786,6 +800,108 @@ ice_vc_fdir_config_input_set(struct ice_vf *vf, struct virtchnl_fdir_add *fltr,
->   	return ret;
->   }
->   
-> +/**
-> + * ice_vc_fdir_is_raw_flow
-> + * @proto: virtchnl protocol headers
-> + *
-> + * Check if the FDIR rule is raw flow (protocol agnostic flow) or not.
-> + * Note that common FDIR rule must have non-zero proto->count.
-> + * Thus, we choose the tunnel_level and count of proto as the indicators.
-
-I wouldn’t break the line after the end of the previous sentence.
-
-> + * If both tunnel_level and count of proto are zeros, this FDIR rule will
-
-are zero
-
-> + * be regarded as raw flow.
-> + *
-> + * Returns: true if headers describe raw flow, false otherwise.
-> + */
-> +static bool
-> +ice_vc_fdir_is_raw_flow(struct virtchnl_proto_hdrs *proto)
-> +{
-> +	return (proto->tunnel_level == 0 && proto->count == 0);
-> +}
-> +
-> +/**
-> + * ice_vc_fdir_parse_raw
-> + * @vf: pointer to the VF info
-> + * @proto: virtchnl protocol headers
-> + * @conf: FDIR configuration for each filter
-> + *
-> + * Parse the virtual channel filter's raw flow and store it in @conf
-> + *
-> + * Return: 0 on success or negative errno on failure.
-> + */
-> +static int
-> +ice_vc_fdir_parse_raw(struct ice_vf *vf,
-> +		      struct virtchnl_proto_hdrs *proto,
-> +		      struct virtchnl_fdir_fltr_conf *conf)
-> +{
-> +	u8 *pkt_buf, *msk_buf __free(kfree);
-> +	struct ice_parser_result rslt;
-> +	struct ice_pf *pf = vf->pf;
-> +	struct ice_parser *psr;
-> +	int status = -ENOMEM;
-> +	struct ice_hw *hw;
-> +	u16 udp_port = 0;
-> +
-> +	pkt_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
-> +	msk_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
-> +	if (!pkt_buf || !msk_buf)
-> +		goto err_mem_alloc;
-> +
-> +	memcpy(pkt_buf, proto->raw.spec, proto->raw.pkt_len);
-> +	memcpy(msk_buf, proto->raw.mask, proto->raw.pkt_len);
-> +
-> +	hw = &pf->hw;
-> +
-> +	/* Get raw profile info via Parser Lib */
-> +	psr = ice_parser_create(hw);
-> +	if (IS_ERR(psr)) {
-> +		status = PTR_ERR(psr);
-> +		goto err_mem_alloc;
-> +	}
-> +
-> +	ice_parser_dvm_set(psr, ice_is_dvm_ena(hw));
-> +
-> +	if (ice_get_open_tunnel_port(hw, &udp_port, TNL_VXLAN))
-> +		ice_parser_vxlan_tunnel_set(psr, udp_port, true);
-> +
-> +	status = ice_parser_run(psr, pkt_buf, proto->raw.pkt_len, &rslt);
-> +	if (status)
-> +		goto err_parser_destroy;
-> +
-> +	if (hw->debug_mask & ICE_DBG_PARSER)
-> +		ice_parser_result_dump(hw, &rslt);
-> +
-> +	conf->prof = kzalloc(sizeof(*conf->prof), GFP_KERNEL);
-> +	if (!conf->prof) {
-> +		status = -ENOMEM;
-> +		goto err_parser_destroy;
-> +	}
-> +
-> +	status = ice_parser_profile_init(&rslt, pkt_buf, msk_buf,
-> +					 proto->raw.pkt_len, ICE_BLK_FD,
-> +					 conf->prof);
-> +	if (status)
-> +		goto err_parser_profile_init;
-> +
-> +	if (hw->debug_mask & ICE_DBG_PARSER)
-> +		ice_parser_profile_dump(hw, conf->prof);
-> +
-> +	/* Store raw flow info into @conf */
-> +	conf->pkt_len = proto->raw.pkt_len;
-> +	conf->pkt_buf = pkt_buf;
-> +	conf->parser_ena = true;
-> +
-> +	ice_parser_destroy(psr);
-> +	return 0;
-> +
-> +err_parser_profile_init:
-> +	kfree(conf->prof);
-> +err_parser_destroy:
-> +	ice_parser_destroy(psr);
-> +err_mem_alloc:
-> +	kfree(pkt_buf);
-> +	return status;
-> +}
-> +
->   /**
->    * ice_vc_fdir_parse_pattern
->    * @vf: pointer to the VF info
-> @@ -813,6 +929,10 @@ ice_vc_fdir_parse_pattern(struct ice_vf *vf, struct virtchnl_fdir_add *fltr,
->   		return -EINVAL;
->   	}
->   
-> +	/* For raw FDIR filters created by the parser */
-> +	if (ice_vc_fdir_is_raw_flow(proto))
-> +		return ice_vc_fdir_parse_raw(vf, proto, conf);
-> +
->   	for (i = 0; i < proto->count; i++) {
->   		struct virtchnl_proto_hdr *hdr = &proto->proto_hdr[i];
->   		struct ip_esp_hdr *esph;
-> @@ -1101,8 +1221,10 @@ ice_vc_validate_fdir_fltr(struct ice_vf *vf, struct virtchnl_fdir_add *fltr,
->   	struct virtchnl_proto_hdrs *proto = &fltr->rule_cfg.proto_hdrs;
->   	int ret;
->   
-> -	if (!ice_vc_validate_pattern(vf, proto))
-> -		return -EINVAL;
-> +	/* For raw FDIR filters created by the parser */
-> +	if (!ice_vc_fdir_is_raw_flow(proto))
-> +		if (!ice_vc_validate_pattern(vf, proto))
-> +			return -EINVAL;
->   
->   	ret = ice_vc_fdir_parse_pattern(vf, fltr, conf);
->   	if (ret)
-> @@ -1295,11 +1417,15 @@ static int ice_vc_fdir_write_fltr(struct ice_vf *vf,
->   		return -ENOMEM;
->   
->   	ice_fdir_get_prgm_desc(hw, input, &desc, add);
-> -	ret = ice_fdir_get_gen_prgm_pkt(hw, input, pkt, false, is_tun);
-> -	if (ret) {
-> -		dev_dbg(dev, "Gen training pkt for VF %d ptype %d failed\n",
-> -			vf->vf_id, input->flow_type);
-> -		goto err_free_pkt;
-> +	if (conf->parser_ena) {
-> +		memcpy(pkt, conf->pkt_buf, conf->pkt_len);
-> +	} else {
-> +		ret = ice_fdir_get_gen_prgm_pkt(hw, input, pkt, false, is_tun);
-> +		if (ret) {
-> +			dev_dbg(dev, "Gen training pkt for VF %d ptype %d failed\n",
-> +				vf->vf_id, input->flow_type);
-> +			goto err_free_pkt;
-> +		}
->   	}
->   
->   	ret = ice_prgm_fdir_fltr(ctrl_vsi, &desc, pkt);
-> @@ -1521,6 +1647,16 @@ ice_vf_verify_rx_desc(struct ice_vf *vf, struct ice_vf_fdir_ctx *ctx,
->   	return ret;
->   }
->   
-> +static int ice_fdir_is_tunnel(enum ice_fdir_tunnel_type ttype)
-> +{
-> +	return (ttype == ICE_FDIR_TUNNEL_TYPE_GRE_INNER ||
-> +		ttype == ICE_FDIR_TUNNEL_TYPE_GTPU_INNER ||
-> +		ttype == ICE_FDIR_TUNNEL_TYPE_GTPU_EH_INNER ||
-> +		ttype == ICE_FDIR_TUNNEL_TYPE_GTPOGRE_INNER ||
-> +		ttype == ICE_FDIR_TUNNEL_TYPE_ECPRI ||
-> +		ttype == ICE_FDIR_TUNNEL_TYPE_L2TPV2_INNER);
-> +}
-> +
->   /**
->    * ice_vc_add_fdir_fltr_post
->    * @vf: pointer to the VF structure
-> @@ -1781,6 +1917,158 @@ static void ice_vc_fdir_clear_irq_ctx(struct ice_vf *vf)
->   	spin_unlock_irqrestore(&vf->fdir.ctx_lock, flags);
->   }
->   
-> +/**
-> + * ice_vc_parser_fv_check_diff - check two parsed FDIR profile fv context
-> + * @fv_a: struct of parsed FDIR profile field vector
-> + * @fv_b: struct of parsed FDIR profile field vector
-> + *
-> + * Check if the two parsed FDIR profile field vector context are different,
-> + * including proto_id, offset and mask.
-> + *
-> + * Return: true on different, false on otherwise.
-> + */
-> +static bool ice_vc_parser_fv_check_diff(struct ice_parser_fv *fv_a,
-> +					struct ice_parser_fv *fv_b)
-> +{
-> +	return (fv_a->proto_id	!= fv_b->proto_id ||
-> +		fv_a->offset	!= fv_b->offset ||
-> +		fv_a->msk	!= fv_b->msk);
-> +}
-> +
-> +/**
-> + * ice_vc_parser_fv_save - save parsed FDIR profile fv context
-> + * @fv: struct of parsed FDIR profile field vector
-> + * @fv_src: parsed FDIR profile field vector context to save
-> + *
-> + * Save the parsed FDIR profile field vector context, including proto_id,
-> + * offset and mask.
-> + *
-> + * Return: Void.
-> + */
-> +static void ice_vc_parser_fv_save(struct ice_parser_fv *fv,
-> +				  struct ice_parser_fv *fv_src)
-> +{
-> +	fv->proto_id	= fv_src->proto_id;
-> +	fv->offset	= fv_src->offset;
-> +	fv->msk		= fv_src->msk;
-> +	fv->spec	= 0;
-> +}
-> +
-> +/**
-> + * ice_vc_add_fdir_raw - add a raw FDIR filter for VF
-> + * @vf: pointer to the VF info
-> + * @conf: FDIR configuration for each filter
-> + * @v_ret: the final VIRTCHNL code
-> + * @stat: pointer to the VIRTCHNL_OP_ADD_FDIR_FILTER
-> + * @len: length of the stat
-> + *
-> + * Return: 0 on success or negative errno on failure.
-> + */
-> +static int
-> +ice_vc_add_fdir_raw(struct ice_vf *vf,
-> +		    struct virtchnl_fdir_fltr_conf *conf,
-> +		    enum virtchnl_status_code *v_ret,
-> +		    struct virtchnl_fdir_add *stat, int len)
-> +{
-> +	struct ice_vsi *vf_vsi, *ctrl_vsi;
-> +	struct ice_fdir_prof_info *pi;
-> +	struct ice_pf *pf = vf->pf;
-> +	int ret, ptg, id, i;
-> +	struct device *dev;
-> +	struct ice_hw *hw;
-> +	bool fv_found;
-> +
-> +	dev = ice_pf_to_dev(pf);
-> +	hw = &pf->hw;
-> +	*v_ret = VIRTCHNL_STATUS_ERR_PARAM;
-> +	stat->status = VIRTCHNL_FDIR_FAILURE_RULE_NORESOURCE;
-> +
-> +	id = find_first_bit(conf->prof->ptypes, ICE_FLOW_PTYPE_MAX);
-> +	ptg = hw->blk[ICE_BLK_FD].xlt1.t[id];
-> +
-> +	vf_vsi = ice_get_vf_vsi(vf);
-> +	if (!vf_vsi) {
-> +		dev_err(dev, "Can not get FDIR vf_vsi for VF %d\n", vf->vf_id);
-> +		return -ENODEV;
-> +	}
-> +
-> +	ctrl_vsi = pf->vsi[vf->ctrl_vsi_idx];
-> +	if (!ctrl_vsi) {
-> +		dev_err(dev, "Can not get FDIR ctrl_vsi for VF %d\n",
-> +			vf->vf_id);
-> +		return -ENODEV;
-> +	}
-> +
-> +	fv_found = false;
-> +
-> +	/* Check if profile info already exists, then update the counter */
-> +	pi = &vf->fdir_prof_info[ptg];
-> +	if (pi->fdir_active_cnt != 0) {
-> +		for (i = 0; i < ICE_MAX_FV_WORDS; i++)
-> +			if (ice_vc_parser_fv_check_diff(&pi->prof.fv[i],
-> +							&conf->prof->fv[i]))
-> +				break;
-> +		if (i == ICE_MAX_FV_WORDS) {
-> +			fv_found = true;
-> +			pi->fdir_active_cnt++;
-> +		}
-> +	}
-> +
-> +	/* HW profile setting is only required for the first time */
-> +	if (!fv_found) {
-> +		ret = ice_flow_set_parser_prof(hw, vf_vsi->idx,
-> +					       ctrl_vsi->idx, conf->prof,
-> +					       ICE_BLK_FD);
-> +
-> +		if (ret) {
-> +			*v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
-> +			dev_dbg(dev, "VF %d: insert hw prof failed\n",
-> +				vf->vf_id);
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	ret = ice_vc_fdir_insert_entry(vf, conf, &conf->flow_id);
-> +	if (ret) {
-> +		*v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
-> +		dev_dbg(dev, "VF %d: insert FDIR list failed\n",
-> +			vf->vf_id);
-> +		return ret;
-> +	}
-> +
-> +	ret = ice_vc_fdir_set_irq_ctx(vf, conf,
-> +				      VIRTCHNL_OP_ADD_FDIR_FILTER);
-> +	if (ret) {
-> +		dev_dbg(dev, "VF %d: set FDIR context failed\n",
-> +			vf->vf_id);
-> +		goto err_rem_entry;
-> +	}
-> +
-> +	ret = ice_vc_fdir_write_fltr(vf, conf, true, false);
-> +	if (ret) {
-> +		dev_err(dev, "VF %d: adding FDIR raw flow rule failed, ret:%d\n",
-> +			vf->vf_id, ret);
-> +		goto err_clr_irq;
-> +	}
-> +
-> +	/* Save parsed profile fv info of the FDIR rule for the first time */
-> +	if (!fv_found) {
-> +		for (i = 0; i < conf->prof->fv_num; i++)
-> +			ice_vc_parser_fv_save(&pi->prof.fv[i],
-> +					      &conf->prof->fv[i]);
-> +		pi->prof.fv_num = conf->prof->fv_num;
-> +		pi->fdir_active_cnt = 1;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_clr_irq:
-> +	ice_vc_fdir_clear_irq_ctx(vf);
-> +err_rem_entry:
-> +	ice_vc_fdir_remove_entry(vf, conf, conf->flow_id);
-> +	return ret;
-> +}
-> +
->   /**
->    * ice_vc_add_fdir_fltr - add a FDIR filter for VF by the msg buffer
->    * @vf: pointer to the VF info
-> @@ -1846,7 +2134,7 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   	len = sizeof(*stat);
->   	ret = ice_vc_validate_fdir_fltr(vf, fltr, conf);
->   	if (ret) {
-> -		v_ret = VIRTCHNL_STATUS_SUCCESS;
-> +		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
->   		stat->status = VIRTCHNL_FDIR_FAILURE_RULE_INVALID;
->   		dev_dbg(dev, "Invalid FDIR filter from VF %d\n", vf->vf_id);
->   		goto err_free_conf;
-> @@ -1861,6 +2149,15 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   		goto exit;
->   	}
->   
-> +	/* For raw FDIR filters created by the parser */
-> +	if (conf->parser_ena) {
-> +		ret = ice_vc_add_fdir_raw(vf, conf, &v_ret, stat, len);
-> +		if (ret)
-> +			goto err_free_conf;
-> +		goto exit;
-> +	}
-> +
-> +	is_tun = ice_fdir_is_tunnel(conf->ttype);
->   	ret = ice_vc_fdir_config_input_set(vf, fltr, conf, is_tun);
->   	if (ret) {
->   		v_ret = VIRTCHNL_STATUS_SUCCESS;
-> @@ -1921,6 +2218,78 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   	return ret;
->   }
->   
-> +/**
-> + * ice_vc_del_fdir_raw - delete a raw FDIR filter for VF
-> + * @vf: pointer to the VF info
-> + * @conf: FDIR configuration for each filter
-> + * @v_ret: the final VIRTCHNL code
-> + * @stat: pointer to the VIRTCHNL_OP_DEL_FDIR_FILTER
-> + * @len: length of the stat
-> + *
-> + * Return: 0 on success or negative errno on failure.
-> + */
-> +static int
-> +ice_vc_del_fdir_raw(struct ice_vf *vf,
-> +		    struct virtchnl_fdir_fltr_conf *conf,
-> +		    enum virtchnl_status_code *v_ret,
-> +		    struct virtchnl_fdir_del *stat, int len)
-> +{
-> +	struct ice_vsi *vf_vsi, *ctrl_vsi;
-> +	enum ice_block blk = ICE_BLK_FD;
-> +	struct ice_fdir_prof_info *pi;
-> +	struct ice_pf *pf = vf->pf;
-> +	struct device *dev;
-> +	struct ice_hw *hw;
-> +	u16 vsi_num;
-> +	int ptg;
-> +	int ret;
-> +	int id;
-
-`first_bit` returns `unsigned long`.
-
-> +
-> +	dev = ice_pf_to_dev(pf);
-> +	hw = &pf->hw;
-> +	*v_ret = VIRTCHNL_STATUS_ERR_PARAM;
-> +	stat->status = VIRTCHNL_FDIR_FAILURE_RULE_NORESOURCE;
-> +
-> +	id = find_first_bit(conf->prof->ptypes, ICE_FLOW_PTYPE_MAX);
-> +	ptg = hw->blk[ICE_BLK_FD].xlt1.t[id];
-> +
-> +	ret = ice_vc_fdir_write_fltr(vf, conf, false, false);
-> +	if (ret) {
-> +		dev_err(dev, "VF %u: deleting FDIR raw flow rule failed: %d\n",
-> +			vf->vf_id, ret);
-> +		return ret;
-> +	}
-> +
-> +	vf_vsi = ice_get_vf_vsi(vf);
-> +	if (!vf_vsi) {
-> +		dev_err(dev, "Can not get FDIR vf_vsi for VF %u\n", vf->vf_id);
-> +		return -ENODEV;
-> +	}
-> +
-> +	ctrl_vsi = pf->vsi[vf->ctrl_vsi_idx];
-> +	if (!ctrl_vsi) {
-> +		dev_err(dev, "Can not get FDIR ctrl_vsi for VF %u\n",
-> +			vf->vf_id);
-> +		return -ENODEV;
-> +	}
-> +
-> +	pi = &vf->fdir_prof_info[ptg];
-> +	if (pi->fdir_active_cnt != 0) {
-> +		pi->fdir_active_cnt--;
-> +		/* Remove the profile id flow if no active FDIR rule left */
-> +		if (!pi->fdir_active_cnt) {
-> +			vsi_num = ice_get_hw_vsi_num(hw, ctrl_vsi->idx);
-> +			ice_rem_prof_id_flow(hw, blk, vsi_num, id);
-> +
-> +			vsi_num = ice_get_hw_vsi_num(hw, vf_vsi->idx);
-> +			ice_rem_prof_id_flow(hw, blk, vsi_num, id);
-> +		}
-> +	}
-> +
-> +	conf->parser_ena = false;
-> +	return 0;
-> +}
-
-
-Kind regards,
-
-Paul
-
-
-> +
->   /**
->    * ice_vc_del_fdir_fltr - delete a FDIR filter for VF by the msg buffer
->    * @vf: pointer to the VF info
-> @@ -1933,7 +2302,10 @@ int ice_vc_del_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   	struct virtchnl_fdir_del *fltr = (struct virtchnl_fdir_del *)msg;
->   	struct virtchnl_fdir_del *stat = NULL;
->   	struct virtchnl_fdir_fltr_conf *conf;
-> +	struct ice_vf_fdir *fdir = &vf->fdir;
->   	enum virtchnl_status_code v_ret;
-> +	struct ice_fdir_fltr *input;
-> +	enum ice_fltr_ptype flow;
->   	struct device *dev;
->   	struct ice_pf *pf;
->   	int is_tun = 0;
-> @@ -1983,6 +2355,15 @@ int ice_vc_del_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   		goto err_exit;
->   	}
->   
-> +	/* For raw FDIR filters created by the parser */
-> +	if (conf->parser_ena) {
-> +		ret = ice_vc_del_fdir_raw(vf, conf, &v_ret, stat, len);
-> +		if (ret)
-> +			goto err_del_tmr;
-> +		goto exit;
-> +	}
-> +
-> +	is_tun = ice_fdir_is_tunnel(conf->ttype);
->   	ret = ice_vc_fdir_write_fltr(vf, conf, false, is_tun);
->   	if (ret) {
->   		v_ret = VIRTCHNL_STATUS_SUCCESS;
-> @@ -1992,6 +2373,13 @@ int ice_vc_del_fdir_fltr(struct ice_vf *vf, u8 *msg)
->   		goto err_del_tmr;
->   	}
->   
-> +	/* Remove unused profiles to avoid unexpected behaviors */
-> +	input = &conf->input;
-> +	flow = input->flow_type;
-> +	if (fdir->fdir_fltr_cnt[flow][is_tun] == 1)
-> +		ice_vc_fdir_rem_prof(vf, flow, is_tun);
-> +
-> +exit:
->   	kfree(stat);
->   
->   	return ret;
 
