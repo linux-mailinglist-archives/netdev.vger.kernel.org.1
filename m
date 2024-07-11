@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-110758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1D8892E371
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:30:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9440292E374
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 11:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349891F221AF
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6FA71C22508
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A1D2A1D1;
-	Thu, 11 Jul 2024 09:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F758156F4C;
+	Thu, 11 Jul 2024 09:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cofzGkA5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eDjbx4g9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9234D10A
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CA815697B
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 09:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720690209; cv=none; b=GCR5Qq2sDOoOD65i9CH4DJ+o6O/y7aHVAMoYdmdZNT+b3QV3wfYdNt+IUBkiezHjJlDNLeN5U6sPptm7HLZd6n7J4Z9ulfr6LTRuNf0QtwDC9g932jmt1HcSc8R0Xqmq86QQ/QZYZ9/P3w6OMyTiPJklR+K2tcCMm464/k9gGKo=
+	t=1720690211; cv=none; b=iU8eUwNn1big5J+FMwxYWE4ke5twO4oBdiTT+8e14u0fDZy68OSWkyVWEgM/tEkgqx8JfoUKEjUNC1cp8NajM+nTSsb298qwZBrAJLIWMNavI3YMqkj+MpuFxtro3RxqqxEnBSlkOEIYM96XJCRsGtpJq3dJ438WwLtScH1M324=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720690209; c=relaxed/simple;
-	bh=2BAkE29AFbYR4Y3G7nNxEfkBEwFbMfKFFipB7Y7HD/I=;
+	s=arc-20240116; t=1720690211; c=relaxed/simple;
+	bh=DX7rbZCADhE+m2wNY5TzBRC4UtHF3vwOkL0h9aRAoEE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sG9ScagYzSKoi6yG3XMsuiZRUaEewaSRq2aA+SyK1PQ+VPNTgeyEU/ryBtMj+F1GoC6UCCTHMyQgsPwwvLUuXIJQ0Il0umU5SFIwkGCd12WSrm9LGgb4j9DJbrsJ1jRc5ThOGcH91Lnbde3R8euKDKYPX6WfgRV3h7NEwfABibQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cofzGkA5; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=MUpj9hpqV1KYqAn1BCRdGrKzOg78TvaemK8xfDdMYGK6rZOPkZiJhk1dclipofq8czI3Wtg6RYnlGUtzEmQKscEbGAJoSZUwSftrnmQwGFySuNdRgyGa75FkkkMRCX4mbKqetctVbcuJQ2kRJdi7iq0uz+okNrnyYZHjngcvPu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eDjbx4g9; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720690207; x=1752226207;
+  t=1720690210; x=1752226210;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2BAkE29AFbYR4Y3G7nNxEfkBEwFbMfKFFipB7Y7HD/I=;
-  b=cofzGkA5uuLUuuWuHGLD6G/eI8qEHkDV6JtJrA+nZAsDsIzUxaSIUOml
-   Cfeg6eNnNojLvVgHno0JpjcOrlwhrFcZWxUGmnD362X2UfA+NDt6JIjE1
-   xO4M/A9FPPADiF3gGGBWkdV76exWr4uypMIoXzMzrTcwa9UjHlAIIUA+z
-   W7M13s5T+Rb9lYzPDwhHdTTZ+BPpWFDEgBpKZ0poGSk5z5akjHVcMMI1P
-   OkN/YCkC/wf68Q7xsysMRu2BhlcTVVuwnzEL1qmkUp9MnHeauUoZ07ykV
-   heYjtinp8zuQ7iKjFt/5LTlvcRpoQZm19ND5a7zuEES/3B+35MsJK+6aE
-   w==;
-X-CSE-ConnectionGUID: 34TA7rYWR9uf+etcsyeL3Q==
-X-CSE-MsgGUID: EQZ+KRDPRbiaWtBzpvt0qw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="21821450"
+  bh=DX7rbZCADhE+m2wNY5TzBRC4UtHF3vwOkL0h9aRAoEE=;
+  b=eDjbx4g9lwXVotr5OGDkD1gPkvefS1hQ3yNUxpbc2tIs4TTmCKNQHcwF
+   U4Zv9SN3nhHkGBlBAwQttNpbZSknW01R7Ixy+LWnMKiefiRxzKXxnGKV0
+   D7X5ZBxCQDvQf64dTWvjSTt3ZetVmpr8160hl5RpiJ/k2N/++3HIUR8aw
+   4aC/9zBAcaBC13xzhosik9G126AGotwYsbvhyTyodxJpkXxu6VvZI2RHh
+   WpV+0FSgMRB7tROEmFKl0eb4FRusvZ0Oh6GiduflhyU02X1UDXkGW6V1i
+   Ix2lPp15gFqv6Gjx7efziqeCxOd71ABznLayCQ7RsAOvGPBRrP12vbGuj
+   g==;
+X-CSE-ConnectionGUID: JmQvubqWRdSOb195J6189g==
+X-CSE-MsgGUID: upvOD0HJTm2hUCK+objM4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11129"; a="21821452"
 X-IronPort-AV: E=Sophos;i="6.09,199,1716274800"; 
-   d="scan'208";a="21821450"
+   d="scan'208";a="21821452"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 02:28:18 -0700
-X-CSE-ConnectionGUID: yGacQ04XTcaLBhuRS+QWsA==
-X-CSE-MsgGUID: BEDQ3zIsSjq5TG4jgrjlTw==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 02:28:19 -0700
+X-CSE-ConnectionGUID: dRVL81lDRzORmcQJx9EHDQ==
+X-CSE-MsgGUID: Isslz2UNSrex8QG2M88uTg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,199,1716274800"; 
-   d="scan'208";a="48580014"
+   d="scan'208";a="48580019"
 Received: from kkolacin-desk1.igk.intel.com ([10.102.102.132])
-  by fmviesa010.fm.intel.com with ESMTP; 11 Jul 2024 02:28:15 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 11 Jul 2024 02:28:17 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
-	Michal Michalik <michal.michalik@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v2 iwl-next 1/4] ice: Implement PTP support for E830 devices
-Date: Thu, 11 Jul 2024 11:24:24 +0200
-Message-ID: <20240711092757.890786-7-karol.kolacinski@intel.com>
+Subject: [PATCH v2 iwl-next 2/4] ice: Process TSYN IRQ in a separate function
+Date: Thu, 11 Jul 2024 11:24:25 +0200
+Message-ID: <20240711092757.890786-8-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240711092757.890786-6-karol.kolacinski@intel.com>
 References: <20240711092757.890786-6-karol.kolacinski@intel.com>
@@ -81,493 +78,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Michalik <michal.michalik@intel.com>
-
-Add specific functions and definitions for E830 devices to enable
-PTP support.
-Introduce new PHY model ICE_PHY_E830.
-E830 devices support direct write to GLTSYN_ registers without shadow
-registers and 64 bit read of PHC time.
+Simplify TSYN IRQ processing by moving it to a separate function and
+having appropriate behavior per PHY model, instead of multiple
+conditions not related to HW, but to specific timestamping modes.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Co-developed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Co-developed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
-V1 -> V2: Fixed compilation issue with GENMASK bits higher than 32
+ drivers/net/ethernet/intel/ice/ice_main.c | 18 +------
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 60 +++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |  6 +++
+ 3 files changed, 68 insertions(+), 16 deletions(-)
 
- drivers/net/ethernet/intel/ice/ice_common.c   |  11 +
- drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |   4 +
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  11 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 197 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  25 ++-
- drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
- 7 files changed, 223 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 009716a12a26..005054439204 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -307,6 +307,17 @@ bool ice_is_e825c(struct ice_hw *hw)
- 	}
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index e2990993b16f..c4d4993ce9e3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3273,22 +3273,8 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
  
-+/**
-+ * ice_is_e830
-+ * @hw: pointer to the hardware structure
-+ *
-+ * returns true if the device is E830 based, false if not.
-+ */
-+bool ice_is_e830(const struct ice_hw *hw)
-+{
-+	return hw->mac_type == ICE_MAC_E830;
-+}
+ 	if (oicr & PFINT_OICR_TSYN_TX_M) {
+ 		ena_mask &= ~PFINT_OICR_TSYN_TX_M;
+-		if (ice_pf_state_is_nominal(pf) &&
+-		    pf->hw.dev_caps.ts_dev_info.ts_ll_int_read) {
+-			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
+-			unsigned long flags;
+-			u8 idx;
+-
+-			spin_lock_irqsave(&tx->lock, flags);
+-			idx = find_next_bit_wrap(tx->in_use, tx->len,
+-						 tx->last_ll_ts_idx_read + 1);
+-			if (idx != tx->len)
+-				ice_ptp_req_tx_single_tstamp(tx, idx);
+-			spin_unlock_irqrestore(&tx->lock, flags);
+-		} else if (ice_ptp_pf_handles_tx_interrupt(pf)) {
+-			set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
+-			ret = IRQ_WAKE_THREAD;
+-		}
 +
- /**
-  * ice_clear_pf_cfg - Clear PF configuration
-  * @hw: pointer to the hardware structure
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 27208a60cece..21a4d9734168 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -279,6 +279,7 @@ bool ice_is_e810t(struct ice_hw *hw);
- bool ice_is_e822(struct ice_hw *hw);
- bool ice_is_e823(struct ice_hw *hw);
- bool ice_is_e825c(struct ice_hw *hw);
-+bool ice_is_e830(const struct ice_hw *hw);
- int
- ice_sched_query_elem(struct ice_hw *hw, u32 node_teid,
- 		     struct ice_aqc_txsched_elem_data *buf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 91cbae1eec89..646089f3e26c 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -533,10 +533,14 @@
- #define PFPM_WUS_MAG_M				BIT(1)
- #define PFPM_WUS_MNG_M				BIT(3)
- #define PFPM_WUS_FW_RST_WK_M			BIT(31)
-+#define E830_PRTMAC_TS_TX_MEM_VALID_H		0x001E2020
-+#define E830_PRTMAC_TS_TX_MEM_VALID_L		0x001E2000
- #define E830_PRTMAC_CL01_PS_QNT			0x001E32A0
- #define E830_PRTMAC_CL01_PS_QNT_CL0_M		GENMASK(15, 0)
- #define E830_PRTMAC_CL01_QNT_THR		0x001E3320
- #define E830_PRTMAC_CL01_QNT_THR_CL0_M		GENMASK(15, 0)
-+#define E830_PRTTSYN_TXTIME_H(_i)		(0x001E5800 + ((_i) * 32))
-+#define E830_PRTTSYN_TXTIME_L(_i)		(0x001E5000 + ((_i) * 32))
- #define VFINT_DYN_CTLN(_i)			(0x00003800 + ((_i) * 4))
- #define VFINT_DYN_CTLN_CLEARPBA_M		BIT(1)
++		ret = ice_ptp_ts_irq(pf);
+ 	}
  
+ 	if (oicr & PFINT_OICR_TSYN_EVNT_M) {
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 85b19e94e2ed..8307fa69daaa 100644
+index 8307fa69daaa..6fae3841bdaa 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -310,6 +310,15 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
- 	/* Read the system timestamp pre PHC read */
- 	ptp_read_system_prets(sts);
+@@ -2764,6 +2764,66 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
+ 	}
+ }
  
-+	if (ice_is_e830(hw)) {
-+		u64 clk_time = rd64(hw, E830_GLTSYN_TIME_L(tmr_idx));
++/**
++ * ice_ptp_ts_irq - Process the PTP Tx timestamps in IRQ context
++ * @pf: Board private structure
++ *
++ * Returns: IRQ_WAKE_THREAD if Tx timestamp read has to be handled in the bottom
++ * half of the interrupt and IRQ_HANDLED otherwise.
++ */
++irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
++{
++	struct ice_hw *hw = &pf->hw;
 +
-+		/* Read the system timestamp post PHC read */
-+		ptp_read_system_postts(sts);
++	switch (hw->ptp.phy_model) {
++	case ICE_PHY_E810:
++		/* E810 capable of low latency timestamping with interrupt can
++		 * request a single timestamp in the top half and wait for
++		 * a second LL TS interrupt from the FW when it's ready.
++		 */
++		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
++			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
++			unsigned long flags;
++			u8 idx;
 +
-+		return clk_time;
++			if (!ice_pf_state_is_nominal(pf))
++				return IRQ_HANDLED;
++
++			spin_lock_irqsave(&tx->lock, flags);
++			idx = find_next_bit_wrap(tx->in_use, tx->len,
++						 tx->last_ll_ts_idx_read + 1);
++			if (idx != tx->len)
++				ice_ptp_req_tx_single_tstamp(tx, idx);
++			spin_unlock_irqrestore(&tx->lock, flags);
++
++			return IRQ_HANDLED;
++		}
++		fallthrough; /* non-LL_TS E810 */
++	case ICE_PHY_E82X:
++	case ICE_PHY_ETH56G:
++		/* All other devices process timestamps in the bottom half due
++		 * to sleeping or polling.
++		 */
++		if (!ice_ptp_pf_handles_tx_interrupt(pf))
++			return IRQ_HANDLED;
++
++		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
++		return IRQ_WAKE_THREAD;
++	case ICE_PHY_E830:
++		/* E830 can read timestamps in the top half using rd32() */
++		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
++			/* Process outstanding Tx timestamps. If there
++			 * is more work, re-arm the interrupt to trigger again.
++			 */
++			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
++			ice_flush(hw);
++		}
++		return IRQ_HANDLED;
++	default:
++		return IRQ_HANDLED;
 +	}
-+
- 	lo = rd32(hw, GLTSYN_TIME_L(tmr_idx));
- 
- 	/* Read the system timestamp post PHC read */
-@@ -2642,7 +2651,7 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 	info->enable = ice_ptp_gpio_enable;
- 	info->verify = ice_verify_pin;
- 
--	if (ice_is_e810(&pf->hw))
-+	if (ice_is_e810(&pf->hw) || ice_is_e830(&pf->hw))
- 		ice_ptp_set_funcs_e810(pf);
- 	else
- 		ice_ptp_set_funcs_e82x(pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index da88c6ccfaeb..e58a75909306 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -897,6 +897,17 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- 	ice_flush(hw);
- }
- 
-+/**
-+ * ice_ptp_cfg_sync_delay - Configure PHC to PHY synchronization delay
-+ * @hw: pointer to HW struct
-+ * @delay: delay between PHC and PHY SYNC command execution in nanoseconds
-+ */
-+static void ice_ptp_cfg_sync_delay(struct ice_hw *hw, u32 delay)
-+{
-+	wr32(hw, GLTSYN_SYNC_DLAY, delay);
-+	ice_flush(hw);
 +}
 +
- /* 56G PHY device functions
-  *
-  * The following functions operate on devices with the ETH 56G PHY.
-@@ -1520,7 +1531,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
- 	 * lower 8 bits in the low register, and the upper 32 bits in the high
- 	 * register.
- 	 */
--	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
-+	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_40B_LOW_M, lo);
- 
- 	return 0;
- }
-@@ -3201,7 +3213,8 @@ ice_read_phy_tstamp_e82x(struct ice_hw *hw, u8 quad, u8 idx, u64 *tstamp)
- 	 * lower 8 bits in the low register, and the upper 32 bits in the high
- 	 * register.
- 	 */
--	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) | FIELD_PREP(TS_PHY_LOW_M, lo);
-+	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_40B_LOW_M, lo);
- 
- 	return 0;
- }
-@@ -4955,7 +4968,8 @@ ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
- 	/* For E810 devices, the timestamp is reported with the lower 32 bits
- 	 * in the low register, and the upper 8 bits in the high register.
- 	 */
--	*tstamp = ((u64)hi) << TS_HIGH_S | ((u64)lo & TS_LOW_M);
-+	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
- 
- 	return 0;
- }
-@@ -5018,8 +5032,7 @@ static int ice_ptp_init_phc_e810(struct ice_hw *hw)
- 	u8 tmr_idx;
- 	int err;
- 
--	/* Ensure synchronization delay is zero */
--	wr32(hw, GLTSYN_SYNC_DLAY, 0);
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 	err = ice_write_phy_reg_e810(hw, ETH_GLTSYN_ENA(tmr_idx),
-@@ -5407,11 +5420,140 @@ static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- 	ptp->ports_per_phy = 4;
- }
- 
-+/* E830 functions
-+ *
-+ * The following functions operate on the E830 series devices.
-+ *
-+ */
-+
-+/**
-+ * ice_ptp_init_phc_e830 - Perform E830 specific PHC initialization
-+ * @hw: pointer to HW struct
-+ *
-+ * Perform E830-specific PTP hardware clock initialization steps.
-+ */
-+static int ice_ptp_init_phc_e830(struct ice_hw *hw)
-+{
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
-+	return 0;
-+}
-+
-+/**
-+ * ice_ptp_write_direct_incval_e830 - Prep PHY port increment value change
-+ * @hw: pointer to HW struct
-+ * @incval: The new 40bit increment value to prepare
-+ *
-+ * Prepare the PHY port for a new increment value by programming the PHC
-+ * GLTSYN_INCVAL_L and GLTSYN_INCVAL_H registers. The actual change is
-+ * completed by FW automatically.
-+ */
-+static int ice_ptp_write_direct_incval_e830(struct ice_hw *hw, u64 incval)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_INCVAL_L(tmr_idx), lower_32_bits(incval));
-+	wr32(hw, GLTSYN_INCVAL_H(tmr_idx), upper_32_bits(incval));
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_ptp_write_direct_phc_time_e830 - Prepare PHY port with initial time
-+ * @hw: Board private structure
-+ * @time: Time to initialize the PHY port clock to
-+ *
-+ * Program the PHY port ETH_GLTSYN_SHTIME registers in preparation setting the
-+ * initial clock time. The time will not actually be programmed until the
-+ * driver issues an ICE_PTP_INIT_TIME command.
-+ *
-+ * The time value is the upper 32 bits of the PHY timer, usually in units of
-+ * nominal nanoseconds.
-+ */
-+static int ice_ptp_write_direct_phc_time_e830(struct ice_hw *hw, u64 time)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_TIME_0(tmr_idx), 0);
-+	wr32(hw, GLTSYN_TIME_L(tmr_idx), lower_32_bits(time));
-+	wr32(hw, GLTSYN_TIME_H(tmr_idx), upper_32_bits(time));
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_ptp_port_cmd_e830 - Prepare all external PHYs for a timer command
-+ * @hw: pointer to HW struct
-+ * @cmd: Command to be sent to the port
-+ *
-+ * Prepare the external PHYs connected to this device for a timer sync
-+ * command.
-+ */
-+static int ice_ptp_port_cmd_e830(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+{
-+	u32 val = ice_ptp_tmr_cmd_to_port_reg(hw, cmd);
-+
-+	return ice_write_phy_reg_e810(hw, E830_ETH_GLTSYN_CMD, val);
-+}
-+
-+/**
-+ * ice_read_phy_tstamp_e830 - Read a PHY timestamp out of the external PHY
-+ * @hw: pointer to the HW struct
-+ * @lport: the lport to read from
-+ * @idx: the timestamp index to read
-+ * @tstamp: on return, the 40bit timestamp value
-+ *
-+ * Read a 40bit timestamp value out of the timestamp block of the external PHY
-+ * on the E830 device.
-+ */
-+static int
-+ice_read_phy_tstamp_e830(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
-+{
-+	u32 hi, lo;
-+
-+	hi = rd32(hw, E830_HIGH_TX_MEMORY_BANK(idx, lport));
-+	lo = rd32(hw, E830_LOW_TX_MEMORY_BANK(idx, lport));
-+
-+	/* For E830 devices, the timestamp is reported with the lower 32 bits
-+	 * in the low register, and the upper 8 bits in the high register.
-+	 */
-+	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_get_phy_tx_tstamp_ready_e830 - Read Tx memory status register
-+ * @hw: pointer to the HW struct
-+ * @port: the PHY port to read
-+ * @tstamp_ready: contents of the Tx memory status register
-+ *
-+ */
-+static int
-+ice_get_phy_tx_tstamp_ready_e830(struct ice_hw *hw, u8 port, u64 *tstamp_ready)
-+{
-+	*tstamp_ready = rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_H);
-+	*tstamp_ready <<= 32;
-+	*tstamp_ready |= rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_L);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_ptp_init_phy_e830 - initialize PHY parameters
-+ * @ptp: pointer to the PTP HW struct
-+ */
-+static void ice_ptp_init_phy_e830(struct ice_ptp_hw *ptp)
-+{
-+	ptp->phy_model = ICE_PHY_E830;
-+	ptp->num_lports = 8;
-+	ptp->ports_per_phy = 4;
-+}
-+
- /* Device agnostic functions
-  *
-- * The following functions implement shared behavior common to both E822 and
-- * E810 devices, possibly calling a device specific implementation where
-- * necessary.
-+ * The following functions implement shared behavior common to all devices,
-+ * possibly calling a device specific implementation where necessary.
-  */
- 
  /**
-@@ -5474,12 +5616,14 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- {
- 	struct ice_ptp_hw *ptp = &hw->ptp;
+  * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
+  * @pf: Board private structure
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index aaf1ba79aa2e..5b786e972388 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -303,6 +303,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
+ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx);
+ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx);
+ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
++irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf);
  
--	if (ice_is_e822(hw) || ice_is_e823(hw))
--		ice_ptp_init_phy_e82x(ptp);
--	else if (ice_is_e810(hw))
-+	if (ice_is_e810(hw))
- 		ice_ptp_init_phy_e810(ptp);
-+	else if (ice_is_e822(hw) || ice_is_e823(hw))
-+		ice_ptp_init_phy_e82x(ptp);
- 	else if (ice_is_e825c(hw))
- 		ice_ptp_init_phy_e825c(hw);
-+	else if (ice_is_e830(hw))
-+		ice_ptp_init_phy_e830(ptp);
- 	else
- 		ptp->phy_model = ICE_PHY_UNSUP;
+ u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+ 			const struct ice_pkt_ctx *pkt_ctx);
+@@ -341,6 +342,11 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
+ 	return true;
  }
-@@ -5570,6 +5714,8 @@ static int ice_ptp_port_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- 	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_E810:
- 		return ice_ptp_port_cmd_e810(hw, cmd);
-+	case ICE_PHY_E830:
-+		return ice_ptp_port_cmd_e830(hw, cmd);
- 	default:
- 		break;
- 	}
-@@ -5640,6 +5786,10 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
  
- 	/* Source timers */
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->ptp.phy_model == ICE_PHY_E830)
-+		return ice_ptp_write_direct_phc_time_e830(hw, time);
++static inline irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
++{
++	return IRQ_HANDLED;
++}
 +
- 	wr32(hw, GLTSYN_SHTIME_L(tmr_idx), lower_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_H(tmr_idx), upper_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_0(tmr_idx), 0);
-@@ -5688,6 +5838,10 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->ptp.phy_model == ICE_PHY_E830)
-+		return ice_ptp_write_direct_incval_e830(hw, incval);
-+
- 	/* Shadow Adjust */
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
-@@ -5795,12 +5949,14 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
- int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
- {
- 	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_read_ptp_tstamp_eth56g(hw, block, idx, tstamp);
- 	case ICE_PHY_E810:
- 		return ice_read_phy_tstamp_e810(hw, block, idx, tstamp);
- 	case ICE_PHY_E82X:
- 		return ice_read_phy_tstamp_e82x(hw, block, idx, tstamp);
-+	case ICE_PHY_E830:
-+		return ice_read_phy_tstamp_e830(hw, block, idx, tstamp);
-+	case ICE_PHY_ETH56G:
-+		return ice_read_ptp_tstamp_eth56g(hw, block, idx, tstamp);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5917,12 +6073,14 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	(void)rd32(hw, GLTSYN_STAT(src_idx));
- 
- 	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_ptp_init_phc_eth56g(hw);
- 	case ICE_PHY_E810:
- 		return ice_ptp_init_phc_e810(hw);
- 	case ICE_PHY_E82X:
- 		return ice_ptp_init_phc_e82x(hw);
-+	case ICE_PHY_E830:
-+		return ice_ptp_init_phc_e830(hw);
-+	case ICE_PHY_ETH56G:
-+		return ice_ptp_init_phc_eth56g(hw);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5942,15 +6100,18 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- {
- 	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
--							  tstamp_ready);
- 	case ICE_PHY_E810:
- 		return ice_get_phy_tx_tstamp_ready_e810(hw, block,
- 							tstamp_ready);
- 	case ICE_PHY_E82X:
- 		return ice_get_phy_tx_tstamp_ready_e82x(hw, block,
- 							tstamp_ready);
-+	case ICE_PHY_E830:
-+		return ice_get_phy_tx_tstamp_ready_e830(hw, block,
-+							tstamp_ready);
-+	case ICE_PHY_ETH56G:
-+		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
-+							  tstamp_ready);
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 64d7da943618..c65f8b6a99e0 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -327,6 +327,7 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
- #define ICE_E810_PLL_FREQ		812500000
- #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
- #define ICE_E810_OUT_PROP_DELAY_NS	1
-+#define ICE_E810_E830_SYNC_DELAY	0
- #define ICE_E825C_OUT_PROP_DELAY_NS	11
- 
- /* Device agnostic functions */
-@@ -675,18 +676,21 @@ static inline bool ice_is_primary(struct ice_hw *hw)
- /* E810 timer command register */
- #define E810_ETH_GLTSYN_CMD		0x03000344
- 
-+/* E830 timer command register */
-+#define E830_ETH_GLTSYN_CMD		0x00088814
-+
-+/* E810 PHC time register */
-+#define E830_GLTSYN_TIME_L(_tmr_idx)	(0x0008A000 + 0x1000 * (_tmr_idx))
-+
- /* Source timer incval macros */
- #define INCVAL_HIGH_M			0xFF
- 
--/* Timestamp block macros */
-+/* PHY 40b registers macros */
-+#define PHY_EXT_40B_LOW_M		GENMASK(31, 0)
-+#define PHY_EXT_40B_HIGH_M		GENMASK_ULL(39, 32)
-+#define PHY_40B_LOW_M			GENMASK(7, 0)
-+#define PHY_40B_HIGH_M			GENMASK_ULL(39, 8)
- #define TS_VALID			BIT(0)
--#define TS_LOW_M			0xFFFFFFFF
--#define TS_HIGH_M			0xFF
--#define TS_HIGH_S			32
--
--#define TS_PHY_LOW_M			0xFF
--#define TS_PHY_HIGH_M			0xFFFFFFFF
--#define TS_PHY_HIGH_S			8
- 
- #define BYTES_PER_IDX_ADDR_L_U		8
- #define BYTES_PER_IDX_ADDR_L		4
-@@ -710,6 +714,11 @@ static inline bool ice_is_primary(struct ice_hw *hw)
- #define LOW_TX_MEMORY_BANK_START	0x03090000
- #define HIGH_TX_MEMORY_BANK_START	0x03090004
- 
-+#define E830_LOW_TX_MEMORY_BANK(slot, port) \
-+				(E830_PRTTSYN_TXTIME_L(slot) + 0x8 * (port))
-+#define E830_HIGH_TX_MEMORY_BANK(slot, port) \
-+				(E830_PRTTSYN_TXTIME_H(slot) + 0x8 * (port))
-+
- /* SMA controller pin control */
- #define ICE_SMA1_DIR_EN		BIT(4)
- #define ICE_SMA1_TX_EN		BIT(5)
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index b6bc2de53b0a..501994f057a7 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -866,6 +866,7 @@ enum ice_phy_model {
- 	ICE_PHY_E810 = 1,
- 	ICE_PHY_E82X,
- 	ICE_PHY_ETH56G,
-+	ICE_PHY_E830,
- };
- 
- /* Global Link Topology */
+ static inline u64
+ ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+ 		    const struct ice_pkt_ctx *pkt_ctx)
 -- 
 2.45.2
 
