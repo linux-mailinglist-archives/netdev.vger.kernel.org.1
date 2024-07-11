@@ -1,129 +1,141 @@
-Return-Path: <netdev+bounces-110755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E01792E2CB
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:54:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A1C92E2E0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 10:59:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02571C22BE3
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C5F1F21083
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 08:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443081527A1;
-	Thu, 11 Jul 2024 08:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DD5155A47;
+	Thu, 11 Jul 2024 08:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AA3gJ1fY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qYg4H5UN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF53128372;
-	Thu, 11 Jul 2024 08:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D701155A24;
+	Thu, 11 Jul 2024 08:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720688059; cv=none; b=RAkxC7l36YmJRGzy56Sxzb8jWw56syA02DDrDBzRncNsAhz3dVcpwtohyuuq3zG4WqPjkuU9juoCsvUuI9B9YK0yGVSSbAyTo3ujP8Nv4y5AtFF8J5ccK0kJqDrwlMk7RiWDx4lQrrYpqUC0cC9T3aD/Z2qtdGyrWcaXsB82T+M=
+	t=1720688382; cv=none; b=VNqNLqldQECnL3ngDEzSKNIhHdE1SkmK7lN6QzdqoWtxBf30kVOroLKAPeSzk99AXkUrZ0eURES1zF+Fb6xHA+0aAR8vgGFsi9AG+grnNrYAuhyuCrwEWSAp5e9XPUtrkWDGezFohGe5iTpYougJwc4KY/VzifjxIWHDSMKk8bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720688059; c=relaxed/simple;
-	bh=D+QQsXFMRvw9K/Ga6VQddVnwvaukbDA+lgAqpvT47JE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hW2tqszfllNgblZZw5PssC2P6ood77fAuS+tMf2/2U6KYuSYIIPTG8ueqdfcemXi020o8mz6idk/pZPvDkUcatlMI0nnxOmjlTLrjg+n8vZ/JEiTdTR8TnGZ/dKZQv8h1eHecoD609XN5D6GBvX5sjIUpz18r3SIdWQ/uvsmruY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AA3gJ1fY; arc=none smtp.client-ip=217.70.178.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay6-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::226])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 7B8A2C6F9D;
-	Thu, 11 Jul 2024 08:53:37 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CCC0C0004;
-	Thu, 11 Jul 2024 08:53:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720688010;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=llx+XP6JadpR4EDUDeetmhDEqpsogxmUXPt4IRV6jhY=;
-	b=AA3gJ1fYpAWXhsN7u788NnDZ/v0vX7dvLEo/dMkPVF5FqXQ24pJWrLa4tMsc3P88ymKrBq
-	6/k6Mvok52jqLwLGDrDHBqpORhVYkPhxEmvcpegNa3p8uJIaugUhdix2M2aDmKhsj4dBIx
-	2JJCKR3Iqw7LHGWBqkX0rYIOoLQBa2KXf0+b54pVu58xPJUh4LNQMBGFoMCZrmavp3FOLR
-	0seHoFINGYwQExywKl2/xoA8PJJVlRzRCpV2v3wRe5i7aKRjYuIAYHWV5yVJQ8klKNcm3E
-	e6mFtzIssZXgr2v+afFUXJb1SrbMP+grMQlia8iERqyPY67fv92Y2SIY6KmeIg==
-Date: Thu, 11 Jul 2024 10:53:26 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v2 1/2] net: pse-pd: Do not return EOPNOSUPP if config
- is null
-Message-ID: <20240711105326.1a5b6b0b@kmaincent-XPS-13-7390>
-In-Reply-To: <20240711084300.GA8788@kernel.org>
-References: <20240710114232.257190-1-kory.maincent@bootlin.com>
-	<20240711084300.GA8788@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1720688382; c=relaxed/simple;
+	bh=qAPsvsx6ujthvgUgIeyjObrCJvC+F+atQvK0TRnobtE=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=CQkkDsmJrXsME0MStchqKOpoYyLUNDf53dUs1HrOD/AOdD8aiMBHzFUwQRd1dBSdQshhf/YI8eSc2DCm51Ee/TsspueZDQJ2hF3P0ZtllcUEFhLJM2HdtpMC3kebGtUYGYAIKT17cxD8Kb4gCO/p8XZcZnaBaBWLR1zkSivSPh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qYg4H5UN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4977C116B1;
+	Thu, 11 Jul 2024 08:59:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720688382;
+	bh=qAPsvsx6ujthvgUgIeyjObrCJvC+F+atQvK0TRnobtE=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=qYg4H5UNGXx0abpiXxr7QNLcnVEZCgJ0uPY0xwdt6THoar8srBitZN0lzPwrxEiN+
+	 rCnlrucXI6YpXoJowLessxsdXV2+Hd60YMuyA9pdZmVzgUlxShSbRDjcWgrthfz8By
+	 FS/16u3l43uGJpUiPvZ3r5/v8R3qFjoPoLbUY0L/Zwrux7+UWllyQ4wJKc9s7zoLQ2
+	 nLHhDrEJ58hVgBBebhO4AWmFPJcvaf1181R9/TvBoqdVlyyLojuX7cFBtRLrA5MuHa
+	 TM+p17a93TLwn5bxAlmmmUcCeQANbQ5iA84RJDLBjWPc4pjzHGplesAITqon804yur
+	 v5K14LXbokrJQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+In-Reply-To: <20240710171004.2164034-1-amorenoz@redhat.com>
+References: <20240710171004.2164034-1-amorenoz@redhat.com>
+Subject: Re: [PATCH net-next v3] net: psample: fix flag being set in wrong skb
+From: Antoine Tenart <atenart@kernel.org>
+Cc: Adrian Moreno <amorenoz@redhat.com>, Eelco Chaudron <echaudro@redhat.com>, Yotam Gigi <yotam.gi@gmail.com>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aaron Conole <aconole@redhat.com>, Ido Schimmel <idosch@nvidia.com>, linux-kernel@vger.kernel.org
+To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
+Date: Thu, 11 Jul 2024 10:59:39 +0200
+Message-ID: <172068837904.3846.3435522780630123273@kwain.local>
 
-On Thu, 11 Jul 2024 09:43:00 +0100
-Simon Horman <horms@kernel.org> wrote:
+Quoting Adrian Moreno (2024-07-10 19:10:04)
+> A typo makes PSAMPLE_ATTR_SAMPLE_RATE netlink flag be added to the wrong
+> sk_buff.
+>=20
+> Fix the error and make the input sk_buff pointer "const" so that it
+> doesn't happen again.
+>=20
+> Acked-by: Eelco Chaudron <echaudro@redhat.com>
+> Fixes: 7b1b2b60c63f ("net: psample: allow using rate as probability")
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 
-> On Wed, Jul 10, 2024 at 01:42:30PM +0200, Kory Maincent wrote:
-> > For a PSE supporting both c33 and PoDL, setting config for one type of =
-PoE
-> > leaves the other type's config null. Currently, this case returns
-> > EOPNOTSUPP, which is incorrect. Instead, we should do nothing if the
-> > configuration is empty.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE
-> > framework") ---
-> >=20
-> > Changes in v2:
-> > - New patch to fix dealing with a null config. =20
->=20
-> Hi Kory,
->=20
-> A few thing from a process perspective:
->=20
-> 1. As fixes, with fixes tags (good!), this patchset seems like it is
->    appropriate for net rather than net-next. And indeed it applies
->    to net but not net-next. However, the absence of a target tree
->    confuses our CI which failed to apply the patchset to net-next.
->=20
->    Probably this means it should be reposted, targeted at net.
->=20
->    Subject: [Patch v3 net x/y] ...
->=20
->    See: https://docs.kernel.org/process/maintainer-netdev.html
+Reviewed-by: Antoine Tenart <atenart@kernel.org>
 
-Oops indeed sorry, forgot to add the net prefix.
+Thanks!
 
-> 2. Please provide a cover letter for patch sets with more than one
->    (but not just one) patch. That provides an overview of how
->    the patches relate to each other. And a convenient anchor for
->    feedback such as point 1 above.
+> ---
+>  include/net/psample.h | 8 +++++---
+>  net/psample/psample.c | 7 ++++---
+>  2 files changed, 9 insertions(+), 6 deletions(-)
 >=20
-> ...
-
-As my first version contained only one patch I did not thought of adding a
-cover letter for the 2nd version but indeed I should. Sorry.
-
-Thanks for the reminder I will try to not have my head in the cloud next ti=
-me.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> diff --git a/include/net/psample.h b/include/net/psample.h
+> index c52e9ebd88dd..5071b5fc2b59 100644
+> --- a/include/net/psample.h
+> +++ b/include/net/psample.h
+> @@ -38,13 +38,15 @@ struct sk_buff;
+> =20
+>  #if IS_ENABLED(CONFIG_PSAMPLE)
+> =20
+> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
+skb,
+> -                          u32 sample_rate, const struct psample_metadata=
+ *md);
+> +void psample_sample_packet(struct psample_group *group,
+> +                          const struct sk_buff *skb, u32 sample_rate,
+> +                          const struct psample_metadata *md);
+> =20
+>  #else
+> =20
+>  static inline void psample_sample_packet(struct psample_group *group,
+> -                                        struct sk_buff *skb, u32 sample_=
+rate,
+> +                                        const struct sk_buff *skb,
+> +                                        u32 sample_rate,
+>                                          const struct psample_metadata *m=
+d)
+>  {
+>  }
+> diff --git a/net/psample/psample.c b/net/psample/psample.c
+> index f48b5b9cd409..a0ddae8a65f9 100644
+> --- a/net/psample/psample.c
+> +++ b/net/psample/psample.c
+> @@ -360,8 +360,9 @@ static int psample_tunnel_meta_len(struct ip_tunnel_i=
+nfo *tun_info)
+>  }
+>  #endif
+> =20
+> -void psample_sample_packet(struct psample_group *group, struct sk_buff *=
+skb,
+> -                          u32 sample_rate, const struct psample_metadata=
+ *md)
+> +void psample_sample_packet(struct psample_group *group,
+> +                          const struct sk_buff *skb, u32 sample_rate,
+> +                          const struct psample_metadata *md)
+>  {
+>         ktime_t tstamp =3D ktime_get_real();
+>         int out_ifindex =3D md->out_ifindex;
+> @@ -498,7 +499,7 @@ void psample_sample_packet(struct psample_group *grou=
+p, struct sk_buff *skb,
+>                 goto error;
+> =20
+>         if (md->rate_as_probability)
+> -               nla_put_flag(skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
+> +               nla_put_flag(nl_skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
+> =20
+>         genlmsg_end(nl_skb, data);
+>         genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+> --=20
+> 2.45.2
+>=20
+>
 
