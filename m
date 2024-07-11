@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-110736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4918A92E090
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:09:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3553892E091
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 09:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD69FB2104A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:08:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4EBC281DED
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 07:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4620812FB29;
-	Thu, 11 Jul 2024 07:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B03412FB29;
+	Thu, 11 Jul 2024 07:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CBofupvq"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hkGYUVBt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9360212FF71
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 07:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24AE12EBE3
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 07:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720681734; cv=none; b=AdleP71XwiSM2L9gXelCPai9DTBTdazlFbJVP+i9Dx5Nrm1iHKRRqIIyV0ZdS11hWi9S4w5SA75ObuFh8neksKYOhTc6SoEM8GJd/JSKiUp0OAMS9hSrNBTlPZPzYuGSv27AbD3R0uhrV7kAQnCImokQ0Wes6+OMb6S+k4wz1ys=
+	t=1720681740; cv=none; b=IgF3hoa1ZfNFmI+mNB7hGfIAjP8kN6DDFfBWpHMCNTevKXfduRzdwpx/w20pnd5+zy/Yb8d2h+CjBRAJ3/jzXOeufJriRSt2DpaWDCkuRoCDRBzNI3R5D9aB9fy/wNrP7TIOCslXZexrlKqRTGsZwkpvBr6gO3czzmvxXcfPqiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720681734; c=relaxed/simple;
-	bh=lRJVMCOJV6C2BB1+59lQPrxBIFylkWwSVhJb5SRi6+Q=;
+	s=arc-20240116; t=1720681740; c=relaxed/simple;
+	bh=XwEGmZToecg9xaCcceekHtX1376JIYfrBI0ooxsZv4s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OE25RQ6vQiyIirZpPSllzn/aeFWyWmDh/y21jNqb/iwnnufpw/vya3rMbWvMh17mH5bnXm4YcgB82fUDWx8t5fdmyvy5T1JOwGkJOpxtw77TrJcA6xgOKIu53Dvc5lCer8785Xk+kV/anytYpsqwPQ0DGMZFL3v6zzny9+zTq4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CBofupvq; arc=none smtp.client-ip=209.85.221.180
+	 MIME-Version:Content-Type; b=lvwkeDKvpZMnctxYMq1mUIegRNw/t7OiVT8a54nlMseHjk3lBTxqnFzzjsy+6qfjVt9gy2LBAAC0CTkFbiVBuuQxKNIDGM0qMxTA+fgUkrBiyOJA326u7vk3GZaeb+TzbHN2w4hS/jkBuaDEunhC9iEHfHoB4A7NTh5LyFrvxho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hkGYUVBt; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-4f48434d70cso258976e0c.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 00:08:52 -0700 (PDT)
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b5eb69e04cso3458596d6.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 00:08:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720681731; x=1721286531; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1720681737; x=1721286537; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SkaqHRPa8CP74K/DzZdBPq2E/lOLynVEe2WdM/aVYlE=;
-        b=CBofupvqCzRMIVOy94f3xOAizrewOe7cAKqhPqVHcfbrWBS3x4pljnFlCHYhlIbrUr
-         mGx2Wicx1HVVSnGTCuaVqeQFGWLN2QkEtCkaazhHY19N72pjne6WEF4vS5IGpQDPH+xn
-         y5p6iKs1UbepxKP30gXN11g/Qp8KGAMfou/7g=
+        bh=Duv0Ov175boKFl/FzQMFuZ//R05ouVIrxMGUwrIPH8c=;
+        b=hkGYUVBthtVccu9WAOIenVteCXdPHtpg+Nptsph5NUQNC/kvHH7zUfkzwrwtVb0uht
+         jgDLmiFSIDGQfeQa7e/4Cu0MoZfzPGJ9aysFeHVtn4wijOs+Jfpa/H3W1lasIZ9AaO8j
+         WEC8mPi5+UCg436ejqALXeuvwxitDiWLGymK8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720681731; x=1721286531;
+        d=1e100.net; s=20230601; t=1720681737; x=1721286537;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SkaqHRPa8CP74K/DzZdBPq2E/lOLynVEe2WdM/aVYlE=;
-        b=tAOlVqbNGjgFZksWRWHiT9WOv7ZwHgBXO513R26n05B3H3mkZqgfWqIIWxsyc/LBVi
-         kWeumpHQJ5+YyaHRyXHFAK7EFGNcIGD5G86vMOY5MmBGt8rIxmn3khQiqCdqARCUJbTr
-         d6pFa41k+UfKgjEWK7yzhcNmukZYchvsVyC8yCd/FkNYf547R8KjrqEqjxlO7siI3sCV
-         c/12p4CKjad+3zBSOBf3A6oNHITX1UwPTTW2+ws+Gtr4jNYUnmet5vNHMhPDCNYhgDti
-         P4k27zAYUi7ScJxDUCQSLSJeLqdvJKWMIX8nxiIyI7vOFpYMv8/VlucE3FsX2uhIJQCz
-         tUfA==
-X-Gm-Message-State: AOJu0YzdKJplhi0U6rkPcQfIJUqMCDHM5SB0TB+zmqPTlV48F3dD3RpG
-	mr/aqmlTuBov8vl3GbXlGwmHBh/PUdwPAsOgkxhYDMP7ZFZChx6smWubm3/VesG/iG+CBLNjS8m
-	btPlbl/k2tcGou+h0OMftgXHukI0ka3G5Ub+ynJ1EPODxDMpHxG0HK/gCrcptWosDXp+Ov+b1MC
-	ZuxuzkZJaJKmf+4b8TLc4pPIj3XQ21zTnFsSKycmM+C2pwy6Kk
-X-Google-Smtp-Source: AGHT+IE9UF++qddERsrGeWMWFt+nq6Z/JG3DqG5FYfAkezvSZI9hR2ZGxfba+VYlZI20BdwVyf9a8w==
-X-Received: by 2002:a05:6122:4682:b0:4ec:f4ea:6495 with SMTP id 71dfb90a1353d-4f33f31ca0cmr9582906e0c.11.1720681730789;
-        Thu, 11 Jul 2024 00:08:50 -0700 (PDT)
+        bh=Duv0Ov175boKFl/FzQMFuZ//R05ouVIrxMGUwrIPH8c=;
+        b=SYpn1XWOMvHUC+lfU9tT4hpuoZWt2VRdkQ8oljGVvY0jhXqssV+1oOKOzwl1RYMw5E
+         Gchb37oVdMlZL8GvrNn03NfvjhMroBrZVwxhbCQ+KHgYHlaa6rKQfuf8AATWzq2+0sMY
+         n1dv9foP5Qt4lf/oZn4YsSeEGeTP0DOJ5jAqBJg4o99hiO9G8CLzSBCm1RVCc5i4N3Ga
+         MHKEuXj/cgVulHcCS8RBipZq1wPhU0fQETwM9+3h9r28zI8o/XlNwsNsmw7ykHdXNVBx
+         IVEJQGNnLxnpnp9DjpLCPjErzT5mOuOoGPgVpDYQy4xAHL8hukslZTmZ7jdCxFvSJ74o
+         pS5Q==
+X-Gm-Message-State: AOJu0YxAIRqgpJGlBJU4ixvjqQ2NZgWOCMDnbehjaAV0O2F/zkgxOysC
+	5i/bxpZqU9KVav6d0AOwPR90U2NrjZr7JrZBQISZ/7nC25hU2iVM5ztmBNzhOhehthevQNCk8cX
+	ZMMbJL9iK1Cn/ka4NN9tkYoc+xCQBNKFrKKEKRPqfmTcgoz6HRHTkj24n/ZWtaPHLiaOaOFbG/o
+	7YfbedBgRcOsrXrOBB/jzAcsvAkb1eJ8lCTA0taWFqWJ1rHJJa
+X-Google-Smtp-Source: AGHT+IEThDsaR4nrdM9QUkfr2fvtoqk6MDSSNv7MdpTh7rVfrWjDIv+GGAfMkKnIH5f3gGJ9izW+qA==
+X-Received: by 2002:ad4:5aad:0:b0:6b5:dfd0:a712 with SMTP id 6a1803df08f44-6b61bf31393mr102912326d6.38.1720681737093;
+        Thu, 11 Jul 2024 00:08:57 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.250.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8d86asm23090006d6.125.2024.07.11.00.08.44
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8d86asm23090006d6.125.2024.07.11.00.08.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jul 2024 00:08:50 -0700 (PDT)
+        Thu, 11 Jul 2024 00:08:56 -0700 (PDT)
 From: Boris Sukholitko <boris.sukholitko@broadcom.com>
 To: netdev@vger.kernel.org,
 	Alexei Starovoitov <ast@kernel.org>,
@@ -96,9 +96,9 @@ To: netdev@vger.kernel.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>
 Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
-Subject: [PATCH net-next 1/2] skb: skb_vlan_push gets VLAN_HLEN as an argument
-Date: Thu, 11 Jul 2024 10:08:27 +0300
-Message-Id: <20240711070828.2741351-2-boris.sukholitko@broadcom.com>
+Subject: [PATCH net-next 2/2] tc vlan: adjust network header in tcf_vlan_act
+Date: Thu, 11 Jul 2024 10:08:28 +0300
+Message-Id: <20240711070828.2741351-3-boris.sukholitko@broadcom.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20240711070828.2741351-1-boris.sukholitko@broadcom.com>
 References: <20240711070828.2741351-1-boris.sukholitko@broadcom.com>
@@ -109,110 +109,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005e7a2e061cf36f1b"
+	boundary="000000000000bce47e061cf36f7b"
 
---0000000000005e7a2e061cf36f1b
+--000000000000bce47e061cf36f7b
 Content-Transfer-Encoding: 8bit
 
-In case of vlan tagged packet, skb_vlan_push flushes current vlan header
-into skb packet buffer. It also advances skb->mac_len by VLAN_HLEN
-amount.
+When double-tagged VLAN packet enters Linux network stack the outer
+vlan is stripped and copied to the skb. As a result, skb->data points
+to the inner vlan.
 
-Some of the callers of skb_vlan_push (e.g. net/sched/act_vlan.c)
-may want to reset skb network header by themselves.
+When second vlan is pushed by tcf_vlan_act, skb->mac_len will be advanced
+by skb_vlan_push. As a result, the final skb_pull_rcsum will have
+network header pointing to the inner protocol header (e.g. IP) rather than
+inner vlan as expected. This causes a problem with further TC processing
+as __skb_flow_dissect expects the network header to point to the inner
+vlan.
 
-To allow this we pass VLAN_HLEN as an argument to skb_vlan_push.
+To fix this problem, we disable skb->mac_len advancement and reset
+network header and mac_len at the end of tcf_vlan_act.
 
 Signed-off-by: Boris Sukholitko <boris.sukholitko@broadcom.com>
 ---
- include/linux/skbuff.h    | 2 +-
- net/core/filter.c         | 2 +-
- net/core/skbuff.c         | 4 ++--
- net/openvswitch/actions.c | 3 ++-
- net/sched/act_vlan.c      | 3 ++-
- 5 files changed, 8 insertions(+), 6 deletions(-)
+ net/sched/act_vlan.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 9c29bdd5596d..e13f44fe33df 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4046,7 +4046,7 @@ int skb_ensure_writable(struct sk_buff *skb, unsigned int write_len);
- int skb_ensure_writable_head_tail(struct sk_buff *skb, struct net_device *dev);
- int __skb_vlan_pop(struct sk_buff *skb, u16 *vlan_tci);
- int skb_vlan_pop(struct sk_buff *skb);
--int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci);
-+int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci, u16 hlen);
- int skb_eth_pop(struct sk_buff *skb);
- int skb_eth_push(struct sk_buff *skb, const unsigned char *dst,
- 		 const unsigned char *src);
-diff --git a/net/core/filter.c b/net/core/filter.c
-index d767880c276d..bb14574422b5 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3187,7 +3187,7 @@ BPF_CALL_3(bpf_skb_vlan_push, struct sk_buff *, skb, __be16, vlan_proto,
- 		vlan_proto = htons(ETH_P_8021Q);
- 
- 	bpf_push_mac_rcsum(skb);
--	ret = skb_vlan_push(skb, vlan_proto, vlan_tci);
-+	ret = skb_vlan_push(skb, vlan_proto, vlan_tci, VLAN_HLEN);
- 	bpf_pull_mac_rcsum(skb);
- 
- 	bpf_compute_data_pointers(skb);
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 83f8cd8aa2d1..9c69c9bff55c 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6223,7 +6223,7 @@ EXPORT_SYMBOL(skb_vlan_pop);
- /* Push a vlan tag either into hwaccel or into payload (if hwaccel tag present).
-  * Expects skb->data at mac header.
-  */
--int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
-+int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci, u16 hlen)
- {
- 	if (skb_vlan_tag_present(skb)) {
- 		int offset = skb->data - skb_mac_header(skb);
-@@ -6241,7 +6241,7 @@ int skb_vlan_push(struct sk_buff *skb, __be16 vlan_proto, u16 vlan_tci)
- 			return err;
- 
- 		skb->protocol = skb->vlan_proto;
--		skb->mac_len += VLAN_HLEN;
-+		skb->mac_len += hlen;
- 
- 		skb_postpush_rcsum(skb, skb->data + (2 * ETH_ALEN), VLAN_HLEN);
- 	}
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 101f9a23792c..34909aca3526 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -244,7 +244,8 @@ static int push_vlan(struct sk_buff *skb, struct sw_flow_key *key,
- 		key->eth.vlan.tpid = vlan->vlan_tpid;
- 	}
- 	return skb_vlan_push(skb, vlan->vlan_tpid,
--			     ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK);
-+			     ntohs(vlan->vlan_tci) & ~VLAN_CFI_MASK,
-+			     VLAN_HLEN);
- }
- 
- /* 'src' is already properly masked. */
 diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index 22f4b1e8ade9..f60cf7062572 100644
+index f60cf7062572..8de6f363885b 100644
 --- a/net/sched/act_vlan.c
 +++ b/net/sched/act_vlan.c
-@@ -50,7 +50,8 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
- 		break;
+@@ -51,7 +51,7 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
  	case TCA_VLAN_ACT_PUSH:
  		err = skb_vlan_push(skb, p->tcfv_push_proto, p->tcfv_push_vid |
--				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT));
-+				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
-+				    VLAN_HLEN);
+ 				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
+-				    VLAN_HLEN);
++				    0);
  		if (err)
  			goto drop;
  		break;
+@@ -94,8 +94,11 @@ TC_INDIRECT_SCOPE int tcf_vlan_act(struct sk_buff *skb,
+ 	}
+ 
+ out:
+-	if (skb_at_tc_ingress(skb))
++	if (skb_at_tc_ingress(skb)) {
+ 		skb_pull_rcsum(skb, skb->mac_len);
++		skb_reset_network_header(skb);
++		skb_reset_mac_len(skb);
++	}
+ 
+ 	return action;
+ 
 -- 
 2.42.0
 
 
---0000000000005e7a2e061cf36f1b
+--000000000000bce47e061cf36f7b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -283,15 +234,15 @@ zPffqO2QS6e4oXzmoYuX9sCNfol1TaQgCYgYoC4rexOBLLtYbwdKWi3/ttntZ2PHS1QRaDzrBSuw
 L39zqstTC0LC/YoSKC/cU9igMELugG/Twy9uVlg2XXTY1wUYSWMsYlpydsrVyG18UScp7FlGFbWX
 EWKS7pkxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwA
-ydoyIjshhiv/IkUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMGWvUln2yPPHV3W
-fu01LKUcb0x628eYNdxwX0cXoiiYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDcxMTA3MDg1MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+ydoyIjshhiv/IkUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOdEgKM0NtOsmTd+
+6aT+NoKcAWZ5TIlTdRKu9Y9OucWFMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDcxMTA3MDg1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAZjJCIOvrfyh+3hnxVPrTEOfe1jbBp1WRN
-sxiIS16UsoIeDgkj6L36ulr4mJQcuJfiPt42zcGJkPEXBFtbwFCVYANNH49fq3ZvrOTs/3QROZYs
-nCMQ5zWOeYJGDt6gVEfAb5gPGG5xawK9dzIt0F69Qf7vo//z4UulgEyFFl6xXG8FC65WOtQB7cQZ
-BZksAPcIU7VlOMzYEv4BOcUvlFcUADMgGNwMdfRRebe5wf2cd7G5oVeFD9hh5XSeO0MrTU3qTaEm
-6Kb7TKwCBf2D0KJKJicEAKPowttnKI9KhjWMVlG3BFcoJen77Z1KwZGd9TOcOdIKazmpQ4Ch9voY
-LXJS
---0000000000005e7a2e061cf36f1b--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQANkcma+/dG0MRyNCouZMbvnpMg2WZb4zpM
+3gloIdtzGEoX1wQWfLfpje31jBwYobJmJnIDewozZdgL95MeEIC5aGa9CuaHivlvnswfSQuxBA7i
+F8vDRBvtAKcvuSDAGRQHqNp5kzQmqX6uj46PIpIVWbhuvfsvCRBwYBf+n3RPMjAAyZoBA1kwHwrl
+DPJjjpFxgEeJxVWbiCYxb4Pd5yOCoiGEiyTU85U0wxobDqRY6eyao3jHNzPWg3c+1oDKhYPZiTjI
+t9WdCddodvSiViO2s1GsJTfILo9OOUbtwprWjyShF4PkE9w4XP0ArRvKsHusjhrmw0k3MJ+qBibX
+HU3H
+--000000000000bce47e061cf36f7b--
 
