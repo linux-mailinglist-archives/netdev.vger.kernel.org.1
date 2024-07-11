@@ -1,192 +1,110 @@
-Return-Path: <netdev+bounces-110855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FBDF92E9E2
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:50:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9B292EA04
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 15:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 550401C21C10
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:50:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7E7C1F23164
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 13:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AAD15FA9E;
-	Thu, 11 Jul 2024 13:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29441607A0;
+	Thu, 11 Jul 2024 13:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QV2Jh6CV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PaRSJRI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2057.outbound.protection.outlook.com [40.107.96.57])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E78A15F40D;
-	Thu, 11 Jul 2024 13:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720705838; cv=fail; b=fJUqvFKIMvpEfAmqqxaNGiB42rb47jenCnymyiQu8d6cADXYLNmDLgVohtlxTfOXHT4WjAL2cc10NlsRVEw2AiwpXygVnXs+Cjv5Qj7SNmIgDi8EkaEr10rEYYx4uri7wzgtg2YQPbh+yXLWISevYz2oOqbDN/bOK5o8pc9hIzg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720705838; c=relaxed/simple;
-	bh=nsg9pam9dUuSnN/M1iQZ9pOT5/oB3wIAtJ7tVcX9TC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ON6nmH16pdfrTk8qyxvIcuMLA8iGZPKNJzXfJ4OLv3iUnA+eOtSTYolTeDyjD1aVY2KS47IPi+dUKAFLD7Umegyh6qirr5UbsXpJJh/df7J9TFNW+xwFQL+zrPQ8vQ2EejFwDQYJOH7SrB6i9nlMDiZ+g9ekmgiYWhZRIoQZelM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QV2Jh6CV; arc=fail smtp.client-ip=40.107.96.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GQOnYmF9Tou0DaCqKqxuTh8SzAqy//HYq6AkFteo/wIIjj0jSw9/CSaHEyNayb9bfT7keiTniAIeblSz7ojmw10kDnLbfEBm3raOzRQfhtO3Ju9j6BYLjKsvHgpdoB6miJ/PDLkASASs+yCxOOuyKsI4s+fkSPZng5QWirYOjrNtChMnHFZetEWWKkoLpc74h4Z38n4DfAYbFsJ0HBQ2pZ2OfT1PJmR23Jt4W4zogTO5BkLRFcFX1Q6bAL1CpUVyrF6lft+TjKa9GMbYwx9sixlPfRXAb70oG9aGyDBusFUIIT4dGxfZ+gFB3GSOGGgFUtSDrP1s47v6kkeb8ftbsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bwGqxbsjI/ipmmqZJF9wbI7qDdV4+QMeHj+865phEr0=;
- b=ZpHEEhMZurIi4O7zVbtsXXFm2GW6LOCVSZOHX9UhSJNUJH717AIlR2OmoZxz37Lafi0BTsuvMx2aJ6b57Ka81K+6f0wKdToJkO7Qze73o7Zr3X7fLvj4O8uq4jabeQxbMBJxYhv7/Bn87tblLDgfDp9CTimJKL0srshge8GqyGGMo3YNa1eeajfDdcUcWg+T4V275JLCMtpeUNCSyykZ0vnrdvyVsCK18mOB55a4pq1tCa1W14DBLaLeWmSEcAWVNPj/YN6VPmSintqt5sHsFuuVe4AJtxXOZqQm+TcMpuCdqUMsqphmdwXzIhSiB1lXUDsc7fD3rw6LQCVrbEVRqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bwGqxbsjI/ipmmqZJF9wbI7qDdV4+QMeHj+865phEr0=;
- b=QV2Jh6CVT9ymbKQ/5xhOkyLm8v6bItY3jCKi1SKR6oddV1LsFVTncIg1lKo5vsoMEv4ddqv0WmQRyOJ+P5XoJ7Kf9Mzh6w59b9fo5eGn6Q0B2wzTJ1xEPYixw0Pp8hH1idEI0sZYSBZE1hdf4UeVv72ycJBqf5m+IlG+Eo2zZvlM8okk39NEdAK0wod0ZFZRtOQn2rtEd/54bxqHT5cJ0tnFg8+Z7spJFhXV8I3MhIaKsL0SunQ/2RJrIECKz7XAFcSpc/lqs/P9dhv39UmkyaDYmTUStYd29pZ/Ur3HVxK9Ud19vkt0GF5Hm8hB5p2PnQBEDkktdTuOqYVqIqGHhw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by BY5PR12MB4146.namprd12.prod.outlook.com (2603:10b6:a03:20d::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.20; Thu, 11 Jul
- 2024 13:50:32 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%5]) with mapi id 15.20.7741.033; Thu, 11 Jul 2024
- 13:50:32 +0000
-Date: Thu, 11 Jul 2024 10:50:30 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240711135030.GD1482543@nvidia.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
-X-ClientProxiedBy: MN0PR02CA0015.namprd02.prod.outlook.com
- (2603:10b6:208:530::16) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6334CE09;
+	Thu, 11 Jul 2024 13:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720706157; cv=none; b=DVd1PA+RUL5zMS0qMb6Ia1Gj93ILXUfxu/EazAMl7shCCrzh8iCdRVU+kk1cn1ibQX+JBVLfblHNNepiZFSvbLrrFsokPUrOCxhnrm1q0H0pbjziC4grzyefPZ7vHCXH3b4MwI5Xk7QfLkB9V5Tm3hBmF7IT6V8McgCOfOXZCJc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720706157; c=relaxed/simple;
+	bh=L7usCHDaVACaTClnTKJXkkwRy0/lN/L4DvB8pcrdI4Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=MdKWPQKTJHqiEEP9WSnVdEOzsyBqHB0m4MupOY39B0oLVVJB9tgPwR/nV5P/exabB7qShz4XrEoqL7rAtFgJ46DQaN3n4hlyC9sWC6HHULvQsMP5Pdg0vbWQyIAgjYtrphUuDRNTyh2QbegU4EpQ14Ravd3jNbUTWUYVy6y7QT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PaRSJRI0; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EDB43C0004;
+	Thu, 11 Jul 2024 13:55:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1720706153;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Rt2/AtZ1Iqo+6uK6QUDvJTbEKbnlhmjWhOIuc5JOZsQ=;
+	b=PaRSJRI0iXH4h67PKz2acSgBROrc6x6Jv2/zBCdDTB4vFirJJbBM5PjwF9qHGMGDqVtKkI
+	V9BYeyzURNXK0jI5ZErOFJAO7mG9pFji1dXV36JwWi7RwV1OiRQtuUkWT3hZmwMV8CtWbU
+	9msCotbvyLVx69xXKZdNqOMXx8QSXnJuqjq/P2MR21OMYPAaoDZ+1vFFWnh8nLp39DjfHb
+	aEvKrNmN4i9MgLjlWOfIeyBJ4IGWQth+nx07E1ISyNUQ8tRFrYxAKFNcl0+MafBizzhnUe
+	qyIsdb5noUXYrIR6Z9mVFD2NvTAAFYhOE7HWlSXeGqreZlTV2KGpZOnPgmhZyw==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net v3 0/2] net: pse-pd: Fix possible issues with a PSE
+ supporting both c33 and PoDL
+Date: Thu, 11 Jul 2024 15:55:17 +0200
+Message-Id: <20240711-fix_pse_pd_deref-v3-0-edd78fc4fe42@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|BY5PR12MB4146:EE_
-X-MS-Office365-Filtering-Correlation-Id: dfff4a82-c667-4a6b-953f-08dca1b06ea6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KJN5dX/SWUhCdUMBV2G8Axy+rpYPGIkfgDDF+98WSJ1Xlj4PJc/jufKGz0uY?=
- =?us-ascii?Q?ZMe0GKgUu806CQoq3GqU89widpIn7itB+eS6/Ry7I3/gQDHA8lv1OlzEU5DW?=
- =?us-ascii?Q?r6Fs1QyLKqXmErpZcxjpE8b//v3nflLTPSTUByt9G62zAU5RjcScqRbasHfD?=
- =?us-ascii?Q?CNnI6IZyx3ooofhpr7YFSmCe3ktaccYnqgZArontNh4JmJa2WiYCf+8/fIWN?=
- =?us-ascii?Q?2D4FEHzjNWJjmCoMbwwKjj/rLaJ/+qZ8Kw11yCDYufrGlNCmCNA0bD/RKpa8?=
- =?us-ascii?Q?nZA2RBj8fR1elvwDItmZiDUQC1YJ5fQ81ccySf7NcEbVqh8kMmuzdHo5Pm0c?=
- =?us-ascii?Q?qbAfXiMf7nkQM/ErpfLkv9rYS5icCy8Xbi4vMlNsENb71pO0rvF5nfaplSQG?=
- =?us-ascii?Q?53BSjbsd7NPuxKECgPiilyGV9Dno4vTSQ/neZY38lDkXg8qIBMJ/7dkrIE5W?=
- =?us-ascii?Q?e5wa4N4riNGm4cM4Jb9QRE5rbWZ3z7PewIXRSNHZt44KUoK39u1/AFC6ST7z?=
- =?us-ascii?Q?Q+X2K4bRdwzT0AeTS9hvhnQQbY8iXtnkLRjhbiSz86qOKQcjm1WZb5wVvW4g?=
- =?us-ascii?Q?PGqlkM1kRUVETCe6BnJCEo5JjCsm4uVRV1KS576Na90C6iv39YLR/XBX80EZ?=
- =?us-ascii?Q?aqllzgYBIp5iKKx6fk9Qg5rKRYot3es/8dqPIig+ozpmmR7VqSJIPV5kRf8l?=
- =?us-ascii?Q?5nuDrUTm/DzZMvWP2asY0CVvxxOxR497A/Bmy1YdmfViA52lJ9xQsWsunS/H?=
- =?us-ascii?Q?kKgrYTtQsp1REr54XZ201bCUz5MoGbM8+m3akVdqhCsvbYl1ML16mGxya+1b?=
- =?us-ascii?Q?AidMlbUAlT7QOpaqJjmPek5zW6Poi+5cGb2whM3hoFXwUP0WIbJWCB3R3QqD?=
- =?us-ascii?Q?yjeFK4qsAozK14dAIu3W/3tXjzXug3v8MqcgmWd++clr8NVgRYP+cQBg9dPs?=
- =?us-ascii?Q?wp0mDaeFlWbh2BV5rC1fa8rHakVfChjZYKaBgzjxUP5Ze4usMDeBi24O+w5Q?=
- =?us-ascii?Q?ZsbjzPHmDyytRykp8br36/UYiQm4Mw5THbfaGD1Ju4ugFY7uJYfvahTyyDwD?=
- =?us-ascii?Q?sLC1yzDa9bOK13z1lJM4huIyGciyTi04LXPmxeNHMBZLV/zr0hZsZ3zdB5Pw?=
- =?us-ascii?Q?3CM4gFV+vpfnt0JVR1ndISlgHGPxPIyxCkedkIzFDtPTFyv6KD1M0fluyRdA?=
- =?us-ascii?Q?PjHgh6gwzb09kfVTQXBTwTd9Nn6wj3P8Vjlmdr1vr5enbZhaAmWAbfoICScJ?=
- =?us-ascii?Q?/UeIYq8jo3Php6lcGHUrB9Vf8BF8rUvwHcDDvfp85mkVKFWO1L+/HIkwgQuN?=
- =?us-ascii?Q?7T/ynZWjObFsLIt2N+ZsnMR+axhR7SWE9ZFQL85ZumWlNg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JxiRECmSj+dR/CQVzm2Yc8mVnHbcuvuGas27oSviyC80y306szqcOVHqm/TI?=
- =?us-ascii?Q?sC/dUjavXtNhrHb/DyIuH0GPYodRpIr2U7qFHk/oaWQE6BYOtv2YmiplcxLe?=
- =?us-ascii?Q?EC795d7kUm5DBu/NdmynrTFZt+IJNASHBSjCmqPlWl6WVttf2KMxDkZ21iUw?=
- =?us-ascii?Q?2zzjZmEsidZTEgsvMIEJvgrv+GR7N1wu1ZEXY8kDaoV1oYoq9pxkRiA390Aq?=
- =?us-ascii?Q?JlM0vhraWejoY6DV6VsdXHiwgefAHW0m87R1tTLm0f0dZpelQT80Blp1CLJd?=
- =?us-ascii?Q?CureSKVEPsoaLLczs4C+zJEZvkFBG8ajXz88kxu0ns/Gm9oKxrqidaStkORY?=
- =?us-ascii?Q?8iZYrFIU4PQGYU21hrS1kY6mDGxnHaUOXMzcm6VwLxw5faVH956LKHmpPvUU?=
- =?us-ascii?Q?/SG9Fzzw2b6+xfBpG9gqAY8mu3msykwgkV5iXMmK4CzK8DFZY2uFknsddLRD?=
- =?us-ascii?Q?WcLaJL1nxetoDZ0HjPQh7Vxlgsq9qLXQDC5D2IxF4GPd+F/34FW5nsvGOVQp?=
- =?us-ascii?Q?v3MjqIUQBJJfi4mQ/sc7NQLUX5EMIkEhiz7XQM4RyaXauZyfOy5bQkWrEDmv?=
- =?us-ascii?Q?ryT8DQim5TieKzE1wn1XEQw3Ildk6nn1hlfCtNvCvWhgOWpSfzGqfv+J5gB7?=
- =?us-ascii?Q?/olPYsU5U0W8UtE/olGAUeFPW8uOYZzrzyGbTlM3SD2hc324lYdLgl8cJQtt?=
- =?us-ascii?Q?/rJcWWMyQEp5Ptlu70GK7nsZwAOdpBKWZX5jrYNAeChGu7Fpy0TVVMKnMzKg?=
- =?us-ascii?Q?8Mq1arGrRMVNxOi7jfY6O1W2mMekV/6rlGqTc235oWhflIY4P293/KOYzs+H?=
- =?us-ascii?Q?Q3JN3ak4CnosJj/MGK+U/Rl2i69K5QalUdU0vHvNU00UT4z3+AwITXKx9Nzv?=
- =?us-ascii?Q?gYpwo91N53nqUxPIKv7mODEsCN7U2U9Xw17It7+TZTTiM/MDHih5Lpdo451Z?=
- =?us-ascii?Q?P3vdoMNRyYHlo6qtNNadTkc5PF03J2w7dAgzFfTX8vmcgB4d+dd26eHZU85V?=
- =?us-ascii?Q?FFEosdYbZFx0N/THGuVX0eiYoD/UVO/3irT7aSrwkf9zTOz+l7SMDGGIRHKI?=
- =?us-ascii?Q?C+hdPkadGBb7WU9NekhXdH1GvwEHAR+oXIoWdAC47OtiW4HbhHoeD7w60itL?=
- =?us-ascii?Q?82lP6XBPfHRo8tsjxRWiXxCYWwcOQ457kYBLKF0yxze/oZmqDZySraV6Ffcb?=
- =?us-ascii?Q?K+5wZKt7Hgm4WQ6O+x5gyMWinGb6F29HZfhhuMhrGvRtZKRfs9f72b8guYhn?=
- =?us-ascii?Q?3z7NB6W+zxrZp5dMtOTh3/0TeFQHfHZGS2Mt5Kdwx36RONkO3HTDmt53bhY2?=
- =?us-ascii?Q?/UvOCsVl6fisqUEwdfSk2q+QCK1gpFl3fL3Ip+PdfAf0qIxkAZ6YiXRDb1qS?=
- =?us-ascii?Q?mkqha1zyVvANSwldFo6KzdUUfSYtwtGVn6rsdAitjyIRvSsDcYFYOXZcOrsm?=
- =?us-ascii?Q?7sVNVB7W1Y2fEBeRyVuduVSKR3uJZlCH7u2OyUJERttaAz4lQSp3KiFWPywg?=
- =?us-ascii?Q?g1Oh7PmAEsL0y+B70WGMNQ1Kw6UEEJpTnRMfw2t05mjVmcpUoGRZmVk6YU0k?=
- =?us-ascii?Q?HHGNEYcf1Ul0MHcZHTsyVFltMjnELm+Tpzh8+LcZ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfff4a82-c667-4a6b-953f-08dca1b06ea6
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2024 13:50:32.5099
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mbzkdFzI5RFNL/dSEc3AcG1gUFayzJp2BEZL5GL2z8X14DMjKDIpIxZDKG+7xIb7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4146
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAEXkj2YC/x2MXQqAIBAGrxL7nGA/aHSVCJH2q/bFRCOC6O5Jj
+ zMw81BGEmQaq4cSLslyhAJdXdGy+7BBCRemVre9tk2jVrldzHCRHSNhVcZb1gxtBt9TyWKRcv/
+ LiQJOmt/3A1ZaMH5nAAAA
+To: Oleksij Rempel <o.rempel@pengutronix.de>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Jul 09, 2024 at 09:02:25AM -0700, James Bottomley wrote:
+Although PSE controllers supporting both c33 and PoDL are not on the
+market yet, we want to prevent potential issues from arising in the
+future. Two possible issues could occur with a PSE supporting both c33
+and PoDL:
 
-> For NVMe and net we do have SPDK and DPDK.  What I find is that people
-> tend to use them for niche use cases (like the NVMe KV command set) or
-> obscure network routers.  Even though the claim they both make is to
-> get the kernel out of the way and do stuff "way faster" the difficulty
-> they create by bypassing everything is quite a high burden.
+- Setting the config for one type of PSE leaves the other type's config
+  null. In this case, the PSE core would return EOPNOTSUPP, which is not
+  the correct behavior.
+- Null dereference of Netlink attributes as only one of the Netlink
+  attributes would be specified at a time.
 
-[..]
- 
-> What all of the prior pass through's taught us is that if the use case
-> is big enough it will get pulled into the kernel and the kernel will
-> usually manage it better (DB users).  If it remains a niche use case it
-> will likely remain out of the kernel, but we won't be hurt by it (NVME
-> KV protocol) and sometimes it doesn't really matter and the device
-> manufacturers will sort it out on their own (USB tokens).
+This patch series contains two patches to fix these issues.
 
-I don't see it as being linked to big enough use case at all.
+Changes in v3:
+- Add a cover letter and the net prefix
 
-The kernel gets involved if there are good technical reasons to do
-so. Databases running over real filesystems with O_DIRECT is really
-technically better than raw block devices.
+Changes in v2:
+- Add a patch to deal with null config
 
-While DPDK shows the opposite, userspace is the technically better
-option. This is now shown at scale. DPDK is not some niche. A big
-chunk of internet traffic is going through DPDKs, especially for
-mobile. Many ORAN solutions include DPDK on Linux.
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Kory Maincent (2):
+      net: pse-pd: Do not return EOPNOSUPP if config is null
+      net: ethtool: pse-pd: Fix possible null-deref
 
-What has been improved kernel-side is the intergation. DPDK
-deployments now often use RDMA raw queue pairs instead of VFIO, which
-laregly eliminates the "high burden".
+ drivers/net/pse-pd/pse_core.c | 4 ++--
+ net/ethtool/pse-pd.c          | 8 +++++---
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+---
+base-commit: d7c199e77ef2fe259ad5b1beca5ddd6c951fcba2
+change-id: 20240711-fix_pse_pd_deref-6a7d0de068a4
 
-There are many other cases, like DPDK, where the right answer is to
-reduce the kernel involvement. It is not so simple that things always
-get pulled into the kernel.
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
-Jason
 
