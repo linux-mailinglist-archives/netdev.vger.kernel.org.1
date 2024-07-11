@@ -1,133 +1,126 @@
-Return-Path: <netdev+bounces-110904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B5C92EDF1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:38:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1E292EDF9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 19:41:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49A81C21622
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 17:38:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E2B6B20DDC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 17:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906AF16DC1C;
-	Thu, 11 Jul 2024 17:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA6316D9BE;
+	Thu, 11 Jul 2024 17:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oe9j52uy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Sqp0yI76"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D03816D326
-	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 17:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A9342AB5
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 17:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720719496; cv=none; b=TR8Y7w821IE7BXtq84j7WMvOnA+ySNisDtSN70MaaSugumo1K8AIhc+nEX5bytdYLS0gEI9FlDQNCq7sX0reiNySHEFJAvBXdNd1QWEH0mPAJTntEh///hyIxdwix3DvakJ9ltRlVuRZ5pn0RciCsfVJTkISrqGUCw6WE2T5nvw=
+	t=1720719700; cv=none; b=hG3U0rOiFUqEL8Cu9RpKaHAosGfq8daHm+PBSv3HNrHnOMOfxoFen39+Mk7BRHaM9ZWliJS7jCOlo2lAz7j2oNuteUjpy42Zbr+GuY7IAYjff4cVq10snTroudqrHBb9H2dU50ViJlPXi/Oo9i1RmAaA4C7QWiGupiX4hDFWSms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720719496; c=relaxed/simple;
-	bh=5Xgl+EcOjT7f93shPiHRMJ4pO5M75AEYdIGVDYwpN8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kHIhdy5UoT3o0eX0hgQ7gK11snnyGaLuyPnYBBIir/rQHGMOBv/u/3981Ev/B6A4QgzrVkdLG1WqsZUXgoIYR6laKybkElTaK0xF6ljjQOjGiutxtyu80+0GQFNBoUSkF0EqWY5k15wSZm8+gW5l86x6Rt7RWe3rJ+VsguxiHkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oe9j52uy; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso554a12.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 10:38:14 -0700 (PDT)
+	s=arc-20240116; t=1720719700; c=relaxed/simple;
+	bh=6MvoPzqV0cy8SIdODz7OzSR38E2by4yFRfeSbGFUx3s=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y1dgEUQfZulLQfnEb7McaveB8QBfMSbsPxTyaJuAgaKnxlSTJPm4wfQwdFfzn9cmLlJdXm+WeWwIFrPcmmya0tR/g0df1bxaBnBnsuToQULKZS1P3vqBYELaU+SrYEu2vu9YEg5ew4d3NK38MBsBHFSRD64iY32WUpgcnfOrvc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Sqp0yI76; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720719492; x=1721324292; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kmi5HLcqE6fK5ySS3lyqzl4ypWFtv4L42PctvT1OoP0=;
-        b=oe9j52uyDrHceb9y99ZhuiWajBBOOb0Vu5p4YsdN8JRq9bMms36Ydg9DebfagfNYFp
-         2bb8egBjYqI+xW7EYeBcnd68Br5gRMChOOnv1uqkpO/NzNAN1bdURs9I1Ys8TSpUaFUB
-         GK9K/LdgpHQT24rwAzYds0+QH0TmzpcXFL/v7MaLkVVEOTer+y6D3tDqGPyJCuvrEBY8
-         XXCOUzLIJGfg8/lRf2OZr7daWAW25E/BcHRFh8ZBjgx0FxsEAfmQUDDc658XqYyVrbzV
-         Xk3n+MfAS1xGB9VXYXXzajf/EM9AjqCa/EMP7xGfTCwggDaU48a3latx5Cg8Bu017uWV
-         qMzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720719493; x=1721324293;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kmi5HLcqE6fK5ySS3lyqzl4ypWFtv4L42PctvT1OoP0=;
-        b=ZkG5/zUn0vVng5PZ+f5Sa3rGyqarkKyeHIJdjivjOrhEvc8+7N+So5s5K0f8Sd2gJE
-         Vb34OLbB8XG9gXNwdPDzlKJudCU9m7OV1+/mcwu0l1FGf+fL46HuSnhLgwc/Y4G6z38c
-         CUl7bc19McmwyGoD5HgSnDvDf1rkFhvbN+ap4rn5mMrhJsb6AlJYjC6DLWB/F3rAofuj
-         n+4MJlbFHmVNcUZj0Jzvq28F7JNx0rodVeHlckIifuwbuKzEOeSPk+e8RWOdnzt31zWc
-         2OSzps2eLPXQiLvsUKbXZt1dQm7/HPLTHlPR1uaqcFrOuP05L87yaU4snC34Fmpo0vPy
-         rv2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXNBZacotGUuCu+shZRICCu7w02DLvqcysnIl0eKR11s6UwKmmhH8wNDdyVbnsNtyDhx4UCz9SrYlg1SgGq16Jdk0y2bjdn
-X-Gm-Message-State: AOJu0Yy3kxzv6G+WRoDtKaMbUdAUZweoKIWsShRmci1/3AoBBlYr42UB
-	Esd2UyVgZ0g2jKA9fZIbuTYJrARKtnbuDmP2J4pduEPAkzoOyby4TXn6cGvsmzma47T0cYuDiy+
-	NSfEsMOhG2HH4pdpRvSvI2tfJL3++FiNfl/t7
-X-Google-Smtp-Source: AGHT+IH7ZVeKGtFW1ffbCmLAUEv4AqAX1Zjzfy/SAWoRHxzSGzNdtgnfN009pJNeMEQH46pIXGbzCkhrPdNrgHUru00=
-X-Received: by 2002:a05:6402:51cc:b0:58b:b1a0:4a2d with SMTP id
- 4fb4d7f45d1cf-5997b09fef9mr1782a12.1.1720719492339; Thu, 11 Jul 2024 10:38:12
- -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720719699; x=1752255699;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rqKrSrlClA1kv2JkQ4QgJsWLgcOM9AMFF+TJ3I3Whds=;
+  b=Sqp0yI76SlKQw6zpQsjgMwKEhTyAzUjSu/9wsYW8icY5Nrqbv1nF1uFJ
+   w591LeQzkhP+6Jgkm4qogEw1Q6ZhmlKBRjxkZcMl/+iPFr5GNiv+nLQ7u
+   o+YwJvDthhLCK8unC8VX9v563xxaLPrsw0ZvSLDWLhKa02ksM8Glku9rx
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.09,200,1716249600"; 
+   d="scan'208";a="666752617"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 17:41:36 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:38570]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.210:2525] with esmtp (Farcaster)
+ id 78872bc1-630b-4f53-81d1-aa30c13b068b; Thu, 11 Jul 2024 17:41:35 +0000 (UTC)
+X-Farcaster-Flow-ID: 78872bc1-630b-4f53-81d1-aa30c13b068b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 11 Jul 2024 17:41:32 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.12) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 11 Jul 2024 17:41:31 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <grzegorz.szpetkowski@intel.com>
+CC: <netdev@vger.kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net] net: core: sock: add AF_PACKET unsupported binding error
+Date: Thu, 11 Jul 2024 10:41:23 -0700
+Message-ID: <20240711174123.66910-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CY5PR11MB6186C896926FDA33E99BD82081A52@CY5PR11MB6186.namprd11.prod.outlook.com>
+References: <CY5PR11MB6186C896926FDA33E99BD82081A52@CY5PR11MB6186.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240711171652.work.887-kees@kernel.org>
-In-Reply-To: <20240711171652.work.887-kees@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Jul 2024 10:38:01 -0700
-Message-ID: <CANn89iKqZD68w1QtM3ztL_X290tj_EGyWRvFrhyAz-=T+GkogQ@mail.gmail.com>
-Subject: Re: [PATCH] net/ipv4: Replace tcp_ca_get_name_by_key()'s strncpy()
- with strscpy()
-To: Kees Cook <kees@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Jul 11, 2024 at 10:16=E2=80=AFAM Kees Cook <kees@kernel.org> wrote:
->
-> Replace the deprecated[1] use of strncpy() in tcp_ca_get_name_by_key().
-> The only caller passes the results to nla_put_string(), so trailing
-> padding is not needed.
->
-> Since passing "buffer" decays it to a pointer, the size can't be
-> trivially determined by the compiler. ca->name is the same length,
-> so strscpy() won't fail (when ca->name is NUL-terminated). Include the
-> length explicitly instead of using the 2-argument strscpy().
->
-> Link: https://github.com/KSPP/linux/issues/90 [1]
-> Signed-off-by: Kees Cook <kees@kernel.org>
+From: "Szpetkowski, Grzegorz" <grzegorz.szpetkowski@intel.com>
+Date: Thu, 11 Jul 2024 13:48:07 +0000
+> Hi All,
+> 
+> Currently, when setsockopt() API with SO_BINDTODEVICE option is
+> called over a raw packet socket, then although the function doesn't
+> return an error, the socket is not bound to a specific interface.
+> 
+> The limitation itself is explicitly stated in man 7 socket, particularly
+> that SO_BINDTODEVICE is "not supported for packet sockets".
+> 
+> The patch below is to align the API, so that it does return failure in
+> case of a packet socket.
+
+SO_XXX is generic options and can be set to any socket (except for
+SO_ZEROCOPY due to MSG_ZEROCOPY, see 76851d1212c11), and whether it's
+really used or not depends on each socket implementation.
+
+Otherwise, we need this kind of change for all socket options and
+families.
+
+
+> 
+> Signed-off-by: Grzegorz Szpetkowski grzegorz.szpetkowski@intel.com
 > ---
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> ---
->  net/ipv4/tcp_cong.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-> index 28ffcfbeef14..2a303a7cba59 100644
-> --- a/net/ipv4/tcp_cong.c
-> +++ b/net/ipv4/tcp_cong.c
-> @@ -203,9 +203,10 @@ char *tcp_ca_get_name_by_key(u32 key, char *buffer)
->
->         rcu_read_lock();
->         ca =3D tcp_ca_find_key(key);
-> -       if (ca)
-> -               ret =3D strncpy(buffer, ca->name,
-> -                             TCP_CA_NAME_MAX);
-> +       if (ca) {
-> +               strscpy(buffer, ca->name, TCP_CA_NAME_MAX);
-> +               ret =3D buffer;
-> +       }
->         rcu_read_unlock();
->
-
-Ok, but what about tcp_get_default_congestion_control() ?
-
-Thanks.
+>  net/core/sock.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 100e975073ca..1b77241ac1f7 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -639,6 +639,11 @@ static int sock_bindtoindex_locked(struct sock *sk, int ifindex)
+>  	if (ifindex < 0)
+>  		goto out;
+>  
+> +	/* Not supported for packet sockets, use bind() instead */
+> +	ret = -EOPNOTSUPP;
+> +	if (sk->sk_family == PF_PACKET)
+> +		goto out;
+> +
+>  	/* Paired with all READ_ONCE() done locklessly. */
+>  	WRITE_ONCE(sk->sk_bound_dev_if, ifindex);
+>  
+> -- 
+> 2.39.2
 
