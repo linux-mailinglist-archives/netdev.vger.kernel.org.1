@@ -1,142 +1,82 @@
-Return-Path: <netdev+bounces-110704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144E392DD57
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:21:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A8A92DD67
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 02:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 466031C21348
-	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 00:21:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9597282D44
+	for <lists+netdev@lfdr.de>; Thu, 11 Jul 2024 00:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6398763A5;
-	Thu, 11 Jul 2024 00:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FE281F;
+	Thu, 11 Jul 2024 00:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="mK/W4GVJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MudpCDjQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D9A17FD;
-	Thu, 11 Jul 2024 00:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ED5383
+	for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 00:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720657251; cv=none; b=Q0yxNpTS1QDtsggatXmrLYWZzIn0YHinBTwg1tYeQYbLAlFBY/K9fwPB2rTsay/ZiNsuGMTU2w3FhKBxCJaiSSz96Ra/yt0r+C1jtSVOLqmcchiiS1OOeHweOS/K8TjXEgExAZipP1hhXsH4csLZKGXJphw0GfomKX0VroFDPvA=
+	t=1720658643; cv=none; b=rRp+m075kzSdvVFu4nbWL2PMLcUWceAcOAWnfWL1DeBJEfTqymcaLSoUmIqR1P7pT8Z7UBN/PCx4toXSYcBui9urSxIJSxzz/7Y+iLbfZaTKGxxIZe+UIILwhLAdnPKsYs6+O0jWzLggSqrExI5xK1r/z9GBUPPkvhBPKW5HOP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720657251; c=relaxed/simple;
-	bh=6C4tMfHM6VQngRyJonPLmoU9doo2Tpxm/TuefZt93jY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sHXc8GhDce+04nC3HfNS4cP3vQCyXrZBoSUn/KmR7rJb5TqCmmY8hPqAz1wvRkQ9YszolfvPC0CqzzDMf+HgVXEpWU4zQkp4Gnjtr1ctqIni7txZkNRqymiJ+7xrKGfSzG9RZpra5Njmie40IF0G/FB5NzPKEEtt2o63HTH1Oas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b=mK/W4GVJ; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1720657225; x=1721262025; i=rwahl@gmx.de;
-	bh=6C4tMfHM6VQngRyJonPLmoU9doo2Tpxm/TuefZt93jY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=mK/W4GVJDRESglynGg0Q4LB4bOLfU2LLVvIn1dYlTd9z6sRr/FcGOGxt29VFhNSa
-	 42hyFPjoTarLsPZvKEe5CsrECARcJsfqflhYqOKiUNDRm02Av4ABg7znJqJZQTRBw
-	 /yJQbErf58UYA5p5IHOV1yty1Q2kDumT5gtZxc+7qr66LI/bGCof3JJZDZJtfWbNb
-	 bZSKDRtwrFfCcmmhraEuX7KnwN7xPdKtaddT8YcGvfjlJRiJhIUwWj/R+W3PrEMfQ
-	 5X5lYisbAwFCqt7g/jvet9AaR3p48m9OwWHksrucL7nyH23UsdOsWNUBj1n1HkV/F
-	 VSyucwKivATCncWJtA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [172.16.0.24] ([84.156.147.254]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N7QxB-1sJv4m0vs5-00zAqR; Thu, 11
- Jul 2024 02:20:25 +0200
-Message-ID: <2a04f707-3b97-4ca8-a10b-15c3aab5fc29@gmx.de>
-Date: Thu, 11 Jul 2024 02:20:17 +0200
+	s=arc-20240116; t=1720658643; c=relaxed/simple;
+	bh=g4b0RW1r4pwSbko8s9KoZ6V6Ks73HRaJzXBaBbKVgcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BIFUZHd4m/e8imhInhwRlGP2hK0S6st0QAEwUKkCSgpOwgqXt0PS6rRv3WO6tAq1jKa97Da8NwPFa2GqV+gl0jnxVGa3tx03ytJWO47UajDquJSlE1wR6r41vxm0VV33E5VNcfbokix1ZigWKFxaUghmyPYRTD8/8iBAFqn26iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MudpCDjQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C1DFC32781;
+	Thu, 11 Jul 2024 00:44:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720658642;
+	bh=g4b0RW1r4pwSbko8s9KoZ6V6Ks73HRaJzXBaBbKVgcc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MudpCDjQ/SJ3LEWQYYSn+Q4cctg9UGiUeGf+0oKLwAeJKM88jJSiKHlmrTAjcPxo2
+	 4CrAi0gP7HibQ/mjUmj43AmTDqLKmrUxkLxZrN6WBJ/Y/WdCbzpi1NDJ5Xv1c72FPg
+	 PAThSRxS5LowwJqwCvwABvG0tGZCQ9XZuPsZKZ46eKmg04P6yrdIZnV9jtXRxPCe3x
+	 uBn92bBetYScb/hrtvK+bjgwvmTX4XrJR9EzToLOjM83CDfvv3+4d3FwPXq0Jkf7tl
+	 wTQgvUvL76fd0DCrmoDj63bUZ5D730IQ84g1vCjolYvmKu9QuJ9W75rrseIafwTsv8
+	 cQZ8NuXS9N3sw==
+Date: Wed, 10 Jul 2024 17:44:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon
+ Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
+Subject: Re: [PATCH net-next V2 01/10] net/mlx5: IFC updates for SF max IO
+ EQs
+Message-ID: <20240710174401.70e8f956@kernel.org>
+In-Reply-To: <CH0PR12MB858029A605D7AF3849C54F6AC9A42@CH0PR12MB8580.namprd12.prod.outlook.com>
+References: <20240708080025.1593555-1-tariqt@nvidia.com>
+	<20240708080025.1593555-2-tariqt@nvidia.com>
+	<20240709185444.6ac9f178@kernel.org>
+	<CH0PR12MB858029A605D7AF3849C54F6AC9A42@CH0PR12MB8580.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ks8851: Fix potential TX stall after interface
- reopen
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- stable@vger.kernel.org
-References: <20240709195845.9089-1-rwahl@gmx.de>
- <8e4c281e-06d8-47bf-9347-d82107f00165@intel.com>
-From: Ronald Wahl <rwahl@gmx.de>
-In-Reply-To: <8e4c281e-06d8-47bf-9347-d82107f00165@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:nmvsRf8tthO2HgAQmne0I0+O/UTifTjj42ENUq5gwsqtOoCTpPx
- er+wjultiKthslwfHJNO0PWxzDrv8H+SvXN14bjzdIAl/S9VhF6ASVLAg8F3y3fB/ZLmHEG
- 3ZD7bNMbWgGJOi3GOxlT+XarP2ewnBhyiM9lm4rMXof4WyjxodC340iQHxzQPYP6H7BxgWT
- fBCsTPk1Vsakqvx79+slA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:AcN5kMcxRjY=;foiD8tHZ1EouTN7VqD7zxOfw9g0
- 8mTY6uzZcyv7xCajBgGVlIj+TUjVfzgTFg8GF56BWpOg7i+RjM/Aks7uG/ZzWcSQIMt0mKmKV
- u0b88wUkvuKHdhnwgOtvVKqN2Zo/Y6xsQAa6PfACiJG2l3lWMqplC1fqlU54wg1EvlflH6VXb
- Httuq5pbY5QJ0xbOxPKz+lYWDBWe+I/dM7+KqRYmUvLM9Q7wSRyyT+0G+ZIGeEzLwDeoMkBPv
- GCc8ySCKHVFFPybELqODB+1FnU2NnEH2zc6icYDGi8ifCmOmOmocNBPGYLyw1atQXUALpzIck
- CSJ+2v1TqWDpxEi/AerDUJnlMd2AQCO3IEJBpM5WaJTmv90gy/cCwwSbqUBdmzgT+fruLFMRQ
- iz94z21sABPHK41PtnAmOfK8r3HDIWSMgMDTBEJKzEPaU1ECZmq9a44CdDn+IYYicqBYkLRIV
- rxz0F5tiOrpqvcUJaLNk3A5K4VuZfUaRP5H4s3Y3ymE9GTUb90u5yWmWK3s2CYVnI/9E+eKcO
- jlvjoRXYiDtL/bgR/71xbXcK5i/s/tGStb9TXwSc7csthGe2F2/p6+Kiict54Od5/xLre1IVc
- 9lKWIyHW/Dz2wJCKmQEPrpaqs+5fzjzM2wEQWlQC3Pk1D5MdSv98v4Qlc3hTSw4i505XkuZsA
- /7wuC34Pk6wo5NElc1Jq6DajlfKw/cMKC2pUNV+Z1+m1P8fzPeUbZuX0ya7GB9Eg10YK6PmsP
- zzQ4dr5YUlLLGWtxEfOpuj/1QBCHPrpgXAMMPrAhmyV6VmUfL+Qkh/ODV/7RELiPMwckcPP+M
- q2l4BKHMl1lfe4IMwTXfJckw==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11.07.24 01:48, Jacob Keller wrote:
->
->
-> On 7/9/2024 12:58 PM, Ronald Wahl wrote:
->> From: Ronald Wahl <ronald.wahl@raritan.com>
->>
->> The amount of TX space in the hardware buffer is tracked in the tx_spac=
-e
->> variable. The initial value is currently only set during driver probing=
-.
->>
->> After closing the interface and reopening it the tx_space variable has
->> the last value it had before close. If it is smaller than the size of
->> the first send packet after reopeing the interface the queue will be
->> stopped. The queue is woken up after receiving a TX interrupt but this
->> will never happen since we did not send anything.
->>
->> This commit moves the initialization of the tx_space variable to the
->> ks8851_net_open function right before starting the TX queue. Also query
->> the value from the hardware instead of using a hard coded value.
->>
->> Only the SPI chip variant is affected by this issue because only this
->> driver variant actually depends on the tx_space variable in the xmit
->> function.
->
-> I'm curious if this dependency could be removed?
+On Wed, 10 Jul 2024 13:08:31 +0000 Dan Jurgens wrote:
+> > > Expose a new cap sf_eq_usage. The vhca_resource_manager can write this
+> > > cap, indicating the SF driver should use max_num_eqs_24b to determine
+> > > how many EQs to use.  
+> > 
+> > How does vhca_resource_manager write this cap?  
+> 
+> In most literal sense, MLX5_SET(cmd_hca_cap_2, hca_caps, sf_eq_usage, 1);. 
+> 
+> But getting there flows through:
+> devlink port function set pci/0000:08:00.0/32768 max_io_eqs 32
 
-I don't think so.
-
-The driver must ensure not to write too much data to the hardware so we
-need a precise accounting of how much we can write. In the original
-driver code for the SPI variant this was broken and repaired in
-3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun").
-Unfortunately we required some rounds of bug fixing to get it finally
-working without any issues. Hopefully this was the last change in that
-regard. :-)
-
-If you ask why only the SPI version is affected then the answer is that
-for the parallel interface chip there is no internal driver queuing,
-i.e. it writes a single packet per xmit call. Not sure if this can also
-overrun the hardware buffer if the receiver throttles via flow control.
-Since I do not own this chip variant I cannot test this. In the end that
-could even mean that we would need the accounting for the parallel chip
-code as well.
-
-- ron
-
+Makes sense, include in the commit message, please?
 
