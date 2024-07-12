@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-110978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D2292F307
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:31:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5729292F308
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD7C81C21AF4
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:31:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E634282DCF
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15DF239B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABC910F9;
 	Fri, 12 Jul 2024 00:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WInaZxY8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exdgC39P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C54376
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 00:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C8E391;
+	Fri, 12 Jul 2024 00:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720744279; cv=none; b=p3YLVnVUbhxnllizIAWNZ3AIzkTMJ6uRvf3xjgWb/Vf9EYi/wph0014Bw7K0+CvrN/WmpvDkApsc5HOT/xBl0iiwxa/KCwb26spzAidWUHtC7ZdzMvLSOualIi8lh9oUlmKDuH4AdcUT+v5pKHh1It1r3ZXQwcJ0TxaefKzziMs=
+	t=1720744279; cv=none; b=uBspjGl17WzusQMFIvCc9oz0Or1KxFmwAdG0PW0d60QEvuURMXEzhCof2esrvVjcQFqoRjNoxTD5FP5mhM/MSMtrW7GgyHqWi4DuiL4iYq1MgZ4t+pti9dy04LPSmmETuBokhKBFXE3DAqPN3/ef0mV7PJS2cX8bb9nmnEKc5Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720744279; c=relaxed/simple;
-	bh=/1VFLMdGeuioSPUcmNwsCoRTwA1pu7cpJ9LhGQcEfVc=;
+	bh=qjaE9orXsJN5GtTPXYD8SOsWN0AkROfEE4nLAMNUV4M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=adkzi7CTp8ee6y0Vi6D2FUiY8lBoONnW1Gr6XqCpSE8NCWSMOLrWAwcwf8h58dnsHEh/sHXVj63gAQ3Vk+j1zGFuBYkEv3R9DBr14PtMcmHYO7/qLSv9eWqYM/Rc9Snqea26oMbfzZQQPzsBMyskl5g13oae+QBa87BH7zyOqMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WInaZxY8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FEBFC116B1;
+	 In-Reply-To:To:Cc; b=nGhRqcjDeg+xXyuGh1y+nf1nAICQNsK2xE27DzSgr42xBpi2UqxVOT5X7hGrGDTzHypzJ4Z8NfJLr7tDvFuywwMWnGIAxQyk5hf74A8Dly+wjAN6wu1ahen4m17DF6fjnHrI0bEUA7gMwBVxMsUqsGnERz8SI4N826D/BFFOWfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exdgC39P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A2BBC4AF09;
 	Fri, 12 Jul 2024 00:31:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720744278;
-	bh=/1VFLMdGeuioSPUcmNwsCoRTwA1pu7cpJ9LhGQcEfVc=;
+	bh=qjaE9orXsJN5GtTPXYD8SOsWN0AkROfEE4nLAMNUV4M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WInaZxY82MpAg2C3c+EBmwPegVIg+FxBcIiSbPohoqO4pc++SMJfWvchCcuyuWgwK
-	 u9Flsfcxg30+benz1HbhZcWpQVUSEbBnVMKMqHh9Hl4JYpnQtRRS9Z6lxwxhNdTuzy
-	 8D/yvnRq20J1uEtA2FuXP6gg3ChwYUmv8qNt3LeGmAitfInZ2ZS45Q440yYs3hwd12
-	 0Lf9rYRincwxzXhB7Mv0YnF9uEGEeS4uk9Mp+HWW5qqUjmCSlxuapxW5Dba8c3thrY
-	 anBSE1EunvElkW3Zk16eexkN7ykqGvGw0w+MRksHPhADQpmMfisyKK1tsGoQYBk+OC
-	 eIa1zIJz9rWPA==
+	b=exdgC39PYsdtU36YyaJ77kgsi9B1O7OmX2W7ANp4DdJ1SCz8/Zy9fqsQTVw1drzWf
+	 AbZTiDF1/Hq+B3or8vdv21xrd1GUdesFK+wNyUS2ZdvqhiZ5Cy3hAp9bcBAr4tYQBv
+	 LzG+1ICAqAvWS1J5dkuindF9oUuBSIGoBSET1IuLOiYfrU5bKhUCBqacNLTfUaLtls
+	 euEY8HkXix79Foe5Y00fFftEzrd/w4y/H4J2pEOqImN2k2fydUAvf8jIekK/Skfyei
+	 Yr8ylx6VKwRSfAxHM5BJi/T1fTRIiNARL90JQIiIIp0qHPzgkvr7Qx3zgh58/3nVaf
+	 Lz+fULoXO71Rw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7C122C4332C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 860DCC43468;
 	Fri, 12 Jul 2024 00:31:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net: reduce rtnetlink_rcv_msg() stack usage
+Subject: Re: [PATCH net-next] net/sched: act_skbmod: convert comma to semicolon
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172074427850.19437.2338434288469713752.git-patchwork-notify@kernel.org>
+ <172074427854.19437.6754797911324663420.git-patchwork-notify@kernel.org>
 Date: Fri, 12 Jul 2024 00:31:18 +0000
-References: <20240710151653.3786604-1-edumazet@google.com>
-In-Reply-To: <20240710151653.3786604-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240709072838.1152880-1-nichen@iscas.ac.cn>
+In-Reply-To: <20240709072838.1152880-1-nichen@iscas.ac.cn>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 10 Jul 2024 15:16:53 +0000 you wrote:
-> IFLA_MAX is increasing slowly but surely.
+On Tue,  9 Jul 2024 15:28:38 +0800 you wrote:
+> Replace a comma between expression statements by a semicolon.
 > 
-> Some compilers use more than 512 bytes of stack in rtnetlink_rcv_msg()
-> because it calls rtnl_calcit() for RTM_GETLINK message.
-> 
-> Use noinline_for_stack attribute to not inline rtnl_calcit(),
-> and directly use nla_for_each_attr_type() (Jakub suggestion)
-> because we only care about IFLA_EXT_MASK at this stage.
-> 
-> [...]
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> ---
+>  net/sched/act_skbmod.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v2,net-next] net: reduce rtnetlink_rcv_msg() stack usage
-    https://git.kernel.org/netdev/net-next/c/cef4902b0fad
+  - [net-next] net/sched: act_skbmod: convert comma to semicolon
+    https://git.kernel.org/netdev/net-next/c/b07593edd2fa
 
 You are awesome, thank you!
 -- 
