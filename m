@@ -1,176 +1,121 @@
-Return-Path: <netdev+bounces-111138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8425693001A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:59:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F1B93001F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01C23B20C53
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 17:58:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1CE51F24979
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 17:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148BD17B515;
-	Fri, 12 Jul 2024 17:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B56F178383;
+	Fri, 12 Jul 2024 17:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CL5mmEX6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ipzjd/X7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BBA17B4FC;
-	Fri, 12 Jul 2024 17:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3B6176FD6;
+	Fri, 12 Jul 2024 17:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720806972; cv=none; b=Lsr8sCH5XmOgQWOq6i83+GUh3240esKYZF1fuHrs+US3NMrLmEdsepMNmr/xFCMPEy0ktoGRUoO7F5TIGI5gB5ZNVG7uVwSzQsL1OCe6CdlfLAv6+t8KYcIQ8ldi8/dsIIksiqHgHIqEKSOxC/iw0Wl5Xlx/gXR9hzFyVlMqc/s=
+	t=1720807009; cv=none; b=NHmZSteqZNuzr36fw//9U1PP2EJ4f7kzPM6hyh3FEg1IaSyA7Rj/hGwgrTAnC0aTEmtTaJ43z6KKbgvNjLG996E7ADBu3H2/3a64pWO8ZKjeODuEjIxUE9LWtB5AAOCYQjtbPXclKQViKhDQyYc6SHe1/+LA5/i33UyUhVCXPMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720806972; c=relaxed/simple;
-	bh=pyeOyZb4wdVKngAuWvkY1s62ITPe9pKZIYvqLBwFkq4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LpBPw6UVBsVVhTCUaM6DQk0zGc+6jwx+ag02fH6Nwi6e4H+CCYhxxzkNdUG5jIA9UPPtiIM63gybzAuPALYp/Z9RQq5FLd2+RJMe+I5KFL75jpQnlxgpntV1CvZJsuqdjXLREeSqJId56gMB2KUZPmfmiwZr88+m9lI4e3IUfmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CL5mmEX6; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46CDh1NS012285;
-	Fri, 12 Jul 2024 10:56:04 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=zmDQRbex59fLltI/bnTVP3snw
-	1zkiULM8MbjWF5s9xE=; b=CL5mmEX6369xVokd7NMnaQk61V5bMMsb8ZcnDxu+l
-	EfSG+B8QoNrSQXgc/zDDArh+bCu38WcwG8YEn6/Z6KbSDIePJsf8iKTt3D0USgJs
-	z1STbOCv0K5giO5+MQLHcHitDmEq6edxRc8gc/SiuBrBSr1mpjxMh1pTc+lt1OJl
-	a1p1trLp1sJc9vPTfUxpGnVTFNLHRisDkm+CalaW24ly1JRCSdRzzJoZxf3dhRbe
-	cNgzk9Cf/AXc+Fyz3nYsZageycU9kOx9SNSW31rafGJXXX08Fx604ysKkJ0gE0P6
-	RO80plqWjM5aPDElrd2d73BWnXfdqGejJqMDAe8DCfjlQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40b5m68wqr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jul 2024 10:56:04 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 12 Jul 2024 10:56:02 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 12 Jul 2024 10:56:02 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id D21A63F70A1;
-	Fri, 12 Jul 2024 10:55:59 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH v9 11/11] octeontx2-pf: Implement offload stats ndo for representors
-Date: Fri, 12 Jul 2024 23:25:20 +0530
-Message-ID: <20240712175520.7013-12-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240712175520.7013-1-gakula@marvell.com>
-References: <20240712175520.7013-1-gakula@marvell.com>
+	s=arc-20240116; t=1720807009; c=relaxed/simple;
+	bh=3eIayu+1UjuqYkXeZHl62aeqtdNVS59QixTFOllGIwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UPb9oW8DRC4yTIH9kur0BJ8cbqN1u1kJuKriInQDif4U9slN4OgtWgTqmR3lzJIdIlQ70BaAXl7scX/jW3Q5c/blHJVIdY7AnQc96SEB1L4R4J4JKlXNzoQkZZmswo+KWLciTcMYhczzEOLjAQBsE2WNrZN492qWbogHKKLm1f8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ipzjd/X7; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70af8062039so1862411b3a.0;
+        Fri, 12 Jul 2024 10:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720807007; x=1721411807; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hvJqMz2g+QWTR/26uvM7LO7+R0enQZRj5mYnnkzzRMo=;
+        b=Ipzjd/X7JjVHinD/8km7XAfv0EgGSbe1cfVeFl4jjNxx4wT+agHmBw851TnH+xVoPz
+         o4eNr4NTuZjv0wJtMD0RE9KHuCwue3aQ5Ys+P9OgpIL4JGDDzlQRNS33E7KToyNDYXuW
+         q3WbOGFnL76MDba8lKKR5uW3IE4++jKe+CVu9KQXcZMny0RduamUFeh6t3DvB32+gj9L
+         gXSNSXU41qRSyU81QUb2I1EEyKTCW7ySFnAwpfudd3Er/EISxf5MvPapZ+svYkaMNFMi
+         iCWiY8Ru/jivVs6fWPEQBQDDujUBj8pUVJX/jV8T0Q1+78ZJnokiTFQtS39XIjPkeZxM
+         Y/zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720807007; x=1721411807;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hvJqMz2g+QWTR/26uvM7LO7+R0enQZRj5mYnnkzzRMo=;
+        b=Ywg6dcK/AsWSV1jeHGJ8A67EuC4EOebfvISZB3AaMRlTHQtTPv/wtltuEyTkxWiz/J
+         zXSZsNykXBh6eRqehjoXprC6CHBZLMdRwXHgcQDrNaEdDU1VYWIQyIRxFPCVVQGlX+bb
+         rUuZVAhvTDGkEiy5E6jD9r3mVOajhFaLVXEYtZ1UE5KxGuRzCiYYnuSHpPHUkT3hIfp6
+         60UA7VTSZzaMaCT/i9gEQiy9eNL9h8SZwyCC2L23HobD0GNgnLLSje53Pvv+uI1cqmHV
+         wcPT3K2p30QRw2JyY6XuVcSQjDJ19oyU0OZl94vVohUcR3srSoRdHAOps2QFuGz7rLOi
+         4IDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVR/keXp1KMeOZijsQFg1SOyAkD6qjLb1ClPCugZprjyZvKsZI8I0DyN4bgsWy+OwiZ8hKo0S74XfYpO7jKYogaCXg/rTfWaQ2E4EuerP3OQ9Mny/vl1J9SNqw8razbvit1CDNZHUjOFhfjrevcS1iCQ2Im7OGe6bJcXlVBGQmuoIcYDtHmTUaXZeh+7nGFQZzj2Gb9Zf/QfMrGTjGCns8EmS4lAWmBiKBxeDBhvgc1CxnRH/qZgJ6P7qdrAgdGNnwoy6+PRafrkA==
+X-Gm-Message-State: AOJu0Yw0XEvYXRXp4aghGx8rm9p6kn2OmbF21k4vmlklqwxK/ztjUFI9
+	+q+8yE5iQyfIIkdAXdYNR/SfDC6phvbB4ebzEIU9199VO3wHquoL8fUuNg==
+X-Google-Smtp-Source: AGHT+IEQhOEcyJo9nymze7EJcWUmb0pa0RPK5Sh5riMCUcRm7lnBoF6POikeGeyiWKlGRHtmtiu3qw==
+X-Received: by 2002:a05:6a21:6704:b0:1c0:f080:ed5b with SMTP id adf61e73a8af0-1c2984ce612mr12926893637.54.1720807006607;
+        Fri, 12 Jul 2024 10:56:46 -0700 (PDT)
+Received: from MacBook-Pro-49.local ([2620:10d:c090:500::7:44ce])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ab8041sm69662725ad.135.2024.07.12.10.56.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 10:56:46 -0700 (PDT)
+Date: Fri, 12 Jul 2024 10:56:41 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-integrity@vger.kernel.org, 
+	apparmor@lists.ubuntu.com, selinux@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+	Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Khadija Kamran <kamrankhadijadj@gmail.com>, Casey Schaufler <casey@schaufler-ca.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, 
+	John Johansen <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu <shung-hsi.yu@suse.com>, 
+	Edward Cree <ecree.xilinx@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Anna Schumaker <anna@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>
+Subject: Re: [PATCH bpf-next v4 11/20] bpf, lsm: Add disabled BPF LSM hook
+ list
+Message-ID: <qjrf5c6f24b6ef5tpvpz75uxp6ro6mhos34ovssinv4yxjwyz3@nvs75o5sywgx>
+References: <20240711111908.3817636-1-xukuohai@huaweicloud.com>
+ <20240711111908.3817636-12-xukuohai@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: BGslHD47Dt0EzLd_ClhPEibnhoWgyCYV
-X-Proofpoint-ORIG-GUID: BGslHD47Dt0EzLd_ClhPEibnhoWgyCYV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-12_13,2024-07-11_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240711111908.3817636-12-xukuohai@huaweicloud.com>
 
-Implement the offload stat ndo by fetching the HW stats
-of rx/tx queues attached to the representor.
+On Thu, Jul 11, 2024 at 07:18:59PM +0800, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
+> 
+> Add a disabled hooks list for BPF LSM. progs being attached to the
+> listed hooks will be rejected by the verifier.
+> 
+> Suggested-by: KP Singh <kpsingh@kernel.org>
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- .../marvell/octeontx2/nic/otx2_common.c       |  2 +
- .../net/ethernet/marvell/octeontx2/nic/rep.c  | 41 +++++++++++++++++++
- 2 files changed, 43 insertions(+)
+Xu,
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 4c11c420399b..b1251f80a569 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -83,6 +83,7 @@ int otx2_update_rq_stats(struct otx2_nic *pfvf, int qidx)
- 	otx2_nix_rq_op_stats(&rq->stats, pfvf, qidx);
- 	return 1;
- }
-+EXPORT_SYMBOL(otx2_update_rq_stats);
- 
- int otx2_update_sq_stats(struct otx2_nic *pfvf, int qidx)
- {
-@@ -99,6 +100,7 @@ int otx2_update_sq_stats(struct otx2_nic *pfvf, int qidx)
- 	otx2_nix_sq_op_stats(&sq->stats, pfvf, qidx);
- 	return 1;
- }
-+EXPORT_SYMBOL(otx2_update_sq_stats);
- 
- void otx2_get_dev_stats(struct otx2_nic *pfvf)
- {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index 6939f213f9f8..d62aabf98833 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -28,6 +28,45 @@ MODULE_DESCRIPTION(DRV_STRING);
- MODULE_LICENSE("GPL");
- MODULE_DEVICE_TABLE(pci, rvu_rep_id_table);
- 
-+static int
-+rvu_rep_sp_stats64(const struct net_device *dev,
-+		   struct rtnl_link_stats64 *stats)
-+{
-+	struct rep_dev *rep = netdev_priv(dev);
-+	struct otx2_nic *priv = rep->mdev;
-+	struct otx2_rcv_queue *rq;
-+	struct otx2_snd_queue *sq;
-+	u16 qidx = rep->rep_id;
-+
-+	otx2_update_rq_stats(priv, qidx);
-+	rq = &priv->qset.rq[qidx];
-+
-+	otx2_update_sq_stats(priv, qidx);
-+	sq = &priv->qset.sq[qidx];
-+
-+	stats->tx_bytes = sq->stats.bytes;
-+	stats->tx_packets = sq->stats.pkts;
-+	stats->rx_bytes = rq->stats.bytes;
-+	stats->rx_packets = rq->stats.pkts;
-+	return 0;
-+}
-+
-+static bool
-+rvu_rep_has_offload_stats(const struct net_device *dev, int attr_id)
-+{
-+	return attr_id == IFLA_OFFLOAD_XSTATS_CPU_HIT;
-+}
-+
-+static int
-+rvu_rep_get_offload_stats(int attr_id, const struct net_device *dev,
-+			  void *sp)
-+{
-+	if (attr_id == IFLA_OFFLOAD_XSTATS_CPU_HIT)
-+		return rvu_rep_sp_stats64(dev, (struct rtnl_link_stats64 *)sp);
-+
-+	return -EINVAL;
-+}
-+
- static int rvu_rep_dl_port_fn_hw_addr_get(struct devlink_port *port,
- 					  u8 *hw_addr, int *hw_addr_len,
- 					  struct netlink_ext_ack *extack)
-@@ -310,6 +349,8 @@ static const struct net_device_ops rvu_rep_netdev_ops = {
- 	.ndo_start_xmit		= rvu_rep_xmit,
- 	.ndo_get_stats64	= rvu_rep_get_stats64,
- 	.ndo_change_mtu		= rvu_rep_change_mtu,
-+	.ndo_has_offload_stats	= rvu_rep_has_offload_stats,
-+	.ndo_get_offload_stats	= rvu_rep_get_offload_stats,
- };
- 
- static int rvu_rep_napi_init(struct otx2_nic *priv,
--- 
-2.25.1
-
+The patches 11 and higher are mostly independent from lsm refactoring.
+Please send them as a separate patchset for bpf-next.
+While lsm cleanups are being reviewed this lsm_disabled list can be
+a bit larger temporarily.
 
