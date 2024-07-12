@@ -1,241 +1,128 @@
-Return-Path: <netdev+bounces-111027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF0392F665
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 09:44:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C75FE92F6AD
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA53E1C22C7C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 07:43:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DD811F22B4D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32ED13D62F;
-	Fri, 12 Jul 2024 07:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60CE12FB3C;
+	Fri, 12 Jul 2024 08:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXE/sLwS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ywzmR3pM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECFC8F58;
-	Fri, 12 Jul 2024 07:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BA012F37B
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 08:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720770236; cv=none; b=mmS3sR+37tf863fUAp96/oFnwY74YfKsyZ+nlzk+4Ktcww8rZFyFm+EpzS5gy9+Q0WxQCDGLVyESUbS9G2JsXwTnrzCTuFahbrIYON15mQ99tNtqmWVQpKvoC9qgar75R2TiLHhnjqG/J15cEj+a6ICImncJvUr4iM+M3Ts+iOw=
+	t=1720771563; cv=none; b=ZQXXmflaNud8J6HliN9vYPtaKrIiBng3V7RJRTX+HZPxj5r49HYENPsuPwtWZuqlZh/CLFY/wt27ncoYcRD63+CFwxP/IW7ONcsJMxYcp6Z2RMMkLaZi265JZljHTwPiglwNSNMWCdEtqxW83xdpe0+h1k2ASboLJUnHmD/E8eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720770236; c=relaxed/simple;
-	bh=lzaWmIZ+RB3H7kwGYmW9hQxX80Gmx1edTEPc27Cixmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iMTweSwFuImmFapi7IT37/AH3XSTwqAU9e8nnkxBuh3FErBZZ2iWxUjIJP5PPOL/h9WHuNl/6scTE8YLCY6Ld+RrK3dCwJMimeTYmOX6aD/iZUxu+SZFvqEcvK/pblR2DsBzMdBt5TS+TjmJ+X1EcxAPJXfogG4b4HbNgvbPUUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXE/sLwS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BEDC3277B;
-	Fri, 12 Jul 2024 07:43:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720770236;
-	bh=lzaWmIZ+RB3H7kwGYmW9hQxX80Gmx1edTEPc27Cixmo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JXE/sLwSVkNc8tuXlKyjNyKH+HLiW2Azc8SHHMEtMhmFi59eE5pTGTuJpDswPHelF
-	 j4irCvasPZFeireyM//BGL5j4CQB1VrCdNnXAZD779Wlvunv6khbY8LfI/dCYaKS/G
-	 F+1c19taBUgfg+LqPonKhUjbK7oEg5vF0ZF0qgZrR0x4IbL5K8EczSY6HP9F/pUvos
-	 wEtEgLCIWYI742a4Kmon0+cjjICVCBiGeDN66yuP4qHZiAAypjxrPVv1oRc9Wso6dr
-	 iYTzxkjEYDJtLdyDugfOgMAU93jAgFYr3i0A8R9kyGeQ5Q5B4hTlqenKxPrfkVrFeo
-	 0EsPsWc4JysiQ==
-Date: Fri, 12 Jul 2024 00:43:54 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Anand Khoje <anand.a.khoje@oracle.com>
-Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, saeedm@mellanox.com, leon@kernel.org,
-	tariqt@nvidia.com, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com
-Subject: Re: [PATCH net-next] net/mlx5: Reclaim max 50K pages at once
-Message-ID: <ZpDeuoUlVoUON8Em@x130.lan>
-References: <20240711151322.158274-1-anand.a.khoje@oracle.com>
- <ZpCI0mGJaNDFjMno@x130>
- <c8d99dba-89e9-4bf2-b436-f1a29cd573bb@oracle.com>
+	s=arc-20240116; t=1720771563; c=relaxed/simple;
+	bh=n7vviI36mP6nxaBfP+nJqOCAwypxVaPTF7rt8y0p4A0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VaxHVK9B8tbueLN2sc8z9+W7eT9311m7eLa4qqC5k9d/q8WOypxHqMqLQ0laYIrMLhlBBUXxYOwLMjgPBmMY0ftrG3feD+KZ76UvfBVf+cONwnWas9TotjMtIW6TA7nu+aYNQmQ4kuZ+MsPShrH82kO4Q15D1aDQ1NN7YCqH4DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ywzmR3pM; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4266fd395eeso11940915e9.3
+        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 01:06:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1720771559; x=1721376359; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mfY0TlwmiLCfard5rvsJoOmoOPvQGEncPGG+Fen4OR0=;
+        b=ywzmR3pMCSP9++FFfZMohStXgtk6rls0WhGhg97ATgzuvDm3/gZJ9Em690kuQzSe6/
+         DWqrQQB3PI6QOpprgNI7cjnnYXPgB0MveeqlsQR+AbWc7CXi18aMuk+B+V2fmg2qlqWD
+         GyqJtuYtX+SxNR4h7vsQ9IRw8c4rMVrvWHG4ACZNwIB3hEMmURbAQUcra+KYTsjMTep4
+         4spEGzeCac9XWCXGPVTJK4vdoJ61JK2+RO6eutnsc+GxdhEfIlm7llqJ/gqhU9P1qXWn
+         X/gsT+eqcXr5KeGIEwxp5G1Uzy3O/wv+DI5WWBS6r0nOFfVdbJQWx3bKotvXnWieDFSx
+         b8bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720771559; x=1721376359;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mfY0TlwmiLCfard5rvsJoOmoOPvQGEncPGG+Fen4OR0=;
+        b=jOlH+SbhcGMnuzJjIXhHpUh+10IPCQ5BwxDr0aqixdOR9e29B8ouKeScsOPtOYIM7L
+         wpaWxTiGfMUczbAGEgI18lVlUdZd5D8dEsXm5nPHQo8csKjQWjLMY49yl2+pCereS+gE
+         9rY3/pyiSzQbk4FUZGyx2MOpxm2zwdvyz/BYDRXkhe4+p3Wdhen0fAJX26zzgyX4L0vt
+         UBua9GR8Wo2uAa8W2WGSBK++Ml+kTzi/yhMBI/xWUl6XXT+TAtxFjKnIbyuL2lZM8uCq
+         fWV1CEPdFYvZHcXGl3DAH5yJIwscSNt0DTH2MbRIXvvAk3UzH+ZXs8K2GSaT19y1KAIL
+         CKZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDGDpgQzt/iHbiUUOE6dov51kkgzRSblQd8uKS3utqugoWmmZot/sqCvFzz6ohcmAFSzrUX9JkRhou0O+doHqS6BDaKir9
+X-Gm-Message-State: AOJu0YwOwg4DaRHO1oPshq9JSYFdRNfX3dk1rtwBw+ZkRgtUmFz8wBjx
+	/CntPMIafx1mursV7r/UvMvtXbpebbRcLdLpyrG52IlRmATMQQacZLFqQpw+Q4A=
+X-Google-Smtp-Source: AGHT+IGfk8XYbf3dJihjzUp/yY597NfBnHKfKpSAf6i1wn1c0DkkGLKIJxiK/uz8d8IUUZUHeOsrTg==
+X-Received: by 2002:a05:600c:33a4:b0:426:6551:3174 with SMTP id 5b1f17b1804b1-426707f7e3amr77282455e9.29.1720771559350;
+        Fri, 12 Jul 2024 01:05:59 -0700 (PDT)
+Received: from localhost.localdomain ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f2c1d54sm14146525e9.44.2024.07.12.01.05.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 01:05:58 -0700 (PDT)
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Aishwarya TCV <aishwarya.tcv@arm.com>
+Subject: [PATCH net-next] net: virtio: fix virtnet_sq_free_stats initialization
+Date: Fri, 12 Jul 2024 09:03:30 +0100
+Message-ID: <20240712080329.197605-2-jean-philippe@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c8d99dba-89e9-4bf2-b436-f1a29cd573bb@oracle.com>
 
-On 12 Jul 10:18, Anand Khoje wrote:
->
->On 7/12/24 07:07, Saeed Mahameed wrote:
->>On 11 Jul 20:43, Anand Khoje wrote:
->>>In non FLR context, at times CX-5 requests release of ~8 million 
->>>FW pages.
->>>This needs humongous number of cmd mailboxes, which to be released once
->>>the pages are reclaimed. Release of humongous number of cmd mailboxes is
->>>consuming cpu time running into many seconds. Which with non preemptible
->>>kernels is leading to critical process starving on that cpu’s RQ.
->>>To alleviate this, this change restricts the total number of pages
->>>a worker will try to reclaim maximum 50K pages in one go.
->>>The limit 50K is aligned with the current firmware capacity/limit of
->>>releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES + 
->>>MLX5_PAGES_TAKE
->>>device command.
->>
->>Where do you see this FW limit? currently we don't have it in the driver,
->>the driver requests from FW to reclaim exactly as many pages as the FW
->>already sent in the initial event. It is up to the FW to decide how many
->>pages out of those it actually release to the driver.
->>
->Hi Saeed,
->
->We have a confirmation from Vendor i.e. nVidia that the current limit 
->of maximum pages firmware will release is 50K.
->
+Commit c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
+added two new fields to struct virtnet_sq_free_stats, but commit
+23c81a20b998 ("net: virtio: unify code to init stats") accidentally
+removed their initialization. In the worst case this can trigger the BUG
+at lib/dynamic_queue_limits.c:99 because dql_completed() receives a
+random value as count. Initialize the whole structure.
 
-Interesting I will try to find out next week, this should've been
-advertised by FW somewhere.
+Fixes: 23c81a20b998 ("net: virtio: unify code to init stats")
+Reported-by: Aishwarya TCV <aishwarya.tcv@arm.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+---
+Both these patches are still in next so it might be possible to fix it
+up directly.
+---
+ drivers/net/virtio_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->>>
->>>Our tests have shown significant benefit of this change in terms of
->>>time consumed by dma_pool_free().
->>>During a test where an event was raised by HCA
->>>to release 1.3 Million pages, following observations were made:
->>>
->>>- Without this change:
->>>Number of mailbox messages allocated was around 20K, to accommodate
->>>the DMA addresses of 1.3 million pages.
->>>The average time spent by dma_pool_free() to free the DMA pool is 
->>>between
->>>16 usec to 32 usec.
->>>          value  ------------- Distribution ------------- count
->>>            256 |                                         0
->>>            512 |@                                        287
->>>           1024 |@@@                                      1332
->>>           2048 |@                                        656
->>>           4096 |@@@@@                                    2599
->>>           8192 |@@@@@@@@@@                               4755
->>>          16384 |@@@@@@@@@@@@@@@                          7545
->>>          32768 |@@@@@                                    2501
->>>          65536 |                                         0
->>>
->>>- With this change:
->>>Number of mailbox messages allocated was around 800; this was to
->>>accommodate DMA addresses of only 50K pages.
->>>The average time spent by dma_pool_free() to free the DMA pool in 
->>>this case
->>>lies between 1 usec to 2 usec.
->>>          value  ------------- Distribution ------------- count
->>>            256 |                                         0
->>>            512 |@@@@@@@@@@@@@@@@@@                       346
->>>           1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
->>>           2048 |                                         0
->>>           4096 |                                         0
->>>           8192 |                                         1
->>>          16384 |                                         0
->>>
->>
->>Sounds like you only release 50k pages out of the 1.3M! what happens 
->>to the
->>rest? eventually we need to release them and waiting for driver unload
->>isn't an option.
->>
->>My theory here of what happened before the patch:
->>1. FW: event to request to release 1.3M;
->>2. driver: prepare a FW command to release 1.3M, send it to FW with 1.3M;
->>3. FW: release 50K;
->>4. goto 1;
->>
->>After the patch:
->>1. FW: event to request to release 1.3M;
->>2. driver: prepare a FW command to release 50k**, send it to FW with 
->>50k*;
->>3. FW: release 50K; Driver didn't ask for more. no event required.
->>4. Done;
->>
->>After your patch it seems like there 1.25M pages that are lingering in FW
->>ownership with no use.
->>
->We have tested this case, here are our observations:
->
->1. FW: event to request to release 1.3M;
->2. driver: prepare a FW command to release 50k**, send it to FW with 50k*;
->3. FW: release 50K; Driver didn't ask for more. no event required.
->4. goto 1 with 1.25M request to release in a new EQE.
->
->It goes on till fw releases all pages from its ownership.
->
->I hope that answers your doubt.
->
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 10d8674eec5d2..f014802522e0f 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -530,7 +530,7 @@ static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
+ 	unsigned int len;
+ 	void *ptr;
+ 
+-	stats->bytes = stats->packets = 0;
++	memset(stats, 0, sizeof(*stats));
+ 
+ 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+ 		if (!is_xdp_frame(ptr)) {
 
-I see, I think now the issue is clear to me, I got confused by the commit
-message a bit, I thought the page allocator gets overwhelmed by the 8M
-pages the FW is trying to release back to the host, but this has nothing to
-do directly with releasing 8M pages, it is just the unnecessary driver allocation
-of the very large command outbox from the dma_pool to accommodate the 8M page
-addresses the FW needs to fill on reclaim, when the FW will only fill up to
-50k.
+base-commit: 3fe121b622825ff8cc995a1e6b026181c48188db
+-- 
+2.45.2
 
-Maybe improve the commit message a bit? Just explain about the unnecessary
-alloc/free of the extra mailboxes for the large outbox buffer, since the FW
-is limited and will never use this memory, so it's an unnecessary overhead.
-
-Anyway, feel free to add:
-Acked-by: Saeed Mahameed <saeedm@nvidia.com>
-
->Thanks,
->
->Anand
->
->>>Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
->>>Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
->>>Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
->>>---
->>>drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 16 
->>>+++++++++++++++-
->>>1 file changed, 15 insertions(+), 1 deletion(-)
->>>
->>>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c 
->>>b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>index d894a88..972e8e9 100644
->>>--- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
->>>@@ -608,6 +608,11 @@ enum {
->>>    RELEASE_ALL_PAGES_MASK = 0x4000,
->>>};
->>>
->>>+/* This limit is based on the capability of the firmware as it 
->>>cannot release
->>>+ * more than 50000 back to the host in one go.
->>>+ */
->>>+#define MAX_RECLAIM_NPAGES (-50000)
->>>+
->>>static int req_pages_handler(struct notifier_block *nb,
->>>                 unsigned long type, void *data)
->>>{
->>>@@ -639,7 +644,16 @@ static int req_pages_handler(struct 
->>>notifier_block *nb,
->>>
->>>    req->dev = dev;
->>>    req->func_id = func_id;
->>>-    req->npages = npages;
->>>+
->>>+    /* npages > 0 means HCA asking host to allocate/give pages,
->>>+     * npages < 0 means HCA asking host to reclaim back the pages 
->>>allocated.
->>>+     * Here we are restricting the maximum number of pages that can be
->>>+     * reclaimed to be MAX_RECLAIM_NPAGES. Note that 
->>>MAX_RECLAIM_NPAGES is
->>>+     * a negative value.
->>>+     * Since MAX_RECLAIM is negative, we are using max() to restrict
->>>+     * req->npages (and not min ()).
->>>+     */
->>>+    req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
->>>    req->ec_function = ec_function;
->>>    req->release_all = release_all;
->>>    INIT_WORK(&req->work, pages_work_handler);
->>>-- 
->>>1.8.3.1
->>>
->>>
 
