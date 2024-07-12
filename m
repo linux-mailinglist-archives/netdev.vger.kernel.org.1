@@ -1,145 +1,236 @@
-Return-Path: <netdev+bounces-111153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E102B930170
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 23:07:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E29BF930183
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 23:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99C7C282AF1
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:07:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B80B282D3C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EAA482C1;
-	Fri, 12 Jul 2024 21:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02FE449633;
+	Fri, 12 Jul 2024 21:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="gSpGb5Qt"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="R1pDqs4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D31D219FF;
-	Fri, 12 Jul 2024 21:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D17649626
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 21:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720818450; cv=none; b=fWq56q6arKRbKVw3qpAC40Znu07ekXhMXgtMzc7nhc8/rRa/gTfZvM7aRk1h4Ua7TUFsJK3ejBciKIsxqPHipY+tqqfzYUiYsNWedPwundi6gs72kc8flJq9BM/KERYp/Cf/LNdrj5RsbV394Aki7uiZmk/tgm7WGm3TvLploVo=
+	t=1720819185; cv=none; b=bviGTkFGLm2oIFLxSnIZ+X5LSRseeSHfHNDnriXw4cKLBwspZY/F8DeL2Jiexu28/T3YIF40/YFM9ZiL7KruAg85qqH8Yl81EttwYClrTqpfzswVCj51lyeEAwFiXEw1w02u2KoLpx1L4Gz1lcuvLTIuxasePsJNghRwVY98Yco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720818450; c=relaxed/simple;
-	bh=vKFZ7VhhVPwDMBl1L3Jwa9uOyxKi/wF0dZAUg/xUYoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RcfxGAhNmJ0i1diy3a30bthBXK33ExUGsqvErnBM/DBf2H806IdKuwtLzvW9a08/gJ6jR6mXPqmCzqdxAQsyBDYU0zsoZzg23RtpjH2+490xl4iA0SIIeX/hKwL9Ny+hYR2VEekJ26mYRZV5BfM2mWcoghKkEC0PCdwHa2Hsyv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=gSpGb5Qt; arc=none smtp.client-ip=178.238.236.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4fyXkYyDXPeoIA7KiK11Pb/8YiiA2kBtTpxn1oy5Xfg=; b=gSpGb5Qt1QavJ4twGDivqpU9x1
-	kJt7FGBvbK2aTCJXowAhCepe19G36RO0QZWmVH4ZPnVqIYIfznu7g94inYaiaa4BZwbr0mfO7JKmq
-	hYRy6/W3yREkiAKPS246SXVVNa0BVKo1HZe+daKDFlZ9wbhS0rpTOJi6AfDKYl1fydKTSjE4zeaFA
-	T2PD/MI/JPC74BKmrhhAdrEh2TjJz5S2lgouEjh1E/aDlO28e1Khlw1472v0LlmBo1AWQJStJIzSv
-	XuNycvvbN48jEJAU5oiGYqzSk8+UlLvMw5zPEmKVQbAREOVeGYIr8Ia4mlMgVp51XfHHXOziLrjME
-	hkmO4NzA==;
-Date: Fri, 12 Jul 2024 23:06:56 +0200
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Jonathan Cameron <jic23@kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Rob Herring
- <robh@kernel.org>, Daniel Scally <djrscally@gmail.com>, Heikki Krogerus
- <heikki.krogerus@linux.intel.com>, Sakari Ailus
- <sakari.ailus@linux.intel.com>, Jean Delvare <jdelvare@suse.com>, Guenter
- Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>, Lee Jones
- <lee@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-acpi@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-leds@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 3/6] leds: bd2606mvv: use device_for_each_child_node()
- to access device child nodes
-Message-ID: <20240712230656.67e89eb2@akphone>
-In-Reply-To: <2cd45260-e737-43e9-9bf6-c267d6f86ad3@gmail.com>
-References: <20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com>
-	<20240706-device_for_each_child_node-available-v1-3-8a3f7615e41c@gmail.com>
-	<20240707175713.4deb559f@jic23-huawei>
-	<4cf71de7-dc47-475c-bba0-a9e755f66d49@gmail.com>
-	<2cd45260-e737-43e9-9bf6-c267d6f86ad3@gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.37; aarch64-alpine-linux-musl)
+	s=arc-20240116; t=1720819185; c=relaxed/simple;
+	bh=4EDnLM3R32wX8YTrWWohhPEyvaknnvc6kF0zp4tb4So=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tm3SDAF9+ymV4qHPoFXzq0mTw/mFICrfdHirFqHfz55wBvC9iAK8N7zt422lajSiWHzvfytdjXQ8dOniB0c5lmWQ4q/cD1q25PZsGbdCAaZrvsS4i/5rmQqRjDzv+n/oIi9PhFpWlm1hMZG4MOtrhgg2Dot1Q9VcZqkmBbVLlGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=R1pDqs4/; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2c1a4192d55so1873840a91.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 14:19:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1720819184; x=1721423984; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HusJ6IrbZy1Tv9qyw50BhMkV9Qd8Rstsp/w7WIr+A3M=;
+        b=R1pDqs4/pyBF562k+K+Ql7ef+JR4C82rqvKUYoH4o7vJzj8dsKWnwdwIHWtq4UF620
+         zTHD9XIfWXnrx+YTb0838aSDpnZaUfPGaEOYlSiKv6j4R54ldCF6+G6pCiIkgtvQ71UQ
+         0Kb9vvtF2edOiSyPG/UQpD9IRqeTYeCR60je8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720819184; x=1721423984;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HusJ6IrbZy1Tv9qyw50BhMkV9Qd8Rstsp/w7WIr+A3M=;
+        b=d8ynCyGQfjv+XbXhp5ydZwYGSOJ1Zoi5DmRiVycQemP+ouOSXB1NXZ72Qaw5NR7qCO
+         g7t6twB2JNqGBnqwKPro67RS79xOL+dh6+Yy03hOU2wjw+k3Inxe6Yld5JMYVD72jdx1
+         l8I7CavZcJDSp8EOZrGSkgQwLZr8GSBEg1GrftIjFz7tGhOHgaOfXuPRFK2+ZEgQDXQn
+         kJMHAzMEkAR71dD3UKs2S79Up20ak/+j/41joJB2zDKumyhydcm1ma1MtSclYAZ68Tbz
+         GnZlOEZxco83NS2Av9oHaT6AgLsSRC7KEYvWSXPKCK25UAm65yXQTFqEd48c3I06CZLb
+         cBsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCigcfzWEu2mIz1W2ixUEWn9KZ5hMVYq/8BFogoh4NTtirRHKJsT2LlLlLRuD0DvCJm2ig+mblvko5XT2uK4+u8JsvSqc+
+X-Gm-Message-State: AOJu0Yz0bY0UfIgko3Bmr3mhmddGb9bpWJDDwwymrPVqR09/MhzT+v2+
+	8ZMrNh/jMazwkuRbu/J2wISKAb1UBLvJIItZvUvE+S8kIt7clNS6UbroXav10w==
+X-Google-Smtp-Source: AGHT+IHHuZ9B1nEASUMH2UOsi/jmTk4UbzHqdKhhBrDl3MEblP0518z+Dv5K9nr1Gp2w73diYVXhVA==
+X-Received: by 2002:a17:90b:913:b0:2c9:75c6:32dc with SMTP id 98e67ed59e1d1-2ca35be1a44mr10123419a91.1.1720819183607;
+        Fri, 12 Jul 2024 14:19:43 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cacd3e2322sm2016716a91.13.2024.07.12.14.19.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Jul 2024 14:19:42 -0700 (PDT)
+Message-ID: <eee4d558-51d5-4f84-8bc8-d01178f5a1e5@broadcom.com>
+Date: Fri, 12 Jul 2024 14:19:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5.10 0/2] Fix for CVE-2024-36901
+To: Ashwin Kamat <ashwin.kamat@broadcom.com>, linux-kernel@vger.kernel.org
+Cc: gregkh@linuxfoundation.org, davem@davemloft.net, yoshfuji@linux-ipv6.org,
+ dsahern@kernel.org, kuba@kernel.org, netdev@vger.kernel.org,
+ ajay.kaher@broadcom.com, vasavi.sirnapalli@broadcom.com,
+ tapas.kundu@broadcom.com
+References: <1720520570-9904-1-git-send-email-ashwin.kamat@broadcom.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <1720520570-9904-1-git-send-email-ashwin.kamat@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000313068061d1370a2"
+
+--000000000000313068061d1370a2
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 8 Jul 2024 17:45:43 +0200
-Javier Carrasco <javier.carrasco.cruz@gmail.com> wrote:
+On 7/9/24 03:22, Ashwin Kamat wrote:
+> From: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
+> 
+> net/ipv6: annotate data-races around cnf.disable_ipv6
+>         disable_ipv6 is read locklessly, add appropriate READ_ONCE() and WRITE_ONCE() annotations.
+> 
+> net/ipv6: prevent NULL dereference in ip6_output()
+>         Fix for CVE-2024-36901
+> 
+> Ashwin Dayanand Kamat (2):
+>         net/ipv6: annotate data-races around cnf.disable_ipv6
+>         net/ipv6: prevent NULL dereference in ip6_output()
 
-> On 08/07/2024 10:14, Javier Carrasco wrote:
-> > On 07/07/2024 18:57, Jonathan Cameron wrote:  
-> >> On Sat, 06 Jul 2024 17:23:35 +0200
-> >> Javier Carrasco <javier.carrasco.cruz@gmail.com> wrote:
-> >>  
-> >>> The iterated nodes are direct children of the device node, and the
-> >>> `device_for_each_child_node()` macro accounts for child node
-> >>> availability.
-> >>>
-> >>> `fwnode_for_each_available_child_node()` is meant to access the
-> >>> child nodes of an fwnode, and therefore not direct child nodes of
-> >>> the device node.
-> >>>
-> >>> Use `device_for_each_child_node()` to indicate device's direct
-> >>> child nodes.
-> >>>
-> >>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>  
-> >> Why not the scoped variant?
-> >> There look to be two error paths in there which would be
-> >> simplified. 
-> > 
-> > I did not use the scoped variant because "child" is used outside
-> > the loop.
-> > 
-> > On the other hand, I think an fwnode_handle_get() is missing for
-> > every "led_fwnodes[reg] = child" because a simple assignment does
-> > not increment the refcount.
-> > 
-> > After adding fwnode_handle_get(), the scoped variant could be used,
-> > and the call to fwnode_handle_put() would act on led_fwnodes[reg]
-> > instead. 
-> 
-> Actually, the whole trouble comes from doing the processing in two
-> consecutive loops, where the second loop accesses a child node that
-> gets released at the end of the first one. It seems that some code
-> got moved from one loop to a new one between two versions of the
-> patchset.
-> 
-> @Andreas Kemnade: I see that you had a single loop until v4 (the
-> driver got applied with v6), and then you split it into two loops,
-> but I don't see any mention to this modification in the change log.
-> 
-> What was the reason for this modification? Apparently, similar drivers
-> do everything in one loop to avoid such issues.
-> 
-The reason for two loops is that we check in the first loop whether
-broghtness can be individually controlled so we can set max_brightness
-in the second loop. I had the assumption that max_brightness should be
-set before registering leds.
+LGTM
 
-Some LEDs share brightness register, in the case where leds are defined
-with a shared register, we revert to on-off.
-
-> Maybe refactoring to have a single loop again (if possible) would be
-> the cleanest solution. Otherwise a get/put mechanism might be
-> necessary.
 > 
-I had no idea how to do it the time I wrote the patch.
+>   net/ipv6/addrconf.c   | 9 +++++----
+>   net/ipv6/ip6_input.c  | 2 +-
+>   net/ipv6/ip6_output.c | 2 +-
+>   3 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> --
+> 2.7.4
+> 
 
-Regards,
-Andreas
+-- 
+Florian
+
+
+--000000000000313068061d1370a2
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOXCwNtJ8fRsTrc2
+PrEFIkx55hkYdOElf8uxbZgIQTNTMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDcxMjIxMTk0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBqb85+bU2mUy+qRd6pP/ao3LNe/d44ijX5
+gsGWe1jG+DwlIAFFx5nAKtvwgQX/EJiv5qI9HwpyTnKsuc/UNxa86C7m1W8zT3eNFtaSAQWsB68R
+iF55/ikse+pzAOOHNiteVj1FpeBpZWN4XHKkWt8XgWzeNeqflTXt3uvppmZDGPKbO7U1rlpy4cgw
+HUow3w5rPBeHGytJdHop3sQ9PzpapSapjJXCo7y36fZWMUMfxRTQGJLN/VM1GliSki2Vg79AwThG
+0UA18f+4SNbLwnTTjDR1s6aR6eGUWsvVCOz7IyHu0uARJ8TdpXGHRAISkxD5KBDTrG2XSAhQDX22
+QaT+
+--000000000000313068061d1370a2--
 
