@@ -1,132 +1,165 @@
-Return-Path: <netdev+bounces-111080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA64592FCA8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:34:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84BDA92FCB1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D7E1C220B2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:34:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41308281571
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF880172BCA;
-	Fri, 12 Jul 2024 14:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A81D172BA8;
+	Fri, 12 Jul 2024 14:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19DC172BAF;
-	Fri, 12 Jul 2024 14:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A0C171670
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 14:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720794878; cv=none; b=HbN7WlrtRtV0aLJDMEMZHusdiincbKBm81fQrAYEa19rjzQ2zDi2KOiuO6D00IkFQ6if1v0V65F04QRbagb3wfI0VWaX1IgXjtdQY1BjRgu7z4ywyivfL8/x7GZMsvDwPG++eg+SHeRq3Vur6Rp7FkBjJ17A0ho+EGNZ2y8H0D8=
+	t=1720794988; cv=none; b=s1DbizGYTFvYXFaqkEQmamPUq5gCgCuwlSCk7Q/O5v90h90Bgy/hZEkjKR90Cn4pBeMlbQ7+pndy5DrcxXh0k12KjZzzU9GJ8qqKntSoTxdCvbnfMFtn2hEYRWTF95Uvzi5EnIMJydElrXu2q0LhNwV5e9/U26wQgUgxOfDMkbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720794878; c=relaxed/simple;
-	bh=l7PJwe3KWvK5haT5OB1kVY4lIVopAz5D0IUJmHHLV5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EFHurp/tK+E8YqcBIaoduL/3tOJfHDh2mqh49Omh6N4wjOdJoOG8+oCPxCwgY9TYFHaOM0+AnwMr29cC5fVqOiObaO4fuv0lqcc3t/CKTnw1p7rXeDHLSdzm3WhB3IBoixxQu65hfBd724psfZMgOsDGImuuRTekDEwqP/y6Low=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-585e774fd3dso2852783a12.0;
-        Fri, 12 Jul 2024 07:34:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720794875; x=1721399675;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vTHbgE6h5G2xxuO/oI+Wjht6sqYDxcfoXzE4OLT7DJE=;
-        b=sS/gsoXbXu5miNMu3U4LZkuOQd1p5f/LcZaHLnXf/uw2eFNnujn/ZJ/49oCALt+Gee
-         Bp/+A3Uph3BXRtVd47O2M/T18voNlToQfBP0SqSk1/oOGBaLxP1JCnksxJVsj13c0D5c
-         2Rhu2CGIpGUCUKHlH0t+iEJ6wnWBZayWBAfeckekHyqpJzLsC0Z1rxVM4WHYXzUMFAih
-         EG2o9AHrunCLANQO/uScm2OYKolk0AzmT/p+xwWYqawO5fuSju6wbzjbtvYWF3IQwIDF
-         YBzoWqt7yj8aKzZXMrndFLAfPN3XMwWW8sVw0YkojePYQc478JgL+DoBLnp4WE6G+VwQ
-         kv8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWFE3C3m1+PltdtYhJVWyrjmITSHr381z4EN1DubS4oed5GrHnPdAWFpMNSyoqKsvOt9MrstTdXrHl4pL2DSqdOELYlBWh9JTWt3zMX1BkGKuxrPDM+soVcmYrN4bLbRxm2jZ4t1cBwcFbPfcnRg6ACVYCIM2oRCLv6+c7X
-X-Gm-Message-State: AOJu0YxdvOS1/aUkJwMFrT910BQl3yLMXLzTgYS3M+zwvQimdbzndvd3
-	vdl+s7nOD2weptjp2VZQduvjHYR9tob5rgKfDSaQrJ+E3dIdb8Pw
-X-Google-Smtp-Source: AGHT+IFx7bkphX+JOo4An8ROVYQ7B6+7lTK29sRJe5lcOp44HVCPT6mVOPXizz7IVkDmbqw4pyxUww==
-X-Received: by 2002:a05:6402:2742:b0:57c:610a:6e7f with SMTP id 4fb4d7f45d1cf-594baf8719fmr9753671a12.11.1720794874945;
-        Fri, 12 Jul 2024 07:34:34 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bb9605dcsm4634440a12.6.2024.07.12.07.34.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 07:34:34 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	=?UTF-8?q?Bruno=20Pr=C3=A9mont?= <bonbons@linux-vserver.org>,
-	Matt Mackall <mpm@selenic.com>
-Cc: thepacketgeek@gmail.com,
-	riel@surriel.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] net: netconsole: Disable target before netpoll cleanup
-Date: Fri, 12 Jul 2024 07:34:15 -0700
-Message-ID: <20240712143415.1141039-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1720794988; c=relaxed/simple;
+	bh=svJbA1BekZ2dk739QeaF+Utydr8sR+CxwwHyqT6FHi4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2lROEO1mSlR99HWdwOmGRxr1RuMWt91f9f8t+HqiXsnY069q1f09Mbb/kXcvz7ryYAdT/pcklYS/LrAVCod69WcDQuZ0BAQ2JypMWNjHqv6MkgdpE5jKkVfHblyP7bPPXacLm2xTBnQ1EPmilDUv9e8zbEzNgynq57Gh+VUsdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sSHNd-0007ws-3Y; Fri, 12 Jul 2024 16:36:13 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sSHNb-0091M6-Es; Fri, 12 Jul 2024 16:36:11 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sSHNb-00CKuQ-1A;
+	Fri, 12 Jul 2024 16:36:11 +0200
+Date: Fri, 12 Jul 2024 16:36:11 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: phy: dp83td510: add cable testing
+ support
+Message-ID: <ZpE_WwtSSdxGyWtC@pengutronix.de>
+References: <20240708140542.2424824-1-o.rempel@pengutronix.de>
+ <a14ae101-d492-45a0-90fe-683e2f43fa3e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a14ae101-d492-45a0-90fe-683e2f43fa3e@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Currently, netconsole cleans up the netpoll structure before disabling
-the target. This approach can lead to race conditions, as message
-senders (write_ext_msg() and write_msg()) check if the target is
-enabled before using netpoll. The sender can validate that the target is
-enabled, but, the netpoll might be de-allocated already, causing
-undesired behaviours.
+Hi Andrew,
 
-This patch reverses the order of operations:
-1. Disable the target
-2. Clean up the netpoll structure
+On Mon, Jul 08, 2024 at 06:44:22PM +0200, Andrew Lunn wrote:
+> On Mon, Jul 08, 2024 at 04:05:42PM +0200, Oleksij Rempel wrote:
+> > Implement the TDR test procedure as described in "Application Note
+> > DP83TD510E Cable Diagnostics Toolkit revC", section 3.2.
+> > 
+> > The procedure was tested with "draka 08 signalkabel 2x0.8mm". The reported
+> > cable length was 5 meters more for each 20 meters of actual cable length.
+> > For instance, a 20-meter cable showed as 25 meters, and a 40-meter cable
+> > showed as 50 meters. Since other parts of the diagnostics provided by this
+> > PHY (e.g., Active Link Cable Diagnostics) require accurate cable
+> > characterization to provide proper results, this tuning can be implemented
+> > in a separate patch/interface.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> >  drivers/net/phy/dp83td510.c | 158 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 158 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+> > index d7616b13c5946..3375fa82927d0 100644
+> > --- a/drivers/net/phy/dp83td510.c
+> > +++ b/drivers/net/phy/dp83td510.c
+> > @@ -4,6 +4,7 @@
+> >   */
+> >  
+> >  #include <linux/bitfield.h>
+> > +#include <linux/ethtool_netlink.h>
+> >  #include <linux/kernel.h>
+> >  #include <linux/module.h>
+> >  #include <linux/phy.h>
+> > @@ -29,6 +30,42 @@
+> >  #define DP83TD510E_INT1_LINK			BIT(13)
+> >  #define DP83TD510E_INT1_LINK_EN			BIT(5)
+> >  
+> > +#define DP83TD510E_TDR_CFG			0x1e
+> > +#define DP83TD510E_TDR_START			BIT(15)
+> > +#define DP83TD510E_TDR_DONE			BIT(1)
+> > +#define DP83TD510E_TDR_FAIL			BIT(0)
+> > +
+> > +#define DP83TD510E_CTRL				0x1f
+> > +#define DP83TD510E_CTRL_HW_RESET		BIT(15)
+> > +#define DP83TD510E_CTRL_SW_RESET		BIT(14)
+> > +
+> > +#define DP83TD510E_TDR_CFG1			0x300
+> 
+> > +/* TX_TYPE: Transmit voltage level for TDR. 0 = 1V, 1 = 2.4V */
+> > +#define DP83TD510E_TDR_TX_TYPE			BIT(12)
+> 
+> This does not appear to be used, so it is not too important. But i
+> generally encode this as
+> 
+> #define DP83TD510E_TDR_TX_TYPE_1V		(0 << 12)
+> #define DP83TD510E_TDR_TX_TYPE_2V4		(1 << 12)
+> 
+> You can then OR in DP83TD510E_TDR_TX_TYPE_1V which does nothing, but
+> does document you are using 1V for the test.
 
-This change eliminates the potential race condition, ensuring that
-no messages are sent through a partially cleaned-up netpoll structure.
+Ack.
 
-Fixes: 2382b15bcc39 ("netconsole: take care of NETDEV_UNREGISTER event")
-Cc: stable@vger.kernel.org
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changelog:
+> > +#define DP83TD510E_TDR_CFG2			0x301
+> > +#define DP83TD510E_TDR_END_TAP_INDEX_1		GENMASK(14, 8)
+> > +#define DP83TD510E_TDR_END_TAP_INDEX_1_DEF	36
+> > +#define DP83TD510E_TDR_START_TAP_INDEX_1	GENMASK(6, 0)
+> > +#define DP83TD510E_TDR_START_TAP_INDEX_1_DEF	3
+> 
+> Does this correspond the minimum and maximum distance it will test?
+> Is this 3m to 36m?
 
-v2:
- * Targeting "net" instead of "net-dev" (Jakub)
+No. At least, i can't confirm it with tests.
 
-v1:
- * https://lore.kernel.org/all/20240709144403.544099-4-leitao@debian.org/
+If I see it correctly, this PHY is using SSTDR instead of usual TDR.
+Instead of pulses it will send modulated transmission with default
+length of 16ms
 
- drivers/net/netconsole.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I tried my best google foo, but was not able to find anything
+understandable about "Start/End tap index for echo coeff sweep for segment 1"
+im context of SSTDR. If anyone know more about this, please tell me :)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index d7070dd4fe73..aa66c923790f 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -974,6 +974,7 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 				/* rtnl_lock already held
- 				 * we might sleep in __netpoll_cleanup()
- 				 */
-+				nt->enabled = false;
- 				spin_unlock_irqrestore(&target_list_lock, flags);
- 
- 				__netpoll_cleanup(&nt->np);
-@@ -981,7 +982,6 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 				spin_lock_irqsave(&target_list_lock, flags);
- 				netdev_put(nt->np.dev, &nt->np.dev_tracker);
- 				nt->np.dev = NULL;
--				nt->enabled = false;
- 				stopped = true;
- 				netconsole_target_put(nt);
- 				goto restart;
+Regards,
+Oleksij
 -- 
-2.43.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
