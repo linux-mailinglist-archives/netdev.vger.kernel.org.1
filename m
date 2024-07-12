@@ -1,99 +1,109 @@
-Return-Path: <netdev+bounces-111087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9DC92FD0C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:58:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F3F92FD17
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 17:00:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684951F24338
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 806F82849B2
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 15:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AD4172BBA;
-	Fri, 12 Jul 2024 14:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC603173343;
+	Fri, 12 Jul 2024 15:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G94/R3lL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38979171670;
-	Fri, 12 Jul 2024 14:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B311B173348;
+	Fri, 12 Jul 2024 15:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720796335; cv=none; b=g83bBEi3Ak6kLvyr5T276FmShfaUMpeZsJ7T2U7Ng+A++6wqZ7Vuxidr6FkmimNKZJUHyF/DoZ/HzqsDj9Q+ndMKR5hcMfhKg2iwO7HjGbpBjGm17SNuHR3jLzqS5j1LfFlhdO4R0B++JsLMOcGVkg5aq2czlR1+Xl7NafmUdxo=
+	t=1720796404; cv=none; b=Q3MSlMn5E8JoP5w3fSZbRIVHSlurAfevROU30j/V4aaO4xA3+LjQbOo/qQ3CeGS8WBIhafszI69XXxruHh4r5y6Il3VYzmNF7MQL0tKg6M1+EaFNPTF6eeafWsbgZnkEsQ0CLUveujngEbdPSWaGc14gaJs2KsoKKF4GWQU/L3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720796335; c=relaxed/simple;
-	bh=M0fdYPs04XFI4MSEL3cVB60IKS2hZVnJ4hxKRPFY7Gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P86eNU17omEhogWVZE2LFt9U3LktzhO4Vs3BhWxS3kCoP/6BIxLnRO8vvuh1brcoSlVOe3rT2sos9OizGMHDkvyTHaORv26MQhjHTmkBBbUkMAs7mJk4sGZG1YFNj8c883BRqoZZXpbEpmbo4jYZn4qctJXf7QP4Mxuz59Wy7N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-58e76294858so5640000a12.0;
-        Fri, 12 Jul 2024 07:58:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720796333; x=1721401133;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iOROqOLL+ICKvSM0IWop1tHiRymkbqTwAK7mSurQUfQ=;
-        b=H45/gAZJDjOJh1Nh3Q/c8uQvDNlVTViQ4teAD1vGt4p7OMjqOPwtTVJeWBreTfeo9I
-         B1m+vHp5cUiWNdCGZlxoUKyjL9jT4XQnwKYZDILB/JMMLJ8OwbeHtgMarYqvPdSVJv7+
-         VK0XYFfou0+9Wad2cEC/AwXpjU9TlE+g3JfC0Vg1Pn42kouqzwuw4DRny0BFxsGyck/q
-         1AJ2bztrZUkTdzHi0W+OrjX8YnwNrqUxTfhwH+YJ754qcXqZF8zNRFew7+uZxqRrQo+m
-         oiouGvpmVNLNeu4uF4zqCYVkMoa8NQyNwi151J9uZjL1ERZHs5hQfl+LuUHJ4S1hPp6m
-         CsLw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzRGyabZMawHwIaJOaEjqK1LtRJLFwfGo31cSpMIIR4aCFpRYqfnWcs/o9z38XNMDBb/yjsXHDXDpa253FQsWZfXa04riNImJf8bOkyoNSxUs8+oQNTBpls0XkvBiQR+1dnTXs
-X-Gm-Message-State: AOJu0YxQ1ENd30AQ0wSFbtFRcMiOfqXDWkmJsXn+jSnhZSMAT3yPz2+V
-	8Fq7W+kl81fRSza0kH5Ut0c9b5VT6NhuAGny0MMGfRKksZCIbep6
-X-Google-Smtp-Source: AGHT+IGdKQn3Gzt2+l/urCVxX8FiOJWgFC28dwbx3rOWY/5MmxMdbQp+jutRVTdORLMXHS7jdj6eVg==
-X-Received: by 2002:a17:907:948b:b0:a72:afd9:6109 with SMTP id a640c23a62f3a-a799cc6abb2mr241330966b.16.1720796332394;
-        Fri, 12 Jul 2024 07:58:52 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6bc85dsm353984166b.41.2024.07.12.07.58.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 07:58:52 -0700 (PDT)
-Date: Fri, 12 Jul 2024 07:58:49 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	rbc@meta.com, horms@kernel.org,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
-Message-ID: <ZpFEqbibtxoK0Xcn@gmail.com>
-References: <20240712115325.54175-1-leitao@debian.org>
- <20240712075432.7918767a@kernel.org>
+	s=arc-20240116; t=1720796404; c=relaxed/simple;
+	bh=pLkYVWWa4KVYmUB7SuThwAZhsHjrcNB+hX34mYYBkrU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rad0KNHPhSKbtib30huwk3oufO1ds8xhIuyQGlWGQXG54xi28HVRtogsgdbW/xDHTtjLPzolrOE3gLT1vwKswoL0rZngcq6SKZ8Ldv+VICBf60hnJ5c0d6uGwwzacSayALBXF/Xzlf4C3DXCM78gB1kMD3IqUZPLzJeTeMK8xzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G94/R3lL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7831CC32782;
+	Fri, 12 Jul 2024 15:00:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720796404;
+	bh=pLkYVWWa4KVYmUB7SuThwAZhsHjrcNB+hX34mYYBkrU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G94/R3lLY3+LV0geoU6JHl7pjmqr4IPDSqahqtDnYG5cqNo7tvR/0Njx7CZjJNe+b
+	 9oDsJlmmJdcxM63FbL81CdKuHdLHftDAT396o+nG8xHeQGRgbsAe2ywqRgWzIeNVux
+	 jEnkiCRB0xibLSL5t5tkRora7AFfW4mUHKLIkFoO34hZabrf6cJwqjxLZqc64NCVtP
+	 IQA8h7yKQV7odGEDD/0NF/K4f4DPjlGm5/SRe4B4oARWtTnXahSgVdUKJHHy/qBte8
+	 RhjXbIiye4W5LFb0x9gefTJEGUVrDL5p9gvK+j+CeT2+aX1ltjzJazQBI+D9hGa5nL
+	 kr4T/eV5BJlFg==
+Date: Fri, 12 Jul 2024 08:00:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ conor@kernel.org, linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ devicetree@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ upstream@airoha.com, angelogioacchino.delregno@collabora.com,
+ benjamin.larsson@genexis.eu, rkannoth@marvell.com, sgoutham@marvell.com,
+ andrew@lunn.ch, arnd@arndb.de, horms@kernel.org
+Subject: Re: [PATCH v7 net-next 2/2] net: airoha: Introduce ethernet support
+ for EN7581 SoC
+Message-ID: <20240712080002.37c11d02@kernel.org>
+In-Reply-To: <ZpFBLkYyMXtMgbA8@lore-desk>
+References: <cover.1720600905.git.lorenzo@kernel.org>
+	<8ca603f8cea1ad64b703191b4c780bab87cb7dff.1720600905.git.lorenzo@kernel.org>
+	<20240711181003.4089a633@kernel.org>
+	<ZpEz-o1Dkg1gF_ud@lore-desk>
+	<20240712072819.4f43062c@kernel.org>
+	<ZpFBLkYyMXtMgbA8@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240712075432.7918767a@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello Jakub,
-
-On Fri, Jul 12, 2024 at 07:54:32AM -0700, Jakub Kicinski wrote:
-> On Fri, 12 Jul 2024 04:53:25 -0700 Breno Leitao wrote:
-> > Subject: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+On Fri, 12 Jul 2024 16:43:58 +0200 Lorenzo Bianconi wrote:
+> > On Fri, 12 Jul 2024 15:47:38 +0200 Lorenzo Bianconi wrote:  
+> > > The Airoha eth SoC architecture is similar to mtk_eth_soc one (e.g MT7988a).
+> > > The FrameEngine (FE) module has multiple GDM ports that are connected to
+> > > different blocks. Current airoha_eth driver supports just GDM1 that is connected
+> > > to a MT7530 DSA switch (I have not posted a tiny patch for mt7530 driver yet).
+> > > In the future we will support even GDM{2,3,4} that will connect to differ
+> > > phy modues (e.g. 2.5Gbps phy).  
+> > 
+> > What I'm confused by is the mentioned of DSA. You put the port in the
+> > descriptor, and there can only be one switch on the other side, right?  
 > 
-> [PATCH net] for fixes so that the bot knows what to test against :)
-> No need to repost (this time).
+> do you mean fport in msg1 (airoha_dev_xmit())?
+> 
+> 	fport = port->id == 4 ? FE_PSE_PORT_GDM4 : port->id;
+> 	msg1 = FIELD_PREP(QDMA_ETH_TXMSG_FPORT_MASK, fport) |
+> 	       ...
+> 
+> fport refers to the GDM port and not to the dsa user port. Am I missing
+> something?
 
-I didn't send to `net` since this WARNING is only "showing" in net-next,
-due to commit bdacf3e34945 ("net: Use nested-BH locking for
-napi_alloc_cache.") being only in net-next.
+Ooh, I see, reading what you explained previously now makes sense.
+So only 1 of the ports goes to the DSA switch, and the other ones
+are connected to SoC pins? A diagram would be worth a 1000 words ;)
 
-But you have a good point, this is a fix and it should go through `net`.
-sorry about it.
+> > be in a setup like this :( It will have no way to figure out the real
+> > egress rate given that each netdev only sees a (non-)random sample
+> > of traffic sharing the queue :(  
+> 
+> do you prefer to remove BQL support?
 
---breno
+No strong preference, I worry it will do more harm than good in
+this case. It's not what it's designed for basically. But without
+testing it's all speculation, so up to you, users can always disable
+using sysfs.
 
