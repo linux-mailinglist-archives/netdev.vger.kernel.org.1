@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-110983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FE592F312
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:33:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD74792F313
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB8BE1F21CA7
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:33:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67EE41F22BA3
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 00:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FB6184E;
-	Fri, 12 Jul 2024 00:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A960C4683;
+	Fri, 12 Jul 2024 00:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHPlwEtF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuG2knB0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59071396
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 00:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FEC441D
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 00:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720744406; cv=none; b=PZhuYRkkBkjIgXV73YQVhupAanJn4AirOYUzjgvU78fX2lxhJx8hK5OnuqwgIDFpTr9Z90OVqBrKimQ3jeBZJDhpXF3+2amwwo5YDGHlaO3SPEoQIeTbrIpokzX26IFdnQ6eg9qdTuiw9FZq9AwwYQHnNiVTbyUf9JzRqpLFIws=
+	t=1720744407; cv=none; b=koplIkfsffyKyZwRdqBebnx6E2eEFiUsjtRUlPpQKyDtF4ryNSS1SWfU0oM2Miu013GBhzeJ46THACCi2v36kON0b/G+696+jlBtxpwUykJlJjHYS9C7rZQf4JFT1S48VLXNczSwT/jsEmiDBot3mj4zsAq8xTldntIBL8pVymY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720744406; c=relaxed/simple;
-	bh=qKpMdWz6tE7fBzAUkJxNWrVWadwuxNoA3IqEeWuJVtA=;
+	s=arc-20240116; t=1720744407; c=relaxed/simple;
+	bh=vvEJwGnN6uyldzpKsS7JynTlHkGx4A9fSa8syNIOeLU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cYSIi/VvdFqah/dEml905cVkjZh+znTPxjIzb6wD5kNmyXF9cr7VnCexH4txXJUvPNrXMsVBXd2lfYZqiYB/FM17oyvlv7BW5+Sui1oqu8l+pWQWbdPdDKJ7+v886pkvH0MSyTkM6dXnLbpt/Opp0X6/hRbcWU8C4PlkSdokMi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHPlwEtF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79474C116B1;
-	Fri, 12 Jul 2024 00:33:26 +0000 (UTC)
+	 MIME-Version; b=RC9rr29R2qzvdA3cyE+n8SSk2ouhO7a6tlMwEoDncqGrFQZaZSt3+ggHVa0Xjuk1IfF8ALUVyil/Q5Brbqr7zTrKjsMtRoyiEuezKyWRgwGGWlkKiEQI9c2g/qCASixriXxSf/IvOT9llEakDpgVMO64Mouk6x0VA+DBqjwfAjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuG2knB0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 598D0C4AF09;
+	Fri, 12 Jul 2024 00:33:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720744406;
-	bh=qKpMdWz6tE7fBzAUkJxNWrVWadwuxNoA3IqEeWuJVtA=;
+	s=k20201202; t=1720744407;
+	bh=vvEJwGnN6uyldzpKsS7JynTlHkGx4A9fSa8syNIOeLU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DHPlwEtF6zGPt1Bxn1Cb4+0bcuWczKGZWuBT6K34qpc/d8/SWJA4rDSTZa2xSOfMK
-	 OuCzeRUn/dsBHVRNQsa8P8dpnDXJt4LBUIbydSgJ6ET865iFmp83xyGVQu1aCgy8KO
-	 beI5aVGDxYMn81tNuHs8dHHYoCIWdwarzsFpt6dGChoPbCwh/7vHLerPI9o3UNXFpS
-	 B5mTcyCxwPyOK0zAxkIseApBcoJygjbK2s4IA4PH1tOMaoVhnX01Fe92nNSXlShQwO
-	 fBPisMRW0rd5I14csHLqpZ68ov+14Q/fQl738XYGq+e7s7/kGJ2xnw5ejbqusSnJ0w
-	 PXJFWEtedAg9Q==
+	b=FuG2knB0tC28M6WuM5RxSRV8h9A8qaMUbRpJCK2+I9GPg4R254vqkVt9CF7EBzc3d
+	 Hoh+mDsOfibQ4J2k5msWbuKXUBsqShV2Q5v4gmOsZOe43cp9JCqQd50/Y631GN4wN8
+	 xX5mO97Q82C7RI0kYB59xihjGSyREmQIjT8X+n5D/60raHOCxm/Fdi7y4cdv/3KGAE
+	 LCbqbZ7pT+YGp9RcAD8oVZSi9eejVAAszSLFmgqMM+8OYIYRMJZWqky6BCdToHnB1A
+	 fE4fFqKWw1g/1pPq0VulAKwlEvHqkNTxdODggdU3COsjqmFEU3GWeBbws49QcwurJC
+	 ZasLtHUx9xOFg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -53,9 +53,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Daniel Jurgens <danielj@nvidia.com>,
 	William Tu <witu@nvidia.com>
-Subject: [PATCH net-next V3 1/4] net/mlx5: IFC updates for SF max IO EQs
-Date: Thu, 11 Jul 2024 17:33:07 -0700
-Message-ID: <20240712003310.355106-2-saeed@kernel.org>
+Subject: [PATCH net-next V3 2/4] net/mlx5: Set sf_eq_usage for SF max EQs
+Date: Thu, 11 Jul 2024 17:33:08 -0700
+Message-ID: <20240712003310.355106-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240712003310.355106-1-saeed@kernel.org>
 References: <20240712003310.355106-1-saeed@kernel.org>
@@ -69,39 +69,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Daniel Jurgens <danielj@nvidia.com>
 
-Expose a new cap sf_eq_usage. The vhca_resource_manager can write this
-cap, indicating the SF driver should use max_num_eqs_24b to determine
-how many EQs to use.
-
-Will be used in the next patch, to indicate to the SF driver from the PF
-that the user has set the max io eqs via devlink. So the SF driver can
-later query the proper max eq value from the new cap.
-
-devlink port function set pci/0000:08:00.0/32768 max_io_eqs 32
+When setting max_io_eqs for an SF function also set the sf_eq_usage_cap.
+This is to indicate to the SF driver from the PF that the user has set
+the max io eqs via devlink. So the SF driver can later query the proper
+max eq value from the new cap.
 
 Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
 Reviewed-by: William Tu <witu@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- include/linux/mlx5/mlx5_ifc.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index fdad0071d599..360d42f041b0 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -1994,7 +1994,9 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
- 	u8	   migration_tracking_state[0x1];
- 	u8	   reserved_at_ca[0x6];
- 	u8	   migration_in_chunks[0x1];
--	u8	   reserved_at_d1[0xf];
-+	u8	   reserved_at_d1[0x1];
-+	u8	   sf_eq_usage[0x1];
-+	u8	   reserved_at_d3[0xd];
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 72949cb85244..099a716f1784 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -4676,6 +4676,9 @@ mlx5_devlink_port_fn_max_io_eqs_set(struct devlink_port *port, u32 max_io_eqs,
+ 	hca_caps = MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capability);
+ 	MLX5_SET(cmd_hca_cap_2, hca_caps, max_num_eqs_24b, max_eqs);
  
- 	u8	   cross_vhca_object_to_object_supported[0x20];
- 
++	if (mlx5_esw_is_sf_vport(esw, vport_num))
++		MLX5_SET(cmd_hca_cap_2, hca_caps, sf_eq_usage, 1);
++
+ 	err = mlx5_vport_set_other_func_cap(esw->dev, hca_caps, vport_num,
+ 					    MLX5_SET_HCA_CAP_OP_MOD_GENERAL_DEVICE2);
+ 	if (err)
 -- 
 2.45.2
 
