@@ -1,109 +1,125 @@
-Return-Path: <netdev+bounces-111029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA7492F6C6
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:17:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FC392F6F6
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDE77B212A2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:17:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D5641F21E7A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBDE13F43C;
-	Fri, 12 Jul 2024 08:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064611422D2;
+	Fri, 12 Jul 2024 08:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZV7769y"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="tFm+6zH7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3471213D601;
-	Fri, 12 Jul 2024 08:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD39F13D891;
+	Fri, 12 Jul 2024 08:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720772257; cv=none; b=YD3tyc6SVY6+on+BZZrcyCsjgDDWIU7MKal2Z3paHK+InwM04xrDvQo9zU3puB9b4mUwrST8LHnPxeZE+zipPq8EZi5dyvmWMnDCJxb37TLCGUlNaIf6440d6jyPVv4jKnYu7vCn108zqVkb14sZ3N7k6gNJuRrcJjdyj4duNpY=
+	t=1720773142; cv=none; b=j3vXjfu9gJtZuOfs57J2Ojs8A4qPRYqezue4hvEpXOKVCyLos6CzeB+42dAeHmJujjgOZmtS3muzM4b0hqidwY1q5PCvkkp4v576RhQvHfFpkKurS6FbczAa1Mrbcnw7N8B3jJnZlLIkxq2plUgEgU/7nS77NusMWZd83IOlQ24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720772257; c=relaxed/simple;
-	bh=g6BQbY2PoskWEZK2+H/k8Itr0ph812HzPCCnqtMZ1Oc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kn0JQFHm1U2ZIYtD8eLzgz8DJYEcIhLjBwwW8uXkVxCTeE8aRJiU/vuMGrAhPojyuPS9wkopJF2JUjf37D/0Y6B2lr9Y7GRg9148mPs9giZrVZ0kb5gpoLnZH7XekFY5PAg42RyAJUJH723YSrWS5qSo7BJg4WKnYDhBZ77cMzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VZV7769y; arc=none smtp.client-ip=209.85.215.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-78964fd9f2dso838773a12.3;
-        Fri, 12 Jul 2024 01:17:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720772255; x=1721377055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J/VNNSVATduh5OiXqB7FDYXYQs1lG35zNpgpLy5fLvc=;
-        b=VZV7769yEjy2W5pdmLNClcNXbME7igINR6EBRNmujAhDrSMOhrJXdP5e+CAyPHEfbW
-         m5ttY+HR18kLYcQcWj9iLTF1RYJAcUaloah8u0samwsizMdPfvlv/teYxZakEuJon7QI
-         ThmRlXJocSeeSdLnDgbLcvICgIKYxdbuwEyvU8N5rb1zgGsAq5j8FSuNW5mRA6+q10rp
-         QO+aqMU0Y3d+KVc624gSlJ4I31jOZy4sNvMoC0yU6139UNbDrDplEvyKXo83VMiwT+TX
-         JLmLA1WXcTmSaMepeLyDp3/qrCUWKndgAsnKoT/BdRt8LNR+dEg43dAyLi9kYZF6arYi
-         Yyvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720772255; x=1721377055;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J/VNNSVATduh5OiXqB7FDYXYQs1lG35zNpgpLy5fLvc=;
-        b=GedzzZdV3xz7EcbV3nzcumXAdR08eW2UzjTHhccSjngwLEpa9jFB2p5H1IT/zNcGCO
-         kFTxcZwrgdNuehBt4VJIi0ifoXWAoe82/kitZcUPC+jC2SKcIGT8SlQSxsa/+KL8NoAp
-         dYgiK40PCQs5kHxaKsUGf0lfyIbyG5DeNl01mZA1+fuG1JU2J8PypnoIBnkWlOX2eRHD
-         TgULg5/OnsXGLEguCkt8iMImPWrOeLsIQTmQC3yol5nsyBqFoV44q5UrVDQOuZ2IEZcr
-         kn5bxMXGPDVRFykLO8MI3TfJZXIZ5P1QQAfiM31PaR5HBflPFeMcr6C0CIYdv5BoDFp6
-         YSPg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1oQbhPywRUF9IKNz1zI6ZC6GuT9ro/mBRbaNQn4a+V/6/zdt1BW7ZFBeyiHGJKaTa6d5wz4xk/hqkLvqT9PfEF4t08pEbSCDh1ItI8GlneLLdLTEL0EHL6tJHQn+/F3gBkcdt
-X-Gm-Message-State: AOJu0Yx6mqdITLer9K6OGMADZDpY/3Q/Ml7VyKvZv/wqlrVvXGJMmm7q
-	+uuuaEAaMMRGHUcejk2WJsj/ZSsIqOiyuaqWz/h9efF2TtcdUfyzkEQVl9GvLloQIQ==
-X-Google-Smtp-Source: AGHT+IGmWBuFODJV7ioe217b0PQGyIcD6RxTMMG+fuHy4GLZ88+lqwWk/PMH6SdhzfghGJKAWrZa3g==
-X-Received: by 2002:a05:6a21:3393:b0:1c1:e75a:5504 with SMTP id adf61e73a8af0-1c29821bb16mr13156121637.15.1720772255334;
-        Fri, 12 Jul 2024 01:17:35 -0700 (PDT)
-Received: from localhost.localdomain ([240e:604:203:6020:60b8:1bf4:882c:1f7a])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cacd41a01asm879730a91.32.2024.07.12.01.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 01:17:34 -0700 (PDT)
-From: Fred Li <dracodingfly@gmail.com>
-To: willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: linearizing skb when downgrade gso_size
-Date: Fri, 12 Jul 2024 16:17:24 +0800
-Message-Id: <20240712081724.95738-1-dracodingfly@gmail.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
-In-Reply-To: <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
-References: <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1720773142; c=relaxed/simple;
+	bh=n1zxY5qH8904VuJHNeImarl5a09WAl8K0FSrsBJ4FYE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QDn3Cuzh/OAT1Ni5ORfMEhHOfzn22p8arwVmYo6sMCVhTaA1I/eaXzEfFbVRgJ6O31TMWYVL/ISjEZWai/z1UkSwwasExh2p0STUQPkH2yuEnaJm8mgljzORqnhucdrzrCWJxyTA+PE+U5N0qwMLp5BoOPIkiv0XgRkE4S6Cdk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=tFm+6zH7; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46C8VgfiE313779, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1720773102; bh=n1zxY5qH8904VuJHNeImarl5a09WAl8K0FSrsBJ4FYE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=tFm+6zH7wRiw3WALQ3iK4Q3wGDDloNokBkw1Nl9WlEWJwsi8jLopXajw2RpdRttdT
+	 f38w3sqUSIZ8gMHGiXGsjzbQ3Ke5IRGJnyqCuAkjv8oTvNBr/Zt7FLStdQGn6jVCYw
+	 55Z3ib+RcKnWUd/C39KSc6bxfqkbLSXoMQVMfyUHELs6FbIPscfddHWiH3xT/agWZa
+	 cowp0T2I3ZFuZzCIDrpCepoep8lyoiKGnWzdxDq06xE1cc8OdLS08k1+4dC+dDzXLF
+	 RsjC6eBhD64TwkJXT4QfrQ+k748CPE38hXC6YDEuxEXJjwpLNLUgHD0NvNRrsiZ9eF
+	 X98GmQMDmDn6A==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46C8VgfiE313779
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 12 Jul 2024 16:31:42 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 12 Jul 2024 16:31:42 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 12 Jul 2024 16:31:42 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Fri, 12 Jul 2024 16:31:42 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        "jdamato@fastly.com" <jdamato@fastly.com>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v23 04/13] rtase: Implement the interrupt routine and rtase_poll
+Thread-Topic: [PATCH net-next v23 04/13] rtase: Implement the interrupt
+ routine and rtase_poll
+Thread-Index: AQHa0no69wfdkW7mNUmbfRSXLRon/rHxzNEAgAD5ekA=
+Date: Fri, 12 Jul 2024 08:31:41 +0000
+Message-ID: <55abfcf00da1494fbc98fc0389ab7c3a@realtek.com>
+References: <20240710033234.26868-1-justinlai0215@realtek.com>
+	<20240710033234.26868-5-justinlai0215@realtek.com>
+ <20240711183640.02241a9a@kernel.org>
+In-Reply-To: <20240711183640.02241a9a@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-> No need for ternary statement.
-> 
-> Instead of the complex test in skb_is_nonsg, can we just assume that
-> alignment will be off if having frag_list and changing gso_size.
-> 
-> The same will apply to bpf_skb_net_shrink too.
+> On Wed, 10 Jul 2024 11:32:25 +0800 Justin Lai wrote:
+> > +#ifdef CONFIG_NET_POLL_CONTROLLER
+> > +/* Polling 'interrupt' - used by things like netconsole to send skbs
+> > + * without having to re-enable interrupts. It's not called while
+> > + * the interrupt routine is executing.
+> > + */
+> > +static void rtase_netpoll(struct net_device *dev) {
+> > +     const struct rtase_private *tp =3D netdev_priv(dev);
+> > +     const struct pci_dev *pdev =3D tp->pdev;
+> > +
+> > +     disable_irq(pdev->irq);
+> > +     rtase_interrupt(pdev->irq, dev);
+>=20
+> Why do you need to implement a separate netpoll handler?
+> netpoll is optional, if driver doesn't implement it core will just core y=
+our NAPI
+> handlers with a budget of 0 (to only clean up Tx, see NAPI documentation)=
+.
+>=20
+> disable_irq() sleeps, you most definitely can't call it here.
+> --
+> pw-bot: cr
 
-increase gso_size may be no problem and we can use BPF_F_ADJ_ROOM_FIXED_GSO
-to avoid update gso_size when shrink.
+Hi Jakub,
 
-> 
-> Not sure that it is okay to linearize inside a BPF helper function.
-> Hopefully bpf experts can chime in on that.
-
-Thanks
-
-Fred Li
-
-
+After confirming, I think there is no need to implement the netpoll handler=
+,
+so I will remove it.
 
