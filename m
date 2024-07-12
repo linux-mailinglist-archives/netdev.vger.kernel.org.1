@@ -1,365 +1,352 @@
-Return-Path: <netdev+bounces-110990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6302292F348
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 03:10:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D634C92F34E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 03:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C602D1F22905
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:10:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C189B2168F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0761FAA;
-	Fri, 12 Jul 2024 01:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ST+XM9Ce"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E408C0B;
+	Fri, 12 Jul 2024 01:10:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F65B10E3;
-	Fri, 12 Jul 2024 01:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279495256;
+	Fri, 12 Jul 2024 01:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720746606; cv=none; b=MXj/gza276DZ/5YVJaWvSaBrSQPsir4YRQVLHFTvMoyULJzDr3SQW/p8To5xJkheyU5BbgjnEwcG4dgKFoYXQzrvqa8rWaJMq7bH6dfckTGZbGeRqtPnKoF6fAwj/gD4IqUlsgTBy/rPyeXULd+NST/ZZz1Ful46B7zDGrjf+PY=
+	t=1720746642; cv=none; b=Y7EuHbgIEJwDyxcgb7TdxKbtnqaVrcDKy2XcH1br7XbtjDOKUeP5QXInvR668weL35JZNszRRXIpTp6CfcOtAqQsrNQtgFyyrHPFvHJYr6vlHGx9OOC/tJZXmLBEV16nmGxskmopA4nfuJPErhgE5FLt58bbDmeWhEqdz3pWZy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720746606; c=relaxed/simple;
-	bh=pbT57k7QB3HrURFKNbnnjOrCHWNpdlLB7IX4cdo349Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J+tsyWI4owyWXDMn1Rom/zqtFqBuSz2dF32BU6fofCZDwr0FythPl3gz3V3xH4ufPPnv5UIo4QLtoRcSXmp4cer230C2p67oRH/VIj4e6eGf50enshvFv4oaBQZaHTPCyD/2fIH6CjyQmfRAtvydbr5HAeB+zYF1xh27LaPA92Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ST+XM9Ce; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07D7C116B1;
-	Fri, 12 Jul 2024 01:10:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720746605;
-	bh=pbT57k7QB3HrURFKNbnnjOrCHWNpdlLB7IX4cdo349Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ST+XM9Cem5GiFdrAEFwqLg7T7ZfCDV8jJrMm/RoTB63Vh3YdxODXNzYhSx/ok+chE
-	 RRJXstoI1etRNXR0PA6cJf14UqTikoMaTJXB+6C5pyAFx7t66kqU+M4ERxIRS6aXcs
-	 iPH0ApcNqhmrDSO7Yi6rejwLM0MiQXrSc2HBRbp7L4gmWQAxBAa2flkx3OGTmrwx7U
-	 g64mkkgB9c5Fih4oECA8B2v+YnvriA5kYnQHE4mTbhXR7884pYiOHTIIloTdsLf44M
-	 A4CMm3m3F4H3joPigcm/ViL/wzUDmX5pC9c8qJKu/Q+wKzQieOQ9H8rAtkc/ujqwb4
-	 HAM3teTMqmwpQ==
-Date: Thu, 11 Jul 2024 18:10:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- conor@kernel.org, linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- devicetree@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
- upstream@airoha.com, angelogioacchino.delregno@collabora.com,
- benjamin.larsson@genexis.eu, rkannoth@marvell.com, sgoutham@marvell.com,
- andrew@lunn.ch, arnd@arndb.de, horms@kernel.org
-Subject: Re: [PATCH v7 net-next 2/2] net: airoha: Introduce ethernet support
- for EN7581 SoC
-Message-ID: <20240711181003.4089a633@kernel.org>
-In-Reply-To: <8ca603f8cea1ad64b703191b4c780bab87cb7dff.1720600905.git.lorenzo@kernel.org>
-References: <cover.1720600905.git.lorenzo@kernel.org>
-	<8ca603f8cea1ad64b703191b4c780bab87cb7dff.1720600905.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1720746642; c=relaxed/simple;
+	bh=1Vt4FW8WENAx7Dle8hz8WMlIDeg/uCm3IuldkxArTvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sabA8QgDTfwywfHZWri7gqQB1eeVCSrtcO9ZpLuRAAWW0MDWkeCPue/S+DQAteHCj5tCeT9DVukZPGsvbBWul/ORmSBQxp5EceW0In7tAgo7RvS6BSVnqdcYL32j9fCC204BT+pTCE0Yb+bID3Id3vZlYeYyZD/FsWDINySaGgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1fb3cf78fa6so10165405ad.1;
+        Thu, 11 Jul 2024 18:10:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720746639; x=1721351439;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y1AVXj0tANqtPFDU7AJSgifQ21HImlVVlL3X1KaD8n0=;
+        b=beIJHV7HiXGyn6kotVc82wHQxeAHuPzMBEiEw5TeAUUqznR73cVea45kFKLUZu0qNv
+         7IGgZvmjJC1JoN3T3szZfRZcDUTKPVac4pT/KHNlvJD1wMttrfNbaq7et16MBhFrSHcT
+         TYq+NymFXOx0zWmj+lhsW9oigX00e90v6EhqOOpLlbQAYmikxddoxDnFUdjOW+IgzLz0
+         PudQ0HWEdEINVVOOV2zz6LZGsQM3O3n6dQGTZtmbBVM6VytTRtgIp7/QPxXtY9i5MzWD
+         geH9bK9neP/hKugCATGTFyHmNIZd7rJ+Y0XxVvQ47YMxnkpmAx76KYe6n5Y3IC0tpilW
+         ddIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVr8uhggtHcTy7at8wzFnFRVQAuXUYIdUcDCPSZZvdzf92PvT9ZwrB6kUYKbwLHV0R/V2REOXTxUuDxDEoQPRpn1OTR2TneAYnlhjN4K8uX5D53PwMNTGpT48DfXKmeRweJkqnMJXxW5tN3zcIVpMkUyEU7N5cRtDEzlP6exbwWDoVCGqNgR7pp7jkRMwsShOc3WRKUx0M+MC9R
+X-Gm-Message-State: AOJu0Ywdb6QRz4zQP4Cjg4E9QQ/U5FaODnWm5px72EKzcl2XS+1bPvDd
+	SYZxZUbnJ5D9apZfNd6f9O1dqnMlXI4LnHbXlGLZMzuu3xzkHljNaEmb2i8=
+X-Google-Smtp-Source: AGHT+IExwoJb+WzSc3arL4DHBmrpKB97Gh1o8Tu8q2wnb74n5OBkQ6vQrthZY2DcdUxBvMMKaSlF5A==
+X-Received: by 2002:a17:902:e5c7:b0:1fb:167e:fb0c with SMTP id d9443c01a7336-1fbb6eff6e2mr75184965ad.56.1720746639185;
+        Thu, 11 Jul 2024 18:10:39 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ab6d0dsm56582405ad.167.2024.07.11.18.10.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jul 2024 18:10:38 -0700 (PDT)
+Date: Thu, 11 Jul 2024 18:10:37 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Alexis =?utf-8?Q?Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>, ebpf@linuxfoundation.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 2/3] selftests/bpf: integrate test_xdp_veth into
+ test_progs
+Message-ID: <ZpCCjQP3XQeJPpwH@mini-arch>
+References: <20240711-convert_test_xdp_veth-v1-0-868accb0a727@bootlin.com>
+ <20240711-convert_test_xdp_veth-v1-2-868accb0a727@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240711-convert_test_xdp_veth-v1-2-868accb0a727@bootlin.com>
 
-On Wed, 10 Jul 2024 10:47:41 +0200 Lorenzo Bianconi wrote:
-> Add airoha_eth driver in order to introduce ethernet support for
-> Airoha EN7581 SoC available on EN7581 development board (en7581-evb).
-> en7581-evb networking architecture is composed by airoha_eth as mac
-> controller (cpu port) and a mt7530 dsa based switch.
-> EN7581 mac controller is mainly composed by Frame Engine (FE) and
-> QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
-> functionalities are supported now) while QDMA is used for DMA operation
-> and QOS functionalities between mac layer and the dsa switch (hw QoS is
-> not available yet and it will be added in the future).
-> Currently only hw lan features are available, hw wan will be added with
-> subsequent patches.
-
-It seems a bit unusual for DSA to have multiple ports, isn't it?
-Can you explain how this driver differs from normal DSA a little=20
-more in the commit message?
-
-> +static void airoha_dev_get_stats64(struct net_device *dev,
-> +				   struct rtnl_link_stats64 *storage)
-> +{
-> +	struct airoha_gdm_port *port =3D netdev_priv(dev);
+On 07/11, Alexis Lothoré (eBPF Foundation) wrote:
+> test_xdp_veth.sh tests that XDP return codes work as expected, by bringing
+> up multiple veth pairs isolated in different namespaces, attaching specific
+> xdp programs to each interface, and ensuring that the whole chain allows to
+> ping one end interface from the first one. The test runs well but is
+> currently not integrated in test_progs, which prevents it from being run
+> automatically in the CI infrastructure.
+> 
+> Rewrite it as a C test relying on libbpf to allow running it in the CI
+> infrastructure. The new code brings up the same network infrastructure and
+> reuses the same eBPF programs as test_xdp_veth.sh, for which skeletons are
+> already generated by the bpf tests makefile.
+> 
+> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+> ---
+> The new code has been tested in an aarch64 qemu instance:
+> Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
+> 
+> I have also checked that some minor alterations in the network
+> configuration (altering the redirect map, or not loading one of the xdp
+> programs) make the test fail.
+> 
+> On my testing setup, the test takes a bit more than 3 seconds to run on
+> average.
+> ---
+>  .../selftests/bpf/prog_tests/test_xdp_veth.c       | 234 +++++++++++++++++++++
+>  1 file changed, 234 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
+> new file mode 100644
+> index 000000000000..40d85aece984
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
+> @@ -0,0 +1,234 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/**
+> + * Create 3 namespaces with 3 veth peers, and
+> + * forward packets in-between using native XDP
+> + *
+> + *                      XDP_TX
+> + * NS1(veth11)        NS2(veth22)        NS3(veth33)
+> + *      |                  |                  |
+> + *      |                  |                  |
+> + *   (veth1,            (veth2,            (veth3,
+> + *   id:111)            id:122)            id:133)
+> + *     ^ |                ^ |                ^ |
+> + *     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
+> + *     | ------------------ ------------------ |
+> + *     -----------------------------------------
+> + *                    XDP_REDIRECT
+> + */
 > +
-> +	mutex_lock(&port->stats.mutex);
-
-can't take sleeping locks here :( Gotta do periodic updates from=20
-a workqueue or spinlock. there are callers under RCU (annoyingly)
-
-> +	airoha_update_hw_stats(port);
-> +	storage->rx_packets =3D port->stats.rx_ok_pkts;
-> +	storage->tx_packets =3D port->stats.tx_ok_pkts;
-> +	storage->rx_bytes =3D port->stats.rx_ok_bytes;
-> +	storage->tx_bytes =3D port->stats.tx_ok_bytes;
-> +	storage->multicast =3D port->stats.rx_multicast;
-> +	storage->rx_errors =3D port->stats.rx_errors;
-> +	storage->rx_dropped =3D port->stats.rx_drops;
-> +	storage->tx_dropped =3D port->stats.tx_drops;
-> +	storage->rx_crc_errors =3D port->stats.rx_crc_error;
-> +	storage->rx_over_errors =3D port->stats.rx_over_errors;
+> +#define _GNU_SOURCE
+> +#include <net/if.h>
+> +#include "test_progs.h"
+> +#include "network_helpers.h"
+> +#include "xdp_dummy.skel.h"
+> +#include "xdp_redirect_map.skel.h"
+> +#include "xdp_tx.skel.h"
 > +
-> +	mutex_unlock(&port->stats.mutex);
-> +}
+> +#define VETH_PAIRS_COUNT	3
+> +#define NS_NAME_MAX_LEN		16
+> +#define NS_SUFFIX_LEN		6
+> +#define VETH_NAME_MAX_LEN	16
+> +#define IP_SRC				"10.1.1.11"
+> +#define IP_DST				"10.1.1.33"
+> +#define IP_CMD_MAX_LEN		128
 > +
-> +static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
-> +				   struct net_device *dev)
-> +{
-> +	struct skb_shared_info *sinfo =3D skb_shinfo(skb);
-> +	struct airoha_gdm_port *port =3D netdev_priv(dev);
-> +	int i, qid =3D skb_get_queue_mapping(skb);
-> +	struct airoha_eth *eth =3D port->eth;
-> +	u32 nr_frags, msg0 =3D 0, msg1;
-> +	u32 len =3D skb_headlen(skb);
-> +	struct netdev_queue *txq;
-> +	struct airoha_queue *q;
-> +	void *data =3D skb->data;
-> +	u16 index;
-> +	u8 fport;
-> +
-> +	if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL)
-> +		msg0 |=3D FIELD_PREP(QDMA_ETH_TXMSG_TCO_MASK, 1) |
-> +			FIELD_PREP(QDMA_ETH_TXMSG_UCO_MASK, 1) |
-> +			FIELD_PREP(QDMA_ETH_TXMSG_ICO_MASK, 1);
-> +
-> +	/* TSO: fill MSS info in tcp checksum field */
-> +	if (skb_is_gso(skb)) {
-> +		if (skb_cow_head(skb, 0))
-> +			goto error;
-> +
-> +		if (sinfo->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) {
-> +			__be16 csum =3D cpu_to_be16(sinfo->gso_size);
-> +
-> +			tcp_hdr(skb)->check =3D (__force __sum16)csum;
-> +			msg0 |=3D FIELD_PREP(QDMA_ETH_TXMSG_TSO_MASK, 1);
-> +		}
-> +	}
-> +
-> +	fport =3D port->id =3D=3D 4 ? FE_PSE_PORT_GDM4 : port->id;
-> +	msg1 =3D FIELD_PREP(QDMA_ETH_TXMSG_FPORT_MASK, fport) |
-> +	       FIELD_PREP(QDMA_ETH_TXMSG_METER_MASK, 0x7f);
-> +
-> +	if (WARN_ON_ONCE(qid >=3D ARRAY_SIZE(eth->q_tx)))
-> +		qid =3D 0;
-
-Hm, how? Stack should protect against that.
-
-> +	q =3D &eth->q_tx[qid];
-> +	if (WARN_ON_ONCE(!q->ndesc))
-> +		goto error;
-> +
-> +	spin_lock_bh(&q->lock);
-> +
-> +	nr_frags =3D 1 + sinfo->nr_frags;
-> +	if (q->queued + nr_frags > q->ndesc) {
-> +		/* not enough space in the queue */
-> +		spin_unlock_bh(&q->lock);
-> +		return NETDEV_TX_BUSY;
-
-no need to stop the queue?
-
-> +	}
-> +
-> +	index =3D q->head;
-> +	for (i =3D 0; i < nr_frags; i++) {
-> +		struct airoha_qdma_desc *desc =3D &q->desc[index];
-> +		struct airoha_queue_entry *e =3D &q->entry[index];
-> +		skb_frag_t *frag =3D &sinfo->frags[i];
-> +		dma_addr_t addr;
-> +		u32 val;
-> +
-> +		addr =3D dma_map_single(dev->dev.parent, data, len,
-> +				      DMA_TO_DEVICE);
-> +		if (unlikely(dma_mapping_error(dev->dev.parent, addr)))
-> +			goto error_unmap;
-> +
-> +		index =3D (index + 1) % q->ndesc;
-> +
-> +		val =3D FIELD_PREP(QDMA_DESC_LEN_MASK, len);
-> +		if (i < nr_frags - 1)
-> +			val |=3D FIELD_PREP(QDMA_DESC_MORE_MASK, 1);
-> +		WRITE_ONCE(desc->ctrl, cpu_to_le32(val));
-> +		WRITE_ONCE(desc->addr, cpu_to_le32(addr));
-> +		val =3D FIELD_PREP(QDMA_DESC_NEXT_ID_MASK, index);
-> +		WRITE_ONCE(desc->data, cpu_to_le32(val));
-> +		WRITE_ONCE(desc->msg0, cpu_to_le32(msg0));
-> +		WRITE_ONCE(desc->msg1, cpu_to_le32(msg1));
-> +		WRITE_ONCE(desc->msg2, cpu_to_le32(0xffff));
-> +
-> +		e->skb =3D i ? NULL : skb;
-> +		e->dma_addr =3D addr;
-> +		e->dma_len =3D len;
-> +
-> +		airoha_qdma_rmw(eth, REG_TX_CPU_IDX(qid), TX_RING_CPU_IDX_MASK,
-> +				FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
-> +
-> +		data =3D skb_frag_address(frag);
-> +		len =3D skb_frag_size(frag);
-> +	}
-> +
-> +	q->head =3D index;
-> +	q->queued +=3D i;
-> +
-> +	txq =3D netdev_get_tx_queue(dev, qid);
-> +	netdev_tx_sent_queue(txq, skb->len);
-> +	skb_tx_timestamp(skb);
-> +
-> +	if (q->ndesc - q->queued < q->free_thr)
-> +		netif_tx_stop_queue(txq);
-> +
-> +	spin_unlock_bh(&q->lock);
-> +
-> +	return NETDEV_TX_OK;
-> +
-> +error_unmap:
-> +	for (i--; i >=3D 0; i++)
-> +		dma_unmap_single(dev->dev.parent, q->entry[i].dma_addr,
-> +				 q->entry[i].dma_len, DMA_TO_DEVICE);
-> +
-> +	spin_unlock_bh(&q->lock);
-> +error:
-> +	dev_kfree_skb_any(skb);
-> +	dev->stats.tx_dropped++;
-> +
-> +	return NETDEV_TX_OK;
-> +}
-> +
-> +static const char * const airoha_ethtool_stats_name[] =3D {
-> +	"tx_eth_bc_cnt",
-> +	"tx_eth_mc_cnt",
-
-struct ethtool_eth_mac_stats
-
-> +	"tx_eth_lt64_cnt",
-> +	"tx_eth_eq64_cnt",
-> +	"tx_eth_65_127_cnt",
-> +	"tx_eth_128_255_cnt",
-> +	"tx_eth_256_511_cnt",
-> +	"tx_eth_512_1023_cnt",
-> +	"tx_eth_1024_1518_cnt",
-> +	"tx_eth_gt1518_cnt",
-
-struct ethtool_rmon_stats=20
-
-> +	"rx_eth_bc_cnt",
-> +	"rx_eth_frag_cnt",
-> +	"rx_eth_jabber_cnt",
-
-those are also covered.. somewhere..
-
-> +	"rx_eth_fc_drops",
-> +	"rx_eth_rc_drops",
-> +	"rx_eth_lt64_cnt",
-> +	"rx_eth_eq64_cnt",
-> +	"rx_eth_65_127_cnt",
-> +	"rx_eth_128_255_cnt",
-> +	"rx_eth_256_511_cnt",
-> +	"rx_eth_512_1023_cnt",
-> +	"rx_eth_1024_1518_cnt",
-> +	"rx_eth_gt1518_cnt",
+> +struct skeletons {
+> +	struct xdp_dummy *xdp_dummy;
+> +	struct xdp_tx *xdp_tx;
+> +	struct xdp_redirect_map *xdp_redirect_maps;
 > +};
 > +
-> +static void airoha_ethtool_get_drvinfo(struct net_device *dev,
-> +				       struct ethtool_drvinfo *info)
-> +{
-> +	struct airoha_gdm_port *port =3D netdev_priv(dev);
-> +	struct airoha_eth *eth =3D port->eth;
+> +struct veth_configuration {
+> +	char local_veth[VETH_NAME_MAX_LEN]; /* Interface in main namespace */
+> +	char remote_veth[VETH_NAME_MAX_LEN]; /* Peer interface in dedicated namespace*/
+> +	char namespace[NS_NAME_MAX_LEN]; /* Namespace for the remote veth */
+> +	char next_veth[VETH_NAME_MAX_LEN]; /* Local interface to redirect traffic to */
+> +	char *remote_addr; /* IP address of the remote veth */
+> +};
 > +
-> +	strscpy(info->driver, eth->dev->driver->name, sizeof(info->driver));
-> +	strscpy(info->bus_info, dev_name(eth->dev), sizeof(info->bus_info));
-> +	info->n_stats =3D ARRAY_SIZE(airoha_ethtool_stats_name) +
-> +			page_pool_ethtool_stats_get_count();
+> +static struct veth_configuration config[VETH_PAIRS_COUNT] = {
+> +	{
+> +		.local_veth = "veth1",
+> +		.remote_veth = "veth11",
+> +		.next_veth = "veth2",
+> +		.remote_addr = IP_SRC
+> +	},
+> +	{
+> +		.local_veth = "veth2",
+> +		.remote_veth = "veth22",
+> +		.next_veth = "veth3",
+> +		.remote_addr = NULL
+> +	},
+> +	{
+> +		.local_veth = "veth3",
+> +		.remote_veth = "veth33",
+> +		.next_veth = "veth1",
+> +		.remote_addr = IP_DST
+> +	}
+> +};
+
+[..]
+
+> +static void generate_random_ns_name(int index, char *out)
+> +{
+> +	int random, count, i;
+> +
+> +	count = snprintf(out, NS_NAME_MAX_LEN, "ns%d-", index);
+> +	for(i=0; i<NS_SUFFIX_LEN; i++) {
+> +		random=rand() % 2;
+> +		out[count++]= random ? 'a' + rand() % 26 : 'A' + rand() % 26;
+> +	}
+> +	out[count] = 0;
+> +}
+
+It's been customary to hard-code netns names for all the tests we have, so
+maybe it's ok here as well? 
+
+> +static int attach_programs_to_veth_pair(struct skeletons *skeletons, int index)
+> +{
+> +	struct bpf_program *local_prog, *remote_prog;
+> +	struct bpf_link **local_link, **remote_link;
+> +	struct nstoken *nstoken;
+> +	struct bpf_link *link;
+> +	int interface;
+> +
+
+[..]
+
+> +	switch(index) {
+
+Can you pls run the patch through the checkpatch.pl? The formatting
+looks wrong, should be 'switch (index)'. Applies to 'if()' elsewhere as
+well.
+
+> +		case 0:
+> +			local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_0;
+> +			local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_0;
+> +			remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
+> +			remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
+> +			break;
+> +		case 1:
+> +			local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_1;
+> +			local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_1;
+> +			remote_prog = skeletons->xdp_tx->progs.xdp_tx;
+> +			remote_link = &skeletons->xdp_tx->links.xdp_tx;
+> +			break;
+> +		case 2:
+> +			local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_2;
+> +			local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_2;
+> +			remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
+> +			remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
+> +			break;
+> +	}
+> +	interface = if_nametoindex(config[index].local_veth);
+> +	if(!ASSERT_NEQ(interface, 0, "non zero interface index"))
+> +		return -1;
+> +	link = bpf_program__attach_xdp(local_prog, interface);
+> +	if (!ASSERT_OK_PTR(link, "attach xdp program to local veth"))
+> +		return -1;
+> +	*local_link = link;
+> +	nstoken = open_netns(config[index].namespace);
+> +	if (!ASSERT_OK_PTR(nstoken, "switch to remote veth namespace"))
+> +		return -1;
+> +	interface = if_nametoindex(config[index].remote_veth);
+> +	if(!ASSERT_NEQ(interface, 0, "non zero interface index"))
+> +		return -1;
+> +	link = bpf_program__attach_xdp(remote_prog, interface);
+> +	*remote_link = link;
+> +	close_netns(nstoken);
+> +	if (!ASSERT_OK_PTR(link, "attach xdp program to remote veth"))
+> +		return -1;
+> +
+> +	return 0;
 > +}
 > +
-> +static void airoha_ethtool_get_strings(struct net_device *dev, u32 sset,
-> +				       u8 *data)
+> +static int configure_network(struct skeletons *skeletons) {
+> +	int interface_id;
+> +	int map_fd;
+> +	int err;
+> +	int i=0;
+> +
+> +	/* First create and configure all interfaces */
+> +	for(i=0; i<VETH_PAIRS_COUNT; i++) {
+> +		generate_random_ns_name(i+1, config[i].namespace);
+> +
+> +		SYS(fail, "ip netns add %s", config[i].namespace);
+> +		SYS(fail, "ip link add %s type veth peer name %s netns %s",
+> +				config[i].local_veth,
+> +				config[i].remote_veth,
+> +				config[i].namespace);
+> +		SYS(fail, "ip link set dev %s up", config[i].local_veth);
+> +		if (config[i].remote_addr)
+> +			SYS(fail, "ip -n %s addr add %s/24 dev %s",
+> +					   config[i].namespace, config[i].remote_addr, config[i].remote_veth);
+> +		SYS(fail, "ip -n %s link set dev %s up",
+> +				   config[i].namespace, config[i].remote_veth);
+> +	}
+> +
+> +	/* Then configure the redirect map and attach programs to interfaces */
+> +	map_fd = bpf_map__fd(skeletons->xdp_redirect_maps->maps.tx_port);
+> +	if (!ASSERT_GE(map_fd, 0, "open redirect map"))
+> +		goto fail;
+> +	for (i=0; i<VETH_PAIRS_COUNT; i++) {
+> +		interface_id = if_nametoindex(config[i].next_veth);
+> +		if(!ASSERT_NEQ(interface_id, 0, "non zero interface index"))
+> +			goto fail;
+> +		err = bpf_map_update_elem(map_fd, &i, &interface_id, BPF_ANY);
+> +		if (!ASSERT_OK(err, "configure interface redirection through map"))
+> +			goto fail;
+> +		if(attach_programs_to_veth_pair(skeletons, i))
+> +			goto fail;
+> +	}
+> +
+> +	return 0;
+> +
+> +fail:
+> +	return -1;
+> +}
+> +
+> +static void cleanup_network()
 > +{
+> +	char cmd[IP_CMD_MAX_LEN];
 > +	int i;
 > +
-> +	if (sset !=3D ETH_SS_STATS)
-> +		return;
-> +
-> +	for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_stats_name); i++)
-> +		ethtool_puts(&data, airoha_ethtool_stats_name[i]);
-> +
-> +	page_pool_ethtool_stats_get_strings(data);
+> +	/* Deleting namespaces is enough to automatically remove veth pairs as well
+> +	 */
+> +	for(i=0; i<VETH_PAIRS_COUNT; i++) {
+> +		if(config[i].namespace[0] == 0)
+> +			continue;
+
+[..]
+
+> +		snprintf(cmd, IP_CMD_MAX_LEN, "ip netns del %s", config[i].namespace);
+> +		system(cmd);
+
+SYS_NOFAIL to avoid separate snprintf?
+
+> +	}
 > +}
 > +
-> +static int airoha_ethtool_get_sset_count(struct net_device *dev, int sse=
-t)
+> +static int check_ping(struct skeletons *skeletons)
 > +{
-> +	if (sset !=3D ETH_SS_STATS)
-> +		return -EOPNOTSUPP;
+> +	char cmd[IP_CMD_MAX_LEN];
 > +
-> +	return ARRAY_SIZE(airoha_ethtool_stats_name) +
-> +	       page_pool_ethtool_stats_get_count();
-> +}
-> +
-> +static void airoha_ethtool_get_stats(struct net_device *dev,
-> +				     struct ethtool_stats *stats, u64 *data)
-> +{
-> +	int off =3D offsetof(struct airoha_hw_stats, tx_broadcast) / sizeof(u64=
-);
-> +	struct airoha_gdm_port *port =3D netdev_priv(dev);
-> +	u64 *hw_stats =3D (u64 *)&port->stats + off;
-> +	struct page_pool_stats pp_stats =3D {};
-> +	struct airoha_eth *eth =3D port->eth;
-> +	int i;
-> +
-> +	BUILD_BUG_ON(ARRAY_SIZE(airoha_ethtool_stats_name) + off !=3D
-> +		     sizeof(struct airoha_hw_stats) / sizeof(u64));
-> +
-> +	mutex_lock(&port->stats.mutex);
-> +
-> +	airoha_update_hw_stats(port);
-> +	for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_stats_name); i++)
-> +		*data++ =3D hw_stats[i];
-> +
-> +	for (i =3D 0; i < ARRAY_SIZE(eth->q_rx); i++) {
-> +		if (!eth->q_rx[i].ndesc)
-> +			continue;
-> +
-> +		page_pool_get_stats(eth->q_rx[i].page_pool, &pp_stats);
-> +	}
-> +	page_pool_ethtool_stats_get(data, &pp_stats);
+> +	/* Test: if all interfaces are properly configured, we must be able to ping
+> +	 * veth33 from veth11
+> +	 */
+> +	snprintf(cmd, IP_CMD_MAX_LEN,
+> +			 "ip netns exec %s ping -c 1 -W 1 %s > /dev/null",
+> +			 config[0].namespace, IP_DST);
+> +	return system(cmd);
 
-We can't use the netlink stats because of the shared DMA / shared
-device? mlxsw had a similar problem recently:
+SYS_NOFAL here as well?
 
-https://lore.kernel.org/all/20240625120807.1165581-1-amcohen@nvidia.com/
 
-Can we list the stats without a netdev or add a new netlink attr
-to describe such devices? BTW setting pp->netdev to an unregistered
-device is probably a bad idea, we should add a WARN_ON() for that
-if we don't have one =F0=9F=98=AE=EF=B8=8F
-
-> +	for_each_child_of_node(pdev->dev.of_node, np) {
-> +		if (!of_device_is_compatible(np, "airoha,eth-mac"))
-> +			continue;
-> +
-> +		if (!of_device_is_available(np))
-> +			continue;
-> +
-> +		err =3D airoha_alloc_gdm_port(eth, np);
-> +		if (err) {
-> +			of_node_put(np);
-> +			goto error;
-> +		}
-> +	}
-> +
-> +	airoha_qdma_start_napi(eth);
-
-Are you sure starting the NAPI after registration is safe?
-Nothing will go wrong if interface gets opened before
-airoha_qdma_start_napi() gets to run?
-
-Also you don't seem to call napi_disable(), NAPI can reschedule itself,
-and netif_napi_del() doesn't wait for quiescence.
+Btw, not sure it makes sense to split that work into 3 patches. After
+you first patch the test is broken anyway, so might as well just delete
+the script at that point...
 
