@@ -1,192 +1,275 @@
-Return-Path: <netdev+bounces-111119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA9892FE11
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 18:03:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A528692FE24
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 18:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4A311F21E25
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:03:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EFDF281552
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B206171E74;
-	Fri, 12 Jul 2024 16:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C92176259;
+	Fri, 12 Jul 2024 16:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="d1SUw+RH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I425MlnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B41522064
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 16:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89EB176240;
+	Fri, 12 Jul 2024 16:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720800203; cv=none; b=T4zhYeJuLjEHy5oUPdZV7g42Na5OG92YrB7s6C79Lj6DrKUzcFKBesPq2Hx4Qerm2Awp62rGpDOg+JZURjblhgdbojP3yqVNdPHvOEYTpN2zJ7A9utP4e0raqG5WGCm1omstYS1TW0LHkB+b83Uj6goFw9FIMe3euL7g5g9X4a8=
+	t=1720800280; cv=none; b=g1qmVXzXYe0n1XxHh4Fb7rlMM/RCTCja7c3OSEv/Dq1OvXxoWYb/BKHVNYh5+kPEm3YRFMzJDfaGqZ2ipnCTLHT63aR4zZWPVuODvmUJckwEvPO5XGEAXBaYZDIp9zQsDZE4qgzr1pLh/lQt7PGAA5I8jbYcWiHvNcKIGU5irrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720800203; c=relaxed/simple;
-	bh=HK0tSHXs492VJofQi4vcTZlJJZ25xYVW0YU0rnGmEBo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IIYIxKOruDJ++VUKO1uNycmpwfwjwJeQA8wGxYVlyp3HkJefeMfRZrSH+/uJFsj/qQzv3SIwwmD2wirm1XD1hfv5OglvCNsedTyeC8WimCgDh8auyiUMXFMEOrozM1Dr87fNy6Tv6rJiMlH22nT0/foaPdyXEHQ3HKJJRdUSW+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=d1SUw+RH; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-59589a9be92so3094811a12.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 09:03:21 -0700 (PDT)
+	s=arc-20240116; t=1720800280; c=relaxed/simple;
+	bh=ngivLCWE81B27y1GSYx8ldBDIwTbs3kiiSoJyDE+qyQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=QbXI7T65I/aKCihaQTVIpBZEpZ8z2JqtUKwI8ZBFGLdAQqBpnFmXu05uH3q+RNK0PV5GR1TPSL2YwGXD1gDJizEof8dk3w7puGVkGc2pL+ZfgLVYN28+5VfXCyRKEUzlx7RDpRPgs1QCihF+QeNs9Nzwq/bfCI5m7MEcMHgry+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I425MlnX; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6b5daf5ea91so12105126d6.1;
+        Fri, 12 Jul 2024 09:04:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720800200; x=1721405000; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ZL4DaNf8Z75GQXbf7dHUJDeIAdCUGwmdKadVvUNeL4=;
-        b=d1SUw+RHqTmMe/WnrYHdA3896ruxJJXBTWqolUXn8/j89F2EA862knujSCAYFepZkK
-         Oq5Sk3i8AOfq+zXPxdfxJUDSDaxU4I6pWjW1Fk/vJtK/QhfTnn1cq6WHJuCNE/au+X4B
-         dOXFySmVlsa79akyRbfQlFVtiENsQarB/Kf9Y=
+        d=gmail.com; s=20230601; t=1720800277; x=1721405077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/h/+q58+aCVjVtZZ4CChDL1/LkloSpcxSAa3+pfndK4=;
+        b=I425MlnXO4WvqqcMMR5NkTIm/u2LSgBp78ad1tRCWxNUHMYFZeHdP2DNObd1Kubwp4
+         HO4ojcW6Xyi7QclMCLtKkuhG3cNik9Kg3t3nx8hB3E5EThGsTpn7f6e06dEKXpfF6tSW
+         zYV0au8j88Q/vltP4Wyaf4J8Ms3PomWLLIAamIJTMfnAA0KcSE0FjqCwXKn4kIU71Jf8
+         fCkjkC4IH6ea7l2zRvroxenWTXLswpy8LA+rIMUz3YXwr5HphSxo2GTasX9f8fijPYmy
+         PgQNuhiOlaOCDtyHgAdu2i+kY07k9avL3pWslxGFU0GJ7p/NPr1YTraAp3iGPxwFZcgP
+         BA9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720800200; x=1721405000;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ZL4DaNf8Z75GQXbf7dHUJDeIAdCUGwmdKadVvUNeL4=;
-        b=l61G3BV+ADvdVlXwBEQH5afHiG15gVP2pqPFz34gO7SCKZFc1nh47vVeYMaYyovfLn
-         YZ2QRKR2lQIPAjcvHyHURYo/iYIFT67piLXyzA2NMh5YutYGHa5hsasgskL8eVD/8rYj
-         Y9SQbIQWt1sCxZYvcwLgxoClGTuX+1aVLDnm6FbeSDFVPK3S+2cfyT2R4U9iS8iRUaDT
-         eBpHTmtcfI01TBltux2ayWZJpfOFY67aBYRjLTHt/s0kQluVHKgJStZtueET2xc2wNIg
-         2CvPmvexaefNymXPMoSOBVBzPJyjgKtDlyZ1nbpAmTnFMSfKSMN+rrqDCfERG75wmnpE
-         rFiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFM49vZkRXxtRD/JIgBgf9n39GDha3OY5b21r5lhQwSgdhSRlpmxQRA1tDWXVGkZtntt2oiXSdvEMykJH9kFV1LzXdyB8U
-X-Gm-Message-State: AOJu0YwsaPG45uKJVVX0uMgvacwdZTZxHnucD5SePnJU7p624v/Uxk7N
-	KorzBypIzF3qeMfXZD/d8FzDUoRYWBtt85scUoqcSxt55Khrg29J8yAzNINN1zlC4KD/GBoMXjE
-	GOxPJbsFqVZYrWV8miSLZGNdBYGI/8a2w2XnFgX0JEtUvGSZjdg==
-X-Google-Smtp-Source: AGHT+IGUhTqCoqGXhCe1MjLFEPTQFpWjlT+uLy8upPKE8hB3KBxm42HmDyBnwX3k8uoBmee7UPGuHFRxIp2KE4wXbjw=
-X-Received: by 2002:aa7:c611:0:b0:58c:2a57:b230 with SMTP id
- 4fb4d7f45d1cf-594baf91486mr7005154a12.13.1720800199699; Fri, 12 Jul 2024
- 09:03:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720800277; x=1721405077;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/h/+q58+aCVjVtZZ4CChDL1/LkloSpcxSAa3+pfndK4=;
+        b=DRHgs5Pne3dYkLd2/i1DeABuwNgpP1LVZF24BiG6lHSdWhKN5GD3cZ8Go9o1BibmAr
+         /9HBTW395drGWVEObhrdVX05r/N30obnjagkeMCpyy1dTXAZ448ZXvClavnwSWIlOPXh
+         2ZaTLB0tDA9GbaLp5zCZN6UoscftLchypxm7Tx8KH2uKmj7j4TRa8CnUOXIL++rwXUMt
+         RkR1EQWE3lFtFHEWzyctAKpqQ4iRPacoJQk4n8DSwqTMVIsDzCIyEi1P0zqiKK7f+Pea
+         3/5JAuRlPT/EM0jf6j/gztzaqRlfjImeQ13FX6Ii8cCvIegE9fP4oUoiRN58wuo0icNs
+         xywg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMqdjibqdZEysMhoARjCTjmJoQjiApTcWVuMAHKxnJhwsq3G/NQKBJbHu8oUUIDzL2Gd1gR9iiSajAYEVKsZC6vOz36juGO+NX/2Fn4EvEQ5DDzjir0D5+xkvzxIr0fKrSICD0LZn8EUBzly61pednCtfUtMJ8s06c18vv
+X-Gm-Message-State: AOJu0Yx+rQb2auVD6CQ7CR/LLhLoJbc/WZifmQNzkoSnsUQGnj+ou3Vh
+	C1KL+yr5U49lERg1UXqPqS7DWgmMWhJQYtiBOpO11EOA8wtY4/7C
+X-Google-Smtp-Source: AGHT+IE3kAbbk52TIf5qNKA7SJsLMhEkEONymK4QKI6w/YFQFGNsXdyyVTVZ2oa5pOndhcqDWbk6mQ==
+X-Received: by 2002:ad4:5764:0:b0:6b5:49c9:ed4f with SMTP id 6a1803df08f44-6b61bf1b917mr135306446d6.34.1720800277201;
+        Fri, 12 Jul 2024 09:04:37 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8c9f1sm36369736d6.123.2024.07.12.09.04.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 09:04:36 -0700 (PDT)
+Date: Fri, 12 Jul 2024 12:04:36 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Chengen Du <chengen.du@canonical.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ kaber@trash.net, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Chengen Du <chengen.du@canonical.com>, 
+ stable@vger.kernel.org
+Message-ID: <66915414758be_24ac88294cd@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240712012956.10408-1-chengen.du@canonical.com>
+References: <20240712012956.10408-1-chengen.du@canonical.com>
+Subject: Re: [PATCH v9] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <ZpFEJeNpwxW1aW9k@gmail.com>
-In-Reply-To: <ZpFEJeNpwxW1aW9k@gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 12 Jul 2024 09:03:06 -0700
-Message-ID: <CACKFLikzwRQFJ+wbe5iRYimBmvAwDo2MCHS+unsvUH-=rw8wWA@mail.gmail.com>
-Subject: Re: net: bnxt: Crash on 6.10 ioctl
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, netdev@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a94a89061d0f04c2"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---000000000000a94a89061d0f04c2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Chengen Du wrote:
+> The issue initially stems from libpcap. The ethertype will be overwritten
+> as the VLAN TPID if the network interface lacks hardware VLAN offloading.
+> In the outbound packet path, if hardware VLAN offloading is unavailable,
+> the VLAN tag is inserted into the payload but then cleared from the sk_buff
+> struct. Consequently, this can lead to a false negative when checking for
+> the presence of a VLAN tag, causing the packet sniffing outcome to lack
+> VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
+> tool may be unable to parse packets as expected.
+> 
+> The TCI-TPID is missing because the prb_fill_vlan_info() function does not
+> modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
+> payload and not in the sk_buff struct. The skb_vlan_tag_present() function
+> only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
+> is stripped, preventing the packet capturing tool from determining the
+> correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
+> which means the packet capturing tool cannot parse the L3 header correctly.
+> 
+> Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
+> Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Chengen Du <chengen.du@canonical.com>
 
-On Fri, Jul 12, 2024 at 7:56=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> Hello,
->
-> Testing commit 24ca36a562 ("Merge tag 'wq-for-6.10-rc5-fixes' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq") I am getting the
-> following crash in bnxt driver:
->
->         BUG: kernel NULL pointer dereference, address: 00000000000000b8
->         #PF: supervisor read access in kernel mode
->         #PF: error_code(0x0000) - not-present page
->         PGD 0 P4D 0
->         Oops: Oops: 0000 [#1] SMP
->         Hardware name: ...
->         RIP: 0010:bnxt_get_max_rss_ctx_ring (drivers/net/ethernet/broadco=
-m/bnxt/bnxt.c:?)
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Maybe bp->rss_ctx_list is not valid.
+For next time, please remember to mention the tree: [PATCH net v9].
+And give a changelog: Changes v8->v9: no changes, rebased resubmit.
 
-I think we can add this check:
+> ---
+>  net/packet/af_packet.c | 86 +++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 84 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index ea3ebc160e25..84e8884a77e3 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -538,6 +538,61 @@ static void *packet_current_frame(struct packet_sock *po,
+>  	return packet_lookup_frame(po, rb, rb->head, status);
+>  }
+>  
+> +static u16 vlan_get_tci(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +	struct vlan_hdr vhdr, *vh;
+> +	u8 *skb_orig_data = skb->data;
+> +	int skb_orig_len = skb->len;
+> +	unsigned int header_len;
 
-(bp->rss_cap & BNXT_RSS_CAP_MULTI_RSS_CTX)
+nit: reverse christmas tree violation
 
-before proceeding in  bnxt_get_max_rss_ctx_ring().
+> +
+> +	if (!dev)
+> +		return 0;
+> +
+> +	/* In the SOCK_DGRAM scenario, skb data starts at the network
+> +	 * protocol, which is after the VLAN headers. The outer VLAN
+> +	 * header is at the hard_header_len offset in non-variable
+> +	 * length link layer headers. If it's a VLAN device, the
+> +	 * min_header_len should be used to exclude the VLAN header
+> +	 * size.
+> +	 */
+> +	if (dev->min_header_len == dev->hard_header_len)
+> +		header_len = dev->hard_header_len;
+> +	else if (is_vlan_dev(dev))
+> +		header_len = dev->min_header_len;
+> +	else
+> +		return 0;
+> +
+> +	skb_push(skb, skb->data - skb_mac_header(skb));
+> +	vh = skb_header_pointer(skb, header_len, sizeof(vhdr), &vhdr);
+> +	if (skb_orig_data != skb->data) {
+> +		skb->data = skb_orig_data;
+> +		skb->len = skb_orig_len;
+> +	}
+> +	if (unlikely(!vh))
+> +		return 0;
+> +
+> +	return ntohs(vh->h_vlan_TCI);
+> +}
+> +
+> +static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
+> +{
+> +	__be16 proto = skb->protocol;
+> +
+> +	if (unlikely(eth_type_vlan(proto))) {
+> +		u8 *skb_orig_data = skb->data;
+> +		int skb_orig_len = skb->len;
+> +
+> +		skb_push(skb, skb->data - skb_mac_header(skb));
+> +		proto = __vlan_get_protocol(skb, proto, NULL);
+> +		if (skb_orig_data != skb->data) {
+> +			skb->data = skb_orig_data;
+> +			skb->len = skb_orig_len;
+> +		}
+> +	}
+> +
+> +	return proto;
+> +}
+> +
+>  static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+>  {
+>  	del_timer_sync(&pkc->retire_blk_timer);
+> @@ -1007,10 +1062,16 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
+>  static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
+>  			struct tpacket3_hdr *ppd)
+>  {
+> +	struct packet_sock *po = container_of(pkc, struct packet_sock, rx_ring.prb_bdqc);
+> +
+>  	if (skb_vlan_tag_present(pkc->skb)) {
+>  		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
+>  		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
+>  		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> +	} else if (unlikely(po->sk.sk_type == SOCK_DGRAM && eth_type_vlan(pkc->skb->protocol))) {
+> +		ppd->hv1.tp_vlan_tci = vlan_get_tci(pkc->skb, pkc->skb->dev);
+> +		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
+> +		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+>  	} else {
+>  		ppd->hv1.tp_vlan_tci = 0;
+>  		ppd->hv1.tp_vlan_tpid = 0;
+> @@ -2428,6 +2489,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
+>  			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
+>  			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> +		} else if (unlikely(sk->sk_type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
+> +			h.h2->tp_vlan_tci = vlan_get_tci(skb, skb->dev);
+> +			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
+> +			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+>  		} else {
+>  			h.h2->tp_vlan_tci = 0;
+>  			h.h2->tp_vlan_tpid = 0;
+> @@ -2457,7 +2522,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
+>  	sll->sll_family = AF_PACKET;
+>  	sll->sll_hatype = dev->type;
+> -	sll->sll_protocol = skb->protocol;
+> +	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
+> +		vlan_get_protocol_dgram(skb) : skb->protocol;
+>  	sll->sll_pkttype = skb->pkt_type;
+>  	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
+>  		sll->sll_ifindex = orig_dev->ifindex;
+> @@ -3482,7 +3548,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  		/* Original length was stored in sockaddr_ll fields */
+>  		origlen = PACKET_SKB_CB(skb)->sa.origlen;
+>  		sll->sll_family = AF_PACKET;
+> -		sll->sll_protocol = skb->protocol;
+> +		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
+> +			vlan_get_protocol_dgram(skb) : skb->protocol;
+>  	}
+>  
+>  	sock_recv_cmsgs(msg, sk, skb);
+> @@ -3539,6 +3606,21 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
+>  			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
+>  			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> +		} else if (unlikely(sock->type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
+> +			struct sockaddr_ll *sll = &PACKET_SKB_CB(skb)->sa.ll;
+> +			struct net_device *dev;
+> +
+> +			rcu_read_lock();
+> +			dev = dev_get_by_index_rcu(sock_net(sk), sll->sll_ifindex);
+> +			if (dev) {
+> +				aux.tp_vlan_tci = vlan_get_tci(skb, dev);
+> +				aux.tp_vlan_tpid = ntohs(skb->protocol);
+> +				aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+> +			} else {
+> +				aux.tp_vlan_tci = 0;
+> +				aux.tp_vlan_tpid = 0;
+> +			}
+> +			rcu_read_unlock();
+>  		} else {
+>  			aux.tp_vlan_tci = 0;
+>  			aux.tp_vlan_tpid = 0;
+> -- 
+> 2.43.0
+> 
 
---000000000000a94a89061d0f04c2
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
-J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
-9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMfUYtS1gLFYA2+IuVFqyTjXkoCPV7v8
-PfWlg9L8XN39MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
-MjE2MDMyMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQARCOZLnGGM6bQGDE2EMLwC/qhZjHdQ1awStOzsD5FO4AFM9BuD
-Qw8X4kKCnBz4jm6TCbkNC/KyFgMm6MzNNk0Ug1sOd5/u/XpCNleIDVgflzftHnztQeJxDmaYoY4W
-cmn07d2NkzaWdvO2F19BsxlgOaBX4R9J9JUZR7vsMH1lzRSzmCjAeaBkl2jnDf3dy71E8oEcu1FW
-oAUpj/AguwC3V1NzHwduc0eFnfAxHPrFeRVpfEjKz0dOe06ufSL9iXMRDmCPNgmWm9VZ1pK53+RH
-pE2BthCcHx++PGnfsqSdAYWQ9j2X3edeYKelaQS8fOdusizmAgSCC3s5aJhjYkYy
---000000000000a94a89061d0f04c2--
 
