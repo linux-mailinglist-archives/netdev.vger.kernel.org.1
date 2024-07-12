@@ -1,108 +1,169 @@
-Return-Path: <netdev+bounces-111075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542FE92FBDC
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 15:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 927E892FBE4
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 15:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08635282F99
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:53:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37E96282ECB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6566417166A;
-	Fri, 12 Jul 2024 13:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EBC171086;
+	Fri, 12 Jul 2024 13:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="hIN9X43K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11012020.outbound.protection.outlook.com [52.101.66.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995DB171646;
-	Fri, 12 Jul 2024 13:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720792387; cv=none; b=FYf9bTjkWPDgeCYZYDxh0U7YjyvWNqCKQIqg17/yQ/g4S6yoYl0oi/6vI0qEp5g3gHupQYgzmDehZjBjGWHVjdnsYR2rFmzOPL090SammkMBaVJfd7W0LjD6Z3K06tWSgTsMLOc0npKrdTSG20ZmaFOxNpaQHcMIBSNQSN7tfZY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720792387; c=relaxed/simple;
-	bh=oUeQAOehsUA8Zz0Q9AJ49iAgQrXTGohjJhjj8d9Ejn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ppUbRfWnYuq6R414jsn5Awi7qYS4Qpbk8wjp6/ZwS2Fz+QMoaxfuv7GUGDnZSp6+z8nRCRroMouhshkuPPZwMOS1QuiijwaIulFGNWdgrFpGLTvklZ2Z5S828ByPynZMbfvqUItxRPE7HheJtqDr1TMd4zfRk0CZfJTs/HLjCZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-58ef19aa6c4so2646040a12.2;
-        Fri, 12 Jul 2024 06:53:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720792384; x=1721397184;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7nM9ZZaS7zEh5VH7vpWzHeJauviA6kuXXb6GAmKaWqo=;
-        b=ZiFbKMtpqwnWX2s27idqj335VmGy+0eWA+NfKDTpKUHaqU4NS+HtXYKLru6YJqk/dI
-         X8a47WdJhKpl1LqrVW10aypTu61sya+PlSV+6lJqk0dctOMk9kb40TR+YzXn1UE2aNx4
-         xHW0ev2h7wC2wqEJsMY6LGaqT0C8HXvrpuDuVb/Ik2Wtg3Nan85wQ4ZqxM/dAoMRNOZO
-         FhJVuCt5pxJ6K+vRex5/3+S8IzzbASYKoGSWEgPFvP57V2FOqLP2O19nN7Bqkw51hWuZ
-         UPI8Oz8djBvUTJfHzQIbJNpcgubxlJ+eBck1IU7FvI7z2RDA/U5JINNX56hSmhnMKQM1
-         5Q3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVvpH7jZsxcF3iB+dD6c9t+4Y30j5/YheW60bFdyPca8j+NFAZ+/wtqXggpdUjqA97OArBbk9YbTOIobD2BFZAIrcCRk4cMiqJn0YET
-X-Gm-Message-State: AOJu0YwX6Csp7ma7PrCcn4x1+kMMcKVTkb7UvsEYu+ZxyG8dPDapDpIe
-	g6I1W41QzrYN+LVVt/hc2J1HKj3tKccKtxj1Ie9ZUd/k2v7NFIMefxsufA==
-X-Google-Smtp-Source: AGHT+IHbRkYceFQ+y9i5wL92DTMDBFZU43kjo/0dzAA2E7wBDXKD7X1+A3oUtgIcQKPoDAnsgKaHbA==
-X-Received: by 2002:a17:906:b319:b0:a72:676a:7d7b with SMTP id a640c23a62f3a-a780b688906mr933166466b.9.1720792383756;
-        Fri, 12 Jul 2024 06:53:03 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6bcc52sm343007166b.4.2024.07.12.06.53.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 06:53:03 -0700 (PDT)
-Date: Fri, 12 Jul 2024 06:52:38 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F406916CD12;
+	Fri, 12 Jul 2024 13:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720792496; cv=fail; b=B4rBcenRTg0v5Mo6rsWbSxE4TeV4Tz1wVz6kWZ3gHSLlZ92o9MqbAlidT3Sb+euWL0UktxchktNqTrT2RNFKsjl59cdAcWNK09sPNCnMx0ZDoBkLGP4L2ZEaZoSUViY/13nWIJvuCAOzB3cPm6wGcJ9Y2hj0eo0EolBKoUy7tJA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720792496; c=relaxed/simple;
+	bh=uA93U13abOwRgVBWi28hQt24i7nIxMAGd4fIOa1nlXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=a8tS/6fUj8asTRWv+0gYBikGNvkhvG4PAypjmp/8o0VmsBHIWlBynHofSx1Xl4bhyOUvjX/NkUEc7zq0YguyLiUKZuGIjH8lWzkjVu34nQ4kiIdvzowVvHQJyiXEXd5m3u4uIQguVHEUW8z1a1q2IWdp9E0rgMb9EoAk990tlCo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=hIN9X43K; arc=fail smtp.client-ip=52.101.66.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=elaw1KlUak/PTzQg3KlU2S/uw3qX+LNStGJwlhpZG8smToMBDyrvd0AkU3Brae9Zr9t427OmCpzR3r14wwFGhtQxwe+HVdhVstTOez6Sd2x06fD7RqdVO6iKeyMrpa5HdssqkyhqtlDAFkVEnYQBnBeZreTy80BfYdpFDbvGyI5+4sMm43A2uNTw+PZ5dhdg4aYLQTcT72ELVkgZC1vTKNwubOmBBwGy2JIEuhB3FtebAIL+4kXmSZqi5yVTr3ujMFRx1wr3O2PQXoABHITx5mnpPaIrNSf9K15mBQFBea4BJBV8HKN9+FHyCf6+HO7VNqXxeaKBvHzF38GcFc91Pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BZQZMH/E+U+68F159rDS7TlLRCOciTMRaAR9pEwIJc4=;
+ b=YjTCBGtKPi2+dJPre7EJb156GJYctef/dVJr+bYCJJGAgrSP7wlw71VFoq9edUuQF7HWvqImTiYLSG7Rmc2Dg/U476kc6pUaLf2NdrIE2/fqvcBkSvh5pP8OlmPCgbmky2lSaQXn8VdEYuMJyEU7KTTDachTZWsG4KM65BhhlFpy8W+hXcduaTgbh0U6R+vKb4uuL/5LkDtZCYUOMUsmcABj2DDD2DBc65uyPY4U9nAMowa+VcwfeTl0dIVqRoCfIYdvT3OlF8w49sUZTsn2jra7MOBGJgkQUHztGiwOh/Uw9vfXpYZIWKBg3aywuVU9Jvg/FV5Z+xy5EUkwL5cHKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BZQZMH/E+U+68F159rDS7TlLRCOciTMRaAR9pEwIJc4=;
+ b=hIN9X43K3O1IxAnm/B72VvyR2RzLVa4cSBOsic/sQuRHFlusiF+vubHEG/fxFxDCAgn7hC5S/cFsqxF7W74AteAb9WSU5iZZGh+ipVlvx0B55Iy1AHQq9T1Dcqae2rhjwgmmmXxQMagxSEYr88mb3yIW0nB6JqkXI4zFyj5rptk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
+ AS4PR04MB9689.eurprd04.prod.outlook.com (2603:10a6:20b:4fc::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7741.36; Fri, 12 Jul 2024 13:54:51 +0000
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a%4]) with mapi id 15.20.7741.017; Fri, 12 Jul 2024
+ 13:54:51 +0000
+Date: Fri, 12 Jul 2024 16:54:48 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Madalin Bucur <madalin.bucur@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Madalin Bucur <madalin.bucur@nxp.com>, linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 5/5] soc: fsl: qbman: FSL_DPAA depends on
- COMPILE_TEST
-Message-ID: <ZpE1Jn5ZbQikAHmI@gmail.com>
-References: <20240710230025.46487-1-vladimir.oltean@nxp.com>
- <20240710230025.46487-6-vladimir.oltean@nxp.com>
- <20240712121400.bnjcexqpqgjhlmuc@skbuf>
+	leit@meta.com,
+	"open list:FREESCALE QORIQ DPAA ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: dpaa: Fix compilation Warning
+Message-ID: <20240712135448.6sxgevfu7hwgkve3@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240712134817.913756-1-leitao@debian.org>
+X-ClientProxiedBy: VE1PR08CA0001.eurprd08.prod.outlook.com
+ (2603:10a6:803:104::14) To DB7PR04MB4555.eurprd04.prod.outlook.com
+ (2603:10a6:5:33::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240712121400.bnjcexqpqgjhlmuc@skbuf>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|AS4PR04MB9689:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b71c578-a111-4ef8-4329-08dca27a3371
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WiADx88k/7VTU0kp73Ev9M+4ULBC7aSsX5WxYbkRuOYtUBR81tvTeHK+fjy7?=
+ =?us-ascii?Q?fYxhpvsDI2rcAM5EiVfhAYsVQExnrUcm+/H6KFizvE8YieK3iWehWGOV/Qwy?=
+ =?us-ascii?Q?T4PC1a0bdJWJN1zijunqNKZ4AmKBVKe5499gApfoAocLpPL5Y0dhWgOQUm/F?=
+ =?us-ascii?Q?/5kb9qjp0b/kfRc4gXvP33zD7e8d7EcA63YRU2ILzcPfn3QiW2xEHfXzAXC8?=
+ =?us-ascii?Q?Vu+ORfScjxZH9n1/yOX7GuN6TNsrIgd7MJBpByTxaGPcRFF6eHfVNogOgwGz?=
+ =?us-ascii?Q?6fqf8+EAue990geDC4l0jWOSnbEMg0mBmBct4YLUZVsmcOS0poTxGCWwZOOs?=
+ =?us-ascii?Q?AzxAwit56pprmBPrtp7Wodz80dM6VWtu9kpoNPcNLE0dZjl4ceaODT+ZUVgn?=
+ =?us-ascii?Q?rUvlJ7JR62n0NAyGTHkmDIH/xQ/n8QU7vXvjX8FgV+JbVEV+qBuSv0Xqk+D1?=
+ =?us-ascii?Q?nTXSr/Vlye2k4pRxJ2BZgubN2JisOJTPcbdFk3uzqJRwizdwM4HmAmh2Cxrx?=
+ =?us-ascii?Q?5DqRVhWM8V4Sbj1kjj7tp+4vPigatjIe6S0ae04UKjd7NsVnAq91ODOU++RI?=
+ =?us-ascii?Q?SFTylTec9jjfwpV51YDV93XA455Dk3xFZKl36Hp1j4L7TjmZgB9SkSJNLxvK?=
+ =?us-ascii?Q?w5w6DOO7XCZEj4wKWO1ugknF//yA/4kvTjb5b5G5MJ3q1HRLO3GJd8szyzdX?=
+ =?us-ascii?Q?zJ0za9WbBlWs9xzSZm+2l176M7G5R3OKCRyREJRppK8mh4wifFKePGv6zts9?=
+ =?us-ascii?Q?k2NdZsE/O18FR1QmSVkMYQq1zwonjB4110+2yGMEreBlzhUWX6qU6lJ34/Ku?=
+ =?us-ascii?Q?6woJwpEHbWBLGHFs4NX4MuMKdDL259kB1D09su+xD13MmlGv4YXN/rNT2UtH?=
+ =?us-ascii?Q?hFh+vuvL26DspkJOdPpvSc0TuCRbtsoSQ+LulTKsasveuFEg/MsxOESuc7Zk?=
+ =?us-ascii?Q?sdMdbYZgXDemQiZWjmtO5pWfJEwihrp92m+9XgN8jx3Q1e8sDqUy+/MDoTuG?=
+ =?us-ascii?Q?Qr3Fz7YMAFgfRarjTKj6doecEm2a+GMzrgJp9+75NUp60xVgy+jMzzZOiWuP?=
+ =?us-ascii?Q?h3lKQSP5b4IQVU2Da5giOyvgNoU1uPXjHHXIVumXrXxsLyEygTQnju6FMwLQ?=
+ =?us-ascii?Q?dumMWcTwgQqq264VvT1EMj1g2X3HZZTH+hTODq5DB+OC14ipnPcOuO9YL26k?=
+ =?us-ascii?Q?YsXSmWfoBXzSk6YDZDKMX9teStsYHJFecrpAXp0eZPXIR1mnwubTopYchMqx?=
+ =?us-ascii?Q?R3pLTxO0MUHz5+IEjINkQwFs2NLJVFgAvOWd68sQuqEOW+s4t/t6Nuea/vXU?=
+ =?us-ascii?Q?ua8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cbstIaxErW5SC9quCTOc/PfXzXObgcQ1/qnaVYRIJ4UzDAljjmf75R30rj2y?=
+ =?us-ascii?Q?pFoopqwFCkhmgbE3ju11B1QuUXVhObmQVwCNf0v5YNdiyJPEjA3pzHOt9SQh?=
+ =?us-ascii?Q?ed1aLlEOYriLxA3j4wSDbfiekt6Edma4PAKxZghX/TN02mzdxGzFWIFty71E?=
+ =?us-ascii?Q?po+7Sq2M6gwobQxFrxB7Hdy/WNWr87+GNzcC3iq+AEYk2/lyxL02D4REPqqS?=
+ =?us-ascii?Q?ohSEwHObHZ0wxqSJjcuy+eCk1yzlTMXV0T/a6AkyutXQurKj5nWJH/0Sa4e6?=
+ =?us-ascii?Q?fG8DeGHzOlJyBAywzjTAnUWRGSZlRi1tzRrJ2RWhXtVTk3SrIWByIugvPXWG?=
+ =?us-ascii?Q?wPOn1R+efTfYHAr+E8br65M2IHzgG7dj26Z/jXd+NP2wLW/lb2ME3HemVPlb?=
+ =?us-ascii?Q?J3eU1vHWRodMJJp8qcc70GmYMd1FVjdKss0om9EhEwF0LkdopXsQdt8TsXIj?=
+ =?us-ascii?Q?hU2XMCF9Ui6tfeK0Q/jzwOagFGmJ0UCsRXrb+DhtYwdOqBY+qjKQGXJsbSxd?=
+ =?us-ascii?Q?2yxWPOxfuzgGSuhWgZ50vGW6VMIElxYZfSj2ltR6G4PMvP8eDNIlf2HBLmHb?=
+ =?us-ascii?Q?2YJwwx1uJaVO+t8XQG6Bkpaf3QvOSzz1GTBWM7h0zsPvh6GKcNE2pyT/48+l?=
+ =?us-ascii?Q?7i+C/alS/xC1uTBjNg9d9sMr1HSfgRmAsVcU2WSDhKAOLI/Wwivz0l+Hu09c?=
+ =?us-ascii?Q?myB9NYlMf+RL64Sh0D2GDdBJD/T6CgBFj8HUOBaY37Fq+Ny561zU13r1+VZI?=
+ =?us-ascii?Q?bB0h41FBLQRbIIu0HMTc38A1mlCaBEg1YVzXmiYX2lxLpDl2/ZGQabNZKf2Z?=
+ =?us-ascii?Q?XN8YjFZveTxVkgz2ar2t6YdDdsbKOPBqLod3CWEb0dJcP5w3DgAqpslfZF2h?=
+ =?us-ascii?Q?I2B9s4n6Q7rogvJ6DJ9HoqLGUFh5AXUYdhs1/n7VqQH8K+slOUc8F7WonqxB?=
+ =?us-ascii?Q?BLgNk+cE4nQkWLq0SMwIrLcAPAyys7qNg9PR633WZFA4wMHJGxqFnJGcEsCv?=
+ =?us-ascii?Q?ltVvMMOoUA2NEc9oMbhrtnu3KOlILZflnXgYnrIMo97leTJgMqlB3DoqQISp?=
+ =?us-ascii?Q?cBr78mXfgkeCfeOAprkpCYIY/IMvE/CeYZhd/TmwtDrh1iMYr1nCEUl1eyFk?=
+ =?us-ascii?Q?f+V5EJ9QJWViyXQ2VX8YHjsCd3+DN4B9zk+Tr3vAvb0+RRad5sYcU8cNQ14U?=
+ =?us-ascii?Q?cBiDUyeMnkTh+eIkc+Vp57f+M2iFoLnOPpxKWZDGSXYECvtNZjwRfJqynPH+?=
+ =?us-ascii?Q?l2K/Gxt4WnrmlHEAsYQrbIiPUbCE4M9MdEISw7egqbNHIDQItu2bDjWkp7/g?=
+ =?us-ascii?Q?7rxEz+9RxeLS/NptY2qi6/84eeNaDun8R7pu9g0vz4bKTtBbZR7bPgOCo5E+?=
+ =?us-ascii?Q?E6Rq8aJepISww5H0gyJW2GKQIPxWJaSdl++RfMCXrCRbbmk6oEwPBOkgNll4?=
+ =?us-ascii?Q?sEZJ2ixa8RsP8j+5I4vMfxfmgazlCBMnqZPnVp7t+OOFIUe4sRJWoONoyvQ3?=
+ =?us-ascii?Q?JbiISFCzhDVZSIer/QdNl/Bg2a/gbRnBoCEAj7mEN5e77BETjgwKy6eIgJvD?=
+ =?us-ascii?Q?pYhsQGQ2y6sz2tPEtiQv0oWXIqnhzUwDsCQctMksCXtotPPnYQHItHy/HSYV?=
+ =?us-ascii?Q?Kw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b71c578-a111-4ef8-4329-08dca27a3371
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2024 13:54:51.5858
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t3+MywDOVCJb+2u3LILxKhQG9rG37JNqJo2iaH42F9Hz1QMORZoxKw/C4+KYaLfh3jT/knRvAqjQs5VGgZjDeA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9689
 
-On Fri, Jul 12, 2024 at 03:14:00PM +0300, Vladimir Oltean wrote:
-> On Thu, Jul 11, 2024 at 02:00:25AM +0300, Vladimir Oltean wrote:
-> > From: Breno Leitao <leitao@debian.org>
-> > 
-> > As most of the drivers that depend on ARCH_LAYERSCAPE, make FSL_DPAA
-> > depend on COMPILE_TEST for compilation and testing.
-> > 
-> > 	# grep -r depends.\*ARCH_LAYERSCAPE.\*COMPILE_TEST | wc -l
-> > 	29
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > ---
+On Fri, Jul 12, 2024 at 06:48:16AM -0700, Breno Leitao wrote:
+> Remove variables that are defined and incremented but never read.
+> This issue appeared in network tests[1] as:
 > 
-> I don't know why nipa says there are 800+ new warnings/errors introduced
-> by this patch, but it looks like a false positive (or I can't seem to
-> find something relevant).
+> 	drivers/net/ethernet/freescale/dpaa/dpaa_eth_sysfs.c:38:6: warning: variable 'i' set but not used [-Wunused-but-set-variable]
+> 	38 |         int i = 0;
+> 	   |             ^
+> 
+> Link: https://netdev.bots.linux.dev/static/nipa/870263/13729811/build_clang/stderr [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
 
-Right, All of the warnings are basically a set of MODULES_DESCRIPTION()
-that are missing in other parts of the kernel, and not related to this
-patch series. None of them seems to be in the network stack. (for
-context, I've fixed all the missing MODULES_DESCRIPTION in the past).
-
-nipa also complained about an unused variable, and we have a patch for
-it already:
-
-https://lore.kernel.org/all/20240712134817.913756-1-leitao@debian.org/
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
