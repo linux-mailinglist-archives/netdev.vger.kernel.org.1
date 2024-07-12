@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-111146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806469300F2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:24:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3178993011B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F87928303A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:24:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5474B21F3B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A2B2F855;
-	Fri, 12 Jul 2024 19:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6F0381A4;
+	Fri, 12 Jul 2024 19:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zko+DMfK"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Cix14nq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C6E2EAE6
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC7C1B95B;
+	Fri, 12 Jul 2024 19:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720812275; cv=none; b=tNFThXuiz/BnA/4EsGPj0x9U0umGSL3/WmI9zvOAy/t5j1TZEJBZIDSUHn+3Ji0RH0zFjrqLKfB7LgvLEX84BJMBijM0sFsMHQGoimmxo0OV6LOGh48HJLO5Chx2Yb4wzmkA5kn5LICk1aaZbr6jCvyptz+TIvYc4F0QQ8vVCjE=
+	t=1720813968; cv=none; b=js0WxOWRtoSyMSZS6rzHAEOWGHD98bs6N8utLJWdtIhABgSA3FL7o3I9VdT5ZWA4GHk3JkUel+HvacpoWNluW8XV00vb5wmfklqtmsY2MmhSDsu+wDy8MygRvPD8Y5g0DdNuOHuUR3APnl3GLdbrf4ZOgdliPZ3caUd53vVRbLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720812275; c=relaxed/simple;
-	bh=HisMQk32mqetWI0mYkCZ1GswldZYydedA82AyBJFKPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uX5m2Tihj2/iyJ55gXyPWVego38xHFYS/qgL+OoGKtFeKUhnxzCm5fLZzxh0MtQgQLQejE3dDjbsVCc8KEf+2MjeErdTe7S2Tfs1MlBlb8+LyL8fbabm4y/Tfv4qnr3dQmtSLhRRoKJGOX3idLhrne5zTtebETO2QwhCdnCopDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Zko+DMfK; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46CGTYMN018477
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:24:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=Ykhv440dsm8zc
-	ec/0AYt4Kh1tFKTjpGggvxF4rBTUGU=; b=Zko+DMfK83yUY2p1fkOEQ5ztC1H1w
-	3IywzmfxSwiQ0ea4WbK+1OuAcs+z1HW1p4QTjH7aHiFPPH9FS9jcvJMsZm9qJuKM
-	8kOq/A6A7YWbc9dBDf5s9hYzTqS3gnZ0y0XKmh5d0ZiEQ3jcO4vfCE/pmwWdaXq+
-	CXDEkqzXgiHKLSO4EwaWwndZV/VY1hMVEgVfcvEgufBBqNNpbCjayqhDy9vOEGdk
-	eaZq1LP8axEPUJU+xrPPaVRVhwAagLsENZET8+Mwg69KZmmkf8hY9NSLwGjUWCA7
-	gyWYgXY7ENEdRZt4v22FviU5IBjXxAO961zfIt3d0iVMy8LYljvRNlmBA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40b81n8bux-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:24:26 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46CGulVt013962
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:24:25 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 407gn18c5x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:24:25 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46CJOMLh41156934
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Jul 2024 19:24:24 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6203B5805D;
-	Fri, 12 Jul 2024 19:24:22 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2FE4F58054;
-	Fri, 12 Jul 2024 19:24:22 +0000 (GMT)
-Received: from tinkpad.ibmuc.com (unknown [9.61.16.211])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Jul 2024 19:24:22 +0000 (GMT)
-From: Nick Child <nnac123@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: Nick Child <nnac123@linux.ibm.com>
-Subject: [RFC PATCH net-next 1/1] bonding: Return TX congested if no active slave
-Date: Fri, 12 Jul 2024 14:24:05 -0500
-Message-ID: <20240712192405.505553-2-nnac123@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240712192405.505553-1-nnac123@linux.ibm.com>
-References: <20240712192405.505553-1-nnac123@linux.ibm.com>
+	s=arc-20240116; t=1720813968; c=relaxed/simple;
+	bh=4JpOdrHF9yVIaqkkjK73+x67qt6NLBvjC+qQbGZmaIs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=eFPlUDdr514e3dH9knHmUdvaOL09AvtJKBWz3eiX0QWii52uxULmW5Ap71nADtcD3CTRgjwPdTPqKUz2FPJlsbyW2UK6gSnLOQXpTRq9/t6a9W+x38HOwUMswA5B08xHHc1QkDM0ocZG3AM4zZ8dL1bMX2zgtW2eF97LFeLLMEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Cix14nq6; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1720813935; x=1721418735; i=markus.elfring@web.de;
+	bh=fihKUc/kaj99ERsbRn7CbqhY5SiZXokiELceXjSmV9g=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Cix14nq66GzkZtyXdh6PdQ52Vd+idDVTP8YUDE4w3KNJ/5XpTPwmTfRo1OcG1GU3
+	 uRp+mm8YCIgH817ZxwqVgDyixShkTULs2RhWwY/0EUyRMYQfvyihPfkKI/nM4xsyq
+	 0LyyVSH0oWGxWvSh/PAxstj/oiSaib1f/Uj6p7LuHuh1xToaq/dVH6IqufY+V+uxP
+	 ZbhC+R/M6/phWtkt/AsgjsN2eCICVpuPQLJnB9hmYXYSrhgLrh3CDW855UFD+LHGI
+	 ShfU29XWfeK33PAGdWA3I1Vr0eN0GCKf7CYW1GqvuGMeG7uxMpOE1aNVDVU/Ke04q
+	 Gm0UCGwgjViboTzmPA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MiMEM-1rqIXZ3XXi-00bNg9; Fri, 12
+ Jul 2024 21:52:15 +0200
+Message-ID: <fd40e1b9-cb76-4617-b699-19f1f580fe98@web.de>
+Date: Fri, 12 Jul 2024 21:52:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nw_SLnhQJRe7OOlwjOU-vgjIhax1Ko1L
-X-Proofpoint-ORIG-GUID: nw_SLnhQJRe7OOlwjOU-vgjIhax1Ko1L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-12_15,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=909 mlxscore=0
- malwarescore=0 suspectscore=0 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407120130
+User-Agent: Mozilla Thunderbird
+To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>
+References: <20240712175520.7013-6-gakula@marvell.com>
+Subject: Re: [net-next PATCH v9 05/11] octeontx2-af: Add packet path between
+ representor and VF
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240712175520.7013-6-gakula@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UVFUEjtxhb49QRh8eHS0Pk5+rTIm5E+GbTko8+MUbvbEXPGzkIO
+ prHH1DXI4rcdARZlEnnhECgPI6owbmhRPyOzQoCdMOODNxpgI74N7jCQM8EQ315eLwoSajH
+ yz8LbzdzY9gM2TR5FEl1Lr2lMcKajZ6NCPYLM23d1pdEJNTxdpe/Q94TyF6EWm5YuN5GzP5
+ iX6MdXblpoPRSti7E/zMw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:9yQUEHdKTxw=;PL8fLEJFKJrcIdKxT2nkYBU/gwa
+ 5sagHM9rfCKc8r8nDtUMv8jh3W8tSYC40LrEpd5hjt7CWZbLbIMvIAtGLWoy6ujY3SUQLz85F
+ s++duNiRt8LOkLyQWLFUU6ZNOjTfXUoigUcpwjgH5UVC4j6r7+NJX/282ZvkTy23J8CiHVdGG
+ OoIPUn0GMbauo2iPtT8HjSkTyjR94a4xzI9UEUPGg2Ahl7ZBEMRBkD+OWqsm766zW27Mt07mj
+ nYNGK7fBd8+1crqJhpvomD1ixEC9gIkUcAfueMW+sUIS5Fms782iTX/Y0ko7lCijW/MTqTCMX
+ VU/KdnWHt9O0zcuQvgV8Wg7LQhgHpzG14a5Ah9ALR9hW8SWksEq9gc0bj77RqBgTqqJuqsJ7d
+ U33XertiyKhpd77reZKPltfpmJjIrc+zsNFpQYToOACN4O8HPV39NrgGkqXHEjyhDkcBFOpro
+ yawQBAP2jdjftcqxCyQTCpzU0zc5dliAf4s9yzseXb2Dww/dNEPL6qR4G5Su283jFnfTYT+SB
+ v36k7PX20CZe9txgUb4HCtZsxNhSAhNiRYxAABV7f/9vSv3r6Y0h9C5vADrp9TiFn6C/EGVsI
+ yAo5NtEfS+JbxiCqnE6fL6c1UHxnI+2z+GkbAfV2XRu42BzXvkS0BHkvzJDRN/CEeNTeVbOJ4
+ gCg7T0t3YY37zPRGI7wjODl2Yh1J0I0EO0athtbhnepUutdFCys4tFF+75OechXhumyHi5Tk2
+ UgeJddfbeMqSevDuYXjjVgejP8Oa1Jym5jZ/vcqNcSevZolhIRJ1sp91HNQPMlAsnNjE9jheX
+ U7KbRMKOb84wa4qbXkXdf9Aw==
 
-When the bonding device cannot find an active slave, it is safe to
-assume that monitoring will eventually call carrier_off on the bonding
-device.
+> Current HW, do not support in-built switch which will forward pkts
+=E2=80=A6
+              does?          built-in?
 
-This means that eventually the bonding devices qdisc will become noop
-and return congested. But, there is an indefinite amount of time
-between no active slaves and the bonding devices qdisc becoming noop.
+How do you think about to avoid any abbreviations for another improved cha=
+nge description?
 
-Previously, during this period, NET_XMIT_DROP was returned. Upper level
-networking functions react differently to a drop vs congested.
 
-Therefore, return NET_XMIT_CN instead of NET_XMIT_DROP because it
-accurately predicts the impending noop_enqueue return code and helps
-to keep sockets alive until then.
+=E2=80=A6
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+=E2=80=A6
+> +void rvu_rep_update_rules(struct rvu *rvu, u16 pcifunc, bool ena)
+> +{
+=E2=80=A6
+> +	rvu_switch_enable_lbk_link(rvu, pcifunc, ena);
+> +	mutex_lock(&mcam->lock);
+> +	for (entry =3D 0; entry < max; entry++) {
+=E2=80=A6
+> +	}
+> +	mutex_unlock(&mcam->lock);
+> +}
+=E2=80=A6
 
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
----
- include/net/bonding.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+Under which circumstances would you become interested to apply a construct
+like =E2=80=9Cscoped_guard(mutex, &mcam->lock)=E2=80=9D?
+https://elixir.bootlin.com/linux/v6.10-rc7/source/include/linux/cleanup.h#=
+L137
 
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index b61fb1aa3a56..22da0916d4a6 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -805,8 +805,15 @@ extern const u8 lacpdu_mcast_addr[];
- 
- static inline netdev_tx_t bond_tx_drop(struct net_device *dev, struct sk_buff *skb)
- {
-+	struct bonding *bond = netdev_priv(dev);
-+
- 	dev_core_stats_tx_dropped_inc(dev);
- 	dev_kfree_skb_any(skb);
-+
-+	/* monitoring will trigger dev_deactivate soon, imitate noop until then */
-+	if (bond_has_slaves(bond))
-+		return NET_XMIT_CN;
-+
- 	return NET_XMIT_DROP;
- }
- 
--- 
-2.43.0
-
+Regards,
+Markus
 
