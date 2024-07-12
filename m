@@ -1,89 +1,97 @@
-Return-Path: <netdev+bounces-110992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-110993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D76592F35D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 03:19:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D3D92F35F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 03:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C83C31C215F6
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:19:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 798481F227D0
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 01:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435C37E6;
-	Fri, 12 Jul 2024 01:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835F1804;
+	Fri, 12 Jul 2024 01:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZoEkDXda"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrt18ueY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A02E7464;
-	Fri, 12 Jul 2024 01:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F05320E6
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 01:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720747162; cv=none; b=hClprfV+zqLtsXQ2yw5PUWkdrYTC0H1dD+6eikC+uOyOKGhVHKdBs+eRjr9awfYpHe4Zn/W1yfLpvAi3/V4AcRCl52ahfE1ET4vtahXOpNEPbdvIlunyomlfgoXYmWPduMae2Yjz0l53q/6Je7c9WfgxwsTfoACz7Xsgt5BhQS8=
+	t=1720747231; cv=none; b=jJbX7nsQgeQ2tigwYXasGXw5y6PFRCNhdBQSncOKqWM+/c1idCYgxPm6S4r83yvD7+p/ZNmbt3kdENGNIS6lEY681DHFsyL4juu6nKjrM7MZPnZ4PiF5RmjMChe0n9ZyfJHooimJncrVw0GdDv6f7y50QArOGFmmXA5TlY2URf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720747162; c=relaxed/simple;
-	bh=xCtxqJghhw5YD87EUrCkZRHwwZcBzY+3OJ4srPuHFko=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e3l4CMoVpz2qERO3CgCWOxQTQMztt7YJsWa9ftXdU8rmaurmpeubj5UZGoEu6u46dicgAHOYqXnV9cC2xAXtyk2Kau15kDDvLUS2lvRQyi2746bPomddRPMarw0k/J90ERh4uCuZ8s3KulNZfjrHKnjo7k93FZXajbRF80BzcXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZoEkDXda; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42E78C116B1;
-	Fri, 12 Jul 2024 01:19:21 +0000 (UTC)
+	s=arc-20240116; t=1720747231; c=relaxed/simple;
+	bh=epWV6PuS59x3B8Kh7yc5md6ZHd8ztszJjAjPGW449K0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DfGrpN0E/W5o6vpSh+S2rQwMxj1kyBN08d8oZxpGAy+vFVYbT71doK+VmNK9tbd2LmG/Gbo4xRAD8O/3mpysJ+r3zZ7HvV5zs9R9R+BYIwvowP/ifY0s0DJD2LC2OBK9VeG1n00g5yrTJLpWKMSg9FKK2Pt6QICYmOLVFwW/LnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrt18ueY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE5EBC4AF09;
+	Fri, 12 Jul 2024 01:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720747161;
-	bh=xCtxqJghhw5YD87EUrCkZRHwwZcBzY+3OJ4srPuHFko=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZoEkDXdaD21NrJf4gmOGRINokYKiCjpIeqS0sC61St0Qoti7gcZftC7Lau/kwWLIU
-	 8ahKkgMo+bltBuknD0DV6722cE0H4t+lyI8Q756Zuucar6lZ9AvyNdGIET3S4Uu8XG
-	 Lf7FLf/5gF625C7cvSCG8cRJGOCZNwRrKP0xH+TzQuCRpK3NMudE97RsCO/aCvbcwr
-	 bxfy9Qc5fUzL+cPAsGgugUalXWXAhoOnkqo0/oI6W/ks9JZg7LlZRxMVZXH8kjlPXF
-	 dpUsuVJzzn1Ve9z1/UfAX8ElMQB0r4v/kfu5XeKgK2j0tCmjO/P/WMTaDHCdRwXXhZ
-	 sql2EcZQZ6S5A==
-Date: Thu, 11 Jul 2024 18:19:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ronald Wahl <rwahl@gmx.de>
-Cc: Ronald Wahl <ronald.wahl@raritan.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] net: ks8851: Fix potential TX stall after interface
- reopen
-Message-ID: <20240711181920.75d86fca@kernel.org>
-In-Reply-To: <20240709195845.9089-1-rwahl@gmx.de>
-References: <20240709195845.9089-1-rwahl@gmx.de>
+	s=k20201202; t=1720747230;
+	bh=epWV6PuS59x3B8Kh7yc5md6ZHd8ztszJjAjPGW449K0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mrt18ueY7G2kRNpgN07aTo5zsy3IuQBH3chDc9NjP3mk8YA4alQ8J6q+9Agcz9xWY
+	 tKegh3Mpq1/UIYYsMtVHbHOfVLkp0b27qmlZBgYhK62EXH4OniNje0yHsZmM2KknDP
+	 /ENc2cyLVFDnAi4IOLE8TCM4JniN2rsPWOdyfQw8Dnib0yV5/X+YdJXcT3KLQsvefL
+	 A/alWxK71rlA8WM/yz9xVNtnlsgD6E3OIkDPUYifwe9dcutan4s/GYEQFJkShR78kV
+	 WkkR11p7ym8+Wlu/6HEgPmmYwybc5VsSZ/x5K/HR8APr57NgEmI+KIDaCSK2QWJhaz
+	 A+3XfsWSALhZQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ABD32C433E9;
+	Fri, 12 Jul 2024 01:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] i40e: fix: remove needless retries of NVM update
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172074723069.25041.4644193905850393042.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Jul 2024 01:20:30 +0000
+References: <20240710224455.188502-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240710224455.188502-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, aleksandr.loktionov@intel.com,
+ horms@kernel.org, leon@kernel.org, kelvin.kang@intel.com,
+ arkadiusz.kubalewski@intel.com, przemyslaw.kitszel@intel.com,
+ tony.brelinski@intel.com
 
-On Tue,  9 Jul 2024 21:58:45 +0200 Ronald Wahl wrote:
-> From: Ronald Wahl <ronald.wahl@raritan.com>
-> 
-> The amount of TX space in the hardware buffer is tracked in the tx_space
-> variable. The initial value is currently only set during driver probing.
-> 
-> After closing the interface and reopening it the tx_space variable has
-> the last value it had before close. If it is smaller than the size of
-> the first send packet after reopeing the interface the queue will be
-> stopped. The queue is woken up after receiving a TX interrupt but this
-> will never happen since we did not send anything.
-> 
-> This commit moves the initialization of the tx_space variable to the
-> ks8851_net_open function right before starting the TX queue. Also query
-> the value from the hardware instead of using a hard coded value.
-> 
-> Only the SPI chip variant is affected by this issue because only this
-> driver variant actually depends on the tx_space variable in the xmit
-> function.
+Hello:
 
-The patchwork bot is taking long siestas in Konstantin's absence, 
-FWIW this patch was applied by Paolo on Tue. Thank you!
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 10 Jul 2024 15:44:54 -0700 you wrote:
+> From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+> Remove wrong EIO to EGAIN conversion and pass all errors as is.
+> 
+> After commit 230f3d53a547 ("i40e: remove i40e_status"), which should only
+> replace F/W specific error codes with Linux kernel generic, all EIO errors
+> suddenly started to be converted into EAGAIN which leads nvmupdate to retry
+> until it timeouts and sometimes fails after more than 20 minutes in the
+> middle of NVM update, so NVM becomes corrupted.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] i40e: fix: remove needless retries of NVM update
+    https://git.kernel.org/netdev/net/c/8b9b59e27aa8
+
+You are awesome, thank you!
 -- 
-pw-bot: accept
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
