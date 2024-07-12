@@ -1,129 +1,156 @@
-Return-Path: <netdev+bounces-111057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE5B92F9A3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:41:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C2A92F9BB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B87A1C219FD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 11:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AFC628472F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 11:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0F215EFB6;
-	Fri, 12 Jul 2024 11:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="R663tXBD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BA316A93F;
+	Fri, 12 Jul 2024 11:54:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D926C4A3D;
-	Fri, 12 Jul 2024 11:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0BF155A39;
+	Fri, 12 Jul 2024 11:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720784477; cv=none; b=J80c+17i8pC2wwQmpVsAIpCIgCDgpsYo+22lk561IW67SLxm5gZ2ZVs/BX7wM8Sbo4FIrmwcqNDhpFhAoosbl6o+i99amwZRO7wTNHucCRNhkvFBNtLX6TbSAGVXi/0Pxd6HKuQnspO+PROJMd9U70jdEpZbQ4efZQBaEPpoBEU=
+	t=1720785264; cv=none; b=S+0zJI4Yt6AWpygCAM2aDb0jcRLD/eVq8p1Q/cCsHTqVBijsCZoa4MgeyzZK0fDwFWG+HW34TDy3sP5T3FXgO/sze5WDPdwyrpM28zKhif8YPGZ316UDvB9/U/+7dBWSDBmHzSHJbIFoaz/aqm34gwGeBAJuakiYnT5zksNYrKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720784477; c=relaxed/simple;
-	bh=/9KhqEJTypNqnFHIEeuXNVKbUv/lh5PoQ/8pTaDM/ps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fOo0RUndmOdb6NfcJwKl8M79YNzbEcXvgnX7SuR1CAlmZrIjShdZ5N31gvxbin1fPY5IcmMtcWEZRikorxLP87ppWIqNqIAM9LLTppXJ24Z8bC9/KQqVG5rqMQQIhAx10tlfJQOuq9E+VnoS+j/DBFxLBJiYHY8lZqtl8bG9nFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=R663tXBD; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 46CBedxp062112;
-	Fri, 12 Jul 2024 06:40:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1720784439;
-	bh=xx+IPyfid+GvirErrxib8ttv/veQTjav2d5pwS73HpI=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=R663tXBD976lrswtz22sFImLlbecjARt5vZrIPiZGxV0xsKqjfN+F3jeajcFAbfgi
-	 MCXb30BAUJrscR1is50rR0OxKn2wUIe7UCaOF/px8AboaH3+58ibOFZHQLyRRNDTGq
-	 H6hRZHZeaddBXK2BESBzGhjr/uhTr9ywev4Xu9c8=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 46CBednV069325
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 12 Jul 2024 06:40:39 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
- Jul 2024 06:40:38 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 12 Jul 2024 06:40:38 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 46CBeVwe046608;
-	Fri, 12 Jul 2024 06:40:32 -0500
-Message-ID: <4cdcf7af-fb0e-47a4-b38a-b8ad98c90188@ti.com>
-Date: Fri, 12 Jul 2024 17:10:30 +0530
+	s=arc-20240116; t=1720785264; c=relaxed/simple;
+	bh=6jQq9w4RlXoevsFAm7Zi5RQIGcv8h3svhEsJaymp9as=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=soYvhLa05BZ5QvQPy2zorxcfY2iqwS6e/lb93cOpl5Ra+8RpgyibiNjA8IT2foAWGsM4D72neKyfCj2ieOup+zpv83BK2/XiVXgfhzefbCFNMPZwlNje1SZL9pyKjX1ujDmbDgMcy0l3XWPvgE5waqf0bHS+M0qnLcRZsB/0QkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-59589a9be92so2719276a12.2;
+        Fri, 12 Jul 2024 04:54:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720785261; x=1721390061;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aylUUjY+eZRZ5UTaJ9YsIwls7PGxo5tR8Y5wxZlssUg=;
+        b=lq6QWTv1KqfohSDEjC+sZX3/ukEzoL2DMRHfvycDwLjfoz5HbycbRNeGTxDK8vZlLy
+         +WSdbVN+Q4pa6ZuAdCEK+owKxPV65ewozrbLBnmwZVMhZ2Y0Po5fjELdbWThnhuz8uwi
+         /KcQE18Ck9v+t7ajYaXfqUOolN2kcPynq1NBsB4vLw1qB1tZ6iNXvMAkvnob7bG/c+uD
+         dDVDInp9tEB73PzqY9S6N/KQMUCGDx50RY608Mw2qYHa+Wdyooq6vvOlPUa2y/40FHe2
+         gs83nX8pv7tXRqzsJYotBLHeznOA3PSyKRmnXiuQwpR3s+EC0gNMreaaY/qQvuWnKwJm
+         jQIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOyobjqJ1fDunNNUIUYbNu5wMVu83mQe4bmHK0Zcn1ibLp4P7skXmHsgaMVztdlEP43uzxD8WumNCjQXhynkel3pPTZbdSUpOemhhOKgv4OyqwzHUaXtPH3BzWpBm5Dylb2zPH
+X-Gm-Message-State: AOJu0Yy7E+bM7S3Fpyb2XMWKyxoRnZsmYyxblnbPwzYVoRW7GhRU8zqA
+	Ag7xTsFIZT8U1nRCCXYZ3JiSqbD/cfIoBIv+8EhlFtYWJS0SmSkz
+X-Google-Smtp-Source: AGHT+IFjCvvGOIX9tsFRJ9Dy0AlCrRfCMApaUx1noM7pWNy8sfC/jqsyqBLhaPGYhuXidj8vb8G5sQ==
+X-Received: by 2002:a05:6402:210f:b0:58b:6096:5554 with SMTP id 4fb4d7f45d1cf-594bcba7e40mr9350900a12.37.1720785260712;
+        Fri, 12 Jul 2024 04:54:20 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bbe2d0f4sm4570995a12.35.2024.07.12.04.54.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 04:54:20 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: rbc@meta.com,
+	horms@kernel.org,
+	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+Date: Fri, 12 Jul 2024 04:53:25 -0700
+Message-ID: <20240712115325.54175-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Split out common
- object into module
-To: Thorsten Leemhuis <linux@leemhuis.info>, Andrew Lunn <andrew@lunn.ch>
-CC: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Diogo Ivo
-	<diogo.ivo@siemens.com>, Roger Quadros <rogerq@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        kernel test robot <lkp@intel.com>
-References: <20240606073639.3299252-1-danishanwar@ti.com>
- <66b917d6-3b72-41c5-9e30-e87cf5505729@lunn.ch>
- <c720c13d-de0e-440d-a10b-717f6012bf56@leemhuis.info>
- <ca53f2e2-6cc5-42ea-8faf-7d9b7d14421d@leemhuis.info>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <ca53f2e2-6cc5-42ea-8faf-7d9b7d14421d@leemhuis.info>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
 
+After the commit bdacf3e34945 ("net: Use nested-BH locking for
+napi_alloc_cache.") was merged, the following warning began to appear:
 
+	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
 
-On 12/07/24 4:42 pm, Thorsten Leemhuis wrote:
-> On 26.06.24 09:19, Thorsten Leemhuis wrote:
->> On 06.06.24 17:54, Andrew Lunn wrote:
->>>> +EXPORT_SYMBOL_GPL(icssg_class_set_mac_addr);
->>>> +EXPORT_SYMBOL_GPL(icssg_class_disable);
->>>> +EXPORT_SYMBOL_GPL(icssg_class_default);
->>>> +EXPORT_SYMBOL_GPL(icssg_class_promiscuous_sr1);
->>> [...]
->>> Please could you clean up the namespace a little. icssg_ and prueth_
->>> are O.K, but we also have arc/emac_rockchip.c, allwinner/sun4i-emac.c,
->>> ibm/emac/, and qualcomm/emac/ using the emac_ prefix.
->>
->> Just wondering (not as a regression tracker, just as someone that ran
->> into this and carries the patch in his tree to avoid a build error for
->> next):
->>
->> What happened to this fix? After above feedback nearly 20 days ago
->> nothing happened afaics. Did this fall through the cracks? Or was some
->> other solution found and I just missed this (and thus can drop the fix
->> from my tree)?
-> 
-> That inquiry lead to a review from Roger (thx!) more than two weeks ago,
-> but that was all afaics. Makes me wonder if this regression will hit
-> mainline soon, as the merge window might open on Monday already.
-> 
-> Ciao, Thorsten
+	  __warn+0x12f/0x340
+	  napi_skb_cache_put+0x82/0x4b0
+	  napi_skb_cache_put+0x82/0x4b0
+	  report_bug+0x165/0x370
+	  handle_bug+0x3d/0x80
+	  exc_invalid_op+0x1a/0x50
+	  asm_exc_invalid_op+0x1a/0x20
+	  __free_old_xmit+0x1c8/0x510
+	  napi_skb_cache_put+0x82/0x4b0
+	  __free_old_xmit+0x1c8/0x510
+	  __free_old_xmit+0x1c8/0x510
+	  __pfx___free_old_xmit+0x10/0x10
 
+The issue arises because virtio is assuming it's running in NAPI context
+even when it's not, such as in the netpoll case.
 
-Andrew L has given comment to clean up the API names. I will rename the
-APIs being exported from emac_ prefix to icssg_ prefix and re-spin this.
+To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
+is available. Same for virtnet_poll_cleantx(), which always assumed that
+it was in a NAPI context.
 
+Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/virtio_net.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 0b4747e81464..fb1331827308 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2341,7 +2341,7 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+ 	return packets;
+ }
+ 
+-static void virtnet_poll_cleantx(struct receive_queue *rq)
++static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
+ {
+ 	struct virtnet_info *vi = rq->vq->vdev->priv;
+ 	unsigned int index = vq2rxq(rq->vq);
+@@ -2359,7 +2359,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+ 
+ 		do {
+ 			virtqueue_disable_cb(sq->vq);
+-			free_old_xmit(sq, txq, true);
++			free_old_xmit(sq, txq, !!budget);
+ 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+ 
+ 		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+@@ -2404,7 +2404,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+ 	unsigned int xdp_xmit = 0;
+ 	bool napi_complete;
+ 
+-	virtnet_poll_cleantx(rq);
++	virtnet_poll_cleantx(rq, budget);
+ 
+ 	received = virtnet_receive(rq, budget, &xdp_xmit);
+ 	rq->packets_in_napi += received;
+@@ -2526,7 +2526,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+ 	txq = netdev_get_tx_queue(vi->dev, index);
+ 	__netif_tx_lock(txq, raw_smp_processor_id());
+ 	virtqueue_disable_cb(sq->vq);
+-	free_old_xmit(sq, txq, true);
++	free_old_xmit(sq, txq, !!budget);
+ 
+ 	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+ 		if (netif_tx_queue_stopped(txq)) {
 -- 
-Thanks and Regards,
-Danish
+2.43.0
+
 
