@@ -1,154 +1,194 @@
-Return-Path: <netdev+bounces-111052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4171A92F92B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 12:53:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D131D92F90E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 12:37:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED937282327
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:53:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BF59285308
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8501914EC73;
-	Fri, 12 Jul 2024 10:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAwI4Oyr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28734158853;
+	Fri, 12 Jul 2024 10:37:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCCD146D7A
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 10:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819A114B978;
+	Fri, 12 Jul 2024 10:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720781608; cv=none; b=as91aHyaSIjr49y4sKZTS86IuhWw4kvrYrk/wihSN6wl2lMy1IrT0YGAp0C3e728I0U886CEm5RTVEcWdotmdAUxYna0lIBN7NoEGEOwF0mMpxu9+VLCHsEAKGXrI5DWg3orRjMjo9p6MGOcFqrr095r4Y79tGMfiDSk8D/xsQM=
+	t=1720780652; cv=none; b=Zyd3hjuHqgbC2M3B63b84ezv2XteNyFID9G5WfTGqqkVcEmnj4ioj0fQ2Bbb9GeOKofVRHTef0N5k0oFP/c5JHQNv6MjU6qhPfns/gTF3jR21ryrbOl6UM760OV7kJxmijEm9gTp1YS+njZzEH/rljXEk42mmMt3y8cOJSCUB30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720781608; c=relaxed/simple;
-	bh=tCFZuMtVtMBuyJdliChvuY/ukdPToyrfLSwiurn6Ex0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=KjCFY1g2y5rWXbPkxidyvu6xqz4+OQVAsrojFbhHP3TAWNeWAR21BPAS1F7TFfEAiYxjuVCd53rf7xw0pUgVSZasO7CK9JbuMvTS9yeK82WlTIsmL8PWt4u8fy103b+sBqV+pO5b8IECHKsj/cFVaSm5JDPOTGsBQij+1VyGyAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAwI4Oyr; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52e9c6b5a62so1987653e87.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 03:53:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720781603; x=1721386403; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBYTv3D66ZQBPCyAJlLK1YqhMSWTQpRP3NRiMFdsHx4=;
-        b=jAwI4OyrVkisJ5oiCFRFidYEUrBY3UdrWHYGzHogEZ3kAAMa7KIIh74nmHh6Y7ZP1U
-         p40H7rdAUZvPU5judyVA/ApSSgTtgdE5LrkW/V35punMtaWBor4bzGDFDuGMNeatVF2W
-         Gb8ur4YyaksRWv33da800QYeRSLRxZZtEhDXhaCz+kQiiTxi0XuqPDRbBntS5RBot6fd
-         3MOombzyfN31tonT/ZbEge10dfbff5Cuds6rzBq/UQVCUkO6H7If1/6MZ8v6P/i0cJfi
-         BfNXKfE89Ep/Bu1tcZ1ExtE5h4/GyKv9HftrfYW1X99c6XUMOTfhsaCSOPlWfXs4Z5Hj
-         N9bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720781603; x=1721386403;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GBYTv3D66ZQBPCyAJlLK1YqhMSWTQpRP3NRiMFdsHx4=;
-        b=itrLD0araG5zY89oKn4zZvOm4JFnrV/O39QxcdPSR1T1YsYGdA9rCSt/4VrN6V1ocg
-         U+vgjqng7EooaeAZnjglkCtJDdOEjF514r6pysSEpuZfAkvo4RPrzLtKsNoVm2VyvI6t
-         vxMB8acCKCjynWWpyVG2rluhiTwSectVuX4oYMu7tjHKX7O9xOI/ZHumR9RquDQPaY9K
-         Dx6i7XRQxmvBZ2nTJJXsYiZa0nTh7Ghd9myiwSWYZcj03pLM99HhrUNwfh65bagMGHaP
-         iejy84ujhDPgALZYQPkwmXWs0Deq+90l3QQVwo8oGSLvZDNmdZfBj4mwrqyc37BRwLWs
-         3j1Q==
-X-Gm-Message-State: AOJu0YzP/PXVcfWW9eq48TnpvxjHQl62kyBZe1/0MWR2ERKC4q+FM/Qj
-	HMY+Xnz4ZGmlVX/iy1ljpbwauFPgKDLfbWOEsa+lZwIWnJ7FqqzzpvmwWA==
-X-Google-Smtp-Source: AGHT+IEwwAi4hJxpYsnK+MAaQ2H46YE3YP78b4i9C4VLMzyIxxCZd143ECVxbzuR0471KdJLSyVcVA==
-X-Received: by 2002:ac2:4c56:0:b0:52e:be49:9d32 with SMTP id 2adb3069b0e04-52ebe499f4amr6304446e87.47.1720781603113;
-        Fri, 12 Jul 2024 03:53:23 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:8864:d940:9b3e:7e21])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa0694sm9978661f8f.66.2024.07.12.03.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 03:53:22 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Adam Nielsen <a.nielsen@shikadi.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: Is the manpage wrong for "ip address delete"?
-In-Reply-To: <20240712005252.5408c0a9@gnosticus.teln.shikadi.net> (Adam
-	Nielsen's message of "Fri, 12 Jul 2024 00:52:52 +1000")
-Date: Fri, 12 Jul 2024 11:33:45 +0100
-Message-ID: <m2sewezypi.fsf@gmail.com>
-References: <20240712005252.5408c0a9@gnosticus.teln.shikadi.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1720780652; c=relaxed/simple;
+	bh=YaczT6mneoVMpKwMgJbp7Rg47TMAqdRTX0u8weR9avY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KctPJ5m0BVDCTLGzeEqP/ZyMwlBXu7NR5cdmhPCzZPOP/cja8GblHVmYAaSNXEAO/2hy1LeZUPNoMHpiWRo5+dfT9qFQke8NGsRIU4ZNQ/gJsZLukHXO9WeVAme0w+GD+xpsFmLFB3d58xHN8pud6x3PPuogqcTGz4eAmOv0bJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WL7LG3yc9z6JB4b;
+	Fri, 12 Jul 2024 18:36:22 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 69B0B1400D9;
+	Fri, 12 Jul 2024 18:37:26 +0800 (CST)
+Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 12 Jul
+ 2024 11:37:26 +0100
+Date: Fri, 12 Jul 2024 11:37:25 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Dan Williams <dan.j.williams@intel.com>
+CC: James Bottomley <James.Bottomley@hansenpartnership.com>,
+	<ksummit@lists.linux.dev>, <linux-cxl@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240712113725.00004cdb@Huawei.com>
+In-Reply-To: <66900a0b9770d_1a7742942c@dwillia2-xfh.jf.intel.com.notmuch>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+	<3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
+	<668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+	<20240710142238.00007295@Huawei.com>
+	<66900a0b9770d_1a7742942c@dwillia2-xfh.jf.intel.com.notmuch>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Adam Nielsen <a.nielsen@shikadi.net> writes:
+On Thu, 11 Jul 2024 09:36:27 -0700
+Dan Williams <dan.j.williams@intel.com> wrote:
 
-> Hi all,
->
-> I'm trying to remove an IP address from an interface, without having to
-> specify it, but the behaviour doesn't seem to match the manpage.
->
-> In the manpage for ip-address it states:
->
->     ip address delete - delete protocol address
->        Arguments: coincide with the arguments of ip addr add.  The
->        device name is a required  argument. The rest are optional.  If no
->        arguments are given, the first address is deleted.
->
-> I can't work out how to trigger the "if no arguments are given" part:
->
->   $ ip address delete dev eth0
->   RTNETLINK answers: Operation not supported
->
->   $ ip address delete "" dev eth0
->   Error: any valid prefix is expected rather than "".
->
->   $ ip address dev eth0 delete
->   Command "dev" is unknown, try "ip address help".
->
-> In the end I worked out that "ip address flush dev eth0" did what I
-> wanted, but I'm just wondering whether the manpage needs to be updated
-> to reflect the current behaviour?
+> Jonathan Cameron wrote:
+> > On Tue, 9 Jul 2024 15:15:13 -0700
+> > Dan Williams <dan.j.williams@intel.com> wrote:
+> >   
+> > > James Bottomley wrote:  
+> > > > > The upstream discussion has yielded the full spectrum of positions on
+> > > > > device specific functionality, and it is a topic that needs cross-
+> > > > > kernel consensus as hardware increasingly spans cross-subsystem
+> > > > > concerns. Please consider it for a Maintainers Summit discussion.    
+> > > > 
+> > > > I'm with Greg on this ... can you point to some of the contrary
+> > > > positions?    
+> > > 
+> > > This thread has that discussion:
+> > > 
+> > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> > > 
+> > > I do not want to speak for others on the saliency of their points, all I
+> > > can say is that the contrary positions have so far not moved me to drop
+> > > consideration of fwctl for CXL.  
+> > 
+> > I was resisting rat holing. Oh well...
+> > 
+> > For a 'subset' of CXL.  There are a wide range of controls that are highly
+> > destructive, potentially to other hosts (simplest one is a command that
+> > will surprise remove someone else's memory). For those I'm not sure
+> > fwctl gets us anywhere - but we still need a solution (Subject to
+> > config gates etc as typically this is BMCs not hosts).
+> > Maybe fwctl eventually ends up with levels of 'safety' (beyond the
+> > current read vs write vs write_full, or maybe those are enough).  
+> 
+> It is not clear to me that fwctl needs more levels of safety vs the
+> local subsystem config options controlling what can and can not be sent
+> over the channel. The CXL backend for fwctl adds the local "command
+> effects" level of safety.
+> 
+> For the "Linux as BMC" case the security model is external to the
+> kernel, right? Which means it does not present a protocol that the
+> kernel can reason about.
 
-Yes, that paragraph of the manpage appears to be wrong. It does not
-match the manpage synopsis, nor the usage from "ip address help" which
-both say:
+The security model is indeed external, but I'd like a Linux BMC
+config to allow turning off the protections but still using the
+same fundamental interfaces as we normally use for the safe stuff.
+I don't want
+1) The CXL IOCTLs
+2) FWCTL
+3) Yet another interface.
 
-  ip address del IFADDR dev IFNAME [ mngtmpaddr ]
+> 
+> Unless and until someone develops an authorization model for BMC nodes
+> to join a network topology I think that use case is orthogonal to the
+> primary in-band use case for fwctl.
 
-The description does match the kernel behaviour for a given address
-family, which you can see by using ynl:
+Use case wise I agree this isn't the current primary in-band use case
+for fwctl, hence the rat hole introductory comment.
 
-$ ip a show dev veth0
-2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-    link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
-    inet 6.6.6.6/24 scope global fred
-       valid_lft forever preferred_lft forever
-    inet 2.2.2.2/24 scope global veth0
-       valid_lft forever preferred_lft forever
-    inet 4.4.4.4/24 scope global veth0
-       valid_lft forever preferred_lft forever
+> 
+> It is still useful there to avoid defining yet another transport, but a
+> node that has unfettered access to wreak havoc on the network is not the
+> kernel's problem.
 
-$ sudo ./tools/net/ynl/cli.py \
-  --spec Documentation/netlink/specs/rt_addr.yaml \
-  --do deladdr --json '{"ifa-family": 2, "ifa-index": 2}'
-None
+As long as I can enable it via a sensible interface (and don't need to
+spin another) that is fine by me.
 
-$ ip a show dev veth0
-2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-    link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
-    inet 2.2.2.2/24 scope global veth0
-       valid_lft forever preferred_lft forever
-    inet 4.4.4.4/24 scope global veth0
-       valid_lft forever preferred_lft forever
+> 
+> > Complexities such as message tunneling to multiple components are also
+> > going to be fun, but we want the non destructive bits of those to work
+> > as part of the safe set, so we can get telemetry from downstream devices.
+> > 
+> > Good to cover the debug and telemetry usecase, but it still leaves us with
+> > gaping holes were we need to solve the permissions problem, perhaps that
+> > is layered on top of fwctl, perhaps something else is needed.  
+> 
+> But that's more a CXL switch-management command security protocol
+> problem than fwctl, right? In other words, as far as I understand, there
+> is no spec provided permission model for switch management that Linux
+> could enforce, so it's more in the category of build a kernel that can
+> pass any payload and hope someone else has solved the problem of
+> limiting what damage that node can inflict.
 
-I guess it makes sense for "ip address del" to be stricter since 'first
-address' is quite arbitrary behaviour.
+Two separate things here.
 
-> Cheers,
-> Adam.
->
-> (Not subscribed, please CC)
+For tunneling, there is plenty that will map to fwctl because it's just
+a transport question.  The tunnel command itself has a CEL that says
+it might eat babies so we'd need to check the relevant CEL for the
+destination to make sure they were just as safe as non tunneled version.
+So it's just an implementation detail, be it a fiddly one.
+
+For destructive options sure it's a config problem. But I do want
+to be able to lock down the kernel on the BMC but still allow the
+discructive command. Lock down is protecting and restricting the BMC
+not the other hosts in this use case. 
+
+> 
+> > So if fwctl is adopted, I do want the means to use it for the highly
+> > destructive stuff as well!  Maybe that's a future discussion.
+> >   
+> > > Where CXL has a Command Effects Log that is a reasonable protocol for
+> > > making decisions about opaque command codes, and that CXL already has a
+> > > few years of experience with the commands that *do* need a Linux-command
+> > > wrapper.  
+> > 
+> > Worth asking if this will incorporate unknown but not vendor defined
+> > commands.  There is a long tail of stuff in the spec we haven't caught up
+> > with yet.  Or you thinking keep this for the strictly vendor defined stuff?  
+> 
+> Long term, yes, it should be able to expand to any command code family.
+> Short term, to get started, the CXL "Feature" facility at least conveys
+> whether opcodes are reads or writes, independent of their side effects,
+> and are scoped to be "settings".
+> 
+> There is still the matter of background commands need to support
+> cancellation to avoid indefinite background-command-slot monopolization,
+> and there are still commands that need kernel coordination. So, I see
+> fwctl command support arriving in stages.
+
+Makes sense.  Tunneled access to CXL features should be an a good explorative
+feature to do reasonably soon.
+
+Jonathan
+
+
 
