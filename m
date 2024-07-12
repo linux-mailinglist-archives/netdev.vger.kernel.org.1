@@ -1,137 +1,176 @@
-Return-Path: <netdev+bounces-111060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA4992F9FB
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:09:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B74692FA06
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59575281E3F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 12:09:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FAA61C21987
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 12:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE65816B3A5;
-	Fri, 12 Jul 2024 12:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C8516CD3B;
+	Fri, 12 Jul 2024 12:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PNBbyBW2"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SENHjsWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013004.outbound.protection.outlook.com [52.101.67.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C424ED512;
-	Fri, 12 Jul 2024 12:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720786164; cv=none; b=lfLUfWhndyJAx9g9cqyOxLfIFJ8XRIpvHFZ8T4s2ofL090II2fwx7vfAYUEn2aQKAItaGJdFBoNV7U+KQ2mvCjRstYGCUh5sJFRm0d+NncegfB6+u4FIyHevXcK3jwNw1Xs0kBP1OZbtEyAUQJRDdmO/F4ReTpC83joYYr9jx9A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720786164; c=relaxed/simple;
-	bh=96rwmz4PyAZTvLi+N82OXvuHTULqmo4k8XWFdYjYqWw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=U70SQJSKT3M1/ILXe5uGQmPL/PNj+XUbRmslWYBeRKY6+1RUKu3kzH2wIVPmHQJEseIOOQE+Z53xlwegoCLHLRuWy8MHF2SeNhIQHD9w4AVv/j9j3MuW7tlIgfuJqXpau1cyjWKi7Z5u6o2UjINqWl8fKHhAwsHzAaMTltY0P0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PNBbyBW2; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 46CC8euN005579;
-	Fri, 12 Jul 2024 07:08:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1720786120;
-	bh=XtTTi2TZFxa9xW00fV6xd7qy5RMAFZNkrA47vtE/kHA=;
-	h=Date:Subject:From:To:CC:References:In-Reply-To;
-	b=PNBbyBW2E66A1rTEBy/+/m6b0kNtsYhBO8zztESdlj2u+onEt8GoIpYCeTnUptx4R
-	 WZHHgjIKuXqgaOv3CujfTybsWLM+nxYLu7BuaFdFk0J9u2NxfOrT1tupPhNDC8TUgQ
-	 01LFsDftDUFoZXHhbPOy57oYKQLKrvlWMoms6MzA=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 46CC8e46117208
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 12 Jul 2024 07:08:40 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
- Jul 2024 07:08:40 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 12 Jul 2024 07:08:40 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 46CC8ZHD085511;
-	Fri, 12 Jul 2024 07:08:36 -0500
-Message-ID: <b0a8501f-a6e8-412e-bc0f-33e8585790e3@ti.com>
-Date: Fri, 12 Jul 2024 17:38:34 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAE2D512;
+	Fri, 12 Jul 2024 12:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720786449; cv=fail; b=ibuVEK7MP9mLbu6KIAmrveXwyWOWyPAsu/f1LTnyd5DTunGfSFLnnxo+aZYBb0R5HvTkB95GUMj9bByyGU1FZh9MZ5lz1gm6renwd6VHSmvbTBuHkplzFhOzrNpEa6EeAkswld5dmCESdqVHlgrQA7jmNjOPevACcJ83euyQS/A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720786449; c=relaxed/simple;
+	bh=4dbR5QnhLufztErejCdDDWyqVN+FFbQzyadIWRfy6mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KbbKo1QYxEgYkG2ZqTJrPY61Etku3eulIFTi9M84h4zyaRqQGEvrAAQpYqsjpauFJzAEYSQ0LiJdRDWaeqEft9dFEGSUvOEB2ehRnWo+zyHnId6qeBrPuWYPtzGgAfEghZtTlgXD90xtnPsS+evxM35QZMAzYpgE5+3NZz2Pi8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=SENHjsWO; arc=fail smtp.client-ip=52.101.67.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Iji0/sqjnpbY1eBIlAeiEzecRI2+hx38hELGNBWMC4wGU34d/B9xEAP+l9TXfEuUEBAqqUiMZcM2VYaOQM6Lm3XGGWsgGK6JYfIvBFip8pC1M7DDEKaHVmNaJpc1k/NAc8D6u5nyGv2FcTXXx1Y2O7Lu5bk6tSS9Pj8/n/Xp1Q69mmX+gref9fZfvUgOGT54/jkQomAd08yB/yOm/NdoURMUA1odhiLiL0Bwu5nuCLD0V1rDAQHcrAEsB004+wTcw0wqkOqdoT+9GLsEklJALZtkxWVczm7OELbnus6iE+6e3DqKd1Q5uG1npJN/2alX2gAckWSV9YO1YKdWLZ0glA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LP/rgZntE9b0tmOx8WkX2U4HW+/dQyIx/gcF23pQJCc=;
+ b=cnlxEXFndLzmNlfmya+XNChuq21MHjt9nA4X+TzQH0PhUIwhP0FKlOUh2LnhoPBNNWX0imsU3kvrrt798fnU+kTAhWM4BR0fw9iAztAaq+54KIB8+sjiAkpZcczlpW/o7tKwZrPuFYLkMSR53GvwTpddNpp7U/cQ2yXnZLEWGblhlHIceZI1D1SQxb1wF9pn8e5pTSkp7wKZVDBLzs9tj2PUiZiBx6BsYybl0YKuQoeOR1NKZtX6gBiJ2mf22yup4w7TQAle93mJcdg4e5He6NrTjRWxMreh6ebI19YiWVQ3D8TuDGwIACsSsxvQIqZtnpkBtfnzs5Wwoei/ip6seg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LP/rgZntE9b0tmOx8WkX2U4HW+/dQyIx/gcF23pQJCc=;
+ b=SENHjsWOOOZ/R8RCuwq7sYqZihvFRL/9/9WzPbQmCvfxkh/BrgTDNF4cGRHwH077OPNWe/j3/39mptYcnp6g+Q+XYL4G/0EBTG9lepKYXFxfx71rexvn9k2CGbu6xFeCtaZ/2Biir9g0fUArd92W8K/czYtvw4xTm4DOOCsECxU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
+ VI1PR04MB6832.eurprd04.prod.outlook.com (2603:10a6:803:139::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23; Fri, 12 Jul
+ 2024 12:14:04 +0000
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a%4]) with mapi id 15.20.7741.017; Fri, 12 Jul 2024
+ 12:14:04 +0000
+Date: Fri, 12 Jul 2024 15:14:00 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Madalin Bucur <madalin.bucur@nxp.com>, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 5/5] soc: fsl: qbman: FSL_DPAA depends on
+ COMPILE_TEST
+Message-ID: <20240712121400.bnjcexqpqgjhlmuc@skbuf>
+References: <20240710230025.46487-1-vladimir.oltean@nxp.com>
+ <20240710230025.46487-6-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240710230025.46487-6-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: VI1P190CA0050.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:800:1bb::15) To DB7PR04MB4555.eurprd04.prod.outlook.com
+ (2603:10a6:5:33::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Split out common
- object into module
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Thorsten Leemhuis <linux@leemhuis.info>, Andrew Lunn <andrew@lunn.ch>
-CC: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Diogo Ivo
-	<diogo.ivo@siemens.com>, Roger Quadros <rogerq@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        kernel test robot <lkp@intel.com>
-References: <20240606073639.3299252-1-danishanwar@ti.com>
- <66b917d6-3b72-41c5-9e30-e87cf5505729@lunn.ch>
- <c720c13d-de0e-440d-a10b-717f6012bf56@leemhuis.info>
- <ca53f2e2-6cc5-42ea-8faf-7d9b7d14421d@leemhuis.info>
- <4cdcf7af-fb0e-47a4-b38a-b8ad98c90188@ti.com>
-Content-Language: en-US
-In-Reply-To: <4cdcf7af-fb0e-47a4-b38a-b8ad98c90188@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|VI1PR04MB6832:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87de5cd9-5b81-49b2-4c02-08dca26c1ef0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Z8PHRIMoXiakr6nzisewkmsNtS7AjnsQ3U8peP4V1CAPYx3UaRJpR1fQP3DF?=
+ =?us-ascii?Q?XMAtYTg9hvGmYlRfvmhJvQ4XbvAde14YOngaVT3LA3UvLd7TDgNaeQhWESVt?=
+ =?us-ascii?Q?DfUEvQwuNyQXoekGEhQDjeCozVj+nHt6FsjeWOWYuDOA6O1Jh/ONvPDCAn5l?=
+ =?us-ascii?Q?ZF25AvXDY6sPeQkoUz2rkjodVzjrZBFHe+qcb4/taGFwlSEus7V1C+QVPo2N?=
+ =?us-ascii?Q?bbnRYifL0q6cEo/8LI7BZGGNJam77lTOygpvHd8OQpqCpCbr8OliE6hI3IWr?=
+ =?us-ascii?Q?Rq5OWyjeaim4cupwKU2OJQ5IHRXKIGFFrWrIekEeljVuXTe61AjCCvUNCg0Z?=
+ =?us-ascii?Q?+CcVy6cBXJsbHJqSfpJbbVEeWX9IUaXONgYIsvooSHx5dHToKxCmG4Bf1XCQ?=
+ =?us-ascii?Q?6//GcbscR5xwj7zztHCztPeydpviAPc0S05eRZvmcwGpmNxCDLQqukM/a4x8?=
+ =?us-ascii?Q?4K8AO1KW0iVevQbJIvHh3YS2lXF/M2ZD9zw+WmgUkbcXwiW1fRXzl52lf0e4?=
+ =?us-ascii?Q?zrA0UYsSnL26Vt7Uh/uInrSSA71PV2Hh5G9Lbr2zvNbg8WjX9Zt6QFjX8IP+?=
+ =?us-ascii?Q?iiP/HivlOK0KUPRvHF11aX/RmScdRnI6y2oIfJ7pIWCKvbRFkxzh7jhZCRX7?=
+ =?us-ascii?Q?RJpWmCZhloXbXMjs94TY/HuUCNscrBKVFj2GWKQbBooORmxYI/ypKVfaa0UG?=
+ =?us-ascii?Q?NfZiQ1bglOrJjyk/inRRC1L7AJoDjo2DAj2BRvy7Z6m/8tS/zWt8Jv1jnOiq?=
+ =?us-ascii?Q?+XFBzjY8i+bUHbpPc52ewh/KBcHFGUGkOSILCilVk7pkwQ3fGdqSxjDOxKVh?=
+ =?us-ascii?Q?JH15IxWo2BSAPlVdYjsxYzUyxRwo3ht3wW1eMfZnu/5mu+/boLK0p+CtKOnP?=
+ =?us-ascii?Q?u8kLHx/KvDn3G8ViJuzYGoV2ShpWH8tJDqYx+E8d1GK9jDusmuXYk5gWtsTd?=
+ =?us-ascii?Q?pW4bNYqlG/LgFLcPE64rXGp4paIsXEMRXeeIpgb2QHawKpX71ZoEESXnjn41?=
+ =?us-ascii?Q?137rQay+tlJflRaONw936lYu046C8SFtakjx1czWnEE7X6z/PLFW1lZfGfqz?=
+ =?us-ascii?Q?2EEKxnSVUo5OSEtlXjtWIyrpUP9OydafgpoNAypO4IJ7wCVAIGZ9zNwIyHK8?=
+ =?us-ascii?Q?3SBLq7Kkzwf4H1sF+AE2zOAg7gT4o5NJxnhXv0NGEkB6hvJ1IhaNw1VXUT2L?=
+ =?us-ascii?Q?lit2SI9DbGdo7Hd/tK8iY6mDH8PieySVbwUsS1XezPvvF/i/TGhMzLEG2P4G?=
+ =?us-ascii?Q?RlJ+2Mo6JZwmFfJwOGZmT6s73+c3+Xb5KHoxpp6JhBIoYLFT7iv3miEGZ3HZ?=
+ =?us-ascii?Q?aGDf6QiDvA+aeCjAzSw09H/NLTUO6RRwFh0wR1kkWAIp3w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?mwrH13oB9sYaHPABXmGBbkvCsxpWTgrfKCyUfwLCiJNmSEOqDryTlAmE5rnH?=
+ =?us-ascii?Q?DtTKbHVFBjfjfD+qATpVlJVe4fuinb6vdS4o7spx7MKVbDK4DQeFhYOQ+LY1?=
+ =?us-ascii?Q?DsT6L+6GOpRFhXQ9LvKxJAN/JuExNFGh2d3ARkqab4KfOGkvet1uxQhT3/mG?=
+ =?us-ascii?Q?QTm+eRytWm0NgG4C06H6awmepaSShMqaBssvd1cDT64N82uMDWD1wG0BAIVR?=
+ =?us-ascii?Q?OvszR84+mG0DVnl2+tH9WEm4xAQ+MopxOgPfC6hDr0OEFkN1ArxJb/r0u4oz?=
+ =?us-ascii?Q?D6yhov/yMAWEhYFhOjEgP58ShPzcwCL4J0dcQnxMsxY4J+3ldfWWYMFsqS7s?=
+ =?us-ascii?Q?RrR0z6wLLugNw32SBcMb7BvdWbDbKF9FIH19JoF5mko/okeNxi++ykY/EbnW?=
+ =?us-ascii?Q?O7rYvG64VB9Eo2uH/V3GoP//6czuHH0BS9kFas/TwxZMOlU+cJMAnqKRmb83?=
+ =?us-ascii?Q?DI/zxmEgoRVLADubf3EwwFzfj3Qez/d2TAjrczHUsaoa+SH/Qv0YQ1po/ZCJ?=
+ =?us-ascii?Q?YXLam+lPx/IrZ2T9IHXm0eZbNXbzKtbCqAL7nGoYk9/T+/DEjQKjm2oYVqaT?=
+ =?us-ascii?Q?ZSih/BR6QuxFdV1hTdK+nYMeHfoYfEn8UINWA9u+7Xs8f9Fp3r2cmv8lPR/Q?=
+ =?us-ascii?Q?hgkgCm5/IScgGGJb3ynKKuBcjpvxXlVcN6rsJHskHLCM/wHGeXBi3sKREek1?=
+ =?us-ascii?Q?6Oke8tX120IQsoQ5hbPiJAqCSz3gsk4AE295BQCCAhfsu8+6C9iL1CX5q/jP?=
+ =?us-ascii?Q?sELk79g4mw15HBfvVuTeBgFbqeXEH0Q2fNBlqSuBrTqVzSndLVimYykYNHSs?=
+ =?us-ascii?Q?X72lmaR9GeFnDQZugokKQ8OycDBXXmIajQd9P2zqFnUKzPI2qgI13lPDRkwo?=
+ =?us-ascii?Q?Z4jlvkmRaWcLqKO8JjGkwe3wU3oMl/mdis9p/xbztc7juUrBy/obcTSrCLZa?=
+ =?us-ascii?Q?FQt6ZsD+KHh9dwh6ZHaJ0kfGZn+XiRtKILpmPF16VMAY7KTDiBZ8j8co1NKG?=
+ =?us-ascii?Q?WcfaD2N+ECEKChd7DOen2JZ146sqgHluC/Yf4wW09i+5gDk9+ssQfE4sAmM0?=
+ =?us-ascii?Q?JgkJ9SsDO69h88q5sAgv6ItFMyTb1TjAtgvu40jM5kjuNeZeWy5y5cVdbYXv?=
+ =?us-ascii?Q?r1F2VF2nIbWjhSXKUM7k8mvJ0jedmkqR3kumMMrKD51uMx6z5v+UsMRaZq2U?=
+ =?us-ascii?Q?Zj+B9gPW3K7DccgQ9Ur691zEIu8y69QcnqgWyKKQZnIXT63nqDE9ZfaMvj+3?=
+ =?us-ascii?Q?nNyQWS8S5KzvWlMSz1ean5Bsu1W8Tyna+BsM/2kog9B3ETHrXA0IkVeX2vfD?=
+ =?us-ascii?Q?/oup73O2JRE81iSLeXXue4cSiPtRB+VIj3Oa46ksfbaSmO/NiYRcp0xVKQoY?=
+ =?us-ascii?Q?AW3Q87+6S2fAXd7sYWjpSEsOMqGK4/jO+5okRNvLknwmtEGh19BsQGF89ABU?=
+ =?us-ascii?Q?Ksp9hUTHvlnNz7ei1ApTL+PUA53UUfF4SAS43lBgnWt5fRAYRfDA3yaRtM+D?=
+ =?us-ascii?Q?h6oy0wTrGiUOMgwcMEjd9H05zLMWso2lSDXH1qaCv2rKERc/2NKs0KiSngIh?=
+ =?us-ascii?Q?SLMlM6EOABNehBUFU1gNywbeufZIUWp80r0bDVeolI0mL3vTULU7kwSqRW+D?=
+ =?us-ascii?Q?cw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87de5cd9-5b81-49b2-4c02-08dca26c1ef0
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2024 12:14:04.0394
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: srUeFOSCBLcL+Qy219mfEp+DYlV6x7a+XyrfiYZpIngJEwjOsPv+7GKTEe+ysrm2O9RIp70Pv+BS9yhtvyryJg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6832
 
+On Thu, Jul 11, 2024 at 02:00:25AM +0300, Vladimir Oltean wrote:
+> From: Breno Leitao <leitao@debian.org>
+> 
+> As most of the drivers that depend on ARCH_LAYERSCAPE, make FSL_DPAA
+> depend on COMPILE_TEST for compilation and testing.
+> 
+> 	# grep -r depends.\*ARCH_LAYERSCAPE.\*COMPILE_TEST | wc -l
+> 	29
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
 
-
-On 12/07/24 5:10 pm, MD Danish Anwar wrote:
-> 
-> 
-> On 12/07/24 4:42 pm, Thorsten Leemhuis wrote:
->> On 26.06.24 09:19, Thorsten Leemhuis wrote:
->>> On 06.06.24 17:54, Andrew Lunn wrote:
->>>>> +EXPORT_SYMBOL_GPL(icssg_class_set_mac_addr);
->>>>> +EXPORT_SYMBOL_GPL(icssg_class_disable);
->>>>> +EXPORT_SYMBOL_GPL(icssg_class_default);
->>>>> +EXPORT_SYMBOL_GPL(icssg_class_promiscuous_sr1);
->>>> [...]
->>>> Please could you clean up the namespace a little. icssg_ and prueth_
->>>> are O.K, but we also have arc/emac_rockchip.c, allwinner/sun4i-emac.c,
->>>> ibm/emac/, and qualcomm/emac/ using the emac_ prefix.
->>>
->>> Just wondering (not as a regression tracker, just as someone that ran
->>> into this and carries the patch in his tree to avoid a build error for
->>> next):
->>>
->>> What happened to this fix? After above feedback nearly 20 days ago
->>> nothing happened afaics. Did this fall through the cracks? Or was some
->>> other solution found and I just missed this (and thus can drop the fix
->>> from my tree)?
->>
->> That inquiry lead to a review from Roger (thx!) more than two weeks ago,
->> but that was all afaics. Makes me wonder if this regression will hit
->> mainline soon, as the merge window might open on Monday already.
->>
->> Ciao, Thorsten
-> 
-> 
-> Andrew L has given comment to clean up the API names. I will rename the
-> APIs being exported from emac_ prefix to icssg_ prefix and re-spin this.
-> 
-
-Posted v3
-https://lore.kernel.org/all/20240712120636.814564-1-danishanwar@ti.com/
-
--- 
-Thanks and Regards,
-Danish
+I don't know why nipa says there are 800+ new warnings/errors introduced
+by this patch, but it looks like a false positive (or I can't seem to
+find something relevant).
 
