@@ -1,214 +1,194 @@
-Return-Path: <netdev+bounces-111161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B3E9301B7
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 23:45:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 782D5930211
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 00:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93AC5B21F7C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:45:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF681F22C6B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 22:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC2461FD4;
-	Fri, 12 Jul 2024 21:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBAF51C21;
+	Fri, 12 Jul 2024 22:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="L3+kuG56"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GjTegZnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A7551C21
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 21:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17E21BDC3;
+	Fri, 12 Jul 2024 22:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720820704; cv=none; b=JpJE11Tzpxr/BxcLpRE1MaCF+eo6+qxYKVSEDXrFlIyobcg7DryWpOMEhP1nmbTgQ8KBIfdzgApCTe8qjW7wcXFuUJ39ixjxSzG28iLg3+CWNQEuekdAWsUnI/GdKExEEZ/SizAie+JcADclsdGfKyubqffrgGWKl4NsUGYN3rI=
+	t=1720822713; cv=none; b=q5fFff2CxGuM6KYeigSy+dzSmkOH7ixf0vqivvyEs73NXSYcnql3ASaHGNOrEI1UB6VEeQpcfntOLsJ227I3ouakKbJzDZnY1sXlITRHYLjPmMbpvsKnBlsH5tGyPZ+6iZLMgzx3al7CyP68hYscseCsCKEyJslBIS46CBrGPPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720820704; c=relaxed/simple;
-	bh=HrpbA+Nh/9HXkgiYd6LjRrLuadOhUMjI6rPQOim6SyA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qwCOUEVOiqRZo+KrZe6Pny6JB1NNouBchPxQEFcQK3rHqHuLi5smTWpYgDFnQmMvpP3ZZvh8tpBgTJR8ZyoqEfpTUkeSzIN+50uTei2OXBvhmuc8nagw+zVhRXiyMAHQeAwDqktlNtKtySnV31fpkQfnvTv/tCJXUBCRSqynoj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=L3+kuG56; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-659f781270dso28727627b3.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 14:45:02 -0700 (PDT)
+	s=arc-20240116; t=1720822713; c=relaxed/simple;
+	bh=3Yd8//CkFdri8ix2BgzZkcKGGDyp6VbpdPgbhhaFr5Q=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhIBm60cSnUI0RqH7yDnrbCleKOlPT0YKistM9SNYrNdbrDrN/6huOzxrdATnkyOT0B5fVz7Fe8Ls3QHVowm/FKi2im1YbFWsMx/Zv36ahpmggkke1novoVFP26ecqHvRCVZWKsPs8Y3BJIKhslqfE41wWK617Bs1Hpv+TeB4TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GjTegZnc; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4277a5ed48bso17832155e9.2;
+        Fri, 12 Jul 2024 15:18:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1720820702; x=1721425502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Kmr0D+B+H7qE4FCqmrG4LnL6SKbCOr3RFTLgldPz/U=;
-        b=L3+kuG56BXOB/DRUENOgFCMMJMUqNuWJAs6pEdS9mbr91AaKaO+CNxzJWcxHd1y62/
-         u8scL3qtjfH4SVKnufc3I1AGz/T53hR5gQrCokKLa46CQuNkFT/WZ0yeSRKM30LV9ygE
-         j0UHKqPgBRYB3AVw+yb0rEeNliTFk01JjgMvyL5Xecze8JsH1st275sUGX0U3GfGMlHn
-         0AN9LCsbN7KlZqLN0J4byvJl7OJJAhaeLYzEPVVpTcYIjzJP4YL/x8v5+/la67ICMBHD
-         vTZgtlHwBbn+O3DC7in2x9N685F4UnISA6aO585TLKYwFVD/eiJCy1unRp/2ErL7YSlv
-         LeLg==
+        d=gmail.com; s=20230601; t=1720822709; x=1721427509; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Gp997xfVUy47LFNuWEWNS+olZrom40X4hD1oREeaYw=;
+        b=GjTegZncTbnEywxJttSRz7WGAv/9JHT6BF1ciCjegPMJnI1LC3VoAkATj/g5J3LU5y
+         9WcnplEBK8UsJMWmAcjWTsGhWOZiE71/ps9Sm3/WO7YewWmBJccdocA5CBJ5VbimpTBX
+         NcWL0rPAIlmqIJTQru99buZbbRj2OsdkLl+r1HPJz++s9CfafPpDTScjDJkkx4e/fEb/
+         euR+8DxDt6udam4Qegsqn/xv1mANIFjHs1Pv6jOEmX+1ZfYtXSn9yIkCUSDfVv8lcRfN
+         /XfDrWBkna1CV1WS+32EugLH4i+cTTlcKNjDIMhQ7KUzg/MoALRA2R8WZIC+voAAbhFo
+         Jqlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720820702; x=1721425502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4Kmr0D+B+H7qE4FCqmrG4LnL6SKbCOr3RFTLgldPz/U=;
-        b=X0uzSa2brb8+GiY30wcCqRCi8Jpn6aZuCRXI+Tu4ywLRR39G3++U3Xa43ZCZwocTbx
-         ZsZ8UldpkisgcU6uYmB+PHppAMxh2V8icBm1iU+nBHk2k7BhRNUlBruP7gW4Pr+usAUL
-         OMLIp+6ITogSXMIoCLR5f1gFS85Ze8xEfRs8/907U79GrSyQOvEUi0Z+cigdDljYBXqa
-         zoHvM87+T+wbaau74BYfUrdTW6w0siqSzEitkipV+iyrOpRf72ydBE7b2gv6eG0NUIPO
-         +BvSwl7JH/obxjHxunXZ/3CPDSJRSrdvZeWJglwZAruhQ/PhCrQTXxlzshl8LbbQZ6OZ
-         sgzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJhttRrmGw453dt3ItuxdVi4uacQ4fK9eDh5+Elo0BtH67VXxzzTBaKg1m+2vjEa/mgcVRSipBKB6oSK7CG9sc3XykU8qs
-X-Gm-Message-State: AOJu0YymkgJe1EMNnb3MyMoR0r8oiKvp+yQ0VLucJQrD2a43YYij3uiq
-	8hW02265zhtzO0QdzOiJFyoTWh/etLa8QYF69agup42m+ArKRwyYa0/HihPm7mrl9UncRrwJrs/
-	YvVyMQJ+aB3yi3xIVEVSwkTKVCcTWLDXf7CDD3NLEtsOkBnGNSq6Z
-X-Google-Smtp-Source: AGHT+IEaqUkUcoofoiCgBx7/38mr/KpB2c3RLOwpHoSCCsqoepBZ3LTzVff/c70jSsidDaLrUQzyB2KbjQRclo3oiSw=
-X-Received: by 2002:a05:690c:6d0a:b0:64b:1eb2:3dd4 with SMTP id
- 00721157ae682-65dfd09005fmr37587657b3.8.1720820702076; Fri, 12 Jul 2024
- 14:45:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720822709; x=1721427509;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+Gp997xfVUy47LFNuWEWNS+olZrom40X4hD1oREeaYw=;
+        b=vi/I37c+dP2x6h2NJU5XR8l7lXHjEfvpa5Y32LcnsD4cny5CNUT7QjNpmyVORtsqLa
+         ZpUJtTy5ECQRC0wFbcM6WcPvDK+23olJQY2nz6iOyZvsOU9G+56LNGQSsqK/ePpBCdEs
+         5gNk+jOx1l0Xnw52j+h3J0yJNf/G8SllVwUZ2oYGdvKPKVaW+3E71I3wao3hPalCsZrX
+         oEQDf5BwnS6ezsn49XzFAf023upgvagt51HcVTb/DcO+HuB5AFjndM34U7zpG/R0uZEi
+         Dd+Rb837ZH6pkJx/u4G3kipLs03aT/y9BbX5r1eOJzicQhqBmJ/iDYe36PpW34QszPMb
+         BOtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCXwTMQfnKbbzw3+uEtyWD/8CBh/KRcUDAizSFIgomhHd0cv1paXaBjlF68rManxE9XkQtDSViZ9wkTie6Urh3rlWZ8skdcSeOA4QGUd6kHQO5iGmHBz5OjEx5
+X-Gm-Message-State: AOJu0YzGHTqgCY68WkREpWsuoqxLe9dkS9JNsZYs2JIg44Q44sD1sYCw
+	JHAZUA99d8Cs+H7TRJ3syb3itYTCxuW9Vdb0eq7Edy7FwNHfON8Z
+X-Google-Smtp-Source: AGHT+IFLpQM4YiEssHHVafXpVRO0//qzed86MvSdeVDSAkWApnTdHqlYS9RY2Uvh2+XC5IqgqUYtYA==
+X-Received: by 2002:a05:600c:2284:b0:426:5e91:391e with SMTP id 5b1f17b1804b1-426707f81a5mr81179955e9.26.1720822709159;
+        Fri, 12 Jul 2024 15:18:29 -0700 (PDT)
+Received: from krava (ip-94-113-247-30.net.vodafone.cz. [94.113.247.30])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa067dsm11124788f8f.78.2024.07.12.15.18.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 15:18:28 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Sat, 13 Jul 2024 00:18:26 +0200
+To: Joe Damato <jdamato@fastly.com>, Kyle Huey <me@kylehuey.com>
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, acme@kernel.org, andrii.nakryiko@gmail.com,
+	elver@google.com, khuey@kylehuey.com, mingo@kernel.org,
+	namhyung@kernel.org, peterz@infradead.org, robert@ocallahan.org,
+	yonghong.song@linux.dev, mkarsten@uwaterloo.ca, kuba@kernel.org
+Subject: Re: [bpf?] [net-next ?] [RESEND] possible bpf overflow/output bug
+ introduced in 6.10rc1 ?
+Message-ID: <ZpGrstyKD-PtWyoP@krava>
+References: <ZpFfocvyF3KHaSzF@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240711111908.3817636-1-xukuohai@huaweicloud.com>
-In-Reply-To: <20240711111908.3817636-1-xukuohai@huaweicloud.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 12 Jul 2024 17:44:50 -0400
-Message-ID: <CAHC9VhRohF+36PQbbEUiiiXjnmx-ZCphjOiAV5VTQwCejuejMA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 00/20] Add return value range check for BPF LSM
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	selinux@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Brendan Jackman <jackmanb@chromium.org>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Khadija Kamran <kamrankhadijadj@gmail.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, John Johansen <john.johansen@canonical.com>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZpFfocvyF3KHaSzF@LQ3V64L9R2>
 
-On Thu, Jul 11, 2024 at 7:13=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.com=
-> wrote:
->
-> From: Xu Kuohai <xukuohai@huawei.com>
->
-> LSM BPF prog returning a positive number attached to the hook
-> file_alloc_security makes kernel panic.
->
-> Here is a panic log:
->
-> [  441.235774] BUG: kernel NULL pointer dereference, address: 00000000000=
-009
-> [  441.236748] #PF: supervisor write access in kernel mode
-> [  441.237429] #PF: error_code(0x0002) - not-present page
-> [  441.238119] PGD 800000000b02f067 P4D 800000000b02f067 PUD b031067 PMD =
-0
-> [  441.238990] Oops: 0002 [#1] PREEMPT SMP PTI
-> [  441.239546] CPU: 0 PID: 347 Comm: loader Not tainted 6.8.0-rc6-gafe0cb=
-f23373 #22
-> [  441.240496] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S rel-1.15.0-0-g2dd4b4
-> [  441.241933] RIP: 0010:alloc_file+0x4b/0x190
-> [  441.242485] Code: 8b 04 25 c0 3c 1f 00 48 8b b0 30 0c 00 00 e8 9c fe f=
-f ff 48 3d 00 f0 ff fb
-> [  441.244820] RSP: 0018:ffffc90000c67c40 EFLAGS: 00010203
-> [  441.245484] RAX: ffff888006a891a0 RBX: ffffffff8223bd00 RCX: 000000003=
-5b08000
-> [  441.246391] RDX: ffff88800b95f7b0 RSI: 00000000001fc110 RDI: f089cd0b8=
-088ffff
-> [  441.247294] RBP: ffffc90000c67c58 R08: 0000000000000001 R09: 000000000=
-0000001
-> [  441.248209] R10: 0000000000000001 R11: 0000000000000001 R12: 000000000=
-0000001
-> [  441.249108] R13: ffffc90000c67c78 R14: ffffffff8223bd00 R15: fffffffff=
-ffffff4
-> [  441.250007] FS:  00000000005f3300(0000) GS:ffff88803ec00000(0000) knlG=
-S:0000000000000000
-> [  441.251053] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  441.251788] CR2: 00000000000001a9 CR3: 000000000bdc4003 CR4: 000000000=
-0170ef0
-> [  441.252688] Call Trace:
-> [  441.253011]  <TASK>
-> [  441.253296]  ? __die+0x24/0x70
-> [  441.253702]  ? page_fault_oops+0x15b/0x480
-> [  441.254236]  ? fixup_exception+0x26/0x330
-> [  441.254750]  ? exc_page_fault+0x6d/0x1c0
-> [  441.255257]  ? asm_exc_page_fault+0x26/0x30
-> [  441.255792]  ? alloc_file+0x4b/0x190
-> [  441.256257]  alloc_file_pseudo+0x9f/0xf0
-> [  441.256760]  __anon_inode_getfile+0x87/0x190
-> [  441.257311]  ? lock_release+0x14e/0x3f0
-> [  441.257808]  bpf_link_prime+0xe8/0x1d0
-> [  441.258315]  bpf_tracing_prog_attach+0x311/0x570
-> [  441.258916]  ? __pfx_bpf_lsm_file_alloc_security+0x10/0x10
-> [  441.259605]  __sys_bpf+0x1bb7/0x2dc0
-> [  441.260070]  __x64_sys_bpf+0x20/0x30
-> [  441.260533]  do_syscall_64+0x72/0x140
-> [  441.261004]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> [  441.261643] RIP: 0033:0x4b0349
-> [  441.262045] Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 4=
-8 89 f8 48 89 f7 48 88
-> [  441.264355] RSP: 002b:00007fff74daee38 EFLAGS: 00000246 ORIG_RAX: 0000=
-000000000141
-> [  441.265293] RAX: ffffffffffffffda RBX: 00007fff74daef30 RCX: 000000000=
-04b0349
-> [  441.266187] RDX: 0000000000000040 RSI: 00007fff74daee50 RDI: 000000000=
-000001c
-> [  441.267114] RBP: 000000000000001b R08: 00000000005ef820 R09: 000000000=
-0000000
-> [  441.268018] R10: 0000000000000000 R11: 0000000000000246 R12: 000000000=
-0000004
-> [  441.268907] R13: 0000000000000004 R14: 00000000005ef018 R15: 000000000=
-04004e8
->
-> This is because the filesystem uses IS_ERR to check if the return value
-> is an error code. If it is not, the filesystem takes the return value
-> as a file pointer. Since the positive number returned by the BPF prog
-> is not a real file pointer, this misinterpretation causes a panic.
->
-> Since other LSM modules always return either a negative error code
-> or a valid pointer, this specific issue only exists in BPF LSM. The
-> proposed solution is to reject LSM BPF progs returning unexpected
-> values in the verifier. This patch set adds return value check to
-> ensure only BPF progs returning expected values are accepted.
->
-> Since each LSM hook has different excepted return values, we need to
-> know the expected return values for each individual hook to do the
-> check. Earlier versions of the patch set used LSM hook annotations
-> to specify the return value range for each hook. Based on Paul's
-> suggestion, current version gets rid of such annotations and instead
-> converts hook return values to a common pattern: return 0 on success
-> and negative error code on failure.
->
-> Basically, LSM hooks are divided into two types: hooks that return a
-> negative error code and zero or other values, and hooks that do not
-> return a negative error code. This patch set converts all hooks of the
-> first type and part of the second type to return 0 on success and a
-> negative error code on failure (see patches 1-10). For certain hooks,
-> like ismaclabel and inode_xattr_skipcap, the hook name already imply
-> that returning 0 or 1 is the best choice, so they are not converted.
-> There are four unconverted hooks. Except for ismaclabel, which is not
-> used by BPF LSM, the other three are specified with a BTF ID list to
-> only return 0 or 1.
+On Fri, Jul 12, 2024 at 09:53:53AM -0700, Joe Damato wrote:
+> Greetings:
+> 
+> (I am reposting this question after 2 days and to a wider audience
+> as I didn't hear back [1]; my apologies it just seemed like a
+> possible bug slipped into 6.10-rc1 and I wanted to bring attention
+> to it before 6.10 is released.)
+> 
+> While testing some unrelated networking code with Martin Karsten (cc'd on
+> this email) we discovered what appears to be some sort of overflow bug in
+> bpf.
+> 
+> git bisect suggests that commit f11f10bfa1ca ("perf/bpf: Call BPF handler
+> directly, not through overflow machinery") is the first commit where the
+> (I assume) buggy behavior appears.
 
-Thank you for following up on your initial work with this patchset, Xu
-Kuohai.  It doesn't look like I'm going to be able to finish my review
-by the end of the day today, so expect that a bit later, but so far I
-think most of the changes look good and provide a nice improvement :)
+heya, nice catch!
 
---=20
-paul-moore.com
+I can reproduce.. it seems that after f11f10bfa1ca we allow to run tracepoint
+program as perf event overflow program 
+
+bpftrace's bpf program returns 1 which means that perf_trace_run_bpf_submit
+will continue to execute perf_tp_event and then:
+
+  perf_tp_event
+    perf_swevent_event
+      __perf_event_overflow
+        bpf_overflow_handler
+
+bpf_overflow_handler then executes event->prog on wrong arguments, which
+results in wrong 'work' data in bpftrace output
+
+I can 'fix' that by checking the event type before running the program like
+in the change below, but I wonder there's probably better fix
+
+Kyle, any idea?
+
+> 
+> Running the following on my machine as of the commit mentioned above:
+> 
+>   bpftrace -e 'tracepoint:napi:napi_poll { @[args->work] = count(); }'
+> 
+> while simultaneously transferring data to the target machine (in my case, I
+> scp'd a 100MiB file of zeros in a loop) results in very strange output
+> (snipped):
+> 
+>   @[11]: 5
+>   @[18]: 5
+>   @[-30590]: 6
+>   @[10]: 7
+>   @[14]: 9
+> 
+> It does not seem that the driver I am using on my test system (mlx5) would
+> ever return a negative value from its napi poll function and likewise for
+> the driver Martin is using (mlx4).
+> 
+> As such, I don't think it is possible for args->work to ever be a large
+> negative number, but perhaps I am misunderstanding something?
+> 
+> I would like to note that commit 14e40a9578b7 ("perf/bpf: Remove #ifdef
+> CONFIG_BPF_SYSCALL from struct perf_event members") does not exhibit this
+> behavior and the output seems reasonable on my test system. Martin confirms
+> the same for both commits on his test system, which uses different hardware
+> than mine.
+> 
+> Is this an expected side effect of this change? I would expect it is not
+> and that the output is a bug of some sort. My apologies in that I am not
+> particularly familiar with the bpf code and cannot suggest what the root
+> cause might be.
+> 
+> If it is not a bug:
+>   1. Sorry for the noise :(
+
+your report is great, thanks a lot!
+
+jirka
+
+
+>   2. Can anyone suggest what this output might mean or how the
+>      script run above should be modified? AFAIK this is a fairly
+>      common bpftrace that many folks run for profiling/debugging
+>      purposes.
+> 
+> Thanks,
+> Joe
+> 
+> [1]: https://lore.kernel.org/bpf/Zo64cpho2cFQiOeE@LQ3V64L9R2/T/#u
+
+---
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index c6a6936183d5..0045dc754ef7 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -9580,7 +9580,7 @@ static int bpf_overflow_handler(struct perf_event *event,
+ 		goto out;
+ 	rcu_read_lock();
+ 	prog = READ_ONCE(event->prog);
+-	if (prog) {
++	if (prog && prog->type == BPF_PROG_TYPE_PERF_EVENT) {
+ 		perf_prepare_sample(data, event, regs);
+ 		ret = bpf_prog_run(prog, &ctx);
+ 	}
 
