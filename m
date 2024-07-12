@@ -1,87 +1,84 @@
-Return-Path: <netdev+bounces-111028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C75FE92F6AD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:06:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA7492F6C6
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DD811F22B4D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:06:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDE77B212A2
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60CE12FB3C;
-	Fri, 12 Jul 2024 08:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBDE13F43C;
+	Fri, 12 Jul 2024 08:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ywzmR3pM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZV7769y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BA012F37B
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 08:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3471213D601;
+	Fri, 12 Jul 2024 08:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720771563; cv=none; b=ZQXXmflaNud8J6HliN9vYPtaKrIiBng3V7RJRTX+HZPxj5r49HYENPsuPwtWZuqlZh/CLFY/wt27ncoYcRD63+CFwxP/IW7ONcsJMxYcp6Z2RMMkLaZi265JZljHTwPiglwNSNMWCdEtqxW83xdpe0+h1k2ASboLJUnHmD/E8eI=
+	t=1720772257; cv=none; b=YD3tyc6SVY6+on+BZZrcyCsjgDDWIU7MKal2Z3paHK+InwM04xrDvQo9zU3puB9b4mUwrST8LHnPxeZE+zipPq8EZi5dyvmWMnDCJxb37TLCGUlNaIf6440d6jyPVv4jKnYu7vCn108zqVkb14sZ3N7k6gNJuRrcJjdyj4duNpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720771563; c=relaxed/simple;
-	bh=n7vviI36mP6nxaBfP+nJqOCAwypxVaPTF7rt8y0p4A0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VaxHVK9B8tbueLN2sc8z9+W7eT9311m7eLa4qqC5k9d/q8WOypxHqMqLQ0laYIrMLhlBBUXxYOwLMjgPBmMY0ftrG3feD+KZ76UvfBVf+cONwnWas9TotjMtIW6TA7nu+aYNQmQ4kuZ+MsPShrH82kO4Q15D1aDQ1NN7YCqH4DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ywzmR3pM; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4266fd395eeso11940915e9.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 01:06:00 -0700 (PDT)
+	s=arc-20240116; t=1720772257; c=relaxed/simple;
+	bh=g6BQbY2PoskWEZK2+H/k8Itr0ph812HzPCCnqtMZ1Oc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kn0JQFHm1U2ZIYtD8eLzgz8DJYEcIhLjBwwW8uXkVxCTeE8aRJiU/vuMGrAhPojyuPS9wkopJF2JUjf37D/0Y6B2lr9Y7GRg9148mPs9giZrVZ0kb5gpoLnZH7XekFY5PAg42RyAJUJH723YSrWS5qSo7BJg4WKnYDhBZ77cMzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VZV7769y; arc=none smtp.client-ip=209.85.215.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-78964fd9f2dso838773a12.3;
+        Fri, 12 Jul 2024 01:17:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720771559; x=1721376359; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mfY0TlwmiLCfard5rvsJoOmoOPvQGEncPGG+Fen4OR0=;
-        b=ywzmR3pMCSP9++FFfZMohStXgtk6rls0WhGhg97ATgzuvDm3/gZJ9Em690kuQzSe6/
-         DWqrQQB3PI6QOpprgNI7cjnnYXPgB0MveeqlsQR+AbWc7CXi18aMuk+B+V2fmg2qlqWD
-         GyqJtuYtX+SxNR4h7vsQ9IRw8c4rMVrvWHG4ACZNwIB3hEMmURbAQUcra+KYTsjMTep4
-         4spEGzeCac9XWCXGPVTJK4vdoJ61JK2+RO6eutnsc+GxdhEfIlm7llqJ/gqhU9P1qXWn
-         X/gsT+eqcXr5KeGIEwxp5G1Uzy3O/wv+DI5WWBS6r0nOFfVdbJQWx3bKotvXnWieDFSx
-         b8bw==
+        d=gmail.com; s=20230601; t=1720772255; x=1721377055; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J/VNNSVATduh5OiXqB7FDYXYQs1lG35zNpgpLy5fLvc=;
+        b=VZV7769yEjy2W5pdmLNClcNXbME7igINR6EBRNmujAhDrSMOhrJXdP5e+CAyPHEfbW
+         m5ttY+HR18kLYcQcWj9iLTF1RYJAcUaloah8u0samwsizMdPfvlv/teYxZakEuJon7QI
+         ThmRlXJocSeeSdLnDgbLcvICgIKYxdbuwEyvU8N5rb1zgGsAq5j8FSuNW5mRA6+q10rp
+         QO+aqMU0Y3d+KVc624gSlJ4I31jOZy4sNvMoC0yU6139UNbDrDplEvyKXo83VMiwT+TX
+         JLmLA1WXcTmSaMepeLyDp3/qrCUWKndgAsnKoT/BdRt8LNR+dEg43dAyLi9kYZF6arYi
+         Yyvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720771559; x=1721376359;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mfY0TlwmiLCfard5rvsJoOmoOPvQGEncPGG+Fen4OR0=;
-        b=jOlH+SbhcGMnuzJjIXhHpUh+10IPCQ5BwxDr0aqixdOR9e29B8ouKeScsOPtOYIM7L
-         wpaWxTiGfMUczbAGEgI18lVlUdZd5D8dEsXm5nPHQo8csKjQWjLMY49yl2+pCereS+gE
-         9rY3/pyiSzQbk4FUZGyx2MOpxm2zwdvyz/BYDRXkhe4+p3Wdhen0fAJX26zzgyX4L0vt
-         UBua9GR8Wo2uAa8W2WGSBK++Ml+kTzi/yhMBI/xWUl6XXT+TAtxFjKnIbyuL2lZM8uCq
-         fWV1CEPdFYvZHcXGl3DAH5yJIwscSNt0DTH2MbRIXvvAk3UzH+ZXs8K2GSaT19y1KAIL
-         CKZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDGDpgQzt/iHbiUUOE6dov51kkgzRSblQd8uKS3utqugoWmmZot/sqCvFzz6ohcmAFSzrUX9JkRhou0O+doHqS6BDaKir9
-X-Gm-Message-State: AOJu0YwOwg4DaRHO1oPshq9JSYFdRNfX3dk1rtwBw+ZkRgtUmFz8wBjx
-	/CntPMIafx1mursV7r/UvMvtXbpebbRcLdLpyrG52IlRmATMQQacZLFqQpw+Q4A=
-X-Google-Smtp-Source: AGHT+IGfk8XYbf3dJihjzUp/yY597NfBnHKfKpSAf6i1wn1c0DkkGLKIJxiK/uz8d8IUUZUHeOsrTg==
-X-Received: by 2002:a05:600c:33a4:b0:426:6551:3174 with SMTP id 5b1f17b1804b1-426707f7e3amr77282455e9.29.1720771559350;
-        Fri, 12 Jul 2024 01:05:59 -0700 (PDT)
-Received: from localhost.localdomain ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f2c1d54sm14146525e9.44.2024.07.12.01.05.58
+        d=1e100.net; s=20230601; t=1720772255; x=1721377055;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J/VNNSVATduh5OiXqB7FDYXYQs1lG35zNpgpLy5fLvc=;
+        b=GedzzZdV3xz7EcbV3nzcumXAdR08eW2UzjTHhccSjngwLEpa9jFB2p5H1IT/zNcGCO
+         kFTxcZwrgdNuehBt4VJIi0ifoXWAoe82/kitZcUPC+jC2SKcIGT8SlQSxsa/+KL8NoAp
+         dYgiK40PCQs5kHxaKsUGf0lfyIbyG5DeNl01mZA1+fuG1JU2J8PypnoIBnkWlOX2eRHD
+         TgULg5/OnsXGLEguCkt8iMImPWrOeLsIQTmQC3yol5nsyBqFoV44q5UrVDQOuZ2IEZcr
+         kn5bxMXGPDVRFykLO8MI3TfJZXIZ5P1QQAfiM31PaR5HBflPFeMcr6C0CIYdv5BoDFp6
+         YSPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1oQbhPywRUF9IKNz1zI6ZC6GuT9ro/mBRbaNQn4a+V/6/zdt1BW7ZFBeyiHGJKaTa6d5wz4xk/hqkLvqT9PfEF4t08pEbSCDh1ItI8GlneLLdLTEL0EHL6tJHQn+/F3gBkcdt
+X-Gm-Message-State: AOJu0Yx6mqdITLer9K6OGMADZDpY/3Q/Ml7VyKvZv/wqlrVvXGJMmm7q
+	+uuuaEAaMMRGHUcejk2WJsj/ZSsIqOiyuaqWz/h9efF2TtcdUfyzkEQVl9GvLloQIQ==
+X-Google-Smtp-Source: AGHT+IGmWBuFODJV7ioe217b0PQGyIcD6RxTMMG+fuHy4GLZ88+lqwWk/PMH6SdhzfghGJKAWrZa3g==
+X-Received: by 2002:a05:6a21:3393:b0:1c1:e75a:5504 with SMTP id adf61e73a8af0-1c29821bb16mr13156121637.15.1720772255334;
+        Fri, 12 Jul 2024 01:17:35 -0700 (PDT)
+Received: from localhost.localdomain ([240e:604:203:6020:60b8:1bf4:882c:1f7a])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cacd41a01asm879730a91.32.2024.07.12.01.17.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 01:05:58 -0700 (PDT)
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Aishwarya TCV <aishwarya.tcv@arm.com>
-Subject: [PATCH net-next] net: virtio: fix virtnet_sq_free_stats initialization
-Date: Fri, 12 Jul 2024 09:03:30 +0100
-Message-ID: <20240712080329.197605-2-jean-philippe@linaro.org>
-X-Mailer: git-send-email 2.45.2
+        Fri, 12 Jul 2024 01:17:34 -0700 (PDT)
+From: Fred Li <dracodingfly@gmail.com>
+To: willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: linearizing skb when downgrade gso_size
+Date: Fri, 12 Jul 2024 16:17:24 +0800
+Message-Id: <20240712081724.95738-1-dracodingfly@gmail.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
+References: <668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,39 +87,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
-added two new fields to struct virtnet_sq_free_stats, but commit
-23c81a20b998 ("net: virtio: unify code to init stats") accidentally
-removed their initialization. In the worst case this can trigger the BUG
-at lib/dynamic_queue_limits.c:99 because dql_completed() receives a
-random value as count. Initialize the whole structure.
+> No need for ternary statement.
+> 
+> Instead of the complex test in skb_is_nonsg, can we just assume that
+> alignment will be off if having frag_list and changing gso_size.
+> 
+> The same will apply to bpf_skb_net_shrink too.
 
-Fixes: 23c81a20b998 ("net: virtio: unify code to init stats")
-Reported-by: Aishwarya TCV <aishwarya.tcv@arm.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
-Both these patches are still in next so it might be possible to fix it
-up directly.
----
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+increase gso_size may be no problem and we can use BPF_F_ADJ_ROOM_FIXED_GSO
+to avoid update gso_size when shrink.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 10d8674eec5d2..f014802522e0f 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -530,7 +530,7 @@ static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
- 	unsigned int len;
- 	void *ptr;
- 
--	stats->bytes = stats->packets = 0;
-+	memset(stats, 0, sizeof(*stats));
- 
- 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
- 		if (!is_xdp_frame(ptr)) {
+> 
+> Not sure that it is okay to linearize inside a BPF helper function.
+> Hopefully bpf experts can chime in on that.
 
-base-commit: 3fe121b622825ff8cc995a1e6b026181c48188db
--- 
-2.45.2
+Thanks
+
+Fred Li
+
 
 
