@@ -1,150 +1,180 @@
-Return-Path: <netdev+bounces-111033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19FBA92F74A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:54:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB80292F758
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 10:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A806283927
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A058E1F23253
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 08:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05ED914E2D8;
-	Fri, 12 Jul 2024 08:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFAF14265A;
+	Fri, 12 Jul 2024 08:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IENHo2gb"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="um9lUo34";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+I5gGEvC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDFF14265C
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 08:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3003142903;
+	Fri, 12 Jul 2024 08:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720774430; cv=none; b=FmSayy4L3BNWPzNh9FwB+0GQeEVpAYmQ7DhxsOgi4AlLTyROVL5OMQ3CWP2CSrXg3H4Sy8I9ZnMVfq8i7JxL53qcZQ5Psg6MIgXU7R0zYhAtzK0wSJVlyJYmbP8NXvllF0V7N1uRQu2w3ZnCvw8ic6gaI3gFcSm2WYdxm2RXe1U=
+	t=1720774556; cv=none; b=ZKe1JQ10p9OHEvG+XYD7FZ3c/MYzs83T/t++WAqY/qCUd5StHriGYuMuVak3NT3lUWUgKbgy6dceC0IGowSrBJFffwdcOusUNLxcEli2C8AENtCnuiBetH1HjWH32ChYAU13k1lJlJXckmjRKb1fFVxxuvU38PBH1VGygTY2Qlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720774430; c=relaxed/simple;
-	bh=7ii2cMWIXSW9Zvft7iHYSxGbuGdBlukrB4DhkMPVLDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BrN+uASZjvNBDV+CW0QhvhVZS4uz5K+IrDQ0KqHr4VgWAiR5tdU0gxhThcizmcKLzALwsV744kHv/Eoup8VY1hrORan2Gu6gYdJuKgnrpuq4lV3BtIeOOcp9AkEdvEx5hI5mZKydmTFXBy2JQV3rvyIVU+dnfdvIdBoYp8DM5PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IENHo2gb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720774427;
+	s=arc-20240116; t=1720774556; c=relaxed/simple;
+	bh=bzZ/1VBPkM1Y2l73oHvsrDybWmcjoURQWVULOSP7hAQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Swp/td94K8S75wvrdbm5dOSUo/X8dbKVPfyzs6J76nHV/9O2HJeMkubjB2PniIxoE117wQcwvci83fk9+f2A1pv8IsCyKc/LGcSt96ijudnpH4wrSmzrOmLnOhsIWD2LjTLOyZFEjezyEUI/c2GiCeNnWqd3H2iWC2vDdYjMyHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=um9lUo34; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=+I5gGEvC; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1720774552;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/6eZohFqmRNYBDXGIYv2tB15qLRHJ4lN578ZEp/GlC8=;
-	b=IENHo2gb7PRqfogW90yrZaZYLRvNzBYFVZVMzO06/s6R3A0JP5mRWtMIq/yBGRfwQMmFmc
-	OD7S2RabvPhDGk8cOzJXVxXInZRU+8baAtmBb1quL3cUnhRX6zlRBsbfPk0LmJMXBBiAJI
-	XXEm4SQ6cUHDRggc3M/kwYiEXSmtvsg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-546-zbCwwYFpPIeu9LRA7d9yaA-1; Fri, 12 Jul 2024 04:53:45 -0400
-X-MC-Unique: zbCwwYFpPIeu9LRA7d9yaA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a77f0eca75bso173029866b.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 01:53:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720774424; x=1721379224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/6eZohFqmRNYBDXGIYv2tB15qLRHJ4lN578ZEp/GlC8=;
-        b=bjU9mYcoKyPivbESMOIRPc57X/4gLlZIE6C7E3gtzI/+KwdV9qR5naLIQ0n8VtBXMG
-         MND4zQ44JCEnw98ZOAvHE3T7Omerd3qDd703cIZIQpOk9CUNXuWjSzRFuR75d19ZFG5k
-         dLwDLbBMVjTg+RNaYEHJg7IdGwaDLgtf8etIB8r/qL4vAexM2EXWgYm3ju0OGFYfO4ZV
-         VpNrAd1yNRI6XKWWmcs49sl7v6+mWfkTVUSJs8mgCMsteVsSvZa4F202i9qwhggz/Di4
-         +19V4W9fTI8qq6sQWOJFkQgK0PuSAGopnXGbPQtqsRv3do1OC+kl/lsAEiTwn9KcmRW3
-         N7Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLgym9JK+JZSEWQSHSPTT334+8v6pQnvpMwiyt/vu74j9GCTo+uiVLh+kWRwxjhuk9Yxcgio/XqaqiCgjGQqQ94jMxqiTj
-X-Gm-Message-State: AOJu0YymyZG7dd9atIR64S7TtFC2jW/0BPbs3SmR1S7P12igkFPI+zUS
-	lHkDz2q/pwWp0Sp0Y0aQahr2AZlVolci3OVclzBfsb2nIFOxmklisdZJqVq7pU/5K3EH/rDXpOX
-	MLRsI8GapoYrRo5cr2DJ/UdOl2FLJcwwTFlLbquio5VJV1Gkzz/hflQ==
-X-Received: by 2002:a17:907:3f1c:b0:a79:8149:967a with SMTP id a640c23a62f3a-a7981499859mr589657966b.16.1720774424715;
-        Fri, 12 Jul 2024 01:53:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHpV63wxZL+4AWmv5IQrzSy5U9zbXvyslQuXagjzNSHgkYzRL5RG5InQqljmrd5V56lJG4Yxg==
-X-Received: by 2002:a17:907:3f1c:b0:a79:8149:967a with SMTP id a640c23a62f3a-a7981499859mr589655066b.16.1720774424085;
-        Fri, 12 Jul 2024 01:53:44 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-153.retail.telecomitalia.it. [82.57.51.153])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6dc721sm322652666b.53.2024.07.12.01.53.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 01:53:43 -0700 (PDT)
-Date: Fri, 12 Jul 2024 10:53:39 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peng Fan <peng.fan@nxp.com>, 
-	"Peng Fan (OSS)" <peng.fan@oss.nxp.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] test/vsock: add install target
-Message-ID: <3cx46c62lttslofdaneqqmsrcffeeblgy3d7eumuwx6x72xqtm@uux54tnn5fe7>
-References: <20240709135051.3152502-1-peng.fan@oss.nxp.com>
- <twxr5pyfntg6igr4mznbljf6kmukxeqwsd222rhiisxonjst2p@suum7sgl5tss>
- <PAXPR04MB845959D5F558BCC2AB46575788A42@PAXPR04MB8459.eurprd04.prod.outlook.com>
- <pugaghoxmegwtlzcmdaqhi5j77dvqpwg4qiu46knvdfu3bx7vt@cnqycuxo5pjb>
- <PAXPR04MB845955C754284163737BECE788A42@PAXPR04MB8459.eurprd04.prod.outlook.com>
- <whgbeixcinqi2dmcfxxy4h7xfzjjx3kpsqsmjiffkkaijlxh6i@ozhumbrjse3c>
- <20240710190059.06f01a4c@kernel.org>
- <hxsdbdaywybncq5tdusx2zosfnhzxmu3zvlus7s722whwf4wei@amci3g47la7x>
- <20240711133801.GA18681@fedora.redhat.com>
- <20240711071455.5abfaae9@kernel.org>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4Z/Fz9ARX3TbHcqBtR1E6kdAR1Rn0Sr+B9M8f/oJ2vk=;
+	b=um9lUo348lxFZFvB3wzvTPZJKIjJ2IjeQUu2BCS5DAlIkdAzGGHYxHutGER+8i2SGxMaGm
+	rkEJyzH8yE0d/NKFK7MNbepB8O2Vc1GXpXnTLXENQ2LU5BUtHfwYKReTbvq3aEJsBy+ieP
+	FV3kx8bzFbKIYwPZgFz0G+CrURyxg2MyN8qXxbMQEj4ljZVHXVYHYahKera26oAUzx3tWr
+	c+LI9jCrKzRdY78XRdcYOYRJa3XcnN/BAby1kVKXRMnBh53f9KRDeW/skgkGNtDA9V1iIO
+	QIS4HyMoNe6ue4myIH6i+aLYwEPoXOMuYppIxeMZ6HyMMykCBhsM0HuLgXKt8Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1720774552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4Z/Fz9ARX3TbHcqBtR1E6kdAR1Rn0Sr+B9M8f/oJ2vk=;
+	b=+I5gGEvCnszFkumtMEYHEnq+kaNihomMmBESMr9BGswdGr0C7tc0UXKB7hKYMWLeKV7ba7
+	gktKEr1/KbKbfGAQ==
+Subject: [PATCH iwl-next v5 0/4] igb: Add support for AF_XDP zero-copy
+Date: Fri, 12 Jul 2024 10:55:28 +0200
+Message-Id: <20240711-b4-igb_zero_copy-v5-0-f3f455113b11@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240711071455.5abfaae9@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIDvkGYC/x2N0QrCMAwAf2Xk2UA7JwN/RWQ0NdsCpR2p0+nYv
+ xt8vIPjdqiswhWuzQ7KL6lSssHl1ECcQ54Y5WEMrWs713uP1KFMNHxZyxDL8kGi3oWz50huBMs
+ oVEbSkONsYV5TMrkoj7L9PzeQd8LM2xPux/EDEjdwyIEAAAA=
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
+ Benjamin Steinke <benjamin.steinke@woks-audio.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, Sriram Yagnaraman <sriram.yagnaraman@est.tech>, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2983; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=bzZ/1VBPkM1Y2l73oHvsrDybWmcjoURQWVULOSP7hAQ=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmkO+V+xXly1mMzX8r36JIFCPESwSq+6+l1mJNR
+ 4TYFZNWPkqJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZpDvlQAKCRDBk9HyqkZz
+ gk+7EACInF4oC1+RbgHdj9yu93XqJE7Qx+bSmOJwzbZY6QG0fkzw9/sTQfXnj+QmNmeKHzAK3As
+ fYCDb0dyi2cfglpFy2WS0MHSWPdzVkJmbtPS1gUHTF+w19nftS8on90te2olQaSxjeuJ7u91C20
+ SMwXsXH8ErKsZSJ5Xethl3pPR49uDq3D8tDjVoW60LYwOxRVJ71v/VJMlqVT9gkaKVpmyhcGi8M
+ PmZs9jWF61304AeI4XYFXq9oJ//dPT/ET6U6oN1p0nxcwsFfjgabgDIGx6PwWPcbpZaEwh2d9gQ
+ 5VFGnRnzq1PRmBI+MZit5xbiyWYhZWb9omsIHoKB/zgQOPORraZy5PgBdiEo66hi1pr4lPhI7y5
+ CY2F7ill3v6Oa3PgZfmlhDtg4wgtgO4XsPMHzJslVsmuUdoUolcQssG0hknOmJTWH65zB0ezDYW
+ 13tfngMJ68bwwNB6gwR5+6hvo8oU/VaSurXryyY0JKbiE3Yhw+NA5L7AMJRyoAbS0WxCbQ1Ni8H
+ XLPv7g8vltRspA2xxRxuvIKdYe2g/m8TCfGRnxzaZnHyhH8aLkKdHsScM2a+CJRWdSNIehSJHUR
+ wzrDPJGGPX4UQc5N7V2gF5Ic9455Sw/fRxo3ob+rZrIBcrhEnJF4uVp78hQneu/CVk9aEe3bivD
+ W9u8JDUX/GccYgA==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-On Thu, Jul 11, 2024 at 07:14:55AM GMT, Jakub Kicinski wrote:
->On Thu, 11 Jul 2024 15:38:01 +0200 Stefan Hajnoczi wrote:
->> > Usually vsock tests test both the driver (virtio-vsock) in the guest and the
->> > device in the host kernel (vhost-vsock). So I usually run the tests in 2
->> > nested VMs to test the latest changes for both the guest and the host.
->> >
->> > I don't know enough selftests, but do you think it is possible to integrate
->> > them?
->> >
->> > CCing Stefan who is the original author and may remember more reasons about
->> > this choice.
->>
->> It's probably because of the manual steps in tools/testing/vsock/README:
->>
->>   The following prerequisite steps are not automated and must be performed prior
->>   to running tests:
->>
->>   1. Build the kernel, make headers_install, and build these tests.
->>   2. Install the kernel and tests on the host.
->>   3. Install the kernel and tests inside the guest.
->>   4. Boot the guest and ensure that the AF_VSOCK transport is enabled.
->>
->> If you want to automate this for QEMU, VMware, and Hyper-V that would be
->> great. It relies on having a guest running under these hypervisors and
->> that's not trivial to automate (plus it involves proprietary software
->> for VMware and Hyper-V that may not be available without additional
->> license agreements and/or payment).
->
->Not sure if there's a requirement that full process is automated.
->Or at least if there is we are already breaking it in networking
->because for some tests we need user to export some env variables
->to point the test to the right interfaces and even a remote machine
->to generate traffic. If the env isn't set up tests return 4 (SKIP).
->I don't feel strongly that ksft + env approach is better but at
->least it gives us easy access to the basic build and packaging
->features from ksft. Up to you but thought I'd ask.
->
+This is version 5 of the AF_XDP zero-copy support for igb. Since Sriram's
+duties changed I am sending this instead. Additionally, I've tested this on
+real hardware, Intel i210 [1].
 
-Yeah, I'll try to allocate some cycles to look into that. Tracking it 
-here: https://gitlab.com/vsock/vsock/-/issues/13
+Changes since v4:
 
-What about this patch, can we queue it for now?
+ - Rebase to v6.10
+ - Fix issue reported by kernel test robot
+ - Provide napi_id for for xdp_rxq_info_reg() so that busy polling works
+ - Set olinfo_status in igb_xmit_zc() so that frames are transmitted
 
-Thanks,
-Stefano
+Link to v4: https://lore.kernel.org/intel-wired-lan/20230804084051.14194-1-sriram.yagnaraman@est.tech/
+
+[1] - https://github.com/Linutronix/TSN-Testbench/tree/main/tests/busypolling_i210
+
+Original cover letter:
+
+The first couple of patches adds helper funcctions to prepare for AF_XDP
+zero-copy support which comes in the last couple of patches, one each
+for Rx and TX paths.
+
+As mentioned in v1 patchset [0], I don't have access to an actual IGB
+device to provide correct performance numbers. I have used Intel 82576EB
+emulator in QEMU [1] to test the changes to IGB driver.
+
+The tests use one isolated vCPU for RX/TX and one isolated vCPU for the
+xdp-sock application [2]. Hope these measurements provide at the least
+some indication on the increase in performance when using ZC, especially
+in the TX path. It would be awesome if someone with a real IGB NIC can
+test the patch.
+
+AF_XDP performance using 64 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-DRV		XDP-DRV(ZC)
+rxdrop		220		235		350
+txpush		1.000		1.000		410
+l2fwd 		1.000		1.000		200
+
+AF_XDP performance using 1500 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-DRV		XDP-DRV(ZC)
+rxdrop		200		210		310
+txpush		1.000		1.000		410
+l2fwd 		0.900		1.000		160
+
+[0]: https://lore.kernel.org/intel-wired-lan/20230704095915.9750-1-sriram.yagnaraman@est.tech/
+[1]: https://www.qemu.org/docs/master/system/devices/igb.html
+[2]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
+
+v3->v4:
+- NULL check buffer_info in igb_dump before dereferencing (Simon Horman)
+
+v2->v3:
+- Avoid TX unit hang when using AF_XDP zero-copy by setting time_stamp
+  on the tx_buffer_info
+- Fix uninitialized nb_buffs (Simon Horman)
+
+v1->v2:
+- Use batch XSK APIs (Maciej Fijalkowski)
+- Follow reverse xmas tree convention and remove the ternary operator
+  use (Simon Horman)
+
+---
+Sriram Yagnaraman (4):
+      igb: prepare for AF_XDP zero-copy support
+      igb: Introduce XSK data structures and helpers
+      igb: add AF_XDP zero-copy Rx support
+      igb: add AF_XDP zero-copy Tx support
+
+ drivers/net/ethernet/intel/igb/Makefile   |   2 +-
+ drivers/net/ethernet/intel/igb/igb.h      |  35 +-
+ drivers/net/ethernet/intel/igb/igb_main.c | 189 ++++++++---
+ drivers/net/ethernet/intel/igb/igb_xsk.c  | 522 ++++++++++++++++++++++++++++++
+ 4 files changed, 700 insertions(+), 48 deletions(-)
+---
+base-commit: 2a4183f864dad50f84edb6b67a2807a438f944fd
+change-id: 20240711-b4-igb_zero_copy-bb70a31ecb0f
+
+Best regards,
+-- 
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
