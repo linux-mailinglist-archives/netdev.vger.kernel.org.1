@@ -1,207 +1,94 @@
-Return-Path: <netdev+bounces-111140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16CD93002E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 20:07:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8D193006A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 20:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 094891C213A8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 18:07:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E22C3B2359A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 18:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F2A1779B8;
-	Fri, 12 Jul 2024 18:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E8C18AF9;
+	Fri, 12 Jul 2024 18:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjkvxCDn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="haKkiWwW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D799D1779B1
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 18:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5297A18EA2;
+	Fri, 12 Jul 2024 18:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720807631; cv=none; b=bVue3Zu+sSvzAaKtVf1tjDzlRIUh93wXmcW6k3C4tnTVDK5FN0BNXYPthggymwgF5zp582PdEsT6IhCwjv7I6j2Qk2TwzH+AcrTURseB6wtlSr6sXJXjz4ogCCp2v/lWpTPQabWI12LIz6tJAW9lGqE4L2qVhRzRX/vJYejlhPc=
+	t=1720808426; cv=none; b=TJMfb4qyd5xCi4PKCA5EOz8uR3ELK5ugoGHbl4fMHuDFbPmbZNrmpDpdLWnEjfPfGaQziZEmJ83jRw11/vcLT7OzjIQGdP/Luyauur3Q3xjVLx4s4zLlAhvvX0oxGddhgNa/U+PfQb+B1iCsAKuUv6K98wIOtF6FuAH9N7DHISk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720807631; c=relaxed/simple;
-	bh=7StgXDt3Bfj8YypYQ53JnodI6Mkg/jFSULezrQfBVyU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D2CvDg6ENHTOfs5PQKaEICdwR2Vruruz+pPrCVzRKU7sgGHoMuD2mfUVnCidUhIJUuUSM4yu/RXjSKVzknd+sIumLiXfC+kfaTx6/dWPlvHG2GOjOorCLFYKT1990jIUPUgqy9rfeTq4qoU9Mdlhh2eIqcR8r/SCuBR49oNeTrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjkvxCDn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 138C4C4AF0C;
-	Fri, 12 Jul 2024 18:07:11 +0000 (UTC)
+	s=arc-20240116; t=1720808426; c=relaxed/simple;
+	bh=i/tK8RDXFn4KoGAhILklscvA71+oECCSOQkenxyUpbo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y7qNIVykjdLYfEhop02tlddr51k/fX/++wJZ7d46Ya5TbRXHo2qWexHca27wtU0jayW0dxvRyEvHR/3WqhsbhO/nhDgfsZImKHCeptEtrfhsMGVo6ObSS9YdEOCObYUU21BqgKlWc7oob+6qSLIJ9c7zu+1h1lrUCkIW58DdMlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=haKkiWwW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 900DEC4AF09;
+	Fri, 12 Jul 2024 18:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720807631;
-	bh=7StgXDt3Bfj8YypYQ53JnodI6Mkg/jFSULezrQfBVyU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SjkvxCDnStsI55/U2mR52PuC0PaFJEq5LpnJ6djyC8PbSRCW/XakY4AckCRWQaV2c
-	 Ukcp+OM/bQrRP86cPlAOnOitb2LNq1alh2tprtOnDNvAvpuSRK0kWiwqS5nfXuYEbt
-	 0EILkwssGCDFywOD4sXZKKgF/cMk4lpxeOWUnd5UUEJxfuxAjO1WyGPqawkyZbU2oE
-	 KaFf7NxV4ea8N9VWdkTpwrlE8S3X45j8LwSFA9U9oLrdg/D7J4dOSaFBYOXQcZC1yC
-	 jVZsjWNLdjQfY24YyTYOZ8si+y3VENHf5PExYQ3yNvxqKDP3bXt7YveKpf5HNNlroR
-	 PB6oEMpuHFAgA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: mkubecek@suse.cz
-Cc: netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	Jakub Kicinski <kuba@kernel.org>,
-	idosch@nvidia.com,
-	danieller@nvidia.com
-Subject: [PATCH ethtool-next] module-eeprom: treat zero arguments like any other arguments for hex dump
-Date: Fri, 12 Jul 2024 11:07:06 -0700
-Message-ID: <20240712180706.466124-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=k20201202; t=1720808426;
+	bh=i/tK8RDXFn4KoGAhILklscvA71+oECCSOQkenxyUpbo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=haKkiWwWEeXzBUAUfEvsHVmQs3SovcnVCl0c58as20YBRukHOtgPETQwktVMtuDMX
+	 fzeCXDKLrAfbElg2Bjo3xHEKq3vuJhbdobw8uUOsyfmTdJDZj8oxRAerdX4mLko3X7
+	 RgP2c1TBTT19mYN+ntSa2Qr1vgUBhXHAjoYvgmUcsoVzV9XnaaErUMXemF6Uq/gkq+
+	 /wy8YuzkHkBzieJ/urc1ZH9HJ+IYZH+A4bQuxtuP+pKhGhgR1AsDt8IEFJbXzaudkR
+	 CLTW/N8zjHc1f/nde/xfdpw9jKJ21vEQG5hMEkUb/1j07piUbgMNGMQIpMPa9dOupv
+	 2RcVLW5kb9YWw==
+Date: Fri, 12 Jul 2024 19:20:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, Aishwarya TCV <aishwarya.tcv@arm.com>
+Subject: Re: [PATCH net-next] net: virtio: fix virtnet_sq_free_stats
+ initialization
+Message-ID: <20240712182021.GC120802@kernel.org>
+References: <20240712080329.197605-2-jean-philippe@linaro.org>
+ <20240712064019-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240712064019-mutt-send-email-mst@kernel.org>
 
-The code does not differentiate between user asking for page 0 and
-page not being set on the CLI at all. This is problematic because
-drivers don't support old type of dumping for newer module types.
-For example trying to hex dump EEPROM of a QSFP-DD on mlx5 gives
-us in kernel logs:
+On Fri, Jul 12, 2024 at 06:41:34AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jul 12, 2024 at 09:03:30AM +0100, Jean-Philippe Brucker wrote:
+> > Commit c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
+> > added two new fields to struct virtnet_sq_free_stats, but commit
+> > 23c81a20b998 ("net: virtio: unify code to init stats") accidentally
+> > removed their initialization. In the worst case this can trigger the BUG
+> > at lib/dynamic_queue_limits.c:99 because dql_completed() receives a
+> > random value as count. Initialize the whole structure.
+> > 
+> > Fixes: 23c81a20b998 ("net: virtio: unify code to init stats")
+> > Reported-by: Aishwarya TCV <aishwarya.tcv@arm.com>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> 
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> > ---
+> > Both these patches are still in next so it might be possible to fix it
+> > up directly.
+> 
+> I'd be fine with squashing but I don't think it's done in net-next.
 
-  mlx5_query_module_eeprom[...]: Module ID not recognized: 0x18
+True, but this patch doesn't apply to net-next.
+And 23c81a20b998 ("net: virtio: unify code to init stats")
+isn't present in net-next.
 
-We can dump all the non-zero pages, and without "hex on" ethtool
-also uses the page-aware API to get the information it will print.
-But hex dumping page 0 is not possible.
-
-Instead of using zero / non-zero to figure out whether param was
-set - add a bitmap of which params got set on command line.
-The nl_param()'s dest option is not used by any other command,
-so we're free to change the format.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: idosch@nvidia.com
-CC: danieller@nvidia.com
----
- netlink/module-eeprom.c | 30 +++++++++++++++++++++---------
- netlink/parser.c        | 11 +++++++++--
- 2 files changed, 30 insertions(+), 11 deletions(-)
-
-diff --git a/netlink/module-eeprom.c b/netlink/module-eeprom.c
-index fe02c5ab2b65..2b30d042c00a 100644
---- a/netlink/module-eeprom.c
-+++ b/netlink/module-eeprom.c
-@@ -22,6 +22,7 @@
- #define ETH_I2C_MAX_ADDRESS	0x7F
- 
- struct cmd_params {
-+	unsigned long present;
- 	u8 dump_hex;
- 	u8 dump_raw;
- 	u32 offset;
-@@ -31,6 +32,14 @@ struct cmd_params {
- 	u32 i2c_address;
- };
- 
-+enum {
-+	PARAM_OFFSET = 2,
-+	PARAM_LENGTH,
-+	PARAM_PAGE,
-+	PARAM_BANK,
-+	PARAM_I2C,
-+};
-+
- static const struct param_parser getmodule_params[] = {
- 	{
- 		.arg		= "hex",
-@@ -44,31 +53,31 @@ static const struct param_parser getmodule_params[] = {
- 		.dest_offset	= offsetof(struct cmd_params, dump_raw),
- 		.min_argc	= 1,
- 	},
--	{
-+	[PARAM_OFFSET] = {
- 		.arg		= "offset",
- 		.handler	= nl_parse_direct_u32,
- 		.dest_offset	= offsetof(struct cmd_params, offset),
- 		.min_argc	= 1,
- 	},
--	{
-+	[PARAM_LENGTH] = {
- 		.arg		= "length",
- 		.handler	= nl_parse_direct_u32,
- 		.dest_offset	= offsetof(struct cmd_params, length),
- 		.min_argc	= 1,
- 	},
--	{
-+	[PARAM_PAGE] = {
- 		.arg		= "page",
- 		.handler	= nl_parse_direct_u32,
- 		.dest_offset	= offsetof(struct cmd_params, page),
- 		.min_argc	= 1,
- 	},
--	{
-+	[PARAM_BANK] = {
- 		.arg		= "bank",
- 		.handler	= nl_parse_direct_u32,
- 		.dest_offset	= offsetof(struct cmd_params, bank),
- 		.min_argc	= 1,
- 	},
--	{
-+	[PARAM_I2C] = {
- 		.arg		= "i2c",
- 		.handler	= nl_parse_direct_u32,
- 		.dest_offset	= offsetof(struct cmd_params, i2c_address),
-@@ -267,15 +276,18 @@ int nl_getmodule(struct cmd_context *ctx)
- 	 * ioctl. Netlink can only request specific pages.
- 	 */
- 	if ((getmodule_cmd_params.dump_hex || getmodule_cmd_params.dump_raw) &&
--	    !getmodule_cmd_params.page && !getmodule_cmd_params.bank &&
--	    !getmodule_cmd_params.i2c_address) {
-+	    !(getmodule_cmd_params.present & (1 << PARAM_PAGE |
-+					      1 << PARAM_BANK |
-+					      1 << PARAM_I2C))) {
- 		nlctx->ioctl_fallback = true;
- 		return -EOPNOTSUPP;
- 	}
- 
- #ifdef ETHTOOL_ENABLE_PRETTY_DUMP
--	if (getmodule_cmd_params.page || getmodule_cmd_params.bank ||
--	    getmodule_cmd_params.offset || getmodule_cmd_params.length)
-+	if (getmodule_cmd_params.present & (1 << PARAM_PAGE |
-+					    1 << PARAM_BANK |
-+					    1 << PARAM_OFFSET |
-+					    1 << PARAM_LENGTH))
- #endif
- 		getmodule_cmd_params.dump_hex = true;
- 
-diff --git a/netlink/parser.c b/netlink/parser.c
-index 6f863610a490..cd32752a9ddb 100644
---- a/netlink/parser.c
-+++ b/netlink/parser.c
-@@ -996,7 +996,7 @@ static void tmp_buff_destroy(struct tmp_buff *head)
-  *               and their handlers; the array must be terminated by null
-  *               element {}
-  * @dest:        optional destination to copy parsed data to (at
-- *               param_parser::offset)
-+ *               param_parser::offset); buffer should start with presence bitmap
-  * @group_style: defines if identifiers in .group represent separate messages,
-  *               nested attributes or are not allowed
-  * @msgbuffs:    (only used for @group_style = PARSER_GROUP_MSG) array to store
-@@ -1096,7 +1096,14 @@ int nl_parser(struct nl_context *nlctx, const struct param_parser *params,
- 			buff = tmp_buff_find(buffs, parser->group);
- 		msgbuff = buff ? buff->msgbuff : &nlsk->msgbuff;
- 
--		param_dest = dest ? ((char *)dest + parser->dest_offset) : NULL;
-+		if (dest) {
-+			unsigned long index = parser - params;
-+
-+			param_dest = ((char *)dest + parser->dest_offset);
-+			set_bit(index, (unsigned long *)dest);
-+		} else {
-+			param_dest = NULL;
-+		}
- 		ret = parser->handler(nlctx, parser->type, parser->handler_data,
- 				      msgbuff, param_dest);
- 		if (ret < 0)
--- 
-2.45.2
-
+...
 
