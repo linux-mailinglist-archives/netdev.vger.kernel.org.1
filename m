@@ -1,115 +1,148 @@
-Return-Path: <netdev+bounces-111084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79D392FCF8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:55:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F3392FD05
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 16:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB3491C225B3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:55:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED185284905
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 14:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B4B172BD1;
-	Fri, 12 Jul 2024 14:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5JaZNGQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54A7172BAE;
+	Fri, 12 Jul 2024 14:56:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460DF1741D4
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 14:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7571E4A9
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 14:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720796082; cv=none; b=FH6VQjQcXTNQBX9RepvHmpH4On9VAl+4sr07ct2yJ+ATbTd32Z9pcY6OsoWRn4te9mLnrRCY69TpwWFLQ5DVKdZMcHXVGr5zbxbo/4mIjRQmp6NwwUiy59kdU3oqI6Wd1KpinKsF6sNKjjNKcSC+RX+b7L+NZydqSXasze9W1q4=
+	t=1720796203; cv=none; b=emudwYizVcZHASEQVzh19IbseNWSmpR/RZSXHyEroYB62HC1JgBkgmu58fA6AOezkI16MnT4p9VXwGWv6gQ5fVl0CAOKtONpARt5oEbHaasOC0KUJYYI9gai0JPSG7RkDO5T8tGY0bB+bijl/K88qzF9Wc+Gi9CBI0K4Rpg/llI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720796082; c=relaxed/simple;
-	bh=/42u5tOBK3DmneyO/dWXEB4gsWKjJ/DxXBVy9Gm1Zhs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nPkoYxGJm1LmOnL9SiMS27uY0lnAOPWe8kC4mTNfUDl5y02/C0i9YgTcIDwRXhckoZ+joP383u99BmsUYX4wQsfiWDUotFuSR/P6lWeGQWGbnFQ0J3WA92flcxcO1WvUWCPkkkewWAUJTnhD9fSnf8OjeLqCL7N2ZWgasdztw2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5JaZNGQ; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1720796203; c=relaxed/simple;
+	bh=qosK8kyeYcgCOZq0j3+LMVxskVgvLDpUzlaOw5qjIC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IRg25m3XTBKSPQOt5Pnh1Z88yqzBfG3lnZS7tUvHZeIz83/BUET2vjJf7HgwrUcnGlnj8swtRlLQZ/RUpCcQWTn1b41eOeKmqjCDBDXIef9HT0kWLIEyT0AgVtGQiLcptRrG51TkP9x3ri5BCpYzcptoyuEKYPnMNcczgcpqC5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79ef810bd4fso139898085a.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 07:54:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720796080; x=1721400880; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RW3/Nj9/9Mv8ufkpNF8ht6um9Bus4NZDvgaHTdS3HtA=;
-        b=D5JaZNGQ8CsT5wNtXoJ+u14W7GRG242HzaOOD2Mx+TTmQW2jbpZZKigY0BJASozP6W
-         Su6ZPsaFmAop1iqSKX42K2yQspYjAFQc5Yz1NQTYZU/jY9ZyQz8Q5q+UF10GjLFUXBWw
-         +5NOoBvYziNCmAQ1SVhcHaF7eKd4psq879yXE2PVds0cx8ELoRBHP+FIoUu/k6/SUe6X
-         JUtAQu0NyDM36c53Imk+nTvcXDuXLKC3LU3dh7UY0dtag18WLcjW7s8LBg8oU4eECSPc
-         3mwywqllshlzeKYoWztvgqEIb5stTyIUGJ6pf3xOtZO7aGXKWyqyEeeQppGDKrabhdli
-         QsAw==
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a77dc08db60so263153966b.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 07:56:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720796080; x=1721400880;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RW3/Nj9/9Mv8ufkpNF8ht6um9Bus4NZDvgaHTdS3HtA=;
-        b=AANjwIUinfP8pbAND2ifiIDvzj9QNiXNbg0SyAbD0vhzvw381ngU2d2EwN070bKTCo
-         JBW/PSy72uwIj3KFgRLgNL6NjW/Ngrp+L6ISq6uAUynF/9BiqBIakLts0V8/5ZckikSS
-         fH2JDXuf18ROhEXKX3IlNNWRjE9WRu2hDyg1+TRk41aUL0qZRc+M3OdfsSbxPz2MVz/R
-         uEueoNwnn8CN6yCtF8F/IMjNQs8jSOrZW+cq2MYUl8ksoQWEPlDFHK0GVqLeB4xGBZBE
-         1NTIF03N1eKUC2lKZVWFGXiy15S4YXSlCF+cVTIY02lCUswj9gNMtf1bsRs0OzvT7ya8
-         puJg==
-X-Gm-Message-State: AOJu0YyXFzSQ7vT12xvqPGwBxuvyY+JTtab3KMw25NTYyMjb3am7GzXC
-	xjjWdv4QAO3muyrAPjFWksEifIjMYeCJZHPOM0oC7hijm1yOQdHHJJrZeA==
-X-Google-Smtp-Source: AGHT+IFX340H488wQP5jkhrsOkiAX85tv+D9O5ef2kh3/MwdZDiWIyE8pzQLt/t+jUPwa0OzSLNFqw==
-X-Received: by 2002:a05:620a:2952:b0:79f:af4:66f1 with SMTP id af79cd13be357-79f19bdff8cmr1618132185a.50.1720796079942;
-        Fri, 12 Jul 2024 07:54:39 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1457912f9sm224054385a.114.2024.07.12.07.54.39
+        d=1e100.net; s=20230601; t=1720796200; x=1721401000;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bGDz4ahuF9yVsDXMP9oVtmyKtWQnnlex8CnWjbAFYtY=;
+        b=Yb1zhQmQLwqTWvOrTye3/E5fGuB55S3Jo2ykLw6/UqNOSY6R84aAit2JH8Swmq2o/e
+         ftBUQqXceu5F46pFIdRVWI54C+4GNgmrqLvQB5dML1Osx57f65sf5D+hPDnkCRXXeoku
+         LViBSWwGrxVp8NFKkhz085d7bhtLYuyw802wo4EQX7uMrdGSVmnggUVsm7eXhC282zal
+         j42iyTRPZqScSo6OuEWDIddAYJ2+e1OButBWQp1k1OWDLRHQMFBbZVXqdWOEjiKP2In8
+         pQzYmthxBLFl7lRRRgk1lzGe61XkdT/EaGYvyhznZ1RPA5gGEsuGyRCl8x9JSmaPdYau
+         /+pQ==
+X-Gm-Message-State: AOJu0Yzok3b0//fWQ4f2tF1Yi8eAMZvzrtXNrsG13YRorZu293Za6TFG
+	yxN5Z0hUQxwn7aK10AuC+NPPQfXc5Oar5XjPd2Oej5l9wNdF0jRfd1cdYA==
+X-Google-Smtp-Source: AGHT+IFl/NKU278rbk3PiMoys33DrCCbsLcoCWu9qujXlpNyNnPxP3jmSTuIfqBR4Io/dRGs/2TKAg==
+X-Received: by 2002:a17:906:f6d5:b0:a75:3c2d:cd8e with SMTP id a640c23a62f3a-a780b6b1941mr753787166b.27.1720796200268;
+        Fri, 12 Jul 2024 07:56:40 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a780a6e1737sm349866566b.89.2024.07.12.07.56.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 07:54:39 -0700 (PDT)
-Date: Fri, 12 Jul 2024 10:54:38 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- grzegorz.szpetkowski@intel.com
-Cc: netdev@vger.kernel.org, 
- kuniyu@amazon.com
-Message-ID: <669143aedb989_24ac882945e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240711174123.66910-1-kuniyu@amazon.com>
-References: <CY5PR11MB6186C896926FDA33E99BD82081A52@CY5PR11MB6186.namprd11.prod.outlook.com>
- <20240711174123.66910-1-kuniyu@amazon.com>
-Subject: Re: [PATCH net] net: core: sock: add AF_PACKET unsupported binding
- error
+        Fri, 12 Jul 2024 07:56:39 -0700 (PDT)
+Date: Fri, 12 Jul 2024 07:56:37 -0700
+From: Breno Leitao <leitao@debian.org>
+To: michael.chan@broadcom.com, kuba@kernel.org
+Cc: netdev@vger.kernel.org
+Subject: net: bnxt: Crash on 6.10 ioctl
+Message-ID: <ZpFEJeNpwxW1aW9k@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Kuniyuki Iwashima wrote:
-> From: "Szpetkowski, Grzegorz" <grzegorz.szpetkowski@intel.com>
-> Date: Thu, 11 Jul 2024 13:48:07 +0000
-> > Hi All,
-> > 
-> > Currently, when setsockopt() API with SO_BINDTODEVICE option is
-> > called over a raw packet socket, then although the function doesn't
-> > return an error, the socket is not bound to a specific interface.
-> > 
-> > The limitation itself is explicitly stated in man 7 socket, particularly
-> > that SO_BINDTODEVICE is "not supported for packet sockets".
-> > 
-> > The patch below is to align the API, so that it does return failure in
-> > case of a packet socket.
-> 
-> SO_XXX is generic options and can be set to any socket (except for
-> SO_ZEROCOPY due to MSG_ZEROCOPY, see 76851d1212c11), and whether it's
-> really used or not depends on each socket implementation.
-> 
-> Otherwise, we need this kind of change for all socket options and
-> families.
+Hello,
 
-Making this change now might also break applications that
-set it even though it is a noop for them.
+Testing commit 24ca36a562 ("Merge tag 'wq-for-6.10-rc5-fixes' of
+git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq") I am getting the
+following crash in bnxt driver:
+
+	BUG: kernel NULL pointer dereference, address: 00000000000000b8
+	#PF: supervisor read access in kernel mode
+	#PF: error_code(0x0000) - not-present page
+	PGD 0 P4D 0
+	Oops: Oops: 0000 [#1] SMP
+	Hardware name: ...
+	RIP: 0010:bnxt_get_max_rss_ctx_ring (drivers/net/ethernet/broadcom/bnxt/bnxt.c:?)
+	Code: e7 03 44 89 ca 83 e2 fc 31 c0 eb 19 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 4d 8b 12 4d 39 f2 0f 84 92 00 00 00 45 85 c9 74 ef <49> 8b b2 b8 00 00 00 31 db 49 83 f8 03 73 30 48 85 ff 74 db 48 8d
+	All code
+	========
+	   0:	e7 03                	out    %eax,$0x3
+	   2:	44 89 ca             	mov    %r9d,%edx
+	   5:	83 e2 fc             	and    $0xfffffffc,%edx
+	   8:	31 c0                	xor    %eax,%eax
+	   a:	eb 19                	jmp    0x25
+	   c:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+	  13:	00 00 00
+	  16:	0f 1f 00             	nopl   (%rax)
+	  19:	4d 8b 12             	mov    (%r10),%r10
+	  1c:	4d 39 f2             	cmp    %r14,%r10
+	  1f:	0f 84 92 00 00 00    	je     0xb7
+	  25:	45 85 c9             	test   %r9d,%r9d
+	  28:	74 ef                	je     0x19
+	  2a:*	49 8b b2 b8 00 00 00 	mov    0xb8(%r10),%rsi		<-- trapping instruction
+	  31:	31 db                	xor    %ebx,%ebx
+	  33:	49 83 f8 03          	cmp    $0x3,%r8
+	  37:	73 30                	jae    0x69
+	  39:	48 85 ff             	test   %rdi,%rdi
+	  3c:	74 db                	je     0x19
+	  3e:	48                   	rex.W
+	  3f:	8d                   	.byte 0x8d
+
+	Code starting with the faulting instruction
+	===========================================
+	   0:	49 8b b2 b8 00 00 00 	mov    0xb8(%r10),%rsi
+	   7:	31 db                	xor    %ebx,%ebx
+	   9:	49 83 f8 03          	cmp    $0x3,%r8
+	   d:	73 30                	jae    0x3f
+	   f:	48 85 ff             	test   %rdi,%rdi
+	  12:	74 db                	je     0xffffffffffffffef
+	  14:	48                   	rex.W
+	  15:	8d                   	.byte 0x8d
+	RSP: 0018:ffffc900014d3cb8 EFLAGS: 00010202
+	RAX: 0000000000000000 RBX: 0000000000000008 RCX: 0000000000000001
+	RDX: 0000000000000080 RSI: 0000000000000206 RDI: 0000000000000000
+	RBP: 00000000ffffffea R08: 000000000000007f R09: 0000000000000080
+	R10: 0000000000000000 R11: 00000003246184b4 R12: 00007ffc260f65c0
+	R13: ffff888103158000 R14: ffff888103158978 R15: ffff888103158840
+	FS:  00007fbc65e3e940(0000) GS:ffff88903fe40000(0000) knlGS:0000000000000000
+	CR2: 00000000000000b8 CR3: 0000000109c98003 CR4: 00000000007706f0
+	05:56:10  PKRU: 55555554
+	Call Trace:
+	<TASK>
+	? __die_body (arch/x86/kernel/dumpstack.c:421)
+	? page_fault_oops (arch/x86/mm/fault.c:711)
+	? schedule_hrtimeout_range_clock (kernel/time/hrtimer.c:1449 kernel/time/hrtimer.c:2293)
+	? exc_page_fault (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:72 arch/x86/mm/fault.c:1489 arch/x86/mm/fault.c:1539)
+	? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:623)
+	? bnxt_get_max_rss_ctx_ring (drivers/net/ethernet/broadcom/bnxt/bnxt.c:?)
+	? bnxt_get_max_rss_ctx_ring (drivers/net/ethernet/broadcom/bnxt/bnxt.c:?)
+	bnxt_set_channels
+	ethtool_set_channels (net/ethtool/ioctl.c:1941)
+	dev_ethtool (net/ethtool/ioctl.c:? net/ethtool/ioctl.c:3177)
+	dev_ioctl (net/core/dev_ioctl.c:?)
+	sock_do_ioctl (net/socket.c:1236)
+	sock_ioctl (net/socket.c:1341)
+	__se_sys_ioctl (fs/ioctl.c:52 fs/ioctl.c:907 fs/ioctl.c:893)
+	do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+
+Are you aware of this problem?
+Unfortunately I don't have a reproducer at this time.
+
+Thanks
 
