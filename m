@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-111046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66AB492F840
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 11:46:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DEF92F85E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 11:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1ECFB20C8F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 09:46:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89244B212F6
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 09:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20F316C853;
-	Fri, 12 Jul 2024 09:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47256143753;
+	Fri, 12 Jul 2024 09:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b5/sHhyU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SKHKztw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAC116191E;
-	Fri, 12 Jul 2024 09:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C482217BB6;
+	Fri, 12 Jul 2024 09:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720777500; cv=none; b=YCWOMAiLQTIOtqfDWaIhm3xyoxS22MuEoic46ezGv9u3fG/CviRr6DmwAMUSeG0C4onzpWv6hxDNnBLnAJtK4yTRqj8dWQwosMzhiRwgM6ITQ8Oeod6PnGbiDw7DYxdwm4LacgJwI7kTOQLFoZsV5w9sgYhf3XrURt2BHCrqEj4=
+	t=1720777899; cv=none; b=Sx7devkQGPzy6phs06heN1F0TP18N6nax3hiJlh7A63p2dcEY0CybEXIz+2k0FGhEXWLJpqA84GRybXAnUXM1vBeRFzRi+9ypvuTY3RxEvzcaMKqJgXhNtbLNGRMim2+0wl19kcwiyQZv82NU8Fu54tGex5Y0EIg935/YsVZy6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720777500; c=relaxed/simple;
-	bh=tX/q0fTw9m6ieC+UmmbGKmEl0FvW8c1JEqZGZzmtFOA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IjYYEeBBajSn8tfEhAzPWSEUbQe/AZ1Sz0OvYcmG+9dVn9Qu0XQtf5qnM5Qu8dNwu+8x0R8iZLH189/YiXcJpsuqL8FmN/ud4kP9J8nnqO0KZC8kfs+ZUSveYbbGG0V5J5d8Dwx0nrcz3aNgV7wrMtwf+IJA/yR2cD/Eax0HTLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b5/sHhyU; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720777499; x=1752313499;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tX/q0fTw9m6ieC+UmmbGKmEl0FvW8c1JEqZGZzmtFOA=;
-  b=b5/sHhyUrhESsfcomLQC56tQLMGJq4RRceCGV2rTD9zLmxRotJd14/BN
-   4px/cxyfr5a3r40RbKK3OAH0O/wFUev1Pvr/oIiF2vEzrgMw5ipIwp8QG
-   aLtz7gjyXylDkxreQrm+rObqBbNkFke5HRWRUW2ut3Jo4mMBgEzb6orz2
-   SpzvCNWqXaVCjhxxHV4X91prJbIk+/wmkxdLysmTF/vjXT2ATzdcOgLdQ
-   j3XRT72KJJcwaJuo6t2WZj/cgT3LQ3l0wvZQ5ZKqKxuXOvQijp8o9gWQJ
-   t86wwAfhHQLXEKQZM04kgXV4oRqr4Cww3mYFEMD4vEfOKUmbHym73NxUU
-   Q==;
-X-CSE-ConnectionGUID: ttctN885Taehj9hW95hkjQ==
-X-CSE-MsgGUID: aGDzZNUwTEenm8PY8rmRfg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11130"; a="18076995"
-X-IronPort-AV: E=Sophos;i="6.09,202,1716274800"; 
-   d="scan'208";a="18076995"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2024 02:44:57 -0700
-X-CSE-ConnectionGUID: yf2VA5M8TxOUkSwkTLeh5g==
-X-CSE-MsgGUID: hMFeL0atSW+qflhmHc0qTw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,202,1716274800"; 
-   d="scan'208";a="49524319"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa007.jf.intel.com with ESMTP; 12 Jul 2024 02:44:53 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 378DF72;
-	Fri, 12 Jul 2024 10:44:52 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: apw@canonical.com,
-	joe@perches.com,
-	dwaipayanray1@gmail.com,
-	lukas.bulwahn@gmail.com,
-	akpm@linux-foundation.org,
-	willemb@google.com,
+	s=arc-20240116; t=1720777899; c=relaxed/simple;
+	bh=umERRsSd8g5DPFaJVrz5gLIFEmGnXj6vwXWkh9WYxkM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Naz/F0pjzzsns2KGArI/TzybFvIX8Wo1kn6aNlB/QhtcNLAqIgEWazrgRiM0RLwlBaEVwb7Ad+Klvs3UC3rdg3LMj2r35UFZKdiYFvyQSuO7toKzzz3QC4epVtsWjmh8LugAtefprm9Ss/pryDuVxsJcV6jaC8GLChf7XFIbQ1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SKHKztw7; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b0d0a7a56so1652806b3a.0;
+        Fri, 12 Jul 2024 02:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720777897; x=1721382697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wPGPH46k7o5HbMYuCRNoYeBltJb7ZUI77U0SMjuuHjU=;
+        b=SKHKztw7CMXiF9C6JBSJKE9AbwswjARvRw1Zy5wPYzoQ/WrXUcvTwxIoZzrq802P4C
+         pgYU+igwVy7aYGH1Lt9gQdVLu6yCgkxx6GB+ugWe5BSXTEztl8ITmCBfoYQMjBel9qcv
+         2RLVaq90YgoL8MbhygnB/uXqJ8Mx9Z22lPB7lw6Bx7TId42DcVR3eDrM1lzUY45w66qX
+         xIzSU+uG1WMNhZvhyCRam5KBVj2iYJzPUq2Zr+GDHzqvUpRxcAUrOlOMVY3Gp8p4Emyw
+         f2a2SKEC7kgd/w2MAEM6MxVXti4Qw+XrdTQJGvg3EERo04IRuehNES3QmQpWw62AxqEd
+         +nnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720777897; x=1721382697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wPGPH46k7o5HbMYuCRNoYeBltJb7ZUI77U0SMjuuHjU=;
+        b=H7j83e5A1j7p+j2gkJJVKlmIR7XffNDBclyRo8//IxxaV2ggZQftRcht9sHo0ym+96
+         Dj62a8pP5Dd9rojVQUDUaW7zesKbwrn/yFny9GwXGvVx3cp7PLszT9lhMszkGEfJzmy2
+         RqfhfZC5FCpbqpGrkK3GEjDyfCul9ZcCD+trOIdBRXJGl15xaBq6hawkmEQndwlexUjX
+         wfOshBmOtx839mNDoaoRWGQ3vQtvHvd6xxXVWm55kR2qHUFf9FIOZrn2K9/oQELzxLCN
+         No2+WLwEIPOhmZmSGK114Rl/8BtpfjAVnWGSvWeyGMffcqHCUJHpP00TflFZbWRhv4Zb
+         mHrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAh09B6gP1x6SvBtalItwwMaLHXtCwI8DvpDPQtIJbac3Cln5JKctglyYthNskIyWFR8H+m0DOyB7xpHJykQU+l0HZkVI13/J0oBQZM73qGaLWx4FRw+BMVQoM
+X-Gm-Message-State: AOJu0Yyep1dJMyDid4tyMU085Tm5RUlDIDo1alTxIqmz6+txfydQFL1d
+	GFysR4yKIL9koD/7MyHljcmeDO+0CHI8Z2pJKGSbJOT6+F0QDvWe
+X-Google-Smtp-Source: AGHT+IEKqr80F3MwHPFCjT17Ot3ryWgBXRjDoksla2S8v9hjO8fMmSVDt563bpooMOkGaM97GAjiHQ==
+X-Received: by 2002:a05:6a21:7885:b0:1c0:f5fa:db10 with SMTP id adf61e73a8af0-1c297d368c5mr13785343637.0.1720777896870;
+        Fri, 12 Jul 2024 02:51:36 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a292a4sm63379165ad.66.2024.07.12.02.51.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 02:51:36 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
 	netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v2 6/6] ice: devlink health: dump also skb on Tx hang
-Date: Fri, 12 Jul 2024 05:32:51 -0400
-Message-Id: <20240712093251.18683-7-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240712093251.18683-1-mateusz.polchlopek@intel.com>
-References: <20240712093251.18683-1-mateusz.polchlopek@intel.com>
+	bpf@vger.kernel.org
+Cc: ap420073@gmail.com,
+	ilias.apalodimas@linaro.org,
+	jonathan.lemon@gmail.com
+Subject: [PATCH net] xdp: fix invalid wait context of page_pool_destroy()
+Date: Fri, 12 Jul 2024 09:51:16 +0000
+Message-Id: <20240712095116.3801586-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,254 +91,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+If the driver uses a page pool, it creates a page pool with
+page_pool_create().
+The reference count of page pool is 1 as default.
+A page pool will be destroyed only when a reference count reaches 0.
+page_pool_destroy() is used to destroy page pool, it decreases a
+reference count.
+When a page pool is destroyed, ->disconnect() is called, which is
+mem_allocator_disconnect().
+This function internally acquires mutex_lock().
 
-Extend Tx hang devlink health reporter dump by skb content.
+If the driver uses XDP, it registers a memory model with
+xdp_rxq_info_reg_mem_model().
+The xdp_rxq_info_reg_mem_model() internally increases a page pool
+reference count if a memory model is a page pool.
+Now the reference count is 2.
 
-This commit includes much code copy-pasted from:
-- net/core/skbuff.c (function skb_dump() - modified to dump into buffer)
-- lib/hexdump.c (function print_hex_dump())
+To destroy a page pool, the driver should call both page_pool_destroy()
+and xdp_unreg_mem_model().
+The xdp_unreg_mem_model() internally calls page_pool_destroy().
+Only page_pool_destroy() decreases a reference count.
 
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+If a driver calls page_pool_destroy() then xdp_unreg_mem_model(), we
+will face an invalid wait context warning.
+Because xdp_unreg_mem_model() calls page_pool_destroy() with
+rcu_read_lock().
+The page_pool_destroy() internally acquires mutex_lock().
+
+Splat looks like:
+=============================
+[ BUG: Invalid wait context ]
+6.10.0-rc6+ #4 Tainted: G W
+-----------------------------
+ethtool/1806 is trying to lock:
+ffffffff90387b90 (mem_id_lock){+.+.}-{4:4}, at: mem_allocator_disconnect+0x73/0x150
+other info that might help us debug this:
+context-{5:5}
+3 locks held by ethtool/1806:
+stack backtrace:
+CPU: 0 PID: 1806 Comm: ethtool Tainted: G W 6.10.0-rc6+ #4 f916f41f172891c800f2fed
+Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/01/2021
+Call Trace:
+<TASK>
+dump_stack_lvl+0x7e/0xc0
+__lock_acquire+0x1681/0x4de0
+? _printk+0x64/0xe0
+? __pfx_mark_lock.part.0+0x10/0x10
+? __pfx___lock_acquire+0x10/0x10
+lock_acquire+0x1b3/0x580
+? mem_allocator_disconnect+0x73/0x150
+? __wake_up_klogd.part.0+0x16/0xc0
+? __pfx_lock_acquire+0x10/0x10
+? dump_stack_lvl+0x91/0xc0
+__mutex_lock+0x15c/0x1690
+? mem_allocator_disconnect+0x73/0x150
+? __pfx_prb_read_valid+0x10/0x10
+? mem_allocator_disconnect+0x73/0x150
+? __pfx_llist_add_batch+0x10/0x10
+? console_unlock+0x193/0x1b0
+? lockdep_hardirqs_on+0xbe/0x140
+? __pfx___mutex_lock+0x10/0x10
+? tick_nohz_tick_stopped+0x16/0x90
+? __irq_work_queue_local+0x1e5/0x330
+? irq_work_queue+0x39/0x50
+? __wake_up_klogd.part.0+0x79/0xc0
+? mem_allocator_disconnect+0x73/0x150
+mem_allocator_disconnect+0x73/0x150
+? __pfx_mem_allocator_disconnect+0x10/0x10
+? mark_held_locks+0xa5/0xf0
+? rcu_is_watching+0x11/0xb0
+page_pool_release+0x36e/0x6d0
+page_pool_destroy+0xd7/0x440
+xdp_unreg_mem_model+0x1a7/0x2a0
+? __pfx_xdp_unreg_mem_model+0x10/0x10
+? kfree+0x125/0x370
+? bnxt_free_ring.isra.0+0x2eb/0x500
+? bnxt_free_mem+0x5ac/0x2500
+xdp_rxq_info_unreg+0x4a/0xd0
+bnxt_free_mem+0x1356/0x2500
+bnxt_close_nic+0xf0/0x3b0
+? __pfx_bnxt_close_nic+0x10/0x10
+? ethnl_parse_bit+0x2c6/0x6d0
+? __pfx___nla_validate_parse+0x10/0x10
+? __pfx_ethnl_parse_bit+0x10/0x10
+bnxt_set_features+0x2a8/0x3e0
+__netdev_update_features+0x4dc/0x1370
+? ethnl_parse_bitset+0x4ff/0x750
+? __pfx_ethnl_parse_bitset+0x10/0x10
+? __pfx___netdev_update_features+0x10/0x10
+? mark_held_locks+0xa5/0xf0
+? _raw_spin_unlock_irqrestore+0x42/0x70
+? __pm_runtime_resume+0x7d/0x110
+ethnl_set_features+0x32d/0xa20
+
+To fix this problem, it uses rhashtable_lookup_fast() instead of
+rhashtable_lookup() with rcu_read_lock().
+Using xa without rcu_read_lock() here is safe.
+xa is freed by __xdp_mem_allocator_rcu_free() and this is called by
+call_rcu() of mem_xa_remove().
+The mem_xa_remove() is called by page_pool_destroy() if a reference
+count reaches 0.
+The xa is already protected by the reference count mechanism well in the
+control plane.
+So removing rcu_read_lock() for page_pool_destroy() is safe.
+
+Fixes: c3f812cea0d7 ("page_pool: do not release pool until inflight == 0.")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- .../intel/ice/devlink/devlink_health.c        | 197 ++++++++++++++++++
- 1 file changed, 197 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_health.c b/drivers/net/ethernet/intel/ice/devlink/devlink_health.c
-index f9edfabc9be8..1a9b19a7e7e1 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_health.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2024, Intel Corporation. */
+Tested this patch with device memory TCP, which is not yet merged into the 
+net and net-next branch.
+
+ net/core/xdp.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 022c12059cf2..bcc5551c6424 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -127,10 +127,8 @@ void xdp_unreg_mem_model(struct xdp_mem_info *mem)
+ 		return;
  
-+#include <net/genetlink.h>
- #include "devlink_health.h"
- #include "ice.h"
- #include "ice_ethtool_common.h"
-@@ -136,6 +137,188 @@ static void ice_dump_ethtool_stats_to_fmsg(struct devlink_fmsg *fmsg,
- 	kfree(stats);
+ 	if (type == MEM_TYPE_PAGE_POOL) {
+-		rcu_read_lock();
+-		xa = rhashtable_lookup(mem_id_ht, &id, mem_id_rht_params);
++		xa = rhashtable_lookup_fast(mem_id_ht, &id, mem_id_rht_params);
+ 		page_pool_destroy(xa->page_pool);
+-		rcu_read_unlock();
+ 	}
  }
- 
-+/**
-+ * ice_emit_to_buf - print to @size sized buffer
-+ *
-+ * @buf: buffer to print into
-+ * @at: current pos to write in @buf
-+ * @size: total space in @buf (incl. prior to @at)
-+ * @fmt: format of the message to print
-+ *
-+ * Return: position in the @buf for next write, @size at most, to ease out
-+ * error handling.
-+ */
-+static __printf(4, 5)
-+int ice_emit_to_buf(char *buf, int size, int at, const char *fmt, ...)
-+{
-+	va_list args;
-+	int len;
-+
-+	va_start(args, fmt);
-+	len = vscnprintf(buf + at, size - at, fmt, args);
-+	va_end(args);
-+
-+	return min(at + len, size);
-+}
-+
-+/**
-+ * ice_emit_hex_to_buf - copy of print_hex_dump() from lib/hexdump.c modified to
-+ * dump into buffer
-+ *
-+ * @out: buffer to print to
-+ * @out_size: total size of @out
-+ * @out_pos: position in @out to write at
-+ * @prefix: string to prefix each line with;
-+ *  caller supplies trailing spaces for alignment if desired
-+ * @buf: data blob to dump
-+ * @buf_len: number of bytes in the @buf
-+ *
-+ * Return: position in the buf for next write, buf_len at most, to ease out
-+ * error handling.
-+ */
-+static int ice_emit_hex_to_buf(char *out, int out_size, int out_pos,
-+			       const char *prefix, const void *buf,
-+			       size_t buf_len)
-+{
-+	unsigned char linebuf[32 * 3 + 2 + 32 + 1];
-+	const int rowsize = 16, groupsize = 1;
-+	int i, linelen, remaining = buf_len;
-+	const u8 *ptr = buf;
-+
-+	for (i = 0; i < buf_len; i += rowsize) {
-+		linelen = min(remaining, rowsize);
-+		remaining -= rowsize;
-+
-+		hex_dump_to_buffer(ptr + i, linelen, rowsize, groupsize,
-+				   linebuf, sizeof(linebuf), false);
-+		out_pos = ice_emit_to_buf(out, out_size, out_pos,
-+					  "%s%.8x: %s\n", prefix, i, linebuf);
-+
-+		if (out_pos == out_size)
-+			break;
-+	}
-+
-+	return out_pos;
-+}
-+
-+/**
-+ * ice_skb_dump_buf - Dump skb information and contents.
-+ *
-+ * copy of skb_dump() from net/core/skbuff.c, modified to dump into buffer
-+ *
-+ * @skb: skb to dump
-+ * @buf: buffer to dump into
-+ * @buf_size: size of @buf
-+ * @buf_pos: current position to write in @buf
-+ *
-+ * Return: position in the buf for next write.
-+ */
-+static int ice_skb_dump_buf(char *buf, int buf_size, int buf_pos,
-+			    const struct sk_buff *skb)
-+{
-+	struct skb_shared_info *sh = skb_shinfo(skb);
-+	struct net_device *dev = skb->dev;
-+	const bool toplvl = !buf_pos;
-+	struct sock *sk = skb->sk;
-+	struct sk_buff *list_skb;
-+	bool has_mac, has_trans;
-+	int headroom, tailroom;
-+	int i, len, seg_len;
-+
-+	len = skb->len;
-+
-+	headroom = skb_headroom(skb);
-+	tailroom = skb_tailroom(skb);
-+
-+	has_mac = skb_mac_header_was_set(skb);
-+	has_trans = skb_transport_header_was_set(skb);
-+
-+	buf_pos = ice_emit_to_buf(buf, buf_size, buf_pos,
-+		"skb len=%u headroom=%u headlen=%u tailroom=%u\n"
-+		"mac=(%d,%d) net=(%d,%d) trans=%d\n"
-+		"shinfo(txflags=%u nr_frags=%u gso(size=%hu type=%u segs=%hu))\n"
-+		"csum(0x%x ip_summed=%u complete_sw=%u valid=%u level=%u)\n"
-+		"hash(0x%x sw=%u l4=%u) proto=0x%04x pkttype=%u iif=%d\n",
-+		skb->len, headroom, skb_headlen(skb), tailroom,
-+		has_mac ? skb->mac_header : -1,
-+		has_mac ? skb_mac_header_len(skb) : -1,
-+		skb->network_header,
-+		has_trans ? skb_network_header_len(skb) : -1,
-+		has_trans ? skb->transport_header : -1,
-+		sh->tx_flags, sh->nr_frags,
-+		sh->gso_size, sh->gso_type, sh->gso_segs,
-+		skb->csum, skb->ip_summed, skb->csum_complete_sw,
-+		skb->csum_valid, skb->csum_level,
-+		skb->hash, skb->sw_hash, skb->l4_hash,
-+		ntohs(skb->protocol), skb->pkt_type, skb->skb_iif);
-+
-+	if (dev)
-+		buf_pos = ice_emit_to_buf(buf, buf_size, buf_pos,
-+					  "dev name=%s feat=%pNF\n", dev->name,
-+					  &dev->features);
-+	if (sk)
-+		buf_pos = ice_emit_to_buf(buf, buf_size, buf_pos,
-+					  "sk family=%hu type=%u proto=%u\n",
-+					  sk->sk_family, sk->sk_type,
-+					  sk->sk_protocol);
-+
-+	if (headroom)
-+		buf_pos = ice_emit_hex_to_buf(buf, buf_size, buf_pos,
-+					      "skb headroom: ", skb->head,
-+					      headroom);
-+
-+	seg_len = min_t(int, skb_headlen(skb), len);
-+	if (seg_len)
-+		buf_pos = ice_emit_hex_to_buf(buf, buf_size, buf_pos,
-+					      "skb linear:   ", skb->data,
-+					      seg_len);
-+	len -= seg_len;
-+
-+	if (tailroom)
-+		buf_pos = ice_emit_hex_to_buf(buf, buf_size, buf_pos,
-+					      "skb tailroom: ",
-+					      skb_tail_pointer(skb), tailroom);
-+
-+	for (i = 0; len && i < skb_shinfo(skb)->nr_frags; i++) {
-+		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-+		u32 p_off, p_len, copied;
-+		struct page *p;
-+		u8 *vaddr;
-+
-+		skb_frag_foreach_page(frag, skb_frag_off(frag),
-+				      skb_frag_size(frag), p, p_off, p_len,
-+				      copied) {
-+			seg_len = min_t(int, p_len, len);
-+			vaddr = kmap_local_page(p);
-+			buf_pos = ice_emit_hex_to_buf(buf, buf_size, buf_pos,
-+						      "skb frag:     ",
-+						      vaddr + p_off, seg_len);
-+			kunmap_local(vaddr);
-+			len -= seg_len;
-+
-+			if (!len || buf_pos == buf_size)
-+				break;
-+		}
-+	}
-+
-+	if (skb_has_frag_list(skb)) {
-+		buf_pos = ice_emit_to_buf(buf, buf_size, buf_pos,
-+					  "skb fraglist:\n");
-+		skb_walk_frags(skb, list_skb) {
-+			buf_pos = ice_skb_dump_buf(buf, buf_size, buf_pos,
-+						   list_skb);
-+
-+			if (buf_pos == buf_size)
-+				break;
-+		}
-+	}
-+
-+	if (toplvl)
-+		buf_pos = ice_emit_to_buf(buf, buf_size, buf_pos, ".");
-+
-+	return buf_pos;
-+}
-+
- /**
-  * ice_fmsg_put_ptr - put hex value of pointer into fmsg
-  *
-@@ -167,6 +350,10 @@ static int ice_tx_hang_reporter_dump(struct devlink_health_reporter *reporter,
- 				     struct netlink_ext_ack *extack)
- {
- 	struct ice_tx_hang_event *event = priv_ctx;
-+	char *skb_txt = NULL;
-+	struct sk_buff *skb;
-+
-+	skb = event->tx_ring->tx_buf->skb;
- 
- 	devlink_fmsg_obj_nest_start(fmsg);
- 	ICE_DEVLINK_FMSG_PUT_FIELD(fmsg, event, head);
-@@ -178,8 +365,18 @@ static int ice_tx_hang_reporter_dump(struct devlink_health_reporter *reporter,
- 	devlink_fmsg_put(fmsg, "irq-mapping", event->tx_ring->q_vector->name);
- 	ice_fmsg_put_ptr(fmsg, "desc-ptr", event->tx_ring->desc);
- 	ice_fmsg_put_ptr(fmsg, "dma-ptr", (void *)(long)event->tx_ring->dma);
-+	ice_fmsg_put_ptr(fmsg, "skb-ptr", skb);
- 	devlink_fmsg_binary_pair_put(fmsg, "desc", event->tx_ring->desc,
- 				     (event->tx_ring->count * sizeof(struct ice_tx_desc)));
-+	if (skb)
-+		skb_txt = kvmalloc(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+
-+	if (skb_txt) {
-+		ice_skb_dump_buf(skb_txt, GENLMSG_DEFAULT_SIZE, 0, skb);
-+		devlink_fmsg_put(fmsg, "skb", skb_txt);
-+		kvfree(skb_txt);
-+	}
-+
- 	ice_dump_ethtool_stats_to_fmsg(fmsg, event->tx_ring->vsi->netdev);
- 	devlink_fmsg_obj_nest_end(fmsg);
- 
+ EXPORT_SYMBOL_GPL(xdp_unreg_mem_model);
 -- 
-2.38.1
+2.34.1
 
 
