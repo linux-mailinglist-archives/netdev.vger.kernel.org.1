@@ -1,124 +1,125 @@
-Return-Path: <netdev+bounces-111149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3178993011B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:52:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C06693012B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 21:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5474B21F3B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:52:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4048D1F23BFB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6F0381A4;
-	Fri, 12 Jul 2024 19:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB333A1DA;
+	Fri, 12 Jul 2024 19:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Cix14nq6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vLTpUb3E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC7C1B95B;
-	Fri, 12 Jul 2024 19:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1046518E1A
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 19:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720813968; cv=none; b=js0WxOWRtoSyMSZS6rzHAEOWGHD98bs6N8utLJWdtIhABgSA3FL7o3I9VdT5ZWA4GHk3JkUel+HvacpoWNluW8XV00vb5wmfklqtmsY2MmhSDsu+wDy8MygRvPD8Y5g0DdNuOHuUR3APnl3GLdbrf4ZOgdliPZ3caUd53vVRbLw=
+	t=1720814265; cv=none; b=dAXo0AHZRo9ZrW/zpUhlz/ceYpN1jonqyY3LnXQRkY2hQeUjYSQigeDh0M2YkzyRCZuY3ipiGaF/aQWMA8m1E+tHsZtyeYOK1a+zxotsiYzUR1q6eUcVgVHIQNfMw/bpN9WrR5nbm8gn1qEGpZW2u+s3Xrnqfo2XVuTnsCT10JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720813968; c=relaxed/simple;
-	bh=4JpOdrHF9yVIaqkkjK73+x67qt6NLBvjC+qQbGZmaIs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=eFPlUDdr514e3dH9knHmUdvaOL09AvtJKBWz3eiX0QWii52uxULmW5Ap71nADtcD3CTRgjwPdTPqKUz2FPJlsbyW2UK6gSnLOQXpTRq9/t6a9W+x38HOwUMswA5B08xHHc1QkDM0ocZG3AM4zZ8dL1bMX2zgtW2eF97LFeLLMEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Cix14nq6; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1720813935; x=1721418735; i=markus.elfring@web.de;
-	bh=fihKUc/kaj99ERsbRn7CbqhY5SiZXokiELceXjSmV9g=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Cix14nq66GzkZtyXdh6PdQ52Vd+idDVTP8YUDE4w3KNJ/5XpTPwmTfRo1OcG1GU3
-	 uRp+mm8YCIgH817ZxwqVgDyixShkTULs2RhWwY/0EUyRMYQfvyihPfkKI/nM4xsyq
-	 0LyyVSH0oWGxWvSh/PAxstj/oiSaib1f/Uj6p7LuHuh1xToaq/dVH6IqufY+V+uxP
-	 ZbhC+R/M6/phWtkt/AsgjsN2eCICVpuPQLJnB9hmYXYSrhgLrh3CDW855UFD+LHGI
-	 ShfU29XWfeK33PAGdWA3I1Vr0eN0GCKf7CYW1GqvuGMeG7uxMpOE1aNVDVU/Ke04q
-	 Gm0UCGwgjViboTzmPA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MiMEM-1rqIXZ3XXi-00bNg9; Fri, 12
- Jul 2024 21:52:15 +0200
-Message-ID: <fd40e1b9-cb76-4617-b699-19f1f580fe98@web.de>
-Date: Fri, 12 Jul 2024 21:52:14 +0200
+	s=arc-20240116; t=1720814265; c=relaxed/simple;
+	bh=wSshsgGED8HPu10U3N0UkRgySoxyARkIZVNYAB+8/Rk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lOhIKFMRaLKwe63GFdVV5W12BX3Fi0RcwoJr8yqFOAQS3wc8SY2GBzVH/BuOe8M7dJFAX+J/uDfOEOx3BvPrz0BtlnndjQiJf/xKLe/cj9+bPmC264Ttd8xC9urUEfMuTwJJ4FdiHY9yF7/U7P2mUBDEy5eSM4H0eVKL+KeZc0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vLTpUb3E; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3678f36f154so1290679f8f.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 12:57:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1720814262; x=1721419062; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OsMYxX3ARgmF2dcWznWm0q60TUYZFPMB1J4kCza84kA=;
+        b=vLTpUb3Ei5ztAUUbNjTzjnIlYunv1QsRvbuget3Mj93eoVDSUBzoHIbn3z9GyqNy7D
+         hRpdwWPoHvFcbVox7gzK1T13z1vBxD9fBAszMl0VeH6G3mJBqpFEBa9B8oWh/jfp1jcE
+         tr8y0DLkKeCVvN3CLVJM88lBI78VM1qo+yFgqPZWsh+yDOREMEOOnYbv7tGgRVPaiNgr
+         pt0aBnARxEWEosMYedU9/q+YXHvXl2ZoanyNVPukFLs6RkuAkfIandmns8t4KwWZfcdT
+         mzq4ORxFRSFgxT4raBdiQXzGpiCzeHpiNVrcHmBGxF94+9ojH+couhECa8Ht3p6XNx9i
+         F01w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720814262; x=1721419062;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OsMYxX3ARgmF2dcWznWm0q60TUYZFPMB1J4kCza84kA=;
+        b=t694iBRk8Ut366dAHXG0XPm6UzgdxOJhUb3WqdnRdFd0MEZ8tE/7UCB8bPJKqm7uli
+         +wRPSN9XjJs8w1TVZCLZDnwIbxQlgLGiKxGTt2VrPsMVIGGAn9TdMefNre93Ul5remCe
+         havd9McKqyEaiGVhMkKEcRlhnwJdUG2bBT3bl7OV5Mr4fIzWY0Xb0c1nCIB6DSXbw3xy
+         A0exYMmXPyoueN69eXxPhtLD/mztjeAYCaDyyPBh9SyOSTijWpN19jkbB6wXMtcITYP1
+         V7F+Le9P/vsz+0TK7gRME0zpPdB2NMqmbATgLVuNFBfRhdeJoP3JDhOnwBH6AOVGManZ
+         5J6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUT9qa4Eq2MwQZfaDDH4ti5DQ7u2Wd+UqB0YJlrNbkDhrmTcF0+yR4hDXisSsE3JH837QJaZ/EgqXseAsWyCnqAAyvwnmdU
+X-Gm-Message-State: AOJu0Yw8GpHI7E6ity27T17JSCjj4kN+iZlneXxJ+vGIqEqyyXGZWjfW
+	X3o7efrj4Iv9gRx/ZJqr+QTf6D40tVD78LcaWhPyemEYbqxdZ/SSWyGPFq07phk=
+X-Google-Smtp-Source: AGHT+IG3l5o5+v6d2/YWNdG57jy0GH9496uZjsVKZv+F5Bh1e+Q20sQIL9icSK4kLKf/YCbIMoS55g==
+X-Received: by 2002:adf:e7cf:0:b0:367:8f81:f9fc with SMTP id ffacd0b85a97d-367cead1615mr8665684f8f.50.1720814262341;
+        Fri, 12 Jul 2024 12:57:42 -0700 (PDT)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfab815sm10819916f8f.110.2024.07.12.12.57.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 12:57:41 -0700 (PDT)
+Date: Fri, 12 Jul 2024 20:57:59 +0100
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, Aishwarya TCV <aishwarya.tcv@arm.com>
+Subject: Re: [PATCH net-next] net: virtio: fix virtnet_sq_free_stats
+ initialization
+Message-ID: <20240712195759.GA2972562@myrica>
+References: <20240712080329.197605-2-jean-philippe@linaro.org>
+ <20240712064019-mutt-send-email-mst@kernel.org>
+ <20240712182021.GC120802@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Hariprasad Kelam <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Sunil Goutham <sgoutham@marvell.com>
-References: <20240712175520.7013-6-gakula@marvell.com>
-Subject: Re: [net-next PATCH v9 05/11] octeontx2-af: Add packet path between
- representor and VF
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240712175520.7013-6-gakula@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:UVFUEjtxhb49QRh8eHS0Pk5+rTIm5E+GbTko8+MUbvbEXPGzkIO
- prHH1DXI4rcdARZlEnnhECgPI6owbmhRPyOzQoCdMOODNxpgI74N7jCQM8EQ315eLwoSajH
- yz8LbzdzY9gM2TR5FEl1Lr2lMcKajZ6NCPYLM23d1pdEJNTxdpe/Q94TyF6EWm5YuN5GzP5
- iX6MdXblpoPRSti7E/zMw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:9yQUEHdKTxw=;PL8fLEJFKJrcIdKxT2nkYBU/gwa
- 5sagHM9rfCKc8r8nDtUMv8jh3W8tSYC40LrEpd5hjt7CWZbLbIMvIAtGLWoy6ujY3SUQLz85F
- s++duNiRt8LOkLyQWLFUU6ZNOjTfXUoigUcpwjgH5UVC4j6r7+NJX/282ZvkTy23J8CiHVdGG
- OoIPUn0GMbauo2iPtT8HjSkTyjR94a4xzI9UEUPGg2Ahl7ZBEMRBkD+OWqsm766zW27Mt07mj
- nYNGK7fBd8+1crqJhpvomD1ixEC9gIkUcAfueMW+sUIS5Fms782iTX/Y0ko7lCijW/MTqTCMX
- VU/KdnWHt9O0zcuQvgV8Wg7LQhgHpzG14a5Ah9ALR9hW8SWksEq9gc0bj77RqBgTqqJuqsJ7d
- U33XertiyKhpd77reZKPltfpmJjIrc+zsNFpQYToOACN4O8HPV39NrgGkqXHEjyhDkcBFOpro
- yawQBAP2jdjftcqxCyQTCpzU0zc5dliAf4s9yzseXb2Dww/dNEPL6qR4G5Su283jFnfTYT+SB
- v36k7PX20CZe9txgUb4HCtZsxNhSAhNiRYxAABV7f/9vSv3r6Y0h9C5vADrp9TiFn6C/EGVsI
- yAo5NtEfS+JbxiCqnE6fL6c1UHxnI+2z+GkbAfV2XRu42BzXvkS0BHkvzJDRN/CEeNTeVbOJ4
- gCg7T0t3YY37zPRGI7wjODl2Yh1J0I0EO0athtbhnepUutdFCys4tFF+75OechXhumyHi5Tk2
- UgeJddfbeMqSevDuYXjjVgejP8Oa1Jym5jZ/vcqNcSevZolhIRJ1sp91HNQPMlAsnNjE9jheX
- U7KbRMKOb84wa4qbXkXdf9Aw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240712182021.GC120802@kernel.org>
 
-> Current HW, do not support in-built switch which will forward pkts
-=E2=80=A6
-              does?          built-in?
+On Fri, Jul 12, 2024 at 07:20:21PM +0100, Simon Horman wrote:
+> On Fri, Jul 12, 2024 at 06:41:34AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Jul 12, 2024 at 09:03:30AM +0100, Jean-Philippe Brucker wrote:
+> > > Commit c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
+> > > added two new fields to struct virtnet_sq_free_stats, but commit
+> > > 23c81a20b998 ("net: virtio: unify code to init stats") accidentally
+> > > removed their initialization. In the worst case this can trigger the BUG
+> > > at lib/dynamic_queue_limits.c:99 because dql_completed() receives a
+> > > random value as count. Initialize the whole structure.
+> > > 
+> > > Fixes: 23c81a20b998 ("net: virtio: unify code to init stats")
+> > > Reported-by: Aishwarya TCV <aishwarya.tcv@arm.com>
+> > > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > 
+> > 
+> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > > ---
+> > > Both these patches are still in next so it might be possible to fix it
+> > > up directly.
+> > 
+> > I'd be fine with squashing but I don't think it's done in net-next.
+> 
+> True, but this patch doesn't apply to net-next.
+> And 23c81a20b998 ("net: virtio: unify code to init stats")
+> isn't present in net-next.
 
-How do you think about to avoid any abbreviations for another improved cha=
-nge description?
+Oh right, it's in linux-next but it looks like it came from
+git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
 
-
-=E2=80=A6
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-=E2=80=A6
-> +void rvu_rep_update_rules(struct rvu *rvu, u16 pcifunc, bool ena)
-> +{
-=E2=80=A6
-> +	rvu_switch_enable_lbk_link(rvu, pcifunc, ena);
-> +	mutex_lock(&mcam->lock);
-> +	for (entry =3D 0; entry < max; entry++) {
-=E2=80=A6
-> +	}
-> +	mutex_unlock(&mcam->lock);
-> +}
-=E2=80=A6
-
-Under which circumstances would you become interested to apply a construct
-like =E2=80=9Cscoped_guard(mutex, &mcam->lock)=E2=80=9D?
-https://elixir.bootlin.com/linux/v6.10-rc7/source/include/linux/cleanup.h#=
-L137
-
-Regards,
-Markus
+Thanks,
+Jean
 
