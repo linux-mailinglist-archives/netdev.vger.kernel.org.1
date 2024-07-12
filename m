@@ -1,175 +1,133 @@
-Return-Path: <netdev+bounces-111017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 138CA92F432
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 04:51:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7332A92F440
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 05:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BCCB1F22F18
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:51:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 328771F23CCB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 03:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658DA947A;
-	Fri, 12 Jul 2024 02:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F121749A;
+	Fri, 12 Jul 2024 03:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z8iFNuO4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pzVNA91m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A4C945A
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 02:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35EE635
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 03:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720752708; cv=none; b=ELB9h0wA6ghDOe+IxFmITtdfDBOr6YsOvuFtyvSOi3LW2ZsaKvD1uwfzgFn7nmjriI0eskQf+Oq6Garkh6gODAFxf4c/tyiMSwrSQ6jcTUWX4g5wgl3wxskaf2xQtEFJSiIYjwFGGrDBtEzCPHANhy9LD/UBWiPgTkHlROsLu0A=
+	t=1720753344; cv=none; b=qVedPoYT0UZJIokgTbMgR35PDem7jtdYLVBYLlSK6NSKDgpFLd/41bFCm9MbXBa4WjasyjQ2f8C/6ItkMO7/t22fB9Ix4CJoGLxknkeHtiIVKElzczNPuYhVPNeLWogxlW6Ly8z0wbnRxu0ueHNIhhUagGgORXqJNKcaS9aAqoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720752708; c=relaxed/simple;
-	bh=rDBvajKY5OC0PXZ1yITuS+5CAbjqQVusYbaPkwQLiLE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Kb3ZO+RYdu7vqqtAbwE2Y3xiQofVjbeEIJZb6KQiInh7RoDeq6TTlkgGvGr7ZIkE+SoXYfKpSFixZ5BWsJ71BddMplsZ0AwXL4LJm4w3sYRl+YDgkBPmmJ0dDHbStpVcyDdaQrJs/9mkp/80CNebUf3ymdFd5IXJkBU6GpFFS9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z8iFNuO4; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1720753344; c=relaxed/simple;
+	bh=aCx0xPZbom50RjqpqNzBRZUay0qhgDN3jLQPgr4Tz/Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l7kMy/eEfvOQNMW2nxJNkUx9EljlS+QWOOiUhzsWZkwtrcT/vtu41o+nrkYlcZSedYO4Rk1DHOXC2ndCB2V+XkyurAZnPvHNlsjicyx0J9nSONKKx7lY51orpowNShWVS4egX1WHrVUNN+IrZPpsdSiQ7GRM9f6fI38Z/VEWkYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pzVNA91m; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03c68c7163so2788601276.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 19:51:46 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a77e7420697so211599666b.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 20:02:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720752706; x=1721357506; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DB4pQNaU+Ev4vjvziD2IB7UTB9UxPT+SsJGcwrSVFTk=;
-        b=z8iFNuO4pszmVBhY8ZFeIn0XQd4igNzNQFYE50+Kl5thnJEB7xHKXjN3WnQqkPI/8r
-         jPcytyCxccEX9vEmzwwxF0rZpN9b443GqIC8ngoFnAe98oQkXauJ56SD9IWV0UDTKmYH
-         V6U42ex/ylCDVFUyw7LPN+Nj5pKyZcKYWzSax9xnSeca8Us/loLSCjqhfIaGnBSvAUP6
-         BbRQOYoEGTCeaAgMSqQyf0pSxxdLQ/sFjFftDWDh2GKW7lx1GDFMNNgVPvtoqLLgXx/a
-         m4gK2qbWmNgugJ+zhQUZe8rrbMSO5XjypLO+d+fY4nugytj1nSP2SeRiDUYMJE7cDL6x
-         qliQ==
+        d=google.com; s=20230601; t=1720753340; x=1721358140; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T4lFs+zjy6MsryyunPsWDlMFHdv/rOIFc2xs8rscZTM=;
+        b=pzVNA91mNSvfPOqgSFqNGJ0elLPbM3db2sBGLC+723C2Uxbn6V1SLnsPdN5HZxtSZ9
+         akcecEHB1O0kK7kZF/p6BRJFNCRPOPOF5QugtyhjdI/rjtgu7KftHSS5R0lqRpohbV3E
+         ScFN1ZTjtFMoM+oTvRkSFVAkDVYrFpcVmlOvOeTOb7TcY/ZRXQ5Em+oxHDrv6/1mfOC1
+         PREeJnWx6H9kvQCqjoQUfaq7JmucU4BRX9EGRtVrbaIl4dPdqjEPyFpRWqiF3r2MFFP6
+         IU9TKmhNq6K+5hcQgyaW90UNt2pFgZrRhkzYkTNaQO3dr2vMmgebrv/llvKJZqm4Nq4C
+         QGyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720752706; x=1721357506;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DB4pQNaU+Ev4vjvziD2IB7UTB9UxPT+SsJGcwrSVFTk=;
-        b=GqMkzxMy6IEk4sFHoNAzGSR33HqJBXfjB2/taSWxuE0qfgrjdWSBroaeUZB5H/ELvb
-         Ku4iq9HdqnYrugUl3+x2ZcN0kELVbdVvr4nWg2Aa6If+U2FygK39Z/7GQbJyfGE9vYGL
-         J+xitUJH4sSU9Vb+RlXYRt/XG3Zmq1Vvdz43c3FkXu3Fs0n2mCFt/wXfrccW+Rfri5W4
-         33ZG7szPV34BS6mDUxyTu4xaK79iQkFJKO/W4zQRgU5oOeLHkANulNVTeGOr3QNx+78v
-         4q1h+VBn0oNjBmY1DMYVKXYxZx23JCJsVN7faV9/93g0BzjHyuIKY1N8wB5zcGjHuVd2
-         IXtg==
-X-Gm-Message-State: AOJu0YyfAtLwWZ4TNnjHjVGvUmbeZfyHVDNBP+EM1ZRltQ2nad2RLWlq
-	rfW7MFV4AKCy+A8J3gVN0wxdqmA+KFc1eSc17MY0X3cWWx0JgInsNLWRpIA1BzPmPqU8BWGVEHc
-	Pe1ixJGTh3wk6Sz54JWpSoIk3mam2QBXTxWTQUvZ/IpCrzzd6edC9bTSldDeafYs9bNx5Lw7erL
-	g/8hJGi99z08N4TVbj/jQUI/ijU2dAEal8
-X-Google-Smtp-Source: AGHT+IFuN+UgKtKYNAIiDsh6EHpLvHt3XqfqagEvkPFAxUDjw6rFDm8sBcnrPqCvSQZ+Gby7eYaZKmdHd1g=
-X-Received: from yumike.c.googlers.com ([fda3:e722:ac3:cc00:3:22c1:c0a8:d2d])
- (user=yumike job=sendgmr) by 2002:a05:6902:188f:b0:dfb:b4e:407a with SMTP id
- 3f1490d57ef6-e041b1153e5mr1113315276.9.1720752705816; Thu, 11 Jul 2024
- 19:51:45 -0700 (PDT)
-Date: Fri, 12 Jul 2024 10:51:25 +0800
-In-Reply-To: <20240712025125.1926249-1-yumike@google.com>
+        d=1e100.net; s=20230601; t=1720753340; x=1721358140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T4lFs+zjy6MsryyunPsWDlMFHdv/rOIFc2xs8rscZTM=;
+        b=Nv6cKBVCrxWw8bKH69DwJ1irJaeB6W14XYTTZ+M6OSka2lhgCy2HkHxcamnyamlMN2
+         3TIcnaFRJUkoHGe9NKkE3aHBRNTeKuIyMlXlwrEEIYSN1+9QAOUVElo1xIDr9MneOVDy
+         DXzQOU/n8eD+ZkYmRHZz1eM37J3OyLEL1AL+kgXPvLD7f5FtuODbnjkNneQm0aS5H/Yj
+         I74sQB+1kZJGjtgr9Ps3BHKF0a3DTOOfdQ5m7vUIf+xMNLdYzoFmrCbYA/5R6fqr2lcb
+         i+RRwG3nvlSM9iMC2RTg7cIejA+gZubrkNTOjTR9/IrytLiuIm31Gi13ww/18bXtGFpI
+         gO0w==
+X-Forwarded-Encrypted: i=1; AJvYcCX0ZjvgbCAf2OEftvB3+63p6wSF5iQib6ib5qK54EqK8DkGj9noBb67MQJ42aWTvRbF3djW6HXwZHrZ+CiQ7n+8H7OcFYSU
+X-Gm-Message-State: AOJu0YzcvcV/44gBCIBdClnKonOWbgbqBnuu6RsDJW5zPPJQLRhXB8m5
+	qm8/kQm0c8xXYu++6bpqxVJSTBy2+DTcOgmrF6PMJr4HWX1K9Ov7sDg4YUZ49QvofzI61n7Gwa4
+	JgAEg0ioHvcmEiRBHM4tP3jaTTF4zfmnhLsg7
+X-Google-Smtp-Source: AGHT+IFf0mgXWvHFnLD310cYRvTOeoTLif8rxMS58idXqvz79P5G9MDHRe7XevDLqrMj6GA8QY33YruHZgaTZ3cXUyE=
+X-Received: by 2002:a17:906:30d2:b0:a77:d7f1:42ea with SMTP id
+ a640c23a62f3a-a780b70541fmr655068666b.45.1720753340000; Thu, 11 Jul 2024
+ 20:02:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240712025125.1926249-1-yumike@google.com>
-X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240712025125.1926249-5-yumike@google.com>
-Subject: [PATCH ipsec-next v4 4/4] xfrm: Support crypto offload for outbound
- IPv4 UDP-encapsulated ESP packet
+MIME-Version: 1.0
+References: <20240710111654.4085575-1-yumike@google.com> <20240711095208.GN6668@unreal>
+ <Zo+vx4wS49TNX4fa@gauss3.secunet.de>
+In-Reply-To: <Zo+vx4wS49TNX4fa@gauss3.secunet.de>
 From: Mike Yu <yumike@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com
-Cc: stanleyjhu@google.com, martinwu@google.com, chiachangwang@google.com, 
-	yumike@google.com
+Date: Fri, 12 Jul 2024 11:02:03 +0800
+Message-ID: <CAHktDpMtHArc1qa+-_YgkgpTT1NBQ6s8OhQP1=d89ma0h6GpiQ@mail.gmail.com>
+Subject: Re: [PATCH ipsec v3 0/4] Support IPsec crypto offload for IPv6 ESP
+ and IPv4 UDP-encapsulated ESP data paths
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, stanleyjhu@google.com, 
+	martinwu@google.com, chiachangwang@google.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-esp_xmit() is already able to handle UDP encapsulation through the call to
-esp_output_head(). However, the ESP header and the outer IP header
-are not correct and need to be corrected.
+Sure. The patch series were already based on ipsec-next.
+Sent v4 that targets ipsec-next tree.
 
-Test: Enabled both dir=in/out IPsec crypto offload, and verified IPv4
-      UDP-encapsulated ESP packets on both wifi/cellular network
-Signed-off-by: Mike Yu <yumike@google.com>
----
-v2->v3: https://lore.kernel.org/all/20240709062326.939083-5-yumike@google.com
-- Correct ESP seq in esp_xmit().
-v1->v2: https://lore.kernel.org/all/20240702084452.2259237-5-yumike@google.com
-- Fix comment style.
----
- net/ipv4/esp4.c         |  8 +++++++-
- net/ipv4/esp4_offload.c | 17 ++++++++++++++++-
- 2 files changed, 23 insertions(+), 2 deletions(-)
+Mike
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 3968d3f98e08..73981595f062 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- {
- 	struct udphdr *uh;
- 	unsigned int len;
-+	struct xfrm_offload *xo = xfrm_offload(skb);
- 
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
- 	if (len + sizeof(struct iphdr) > IP_MAX_MTU)
-@@ -360,7 +361,12 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- 	uh->len = htons(len);
- 	uh->check = 0;
- 
--	*skb_mac_header(skb) = IPPROTO_UDP;
-+	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
-+	 * data path, which means that esp_output_udp_encap is called outside of the XFRM stack.
-+	 * In this case, the mac header doesn't point to the IPv4 protocol field, so don't set it.
-+	 */
-+	if (!xo || encap_type != UDP_ENCAP_ESPINUDP)
-+		*skb_mac_header(skb) = IPPROTO_UDP;
- 
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index b3271957ad9a..a37d18858c72 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 	struct esp_info esp;
- 	bool hw_offload = true;
- 	__u32 seq;
-+	int encap_type = 0;
- 
- 	esp.inplace = true;
- 
-@@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.esph = ip_esp_hdr(skb);
- 
-+	if (x->encap)
-+		encap_type = x->encap->encap_type;
- 
--	if (!hw_offload || !skb_is_gso(skb)) {
-+	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
- 		esp.nfrags = esp_output_head(x, skb, &esp);
- 		if (esp.nfrags < 0)
- 			return esp.nfrags;
-@@ -324,6 +327,18 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.seqno = cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
- 
-+	if (hw_offload && encap_type == UDP_ENCAP_ESPINUDP) {
-+		/* In the XFRM stack, the encapsulation protocol is set to iphdr->protocol by
-+		 * setting *skb_mac_header(skb) (see esp_output_udp_encap()) where skb->mac_header
-+		 * points to iphdr->protocol (see xfrm4_tunnel_encap_add()).
-+		 * However, in esp_xmit(), skb->mac_header doesn't point to iphdr->protocol.
-+		 * Therefore, the protocol field needs to be corrected.
-+		 */
-+		ip_hdr(skb)->protocol = IPPROTO_UDP;
-+
-+		esph->seq_no = htonl(seq);
-+	}
-+
- 	ip_hdr(skb)->tot_len = htons(skb->len);
- 	ip_send_check(ip_hdr(skb));
- 
--- 
-2.45.2.993.g49e7a77208-goog
+Mike
 
+
+On Thu, Jul 11, 2024 at 6:11=E2=80=AFPM Steffen Klassert
+<steffen.klassert@secunet.com> wrote:
+>
+> On Thu, Jul 11, 2024 at 12:52:08PM +0300, Leon Romanovsky wrote:
+> > On Wed, Jul 10, 2024 at 07:16:50PM +0800, Mike Yu wrote:
+> > >
+> > > Mike Yu (4):
+> > >   xfrm: Support crypto offload for inbound IPv6 ESP packets not in GR=
+O
+> > >     path
+> > >   xfrm: Allow UDP encapsulation in crypto offload control path
+> > >   xfrm: Support crypto offload for inbound IPv4 UDP-encapsulated ESP
+> > >     packet
+> > >   xfrm: Support crypto offload for outbound IPv4 UDP-encapsulated ESP
+> > >     packet
+> > >
+> > >  net/ipv4/esp4.c         |  8 +++++++-
+> > >  net/ipv4/esp4_offload.c | 17 ++++++++++++++++-
+> > >  net/xfrm/xfrm_device.c  |  6 +++---
+> > >  net/xfrm/xfrm_input.c   |  3 ++-
+> > >  net/xfrm/xfrm_policy.c  |  5 ++++-
+> > >  5 files changed, 32 insertions(+), 7 deletions(-)
+> >
+> > Steffen,
+> >
+> > If it helps, we tested v2 version and it didn't break anything for us :=
+).
+> > But we didn't test this specific functionality.
+> >
+> > Thanks
+>
+> Thanks for testing it Leon!
+>
+> This is a new feature, so I don't want to apply it to the ipsec
+> tree. Mike, can you rebase on top of ipsec-next instead?
+>
+> Thanks!
 
