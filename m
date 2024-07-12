@@ -1,81 +1,72 @@
-Return-Path: <netdev+bounces-111067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A77D892FAEF
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 15:11:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F29092FB8E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 15:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60B8728488E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:11:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 334671C223E5
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 13:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D1516F825;
-	Fri, 12 Jul 2024 13:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A9117107A;
+	Fri, 12 Jul 2024 13:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bq2GtCDc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIY87nuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B38A15957E;
-	Fri, 12 Jul 2024 13:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23334171068
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 13:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720789897; cv=none; b=rpYBInvux3jtzlY9AbOfVlZjOqnBDbFpJ6NAZaUWhIXCgfMQkKueumffBKaBmo9NT3/lggYFQjy8vwDP5n2ekGA58NKO79NzOzuaCI11GJbF1KDE2bekM5PwRiBQudj9Wf6aU/Ei69ac9e2s4BSM0vKB9vSjg+dPctSosDMtS1k=
+	t=1720791502; cv=none; b=SDjc9/u8ExjZW0RO8SWTN8en6NlacRh9bs1pk6MlMu+nb56Yw4xVcBN3gvUTIVgkW4FsOBzlT0+TP7iSA/CIw3OptdMTdrEdY5M4UAFcQzlKjBaNUJkDRqDfVO3G8NxZ9DxcZvTFIcvmN95mxJiq9FyOZYMFIJ9MGFJlewXIop8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720789897; c=relaxed/simple;
-	bh=HDosvXuSleQyB8lYY7i6tGGf2MEJMbnXC05n5hsQSt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WwXOylrJQnvod5nN3tBfRr4gxmExn/GiOqIEByXOUA7fh6h/hCtCIU9WZ2ML+30E/c7lAHKbD/8+dMh+IMdMsr1+11PtJHn7gwlpUkwrfZQlc8+sC6+w62t2kLxG9ytJ4XKNTQfKrgcoJ26Xm42HUc9fzaaqCu8JcjTTipVH1cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bq2GtCDc; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 96204FF811;
-	Fri, 12 Jul 2024 13:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1720789886;
+	s=arc-20240116; t=1720791502; c=relaxed/simple;
+	bh=KShYyED066RFUk2ejqR4JPdAC73ebY5ibNreeBwRByk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o4wZv7I134vP65RdWWe7nn01u9bybtpD+mnaMXBIc5FsuWfa7s1v3cFdVZFw0p7tWc+PqtV8u7d4Wq3kbYy2IkV3VA78o+11u4EZ3gjpPaE6NCN5mMHKnvqwlXRj85R2KAfVIyElIf4PnUS/7W8EgVmwMkG8pAF3SENtDFi7Caw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIY87nuc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720791499;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=StjVOnU5djjXaehWS8TjNnExgQiHvF7T/RHfibeCJL0=;
-	b=bq2GtCDc/yQX7j0iSwRzBaqUG+BHWIGjTD3RSrtHJb0WAoAbTrSv7AzYkV5jZcU5EmCBZJ
-	Np7r9LOxpuWSSr7b6AWb4kTRfbNrGKOI/s8xN3nxlp7TKmLLxKDSlCS40jnjMoEp0HnQVN
-	AOll4fv6Iq8q6S/lQxhqGOuSgb1TIx4p8mmhNjYYBZLaDwBtyTbkUqh8j8abIroK70Se6O
-	l46i48SNnAteGnzfTvYzrwpmCPp1rJDS1vzVFn3L4k9A+nAsKUqHxUvYV8iNMUjXV9h2I3
-	m9z+Irm4BA7+8Dq7XYx5V9+KUiznXlu1/XUoha+QHZfZIhPNRqQ68zwEPp6PRg==
-Date: Fri, 12 Jul 2024 15:11:22 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Conor
- Dooley <conor@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Lee Jones
- <lee@kernel.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman
- <horms@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, UNGLinuxDriver@microchip.com, Saravana Kannan
- <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
- <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
- Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Allan Nielsen
- <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
-Message-ID: <20240712151122.67a17a94@bootlin.com>
-In-Reply-To: <CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
-References: <20240627091137.370572-1-herve.codina@bootlin.com>
-	<20240627091137.370572-7-herve.codina@bootlin.com>
-	<20240711152952.GL501857@google.com>
-	<20240711184438.65446cc3@bootlin.com>
-	<2024071113-motocross-escalator-e034@gregkh>
-	<CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
-Followup-To: linux-kernel@vger.kernel.org
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eb6lKjPIJnWix7Af3DEVxFIbOm+H1U68dLjiRh2/hY8=;
+	b=PIY87nucRF0Yop2j0YbQCREGXHmcJmKbJog1RTdLVNqIngBdk3iY3P01Hagrq7CTFwItXH
+	KAPNF9Uod7BLUXiVmB0uGkEY7KPYv/UV9t9fvridgEcsdXFAuGZGjV3fo5ztdVtXfX5uNJ
+	1y+fu6aKe5+BJhm79/lLtMsEghZok34=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-4lXTEU8HO_6VdWffx3TR2Q-1; Fri,
+ 12 Jul 2024 09:38:15 -0400
+X-MC-Unique: 4lXTEU8HO_6VdWffx3TR2Q-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D5FF01958B1F;
+	Fri, 12 Jul 2024 13:38:13 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.39.194.228])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 92C991955E85;
+	Fri, 12 Jul 2024 13:38:10 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: stephen@networkplumber.org
+Cc: aclaudi@redhat.com,
+	ast@fiberby.net,
+	dcaratti@redhat.com,
+	dsahern@kernel.org,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	jhs@mojatatu.com,
+	netdev@vger.kernel.org
+Subject: [RFC iproute2-next v2] tc: f_flower: add support for matching on tunnel metadata
+Date: Fri, 12 Jul 2024 15:28:08 +0200
+Message-ID: <560bcd549ca8ab24b1ad5abe352580a621f6d426.1720790774.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,52 +75,208 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi Rob, Conor,
+extend TC flower for matching on tunnel metadata.
 
-On Thu, 11 Jul 2024 14:33:26 -0600
-Rob Herring <robh@kernel.org> wrote:
+Changes since RFC v1:
+ - update uAPI bits to Asbjørn's most recent code [1]
+ - add 'tun' prefix to all flag names (Asbjørn)
+ - allow parsing 'enc_flags' multiple times, without clearing the match
+   mask every time, like happens for 'ip_flags' (Asbjørn)
+ - don't use "matches()" for parsing argv[]  (Stephen)
+ - (hopefully) improve usage() printout (Asbjørn)
+ - update man page
 
-> On Thu, Jul 11, 2024 at 1:08 PM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Jul 11, 2024 at 06:44:38PM +0200, Herve Codina wrote:  
-> > > Hi Lee,
-> > >
-> > > On Thu, 11 Jul 2024 16:29:52 +0100
-> > > Lee Jones <lee@kernel.org> wrote:
-> > >  
-> > > > On Thu, 27 Jun 2024, Herve Codina wrote:
-> > > >  
-> > > > > Add a PCI driver that handles the LAN966x PCI device using a device-tree
-> > > > > overlay. This overlay is applied to the PCI device DT node and allows to
-> > > > > describe components that are present in the device.
-> > > > >
-> > > > > The memory from the device-tree is remapped to the BAR memory thanks to
-> > > > > "ranges" properties computed at runtime by the PCI core during the PCI
-> > > > > enumeration.
-> > > > >
-> > > > > The PCI device itself acts as an interrupt controller and is used as the
-> > > > > parent of the internal LAN966x interrupt controller to route the
-> > > > > interrupts to the assigned PCI INTx interrupt.  
-> > > >
-> > > > Not entirely sure why this is in MFD.  
-> > >
-> > > This PCI driver purpose is to instanciate many other drivers using a DT
-> > > overlay. I think MFD is the right subsystem.  
-> 
-> It is a Multi-function Device, but it doesn't appear to use any of the
-> MFD subsystem. So maybe drivers/soc/? Another dumping ground, but it
-> is a driver for an SoC exposed as a PCI device.
-> 
+[1] https://lore.kernel.org/netdev/20240709163825.1210046-1-ast@fiberby.net/
 
-In drivers/soc, drivers/soc/microchip/ could be the right place.
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+---
+ include/uapi/linux/pkt_cls.h |  7 +++++++
+ man/man8/tc-flower.8         | 28 ++++++++++++++++++++++++--
+ tc/f_flower.c                | 38 +++++++++++++++++++++++++++++++++++-
+ 3 files changed, 70 insertions(+), 3 deletions(-)
 
-Conor, are you open to have the PCI LAN966x device driver in
-drivers/soc/microchip/ ?
-
-Best regards,
-Hervé
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index 229fc925ec3a..19e25bceb24c 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -554,6 +554,9 @@ enum {
+ 	TCA_FLOWER_KEY_SPI,		/* be32 */
+ 	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+ 
++	TCA_FLOWER_KEY_ENC_FLAGS,	/* be32 */
++	TCA_FLOWER_KEY_ENC_FLAGS_MASK,	/* be32 */
++
+ 	__TCA_FLOWER_MAX,
+ };
+ 
+@@ -674,6 +677,10 @@ enum {
+ enum {
+ 	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
+ 	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM = (1 << 2),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT = (1 << 3),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM = (1 << 4),
++	TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT = (1 << 5),
+ };
+ 
+ enum {
+diff --git a/man/man8/tc-flower.8 b/man/man8/tc-flower.8
+index 6b56640503d5..028f48571be3 100644
+--- a/man/man8/tc-flower.8
++++ b/man/man8/tc-flower.8
+@@ -106,7 +106,9 @@ flower \- flow based traffic control filter
+ .B l2_miss
+ .IR L2_MISS " | "
+ .BR cfm
+-.IR CFM_OPTIONS " }"
++.IR CFM_OPTIONS " | "
++.BR enc_flags
++.IR ENCFLAG_LIST " }"
+ 
+ .ti -8
+ .IR LSE_LIST " := [ " LSE_LIST " ] " LSE
+@@ -131,6 +133,16 @@ flower \- flow based traffic control filter
+ .B op
+ .IR OPCODE "
+ 
++.ti -8
++.IR ENCFLAG_LIST " := [ " ENCFLAG_LIST "/ ] " ENCFLAG
++
++.ti -8
++.IR ENCFLAG " := { "
++.BR [no]tuncsum " | "
++.BR [no]tundf " | "
++.BR [no]tunoam " | "
++.BR [no]tuncrit " } "
++
+ .SH DESCRIPTION
+ The
+ .B flower
+@@ -538,11 +550,23 @@ Match on the Maintenance Domain (MD) level field.
+ .BI op " OPCODE "
+ Match on the CFM opcode field. \fIOPCODE\fR is an unsigned 8 bit value in
+ decimal format.
++.RE
++.TP
++.BI enc_flags " ENCFLAGS_LIST "
++Match on tunnel control flags.
++.I ENCFLAGS_LIST
++is a list of the following tunnel control flags:
++.BR [no]tuncsum ", "
++.BR [no]tundf ", "
++.BR [no]tunoam ", "
++.BR [no]tuncrit ", "
++each separated by '/'.
++.TP
+ 
+ .SH NOTES
+ As stated above where applicable, matches of a certain layer implicitly depend
+ on the matches of the next lower layer. Precisely, layer one and two matches
+-(\fBindev\fR,  \fBdst_mac\fR and \fBsrc_mac\fR)
++(\fBindev\fR,  \fBdst_mac\fR, \fBsrc_mac\fR and \fBenc_flags\fR)
+ have no dependency,
+ MPLS and layer three matches
+ (\fBmpls\fR, \fBmpls_label\fR, \fBmpls_tc\fR, \fBmpls_bos\fR, \fBmpls_ttl\fR,
+diff --git a/tc/f_flower.c b/tc/f_flower.c
+index 08c1001af7b4..35ccc3743f46 100644
+--- a/tc/f_flower.c
++++ b/tc/f_flower.c
+@@ -28,6 +28,7 @@
+ 
+ enum flower_matching_flags {
+ 	FLOWER_IP_FLAGS,
++	FLOWER_ENC_DST_FLAGS,
+ };
+ 
+ enum flower_endpoint {
+@@ -99,13 +100,16 @@ static void explain(void)
+ 		"			ct_label MASKED_CT_LABEL |\n"
+ 		"			ct_mark MASKED_CT_MARK |\n"
+ 		"			ct_zone MASKED_CT_ZONE |\n"
+-		"			cfm CFM }\n"
++		"			cfm CFM |\n"
++		"			enc_flags ENC-FLAGS }\n"
+ 		"	LSE-LIST := [ LSE-LIST ] LSE\n"
+ 		"	LSE := lse depth DEPTH { label LABEL | tc TC | bos BOS | ttl TTL }\n"
+ 		"	FILTERID := X:Y:Z\n"
+ 		"	MASKED_LLADDR := { LLADDR | LLADDR/MASK | LLADDR/BITS }\n"
+ 		"	MASKED_CT_STATE := combination of {+|-} and flags trk,est,new,rel,rpl,inv\n"
+ 		"	CFM := { mdl LEVEL | op OPCODE }\n"
++		"	ENCFLAG-LIST := [ ENCFLAG-LIST/ ]ENCFLAG\n"
++		"	ENCFLAG := { [no]tuncsum | [no]tundf | [no]tunoam | [no]tuncrit }\n"
+ 		"	ACTION-SPEC := ... look at individual actions\n"
+ 		"\n"
+ 		"NOTE:	CLASSID, IP-PROTO are parsed as hexadecimal input.\n"
+@@ -205,6 +209,10 @@ struct flag_to_string {
+ static struct flag_to_string flags_str[] = {
+ 	{ TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT, FLOWER_IP_FLAGS, "frag" },
+ 	{ TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST, FLOWER_IP_FLAGS, "firstfrag" },
++	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM, FLOWER_ENC_DST_FLAGS, "tuncsum" },
++	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT, FLOWER_ENC_DST_FLAGS, "tundf" },
++	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM, FLOWER_ENC_DST_FLAGS, "tunoam" },
++	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT, FLOWER_ENC_DST_FLAGS, "tuncrit" },
+ };
+ 
+ static int flower_parse_matching_flags(char *str,
+@@ -1642,6 +1650,8 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
+ 	__u32 flags = 0;
+ 	__u32 mtf = 0;
+ 	__u32 mtf_mask = 0;
++	__u32 dst_flags = 0;
++	__u32 dst_flags_mask = 0;
+ 
+ 	if (handle) {
+ 		ret = get_u32(&t->tcm_handle, handle, 0);
+@@ -2248,6 +2258,17 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
+ 				fprintf(stderr, "Illegal \"pfcp_opts\"\n");
+ 				return -1;
+ 			}
++		} else if (!strcmp(*argv, "enc_flags")) {
++			NEXT_ARG();
++			ret = flower_parse_matching_flags(*argv,
++							  FLOWER_ENC_DST_FLAGS,
++							  &dst_flags,
++							  &dst_flags_mask);
++
++			if (ret < 0) {
++				fprintf(stderr, "Illegal \"enc_flags\"\n");
++				return -1;
++			}
+ 		} else if (matches(*argv, "action") == 0) {
+ 			NEXT_ARG();
+ 			ret = parse_action(&argc, &argv, TCA_FLOWER_ACT, n);
+@@ -2286,6 +2307,17 @@ parse_done:
+ 			return ret;
+ 	}
+ 
++	if (dst_flags_mask) {
++		ret = addattr32(n, MAX_MSG, TCA_FLOWER_KEY_ENC_FLAGS,
++				htonl(dst_flags));
++		if (ret)
++			return ret;
++		ret = addattr32(n, MAX_MSG, TCA_FLOWER_KEY_ENC_FLAGS_MASK,
++				htonl(dst_flags_mask));
++		if (ret)
++			return ret;
++	}
++
+ 	if (tc_proto != htons(ETH_P_ALL)) {
+ 		ret = addattr16(n, MAX_MSG, TCA_FLOWER_KEY_ETH_TYPE, tc_proto);
+ 		if (ret)
+@@ -3262,6 +3294,10 @@ static int flower_print_opt(const struct filter_util *qu, FILE *f,
+ 				    tb[TCA_FLOWER_KEY_FLAGS],
+ 				    tb[TCA_FLOWER_KEY_FLAGS_MASK]);
+ 
++	flower_print_matching_flags("enc_flags", FLOWER_ENC_DST_FLAGS,
++				    tb[TCA_FLOWER_KEY_ENC_FLAGS],
++				    tb[TCA_FLOWER_KEY_ENC_FLAGS_MASK]);
++
+ 	if (tb[TCA_FLOWER_L2_MISS]) {
+ 		struct rtattr *attr = tb[TCA_FLOWER_L2_MISS];
+ 
+-- 
+2.45.2
 
 
