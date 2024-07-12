@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-111014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54AE92F42F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 04:51:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AC292F430
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 04:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 073FF1C223C0
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:51:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BDAE1C2207C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 02:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0A08F70;
-	Fri, 12 Jul 2024 02:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB35945A;
+	Fri, 12 Jul 2024 02:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RMRAkTbp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wrXDpaWK"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7489FBE4A
-	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 02:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB77C8D1
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 02:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720752696; cv=none; b=pNU9eFghWLvpsP3G7EvDMk9QHcFD/G5U9tV4szCZUaoEPO6cbQPzsgn6t4sZQ+y0wA5vbmprGU+gH6XcWD41UObizB9B0CfyRE3GBC42t8Lvu8ZOebLw7ktr76062gyiZ/41j2NVQgew3JFDjP3kOKZagqVQL5tgFEzsxb+62l0=
+	t=1720752700; cv=none; b=Mh8nbwZJSFHoi7soZ/E6wG/SH0I8rUSbbzdFLy7UrzrJ2Xo2U+DE+eIiyV8RFZUNkqPEM63Fp/yL317Cuu5f0xYZgbtDhXEPKkV+BHhr18em9+27pjqlZtNRbOY9CqGTbiUxbRR2Z8a4xSZCZMZITE5hbckVR//Cyf8sWcbd/a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720752696; c=relaxed/simple;
-	bh=XDn2xQ6mSdf4vqwrpivn/Bk8DGfc3nDkUe4obUElGNk=;
+	s=arc-20240116; t=1720752700; c=relaxed/simple;
+	bh=lY42/By9JtdK4d4bhg7ZM1sr2cWBf0pXTfnlotNosUo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j0oMms7GOtvIwj9mqFI40biR3UoI75t2FTqXAqp5kI4bIQHkol1gsgN+PvVPAzm/DOI2/CFKDgnjZ8xHgtGdxi35SVdmVdAl/JgVVhjyXTl/dx3hmBnD9xxYtmaSdlBbEJlYb6izAWZJ0L5Pcg7psfQXp9WBLDxr5mBUjK+EwbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RMRAkTbp; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=sq+E3NH8ZENW35LJhGaHcBan9ZH7iZ4DAW8pIJIiUezFLCqPvIfKC5Ealb8+Hf4fOboQSAuuf5GsdfLbS93A1/gX2F9oqQzJ1BXRgbisGFveQM+K0JFdz9BM7r015gzgBnKp8Gk1Yu0skCCwOnK8DPwFlaqjo4eo/h/K9IH8IpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wrXDpaWK; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yumike.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-64b70c4a269so25791177b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 19:51:35 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6501bac2d6aso18014377b3.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jul 2024 19:51:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720752694; x=1721357494; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720752698; x=1721357498; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xa2SKE1EBrP4tXqYTNA1j0gjaQqK1FrRbdlXtusiecc=;
-        b=RMRAkTbpOn/S6H+Ty+IZpFLXP+8RV7P/tIWukKdq6qzX1eKR06RiP9IsXF4dzNu/E4
-         SlIrAqbp3aDqXy+RA5eCWSPnTZBLoC12q2AAmvEDI4qIRjUq/d4q4G+fSAIAfv0xCq2K
-         j7AgCBVmF+f9bOj9W7XAYunQUO5+3IV4dWcLrtUjN0JDPnc94Vhm1xzKHTRX526mz4Hf
-         2HxJLuHTji7yZ9Jd7YCUQym2p3gzf6qb2Mr98/Wv0w0wlg8qbQYKj45HD3D21AZh52ZN
-         tIOon5+KH9YngJKbqultcJPJCx+G4Is+7gIv38+FZ2S3PVBOEeuaww6aI4WqkDDvZZ6y
-         mFOw==
+        bh=1wfGIYHAsP0uvUmYT83Hpv70MkEkseiVLdINBjnhZCk=;
+        b=wrXDpaWKUrvdO27TNyxDTMYBflIF6PdpfF4iPrNMhSzYcP6A5FL4AJqJJ1hYmx6B3r
+         TeKjlbeDv1b3+c95R4lUX8A2RH1bykl4LDdiCqmsXj4Bnj7Ybko3g9z/RdBSpwSDE8Ch
+         fVcbxFepnYWZKfrsuI13qFjSTwenNPdFvmhNBV8hWlJWg9fpIbHEP40HvfczN2PgX68H
+         +6JpZ4m/XLlKHKuTv1TWI/WD/8h0mGrBYc+G8sG3gKIUN6t0jkP5rRQtxWxDyoDnGAPr
+         7iM4BtSXg2hxJt0hKTsaUFwhXde4sVE2VHupo+Iop0hUnef0+Nvte7VVeLfdtJmxsCDN
+         G0iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720752694; x=1721357494;
+        d=1e100.net; s=20230601; t=1720752698; x=1721357498;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xa2SKE1EBrP4tXqYTNA1j0gjaQqK1FrRbdlXtusiecc=;
-        b=UKv8QXpsTCYRLeJRlR8FuapEbAaVJpThVox6FrfONmIutZjcDxYkqvVcX52LYEdUwp
-         bpP13miR5wsLQpz+kFS99kruIOxYFexDzcJPBNV0Q8G/OZpGj5e/W8qGzZTKbyzIsgyc
-         1YmgYm0jTU7q0JU3rgWpm2Ny/dnndGmLY5L+z+Q1yN2KQde3KEINePMeMQzMFzPkTr1a
-         RNu8V7bDVJKsrkitYWxQyVhmrKOesS+WdtuqZ8Q/V6WDEzGwEwG0P8c2lndMccxjmkX9
-         Rah+fwInN89SogJmfUdDqwMyenRL51UueagZYXf4PCNhCh3Sse1tUa8eIlsVzOqs6uaF
-         I+/Q==
-X-Gm-Message-State: AOJu0YxpuUKXMx4ROAPobzvIOWanJZMpLbmZb319I4azAg9RU/ldX9/D
-	E6K2Jk+hhK96s7+P7WtM+70BasCIrm/KtnX6btWAhcG6K8x+Q4g1iIZh19h64T3Gg13Iy16c2xK
-	G2PKL61sSAamo9OHvB8pjd2IolQxdSNiNH6ZRVCnKRVqUtiI9Mfef5ed/eSNGR2sMpTzmhs5I8d
-	cJXVFtsjpX4Bx0laHN5W9XEQ4EvA8xLThY
-X-Google-Smtp-Source: AGHT+IEP7AUtVMMSa+uF6p6qEwt8XaV85M23q4GMS6hVT/M8vT4Yox7CY6eP+meNWx8q6W0fIrpjXNPPg3c=
+        bh=1wfGIYHAsP0uvUmYT83Hpv70MkEkseiVLdINBjnhZCk=;
+        b=tAKZ9/dgmjgJ09txfSS5dQ9+Hf/jHqF5ox+M8W/+PD41e514NJztShx1P7eIFewez7
+         8OIKbMuSkdBolvZlASqIExBHMK1AVhOTzWrRFAr+yk7O3RqoPjD54R1HxBu3uBvnFA3n
+         MyiMfOCI6u1mp1qJ9s86GEHjJZbCieJrSGh02newUjMwkxomOz5EjeDxM12f9VRH5qBl
+         ha73wsRonwp26SAMta6SzO8mcHimnc1MlfiZiidtYMU0u4q5ZQPeq6cGEHEURnT+vUBr
+         6d/z2V4Zueye+01uyWSDPogltSJMtc2Tq9Y5jc1qdmVfoW/VSS/5flSYdW/dFkTHFJYB
+         JocQ==
+X-Gm-Message-State: AOJu0YyqL7i4v7wOTlCpO0uTgJcJGY3balQ+V6ewxcRG2mejB4vkpkmF
+	i7HTZVCOJ/Gg0SaqRXPa1f81+vH8PGMO1+TkvO5LT/FWqwEXaIJ2sBv4jZI529ZGSQRC8vCr6pR
+	EK1T34L+9roOTLdBoHphD995xwwpu8asyXcVqp/fUW2kq6pGaGxOPtgwVg/nx4dyGw317Ma3zX1
+	paj2UZndB0vX0jeJVp3WwXDjBZVF01oc0Q
+X-Google-Smtp-Source: AGHT+IEMlj+g4IvcIQkRixKXwIJVkhEWqD/XSWjU1ABRg9vQ1jI4xIGpx818oUKDOEIbQzfcXKOlZk/Sg+U=
 X-Received: from yumike.c.googlers.com ([fda3:e722:ac3:cc00:3:22c1:c0a8:d2d])
- (user=yumike job=sendgmr) by 2002:a05:690c:4d82:b0:62c:f6fd:5401 with SMTP id
- 00721157ae682-658f04e51a9mr1352387b3.6.1720752694382; Thu, 11 Jul 2024
- 19:51:34 -0700 (PDT)
-Date: Fri, 12 Jul 2024 10:51:22 +0800
+ (user=yumike job=sendgmr) by 2002:a05:690c:39c:b0:618:5009:cb71 with SMTP id
+ 00721157ae682-65dfa1d7effmr669807b3.5.1720752698062; Thu, 11 Jul 2024
+ 19:51:38 -0700 (PDT)
+Date: Fri, 12 Jul 2024 10:51:23 +0800
 In-Reply-To: <20240712025125.1926249-1-yumike@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,83 +74,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240712025125.1926249-1-yumike@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240712025125.1926249-2-yumike@google.com>
-Subject: [PATCH ipsec-next v4 1/4] xfrm: Support crypto offload for inbound
- IPv6 ESP packets not in GRO path
+Message-ID: <20240712025125.1926249-3-yumike@google.com>
+Subject: [PATCH ipsec-next v4 2/4] xfrm: Allow UDP encapsulation in crypto
+ offload control path
 From: Mike Yu <yumike@google.com>
 To: netdev@vger.kernel.org, steffen.klassert@secunet.com
 Cc: stanleyjhu@google.com, martinwu@google.com, chiachangwang@google.com, 
 	yumike@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-IPsec crypt offload supports outbound IPv6 ESP packets, but it doesn't
-support inbound IPv6 ESP packets.
+Unblock this limitation so that SAs with encapsulation specified
+can be passed to HW drivers. HW drivers can still reject the SA
+in their implementation of xdo_dev_state_add if the encapsulation
+is not supported.
 
-This change enables the crypto offload for inbound IPv6 ESP packets
-that are not handled through GRO code path. If HW drivers add the
-offload information to the skb, the packet will be handled in the
-crypto offload rx code path.
-
-Apart from the change in crypto offload rx code path, the change
-in xfrm_policy_check is also needed.
-
-Exampe of RX data path:
-
-  +-----------+   +-------+
-  | HW Driver |-->| wlan0 |--------+
-  +-----------+   +-------+        |
-                                   v
-                             +---------------+   +------+
-                     +------>| Network Stack |-->| Apps |
-                     |       +---------------+   +------+
-                     |             |
-                     |             v
-                 +--------+   +------------+
-                 | ipsec1 |<--| XFRM Stack |
-                 +--------+   +------------+
-
-Test: Enabled both in/out IPsec crypto offload, and verified IPv6
-      ESP packets on Android device on both wifi/cellular network
+Test: Verified on Android device
 Signed-off-by: Mike Yu <yumike@google.com>
 ---
- net/xfrm/xfrm_input.c  | 2 +-
- net/xfrm/xfrm_policy.c | 5 ++++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ net/xfrm/xfrm_device.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index d2ea18dcb0cb..ba8deb0235ba 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -471,7 +471,7 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	struct sec_path *sp;
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 2455a76a1cff..9a44d363ba62 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -261,9 +261,9 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
  
--	if (encap_type < 0 || (xo && xo->flags & XFRM_GRO)) {
-+	if (encap_type < 0 || (xo && (xo->flags & XFRM_GRO || encap_type == 0))) {
- 		x = xfrm_input_state(skb);
+ 	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
  
- 		if (unlikely(x->dir && x->dir != XFRM_SA_DIR_IN)) {
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6603d3bd171f..2a9a31f2a9c1 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3718,12 +3718,15 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 		pol = xfrm_in_fwd_icmp(skb, &fl, family, if_id);
+-	/* We don't yet support UDP encapsulation and TFC padding. */
+-	if ((!is_packet_offload && x->encap) || x->tfcpad) {
+-		NL_SET_ERR_MSG(extack, "Encapsulation and TFC padding can't be offloaded");
++	/* We don't yet support TFC padding. */
++	if (x->tfcpad) {
++		NL_SET_ERR_MSG(extack, "TFC padding can't be offloaded");
+ 		return -EINVAL;
+ 	}
  
- 	if (!pol) {
-+		const bool is_crypto_offload = sp &&
-+			(xfrm_input_state(skb)->xso.type == XFRM_DEV_OFFLOAD_CRYPTO);
-+
- 		if (net->xfrm.policy_default[dir] == XFRM_USERPOLICY_BLOCK) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOPOLS);
- 			return 0;
- 		}
- 
--		if (sp && secpath_has_nontransport(sp, 0, &xerr_idx)) {
-+		if (sp && secpath_has_nontransport(sp, 0, &xerr_idx) && !is_crypto_offload) {
- 			xfrm_secpath_reject(xerr_idx, skb, &fl);
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOPOLS);
- 			return 0;
 -- 
 2.45.2.993.g49e7a77208-goog
 
