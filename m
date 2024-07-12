@@ -1,121 +1,207 @@
-Return-Path: <netdev+bounces-111139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F1B93001F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 19:59:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D16CD93002E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 20:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1CE51F24979
-	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 17:59:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 094891C213A8
+	for <lists+netdev@lfdr.de>; Fri, 12 Jul 2024 18:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B56F178383;
-	Fri, 12 Jul 2024 17:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F2A1779B8;
+	Fri, 12 Jul 2024 18:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ipzjd/X7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjkvxCDn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3B6176FD6;
-	Fri, 12 Jul 2024 17:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D799D1779B1
+	for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 18:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720807009; cv=none; b=NHmZSteqZNuzr36fw//9U1PP2EJ4f7kzPM6hyh3FEg1IaSyA7Rj/hGwgrTAnC0aTEmtTaJ43z6KKbgvNjLG996E7ADBu3H2/3a64pWO8ZKjeODuEjIxUE9LWtB5AAOCYQjtbPXclKQViKhDQyYc6SHe1/+LA5/i33UyUhVCXPMs=
+	t=1720807631; cv=none; b=bVue3Zu+sSvzAaKtVf1tjDzlRIUh93wXmcW6k3C4tnTVDK5FN0BNXYPthggymwgF5zp582PdEsT6IhCwjv7I6j2Qk2TwzH+AcrTURseB6wtlSr6sXJXjz4ogCCp2v/lWpTPQabWI12LIz6tJAW9lGqE4L2qVhRzRX/vJYejlhPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720807009; c=relaxed/simple;
-	bh=3eIayu+1UjuqYkXeZHl62aeqtdNVS59QixTFOllGIwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UPb9oW8DRC4yTIH9kur0BJ8cbqN1u1kJuKriInQDif4U9slN4OgtWgTqmR3lzJIdIlQ70BaAXl7scX/jW3Q5c/blHJVIdY7AnQc96SEB1L4R4J4JKlXNzoQkZZmswo+KWLciTcMYhczzEOLjAQBsE2WNrZN492qWbogHKKLm1f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ipzjd/X7; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70af8062039so1862411b3a.0;
-        Fri, 12 Jul 2024 10:56:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720807007; x=1721411807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hvJqMz2g+QWTR/26uvM7LO7+R0enQZRj5mYnnkzzRMo=;
-        b=Ipzjd/X7JjVHinD/8km7XAfv0EgGSbe1cfVeFl4jjNxx4wT+agHmBw851TnH+xVoPz
-         o4eNr4NTuZjv0wJtMD0RE9KHuCwue3aQ5Ys+P9OgpIL4JGDDzlQRNS33E7KToyNDYXuW
-         q3WbOGFnL76MDba8lKKR5uW3IE4++jKe+CVu9KQXcZMny0RduamUFeh6t3DvB32+gj9L
-         gXSNSXU41qRSyU81QUb2I1EEyKTCW7ySFnAwpfudd3Er/EISxf5MvPapZ+svYkaMNFMi
-         iCWiY8Ru/jivVs6fWPEQBQDDujUBj8pUVJX/jV8T0Q1+78ZJnokiTFQtS39XIjPkeZxM
-         Y/zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720807007; x=1721411807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hvJqMz2g+QWTR/26uvM7LO7+R0enQZRj5mYnnkzzRMo=;
-        b=Ywg6dcK/AsWSV1jeHGJ8A67EuC4EOebfvISZB3AaMRlTHQtTPv/wtltuEyTkxWiz/J
-         zXSZsNykXBh6eRqehjoXprC6CHBZLMdRwXHgcQDrNaEdDU1VYWIQyIRxFPCVVQGlX+bb
-         rUuZVAhvTDGkEiy5E6jD9r3mVOajhFaLVXEYtZ1UE5KxGuRzCiYYnuSHpPHUkT3hIfp6
-         60UA7VTSZzaMaCT/i9gEQiy9eNL9h8SZwyCC2L23HobD0GNgnLLSje53Pvv+uI1cqmHV
-         wcPT3K2p30QRw2JyY6XuVcSQjDJ19oyU0OZl94vVohUcR3srSoRdHAOps2QFuGz7rLOi
-         4IDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVR/keXp1KMeOZijsQFg1SOyAkD6qjLb1ClPCugZprjyZvKsZI8I0DyN4bgsWy+OwiZ8hKo0S74XfYpO7jKYogaCXg/rTfWaQ2E4EuerP3OQ9Mny/vl1J9SNqw8razbvit1CDNZHUjOFhfjrevcS1iCQ2Im7OGe6bJcXlVBGQmuoIcYDtHmTUaXZeh+7nGFQZzj2Gb9Zf/QfMrGTjGCns8EmS4lAWmBiKBxeDBhvgc1CxnRH/qZgJ6P7qdrAgdGNnwoy6+PRafrkA==
-X-Gm-Message-State: AOJu0Yw0XEvYXRXp4aghGx8rm9p6kn2OmbF21k4vmlklqwxK/ztjUFI9
-	+q+8yE5iQyfIIkdAXdYNR/SfDC6phvbB4ebzEIU9199VO3wHquoL8fUuNg==
-X-Google-Smtp-Source: AGHT+IEQhOEcyJo9nymze7EJcWUmb0pa0RPK5Sh5riMCUcRm7lnBoF6POikeGeyiWKlGRHtmtiu3qw==
-X-Received: by 2002:a05:6a21:6704:b0:1c0:f080:ed5b with SMTP id adf61e73a8af0-1c2984ce612mr12926893637.54.1720807006607;
-        Fri, 12 Jul 2024 10:56:46 -0700 (PDT)
-Received: from MacBook-Pro-49.local ([2620:10d:c090:500::7:44ce])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ab8041sm69662725ad.135.2024.07.12.10.56.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 10:56:46 -0700 (PDT)
-Date: Fri, 12 Jul 2024 10:56:41 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	apparmor@lists.ubuntu.com, selinux@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Brendan Jackman <jackmanb@chromium.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Khadija Kamran <kamrankhadijadj@gmail.com>, Casey Schaufler <casey@schaufler-ca.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, 
-	John Johansen <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu <shung-hsi.yu@suse.com>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Anna Schumaker <anna@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: Re: [PATCH bpf-next v4 11/20] bpf, lsm: Add disabled BPF LSM hook
- list
-Message-ID: <qjrf5c6f24b6ef5tpvpz75uxp6ro6mhos34ovssinv4yxjwyz3@nvs75o5sywgx>
-References: <20240711111908.3817636-1-xukuohai@huaweicloud.com>
- <20240711111908.3817636-12-xukuohai@huaweicloud.com>
+	s=arc-20240116; t=1720807631; c=relaxed/simple;
+	bh=7StgXDt3Bfj8YypYQ53JnodI6Mkg/jFSULezrQfBVyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D2CvDg6ENHTOfs5PQKaEICdwR2Vruruz+pPrCVzRKU7sgGHoMuD2mfUVnCidUhIJUuUSM4yu/RXjSKVzknd+sIumLiXfC+kfaTx6/dWPlvHG2GOjOorCLFYKT1990jIUPUgqy9rfeTq4qoU9Mdlhh2eIqcR8r/SCuBR49oNeTrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjkvxCDn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 138C4C4AF0C;
+	Fri, 12 Jul 2024 18:07:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720807631;
+	bh=7StgXDt3Bfj8YypYQ53JnodI6Mkg/jFSULezrQfBVyU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SjkvxCDnStsI55/U2mR52PuC0PaFJEq5LpnJ6djyC8PbSRCW/XakY4AckCRWQaV2c
+	 Ukcp+OM/bQrRP86cPlAOnOitb2LNq1alh2tprtOnDNvAvpuSRK0kWiwqS5nfXuYEbt
+	 0EILkwssGCDFywOD4sXZKKgF/cMk4lpxeOWUnd5UUEJxfuxAjO1WyGPqawkyZbU2oE
+	 KaFf7NxV4ea8N9VWdkTpwrlE8S3X45j8LwSFA9U9oLrdg/D7J4dOSaFBYOXQcZC1yC
+	 jVZsjWNLdjQfY24YyTYOZ8si+y3VENHf5PExYQ3yNvxqKDP3bXt7YveKpf5HNNlroR
+	 PB6oEMpuHFAgA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: mkubecek@suse.cz
+Cc: netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	Jakub Kicinski <kuba@kernel.org>,
+	idosch@nvidia.com,
+	danieller@nvidia.com
+Subject: [PATCH ethtool-next] module-eeprom: treat zero arguments like any other arguments for hex dump
+Date: Fri, 12 Jul 2024 11:07:06 -0700
+Message-ID: <20240712180706.466124-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240711111908.3817636-12-xukuohai@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 11, 2024 at 07:18:59PM +0800, Xu Kuohai wrote:
-> From: Xu Kuohai <xukuohai@huawei.com>
-> 
-> Add a disabled hooks list for BPF LSM. progs being attached to the
-> listed hooks will be rejected by the verifier.
-> 
-> Suggested-by: KP Singh <kpsingh@kernel.org>
-> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+The code does not differentiate between user asking for page 0 and
+page not being set on the CLI at all. This is problematic because
+drivers don't support old type of dumping for newer module types.
+For example trying to hex dump EEPROM of a QSFP-DD on mlx5 gives
+us in kernel logs:
 
-Xu,
+  mlx5_query_module_eeprom[...]: Module ID not recognized: 0x18
 
-The patches 11 and higher are mostly independent from lsm refactoring.
-Please send them as a separate patchset for bpf-next.
-While lsm cleanups are being reviewed this lsm_disabled list can be
-a bit larger temporarily.
+We can dump all the non-zero pages, and without "hex on" ethtool
+also uses the page-aware API to get the information it will print.
+But hex dumping page 0 is not possible.
+
+Instead of using zero / non-zero to figure out whether param was
+set - add a bitmap of which params got set on command line.
+The nl_param()'s dest option is not used by any other command,
+so we're free to change the format.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: idosch@nvidia.com
+CC: danieller@nvidia.com
+---
+ netlink/module-eeprom.c | 30 +++++++++++++++++++++---------
+ netlink/parser.c        | 11 +++++++++--
+ 2 files changed, 30 insertions(+), 11 deletions(-)
+
+diff --git a/netlink/module-eeprom.c b/netlink/module-eeprom.c
+index fe02c5ab2b65..2b30d042c00a 100644
+--- a/netlink/module-eeprom.c
++++ b/netlink/module-eeprom.c
+@@ -22,6 +22,7 @@
+ #define ETH_I2C_MAX_ADDRESS	0x7F
+ 
+ struct cmd_params {
++	unsigned long present;
+ 	u8 dump_hex;
+ 	u8 dump_raw;
+ 	u32 offset;
+@@ -31,6 +32,14 @@ struct cmd_params {
+ 	u32 i2c_address;
+ };
+ 
++enum {
++	PARAM_OFFSET = 2,
++	PARAM_LENGTH,
++	PARAM_PAGE,
++	PARAM_BANK,
++	PARAM_I2C,
++};
++
+ static const struct param_parser getmodule_params[] = {
+ 	{
+ 		.arg		= "hex",
+@@ -44,31 +53,31 @@ static const struct param_parser getmodule_params[] = {
+ 		.dest_offset	= offsetof(struct cmd_params, dump_raw),
+ 		.min_argc	= 1,
+ 	},
+-	{
++	[PARAM_OFFSET] = {
+ 		.arg		= "offset",
+ 		.handler	= nl_parse_direct_u32,
+ 		.dest_offset	= offsetof(struct cmd_params, offset),
+ 		.min_argc	= 1,
+ 	},
+-	{
++	[PARAM_LENGTH] = {
+ 		.arg		= "length",
+ 		.handler	= nl_parse_direct_u32,
+ 		.dest_offset	= offsetof(struct cmd_params, length),
+ 		.min_argc	= 1,
+ 	},
+-	{
++	[PARAM_PAGE] = {
+ 		.arg		= "page",
+ 		.handler	= nl_parse_direct_u32,
+ 		.dest_offset	= offsetof(struct cmd_params, page),
+ 		.min_argc	= 1,
+ 	},
+-	{
++	[PARAM_BANK] = {
+ 		.arg		= "bank",
+ 		.handler	= nl_parse_direct_u32,
+ 		.dest_offset	= offsetof(struct cmd_params, bank),
+ 		.min_argc	= 1,
+ 	},
+-	{
++	[PARAM_I2C] = {
+ 		.arg		= "i2c",
+ 		.handler	= nl_parse_direct_u32,
+ 		.dest_offset	= offsetof(struct cmd_params, i2c_address),
+@@ -267,15 +276,18 @@ int nl_getmodule(struct cmd_context *ctx)
+ 	 * ioctl. Netlink can only request specific pages.
+ 	 */
+ 	if ((getmodule_cmd_params.dump_hex || getmodule_cmd_params.dump_raw) &&
+-	    !getmodule_cmd_params.page && !getmodule_cmd_params.bank &&
+-	    !getmodule_cmd_params.i2c_address) {
++	    !(getmodule_cmd_params.present & (1 << PARAM_PAGE |
++					      1 << PARAM_BANK |
++					      1 << PARAM_I2C))) {
+ 		nlctx->ioctl_fallback = true;
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+ #ifdef ETHTOOL_ENABLE_PRETTY_DUMP
+-	if (getmodule_cmd_params.page || getmodule_cmd_params.bank ||
+-	    getmodule_cmd_params.offset || getmodule_cmd_params.length)
++	if (getmodule_cmd_params.present & (1 << PARAM_PAGE |
++					    1 << PARAM_BANK |
++					    1 << PARAM_OFFSET |
++					    1 << PARAM_LENGTH))
+ #endif
+ 		getmodule_cmd_params.dump_hex = true;
+ 
+diff --git a/netlink/parser.c b/netlink/parser.c
+index 6f863610a490..cd32752a9ddb 100644
+--- a/netlink/parser.c
++++ b/netlink/parser.c
+@@ -996,7 +996,7 @@ static void tmp_buff_destroy(struct tmp_buff *head)
+  *               and their handlers; the array must be terminated by null
+  *               element {}
+  * @dest:        optional destination to copy parsed data to (at
+- *               param_parser::offset)
++ *               param_parser::offset); buffer should start with presence bitmap
+  * @group_style: defines if identifiers in .group represent separate messages,
+  *               nested attributes or are not allowed
+  * @msgbuffs:    (only used for @group_style = PARSER_GROUP_MSG) array to store
+@@ -1096,7 +1096,14 @@ int nl_parser(struct nl_context *nlctx, const struct param_parser *params,
+ 			buff = tmp_buff_find(buffs, parser->group);
+ 		msgbuff = buff ? buff->msgbuff : &nlsk->msgbuff;
+ 
+-		param_dest = dest ? ((char *)dest + parser->dest_offset) : NULL;
++		if (dest) {
++			unsigned long index = parser - params;
++
++			param_dest = ((char *)dest + parser->dest_offset);
++			set_bit(index, (unsigned long *)dest);
++		} else {
++			param_dest = NULL;
++		}
+ 		ret = parser->handler(nlctx, parser->type, parser->handler_data,
+ 				      msgbuff, param_dest);
+ 		if (ret < 0)
+-- 
+2.45.2
+
 
