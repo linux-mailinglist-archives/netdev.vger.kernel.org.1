@@ -1,137 +1,136 @@
-Return-Path: <netdev+bounces-111177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4198C9302F6
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 03:15:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8BC930300
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 03:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1D0C282EEB
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 01:15:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25071C21888
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 01:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BB68BFF;
-	Sat, 13 Jul 2024 01:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B20D2FF;
+	Sat, 13 Jul 2024 01:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="v0PMbDDV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dNYcsn+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4829748F;
-	Sat, 13 Jul 2024 01:15:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBD2168A9;
+	Sat, 13 Jul 2024 01:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720833320; cv=none; b=aRg2LDPmuTISGVHexHe5WQYwWrH3j1ttrRSZl8MxbNpJgD3QCKjAbM9Q4Ktl//KoIITmhZj14K+DXwvYdaUyfFvtBaoiFBUH4TosxkcwtllkmkQ1/khNexMtVuaLMYCUJ93R00zvaxCNZBHqVBv/et/g0DfPlHfRhcKxsJF+4+0=
+	t=1720833727; cv=none; b=iIAENMnm0QBYn3LUEOqEXtjjH5y+sLOmvdp1x/98tHHp9VjuK0KMW98CIh0oQ4Ryd1rA7o2SCBlX0Yj8aZ9HH+TiF9wHf7ndo+gWA8FBE+9KBMWQqAqCqt04lMgW6G0abIdOz2xAD8wEbDW21miSWCW8f97Z98fTNlLEjGOBz2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720833320; c=relaxed/simple;
-	bh=du3UW8tRNOLxQwkKF7Z6rMUYEyzL+xfjgY6IRpaAueg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mBbRUfHyzGl1EBH3bBe0uDUsW9FBDP6I2ok5LjMrAiN6KugEzUZURMUMyHdLUizt0J6XLYu7IaCst5BsupMQ8OnZHYaKyO1TSG4PCX4Kh4YL2C7/NccShOBT1GqQmEFCVBbk/F/PDyK9cQsL3sPpIYg7zD/m6BKJ5qruZuZM230=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=v0PMbDDV; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1720833308;
-	bh=du3UW8tRNOLxQwkKF7Z6rMUYEyzL+xfjgY6IRpaAueg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=v0PMbDDVruenwHGcOXejYi0xAzx7FtGIvgGlfpSrqLC9W5AmiFcfHJ6XHkpr+eJEd
-	 LeFFiVbrfkoNT76Rh3bvESxyFA+KfcdFDhJz7GvHsZYESdPl9Li1BfXQugG3y8OYct
-	 eI/vhj094zqXMwOv0X06/ujF0ntOHVXXk3LCWmlvdUzJnrUZwgVGLkQFWH6k0GzdW+
-	 e0Pq9I5MdkRueTT8LZdNJFZ5mH2fxUb7iBl2nhZNwjuZhU8f8ZdNdkkcsEQBYXPPIT
-	 bkH07WvI/U0fjhDJ+rdPRV523t+Ipy6TiGkZjmfHhJg0DflE3Z7hIYPp/xxltJtept
-	 r6tcUNh/oUTsw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 9797260078;
-	Sat, 13 Jul 2024 01:15:07 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 1C01320484A;
-	Sat, 13 Jul 2024 01:14:58 +0000 (UTC)
-Message-ID: <84b4b03d-3ec5-48cc-a889-bbeaaf3ceb0c@fiberby.net>
-Date: Sat, 13 Jul 2024 01:14:57 +0000
+	s=arc-20240116; t=1720833727; c=relaxed/simple;
+	bh=ZplZcFQQhACVAehHShfXFFQ9wl/eljFn6N761AyGB3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u7V3Y3rPIupd0ILkdntQcl2IS51iAArIRqolDEZQ8NDp21EwCCTqs2s1Vqd2HmB89nGBMJCDdWCS4hDnFK0mLY+zSTQacU0Kregoc4g8dtVG/535Bpho+7jL+kQ3uB+G1NWoaBqNVG0Mc48u/xzFZQIztbRfGG2e4Y5+SEF/VRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dNYcsn+E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D74FC32782;
+	Sat, 13 Jul 2024 01:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720833726;
+	bh=ZplZcFQQhACVAehHShfXFFQ9wl/eljFn6N761AyGB3g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dNYcsn+ElWybb9Mc5w+T8YP6HuGeiabalkAPmQOP4SeOLaHk9mpp4Qc7EEVYicH08
+	 /B5sAM0mdlZRqm5FL3vv3quAtKFJxez0kyxzAmpm9veVjb0b+kXPZj624wg8NVcIVG
+	 t07S7hJsly8O2mttMvXz4C6vl+PCIkYGgPTzNsmdZM9C88nJdpv6rEgpOIjus43vYx
+	 NEFIDx7KuuBSnIRk8z0hRyn2dVRAszxDOTNpOhNW3Gn/3SDgs5n2pyXiRQFIT3R1Gt
+	 gFz3pYPbC4AKATE5649HBwEbLFDlRwxbmyLAYbLD0VzkIROaANXqxwYqz4ujdS1skw
+	 89uVzUarPNGUg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.10-rc8 (follow up)
+Date: Fri, 12 Jul 2024 18:22:05 -0700
+Message-ID: <20240713012205.4143828-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 03/10] net/sched: cls_flower: prepare
- fl_{set,dump}_key_flags() for ENC_FLAGS
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Davide Caratti <dcaratti@redhat.com>,
- Ilya Maximets <i.maximets@ovn.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
- Simon Horman <horms@kernel.org>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Florian Westphal <fw@strlen.de>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- linux-kernel@vger.kernel.org
-References: <20240709163825.1210046-1-ast@fiberby.net>
- <20240709163825.1210046-4-ast@fiberby.net>
- <20240711185404.2b1c4c00@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <20240711185404.2b1c4c00@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+Hi Linus!
 
-On 7/12/24 1:54 AM, Jakub Kicinski wrote:
-> On Tue,  9 Jul 2024 16:38:17 +0000 Asbjørn Sloth Tønnesen wrote:
->> +	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, fl_mask)) {
-> 
-> Does this work with nest as NULL?
+If you're planning to cut final on Friday please consider pulling
+for the bnxt fix.
 
-It does, but it gives less information:
+The following changes since commit 51df8e0cbaefd432f7029dde94e6c7e4e5b19465:
 
-  * struct netlink_ext_ack - netlink extended ACK report struct
-  [..]
-  * @miss_nest: nest missing an attribute (%NULL if missing top level attr)
+  Merge tag 'net-6.10-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-07-11 09:29:49 -0700)
 
-NL_REQ_ATTR_CHECK() doesn't check the value of nest, it just sets it.
+are available in the Git repository at:
 
-That line originates from Davide's patch and is already in net-next:
-1d17568e74de ("net/sched: cls_flower: add support for matching tunnel control flags")
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.10-rc8-2
 
-It was added to that patch, after Jamal requested it.
-https://lore.kernel.org/CAM0EoMkE3kzL28jg-nZiwQ0HnrFtm9HNBJwU1SJk7Z++yHzrMw@mail.gmail.com/
+for you to fetch changes up to f7ce5eb2cb7993e4417642ac28713a063123461f:
 
-> tb here is corresponding to attrs from tca[TCA_OPTIONS], so IIRC we need
-> to pass tca[TCA_OPTIONS] as nest here. Otherwise the decoder will look
-> for attribute with ID fl_mask at the root level, and the root attrs are
-> from the TCA_ enum.
-> 
-> Looks like Donald covered flower in Documentation/netlink/specs/tc.yaml
-> so you should be able to try to hit this using the Python ynl CLI:
-> https://docs.kernel.org/next/userspace-api/netlink/intro-specs.html#simple-cli
-> But to be honest I'm not 100% sure if the YNL reverse parser works with
-> TC and its "sub-message" polymorphism ;)
+  bnxt_en: Fix crash in bnxt_get_max_rss_ctx_ring() (2024-07-12 18:00:00 -0700)
 
-After extending the spec to know about the enc_flags keys, I get this:
+----------------------------------------------------------------
+A quick follow up to yesterday's PR. We got a regressions report for
+the bnxt patch as soon as it got to your tree. The ethtool fix is also
+good to have, although it's an older regression.
 
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/tc.yaml --do newtfilter --json '{"chain": 0, "family": 
-0, "handle": 4, "ifindex": 22, "info": 262152, "kind": "flower", "options": { "flags": 0, "key-enc-flags": 8, 
-"key-eth-type": 2048}, "parent": 4294967283}'
-Netlink error: Invalid argument
-nl_len = 68 (52) nl_flags = 0x300 nl_type = 2
-         error: -22
-         extack: {'msg': 'Missing flags mask', 'miss-type': 111}
+Current release - regressions:
 
-After propagating tca[TCA_OPTIONS] through:
+ - eth: bnxt_en: fix crash in bnxt_get_max_rss_ctx_ring() on older HW
+   when user tries to decrease the ring count
 
-Netlink error: Invalid argument
-nl_len = 76 (60) nl_flags = 0x300 nl_type = 2
-         error: -22
-         extack: {'msg': 'Missing flags mask', 'miss-type': 111, 'miss-nest': 56}
+Previous releases - regressions:
 
-In v4, I have added the propagation as the last patch.
+ - ethtool: fix RSS setting, accept "no change" setting if the driver
+   doesn't support the new features
 
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+ - eth: i40e: remove needless retries of NVM update, don't wait 20min
+   when we know the firmware update won't succeed
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Aleksandr Loktionov (1):
+      i40e: fix: remove needless retries of NVM update
+
+David S. Miller (1):
+      Merge branch 'octeontx2-cpt-rss-cfg-fixes' into main
+
+Kiran Kumar K (1):
+      octeontx2-af: fix issue with IPv6 ext match for RSS
+
+Michael Chan (1):
+      bnxt_en: Fix crash in bnxt_get_max_rss_ctx_ring()
+
+Michal Mazur (1):
+      octeontx2-af: fix detection of IP layer
+
+Nithin Dabilpuram (1):
+      octeontx2-af: replace cpt slot with lf id on reg write
+
+Saeed Mahameed (1):
+      net: ethtool: Fix RSS setting
+
+Satheesh Paul (1):
+      octeontx2-af: fix issue with IPv4 match for RSS
+
+Srujana Challa (1):
+      octeontx2-af: fix a issue with cpt_lf_alloc mailbox
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  3 +++
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h      |  4 ----
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/npc.h    |  8 ++++++--
+ .../net/ethernet/marvell/octeontx2/af/rvu_cpt.c    | 23 +++++++++++++++-------
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    | 12 +++++++----
+ net/ethtool/ioctl.c                                |  3 ++-
+ 7 files changed, 36 insertions(+), 19 deletions(-)
 
