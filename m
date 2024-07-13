@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-111278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EFE593076F
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:20:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B871B930771
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 546B7B21DB4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 21:20:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8115B20CB9
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 21:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2304417836A;
-	Sat, 13 Jul 2024 21:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C538178CC0;
+	Sat, 13 Jul 2024 21:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWasuZQf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9SfZn0k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69612177990;
-	Sat, 13 Jul 2024 21:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BAD178386;
+	Sat, 13 Jul 2024 21:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720905428; cv=none; b=KXeLzotYlRaPNaRVzD6QBYytY/MAVGluQDMEvhi6HngKH4DsDXCMWVczUsiTypI3rzMU+5ea+1o3EjhEm1ins74msKM1kJU53cEAEh0a32/odx2rcgxv1tBLRmkG8RjcvWkJhnlb+XNzbIv/Bw5IqxVtOysBhJOW49kqhYy+ryE=
+	t=1720905431; cv=none; b=MnHsiu1KBXiSGtgbHAcmxm8hk3SW4JE77VTuK2g7OIGL+13JUV/ccb8q0rnsUAafXAYKS+pOeizYGScw5PGGlT606AxtJGM4bLZ/U4AkGSJTJpaf0hFdSa5JIdc2qjNstiEP47hBEbmP6HVuqVuoVB2fujIlwqLFKDGoN/lLE70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720905428; c=relaxed/simple;
-	bh=MVXmrQ2LRCuJIf/94lH/IfWgZoufMkSDKJmB8MbQINo=;
+	s=arc-20240116; t=1720905431; c=relaxed/simple;
+	bh=4JGVEthUO/9/JGyzV/xSN/50/6+D88uFUZ67OyzkPfc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OsAmACM4U6GNhmMDHi4ApV3c8ug84zOCq0IFmVTMIy25YTJDfx6yeas23gI6Gk5TNzAIv1N+E1k+uaCb2eVMiY1+4vJXub66xW9vkiMV5YdH9NTlgfj9uB1yBIy5akUUdFTer+NQVVxrgA8iUbq3vOOzMrB66WVmUZSP24MdI/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWasuZQf; arc=none smtp.client-ip=209.85.218.41
+	 MIME-Version; b=VgqqpxQdS037aHh8e1KGdeaac5f893rN+qu5OKI93XOdHz4xnErmBuV/hkMTPqTfKHTZnEWcd28EEgkwUQFrdpZ/3/en4p1IfIBPwWfcakZn6CYQwLuGU/FdylGjLO3Nm4dtTAAWPGCC4pOADreHPuSWV6E1n7ljIWX+p8hI8w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9SfZn0k; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a77c0b42a8fso640482866b.1;
-        Sat, 13 Jul 2024 14:17:06 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so48282561fa.0;
+        Sat, 13 Jul 2024 14:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720905424; x=1721510224; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720905428; x=1721510228; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rh1vKhQI83uBVL3wLqhVH8a/5LN3/IDubJghfAucUvc=;
-        b=CWasuZQfRbpThJnL4OEYS5UHH40CaoBQQ9gPVKBpVQ8vyQpe0Zd22VDmBOuJMxGC8x
-         cGq5Ihb96V/tmnVcZi3zNB0g/F2Jb6v/fS56Be+4YX1kiKnckTI+j/YrJTKhFdGPoJXg
-         /wheL2RBxUrGuD/PCZxGzOIoxKYDRu7sZpcODJk4Nyp9qlHnn5btkSURzBYyUzWUCs40
-         rbsQ99+jhy3HpGbZKiwE0EicGfullV2LeASIYzjcdQy3VVvlAm1XBcIYw+P7XiRFZWj0
-         74CaJXeDTQIICXX4A3VqfVy9C3TAOp1shU3+/cgbkt04AeKsNucuxJqczZQrBpHov46T
-         tFiw==
+        bh=O7E/9qsW4s25NpSrBKRqdhwhFtq7oMnQgr3sY+zQz70=;
+        b=Z9SfZn0k13vRfa9nXFsUXIpKVEjwZgpurEfMeAaMxtprTHNX25JeykZBkq0R5BkVG1
+         93PVDQoCnwiIG/8aLjjijM3QulhNmrt8Je80AvSmE8gIsJBxN5h+eFi/6lhIdHIzDRs1
+         jOKmE2Ynt6DaEl2dK3jHP4Un3gVa64V++uvUTxU6G/gGTcwvixnKf6skOpO+EyM69+Cl
+         QhinXJeYS9YUyovhpPFW/XibokOvuNzUjC3H1mciLeybo9yZ4qlnykxt72xZwM1c9N0z
+         R1g53S1IkG/TkhFek5mACboQQNqzR902om4D0H+mGWwGavvNj2BRyaz+mmzrsqq7RP9h
+         nUKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720905424; x=1721510224;
+        d=1e100.net; s=20230601; t=1720905428; x=1721510228;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rh1vKhQI83uBVL3wLqhVH8a/5LN3/IDubJghfAucUvc=;
-        b=GnevduW/OKvEecKK9qIM4Ev/3lP/cq/ZhildppqoGAc4bziFVHyUF6mq9c7ZSdvmCo
-         JQTGhD0ydGNx87iQc0aO/HpwWvQfO1hNVSj4irj3HRl2Ao9KNze8AioljiBwoeRkIG4t
-         +Q2VjlXuYb02TGM6bLAkOBT6g548HJu7YJuNITG3Nj9q3ghL6XU6JMAkS1Vt4wacsbTz
-         fdlYWLmokThgM1AZOcWChZyksZf1e7U7c9DpNHnc+5kDYKrrp78RAk4ckM72jOFDVKJT
-         dyXO30S/Mri/WicB8ZvBu6lPgct89QKn1bAmnDtknemFZJV0zm6AY/w9Nyrz1RMdzFmT
-         pj/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUuCjlc7FeIe2w18sQWgPpgcW5jqwsRfQLA5926MVvlehOiTUFIhs4rKAX2Tb27eGhSSnxFPnjnPXxVYS0+kWQrv4qFrgaxGZwssLkw
-X-Gm-Message-State: AOJu0Yz/dGnOpt7svktuWlYeJv5sphXUquMTY+hWoFIkY80mBjP15VvL
-	lUXXCl9GS6i6SL+eywLe0FT9/PBqu1Jx3zWcBMBK233gyv4DUNQFcakhbOO+
-X-Google-Smtp-Source: AGHT+IEIu+3YlARYqTKgb4ZN+PQScmNIkc6S2L87Y9z7eBUCHpyM2Y/b5zktZ4qu9+T3GiyIDqSe2A==
-X-Received: by 2002:a17:907:7f14:b0:a77:db04:8ceb with SMTP id a640c23a62f3a-a799cc6ab6cmr617731266b.19.1720905424387;
-        Sat, 13 Jul 2024 14:17:04 -0700 (PDT)
+        bh=O7E/9qsW4s25NpSrBKRqdhwhFtq7oMnQgr3sY+zQz70=;
+        b=pinn9UW15++yLawZCPZEsYhc3n7DZvtAqhLY9w0k2JnhX7/SbfUGGxnmROfNEvqwF/
+         BlBjwz1ExkGAD9I3vyopZhzOjuzAStjOH4fat7QI4OhYedP9kIOIZxKHuisrNDDqG0iy
+         SrGcbCliX8XQnFwvL9pbyUpLCaHuw/7iDzMEyDv1E7dqJI+LzlRbkz7k5Eu6jkjd2lF7
+         dLr83H71DAuUepspK1rjvfCPyyzq2NkQNGP9kGSBqArfi8xgsYF3JpCcLA1of8Tk9q7o
+         FrtS8QxEH4Iom7RIc/CtrNX2At4P9UYIsRFWUfUv9gOBgMuw+nBCrhQO3QTDdZWhCekn
+         m8Mg==
+X-Forwarded-Encrypted: i=1; AJvYcCWqyJ9MZ9smcYdc4yxGufip0J95ViQYN11VEau4/ypJWGzbG6Eb5N9xJXXjOeCFEeszdJrRTRISDcJT8jWBJxG0jSHUg4ORxm2jiPB8
+X-Gm-Message-State: AOJu0Yyi24jkUdBxFiIkgcpkzHXOD5KkHjhWKflqrgXBGX+13Mz55Hbq
+	usRgbjCA4+F+5j0LscKDxB9rZuzhOrldceuDXku9n1IARKBEg3K83gcQMkyL
+X-Google-Smtp-Source: AGHT+IGnLD8NfLHaxlQlwBJChqsHQyqOuQcrvJiZ7wL5RvoAK+IpALurSf7sX4Ge8mYxtnu37ORYtA==
+X-Received: by 2002:a2e:830c:0:b0:2ea:e74c:40a2 with SMTP id 38308e7fff4ca-2eeb30e5025mr112992081fa.20.1720905427882;
+        Sat, 13 Jul 2024 14:17:07 -0700 (PDT)
 Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59b255253b6sm1187286a12.41.2024.07.13.14.17.03
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59b255253b6sm1187286a12.41.2024.07.13.14.17.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jul 2024 14:17:03 -0700 (PDT)
+        Sat, 13 Jul 2024 14:17:07 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Paolo Abeni <pabeni@redhat.com>,
@@ -82,9 +82,9 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 10/12] net: dsa: prepare 'dsa_tag_8021q_bridge_join' for standalone use
-Date: Sat, 13 Jul 2024 23:16:16 +0200
-Message-Id: <20240713211620.1125910-11-paweldembicki@gmail.com>
+Subject: [PATCH net-next v4 11/12] net: dsa: vsc73xx: Add bridge support
+Date: Sat, 13 Jul 2024 23:16:17 +0200
+Message-Id: <20240713211620.1125910-12-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240713211620.1125910-1-paweldembicki@gmail.com>
 References: <20240713211620.1125910-1-paweldembicki@gmail.com>
@@ -96,91 +96,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The 'dsa_tag_8021q_bridge_join' could be used as a generic implementation
-of the 'ds->ops->port_bridge_join()' function. However, it is necessary
-to synchronize their arguments.
+This patch adds bridge support for the vsc73xx driver.
 
-This patch also moves the 'tx_fwd_offload' flag configuration line into
-'dsa_tag_8021q_bridge_join' body. Currently, every (sja1105) driver sets
-it, and the future vsc73xx implementation will also need it for
-simplification.
+The vsc73xx requires minimal operations and ithe generic
+dsa_tag_8021q_bridge_* API is sufficient.
+The forwarding matrix is managed by vsc73xx_port_stp_state_set() ->
+vsc73xx_refresh_fwd_map()i routine, which is called immediately after
+.port_bridge_join() and .port_bridge_leave().
 
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 ---
 v4:
   - resend only
 v3:
-  - added 'Reviewed-by' only
-v2:
-  - resend only
-v1:
-  - introduce patch
+  - improved commit description
+  - added 'Reviewed-by'
+v2, v1:
+  - Use generic functions instead unnecessary intermediary shims
 ---
- drivers/net/dsa/sja1105/sja1105_main.c | 5 ++---
- include/linux/dsa/8021q.h              | 3 ++-
- net/dsa/tag_8021q.c                    | 5 ++++-
- 3 files changed, 8 insertions(+), 5 deletions(-)
+Before patch series split:
+https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
+v8:
+  - resend only
+v7:
+  - added 'Reviewed-by' only
+v6:
+  - resend only
+v5:
+  - added 'Reviewed-by' only
+v4:
+  - remove forward configuration after stp patch refactoring
+  - implement new define with max num of bridges for tag8021q devices
+v3:
+  - All vlan commits was reworked
+  - move VLAN_AWR and VLAN_DBLAWR to port setup in other commit
+  - drop vlan table upgrade
+v2:
+  - no changes done
+---
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index 0c55a29d7dd3..c7282ce3d11c 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -2133,14 +2133,13 @@ static int sja1105_bridge_join(struct dsa_switch *ds, int port,
- 	if (rc)
- 		return rc;
+diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+index 25c3cd661b30..d0e501bbd57d 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx-core.c
++++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+@@ -691,6 +691,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
  
--	rc = dsa_tag_8021q_bridge_join(ds, port, bridge);
-+	rc = dsa_tag_8021q_bridge_join(ds, port, bridge, tx_fwd_offload,
-+				       extack);
- 	if (rc) {
- 		sja1105_bridge_member(ds, port, bridge, false);
- 		return rc;
- 	}
+ 	dev_info(vsc->dev, "set up the switch\n");
  
--	*tx_fwd_offload = true;
--
- 	return 0;
- }
- 
-diff --git a/include/linux/dsa/8021q.h b/include/linux/dsa/8021q.h
-index 1dda2a13b832..d13aabdeb4b2 100644
---- a/include/linux/dsa/8021q.h
-+++ b/include/linux/dsa/8021q.h
-@@ -18,7 +18,8 @@ int dsa_tag_8021q_register(struct dsa_switch *ds, __be16 proto);
- void dsa_tag_8021q_unregister(struct dsa_switch *ds);
- 
- int dsa_tag_8021q_bridge_join(struct dsa_switch *ds, int port,
--			      struct dsa_bridge bridge);
-+			      struct dsa_bridge bridge, bool *tx_fwd_offload,
-+			      struct netlink_ext_ack *extack);
- 
- void dsa_tag_8021q_bridge_leave(struct dsa_switch *ds, int port,
- 				struct dsa_bridge bridge);
-diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
-index c0eee113a2b9..3ee53e28ec2e 100644
---- a/net/dsa/tag_8021q.c
-+++ b/net/dsa/tag_8021q.c
-@@ -286,7 +286,8 @@ int dsa_switch_tag_8021q_vlan_del(struct dsa_switch *ds,
-  * be used for VLAN-unaware bridging.
-  */
- int dsa_tag_8021q_bridge_join(struct dsa_switch *ds, int port,
--			      struct dsa_bridge bridge)
-+			      struct dsa_bridge bridge, bool *tx_fwd_offload,
-+			      struct netlink_ext_ack *extack)
- {
- 	struct dsa_port *dp = dsa_to_port(ds, port);
- 	u16 standalone_vid, bridge_vid;
-@@ -304,6 +305,8 @@ int dsa_tag_8021q_bridge_join(struct dsa_switch *ds, int port,
- 
- 	dsa_port_tag_8021q_vlan_del(dp, standalone_vid, false);
- 
-+	*tx_fwd_offload = true;
++	ds->untag_bridge_pvid = true;
++	ds->max_num_bridges = DSA_TAG_8021Q_MAX_NUM_BRIDGES;
 +
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(dsa_tag_8021q_bridge_join);
+ 	/* Issue RESET */
+ 	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+ 		      VSC73XX_GLORESET_MASTER_RESET);
+@@ -1716,6 +1719,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+ 	.get_sset_count = vsc73xx_get_sset_count,
+ 	.port_enable = vsc73xx_port_enable,
+ 	.port_disable = vsc73xx_port_disable,
++	.port_bridge_join = dsa_tag_8021q_bridge_join,
++	.port_bridge_leave = dsa_tag_8021q_bridge_leave,
+ 	.port_change_mtu = vsc73xx_change_mtu,
+ 	.port_max_mtu = vsc73xx_get_max_mtu,
+ 	.port_stp_state_set = vsc73xx_port_stp_state_set,
 -- 
 2.34.1
 
