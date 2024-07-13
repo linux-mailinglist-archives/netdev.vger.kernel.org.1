@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-111187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FCAF93033A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:19:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F6D9930345
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F138A1F21C18
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CECE6283688
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C0F179BF;
-	Sat, 13 Jul 2024 02:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1442149633;
+	Sat, 13 Jul 2024 02:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="i3OBSXhO"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="vOoh7bcm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E9E125BA;
-	Sat, 13 Jul 2024 02:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAB820328;
+	Sat, 13 Jul 2024 02:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720837164; cv=none; b=HPTYr6/cRUvUYC8srbWiqSdCUI/tDHUhLnOVYCXrplErXEPVnWgvUShjM1lPTbfZBORIYUEZe7JzLe51emVGzP2AZo7z4TyCZRp+PlpSU+CJ265tuu7beFnBL0sl9slQW41nde4BLSalXukrubQejDqTuD/y1/aP+KYyIc4g3dg=
+	t=1720837168; cv=none; b=aIaSim0aspQH2rTl5XI3hn/NpieB1suvq6aP/YDtlS0TnobfgUPAfa3XzptxQquNSDNTwD7ci5aq+8r+S5wUvLchhhVYwbrmn3jiX6+5u/ys0KC62YYJMat41U6pOg4fB/RF2uGAa9REw4gjOLiMOF5ylkWNLEYvLUzflUSHXxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720837164; c=relaxed/simple;
-	bh=4E4yZXx8jCUbakXcIoD1t29dMzRRXIiEsqKxbHkysPk=;
+	s=arc-20240116; t=1720837168; c=relaxed/simple;
+	bh=0oXrAqaLRc8r6eOka7Lu+JeTrPM0sGdE1nkvpFvZ/sc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BNhwOYcMOAsUHqIyc6BvUg8Sfd2kNHhGobJUklNcXsry0yGOQsgkGaFMsWtHq+C6S4ISm8r+euJocyuu/b0+bGaD9NzK/H/uCbXYLQja2pc7A7uIUs8ehkvbeW3KaL75F7GkLKsrdCwsfRlvHtzBcq+6BYUgNgYQd2+bgBcJyKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=i3OBSXhO; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=n+lxui3SlKayK6ZLKLTPCiJTaaBuopjdEguwLFdkIZE5BnaDELuH/iwbZ/dxOAcot95agQQOBW0U0xI67DAdvHow5Bk2BIbtYyTlS7lNDnttvnLbinWDlMcV4jmfQioj9C1JlNVtGCQ5gHxAS8f3ntMD18l/0+WSjFiDD/HgUaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=vOoh7bcm; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1720837159;
-	bh=4E4yZXx8jCUbakXcIoD1t29dMzRRXIiEsqKxbHkysPk=;
+	bh=0oXrAqaLRc8r6eOka7Lu+JeTrPM0sGdE1nkvpFvZ/sc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i3OBSXhOyoPARgVaHefU0wgOYduI6cohW58aCOdq8UkMhiaBIZQl01vmlu3+EhMx7
-	 wBu3AL2/3tfUmRbDP4bWK07L0KMpxNWpdYDkZAx5FAPMuHSEU6ePzuP9rZ3bcbJotZ
-	 onee1GcZ1k1WGY3dWd8YwTNrWNfTs01gPetihh9f7V5wG+O4ZJG4itVc73QNfeL937
-	 G8wpj+WYOKtF0A3mP53kgLKsG3ced7XErlvMZqiq5sKmqTKPgyfjsZXIvWzyMdCIJU
-	 OwoVaWtFqCmvAEClSEDhi/Rt1miNuAJbe1AJmes0X6/mih7KGKXVumKTZhrVdf8pFi
-	 Mm3W32A7KbzAw==
+	b=vOoh7bcmOPBD5sLTcB31op2YXem+ovjzeeNcyFxEAV6LobUNvFjpbA5FDVCwVES/E
+	 oFpp1Y0Dv3dRxn/gi8i1B5w+yuwAs3OIRf+/Tkfd+36WvUHPyQ0jAowXgOt6LKmIiW
+	 3waI69Zbw6oylxutxXpqSEFsseh0I/fMxjXeqnwmhpH370QBEOWhpXMSh+MNUsKmJJ
+	 jAs04peNg0Q5iQzK1AXie+SQXji0iQJhx4OPkx4Q4QcP9CyCx9eGiZeOzqIaN/RnZw
+	 mhbcL4tOt7ttjssm45vk1pZV1TMACRlvxJNh4FqrSGHt2IUNU8JBoFchbYbIaHqEFv
+	 YxUzAZ8NDU6hg==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 4054360089;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 632CB6008D;
 	Sat, 13 Jul 2024 02:19:19 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 1695920498F; Sat, 13 Jul 2024 02:19:12 +0000 (UTC)
+	id 3CC99204A30; Sat, 13 Jul 2024 02:19:12 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -65,9 +65,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 07/13] flow_dissector: set encapsulated control flags from tun_flags
-Date: Sat, 13 Jul 2024 02:19:04 +0000
-Message-ID: <20240713021911.1631517-8-ast@fiberby.net>
+Subject: [PATCH net-next v4 08/13] net/sched: cls_flower: add tunnel flags to fl_{set,dump}_key_flags()
+Date: Sat, 13 Jul 2024 02:19:05 +0000
+Message-ID: <20240713021911.1631517-9-ast@fiberby.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240713021911.1631517-1-ast@fiberby.net>
 References: <20240713021911.1631517-1-ast@fiberby.net>
@@ -80,40 +80,67 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Set the new FLOW_DIS_F_TUNNEL_* encapsulated control flags, based
-on if their counter-part is set in tun_flags.
+Prepare to set and dump the tunnel flags.
 
-These flags are not userspace visible yet, as the code to dump
-encapsulated control flags will first be added, and later activated
-in the following patches.
+This code won't see any of these flags yet, as these flags
+aren't allowed by the NLA_POLICY_MASK, and the functions
+doesn't get called with encap set to true yet.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 Tested-by: Davide Caratti <dcaratti@redhat.com>
 Reviewed-by: Davide Caratti <dcaratti@redhat.com>
 ---
- net/core/flow_dissector.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/sched/cls_flower.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 1614c6708ea7c..a0263a4c5489e 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -396,6 +396,15 @@ skb_flow_dissect_tunnel_info(const struct sk_buff *skb,
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index fc9a9a0b4897c..2a440f11fe1fa 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -1204,6 +1204,21 @@ static int fl_set_key_flags(struct nlattr **tb, bool encap, u32 *flags_key,
+ 			TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
+ 			FLOW_DIS_FIRST_FRAG);
  
- 	key = &info->key;
- 
-+	if (test_bit(IP_TUNNEL_CSUM_BIT, key->tun_flags))
-+		ctrl_flags |= FLOW_DIS_F_TUNNEL_CSUM;
-+	if (test_bit(IP_TUNNEL_DONT_FRAGMENT_BIT, key->tun_flags))
-+		ctrl_flags |= FLOW_DIS_F_TUNNEL_DONT_FRAGMENT;
-+	if (test_bit(IP_TUNNEL_OAM_BIT, key->tun_flags))
-+		ctrl_flags |= FLOW_DIS_F_TUNNEL_OAM;
-+	if (test_bit(IP_TUNNEL_CRIT_OPT_BIT, key->tun_flags))
-+		ctrl_flags |= FLOW_DIS_F_TUNNEL_CRIT_OPT;
++	fl_set_key_flag(key, mask, flags_key, flags_mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM,
++			FLOW_DIS_F_TUNNEL_CSUM);
 +
- 	switch (ip_tunnel_info_af(info)) {
- 	case AF_INET:
- 		skb_flow_dissect_set_enc_control(FLOW_DISSECTOR_KEY_IPV4_ADDRS,
++	fl_set_key_flag(key, mask, flags_key, flags_mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT,
++			FLOW_DIS_F_TUNNEL_DONT_FRAGMENT);
++
++	fl_set_key_flag(key, mask, flags_key, flags_mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM, FLOW_DIS_F_TUNNEL_OAM);
++
++	fl_set_key_flag(key, mask, flags_key, flags_mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT,
++			FLOW_DIS_F_TUNNEL_CRIT_OPT);
++
+ 	return 0;
+ }
+ 
+@@ -3127,6 +3142,21 @@ static int fl_dump_key_flags(struct sk_buff *skb, bool encap,
+ 			TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
+ 			FLOW_DIS_FIRST_FRAG);
+ 
++	fl_get_key_flag(flags_key, flags_mask, &key, &mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM,
++			FLOW_DIS_F_TUNNEL_CSUM);
++
++	fl_get_key_flag(flags_key, flags_mask, &key, &mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT,
++			FLOW_DIS_F_TUNNEL_DONT_FRAGMENT);
++
++	fl_get_key_flag(flags_key, flags_mask, &key, &mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM, FLOW_DIS_F_TUNNEL_OAM);
++
++	fl_get_key_flag(flags_key, flags_mask, &key, &mask,
++			TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT,
++			FLOW_DIS_F_TUNNEL_CRIT_OPT);
++
+ 	_key = cpu_to_be32(key);
+ 	_mask = cpu_to_be32(mask);
+ 
 -- 
 2.45.2
 
