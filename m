@@ -1,142 +1,109 @@
-Return-Path: <netdev+bounces-111265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DA293073E
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:11:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D8C893073F
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7277C282407
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 20:11:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA52D28254B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 20:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01848130485;
-	Sat, 13 Jul 2024 20:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0A513D533;
+	Sat, 13 Jul 2024 20:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNA03MWa"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pCis6QhX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441101BF54
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 20:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F02218EA1;
+	Sat, 13 Jul 2024 20:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720901470; cv=none; b=YlVOA3J5Buvu/z0im9QjQfHTuJ4nlm/0JlYMgkdGFRebYDSnmoif97UGkCZQ2gfLVaW5VafL1ehkBzfus4CqWP83emaHbsnPr4CshR2oaN0jjDRk7N48Bub12y1oJp4BnxwfWZ14lxMXNYBTK5zlBcgEEG2SbhYUb5IKsEhyh8Y=
+	t=1720901684; cv=none; b=LVrfYwKlOYi9do/dvU+2HhzCaX8iyoi1L5e33qUQ0nx+9BkQ4v3FEPFM4XB7NsNbxel43qF/J1JjeKV24AaLlc/haIPELnRFHeJ/56suuxZn+CwFtdgRTIfnTugzZnftmfz8PhpOV+3pJjPtj9S/dFRns8RZAzEs2htxoDiLk24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720901470; c=relaxed/simple;
-	bh=vVWevBuG8qBT9ww7eHfRE+wPCnRFdsZS6+uQD4PnJwU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dHnWUVPBnhJ17kWPJKZKnjgbY/lqbPNwSsoSeMR2Wf6DhWDEGhjiuQbevZ1wNe9iYgdo+MlS5w11cSnVw/ckrxDo6+iJF/HmrSu+UOzJqR8zaG/q1X9reyWIQoONzOUvCNtoeWGbNk1JiYyHgcJCF9zlKiYJ19b7wgdzRLxjExU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNA03MWa; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-367818349a0so1746565f8f.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 13:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720901467; x=1721506267; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kM25Qgx/ayjWmRKdRZYdvX/h31K9G6S9D27+fll+EGw=;
-        b=TNA03MWa8ADRWHnPPM3bm5FaMSuraJV3VaylNaV5fEwnJkJPZYPGAFFzgLbknKa009
-         Gmcx6wEJUg9Rx3EVZpmTfnm9OGFHCf1YwDfP6CY1D54hZGX6LPn9xd9q9Zf9Q0KwggMq
-         6ZzPomvJF0e/X40pQSr0LZ1cSOtPpomGBI+OiRB8vYMWEDl/b2kZF4Tl0P/h2xC50vgo
-         jOG194Z5VWBpCWQmwLZcGgX9BR61XySfZdp9F6afAhq8DvN/twmjkWond/ogqr9AlbQo
-         IPRUN0fRzOfs10v7wNsRrkTUB2SYzJ6sMnzG/6Y4DT+Dq1J8oqgJ2qEYwOT+MCXHaFC2
-         88qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720901467; x=1721506267;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kM25Qgx/ayjWmRKdRZYdvX/h31K9G6S9D27+fll+EGw=;
-        b=u8CI2/yPpBtDaD0a+yeqf0+L8tV5HQZHKIBTeIjVTawiPjmuCkXKr19RLnA/54rRO7
-         RvMw+XzMgKtj9Xbqfita0efuaAGwHD3T9ldVNsiiVG2IiVpi1MLsmoQ7CloP1zp7VhDr
-         DGD6PjUuoNwnqVaR4lOhjqo3h0im/BMaV82nOjJhBeGmGlrtyLk/zK6zgitGI/sBb1C5
-         w/xTKlgijfLKP9RxzMR2zqI56uC+pt0ehEhxp4Ag42B3jeGxwyFCg1Ru1mqCvgK0Twfj
-         y281pN7QjHxaCPUJA7pj6w0rniARFDgP6XRGX+JBjBio5Gg0QllzAGrJbSyQfCpD3ojW
-         1zzg==
-X-Gm-Message-State: AOJu0YwjWpG4ymDfeVX4Ul/NVK9Yak5j6FI3HE/9jL+yK8tZlG+WzsDK
-	KKz6V7fXv4SF/PDKMpoTTb1qMq7fRrgRSg8F3iL1jrVTPQGTsMobX+5ryqvz97234/Ak3sWrbbs
-	vSgDHBpYFQ5bENeaz9r41360IS4g=
-X-Google-Smtp-Source: AGHT+IEHEINlTsyQ/rGqtk8hNY4SBKNhdmK8CNJA+q1xI9GHx9LQisUVjsz4oI9vouKZgj5350mMjgWw48VJzNCE/ag=
-X-Received: by 2002:adf:f1c5:0:b0:367:f0d6:24e8 with SMTP id
- ffacd0b85a97d-367f0d62728mr5629654f8f.48.1720901467417; Sat, 13 Jul 2024
- 13:11:07 -0700 (PDT)
+	s=arc-20240116; t=1720901684; c=relaxed/simple;
+	bh=B3tkF5ilr5P/pluWVQVHBV612MuyhLdB6uu8hhYGo/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cWxGoDCiN0NANqmGa2l0ne9AsOCd/74WvZmzDApwA7SVn1QeH6qT3SDlqVY4Ue5paxjIzfMHoCnqfi/58VYjvrn4AkWq+ipV+8DmGh8F9J/oxAqZYmqkCZIBz3i1HjVErqwE3/wEAVJOt2s46qxepdzTSndkAI/KoU7/NIhCE+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pCis6QhX; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sSj8f-00FcW8-Bl; Sat, 13 Jul 2024 22:14:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=1RSZc8Z267ymAY0LSMCxfts/ykk1ogkiXvSrzU74YxE=; b=pCis6QhXS4nJmo88wCxHrSaY+m
+	AL/n2lKr/gNWJnu6ubB8ZRJqy9WywasPtwmsu8B177Kh0p32AYNS9V5nlOidjVssw3wCscx8u1DBy
+	u4MMwqtiqTXE0JmvgbM+INRC7idPkECw181QXFodCIVj7BMRZa/FiW7s3+fy2YWIpKC8XGeB9OE5i
+	wnXKprK8hr2ZyA0nOds19o0K8XhHYJ+SEob2FpDPI7T9RQwUP8tSOGrmgKouuuinFA3j1m3AQPhX5
+	COFnHtPtmvYQSB0p12iFPtY+ilvBeHJy3GekvEpPNl7cm99ciuzGWY6gYFRa7c0pJu6tpJKS4BvKe
+	JKHf2JDw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sSj8e-0007es-7T; Sat, 13 Jul 2024 22:14:36 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sSj8M-0013GH-3J; Sat, 13 Jul 2024 22:14:18 +0200
+Message-ID: <cc71d3c5-41f9-4e6a-98d2-7822877b6214@rbox.co>
+Date: Sat, 13 Jul 2024 22:14:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <172079913640.1778861.11459276843992867323.stgit@ahduyck-xeon-server.home.arpa>
- <172079936012.1778861.4670986685222676467.stgit@ahduyck-xeon-server.home.arpa>
- <24ac80b6-ee09-4aee-b9f7-162a3377baa3@lunn.ch>
-In-Reply-To: <24ac80b6-ee09-4aee-b9f7-162a3377baa3@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sat, 13 Jul 2024 13:10:31 -0700
-Message-ID: <CAKgT0UcMsTFSMdz8h0TttyCn1LmPORX7acGyct+uQGtO1C_9EQ@mail.gmail.com>
-Subject: Re: [net-next PATCH v5 03/15] eth: fbnic: Allocate core device
- specific structures and devlink interface
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf v4 0/4] af_unix: MSG_OOB handling fix & selftest
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, john.fastabend@gmail.com,
+ jakub@cloudflare.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
+ cong.wang@bytedance.com
+References: <20240713200218.2140950-1-mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240713200218.2140950-1-mhal@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jul 13, 2024 at 11:50=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> > +int fbnic_alloc_irqs(struct fbnic_dev *fbd)
-> > +{
-> > +     unsigned int wanted_irqs =3D FBNIC_NON_NAPI_VECTORS;
-> > +     struct pci_dev *pdev =3D to_pci_dev(fbd->dev);
-> > +     int num_irqs;
-> > +
-> > +     wanted_irqs +=3D 1;
-> > +     num_irqs =3D pci_alloc_irq_vectors(pdev, FBNIC_NON_NAPI_VECTORS +=
- 1,
-> > +                                      wanted_irqs, PCI_IRQ_MSIX);
->
-> nit picking, but this is a bit odd. Why not:
->
-> > +     unsigned int wanted_irqs =3D FBNIC_NON_NAPI_VECTORS + 1;
-> > +     num_irqs =3D pci_alloc_irq_vectors(pdev, wanted_irqs,
-> > +                                      wanted_irqs, PCI_IRQ_MSIX);
+On 7/13/24 21:41, Michal Luczaj wrote:
+> PATCH 1/4 tells BPF redirect to silently drop AF_UNIX's MSG_OOB. The rest
+> is selftest-related.
+> 
+> Michal Luczaj (4):
+>   af_unix: Disable MSG_OOB handling for sockets in sockmap/sockhash
+>   selftest/bpf: Support SOCK_STREAM in unix_inet_redir_to_connected()
+>   selftest/bpf: Parametrize AF_UNIX redir functions to accept send()
+>     flags
+>   selftest/bpf: Test sockmap redirect for AF_UNIX MSG_OOB
+> 
+>  net/unix/af_unix.c                            | 41 ++++++++-
+>  net/unix/unix_bpf.c                           |  3 +
+>  .../selftests/bpf/prog_tests/sockmap_listen.c | 85 +++++++++++++------
+>  3 files changed, 102 insertions(+), 27 deletions(-)
 
-The the min and max diverge once we add NAPI vectors to the equation.
-For now it is wanted_irqs +=3D 1 to avoid an issue with wanted_irqs/max
-being less than (NON_NAPI_VECTORS + 1)/min.
+Arrgh, forgot the changelog:
 
-The final format after patch 7 is:
-        wanted_irqs +=3D min_t(unsigned int, num_online_cpus(), FBNIC_MAX_R=
-XQS);
-        num_irqs =3D pci_alloc_irq_vectors(pdev, FBNIC_NON_NAPI_VECTORS + 1=
-,
-                                         wanted_irqs, PCI_IRQ_MSIX);
+v4:
+  - Fix typo; comment, extend and streamline the selftest (Jakub)
+  - Fix commit message in PATCH 2/4
+  - Collect Reviewed-bys
 
-> > +     if (num_irqs < 0) {
-> > +             dev_err(fbd->dev, "Failed to allocate MSI-X entries\n");
-> > +             return num_irqs;
-> > +     }
-> > +
-> > +     if (num_irqs < wanted_irqs)
-> > +             dev_warn(fbd->dev, "Allocated %d IRQs, expected %d\n",
-> > +                      num_irqs, wanted_irqs);
->
-> https://elixir.bootlin.com/linux/latest/source/drivers/pci/msi/api.c#L206
->
->  * Return: number of allocated vectors (which might be smaller than
->  * @max_vecs), -ENOSPC if less than @min_vecs interrupt vectors are
->  * available, other errnos otherwise.
->
-> So i don't think this is possible.
->
->         Andrew
+v3: https://lore.kernel.org/netdev/20240707222842.4119416-1-mhal@rbox.co/
+  - Add selftest
 
-I agree it isn't with the current state. However after adding patch 7
-it is definitely possible. This is basically just enabling support for
-the NAPI interrupt vectors that will be introduced in patch 7.
+v2: https://lore.kernel.org/netdev/20240622223324.3337956-1-mhal@rbox.co/
+  - Reduce time under mutex, restructure (Kuniyuki)
+  - Handle unix_release_sock() race
+
+v1: https://lore.kernel.org/netdev/20240620203009.2610301-1-mhal@rbox.co/
+
 
