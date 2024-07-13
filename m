@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-111317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16EAD930817
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 676CD930818
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D049283FE9
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD9B2B20EE1
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CD0166311;
-	Sat, 13 Jul 2024 23:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FCB15538C;
+	Sat, 13 Jul 2024 23:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QOQjI8Bj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PKtq18LM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026301CFB6
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F26E158A3D
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720914245; cv=none; b=VnuhSjv1qezJtHGURuraTZdItczdAujRXpxJmE3rh4icpUugWxggIzWxCJMoD0CwPjDklFlbcRXqKWK0Zx06Ur7PPRF2edojU2C7NabR3FHWZPY2MYcbv6DpSQ1FrcPE71h1ZZmSlD5CXAy3D5BcQ371/9lRlt0Sdb3d41tF+5g=
+	t=1720914247; cv=none; b=KcQOvQntfN9yG15FVlvKNrSvflSEnVJ5RdeYxreT+oLFtlN6WqaKG+sWS94zlOfcX9/PV9J+s7K5mslMRLYlW0TKfvGE5KBhLvS+Ui//42ZKOe04RjfoT0wXOwozYpHR5K6lCuo9fehEh+7mO+FQV7ejCbU8ONneqApeVFMxCKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720914245; c=relaxed/simple;
-	bh=pWkCACW6CMmRMxpuNn5/+muyCuGRXZODp6Itx6SIoTs=;
+	s=arc-20240116; t=1720914247; c=relaxed/simple;
+	bh=S16Ojt4+3M0OEnu13HDWuvSBF86tu1UY2+2ptdWjy0Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nwasMZHkDRTgyk2kCcs+rY3W3yM62F3pL94rEdEvIxNnkzqCuVSIt0a0GrV7z3nqPJJdEZYPg+5UUKnVRgr4rXBR8oHl0HQT9LxO9Ff7kosScVGaAd5Yy+1vYf4OVFcJ6jTasf2sxlaTmDzh8LqxdCWe9X2IYU2N63mYu/86eZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QOQjI8Bj; arc=none smtp.client-ip=209.85.160.175
+	 MIME-Version:Content-Type; b=uwJEzHvEK0zfEutYpLGXFRgwQ2tgXB5MroopyyTzoTWGCyL5ouU43rl5HHMPAcH99HgoZGMsvhxhp6L09ToiiUkbAi4o0QM9W8tlxaXzmCBKgA6I7s3eeZ6DSZ9mwDhEiFM01BqXT2Y/oQXAoRpdkOtfI7kINiJC/wK+qZeENoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PKtq18LM; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-44f666d9607so143001cf.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:44:03 -0700 (PDT)
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-79efd2151d9so213324485a.0
+        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:44:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720914243; x=1721519043; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1720914244; x=1721519044; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ht24nYjeEFaELDrdwiXs89uTywrxH7j64O/abMLZNFw=;
-        b=QOQjI8BjlwlnbPAeYY6IUv+cXzN+RPTCuxO0ppVh4VQP7Yap7I9bOkTOdRxnkE24rO
-         nh2zDqB+vWseGqrCinHsohL+XUkQ47cDKjlms1E0wghH0UzwZimFSwr06Re8YRSt2+QV
-         kh5WVXCee1qyHZom9QQW38+O4+iFbaY8p3AiQ=
+        bh=lRstUM1/Ax0qtJG1kX00Fg7S46TxruHPJqXmHJ8RXPQ=;
+        b=PKtq18LMyQ2mlI48CVopwMeW5BAuNl8evGdSC/pPSjkmB3sZ7bX+jyChQMjIq3NbDH
+         XLaFLJrLGv9I4woRiQkzSOHSZWbZriSW4IDyX2nwshnENMp62MuV9e9Y8jEp/Ig+GMdU
+         dMEwydzB7Fq5RsaEwWwQb5O2ngN7RqnyRCj+o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720914243; x=1721519043;
+        d=1e100.net; s=20230601; t=1720914244; x=1721519044;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ht24nYjeEFaELDrdwiXs89uTywrxH7j64O/abMLZNFw=;
-        b=HtVG78dVilOWORUM1+JfunG7s/PGehmiyLf2Yx8BtUovfKDLdkIYgqctfoPuAZXa2n
-         zTk8Sh/49Z+4oS7VhdcyUzYPsKO2LpmWdFrVXQujGjD5F2/PvuA3UjmkJcATpeo447bT
-         ij8vog3VWtSn1F+F2JUU8zQ2yJ/h+qxgLrA2GyPpelUI2z9RCz8OkJGTdC1ZuPmLoyrN
-         WDuhu6eckUkpc7OWz8ZyDA83l6ELJklN/olyC2AFXbCL650SdIYPMB3MlFyo5rpFUxKo
-         SwAy2KNazA9EuVGnZtVeROxAvQ7wtVX4x15ByZMZ+6PjZ0DTwk3lgc8gL+dt0CooRkaQ
-         gU7Q==
-X-Gm-Message-State: AOJu0YzPSRMhTloFoS55w9+RWw+R9o0iUYyGDVaDac+kF6mFj0CYHhKR
-	+eocVEWaOKp1WGWqe8vVBC1tX0lxK1eIZHTSb0sxA/aB1yd2vEdjOIlFBxIGXw==
-X-Google-Smtp-Source: AGHT+IFG36GQgY4uCjZVXfvzOA+CLsaqzqWLJJzVuABtpMBQX73k8Fp0qhp2LdItmxdajN/JAxzpeg==
-X-Received: by 2002:ac8:7e92:0:b0:447:f12f:38dd with SMTP id d75a77b69052e-447faacbf83mr192085311cf.59.1720914242797;
-        Sat, 13 Jul 2024 16:44:02 -0700 (PDT)
+        bh=lRstUM1/Ax0qtJG1kX00Fg7S46TxruHPJqXmHJ8RXPQ=;
+        b=wKCNeQ2VpdPVgCcYQHUmG+lbTc/7aTH4akxRWRtsOqaKGaW6h57+iBLSJPeLga9L+q
+         N1VhIzXMU0MhTIGCt8tyHJ6Q9Y9JEXWf9KsV2/bSXYcIsWNVI4QC0iPGu1sXN7EuLqpJ
+         zd5nxtBMhKwrWI7Svlt0dLJHyVry6tMBhX5rUF/TtAsOxuWsa0H2x5t+UNRlJSDtDWUF
+         jBgVSnT3X3gskrByoI0bqyUwmfNsXKpLiO2FHoGWAi4BVRw/0mWk2zjHV9MmUktvsA7Y
+         ki86flSVj99OS5N8Xmc4JXpNqSiSwldCQ3NQlsvAAg8TuVJaxa1REJCc6RGOsaQtFyIr
+         /V/A==
+X-Gm-Message-State: AOJu0YxnFNNL+r9bePxDDpr4PRCJRBgM/YiJ+Nr36s9Bmvch671uFwn4
+	oDImX2bP1OkY3cVL/Phlalt/5urAu+LZKP+Qo7iclclEvDlpVzpLeJi+0OKRoQ==
+X-Google-Smtp-Source: AGHT+IHWCHmLU/DqfBUPxtUpJyhxNsVJnO4+USiFi+hkDyZi64KcnyzFHqpd9NWNT2gaxNTXGFQKMg==
+X-Received: by 2002:a05:620a:2915:b0:7a1:417a:9d05 with SMTP id af79cd13be357-7a1417a9ff3mr1531164285a.56.1720914244335;
+        Sat, 13 Jul 2024 16:44:04 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.44.00
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.44.02
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 13 Jul 2024 16:44:01 -0700 (PDT)
+        Sat, 13 Jul 2024 16:44:03 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -69,11 +69,10 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 2/9] bnxt_en: add support for retrieving crash dump using ethtool
-Date: Sat, 13 Jul 2024 16:43:32 -0700
-Message-ID: <20240713234339.70293-3-michael.chan@broadcom.com>
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Subject: [PATCH net-next 3/9] bnxt_en: Support QOS and TPID settings for the SRIOV VLAN
+Date: Sat, 13 Jul 2024 16:43:33 -0700
+Message-ID: <20240713234339.70293-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240713234339.70293-1-michael.chan@broadcom.com>
 References: <20240713234339.70293-1-michael.chan@broadcom.com>
@@ -84,162 +83,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000285c97061d299200"
+	boundary="000000000000417b64061d299264"
 
---000000000000285c97061d299200
+--000000000000417b64061d299264
 Content-Transfer-Encoding: 8bit
 
-From: Vikas Gupta <vikas.gupta@broadcom.com>
+From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
 
-Add support for retrieving crash dump using ethtool -w on the
-supported interface.
+With recent changes in the .ndo_set_vf_*() guidelines, resubmitting
+this patch that was reverted eariler in 2023:
 
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+c27153682eac ("Revert "bnxt_en: Support QOS and TPID settings for the SRIOV VLAN")
+
+Add these missing settings in the .ndo_set_vf_vlan() method.
+Older firmware does not support the TPID setting so check for
+proper support.
+
+Remove the unused BNXT_VF_QOS flag.
+
+Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../ethernet/broadcom/bnxt/bnxt_coredump.c    | 83 +++++++++++++++++--
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 ++-
- 2 files changed, 87 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  2 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 -
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   | 24 ++++++++++---------
+ 3 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-index ebbad9ccab6a..9ed915e4c618 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-@@ -372,14 +372,78 @@ static int __bnxt_get_coredump(struct bnxt *bp, void *buf, u32 *dump_len)
- 	return rc;
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 37da16b39f77..4f9d9a1d9c88 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -9191,6 +9191,8 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
+ 		bp->fw_cap |= BNXT_FW_CAP_HOT_RESET_IF;
+ 	if (BNXT_PF(bp) && (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_FW_LIVEPATCH_SUPPORTED))
+ 		bp->fw_cap |= BNXT_FW_CAP_LIVEPATCH;
++	if (BNXT_PF(bp) && (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_DFLT_VLAN_TPID_PCP_SUPPORTED))
++		bp->fw_cap |= BNXT_FW_CAP_DFLT_VLAN_TPID_PCP;
+ 	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_BS_V2_SUPPORTED)
+ 		bp->fw_cap |= BNXT_FW_CAP_BACKING_STORE_V2;
+ 	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_TX_COAL_CMPL_CAP)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 77bd36812293..af4d9bb947b3 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1355,7 +1355,6 @@ struct bnxt_vf_info {
+ 	u16	vlan;
+ 	u16	func_qcfg_flags;
+ 	u32	flags;
+-#define BNXT_VF_QOS		0x1
+ #define BNXT_VF_SPOOFCHK	0x2
+ #define BNXT_VF_LINK_FORCED	0x4
+ #define BNXT_VF_LINK_UP		0x8
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index 22898d3d088b..58bd84b59f0e 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -15,6 +15,7 @@
+ #include <linux/if_vlan.h>
+ #include <linux/interrupt.h>
+ #include <linux/etherdevice.h>
++#include <net/dcbnl.h>
+ #include "bnxt_hsi.h"
+ #include "bnxt.h"
+ #include "bnxt_hwrm.h"
+@@ -196,11 +197,8 @@ int bnxt_get_vf_config(struct net_device *dev, int vf_id,
+ 		memcpy(&ivi->mac, vf->vf_mac_addr, ETH_ALEN);
+ 	ivi->max_tx_rate = vf->max_tx_rate;
+ 	ivi->min_tx_rate = vf->min_tx_rate;
+-	ivi->vlan = vf->vlan;
+-	if (vf->flags & BNXT_VF_QOS)
+-		ivi->qos = vf->vlan >> VLAN_PRIO_SHIFT;
+-	else
+-		ivi->qos = 0;
++	ivi->vlan = vf->vlan & VLAN_VID_MASK;
++	ivi->qos = vf->vlan >> VLAN_PRIO_SHIFT;
+ 	ivi->spoofchk = !!(vf->flags & BNXT_VF_SPOOFCHK);
+ 	ivi->trusted = bnxt_is_trusted_vf(bp, vf);
+ 	if (!(vf->flags & BNXT_VF_LINK_FORCED))
+@@ -256,21 +254,21 @@ int bnxt_set_vf_vlan(struct net_device *dev, int vf_id, u16 vlan_id, u8 qos,
+ 	if (bp->hwrm_spec_code < 0x10201)
+ 		return -ENOTSUPP;
  
-+static u32 bnxt_copy_crash_data(struct bnxt_ring_mem_info *rmem, void *buf,
-+				u32 dump_len)
-+{
-+	u32 data_copied = 0;
-+	u32 data_len;
-+	int i;
-+
-+	for (i = 0; i < rmem->nr_pages; i++) {
-+		data_len = rmem->page_size;
-+		if (data_copied + data_len > dump_len)
-+			data_len = dump_len - data_copied;
-+		memcpy(buf + data_copied, rmem->pg_arr[i], data_len);
-+		data_copied += data_len;
-+		if (data_copied >= dump_len)
-+			break;
-+	}
-+	return data_copied;
-+}
-+
-+static int bnxt_copy_crash_dump(struct bnxt *bp, void *buf, u32 dump_len)
-+{
-+	struct bnxt_ring_mem_info *rmem;
-+	u32 offset = 0;
-+
-+	if (!bp->fw_crash_mem)
-+		return -EEXIST;
-+
-+	rmem = &bp->fw_crash_mem->ring_mem;
-+
-+	if (rmem->depth > 1) {
-+		int i;
-+
-+		for (i = 0; i < rmem->nr_pages; i++) {
-+			struct bnxt_ctx_pg_info *pg_tbl;
-+
-+			pg_tbl = bp->fw_crash_mem->ctx_pg_tbl[i];
-+			offset += bnxt_copy_crash_data(&pg_tbl->ring_mem,
-+						       buf + offset,
-+						       dump_len - offset);
-+			if (offset >= dump_len)
-+				break;
-+		}
-+	} else {
-+		bnxt_copy_crash_data(rmem, buf, dump_len);
-+	}
-+
-+	return 0;
-+}
-+
-+static bool bnxt_crash_dump_avail(struct bnxt *bp)
-+{
-+	u32 sig = 0;
-+
-+	/* First 4 bytes(signature) of crash dump is always non-zero */
-+	bnxt_copy_crash_dump(bp, &sig, sizeof(u32));
-+	if (!sig)
-+		return false;
-+
-+	return true;
-+}
-+
- int bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf, u32 *dump_len)
- {
- 	if (dump_type == BNXT_DUMP_CRASH) {
-+		if (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR)
-+			return bnxt_copy_crash_dump(bp, buf, *dump_len);
- #ifdef CONFIG_TEE_BNXT_FW
--		return tee_bnxt_copy_coredump(buf, 0, *dump_len);
--#else
--		return -EOPNOTSUPP;
-+		else if (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR)
-+			return tee_bnxt_copy_coredump(buf, 0, *dump_len);
- #endif
-+		else
-+			return -EOPNOTSUPP;
- 	} else {
- 		return __bnxt_get_coredump(bp, buf, dump_len);
- 	}
-@@ -442,10 +506,17 @@ u32 bnxt_get_coredump_length(struct bnxt *bp, u16 dump_type)
- {
- 	u32 len = 0;
+-	if (vlan_proto != htons(ETH_P_8021Q))
++	if (vlan_proto != htons(ETH_P_8021Q) &&
++	    (vlan_proto != htons(ETH_P_8021AD) ||
++	     !(bp->fw_cap & BNXT_FW_CAP_DFLT_VLAN_TPID_PCP)))
+ 		return -EPROTONOSUPPORT;
  
-+	if (dump_type == BNXT_DUMP_CRASH &&
-+	    bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR &&
-+	    bp->fw_crash_mem) {
-+		if (!bnxt_crash_dump_avail(bp))
-+			return 0;
-+
-+		return bp->fw_crash_len;
-+	}
-+
- 	if (bnxt_hwrm_get_dump_len(bp, dump_type, &len)) {
--		if (dump_type == BNXT_DUMP_CRASH)
--			len = BNXT_CRASH_DUMP_LEN;
--		else
-+		if (dump_type != BNXT_DUMP_CRASH)
- 			__bnxt_get_coredump(bp, NULL, &len);
- 	}
- 	return len;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index f121a5e9691f..1e720aa69568 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -4983,9 +4983,16 @@ static int bnxt_set_dump(struct net_device *dev, struct ethtool_dump *dump)
+ 	rc = bnxt_vf_ndo_prep(bp, vf_id);
+ 	if (rc)
+ 		return rc;
+ 
+-	/* TODO: needed to implement proper handling of user priority,
+-	 * currently fail the command if there is valid priority
+-	 */
+-	if (vlan_id > 4095 || qos)
++	if (vlan_id >= VLAN_N_VID || qos >= IEEE_8021Q_MAX_PRIORITIES ||
++	    (!vlan_id && qos))
  		return -EINVAL;
- 	}
  
--	if (!IS_ENABLED(CONFIG_TEE_BNXT_FW) && dump->flag == BNXT_DUMP_CRASH) {
--		netdev_info(dev, "Cannot collect crash dump as TEE_BNXT_FW config option is not enabled.\n");
--		return -EOPNOTSUPP;
-+	if (dump->flag == BNXT_DUMP_CRASH) {
-+		if (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR &&
-+		    (!IS_ENABLED(CONFIG_TEE_BNXT_FW))) {
-+			netdev_info(dev,
-+				    "Cannot collect crash dump as TEE_BNXT_FW config option is not enabled.\n");
-+			return -EOPNOTSUPP;
-+		} else if (!(bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR)) {
-+			netdev_info(dev, "Crash dump collection from host memory is not supported on this interface.\n");
-+			return -EOPNOTSUPP;
+ 	vf = &bp->pf.vf[vf_id];
+-	vlan_tag = vlan_id;
++	vlan_tag = vlan_id | (u16)qos << VLAN_PRIO_SHIFT;
+ 	if (vlan_tag == vf->vlan)
+ 		return 0;
+ 
+@@ -279,6 +277,10 @@ int bnxt_set_vf_vlan(struct net_device *dev, int vf_id, u16 vlan_id, u8 qos,
+ 		req->fid = cpu_to_le16(vf->fw_fid);
+ 		req->dflt_vlan = cpu_to_le16(vlan_tag);
+ 		req->enables = cpu_to_le32(FUNC_CFG_REQ_ENABLES_DFLT_VLAN);
++		if (bp->fw_cap & BNXT_FW_CAP_DFLT_VLAN_TPID_PCP) {
++			req->enables |= cpu_to_le32(FUNC_CFG_REQ_ENABLES_TPID);
++			req->tpid = vlan_proto;
 +		}
- 	}
- 
- 	bp->dump_flag = dump->flag;
+ 		rc = hwrm_req_send(bp, req);
+ 		if (!rc)
+ 			vf->vlan = vlan_tag;
 -- 
 2.30.1
 
 
---000000000000285c97061d299200
+--000000000000417b64061d299264
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -310,14 +274,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBg8zvWOLsURqCx1j8WZT8TnPceF8DDM
-YbATIeRfd53sMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
-MzIzNDQwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIP9MwmJbmaWwLjq3i9cgxdjZH++Kxa1A
+6czUHDLNszaLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
+MzIzNDQwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBUOShRBcBKFtCeXrSnqvTLc8Rpx8+aPPReq+96YA+v4WtRboET
-6IrOIDgZjj2VCYEPKq/ouLsu0zUxdrlOFG+/+1OUuuCHJFvv+Qaa5c6Vngv2e0ZS648ZX0bdmAtB
-zWVf91cl5LzDI95Y4UNiO+uL1ZNbcF9OxhSGVJGsOUr47LR2qA+T6oE0gBL9AsdWY4u4f/45Nn2D
-L04cgFIl+kAPhFkSK44A2PHejPnHLWLtxRMEbpObO5gtG/zC42EI9/IcZ7Uxy/zz0PJWNho2KiT2
-qHyiV0Ve4IU7RudWvD6PbxacRGkLf3+33ZmAGsXmHeX8mpduxWlkdpO3Z6mkSQrE
---000000000000285c97061d299200--
+ATANBgkqhkiG9w0BAQEFAASCAQCbp8B1VPyl/Jw91q95F2DKQW0G+AAFOzWiXjZJjj4uwn6Y/UGr
+YA4/Vm8YcZUM2kJK+1EUAY8WRp7EdQeaZ3/G+n+OMoMrpzTtQRjM/JH9X8igR0NdnniYs09ehhJq
+9iozdipUqJ5uNXHNQSy7goeucsmV0ZO95pjbIx3QKdUvy/oT/BNhSZi3oIVgSVDg7WVucXHlqb7m
+tuvEElkhAI68VR2TFKKg0tmooosaC9jygAU2zxIDEImUR5NOGpIfzr7izf1nJThoHGu7lBN0ruTP
+bSiXXzaIfYq5vWPm87Xi/iLkJ+pBRz34LqODyllyuOX2MK1A+7ABmCkG9F5m4aBo
+--000000000000417b64061d299264--
 
