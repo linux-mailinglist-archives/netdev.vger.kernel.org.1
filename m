@@ -1,124 +1,171 @@
-Return-Path: <netdev+bounces-111288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8604A9307B8
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:34:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3E19307BA
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 280511F218AA
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:34:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05260282446
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D594014388E;
-	Sat, 13 Jul 2024 22:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E597146A6F;
+	Sat, 13 Jul 2024 22:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b="ViurjQkx"
+	dkim=pass (2048-bit key) header.d=pdp7-com.20230601.gappssmtp.com header.i=@pdp7-com.20230601.gappssmtp.com header.b="2ITqWotF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193F929401
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C8A6EB5C
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720910052; cv=none; b=BS3Y4/Lh8pzo1cEsc1XCE+JiFPKDJ8hBZEOaN3nRHi01MXrBWT2uzVEkAlpdUL8/O7etpNDY3LIXB9PEr9VcExZZiLlpNybaJOGNykJhgXS/vC+bMJXrq08mYb4OIg64F5ZPd957kt+5L3gZouAvKl4xnxp6ssUdEpZPgEA75jg=
+	t=1720910123; cv=none; b=P3oAjw5DjcuhW+13mmRKMRE0yDGZFS5xkdqd3Vsh+iK+ZSt84+naSmPXQ6+FwtOJv64VDQHBHzkG5HiASuE5y7iYU/bVZIIqaz/8GhK8wVN7i2WQc9Moo1tIZkEv2Ykk1tItL4A2rSyvoO7Yy7LHZ0B3s15FqImXvkVGgYXN6Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720910052; c=relaxed/simple;
-	bh=H7Wqs9IY0RVk3/f8b71KD0COfcu6Ng2RKx6CTnHunBk=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=gMNso/jW3q1hhcxNXo+NZMGdG9SCbJZ5wtJFNOrFsmlYnXcQ6CDra+6ly+0w22Dq7ZnVWEu/3GKck50ZTDmQcNXo56jRoe3oUOK/xOApH/Z2p3ws+rQNYUs9KEHsvubJeV2kcZWfmyVU0xywJMOj8w5vVYt7Nnjtnd4CLqC2Rh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b=ViurjQkx; arc=none smtp.client-ip=212.77.101.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 44297 invoked from network); 14 Jul 2024 00:34:06 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=1024a;
-          t=1720910046; bh=W3lApuN7YTRnEcM3XCm9T9HOweCmIdx72YW45Ridj4A=;
-          h=From:To:Subject;
-          b=ViurjQkxraPQnJOQurZBwphlA+HnUEZ4V2AKL4y91ir2Oi+ryDAxD1UXZobPVutKv
-           8KnmcgdQWw26NC99xfVCGilzl/0aujJh+d+q3FkoPm92e68LJGwTLACwKXiMnSCFnQ
-           L5teRuGhB+xZ12Ng0GAZwLlR6fE4i/QOEGQno4U0=
-Received: from 83.24.148.52.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.148.52])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <davem@davemloft.net>; 14 Jul 2024 00:34:06 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	olek2@wp.pl,
-	shannon.nelson@amd.com,
-	sd@queasysnail.net,
-	u.kleine-koenig@pengutronix.de,
-	john@phrozen.org,
-	ralf@linux-mips.org,
-	ralph.hempel@lantiq.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: ethernet: lantiq_etop: fix memory disclosure
-Date: Sun, 14 Jul 2024 00:33:57 +0200
-Message-Id: <20240713223357.2911169-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1720910123; c=relaxed/simple;
+	bh=w/NbNx0hQrYCCt4fhGgjxPcsuaVQDgpxDwOcni8EUgY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=l9qvwynZuv2Jvvd5LQUTy7RfI037Gt/VIBHRFMuTalRBuIfmazTJKhW+Jh5puCsQBVHLqpQAHV212ZWJapAUzV+7uZnxA1nFy9wzILxxMtPgFjHaOlxI8YfF3a/BxMzwD1yBRLb/wx2W2OCZrFfPTrkra1p5XMcrgI7RDGiG+6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pdp7.com; spf=none smtp.mailfrom=pdp7.com; dkim=pass (2048-bit key) header.d=pdp7-com.20230601.gappssmtp.com header.i=@pdp7-com.20230601.gappssmtp.com header.b=2ITqWotF; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pdp7.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pdp7.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3d9306100b5so2093911b6e.1
+        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 15:35:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pdp7-com.20230601.gappssmtp.com; s=20230601; t=1720910121; x=1721514921; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=59P5oqU7NcCQSekZycQB8SHFulzZjU5cylTceccordQ=;
+        b=2ITqWotFU+ZzxMUbo8IkFkrHewbH0jpZukP2QRtYK9xqqVdTuTJhfN5EnOJE92xtwr
+         6TsQuksldBbxPAtaJHQfvTLWRejGxmrB9ubOjHUG+oRTTNaS/hZdUOz9oMEBx2GlZ2z0
+         l1b93BNvq0ui96zXZUWdy3xZMATuGJGCpjeReMQE13Q3lJ7uIyJnPm32Fy+nV6E79/Bq
+         X2u4ZRGwvqfjc9k+Og/+nPkaFtzkf+GKeJZs7/XHChtc6+qYFlqvbP1UAkQ4//XtPElS
+         YLeWsoIdaBSGolBVIM8HuTiCEISXPBjlvYrbJMYmLrXeNyoA/EXXY68BOeUVOTkM0gHU
+         +NBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720910121; x=1721514921;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=59P5oqU7NcCQSekZycQB8SHFulzZjU5cylTceccordQ=;
+        b=Cj2FJYw2/oorajijIFamIam/B7BIg6w8I9Pt33MEPk3XMrwzU89FCz1RcblR7sIvZn
+         1xomXRG1uHsK/aPN1crpcFc3o27C7W9pqnk/lZfAi9meP5ROwhdJdEe0wFpc40vcQIOV
+         rHjI6x1E+2yiCdK+Lrms/EcA7eTL7x8oPo/Ly6LxzC8Rj6uvrFLJJaSKtnSh/HYq8Jky
+         sUecdyIuAvVmkLgqQxCABQWVzSQBV2SNrryrM1rKo9ry91+Sxct4AB/3sx7jBypDares
+         hpt8MEakbarX7lm0cWrT0WlGr/QsAOMtQiqnOT9wGbXKpGTxzf/ThqmdbkfywCxyqQQG
+         /f4w==
+X-Gm-Message-State: AOJu0YwfBhohUw2jTYcd6OqlbYh9KNGEIIDdMtF9kaBHErvkgmCZ98tE
+	5laPyF6Di43lz1islEHN+a1WoLszzigaDK7CTgksn993FJzjwP3stI6TWMAcU/c=
+X-Google-Smtp-Source: AGHT+IEg9antJl5Um5shbWWC4aJSAEXG1X4QgFtAyLnt8rqbE/pGgSXXmoU49K8Rk27lGnV7pllKRA==
+X-Received: by 2002:a05:6808:19a8:b0:3d6:317b:a95c with SMTP id 5614622812f47-3d93c07512amr17596782b6e.38.1720910120935;
+        Sat, 13 Jul 2024 15:35:20 -0700 (PDT)
+Received: from [127.0.1.1] ([2601:1c2:1802:170:d7fc:57d0:ada6:13b7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc4d9d8sm14640025ad.264.2024.07.13.15.35.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jul 2024 15:35:20 -0700 (PDT)
+From: Drew Fustini <drew@pdp7.com>
+Subject: [PATCH RFC net-next 0/4] Add the dwmac driver support for T-HEAD
+ TH1520 SoC.
+Date: Sat, 13 Jul 2024 15:35:09 -0700
+Message-Id: <20240713-thead-dwmac-v1-0-81f04480cd31@tenstorrent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: b5f9b250616002899b8321895476c16d
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 000000B [gaOU]                               
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB4Bk2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDc0Mj3ZKM1MQU3ZTy3MRkXcMUE5NkE3OjpKQUUyWgjoKi1LTMCrBp0Up
+ Bbs4gsbzUEt281IoSpdjaWgC5/rGAbgAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
+ Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>, 
+ Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1720910119; l=2542;
+ i=dfustini@tenstorrent.com; s=20230430; h=from:subject:message-id;
+ bh=w/NbNx0hQrYCCt4fhGgjxPcsuaVQDgpxDwOcni8EUgY=;
+ b=zhSGOkCGTA785OB0MaNJWsmX/0kLmkWTEMMzX8DoIdS3pa54QR5Rc1GW96RessAlJhjWKCsbm
+ OZwPPbSVHNBARLIGPxYzRew0qKbsZpMAUxb9mzEk1yLH2//jZDwblTr
+X-Developer-Key: i=dfustini@tenstorrent.com; a=ed25519;
+ pk=p3GKE9XFmjhwAayAHG4U108yag7V8xQVd4zJLdW0g7g=
 
-When applying padding, the buffer is not zeroed, which results in
-memory disclosure. This patch uses skb_put_padto() to pad Ethernet
-frames properly.
+I am marking this as an RFC since it has been almost a year since the
+previous series and Jisheng has handed it off to me. There was
+discussion about the syscon for the APB registers in Jisheng's v2. I've
+gone a different route and switched to adding a second memory region to
+the gmac node:
 
-It appears that only the MAC in xrx100 and newer SoCs supports
-padding by hardware, so software padding must be applied.
+  dwmac: DesignWare GMAC IP core registers
+    apb: GMAC APB registers
 
-Fixes: 504d4721ee8e ("MIPS: Lantiq: Add ethernet driver")
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+This patch depends my clock controller series:
+
+ [PATCH v3 0/7] clk: thead: Add support for TH1520 AP_SUBSYS clock controller
+ https://lore.kernel.org/linux-riscv/20240711-th1520-clk-v3-0-6ff17bb318fb@tenstorrent.com/
+
+and the pinctrl series from Emil:
+
+ [PATCH v2 0/8] Add T-Head TH1520 SoC pin control
+ https://lore.kernel.org/linux-riscv/20240103132852.298964-1-emil.renner.berthing@canonical.com
+
+I have a branch with this series and the dependencies on top of 6.10-rc7:
+ https://github.com/pdp7/linux/tree/b4/thead-dwmac
+
+Changes since Jisheng v2:
+ - remove thead,gmacapb that references syscon for APB registers
+ - add a second memory region to gmac nodes for the APB registers
+ - Link: https://lore.kernel.org/all/20230827091710.1483-1-jszhang@kernel.org/
+
+Changes since Jisheng v1:
+ - rebase on the lastest net-next
+ - collect Reviewed-by tag
+ - address Krzysztof's comment of the dt binding
+ - fix "div is not initialised" issue pointed out by Simon
+ - Link: https://lore.kernel.org/all/20230820120213.2054-1-jszhang@kernel.org/
+
 ---
- drivers/net/ethernet/lantiq_etop.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Emil Renner Berthing (1):
+      riscv: dts: thead: Add TH1520 ethernet nodes
 
-diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
-index 0b9982804370..196715d9ea43 100644
---- a/drivers/net/ethernet/lantiq_etop.c
-+++ b/drivers/net/ethernet/lantiq_etop.c
-@@ -478,11 +478,11 @@ ltq_etop_tx(struct sk_buff *skb, struct net_device *dev)
- 	struct ltq_etop_priv *priv = netdev_priv(dev);
- 	struct ltq_etop_chan *ch = &priv->ch[(queue << 1) | 1];
- 	struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
--	int len;
- 	unsigned long flags;
- 	u32 byte_offset;
- 
--	len = skb->len < ETH_ZLEN ? ETH_ZLEN : skb->len;
-+	if (skb_put_padto(skb, ETH_ZLEN))
-+		return NETDEV_TX_OK;
- 
- 	if ((desc->ctl & (LTQ_DMA_OWN | LTQ_DMA_C)) || ch->skb[ch->dma.desc]) {
- 		netdev_err(dev, "tx ring full\n");
-@@ -497,12 +497,13 @@ ltq_etop_tx(struct sk_buff *skb, struct net_device *dev)
- 	netif_trans_update(dev);
- 
- 	spin_lock_irqsave(&priv->lock, flags);
--	desc->addr = ((unsigned int)dma_map_single(&priv->pdev->dev, skb->data, len,
--						DMA_TO_DEVICE)) - byte_offset;
-+	desc->addr = ((unsigned int)dma_map_single(&priv->pdev->dev, skb->data,
-+						   skb->len, DMA_TO_DEVICE)) -
-+						   byte_offset;
- 	/* Make sure the address is written before we give it to HW */
- 	wmb();
- 	desc->ctl = LTQ_DMA_OWN | LTQ_DMA_SOP | LTQ_DMA_EOP |
--		LTQ_DMA_TX_OFFSET(byte_offset) | (len & LTQ_DMA_SIZE_MASK);
-+		LTQ_DMA_TX_OFFSET(byte_offset) | (skb->len & LTQ_DMA_SIZE_MASK);
- 	ch->dma.desc++;
- 	ch->dma.desc %= LTQ_DESC_NUM;
- 	spin_unlock_irqrestore(&priv->lock, flags);
+Jisheng Zhang (3):
+      dt-bindings: net: snps,dwmac: allow dwmac-3.70a to set pbl properties
+      dt-bindings: net: add T-HEAD dwmac support
+      net: stmmac: add glue layer for T-HEAD TH1520 SoC
+
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   2 +
+ .../devicetree/bindings/net/thead,dwmac.yaml       |  81 ++++++
+ MAINTAINERS                                        |   2 +
+ arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts |  89 ++++++
+ .../boot/dts/thead/th1520-lichee-module-4a.dtsi    | 131 +++++++++
+ arch/riscv/boot/dts/thead/th1520.dtsi              |  55 +++-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 300 +++++++++++++++++++++
+ 9 files changed, 670 insertions(+), 2 deletions(-)
+---
+base-commit: 568c4e4b646777f3373f383cc38864a3cd91bbb7
+change-id: 20240712-thead-dwmac-1d44c472bbd5
+
+Best regards,
 -- 
-2.39.2
+Drew Fustini <dfustini@tenstorrent.com>
 
 
