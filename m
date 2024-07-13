@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-111322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAFD93081C
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D44493081D
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F23B01C20E40
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F8B28232D
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0813E16F8E7;
-	Sat, 13 Jul 2024 23:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60B5170826;
+	Sat, 13 Jul 2024 23:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Uuz+5vaA"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U6dnOHjw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B07716D9AC
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C94715E5D0
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720914253; cv=none; b=fTWbt/yatf5ClLGE5uk+ewVyV1PJcFPmqvtRhIOg3xTjzevkiIkjE40gjZLUAAcD7I+U1uxgKBulO+iQ8SHnSONzq5AEJF+FfmBa2R0Zxw0kmBjAu9DnFQcz8TgHkQ9fhNeMmP5l/VWve/UT1LLF2Rwdw/RWfHQ05LcdaNBIe6A=
+	t=1720914255; cv=none; b=fQdK+vSBUJWSWoerrF+Tt7v6tG+R0vkJsIhO2IOVFHaePqNtXZe3BSk9CqOc/ppITVAENoIH0AC1AOHM08MUgvd9iOkEFbCF3KlFHoMveyF+f5L4NVWyAQPwIBCRAYdtL2XcbiKa4A5bn68chMw1G+41pTvsp5kay9D3XoTx3r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720914253; c=relaxed/simple;
-	bh=P1WfGf4A+k4zp8T8UMLY+eQrWiaPQVxK9mq4A+jrKnk=;
+	s=arc-20240116; t=1720914255; c=relaxed/simple;
+	bh=rcBiMb5GCzfSy5v6UQvVcSh7pYaWsaCzjES9fPEr1x0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QFIpmLrZ2SFFEWGe08W7CuByLkNFnd/i7/eNf/AXJ5aH66DMfoYcL0hthFTa8knmrt2hrhz3BJfooL7KvpDbz3ReUNvAmbqwSiSFjf2u+rlztiFCYpJ/uhffphOxn42J6kvm+uastHniCrW3GZaka69JvBEior9OBGyezV43ojs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Uuz+5vaA; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version:Content-Type; b=sBYRl6ESl9OUTHxNk+RoHOQMwdaGzF0IahtogDH8MWU2Ft8FFheNxV7yChe4wkpg3MX2taJgjACscr6JB/SLIlqqVJV3031DJr81daMWBBp9gIl+cN11Gg4cRjU147N20uAPyrXBIcM7y2VK2oWplx7i7TX6YJxSxDlvcLCuG7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U6dnOHjw; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-79f08b01ba6so270597485a.0
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:44:12 -0700 (PDT)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79ef8fe0e90so218713485a.3
+        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:44:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720914251; x=1721519051; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1720914253; x=1721519053; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ub+FoEYnFCQMABszXrLYdr7VdK1IJzfQULaMgBRK7f0=;
-        b=Uuz+5vaAtwuKPh554cqXXawEahVjevmLsfna2nBpCP60VV82kasU/ugPwdz0GqeFDM
-         3mdrJRYosMSfEgfU1Koel79OA6rL7z81VuAuPZVoeCTACXeut19TcCk/7UYwW6LK669L
-         +9oOuQslTYCeRKC9xOvm0IuSyjXxc6Y1Fe/hM=
+        bh=ZUZL+0wphrv8rvFSV2QuTjXM/nNYD28JxEJYojq1Ooo=;
+        b=U6dnOHjwEHbfOS01bdGLv5UI6zZ6+C27wpJr388txGlPdQWzrgo8TFLy7+kwAKAIvw
+         K7S6estQbMzWDa1rdIboueaOYnmCotwgnh/P3mMSYwwVXSgNpz+sixuT9QA6H5AdLbfQ
+         nsERedVk5lMTQY/O+mkVS5VSF1/8voorlDpxM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720914251; x=1721519051;
+        d=1e100.net; s=20230601; t=1720914253; x=1721519053;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ub+FoEYnFCQMABszXrLYdr7VdK1IJzfQULaMgBRK7f0=;
-        b=E1JI/rCe2J7pfNK7pqk4wOv6ko4fbKUKUbyL17gKOvFnEo0afSZeUNcYqIdm1rsfRQ
-         j59rI0HJ4a7WUJBWcSMyCau3CXUDiCMp+UF7YHte2cPorgncp/mXpatkSfP7fcXBt32H
-         iZHHkHZhD9yG4YXe2r3eWlYocs17PM0lC6gakurPeKNxtqsoYHJ3eoA54UMquUVuUVaM
-         x4I6bZoT3iPm5IwrJo0C41HL4bImCPPmsEBwIgnx1oS6/EwZzmcbORQa5oK3FkhNi5ew
-         qq5OvZNr70NtZ8Y853Dg2Jb+Eg92d024PTEYno9vuH/NGlQ+7YBF5sr8J7VWyr6hW+rZ
-         6O3w==
-X-Gm-Message-State: AOJu0YxFPC8dCPiwrb6IHLPg0X4khO0FkttNdcmZl6hSdKpCI96DVjQc
-	UorZHVN2wnCICE5on6SQsasZb6/DD+6WkUHo8wOkhZWN4WTAgo53+TF8RGOX/w==
-X-Google-Smtp-Source: AGHT+IE+FOMefFnaMQnYMWSS+alyYpSqDp1jzIW1pyzdeWrL4rwPjy5OSimvjFYOB45i03c0cZ4D/A==
-X-Received: by 2002:a05:620a:55b4:b0:79f:1bb:e7e6 with SMTP id af79cd13be357-7a153252629mr1027739785a.18.1720914251286;
-        Sat, 13 Jul 2024 16:44:11 -0700 (PDT)
+        bh=ZUZL+0wphrv8rvFSV2QuTjXM/nNYD28JxEJYojq1Ooo=;
+        b=oHB3+Yd8HIbSFTmw7IjMkN1ve5GgY7yH9cGPaEILHyxFXhmVDaHjff8yEuaYfF4J/T
+         SJf5J4ChH7n1Uao/arZMGAMEYzUvobBIlZDilFI4BHsex1q/06DSA2+iMyAdQJzVkNoU
+         rXi4pxV/ShaJZt4MmCYDVVtdTHsGgdmb5ubPNAqatYX/BJtKvq3aRG4PJaKaA0wuyh13
+         iDm9Pr8/f2O8dCyHlCXuuckbwObFyzCFVDGI8pxbxI6OT87cQViZVSxDmhWwkIHiyX7c
+         5uxgoEM3vf21VUnXPg44CcYgsZZ2d/t76+L6/FwdkjweM1JPWpgf0SsanQiS1mZBiNT0
+         I23g==
+X-Gm-Message-State: AOJu0Yz9evKxUtXlYXko8YMdLox6C0MLIPCVW7cxD2UMpZef/kpwGPg6
+	2ir7htng74uc8+SIsp/0eNu0UOxYSxGqW8vTBeZ+iIjTM7ePjLGp8jyk37glAw==
+X-Google-Smtp-Source: AGHT+IFiot0AmrMSmvO1WKYeT0+IyMvTZ7s25aklo9QOmbpmViwIrIjjityB0a9IP4b4f0dIQho6RA==
+X-Received: by 2002:a05:620a:2490:b0:79e:f9f8:155f with SMTP id af79cd13be357-79f199f5024mr2214344885a.10.1720914252968;
+        Sat, 13 Jul 2024 16:44:12 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.44.09
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.44.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 13 Jul 2024 16:44:10 -0700 (PDT)
+        Sat, 13 Jul 2024 16:44:12 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -69,10 +69,11 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
+	Hongguang Gao <hongguang.gao@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 7/9] bnxt_en: Replace deprecated PCI MSIX APIs
-Date: Sat, 13 Jul 2024 16:43:37 -0700
-Message-ID: <20240713234339.70293-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next 8/9] bnxt_en: Allocate the max bp->irq_tbl size for dynamic msix allocation
+Date: Sat, 13 Jul 2024 16:43:38 -0700
+Message-ID: <20240713234339.70293-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240713234339.70293-1-michael.chan@broadcom.com>
 References: <20240713234339.70293-1-michael.chan@broadcom.com>
@@ -83,93 +84,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a9ea6a061d29921e"
+	boundary="000000000000c1b49d061d29923e"
 
---000000000000a9ea6a061d29921e
+--000000000000c1b49d061d29923e
 Content-Transfer-Encoding: 8bit
 
-Use the new pci_alloc_irq_vectors() and pci_free_irq_vectors() to
-replace the deprecated pci_enable_msix_range() and pci_disable_msix().
+If dynamic MSIX allocation is supported, additional MSIX can be
+allocated at run-time without reinitializing the existing MSIX entries.
+The first step to support this dynamic scheme is to alloacte a large
+enough bp->irq_tbl if dynamic allocation is supported.
 
+Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 21 +++++----------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 085dffcbe6f2..c0695a06744d 100644
+index c0695a06744d..7483ea246c9d 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10698,7 +10698,6 @@ static int bnxt_get_num_msix(struct bnxt *bp)
+@@ -10697,7 +10697,7 @@ static int bnxt_get_num_msix(struct bnxt *bp)
+ 
  static int bnxt_init_int_mode(struct bnxt *bp)
  {
- 	int i, total_vecs, max, rc = 0, min = 1, ulp_msix, tx_cp;
--	struct msix_entry *msix_ent;
+-	int i, total_vecs, max, rc = 0, min = 1, ulp_msix, tx_cp;
++	int i, total_vecs, max, rc = 0, min = 1, ulp_msix, tx_cp, tbl_size;
  
  	total_vecs = bnxt_get_num_msix(bp);
  	max = bnxt_get_max_func_irqs(bp);
-@@ -10708,19 +10707,11 @@ static int bnxt_init_int_mode(struct bnxt *bp)
- 	if (!total_vecs)
- 		return 0;
- 
--	msix_ent = kcalloc(total_vecs, sizeof(struct msix_entry), GFP_KERNEL);
--	if (!msix_ent)
--		return -ENOMEM;
--
--	for (i = 0; i < total_vecs; i++) {
--		msix_ent[i].entry = i;
--		msix_ent[i].vector = 0;
--	}
--
- 	if (!(bp->flags & BNXT_FLAG_SHARED_RINGS))
- 		min = 2;
- 
--	total_vecs = pci_enable_msix_range(bp->pdev, msix_ent, min, total_vecs);
-+	total_vecs = pci_alloc_irq_vectors(bp->pdev, min, total_vecs,
-+					   PCI_IRQ_MSIX);
- 	ulp_msix = bnxt_get_ulp_msix_num(bp);
- 	if (total_vecs < 0 || total_vecs < ulp_msix) {
- 		rc = -ENODEV;
-@@ -10730,7 +10721,7 @@ static int bnxt_init_int_mode(struct bnxt *bp)
- 	bp->irq_tbl = kcalloc(total_vecs, sizeof(struct bnxt_irq), GFP_KERNEL);
- 	if (bp->irq_tbl) {
- 		for (i = 0; i < total_vecs; i++)
--			bp->irq_tbl[i].vector = msix_ent[i].vector;
-+			bp->irq_tbl[i].vector = pci_irq_vector(bp->pdev, i);
- 
- 		bp->total_irqs = total_vecs;
- 		/* Trim rings based upon num of vectors allocated */
-@@ -10748,21 +10739,19 @@ static int bnxt_init_int_mode(struct bnxt *bp)
- 		rc = -ENOMEM;
+@@ -10718,7 +10718,10 @@ static int bnxt_init_int_mode(struct bnxt *bp)
  		goto msix_setup_exit;
  	}
--	kfree(msix_ent);
- 	return 0;
  
- msix_setup_exit:
- 	netdev_err(bp->dev, "bnxt_init_int_mode err: %x\n", rc);
- 	kfree(bp->irq_tbl);
- 	bp->irq_tbl = NULL;
--	pci_disable_msix(bp->pdev);
--	kfree(msix_ent);
-+	pci_free_irq_vectors(bp->pdev);
- 	return rc;
- }
- 
- static void bnxt_clear_int_mode(struct bnxt *bp)
- {
--	pci_disable_msix(bp->pdev);
-+	pci_free_irq_vectors(bp->pdev);
- 
- 	kfree(bp->irq_tbl);
- 	bp->irq_tbl = NULL;
+-	bp->irq_tbl = kcalloc(total_vecs, sizeof(struct bnxt_irq), GFP_KERNEL);
++	tbl_size = total_vecs;
++	if (pci_msix_can_alloc_dyn(bp->pdev))
++		tbl_size = max;
++	bp->irq_tbl = kcalloc(tbl_size, sizeof(struct bnxt_irq), GFP_KERNEL);
+ 	if (bp->irq_tbl) {
+ 		for (i = 0; i < total_vecs; i++)
+ 			bp->irq_tbl[i].vector = pci_irq_vector(bp->pdev, i);
 -- 
 2.30.1
 
 
---000000000000a9ea6a061d29921e
+--000000000000c1b49d061d29923e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -240,14 +201,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJ/npvM8jkTDbWP/tx7v5fMfDBPGd2HJ
-lkeEpvuVqA0LMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
-MzIzNDQxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIExJ1N//hMNS0lBj/+tR3Jtjq75EiAzM
+sbCEzgWs+MgmMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
+MzIzNDQxM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCFndNkhHs07uupakYCDbFwIXPtDgr6buFwkXpezup8ldxFbJzS
-4I582Hpl5V8w1dL/jQjCHRLI9NileBKHhelV0KTSq+w0kwWID8kTvmBaBamU0HKEn0BQ6/SRL+ar
-7xBlpKDGUAjlTI2HlUTQC2achGv/mnLIyH5ZJvY5tqfs9pH1Ksxo405BNDE68SJ8EgbkKyF7QW3U
-r3Uj5U/7GdaJ3XGWfiEsOMp3qojHAaR672el7j1lGdKOhNJaB5X2Fyv+g5nG9DonHG308M2JBvbm
-YALWPxDSy4fmLE+xOIhlAs26ulWr2VGFD2te0ogdEHcdTKhVWw7Q2CmrBtMxNID3
---000000000000a9ea6a061d29921e--
+ATANBgkqhkiG9w0BAQEFAASCAQBmqsf0jKTZiVyq+L4VnUVpak0iemd6xvcpohcTElp8w/DO48Zf
+BzsKaRtm9nrmfOCefbFgWTd3D3srf0pAKQjNF+KBn9HW7oYLeY2bhdD2LzKCI+ZLQCqNb4Pb3imD
+lriTm0NsHc6zs57u7cBLS79s+3QFvmX3Dipj4PKTC8eaLWcNqBRGtmDgx9+DbN2wOQYpFmOapbvy
+FzstALvAOUfQeunpywLwZFNHPmBatqfYWwvHQtz2IGhxA/ZsqSd3xj0ufH4838yPhiWcHbHK5pyB
+6FYY8mxviZIEsfQ8QkTOGOxAG6Z1+DRmGQOtxRR0iBziGuRHG3B86bDLu3kSY1w4
+--000000000000c1b49d061d29923e--
 
