@@ -1,216 +1,309 @@
-Return-Path: <netdev+bounces-111250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B617693065E
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 18:24:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F763930685
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 19:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA4951C21055
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 16:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 864131F2408E
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 17:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C445C13C80A;
-	Sat, 13 Jul 2024 16:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6B617279C;
+	Sat, 13 Jul 2024 16:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IMc3e9+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B85139590
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856E5171E57;
+	Sat, 13 Jul 2024 16:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720887866; cv=none; b=N5tlypu81AYc97JloK5a2Vc3W+mMQcnO1GozP2jI/oUfH5rQW61U4RfK7htnATKp0Yu4TvCgHbbkAS8xK5zEtcYb84rMmBUiMFB4FmHJfC7dmWLzhKn7CkAXoJDsqUmWvOgc2KOTWrVhOwtpD8dCfpvPE3QfvEZyjlmPB8Wv2u8=
+	t=1720889797; cv=none; b=BErzNxf7Oad7Wo4PQbv4F5cdBy1Qu0eYYhty4c9FbvovPhnXhzfOGRwU0SZmXDTlmxecGxfkaJ7Y/f+3u13f/qdFjoLWw9usDXbY1V9b3GVtBy87nPJnM4o7JD8mLybEvyhWBZ2SeqswkpSPL2PndEZ7VytyzIrTLSVvbdFdDxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720887866; c=relaxed/simple;
-	bh=xpb5I2zJPE5D0bPloO26bg1gbNNMxjtkM+WgGTFmj3o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FkXmd8yfGak9E8bvu7Lsij3w1GonS2ra8Jq+4mmZC1Q2E690gEvljkTtxbv39UJjNK+jThgUKq0IpA/CII4hxhYMC7Btt7ZU9JFGkAJ41FPvzBYU5ii2XFpo69AhcxZ8o7eUyC0jz3qbVk+mDAIc5zmddXC4g/wn7kL5QDEy71w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7fba8d323f9so295366439f.3
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 09:24:23 -0700 (PDT)
+	s=arc-20240116; t=1720889797; c=relaxed/simple;
+	bh=s4hLEGAo6TkxA2Kn3tloADVBco6FHnB6JolUqrnimpY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kf2xb5Hk8aErWKsZSt2GbjNfXxlTMkuHe+VQMv8sQ2B0qazuOF6W/ToeBET/LKehzgEn8KvgLk5tQNtRw13lmCn1lJikbo8pDWS+CwViR8K9IxKymlxNfWV3hBRHfIOU806UgYv0qDxrtb+TBZUrrbbbS3ZGEQVN2jurg+ZlnsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IMc3e9+O; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3679df4cb4cso1873757f8f.0;
+        Sat, 13 Jul 2024 09:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720889794; x=1721494594; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cNt1wrkptkd8WR0JstD22LLnVmr+AtU5Ut9aSaxTWAM=;
+        b=IMc3e9+Oqw5ZGgWMy1mQqFP/smM6z5am0jDTTFg/HM+l3u2BSh4TxVOiHk70QGDGgP
+         +mgQrx6GedpHk+Y6V9eKiqw/ynG5ke5Ems7LcLPu01dBMi6ZY5mSSYFnf+1nCq2pQb3U
+         HFopQSwgu7J4FTEzhIA5eE+FYjuuN5MjR9L8bsQoR65NA38QVUpB3GJznjYpPnG9rJAg
+         7uLXxzL3SDfR0lQQ3o/xl7x+AoDEajLOuNyDZBx33k4dXXpg9v8YuKX8iZJeUTXsIKQy
+         AmDCiNThm/y8yjGVVGtLXlVnO49M5kpGpU2mFr+4zh4Cetcqigoc6gVzGGOctodvmp6j
+         E7Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720887863; x=1721492663;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E296RzClnDhpDUcuegleyH62gwNo5mzWmNwTtDEFd4g=;
-        b=FALMzbLy5vIzdTL6b962GYVSVjW4Pc/1sJqXZNUPEuYlF+Q64OaWDI0cOGXB3M5GHO
-         hwwoIuUcwuM3JPE6p+txI4jFPAqSpdedzeqW2tz8spSrFFY/RbJfX4skBWkaTIxpK5JG
-         i6qojQDtrdZ949zfdGoY/6upfTgxo5hj2wDeAPCa124BGxq6tnCrphqHqTgkigLOQBaU
-         h8RetcS9cm6UEZiI3pAxvMceQh3e8caTN/KOlGtmmKgae85fZ0klffbnNQ7Dnl6QvnFr
-         lDpoKc6lGU06+pgXJ1529hfqXeEdC/vW5/rB/4nqa9eSp0bqp7LAOAFemd66/pOgYYKA
-         aZhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCS/WEdvxV0bEYvt/oxhwgLQbVfqo2zH5+JLAEwmuLb04eG+5BcRIQE78NOILchWZ3WyVZihAAR8+nnTMr1Gy+VZvNFs90
-X-Gm-Message-State: AOJu0YzFkehubXRe5/iUU7BkbovImnyGHhNmDxbgDlLkDPHRuk4WxjTq
-	XmetHBNp4Tv7nvjlQMqBVspGaR1Z3fvVLVJP7NRhfq1mdwz9hNPDO5HExeAnEotHYE9b2DhbMZH
-	GCFrLwOsuLo826BUnfHeTmylnZhixRatDQMES2lL3tH4oOrz8hADsy8c=
-X-Google-Smtp-Source: AGHT+IEsnS9zUo0dPuae33bLd+vzGrV52ncVkwDwwbg3xoBy5DjDE3By6X9h+aogNRQiy9djP5qIZ0M3aTVocfPwrYfDiBMm8w3E
+        d=1e100.net; s=20230601; t=1720889794; x=1721494594;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNt1wrkptkd8WR0JstD22LLnVmr+AtU5Ut9aSaxTWAM=;
+        b=XEMtGmaWtwkcBMJilyOkYHZj3916vD3BATvrVrYxADuvV4f8Eg9v5+uCE8sdZQhV/5
+         WyGEsli3wPJ3as81/JH3lpMmZ5nkYp5iIWHgiTxjOUuLfRrYhYULm8mE69/qMiM6Wpt6
+         jJSoffVMnKlPvgpmEfVuH5LDMrhJSXX719oelYy79SA/quf5A2MJT7s19oZC5cGt+TJw
+         X6Qzb7/KdeaY8r4FWr5m1+SErvM3a2BQcoqNwGglNRxH54DEiiOcrME/hr4RjcmwNPTP
+         Nibu9yO0hAVnZhvCG5PcDRcMTvBe6doAIeFT9/gEUP86MaNc24VqHJwyqAiISLHWFyFM
+         0O3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUxU50CxgLeTdMTtWmc7zOyi0L/aYM8tGmboM3UI2hiioQG6m4bcVvSnbteHpd0u/o5pjZOw4AqqG0SfXhIcKrNsxnR6njjEiJ3zIB1nYYeghpE9Jc687JujrvDAYo3dhNFvmMy
+X-Gm-Message-State: AOJu0Yyqo9Ih/aib8tuX0EgVOYay4qv9GxpH/M66EjtQ/j4DXB2mkAyn
+	GJYl3+rW5iZG3gltcNX9YBEQdwArIxzmFCe8W51343D1Kj+2A96lb4tfzo3UyRyl0hpkJa9gQyT
+	FtblSxlYq9fneD8hiZUh48dSElEU=
+X-Google-Smtp-Source: AGHT+IFM1aA9fPQwig9kG5G53o8ZVZdSWMlzL8lNEGzlwh+Yw9AUubW1OizJr1MnA3tS1MsWUsOY3FLesOPBVz8bLKI=
+X-Received: by 2002:a5d:5f45:0:b0:368:6bb:f79e with SMTP id
+ ffacd0b85a97d-36806bbf7e9mr5375120f8f.4.1720889793488; Sat, 13 Jul 2024
+ 09:56:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:710a:b0:4b9:def5:3dcb with SMTP id
- 8926c6da1cb9f-4c0b29ba495mr1263022173.2.1720887863213; Sat, 13 Jul 2024
- 09:24:23 -0700 (PDT)
-Date: Sat, 13 Jul 2024 09:24:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c90eee061d236d37@google.com>
-Subject: [syzbot] [bpf?] [net?] BUG: unable to handle kernel paging request in
- bpf_prog_ADDR (3)
-From: syzbot <syzbot+ad9ec60c8eaf69e6f99c@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, sdf@google.com, 
-	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-7-linyunsheng@huawei.com> <12a8b9ddbcb2da8431f77c5ec952ccfb2a77b7ec.camel@gmail.com>
+ <808be796-6333-c116-6ecb-95a39f7ad76e@huawei.com> <a026c32218cabc7b6dc579ced1306aefd7029b10.camel@gmail.com>
+ <f4ff5a42-9371-bc54-8523-b11d8511c39a@huawei.com> <96b04ebb7f46d73482d5f71213bd800c8195f00d.camel@gmail.com>
+ <5daed410-063b-4d86-b544-d1a85bd86375@huawei.com> <CAKgT0UdJPcnfOJ=-1ZzXbiFiA=8a0z_oVBgQC-itKB1HWBU+yA@mail.gmail.com>
+ <df38c0fb-64a9-48da-95d7-d6729cc6cf34@huawei.com> <CAKgT0UdSjmJoaQvTOz3STjBi2PazQ=piWY5wqFsYFBFLcPrLjQ@mail.gmail.com>
+ <29e8ac53-f7da-4896-8121-2abc25ec2c95@gmail.com>
+In-Reply-To: <29e8ac53-f7da-4896-8121-2abc25ec2c95@gmail.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Sat, 13 Jul 2024 09:55:56 -0700
+Message-ID: <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 06/13] mm: page_frag: reuse existing space for
+ 'size' and 'pfmemalloc'
+To: Yunsheng Lin <yunshenglin0825@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Jul 12, 2024 at 10:20=E2=80=AFPM Yunsheng Lin <yunshenglin0825@gmai=
+l.com> wrote:
+>
+> On 7/13/2024 12:55 AM, Alexander Duyck wrote:
+>
+> ...
+>
+> >>
+> >> So it is about ensuring the additional room due to alignment requireme=
+nt
+> >> being placed at the end of a fragment, in order to avoid false sharing
+> >> between the last fragment and the current fragment as much as possible=
+,
+> >> right?
+> >>
+> >> I am generally agreed with above if we can also ensure skb coaleasing =
+by
+> >> doing offset count-up instead of offset countdown.
+> >>
+> >> If there is conflict between them, I am assuming that enabling skb fra=
+g
+> >> coaleasing is prefered over avoiding false sharing, right?
+> >
+> > The question I would have is where do we have opportunities for this
+> > to result in coalescing? If we are using this to allocate skb->data
+> > then there isn't such a chance as the tailroom gets in the way.
+> >
+> > If this is for a device allocating for an Rx buffer we won't get that
+> > chance as we have to preallocate some fixed size not knowing the
+> > buffer that is coming, and it needs to usually be DMA aligned in order
+> > to avoid causing partial cacheline reads/writes. The only way these
+> > would combine well is if you are doing aligned fixed blocks and are
+> > the only consumer of the page frag cache. It is essentially just
+> > optimizing for jumbo frames in that case.
+>
+> And hw-gro or sw-gro.
 
-syzbot found the following issue on:
+No and no. The problem is for hw-gro in many cases the device will be
+DMA aligning the start of writes for each new frame that comes in. As
+such it is possible you won't be able to make use of this unless the
+device is either queueing up the entire packet before writing it to
+memory, or taking a double penalty for partial cache line writes which
+will negatively impact performance. For sw-gro it won't happen since
+as I mentioned the device is doing DMA aligned writes usually w/ fixed
+size buffers that will be partially empty. As such coalescing will
+likely not be possible in either of those scenarios.
 
-HEAD commit:    8b9b59e27aa8 i40e: fix: remove needless retries of NVM upd..
-git tree:       bpf
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=135ee4f6980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b63b35269462a0e0
-dashboard link: https://syzkaller.appspot.com/bug?extid=ad9ec60c8eaf69e6f99c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=171399dd980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e4054e980000
+This is why I was so comfortable using the reverse ordering for the
+allocations. Trying to aggregate frames in this way will be very
+difficult and the likelihood of anyone ever needing to do it is
+incredibly small.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/535b0bcd3e1f/disk-8b9b59e2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/127f5ddff150/vmlinux-8b9b59e2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a3ac9910529c/bzImage-8b9b59e2.xz
+> >
+> > If this is for some software interface why wouldn't it request the
+> > coalesced size and do one allocation rather than trying to figure out
+> > how to perform a bunch of smaller allocations and then trying to merge
+> > them together after the fact.
+>
+> I am not sure I understand what 'some software interface' is referring
+> to, I hope you are not suggesting the below optimizations utilizing of
+> skb_can_coalesce() checking is unnecessary:(
+>
+> https://elixir.bootlin.com/linux/v6.10-rc7/C/ident/skb_can_coalesce
+>
+> Most of the usecases do that for the reason below as mentioned in the
+> Documentation/mm/page_frags.rst as my understanding:
+> "There is also a use case that needs minimum memory in order for forward
+> progress, but more performant if more memory is available."
 
-The issue was bisected to:
+No what I am talking about is that it will be expensive to use and
+have very little benefit to coalesce frames coming from a NIC as I
+called out above. Most NICs won't use page frags anyway they will be
+using page pool which is a slightly different beast anyway.
 
-commit 1f1e864b65554e33fe74e3377e58b12f4302f2eb
-Author: Yonghong Song <yonghong.song@linux.dev>
-Date:   Fri Jul 28 01:12:07 2023 +0000
+> >
+> >>>
+> >>>> The above is why I added the below paragraph in the doc to make the =
+semantic
+> >>>> more explicit:
+> >>>> "Depending on different aligning requirement, the page_frag API call=
+er may call
+> >>>> page_frag_alloc*_align*() to ensure the returned virtual address or =
+offset of
+> >>>> the page is aligned according to the 'align/alignment' parameter. No=
+te the size
+> >>>> of the allocated fragment is not aligned, the caller needs to provid=
+e an aligned
+> >>>> fragsz if there is an alignment requirement for the size of the frag=
+ment."
+> >>>>
+> >>>> And existing callers of page_frag aligned API does seems to follow t=
+he above
+> >>>> rule last time I checked.
+> >>>>
+> >>>> Or did I miss something obvious here?
+> >>>
+> >>> No you didn't miss anything. It is just that there is now more
+> >>> potential for error than there was before.
+> >>
+> >> I guess the 'error' is referred to the 'false sharing' mentioned above=
+,
+> >> right? If it is indeed an error, are we not supposed to fix it instead
+> >> of allowing such implicit implication? Allowing implicit implication
+> >> seems to make the 'error' harder to reproduce and debug.
+> >
+> > The concern with the code as it stands is that if I am not mistaken
+> > remaining isn't actually aligned. You aligned it, then added fragsz.
+> > That becomes the start of the next frame so if fragsz isn't aligned
+> > the next requester will be getting an unaligned buffer, or one that is
+> > only aligned to the previous caller's alignment.
+>
+> As mentioned below:
+> https://lore.kernel.org/all/3da33d4c-a70e-23a4-8e00-23fe96dd0c1a@huawei.c=
+om/
+>
+> what alignment semantics are we providing here:
+> 1. Ensure alignment for both offset and fragsz.
+> 2. Ensure alignment for offset only.
+> 3. Ensure alignment for fragsz only.
+>
+> As my understanding, the original code before this patchset is only
+> ensuring alignment for offset too. So there may be 'false sharing'
+> both before this patchset and after this patchset. It would be better
+> not to argue about which implementation having more/less potential
+> to avoid the 'false sharing', it is an undefined behavior, the argument
+> would be endless depending on usecase and personal preference.
+>
+> As I said before, I would love to retain the old undefined behavior
+> when there is a reasonable way to support the new usecases.
 
-    bpf: Handle sign-extenstin ctx member accesses
+My main concern is that you were aligning "remaining", then adding
+fragsz, and storing that. That was then used as the offset for the
+next buffer. That isn't aligned since fragsz and the previous offset
+aren't guaranteed to align with the new allocation.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=121c054e980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=111c054e980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=161c054e980000
+So at a minimum the existing code cannot be using nc->remaining when
+generating the pointer to the page. Instead it has to be using the
+aligned version of that value that you generated before adding fragsz
+and verifying there is space.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ad9ec60c8eaf69e6f99c@syzkaller.appspotmail.com
-Fixes: 1f1e864b6555 ("bpf: Handle sign-extenstin ctx member accesses")
+> >
+> >>>
+> >>>>> need to align the remaining, then add fragsz, and then I guess you
+> >>>>> could store remaining and then subtract fragsz from your final virt=
+ual
+> >>>>> address to get back to where the starting offset is actually locate=
+d.
+> >>>>
+> >>>> remaining =3D __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
+> >>>> remaining +=3D fragsz;
+> >>>> nc->remaining =3D remaining;
+> >>>> return encoded_page_address(nc->encoded_va) + (size + remaining) - f=
+ragsz;
+> >>>>
+> >>>> If yes, I am not sure what is the point of doing the above yet, it
+> >>>> just seem to make thing more complicated and harder to understand.
+> >>>
+> >>> That isn't right. I am not sure why you are adding size + remaining o=
+r
+> >>> what those are supposed to represent.
+> >>
+> >> As the above assumes 'remaining' is a negative value as you suggested,
+> >> (size + remaining) is supposed to represent the offset of next fragmen=
+t
+> >> to ensure we have count-up offset for enabling skb frag coaleasing, an=
+d
+> >> '- fragsz' is used to get the offset of current fragment.
+> >>
+> >>>
+> >>> The issue was that the "remaining" ends up being an unaligned value a=
+s
+> >>> you were starting by aligning it and then adding fragsz. So by
+> >>> subtracting fragsz you can get back to the aliglined start. What this
+> >>> patch was doing before was adding the raw unaligned nc->remaining at
+> >>> the end of the function.
+> >>>
+> >>>>>
+> >>>>> Basically your "remaining" value isn't a safe number to use for an
+> >>>>> offset since it isn't aligned to your starting value at any point.
+> >>>>
+> >>>> Does using 'aligned_remaining' local variable to make it more obviou=
+s
+> >>>> seem reasonable to you?
+> >>>
+> >>> No, as the value you are storing above isn't guaranteed to be aligned=
+.
+> >>> If you stored it before adding fragsz then it would be aligned.
+> >>
+> >> I have a feeling that what you are proposing may be conflict with enab=
+ling
+> >> skb frag coaleasing, as doing offset count-up seems to need some room =
+to
+> >> be reserved at the begin of a allocated fragment due to alignment requ=
+irement,
+> >> and that may mean we need to do both fragsz and offset aligning.
+> >>
+> >> Perhaps the 'remaining' changing in this patch does seems to make thin=
+gs
+> >> harder to discuss. Anyway, it would be more helpful if there is some p=
+seudo
+> >> code to show the steps of how the above can be done in your mind.
+> >
+> > Basically what you would really need do for all this is:
+> >    remaining =3D __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
+> >    nc->remaining =3D remaining + fragsz;
+> >    return encoded_page_address(nc->encoded_va) + size + remaining;
+>
 
-BUG: unable to handle page fault for address: 000000002aebd040
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 80000000226b6067 P4D 80000000226b6067 PUD 226b7067 PMD 0 
-Oops: Oops: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 PID: 5096 Comm: syz-executor365 Not tainted 6.10.0-rc7-syzkaller-00133-g8b9b59e27aa8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:bpf_prog_82ec301e76077160+0x5c/0xa0
-Code: 0a b8 02 00 00 00 41 5d 5b c9 c3 48 89 df 48 8b b7 d8 00 00 00 48 63 f6 48 8b 57 50 48 89 f0 48 83 c0 08 48 39 c2 77 02 eb dc <48> 0f b7 5e 00 4c 0f bf eb 48 81 fb 0f ff 07 00 74 00 48 c1 e3 20
-RSP: 0018:ffffc900031f7980 EFLAGS: 00010292
-RAX: 000000002aebd048 RBX: 0000000000000000 RCX: ffff888076a99e00
-RDX: ffff88802aebd050 RSI: 000000002aebd040 RDI: ffff8880226b4b40
-RBP: ffffc900031f7990 R08: ffffffff8183cf51 R09: 1ffffffff1f5b295
-R10: dffffc0000000000 R11: ffffffffa0001f9c R12: ffffffff8998404e
-R13: dffffc0000000000 R14: ffffc90000ace030 R15: ffffc90000ace020
-FS:  0000555562a39380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002aebd040 CR3: 0000000021bc0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
- __bpf_prog_run include/linux/filter.h:691 [inline]
- bpf_prog_run include/linux/filter.h:698 [inline]
- bpf_test_run+0x409/0x910 net/bpf/test_run.c:425
- bpf_prog_test_run_skb+0xafa/0x13a0 net/bpf/test_run.c:1072
- bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4292
- __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5706
- __do_sys_bpf kernel/bpf/syscall.c:5795 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5793 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5793
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcd7dc9bbb9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc1893ff98 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcd7dc9bbb9
-RDX: 000000000000004c RSI: 0000000020000240 RDI: 000000000000000a
-RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
-CR2: 000000002aebd040
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_prog_82ec301e76077160+0x5c/0xa0
-Code: 0a b8 02 00 00 00 41 5d 5b c9 c3 48 89 df 48 8b b7 d8 00 00 00 48 63 f6 48 8b 57 50 48 89 f0 48 83 c0 08 48 39 c2 77 02 eb dc <48> 0f b7 5e 00 4c 0f bf eb 48 81 fb 0f ff 07 00 74 00 48 c1 e3 20
-RSP: 0018:ffffc900031f7980 EFLAGS: 00010292
-RAX: 000000002aebd048 RBX: 0000000000000000 RCX: ffff888076a99e00
-RDX: ffff88802aebd050 RSI: 000000002aebd040 RDI: ffff8880226b4b40
-RBP: ffffc900031f7990 R08: ffffffff8183cf51 R09: 1ffffffff1f5b295
-R10: dffffc0000000000 R11: ffffffffa0001f9c R12: ffffffff8998404e
-R13: dffffc0000000000 R14: ffffc90000ace030 R15: ffffc90000ace020
-FS:  0000555562a39380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002aebd040 CR3: 0000000021bc0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	0a b8 02 00 00 00    	or     0x2(%rax),%bh
-   6:	41 5d                	pop    %r13
-   8:	5b                   	pop    %rbx
-   9:	c9                   	leave
-   a:	c3                   	ret
-   b:	48 89 df             	mov    %rbx,%rdi
-   e:	48 8b b7 d8 00 00 00 	mov    0xd8(%rdi),%rsi
-  15:	48 63 f6             	movslq %esi,%rsi
-  18:	48 8b 57 50          	mov    0x50(%rdi),%rdx
-  1c:	48 89 f0             	mov    %rsi,%rax
-  1f:	48 83 c0 08          	add    $0x8,%rax
-  23:	48 39 c2             	cmp    %rax,%rdx
-  26:	77 02                	ja     0x2a
-  28:	eb dc                	jmp    0x6
-* 2a:	48 0f b7 5e 00       	movzwq 0x0(%rsi),%rbx <-- trapping instruction
-  2f:	4c 0f bf eb          	movswq %bx,%r13
-  33:	48 81 fb 0f ff 07 00 	cmp    $0x7ff0f,%rbx
-  3a:	74 00                	je     0x3c
-  3c:	48 c1 e3 20          	shl    $0x20,%rbx
+I might have mixed my explanation up a bit. This is assuming remaining
+is a negative value as I mentioned before.
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Basically the issue is your current code is using nc->remaining to
+generate the current address and that is bad as it isn't aligned to
+anything as fragsz was added to it and no alignment check had been
+done on that value.
 
