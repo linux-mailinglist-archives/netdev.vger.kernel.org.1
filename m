@@ -1,101 +1,96 @@
-Return-Path: <netdev+bounces-111259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C2B930713
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 20:50:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53DDB930733
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5DB1F228E7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 18:50:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79ABF1C2110C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 20:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3AF13D8B5;
-	Sat, 13 Jul 2024 18:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3583814039E;
+	Sat, 13 Jul 2024 20:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z1bsVl+U"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="aXn7YkOy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E760F1B28D
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 18:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1350C18E20;
+	Sat, 13 Jul 2024 20:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720896612; cv=none; b=P4oy1OeHdDLzW7Hx/PleTlKJmsMcWAO11Nf9sPyraxT2tOFqbC4kfCU0Y+s1kcXl1kLMAVr22lXE2DCwRap+t7YCygosE/bFHwNT1SFUCjG5fAkEa4n4YbeONBmk8BPv8cy/Aq02aY/oiu4diJZp+JFF//TTX4eOWy3tKOeYijI=
+	t=1720900976; cv=none; b=VFSqX6reXzPrsCwSUGF4BgBOyTdVTBvYsJ2tVZWFOZSHu9eF9XQvjyxSCpbKIl5YxlUMqbHoB0ir9yCuEk+oO2gg8nzBxV38UVv3vUd3LXuNUqsc0a9iwWBP4xV9XFz0NA5L+YzdxWtciavKWgzsSfIJKNVGA2cQ5jG48dpMf8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720896612; c=relaxed/simple;
-	bh=yE9YHoxgrWcBTKsNcw4yrXqhxNdVVWjvI97p+mOF8rg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iHrdCECYgU6dc1qV+hJtIRxXzDAWxE5u/b8uIfMYRjGWIDpCeHFtSw29vKmCsnPqkGvK3rqTTFrO8eIDE4vzTTCP42IOzKjGeXLpk5j2wGDnU0DibbSsiHuJ1h9s2DHV152WEamneY/tbw4N0Mv77HJ7jzV+yKTSnRToaFB3RWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z1bsVl+U; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nac84ig0oaRcbYmSxZQlRwtHpCCiVKboY3fHx0HLV3s=; b=Z1bsVl+UPkxok9FMCxdk4+0QzJ
-	75dKYEMZT/1KnLNdaIA/UGKPXElEqDYKRr0CZT1uiOsHtvr5zN+KiboSM3WBSq2Idj/DwDyoA1SL9
-	JOKTzsaNNxSQBWH7vZfrkjCK6iPu0ozLp40S+vDn4XUsaTFWDAF+bPNp3Z0mSYHqOwvw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sShot-002TGv-2n; Sat, 13 Jul 2024 20:50:07 +0200
-Date: Sat, 13 Jul 2024 20:50:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, kernel-team@meta.com
-Subject: Re: [net-next PATCH v5 03/15] eth: fbnic: Allocate core device
- specific structures and devlink interface
-Message-ID: <24ac80b6-ee09-4aee-b9f7-162a3377baa3@lunn.ch>
-References: <172079913640.1778861.11459276843992867323.stgit@ahduyck-xeon-server.home.arpa>
- <172079936012.1778861.4670986685222676467.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1720900976; c=relaxed/simple;
+	bh=MM4eNVMg3kPNkxH5RchtX2R+vU+hx7d+zbMU1H0dI3c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pan88N8OgZSAc4IF1xKs0/raUpmuuH0/kTgNphuozZPWdYhhet+Z6w1K6zSR6YjrlajLmYkSmAzEFfGasMuJ3eXVfck5NDso9c0LruSdmzNthWMc34wDoE+bsL/xkUr2aRg1DAvTUch5nf1YjgnFcWATC7UUXho+UiXLCiQmCoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=aXn7YkOy; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sSix7-00FbQJ-US; Sat, 13 Jul 2024 22:02:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From; bh=cByYk0lvIWunhrbwXLOqV7Y742DeSDOR7RaGVk8RYhQ=; b=aXn7YkOyym/we
+	MlC3a9HOVCjOEZ0MH4WPkWyZ25E6xAk0uoL9+iHZPHxdHeWvoaYomD2h4Rtz9v75IyE+iAGZQo/+W
+	eKb2KOW0J+KnCLaxp+C0xHW5g3avbnnWMfDZ/+G4bz3loa7uhJW3B1QvvwqLGkq+YD22KIj57Uo5O
+	xZ7rCQqHxiI7FFH79tILxo3W/xrZZsckDYbLEqI6Nzgi4bpqtkPjwOZCJ6WZ/9jw34tiChX8ClJix
+	KV4pM61NS/H5ZxL+ak+DXmnkoCnb4j34RD4beDPT4RqFVZ/vkiZPgyeeiMnXJJ+1C7C245/IFYmZv
+	XbpTQYjaWSnS7WFZg6T2A==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sSix7-0006ij-Hr; Sat, 13 Jul 2024 22:02:41 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sSix3-000dGr-1q; Sat, 13 Jul 2024 22:02:37 +0200
+From: Michal Luczaj <mhal@rbox.co>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	kuniyu@amazon.com,
+	Rao.Shoaib@oracle.com,
+	cong.wang@bytedance.com,
+	Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH bpf v4 0/4] af_unix: MSG_OOB handling fix & selftest
+Date: Sat, 13 Jul 2024 21:41:37 +0200
+Message-ID: <20240713200218.2140950-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <172079936012.1778861.4670986685222676467.stgit@ahduyck-xeon-server.home.arpa>
+Content-Transfer-Encoding: 8bit
 
-> +int fbnic_alloc_irqs(struct fbnic_dev *fbd)
-> +{
-> +	unsigned int wanted_irqs = FBNIC_NON_NAPI_VECTORS;
-> +	struct pci_dev *pdev = to_pci_dev(fbd->dev);
-> +	int num_irqs;
-> +
-> +	wanted_irqs += 1;
-> +	num_irqs = pci_alloc_irq_vectors(pdev, FBNIC_NON_NAPI_VECTORS + 1,
-> +					 wanted_irqs, PCI_IRQ_MSIX);
+PATCH 1/4 tells BPF redirect to silently drop AF_UNIX's MSG_OOB. The rest
+is selftest-related.
 
-nit picking, but this is a bit odd. Why not:
+Michal Luczaj (4):
+  af_unix: Disable MSG_OOB handling for sockets in sockmap/sockhash
+  selftest/bpf: Support SOCK_STREAM in unix_inet_redir_to_connected()
+  selftest/bpf: Parametrize AF_UNIX redir functions to accept send()
+    flags
+  selftest/bpf: Test sockmap redirect for AF_UNIX MSG_OOB
 
-> +	unsigned int wanted_irqs = FBNIC_NON_NAPI_VECTORS + 1;
-> +	num_irqs = pci_alloc_irq_vectors(pdev, wanted_irqs,
-> +					 wanted_irqs, PCI_IRQ_MSIX);
+ net/unix/af_unix.c                            | 41 ++++++++-
+ net/unix/unix_bpf.c                           |  3 +
+ .../selftests/bpf/prog_tests/sockmap_listen.c | 85 +++++++++++++------
+ 3 files changed, 102 insertions(+), 27 deletions(-)
 
+-- 
+2.45.2
 
-> +	if (num_irqs < 0) {
-> +		dev_err(fbd->dev, "Failed to allocate MSI-X entries\n");
-> +		return num_irqs;
-> +	}
-> +
-> +	if (num_irqs < wanted_irqs)
-> +		dev_warn(fbd->dev, "Allocated %d IRQs, expected %d\n",
-> +			 num_irqs, wanted_irqs);
-
-https://elixir.bootlin.com/linux/latest/source/drivers/pci/msi/api.c#L206
-
- * Return: number of allocated vectors (which might be smaller than
- * @max_vecs), -ENOSPC if less than @min_vecs interrupt vectors are
- * available, other errnos otherwise.
-
-So i don't think this is possible.
-
-	Andrew
 
