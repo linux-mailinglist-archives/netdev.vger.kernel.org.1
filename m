@@ -1,246 +1,137 @@
-Return-Path: <netdev+bounces-111186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F7D930339
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:19:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8522C930364
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46D3B1C2146D
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:19:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A7181F22358
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CEF168A9;
-	Sat, 13 Jul 2024 02:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Du8ojnJ1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9FE14006;
+	Sat, 13 Jul 2024 02:59:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EC4DF53;
-	Sat, 13 Jul 2024 02:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A12A1849;
+	Sat, 13 Jul 2024 02:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720837164; cv=none; b=jhbapvSHWZVuzTs7ZvD9aV/DJg1E15h1Bv+kY+Sh5Rl5cH6SZxc3EEnkzf13mjp3rMjONqIcWTqzT4sDwRNYPDXti6f0jw3/AKu3BaSBmJS5Pk3d/G3o4sLaIKdph8VLgh1vSKIG8z+DhviHVLhMTtwCuAbA+CadpCattgGMP5A=
+	t=1720839583; cv=none; b=DB+mBvH5RObZSt6mRHkMZLhQUhlN5xEpBC26j17Heki0Hqc+8saYEVZHdxXhU7aTgK8IX13UgKptuB9HwQva7qD81b61Alp/x7CtEk7bB+X26ydGoAnSeu3AVMpZpfzmXvM12dN9cm+/4895bt/eFBIPOTWTEOXZVXG4+a2jex4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720837164; c=relaxed/simple;
-	bh=v3mNEqFK0Q6h4padIx+/4n10HpzalQwxOLizi2JEcJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c1oL55/XX5h0cLtK5ft5KGpAWVkXgWPGAhrkh1v2kqWNL0zuXgaIVRAIU9xXgUFamTDAjl1RMIAy6n9pc5lC77hXycKtOhOu6KPEsbp3AUfv27ZyHa+I3k38zGLvWDczailFpFD1tSNUMDr2lToXXm1s1xZ3Ie2o85R+ryejsqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Du8ojnJ1; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1720837158;
-	bh=v3mNEqFK0Q6h4padIx+/4n10HpzalQwxOLizi2JEcJk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Du8ojnJ1ANsrtJ9EA7xRjipz+FOSt9c8B5BAxZYZx2uOgqWME8ESJGMxol58vOZ0W
-	 HV9FGOMFUiDEsfkXZogq8p+Dv4v7wfMt9YmZXkgczGY1/AU2WC+7Y4OpIP2bbzblqj
-	 o+moUwWov8UkLD5IFQ6jmLM/0LwpcxqBVXjDQyCV/Rz2vtKYx+F5WJysf8mfhGTHfa
-	 xjuSNoi8AJUU6s0nmcz98eGqfoFxx1Fldmgz7Fz07QXD9MYLVjPByQ9NHaaTWyfmYq
-	 Drqgc9NoGfPoYsyyvmAWxiaOZ/dgABLqGb9SNuZX047D/cSp19fEb527MFcBE9RyFD
-	 FhnmKLHiYehcA==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 46FCF60079;
-	Sat, 13 Jul 2024 02:19:17 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 0026E204FDE; Sat, 13 Jul 2024 02:19:12 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Florian Westphal <fw@strlen.de>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 13/13] net/sched: cls_flower: propagate tca[TCA_OPTIONS] to NL_REQ_ATTR_CHECK
-Date: Sat, 13 Jul 2024 02:19:10 +0000
-Message-ID: <20240713021911.1631517-14-ast@fiberby.net>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240713021911.1631517-1-ast@fiberby.net>
-References: <20240713021911.1631517-1-ast@fiberby.net>
+	s=arc-20240116; t=1720839583; c=relaxed/simple;
+	bh=O6bTVwvQaYdt6K0mhtCJE/WG81yT3XSy98eP6Cc32Xw=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=lbBwvQfxFKdECoIq8D7JPBw37weGM7c0D0aRoBC6IBahWzRifTvv6zHjRmLobWmAfcyTqTCtE5qJJNdB8Zjxk9kRxCFGnvHoOrIGwWa0tX+QzdSNaFjwV6dw/BL/U1wPTrvrdRvSGPV87QqadJ6Py6954xFSRBKZwfVw16DvpmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WLY354cx1z1JC9c;
+	Sat, 13 Jul 2024 10:54:41 +0800 (CST)
+Received: from kwepemd200011.china.huawei.com (unknown [7.221.188.251])
+	by mail.maildlp.com (Postfix) with ESMTPS id AE3A418009E;
+	Sat, 13 Jul 2024 10:59:27 +0800 (CST)
+Received: from [10.67.110.176] (10.67.110.176) by
+ kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Sat, 13 Jul 2024 10:59:26 +0800
+Subject: Re: [PATCH -next,v2] gss_krb5: refactor code to return correct
+ PTR_ERR in krb5_DK
+To: Chuck Lever <chuck.lever@oracle.com>
+CC: <trondmy@kernel.org>, <anna@kernel.org>, <jlayton@kernel.org>,
+	<neilb@suse.de>, <kolga@netapp.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <linux-nfs@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+References: <20240712072423.1942417-1-cuigaosheng1@huawei.com>
+ <ZpEx/Jejy/CiXE5Z@tissot.1015granger.net>
+ <ZpE9luTCrUnh8RBH@tissot.1015granger.net>
+From: cuigaosheng <cuigaosheng1@huawei.com>
+Message-ID: <0735690c-9c05-b932-7883-c2f7425b3076@huawei.com>
+Date: Sat, 13 Jul 2024 10:59:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZpE9luTCrUnh8RBH@tissot.1015granger.net>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemd200011.china.huawei.com (7.221.188.251)
 
-NL_REQ_ATTR_CHECK() is used in fl_set_key_flags() to set
-extended attributes about the origin of an error, this
-patch propagates tca[TCA_OPTIONS] through.
+Thanks for reviewing this patch.
 
-Before this patch:
+I think this modification makes sense, for example, if 
+crypto_sync_skcipher_setkey
 
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/tc.yaml \
-	 --do newtfilter --json '{
-		"chain": 0, "family": 0, "handle": 4, "ifindex": 22,
-		"info": 262152,
-		"kind": "flower",
-		"options": {
-			"flags": 0, "key-enc-flags": 8,
-			"key-eth-type": 2048 },
-		"parent": 4294967283 }'
-Netlink error: Invalid argument
-nl_len = 68 (52) nl_flags = 0x300 nl_type = 2
-        error: -22
-        extack: {'msg': 'Missing flags mask',
-                 'miss-type': 111}
+return -ENOMEM, it's better to return -ENOMEM than to return -EINVAL,
 
-After this patch:
+just like elsewhere.
 
-[same cmd]
-Netlink error: Invalid argument
-nl_len = 76 (60) nl_flags = 0x300 nl_type = 2
-        error: -22
-        extack: {'msg': 'Missing flags mask',
-                 'miss-type': 111, 'miss-nest': 56}
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- net/sched/cls_flower.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
-
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 38b2df387c1e1..e280c27cb9f9a 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -1171,8 +1171,9 @@ static void fl_set_key_flag(u32 flower_key, u32 flower_mask,
- 	}
- }
- 
--static int fl_set_key_flags(struct nlattr **tb, bool encap, u32 *flags_key,
--			    u32 *flags_mask, struct netlink_ext_ack *extack)
-+static int fl_set_key_flags(struct nlattr *tca_opts, struct nlattr **tb,
-+			    bool encap, u32 *flags_key, u32 *flags_mask,
-+			    struct netlink_ext_ack *extack)
- {
- 	int fl_key, fl_mask;
- 	u32 key, mask;
-@@ -1186,7 +1187,7 @@ static int fl_set_key_flags(struct nlattr **tb, bool encap, u32 *flags_key,
- 	}
- 
- 	/* mask is mandatory for flags */
--	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, fl_mask)) {
-+	if (NL_REQ_ATTR_CHECK(extack, tca_opts, tb, fl_mask)) {
- 		NL_SET_ERR_MSG(extack, "Missing flags mask");
- 		return -EINVAL;
- 	}
-@@ -1865,9 +1866,9 @@ static int fl_set_key_cfm(struct nlattr **tb,
- 	return 0;
- }
- 
--static int fl_set_key(struct net *net, struct nlattr **tb,
--		      struct fl_flow_key *key, struct fl_flow_key *mask,
--		      struct netlink_ext_ack *extack)
-+static int fl_set_key(struct net *net, struct nlattr *tca_opts,
-+		      struct nlattr **tb, struct fl_flow_key *key,
-+		      struct fl_flow_key *mask, struct netlink_ext_ack *extack)
- {
- 	__be16 ethertype;
- 	int ret = 0;
-@@ -2100,14 +2101,16 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
- 		return ret;
- 
- 	if (tb[TCA_FLOWER_KEY_FLAGS]) {
--		ret = fl_set_key_flags(tb, false, &key->control.flags,
-+		ret = fl_set_key_flags(tca_opts, tb, false,
-+				       &key->control.flags,
- 				       &mask->control.flags, extack);
- 		if (ret)
- 			return ret;
- 	}
- 
- 	if (tb[TCA_FLOWER_KEY_ENC_FLAGS])
--		ret = fl_set_key_flags(tb, true, &key->enc_control.flags,
-+		ret = fl_set_key_flags(tca_opts, tb, true,
-+				       &key->enc_control.flags,
- 				       &mask->enc_control.flags, extack);
- 
- 	return ret;
-@@ -2358,6 +2361,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- {
- 	struct cls_fl_head *head = fl_head_dereference(tp);
- 	bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
-+	struct nlattr *tca_opts = tca[TCA_OPTIONS];
- 	struct cls_fl_filter *fold = *arg;
- 	bool bound_to_filter = false;
- 	struct cls_fl_filter *fnew;
-@@ -2366,7 +2370,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	bool in_ht;
- 	int err;
- 
--	if (!tca[TCA_OPTIONS]) {
-+	if (!tca_opts) {
- 		err = -EINVAL;
- 		goto errout_fold;
- 	}
-@@ -2384,7 +2388,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_FLOWER_MAX,
--					  tca[TCA_OPTIONS], fl_policy, NULL);
-+					  tca_opts, fl_policy, NULL);
- 	if (err < 0)
- 		goto errout_tb;
- 
-@@ -2460,7 +2464,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 		bound_to_filter = true;
- 	}
- 
--	err = fl_set_key(net, tb, &fnew->key, &mask->key, extack);
-+	err = fl_set_key(net, tca_opts, tb, &fnew->key, &mask->key, extack);
- 	if (err)
- 		goto unbind_filter;
- 
-@@ -2800,18 +2804,19 @@ static void *fl_tmplt_create(struct net *net, struct tcf_chain *chain,
- 			     struct nlattr **tca,
- 			     struct netlink_ext_ack *extack)
- {
-+	struct nlattr *tca_opts = tca[TCA_OPTIONS];
- 	struct fl_flow_tmplt *tmplt;
- 	struct nlattr **tb;
- 	int err;
- 
--	if (!tca[TCA_OPTIONS])
-+	if (!tca_opts)
- 		return ERR_PTR(-EINVAL);
- 
- 	tb = kcalloc(TCA_FLOWER_MAX + 1, sizeof(struct nlattr *), GFP_KERNEL);
- 	if (!tb)
- 		return ERR_PTR(-ENOBUFS);
- 	err = nla_parse_nested_deprecated(tb, TCA_FLOWER_MAX,
--					  tca[TCA_OPTIONS], fl_policy, NULL);
-+					  tca_opts, fl_policy, NULL);
- 	if (err)
- 		goto errout_tb;
- 
-@@ -2821,7 +2826,8 @@ static void *fl_tmplt_create(struct net *net, struct tcf_chain *chain,
- 		goto errout_tb;
- 	}
- 	tmplt->chain = chain;
--	err = fl_set_key(net, tb, &tmplt->dummy_key, &tmplt->mask, extack);
-+	err = fl_set_key(net, tca_opts, tb, &tmplt->dummy_key,
-+			 &tmplt->mask, extack);
- 	if (err)
- 		goto errout_tmplt;
- 
--- 
-2.45.2
-
+On 2024/7/12 22:28, Chuck Lever wrote:
+> On Fri, Jul 12, 2024 at 09:39:08AM -0400, Chuck Lever wrote:
+>> On Fri, Jul 12, 2024 at 03:24:23PM +0800, Gaosheng Cui wrote:
+>>> Refactor the code in krb5_DK to return PTR_ERR when an error occurs.
+>> My understanding of the current code is that if either
+>> crypto_alloc_sync_skcipher() or crypto_sync_skcipher_blocksize()
+>> fails, then krb5_DK() returns -EINVAL. At the only call site for
+>> krb5_DK(), that return code is unconditionally discarded. Thus I
+>> don't see that the proposed change is necessary or improves
+>> anything.
+> My understanding is wrong  ;-)
+>
+> The return code isn't discarded. A non-zero return code from
+> krb5_DK() is carried back up the call stack. The logic in
+> krb5_derive_key_v2() does not use the kernel's usual error flow
+> form, so I missed this.
+>
+> However, it still isn't clear to me why the error behavior here
+> needs to change. It's possible, for example, that -EINVAL is
+> perfectly adequate to indicate when sync_skcipher() can't find the
+> specified encryption algorithm (gk5e->encrypt_name).
+>
+> Specifying the wrong encryption type: -EINVAL. That makes sense.
+>
+>
+>>> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+>>> ---
+>>> v2: Update IS_ERR to PTR_ERR, thanks very much!
+>>>   net/sunrpc/auth_gss/gss_krb5_keys.c | 8 ++++++--
+>>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/sunrpc/auth_gss/gss_krb5_keys.c b/net/sunrpc/auth_gss/gss_krb5_keys.c
+>>> index 4eb19c3a54c7..5ac8d06ab2c0 100644
+>>> --- a/net/sunrpc/auth_gss/gss_krb5_keys.c
+>>> +++ b/net/sunrpc/auth_gss/gss_krb5_keys.c
+>>> @@ -164,10 +164,14 @@ static int krb5_DK(const struct gss_krb5_enctype *gk5e,
+>>>   		goto err_return;
+>>>   
+>>>   	cipher = crypto_alloc_sync_skcipher(gk5e->encrypt_name, 0, 0);
+>>> -	if (IS_ERR(cipher))
+>>> +	if (IS_ERR(cipher)) {
+>>> +		ret = PTR_ERR(cipher);
+>>>   		goto err_return;
+>>> +	}
+>>> +
+>>>   	blocksize = crypto_sync_skcipher_blocksize(cipher);
+>>> -	if (crypto_sync_skcipher_setkey(cipher, inkey->data, inkey->len))
+>>> +	ret = crypto_sync_skcipher_setkey(cipher, inkey->data, inkey->len);
+>>> +	if (ret)
+>>>   		goto err_free_cipher;
+>>>   
+>>>   	ret = -ENOMEM;
+>>> -- 
+>>> 2.25.1
+>>>
+>> -- 
+>> Chuck Lever
+>>
 
