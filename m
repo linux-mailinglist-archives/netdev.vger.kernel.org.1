@@ -1,166 +1,132 @@
-Return-Path: <netdev+bounces-111175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E64289302D6
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:46:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2E69302F1
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 03:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 300CFB23F25
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 00:46:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A784D1C210BF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 01:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F38C152;
-	Sat, 13 Jul 2024 00:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5816F8BE0;
+	Sat, 13 Jul 2024 01:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="bqX3/N98"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLrM5D48"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853094C8E
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 00:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316ED4C6E
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 01:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720831560; cv=none; b=Gwe+/iIhCZPiFHnVlgGLy1W7O7Q4tMXeYDRqFNEWa6pTyDV6gAANQmNTgiS/+waSijg27mqBzEuOW9Ez5lwtAYyO4MjIqM8LMoIiq69ctAXp1AlDxrK9WzSY1N49CUNgCeYgbJ6kZ69sM66BxbMP20FHC85V98uHz6B2g8kLVLI=
+	t=1720833032; cv=none; b=b18F38eC2mW3o22o8npx6I0VKCaDzGHl8TcIK4q3svf+RvtJ+H69iyj/ArvvHRewFJush2XwxpNz3iJXHRfdPfxzS8ASyfCtQvk2tBmV3o59ecmnnFJxjkDRwHX/gWfNnkrUa7fD3iePnayL7quZtgi6zun5b7ncWNEcDxM+JqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720831560; c=relaxed/simple;
-	bh=fIeC+An8Bolk7ryUxH57g7EED4R3JHcxo9Xw3ewYCag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LU6tfjIdbb/kygPCxjVtBzNhj0lNJ9O5ODd8mZnJLSKCASmrySrtF3xwQbu3Qv9D6K79RgwAoc+dG+FCt4CdhSSx+13wmTkPd9NOC6Lc0XVHuS/HbqiQwCJEnfie5pgM7dJgUsXwVfIvy/ArcfmCqIJ2jiuy6u0Z8KMJqPbMn3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=bqX3/N98; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70af5fbf0d5so1703205b3a.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jul 2024 17:45:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1720831558; x=1721436358; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dW4zTFHOtzR/wwPx1Zay5ljlIiuZLQskqd4uueA0+2Y=;
-        b=bqX3/N98t+U/N9aESe4MeB4CFUyQ49wotzpLFJgKHHZGuRJWJlg+fkJZdJm+q4YAa2
-         K2FVaAkxBk6ZfSGIsRdUAMWFydmmuhf3+BgWJqSmBR70LSLPho/4f7kFCRjiJZYKhDRX
-         6qWAYgOP7Dm/En6SKS2fQCsgXRZixxtW6teUQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720831558; x=1721436358;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dW4zTFHOtzR/wwPx1Zay5ljlIiuZLQskqd4uueA0+2Y=;
-        b=kDUeUsnSx8PV8iSHHaTs3+sdHc+9G4BTiTrEGrXbNFYoQvku8ALaHcSG3euI60dicq
-         ffdAjTRPu/vKRHcpZFdHHRWzGUYqFDrxDE18j4JhMsHV+pEGnG+mGd9pfjzbx6rY/Pso
-         5jWNVsHvI3pk8dfGZyg1F0GqArIq5tX1X6SnhMWhnpYyKSJ25l7aAodmF725PewoVjGe
-         g6idgorMrUT8L0gbQMLHDf5bhhQzvpCH9u9wFk7FGPJX9faZ4MpE1ARzo5oynnv7JQ42
-         lbQULc0wOmtEnYF2qvlyKExwpjpTVZ1O8z1Dw/vDsM6F3hJid3xhkEWHdF/j8kQ5ugcU
-         y9Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJu/GdrRpcV8sUnLbPE0MJQEECNd+52cHTXQF0ogTBPj+HoQYIuBcQOjuqNBcXDFjAA8MzT8tbDlz3KPQrYSiJD5iH609f
-X-Gm-Message-State: AOJu0Yxwwna4LJwHCQMTy5OMcLpmpK49ipMk8qJoK/h9ozJ69Ooug0XM
-	mA7ewF5HG3c+bRU1CgveUZsyFEDWDrkCC4U4HKr2gl/eGqNJe/IYok7hTlC6a0g=
-X-Google-Smtp-Source: AGHT+IHoPtn3Alyl3FZi++726JDLvsj5bOjq0G1Q9EoK3jyg4rB7GE4Kv5UyyYhw1tM2Dc6MPFlM8A==
-X-Received: by 2002:a62:e915:0:b0:705:cc7d:ab7d with SMTP id d2e1a72fcca58-70b6c884c43mr5316300b3a.5.1720831557735;
-        Fri, 12 Jul 2024 17:45:57 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7eb9e226sm145706b3a.27.2024.07.12.17.45.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 17:45:57 -0700 (PDT)
-Date: Fri, 12 Jul 2024 17:45:54 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Kyle Huey <me@kylehuey.com>
-Cc: Jiri Olsa <olsajiri@gmail.com>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, netdev@vger.kernel.org, acme@kernel.org,
-	andrii.nakryiko@gmail.com, elver@google.com, khuey@kylehuey.com,
-	mingo@kernel.org, namhyung@kernel.org, peterz@infradead.org,
-	robert@ocallahan.org, yonghong.song@linux.dev,
-	mkarsten@uwaterloo.ca, kuba@kernel.org
-Subject: Re: [bpf?] [net-next ?] [RESEND] possible bpf overflow/output bug
- introduced in 6.10rc1 ?
-Message-ID: <ZpHOQoyEE7Rl1ky8@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Kyle Huey <me@kylehuey.com>, Jiri Olsa <olsajiri@gmail.com>,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, acme@kernel.org, andrii.nakryiko@gmail.com,
-	elver@google.com, khuey@kylehuey.com, mingo@kernel.org,
-	namhyung@kernel.org, peterz@infradead.org, robert@ocallahan.org,
-	yonghong.song@linux.dev, mkarsten@uwaterloo.ca, kuba@kernel.org
-References: <ZpFfocvyF3KHaSzF@LQ3V64L9R2>
- <ZpGrstyKD-PtWyoP@krava>
- <CAP045ApgYjQLVgvPeB0jK4LjfBB+XMo89gdVkZH8XJAdD=a6sg@mail.gmail.com>
- <CAP045ApsNDc-wJSSY0-BC+HMvWErUYk=GAt6P+J_8Q6dcdXj4Q@mail.gmail.com>
- <CAP045AqqfU3g2+-groEHzzdJvO3nyHPM5_faUao5UdbSOtK48A@mail.gmail.com>
+	s=arc-20240116; t=1720833032; c=relaxed/simple;
+	bh=XF5QVXWuEk1EoOj+cTSH2LmVsMKdzRwj7e5tLnEHnMc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QKLmkVsNRuUpeOb2td6tBqUledgYqnTVxN+6cRzeAwZ70dSpibJuuZN0N8FPvmcPj9aP+WNkg5lRZLGwp6ePjelGWsD7EwFNVPiaDBqk6/ywA/asaVRVaCiNkSD2AFjcQATWEuqtjKiw9WVm9Pz0bLX2Or3ZpL9ttFJPWGZftVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLrM5D48; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B1F24C4AF07;
+	Sat, 13 Jul 2024 01:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720833031;
+	bh=XF5QVXWuEk1EoOj+cTSH2LmVsMKdzRwj7e5tLnEHnMc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eLrM5D48pTNdNT5xJyifGtHVNhT5N9WjXsmBiWXmErd7c4dKOg3ZUDr5XzTPImwaV
+	 CydNGZhK8OuBlm5Wgt5ONWMhKHdxVqxo4Lx4gIVehqVKTuqf94OpLP2lDHnY6fwbzO
+	 yJA4T5k1DXEcESgG77mxs99quet0Z2VYHE3QPT7zmlxUqrgj2L7V3rmfQUP4dILaYt
+	 guzM6GfyO4al6fphnSbXkdK10rjIYYeo6w6czvgzAYF2VYcI7O1wEXIcdBNfqv5hix
+	 WGQ4+xylRUwAtcY3JESQBvmkLi03c6pI8+7s2Qa8ib2jdr3smABKXJdZuW5GlcMuzx
+	 2CFCWEEF8DLkw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9563DDAE95C;
+	Sat, 13 Jul 2024 01:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAP045AqqfU3g2+-groEHzzdJvO3nyHPM5_faUao5UdbSOtK48A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] bnxt_en: Fix crash in bnxt_get_max_rss_ctx_ring()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172083303160.3780.17657565730244077368.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Jul 2024 01:10:31 +0000
+References: <20240712175318.166811-1-michael.chan@broadcom.com>
+In-Reply-To: <20240712175318.166811-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com, leitao@debian.org
 
-On Fri, Jul 12, 2024 at 04:30:31PM -0700, Kyle Huey wrote:
-> Joe, can you test this?
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 12 Jul 2024 10:53:18 -0700 you wrote:
+> On older chips not supporting multiple RSS contexts, reducing
+> ethtool channels will crash:
 > 
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 8f908f077935..f0d7119585dc 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -9666,6 +9666,8 @@ static inline void
-> perf_event_free_bpf_handler(struct perf_event *event)
->   * Generic event overflow handling, sampling.
->   */
+> BUG: kernel NULL pointer dereference, address: 00000000000000b8
+> PGD 0 P4D 0
+> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
+> CPU: 1 PID: 7032 Comm: ethtool Tainted: G S                 6.10.0-rc4 #1
+> Hardware name: Dell Inc. PowerEdge R730/072T6D, BIOS 2.4.3 01/17/2017
+> RIP: 0010:bnxt_get_max_rss_ctx_ring+0x4c/0x90 [bnxt_en]
+> Code: c3 d3 eb 4c 8b 83 38 01 00 00 48 8d bb 38 01 00 00 4c 39 c7 74 42 41 8d 54 24 ff 31 c0 0f b7 d2 4c 8d 4c 12 02 66 85 ed 74 1d <49> 8b 90 b8 00 00 00 49 8d 34 11 0f b7 0a 66 39 c8 0f 42 c1 48 83
+> RSP: 0018:ffffaaa501d23ba8 EFLAGS: 00010202
+> RAX: 0000000000000000 RBX: ffff8efdf600c940 RCX: 0000000000000000
+> RDX: 000000000000007f RSI: ffffffffacf429c4 RDI: ffff8efdf600ca78
+> RBP: 0000000000000080 R08: 0000000000000000 R09: 0000000000000100
+> R10: 0000000000000001 R11: ffffaaa501d238c0 R12: 0000000000000080
+> R13: 0000000000000000 R14: ffff8efdf600c000 R15: 0000000000000006
+> FS:  00007f977a7d2740(0000) GS:ffff8f041f840000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000000000b8 CR3: 00000002320aa004 CR4: 00000000003706f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> ? __die_body+0x15/0x60
+> ? page_fault_oops+0x157/0x440
+> ? do_user_addr_fault+0x60/0x770
+> ? _raw_spin_lock_irqsave+0x12/0x40
+> ? exc_page_fault+0x61/0x120
+> ? asm_exc_page_fault+0x22/0x30
+> ? bnxt_get_max_rss_ctx_ring+0x4c/0x90 [bnxt_en]
+> ? bnxt_get_max_rss_ctx_ring+0x25/0x90 [bnxt_en]
+> bnxt_set_channels+0x9d/0x340 [bnxt_en]
+> ethtool_set_channels+0x14b/0x210
+> __dev_ethtool+0xdf8/0x2890
+> ? preempt_count_add+0x6a/0xa0
+> ? percpu_counter_add_batch+0x23/0x90
+> ? filemap_map_pages+0x417/0x4a0
+> ? avc_has_extended_perms+0x185/0x420
+> ? __pfx_udp_ioctl+0x10/0x10
+> ? sk_ioctl+0x55/0xf0
+> ? kmalloc_trace_noprof+0xe0/0x210
+> ? dev_ethtool+0x54/0x170
+> dev_ethtool+0xa2/0x170
+> dev_ioctl+0xbe/0x530
+> sock_do_ioctl+0xa3/0xf0
+> sock_ioctl+0x20d/0x2e0
 > 
-> +static bool perf_event_is_tracing(struct perf_event *event);
-> +
->  static int __perf_event_overflow(struct perf_event *event,
->                   int throttle, struct perf_sample_data *data,
->                   struct pt_regs *regs)
-> @@ -9682,7 +9684,9 @@ static int __perf_event_overflow(struct perf_event *event,
-> 
->      ret = __perf_event_account_interrupt(event, throttle);
-> 
-> -    if (event->prog && !bpf_overflow_handler(event, data, regs))
-> +    if (event->prog &&
-> +        !perf_event_is_tracing(event) &&
-> +        !bpf_overflow_handler(event, data, regs))
->          return ret;
-> 
->      /*
-> @@ -10612,6 +10616,11 @@ void perf_event_free_bpf_prog(struct perf_event *event)
-> 
->  #else
-> 
-> +static inline bool perf_event_is_tracing(struct perf_event *event)
-> +{
-> +    return false;
-> +}
-> +
->  static inline void perf_tp_register(void)
->  {
->  }
->
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [net] bnxt_en: Fix crash in bnxt_get_max_rss_ctx_ring()
+    https://git.kernel.org/netdev/net/c/f7ce5eb2cb79
 
-I've applied the above patch on top of commit 338a93cf4a18 ("net:
-mctp-i2c: invalidate flows immediately on TX errors"), which seems
-to be latest on net-next/main.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I built and booted that kernel on my mlx5 test machine and re-ran
-the same bpftrace invocation:
 
-  bpftrace -e 'tracepoint:napi:napi_poll { @[args->work] = count(); }'
-
-I then scp-ed a 100MiB zero filled file to the target 48 times back
-to back (e.g. scp zeroes target:~/ && scp zeroes target:~/ && ... )
-and the bpftrace output seems reasonable; there are no negative
-numbers and the values output *look* reasonable to me.
-
-The patch seems reasonable, as well, with the major caveat that I've
-only hacked on drivers and networking stuff and know absolutely
-nothing about bpf internals.
-
-All that said:
-
-Tested-by: Joe Damato <jdamato@fastly.com>
 
