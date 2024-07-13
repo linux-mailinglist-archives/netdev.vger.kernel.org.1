@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-111219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFFFA9303E7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 07:58:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F799303E9
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 07:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9D02281B03
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 05:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB4F41C2242F
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 05:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EC2137769;
-	Sat, 13 Jul 2024 05:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3315137C33;
+	Sat, 13 Jul 2024 05:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GeZlbaIv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hq90AX6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9D313774C;
-	Sat, 13 Jul 2024 05:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B817137928;
+	Sat, 13 Jul 2024 05:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720850131; cv=none; b=e2gc15sX1aMVSUt3df4J2k8bloVPimCCkMFqHnIKpDo2+sj4FZGBCH6g7lT0pPT1vX/Q44Otvyjct65UtKByKaiuK4a5cqkOLXzpJtUJo3EQrJ/r+TUUkDM5JRdocBIY3cK464xYl3M/dHwqUh+1HDKofz1CYJBlMg1kn4L2dU0=
+	t=1720850135; cv=none; b=PR5SevKflYV6lwhy35dMWKTKe4oJorS5dR+7p2JaAaShxHWsvDYVLjC0KfVwKM9gQwja2aIBiCuBZhpJXgF6LZPG+rWf8w7v2rLQLq4vb0WyCPi/dNXsHaRM/19l78T1rf17kqiOBbVe2u7bFfCNYQKlfZVf9R7W7P1ZGVEY2Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720850131; c=relaxed/simple;
-	bh=Tn5iSYglhZtXTG+V7gPq7wzrm75FHFu4BGHykn1Yk0s=;
+	s=arc-20240116; t=1720850135; c=relaxed/simple;
+	bh=m61yrLiCo/6Coqan3yroa8I4c7Fp0BM+pnhcB9oQZzk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eF68O/y7+5+0RKcy6kR2GB2YEXljOpSsRo9Qv8PDCpQMH19JO7mT5M5ba5cKYFkLfo54pRjQv0J1hzDOVHg4m3hNUANo/DCWiwO0F2FaFxhz/GHlc5WvEcnDUBG5MnN9HOmthsMG0b3Cj19L2yMvYmkJLzapEPyQp0wcdQ1+uMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GeZlbaIv; arc=none smtp.client-ip=209.85.208.53
+	 MIME-Version; b=qloy+OGXieUmx1z8E+vdOVOIznipWbb3yzAe/Cf+GlnR0lx2Gp8SLxiHdUzoetgQeySUeadhp1Kjo6hYf2W5Sgy8A43HlcyO2vZWJJ+pV+pANNHy83ccq+mgZOasBBMk7bL5lGwg1Ue9dxcPkePtxtY0TakghlxGKesF3iQ/vU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hq90AX6H; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-58b447c519eso3536675a12.3;
-        Fri, 12 Jul 2024 22:55:30 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eea8ea8bb0so51043771fa.1;
+        Fri, 12 Jul 2024 22:55:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720850128; x=1721454928; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720850132; x=1721454932; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=89QJeNVLQDkmc2B+6tcM2WBPPc8pRRTlrLPa+MuYhlQ=;
-        b=GeZlbaIvQg2YvXcNw0zBx1R/NgJO1IhLUfDqpEeL2HfRnUTkctRj4k6eLEyu8Mp6QM
-         5xrfV241/HzCzuaU94cZS14UWKZu12g2axs+Lvtwdzf4NbCJILNuIBmHt90dHmVuXW0x
-         AdRtfc6XiX52Lihzx96v+TvecuTXVCg/DjbVUFiENRbxP03UOm6Iv9c67vMp1mFxuo+O
-         Ah7mizSvsAeSCjJhMCvYBTyLFQm9HLHoXNTmFxCdotmQZce+plJifi3SOJXSsdMoVVyv
-         +6WWKR6aJgWI4GwKRPfraRL6DLI3ryhQ9I4dptzVAPXlIUIRO9dmkAlkqstNcJmqTa4y
-         wjGA==
+        bh=TJ8lt0WIPJML/L+Gu3zpYCM/DKICydm3DLZEC2BtLFY=;
+        b=hq90AX6HgCNflw1ytD/c4xBC+jF411ILS1ST7lNKX2Nd7Dgi0A4EqR+UotmFN5p25A
+         /SoOFePMEx/dTO15kxXjVCeMMq7Ta8vLCj6jrefbKPcaCB0bHWC9CLMZsPwg2nwhJWEW
+         Le0ACv+e9NEEtTZ60XPc6S/singZya3CgCnuRHx+7dtdJ+WHeF7ZloO+tUl6nyeJIaAd
+         YCA4IN+NB8q9gUip63k+ru+Sug8RmnaTVur5cnWkohSuwK92Coz11kzBVi0gGB3dDRvo
+         vnb1q9DiwWJqZ0JLDhO5JnyoYOaj66nOs/QuCCXWsQzT6SQdDGafXb6nOPaLvp9WFbd5
+         95zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720850128; x=1721454928;
+        d=1e100.net; s=20230601; t=1720850132; x=1721454932;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=89QJeNVLQDkmc2B+6tcM2WBPPc8pRRTlrLPa+MuYhlQ=;
-        b=nTPBuMEZSCwoFtL8gkM8HR4M5Z0aSfzh2WZLz0W+Vo+PElV1/RLH7gT7BlS/+poXSk
-         zROitdqrp3M7WLcsJRpBg4CniS3fhSWPA0/Ft8e9WAdmsWI1J1hartE0bJDWsWaWzoc4
-         KkH5LDNH9dQxjF34i9aj96mcahYID5qami+VtE3jW3/234jAMwuHs6/TSRr0TPAhA3ox
-         dyjcpMpsFdLAIt4s0JCkJLUv01mDmPVmyShDRTlV89nGf9uuQEljFGoAKQzuzAyP1RzF
-         LMjytuJic4100/LYyWFov1osUbTDXEWknazDUetYhmhOUEq3HB6jPuPBDoj7AVUKn1AK
-         dckg==
-X-Forwarded-Encrypted: i=1; AJvYcCW1YXjcExzXkwTHJA7WHOfppSWe9NVAHhhermblPF8wlMNpD72g7YLGOLPN+8XLlJfNe3Y0QkA+G6JlTCStCnEk7xkVv0nWlhGDSOWK
-X-Gm-Message-State: AOJu0YxnQF9BlrE6F+CuC9HYUU1kBqN0Hpam1SScCd7sz2NM4pNsHV3l
-	ruvhgeh+LDtapnTyOldCqGTpTDtfCWGRY9TM95TMGfu00mB0WSt/DHoNcJnJ
-X-Google-Smtp-Source: AGHT+IFGgnA+t54HANbyOXm/4GGjfvzmO+co5MVkRKRDiZcbLGgpHvO4ZWtcbYZ7NP2H5lOlkUzcNA==
-X-Received: by 2002:a17:906:2401:b0:a6f:5815:f5e6 with SMTP id a640c23a62f3a-a780b68a736mr856655766b.8.1720850128449;
-        Fri, 12 Jul 2024 22:55:28 -0700 (PDT)
+        bh=TJ8lt0WIPJML/L+Gu3zpYCM/DKICydm3DLZEC2BtLFY=;
+        b=FmP8aReP8LCN74cd9YqPgUIgVfFHE3n8aGwLLOqWVK5GwS9/MfKqkSPxwbIrhLjERg
+         4/ZrHISK5ybRKoaU4WIq7krZ0bRE4f0oMr3CmbxcdEYnXtQVqDQamLad++6rzBZUbtt3
+         k76QL2yemmK9uNj8ZfLglc5+rvZP2pBTMQoLCwXj5V1m3hlt/dJ+MWyv96c+iz2wSElk
+         rL8xtpOtchaSPobBuWt562PV4R4pdkhl+hQNeUK1sxBeceI3J7EEuQz9MIHpToP74HcB
+         qJvh3tbj19HEejuRJ4CpZHyoXEfftmYjK5WktB+pgYzOsKfQB3LFp6MokHnRDEDZha5X
+         8Y5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVUuHdRIYZGwu0jZeMpk0/qdneUoJonm8PH6NxES/w45cM3uc3HvsptQDD7S3QQyBALYVPvLtoOu8MYj63gakpVqUHPmXW2Y+hrnBwc
+X-Gm-Message-State: AOJu0Yw0g9N5P9cR/RMdO/PKd57woWW685oSPf4mPfdJ7S9pAG+Gev9h
+	6Pm7/vJ71jnjr2r2WI9sU8bui4zK19ntEbkVS1PNEbZTCMh4CHg6EnJv62vC
+X-Google-Smtp-Source: AGHT+IHIGpOuMZbLh4SlGsMLM9NGHFZ017JxrUCmTRcLTgrAKIfbXnMlZNIOjvU18F8Znrn6y84uUQ==
+X-Received: by 2002:a2e:3306:0:b0:2ee:8454:1c25 with SMTP id 38308e7fff4ca-2eeb316b020mr105005701fa.34.1720850131922;
+        Fri, 12 Jul 2024 22:55:31 -0700 (PDT)
 Received: from WBEC325.dom.lan ([2001:470:608f:0:b4ea:33f8:5eca:e7fc])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc7f1ceesm20515666b.126.2024.07.12.22.55.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc7f1ceesm20515666b.126.2024.07.12.22.55.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 22:55:28 -0700 (PDT)
+        Fri, 12 Jul 2024 22:55:31 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Paolo Abeni <pabeni@redhat.com>,
 	Pawel Dembicki <paweldembicki@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
@@ -82,9 +84,9 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com,
 	Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 11/12] net: dsa: vsc73xx: Add bridge support
-Date: Sat, 13 Jul 2024 07:54:39 +0200
-Message-Id: <20240713055443.1112925-12-paweldembicki@gmail.com>
+Subject: [PATCH net-next v3 12/12] net: dsa: vsc73xx: start treating the BR_LEARNING flag
+Date: Sat, 13 Jul 2024 07:54:40 +0200
+Message-Id: <20240713055443.1112925-13-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240713055443.1112925-1-paweldembicki@gmail.com>
 References: <20240713055443.1112925-1-paweldembicki@gmail.com>
@@ -96,69 +98,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds bridge support for the vsc73xx driver.
+This patch implements .port_pre_bridge_flags() and .port_bridge_flags(),
+which are required for properly treating the BR_LEARNING flag. Also,
+.port_stp_state_set() is tweaked and now disables learning for standalone
+ports.
 
-The vsc73xx requires minimal operations and ithe generic
-dsa_tag_8021q_bridge_* API is sufficient.
-The forwarding matrix is managed by vsc73xx_port_stp_state_set() ->
-vsc73xx_refresh_fwd_map()i routine, which is called immediately after
-.port_bridge_join() and .port_bridge_leave().
+Disabling learning for standalone ports is required to avoid situations
+where one port sees traffic originating from another, which could cause
+packet drops.
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 ---
-v3:
-  - improved commit description
-  - added 'Reviewed-by'
-v2, v1:
-  - Use generic functions instead unnecessary intermediary shims
+v3,v2,v1:
+  - resend only
 ---
 Before patch series split:
 https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
 v8:
   - resend only
 v7:
-  - added 'Reviewed-by' only
+  - added 'Acked-by' and 'Reviewed-by' and improve  commit message
 v6:
-  - resend only
+  - fix arranging local variables in reverse xmas tree order
 v5:
-  - added 'Reviewed-by' only
-v4:
-  - remove forward configuration after stp patch refactoring
-  - implement new define with max num of bridges for tag8021q devices
-v3:
-  - All vlan commits was reworked
-  - move VLAN_AWR and VLAN_DBLAWR to port setup in other commit
-  - drop vlan table upgrade
-v2:
-  - no changes done
+  - introduce patch
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 41 ++++++++++++++++++++++----
+ 1 file changed, 35 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index 71be5acb291b..07115a9d1869 100644
+index 07115a9d1869..193752194b66 100644
 --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
 +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -691,6 +691,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+@@ -1613,6 +1613,31 @@ static int vsc73xx_tag_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
+ 	return vsc73xx_update_vlan_table(vsc, port, vid, false);
+ }
  
- 	dev_info(vsc->dev, "set up the switch\n");
- 
-+	ds->untag_bridge_pvid = true;
-+	ds->max_num_bridges = DSA_TAG_8021Q_MAX_NUM_BRIDGES;
++static int vsc73xx_port_pre_bridge_flags(struct dsa_switch *ds, int port,
++					 struct switchdev_brport_flags flags,
++					 struct netlink_ext_ack *extack)
++{
++	if (flags.mask & ~BR_LEARNING)
++		return -EINVAL;
 +
- 	/* Issue RESET */
- 	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
- 		      VSC73XX_GLORESET_MASTER_RESET);
-@@ -1707,6 +1710,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
++	return 0;
++}
++
++static int vsc73xx_port_bridge_flags(struct dsa_switch *ds, int port,
++				     struct switchdev_brport_flags flags,
++				     struct netlink_ext_ack *extack)
++{
++	if (flags.mask & BR_LEARNING) {
++		u32 val = flags.val & BR_LEARNING ? BIT(port) : 0;
++		struct vsc73xx *vsc = ds->priv;
++
++		return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
++					   VSC73XX_LEARNMASK, BIT(port), val);
++	}
++
++	return 0;
++}
++
+ static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
+ {
+ 	struct dsa_port *other_dp, *dp = dsa_to_port(ds, port);
+@@ -1673,19 +1698,21 @@ static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
+ static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
+ 				       u8 state)
+ {
++	struct dsa_port *dp = dsa_to_port(ds, port);
+ 	struct vsc73xx *vsc = ds->priv;
+-	u32 val;
++	u32 val = 0;
++
++	if (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING)
++		val = dp->learning ? BIT(port) : 0;
++
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
++			    VSC73XX_LEARNMASK, BIT(port), val);
+ 
+ 	val = (state == BR_STATE_BLOCKING || state == BR_STATE_DISABLED) ?
+ 	      0 : BIT(port);
+ 	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+ 			    VSC73XX_RECVMASK, BIT(port), val);
+ 
+-	val = (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) ?
+-	      BIT(port) : 0;
+-	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+-			    VSC73XX_LEARNMASK, BIT(port), val);
+-
+ 	/* CPU Port should always forward packets when user ports are forwarding
+ 	 * so let's configure it from other ports only.
+ 	 */
+@@ -1710,6 +1737,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
  	.get_sset_count = vsc73xx_get_sset_count,
  	.port_enable = vsc73xx_port_enable,
  	.port_disable = vsc73xx_port_disable,
-+	.port_bridge_join = dsa_tag_8021q_bridge_join,
-+	.port_bridge_leave = dsa_tag_8021q_bridge_leave,
++	.port_pre_bridge_flags = vsc73xx_port_pre_bridge_flags,
++	.port_bridge_flags = vsc73xx_port_bridge_flags,
+ 	.port_bridge_join = dsa_tag_8021q_bridge_join,
+ 	.port_bridge_leave = dsa_tag_8021q_bridge_leave,
  	.port_change_mtu = vsc73xx_change_mtu,
- 	.port_max_mtu = vsc73xx_get_max_mtu,
- 	.port_stp_state_set = vsc73xx_port_stp_state_set,
 -- 
 2.34.1
 
