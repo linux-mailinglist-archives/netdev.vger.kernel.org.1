@@ -1,179 +1,81 @@
-Return-Path: <netdev+bounces-111235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52DE930522
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 12:25:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3881B930557
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 13:06:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D711C21134
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 10:25:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED6EC281710
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 11:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BF913247D;
-	Sat, 13 Jul 2024 10:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C63071B40;
+	Sat, 13 Jul 2024 11:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="aOCEu/m1"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MDTpqaRO"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A32130AC8
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 10:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C76E4AEC6;
+	Sat, 13 Jul 2024 11:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720866273; cv=none; b=kJX01ZS7OHVQA7kVC85ZEKDTpS1hJn9XOB2eaI7DZzKQMrNudzLfSFW9ABUh8Fi1LANUMKfMUqOZt2t+TykqYXMzffvAGHTxGjAH9ugJzwwCBeGcyGqG9B/j2xMej/mz6Lp8KjOJr8kQPVnJMF2S+AqQpddI7oB97lCKeLdOnwA=
+	t=1720868756; cv=none; b=l1mOskc2smIIO2a9EQXzPBR6bd2CgSiZZ1tD4X4O4Bvjdl/iDLMI52Yl6BQEJYWMdZf9VOZ18o+FOgtOOvTXcZUyjv/qQq6s1FaLlIP9BSgMHc5ikUjMUpSy61dERz9SmN13k0HHFS6//GLDJJy/GWHjhxJNEclRi2qoXVg4OY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720866273; c=relaxed/simple;
-	bh=5eHNvpVHutNTbieW2X35cWR4ydlJpHiOXkexoQ0UHnE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dR7FzyswA5I4r43Rk+JJTfWSF0PxFM5kBq0mNvB5vHyFcdfl9zVc2euhUmzgr0J+b0rxEBbKp56QG2Y78nHIK36zs1AMQjdTGK+hpJOyKN9EBje2WaRQd9JDpDqzoH3DIKFleHI2SA2ZCn2s3eIxtkcbCADT4adXDYW5OTDYWnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=aOCEu/m1; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 485C12087C;
-	Sat, 13 Jul 2024 12:24:27 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5PnV8_8NMSLt; Sat, 13 Jul 2024 12:24:26 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id EC0DB20754;
-	Sat, 13 Jul 2024 12:24:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com EC0DB20754
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1720866266;
-	bh=GIa8Y8S1SJ4aBKnjJqdhcm+uoyyxgMQzUlJ8NWETypA=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=aOCEu/m1UQ00GN+AQxtRW0HAA3kQ1256xyQI6SipvFaucGmJjkqJdySsf7yrzSzwo
-	 pRsTlC35MffC1zrknnDnBQUAPUzSjSyteEeN4+miPSb178xSsvViLsDX3hmnTxA7l+
-	 fqFhkSF62Tw0ZUfdNr/a9EC6Iew4wQI6ye4NcrPJk3xFt9a6W4vfi1yO6CBvwxBGQv
-	 mihm9JYT+Sa2PO7naTcbxgtQsOHijcKMnPCUxq5ESLN9hdSdiT94mq2XaHeLOtq6O9
-	 n73b3jf5hRRxYpFEuD1HElWzyLSEglbGehlQe/j54aqqii9D9I16KT7z0eKHF4nJio
-	 iOIK3sO9Nt04Q==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id DFCF980004A;
-	Sat, 13 Jul 2024 12:24:25 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 13 Jul 2024 12:24:25 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 13 Jul
- 2024 12:24:24 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 5EF2D318401A; Sat, 13 Jul 2024 12:24:24 +0200 (CEST)
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 5/5] xfrm: Support crypto offload for outbound IPv4 UDP-encapsulated ESP packet
-Date: Sat, 13 Jul 2024 12:24:16 +0200
-Message-ID: <20240713102416.3272997-6-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240713102416.3272997-1-steffen.klassert@secunet.com>
-References: <20240713102416.3272997-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1720868756; c=relaxed/simple;
+	bh=/aQEoAtJevZOtnhQxzPJg1RlTHsJoGK/euntEf/HqRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FfMgXYoD3TvEiFppgcSkuRndlk7kDRwx8jZGx7dy6/k9+hW5kuY7vUlV3UPZ5B/i6s8F6N7swBNLZ2yQbGsdC460UObcTPT1mi6gB0c09qij3mCu6/YreZct2OfX3mp81btwHlIMl64XBjtiRlMVkKvANgNnx22OiTeOI54kChg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MDTpqaRO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180FAC32781;
+	Sat, 13 Jul 2024 11:05:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720868755;
+	bh=/aQEoAtJevZOtnhQxzPJg1RlTHsJoGK/euntEf/HqRo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MDTpqaROuDDJA85T2CmWV2lRTEQ5+ynWicXt09KcKOGIohfPbeK0E7/Hj1OJx2hhm
+	 z+yEaoX5eSJC8hzy9UiYDddQ0z9kf6YI8VnebftV2PAEpnNAt9+VStC96lmqHLPzrJ
+	 Zm0QmI65/r/pFYUVj9n1X2U+fyFhiy011WcX8tFM=
+Date: Sat, 13 Jul 2024 13:05:52 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ashwin Kamat <ashwin.kamat@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net,
+	yoshfuji@linux-ipv6.org, dsahern@kernel.org, kuba@kernel.org,
+	netdev@vger.kernel.org, ajay.kaher@broadcom.com,
+	vasavi.sirnapalli@broadcom.com, tapas.kundu@broadcom.com
+Subject: Re: [PATCH v5.10 0/2] Fix for CVE-2024-36901
+Message-ID: <2024071323-disarray-moody-1e0b@gregkh>
+References: <1720520570-9904-1-git-send-email-ashwin.kamat@broadcom.com>
+ <2024071313-even-unpack-9173@gregkh>
+ <CA+tTbbvb04ZuTY+5pH+Yf5-OKJnx5RqvyjxfDixWhinwvH_hFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+tTbbvb04ZuTY+5pH+Yf5-OKJnx5RqvyjxfDixWhinwvH_hFw@mail.gmail.com>
 
-From: Mike Yu <yumike@google.com>
+On Sat, Jul 13, 2024 at 03:16:15PM +0530, Ashwin Kamat wrote:
+> Hi Greg,
+> The patches get applied to 5.10 stable branch with an offset [i.e Hunk #1
+> succeeded at 240 (offset 19 lines).]
+> To avoid that I sent separate patches to 5.10 and 5.15. Apart from that
+> there is no other difference.
 
-esp_xmit() is already able to handle UDP encapsulation through the call to
-esp_output_head(). However, the ESP header and the outer IP header
-are not correct and need to be corrected.
+That's not what I asked, I asked:
 
-Test: Enabled both dir=in/out IPsec crypto offload, and verified IPv4
-      UDP-encapsulated ESP packets on both wifi/cellular network
-Signed-off-by: Mike Yu <yumike@google.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/ipv4/esp4.c         |  8 +++++++-
- net/ipv4/esp4_offload.c | 17 ++++++++++++++++-
- 2 files changed, 23 insertions(+), 2 deletions(-)
+> > Any reason you didn't actually cc: the stable@vger.kernel.org address
+> > for these so we know to pick them up?
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 3968d3f98e08..73981595f062 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -349,6 +349,7 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- {
- 	struct udphdr *uh;
- 	unsigned int len;
-+	struct xfrm_offload *xo = xfrm_offload(skb);
- 
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
- 	if (len + sizeof(struct iphdr) > IP_MAX_MTU)
-@@ -360,7 +361,12 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- 	uh->len = htons(len);
- 	uh->check = 0;
- 
--	*skb_mac_header(skb) = IPPROTO_UDP;
-+	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
-+	 * data path, which means that esp_output_udp_encap is called outside of the XFRM stack.
-+	 * In this case, the mac header doesn't point to the IPv4 protocol field, so don't set it.
-+	 */
-+	if (!xo || encap_type != UDP_ENCAP_ESPINUDP)
-+		*skb_mac_header(skb) = IPPROTO_UDP;
- 
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index b3271957ad9a..a37d18858c72 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -264,6 +264,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 	struct esp_info esp;
- 	bool hw_offload = true;
- 	__u32 seq;
-+	int encap_type = 0;
- 
- 	esp.inplace = true;
- 
-@@ -296,8 +297,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.esph = ip_esp_hdr(skb);
- 
-+	if (x->encap)
-+		encap_type = x->encap->encap_type;
- 
--	if (!hw_offload || !skb_is_gso(skb)) {
-+	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
- 		esp.nfrags = esp_output_head(x, skb, &esp);
- 		if (esp.nfrags < 0)
- 			return esp.nfrags;
-@@ -324,6 +327,18 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	esp.seqno = cpu_to_be64(seq + ((u64)xo->seq.hi << 32));
- 
-+	if (hw_offload && encap_type == UDP_ENCAP_ESPINUDP) {
-+		/* In the XFRM stack, the encapsulation protocol is set to iphdr->protocol by
-+		 * setting *skb_mac_header(skb) (see esp_output_udp_encap()) where skb->mac_header
-+		 * points to iphdr->protocol (see xfrm4_tunnel_encap_add()).
-+		 * However, in esp_xmit(), skb->mac_header doesn't point to iphdr->protocol.
-+		 * Therefore, the protocol field needs to be corrected.
-+		 */
-+		ip_hdr(skb)->protocol = IPPROTO_UDP;
-+
-+		esph->seq_no = htonl(seq);
-+	}
-+
- 	ip_hdr(skb)->tot_len = htons(skb->len);
- 	ip_send_check(ip_hdr(skb));
- 
--- 
-2.34.1
+That is a requirement to get a patch merged into a stable release,
+right?
 
+thanks,
+
+greg k-h
 
