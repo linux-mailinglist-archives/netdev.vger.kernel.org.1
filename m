@@ -1,50 +1,64 @@
-Return-Path: <netdev+bounces-111286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3459D9307B1
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:30:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8604A9307B8
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E7651C2034B
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:30:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 280511F218AA
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C582013DDD3;
-	Sat, 13 Jul 2024 22:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D594014388E;
+	Sat, 13 Jul 2024 22:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8BFV8iG"
+	dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b="ViurjQkx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01AB61FD7
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193F929401
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720909831; cv=none; b=k0JYS02DeMwgpPMjoxk5mu7b8KGcNO4D3sQQUsS8lZvJZHERb5/3l9r2B8n7/hcdzEU2soQyy35jfpeBv20OexUnEmWNpG/NubrxzhmteT3U7xlrx2Ba1Z8AMTSf7MeoQ+sD2sGC2ckA12i8x4YwZ0S4wZJRl52PdiKPu7uvGG4=
+	t=1720910052; cv=none; b=BS3Y4/Lh8pzo1cEsc1XCE+JiFPKDJ8hBZEOaN3nRHi01MXrBWT2uzVEkAlpdUL8/O7etpNDY3LIXB9PEr9VcExZZiLlpNybaJOGNykJhgXS/vC+bMJXrq08mYb4OIg64F5ZPd957kt+5L3gZouAvKl4xnxp6ssUdEpZPgEA75jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720909831; c=relaxed/simple;
-	bh=LZX/bqZVErdO+KRsqjNWnUZeXMQmvYYWGXlebmlK4Ok=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pOBwI95ecjQGZh/ixM+bHUt0Tu/WTo0DJjK85EX5woVTZ4L3FYPwC7RhVY4+bI4LHSlreuk2w/WU3o6c95hmN9CYafxmcfjCStRtqPYrXb+fsIl3J9Ma3yDzCQX5Dzy6XHI7OMXiGqQ7RYRxB5LuIMEOwS+ZWVbHJQiDUvOm8xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8BFV8iG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 15265C4AF0B;
-	Sat, 13 Jul 2024 22:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720909831;
-	bh=LZX/bqZVErdO+KRsqjNWnUZeXMQmvYYWGXlebmlK4Ok=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C8BFV8iGTzSdJj6SVY+IIk64a2jMqHjLPDPGEp4tMmuc9Z4AyMISLrAP8TziVqF0b
-	 YTbn44qrYPGWN6NPotHmH/4Ku6bu2TPjBoZ39iXu7d63WYuS5Nuke7ZdM3mGwDe3ef
-	 dlFIjDVB4e6VX4Kl/FAHavRe9sgAkKCwSBjxAONoIEWvBR7s5/tehi//YA9sJrLVz1
-	 /7fH3xDjuw+bQ/UrJh8grfVREvwi4SBwrlZtMIRFegx9JeAl9nzpzmzi1aPXCp+2IQ
-	 GNVcL695SU5/2ojulrm8MgWxrE5VE9sexE83yq0bGBKGOjJSEtR+bChUB4fou053rD
-	 WMn0yTOQ44xig==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F116DC43153;
-	Sat, 13 Jul 2024 22:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720910052; c=relaxed/simple;
+	bh=H7Wqs9IY0RVk3/f8b71KD0COfcu6Ng2RKx6CTnHunBk=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=gMNso/jW3q1hhcxNXo+NZMGdG9SCbJZ5wtJFNOrFsmlYnXcQ6CDra+6ly+0w22Dq7ZnVWEu/3GKck50ZTDmQcNXo56jRoe3oUOK/xOApH/Z2p3ws+rQNYUs9KEHsvubJeV2kcZWfmyVU0xywJMOj8w5vVYt7Nnjtnd4CLqC2Rh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b=ViurjQkx; arc=none smtp.client-ip=212.77.101.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 44297 invoked from network); 14 Jul 2024 00:34:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=1024a;
+          t=1720910046; bh=W3lApuN7YTRnEcM3XCm9T9HOweCmIdx72YW45Ridj4A=;
+          h=From:To:Subject;
+          b=ViurjQkxraPQnJOQurZBwphlA+HnUEZ4V2AKL4y91ir2Oi+ryDAxD1UXZobPVutKv
+           8KnmcgdQWw26NC99xfVCGilzl/0aujJh+d+q3FkoPm92e68LJGwTLACwKXiMnSCFnQ
+           L5teRuGhB+xZ12Ng0GAZwLlR6fE4i/QOEGQno4U0=
+Received: from 83.24.148.52.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.148.52])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <davem@davemloft.net>; 14 Jul 2024 00:34:06 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	olek2@wp.pl,
+	shannon.nelson@amd.com,
+	sd@queasysnail.net,
+	u.kleine-koenig@pengutronix.de,
+	john@phrozen.org,
+	ralf@linux-mips.org,
+	ralph.hempel@lantiq.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: ethernet: lantiq_etop: fix memory disclosure
+Date: Sun, 14 Jul 2024 00:33:57 +0200
+Message-Id: <20240713223357.2911169-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,45 +66,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 0/2] tcp: Make simultaneous connect()
- RFC-compliant.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172090983097.21567.15657611491994442725.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Jul 2024 22:30:30 +0000
-References: <20240710171246.87533-1-kuniyu@amazon.com>
-In-Reply-To: <20240710171246.87533-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+X-WP-MailID: b5f9b250616002899b8321895476c16d
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 000000B [gaOU]                               
 
-Hello:
+When applying padding, the buffer is not zeroed, which results in
+memory disclosure. This patch uses skb_put_padto() to pad Ethernet
+frames properly.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+It appears that only the MAC in xrx100 and newer SoCs supports
+padding by hardware, so software padding must be applied.
 
-On Wed, 10 Jul 2024 10:12:44 -0700 you wrote:
-> Patch 1 fixes an issue that BPF TCP option parser is triggered for ACK
-> instead of SYN+ACK in the case of simultaneous connect().
-> 
-> Patch 2 removes an wrong assumption in tcp_ao/self-connnect tests.
-> 
-> v3:
->   * Use (sk->sk_state == TCP_SYN_RECV && sk->sk_socket) to detect cross SYN case
-> 
-> [...]
+Fixes: 504d4721ee8e ("MIPS: Lantiq: Add ethernet driver")
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ drivers/net/ethernet/lantiq_etop.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Here is the summary with links:
-  - [v3,net-next,1/2] tcp: Don't drop SYN+ACK for simultaneous connect().
-    https://git.kernel.org/netdev/net-next/c/23e89e8ee7be
-  - [v3,net-next,2/2] selftests: tcp: Remove broken SNMP assumptions for TCP AO self-connect tests.
-    https://git.kernel.org/netdev/net-next/c/b3bb4d23a41b
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
+index 0b9982804370..196715d9ea43 100644
+--- a/drivers/net/ethernet/lantiq_etop.c
++++ b/drivers/net/ethernet/lantiq_etop.c
+@@ -478,11 +478,11 @@ ltq_etop_tx(struct sk_buff *skb, struct net_device *dev)
+ 	struct ltq_etop_priv *priv = netdev_priv(dev);
+ 	struct ltq_etop_chan *ch = &priv->ch[(queue << 1) | 1];
+ 	struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
+-	int len;
+ 	unsigned long flags;
+ 	u32 byte_offset;
+ 
+-	len = skb->len < ETH_ZLEN ? ETH_ZLEN : skb->len;
++	if (skb_put_padto(skb, ETH_ZLEN))
++		return NETDEV_TX_OK;
+ 
+ 	if ((desc->ctl & (LTQ_DMA_OWN | LTQ_DMA_C)) || ch->skb[ch->dma.desc]) {
+ 		netdev_err(dev, "tx ring full\n");
+@@ -497,12 +497,13 @@ ltq_etop_tx(struct sk_buff *skb, struct net_device *dev)
+ 	netif_trans_update(dev);
+ 
+ 	spin_lock_irqsave(&priv->lock, flags);
+-	desc->addr = ((unsigned int)dma_map_single(&priv->pdev->dev, skb->data, len,
+-						DMA_TO_DEVICE)) - byte_offset;
++	desc->addr = ((unsigned int)dma_map_single(&priv->pdev->dev, skb->data,
++						   skb->len, DMA_TO_DEVICE)) -
++						   byte_offset;
+ 	/* Make sure the address is written before we give it to HW */
+ 	wmb();
+ 	desc->ctl = LTQ_DMA_OWN | LTQ_DMA_SOP | LTQ_DMA_EOP |
+-		LTQ_DMA_TX_OFFSET(byte_offset) | (len & LTQ_DMA_SIZE_MASK);
++		LTQ_DMA_TX_OFFSET(byte_offset) | (skb->len & LTQ_DMA_SIZE_MASK);
+ 	ch->dma.desc++;
+ 	ch->dma.desc %= LTQ_DESC_NUM;
+ 	spin_unlock_irqrestore(&priv->lock, flags);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.2
 
 
