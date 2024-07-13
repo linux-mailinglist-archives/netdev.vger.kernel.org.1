@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-111315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD2D930815
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6197930816
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 01:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 352F428231D
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DC401F218C2
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 23:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E7A15538C;
-	Sat, 13 Jul 2024 23:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0772215E5D0;
+	Sat, 13 Jul 2024 23:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ImJoSCc5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JVPrM1DU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BAE1CFB6
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24457158A3D
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 23:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720914241; cv=none; b=u+hAP7w9Ks1YzMMjxfvE6L7qOH4XlOYuS7dPYnZD8hDHvPU5KplY/n1c5C2N3JjU4y0OGT/bXjfFhF5ozwZXbf8+tFIdYWsGFDxcmciQUO6qAB0w7Sna2D26Cim8JvcLhd/iCuKG6YDpnMit3LTVaxbQ0FsmmUoOMc4JzUZl5d0=
+	t=1720914243; cv=none; b=OzcK7MGNfL1pJWfnxKywN26isawETTPmZGifJdV/KCY8sEKk7t5cQXL7kBSxV64fCKKZrcRfJ++FzpF7wbjlhCXcJp3HyZ0g5yLPygjer5N74qFn8cuHUnhoWucqwgWK2nC3Wcn7e6JXHOZlqg4eL0++GcmdaPzzjJeMdW/dbtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720914241; c=relaxed/simple;
-	bh=zlgqCJw6WYQJpnlnVghLQRPJ0YoYWBtJavXle984bJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fNQhjXD5v0YZjG4mhrUf74utQ7o6R4r/YbOSdFjJw2BL5iWXe2Y1OvejRE48m9vwdOJJ854U9SJX0Td/OYdOhjs6S8TfKvr4Naj9cMB58oKzC2ELtfQ/1eN82iLGVgXSQVObqwbD1luccAg+cpEN9L5ahRRqTbdtq2EodiXktP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ImJoSCc5; arc=none smtp.client-ip=209.85.222.179
+	s=arc-20240116; t=1720914243; c=relaxed/simple;
+	bh=5LGpVoNPv2zBHysh7o7ZZGAFjmz2XZV9kk5nlfvlgCI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OjyhpVgGExOvPBCylXRe3VlxlnY5iv26lgsptCJUoOHO9e3unXQoHSwsbVFUcTXEvkOPv6ThHkgmdp0/CdSKCa91+EuXfjyop4wA9u3zsXlvvRuIGpxoQj+QfwZ/K9TYMqECtE3Gi0buZXTN7l63vJcArpEvpRhjiuThEdsnO8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JVPrM1DU; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-79f1828ed64so214273185a.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:43:59 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-79f0e7faafcso247883485a.3
+        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 16:44:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720914239; x=1721519039; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iqde//ABvOII1ZaTaub0t86y7Arzqo3nCX2qzLQfG3o=;
-        b=ImJoSCc5/WziQ0w3DBzdXv3Cmh5BS5oUkF3H1akyDHuDMyDsbmxKyaMp6/KiJWZXSY
-         BLSpKYTn6tG2qpLdUR7fodncM9Jf6OGcLrQ/MnavZ6fWF5+MLj5nGjpjim3iFDtT62N7
-         rI3giNfd3dPurTT0E5xbY6qHv6KboDSGOC5uM=
+        d=broadcom.com; s=google; t=1720914241; x=1721519041; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tWbyFey4/Ke8Fix12qt6SfN37g8pC8iWjHgC0Z1CcYA=;
+        b=JVPrM1DUgNp3jk/M4EFVx/HsZ0HuaczgARMZHU8kh9hAOWrcaxMD+So/oJ8nL0ebJX
+         uraDqvUW2Y85FNmDN+YhNvcxqKQeOaHIeUCV2/rdtkNhqiFYYtO1+Jh2hnZbljraazkr
+         X02yUZ3BOA4YSbSP9SKbO5SCjjQ8P42gu5vVg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720914239; x=1721519039;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iqde//ABvOII1ZaTaub0t86y7Arzqo3nCX2qzLQfG3o=;
-        b=dDOQ4wk4t/7/G+UeMIoH4vGyo9qf5h37/FvTeOSnNQBjdeklrbbbLRdlGkrs/J9svX
-         IMRSGaZ0YORPSVU6d/A8VKnJnZQmubnvf+Rk4wNbu83TUYA41Y5PMFMaTxGD5u/vI+8l
-         QL7npPBJDZmq/6/TU1cd+y6Zu0ARjUQ/IbKASZl+4SimFd/pjasP21FzAruWcJuc7N24
-         3B2fQaRrI2Q+tJyAe+FHlThYtsw6jhOVQU46Q3IELIKk7PiN60ppQumYaaJqnem0daqG
-         CTSRC6IgC4TZ3zci45BO4vE+Kfro2dySKVw9MXup+m24zu7pY/83LPZIWk3An+MWFbX8
-         QykQ==
-X-Gm-Message-State: AOJu0YzU7sy9Zmez/t4FbbnYynxAaII+d11+cFPX1fWAYidYfvSDt4PD
-	8ZC8hq2RfbM7ZavSrHU0SVr4ou11tmSt164JWCp1lVMSaat5YQ0iYKBPizcrHQ==
-X-Google-Smtp-Source: AGHT+IFchzgSOcvpl/ijP4s1eXlZSFfRGUgDqpipR233Uyms0pLP3XJ+bIfp7rVPky7+N3kzcmZIoQ==
-X-Received: by 2002:a05:620a:12f1:b0:79e:ff5a:2da4 with SMTP id af79cd13be357-79f19befbb3mr1754460585a.66.1720914238790;
-        Sat, 13 Jul 2024 16:43:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720914241; x=1721519041;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tWbyFey4/Ke8Fix12qt6SfN37g8pC8iWjHgC0Z1CcYA=;
+        b=NdOurzJ6iGhleR9PGLFGh+cM3oSqNpzdDIIWZk1o/vN7RoA7Bn1JoN8oO6y+dk7dBr
+         spDQJUXuFVZMb/WrQDIfKT3+1Lo1k4FVWPlgxk/iMEw+pkYHRlvXgPTeMmbNgj3cqrDt
+         rVgpu0w/l908O+zaBfWScuQ8/28ETdTL7BlrwqKvZrOmZZCrYNBICiDB9c7D38cxnLLr
+         +//MlomJ00iw/l/jfgxukL8deTFtq05DlBJeQ4ZziIA1DBO2UzfGGrHfT5Qefg5bGsY7
+         aq11APQMKqC5PCMef8hJRY+TcviibsdR92OonI1PCkgiKntp7xsmqU6wOLzVZRrP4Q7M
+         XH+Q==
+X-Gm-Message-State: AOJu0YwHKJIQ3ZODxbh7f4jzFeA0MqGM/Xse4nBITGV5Llo6mDyYjTwz
+	uqh+q2dZNC5/5o2+D5ogG7w+c0OwzjGk6bWizQaAviZAqaAH9JN9U7XWPvnBjQ==
+X-Google-Smtp-Source: AGHT+IG5CxsgnSXS59LLrKItDi/ikqXtX83AUAeVCI/ayTOlLpFcTtPj5RfKXKvmrOWfSmU8YvhDOA==
+X-Received: by 2002:a05:620a:468a:b0:79e:ff22:b23c with SMTP id af79cd13be357-79f199f62bamr2398925685a.9.1720914240611;
+        Sat, 13 Jul 2024 16:44:00 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.43.57
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6f7sm78124585a.37.2024.07.13.16.43.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 13 Jul 2024 16:43:58 -0700 (PDT)
+        Sat, 13 Jul 2024 16:43:59 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -67,11 +68,15 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 0/9] bnxt_en: Update for net-next
-Date: Sat, 13 Jul 2024 16:43:30 -0700
-Message-ID: <20240713234339.70293-1-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 1/9] bnxt_en: add support for storing crash dump into host memory
+Date: Sat, 13 Jul 2024 16:43:31 -0700
+Message-ID: <20240713234339.70293-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
+In-Reply-To: <20240713234339.70293-1-michael.chan@broadcom.com>
+References: <20240713234339.70293-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,50 +84,258 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ea20c2061d299117"
+	boundary="0000000000000c80ec061d2992f8"
 
---000000000000ea20c2061d299117
+--0000000000000c80ec061d2992f8
 Content-Transfer-Encoding: 8bit
 
-This series starts with 2 patches to support firmware crash dump.  The
-driver allocates the required DMA memory ahead of time for firmware to
-store the crash dump if and when it crashes.  Patch 3 adds priority and
-TPID for the .ndo_set_vf_vlan() callback.  Note that this was rejected
-and reverted last year and it is being re-submitted after recent changes
-in the guidelines.  The remaining patches are MSIX related.  Legacy
-interrupt is no longer supported by firmware so we remove the support
-in the driver.  We then convert to use the newer kernel APIs to
-allocate and enable MSIX vectors.  The last patch adds support for
-dynamic MSIX.
+From: Vikas Gupta <vikas.gupta@broadcom.com>
 
-Michael Chan (6):
-  bnxt_en: Deprecate support for legacy INTX mode
-  bnxt_en: Remove BNXT_FLAG_USING_MSIX flag
-  bnxt_en: Remove register mapping to support INTX
-  bnxt_en: Replace deprecated PCI MSIX APIs
-  bnxt_en: Allocate the max bp->irq_tbl size for dynamic msix allocation
-  bnxt_en: Support dynamic MSIX
+Newer firmware supports automatic DMA of crash dump to host memory
+when it crashes.  If the feature is supported, allocate the required
+memory using the existing context memory infrastructure.  Communicate
+the page table containing the DMA addresses to the firmware.
 
-Sreekanth Reddy (1):
-  bnxt_en: Support QOS and TPID settings for the SRIOV VLAN
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 93 +++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 +
+ .../ethernet/broadcom/bnxt/bnxt_coredump.c    | 18 +++-
+ .../ethernet/broadcom/bnxt/bnxt_coredump.h    |  8 ++
+ 4 files changed, 117 insertions(+), 5 deletions(-)
 
-Vikas Gupta (2):
-  bnxt_en: add support for storing crash dump into host memory
-  bnxt_en: add support for retrieving crash dump using ethtool
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 329 ++++++++++--------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   8 +-
- .../ethernet/broadcom/bnxt/bnxt_coredump.c    | 101 +++++-
- .../ethernet/broadcom/bnxt/bnxt_coredump.h    |   8 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  13 +-
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |  29 +-
- 6 files changed, 302 insertions(+), 186 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index bb3be33c1bbd..37da16b39f77 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -69,6 +69,7 @@
+ #include "bnxt_tc.h"
+ #include "bnxt_devlink.h"
+ #include "bnxt_debugfs.h"
++#include "bnxt_coredump.h"
+ #include "bnxt_hwmon.h"
+ 
+ #define BNXT_TX_TIMEOUT		(5 * HZ)
+@@ -8939,6 +8940,82 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+ 	return 0;
+ }
+ 
++#define BNXT_SET_CRASHDUMP_PAGE_ATTR(attr)				\
++do {									\
++	if (BNXT_PAGE_SIZE == 0x2000)					\
++		attr = DBG_CRASHDUMP_MEDIUM_CFG_REQ_PG_SIZE_PG_8K;	\
++	else if (BNXT_PAGE_SIZE == 0x10000)				\
++		attr = DBG_CRASHDUMP_MEDIUM_CFG_REQ_PG_SIZE_PG_64K;	\
++	else								\
++		attr = DBG_CRASHDUMP_MEDIUM_CFG_REQ_PG_SIZE_PG_4K;	\
++} while (0)
++
++static int bnxt_hwrm_crash_dump_mem_cfg(struct bnxt *bp)
++{
++	struct hwrm_dbg_crashdump_medium_cfg_input *req;
++	u16 page_attr = 0;
++	int rc;
++
++	if (!(bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR))
++		return 0;
++
++	rc = hwrm_req_init(bp, req, HWRM_DBG_CRASHDUMP_MEDIUM_CFG);
++	if (rc)
++		return rc;
++
++	BNXT_SET_CRASHDUMP_PAGE_ATTR(page_attr);
++	req->pg_size_lvl = cpu_to_le16(page_attr |
++				       bp->fw_crash_mem->ring_mem.depth);
++	req->pbl = cpu_to_le64(bp->fw_crash_mem->ring_mem.pg_tbl_map);
++	req->size = cpu_to_le32(bp->fw_crash_len);
++	req->output_dest_flags = cpu_to_le16(BNXT_DBG_CR_DUMP_MDM_CFG_DDR);
++	return hwrm_req_send(bp, req);
++}
++
++static void bnxt_free_crash_dump_mem(struct bnxt *bp)
++{
++	if (bp->fw_crash_mem) {
++		bnxt_free_ctx_pg_tbls(bp, bp->fw_crash_mem);
++		kfree(bp->fw_crash_mem);
++		bp->fw_crash_len = 0;
++		bp->fw_crash_mem = NULL;
++	}
++}
++
++static int bnxt_alloc_crash_dump_mem(struct bnxt *bp)
++{
++	u32 mem_size = 0;
++	int rc;
++
++	if (!(bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR))
++		return 0;
++
++	rc = bnxt_hwrm_get_dump_len(bp, BNXT_DUMP_CRASH, &mem_size);
++	if (rc)
++		return rc;
++
++	mem_size = round_up(mem_size, 4);
++
++	if (bp->fw_crash_mem && mem_size == bp->fw_crash_len)
++		return 0;
++
++	bnxt_free_crash_dump_mem(bp);
++
++	bp->fw_crash_mem = kzalloc(sizeof(*bp->fw_crash_mem), GFP_KERNEL);
++	if (!bp->fw_crash_mem)
++		return -ENOMEM;
++
++	rc = bnxt_alloc_ctx_pg_tbls(bp, bp->fw_crash_mem, mem_size, 1, NULL);
++	if (rc) {
++		bnxt_free_crash_dump_mem(bp);
++		return rc;
++	}
++
++	bp->fw_crash_len = mem_size;
++
++	return 0;
++}
++
+ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all)
+ {
+ 	struct hwrm_func_resource_qcaps_output *resp;
+@@ -13959,6 +14036,19 @@ static int bnxt_fw_init_one_p2(struct bnxt *bp)
+ 	if (rc)
+ 		return -ENODEV;
+ 
++	rc = bnxt_alloc_crash_dump_mem(bp);
++	if (rc)
++		netdev_warn(bp->dev, "crash dump mem alloc failure rc: %d\n",
++			    rc);
++	if (!rc) {
++		rc = bnxt_hwrm_crash_dump_mem_cfg(bp);
++		if (rc) {
++			bnxt_free_crash_dump_mem(bp);
++			netdev_warn(bp->dev,
++				    "hwrm crash dump mem failure rc: %d\n", rc);
++		}
++	}
++
+ 	if (bnxt_fw_pre_resv_vnics(bp))
+ 		bp->fw_cap |= BNXT_FW_CAP_PRE_RESV_VNICS;
+ 
+@@ -15237,6 +15327,7 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+ 	bp->fw_health = NULL;
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp);
++	bnxt_free_crash_dump_mem(bp);
+ 	kfree(bp->rss_indir_tbl);
+ 	bp->rss_indir_tbl = NULL;
+ 	bnxt_free_port_stats(bp);
+@@ -15875,6 +15966,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bp->fw_health = NULL;
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp);
++	bnxt_free_crash_dump_mem(bp);
+ 	kfree(bp->rss_indir_tbl);
+ 	bp->rss_indir_tbl = NULL;
+ 
+@@ -15928,6 +16020,7 @@ static int bnxt_suspend(struct device *device)
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
+ 	pci_disable_device(bp->pdev);
+ 	bnxt_free_ctx_mem(bp);
++	bnxt_free_crash_dump_mem(bp);
+ 	rtnl_unlock();
+ 	return rc;
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 6bbdc718c3a7..77bd36812293 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2644,6 +2644,9 @@ struct bnxt {
+ #endif
+ 	u32			thermal_threshold_type;
+ 	enum board_idx		board_idx;
++
++	struct bnxt_ctx_pg_info	*fw_crash_mem;
++	u32			fw_crash_len;
+ };
+ 
+ #define BNXT_NUM_RX_RING_STATS			8
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+index c06789882036..ebbad9ccab6a 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+@@ -385,7 +385,7 @@ int bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf, u32 *dump_len)
+ 	}
+ }
+ 
+-static int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len)
++int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len)
+ {
+ 	struct hwrm_dbg_qcfg_output *resp;
+ 	struct hwrm_dbg_qcfg_input *req;
+@@ -395,7 +395,8 @@ static int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len)
+ 		return -EOPNOTSUPP;
+ 
+ 	if (dump_type == BNXT_DUMP_CRASH &&
+-	    !(bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR))
++	    !(bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR ||
++	     (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_HOST_DDR)))
+ 		return -EOPNOTSUPP;
+ 
+ 	rc = hwrm_req_init(bp, req, HWRM_DBG_QCFG);
+@@ -403,8 +404,12 @@ static int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len)
+ 		return rc;
+ 
+ 	req->fid = cpu_to_le16(0xffff);
+-	if (dump_type == BNXT_DUMP_CRASH)
+-		req->flags = cpu_to_le16(DBG_QCFG_REQ_FLAGS_CRASHDUMP_SIZE_FOR_DEST_DEST_SOC_DDR);
++	if (dump_type == BNXT_DUMP_CRASH) {
++		if (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR)
++			req->flags = cpu_to_le16(BNXT_DBG_FL_CR_DUMP_SIZE_SOC);
++		else
++			req->flags = cpu_to_le16(BNXT_DBG_FL_CR_DUMP_SIZE_HOST);
++	}
+ 
+ 	resp = hwrm_req_hold(bp, req);
+ 	rc = hwrm_req_send(bp, req);
+@@ -412,7 +417,10 @@ static int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len)
+ 		goto get_dump_len_exit;
+ 
+ 	if (dump_type == BNXT_DUMP_CRASH) {
+-		*dump_len = le32_to_cpu(resp->crashdump_size);
++		if (bp->fw_dbg_cap & DBG_QCAPS_RESP_FLAGS_CRASHDUMP_SOC_DDR)
++			*dump_len = BNXT_CRASH_DUMP_LEN;
++		else
++			*dump_len = le32_to_cpu(resp->crashdump_size);
+ 	} else {
+ 		/* Driver adds coredump header and "HWRM_VER_GET response"
+ 		 * segment additionally to coredump.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
+index b1a1b2fffb19..a76d5c281413 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
+@@ -111,7 +111,15 @@ struct hwrm_dbg_cmn_output {
+ 	#define HWRM_DBG_CMN_FLAGS_MORE	1
+ };
+ 
++#define BNXT_DBG_FL_CR_DUMP_SIZE_SOC	\
++	DBG_QCFG_REQ_FLAGS_CRASHDUMP_SIZE_FOR_DEST_DEST_SOC_DDR
++#define BNXT_DBG_FL_CR_DUMP_SIZE_HOST	\
++	DBG_QCFG_REQ_FLAGS_CRASHDUMP_SIZE_FOR_DEST_DEST_HOST_DDR
++#define BNXT_DBG_CR_DUMP_MDM_CFG_DDR	\
++	DBG_CRASHDUMP_MEDIUM_CFG_REQ_TYPE_DDR
++
+ int bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf, u32 *dump_len);
++int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len);
+ u32 bnxt_get_coredump_length(struct bnxt *bp, u16 dump_type);
+ 
+ #endif
 -- 
 2.30.1
 
 
---000000000000ea20c2061d299117
+--0000000000000c80ec061d2992f8
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -193,14 +406,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJC7BeAIyXqedigBr7JHiNLNyuctp4Wp
-VqJlnzWpIdSzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
-MzIzNDM1OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIK6POSkjsgeqnJA4mPRl3EeT5UM2xHGv
+X57uRb3rF2+sMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcx
+MzIzNDQwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBUZKX6bquQ5GdangoHMTfuVBEMviSye0zRqEt34Davh5MkV87e
-0+wNyyUR+O8rtjLVok9zFz6Ax1/lsF3ozbbm5a5m6S1E4VodOE0KjFtpDet+GADSdfCySBepL56e
-hPFHYcwrB2++gxNYCVTMnWAnAaz9C85G30LEF87Y6Nraqc0HgATrwJ9WCOeD2bagjVXrASR4UQU9
-EKAw4laRR/h5SmZMYtSEANMDvcuTVWAZFUpOLVN6nLWZoWYXT4jU/dTzsqovaveL1fup7Vf7K7Bi
-7uijCHQ2AYNho3UHAskEf27GdPkt7EYEkAfwSTFx5g0sopWPmxcLbolpMU3/mZSj
---000000000000ea20c2061d299117--
+ATANBgkqhkiG9w0BAQEFAASCAQAMdBx4O7Mst7ZAUKf4J6VvL2z0DYjtfvmjU9oTqgoxtsUPThst
+32WsvqlNpiTtHSbyB29ue9X5U1OU3KN/k74XpPQwBDyIyPKKejKgz/ghRJ0xL4ajtEjvudzXSX5C
+R6zW2hbLTqyDMaQ/WhwZgI8yQE/wDeyGUy4hRicL4YisnPZOGXU554BIHinwNVi38EmsFAQ+uOUi
+PWnBzLvd7wnzwdCjqcqxyU5rkV7+3OZEpY7D3UiwHzQyzYvzQfy7gHzqRrtHKLXG9BDjzLTLIUcA
+5Turgy27fB8HpJ1GZ+6p939CScnozbJMoRzxmmuf1ih68xjf+/AvmRR+irUcaKll
+--0000000000000c80ec061d2992f8--
 
