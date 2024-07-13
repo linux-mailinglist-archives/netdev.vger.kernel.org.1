@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-111198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2ADB93034F
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:21:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DFFD930343
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 04:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D55971C21556
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:21:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF5A283671
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7B8131BAF;
-	Sat, 13 Jul 2024 02:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8641744C9B;
+	Sat, 13 Jul 2024 02:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="bfBHOReK"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="kXGOWUI2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A22446A1;
-	Sat, 13 Jul 2024 02:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84871DDF8;
+	Sat, 13 Jul 2024 02:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720837169; cv=none; b=fuzWELEq0p3AgOLJRugDyYtMmd+rhClMYb0iEl5R+2XUIRFP2U17dAjFbyFM5l2zlrdX6YiQZovv6zOFcIGoDzmzzOm+bqa1GRnbG0LFiqJb11VMntZEYXaA5eps7/ln4lmJesrLj59ylGqfcTPL5mwqYoNbpg7ieRg2X+pjJZk=
+	t=1720837167; cv=none; b=IGJaxlvqfrNZwR9ieFXNV5R9q+6TgGVZhDyc4OnfdtufiVtAxoNEoGTC3AB0VNlA/cq+gkEIWO8hNc+DklwzyQYsIw1wINNqkCIbKN7zXyWDQlHtO8BPFqWkfTE0859cM0xK457RozNUOqFGYBu8qX7cLE5aZa9lfQhbmflN28Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720837169; c=relaxed/simple;
-	bh=97BaKpl+A98ebdWTkMEpQnN/VML4HX7Gwx29yVODybs=;
+	s=arc-20240116; t=1720837167; c=relaxed/simple;
+	bh=llMUWHdeum9yJZfRx0fxi7KhtITZMOALBJSdilj0JYc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EbP5X6Y1Ked8OA9e3xyHfxb5l7ytVyObvT66uAg+GwX+cHlFqbmqSgWk4KgcryFvJMp61e6JMCEKAPmmyq/HLpSUQrl8aAkIcpHbUDSud16bI11ZPf0dNIIy2M/U/vBExLR9TgX8fdBumk+P6FM+TVFHUTXwIpHRu3lqD0l3zsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=bfBHOReK; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=rh7ClCJaFw7dm+ojW8SVLKRg4Xr9e5Jv1G0vuOFKf5V9wsbqBXcYvY2JpRi0XwfygNM1P6FlLjTbqERRMvSGS2usPwuYj5HMXlRIRNxNUrOCLkZgh88souguHaMcALcJvBu50nqUaxmUwZDsUJFULaisRrOF6tWKyJ3EJ+a6JP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=kXGOWUI2; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1720837160;
-	bh=97BaKpl+A98ebdWTkMEpQnN/VML4HX7Gwx29yVODybs=;
+	s=202008; t=1720837159;
+	bh=llMUWHdeum9yJZfRx0fxi7KhtITZMOALBJSdilj0JYc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bfBHOReK4es2OSKZtSYHhEWmdhhS4gksrxslQ8RbfWMrqTqH6TcXUZwhC6arCp+Wf
-	 gREeAf28XyHKWCM+E6AwvaybBwqR8NI1udc4a2pX0AbOOO5JUaONwjLKwXY7aW05j4
-	 9cfNS8EW6p013HKvdlS3vStN32/zoijS8ybJ9QqOq/oCKDXKbVsEzcMvMb/RRk/41R
-	 1mpQpqLX+R/V6801UTDgvCPRicCeXISlXqkRn4RdwafHNQBeR+alVMaAnkfkUclSJf
-	 YBZfuUAJG7jEBPXmeX3JEtQWWEUJDfJcxQYbd/vVaFqgLrKnAvWaj4q/5m3JF5df7V
-	 aSbd93QdMk2rA==
+	b=kXGOWUI2M4r97F+GTo4ys14A8Jy/iW12f10T6UdOtZC8x5gLEEzabZE9BmCtkwoxu
+	 qZQHiQLcMTSDcXWK4zG8Wb1DbEFBOxIYB7o4ZIsvFAvkxyo6+76GAhQKEikVL4HUPq
+	 0c09N9DSxLtRjXW9T5SfyaDAcAWbJeBUPTumdVRXs0COpnu3eMHiSco45ztG5OAbRq
+	 jexlMk7exKwq+1D4KWBtbnlB3kUY4zTXoMHm1ply44gfhLi4hxGC3ihPiQlZSZYHdP
+	 JLuMotTUGFjFEqBfAEX+WZ/EhG7/lkPDS2nb5yCEG5kV4nmeCetfgWzVSjKnACVdSr
+	 ShZabB/ctq79Q==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id ABAD26007D;
-	Sat, 13 Jul 2024 02:19:17 +0000 (UTC)
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 8146760099;
+	Sat, 13 Jul 2024 02:19:19 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 4B6FD201ED5; Sat, 13 Jul 2024 02:19:11 +0000 (UTC)
+	id 57DF2202266; Sat, 13 Jul 2024 02:19:11 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -65,9 +65,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Donald Hunter <donald.hunter@gmail.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 01/13] net/sched: flower: refactor control flag definitions
-Date: Sat, 13 Jul 2024 02:18:58 +0000
-Message-ID: <20240713021911.1631517-2-ast@fiberby.net>
+Subject: [PATCH net-next v4 02/13] doc: netlink: specs: tc: describe flower control flags
+Date: Sat, 13 Jul 2024 02:18:59 +0000
+Message-ID: <20240713021911.1631517-3-ast@fiberby.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240713021911.1631517-1-ast@fiberby.net>
 References: <20240713021911.1631517-1-ast@fiberby.net>
@@ -80,75 +80,49 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Redefine the flower control flags as an enum, so they are
-included in BTF info.
+Describe the flower control flags, and use them
+for key-flags and key-flags-mask.
 
-Make the kernel-side enum a more explicit superset of
-TCA_FLOWER_KEY_FLAGS_*, new flags still need to be added to
-both enums, but at least the bit position only has to be
-defined once.
+The flag names have been taken from iproute2.
 
-FLOW_DIS_ENCAPSULATION is never set for mask, so it can't be
-exposed to userspace in an unsupported flags mask error message,
-so it will be placed one bit position above the last uAPI flag.
-
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-Reviewed-by: Davide Caratti <dcaratti@redhat.com>
 ---
- include/net/flow_dissector.h | 14 +++++++++++---
- include/uapi/linux/pkt_cls.h |  3 +++
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ Documentation/netlink/specs/tc.yaml | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
-index 3e47e123934d4..c3fce070b9129 100644
---- a/include/net/flow_dissector.h
-+++ b/include/net/flow_dissector.h
-@@ -7,6 +7,7 @@
- #include <linux/siphash.h>
- #include <linux/string.h>
- #include <uapi/linux/if_ether.h>
-+#include <uapi/linux/pkt_cls.h>
- 
- struct bpf_prog;
- struct net;
-@@ -24,9 +25,16 @@ struct flow_dissector_key_control {
- 	u32	flags;
- };
- 
--#define FLOW_DIS_IS_FRAGMENT	BIT(0)
--#define FLOW_DIS_FIRST_FRAG	BIT(1)
--#define FLOW_DIS_ENCAPSULATION	BIT(2)
-+/* The control flags are kept in sync with TCA_FLOWER_KEY_FLAGS_*, as those
-+ * flags are exposed to userspace in some error paths, ie. unsupported flags.
-+ */
-+enum flow_dissector_ctrl_flags {
-+	FLOW_DIS_IS_FRAGMENT		= TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT,
-+	FLOW_DIS_FIRST_FRAG		= TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST,
-+
-+	/* These flags are internal to the kernel */
-+	FLOW_DIS_ENCAPSULATION		= (TCA_FLOWER_KEY_FLAGS_MAX << 1),
-+};
- 
- enum flow_dissect_ret {
- 	FLOW_DISSECT_RET_OUT_GOOD,
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index b6d38f5fd7c05..12db276f0c11e 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -677,8 +677,11 @@ enum {
- enum {
- 	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
- 	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
-+	__TCA_FLOWER_KEY_FLAGS_MAX,
- };
- 
-+#define TCA_FLOWER_KEY_FLAGS_MAX (__TCA_FLOWER_KEY_FLAGS_MAX - 1)
-+
- enum {
- 	TCA_FLOWER_KEY_CFM_OPT_UNSPEC,
- 	TCA_FLOWER_KEY_CFM_MD_LEVEL,
+diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
+index 8c01e4e131954..fbbc928647fa3 100644
+--- a/Documentation/netlink/specs/tc.yaml
++++ b/Documentation/netlink/specs/tc.yaml
+@@ -41,6 +41,12 @@ definitions:
+       - in-hw
+       - not-in-nw
+       - verbose
++  -
++    name: tc-flower-key-ctrl-flags
++    type: flags
++    entries:
++      - frag
++      - firstfrag
+   -
+     name: tc-stats
+     type: struct
+@@ -2536,10 +2542,14 @@ attribute-sets:
+         name: key-flags
+         type: u32
+         byte-order: big-endian
++        enum: tc-flower-key-ctrl-flags
++        enum-as-flags: true
+       -
+         name: key-flags-mask
+         type: u32
+         byte-order: big-endian
++        enum: tc-flower-key-ctrl-flags
++        enum-as-flags: true
+       -
+         name: key-icmpv4-code
+         type: u8
 -- 
 2.45.2
 
