@@ -1,130 +1,149 @@
-Return-Path: <netdev+bounces-111229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC919304C1
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 11:45:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67C893051E
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 12:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA321F21A64
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 09:45:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60AA9283648
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 10:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC0C45BE3;
-	Sat, 13 Jul 2024 09:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090727344A;
+	Sat, 13 Jul 2024 10:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="cHDcSTRx"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="hvgGXAan"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087D2D2F5
-	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 09:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD9669D2B
+	for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 10:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720863950; cv=none; b=om/pggDEVdfclr5ij3mPvc06VQd2CsIzXrfc7sQOknp7m6BjrlCqIKofm5Cj4ApoKZlTUkuRyU6ilAkk8oIbXJp9nRDuiwAlQC12adC3scy+gog6mPqi55selV5Vk3XrjnUV/JjtaE/D2gxD0s1eS21v4Tg/Fx5kpnCPZbSyNeQ=
+	t=1720866270; cv=none; b=ErT5SLH0dHDH3XDXLvU2RpNmib7hxftwOWvrfCF+ihbODPGA8HWtpN6Jf4tTMvO3Mse9TNgQ4YZMak7z75llqM7IzCV0X9dh7dJJDsqaFwfPbtDcR7+ZfKlMfCNkiS1Jq3SijGxgxr40HsV3UHB1yx3TwmJ9aeYBn9mTjZTtOG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720863950; c=relaxed/simple;
-	bh=8qF7UPeRZhj/HTohlSa2VCmCw/D+IbTZFZb7+YXe6YM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=al/IaKZrHBdkejT6KtZPesDabqPulDjP8aG1yyMzHQKdg84tss0YdTBW+4MzoxQDcI9Urz6t8Phnn7fNzDqPviRHPRIKBvJgokpMltOxE/ubk6xXRpUMRGw17pY9jk8BUCP5FuorxyXiripDVOcXFWIm9D5s/FDE3E9a+OEc+q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=cHDcSTRx; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a77e5929033so380867766b.0
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 02:45:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1720863947; x=1721468747; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Nh+8YXuAxTLUPYSeGC7W1T0QQtjQ7blnhe3sgUvJW8=;
-        b=cHDcSTRxUsjwYeKhUjJ/H2rcqdmwXmqP9JHyHsug5bD7pkfVmCpEaTNunUlsYwyM/f
-         mhVQjLwZOvmO3itZSNo5doQPOsDsgPULiEfErFeRLzEUakxW7zWI26kI4AlRrrwW+ZUW
-         2gUDAF7Jslk3wnWKVYi8s+mJBQ1avYj/PYM8/+IeTtkbCP+d5Ft+xswl9yPQa6Xqqm4F
-         nb36UFWOI9ZKFxayKOlSO5I3EinqtbJGDg5Om4NeN2RQg0KPDjy+cbG9ExhgPhnE1LZ4
-         XDctn7QGmnlMfm2kxntcUfzsNUZ1cEKnT609okxsy5OFeItYu0A9Qyzc3UyYAG2m5sBy
-         HDFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720863947; x=1721468747;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6Nh+8YXuAxTLUPYSeGC7W1T0QQtjQ7blnhe3sgUvJW8=;
-        b=Ntb/uY0q1RRZ0x87ISUEttxG3UlxJJkOcrnSCmWfSyXO14NQiLsS10wtUNY4M/2FYa
-         Fbf6LjfdYMHvKcEM6slRofLpDx9AQXbFFFM0XG619qOkx5sYy/Noe8Hm9vVjD2APYSK8
-         yXfUZLGJeB0XEwwNr7tLwdOP29Nu0YWssGvkhyZfoPDQoF+TRu0+SA0icS5xJTgiZ4bk
-         /scy2D0qoi3WXq9jswrG2QkRaQba1CVzQ3s2MnPWIRxzu70Eek3gP6t8nDarqKIpTrwB
-         PKygk2pVet5qchnnTiwnINcIaKrJ3oQLRsoDGW6ZCSScxbcHTisYJ3i3h2LAirRBsvE0
-         utbg==
-X-Gm-Message-State: AOJu0Yzd/MlYRPhriuw75zNB42nMo7yjf8GJ5E5L0cDduAph0XSGh1Vn
-	DpzC1Zov2PtXIxI88dfSNNL91PuGMglfpHkdpcF16mepaVX1ANeAcSHvG7dTqIE=
-X-Google-Smtp-Source: AGHT+IFXtRW+ihxAl3u041y0SF2jGut4b+Mhn19tk41jsYq1JkTX9JRCKPwJHkjJuHOG0nSw5REeLw==
-X-Received: by 2002:a17:906:e57:b0:a77:dbf0:d22 with SMTP id a640c23a62f3a-a780b89ca72mr860650666b.65.1720863947206;
-        Sat, 13 Jul 2024 02:45:47 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:ba])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc3cb347sm36959166b.0.2024.07.13.02.45.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jul 2024 02:45:46 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
-  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
-  john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
-  cong.wang@bytedance.com
-Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
- unix_inet_redir_to_connected()
-In-Reply-To: <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co> (Michal Luczaj's
-	message of "Thu, 11 Jul 2024 22:33:17 +0200")
-References: <20240707222842.4119416-1-mhal@rbox.co>
-	<20240707222842.4119416-3-mhal@rbox.co>
-	<87zfqqnbex.fsf@cloudflare.com>
-	<fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Sat, 13 Jul 2024 11:45:45 +0200
-Message-ID: <87ikx962wm.fsf@cloudflare.com>
+	s=arc-20240116; t=1720866270; c=relaxed/simple;
+	bh=L0xqgZ57jEXmPs5BxkicGauoRf+kebFyM572VEBlHO8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p3lfjdGgqx5EhyiKXewBCGJt2jDMwvsDNeszr7EkmKPX3uDp066DVpkReC0kRsBSKAP4kxL6OaaqHhQpDYn16O1dSMGgpJVRYHT3qRaBaoeTsx1UaX+/i5RyfsPQB1ERS4qe3v3PqvLEIvdvmmih6mv8gLeA1nmKStLb7z29rk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=hvgGXAan; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 474AC2087D;
+	Sat, 13 Jul 2024 12:24:26 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id wR3mj8tnyDQC; Sat, 13 Jul 2024 12:24:25 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 7030620872;
+	Sat, 13 Jul 2024 12:24:25 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 7030620872
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1720866265;
+	bh=MINrrlYF1IhQRCcUUJ3CRTHK9FmLlLHBfCx3z4JyMrc=;
+	h=From:To:CC:Subject:Date:From;
+	b=hvgGXAanbGHMeyeHeQCeMjf02U2RHmm8QmfBwoi0yMwIlaXkATpPyDoVCMIo3/ulR
+	 HXmGfuUfgdGr7fJClHhvnvvYflekEDfqEuhvs0lh9ftEjsrC01lKCzchHUkTnbLZn/
+	 BAsIg+j10+e8XyyW6IMvzgFwCddKg/E1VJ4BjOUivRWz6FlAmsZKGoCkfJ4sg0humx
+	 qeDOZxvr91YmkfnuffHdJGhN/LwM+obXDip+LjPN8cqqCbCr51KfPv3f66C1AFhOnf
+	 pO38mERG0IN6EYdMdESlLKD3mmRieoBEQJexlKMtbCb9PyrKEL0lEYxbKxeCX2dz3X
+	 chqLCBZK1b2wA==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 608C080004A;
+	Sat, 13 Jul 2024 12:24:25 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 13 Jul 2024 12:24:25 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 13 Jul
+ 2024 12:24:24 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 483713182D21; Sat, 13 Jul 2024 12:24:24 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/5] pull request (net-next): ipsec-next 2024-07-13
+Date: Sat, 13 Jul 2024 12:24:11 +0200
+Message-ID: <20240713102416.3272997-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Thu, Jul 11, 2024 at 10:33 PM +02, Michal Luczaj wrote:
-> On 7/9/24 11:48, Jakub Sitnicki wrote:
->> On Sun, Jul 07, 2024 at 11:28 PM +02, Michal Luczaj wrote:
->>> Function ignores the AF_INET socket type argument, SOCK_DGRAM is hardcoded.
->>> Fix to respect the argument provided.
->>>
->>> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->> 
->> Thanks for the fixup.
->> 
->> Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
->
-> Ugh, my commit message is wrong. Change is for socketpair(AF_UNIX), not
-> inet_socketpair(). Sorry, will fix.
+1) Support sending NAT keepalives in ESP in UDP states.
+   Userspace IKE daemon had to do this before, but the
+   kernel can better keep track of it.
+   From Eyal Birger.
 
-Right. Didn't catch that. You can keep my Reviewed-by nevertheless.
+2) Support IPsec crypto offload for IPv6 ESP and IPv4 UDP-encapsulated
+   ESP data paths. Currently, IPsec crypto offload is enabled for GRO
+   code path only. This patchset support UDP encapsulation for the non
+   GRO path. From Mike Yu.
 
-> Speaking of fixups, do you want it tagged with Fixes: 75e0e27db6cf
-> ("selftest/bpf: Change udp to inet in some function names")?
+Please pull or let me know if there are problems.
 
-Yes, we can add Fixes if we want the change to be backported to stable
-kernels, or just for information.
+Thanks!
 
-> And looking at that commit[1], inet_unix_redir_to_connected() has its
-> @type ignored, too.  Same treatment?
+The following changes since commit 5233a55a5254ea38dcdd8d836a0f9ee886c3df51:
 
-That one will not be a trivial fix like this case. inet_socketpair()
-won't work for TCP as is. It will fail trying to connect() a listening
-socket (p0). I recall now that we are in this state due to some
-abandoned work that began in 75e0e27db6cf ("selftest/bpf: Change udp to
-inet in some function names").
+  mISDN: remove unused struct 'bf_ctx' (2024-05-27 16:48:00 -0700)
 
-If we bundle stuff together then it takes more energy to push it through
-(iterations, reviews). I find it easier to keep the scope down to
-minimum for a series.
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git tags/ipsec-next-2024-07-13
+
+for you to fetch changes up to d5b60c6517d227b044674718a993caae19080f7b:
+
+  Merge  branch 'Support IPsec crypto offload for IPv6 ESP and IPv4 UDP-encapsulated ESP data paths' (2024-07-13 11:14:04 +0200)
+
+----------------------------------------------------------------
+ipsec-next-2024-07-13
+
+----------------------------------------------------------------
+Eyal Birger (1):
+      xfrm: support sending NAT keepalives in ESP in UDP states
+
+Mike Yu (4):
+      xfrm: Support crypto offload for inbound IPv6 ESP packets not in GRO path
+      xfrm: Allow UDP encapsulation in crypto offload control path
+      xfrm: Support crypto offload for inbound IPv4 UDP-encapsulated ESP packet
+      xfrm: Support crypto offload for outbound IPv4 UDP-encapsulated ESP packet
+
+Steffen Klassert (1):
+      Merge  branch 'Support IPsec crypto offload for IPv6 ESP and IPv4 UDP-encapsulated ESP data paths'
+
+ include/net/ipv6_stubs.h      |   3 +
+ include/net/netns/xfrm.h      |   1 +
+ include/net/xfrm.h            |  10 ++
+ include/uapi/linux/xfrm.h     |   1 +
+ net/ipv4/esp4.c               |   8 +-
+ net/ipv4/esp4_offload.c       |  17 ++-
+ net/ipv6/af_inet6.c           |   1 +
+ net/ipv6/xfrm6_policy.c       |   7 +
+ net/xfrm/Makefile             |   3 +-
+ net/xfrm/xfrm_compat.c        |   6 +-
+ net/xfrm/xfrm_device.c        |   6 +-
+ net/xfrm/xfrm_input.c         |   3 +-
+ net/xfrm/xfrm_nat_keepalive.c | 292 ++++++++++++++++++++++++++++++++++++++++++
+ net/xfrm/xfrm_policy.c        |  13 +-
+ net/xfrm/xfrm_state.c         |  17 +++
+ net/xfrm/xfrm_user.c          |  15 +++
+ 16 files changed, 393 insertions(+), 10 deletions(-)
+ create mode 100644 net/xfrm/xfrm_nat_keepalive.c
 
