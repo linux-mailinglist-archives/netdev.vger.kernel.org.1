@@ -1,61 +1,58 @@
-Return-Path: <netdev+bounces-111297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805779307D2
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:40:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6FD69307D9
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7240B22AA4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:40:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36A4BB21AB4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FD2146D7E;
-	Sat, 13 Jul 2024 22:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317D0146D7E;
+	Sat, 13 Jul 2024 22:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTRZrNDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pL2DW2pC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0820114388E;
-	Sat, 13 Jul 2024 22:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF45044C7B;
+	Sat, 13 Jul 2024 22:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720910403; cv=none; b=kbtCHcxHSm3pOXDuZg8Ck6UUQiEUSGU5jwT0TOqKEd2hvrVvMcTPUV+JogvOp4FrH3utegLMuveuT9j6fM3uVeF+bl/UQcpJg8MxC7Af2PABXWYj7Q1hKu7GQELBVF6pb0CCrX7W4Wyrl0xYauGZ/1ocgXti+2JVmvLLZbWUdJs=
+	t=1720910776; cv=none; b=f0jzQ36nw09JhxwMeclOA/gW4+uud6CHQeEXJ7HuQQccD8kCrJ3TPgUVoI8fpBWvsFf9zzWm2qMKzTkQlMQ5J/0Wc4EbYS8Vm4Q0BUAxYA5ZhRK2jdwLqw9uYPMGyW+4mByEc+P4MFKxi1J0Fs7dYO3O/gtbFWaPlBw0ezLgdDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720910403; c=relaxed/simple;
-	bh=Mj0RjWNgbBjGNr3FlRvT2/B+5iT7Xih2HynTQ7PZ/u4=;
+	s=arc-20240116; t=1720910776; c=relaxed/simple;
+	bh=UwofqbVZqwaGSdtJu7hNgGk0S78WZ1m7zs7Iyxom9Qs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZfWqjypNcOEqR3OSlO97fmfOa5pZV5ohWY65qeTtKQ3IMeZpjDqY8/EgxWAoi/kikYvn10QCoyXhlObQ36TSS2lFRDc0Ed5tlPSsu8OulcjRxW/EQunONsf7rzFum6+cuHE3LTPQhIXnyy3MsXFyMBRCH0dFnCiSx2x2m1bUWl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rTRZrNDD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1776CC32781;
-	Sat, 13 Jul 2024 22:40:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=imX1D8q33rOtbS0gy2O0NM3Ej8Wr27CvlnksfHoebUE587j79nL1X3jLuMU1E8zd6ndYSZAL/SRMoj63sdWktSq5D9LJFmcYH9hkprdnw9J5IlASw6J7SH0+C5KVpGUiDUF0HEidATMkxXAfmwWzvbi32EixmgCYMZPDD3HS4aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pL2DW2pC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 048E3C32781;
+	Sat, 13 Jul 2024 22:46:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720910402;
-	bh=Mj0RjWNgbBjGNr3FlRvT2/B+5iT7Xih2HynTQ7PZ/u4=;
+	s=k20201202; t=1720910775;
+	bh=UwofqbVZqwaGSdtJu7hNgGk0S78WZ1m7zs7Iyxom9Qs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rTRZrNDDxghQLFMWOBvbUAos86D5e6vcIAHcRsHbHNIlRKOel4SSFcd49sT/noSL8
-	 xC1YxgMHo0nTzumo0fD9QH2upMAq6wUGeMX6HMiLSYSWMCSYE/XSm2eT0m6UUWZyVo
-	 NN/Wvic4988zlLEFUG4yxheGkOdfbURh2OCNlZOkEK9tN7DxFgTFsJoHg3fgnR8bai
-	 ZebFlmWhJAm28j68ZSXNBNCh/rIX2KjuDm/yvNFVBVKbbVhyv1ZKtp2zL+BsPcay32
-	 ipBbXc8JLKQ+w4cMz9rpLhU3ONiP3Two+gB5iueF6A65/f+iXexdKTnUaBby7AcYkw
-	 I3h7jkn3dVOng==
-Date: Sat, 13 Jul 2024 15:40:01 -0700
+	b=pL2DW2pCE3ihMNvR25rHszj7M5f4HJPWWvnxIgylzPGwBEAIfxVJOFMyKm5dLAdPG
+	 5VMGjr7OcvpMMrHHLE4Www5hissobknwvO3MQchHspgGI8bZZRYzsfbVhH4lp4tRFf
+	 5UTtnkPws0D72NdvQZPNdPvQncKQ/8NzU/EVMnygMNYVpjkdB0lNrknyVDIt8TUoLf
+	 FY7VhJbnF0TnQirwLD518v3H8EAefwigV6b6tfyCo2YUbwKmjUdL+j4TSSlhuHaVma
+	 J6pNmusLISAIdR0zMfKSi+BjWDGTGRIfOHt0DziphCxPx4qKRq+BZYaRK52LXu5IhK
+	 bv/NEIyxzmYkg==
+Date: Sat, 13 Jul 2024 15:46:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Anand Khoje <anand.a.khoje@oracle.com>
-Cc: Saeed Mahameed <saeed@kernel.org>, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
- leon@kernel.org, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- davem@davemloft.net, rama.nichanamatlu@oracle.com,
- manjunath.b.patil@oracle.com
-Subject: Re: [PATCH net-next] net/mlx5: Reclaim max 50K pages at once
-Message-ID: <20240713154001.5eb3313f@kernel.org>
-In-Reply-To: <ZpDeuoUlVoUON8Em@x130.lan>
-References: <20240711151322.158274-1-anand.a.khoje@oracle.com>
-	<ZpCI0mGJaNDFjMno@x130>
-	<c8d99dba-89e9-4bf2-b436-f1a29cd573bb@oracle.com>
-	<ZpDeuoUlVoUON8Em@x130.lan>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
+ Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: mptcp: lib: fix shellcheck errors
+Message-ID: <20240713154614.653f30ce@kernel.org>
+In-Reply-To: <20240712-upstream-net-next-20240712-selftests-mptcp-fix-shellcheck-v1-1-1cb7180db40a@kernel.org>
+References: <20240712-upstream-net-next-20240712-selftests-mptcp-fix-shellcheck-v1-1-1cb7180db40a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,10 +62,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Jul 2024 00:43:54 -0700 Saeed Mahameed wrote:
-> Maybe improve the commit message a bit? Just explain about the unnecessary
-> alloc/free of the extra mailboxes for the large outbox buffer, since the FW
-> is limited and will never use this memory, so it's an unnecessary overhead.
+On Fri, 12 Jul 2024 12:00:15 +0200 Matthieu Baerts (NGI0) wrote:
+> It looks like we missed these two errors recently:
+> 
+>   - SC2068: Double quote array expansions to avoid re-splitting elements.
+>   - SC2145: Argument mixes string and array. Use * or separate argument.
+> 
+> Two simple fixes, it is not supposed to change the behaviour as the
+> variable names should not have any spaces in their names. Still, better
+> to fix them to easily spot new issues.
+> 
+> Fixes: f265d3119a29 ("selftests: mptcp: lib: use setup/cleanup_ns helpers")
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-+1
+Speaking of MPTCP tests - I added the connect test to ignored today.
+Too many failures :(
 
