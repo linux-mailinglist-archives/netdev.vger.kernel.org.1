@@ -1,213 +1,200 @@
-Return-Path: <netdev+bounces-111171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3CB9302A4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:02:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B9B9302CC
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 02:43:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F616283143
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 00:02:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54F35B23511
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 00:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A49E2F2A;
-	Sat, 13 Jul 2024 00:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DFF748D;
+	Sat, 13 Jul 2024 00:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CaEFdFOM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IU7EV15N"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60F01849;
-	Sat, 13 Jul 2024 00:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720828921; cv=fail; b=CpevTLrt8tFeoasL73UR70tci2g4zRBG4bDC+uvOn4D45RqhURJj9VddtnIgx0jYmoSv9TLbFmDTV6KFtImW1z6kixft9kDXiXZs4NHtOfBeKbuy29hv+/59wJa8wY/1+oWxIDdR/r4Tq0ghC/CxGRF1ZMB1xZ0Zkl9t0bL/p8w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720828921; c=relaxed/simple;
-	bh=wJXWzNqO6SzCgQ0VhpNDyiIa5GL7D969mTpi0FopQ3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jIBLgMhul7/4wquLYUnncQgVAPrCSahFm+J4eBjmvd3aYrmFfRI7aSFCelbzteIYvAF018t+pWZT3B6jCDqQlaFwfjJHnxrdlXd2Dk6ttzQoxY0/tCH+xnh1AOcYLLZwHB1jhTuMZhYy/dHT5i7qtBsJFFB7piSSlgRfC3u+dsE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CaEFdFOM; arc=fail smtp.client-ip=40.107.243.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G2bJqY1HO9VLcoACjQa5rgPayYOu5F/dDW/e7s8VryWWGf+VFSRmOIy772uqdaXhW3wfEFtgHuydbnmLlnq32W32chC+FTntKOnDLBcK4wIa6E8L8U68OgA5GKHJBt01FFzhKACm5+byFt1cg9/63mgrAvpIGVmjwDty7W0iREnZhende+IMP8myrz8JvKV4wjZl/C9jh45sXIs8qGxcbdABgy+n9E1qDS0PyAeSgAAFBhvauReCV7E89W6c/Wm0VWARXRhaoHTpUwtfXXc9Y6uPZfRGYoE2Pne8nuKRZUyyX7zJ6q20RzRpiuNbHUUSkwnrhSkjUnCKZ/TJZS8qhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o1mT6PlMdzu79a8oj2oSMpn7lPddAo5re8ZN7EDToGo=;
- b=GYYbn+GtuAdzr7TircQxe0jjHfh9zylPa4wXhqwYWOfM9HMZeJpV+vVR6XHVqRMVncQlBy7vyERreyV0ZszGpv8djuzH8Y/I3A76+oZFFw3wkxvoYIDZdCcbZERHUptQPX+xeh90eUkwAa0dDMPrrog0ci+sXfcn34mBCVI1RFFb4DL5SKGWkOhQOAh1r1J+VC/VVoa0aAJ0pDWw5VtntE1YCnCemnluP1s0zOLHnpTdrBeTP63/ULBiojV3aDd+k7uczgMnCyNtz2GT5n3m0KptRDkzi1HbpEEwDdm8qrOPjxhNSXea3mbOoUrs8Fky3MeNnrJgIvnv+odSVnzmfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=linuxfoundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o1mT6PlMdzu79a8oj2oSMpn7lPddAo5re8ZN7EDToGo=;
- b=CaEFdFOMPytTA0r5ZE7f9S4mSLx3DIfitz56IXN/TCBKrHnQdveKiEteZdeSWg67CCljmHDRzRgSEYfKTjcdePwvq2cbDI1zBC1DSR1uNIIF4W/GpQi7mKOHDl+xHsx92zsVrmGzvupFQoV3A9Kzhgy9J3f2Fayqq1b16MSFIfb4qhlKUHL09JQTygPbtrxYSpw7fAX6jic+2yQk1t/rrREj+2natGhmK2u3q5iwqtWz2wCsJnaXpZHM+4fYJnk1ZstewZkPmup9mnIChfBf/wXqZxZSFETuEtinlF9ywzFNPvRQOlv3Wh5mygUwBwedHzLgzd4jsOHBGGJC71Xqjg==
-Received: from BY5PR16CA0021.namprd16.prod.outlook.com (2603:10b6:a03:1a0::34)
- by MW3PR12MB4458.namprd12.prod.outlook.com (2603:10b6:303:5d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.21; Sat, 13 Jul
- 2024 00:01:56 +0000
-Received: from SJ1PEPF000023D7.namprd21.prod.outlook.com
- (2603:10b6:a03:1a0:cafe::55) by BY5PR16CA0021.outlook.office365.com
- (2603:10b6:a03:1a0::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35 via Frontend
- Transport; Sat, 13 Jul 2024 00:01:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF000023D7.mail.protection.outlook.com (10.167.244.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.5 via Frontend Transport; Sat, 13 Jul 2024 00:01:55 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 12 Jul
- 2024 17:01:40 -0700
-Received: from [10.110.48.28] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 12 Jul
- 2024 17:01:39 -0700
-Message-ID: <682e293b-cc0d-4261-90a8-bc6f16df0992@nvidia.com>
-Date: Fri, 12 Jul 2024 17:01:38 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F4A8F5E;
+	Sat, 13 Jul 2024 00:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720831402; cv=none; b=PZcQW5u7L/02OgAhza6cQxdrN1XAlYiw0n9wrx4R0SNT86U5rqsgZTfmAOPWwoMEAyXAfvBVlzck1IJZMkkgX1quFYADe7K4MHwEEp7fINVNqmVu4X16elxu+dRyktnqkz3uiDvYt51QZ47hEJ41FEaEwXwwOWnpdEybs5Lj8As=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720831402; c=relaxed/simple;
+	bh=R8JyO3eqqWBetdzBaHSoU9utazIuaOWoUNvGuk9O3GM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Awt1qcHpZnUz8KZZiPA+Iv6sTtA4YAaGgE/lPGp2fJ58rFNBvaFTXk7tpH2xkjvADmAicB6tWB90G6+wO1vRpv/Px8Tfmt9h1LJt0qUe2ITc/TMs2kfBqgn1A3Dz/lhv5gxi3LF3nQO8oFAER90Fgt53SUXvLTB3z3Gm4RmOuUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IU7EV15N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E910DC32782;
+	Sat, 13 Jul 2024 00:43:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720831402;
+	bh=R8JyO3eqqWBetdzBaHSoU9utazIuaOWoUNvGuk9O3GM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IU7EV15NqUZZ1kCxiPvOWkzjimxWfxZ0tJmlJh8H9plJ6HR/hnWONIF0rbWUI/aoV
+	 e3zyHnjLGOyhyyVnu0G2Ir2srvw5x5FQ6gzmcJ7oBipDRlt+tpE1vmtvVa8d3SrUYG
+	 9ramxz/qPe/Z3sqX11a2CvuBLBEJcHobQbTF5UK6a/+V7de/XYYsTelG6xfBN+/kCs
+	 cu2qcMWa1xPh2dpkxMNhlbeuyCcwDoUylr2cF4wzsSL/Z8NJEJpZBNYLPBYh8KzyO7
+	 1avBhd86tS4kfkIisBv9GTz8OiCAkK7v8eHeuq21eInEnAnRovyNkMvDguVaONZS5K
+	 Kp8dUvf2pW+AA==
+Date: Fri, 12 Jul 2024 17:43:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: xiujianfeng <xiujianfeng@huawei.com>, <netdev@vger.kernel.org>, Linux
+ kernel mailing list <linux-kernel@vger.kernel.org>, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ virtualization@lists.linux.dev
+Subject: Re: [BUG REPORT] kernel BUG at lib/dynamic_queue_limits.c:99!
+Message-ID: <20240712174321.603b4436@kernel.org>
+In-Reply-To: <8036617e-62f3-17cb-f43a-80531e10e241@huawei.com>
+References: <08227db9-6ed7-4909-838d-ce9a0233fba3@huawei.com>
+	<8036617e-62f3-17cb-f43a-80531e10e241@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests/net: fix gro.c compilation failure due to
- non-existent opt_ipproto_off
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Shuah Khan <shuah@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
-	<afaerber@suse.de>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>, Pravin B Shelar <pshelar@ovn.org>, "Willem
- de Bruijn" <willemdebruijn.kernel@gmail.com>, Alexander Mikhalitsyn
-	<alexander@mihalicyn.com>, zhujun2 <zhujun2@cmss.chinamobile.com>, "Petr
- Machata" <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Hangbin Liu
-	<liuhangbin@gmail.com>, Nikolay Aleksandrov <razor@blackwall.org>, "Benjamin
- Poirier" <bpoirier@nvidia.com>, Sebastian Andrzej Siewior
-	<bigeasy@linutronix.de>, Dmitry Safonov <0x7f454c46@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-actions@lists.infradead.org>, <mptcp@lists.linux.dev>,
-	<dev@openvswitch.org>, <linux-kselftest@vger.kernel.org>, LKML
-	<linux-kernel@vger.kernel.org>, <llvm@lists.linux.dev>,
-	<stable@vger.kernel.org>, Ignat Korchagin <ignat@cloudflare.com>
-References: <20240712235150.99175-1-jhubbard@nvidia.com>
-Content-Language: en-US
-From: John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20240712235150.99175-1-jhubbard@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D7:EE_|MW3PR12MB4458:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1667e350-5152-4741-711a-08dca2cf0244
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QXBWV1B4dWExY082ekxQaGRjTWh0UHZwWjI0QTZtNGsveU9PREFaK2N5eWg3?=
- =?utf-8?B?MUI0RXNWVEhXUEZPbURjcVNNdnRNSjllbDIvSjdKTjllaE1MNXhFMktlM3Fa?=
- =?utf-8?B?SERYdVZsODRBUFg2TXk1U0gxSWplWWl1bEU2M2NlMTIrOEx6dVlHb01ORjd1?=
- =?utf-8?B?S2NRRUJqYnFwUU5ObkFvMURobnU4SGNESDlqY05kZksydCtmZ2x1V3lrOXJr?=
- =?utf-8?B?YlZrYzJCNmgzMjNETUZxQ05uenc1aDB0b3Z5cHo2UHlqY0xCaFVCL1FRK3JH?=
- =?utf-8?B?VG85TXgrcjVXWlB6Mk5Ja2RPanNOZ1NCKzRRaytXU3JnNkMrMk93bjdEVE9L?=
- =?utf-8?B?OG1ncm1YMXBuUUpGYmh0Z0FIVkxuK2ZuazFab1dFQzVkMnIvV1MzdWZVcnBE?=
- =?utf-8?B?QkVCb0JaejFUSllWNmp5dy9wc2N1L1M0RkhzTENLZms4YWo0dDVZaGNrR3hH?=
- =?utf-8?B?WUd5RUZOZ3BjUUtNSFRJRHJLZVE2eklUa2VIUk42K1dHRjlIRkxBRWFYc1dT?=
- =?utf-8?B?OExKanIvRkxtRmVzNGY2QVBUZ3UvUlg1K1BHR3ZLdlY0RGk2enQ0SHBiM2tC?=
- =?utf-8?B?aVlwRi8zOGV3RGpEclY2eXoyelRmTm4wT2cwd2lNUEV5blkxMnJNRGUrUnpl?=
- =?utf-8?B?Q3pFaWl1VW5kZW1KNzVPYyt4b2NvTEpKZE1HNmxEdzQwV2wxSGRqZVpTc2xN?=
- =?utf-8?B?QkRKT1FwRW0wK0h0LytsY0xnRDZyb0tqOUgwcVBWM2w3dFBhcENrVlVHYUlk?=
- =?utf-8?B?YXUrMXZMNG11ZDJQMlJJWFJORVFYRGZHT0w3QmRGVXlDdlI1MjhsV2QrbmhL?=
- =?utf-8?B?amZTc2lGbVZFaVJUelhmVzFldzNuR0JDNkQrbHVSU1VWVDBKcjV4cDVpcXAx?=
- =?utf-8?B?VGlIN2hORjJjUlF2elRoMWpySmthMnZNVndiRm5Bc2Z4YkI2NkU2UXhnaTBU?=
- =?utf-8?B?d3cxOG1maDVXeTJrTlVCNWpTWE8rYnQzaVF2M05sRDFiMUNJU09mRW0wcGJO?=
- =?utf-8?B?ZXo2cjh3OEVTcS9IcVZtb3lyUFVBZzlsWDY3N29hTVJTYWVFL1hyZmdCNHB1?=
- =?utf-8?B?SU44a2pTUXVQbmtkbENyT2cyY0NnbmV6V3poTVpFelZWV1VLVUtrMnNmZU1j?=
- =?utf-8?B?QjFTRnNzOHh5aUZvNmFiUkJLdGFnZEQxakJiQ2pLTGNPbmpCNUFRNmlBNWp5?=
- =?utf-8?B?Yk9UWm5zcnd0TmMvWFFySE1zTGNPcFRkQmpzSjFVOVJ6cW5uc1dJVzdzZmho?=
- =?utf-8?B?elJqUkxJWHlyOUVZZGptQU5mdkxpVnVReG1SUVBmNUxkZkRIUStBYUVCaWov?=
- =?utf-8?B?Z1habkFOUGhKSHMwUnNyOXF2QXdKUDVRbEo2eG5OM0tCY2l3cUcrYXdadWxT?=
- =?utf-8?B?U2hOcG1hQ3ZNbTg2aGRFVWk0K0ZYRS90eFluaE81WXFWMEdWVmxaQXhIa1Nn?=
- =?utf-8?B?c0pDMk4rZlVQSkIrdGtjZWxYeHdDUFJYQVh6ZFp4TzFya2N1NkNKVlhaVXRh?=
- =?utf-8?B?bzFPS0U1U3B3eTE4YmQ1TTVtU2VXZUJlQmd0UjYxaXJYYXVFNDlKbDZMdDgv?=
- =?utf-8?B?K29wbzNtU1hINDJTWjFCYzBmNm84ZEtITHZINFFaRXJhMzlpcEd1TG5NSHhN?=
- =?utf-8?B?amROa29meStZZFVxT0V3QmU5NVA2NUp4Z2kwR3F4c2xqK1Rjbjd5YmU3Y2ln?=
- =?utf-8?B?UHYvSS8zc3Rocno0S3kwb0tYc2pXcW5BTWFwamtGNVMxOC9UdUV4eXJRaDNU?=
- =?utf-8?B?U2FKR3ZSbzlhTkRQWGVITFR1UEkrUWkyRnJGUzgrTk1tSUQwcjVBK3FSQWxY?=
- =?utf-8?B?MStoK0YxZEV1eEtZRWNmRHJxQVpOa3pBZE5rVVdXZDVRYnh3UVNTMzgvVTdi?=
- =?utf-8?B?aWhhdEJ1MGpQRkZCVThGZUppVGNKc0Y0Nk85OEZFRitwZFE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2024 00:01:55.9425
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1667e350-5152-4741-711a-08dca2cf0244
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D7.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4458
 
-On 7/12/24 4:51 PM, John Hubbard wrote:
-> Linux 6.6 does not have an opt_ipproto_off variable in gro.c at all (it
-> was added in later kernel versions), so attempting to initialize one
-> breaks the build.
+CC: virtio_net maintainers and Jiri who added BQL
 
-This is the first time I've tried to fix something in linux-stable, and
-I'm not sure that I've made it completely clear. This is only for
-linux-6.6.y in linux-stable.
-
-thanks,
--- 
-John Hubbard
-NVIDIA
-
+On Fri, 12 Jul 2024 10:12:42 +0800 xiujianfeng wrote:
+> On 2024/7/12 10:08, xiujianfeng wrote:
+> > I found a problem with my QEMU environment, and the log is as follows.
+> > 
+> > After I did the bisect to locate the issue, I found
+> > 8490dd0592e85e0cceefa6b48d66dbdd73df0fb3 is the first bad commit,
+> > however this is a merge commit, and I cannot further confirm which
+> > specific commit caused this issue.  
 > 
-> Fixes: c80d53c484e8 ("selftests/net: fix uninitialized variables")
-> Cc: <stable@vger.kernel.org> # 6.6
-> Reported-by: Ignat Korchagin <ignat@cloudflare.com>
-> Closes: https://lore.kernel.org/all/8B1717DB-8C4A-47EE-B28C-170B630C4639@cloudflare.com/#t
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->   tools/testing/selftests/net/gro.c | 3 ---
->   1 file changed, 3 deletions(-)
+> It's on
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git and
+> the base commit is f477dd6eede3
 > 
-> diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
-> index b204df4f3332..30024d0ed373 100644
-> --- a/tools/testing/selftests/net/gro.c
-> +++ b/tools/testing/selftests/net/gro.c
-> @@ -113,9 +113,6 @@ static void setup_sock_filter(int fd)
->   		next_off = offsetof(struct ipv6hdr, nexthdr);
->   	ipproto_off = ETH_HLEN + next_off;
->   
-> -	/* Overridden later if exthdrs are used: */
-> -	opt_ipproto_off = ipproto_off;
-> -
->   	if (strcmp(testname, "ip") == 0) {
->   		if (proto == PF_INET)
->   			optlen = sizeof(struct ip_timestamp);
+> > 
+> > ------------[ cut here ]------------
+> > kernel BUG at lib/dynamic_queue_limits.c:99!
+> > Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> > CPU: 1 UID: 0 PID: 203 Comm: ip Not tainted
+> > 6.10.0-rc7-next-20240711-12643-gf477dd6eede3 #613
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
+> > 04/01/2014
+> > RIP: 0010:dql_completed+0x212/0x230
+> > Code: 41 1c 01 48 89 57 58 e9 85 fe ff ff 85 ed 40 0f 95 c5 41 39 d8 0f
+> > 95 c1 40 84 cd 74 05 45 85 e4 78 0a 44 89 d9 e9 67 fe fe
+> > RSP: 0018:ffffc900000f0d70 EFLAGS: 00000213
+> > RAX: 0000000000000000 RBX: ffff88800413b800 RCX: ffff888005925240
+> > RDX: 0000000000000000 RSI: 0000000081df1116 RDI: ffff888003a0d700
+> > RBP: ffff888003a0d600 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: ffff88800a403c90 R12: 0000000000000001
+> > R13: ffffc900000f0db0 R14: ffff888003a0d680 R15: ffff88803cc80000
+> > FS:  00007fcf4229f1c0(0000) GS:ffff88803cc80000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00005596d60d1290 CR3: 00000000093c0000 CR4: 00000000000006f0
+> > Call Trace:
+> >  <IRQ>
+> >  ? die+0x32/0x90
+> >  ? do_trap+0xdc/0x100
+> >  ? dql_completed+0x212/0x230
+> >  ? do_error_trap+0x60/0x80
+> >  ? dql_completed+0x212/0x230
+> >  ? exc_invalid_op+0x4f/0x70
+> >  ? dql_completed+0x212/0x230
+> >  ? asm_exc_invalid_op+0x1a/0x20
+> >  ? dql_completed+0x212/0x230
+> >  __free_old_xmit+0xb2/0x120
+> >  free_old_xmit+0x23/0x70
+> >  ? _raw_spin_trylock+0x46/0x60
+> >  virtnet_poll+0xe0/0x590
+> >  ? update_curr+0xf9/0x1c0
+> >  ? find_held_lock+0x2b/0x80
+> >  __napi_poll+0x25/0x160
+> >  net_rx_action+0x177/0x310
+> >  ? clockevents_program_event+0x53/0x100
+> >  ? lock_release+0xa4/0x1d0
+> >  ? ktime_get+0x76/0x100
+> >  ? lapic_next_event+0x10/0x20
+> >  handle_softirqs+0xd0/0x210
+> >  do_softirq+0x3b/0x60
+> >  </IRQ>
+> >  <TASK>
+> >  __local_bh_enable_ip+0x55/0x70
+> >  virtnet_open+0xac/0x2d0
+> >  __dev_open+0xda/0x190
+> >  __dev_change_flags+0x1b3/0x230
+> >  ? __pfx_stack_trace_consume_entry+0x10/0x10
+> >  ? arch_stack_walk+0x9d/0xf0
+> >  dev_change_flags+0x20/0x60
+> >  do_setlink+0x27e/0x1120
+> >  ? set_track_prepare+0x3b/0x60
+> >  ? rtnl_newlink+0x5a/0xa0
+> >  ? rtnetlink_rcv_msg+0x199/0x4c0
+> >  ? __nla_validate_parse+0x5e/0xed0
+> >  ? netlink_sendmsg+0x1e3/0x420
+> >  ? __sock_sendmsg+0x5e/0x60
+> >  ? ____sys_sendmsg+0x1da/0x210
+> >  ? ___sys_sendmsg+0x7b/0xc0
+> >  ? __sys_sendmsg+0x50/0x90
+> >  ? do_syscall_64+0x4b/0x110
+> >  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >  __rtnl_newlink+0x50d/0x990
+> >  ? __kmalloc_cache_noprof+0x1a0/0x260
+> >  ? __kmalloc_cache_noprof+0x204/0x260
+> >  ? rtnetlink_rcv_msg+0x14e/0x4c0
+> >  ? rtnl_newlink+0x5a/0xa0
+> >  rtnl_newlink+0x73/0xa0
+> >  rtnetlink_rcv_msg+0x199/0x4c0
+> >  ? find_held_lock+0x2b/0x80
+> >  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+> >  netlink_rcv_skb+0x56/0x100
+> >  ? netlink_unicast+0x69/0x3a0
+> >  netlink_unicast+0x283/0x3a0
+> >  netlink_sendmsg+0x1e3/0x420
+> >  __sock_sendmsg+0x5e/0x60
+> >  ____sys_sendmsg+0x1da/0x210
+> >  ? copy_msghdr_from_user+0x68/0xa0
+> >  ___sys_sendmsg+0x7b/0xc0
+> >  ? stack_depot_save_flags+0x2e/0x8a0
+> >  ? check_bytes_and_report.constprop.0+0x48/0x120
+> >  ? check_object+0xb5/0x3a0
+> >  ? find_held_lock+0x2b/0x80
+> >  __sys_sendmsg+0x50/0x90
+> >  do_syscall_64+0x4b/0x110
+> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > RIP: 0033:0x7fcf423c7f03
+> > Code: 64 89 02 48 c7 c0 ff ff ff ff eb b7 66 2e 0f 1f 84 00 00 00 00 00
+> > 90 64 8b 04 25 18 00 00 00 85 c0 75 14 b8 2e 00 00 00 08
+> > RSP: 002b:00007ffcbfa59528 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> > RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fcf423c7f03
+> > RDX: 0000000000000000 RSI: 00007ffcbfa59590 RDI: 0000000000000003
+> > RBP: 0000000066907e78 R08: 0000000000000001 R09: 00007fcf42499be0
+> > R10: 0000000000000076 R11: 0000000000000246 R12: 0000000000000001
+> > R13: 00007ffcbfa59660 R14: 0000000000000000 R15: 00005596d6088020
+> >  </TASK>
+> > Modules linked in:
+> > ---[ end trace 0000000000000000 ]---
+> > RIP: 0010:dql_completed+0x212/0x230
+> > Code: 41 1c 01 48 89 57 58 e9 85 fe ff ff 85 ed 40 0f 95 c5 41 39 d8 0f
+> > 95 c1 40 84 cd 74 05 45 85 e4 78 0a 44 89 d9 e9 67 fe fe
+> > RSP: 0018:ffffc900000f0d70 EFLAGS: 00000213
+> > RAX: 0000000000000000 RBX: ffff88800413b800 RCX: ffff888005925240
+> > RDX: 0000000000000000 RSI: 0000000081df1116 RDI: ffff888003a0d700
+> > RBP: ffff888003a0d600 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: ffff88800a403c90 R12: 0000000000000001
+> > R13: ffffc900000f0db0 R14: ffff888003a0d680 R15: ffff88803cc80000
+> > FS:  00007fcf4229f1c0(0000) GS:ffff88803cc80000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00005596d60d1290 CR3: 00000000093c0000 CR4: 00000000000006f0
+> > Kernel panic - not syncing: Fatal exception in interrupt
+> > Kernel Offset: disabled
+> > ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+> >   
 > 
-> base-commit: 2ced7518a03d002284999ed8336ffac462a358ec
-
 
 
