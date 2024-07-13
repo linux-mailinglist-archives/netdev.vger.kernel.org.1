@@ -1,93 +1,85 @@
-Return-Path: <netdev+bounces-111300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A06C09307DC
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8B89307E3
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 00:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4699F1F2199C
-	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0460F1F21B6C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jul 2024 22:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944E114A624;
-	Sat, 13 Jul 2024 22:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933CC14D42C;
+	Sat, 13 Jul 2024 22:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EojgsOhp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dhn84gL/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BF113D881;
-	Sat, 13 Jul 2024 22:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE031487CC;
+	Sat, 13 Jul 2024 22:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720911030; cv=none; b=iuHBDKBqvNzZzhsnJd9uPmd7abKSpfo953Gc7sZjGqaJWZUkBAl15gr89Z6mqcXyyyL9LvFIaUsD9X8BWtA8S9urHRnS6m34owdjGuCt5N7O3DSIjid3zCuFjf2rhDPG7QlF1Kaf9Le4Q5pWvkRlKKxu5JsB9xDs7A6CRClDCeo=
+	t=1720911067; cv=none; b=Bwg1XLld2pES7ZoQxuoa0GM53xEM9SBeTJBEoKGVz5emev0GIdDYxkU93wKJSOib8UltRVaABbK1TpCMrzdDtqQGGkpHMmi1XA0mXl5fxlPvngri3qh1P3qlhfGEqe8/Q63DfXqLlB53XJXPc7dN0CN3SQ0EAfuudDC7WjrG3/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720911030; c=relaxed/simple;
-	bh=e47nO6hsmSNbPmkiBxViJcHcd37trZNLi5Zkg/LaV78=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dah1/xAsaTtq3xntfpIVw63Hfwfvv7TD65MJuapQG9zwv9AIc/kM0js5yHDuL28IRRBM87KPwDE1p9IM+K6t7IZRJyILncc3QO6YGq97+uMGznpxyd88yBT4tVVDW/A/pc/QoDrKi9prFBXYZdjS0648XjQchY4RL2zHk4wn0GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EojgsOhp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0E9DEC4AF10;
-	Sat, 13 Jul 2024 22:50:30 +0000 (UTC)
+	s=arc-20240116; t=1720911067; c=relaxed/simple;
+	bh=XPM/dAuo9BmoeqUluLKdSiEYzO5ZFH7rSKTwCw3ZGBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VWS6zMMg9muxrB5swiTHg1bndpwAFu49oJuDapXnuxDJOfwfFOHCOL7eiKpw2hdoqqxwiLqG2y7ngTNG4YzSs79cMaDBnXvhN2iOKcrgnlV2pxvq65SMv3kogxORnnQpAQNY03xFdIba4yxEjWpIvbQ4q6Qi/m/l3b5dskywOmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dhn84gL/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C18ACC32781;
+	Sat, 13 Jul 2024 22:51:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720911030;
-	bh=e47nO6hsmSNbPmkiBxViJcHcd37trZNLi5Zkg/LaV78=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EojgsOhpV1zNOsxMFW5FVeqdLQpnMJbsRWbL0/7Pyj/3yFsYN8ztB7d9rEUk0zVwN
-	 S4Ttsoo05WO4gXLdKNAl0cA98ssJL18AZij71IjQ41x86gVRw/r7JGoF2FUer141ob
-	 gH2QYsjRlEIpsRzYgj8E5AnZVQe0v6iDV0W/Bmi/4KO7Qsdm6YmpFAf5PsEix0jAZr
-	 ymApb2F3dDXNX1F6K355SJg0S7J/u//5MEqWya3uqdS2HxKNPDoIcwTxNs9RAY5mKN
-	 KxR5pHhb/iioXCsYhoick4f3EaU4Aapo36LADUfwX+o6dlh8Rziq3kVrQ77r2jyeX+
-	 G/IsAAZPa6aIg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC42BDAE961;
-	Sat, 13 Jul 2024 22:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720911067;
+	bh=XPM/dAuo9BmoeqUluLKdSiEYzO5ZFH7rSKTwCw3ZGBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dhn84gL/JjgpABXLzfrRTNIqT6fp0EYU+HVhJci09rOy7xwdezs7087qR3htdZ13C
+	 +Tx2oKPZ/3YXWtzlfYFrnEXV7EzR3Jb2yrxryM7eNxuDX+ro3ZQQgesQjbOXW/4neh
+	 J6GEANZFGcdnYIrlaAEOYspcWY2A4nmi24JtU0lVxq7aqg8bgxiWT7qx0plNizJdIo
+	 rdgEHoVYgoK5WPzcH2HwFKvbgYhT3iP8xUyVa/5UBMO15CcssGaraIeXp8o1PSTDDd
+	 8PyUpIm/gugcH4kQy8/v+eB7yDFVId00NVUQpKR4MqyNr6DmP5jXlYcdPu7sv2t/V+
+	 KL0w7JJC8Bzxg==
+Date: Sat, 13 Jul 2024 15:51:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Jason Gunthorpe
+ <jgg@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ linux-rdma@vger.kernel.org, Leon Romanovsky <leonro@nvidia.com>,
+ netdev@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Parav Pandit
+ <parav@nvidia.com>, Shay Drory <shayd@nvidia.com>
+Subject: Re: [GIT PULL mlx5-next] Introduce auxiliary bus IRQs sysfs
+Message-ID: <20240713155105.233dd84a@kernel.org>
+In-Reply-To: <20240711213140.256997-1-saeed@kernel.org>
+References: <20240711213140.256997-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethtool: Monotonically increase the message
- sequence number
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172091102996.32137.16513833581251462374.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Jul 2024 22:50:29 +0000
-References: <20240711080934.2071869-1-danieller@nvidia.com>
-In-Reply-To: <20240711080934.2071869-1-danieller@nvidia.com>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, idosch@nvidia.com, petrm@nvidia.com,
- ecree.xilinx@gmail.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 11 Jul 2024 11:09:34 +0300 you wrote:
-> Currently, during the module firmware flashing process, unicast
-> notifications are sent from the kernel using the same sequence number,
-> making it impossible for user space to track missed notifications.
+On Thu, 11 Jul 2024 14:31:38 -0700 Saeed Mahameed wrote:
+> Following the review of v10 and Greg's request to send this via netdev.
+> This is a pull request that includes the 2 patches of adding IRQs sysfs
+> to aux dev subsystem based on mlx5-next tree (6.10-rc3).
 > 
-> Monotonically increase the message sequence number, so the order of
-> notifications could be tracked effectively.
+> v10: https://lore.kernel.org/all/2024071041-frosted-stonework-2c60@gregkh/
 > 
-> [...]
+> Please pull and let me know if there's any problem.
 
-Here is the summary with links:
-  - [net-next] net: ethtool: Monotonically increase the message sequence number
-    https://git.kernel.org/netdev/net-next/c/275a63c9fe10
+Hi Saeed, when I pull this I get:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  net/mlx5: Reimplement write combining test
+  RDMA/mlx5: Add Qcounters req_transport_retries_exceeded/req_rnr_retries_exceeded
+  driver core: auxiliary bus: show auxiliary device IRQs
+  net/mlx5: Expose SFs IRQs
 
-
+and the subject says mlx5-next, so please confirm if you want me to
+pull this or there's another plan..
 
