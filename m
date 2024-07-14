@@ -1,157 +1,182 @@
-Return-Path: <netdev+bounces-111332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFFE3930896
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 07:31:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F036E9308E5
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 09:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67B51C20A7F
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 05:31:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6E26281EE1
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 07:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7CBF505;
-	Sun, 14 Jul 2024 05:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2547918C0B;
+	Sun, 14 Jul 2024 07:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dJWaXN5l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKXk7BvI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809D520EB
-	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 05:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990641BC4B
+	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 07:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720935078; cv=none; b=CGSt6x/O+RiBD6zHEcWgRrg5Rk5zQ4woZiSg1OZVTLNd5FtpzP3Z1YOPgpunT5hywINZe2XyrYj3sZx2bJqY9c0/pEHjYA42hSwpkfrWvRzDaxPhOjMGyRu4E61ASPrO3A2lvR7OFVS7Mo5Ioiaz41tT4czhDbet9+24vE82c2o=
+	t=1720942736; cv=none; b=kbAxy8WFbl59FRVu6ZEGK0pqIYJ6WENPdQfoVyJ8G2ti8fjw7pVFr5wbrya+5JJofLrEYKuyugS+rsjt3XOmVqU9sculdrhQhgJhLuiYWB2q8suLhltqpWOZSwtVfi9vsp1mr8uwdSV8al/20mKM8eChLKxwyMrfRkFtSPBI0PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720935078; c=relaxed/simple;
-	bh=3QIMAs3IFSh7u1SCIPMUxyPU5FqaYl2jhpJiMumGDeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VzQAnaIrK/mZGjP/6W6p4j6zHPFgWnb7Pwwl1ZvLlwFZ5a8DeGMpG/eh2bl1bEAAuIryYAO/o6koOpd6oLuslRPhGb6pM0Hp+hBnL+++B8U4veaqa0dRd5vEAj0z/O1n2c99iPBRPnM0BJHlYpTb0LiHw8jU73rBqdMHpeBDciI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=dJWaXN5l; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d91e390601so1966478b6e.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720935075; x=1721539875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fG/PfKdeWUxDcrt2oIAXldZj9CzlPpZ261JHkQi/zXU=;
-        b=dJWaXN5l9v5aqZGYeITR+nBcd7j7ckJ2/ndkVu5zfeKPalBf70/2hvTukD3jO2F8t2
-         75D+M1fMn/pEzMScQULZmWXeLqyh4tWf+YRFsFmomkHDrA5Yr3yamR9C/BVJQi/90Zzv
-         EBjez/whzPS1ZI45v537IQjS7wKyZFuZ1ardVoZEamLxgLoVw2TnETWo6gpGwtk0Zna0
-         Tznl5QgYmRJH6nyd0/JLh5V6xjO4i94Q9zsELeodKpbsTZrKDJ6xDE0UldbRGoYWFVcg
-         974Hgo2fe+WmgjsKkSWxVBET+4OKIror8Hcq0dWZhQBrkE9Mh+LuDJFY0hC2XIpybTk6
-         Hmuw==
+	s=arc-20240116; t=1720942736; c=relaxed/simple;
+	bh=mURsluDMLpxNoaumQ2nTLxmmSeyyeYKTv6HWHwvKTh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qnIYmYVfz15ZwiHsAneLvxxsUjjeN0fNTxsQS9hxZyb7k/Jo18cBPnB+6UIeTD/ulLf73Rc1UyDs5t3xN8gW7654HwVv1b52nYBM0umORnLRgtzK9dVmcj7x4HtbYavwJ4ZwLOud4j6/hrD+CplWo7efMYcbuUMTu7Nk8756zWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IKXk7BvI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720942732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y/SebrfEikJq8ECk0NytyAByK+ewDtjBFqNCZE/Bunw=;
+	b=IKXk7BvIaKl6PBFZyWjp3j2sdx1n//Ef0Fx3O5NKfPSyHAs5gBOYhsxIRGDRbMbTLyNggc
+	Y8a27qMPa1f+Q40rjX/yWbIfW9ZDZrnKihywb1iCK6DzobOqcI5C6SRv89SBy9kgIN6mPo
+	SnRWx5iFlQZj/USTiNfaovVoSVvj0Js=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-53-PzX3apjZM92OOhqkBkUgEw-1; Sun, 14 Jul 2024 03:38:50 -0400
+X-MC-Unique: PzX3apjZM92OOhqkBkUgEw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36789dfcc8bso2053186f8f.3
+        for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 00:38:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720935075; x=1721539875;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fG/PfKdeWUxDcrt2oIAXldZj9CzlPpZ261JHkQi/zXU=;
-        b=N0iXovDIiBRPBA93TyCHJK0EX5wMYM/MDPdYokCFKCeKhCybhVvghUgZ9FdN8eKfov
-         ry8nqM1s7KhfisiFaRQqkFczy6Ne/VGlh8OkDck0ojEOz3Z4tKsh/RHFcF1oP99yQjCQ
-         mqLFnlK9iWEDnu+Ts8nMCq9LvmWVYOAsj/iIacFumB198zagiAEwtKhxfh9ctIENksF6
-         wSFwu1QE712rgvqheCyn3aizS0zYZjGdQEZykuUJFSr5KlFOdrSi+0ffx+fViXCciaV4
-         jom3QK/frdlCl+BVWbJXzhR+83X4Y2IPN5dhhXAxRj6tZuJPZBa2bm+ru8iIeYMvaTQa
-         gw0w==
-X-Forwarded-Encrypted: i=1; AJvYcCWDR+4rlQCNWg+tMogtNg4LvGLvLb4ZUgoCl7kvmgcVDtDDjXK12YDbuapnnSE/iHONdacVsHoyHEfnGIBUe+OMpwFvxufq
-X-Gm-Message-State: AOJu0YxI9a1yQj9XyWtdFmiw81bx3aHc8JR30B8LZ9DL73eJ/gbxO3Xy
-	lNo9XeTjM/1uazvRv8aEYnVY2OXDeSLKl+nd19villLNxJSulsNtk4EwcM4eoFQ=
-X-Google-Smtp-Source: AGHT+IEtxJqu4j5l5kEVZts9GPmpqkb6+LMj87Bezmzc+8y/bcNnj/BuvWU5TphzRDvdVcPidUZI6Q==
-X-Received: by 2002:a05:6808:2991:b0:3d9:dcbc:6b7a with SMTP id 5614622812f47-3d9dcbc733bmr12440111b6e.13.1720935075379;
-        Sat, 13 Jul 2024 22:31:15 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc273d7sm18048705ad.120.2024.07.13.22.31.14
+        d=1e100.net; s=20230601; t=1720942729; x=1721547529;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y/SebrfEikJq8ECk0NytyAByK+ewDtjBFqNCZE/Bunw=;
+        b=pZCswHwsjiy9daPkdr0g7vZa5MeUvTvqjINu6EvpE2kzZmOenyBmJr+MnTOM5GK/wb
+         oUV2Cr7ca+o+QYmiMIdvTZpeVExpvJ269+z8OHX/6xKUjt1FG95mKRH2R8r6clXKVzzm
+         pf6FKH6sqSJoBvmcwApkc0EaZvf1YxSKx7QzOqXLshP/7wVeHFiJtkWBiwa1myb+M9nW
+         xgjpvMdzNmJwMbhnvFQbsBzJXS5HNuURkAgrIxb1D6nAtWY6YMT0+xn//wpfOqB9aOMz
+         Wui5zMVLhruYWP4DAOXWS/IvqmMJDU3M+HUQqn0gRak7lYND5G9zrpZ721YXsQ2iBVbk
+         Zlzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUX37G7f9GBBpCmJJ3y+SO6JoSF2JPH73+kIz/H7EheCGgMYO0zrjjUUCg+fvVMQwz/R4cObWYmar/jXpPUP6ygc1hiIzlM
+X-Gm-Message-State: AOJu0YzBu/xEjoT3AW+nQkd3ZjVpRSym2SJZ7JD26cZsXp804xiI5Lnp
+	wipTfcAx63Xr9ocymCD//8N9GB8XfNUh8JPNZETl7Bytc7FebbyFXG7fSaVnyCWf2UfIom//U9B
+	6iCUAriyWTfRjoW77zC72oEXTwBbYm8QWaGcCejWJh5DLPzABCkDFFg==
+X-Received: by 2002:a5d:6885:0:b0:367:9ab5:2c89 with SMTP id ffacd0b85a97d-367cea91ce0mr8942038f8f.30.1720942729119;
+        Sun, 14 Jul 2024 00:38:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFSMMoiqQ+jKFg/wkDA5WQf1lEooI7FM/27fu/XXp8qm7yGliPIqQE2zbCOoEObLvDZvhAtXQ==
+X-Received: by 2002:a5d:6885:0:b0:367:9ab5:2c89 with SMTP id ffacd0b85a97d-367cea91ce0mr8942022f8f.30.1720942728341;
+        Sun, 14 Jul 2024 00:38:48 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:240:5146:27c:20a3:47d4:904])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680db03f02sm3177735f8f.96.2024.07.14.00.38.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jul 2024 22:31:14 -0700 (PDT)
-Date: Sat, 13 Jul 2024 22:31:12 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Adam Nielsen <a.nielsen@shikadi.net>, netdev@vger.kernel.org
-Subject: Re: Is the manpage wrong for "ip address delete"?
-Message-ID: <20240713223112.4d5db4b6@hermes.local>
-In-Reply-To: <m2sewezypi.fsf@gmail.com>
-References: <20240712005252.5408c0a9@gnosticus.teln.shikadi.net>
-	<m2sewezypi.fsf@gmail.com>
+        Sun, 14 Jul 2024 00:38:47 -0700 (PDT)
+Date: Sun, 14 Jul 2024 03:38:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rbc@meta.com, horms@kernel.org,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+Message-ID: <20240714033803-mutt-send-email-mst@kernel.org>
+References: <20240712115325.54175-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240712115325.54175-1-leitao@debian.org>
 
-On Fri, 12 Jul 2024 11:33:45 +0100
-Donald Hunter <donald.hunter@gmail.com> wrote:
+On Fri, Jul 12, 2024 at 04:53:25AM -0700, Breno Leitao wrote:
+> After the commit bdacf3e34945 ("net: Use nested-BH locking for
+> napi_alloc_cache.") was merged, the following warning began to appear:
+> 
+> 	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
+> 
+> 	  __warn+0x12f/0x340
+> 	  napi_skb_cache_put+0x82/0x4b0
+> 	  napi_skb_cache_put+0x82/0x4b0
+> 	  report_bug+0x165/0x370
+> 	  handle_bug+0x3d/0x80
+> 	  exc_invalid_op+0x1a/0x50
+> 	  asm_exc_invalid_op+0x1a/0x20
+> 	  __free_old_xmit+0x1c8/0x510
+> 	  napi_skb_cache_put+0x82/0x4b0
+> 	  __free_old_xmit+0x1c8/0x510
+> 	  __free_old_xmit+0x1c8/0x510
+> 	  __pfx___free_old_xmit+0x10/0x10
+> 
+> The issue arises because virtio is assuming it's running in NAPI context
+> even when it's not, such as in the netpoll case.
+> 
+> To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
+> is available. Same for virtnet_poll_cleantx(), which always assumed that
+> it was in a NAPI context.
+> 
+> Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-> Adam Nielsen <a.nielsen@shikadi.net> writes:
-> 
-> > Hi all,
-> >
-> > I'm trying to remove an IP address from an interface, without having to
-> > specify it, but the behaviour doesn't seem to match the manpage.
-> >
-> > In the manpage for ip-address it states:
-> >
-> >     ip address delete - delete protocol address
-> >        Arguments: coincide with the arguments of ip addr add.  The
-> >        device name is a required  argument. The rest are optional.  If no
-> >        arguments are given, the first address is deleted.
-> >
-> > I can't work out how to trigger the "if no arguments are given" part:
-> >
-> >   $ ip address delete dev eth0
-> >   RTNETLINK answers: Operation not supported
-> >
-> >   $ ip address delete "" dev eth0
-> >   Error: any valid prefix is expected rather than "".
-> >
-> >   $ ip address dev eth0 delete
-> >   Command "dev" is unknown, try "ip address help".
-> >
-> > In the end I worked out that "ip address flush dev eth0" did what I
-> > wanted, but I'm just wondering whether the manpage needs to be updated
-> > to reflect the current behaviour?  
-> 
-> Yes, that paragraph of the manpage appears to be wrong. It does not
-> match the manpage synopsis, nor the usage from "ip address help" which
-> both say:
-> 
->   ip address del IFADDR dev IFNAME [ mngtmpaddr ]
-> 
-> The description does match the kernel behaviour for a given address
-> family, which you can see by using ynl:
-> 
-> $ ip a show dev veth0
-> 2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->     link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
->     inet 6.6.6.6/24 scope global fred
->        valid_lft forever preferred_lft forever
->     inet 2.2.2.2/24 scope global veth0
->        valid_lft forever preferred_lft forever
->     inet 4.4.4.4/24 scope global veth0
->        valid_lft forever preferred_lft forever
-> 
-> $ sudo ./tools/net/ynl/cli.py \
->   --spec Documentation/netlink/specs/rt_addr.yaml \
->   --do deladdr --json '{"ifa-family": 2, "ifa-index": 2}'
-> None
-> 
-> $ ip a show dev veth0
-> 2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->     link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
->     inet 2.2.2.2/24 scope global veth0
->        valid_lft forever preferred_lft forever
->     inet 4.4.4.4/24 scope global veth0
->        valid_lft forever preferred_lft forever
-> 
-> I guess it makes sense for "ip address del" to be stricter since 'first
-> address' is quite arbitrary behaviour.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-I wonder if it used to work long ago in some early version (like 2.4) and
-got broken and no one ever noticed
+though I'm not sure I understand the connection with bdacf3e34945.
+
+> ---
+>  drivers/net/virtio_net.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 0b4747e81464..fb1331827308 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2341,7 +2341,7 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+>  	return packets;
+>  }
+>  
+> -static void virtnet_poll_cleantx(struct receive_queue *rq)
+> +static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
+>  {
+>  	struct virtnet_info *vi = rq->vq->vdev->priv;
+>  	unsigned int index = vq2rxq(rq->vq);
+> @@ -2359,7 +2359,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+>  
+>  		do {
+>  			virtqueue_disable_cb(sq->vq);
+> -			free_old_xmit(sq, txq, true);
+> +			free_old_xmit(sq, txq, !!budget);
+>  		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>  
+>  		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+> @@ -2404,7 +2404,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>  	unsigned int xdp_xmit = 0;
+>  	bool napi_complete;
+>  
+> -	virtnet_poll_cleantx(rq);
+> +	virtnet_poll_cleantx(rq, budget);
+>  
+>  	received = virtnet_receive(rq, budget, &xdp_xmit);
+>  	rq->packets_in_napi += received;
+> @@ -2526,7 +2526,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+>  	txq = netdev_get_tx_queue(vi->dev, index);
+>  	__netif_tx_lock(txq, raw_smp_processor_id());
+>  	virtqueue_disable_cb(sq->vq);
+> -	free_old_xmit(sq, txq, true);
+> +	free_old_xmit(sq, txq, !!budget);
+>  
+>  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+>  		if (netif_tx_queue_stopped(txq)) {
+> -- 
+> 2.43.0
+
 
