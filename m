@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-111375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8CC930B7A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 22:12:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF04D930B7D
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 22:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A3A81F21F24
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 20:12:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC2211C208E0
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 20:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A5013D24C;
-	Sun, 14 Jul 2024 20:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D9913D28C;
+	Sun, 14 Jul 2024 20:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QivNE2Mm"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JKvST+et"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1E4136E37
-	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 20:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E1313CFAA
+	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 20:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720987957; cv=none; b=XUX2N+IwgzR5SMrRFC5PDPwqUPWXPxlcKkErLRCfe/l5YEeYU1Z1aJ1DOweyKhwkWNdHVg9ZwxyFp5A/wCwH96FMRyMVxUy/AkseFC+6AeWqux6B+wljvc3UADvK8CrAoG/KK7CCS91aH9R3Xyxewpz+7OANgiCU4ZxODvNHln4=
+	t=1720987997; cv=none; b=JzfI7zeuumuQEX6i15t0YwhKaog+CHgUFRB3ZxAhF7iUy1F/Egxofnlm3zngEZCQClmqvkVsuUtjvYIAPSrZtL3IeVd26KRDWDpXudOrWXIYJtmyOZTg0uHQoMtFn4vlWqlWU6LKfHIH9uxDiBX0uYk0EBRT6WHDIzo/NGDTDrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720987957; c=relaxed/simple;
-	bh=IppDdL//4dDcsyVcTA5+3sYVXW55FrdfkQqlnDiJyoM=;
+	s=arc-20240116; t=1720987997; c=relaxed/simple;
+	bh=ilOJ/OrP5tItjuxQ5fw3Geh6ZPWSUHwMnmtx2XkHaMs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DGRUPGZ1f5GLxfE5GegpbOP7ttoSL2q4zQeyDrCv9ByDdSQPehL19lT31MBai/8WPLkCNxK49i2sFMeth29+Ii03wd3haMYlJOWX+z9V7d13DEoNJsvAlspmLdDhC/EC0CsKS1dq5UbRQusOkxsZ12PkQiFn/Lg1bsaaaabOmV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QivNE2Mm; arc=none smtp.client-ip=209.85.210.173
+	 In-Reply-To:Content-Type; b=LIPOu7DsdbxczXYNZ5m6QTqzsY6ud9eDcliHmWf8Q6+hR7JI+ZgWss4tdC6Sf4ubGGelHdbW7vvWxhZMGNKfYEIIA6NcB2+Jx0fCd9wfzjj3XAvYR2f13t2E1ZTm/Uq8JA+ltT0/X/gew8D2d6PEHp6cQ5qjgMM8e81ak2jBHI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JKvST+et; arc=none smtp.client-ip=209.85.210.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70af81e8439so3138744b3a.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 13:12:36 -0700 (PDT)
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-70448cae1e0so2077336a34.3
+        for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 13:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1720987956; x=1721592756; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1720987995; x=1721592795; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MwIGMyOoCyC8VqJwpvGq37qmJXUXslEzbeWZExSCTEc=;
-        b=QivNE2MmHyIhpw++xelfw380JI7GVRofWiu+tbdQSIl0owPR6cQwgrfcSfAnHVn/GH
-         h+KSNarU1CVaOqzWi5/cAcBm2RY6025YlVXAGztycWnhdGgc8turUoaFARa4WAq3lRY2
-         l9iHYgotkNaDt4RfVM3bPFmsoX7PgEG0M4Zic=
+        bh=4pBiaszZ5OSukTVSAw790615vSBitX0+TXoGcDksXWQ=;
+        b=JKvST+et8yihC2b5ZO2loURfGp2/DxYqPRMYGv9EwvAzbhHOvBGfWZ8MCuZsuKJ+cK
+         Ww7OtwQxayrXe5eQI1Vsu4Hwz2Zl4lIXfg+oAQvldBeMJyMgG8Sa8qnQ+XqqO1En0xCg
+         p+d6ssX1EMOpmtAyK6wcQUcI3wP4KiHYOJEcQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720987956; x=1721592756;
+        d=1e100.net; s=20230601; t=1720987995; x=1721592795;
         h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=MwIGMyOoCyC8VqJwpvGq37qmJXUXslEzbeWZExSCTEc=;
-        b=Q+7ieiocmhq0eATziekwbzc1yYMuN77LO5y6dNnfEa9qY/5egRTOTP5KFSjoVagyoJ
-         ZUTDjYEVDIUYfZWPAQ3EIRLeJXe74Euk9IqTHFy2G1DTY3aEzCtpbcjpo4JJp1zsPgBW
-         cxz1WX1SEp8fE7n53VyzPtpX4OoaDSUrdqEY0yZma+rAGijyhICGsYTfSI+7Ezibcuik
-         M/2lkSRi2uDLzksuqPgWS00sgB3c01gtubLlygAbeMr+WNfxFhSOCYdvCvOfgQFbZP8L
-         QQ9uSUei9FBSTNSbL1JBvxI1OcQ1GaKo/nSTQxUSnmav1Y6JVjuWlBygnGkQUgWK4GIw
-         jOuw==
-X-Gm-Message-State: AOJu0YxssM4G7GPbbMU5eBA7J1Fvdi1qHogP34cza9Y1V1V52X+pmgtT
-	xcFL7g+NtMSyGqtJwM38XnLKp3egIdeZZ81g9/PyOjoPVmcHXzav0KQQPtQCkA==
-X-Google-Smtp-Source: AGHT+IE2qHVrZb6EfJKkQuDu5FIDb2E9ESJUpMC07Z3WKPXkzo13+C8D1dcx2ZgKC+0rzdwb11dGaA==
-X-Received: by 2002:a05:6a00:180e:b0:70b:cf1:8dc9 with SMTP id d2e1a72fcca58-70b435f6239mr23347731b3a.25.1720987955621;
-        Sun, 14 Jul 2024 13:12:35 -0700 (PDT)
+        bh=4pBiaszZ5OSukTVSAw790615vSBitX0+TXoGcDksXWQ=;
+        b=kCgCPfXAnWzX5P440RBHBdshO/GJYMpVsNX5Hdp2+vBahuqo8p/R3ma1Rj+j/3qvVU
+         T6/vbEGZ3SxoX8C40Qzdp1B4OigTaW4E/ib0JhN1kmvqXdnk03pzCR7DXi2nb3ajJIli
+         P/xffpHIZB7vyJi1jedLWwGzODNr4lyQ+HGGcMoIYVrppqKNuA4afHro1OX9rjxFn/UH
+         KWAJTqxt6sN8ZLt7s2lm06pjGmWu1Q9z5MfZ4S58DqAg4Isvly4K+x0IvPAK2UTZJgga
+         9mfET2fJJLpoEc1xAI+3Uqz8nDH0To813RVYWz8l+YAJYfO0tSuTzEtmQpBH8/Gsh4os
+         KPaw==
+X-Gm-Message-State: AOJu0YxdJ3zzBwzOsJ98omEZKRZopGd78NjW2zNgJXw3+rZ5XDAYdlMn
+	moU8+7VcgM5hQ13PBYQsYYWELPzL8MM0EUDWJyWIrOlbt4pX+dXboY8eXj6xMA==
+X-Google-Smtp-Source: AGHT+IFfEIzml9ZKjQB5MeghetlQ9ipNSyYzG9gVFdT3C0zM4KUTcV020jwr/9oafD/DRXI/E76FPQ==
+X-Received: by 2002:a05:6830:44a1:b0:708:bea8:ae3f with SMTP id 46e09a7af769-708bea8afdemr9240361a34.25.1720987994722;
+        Sun, 14 Jul 2024 13:13:14 -0700 (PDT)
 Received: from ?IPV6:2600:8802:b00:ba1:ed87:a284:3a25:6aa1? ([2600:8802:b00:ba1:ed87:a284:3a25:6aa1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7ec7d0cbsm2935837b3a.137.2024.07.14.13.12.33
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7eb9e1f9sm2926228b3a.44.2024.07.14.13.13.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jul 2024 13:12:34 -0700 (PDT)
-Message-ID: <a0be75e0-ee6d-4767-afa2-30c825db411c@broadcom.com>
-Date: Sun, 14 Jul 2024 13:12:35 -0700
+        Sun, 14 Jul 2024 13:13:13 -0700 (PDT)
+Message-ID: <6dc73033-77fd-4218-b144-2086357f96ff@broadcom.com>
+Date: Sun, 14 Jul 2024 13:13:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,8 +72,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 3/4] dt-bindings: ethernet-phy: add optional brr-mode
- flag
+Subject: Re: [PATCH v12 4/4] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
 To: =?UTF-8?B?S2FtaWwgSG9yw6FrICgyTik=?= <kamilh@axis.com>,
  bcm-kernel-feedback-list@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
  linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
@@ -82,7 +82,7 @@ To: =?UTF-8?B?S2FtaWwgSG9yw6FrICgyTik=?= <kamilh@axis.com>,
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20240712150709.3134474-1-kamilh@axis.com>
- <20240712150709.3134474-4-kamilh@axis.com>
+ <20240712150709.3134474-5-kamilh@axis.com>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
@@ -116,11 +116,11 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240712150709.3134474-4-kamilh@axis.com>
+In-Reply-To: <20240712150709.3134474-5-kamilh@axis.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c8ff17061d3abb67"
+	boundary="0000000000001bfc24061d3abe19"
 
---000000000000c8ff17061d3abb67
+--0000000000001bfc24061d3abe19
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
@@ -128,25 +128,25 @@ Content-Transfer-Encoding: 8bit
 
 
 On 7/12/2024 8:07 AM, Kamil Horák (2N) wrote:
-> There is a group of PHY chips supporting BroadR-Reach link modes in
-> a manner allowing for more or less identical register usage as standard
-> Clause 22 PHY.
-> These chips support standard Ethernet link modes as well, however, the
-> circuitry is mutually exclusive and cannot be auto-detected.
-> The link modes in question are 100Base-T1 as defined in IEEE802.3bw,
-> based on Broadcom's 1BR-100 link mode, and newly defined 10Base-T1BRR
-> (1BR-10 in Broadcom documents).
-> 
-> Add optional brr-mode flag to switch the PHY to BroadR-Reach mode.
+> Implement single-pair BroadR-Reach modes on bcm5481x PHY by Broadcom.
+> Create set of functions alternative to IEEE 802.3 to handle
+> configuration of these modes on compatible Broadcom PHYs.
+> There is only subset of capabilities supported because of limited
+> collection of hardware available for the development.
+> For BroadR-Reach capable PHYs, the LRE (Long Reach Ethernet)
+> alternative register set is handled. Only bcm54811 PHY is verified,
+> for bcm54810, there is some support possible but untested. There
+> is no auto-negotiation of the link parameters (called LDS in the
+> Broadcom terminology, Long-Distance Signaling) for bcm54811.
+> It should be possible to enable LDS for bcm54810.
 > 
 > Signed-off-by: Kamil Horák (2N) <kamilh@axis.com>
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
 Florian
 
---000000000000c8ff17061d3abb67
+--0000000000001bfc24061d3abe19
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -217,15 +217,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBprSqZU17HBIkeI
-S8dn4QPte2eQkToY0glRujE53cjuMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTI0MDcxNDIwMTIzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILj1XeZSd097RGp9
+HVpBPCkrlwIaiyYrhDhXPnORPZb5MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDcxNDIwMTMxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC8w5QGRAaandphkJV2AKDIeMpdQ7z0w4E1
-+h/cx1P0bRuj6z15wGnHsxB/NUGn4Bisx032uH0xWBqloUtnI2BkfBKHx2W9FY4702GGvApzN9ti
-HzhSrYEK9cp9JKZCHA5JaxaBrFDJuWz4Vp0dYFMZFnpmrExA+h+h1GDiKUi4Oz/helA1+RudlDwI
-o6GI4QEDi/FgEssBDyzueEvEXdD5fQlT2bjDWhL+0P7yokaIfDwLpTvojdXUYF/7KAZHoizIHUbo
-0/5nImP6Gi3GMyc9XE0LRYlx4rpMoJhXOFP61Xk5qRSMD/LT7sAjJNa6GA+palKaIEiA63hK4KeG
-c/A1
---000000000000c8ff17061d3abb67--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQASyMs96W+pk8fM6/3Tni4EHyEXvnC15o+m
+bSVKvGJrwQ1RoqYFTMYTSX3aV8QGmKI2Kx9n3c3Xptz/TlSLYGSOtKZxoVgZDcJDsMc9mv4Zc1uS
+KZW3JYA+PMO/1aMzRdFAap+9zGv+xOHrks34Z5+eKtVSbIuKfxCJ3aICnKfKxTDLg+U3SSSusavq
+XTP58b/hCMhKu7yrsX/mZrQX+yq90GXnzuoeTNTatgetQO9y8s2EWqBV/jYe6zzhPTXnzYQLlXD4
+XZsqguwcUFxzmUdPvpA6/0Q4NQAhefwHa3wcGFU1IGSWukzQkLs0pSjttH4h+kW71/y/PB4iO8Xv
+3rFZ
+--0000000000001bfc24061d3abe19--
 
