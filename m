@@ -1,111 +1,64 @@
-Return-Path: <netdev+bounces-111353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CAC930AAA
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 18:02:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63978930AB2
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 18:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1CB31F20FF7
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:02:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A4F11C208A5
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F0013A27E;
-	Sun, 14 Jul 2024 16:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8C313A88A;
+	Sun, 14 Jul 2024 16:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iK9RIOBu"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="J9eFUlRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f194.google.com (mail-oi1-f194.google.com [209.85.167.194])
+Received: from msa.smtpout.orange.fr (out-67.smtpout.orange.fr [193.252.22.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E332171BB;
-	Sun, 14 Jul 2024 16:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40DF26AD3;
+	Sun, 14 Jul 2024 16:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720972968; cv=none; b=DIqvfvqm6ACzUlicy5sabQ55sO9O1Fp4oeLZjZMphhX92knio7git5gIKkEi7Nk9q7IIQZGIb/WH+hLaHMYxkfBwu32tuHNUL7OSHOrfE2Qa56u504qNWqPAu9jGiwZ0JtfUUijKfuoRlEh+54loBtp+jZ3lrCXboWrEt34eJVw=
+	t=1720973184; cv=none; b=ttPJGzHp5uHQPsr5SpwbsIPiKOeR6/pUqNEc/K81hc6lLAYJWvRgEtwkaUpdMvOISzCBaw0SPKNzCpiAFHsfgkvQH4gEUTS5OaG8KMzlAEKTfwqkpYuD/ExBr7ubd5wjXA0B/PGoLFrm+W5IiJZDiBFJQSY6cTV7igAiurvjfxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720972968; c=relaxed/simple;
-	bh=JK5CLW/aIZ84XUM/4CQx9DwLVq4SKC7xt14Rv+O7IY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UCJo3o6KwIWlNw/rKi3s+CB6YbWZSH0SYekKd6lTK+0Db4U5FOEiTb2EnV4zSbCeNULu5j/Cl+EjeJnn3qOsI/jy23d8p9Gx4qjC/Po0z/6uBCScTy7w2iaUnkEeJaUvNvDMYMOFoZBEVOpH9kdQ0TK+UWpvEtf/Z2m8fW8+WTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iK9RIOBu; arc=none smtp.client-ip=209.85.167.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f194.google.com with SMTP id 5614622812f47-3dab349467dso762794b6e.1;
-        Sun, 14 Jul 2024 09:02:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720972965; x=1721577765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QC04o2Oc39KDZ+EJDTk3+OtuWSzsHOXwGAlbi4rw6ck=;
-        b=iK9RIOBuhsFcoe1ftLsFjH3d8oGwzIMeWl8yz0d9in+k8whYQVUwAIik4Aq32bg9M6
-         rcgoo/dg8jRWgN/Bl6qu8bdhtaGxsfXtRTB7oBOsbV28VrgzTHpc+7O2i8aJ1Q5Fp49Q
-         6N/pDT0AzwlQ8jwOrC3SzpmSgrqlRJrsEQmaLRjdq7PKNc0YqyR2dpCbLAvAOGBKN2nk
-         1FZHSjQkUhcJteT2FBmzXRo6L1cYPq/iBjs3bfRNKx60vH7mf2wvHcHHHhIR2JbEJyBn
-         VMSjo6OVlXCBx/YWklUZtbkYOC1sanYozcW2BNgj24HP563OOhUSMVaCMTUAbv+pdw9/
-         8rUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720972965; x=1721577765;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QC04o2Oc39KDZ+EJDTk3+OtuWSzsHOXwGAlbi4rw6ck=;
-        b=kx7/DOm6cGtXnOnE4tD3ATqEcEZKQ0fzf1Rw5+Dx7sBFOfrJKCYlsikPOIu3dOQzAi
-         NwtFZTCNsUMZn/0WOZ7AtIuoS11H36hB716ptj3eWH80sIE/7VXR77ai76RojBGtGRLe
-         P+2FuDDxmYYEYpv9ke5vTUXMXpF3Y6jTjsGKAplaLajPoo6RwdVGvMu5qGLjImt+dOXt
-         ifAKH7MrHe8W+SGT9nPpKpkFUygFafXvHC5O+h/4HCxmDwMJxrbTQM4k06RGvRG0rHQ2
-         dPkmNgheVs3vTnENjEVARwhC6pTXWCbjn85xY/2l1EWRp87BW6ndjyiRB3hkiozgEnFN
-         Rt+g==
-X-Forwarded-Encrypted: i=1; AJvYcCX4VCAMv3KC/Hsl/ktoYOBa6h+aZ+i/NOtQkb9pkmmMpH+ZUkVqiBnltrqUOOGZol6mhkOlzRtFHzHqFgwoDoTBNXeV30IEGLTtFyHxXcGoMdH9W1a44TZEyPUMYk86DoeSMYCHuuh7KixGsC8y+UTn/8R4ydonGrOdGLKcBiRtc9W0rwRrHOmW5luBZaXyqq4oS+FwrS2Zou+hlBKPUi9KPjnY3lo=
-X-Gm-Message-State: AOJu0YyHkxcaPaHc1qeIRpnYO1U5+gYC1HSRFIvSAot32rE9T/nHeqp/
-	U8AaX/2c5hgPJwkfC24gq8fMNL8HJOszN89alT1fmhcyiWq9GGe0
-X-Google-Smtp-Source: AGHT+IHJs/7FdElGIO/Zgf0ElR99qNvty5EJddX01vOD2HNkiMp/pAeUblyMUM+sL6Xzrs51bo4ndA==
-X-Received: by 2002:a05:6808:118c:b0:3d5:5d4c:d15a with SMTP id 5614622812f47-3d93c0bf841mr14989295b6e.55.1720972964277;
-        Sun, 14 Jul 2024 09:02:44 -0700 (PDT)
-Received: from vadorovsky-macbookpro.. ([207.35.255.94])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7619789aesm14010566d6.33.2024.07.14.09.02.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jul 2024 09:02:43 -0700 (PDT)
-From: Michal Rostecki <vadorovsky@gmail.com>
-To: 
-Cc: Michal Rostecki <vadorovsky@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>,
-	Rae Moar <rmoar@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Martin Rodriguez Reboredo <yakoyoku@gmail.com>,
-	Finn Behrens <me@kloenk.dev>,
-	Manmohan Shukla <manmshuk@gmail.com>,
-	Valentin Obst <kernel@valentinobst.de>,
-	Laine Taffin Altman <alexanderaltman@me.com>,
-	Danilo Krummrich <dakr@redhat.com>,
-	Yutaro Ohno <yutaro.ono.418@gmail.com>,
-	Tiago Lam <tiagolam@gmail.com>,
-	Charalampos Mitrodimas <charmitro@posteo.net>,
-	Ben Gooding <ben.gooding.dev@gmail.com>,
-	Roland Xu <mu001999@outlook.com>,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	netdev@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] rust: str: Use `core::CStr`, remove the custom `CStr` implementation
-Date: Sun, 14 Jul 2024 18:02:19 +0200
-Message-ID: <20240714160238.238708-1-vadorovsky@gmail.com>
+	s=arc-20240116; t=1720973184; c=relaxed/simple;
+	bh=X47K9H9ajGdjebb0A7a8ymmuICaFX4e+uNthMMi5feY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FNdULtrSChBU3TX9b76hmLOffVVivlmk0rrN9KyvYHOakXtohju2X48ZA9AHuPt3zMqPjZ1cR7CjBSG3fHAtKtrdYe19QAVO33Q2tsS0+Xtho8B/Wp9jUsJGSFLKtVt+wZF76HFA4WtWEnEB+P4LWxFEbGrYdNSMjueK1FrYokQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=J9eFUlRM; arc=none smtp.client-ip=193.252.22.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id T1jksfq6pEfqMT1jlscsxd; Sun, 14 Jul 2024 18:06:10 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1720973170;
+	bh=r+UdIaj/aT0W1EAZQ/bo0go3SPqNogmj4Rc2M96MZjY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=J9eFUlRMwBbPLQSYkLePbPlvg9SYOL5b+GmKb08/x+en7cvRvsgGK5sBU3PLVaS5g
+	 dmT5Nyy8gW/6kZQY4yDVFcKHZVpnw+tic7ikLEEEacwRpIq1WvAVQcLUXt223jiuq3
+	 v4DJLbOQfHU6+T8Ag39FAiSDxcRvy9KRG4xSRYIIVNL8XIlb2tjKh33YKaW1Ldlvv6
+	 R9WNXusOaltLkalM53D5G9332g6iTx/+vHvAWq8ugb0BA58hii0NTwvQhFegP4FbPU
+	 SZpAXsH5/m7bGT8n/ZCVvJCOEY1WSYCNdfCDOYpua0DrLrzKnnstNF/AwP6T6wJnJM
+	 q82p0pNKNc8Fw==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 14 Jul 2024 18:06:10 +0200
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] llc: Constify struct llc_conn_state_trans
+Date: Sun, 14 Jul 2024 18:05:56 +0200
+Message-ID: <87cda89e4c9414e71d1a54bb1eb491b0e7f70375.1720973029.git.christophe.jaillet@wanadoo.fr>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -113,900 +66,2365 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-`CStr` became a part of `core` library in Rust 1.75, therefore there is
-no need to keep the custom implementation.
+'struct llc_conn_state_trans' are not modified in this driver.
 
-`core::CStr` behaves generally the same as the removed implementation,
-with the following differences:
+Constifying this structure moves some data to a read-only section, so
+increase overall security.
 
-- It does not implement `Display` (but implements `Debug`).
-- It does not provide `from_bytes_with_nul_unchecked_mut` method.
-  - It was used only in `DerefMut` implementation for `CString`. This
-    change replaces it with a manual cast to `&mut CStr`.
-  - Otherwise, having such a method is not really desirable. `CStr` is
-    a reference type
-    or `str` are usually not supposed to be modified.
-- It has `as_ptr()` method instead of `as_char_ptr()`, which also returns
-  `*const c_char`.
+On a x86_64, with allmodconfig, as an example:
+Before:
+======
+   text	   data	    bss	    dec	    hex	filename
+  13923	  10896	     32	  24851	   6113	net/llc/llc_c_st.o
 
-Rust also introduces C literals (`c""`), so the `c_str` macro is removed
-here as well.
+After:
+=====
+   text	   data	    bss	    dec	    hex	filename
+  21859	   3328	      0	  25187	   6263	net/llc/llc_c_st.o
 
-Signed-off-by: Michal Rostecki <vadorovsky@gmail.com>
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- rust/kernel/error.rs        |   7 +-
- rust/kernel/init.rs         |   8 +-
- rust/kernel/kunit.rs        |  16 +-
- rust/kernel/net/phy.rs      |   2 +-
- rust/kernel/prelude.rs      |   4 +-
- rust/kernel/str.rs          | 490 +-----------------------------------
- rust/kernel/sync.rs         |  13 +-
- rust/kernel/sync/condvar.rs |   5 +-
- rust/kernel/sync/lock.rs    |   6 +-
- rust/kernel/workqueue.rs    |  10 +-
- scripts/rustdoc_test_gen.rs |   4 +-
- 11 files changed, 57 insertions(+), 508 deletions(-)
+Compile tested-only.
+---
+ include/net/llc_c_st.h |   4 +-
+ net/llc/llc_c_st.c     | 500 ++++++++++++++++++++---------------------
+ net/llc/llc_conn.c     |  20 +-
+ 3 files changed, 262 insertions(+), 262 deletions(-)
 
-diff --git a/rust/kernel/error.rs b/rust/kernel/error.rs
-index 55280ae9fe40..18808b29604d 100644
---- a/rust/kernel/error.rs
-+++ b/rust/kernel/error.rs
-@@ -4,10 +4,11 @@
- //!
- //! C header: [`include/uapi/asm-generic/errno-base.h`](srctree/include/uapi/asm-generic/errno-base.h)
- 
--use crate::{alloc::AllocError, str::CStr};
-+use crate::alloc::AllocError;
- 
- use alloc::alloc::LayoutError;
- 
-+use core::ffi::CStr;
- use core::fmt;
- use core::num::TryFromIntError;
- use core::str::Utf8Error;
-@@ -142,7 +143,7 @@ pub fn name(&self) -> Option<&'static CStr> {
-             None
-         } else {
-             // SAFETY: The string returned by `errname` is static and `NUL`-terminated.
--            Some(unsafe { CStr::from_char_ptr(ptr) })
-+            Some(unsafe { CStr::from_ptr(ptr) })
-         }
-     }
- 
-@@ -164,7 +165,7 @@ fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-             None => f.debug_tuple("Error").field(&-self.0).finish(),
-             // SAFETY: These strings are ASCII-only.
-             Some(name) => f
--                .debug_tuple(unsafe { core::str::from_utf8_unchecked(name) })
-+                .debug_tuple(unsafe { core::str::from_utf8_unchecked(name.to_bytes()) })
-                 .finish(),
-         }
-     }
-diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
-index 68605b633e73..af0017e56c0e 100644
---- a/rust/kernel/init.rs
-+++ b/rust/kernel/init.rs
-@@ -46,7 +46,7 @@
- //! }
- //!
- //! let foo = pin_init!(Foo {
--//!     a <- new_mutex!(42, "Foo::a"),
-+//!     a <- new_mutex!(42, c"Foo::a"),
- //!     b: 24,
- //! });
- //! ```
-@@ -65,7 +65,7 @@
- //! #     b: u32,
- //! # }
- //! # let foo = pin_init!(Foo {
--//! #     a <- new_mutex!(42, "Foo::a"),
-+//! #     a <- new_mutex!(42, c"Foo::a"),
- //! #     b: 24,
- //! # });
- //! let foo: Result<Pin<Box<Foo>>> = Box::pin_init(foo, GFP_KERNEL);
-@@ -81,7 +81,7 @@
- //! ```rust
- //! # use kernel::sync::{new_mutex, Arc, Mutex};
- //! let mtx: Result<Arc<Mutex<usize>>> =
--//!     Arc::pin_init(new_mutex!(42, "example::mtx"), GFP_KERNEL);
-+//!     Arc::pin_init(new_mutex!(42, c"example::mtx"), GFP_KERNEL);
- //! ```
- //!
- //! To declare an init macro/function you just return an [`impl PinInit<T, E>`]:
-@@ -99,7 +99,7 @@
- //! impl DriverData {
- //!     fn new() -> impl PinInit<Self, Error> {
- //!         try_pin_init!(Self {
--//!             status <- new_mutex!(0, "DriverData::status"),
-+//!             status <- new_mutex!(0, c"DriverData::status"),
- //!             buffer: Box::init(kernel::init::zeroed(), GFP_KERNEL)?,
- //!         })
- //!     }
-diff --git a/rust/kernel/kunit.rs b/rust/kernel/kunit.rs
-index 0ba77276ae7e..6da0d5e237b6 100644
---- a/rust/kernel/kunit.rs
-+++ b/rust/kernel/kunit.rs
-@@ -56,9 +56,13 @@ macro_rules! kunit_assert {
-                 break 'out;
-             }
- 
--            static FILE: &'static $crate::str::CStr = $crate::c_str!($file);
-+            static FILE: &'static core::ffi::CStr = $file;
-             static LINE: i32 = core::line!() as i32 - $diff;
--            static CONDITION: &'static $crate::str::CStr = $crate::c_str!(stringify!($condition));
-+            static CONDITION: &'static core::ffi::CStr = unsafe {
-+                core::ffi::CStr::from_bytes_with_nul_unchecked(
-+                    core::concat!(stringify!($condition), "\0").as_bytes()
-+                )
-+            };
- 
-             // SAFETY: FFI call without safety requirements.
-             let kunit_test = unsafe { $crate::bindings::kunit_get_current_test() };
-@@ -71,11 +75,11 @@ macro_rules! kunit_assert {
-                 //
-                 // This mimics KUnit's failed assertion format.
-                 $crate::kunit::err(format_args!(
--                    "    # {}: ASSERTION FAILED at {FILE}:{LINE}\n",
-+                    "    # {:?}: ASSERTION FAILED at {FILE:?}:{LINE:?}\n",
-                     $name
-                 ));
-                 $crate::kunit::err(format_args!(
--                    "    Expected {CONDITION} to be true, but is false\n"
-+                    "    Expected {CONDITION:?} to be true, but is false\n"
-                 ));
-                 $crate::kunit::err(format_args!(
-                     "    Failure not reported to KUnit since this is a non-KUnit task\n"
-@@ -98,12 +102,12 @@ unsafe impl Sync for Location {}
-             unsafe impl Sync for UnaryAssert {}
- 
-             static LOCATION: Location = Location($crate::bindings::kunit_loc {
--                file: FILE.as_char_ptr(),
-+                file: FILE.as_ptr(),
-                 line: LINE,
-             });
-             static ASSERTION: UnaryAssert = UnaryAssert($crate::bindings::kunit_unary_assert {
-                 assert: $crate::bindings::kunit_assert {},
--                condition: CONDITION.as_char_ptr(),
-+                condition: CONDITION.as_ptr(),
-                 expected_true: true,
-             });
- 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index fd40b703d224..19f45922ec42 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -502,7 +502,7 @@ unsafe impl Sync for DriverVTable {}
- pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
-     // INVARIANT: All the fields of `struct phy_driver` are initialized properly.
-     DriverVTable(Opaque::new(bindings::phy_driver {
--        name: T::NAME.as_char_ptr().cast_mut(),
-+        name: T::NAME.as_ptr().cast_mut(),
-         flags: T::FLAGS,
-         phy_id: T::PHY_DEVICE_ID.id,
-         phy_id_mask: T::PHY_DEVICE_ID.mask_as_int(),
-diff --git a/rust/kernel/prelude.rs b/rust/kernel/prelude.rs
-index b37a0b3180fb..5efabfaa5804 100644
---- a/rust/kernel/prelude.rs
-+++ b/rust/kernel/prelude.rs
-@@ -12,7 +12,7 @@
- //! ```
- 
- #[doc(no_inline)]
--pub use core::pin::Pin;
-+pub use core::{ffi::CStr, pin::Pin};
- 
- pub use crate::alloc::{box_ext::BoxExt, flags::*, vec_ext::VecExt};
- 
-@@ -35,7 +35,7 @@
- 
- pub use super::error::{code::*, Error, Result};
- 
--pub use super::{str::CStr, ThisModule};
-+pub use super::{ThisModule};
- 
- pub use super::init::{InPlaceInit, Init, PinInit};
- 
-diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-index bb8d4f41475b..d1e6335a02a3 100644
---- a/rust/kernel/str.rs
-+++ b/rust/kernel/str.rs
-@@ -4,8 +4,9 @@
- 
- use crate::alloc::{flags::*, vec_ext::VecExt, AllocError};
- use alloc::vec::Vec;
-+use core::ffi::CStr;
- use core::fmt::{self, Write};
--use core::ops::{self, Deref, DerefMut, Index};
-+use core::ops::{Deref, DerefMut};
- 
- use crate::error::{code::*, Error};
- 
-@@ -41,11 +42,11 @@ impl fmt::Display for BStr {
-     /// # use kernel::{fmt, b_str, str::{BStr, CString}};
-     /// let ascii = b_str!("Hello, BStr!");
-     /// let s = CString::try_from_fmt(fmt!("{}", ascii)).unwrap();
--    /// assert_eq!(s.as_bytes(), "Hello, BStr!".as_bytes());
-+    /// assert_eq!(s.to_bytes(), "Hello, BStr!".as_bytes());
-     ///
-     /// let non_ascii = b_str!("🦀");
-     /// let s = CString::try_from_fmt(fmt!("{}", non_ascii)).unwrap();
--    /// assert_eq!(s.as_bytes(), "\\xf0\\x9f\\xa6\\x80".as_bytes());
-+    /// assert_eq!(s.to_bytes(), "\\xf0\\x9f\\xa6\\x80".as_bytes());
-     /// ```
-     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-         for &b in &self.0 {
-@@ -72,11 +73,11 @@ impl fmt::Debug for BStr {
-     /// // Embedded double quotes are escaped.
-     /// let ascii = b_str!("Hello, \"BStr\"!");
-     /// let s = CString::try_from_fmt(fmt!("{:?}", ascii)).unwrap();
--    /// assert_eq!(s.as_bytes(), "\"Hello, \\\"BStr\\\"!\"".as_bytes());
-+    /// assert_eq!(s.to_bytes(), "\"Hello, \\\"BStr\\\"!\"".as_bytes());
-     ///
-     /// let non_ascii = b_str!("😺");
-     /// let s = CString::try_from_fmt(fmt!("{:?}", non_ascii)).unwrap();
--    /// assert_eq!(s.as_bytes(), "\"\\xf0\\x9f\\x98\\xba\"".as_bytes());
-+    /// assert_eq!(s.to_bytes(), "\"\\xf0\\x9f\\x98\\xba\"".as_bytes());
-     /// ```
-     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-         f.write_char('"')?;
-@@ -128,477 +129,11 @@ macro_rules! b_str {
-     }};
- }
- 
--/// Possible errors when using conversion functions in [`CStr`].
--#[derive(Debug, Clone, Copy)]
--pub enum CStrConvertError {
--    /// Supplied bytes contain an interior `NUL`.
--    InteriorNul,
--
--    /// Supplied bytes are not terminated by `NUL`.
--    NotNulTerminated,
--}
--
--impl From<CStrConvertError> for Error {
--    #[inline]
--    fn from(_: CStrConvertError) -> Error {
--        EINVAL
--    }
--}
--
--/// A string that is guaranteed to have exactly one `NUL` byte, which is at the
--/// end.
--///
--/// Used for interoperability with kernel APIs that take C strings.
--#[repr(transparent)]
--pub struct CStr([u8]);
--
--impl CStr {
--    /// Returns the length of this string excluding `NUL`.
--    #[inline]
--    pub const fn len(&self) -> usize {
--        self.len_with_nul() - 1
--    }
--
--    /// Returns the length of this string with `NUL`.
--    #[inline]
--    pub const fn len_with_nul(&self) -> usize {
--        // SAFETY: This is one of the invariant of `CStr`.
--        // We add a `unreachable_unchecked` here to hint the optimizer that
--        // the value returned from this function is non-zero.
--        if self.0.is_empty() {
--            unsafe { core::hint::unreachable_unchecked() };
--        }
--        self.0.len()
--    }
--
--    /// Returns `true` if the string only includes `NUL`.
--    #[inline]
--    pub const fn is_empty(&self) -> bool {
--        self.len() == 0
--    }
--
--    /// Wraps a raw C string pointer.
--    ///
--    /// # Safety
--    ///
--    /// `ptr` must be a valid pointer to a `NUL`-terminated C string, and it must
--    /// last at least `'a`. When `CStr` is alive, the memory pointed by `ptr`
--    /// must not be mutated.
--    #[inline]
--    pub unsafe fn from_char_ptr<'a>(ptr: *const core::ffi::c_char) -> &'a Self {
--        // SAFETY: The safety precondition guarantees `ptr` is a valid pointer
--        // to a `NUL`-terminated C string.
--        let len = unsafe { bindings::strlen(ptr) } + 1;
--        // SAFETY: Lifetime guaranteed by the safety precondition.
--        let bytes = unsafe { core::slice::from_raw_parts(ptr as _, len as _) };
--        // SAFETY: As `len` is returned by `strlen`, `bytes` does not contain interior `NUL`.
--        // As we have added 1 to `len`, the last byte is known to be `NUL`.
--        unsafe { Self::from_bytes_with_nul_unchecked(bytes) }
--    }
--
--    /// Creates a [`CStr`] from a `[u8]`.
--    ///
--    /// The provided slice must be `NUL`-terminated, does not contain any
--    /// interior `NUL` bytes.
--    pub const fn from_bytes_with_nul(bytes: &[u8]) -> Result<&Self, CStrConvertError> {
--        if bytes.is_empty() {
--            return Err(CStrConvertError::NotNulTerminated);
--        }
--        if bytes[bytes.len() - 1] != 0 {
--            return Err(CStrConvertError::NotNulTerminated);
--        }
--        let mut i = 0;
--        // `i + 1 < bytes.len()` allows LLVM to optimize away bounds checking,
--        // while it couldn't optimize away bounds checks for `i < bytes.len() - 1`.
--        while i + 1 < bytes.len() {
--            if bytes[i] == 0 {
--                return Err(CStrConvertError::InteriorNul);
--            }
--            i += 1;
--        }
--        // SAFETY: We just checked that all properties hold.
--        Ok(unsafe { Self::from_bytes_with_nul_unchecked(bytes) })
--    }
--
--    /// Creates a [`CStr`] from a `[u8]` without performing any additional
--    /// checks.
--    ///
--    /// # Safety
--    ///
--    /// `bytes` *must* end with a `NUL` byte, and should only have a single
--    /// `NUL` byte (or the string will be truncated).
--    #[inline]
--    pub const unsafe fn from_bytes_with_nul_unchecked(bytes: &[u8]) -> &CStr {
--        // SAFETY: Properties of `bytes` guaranteed by the safety precondition.
--        unsafe { core::mem::transmute(bytes) }
--    }
--
--    /// Creates a mutable [`CStr`] from a `[u8]` without performing any
--    /// additional checks.
--    ///
--    /// # Safety
--    ///
--    /// `bytes` *must* end with a `NUL` byte, and should only have a single
--    /// `NUL` byte (or the string will be truncated).
--    #[inline]
--    pub unsafe fn from_bytes_with_nul_unchecked_mut(bytes: &mut [u8]) -> &mut CStr {
--        // SAFETY: Properties of `bytes` guaranteed by the safety precondition.
--        unsafe { &mut *(bytes as *mut [u8] as *mut CStr) }
--    }
--
--    /// Returns a C pointer to the string.
--    #[inline]
--    pub const fn as_char_ptr(&self) -> *const core::ffi::c_char {
--        self.0.as_ptr() as _
--    }
--
--    /// Convert the string to a byte slice without the trailing `NUL` byte.
--    #[inline]
--    pub fn as_bytes(&self) -> &[u8] {
--        &self.0[..self.len()]
--    }
--
--    /// Convert the string to a byte slice containing the trailing `NUL` byte.
--    #[inline]
--    pub const fn as_bytes_with_nul(&self) -> &[u8] {
--        &self.0
--    }
--
--    /// Yields a [`&str`] slice if the [`CStr`] contains valid UTF-8.
--    ///
--    /// If the contents of the [`CStr`] are valid UTF-8 data, this
--    /// function will return the corresponding [`&str`] slice. Otherwise,
--    /// it will return an error with details of where UTF-8 validation failed.
--    ///
--    /// # Examples
--    ///
--    /// ```
--    /// # use kernel::str::CStr;
--    /// let cstr = CStr::from_bytes_with_nul(b"foo\0").unwrap();
--    /// assert_eq!(cstr.to_str(), Ok("foo"));
--    /// ```
--    #[inline]
--    pub fn to_str(&self) -> Result<&str, core::str::Utf8Error> {
--        core::str::from_utf8(self.as_bytes())
--    }
--
--    /// Unsafely convert this [`CStr`] into a [`&str`], without checking for
--    /// valid UTF-8.
--    ///
--    /// # Safety
--    ///
--    /// The contents must be valid UTF-8.
--    ///
--    /// # Examples
--    ///
--    /// ```
--    /// # use kernel::c_str;
--    /// # use kernel::str::CStr;
--    /// let bar = c_str!("ツ");
--    /// // SAFETY: String literals are guaranteed to be valid UTF-8
--    /// // by the Rust compiler.
--    /// assert_eq!(unsafe { bar.as_str_unchecked() }, "ツ");
--    /// ```
--    #[inline]
--    pub unsafe fn as_str_unchecked(&self) -> &str {
--        unsafe { core::str::from_utf8_unchecked(self.as_bytes()) }
--    }
--
--    /// Convert this [`CStr`] into a [`CString`] by allocating memory and
--    /// copying over the string data.
--    pub fn to_cstring(&self) -> Result<CString, AllocError> {
--        CString::try_from(self)
--    }
--
--    /// Converts this [`CStr`] to its ASCII lower case equivalent in-place.
--    ///
--    /// ASCII letters 'A' to 'Z' are mapped to 'a' to 'z',
--    /// but non-ASCII letters are unchanged.
--    ///
--    /// To return a new lowercased value without modifying the existing one, use
--    /// [`to_ascii_lowercase()`].
--    ///
--    /// [`to_ascii_lowercase()`]: #method.to_ascii_lowercase
--    pub fn make_ascii_lowercase(&mut self) {
--        // INVARIANT: This doesn't introduce or remove NUL bytes in the C
--        // string.
--        self.0.make_ascii_lowercase();
--    }
--
--    /// Converts this [`CStr`] to its ASCII upper case equivalent in-place.
--    ///
--    /// ASCII letters 'a' to 'z' are mapped to 'A' to 'Z',
--    /// but non-ASCII letters are unchanged.
--    ///
--    /// To return a new uppercased value without modifying the existing one, use
--    /// [`to_ascii_uppercase()`].
--    ///
--    /// [`to_ascii_uppercase()`]: #method.to_ascii_uppercase
--    pub fn make_ascii_uppercase(&mut self) {
--        // INVARIANT: This doesn't introduce or remove NUL bytes in the C
--        // string.
--        self.0.make_ascii_uppercase();
--    }
--
--    /// Returns a copy of this [`CString`] where each character is mapped to its
--    /// ASCII lower case equivalent.
--    ///
--    /// ASCII letters 'A' to 'Z' are mapped to 'a' to 'z',
--    /// but non-ASCII letters are unchanged.
--    ///
--    /// To lowercase the value in-place, use [`make_ascii_lowercase`].
--    ///
--    /// [`make_ascii_lowercase`]: str::make_ascii_lowercase
--    pub fn to_ascii_lowercase(&self) -> Result<CString, AllocError> {
--        let mut s = self.to_cstring()?;
--
--        s.make_ascii_lowercase();
--
--        Ok(s)
--    }
--
--    /// Returns a copy of this [`CString`] where each character is mapped to its
--    /// ASCII upper case equivalent.
--    ///
--    /// ASCII letters 'a' to 'z' are mapped to 'A' to 'Z',
--    /// but non-ASCII letters are unchanged.
--    ///
--    /// To uppercase the value in-place, use [`make_ascii_uppercase`].
--    ///
--    /// [`make_ascii_uppercase`]: str::make_ascii_uppercase
--    pub fn to_ascii_uppercase(&self) -> Result<CString, AllocError> {
--        let mut s = self.to_cstring()?;
--
--        s.make_ascii_uppercase();
--
--        Ok(s)
--    }
--}
--
--impl fmt::Display for CStr {
--    /// Formats printable ASCII characters, escaping the rest.
--    ///
--    /// ```
--    /// # use kernel::c_str;
--    /// # use kernel::fmt;
--    /// # use kernel::str::CStr;
--    /// # use kernel::str::CString;
--    /// let penguin = c_str!("🐧");
--    /// let s = CString::try_from_fmt(fmt!("{}", penguin)).unwrap();
--    /// assert_eq!(s.as_bytes_with_nul(), "\\xf0\\x9f\\x90\\xa7\0".as_bytes());
--    ///
--    /// let ascii = c_str!("so \"cool\"");
--    /// let s = CString::try_from_fmt(fmt!("{}", ascii)).unwrap();
--    /// assert_eq!(s.as_bytes_with_nul(), "so \"cool\"\0".as_bytes());
--    /// ```
--    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
--        for &c in self.as_bytes() {
--            if (0x20..0x7f).contains(&c) {
--                // Printable character.
--                f.write_char(c as char)?;
--            } else {
--                write!(f, "\\x{:02x}", c)?;
--            }
--        }
--        Ok(())
--    }
--}
--
--impl fmt::Debug for CStr {
--    /// Formats printable ASCII characters with a double quote on either end, escaping the rest.
--    ///
--    /// ```
--    /// # use kernel::c_str;
--    /// # use kernel::fmt;
--    /// # use kernel::str::CStr;
--    /// # use kernel::str::CString;
--    /// let penguin = c_str!("🐧");
--    /// let s = CString::try_from_fmt(fmt!("{:?}", penguin)).unwrap();
--    /// assert_eq!(s.as_bytes_with_nul(), "\"\\xf0\\x9f\\x90\\xa7\"\0".as_bytes());
--    ///
--    /// // Embedded double quotes are escaped.
--    /// let ascii = c_str!("so \"cool\"");
--    /// let s = CString::try_from_fmt(fmt!("{:?}", ascii)).unwrap();
--    /// assert_eq!(s.as_bytes_with_nul(), "\"so \\\"cool\\\"\"\0".as_bytes());
--    /// ```
--    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
--        f.write_str("\"")?;
--        for &c in self.as_bytes() {
--            match c {
--                // Printable characters.
--                b'\"' => f.write_str("\\\"")?,
--                0x20..=0x7e => f.write_char(c as char)?,
--                _ => write!(f, "\\x{:02x}", c)?,
--            }
--        }
--        f.write_str("\"")
--    }
--}
--
--impl AsRef<BStr> for CStr {
--    #[inline]
--    fn as_ref(&self) -> &BStr {
--        BStr::from_bytes(self.as_bytes())
--    }
--}
--
--impl Deref for CStr {
--    type Target = BStr;
--
--    #[inline]
--    fn deref(&self) -> &Self::Target {
--        self.as_ref()
--    }
--}
--
--impl Index<ops::RangeFrom<usize>> for CStr {
--    type Output = CStr;
--
--    #[inline]
--    fn index(&self, index: ops::RangeFrom<usize>) -> &Self::Output {
--        // Delegate bounds checking to slice.
--        // Assign to _ to mute clippy's unnecessary operation warning.
--        let _ = &self.as_bytes()[index.start..];
--        // SAFETY: We just checked the bounds.
--        unsafe { Self::from_bytes_with_nul_unchecked(&self.0[index.start..]) }
--    }
--}
--
--impl Index<ops::RangeFull> for CStr {
--    type Output = CStr;
--
--    #[inline]
--    fn index(&self, _index: ops::RangeFull) -> &Self::Output {
--        self
--    }
--}
--
--mod private {
--    use core::ops;
--
--    // Marker trait for index types that can be forward to `BStr`.
--    pub trait CStrIndex {}
--
--    impl CStrIndex for usize {}
--    impl CStrIndex for ops::Range<usize> {}
--    impl CStrIndex for ops::RangeInclusive<usize> {}
--    impl CStrIndex for ops::RangeToInclusive<usize> {}
--}
--
--impl<Idx> Index<Idx> for CStr
--where
--    Idx: private::CStrIndex,
--    BStr: Index<Idx>,
--{
--    type Output = <BStr as Index<Idx>>::Output;
--
--    #[inline]
--    fn index(&self, index: Idx) -> &Self::Output {
--        &self.as_ref()[index]
--    }
--}
--
--/// Creates a new [`CStr`] from a string literal.
--///
--/// The string literal should not contain any `NUL` bytes.
--///
--/// # Examples
--///
--/// ```
--/// # use kernel::c_str;
--/// # use kernel::str::CStr;
--/// const MY_CSTR: &CStr = c_str!("My awesome CStr!");
--/// ```
--#[macro_export]
--macro_rules! c_str {
--    ($str:expr) => {{
--        const S: &str = concat!($str, "\0");
--        const C: &$crate::str::CStr = match $crate::str::CStr::from_bytes_with_nul(S.as_bytes()) {
--            Ok(v) => v,
--            Err(_) => panic!("string contains interior NUL"),
--        };
--        C
--    }};
--}
--
- #[cfg(test)]
- mod tests {
-     use super::*;
-     use alloc::format;
- 
--    const ALL_ASCII_CHARS: &'static str =
--        "\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08\\x09\\x0a\\x0b\\x0c\\x0d\\x0e\\x0f\
--        \\x10\\x11\\x12\\x13\\x14\\x15\\x16\\x17\\x18\\x19\\x1a\\x1b\\x1c\\x1d\\x1e\\x1f \
--        !\"#$%&'()*+,-./0123456789:;<=>?@\
--        ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\\x7f\
--        \\x80\\x81\\x82\\x83\\x84\\x85\\x86\\x87\\x88\\x89\\x8a\\x8b\\x8c\\x8d\\x8e\\x8f\
--        \\x90\\x91\\x92\\x93\\x94\\x95\\x96\\x97\\x98\\x99\\x9a\\x9b\\x9c\\x9d\\x9e\\x9f\
--        \\xa0\\xa1\\xa2\\xa3\\xa4\\xa5\\xa6\\xa7\\xa8\\xa9\\xaa\\xab\\xac\\xad\\xae\\xaf\
--        \\xb0\\xb1\\xb2\\xb3\\xb4\\xb5\\xb6\\xb7\\xb8\\xb9\\xba\\xbb\\xbc\\xbd\\xbe\\xbf\
--        \\xc0\\xc1\\xc2\\xc3\\xc4\\xc5\\xc6\\xc7\\xc8\\xc9\\xca\\xcb\\xcc\\xcd\\xce\\xcf\
--        \\xd0\\xd1\\xd2\\xd3\\xd4\\xd5\\xd6\\xd7\\xd8\\xd9\\xda\\xdb\\xdc\\xdd\\xde\\xdf\
--        \\xe0\\xe1\\xe2\\xe3\\xe4\\xe5\\xe6\\xe7\\xe8\\xe9\\xea\\xeb\\xec\\xed\\xee\\xef\
--        \\xf0\\xf1\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff";
--
--    #[test]
--    fn test_cstr_to_str() {
--        let good_bytes = b"\xf0\x9f\xa6\x80\0";
--        let checked_cstr = CStr::from_bytes_with_nul(good_bytes).unwrap();
--        let checked_str = checked_cstr.to_str().unwrap();
--        assert_eq!(checked_str, "🦀");
--    }
--
--    #[test]
--    #[should_panic]
--    fn test_cstr_to_str_panic() {
--        let bad_bytes = b"\xc3\x28\0";
--        let checked_cstr = CStr::from_bytes_with_nul(bad_bytes).unwrap();
--        checked_cstr.to_str().unwrap();
--    }
--
--    #[test]
--    fn test_cstr_as_str_unchecked() {
--        let good_bytes = b"\xf0\x9f\x90\xA7\0";
--        let checked_cstr = CStr::from_bytes_with_nul(good_bytes).unwrap();
--        let unchecked_str = unsafe { checked_cstr.as_str_unchecked() };
--        assert_eq!(unchecked_str, "🐧");
--    }
--
--    #[test]
--    fn test_cstr_display() {
--        let hello_world = CStr::from_bytes_with_nul(b"hello, world!\0").unwrap();
--        assert_eq!(format!("{}", hello_world), "hello, world!");
--        let non_printables = CStr::from_bytes_with_nul(b"\x01\x09\x0a\0").unwrap();
--        assert_eq!(format!("{}", non_printables), "\\x01\\x09\\x0a");
--        let non_ascii = CStr::from_bytes_with_nul(b"d\xe9j\xe0 vu\0").unwrap();
--        assert_eq!(format!("{}", non_ascii), "d\\xe9j\\xe0 vu");
--        let good_bytes = CStr::from_bytes_with_nul(b"\xf0\x9f\xa6\x80\0").unwrap();
--        assert_eq!(format!("{}", good_bytes), "\\xf0\\x9f\\xa6\\x80");
--    }
--
--    #[test]
--    fn test_cstr_display_all_bytes() {
--        let mut bytes: [u8; 256] = [0; 256];
--        // fill `bytes` with [1..=255] + [0]
--        for i in u8::MIN..=u8::MAX {
--            bytes[i as usize] = i.wrapping_add(1);
--        }
--        let cstr = CStr::from_bytes_with_nul(&bytes).unwrap();
--        assert_eq!(format!("{}", cstr), ALL_ASCII_CHARS);
--    }
--
--    #[test]
--    fn test_cstr_debug() {
--        let hello_world = CStr::from_bytes_with_nul(b"hello, world!\0").unwrap();
--        assert_eq!(format!("{:?}", hello_world), "\"hello, world!\"");
--        let non_printables = CStr::from_bytes_with_nul(b"\x01\x09\x0a\0").unwrap();
--        assert_eq!(format!("{:?}", non_printables), "\"\\x01\\x09\\x0a\"");
--        let non_ascii = CStr::from_bytes_with_nul(b"d\xe9j\xe0 vu\0").unwrap();
--        assert_eq!(format!("{:?}", non_ascii), "\"d\\xe9j\\xe0 vu\"");
--        let good_bytes = CStr::from_bytes_with_nul(b"\xf0\x9f\xa6\x80\0").unwrap();
--        assert_eq!(format!("{:?}", good_bytes), "\"\\xf0\\x9f\\xa6\\x80\"");
--    }
--
-     #[test]
-     fn test_bstr_display() {
-         let hello_world = BStr::from_bytes(b"hello, world!");
-@@ -779,11 +314,11 @@ fn write_str(&mut self, s: &str) -> fmt::Result {
- /// use kernel::{str::CString, fmt};
- ///
- /// let s = CString::try_from_fmt(fmt!("{}{}{}", "abc", 10, 20)).unwrap();
--/// assert_eq!(s.as_bytes_with_nul(), "abc1020\0".as_bytes());
-+/// assert_eq!(s.to_bytes_with_nul(), "abc1020\0".as_bytes());
- ///
- /// let tmp = "testing";
- /// let s = CString::try_from_fmt(fmt!("{tmp}{}", 123)).unwrap();
--/// assert_eq!(s.as_bytes_with_nul(), "testing123\0".as_bytes());
-+/// assert_eq!(s.to_bytes_with_nul(), "testing123\0".as_bytes());
- ///
- /// // This fails because it has an embedded `NUL` byte.
- /// let s = CString::try_from_fmt(fmt!("a\0b{}", 123));
-@@ -840,9 +375,10 @@ fn deref(&self) -> &Self::Target {
- 
- impl DerefMut for CString {
-     fn deref_mut(&mut self) -> &mut Self::Target {
--        // SAFETY: A `CString` is always NUL-terminated and contains no other
--        // NUL bytes.
--        unsafe { CStr::from_bytes_with_nul_unchecked_mut(self.buf.as_mut_slice()) }
-+        debug_assert!(!self.buf.is_empty() && self.buf[self.buf.len() - 1] == 0);
-+        // SAFETY: Casting to CStr is safe because its internal representation
-+        // is a [u8] too.
-+        unsafe { &mut *(self.buf.as_mut_slice() as *mut [u8] as *mut CStr) }
-     }
- }
- 
-@@ -852,7 +388,7 @@ impl<'a> TryFrom<&'a CStr> for CString {
-     fn try_from(cstr: &'a CStr) -> Result<CString, AllocError> {
-         let mut buf = Vec::new();
- 
--        <Vec<_> as VecExt<_>>::extend_from_slice(&mut buf, cstr.as_bytes_with_nul(), GFP_KERNEL)
-+        <Vec<_> as VecExt<_>>::extend_from_slice(&mut buf, cstr.to_bytes_with_nul(), GFP_KERNEL)
-             .map_err(|_| AllocError)?;
- 
-         // INVARIANT: The `CStr` and `CString` types have the same invariants for
-diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-index 0ab20975a3b5..f909e7bb2070 100644
---- a/rust/kernel/sync.rs
-+++ b/rust/kernel/sync.rs
-@@ -59,9 +59,18 @@ macro_rules! static_lock_class {
- #[macro_export]
- macro_rules! optional_name {
-     () => {
--        $crate::c_str!(::core::concat!(::core::file!(), ":", ::core::line!()))
-+        unsafe {
-+            CStr::from_bytes_with_nul_unchecked(
-+                ::core::concat!(
-+                    ::core::file!(),
-+                    ":",
-+                    ::core::line!(),
-+                    "\0"
-+                ).as_bytes()
-+            )
-+        }
-     };
-     ($name:literal) => {
--        $crate::c_str!($name)
-+        $name
-     };
- }
-diff --git a/rust/kernel/sync/condvar.rs b/rust/kernel/sync/condvar.rs
-index 2b306afbe56d..16d1a1cb8d00 100644
---- a/rust/kernel/sync/condvar.rs
-+++ b/rust/kernel/sync/condvar.rs
-@@ -9,12 +9,11 @@
- use crate::{
-     init::PinInit,
-     pin_init,
--    str::CStr,
-     task::{MAX_SCHEDULE_TIMEOUT, TASK_INTERRUPTIBLE, TASK_NORMAL, TASK_UNINTERRUPTIBLE},
-     time::Jiffies,
-     types::Opaque,
+diff --git a/include/net/llc_c_st.h b/include/net/llc_c_st.h
+index 53823d61d8b6..a4bea0f33188 100644
+--- a/include/net/llc_c_st.h
++++ b/include/net/llc_c_st.h
+@@ -44,8 +44,8 @@ struct llc_conn_state_trans {
  };
--use core::ffi::{c_int, c_long};
-+use core::ffi::{c_int, c_long, CStr};
- use core::marker::PhantomPinned;
- use core::ptr;
- use macros::pin_data;
-@@ -108,7 +107,7 @@ pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self
-             // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
-             // static lifetimes so they live indefinitely.
-             wait_queue_head <- Opaque::ffi_init(|slot| unsafe {
--                bindings::__init_waitqueue_head(slot, name.as_char_ptr(), key.as_ptr())
-+                bindings::__init_waitqueue_head(slot, name.as_ptr(), key.as_ptr())
-             }),
-         })
-     }
-diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
-index f6c34ca4d819..318ecb5a5916 100644
---- a/rust/kernel/sync/lock.rs
-+++ b/rust/kernel/sync/lock.rs
-@@ -6,8 +6,8 @@
- //! spinlocks, raw spinlocks) to be provided with minimal effort.
  
- use super::LockClassKey;
--use crate::{init::PinInit, pin_init, str::CStr, types::Opaque, types::ScopeGuard};
--use core::{cell::UnsafeCell, marker::PhantomData, marker::PhantomPinned};
-+use crate::{init::PinInit, pin_init, types::Opaque, types::ScopeGuard};
-+use core::{cell::UnsafeCell, ffi::CStr, marker::PhantomData, marker::PhantomPinned};
- use macros::pin_data;
+ struct llc_conn_state {
+-	u8			    current_state;
+-	struct llc_conn_state_trans **transitions;
++	u8				  current_state;
++	const struct llc_conn_state_trans **transitions;
+ };
  
- pub mod mutex;
-@@ -113,7 +113,7 @@ pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinIni
-             // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
-             // static lifetimes so they live indefinitely.
-             state <- Opaque::ffi_init(|slot| unsafe {
--                B::init(slot, name.as_char_ptr(), key.as_ptr())
-+                B::init(slot, name.as_ptr(), key.as_ptr())
-             }),
-         })
-     }
-diff --git a/rust/kernel/workqueue.rs b/rust/kernel/workqueue.rs
-index 553a5cba2adc..b1f5c4b5840c 100644
---- a/rust/kernel/workqueue.rs
-+++ b/rust/kernel/workqueue.rs
-@@ -51,7 +51,7 @@
- //!     fn new(value: i32) -> Result<Arc<Self>> {
- //!         Arc::pin_init(pin_init!(MyStruct {
- //!             value,
--//!             work <- new_work!("MyStruct::work"),
-+//!             work <- new_work!(c"MyStruct::work"),
- //!         }), GFP_KERNEL)
- //!     }
- //! }
-@@ -97,8 +97,8 @@
- //!         Arc::pin_init(pin_init!(MyStruct {
- //!             value_1,
- //!             value_2,
--//!             work_1 <- new_work!("MyStruct::work_1"),
--//!             work_2 <- new_work!("MyStruct::work_2"),
-+//!             work_1 <- new_work!(c"MyStruct::work_1"),
-+//!             work_2 <- new_work!(c"MyStruct::work_2"),
- //!         }), GFP_KERNEL)
- //!     }
- //! }
-@@ -212,7 +212,7 @@ pub fn try_spawn<T: 'static + Send + FnOnce()>(
-         func: T,
-     ) -> Result<(), AllocError> {
-         let init = pin_init!(ClosureWork {
--            work <- new_work!("Queue::try_spawn"),
-+            work <- new_work!(c"Queue::try_spawn"),
-             func: Some(func),
-         });
+ extern struct llc_conn_state llc_conn_state_table[];
+diff --git a/net/llc/llc_c_st.c b/net/llc/llc_c_st.c
+index 2467573b5f84..1c267db304df 100644
+--- a/net/llc/llc_c_st.c
++++ b/net/llc/llc_c_st.c
+@@ -42,7 +42,7 @@ static const llc_conn_action_t llc_common_actions_1[] = {
+ 	[5] = NULL,
+ };
  
-@@ -380,7 +380,7 @@ pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self
-                         slot,
-                         Some(T::Pointer::run),
-                         false,
--                        name.as_char_ptr(),
-+                        name.as_ptr(),
-                         key.as_ptr(),
-                     )
-                 }
-diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
-index 5ebd42ae4a3f..339991ee6885 100644
---- a/scripts/rustdoc_test_gen.rs
-+++ b/scripts/rustdoc_test_gen.rs
-@@ -172,7 +172,7 @@ pub extern "C" fn {kunit_name}(__kunit_test: *mut kernel::bindings::kunit) {{
-     #[allow(unused)]
-     macro_rules! assert {{
-         ($cond:expr $(,)?) => {{{{
--            kernel::kunit_assert!("{kunit_name}", "{real_path}", __DOCTEST_ANCHOR - {line}, $cond);
-+            kernel::kunit_assert!(c"{kunit_name}", c"{real_path}", __DOCTEST_ANCHOR - {line}, $cond);
-         }}}}
-     }}
+-static struct llc_conn_state_trans llc_common_state_trans_1 = {
++static const struct llc_conn_state_trans llc_common_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_disc_req,
+ 	.next_state    = LLC_CONN_STATE_D_CONN,
+ 	.ev_qualifiers = NONE,
+@@ -59,7 +59,7 @@ static const llc_conn_action_t llc_common_actions_2[] = {
+ 	[5] = NULL,
+ };
  
-@@ -180,7 +180,7 @@ macro_rules! assert {{
-     #[allow(unused)]
-     macro_rules! assert_eq {{
-         ($left:expr, $right:expr $(,)?) => {{{{
--            kernel::kunit_assert_eq!("{kunit_name}", "{real_path}", __DOCTEST_ANCHOR - {line}, $left, $right);
-+            kernel::kunit_assert_eq!(c"{kunit_name}", c"{real_path}", __DOCTEST_ANCHOR - {line}, $left, $right);
-         }}}}
-     }}
+-static struct llc_conn_state_trans llc_common_state_trans_2 = {
++static const struct llc_conn_state_trans llc_common_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rst_req,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = NONE,
+@@ -79,7 +79,7 @@ static const llc_conn_action_t llc_common_actions_3[] = {
+ 	[8] = NULL,
+ };
  
+-static struct llc_conn_state_trans llc_common_state_trans_3 = {
++static const struct llc_conn_state_trans llc_common_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -95,7 +95,7 @@ static const llc_conn_action_t llc_common_actions_4[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_4 = {
++static const struct llc_conn_state_trans llc_common_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -114,7 +114,7 @@ static const llc_conn_action_t llc_common_actions_5[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_5 = {
++static const struct llc_conn_state_trans llc_common_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_frmr_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = NONE,
+@@ -129,7 +129,7 @@ static const llc_conn_action_t llc_common_actions_6[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_6 = {
++static const struct llc_conn_state_trans llc_common_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -145,7 +145,7 @@ static const llc_conn_action_t llc_common_actions_7a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_7a = {
++static const struct llc_conn_state_trans llc_common_state_trans_7a = {
+ 	.ev	       = llc_conn_ev_rx_zzz_cmd_pbit_set_x_inval_nr,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -161,7 +161,7 @@ static const llc_conn_action_t llc_common_actions_7b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_7b = {
++static const struct llc_conn_state_trans llc_common_state_trans_7b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_x_inval_ns,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -177,7 +177,7 @@ static const llc_conn_action_t llc_common_actions_8a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_8a = {
++static const struct llc_conn_state_trans llc_common_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_zzz_rsp_fbit_set_x_inval_nr,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -193,7 +193,7 @@ static const llc_conn_action_t llc_common_actions_8b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_8b = {
++static const struct llc_conn_state_trans llc_common_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_x_inval_ns,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -209,7 +209,7 @@ static const llc_conn_action_t llc_common_actions_8c[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_8c = {
++static const struct llc_conn_state_trans llc_common_state_trans_8c = {
+ 	.ev	       = llc_conn_ev_rx_bad_pdu,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -225,7 +225,7 @@ static const llc_conn_action_t llc_common_actions_9[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_9 = {
++static const struct llc_conn_state_trans llc_common_state_trans_9 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -247,7 +247,7 @@ static const llc_conn_action_t llc_common_actions_10[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_10 = {
++static const struct llc_conn_state_trans llc_common_state_trans_10 = {
+ 	.ev	       = llc_conn_ev_rx_xxx_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = llc_common_ev_qfyrs_10,
+@@ -270,7 +270,7 @@ static const llc_conn_action_t llc_common_actions_11a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_11a = {
++static const struct llc_conn_state_trans llc_common_state_trans_11a = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_common_ev_qfyrs_11a,
+@@ -292,7 +292,7 @@ static const llc_conn_action_t llc_common_actions_11b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_11b = {
++static const struct llc_conn_state_trans llc_common_state_trans_11b = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_common_ev_qfyrs_11b,
+@@ -314,7 +314,7 @@ static const llc_conn_action_t llc_common_actions_11c[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_11c = {
++static const struct llc_conn_state_trans llc_common_state_trans_11c = {
+ 	.ev	       = llc_conn_ev_rej_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_common_ev_qfyrs_11c,
+@@ -336,7 +336,7 @@ static const llc_conn_action_t llc_common_actions_11d[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_common_state_trans_11d = {
++static const struct llc_conn_state_trans llc_common_state_trans_11d = {
+ 	.ev	       = llc_conn_ev_busy_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_common_ev_qfyrs_11d,
+@@ -347,7 +347,7 @@ static struct llc_conn_state_trans llc_common_state_trans_11d = {
+  * Common dummy state transition; must be last entry for all state
+  * transition groups - it'll be on .bss, so will be zeroed.
+  */
+-static struct llc_conn_state_trans llc_common_state_trans_end;
++static const struct llc_conn_state_trans llc_common_state_trans_end;
+ 
+ /* LLC_CONN_STATE_ADM transitions */
+ /* State transitions for LLC_CONN_EV_CONN_REQ event */
+@@ -359,7 +359,7 @@ static const llc_conn_action_t llc_adm_actions_1[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_adm_state_trans_1 = {
++static const struct llc_conn_state_trans llc_adm_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_conn_req,
+ 	.next_state    = LLC_CONN_STATE_SETUP,
+ 	.ev_qualifiers = NONE,
+@@ -378,7 +378,7 @@ static const llc_conn_action_t llc_adm_actions_2[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_adm_state_trans_2 = {
++static const struct llc_conn_state_trans llc_adm_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -392,7 +392,7 @@ static const llc_conn_action_t llc_adm_actions_3[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_adm_state_trans_3 = {
++static const struct llc_conn_state_trans llc_adm_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -406,7 +406,7 @@ static const llc_conn_action_t llc_adm_actions_4[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_adm_state_trans_4 = {
++static const struct llc_conn_state_trans llc_adm_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_xxx_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -419,7 +419,7 @@ static const llc_conn_action_t llc_adm_actions_5[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_adm_state_trans_5 = {
++static const struct llc_conn_state_trans llc_adm_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_any_frame,
+ 	.next_state    = LLC_CONN_OUT_OF_SVC,
+ 	.ev_qualifiers = NONE,
+@@ -430,7 +430,7 @@ static struct llc_conn_state_trans llc_adm_state_trans_5 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_adm_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_adm_state_transitions[] = {
+ 	[0] = &llc_adm_state_trans_1,		/* Request */
+ 	[1] = &llc_common_state_trans_end,
+ 	[2] = &llc_common_state_trans_end,	/* local_busy */
+@@ -453,7 +453,7 @@ static const llc_conn_action_t llc_setup_actions_1[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_1 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_SETUP,
+ 	.ev_qualifiers = NONE,
+@@ -477,7 +477,7 @@ static const llc_conn_action_t llc_setup_actions_2[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_2 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_2,
+@@ -498,7 +498,7 @@ static const llc_conn_action_t llc_setup_actions_3[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_3 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_3,
+@@ -519,7 +519,7 @@ static const llc_conn_action_t llc_setup_actions_4[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_4 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_4,
+@@ -539,7 +539,7 @@ static const llc_conn_action_t llc_setup_actions_5[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_5 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_5,
+@@ -560,7 +560,7 @@ static const llc_conn_action_t llc_setup_actions_7[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_7 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_SETUP,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_7,
+@@ -581,7 +581,7 @@ static const llc_conn_action_t llc_setup_actions_8[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_setup_state_trans_8 = {
++static const struct llc_conn_state_trans llc_setup_state_trans_8 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_setup_ev_qfyrs_8,
+@@ -592,7 +592,7 @@ static struct llc_conn_state_trans llc_setup_state_trans_8 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_setup_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_setup_state_transitions[] = {
+ 	 [0] = &llc_common_state_trans_end,	/* Request */
+ 	 [1] = &llc_common_state_trans_end,	/* local busy */
+ 	 [2] = &llc_common_state_trans_end,	/* init_pf_cycle */
+@@ -622,7 +622,7 @@ static const llc_conn_action_t llc_normal_actions_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_1 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_1,
+@@ -643,7 +643,7 @@ static const llc_conn_action_t llc_normal_actions_2[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_2 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_2,
+@@ -660,7 +660,7 @@ static const llc_conn_ev_qfyr_t llc_normal_ev_qfyrs_2_1[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_normal_actions_2_1[1];
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_2_1 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_2_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_2_1,
+@@ -680,7 +680,7 @@ static const llc_conn_action_t llc_normal_actions_3[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_3 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_3,
+@@ -700,7 +700,7 @@ static const llc_conn_action_t llc_normal_actions_4[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_4 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_4,
+@@ -723,7 +723,7 @@ static const llc_conn_action_t llc_normal_actions_5a[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_5a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_5a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_5a,
+@@ -746,7 +746,7 @@ static const llc_conn_action_t llc_normal_actions_5b[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_5b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_5b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_5b,
+@@ -769,7 +769,7 @@ static const llc_conn_action_t llc_normal_actions_5c[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_5c = {
++static const struct llc_conn_state_trans llc_normal_state_trans_5c = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_5c,
+@@ -790,7 +790,7 @@ static const llc_conn_action_t llc_normal_actions_6a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_6a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_6a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_6a,
+@@ -811,7 +811,7 @@ static const llc_conn_action_t llc_normal_actions_6b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_6b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_6b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_6b,
+@@ -827,7 +827,7 @@ static const llc_conn_action_t llc_normal_actions_7[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_7 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -850,7 +850,7 @@ static const llc_conn_action_t llc_normal_actions_8[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_8a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_8a,
+@@ -863,7 +863,7 @@ static const llc_conn_ev_qfyr_t llc_normal_ev_qfyrs_8b[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_8b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_8b,
+@@ -884,7 +884,7 @@ static const llc_conn_action_t llc_normal_actions_9a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_9a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_9a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_9a,
+@@ -905,7 +905,7 @@ static const llc_conn_action_t llc_normal_actions_9b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_9b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_9b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_9b,
+@@ -922,7 +922,7 @@ static const llc_conn_action_t llc_normal_actions_10[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_10 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_10 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -937,7 +937,7 @@ static const llc_conn_action_t llc_normal_actions_11a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_11a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_11a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -952,7 +952,7 @@ static const llc_conn_action_t llc_normal_actions_11b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_11b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_11b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -973,7 +973,7 @@ static const llc_conn_action_t llc_normal_actions_11c[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_11c = {
++static const struct llc_conn_state_trans llc_normal_state_trans_11c = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_11c,
+@@ -990,7 +990,7 @@ static const llc_conn_action_t llc_normal_actions_12[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_12 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_12 = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -1005,7 +1005,7 @@ static const llc_conn_action_t llc_normal_actions_13a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_13a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_13a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -1020,7 +1020,7 @@ static const llc_conn_action_t llc_normal_actions_13b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_13b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_13b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -1040,7 +1040,7 @@ static const llc_conn_action_t llc_normal_actions_13c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_13c = {
++static const struct llc_conn_state_trans llc_normal_state_trans_13c = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_13c,
+@@ -1057,7 +1057,7 @@ static const llc_conn_action_t llc_normal_actions_14[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_14 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_14 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -1080,7 +1080,7 @@ static const llc_conn_action_t llc_normal_actions_15a[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_15a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_15a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_15a,
+@@ -1103,7 +1103,7 @@ static const llc_conn_action_t llc_normal_actions_15b[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_15b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_15b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_15b,
+@@ -1125,7 +1125,7 @@ static const llc_conn_action_t llc_normal_actions_16a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_16a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_16a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_16a,
+@@ -1147,7 +1147,7 @@ static const llc_conn_action_t llc_normal_actions_16b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_16b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_16b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_16b,
+@@ -1164,7 +1164,7 @@ static const llc_conn_action_t llc_normal_actions_17[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_17 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_17 = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -1183,7 +1183,7 @@ static const llc_conn_action_t llc_normal_actions_18[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_18 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_18 = {
+ 	.ev	       = llc_conn_ev_init_p_f_cycle,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_18,
+@@ -1205,7 +1205,7 @@ static const llc_conn_action_t llc_normal_actions_19[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_19 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_19 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_19,
+@@ -1228,7 +1228,7 @@ static const llc_conn_action_t llc_normal_actions_20a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_20a = {
++static const struct llc_conn_state_trans llc_normal_state_trans_20a = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_20a,
+@@ -1251,7 +1251,7 @@ static const llc_conn_action_t llc_normal_actions_20b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_20b = {
++static const struct llc_conn_state_trans llc_normal_state_trans_20b = {
+ 	.ev	       = llc_conn_ev_busy_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_20b,
+@@ -1270,7 +1270,7 @@ static const llc_conn_action_t llc_normal_actions_21[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_normal_state_trans_21 = {
++static const struct llc_conn_state_trans llc_normal_state_trans_21 = {
+ 	.ev	       = llc_conn_ev_tx_buffer_full,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_normal_ev_qfyrs_21,
+@@ -1281,7 +1281,7 @@ static struct llc_conn_state_trans llc_normal_state_trans_21 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_normal_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_normal_state_transitions[] = {
+ 	 [0] = &llc_normal_state_trans_1,	/* Requests */
+ 	 [1] = &llc_normal_state_trans_2,
+ 	 [2] = &llc_normal_state_trans_2_1,
+@@ -1354,7 +1354,7 @@ static const llc_conn_action_t llc_busy_actions_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_1 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_1,
+@@ -1374,7 +1374,7 @@ static const llc_conn_action_t llc_busy_actions_2[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_2 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_2,
+@@ -1391,7 +1391,7 @@ static const llc_conn_ev_qfyr_t llc_busy_ev_qfyrs_2_1[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_busy_actions_2_1[1];
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_2_1 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_2_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_2_1,
+@@ -1411,7 +1411,7 @@ static const llc_conn_action_t llc_busy_actions_3[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_3 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_3,
+@@ -1431,7 +1431,7 @@ static const llc_conn_action_t llc_busy_actions_4[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_4 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_4,
+@@ -1450,7 +1450,7 @@ static const llc_conn_action_t llc_busy_actions_5[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_5 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_5,
+@@ -1469,7 +1469,7 @@ static const llc_conn_action_t llc_busy_actions_6[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_6 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_6,
+@@ -1488,7 +1488,7 @@ static const llc_conn_action_t llc_busy_actions_7[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_7 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_7,
+@@ -1507,7 +1507,7 @@ static const llc_conn_action_t llc_busy_actions_8[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_8 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_8 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_8,
+@@ -1529,7 +1529,7 @@ static const llc_conn_action_t llc_busy_actions_9a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_9a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_9a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_x_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_9a,
+@@ -1551,7 +1551,7 @@ static const llc_conn_action_t llc_busy_actions_9b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_9b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_9b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_9b,
+@@ -1571,7 +1571,7 @@ static const llc_conn_action_t llc_busy_actions_10a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_10a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_10a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_10a,
+@@ -1591,7 +1591,7 @@ static const llc_conn_action_t llc_busy_actions_10b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_10b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_10b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_10b,
+@@ -1606,7 +1606,7 @@ static const llc_conn_action_t llc_busy_actions_11[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_11 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_11 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1624,7 +1624,7 @@ static const llc_conn_action_t llc_busy_actions_12[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_12 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_12 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1649,7 +1649,7 @@ static const llc_conn_action_t llc_busy_actions_13a[] = {
+ 	[8] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_13a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_13a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_13a,
+@@ -1674,7 +1674,7 @@ static const llc_conn_action_t llc_busy_actions_13b[] = {
+ 	[8] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_13b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_13b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_13b,
+@@ -1697,7 +1697,7 @@ static const llc_conn_action_t llc_busy_actions_14a[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_14a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_14a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_14a,
+@@ -1720,7 +1720,7 @@ static const llc_conn_action_t llc_busy_actions_14b[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_14b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_14b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_14b,
+@@ -1735,7 +1735,7 @@ static const llc_conn_action_t llc_busy_actions_15a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_15a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_15a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1750,7 +1750,7 @@ static const llc_conn_action_t llc_busy_actions_15b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_15b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_15b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1770,7 +1770,7 @@ static const llc_conn_action_t llc_busy_actions_15c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_15c = {
++static const struct llc_conn_state_trans llc_busy_state_trans_15c = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_15c,
+@@ -1785,7 +1785,7 @@ static const llc_conn_action_t llc_busy_actions_16[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_16 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_16 = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1800,7 +1800,7 @@ static const llc_conn_action_t llc_busy_actions_17a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_17a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_17a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1815,7 +1815,7 @@ static const llc_conn_action_t llc_busy_actions_17b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_17b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_17b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1835,7 +1835,7 @@ static const llc_conn_action_t llc_busy_actions_17c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_17c = {
++static const struct llc_conn_state_trans llc_busy_state_trans_17c = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_17c,
+@@ -1850,7 +1850,7 @@ static const llc_conn_action_t llc_busy_actions_18[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_18 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_18 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1872,7 +1872,7 @@ static const llc_conn_action_t llc_busy_actions_19a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_19a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_19a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_19a,
+@@ -1894,7 +1894,7 @@ static const llc_conn_action_t llc_busy_actions_19b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_19b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_19b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_19b,
+@@ -1915,7 +1915,7 @@ static const llc_conn_action_t llc_busy_actions_20a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_20a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_20a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_20a,
+@@ -1936,7 +1936,7 @@ static const llc_conn_action_t llc_busy_actions_20b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_20b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_20b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_20b,
+@@ -1953,7 +1953,7 @@ static const llc_conn_action_t llc_busy_actions_21[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_21 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_21 = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -1972,7 +1972,7 @@ static const llc_conn_action_t llc_busy_actions_22[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_22 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_22 = {
+ 	.ev	       = llc_conn_ev_init_p_f_cycle,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_22,
+@@ -1993,7 +1993,7 @@ static const llc_conn_action_t llc_busy_actions_23[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_23 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_23 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_23,
+@@ -2015,7 +2015,7 @@ static const llc_conn_action_t llc_busy_actions_24a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_24a = {
++static const struct llc_conn_state_trans llc_busy_state_trans_24a = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_24a,
+@@ -2037,7 +2037,7 @@ static const llc_conn_action_t llc_busy_actions_24b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_24b = {
++static const struct llc_conn_state_trans llc_busy_state_trans_24b = {
+ 	.ev	       = llc_conn_ev_busy_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_24b,
+@@ -2060,7 +2060,7 @@ static const llc_conn_action_t llc_busy_actions_25[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_25 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_25 = {
+ 	.ev	       = llc_conn_ev_rej_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_25,
+@@ -2079,7 +2079,7 @@ static const llc_conn_action_t llc_busy_actions_26[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_busy_state_trans_26 = {
++static const struct llc_conn_state_trans llc_busy_state_trans_26 = {
+ 	.ev	       = llc_conn_ev_rej_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_busy_ev_qfyrs_26,
+@@ -2090,7 +2090,7 @@ static struct llc_conn_state_trans llc_busy_state_trans_26 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_busy_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_busy_state_transitions[] = {
+ 	 [0] = &llc_common_state_trans_1,	/* Request */
+ 	 [1] = &llc_common_state_trans_2,
+ 	 [2] = &llc_busy_state_trans_1,
+@@ -2166,7 +2166,7 @@ static const llc_conn_action_t llc_reject_actions_1[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_1 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_1,
+@@ -2185,7 +2185,7 @@ static const llc_conn_action_t llc_reject_actions_2[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_2 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_2,
+@@ -2202,7 +2202,7 @@ static const llc_conn_ev_qfyr_t llc_reject_ev_qfyrs_2_1[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_reject_actions_2_1[1];
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_2_1 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_2_1 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_2_1,
+@@ -2222,7 +2222,7 @@ static const llc_conn_action_t llc_reject_actions_3[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_3 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_3,
+@@ -2241,7 +2241,7 @@ static const llc_conn_action_t llc_reject_actions_4[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_4 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_4,
+@@ -2256,7 +2256,7 @@ static const llc_conn_action_t llc_reject_actions_5a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_5a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_5a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2271,7 +2271,7 @@ static const llc_conn_action_t llc_reject_actions_5b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_5b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_5b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2291,7 +2291,7 @@ static const llc_conn_action_t llc_reject_actions_5c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_5c = {
++static const struct llc_conn_state_trans llc_reject_state_trans_5c = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_5c,
+@@ -2305,7 +2305,7 @@ static const llc_conn_action_t llc_reject_actions_6[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_6 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2330,7 +2330,7 @@ static const llc_conn_action_t llc_reject_actions_7a[] = {
+ 
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_7a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_7a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_7a,
+@@ -2354,7 +2354,7 @@ static const llc_conn_action_t llc_reject_actions_7b[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_7b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_7b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_7b,
+@@ -2376,7 +2376,7 @@ static const llc_conn_action_t llc_reject_actions_8a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_8a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_8a,
+@@ -2398,7 +2398,7 @@ static const llc_conn_action_t llc_reject_actions_8b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_8b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_8b,
+@@ -2415,7 +2415,7 @@ static const llc_conn_action_t llc_reject_actions_9[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_9 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_9 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -2430,7 +2430,7 @@ static const llc_conn_action_t llc_reject_actions_10a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_10a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_10a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2445,7 +2445,7 @@ static const llc_conn_action_t llc_reject_actions_10b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_10b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_10b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2465,7 +2465,7 @@ static const llc_conn_action_t llc_reject_actions_10c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_10c = {
++static const struct llc_conn_state_trans llc_reject_state_trans_10c = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_10c,
+@@ -2480,7 +2480,7 @@ static const llc_conn_action_t llc_reject_actions_11[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_11 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_11 = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2495,7 +2495,7 @@ static const llc_conn_action_t llc_reject_actions_12a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_12a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_12a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2510,7 +2510,7 @@ static const llc_conn_action_t llc_reject_actions_12b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_12b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_12b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2530,7 +2530,7 @@ static const llc_conn_action_t llc_reject_actions_12c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_12c = {
++static const struct llc_conn_state_trans llc_reject_state_trans_12c = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_12c,
+@@ -2545,7 +2545,7 @@ static const llc_conn_action_t llc_reject_actions_13[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_13 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_13 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2567,7 +2567,7 @@ static const llc_conn_action_t llc_reject_actions_14a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_14a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_14a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_14a,
+@@ -2589,7 +2589,7 @@ static const llc_conn_action_t llc_reject_actions_14b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_14b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_14b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_14b,
+@@ -2610,7 +2610,7 @@ static const llc_conn_action_t llc_reject_actions_15a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_15a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_15a = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_15a,
+@@ -2631,7 +2631,7 @@ static const llc_conn_action_t llc_reject_actions_15b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_15b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_15b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_15b,
+@@ -2647,7 +2647,7 @@ static const llc_conn_action_t llc_reject_actions_16[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_16 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_16 = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2666,7 +2666,7 @@ static const llc_conn_action_t llc_reject_actions_17[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_17 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_17 = {
+ 	.ev	       = llc_conn_ev_init_p_f_cycle,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_17,
+@@ -2688,7 +2688,7 @@ static const llc_conn_action_t llc_reject_actions_18[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_18 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_18 = {
+ 	.ev	       = llc_conn_ev_rej_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_18,
+@@ -2710,7 +2710,7 @@ static const llc_conn_action_t llc_reject_actions_19[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_19 = {
++static const struct llc_conn_state_trans llc_reject_state_trans_19 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_19,
+@@ -2733,7 +2733,7 @@ static const llc_conn_action_t llc_reject_actions_20a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_20a = {
++static const struct llc_conn_state_trans llc_reject_state_trans_20a = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_20a,
+@@ -2756,7 +2756,7 @@ static const llc_conn_action_t llc_reject_actions_20b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_reject_state_trans_20b = {
++static const struct llc_conn_state_trans llc_reject_state_trans_20b = {
+ 	.ev	       = llc_conn_ev_busy_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_reject_ev_qfyrs_20b,
+@@ -2767,7 +2767,7 @@ static struct llc_conn_state_trans llc_reject_state_trans_20b = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_reject_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_reject_state_transitions[] = {
+ 	 [0] = &llc_common_state_trans_1,	/* Request */
+ 	 [1] = &llc_common_state_trans_2,
+ 	 [2] = &llc_common_state_trans_end,
+@@ -2834,7 +2834,7 @@ static const llc_conn_ev_qfyr_t llc_await_ev_qfyrs_1_0[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_await_actions_1_0[1];
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_1_0 = {
++static const struct llc_conn_state_trans llc_await_state_trans_1_0 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_await_ev_qfyrs_1_0,
+@@ -2848,7 +2848,7 @@ static const llc_conn_action_t llc_await_actions_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_1 = {
++static const struct llc_conn_state_trans llc_await_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -2867,7 +2867,7 @@ static const llc_conn_action_t llc_await_actions_2[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_2 = {
++static const struct llc_conn_state_trans llc_await_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2883,7 +2883,7 @@ static const llc_conn_action_t llc_await_actions_3a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_3a = {
++static const struct llc_conn_state_trans llc_await_state_trans_3a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2899,7 +2899,7 @@ static const llc_conn_action_t llc_await_actions_3b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_3b = {
++static const struct llc_conn_state_trans llc_await_state_trans_3b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2916,7 +2916,7 @@ static const llc_conn_action_t llc_await_actions_4[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_4 = {
++static const struct llc_conn_state_trans llc_await_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -2935,7 +2935,7 @@ static const llc_conn_action_t llc_await_actions_5[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_5 = {
++static const struct llc_conn_state_trans llc_await_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -2952,7 +2952,7 @@ static const llc_conn_action_t llc_await_actions_6a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_6a = {
++static const struct llc_conn_state_trans llc_await_state_trans_6a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -2969,7 +2969,7 @@ static const llc_conn_action_t llc_await_actions_6b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_6b = {
++static const struct llc_conn_state_trans llc_await_state_trans_6b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -2986,7 +2986,7 @@ static const llc_conn_action_t llc_await_actions_7[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_7 = {
++static const struct llc_conn_state_trans llc_await_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3003,7 +3003,7 @@ static const llc_conn_action_t llc_await_actions_8a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_8a = {
++static const struct llc_conn_state_trans llc_await_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -3020,7 +3020,7 @@ static const llc_conn_action_t llc_await_actions_8b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_8b = {
++static const struct llc_conn_state_trans llc_await_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -3035,7 +3035,7 @@ static const llc_conn_action_t llc_await_actions_9a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_9a = {
++static const struct llc_conn_state_trans llc_await_state_trans_9a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3050,7 +3050,7 @@ static const llc_conn_action_t llc_await_actions_9b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_9b = {
++static const struct llc_conn_state_trans llc_await_state_trans_9b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3065,7 +3065,7 @@ static const llc_conn_action_t llc_await_actions_9c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_9c = {
++static const struct llc_conn_state_trans llc_await_state_trans_9c = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3080,7 +3080,7 @@ static const llc_conn_action_t llc_await_actions_9d[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_9d = {
++static const struct llc_conn_state_trans llc_await_state_trans_9d = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3096,7 +3096,7 @@ static const llc_conn_action_t llc_await_actions_10a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_10a = {
++static const struct llc_conn_state_trans llc_await_state_trans_10a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3112,7 +3112,7 @@ static const llc_conn_action_t llc_await_actions_10b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_10b = {
++static const struct llc_conn_state_trans llc_await_state_trans_10b = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3128,7 +3128,7 @@ static const llc_conn_action_t llc_await_actions_11[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_11 = {
++static const struct llc_conn_state_trans llc_await_state_trans_11 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -3143,7 +3143,7 @@ static const llc_conn_action_t llc_await_actions_12a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_12a = {
++static const struct llc_conn_state_trans llc_await_state_trans_12a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3158,7 +3158,7 @@ static const llc_conn_action_t llc_await_actions_12b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_12b = {
++static const struct llc_conn_state_trans llc_await_state_trans_12b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3174,7 +3174,7 @@ static const llc_conn_action_t llc_await_actions_13[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_13 = {
++static const struct llc_conn_state_trans llc_await_state_trans_13 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3194,7 +3194,7 @@ static const llc_conn_action_t llc_await_actions_14[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_state_trans_14 = {
++static const struct llc_conn_state_trans llc_await_state_trans_14 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_await_ev_qfyrs_14,
+@@ -3205,7 +3205,7 @@ static struct llc_conn_state_trans llc_await_state_trans_14 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_await_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_await_state_transitions[] = {
+ 	 [0] = &llc_common_state_trans_1,	/* Request */
+ 	 [1] = &llc_common_state_trans_2,
+ 	 [2] = &llc_await_state_trans_1_0,
+@@ -3263,7 +3263,7 @@ static const llc_conn_ev_qfyr_t llc_await_busy_ev_qfyrs_1_0[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_await_busy_actions_1_0[1];
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_1_0 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_1_0 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_await_busy_ev_qfyrs_1_0,
+@@ -3282,7 +3282,7 @@ static const llc_conn_action_t llc_await_busy_actions_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_1 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_await_busy_ev_qfyrs_1,
+@@ -3300,7 +3300,7 @@ static const llc_conn_action_t llc_await_busy_actions_2[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_2 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = llc_await_busy_ev_qfyrs_2,
+@@ -3318,7 +3318,7 @@ static const llc_conn_action_t llc_await_busy_actions_3[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_3 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_local_busy_cleared,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_await_busy_ev_qfyrs_3,
+@@ -3337,7 +3337,7 @@ static const llc_conn_action_t llc_await_busy_actions_4[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_4 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3353,7 +3353,7 @@ static const llc_conn_action_t llc_await_busy_actions_5a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_5a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_5a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3369,7 +3369,7 @@ static const llc_conn_action_t llc_await_busy_actions_5b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_5b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_5b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3385,7 +3385,7 @@ static const llc_conn_action_t llc_await_busy_actions_6[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_6 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3406,7 +3406,7 @@ static const llc_conn_action_t llc_await_busy_actions_7[] = {
+ 	[9] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_7 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3424,7 +3424,7 @@ static const llc_conn_action_t llc_await_busy_actions_8a[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_8a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3442,7 +3442,7 @@ static const llc_conn_action_t llc_await_busy_actions_8b[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_8b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3460,7 +3460,7 @@ static const llc_conn_action_t llc_await_busy_actions_9[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_9 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_9 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3477,7 +3477,7 @@ static const llc_conn_action_t llc_await_busy_actions_10a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_10a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_10a = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3494,7 +3494,7 @@ static const llc_conn_action_t llc_await_busy_actions_10b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_10b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_10b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3509,7 +3509,7 @@ static const llc_conn_action_t llc_await_busy_actions_11a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_11a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_11a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3524,7 +3524,7 @@ static const llc_conn_action_t llc_await_busy_actions_11b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_11b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_11b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3539,7 +3539,7 @@ static const llc_conn_action_t llc_await_busy_actions_11c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_11c = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_11c = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3554,7 +3554,7 @@ static const llc_conn_action_t llc_await_busy_actions_11d[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_11d = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_11d = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3570,7 +3570,7 @@ static const llc_conn_action_t llc_await_busy_actions_12a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_12a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_12a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3586,7 +3586,7 @@ static const llc_conn_action_t llc_await_busy_actions_12b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_12b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_12b = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3602,7 +3602,7 @@ static const llc_conn_action_t llc_await_busy_actions_13[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_13 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_13 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3617,7 +3617,7 @@ static const llc_conn_action_t llc_await_busy_actions_14a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_14a = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_14a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3632,7 +3632,7 @@ static const llc_conn_action_t llc_await_busy_actions_14b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_14b = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_14b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3648,7 +3648,7 @@ static const llc_conn_action_t llc_await_busy_actions_15[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_15 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_15 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3668,7 +3668,7 @@ static const llc_conn_action_t llc_await_busy_actions_16[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_busy_state_trans_16 = {
++static const struct llc_conn_state_trans llc_await_busy_state_trans_16 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = llc_await_busy_ev_qfyrs_16,
+@@ -3679,7 +3679,7 @@ static struct llc_conn_state_trans llc_await_busy_state_trans_16 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_await_busy_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_await_busy_state_transitions[] = {
+ 	 [0] = &llc_common_state_trans_1,		/* Request */
+ 	 [1] = &llc_common_state_trans_2,
+ 	 [2] = &llc_await_busy_state_trans_1_0,
+@@ -3739,7 +3739,7 @@ static const llc_conn_ev_qfyr_t llc_await_reject_ev_qfyrs_1_0[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_await_reject_actions_1_0[1];
+ 
+-static struct llc_conn_state_trans llc_await_reject_state_trans_1_0 = {
++static const struct llc_conn_state_trans llc_await_reject_state_trans_1_0 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_await_reject_ev_qfyrs_1_0,
+@@ -3753,7 +3753,7 @@ static const llc_conn_action_t llc_await_rejct_actions_1[] = {
+ 	[2] = NULL
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_1 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_local_busy_detected,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_BUSY,
+ 	.ev_qualifiers = NONE,
+@@ -3767,7 +3767,7 @@ static const llc_conn_action_t llc_await_rejct_actions_2a[] = {
+ 	[2] = NULL
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_2a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_2a = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3781,7 +3781,7 @@ static const llc_conn_action_t llc_await_rejct_actions_2b[] = {
+ 	[2] = NULL
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_2b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_2b = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3796,7 +3796,7 @@ static const llc_conn_action_t llc_await_rejct_actions_3[] = {
+ 	[3] = NULL
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_3 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3816,7 +3816,7 @@ static const llc_conn_action_t llc_await_rejct_actions_4[] = {
+ 	[8] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_4 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -3834,7 +3834,7 @@ static const llc_conn_action_t llc_await_rejct_actions_5a[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_5a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_5a = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3852,7 +3852,7 @@ static const llc_conn_action_t llc_await_rejct_actions_5b[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_5b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_5b = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3870,7 +3870,7 @@ static const llc_conn_action_t llc_await_rejct_actions_6[] = {
+ 	[6] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_6 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_rx_i_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT,
+ 	.ev_qualifiers = NONE,
+@@ -3887,7 +3887,7 @@ static const llc_conn_action_t llc_await_rejct_actions_7a[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_7a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_7a = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3904,7 +3904,7 @@ static const llc_conn_action_t llc_await_rejct_actions_7b[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_7b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_7b = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3921,7 +3921,7 @@ static const llc_conn_action_t llc_await_rejct_actions_7c[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_7c = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_7c = {
+ 	.ev	       = llc_conn_ev_rx_i_rsp_fbit_set_1_unexpd_ns,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3936,7 +3936,7 @@ static const llc_conn_action_t llc_await_rejct_actions_8a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_8a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_8a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3951,7 +3951,7 @@ static const llc_conn_action_t llc_await_rejct_actions_8b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_8b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_8b = {
+ 	.ev	       = llc_conn_ev_rx_rr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3966,7 +3966,7 @@ static const llc_conn_action_t llc_await_rejct_actions_8c[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_8c = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_8c = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3981,7 +3981,7 @@ static const llc_conn_action_t llc_await_rejct_actions_8d[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_8d = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_8d = {
+ 	.ev	       = llc_conn_ev_rx_rej_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -3997,7 +3997,7 @@ static const llc_conn_action_t llc_await_rejct_actions_9a[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_9a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_9a = {
+ 	.ev	       = llc_conn_ev_rx_rr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4013,7 +4013,7 @@ static const llc_conn_action_t llc_await_rejct_actions_9b[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_9b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_9b = {
+ 	.ev	       = llc_conn_ev_rx_rej_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4029,7 +4029,7 @@ static const llc_conn_action_t llc_await_rejct_actions_10[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_10 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_10 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4044,7 +4044,7 @@ static const llc_conn_action_t llc_await_rejct_actions_11a[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_11a = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_11a = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4059,7 +4059,7 @@ static const llc_conn_action_t llc_await_rejct_actions_11b[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_11b = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_11b = {
+ 	.ev	       = llc_conn_ev_rx_rnr_rsp_fbit_set_0,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4075,7 +4075,7 @@ static const llc_conn_action_t llc_await_rejct_actions_12[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_12 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_12 = {
+ 	.ev	       = llc_conn_ev_rx_rnr_cmd_pbit_set_1,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = NONE,
+@@ -4095,7 +4095,7 @@ static const llc_conn_action_t llc_await_rejct_actions_13[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_await_rejct_state_trans_13 = {
++static const struct llc_conn_state_trans llc_await_rejct_state_trans_13 = {
+ 	.ev	       = llc_conn_ev_p_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_AWAIT_REJ,
+ 	.ev_qualifiers = llc_await_rejct_ev_qfyrs_13,
+@@ -4106,7 +4106,7 @@ static struct llc_conn_state_trans llc_await_rejct_state_trans_13 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_await_rejct_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_await_rejct_state_transitions[] = {
+ 	 [0] = &llc_await_reject_state_trans_1_0,
+ 	 [1] = &llc_common_state_trans_1,		/* requests */
+ 	 [2] = &llc_common_state_trans_2,
+@@ -4171,7 +4171,7 @@ static const llc_conn_action_t llc_d_conn_actions_1[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_1 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_1,
+@@ -4194,7 +4194,7 @@ static const llc_conn_action_t llc_d_conn_actions_1_1[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_1_1 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_1_1 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_1_1,
+@@ -4218,7 +4218,7 @@ static const llc_conn_action_t llc_d_conn_actions_2[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_2 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_2,
+@@ -4241,7 +4241,7 @@ static const llc_conn_action_t llc_d_conn_actions_2_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_2_1 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_2_1 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_2_1,
+@@ -4254,7 +4254,7 @@ static const llc_conn_action_t llc_d_conn_actions_3[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_3 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_D_CONN,
+ 	.ev_qualifiers = NONE,
+@@ -4277,7 +4277,7 @@ static const llc_conn_action_t llc_d_conn_actions_4[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_4 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_4,
+@@ -4299,7 +4299,7 @@ static const llc_conn_action_t llc_d_conn_actions_4_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_4_1 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_4_1 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_4_1,
+@@ -4318,7 +4318,7 @@ static const llc_conn_ev_qfyr_t llc_d_conn_ev_qfyrs_5[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_d_conn_actions_5[1];
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_5 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_D_CONN,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_5,
+@@ -4338,7 +4338,7 @@ static const llc_conn_action_t llc_d_conn_actions_6[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_6 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_D_CONN,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_6,
+@@ -4359,7 +4359,7 @@ static const llc_conn_action_t llc_d_conn_actions_7[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_7 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_7,
+@@ -4379,7 +4379,7 @@ static const llc_conn_action_t llc_d_conn_actions_8[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_d_conn_state_trans_8 = {
++static const struct llc_conn_state_trans llc_d_conn_state_trans_8 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_d_conn_ev_qfyrs_8,
+@@ -4390,7 +4390,7 @@ static struct llc_conn_state_trans llc_d_conn_state_trans_8 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_d_conn_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_d_conn_state_transitions[] = {
+ 	 [0] = &llc_d_conn_state_trans_5,	/* Request */
+ 	 [1] = &llc_common_state_trans_end,
+ 	 [2] = &llc_common_state_trans_end,	/* Local busy */
+@@ -4419,7 +4419,7 @@ static const llc_conn_action_t llc_rst_actions_1[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_1 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = NONE,
+@@ -4447,7 +4447,7 @@ static const llc_conn_action_t llc_rst_actions_2[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_2 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_2,
+@@ -4475,7 +4475,7 @@ static const llc_conn_action_t llc_rst_actions_2_1[] = {
+ 	[7] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_2_1 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_2_1 = {
+ 	.ev	       = llc_conn_ev_rx_ua_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_2_1,
+@@ -4495,7 +4495,7 @@ static const llc_conn_action_t llc_rst_actions_3[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_3 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_3,
+@@ -4518,7 +4518,7 @@ static const llc_conn_action_t llc_rst_actions_4[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_4 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_4,
+@@ -4541,7 +4541,7 @@ static const llc_conn_action_t llc_rst_actions_4_1[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_4_1 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_4_1 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_4_1,
+@@ -4564,7 +4564,7 @@ static const llc_conn_action_t llc_rst_actions_5[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_5 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_5,
+@@ -4586,7 +4586,7 @@ static const llc_conn_action_t llc_rst_actions_5_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_5_1 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_5_1 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_5_1,
+@@ -4602,7 +4602,7 @@ static const llc_conn_ev_qfyr_t llc_rst_ev_qfyrs_6[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_rst_actions_6[1];
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_6 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_6,
+@@ -4623,7 +4623,7 @@ static const llc_conn_action_t llc_rst_actions_7[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_7 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_7,
+@@ -4644,7 +4644,7 @@ static const llc_conn_action_t llc_rst_actions_8[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_8 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_8 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_8,
+@@ -4665,7 +4665,7 @@ static const llc_conn_action_t llc_rst_actions_8_1[] = {
+ 	[2] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_rst_state_trans_8_1 = {
++static const struct llc_conn_state_trans llc_rst_state_trans_8_1 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = llc_rst_ev_qfyrs_8_1,
+@@ -4676,7 +4676,7 @@ static struct llc_conn_state_trans llc_rst_state_trans_8_1 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_rst_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_rst_state_transitions[] = {
+ 	 [0] = &llc_rst_state_trans_6,		/* Request */
+ 	 [1] = &llc_common_state_trans_end,
+ 	 [2] = &llc_common_state_trans_end,	/* Local busy */
+@@ -4710,7 +4710,7 @@ static const llc_conn_action_t llc_error_actions_1[] = {
+ 	[8] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_1 = {
++static const struct llc_conn_state_trans llc_error_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_rx_sabme_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_NORMAL,
+ 	.ev_qualifiers = NONE,
+@@ -4726,7 +4726,7 @@ static const llc_conn_action_t llc_error_actions_2[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_2 = {
++static const struct llc_conn_state_trans llc_error_state_trans_2 = {
+ 	.ev	       = llc_conn_ev_rx_disc_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -4741,7 +4741,7 @@ static const llc_conn_action_t llc_error_actions_3[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_3 = {
++static const struct llc_conn_state_trans llc_error_state_trans_3 = {
+ 	.ev	       = llc_conn_ev_rx_dm_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -4757,7 +4757,7 @@ static const llc_conn_action_t llc_error_actions_4[] = {
+ 	[4] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_4 = {
++static const struct llc_conn_state_trans llc_error_state_trans_4 = {
+ 	.ev	       = llc_conn_ev_rx_frmr_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = NONE,
+@@ -4770,7 +4770,7 @@ static const llc_conn_action_t llc_error_actions_5[] = {
+ 	[1] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_5 = {
++static const struct llc_conn_state_trans llc_error_state_trans_5 = {
+ 	.ev	       = llc_conn_ev_rx_xxx_cmd_pbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -4778,7 +4778,7 @@ static struct llc_conn_state_trans llc_error_state_trans_5 = {
+ };
+ 
+ /* State transitions for LLC_CONN_EV_RX_XXX_RSP_Fbit_SET_X event */
+-static struct llc_conn_state_trans llc_error_state_trans_6 = {
++static const struct llc_conn_state_trans llc_error_state_trans_6 = {
+ 	.ev	       = llc_conn_ev_rx_xxx_rsp_fbit_set_x,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = NONE,
+@@ -4798,7 +4798,7 @@ static const llc_conn_action_t llc_error_actions_7[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_7 = {
++static const struct llc_conn_state_trans llc_error_state_trans_7 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = llc_error_ev_qfyrs_7,
+@@ -4820,7 +4820,7 @@ static const llc_conn_action_t llc_error_actions_8[] = {
+ 	[5] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_8 = {
++static const struct llc_conn_state_trans llc_error_state_trans_8 = {
+ 	.ev	       = llc_conn_ev_ack_tmr_exp,
+ 	.next_state    = LLC_CONN_STATE_RESET,
+ 	.ev_qualifiers = llc_error_ev_qfyrs_8,
+@@ -4836,7 +4836,7 @@ static const llc_conn_ev_qfyr_t llc_error_ev_qfyrs_9[] = {
+ /* just one member, NULL, .bss zeroes it */
+ static const llc_conn_action_t llc_error_actions_9[1];
+ 
+-static struct llc_conn_state_trans llc_error_state_trans_9 = {
++static const struct llc_conn_state_trans llc_error_state_trans_9 = {
+ 	.ev	       = llc_conn_ev_data_req,
+ 	.next_state    = LLC_CONN_STATE_ERROR,
+ 	.ev_qualifiers = llc_error_ev_qfyrs_9,
+@@ -4847,7 +4847,7 @@ static struct llc_conn_state_trans llc_error_state_trans_9 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_error_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_error_state_transitions[] = {
+ 	 [0] = &llc_error_state_trans_9,	/* Request */
+ 	 [1] = &llc_common_state_trans_end,
+ 	 [2] = &llc_common_state_trans_end,	/* Local busy */
+@@ -4873,7 +4873,7 @@ static const llc_conn_action_t llc_temp_actions_1[] = {
+ 	[3] = NULL,
+ };
+ 
+-static struct llc_conn_state_trans llc_temp_state_trans_1 = {
++static const struct llc_conn_state_trans llc_temp_state_trans_1 = {
+ 	.ev	       = llc_conn_ev_disc_req,
+ 	.next_state    = LLC_CONN_STATE_ADM,
+ 	.ev_qualifiers = NONE,
+@@ -4884,7 +4884,7 @@ static struct llc_conn_state_trans llc_temp_state_trans_1 = {
+  * Array of pointers;
+  * one to each transition
+  */
+-static struct llc_conn_state_trans *llc_temp_state_transitions[] = {
++static const struct llc_conn_state_trans *llc_temp_state_transitions[] = {
+ 	[0] = &llc_temp_state_trans_1,		/* requests */
+ 	[1] = &llc_common_state_trans_end,
+ 	[2] = &llc_common_state_trans_end,	/* local busy */
+diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
+index 0a3f5e0bec00..afc6974eafda 100644
+--- a/net/llc/llc_conn.c
++++ b/net/llc/llc_conn.c
+@@ -34,10 +34,10 @@ static int llc_find_offset(int state, int ev_type);
+ static void llc_conn_send_pdus(struct sock *sk);
+ static int llc_conn_service(struct sock *sk, struct sk_buff *skb);
+ static int llc_exec_conn_trans_actions(struct sock *sk,
+-				       struct llc_conn_state_trans *trans,
++				       const struct llc_conn_state_trans *trans,
+ 				       struct sk_buff *ev);
+-static struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
+-							struct sk_buff *skb);
++static const struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
++							      struct sk_buff *skb);
+ 
+ /* Offset table on connection states transition diagram */
+ static int llc_offset_table[NBR_CONN_STATES][NBR_CONN_EV];
+@@ -356,9 +356,9 @@ static void llc_conn_send_pdus(struct sock *sk)
+  */
+ static int llc_conn_service(struct sock *sk, struct sk_buff *skb)
+ {
+-	int rc = 1;
++	const struct llc_conn_state_trans *trans;
+ 	struct llc_sock *llc = llc_sk(sk);
+-	struct llc_conn_state_trans *trans;
++	int rc = 1;
+ 
+ 	if (llc->state > NBR_CONN_STATES)
+ 		goto out;
+@@ -384,10 +384,10 @@ static int llc_conn_service(struct sock *sk, struct sk_buff *skb)
+  *	This function finds transition that matches with happened event.
+  *	Returns pointer to found transition on success, %NULL otherwise.
+  */
+-static struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
+-							struct sk_buff *skb)
++static const struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
++							      struct sk_buff *skb)
+ {
+-	struct llc_conn_state_trans **next_trans;
++	const struct llc_conn_state_trans **next_trans;
+ 	const llc_conn_ev_qfyr_t *next_qualifier;
+ 	struct llc_conn_state_ev *ev = llc_conn_ev(skb);
+ 	struct llc_sock *llc = llc_sk(sk);
+@@ -432,7 +432,7 @@ static struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
+  *	success, 1 to indicate failure of at least one action.
+  */
+ static int llc_exec_conn_trans_actions(struct sock *sk,
+-				       struct llc_conn_state_trans *trans,
++				       const struct llc_conn_state_trans *trans,
+ 				       struct sk_buff *skb)
+ {
+ 	int rc = 0;
+@@ -635,8 +635,8 @@ u8 llc_data_accept_state(u8 state)
+  */
+ static u16 __init llc_find_next_offset(struct llc_conn_state *state, u16 offset)
+ {
++	const struct llc_conn_state_trans **next_trans;
+ 	u16 cnt = 0;
+-	struct llc_conn_state_trans **next_trans;
+ 
+ 	for (next_trans = state->transitions + offset;
+ 	     (*next_trans)->ev; next_trans++)
 -- 
 2.45.2
 
