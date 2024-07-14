@@ -1,65 +1,72 @@
-Return-Path: <netdev+bounces-111357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1DA930AC3
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 18:24:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC481930ABD
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 18:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 211FB281941
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:24:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 040361C20927
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE87813B2AC;
-	Sun, 14 Jul 2024 16:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE52913A3F0;
+	Sun, 14 Jul 2024 16:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="GWsjA/f5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mMLYVLq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from msa.smtpout.orange.fr (msa-213.smtpout.orange.fr [193.252.23.213])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C707F;
-	Sun, 14 Jul 2024 16:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.213
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151F27F
+	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 16:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720974282; cv=none; b=fmXdPgYCZmhu2RSUtUYJjoHxUPCyvfo8eTaan5a7bWh234Zl4LKipj1MU17S1YYlb7pdyZMz/VsUoYFOGuW1JYgX/1pqhWeMGNENOTNbYsqz/7xrahUGS0+K2wnKfNl3oaTAtdPwESRAPB/ftyr/SStCiIIci2wJjAk0colXaAk=
+	t=1720973858; cv=none; b=Y4xeFNTN2Opp8V3rY52xZeHQBpQ0G0BAHsPZ0BqMXOhiAOWUs+1l9DBh0fCYqa5HeViKQML5hVjrYcqdp6cRoqfBLYfwSSjkgigY91FUS4/vviwt4ca0Bi7Kd08t9nI0Ej55Ufo1PHLcQBwFfIK5tUo8D8K8PD+sxnPgaBfmV8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720974282; c=relaxed/simple;
-	bh=FjJUbEgbT6njuYxFEiqNqLxRsMj/drbnkC+PvKhsWUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D0cBV7oYNiTVGnmOYqt16uf+MaBBVcifcceEsy0IviJoNanf8V3VAYiWTX8FXhVGMGWpx3UVyRam2kGn2WzXn/9rFAbNAh2j50Dt1dhiErU7/gnYCbWyOEheCt7IPt435/7jFjoTHMsA5qhPw35/fHKxRxOVomW8ChFUmSdGDcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=GWsjA/f5; arc=none smtp.client-ip=193.252.23.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id T1sisr9XfKcZaT1sisRKQy; Sun, 14 Jul 2024 18:15:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1720973726;
-	bh=X3BjMkIlLlKNDRITAi0sF43nNx7bZHbsFoiwfhlAf7k=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=GWsjA/f5s8n6lHS+5b6ZngPEeC/AEXjE5/TISfvAuxgb1IA1/gluGT2mvBGToXe+k
-	 Sg607eCgxufF882GoU+gYrtE7vpgFenVff1SUY4W5Dbhfzlq3QtvbohpuglgUDZRlm
-	 vq/KIgYP+jXOyqiSWMM/HzAoAzDZ5qQOB6fpJ75KoGdbCSJFyrxJY8lKF47Tv2z/z5
-	 D2k4Vy1uiSKwkDiF0Hvx8YV2h9IpOf747+GCpQKIg3NVg+BeL9bO5U3je9ql70WLm1
-	 rUpwmS2qvRcLD37Fyf7lpPxvO0HN1LYI0tm5Qsv4ekqOcxnS/vZwswd4ZdNv9aZ55C
-	 HUQ8PYO8DAQGQ==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 14 Jul 2024 18:15:26 +0200
-X-ME-IP: 90.11.132.44
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: [PATCH] llc: Constify struct llc_sap_state_trans
-Date: Sun, 14 Jul 2024 18:15:20 +0200
-Message-ID: <9d17587639195ee94b74ff06a11ef97d1833ee52.1720973710.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1720973858; c=relaxed/simple;
+	bh=xaKgaN04ZsHuMg5p83MsC2nnbyXrE4ivb9lxjtSQSJ4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jX3r34v5+tte4VvuLtvhrOMlIe0lMnR6OAFoZAmtoqZX4BkmkJ1Ip87Yk7FSgh9dushoIiUx5Q2s6K4aH7bNGSkR+xTli8fU7zRKP2NXpn0rJmqaLqu144r9O+zJuWgENdYk3tu1LFsa01Pv9IcOuV1jF7Rbt3IfS1/nvUD1sRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mMLYVLq9; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720973857; x=1752509857;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ikHxIvTitLkse3rRietbGiGoO6FF/QMqy22LQ/kuha8=;
+  b=mMLYVLq9L4GrcVy3KoChEGEIaesbgw3FTuuzLFqlF/rPG3+hSL4t407A
+   22TeTRN2mBxQuOZDyrxexGR2y3xyXxgDRvGSPb6//u4851+w4+67oViw1
+   RYKL+LF1fpalz30q+iLR3RAqtgjNntpy1FvWeeBATuxQ0met85Sei1cMB
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.09,208,1716249600"; 
+   d="scan'208";a="105882976"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2024 16:17:34 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:22365]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.210:2525] with esmtp (Farcaster)
+ id 9b16925a-5192-48f0-a666-1eeedfb50b2a; Sun, 14 Jul 2024 16:17:34 +0000 (UTC)
+X-Farcaster-Flow-ID: 9b16925a-5192-48f0-a666-1eeedfb50b2a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sun, 14 Jul 2024 16:17:31 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.56) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sun, 14 Jul 2024 16:17:29 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Dmitry Safonov <0x7f454c46@gmail.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>
+Subject: [PATCH v1 net] tcp: Don't access uninit tcp_rsk(req)->ao_keyid in tcp_create_openreq_child().
+Date: Sun, 14 Jul 2024 09:17:19 -0700
+Message-ID: <20240714161719.6528-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,207 +74,195 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-'struct llc_sap_state_trans' are not modified in this driver.
+syzkaller reported KMSAN splat in tcp_create_openreq_child(). [0]
 
-Constifying this structure moves some data to a read-only section, so
-increase overall security.
+The uninit variable is tcp_rsk(req)->ao_keyid.
 
-On a x86_64, with allmodconfig, as an example:
-Before:
-======
-   text	   data	    bss	    dec	    hex	filename
-    339	    456	     24	    819	    333	net/llc/llc_s_st.o
+tcp_rsk(req)->ao_keyid is initialised only when tcp_conn_request() finds
+a valid TCP AO option in SYN.  Then, tcp_rsk(req)->used_tcp_ao is set
+accordingly.
 
-After:
-=====
-   text	   data	    bss	    dec	    hex	filename
-    683	    144	      0	    827	    33b	net/llc/llc_s_st.o
+Let's not read tcp_rsk(req)->ao_keyid when tcp_rsk(req)->used_tcp_ao is
+false.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+[0]:
+BUG: KMSAN: uninit-value in tcp_create_openreq_child+0x198b/0x1ff0 net/ipv4/tcp_minisocks.c:610
+ tcp_create_openreq_child+0x198b/0x1ff0 net/ipv4/tcp_minisocks.c:610
+ tcp_v4_syn_recv_sock+0x18e/0x2170 net/ipv4/tcp_ipv4.c:1754
+ tcp_check_req+0x1a3e/0x20c0 net/ipv4/tcp_minisocks.c:852
+ tcp_v4_rcv+0x26a4/0x53a0 net/ipv4/tcp_ipv4.c:2265
+ ip_protocol_deliver_rcu+0x884/0x1270 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x30f/0x530 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x230/0x4c0 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_sublist_rcv_finish net/ipv4/ip_input.c:580 [inline]
+ ip_list_rcv_finish net/ipv4/ip_input.c:631 [inline]
+ ip_sublist_rcv+0x10f7/0x13e0 net/ipv4/ip_input.c:639
+ ip_list_rcv+0x952/0x9c0 net/ipv4/ip_input.c:674
+ __netif_receive_skb_list_ptype net/core/dev.c:5703 [inline]
+ __netif_receive_skb_list_core+0xd92/0x11d0 net/core/dev.c:5751
+ __netif_receive_skb_list net/core/dev.c:5803 [inline]
+ netif_receive_skb_list_internal+0xd8f/0x1350 net/core/dev.c:5895
+ gro_normal_list include/net/gro.h:515 [inline]
+ napi_complete_done+0x3f2/0x990 net/core/dev.c:6246
+ e1000_clean+0x1fa4/0x5e50 drivers/net/ethernet/intel/e1000/e1000_main.c:3808
+ __napi_poll+0xd9/0x990 net/core/dev.c:6771
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x90f/0x17e0 net/core/dev.c:6962
+ handle_softirqs+0x152/0x6b0 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu kernel/softirq.c:637 [inline]
+ irq_exit_rcu+0x5d/0x120 kernel/softirq.c:649
+ common_interrupt+0x83/0x90 arch/x86/kernel/irq.c:278
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+ __msan_instrument_asm_store+0xd6/0xe0
+ arch_atomic_inc arch/x86/include/asm/atomic.h:53 [inline]
+ raw_atomic_inc include/linux/atomic/atomic-arch-fallback.h:992 [inline]
+ atomic_inc include/linux/atomic/atomic-instrumented.h:436 [inline]
+ page_ref_inc include/linux/page_ref.h:153 [inline]
+ folio_ref_inc include/linux/page_ref.h:160 [inline]
+ filemap_map_order0_folio mm/filemap.c:3596 [inline]
+ filemap_map_pages+0x11c7/0x2270 mm/filemap.c:3644
+ do_fault_around mm/memory.c:4879 [inline]
+ do_read_fault mm/memory.c:4912 [inline]
+ do_fault mm/memory.c:5051 [inline]
+ do_pte_missing mm/memory.c:3897 [inline]
+ handle_pte_fault mm/memory.c:5381 [inline]
+ __handle_mm_fault mm/memory.c:5524 [inline]
+ handle_mm_fault+0x3677/0x6f00 mm/memory.c:5689
+ do_user_addr_fault+0x1373/0x2b20 arch/x86/mm/fault.c:1338
+ handle_page_fault arch/x86/mm/fault.c:1481 [inline]
+ exc_page_fault+0x54/0xc0 arch/x86/mm/fault.c:1539
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+
+Uninit was stored to memory at:
+ tcp_create_openreq_child+0x1984/0x1ff0 net/ipv4/tcp_minisocks.c:611
+ tcp_v4_syn_recv_sock+0x18e/0x2170 net/ipv4/tcp_ipv4.c:1754
+ tcp_check_req+0x1a3e/0x20c0 net/ipv4/tcp_minisocks.c:852
+ tcp_v4_rcv+0x26a4/0x53a0 net/ipv4/tcp_ipv4.c:2265
+ ip_protocol_deliver_rcu+0x884/0x1270 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x30f/0x530 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x230/0x4c0 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_sublist_rcv_finish net/ipv4/ip_input.c:580 [inline]
+ ip_list_rcv_finish net/ipv4/ip_input.c:631 [inline]
+ ip_sublist_rcv+0x10f7/0x13e0 net/ipv4/ip_input.c:639
+ ip_list_rcv+0x952/0x9c0 net/ipv4/ip_input.c:674
+ __netif_receive_skb_list_ptype net/core/dev.c:5703 [inline]
+ __netif_receive_skb_list_core+0xd92/0x11d0 net/core/dev.c:5751
+ __netif_receive_skb_list net/core/dev.c:5803 [inline]
+ netif_receive_skb_list_internal+0xd8f/0x1350 net/core/dev.c:5895
+ gro_normal_list include/net/gro.h:515 [inline]
+ napi_complete_done+0x3f2/0x990 net/core/dev.c:6246
+ e1000_clean+0x1fa4/0x5e50 drivers/net/ethernet/intel/e1000/e1000_main.c:3808
+ __napi_poll+0xd9/0x990 net/core/dev.c:6771
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x90f/0x17e0 net/core/dev.c:6962
+ handle_softirqs+0x152/0x6b0 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu kernel/softirq.c:637 [inline]
+ irq_exit_rcu+0x5d/0x120 kernel/softirq.c:649
+ common_interrupt+0x83/0x90 arch/x86/kernel/irq.c:278
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+
+Uninit was created at:
+ __alloc_pages_noprof+0x82d/0xcb0 mm/page_alloc.c:4706
+ __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+ alloc_slab_page mm/slub.c:2265 [inline]
+ allocate_slab mm/slub.c:2428 [inline]
+ new_slab+0x2af/0x14e0 mm/slub.c:2481
+ ___slab_alloc+0xf73/0x3150 mm/slub.c:3667
+ __slab_alloc mm/slub.c:3757 [inline]
+ __slab_alloc_node mm/slub.c:3810 [inline]
+ slab_alloc_node mm/slub.c:3990 [inline]
+ kmem_cache_alloc_noprof+0x53a/0x9f0 mm/slub.c:4009
+ reqsk_alloc_noprof net/ipv4/inet_connection_sock.c:920 [inline]
+ inet_reqsk_alloc+0x63/0x700 net/ipv4/inet_connection_sock.c:951
+ tcp_conn_request+0x339/0x4860 net/ipv4/tcp_input.c:7177
+ tcp_v4_conn_request+0x13b/0x190 net/ipv4/tcp_ipv4.c:1719
+ tcp_rcv_state_process+0x2dd/0x4a10 net/ipv4/tcp_input.c:6711
+ tcp_v4_do_rcv+0xbee/0x10d0 net/ipv4/tcp_ipv4.c:1932
+ tcp_v4_rcv+0x3fad/0x53a0 net/ipv4/tcp_ipv4.c:2334
+ ip_protocol_deliver_rcu+0x884/0x1270 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x30f/0x530 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x230/0x4c0 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_sublist_rcv_finish net/ipv4/ip_input.c:580 [inline]
+ ip_list_rcv_finish net/ipv4/ip_input.c:631 [inline]
+ ip_sublist_rcv+0x10f7/0x13e0 net/ipv4/ip_input.c:639
+ ip_list_rcv+0x952/0x9c0 net/ipv4/ip_input.c:674
+ __netif_receive_skb_list_ptype net/core/dev.c:5703 [inline]
+ __netif_receive_skb_list_core+0xd92/0x11d0 net/core/dev.c:5751
+ __netif_receive_skb_list net/core/dev.c:5803 [inline]
+ netif_receive_skb_list_internal+0xd8f/0x1350 net/core/dev.c:5895
+ gro_normal_list include/net/gro.h:515 [inline]
+ napi_complete_done+0x3f2/0x990 net/core/dev.c:6246
+ e1000_clean+0x1fa4/0x5e50 drivers/net/ethernet/intel/e1000/e1000_main.c:3808
+ __napi_poll+0xd9/0x990 net/core/dev.c:6771
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x90f/0x17e0 net/core/dev.c:6962
+ handle_softirqs+0x152/0x6b0 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu kernel/softirq.c:637 [inline]
+ irq_exit_rcu+0x5d/0x120 kernel/softirq.c:649
+ common_interrupt+0x83/0x90 arch/x86/kernel/irq.c:278
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+
+CPU: 0 PID: 239 Comm: modprobe Tainted: G    B              6.10.0-rc7-01816-g852e42cc2dd4 #3 1107521f0c7b55c9309062382d0bda9f604dbb6d
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+
+Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-Compile tested-only.
----
- include/net/llc_s_st.h |  4 ++--
- net/llc/llc_s_st.c     | 26 +++++++++++++-------------
- net/llc/llc_sap.c      | 12 ++++++------
- 3 files changed, 21 insertions(+), 21 deletions(-)
+ net/ipv4/tcp_minisocks.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/llc_s_st.h b/include/net/llc_s_st.h
-index ed5b2fa40d32..fca49d483d20 100644
---- a/include/net/llc_s_st.h
-+++ b/include/net/llc_s_st.h
-@@ -29,8 +29,8 @@ struct llc_sap_state_trans {
- };
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 538c06f95918..0fbebf6266e9 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -515,9 +515,6 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
+ 	const struct tcp_sock *oldtp;
+ 	struct tcp_sock *newtp;
+ 	u32 seq;
+-#ifdef CONFIG_TCP_AO
+-	struct tcp_ao_key *ao_key;
+-#endif
  
- struct llc_sap_state {
--	u8			   curr_state;
--	struct llc_sap_state_trans **transitions;
-+	u8				 curr_state;
-+	const struct llc_sap_state_trans **transitions;
- };
- 
- /* only access to SAP state table */
-diff --git a/net/llc/llc_s_st.c b/net/llc/llc_s_st.c
-index 308c616883a4..acccc827c562 100644
---- a/net/llc/llc_s_st.c
-+++ b/net/llc/llc_s_st.c
-@@ -24,7 +24,7 @@
-  * last entry for this state
-  * all members are zeros, .bss zeroes it
-  */
--static struct llc_sap_state_trans llc_sap_state_trans_end;
-+static const struct llc_sap_state_trans llc_sap_state_trans_end;
- 
- /* state LLC_SAP_STATE_INACTIVE transition for
-  * LLC_SAP_EV_ACTIVATION_REQ event
-@@ -34,14 +34,14 @@ static const llc_sap_action_t llc_sap_inactive_state_actions_1[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_inactive_state_trans_1 = {
-+static const struct llc_sap_state_trans llc_sap_inactive_state_trans_1 = {
- 	.ev =		llc_sap_ev_activation_req,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_inactive_state_actions_1,
- };
- 
- /* array of pointers; one to each transition */
--static struct llc_sap_state_trans *llc_sap_inactive_state_transitions[] = {
-+static const struct llc_sap_state_trans *llc_sap_inactive_state_transitions[] = {
- 	[0] = &llc_sap_inactive_state_trans_1,
- 	[1] = &llc_sap_state_trans_end,
- };
-@@ -52,7 +52,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_1[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_1 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_1 = {
- 	.ev =		llc_sap_ev_rx_ui,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_1,
-@@ -64,7 +64,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_2[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_2 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_2 = {
- 	.ev =		llc_sap_ev_unitdata_req,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_2,
-@@ -76,7 +76,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_3[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_3 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_3 = {
- 	.ev =		llc_sap_ev_xid_req,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_3,
-@@ -88,7 +88,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_4[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_4 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_4 = {
- 	.ev =		llc_sap_ev_rx_xid_c,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_4,
-@@ -100,7 +100,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_5[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_5 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_5 = {
- 	.ev =		llc_sap_ev_rx_xid_r,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_5,
-@@ -112,7 +112,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_6[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_6 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_6 = {
- 	.ev =		llc_sap_ev_test_req,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_6,
-@@ -124,7 +124,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_7[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_7 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_7 = {
- 	.ev =		llc_sap_ev_rx_test_c,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_7
-@@ -136,7 +136,7 @@ static const llc_sap_action_t llc_sap_active_state_actions_8[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_8 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_8 = {
- 	.ev =		llc_sap_ev_rx_test_r,
- 	.next_state =	LLC_SAP_STATE_ACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_8,
-@@ -150,14 +150,14 @@ static const llc_sap_action_t llc_sap_active_state_actions_9[] = {
- 	[1] = NULL,
- };
- 
--static struct llc_sap_state_trans llc_sap_active_state_trans_9 = {
-+static const struct llc_sap_state_trans llc_sap_active_state_trans_9 = {
- 	.ev =		llc_sap_ev_deactivation_req,
- 	.next_state =	LLC_SAP_STATE_INACTIVE,
- 	.ev_actions =	llc_sap_active_state_actions_9
- };
- 
- /* array of pointers; one to each transition */
--static struct llc_sap_state_trans *llc_sap_active_state_transitions[] = {
-+static const struct llc_sap_state_trans *llc_sap_active_state_transitions[] = {
- 	[0] = &llc_sap_active_state_trans_2,
- 	[1] = &llc_sap_active_state_trans_1,
- 	[2] = &llc_sap_active_state_trans_3,
-diff --git a/net/llc/llc_sap.c b/net/llc/llc_sap.c
-index 116c0e479183..6cd03c2ae7d5 100644
---- a/net/llc/llc_sap.c
-+++ b/net/llc/llc_sap.c
-@@ -114,12 +114,12 @@ void llc_sap_rtn_pdu(struct llc_sap *sap, struct sk_buff *skb)
-  *	Returns the pointer to found transition on success or %NULL for
-  *	failure.
-  */
--static struct llc_sap_state_trans *llc_find_sap_trans(struct llc_sap *sap,
--						      struct sk_buff *skb)
-+static const struct llc_sap_state_trans *llc_find_sap_trans(struct llc_sap *sap,
-+							    struct sk_buff *skb)
- {
- 	int i = 0;
--	struct llc_sap_state_trans *rc = NULL;
--	struct llc_sap_state_trans **next_trans;
-+	const struct llc_sap_state_trans *rc = NULL;
-+	const struct llc_sap_state_trans **next_trans;
- 	struct llc_sap_state *curr_state = &llc_sap_state_table[sap->state - 1];
- 	/*
- 	 * Search thru events for this state until list exhausted or until
-@@ -143,7 +143,7 @@ static struct llc_sap_state_trans *llc_find_sap_trans(struct llc_sap *sap,
-  *	Returns 0 for success and 1 for failure of at least one action.
-  */
- static int llc_exec_sap_trans_actions(struct llc_sap *sap,
--				      struct llc_sap_state_trans *trans,
-+				      const struct llc_sap_state_trans *trans,
- 				      struct sk_buff *skb)
- {
- 	int rc = 0;
-@@ -166,8 +166,8 @@ static int llc_exec_sap_trans_actions(struct llc_sap *sap,
-  */
- static int llc_sap_next_state(struct llc_sap *sap, struct sk_buff *skb)
- {
-+	const struct llc_sap_state_trans *trans;
- 	int rc = 1;
--	struct llc_sap_state_trans *trans;
- 
- 	if (sap->state > LLC_NR_SAP_STATES)
- 		goto out;
+ 	if (!newsk)
+ 		return NULL;
+@@ -608,10 +605,14 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
+ #endif
+ #ifdef CONFIG_TCP_AO
+ 	newtp->ao_info = NULL;
+-	ao_key = treq->af_specific->ao_lookup(sk, req,
+-				tcp_rsk(req)->ao_keyid, -1);
+-	if (ao_key)
+-		newtp->tcp_header_len += tcp_ao_len_aligned(ao_key);
++
++	if (tcp_rsk_used_ao(req)) {
++		struct tcp_ao_key *ao_key;
++
++		ao_key = treq->af_specific->ao_lookup(sk, req, tcp_rsk(req)->ao_keyid, -1);
++		if (ao_key)
++			newtp->tcp_header_len += tcp_ao_len_aligned(ao_key);
++	}
+  #endif
+ 	if (skb->len >= TCP_MSS_DEFAULT + newtp->tcp_header_len)
+ 		newicsk->icsk_ack.last_seg_size = skb->len - newtp->tcp_header_len;
 -- 
-2.45.2
+2.30.2
 
 
