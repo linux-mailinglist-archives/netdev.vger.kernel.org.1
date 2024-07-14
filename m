@@ -1,165 +1,284 @@
-Return-Path: <netdev+bounces-111359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E84930AF6
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 19:30:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83891930B0B
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 19:51:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F9C31C20BE9
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 17:30:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B375281217
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 17:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B635213B58E;
-	Sun, 14 Jul 2024 17:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CC713BC03;
+	Sun, 14 Jul 2024 17:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSk3/g3x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8hgj0hK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C87335C0;
-	Sun, 14 Jul 2024 17:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5FA15C0;
+	Sun, 14 Jul 2024 17:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720978230; cv=none; b=XGl7f6FiWK0pp4P3ykulmL9W+P4DTRncURsgPRV4m1TfZ+Szq8uswqQTCqVanXKCG+9Fk7rNhJ3kLAdhQsY6T4JUGPRanQozzXTUioTsvNns4PZSauxeRMjSMFxMljot/X0x1yCIPWlR4tkspEEmoRcmwKSNArHSjrYbsnwnmwc=
+	t=1720979494; cv=none; b=Laoj6/+GcBuFhDyzaDWUejsaahflBvEFl8HqvaK2rvnnoOvLwLoCn/tyF0w0NXbCp2xJnPTr02n/02buZrfBOxmfF5K094EMdoMwbzza40Dv8frL5GOZRYEBYUaT+iF0ho/AGKLy5pt2ix40Iqir6M0fTCf6LC/0d0+vuMZTj30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720978230; c=relaxed/simple;
-	bh=eoz4ISS7d2sH2hTa7QRiAuGG1rWHxXjixXnT2ssYqnM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AO3Fj0XMJKh90T00COq5XQ16IqaOB66SioCeLGAnkpqzmySy2je2+ttMsFf35wmO89Wu5QQtaXKKxnZbLHguo/VA+DIYjEzL9EiS9qx1UrU2c4RvjFp1K/yAkHqFAR7mU3sApNpOTx1syAqYeRTwgaS4sSKRVeAsSWWHV04YVHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSk3/g3x; arc=none smtp.client-ip=209.85.161.53
+	s=arc-20240116; t=1720979494; c=relaxed/simple;
+	bh=Wk/fAgif21ZTPLwUEv0nzy5h6aetAxhk7e7VOkM3aZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jH1CmzWDafua60W9t7fXzkmJ5cweWRhaby4in9ffIc7pMGQgs+7M7k4Ziu14WhVOnSHD7KAeqkIV5LNgm6aCXjd1FBEtaaBg1MovNxSijDVBkz2smIg3dHS2WmgqzbWVmJVzFKMENtHsDQel6p91hBXAGNaCav7BFb8XpDdCD1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y8hgj0hK; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5ce739c2650so744199eaf.1;
-        Sun, 14 Jul 2024 10:30:28 -0700 (PDT)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-79f0e7faafcso286457785a.3;
+        Sun, 14 Jul 2024 10:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720978228; x=1721583028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/cLW4DNVGNshBrBTsdLmOTS96GV7TP/xD70TwT5VJ2s=;
-        b=RSk3/g3x+KC5pdCWdnNBf61NEFFzqwP+LIhKpoLUseg+/U8g/MimyGrBobCcujxVtC
-         FusL/wAghTCez1/FpUASI4SSwf2QMQs0xPuoZvXvtj1DwlJhtUiOBmI3PGWYCqPMa9KR
-         GF207AvA96ovz0b3zSl1Tz+cbWhb1+UhH6q/Jke5iCMe0BalRxMLByn+7YcAxzVL493F
-         +LmSRFQ5syd+qmch8wmrQRfS21YAJeVHGo6fD5V15X3jUbIz55bx3ZtIlcng7Jdsmq82
-         nPVUSvNTxvKStLCMfsNFytxZNf4jAxTzF0QaaOkBfdGnUKYjm0bCn03yB685UmgKv7nA
-         5aAA==
+        d=gmail.com; s=20230601; t=1720979491; x=1721584291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OfaiOOrjESjDdpDGyOKMuYRm7PD0zFekR/TMfjqNaVk=;
+        b=Y8hgj0hKkq6OnUC0wV48H2ccFyAkBljlkNOXMVmNMC4OT8KFaBzPf6gZlMVA4SP4jK
+         3lBTb8v1S0CQImrlVQmkK50ufm2eF4Ka/RI3R3zcqCZ9u//4ulOmVY4xz/mfJcn40ixH
+         cquNClgtebkbss536M6C+Fipv8gJprSFq7QPcg76R7R8ClFuMqvo7CCddKIg0q6+l8zI
+         5DpeXiq0jvEg6Z8GTuw1S+l1AlvZF9fohQFp7lDQIWWpCCto8o7WEi2C5qHj+EWzVpHR
+         EzQEk2m3zdr6oApX0eV2lvLUkKKRGkNJSd0FRUkmMVv/wwsO9RnlgA7BkER9uFkLaYjs
+         mbOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720978228; x=1721583028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/cLW4DNVGNshBrBTsdLmOTS96GV7TP/xD70TwT5VJ2s=;
-        b=wjx0HrmDplV9eMQmGvcQTJAxH2zPwf8q9Harnprj3WqsTJ4IT37O/HC/GmAb1D9Bz9
-         Gxi7FKsIzlRMuT+yRCfQFr+sIkxeU6ZkE11B80Enhu3KymlVTgP8DMuEZYbB/EUvURdF
-         hqkFclBCYYUFJ8YA9ANkXdZ+1k6v3QtO/TkLxqvOZD62JqbY6cDZRdb9Rr9SypmM1qg8
-         IL6PAiO/yacFdxJio7HH9pE9hQTDSjJtyFTWzm7kualU6nVI/0d/zsTFtKtBXyWzHjkk
-         TH1Wq5lYiJ/9xBVNXd/JQq8/w8zBaJwhmOP5HwIcfy+yPGJWYSNXsdt0AOryNDz5hTkv
-         DGTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWehTQFvXvR2MLELndXl093ysXio5C5xfHrjuXWiCCghw56V2Yit9cO2X7UWG3oHxGDNsFiZoon9vqq9021Hz0RPHTBSyKm1qrQzY0DDZCDHw3RLmJRXOhKmddozOsRYrjyURijJSxXqX8px/w9G0hx0EsSS/inOBL5A96C1wtenPUZMXb7tpZwyYN9kI4IS7i9ZJkc/Lcxt6lRZOui56TjB9MvRng=
-X-Gm-Message-State: AOJu0Yz664Uvb7nWdYx1idFtE8p6jVfa6rmigLXsIkryaAxQ7l7M1Mrg
-	BDWQSNrRwehQIHj3uppBs0OneXgWVhzfR5Q3V9ezhRhtzj8hqcnoiexqKiaBK7b+LhtrqkEWrh6
-	zaEZQfxSmzBXoPsr0vQd1jAr1EUE=
-X-Google-Smtp-Source: AGHT+IEl8QKe4NvFcBM4q9JGhb2MwGeuTO3IyYzcItTz+lIQYAUJkOIhJojhagfWcGc8DwiST3dj+mLBvjJ/MoDWQBw=
-X-Received: by 2002:a05:6358:70b:b0:1ac:6234:faaf with SMTP id
- e5c5f4694b2df-1ac6234fdc4mr496748155d.17.1720978227984; Sun, 14 Jul 2024
- 10:30:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720979491; x=1721584291;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OfaiOOrjESjDdpDGyOKMuYRm7PD0zFekR/TMfjqNaVk=;
+        b=lma1CEEmYwpi1Zlen0Z9TnFq/vG8cWch+CL/1fVMRz/YxKhM5FwJCv9d3+6Jo/4ok7
+         /lUdxud0eNo11TeBqrliKtDzK1iQJhGLzgaIQbV8YiYe/BkgN9tNmb14ds0qanib82c/
+         2aSQcPdsFxp7jFzd3FUF3G1m5PLZjQtC9FdBHBW0ok3PIQC8nUuDCSSu3J1JvM25NE8g
+         C7T3rbn8JUxEfm8LQo+EwjYZBHhUBOcUxkU405cx7mlwSu2TZEdaRQIrUAnjAUMAF9uP
+         6NjsF6jwtZPHDuRnYE/88arpojMtkmsS2s3JB0XT/T76jNYecrmuUQfLWihZ4v9GTMqj
+         SpeA==
+X-Gm-Message-State: AOJu0Yw/2xfNRuqZBrdM7UC9kL3XEwgnKw0+8mwL3doitAUqFXvrNwHC
+	BLbVJw1/7ZtZBYy2l+lscnXG+pd2yFqv5R0oohAI22qHkQFmPtIESjjJZg==
+X-Google-Smtp-Source: AGHT+IE+RGOlXzeml+sAdPLKly8bs87or7oWVbagsDC3FnoQjxORWegW1yJuAvQfdOA+VTjR3R5joQ==
+X-Received: by 2002:a05:620a:20c5:b0:79f:38e:c015 with SMTP id af79cd13be357-79f19aaee70mr1749088085a.62.1720979491448;
+        Sun, 14 Jul 2024 10:51:31 -0700 (PDT)
+Received: from n36-183-057.byted.org ([147.160.184.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f5b7e1e38sm17010481cf.25.2024.07.14.10.51.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jul 2024 10:51:30 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	yangpeihao@sjtu.edu.cn,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	alexei.starovoitov@gmail.com,
+	martin.lau@kernel.org,
+	sinquersw@gmail.com,
+	toke@redhat.com,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	sdf@google.com,
+	xiyou.wangcong@gmail.com,
+	yepeilin.cs@gmail.com,
+	ameryhung@gmail.com
+Subject: [RFC PATCH v9 00/11] bpf qdisc
+Date: Sun, 14 Jul 2024 17:51:19 +0000
+Message-Id: <20240714175130.4051012-1-amery.hung@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240714160238.238708-1-vadorovsky@gmail.com>
-In-Reply-To: <20240714160238.238708-1-vadorovsky@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 14 Jul 2024 19:30:15 +0200
-Message-ID: <CANiq72=kchSt5XjAJRVgNWG-iNXbc2E64ojwsQYnB2pshULK1Q@mail.gmail.com>
-Subject: Re: [PATCH] rust: str: Use `core::CStr`, remove the custom `CStr` implementation
-To: Michal Rostecki <vadorovsky@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Martin Rodriguez Reboredo <yakoyoku@gmail.com>, Finn Behrens <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>, 
-	Valentin Obst <kernel@valentinobst.de>, Laine Taffin Altman <alexanderaltman@me.com>, 
-	Danilo Krummrich <dakr@redhat.com>, Yutaro Ohno <yutaro.ono.418@gmail.com>, 
-	Tiago Lam <tiagolam@gmail.com>, Charalampos Mitrodimas <charmitro@posteo.net>, 
-	Ben Gooding <ben.gooding.dev@gmail.com>, Roland Xu <mu001999@outlook.com>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Michal,
+Hi all,
 
-Thanks for the patch! Some notes below...
+This patchset aims to support implementing qdisc using bpf struct_ops.
+This version takes a step back and only implements the minimum support
+for bpf qdisc. 1) support of adding skb to bpf_list and bpf_rbtree
+directly and 2) classful qdisc are deferred to future patchsets.
 
-On Sun, Jul 14, 2024 at 6:02=E2=80=AFPM Michal Rostecki <vadorovsky@gmail.c=
-om> wrote:
->
-> `CStr` became a part of `core` library in Rust 1.75, therefore there is
-> no need to keep the custom implementation.
+* Overview *
 
-It would depend on the differences, right? i.e. for a reader, is this
-meant to imply there is no meaningful difference in what you point out
-below?
+This series supports implementing qdisc using bpf struct_ops. bpf qdisc
+aims to be a flexible and easy-to-use infrastructure that allows users to
+quickly experiment with different scheduling algorithms/policies. It only
+requires users to implement core qdisc logic using bpf and implements the
+mundane part for them. In addition, the ability to easily communicate
+between qdisc and other components will also bring new opportunities for
+new applications and optimizations.
 
-> - It does not implement `Display` (but implements `Debug`).
+* struct_ops changes *
 
-One question that comes up when reading this is: are we losing
-`Display`'s output form?
+To make struct_ops works better with bpf qdisc, two new changes are
+introduced to bpf specifically for struct_ops programs. Frist, we
+introduce "ref_acquired" postfix for arguments in stub functions [1] in
+patch 1-2. It will allow Qdisc_ops->enqueue to acquire an referenced kptr
+to an skb just once. Through the reference object tracking mechanism in
+the verifier, we can make sure that the acquired skb will be either
+enqueued or dropped. Besides, no duplicate references can be acquired.
+Then, we allow a reference leak in struct_ops programs so that we can
+return an skb naturally. This is done and tested in patch 3 and 4.
 
-Also, for clarity, please mention if there is a difference in the
-output of the `Debug` ones.
+* Performance of bpf qdisc *
 
->   - Otherwise, having such a method is not really desirable. `CStr` is
->     a reference type
->     or `str` are usually not supposed to be modified.
+We tested several bpf qdiscs included in the selftests and their in-tree
+counterparts to give you a sense of the performance of qdisc implemented
+in bpf.
 
-The sentence seems to be cut, and it should probably try to explain
-better why it is undesirable, i.e. if it is needed for something like
-`DerefMut`, then it seems better to have a method.
+The implementation of bpf_fq is fairly complex and slightly different from
+fq so later we only compare the two fifo qdiscs. bpf_fq implements the
+same fair queueing algorithm in fq, but without flow hash collision
+avoidance and garbage collection of inactive flows. bpf_fifo uses a single
+bpf_list as a queue instead of three queues for different priorities in
+pfifo_fast. The time complexity of fifo however should be similar since the
+queue selection time is negligible.
 
-> -            static CONDITION: &'static $crate::str::CStr =3D $crate::c_s=
-tr!(stringify!($condition));
-> +            static CONDITION: &'static core::ffi::CStr =3D unsafe {
-> +                core::ffi::CStr::from_bytes_with_nul_unchecked(
-> +                    core::concat!(stringify!($condition), "\0").as_bytes=
-()
-> +                )
-> +            };
+Test setup:
 
-This looks worse after the change and requires `unsafe`. Can we do
-something to improve it?
+    client -> qdisc ------------->  server
+    ~~~~~~~~~~~~~~~                 ~~~~~~
+    nested VM1 @ DC1               VM2 @ DC2
 
-> +        // SAFETY: Casting to CStr is safe because its internal represen=
-tation
-> +        // is a [u8] too.
-> +        unsafe { &mut *(self.buf.as_mut_slice() as *mut [u8] as *mut CSt=
-r) }
+Throghput: iperf3 -t 600, 5 times
 
-I see Bj=C3=B6rn commented on this already -- `CStr`'s layout is not
-guaranteed (and is a `[c_char]` instead).
+      Qdisc        Average (GBits/sec)
+    ----------     -------------------
+    pfifo_fast       12.52 ± 0.26
+    bpf_fifo         11.72 ± 0.32 
+    fq               10.24 ± 0.13
+    bpf_fq           11.92 ± 0.64 
 
-Also, the casting is not what is unsafe, so perhaps it may be clearer
-to reword the comment.
+Latency: sockperf pp --tcp -t 600, 5 times
 
-In addition, please format comments as Markdown.
+      Qdisc        Average (usec)
+    ----------     --------------
+    pfifo_fast      244.58 ± 7.93
+    bpf_fifo        244.92 ± 15.22
+    fq              234.30 ± 19.25
+    bpf_fq          221.34 ± 10.76
 
-> -//!             work <- new_work!("MyStruct::work"),
-> +//!             work <- new_work!(c"MyStruct::work"),
+Looking at the two fifo qdiscs, the 6.4% drop in throughput in the bpf
+implementatioin is consistent with previous observation (v8 throughput
+test on a loopback device). This should be able to be mitigated by
+supporting adding skb to bpf_list or bpf_rbtree directly in the future.
 
-I agree as well that it may make sense to simplify the callers as much
-as possible, unless there is a need to have that flexibility.
+* Clean up skb in bpf qdisc during reset *
 
-Cheers,
-Miguel
+The current implementation relies on bpf qdisc implementors to correctly
+release skbs in queues (bpf graphs or maps), which might not be a safe
+thing to do. The solution remains to be explored in the next version and
+Martin has suggested to store skb in qdisc private data.
+
+* Miscellaneous notes *
+
+The bpf qdiscs in selftest requires support of exchanging kptr into
+allocated objects (local kptr), which Dave Marchevsky developed and
+kindly sent me as off-list patchset.
+
+Todo:
+  - Properly clean up skb in bpf qdisc during reset
+  - Support updating Qdisc_ops
+
+---
+v9: Drop classful qdisc operations and kfuncs
+    Drop support of enqueuing skb directly to bpf_rbtree/list
+
+v8: Implement support of bpf qdisc using struct_ops
+    Allow struct_ops to acquire referenced kptr via argument
+    Allow struct_ops to release and return referenced kptr
+    Support enqueuing sk_buff to bpf_rbtree/list
+    Move examples from samples to selftests
+    Add a classful qdisc selftest
+    Link: https://lore.kernel.org/netdev/20240510192412.3297104-15-amery.hung@bytedance.com/
+
+v7: Reference skb using kptr to sk_buff instead of __sk_buff
+    Use the new bpf rbtree/link to for skb queues
+    Add reset and init programs
+    Add a bpf fq qdisc sample
+    Add a bpf netem qdisc sample
+    Link: https://lore.kernel.org/netdev/cover.1705432850.git.amery.hung@bytedance.com/
+
+v6: switch to kptr based approach
+
+v5: mv kernel/bpf/skb_map.c net/core/skb_map.c
+    implement flow map as map-in-map
+    rename bpf_skb_tc_classify() and move it to net/sched/cls_api.c
+    clean up eBPF qdisc program context
+
+v4: get rid of PIFO, use rbtree directly
+
+v3: move priority queue from sch_bpf to skb map
+    introduce skb map and its helpers
+    introduce bpf_skb_classify()
+    use netdevice notifier to reset skb's
+    Rebase on latest bpf-next
+
+v2: Rebase on latest net-next
+    Make the code more complete (but still incomplete)
+
+Amery Hung (11):
+  bpf: Support getting referenced kptr from struct_ops argument
+  selftests/bpf: Test referenced kptr arguments of struct_ops programs
+  bpf: Allow struct_ops prog to return referenced kptr
+  selftests/bpf: Test returning referenced kptr from struct_ops programs
+  bpf: net_sched: Support implementation of Qdisc_ops in bpf
+  bpf: net_sched: Add bpf qdisc kfuncs
+  bpf: net_sched: Allow more optional operators in Qdisc_ops
+  libbpf: Support creating and destroying qdisc
+  selftests: Add a basic fifo qdisc test
+  selftests: Add a bpf fq qdisc to selftest
+  selftests: Add a bpf netem qdisc to selftest
+
+ include/linux/bpf.h                           |   3 +
+ include/linux/btf.h                           |   1 +
+ include/net/sch_generic.h                     |   7 +
+ kernel/bpf/bpf_struct_ops.c                   |  26 +-
+ kernel/bpf/btf.c                              |   3 +-
+ kernel/bpf/verifier.c                         |  84 ++-
+ net/sched/Makefile                            |   4 +
+ net/sched/bpf_qdisc.c                         | 412 ++++++++++++
+ net/sched/sch_api.c                           |  18 +-
+ net/sched/sch_generic.c                       |  11 +-
+ tools/lib/bpf/libbpf.h                        |   5 +-
+ tools/lib/bpf/netlink.c                       |  20 +-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  15 +
+ .../selftests/bpf/bpf_testmod/bpf_testmod.h   |   6 +
+ .../selftests/bpf/prog_tests/bpf_qdisc.c      | 215 ++++++
+ .../prog_tests/test_struct_ops_kptr_return.c  |  87 +++
+ .../prog_tests/test_struct_ops_refcounted.c   |  41 ++
+ .../selftests/bpf/progs/bpf_qdisc_common.h    |  16 +
+ .../selftests/bpf/progs/bpf_qdisc_fifo.c      | 102 +++
+ .../selftests/bpf/progs/bpf_qdisc_fq.c        | 623 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_qdisc_netem.c     | 258 ++++++++
+ .../bpf/progs/struct_ops_kptr_return.c        |  29 +
+ ...uct_ops_kptr_return_fail__invalid_scalar.c |  24 +
+ .../struct_ops_kptr_return_fail__local_kptr.c |  30 +
+ ...uct_ops_kptr_return_fail__nonzero_offset.c |  23 +
+ .../struct_ops_kptr_return_fail__wrong_type.c |  28 +
+ .../bpf/progs/struct_ops_refcounted.c         |  67 ++
+ .../struct_ops_refcounted_fail__ref_leak.c    |  17 +
+ 28 files changed, 2153 insertions(+), 22 deletions(-)
+ create mode 100644 net/sched/bpf_qdisc.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_kptr_return.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_refcounted.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fifo.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fq.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_netem.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_kptr_return.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_kptr_return_fail__invalid_scalar.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_kptr_return_fail__local_kptr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_kptr_return_fail__nonzero_offset.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_kptr_return_fail__wrong_type.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_refcounted.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_refcounted_fail__ref_leak.c
+
+-- 
+2.20.1
+
 
