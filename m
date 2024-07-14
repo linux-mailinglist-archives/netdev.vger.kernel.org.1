@@ -1,244 +1,230 @@
-Return-Path: <netdev+bounces-111330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0F393087B
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 06:32:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B15930888
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 06:52:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43F55281C0D
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 04:32:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E484BB212F0
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 04:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E03DDD9;
-	Sun, 14 Jul 2024 04:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4491DDF6B;
+	Sun, 14 Jul 2024 04:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HggCK/Cq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VdVqeC+W";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HggCK/Cq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VdVqeC+W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWwenD4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E334DDAD;
-	Sun, 14 Jul 2024 04:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A313812B87;
+	Sun, 14 Jul 2024 04:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720931519; cv=none; b=H8/5MCMeFhtYJq8VCkLCBQLrUQbr+NFAaL70O7uRC5WiRF9n3Rgw5HOtZV90jyvPz5DKmmUwn8z2o6sfl9q17ljbeW1dwSyt4xmUVGZCvzxGnrx6+lGZt81oeKp4ox7tjJXrW2xB4pZyyB16s4y48Xh7AYQkUI4G/7t+rzEYMCU=
+	t=1720932746; cv=none; b=Xi5Li0k0f53cZXx2E2LmxO+UC0GkPY8FAVBunGYGprkMh9aR5/AnOjJPpXCptIjMVaJzcefy6WvjbhF+2tddryT0+7QVv/HRoab9LfimBudeXT+KBM2mEeGWwqwS7vChMAsjYcrZXdO1reNQGYHhSMWRqrkag/nBvHyVTXSBP0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720931519; c=relaxed/simple;
-	bh=Tai56idA7i3ldOTVzpBFhTodct2uYIBVu3ZEmedXFo0=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=Kfd91fdq+Pkyc2CECnXzaeixuSn2T17ZOO4Kw7/B9Qa5oWclr9GIXP5eXOCea4WjZTS2Ek6GuXb3s+00tcxkPmn+aUqWOnyEAn9yb969zPeqCT/UyYJTZ6LumadEocdfkUfHsVhg/g0rHqyNEL2IEOso5k8E9ZB93kh0MOJfVPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HggCK/Cq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=VdVqeC+W; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HggCK/Cq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=VdVqeC+W; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 85A201F38E;
-	Sun, 14 Jul 2024 04:31:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1720931515; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUwGToKKARtiAo8j0bi3ivVl6DF2GFyT069klfBDpIM=;
-	b=HggCK/CqMvnNvwIUEM4hn9BDytejEkTq2fz7y994rAxiIh2LImDtQ5HssG2JmpNir72+4F
-	bYJ+oBYRQyfAhxuEVXQnv8p8ISJniF2C9F2omlOHdgEvWH9Z6pw1xq3/asXt8AxdBvrov/
-	8DTrjKda8axWuPzIfXuexDaTzLE3m14=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1720931515;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUwGToKKARtiAo8j0bi3ivVl6DF2GFyT069klfBDpIM=;
-	b=VdVqeC+WMs8fVjH00Bqi6cMwuzIYcPEkoaNzgaVePuLrSzZCLdCaZZs13exsQZ+ixmk+Lc
-	mqSdOrDI+YMhCNBw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="HggCK/Cq";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=VdVqeC+W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1720931515; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUwGToKKARtiAo8j0bi3ivVl6DF2GFyT069klfBDpIM=;
-	b=HggCK/CqMvnNvwIUEM4hn9BDytejEkTq2fz7y994rAxiIh2LImDtQ5HssG2JmpNir72+4F
-	bYJ+oBYRQyfAhxuEVXQnv8p8ISJniF2C9F2omlOHdgEvWH9Z6pw1xq3/asXt8AxdBvrov/
-	8DTrjKda8axWuPzIfXuexDaTzLE3m14=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1720931515;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUwGToKKARtiAo8j0bi3ivVl6DF2GFyT069klfBDpIM=;
-	b=VdVqeC+WMs8fVjH00Bqi6cMwuzIYcPEkoaNzgaVePuLrSzZCLdCaZZs13exsQZ+ixmk+Lc
-	mqSdOrDI+YMhCNBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BB639137AC;
-	Sun, 14 Jul 2024 04:31:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id uSPYG7ZUk2bEeQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Sun, 14 Jul 2024 04:31:50 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1720932746; c=relaxed/simple;
+	bh=zreJeKJLhmL0JG895SlaLVNVQFOIvr78TW6idthSuro=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VrrRH0D8X3Dn7HA1iVA327QKxBSWYGjgM211dqNMq3qNUnNrb00x5zwbEQvKk5DXafNOj6n5BXG7RWrSFlyB4d+uDag1WOoWyXO3nIitjRNESQDDOPEvtWElermbyPpdaFRIZt84zPea0CVUe9bFaIB8A/7XJewyQTcyXLuJ7DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWwenD4g; arc=none smtp.client-ip=209.85.167.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-3d96365dc34so2743781b6e.2;
+        Sat, 13 Jul 2024 21:52:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720932743; x=1721537543; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eQpCHDZFDAGZ/nCT7bmpCzurf744d17uzqi+k1JGFEg=;
+        b=FWwenD4geINn3mXME2WbVIKmn89JteuG1eIBEZMhTky9YVT3gCJOxGeGI2qILXzkAB
+         typBiPwD8YZPFr04MnZJQbxmUu4t3mEwuoLvlQxQbjYEfpoLAEibVNfd7j0HZyPeDv28
+         LdYEAokWjC59J9//AAOem+AfkWCaje7zymbovCrDgt6yZAwflL8zVE28sHEpbyoDW9w9
+         SlDTlX053kKiWx+cnO4w0pNEcTPU0lQwjxd21BufkyTEeM0CThr1kTgqG8k/I1v7DrVt
+         BXbVJRbcBVPyXklvARZ+xNhTr3HWyDTKwJARMU8e6VUM/eTjDpievRo1X/jbxnx8jmkn
+         362w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720932743; x=1721537543;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eQpCHDZFDAGZ/nCT7bmpCzurf744d17uzqi+k1JGFEg=;
+        b=KbfB1rT7NJvDMtSE2IewgqnpVyCjzMnGOjfpN83ygIafd7hBRH8n1+cElocKFvIxNX
+         2Jg1/sE0e0w96HBPkmtRBQ4Mz3dLMXT8PAiYNSawmvIehurZPEF+Wwj7U+pgyq/xrA5C
+         uK4jy+iZfxWIuLeXdCGnmbRrykKqpvd5M0dIyNzLIKG4dqXfObW+mozT8x8meE6dtgii
+         u2SvWJOrrELXnCu1XiYDBhOXewT8pF6nvQfnmRobEohb97O+EmD3BTgJGb3xVhivbsHL
+         YxMMgayTzZyzRVMYB9I2QBkhO0qyDf/EC6OcZqzh6dDFpgItXkn0qwLeY6TJrsaKBf4m
+         X9jg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7WjIpMtHF8uU/MnsGQD2kQfj48x+4IERQ/OkB/SuzRuiSRFFOQAhxQYfGJsnKaTAohSm0S9O+YmLPpAU1N8b1kQMgjypOrXxcbaIrwe1QTA2ba3/IDGKa0Fshjr4f0jLElZC+
+X-Gm-Message-State: AOJu0Yw7wN6galpIZfwCVGrIyx29W4OmC0N8GrDFQZzXIeJdybqJg7hr
+	0KG3zhAsXSDgjPwFBl929+0X6t0CZ+j7I+KLsbGmwQ971sJ6vVjb
+X-Google-Smtp-Source: AGHT+IGR/MPyvZbmyI9BZCtumU88jtog7daHPZeJeS+yFlVQXisT5Eo9zc7ta78BFo/AWQqtWhSwvA==
+X-Received: by 2002:a05:6808:221a:b0:3d9:2c62:72b4 with SMTP id 5614622812f47-3d93c00bdcbmr18757511b6e.19.1720932743516;
+        Sat, 13 Jul 2024 21:52:23 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:dd5e:dfbe:bb33:8d5? ([2409:8a55:301b:e120:dd5e:dfbe:bb33:8d5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc4e477sm17523645ad.265.2024.07.13.21.52.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 13 Jul 2024 21:52:23 -0700 (PDT)
+Message-ID: <12ff13d9-1f3d-4c1b-a972-2efb6f247e31@gmail.com>
+Date: Sun, 14 Jul 2024 12:52:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Chuck Lever" <chuck.lever@oracle.com>
-Cc: "Gaosheng Cui" <cuigaosheng1@huawei.com>, trondmy@kernel.org,
- anna@kernel.org, jlayton@kernel.org, kolga@netapp.com, Dai.Ngo@oracle.com,
- tom@talpey.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-nfs@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH -next,v2] gss_krb5: refactor code to return correct
- PTR_ERR in krb5_DK
-In-reply-to: <ZpE9luTCrUnh8RBH@tissot.1015granger.net>
-References: <>, <ZpE9luTCrUnh8RBH@tissot.1015granger.net>
-Date: Sun, 14 Jul 2024 14:31:42 +1000
-Message-id: <172093150291.15471.15426043640692195014@noble.neil.brown.name>
-X-Rspamd-Queue-Id: 85A201F38E
-X-Spam-Flag: NO
-X-Spam-Score: -0.51
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-0.51 / 50.00];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spamd-Bar: /
+User-Agent: Mozilla Thunderbird
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+Subject: Re: [PATCH net-next v9 06/13] mm: page_frag: reuse existing space for
+ 'size' and 'pfmemalloc'
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ linux-mm@kvack.org
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-7-linyunsheng@huawei.com>
+ <12a8b9ddbcb2da8431f77c5ec952ccfb2a77b7ec.camel@gmail.com>
+ <808be796-6333-c116-6ecb-95a39f7ad76e@huawei.com>
+ <a026c32218cabc7b6dc579ced1306aefd7029b10.camel@gmail.com>
+ <f4ff5a42-9371-bc54-8523-b11d8511c39a@huawei.com>
+ <96b04ebb7f46d73482d5f71213bd800c8195f00d.camel@gmail.com>
+ <5daed410-063b-4d86-b544-d1a85bd86375@huawei.com>
+ <CAKgT0UdJPcnfOJ=-1ZzXbiFiA=8a0z_oVBgQC-itKB1HWBU+yA@mail.gmail.com>
+ <df38c0fb-64a9-48da-95d7-d6729cc6cf34@huawei.com>
+ <CAKgT0UdSjmJoaQvTOz3STjBi2PazQ=piWY5wqFsYFBFLcPrLjQ@mail.gmail.com>
+ <29e8ac53-f7da-4896-8121-2abc25ec2c95@gmail.com>
+ <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, 13 Jul 2024, Chuck Lever wrote:
-> On Fri, Jul 12, 2024 at 09:39:08AM -0400, Chuck Lever wrote:
-> > On Fri, Jul 12, 2024 at 03:24:23PM +0800, Gaosheng Cui wrote:
-> > > Refactor the code in krb5_DK to return PTR_ERR when an error occurs.
-> >=20
-> > My understanding of the current code is that if either
-> > crypto_alloc_sync_skcipher() or crypto_sync_skcipher_blocksize()
-> > fails, then krb5_DK() returns -EINVAL. At the only call site for
-> > krb5_DK(), that return code is unconditionally discarded. Thus I
-> > don't see that the proposed change is necessary or improves
-> > anything.
->=20
-> My understanding is wrong  ;-)
+On 7/14/2024 12:55 AM, Alexander Duyck wrote:
 
-True, but I think your conclusion was correct.
+...
 
-krb5_DK() returns zero or -EINVAL.
-It is only used by krb5_derive_key_v2(), which returns zero or -EINVAL,
-or -ENOMEM.
+>>>>
+>>>> Perhaps the 'remaining' changing in this patch does seems to make things
+>>>> harder to discuss. Anyway, it would be more helpful if there is some pseudo
+>>>> code to show the steps of how the above can be done in your mind.
+>>>
+>>> Basically what you would really need do for all this is:
+>>>     remaining = __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
+>>>     nc->remaining = remaining + fragsz;
+>>>     return encoded_page_address(nc->encoded_va) + size + remaining;
+>>
+> 
+> I might have mixed my explanation up a bit. This is assuming remaining
+> is a negative value as I mentioned before.
 
-krb4_derive_key_v2() is only used as a ->derive_key() method.
-This is called from krb5_derive_key(), and various unit tests in
-gss_krb5_tests.c
+Let's be more specific about the options here, what you meant is below,
+right? Let's say it is option 1 as below:
+struct page_frag_cache {
+         /* encoded_va consists of the virtual address, pfmemalloc bit 
+and order
+          * of a page.
+          */
+         unsigned long encoded_va;
 
-krb5_derive_key() is only called in gss_krb5_mech.c, and each call site
-is of the form:
-  if (krb5_derive_key(...)) goto out;
-so it doesn't matter what error is returned.
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+         __s16 remaining;
+         __u16 pagecnt_bias;
+#else
+         __s32 remaining;
+         __u32 pagecnt_bias;
+#endif
+};
 
-The unit test calls are all followed by
-	KUNIT_ASSERT_EQ(test, err, 0);
-so the only place the err is used is (presumably) in failure reports
-from the unit tests.
+void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+                                  unsigned int fragsz, gfp_t gfp_mask,
+                                  unsigned int align_mask)
+{
+         unsigned int size = page_frag_cache_page_size(nc->encoded_va);
+         int remaining;
 
-So the proposed change seems unnecessary from a practical perspective.
+         remaining = __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
+         if (unlikely(remaining + (int)fragsz > 0)) {
+                 if (!__page_frag_cache_refill(nc, gfp_mask))
+                         return NULL;
 
-Maybe it is justified from an aesthetic perspective, but I think that
-should be clearly stated in the commit message.  e.g.
+                 size = page_frag_cache_page_size(nc->encoded_va);
 
-  This change has no practical effect as all non-zero error statuses
-  are treated equally, however the distinction between EINVAL and ENOMEM
-  may be relevant at some future time and it seems cleaner to maintain
-  the distinction.
+                 remaining = -size;
+                 if (unlikely(remaining + (int)fragsz > 0))
+                         return NULL;
+         }
 
-NeilBrown
+         nc->pagecnt_bias--;
+         nc->remaining = remaining + fragsz;
+
+         return encoded_page_address(nc->encoded_va) + size + remaining;
+}
 
 
->=20
-> The return code isn't discarded. A non-zero return code from
-> krb5_DK() is carried back up the call stack. The logic in
-> krb5_derive_key_v2() does not use the kernel's usual error flow
-> form, so I missed this.
->=20
-> However, it still isn't clear to me why the error behavior here
-> needs to change. It's possible, for example, that -EINVAL is
-> perfectly adequate to indicate when sync_skcipher() can't find the
-> specified encryption algorithm (gk5e->encrypt_name).
->=20
-> Specifying the wrong encryption type: -EINVAL. That makes sense.
->=20
->=20
-> > > Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
-> > > ---
-> > > v2: Update IS_ERR to PTR_ERR, thanks very much!
-> > >  net/sunrpc/auth_gss/gss_krb5_keys.c | 8 ++++++--
-> > >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/net/sunrpc/auth_gss/gss_krb5_keys.c b/net/sunrpc/auth_gss/=
-gss_krb5_keys.c
-> > > index 4eb19c3a54c7..5ac8d06ab2c0 100644
-> > > --- a/net/sunrpc/auth_gss/gss_krb5_keys.c
-> > > +++ b/net/sunrpc/auth_gss/gss_krb5_keys.c
-> > > @@ -164,10 +164,14 @@ static int krb5_DK(const struct gss_krb5_enctype =
-*gk5e,
-> > >  		goto err_return;
-> > > =20
-> > >  	cipher =3D crypto_alloc_sync_skcipher(gk5e->encrypt_name, 0, 0);
-> > > -	if (IS_ERR(cipher))
-> > > +	if (IS_ERR(cipher)) {
-> > > +		ret =3D PTR_ERR(cipher);
-> > >  		goto err_return;
-> > > +	}
-> > > +
-> > >  	blocksize =3D crypto_sync_skcipher_blocksize(cipher);
-> > > -	if (crypto_sync_skcipher_setkey(cipher, inkey->data, inkey->len))
-> > > +	ret =3D crypto_sync_skcipher_setkey(cipher, inkey->data, inkey->len);
-> > > +	if (ret)
-> > >  		goto err_free_cipher;
-> > > =20
-> > >  	ret =3D -ENOMEM;
-> > > --=20
-> > > 2.25.1
-> > >=20
-> >=20
-> > --=20
-> > Chuck Lever
-> >=20
->=20
-> --=20
-> Chuck Lever
->=20
+And let's say what I am proposing in v10 is option 2 as below:
+struct page_frag_cache {
+         /* encoded_va consists of the virtual address, pfmemalloc bit 
+and order
+          * of a page.
+          */
+         unsigned long encoded_va;
 
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+         __u16 remaining;
+         __u16 pagecnt_bias;
+#else
+         __u32 remaining;
+         __u32 pagecnt_bias;
+#endif
+};
+
+void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+                                  unsigned int fragsz, gfp_t gfp_mask,
+                                  unsigned int align_mask)
+{
+         unsigned int size = page_frag_cache_page_size(nc->encoded_va);
+         int aligned_remaining = nc->remaining & align_mask;
+         int remaining = aligned_remaining - fragsz;
+
+         if (unlikely(remaining < 0)) {
+                 if (!__page_frag_cache_refill(nc, gfp_mask))
+                         return NULL;
+
+                 size = page_frag_cache_page_size(nc->encoded_va);
+
+                 aligned_remaining = size;
+                 remaining = aligned_remaining - fragsz;
+                 if (unlikely(remaining < 0))
+                         return NULL;
+         }
+
+         nc->pagecnt_bias--;
+         nc->remaining = remaining;
+
+         return encoded_page_address(nc->encoded_va) + (size - 
+aligned_remaining);
+}
+
+If the option 1 is not what you have in mind, it would be better to be 
+more specific about what you have in mind.
+
+If the option 1 is what you have in mind, it seems both option 1 and
+option 2 have the same semantics as my understanding, right? The 
+question here seems to be what is your perfer option and why?
+
+I implemented both of them, and the option 1 seems to have a
+bigger generated asm size as below:
+./scripts/bloat-o-meter vmlinux_non_neg vmlinux
+add/remove: 0/0 grow/shrink: 1/0 up/down: 37/0 (37)
+Function                                     old     new   delta
+__page_frag_alloc_va_align                   414     451     +37
+
+> 
+> Basically the issue is your current code is using nc->remaining to
+> generate the current address and that is bad as it isn't aligned to
+> anything as fragsz was added to it and no alignment check had been
+> done on that value.
 
