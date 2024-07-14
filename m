@@ -1,230 +1,157 @@
-Return-Path: <netdev+bounces-111331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25B15930888
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 06:52:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFFE3930896
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 07:31:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E484BB212F0
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 04:52:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67B51C20A7F
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 05:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4491DDF6B;
-	Sun, 14 Jul 2024 04:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7CBF505;
+	Sun, 14 Jul 2024 05:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWwenD4g"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dJWaXN5l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A313812B87;
-	Sun, 14 Jul 2024 04:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809D520EB
+	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 05:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720932746; cv=none; b=Xi5Li0k0f53cZXx2E2LmxO+UC0GkPY8FAVBunGYGprkMh9aR5/AnOjJPpXCptIjMVaJzcefy6WvjbhF+2tddryT0+7QVv/HRoab9LfimBudeXT+KBM2mEeGWwqwS7vChMAsjYcrZXdO1reNQGYHhSMWRqrkag/nBvHyVTXSBP0s=
+	t=1720935078; cv=none; b=CGSt6x/O+RiBD6zHEcWgRrg5Rk5zQ4woZiSg1OZVTLNd5FtpzP3Z1YOPgpunT5hywINZe2XyrYj3sZx2bJqY9c0/pEHjYA42hSwpkfrWvRzDaxPhOjMGyRu4E61ASPrO3A2lvR7OFVS7Mo5Ioiaz41tT4czhDbet9+24vE82c2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720932746; c=relaxed/simple;
-	bh=zreJeKJLhmL0JG895SlaLVNVQFOIvr78TW6idthSuro=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VrrRH0D8X3Dn7HA1iVA327QKxBSWYGjgM211dqNMq3qNUnNrb00x5zwbEQvKk5DXafNOj6n5BXG7RWrSFlyB4d+uDag1WOoWyXO3nIitjRNESQDDOPEvtWElermbyPpdaFRIZt84zPea0CVUe9bFaIB8A/7XJewyQTcyXLuJ7DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWwenD4g; arc=none smtp.client-ip=209.85.167.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-3d96365dc34so2743781b6e.2;
-        Sat, 13 Jul 2024 21:52:24 -0700 (PDT)
+	s=arc-20240116; t=1720935078; c=relaxed/simple;
+	bh=3QIMAs3IFSh7u1SCIPMUxyPU5FqaYl2jhpJiMumGDeY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VzQAnaIrK/mZGjP/6W6p4j6zHPFgWnb7Pwwl1ZvLlwFZ5a8DeGMpG/eh2bl1bEAAuIryYAO/o6koOpd6oLuslRPhGb6pM0Hp+hBnL+++B8U4veaqa0dRd5vEAj0z/O1n2c99iPBRPnM0BJHlYpTb0LiHw8jU73rBqdMHpeBDciI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=dJWaXN5l; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d91e390601so1966478b6e.1
+        for <netdev@vger.kernel.org>; Sat, 13 Jul 2024 22:31:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720932743; x=1721537543; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eQpCHDZFDAGZ/nCT7bmpCzurf744d17uzqi+k1JGFEg=;
-        b=FWwenD4geINn3mXME2WbVIKmn89JteuG1eIBEZMhTky9YVT3gCJOxGeGI2qILXzkAB
-         typBiPwD8YZPFr04MnZJQbxmUu4t3mEwuoLvlQxQbjYEfpoLAEibVNfd7j0HZyPeDv28
-         LdYEAokWjC59J9//AAOem+AfkWCaje7zymbovCrDgt6yZAwflL8zVE28sHEpbyoDW9w9
-         SlDTlX053kKiWx+cnO4w0pNEcTPU0lQwjxd21BufkyTEeM0CThr1kTgqG8k/I1v7DrVt
-         BXbVJRbcBVPyXklvARZ+xNhTr3HWyDTKwJARMU8e6VUM/eTjDpievRo1X/jbxnx8jmkn
-         362w==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1720935075; x=1721539875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fG/PfKdeWUxDcrt2oIAXldZj9CzlPpZ261JHkQi/zXU=;
+        b=dJWaXN5l9v5aqZGYeITR+nBcd7j7ckJ2/ndkVu5zfeKPalBf70/2hvTukD3jO2F8t2
+         75D+M1fMn/pEzMScQULZmWXeLqyh4tWf+YRFsFmomkHDrA5Yr3yamR9C/BVJQi/90Zzv
+         EBjez/whzPS1ZI45v537IQjS7wKyZFuZ1ardVoZEamLxgLoVw2TnETWo6gpGwtk0Zna0
+         Tznl5QgYmRJH6nyd0/JLh5V6xjO4i94Q9zsELeodKpbsTZrKDJ6xDE0UldbRGoYWFVcg
+         974Hgo2fe+WmgjsKkSWxVBET+4OKIror8Hcq0dWZhQBrkE9Mh+LuDJFY0hC2XIpybTk6
+         Hmuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720932743; x=1721537543;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eQpCHDZFDAGZ/nCT7bmpCzurf744d17uzqi+k1JGFEg=;
-        b=KbfB1rT7NJvDMtSE2IewgqnpVyCjzMnGOjfpN83ygIafd7hBRH8n1+cElocKFvIxNX
-         2Jg1/sE0e0w96HBPkmtRBQ4Mz3dLMXT8PAiYNSawmvIehurZPEF+Wwj7U+pgyq/xrA5C
-         uK4jy+iZfxWIuLeXdCGnmbRrykKqpvd5M0dIyNzLIKG4dqXfObW+mozT8x8meE6dtgii
-         u2SvWJOrrELXnCu1XiYDBhOXewT8pF6nvQfnmRobEohb97O+EmD3BTgJGb3xVhivbsHL
-         YxMMgayTzZyzRVMYB9I2QBkhO0qyDf/EC6OcZqzh6dDFpgItXkn0qwLeY6TJrsaKBf4m
-         X9jg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7WjIpMtHF8uU/MnsGQD2kQfj48x+4IERQ/OkB/SuzRuiSRFFOQAhxQYfGJsnKaTAohSm0S9O+YmLPpAU1N8b1kQMgjypOrXxcbaIrwe1QTA2ba3/IDGKa0Fshjr4f0jLElZC+
-X-Gm-Message-State: AOJu0Yw7wN6galpIZfwCVGrIyx29W4OmC0N8GrDFQZzXIeJdybqJg7hr
-	0KG3zhAsXSDgjPwFBl929+0X6t0CZ+j7I+KLsbGmwQ971sJ6vVjb
-X-Google-Smtp-Source: AGHT+IGR/MPyvZbmyI9BZCtumU88jtog7daHPZeJeS+yFlVQXisT5Eo9zc7ta78BFo/AWQqtWhSwvA==
-X-Received: by 2002:a05:6808:221a:b0:3d9:2c62:72b4 with SMTP id 5614622812f47-3d93c00bdcbmr18757511b6e.19.1720932743516;
-        Sat, 13 Jul 2024 21:52:23 -0700 (PDT)
-Received: from ?IPV6:2409:8a55:301b:e120:dd5e:dfbe:bb33:8d5? ([2409:8a55:301b:e120:dd5e:dfbe:bb33:8d5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc4e477sm17523645ad.265.2024.07.13.21.52.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Jul 2024 21:52:23 -0700 (PDT)
-Message-ID: <12ff13d9-1f3d-4c1b-a972-2efb6f247e31@gmail.com>
-Date: Sun, 14 Jul 2024 12:52:18 +0800
+        d=1e100.net; s=20230601; t=1720935075; x=1721539875;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fG/PfKdeWUxDcrt2oIAXldZj9CzlPpZ261JHkQi/zXU=;
+        b=N0iXovDIiBRPBA93TyCHJK0EX5wMYM/MDPdYokCFKCeKhCybhVvghUgZ9FdN8eKfov
+         ry8nqM1s7KhfisiFaRQqkFczy6Ne/VGlh8OkDck0ojEOz3Z4tKsh/RHFcF1oP99yQjCQ
+         mqLFnlK9iWEDnu+Ts8nMCq9LvmWVYOAsj/iIacFumB198zagiAEwtKhxfh9ctIENksF6
+         wSFwu1QE712rgvqheCyn3aizS0zYZjGdQEZykuUJFSr5KlFOdrSi+0ffx+fViXCciaV4
+         jom3QK/frdlCl+BVWbJXzhR+83X4Y2IPN5dhhXAxRj6tZuJPZBa2bm+ru8iIeYMvaTQa
+         gw0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWDR+4rlQCNWg+tMogtNg4LvGLvLb4ZUgoCl7kvmgcVDtDDjXK12YDbuapnnSE/iHONdacVsHoyHEfnGIBUe+OMpwFvxufq
+X-Gm-Message-State: AOJu0YxI9a1yQj9XyWtdFmiw81bx3aHc8JR30B8LZ9DL73eJ/gbxO3Xy
+	lNo9XeTjM/1uazvRv8aEYnVY2OXDeSLKl+nd19villLNxJSulsNtk4EwcM4eoFQ=
+X-Google-Smtp-Source: AGHT+IEtxJqu4j5l5kEVZts9GPmpqkb6+LMj87Bezmzc+8y/bcNnj/BuvWU5TphzRDvdVcPidUZI6Q==
+X-Received: by 2002:a05:6808:2991:b0:3d9:dcbc:6b7a with SMTP id 5614622812f47-3d9dcbc733bmr12440111b6e.13.1720935075379;
+        Sat, 13 Jul 2024 22:31:15 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc273d7sm18048705ad.120.2024.07.13.22.31.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jul 2024 22:31:14 -0700 (PDT)
+Date: Sat, 13 Jul 2024 22:31:12 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Adam Nielsen <a.nielsen@shikadi.net>, netdev@vger.kernel.org
+Subject: Re: Is the manpage wrong for "ip address delete"?
+Message-ID: <20240713223112.4d5db4b6@hermes.local>
+In-Reply-To: <m2sewezypi.fsf@gmail.com>
+References: <20240712005252.5408c0a9@gnosticus.teln.shikadi.net>
+	<m2sewezypi.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-Subject: Re: [PATCH net-next v9 06/13] mm: page_frag: reuse existing space for
- 'size' and 'pfmemalloc'
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
- linux-mm@kvack.org
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
- <20240625135216.47007-7-linyunsheng@huawei.com>
- <12a8b9ddbcb2da8431f77c5ec952ccfb2a77b7ec.camel@gmail.com>
- <808be796-6333-c116-6ecb-95a39f7ad76e@huawei.com>
- <a026c32218cabc7b6dc579ced1306aefd7029b10.camel@gmail.com>
- <f4ff5a42-9371-bc54-8523-b11d8511c39a@huawei.com>
- <96b04ebb7f46d73482d5f71213bd800c8195f00d.camel@gmail.com>
- <5daed410-063b-4d86-b544-d1a85bd86375@huawei.com>
- <CAKgT0UdJPcnfOJ=-1ZzXbiFiA=8a0z_oVBgQC-itKB1HWBU+yA@mail.gmail.com>
- <df38c0fb-64a9-48da-95d7-d6729cc6cf34@huawei.com>
- <CAKgT0UdSjmJoaQvTOz3STjBi2PazQ=piWY5wqFsYFBFLcPrLjQ@mail.gmail.com>
- <29e8ac53-f7da-4896-8121-2abc25ec2c95@gmail.com>
- <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/14/2024 12:55 AM, Alexander Duyck wrote:
+On Fri, 12 Jul 2024 11:33:45 +0100
+Donald Hunter <donald.hunter@gmail.com> wrote:
 
-...
-
->>>>
->>>> Perhaps the 'remaining' changing in this patch does seems to make things
->>>> harder to discuss. Anyway, it would be more helpful if there is some pseudo
->>>> code to show the steps of how the above can be done in your mind.
->>>
->>> Basically what you would really need do for all this is:
->>>     remaining = __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
->>>     nc->remaining = remaining + fragsz;
->>>     return encoded_page_address(nc->encoded_va) + size + remaining;
->>
+> Adam Nielsen <a.nielsen@shikadi.net> writes:
 > 
-> I might have mixed my explanation up a bit. This is assuming remaining
-> is a negative value as I mentioned before.
-
-Let's be more specific about the options here, what you meant is below,
-right? Let's say it is option 1 as below:
-struct page_frag_cache {
-         /* encoded_va consists of the virtual address, pfmemalloc bit 
-and order
-          * of a page.
-          */
-         unsigned long encoded_va;
-
-#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
-         __s16 remaining;
-         __u16 pagecnt_bias;
-#else
-         __s32 remaining;
-         __u32 pagecnt_bias;
-#endif
-};
-
-void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-                                  unsigned int fragsz, gfp_t gfp_mask,
-                                  unsigned int align_mask)
-{
-         unsigned int size = page_frag_cache_page_size(nc->encoded_va);
-         int remaining;
-
-         remaining = __ALIGN_KERNEL_MASK(nc->remaining, ~align_mask);
-         if (unlikely(remaining + (int)fragsz > 0)) {
-                 if (!__page_frag_cache_refill(nc, gfp_mask))
-                         return NULL;
-
-                 size = page_frag_cache_page_size(nc->encoded_va);
-
-                 remaining = -size;
-                 if (unlikely(remaining + (int)fragsz > 0))
-                         return NULL;
-         }
-
-         nc->pagecnt_bias--;
-         nc->remaining = remaining + fragsz;
-
-         return encoded_page_address(nc->encoded_va) + size + remaining;
-}
-
-
-And let's say what I am proposing in v10 is option 2 as below:
-struct page_frag_cache {
-         /* encoded_va consists of the virtual address, pfmemalloc bit 
-and order
-          * of a page.
-          */
-         unsigned long encoded_va;
-
-#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
-         __u16 remaining;
-         __u16 pagecnt_bias;
-#else
-         __u32 remaining;
-         __u32 pagecnt_bias;
-#endif
-};
-
-void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-                                  unsigned int fragsz, gfp_t gfp_mask,
-                                  unsigned int align_mask)
-{
-         unsigned int size = page_frag_cache_page_size(nc->encoded_va);
-         int aligned_remaining = nc->remaining & align_mask;
-         int remaining = aligned_remaining - fragsz;
-
-         if (unlikely(remaining < 0)) {
-                 if (!__page_frag_cache_refill(nc, gfp_mask))
-                         return NULL;
-
-                 size = page_frag_cache_page_size(nc->encoded_va);
-
-                 aligned_remaining = size;
-                 remaining = aligned_remaining - fragsz;
-                 if (unlikely(remaining < 0))
-                         return NULL;
-         }
-
-         nc->pagecnt_bias--;
-         nc->remaining = remaining;
-
-         return encoded_page_address(nc->encoded_va) + (size - 
-aligned_remaining);
-}
-
-If the option 1 is not what you have in mind, it would be better to be 
-more specific about what you have in mind.
-
-If the option 1 is what you have in mind, it seems both option 1 and
-option 2 have the same semantics as my understanding, right? The 
-question here seems to be what is your perfer option and why?
-
-I implemented both of them, and the option 1 seems to have a
-bigger generated asm size as below:
-./scripts/bloat-o-meter vmlinux_non_neg vmlinux
-add/remove: 0/0 grow/shrink: 1/0 up/down: 37/0 (37)
-Function                                     old     new   delta
-__page_frag_alloc_va_align                   414     451     +37
-
+> > Hi all,
+> >
+> > I'm trying to remove an IP address from an interface, without having to
+> > specify it, but the behaviour doesn't seem to match the manpage.
+> >
+> > In the manpage for ip-address it states:
+> >
+> >     ip address delete - delete protocol address
+> >        Arguments: coincide with the arguments of ip addr add.  The
+> >        device name is a required  argument. The rest are optional.  If no
+> >        arguments are given, the first address is deleted.
+> >
+> > I can't work out how to trigger the "if no arguments are given" part:
+> >
+> >   $ ip address delete dev eth0
+> >   RTNETLINK answers: Operation not supported
+> >
+> >   $ ip address delete "" dev eth0
+> >   Error: any valid prefix is expected rather than "".
+> >
+> >   $ ip address dev eth0 delete
+> >   Command "dev" is unknown, try "ip address help".
+> >
+> > In the end I worked out that "ip address flush dev eth0" did what I
+> > wanted, but I'm just wondering whether the manpage needs to be updated
+> > to reflect the current behaviour?  
 > 
-> Basically the issue is your current code is using nc->remaining to
-> generate the current address and that is bad as it isn't aligned to
-> anything as fragsz was added to it and no alignment check had been
-> done on that value.
+> Yes, that paragraph of the manpage appears to be wrong. It does not
+> match the manpage synopsis, nor the usage from "ip address help" which
+> both say:
+> 
+>   ip address del IFADDR dev IFNAME [ mngtmpaddr ]
+> 
+> The description does match the kernel behaviour for a given address
+> family, which you can see by using ynl:
+> 
+> $ ip a show dev veth0
+> 2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
+>     link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
+>     inet 6.6.6.6/24 scope global fred
+>        valid_lft forever preferred_lft forever
+>     inet 2.2.2.2/24 scope global veth0
+>        valid_lft forever preferred_lft forever
+>     inet 4.4.4.4/24 scope global veth0
+>        valid_lft forever preferred_lft forever
+> 
+> $ sudo ./tools/net/ynl/cli.py \
+>   --spec Documentation/netlink/specs/rt_addr.yaml \
+>   --do deladdr --json '{"ifa-family": 2, "ifa-index": 2}'
+> None
+> 
+> $ ip a show dev veth0
+> 2: veth0@veth1: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
+>     link/ether 6a:66:c7:67:bc:81 brd ff:ff:ff:ff:ff:ff
+>     inet 2.2.2.2/24 scope global veth0
+>        valid_lft forever preferred_lft forever
+>     inet 4.4.4.4/24 scope global veth0
+>        valid_lft forever preferred_lft forever
+> 
+> I guess it makes sense for "ip address del" to be stricter since 'first
+> address' is quite arbitrary behaviour.
+
+I wonder if it used to work long ago in some early version (like 2.4) and
+got broken and no one ever noticed
 
