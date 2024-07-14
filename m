@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-111344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E60E930A67
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:41:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9D9930A66
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 16:41:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79BD21F21915
-	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 14:41:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A9B41C20ABA
+	for <lists+netdev@lfdr.de>; Sun, 14 Jul 2024 14:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FD9139D05;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EE313957C;
 	Sun, 14 Jul 2024 14:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bXeCKc9k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ncYYCFT6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAAC13958F
-	for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 14:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E79563C8;
+	Sun, 14 Jul 2024 14:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720968096; cv=none; b=K98sGtvFtQWPkLkPtMnpkZ9hejRrKdHDT3ONGk/B7C0+36CITktOv+1NtfFx0gdLJuqlZn2ewBF6zLFWD8fcGBc0u8cFfE8WLYUjppcMQgJoI6Y2LJmeQzmQeE4FuKsmHHgQ7xZ8KHS5QS7qAeH/F35+W9yBYsh5bMRomCC3Amw=
+	t=1720968096; cv=none; b=k4pXOSNd6AIjjTVIa3A9waK1r8XXQPd76ch03ooqdFoBG5ORhlQJK1CTEFfnnzjX2F/Z4SoZHoh79x4+G2/+VLJpDw1Zv88RmPjsm37vDQPdaRvADmg4XS/iHdnCWetD7fvG0ggsgWCiI+x2u0Bksd9Y3e0hKS+AoLSglXX2Fe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720968096; c=relaxed/simple;
-	bh=D7B95Wreuw2GRcZ64T5fqEzWgKMMTRLtQ/Qz6chH0pE=;
+	bh=AdOhLUrd5pkToxj3RfzJnpWjxeeBOLwo/FGLq0sUyG8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EZ2BWc8JbmJhl2EJcVRAjGUlqJgcMnhSzWLOMHTb71LU3qs9XVR/10NlhKwN5m+iPa5EnziSBganJ739uhAY8N8xQbe0YcDSjfnrpqLOBzSMEmRojUF+oTdb8vPqwcBxEY+F7aTwZUZU9wLCgGvZ/vdL430FDIFA+17JfUKQXiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bXeCKc9k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9013C32782;
+	 In-Reply-To:To:Cc; b=GqSq1VEAUBmlQjMVmGe6QHiJACh36QzPsA19g/YImlJotudCdt8DKTN9UXZjgUhisZMx3mYY7nK5zDEjQoFhzmkObOS4Xjc7+FCe4Dlg6WH99xZYP0/Rdgg+ruBjl8hiJ8Z0vmkN3k5luoSWNx/s4rqqfFdjzYd0TwoICKYA/gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ncYYCFT6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E0FDFC4AF0E;
 	Sun, 14 Jul 2024 14:41:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720968096;
-	bh=D7B95Wreuw2GRcZ64T5fqEzWgKMMTRLtQ/Qz6chH0pE=;
+	bh=AdOhLUrd5pkToxj3RfzJnpWjxeeBOLwo/FGLq0sUyG8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bXeCKc9kxJ1v6SZWCCFTeKpm7yqlK6DrW8mYbqS37LmRbloTjUxoqR/z6JWPj3MzW
-	 DAro/VKqspDnQKR/UZU4yLvjriq1ytKTRA6brJJ3h5UjjM0b+MNVkstUgoeLm78KhX
-	 61xUg20/Gz13xEU7rrdLTxSb/LlBxEVKil1MPIBF4htcrbeKEgWypuerARe0cuB0Mv
-	 Wxqrx5tDuvWNW6SNH+sPg/EiW5ERlAW15QBNXTeVU7mzIpE6Lh+E2bqcS0QYVDAiG5
-	 lnejckamc8nr2krgMicKA9iEGCzY5GWxL8xOIlS7nyclUYXUDDmkWcg/+RyqkfM+TB
-	 +Nhd1PQRqhbWQ==
+	b=ncYYCFT6qWx/eFIq/ISywXR1wri9P9BKhpnEJCwi8EWW08DDgK2wy+eiZBc6Fcav9
+	 CoAnrEt8XjpFwBmsWUARwB+v1lKC0zbpry1Z9YVSvFvLc+KxmANZidgt+BDDwp/JZo
+	 SKXRSVzjouDPDy1EBBKUDoPWBGEtag/OTq3z8893npCEsF4TJ2QqY9TxY60Tm46Kfe
+	 S8jhqQXr1/f1/HtirPAPSh2txQi+kW0yFeGsSkpkWAFg4lSMjrCPnMaFnyWu1q0eAw
+	 n5e/Z1lt7iJtM2C/U6l2Tx+GEVSFETokqidKJ6SElj54l7dQKfA9p4Y2hhZy8k2Klz
+	 b0x6Ozawwi3Gw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D18C0C43153;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C661CDAE940;
 	Sun, 14 Jul 2024 14:41:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: forwarding: devlink_lib: Wait for udev events
- after reloading
+Subject: Re: [PATCH net v3 0/2] net: pse-pd: Fix possible issues with a PSE
+ supporting both c33 and PoDL
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172096809584.533.3773226039519384629.git-patchwork-notify@kernel.org>
+ <172096809580.533.3628542682652839668.git-patchwork-notify@kernel.org>
 Date: Sun, 14 Jul 2024 14:41:35 +0000
-References: <89367666e04b38a8993027f1526801ca327ab96a.1720709333.git.petrm@nvidia.com>
-In-Reply-To: <89367666e04b38a8993027f1526801ca327ab96a.1720709333.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
- amcohen@nvidia.com, shuah@kernel.org, mlxsw@nvidia.com
+References: <20240711-fix_pse_pd_deref-v3-0-edd78fc4fe42@bootlin.com>
+In-Reply-To: <20240711-fix_pse_pd_deref-v3-0-edd78fc4fe42@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: o.rempel@pengutronix.de, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, horms@kernel.org,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 11 Jul 2024 17:27:02 +0200 you wrote:
-> From: Amit Cohen <amcohen@nvidia.com>
+On Thu, 11 Jul 2024 15:55:17 +0200 you wrote:
+> Although PSE controllers supporting both c33 and PoDL are not on the
+> market yet, we want to prevent potential issues from arising in the
+> future. Two possible issues could occur with a PSE supporting both c33
+> and PoDL:
 > 
-> Lately, an additional locking was added by commit c0a40097f0bc
-> ("drivers: core: synchronize really_probe() and dev_uevent()"). The
-> locking protects dev_uevent() calling. This function is used to send
-> messages from the kernel to user space. Uevent messages notify user space
-> about changes in device states, such as when a device is added, removed,
-> or changed. These messages are used by udev (or other similar user-space
-> tools) to apply device-specific rules.
+> - Setting the config for one type of PSE leaves the other type's config
+>   null. In this case, the PSE core would return EOPNOTSUPP, which is not
+>   the correct behavior.
+> - Null dereference of Netlink attributes as only one of the Netlink
+>   attributes would be specified at a time.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: forwarding: devlink_lib: Wait for udev events after reloading
-    https://git.kernel.org/netdev/net/c/f67a90a0c8f5
+  - [net,v3,1/2] net: pse-pd: Do not return EOPNOSUPP if config is null
+    https://git.kernel.org/netdev/net/c/93c3a96c301f
+  - [net,v3,2/2] net: ethtool: pse-pd: Fix possible null-deref
+    https://git.kernel.org/netdev/net/c/4cddb0f15ea9
 
 You are awesome, thank you!
 -- 
