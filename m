@@ -1,165 +1,258 @@
-Return-Path: <netdev+bounces-111542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3127F9317ED
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:57:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEC519317F8
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E863B21982
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:57:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37850B22A9F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FADCEAD5;
-	Mon, 15 Jul 2024 15:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F810D53C;
+	Mon, 15 Jul 2024 15:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="MP3Pulc3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpnSWaFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4319.protonmail.ch (mail-4319.protonmail.ch [185.70.43.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756E4D53C;
-	Mon, 15 Jul 2024 15:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE911F4FB
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 15:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721059015; cv=none; b=ufds+YyEikJxOZ88IIaUBmrh3E/Zxc06M6HSW+18e89lCSun4LLT1WqENbSAC5YLTlaKnluO9T4dcfyv53Wxp51ckXcv6kT1zyVilpPPgDN5wmGtCX4N54hNQW0PscD77GPoEO9moo3K33aSVNnxd3T21C1G4EZj4QSaZblBVpc=
+	t=1721059135; cv=none; b=FGRSsfLrOpPK3yw5kRiEf7phRtW7HW407eDC8YBk6+TaM7PXkRaBNIhuEaGJ5F/C03liTp6OpXdMu4dBfnkY13xIYWTKQuEbCZPNu4NlLj5K53oAo4FbxvCdhi8CqmfrLip4ku2PqZOAbki6hwW9M88OKP8SmhR0NID6g28foqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721059015; c=relaxed/simple;
-	bh=n2yLQUwt6s0OAtUfcYSQI9h6EpwTHBoPl8UvFbLKLxU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oiREFRicBihvOkOK31lHf3kmQz2Ri1bVbW19qg1mvGwQBy/VXsFKhZmoLTUEroRhHqWtytlCveS/h4FD3vXbEGmaCiXRngpgjQ3oKbIDFAf63IAAEj1yMivTcODhKxoitBK0sB0O0JGX/+i06qYbSV+4vhUuA4MaXUJLLlPFvs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=MP3Pulc3; arc=none smtp.client-ip=185.70.43.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1721059006; x=1721318206;
-	bh=0X2OwfENCQ/M/pnkr0i+ZvgaNKd3AS7YhCHGsueDZJI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=MP3Pulc3tWE2RK/Y87KVMcpoTd9k7A88xsAzdxuFvwuLeDiwocQczv0thIwsZM9wM
-	 8zSNMEQhHqkLT40Vd60mnEKaOc8sMme8VhVij/mFXsPDC6hP8JcA/HGM2MLasZxCsB
-	 4QjAOb00/s6eh/F2VAKhO0NtmRfavb1gOuW7wsAffebM65/otAVnP6jcTnSgLEFPGD
-	 9CaBur2unZZerj3XJYcCSocz/m1qIodCuIECaqgB+9k7iEQYRL3OXbfhORj/jFKcUN
-	 cfD7DvRd/9vioU+aMXTwT8Nhro6WcehXBLhe6UPuLkUqCy2TMlxlICKah6954wX/6S
-	 5KdXrbY3O0zaA==
-Date: Mon, 15 Jul 2024 15:56:39 +0000
-To: Michal Rostecki <vadorovsky@gmail.com>
-From: =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl <aliceryhl@google.com>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Martin Rodriguez Reboredo <yakoyoku@gmail.com>, Finn Behrens <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>, Valentin Obst <kernel@valentinobst.de>, Laine Taffin Altman <alexanderaltman@me.com>, Danilo Krummrich <dakr@redhat.com>, Yutaro Ohno <yutaro.ono.418@gmail.com>, Tiago Lam <tiagolam@gmail.com>, Charalampos Mitrodimas <charmitro@posteo.net>,
-	Ben Gooding <ben.gooding.dev@gmail.com>, Roland Xu <mu001999@outlook.com>, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] rust: str: Use `core::CStr`, remove the custom `CStr` implementation
-Message-ID: <T4cW5BFYytkMlTR5e2C2FfFJ5Z8P5XPw5dEsTQ2V-hoAo5yZkeYLSU3GvVCTH1Ga3f-mbPvEKZxOEWT7E1-xWu4EDE6-jCoQj3If-qCKCHA=@protonmail.com>
-In-Reply-To: <df092baf-03a5-4b4a-ab8b-ee7a5677c172@gmail.com>
-References: <20240714160238.238708-1-vadorovsky@gmail.com> <S-L4QE4MFYzY1ba0fdkJYuAVIkZHxxYB6Jk9XPFuo3ZdbvNxtfN_mCFc5oNPfTu2X17vvyPUStAviAUAzeKlCGxwRM-VbC4aPUGBGtDQCcU=@protonmail.com> <df092baf-03a5-4b4a-ab8b-ee7a5677c172@gmail.com>
-Feedback-ID: 27884398:user:proton
-X-Pm-Message-ID: 95e82dd63daf75c00a972e8d3703e1d61f419209
+	s=arc-20240116; t=1721059135; c=relaxed/simple;
+	bh=KHkkuqYzY91KjdwB6P2+n5eOed9HnsuycMRYPnzsoSg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i474+RMCmpnvI161b3TrTFmQA0ByScwRNj6pHPKWMXULp7S/G9GTA5+YrC4aWpPHBQsM6SWHWl422Jx5pJdI2kbAkDg46HD8xYhMVFUZI51btPU03QXgLfUYEZZ44gdoA352QKYyIe6J2M2JgyTBb8vq/f4oJI2sUx7ogkJLuA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpnSWaFq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 434B2C4AF10;
+	Mon, 15 Jul 2024 15:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721059134;
+	bh=KHkkuqYzY91KjdwB6P2+n5eOed9HnsuycMRYPnzsoSg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qpnSWaFqL3fIqDMajbIqqbBNzTx2djSgYH/aXxxU51Zy/fgC5tY8Logh0xYdjGXuw
+	 HMhm/sihGBC1imx+1X2EaJXSukrENFJpodhIeA6/L2lm3Q1LNWX11oFYd0bVFJ01QR
+	 GIytFEqrOWJsjg0LVuxdaY2yV3t4TB0h2zPs70kRbgY+WmFZutfa5TN8eRyGBSvpNj
+	 roY+JrvtHhiqZSO/jsq1pP/MhfSSanmciYqXjhvxdcYs5yVIBHldrVQGBvlXABSLOQ
+	 XhEVGhPfr0LTnpY0MqHQzXznuvZJTV+NLDEQNQOomSJCmNZWd/isWcZ5921e34o7Fy
+	 fR4GaMbp69J2g==
+Message-ID: <19b76438-2fc8-4f2f-a0ae-c988f5b17e9f@kernel.org>
+Date: Mon, 15 Jul 2024 17:58:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v3 net-next 1/2] tcp: Don't drop SYN+ACK for simultaneous
+ connect().
+Content-Language: en-GB
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20240710171246.87533-1-kuniyu@amazon.com>
+ <20240710171246.87533-2-kuniyu@amazon.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240710171246.87533-2-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Monday, July 15th, 2024 at 17:46, Michal Rostecki <vadorovsky@gmail.com>=
- wrote:
+Hi Kuniyuki,
 
-> On 14.07.24 19:01, Bj=C3=B6rn Roy Baron wrote:
-> > On Sunday, July 14th, 2024 at 18:02, Michal Rostecki <vadorovsky@gmail.=
-com> wrote:
-> >
-> >> `CStr` became a part of `core` library in Rust 1.75, therefore there i=
-s
-> >> no need to keep the custom implementation.
-> >>
-> >> `core::CStr` behaves generally the same as the removed implementation,
-> >> with the following differences:
-> >>
-> >> - It does not implement `Display` (but implements `Debug`).
-> >> - It does not provide `from_bytes_with_nul_unchecked_mut` method.
-> >>    - It was used only in `DerefMut` implementation for `CString`. This
-> >>      change replaces it with a manual cast to `&mut CStr`.
-> >>    - Otherwise, having such a method is not really desirable. `CStr` i=
-s
-> >>      a reference type
-> >>      or `str` are usually not supposed to be modified.
-> >> - It has `as_ptr()` method instead of `as_char_ptr()`, which also retu=
-rns
-> >>    `*const c_char`.
-> >>
-> >> Rust also introduces C literals (`c""`), so the `c_str` macro is remov=
-ed
-> >> here as well.
-> >>
-> >> Signed-off-by: Michal Rostecki <vadorovsky@gmail.com>
-> >> ---
-> >>   rust/kernel/error.rs        |   7 +-
-> >>   rust/kernel/init.rs         |   8 +-
-> >>   rust/kernel/kunit.rs        |  16 +-
-> >>   rust/kernel/net/phy.rs      |   2 +-
-> >>   rust/kernel/prelude.rs      |   4 +-
-> >>   rust/kernel/str.rs          | 490 +---------------------------------=
---
-> >>   rust/kernel/sync.rs         |  13 +-
-> >>   rust/kernel/sync/condvar.rs |   5 +-
-> >>   rust/kernel/sync/lock.rs    |   6 +-
-> >>   rust/kernel/workqueue.rs    |  10 +-
-> >>   scripts/rustdoc_test_gen.rs |   4 +-
-> >>   11 files changed, 57 insertions(+), 508 deletions(-)
-> >>
-> >
-> > [snip]
-> >
-> >> diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
-> >> index 68605b633e73..af0017e56c0e 100644
-> >> --- a/rust/kernel/init.rs
-> >> +++ b/rust/kernel/init.rs
-> >> @@ -46,7 +46,7 @@
-> >>   //! }
-> >>   //!
-> >>   //! let foo =3D pin_init!(Foo {
-> >> -//!     a <- new_mutex!(42, "Foo::a"),
-> >> +//!     a <- new_mutex!(42, c"Foo::a"),
-> >
-> > That we need a CStr here seems a bit of an internal implementation deta=
-il. Maybe
-> > keep accepting a regular string literal and converting it to a CStr int=
-ernally?
-> > If others think what you have here is fine, I don't it mind all that mu=
-ch though.
-> >
->=20
-> The names passed to `new_mutex`, `new_condvar`, `new_spinlock` etc. are
-> immediately passed in the FFI calls (`__mutex_init`,
-> `__init_waitqueue_head`, `__spin_lock_init`) [0][1][2]. In fact, I don't
-> see any internal usage, where using Rust &str would be beneficial. Am I
-> missing something?
->=20
-> Converting a &str to &CStr inside `Mutex::new` or `CondVar::new` would
-> require allocating a new buffer, larger by 1, to include the nul byte.
-> Doing that for every new mutex or condvar seems a bit wasteful to me.
+On 10/07/2024 19:12, Kuniyuki Iwashima wrote:
+> RFC 9293 states that in the case of simultaneous connect(), the connection
+> gets established when SYN+ACK is received. [0]
+> 
+>       TCP Peer A                                       TCP Peer B
+> 
+>   1.  CLOSED                                           CLOSED
+>   2.  SYN-SENT     --> <SEQ=100><CTL=SYN>              ...
+>   3.  SYN-RECEIVED <-- <SEQ=300><CTL=SYN>              <-- SYN-SENT
+>   4.               ... <SEQ=100><CTL=SYN>              --> SYN-RECEIVED
+>   5.  SYN-RECEIVED --> <SEQ=100><ACK=301><CTL=SYN,ACK> ...
+>   6.  ESTABLISHED  <-- <SEQ=300><ACK=101><CTL=SYN,ACK> <-- SYN-RECEIVED
+>   7.               ... <SEQ=100><ACK=301><CTL=SYN,ACK> --> ESTABLISHED
+> 
+> However, since commit 0c24604b68fc ("tcp: implement RFC 5961 4.2"), such a
+> SYN+ACK is dropped in tcp_validate_incoming() and responded with Challenge
+> ACK.
+> 
+> For example, the write() syscall in the following packetdrill script fails
+> with -EAGAIN, and wrong SNMP stats get incremented.
+> 
+>    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
+>   +0 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+> 
+>   +0 > S  0:0(0) <mss 1460,sackOK,TS val 1000 ecr 0,nop,wscale 8>
+>   +0 < S  0:0(0) win 1000 <mss 1000>
+>   +0 > S. 0:0(0) ack 1 <mss 1460,sackOK,TS val 3308134035 ecr 0,nop,wscale 8>
+>   +0 < S. 0:0(0) ack 1 win 1000
+> 
+>   +0 write(3, ..., 100) = 100
+>   +0 > P. 1:101(100) ack 1
+> 
+>   --
+> 
+>   # packetdrill cross-synack.pkt
+>   cross-synack.pkt:13: runtime error in write call: Expected result 100 but got -1 with errno 11 (Resource temporarily unavailable)
+>   # nstat
+>   ...
+>   TcpExtTCPChallengeACK           1                  0.0
+>   TcpExtTCPSYNChallenge           1                  0.0
+> 
+> The problem is that bpf_skops_established() is triggered by the Challenge
+> ACK instead of SYN+ACK.  This causes the bpf prog to miss the chance to
+> check if the peer supports a TCP option that is expected to be exchanged
+> in SYN and SYN+ACK.
+> 
+> Let's accept a bare SYN+ACK for active-open TCP_SYN_RECV sockets to avoid
+> such a situation.
+> 
+> Note that tcp_ack_snd_check() in tcp_rcv_state_process() is skipped not to
+> send an unnecessary ACK, but this could be a bit risky for net.git, so this
+> targets for net-next.
+> 
+> Link: https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5-7 [0]
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-The names passed to `new_mutex!` and such are literals known at
-compile time. This means we can keep adding the nul terminator at
-compile time without allocating any extra buffer. Basically just
-adapting the current implementation of `optional_name!` to produce an
-`core::ffi::&CStr` rather than a `kernel::str::CStr` from a regular
-string literal is enough to avoid having to explicitly use C string
-literals in those macro invocations. This way users don't need to
-know that internally an `&CStr` is used.
+Thank you for having worked on this patch!
 
->=20
-> [0]
-> https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af72872859=
-1465becb45b0/rust/kernel/sync/lock/mutex.rs#L104
-> [1]
-> https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af72872859=
-1465becb45b0/rust/kernel/sync/condvar.rs#L111
-> [2]
-> https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af72872859=
-1465becb45b0/rust/kernel/sync/lock/spinlock.rs#L103
+> ---
+>  net/ipv4/tcp_input.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 47dacb575f74..1eddb6b9fb2a 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -5989,6 +5989,11 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+>  	 * RFC 5961 4.2 : Send a challenge ack
+>  	 */
+>  	if (th->syn) {
+> +		if (sk->sk_state == TCP_SYN_RECV && sk->sk_socket && th->ack &&
+> +		    TCP_SKB_CB(skb)->seq + 1 == TCP_SKB_CB(skb)->end_seq &&
+> +		    TCP_SKB_CB(skb)->seq + 1 == tp->rcv_nxt &&
+> +		    TCP_SKB_CB(skb)->ack_seq == tp->snd_nxt)
+> +			goto pass;
+>  syn_challenge:
+>  		if (syn_inerr)
+>  			TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS);
+> @@ -5998,6 +6003,7 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+>  		goto discard;
+>  	}
+>  
+> +pass:
+>  	bpf_skops_parse_hdr(sk, skb);
+>  
+>  	return true;
+> @@ -6804,6 +6810,9 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  		tcp_fast_path_on(tp);
+>  		if (sk->sk_shutdown & SEND_SHUTDOWN)
+>  			tcp_shutdown(sk, SEND_SHUTDOWN);
+> +
+> +		if (sk->sk_socket)
+> +			goto consume;
 
-[snip]
+It looks like this modification changes the behaviour for MPTCP Join
+requests for listening sockets: when receiving the 3rd ACK of a request
+adding a new path (MP_JOIN), sk->sk_socket will be set, and point to the
+MPTCP sock that has been created when the MPTCP connection got created
+before with the first path. This new 'goto' here will then skip the
+process of the segment text (step 7) and not go through tcp_data_queue()
+where the MPTCP options are validated, and some actions are triggered,
+e.g. sending the MPJ 4th ACK [1].
+
+This doesn't fully break MPTCP, mainly the 4th MPJ ACK that will be
+delayed, but it looks like it affects the MPTFO feature as well --
+probably in case of retransmissions I suppose -- and being the reason
+why the selftests started to be unstable the last few days [2].
+
+[1] https://datatracker.ietf.org/doc/html/rfc8684#fig_tokens
+[2]
+https://netdev.bots.linux.dev/contest.html?executor=vmksft-mptcp-dbg&test=mptcp-connect-sh
+
+
+Looking at what this patch here is trying to fix, I wonder if it would
+not be enough to apply this patch:
+
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index ff9ab3d01ced..ff981d7776c3 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6820,7 +6820,7 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>                 if (sk->sk_shutdown & SEND_SHUTDOWN)
+>                         tcp_shutdown(sk, SEND_SHUTDOWN);
+>  
+> -               if (sk->sk_socket)
+> +               if (sk->sk_socket && !sk_is_mptcp(sk))
+>                         goto consume;
+>                 break;
+>  
+
+But I still need to investigate how the issue that is being addressed by
+your patch can be translated to the MPTCP case. I guess we could add
+additional checks for MPTCP: new connection or additional path? etc. Or
+maybe that's not needed.
+
+>  		break;
+>  
+>  	case TCP_FIN_WAIT1: {
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
