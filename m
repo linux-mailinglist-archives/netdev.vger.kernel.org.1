@@ -1,84 +1,86 @@
-Return-Path: <netdev+bounces-111525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D9293173B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:59:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C060C93165D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80D1AB225BE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:59:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F14471C213C5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D3C18EFF4;
-	Mon, 15 Jul 2024 14:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBE618D4B5;
+	Mon, 15 Jul 2024 14:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loCl+8Fr"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F29E18EFDA;
-	Mon, 15 Jul 2024 14:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46627180A70;
+	Mon, 15 Jul 2024 14:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721055544; cv=none; b=Dekc8xhVoOrTbfjLfF1rlQ3EnXCWhYS6RwxA7wr3cIkBGYOznFZPOq0ckE80NcArUye4DRPV671jJrVr5DdkT5IOpo7srRt2tpbuEp09gadrl0wmZij3zlDE4khsOU3kTDTTaXy6a2jbZociep+dr/rrbStSAOvzsiiTSPZH/Hs=
+	t=1721052357; cv=none; b=aQriyG4erT3Z/gHMZfUNwFV9K9z/hkYipanLDp4/rNhCpAC2vZl6ET/xeynKOeZpO0xD5cpp6SpH3sZ4Guu/GLML4BUSvYrwRzEifvoKSQM6R1llTE4JaLb257j86GBhcaW9npK7Qw5Pkxi7/CLATjlsk4ekI9ST9vjjDmICf+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721055544; c=relaxed/simple;
-	bh=XPZ/2x7i9TXdlGROA0TXoMHVzstSMa8V+va0EHzXE6k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A2tkmWA9TUtQ//rJeOamBAlLPRfp2cyTtdN94U8j+U2MkXeq3ixft/YfObwdBj3D8KTt3EZdJpZ6SmKd9j/SPCQWN37/UIkwLsOYte65+f/k6SY9Zlbp4Cit6dgem8jYJCct5vmuV3h45qhIsf/YBx2FSwshem7QjGBlhJPHnZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 46FDxBZm053972;
-	Mon, 15 Jul 2024 22:59:11 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Mon, 15 Jul 2024 22:59:11 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 46FDx6ui053939
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 15 Jul 2024 22:59:11 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <01ef97b5-33a5-4c79-a0cf-4655881f106c@I-love.SAKURA.ne.jp>
-Date: Mon, 15 Jul 2024 22:59:06 +0900
+	s=arc-20240116; t=1721052357; c=relaxed/simple;
+	bh=jv1UJF0Yr2g6D8aCkEx7VdD/PoqrXCsZV7kGQ73zM88=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F+4LjFVssIFEGNIgwZXTZXLDFVjp3kruAFt12Mgtfr6CJIVGwcjEcdmKTwoi5O4H04MIy9Yq5h6cWJR9yw/QxIx+Zw5BgoQqsqhjiEb5CzYDfWMn2IP4y/eGmWXGgx2Y+6KvUK1tTarw3seYsamE0WAFKIke9taWg51lM26uQhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loCl+8Fr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D171C32782;
+	Mon, 15 Jul 2024 14:05:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721052356;
+	bh=jv1UJF0Yr2g6D8aCkEx7VdD/PoqrXCsZV7kGQ73zM88=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=loCl+8FrMOREWBSEX9oancIpWwIssNPHmwj0KiuEqH3FkEj1QLQCmibu1GyyI+CJ5
+	 HhLKVacEreFCAviN/564LEIYjcZ2C7LB0n50cG7uXvV18lHamnC3eN5sFyjlu4walk
+	 vmWsdQTZCEFltrMlVKCBsJt030qLH8nqvG3+xqW4ASObwF2j6CjRFAWbxmtXbnhhbO
+	 SwZPphMuI99yrMUyN5D6kRtJfz1hXrIbD8ClGnDbNISUaLdukcocQ/uD6Pl/y6VaMG
+	 s2I4PdS8b5hY9mYoLzNF6l/cCWrceMtyneeSOLvEUkIkiIO7bIeVbnApaSVTU0qi3w
+	 l1WO/t3ElsiKg==
+Date: Mon, 15 Jul 2024 07:05:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2024-07-14
+Message-ID: <20240715070555.64c2773c@kernel.org>
+In-Reply-To: <CABBYNZKudJ=7F2px9DYcqgpfEJX7n1+p4ASsH24VwELSMt8X4w@mail.gmail.com>
+References: <20240715015726.240980-1-luiz.dentz@gmail.com>
+	<20240715064939.644536f3@kernel.org>
+	<CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
+	<CABBYNZKudJ=7F2px9DYcqgpfEJX7n1+p4ASsH24VwELSMt8X4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: Split a __sys_bind helper for io_uring
-To: Matus Jokay <matus.jokay@stuba.sk>, Jens Axboe <axboe@kernel.dk>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>, io-uring@vger.kernel.org,
-        netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20240614163047.31581-1-krisman@suse.de>
- <20240618174953.5efda404@kernel.org>
- <68b482cd-4516-4e00-b540-4f9ee492d6e3@kernel.dk>
- <20240619080447.6ad08fea@kernel.org>
- <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
- <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2024/07/15 21:49, Matus Jokay wrote:
-> Please fix io_bind and io_listen to not pass NULL ptr to related helpers
-> __sys_bind_socket and __sys_listen_socket. The first helper's argument
-> shouldn't be NULL, as related security hooks expect a valid socket object.
+On Mon, 15 Jul 2024 09:59:57 -0400 Luiz Augusto von Dentz wrote:
+> > Luiz pulled the immutable branch I provided (on which my PR to Linus
+> > is based) but I no longer see the Merge commit in the bluetooth-next
+> > tree[1]. Most likely a bad rebase.
+> >
+> > Luiz: please make sure to let Linus (or whomever your upstream is)
+> > know about this. I'm afraid there's not much we can do now, the
+> > commits will appear twice in mainline. :(  
 > 
-> See the syzkaller's bug report:
-> https://lore.kernel.org/linux-security-module/0000000000007b7ce6061d1caec0@google.com/
+> My bad, didn't you send a separate pull request though? I assumed it
+> is already in net-next,
 
-That was already fixed.
+unless we pull it ourselves we only get overall linux-next material
+during the merge window
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-next&id=ad00e629145b2b9f0d78aa46e204a9df7d628978
+> but apparently it is not, doesn't git skip if already applied?
 
+Sort of.. it may be clever enough to not show a conflict but it doesn't
+fully skip, both will appear in history (somewhat confusingly).
+It's better to rebase back into order, if you can.
 
