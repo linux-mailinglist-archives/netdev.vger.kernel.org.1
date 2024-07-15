@@ -1,164 +1,195 @@
-Return-Path: <netdev+bounces-111476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 636D8931430
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:27:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F76A931448
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92F9A1C216C0
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:27:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC6D21F21C76
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA25C18A95F;
-	Mon, 15 Jul 2024 12:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FBB188CDE;
+	Mon, 15 Jul 2024 12:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JsgwRnix"
+	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="GHlNdB8k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2083.outbound.protection.outlook.com [40.107.21.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B827413B295;
-	Mon, 15 Jul 2024 12:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721046464; cv=none; b=p4FvUlGqzUmeu1TMvoMdJex/Sz8focgZnA0fNJwfNgLz/ZqVX8DH22Xx4oQ5mZ8Z3Co3DCXI5xD3V5PTF+vMjx2w0+OMvRvYJ25tj/zUT/aDHUme+MiMFDgdNjADnLmOM7+Kk11G+CbywVj86GM2t/gVuKabqprZzlMgAqqNS1w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721046464; c=relaxed/simple;
-	bh=OydOCMejKpJcg79tQCcz01EkeqMAe0rOO+MxhxkGudM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2uBm7UXYqBzL4dBzOdbFa2cKH4wWCJHQ/aVsLUSt/ZxJxZ9WDZEsM6UddPbZ5O68TPIP0Y+q6d2xc11oAu2biDIuOihpYRreTyujH22ZX2FNFhAvVjSa8RFJBr/ebujlFUK+2+meNxcgEM+PnSDw24uEsdUoLZfEusLSjnvRVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JsgwRnix; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97FD3C32782;
-	Mon, 15 Jul 2024 12:27:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721046464;
-	bh=OydOCMejKpJcg79tQCcz01EkeqMAe0rOO+MxhxkGudM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JsgwRnix/92vzUvhsVv0wv1BuX/ZlDDvUQn8PQo9Wi3/SQSD10ETwPZTf8rNemh0B
-	 d36jxtTg34q2UgNg4dBj2GhfxCuiIJBkS6PKZdioZ9S7t2QHLj+ayxE3FFfNZX7ggZ
-	 sy8NuKizDNaX/4mpjTY4cViCH8y6PxMrQp8XgWifeqG+zn1Tmv+7VWXuIvIn6xVmPY
-	 Kao0IXhFfmHjwMdr2dFM6fKhfnAz4oA2IX4Kx+kfYPjHTY6W6M27QzyTVUeIuKOYJ4
-	 ySncMAmw9sEezUeTWw0URqON07YGmoIqXKIOUYIYGU3wSWsN4hMRyFOfhgwk+Yacgc
-	 WXjiXxP2k5+uA==
-Date: Mon, 15 Jul 2024 13:27:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexis =?utf-8?Q?Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	ebpf@linuxfoundation.org, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 2/2] selftests/bpf: integrate test_xdp_veth into
- test_progs
-Message-ID: <20240715122737.GA45692@kernel.org>
-References: <20240715-convert_test_xdp_veth-v2-0-46290b82f6d2@bootlin.com>
- <20240715-convert_test_xdp_veth-v2-2-46290b82f6d2@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A5313BAC2;
+	Mon, 15 Jul 2024 12:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721046749; cv=fail; b=lECiNqKtQh3qArFYWOswuE0/N0E9dMH+lxe/ZPaV+fmxXTUt25Eikpjk45UdJTb+KNzcHReAFQnTb0HAQdzOBmPC1ZQBK+J9s3Fn3bqzXjKdClGoH3g9FCSSRncYwu2LFEZVRT2SeWDEGFr0m5HVbljHOS9tVR6SdTVoh6zE9fo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721046749; c=relaxed/simple;
+	bh=1xoBAkrdIgUmj9FBWp+qKZdOPtOuNx12WQIpIeoIhKI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tn5j2Cfz+RNdgsKCHgUuKbuc4hux//vwDgTk7ZunlyVINPAprRMU3CreVATgd6Xxa3Idgfs3DX5QR4G74Dx2vkSnrV+m4WKfYv7vP0+Dy/RfgcaTcDNWXBP2nC3fKBkejXeYnQ6CkrSq+aMUPyaoPl/q/EecqJTy/sXNDFg3QUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=GHlNdB8k; arc=fail smtp.client-ip=40.107.21.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vTjyQebuUjXSd4LlyMi2xG7z8BRevtdPlQBX5w0b/K9T7e/kEQkHGbrLOHbqCEtZzD5TK33WSS1b/Sb1TeHZYBQU8lBZPyRXOyxrCYncwtU9FtnWoei6PE8W3beiRivttHF7h2YiPdPeFYBEHR98gXQ6z6+ianLkLIyc4v2q4SvgEZA33E+62Nqnly6icU3IXJZncvtQsjAAyEPLVx9vinsNu4ASCzEBlj84VZRo1+gwClRN683kcu30PY/DWc5UdhlC4do7OO2wEfrC6utXZw8k2OuHkSbkRwjGO6LM9uu3d5GUMvYP9LbPOYc3GTAPhG5mT5S8FDwWTi75t5NLvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SOsLc1RRGj7Cx25GUugndgTuCBtowFqMXO3cEi6jm4o=;
+ b=Ogm2YcpuYqSuKfFHWSljWtt5mOyzNba79qDmBUrkozHUJ9ebjkcqUSd7FxzNwA3CoTJGy3fJJF4nAGuTSVtGZKF26T9j5eJksxIh6MgYG50PlkGngfbQWhPmeOU/Ge4/+7FnP0prObEFDnYnLRnJx+2b43eLf+M6lDDAtRfp8OxdgEdbJZcpaF2MLzkM3gUABbgQh+I+N8mr7ZGkwnrN1YdesiSeG4X965B0gw7rPPK5rpYSmb5zsVJa+7y5rlL4IZrBD1zezKGfoyEmiiu87mQWZAhOGLRykVbXt0pPQxxCu69Dt3aTn7ekjy5LYkXi7bh25wzq/rKw1XboG4bCBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=lunn.ch smtp.mailfrom=arri.de; dmarc=fail
+ (p=none sp=none pct=100) action=none header.from=arri.de; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SOsLc1RRGj7Cx25GUugndgTuCBtowFqMXO3cEi6jm4o=;
+ b=GHlNdB8kbqkMZRuRCAwDaQrbfxZlmRvB0n9E9xxJzt9zr46TKfO81Qrj5kn1XTWvQT2jZkksypwuPoY0LxqwtIZ/3CbfvYoBSFtXvfImmmIcXB8SXP7quSWuGK0sTqcmih4Pl8u9wW0ijAjojODEnSFOogXgpS0GIozEMGkmVTA=
+Received: from AS9PR06CA0295.eurprd06.prod.outlook.com (2603:10a6:20b:45a::12)
+ by PAVPR07MB9381.eurprd07.prod.outlook.com (2603:10a6:102:311::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.12; Mon, 15 Jul
+ 2024 12:32:19 +0000
+Received: from AMS0EPF000001A6.eurprd05.prod.outlook.com
+ (2603:10a6:20b:45a:cafe::25) by AS9PR06CA0295.outlook.office365.com
+ (2603:10a6:20b:45a::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28 via Frontend
+ Transport; Mon, 15 Jul 2024 12:32:17 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AMS0EPF000001A6.mail.protection.outlook.com (10.167.16.233) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 12:32:17 +0000
+Received: from N9W6SW14.arri.de (10.30.4.252) by mta.arri.de (10.10.18.5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Mon, 15 Jul
+ 2024 14:32:17 +0200
+From: Christian Eggers <ceggers@arri.de>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Juergen Beisert
+	<jbe@pengutronix.de>, Stefan Roese <sr@denx.de>, Juergen Borleis
+	<kernel@pengutronix.de>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Christian Eggers
+	<ceggers@arri.de>
+Subject: [PATCH net-next] dsa: lan9303: consistent naming for PHY address parameter
+Date: Mon, 15 Jul 2024 14:30:50 +0200
+Message-ID: <20240715123050.21202-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240715-convert_test_xdp_veth-v2-2-46290b82f6d2@bootlin.com>
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001A6:EE_|PAVPR07MB9381:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2fcf75e-5292-421a-6c3d-08dca4ca2a0b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|7416014|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?niYBccpzrG9iURx/elVuSIBZqxH06tuosK7naNDH/dyqUsSZO4pBbGCiQu42?=
+ =?us-ascii?Q?SvBLKMebijHGr7vfDziMHDmAedVLHYGG1WoxbjrBB4FPK9RZSOAs+2a+8x6B?=
+ =?us-ascii?Q?71y4HDOr8L8EG99t+fTsRpvcvO1W1ctABt1IdxqACmsVTT22fkfLYw8pbRYH?=
+ =?us-ascii?Q?23U+QJ/QB38oyplhAA3ZNPfxiC4DqArMFQ38ZFCZGWXDWMsKEsK4iT1n52Ck?=
+ =?us-ascii?Q?yrAHeX6klOepOjVxJzWwK9vW2y1nIFb0+FkLWM0MiUC78r2tr6QaJLuO8crt?=
+ =?us-ascii?Q?1nGasH9EgYuLE0I4ILH2lwpUQg2rVskRSI0DvM8UcPcZsbgOguq44aRAb99Y?=
+ =?us-ascii?Q?1nLBaOzVmgMCI/JHX9Gzt+vtmDxrQNPQnXBBCnYjI+NfRzmAGArvK4MHjdQ7?=
+ =?us-ascii?Q?TB0lj4lnlPCl0vBz7gzhA8FzzCXHL9tt9Wymy9oVBwOvPrGOraj3KlMSqFa8?=
+ =?us-ascii?Q?F454x2xgF8IyWW7vH7j3PjD0dwEhVI0hBwZ26umAKSLG+S84K2R8v/8zyiFo?=
+ =?us-ascii?Q?culFio7mVwv+/ep8zPpHRCZHxDaASRP3M1tMIEwRV+nvK+G8HBVnBdscP5zM?=
+ =?us-ascii?Q?xCi7p/dR2Xsen2rDviTcbc83++Tm/WSVrXRV4OGKyoL19sqGrhZ1/8wKLMer?=
+ =?us-ascii?Q?OHgN6NYRem/9nMW45vkzT78rLsJOKB+LCbRFpxZYoiAhvAdWuwPL7ZJwFdrk?=
+ =?us-ascii?Q?64ICJ2IAXz0WYMYxqrLLoCplLaTSXBS+SPhLv3fc25nTLHHjM41TTzqxvh24?=
+ =?us-ascii?Q?xQe5wSQb9Em3Vn1OLDlh615KNVQSvNEbRi2+YXrCviti7ilg4tNQTfEiFULN?=
+ =?us-ascii?Q?m1I1b8qspzNHbfqL9j0a8mDCInaCXE7nGe7RZtueb1gErVZSgF6SGiQ4y/dS?=
+ =?us-ascii?Q?hvvyEDFp062ut1SA9LbSfPmC4U+a00yv07e3eHsu74300C98k/DJ8FAz+wyG?=
+ =?us-ascii?Q?7jAadVrasnFcneu/0ove+LYSx/1V3Ciyx2XuHP6HdYRM0Qm8zdKSwYpEFLn/?=
+ =?us-ascii?Q?B6FygCYql3Qw+pS4nzbvLDB+GnEXNz5+Ol2CtWFN7mKQIQaI4Gq2We4KMeQm?=
+ =?us-ascii?Q?PAbaIzO9W844Ipmt/1tcIXhxBYTHLfZwqpztotlOnmrOfXOIEDGLlpWyb1+u?=
+ =?us-ascii?Q?h+3MOA5mOVFL4r+jDaVik201RYxdAwv/I7yqRsSXCUGBsE5VHZfzsOOhUtch?=
+ =?us-ascii?Q?oWcX66N2nrwCp5Ay/u9gtDsoS/p2G4eZurbJTNiTSrTRejWPz2BeVUv6sjjB?=
+ =?us-ascii?Q?qN6k1bKuRI9G7JogrG36ilgXcHpP7lEAddv8Gswf3Njs2cYqQqF/TOOu+50k?=
+ =?us-ascii?Q?Y8KP2WBHnj+MuNDf6XXHoGvtnBmD0ibDhRPHGYXl+LUa+VN0v7UGSktPgYbi?=
+ =?us-ascii?Q?4iQLNDJMoTaqvt41zgrqFvvSr1KcvNo3Rv5TWl/Tbjv41ubizfG8ztMgaki/?=
+ =?us-ascii?Q?xIs33xeAiV4OnzH63RlMnZaFf/1QOaeHZL+RrsGIzHeSMrCqWAvFmA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(7416014)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 12:32:17.5039
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2fcf75e-5292-421a-6c3d-08dca4ca2a0b
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001A6.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR07MB9381
 
-On Mon, Jul 15, 2024 at 11:53:45AM +0200, Alexis Lothoré (eBPF Foundation) wrote:
-> test_xdp_veth.sh tests that XDP return codes work as expected, by bringing
-> up multiple veth pairs isolated in different namespaces, attaching specific
-> xdp programs to each interface, and ensuring that the whole chain allows to
-> ping one end interface from the first one. The test runs well but is
-> currently not integrated in test_progs, which prevents it from being run
-> automatically in the CI infrastructure.
-> 
-> Rewrite it as a C test relying on libbpf to allow running it in the CI
-> infrastructure. The new code brings up the same network infrastructure and
-> reuses the same eBPF programs as test_xdp_veth.sh, for which skeletons are
-> already generated by the bpf tests makefile.
-> 
-> Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
-> ---
-> The new code has been tested in an aarch64 qemu instance:
-> Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
-> 
-> I have also checked that some minor alterations in the network
-> configuration (altering the redirect map, or not loading one of the xdp
-> programs) make the test fail.
-> 
-> On my testing setup, the test takes a bit more than 3 seconds to run on
-> average.
-> 
-> Changes in v2:
-> - fix many formatting issues raised by checkpatch
-> - use static namespaces instead of random ones
-> - use SYS_NOFAIL instead of snprintf() + system ()
-> - squashed the new test addition patch and the old test removal patch
-> ---
->  tools/testing/selftests/bpf/Makefile               |   1 -
->  .../selftests/bpf/prog_tests/test_xdp_veth.c       | 211 +++++++++++++++++++++
->  tools/testing/selftests/bpf/test_xdp_veth.sh       | 121 ------------
->  3 files changed, 211 insertions(+), 122 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-> index a7932bead77d..2864a0dc04d5 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -117,7 +117,6 @@ TEST_PROGS := test_kmod.sh \
->  	test_xdp_redirect.sh \
->  	test_xdp_redirect_multi.sh \
->  	test_xdp_meta.sh \
-> -	test_xdp_veth.sh \
->  	test_tunnel.sh \
->  	test_lwt_seg6local.sh \
->  	test_lirc_mode2.sh \
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-> new file mode 100644
-> index 000000000000..3ffeb411c131
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-> @@ -0,0 +1,211 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/**
-> + * Create 3 namespaces with 3 veth peers, and
-> + * forward packets in-between using native XDP
-> + *
-> + *                      XDP_TX
-> + * NS1(veth11)        NS2(veth22)        NS3(veth33)
-> + *      |                  |                  |
-> + *      |                  |                  |
-> + *   (veth1,            (veth2,            (veth3,
-> + *   id:111)            id:122)            id:133)
-> + *     ^ |                ^ |                ^ |
-> + *     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
-> + *     | ------------------ ------------------ |
-> + *     -----------------------------------------
-> + *                    XDP_REDIRECT
-> + */
+Name it 'addr' instead of 'port' or 'phy'.
 
-Hi Alexis,
+Signed-off-by: Christian Eggers <ceggers@arri.de>
+---
+ drivers/net/dsa/lan9303_mdio.c | 8 ++++----
+ include/linux/dsa/lan9303.h    | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-A minor nit from my side.
+diff --git a/drivers/net/dsa/lan9303_mdio.c b/drivers/net/dsa/lan9303_mdio.c
+index 167a86f39f27..0ac4857e5ee8 100644
+--- a/drivers/net/dsa/lan9303_mdio.c
++++ b/drivers/net/dsa/lan9303_mdio.c
+@@ -58,19 +58,19 @@ static int lan9303_mdio_read(void *ctx, uint32_t reg, uint32_t *val)
+ 	return 0;
+ }
+ 
+-static int lan9303_mdio_phy_write(struct lan9303 *chip, int phy, int reg,
++static int lan9303_mdio_phy_write(struct lan9303 *chip, int addr, int reg,
+ 				  u16 val)
+ {
+ 	struct lan9303_mdio *sw_dev = dev_get_drvdata(chip->dev);
+ 
+-	return mdiobus_write_nested(sw_dev->device->bus, phy, reg, val);
++	return mdiobus_write_nested(sw_dev->device->bus, addr, reg, val);
+ }
+ 
+-static int lan9303_mdio_phy_read(struct lan9303 *chip, int phy,  int reg)
++static int lan9303_mdio_phy_read(struct lan9303 *chip, int addr, int reg)
+ {
+ 	struct lan9303_mdio *sw_dev = dev_get_drvdata(chip->dev);
+ 
+-	return mdiobus_read_nested(sw_dev->device->bus, phy, reg);
++	return mdiobus_read_nested(sw_dev->device->bus, addr, reg);
+ }
+ 
+ static const struct lan9303_phy_ops lan9303_mdio_phy_ops = {
+diff --git a/include/linux/dsa/lan9303.h b/include/linux/dsa/lan9303.h
+index b4f22112ba75..3ce7cbcc37a3 100644
+--- a/include/linux/dsa/lan9303.h
++++ b/include/linux/dsa/lan9303.h
+@@ -5,8 +5,8 @@ struct lan9303;
+ 
+ struct lan9303_phy_ops {
+ 	/* PHY 1 and 2 access*/
+-	int	(*phy_read)(struct lan9303 *chip, int port, int regnum);
+-	int	(*phy_write)(struct lan9303 *chip, int port,
++	int	(*phy_read)(struct lan9303 *chip, int addr, int regnum);
++	int	(*phy_write)(struct lan9303 *chip, int addr,
+ 			     int regnum, u16 val);
+ };
+ 
+-- 
+2.43.0
 
-The comment above starts with '/**' but otherwise it is not a Kernel doc.
-It's probably best if it's a networking-style multi-line comment instead.
-
-/* Create 3 namespaces with 3 veth peers, and
- * ...
- */
-
-...
 
