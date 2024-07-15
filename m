@@ -1,242 +1,113 @@
-Return-Path: <netdev+bounces-111594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9681F931AA8
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 21:12:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81068931B16
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 21:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F032811F7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:12:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 375A01F22CD3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D43A78C6C;
-	Mon, 15 Jul 2024 19:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DC2139D13;
+	Mon, 15 Jul 2024 19:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M4nVlNV2"
+	dkim=pass (2048-bit key) header.d=patrick-wildt-de.20230601.gappssmtp.com header.i=@patrick-wildt-de.20230601.gappssmtp.com header.b="cXTiYOxj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f226.google.com (mail-lj1-f226.google.com [209.85.208.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D526317588
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 19:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FA9131E38
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 19:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721070738; cv=none; b=klTjgg25LUseScl7PI8nOcEOqX/ahbeX675JoeY1Sq2vYct21up0zSzlEge5lQJ+8EUgvqGRMUdWrCVOzd1YE6YNsmehUrCJYKB3kZRFRRwmg0Lz/7Pi4An4TzOAhkR6IZLmRNQpHU/l8/3kZ/eNWnerMVXpzWzhZGv3Z3UK380=
+	t=1721072300; cv=none; b=au2eLY143JMtb0S8FpVI/x0JPm6+BYhOvTrOGuPQclBO8+RJbZp3oO+fT8vxpd6SetdMn974tP5w9wkv9XzlDO86zv2ZzqVESyBQvBDzdQgQJTiUtKpCbSvOTznq9wWm9hK16sPk41layrkdYxONpjT7Ex4RgMsNbtB5EqPve30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721070738; c=relaxed/simple;
-	bh=5e32aGrDkQ+8+nnK1OKNyx/Zqlk2eAxCsTVxfnQQC/E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gq3OJ97pC6K+3ycBDl2PRoBjbkURusu+ccuOhQIqLJsQnPUUZqQfqVfy6i5Q91pbi7nCMxnn+tesLFU7rZNG/wJMS4ujg3NpwdGta/f6Z0URgwd9igj8o18rybUFd650BJ1LeHMhVY2sgF1/kdrnVhLrhKjctCxZ1XQGj3TU994=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M4nVlNV2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721070735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9FyOTMQEyctKcX6PD7xEEfPVD/zlnl5HQmXYTfM+6jY=;
-	b=M4nVlNV2C8CjHhd8QrDMaWZOrQGrseNZWGH+Fc+aaNVI69dw9UwsK2pePagfhXMX7jelEa
-	lPuDXAPG6YH6md6cmmobSjGxXYu/kgf9DcgLc+9ympv+rH0s2Lt06gebwQGZpOJ4o6M84U
-	w8GbMjBAujsULflBEciqAcu2YgmpSt0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-195-On_l9IgAOuGIKzO9doLriA-1; Mon,
- 15 Jul 2024 15:12:11 -0400
-X-MC-Unique: On_l9IgAOuGIKzO9doLriA-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 10DDE1955D53;
-	Mon, 15 Jul 2024 19:12:10 +0000 (UTC)
-Received: from fedora-x1.redhat.com (unknown [10.22.16.23])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9479D19560AE;
-	Mon, 15 Jul 2024 19:12:07 +0000 (UTC)
-From: Kamal Heib <kheib@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kamal Heib <kheib@redhat.com>
-Subject: [PATCH iwl-next] i40e: Add support for fw health report
-Date: Mon, 15 Jul 2024 15:11:48 -0400
-Message-ID: <20240715191148.746362-1-kheib@redhat.com>
+	s=arc-20240116; t=1721072300; c=relaxed/simple;
+	bh=cemq+9OuqeY3+ummp337Mvo5F4mXDIT79m4hgKaBI1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=G+HQ7LMysUDZwAMOscCMLGr7LHlLK5JxZj5erlwxy1YFUaA7J/65p+nRLCw+v3ieKREEgpdAHtZKYeY1jNOnPr7kzYmMpLALD0bud6Wzv8f8e24KrM7zqv4VNIzeqrV4fIVq/UoHLSLG3qgAhY/L2Uo1d4qdSKK1tUhs5Ck5U8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blueri.se; spf=pass smtp.mailfrom=blueri.se; dkim=pass (2048-bit key) header.d=patrick-wildt-de.20230601.gappssmtp.com header.i=@patrick-wildt-de.20230601.gappssmtp.com header.b=cXTiYOxj; arc=none smtp.client-ip=209.85.208.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=blueri.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blueri.se
+Received: by mail-lj1-f226.google.com with SMTP id 38308e7fff4ca-2ee91d9cb71so49195331fa.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 12:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=patrick-wildt-de.20230601.gappssmtp.com; s=20230601; t=1721072296; x=1721677096; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NFsCI/nUGMHpQYBhPffSAiv0o4Z8VMEXV4FQksJuyUk=;
+        b=cXTiYOxjsrz5BFWB5pXFPYwf5UusjMzd5o6+Kwrii5SuKh/2njn3BY9/edtzCLuxWn
+         TRzSnXtUIkdwbyAxibs7EOTVlJEVmAxZdOiRsM71pRbF+eNhztMeijNDVSxe2SlziSxX
+         EMAq3G5sVqhGIYC9cXO0/yxR9YQaPtRAZPt/RT5idM5vwS8Qj0Rb4Ztvx4wGIlOxE9Zm
+         A9B8d2QaYZZ3XnEsbt+aYRGczVBra+jhfdbqUbt/osRgy2JofcSWdya490iHGSHts3us
+         lEY5zUnHVMJE+KG82VozYh659abwJ7jmNvY0Jv9S93Ly3RTwKpLBDTkPGEqDFgMdjxm2
+         zBAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721072296; x=1721677096;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NFsCI/nUGMHpQYBhPffSAiv0o4Z8VMEXV4FQksJuyUk=;
+        b=Nod3Kumgj1lLB4CHyUdjqcoCq7LLiLVfPClP3zKDQvhFgHrjiWP1ex6roTD0ttZnNh
+         +mC/MhoUHXlpVxR5TkvAPRnDfkVfcyj+JLOFJLNM6QYTihuWf0Ovs7Nv27eIYO2KBgII
+         wVpC+COEXZKsMcLT2XhRphpDjTlWUnE/ip72FIPM/7Qbz91YLwX3Mc/M1zp9BN4YlVxT
+         ofZWAT74PqUuVO9NBM4W+y9YAZZi2AHy8qsD/qwrdKD6gpikwIqcFzMeLGiYHfoszB61
+         2bRwoNQ/FaLYYgfStf9dMkMdNlnKQW+uh5hbZL15qox7qREFqkYI7ZtqvUW7kVBufDdw
+         C6xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUt6HdNjlm+iSpwzGuBKUQiP6dDFIlAKvGAjs3ukJR9q5UMc3dZF/eqQ/jtETLtSll6PnbU9uO8GJWzlTx15zptDyl16uoz
+X-Gm-Message-State: AOJu0Yy/boTGMcli5QxDFm/zqOznOiAugWyvFULvfutD38J4pZxtRVeb
+	gOQngPci0SzfwwAxVEZrhki/9WmfK2YhbBBNABk9+8ryRcDgpLK0I1zCs9rvXCeaHjfupZokMEM
+	D2y98GLPkb2Jh/n1uP/rO/Nf0QhjVJ3Zo
+X-Google-Smtp-Source: AGHT+IHjhs7lFn6xanLhyvwaA7PatZ3sOOeEdpx/Nn5lzGlDNwLD/+lV4ElphVBjqkaDIyu0IV9Qs/ersaIQ
+X-Received: by 2002:a2e:91d3:0:b0:2ee:8eb6:ff61 with SMTP id 38308e7fff4ca-2eef4156be4mr722331fa.2.1721072295803;
+        Mon, 15 Jul 2024 12:38:15 -0700 (PDT)
+Received: from windev.fritz.box (p5b0ac4d1.dip0.t-ipconnect.de. [91.10.196.209])
+        by smtp-relay.gmail.com with ESMTPS id 38308e7fff4ca-2eee1936872sm625101fa.64.2024.07.15.12.38.14
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 15 Jul 2024 12:38:15 -0700 (PDT)
+X-Relaying-Domain: blueri.se
+Date: Mon, 15 Jul 2024 21:38:11 +0200
+From: Patrick Wildt <patrick@blueri.se>
+To: Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Andy Gross <agross@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Steev Klimaszewski <steev@kali.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Johan Hovold <johan+linaro@kernel.org>,
+	Patrick Wildt <patrick@blueri.se>
+Subject: [PATCH 0/2] arm64: dts: qcom: x1e80100-yoga: add wifi calibration
+ variant
+Message-ID: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add support for reporting fw status via the devlink health report.
+This series adds the missing calibration variant devicetree property
+which is needed to load the calibration data and use the ath12k wifi
+on the Lenovo Yoga Slim 7x.
 
-Example:
- # devlink health show pci/0000:02:00.0 reporter fw
- pci/0000:02:00.0:
-   reporter fw
-     state healthy error 0 recover 0
- # devlink health diagnose pci/0000:02:00.0 reporter fw
- Status: normal
+Patrick Wildt (2):
+  dt-bindings: net: wireless: add ath12k pcie bindings
+  arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
 
-Signed-off-by: Kamal Heib <kheib@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
- .../net/ethernet/intel/i40e/i40e_devlink.c    | 57 +++++++++++++++++++
- .../net/ethernet/intel/i40e/i40e_devlink.h    |  2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 15 +++++
- 4 files changed, 75 insertions(+)
+ .../net/wireless/qcom,ath12k-pci.yaml         | 59 +++++++++++++++++++
+ .../dts/qcom/x1e80100-lenovo-yoga-slim7x.dts  |  9 +++
+ arch/arm64/boot/dts/qcom/x1e80100.dtsi        | 10 ++++
+ 3 files changed, 78 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index d546567e0286..f94671b6e7c6 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -465,6 +465,7 @@ static inline const u8 *i40e_channel_mac(struct i40e_channel *ch)
- struct i40e_pf {
- 	struct pci_dev *pdev;
- 	struct devlink_port devlink_port;
-+	struct devlink_health_reporter *fw_health_report;
- 	struct i40e_hw hw;
- 	DECLARE_BITMAP(state, __I40E_STATE_SIZE__);
- 	struct msix_entry *msix_entries;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-index cc4e9e2addb7..ad91c150cdba 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-@@ -122,6 +122,25 @@ static int i40e_devlink_info_get(struct devlink *dl,
- 	return err;
- }
- 
-+static int i40e_fw_reporter_diagnose(struct devlink_health_reporter *reporter,
-+				     struct devlink_fmsg *fmsg,
-+				     struct netlink_ext_ack *extack)
-+{
-+	struct i40e_pf *pf = devlink_health_reporter_priv(reporter);
-+
-+	if (test_bit(__I40E_RECOVERY_MODE, pf->state))
-+		devlink_fmsg_string_pair_put(fmsg, "Status", "recovery");
-+	else
-+		devlink_fmsg_string_pair_put(fmsg, "Status", "normal");
-+
-+	return 0;
-+}
-+
-+static const struct devlink_health_reporter_ops i40e_fw_reporter_ops = {
-+	.name = "fw",
-+	.diagnose = i40e_fw_reporter_diagnose,
-+};
-+
- static const struct devlink_ops i40e_devlink_ops = {
- 	.info_get = i40e_devlink_info_get,
- };
-@@ -233,3 +252,41 @@ void i40e_devlink_destroy_port(struct i40e_pf *pf)
- {
- 	devlink_port_unregister(&pf->devlink_port);
- }
-+
-+/**
-+ * i40e_devlink_create_health_reporter - Create the health reporter for this PF
-+ * @pf: the PF to create reporter for
-+ *
-+ * Create health reporter for this PF.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ **/
-+int i40e_devlink_create_health_reporter(struct i40e_pf *pf)
-+{
-+	struct devlink *devlink = priv_to_devlink(pf);
-+	struct device *dev = &pf->pdev->dev;
-+	int rc = 0;
-+
-+	devl_lock(devlink);
-+	pf->fw_health_report =
-+		devl_health_reporter_create(devlink, &i40e_fw_reporter_ops, 0, pf);
-+	if (IS_ERR(pf->fw_health_report)) {
-+		rc = PTR_ERR(pf->fw_health_report);
-+		dev_err(dev, "Failed to create fw reporter, err = %d\n", rc);
-+	}
-+	devl_unlock(devlink);
-+
-+	return rc;
-+}
-+
-+/**
-+ * i40e_devlink_destroy_health_reporter - Destroy the health reporter
-+ * @pf: the PF to cleanup
-+ *
-+ * Destroy the health reporter
-+ **/
-+void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf)
-+{
-+	if (!IS_ERR_OR_NULL(pf->fw_health_report))
-+		devlink_health_reporter_destroy(pf->fw_health_report);
-+}
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.h b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-index 469fb3d2ee25..018679094bb5 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-@@ -14,5 +14,7 @@ void i40e_devlink_register(struct i40e_pf *pf);
- void i40e_devlink_unregister(struct i40e_pf *pf);
- int i40e_devlink_create_port(struct i40e_pf *pf);
- void i40e_devlink_destroy_port(struct i40e_pf *pf);
-+int i40e_devlink_create_health_reporter(struct i40e_pf *pf);
-+void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf);
- 
- #endif /* _I40E_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index cbcfada7b357..13cad5f58029 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -15370,6 +15370,9 @@ static bool i40e_check_recovery_mode(struct i40e_pf *pf)
- 		dev_crit(&pf->pdev->dev, "Firmware recovery mode detected. Limiting functionality.\n");
- 		dev_crit(&pf->pdev->dev, "Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode.\n");
- 		set_bit(__I40E_RECOVERY_MODE, pf->state);
-+		if (pf->fw_health_report)
-+			devlink_health_report(pf->fw_health_report,
-+					      "FW recovery mode detected", pf);
- 
- 		return true;
- 	}
-@@ -15636,6 +15639,14 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		err = -ENOMEM;
- 		goto err_pf_alloc;
- 	}
-+
-+	err = i40e_devlink_create_health_reporter(pf);
-+	if (err) {
-+		dev_err(&pdev->dev,
-+			"Failed to create health reporter %d\n", err);
-+		goto err_health_reporter;
-+	}
-+
- 	pf->next_vsi = 0;
- 	pf->pdev = pdev;
- 	set_bit(__I40E_DOWN, pf->state);
-@@ -16180,6 +16191,8 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- err_pf_reset:
- 	iounmap(hw->hw_addr);
- err_ioremap:
-+	i40e_devlink_destroy_health_reporter(pf);
-+err_health_reporter:
- 	i40e_free_pf(pf);
- err_pf_alloc:
- 	pci_release_mem_regions(pdev);
-@@ -16209,6 +16222,8 @@ static void i40e_remove(struct pci_dev *pdev)
- 
- 	i40e_devlink_unregister(pf);
- 
-+	i40e_devlink_destroy_health_reporter(pf);
-+
- 	i40e_dbg_pf_exit(pf);
- 
- 	i40e_ptp_stop(pf);
 -- 
 2.45.2
 
