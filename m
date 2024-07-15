@@ -1,65 +1,56 @@
-Return-Path: <netdev+bounces-111493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38BAC931605
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:45:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B68D931614
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7C561F225A4
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:45:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AC231F2117A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AA118D4BE;
-	Mon, 15 Jul 2024 13:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EDE18D4A9;
+	Mon, 15 Jul 2024 13:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEOs2APd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9lnXJwN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9490A1741CF;
-	Mon, 15 Jul 2024 13:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930691836D4;
+	Mon, 15 Jul 2024 13:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721051153; cv=none; b=mzkWvpnd6GddjTe4b6QeAdyd+YEmPOjdw/0pJeG0Uo/dyxYOhL8pF5wUu+46X6FvV3iquouekbdMkWn2MyxcBQBsOHjLPd7Hy+3EALJmKdB8i+oMyO1B826JmFQwScJtFKleWSIWqHDpm/zGyAzf0epJKkbAYY6Y5EO1B5AZGHs=
+	t=1721051381; cv=none; b=ocyohd/9YIjUn6HUDMjuM5bNnqvVc+I+MvfpLnshctblua4GMokq87mMqLyYdcgywjxPvJ38SAKquVngBEL54AADCddMMsXls9kbRAcny8NC11T2rsG93kuK2oMMV+RJzhu7Ckoz5k8rVdiIAL2FeP8l5Q4Bv/FUdR5Tpykueuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721051153; c=relaxed/simple;
-	bh=HVGY/h4cNN4DFAIeEiRfe9sGWKWRmKyBHgJJ93LF0CQ=;
+	s=arc-20240116; t=1721051381; c=relaxed/simple;
+	bh=A9DZgxnIbR75iXFnIQtTCJmbz1eh8oOqSCv5guVQi5E=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qpnpdvOTxVA11QFAHrIvuzQziUrCVxoxmCX3AV8z2Gu071mPdcJEPh7KhrOuOdTJhWUadssBJUHJ6CQIo02CRYA0bMWckbhMFLwwBqRER1uRogRQiYTMLxNZ79/IGutxTSPctIptHjfB5G35c6JwLX4pc8IyTYLUEdjHUxotSJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEOs2APd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45AFCC32782;
-	Mon, 15 Jul 2024 13:45:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SBzzlFoEKDiVahP7UuT3gQrWQs7QEntrw/zwCwYIacDvH0zKeOtjFDlJ6j+xccDDmWb+OY1JFBgj/kT42je330SuVwDO0n8ZgtZtUS8ujyQy6XYhEYhf7d+FZ/GZCtyxqSU0RjKNDamb32oZ7AImdfzpm2ZPmu+mQgHurXv8EEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9lnXJwN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C37C32782;
+	Mon, 15 Jul 2024 13:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721051153;
-	bh=HVGY/h4cNN4DFAIeEiRfe9sGWKWRmKyBHgJJ93LF0CQ=;
+	s=k20201202; t=1721051381;
+	bh=A9DZgxnIbR75iXFnIQtTCJmbz1eh8oOqSCv5guVQi5E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TEOs2APdlr9nB8KQSYdCEhpSlXEM4ZB5hxlg8ww8JUyr0kjCBy8yuxROJ9FKcafZ1
-	 On71BBQpyuQWTSBpHEv7Z8htHbDgQHLpBMRY0+cAHF+JYXju2zHfWrc8NkoqyxII+4
-	 PhI6VI6thzptWqBtvYiDcXtkOHB6MzpBayA0xZaDnae8jjJVmyk9R9NUs2AtjlKnwN
-	 BMgX6bo1JvguXIl6iLrrso+37JAfSsLFbYI8STexq6fl+syFm/3CsbPar4MfYpsABf
-	 bPKBNbZiZGgBH5L8pZzY5mW2PO7Je56FisqkWzDoSdy/4K8MA9E0nzNv1LfTHwAdGl
-	 /+W1hFtcaTN6A==
-Date: Mon, 15 Jul 2024 06:45:51 -0700
+	b=I9lnXJwN7FkBrkKModJisBdX/o5D0opMrJf3iOeACjKtyEHDvLkPpbRX8VfR/HuPe
+	 b2W+ONR9XJdCVPZU/Re8v6upBZ81WLhFVZXNBxzinvM5mT8YN71ytjOQGOTbjFy37V
+	 IMgddbyFgyW1VjF/GKT1FVDR+o/66vCZzlofm/thd0a2ySPuPuF/rLqnWhxiuG1XaR
+	 g7pexrxgMQqfyIKBpj8uGpRAaivkzFwgp3gBgeieSdVyXRMcl2OYPtUCjvFdVfAPFW
+	 ACNrH6j5KGnsWxGBtHVQr79ZGOBnts6iugPjpwU3/Awyh4LzAJPDGVI3ayqVL2qf8K
+	 lz9N0PIZFrb5A==
+Date: Mon, 15 Jul 2024 06:49:39 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Ajay Sharma
- <sharmaajay@microsoft.com>, Simon Horman <horms@kernel.org>, Konstantin
- Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
- <schakrabarti@linux.microsoft.com>, Erick Archer
- <erick.archer@outlook.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, Colin Ian King <colin.i.king@gmail.com>
-Subject: Re: [PATCH net-next] net: mana: Implement
- get_ringparam/set_ringparam for mana
-Message-ID: <20240715064551.6036d46b@kernel.org>
-In-Reply-To: <1721014820-2507-1-git-send-email-shradhagupta@linux.microsoft.com>
-References: <1721014820-2507-1-git-send-email-shradhagupta@linux.microsoft.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ bartosz.golaszewski@linaro.org
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2024-07-14
+Message-ID: <20240715064939.644536f3@kernel.org>
+In-Reply-To: <20240715015726.240980-1-luiz.dentz@gmail.com>
+References: <20240715015726.240980-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,37 +60,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 14 Jul 2024 20:40:20 -0700 Shradha Gupta wrote:
-> +	if (ring->rx_jumbo_pending) {
-> +		netdev_err(ndev, "%s: rx_jumbo_pending not supported\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +	if (ring->rx_mini_pending) {
-> +		netdev_err(ndev, "%s: rx_mini_pending not supported\n", __func__);
-> +		return -EINVAL;
-> +	}
+On Sun, 14 Jul 2024 21:57:25 -0400 Luiz Augusto von Dentz wrote:
+>  - qca: use the power sequencer for QCA6390
 
-I think that core already checks this
+Something suspicious here, I thought Bartosz sent a PR but the commits
+appear with Luiz as committer (and lack Luiz's SoB):
 
-> +	if (!apc)
-> +		return -EINVAL;
+Commit ead30f3a1bae ("power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets") committer Signed-off-by missing
+	author email:    bartosz.golaszewski@linaro.org
+	committer email: luiz.von.dentz@intel.com
+	Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Provably impossible, apc is netdev + sizeof(netdev) so it'd have to
-wrap a 64b integer to be NULL :|
+Commit e6491bb4ba98 ("power: sequencing: implement the pwrseq core")
+	committer Signed-off-by missing
+	author email:    bartosz.golaszewski@linaro.org
+	committer email: luiz.von.dentz@intel.com
+	Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-> +	old_tx = apc->tx_queue_size;
-> +	old_rx = apc->rx_queue_size;
-> +	new_tx = clamp_t(u32, ring->tx_pending, MIN_TX_BUFFERS_PER_QUEUE, MAX_TX_BUFFERS_PER_QUEUE);
-> +	new_rx = clamp_t(u32, ring->rx_pending, MIN_RX_BUFFERS_PER_QUEUE, MAX_RX_BUFFERS_PER_QUEUE);
-> +
-> +	if (new_tx == old_tx && new_rx == old_rx)
-> +		return 0;
-
-Pretty sure core will also not call you if there's no change.
-If it does please update core instead of catching this in the driver.
-
-Please keep in mind that net-next will be closed for the duration
-of the merge window.
--- 
-pw-bot: cr
+Is this expected? Any conflicts due to this we need to tell Linus about?
 
