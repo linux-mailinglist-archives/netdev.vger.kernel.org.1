@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-111462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E4A931299
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:50:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6F693129C
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 540761C22A4E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 10:50:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656A81F230F9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 10:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00249188CC3;
-	Mon, 15 Jul 2024 10:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2684F188CB8;
+	Mon, 15 Jul 2024 10:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KwcEswmd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lMOgYdwi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2DB188CB8
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 10:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7828C18411C
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 10:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721040623; cv=none; b=g6CNu9hoqcL2weMgNHgy0Wklh1xo1RFZQAAYGj4EFvDrUAxgaewEYuNICCijzpx/DwphsZFHyAYQGfJKfVPhBgXFMPzsrpZn5CKFCbzCm60YGvkQxFbet8bzejRBsOxN8POWxBRH41e6rs4n+5V1IDGzZS1WlHQW20BhhLQ8Wio=
+	t=1721040652; cv=none; b=WH0UqWskF8bzOdLeVLcxbAT1mD1rGr9e5NTHzmD5M4lBK9rw/daRDQgCBffY8Fh0QPzFuNkMMwugNwQKdzZHHKHCpOS4MSGxrzYbpyN9yKB0XM19DqG2XwWXUuSl/W6f7RZP0p7MQnkqBW4H+Wp5xO5+SAjwnFCsApJA0smsunI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721040623; c=relaxed/simple;
-	bh=Xcby91CvHtdQucL3Gqpiq/obaC+y2zTJJ2JE4tqdZ6o=;
+	s=arc-20240116; t=1721040652; c=relaxed/simple;
+	bh=X+n2EA+PpcwiVRODe8SXcZ/ebefjWKERhrirkSfG7uk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ABlz6S8Xsy1t+F9UHKojcZiP8oFRz8TOaoC9sBnimNvBn80+awhDiovJDSp3Abl9c3aCK83EWzSoaLhdFFqKU3QM/LITm4CKuXd5pB+79kORb2Q2W8V363yjTxdxIXhtiCnvwbHz8kg1ye6Y2AeGgzVASqMgcvbmylVSm5TRzCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KwcEswmd; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=eZ2bUw//wtCNX0LayXQaoQU7oFEFZWwHniCjGXgoJ6RG0INidVGJnG00AdT/ppAvkiTyouWP6KMY9XlBUDK4tXpbTLTzZZhDX4Ol3fdTY9BBVJnuqmzyfDaYowZedRaQJh+/1YLNt7FnOVeOJOblrx3GfhsKGQKSz8t/wZgDCPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lMOgYdwi; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721040623; x=1752576623;
+  t=1721040651; x=1752576651;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Xcby91CvHtdQucL3Gqpiq/obaC+y2zTJJ2JE4tqdZ6o=;
-  b=KwcEswmdsBx+3ILdVax1IUFd6Tnt3HZXzGHk1iMnlJUvoCZXa5fSdHJW
-   KgaGw2YAQHXglY7rBP2xCZsG/0QZxBwulb/Gnyos8mrV4GL7Rk8lSmvxd
-   QMrtO8Rc+8vJWCnT8EgGhjKTA5esSlTa5/RIdQlOL3vSwhvf6OHFH4Bg5
-   Ro3ct0Yayl7IL4r/tFB+WLoBw+JgxYTR4Lk/G6q6I8K00GMKc/2WhakcC
-   LI5zqIkGvV1a2BcThTzSJdaaPAnex99NbHj48Ssxx9/eJpPlPhmOTTy9H
-   qJWFL2uHNYW1DXg3Tsj90+OJpAgc4thN2J9PTiGelLZyOfrHg2bqHDAWd
-   Q==;
-X-CSE-ConnectionGUID: WU1msNvOSn2nQlmK5ZILlQ==
-X-CSE-MsgGUID: NChDFK4fRzybla7lASOzSg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11133"; a="18609010"
+  bh=X+n2EA+PpcwiVRODe8SXcZ/ebefjWKERhrirkSfG7uk=;
+  b=lMOgYdwiviHYq0ekw9xzbufGM0bb99oPf96w4scUjX0ubl3rTkTF1Z6n
+   uCXCYlbt0YhZzSUNS3El6RAhJNLzUKF/rxmAZmVhFCnbkVXRBVC8FpLF7
+   DO6E4T15ZhIQdiPDfLom0HRoVNHXD1Dp9vSeFdq8mtWZff2wRwKzpP4+N
+   iZkfS3Z0lB1HlDuhL3gesnSD+Ol33Jp70fMxOVctcZon0ieVcKkDke5wJ
+   Ocgpj2nRns1UrM/jHhSI4MawlcnZLsIldtyjqzpNr3BhxXAV69gtlBJvD
+   BIBVATreWkDEzpyOaQKtY2NU3b+49kTNR/ucX7iOmCV7AtP0l53zhSizP
+   w==;
+X-CSE-ConnectionGUID: mrPApUOTRFmh2wNwwT56WA==
+X-CSE-MsgGUID: 03EIUMcGQRi0JpAdS9l5/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11133"; a="18609046"
 X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="18609010"
+   d="scan'208";a="18609046"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 03:50:20 -0700
-X-CSE-ConnectionGUID: 2t9QlrDnQDquXCaCLEbrVg==
-X-CSE-MsgGUID: r6XHH3dJT/m22GOXVyrZ5w==
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 03:50:23 -0700
+X-CSE-ConnectionGUID: 64AKA/R5RvWUq4G7tf1YtQ==
+X-CSE-MsgGUID: Cf9nDKKQS6mp6IT4vZkPcA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="49545153"
+   d="scan'208";a="49545174"
 Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by fmviesa009.fm.intel.com with ESMTP; 15 Jul 2024 03:50:19 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 15 Jul 2024 03:50:21 -0700
 From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
 	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v1 1/2] ice: Fix reset handler
-Date: Mon, 15 Jul 2024 12:48:44 +0200
-Message-ID: <20240715104845.51419-2-sergey.temerkhanov@intel.com>
+Subject: [PATCH iwl-net v1 2/2] ice: Skip PTP HW writes during PTP reset procedure
+Date: Mon, 15 Jul 2024 12:48:45 +0200
+Message-ID: <20240715104845.51419-3-sergey.temerkhanov@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240715104845.51419-1-sergey.temerkhanov@intel.com>
 References: <20240715104845.51419-1-sergey.temerkhanov@intel.com>
@@ -81,30 +82,35 @@ Content-Transfer-Encoding: 8bit
 
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-Synchronize OICR IRQ when preparing for reset to avoid potential
-race conditions between the reset procedure and OICR
+Block HW write access for the driver while the device is in reset to
+avoid potential race condition and access to the PTP HW in
+non-nominal state which could lead to undesired effects
 
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 Fixes: 4aad5335969f ("ice: add individual interrupt allocation")
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index e2990993b16f..3405fe749b25 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -560,6 +560,8 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	if (test_bit(ICE_PREPARED_FOR_RESET, pf->state))
- 		return;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 85b19e94e2ed..1f365bd6f525 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -1420,6 +1420,10 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
+ 	/* Update cached link status for this port immediately */
+ 	ptp_port->link_up = linkup;
  
-+	synchronize_irq(pf->oicr_irq.virq);
++	/* Skip HW writes if reset is in progress */
++	if (pf->hw.reset_ongoing)
++		return;
 +
- 	ice_unplug_aux_dev(pf);
- 
- 	/* Notify VFs of impending reset */
+ 	switch (ice_get_phy_model(hw)) {
+ 	case ICE_PHY_E810:
+ 		/* Do not reconfigure E810 PHY */
 -- 
 2.43.0
 
