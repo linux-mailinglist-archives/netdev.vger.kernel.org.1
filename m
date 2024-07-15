@@ -1,169 +1,462 @@
-Return-Path: <netdev+bounces-111521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E926D9316D6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64EE79316DD
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13E241C223DD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:32:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899341C21640
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E790C18EA71;
-	Mon, 15 Jul 2024 14:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8139618F2C6;
+	Mon, 15 Jul 2024 14:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fHnsMSB8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eyc9uMXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35620433B3
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 14:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721053971; cv=none; b=sfyO3DSTDETN4ZgVloY8/oL6UwH2SonfuxCamlmLSsHagR+8v/VF7TqIPhIpwoNXBzRxfCK4rkoWeJyvsRnNaBqy0EKAsSwdIFywFZEwfEXl7jeYfzMX+VYJLFDIoJpd+OoOufNGZ738QkVVZw/Cai8XTHW+T8wH/o9y2rpMK98=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721053971; c=relaxed/simple;
-	bh=Br5NjM+8wQNBe7Uk9YsTAeXeTj40IkCtiYiYKTREDRU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=abxRCB5q6GJq/I0G9EsCYo33b5OlBbFfMZ9l2gh/cpT1g/p1SN0h90tZOrU9obftfF3VFB69yZHHSCCjO3QzbJyjS48j5tFDeqSBBX4hf6HfkhbPrSQOVdOW8FLc5b4JqwSJvE6lGZH8wpYRMMte4jMK9EAv7861PtaXCFlWeaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fHnsMSB8; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-66108213e88so11940367b3.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 07:32:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721053969; x=1721658769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8XBIY7M7BM4brKFl2c3AgS2v9Iaoh8qE16Ej5dbPbOE=;
-        b=fHnsMSB8XPdHXS3+Bua0iBWxwfRb4L8W9qpngSogVLwVp502ChDLKV7mnBvadj2GNt
-         M7gB6/IHy+xavR9GYxhwwcff6WPpBmh+B97+IbdoWIWpRJsRNpXzQxbGJxwa6AK2D0e8
-         9NZ2Ah8uy/ATtH/MyquacswvoLwadswjXmiUjtjbpSYY+ixlZoHhbCkMn33ph/fKJG1s
-         SYQJx/Fu1yhegghCEltYh9KyYapeQ2rGQSCE97cTu6QkQrHKhs7hS1Jaq240XOLDemEI
-         YTsXgx6FWM7fW1k1xQYUsnjLJkIKzfGzBnoN9UhsYKCLJSYTw5nom0nbQrhcxV026Z1t
-         I6sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721053969; x=1721658769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8XBIY7M7BM4brKFl2c3AgS2v9Iaoh8qE16Ej5dbPbOE=;
-        b=qZ0bDZST7yA/P04ikqY2WTMFyEnL7tXYwdeF0DQrmCHJP0T+WtCFGgXCxqYrdNWrL0
-         nX//RZHkbcwzsJlERduDnIMP8cmMdf8A00bhDljEimb9Vq4b/JzHlpjdEyjNnfLzaHPe
-         OnggHNOQOqJRZRKQU9p32PlyQ5i2oNhCkOaGpPmYJlb6jxjK25ITch5awHI3WRqNBVST
-         QpQHDdZXWjq+exLwASlTr2bG+2/TBKN+n6Cvouh4kJm19E3kIPWir20hAKbmJtNm4QpJ
-         VuZE/Pl+OyXz3I6fNGfH23ObJhpGBg7sE8atZzEBTr2MOxq8ba21PSB93XqDq3gL592B
-         byaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWaCCR3T+EyiQ3g/RS7HghgsrT5nU9gzqw9TbJ+utPbuS1Td6AP8p3ZZl5MDv0DuU+bt7H75XnmRQHjY0dcGivmr2OLjBoE
-X-Gm-Message-State: AOJu0Yzt+qA/cU23qjfaSFzlztRmt0C8o354IFHDJRg9IA4gHCn0yPlA
-	G44Jv7c9iw4kbHCTgTk/YnIXG07S1wDcBIMiBsHnYp4VQqfHg1n6IFgDBdXJiITW3ue7mF0Xxy7
-	x9hxxtENHBr0FI5TYN8m9pO9Vdjy8pPNMRvIx9A==
-X-Google-Smtp-Source: AGHT+IEsBnieFa35w2SSedbZu4wM92dlRuNoduR7DEiwRWhJOSszj9ucHx3kBKQaHbI5F1b0vzWl3n8BTBqXpvCzljI=
-X-Received: by 2002:a05:690c:4a13:b0:64a:7d9b:934 with SMTP id
- 00721157ae682-658eed5fc6dmr231759647b3.16.1721053968979; Mon, 15 Jul 2024
- 07:32:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58ED18EA85
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 14:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721054056; cv=fail; b=KVZoSeWDnQu1Z2rFGpICCjlIU+SBFDMwczHH2QFue6rNt7KOJbBrYyaLgXjqDWSBTY70vQfsBKCI7UMaopvIBrqsXTM268cK9YPaRAYD7xS1zzsQP2bIJqwByztsSEPduLkgo1O1K3suYirFqBwKA51ioe+WKG6DZzUaL7s4Jh0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721054056; c=relaxed/simple;
+	bh=2/RNF2vrtXE4F6x1PCnxFpsZAEnl+N672u9V1un5pkA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=soLAh1BBzgrLknZgC+5TC25zaVWhyXujOGB7P8D/vIFkArsYPC0q/UKw02Ld51XnzcQKsuvjHYL3f+4y8lQOLSKGPDJ/7zdBJPg+1h/qSwKpD8kyIRTopa5EqCw/aC5+R2YvZrGjCwj2Hq5JLciNwEHUBUjK0PUbLtwvX6HL2O8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eyc9uMXA; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721054054; x=1752590054;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2/RNF2vrtXE4F6x1PCnxFpsZAEnl+N672u9V1un5pkA=;
+  b=Eyc9uMXAE+J7RLlum8Su21mMLEQ5SfcOo0YCr8wglaH/9FMjc/lfeSFJ
+   jKyZC49TdUgZofeKjj7fqRmSUQBQoJWRfmbz81BKj2Xw8D+lZ6TxoLztE
+   s1KHAKwykwkG2b6StUPyooylG4h2a4RJNOmi4yv4epVcTOgRhfCarQs7E
+   Oxz0kAO3e2Zv2EL5yNo0quPeYzGIM/bM8d8Xrl0jfQavqMor1Ug5CQWRd
+   RXbqGarIrtP1XU4ewUR+JOv3gymxyaRTf0XfUOMXGmzB7hTDxf3aHINrI
+   NQVcrzE2++GwI6HcEDT40l6oFDa+/CSSIyO8DmlhYpWiVXLQcGECwO2OX
+   Q==;
+X-CSE-ConnectionGUID: b/YFfJpFSiaOwtznBQpmJg==
+X-CSE-MsgGUID: ay17U2bKR+W3LaZAbp5OJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="29027045"
+X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
+   d="scan'208";a="29027045"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 07:34:14 -0700
+X-CSE-ConnectionGUID: 7W8zeBMaThinDC3YJS8NIQ==
+X-CSE-MsgGUID: 9k5MjfGpRgC2OSfud84Yfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
+   d="scan'208";a="54820199"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jul 2024 07:34:14 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 15 Jul 2024 07:34:12 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 15 Jul 2024 07:34:12 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 15 Jul 2024 07:34:12 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 15 Jul 2024 07:34:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OliDvaJS+y5EN5oQF+/tlrbKBOQAghxePxTlSkftKMzoKdbrkcKs1QvucZUe35JOMagZrcJThupHbhKF+Xe3nfq8FUA1ryyRjLmMPJ6RisLgUgiS8FM9+5laGnVcdIuyBxcBVUJoOJ4AEaIfQ5ZKFbkpos+p9sEccdo6Wk4HDllQH2K0vXTRpFnhkbDCOyJrmq5rTXE1yQtcV3PV2lOpuQKQPFFA5PCo8k21zWRrBDscvixgG6dQpyMTC7Jl0j7wEJpr/Ve8SB2DMC+89RiNj7n96ibMcK332kHFhHUajRwwds2DN0MF05OPHPhN+H7TwXge+/18QfdvZC2WjDAfwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YUyOxjuG7m90246AnT0z8h7W1out+OgYoOxtaNO8nEA=;
+ b=EA+8L9q2ZXkfCATpF9ySeaLcqVOBYw63hkttEgP1Y07BfcNZZIFLhbonNR0ohb6obmszFsUbrL/lA20FbADo2Y4zbe+aOJBp0c5KMd++d5QnrK9qFEA/hkMByTsLNpflli0VyaSA9KPkdmx9QUMKRKh9SRrz+dfdl0B+n2HIFFciAa9x76jTSzOelcVKOSwh/zxhBQKBaA/THl4jX8d9uIe13J1ZpYheCob/XDNi2QvrbRGHgcG+mpm8QJEtYwweGUGqJHQRD8BDu8djLvXOBLWqeclIehNMWcRntBelsmXkXjGyyuk5gHU8kB4yCxmRcrdcOETRBY2Si63iCTYEKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by SA3PR11MB7462.namprd11.prod.outlook.com (2603:10b6:806:31d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.27; Mon, 15 Jul
+ 2024 14:34:06 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
+ 14:34:05 +0000
+Message-ID: <9cb7c957-8746-4a94-b8a3-cf3da927511c@intel.com>
+Date: Mon, 15 Jul 2024 08:33:43 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 11/13] ice: enable FDIR
+ filters from raw binary patterns for VFs
+To: Paul Menzel <pmenzel@molgen.mpg.de>, Junfeng Guo <junfeng.guo@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Marcin
+ Szycik" <marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<horms@kernel.org>
+References: <20240710204015.124233-1-ahmed.zaki@intel.com>
+ <20240710204015.124233-12-ahmed.zaki@intel.com>
+ <565ea3da-06a9-481d-b32f-32c8c7240dad@molgen.mpg.de>
+Content-Language: en-US
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <565ea3da-06a9-481d-b32f-32c8c7240dad@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: WA0P291CA0020.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::17) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240715015726.240980-1-luiz.dentz@gmail.com> <20240715064939.644536f3@kernel.org>
- <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
- <CABBYNZKudJ=7F2px9DYcqgpfEJX7n1+p4ASsH24VwELSMt8X4w@mail.gmail.com>
- <CACMJSesSpm=C67LE9Nn+fBS_JLZgzA_h-ocnPGy_wqzy8vH70Q@mail.gmail.com> <CABBYNZJJZp1Ge5UJS9SgR+YrYVA_-fLaM_Ft_51a3Bz+Q8JJWw@mail.gmail.com>
-In-Reply-To: <CABBYNZJJZp1Ge5UJS9SgR+YrYVA_-fLaM_Ft_51a3Bz+Q8JJWw@mail.gmail.com>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Mon, 15 Jul 2024 16:32:38 +0200
-Message-ID: <CACMJSes8SYppYf1ix+5N92YyiVfmkkpz2xYeVv8iA0e5mBGzsQ@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-07-14
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|SA3PR11MB7462:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfeafd74-33c7-4fb0-07f5-08dca4db2e0f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WnlkMTZ4cXg5SCtDVGtlYS94Z2dkYzdZZEtCTFRRUGZVdGxQQVp6VmFxbERK?=
+ =?utf-8?B?YTRjTWlYNUpRbFA4YURZd2RRVGZwcytZK1JBQVFvaWROeE44SGhRb2s1eHlB?=
+ =?utf-8?B?ZU1WTlhUZVRMT1lqQ2FjRmh2T2wxQ3R4YnpmOExIdkZBQjRCQXdua0ZIWGFN?=
+ =?utf-8?B?RlRHZnl0c1ZvMXpOQ0pGUm92dFpjMzU5TWZNbU9TMGZRM29CSlhjS3dZMTdI?=
+ =?utf-8?B?TVoyODVUYTlJRlplZTlvL3Z2VDgvS3pENDBUelM1L3o1ZmluRXdYWEJKZ0wv?=
+ =?utf-8?B?cFJydCszV3R6MFV3NTRyVCs0aVFxRS8vNE4yRFRpTDVpSDhGMndVQVprdlFh?=
+ =?utf-8?B?THkwOS9hRmdxSUhOQWxISWxWeThtSjhNbmlBdEVZRnhJWG9RZjFJUTlPSlpp?=
+ =?utf-8?B?TzlEbTM4STdXNmgwRXdoOHU5aTRnZUdUZWxHRXBkbFhXK0VwODBiYktNZDNm?=
+ =?utf-8?B?OE5WVVRsWllXVFBrdk5SMDJRUmdvMHNVRklDWXdUNkVKdW9mcnQyU2tTMkMr?=
+ =?utf-8?B?K2gwRzJEQ1VWUG5UZlhIcVZVWk1nQnZ3ZVlBN2RFenFQYUh3UStBUklZeElp?=
+ =?utf-8?B?THRpZDArMHd3b0U1OWVqVWVxei91S3VmV0l3cjFPUDkvM05icUhLLzdqdElQ?=
+ =?utf-8?B?Q1lJZXMvYVRVd1RlV241Mmp1T3pRUEoremFBendVd3dqbmxnSG92UGdDYlBR?=
+ =?utf-8?B?RjF0YzVTbEFoeWswdkh6cGF4TURwSktsSFEyNVBoTmgzb1Z5YXdGbHE3TXQ4?=
+ =?utf-8?B?bE0vZGk4c3NsOFN2T0Qya0IrcjNrSzAzRVk0Z3dqRHVGZzVSdUJBUTFMdGdZ?=
+ =?utf-8?B?K09hSkdsMHMxb3pPeVJSdWp3VXVWV1Ywd2tNb04zcVdvdU1iMlpDR3duV1Nj?=
+ =?utf-8?B?cEk0S2lZZU1YSU03QXBxNHFpQzRuSTZmRXpUR1VibDhDUU11NTByVGt0Ym5l?=
+ =?utf-8?B?cC9Ub0VsQW83K0Q5VUVubDBoYXdCSloxVWgybUVhUlhYWjViME45MkxUMUsv?=
+ =?utf-8?B?UU1LNUFTVHAwM1RZK09CWkVvWnpHb2hNOUVOeUxNVUM5S2F1dmdwVDdRN254?=
+ =?utf-8?B?NVVTaGRhclJkcTliMm1HZGVBbFZnc1o2ak9MYStmYVdKVW1ySGZhUEdWSFlw?=
+ =?utf-8?B?dUp6UzlBUmhDakhabjVuNDVraWVROTNRRkhtQWVWWkYxa05zVzRJUkZIWDRE?=
+ =?utf-8?B?cy9OVUN4d0hrNXRNZ0dtTkI4Q04wVWZRQ2RPa2FadndVRzA1aS94bGR6U2hi?=
+ =?utf-8?B?K2FIL1hqUWhYL1JJdFlmeGpncFhaRU1HL08ya0IvakUvcGptSkpQQkRTbWdV?=
+ =?utf-8?B?eHJoT0R6eHVxc1ZtR0tOK0NCRTk2M3QrYVhSZXlRVnRqYVNDczVxTzdYODNU?=
+ =?utf-8?B?bWIxK2RxZnNDdFRnWmlDN0Q4b1VDUWJtaWthaDlybTJFcTNaTjhEQUpxZTd1?=
+ =?utf-8?B?eldiWU1BcDI4ejViQnVWNzZsZEVQWXB5ZGI4MFoxNVpNOG5OWndFQU9jc05m?=
+ =?utf-8?B?ZnVVOXRUcjZ1amJETmZPdFVkdTI3Z2s2SFY5ZWt4YjFscVQ0QUpPQ3k2RGsv?=
+ =?utf-8?B?VkRYQTVGUzUxamhlZVczd2pvc2NhWUFMeVFXallKdVBhWGhSM0Y4V0I1WDda?=
+ =?utf-8?B?a2RZbThDWTZzNXRVYVJjVXFYM3M1aWhNb3dJQ0J2dmppVzlBT1ExMnNMN1Jr?=
+ =?utf-8?B?czF5VE0va1FLbkJQdjA4bHpFQVg2cXZJOGEvNzQ5WVVjYUxkbTRiL3diMHF6?=
+ =?utf-8?B?Wkg2QTRjTDZERWUrSFgrOW5MYzRmcENWOTFkTFVvZ2ZsalYwMzQvZk5tR0FZ?=
+ =?utf-8?B?TThxR0c0UDdzWGtZc21xdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OXJSZ2Nlc0oyMFo1WERNK0J6TTlqbzFOMnFWamtSdlFXRXBiQzlzQ3l5dzFK?=
+ =?utf-8?B?OVcwbUlkckdVeENYQXVpM09PUGxOLzNjaVBrMlNKam9JZXlMZHF5OUtPQzAx?=
+ =?utf-8?B?TWttMHlwdE9IYlQwV0VRZzNYaVJFZFlERUxjNXlnTythTnprT09ldXBqazhm?=
+ =?utf-8?B?S1UvYmdTQjdzdDJjZ0pXdlBLN2wxemNhYXBRaHlIejNEaHQvc0xSNWxLcTc4?=
+ =?utf-8?B?TUlqdUxYL1pzMDhZdk96dVEwaXo1K2JmT0lWM2VFUkFkbFFMdHBkWFkxSzRU?=
+ =?utf-8?B?TjRkcFc3dGtDRkdDbXpUcmU3QmVuanNETkVuaVAyTFludjY4NlVKblBPYmUr?=
+ =?utf-8?B?cElYR0V1bW1mUDdzUStLcGNWRmVsVGVIcmNUK3NuRkVCdmRtMk0rNjNFMmE0?=
+ =?utf-8?B?aVRjWnp5NTNrUUtObEtBL051RTFKMHUyLzMwNkxJaUptYncrMnhnQmpGRFc2?=
+ =?utf-8?B?UjQrZlpCTTZVQXhkRE8ydis3UTRtMy93eHdoYWJjSGJYQk01NUVwWWNRUndH?=
+ =?utf-8?B?Mkg3c0w5dE9VVXhrcjNIVHVuOStOS2U1V1VkMlNvcWoraEh1M2dTRHdpQUZS?=
+ =?utf-8?B?azBwVkZ5Q0dXdjR5NkJnNTBmNlNsQ3pIVDRNOWtSWkFCZ0xqekhLZ0JRdFRL?=
+ =?utf-8?B?WTcwckZpZFlVY2xMQXJnb0dOdUlxOEVBTTM2OXFWelNDa0RreWEvZzFiZG1i?=
+ =?utf-8?B?cTdxTmpSb0JuUGRLQnBUUlpOWEg5WXBPc0JaRjZTYlpOSHY1NXBJSk92L3BE?=
+ =?utf-8?B?djBEOFVDT3hwbFVLV0gxREhPS3ZKS3BZSzJwV0JDQTFrR2thcXltaGtiNHly?=
+ =?utf-8?B?azZtU3VId2RiMk1zWk1iY0NSVFg0SFNZRXVuZStSMTNPdEhrOGJ0T2M1cnZ4?=
+ =?utf-8?B?SWJPcURVeG1kN1NZTVlxaVBGTktDUlRaR25YZ0xETUREeHE2WFRmdmsrTG9n?=
+ =?utf-8?B?VWt5emlzclQrY21iRFM5akFVKzliTnNTNmVMSmtsc3JXTGdZVERtU2V4akVa?=
+ =?utf-8?B?UlFZN3prZFBMTUtuYUUvazNoZHdNd25aNUhTMjJucFpPY0lRbTNLRGF0RTNS?=
+ =?utf-8?B?bFdwZEpDL0pWZ1IzaDZGenYvK3JKWnBJajRiOHBMV1k5eTBCT2RWRC8wd0VS?=
+ =?utf-8?B?RDh2eGxDUEJwV0pNM3BpQ3FtT1JWdWs5WGtVajZnNWhpN0ZUVTdDdU1RVUJi?=
+ =?utf-8?B?WFVubEVVOEdzRmEvSXdSWFcrUFFWckpBRUlIcjhSRGgzQzJjZVBHaHdDV3N0?=
+ =?utf-8?B?NU1HT2o3bkJjcnBURFdrVlNyWEwwVHNpYURMcFZLMW1KVEpORTdnUlFUZ2Nj?=
+ =?utf-8?B?cWx0NUNubXJFTkpKSmw0VEN2ZFpvb2hCd2R2WGJvc3VCT1EzNWoxYWtVd0pL?=
+ =?utf-8?B?QzdrTGkzbmVRZkNYeHFlVWlWSkpPYURjSHFDTjlydmZOZjNGK05rdFRqekdw?=
+ =?utf-8?B?VDZEZkxKS1hCN2J6eVlneFhBUEdzRFdNVjJnQ1hmU1IzSDFrWGErL0ZzTjJ6?=
+ =?utf-8?B?SkI4amVYc0M5SzJrRm42ODFFY01jNHNJZzBoVHFIeEZBQWRSb3prTDcyZys5?=
+ =?utf-8?B?elMzSmVoODN5RDMxZUJKdnVxbXBvbHJVRHBQY1JPait3Z3pvc3labG9WVmkx?=
+ =?utf-8?B?aVJjSXlDOXdLU0dROHlpRmNwK3RpN1dka3phdVpWamJONm0yZko3VXYwa2tm?=
+ =?utf-8?B?UUgzaWxUc2NHY2V4WjE2MjRhdDBnbWhuendINUwzYWtrNjY0WkVrY3R6U0lD?=
+ =?utf-8?B?MWFtQVdkbVFWTFVrdERYdWRXN0xKeG1PemdtdFVrZUEvYURlWXRzSUs5S1A4?=
+ =?utf-8?B?cFdvdjR2TlduTHpieUhVbHdXRFlJRU45SS96akZUWm8wbmNXRERia3Y1d1Qy?=
+ =?utf-8?B?Wmdad1FWQ0VrR2ZaOFYrUjhWZ3k0ZkZLZUhZZS80Y1BhdGdlZFhxU29JSzVh?=
+ =?utf-8?B?UWRib0JKRDJQekU4Ry92YWlIdERwRncvOXpGTUE3cE1LLzdMTnRwMTVpbm5i?=
+ =?utf-8?B?dXU1VlRlbk5pMjdrZi9QcnJLa2R0STR6aitZb3JRb214VUdGUEZQUmJmUnZq?=
+ =?utf-8?B?RExjV0Z4ZytxZnNsSTRBb0ZuV3R1Z2x4VERiZjI3dSsxbjV3ZDZteE5jUnpy?=
+ =?utf-8?Q?NTuCjt5PaKxJh9Sg3LyK8hvRC?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfeafd74-33c7-4fb0-07f5-08dca4db2e0f
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 14:34:05.8538
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7dO3HvF3Mb1CB2kCxMTlv/7dp/BlVzzBFlLQkL9vBr0nDxuCCt8SCbBQEfeKf3InRubLpLW38BNUVj2f1U6Sdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7462
+X-OriginatorOrg: intel.com
 
-On Mon, 15 Jul 2024 at 16:28, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> HI Bartosz, Jakub,
->
-> On Mon, Jul 15, 2024 at 10:17=E2=80=AFAM Bartosz Golaszewski
-> <bartosz.golaszewski@linaro.org> wrote:
-> >
-> > On Mon, 15 Jul 2024 at 16:00, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Bartosz,
-> > >
-> > > On Mon, Jul 15, 2024 at 9:56=E2=80=AFAM Bartosz Golaszewski
-> > > <bartosz.golaszewski@linaro.org> wrote:
-> > > >
-> > > > On Mon, 15 Jul 2024 at 15:49, Jakub Kicinski <kuba@kernel.org> wrot=
-e:
-> > > > >
-> > > > > On Sun, 14 Jul 2024 21:57:25 -0400 Luiz Augusto von Dentz wrote:
-> > > > > >  - qca: use the power sequencer for QCA6390
-> > > > >
-> > > > > Something suspicious here, I thought Bartosz sent a PR but the co=
-mmits
-> > > > > appear with Luiz as committer (and lack Luiz's SoB):
-> > > > >
-> > > > > Commit ead30f3a1bae ("power: pwrseq: add a driver for the PMU mod=
-ule on the QCom WCN chipsets") committer Signed-off-by missing
-> > > > >         author email:    bartosz.golaszewski@linaro.org
-> > > > >         committer email: luiz.von.dentz@intel.com
-> > > > >         Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@l=
-inaro.org>
-> > > > >
-> > > > > Commit e6491bb4ba98 ("power: sequencing: implement the pwrseq cor=
-e")
-> > > > >         committer Signed-off-by missing
-> > > > >         author email:    bartosz.golaszewski@linaro.org
-> > > > >         committer email: luiz.von.dentz@intel.com
-> > > > >         Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@l=
-inaro.org>
-> > > > >
-> > > > > Is this expected? Any conflicts due to this we need to tell Linus=
- about?
-> > > >
-> > > > Luiz pulled the immutable branch I provided (on which my PR to Linu=
-s
-> > > > is based) but I no longer see the Merge commit in the bluetooth-nex=
-t
-> > > > tree[1]. Most likely a bad rebase.
-> > > >
-> > > > Luiz: please make sure to let Linus (or whomever your upstream is)
-> > > > know about this. I'm afraid there's not much we can do now, the
-> > > > commits will appear twice in mainline. :(
-> > >
-> > > My bad, didn't you send a separate pull request though? I assumed it
-> > > is already in net-next, but apparently it is not, doesn't git skip if
-> > > already applied?
-> > >
-> >
-> > My PR went directly to Torvalds. It was never meant to go into
-> > net-next. You should keep the merge commit in your tree and mention it
-> > to Linus in your PR.
-> >
-> > Bart
->
-> Should be fixed now:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git/commit/?id=3Df497862d99ddbf4e46d6e26cd0f40adb724f55c9
->
-> And I made another tag for the pull-request:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git/tag/?h=3Dfor-net-next-2024-07-15
->
 
-Commit hashes now check out. Looks good.
 
-Thanks,
-Bartosz
+On 2024-07-10 11:42 p.m., Paul Menzel wrote:
+> Dear Ahmed, dear Junfeng,
+> 
+> 
+> Thank you for the patch.
+> 
+> Am 10.07.24 um 22:40 schrieb Ahmed Zaki:
+>> From: Junfeng Guo <junfeng.guo@intel.com>
+>>
+>> Enable VFs to create FDIR filters from raw binary patterns.
+>> The corresponding processes for raw flow are added in the
+>> Parse / Create / Destroy stages.
+>>
+>> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+>> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+>> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+>> ---
+>>   .../net/ethernet/intel/ice/ice_flex_pipe.c    |  48 +++
+>>   .../net/ethernet/intel/ice/ice_flex_pipe.h    |   3 +
+>>   drivers/net/ethernet/intel/ice/ice_flow.c     | 106 +++++
+>>   drivers/net/ethernet/intel/ice/ice_flow.h     |   5 +
+>>   drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   8 +
+>>   .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 404 +++++++++++++++++-
+>>   6 files changed, 566 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c 
+>> b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+>> index a750d7e1edd8..51aa6525565c 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
+>> @@ -4146,6 +4146,54 @@ ice_add_prof_id_flow(struct ice_hw *hw, enum 
+>> ice_block blk, u16 vsi, u64 hdl)
+>>       return status;
+>>   }
+>> +/**
+>> + * ice_flow_assoc_fdir_prof - add a FDIR profile for main/ctrl VSI
+> 
+> a*n* FDIR?
+> 
+>> + * @hw: pointer to the HW struct
+>> + * @blk: HW block
+>> + * @dest_vsi: dest VSI
+>> + * @fdir_vsi: fdir programming VSI
+>> + * @hdl: profile handle
+>> + *
+>> + * Update the hardware tables to enable the FDIR profile indicated by 
+>> @hdl for
+>> + * the VSI specified by @dest_vsi. On success, the flow will be enabled.
+>> + *
+>> + * Return: 0 on success or negative errno on failure.
+>> + */
+>> +int
+>> +ice_flow_assoc_fdir_prof(struct ice_hw *hw, enum ice_block blk,
+>> +             u16 dest_vsi, u16 fdir_vsi, u64 hdl)
+>> +{
+>> +    int status = 0;
+>> +    u16 vsi_num;
+>> +
+>> +    if (blk != ICE_BLK_FD)
+>> +        return -EINVAL;
+>> +
+>> +    vsi_num = ice_get_hw_vsi_num(hw, dest_vsi);
+>> +    status = ice_add_prof_id_flow(hw, blk, vsi_num, hdl);
+>> +    if (status) {
+>> +        ice_debug(hw, ICE_DBG_FLOW, "HW profile add failed for main 
+>> VSI flow entry: %d\n",
+> 
+> Maybe: Adding HW profile failed …? (Also below.)
+> 
+>> +              status);
+>> +        return status;
+>> +    }
+>> +
+>> +    vsi_num = ice_get_hw_vsi_num(hw, fdir_vsi);
+>> +    status = ice_add_prof_id_flow(hw, blk, vsi_num, hdl);
+>> +    if (status) {
+>> +        ice_debug(hw, ICE_DBG_FLOW, "HW profile add failed for ctrl 
+>> VSI flow entry: %d\n",
+>> +              status);
+>> +        goto err;
+>> +    }
+>> +
+>> +    return 0;
+>> +
+>> +err:
+>> +    vsi_num = ice_get_hw_vsi_num(hw, dest_vsi);
+>> +    ice_rem_prof_id_flow(hw, blk, vsi_num, hdl);
+>> +
+>> +    return status;
+>> +}
+>> +
+>>   /**
+>>    * ice_rem_prof_from_list - remove a profile from list
+>>    * @hw: pointer to the HW struct
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h 
+>> b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+>> index 7c66652dadd6..90b9b0993122 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+>> +++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.h
+>> @@ -51,6 +51,9 @@ int
+>>   ice_add_prof_id_flow(struct ice_hw *hw, enum ice_block blk, u16 vsi, 
+>> u64 hdl);
+>>   int
+>>   ice_rem_prof_id_flow(struct ice_hw *hw, enum ice_block blk, u16 vsi, 
+>> u64 hdl);
+>> +int
+>> +ice_flow_assoc_fdir_prof(struct ice_hw *hw, enum ice_block blk,
+>> +             u16 dest_vsi, u16 fdir_vsi, u64 hdl);
+>>   enum ice_ddp_state ice_init_pkg(struct ice_hw *hw, u8 *buff, u32 len);
+>>   enum ice_ddp_state
+>>   ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf, u32 len);
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c 
+>> b/drivers/net/ethernet/intel/ice/ice_flow.c
+>> index 79106503194b..99d584f46c23 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_flow.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+>> @@ -409,6 +409,29 @@ static const u32 ice_ptypes_gtpc_tid[] = {
+>>   };
+>>   /* Packet types for GTPU */
+>> +static const struct ice_ptype_attributes ice_attr_gtpu_session[] = {
+>> +    { ICE_MAC_IPV4_GTPU_IPV4_FRAG,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV4_PAY,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV4_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV4_TCP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV4_ICMP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV4_FRAG,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV4_PAY,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV4_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV4_TCP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV4_ICMP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV6_FRAG,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV6_PAY,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV6_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV6_TCP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV4_GTPU_IPV6_ICMPV6,  ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV6_FRAG,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV6_PAY,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV6_UDP_PAY, ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV6_TCP,      ICE_PTYPE_ATTR_GTP_SESSION },
+>> +    { ICE_MAC_IPV6_GTPU_IPV6_ICMPV6,  ICE_PTYPE_ATTR_GTP_SESSION },
+>> +};
+>> +
+>>   static const struct ice_ptype_attributes ice_attr_gtpu_eh[] = {
+>>       { ICE_MAC_IPV4_GTPU_IPV4_FRAG,      ICE_PTYPE_ATTR_GTP_PDU_EH },
+>>       { ICE_MAC_IPV4_GTPU_IPV4_PAY,      ICE_PTYPE_ATTR_GTP_PDU_EH },
+>> @@ -1523,6 +1546,89 @@ ice_flow_disassoc_prof(struct ice_hw *hw, enum 
+>> ice_block blk,
+>>       return status;
+>>   }
+>> +#define FLAG_GTP_EH_PDU_LINK    BIT_ULL(13)
+>> +#define FLAG_GTP_EH_PDU        BIT_ULL(14)
+>> +
+>> +#define HI_BYTE_IN_WORD        GENMASK(15, 8)
+>> +#define LO_BYTE_IN_WORD        GENMASK(7, 0)
+>> +
+>> +#define FLAG_GTPU_MSK    \
+>> +    (FLAG_GTP_EH_PDU | FLAG_GTP_EH_PDU_LINK)
+>> +#define FLAG_GTPU_UP    \
+>> +    (FLAG_GTP_EH_PDU | FLAG_GTP_EH_PDU_LINK)
+>> +#define FLAG_GTPU_DW    FLAG_GTP_EH_PDU
+>> +/**
+>> + * ice_flow_set_parser_prof - Set flow profile based on the parsed 
+>> profile info
+>> + * @hw: pointer to the HW struct
+>> + * @dest_vsi: dest VSI
+>> + * @fdir_vsi: fdir programming VSI
+>> + * @prof: stores parsed profile info from raw flow
+>> + * @blk: classification blk
+>> + *
+>> + * Return: 0 on success or negative errno on failure.
+>> + */
+>> +int
+>> +ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+>> +             struct ice_parser_profile *prof, enum ice_block blk)
+>> +{
+>> +    u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
+>> +    struct ice_flow_prof_params *params __free(kfree);
+>> +    u8 fv_words = hw->blk[blk].es.fvw;
+>> +    int status;
+>> +    int i, idx;
+> 
+> Use size_t as it’s used in arrays?
+> 
+>> +
+>> +    params = kzalloc(sizeof(*params), GFP_KERNEL);
+>> +    if (!params)
+>> +        return -ENOMEM;
+>> +
+>> +    for (i = 0; i < ICE_MAX_FV_WORDS; i++) {
+>> +        params->es[i].prot_id = ICE_PROT_INVALID;
+>> +        params->es[i].off = ICE_FV_OFFSET_INVAL;
+>> +    }
+>> +
+>> +    for (i = 0; i < prof->fv_num; i++) {
+>> +        if (hw->blk[blk].es.reverse)
+>> +            idx = fv_words - i - 1;
+>> +        else
+>> +            idx = i;
+> 
+> Use ternery operator?
+
+(hw->blk[blk].es.reverse) ? idx = fv_words - i - 1 : idx = i;
+
+better readability with if/else IMO.
+
+
+
+>> +        params->es[idx].prot_id = prof->fv[i].proto_id;
+>> +        params->es[idx].off = prof->fv[i].offset;
+>> +        params->mask[idx] = (((prof->fv[i].msk) << BITS_PER_BYTE) &
+>> +                      HI_BYTE_IN_WORD) |
+>> +                    (((prof->fv[i].msk) >> BITS_PER_BYTE) &
+>> +                      LO_BYTE_IN_WORD);
+>> +    }
+>> +
+>> +    switch (prof->flags) {
+>> +    case FLAG_GTPU_DW:
+>> +        params->attr = ice_attr_gtpu_down;
+>> +        params->attr_cnt = ARRAY_SIZE(ice_attr_gtpu_down);
+>> +        break;
+>> +    case FLAG_GTPU_UP:
+>> +        params->attr = ice_attr_gtpu_up;
+>> +        params->attr_cnt = ARRAY_SIZE(ice_attr_gtpu_up);
+
+<..>
+
+>> +            vsi_num = ice_get_hw_vsi_num(hw, ctrl_vsi->idx);
+>> +            ice_rem_prof_id_flow(hw, blk, vsi_num, id);
+>> +
+>> +            vsi_num = ice_get_hw_vsi_num(hw, vf_vsi->idx);
+>> +            ice_rem_prof_id_flow(hw, blk, vsi_num, id);
+>> +        }
+>> +    }
+>> +
+>> +    conf->parser_ena = false;
+>> +    return 0;
+>> +}
+> 
+> 
+> Kind regards,
+> 
+> Paul
+> 
+
+All other comments will be fixed in the next version.
+
+Thanks for reviewing the code.
+Ahmed
 
