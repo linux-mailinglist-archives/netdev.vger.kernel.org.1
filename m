@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-111400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E872930CD0
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 04:45:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7886930CDB
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 04:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2A81B20C99
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 02:45:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA7E1C20DF5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 02:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A465D79F3;
-	Mon, 15 Jul 2024 02:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56FE8825;
+	Mon, 15 Jul 2024 02:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pbZAsAVi"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HiQl0XKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1730A847A;
-	Mon, 15 Jul 2024 02:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CFEAD5;
+	Mon, 15 Jul 2024 02:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721011541; cv=none; b=raeBY6qUEx8FlappKze1DoRb4yLHvl2pOzwBfqKllZgA6Se0z7ASwbbLU+SD4FnOog4/EgMXOCFZdz2c+1B8ahEJEKKcp5+JRvl+7mFTCUPPT8Xv/G89JqJHnWs4RJnWebpAkMN5VXGQ7uGK3HdIzIGoLE0zaV5naXk91pSQNOI=
+	t=1721012037; cv=none; b=OZQ/v+iL2kfkG8UqvkGQ6GWibERfhRUnKKQpOsGTWocbLX103ZYnX2kNL6s3fP47uvOr0B/wvVaFgFTiG5ork8shXGLinkw2dHXJ1MNUXFvuNizmPq/KieUTjmU/JjwdIpw+YtAJ8rdtdIPH7hnAAbkJb51PYPqUbji2ViAsJLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721011541; c=relaxed/simple;
-	bh=ctGWsdO0ej5tPQjRZHOPvi6pJHzhlFIKiR3w9xWi2hM=;
+	s=arc-20240116; t=1721012037; c=relaxed/simple;
+	bh=aQiqzrVZ3PHS2MYW5gjFRHJupDz2inDkWvjjBjUDgog=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X3xNwIEcOX7A8UGqtac2tddU8bj6ZD7gYTggmk6Nerqlix0pCBVs+ZaocfKDB1ci8qkSl/ksL3eurT7uscF/ZvT1Ctm+vrnrI2rghHuNejU3BMDXZb2me/3oa9q6xm+7PmyA/Mm3X0No1JSo8MCo6ZFVlBIkiLd8DGd32CQpa+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pbZAsAVi; arc=none smtp.client-ip=115.124.30.133
+	 In-Reply-To:Content-Type; b=ecKk63+d0IVSB+q7wtLnlla+3WorNLXqKYl0nkK2fPQtCC7RBD2gdggmnXkc1FdKEoimY17t1TI74qjUccto0vx/nmaCIG3T16IvcbumHbokB3bMocyyAMtgFb12hk9gnYnMmA/90ePHwkxofPIzv6++EgcN+rjfKgeRVRlQKME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HiQl0XKB; arc=none smtp.client-ip=115.124.30.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1721011528; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=aFJAiJacnHMlZNMvKXDirjWe+OPAnESCR9uHIfCE5gE=;
-	b=pbZAsAViEERhM5NVqoAQ8zgwkUQm0rB1wWYNplh50ruEo2jQ8bIylVA4yUg2kcutwZPqkJOHEuGsoJPitOKJyN1UJNxs/Un9gjLfHOqWtlxmy68eC0zAdeO1+cciiEPtz2hLYKRFsl7B8xf37xpw0QnXaoN8CkVFaVPIaRkxSiw=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0WAUnIPg_1721011527;
-Received: from 30.221.148.126(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WAUnIPg_1721011527)
+	t=1721012026; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=HVInFwlXXhbbzZQjxVtud9mzYHkhIRQyqI9B0uOtKBg=;
+	b=HiQl0XKBeqWk/yz3cbs+xXXMqKDBA9eNUrYa/DQmwTorDxRibhuLm5KnnYnJz1NhClNamakLV4YMSI4QdOVoyQKrxT44Stzo2XTmDaQsgGI/QaTkp4lVwV7YizidN/OJdGpYlabpQWWaRxwUYzzdkAJ0LRHgxxOISM/izb80ONM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WAUsDnm_1721012024;
+Received: from 30.221.101.244(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WAUsDnm_1721012024)
           by smtp.aliyun-inc.com;
-          Mon, 15 Jul 2024 10:45:27 +0800
-Message-ID: <dfd6b17e-ada5-41ce-8922-d97dd192ddb3@linux.alibaba.com>
-Date: Mon, 15 Jul 2024 10:45:24 +0800
+          Mon, 15 Jul 2024 10:53:45 +0800
+Message-ID: <63862dcc-33fd-4757-8daf-e0a018a1c7a3@linux.alibaba.com>
+Date: Mon, 15 Jul 2024 10:53:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,98 +49,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
-To: Breno Leitao <leitao@debian.org>
-Cc: rbc@meta.com, horms@kernel.org,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240712115325.54175-1-leitao@debian.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240712115325.54175-1-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net-next] net/smc: introduce autosplit for smc
+To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ guwen@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
+ <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
-在 2024/7/12 下午7:53, Breno Leitao 写道:
-> After the commit bdacf3e34945 ("net: Use nested-BH locking for
-> napi_alloc_cache.") was merged, the following warning began to appear:
->
-> 	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
->
-> 	  __warn+0x12f/0x340
-> 	  napi_skb_cache_put+0x82/0x4b0
-> 	  napi_skb_cache_put+0x82/0x4b0
-> 	  report_bug+0x165/0x370
-> 	  handle_bug+0x3d/0x80
-> 	  exc_invalid_op+0x1a/0x50
-> 	  asm_exc_invalid_op+0x1a/0x20
-> 	  __free_old_xmit+0x1c8/0x510
-> 	  napi_skb_cache_put+0x82/0x4b0
-> 	  __free_old_xmit+0x1c8/0x510
-> 	  __free_old_xmit+0x1c8/0x510
-> 	  __pfx___free_old_xmit+0x10/0x10
->
-> The issue arises because virtio is assuming it's running in NAPI context
-> even when it's not, such as in the netpoll case.
->
-> To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
-> is available. Same for virtnet_poll_cleantx(), which always assumed that
-> it was in a NAPI context.
->
-> Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   drivers/net/virtio_net.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
 
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
+On 2024/7/11 23:57, Wenjia Zhang wrote:
+> 
+> 
+> On 09.07.24 18:05, Guangguan Wang wrote:
+>> When sending large size data in TCP, the data will be split into
+>> several segments(packets) to transfer due to MTU config. And in
+>> the receive side, application can be woken up to recv data every
+>> packet arrived, the data transmission and data recv copy are
+>> pipelined.
+>>
+>> But for SMC-R, it will transmit as many data as possible in one
+>> RDMA WRITE and a CDC msg follows the RDMA WRITE, in the receive
+>> size, the application only be woken up to recv data when all RDMA
+>> WRITE data and the followed CDC msg arrived. The data transmission
+>> and data recv copy are sequential.
+>>
+>> This patch introduce autosplit for SMC, which can automatic split
+>> data into several segments and every segment transmitted by one RDMA
+>> WRITE when sending large size data in SMC. Because of the split, the
+>> data transmission and data send copy can be pipelined in the send side,
+>> and the data transmission and data recv copy can be pipelined in the
+>> receive side. Thus autosplit helps improving latency performance when
+>> sending large size data. The autosplit also works for SMC-D.
+>>
+>> This patch also introduce a sysctl names autosplit_size for configure
+>> the max size of the split segment, whose default value is 128KiB
+>> (128KiB perform best in my environment).
+>>
+>> The sockperf benchmark shows 17%-28% latency improvement when msgsize
+>>> = 256KB for SMC-R, 15%-32% latency improvement when msgsize >= 256KB
+>> for SMC-D with smc-loopback.
+>>
+>> Test command:
+>> sockperf sr --tcp -m 1048575
+>> sockperf pp --tcp -i <server ip> -m <msgsize> -t 20
+>>
+>> Test config:
+>> sysctl -w net.smc.wmem=524288
+>> sysctl -w net.smc.rmem=524288
+>>
+>> Test results:
+>> SMC-R
+>> msgsize   noautosplit    autosplit
+>> 128KB       55.546 us     55.763 us
+>> 256KB       83.537 us     69.743 us (17% improve)
+>> 512KB      138.306 us    100.313 us (28% improve)
+>> 1MB        273.702 us    197.222 us (28% improve)
+>>
+>> SMC-D with smc-loopback
+>> msgsize   noautosplit    autosplit
+>> 128KB       14.672 us     14.690 us
+>> 256KB       28.277 us     23.958 us (15% improve)
+>> 512KB       63.047 us     45.339 us (28% improve)
+>> 1MB        129.306 us     87.278 us (32% improve)
+>>
+>> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+>> ---
+>>   Documentation/networking/smc-sysctl.rst | 11 +++++++++++
+>>   include/net/netns/smc.h                 |  1 +
+>>   net/smc/smc_sysctl.c                    | 12 ++++++++++++
+>>   net/smc/smc_tx.c                        | 19 ++++++++++++++++++-
+>>   4 files changed, 42 insertions(+), 1 deletion(-)
+>>
+> 
+> Hi Guangguan,
+> 
+> If I remember correctly, the intention to use one RDMA-write for a possible large data is to reduce possible many partial stores. Since many year has gone, I'm not that sure if it would still be an issue. I need some time to check on it.
+> 
 
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0b4747e81464..fb1331827308 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2341,7 +2341,7 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->   	return packets;
->   }
->   
-> -static void virtnet_poll_cleantx(struct receive_queue *rq)
-> +static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
->   {
->   	struct virtnet_info *vi = rq->vq->vdev->priv;
->   	unsigned int index = vq2rxq(rq->vq);
-> @@ -2359,7 +2359,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->   
->   		do {
->   			virtqueue_disable_cb(sq->vq);
-> -			free_old_xmit(sq, txq, true);
-> +			free_old_xmit(sq, txq, !!budget);
->   		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->   
->   		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> @@ -2404,7 +2404,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->   	unsigned int xdp_xmit = 0;
->   	bool napi_complete;
->   
-> -	virtnet_poll_cleantx(rq);
-> +	virtnet_poll_cleantx(rq, budget);
->   
->   	received = virtnet_receive(rq, budget, &xdp_xmit);
->   	rq->packets_in_napi += received;
-> @@ -2526,7 +2526,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
->   	txq = netdev_get_tx_queue(vi->dev, index);
->   	__netif_tx_lock(txq, raw_smp_processor_id());
->   	virtqueue_disable_cb(sq->vq);
-> -	free_old_xmit(sq, txq, true);
-> +	free_old_xmit(sq, txq, !!budget);
->   
->   	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
->   		if (netif_tx_queue_stopped(txq)) {
+Did you mean too many partial stores will result in some issue? What's the issue?
+
+
+> BTW, I don't really like the idea to use sysctl to set the autosplit_size in any value at will. That makes no sense to improve the performance.
+
+Although 128KB autosplit_size have a good performance in most scenario, I still found some better autosplit_size for some specific network configurations.
+For example, 128KB autosplit_size have a good performance whether the MTU is 1500 or 8500, but for 8500 MTU, 64KB autosplit_size performs better.
+
+Maybe the sysctl is not the best way, but I think it should have a way to set the value of autosplit_size for possible performance tuning.
+
+Thanks,
+Guangguan Wang
+
+> 
+> Thanks,
+> Wenjia
 
