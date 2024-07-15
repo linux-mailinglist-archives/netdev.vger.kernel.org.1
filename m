@@ -1,166 +1,125 @@
-Return-Path: <netdev+bounces-111529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D611D93176F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:17:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA71931788
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:26:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91798281E64
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:17:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54C0F1C21235
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4990A18F2FF;
-	Mon, 15 Jul 2024 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F5918EA98;
+	Mon, 15 Jul 2024 15:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2eczL/Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ph0dJc8H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D3318F2F6;
-	Mon, 15 Jul 2024 15:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE7D18C35B
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 15:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721056637; cv=none; b=iBMtTBBmnUP0mLs3x2/RRoquCyOClhnSEW5IdnU9vkExY4hoGyyNeIAPBCL8+z8nXLa2J5YYS1cMfRzW7uMjoisxElJ6ni+ylu30T4Y1qcBmOvZtMEYSf6uMPUct/GQjDsh9d9+FXe3HymMr4GbJwX9GMIq8sexPHWq9A6NGDYA=
+	t=1721057163; cv=none; b=Rkpa/r+BW+2s/0KraB/LdyhbgpHIThp+INjYkUh1moUqvhYkvObZ6lZvWh7Iu6aWlUgRr7y25fXwfF1Yw9fBArz7j4yQ7rGWjOL6lI5ru8V8tDVOnvr2mluQK8TVnAucidPo/G/CUl5eGUM37BKfAqkCFXgQVNz9Jxkk7rB8WP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721056637; c=relaxed/simple;
-	bh=SIOvuXasD2Ku5vaG8bCxpnsgoWs+peqYoCOdAGQ44NQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pgijD1zvQXgyLQR1tG3L5OAsRv//HtaAGZXvleLEHP6cYrsQXRIxLehcC2WHyoRW9rB91Ikvrl+BxOLsdcRQbjUOKBIOE8hWJOCyUFsnaPWq8rULyJV2R5HbK/9l+c10tq+KlLJeyfRBZYixhZAdOnLuJb7Lc3DEyxM/T/bZ92I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2eczL/Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30353C32782;
-	Mon, 15 Jul 2024 15:17:15 +0000 (UTC)
+	s=arc-20240116; t=1721057163; c=relaxed/simple;
+	bh=znGvyjTORceX1GewmKfD0yr01wOkn6ojfBV4Bd0N8uU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uAux9VvrybiWbw+fi0PoF/0EcPvdhQcWtUV0SIFE3Z6Z1oXDzUWdiVNWvSy7219DVyQUiIqKo4FwaVG0Frwz/F5rZIRjE0ZNpAXx8594vWaPC2gogLO5FUDOLQ9nImRUhVZv2dXLOK4V6O8j9HiMdNK1TgYrTqXzIwGgZDyCBlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ph0dJc8H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0FBC32782;
+	Mon, 15 Jul 2024 15:26:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721056636;
-	bh=SIOvuXasD2Ku5vaG8bCxpnsgoWs+peqYoCOdAGQ44NQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F2eczL/Qs0RNZTJuYSG2IFtar5lB1VfQIb4GWvAa7ToObZ+6AGN6OAT+lIhrqC2Vh
-	 /+HFO2t2F+kKIzAVCcB3KdZ3GhUSMa0rY9dx6OSX6ACXIf8U/X8KqBz4oTBmAdBMOX
-	 GRI+3aFIZiKGm+ScgKXQ1g9cNX6ohTrTaG+mOBx1oStGtgQRqc2yCSflpHgqgEc5kC
-	 Gd1FiaweoqndjLT2OynLEjRVKI4FvDgyP4EMZArQIcuxM7I81qRrgBdr6sva6M8fpo
-	 v75P0aJRwiiqn2V0LNj/4Gj5sDIBrqaOn0nf5UaTlT4ZqY7Sb4kOBecmueu9OwV64z
-	 GLN/Zq48DEAxA==
-Date: Mon, 15 Jul 2024 17:17:12 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the phy-next tree with the net-next
- tree
-Message-ID: <ZpU9eOsMq_ogA7Nr@lore-desk>
-References: <20240715151222.5131118f@canb.auug.org.au>
- <ZpTBCUXx5e24izzR@matsya>
+	s=k20201202; t=1721057162;
+	bh=znGvyjTORceX1GewmKfD0yr01wOkn6ojfBV4Bd0N8uU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ph0dJc8H6mt0Iz0L6MuPBM+8SN4dfO/+Bf3CzIt3UP6Mmv5d0ElfXfeZmxJE2VTLh
+	 rT8Tl3DbwbRan8Fl2jBxNhsMGj24U7IOHHfQ/aL/7uYFiSS+bQWqWp1rmsTBqK1tka
+	 IHJTUIU8XT8St2p73iYbbGc4MOoGW4dOwKEyXfejKB2G3nRc4pY44WDH/I2kAAv2oE
+	 gxa4SISirnpNWtfI2x807oy/FeKQrhSrefzX6/DcsQ4KAo9LQz/L4mihORoaNDqnC9
+	 ozohL+3VSnGCbGmtVzl9EDidmteZL8kaHoiy3/zesAsg5vs9QhpaVH8QAeKixCR2zQ
+	 OOOYTezm0BE0Q==
+Date: Mon, 15 Jul 2024 08:26:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: "Mogilappagari, Sudheer" <sudheer.mogilappagari@intel.com>, Michal
+ Kubecek <mkubecek@suse.cz>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Wei Fang <wei.fang@nxp.com>, "Samudrala, Sridhar"
+ <sridhar.samudrala@intel.com>
+Subject: Re: Netlink handler for ethtool --show-rxfh breaks driver
+ compatibility
+Message-ID: <20240715082600.770c1a89@kernel.org>
+In-Reply-To: <20240715150543.wvqdfwzes4ptvd4m@skbuf>
+References: <20240711114535.pfrlbih3ehajnpvh@skbuf>
+	<IA1PR11MB626638AF6428C3E669F3FD4FE4A12@IA1PR11MB6266.namprd11.prod.outlook.com>
+	<20240715115807.uc5nbc53rmthdbpu@skbuf>
+	<20240715061137.3df01bf2@kernel.org>
+	<20240715132253.jd7u3ompexonweoe@skbuf>
+	<20240715063931.16bbe350@kernel.org>
+	<20240715150543.wvqdfwzes4ptvd4m@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7NU3L9KF/lDLpv0p"
-Content-Disposition: inline
-In-Reply-To: <ZpTBCUXx5e24izzR@matsya>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 15 Jul 2024 18:05:43 +0300 Vladimir Oltean wrote:
+> On Mon, Jul 15, 2024 at 06:39:31AM -0700, Jakub Kicinski wrote:
+> > The definition I have in mind is that the design can't be well
+> > understood without taking into account the history, i.e. the order
+> > in which things were developed and the information we were working
+> > with at the time.
+> > 
+> > In this case, simply put, GRXRINGS was added well before GCHANNELS
+> > and to assign any semantic distinction between GRXRINGS and GCHANNELS 
+> > is revisionist, for lack of a better word.  
+> 
+> Are you saying a channel is a ring?
 
---7NU3L9KF/lDLpv0p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The information about rings can be computed based on channels as
+currently used by drivers.
 
-> Hi Stephen,
->=20
-> On 15-07-24, 15:12, Stephen Rothwell wrote:
-> > Hi all,
-> >=20
-> > Today's linux-next merge of the phy-next tree got a conflict in:
-> >=20
-> >   MAINTAINERS
-> >=20
-> > between commit:
-> >=20
-> >   23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC=
-")
-> >=20
-> > from the net-next tree and commit:
-> >=20
-> >   d7d2818b9383 ("phy: airoha: Add PCIe PHY driver for EN7581 SoC.")
-> >=20
-> > from the phy-next tree.
->=20
-> lgtm, thanks for letting us know
+> Semantical differences / lack thereof aside - it is factually not the
+> same thing to report a number retrieved through a different UAPI
+> interface in the netlink handler variant for the same command.
+> You have the chance of either reporting a different number on the same
+> NIC
 
-Hi Stephen,
+They can provide a different number? Which number is the user
+supposed to trust? Out of the 4 APIs we have? Or the NIC has
+a different ring count depending on the API?
 
-LGTM as well. I forgot to mention this conflict, sorry for that.
+> or GCHANNELS not being implemented by its driver.
+> 
+> revisionist
+> noun
+> someone who examines and tries to change existing beliefs about how
+> events happened or what their importance or meaning is
 
-Regards,
-Lorenzo
+Why not also look up "for lack of a better word" :|
 
->=20
-> >=20
-> > I fixed it up (see below) and can carry the fix as necessary. This
-> > is now fixed as far as linux-next is concerned, but any non trivial
-> > conflicts should be mentioned to your upstream maintainer when your tree
-> > is submitted for merging.  You may also want to consider cooperating
-> > with the maintainer of the conflicting tree to minimise any particularly
-> > complex conflicts.
-> >=20
-> > --=20
-> > Cheers,
-> > Stephen Rothwell
-> >=20
-> > diff --cc MAINTAINERS
-> > index d739d07fb234,269c2144bedb..000000000000
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@@ -693,15 -682,14 +693,23 @@@ S:	Supporte
-> >   F:	fs/aio.c
-> >   F:	include/linux/*aio*.h
-> >  =20
-> >  +AIROHA ETHERNET DRIVER
-> >  +M:	Lorenzo Bianconi <lorenzo@kernel.org>
-> >  +L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscriber=
-s)
-> >  +L:	linux-mediatek@lists.infradead.org (moderated for non-subscribers)
-> >  +L:	netdev@vger.kernel.org
-> >  +S:	Maintained
-> >  +F:	Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> >  +F:	drivers/net/ethernet/mediatek/airoha_eth.c
-> >  +
-> > + AIROHA PCIE PHY DRIVER
-> > + M:	Lorenzo Bianconi <lorenzo@kernel.org>
-> > + L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscriber=
-s)
-> > + S:	Maintained
-> > + F:	Documentation/devicetree/bindings/phy/airoha,en7581-pcie-phy.yaml
-> > + F:	drivers/phy/phy-airoha-pcie-regs.h
-> > + F:	drivers/phy/phy-airoha-pcie.c
-> > +=20
-> >   AIROHA SPI SNFI DRIVER
-> >   M:	Lorenzo Bianconi <lorenzo@kernel.org>
-> >   M:	Ray Liu <ray.liu@airoha.com>
->=20
->=20
->=20
-> --=20
-> ~Vinod
+> > I could be wrong, but that's what I meant by "historic coincidence".  
+> 
+> And the fact that ethtool --show-rxfh uses GCHANNELS when the kernel is
+> compiled with CONFIG_ETHTOOL_NETLINK support, but GRXRINGS when it isn't,
+> helps de-blur the lines how?
 
---7NU3L9KF/lDLpv0p
-Content-Type: application/pgp-signature; name="signature.asc"
+IDK what you mean, given the slice of my message you're responding to.
 
------BEGIN PGP SIGNATURE-----
+> I can't avoid the feeling that introducing GCHANNELS into the mix is
+> what is revisionist :( I hope I'm not missing something.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZpU9eAAKCRA6cBh0uS2t
-rPtOAQDrCHibxn8g7lD/GZw/vM0OmS+HGcrIpsepQ/Ie1Fe+cgD+I8Sn6vNAbrds
-RmuN5pcMP2TYqDn8VWGwCfdGqYkwkQE=
-=24iA
------END PGP SIGNATURE-----
+You are missing the fact that other parts of the stack use different
+APIs. Why does RXFH need its own way of reading queue count if we have
+channels and rx queue count in rtnl?
 
---7NU3L9KF/lDLpv0p--
+> I'm just a simple user, I came here because the command stopped working,
+> not because I want to split hairs.
+
+Plainly :|
 
