@@ -1,160 +1,274 @@
-Return-Path: <netdev+bounces-111460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FD6931287
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:45:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B1A9312B3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1839C1C226F8
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 10:45:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C16A1283D87
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66BE188CC5;
-	Mon, 15 Jul 2024 10:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D74E187324;
+	Mon, 15 Jul 2024 11:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="U05jbKfb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Yw1LUnTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2013.outbound.protection.outlook.com [40.92.89.13])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2088.outbound.protection.outlook.com [40.107.237.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB34171E53;
-	Mon, 15 Jul 2024 10:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.89.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C05F23B1;
+	Mon, 15 Jul 2024 11:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721040334; cv=fail; b=BUgj4YNFnLG6qnws6ghAFWxer4JLLLnfEZlNX8turUjyo52R9girg/YQXUURb4peTrRBKyOQzknbsx+qA2Zc0P+HF8Ogvc/q5v+IVNRMYhMjDVdTyhmsFKg16W4dte1kmOXxCztGS2OKfjpAFJXCcduAr13nIYGNsLsjv+C8hjI=
+	t=1721041237; cv=fail; b=KmqadARQXZMoL6oxai5RYKN9IsLp1TMo5kkEPEaIRKP3/8GSlj17RoHcUzk2EJxP8OSZJlprQI/bkrx/HzjFERFxZckERFMQr2FAnYMvjVIksIZABxGDelw5eHxhvQlsinrznqTk1MYwnDFyvnFdJ/Wxog8UOZO02nnwQLeooyA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721040334; c=relaxed/simple;
-	bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J0+3zbax3FAgje/wGkePJQg0xMBk595JzNFWBW0i2ywBnuJacHPxnWvlJyDA2vG8mBPPBBYEF12X0cgTT/D5bBDIodq9z/ukXUrhb54U2nQxoNHNIV11HBq4QOFJCq5tjRSyGaO7uWTIk0dPiIjsAhy45ly4GtWShv76qwzrhYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=U05jbKfb; arc=fail smtp.client-ip=40.92.89.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	s=arc-20240116; t=1721041237; c=relaxed/simple;
+	bh=p6Ae4qW+Y2cA5pgaRD7Z86F3kUmhorhlJKSLNXsrAZI=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=fRlkaVNzhyZMi7yehR5JWPNlbMllPYMU8sR1efcI48Q24jHVfgUPTSAeq1Nv1nBDR2aBIFvn4Qda3ahVuu9IaNNmzoL6okRrxkbvS+GroVqfmFJXXlvvyGeVqu31z13UC5Xwqo62OXNQnMM4P+htj57kjSFEJdgINhlRS8jLYw8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Yw1LUnTQ; arc=fail smtp.client-ip=40.107.237.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uZmDKHOsfqe0saZlw1oifvi2wyOw65zoc8zn4sDKmxWiyxJyzVOkVuk4Lf6ZYrdjJ4fZazvHu5/uzz9BLYCGFuK087bfbzVGqioeSFqiN8eQm5heFSyH1m1Wf7i4Pnx8+N1aDitOb8x4y5ugAZe/QJKBHinM+W0eZJSNLCrDifOZNNfa6jZX5gVb2TufIkNpNq6NYruhlooAa01uMmzTbatReiCEPTRCxY7cZs3YHorQI1bJhn7Vrcit0Bc1+s0M3yz/+3ri40WizVgZvpdH+2JBGH2qB/6ZvhUESbiEss92sTOZLrAHZU8+CgKhK3ufSgRK87Icq+ag7cdDUL513g==
+ b=b7S6q9UHSlHQ844hkcYsHtik+ENnu1z8v9aDBJBJz8PIT6De1HIGdTga/pKXOK7MmmNOcX01SMIF5GM3bz2AW75BWE/SacgfiK8NuNC2lmvmlV1dl8Y7m/8eyIVfgRwNdrZVdB8BR6h4dtoqp/nvfFcoVNvMndPVYq2EukeSVD9reFrNLwuNW/IPEKZuhD4gu5YVsxOTA1c3DO7Hejx+xojXfHSomPYKf2u3nAJXCVBNYiNXr6seYqc2x5PStSI+Cop3d/1MNbFtQy4PFm40m/7mahCQSv00kW6gyhc+gIQbMhQOHUaf8elhoylv+vgvfcAhdF/M+LmeZR0269Vsbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
- b=KLrUoz08ek05liRoRTGUL4jUY/pigZvKBuPgaX7BLlDSWsgDt1ixpjLy55xqvJ0vuJAQGNTfxtJEqU4ftSUtbbH254WAaN6MXxyqJBrADcdUq508FB3lVk5M7O6tQ4wS0yhN9smNaCqfGKqfqapxe8AN79z8YteSCLrgUAFm7+yVbAsyHSc3EHHjNDAhaW6G6rLhuN68L80Uy4N65lOsyNR3A3nGUz8dJKueTuI19SqQEEf69h3GYh13P6916/D84OhkajNQSIA/9XhAPzr4H8PjxwyVu/3NXFP71R2yTl+e/waHtV+Tx5TZUiCOjN1VFV+Y6B7O2nFPLXqljL6RZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
+ bh=/EHkITvxMp4UUzhc8nyT6G+vGbiWfEMc0El50cZjjPY=;
+ b=ydKCHgKvt0NkBRWcNN8VjRF3mzGkZAx0LFs04ZsYhwjQPs4XMRaz0QwQLMc7ctLk5TdDSg80Y604eBdQPSzcbU8RYHd3jkxSsgFExNdG2wW9g817Rw8ofstVhPVSQzucjgHqYT5ETgeOBbUXNCXF34V/RQuucci+ry48wfZzuOD7KjznbOsBIK99R7Nug4MajYXC6ogUhI/QkpNDGnBwizS1JlXSooE5Y4k0LhVEGvjJnQ98YQganj+EcGP9mDkRvHsCN9wXtNw87QHKBi1TU2am47gdTMvztSvmsqIlMktGSiJKCGwkBNQcZyAzvoAOzjGoSvDm+ZpCPl7H6y/yqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
- b=U05jbKfbvJYrsdOCXQ+yPBqavpV+QjEyQxlgXqOyVhx5vhWNlKZR6OKTltqjnLbOw/qofIJ+GUSWSbTVkQWphMztxGlh7PiIatoqePrYOd4n9BkXLj6QWkp+qP+4Q795JdAdovFSrYeVO45zS3QlkgDdD6XwMhbHd7mqEPjWutmY82cGHbho5FhV5wFT0U4WirSdxstnz5FFPxgRFBn91P4g6WVmx243KECYR1iGIFs9KwokIDf3sPeEntBS9bYAIgIwQ42U7mJqMQ/izwoeeKWR0qP6x94FYMzIgyBlmLcNB86O40T/EdkgmUv+FKYjT3KoK4r0YBz6SnyvaaRN4A==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by PA4P194MB1135.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:c3::18) with
+ bh=/EHkITvxMp4UUzhc8nyT6G+vGbiWfEMc0El50cZjjPY=;
+ b=Yw1LUnTQNwNewvEd4glw5KYi7hv+vdOEqdxsCFVlSyK8Kj2BkX7/mmsmylaPCx/VG39buWLtIWE6dPGxECgHoY39Qgj0Iko8Upfk6RBm9DUjF4wgxQBqWF2h72CvYQFGMq90PRTqulJa4DLxYPX/ehuob01EdWigi9vBAUBr1fNslOpSUBXy8hH3eYW6aTG/4k6jrCYtcXghtaYjsEQ2bKlMaLFRvoXl5z5Dyf0YrGqtqxxqn+yvHXt/IukdhNJEuGdzkYTrx3H1CBGrQn2PnVyX8nyVO2xdr5X50LeHURDOIgIBdNb+nD5sevkNVk28xUwIiQjvNZt7REluEFn6/Q==
+Received: from SJ0PR13CA0160.namprd13.prod.outlook.com (2603:10b6:a03:2c7::15)
+ by MW3PR12MB4491.namprd12.prod.outlook.com (2603:10b6:303:5c::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
- 2024 10:45:29 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
- 10:45:29 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luigi.leonardi@outlook.com,
-	marco.pinn95@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v3 2/2] vsock/virtio: avoid queuing packets when work queue is empty
-Date: Mon, 15 Jul 2024 12:44:49 +0200
-Message-ID:
- <VI1P194MB2166D217DAB34D4A774FA2129AA12@VI1P194MB2166.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <4ou6pj632vwst652fcnfiz4hklncc6g4djel5byabdb3hpyap2@ebxpk7ovewv3>
-References: <4ou6pj632vwst652fcnfiz4hklncc6g4djel5byabdb3hpyap2@ebxpk7ovewv3>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [7I9CNCLVGfv0eEWN2jEbHUk1JDj3EcXX]
-X-ClientProxiedBy: MI2P293CA0003.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::16) To VI1P194MB2166.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:800:1c4::11)
-X-Microsoft-Original-Message-ID:
- <20240715104449.14687-1-luigi.leonardi@outlook.com>
+ 2024 11:00:31 +0000
+Received: from SJ5PEPF000001CC.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::da) by SJ0PR13CA0160.outlook.office365.com
+ (2603:10b6:a03:2c7::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.13 via Frontend
+ Transport; Mon, 15 Jul 2024 11:00:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001CC.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 11:00:30 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 15 Jul
+ 2024 04:00:14 -0700
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 15 Jul
+ 2024 04:00:08 -0700
+References: <20240715030723.1768360-1-mohsin.bashr@gmail.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+CC: <netdev@vger.kernel.org>, <shuah@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<willemb@google.com>, <petrm@nvidia.com>, <dw@davidwei.uk>,
+	<przemyslaw.kitszel@intel.com>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next] selftests: net: py: support verbose printing,
+ display executed commands
+Date: Mon, 15 Jul 2024 12:45:58 +0200
+In-Reply-To: <20240715030723.1768360-1-mohsin.bashr@gmail.com>
+Message-ID: <87bk2yrkcs.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PA4P194MB1135:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2448f90f-57ee-4c70-fd63-08dca4bb3d7b
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CC:EE_|MW3PR12MB4491:EE_
+X-MS-Office365-Filtering-Correlation-Id: 471e0585-5d14-4565-40aa-08dca4bd57d2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|8060799006|19110799003|440099028|3412199025|1710799026;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	6UllsjvSSIsN8/WDapz9qMl7r2kBYS6uDRnfllxVO+j6CdFTg19N8ZHULkXYDH3LjG/EhjR97us21ClLCYg4+z7+QQrjO7zqDAArmFvbJoVkRo/4VrLvlBVoe+ETtZh6l9FVh37K0RcA/uMXIByIK4gwD3ZwngIAYpEkDRyZF10JBcqMPnWDj2ByPnBIpz186cezLy/f6ch00Cap6duLENOUTG+GwPLShYjP/W2DkiuQg5ghEJJaHEwwhHz19Pd+vvpxEVFP6QgbgUfxpC1F5oaH1wqkz1ijR8zRL3qQ+cER86B4uE1JRrGF3f7zRMKCb5zhBwc8E0py+O4MB2PoNo9UzWS354vPoE+Di7IfHsrIZE1AYRUjV3tBIhRWkE66nwhPsrJVGaH+uBTh7CSjmWxBMJ3l78ffr0qcmabsxbWbqFwa3BHUu3Y9HMp132BNAtTQ02WNh3CNmzSRH8/cVacrf6WvNHdcJ941i7PWt4FaOtN0VznGe9DtCtgTdaYJ7rN6n1JCaPUW+RmZmKhDX8cbbPVMv7VDrssBOEXsqRfajC/x585kWLRPVRKww6kbp3AKGw0aHgQmd6M1TS/6NJQlJOBA8Qv5PwUqO78g6BPe/frLWbuXEJgF+3o8o3fDOIpjjTSJVGH6lVTmOrxSVd9egGrUq5e3QU1zf62amVXYViPX9906EUxM30BSjMgL
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?euqBBuYain5aIP2usZS7QBbozl8wCBeqW5xZNpof9D2AoJYAv5QJFyIc/EEE?=
- =?us-ascii?Q?ucal/FHSKJ8Ux6VYSWW9vgFw0nse2GyjvSDlHMlvhfrEZQBvCn83ueaLLrh7?=
- =?us-ascii?Q?qOyet42XaeJU6SKqeI0eLSPMZRhxSUdk3gzqglc/wpXm2GgJfm1AHVlwUo+p?=
- =?us-ascii?Q?Kyhxqr2wxQ5ex3GPlvOqKpe6J2DCOz3Gc0UHxy+K/cC87Vs1McwVddQ1yQol?=
- =?us-ascii?Q?AMFN8Oxhxu6+Be3pDpUp/vKG8SfweHaKVT6gnbOmZwz8xsKZR9J/TVbAjzHh?=
- =?us-ascii?Q?JoHN6aJIITTkhiPWAu17XFa9dWqyRcSebJhMiZWuGMobfT6ex1osfRQtZ6Va?=
- =?us-ascii?Q?Hlwa8sT+d04zgVYL+hybrOlizYprhoScGXWon0TX6dRdz1iWWgK5UicDoW6P?=
- =?us-ascii?Q?YiHoU3izvhPn8qkHAJbHMTDS/7gCrmIEXkPiQkfgJG9RAH1Q2vA8JIB1Vj6Z?=
- =?us-ascii?Q?C+heTJ9NRF/l5qEFLtGr8ydHp4xAM99xWk0wbUz7AN+7bcjmyzhT689Le3cj?=
- =?us-ascii?Q?D1w+njzzBjLuAshHA2XHI9c+behv3aUzLo0UdY+YK0yI/y7pIBb3w/1worwP?=
- =?us-ascii?Q?76GNgBsnOrqAvj5qcSKk/Z8U3cMA9lBiQSDB+7KaISDEcVy2cuxxbcrYYwz6?=
- =?us-ascii?Q?WsmQksTOWK5wTEL3TFQRjELtT/GamhitLtyw9cXMZiDF+Wwq1ucwl4X8TlRH?=
- =?us-ascii?Q?xKDy/5rOj/6WmGkXTHpvTBGawKG57hM1gga58ujZMwfnGzbwAIuBTwzumHSQ?=
- =?us-ascii?Q?RvXyckneRvy0hot9lHY+jGuDicLAtqbugPstdNJt730irGQfdcC6GUukXXAk?=
- =?us-ascii?Q?UrLyP++SgmFWiI+q+buTMRSVDKB4utXG5ko51zt4IeNl9d4hdJnhE+6qmIfY?=
- =?us-ascii?Q?dJ+EZy76hqCmUu6aDhd9bcR+Vd1wK/fGBNUo1BBWW0gnC5ENA6cnWLImwUV0?=
- =?us-ascii?Q?G4Mq4sBiIE5hK/xSD5gnRhzEnezb1HOVA4NHwDR6PguixMJCnoobKptxQeeC?=
- =?us-ascii?Q?erHM8OunmNky3gbAjGZvlV+Ixd+sJLN0AdeenmCAaOrGNt4NIUsVk7Ujxnon?=
- =?us-ascii?Q?Tl105euVHNsw+uLhfl4Q4nQJ0zSX10CfoCEScDg5XuVtkzRPf6Awwn6ei5kS?=
- =?us-ascii?Q?qpreqIo/xyVb9/cwNjUSPwDRKjO3mADUQOj2CO2oJy0iSOcNch5sIEG24LKf?=
- =?us-ascii?Q?iH/po9iejyKVMFAkKdiy1Tu2JUHijscAVGWX1t8FYLj9QzKNWUZUu6xpueX8?=
- =?us-ascii?Q?W5xaNTnGOTQX6GflTXi0?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2448f90f-57ee-4c70-fd63-08dca4bb3d7b
-X-MS-Exchange-CrossTenant-AuthSource: VI1P194MB2166.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 10:45:29.5369
+	=?us-ascii?Q?zzvi1KlFs3WFF/OL64wVPqBS/gq6KIRDOuRXYrgIZc07C4maPeRYIG9cLDvC?=
+ =?us-ascii?Q?7LWS7Xx7xuAKDEfVG2XmWZXk72ofXNlmNFPtQTtPGT9QSJVnuAT+sCuJXQNi?=
+ =?us-ascii?Q?VwPMSgDZGmHckPQf8Zqoa3eL1Ayla8tkT6VPJJwkHvEou7sJW3/BruJ1LW1x?=
+ =?us-ascii?Q?X47QbL8IRDowMW5c1OeRNw18IulioA8Mh94d2eAK3YuuXyntTiipBEpW+hGf?=
+ =?us-ascii?Q?8hq+vZqf2mIAhrzxSvx2BFcYrkylcmmlDUqqao6lb5zasaTwCywUkIP/o+0V?=
+ =?us-ascii?Q?X1Yi3hDibiCJjx4p8FgALNAZME/w4mfCOZJo2owGaptdFCIOCajFTkn3Q9z0?=
+ =?us-ascii?Q?s2/aeZ7APp5HKuyISrXn87N0+g/okEu49SkbbP5M4AbBw5vuj1AiszFgHbbV?=
+ =?us-ascii?Q?dt0XVql7C5tP6oR283riS+UiOOPDh9R3cn5EA8g/iUTNQP6WzqwnaSDIEJ9g?=
+ =?us-ascii?Q?dF0oLd+1FbGWul0JzC84/AOH/26PxtqXysaaK2EhegGNslzEZFlPHtbBhJkS?=
+ =?us-ascii?Q?jHBjrW/yfY3PWQrQWjcO7XpL9AzMYB8eOJri6logKxRvNIluz3Uz8PPNXnu4?=
+ =?us-ascii?Q?XRj7qT5yySBP/msy/Y6/DZdNhhYn+7qvC6abm6tclK266gJqtXdh9eehIPLO?=
+ =?us-ascii?Q?HgkHiC8KwsMWIdHYRjZg9Htuv1KgBRYn6GMW7ON6HkPbgSk8/L/HVDO4IYlL?=
+ =?us-ascii?Q?4PBc4V45cLAN90TYIMSJlYMrU1hZkiYXZQ4Q0uvvVRiJrZPaQNnw4ey+mYFs?=
+ =?us-ascii?Q?BANE2s9gZAXWKr5kogkIIRfrhno7moN0lK8zRR+rZR0v9v4eg7sylS2+9qw8?=
+ =?us-ascii?Q?N3nOfOaBCEA73GeqqXg6g1bOjnS+KYbGycHEvN1fP3d4whhePkFhI/jpuHZP?=
+ =?us-ascii?Q?e30NZpsIKLD6+6RdkBWNjUeIKvDr0cXMhrknedSTg2VJIzAWNi/EroppeL8a?=
+ =?us-ascii?Q?SY/8XkvJKzq/l/kP0WuhsFDouhRqUnWxh1Fkkq1Q4HMMqjlfkPuqN/cWjpLD?=
+ =?us-ascii?Q?RN5/yQSWvR3O1KlH2pQcpRtJa7k0eDbvAdKLDs+U1UZMJjqkt2U+YwwE8cu2?=
+ =?us-ascii?Q?O5WrZZ75OdPJdQ0b9AM+G7LwgGE0q7GyQ5qeDIZKiv0biKqdrVBeKJYFM1PL?=
+ =?us-ascii?Q?2Sud/bbCuD3EiAxXrAXBhEk7vW/RXTsDSZvkwK0Di52lcrkgDO8NgryVcFF9?=
+ =?us-ascii?Q?gR3zz1Veke4vUHEUrY84Fbn9Lmur5FUPkOLWgrxhBCf6NIv9Eae5UKqC86AB?=
+ =?us-ascii?Q?sgeVyO3S5VNG7mhl+71sSdsORQ7p3zAc8t4/JzTL9iAx2AUxROEyc8PvVxfe?=
+ =?us-ascii?Q?XE/Mhk/0NfuVwyb0VpEVBIZhIka/CtEHQiIwemtSdieDub/MaBScnUmWwzDI?=
+ =?us-ascii?Q?oEjAmkWCJV8IHbXO7R2J8GQXZYdbOMa/8EsTDQ7xUsI2+bKoO9vePdGZuC95?=
+ =?us-ascii?Q?RmvWWqbyFhQJW0kEr7jh8qlh8VH59mdR?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 11:00:30.7688
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4P194MB1135
+X-MS-Exchange-CrossTenant-Network-Message-Id: 471e0585-5d14-4565-40aa-08dca4bd57d2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001CC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4491
 
-Hi Stefano,
 
-Thanks for your review!
+Mohsin Bashir <mohsin.bashr@gmail.com> writes:
 
-> On Thu, Jul 11, 2024 at 04:58:47PM GMT, Luigi Leonardi via B4 Relay wrote:
-> >From: Luigi Leonardi <luigi.leonardi@outlook.com>
-> >
-> >Introduce an optimization in virtio_transport_send_pkt:
-> >when the work queue (send_pkt_queue) is empty the packet is
+> Add verbosity support to show the commands executed while
+> running tests. Enable verbosity if either an environment
+> variable 'VERBOSE' is set to a non-zero number or it is defined
+> in a config file under driver tests as discussed here:
+> https://github.com/linux-netdev/nipa/wiki/Running-driver-tests.
 >
-> Note: send_pkt_queue is just a queue of sk_buff, is not really a work
-> queue.
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> ---
+>  tools/testing/selftests/drivers/net/lib/py/env.py | 14 +++++++++++++-
+>  tools/testing/selftests/net/lib/py/__init__.py    |  7 +++++++
+>  tools/testing/selftests/net/lib/py/utils.py       | 14 ++++++++++++++
+>  3 files changed, 34 insertions(+), 1 deletion(-)
 >
-> >put directly in the virtqueue increasing the throughput.
->
-> Why?
-My guess is that is due to the hotpath being faster, there is (potentially) one less
-step!
->
-> I tested the patch and everything seems to be fine, all my comments are
-> minor and style, the code should be fine!
-Great, I'll send a v4 addressing all your comments :)
+> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+> index a5e800b8f103..ec53cf59e104 100644
+> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
+> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+> @@ -4,7 +4,7 @@ import os
+>  import time
+>  from pathlib import Path
+>  from lib.py import KsftSkipEx, KsftXfailEx
+> -from lib.py import cmd, ethtool, ip
+> +from lib.py import cmd, ethtool, ip, verbosity_ctl
+>  from lib.py import NetNS, NetdevSimDev
+>  from .remote import Remote
+>  
+> @@ -42,6 +42,12 @@ class NetDrvEnv:
+>  
+>          self.env = _load_env_file(src_path)
+>  
+> +        try:
+> +            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
+> +        except ValueError as e:
+> +            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
+> +            verbosity_ctl(level=0)
+> +
 
-Thanks,
-Luigi
+I think you are looking to catch the integer conversion errors here, so
+just enclose that bit:
+
+        env_level = self.env.get('VERBOSE', 0)
+        try:
+            level = int(env_level)
+        except ValueError as e:
+            print(f'Ignoring \'VERBOSE\'. Unknown value \'{env_level}\'')
+	    level = 0
+        verbosity_ctl(level=level)
+
+Now instead of cut'n'pasting this twice, shouldn't this be the real
+verbosity_ctl()? Call it set_verbosity(self.env) maybe, call from the
+three sites that currently open-code the same.
+
+>          if 'NETIF' in self.env:
+>              self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
+>          else:
+> @@ -92,6 +98,12 @@ class NetDrvEpEnv:
+>          self._ns = None
+>          self._ns_peer = None
+>  
+> +        try:
+> +            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
+> +        except ValueError as e:
+> +            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
+> +            verbosity_ctl(level=0)
+> +
+>          if "NETIF" in self.env:
+>              if nsim_test is True:
+>                  raise KsftXfailEx("Test only works on netdevsim")
+> diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+> index b6d498d125fe..1541079fadce 100644
+> --- a/tools/testing/selftests/net/lib/py/__init__.py
+> +++ b/tools/testing/selftests/net/lib/py/__init__.py
+> @@ -1,8 +1,15 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> +import os
+>  from .consts import KSRC
+>  from .ksft import *
+>  from .netns import NetNS
+>  from .nsim import *
+>  from .utils import *
+>  from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily
+> +
+> +try:
+> +    verbosity_ctl(level=int(os.environ.get('VERBOSE', 0)))
+> +except ValueError as e:
+> +    print(f'Ignoring \'VERBOSE\'. Unknown value \'{os.environ.get("VERBOSE")}\'')
+> +    verbosity_ctl(level=0)
+> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+> index 72590c3f90f1..4a59958649be 100644
+> --- a/tools/testing/selftests/net/lib/py/utils.py
+> +++ b/tools/testing/selftests/net/lib/py/utils.py
+> @@ -9,6 +9,18 @@ import subprocess
+>  import time
+>  
+>  
+> +def verbosity_ctl(level=None):
+> +    global VERBOSITY_LEVEL
+> +    if level is not None:
+> +        VERBOSITY_LEVEL = level
+> +    return VERBOSITY_LEVEL
+
+IMHO, have a set_verbosity to just set it, and have verbose() below ask
+for the global directly. So if VERBOSITY_LEVEL >= 1.
+
+> +def verbose(*objs, **kwargs):
+> +    if verbosity_ctl() >= 1:
+> +        print(*objs, **kwargs)
+> +
+> +
+>  class CmdExitFailure(Exception):
+>      pass
+>  
+> @@ -22,6 +34,8 @@ class cmd:
+>          self.stderr = None
+>          self.ret = None
+>  
+> +        verbose("#cmd|", comm)
+> +
+>          self.comm = comm
+>          if host:
+>              self.proc = host.cmd(comm)
+
 
