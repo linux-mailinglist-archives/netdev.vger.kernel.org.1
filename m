@@ -1,269 +1,285 @@
-Return-Path: <netdev+bounces-111515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EDA9316A3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:25:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F46D9316A5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A887B28157B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:25:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E3F1B21489
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5BC18EA68;
-	Mon, 15 Jul 2024 14:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828B318EA71;
+	Mon, 15 Jul 2024 14:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MwsIcguU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WBYlWa4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85FB18EA62
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 14:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721053542; cv=fail; b=Gx+z4q8zNSMyr/TlnoFCsJ4qV9qbUNJWcqqN/k0MoaN81xpcRUM5S3DxCqMUBWH01aIpYEgANBlKkHt6ziJ0GCi9VsnlyX4XTbGKwuf/tQZRyAZkX/TnTlRK0rcPGQXiHKCdhgOowJVC4BLuRv2VDSHv3cSSjxGXcxPm/SnCqxg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721053542; c=relaxed/simple;
-	bh=IKVtjLITyK//ne4q2Mu8idvwNQ2tYAM2x0498dPIExs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nFdVjxnskhnM3nBVmyBFygJcmJZSSaSlhVAPBe026wiLutookNnQvLeGNak7/r8N+1Wd0LUvSpVb30cTRs97KFrV7udu/sHFuM8BzVLlRx0WhfjDPo3/bTRnfT/44HeiKB6v1Hf3yelZzJFI2+IY3vq8gKnMrlTVpjdZXTiAQGk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MwsIcguU; arc=fail smtp.client-ip=40.107.237.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k18cSNViAFVF7lkY5HyYyocuhIgi7Lu51uco8HHnktKCDBdBL6g25MvTxFzUPTIziw8MGcWiJGIod53oBvEPHFNXjWOUTwsrz4Mdo81kFE25KNvaofC1kGDWvlvwwf2peySo3DVd5ErVRJyGN4YAhp0hNnYd3RSnYyT+2/9g7ce7TJGgLr+PeCrMT4JXFE0aKwANmKt3Zik1wPklivnzrQXeoOxjfGSRl9/+TTzMRGLVdAPsIWedYdMidcorxFABEjqr+1US+uDimZwW3MiS2bvFeU897UJWsTvHYcobdr3K8eHbXnkF9VkJuMjRr/UHOA+RQGnsnNfQM4NsOC0LJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=65Dm9BwACDetKrifQv2kSQo5WOZfl8ms8rAi+1u3fPk=;
- b=Ag6vo9ArCJQzAzDKnOqt6Nf5M1tj8XrArAy5wz53Z2rP+AaMQWa5j69rQJqpsMwGgD4KM9bItiOa7cQ0wHy3dlD6u6jsm5pjxTbo74/yP7GrXMCXGF/LmluRreEh0lLsQHdG8TeC9qD6+bjQxf+gYk9POIBvyzrWkC8TuVxJfhHS0vvrT3pJAOXC8POU/y7Q7kPxXYBWWL6qH2U8oFDk7faCQqyJ33BXnIkR9ridKAxUCPmQObcB94nkDfK6OIU+CqnY6FCwz99Vcqm3jHJ5iH2lF52PofW0FCDIBhqj0iGd0C16A5M9cnI6wuJce53cPTfd84fn/vM1Cw6YeGiIpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65Dm9BwACDetKrifQv2kSQo5WOZfl8ms8rAi+1u3fPk=;
- b=MwsIcguU5hunNrMS6KRWsC6lxgSLPfiwQU8EbYoIqu0f/WKgOAtSwxPkoWMUE/3jnKXehc/lyvOWM8NQqyUCFWg5JiXOz2NJ6R2uu7nsaKp0zfneDLa7Si94TMk1DYZ5/SSVkryy1U0wD4AhunJVD2jj/wCWJic57oi6uSK+E48JEZprYKTlCG21x13QTWrFcPhM4y51hC9DlugKerLNPkKOYI8biry11a8RFw8Ux0MqaQKRhbHtlNKbPwyskBs5yJQH3A8p4tVLKkPtQ4ciUDNEg64h2iICZMFXsebNqmJf6kGRv9aAirhUxO5C8upkYFw7tKCydd9aF9UXf9WGhQ==
-Received: from PH8PR02CA0022.namprd02.prod.outlook.com (2603:10b6:510:2d0::12)
- by MW4PR12MB5626.namprd12.prod.outlook.com (2603:10b6:303:169::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
- 2024 14:25:34 +0000
-Received: from SN1PEPF000397B1.namprd05.prod.outlook.com
- (2603:10b6:510:2d0:cafe::1f) by PH8PR02CA0022.outlook.office365.com
- (2603:10b6:510:2d0::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29 via Frontend
- Transport; Mon, 15 Jul 2024 14:25:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF000397B1.mail.protection.outlook.com (10.167.248.55) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 14:25:34 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 15 Jul
- 2024 07:25:17 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 15 Jul 2024 07:25:14 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dsahern@kernel.org>, <gnault@redhat.com>,
-	<roopa@cumulusnetworks.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net 2/2] ipv4: Fix incorrect TOS in fibmatch route get reply
-Date: Mon, 15 Jul 2024 17:23:54 +0300
-Message-ID: <20240715142354.3697987-3-idosch@nvidia.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240715142354.3697987-1-idosch@nvidia.com>
-References: <20240715142354.3697987-1-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BB018C197;
+	Mon, 15 Jul 2024 14:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721053550; cv=none; b=B0U+5u++1uW3+PqD7iKfz9JBV8I6RmCDzB5UnhuYhQc7pi9wYLXrmNfDCDE/Lr19K/L67zbNhYIMv1Ltk0trHSP1J1n2qJNUiOzEetosrFu1OOuU7Jzu0oqDdDoy4WKk0csWDdsOj4xlhPksc9bzu3Q/bcC1GlGkVhWwTaT1Lic=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721053550; c=relaxed/simple;
+	bh=mIiOFmYZoRQb12KrkaebfAM768SVrsHrBh80Kv8Yj4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ajeK0GiwgKkBVsg9GkWwnS5eiM8/6+1EEzDq03DBi5Nw+EBE/Fj71lQkbyE0Xr4VjIU4GP+DPAFBIPP9olMlD+GsPssYNQG1jbN3qhn6zV2/J7NFHapiSC6PqRUGDPME7k5kmrutUtkItGyAJ59Nd7nnuILhMWYm46D29H2fqZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WBYlWa4q; arc=none smtp.client-ip=209.85.221.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4f2f31a9410so1625726e0c.3;
+        Mon, 15 Jul 2024 07:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721053547; x=1721658347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eewemGN75+rbcMxe1DGw80syxi564qM81+q27+G+F1U=;
+        b=WBYlWa4qtoIm6qt1AqI5kEyN/uc1qKwmFb52DeSEEtdUj/dPS36eBwtFuU5gYZvJKd
+         dW9ljyPG0amYKsC5dz6oCcqsMZwNXLmgRJS//Zt8ADpVbXIjjYe9XfUsMzmMGB/jQxqH
+         BC0GLXk6oPAncNPROy9PG759RURTWRig0OwM+PI6CAYeIM0ifStmDaEDg/CnFxSRhFP+
+         C6dUD/lJu2xXaq9KXA9OSsYPMw2gDkBZ0GL0GlieAEYY6aRkHdEWbV1jVw4fbZm6u41r
+         Rhs7EBVaVrALFq8SV7IS4GWFxEh0AkapbJh6IHpmR5d5JnuWvGn89EOYJSVXbUJ8kmqA
+         c/8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721053547; x=1721658347;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eewemGN75+rbcMxe1DGw80syxi564qM81+q27+G+F1U=;
+        b=wbHzUxd3iZSytDufL3skdbCtsHqiigCNqIVtvfIuQuEzxj1IjVtXw2qhguIiPyQ/kE
+         OAEL6mz8U76OdFcfx/oMe9J03WYKQkpnxDQNw/ycUMZMlfd/sUTs7lREZ8sB3n4qm8r0
+         kSzpv/RxEJxbNpXb4LEdWKtqNKXQTgoMmnJraTXixPyi0h2ivmxss5O+MwFfIETzbWQ4
+         H7K1CaNxE09j6ZLvhEwWdAaE9KKpzmYTgo2EMX5QZ83k6l3ev6XuDKJEnKpcUmseVr0q
+         Au13WmAXZhJz9pre6aCGQGBUX3BOGoCkn9mHdiwQbg++qflvCq8GnMLE93mnyw2UJdc5
+         QqjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjx84GQusZpDxlZKa46zI8M9k/Zn1Z65PeabXovuzcZhO5rZ/y2KZ2IqeqGvbchdhOIZHPlsD9bV/rQpeOgCn8F94kUjXt
+X-Gm-Message-State: AOJu0YwczcjEaFBRqMwyEKmMpII9mw8UCv3wDPu4xTw3T8Oyib0BeWw6
+	pBHobh4UgTfvw9x9YcvOlekrLKYW6djvmAu033GxvT7NZu8RAn5A
+X-Google-Smtp-Source: AGHT+IHgnqROiuKRGIvgn5B33hZnm2J+B4JQqGGHojfS/E4NMAQk5qEWeYGhNM5RiiQZIgZ5Bz3jcw==
+X-Received: by 2002:a05:6122:3196:b0:4f2:e1c9:fc1b with SMTP id 71dfb90a1353d-4f4cd2941d2mr92878e0c.4.1721053545938;
+        Mon, 15 Jul 2024 07:25:45 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f4a48b08adsm627598e0c.26.2024.07.15.07.25.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jul 2024 07:25:44 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2024-07-15
+Date: Mon, 15 Jul 2024 10:25:42 -0400
+Message-ID: <20240715142543.303944-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B1:EE_|MW4PR12MB5626:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab0e6013-54b2-4355-5407-08dca4d9fd35
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?r4rdoc6fblm9qvsE8r8IcWcvLRUsSlKjV1eDFvEW4LaJJkxq/OJjv9hZN8Ii?=
- =?us-ascii?Q?L8JN5qO6BE90Xy2hTosg8zyLnHgFERk97iEfunYnsYkjLt6Af778mC44TMfr?=
- =?us-ascii?Q?qkKQNjwjmR1vCW/jJTmNZVHJBt/Q9rJd1rAnbYj2/ddi3V64SvKgyVI8Omm7?=
- =?us-ascii?Q?P0a23BcCXrfEBHgoKUBaJiXZqE0a4hgmm3Q6lEmvFerFUdE6I65td+cgVUoO?=
- =?us-ascii?Q?jeMMv+iau4jGm6B7fgfX6l6/dbDuUkk7pMNKq1sIMEkwTWip078dJettHd6s?=
- =?us-ascii?Q?m+L0wiVqE52KYJ67rsCLNbvjZAvfZMoQ7W/pZXgsupVDrPAVypF5zMh+RBmN?=
- =?us-ascii?Q?fyfNXUeIYJBI8m1ZtC3pOHt9Oo9f79hwfFdkFLRf4Y67j/NgC+SiEAiw+aLg?=
- =?us-ascii?Q?PgML/hbLCp33UuLX59rZwwdGrd3E2StbG+yZgEdcFAi2sJW3zXrYv/pKiA9e?=
- =?us-ascii?Q?YCiKPnC3Q6mnS0Stt/623p9BY8RTpeix/PK/O1xvm/Aw1lS0hB3c5TLoovfn?=
- =?us-ascii?Q?SkNmH2rXW5SV9gWFcHnZ6cYgnP2QyD3QvZCjGIp2OVt/y4msWatWxU8FKfsI?=
- =?us-ascii?Q?pJdsFvGaZGiodsX76sHQITvpS5mLTx9y5iI5d2DndJe1ebyOR9exQhPoPqkl?=
- =?us-ascii?Q?OsyV3vtw+c1s06t7bF1Wrx6qF8lGv2lVwM6VUv3nJAyWFkyusx1HC7NyG/Vb?=
- =?us-ascii?Q?OPBCc8shOs4FpL/oyXmmjn8wAu7nmfcsdT/pxnfqjYi6eBQQ/X8EcBao8W/E?=
- =?us-ascii?Q?17Z/StY6mlpe4OfWrAihXXHodyPSb/wKHb3Qsv319UgZpHBcst7MPx7hoUC3?=
- =?us-ascii?Q?xX1R9l7XYIpiZeWmG/dSHrxmZ5jLHs6QPksfMwutPhSd/X7bwm1lKNuoTkZb?=
- =?us-ascii?Q?1IIb2LI2r2uLTjGD1B5EtVm2oup4O34H/mYY0KwGnJSylOwS3iw9T+RQFsZj?=
- =?us-ascii?Q?FLW0EGLiNhn+ZS4VzjbUXII4jg+9XLposHF3uekyj/uxMxbqN8RF8I3IvUIv?=
- =?us-ascii?Q?D1YqAin85Qxl8FxABpzu2x6Vy5zUk0g/bb5IEQkh6Ampm6O+f+07Y3cPrUN2?=
- =?us-ascii?Q?p2iO7ZGl4nrtRkLSnWtuGJ/91r6tZvGn+M/6NPQmwkxo5XtPK4bcZ9AuPGoo?=
- =?us-ascii?Q?+PdA+TDNAENS03HGMc8KLQFJjl+/bSDPrnEs8BCtD3EnSjI8wpMbpNiWxM1J?=
- =?us-ascii?Q?d4peB3sm87zA/eNUYjTFcLcW8grw2ie3n8/FxrujD3G9VBio8dReIu5krWG+?=
- =?us-ascii?Q?0/k5yyHS5MxT8ONM+cm2cVCyqxdqjStMsfSZM3lpjchFNFUvLs951km1tg55?=
- =?us-ascii?Q?yOUiWZohYOuNj0vtmn0QmWozsp0BWTTbElk5Yc+KXOKVO3qQA1nnmgeubgpP?=
- =?us-ascii?Q?lPxJrYegwd8dlOs5hX46L2AYCTBICQDdFFZnjAQG8vNMuVaizzXHG7aSktqR?=
- =?us-ascii?Q?6kfUnjlhppVWI0MCTNxsuZi5fvtoZIG3?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 14:25:34.1663
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab0e6013-54b2-4355-5407-08dca4d9fd35
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5626
 
-The TOS value that is returned to user space in the route get reply is
-the one with which the lookup was performed ('fl4->flowi4_tos'). This is
-fine when the matched route is configured with a TOS as it would not
-match if its TOS value did not match the one with which the lookup was
-performed.
+The following changes since commit ecb1e1dcb7b5d68828c13ab3f99e399b4ec0c350:
 
-However, matching on TOS is only performed when the route's TOS is not
-zero. It is therefore possible to have the kernel incorrectly return a
-non-zero TOS:
+  Merge branch 'introduce-en7581-ethernet-support' (2024-07-14 07:46:55 -0700)
 
- # ip link add name dummy1 up type dummy
- # ip address add 192.0.2.1/24 dev dummy1
- # ip route get fibmatch 192.0.2.2 tos 0xfc
- 192.0.2.0/24 tos 0x1c dev dummy1 proto kernel scope link src 192.0.2.1
+are available in the Git repository at:
 
-Fix by instead returning the DSCP field from the FIB result structure
-which was populated during the route lookup.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-07-15
 
-Output after the patch:
+for you to fetch changes up to 23e88450bb04f6b44ce4cacbd76cd775e426a5b2:
 
- # ip link add name dummy1 up type dummy
- # ip address add 192.0.2.1/24 dev dummy1
- # ip route get fibmatch 192.0.2.2 tos 0xfc
- 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
+  Bluetooth: btmtk: Mark all stub functions as inline (2024-07-15 10:13:17 -0400)
 
-Extend the existing selftests to not only verify that the correct route
-is returned, but that it is also returned with correct "tos" value (or
-without it).
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
-Fixes: b61798130f1b ("net: ipv4: RTM_GETROUTE: return matched fib result when requested")
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- net/ipv4/route.c                         |  2 +-
- tools/testing/selftests/net/fib_tests.sh | 24 ++++++++++++------------
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ - qca: use the power sequencer for QCA6390
+ - btusb: mediatek: add ISO data transmission functions
+ - hci_bcm4377: Add BCM4388 support
+ - btintel: Add support for BlazarU core
+ - btintel: Add support for Whale Peak2
+ - btnxpuart: Add support for AW693 A1 chipset
+ - btnxpuart: Add support for IW615 chipset
+ - btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 7790a8347461..3473e0105e29 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -3332,7 +3332,7 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 		fri.tb_id = table_id;
- 		fri.dst = res.prefix;
- 		fri.dst_len = res.prefixlen;
--		fri.dscp = inet_dsfield_to_dscp(fl4.flowi4_tos);
-+		fri.dscp = res.dscp;
- 		fri.type = rt->rt_type;
- 		fri.offload = 0;
- 		fri.trap = 0;
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 73895711cdf4..5f3c28fc8624 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -1737,53 +1737,53 @@ ipv4_rt_dsfield()
- 
- 	# DSCP 0x10 should match the specific route, no matter the ECN bits
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x10 | \
--		grep -q "via 172.16.103.2"
-+		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
- 	log_test $? 0 "IPv4 route with DSCP and ECN:Not-ECT"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x11 | \
--		grep -q "via 172.16.103.2"
-+		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
- 	log_test $? 0 "IPv4 route with DSCP and ECN:ECT(1)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x12 | \
--		grep -q "via 172.16.103.2"
-+		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
- 	log_test $? 0 "IPv4 route with DSCP and ECN:ECT(0)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x13 | \
--		grep -q "via 172.16.103.2"
-+		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
- 	log_test $? 0 "IPv4 route with DSCP and ECN:CE"
- 
- 	# Unknown DSCP should match the generic route, no matter the ECN bits
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x14 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:Not-ECT"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x15 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:ECT(1)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x16 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:ECT(0)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x17 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:CE"
- 
- 	# Null DSCP should match the generic route, no matter the ECN bits
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x00 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with no DSCP and ECN:Not-ECT"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x01 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with no DSCP and ECN:ECT(1)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x02 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with no DSCP and ECN:ECT(0)"
- 
- 	$IP route get fibmatch 172.16.102.1 dsfield 0x03 | \
--		grep -q "via 172.16.101.2"
-+		grep -q "172.16.102.0/24 via 172.16.101.2"
- 	log_test $? 0 "IPv4 route with no DSCP and ECN:CE"
- }
- 
--- 
-2.45.1
+----------------------------------------------------------------
+Bartosz Golaszewski (10):
+      power: sequencing: implement the pwrseq core
+      power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+      dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+      Bluetooth: qca: use the power sequencer for QCA6390
+      Bluetooth: qca: don't disable power management for QCA6390
+      dt-bindings: bluetooth: qualcomm: describe the inputs from PMU for wcn7850
+      Bluetooth: hci_qca: schedule a devm action for disabling the clock
+      Bluetooth: hci_qca: unduplicate calls to hci_uart_register_device()
+      Bluetooth: hci_qca: make pwrseq calls the default if available
+      Bluetooth: hci_qca: use the power sequencer for wcn7850 and wcn6855
 
+Chris Lu (8):
+      Bluetooth: btusb: mediatek: remove the unnecessary goto tag
+      Bluetooth: btusb: mediatek: return error for failed reg access
+      Bluetooth: btmtk: rename btmediatek_data
+      Bluetooth: btusb: add callback function in btusb suspend/resume
+      Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
+      Bluetooth: btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c
+      Bluetooth: btmtk: move btusb_recv_acl_mtk to btmtk.c
+      Bluetooth: btusb: mediatek: add ISO data transmission functions
+
+Dan Carpenter (1):
+      Bluetooth: MGMT: Uninitialized variable in load_conn_param()
+
+Dmitry Antipov (2):
+      Bluetooth: hci_core, hci_sync: cleanup struct discovery_state
+      Bluetooth: hci_core: cleanup struct hci_dev
+
+Dr. David Alan Gilbert (2):
+      Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
+      Bluetooth: iso: remove unused struct 'iso_list_data'
+
+Erick Archer (5):
+      Bluetooth: hci_core: Prefer struct_size over open coded arithmetic
+      Bluetooth: hci_core: Prefer array indexing over pointer arithmetic
+      tty: rfcomm: prefer struct_size over open coded arithmetic
+      tty: rfcomm: prefer array indexing over pointer arithmetic
+      Bluetooth: Use sizeof(*pointer) instead of sizeof(type)
+
+Hao Qin (3):
+      Bluetooth: btusb: mediatek: refactor the function btusb_mtk_reset
+      Bluetooth: btusb: mediatek: reset the controller before downloading the fw
+      Bluetooth: btusb: mediatek: add MT7922 subsystem reset
+
+Hector Martin (2):
+      Bluetooth: hci_bcm4377: Increase boot timeout
+      Bluetooth: hci_bcm4377: Add BCM4388 support
+
+Hilda Wu (1):
+      Bluetooth: btusb: Add RTL8852BE device 0489:e125 to device tables
+
+Iulia Tanasescu (1):
+      Bluetooth: hci_event: Set QoS encryption from BIGInfo report
+
+Kiran K (7):
+      Bluetooth: btintel: Refactor btintel_set_ppag()
+      Bluetooth: btintel_pcie: Print Firmware Sequencer information
+      Bluetooth: btintel_pcie: Fix irq leak
+      Bluetooth: btintel: Add firmware ID to firmware name
+      Bluetooth: btintel: Fix the sfi name for BlazarU
+      Bluetooth: btintel: Add support for BlazarU core
+      Bluetooth: btintel: Add support for Whale Peak2
+
+Krzysztof Kozlowski (1):
+      Bluetooth: hci: fix build when POWER_SEQUENCING=m
+
+Luiz Augusto von Dentz (9):
+      Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection
+      Merge tag 'pwrseq-initial-for-v6.11' of git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux into HEAD
+      Bluetooth: Fix usage of __hci_cmd_sync_status
+      Bluetooth: hci_core: Remove usage of hci_req_sync
+      Bluetooth: hci_core: Don't use hci_prepare_cmd
+      Bluetooth: hci_sync: Move handling of interleave_scan
+      Bluetooth: hci_sync: Remove remaining dependencies of hci_request
+      Bluetooth: Remove hci_request.{c,h}
+      Bluetooth: hci_qca: Fix build error
+
+Luke Wang (1):
+      Bluetooth: btnxpuart: Shutdown timer and prevent rearming when driver unloading
+
+Nathan Chancellor (1):
+      Bluetooth: btmtk: Mark all stub functions as inline
+
+Neeraj Sanjay Kale (10):
+      Bluetooth: btnxpuart: Fix Null pointer dereference in btnxpuart_flush()
+      Bluetooth: btnxpuart: Enable status prints for firmware download
+      Bluetooth: btnxpuart: Handle FW Download Abort scenario
+      dt-bindings: net: bluetooth: nxp: Add firmware-name property
+      Bluetooth: btnxpuart: Update firmware names
+      Bluetooth: btnxpuart: Add handling for boot-signature timeout errors
+      Bluetooth: btnxpuart: Add support for AW693 A1 chipset
+      Bluetooth: btnxpuart: Add support for IW615 chipset
+      Bluetooth: btnxpuart: Add system suspend and resume handlers
+      Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
+
+Paul Menzel (1):
+      Bluetooth: btintel: Fix spelling of *intermediate* in comment
+
+Rafał Miłecki (1):
+      dt-bindings: net: bluetooth: convert MT7622 Bluetooth to the json-schema
+
+Sean Wang (2):
+      Bluetooth: btmtk: add the function to get the fw name
+      Bluetooth: btmtk: apply the common btmtk_fw_get_filename
+
+Sven Peter (1):
+      Bluetooth: hci_bcm4377: Use correct unit for timeouts
+
+Thorsten Blum (1):
+      Bluetooth: btintel_pcie: Remove unnecessary memset(0) calls
+
+WangYuli (1):
+      Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
+
+Ying Hsu (1):
+      Bluetooth: Add vendor-specific packet classification for ISO data
+
+ .../net/bluetooth/mediatek,mt7622-bluetooth.yaml   |   51 +
+ .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |    4 +
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   35 +-
+ .../devicetree/bindings/net/mediatek-bluetooth.txt |   36 -
+ MAINTAINERS                                        |    8 +
+ drivers/bluetooth/Kconfig                          |    7 +-
+ drivers/bluetooth/btintel.c                        |  240 +++--
+ drivers/bluetooth/btintel.h                        |   11 +-
+ drivers/bluetooth/btintel_pcie.c                   |   10 +-
+ drivers/bluetooth/btmtk.c                          | 1085 ++++++++++++++++++-
+ drivers/bluetooth/btmtk.h                          |  118 ++-
+ drivers/bluetooth/btmtksdio.c                      |    4 +
+ drivers/bluetooth/btmtkuart.c                      |    1 +
+ drivers/bluetooth/btnxpuart.c                      |  242 ++++-
+ drivers/bluetooth/btrtl.c                          |    2 +-
+ drivers/bluetooth/btusb.c                          |  735 ++-----------
+ drivers/bluetooth/hci_bcm4377.c                    |   66 +-
+ drivers/bluetooth/hci_ldisc.c                      |    2 +-
+ drivers/bluetooth/hci_nokia.c                      |    5 -
+ drivers/bluetooth/hci_qca.c                        |  133 ++-
+ drivers/bluetooth/hci_vhci.c                       |    2 +-
+ drivers/power/Kconfig                              |    1 +
+ drivers/power/Makefile                             |    1 +
+ drivers/power/sequencing/Kconfig                   |   29 +
+ drivers/power/sequencing/Makefile                  |    6 +
+ drivers/power/sequencing/core.c                    | 1105 ++++++++++++++++++++
+ drivers/power/sequencing/pwrseq-qcom-wcn.c         |  336 ++++++
+ include/linux/pwrseq/consumer.h                    |   56 +
+ include/linux/pwrseq/provider.h                    |   75 ++
+ include/net/bluetooth/bluetooth.h                  |    4 +
+ include/net/bluetooth/hci_core.h                   |    7 +-
+ include/net/bluetooth/hci_sock.h                   |    2 +-
+ include/net/bluetooth/hci_sync.h                   |   26 +
+ include/net/bluetooth/rfcomm.h                     |    2 +-
+ net/bluetooth/Makefile                             |    3 +-
+ net/bluetooth/hci_conn.c                           |    1 -
+ net/bluetooth/hci_core.c                           |   95 +-
+ net/bluetooth/hci_debugfs.c                        |    1 -
+ net/bluetooth/hci_event.c                          |    3 +-
+ net/bluetooth/hci_request.c                        |  903 ----------------
+ net/bluetooth/hci_request.h                        |   71 --
+ net/bluetooth/hci_sync.c                           |  103 +-
+ net/bluetooth/iso.c                                |    5 -
+ net/bluetooth/mgmt.c                               |   51 +-
+ net/bluetooth/msft.c                               |    1 -
+ net/bluetooth/rfcomm/tty.c                         |   23 +-
+ 46 files changed, 3693 insertions(+), 2014 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
+ create mode 100644 drivers/power/sequencing/Kconfig
+ create mode 100644 drivers/power/sequencing/Makefile
+ create mode 100644 drivers/power/sequencing/core.c
+ create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
+ create mode 100644 include/linux/pwrseq/consumer.h
+ create mode 100644 include/linux/pwrseq/provider.h
+ delete mode 100644 net/bluetooth/hci_request.c
+ delete mode 100644 net/bluetooth/hci_request.h
 
