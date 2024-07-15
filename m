@@ -1,87 +1,84 @@
-Return-Path: <netdev+bounces-111403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC80E930CEA
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 05:07:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E84930CFD
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 05:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 320191F212FA
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 03:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A353280BF9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 03:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E768F48;
-	Mon, 15 Jul 2024 03:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E68E17DE19;
+	Mon, 15 Jul 2024 03:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRY07tJf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQCnLTG6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68122F41;
-	Mon, 15 Jul 2024 03:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9526617DE06
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 03:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721012861; cv=none; b=jI07W0QvK1/TGuu1VdkcL5U1tVuecF5Fv6K+30qQxGZ85hbwnlmfT+SO0QpMSDpA3ZrQ+gjthBmJEiJdPYAIWw5pj1rY1hVS1PCKStuEO8eiSCvg2J6916knL0mORtpQK4zO7pgpZ5sCMWZ7IEIjMFyD5jPHbkvfJ2oUpWeMpJg=
+	t=1721014294; cv=none; b=r+gsxWsGYLfnG5zsnkkINvL76drwKyekOENR40mf2x45Oy0sxd7hDcZLf4nroGiDLhemy36vmtboBaoOM6O9rmCLLskiSkgHWASSZPE1bVbghj/HfrCmAasRgAgIdcgdbx9EW36VOL/Kl9NOPzo382WgetEcKnNhL9yDhoG+UC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721012861; c=relaxed/simple;
-	bh=nvkTLskiSjR1wEWCGet8hWznszuqHulbDw6SUh1768k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rwJtP4TtomDmy+ICv1YEWhxcstsszJ3OtFJZMQ27f7lzLg9r+p+h4lXWu4+/UGoryYIdWqxd8jjHEbdIVL4dRO0AwtjsEIExIcKPdhU4tyoPBiAaoL475n48l70B1ayaiBbalM2fwURBILnZx1ZoXwp1h+RMUDwVspFuuWaO+ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRY07tJf; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1721014294; c=relaxed/simple;
+	bh=wThg9YM+o+P8iubLMx8hMaunWIc3nEdrIT+EOo0datQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JrOaW3Vva1tnhpQ9Zer+ZFBn1QEwqKHHpXJIY5Rzg+sZzibwZVu8GJ/wfAPr7wFDjbI2RhcrAxfAHWiTIzyd3Bj9gs8puzP/vSwS33gre2bWBQG3GrkkYgzBG8GNT79T0YPvUBIcGGQdSrMBKeudT9QbJc5yEtDFwJZnboObZVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQCnLTG6; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-426717a2d12so21976805e9.0;
-        Sun, 14 Jul 2024 20:07:39 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1fb4a807708so33593005ad.2
+        for <netdev@vger.kernel.org>; Sun, 14 Jul 2024 20:31:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721012858; x=1721617658; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721014292; x=1721619092; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bPOGNQoOVZHDwCKu6mfQ/96DtFXkwzO8aleJ5SEVjrg=;
-        b=GRY07tJfkDbz1eOfab4icOLaSIlQ7Uznx9KCvPHYM6OdaGWkBBvt37VAtqp/vDV/dr
-         FxPJjy4A/IKmULtLOVbTxOPXOMCgtnfigOO9TGlif37cjyZFDeh53bS1lkeg6gBQ3Qhw
-         /ZDcbOj1pibPW9CuJI2P3WN4a/CutKhtF7oQSeAlxKOU/jg56/sRAxxRAQy8Yva/Ve4F
-         lCrHE0kH7jxINHjCZFmTENJO3PQmkROz9XFB4p3TEKiMjo9bAaGiWuLvZGciuBPvICUQ
-         8KIqHn2ec6t03UHWsiTG8TzpA75i9srGIgx3EwIyg4rX8WwBXDrQCCHvCcfIzhH6FMPO
-         chdw==
+        bh=5YSZO7atVmSxVafGMqLvkpjN2+QsZnXkhX1sTkuEMn4=;
+        b=UQCnLTG63MsEeR6PiTkdJIcc1odLipC9lpF1rHmN4/isSkjjRi9K7uXAYtKYjrT8iN
+         ccXshVXqgAQNJWTqgEHxhUnie7vdH9A3WUyoUy/T+iWGPzSq1wMI5nMmY5aWGW7Hmc6p
+         7at7qWJ3m7QloqW8LcL9adBDQgz+C2ocH0/7O0pLcyY9Icdb5aoCQxTz0UZzaiVI4H4O
+         0Z2cTGYcN/NuY5xPdxcvKiXLGwTI+Ha+XuR6qSzZhJfG0aVyE6qCOKBg+9pBeKhjDP9P
+         8WZ66lG/2e+uU22flBg08lsxoKcAybktj1RrWeDGL+tiYn2dw2guJSkqeXLhPdnBvLWP
+         ThNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721012858; x=1721617658;
+        d=1e100.net; s=20230601; t=1721014292; x=1721619092;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bPOGNQoOVZHDwCKu6mfQ/96DtFXkwzO8aleJ5SEVjrg=;
-        b=a06ieK3sgvAU0q0afeY396tXORTaXpkPBHEL5fMs0vub/jgxlY9cBVnXrE4gBLgPcE
-         QEUzdMNLaMfCqvh1mFAraTDb9AxY69zhU6v6mLFJ0Pq1TWOZf2Lg2ktcnmNreauY0JHP
-         gsAl+yu9f0OrhHPsisV1J25Kg5N9Y/dHz5+hMJOt9QccAcl7cnStulRvJdw2AGSYn82w
-         077SdJosZuUNsPLQzdfr148vk+P3bLGpCpVTJimHIAbQueV/7OiyU6M2zIepQNt34ESm
-         HXAtHxqDJPFEHl4hFx5wP7/pUqIWvGwy4We7N9/1kCbg0bZ0LGUKg5jhSnKRo6HkyZG+
-         sV0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUuSshlogGzVgvCWbonGmttxCAlkgzSPJdXVDTpmrw8Hu8q1//EGu+jGltDgVStEEKYUk751KEeEx7871HciN8IH5TycH2MhGqUjmRmsA7+
-X-Gm-Message-State: AOJu0YwpGBMEL+7N5Ursq9xW8drMJnDCz9dyQwtA/Rhu18k4cIq9ZHHD
-	scjq8efExy4EtEbCMwCY08UcxDUoGsq/AixwiVAGZU8OxHSrYoUBZ4snery0
-X-Google-Smtp-Source: AGHT+IFwhBEgWJHb2mzcvstXAEuLa5ItlvPmIFzGZG7TBwdVd/xBshToNvarAlausdQ5IyN1qU39qQ==
-X-Received: by 2002:a05:600c:714:b0:426:67fa:f7 with SMTP id 5b1f17b1804b1-4279da067dfmr80624865e9.9.1721012857685;
-        Sun, 14 Jul 2024 20:07:37 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-018.fbsv.net. [2a03:2880:31ff:12::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427a630b218sm66150915e9.14.2024.07.14.20.07.36
+        bh=5YSZO7atVmSxVafGMqLvkpjN2+QsZnXkhX1sTkuEMn4=;
+        b=sZZ6RBuz5q/deqbdmqEFQe1kvs9llU+20+8oAVOvQXJyUOX4xHKSE/8st7e97FbtJ1
+         slxtQm6WqtqBjOi6n9ay1vX6jfvMAVnu7dZWJ9T8cdGp0U76e3u/tMeLnhv6A8xub1XL
+         SasCyv7jhuwTQqFYu3JjVzOPAxKyy3+7SSsLRV7qRHK/WlAw+cfIxdJpVjlEnglfSbaq
+         YlVnzWkmshqrv+Jf7uLJ5ykhKGrvugkHYi9BnkOID/MjZzHoFyTEro3GlZklA+TLqaCn
+         V0PlYI4jkqFPXT3Up4wYqIfmqy8l++o7Lt6B/SB6Yfnt68kw4Z55vvIdAENS3GUSiPi2
+         ZXPQ==
+X-Gm-Message-State: AOJu0YwUT2L4XbijCvntwmmuEHoSe9qwv058oH+cGS3h2VCMS45xFbey
+	MWBTWipgHT2/p45OwjMUGdoURE3+fpSCjBYq7a1cpOWmrxvZIoHw
+X-Google-Smtp-Source: AGHT+IHg3IacY5QCn5dWc83Xll4Vol7faZOY47WCv+B8Tk4vh86YleHi69FvYY8h14RVzDFsb6kRDA==
+X-Received: by 2002:a17:902:ce8f:b0:1fb:6794:b463 with SMTP id d9443c01a7336-1fbb6edb351mr185052635ad.54.1721014291818;
+        Sun, 14 Jul 2024 20:31:31 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc27671sm29992445ad.142.2024.07.14.20.31.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jul 2024 20:07:37 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: shuah@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
+        Sun, 14 Jul 2024 20:31:31 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	willemb@google.com,
-	petrm@nvidia.com,
-	dw@davidwei.uk,
-	przemyslaw.kitszel@intel.com,
-	linux-kselftest@vger.kernel.org,
-	mohsin.bashr@gmail.com
-Subject: [PATCH net-next] selftests: net: py: support verbose printing, display executed commands
-Date: Sun, 14 Jul 2024 20:07:23 -0700
-Message-ID: <20240715030723.1768360-1-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	ncardwell@google.com,
+	corbet@lwn.net
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] tcp: introduce rto_max_us sysctl knob
+Date: Mon, 15 Jul 2024 11:31:18 +0800
+Message-Id: <20240715033118.32322-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,111 +87,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add verbosity support to show the commands executed while
-running tests. Enable verbosity if either an environment
-variable 'VERBOSE' is set to a non-zero number or it is defined
-in a config file under driver tests as discussed here:
-https://github.com/linux-netdev/nipa/wiki/Running-driver-tests.
+From: Jason Xing <kernelxing@tencent.com>
 
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+As we all know, the algorithm of rto is exponential backoff as RFC
+defined long time ago. After several rounds of repeatedly transmitting
+a lost skb, the expiry of rto timer could reach above 1 second within
+the upper bound (120s).
+
+Waiting more than one second to retransmit for some latency-sensitive
+application is a little bit unacceptable nowadays, so I decided to
+introduce a sysctl knob to allow users to tune it. Still, the maximum
+value is 120 seconds.
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- tools/testing/selftests/drivers/net/lib/py/env.py | 14 +++++++++++++-
- tools/testing/selftests/net/lib/py/__init__.py    |  7 +++++++
- tools/testing/selftests/net/lib/py/utils.py       | 14 ++++++++++++++
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ Documentation/networking/ip-sysctl.rst | 10 ++++++++++
+ include/net/inet_connection_sock.h     | 10 +++++++++-
+ include/net/netns/ipv4.h               |  1 +
+ net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+ net/ipv4/tcp_ipv4.c                    |  1 +
+ 5 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index a5e800b8f103..ec53cf59e104 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -4,7 +4,7 @@ import os
- import time
- from pathlib import Path
- from lib.py import KsftSkipEx, KsftXfailEx
--from lib.py import cmd, ethtool, ip
-+from lib.py import cmd, ethtool, ip, verbosity_ctl
- from lib.py import NetNS, NetdevSimDev
- from .remote import Remote
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 3616389c8c2d..32a1907ca95d 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -1223,6 +1223,16 @@ tcp_rto_min_us - INTEGER
  
-@@ -42,6 +42,12 @@ class NetDrvEnv:
+ 	Default: 200000
  
-         self.env = _load_env_file(src_path)
- 
-+        try:
-+            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
-+        except ValueError as e:
-+            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
-+            verbosity_ctl(level=0)
++tcp_rto_max_us - INTEGER
++	Maximum TCP retransmission timeout (in microseconds).
 +
-         if 'NETIF' in self.env:
-             self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
-         else:
-@@ -92,6 +98,12 @@ class NetDrvEpEnv:
-         self._ns = None
-         self._ns_peer = None
++	The recommended practice is to use a value less or equal to 120000000
++	microseconds.
++
++	Possible Values: 1 - INT_MAX
++
++	Default: 120000000
++
+ UDP variables
+ =============
  
-+        try:
-+            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
-+        except ValueError as e:
-+            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
-+            verbosity_ctl(level=0)
-+
-         if "NETIF" in self.env:
-             if nsim_test is True:
-                 raise KsftXfailEx("Test only works on netdevsim")
-diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
-index b6d498d125fe..1541079fadce 100644
---- a/tools/testing/selftests/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/net/lib/py/__init__.py
-@@ -1,8 +1,15 @@
- # SPDX-License-Identifier: GPL-2.0
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index c0deaafebfdc..a0abbafcab9e 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -217,10 +217,18 @@ static inline void inet_csk_clear_xmit_timer(struct sock *sk, const int what)
+  */
+ static inline void inet_csk_reset_xmit_timer(struct sock *sk, const int what,
+ 					     unsigned long when,
+-					     const unsigned long max_when)
++					     unsigned long max_when)
+ {
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
  
-+import os
- from .consts import KSRC
- from .ksft import *
- from .netns import NetNS
- from .nsim import *
- from .utils import *
- from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily
++	if (what == ICSK_TIME_RETRANS) {
++		int rto_max_us = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rto_max_us);
++		unsigned int rto_max = usecs_to_jiffies(rto_max_us);
 +
-+try:
-+    verbosity_ctl(level=int(os.environ.get('VERBOSE', 0)))
-+except ValueError as e:
-+    print(f'Ignoring \'VERBOSE\'. Unknown value \'{os.environ.get("VERBOSE")}\'')
-+    verbosity_ctl(level=0)
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index 72590c3f90f1..4a59958649be 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -9,6 +9,18 @@ import subprocess
- import time
++		if (rto_max < max_when)
++			max_when = rto_max;
++	}
++
+ 	if (when > max_when) {
+ 		pr_debug("reset_xmit_timer: sk=%p %d when=0x%lx, caller=%p\n",
+ 			 sk, what, when, (void *)_THIS_IP_);
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 5fcd61ada622..09a28a5c94d2 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -178,6 +178,7 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_window_scaling;
+ 	u8 sysctl_tcp_timestamps;
+ 	int sysctl_tcp_rto_min_us;
++	int sysctl_tcp_rto_max_us;
+ 	u8 sysctl_tcp_recovery;
+ 	u8 sysctl_tcp_thin_linear_timeouts;
+ 	u8 sysctl_tcp_slow_start_after_idle;
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 9140d20eb2d4..304f173837bc 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -1573,6 +1573,14 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.proc_handler	= proc_dointvec_minmax,
+ 		.extra1		= SYSCTL_ONE,
+ 	},
++	{
++		.procname	= "tcp_rto_max_us",
++		.data		= &init_net.ipv4.sysctl_tcp_rto_max_us,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++	},
+ };
  
+ static __net_init int ipv4_sysctl_init_net(struct net *net)
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index fd17f25ff288..f06859be5942 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -3506,6 +3506,7 @@ static int __net_init tcp_sk_init(struct net *net)
  
-+def verbosity_ctl(level=None):
-+    global VERBOSITY_LEVEL
-+    if level is not None:
-+        VERBOSITY_LEVEL = level
-+    return VERBOSITY_LEVEL
-+
-+
-+def verbose(*objs, **kwargs):
-+    if verbosity_ctl() >= 1:
-+        print(*objs, **kwargs)
-+
-+
- class CmdExitFailure(Exception):
-     pass
+ 	net->ipv4.sysctl_tcp_pingpong_thresh = 1;
+ 	net->ipv4.sysctl_tcp_rto_min_us = jiffies_to_usecs(TCP_RTO_MIN);
++	net->ipv4.sysctl_tcp_rto_max_us = jiffies_to_usecs(TCP_RTO_MAX);
  
-@@ -22,6 +34,8 @@ class cmd:
-         self.stderr = None
-         self.ret = None
- 
-+        verbose("#cmd|", comm)
-+
-         self.comm = comm
-         if host:
-             self.proc = host.cmd(comm)
+ 	return 0;
+ }
 -- 
-2.43.0
+2.37.3
 
 
