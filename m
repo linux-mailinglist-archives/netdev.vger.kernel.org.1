@@ -1,70 +1,84 @@
-Return-Path: <netdev+bounces-111504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A97931653
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:03:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D9293173B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75C40B20940
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:03:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80D1AB225BE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41D218C35B;
-	Mon, 15 Jul 2024 14:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4ZOCMPO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D3C18EFF4;
+	Mon, 15 Jul 2024 14:59:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A73E180A70;
-	Mon, 15 Jul 2024 14:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F29E18EFDA;
+	Mon, 15 Jul 2024 14:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721052184; cv=none; b=mJPd1oGevJDjz/n2IX0Ain0qM8/bjXNne6I7aGWlFFVhlSNO2vPAEWY7PPtcEaR9K9EMlaiJF1+okrUt3K4TnF8PThZXYVbjDCWvDtt8PNwDJRCqD1SSUbdpf3ZCGlZTK7k0ehxR/OR3Sm8I6rmfehmHnN0cnzVk2l86dYjZxdE=
+	t=1721055544; cv=none; b=Dekc8xhVoOrTbfjLfF1rlQ3EnXCWhYS6RwxA7wr3cIkBGYOznFZPOq0ckE80NcArUye4DRPV671jJrVr5DdkT5IOpo7srRt2tpbuEp09gadrl0wmZij3zlDE4khsOU3kTDTTaXy6a2jbZociep+dr/rrbStSAOvzsiiTSPZH/Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721052184; c=relaxed/simple;
-	bh=q2kmb7iqudj32/vqxdTmeBnwBdx1BZ5aJv5iK6I82Ss=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nrc+2KdPzUivaLKEziPViPwitRpumDkdvcu6tR920SKv3zJlbB0Qcs3pJdudGZYS9Wy2H88ARldJfGag1DJKy3M5PzJ7IXQo0fSWz2IbsbXCm0hIYz9AUEa/WKYXwEIkaqnV5zWAFKodh5DtthdvJ5k6bkRFLfyQSj1fupkO7y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4ZOCMPO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ECD7C32782;
-	Mon, 15 Jul 2024 14:03:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721052184;
-	bh=q2kmb7iqudj32/vqxdTmeBnwBdx1BZ5aJv5iK6I82Ss=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q4ZOCMPOd6i4r/c9ZF/veM1FVN1lqhIUlU2ntJR4MLmcrCb5RNp54vmI7voUV5yuH
-	 Itu9AyLW9YBGh9ZFNrMwN/IzaOj78lw6ZCoUunhRbhf1PrzfdJkt/EtigUJ9Tbwtma
-	 ietKpD+3AmHxR9DTcYqGho9P3YN8XFuMvgNZ9qqy0KIT/tvsxjxdvrU9F2TkmkFTLw
-	 6ait0+WT4e8FVDsn/swF4IrigALr+1/4ZH+H5J0H00hVO5y5KKfNu8ghJRZyTkxQ1z
-	 wA/Zxa8ujlaxbJYjOuGTbODi892s959oimaB9Oky+Dkhp7ODzMTzUltbQ2X4Y1yaJ7
-	 51S33YpK0HV/Q==
-Date: Mon, 15 Jul 2024 07:03:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, jacob.e.keller@intel.com, horms@kernel.org,
- u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: ethernet: lantiq_etop: remove
- redundant device name setup
-Message-ID: <20240715070302.3d4d1cf0@kernel.org>
-In-Reply-To: <92570003-ddcd-482b-80e1-1da1fa0cc91f@lunn.ch>
-References: <20240713170920.863171-1-olek2@wp.pl>
-	<92570003-ddcd-482b-80e1-1da1fa0cc91f@lunn.ch>
+	s=arc-20240116; t=1721055544; c=relaxed/simple;
+	bh=XPZ/2x7i9TXdlGROA0TXoMHVzstSMa8V+va0EHzXE6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A2tkmWA9TUtQ//rJeOamBAlLPRfp2cyTtdN94U8j+U2MkXeq3ixft/YfObwdBj3D8KTt3EZdJpZ6SmKd9j/SPCQWN37/UIkwLsOYte65+f/k6SY9Zlbp4Cit6dgem8jYJCct5vmuV3h45qhIsf/YBx2FSwshem7QjGBlhJPHnZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 46FDxBZm053972;
+	Mon, 15 Jul 2024 22:59:11 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Mon, 15 Jul 2024 22:59:11 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 46FDx6ui053939
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 15 Jul 2024 22:59:11 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <01ef97b5-33a5-4c79-a0cf-4655881f106c@I-love.SAKURA.ne.jp>
+Date: Mon, 15 Jul 2024 22:59:06 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] net: Split a __sys_bind helper for io_uring
+To: Matus Jokay <matus.jokay@stuba.sk>, Jens Axboe <axboe@kernel.dk>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>, io-uring@vger.kernel.org,
+        netdev@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20240614163047.31581-1-krisman@suse.de>
+ <20240618174953.5efda404@kernel.org>
+ <68b482cd-4516-4e00-b540-4f9ee492d6e3@kernel.dk>
+ <20240619080447.6ad08fea@kernel.org>
+ <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
+ <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Sat, 13 Jul 2024 20:02:49 +0200 Andrew Lunn wrote:
-> maybe you can remove all these as well?
+On 2024/07/15 21:49, Matus Jokay wrote:
+> Please fix io_bind and io_listen to not pass NULL ptr to related helpers
+> __sys_bind_socket and __sys_listen_socket. The first helper's argument
+> shouldn't be NULL, as related security hooks expect a valid socket object.
+> 
+> See the syzkaller's bug report:
+> https://lore.kernel.org/linux-security-module/0000000000007b7ce6061d1caec0@google.com/
 
-+1 seems like a good cleanup (after the merge window is over)
+That was already fixed.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-next&id=ad00e629145b2b9f0d78aa46e204a9df7d628978
+
 
