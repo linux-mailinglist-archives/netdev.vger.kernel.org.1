@@ -1,128 +1,243 @@
-Return-Path: <netdev+bounces-111581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246F59319B5
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B65C9319D2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C29A81F2520A
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:42:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6591C21C33
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787E24D8C6;
-	Mon, 15 Jul 2024 17:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73EAB4E1C8;
+	Mon, 15 Jul 2024 17:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMZaXl0d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPf3uUwk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F74364D6;
-	Mon, 15 Jul 2024 17:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE64B22318;
+	Mon, 15 Jul 2024 17:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721065314; cv=none; b=YmlXDbNjZodKXWqrMS6/r6xkPg0shopPBlkVwNGH0OsL8lll/YfwJjeiabbKrdGbK++7YcbefaHexS89DI5d/iEA2Y2AlKi0TbnPPxSBmSppXg3wABK5a70b7S9wiDJYnYurJQlb8VzOl9X8d28PL3IVK+Ni/FCS8vae6NZVQmY=
+	t=1721065821; cv=none; b=JfRrp6nTF4a/KIm7669BE0/AbRZagrgm3qNNW7XfwyyrrlE+tZR9Q9IWBVOpGqvZaNG9jaC7B5IO1oYZhQ17tqaehJVQjEaBxCdT6gdz3pC7M1dazlmqDxyNFJ6uV63GwS13DY0gwYrJS7YAYKF9eve0syFMj7Y/+eJxGNjliP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721065314; c=relaxed/simple;
-	bh=b42JSvuywZe+7wglo+K7VO6xLJINq/9FZ8Q+hh/Syfw=;
+	s=arc-20240116; t=1721065821; c=relaxed/simple;
+	bh=4+i1UsL97O1JksI3ZE8/xZjUcQ+JJkVk0QoBSx0+CDY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rLB8xHymDizbyBYx8lqxKrLMECvDwMnzEaQvl2T6WEYiRx0fG7b9ZcSyfgQEvuF7FzEfvCxAT6Pc7CZE2OwBddulgjTLb2HdmLAqnRtjE0++Bm9sYd+2p4iUzGBD/TW8PX2ioZtx6TMzO2Glc7tEuiI30twU/bs74BJqoJ/GQhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMZaXl0d; arc=none smtp.client-ip=209.85.219.172
+	 To:Cc:Content-Type; b=diM0HTuVpubLEeGCPE7xSBzUjClDiLnh9e0f7PuJ9hKqXqJ++2aoRGahkPG70MFrukzHI/X3WeSgVr3Msg2rp4jLlZutGPlHXnxG9lqszVCnjZ5+VVJLvb7aKdHkB+jWpXrlDX+lV4e2kLmsUC+/S18bBZPVhcYPiNpP1Yu7wbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPf3uUwk; arc=none smtp.client-ip=209.85.222.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e04196b7603so4633048276.0;
-        Mon, 15 Jul 2024 10:41:52 -0700 (PDT)
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-8100eb38a99so1267323241.2;
+        Mon, 15 Jul 2024 10:50:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721065311; x=1721670111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xEV5pedtY2Y2FeTPODdvM+/ZX+4nHrD94jMR2RlwhT4=;
-        b=YMZaXl0dP4AHdLxHhS8hluEiCfkZ/a9t9Zw6eN6kNG4YoMz/njoeJW6X6jau9yGeFj
-         ypjOOMS2OixEIFNUqqYeFFxd52KntJWDfoBSJFg7ii+6Ts9jgUo9O1guIVGvU2sT+3dD
-         jrsMwuKDdY90BowjBlltmx/CBFi3uxr76VF8RjKt7GJ1y94NCfArnv65awV27ZstDrgE
-         qfb4vF4EfeU9xu0xRpCXacSevydh7SzQn/1N82qMRROJPQVyZPUEhOskXpn3LyedMJ6d
-         /wxnd8/tiJYoLKnIGgMhy/3rWYeR1U8HxSuDlBYvRbE9JNA1NbbpHiomLSPVRJz0KAbt
-         ImFw==
+        d=gmail.com; s=20230601; t=1721065818; x=1721670618; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ERxQCYashp1sXDomDBYo1CjjiKALhd05RJix5zIQ6dQ=;
+        b=nPf3uUwkHT76rwxMGL1dpUirip6Ua/Bsy9F4r3ADXyUSqm+Euoa1qzGWelg4itgU7o
+         1JCUa1/fAzgYihModhQDaWk8iOhcsvJtMQz9pdgeT4KZxWGUx7gYQpVAwyC1ERQf7roH
+         773RTCCr1SayqCipWg1UQZubslzFVAKygOs81IqUIcD+fSpVMGgshrlgKsKwnfmMOYlA
+         i3BVLIQLRFx2IpTGXZW9G1PIU3di0zfP/0eclZs8SOPnvEpXh9D9dMxfzIwAT4Qje9pV
+         8UNcxKtRXcLpL0oka7pUsigNvvpzNidTleqL2QPihV6kiqrqnRGj9QcyEvJcIloLStsE
+         /j8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721065311; x=1721670111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xEV5pedtY2Y2FeTPODdvM+/ZX+4nHrD94jMR2RlwhT4=;
-        b=MPach5nFH8Ra8LlXSiafe/FHydsHLOSmBNAfaLcoavHWB6Ev+U8bTX+0Z8trE+Wcdu
-         dQ7Iceak0idJkX6YqX2rvYsP5Mh1Ae1pRbN+EkkEawFYBcVYSWgbdcQSXt4vnIdPDpTe
-         dgT6/gLKUFm+3rm1lj1Oprk77B0G9lahN65mCK0Scw7zptizd0ADKxq6Ev/ga2v3QK3a
-         4tJK6Rz9UIhstwaXu5ASMWV6Ii6Bnly7p7EwkKkSRkTINQigriNQKQZqn+/hs7Wlgqm/
-         PlDyJq/twzWVmE7IJDvVkZjyn7SFco6SyLqy4ErsuqIL3ixX3k/GCEEB4OM38HEYIpG7
-         a7bg==
-X-Forwarded-Encrypted: i=1; AJvYcCVoh8jh6pncCfudksKsVPVD5ZaylurJ67ym19B/fUN8fsja1KG2AkScx2agseP5a6VX6rXJTMzge78CFFQSBqxdpgFPbM21QX7/6ctVar+qVcb1oqhVXrlra6kMHMidkGosxIPL+1xsFRi/qgmZ6k2NOa095j+9+hc9lXa2moOmEjy6FYIw59Vj5d/N+VvnL7H3J01bFErWXJEYQK55fNgcDnaBMwUPStrQ+qZA
-X-Gm-Message-State: AOJu0YyCfVrfAfSbqAibVEnEXdg2+Cac3n7HapZcWZ+aMxmwXt4epPBj
-	242saFqI5Jh7Sr2uxoA9CE9EBN/Q0l9G91Mq/RuZS2NFOKRkJXpPeosrlN1l42uSCtexhPviiaL
-	a1c1kIGOwsmKmoRtudCAJpNmFJ5k=
-X-Google-Smtp-Source: AGHT+IHIN6/eBpniYpqerz8db8xwfOTyovfSRjDMk7JvYfmegjzpFKzgDJtBVYAnhNHbomijkTgVUKTNkbIU54dFkr4=
-X-Received: by 2002:a05:6902:702:b0:dca:c369:fac2 with SMTP id
- 3f1490d57ef6-e05d3aae365mr381626276.3.1721065311277; Mon, 15 Jul 2024
- 10:41:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721065818; x=1721670618;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ERxQCYashp1sXDomDBYo1CjjiKALhd05RJix5zIQ6dQ=;
+        b=Zc8uuZd7e8K3Tj9bL0UYjnnnkK+kx+aX0Lw45y0IZ7H3klS99j9KlkS7cYyUb2/lHi
+         x+C9ZADd+RmgAPHmJDdr8P+1SIsLy48eGH/qQAZYMLAlcukXpBP149ZoEvudbIQlzfDN
+         Gf1nBbe9EZLvviIQqUQh0iAVSFm+XbLo5MncPC2jAsmwrgURitchoyEDQLSFYcLkRKU+
+         BPiKC6GFn4iMMhg5wMdqAe38fSvNMIygKQxk6nkh+/OqlyKMcALFyNOgwsLuJoCR2Xl5
+         +ej/yBPWPARLyOuhPSaB9ppELzNm05qFGPfG9OTJg/srmTjW5ERqh/6Q5K6ycGfLBU9Z
+         m8dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRneKzmhM0t3W09fqhs57qZqh2g5iEZaCn5UvBTZVSTJ5Pn4Ejf8cNSn8HFfQZ6a7FkJBeNfjtba8bEYlvr0qC+/oHC/EnVIgDg10lFOE3pGd1Gptyywh9ejfV11G8FDRvws8rl34iZYi7vyq/E6kvGZI4ZPwITMcTrhMZiQDFGw==
+X-Gm-Message-State: AOJu0YwkqTwgUQrXn8g/S1QwlnDK1ESqsbWdWBTpSNc+Cx35UI29PeY9
+	LQRrHCNJkR0biUDCa33RiqPwObXxDdNrI5NsBi2ueyw6GSGmWsObcZSQEx1L2qj58+KgNEoDY08
+	4waYU0KklTtkaIJSc4p4sWtdyBl8=
+X-Google-Smtp-Source: AGHT+IHKfckH9egHQidXByx58hTCytqVIN7acGBSHE2qTxXBij6F29KNRiJ+g4pQoQbZW58b4wWt7Ews7b39sGYS90c=
+X-Received: by 2002:a05:6122:3127:b0:4ec:f6f2:f1cd with SMTP id
+ 71dfb90a1353d-4f4cd2c2e14mr813292e0c.9.1721065818535; Mon, 15 Jul 2024
+ 10:50:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710212555.1617795-4-amery.hung@bytedance.com> <85d64656-d8ff-1133-175f-b12f4913fccf@salutedevices.com>
-In-Reply-To: <85d64656-d8ff-1133-175f-b12f4913fccf@salutedevices.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Mon, 15 Jul 2024 10:41:40 -0700
-Message-ID: <CAMB2axN5jJ_uabb-rd=wdcbX9DQYvENxQjK_7ZWhM60+5fVLKA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 03/14] af_vsock: support multi-transport datagrams
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org, 
-	bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com, 
-	kernel <kernel@sberdevices.ru>
+References: <20240621050525.3720069-1-allen.lkml@gmail.com>
+ <20240621050525.3720069-14-allen.lkml@gmail.com> <ba3b8f5907c071e40be68758f2a11662008713e8.camel@redhat.com>
+ <CAOMdWSKKyqaJB2Psgcy9piUv3LTDBHhbo_g404fSmqQrVSyr7Q@mail.gmail.com> <7348f2c9f594dd494732c481c0e35638ae064988.camel@redhat.com>
+In-Reply-To: <7348f2c9f594dd494732c481c0e35638ae064988.camel@redhat.com>
+From: Allen <allen.lkml@gmail.com>
+Date: Mon, 15 Jul 2024 10:50:06 -0700
+Message-ID: <CAOMdWSKU_Ezk-15whDnNQKK_is2UtBOY59_4fPfKZE0-K+cB6w@mail.gmail.com>
+Subject: Re: [PATCH 13/15] net: jme: Convert tasklet API to new bottom half
+ workqueue mechanism
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: kuba@kernel.org, Guo-Fu Tseng <cooldavid@cooldavid.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, jes@trained-monkey.org, 
+	kda@linux-powerpc.org, cai.huoqing@linux.dev, dougmill@linux.ibm.com, 
+	npiggin@gmail.com, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, 
+	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com, tlfalcon@linux.ibm.com, 
+	marcin.s.wojtas@gmail.com, mlindner@marvell.com, stephen@networkplumber.org, 
+	nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, 
+	lorenzo@kernel.org, matthias.bgg@gmail.com, 
+	angelogioacchino.delregno@collabora.com, borisp@nvidia.com, 
+	bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com, 
+	louis.peens@corigine.com, richardcochran@gmail.com, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-acenic@sunsite.dk, linux-net-drivers@amd.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 15, 2024 at 1:25=E2=80=AFAM Arseniy Krasnov
-<avkrasnov@salutedevices.com> wrote:
+> > > > @@ -1326,22 +1326,22 @@ static void jme_link_change_work(struct work_struct *work)
+> > > >               jme_start_shutdown_timer(jme);
+> > > >       }
+> > > >
+> > > > -     goto out_enable_tasklet;
+> > > > +     goto out_enable_bh_work;
+> > > >
+> > > >  err_out_free_rx_resources:
+> > > >       jme_free_rx_resources(jme);
+> > > > -out_enable_tasklet:
+> > > > -     tasklet_enable(&jme->txclean_task);
+> > > > -     tasklet_enable(&jme->rxclean_task);
+> > > > -     tasklet_enable(&jme->rxempty_task);
+> > > > +out_enable_bh_work:
+> > > > +     enable_and_queue_work(system_bh_wq, &jme->txclean_bh_work);
+> > > > +     enable_and_queue_work(system_bh_wq, &jme->rxclean_bh_work);
+> > > > +     enable_and_queue_work(system_bh_wq, &jme->rxempty_bh_work);
+> > >
+> > > This will unconditionally schedule the rxempty_bh_work and is AFAICS a
+> > > different behavior WRT prior this patch.
+> > >
+> > > In turn the rxempty_bh_work() will emit (almost unconditionally) the
+> > > 'RX Queue Full!' message, so the change should be visibile to the user.
+> > >
+> > > I think you should queue the work only if it was queued at cancel time.
+> > > You likely need additional status to do that.
+> > >
+> >
+> >  Thank you for taking the time out to review. Now that it's been a week, I was
+> > preparing to send out version 3. Before I do that, I want to make sure if this
+> > the below approach is acceptable.
 >
-> Hi! Sorry, i was not in cc, so I'll reply in this way :)
-
-Ope. I will copy you in the next version.
-
+> I _think_ the following does not track the  rxempty_bh_work 'queued'
+> status fully/correctly.
 >
-> +static const struct vsock_transport *
-> +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
-> +{
-> +       const struct vsock_transport *transport;
-> +
-> +       transport =3D vsock_connectible_lookup_transport(cid, flags);
-> +       if (transport)
-> +               return transport;
-> +
-> +       return transport_dgram_fallback;
-> +}
-> +
-> ^^^
+> > @@ -1282,9 +1282,9 @@ static void jme_link_change_work(struct work_struct *work)
+> >                 jme_stop_shutdown_timer(jme);
+> >
+> >         jme_stop_pcc_timer(jme);
+> > -       tasklet_disable(&jme->txclean_task);
+> > -       tasklet_disable(&jme->rxclean_task);
+> > -       tasklet_disable(&jme->rxempty_task);
+> > +       disable_work_sync(&jme->txclean_bh_work);
+> > +       disable_work_sync(&jme->rxclean_bh_work);
+> > +       disable_work_sync(&jme->rxempty_bh_work);
 >
-> I guess this must be under EXPORT_SYMBOL, because it is called from
-> virtio_transport_common.c, so module build fails.
+> I think the above should be:
 >
-> Thanks
+>           jme->rxempty_bh_work_queued = disable_work_sync(&jme->rxempty_bh_work);
+>
+> [...]
+> > @@ -1326,22 +1326,23 @@ static void jme_link_change_work(struct
+> > work_struct *work)
+> >                 jme_start_shutdown_timer(jme);
+> >         }
+> >
+> > -       goto out_enable_tasklet;
+> > +       goto out_enable_bh_work;
+> >
+> >  err_out_free_rx_resources:
+> >         jme_free_rx_resources(jme);
+> > -out_enable_tasklet:
+> > -       tasklet_enable(&jme->txclean_task);
+> > -       tasklet_enable(&jme->rxclean_task);
+> > -       tasklet_enable(&jme->rxempty_task);
+> > +out_enable_bh_work:
+> > +       enable_and_queue_work(system_bh_wq, &jme->txclean_bh_work);
+> > +       enable_and_queue_work(system_bh_wq, &jme->rxclean_bh_work);
+> > +       if (jme->rxempty_bh_work_queued)
+> > +               enable_and_queue_work(system_bh_wq, &jme->rxempty_bh_work);
+>
+> Missing:
+>
+>           else
+>                 enable_work(system_bh_wq, &jme->rxempty_bh_work);
+>
+> [...]
+> > @@ -3180,9 +3182,9 @@ jme_suspend(struct device *dev)
+> >         netif_stop_queue(netdev);
+> >         jme_stop_irq(jme);
+> >
+> > -       tasklet_disable(&jme->txclean_task);
+> > -       tasklet_disable(&jme->rxclean_task);
+> > -       tasklet_disable(&jme->rxempty_task);
+> > +       disable_work_sync(&jme->txclean_bh_work);
+> > +       disable_work_sync(&jme->rxclean_bh_work);
+> > +       disable_work_sync(&jme->rxempty_bh_work);
+>
+> should be:
+>
+>           jme->rxempty_bh_work_queued = disable_work_sync(&jme->rxempty_bh_work);
+>
+>
+> >
+> > @@ -3198,9 +3200,10 @@ jme_suspend(struct device *dev)
+> >                 jme->phylink = 0;
+> >         }
+> >
+> > -       tasklet_enable(&jme->txclean_task);
+> > -       tasklet_enable(&jme->rxclean_task);
+> > -       tasklet_enable(&jme->rxempty_task);
+> > +       enable_and_queue_work(system_bh_wq, &jme->txclean_bh_work);
+> > +       enable_and_queue_work(system_bh_wq, &jme->rxclean_bh_work);
+> > +       jme->rxempty_bh_work_queued = true;
+> > +       enable_and_queue_work(system_bh_wq, &jme->rxempty_bh_work);
+>
+> should be:
+>
+>         if (jme->rxempty_bh_work_queued)
+>                 enable_and_queue_work(system_bh_wq, &jme->rxempty_bh_work);
+>         else
+>                 enable_work(system_bh_wq, &jme->rxempty_bh_work);
+>
+> I think the above ones are the only places where you need to touch
+> 'rxempty_bh_work_queued'.
+>
+>
+> [...]
+> >   Do we need a flag for rxclean and txclean too?
+>
+> Functionally speaking I don't think it will be necessary, as
+> rxclean_bh_work() and txclean_bh_work() don't emit warnings on spurious
+> invocation.
+>
+> Thanks,
+>
+> Paolo
+>
 
-Right. I will fix it by exporting vsock_dgram_lookup_transport() in patch 7=
-.
+Thank you very much. Will send out v3 later today with these changes.
+Note, it will be as follows, enable_work() does not have workqueue type.
 
-Thanks!
-Amery
++  if (jme->rxempty_bh_work_queued)
++                 enable_and_queue_work(system_bh_wq, &jme->rxempty_bh_work);
++         else
+-                 enable_work(system_bh_wq, &jme->rxempty_bh_work);
++                enable_work(&jme->rxempty_bh_work);
+
+Thanks,
+Allen
+>
+
+
+-- 
+       - Allen
 
