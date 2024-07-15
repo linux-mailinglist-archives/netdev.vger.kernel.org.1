@@ -1,117 +1,121 @@
-Return-Path: <netdev+bounces-111463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6F693129C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:50:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA6E931305
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656A81F230F9
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 10:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87CD328323E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2684F188CB8;
-	Mon, 15 Jul 2024 10:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lMOgYdwi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E6F1891D6;
+	Mon, 15 Jul 2024 11:25:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7828C18411C
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 10:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8021891B7;
+	Mon, 15 Jul 2024 11:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721040652; cv=none; b=WH0UqWskF8bzOdLeVLcxbAT1mD1rGr9e5NTHzmD5M4lBK9rw/daRDQgCBffY8Fh0QPzFuNkMMwugNwQKdzZHHKHCpOS4MSGxrzYbpyN9yKB0XM19DqG2XwWXUuSl/W6f7RZP0p7MQnkqBW4H+Wp5xO5+SAjwnFCsApJA0smsunI=
+	t=1721042712; cv=none; b=lDG+f86oGwLSt8zJANefU/H+KbE+D1lE95E/8k9ad+NeWH8xFwj3XD5S4Jml490n406qHp2D7Wk1jVMSFe+nu7R/bkv82aC/p/Ie8GFpKWm9ZDskaPJM8Px8GXgr6joHwU3m62C/iWCVD9iu1r0AjvZ8GSh/Oa/eMkzM8CHdCtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721040652; c=relaxed/simple;
-	bh=X+n2EA+PpcwiVRODe8SXcZ/ebefjWKERhrirkSfG7uk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eZ2bUw//wtCNX0LayXQaoQU7oFEFZWwHniCjGXgoJ6RG0INidVGJnG00AdT/ppAvkiTyouWP6KMY9XlBUDK4tXpbTLTzZZhDX4Ol3fdTY9BBVJnuqmzyfDaYowZedRaQJh+/1YLNt7FnOVeOJOblrx3GfhsKGQKSz8t/wZgDCPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lMOgYdwi; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721040651; x=1752576651;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=X+n2EA+PpcwiVRODe8SXcZ/ebefjWKERhrirkSfG7uk=;
-  b=lMOgYdwiviHYq0ekw9xzbufGM0bb99oPf96w4scUjX0ubl3rTkTF1Z6n
-   uCXCYlbt0YhZzSUNS3El6RAhJNLzUKF/rxmAZmVhFCnbkVXRBVC8FpLF7
-   DO6E4T15ZhIQdiPDfLom0HRoVNHXD1Dp9vSeFdq8mtWZff2wRwKzpP4+N
-   iZkfS3Z0lB1HlDuhL3gesnSD+Ol33Jp70fMxOVctcZon0ieVcKkDke5wJ
-   Ocgpj2nRns1UrM/jHhSI4MawlcnZLsIldtyjqzpNr3BhxXAV69gtlBJvD
-   BIBVATreWkDEzpyOaQKtY2NU3b+49kTNR/ucX7iOmCV7AtP0l53zhSizP
-   w==;
-X-CSE-ConnectionGUID: mrPApUOTRFmh2wNwwT56WA==
-X-CSE-MsgGUID: 03EIUMcGQRi0JpAdS9l5/A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11133"; a="18609046"
-X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="18609046"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 03:50:23 -0700
-X-CSE-ConnectionGUID: 64AKA/R5RvWUq4G7tf1YtQ==
-X-CSE-MsgGUID: Cf9nDKKQS6mp6IT4vZkPcA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="49545174"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by fmviesa009.fm.intel.com with ESMTP; 15 Jul 2024 03:50:21 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v1 2/2] ice: Skip PTP HW writes during PTP reset procedure
-Date: Mon, 15 Jul 2024 12:48:45 +0200
-Message-ID: <20240715104845.51419-3-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240715104845.51419-1-sergey.temerkhanov@intel.com>
-References: <20240715104845.51419-1-sergey.temerkhanov@intel.com>
+	s=arc-20240116; t=1721042712; c=relaxed/simple;
+	bh=ty+USuCasgyD0q5WV6y+xqpiIL59dUuUhJrHdOnICuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LM4x19/myLF5avv/x5Hw6d4OwNJ4svedEygwIZ6K1KmNwnsUhj7rb+SJxn6edqeSK5OB2xyRzzQsG0P6mO4yXNqdURimcP4pIXYc9NVAZVzYUiR1FuRNqY6Ehv7tDGC6m0od4AZWwfU3AjKAZpVNBsku+RdiOmbiRwijL/YPD+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2eecd2c6432so57432761fa.3;
+        Mon, 15 Jul 2024 04:25:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721042709; x=1721647509;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nIjlZKoODIvZ5ta3ient2GVc/jl/vGg+wUu4XZXyR/w=;
+        b=WVjtXsBESy0UEByyNgjK1qOlaEcvzaBP1YlHvA5aq7wiRLSYGDe7cTJiWUWob+6rJV
+         Ylrilhdy9zz8pUeeL7gR+doPO8R0eFId8zX18p8uawgUw8Tf2lIEgoUYYlVbrRQM5pB9
+         PqpuBeLEqqVBhlNheu19a/4GyzHp/BcmKc0BGrrIMZK3umIwfZQB6Med6pNAeDp+LtsZ
+         os4fPl4dJjc57PakK7a7XJpVrq5FYLGczkOaLvahHi2eMxGgZTGtMv/rvSbCi617iKDV
+         Hzdw4t/utcspr88Azu1KsZ42k4PFlOOakxWItID38ycN4wWQGPuoW6p6dHSIPY74u9cs
+         J0ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVezM+NC3Qp+U008rQDOvt8awahf01jYx6g2EEuYoMx2y0pezkf0PLSuP4Is31d2AoWXBgNjySawpwet0rZQF+qa5Ur688RhjOfI2S9WtYfQCZLRJELK9JSspPlp85+qL+E/aEE
+X-Gm-Message-State: AOJu0YyL0sHbB6Og6AZkpU5XAMZPZpG/+RfJtx69VffZe0QGarLFHHW4
+	TzY66IUffVCOD9QXK8Jchnb2v5GIXxsJ1ZjEZ5iAd3b2KPliyzHNgQ44Jg==
+X-Google-Smtp-Source: AGHT+IG78sUAzx9I4a7vE8/3T/SQW4az1utlpNNwNzPZzbTFoS9BD8x4sD9BV4nV2NExq/Pw+CcMGQ==
+X-Received: by 2002:a05:6512:36d3:b0:52c:daa4:2f6a with SMTP id 2adb3069b0e04-52eb99d670dmr12258120e87.64.1721042709246;
+        Mon, 15 Jul 2024 04:25:09 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc820fb5sm204451066b.212.2024.07.15.04.25.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jul 2024 04:25:08 -0700 (PDT)
+Date: Mon, 15 Jul 2024 04:25:06 -0700
+From: Breno Leitao <leitao@debian.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rbc@meta.com, horms@kernel.org,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+Message-ID: <ZpUHEszCj16rNoGy@gmail.com>
+References: <20240712115325.54175-1-leitao@debian.org>
+ <20240714033803-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240714033803-mutt-send-email-mst@kernel.org>
 
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Hello Michael,
 
-Block HW write access for the driver while the device is in reset to
-avoid potential race condition and access to the PTP HW in
-non-nominal state which could lead to undesired effects
+On Sun, Jul 14, 2024 at 03:38:42AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jul 12, 2024 at 04:53:25AM -0700, Breno Leitao wrote:
+> > After the commit bdacf3e34945 ("net: Use nested-BH locking for
+> > napi_alloc_cache.") was merged, the following warning began to appear:
+> > 
+> > 	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
+> > 
+> > 	  __warn+0x12f/0x340
+> > 	  napi_skb_cache_put+0x82/0x4b0
+> > 	  napi_skb_cache_put+0x82/0x4b0
+> > 	  report_bug+0x165/0x370
+> > 	  handle_bug+0x3d/0x80
+> > 	  exc_invalid_op+0x1a/0x50
+> > 	  asm_exc_invalid_op+0x1a/0x20
+> > 	  __free_old_xmit+0x1c8/0x510
+> > 	  napi_skb_cache_put+0x82/0x4b0
+> > 	  __free_old_xmit+0x1c8/0x510
+> > 	  __free_old_xmit+0x1c8/0x510
+> > 	  __pfx___free_old_xmit+0x10/0x10
+> > 
+> > The issue arises because virtio is assuming it's running in NAPI context
+> > even when it's not, such as in the netpoll case.
+> > 
+> > To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
+> > is available. Same for virtnet_poll_cleantx(), which always assumed that
+> > it was in a NAPI context.
+> > 
+> > Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
+> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> though I'm not sure I understand the connection with bdacf3e34945.
 
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Fixes: 4aad5335969f ("ice: add individual interrupt allocation")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 85b19e94e2ed..1f365bd6f525 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1420,6 +1420,10 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 	/* Update cached link status for this port immediately */
- 	ptp_port->link_up = linkup;
- 
-+	/* Skip HW writes if reset is in progress */
-+	if (pf->hw.reset_ongoing)
-+		return;
-+
- 	switch (ice_get_phy_model(hw)) {
- 	case ICE_PHY_E810:
- 		/* Do not reconfigure E810 PHY */
--- 
-2.43.0
-
+The warning above appeared after bdacf3e34945 landed.
 
