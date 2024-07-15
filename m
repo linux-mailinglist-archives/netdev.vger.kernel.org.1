@@ -1,258 +1,278 @@
-Return-Path: <netdev+bounces-111546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90416931808
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:03:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63F4093180C
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCA6FB223D9
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:02:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8D5CB226FF
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A490B134DE;
-	Mon, 15 Jul 2024 16:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3033134DE;
+	Mon, 15 Jul 2024 16:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="JX/iFYTN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zgq/i6MO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A7FE556;
-	Mon, 15 Jul 2024 16:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721059374; cv=fail; b=VGAdhQZZm4SXfJ0P85t10khGs6eNPJB2hfeWSMqRInyMbfWzAHcXXt0/9Un0qq0C+uYojMdgcbpOHtHNq5iM/hmLIq+mtoC3QINm4hh4T+nxZF5+HfBzWvuvPU2IMyriPL2uzNWO3hahOpjrYq42JL04F97jMwR+htfrAU0Np+M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721059374; c=relaxed/simple;
-	bh=KXX6JCN6rmRoZrZQbDKPe1Pzei4PXaMXdst0pSzs7d0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uY4NTPV4EA67v1f+lCljIFm//XB/Xrvurb0IUOplFanMXHPVHuuLgO40VOpGmHTAoKNtTNlRBEPTPH4K6jf6B/FKsAs2u6p8/v2OdBmdm/n5XKKEA0V3nL/Lw/uoS4bi6pW85Css6TybXYnodM4csFAl/RyE0wAuyEGADrB44cA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=JX/iFYTN; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46F94ok0031360;
-	Mon, 15 Jul 2024 09:02:27 -0700
-Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2171.outbound.protection.outlook.com [104.47.73.171])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40c9p5uwpr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jul 2024 09:02:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iJ1Lp+oYCvBjDXOpEQ9K4591IuI+XI7iuLyxE+kFOmZfPjbPS2ejeySiGCLTok2m5rUqBPE58a+8IxrCoeoOaNZTN9E0b5hmbDTRtSElyvehhbM4dylKNhKg4aHs+/Nm4g/nWhJC1ljdUlsY2JuqS6iLkVrQPey0deCzjKpwcDNW9GgYXGsH5nTAXdziNUn6aDBW94Dd/L1jFMxIDB/MrJ8qaS0CYmEQp6WrWUYIRashrNmHitu+FHUqj5Yezh8tngJYP4MMKHGvC+YjshFtkqeVixqJ3+rJDwP0g/tVTlJyctS96aJ2Eo3gA3wYgkmt6J+4RzCazV4CWVw+zKcMgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KXX6JCN6rmRoZrZQbDKPe1Pzei4PXaMXdst0pSzs7d0=;
- b=nwmGVWvMXpdR6yc3oQYV9BXcvLXA2nWEGqE0hAIP6cIvwXgRxhiP2Je6moDAGGEWCQFEoPxN4Qr+tp53u8rovRzgriO0ixbgyfyN4sB1vr9jqdIuiubXOS/Vblmvg/thKuRWZ1rhbcBBT+7iZIzUszU9HElsbkYr6zJyoTtF1ZmeFRtHYsam1f+T/KgsiQXEyebxYoanmB9Q+Bj0/sDsfX4C5uyN3sAbGFrEvZjbLxIfY4Clm2zlAnywOrNq3RNnMIyEUHlSiCxdJCB1HwT0m3BRLRv23jWFRaYATi9b31we0KLEs1FqoH4Vgijfttk5MLXSTlUOttizELhqhnvCaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KXX6JCN6rmRoZrZQbDKPe1Pzei4PXaMXdst0pSzs7d0=;
- b=JX/iFYTNoE6rz+JnlXW56N06+yt+f1EshMD0WzyHC/bIlfS8lo2B94CGG2DEuRlS+5L5ft+GN04nyHEDPS1oWuXVkN5in3LkpuSPswmsRgT7+asZyy1rci7PgiPGxI/O0Y/9Tta7io6HAZT3YCA6dss26gAvzXBCbnGxv4b9ceA=
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
- by CO6PR18MB4403.namprd18.prod.outlook.com (2603:10b6:5:35d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
- 2024 16:02:24 +0000
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::e225:5161:1478:9d30]) by BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::e225:5161:1478:9d30%4]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
- 16:02:24 +0000
-From: Sai Krishna Gajula <saikrishnag@marvell.com>
-To: "nikita.shubin@maquefel.me" <nikita.shubin@maquefel.me>,
-        Hartley Sweeten
-	<hsweeten@visionengravers.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Andrew Lunn
-	<andrew@lunn.ch>
-Subject: RE: [PATCH v11 17/38] net: cirrus: add DT support for Cirrus EP93xx
-Thread-Topic: [PATCH v11 17/38] net: cirrus: add DT support for Cirrus EP93xx
-Thread-Index: AQHa1tBhqcrYnL86OEOoC/iw79eWpQ==
-Date: Mon, 15 Jul 2024 16:02:24 +0000
-Message-ID: 
- <BY3PR18MB4707D450930467656DDFA58DA0A12@BY3PR18MB4707.namprd18.prod.outlook.com>
-References: <20240715-ep93xx-v11-0-4e924efda795@maquefel.me>
- <20240715-ep93xx-v11-17-4e924efda795@maquefel.me>
-In-Reply-To: <20240715-ep93xx-v11-17-4e924efda795@maquefel.me>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|CO6PR18MB4403:EE_
-x-ms-office365-filtering-correlation-id: 6964970d-733d-4bf5-563d-08dca4e78481
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?TEJXdnhveHRGZHhjVDF2M2tZNzBZR1NweXFWeElHTTQzbmhGSU1LWUNJQytn?=
- =?utf-8?B?RFN0VzU4b0FDb09TU0ozckhub0hIRWhqMWhsNGlUMTRaNU8rNy9YVVlpeTdm?=
- =?utf-8?B?Skc0bFVIM1lqWU1ZQnFrL3h2WVdEYjE1b3ZEaUJEQzBXTWh2bjdPQWxJcUVP?=
- =?utf-8?B?QkdvcXNpSGRkOStqUjF4cUFLWXBxWDRteUNiUUpPbUNQMm9SalpxK0pJNGty?=
- =?utf-8?B?YklUdFVQTTFDdC9iMFA5VnhKbWNFaVo2NWVZTnBDbEdlWlZFcmlsK21OUkdE?=
- =?utf-8?B?SVBPVWxBeER3WjhVSlZhcEthRUNJSHZTVGU1eXBkOWpId2hxMU5yL0h6dFJ2?=
- =?utf-8?B?WmtQUjNXZVFyNlVZVUpqSmlaQVVGOU51ejlRaWgxOWVmWm50YzFkS3RsWjF0?=
- =?utf-8?B?dHpsUkVCQVNqMFB2N2ZVb2hSQ3BVcEpUL3BVeG5NSXNrb2NzK1RPUjN3ZWtW?=
- =?utf-8?B?NUpZWnVhdDFEcnVhL0grV09Hc1p6dVU0bzc3Wmh0ODVabnc3UllMaGZJOUJP?=
- =?utf-8?B?UFAvdUtVbWsxU0pQbHJLRk5UNWtBdTVZOFR6L1d2cThnSFZObXIyRzRzb2ZL?=
- =?utf-8?B?Ujg2elI5ZGdoTk1ycWkyRGMzK1RnYllrN1h6K1MxSFRBNkVtWVlJMnFVUnBW?=
- =?utf-8?B?MVFYSDAzZnlOWE9OaHNsQ1ZKNHRlUWtodnVLYms4NzNyZjYweTRoZHRNQjA3?=
- =?utf-8?B?YkNtdDVHcithSlJZZm5rWU5yV1FIZ2JGd0NHT2hIdW5heGtEaWg0aE5BdnpG?=
- =?utf-8?B?NEtlUVlzTE5lUnlPc0QzeE8xTys5blBzZHZUVmtTNWpmM2xSRnlDZjk2ejQw?=
- =?utf-8?B?Q3EyOExIVTFDbkl5VTRYMWEvWnU0YTJGKytCTEFlK3VKNEVxRHVSbXcwM3M2?=
- =?utf-8?B?UnVOMkZEQmZMd1pCdWN4WjlXTjZENDRmTlpTbzZMd0dZWjhubDU5VzZLZjAx?=
- =?utf-8?B?Mnp2eVpPVEdZejNCQUZuRlVoSGtBSmRGNDlmK0NzejdmMnNUNE95SzAxZWxL?=
- =?utf-8?B?Q1V3V2ppdERPV0R2MVFYbEk0dGNoenpWVE84L1o3Zmt3RHR3ekJHQ3hqQkNJ?=
- =?utf-8?B?SGFlVDR6eWF1b2JFQXVDcjNjSE03UDZRTWlPK0NvWEQ0MjFPbVhxNmJoZ2xy?=
- =?utf-8?B?bXc1d0pkbDlzRk0vSU9naG9DTjRCTnp5Q3FNV0t3RGh5MjVZaVZzdW1teFRE?=
- =?utf-8?B?Qy9zWUJKUWc5VjkzUHRSaUVlYjhCZmx1aHJkOTNrUUdJZDFIZm0rbGZZQzRs?=
- =?utf-8?B?OFZPL2svTjAzSHBOVzBIaWJRb2htdDM1emhuWWRteEQ4Tnc1aFg4dm9FcWlZ?=
- =?utf-8?B?YVZJVjE5aWdQRXh2b2hxZUdBZGpyVXVsS3dFMGhrOCsrUFFibUVpWnh3K21m?=
- =?utf-8?B?ZDJYdHFnV2xOeXJZc1lUN1dFRXNYaURIK08zN0ZmM2RyMXc4VkpaQ0hWWDBw?=
- =?utf-8?B?ZENiLzlzQkNDaFFsTXFCTTdBYmIyQzFza0ZpUkJkWW5zNVI3cEF4OUppVENN?=
- =?utf-8?B?VkwvT09SVkhjdTV1a0tkQ0VrSVNNU3U3QzZFb21SQmQ5TkZuTFVDL1V2WkI0?=
- =?utf-8?B?N0p5cGxvTk91UU9mMnlmWXBTNjlybWVqcS9Mc0ppVDBQR2xycThmVzNrdWhh?=
- =?utf-8?B?dkJadThMdDRWeitNS1hxbFAzQzhOcUV1VFVSOW1rY2VXZE9qN3dES2kyUXMx?=
- =?utf-8?B?RUVwTUdMTW8zS2VZeW85eitvOStmUlM5dzYzMGYvdDBUKzV2MW43MVQ1NHlo?=
- =?utf-8?B?TmpQMy9MWGFnYjFNb0lmWHE4Mk9QclBxcElhVDJaNUR1NzN6VWNXZlgzUmhG?=
- =?utf-8?B?SnQ5V1owcnljc2hSS256N2EzSUxEK2x2NFRUeEt6UVBvK1NuMVJjaTFYM3hN?=
- =?utf-8?B?L2RxMCtYa01yTTBYNE9GUHQxS3UxV2Y0MDAxSjNqQVJNbkE9PQ==?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?enVUSzZWNUVXcUhyb3FwY05zZzhxa0lvNmZCb3IyZlZDeUtUdGRROGp3a0Rh?=
- =?utf-8?B?Z3pCTHNEb2NoR3dURkZHbit4VVRINDBWYnVLNmQ1WWY3OXR3TFRxR1lPMEJj?=
- =?utf-8?B?dlYxS1pIYnpxZkxRbEtDRTc1UFcxTnYxM2d0KzF3MzVhUzhlOVNIRklYcC9k?=
- =?utf-8?B?TzNEdlRmbzNEWmszZVFPMkNycUc5R3BYL3BDMmVvTGJMWTRyeVhUcUJOYm1J?=
- =?utf-8?B?aGZWeGJBNHkzUlRRaW5INnU0TVhQWWVsVlI1TE0yOFVHbVlONGU3WjVzZm5J?=
- =?utf-8?B?MUc2NWJMQTNpRU9SYVBxcXVJUm1taU8wcjlGSVMvMXZtekRlR3dRQnYrZ1cw?=
- =?utf-8?B?ejhuSHdrekg3eFFNb3JVRWdxbENWdUFJTmErcTEyekhtSUNYQ29XcEVrRVNB?=
- =?utf-8?B?cHZNUkp0Q1BiNitUOFIyTEVJODhTanNEaEszMUhzamJOdzl5UFB3bHNWeWs1?=
- =?utf-8?B?WEtNbnJIZDllSXo3WE9WNVY2Yll0b2FReGtWbWE2NWxvQmMzaG5YOFlEZTZo?=
- =?utf-8?B?eU41Z2U4cmdtMnlXZkM4RmtDZE1aU094cnhZZDZBemUyT3RRNW5HNWJCNWNt?=
- =?utf-8?B?K3llc0luV21odWI3RXAyTDd0Vm9kbDYwYjQ1cWdMQmQwd0d1L3B2eVNFU2xT?=
- =?utf-8?B?V2xubHBPOCtDL1R1YkMvamNobGlzOGFrbmxEYU1aYlBSaFEwS1FsaXBTdFV4?=
- =?utf-8?B?VGxOUDMrZW84QjZYZzZmVWhwazk1K0R5N2E3RzErN0Z1K1NZRCtOQ2dhb0Zt?=
- =?utf-8?B?SEJ3OGlwZm9QUXZJcjJwUWwrMisrZWF0OWNWcVllY29UZW9QVk01UzdEVHRt?=
- =?utf-8?B?RHhBQnhMVUFsTUxXdkhZNlNvdGxITnZnYldjSU9WZDRuU0VQdmltcGVKb3FL?=
- =?utf-8?B?dzZCbWt4WFRheFBFdWVsYk5YK3lSQm9lWjNTK1VqRHFFN1JuU2FxbXZlNENl?=
- =?utf-8?B?YkhEbmtaU3ovdm9tMDhYVVpWRWZUSXVZaVp4R1hRK21uMFlsNkw3T3FVK0Uz?=
- =?utf-8?B?bHo0VGtScDdGMlNwWjhENVhMeGFMb1k4V3dMekhYRllXcWJiRkhyNms1TEIy?=
- =?utf-8?B?akZDUkh3TUR0d09uMllMeDBBMmk4amNNUVNuM21sQml6cGY0SUVuOWJLK1dk?=
- =?utf-8?B?MmJPeVpnams1WkxhTUZ3N1FQSWVnWWd6NUxsbjZLM25nd0cydXR1YnVTVEUw?=
- =?utf-8?B?cksxN2Z0VTM2S2pQTHN5cW5ocHp6WWRPUk0vNktwd3VyQU9aWDdkVUJCRlEv?=
- =?utf-8?B?K1d2RWFZaEFTWUNreWtzRFpacmczWmlmelZhN0c2elpHTzlsa1BnbVZZY3U2?=
- =?utf-8?B?cUVHWnhManM0YnA1L0JQT2M1Ym50Rmc3b21TQjUwL1ZhTS8yaVNERVdMYXps?=
- =?utf-8?B?VjFIajV2M2lTb2pFSTJjTFRBblczQ2hjbTFOeFVmYlNMZENSN3gvVHRHS2Yw?=
- =?utf-8?B?ZzhVOWZJenJ5VjlVNDJiUEF0dURlenUvYkpWaW5vVXRoWG85S3NnWmtLL3ZZ?=
- =?utf-8?B?V2h4MHNkNU1sanREQU82YWNMczVtZklnU3dIZ0lDSDV2Qm9wb0ZrV2twUXNB?=
- =?utf-8?B?L1phaTZKVzBGWVBaZTBqQWhaMW4reEEyVHpQejUzekJWNFFPalFOcGxYY25x?=
- =?utf-8?B?bzU1Q2RZS2dDOE1malVZekRnYjUzd2xRRnQzVTJkNjI2dk5LZXhFL0xaMFhp?=
- =?utf-8?B?Ynl1dkpFOGVrVk1DM0ZNLzBod1dUaVBWZ3Jqd0oyZlE4SlpoL3Jaa282M1dR?=
- =?utf-8?B?TTczaUU3NitDZjUycy8rQ3kwdFpLZllIMy81WGRHQm4yTi9IOHc3aXg3c20w?=
- =?utf-8?B?STNTdC9meVZLeVR3L1R3ak43M3FmTEUvbDF5TkZ2dU9JZU5rZVBtMjVjSTY0?=
- =?utf-8?B?Y1VHMHZiTkdvbEdDM2N4M1IraVRJY3BQc3pVNnRvOFhiVUt1dkJKcm4vaU45?=
- =?utf-8?B?djRIU214YmdjU0plM01IaXByUzY0UzI1YmVCckM2MnhtVDYrd0xIUXRzMm9y?=
- =?utf-8?B?L3dRZ0Y2WGdRcFlkMFpGT0V4YklVY2cxZk4zNGpEc2dPOTZFNHBNM1lXRDJz?=
- =?utf-8?B?ZWJzQmRsZDhLMUtsVVNyQ2o4dU51QjhzcCs0QmVRVmtjbE5pWlJQQ2IvRERy?=
- =?utf-8?Q?EypdlWnv/Cze9eypOqg/13mJ+?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB941BF2B
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 16:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721059417; cv=none; b=a1m6DJLjoohNgVSIzxsTvlNoO8gzOfggbjcvUUmRWhBM+fbGeUqCuI6cp6JWK9gR2pZNAOnra/mxwYh/axnIk04oh2yU/bKYCjDUtqJtyyYFWUEzVX3Uc/7FpnQUoW0rQf93zz+9LAq+jTxK67kB04c1r1Jp7WXwZ14GnctONh8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721059417; c=relaxed/simple;
+	bh=WwiRujX6MAUUmyIavp+bDMga5jpJYalx8NnaDKPs2nY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ClAB2HGErTi5k+cJH2H4qSFCRvoGKXmr+ojBi5ihcREisdGt0vbqxCN2PYLjnUvI5LsNqaShXoBX+fU027q3/97avFOY1PeQrENoHzmYG/ItssRGkbNsTMKApF9J7vUklGkzFPontkKl8aIRDQFNUvLBIR4JVcY6TeTD/VqioOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zgq/i6MO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721059415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PQzTHcvy7rIISWd9N5iznAkcIpExB4iFhwW9JO+9a68=;
+	b=Zgq/i6MO1O0gecPUvaiNYUHCXez95KEcVXwAxd0NuedK1KJ2B/79dipCyA9VDsT86ik3C5
+	5qctf0z6SpLRDxpi/UNSmUWMp5v3X/K7ru5TbVyC5R8WcuM+aMWmSgcLMSNDNyrLOL3t76
+	WxJgP8xGE9FdPwUc8D8Z+jXob5eSubY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-428-jsMJbQCCNwW9wr8vKv3iVQ-1; Mon, 15 Jul 2024 12:03:33 -0400
+X-MC-Unique: jsMJbQCCNwW9wr8vKv3iVQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4279418eb2bso29548285e9.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 09:03:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721059412; x=1721664212;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PQzTHcvy7rIISWd9N5iznAkcIpExB4iFhwW9JO+9a68=;
+        b=vckte113Met63luaHcHkXtHRzVlIHtRd8uxMLmQarBn0RHxSKeZK76XPUvWR5Wa1bn
+         uZpKYopk9r+EWKvmRYGUkuw3u4D+1t3JRbYHkmssjAiDJq5EdWbTP231pb8Rhrlh0OA4
+         2WoWxnL2lzTbrXheJQnBEZp59bt0LNnEJcVVITOdC+xc+f7PKp9O5QQME0FTu1/WGf5S
+         f62c+/HuwjqH2SFSDGVpI6jWMn1OFC0BZ0/WbvaQcQ6/bbipKIo4sy8TuvAHyr33TuRR
+         pCWh9m0hK3dChChrGnPYgR87B+5/hu/JLLZSph7lnwtJlsmJ56F+7avBckJq4LkvOQM1
+         eipQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVfWMr37f4FtQDe46gq24htIyD1i7GnC83+7qpVcdrgukHV2i0ldP7MqUEsh5Iwy/tbPYdRp90n8HCjgER5T78a1bkXgEbO
+X-Gm-Message-State: AOJu0Yw/6UBGxL6thB+lvPEgNkNES2m8tvExqBxOUOoUfD8XfordNEUl
+	MT9yXNzm9EOJ6WFLo11wK8sfmDpzjH0buWSs7qArDizBWZgoinGG8HuqYkvM66PGECCFbu9XmVm
+	WUaAtapmpQ/LX4togssAhkC5doyq7P+DjAlBeDf4XJJOP51wti7KzYg==
+X-Received: by 2002:a05:600c:310d:b0:426:629f:1556 with SMTP id 5b1f17b1804b1-427b88c2e8amr511415e9.31.1721059412651;
+        Mon, 15 Jul 2024 09:03:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IESdfYLQweNPfY1VGrdhD01jrKdhhF0qNRqfcsooulYbUS6vFKHA5l4BVKwugm9LlCeEvW1uA==
+X-Received: by 2002:a05:600c:310d:b0:426:629f:1556 with SMTP id 5b1f17b1804b1-427b88c2e8amr511205e9.31.1721059412069;
+        Mon, 15 Jul 2024 09:03:32 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-153.retail.telecomitalia.it. [82.57.51.153])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f276c52sm127451465e9.22.2024.07.15.09.03.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jul 2024 09:03:31 -0700 (PDT)
+Date: Mon, 15 Jul 2024 18:03:26 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: luigi.leonardi@outlook.com
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/3] test/vsock: add ioctl unsent bytes test
+Message-ID: <5wa2u2eolzxqz2gxeoccazimd4ixpycgkv27cfdmjcpsn3ew2e@drkemucyuvda>
+References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
+ <20240626-ioctl_next-v3-3-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6964970d-733d-4bf5-563d-08dca4e78481
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2024 16:02:24.7060
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MnMMR8ToVYhrZBApLrtp/oDiuxmJmxWUlLqmFcC84VoCt7SHJVhytQHUbsCpHrlLrVWve7ruxEQihBR4NSxaPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR18MB4403
-X-Proofpoint-GUID: HUvMHXP7Y4c1iBNaa3lDrMU39mVupnWw
-X-Proofpoint-ORIG-GUID: HUvMHXP7Y4c1iBNaa3lDrMU39mVupnWw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-15_10,2024-07-11_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240626-ioctl_next-v3-3-63be5bf19a40@outlook.com>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE5pa2l0YSBTaHViaW4gdmlh
-IEI0IFJlbGF5DQo+IDxkZXZudWxsK25pa2l0YS5zaHViaW4ubWFxdWVmZWwubWVAa2VybmVsLm9y
-Zz4NCj4gU2VudDogTW9uZGF5LCBKdWx5IDE1LCAyMDI0IDI6MDggUE0NCj4gVG86IEhhcnRsZXkg
-U3dlZXRlbiA8aHN3ZWV0ZW5AdmlzaW9uZW5ncmF2ZXJzLmNvbT47IERhdmlkIFMuIE1pbGxlcg0K
-PiA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xlLmNv
-bT47IEpha3ViDQo+IEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBQYW9sbyBBYmVuaSA8cGFi
-ZW5pQHJlZGhhdC5jb20+DQo+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJu
-ZWxAdmdlci5rZXJuZWwub3JnOyBBbmRyZXcgTHVubg0KPiA8YW5kcmV3QGx1bm4uY2g+DQo+IFN1
-YmplY3Q6ICBbUEFUQ0ggdjExIDE3LzM4XSBuZXQ6IGNpcnJ1czogYWRkIERUIHN1cHBvcnQgZm9y
-IENpcnJ1cw0KPiBFUDkzeHgNCj4gDQo+IEZyb206IE5pa2l0YSBTaHViaW4gPG5pa2l0YS7igIpz
-aHViaW5A4oCKbWFxdWVmZWwu4oCKbWU+IC0gYWRkIE9GIElEIG1hdGNoIHRhYmxlIC0NCj4gZ2V0
-IHBoeV9pZCBmcm9tIHRoZSBkZXZpY2UgdHJlZSwgYXMgcGFydCBvZiBtZGlvIC0gY29weV9hZGRy
-IGlzIG5vdyBhbHdheXMNCj4gdXNlZCwgYXMgdGhlcmUgaXMgbm8gU29DL2JvYXJkIHRoYXQgYXJl
-bid0IC0gZHJvcHBlZCBwbGF0Zm9ybSBoZWFkZXIgU2lnbmVkLQ0KPiBvZmYtYnk6IE5pa2l0YSAN
-Cj4gRnJvbTogTmlraXRhIFNodWJpbiA8bmlraXRhLnNodWJpbkBtYXF1ZWZlbC5tZT4NCj4gDQo+
-IC0gYWRkIE9GIElEIG1hdGNoIHRhYmxlDQo+IC0gZ2V0IHBoeV9pZCBmcm9tIHRoZSBkZXZpY2Ug
-dHJlZSwgYXMgcGFydCBvZiBtZGlvDQo+IC0gY29weV9hZGRyIGlzIG5vdyBhbHdheXMgdXNlZCwg
-YXMgdGhlcmUgaXMgbm8gU29DL2JvYXJkIHRoYXQgYXJlbid0DQo+IC0gZHJvcHBlZCBwbGF0Zm9y
-bSBoZWFkZXINCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE5pa2l0YSBTaHViaW4gPG5pa2l0YS5zaHVi
-aW5AbWFxdWVmZWwubWU+DQo+IFRlc3RlZC1ieTogQWxleGFuZGVyIFN2ZXJkbGluIDxhbGV4YW5k
-ZXIuc3ZlcmRsaW5AZ21haWwuY29tPg0KPiBSZXZpZXdlZC1ieTogQW5kcmV3IEx1bm4gPGFuZHJl
-d0BsdW5uLmNoPg0KPiBSZXZpZXdlZC1ieTogTGludXMgV2FsbGVpaiA8bGludXMud2FsbGVpakBs
-aW5hcm8ub3JnPg0KDQpUaGlzIHBhdGNoIHNlZW1lZCB0byBiZSBmb3IgbmV0LW5leHQsIGluIGNh
-c2UgTkVULCBGaXhlcyB0YWcgaXMgcmVxdWlyZWQuIFBsZWFzZSBjaGVjay4NCg0KPiAtLS0NCj4g
-IGRyaXZlcnMvbmV0L2V0aGVybmV0L2NpcnJ1cy9lcDkzeHhfZXRoLmMgfCA2MyArKysrKysrKysr
-KysrKysrLS0tLS0tLS0tLS0tLS0NCj4gLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAzMiBpbnNlcnRp
-b25zKCspLCAzMSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9l
-dGhlcm5ldC9jaXJydXMvZXA5M3h4X2V0aC5jDQo+IGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvY2ly
-cnVzL2VwOTN4eF9ldGguYw0KPiBpbmRleCAxZjQ5NWNmZDc5NTkuLjI1MjNkOWM5ZDFiOCAxMDA2
-NDQNCj4gLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvY2lycnVzL2VwOTN4eF9ldGguYw0KPiAr
-KysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9jaXJydXMvZXA5M3h4X2V0aC5jDQo+IEBAIC0xNiwx
-MyArMTYsMTIgQEANCj4gICNpbmNsdWRlIDxsaW51eC9ldGh0b29sLmg+DQo+ICAjaW5jbHVkZSA8
-bGludXgvaW50ZXJydXB0Lmg+DQo+ICAjaW5jbHVkZSA8bGludXgvbW9kdWxlcGFyYW0uaD4NCj4g
-KyNpbmNsdWRlIDxsaW51eC9vZi5oPg0KPiAgI2luY2x1ZGUgPGxpbnV4L3BsYXRmb3JtX2Rldmlj
-ZS5oPg0KPiAgI2luY2x1ZGUgPGxpbnV4L2RlbGF5Lmg+DQo+ICAjaW5jbHVkZSA8bGludXgvaW8u
-aD4NCj4gICNpbmNsdWRlIDxsaW51eC9zbGFiLmg+DQo+IA0KPiAtI2luY2x1ZGUgPGxpbnV4L3Bs
-YXRmb3JtX2RhdGEvZXRoLWVwOTN4eC5oPg0KPiAtDQo+ICAjZGVmaW5lIERSVl9NT0RVTEVfTkFN
-RQkJImVwOTN4eC1ldGgiDQo+IA0KPiAgI2RlZmluZSBSWF9RVUVVRV9FTlRSSUVTCTY0DQo+IEBA
-IC03MzgsMjUgKzczNyw2IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgbmV0X2RldmljZV9vcHMNCj4g
-ZXA5M3h4X25ldGRldl9vcHMgPSB7DQo+ICAJLm5kb19zZXRfbWFjX2FkZHJlc3MJPSBldGhfbWFj
-X2FkZHIsDQo+ICB9Ow0KPiANCj4gLXN0YXRpYyBzdHJ1Y3QgbmV0X2RldmljZSAqZXA5M3h4X2Rl
-dl9hbGxvYyhzdHJ1Y3QgZXA5M3h4X2V0aF9kYXRhICpkYXRhKSAtew0KPiAtCXN0cnVjdCBuZXRf
-ZGV2aWNlICpkZXY7DQo+IC0NCj4gLQlkZXYgPSBhbGxvY19ldGhlcmRldihzaXplb2Yoc3RydWN0
-IGVwOTN4eF9wcml2KSk7DQo+IC0JaWYgKGRldiA9PSBOVUxMKQ0KPiAtCQlyZXR1cm4gTlVMTDsN
-Cj4gLQ0KPiAtCWV0aF9od19hZGRyX3NldChkZXYsIGRhdGEtPmRldl9hZGRyKTsNCj4gLQ0KPiAt
-CWRldi0+ZXRodG9vbF9vcHMgPSAmZXA5M3h4X2V0aHRvb2xfb3BzOw0KPiAtCWRldi0+bmV0ZGV2
-X29wcyA9ICZlcDkzeHhfbmV0ZGV2X29wczsNCj4gLQ0KPiAtCWRldi0+ZmVhdHVyZXMgfD0gTkVU
-SUZfRl9TRyB8IE5FVElGX0ZfSFdfQ1NVTTsNCj4gLQ0KPiAtCXJldHVybiBkZXY7DQo+IC19DQo+
-IC0NCj4gLQ0KPiAgc3RhdGljIHZvaWQgZXA5M3h4X2V0aF9yZW1vdmUoc3RydWN0IHBsYXRmb3Jt
-X2RldmljZSAqcGRldikgIHsNCj4gIAlzdHJ1Y3QgbmV0X2RldmljZSAqZGV2Ow0KPiBAQCAtNzg2
-LDI3ICs3NjYsNDcgQEAgc3RhdGljIHZvaWQgZXA5M3h4X2V0aF9yZW1vdmUoc3RydWN0DQo+IHBs
-YXRmb3JtX2RldmljZSAqcGRldikNCj4gDQo+ICBzdGF0aWMgaW50IGVwOTN4eF9ldGhfcHJvYmUo
-c3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikgIHsNCj4gLQlzdHJ1Y3QgZXA5M3h4X2V0aF9k
-YXRhICpkYXRhOw0KPiAgCXN0cnVjdCBuZXRfZGV2aWNlICpkZXY7DQo+ICAJc3RydWN0IGVwOTN4
-eF9wcml2ICplcDsNCj4gIAlzdHJ1Y3QgcmVzb3VyY2UgKm1lbTsNCj4gKwl2b2lkIF9faW9tZW0g
-KmJhc2VfYWRkcjsNCj4gKwlzdHJ1Y3QgZGV2aWNlX25vZGUgKm5wOw0KDQpTbWFsbCBuaXQsIHBs
-ZWFzZSBjaGVjayBpZiByZXZlcnNlIHgtbWFzIHRyZWUgb3JkZXIgbmVlZCB0byBiZSBmb2xsb3cg
-aGVyZS4NCg0KPiArCXUzMiBwaHlfaWQ7DQo+ICAJaW50IGlycTsNCj4gIAlpbnQgZXJyOw0KPiAN
-Cg0KLi4uDQoNCj4gIHN0YXRpYyBzdHJ1Y3QgcGxhdGZvcm1fZHJpdmVyIGVwOTN4eF9ldGhfZHJp
-dmVyID0gew0KPiAgCS5wcm9iZQkJPSBlcDkzeHhfZXRoX3Byb2JlLA0KPiAgCS5yZW1vdmVfbmV3
-CT0gZXA5M3h4X2V0aF9yZW1vdmUsDQo+ICAJLmRyaXZlcgkJPSB7DQo+ICAJCS5uYW1lCT0gImVw
-OTN4eC1ldGgiLA0KPiArCQkub2ZfbWF0Y2hfdGFibGUgPSBlcDkzeHhfZXRoX29mX2lkcywNCj4g
-IAl9LA0KPiAgfTsNCj4gDQo+IA0KPiAtLQ0KPiAyLjQzLjINCj4gDQo+IA0KDQo=
+On Wed, Jun 26, 2024 at 02:08:37PM GMT, Luigi Leonardi via B4 Relay wrote:
+>From: Luigi Leonardi <luigi.leonardi@outlook.com>
+>
+>Introduce two tests, one for SOCK_STREAM and one for SOCK_SEQPACKET, which checks
+>after a packet is delivered, that the number of unsent bytes is zero,
+>using ioctl SIOCOUTQ.
+>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> tools/testing/vsock/util.c       |  6 +--
+> tools/testing/vsock/util.h       |  3 ++
+> tools/testing/vsock/vsock_test.c | 85 ++++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 91 insertions(+), 3 deletions(-)
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 554b290fefdc..a3d448a075e3 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
+> }
+>
+> /* Connect to <cid, port> and return the file descriptor. */
+>-static int vsock_connect(unsigned int cid, unsigned int port, int type)
+>+int vsock_connect(unsigned int cid, unsigned int port, int type)
+> {
+> 	union {
+> 		struct sockaddr sa;
+>@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
+> /* Listen on <cid, port> and return the first incoming connection.  The remote
+>  * address is stored to clientaddrp.  clientaddrp may be NULL.
+>  */
+>-static int vsock_accept(unsigned int cid, unsigned int port,
+>-			struct sockaddr_vm *clientaddrp, int type)
+>+int vsock_accept(unsigned int cid, unsigned int port,
+>+		 struct sockaddr_vm *clientaddrp, int type)
+> {
+> 	union {
+> 		struct sockaddr sa;
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index e95e62485959..fff22d4a14c0 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -39,6 +39,9 @@ struct test_case {
+> void init_signals(void);
+> unsigned int parse_cid(const char *str);
+> unsigned int parse_port(const char *str);
+>+int vsock_connect(unsigned int cid, unsigned int port, int type);
+>+int vsock_accept(unsigned int cid, unsigned int port,
+>+		 struct sockaddr_vm *clientaddrp, int type);
+
+I'd mention in the commit description that you need these functions to 
+be more generic. Maybe in the future we can re-use them where we share 
+the same test for both SEQPACKET and STREAM.
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+> int vsock_stream_connect(unsigned int cid, unsigned int port);
+> int vsock_bind_connect(unsigned int cid, unsigned int port,
+> 		       unsigned int bind_port, int type);
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f851f8961247..76bd17b4b291 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -20,6 +20,8 @@
+> #include <sys/mman.h>
+> #include <poll.h>
+> #include <signal.h>
+>+#include <sys/ioctl.h>
+>+#include <linux/sockios.h>
+>
+> #include "vsock_test_zerocopy.h"
+> #include "timeout.h"
+>@@ -1238,6 +1240,79 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
+> 	}
+> }
+>
+>+#define MSG_BUF_IOCTL_LEN 64
+>+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
+>+{
+>+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+>+	int client_fd;
+>+
+>+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
+>+	if (client_fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
+>+	control_writeln("RECEIVED");
+>+
+>+	close(client_fd);
+>+}
+>+
+>+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
+>+{
+>+	unsigned char buf[MSG_BUF_IOCTL_LEN];
+>+	int ret, fd, sock_bytes_unsent;
+>+
+>+	fd = vsock_connect(opts->peer_cid, 1234, type);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	for (int i = 0; i < sizeof(buf); i++)
+>+		buf[i] = rand() & 0xFF;
+>+
+>+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
+>+	control_expectln("RECEIVED");
+>+
+>+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+>+	if (ret < 0) {
+>+		if (errno == EOPNOTSUPP) {
+>+			fprintf(stderr, "Test skipped\n");
+>+		} else {
+>+			perror("ioctl");
+>+			exit(EXIT_FAILURE);
+>+		}
+>+	} else if (ret == 0 && sock_bytes_unsent != 0) {
+>+		fprintf(stderr,
+>+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
+>+			sock_bytes_unsent);
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
+>+{
+>+	test_unsent_bytes_client(opts, SOCK_STREAM);
+>+}
+>+
+>+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
+>+{
+>+	test_unsent_bytes_server(opts, SOCK_STREAM);
+>+}
+>+
+>+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
+>+{
+>+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
+>+}
+>+
+>+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
+>+{
+>+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
+>+}
+>+
+> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
+> /* This define is the same as in 'include/linux/virtio_vsock.h':
+>  * it is used to decide when to send credit update message during
+>@@ -1523,6 +1598,16 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
+> 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
+>+		.run_client = test_stream_unsent_bytes_client,
+>+		.run_server = test_stream_unsent_bytes_server,
+>+	},
+>+	{
+>+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
+>+		.run_client = test_seqpacket_unsent_bytes_client,
+>+		.run_server = test_seqpacket_unsent_bytes_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.45.2
+>
+>
+>
+
 
