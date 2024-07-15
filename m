@@ -1,157 +1,104 @@
-Return-Path: <netdev+bounces-111479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CB993147F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68AB7931572
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 388251F225F1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:39:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 119CE1F22231
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE63018C199;
-	Mon, 15 Jul 2024 12:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1624618C353;
+	Mon, 15 Jul 2024 13:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZlCT+jqe"
+	dkim=pass (2048-bit key) header.d=stuba.sk header.i=@stuba.sk header.b="yRdfuyUk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.cvt.stuba.sk (smtp-out.cvt.stuba.sk [147.175.1.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA64D4C66
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 12:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016E18D4C1;
+	Mon, 15 Jul 2024 13:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.175.1.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721047166; cv=none; b=j0fz0JM0dwU1PEc9xY+7HLaVSA2ruaPe0YgRnWfUKqI4O8i6tSvfiDyjGabIJaveq+vLWPqCI/KpuCYfWDx2L89iTlhJdi+xwQ3i41YsVYt8NipetUstEtcjwXepd5+EtOaPMB0MnmJiDuaXZHyE/xi37BtLuf2nGnLLBmtQAq8=
+	t=1721049071; cv=none; b=fLVAWrBCYpapmQObrG7anPasg1vD6EJ5FfWMN4BXsuhGiC95CR+zIZUNynmzb9JMcuLKoMNcNy1h0Ug0AgA97N4XTl/NuaPo4Kk7YiRTlWTsbFNuyn0KryND/TQdV5zsMa2mLQoTPzILUFACqmkYGkReSR80ggld5FOgXz/ZfJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721047166; c=relaxed/simple;
-	bh=OQ3e44CBQLNh64zML8893FYmghmT7vnAyPPNVRvRj+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKbq/eWCR1Ye/zm9oejxkFElYG2X14J52XYCnsLCReJIq97bER9/uw3HhxybPskFs6f9V+VbXH2Io8Wl4KmtsN/PvIzwczZaNwv+tTfFPcO8YI9p8K4nQhtIUMdCejEbZvau/un4K8m2cVSysE0W7iWRmJbhT/nKHbDBMIddtvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZlCT+jqe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BF1C32782;
-	Mon, 15 Jul 2024 12:39:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721047166;
-	bh=OQ3e44CBQLNh64zML8893FYmghmT7vnAyPPNVRvRj+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZlCT+jqe9fHkKSTqRqCeqef82dJ1fqbW+eI2oJGGPzHfNIeHu4tzEgzXBxkqCR0rw
-	 T5taRIaub2QvZ76gepUx46jnK49YtrXc8mEGniThngNLDc4OEa6aBmVQ5RPhJvysUj
-	 ZJgE+sEz+LZmFls3Df/WzEw/UUNas2dsTAoXHFJSZe3AvsZFQoqG20o6BG8z4C4rN9
-	 pVkdj4p5cKy1I3kKw7ddh5wavKFLw2TIhnE5iZv3o5Vuqj/MgmzUOCGCkqsfD4LGcr
-	 NtMjSRNbCA3tuPV5IMdWdYUPs3gsLpp9D7RoW9DnplREgEFaHbrt7rDy2TE6guyuLt
-	 EosHJWaotZqEw==
-Date: Mon, 15 Jul 2024 13:39:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Christian Hopps <chopps@chopps.org>
-Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v5 08/17] xfrm: iptfs: add new iptfs xfrm mode
- impl
-Message-ID: <20240715123923.GB45692@kernel.org>
-References: <20240714202246.1573817-1-chopps@chopps.org>
- <20240714202246.1573817-9-chopps@chopps.org>
+	s=arc-20240116; t=1721049071; c=relaxed/simple;
+	bh=UBfgy5+0l8x+M07N7A4Dki6luKXzyCWR4r70sFx/1SY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sookpNAuyUJLYdswfRzgMCfE8lTQgmGKrIwrsyBRUa/49SXmWiAq9VJEIhaG/e4kuxQnjQu/qnciIKnc2twRlSkfLkH66pIhXFIUQ2YdGc40VoU/7Hl8dRpP6b8Wuw+twJqhVJZHcpD6trQklSXOAyzP2buU1dtyY7K8b9Ns7uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stuba.sk; spf=pass smtp.mailfrom=stuba.sk; dkim=pass (2048-bit key) header.d=stuba.sk header.i=@stuba.sk header.b=yRdfuyUk; arc=none smtp.client-ip=147.175.1.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stuba.sk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stuba.sk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=stuba.sk;
+	s=20180406; h=Content-Transfer-Encoding:Content-Type:From:To:Subject:
+	MIME-Version:Date:Message-ID; bh=hPXmEGrpNCxQtlE+7MmiOVH/DDCPb8s47qf1vlPNH8Y=
+	; t=1721049068; x=1721481068; b=yRdfuyUka8R8o/yS9lizhVwyr0ygk5Wde5XqpaziEQpOp
+	j1O7FP/gSubqEyJ6/+7NWKmQeGS3K2wpxTQkKnzyWSEDnzagJF0sqCFSpLb7D0nUHnJUfW4WSSvGR
+	SU1o1LEdZMM4NF4htQGocy9AjBNIrLp1lXn7cQPWF1BVsq/87g8mhbHvXRY/nQh6CKpNNj5p1iTq4
+	yB8dWUshaa+TyyUHM2vkXiDGhhBx5ycWvi1zKQwKqGdJqHXgfgYHqUy1YvHV7m/jOJyg7EZNQW1Gu
+	gpUkjMSYm56MDGKnTQYo0apIxf6QzSJn0+oPMHxi5SYjlIzPHAnBii2daofaJGpgGA==;
+X-STU-Diag: 0488aa0426ae2156 (auth)
+Received: from ellyah.uim.fei.stuba.sk ([147.175.106.89])
+	by mx1.stuba.sk (Exim4) with esmtpsa (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+	(envelope-from <matus.jokay@stuba.sk>)
+	id 1sTL8u-000000003nF-2IVT;
+	Mon, 15 Jul 2024 14:49:24 +0200
+Message-ID: <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
+Date: Mon, 15 Jul 2024 14:49:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240714202246.1573817-9-chopps@chopps.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] net: Split a __sys_bind helper for io_uring
+To: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>
+Cc: Gabriel Krisman Bertazi <krisman@suse.de>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20240614163047.31581-1-krisman@suse.de>
+ <20240618174953.5efda404@kernel.org>
+ <68b482cd-4516-4e00-b540-4f9ee492d6e3@kernel.dk>
+ <20240619080447.6ad08fea@kernel.org>
+ <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
+Content-Language: en-US
+From: Matus Jokay <matus.jokay@stuba.sk>
+In-Reply-To: <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jul 14, 2024 at 04:22:36PM -0400, Christian Hopps wrote:
-> From: Christian Hopps <chopps@labn.net>
+On 19. 6. 2024 17:06, Jens Axboe wrote:
+> On 6/19/24 9:04 AM, Jakub Kicinski wrote:
+>> On Wed, 19 Jun 2024 07:40:40 -0600 Jens Axboe wrote:
+>>> On 6/18/24 6:49 PM, Jakub Kicinski wrote:
+>>>> On Fri, 14 Jun 2024 12:30:44 -0400 Gabriel Krisman Bertazi wrote:  
+>>>>> io_uring holds a reference to the file and maintains a
+>>>>> sockaddr_storage address.  Similarly to what was done to
+>>>>> __sys_connect_file, split an internal helper for __sys_bind in
+>>>>> preparation to supporting an io_uring bind command.
+>>>>>
+>>>>> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+>>>>> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>  
+>>>>
+>>>> Acked-by: Jakub Kicinski <kuba@kernel.org>  
+>>>
+>>> Are you fine with me queueing up 1-2 via the io_uring branch?
+>>> I'm guessing the risk of conflict should be very low, so doesn't
+>>> warrant a shared branch.
+>>
+>> Yup, exactly, these can go via io_uring without branch juggling.
 > 
-> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
+> Great thanks!
 > 
-> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
-> functionality. This functionality can be used to increase bandwidth
-> utilization through small packet aggregation, as well as help solve PMTU
-> issues through it's efficient use of fragmentation.
-> 
->   Link: https://www.rfc-editor.org/rfc/rfc9347.txt
-> 
-> Multiple commits follow to build the functionality into xfrm_iptfs.c
-> 
-> Signed-off-by: Christian Hopps <chopps@labn.net>
-> ---
->  net/xfrm/Makefile     |   1 +
->  net/xfrm/xfrm_iptfs.c | 206 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 207 insertions(+)
->  create mode 100644 net/xfrm/xfrm_iptfs.c
-> 
-> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
-> index 512e0b2f8514..5a1787587cb3 100644
-> --- a/net/xfrm/Makefile
-> +++ b/net/xfrm/Makefile
-> @@ -21,5 +21,6 @@ obj-$(CONFIG_XFRM_USER) += xfrm_user.o
->  obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
->  obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
->  obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
-> +obj-$(CONFIG_XFRM_IPTFS) += xfrm_iptfs.o
->  obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
->  obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-> new file mode 100644
-> index 000000000000..414035a7a208
-> --- /dev/null
-> +++ b/net/xfrm/xfrm_iptfs.c
-> @@ -0,0 +1,206 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* xfrm_iptfs: IPTFS encapsulation support
-> + *
-> + * April 21 2022, Christian Hopps <chopps@labn.net>
-> + *
-> + * Copyright (c) 2022, LabN Consulting, L.L.C.
-> + *
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/icmpv6.h>
-> +#include <net/gro.h>
-> +#include <net/icmp.h>
-> +#include <net/ip6_route.h>
-> +#include <net/inet_ecn.h>
-> +#include <net/xfrm.h>
-> +
-> +#include <crypto/aead.h>
-> +
-> +#include "xfrm_inout.h"
-> +
-> +struct xfrm_iptfs_config {
-> +	u32 pkt_size;	    /* outer_packet_size or 0 */
-> +};
-> +
-> +struct xfrm_iptfs_data {
-> +	struct xfrm_iptfs_config cfg;
-> +
-> +	/* Ingress User Input */
-> +	struct xfrm_state *x;	    /* owning state */
-> +	u32 payload_mtu;	    /* max payload size */
-> +};
-> +
-> +/* ========================== */
-> +/* State Management Functions */
-> +/* ========================== */
-> +
-> +/**
-> + * iptfs_get_inner_mtu() - return inner MTU with no fragmentation.
-> + * @x: xfrm state.
-> + * @outer_mtu: the outer mtu
-> + */
+Please fix io_bind and io_listen to not pass NULL ptr to related helpers
+__sys_bind_socket and __sys_listen_socket. The first helper's argument
+shouldn't be NULL, as related security hooks expect a valid socket object.
 
-Hi Christian,
+See the syzkaller's bug report:
+https://lore.kernel.org/linux-security-module/0000000000007b7ce6061d1caec0@google.com/
 
-Please consider including a "Return:" or "Returns:" section
-in the Kernel doc for functions that return values.
-
-Likewise elsewhere in this patchset.
-
-Flagged by: ./scripts/kernel-doc -none -Wall
-
-> +static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
-
-...
+Thanks,
+mY
 
