@@ -1,102 +1,142 @@
-Return-Path: <netdev+bounces-111466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3802931318
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:29:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE450931344
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C1A3280DDA
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 299881C21AE2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C101188CD4;
-	Mon, 15 Jul 2024 11:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10687189F59;
+	Mon, 15 Jul 2024 11:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=woks-audio.com header.i=@woks-audio.com header.b="EtvVcCtS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0.woks-audio.com (mx0.woks-audio.com [88.99.2.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CB31465B8
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 11:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78338171BB;
+	Mon, 15 Jul 2024 11:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.99.2.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721042961; cv=none; b=o8Y3tGyNdacity2B9Jiz/CfysLJsB4dF47T8wg3t2bkA0V87dryDdQoUTQNFnb51uY7E8SLMH3ftNeWCKwrqcSNSlEw6IUdJ7mLU34fLVRBBeAwHIA2S2EgueK8Ec5hm4uUZ2xdR5pvX6iyYjDCyQhJzhnBqxDJZpcMiF/5SKkU=
+	t=1721043788; cv=none; b=gLMGUIEUVOBNxZXSps8bmK02mN4qSOzm4/E8K9IofRgd9j8XFR/t7EBftXLohWucfW6KlOdGuWgL4d9OHimQ7hqNH1MmNpoSIMdu/ndBoPmxea36Q7UOlPBFCdJcA4ARoPsR3mlyH/lVWXPk0jMcVSl2cpFOVqYJDVtJuooih7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721042961; c=relaxed/simple;
-	bh=/Wg9Bwx5UzSAg49nSBeaQFr6oiEsAjYEDRog5ptG4Ns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oL0Lp4uYJKvGuew+RlRLnN7iB+jj8xdkemixPWhRzpfBzYeifxJWmXuqs7yaefAUl3VJyhqUIEgXi+G+KZNvjLLeD/jUQuFllaua04aREIx4TelmiEg6i0yoV2Wv19ZEXpZuYd2mIuP05i5LlcFKon0m1l1V/hDuJBFVXDU78ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eebc76119aso47007571fa.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 04:29:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721042958; x=1721647758;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zNXe5eFWgRVmYvF1FXndekoHf0mNH5gGNvXJ/aco47U=;
-        b=ifAgk5FLwOP4AKf2G4WNESk0BmgohViQOwajBgev27I7QOQO7XXStcKpKhsE1jke1T
-         Pr+wrrWLFl9rK+XU2D5qobcYDqD11F0idAOEl5Lf0hsc0dWdQmx6gynB1l/DC+jwG14m
-         PPyFZhuYhAUtvpmeL0WKJaEEVCDRT7uClyLWGmbeg5hiTkj1cS9tNofRloAu5qzhsvJP
-         Ohy/G4tcMjQP8Uygyc2yMCoUjtAc6kxyoO7Ycr6x4fAUIOG8HgErFdmp+cveA8Vr0ejW
-         2AnB4iELj0dzUUJ5o5zd9nQrPoHgJ8svWXsiEFWJnEg3zUKujsIgvQO4EExduXUcCXVE
-         nNjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYS7CRMzjXYMaVs4p1UAJbTRNmInqu8JLBIYN1ePAVws+PziUN6WaMjUmuvv/H7Jd7WM6EJN7G25oraE9bcuJu8ZmI3rRG
-X-Gm-Message-State: AOJu0YwPTg2ROnbEXMtU7p9IemTOtMi7/ph5z5szGpi4oEkX9XWxEa6L
-	w8Ep3fPm3XTbLql1bGtouMzYhYA9iXNv82Jj8DD90xWuTpGceUxCiCSNzg==
-X-Google-Smtp-Source: AGHT+IG755+7hsbhRlut6EmwkaH93+OxoNv3c67sNj2YFIIlGzGMFTj4yFRNE3y52trenmCy321NPA==
-X-Received: by 2002:a2e:81c7:0:b0:2ee:8d04:7689 with SMTP id 38308e7fff4ca-2eeb30e5f12mr122983671fa.20.1721042957326;
-        Mon, 15 Jul 2024 04:29:17 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59c51dc51b4sm2106648a12.30.2024.07.15.04.29.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 04:29:17 -0700 (PDT)
-Date: Mon, 15 Jul 2024 04:29:15 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: kuba@kernel.org, netdev@vger.kernel.org
-Subject: Re: net: bnxt: Crash on 6.10 ioctl
-Message-ID: <ZpUIC2ESlEQP0PP1@gmail.com>
-References: <ZpFEJeNpwxW1aW9k@gmail.com>
- <CACKFLikzwRQFJ+wbe5iRYimBmvAwDo2MCHS+unsvUH-=rw8wWA@mail.gmail.com>
- <CACKFLi=Au=9H_O4QtgUJ101NZHAW97DF+isGQ4OOsC3x6O5k0g@mail.gmail.com>
+	s=arc-20240116; t=1721043788; c=relaxed/simple;
+	bh=T9mhDH0c1ZG2sIUI32/qS5pA87j3GgJBY4C7u3AmmXE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bZk/X5VKyfxlL0fSOSYXYF4rMzoPU94FM8ml+g5bzpITHMjFhWcdU1tobMZ/OgOLCkYmVLRgv5jQDQl0whYXgu8YWlTczKVl4Qy9xMeKZcCPjmmz6KGTdA7u3kjLSrTIYALSZQZxtiunhbHUuya9U4ETYDCBSNL8p9UGbC0brOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=woks-audio.com; spf=pass smtp.mailfrom=woks-audio.com; dkim=pass (2048-bit key) header.d=woks-audio.com header.i=@woks-audio.com header.b=EtvVcCtS; arc=none smtp.client-ip=88.99.2.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=woks-audio.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=woks-audio.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=woks-audio.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=woks; bh=J7xpTlNWKSsTCrvwopXn
+	KlFCYuKohhqt/axMz6/Ds/c=; b=EtvVcCtScC2cpKeH7QyV6FoIFUg3GX2dRPZa
+	eXmmiMT8yv0wZlRwurE7l3EqHqb6HkAaWMnHOIeS/a+lltfrjV1zOS7EroMsH3ak
+	PftJYjRQeVpnySaY1hICRDRLySA5XV5VEyb50xscve8tPCbPXMpjL9MnKy9LDZhE
+	6ilA96Ag+d6BZbiYbjV3fma1Fxs/1WkhpG7bxaW9gFZzf5KTcJzclrs2x1ZdpkXg
+	qdyOVBVjl6rbibY4DrKLERSuYC/OKoI/WG93OmBB6DUbClBB9JVJWUsqBwYA8Fs3
+	/+/IwbYCkUH7sLyr6bRgdHx4FQCjqMLW3rD97NmpA3ySDEJsaQ==
+From: Benjamin Steinke <benjamin.steinke@woks-audio.com>
+To: <intel-wired-lan@osuosl.org>, Kurt Kanzenbach <kurt@linutronix.de>
+CC: Sriram Yagnaraman <sriram.yagnaraman@est.tech>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, <netdev@vger.kernel.org>, Jonathan
+ Lemon <jonathan.lemon@gmail.com>, John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>, =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?=
+	<bjorn@kernel.org>, Eric Dumazet <edumazet@google.com>, Sriram Yagnaraman
+	<sriram.yagnaraman@est.tech>, Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub
+ Kicinski <kuba@kernel.org>, <bpf@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, Magnus
+ Karlsson <magnus.karlsson@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/4] igb: Add support for AF_XDP zero-copy
+Date: Mon, 15 Jul 2024 13:34:11 +0200
+Message-ID: <16778076.kXn58iQkRG@desktop>
+In-Reply-To: <87cyo2fgnm.fsf@kurt.kurt.home>
+References: <20230804084051.14194-1-sriram.yagnaraman@est.tech> <3253130.2gtjKKCVsX@desktop> <87cyo2fgnm.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLi=Au=9H_O4QtgUJ101NZHAW97DF+isGQ4OOsC3x6O5k0g@mail.gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-ClientProxiedBy: EX1.jas.loc (10.100.2.20) To EX1.jas.loc (10.100.2.20)
 
-On Fri, Jul 12, 2024 at 10:02:06AM -0700, Michael Chan wrote:
-> On Fri, Jul 12, 2024 at 9:03 AM Michael Chan <michael.chan@broadcom.com> wrote:
-> >
-> > On Fri, Jul 12, 2024 at 7:56 AM Breno Leitao <leitao@debian.org> wrote:
-> > >         BUG: kernel NULL pointer dereference, address: 00000000000000b8
-> > >         #PF: supervisor read access in kernel mode
-> > >         #PF: error_code(0x0000) - not-present page
-> > >         PGD 0 P4D 0
-> > >         Oops: Oops: 0000 [#1] SMP
-> > >         Hardware name: ...
-> > >         RIP: 0010:bnxt_get_max_rss_ctx_ring (drivers/net/ethernet/broadcom/bnxt/bnxt.c:?)
-> >
-> > Maybe bp->rss_ctx_list is not valid.
-> >
-> > I think we can add this check:
-> >
-> > (bp->rss_cap & BNXT_RSS_CAP_MULTI_RSS_CTX)
-> >
-> > before proceeding in  bnxt_get_max_rss_ctx_ring().
+On Thursday, 27 June 2024, 19:18:37 CEST, Kurt Kanzenbach wrote:
+> Hi Benjamin,
 > 
-> I've confirmed the issue on older NICs not supporting multi RSS
-> contexts and I will send out the patch very shortly.  Thanks.
+> On Thu Jun 27 2024, Benjamin Steinke wrote:
+> > On Thursday, 27 June 2024, 09:07:55 CEST, Kurt Kanzenbach wrote:
+> >> Hi Sriram,
+> >> 
+> >> On Fri Aug 04 2023, Sriram Yagnaraman wrote:
+> >> > The first couple of patches adds helper funcctions to prepare for
+> >> > AF_XDP
+> >> > zero-copy support which comes in the last couple of patches, one each
+> >> > for Rx and TX paths.
+> >> > 
+> >> > As mentioned in v1 patchset [0], I don't have access to an actual IGB
+> >> > device to provide correct performance numbers. I have used Intel
+> >> > 82576EB
+> >> > emulator in QEMU [1] to test the changes to IGB driver.
+> >> 
+> >> I gave this patch series a try on a recent kernel and silicon
+> >> (i210). There was one issue in igb_xmit_zc(). But other than that it
+> >> worked very nicely.
+> > 
+> > Hi Kurt and Sriram,
+> > 
+> > I recently tried the patches on a 6.1 kernel. On two different devices
+> > i210 & i211 I couldn't see any packets being transmitted on the wire.
+> > Perhaps caused by the issue in igb_xmit_zc() you mentioned, Kurt? Can you
+> > share your findings, please?
+> 
+> Yeah, that's exactly the issue.
+> 
+> Following igb_xmit_xdp_ring() I've added PAYLEN to the Tx descriptor
+> instead of setting it to zero:
+> 
+> igb_xmit_zc()
+> {
+>         [...]
+> 
+> 	/* put descriptor type bits */
+> 	cmd_type = E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
+> 		   E1000_ADVTXD_DCMD_IFCS;
+> 	olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
+> 
+> 	cmd_type |= descs[i].len | IGB_TXD_DCMD;
+> 	tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
+> 	tx_desc->read.olinfo_status = cpu_to_le32(olinfo_status);
+> 
+> 	[...]
+> }
+> 
+> Afterwards packets are transmitted on the wire.
 
-Awesome. I've tested it and it fixed the problem.
+Hi Kurt,
 
-Thanks!
+I can confirm this makes the transmitter work.
+Thank you for taking over this patch series and continue to bring this 
+upstream. I will continue testing on this.
+ 
+> > RX seemed to work on first sight.
+> 
+> Yes, Rx works even with PTP enabled.
+
+I can confirm this as well. 
+
+Best regards,
+Benjamin
+
+
+
+
+
 
