@@ -1,97 +1,124 @@
-Return-Path: <netdev+bounces-111473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F23F9313B3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:11:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A994C9313B8
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDB081C2130E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:11:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A70A1F22483
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45B918A95A;
-	Mon, 15 Jul 2024 12:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3FD189F5C;
+	Mon, 15 Jul 2024 12:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="VD3ldg5z"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="C72YI2wv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCBF2B9A3;
-	Mon, 15 Jul 2024 12:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB2823BF;
+	Mon, 15 Jul 2024 12:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721045482; cv=none; b=SsDw62SUrP4PNQr1prn4pTOZubArMmdVBydH2txdvAEmOy1Pia2H69xdmMVHH0TrCxBJqPEJhlrtWPkqJhMqrt/NYfbrWTqN17Qw5E95fMAq6s6crtW65wLCIEfI1qmrM7zwvYC1oPgA57AvgLcs3Xym/T1fkf4wDxAiOwWzPZ8=
+	t=1721045564; cv=none; b=g74OayVrMNODovPAs57hRqF+D69oEv8ugWagBKMwFFDJOJKclpMxOR1C18ym/e4gzm5yRtel5l8psSc+3oDs9n0TE0ASxyTCrkdUddEtDzWQ/SyobVXaWJOk8VMFtvXDrq0p0YyVBxEs0AYFiYoHfM4Q4qSqAsIKIEtnyaBn8hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721045482; c=relaxed/simple;
-	bh=O+BTPTA2oAy1gEZ2DaoSdBiN0ot7oChtHLe94OpTykU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L0b6v6bXuJsWFBcHyTEN/22U8pJCx67YqoduZQ1woYoedS33HgoZW/FaO5cdRQXWoNzbx45GPLGZro3ZuCBeexYhBls68U6qnf+AQ7mqloIUo+BcWjhRSyuMJLAMm+DnPEnIsw8G0x3bPQwQGjnTOR79hssVaEalqyJfdIDVPD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=VD3ldg5z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91515C32782;
-	Mon, 15 Jul 2024 12:11:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721045482;
-	bh=O+BTPTA2oAy1gEZ2DaoSdBiN0ot7oChtHLe94OpTykU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VD3ldg5zv7dJ//KG+8TpbTMjO94tewAMEq48PEsxp7aCQX6cJA8rvQfRYDCtKw4Tb
-	 XuQPigELKqJQBmTuPX1DJxHgJaKLIQZqjs3vHbccECtDl6LHW/qC1N/QSVc7Zmx1eP
-	 Y6XqdJK7OLfkibnOfdMY/aUZlFenaQYFCXu281w4=
-Date: Mon, 15 Jul 2024 14:11:19 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: John Hubbard <jhubbard@nvidia.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	zhujun2 <zhujun2@cmss.chinamobile.com>,
-	Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Dmitry Safonov <0x7f454c46@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
-	dev@openvswitch.org, linux-kselftest@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
-	stable@vger.kernel.org, Ignat Korchagin <ignat@cloudflare.com>
-Subject: Re: [PATCH] selftests/net: fix gro.c compilation failure due to
- non-existent opt_ipproto_off
-Message-ID: <2024071508-refrain-enjoyable-a505@gregkh>
-References: <20240712235150.99175-1-jhubbard@nvidia.com>
- <682e293b-cc0d-4261-90a8-bc6f16df0992@nvidia.com>
+	s=arc-20240116; t=1721045564; c=relaxed/simple;
+	bh=VMT/rOOT1qU6Hq3BJfq7+bEmeu/KFHSk04Ws3Ap/4ck=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CixhIZAfeYB5tBb8J8948/wYsNPE2TGogervwopoookf6+5WCUKz0dD8c/Qlc595bvc18Jcjj76d6CLLEY8fPQ86ZXOsm1l8x9Xgr7lHjAEq5kjo5tnosjvbhOeeKFaRP7fQAu+m40s+obQPV0ImDnVy24JnuvQL5ra3Z6oVuKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=C72YI2wv; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4A18DFF807;
+	Mon, 15 Jul 2024 12:12:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1721045554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J42xHR7gwk4N29F7WjDkMRYuLDoqLtCVLUGQwLuIj/c=;
+	b=C72YI2wvQberRhw2lVvuDSA+IPGFIE/OYIHxbtnYZM3vI9rff8lNmiBdud4necXX0yPdL2
+	tRLV/EmzVfjFoxUSRvJ9gntMpsyEXBvavtT2eajp73QNd3Xg/yf8ce0JreU4aoLahoqWOu
+	Vg2ynDc3WQ3uRPZBJsqt1Jdu3sw/Ku+8ISx7ujQ4IYn57r3ZcgmOK0GMiPmS8vl+Aff5xs
+	zvwWXZYwpghuWnR2GKE0iVl7MPpYMSqa0/APTgBjIm3BC7LooahALXAKdbQW3eBtkMOt3y
+	TJ2HKx0utDS0yL4Y3A9Dr5wNs6DM0eGlOoOo+S5x1A+5LpHu552OKkV02V5brw==
+Date: Mon, 15 Jul 2024 14:12:29 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Rob Herring" <robh@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Conor Dooley" <conor@kernel.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Lee Jones" <lee@kernel.org>, "Andy
+ Shevchenko" <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>, UNGLinuxDriver@microchip.com,
+ "Saravana Kannan" <saravanak@google.com>, "Bjorn Helgaas"
+ <bhelgaas@google.com>, "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Horatiu Vultur"
+ <horatiu.vultur@microchip.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ devicetree@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
+Message-ID: <20240715141229.506bfff7@bootlin.com>
+In-Reply-To: <83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com>
+References: <20240627091137.370572-1-herve.codina@bootlin.com>
+	<20240627091137.370572-7-herve.codina@bootlin.com>
+	<20240711152952.GL501857@google.com>
+	<20240711184438.65446cc3@bootlin.com>
+	<2024071113-motocross-escalator-e034@gregkh>
+	<CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
+	<20240712151122.67a17a94@bootlin.com>
+	<83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <682e293b-cc0d-4261-90a8-bc6f16df0992@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Fri, Jul 12, 2024 at 05:01:38PM -0700, John Hubbard wrote:
-> On 7/12/24 4:51 PM, John Hubbard wrote:
-> > Linux 6.6 does not have an opt_ipproto_off variable in gro.c at all (it
-> > was added in later kernel versions), so attempting to initialize one
-> > breaks the build.
+Hi Arnd,
+
+On Fri, 12 Jul 2024 16:14:31 +0200
+"Arnd Bergmann" <arnd@arndb.de> wrote:
+
+> On Fri, Jul 12, 2024, at 15:11, Herve Codina wrote:
+> > On Thu, 11 Jul 2024 14:33:26 -0600 Rob Herring <robh@kernel.org> wrote:  
+> >> On Thu, Jul 11, 2024 at 1:08 PM Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:  
 > 
-> This is the first time I've tried to fix something in linux-stable, and
-> I'm not sure that I've made it completely clear. This is only for
-> linux-6.6.y in linux-stable.
+> >> > >
+> >> > > This PCI driver purpose is to instanciate many other drivers using a DT
+> >> > > overlay. I think MFD is the right subsystem.    
+> >> 
+> >> It is a Multi-function Device, but it doesn't appear to use any of the
+> >> MFD subsystem. So maybe drivers/soc/? Another dumping ground, but it
+> >> is a driver for an SoC exposed as a PCI device.
+> >>   
+> >
+> > In drivers/soc, drivers/soc/microchip/ could be the right place.
+> >
+> > Conor, are you open to have the PCI LAN966x device driver in
+> > drivers/soc/microchip/ ?  
+> 
+> That sounds like a much worse fit than drivers/mfd: the code
+> here does not actually run on the lan966x soc, it instead runs
+> on whatever other machine you happen to plug it into as a
+> PCI device.
 
-This worked just fine, now queued up, thanks.
+Maybe drivers/misc ?
 
-greg k-h
+Best regards,
+Hervé
 
