@@ -1,107 +1,73 @@
-Return-Path: <netdev+bounces-111559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17F159318DC
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:55:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7F7C93193B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86EBEB22489
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:55:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E26280F97
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3834C1D531;
-	Mon, 15 Jul 2024 16:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8925D2421D;
+	Mon, 15 Jul 2024 17:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b="N4iLTXsR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyhKgGzl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80434446D2
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 16:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D264D8A3
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 17:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721062545; cv=none; b=GhHZW0uot53KEAZzLm/gE82TqLjfn8w1y3tVtpAkEHNe99mCKpH4XMsGZP2zWYlshgSsuoxlJMHPF8UGvDTmQ8bgrdufPH8fzeh2eJfTNXlh3LkeQV34iRiKsOxFxBVlFfPfp01bk/70scIDbjAemjqUGHwMUadUZfatPDUTkeE=
+	t=1721064447; cv=none; b=UMN5sDKo8MRsaU+zS48C9nPbSKAI17p81jj4p+BIAcGLdAlLQiVoOKWYTIE2Bx+ClKahSsXCRQG+NTRh83KfNvlCUqC89kscwKVZuFItDCOdfCWrwoY7GDay5/nqJNYZlIe6TaSYtludtjosOJW507v8fZITqOziMl4Rc4yuxRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721062545; c=relaxed/simple;
-	bh=kS0fwxUH/JUKLTIiU2CiR8HRF9SdfEDnRNZgjvea2O8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZY/nt7sRPdqjPldddZdCLPFaJN8v+kP6duW0leA+6Et3m+m7ml6a7SoRd8v/e9UVKs10z5B79/tCcWsgb2xiMCu5qVf+FXfKtR+PUbEpg2VxiLltvWujFKFDftHI36mzS6oUmJcrRLnInDRXxi+osx1Du3VIZDJQLmtDRbdV9vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (1024-bit key) header.d=wp.pl header.i=@wp.pl header.b=N4iLTXsR; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 24655 invoked from network); 15 Jul 2024 18:55:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=1024a;
-          t=1721062533; bh=9KE2JDUcNrmeHQCDFpPFbwwq+eLfcwh1/bc9mtWbaXk=;
-          h=Subject:To:Cc:From;
-          b=N4iLTXsRnGqRcNaRDDF8PO4SFQtUiCFBLSGlLcr5MT7zmKIskESa5uY0I2/ArBAHH
-           xJrtGBKBYQYRJdzn7ghZyzn6YIH+HxlyQ9tI4Dl52rJTLDiNhP9722TiX0O8hVpsDx
-           W9PwoSKaxYGgchLyAH2AScLcZX6uhnzgqRTfCyw4=
-Received: from 83.24.148.52.ipv4.supernova.orange.pl (HELO [192.168.3.174]) (olek2@wp.pl@[83.24.148.52])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <andrew@lunn.ch>; 15 Jul 2024 18:55:33 +0200
-Message-ID: <475f4e18-5595-4761-ad3c-f792e6dc60a2@wp.pl>
-Date: Mon, 15 Jul 2024 18:55:33 +0200
+	s=arc-20240116; t=1721064447; c=relaxed/simple;
+	bh=QdrkNgd6gCuS6mvkXahho1xuQ76NsCCfIYNyxSW7bFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Un4taqTWdYnzaWTI8mFnn7A1SJSQoRxB7EkF9kH2tz/RMr626IxFoCnbFbgrKZlvWhQknx9I14HPbSV1v4ZXvxkY32u4qywdLx0AFR9Cchs5joOHXlTC81mY4WthcRa2+5/fqAguMxxLzmG4HDgYeCy8FjSUR1HApqGcv9hKby8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyhKgGzl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973F6C4AF0D;
+	Mon, 15 Jul 2024 17:27:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721064446;
+	bh=QdrkNgd6gCuS6mvkXahho1xuQ76NsCCfIYNyxSW7bFo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=uyhKgGzl+tUIM84rYGV2cL2vuWZ4ds0+DqmmrmIiCJRs0Ivu+ohYRXMvVBBfQEeCx
+	 PAbOZfP9GfO5m9T1QaBxSoRtgUkK+qfAnbG9CsBSCdQF/m04aDRx+6jxh76xDDOnIj
+	 3Wdqgl/LNToVLZbz/1kPWX2qF5fKbBNhsNtq1Kthc2WKmMgVIX3vfsup1YusNtSf27
+	 Wc9WjDq6NatZ1+r3fbQaS/o5DW2EUh1bhqZ5MEegRrkIgbwCJK/UJZPGj78JFZbW+6
+	 9vD3eStnRqLJE8vqLXheAKa8kL14E7xeXhAO7o6Et7yHwR8lorjGCEfQ+1hLksEPto
+	 WglsxPgooUUMw==
+Date: Mon, 15 Jul 2024 12:27:24 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Hongguang Gao <hongguang.gao@broadcom.com>
+Subject: Re: [PATCH net-next 6/9] bnxt_en: Remove register mapping to support
+ INTX
+Message-ID: <20240715172724.GA435391@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: ethernet: lantiq_etop: remove redundant
- device name setup
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jacob.e.keller@intel.com, horms@kernel.org,
- u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240713170920.863171-1-olek2@wp.pl>
- <92570003-ddcd-482b-80e1-1da1fa0cc91f@lunn.ch>
-Content-Language: en-US
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-In-Reply-To: <92570003-ddcd-482b-80e1-1da1fa0cc91f@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-WP-MailID: 1da0bff9ba1eba8cac3f37dd5dcfd54e
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [ccPQ]                               
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240713234339.70293-7-michael.chan@broadcom.com>
 
+On Sat, Jul 13, 2024 at 04:43:36PM -0700, Michael Chan wrote:
+> In legacy INTX mode, a register is mapped so that the INTX handler can
+> read it to determine if the NIC is the source of the interrupt.  This
+> and all the related macros are no longer needed.
 
-On 13.07.2024 20:02, Andrew Lunn wrote:
-> On Sat, Jul 13, 2024 at 07:09:20PM +0200, Aleksander Jan Bajkowski wrote:
->> The same name is set when allocating the netdevice structure in the
->> alloc_etherdev_mq()->alloc_etherrdev_mqs() function. Therefore, there
->> is no need to manually set it.
-> If this one is not needed:
->
-> grep -r "eth%d" *
-> 3com/3c515.c:		sprintf(dev->name, "eth%d", unit);
-> 8390/smc-ultra.c:	sprintf(dev->name, "eth%d", unit);
-> 8390/wd.c:	sprintf(dev->name, "eth%d", unit);
-> 8390/ne.c:	sprintf(dev->name, "eth%d", unit);
-> amd/lance.c:	sprintf(dev->name, "eth%d", unit);
-> atheros/atlx/atl2.c:	strcpy(netdev->name, "eth%d"); /* ?? */
-> cirrus/cs89x0.c:	sprintf(dev->name, "eth%d", unit);
-> dec/tulip/tulip_core.c:		strcpy(dev->name, "eth%d");			/* un-hack */
-> intel/ixgbe/ixgbe_main.c:	strcpy(netdev->name, "eth%d");
-> intel/ixgbevf/ixgbevf_main.c:	strcpy(netdev->name, "eth%d");
-> intel/e100.c:	strcpy(netdev->name, "eth%d");
-> intel/igbvf/netdev.c:	strcpy(netdev->name, "eth%d");
-> intel/e1000e/netdev.c:	strscpy(netdev->name, "eth%d", sizeof(netdev->name));
-> intel/igb/igb_main.c:	strcpy(netdev->name, "eth%d");
-> intel/igc/igc_main.c:	strscpy(netdev->name, "eth%d", sizeof(netdev->name));
-> intel/e1000/e1000_main.c:	strcpy(netdev->name, "eth%d");
-> lantiq_etop.c:	strcpy(dev->name, "eth%d");
-> micrel/ks8842.c:	strcpy(netdev->name, "eth%d");
-> smsc/smc9194.c:		sprintf(dev->name, "eth%d", unit);
->
-> maybe you can remove all these as well?
-
-Added to my todo list.
-
-
->        Andrew
+This commit log only makes sense if you already know INTx support has
+been removed.  Ideally a commit log would make sense by itself,
+without having to extract all the preceding history.
 
