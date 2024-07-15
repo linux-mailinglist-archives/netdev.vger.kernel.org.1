@@ -1,153 +1,200 @@
-Return-Path: <netdev+bounces-111402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7886930CDB
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 04:54:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC80E930CEA
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 05:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA7E1C20DF5
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 02:54:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 320191F212FA
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 03:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56FE8825;
-	Mon, 15 Jul 2024 02:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E768F48;
+	Mon, 15 Jul 2024 03:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HiQl0XKB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRY07tJf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CFEAD5;
-	Mon, 15 Jul 2024 02:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68122F41;
+	Mon, 15 Jul 2024 03:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721012037; cv=none; b=OZQ/v+iL2kfkG8UqvkGQ6GWibERfhRUnKKQpOsGTWocbLX103ZYnX2kNL6s3fP47uvOr0B/wvVaFgFTiG5ork8shXGLinkw2dHXJ1MNUXFvuNizmPq/KieUTjmU/JjwdIpw+YtAJ8rdtdIPH7hnAAbkJb51PYPqUbji2ViAsJLc=
+	t=1721012861; cv=none; b=jI07W0QvK1/TGuu1VdkcL5U1tVuecF5Fv6K+30qQxGZ85hbwnlmfT+SO0QpMSDpA3ZrQ+gjthBmJEiJdPYAIWw5pj1rY1hVS1PCKStuEO8eiSCvg2J6916knL0mORtpQK4zO7pgpZ5sCMWZ7IEIjMFyD5jPHbkvfJ2oUpWeMpJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721012037; c=relaxed/simple;
-	bh=aQiqzrVZ3PHS2MYW5gjFRHJupDz2inDkWvjjBjUDgog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ecKk63+d0IVSB+q7wtLnlla+3WorNLXqKYl0nkK2fPQtCC7RBD2gdggmnXkc1FdKEoimY17t1TI74qjUccto0vx/nmaCIG3T16IvcbumHbokB3bMocyyAMtgFb12hk9gnYnMmA/90ePHwkxofPIzv6++EgcN+rjfKgeRVRlQKME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HiQl0XKB; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1721012026; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=HVInFwlXXhbbzZQjxVtud9mzYHkhIRQyqI9B0uOtKBg=;
-	b=HiQl0XKBeqWk/yz3cbs+xXXMqKDBA9eNUrYa/DQmwTorDxRibhuLm5KnnYnJz1NhClNamakLV4YMSI4QdOVoyQKrxT44Stzo2XTmDaQsgGI/QaTkp4lVwV7YizidN/OJdGpYlabpQWWaRxwUYzzdkAJ0LRHgxxOISM/izb80ONM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WAUsDnm_1721012024;
-Received: from 30.221.101.244(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WAUsDnm_1721012024)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Jul 2024 10:53:45 +0800
-Message-ID: <63862dcc-33fd-4757-8daf-e0a018a1c7a3@linux.alibaba.com>
-Date: Mon, 15 Jul 2024 10:53:44 +0800
+	s=arc-20240116; t=1721012861; c=relaxed/simple;
+	bh=nvkTLskiSjR1wEWCGet8hWznszuqHulbDw6SUh1768k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rwJtP4TtomDmy+ICv1YEWhxcstsszJ3OtFJZMQ27f7lzLg9r+p+h4lXWu4+/UGoryYIdWqxd8jjHEbdIVL4dRO0AwtjsEIExIcKPdhU4tyoPBiAaoL475n48l70B1ayaiBbalM2fwURBILnZx1ZoXwp1h+RMUDwVspFuuWaO+ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRY07tJf; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-426717a2d12so21976805e9.0;
+        Sun, 14 Jul 2024 20:07:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721012858; x=1721617658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bPOGNQoOVZHDwCKu6mfQ/96DtFXkwzO8aleJ5SEVjrg=;
+        b=GRY07tJfkDbz1eOfab4icOLaSIlQ7Uznx9KCvPHYM6OdaGWkBBvt37VAtqp/vDV/dr
+         FxPJjy4A/IKmULtLOVbTxOPXOMCgtnfigOO9TGlif37cjyZFDeh53bS1lkeg6gBQ3Qhw
+         /ZDcbOj1pibPW9CuJI2P3WN4a/CutKhtF7oQSeAlxKOU/jg56/sRAxxRAQy8Yva/Ve4F
+         lCrHE0kH7jxINHjCZFmTENJO3PQmkROz9XFB4p3TEKiMjo9bAaGiWuLvZGciuBPvICUQ
+         8KIqHn2ec6t03UHWsiTG8TzpA75i9srGIgx3EwIyg4rX8WwBXDrQCCHvCcfIzhH6FMPO
+         chdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721012858; x=1721617658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bPOGNQoOVZHDwCKu6mfQ/96DtFXkwzO8aleJ5SEVjrg=;
+        b=a06ieK3sgvAU0q0afeY396tXORTaXpkPBHEL5fMs0vub/jgxlY9cBVnXrE4gBLgPcE
+         QEUzdMNLaMfCqvh1mFAraTDb9AxY69zhU6v6mLFJ0Pq1TWOZf2Lg2ktcnmNreauY0JHP
+         gsAl+yu9f0OrhHPsisV1J25Kg5N9Y/dHz5+hMJOt9QccAcl7cnStulRvJdw2AGSYn82w
+         077SdJosZuUNsPLQzdfr148vk+P3bLGpCpVTJimHIAbQueV/7OiyU6M2zIepQNt34ESm
+         HXAtHxqDJPFEHl4hFx5wP7/pUqIWvGwy4We7N9/1kCbg0bZ0LGUKg5jhSnKRo6HkyZG+
+         sV0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUuSshlogGzVgvCWbonGmttxCAlkgzSPJdXVDTpmrw8Hu8q1//EGu+jGltDgVStEEKYUk751KEeEx7871HciN8IH5TycH2MhGqUjmRmsA7+
+X-Gm-Message-State: AOJu0YwpGBMEL+7N5Ursq9xW8drMJnDCz9dyQwtA/Rhu18k4cIq9ZHHD
+	scjq8efExy4EtEbCMwCY08UcxDUoGsq/AixwiVAGZU8OxHSrYoUBZ4snery0
+X-Google-Smtp-Source: AGHT+IFwhBEgWJHb2mzcvstXAEuLa5ItlvPmIFzGZG7TBwdVd/xBshToNvarAlausdQ5IyN1qU39qQ==
+X-Received: by 2002:a05:600c:714:b0:426:67fa:f7 with SMTP id 5b1f17b1804b1-4279da067dfmr80624865e9.9.1721012857685;
+        Sun, 14 Jul 2024 20:07:37 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-018.fbsv.net. [2a03:2880:31ff:12::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427a630b218sm66150915e9.14.2024.07.14.20.07.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jul 2024 20:07:37 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: shuah@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	petrm@nvidia.com,
+	dw@davidwei.uk,
+	przemyslaw.kitszel@intel.com,
+	linux-kselftest@vger.kernel.org,
+	mohsin.bashr@gmail.com
+Subject: [PATCH net-next] selftests: net: py: support verbose printing, display executed commands
+Date: Sun, 14 Jul 2024 20:07:23 -0700
+Message-ID: <20240715030723.1768360-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: introduce autosplit for smc
-To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
- <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Add verbosity support to show the commands executed while
+running tests. Enable verbosity if either an environment
+variable 'VERBOSE' is set to a non-zero number or it is defined
+in a config file under driver tests as discussed here:
+https://github.com/linux-netdev/nipa/wiki/Running-driver-tests.
 
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+---
+ tools/testing/selftests/drivers/net/lib/py/env.py | 14 +++++++++++++-
+ tools/testing/selftests/net/lib/py/__init__.py    |  7 +++++++
+ tools/testing/selftests/net/lib/py/utils.py       | 14 ++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
 
-On 2024/7/11 23:57, Wenjia Zhang wrote:
-> 
-> 
-> On 09.07.24 18:05, Guangguan Wang wrote:
->> When sending large size data in TCP, the data will be split into
->> several segments(packets) to transfer due to MTU config. And in
->> the receive side, application can be woken up to recv data every
->> packet arrived, the data transmission and data recv copy are
->> pipelined.
->>
->> But for SMC-R, it will transmit as many data as possible in one
->> RDMA WRITE and a CDC msg follows the RDMA WRITE, in the receive
->> size, the application only be woken up to recv data when all RDMA
->> WRITE data and the followed CDC msg arrived. The data transmission
->> and data recv copy are sequential.
->>
->> This patch introduce autosplit for SMC, which can automatic split
->> data into several segments and every segment transmitted by one RDMA
->> WRITE when sending large size data in SMC. Because of the split, the
->> data transmission and data send copy can be pipelined in the send side,
->> and the data transmission and data recv copy can be pipelined in the
->> receive side. Thus autosplit helps improving latency performance when
->> sending large size data. The autosplit also works for SMC-D.
->>
->> This patch also introduce a sysctl names autosplit_size for configure
->> the max size of the split segment, whose default value is 128KiB
->> (128KiB perform best in my environment).
->>
->> The sockperf benchmark shows 17%-28% latency improvement when msgsize
->>> = 256KB for SMC-R, 15%-32% latency improvement when msgsize >= 256KB
->> for SMC-D with smc-loopback.
->>
->> Test command:
->> sockperf sr --tcp -m 1048575
->> sockperf pp --tcp -i <server ip> -m <msgsize> -t 20
->>
->> Test config:
->> sysctl -w net.smc.wmem=524288
->> sysctl -w net.smc.rmem=524288
->>
->> Test results:
->> SMC-R
->> msgsize   noautosplit    autosplit
->> 128KB       55.546 us     55.763 us
->> 256KB       83.537 us     69.743 us (17% improve)
->> 512KB      138.306 us    100.313 us (28% improve)
->> 1MB        273.702 us    197.222 us (28% improve)
->>
->> SMC-D with smc-loopback
->> msgsize   noautosplit    autosplit
->> 128KB       14.672 us     14.690 us
->> 256KB       28.277 us     23.958 us (15% improve)
->> 512KB       63.047 us     45.339 us (28% improve)
->> 1MB        129.306 us     87.278 us (32% improve)
->>
->> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->> ---
->>   Documentation/networking/smc-sysctl.rst | 11 +++++++++++
->>   include/net/netns/smc.h                 |  1 +
->>   net/smc/smc_sysctl.c                    | 12 ++++++++++++
->>   net/smc/smc_tx.c                        | 19 ++++++++++++++++++-
->>   4 files changed, 42 insertions(+), 1 deletion(-)
->>
-> 
-> Hi Guangguan,
-> 
-> If I remember correctly, the intention to use one RDMA-write for a possible large data is to reduce possible many partial stores. Since many year has gone, I'm not that sure if it would still be an issue. I need some time to check on it.
-> 
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index a5e800b8f103..ec53cf59e104 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -4,7 +4,7 @@ import os
+ import time
+ from pathlib import Path
+ from lib.py import KsftSkipEx, KsftXfailEx
+-from lib.py import cmd, ethtool, ip
++from lib.py import cmd, ethtool, ip, verbosity_ctl
+ from lib.py import NetNS, NetdevSimDev
+ from .remote import Remote
+ 
+@@ -42,6 +42,12 @@ class NetDrvEnv:
+ 
+         self.env = _load_env_file(src_path)
+ 
++        try:
++            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
++        except ValueError as e:
++            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
++            verbosity_ctl(level=0)
++
+         if 'NETIF' in self.env:
+             self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
+         else:
+@@ -92,6 +98,12 @@ class NetDrvEpEnv:
+         self._ns = None
+         self._ns_peer = None
+ 
++        try:
++            verbosity_ctl(level=int(self.env.get('VERBOSE', 0)))
++        except ValueError as e:
++            print(f'Ignoring \'VERBOSE\'. Unknown value \'{self.env.get("VERBOSE")}\'')
++            verbosity_ctl(level=0)
++
+         if "NETIF" in self.env:
+             if nsim_test is True:
+                 raise KsftXfailEx("Test only works on netdevsim")
+diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+index b6d498d125fe..1541079fadce 100644
+--- a/tools/testing/selftests/net/lib/py/__init__.py
++++ b/tools/testing/selftests/net/lib/py/__init__.py
+@@ -1,8 +1,15 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
++import os
+ from .consts import KSRC
+ from .ksft import *
+ from .netns import NetNS
+ from .nsim import *
+ from .utils import *
+ from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily
++
++try:
++    verbosity_ctl(level=int(os.environ.get('VERBOSE', 0)))
++except ValueError as e:
++    print(f'Ignoring \'VERBOSE\'. Unknown value \'{os.environ.get("VERBOSE")}\'')
++    verbosity_ctl(level=0)
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index 72590c3f90f1..4a59958649be 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -9,6 +9,18 @@ import subprocess
+ import time
+ 
+ 
++def verbosity_ctl(level=None):
++    global VERBOSITY_LEVEL
++    if level is not None:
++        VERBOSITY_LEVEL = level
++    return VERBOSITY_LEVEL
++
++
++def verbose(*objs, **kwargs):
++    if verbosity_ctl() >= 1:
++        print(*objs, **kwargs)
++
++
+ class CmdExitFailure(Exception):
+     pass
+ 
+@@ -22,6 +34,8 @@ class cmd:
+         self.stderr = None
+         self.ret = None
+ 
++        verbose("#cmd|", comm)
++
+         self.comm = comm
+         if host:
+             self.proc = host.cmd(comm)
+-- 
+2.43.0
 
-Did you mean too many partial stores will result in some issue? What's the issue?
-
-
-> BTW, I don't really like the idea to use sysctl to set the autosplit_size in any value at will. That makes no sense to improve the performance.
-
-Although 128KB autosplit_size have a good performance in most scenario, I still found some better autosplit_size for some specific network configurations.
-For example, 128KB autosplit_size have a good performance whether the MTU is 1500 or 8500, but for 8500 MTU, 64KB autosplit_size performs better.
-
-Maybe the sysctl is not the best way, but I think it should have a way to set the value of autosplit_size for possible performance tuning.
-
-Thanks,
-Guangguan Wang
-
-> 
-> Thanks,
-> Wenjia
 
