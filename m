@@ -1,282 +1,247 @@
-Return-Path: <netdev+bounces-111561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6125C93193D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:28:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92359931941
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 19:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5CCA280D60
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:28:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11FF1C2171E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A1D446D1;
-	Mon, 15 Jul 2024 17:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9128447773;
+	Mon, 15 Jul 2024 17:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AjeInJaS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cmCQhu9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2044.outbound.protection.outlook.com [40.107.92.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DB11F608
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 17:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721064507; cv=none; b=g7iKHURQxqtEOJ3tve5C3loD28Wwz7Onh1wp+to5CxFSqiav0539jf9YpDaEBxt5pKoMgMlrdeETMbFFLYoT4f3GRb0dlBRNKO4SyOBZ4Pn8YYkuktORjjljqiZLi6YV810VuMkQMLRW97Tn4Aj1QYBUHI84Y+m6p1KjfzXmp9M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721064507; c=relaxed/simple;
-	bh=sim/q3b3pOM18dbdqHjNNMP/gbwbxxnjKtto8RIoxF4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VuLGER1A1XeIMMeFQp21LIhrG/Uj6aKHzTspe+ArgpI1ECQErPuNhALCxnE8jhrnMWDqf0WNfzATCzE7ZzejXAvMDl9CpUKp+zhIt4MrNPWeRTIKztqwu93/+fScPkZ4AzcvCSvySvA7Clo6NhD9V5Q5Lp/X4TU0HtL7wSgHL8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AjeInJaS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721064504;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=U0qsHao8ux+S2ayoL4DqlPuvlgfgrCkG5whxGOdZAn4=;
-	b=AjeInJaSJfptQwd6Xf3s92fOh9Y7l5f4jXUdSllAaeernuddxtIqWaag8pAUfZM69vuE/P
-	LG4WROzoWbG3KPNEvd2IPGuMh/Rp9oOFPRQQHhYidhbx0GBmD7qUZw/yaCMKK5NWQdYw7E
-	L5MLrYq63o+sw7mR+2gZyqVczYJ+zpk=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-519-5ELIBpZHMpOXDMVEUOkk5w-1; Mon,
- 15 Jul 2024 13:28:21 -0400
-X-MC-Unique: 5ELIBpZHMpOXDMVEUOkk5w-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B29C21955D48;
-	Mon, 15 Jul 2024 17:28:19 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.225.154])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCFC01955F40;
-	Mon, 15 Jul 2024 17:28:14 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: dcaratti@redhat.com
-Cc: aclaudi@redhat.com,
-	ast@fiberby.net,
-	dsahern@kernel.org,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	jhs@mojatatu.com,
-	netdev@vger.kernel.org,
-	stephen@networkplumber.org
-Subject: [PATCH iproute2-next] tc: f_flower: add support for matching on tunnel metadata
-Date: Mon, 15 Jul 2024 19:27:59 +0200
-Message-ID: <db729874972e2428df9b28323f24d3ec35f453b5.1721064345.git.dcaratti@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A230E17753;
+	Mon, 15 Jul 2024 17:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721064529; cv=fail; b=lTNqlWjUinwoNjoZn+mltwFrnZODOtwY89jXwoFCcsc/w7Bs8n1vm7pRF7EOkewo/VIdNRx3yJtlHpTQGf8Mdiv7cHuU0l+aZMfzCKHGNMijLY3gfw2CepYK+1dRVQLsgQgDm7aj8Y4yFrdXkmkjB6so6prYszoijEFT9Q6MjHI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721064529; c=relaxed/simple;
+	bh=D+uibmt4y1KE/vyPkyAV4M8OT1QDbIqjBVAk9cIZ+Gc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SS8/Jrpup27bl/yevHF3AKr9CjvB81eEqf+2hZ832V63jz9kQwBj6s3Qa2jAd132GmV/HNNN2OYfczGLjR7tdFbZRceYPy70t6MOxnhadytU85X1k0olb1kHzHHe2osyzU71M/olDTXFC059L9hOLgsjo922JjjzanA1MG3gZC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cmCQhu9u; arc=fail smtp.client-ip=40.107.92.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dwwYo51jr1AlTMkyfMcHQ5BNtTTbT47xSWysP4hLYDOupcNDshA5yjOFeC6LsLwtgQ9nIpHgsvYNUzsYCCLlxSLk5QkhTOShWbDhgKSe4GxqSOUdk9x/E8ogRIv7z0PKLTx6jPGZtKeYjWFNlsqt7zU3f4DLYakbJ9+dNEgcPzhjuPXNVh1TE74rZnBVxwaFvHVMrN6H8R+qBsHfGIgfomB1zRPCV9olz8QnYUiBBiqATxEucw7lUZAipZf2VjX35FLNFyLRDpj7AH1NZiJWoPt5XCkh3Z73nCkbGPAY7Grqr3XwWTCt9Bu8Bil8WZ3EPsfYIsE7daj0mkqGlmiNtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sl/diJvG+QLXcaH2Op++o+G1PVA4ZiuPgvrtxuNtCj4=;
+ b=PRq8X5iKBmfHPXeOgwJzMu1pgnVt47kguLrWK2jZzC9ALi4xygnMv0wzhfuUBVnSB6qK2SLrrhe4769g1KSZ9z79hd5Bio6ljHK/BRCl0rMguIqlHyyA11ovyMYrNBF8Ei1xcS7Mxzr2IAf11Hs9v856i1rrCy+k7ZN0bQHY3eVsCLQVys45Hv6jk7hy6X6XykdBYRXZEs3qOWRfFbPo9Z0f9y9Hbr4sTsqxBk9tCzLpH1Hu9dk/cxm34KDMYrwzpZDRgprU/ZNLRJlMHwvOJGUhFxlm9O+UpUn9XbjslifFHIh8+3gqHeyw7DmUoBVOSNJ6mS1bkBWuyUkXFimmEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sl/diJvG+QLXcaH2Op++o+G1PVA4ZiuPgvrtxuNtCj4=;
+ b=cmCQhu9uTB6e/QThbvywpsnFQ12hlSMyNJHkckRNRDAThBEaTor/kuenGaEcZmPEZa80g+onwN2ZhlIhay+7b2ZceHsxm2xggdH0ptSxER5eH04HZOfEJoTPGHYlZqiWGslmtNuASzXZa+be186Sl1UoBx406OigNsMxCFKIudg=
+Received: from BYAPR02CA0011.namprd02.prod.outlook.com (2603:10b6:a02:ee::24)
+ by CH0PR12MB8461.namprd12.prod.outlook.com (2603:10b6:610:183::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
+ 2024 17:28:44 +0000
+Received: from SJ1PEPF000023DA.namprd21.prod.outlook.com
+ (2603:10b6:a02:ee:cafe::79) by BYAPR02CA0011.outlook.office365.com
+ (2603:10b6:a02:ee::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29 via Frontend
+ Transport; Mon, 15 Jul 2024 17:28:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SJ1PEPF000023DA.mail.protection.outlook.com (10.167.244.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7784.5 via Frontend Transport; Mon, 15 Jul 2024 17:28:43 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 15 Jul
+ 2024 12:28:42 -0500
+Received: from xcbalucerop41x.xilinx.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 15 Jul 2024 12:28:41 -0500
+From: <alejandro.lucero-palau@amd.com>
+To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <richard.hughes@amd.com>
+CC: Alejandro Lucero <alejandro.lucero-palau@amd.com>
+Subject: [PATCH v2 00/15] cxl: add Type2 device support
+Date: Mon, 15 Jul 2024 18:28:20 +0100
+Message-ID: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Received-SPF: None (SATLEXMB03.amd.com: alejandro.lucero-palau@amd.com does
+ not designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023DA:EE_|CH0PR12MB8461:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2264491-cc8c-460a-a1da-08dca4f3938a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RnFPaFVXdEh6WENkdE9IN1ZZL3p1QUQ0YzdwOW10bzVJK2dDeVpBTkpqb0kv?=
+ =?utf-8?B?alNlY2pTYzJXNmcxQklVcUxwTWplaTJyak9nSDM1TkdPQVdpZk14SlRReXJH?=
+ =?utf-8?B?eWl5QXArZHhhUGliU1ZpTThpUXBWU1IxYmd4eFBQdFNHQVRoZlNXTkZJOEsv?=
+ =?utf-8?B?V3pPVGVQQnFSNzh4NnAxbXg3ZGxpRG5xL1BybnR5WVB6ak1qUXFsWlN2Ykd2?=
+ =?utf-8?B?Qi8wY3pPVHE2a3ZWdXo5N090RnB3WjJBZUVMOWo2SU9jOTdXRER2eFhvV3pU?=
+ =?utf-8?B?dW1JSkhNOUZua3IweFVISUN5ZGRoWUt5OUQxYUVZVURvdHJOdXhLREtYLzFu?=
+ =?utf-8?B?MkN2STQxejZES3YyQk5jS1pMb08wb0ZBUmg2ai9FNTFFWnIxaEJGWU5iczZP?=
+ =?utf-8?B?aEJDMXlxbnlOWlBsTlRyTm53dDE3a1U5UjVrK0tYU2hqRUlONGtWMm11cHBv?=
+ =?utf-8?B?WU0rWk8zMEx1Nk1SNVNWclQ1OTVqdkMwM1hOWS9rc1hqWE5OQWQydHBZMEkw?=
+ =?utf-8?B?K2hYRWtiaGM0K1R2cXJnUDljNmhibUI5UHZVWkw3T1h1V0hkR2VYdlZiZzJh?=
+ =?utf-8?B?UkwwTDQ2emJYVklIWUF4WDhEeXFVRHRIWGExalo1bi84RFlyb25DdTQrYmFS?=
+ =?utf-8?B?ZVc2YUJYeU5jbVNxWmo4cWtQV1hDN2o0VDkzRGRzR0xCbnNsM1o5Vmx2bUxN?=
+ =?utf-8?B?K0krRU9OOWYzcGZnUU9meWNaMnNjK3l6R2tBSkIzRjlId1VqWDY3b3ExVVBj?=
+ =?utf-8?B?bE5ObVVRaGRlLzZTVmRlckZ5eFk2NVF5c0RTbjdZOXV1WjhhSlRUNWZSa2Vn?=
+ =?utf-8?B?SXJrZnowYlpwS3k5YWR3SUVDU0Y2cmFXWEJDT3dvbmk1RldDMmxqSDJCU1NY?=
+ =?utf-8?B?Q09kZnUraW9sWnR5VVFLVHFSc1h5bWlzNDlnZ0JnOUdLNWNtQ3B3Z1lZMmlQ?=
+ =?utf-8?B?THc0VXVZNmpIUTFtTEFoQXRKK2RWSGV0SzZ3T1haYlN2UVlYMUl0OTE1UFhN?=
+ =?utf-8?B?UnZkMjdGU0d3R2NZWkJ2QS9KY25sZW43ZjVKeTVlYjVzaU5QWVdzZkE3ckdP?=
+ =?utf-8?B?SEVuT0NLSUN6QU1aYU01YWNJY09sRXpIb3FhcytkL1lJUWoyTEhqZkNqbVhY?=
+ =?utf-8?B?dmFaa1Y2ekhnMU5yeDFBdGVqYmFpV3JJVnNWeG4wWXlOdUo4ekZxWWdsSFVZ?=
+ =?utf-8?B?M2c2aWNoOThqQzhLMTlPQW5TS1VibDNXRUk3QUwzTmQzbTFsUXJjeWlURGpx?=
+ =?utf-8?B?bitGblFUenptRlYzdHlJbUNjcHZiTm9GUHhkd0RuSm9uVDNCQ3JMYk11eTI3?=
+ =?utf-8?B?OTNQWkcyQlJNUXJMVjE3QVpmSlBlVlBnUUMzUzhPQlN3aEE2Q2J6cXhkY1Bx?=
+ =?utf-8?B?UUEvM3hnNThwMmJMQkovbExJM0s1ZG5KVk1ScU1zUzdwb3dCVWpDbzd6RFdz?=
+ =?utf-8?B?QjZmMEpMYXgwdVpid05ORVRtc2ZxM2FvT1k0dXZ6T21vdnYybGdvcXFsN3RR?=
+ =?utf-8?B?STZ5ZlFRTU9VRmYrMnRXMWRNb3VNMTFqZ3NwVUNuZDI5VlNjM2Qrd0l6aHYz?=
+ =?utf-8?B?VUFReDZkSnFMc2ROQ2dxbktrN3hNNzNZSFZmZTFzU3VOdU1JYlhoZ0c1Y3BB?=
+ =?utf-8?B?aFc5TkZQK1dhTnFaY0JOQnBjNVI1L1VNWnN5dUtQajZ0NFZIaXhhbXc5ZkF1?=
+ =?utf-8?B?aSszbUpIT2lTVTV4SEQ5cXdrRlRzOWFJUFYwRVQwTlJWbUlNSWhNUVMzTmwr?=
+ =?utf-8?B?TnVUcHpPNUpqR2JyY2ltSEFxRmxWY1lIWjJmVndvb1N1TERtQVRJTXJmZ3Fm?=
+ =?utf-8?B?UzZkcC9WWllpdkVUMkNjWXdWd0VhNkNrNjVxZ01Xb1JGdHlyMmVoVmZSZUl0?=
+ =?utf-8?Q?8OPqBW2Xk2bf+?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 17:28:43.7705
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2264491-cc8c-460a-a1da-08dca4f3938a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023DA.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8461
 
-extend TC flower for matching on tunnel metadata.
+From: Alejandro Lucero <alejandro.lucero-palau@amd.com>
 
-Changes since RFC:
- - update uAPI bits to Asbjørn's most recent code [1]
- - add 'tun' prefix to all flag names (Asbjørn)
- - allow parsing 'enc_flags' multiple times, without clearing the match
-   mask every time, like happens for 'ip_flags' (Asbjørn)
- - don't use "matches()" for parsing argv[]  (Stephen)
- - (hopefully) improve usage() printout (Asbjørn)
- - update man page
+This is a second version for adding CXL Type2 support with changes from the
+first RFC patchset.
 
-[1] https://lore.kernel.org/netdev/20240709163825.1210046-1-ast@fiberby.net/
+I have removed the introduction about the concerns with BIOS/UEFI after the
+discussion leading to confirm the need of the functionality implemented, at
+least is some scenarios.
 
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- include/uapi/linux/pkt_cls.h |  7 +++++++
- man/man8/tc-flower.8         | 28 ++++++++++++++++++++++++--
- tc/f_flower.c                | 38 +++++++++++++++++++++++++++++++++++-
- 3 files changed, 70 insertions(+), 3 deletions(-)
+There are two main changes from the RFC:
 
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 229fc925ec3a..19e25bceb24c 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -554,6 +554,9 @@ enum {
- 	TCA_FLOWER_KEY_SPI,		/* be32 */
- 	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
- 
-+	TCA_FLOWER_KEY_ENC_FLAGS,	/* be32 */
-+	TCA_FLOWER_KEY_ENC_FLAGS_MASK,	/* be32 */
-+
- 	__TCA_FLOWER_MAX,
- };
- 
-@@ -674,6 +677,10 @@ enum {
- enum {
- 	TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
- 	TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM = (1 << 2),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT = (1 << 3),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM = (1 << 4),
-+	TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT = (1 << 5),
- };
- 
- enum {
-diff --git a/man/man8/tc-flower.8 b/man/man8/tc-flower.8
-index 6b56640503d5..028f48571be3 100644
---- a/man/man8/tc-flower.8
-+++ b/man/man8/tc-flower.8
-@@ -106,7 +106,9 @@ flower \- flow based traffic control filter
- .B l2_miss
- .IR L2_MISS " | "
- .BR cfm
--.IR CFM_OPTIONS " }"
-+.IR CFM_OPTIONS " | "
-+.BR enc_flags
-+.IR ENCFLAG_LIST " }"
- 
- .ti -8
- .IR LSE_LIST " := [ " LSE_LIST " ] " LSE
-@@ -131,6 +133,16 @@ flower \- flow based traffic control filter
- .B op
- .IR OPCODE "
- 
-+.ti -8
-+.IR ENCFLAG_LIST " := [ " ENCFLAG_LIST "/ ] " ENCFLAG
-+
-+.ti -8
-+.IR ENCFLAG " := { "
-+.BR [no]tuncsum " | "
-+.BR [no]tundf " | "
-+.BR [no]tunoam " | "
-+.BR [no]tuncrit " } "
-+
- .SH DESCRIPTION
- The
- .B flower
-@@ -538,11 +550,23 @@ Match on the Maintenance Domain (MD) level field.
- .BI op " OPCODE "
- Match on the CFM opcode field. \fIOPCODE\fR is an unsigned 8 bit value in
- decimal format.
-+.RE
-+.TP
-+.BI enc_flags " ENCFLAGS_LIST "
-+Match on tunnel control flags.
-+.I ENCFLAGS_LIST
-+is a list of the following tunnel control flags:
-+.BR [no]tuncsum ", "
-+.BR [no]tundf ", "
-+.BR [no]tunoam ", "
-+.BR [no]tuncrit ", "
-+each separated by '/'.
-+.TP
- 
- .SH NOTES
- As stated above where applicable, matches of a certain layer implicitly depend
- on the matches of the next lower layer. Precisely, layer one and two matches
--(\fBindev\fR,  \fBdst_mac\fR and \fBsrc_mac\fR)
-+(\fBindev\fR,  \fBdst_mac\fR, \fBsrc_mac\fR and \fBenc_flags\fR)
- have no dependency,
- MPLS and layer three matches
- (\fBmpls\fR, \fBmpls_label\fR, \fBmpls_tc\fR, \fBmpls_bos\fR, \fBmpls_ttl\fR,
-diff --git a/tc/f_flower.c b/tc/f_flower.c
-index 08c1001af7b4..35ccc3743f46 100644
---- a/tc/f_flower.c
-+++ b/tc/f_flower.c
-@@ -28,6 +28,7 @@
- 
- enum flower_matching_flags {
- 	FLOWER_IP_FLAGS,
-+	FLOWER_ENC_DST_FLAGS,
- };
- 
- enum flower_endpoint {
-@@ -99,13 +100,16 @@ static void explain(void)
- 		"			ct_label MASKED_CT_LABEL |\n"
- 		"			ct_mark MASKED_CT_MARK |\n"
- 		"			ct_zone MASKED_CT_ZONE |\n"
--		"			cfm CFM }\n"
-+		"			cfm CFM |\n"
-+		"			enc_flags ENC-FLAGS }\n"
- 		"	LSE-LIST := [ LSE-LIST ] LSE\n"
- 		"	LSE := lse depth DEPTH { label LABEL | tc TC | bos BOS | ttl TTL }\n"
- 		"	FILTERID := X:Y:Z\n"
- 		"	MASKED_LLADDR := { LLADDR | LLADDR/MASK | LLADDR/BITS }\n"
- 		"	MASKED_CT_STATE := combination of {+|-} and flags trk,est,new,rel,rpl,inv\n"
- 		"	CFM := { mdl LEVEL | op OPCODE }\n"
-+		"	ENCFLAG-LIST := [ ENCFLAG-LIST/ ]ENCFLAG\n"
-+		"	ENCFLAG := { [no]tuncsum | [no]tundf | [no]tunoam | [no]tuncrit }\n"
- 		"	ACTION-SPEC := ... look at individual actions\n"
- 		"\n"
- 		"NOTE:	CLASSID, IP-PROTO are parsed as hexadecimal input.\n"
-@@ -205,6 +209,10 @@ struct flag_to_string {
- static struct flag_to_string flags_str[] = {
- 	{ TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT, FLOWER_IP_FLAGS, "frag" },
- 	{ TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST, FLOWER_IP_FLAGS, "firstfrag" },
-+	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_CSUM, FLOWER_ENC_DST_FLAGS, "tuncsum" },
-+	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_DONT_FRAGMENT, FLOWER_ENC_DST_FLAGS, "tundf" },
-+	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM, FLOWER_ENC_DST_FLAGS, "tunoam" },
-+	{ TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT, FLOWER_ENC_DST_FLAGS, "tuncrit" },
- };
- 
- static int flower_parse_matching_flags(char *str,
-@@ -1642,6 +1650,8 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
- 	__u32 flags = 0;
- 	__u32 mtf = 0;
- 	__u32 mtf_mask = 0;
-+	__u32 dst_flags = 0;
-+	__u32 dst_flags_mask = 0;
- 
- 	if (handle) {
- 		ret = get_u32(&t->tcm_handle, handle, 0);
-@@ -2248,6 +2258,17 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
- 				fprintf(stderr, "Illegal \"pfcp_opts\"\n");
- 				return -1;
- 			}
-+		} else if (!strcmp(*argv, "enc_flags")) {
-+			NEXT_ARG();
-+			ret = flower_parse_matching_flags(*argv,
-+							  FLOWER_ENC_DST_FLAGS,
-+							  &dst_flags,
-+							  &dst_flags_mask);
-+
-+			if (ret < 0) {
-+				fprintf(stderr, "Illegal \"enc_flags\"\n");
-+				return -1;
-+			}
- 		} else if (matches(*argv, "action") == 0) {
- 			NEXT_ARG();
- 			ret = parse_action(&argc, &argv, TCA_FLOWER_ACT, n);
-@@ -2286,6 +2307,17 @@ parse_done:
- 			return ret;
- 	}
- 
-+	if (dst_flags_mask) {
-+		ret = addattr32(n, MAX_MSG, TCA_FLOWER_KEY_ENC_FLAGS,
-+				htonl(dst_flags));
-+		if (ret)
-+			return ret;
-+		ret = addattr32(n, MAX_MSG, TCA_FLOWER_KEY_ENC_FLAGS_MASK,
-+				htonl(dst_flags_mask));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	if (tc_proto != htons(ETH_P_ALL)) {
- 		ret = addattr16(n, MAX_MSG, TCA_FLOWER_KEY_ETH_TYPE, tc_proto);
- 		if (ret)
-@@ -3262,6 +3294,10 @@ static int flower_print_opt(const struct filter_util *qu, FILE *f,
- 				    tb[TCA_FLOWER_KEY_FLAGS],
- 				    tb[TCA_FLOWER_KEY_FLAGS_MASK]);
- 
-+	flower_print_matching_flags("enc_flags", FLOWER_ENC_DST_FLAGS,
-+				    tb[TCA_FLOWER_KEY_ENC_FLAGS],
-+				    tb[TCA_FLOWER_KEY_ENC_FLAGS_MASK]);
-+
- 	if (tb[TCA_FLOWER_L2_MISS]) {
- 		struct rtattr *attr = tb[TCA_FLOWER_L2_MISS];
- 
+1) Following concerns about drivers using CXL core without restrictions, the CXL
+struct to work with is opaque to those drivers, therefore functions are
+implemented for modifying or reading those structs indirectly.
+
+2) The driver for using the added functionality is not a test driver but a real
+one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
+buffers instead of regions inside PCIe BARs.
+
+Current CXL kernel code is focused on supporting Type3 CXL devices, aka memory
+expanders. Type2 CXL devices, aka device accelerators, share some functionalities
+but require some special handling.
+
+First of all, Type2 are by definition specific to drivers doing something and not just
+a memory expander, so it is expected to work with the CXL specifics. This implies the CXL
+setup needs to be done by such a driver instead of by a generic CXL PCI driver
+as for memory expanders. Most of such setup needs to use current CXL core code
+and therefore needs to be accessible to those vendor drivers. This is accomplished 
+exporting opaque CXL structs and adding and exporting functions for working with
+those structs indirectly.
+
+Some of the patches are based on a patchset sent by Dan Williams [1] which was just
+partially integrated, most related to making things ready for Type2 but none
+related to specific Type2 support. Those patches based on Dan´s work have Dan´s
+signing as co-developer, and a link to the original patch.
+
+A final note about CXL.cache is needed. This patchset does not cover it at all,
+although the emulated Type2 device advertises it. From the kernel point of view
+supporting CXL.cache will imply to be sure the CXL path supports what the Type2
+device needs. A device accelerator will likely be connected to a Root Switch,
+but other configurations can not be discarded. Therefore the kernel will need to
+check not just HPA, DPA, interleave and granularity, but also the available
+CXL.cache support and resources in each switch in the CXL path to the Type2
+device. I expect to contribute to this support in the following months, and
+it would be good to discuss about it when possible.
+
+[1] https://lore.kernel.org/linux-cxl/98b1f61a-e6c2-71d4-c368-50d958501b0c@intel.com/T/
+
+Alejandro Lucero (15):
+  cxl: add type2 device basic support
+  cxl: add function for type2 cxl regs setup
+  cxl: add function for type2 resource request
+  cxl: add capabilities field to cxl_dev_state
+  cxl: fix use of resource_contains
+  cxl: add function for setting media ready by an accelerator
+  cxl: support type2 memdev creation
+  cxl: indicate probe deferral
+  cxl: define a driver interface for HPA free space enumaration
+  cxl: define a driver interface for DPA allocation
+  cxl: make region type based on endpoint type
+  cxl: allow region creation by type2 drivers
+  cxl: preclude device memory to be used for dax
+  cxl: add function for obtaining params from a region
+  efx: support pio mapping based on cxl
+
+ drivers/cxl/core/cdat.c               |   3 +
+ drivers/cxl/core/core.h               |   1 +
+ drivers/cxl/core/hdm.c                | 160 +++++++--
+ drivers/cxl/core/mbox.c               |   1 +
+ drivers/cxl/core/memdev.c             | 122 +++++++
+ drivers/cxl/core/port.c               |   4 +-
+ drivers/cxl/core/region.c             | 459 ++++++++++++++++++++++----
+ drivers/cxl/core/regs.c               |  11 +-
+ drivers/cxl/cxl.h                     |   9 +-
+ drivers/cxl/cxlmem.h                  |  11 +
+ drivers/cxl/mem.c                     |  24 +-
+ drivers/cxl/pci.c                     |  39 ++-
+ drivers/net/ethernet/sfc/Makefile     |   2 +-
+ drivers/net/ethernet/sfc/ef10.c       |  25 +-
+ drivers/net/ethernet/sfc/efx.c        |   6 +
+ drivers/net/ethernet/sfc/efx_cxl.c    | 134 ++++++++
+ drivers/net/ethernet/sfc/efx_cxl.h    |  30 ++
+ drivers/net/ethernet/sfc/mcdi_pcol.h  |   3 +
+ drivers/net/ethernet/sfc/net_driver.h |   4 +
+ drivers/net/ethernet/sfc/nic.h        |   1 +
+ include/linux/cxl_accel_mem.h         |  58 ++++
+ include/linux/cxl_accel_pci.h         |  23 ++
+ 22 files changed, 1021 insertions(+), 109 deletions(-)
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+ create mode 100644 include/linux/cxl_accel_mem.h
+ create mode 100644 include/linux/cxl_accel_pci.h
+
 -- 
-2.45.2
+2.17.1
 
 
