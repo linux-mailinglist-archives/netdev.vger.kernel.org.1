@@ -1,100 +1,115 @@
-Return-Path: <netdev+bounces-111482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84730931547
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:00:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4C7931575
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:11:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B68021C225BD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:00:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FE3DB2113B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF9E18A926;
-	Mon, 15 Jul 2024 13:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UoQL4ffM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01C818D4A9;
+	Mon, 15 Jul 2024 13:11:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756A0172BA6;
-	Mon, 15 Jul 2024 13:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5923018A926
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 13:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721048433; cv=none; b=gmthYUYx/Fm3CMkd6lKsF+BV89NcQ54tRIfbRgdjBfraO+7tcukpj/asVEXSStcHceAnmvnc74UUCNLdYiynEMDh6XVuc3Wp6nMrrRl7Q85mCM5W7A4D2ThA6N3N7mBW1/pmsyXVm2mR2clGdZre5URDnJm0p9v7yP6vbrQu7V8=
+	t=1721049100; cv=none; b=cVtz7aXvjtrCj+Ir75bhM8zZE43Ikh8J+puBo/F23aDOiLPXYY9/sSVIULTrn+eC2heIlFKiR1XfPIIoRskqcEMmZwvKsRCj7zIGgfVAiyRnptm50XBuMZ52/mg6aVwN1ZVTHuo0bj4B5so8DkWkTuwND59QEi75vWUp07jedLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721048433; c=relaxed/simple;
-	bh=xBp6wVPgvsV2DDw1J9KEqgZp6b7FI6NgpSBWW1KGY5s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J4NFE5gt2SdamGYWjW+k9PxAejjOrxtrDZyQUQY3C8wsKx55I3OV+IypK5BTosN7ff+OKzG55oD8LT4XfCN7Qjx/ACz2WlGfO/FYctSFMaTfCNkqHgyX1FjDOU/rsxUI/wn+V3D6TRXgIqadVNDoeFLGmY+ix1Bz6zgOP9FLbIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UoQL4ffM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5541C4AF0A;
-	Mon, 15 Jul 2024 13:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721048433;
-	bh=xBp6wVPgvsV2DDw1J9KEqgZp6b7FI6NgpSBWW1KGY5s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UoQL4ffMw4JVCnc0lByBfRXvY0EG5mldxmXxgUWA49Wmx04yllSIo+UEo2aZbND+i
-	 +xiSh8FloNN5cwdVwRhuGvYEbdvbAnrgviQFl5N+68U1IBEZgBgh12iMpxuZoAi4K0
-	 3kydD34vRYNgGXOI0scKSsCTpsix/X+E5eVjwZKhLUzZfzLp3qAdFeeqlG2b+gkRNM
-	 +cM/5slN3cCCD/cMhOGO3cpd0Bv10lsloGfpfEJgkLhjg+caLWGsaU0EibnFmVmw3W
-	 oQh9HHpxJCZ1cSJot+iMocAtWSXf6DbktKlX12rijjCoR7l/BUO8b0OSYCMO7YJDbf
-	 dSiEQnEC0gPGQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D4C93C43443;
-	Mon, 15 Jul 2024 13:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1721049100; c=relaxed/simple;
+	bh=dObdQ1IsVQ2RU6Yf86U8FZ/FL0Q5hb3z2btOx7AZnU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=pL8hGPniYWw2hFxEPZA2vLjEZh+5jHb0iRyoKh7qtVHHDgJcQ8j0Mxip6StPvk8LWxXk60vpymQhl0C+F8T9M+uiTopHMNhhZYiQ4heCXgG6unbS7jRwAgVeCTGBH24haXfYKAsQHZDrCArvKJwCDRbRg+YXi0jzRjYWbJqoXqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-443-2ltflJ10ODeCPWARpRPt7Q-1; Mon,
+ 15 Jul 2024 09:11:33 -0400
+X-MC-Unique: 2ltflJ10ODeCPWARpRPt7Q-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93A731955D4F;
+	Mon, 15 Jul 2024 13:11:32 +0000 (UTC)
+Received: from hog (unknown [10.39.192.3])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B645E1955D44;
+	Mon, 15 Jul 2024 13:11:29 +0000 (UTC)
+Date: Mon, 15 Jul 2024 15:11:27 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+	pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
+Subject: Re: [PATCH net-next v5 16/25] ovpn: implement peer lookup logic
+Message-ID: <ZpUf_1gdsZvoLYbn@hog>
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-17-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: ti: icssg-prueth: Split out common object
- into module
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172104843286.23241.15744127998585161383.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jul 2024 13:00:32 +0000
-References: <20240712120636.814564-1-danishanwar@ti.com>
-In-Reply-To: <20240712120636.814564-1-danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: hkallweit1@gmail.com, horms@kernel.org, dan.carpenter@linaro.org,
- jan.kiszka@siemens.com, wsa+renesas@sang-engineering.com,
- diogo.ivo@siemens.com, andrew@lunn.ch, rogerq@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, srk@ti.com, vigneshr@ti.com, linux@leemhuis.info
+In-Reply-To: <20240627130843.21042-17-antonio@openvpn.net>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+2024-06-27, 15:08:34 +0200, Antonio Quartulli wrote:
+>  /**
+>   * ovpn_peer_check_by_src - check that skb source is routed via peer
+>   * @ovpn: the openvpn instance to search
+>   * @skb: the packet to extra source address from
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+nit, just noticed now but should be fixed in patch 12: s/to extra/to extrac=
+t/
 
-On Fri, 12 Jul 2024 17:36:36 +0530 you wrote:
-> icssg_prueth.c and icssg_prueth_sr1.c drivers use multiple common .c
-> files. These common objects are getting added to multiple modules. As a
-> result when both drivers are enabled in .config, below warning is seen.
-> 
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_common.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_classifier.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_config.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_mii_cfg.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_stats.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> drivers/net/ethernet/ti/Makefile: icssg/icssg_ethtool.o is added to multiple modules: icssg-prueth icssg-prueth-sr1
-> 
-> [...]
+[...]
+> @@ -324,11 +576,11 @@ static int ovpn_peer_add_mp(struct ovpn_struct *ovp=
+n, struct ovpn_peer *peer)
+>  =09struct sockaddr_storage sa =3D { 0 };
+>  =09struct sockaddr_in6 *sa6;
+>  =09struct sockaddr_in *sa4;
+> +=09struct hlist_head *head;
+>  =09struct ovpn_bind *bind;
+>  =09struct ovpn_peer *tmp;
+>  =09size_t salen;
+>  =09int ret =3D 0;
+> -=09u32 index;
+> =20
+>  =09spin_lock_bh(&ovpn->peers->lock);
+>  =09/* do not add duplicates */
+> @@ -364,30 +616,27 @@ static int ovpn_peer_add_mp(struct ovpn_struct *ovp=
+n, struct ovpn_peer *peer)
+>  =09=09=09goto unlock;
+>  =09=09}
+> =20
+> -=09=09index =3D ovpn_peer_index(ovpn->peers->by_transp_addr, &sa,
+> -=09=09=09=09=09salen);
+> -=09=09hlist_add_head_rcu(&peer->hash_entry_transp_addr,
+> -=09=09=09=09   &ovpn->peers->by_transp_addr[index]);
+> +=09=09head =3D ovpn_get_hash_head(ovpn->peers->by_transp_addr, &sa,
+> +=09=09=09=09=09  salen);
+> +=09=09hlist_add_head_rcu(&peer->hash_entry_transp_addr, head);
+>  =09}
 
-Here is the summary with links:
-  - [net-next,v3] net: ti: icssg-prueth: Split out common object into module
-    https://git.kernel.org/netdev/net-next/c/a8ea8d531d1e
+These changes to ovpn_peer_add_mp (and the replacement of
+ovpn_peer_index with ovpn_get_hash_head) could be squashed into the
+previous patch.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+--=20
+Sabrina
 
 
