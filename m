@@ -1,244 +1,205 @@
-Return-Path: <netdev+bounces-111538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4449317D6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:46:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D119317D9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 17:47:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F2A41C20CAA
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:46:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87E09B21A7D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB33C15B;
-	Mon, 15 Jul 2024 15:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041BED53C;
+	Mon, 15 Jul 2024 15:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFrX5Mmj"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Wx90gagL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com [209.85.160.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010070.outbound.protection.outlook.com [52.101.69.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C93620EB;
-	Mon, 15 Jul 2024 15:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721058382; cv=none; b=gu31YFV2bmFZQOF2ntHcAFVM+vjvyQ/c8Gm21oNOToiF8XW7P+Yzoazbaanepkqy8rp8m+xigO4jkCDd/YpQoGAJnL9q7cAtSS1Yd1AJCRJ/m0kZJSAOuHtzHhnfLQLKHxWWpZc6Xz27x0uL6JJvGIew2KlMhMntQczDSlAp8B0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721058382; c=relaxed/simple;
-	bh=oLiaQ1klWwSQIumg3AhxoPfNz0aYuW3gA3TqWpED+g0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E6ygxA8egmwchsJ9y4kaTAwzxwgxK5YjnkzvoveMJP3ofTBN/uoOkGiQfZqLFRZJ9PPcKb0gijCNEvrzG7AcbydMSIxp5LjzgmmvMQ8YB/sakrW/JolSLKpHpP6vW16wX2NLl+hjJo1wzJ/0RY4SAK05gWf70xON+VHKyWe6CMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFrX5Mmj; arc=none smtp.client-ip=209.85.160.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f195.google.com with SMTP id d75a77b69052e-44d5f487556so24083561cf.3;
-        Mon, 15 Jul 2024 08:46:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721058380; x=1721663180; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=L02Bv3qTm0KPSZYoQ77x+hSiHLw/7P4AfHH/o8NuIjE=;
-        b=bFrX5MmjvQBT+EUhWzr5/H8TJKnAl9+LG7g8uohqDNQBBDe0kS58GszelJJ1fK8WFA
-         WDxVnmOMivMyqiUiQM0V7K1zXbZP+divlIVt4t86dX3torag5dGmuH+kyb0nP2K4rr/r
-         nzlknQVqaI6wlPj4asp8gCz+LeAIyK2bdGiGZR+shTSFV3yz1s13C2z49j3Kz0arxntT
-         IMY8evhi2EHJxRthDHePJ72Dh3Y+WLnxmPbNhtjUvzUaLpI68eF+rKJkY74xvqVxtAop
-         1HfUdv6qYJpkJpTLIabnb/Zkt8HIspD51U3mfPqf9IGVwJ7SA6W1wxJNxvCVhBXvCjnI
-         Tv0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721058380; x=1721663180;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L02Bv3qTm0KPSZYoQ77x+hSiHLw/7P4AfHH/o8NuIjE=;
-        b=Tz9NpzFdoScgfoCQ6CKOdB8he6pxNxAljllmt3bG/nD8pl9cDN1ctd08MnLYSXYtPf
-         yC3tZ6jMnj55ZUG6HEbeGZSBGT5Jznq3VRh1Gvosv4LojxQKG9IBnL9EPqZ9V/MjPbXI
-         cB0mzzg1EFP84yskj5T5ZY+49e2ijctg73RAZqCiAr6UUrx6w5Lfp91dqvy/lYMly2yX
-         k0WP4WauAW9AXRpF3TmQOsdEcHrTZd4H7SpgyFfZMkrYCDDAo70x6RINFsZaUQwEeP2E
-         IyaLdgo/buMwKw5Y4A12vnJws48/H7wniKNdxRR/La7xssZLVPl8vIuznkn7W8/xgHzu
-         bclQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWNgiQ4Xss6MZL+7eTlxz3snRVsOKivlyDCWfcjEL739fsCCieVYJCVJxafyUe4RXzygpuIbosaFFkV2YL781SSZbwNuRrJDgrYkAdIim87qomSf7lSn6rA3wP7gH67zUg3u1OOMUxe8K3Y1Ao7uGq4i2NRfBY3cM5ZWYPkiGyMLRGXEZeCTNKvu/l8e0TQFxaGue8/L2tu1jIbtQJGGff0Y4HbtM=
-X-Gm-Message-State: AOJu0YxQpAQ8j3lRo+ZfExNCQaeYxL3258UVNY/BSd9agv5NGBkfO0aX
-	Gq6g1+D3gc+tPdMCjnpDPc3zJzfczURcBy482/D6IwCyije4xdzI
-X-Google-Smtp-Source: AGHT+IGVHJOL20G58t7+WWacMZ8rb/Ay90S6Qtca9nWqRmAF8WjfdCNlo9MnaJe+xxHT3FB1TPsI7A==
-X-Received: by 2002:a05:6214:226b:b0:6b5:4288:7e94 with SMTP id 6a1803df08f44-6b77de52af9mr980926d6.8.1721058379788;
-        Mon, 15 Jul 2024 08:46:19 -0700 (PDT)
-Received: from [192.168.158.7] ([207.35.255.94])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b76197c6e4sm22487286d6.39.2024.07.15.08.46.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jul 2024 08:46:19 -0700 (PDT)
-Message-ID: <df092baf-03a5-4b4a-ab8b-ee7a5677c172@gmail.com>
-Date: Mon, 15 Jul 2024 17:46:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E27CBE71
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 15:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721058421; cv=fail; b=eQM9qyM/wVRliOAOjI4J7ARgvsXAzU5WAtKeb1Gp1hvWgufG1leRya+4GE9ALTULh98D09ynL44y9guqEekwEcwJhyN80FjU5T60dtUHsnTMvze0Ykzs5ArkSijBoJ0TWZokC83fqED8t3pHpfXP06PRlLePOxEbtpSjO8GtTQ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721058421; c=relaxed/simple;
+	bh=N9qVHKyj3xi763OBxai3uJ8y95/0KHE5rbd3DT2HNVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CS+/pklOPqHtc6iuic+5UCkyiW77LieXLI6GyHGeowAFlC8R+0lCu2ycYkPABuyWOYyRU6yZudtQO6lFgLjtGOyLX/DluoZxY/qSkW80I2AAkR1UrKfrq9vEBRkxLQpfxdCXvN+UBCdpv+39jeH5519IfcKzyAF30VOpUAoul2A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=Wx90gagL; arc=fail smtp.client-ip=52.101.69.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gC6V8dIZ7Uh91EH0GhZrYHZ5KP3ql7Wr5S38caqo8osXukyqI36hXoQ1HZpwUxS73D7Y3T4YwxwPVtX1g/w8DB5sJhGWiki8mrWEKvY6FHHyU7Y6rFAMeYVOQbAJZNb7hyBoWPi6ZC+90OxU8nSdv+t9FPeFkTNNqt/1eNG6v8SIiVLmCdbx/6PKrpihNIiskSexxWPux/7wn0BuFc5odmioSjdUeVJZDhPZMD9wryMOV0lLzozzoDzi7W7fdKtdVnz+vgNukHMdXJLAFPYjlLLx0m3srKXkTGM8iM558tmtPCoymHpnQd6U0wFLSIT/ZKHOnBATivAPhi2VTADEwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PqkNpXnCtseO610YbNPcHHPPN/Aw+F2fxSPow6DfqSo=;
+ b=MpWpARQi3AQoaJ8VMf0y2iFiTy5HzxqAS+QRjWJ2XgWXoT1bSLte6wEeYT1WKqdMOjvO6COVrfBKjJW82wRo4/bGhsDg9Exw3LyYfbT+LHjjZFvygjCMIHaku0M0JzUqWvsrq/okdLeqceppibljnEv3zPaMMqoLfISmkADlYtlF0uOMdngFrCuXXCEYRA1KHiePNI3w9mDnyZjk4hW23WFGABFcFs0ebITbPhpUZDinAVyDWt42L1wSnfStPUz6wF/zyoC9eHFA6gwbEmHB2WVc4hRq9qkenwHySfhgjk1wv1Bmmm1Gfx9ibNGdXGAOoYw5PwXMq+P5Sm6pO5VQkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PqkNpXnCtseO610YbNPcHHPPN/Aw+F2fxSPow6DfqSo=;
+ b=Wx90gagLqYLSZCSr+0c5hSlXrtswq2dgW4B8YwCfmPUKh4DrIMccZYx7jhzXSP1IxvHODdCAPvYAx6pA0q64DKyh7FruX5cu0pbjtR4yX8Oid54rz0FIwYcfG0A9Pdehvy566kDkNfIqm++ovS7QVEkYcUS0UZblZeTpIH/gEiA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
+ AS8PR04MB8037.eurprd04.prod.outlook.com (2603:10a6:20b:2ac::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Mon, 15 Jul
+ 2024 15:46:57 +0000
+Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
+ ([fe80::86ff:def:c14a:a72a%4]) with mapi id 15.20.7741.017; Mon, 15 Jul 2024
+ 15:46:57 +0000
+Date: Mon, 15 Jul 2024 18:46:53 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Mogilappagari, Sudheer" <sudheer.mogilappagari@intel.com>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Wei Fang <wei.fang@nxp.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Subject: Re: Netlink handler for ethtool --show-rxfh breaks driver
+ compatibility
+Message-ID: <20240715154653.kcqcazsndp4nrqqh@skbuf>
+References: <20240711114535.pfrlbih3ehajnpvh@skbuf>
+ <IA1PR11MB626638AF6428C3E669F3FD4FE4A12@IA1PR11MB6266.namprd11.prod.outlook.com>
+ <20240715115807.uc5nbc53rmthdbpu@skbuf>
+ <20240715061137.3df01bf2@kernel.org>
+ <20240715132253.jd7u3ompexonweoe@skbuf>
+ <20240715063931.16bbe350@kernel.org>
+ <20240715150543.wvqdfwzes4ptvd4m@skbuf>
+ <20240715082600.770c1a89@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240715082600.770c1a89@kernel.org>
+X-ClientProxiedBy: VI1PR03CA0056.eurprd03.prod.outlook.com
+ (2603:10a6:803:50::27) To DB7PR04MB4555.eurprd04.prod.outlook.com
+ (2603:10a6:5:33::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rust: str: Use `core::CStr`, remove the custom `CStr`
- implementation
-To: =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
- Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng
- <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- Benno Lossin <benno.lossin@proton.me>,
- Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl
- <aliceryhl@google.com>, Brendan Higgins <brendan.higgins@linux.dev>,
- David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross
- <tmgross@umich.edu>, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Martin Rodriguez Reboredo <yakoyoku@gmail.com>, Finn Behrens
- <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>,
- Valentin Obst <kernel@valentinobst.de>,
- Laine Taffin Altman <alexanderaltman@me.com>,
- Danilo Krummrich <dakr@redhat.com>, Yutaro Ohno <yutaro.ono.418@gmail.com>,
- Tiago Lam <tiagolam@gmail.com>, Charalampos Mitrodimas
- <charmitro@posteo.net>, Ben Gooding <ben.gooding.dev@gmail.com>,
- Roland Xu <mu001999@outlook.com>, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, netdev@vger.kernel.org, llvm@lists.linux.dev
-References: <20240714160238.238708-1-vadorovsky@gmail.com>
- <S-L4QE4MFYzY1ba0fdkJYuAVIkZHxxYB6Jk9XPFuo3ZdbvNxtfN_mCFc5oNPfTu2X17vvyPUStAviAUAzeKlCGxwRM-VbC4aPUGBGtDQCcU=@protonmail.com>
-Content-Language: en-US
-From: Michal Rostecki <vadorovsky@gmail.com>
-Autocrypt: addr=vadorovsky@gmail.com; keydata=
- xsBNBGYJcUEBCAD3ciAzHQ8NElYQtsiPZ9NjsR7ttfihe0FM+PDT+6cChjFLQ8qO/1zEL5mh
- YaLbkjitrIYARhmo3lRDq3+G4L5+gRVExm9Rd98PcQy2P9F8shxI/msC50i1Fb9N4D0pP8Hx
- hhZ/or+2mbokZh8Qc9RdjynXRXAezhOFN4+0L2jkN7fjTO1IArl+TirXx+cvhQUbwKyyJlGL
- Kldvue2EqU4maZ+KIUs5di3kZgDPLILzvBqX9TLtwEMAkNY1uMCKK+C2aihap19OjoK0qOYj
- IahVHjqGL+Mb/Ga7jxMGr2TFeQEcwIgvdRiVVLtu+uiaRKqULGokBL3l9gprtBZWdLq7ABEB
- AAHNJk1pY2hhbCBSb3N0ZWNraSA8dmFkb3JvdnNreUBnbWFpbC5jb20+wsCXBBMBCABBFiEE
- 3RZt3oLrB5kpFLy14qU49yah1xEFAmYJdCQCGwMFCQHhM4AFCwkIBwICIgIGFQoJCAsCBBYC
- AwECHgcCF4AACgkQ4qU49yah1xFuDQf+NE2Oy6zF+uVh3vtidkfacCSMnu1QxojJHB8C1/Ep
- g4JU5hPcG9hC+HrMs5/Hqs7DOike9bZjhpEmnW4DIeI7Wy3t1Qf7A8EOzS0nrMgbX8TnkEon
- zMBBqiNp3VVVcltRJtc58xMP8K3yu6Ty2Q8e6GWdL5bqDr9gshb+vWu8inh5CullsGRJFJl0
- BfSdDKAbpH3NdEoWnL4JvFphpouh2vhd/ScvfNAQcuyBn3cbCyQdjNTgRVBkBNDEYCaWLVqP
- r4IU0JNjgk+cTLbyFmgn2++bWoIICGrAeWGruSpl7UGJ2PdJokWI9zp5UqSCezejDS53yhkU
- GsCrF7LrTceB6c7ATQRmCXFBAQgA2yrqjTKvL7VJKi/NNcpQ7EvAEm6omO+O4wQltdpybaxe
- mbLT0vZTH6rjZba28ixZmFHtwOjzNNtabmb4uK+nxs0BkVBpRvJNJ0LM1ydGYZQ46Sbvr1dE
- 7yWDkkG1CjmXYGd5I2iqx+ATbdrtzDGWLsvDXd/yEaO9dxAR+LqGOg1HdgE9Hhmuv8BRYSCL
- vnXaMA7Orq9oAmu+Q5q9TT3aZGMdBFdcoUNSVPX82uIYXjDaXj0Del8tluAHLf3oV7ZXEgOx
- c6OpRY3+8Pr9//UtfoaHNOjoKFNyPaIUf5U1+E9J0UoDm8m1usrwnghg6yRyPhczhCOvbYNL
- hQ6TiImvowARAQABwsB8BBgBCAAmFiEE3RZt3oLrB5kpFLy14qU49yah1xEFAmYJcUECGwwF
- CQHhM4AACgkQ4qU49yah1xHetgf9FpI4Y+okwFRIqRa6WJ8jhz6us+oYKedftr313NwerUB5
- 8nnhK0YWkZWZMuu5B4LCMiv71Ugqlc7ahBy5sQx/acRPe+NiYpwiN/pWrv7njaA6evDieXL8
- jc3j+xy4fsi861BWJXaurWQtLMXyHBUmdJ+StU7tscYTPe4fN1fdkBh0SreZxLfvp/+SMRQk
- g9PmXb1BMZdw8gWghPAbYg5bfCzXF9iZp4bmjuCENfwG4zmnYJzR6uTI0reqECo6Ee7NjOQ7
- qKy29wW+kVnEjX481iCEUmqKHEaQB08Ueb45If09fThw1baHLAk6bFk5cabMtD3JbWEifa6M
- RS+eXZNwwQ==
-In-Reply-To: <S-L4QE4MFYzY1ba0fdkJYuAVIkZHxxYB6Jk9XPFuo3ZdbvNxtfN_mCFc5oNPfTu2X17vvyPUStAviAUAzeKlCGxwRM-VbC4aPUGBGtDQCcU=@protonmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|AS8PR04MB8037:EE_
+X-MS-Office365-Filtering-Correlation-Id: 857977bf-f15d-429f-e229-08dca4e55b7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?69xWiSX609TJvm1/2nE7I6mfLGa1AXZr50SNALXMbZjRbTzNdyNoTUrlbz3s?=
+ =?us-ascii?Q?EVgpznonE8NTG0q4Vsn+PMquksi3FFQd0GjeyiO8KEaHTknh9LNmgw5BXSWH?=
+ =?us-ascii?Q?zp1ZziCRXy5VpWqSc2CpOz12WL2KZh1qduDJ0iuB5yRzTz+O4694S7M7W6el?=
+ =?us-ascii?Q?xQ5cVXBKdHJa+UUgwnt7opVd96UlaZijQ3fiwOydjrjzigOjxHqPQmvAUY/p?=
+ =?us-ascii?Q?j+Xp3OKkFl3besWf9hJqBoI4ey85aScKUaNdfRsOtzHd7cQQpJPv+q5fD8oz?=
+ =?us-ascii?Q?bG4Pf8cTnOq66hTDklfd7ElFUh4ldEsuBPbSiM3XDjD/4WrgLYQNn1q+J4Gv?=
+ =?us-ascii?Q?SG5bDrzDvWUVGhUXGlnaLj7vpeKuyOJfzqVPLyEsNOxYAl5gTb8SmV6wDd52?=
+ =?us-ascii?Q?q/YB4SRwj28RoM4b0bH5m+hwa7hYwHS13QurfmhaK9KRhoUn8Kv+/981uzeg?=
+ =?us-ascii?Q?MPNB75cPkbUu35vsbMN+vOCq8GwTlq+iLYKx0ImmsIwWX9botjLo91OHeVx/?=
+ =?us-ascii?Q?OMn6/E/b+o5L1WkJhO6o17REvMb+li5nMbuuK169M7nrrN0TXwnxs52eUfC1?=
+ =?us-ascii?Q?azykcSvITDgHzIUqztJLNLQ40HL6kAkRn7M4Zxzf+FXuw3IIhxXexSc5/DnE?=
+ =?us-ascii?Q?N+dKIwjvL5RIxvxzIEI9v18CQIsoJOzdlHtL2ZQZ7mzRBrAvqyeDzk2E8D12?=
+ =?us-ascii?Q?nQxZyinQgHPTYdMORKFQG+5ms1jZgoiXkA7O0L1lB3A95KEi4CYLKW9Lj3wb?=
+ =?us-ascii?Q?Zeterp3XTDeTwBFWrnTfL4DJV5ATZQJwAurYCh58H/7hsHjVHWSvIMeTySIG?=
+ =?us-ascii?Q?93Ji4L9qaat4stl49CChjARc1iTWM6UxcopY8kXuWAZnUltBWvT4EgGX63OW?=
+ =?us-ascii?Q?AjzHHXJO83ytJhWTyT3cHPIjYxmXIgCPIyxwl+Q1PWeaP/SVgKoSvBFksOIQ?=
+ =?us-ascii?Q?CXotxWSgBPdbXOxMEMzAPQ+4bJB2DkYWrmU0pcjRtLO85A2fhq1RkSR8sjgV?=
+ =?us-ascii?Q?3T6tgnhpSz+flwi5+rDihb6ME2jfzj7Srytzg5TXbnvaSTFifc5f7VZ316Sg?=
+ =?us-ascii?Q?3qHh6JIfTHlfnqzLeviiZM46lJRI7z+0JV6uWfylhMXut+ASITPY7Es1kZx0?=
+ =?us-ascii?Q?leMB2WhG9pzRvADNsQnTsKeDw7MMhtzOjsd9ulBogKwPoITbuiRem/95IMgp?=
+ =?us-ascii?Q?08Wyz0ndgOf8Znt+y2RR5W3QOMsllQJc9M7N4BRvo9vbB96N+DvFRmCkmFvB?=
+ =?us-ascii?Q?cTzXppMpecF2L7sbyP1rsiEYbJhts1YoezFRukVxqM1O7XcOnYKHBNze7YCQ?=
+ =?us-ascii?Q?Z2780hoDSCp/rc/0aVBaLvbKjwPiT/l4L/fmlQG0JqaHCg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?fWlB62jBOYpvh134tlx4ykVEtiyTpLft+kMkBa5vTXSViIZ5HWvNGL5bEEDI?=
+ =?us-ascii?Q?7dynswTKx8YzhhPzc3A3TmyBwUaiIK+/mE3YQ3EBdrZMbWTmwDznjoc4z5pD?=
+ =?us-ascii?Q?GEpjVLVtRTv3ghJkpCBqWfuIs28y/MBIXmrSrENdXtOKXkZnvIoQZXAfVopS?=
+ =?us-ascii?Q?jAdrUxNR8xOVdq8fj2EkRkAToW5tLflA0gOYOrcsGlV4CLH742GzjlG05KjQ?=
+ =?us-ascii?Q?Lry0+6UDuqxg/KQdIvRod5iJAfvntpwz81v8oZ91TaaxSJh93x5OH/ISd79e?=
+ =?us-ascii?Q?bhn3qSxCKpDNv6XxSzymuQUmKCEal1sUyoUUmLvKMlOynt/hFpVhBirJZis8?=
+ =?us-ascii?Q?v0UT1fJtcApFUM0SzKfAF9rdtdV1178r5DPQVsuUWRwt5fICOhns2ZHRD6eB?=
+ =?us-ascii?Q?NjdfS7uLejR1YhUkpkONxujO75lFs80iKP3qCzY9g9OgI5CEuUfm3hFApuuw?=
+ =?us-ascii?Q?y4ev2krZQwhZGu8JAhHfAo56fZ0Fyv6r9Q7e6leJ3QQJVruq/bCe+zT46YmG?=
+ =?us-ascii?Q?vWhQO5AzoZV2ntAS3aJej3H8QA2nkduvLlq+rSfMVvdXwt5FqBLVK0c27nhZ?=
+ =?us-ascii?Q?VJn6FVaMl90UJPXoAzNUxOUkMLaLKW1Or/w4DtkO8nVDgVdp0wLMVIZu1JiN?=
+ =?us-ascii?Q?+WODPY8Vvgbw6ZzInTImfgUqI50Cjo4GJYcPw2zwBjEz5A8Cfl3PgJbIZI0S?=
+ =?us-ascii?Q?8hRVQ3jXDZnCRuKTYYvUtawOl0ewfeKBWPCbQz1yu7s5DrgKYn+/eNy5y2TT?=
+ =?us-ascii?Q?P77yXrSBU4ljb1kupK/j+bpyDB7bFWTzHI/A3jVtuBFWEBukTDxEoZQxLQE2?=
+ =?us-ascii?Q?+q1Vl+6k/YqYgPT7ebHcJWhGqR5XTANQ8/cQq/+4PzZY8B3r29q+GJrDICY5?=
+ =?us-ascii?Q?e0nv9x0GG+HJ3Dul7fHLvT4v7l1IVdyx9SVgRr3IHL2QNzFwfIU2yAS9pnWL?=
+ =?us-ascii?Q?t1RNQBqwyUaeLBEcMFAD4WPk/gw2j2PO1tMQo168TVRHkdurfpW6FY2nb0Es?=
+ =?us-ascii?Q?8tgsUXHoGUQWkFitJg6n1Ca+/RfSKf4e76HWSp6J2JwyXkjmXWVnpbIpVTmV?=
+ =?us-ascii?Q?bAm9M5rXlAcVVBp5tuulirVXI2PF+3ZVxf0TjKll1hkOwjR8zIQnTfTJ5+ui?=
+ =?us-ascii?Q?RolbrfEVzUhrbXyqPPfBE+ZAxLTD9jgu7oG4+7PPM6fWLCijY7KzFsBwKS7O?=
+ =?us-ascii?Q?c3b+qZbZQXTN1SfEXbTVmnHwNOoSwLxQW0LMzb+eBM2iHmKHEpzk9Ej1K1Im?=
+ =?us-ascii?Q?MQknRDtSAullK0QqEzWbtHBtw9Y+QqquytgJl7OfiY/4bsbjGbhTT2Nrf9mi?=
+ =?us-ascii?Q?z4X2dnCkBRjfUYt/iumGdvtaCyzt9RlkpHC5VlU6VXUSBG1fYAVTBMmX+cDh?=
+ =?us-ascii?Q?8hNHB7yJdPd5i/01JBki4UI4BMq9yHPs//COP4t84sW0sBrSvktUEkZFmDjF?=
+ =?us-ascii?Q?sU2Ds9RVQMiLJrXiAVAjRhhcrvPu5Aqt+D2wcKMbiRwKSCdB2EMHlr1mo0Ys?=
+ =?us-ascii?Q?fRVJTrRy7EDoJcptfa6jrvr4Bt25V0f1TFq1lNbMgf+lAM8gFVht8AZwCsTo?=
+ =?us-ascii?Q?Io4hMHSBtXgz6dfiCzDKLgiupjJKD6137tlt0j8l1LuWUd0u+yrOgtrAFhKG?=
+ =?us-ascii?Q?Jw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 857977bf-f15d-429f-e229-08dca4e55b7e
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 15:46:57.0260
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KPjIblDUIOQuw1Wd7jLr8K3f2gmOOQjZPwifKdA9On8Id5fIBIyZ2boXCXiJpKhzxktKGWaFwbQlNP4SONgDVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8037
 
-On 14.07.24 19:01, Björn Roy Baron wrote:
-> On Sunday, July 14th, 2024 at 18:02, Michal Rostecki <vadorovsky@gmail.com> wrote:
+On Mon, Jul 15, 2024 at 08:26:00AM -0700, Jakub Kicinski wrote:
+> The information about rings can be computed based on channels as
+> currently used by drivers.
+(...)
 > 
->> `CStr` became a part of `core` library in Rust 1.75, therefore there is
->> no need to keep the custom implementation.
->>
->> `core::CStr` behaves generally the same as the removed implementation,
->> with the following differences:
->>
->> - It does not implement `Display` (but implements `Debug`).
->> - It does not provide `from_bytes_with_nul_unchecked_mut` method.
->>    - It was used only in `DerefMut` implementation for `CString`. This
->>      change replaces it with a manual cast to `&mut CStr`.
->>    - Otherwise, having such a method is not really desirable. `CStr` is
->>      a reference type
->>      or `str` are usually not supposed to be modified.
->> - It has `as_ptr()` method instead of `as_char_ptr()`, which also returns
->>    `*const c_char`.
->>
->> Rust also introduces C literals (`c""`), so the `c_str` macro is removed
->> here as well.
->>
->> Signed-off-by: Michal Rostecki <vadorovsky@gmail.com>
->> ---
->>   rust/kernel/error.rs        |   7 +-
->>   rust/kernel/init.rs         |   8 +-
->>   rust/kernel/kunit.rs        |  16 +-
->>   rust/kernel/net/phy.rs      |   2 +-
->>   rust/kernel/prelude.rs      |   4 +-
->>   rust/kernel/str.rs          | 490 +-----------------------------------
->>   rust/kernel/sync.rs         |  13 +-
->>   rust/kernel/sync/condvar.rs |   5 +-
->>   rust/kernel/sync/lock.rs    |   6 +-
->>   rust/kernel/workqueue.rs    |  10 +-
->>   scripts/rustdoc_test_gen.rs |   4 +-
->>   11 files changed, 57 insertions(+), 508 deletions(-)
->>
-> 
-> [snip]
-> 
->> diff --git a/rust/kernel/init.rs b/rust/kernel/init.rs
->> index 68605b633e73..af0017e56c0e 100644
->> --- a/rust/kernel/init.rs
->> +++ b/rust/kernel/init.rs
->> @@ -46,7 +46,7 @@
->>   //! }
->>   //!
->>   //! let foo = pin_init!(Foo {
->> -//!     a <- new_mutex!(42, "Foo::a"),
->> +//!     a <- new_mutex!(42, c"Foo::a"),
-> 
-> That we need a CStr here seems a bit of an internal implementation detail. Maybe
-> keep accepting a regular string literal and converting it to a CStr internally?
-> If others think what you have here is fine, I don't it mind all that much though.
-> 
+> They can provide a different number? Which number is the user
+> supposed to trust? Out of the 4 APIs we have? Or the NIC has
+> a different ring count depending on the API?
 
-The names passed to `new_mutex`, `new_condvar`, `new_spinlock` etc. are 
-immediately passed in the FFI calls (`__mutex_init`, 
-`__init_waitqueue_head`, `__spin_lock_init`) [0][1][2]. In fact, I don't 
-see any internal usage, where using Rust &str would be beneficial. Am I 
-missing something?
+To stay on point on GRXRINGS vs GCHANNELS, "man ethtool" does say
+"A channel is an IRQ and the set of queues that can trigger that IRQ."
+Doesn't sound either (a) identical or (b) that you can recover the # of
+rings from the # of channels, unless you make an assumption about how
+they are distributed to IRQs...
 
-Converting a &str to &CStr inside `Mutex::new` or `CondVar::new` would 
-require allocating a new buffer, larger by 1, to include the nul byte. 
-Doing that for every new mutex or condvar seems a bit wasteful to me.
+> > > I could be wrong, but that's what I meant by "historic coincidence".  
+> > 
+> > And the fact that ethtool --show-rxfh uses GCHANNELS when the kernel is
+> > compiled with CONFIG_ETHTOOL_NETLINK support, but GRXRINGS when it isn't,
+> > helps de-blur the lines how?
+> 
+> IDK what you mean, given the slice of my message you're responding to.
 
-[0] 
-https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af728728591465becb45b0/rust/kernel/sync/lock/mutex.rs#L104
-[1] 
-https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af728728591465becb45b0/rust/kernel/sync/condvar.rs#L111
-[2] 
-https://github.com/Rust-for-Linux/linux/blob/b1263411112305acf2af728728591465becb45b0/rust/kernel/sync/lock/spinlock.rs#L103
+Not connected to that particular sentence, it's just a comment about the
+lack of consistency implied by your proposal, placed at the end of your
+quoted email.
 
->>   //!     b: 24,
->>   //! });
->>   //! ```
+> > I can't avoid the feeling that introducing GCHANNELS into the mix is
+> > what is revisionist :( I hope I'm not missing something.
 > 
-> [snip]
-> 
->> @@ -840,9 +375,10 @@ fn deref(&self) -> &Self::Target {
->>
->>   impl DerefMut for CString {
->>       fn deref_mut(&mut self) -> &mut Self::Target {
->> -        // SAFETY: A `CString` is always NUL-terminated and contains no other
->> -        // NUL bytes.
->> -        unsafe { CStr::from_bytes_with_nul_unchecked_mut(self.buf.as_mut_slice()) }
->> +        debug_assert!(!self.buf.is_empty() && self.buf[self.buf.len() - 1] == 0);
->> +        // SAFETY: Casting to CStr is safe because its internal representation
->> +        // is a [u8] too.
->> +        unsafe { &mut *(self.buf.as_mut_slice() as *mut [u8] as *mut CStr) }
-> 
-> The documentation of CStr [1] is very clear that the layout of CStr is not guaranteed.
-> 
->> Note that this structure does not have a guaranteed layout (the repr(transparent)
->> notwithstanding) and is not recommended to be placed in the signatures of FFI
->> functions. Instead, safe wrappers of FFI functions may leverage the unsafe
->> CStr::from_ptr constructor to provide a safe interface to other consumers.
-> 
-> Is there any place where this DerefMut impl is actually used? If not it should probably
-> be removed. The liballoc version of CString doesn't have this impl either. (Can we use
-> the liballoc version of CString too just like this patch does for CStr?)
-> 
-> [snip]
-> 
-> Link: https://doc.rust-lang.org/stable/std/ffi/struct.CStr.html [1]
+> You are missing the fact that other parts of the stack use different
+> APIs. Why does RXFH need its own way of reading queue count if we have
+> channels and rx queue count in rtnl?
 
-Good call. The `DerefMut` was not used anywhere, removing it works.
+Maybe if introduced today, it wouldn't have to, but the more relevant
+question for my situation here is "why change it?"
+
+I only expressed my dislike of a netlink/no netlink inconsistency
+because your question was seemingly addressed to me. Luckily I am not
+the one who needs to make that decision and I will gladly test out any
+patch that fixes the regression.
 
