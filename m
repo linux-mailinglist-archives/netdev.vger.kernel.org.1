@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-111516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 213729316A4
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:25:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3EDA9316A3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A09BAB218E6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:25:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A887B28157B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FFEA18EA7E;
-	Mon, 15 Jul 2024 14:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5BC18EA68;
+	Mon, 15 Jul 2024 14:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="owTRrKjY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MwsIcguU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D64B18C197
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 14:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85FB18EA62
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 14:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721053546; cv=fail; b=j9AX5qgRxogiYkvHCF7L8Y0YXGQgb0v3XVSTT/WSwmsVuUjrx9fH0xzFt50uljZdqjTUVeAcaCQm7HvrHjmHU7UgcnBudt78xIS8zACwzF0E0qdEl8lDjirFhGAPQ+ezkU/l2DLS+VyQNVYgtL06JpSKmEZDVdpc6LFFdRRubDo=
+	t=1721053542; cv=fail; b=Gx+z4q8zNSMyr/TlnoFCsJ4qV9qbUNJWcqqN/k0MoaN81xpcRUM5S3DxCqMUBWH01aIpYEgANBlKkHt6ziJ0GCi9VsnlyX4XTbGKwuf/tQZRyAZkX/TnTlRK0rcPGQXiHKCdhgOowJVC4BLuRv2VDSHv3cSSjxGXcxPm/SnCqxg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721053546; c=relaxed/simple;
-	bh=WfjJnRgcfILezCkRIdkua/eBObwpSNFq35GCaKiSFks=;
+	s=arc-20240116; t=1721053542; c=relaxed/simple;
+	bh=IKVtjLITyK//ne4q2Mu8idvwNQ2tYAM2x0498dPIExs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UHfciH2/Jb/UPQpQGEYtGd7ch8RAxtb6AQ1LW53iUzWxF50hXOvGwveEqLgNV3YAxCTafaYIsub9ljnAfeHlVkvPX6yzvxWq+9P1FZVItgJC9Z2thRzpoL6MqOwY4vL3O+UlZCiYcS+OKsavJQU98xtcB7w6yy0HMTiJHwfTfq8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=owTRrKjY; arc=fail smtp.client-ip=40.107.223.87
+	 MIME-Version:Content-Type; b=nFdVjxnskhnM3nBVmyBFygJcmJZSSaSlhVAPBe026wiLutookNnQvLeGNak7/r8N+1Wd0LUvSpVb30cTRs97KFrV7udu/sHFuM8BzVLlRx0WhfjDPo3/bTRnfT/44HeiKB6v1Hf3yelZzJFI2+IY3vq8gKnMrlTVpjdZXTiAQGk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MwsIcguU; arc=fail smtp.client-ip=40.107.237.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r5zbUtyrfWrg7yxQOKw0khgf3063djL1XBHoelnQKSdPrt8+mQEXZOpJQHOyJv9oNCHq+NGIMPyGuoU3sTmxPb02ONFS0ZRa0FZ+J7FMeWZlE5FHJ8mOS0c4PBqj328Cm2g4XqI0iembsXfQCEsquNSGITuXZKemkTJM+u24W3DS/+JTMo1MozSkzMkpZG0N+cXTNkEH6/KlJDNmottksDAgwWfl6UXPq3nJuP6yaPYrXoXA8o8sI0JqJNUr2zRARvwtk7zCQhQSij0eld3jhOHBcpK7JQQ6SVBgdJupRr04Qz1Xwim5mwO1v/UWp8/JwOZf/8HI0fofKxx40xE2CQ==
+ b=k18cSNViAFVF7lkY5HyYyocuhIgi7Lu51uco8HHnktKCDBdBL6g25MvTxFzUPTIziw8MGcWiJGIod53oBvEPHFNXjWOUTwsrz4Mdo81kFE25KNvaofC1kGDWvlvwwf2peySo3DVd5ErVRJyGN4YAhp0hNnYd3RSnYyT+2/9g7ce7TJGgLr+PeCrMT4JXFE0aKwANmKt3Zik1wPklivnzrQXeoOxjfGSRl9/+TTzMRGLVdAPsIWedYdMidcorxFABEjqr+1US+uDimZwW3MiS2bvFeU897UJWsTvHYcobdr3K8eHbXnkF9VkJuMjRr/UHOA+RQGnsnNfQM4NsOC0LJw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gzXu5qJdRG5rTgNLnZfxwGhJzNUVRbay4M1N7LWCzb4=;
- b=wZq4XgtF7XVwG7/B/PgaqbB5JHatO7UsPQiOq3C+aohA0R5GVDAhI0E0QYUZ74NbeE1EfexBcwmVB+8JwDcNFaMVHkHF9u79/7iFjZUmX8jXw2jQ5ljfYtKpXZv0CR+0sjU2MeuQauE5uw0W4vVBV1+2cYrjLTMKt4rxFr/vBqimbK9k0f+9FmAf8ufCDzpz2zU4cY9MddmGCqsPjpZ9HJ72+hD2mmhNhXgT1KVGc3xVmtdXuwXGK1oARUQKZyEwgKUJ3S4mQldm/pPMdy3VyoJA+Blv4ZoqsOHoB75sXvdgMPipEm4XZ47I9YemxLjKB41RaC0YqNB0oMDcqXOpRQ==
+ bh=65Dm9BwACDetKrifQv2kSQo5WOZfl8ms8rAi+1u3fPk=;
+ b=Ag6vo9ArCJQzAzDKnOqt6Nf5M1tj8XrArAy5wz53Z2rP+AaMQWa5j69rQJqpsMwGgD4KM9bItiOa7cQ0wHy3dlD6u6jsm5pjxTbo74/yP7GrXMCXGF/LmluRreEh0lLsQHdG8TeC9qD6+bjQxf+gYk9POIBvyzrWkC8TuVxJfhHS0vvrT3pJAOXC8POU/y7Q7kPxXYBWWL6qH2U8oFDk7faCQqyJ33BXnIkR9ridKAxUCPmQObcB94nkDfK6OIU+CqnY6FCwz99Vcqm3jHJ5iH2lF52PofW0FCDIBhqj0iGd0C16A5M9cnI6wuJce53cPTfd84fn/vM1Cw6YeGiIpw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gzXu5qJdRG5rTgNLnZfxwGhJzNUVRbay4M1N7LWCzb4=;
- b=owTRrKjYd8IaEpc28LBxy8kmUMteha06HZ0Z5JjkuyPRCPflOY50wLMOfkJS30c0J68Yonxx1kCmhcgXNGPt7iXo8fJbJ+1nz6om5BrMtroZLcmnq68Y2wc/c5n4Y/lLSEgLe/NJOeBlZ+Z017lGFEe0K4By2ULK+SB/E6UR+6ReOuynKNfXwCabKc2g3Wf0BmgEA8F5YZGjnAlvmG0D5wdVYoIUFg8T3eKnkt3thBa5X6HmIK125bG5OlY0vC/fPfF5PXOM3xqCQdiZHLPO6JhxJaZG/buq8jLRmsHUZXxMVMnU8qaBmEZAPDsS1vioRDHGhOr1MKZjLSFot5Gu1g==
-Received: from BN9PR03CA0422.namprd03.prod.outlook.com (2603:10b6:408:113::7)
- by DS0PR12MB8527.namprd12.prod.outlook.com (2603:10b6:8:161::6) with
+ bh=65Dm9BwACDetKrifQv2kSQo5WOZfl8ms8rAi+1u3fPk=;
+ b=MwsIcguU5hunNrMS6KRWsC6lxgSLPfiwQU8EbYoIqu0f/WKgOAtSwxPkoWMUE/3jnKXehc/lyvOWM8NQqyUCFWg5JiXOz2NJ6R2uu7nsaKp0zfneDLa7Si94TMk1DYZ5/SSVkryy1U0wD4AhunJVD2jj/wCWJic57oi6uSK+E48JEZprYKTlCG21x13QTWrFcPhM4y51hC9DlugKerLNPkKOYI8biry11a8RFw8Ux0MqaQKRhbHtlNKbPwyskBs5yJQH3A8p4tVLKkPtQ4ciUDNEg64h2iICZMFXsebNqmJf6kGRv9aAirhUxO5C8upkYFw7tKCydd9aF9UXf9WGhQ==
+Received: from PH8PR02CA0022.namprd02.prod.outlook.com (2603:10b6:510:2d0::12)
+ by MW4PR12MB5626.namprd12.prod.outlook.com (2603:10b6:303:169::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.27; Mon, 15 Jul
- 2024 14:25:39 +0000
-Received: from BN2PEPF000044A0.namprd02.prod.outlook.com
- (2603:10b6:408:113:cafe::39) by BN9PR03CA0422.outlook.office365.com
- (2603:10b6:408:113::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
+ 2024 14:25:34 +0000
+Received: from SN1PEPF000397B1.namprd05.prod.outlook.com
+ (2603:10b6:510:2d0:cafe::1f) by PH8PR02CA0022.outlook.office365.com
+ (2603:10b6:510:2d0::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29 via Frontend
- Transport; Mon, 15 Jul 2024 14:25:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ Transport; Mon, 15 Jul 2024 14:25:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN2PEPF000044A0.mail.protection.outlook.com (10.167.243.151) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF000397B1.mail.protection.outlook.com (10.167.248.55) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 14:25:39 +0000
+ 15.20.7784.11 via Frontend Transport; Mon, 15 Jul 2024 14:25:34 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 15 Jul
- 2024 07:25:14 -0700
+ 2024 07:25:17 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 15 Jul 2024 07:25:11 -0700
+ 15.2.1544.4; Mon, 15 Jul 2024 07:25:14 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <dsahern@kernel.org>, <gnault@redhat.com>,
 	<roopa@cumulusnetworks.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net 1/2] ipv4: Fix incorrect TOS in route get reply
-Date: Mon, 15 Jul 2024 17:23:53 +0300
-Message-ID: <20240715142354.3697987-2-idosch@nvidia.com>
+Subject: [PATCH net 2/2] ipv4: Fix incorrect TOS in fibmatch route get reply
+Date: Mon, 15 Jul 2024 17:23:54 +0300
+Message-ID: <20240715142354.3697987-3-idosch@nvidia.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240715142354.3697987-1-idosch@nvidia.com>
 References: <20240715142354.3697987-1-idosch@nvidia.com>
@@ -98,51 +98,51 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A0:EE_|DS0PR12MB8527:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3fca1ac5-c1b3-4d1f-1ccd-08dca4da004b
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397B1:EE_|MW4PR12MB5626:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab0e6013-54b2-4355-5407-08dca4d9fd35
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rfgGw3WVd4TrliqtRTHIpYs8ktj4Z1hrFCKyPfyUCkB1XhpwIcIWsAK2Kwpx?=
- =?us-ascii?Q?ZvkR3k9ZL96DDpBPHZIerfpHUe04HfTt8bNT2qN+Ea0PJq/rgR1ejFmykvBh?=
- =?us-ascii?Q?cScytgprvVgKdffaPxL4mXQwxkuvHfzNFsP0SYasVeGcW64P7lToi09htI/7?=
- =?us-ascii?Q?Z0KuT+uM4Kv2GCCNiovz0vsTq4wXMPtcdj65LIOntjTDXimMNlh+cL1kVwZy?=
- =?us-ascii?Q?39+1uljO5kbnBQcTTFcXoMvD/QK4TCdT7GEvV3YvWj15/FEvyftY5oRPTmG9?=
- =?us-ascii?Q?8Rmgb7hohwlqCoMqVO3XECZPlnqqth3NpE/gOlyWDDyF6cDuRfrSF9tjS78y?=
- =?us-ascii?Q?7daVDryRSyNOQJ2otnAkJTHixBAFPC9afVC3V2pq/8PcvicRfAcT+uuUHIKf?=
- =?us-ascii?Q?/aYxxsxef/uSgMD5ApWn3T3Ws9/aUWBQq5eWJgMfleTqtlSDn2ZwstRBDwjb?=
- =?us-ascii?Q?D5AMzaj8Jxqx8LGV9e/hunsIOFJfHB1ClhIJVOKzwtUqHtV1FBSpTueZ8+9I?=
- =?us-ascii?Q?1dhxr045l3Sy4yVhiGpoBjjBvYJL+4J25Y7Oe5wYx4frlA4zDUNWQ5J+b+Q2?=
- =?us-ascii?Q?H+KnYlscALLGkqqaMQFyy3yztDdNjrTFHRo9PMm6iovNV/4ZdIlYQ/2fzST8?=
- =?us-ascii?Q?6AHV0eKeKIr2aKWD1mhRfnHAJZJnEXkhMK/BO8K32VWh36R29Q/GGdO/nLqK?=
- =?us-ascii?Q?6VXbR3SnmUrdkxLlBOSoUiBWgXxwYcqs5vaBf25GKEtNaf8pyzmtXK4ygwB6?=
- =?us-ascii?Q?mkK1cDBYOKzwF7NJSURGwKOkG6aaiG5ow0qjewgh3BGTsyNAulupFDAQ7swS?=
- =?us-ascii?Q?Z64qXrNLiF/UC6hZRwauKIL2FSkYSEis8MkaiYrwK/3i8gQ/7xOH3MKWPCs+?=
- =?us-ascii?Q?9hyaRJ2J0iKmZDM+QcijbggDllBfgZ3dZ/Ir/B9b4gjE/WC7MM6WDj/g+Vbh?=
- =?us-ascii?Q?1tFVo10y+wLJeEirG5ltmN2Mu0CwnLJoVp0HE0Eiwsdw9UFS+p4kT7w1VAhn?=
- =?us-ascii?Q?Uf6eE2SF/CrM6CqBzWeauRBCvbtasiicWAglWdCjvGwivx+kLHwJ5bR49iKJ?=
- =?us-ascii?Q?TpOHHP9KQica3YJOtFp6oB5+eOtF/Bn15LeCXG5E769Cp4D3FeLXEoS+VuYd?=
- =?us-ascii?Q?u/9oIdsvGIgOTO5VTa9YT1qTX0GESiB9D3Wh6VCCG6hHX46qQcb9vlsIdC8N?=
- =?us-ascii?Q?WsXgSmMaDhuRO2a6HvmCNX1NKvaFjsnK6fHcBWzC5fKT63wphqh1/5D+0VKX?=
- =?us-ascii?Q?ACtkXTf7qp4Rs5b99/KezTZ3vs6jIXAdoFOnmUSmzArr5mIdZ5Od81TBfAci?=
- =?us-ascii?Q?QOm53RFFY2ODP+JveR3nfGYRBe4Fj2VNePqUaC5OzmFlhhPfuEcs62J9+Qot?=
- =?us-ascii?Q?8MVDsg+DMqHlGrImWrFIHPLvYQP/bUDZCfJTiEYYF/s5E7tbXODxZUdUoGiF?=
- =?us-ascii?Q?SoZii4SFfOIoi7IPgSXPLnvpyX+CqUwx?=
+	=?us-ascii?Q?r4rdoc6fblm9qvsE8r8IcWcvLRUsSlKjV1eDFvEW4LaJJkxq/OJjv9hZN8Ii?=
+ =?us-ascii?Q?L8JN5qO6BE90Xy2hTosg8zyLnHgFERk97iEfunYnsYkjLt6Af778mC44TMfr?=
+ =?us-ascii?Q?qkKQNjwjmR1vCW/jJTmNZVHJBt/Q9rJd1rAnbYj2/ddi3V64SvKgyVI8Omm7?=
+ =?us-ascii?Q?P0a23BcCXrfEBHgoKUBaJiXZqE0a4hgmm3Q6lEmvFerFUdE6I65td+cgVUoO?=
+ =?us-ascii?Q?jeMMv+iau4jGm6B7fgfX6l6/dbDuUkk7pMNKq1sIMEkwTWip078dJettHd6s?=
+ =?us-ascii?Q?m+L0wiVqE52KYJ67rsCLNbvjZAvfZMoQ7W/pZXgsupVDrPAVypF5zMh+RBmN?=
+ =?us-ascii?Q?fyfNXUeIYJBI8m1ZtC3pOHt9Oo9f79hwfFdkFLRf4Y67j/NgC+SiEAiw+aLg?=
+ =?us-ascii?Q?PgML/hbLCp33UuLX59rZwwdGrd3E2StbG+yZgEdcFAi2sJW3zXrYv/pKiA9e?=
+ =?us-ascii?Q?YCiKPnC3Q6mnS0Stt/623p9BY8RTpeix/PK/O1xvm/Aw1lS0hB3c5TLoovfn?=
+ =?us-ascii?Q?SkNmH2rXW5SV9gWFcHnZ6cYgnP2QyD3QvZCjGIp2OVt/y4msWatWxU8FKfsI?=
+ =?us-ascii?Q?pJdsFvGaZGiodsX76sHQITvpS5mLTx9y5iI5d2DndJe1ebyOR9exQhPoPqkl?=
+ =?us-ascii?Q?OsyV3vtw+c1s06t7bF1Wrx6qF8lGv2lVwM6VUv3nJAyWFkyusx1HC7NyG/Vb?=
+ =?us-ascii?Q?OPBCc8shOs4FpL/oyXmmjn8wAu7nmfcsdT/pxnfqjYi6eBQQ/X8EcBao8W/E?=
+ =?us-ascii?Q?17Z/StY6mlpe4OfWrAihXXHodyPSb/wKHb3Qsv319UgZpHBcst7MPx7hoUC3?=
+ =?us-ascii?Q?xX1R9l7XYIpiZeWmG/dSHrxmZ5jLHs6QPksfMwutPhSd/X7bwm1lKNuoTkZb?=
+ =?us-ascii?Q?1IIb2LI2r2uLTjGD1B5EtVm2oup4O34H/mYY0KwGnJSylOwS3iw9T+RQFsZj?=
+ =?us-ascii?Q?FLW0EGLiNhn+ZS4VzjbUXII4jg+9XLposHF3uekyj/uxMxbqN8RF8I3IvUIv?=
+ =?us-ascii?Q?D1YqAin85Qxl8FxABpzu2x6Vy5zUk0g/bb5IEQkh6Ampm6O+f+07Y3cPrUN2?=
+ =?us-ascii?Q?p2iO7ZGl4nrtRkLSnWtuGJ/91r6tZvGn+M/6NPQmwkxo5XtPK4bcZ9AuPGoo?=
+ =?us-ascii?Q?+PdA+TDNAENS03HGMc8KLQFJjl+/bSDPrnEs8BCtD3EnSjI8wpMbpNiWxM1J?=
+ =?us-ascii?Q?d4peB3sm87zA/eNUYjTFcLcW8grw2ie3n8/FxrujD3G9VBio8dReIu5krWG+?=
+ =?us-ascii?Q?0/k5yyHS5MxT8ONM+cm2cVCyqxdqjStMsfSZM3lpjchFNFUvLs951km1tg55?=
+ =?us-ascii?Q?yOUiWZohYOuNj0vtmn0QmWozsp0BWTTbElk5Yc+KXOKVO3qQA1nnmgeubgpP?=
+ =?us-ascii?Q?lPxJrYegwd8dlOs5hX46L2AYCTBICQDdFFZnjAQG8vNMuVaizzXHG7aSktqR?=
+ =?us-ascii?Q?6kfUnjlhppVWI0MCTNxsuZi5fvtoZIG3?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 14:25:39.2484
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 14:25:34.1663
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3fca1ac5-c1b3-4d1f-1ccd-08dca4da004b
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab0e6013-54b2-4355-5407-08dca4d9fd35
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A0.namprd02.prod.outlook.com
+	SN1PEPF000397B1.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8527
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5626
 
 The TOS value that is returned to user space in the route get reply is
 the one with which the lookup was performed ('fl4->flowi4_tos'). This is
@@ -156,100 +156,113 @@ non-zero TOS:
 
  # ip link add name dummy1 up type dummy
  # ip address add 192.0.2.1/24 dev dummy1
- # ip route get 192.0.2.2 tos 0xfc
- 192.0.2.2 tos 0x1c dev dummy1 src 192.0.2.1 uid 0
-     cache
+ # ip route get fibmatch 192.0.2.2 tos 0xfc
+ 192.0.2.0/24 tos 0x1c dev dummy1 proto kernel scope link src 192.0.2.1
 
-Fix by adding a DSCP field to the FIB result structure (inside an
-existing 4 bytes hole), populating it in the route lookup and using it
-when filling the route get reply.
+Fix by instead returning the DSCP field from the FIB result structure
+which was populated during the route lookup.
 
 Output after the patch:
 
  # ip link add name dummy1 up type dummy
  # ip address add 192.0.2.1/24 dev dummy1
- # ip route get 192.0.2.2 tos 0xfc
- 192.0.2.2 dev dummy1 src 192.0.2.1 uid 0
-     cache
+ # ip route get fibmatch 192.0.2.2 tos 0xfc
+ 192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
 
-Fixes: 1a00fee4ffb2 ("ipv4: Remove rt_key_{src,dst,tos} from struct rtable.")
+Extend the existing selftests to not only verify that the correct route
+is returned, but that it is also returned with correct "tos" value (or
+without it).
+
+Fixes: b61798130f1b ("net: ipv4: RTM_GETROUTE: return matched fib result when requested")
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- include/net/ip_fib.h |  1 +
- net/ipv4/fib_trie.c  |  1 +
- net/ipv4/route.c     | 14 +++++++-------
- 3 files changed, 9 insertions(+), 7 deletions(-)
+ net/ipv4/route.c                         |  2 +-
+ tools/testing/selftests/net/fib_tests.sh | 24 ++++++++++++------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index 9b2f69ba5e49..c29639b4323f 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -173,6 +173,7 @@ struct fib_result {
- 	unsigned char		type;
- 	unsigned char		scope;
- 	u32			tclassid;
-+	dscp_t			dscp;
- 	struct fib_nh_common	*nhc;
- 	struct fib_info		*fi;
- 	struct fib_table	*table;
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index f474106464d2..8f30e3f00b7f 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1629,6 +1629,7 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
- 			res->nhc = nhc;
- 			res->type = fa->fa_type;
- 			res->scope = fi->fib_scope;
-+			res->dscp = fa->fa_dscp;
- 			res->fi = fi;
- 			res->table = tb;
- 			res->fa_head = &n->leaf;
 diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index b3073d1c8f8f..7790a8347461 100644
+index 7790a8347461..3473e0105e29 100644
 --- a/net/ipv4/route.c
 +++ b/net/ipv4/route.c
-@@ -2868,9 +2868,9 @@ EXPORT_SYMBOL_GPL(ip_route_output_flow);
+@@ -3332,7 +3332,7 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 		fri.tb_id = table_id;
+ 		fri.dst = res.prefix;
+ 		fri.dst_len = res.prefixlen;
+-		fri.dscp = inet_dsfield_to_dscp(fl4.flowi4_tos);
++		fri.dscp = res.dscp;
+ 		fri.type = rt->rt_type;
+ 		fri.offload = 0;
+ 		fri.trap = 0;
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index 73895711cdf4..5f3c28fc8624 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -1737,53 +1737,53 @@ ipv4_rt_dsfield()
  
- /* called with rcu_read_lock held */
- static int rt_fill_info(struct net *net, __be32 dst, __be32 src,
--			struct rtable *rt, u32 table_id, struct flowi4 *fl4,
--			struct sk_buff *skb, u32 portid, u32 seq,
--			unsigned int flags)
-+			struct rtable *rt, u32 table_id, dscp_t dscp,
-+			struct flowi4 *fl4, struct sk_buff *skb, u32 portid,
-+			u32 seq, unsigned int flags)
- {
- 	struct rtmsg *r;
- 	struct nlmsghdr *nlh;
-@@ -2886,7 +2886,7 @@ static int rt_fill_info(struct net *net, __be32 dst, __be32 src,
- 	r->rtm_family	 = AF_INET;
- 	r->rtm_dst_len	= 32;
- 	r->rtm_src_len	= 0;
--	r->rtm_tos	= fl4 ? fl4->flowi4_tos : 0;
-+	r->rtm_tos	= inet_dscp_to_dsfield(dscp);
- 	r->rtm_table	= table_id < 256 ? table_id : RT_TABLE_COMPAT;
- 	if (nla_put_u32(skb, RTA_TABLE, table_id))
- 		goto nla_put_failure;
-@@ -3036,7 +3036,7 @@ static int fnhe_dump_bucket(struct net *net, struct sk_buff *skb,
- 				goto next;
+ 	# DSCP 0x10 should match the specific route, no matter the ECN bits
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x10 | \
+-		grep -q "via 172.16.103.2"
++		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
+ 	log_test $? 0 "IPv4 route with DSCP and ECN:Not-ECT"
  
- 			err = rt_fill_info(net, fnhe->fnhe_daddr, 0, rt,
--					   table_id, NULL, skb,
-+					   table_id, 0, NULL, skb,
- 					   NETLINK_CB(cb->skb).portid,
- 					   cb->nlh->nlmsg_seq, flags);
- 			if (err)
-@@ -3359,8 +3359,8 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 		err = fib_dump_info(skb, NETLINK_CB(in_skb).portid,
- 				    nlh->nlmsg_seq, RTM_NEWROUTE, &fri, 0);
- 	} else {
--		err = rt_fill_info(net, dst, src, rt, table_id, &fl4, skb,
--				   NETLINK_CB(in_skb).portid,
-+		err = rt_fill_info(net, dst, src, rt, table_id, res.dscp, &fl4,
-+				   skb, NETLINK_CB(in_skb).portid,
- 				   nlh->nlmsg_seq, 0);
- 	}
- 	if (err < 0)
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x11 | \
+-		grep -q "via 172.16.103.2"
++		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
+ 	log_test $? 0 "IPv4 route with DSCP and ECN:ECT(1)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x12 | \
+-		grep -q "via 172.16.103.2"
++		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
+ 	log_test $? 0 "IPv4 route with DSCP and ECN:ECT(0)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x13 | \
+-		grep -q "via 172.16.103.2"
++		grep -q "172.16.102.0/24 tos 0x10 via 172.16.103.2"
+ 	log_test $? 0 "IPv4 route with DSCP and ECN:CE"
+ 
+ 	# Unknown DSCP should match the generic route, no matter the ECN bits
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x14 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:Not-ECT"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x15 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:ECT(1)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x16 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:ECT(0)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x17 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with unknown DSCP and ECN:CE"
+ 
+ 	# Null DSCP should match the generic route, no matter the ECN bits
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x00 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with no DSCP and ECN:Not-ECT"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x01 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with no DSCP and ECN:ECT(1)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x02 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with no DSCP and ECN:ECT(0)"
+ 
+ 	$IP route get fibmatch 172.16.102.1 dsfield 0x03 | \
+-		grep -q "via 172.16.101.2"
++		grep -q "172.16.102.0/24 via 172.16.101.2"
+ 	log_test $? 0 "IPv4 route with no DSCP and ECN:CE"
+ }
+ 
 -- 
 2.45.1
 
