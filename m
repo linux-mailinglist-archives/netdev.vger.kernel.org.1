@@ -1,178 +1,294 @@
-Return-Path: <netdev+bounces-111398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A9E930CC3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 04:32:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BECD930CC9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 04:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A46941F21331
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 02:32:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9951C20B90
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 02:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9625234;
-	Mon, 15 Jul 2024 02:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB61B5234;
+	Mon, 15 Jul 2024 02:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PfYmxYM4"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O+JuLxm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BA6D2EE;
-	Mon, 15 Jul 2024 02:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54E82572;
+	Mon, 15 Jul 2024 02:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721010730; cv=none; b=m6TeRX5iOU5tamE5yP183QelSaGqEyma5iz+rY8AfiZtPtu+KcG2qwT+B/nvr9d8vF5BTOxPfROVkL9O8XeK49bL+LzMpl/WY3TRMELw3VacqciKcwOByf71W36hIW3l0WSjvZaQhOisZaW6fDNs6aWa7h7qSZC6IMgSctG915U=
+	t=1721011123; cv=none; b=QLmawpLw0E9wTYfm8aY2W9vXNh0dMl4omrH0pNVTTKaE2xFgg6o9mOPy77g0zkC7mOfZdUJ76Fgqe0wo0uDUfwxXZf0QeJaEg6xxiMfHQdQ2XksJBn0ZKXBFOjleRc35xlT5YqmmF9qFn6dDRSiKbnbWoy6HwTXqOloWJ4OYTrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721010730; c=relaxed/simple;
-	bh=fzR/p95q2086VGkqYnPwCfEzaAzY++RI2K823kku07U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=h9djFgqibZStMy0K/v+7bpOnew2zbjBnaAIjhuPsV6axKuorFM7buDzOpsTfEc2AKjuxS7FeYu7Dr4cg42y413uadqXHEbZL6YI75Yd53R2nYkZGRwzHzdS9GTVNVJO5gkw8xce2CwQR1rN5VnIwwWK8GxmwpqkmFimW7L1d5YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=PfYmxYM4; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1721010726;
-	bh=KAPolTv3Xg1geLGQx/RurTDhQBE7h29WNswPdwJUBBI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=PfYmxYM4bvVIzILFo0hzTJ3A3dzYFRn4ZfPPuEFtHBXWoYWXEyHL4QfwVr/1QUSxK
-	 xGx1nOg7nL/bLZ0AYiXvWuL4iNgGbIg1NLhq3Vg5PcEOStkyUi1NNF8sG6mgsv2Ss5
-	 SrfZd7AyVPLEBZzZlDWcppJtuT5rN2+rwKKPG1dg9DyjQGQ8Yvv0qPKIjHKijXvFI5
-	 SKVIVb334NNaTQJ8tDCQyUaqetwonRrme+sWabQ/SHScEvF3kvt+joTuUddtEcbrTm
-	 K6LjvJM4CtSFsAKuVhtmZ4NnvRk5k7gbI+pl/fRX4f6YfhYC/cI7M2Vem46l+2pbKl
-	 fB0BwfRBysvNg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WMmS53GPYz4w2R;
-	Mon, 15 Jul 2024 12:32:04 +1000 (AEST)
-Date: Mon, 15 Jul 2024 12:32:04 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, "Kory Maincent (Dent Project)"
- <kory.maincent@bootlin.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240715123204.623520bb@canb.auug.org.au>
+	s=arc-20240116; t=1721011123; c=relaxed/simple;
+	bh=2jpw9q1IDvu0gkJtUGNMwvxlwmNrCsl0XC7BUjR0YbQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VR0k5uQMyNst8b+a+aKIb5PwqqdNB+jaBUqV0Ia1BOWjNpu6Ym94Kr4he0er+zvjUUFAxVIZW1ZGCDFg0eRVA1hjc6ypjql5SkoZ72xgpNEa9s5DijfIeP1F3Zl0Ux3gRhvonPoh6B7+PAzi0pU7W0AomSbvsotLJ77oFsVFRTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O+JuLxm8; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46F0E8WV024036;
+	Mon, 15 Jul 2024 02:38:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=DdS7iyiiwXdZcOSMR83Am9
+	cMk8IYiEsJKsY8E/rfWqg=; b=O+JuLxm8pJnjp97nzvCgwnkyuhkcDTP8F0M6bd
+	x4TqSy+ZPBx6yyGF+K5k1lkyxQKOjEjtqduv5sxmq9GI+EUuuJRvCLWtFIK3mn8D
+	SIgXSlbOtD0YCJ8TGO9sdnlUGgUm1TsONfAB4w+gQp36jZm3ADM8XfdarV3h2k5D
+	cwkyjOMML+smQUrZNjbgrOgsPFRFqdRhYSG6B4z75xgXfrKznPcDzZSJRtwSVRCM
+	LlmRwjTRRGXImCJc8SOVgTl6Lee5ita8BRMK3SJ52Mv0hqmkUSeRvSAEGZTRQhvk
+	f4BgcMdMoct2Tc78SCNicneGaEPUoW5Rn8yw5LfzY/K8Pxsg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bht2jjvn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Jul 2024 02:38:36 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46F2cZ1w014290
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Jul 2024 02:38:35 GMT
+Received: from bqiang-SFF.qca.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 14 Jul 2024 19:38:30 -0700
+From: Baochen Qiang <quic_bqiang@quicinc.com>
+To: <ath12k@lists.infradead.org>
+CC: <linux-wireless@vger.kernel.org>, <quic_bqiang@quicinc.com>,
+        <kernel@quicinc.com>, <netdev@vger.kernel.org>
+Subject: [PATCH] wifi: ath12k: use 128 bytes aligned iova in transmit path for WCN7850
+Date: Mon, 15 Jul 2024 10:38:14 +0800
+Message-ID: <20240715023814.20242-1-quic_bqiang@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/q.5VMWPI.Hy2VZwII.5Qerr";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: h2j_DL7fX8r8ze4NdACtA1U4tFedkU81
+X-Proofpoint-ORIG-GUID: h2j_DL7fX8r8ze4NdACtA1U4tFedkU81
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-14_19,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 adultscore=0 impostorscore=0
+ clxscore=1011 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407150020
 
---Sig_/q.5VMWPI.Hy2VZwII.5Qerr
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+In transmit path, it is likely that the iova is not aligned to PCIe TLP
+max payload size, which is 128 for WCN7850. Normally in such cases hardware
+is expected to split the packet into several parts in a manner such that
+they, other than the first one, have aligned iova. However due to hardware
+limitations, WCN7850 does not behave like that properly with some specific
+unaligned iova in transmit path. This easily results in target hang in a
+KPI transmit test: packet send/receive failure, WMI command send timeout
+etc. Also fatal error seen in PCIe level:
 
-Hi all,
+	...
+	Capabilities: ...
+		...
+		DevSta: ... FatalErr+ ...
+		...
+	...
 
-Today's linux-next merge of the net-next tree got a conflict in:
+Work around this by manually moving/reallocating payload buffer such that
+we can map it to a 128 bytes aligned iova. The moving requires sufficient
+head room or tail room in skb: for the former we can do ourselves a favor
+by asking some extra bytes when registering with mac80211, while for the
+latter we can do nothing.
 
-  net/ethtool/pse-pd.c
+Moving/reallocating buffer consumes additional CPU cycles, but the good news
+is that an aligned iova increases PCIe efficiency. In my tests on some X86
+platforms the KPI results are almost consistent.
 
-between commits:
+Since this is seen only with WCN7850, add a new hardware parameter to
+differentiate from others.
 
-  93c3a96c301f ("net: pse-pd: Do not return EOPNOSUPP if config is null")
-  4cddb0f15ea9 ("net: ethtool: pse-pd: Fix possible null-deref")
+Tested-on: WCN7850 hw2.0 PCI WLAN.HMT.1.0.c5-00481-QCAHMTSWPL_V1.0_V2.0_SILICONZ-3
 
-from the net tree and commit:
+Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+---
+ drivers/net/wireless/ath/ath12k/dp_tx.c | 72 +++++++++++++++++++++++++
+ drivers/net/wireless/ath/ath12k/hw.c    |  6 +++
+ drivers/net/wireless/ath/ath12k/hw.h    |  4 ++
+ drivers/net/wireless/ath/ath12k/mac.c   |  1 +
+ 4 files changed, 83 insertions(+)
 
-  30d7b6727724 ("net: ethtool: Add new power limit get and set features")
+diff --git a/drivers/net/wireless/ath/ath12k/dp_tx.c b/drivers/net/wireless/ath/ath12k/dp_tx.c
+index d08c04343e90..00475d0848e1 100644
+--- a/drivers/net/wireless/ath/ath12k/dp_tx.c
++++ b/drivers/net/wireless/ath/ath12k/dp_tx.c
+@@ -162,6 +162,60 @@ static int ath12k_dp_prepare_htt_metadata(struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static void ath12k_dp_tx_move_payload(struct sk_buff *skb,
++				      unsigned long delta,
++				      bool head)
++{
++	unsigned long len = skb->len;
++
++	if (head) {
++		skb_push(skb, delta);
++		memmove(skb->data, skb->data + delta, len);
++		skb_trim(skb, len);
++	} else {
++		skb_put(skb, delta);
++		memmove(skb->data + delta, skb->data, len);
++		skb_pull(skb, delta);
++	}
++}
++
++static int ath12k_dp_tx_align_payload(struct ath12k_base *ab,
++				      struct sk_buff **pskb)
++{
++	u32 iova_mask = ab->hw_params->iova_mask;
++	unsigned long offset, delta1, delta2;
++	struct sk_buff *skb2, *skb = *pskb;
++	unsigned int headroom = skb_headroom(skb);
++	int tailroom = skb_tailroom(skb);
++	int ret = 0;
++
++	offset = (unsigned long)skb->data & iova_mask;
++	delta1 = offset;
++	delta2 = iova_mask - offset + 1;
++
++	if (headroom >= delta1) {
++		ath12k_dp_tx_move_payload(skb, delta1, true);
++	} else if (tailroom >= delta2) {
++		ath12k_dp_tx_move_payload(skb, delta2, false);
++	} else {
++		skb2 = skb_realloc_headroom(skb, iova_mask);
++		if (!skb2) {
++			ret = -ENOMEM;
++			goto out;
++		}
++
++		dev_kfree_skb_any(skb);
++
++		offset = (unsigned long)skb2->data & iova_mask;
++		if (offset)
++			ath12k_dp_tx_move_payload(skb2, offset, true);
++		*pskb = skb2;
++	}
++
++out:
++	return ret;
++}
++
+ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+ 		 struct sk_buff *skb)
+ {
+@@ -184,6 +238,7 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+ 	bool tcl_ring_retry;
+ 	bool msdu_ext_desc = false;
+ 	bool add_htt_metadata = false;
++	u32 iova_mask = ab->hw_params->iova_mask;
+ 
+ 	if (test_bit(ATH12K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
+ 		return -ESHUTDOWN;
+@@ -279,6 +334,23 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+ 		goto fail_remove_tx_buf;
+ 	}
+ 
++	if (iova_mask &&
++	    (unsigned long)skb->data & iova_mask) {
++		ret = ath12k_dp_tx_align_payload(ab, &skb);
++		if (ret) {
++			dev_warn_once(ab->dev, "failed to align TX buffer %d\n", ret);
++			/* don't bail out, give original buffer
++			 * a chance even unaligned.
++			 */
++			goto map;
++		}
++
++		/* hdr is pointing to a wrong place after alignment,
++		 * so refresh it for later use.
++		 */
++		hdr = (void *)skb->data;
++	}
++map:
+ 	ti.paddr = dma_map_single(ab->dev, skb->data, skb->len, DMA_TO_DEVICE);
+ 	if (dma_mapping_error(ab->dev, ti.paddr)) {
+ 		atomic_inc(&ab->soc_stats.tx_err.misc_fail);
+diff --git a/drivers/net/wireless/ath/ath12k/hw.c b/drivers/net/wireless/ath/ath12k/hw.c
+index 2e11ea763574..7b3e2420e3c5 100644
+--- a/drivers/net/wireless/ath/ath12k/hw.c
++++ b/drivers/net/wireless/ath/ath12k/hw.c
+@@ -924,6 +924,8 @@ static const struct ath12k_hw_params ath12k_hw_params[] = {
+ 
+ 		.acpi_guid = NULL,
+ 		.supports_dynamic_smps_6ghz = true,
++
++		.iova_mask = 0,
+ 	},
+ 	{
+ 		.name = "wcn7850 hw2.0",
+@@ -1000,6 +1002,8 @@ static const struct ath12k_hw_params ath12k_hw_params[] = {
+ 
+ 		.acpi_guid = &wcn7850_uuid,
+ 		.supports_dynamic_smps_6ghz = false,
++
++		.iova_mask = PCIE_MAX_PAYLOAD_SIZE - 1,
+ 	},
+ 	{
+ 		.name = "qcn9274 hw2.0",
+@@ -1072,6 +1076,8 @@ static const struct ath12k_hw_params ath12k_hw_params[] = {
+ 
+ 		.acpi_guid = NULL,
+ 		.supports_dynamic_smps_6ghz = true,
++
++		.iova_mask = 0,
+ 	},
+ };
+ 
+diff --git a/drivers/net/wireless/ath/ath12k/hw.h b/drivers/net/wireless/ath/ath12k/hw.h
+index e792eb6b249b..49668aa0efc8 100644
+--- a/drivers/net/wireless/ath/ath12k/hw.h
++++ b/drivers/net/wireless/ath/ath12k/hw.h
+@@ -96,6 +96,8 @@
+ #define ATH12K_M3_FILE			"m3.bin"
+ #define ATH12K_REGDB_FILE_NAME		"regdb.bin"
+ 
++#define PCIE_MAX_PAYLOAD_SIZE		128
++
+ enum ath12k_hw_rate_cck {
+ 	ATH12K_HW_RATE_CCK_LP_11M = 0,
+ 	ATH12K_HW_RATE_CCK_LP_5_5M,
+@@ -215,6 +217,8 @@ struct ath12k_hw_params {
+ 
+ 	const guid_t *acpi_guid;
+ 	bool supports_dynamic_smps_6ghz;
++
++	u32 iova_mask;
+ };
+ 
+ struct ath12k_hw_ops {
+diff --git a/drivers/net/wireless/ath/ath12k/mac.c b/drivers/net/wireless/ath/ath12k/mac.c
+index 8106297f0bc1..ce41c8153080 100644
+--- a/drivers/net/wireless/ath/ath12k/mac.c
++++ b/drivers/net/wireless/ath/ath12k/mac.c
+@@ -9193,6 +9193,7 @@ static int ath12k_mac_hw_register(struct ath12k_hw *ah)
+ 
+ 	hw->vif_data_size = sizeof(struct ath12k_vif);
+ 	hw->sta_data_size = sizeof(struct ath12k_sta);
++	hw->extra_tx_headroom = ab->hw_params->iova_mask;
+ 
+ 	wiphy_ext_feature_set(wiphy, NL80211_EXT_FEATURE_CQM_RSSI_LIST);
+ 	wiphy_ext_feature_set(wiphy, NL80211_EXT_FEATURE_STA_TX_PWR);
 
-from the net-next tree.
+base-commit: db1ce56e6e1d395dd42a3cd6332a871d9be59c45
+-- 
+2.25.1
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/ethtool/pse-pd.c
-index 776ac96cdadc,ba46c9c8b12d..000000000000
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@@ -172,21 -256,39 +256,39 @@@ static in
-  ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
-  {
-  	struct net_device *dev =3D req_info->dev;
-- 	struct pse_control_config config =3D {};
-  	struct nlattr **tb =3D info->attrs;
-  	struct phy_device *phydev;
-+ 	int ret =3D 0;
- =20
-  	phydev =3D dev->phydev;
-- 	/* These values are already validated by the ethnl_pse_set_policy */
-- 	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL])
-- 		config.podl_admin_control =3D nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_C=
-ONTROL]);
-- 	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
-- 		config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_CON=
-TROL]);
- =20
-- 	/* Return errno directly - PSE has no notification
-- 	 * pse_ethtool_set_config() will do nothing if the config is null
-- 	 */
-- 	return pse_ethtool_set_config(phydev->psec, info->extack, &config);
-+ 	if (tb[ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT]) {
-+ 		unsigned int pw_limit;
-+=20
-+ 		pw_limit =3D nla_get_u32(tb[ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT]);
-+ 		ret =3D pse_ethtool_set_pw_limit(phydev->psec, info->extack,
-+ 					       pw_limit);
-+ 		if (ret)
-+ 			return ret;
-+ 	}
-+=20
-+ 	/* These values are already validated by the ethnl_pse_set_policy */
-+ 	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
-+ 	    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
-+ 		struct pse_control_config config =3D {};
-+=20
- -		if (pse_has_podl(phydev->psec))
-++		if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL])
-+ 			config.podl_admin_control =3D nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_=
-CONTROL]);
- -		if (pse_has_c33(phydev->psec))
-++		if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
-+ 			config.c33_admin_control =3D nla_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_CO=
-NTROL]);
-+=20
-+ 		ret =3D pse_ethtool_set_config(phydev->psec, info->extack,
-+ 					     &config);
-+ 		if (ret)
-+ 			return ret;
-+ 	}
-+=20
-+ 	return ret;
-  }
- =20
-  const struct ethnl_request_ops ethnl_pse_request_ops =3D {
-
---Sig_/q.5VMWPI.Hy2VZwII.5Qerr
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmaUiiQACgkQAVBC80lX
-0GxNRAf/d6V6b1DZWRxA6myvC+YUaSJUhf/Tjg5UZ1eE76/DNiWb6LrXpmt16A+x
-wERDIg5ObaKmyaDz/peUSzZYjJmWtaMZdUNGXV8tCrggpmfPi98BmJYluvq5r97H
-jDDR2DLCGOo3XhMU4hC7F0bK5VH7+xVYZpUlBZN7D0QGrjcBHCPQKd8h9AO7NWDX
-h8a6bXdUvYJrNBbirfCbSbac1q92rddyIXTzVico+D5+dYGa9YkkZhU11peE+lqW
-ap+6HteVPElsL7PCLOJ38WtLwkukNv/2fyAk5Ch0H1dYTJKBORzI8QhzY/RN4EB9
-MStWyaxAncHQrAnU8knTocsRkCOkFQ==
-=NlhN
------END PGP SIGNATURE-----
-
---Sig_/q.5VMWPI.Hy2VZwII.5Qerr--
 
