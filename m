@@ -1,477 +1,274 @@
-Return-Path: <netdev+bounces-111455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EF549311BD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:55:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D66349311E3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:59:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4284E1C223CF
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 09:55:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC68280F23
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 09:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27B9188CCF;
-	Mon, 15 Jul 2024 09:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O9rW+YD9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E024187333;
+	Mon, 15 Jul 2024 09:59:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A0018756B;
-	Mon, 15 Jul 2024 09:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA31186E5A
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 09:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721037253; cv=none; b=fQ7vqXGaz7lEudGM3CHILG1jERNkkKzt1WwcHfgvyLAYEmUGFUWSo5Em4olRQ+z0wquCrYaqbNudxNtKh6U/+EIiO25YmlAK17WAugm6EEQcouTaKbQoKRtXNPixeuhxKOxS12D5bJjzEVIXuFzMyHpr1d2yOA6P+m/dhYQAnSA=
+	t=1721037580; cv=none; b=I2YYsLcz2CacnM7Rh5zLcwyO1BPGPoAPBk6GaMnXYbQqO5YPvli6Q8JDrBlXkSAyYh4IihCbThCTlRt0smdTkiEZx5qdZ3oizWk9yiUFoj5ash49UoHsXkDklLSXlwKuK5Cuyo6pC1yPr2+xLmf/ZpKWk3phUN6HZ2Rjb9UiYnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721037253; c=relaxed/simple;
-	bh=u8LOQEo/wTK4vk8/HBkrbRalpwaGdVInJCyc50apEmU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Yn74xg8UqqciJ8EA0HU0WY5gNvhnae+OF2p6IA0pyprvZ+cCvwRYSS9ezJZX08mSpuz1sUCP4quTUU/0c8Kq6u4J9ZcHO0ZqmNpSjYupvS7AhRe5z/HVgoW4o+HZsEtTfdPosV4HM20Wrpm+lNOV8ENeJlCLspzh+VLBTGcvjwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O9rW+YD9; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B23E71C000E;
-	Mon, 15 Jul 2024 09:54:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1721037247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3uLY9RmITpN9IDm1nP7ZpMoU5By1ez+3uofCW90JBCw=;
-	b=O9rW+YD91bsb9wX6ifDWB95i4ZLeylu8phtKZwljQEsixcfo+KSZbRBLdDvDVuRvQsxb3s
-	fkMNrzL1pxFS7cHKHzwH/i4rVcb9r+Wrr+EBPpOnMYLj5Tx3MYaEfk0ZItd4iteOysRjlg
-	V+fQx7yBEZWYKaR/hGdAfTszwB0aJMPyAU6C0jSB5FpAxtVw+LKtonHdaNC9ulD3OD19eA
-	AgBnTw8TtkYls76lFJpaAbSgxGJKkHBsNi3LSEJ6Nr7lwT2Xr0XwY4yFJ/qPOh6XgIsywj
-	V4nc6ME2ecNz7hHELhGP/Y/FMeqktJiLQArk1FvZ08bVQa9eoSDXc5u57uZkMg==
-From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Date: Mon, 15 Jul 2024 11:53:45 +0200
-Subject: [PATCH v2 2/2] selftests/bpf: integrate test_xdp_veth into
- test_progs
+	s=arc-20240116; t=1721037580; c=relaxed/simple;
+	bh=8PHTnGP9YJFHb0LKlPNtyGVyaSnq+2gL2AiNtobiHAY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=pDSwmGuMb61mI3vR+0irJFpvCwVAKoTlkT/9Ufkgx2t5dEZNB8qxcFcZgmzFfthh+yd/8Zz68QFx7iT2zhO3O/tzoUSFT3hP9mT4DorOnghuQs1uG0D60aBMbJYCO5JtbQ29TSOCrvNppLT5QEa8D3igfRDYASrYvvykYNhjo1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-563-nshjpSUrO3WZDlfmoCcLLw-1; Mon,
+ 15 Jul 2024 05:59:22 -0400
+X-MC-Unique: nshjpSUrO3WZDlfmoCcLLw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E04D61955D45;
+	Mon, 15 Jul 2024 09:59:20 +0000 (UTC)
+Received: from hog (unknown [10.39.192.3])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA5FD300018D;
+	Mon, 15 Jul 2024 09:59:17 +0000 (UTC)
+Date: Mon, 15 Jul 2024 11:59:15 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+	pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
+Subject: Re: [PATCH net-next v5 14/25] ovpn: implement TCP transport
+Message-ID: <ZpTy860ss-JwT_2W@hog>
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-15-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240715-convert_test_xdp_veth-v2-2-46290b82f6d2@bootlin.com>
-References: <20240715-convert_test_xdp_veth-v2-0-46290b82f6d2@bootlin.com>
-In-Reply-To: <20240715-convert_test_xdp_veth-v2-0-46290b82f6d2@bootlin.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: ebpf@linuxfoundation.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.13.0
-X-GND-Sasl: alexis.lothore@bootlin.com
+In-Reply-To: <20240627130843.21042-15-antonio@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-test_xdp_veth.sh tests that XDP return codes work as expected, by bringing
-up multiple veth pairs isolated in different namespaces, attaching specific
-xdp programs to each interface, and ensuring that the whole chain allows to
-ping one end interface from the first one. The test runs well but is
-currently not integrated in test_progs, which prevents it from being run
-automatically in the CI infrastructure.
+2024-06-27, 15:08:32 +0200, Antonio Quartulli wrote:
+> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+> index 0475440642dd..764b3df996bc 100644
+> --- a/drivers/net/ovpn/io.c
+> +++ b/drivers/net/ovpn/io.c
+> @@ -21,6 +21,7 @@
+>  #include "netlink.h"
+>  #include "proto.h"
+>  #include "socket.h"
+> +#include "tcp.h"
+>  #include "udp.h"
+>  #include "skb.h"
+> =20
+> @@ -84,8 +85,11 @@ void ovpn_decrypt_post(struct sk_buff *skb, int ret)
+>  =09/* PID sits after the op */
+>  =09pid =3D (__force __be32 *)(skb->data + OVPN_OP_SIZE_V2);
+>  =09ret =3D ovpn_pktid_recv(&ks->pid_recv, ntohl(*pid), 0);
+> -=09if (unlikely(ret < 0))
+> +=09if (unlikely(ret < 0)) {
+> +=09=09net_err_ratelimited("%s: PKT ID RX error: %d\n",
+> +=09=09=09=09    peer->ovpn->dev->name, ret);
 
-Rewrite it as a C test relying on libbpf to allow running it in the CI
-infrastructure. The new code brings up the same network infrastructure and
-reuses the same eBPF programs as test_xdp_veth.sh, for which skeletons are
-already generated by the bpf tests makefile.
+nit: this should be part of the "packet processing" patch?
 
-Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
----
-The new code has been tested in an aarch64 qemu instance:
-Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
 
-I have also checked that some minor alterations in the network
-configuration (altering the redirect map, or not loading one of the xdp
-programs) make the test fail.
+> diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
+> index dd4d91dfabb5..86d4696b1529 100644
+> --- a/drivers/net/ovpn/peer.h
+> +++ b/drivers/net/ovpn/peer.h
+> @@ -10,8 +10,8 @@
+>  #ifndef _NET_OVPN_OVPNPEER_H_
+>  #define _NET_OVPN_OVPNPEER_H_
+> =20
+> -#include <linux/ptr_ring.h>
 
-On my testing setup, the test takes a bit more than 3 seconds to run on
-average.
+nit: I think you don't need it at all in this version and forgot to
+drop it in a previous patch? (I didn't notice when it was introduced)
 
-Changes in v2:
-- fix many formatting issues raised by checkpatch
-- use static namespaces instead of random ones
-- use SYS_NOFAIL instead of snprintf() + system ()
-- squashed the new test addition patch and the old test removal patch
----
- tools/testing/selftests/bpf/Makefile               |   1 -
- .../selftests/bpf/prog_tests/test_xdp_veth.c       | 211 +++++++++++++++++++++
- tools/testing/selftests/bpf/test_xdp_veth.sh       | 121 ------------
- 3 files changed, 211 insertions(+), 122 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index a7932bead77d..2864a0dc04d5 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -117,7 +117,6 @@ TEST_PROGS := test_kmod.sh \
- 	test_xdp_redirect.sh \
- 	test_xdp_redirect_multi.sh \
- 	test_xdp_meta.sh \
--	test_xdp_veth.sh \
- 	test_tunnel.sh \
- 	test_lwt_seg6local.sh \
- 	test_lirc_mode2.sh \
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-new file mode 100644
-index 000000000000..3ffeb411c131
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-@@ -0,0 +1,211 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/**
-+ * Create 3 namespaces with 3 veth peers, and
-+ * forward packets in-between using native XDP
-+ *
-+ *                      XDP_TX
-+ * NS1(veth11)        NS2(veth22)        NS3(veth33)
-+ *      |                  |                  |
-+ *      |                  |                  |
-+ *   (veth1,            (veth2,            (veth3,
-+ *   id:111)            id:122)            id:133)
-+ *     ^ |                ^ |                ^ |
-+ *     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
-+ *     | ------------------ ------------------ |
-+ *     -----------------------------------------
-+ *                    XDP_REDIRECT
-+ */
-+
-+#define _GNU_SOURCE
-+#include <net/if.h>
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "xdp_dummy.skel.h"
-+#include "xdp_redirect_map.skel.h"
-+#include "xdp_tx.skel.h"
-+
-+#define VETH_PAIRS_COUNT	3
-+#define NS_SUFFIX_LEN		6
-+#define VETH_NAME_MAX_LEN	16
-+#define IP_SRC				"10.1.1.11"
-+#define IP_DST				"10.1.1.33"
-+#define IP_CMD_MAX_LEN		128
-+
-+struct skeletons {
-+	struct xdp_dummy *xdp_dummy;
-+	struct xdp_tx *xdp_tx;
-+	struct xdp_redirect_map *xdp_redirect_maps;
-+};
-+
-+struct veth_configuration {
-+	char local_veth[VETH_NAME_MAX_LEN]; /* Interface in main namespace */
-+	char remote_veth[VETH_NAME_MAX_LEN]; /* Peer interface in dedicated namespace*/
-+	const char *namespace; /* Namespace for the remote veth */
-+	char next_veth[VETH_NAME_MAX_LEN]; /* Local interface to redirect traffic to */
-+	char *remote_addr; /* IP address of the remote veth */
-+};
-+
-+static struct veth_configuration config[VETH_PAIRS_COUNT] = {
-+	{
-+		.local_veth = "veth1",
-+		.remote_veth = "veth11",
-+		.next_veth = "veth2",
-+		.remote_addr = IP_SRC,
-+		.namespace = "ns-veth11"
-+	},
-+	{
-+		.local_veth = "veth2",
-+		.remote_veth = "veth22",
-+		.next_veth = "veth3",
-+		.remote_addr = NULL,
-+		.namespace = "ns-veth22"
-+	},
-+	{
-+		.local_veth = "veth3",
-+		.remote_veth = "veth33",
-+		.next_veth = "veth1",
-+		.remote_addr = IP_DST,
-+		.namespace = "ns-veth33"
-+	}
-+};
-+
-+static int attach_programs_to_veth_pair(struct skeletons *skeletons, int index)
-+{
-+	struct bpf_program *local_prog, *remote_prog;
-+	struct bpf_link **local_link, **remote_link;
-+	struct nstoken *nstoken;
-+	struct bpf_link *link;
-+	int interface;
-+
-+	switch (index) {
-+	case 0:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_0;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_0;
-+		remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
-+		remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
-+		break;
-+	case 1:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_1;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_1;
-+		remote_prog = skeletons->xdp_tx->progs.xdp_tx;
-+		remote_link = &skeletons->xdp_tx->links.xdp_tx;
-+		break;
-+	case 2:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_2;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_2;
-+		remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
-+		remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
-+		break;
-+	}
-+	interface = if_nametoindex(config[index].local_veth);
-+	if (!ASSERT_NEQ(interface, 0, "non zero interface index"))
-+		return -1;
-+	link = bpf_program__attach_xdp(local_prog, interface);
-+	if (!ASSERT_OK_PTR(link, "attach xdp program to local veth"))
-+		return -1;
-+	*local_link = link;
-+	nstoken = open_netns(config[index].namespace);
-+	if (!ASSERT_OK_PTR(nstoken, "switch to remote veth namespace"))
-+		return -1;
-+	interface = if_nametoindex(config[index].remote_veth);
-+	if (!ASSERT_NEQ(interface, 0, "non zero interface index"))
-+		return -1;
-+	link = bpf_program__attach_xdp(remote_prog, interface);
-+	*remote_link = link;
-+	close_netns(nstoken);
-+	if (!ASSERT_OK_PTR(link, "attach xdp program to remote veth"))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int configure_network(struct skeletons *skeletons)
-+{
-+	int interface_id;
-+	int map_fd;
-+	int err;
-+	int i = 0;
-+
-+	/* First create and configure all interfaces */
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		SYS(fail, "ip netns add %s", config[i].namespace);
-+		SYS(fail, "ip link add %s type veth peer name %s netns %s",
-+		    config[i].local_veth, config[i].remote_veth, config[i].namespace);
-+		SYS(fail, "ip link set dev %s up", config[i].local_veth);
-+		if (config[i].remote_addr)
-+			SYS(fail, "ip -n %s addr add %s/24 dev %s",	config[i].namespace,
-+			    config[i].remote_addr, config[i].remote_veth);
-+		SYS(fail, "ip -n %s link set dev %s up", config[i].namespace,
-+		    config[i].remote_veth);
-+	}
-+
-+	/* Then configure the redirect map and attach programs to interfaces */
-+	map_fd = bpf_map__fd(skeletons->xdp_redirect_maps->maps.tx_port);
-+	if (!ASSERT_GE(map_fd, 0, "open redirect map"))
-+		goto fail;
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		interface_id = if_nametoindex(config[i].next_veth);
-+		if (!ASSERT_NEQ(interface_id, 0, "non zero interface index"))
-+			goto fail;
-+		err = bpf_map_update_elem(map_fd, &i, &interface_id, BPF_ANY);
-+		if (!ASSERT_OK(err, "configure interface redirection through map"))
-+			goto fail;
-+		if (attach_programs_to_veth_pair(skeletons, i))
-+			goto fail;
-+	}
-+
-+	return 0;
-+
-+fail:
-+	return -1;
-+}
-+
-+static void cleanup_network(void)
-+{
-+	int i;
-+
-+	/* Deleting namespaces is enough to automatically remove veth pairs as well
-+	 */
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++)
-+		SYS_NOFAIL("ip netns del %s", config[i].namespace);
-+}
-+
-+static int check_ping(struct skeletons *skeletons)
-+{
-+	/* Test: if all interfaces are properly configured, we must be able to ping
-+	 * veth33 from veth11
-+	 */
-+	return SYS_NOFAIL("ip netns exec %s ping -c 1 -W 1 %s > /dev/null",
-+					  config[0].namespace, IP_DST);
-+}
-+
-+void test_xdp_veth_redirect(void)
-+{
-+	struct skeletons skeletons = {};
-+
-+	skeletons.xdp_dummy = xdp_dummy__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_dummy, "xdp_dummy__open_and_load"))
-+		return;
-+
-+	skeletons.xdp_tx = xdp_tx__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_tx, "xdp_tx__open_and_load"))
-+		goto destroy_xdp_dummy;
-+
-+	skeletons.xdp_redirect_maps = xdp_redirect_map__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_redirect_maps, "xdp_redirect_map__open_and_load"))
-+		goto destroy_xdp_tx;
-+
-+	if (configure_network(&skeletons))
-+		goto destroy_xdp_redirect_map;
-+
-+	ASSERT_OK(check_ping(&skeletons), "ping");
-+
-+destroy_xdp_redirect_map:
-+	xdp_redirect_map__destroy(skeletons.xdp_redirect_maps);
-+destroy_xdp_tx:
-+	xdp_tx__destroy(skeletons.xdp_tx);
-+destroy_xdp_dummy:
-+	xdp_dummy__destroy(skeletons.xdp_dummy);
-+
-+	cleanup_network();
-+}
-diff --git a/tools/testing/selftests/bpf/test_xdp_veth.sh b/tools/testing/selftests/bpf/test_xdp_veth.sh
-deleted file mode 100755
-index 5211ca9a0239..000000000000
---- a/tools/testing/selftests/bpf/test_xdp_veth.sh
-+++ /dev/null
-@@ -1,121 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0
--#
--# Create 3 namespaces with 3 veth peers, and
--# forward packets in-between using native XDP
--#
--#                      XDP_TX
--# NS1(veth11)        NS2(veth22)        NS3(veth33)
--#      |                  |                  |
--#      |                  |                  |
--#   (veth1,            (veth2,            (veth3,
--#   id:111)            id:122)            id:133)
--#     ^ |                ^ |                ^ |
--#     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
--#     | ------------------ ------------------ |
--#     -----------------------------------------
--#                    XDP_REDIRECT
--
--# Kselftest framework requirement - SKIP code is 4.
--ksft_skip=4
--
--TESTNAME=xdp_veth
--BPF_FS=$(awk '$3 == "bpf" {print $2; exit}' /proc/mounts)
--BPF_DIR=$BPF_FS/test_$TESTNAME
--readonly NS1="ns1-$(mktemp -u XXXXXX)"
--readonly NS2="ns2-$(mktemp -u XXXXXX)"
--readonly NS3="ns3-$(mktemp -u XXXXXX)"
--
--_cleanup()
--{
--	set +e
--	ip link del veth1 2> /dev/null
--	ip link del veth2 2> /dev/null
--	ip link del veth3 2> /dev/null
--	ip netns del ${NS1} 2> /dev/null
--	ip netns del ${NS2} 2> /dev/null
--	ip netns del ${NS3} 2> /dev/null
--	rm -rf $BPF_DIR 2> /dev/null
--}
--
--cleanup_skip()
--{
--	echo "selftests: $TESTNAME [SKIP]"
--	_cleanup
--
--	exit $ksft_skip
--}
--
--cleanup()
--{
--	if [ "$?" = 0 ]; then
--		echo "selftests: $TESTNAME [PASS]"
--	else
--		echo "selftests: $TESTNAME [FAILED]"
--	fi
--	_cleanup
--}
--
--if [ $(id -u) -ne 0 ]; then
--	echo "selftests: $TESTNAME [SKIP] Need root privileges"
--	exit $ksft_skip
--fi
--
--if ! ip link set dev lo xdp off > /dev/null 2>&1; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without the ip xdp support"
--	exit $ksft_skip
--fi
--
--if [ -z "$BPF_FS" ]; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without bpffs mounted"
--	exit $ksft_skip
--fi
--
--if ! bpftool version > /dev/null 2>&1; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without bpftool"
--	exit $ksft_skip
--fi
--
--set -e
--
--trap cleanup_skip EXIT
--
--ip netns add ${NS1}
--ip netns add ${NS2}
--ip netns add ${NS3}
--
--ip link add veth1 index 111 type veth peer name veth11 netns ${NS1}
--ip link add veth2 index 122 type veth peer name veth22 netns ${NS2}
--ip link add veth3 index 133 type veth peer name veth33 netns ${NS3}
--
--ip link set veth1 up
--ip link set veth2 up
--ip link set veth3 up
--
--ip -n ${NS1} addr add 10.1.1.11/24 dev veth11
--ip -n ${NS3} addr add 10.1.1.33/24 dev veth33
--
--ip -n ${NS1} link set dev veth11 up
--ip -n ${NS2} link set dev veth22 up
--ip -n ${NS3} link set dev veth33 up
--
--mkdir $BPF_DIR
--bpftool prog loadall \
--	xdp_redirect_map.bpf.o $BPF_DIR/progs type xdp \
--	pinmaps $BPF_DIR/maps
--bpftool map update pinned $BPF_DIR/maps/tx_port key 0 0 0 0 value 122 0 0 0
--bpftool map update pinned $BPF_DIR/maps/tx_port key 1 0 0 0 value 133 0 0 0
--bpftool map update pinned $BPF_DIR/maps/tx_port key 2 0 0 0 value 111 0 0 0
--ip link set dev veth1 xdp pinned $BPF_DIR/progs/xdp_redirect_map_0
--ip link set dev veth2 xdp pinned $BPF_DIR/progs/xdp_redirect_map_1
--ip link set dev veth3 xdp pinned $BPF_DIR/progs/xdp_redirect_map_2
--
--ip -n ${NS1} link set dev veth11 xdp obj xdp_dummy.bpf.o sec xdp
--ip -n ${NS2} link set dev veth22 xdp obj xdp_tx.bpf.o sec xdp
--ip -n ${NS3} link set dev veth33 xdp obj xdp_dummy.bpf.o sec xdp
--
--trap cleanup EXIT
--
--ip netns exec ${NS1} ping -c 1 -W 1 10.1.1.33
--
--exit 0
 
--- 
-2.45.2
+> +static int ovpn_tcp_to_userspace(struct ovpn_socket *sock, struct sk_buf=
+f *skb)
+> +{
+> +=09struct sock *sk =3D sock->sock->sk;
+> +
+> +=09skb_set_owner_r(skb, sk);
+> +=09memset(skb->cb, 0, sizeof(skb->cb));
+
+nit: this was just done in ovpn_tcp_rcv
+
+> +=09skb_queue_tail(&sock->peer->tcp.user_queue, skb);
+> +=09sock->peer->tcp.sk_cb.sk_data_ready(sk);
+> +
+> +=09return 0;
+> +}
+> +
+> +static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
+> +{
+[...]
+> +=09/* DATA_V2 packets are handled in kernel, the rest goes to user space=
+ */
+> +=09if (likely(ovpn_opcode_from_skb(skb, 0) =3D=3D OVPN_DATA_V2)) {
+> +=09=09/* hold reference to peer as required by ovpn_recv().
+> +=09=09 *
+> +=09=09 * NOTE: in this context we should already be holding a
+> +=09=09 * reference to this peer, therefore ovpn_peer_hold() is
+> +=09=09 * not expected to fail
+> +=09=09 */
+> +=09=09WARN_ON(!ovpn_peer_hold(peer));
+
+drop the packet if this fails? otherwise I suspect we'll crash later on.
+
+> +=09=09ovpn_recv(peer, skb);
+> +=09} else {
+> +=09=09/* The packet size header must be there when sending the packet
+> +=09=09 * to userspace, therefore we put it back
+> +=09=09 */
+> +=09=09skb_push(skb, 2);
+> +=09=09memset(skb->cb, 0, sizeof(skb->cb));
+> +=09=09if (ovpn_tcp_to_userspace(peer->sock, skb) < 0) {
+> +=09=09=09net_warn_ratelimited("%s: cannot send skb to userspace\n",
+> +=09=09=09=09=09     peer->ovpn->dev->name);
+> +=09=09=09goto err;
+> +=09=09}
+> +=09}
+[...]
+
+
+> +void ovpn_tcp_socket_detach(struct socket *sock)
+> +{
+> +=09struct ovpn_socket *ovpn_sock;
+> +=09struct ovpn_peer *peer;
+> +
+> +=09if (!sock)
+> +=09=09return;
+> +
+> +=09rcu_read_lock();
+> +=09ovpn_sock =3D rcu_dereference_sk_user_data(sock->sk);
+> +
+[...]
+> +=09/* cancel any ongoing work. Done after removing the CBs so that these
+> +=09 * workers cannot be re-armed
+> +=09 */
+> +=09cancel_work_sync(&peer->tcp.tx_work);
+
+I don't think that's ok to call under rcu_read_lock, it seems it can
+sleep.
+
+> +=09strp_done(&peer->tcp.strp);
+
+And same here, since strp_done also calls cancel_work_sync.
+
+> +=09rcu_read_unlock();
+> +}
+> +
+> +static void ovpn_tcp_send_sock(struct ovpn_peer *peer)
+> +{
+> +=09struct sk_buff *skb =3D peer->tcp.out_msg.skb;
+> +
+> +=09if (!skb)
+> +=09=09return;
+> +
+> +=09if (peer->tcp.tx_in_progress)
+> +=09=09return;
+> +
+> +=09peer->tcp.tx_in_progress =3D true;
+
+I'm not convinced this is safe. ovpn_tcp_send_sock could run
+concurrently for the same peer (lock_sock doesn't exclude bh_lock_sock
+after the short "grab ownership" phase), so I think both sides could
+see tx_in_progress =3D false and then proceed.
+
+
+> +=09do {
+> +=09=09int ret =3D skb_send_sock_locked(peer->sock->sock->sk, skb,
+> +=09=09=09=09=09       peer->tcp.out_msg.offset,
+> +=09=09=09=09=09       peer->tcp.out_msg.len);
+> +=09=09if (unlikely(ret < 0)) {
+> +=09=09=09if (ret =3D=3D -EAGAIN)
+> +=09=09=09=09goto out;
+
+This will silently drop the message? And then in case of a userspace
+message, ovpn_tcp_sendmsg will lie to the user (the openvpn client),
+claiming that the control message was sent (ret =3D size just above the
+unlock)?
+
+> +
+> +=09=09=09net_warn_ratelimited("%s: TCP error to peer %u: %d\n",
+> +=09=09=09=09=09     peer->ovpn->dev->name, peer->id,
+> +=09=09=09=09=09     ret);
+> +
+> +=09=09=09/* in case of TCP error we can't recover the VPN
+> +=09=09=09 * stream therefore we abort the connection
+> +=09=09=09 */
+> +=09=09=09ovpn_peer_del(peer,
+> +=09=09=09=09      OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
+> +=09=09=09break;
+> +=09=09}
+> +
+> +=09=09peer->tcp.out_msg.len -=3D ret;
+> +=09=09peer->tcp.out_msg.offset +=3D ret;
+> +=09} while (peer->tcp.out_msg.len > 0);
+
+Another thing that worries me: assume the receiver is a bit slow, the
+underlying TCP socket gets stuck. skb_send_sock_locked manages to push
+some data down the TCP socket, but not everything. We advance by that
+amount, and restart this loop. The socket is still stuck, so
+skb_send_sock_locked returns -EAGAIN. We have only pushed a partial
+message down to the TCP socket, but we drop the rest? Now the stream
+is broken, and the next call to ovpn_tcp_send_sock will happily send
+its message.
+
+ovpn_tcp_send_sock with msg_len =3D 1000
+iteration 1
+  skb_send_sock_locked returns 100
+  advance
+iteration 2
+  skb_send_sock_locked returns -EAGAIN
+  goto out
+
+
+So you'd have to keep that partially-sent message around until you can
+finish pushing it out on the socket.
+
+
+[...]
+> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t =
+size)
+> +{
+> +=09struct ovpn_socket *sock;
+> +=09int ret, linear =3D PAGE_SIZE;
+> +=09struct ovpn_peer *peer;
+> +=09struct sk_buff *skb;
+> +
+> +=09rcu_read_lock();
+> +=09sock =3D rcu_dereference_sk_user_data(sk);
+> +=09peer =3D sock->peer;
+> +=09rcu_read_unlock();
+
+What's stopping the peer being freed here?
+
+--=20
+Sabrina
 
 
