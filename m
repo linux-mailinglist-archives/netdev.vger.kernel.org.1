@@ -1,232 +1,149 @@
-Return-Path: <netdev+bounces-111441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C73C931019
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 10:40:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D2C9310D4
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8D321F2204B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 08:40:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E367283441
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 09:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD03618628C;
-	Mon, 15 Jul 2024 08:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AE6185E76;
+	Mon, 15 Jul 2024 09:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5y9Gi9N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EelWWvlC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839ED185E7F;
-	Mon, 15 Jul 2024 08:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0D0185E57;
+	Mon, 15 Jul 2024 09:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721032804; cv=none; b=Y00tHAaSV8PEnJvE7bFfe0Z/4e/Fxj++9ILf894/uvPL5xBFdubk6KLjExoHAwBOpNyzn7BxHxx6TWYDAJo1JMrekBCzeTB4E+oWeJwDscdXFPhpw0QFAWvMYr2L7NJvUJSwhRqcyMHGlfdpQsRQdtDncnnyvAnVX06Svv5o2cs=
+	t=1721034452; cv=none; b=rblRkc3zFzyCt9BwudQR1OT+697kaNTAOzEmUHVrKzXD/M88ZIFH1R/ayPSgRp/W1exho7PWkyq2ExRgpuiQ4yZqphoM97V4pwYVgM/xBjmr9qQQkZB2ktXp1yzYeSMFnQcgBrywASw8CADubCtsrPV2RIUmvYeAfRms+E2mgq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721032804; c=relaxed/simple;
-	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=M4lsb0r7FCxQSsXBMuUG9a69qLIpqoP3E30/TvazF031YYkad3twv0OgnzYfK2hOez5FOt3Lzo5xamwsK5jcc2mtVAsc883fE7eVf+4Nmv7PZZNFFBK+Y85S4bT2WNwA1PNrQHo8nPyAI34oHLWSA1YwvjtGMoiPkVLMdCHn8GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5y9Gi9N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D36C3C4DE07;
-	Mon, 15 Jul 2024 08:40:03 +0000 (UTC)
+	s=arc-20240116; t=1721034452; c=relaxed/simple;
+	bh=0HFCwZt7C8k2qyxkILy1fA1A4/qXLb8dyXMJYP/qx8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ovKs0pBQYzP31HHm8oZFupVIxJ4eUp2N5dLVlCDoRihLurtxXqk/SwKLyAsJiynWJsVkVjABmpDyXhyaY6Mx//AwbEobbkNSs4uA1dOza0M2U2+E7arU/FyOSL/xTbafeL3Ng3xY5TwaCNhMAKKZ3lsfeBQS8nUaBUpasq4ghqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EelWWvlC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B069C4AF0A;
+	Mon, 15 Jul 2024 09:07:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721032803;
-	bh=hu+7JHtL6Prd6V/S2TJxZvc5nnlMUcfi+uYAd+zwbqo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=m5y9Gi9NoHE9iAcMYXWAerQd7GwouDwHIAA/bSsxf7m1cMcDZ7FIgaU4KENubXCjp
-	 KW01Vx/KE/Cvy5HxNU67NROWO7k9Ay4e5wdAkYRCd+PskOFKRbFW6FHTvKxtEiQMIe
-	 jwwzCO3bdX+P4PhCL4PtQCepXJfNvdZj9fdfb9QvNVIIWXouNgov8B8wFFCJShbUmM
-	 26V4VeNjxOWbdTBK6AF1fuRWp/aoyqcGJx5VD14LR2OXT9nkD4WExsqwT1Be0t1yBh
-	 X0MBpNhexEfuZdBlnMlTszTJvzghW2Xfoo2xRx72B+CQfDvtkeCekR7haQj74bY+EX
-	 BbgeP+0ajWgQw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8896C2BD09;
-	Mon, 15 Jul 2024 08:40:03 +0000 (UTC)
-From: Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Mon, 15 Jul 2024 11:38:21 +0300
-Subject: [PATCH v11 17/38] net: cirrus: add DT support for Cirrus EP93xx
+	s=k20201202; t=1721034451;
+	bh=0HFCwZt7C8k2qyxkILy1fA1A4/qXLb8dyXMJYP/qx8A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EelWWvlC+Rg0xnY/NNWoHkOnZEauXQJqxXHwsAuxz/EkouLVOxwO+wGwMnrr4bWHV
+	 PmMgtpKWPE1Ve6APJwUABp8P9VbHni8hmDQL5oaayjB/ntGjbBs1ViVtsq3EKZAI+5
+	 VMXaI+lIh2IfUEqNu2Kk5TmR1w0pGG5wS8Ooaeff2UZvsz11cEgb2efxo4QT2I4jAC
+	 4miT40bh61ID+WSNR/LOCIlL7gZuL05OPJxdLubHIyeMM8VYajs7P+SGQLy4ZtYcOu
+	 NZMAVqpV7ba6iIwi3qoblKwiK1s9/pcl2yWWZVSbgvvedmcbHpa98qE1DLlWnd4359
+	 pFS/8c/ErfzVQ==
+Message-ID: <7a1fea0c-1389-4867-aaec-0c0db01cb6c0@kernel.org>
+Date: Mon, 15 Jul 2024 11:07:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] selftests: mptcp: lib: fix shellcheck errors
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240712-upstream-net-next-20240712-selftests-mptcp-fix-shellcheck-v1-1-1cb7180db40a@kernel.org>
+ <20240713154614.653f30ce@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240713154614.653f30ce@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240715-ep93xx-v11-17-4e924efda795@maquefel.me>
-References: <20240715-ep93xx-v11-0-4e924efda795@maquefel.me>
-In-Reply-To: <20240715-ep93xx-v11-0-4e924efda795@maquefel.me>
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1721032799; l=4277;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=b1GOTD5HubzYgxiOB7lYJxNswjw8j/5q0+HrSptbhew=;
- b=rKabVJ2eVAk5cAgCA0iDMlooaUUDvBHdd9owdLmcit71rrco09VSAxRewR9Sddc4di01P3+XGmus
- GH3En/IxBnWAKgdyOQh0k5hpONEAaIsyEga8q4Sns4B8lPrZViVE
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received: by B4 Relay for nikita.shubin@maquefel.me/20230718
- with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: nikita.shubin@maquefel.me
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
+Hi Jakub,
 
-- add OF ID match table
-- get phy_id from the device tree, as part of mdio
-- copy_addr is now always used, as there is no SoC/board that aren't
-- dropped platform header
+On 14/07/2024 00:46, Jakub Kicinski wrote:
+> On Fri, 12 Jul 2024 12:00:15 +0200 Matthieu Baerts (NGI0) wrote:
+>> It looks like we missed these two errors recently:
+>>
+>>   - SC2068: Double quote array expansions to avoid re-splitting elements.
+>>   - SC2145: Argument mixes string and array. Use * or separate argument.
+>>
+>> Two simple fixes, it is not supposed to change the behaviour as the
+>> variable names should not have any spaces in their names. Still, better
+>> to fix them to easily spot new issues.
+>>
+>> Fixes: f265d3119a29 ("selftests: mptcp: lib: use setup/cleanup_ns helpers")
+>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> Speaking of MPTCP tests - I added the connect test to ignored today.
+> Too many failures :(
 
-Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+Sorry for that, and thank you for having ignore it for the 'dbg' runner.
 
-diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-index 1f495cfd7959..2523d9c9d1b8 100644
---- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-+++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-@@ -16,13 +16,12 @@
- #include <linux/ethtool.h>
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/delay.h>
- #include <linux/io.h>
- #include <linux/slab.h>
- 
--#include <linux/platform_data/eth-ep93xx.h>
--
- #define DRV_MODULE_NAME		"ep93xx-eth"
- 
- #define RX_QUEUE_ENTRIES	64
-@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
- 
--static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
--{
--	struct net_device *dev;
--
--	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
--	if (dev == NULL)
--		return NULL;
--
--	eth_hw_addr_set(dev, data->dev_addr);
--
--	dev->ethtool_ops = &ep93xx_ethtool_ops;
--	dev->netdev_ops = &ep93xx_netdev_ops;
--
--	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
--
--	return dev;
--}
--
--
- static void ep93xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *dev;
-@@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
- 
- static int ep93xx_eth_probe(struct platform_device *pdev)
- {
--	struct ep93xx_eth_data *data;
- 	struct net_device *dev;
- 	struct ep93xx_priv *ep;
- 	struct resource *mem;
-+	void __iomem *base_addr;
-+	struct device_node *np;
-+	u32 phy_id;
- 	int irq;
- 	int err;
- 
- 	if (pdev == NULL)
- 		return -ENODEV;
--	data = dev_get_platdata(&pdev->dev);
- 
- 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq = platform_get_irq(pdev, 0);
- 	if (!mem || irq < 0)
- 		return -ENXIO;
- 
--	dev = ep93xx_dev_alloc(data);
-+	base_addr = ioremap(mem->start, resource_size(mem));
-+	if (!base_addr)
-+		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-+
-+	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-+	if (!np)
-+		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-+
-+	err = of_property_read_u32(np, "reg", &phy_id);
-+	of_node_put(np);
-+	if (err)
-+		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-+
-+	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
- 	if (dev == NULL) {
- 		err = -ENOMEM;
- 		goto err_out;
- 	}
-+
-+	eth_hw_addr_set(dev, base_addr + 0x50);
-+	dev->ethtool_ops = &ep93xx_ethtool_ops;
-+	dev->netdev_ops = &ep93xx_netdev_ops;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-+
- 	ep = netdev_priv(dev);
- 	ep->dev = dev;
- 	SET_NETDEV_DEV(dev, &pdev->dev);
-@@ -822,15 +822,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 		goto err_out;
- 	}
- 
--	ep->base_addr = ioremap(mem->start, resource_size(mem));
--	if (ep->base_addr == NULL) {
--		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_out;
--	}
-+	ep->base_addr = base_addr;
- 	ep->irq = irq;
- 
--	ep->mii.phy_id = data->phy_id;
-+	ep->mii.phy_id = phy_id;
- 	ep->mii.phy_id_mask = 0x1f;
- 	ep->mii.reg_num_mask = 0x1f;
- 	ep->mii.dev = dev;
-@@ -857,12 +852,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 	return err;
- }
- 
-+static const struct of_device_id ep93xx_eth_of_ids[] = {
-+	{ .compatible = "cirrus,ep9301-eth" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
- 
- static struct platform_driver ep93xx_eth_driver = {
- 	.probe		= ep93xx_eth_probe,
- 	.remove_new	= ep93xx_eth_remove,
- 	.driver		= {
- 		.name	= "ep93xx-eth",
-+		.of_match_table = ep93xx_eth_of_ids,
- 	},
- };
- 
+This sudden regression looks strange. Our CI didn't catch this issue so
+far. It is only happening with the debug kernel config.
 
+Do you know if anything has changed recently -- around the 11th of July
+-- on NIPA's config side that is not documented? e.g. more jobs in
+parallel, new kernel config? I didn't see anything that could cause the
+new issues when looking at NIPA's git log and the CI change log sheet.
+
+I will try to reproduce the issue locally, maybe it is caused by a patch
+that is in patchwork, but not in net or net-next yet.
+
+Cheers,
+Matt
 -- 
-2.43.2
-
+Sponsored by the NGI0 Core fund.
 
 
