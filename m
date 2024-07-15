@@ -1,147 +1,165 @@
-Return-Path: <netdev+bounces-111588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89517931A2B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 20:18:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED790931A2D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 20:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6291C20CAD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:18:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28062833F4
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7653854670;
-	Mon, 15 Jul 2024 18:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJodtI76"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C8E6FE21;
+	Mon, 15 Jul 2024 18:18:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADCD10A2A;
-	Mon, 15 Jul 2024 18:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583D917BB5
+	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 18:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721067503; cv=none; b=dw3VhX2CYKdXTQcPx0mAX+TR3SNniP42gf8ftUO5FqLBjyuOvHCLWygU57mjVF3fE7T6MqpgWvMaWa+E4nLT5mhCDis1IJvHcaVDesx1LUKYYT4nJMrhlBEb8GwWUfHJqo56ygidGlFDsr0Q/78qtWUyE5ecgcDfj83W2x+K6AA=
+	t=1721067507; cv=none; b=W4xeVlxuh2ug+ITfn6fGS0fiekyO3ve/7pGfNKbXoQ9XpJd5575/GmvIIohU2LsLbPGIByeiYSs2p4KWDf3a8oEwR4Tq7vxR2PCMDjwoGDtn9yytw8Z6uzw0P8ha4BAQUaVqEfyG4cRrAdhX8h7G+kGHZZ17LUoI7y3oNRhSZOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721067503; c=relaxed/simple;
-	bh=dSFMdMwXY82MZ3qDGBu0+q+kEdGr+5JZfHK4QyzYUJ8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=YzG5IFuB7AS1kT8jnYLwgPem4GCjgYgbFIL9hK4s6XEyUvy8maNTyew2MLF43inYjWbV4spVpZxaOU98xYj228U6gwai2KkqY4RfisUThri+7+5Ai8UmZrzE/nQ++UIjkhVqyd3M32kFiCVcO9lbW6ISRMRfbuc1w0gVh3K1Xdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CJodtI76; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-79f178e6225so322799085a.2;
-        Mon, 15 Jul 2024 11:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721067500; x=1721672300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+JdmbicsHA1eZpBDvD12TITVsyaXmn/yyPkv0C2f5fI=;
-        b=CJodtI76VKjIjKIogoj799GgawWGj7q/yOjaSy8FSjbIM6ogiJsYu7XttHb6TDNQMP
-         HZQRYKxPqDGktCXTIRpn1jvRjEkGkkuPugKfzL+zd+fy9D1VAXAn9vwXNpamV2u2A1Iv
-         k+fPWFpgj2aZoQ1jOH/poju6NpKeZvmuBFQT0GSlK2TKMwfHCQjhxgQwDZxH71121OXB
-         iyW7y4+i+KobM24WNgYSg+/bT/CqbCFLvEtLeP0TModaKTrGG+ZpogK5bruix+NOiqiN
-         Dh3bLOIeCaZW8XEUXT7ULdaISfXinPh3YdMZ6rR7ErNEbrzwhmJmOV8dsnyjgezoovBu
-         nJvA==
+	s=arc-20240116; t=1721067507; c=relaxed/simple;
+	bh=OBznxfoYKy1Zf974n+ASvWJ9uXh8KBeGGa1OHU3//EI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BBGDgpUyDCtq6xKK2gKTm+7NAH0SWho90SH8MuqFplpesmVfNJgYqMd2CO958/sFvTPibAR3st+5cvTK7z8ms0rBCr+Ba+JxBuOYJ2yIEosBo8bapaRTPblXrz7XhsPW5iST39iO5ayqHn71BSyf7JCNvgOab3sQEveqMO6RP/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-376210a881dso53105005ab.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 11:18:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721067500; x=1721672300;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+JdmbicsHA1eZpBDvD12TITVsyaXmn/yyPkv0C2f5fI=;
-        b=UCoVvWl5bp/7cpLg6hNIhrIlbnzYn0ge8TFbMOJ2SV1Qci7+9QHY662+xEQIbu9uXI
-         Yr/J2Mi6l5gQr7B261itG5KUaGOOPo4R6jHElj0aewEYf/Z/dXeOFj9asNaB+zN1jigr
-         ABfuxpsmLOHDuW6A3TV7w8gv5DbWbUaTXl3BxqyGsKWnl/QOOx1DXGDAI3hjR2rbHKFV
-         YBHS99wfzkKVO1hi+AnnYJAqNpby2X8Oud58ShhDimTHJlNXDskSiSES5sBlpZTNqzA+
-         WiiDIpK+KtN3q8HKYcRAszp84I/UlX4z9P1dhV+EGgZzdcrIj1yKu26ItBlrmNBR5fqZ
-         zStw==
-X-Forwarded-Encrypted: i=1; AJvYcCU78WE2eLFsK0tGXKIjnW8EX71DS5e06P9NGBGhvOwTUVl+8R2aKkYLZA6VjXCnqnf2Uclmb34W3haINen6bH6Hnnqgq5JE
-X-Gm-Message-State: AOJu0Yzo48kljdVKH/GbiM5w6ykC7FAs9a5pDtb+pG2lA1/LaiGK0b1G
-	BuzdcJCJD+OJ9UGC6/ybKkqoJahxojUiUkyaoHNIZ3FcL1RJHyso
-X-Google-Smtp-Source: AGHT+IEUC82LAgEdAUXep1GXNhv8zoutAtzgDq12Vz/xpe1ZmMc5FjkvUwLzODXPpqr010IfIl498Q==
-X-Received: by 2002:a05:620a:3187:b0:79d:7ae0:ffd2 with SMTP id af79cd13be357-7a179fb23b0mr77078685a.49.1721067500357;
-        Mon, 15 Jul 2024 11:18:20 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bbe6c6sm222572585a.39.2024.07.15.11.18.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 11:18:19 -0700 (PDT)
-Date: Mon, 15 Jul 2024 14:18:19 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- netdev@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- fw@strlen.de, 
- sdf@google.com, 
- daniel@iogearbox.net
-Message-ID: <669567eb4caa8_2d2577294ab@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240715141442.43775-1-pablo@netfilter.org>
-References: <20240715141442.43775-1-pablo@netfilter.org>
-Subject: Re: [PATCH net] net: flow_dissector: use DEBUG_NET_WARN_ON_ONCE
+        d=1e100.net; s=20230601; t=1721067505; x=1721672305;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y9L7surq7e5cJ+iFDr3RDLEh2S5o7LANGMRFfpgtm4I=;
+        b=BZsIgVbpUDwQkW3exB9qQfdQb3QvrW5pZJogFfBJcPR+nZizKNsGVSmG7dUT8cAbKy
+         /cTjLCfltcfVg1S8LXLEKFo+ojABGNHwxKAfkjv0ODpdxzvc/H9QVD4eH9yDCrykHbfX
+         dAiq98sz3kNXefuKJg5I/8FXcRvW6WI8o8/sjprYQNMcHVXAUtUVBnIwzL0YEY4jv0Gf
+         Wzzhk64eYbHHAWQ3ecmCf7sealm4UpUjB4RlSJq0L3eaTacD7DLNU3efeEZ6wRwGm0xf
+         X7nha5waYzbEzLGkTu+dIDdIQbMgjPGC+DFXmYiDkBSrue3y5rYi73BXCWaRi6cozeKv
+         B5ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWuPMuIgF3vkWk6t9l4PrD62wo7pF+KSFt/2D4zeEdvCMQdwlirPXefwX0u7EhBFuTB9nSKszPCiasTJPFZCqyWFRL7PeKM
+X-Gm-Message-State: AOJu0YwaL1J69mIgtNgbRkT/ZCTEcl8ifjsJ3YrOlw1BDsI+Td8Buh39
+	xDJqPwL5WH8ZJuCozS/pzc3XALUsbxQXzCssWo2+ZIPKJ8QgOAGDllQKs9z1sRo/ji4BJO3g20H
+	T611RSxVaRoKGAxESyHmX3qH8f1lQD+hw1xqUbaI6U0hUdzZYVEd28s8=
+X-Google-Smtp-Source: AGHT+IGvaAmICzGAjLmKfxj+Tf0nNdpleoxIcGAnXRywkDzcjemvQr9koMk4Qo8p6WOSIkGSpIZhfL9f/b69V1iSna2jGbm4IwCp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1985:b0:380:fd76:29e4 with SMTP id
+ e9e14a558f8ab-393a0ec10edmr406765ab.4.1721067505542; Mon, 15 Jul 2024
+ 11:18:25 -0700 (PDT)
+Date: Mon, 15 Jul 2024 11:18:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004d78dd061d4d4190@google.com>
+Subject: [syzbot] [wireless?] WARNING in drv_link_info_changed (2)
+From: syzbot <syzbot+91af2efe46a484b223f0@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Pablo Neira Ayuso wrote:
-> The following splat is easy to reproduce upstream as well as in -stable
-> kernels. Florian Westphal provided the following commit:
-> 
->   d1dab4f71d37 ("net: add and use __skb_get_hash_symmetric_net")
-> 
-> but this complementary fix has been also suggested by Willem de Bruijn
-> and it can be easily backported to -stable kernel which consists in
-> using DEBUG_NET_WARN_ON_ONCE instead to silence the following splat
-> given __skb_get_hash() is used by the nftables tracing infrastructure to
-> to identify packets in traces.
-> 
-> [69133.561393] ------------[ cut here ]------------
-> [69133.561404] WARNING: CPU: 0 PID: 43576 at net/core/flow_dissector.c:1104 __skb_flow_dissect+0x134f/
-> [...]
-> [69133.561944] CPU: 0 PID: 43576 Comm: socat Not tainted 6.10.0-rc7+ #379
-> [69133.561959] RIP: 0010:__skb_flow_dissect+0x134f/0x2ad0
-> [69133.561970] Code: 83 f9 04 0f 84 b3 00 00 00 45 85 c9 0f 84 aa 00 00 00 41 83 f9 02 0f 84 81 fc ff
-> ff 44 0f b7 b4 24 80 00 00 00 e9 8b f9 ff ff <0f> 0b e9 20 f3 ff ff 41 f6 c6 20 0f 84 e4 ef ff ff 48 8d 7b 12 e8
-> [69133.561979] RSP: 0018:ffffc90000006fc0 EFLAGS: 00010246
-> [69133.561988] RAX: 0000000000000000 RBX: ffffffff82f33e20 RCX: ffffffff81ab7e19
-> [69133.561994] RDX: dffffc0000000000 RSI: ffffc90000007388 RDI: ffff888103a1b418
-> [69133.562001] RBP: ffffc90000007310 R08: 0000000000000000 R09: 0000000000000000
-> [69133.562007] R10: ffffc90000007388 R11: ffffffff810cface R12: ffff888103a1b400
-> [69133.562013] R13: 0000000000000000 R14: ffffffff82f33e2a R15: ffffffff82f33e28
-> [69133.562020] FS:  00007f40f7131740(0000) GS:ffff888390800000(0000) knlGS:0000000000000000
-> [69133.562027] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [69133.562033] CR2: 00007f40f7346ee0 CR3: 000000015d200001 CR4: 00000000001706f0
-> [69133.562040] Call Trace:
-> [69133.562044]  <IRQ>
-> [69133.562049]  ? __warn+0x9f/0x1a0
-> [ 1211.841384]  ? __skb_flow_dissect+0x107e/0x2860
-> [...]
-> [ 1211.841496]  ? bpf_flow_dissect+0x160/0x160
-> [ 1211.841753]  __skb_get_hash+0x97/0x280
-> [ 1211.841765]  ? __skb_get_hash_symmetric+0x230/0x230
-> [ 1211.841776]  ? mod_find+0xbf/0xe0
-> [ 1211.841786]  ? get_stack_info_noinstr+0x12/0xe0
-> [ 1211.841798]  ? bpf_ksym_find+0x56/0xe0
-> [ 1211.841807]  ? __rcu_read_unlock+0x2a/0x70
-> [ 1211.841819]  nft_trace_init+0x1b9/0x1c0 [nf_tables]
-> [ 1211.841895]  ? nft_trace_notify+0x830/0x830 [nf_tables]
-> [ 1211.841964]  ? get_stack_info+0x2b/0x80
-> [ 1211.841975]  ? nft_do_chain_arp+0x80/0x80 [nf_tables]
-> [ 1211.842044]  nft_do_chain+0x79c/0x850 [nf_tables]
-> 
-> Fixes: 9b52e3f267a6 ("flow_dissector: handle no-skb use case")
-> Suggested-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Hello,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+syzbot found the following issue on:
+
+HEAD commit:    9d9a2f29aefd Merge tag 'mm-hotfixes-stable-2024-07-10-13-1..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11988fb9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b63b35269462a0e0
+dashboard link: https://syzkaller.appspot.com/bug?extid=91af2efe46a484b223f0
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c1cad98f467f/disk-9d9a2f29.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e4f4b4b7a5f8/vmlinux-9d9a2f29.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ed300468d50d/bzImage-9d9a2f29.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+91af2efe46a484b223f0@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 18830 at net/mac80211/driver-ops.c:465 drv_link_info_changed+0x153/0x8b0 net/mac80211/driver-ops.c:460
+Modules linked in:
+CPU: 1 PID: 18830 Comm: syz.2.3286 Not tainted 6.10.0-rc7-syzkaller-00076-g9d9a2f29aefd #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+RIP: 0010:drv_link_info_changed+0x153/0x8b0 net/mac80211/driver-ops.c:460
+Code: 83 fd 01 75 1f e8 cd 3b a6 f6 eb 32 e8 c6 3b a6 f6 eb 2b 83 fd 03 74 21 83 fd 05 75 07 e8 b5 3b a6 f6 eb 1a e8 ae 3b a6 f6 90 <0f> 0b 90 e9 c3 01 00 00 e8 a0 3b a6 f6 eb 05 e8 99 3b a6 f6 4d 8d
+RSP: 0018:ffffc9000e11ece8 EFLAGS: 00010283
+RAX: ffffffff8aefec72 RBX: 0000000000000001 RCX: 0000000000040000
+RDX: ffffc9000a6de000 RSI: 0000000000000f5a RDI: 0000000000000f5b
+RBP: 0000000080000000 R08: 0000000000000005 R09: ffffffff8aefec40
+R10: 0000000000000004 R11: ffff88801dc30000 R12: 0000000000000000
+R13: 0000000000000200 R14: ffff88806d0c0ca0 R15: ffff88801f218e20
+FS:  00007f81b55296c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2e311ff8 CR3: 000000002d852000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_offchannel_stop_vifs+0x25c/0x590 net/mac80211/offchannel.c:122
+ ieee80211_start_sw_scan net/mac80211/scan.c:559 [inline]
+ __ieee80211_start_scan+0x1a7d/0x1e00 net/mac80211/scan.c:849
+ rdev_scan net/wireless/rdev-ops.h:466 [inline]
+ cfg80211_conn_scan+0x9de/0xe80 net/wireless/sme.c:133
+ cfg80211_sme_connect net/wireless/sme.c:630 [inline]
+ cfg80211_connect+0x14a4/0x1cf0 net/wireless/sme.c:1524
+ nl80211_connect+0x188f/0x1fe0 net/wireless/nl80211.c:12035
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2564
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8db/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+ ___sys_sendmsg net/socket.c:2639 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2668
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f81b4775bd9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f81b5529048 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f81b4904038 RCX: 00007f81b4775bd9
+RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000004
+RBP: 00007f81b47e4e60 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f81b4904038 R15: 00007f81b4a2fa78
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
