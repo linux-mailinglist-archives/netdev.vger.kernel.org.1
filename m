@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-111451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F3F93113A
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:31:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7D4931173
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 11:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7356EB21F54
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 09:31:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E040B229AD
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 09:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BAD186E37;
-	Mon, 15 Jul 2024 09:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71BF186E5A;
+	Mon, 15 Jul 2024 09:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cUoXGt+G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Re0OJe5U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96291199A2
-	for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 09:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8470186E53;
+	Mon, 15 Jul 2024 09:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721035865; cv=none; b=oDuKtz7s9syPZF5rca7iecJxNGD4Clsa9otkNapfU4i+xBDlqai3t/tHNVSgQDCCtvw8iPJGDp3Aw5mnzZYNC3bwrOPlIOeBcuFQR5vVS/jjvYKDVR/cVc8JVxytq1BQ7RNBlJPa/dGLKfxf67pIaqc/9vrVfDr4A/WZ/MVxnpU=
+	t=1721036471; cv=none; b=nJcyVKCps5ovWEeCLzVkErsNWXZ5tziDfiNy+PAwk+zpl/k8A2KkOxEZbEhm/a0xuf06H7pUxnaOIgGL0I6H0WSD0tkWHk77fl8jaAZlmVK41jHRIKmeF9zEI2kcMIRqa8odxFzGTILKvrcPM3AOojm7iaIG4GDEmW4hpdD9de0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721035865; c=relaxed/simple;
-	bh=9h2wTSw8EuPWyFr/HCsD/b38FdzEbTfv2HZPgwyV0ew=;
+	s=arc-20240116; t=1721036471; c=relaxed/simple;
+	bh=AEai4tRTjpLLxJMQynC7rJSqQSFH7z3lKVFB/znJm0Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sDDiU+tvlHD5BmpyIDLFpPJmvEDcOQz1OMxTBbIGZ44cqLAR41UbaEwRs6n3HtiKxhwl61LWbR6oI2phRxBZa99D5GB29jbsH16XoOQmJWhgP7vNIiAQBXhEjs8Ws3Vcd8Nxo7W8kQsuQU368wCHAeRyvslIX/60gByet3rk6RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cUoXGt+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01EAFC32782;
-	Mon, 15 Jul 2024 09:31:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=TxllvNLoS4GX6nZi93XRtNNOsFCWTxJNPpbtuYhy2RIKRj5aI9kja6r41h0rtDGlO24oSscNqY9fDVqA6TBsXbfN81pYq6xHq0LJ0PycIuXY6LdsV7vpenc+tOTBOcQnJSKlqJtMRfO7EU29FMasLdj1jxKDjyRapamTNPc7J1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Re0OJe5U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CD12C32782;
+	Mon, 15 Jul 2024 09:41:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721035865;
-	bh=9h2wTSw8EuPWyFr/HCsD/b38FdzEbTfv2HZPgwyV0ew=;
+	s=k20201202; t=1721036471;
+	bh=AEai4tRTjpLLxJMQynC7rJSqQSFH7z3lKVFB/znJm0Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cUoXGt+GSQhIADRI45zd87yOSIKblZ/b128ijyU5Z+BvxfX3UlatE+xUAEKOFNDja
-	 28+ZFxNFbOwg0fZ+q5aaRPhD0BnaF+z6y6dIRI9JtNUUyDHsD2YB5DdJ3NPiKzuFMe
-	 /WesgSdQWe8A1Nn1IM3jLByTQI/t5GykL1bpOYkM4BmZgqYrRjeVu7CP0ePyJMS5Pr
-	 dGieCB99zPjKJ+u4ZG3SBK1d0vC2S049LFFZxMLI7/Kfk+7zapNdpAMreEOAlMIbem
-	 02WypFfTQqtsMv5GO61PIVODmyW4M/6W3h3A1HeNI7yHX5WkuL5ACOWXj9jMPv/eEY
-	 j3awrHsAQg+oQ==
-Date: Mon, 15 Jul 2024 10:31:00 +0100
+	b=Re0OJe5Upu2yCWIQNxGahN+p84im4ZC+xPwuDAcU7lA32btwaFLFUvESaTrLCC+Ym
+	 +8EJ5hYpVTKB03qr7qZWCc4j7viDn5U7zFyHXOZdGqDRPzWKe69MVWDPK2EK3u7RIq
+	 fdkPcC/SRlP1jKND+cSsxUclGSf9jxWqcHnQ5v10f+vc5jHI0RVo6kFm0EuUYKwsyO
+	 zcu8XzDREKByGytbo+fCidF98zSEub+UNcFvc8vpwjqO7sXlQDtB7eNNJPfe3uwmvg
+	 MoXnLe5zVbbR0ZLQX1D/9Aaokk1x2QQfJCmJVCEJ7Im0iz96ID0d7TnXvz8+AWLOtt
+	 BEHkPejXNg2WA==
+Date: Mon, 15 Jul 2024 10:41:07 +0100
 From: Simon Horman <horms@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next 9/9] bnxt_en: Support dynamic MSIX
-Message-ID: <20240715093100.GL8432@kernel.org>
-References: <20240713234339.70293-1-michael.chan@broadcom.com>
- <20240713234339.70293-10-michael.chan@broadcom.com>
+To: Kees Cook <kees@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2] net/ipv4/tcp_cong: Replace strncpy() with strscpy()
+Message-ID: <20240715094107.GM8432@kernel.org>
+References: <20240714041111.it.918-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,25 +60,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240713234339.70293-10-michael.chan@broadcom.com>
+In-Reply-To: <20240714041111.it.918-kees@kernel.org>
 
-On Sat, Jul 13, 2024 at 04:43:39PM -0700, Michael Chan wrote:
-> A range of MSIX vectors are allocated at initializtion for the number
-> needed for RocE and L2.  During run-time, if the user increases or
-> decreases the number of L2 rings, all the MSIX vectors have to be
-> freed and a new range has to be allocated.  This is not optimal and
-> causes disruptions to RoCE traffic every time there is a change in L2
-> MSIX.
+On Sat, Jul 13, 2024 at 09:11:15PM -0700, Kees Cook wrote:
+> Replace the deprecated[1] uses of strncpy() in tcp_ca_get_name_by_key()
+> and tcp_get_default_congestion_control(). The callers use the results as
+> standard C strings (via nla_put_string() and proc handlers respectively),
+> so trailing padding is not needed.
 > 
-> If the system supports dynamic MSIX allocations, use dynamic
-> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
-> vectors.  RoCE traffic is not affected using this scheme.
+> Since passing the destination buffer arguments decays it to a pointer,
+> the size can't be trivially determined by the compiler. ca->name is
+> the same length in both cases, so strscpy() won't fail (when ca->name
+> is NUL-terminated). Include the length explicitly instead of using the
+> 2-argument strscpy().
 > 
-> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> Link: https://github.com/KSPP/linux/issues/90 [1]
+> Signed-off-by: Kees Cook <kees@kernel.org>
+
+nit: Looking at git history, the subject prefix should probably be 'tcp'.
+     And it would be best to explicitly target the patch against net-next.
+
+     Subject: [PATCH net-next v2] tcp: ...
+
+That notwithstanding, this looks good to me.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-
+...
 
