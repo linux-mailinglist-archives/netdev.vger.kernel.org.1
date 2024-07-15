@@ -1,125 +1,89 @@
-Return-Path: <netdev+bounces-111556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263FE9318A4
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:41:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CBE9318AA
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 18:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16E61F2282B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:41:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6A11F22553
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 16:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC689446AF;
-	Mon, 15 Jul 2024 16:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0471CAAF;
+	Mon, 15 Jul 2024 16:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdVdemQ8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rh5GkW1B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D3342A9D;
-	Mon, 15 Jul 2024 16:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9121CAA1;
+	Mon, 15 Jul 2024 16:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721061635; cv=none; b=oxjj7F0YIpUmiNMv0dpZrlQbkWig5gbLfbxg52m+xvrfvIRY0SLOynV81Hscx1p25LoiTUIdoN5IQPVL4FpUXTkiIJR+gHjuNWp4QimUywQh8euKcvuHALDMNZnJkKWlKbAMcZX4LgQvM0CbpCJ3cVICf2dDtisv65IpjcfaSBo=
+	t=1721061867; cv=none; b=gWAIO9FFwKaX8d0dYEvoEsxDRwBhZ27t9aG7SslYaOQzv759TqUzdqZQpIBI1Fyh05U64McbHOfn587J1trTeqaLUJq6qGkG/HQmHtm0Riz4amrK9oEcCHrLKJbySgGe+NNRA+HitiB9B94Pbes3zKCIqinIeNyI9JpnGz0M8lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721061635; c=relaxed/simple;
-	bh=F5YsMjAkLh27ZHf6rNRj5lSqspaU+jyfHUOdjACkHVY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jdtn0YfqoRbkzkDO3/ZvU4Q3vGxCtmtKGwgeOA3o4AcPATQ/3GLoebcN4YwMLS8BRhLWNb4a0TEVuMWTKkZEClkr3g8wJT3d+nwtgnp1rLJnpTrVEDg2zPkd3IzGs8BsDIA7VrdY+Smq3xWF90AIB0SpPe2UdTX0iEhFRe1Rzck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AdVdemQ8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 49521C4AF11;
-	Mon, 15 Jul 2024 16:40:35 +0000 (UTC)
+	s=arc-20240116; t=1721061867; c=relaxed/simple;
+	bh=N2yjfoVVb62B5YRNRRgSE+eSyRPzWjGNcXyKTqao2k8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dXVoflXF6SHX/pzYewlr8tqB/M3MDTHAR9WvZ6P6X9zZcXJP6GoxaDSnrk96ucNPXtLxc9RBrza/gTQ5NA2b0hy1xxJo+TUGGQ0gLGrSMoLCTBKLElYDfuQjXCeqz3nXe7y11B3WpAHWUuMe98i/8/+nTAFNHdPLKgQeoxcvvsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rh5GkW1B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0D7C32782;
+	Mon, 15 Jul 2024 16:44:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721061635;
-	bh=F5YsMjAkLh27ZHf6rNRj5lSqspaU+jyfHUOdjACkHVY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AdVdemQ8QFLMdRQ1Q2PzZp56oKyVnlQzzXvT4XcAAXkGdBqXCd3o49isfmTbx+dsq
-	 C0+1rlOTt2fvpKD3evic/BKSjBxtGKPyDukEY0TbWxg75+jF94KaIocL4B8fJlg9Al
-	 4Bl4/ktWDZAn+YgpKkNJijVC4PNVIPYBrdBig/Z4p38pm25bwRnMg3wRSmHeR0FPOr
-	 BrWwWzglN2SIg1XewWktLk14tKqHyws7k8VYh9A9Kgnl3Si8DmgkamehzdARa4S2FB
-	 OE5VOp+3lGv+DUaTU4G2we+sYJPQL1FIb+W6kzRnyEsJVV2xmrJfsTxkHfKH8ITOv5
-	 1s7ecWq+S92pQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3581CC43443;
-	Mon, 15 Jul 2024 16:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1721061867;
+	bh=N2yjfoVVb62B5YRNRRgSE+eSyRPzWjGNcXyKTqao2k8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rh5GkW1BZoh2ss+IFJ49QjqjRtf+ebEO5f23Veo6G1DfLHD3/6HyYMAM4Bt7Ffxt1
+	 SSGgJt8hDW2Gn0sIFnfSUv8ue+uKNgHx1ZD1MiXL2chwDyI5Wq00v67f5YqJ/xObS2
+	 YbY82b7f4ETwGfGaeNBy2bwOSRWz73jI+tEvsNP3fPHUjOQFJQkTzCwF2RUSxSzCm7
+	 fbemzLiUzicOWj3qCPmnRPkhgJzqHbiBLN+/6jvxPyyH6SH7B3AkxtAaKN9h99rZbX
+	 nyRABrToW6OVrc6XZvHZUPZ8v1Q/kDAtA4sric+NyBxV9AynO/zAOJymdVO1Bhj7Gr
+	 xGdftpOLJ1/XQ==
+Date: Mon, 15 Jul 2024 09:44:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
+ Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: mptcp: lib: fix shellcheck errors
+Message-ID: <20240715094425.73738ca0@kernel.org>
+In-Reply-To: <7a1fea0c-1389-4867-aaec-0c0db01cb6c0@kernel.org>
+References: <20240712-upstream-net-next-20240712-selftests-mptcp-fix-shellcheck-v1-1-1cb7180db40a@kernel.org>
+	<20240713154614.653f30ce@kernel.org>
+	<7a1fea0c-1389-4867-aaec-0c0db01cb6c0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 00/13] flower: rework TCA_FLOWER_KEY_ENC_FLAGS
- usage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172106163520.24349.6809733629118549125.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jul 2024 16:40:35 +0000
-References: <20240713021911.1631517-1-ast@fiberby.net>
-In-Reply-To: <20240713021911.1631517-1-ast@fiberby.net>
-To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
-Cc: netdev@vger.kernel.org, dcaratti@redhat.com, i.maximets@ovn.org,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, horms@kernel.org, rkannoth@marvell.com, fw@strlen.de,
- aleksander.lobakin@intel.com, donald.hunter@gmail.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 13 Jul 2024 02:18:57 +0000 you wrote:
-> This series reworks the recently added TCA_FLOWER_KEY_ENC_FLAGS
-> attribute, to be more like TCA_FLOWER_KEY_FLAGS, and use the unused
-> u32 flags field in FLOW_DISSECTOR_KEY_ENC_CONTROL, instead of adding
-> a new flags field as FLOW_DISSECTOR_KEY_ENC_FLAGS.
+On Mon, 15 Jul 2024 11:07:26 +0200 Matthieu Baerts wrote:
+> > Speaking of MPTCP tests - I added the connect test to ignored today.
+> > Too many failures :(  
 > 
-> I have defined the new FLOW_DIS_F_* and TCA_FLOWER_KEY_FLAGS_*
-> flags to co-exist with the existing flags, so the meaning
-> of the flags field in struct flow_dissector_key_control is not
-> depending on the context it is used in. If we run out of bits
-> then we can always split them up later, if we really want to.
-> Future flags might also be valid in both contexts.
+> Sorry for that, and thank you for having ignore it for the 'dbg' runner.
 > 
-> [...]
+> This sudden regression looks strange. Our CI didn't catch this issue so
+> far. It is only happening with the debug kernel config.
+> 
+> Do you know if anything has changed recently -- around the 11th of July
+> -- on NIPA's config side that is not documented? e.g. more jobs in
+> parallel, new kernel config? I didn't see anything that could cause the
+> new issues when looking at NIPA's git log and the CI change log sheet.
 
-Here is the summary with links:
-  - [net-next,v4,01/13] net/sched: flower: refactor control flag definitions
-    https://git.kernel.org/netdev/net-next/c/6e5c85c003e4
-  - [net-next,v4,02/13] doc: netlink: specs: tc: describe flower control flags
-    https://git.kernel.org/netdev/net-next/c/49ba9fc1c773
-  - [net-next,v4,03/13] net/sched: flower: define new tunnel flags
-    https://git.kernel.org/netdev/net-next/c/bfda5a63137b
-  - [net-next,v4,04/13] net/sched: cls_flower: prepare fl_{set,dump}_key_flags() for ENC_FLAGS
-    https://git.kernel.org/netdev/net-next/c/fcb4bb07a927
-  - [net-next,v4,05/13] net/sched: cls_flower: add policy for TCA_FLOWER_KEY_FLAGS
-    https://git.kernel.org/netdev/net-next/c/0e83a7875d69
-  - [net-next,v4,06/13] flow_dissector: prepare for encapsulated control flags
-    https://git.kernel.org/netdev/net-next/c/4d0aed380f9d
-  - [net-next,v4,07/13] flow_dissector: set encapsulated control flags from tun_flags
-    https://git.kernel.org/netdev/net-next/c/03afeb613bfe
-  - [net-next,v4,08/13] net/sched: cls_flower: add tunnel flags to fl_{set,dump}_key_flags()
-    https://git.kernel.org/netdev/net-next/c/988f8723d398
-  - [net-next,v4,09/13] net/sched: cls_flower: rework TCA_FLOWER_KEY_ENC_FLAGS usage
-    https://git.kernel.org/netdev/net-next/c/11036bd7a0b3
-  - [net-next,v4,10/13] doc: netlink: specs: tc: flower: add enc-flags
-    https://git.kernel.org/netdev/net-next/c/880a51a8ab8c
-  - [net-next,v4,11/13] flow_dissector: cleanup FLOW_DISSECTOR_KEY_ENC_FLAGS
-    https://git.kernel.org/netdev/net-next/c/db5271d50ec1
-  - [net-next,v4,12/13] flow_dissector: set encapsulation control flags for non-IP
-    https://git.kernel.org/netdev/net-next/c/706bf4f44c6d
-  - [net-next,v4,13/13] net/sched: cls_flower: propagate tca[TCA_OPTIONS] to NL_REQ_ATTR_CHECK
-    https://git.kernel.org/netdev/net-next/c/536b97acddd7
+The usual suspect on Thursdays is that we pull in changes from Linus,
+it'd be surprising if there were major changes there the week of the
+release but maybe..
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> I will try to reproduce the issue locally, maybe it is caused by a patch
+> that is in patchwork, but not in net or net-next yet.
 
-
+I was going to mention Kuniyuki's patch but you discovered it already :)
 
