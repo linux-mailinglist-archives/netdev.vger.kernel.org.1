@@ -1,104 +1,95 @@
-Return-Path: <netdev+bounces-111483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AB7931572
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 15:11:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB50A9314F2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 14:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 119CE1F22231
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 13:11:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AB76B22D94
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 12:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1624618C353;
-	Mon, 15 Jul 2024 13:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4821E18C176;
+	Mon, 15 Jul 2024 12:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stuba.sk header.i=@stuba.sk header.b="yRdfuyUk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eQOcO9R2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.cvt.stuba.sk (smtp-out.cvt.stuba.sk [147.175.1.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016E18D4C1;
-	Mon, 15 Jul 2024 13:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.175.1.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4761891D6;
+	Mon, 15 Jul 2024 12:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721049071; cv=none; b=fLVAWrBCYpapmQObrG7anPasg1vD6EJ5FfWMN4BXsuhGiC95CR+zIZUNynmzb9JMcuLKoMNcNy1h0Ug0AgA97N4XTl/NuaPo4Kk7YiRTlWTsbFNuyn0KryND/TQdV5zsMa2mLQoTPzILUFACqmkYGkReSR80ggld5FOgXz/ZfJY=
+	t=1721047831; cv=none; b=QVYrg1IOkukdC+P1KYWdGn/DphJmI6McCQRufU3SohSQKDT8spB1HTo2z5nDj+/cXxZNTJl/VUNySbBMp3uwuLdVCoq8Bs3uWsQhPcS9484qLQOnkr8EkE8sMvM3xHt5nopVp+6BrTrHo3A4bynltdFLC4XiXu2oQ5UTfO2Nueg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721049071; c=relaxed/simple;
-	bh=UBfgy5+0l8x+M07N7A4Dki6luKXzyCWR4r70sFx/1SY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sookpNAuyUJLYdswfRzgMCfE8lTQgmGKrIwrsyBRUa/49SXmWiAq9VJEIhaG/e4kuxQnjQu/qnciIKnc2twRlSkfLkH66pIhXFIUQ2YdGc40VoU/7Hl8dRpP6b8Wuw+twJqhVJZHcpD6trQklSXOAyzP2buU1dtyY7K8b9Ns7uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stuba.sk; spf=pass smtp.mailfrom=stuba.sk; dkim=pass (2048-bit key) header.d=stuba.sk header.i=@stuba.sk header.b=yRdfuyUk; arc=none smtp.client-ip=147.175.1.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stuba.sk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stuba.sk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=stuba.sk;
-	s=20180406; h=Content-Transfer-Encoding:Content-Type:From:To:Subject:
-	MIME-Version:Date:Message-ID; bh=hPXmEGrpNCxQtlE+7MmiOVH/DDCPb8s47qf1vlPNH8Y=
-	; t=1721049068; x=1721481068; b=yRdfuyUka8R8o/yS9lizhVwyr0ygk5Wde5XqpaziEQpOp
-	j1O7FP/gSubqEyJ6/+7NWKmQeGS3K2wpxTQkKnzyWSEDnzagJF0sqCFSpLb7D0nUHnJUfW4WSSvGR
-	SU1o1LEdZMM4NF4htQGocy9AjBNIrLp1lXn7cQPWF1BVsq/87g8mhbHvXRY/nQh6CKpNNj5p1iTq4
-	yB8dWUshaa+TyyUHM2vkXiDGhhBx5ycWvi1zKQwKqGdJqHXgfgYHqUy1YvHV7m/jOJyg7EZNQW1Gu
-	gpUkjMSYm56MDGKnTQYo0apIxf6QzSJn0+oPMHxi5SYjlIzPHAnBii2daofaJGpgGA==;
-X-STU-Diag: 0488aa0426ae2156 (auth)
-Received: from ellyah.uim.fei.stuba.sk ([147.175.106.89])
-	by mx1.stuba.sk (Exim4) with esmtpsa (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	(envelope-from <matus.jokay@stuba.sk>)
-	id 1sTL8u-000000003nF-2IVT;
-	Mon, 15 Jul 2024 14:49:24 +0200
-Message-ID: <498a6aad-3b53-4918-975e-3827f8230bd0@stuba.sk>
-Date: Mon, 15 Jul 2024 14:49:24 +0200
+	s=arc-20240116; t=1721047831; c=relaxed/simple;
+	bh=pIVANU6xP0xHHXRKTBCyi1bN9Q/dCKwFUjlq/HH6aaU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ahe1cPULBzUfkjCAG+goMQRsQ2dFmslSf3qU2kou2Qu8XJpB7q7KZgVXOEWy3mav9KZdSOTLdPU7ewRI+5K43L9x0KbPNVlWQTKWT80C4JA66g6eeK+Cwv7erFo7HhKmTXo6WazgXfKBzsRd2dn5gZzW3f2+ua9qKfjHZf8QGuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eQOcO9R2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EC2CAC4AF0A;
+	Mon, 15 Jul 2024 12:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721047831;
+	bh=pIVANU6xP0xHHXRKTBCyi1bN9Q/dCKwFUjlq/HH6aaU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eQOcO9R275tPJWL8v40FE1qer4KJz4NrcrYE94Rtm2qgO2mZVrHQd5CpuP5vQrB74
+	 DDumhv2IAZsfvQyiYjk1v6+i1x3iYkagp+t0kFFV9N5QngnTdofCbhiRVgiYTNlH7f
+	 4sLxJwoLd87FlgaGjy6EZA+1/WgRoKuSAUeqvXz5JATuCqa762fuDSCSGKbyfdDFj6
+	 zu+xkWmzJ/SYJa+XPi26sGMjTlOcIW44OOph9JtzjNT/XSS4iXJ63dGg/5JZ2j68VU
+	 ADAI4IPOOBdKjV7pm+Da0Ha57fUQj4afJKuFrkATmv/mIeJUkJ3B8OFnHq+y+zJIki
+	 xy5dS/HvGweOQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1708C4332C;
+	Mon, 15 Jul 2024 12:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: Split a __sys_bind helper for io_uring
-To: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>
-Cc: Gabriel Krisman Bertazi <krisman@suse.de>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20240614163047.31581-1-krisman@suse.de>
- <20240618174953.5efda404@kernel.org>
- <68b482cd-4516-4e00-b540-4f9ee492d6e3@kernel.dk>
- <20240619080447.6ad08fea@kernel.org>
- <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
-Content-Language: en-US
-From: Matus Jokay <matus.jokay@stuba.sk>
-In-Reply-To: <8002392e-5246-4d3e-8c8a-70ccffe39a08@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: bridge: mst: Check vlan state for egress decision
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172104783085.16511.9830005090027267122.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jul 2024 12:50:30 +0000
+References: <20240712013134.717150-1-elliot.ayrey@alliedtelesis.co.nz>
+In-Reply-To: <20240712013134.717150-1-elliot.ayrey@alliedtelesis.co.nz>
+To: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+Cc: davem@davemloft.net, roopa@nvidia.com, razor@blackwall.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ tobias@waldekranz.com, bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On 19. 6. 2024 17:06, Jens Axboe wrote:
-> On 6/19/24 9:04 AM, Jakub Kicinski wrote:
->> On Wed, 19 Jun 2024 07:40:40 -0600 Jens Axboe wrote:
->>> On 6/18/24 6:49 PM, Jakub Kicinski wrote:
->>>> On Fri, 14 Jun 2024 12:30:44 -0400 Gabriel Krisman Bertazi wrote:  
->>>>> io_uring holds a reference to the file and maintains a
->>>>> sockaddr_storage address.  Similarly to what was done to
->>>>> __sys_connect_file, split an internal helper for __sys_bind in
->>>>> preparation to supporting an io_uring bind command.
->>>>>
->>>>> Reviewed-by: Jens Axboe <axboe@kernel.dk>
->>>>> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>  
->>>>
->>>> Acked-by: Jakub Kicinski <kuba@kernel.org>  
->>>
->>> Are you fine with me queueing up 1-2 via the io_uring branch?
->>> I'm guessing the risk of conflict should be very low, so doesn't
->>> warrant a shared branch.
->>
->> Yup, exactly, these can go via io_uring without branch juggling.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 12 Jul 2024 13:31:33 +1200 you wrote:
+> If a port is blocking in the common instance but forwarding in an MST
+> instance, traffic egressing the bridge will be dropped because the
+> state of the common instance is overriding that of the MST instance.
 > 
-> Great thanks!
+> Fix this by skipping the port state check in MST mode to allow
+> checking the vlan state via br_allowed_egress(). This is similar to
+> what happens in br_handle_frame_finish() when checking ingress
+> traffic, which was introduced in the change below.
 > 
-Please fix io_bind and io_listen to not pass NULL ptr to related helpers
-__sys_bind_socket and __sys_listen_socket. The first helper's argument
-shouldn't be NULL, as related security hooks expect a valid socket object.
+> [...]
 
-See the syzkaller's bug report:
-https://lore.kernel.org/linux-security-module/0000000000007b7ce6061d1caec0@google.com/
+Here is the summary with links:
+  - [net,v3] net: bridge: mst: Check vlan state for egress decision
+    https://git.kernel.org/netdev/net/c/0a1868b93fad
 
-Thanks,
-mY
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
