@@ -1,260 +1,491 @@
-Return-Path: <netdev+bounces-111628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADCE3931DAE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:37:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66044931DB4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2D29B222AB
-	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 23:37:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AEBD1C210EF
+	for <lists+netdev@lfdr.de>; Mon, 15 Jul 2024 23:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C30013D24C;
-	Mon, 15 Jul 2024 23:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1DE143755;
+	Mon, 15 Jul 2024 23:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AggwyFDl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZiU9du0G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5FD208A9;
-	Mon, 15 Jul 2024 23:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721086673; cv=fail; b=iEfK2FETU0b+ghfURpoTsUwJtkog0MCVl+TS3X0w2tz0l0XtuEAerJJzf03W2JP0ED+fDOEWZ3PcOPzYWnjtZOTPqiYf6AI9FUMcs9xbCFJLnrEX/zITlwzJ3lg/kgZaEYCqZUFYuIhJQ2oXmAlavsNHHBZJ/HYk+pXTYrIwf28=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721086673; c=relaxed/simple;
-	bh=WfulsWBd0BW44ywgXxFxEAtJZ2geUR4nDofrA/SKdJg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tXLQzgUtvLTjae+R8bxw3p+vQP57hauo48TWKYJCr5fyjMkvL00utk3/Dqlc7G2iyZlBCGRr6AWSlz4Go0L2iMD4Fxskk+gJXqHjKLANYOLut0r2lWbh/La6kzdwmv+jT/TtHKHlKEeTdOW6MU7wOOHwtq9ZNfVk/CIROMqxPIo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AggwyFDl; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721086672; x=1752622672;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WfulsWBd0BW44ywgXxFxEAtJZ2geUR4nDofrA/SKdJg=;
-  b=AggwyFDlQstscS8vNfBVF2VeSIj0KO7y6DmjqicBy4J721rvcke1C61E
-   LP06XxIxqF4m3Ng4j0zDtisYZdyhlCMr+8QU+MolIc345aPZAF3g5fFmt
-   LnHgOcTKXOebj4ssKMINNrmdbDdHimN0VLu5JQt9incmY9KEmL8Zz4ZKj
-   MErA0mchNc/q8F1ItuiMAZGrWFBIXzz+qKKPM2nJbIG2TQxgOClZrESqF
-   Uwr3P6kzYfcXxbViIFSwm0/E2r11FahOFfzIlCu/gOEPXNjbipcMNR022
-   zIMboe4DvDyFepAmVcZ9sMzD4sn/dfWqGW2ZOrrAO+IS6KXKXr3lt+9w5
-   Q==;
-X-CSE-ConnectionGUID: ZG6YxHqlQkylfdCUWaFRrQ==
-X-CSE-MsgGUID: VBNNVjIzRX227hKNqiz40A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="22307349"
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="22307349"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 16:37:51 -0700
-X-CSE-ConnectionGUID: IZNeS5mESFy2Dt4fdMnZLw==
-X-CSE-MsgGUID: XPrKXuEXQgm3y52BoslZzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="49747659"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jul 2024 16:37:48 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 15 Jul 2024 16:37:47 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 15 Jul 2024 16:37:46 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 15 Jul 2024 16:37:46 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.170)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 15 Jul 2024 16:37:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e8jKJ3guFxPmesk8JeDEBNlJOovsqxnZ0kF2EC27ArwfTU5QkF/5paLBJo9CgtPKYTdAM+RGhCiAS9JCx6G+tK10A3Wq6/rkMgMc0j+FUOIFT2bVNXMiDaPmsHiNbqj9tw4OgsooNuGbrS4fWCY32l74WRZo+2PTYXid/XlyqIUCtjRTdGbYmWXWCG5mY2SGJbSlS7fxoSd7z5wORNkpNUlGGQCQhucY8sLqR3Lx8JpRSRgaDjPWpSUD3CzyE9GZdOozNIda9ADIIsE1Fp6qkxu1It89u7n6zwIRNrKPlqPg0fPNwSH2vg/NrS++9KQVgqX9GEWyrRS27y0g65CZAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pXMiDDQoZDtE5XPkETpdn/0Yglr+NgVa1M9D3718QW4=;
- b=GS1ju7Tbr8fAU5eMAtZ6HHmMRyB0oKtCh7VBruWIGtYFa9r0rGl6JgUOyrVwUXX/s5k4trF/zXIoHzCQMY1Leyqyu/HVfSjNQvIxNKOGub/BAjRM0+io8lMtCzNPeIy1EebG/M6/YcqV9nieD/+HUO1kIzgQojgxiTXH8/C2EWB6PVUWvSmKzO1cbVQ4SCa0s4ceXdfpZNILvbJddavAummnNgsJwGbw3xvRDQ643982baepx8Zg1f8bR1HC2f+sYb3Ku0WolG2FSHRIMu9aQq9PELju7Ti+8Vbzih6UOVBM0eRbjZrFejAfXvy0FyVq2CLDwkYs0kDfogmIgBXoPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CH3PR11MB8659.namprd11.prod.outlook.com (2603:10b6:610:1cf::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Mon, 15 Jul
- 2024 23:37:44 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
- 23:37:44 +0000
-Message-ID: <d8468522-23a9-4614-a246-d5a9fa2d0374@intel.com>
-Date: Mon, 15 Jul 2024 16:37:41 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v17 05/14] net: net_tstamp: Add unspec field to
- hwtstamp_source enumeration
-To: Kory Maincent <kory.maincent@bootlin.com>, Florian Fainelli
-	<florian.fainelli@broadcom.com>, Broadcom internal kernel review list
-	<bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, "Radu Pirea"
-	<radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Horatiu
- Vultur <horatiu.vultur@microchip.com>, <UNGLinuxDriver@microchip.com>, Simon
- Horman <horms@kernel.org>, "Vladimir Oltean" <vladimir.oltean@nxp.com>,
-	<donald.hunter@gmail.com>, <danieller@nvidia.com>, <ecree.xilinx@gmail.com>
-CC: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>, Shannon Nelson
-	<shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>
-References: <20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com>
- <20240709-feature_ptp_netnext-v17-5-b5317f50df2a@bootlin.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20240709-feature_ptp_netnext-v17-5-b5317f50df2a@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR04CA0029.namprd04.prod.outlook.com
- (2603:10b6:a03:1d0::39) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A50E13D24C;
+	Mon, 15 Jul 2024 23:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721086809; cv=none; b=LqmwzT4xkgqEnXe/Ro/SZk+bbH2VEj2zHUU1zIkzGXAsOacdArq/kKdbtl3yD8YdOL8yfxgeAxUdo0QlRoI0EIU6R3YdP710krBT5bGJrGR2U1ocqC0P6D1nzpjHAXMckl2TGG8IhiVepwIBmgKpdqnqq8G8jKmLoCrUQ8JC4H8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721086809; c=relaxed/simple;
+	bh=IYxflzTkvvDnzo/O5Exeaaz6QZwX1+dOjhXFIdh5qjM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N+0cMOvCKGTx2BlsM30R2ovEHqhFte+FE5n+tr1xattTH8qAAm83ex5yVGjQQMlHuRezGZaDH62kjl3EangAkI1WcmN5iFbt17co9nMlErDqa6+byjGMqxTD/g/CIHNWpGs7hvw9HaYC/sGYFMq2m1qiftsDPoibP5NxIopmZz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZiU9du0G; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e05a61303b7so2277649276.0;
+        Mon, 15 Jul 2024 16:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721086806; x=1721691606; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=11nSWK2DsfMrraLYfcTYiqBnSNQFLOrBGZBeHRpNduU=;
+        b=ZiU9du0GDvirzo1EdkN6k0NsyFMYTdtQbRmK6pAWqjqYO60J9dnzg0Gb0GTCHcm9eo
+         dya4qAffU58RABzc0OiY8T3LQWJI1F2618mat/RV/sPOJloiK0b4FJN7l6RGNJfua1mP
+         mRxU2E2W/c3iGOeh6QLqGtFOWzkzDmsWf1bnLPBOoP401z3FsyOAXTSgtteQ+5NT3NpT
+         ku8wAniKbjRBGPUdaocFFfGhkn7mDK8VLRl3EvjrET4Oyg+nQKJbJVdDQtNBHigPcnmr
+         oG1EYa9ydyWc7Or23CAxc4ffardZqNh0fjgEKBf/anqFhq/sqF8n8W8UYSmm/5Y1XqVo
+         BStQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721086806; x=1721691606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=11nSWK2DsfMrraLYfcTYiqBnSNQFLOrBGZBeHRpNduU=;
+        b=hxxHuToI2Io5nsENGl0mIbDshGZ2bGQacSF/mRVZioXPP2/hfBV5KZsQIZDp0Ve6ka
+         aZwQe8ZKyqvt0Gdw0YwG6cgHFUP6q2p9gtn8ILHW7bVDSmcMIpqECd0bRF+wIyUS/wyo
+         hDwst8qB2rvDjgjmpqLfMBO74G449ySyzcn0A6k4DHt6gV6zkqJ4tngKcAtgNqBTynqy
+         riibd7fj0Nbr4fDSZqEA5Csfe/Bo4ZKpec5/7iS28jB9z3XlNkXdxNiyKIMNN1/naFpM
+         bXlnrAv3Sq7s54jC282FhVDbIeqfGY7DIWHHbdeXcutzgIHUfkiiKTtukQrbvKHly4eA
+         HQvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXirCa6MMeUOhlgp/iN/Pd36KxQI68bPjHSNkzH2R2WWTA4BQjccuwIGufSMySBpm+HNLhBUUIgZeX1joCTdo43is/wILAWExf9u6/NVNP3YaornASlKfgcKEZnP2Szd+4gtivAbFaCP9wRR/aY6TSkW5xxs7jzadcpVxcC4jaJWE/del92gYOeElg5oHmR0OOSKaek9xs4wIZJbAt0wV13NuNzIjcCBQp7J0pn
+X-Gm-Message-State: AOJu0YzBkGRxW5Xno5/NfpjQNCHo/tEo28n0SVvgKzM4STu6/gDhO4r7
+	gD8i/bNgLkFpMdblE5blF4IN1zbEal8OD/mVMMSnBnBr2ArnRNBAMlyX0M4zpeoX1KAJE8iQAzp
+	bd84+z7+kyS8P6j6gnTc7RCQxe8Q=
+X-Google-Smtp-Source: AGHT+IEBq0pvl8kIIqh5kP5RjyqtMxsRfTwvg+dA7+/RIKG3tCsg9lQtVLnTQrLXFec1OXYriekS+isTPIt8B7q07RA=
+X-Received: by 2002:a05:6902:114c:b0:e03:ab31:9aa6 with SMTP id
+ 3f1490d57ef6-e05d56d3d2dmr919642276.24.1721086806098; Mon, 15 Jul 2024
+ 16:40:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH3PR11MB8659:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29464529-9eb0-4d02-23fd-08dca527200c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?b2MyWFFxcWloQ1E2MUZhQ0lyR2ZLaWtFUEZqQWF2Z0h4ZkpQclRPT3ozT3I1?=
- =?utf-8?B?MEE4U1ppb1VmRlBpSFBxOG5sZHk1VVB2eGJaUXZzc0tTamVyKy8wbGMyLzd6?=
- =?utf-8?B?bDZuRDQwZVRTenk1V2JIQzlFaHJ4SkhPTUVDUHJINWtKQW52ZUZrNDVFZURp?=
- =?utf-8?B?U1F1SVBrS2JvN01lMUN4NUw4aW9kaGRyS2M2TCtmaHVwQ2JtdGtHclc5eDBJ?=
- =?utf-8?B?eDgvRzFtdDRhTmFLZVAzcExGTVh0Njk0L3NPOEVNOHhHK2krMVBhWnIxMkla?=
- =?utf-8?B?d0dINUN6TGVEbldJUVlJLy9Sc1M5Mzk5Ni93dVlabS82Q0diNmVEeXc1NVhS?=
- =?utf-8?B?aHRMUXR1NEJGK25KRnIxSXZHMy80T1M0RGxrSUJ1V3RJTzNObmVOS1NYWlFB?=
- =?utf-8?B?SVowS04xKzVPQTRJYkNkUUV0NDBaSTlqQ1IzdHpzaEhSTnAvd0FpdU14UkRO?=
- =?utf-8?B?ZDlDNmtGKy8xUlRsNGZHckZ0Ylo2cEdqUWhCTFNWWWt2WEVzTW11bGJncWNG?=
- =?utf-8?B?Ym5Pa1h3cXZybUVZWkt5YytFM2ZLQWI0ekpmWGJXTC9wOUpEVi9xZVZKWm5j?=
- =?utf-8?B?NW1jc2dCVkYzSmhmYlgxN01CWGRiOE53MW5Rd0FoSnlCSmRPY2dIOVJsVzEy?=
- =?utf-8?B?REVzZ3VSVzBpclJuNWFNanczWUJrOEY3bGVHSVlwdllydkhWUjRLclo3K0x1?=
- =?utf-8?B?c3haMEF6eENyS2lGZitFdFo4djF2RVYvQ0VZUlZYb29iY2dTTlhGWElmYlJh?=
- =?utf-8?B?cndqcGxGdXl1Zms0eFNpNWlEYlVvQVFpVmFHQys4RDhnbTB4OWdoRXVnSzRU?=
- =?utf-8?B?N3NSdzh1cnkrK0JudVJEaU01WHFCcndBVjlveHozQWIxQjM5QTJtNDV1NGZa?=
- =?utf-8?B?R3BnVC9lMDlEdVlHcXVGam1xV1puT3VOK1V2OVNpM0diVHA1MVgyYnNURU1v?=
- =?utf-8?B?ZE1wNDZpcG40YlRsQ01wZUplMHc1UmljSC9IWTMyYlpEU3UwaFZaSUZWRURG?=
- =?utf-8?B?NUNyZGQ4cmp1M3JOVG5sY0NNRzVhWFJOakVlK0VtZHVLKy9rd2xQU1BjZFZz?=
- =?utf-8?B?Z3FnZUhEUDdqOE4raWNFMExiNm91Wm1rc1Q3akEzYjB5b1l2MVM4Mm9FMi9S?=
- =?utf-8?B?ZFZhVjMvZE1CWDVER3lZQ1FmdFdZbjRVb2U3Ky9YYWtCbkRYWEpNMCsvVXhN?=
- =?utf-8?B?U2dNbU8vSHNqbU56MnZOL3BzU3M5UXFOSzQ2QW5GS3VWSEYwV2NaMTZoWEhh?=
- =?utf-8?B?Y21iMFdHRkQrMFBDbGRrcitVUlFrRnNkNlNxOU5BUHhJbXZteHVZRG5IM1lk?=
- =?utf-8?B?c3o2Q1NSOXpkWVQyUm1IRUJDeGNLZmthSnhicHBTTXVFNjNkWlkrVWJxWXVG?=
- =?utf-8?B?eDltU2pMM2Mxdms5ZDBabXluNlpKcVJ5cFZ5Y0licGZLV2xoOFQ0VVZZQWpr?=
- =?utf-8?B?eUlUVWI5Mnl4eWlHa2hlcUYweTNFaFdKdDlESUpVRHFIQjRqMitpWVpTNCtR?=
- =?utf-8?B?enAxMzVrM0Y2dktuWVViRDBKS0JnZkNEWkpUSTgyNFN5Vm0rN2s1UGNzZjJp?=
- =?utf-8?B?YTVLMzh2NEtiVHVsZGRueHcxekNvZ2FPT1kyNHBGOFNGdTk0VjN3NG1pQ1hz?=
- =?utf-8?B?ekw1cWpYUDM3MHk4RlNjWVl1K0h3ZDg5ZkdTUVdHTEVPRWNCZGN4YUpQbkJT?=
- =?utf-8?B?ZG5teDh1NkMxVlA2QUt2K2x1OGRhQ1VSenMyaDM3UGhnQkgvaExNZE9oN3Ri?=
- =?utf-8?B?T1lJellnemFpQWVUOVkxSCsvbmswL3lISVNCblZMUmVuSDBHbnBwSTdDZ1Vj?=
- =?utf-8?B?QXpzV1lMckhvQjNMZ2VJRENVZzdnTnUzcXhESGlsSTNOM2JjbWllOHFpTHJH?=
- =?utf-8?Q?TePS5t32zPczl?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UlZQNk8wcWpUWUdLa2x5cUJKMktFbjJvMUd2eEx4ODJLWk5XZ3RKUUpqcVR6?=
- =?utf-8?B?Z1hkWGxYYzRobVMvaHpjRzRHeXJIckNINXNvQkxIM0VjZ3ZtcWVNeGk0dFhs?=
- =?utf-8?B?UjVBYUlZUksyTFJYeFg0cVF5TjNFc05BSFBlR0NJSkJtUTgwOVJPaWUrRzZD?=
- =?utf-8?B?NFh3TXV2czgycFRNeGR0QkpMUXBhS1h3VW4zRWpid3V1SlhuZDZHbStzTjZx?=
- =?utf-8?B?WjFhSnJqMUN4VjU0N3pZSTJURnBSb3BjdCthRDBUT2lPMW1rako2Nm4vcFpt?=
- =?utf-8?B?dUNMTTlXMUJpc0MxYXExUmRHUWpNcmRXaEZVM2hXaStZV0xvM2UrNDZmUmM3?=
- =?utf-8?B?Y2grZWQxTDU3ZlRlSWx5K2k0UUVXbFNONUs4UDRQQ1ppTWZXS0RUcUh5Mk9l?=
- =?utf-8?B?QkJKR0VvSklDUDI4blJnMSs0aWNzLzFJallzK2dieTcrblRUOSthSTZscjBj?=
- =?utf-8?B?Y2FSbGV4R1lBSHF4UDQzRUduZGNkdk5pWm1XVUptbGE5Z2szcDBxU0tsV1Jo?=
- =?utf-8?B?RnpTdUs3Ty9zTzVVTGM5SjlWeWMzK2ptNVY3NWlFWUlKUkFhQlZxWVN6QXd0?=
- =?utf-8?B?em1lUnNJRWs5aG9YREhZMXRmL0tnUDA2Y2cxWUpKaXpXSTZRQVNiN3E5OHQ2?=
- =?utf-8?B?ZEE0Z1FVMVpyVEQxZ2Q5SmF4OHlacEdEZ2t2MDUrdDRlMjRjcGQ3dzAyVEhy?=
- =?utf-8?B?Wlgxb25sRk84ZzFEbVF2VkErSHk5SnF1WS9kbDRwRGVrOVFQNkxhb2ZhOEV0?=
- =?utf-8?B?RlBjYUErK2prZ1FUTXN0T2dLd3lGby8zQWVHZ0VnbTYwUzF0by9NTGpFcFlZ?=
- =?utf-8?B?bjRHaHRoOGFhQWZ2OGJzakJGK0RUY3F2VEtGQ3cvalZHL0V3dWtMdGtNWHBu?=
- =?utf-8?B?TDBtZVhmd0xZczM4cVVtVlV6WUpYTWVsd3NIZ0crd0N6NDZMUFA1enNPNDNa?=
- =?utf-8?B?d3J3QVdVZTBqRVV0VEU2eUVwZDhTcHZ5OHZZYzR6bHBxaXcyVU5ZeVg0WDUx?=
- =?utf-8?B?VUhVMDRJbXNxb0t4VkRsYzNHalM2Zi9jRnlFc0hkNU5wNW40T0xNaDJYalgy?=
- =?utf-8?B?emRUMHd6OEZIT1ZCdVFneWRIZVVOOWwydTJUbU95WjlsMmt1OVN0QW5EWWFL?=
- =?utf-8?B?VllVYnRRbS9lL0Yyc0hRUXM5RnBVdTR4WTV4TkxQRWM4VERjT0NnTGd0SXNQ?=
- =?utf-8?B?Y2M1ejVsTlczU1F3c2FFVXo5czlDMGlLZGtTa1VPUkg2NXZSUXNZY0lteUEx?=
- =?utf-8?B?T1JkRGliOFpjcjE5NTZWaTVJVHRWTHROdWtsMnI3K2VmSE5nN2Jza3N0L2hy?=
- =?utf-8?B?dWFHQ3JUN2xXZDhyR0laUWJXejVMcVlrR2t0WFNwSXRkZDR2ZTZRYkgrcElL?=
- =?utf-8?B?Rk14aDh3WERSRDI3ek1MU1hOSWlySUJIdW1ycEVmVXprakhvYUQxNjE5UDRt?=
- =?utf-8?B?aG1KL3lBbGNlV293S1JPVnRKZEVDaVpJYU8wK042VXhIWVBIbzJQVytBZ3dC?=
- =?utf-8?B?eXdzR09pZjZtMEQ5dUN1eUova2liT2NhS1p5dHpxcXRYR0JnY3B0L2sxR2h0?=
- =?utf-8?B?NUJmV29qdktuMGprYysxYnhLd2FwTEt0UGdjZnhhWGNMZzhxZThEZG5uMm4y?=
- =?utf-8?B?WkpFRXBjaUZ0TE8zVWJBbTJCcTF5MkF6MHdOU2xiK0NBZHNqa1BRcll3Rktt?=
- =?utf-8?B?enJtTnFsaWtiTjlLRmYxZVkzbTNYa1N6ckNtTVN2UHNyQXlFT2lLVERuejgz?=
- =?utf-8?B?Q0VseXp3MUdvenhLRlRPeW1mbG42eEJTNjA3YS9ub2JuWTcwMGdpaUE0QVAy?=
- =?utf-8?B?QUtLYkxtWGx4TEd2Uk5ST1EzMnpYQ2FPd0dLMDI5YTdUVW9ETkF6V3RRNWlh?=
- =?utf-8?B?VERHWDBON0ZPQzRvQzNrVFRLaWxvNUFVanlVOXBXUDNPbFRMU0EvTko2TGY5?=
- =?utf-8?B?c3g1Ly9vS3ptN09zT2owL2xCVSttOW9MNWlsYWF2YmRDdFNTN2IrQ2h1N3pU?=
- =?utf-8?B?dFgrREpnRFErZSt0UXd6d1JGZ3dRN1R1aWFqL21uNHBxQWsyT1ZXZlo4Qndk?=
- =?utf-8?B?Um9ZeklVOGRYdTdiVWNuUEthOGJSN29WZnVaR1BITk9ROW5pSUc1TTN2OEdS?=
- =?utf-8?B?Q2Q4NGJoNUI5UmRTZzcrK2VCL0ZHSytMTTdLOXRJSDFpd0JOSCt0aUZPMWVK?=
- =?utf-8?B?Y3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29464529-9eb0-4d02-23fd-08dca527200c
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 23:37:44.1060
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OjgXLRL8iuzUTI6Xr6yLlSNlOgD2+wIZt7j7uT4r3MKEPYHSbCW7xRv3iq4s9OXZcWsBkNbjSUL0bBcZggktpDBnyl6pc4x+ZL2tPfP2JiY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8659
-X-OriginatorOrg: intel.com
+References: <20240710212555.1617795-2-amery.hung@bytedance.com> <AS2P194MB2170B9984C55A5F460F9E03E9AA12@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AS2P194MB2170B9984C55A5F460F9E03E9AA12@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 15 Jul 2024 16:39:55 -0700
+Message-ID: <CAMB2axPcjTvbriw7rNXRy5dN4n8Zq-myesXWsH1USM44XFyMxA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 01/14] af_vsock: generalize
+ vsock_dgram_recvmsg() to all transports
+To: Luigi Leonardi <luigi.leonardi@outlook.com>
+Cc: amery.hung@bytedance.com, bobby.eshleman@bytedance.com, 
+	bpf@vger.kernel.org, bryantan@vmware.com, dan.carpenter@linaro.org, 
+	davem@davemloft.net, decui@microsoft.com, edumazet@google.com, 
+	haiyangz@microsoft.com, jasowang@redhat.com, jiang.wang@bytedance.com, 
+	kuba@kernel.org, kvm@vger.kernel.org, kys@microsoft.com, 
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, oxffffaa@gmail.com, pabeni@redhat.com, 
+	pv-drivers@vmware.com, sgarzare@redhat.com, simon.horman@corigine.com, 
+	stefanha@redhat.com, vdasa@vmware.com, 
+	virtualization@lists.linux-foundation.org, wei.liu@kernel.org, 
+	xiyou.wangcong@gmail.com, xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jul 15, 2024 at 1:02=E2=80=AFAM Luigi Leonardi
+<luigi.leonardi@outlook.com> wrote:
+>
+> Hi Amery, Bobby
+>
+> > From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >
+> > This commit drops the transport->dgram_dequeue callback and makes
+> > vsock_dgram_recvmsg() generic to all transports.
+> >
+> > To make this possible, two transport-level changes are introduced:
+> > - transport in the receiving path now stores the cid and port into
+> >   the control buffer of an skb when populating an skb. The information
+> >   later is used to initialize sockaddr_vm structure in recvmsg()
+> >   without referencing vsk->transport.
+> > - transport implementations set the skb->data pointer to the beginning
+> >   of the payload prior to adding the skb to the socket's receive queue.
+> >   That is, they must use skb_pull() before enqueuing. This is an
+> >   agreement between the transport and the socket layer that skb->data
+> >   always points to the beginning of the payload (and not, for example,
+> >   the packet header).
+> >
+> Like in the other patch, please use imperative in the commit message.
+> >
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >  drivers/vhost/vsock.c                   |  1 -
+> >  include/linux/virtio_vsock.h            |  5 ---
+> >  include/net/af_vsock.h                  | 11 ++++-
+> >  net/vmw_vsock/af_vsock.c                | 42 +++++++++++++++++-
+> >  net/vmw_vsock/hyperv_transport.c        |  7 ---
+> >  net/vmw_vsock/virtio_transport.c        |  1 -
+> >  net/vmw_vsock/virtio_transport_common.c |  9 ----
+> >  net/vmw_vsock/vmci_transport.c          | 59 +++----------------------
+> >  net/vmw_vsock/vsock_loopback.c          |  1 -
+> >  9 files changed, 55 insertions(+), 81 deletions(-)
+> >
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index ec20ecff85c7..97fffa914e66 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -419,7 +419,6 @@ static struct virtio_transport vhost_transport =3D =
+{
+> >               .cancel_pkt               =3D vhost_transport_cancel_pkt,
+> >
+> >               .dgram_enqueue            =3D virtio_transport_dgram_enqu=
+eue,
+> > -             .dgram_dequeue            =3D virtio_transport_dgram_dequ=
+eue,
+> >               .dgram_bind               =3D virtio_transport_dgram_bind=
+,
+> >               .dgram_allow              =3D virtio_transport_dgram_allo=
+w,
+> >
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.=
+h
+> > index c82089dee0c8..8b56b8a19ddd 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -177,11 +177,6 @@ virtio_transport_stream_dequeue(struct vsock_sock =
+*vsk,
+> >                               size_t len,
+> >                               int type);
+> >  int
+> > -virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> > -                            struct msghdr *msg,
+> > -                            size_t len, int flags);
+> > -
+> > -int
+> >  virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+> >                                  struct msghdr *msg,
+> >                                  size_t len);
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index 535701efc1e5..7aa1f5f2b1a5 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -120,8 +120,6 @@ struct vsock_transport {
+> >
+> >       /* DGRAM. */
+> >       int (*dgram_bind)(struct vsock_sock *, struct sockaddr_vm *);
+> > -     int (*dgram_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+> > -                          size_t len, int flags);
+> >       int (*dgram_enqueue)(struct vsock_sock *, struct sockaddr_vm *,
+> >                            struct msghdr *, size_t len);
+> >       bool (*dgram_allow)(u32 cid, u32 port);
+> > @@ -219,6 +217,15 @@ void vsock_for_each_connected_socket(struct vsock_=
+transport *transport,
+> >  int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *=
+psk);
+> >  bool vsock_find_cid(unsigned int cid);
+> >
+> > +struct vsock_skb_cb {
+> > +     unsigned int src_cid;
+> > +     unsigned int src_port;
+> > +};
+> > +
+> > +static inline struct vsock_skb_cb *vsock_skb_cb(struct sk_buff *skb) {
+> > +     return (struct vsock_skb_cb *)skb->cb;
+> > +};
+> > +
+> >
+>
+> Running scripts/checkpatch.pl --strict --codespell on the patch shows thi=
+s error:
+>
+>  ERROR: open brace '{' following function definitions go on the next line
+>  #183: FILE: include/net/af_vsock.h:225:
+>  +static inline struct vsock_skb_cb *vsock_skb_cb(struct sk_buff *skb) {
+>
+>  total: 1 errors, 0 warnings, 0 checks, 235 lines checked
+> >
+> >  /**** TAP ****/
+> >
+> >  struct vsock_tap {
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index 4b040285aa78..5e7d4d99ea2c 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -1273,11 +1273,15 @@ static int vsock_dgram_connect(struct socket *s=
+ock,
+> >  int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> >                       size_t len, int flags)
+> >  {
+> > +     struct vsock_skb_cb *vsock_cb;
+> >  #ifdef CONFIG_BPF_SYSCALL
+> >       const struct proto *prot;
+> >  #endif
+> >       struct vsock_sock *vsk;
+> > +     struct sk_buff *skb;
+> > +     size_t payload_len;
+> >       struct sock *sk;
+> > +     int err;
+> >
+> >       sk =3D sock->sk;
+> >       vsk =3D vsock_sk(sk);
+> > @@ -1288,7 +1292,43 @@ int vsock_dgram_recvmsg(struct socket *sock, str=
+uct msghdr *msg,
+> >               return prot->recvmsg(sk, msg, len, flags, NULL);
+> >  #endif
+> >
+> > -     return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
+> > +     if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     if (unlikely(flags & MSG_ERRQUEUE))
+> > +             return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
+> >
+> This if statement is always false!
+> >
+> > +
+> > +     /* Retrieve the head sk_buff from the socket's receive queue. */
+> > +     err =3D 0;
+> > +     skb =3D skb_recv_datagram(sk_vsock(vsk), flags, &err);
+> > +     if (!skb)
+> > +             return err;
+> > +
+> > +     payload_len =3D skb->len;
+> > +
+> nit: I'd remove this blank line.
+> > +     if (payload_len > len) {
+> > +             payload_len =3D len;
+> > +             msg->msg_flags |=3D MSG_TRUNC;
+> > +     }
+> > +
+> > +     /* Place the datagram payload in the user's iovec. */
+> > +     err =3D skb_copy_datagram_msg(skb, 0, msg, payload_len);
+> > +     if (err)
+> > +             goto out;
+> > +
+> > +     if (msg->msg_name) {
+> > +             /* Provide the address of the sender. */
+> > +             DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr, msg->msg_=
+name);
+> > +
+> > +             vsock_cb =3D vsock_skb_cb(skb);
+> > +             vsock_addr_init(vm_addr, vsock_cb->src_cid, vsock_cb->src=
+_port);
+> > +             msg->msg_namelen =3D sizeof(*vm_addr);
+> > +     }
+> > +     err =3D payload_len;
+> > +
+> > +out:
+> > +     skb_free_datagram(&vsk->sk, skb);
+> > +     return err;
+> >  }
+> >  EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+> >
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_tr=
+ansport.c
+> > index e2157e387217..326dd41ee2d5 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -556,12 +556,6 @@ static int hvs_dgram_bind(struct vsock_sock *vsk, =
+struct sockaddr_vm *addr)
+> >       return -EOPNOTSUPP;
+> >  }
+> >
+> > -static int hvs_dgram_dequeue(struct vsock_sock *vsk, struct msghdr *ms=
+g,
+> > -                          size_t len, int flags)
+> > -{
+> > -     return -EOPNOTSUPP;
+> > -}
+> > -
+> >  static int hvs_dgram_enqueue(struct vsock_sock *vsk,
+> >                            struct sockaddr_vm *remote, struct msghdr *m=
+sg,
+> >                            size_t dgram_len)
+> > @@ -833,7 +827,6 @@ static struct vsock_transport hvs_transport =3D {
+> >       .shutdown                 =3D hvs_shutdown,
+> >
+> >       .dgram_bind               =3D hvs_dgram_bind,
+> > -     .dgram_dequeue            =3D hvs_dgram_dequeue,
+> >       .dgram_enqueue            =3D hvs_dgram_enqueue,
+> >       .dgram_allow              =3D hvs_dgram_allow,
+> >
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tr=
+ansport.c
+> > index 43d405298857..a8c97e95622a 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -508,7 +508,6 @@ static struct virtio_transport virtio_transport =3D=
+ {
+> >               .cancel_pkt               =3D virtio_transport_cancel_pkt=
+,
+> >
+> >               .dgram_bind               =3D virtio_transport_dgram_bind=
+,
+> > -             .dgram_dequeue            =3D virtio_transport_dgram_dequ=
+eue,
+> >               .dgram_enqueue            =3D virtio_transport_dgram_enqu=
+eue,
+> >               .dgram_allow              =3D virtio_transport_dgram_allo=
+w,
+> >
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/vi=
+rtio_transport_common.c
+> > index 16ff976a86e3..4bf73d20c12a 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -810,15 +810,6 @@ virtio_transport_seqpacket_enqueue(struct vsock_so=
+ck *vsk,
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_enqueue);
+> >
+> > -int
+> > -virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> > -                            struct msghdr *msg,
+> > -                            size_t len, int flags)
+> > -{
+> > -     return -EOPNOTSUPP;
+> > -}
+> > -EXPORT_SYMBOL_GPL(virtio_transport_dgram_dequeue);
+> > -
+> >  s64 virtio_transport_stream_has_data(struct vsock_sock *vsk)
+> >  {
+> >       struct virtio_vsock_sock *vvs =3D vsk->trans;
+> > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transp=
+ort.c
+> > index b370070194fa..b39df3ed8c8d 100644
+> > --- a/net/vmw_vsock/vmci_transport.c
+> > +++ b/net/vmw_vsock/vmci_transport.c
+> > @@ -610,6 +610,7 @@ vmci_transport_datagram_create_hnd(u32 resource_id,
+> >
+> >  static int vmci_transport_recv_dgram_cb(void *data, struct vmci_datagr=
+am *dg)
+> >  {
+> > +     struct vsock_skb_cb *vsock_cb;
+> >       struct sock *sk;
+> >       size_t size;
+> >       struct sk_buff *skb;
+> > @@ -637,10 +638,14 @@ static int vmci_transport_recv_dgram_cb(void *dat=
+a, struct vmci_datagram *dg)
+> >       if (!skb)
+> >               return VMCI_ERROR_NO_MEM;
+> >
+> > +     vsock_cb =3D vsock_skb_cb(skb);
+> > +     vsock_cb->src_cid =3D dg->src.context;
+> > +     vsock_cb->src_port =3D dg->src.resource;
+> >       /* sk_receive_skb() will do a sock_put(), so hold here. */
+> >       sock_hold(sk);
+> >       skb_put(skb, size);
+> >       memcpy(skb->data, dg, size);
+> > +     skb_pull(skb, VMCI_DG_HEADERSIZE);
+> >       sk_receive_skb(sk, skb, 0);
+> >
+> >       return VMCI_SUCCESS;
+> > @@ -1731,59 +1736,6 @@ static int vmci_transport_dgram_enqueue(
+> >       return err - sizeof(*dg);
+> >  }
+> >
+> > -static int vmci_transport_dgram_dequeue(struct vsock_sock *vsk,
+> > -                                     struct msghdr *msg, size_t len,
+> > -                                     int flags)
+> > -{
+> > -     int err;
+> > -     struct vmci_datagram *dg;
+> > -     size_t payload_len;
+> > -     struct sk_buff *skb;
+> > -
+> > -     if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+> > -             return -EOPNOTSUPP;
+> > -
+> > -     /* Retrieve the head sk_buff from the socket's receive queue. */
+> > -     err =3D 0;
+> > -     skb =3D skb_recv_datagram(&vsk->sk, flags, &err);
+> > -     if (!skb)
+> > -             return err;
+> > -
+> > -     dg =3D (struct vmci_datagram *)skb->data;
+> > -     if (!dg)
+> > -             /* err is 0, meaning we read zero bytes. */
+> > -             goto out;
+> > -
+> > -     payload_len =3D dg->payload_size;
+> > -     /* Ensure the sk_buff matches the payload size claimed in the pac=
+ket. */
+> > -     if (payload_len !=3D skb->len - sizeof(*dg)) {
+> > -             err =3D -EINVAL;
+> > -             goto out;
+> > -     }
+> > -
+> > -     if (payload_len > len) {
+> > -             payload_len =3D len;
+> > -             msg->msg_flags |=3D MSG_TRUNC;
+> > -     }
+> > -
+> > -     /* Place the datagram payload in the user's iovec. */
+> > -     err =3D skb_copy_datagram_msg(skb, sizeof(*dg), msg, payload_len)=
+;
+> > -     if (err)
+> > -             goto out;
+> > -
+> > -     if (msg->msg_name) {
+> > -             /* Provide the address of the sender. */
+> > -             DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr, msg->msg_=
+name);
+> > -             vsock_addr_init(vm_addr, dg->src.context, dg->src.resourc=
+e);
+> > -             msg->msg_namelen =3D sizeof(*vm_addr);
+> > -     }
+> > -     err =3D payload_len;
+> > -
+> > -out:
+> > -     skb_free_datagram(&vsk->sk, skb);
+> > -     return err;
+> > -}
+> > -
+> >  static bool vmci_transport_dgram_allow(u32 cid, u32 port)
+> >  {
+> >       if (cid =3D=3D VMADDR_CID_HYPERVISOR) {
+> > @@ -2040,7 +1992,6 @@ static struct vsock_transport vmci_transport =3D =
+{
+> >       .release =3D vmci_transport_release,
+> >       .connect =3D vmci_transport_connect,
+> >       .dgram_bind =3D vmci_transport_dgram_bind,
+> > -     .dgram_dequeue =3D vmci_transport_dgram_dequeue,
+> >       .dgram_enqueue =3D vmci_transport_dgram_enqueue,
+> >       .dgram_allow =3D vmci_transport_dgram_allow,
+> >       .stream_dequeue =3D vmci_transport_stream_dequeue,
+> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopb=
+ack.c
+> > index 6dea6119f5b2..11488887a5cc 100644
+> > --- a/net/vmw_vsock/vsock_loopback.c
+> > +++ b/net/vmw_vsock/vsock_loopback.c
+> > @@ -66,7 +66,6 @@ static struct virtio_transport loopback_transport =3D=
+ {
+> >               .cancel_pkt               =3D vsock_loopback_cancel_pkt,
+> >
+> >               .dgram_bind               =3D virtio_transport_dgram_bind=
+,
+> > -             .dgram_dequeue            =3D virtio_transport_dgram_dequ=
+eue,
+> >               .dgram_enqueue            =3D virtio_transport_dgram_enqu=
+eue,
+> >               .dgram_allow              =3D virtio_transport_dgram_allo=
+w,
+> >
+> > --
+> > 2.20.1
+> >
+> >
+>
+> Small changes :)
+> Rest LGTM!
+>
 
+I will fix the two style issues.
 
-On 7/9/2024 6:53 AM, Kory Maincent wrote:
-> Prepare for future support of saving hwtstamp source in PTP xarray by
-> introducing HWTSTAMP_SOURCE_UNSPEC to hwtstamp_source enum, setting it
-> to 0 to match old behavior of no source defined.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> 
+Thank you,
+Amery
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-> Change in v8:
-> - New patch
-> ---
->  include/linux/net_tstamp.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-> index 3799c79b6c83..662074b08c94 100644
-> --- a/include/linux/net_tstamp.h
-> +++ b/include/linux/net_tstamp.h
-> @@ -14,6 +14,7 @@
->  					 SOF_TIMESTAMPING_RAW_HARDWARE)
->  
->  enum hwtstamp_source {
-> +	HWTSTAMP_SOURCE_UNSPEC,
->  	HWTSTAMP_SOURCE_NETDEV,
->  	HWTSTAMP_SOURCE_PHYLIB,
->  };
-> 
+> Thanks,
+> Luigi
 
