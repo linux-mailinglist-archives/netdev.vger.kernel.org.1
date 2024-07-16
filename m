@@ -1,160 +1,144 @@
-Return-Path: <netdev+bounces-111792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 970BC932AF1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE653932CDE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B97001C22B19
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:39:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC451C22114
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F422719B3D3;
-	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A1519FA75;
+	Tue, 16 Jul 2024 15:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRifRU+X"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f5WUxMue"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886E19A86F;
-	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888BE19FA99;
+	Tue, 16 Jul 2024 15:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721144381; cv=none; b=jAq5aqYt+t1RI+lh5f52lHlzg2Z08q1DD+ywlk6uvvTd4K6imQ6a1uQX/WIDHE7SOS06veTh+g5jv7t1dKEoKqtlJaWI1TpRF74kSj090IEt/6YSqlHjPb/aeupgjEBZpreNGElH+sWEG+Azu6XfLmBYf2DcAu0IKVanXKm6HQs=
+	t=1721145513; cv=none; b=h4dmr00aE326tCaqP8D3k8hu7sqE0QudcixCXPv1xG/3Ky5ohn/bqbuGfFEKzcQQQGYlLk1HlSO1iDyohXM7VEKdYdFFu0pQ1gtTpr5QS2zdI8pch5CZ90yeHMKaWOZtkqe3yGLnw+HXBx7RIf1o8JDCFPEPnf2bUfmRy/eeJyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721144381; c=relaxed/simple;
-	bh=C1k0pii6K6mISsN7ikworzl7ytrXnGBw4UelyAmvbWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XYSOlu4QyfTowlYX8qbvjQOHPBVr182AxJ81udwrjz90gAJzYlaTHhQp75REsTkf679p/hCyTe887O2gx8nTgobSFTYAaTBikHT9NS3Iz0BQipk54uz8/bQlU566GuHaLJOP6F97znLU78KWtFJ87EDMpZMASYCdxKkrrQyl2CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRifRU+X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88487C4AF0B;
-	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721144381;
-	bh=C1k0pii6K6mISsN7ikworzl7ytrXnGBw4UelyAmvbWc=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=pRifRU+Xc+hgTIIzsj8Niih5psN5fJ8f92vDRMRyELzF9g1nEtkXzvSnTQIGcR2pB
-	 hdg7LBTYVPJngy4Bu2e9cjVFtjB1q0kgBhMtTpKyQbRGBuWlrBtsl+Ll29hkyH7LeH
-	 Fh4qjbFUZwWodMD3luPFQ/Ym7h3H8d5/AVj9dPG9bEuRqNdZ8Xz31nC992fnC84nhk
-	 Yw/nQxXQiCfZ7QnXvuGmkjpMIBNam8oiFLKPDo9/26DU+fNbdaMnLM/YYfjusadXKQ
-	 hsYZSFx1wXFkkkE+4Fr4BYQY2KKV1Dm/s+fH/SNFTUO9oQobXO39vYx0AS7/ZNnbzL
-	 0xQH18MTum5Yw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 269B2CE13CB; Tue, 16 Jul 2024 08:39:41 -0700 (PDT)
-Date: Tue, 16 Jul 2024 08:39:41 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Baochen Qiang <quic_bqiang@quicinc.com>,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net] wifi: ath12k: fix build vs old compiler
-Message-ID: <834dd0b3-6a2c-4af6-9541-27fd4b21d833@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
- <a7950e7b-2275-4b6d-b8e1-4f50d0bc28e6@quicinc.com>
- <93d282fb-4691-460a-aa5b-13e9ef054cdb@quicinc.com>
- <A4FF7C44-06C7-4241-B33E-1E9684A979E0@kernel.org>
+	s=arc-20240116; t=1721145513; c=relaxed/simple;
+	bh=NDRLYyT8pN/HFDs6K/Dfs1m0KHkA5QT/h/5XhCFwghE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZmqWHx4vv+wKebDsPnFU0RSRvZUxFtHSLNNScHzz/kuOj3yHN2NU5XUKM9m7P2sqYI5bftC2ro3DPmt/z6MDguLPSEUvE3tkTgd4rbLs4z40ygxZ/ANPnZImPXfEQPf6rM8RHii5wzr9Zm9KHtpicyKof08smRjs1yjg3s6xmlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f5WUxMue; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BEAA81C0006;
+	Tue, 16 Jul 2024 15:58:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1721145503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/6fyfU7hh9xia4CKde5/FfdqWurIEu+oueFw1Yyue2o=;
+	b=f5WUxMuemYRLVJeAA6sWlmzDtzBkqz+hbBTE5MQ0kHlOXdG6MUR0c8BtaEs+EqnSCI3Ila
+	oWQ7hQ1r4xxK56Gmh+RY5r0HAgbmte0NZFR2vK51PpC9WmuJ/qjiPYGOT91n7b/wmAvwQp
+	AARSmzwvBd3AaTQqEiU4c/eNwjxx6JXYEtgDlRT+bI0GkZgmiM4QPzIB8k+kFbXNo+dtNP
+	1SjaHNhg6AUvxBYJq9luF1KHnqww9r9kj2tCfM9rbGp0vB4vRmq7N1rQF1xSSxdUBp7MZU
+	CCweZyaBh2wC4Xd+/EE6L01nAU2Rf5ke/xhu79Ld/dvkiLfpjzSnInlHCk2qjg==
+Date: Tue, 16 Jul 2024 17:58:18 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Rob Herring" <robh@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Conor Dooley" <conor@kernel.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Lee Jones" <lee@kernel.org>, "Andy
+ Shevchenko" <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>, UNGLinuxDriver@microchip.com,
+ "Saravana Kannan" <saravanak@google.com>, "Bjorn Helgaas"
+ <bhelgaas@google.com>, "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Horatiu Vultur"
+ <horatiu.vultur@microchip.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ devicetree@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
+Message-ID: <20240716175818.2ef948d9@bootlin.com>
+In-Reply-To: <7289bb54-99f2-4630-a437-21997a9e2b1f@app.fastmail.com>
+References: <20240627091137.370572-1-herve.codina@bootlin.com>
+	<20240627091137.370572-7-herve.codina@bootlin.com>
+	<20240711152952.GL501857@google.com>
+	<20240711184438.65446cc3@bootlin.com>
+	<2024071113-motocross-escalator-e034@gregkh>
+	<CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
+	<20240712151122.67a17a94@bootlin.com>
+	<83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com>
+	<20240715141229.506bfff7@bootlin.com>
+	<7289bb54-99f2-4630-a437-21997a9e2b1f@app.fastmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <A4FF7C44-06C7-4241-B33E-1E9684A979E0@kernel.org>
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Tue, Jul 16, 2024 at 07:36:40AM -0700, Kees Cook wrote:
-> 
-> 
-> On July 16, 2024 7:03:55 AM PDT, Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
-> >On 7/16/2024 7:00 AM, Jeff Johnson wrote:
-> >> On 7/16/2024 4:06 AM, Paolo Abeni wrote:
-> >>> gcc 11.4.1-3 warns about memcpy() with overlapping pointers:
-> >>>
-> >>> drivers/net/wireless/ath/ath12k/wow.c: In function ‘ath12k_wow_convert_8023_to_80211.constprop’:
-> >>> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551611 or more bytes at offsets 0 and 0 overlaps 9223372036854775799 bytes at offset -9223372036854775804 [-Werror=restrict]
-> >>>   114 | #define __underlying_memcpy     __builtin_memcpy
-> >>>       |                                 ^
-> >>> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
-> >>>   637 |         __underlying_##op(p, q, __fortify_size);                        \
-> >>>       |         ^~~~~~~~~~~~~
-> >>> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
-> >>>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-> >>>       |                          ^~~~~~~~~~~~~~~~~~~~
-> >>> drivers/net/wireless/ath/ath12k/wow.c:190:25: note: in expansion of macro ‘memcpy’
-> >>>   190 |                         memcpy(pat, eth_pat, eth_pat_len);
-> >>>       |                         ^~~~~~
-> >>> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551605 or more bytes at offsets 0 and 0 overlaps 9223372036854775787 bytes at offset -9223372036854775798 [-Werror=restrict]
-> >>>   114 | #define __underlying_memcpy     __builtin_memcpy
-> >>>       |                                 ^
-> >>> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
-> >>>   637 |         __underlying_##op(p, q, __fortify_size);                        \
-> >>>       |         ^~~~~~~~~~~~~
-> >>> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
-> >>>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-> >>>       |                          ^~~~~~~~~~~~~~~~~~~~
-> >>> drivers/net/wireless/ath/ath12k/wow.c:232:25: note: in expansion of macro ‘memcpy’
-> >>>   232 |                         memcpy(pat, eth_pat, eth_pat_len);
-> >>>       |                         ^~~~~~
-> >>>
-> >>> The sum of size_t operands can overflow SIZE_MAX, triggering the
-> >>> warning.
-> >>> Address the issue using the suitable helper.
-> >>>
-> >>> Fixes: 4a3c212eee0e ("wifi: ath12k: add basic WoW functionalities")
-> >>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> >>> ---
-> >>> Only built tested. Sending directly to net to reduce the RTT, but no
-> >>> objections to go through the WiFi tree first
-> >>> ---
-> >>>  drivers/net/wireless/ath/ath12k/wow.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/drivers/net/wireless/ath/ath12k/wow.c b/drivers/net/wireless/ath/ath12k/wow.c
-> >>> index c5cba825a84a..bead19db2c9a 100644
-> >>> --- a/drivers/net/wireless/ath/ath12k/wow.c
-> >>> +++ b/drivers/net/wireless/ath/ath12k/wow.c
-> >>> @@ -186,7 +186,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
-> >>>  	if (eth_pkt_ofs < ETH_ALEN) {
-> >>>  		pkt_ofs = eth_pkt_ofs + a1_ofs;
-> >>>  
-> >>> -		if (eth_pkt_ofs + eth_pat_len < ETH_ALEN) {
-> >>> +		if (size_add(eth_pkt_ofs, eth_pat_len) < ETH_ALEN) {
-> >>>  			memcpy(pat, eth_pat, eth_pat_len);
-> >>>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
-> >>>  
-> >>> @@ -228,7 +228,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
-> >>>  	} else if (eth_pkt_ofs < prot_ofs) {
-> >>>  		pkt_ofs = eth_pkt_ofs - ETH_ALEN + a3_ofs;
-> >>>  
-> >>> -		if (eth_pkt_ofs + eth_pat_len < prot_ofs) {
-> >>> +		if (size_add(eth_pkt_ofs, eth_pat_len) < prot_ofs) {
-> >>>  			memcpy(pat, eth_pat, eth_pat_len);
-> >>>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
-> >>>  
-> >> 
-> >> Duplicate of https://msgid.link/20240704144341.207317-1-kvalo@kernel.org ??
+On Tue, 16 Jul 2024 16:44:12 +0200
+"Arnd Bergmann" <arnd@arndb.de> wrote:
+
+> On Mon, Jul 15, 2024, at 14:12, Herve Codina wrote:
+> > Hi Arnd,
 > >
-> >Let me add Kees & Paul to see if they prefer your solution
+> > On Fri, 12 Jul 2024 16:14:31 +0200
+> > "Arnd Bergmann" <arnd@arndb.de> wrote:
+> >  
+> >> On Fri, Jul 12, 2024, at 15:11, Herve Codina wrote:  
+> >> > On Thu, 11 Jul 2024 14:33:26 -0600 Rob Herring <robh@kernel.org> wrote:    
+> >> >> On Thu, Jul 11, 2024 at 1:08 PM Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:    
+> >>   
+> >> >> > >
+> >> >> > > This PCI driver purpose is to instanciate many other drivers using a DT
+> >> >> > > overlay. I think MFD is the right subsystem.      
+> >> >> 
+> >> >> It is a Multi-function Device, but it doesn't appear to use any of the
+> >> >> MFD subsystem. So maybe drivers/soc/? Another dumping ground, but it
+> >> >> is a driver for an SoC exposed as a PCI device.
+> >> >>     
+> >> >
+> >> > In drivers/soc, drivers/soc/microchip/ could be the right place.
+> >> >
+> >> > Conor, are you open to have the PCI LAN966x device driver in
+> >> > drivers/soc/microchip/ ?    
+> >> 
+> >> That sounds like a much worse fit than drivers/mfd: the code
+> >> here does not actually run on the lan966x soc, it instead runs
+> >> on whatever other machine you happen to plug it into as a
+> >> PCI device.  
+> >
+> > Maybe drivers/misc ?  
 > 
-> Heh, yeah, that works too! Avoid the overflow via saturating addition.
+> That's probably a little better, and there is already
+> drivers/misc/mchp_pci1xxxx in there, which also has some
+> aux devices.
 > 
-> Reviewed-by: Kees Cook<kees@kernel.org>
+> Maybe we need a new place and then move both of these
+> and some of the similar devices from drivers/mfd to that, but
+> we don't really have to pick one now.
+> 
 
-Tested-by: Paul E. McKenney <paulmck@kernel.org>
+In the next iteration, I plan to move the lan966x pci driver in
+drivers/misc/
 
-I have no preference between the two, but it would be really nice if a
-fix were to hit both -next and mainline sooner rather than later.  ;-)
+Not sure that it needs to be in a subdir.
 
-							Thanx, Paul
+Best regards
+Hervé
 
