@@ -1,206 +1,225 @@
-Return-Path: <netdev+bounces-111633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0BB931E1F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 02:46:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B96931E31
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 02:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47011B21E7D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 00:46:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3110B21EB8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 00:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AFD4405;
-	Tue, 16 Jul 2024 00:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A35D17F7;
+	Tue, 16 Jul 2024 00:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="GPlCRVLS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fcLeNty4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4342312B72
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 00:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB3A4A32;
+	Tue, 16 Jul 2024 00:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721090774; cv=none; b=TE7hvNpThbUk/8wLlDAOgNp83s3XEkhVLetKd2eAxj4hF5KQMteBhzvraNLGE8LBikp4DxNUA+4RKE3NYOXw7sl3aSBwcBjXX9JlRlh2+D5cl+7m3pkOgVfhixFe8CKWdx9C0yZpnIVNyEvuY2WUJaPNUdusL/g4yT7eccIqMaw=
+	t=1721091262; cv=none; b=Q3wrV7PqAX2GCk1+76+SoT+lc+4Vwd0oSfos1Ly60YG3RFQXJ60XMatYJS6HRzNYN9UuTeTbZVaBdW1H2pLt5CAM/lTZQ2YHlhY3D1ql257sLs4AH5+i3CFGYoSIit1lOf5hcWSwwXCfoqWmVvG5724qXSueP/lICy4yH7kLxyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721090774; c=relaxed/simple;
-	bh=4uM0FvLy5udE+HfWQP/w0Px9dpx3wbZvNKZHLMQ7a2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SAHMEVv0Pp3S+H7zh4+S+34tT4WCuEv+LU2r0rtCl/SATbdWkJ3dsGCvPLThJGwWtrrJkPFsLvpYpGs+YtGKsdIx1j5dDflLJPHr84V4uIvH9zF57atEQYwdtlgIea8O64V2sBvEso9Ayre+gPASS88B4H7BIIs31eoRkjd4axE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=GPlCRVLS; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6325b04c275so50828067b3.3
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 17:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1721090770; x=1721695570; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TD66OtDeh2iGxjhj1zv4qHDsUsV2aL1QtkjuvW+JSWU=;
-        b=GPlCRVLSwC8ZDuocFpWUxrpS/MC7SXRJMG3zqnk0dKCx2OxlSR4a4V1zV+5kM9fNvw
-         07rDG7Qy8rqKKZvmZIv8bOUFH1FdY2t8Su6lt5TFYKGfJu52aM4bbEonLefF+IJ9E9kd
-         Q9uiswVmaBNx7T/5UgKp5VArNL9weQFafAcA+j8XIlh3xzE/ZMW2KbsDMCUHPe1R5xaV
-         3R45Jh2pe+q7TWWAQ6c1sSAKdk6iumh59x0tQ2UPSkqDokOd1quAV2RCD144E3WldSO8
-         2l8BvyuCzOzFsuYG2WBPSfLYN6OyDZ1TUlOAz3ppUOMiZKCAKBvQfwtjZA1vbKn75TPv
-         aPkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721090770; x=1721695570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TD66OtDeh2iGxjhj1zv4qHDsUsV2aL1QtkjuvW+JSWU=;
-        b=NckWFYUdNCSgwnEDO24r9PdpCP82yQAQzRt3tLq2qMHPTLul/xiGJSkrkultn7NTUX
-         TuS9xaObZYYewYB8KUQIL/77rNcggrRojqxmsoKTYeFanZqxXvUhNMJucqW6p6LhAOi9
-         6Xy5v7NED+qsk91tm/z9SOom8Z8ROBcaUhpEaaWo1OKKr0wSACMkAfi2WadbWWiZlf/y
-         eVk+Qp0PhjfWJCYrP5hFySbPewTRLkaeI5xV6Q8TGeaCEgeob4UIYHmZCWibyi5cgSi1
-         5coGyb0AsBGTnucstL5hrdhjtYkX/w5wedGdtzPcIgAJ9E9cUMkF46GvK4+BloyvZXst
-         PmsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTsqCZATQ+GpssZZG1IGN2W0ONcwCNCq/VanuCmBsexahlqkaRxzYYByRNWWojeYls4gjuN8nTP9LfYZulsU4nJsT662bI
-X-Gm-Message-State: AOJu0YwkD0PpIsRyXhkYSQcrumRuTNFzOmZWy+YzBm0ldpGQzQp67Xda
-	dRKvADtCKbwAAggbfcMkN7VGNXYdD7vtCuRG5z0yrtANTq1+DcXAAzTzMOI2md9BmdEDBFCk+zl
-	ggP/91M9pUHxuvvsHlPB1dmKqKWi3cGt9BVaU0g==
-X-Google-Smtp-Source: AGHT+IH2/Rko98brgCuBjHJl2Gx5ElpjIF+OOpCL1/BI2lJd+gA1z6MJ0fwOhu2NUVrUxOY5J6MQlr1Xw34lVNgzmNs=
-X-Received: by 2002:a81:7c06:0:b0:64a:5f5a:b38c with SMTP id
- 00721157ae682-66381bbc211mr7303107b3.26.1721090770201; Mon, 15 Jul 2024
- 17:46:10 -0700 (PDT)
+	s=arc-20240116; t=1721091262; c=relaxed/simple;
+	bh=AlcLkl3ZckSTetDqtkbewgaIlrmC0fd1HpPyOnPIDOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jpVPqVe7iCrlh3YDbvHd+bLgmVEf4hB12qktHNbyUuKaW84O8qkrtS2XxQc3lNXXD6lGoHczOXpfXQYaA+8RXP7kXNgD7OF0hppQnA81Kxbt3A/noe5yJA/BK+8SABhGxi7yOwgoYdIaU7X1dsusI2iXMv4AZd26EKZmHlz3m+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fcLeNty4; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721091261; x=1752627261;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AlcLkl3ZckSTetDqtkbewgaIlrmC0fd1HpPyOnPIDOY=;
+  b=fcLeNty4gachm/QAf+C34YoA5aWRnQEdXL9M65DlntQxphUR0+uwE+S7
+   GBJrFHw6b5W0cYoH7Q8ElXPyUdJmFR8Z10QXaK6M6emWUa0OF7Hv9R86n
+   griNzwxMIyQsODnStNbF/KWeR/tzJQVhe16KL3pfcxagRCHZZ82o5o6SJ
+   detH0otubmzxRLnTsIG+mcbUg6PaEcILdh7XcoRxGokcPzT4HoXQ4/bxe
+   7ctPnTcwIgT/CmndfJ99SE2HfI361EPZxLt2URHyYoB3N36ogWcPPJsxf
+   6uKMZvPYcdO2Bn/6T+9UyQkRFTVNkDDL7GOBh/UZBy6hcW/fZiYLiUX1+
+   A==;
+X-CSE-ConnectionGUID: 93vqPGZLQkyK+1RI9tBqrQ==
+X-CSE-MsgGUID: 3Lq3RKmsSFmeiZZqV2jmHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="18642260"
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="18642260"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 17:54:20 -0700
+X-CSE-ConnectionGUID: lF6M1kDsQcupE5CgB6cnNw==
+X-CSE-MsgGUID: EmctZzIbRMavmTAEQvtPpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="49900247"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 15 Jul 2024 17:54:16 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sTWSM-000eiJ-1i;
+	Tue, 16 Jul 2024 00:54:14 +0000
+Date: Tue, 16 Jul 2024 08:53:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dan.j.williams@intel.com,
+	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	richard.hughes@amd.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v2 09/15] cxl: define a driver interface for HPA free
+ space enumaration
+Message-ID: <202407160818.7GrterxM-lkp@intel.com>
+References: <20240715172835.24757-10-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240715221126.487345-2-vadorovsky@gmail.com>
-In-Reply-To: <20240715221126.487345-2-vadorovsky@gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Mon, 15 Jul 2024 19:45:59 -0500
-Message-ID: <CALNs47t=YQX+UP_ekq_Ue=BrA4JscDbU1qNDoKFar3yUbOSZ5g@mail.gmail.com>
-Subject: Re: [PATCH v3] rust: str: Use `core::CStr`, remove the custom `CStr` implementation
-To: Michal Rostecki <vadorovsky@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Martin Rodriguez Reboredo <yakoyoku@gmail.com>, 
-	Manmohan Shukla <manmshuk@gmail.com>, Valentin Obst <kernel@valentinobst.de>, 
-	Asahi Lina <lina@asahilina.net>, Yutaro Ohno <yutaro.ono.418@gmail.com>, 
-	Danilo Krummrich <dakr@redhat.com>, Charalampos Mitrodimas <charmitro@posteo.net>, 
-	Ben Gooding <ben.gooding.dev@gmail.com>, Tejun Heo <tj@kernel.org>, 
-	Roland Xu <mu001999@outlook.com>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240715172835.24757-10-alejandro.lucero-palau@amd.com>
 
-On Mon, Jul 15, 2024 at 5:14=E2=80=AFPM Michal Rostecki <vadorovsky@gmail.c=
-om> wrote:
+Hi,
 
-> diff --git a/rust/kernel/kunit.rs b/rust/kernel/kunit.rs
-> index 0ba77276ae7e..c08f9dddaa6f 100644
-> --- a/rust/kernel/kunit.rs
-> +++ b/rust/kernel/kunit.rs
-> [...]
->              // SAFETY: FFI call without safety requirements.
->              let kunit_test =3D unsafe { $crate::bindings::kunit_get_curr=
-ent_test() };
-> @@ -71,11 +71,11 @@ macro_rules! kunit_assert {
->                  //
->                  // This mimics KUnit's failed assertion format.
->                  $crate::kunit::err(format_args!(
-> -                    "    # {}: ASSERTION FAILED at {FILE}:{LINE}\n",
-> +                    "    # {:?}: ASSERTION FAILED at {FILE:?}:{LINE:?}\n=
-",
->                      $name
->                  ));
->                  $crate::kunit::err(format_args!(
-> -                    "    Expected {CONDITION} to be true, but is false\n=
-"
-> +                    "    Expected {CONDITION:?} to be true, but is false=
-\n"
->                  ));
+kernel test robot noticed the following build warnings:
 
-These aren't exactly the same: the existing `Display` impl will print
-the string (hexifying invalid characters), but this will add `" ... "`
-around it.
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.10 next-20240715]
+[cannot apply to cxl/next cxl/pending horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-In Rust's libraries, string `Path` and `OsStr` both have a
-`.display()` method that returns a wrapper type that does implement
-`fmt::Display`, which can then be printed (see [1]). We could do
-something similar here, via a `CStrExt` trait that goes in the prelude
-and provides `.display(&self)`.
+url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20240716-015920
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20240715172835.24757-10-alejandro.lucero-palau%40amd.com
+patch subject: [PATCH v2 09/15] cxl: define a driver interface for HPA free space enumaration
+config: i386-buildonly-randconfig-004-20240716 (https://download.01.org/0day-ci/archive/20240716/202407160818.7GrterxM-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240716/202407160818.7GrterxM-lkp@intel.com/reproduce)
 
-Rust itself could actually use something here too - if you're up for
-it, feel free to propose an implementation via ACP (that's just an
-issue template at [2]). It would probably be pretty similar to the
-recent `OsStr` one. Of course it will be a while before we can use it
-in the kernel, but it wouldn't hurt to get the ball rolling.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407160818.7GrterxM-lkp@intel.com/
 
-[1]: https://doc.rust-lang.org/std/path/struct.Path.html#method.display
-[2]: https://github.com/rust-lang/libs-team/issues
+All warnings (new ones prefixed by >>):
 
->  /// Creates a new [`CStr`] from a string literal.
->  ///
-> -/// The string literal should not contain any `NUL` bytes.
-> +/// Usually, defining C-string literals directly should be preffered, bu=
-t this
-> +/// macro is helpful in situations when C-string literals are hard or
-> +/// impossible to use, for example:
-> +///
-> +/// - When working with macros, which already return a Rust string liter=
-al
-> +///   (e.g. `stringify!`).
-> +/// - When building macros, where we want to take a Rust string literal =
-as an
-> +///   argument (for caller's convenience), but still use it as a C-strin=
-g
-> +///   internally.
-> +///
+   In file included from drivers/net/ethernet/sfc/efx_cxl.c:17:
+   drivers/net/ethernet/sfc/efx_cxl.h:11:9: warning: 'EFX_CXL_H' is used as a header guard here, followed by #define of a different macro [-Wheader-guard]
+      11 | #ifndef EFX_CXL_H
+         |         ^~~~~~~~~
+   drivers/net/ethernet/sfc/efx_cxl.h:12:9: note: 'EFX_CLX_H' is defined here; did you mean 'EFX_CXL_H'?
+      12 | #define EFX_CLX_H
+         |         ^~~~~~~~~
+         |         EFX_CXL_H
+>> drivers/net/ethernet/sfc/efx_cxl.c:89:7: warning: format specifies type 'unsigned long long' but the argument has type 'resource_size_t' (aka 'unsigned int') [-Wformat]
+      88 |                 pci_info(pci_dev, "CXL accel not enough free HPA space %llu < %u\n",
+         |                                                                        ~~~~
+         |                                                                        %u
+      89 |                                   max, EFX_CTPIO_BUFFER_SIZE);
+         |                                   ^~~
+   include/linux/pci.h:2683:67: note: expanded from macro 'pci_info'
+    2683 | #define pci_info(pdev, fmt, arg...)     dev_info(&(pdev)->dev, fmt, ##arg)
+         |                                                                ~~~    ^~~
+   include/linux/dev_printk.h:160:67: note: expanded from macro 'dev_info'
+     160 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                                                  ~~~     ^~~~~~~~~~~
+   include/linux/dev_printk.h:110:23: note: expanded from macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                              ~~~    ^~~~~~~~~~~
+   2 warnings generated.
 
-s/preffered/prefered
 
-"when C-string literals are hard or impossible to use" doesn't sound
-quite right - I think it is more common that you're just hiding an
-implementation detail (string type) from the user of a macro. Maybe
-something like:
+vim +89 drivers/net/ethernet/sfc/efx_cxl.c
 
-    This isn't needed when C-string literals (`c"hello"` syntax) can be
-    used directly, but can be used when a C-string version of a standard st=
-ring
-    literal is required (often when working with macros).
+    15	
+    16	#include "net_driver.h"
+  > 17	#include "efx_cxl.h"
+    18	
+    19	#define EFX_CTPIO_BUFFER_SIZE	(1024*1024*256)
+    20	
+    21	void efx_cxl_init(struct efx_nic *efx)
+    22	{
+    23		struct pci_dev *pci_dev = efx->pci_dev;
+    24		struct efx_cxl *cxl = efx->cxl;
+    25		resource_size_t max = 0;
+    26		struct resource res;
+    27		u16 dvsec;
+    28	
+    29		dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
+    30						  CXL_DVSEC_PCIE_DEVICE);
+    31	
+    32		if (!dvsec)
+    33			return;
+    34	
+    35		pci_info(pci_dev, "CXL CXL_DVSEC_PCIE_DEVICE capability found");
+    36	
+    37		cxl->cxlds = cxl_accel_state_create(&pci_dev->dev,
+    38						    CXL_ACCEL_DRIVER_CAP_HDM);
+    39		if (IS_ERR(cxl->cxlds)) {
+    40			pci_info(pci_dev, "CXL accel device state failed");
+    41			return;
+    42		}
+    43	
+    44		cxl_accel_set_dvsec(cxl->cxlds, dvsec);
+    45		cxl_accel_set_serial(cxl->cxlds, pci_dev->dev.id);
+    46	
+    47		res = DEFINE_RES_MEM(0, EFX_CTPIO_BUFFER_SIZE);
+    48		cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_DPA);
+    49	
+    50		res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
+    51		cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_RAM);
+    52	
+    53		if (cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds)) {
+    54			pci_info(pci_dev, "CXL accel setup regs failed");
+    55			return;
+    56		}
+    57	
+    58		if (cxl_accel_request_resource(cxl->cxlds, true))
+    59			pci_info(pci_dev, "CXL accel resource request failed");
+    60	
+    61		if (!cxl_await_media_ready(cxl->cxlds)) {
+    62			cxl_accel_set_media_ready(cxl->cxlds);
+    63		} else {
+    64			pci_info(pci_dev, "CXL accel media not active");
+    65			return;
+    66		}
+    67	
+    68		cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
+    69		if (IS_ERR(cxl->cxlmd)) {
+    70			pci_info(pci_dev, "CXL accel memdev creation failed");
+    71			return;
+    72		}
+    73	
+    74		cxl->endpoint = cxl_acquire_endpoint(cxl->cxlmd);
+    75		if (IS_ERR(cxl->endpoint))
+    76			pci_info(pci_dev, "CXL accel acquire endpoint failed");
+    77	
+    78		cxl->cxlrd = cxl_get_hpa_freespace(cxl->endpoint, 1,
+    79						    CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+    80						    &max);
+    81	
+    82		if (IS_ERR(cxl->cxlrd)) {
+    83			pci_info(pci_dev, "CXL accel get HPA failed");
+    84			goto out;
+    85		}
+    86	
+    87		if (max < EFX_CTPIO_BUFFER_SIZE)
+    88			pci_info(pci_dev, "CXL accel not enough free HPA space %llu < %u\n",
+  > 89					  max, EFX_CTPIO_BUFFER_SIZE);
+    90	out:
+    91		cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
+    92	}
+    93	
 
-> +/// The string should not contain any `NUL` bytes.
->  ///
->  /// # Examples
->  ///
->  /// ```
-> +/// # use core::ffi::CStr;
->  /// # use kernel::c_str;
-> -/// # use kernel::str::CStr;
-> -/// const MY_CSTR: &CStr =3D c_str!("My awesome CStr!");
-> +/// const MY_CSTR: &CStr =3D c_str!(stringify!(5));
->  /// ```
->  #[macro_export]
->  macro_rules! c_str {
->      ($str:expr) =3D> {{
->          const S: &str =3D concat!($str, "\0");
-> -        const C: &$crate::str::CStr =3D match $crate::str::CStr::from_by=
-tes_with_nul(S.as_bytes()) {
-> +        const C: &core::ffi::CStr =3D match core::ffi::CStr::from_bytes_=
-with_nul(S.as_bytes()) {
->              Ok(v) =3D> v,
->              Err(_) =3D> panic!("string contains interior NUL"),
->          };
-
-Thanks for this, will be a nice bit of code cleanup.
-
-- Trevor
-
-(also, v2 and v3 are appearing in different threads on lore (as they
-should), but they're in the same thread as v1 in my email client - any
-idea if there is a reason for this?)
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
