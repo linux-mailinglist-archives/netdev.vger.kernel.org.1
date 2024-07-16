@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-111787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9149E9329D0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:00:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889969329D1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15EE8B2163A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:00:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 131CEB216FF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2702819DF78;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC1D19DF7B;
 	Tue, 16 Jul 2024 15:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6Sj+5TW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8sllzqy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3911E889;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3621E861;
 	Tue, 16 Jul 2024 15:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721142033; cv=none; b=QlhbuOZpo/ryjcKHO7Xlg4XDP0+00+r9YZXjl+8jA7iuQjVvi+CYGihvDyEaFxztBSk3KalyAND29Mwj56/v8ndf0Jd/zx7OLdpqK63ANB6dNxiovcogp2uTiPHPWdYE7Q0/ICRR65T85kodBLd92SJanA0yZTch0JKmna7URcQ=
+	t=1721142033; cv=none; b=DbX5sZvfqQcdWZeTtmFu584ViFBH1eSkwt3CHaXeiCwzLpqSkcxMfiGl5KaEmil641Z7gI8q6UVKmcYh6uk/qhvRkEnsDV0X6X6a2biW//E1npciasWvhkLkY6SR7fpW9AKsJYrJ2eh3YgWS8+XcMDsnZ6WBWIP1d2HnCj3edOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721142033; c=relaxed/simple;
-	bh=qhkMF8KQIgDpGs8uEfEZIOOfX/MKKHV0oErPGRa35hk=;
+	bh=FeiFYy9THrb7N4QDM9ks7jrXubXqyWHCRCwbJ7CCbcc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OkcNcYSVd9VdYaWbyhoIYtX5shFQqKiHXtSUz06a1V7ovF74zZgoBsiZ6ytYuFTB6cGtTKYVvuQtpU4WWpqRZ2K5625hg6rs5nzpVPsbBs1gVaveKpsUMgyn5TZnAU02AoxaUBe7ssKMaGRIBbcdMfZ+ZehNsveh+b9bq4BLPUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6Sj+5TW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 72973C4AF0E;
+	 In-Reply-To:To:Cc; b=HZeklliQWNYEBP0NEdOOeXzqUMDMd2O/rK2ZDMqoFchEXRw30qUGGWyog835hFfr4DMZ4pS4F1SEnU0XVtc8t2m9o/JciVEv5qvTAcL0hm+CC5g3heB+w682r2+nxm+phBTods4CWbvLW/GsE/bapMQVV9fTnkpFIoYaPg6pSb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8sllzqy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87897C4AF10;
 	Tue, 16 Jul 2024 15:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1721142032;
-	bh=qhkMF8KQIgDpGs8uEfEZIOOfX/MKKHV0oErPGRa35hk=;
+	bh=FeiFYy9THrb7N4QDM9ks7jrXubXqyWHCRCwbJ7CCbcc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f6Sj+5TWpgs4WeJid8ixrMdJdSX9UApFDlTCmkN3s+Av97Er0Y0bZYukzm6OZHRQ5
-	 Djt3mhoyx7O2qwy8QTKmbWksXanjZ1ChimZxxTecvvbusozV6usAq6nlmFJx9vvYcH
-	 I/WJ9d6mhULKblX74n5afqBSvihqdg+Ff3xXMP1G9y6rjWjdxn8EvViZBFmD7chBVV
-	 y93zBp6xH2zJ/cRefVLhVY4/yuZkULQ2TnoxQZaI1Jg+sXRuQpTdusBxGSmOiRCsOK
-	 DaIaSB/8f4piYbKkGfYklTasHPiLupUevyyJQWedLoNDJJPTQA1FVKzSDaUrvdT7oq
-	 kFWuvegQBI1oA==
+	b=s8sllzqy6U0Axeqyvtp4Mf86ItkVGdrMSZIZ7GETGbsKtYdtXl12Y8L9rbnjUcp7i
+	 neNiG5FTFFOzmUUo2EUxawFnhLD6tLNfIILaQ9nCFhZO+RTJsFMBPuNphhUd0a+7F+
+	 ZdLJHOZymUNNZkOSedJUQqBVaEVin1b/4p1jK4GhDvevC8rXiR4+knqr6mmcuz2ST6
+	 bjRgMxvaxOLKR0vNO1bxJirKpBB4cPAbcobsx7OQPYslKZst2ZnsTiQTgSLFLzCmS6
+	 MAlZl2fSq5v/Bh6WejkQfm5VW6Fhec+RF609XBD1kTsRKl2k0PzgTVJDslZSF1T36s
+	 yqwTlBmz8sAUA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5C2A0C4332E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FFFEC43335;
 	Tue, 16 Jul 2024 15:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] eth: fbnic: Fix spelling mistake "tiggerring" ->
- "triggering"
+Subject: Re: [PATCH v2] net/ipv4/tcp_cong: Replace strncpy() with strscpy()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172114203237.4794.14903597720826350692.git-patchwork-notify@kernel.org>
+ <172114203245.4794.1156267862455806802.git-patchwork-notify@kernel.org>
 Date: Tue, 16 Jul 2024 15:00:32 +0000
-References: <20240716093851.1003131-1-colin.i.king@gmail.com>
-In-Reply-To: <20240716093851.1003131-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: alexanderduyck@fb.com, kuba@kernel.org, kernel-team@meta.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240714041111.it.918-kees@kernel.org>
+In-Reply-To: <20240714041111.it.918-kees@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Jul 2024 10:38:51 +0100 you wrote:
-> There is a spelling mistake in a netdev_warn message. Fix it.
+On Sat, 13 Jul 2024 21:11:15 -0700 you wrote:
+> Replace the deprecated[1] uses of strncpy() in tcp_ca_get_name_by_key()
+> and tcp_get_default_congestion_control(). The callers use the results as
+> standard C strings (via nla_put_string() and proc handlers respectively),
+> so trailing padding is not needed.
 > 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Since passing the destination buffer arguments decays it to a pointer,
+> the size can't be trivially determined by the compiler. ca->name is
+> the same length in both cases, so strscpy() won't fail (when ca->name
+> is NUL-terminated). Include the length explicitly instead of using the
+> 2-argument strscpy().
+> 
+> [...]
 
 Here is the summary with links:
-  - [next] eth: fbnic: Fix spelling mistake "tiggerring" -> "triggering"
-    https://git.kernel.org/netdev/net-next/c/77ae5e5b0072
+  - [v2] net/ipv4/tcp_cong: Replace strncpy() with strscpy()
+    https://git.kernel.org/netdev/net-next/c/a3bfc095060b
 
 You are awesome, thank you!
 -- 
