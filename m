@@ -1,165 +1,176 @@
-Return-Path: <netdev+bounces-111718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE1B09323AB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:14:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB3A9323BE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:17:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69DC4284C4C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 10:14:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD3D71C20F0A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 10:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533F61991C9;
-	Tue, 16 Jul 2024 10:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D2F1991BE;
+	Tue, 16 Jul 2024 10:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NTEDsi9k"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QffpEaVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A80198A29
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 10:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0912C1991AA
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 10:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721124830; cv=none; b=X5L9W/sl2k1BNk4IycZXb/Uoe0/wOQo0a3GbEmd/r4FPze6gw2xtMrEfXsMq1qNPklJ8+Sh5FZzP/fzM81jHLq6f0LIcy0bZFO833loSXzqie7/XrIqEW3J7sRFxXrbDhXDRGcHco4Z2vbizvV5VIA3v8FsmNd4BLkr3FfEzEBw=
+	t=1721125065; cv=none; b=CffxCegM5rVsRRp6hYdR9+HFC+7FZLceeL/VIefPZRwbY18DsOoO9/j58gnUB+/l/p7llcAbhJx8UU8b0Ux+V8OCj+8LRgQaegHdvdH/H1uMSDuuxE0u/8W0r56NQgO5c+9C/nbZOtEMIQB+qNAXBPdDO8Q7Wvua4PwT+ma34XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721124830; c=relaxed/simple;
-	bh=f8Gky9YqWDCmNh8MKNY9H8sRB+mkfPsGLsY2vGiP7+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4UuigBXxL8y2xYsVesLjzSUgmi87UvzL4DswyV7JUwYhJaNH6jX92+1A+11vNq/SkFwfVDjHAKAILd85/GdwCMYeR5H9J16z1GX2eDcK+ZHuVYGYqDTwrHOPJbVLYQk5mHAspW9yo6bSj9TUIpkWxfLYuVcFgEzbPfbwDeO7mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NTEDsi9k; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70af3d9169bso3640722b3a.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 03:13:47 -0700 (PDT)
+	s=arc-20240116; t=1721125065; c=relaxed/simple;
+	bh=1SpVvLeQUy6M2nodyPepY4vIlLRLMn5jCT9Jkh3yqUU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=aYj75Yb4YJ9RWkKgDhYD+LgSL9P/diYEC0EkTU5tARU/Cbn77dNZN3psm0QIiYi6FGNGSE2zBQTSSbL9fHf+JUW2NKCPfkjU7G12k9ByEhOUo8lfMms28ALV+SGLZb//DX1ja+LDURuFRWFpnqFI9al62dILfcg6vEMkQQwQdfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QffpEaVA; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-58b447c519eso7088665a12.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 03:17:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721124827; x=1721729627; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g6gMwbuavCbnycNTjRaKx9Abv3DoqBPYUEzkdAtOD14=;
-        b=NTEDsi9kYF9duQPxqkOq3Bkr6Vol49BNRWzhV2wsTBiR7MJtBd+1IRNl4jzjrxoUAv
-         Ykd5vKc7d+ndCODB7vfiibVcjhTZ6DkOt98lfgDBgb0QTKO1LfpaUmfF/TuD8x7oS9XD
-         C+sd80RtqFIrVMON04BADFTBcEywMkjURVrCO4sQf4Sd56oPOTrjirsk+VgyNUI0JvkR
-         IjzBRi0FEk4DLGimAtE/KdozIezmWTU0VYTR6nGHDPgafu6qtCrWU8PFPoLIEB6KUqyP
-         kLYXTr3nvppS6V/MQ1Simq77QoMT5FvSVNHjjH9E33TIgzc4bmPdoTayW/ZGytsTvTDb
-         ddjw==
+        d=cloudflare.com; s=google09082023; t=1721125062; x=1721729862; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h3LxmxCoW3E8bDNIaxIpOdypnPGQGV/6ObFe/9muMyw=;
+        b=QffpEaVAxTdSjQBdK2/LpCl++EiuZPpBIwR1XPdDo0HaDmqPJop4oZPcHrXmV0VkP+
+         4lEObgRrI9BjFd3pkcnbMSz+1Ym/cKaRNbGM7N1RqEbo7OKrKyQbmWLFJj8MsILczWAR
+         5DbsZE+GTp7Jaf2nPMxnmxmefb0Um+EjpvLq66XQzGmmrsS2CZGy7cH+FN9wRLAUat99
+         GMiJA2n6G6JqDxM+OvXpxVYWq2fYcw7fw3HxxGZohTYFwBKLwmVYlg44nAA57kfjfnuf
+         136wZ6pPQcsVYGR8HsRB4ySqlcjafBJHheRq5rQjdzSWbS9+3UgtK4fsdqDRVR0OZXXU
+         J5SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721124827; x=1721729627;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g6gMwbuavCbnycNTjRaKx9Abv3DoqBPYUEzkdAtOD14=;
-        b=P1ycX3Rtuh1wPzZaq1z83xlm1p/BPI9yX6QPuH1n+qUPaDQTr26Q1cFv/zxkheWseB
-         fno220sswQBNDYBgpKXTSMfaZUfKy6jQ5ArnlsHpZUQBGxX/sX8jdYR4n9Y8n1OkuuxW
-         5ot/a/GnVGhHuZI2GVbe0yWGYPZ7WR7tMICvqL7zHcAq2pnXEqSViXg52+IZLa7663Ja
-         1ln1s6EAxxF1+BHC9W1hExe1qOfvbet/TS74eHcp6vAIUt9NOvyZNeIs1WLxTAwLI09B
-         I59485el6jdRppG8/Fu/YGRVOW4UQPRyc+6H/L8vnvCrWiO5IZsBKxdpm9V7ke5otnLO
-         vkJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeSJFPJzWrGOisLQv6wNIrDR4n5hwiQ+ufg4GminYdVkN5070jhKIAs9TV4RoumyGbgnAQogZrEsqXONZTqdfwrtZtCs/Q
-X-Gm-Message-State: AOJu0Ywq+Nyf2WJ55bWiJq8GJbbKX35ux9/kv9KcBV4mVEfjsAzAiK3m
-	sDTAp38amKIP8Sngjhz3uedKeMmFg/vt8hgsemXMgfSKsJsuSZbQozkik2S0kw==
-X-Google-Smtp-Source: AGHT+IEDJskFirz6paZGF1HW14iR2GuRPxyEKCS91A1U9kJEn0J3pLh5f3w2w9WhXlu21KxqWnu3BQ==
-X-Received: by 2002:a05:6a00:170d:b0:706:6272:417 with SMTP id d2e1a72fcca58-70c1fbd50acmr2120187b3a.10.1721124827058;
-        Tue, 16 Jul 2024 03:13:47 -0700 (PDT)
-Received: from thinkpad ([220.158.156.207])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7eb9e285sm5915488b3a.8.2024.07.16.03.13.42
+        d=1e100.net; s=20230601; t=1721125062; x=1721729862;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h3LxmxCoW3E8bDNIaxIpOdypnPGQGV/6ObFe/9muMyw=;
+        b=CS8WOvBco5EN7ukNb69M3o57kpHR521BznMNP3e+GoWJIMQruVLjBXsPJK+T9tSxA4
+         EpmRpz+fTBplV7hkYtCaKzR5ZOqeDzYjq0kvD3eu5RHNE3U97lQyiUXbx50yxKqkD9GC
+         XSy2a2vjI7OVRMm3zmFmFU24Vio1fyYG+oCXuvpJ5IgEJTMkSoLjmt5artqHR28SoTLM
+         62KZSulRXyA/r7O1sbSmCT/unm7yJ96ETJPEgqSQc/FhSMTagVpCSHN/ew0fIsRmZp7s
+         tyCcy6WT+KAW0ecaFcJSAbXxhgsnYshiixD1+0qtqJCR7XF/lonLSbHHUfRmxm2rkUfx
+         5qiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQydP8uC6JcfV4OzklVYXmSsas9xGtty5jQ9TPtLDcXZX0/Xt7pZIKVqk/H5+t256IHC8yTPxu541XbsB9XSBoFhjQLeNK
+X-Gm-Message-State: AOJu0YxJrkwX5uzT0NsOQ6aHVvKmhhSJUHbL4lg6wCDMIt0vLBqhiRhE
+	CgCemKGj/dltMO4VU1KCZAAhr+BJNi038IeLk6zdXifPGvDT/L/B1H6yB4D9y0E=
+X-Google-Smtp-Source: AGHT+IH8nILJXMilbhvyoNcXg2t3GY0Ge5UpJ/i0bhjtXPS9zxhmWBR4mLOmhf6ZFPFHsBLZye6CXg==
+X-Received: by 2002:a50:c317:0:b0:573:5c4f:27a8 with SMTP id 4fb4d7f45d1cf-59ef01bb430mr971210a12.35.1721125062250;
+        Tue, 16 Jul 2024 03:17:42 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:77])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59b268a276bsm4603777a12.62.2024.07.16.03.17.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 03:13:46 -0700 (PDT)
-Date: Tue, 16 Jul 2024 15:43:35 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Patrick Wildt <patrick@blueri.se>
-Cc: Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Steev Klimaszewski <steev@kali.org>, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: x1e80100-yoga: add wifi
- calibration variant
-Message-ID: <20240716101335.GK3446@thinkpad>
-References: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
- <ZpV7OeGNIGGpqNC0@windev.fritz.box>
+        Tue, 16 Jul 2024 03:17:41 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: syzbot <syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com>,
+  davem@davemloft.net,  dsahern@kernel.org,  edumazet@google.com,
+  kuba@kernel.org,  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
+  soheil@google.com,  syzkaller-bugs@googlegroups.com,  willemb@google.com
+Subject: Re: [syzbot] [net?] WARNING in skb_warn_bad_offload (5)
+In-Reply-To: <5e4905d7-32e1-4359-9720-a32330aec424@redhat.com> (Paolo Abeni's
+	message of "Tue, 16 Jul 2024 12:04:02 +0200")
+References: <000000000000e1609a061d5330ce@google.com>
+	<5e4905d7-32e1-4359-9720-a32330aec424@redhat.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Tue, 16 Jul 2024 12:17:40 +0200
+Message-ID: <87wmll7i9n.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZpV7OeGNIGGpqNC0@windev.fritz.box>
+Content-Type: text/plain
 
-On Mon, Jul 15, 2024 at 09:40:41PM +0200, Patrick Wildt wrote:
-> Describe the bus topology for PCIe domain 4 and add the ath12k
-> calibration variant so that the board file (calibration data) can be
-> loaded.
-> 
-> Signed-off-by: Patrick Wildt <patrick@blueri.se>
+On Tue, Jul 16, 2024 at 12:04 PM +02, Paolo Abeni wrote:
+> On 7/16/24 03:23, syzbot wrote:
+>> syzbot found the following issue on:
+>> HEAD commit:    80ab5445da62 Merge tag 'wireless-next-2024-07-11' of git:/..
+>> git tree:       net-next
+>> console+strace: https://syzkaller.appspot.com/x/log.txt?x=175fb821980000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=2dbcdd8641c4638f
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=e15b7e15b8a751a91d9a
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=172bf566980000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12fff535980000
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/184da3869c30/disk-80ab5445.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/85bfe9b60f21/vmlinux-80ab5445.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/06064623a948/bzImage-80ab5445.xz
+>> The issue was bisected to:
+>> commit 10154dbded6d6a2fecaebdfda206609de0f121a9
+>> Author: Jakub Sitnicki <jakub@cloudflare.com>
+>> Date:   Wed Jun 26 17:51:26 2024 +0000
+>>      udp: Allow GSO transmit from devices with no checksum offload
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=142ccbed980000
+>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=162ccbed980000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=122ccbed980000
+>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+>> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+>> skb frag:     00000080: 62 3f 77 e4 0e 82 0d 2f 85 cc 44 ea 25 5a 99 76
+>> skb frag:     00000090: f2 53
+>> ------------[ cut here ]------------
+>> ip6tnl0: caps=(0x00000006401d7869, 0x00000006401d7869)
+>> WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+>> Modules linked in:
+>> CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzkaller-01603-g80ab5445da62 #0
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+>> RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+>> Code: e8 5f 94 a3 f8 49 8b 04 24 48 8d 88 a0 03 00 00 48 85 c0 48 0f 44 cd 48 c7 c7 00 cc c5 8c 4c 89 f6 48 89 da e8 fb 92 ff f7 90 <0f> 0b 90 90 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 44 89 f9
+>> RSP: 0018:ffffc900034bedc8 EFLAGS: 00010246
+>> RAX: 7d287cad4185da00 RBX: ffff888040cdc0b8 RCX: ffff888023d1bc00
+>> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+>> RBP: ffffffff8cc5cbc0 R08: ffffffff815857b2 R09: fffffbfff1c39994
+>> R10: dffffc0000000000 R11: fffffbfff1c39994 R12: ffff888022880518
+>> R13: dffffc0000000000 R14: ffff888040cdc130 R15: ffff888040cdc130
+>> FS:  000055556e9e9380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 0000000020001180 CR3: 000000007c876000 CR4: 00000000003506f0
+>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> Call Trace:
+>>   <TASK>
+>>   __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
+>>   skb_gso_segment include/net/gso.h:83 [inline]
+>>   validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
+>>   __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
+>>   neigh_output include/net/neighbour.h:542 [inline]
+>>   ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
+>>   ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
+>>   ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
+>>   udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
+>>   udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
+>>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>>   __sock_sendmsg+0xef/0x270 net/socket.c:745
+>>   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+>>   ___sys_sendmsg net/socket.c:2639 [inline]
+>>   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
+>>   __do_sys_sendmmsg net/socket.c:2754 [inline]
+>>   __se_sys_sendmmsg net/socket.c:2751 [inline]
+>>   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
+>>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>> RIP: 0033:0x7f04f688fe89
+>> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+>> RSP: 002b:00007ffeebc526e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+>> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f04f688fe89
+>> RDX: 0000000000000001 RSI: 0000000020003cc0 RDI: 0000000000000003
+>> RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
+>> R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffeebc52740
+>> R13: 00007f04f68dd406 R14: 0000000000000003 R15: 00007ffeebc52720
+>>   </TASK>
+>
+> Looking at the console log, the the relevant GSO packet is an UFO one with
+> CSUM_NONE. commit 10154dbded6d6a2fecaebdfda206609de0f121a9 only adjust the skb
+> csum for USO packets. @Jakub S. could you please have a look?
 
-Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-
-- Mani
-
-> ---
->  .../boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts      |  9 +++++++++
->  arch/arm64/boot/dts/qcom/x1e80100.dtsi                 | 10 ++++++++++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> index fbff558f5b07..f569f0fbd1fc 100644
-> --- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> +++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> @@ -635,6 +635,15 @@ &pcie4_phy {
->  	status = "okay";
->  };
->  
-> +&pcie4_port0 {
-> +	wifi@0 {
-> +		compatible = "pci17cb,1107";
-> +		reg = <0x10000 0x0 0x0 0x0 0x0>;
-> +
-> +		qcom,ath12k-calibration-variant = "LES790";
-> +	};
-> +};
-> +
->  &pcie6a {
->  	perst-gpios = <&tlmm 152 GPIO_ACTIVE_LOW>;
->  	wake-gpios = <&tlmm 154 GPIO_ACTIVE_LOW>;
-> diff --git a/arch/arm64/boot/dts/qcom/x1e80100.dtsi b/arch/arm64/boot/dts/qcom/x1e80100.dtsi
-> index 7bca5fcd7d52..70eeacd4f9ad 100644
-> --- a/arch/arm64/boot/dts/qcom/x1e80100.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/x1e80100.dtsi
-> @@ -3085,6 +3085,16 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->  			phy-names = "pciephy";
->  
->  			status = "disabled";
-> +
-> +			pcie4_port0: pcie@0 {
-> +				device_type = "pci";
-> +				reg = <0x0 0x0 0x0 0x0 0x0>;
-> +				bus-range = <0x01 0xff>;
-> +
-> +				#address-cells = <3>;
-> +				#size-cells = <2>;
-> +				ranges;
-> +			};
->  		};
->  
->  		pcie4_phy: phy@1c0e000 {
-> -- 
-> 2.45.2
-> 
-> 
-
--- 
-மணிவண்ணன் சதாசிவம்
+Will do. Thanks for the hint.
 
