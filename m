@@ -1,132 +1,160 @@
-Return-Path: <netdev+bounces-111797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FBDE932C9B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:57:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 970BC932AF1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EA0F28525B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:57:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B97001C22B19
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F02F19E7FE;
-	Tue, 16 Jul 2024 15:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F422719B3D3;
+	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Vg+roO45"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRifRU+X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B6219AD59;
-	Tue, 16 Jul 2024 15:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886E19A86F;
+	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145386; cv=none; b=jzfok2iy2C76sUx+VNag8G6nxczEImAwRQ9Tz3j3JXL8eGcG9N5DDIeBKoUd4DpDRbQvCOk2JT9Vf/oL+md+ptbzPfJ6S6m5330naZblh6qQeSFjWuMylrvlHGDOotCPEPRY3+a23qv8YK3PujBK2Eigmi7ikNjDKR/oq7DMt48=
+	t=1721144381; cv=none; b=jAq5aqYt+t1RI+lh5f52lHlzg2Z08q1DD+ywlk6uvvTd4K6imQ6a1uQX/WIDHE7SOS06veTh+g5jv7t1dKEoKqtlJaWI1TpRF74kSj090IEt/6YSqlHjPb/aeupgjEBZpreNGElH+sWEG+Azu6XfLmBYf2DcAu0IKVanXKm6HQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145386; c=relaxed/simple;
-	bh=gAN4rPO1rDlM4Jgl9KFPBLbS35m5zXKZv76hC6c4Uvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Frpw6Vqe5hOhqFZzSi2zzS3aSN9ejXSrmD+ZJuinTD8batDyvYoszBFzgqE8Y5ibVfoNxBwBs2i6rykA+okSYbpn8YpK+AcveN0eGe5sA3wu9mrdiEIcgvsuxQCfMy0Iy9AFbxirb2+wXF2HuEJEIwudaj4F8lTdZ+krQpc9+is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Vg+roO45; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA50DC4AF10;
-	Tue, 16 Jul 2024 15:56:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721145384;
-	bh=gAN4rPO1rDlM4Jgl9KFPBLbS35m5zXKZv76hC6c4Uvw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vg+roO45cPAmJiyUAbHkthL8oKVUf1TXryFWEG2SKoeV4ChX4lxW+VVe3s5OaN2AH
-	 vOJJSGGUDlZpr3gAHajBNb60gWkUlTpT7aH7pglB6Ic0zindR0Iwtdk7do1X3OGWcf
-	 lXWLB/H2NbcuAfypA39v/P4il6ocjiUdzoxCEoUI=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1721144381; c=relaxed/simple;
+	bh=C1k0pii6K6mISsN7ikworzl7ytrXnGBw4UelyAmvbWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYSOlu4QyfTowlYX8qbvjQOHPBVr182AxJ81udwrjz90gAJzYlaTHhQp75REsTkf679p/hCyTe887O2gx8nTgobSFTYAaTBikHT9NS3Iz0BQipk54uz8/bQlU566GuHaLJOP6F97znLU78KWtFJ87EDMpZMASYCdxKkrrQyl2CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRifRU+X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88487C4AF0B;
+	Tue, 16 Jul 2024 15:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721144381;
+	bh=C1k0pii6K6mISsN7ikworzl7ytrXnGBw4UelyAmvbWc=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=pRifRU+Xc+hgTIIzsj8Niih5psN5fJ8f92vDRMRyELzF9g1nEtkXzvSnTQIGcR2pB
+	 hdg7LBTYVPJngy4Bu2e9cjVFtjB1q0kgBhMtTpKyQbRGBuWlrBtsl+Ll29hkyH7LeH
+	 Fh4qjbFUZwWodMD3luPFQ/Ym7h3H8d5/AVj9dPG9bEuRqNdZ8Xz31nC992fnC84nhk
+	 Yw/nQxXQiCfZ7QnXvuGmkjpMIBNam8oiFLKPDo9/26DU+fNbdaMnLM/YYfjusadXKQ
+	 hsYZSFx1wXFkkkE+4Fr4BYQY2KKV1Dm/s+fH/SNFTUO9oQobXO39vYx0AS7/ZNnbzL
+	 0xQH18MTum5Yw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 269B2CE13CB; Tue, 16 Jul 2024 08:39:41 -0700 (PDT)
+Date: Tue, 16 Jul 2024 08:39:41 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Baochen Qiang <quic_bqiang@quicinc.com>,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 6.1 49/96] net: ks8851: Fix potential TX stall after interface reopen
-Date: Tue, 16 Jul 2024 17:32:00 +0200
-Message-ID: <20240716152748.392942744@linuxfoundation.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240716152746.516194097@linuxfoundation.org>
-References: <20240716152746.516194097@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net] wifi: ath12k: fix build vs old compiler
+Message-ID: <834dd0b3-6a2c-4af6-9541-27fd4b21d833@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
+ <a7950e7b-2275-4b6d-b8e1-4f50d0bc28e6@quicinc.com>
+ <93d282fb-4691-460a-aa5b-13e9ef054cdb@quicinc.com>
+ <A4FF7C44-06C7-4241-B33E-1E9684A979E0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <A4FF7C44-06C7-4241-B33E-1E9684A979E0@kernel.org>
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+On Tue, Jul 16, 2024 at 07:36:40AM -0700, Kees Cook wrote:
+> 
+> 
+> On July 16, 2024 7:03:55 AM PDT, Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
+> >On 7/16/2024 7:00 AM, Jeff Johnson wrote:
+> >> On 7/16/2024 4:06 AM, Paolo Abeni wrote:
+> >>> gcc 11.4.1-3 warns about memcpy() with overlapping pointers:
+> >>>
+> >>> drivers/net/wireless/ath/ath12k/wow.c: In function ‘ath12k_wow_convert_8023_to_80211.constprop’:
+> >>> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551611 or more bytes at offsets 0 and 0 overlaps 9223372036854775799 bytes at offset -9223372036854775804 [-Werror=restrict]
+> >>>   114 | #define __underlying_memcpy     __builtin_memcpy
+> >>>       |                                 ^
+> >>> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
+> >>>   637 |         __underlying_##op(p, q, __fortify_size);                        \
+> >>>       |         ^~~~~~~~~~~~~
+> >>> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+> >>>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+> >>>       |                          ^~~~~~~~~~~~~~~~~~~~
+> >>> drivers/net/wireless/ath/ath12k/wow.c:190:25: note: in expansion of macro ‘memcpy’
+> >>>   190 |                         memcpy(pat, eth_pat, eth_pat_len);
+> >>>       |                         ^~~~~~
+> >>> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551605 or more bytes at offsets 0 and 0 overlaps 9223372036854775787 bytes at offset -9223372036854775798 [-Werror=restrict]
+> >>>   114 | #define __underlying_memcpy     __builtin_memcpy
+> >>>       |                                 ^
+> >>> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
+> >>>   637 |         __underlying_##op(p, q, __fortify_size);                        \
+> >>>       |         ^~~~~~~~~~~~~
+> >>> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+> >>>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+> >>>       |                          ^~~~~~~~~~~~~~~~~~~~
+> >>> drivers/net/wireless/ath/ath12k/wow.c:232:25: note: in expansion of macro ‘memcpy’
+> >>>   232 |                         memcpy(pat, eth_pat, eth_pat_len);
+> >>>       |                         ^~~~~~
+> >>>
+> >>> The sum of size_t operands can overflow SIZE_MAX, triggering the
+> >>> warning.
+> >>> Address the issue using the suitable helper.
+> >>>
+> >>> Fixes: 4a3c212eee0e ("wifi: ath12k: add basic WoW functionalities")
+> >>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >>> ---
+> >>> Only built tested. Sending directly to net to reduce the RTT, but no
+> >>> objections to go through the WiFi tree first
+> >>> ---
+> >>>  drivers/net/wireless/ath/ath12k/wow.c | 4 ++--
+> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/drivers/net/wireless/ath/ath12k/wow.c b/drivers/net/wireless/ath/ath12k/wow.c
+> >>> index c5cba825a84a..bead19db2c9a 100644
+> >>> --- a/drivers/net/wireless/ath/ath12k/wow.c
+> >>> +++ b/drivers/net/wireless/ath/ath12k/wow.c
+> >>> @@ -186,7 +186,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
+> >>>  	if (eth_pkt_ofs < ETH_ALEN) {
+> >>>  		pkt_ofs = eth_pkt_ofs + a1_ofs;
+> >>>  
+> >>> -		if (eth_pkt_ofs + eth_pat_len < ETH_ALEN) {
+> >>> +		if (size_add(eth_pkt_ofs, eth_pat_len) < ETH_ALEN) {
+> >>>  			memcpy(pat, eth_pat, eth_pat_len);
+> >>>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
+> >>>  
+> >>> @@ -228,7 +228,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
+> >>>  	} else if (eth_pkt_ofs < prot_ofs) {
+> >>>  		pkt_ofs = eth_pkt_ofs - ETH_ALEN + a3_ofs;
+> >>>  
+> >>> -		if (eth_pkt_ofs + eth_pat_len < prot_ofs) {
+> >>> +		if (size_add(eth_pkt_ofs, eth_pat_len) < prot_ofs) {
+> >>>  			memcpy(pat, eth_pat, eth_pat_len);
+> >>>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
+> >>>  
+> >> 
+> >> Duplicate of https://msgid.link/20240704144341.207317-1-kvalo@kernel.org ??
+> >
+> >Let me add Kees & Paul to see if they prefer your solution
+> 
+> Heh, yeah, that works too! Avoid the overflow via saturating addition.
+> 
+> Reviewed-by: Kees Cook<kees@kernel.org>
 
-------------------
+Tested-by: Paul E. McKenney <paulmck@kernel.org>
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+I have no preference between the two, but it would be really nice if a
+fix were to hit both -next and mainline sooner rather than later.  ;-)
 
-commit 7a99afef17af66c276c1d6e6f4dbcac223eaf6ac upstream.
-
-The amount of TX space in the hardware buffer is tracked in the tx_space
-variable. The initial value is currently only set during driver probing.
-
-After closing the interface and reopening it the tx_space variable has
-the last value it had before close. If it is smaller than the size of
-the first send packet after reopeing the interface the queue will be
-stopped. The queue is woken up after receiving a TX interrupt but this
-will never happen since we did not send anything.
-
-This commit moves the initialization of the tx_space variable to the
-ks8851_net_open function right before starting the TX queue. Also query
-the value from the hardware instead of using a hard coded value.
-
-Only the SPI chip variant is affected by this issue because only this
-driver variant actually depends on the tx_space variable in the xmit
-function.
-
-Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org # 5.10+
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://patch.msgid.link/20240709195845.9089-1-rwahl@gmx.de
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/net/ethernet/micrel/ks8851_common.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- a/drivers/net/ethernet/micrel/ks8851_common.c
-+++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -482,6 +482,7 @@ static int ks8851_net_open(struct net_de
- 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
- 
- 	ks->queued_len = 0;
-+	ks->tx_space = ks8851_rdreg16(ks, KS_TXMIR);
- 	netif_start_queue(ks->netdev);
- 
- 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
-@@ -1101,7 +1102,6 @@ int ks8851_probe_common(struct net_devic
- 	int ret;
- 
- 	ks->netdev = netdev;
--	ks->tx_space = 6144;
- 
- 	ks->gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
- 	ret = PTR_ERR_OR_ZERO(ks->gpio);
-
-
+							Thanx, Paul
 
