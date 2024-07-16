@@ -1,153 +1,132 @@
-Return-Path: <netdev+bounces-111725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F076A9324A9
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:13:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F15C932589
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B28C3282A61
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F88C1C2245F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D761990B2;
-	Tue, 16 Jul 2024 11:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D467D198E60;
+	Tue, 16 Jul 2024 11:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UFqYks1F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8Lk+DDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8CA198E88
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 11:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553411953A8
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 11:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721128382; cv=none; b=QcMSMidkRgwz2dIxOL3R5coI20uTar5cdBE/s5hxM/X8txZw5fGhb/8sE45LEM2WOw3FRi4nzf7pCoyU/NWr89G3UVZKnk7Eos9wzkqXwwJMNROOD3NBQ0iAVbehQONYU3nwFx6MdlpGq4kKTTx3f8VZbIEdU90tBvrmVv9afvk=
+	t=1721129083; cv=none; b=IQUo9ny/+UjI6hjaejwOEaa0x9NlFLryuDAHLtVUHt3i8SIMX8tVBUWTO2WIptSjkA+1n6IPK72x3i0Hee1UoM3d9m5EM7rxg4HQUQOzei4fJUwS+47PjaMy/dPhmF8VcCvNjp70rToi+361c+iXHVot/zmwXETp33DHWoU6icE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721128382; c=relaxed/simple;
-	bh=Npyk8yTFFIp3zu60cJGVp6aA2D+oqrywC7FU3CijOAg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CpVNVhXDMnxU3gW8ydm18PE1HpoAQsuLdwvPVgtlxHfq12xsU1irZcPTuYfvuU250jN3Yz0mj+pjthAGX4Ae0k7SjpBeoAlstNqWbh3tSrqrwhxAVv+RXnoubuNuIS5NMqYn/ncM7xw4fNtNo4MLHwXexcUpFQTpJ+fRDcZ7F7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UFqYks1F; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52e98087e32so6412919e87.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 04:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721128378; x=1721733178; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lkRwuDFICXCFOrI/2I8SRM97q+8MIDN5II0awTzIkIA=;
-        b=UFqYks1FUQj1fkWtSQONxgEwcl+o5btCtEqDcCrVT9OxqiHB9vYmhNm1+w7/X4+VFH
-         Q9qiZiDhyUvnxE1bLmtmcUACwFMWspkXahEVywXfGHMy/FedYBFK8NjjV91fUU/z/RHF
-         lgFmDrUqZjYRIFeA8JJ57TaCkFrXfNr711ynsBu0aawhbENZ9a9TIHt31O5yVfCEeTED
-         /RJrjLCLs1VPO855WiAi7XY0fkMIzmbI/J9gJyGAXtiz5kW+3t5oS+rpy0YHW7f7vskh
-         SYLrCG9cYkuSNo1Xj38ZvkiOJDfEFcxq1XENPmmuBtgwWgxSpH+kn2UKY3YPeaLLVMR1
-         PfyA==
+	s=arc-20240116; t=1721129083; c=relaxed/simple;
+	bh=DgKuKRTEZ4elrnLxiUiV49PCVL1/62eRHniBrw+ImiM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LDAXr7qla/UhFB5CKxlk9yn4viR3WgEjIrqZrW36301ssTjEs2WzXKZhQi2v78s8PBiXtcRgr+YiKY2MCPVIGJB5NmsSJFM44XtFkpzgz7smsMLD+cniPIswjUFAuE6rPd78CacSyBAQx7LVAYJTfeRd7twPqNQ2s7OgFA7rM8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c8Lk+DDz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721129081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9xigDHiuKg1vf2r9wLNcMWu6wRFVXSmz8+urmcNUTy4=;
+	b=c8Lk+DDzv9DeaGNnh8kUHmDT7J9J5k+Wxnk5N1LCUaElPtoyIavNz9zEqxdgolErOTLpYu
+	3E1xALkoRNCmgV3J6fGY3O7iqUgipwQ/VM1OhZbeTvuEF6qjLn/xlF+8a7I2kmHkzHlhPt
+	PlkAhHftrrI6+XJSiVPUI+zY1MU1Q4o=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-681-BvBQb2WePbeVtV2iZlNhvA-1; Tue, 16 Jul 2024 07:24:39 -0400
+X-MC-Unique: BvBQb2WePbeVtV2iZlNhvA-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ee88b1c3e9so11463201fa.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 04:24:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721128378; x=1721733178;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lkRwuDFICXCFOrI/2I8SRM97q+8MIDN5II0awTzIkIA=;
-        b=ogjR5ObLLR0SYNWfu6m0ttb1xXr5Z8GwdRTCcwO2oy6nrzK86wSNEQSs36B5tOaVtn
-         Tat6vrNUhW387gGq+t3k21x8QGcfP+JtOBg3Wve/svOHN3jOYTOqYRh7rKmtjHaPEI6M
-         pNzc0ITdvhyKWxehmxcjw/aJ22t3RQgC8WqyrhejtLS4IkS8tlJU9UrIo2chb/kN8dWk
-         jcYxpUUkxgsmzpsx2Q8p8nijSuO9+XIux6IWS3EYRf8Y/l355WPD2eAoS/UWWFJBR7jA
-         WHBrLWHKZUIUwbNYS9w/A+kXCnLYDQFRyJsA2iSKGLq+isj+Sde8IebOErz+StMqytzK
-         NwhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWeJunqciGsPBOFFc1WzRBUCqYKicSnbu9WdgZNYMXWFLwzKmFhLyJ8myZk1BFJ8uQFJEkgJ47IFS/BSPoJeM2wmPx5bSOJ
-X-Gm-Message-State: AOJu0Yystdv2mF+Jj7VlqXMAPhKlzyeifOTmw8phjYsPy+1dVcWxaCUH
-	9teFys2YXhZ1gY9awoYv1qnfTZfpkvJ8lXEolelvgydbdsoGOmcxYxkIaFmgJhM=
-X-Google-Smtp-Source: AGHT+IG35l+B1/YBwglx16llaqYjEWDCga2Oe9hUaLufPC7j7EzfiIml0NpEIJWCt7t15bPWQxNWIg==
-X-Received: by 2002:a05:6512:138a:b0:52e:7a8c:35a0 with SMTP id 2adb3069b0e04-52edef0e8edmr1040257e87.7.1721128378321;
-        Tue, 16 Jul 2024 04:12:58 -0700 (PDT)
-Received: from eriador.lumag.spb.ru (dzdbxzyyyyyyyyyyybrhy-3.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ed25398basm1111790e87.285.2024.07.16.04.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 04:12:57 -0700 (PDT)
-Date: Tue, 16 Jul 2024 14:12:56 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Patrick Wildt <patrick@blueri.se>
-Cc: Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Andy Gross <agross@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Steev Klimaszewski <steev@kali.org>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: x1e80100-yoga: add wifi
- calibration variant
-Message-ID: <56zweixkjz2oqvmmxxgd3zoc2jf4us4mmhutjtjvejsurtycwh@fv24arxg2eqr>
-References: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
- <ZpV7OeGNIGGpqNC0@windev.fritz.box>
- <cisap4ctuolfrs6hjqxz45fqtckcy6uhjzma2shcxkso73jvoh@jj7l4bgftoir>
- <ZpWbUjHna1cE5zHW@mone.local>
+        d=1e100.net; s=20230601; t=1721129078; x=1721733878;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9xigDHiuKg1vf2r9wLNcMWu6wRFVXSmz8+urmcNUTy4=;
+        b=t0f/VwJmlZnNHrIMXKdXykPAWh4uHHq2R4A/HHLv5MBhoe0kDvxk3kzWZKOeRyKDZu
+         ykojdINYFq0vz+kgCH6VejDAfAxzaU9014k94yVM9FSOjsM1Uy/rTvyuecmFbyNqQUVk
+         9rM60CpAe5N4m1VAAZrGip4przp0yKEMi3ItnMCrEAejMs0KIWIYe3fJkX4qgU2qTXW4
+         OjNPG9yzTM402giym5SmOPw8NjJYpL8uHriOJU0ZGU4J9ym74rZSKBzMcrxBWNKGg82j
+         JpJaw9t6uSTOhn+zu42Syh1NRYv4tqf0f7ih3Q6LRiebfMOHn3Ot7XBjejQxsOUml00b
+         s+sw==
+X-Forwarded-Encrypted: i=1; AJvYcCVshjRSmylPQnPLlst+VvoQ9h5+6Fo3qA0uLIkr836d4LQ+/GPYWur0dmuy0d4kSQ5Hc59wpePfLSQebFD6/QHFqKxpr4f0
+X-Gm-Message-State: AOJu0YzucLpybtYBjbq/5CyYNjjnEOS45xGvIwS7eiOUBuNSZIoMFQ1g
+	PruJuv99rIQLj5ZpmetW1XXN6TT6YQlu64Oojue3XUDLIi3ECVMK/N005cSz0HWYlJV/hywWbvD
+	Pfcgg6k0Wp1lq9zUNPcUBQCarBJ2U4yD1F/GcwXPXZpatwkYk2hIfHg==
+X-Received: by 2002:a05:651c:2213:b0:2ed:59fa:551e with SMTP id 38308e7fff4ca-2eef2dbf4d6mr13944921fa.4.1721129078256;
+        Tue, 16 Jul 2024 04:24:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEC6ZKy2OwDqLzG5ygo5Ts8XnTEGW3eK1A1I6PdcCUOGLjny3/tsLCx7Haj/ejGp6zed7Bdw==
+X-Received: by 2002:a05:651c:2213:b0:2ed:59fa:551e with SMTP id 38308e7fff4ca-2eef2dbf4d6mr13944781fa.4.1721129077826;
+        Tue, 16 Jul 2024 04:24:37 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3? ([2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f259761sm154663685e9.11.2024.07.16.04.24.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jul 2024 04:24:37 -0700 (PDT)
+Message-ID: <596fd758-11ad-46c0-b6f1-2c04aeba5e06@redhat.com>
+Date: Tue, 16 Jul 2024 13:24:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZpWbUjHna1cE5zHW@mone.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tipc: Return non-zero value from tipc_udp_addr2str()
+ on error
+To: Shigeru Yoshida <syoshida@redhat.com>, tung.q.nguyen@endava.com
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
+References: <20240716020905.291388-1-syoshida@redhat.com>
+ <AS5PR06MB8752BF82AFB1C174C074547DDBA22@AS5PR06MB8752.eurprd06.prod.outlook.com>
+ <20240716.164535.1952205982608398288.syoshida@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240716.164535.1952205982608398288.syoshida@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 16, 2024 at 12:01:28AM GMT, Patrick Wildt wrote:
-> Am Tue, Jul 16, 2024 at 12:51:53AM +0300 schrieb Dmitry Baryshkov:
-> > On Mon, Jul 15, 2024 at 09:40:41PM GMT, Patrick Wildt wrote:
-> > > Describe the bus topology for PCIe domain 4 and add the ath12k
-> > > calibration variant so that the board file (calibration data) can be
-> > > loaded.
-> > > 
-> > > Signed-off-by: Patrick Wildt <patrick@blueri.se>
-> > > ---
-> > >  .../boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts      |  9 +++++++++
-> > >  arch/arm64/boot/dts/qcom/x1e80100.dtsi                 | 10 ++++++++++
-> > >  2 files changed, 19 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> > > index fbff558f5b07..f569f0fbd1fc 100644
-> > > --- a/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> > > +++ b/arch/arm64/boot/dts/qcom/x1e80100-lenovo-yoga-slim7x.dts
-> > > @@ -635,6 +635,15 @@ &pcie4_phy {
-> > >  	status = "okay";
-> > >  };
-> > >  
-> > > +&pcie4_port0 {
-> > > +	wifi@0 {
-> > > +		compatible = "pci17cb,1107";
-> > > +		reg = <0x10000 0x0 0x0 0x0 0x0>;
-> > > +
-> > > +		qcom,ath12k-calibration-variant = "LES790";
-> > 
-> > It doesn't look like it follows the rest of the calibration variants.
-> > 
-> > Something like "Lenovo_Y7x" or "Lenovo_Yoga7x" sounds more logical.
+On 7/16/24 09:45, Shigeru Yoshida wrote:
+> On Tue, 16 Jul 2024 07:35:50 +0000, Tung Nguyen wrote:
+>>> net/tipc/udp_media.c | 5 ++++-
+>>> 1 file changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index b849a3d133a0..439f75539977 100644
+>>> --- a/net/tipc/udp_media.c
+>>> +++ b/net/tipc/udp_media.c
+>>> @@ -135,8 +135,11 @@ static int tipc_udp_addr2str(struct tipc_media_addr *a, char *buf, int size)
+>>>                 snprintf(buf, size, "%pI4:%u", &ua->ipv4, ntohs(ua->port));
+>>>         else if (ntohs(ua->proto) == ETH_P_IPV6)
+>>>                 snprintf(buf, size, "%pI6:%u", &ua->ipv6, ntohs(ua->port));
+>>> -       else
+>>> +       else {
+>>>                 pr_err("Invalid UDP media address\n");
+>>> +               return 1;
+>> Please use -EINVAL instead.
 > 
-> This is what's both in the DSDT
-> 
->   Device (WLN)
->   {
->     [...]
->     Name (BDFE, "BDF_LES790")
-> 
-> and kvalo's board-2.bin for this machine:
-> 
->   $ strings board-2.bin | grep LES
->   bus=pci,vendor=17cb,device=1107,subsystem-vendor=17aa,subsystem-device=e0e9,qmi-chip-id=2,qmi-board-id=255,variant=LES790
-> 
-> I don't think we can hand-pick these strings, they come from whoever
-> decided upon them and fed them into ACPI tables and QC's binaries.
+> Other addr2str functions like tipc_eth_addr2str() use 1, so I followed
+> convention. But -EINVAL is more appropriate, as you say.
 
-Ack, if Kalle has already selected this string, we can't argue.
+I think that consistency with other tipc helpers here would be more 
+appropriate: IMHO no need to send a v2.
 
+@Tung: please trim your replies to only include the relevant quoted text 
+and fix your configuration to avoid inserting the long trailer, quite 
+unsuitable for messages sent to a public ML.
 
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Thanks,
 
+Paolo
 
--- 
-With best wishes
-Dmitry
 
