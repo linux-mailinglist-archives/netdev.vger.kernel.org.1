@@ -1,366 +1,221 @@
-Return-Path: <netdev+bounces-111784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 632E09329BF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:52:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D08A9329C8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E431F2169F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:52:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60B9A1C20884
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E8119B3C8;
-	Tue, 16 Jul 2024 14:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EB01990D7;
+	Tue, 16 Jul 2024 14:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="L9lnxCJI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EZyFvzIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C5554BD4
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 14:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDDF1420B6
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 14:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721141563; cv=none; b=DaIdtdHS7DSikOOyU0i4wS4FfN1yhQGG//ZR4vIu2U0uV9osIu8bb0JRbbR1lDau72dIjf0mH8l0vAsPKKHdI/oNJ4MOGlr3BvFcF4FpKBCo+co2o1wDa11VJICNQgAdUOrx5b0bCvh5h217wxD3gxIjUxFGEATfaQy76EY/tLw=
+	t=1721141660; cv=none; b=UrA//lZP0dajPaHrbSKurquxXsX8Ptkfh2AKb7O0eRunOVRj+OZ2q0sQgCM0Ni2EFKghQYLSbTDcto5bjnPMwpa89k/z50TLBL2lrh2fsyQdshKNsVIpAK6tVto/Gtj6dJhQ9OYonmQvSwdG1ixpkgcfAn3cZzdupdrQ2vLXKVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721141563; c=relaxed/simple;
-	bh=tThjEzmfJoq1dgK8yKOd9whDy/KW1ojZ60ReMIu71ok=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KnbtYHLFGR/fkh7hc4KpyZuS4MTeWNctFaju1pYAeBfzePKgLBe9sHF0Y7ZZ9rn9xxC4wtaDXbV+SBH/uYE2WuoydvWWu5lr5Wjn8I5FX5N6P88b0XcgtdbPQAlAgxN6Uw0HOs7puW04YE1zzejc3K/Z7+oxDiYRe9wKa28z5Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=L9lnxCJI; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2eeec60a324so25577831fa.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 07:52:40 -0700 (PDT)
+	s=arc-20240116; t=1721141660; c=relaxed/simple;
+	bh=8Bh6guIhZQVTnYNJwSnBOzgjlVjsEuz8MT5Z+AaE31s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cQMCrWRpDbH94oBcrJ9vHfHCWBRRXeZIMacy0cUDzPh/b0QMCcMt78KPpVmiPkLicHgo1kkdySRPEGCrKwAeyGFtGNOG3nlJsc6Bpym8mKj+mZBF2sunVTvjvx3LnxzN9/MorTLbk7tTaFKP9PFm6Y1jyTvTqmD3rl8rNYsuxao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EZyFvzIC; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-38206c2f5e3so146395ab.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 07:54:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1721141559; x=1721746359; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HhQ44Rb3p3NpHrr7w4L+WTWqB4Yu35NDMF2codvLnMw=;
-        b=L9lnxCJIdCcw+o6hvwW9JQ9jtyXchWYYsAXaalYBxsxgkJ4e2tlclt3x+E6pnFm0ri
-         MA0PJMLzKwqiDE7BFx/HgZZLD4RhTtHkkS9Upjd0Z6pm1Xs7wbqnBkx2+l6bT9d6kd5L
-         LAXCtc+lWfHiGL1Yf8XJpNB9Mr16BUBr+9Ys0ekDUD3p5C7SrsR10iA6+V+/FcE6Buq7
-         kLe8EziVmpSj3ubiRleZWhYezkLXr24nKqRh4stfyaEvxqtrb+E93vDdjQhsFxJfwe1g
-         TgyHfZDRqr3/mDnqIVO9ipSzAkvjwqktFRkFE17wmqMZoz2n6S/Kxn9kdtA2A3xyDFa1
-         dwtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721141559; x=1721746359;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1721141658; x=1721746458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HhQ44Rb3p3NpHrr7w4L+WTWqB4Yu35NDMF2codvLnMw=;
-        b=bsaTsW2WgOnbY7QfvAvFhOlcsJMCuO0A6B0hjDhmNLuVkCC23aWPKW8YSb5nUE+s59
-         sFFYfriCbbQryAiWW4FsNT+2dq/2CYs8LDT6Id5wkdtMUIDo2H51fK2YW5fltQc07q41
-         zs/YqLyliM607N5N24r8IGSNt6DYhpocsA0jJefHW7C9rCHJeFKdTe/tXx77fO0fUZ2j
-         90HY9MhlwJK1vdmmaGBfWXd3o8X0lWJQ9PLyD3g+yp0949t8MfwHX1Km0l2coiac5LT5
-         K7JyCBsqUo0cUOje+NWR6CdzfIq2sErM2xZz6Lgxqh5MOsBcD5QZUGSswC00lqOagZll
-         jvug==
-X-Forwarded-Encrypted: i=1; AJvYcCV68b0rV3fPmeegNmy5BGqsh/9kq3OZBrSf2WFgRGE0buSCF0i5DSYswTiocv1/3tB86fP5AN/zg4AtSi5PVE6Hy/EHelXH
-X-Gm-Message-State: AOJu0Yy1RRZOIWg9y31R/z2sGZ73Eu0QPQUYy57Zgl+uWMBWYclcz4jT
-	lb374tg3l3SZVIFYBc8DcVHZpyGnFOA8s/Ww13ap79T6eyj0+ClaUbP6RZVPRBo=
-X-Google-Smtp-Source: AGHT+IE+QA5e7Gk02EUeAn2TLiaLEB5cdazVkJEF7C/3/PCLDNbM6i0IR/WDIGWmTRpRqEl61bgOZA==
-X-Received: by 2002:a2e:9d86:0:b0:2ee:4a67:3d82 with SMTP id 38308e7fff4ca-2eef4191defmr19882211fa.28.1721141558983;
-        Tue, 16 Jul 2024 07:52:38 -0700 (PDT)
-Received: from u94a (2001-b011-fa04-1e5c-b2dc-efff-fee8-7e7a.dynamic-ip6.hinet.net. [2001:b011:fa04:1e5c:b2dc:efff:fee8:7e7a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-790c3ac9811sm3148355a12.52.2024.07.16.07.52.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 07:52:38 -0700 (PDT)
-Date: Tue, 16 Jul 2024 22:52:26 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Xu Kuohai <xukuohai@huaweicloud.com>, 
-	Eduard Zingerman <eddyz87@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Harishankar Vishwanathan <harishankar.vishwanathan@gmail.com>, Santosh Nagarakatte <santosh.nagarakatte@rutgers.edu>, 
-	Srinivas Narayana <srinivas.narayana@rutgers.edu>, Matan Shachnai <m.shachnai@rutgers.edu>
-Subject: [RFC bpf-next] bpf, verifier: improve signed ranges inference for
- BPF_AND
-Message-ID: <ykuhustu7vt2ilwhl32kj655xfdgdlm2xkl5rff6tw2ycksovp@ss2n4gpjysnw>
-References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
- <20240711113828.3818398-4-xukuohai@huaweicloud.com>
- <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
- <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
+        bh=Tv+rvFn1x/U1DFPm5AX9SGRIgB+cdcVraNVGv0+q5no=;
+        b=EZyFvzICSJTPyW/bdQBeyzNLrglMnS04yqsGnQga4ekxiYhpOUWBCoadouYpY5hUnz
+         MyKWNWYES4qrU8TYurFOU7L4VS8n4qX+wWjGmVGoJWQoNBMCH+RhADTtk7ViX++KTIRM
+         n45O9F8r0OWQ7yGea3b+YczXJhB2DvkxAsCTqRXynfXDv620BO4xKeWQUB0kOeK8ORPm
+         1FxZ1pRTUS7jyL4ncLkkbT22rx2YuqYQbhx5OXmcYqioUFdffOGvzcaJ4NGAv1JGlX4G
+         pp+TAFop5iyA3M7AacoooCyRZXZ9PwQ84vGyNCeo1eW8KWu8Xs2xTyWBaaYrrOhy1gZe
+         aEkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721141658; x=1721746458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tv+rvFn1x/U1DFPm5AX9SGRIgB+cdcVraNVGv0+q5no=;
+        b=wag40Wb+1K5ngceH39pGjzTh7ymll+g10y9VGqMfBA9ahui94xTRSBCFRCiYxuiyOq
+         bB7Z3szk7ETUuFqmQJOFqXK7N4xX24X83MDgOA8A9oP+PyTMbs8/BgqnXo9t6O0qI8fd
+         zjtZ0UhAH/E8vTzo0KEO/GnlM4X0fDpW4901vvyerevU6ioea0rEkNLQb1GR085gLN39
+         dC3vyx52ac2I8g/uhn1IoltPVzEC1oNrU8w1q1afVSxx4uBv0nA+kPc0lORIvwSS5Bx3
+         pwqDt5zldH0Q6FHHjmYkYgcdduLv9of0wbyNcfIzoiLo+zxwPRGW+7Ly87afawGQ53Cf
+         qzSA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6jkqfVuFJ6I7dL9YdiQ/0QUP6t7pZVjbgmxRclNoIHvJW9D2nk6AY6uOHdxy369jGW6DsEa72OvRNXsMWIKN5hyWWbu8h
+X-Gm-Message-State: AOJu0YzUGcqGzjQ/1MN4tNeoIYphEPFW668r/8Oc2sTYdSVs92hdXkW3
+	umTTYbyLl0me3rARlmKm4DuMX3Os6UBY4ayHrWKuzBEINR/WfnXn7s+bVbqQeWuGnaklfTN4G7b
+	90UDHAbXVWkKWpuOOyUfwIN+CD6l0kT8GCqrE
+X-Google-Smtp-Source: AGHT+IEOhZKFncPOlx3bgVqvrSyoX8tV4isXtb7+LhHviIXxu2OBtWnGPIoOexXBZzILdhdEZ4iKmB1sjgFRmofa/uQ=
+X-Received: by 2002:a05:6e02:1b08:b0:375:cd76:1602 with SMTP id
+ e9e14a558f8ab-393c1e1f3a7mr3190755ab.28.1721141658176; Tue, 16 Jul 2024
+ 07:54:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
+References: <000000000000e1609a061d5330ce@google.com> <5e4905d7-32e1-4359-9720-a32330aec424@redhat.com>
+ <87wmll7i9n.fsf@cloudflare.com>
+In-Reply-To: <87wmll7i9n.fsf@cloudflare.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 16 Jul 2024 07:54:00 -0700
+Message-ID: <CANn89iKa8fyD2s1VdHJ2SQAUUzm-iPEXoKOGF6wvuqxofC4Frw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in skb_warn_bad_offload (5)
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+	syzbot <syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com>, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, soheil@google.com, syzkaller-bugs@googlegroups.com, 
+	willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This commit teach the BPF verifier how to infer signed ranges directly
-from signed ranges of the operands to prevent verifier rejection, which
-is needed for the following BPF program's no-alu32 version, as shown by
-Xu Kuohai:
+On Tue, Jul 16, 2024 at 3:17=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> On Tue, Jul 16, 2024 at 12:04 PM +02, Paolo Abeni wrote:
+> > On 7/16/24 03:23, syzbot wrote:
+> >> syzbot found the following issue on:
+> >> HEAD commit:    80ab5445da62 Merge tag 'wireless-next-2024-07-11' of g=
+it:/..
+> >> git tree:       net-next
+> >> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D175fb82198=
+0000
+> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D2dbcdd8641=
+c4638f
+> >> dashboard link: https://syzkaller.appspot.com/bug?extid=3De15b7e15b8a7=
+51a91d9a
+> >> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for =
+Debian) 2.40
+> >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D172bf566=
+980000
+> >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D12fff53598=
+0000
+> >> Downloadable assets:
+> >> disk image: https://storage.googleapis.com/syzbot-assets/184da3869c30/=
+disk-80ab5445.raw.xz
+> >> vmlinux: https://storage.googleapis.com/syzbot-assets/85bfe9b60f21/vml=
+inux-80ab5445.xz
+> >> kernel image: https://storage.googleapis.com/syzbot-assets/06064623a94=
+8/bzImage-80ab5445.xz
+> >> The issue was bisected to:
+> >> commit 10154dbded6d6a2fecaebdfda206609de0f121a9
+> >> Author: Jakub Sitnicki <jakub@cloudflare.com>
+> >> Date:   Wed Jun 26 17:51:26 2024 +0000
+> >>      udp: Allow GSO transmit from devices with no checksum offload
+> >> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D142ccbe=
+d980000
+> >> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D162ccbe=
+d980000
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=3D122ccbed98=
+0000
+> >> IMPORTANT: if you fix the issue, please add the following tag to the c=
+ommit:
+> >> Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+> >> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no che=
+cksum offload")
+> >> skb frag:     00000080: 62 3f 77 e4 0e 82 0d 2f 85 cc 44 ea 25 5a 99 7=
+6
+> >> skb frag:     00000090: f2 53
+> >> ------------[ cut here ]------------
+> >> ip6tnl0: caps=3D(0x00000006401d7869, 0x00000006401d7869)
+> >> WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offload+=
+0x166/0x1a0 net/core/dev.c:3291
+> >> Modules linked in:
+> >> CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzkalle=
+r-01603-g80ab5445da62 #0
+> >> Hardware name: Google Google Compute Engine/Google Compute Engine, BIO=
+S Google 06/07/2024
+> >> RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+> >> Code: e8 5f 94 a3 f8 49 8b 04 24 48 8d 88 a0 03 00 00 48 85 c0 48 0f 4=
+4 cd 48 c7 c7 00 cc c5 8c 4c 89 f6 48 89 da e8 fb 92 ff f7 90 <0f> 0b 90 90=
+ 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 44 89 f9
+> >> RSP: 0018:ffffc900034bedc8 EFLAGS: 00010246
+> >> RAX: 7d287cad4185da00 RBX: ffff888040cdc0b8 RCX: ffff888023d1bc00
+> >> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> >> RBP: ffffffff8cc5cbc0 R08: ffffffff815857b2 R09: fffffbfff1c39994
+> >> R10: dffffc0000000000 R11: fffffbfff1c39994 R12: ffff888022880518
+> >> R13: dffffc0000000000 R14: ffff888040cdc130 R15: ffff888040cdc130
+> >> FS:  000055556e9e9380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000=
+000000
+> >> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >> CR2: 0000000020001180 CR3: 000000007c876000 CR4: 00000000003506f0
+> >> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> >> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> >> Call Trace:
+> >>   <TASK>
+> >>   __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
+> >>   skb_gso_segment include/net/gso.h:83 [inline]
+> >>   validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
+> >>   __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
+> >>   neigh_output include/net/neighbour.h:542 [inline]
+> >>   ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
+> >>   ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
+> >>   ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
+> >>   udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
+> >>   udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
+> >>   sock_sendmsg_nosec net/socket.c:730 [inline]
+> >>   __sock_sendmsg+0xef/0x270 net/socket.c:745
+> >>   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+> >>   ___sys_sendmsg net/socket.c:2639 [inline]
+> >>   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
+> >>   __do_sys_sendmmsg net/socket.c:2754 [inline]
+> >>   __se_sys_sendmmsg net/socket.c:2751 [inline]
+> >>   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
+> >>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >> RIP: 0033:0x7f04f688fe89
+> >> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 8=
+9 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0=
+ ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> >> RSP: 002b:00007ffeebc526e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+> >> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f04f688fe89
+> >> RDX: 0000000000000001 RSI: 0000000020003cc0 RDI: 0000000000000003
+> >> RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
+> >> R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffeebc52740
+> >> R13: 00007f04f68dd406 R14: 0000000000000003 R15: 00007ffeebc52720
+> >>   </TASK>
+> >
+> > Looking at the console log, the the relevant GSO packet is an UFO one w=
+ith
+> > CSUM_NONE. commit 10154dbded6d6a2fecaebdfda206609de0f121a9 only adjust =
+the skb
+> > csum for USO packets. @Jakub S. could you please have a look?
+>
+> Will do. Thanks for the hint.
 
-    SEC("lsm/bpf_map")
-    int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
-    {
-         if (map != (struct bpf_map *)&data_input)
-    	    return 0;
+The trigger for the bug is the following :
 
-    	 if (fmode & FMODE_WRITE)
-    	    return -EACCES;
+setsockopt(3, SOL_IPV6, IPV6_HOPOPTS,
+"\0\3\0\0\0\0\0\0\5\2\0\0\0\1\0\302\4\200\0\0\0\5\2\0\6\302\4\0\0\0\1\302".=
+..,
+40) =3D 0
 
-         return 0;
-    }
+Some random IPV6_HOPTS, with multiple IPV6_TLV_JUMBO options
 
-Where the relevant verifer log upon rejection are:
+Non GSO path sends a malformed packet just fine, but GSO complains loudly.
 
-    ...
-    5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
-    ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
-    6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
-    7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
-    ;  @ test_libbpf_get_fd_by_id_opts.c:0
-    8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
-    9: (95) exit
-
-This sequence of instructions comes from Clang's transformation located
-in DAGCombiner::SimplifySelectCC() method, which combined the "fmode &
-FMODE_WRITE" check with the return statement without needing BPF_JMP at
-all. See Eduard's comment for more detail of this transformation[0].
-
-While the verifier can correctly infer that the value of r0 is in a
-tight [-1, 0] range after instruction "r0 s>>= 63", is was not able to
-come up with a tight range for "r0 &= -13" (which would be [-13, 0]),
-and instead inferred a very loose range:
-
-    r0 s>>= 63; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
-    r0 &= -13 ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
-
-The reason is that scalar*_min_max_add() mainly relies on tnum for
-interring value in register after BPF_AND, however [-1, 0] cannot be
-tracked precisely with tnum, and effectively turns into [0, -1] (i.e.
-tnum_unknown). So upon BPF_AND the resulting tnum is equivalent to
-
-    dst_reg->var_off = tnum_and(tnum_unknown, tnum_const(-13))
-
-And from there the BPF verifier was only able to infer smin=S64_MIN,
-smax=0x7ffffffffffffff3, which is outside of the expected [-4095, 0]
-range for return values, and thus the program was rejected.
-
-To allow verification of such instruction pattern, update
-scalar*_min_max_and() to infer signed ranges directly from signed ranges
-of the operands. With BPF_AND, the resulting value always gains more
-unset '0' bit, thus it only move towards 0x0000000000000000. The
-difficulty lies with how to deal with signs. While non-negative
-(positive and zero) value simply grows smaller, a negative number can
-grows smaller, but may also underflow and become a larger value.
-
-To better address this situation we split the signed ranges into
-negative range and non-negative range cases, ignoring the mixed sign
-cases for now; and only consider how to calculate smax_value.
-
-Since negative range & negative range preserve the sign bit, so we know
-the result is still a negative value, thus it only move towards S64_MIN,
-but never underflow, thus a save bet is to use a value in ranges that is
-closet to 0, thus "max(dst_reg->smax_value, src->smax_value)". For
-negative range & positive range the sign bit is always cleared, thus we
-know the resulting is a non-negative, and only moves towards 0, so a
-safe bet is to use smax_value of the non-negative range. Last but not
-least, non-negative range & non-negative range is still a non-negative
-value, and only moves towards 0; however same as the unsigned range
-case, the maximum is actually capped by the lesser of the two, and thus
-min(dst_reg->smax_value, src_reg->smax_value);
-
-Listing out the above reasoning as a table (dst_reg abbreviated as dst,
-src_reg abbreviated as src, smax_value abbrivated as smax) we get:
-
-                        |                         src_reg
-       smax = ?         +---------------------------+---------------------------
-                        |        negative           |       non-negative
----------+--------------+---------------------------+---------------------------
-         | negative     | max(dst->smax, src->smax) |         src->smax
-dst_reg  +--------------+---------------------------+---------------------------
-         | non-negative |         dst->smax         | min(dst->smax, src->smax)
-
-However this is quite complicated, luckily it can be simplified given
-the following observations
-
-    max(dst_reg->smax_value, src_reg->smax_value) >= src_reg->smax_value
-    max(dst_reg->smax_value, src_reg->smax_value) >= dst_reg->smax_value
-    max(dst_reg->smax_value, src_reg->smax_value) >= min(dst_reg->smax_value, src_reg->smax_value)
-
-So we could substitute the cells in the table above all with max(...),
-and arrive at:
-
-                        |                         src_reg
-      smax' = ?         +---------------------------+---------------------------
-                        |        negative           |       non-negative
----------+--------------+---------------------------+---------------------------
-         | negative     | max(dst->smax, src->smax) | max(dst->smax, src->smax)
-dst_reg  +--------------+---------------------------+---------------------------
-         | non-negative | max(dst->smax, src->smax) | max(dst->smax, src->smax)
-
-Meaning that simply using
-
-  max(dst_reg->smax_value, src_reg->smax_value)
-
-to calculate the resulting smax_value would work across all sign combinations.
-
-
-For smin_value, we know that both non-negative range & non-negative
-range and negative range & non-negative range both result in a
-non-negative value, so an easy guess is to use the minimum non-negative
-value, thus 0.
-
-                        |                         src_reg
-       smin = ?         +----------------------------+---------------------------
-                        |          negative          |       non-negative
----------+--------------+----------------------------+---------------------------
-         | negative     |             ?              |             0
-dst_reg  +--------------+----------------------------+---------------------------
-         | non-negative |             0              |             0
-
-This leave the negative range & negative range case to be considered. We
-know that negative range & negative range always yield a negative value,
-so a preliminary guess would be S64_MIN. However, that guess is too
-imprecise to help with the r0 <<= 62, r0 s>>= 63, r0 &= -13 pattern
-we're trying to deal with here.
-
-This can be further improve with the observation that for negative range
-& negative range, the smallest possible value must be one that has
-longest _common_ most-significant set '1' bits sequence, thus we can use
-min(dst_reg->smin_value, src->smin_value) as the starting point, as the
-smaller value will be the one with the shorter most-significant set '1'
-bits sequence. But that alone is not enough, as we do not know whether
-rest of the bits would be set, so the safest guess would be one that
-clear alls bits after the most-significant set '1' bits sequence,
-something akin to bit_floor(), but for rounding to a negative power-of-2
-instead.
-
-    negative_bit_floor(0xffff000000000003) == 0xffff000000000000
-    negative_bit_floor(0xf0ff0000ffff0000) == 0xf000000000000000
-    negative_bit_floor(0xfffffb0000000000) == 0xfffff80000000000
-
-With negative range & negative range solve, we now have:
-
-                        |                         src_reg
-       smin = ?         +----------------------------+---------------------------
-                        |        negative            |       non-negative
----------+--------------+----------------------------+---------------------------
-         |   negative   |negative_bit_floor(         |             0
-         |              |  min(dst->smin, src->smin))|
-dst_reg  +--------------+----------------------------+---------------------------
-         | non-negative |           0                |             0
-
-This can be further simplied since min(dst->smin, src->smin) < 0 when both
-dst_reg and src_reg have a negative range. Which means using
-
-    negative_bit_floor(min(dst_reg->smin_value, src_reg->smin_value)
-
-to calculate the resulting smin_value would work across all sign combinations.
-
-Together these allows us to infer the signed range of the result of BPF_AND
-operation using the signed range from its operands.
-
-[0] https://lore.kernel.org/bpf/e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com/
-
-Link: https://lore.kernel.org/bpf/phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d/
-Cc: Eduard Zingerman <eddyz87@gmail.com>
-Signed-off-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
----
- kernel/bpf/verifier.c | 62 +++++++++++++++++++++++++++++--------------
- 1 file changed, 42 insertions(+), 20 deletions(-)
-
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 8da132a1ef28..6d4cdf30cd76 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -13466,6 +13466,39 @@ static void scalar_min_max_mul(struct bpf_reg_state *dst_reg,
- 	}
- }
- 
-+/* Clears all trailing bits after the most significant unset bit.
-+ *
-+ * Used for estimating the minimum possible value after BPF_AND. This
-+ * effectively rounds a negative value down to a negative power-of-2 value
-+ * (except for -1, which just return -1) and returning 0 for non-negative
-+ * values. E.g. masked32_negative(0xff0ff0ff) == 0xff000000.
-+ */
-+static inline s32 negative32_bit_floor(s32 v)
-+{
-+	/* XXX: per C standard section 6.5.7 right shift of signed negative
-+	 * value is implementation-defined. Should unsigned type be used here
-+	 * instead?
-+	 */
-+	v &= v >> 1;
-+	v &= v >> 2;
-+	v &= v >> 4;
-+	v &= v >> 8;
-+	v &= v >> 16;
-+	return v;
-+}
-+
-+/* Same as negative32_bit_floor() above, but for 64-bit signed value */
-+static inline s64 negative_bit_floor(s64 v)
-+{
-+	v &= v >> 1;
-+	v &= v >> 2;
-+	v &= v >> 4;
-+	v &= v >> 8;
-+	v &= v >> 16;
-+	v &= v >> 32;
-+	return v;
-+}
-+
- static void scalar32_min_max_and(struct bpf_reg_state *dst_reg,
- 				 struct bpf_reg_state *src_reg)
- {
-@@ -13485,16 +13518,10 @@ static void scalar32_min_max_and(struct bpf_reg_state *dst_reg,
- 	dst_reg->u32_min_value = var32_off.value;
- 	dst_reg->u32_max_value = min(dst_reg->u32_max_value, umax_val);
- 
--	/* Safe to set s32 bounds by casting u32 result into s32 when u32
--	 * doesn't cross sign boundary. Otherwise set s32 bounds to unbounded.
--	 */
--	if ((s32)dst_reg->u32_min_value <= (s32)dst_reg->u32_max_value) {
--		dst_reg->s32_min_value = dst_reg->u32_min_value;
--		dst_reg->s32_max_value = dst_reg->u32_max_value;
--	} else {
--		dst_reg->s32_min_value = S32_MIN;
--		dst_reg->s32_max_value = S32_MAX;
--	}
-+	/* Rough estimate tuned for [-1, 0] & -CONSTANT cases. */
-+	dst_reg->s32_min_value = negative32_bit_floor(min(dst_reg->s32_min_value,
-+							  src_reg->s32_min_value));
-+	dst_reg->s32_max_value = max(dst_reg->s32_max_value, src_reg->s32_max_value);
- }
- 
- static void scalar_min_max_and(struct bpf_reg_state *dst_reg,
-@@ -13515,16 +13542,11 @@ static void scalar_min_max_and(struct bpf_reg_state *dst_reg,
- 	dst_reg->umin_value = dst_reg->var_off.value;
- 	dst_reg->umax_value = min(dst_reg->umax_value, umax_val);
- 
--	/* Safe to set s64 bounds by casting u64 result into s64 when u64
--	 * doesn't cross sign boundary. Otherwise set s64 bounds to unbounded.
--	 */
--	if ((s64)dst_reg->umin_value <= (s64)dst_reg->umax_value) {
--		dst_reg->smin_value = dst_reg->umin_value;
--		dst_reg->smax_value = dst_reg->umax_value;
--	} else {
--		dst_reg->smin_value = S64_MIN;
--		dst_reg->smax_value = S64_MAX;
--	}
-+	/* Rough estimate tuned for [-1, 0] & -CONSTANT cases. */
-+	dst_reg->smin_value = negative_bit_floor(min(dst_reg->smin_value,
-+						     src_reg->smin_value));
-+	dst_reg->smax_value = max(dst_reg->smax_value, src_reg->smax_value);
-+
- 	/* We may learn something more from the var_off */
- 	__update_reg_bounds(dst_reg);
- }
--- 
-2.45.2
-
+(flowlabel 0x754ca, hlim 64, next-header Options (0) payload length:
+186) localhost > localhost: HBH
+(pad1)(pad1)(pad1)(pad1)(pad1)(pad1)(rtalert: 0x0000)
+(pad1)(padn)(jumbo: 2147483648 - payload len !=3D 0) (rtalert: 0x0006)
+(jumbo: 1 - already seen)  [|hbhopt]
 
