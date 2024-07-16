@@ -1,175 +1,277 @@
-Return-Path: <netdev+bounces-111689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09F693210C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:15:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EC593210E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715881F22CAB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D22D281B9B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BA522309;
-	Tue, 16 Jul 2024 07:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E23022309;
+	Tue, 16 Jul 2024 07:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tv+DX5xE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bXdhLx7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24C2101CA
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 07:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721114112; cv=none; b=oElnVWytAQdqPcwrDvogL7X4OS23QGfdFxYuJTAyb94VdrPaXNm4AlJ0QNZB232Js10Iq1af2RSv5A4E05W7UnUdic3nWwUnncXNL+H9OwFLvrP5hOtb1awhTjfkzEJlKmr3yOsUYSwGwb6J1irzQASlvt71KJnmMfEhhnvU3vk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721114112; c=relaxed/simple;
-	bh=ahW7EzcmZwslEiOBlqfnNZ57dNnTSeqDC5XpmJB3xEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UkIyNbZx1er0/I5t7wY0eddQvqzfL3NXL8g+QFcJGD3zBAw3W8YKh/bkqkmrZz8BW+5CyLvAI77b7PU+fkIXesYdWj0OggkGrhyMDEHq3I4Ybo0BLuiQdguWGh7EBzd9we6ch5j3wMlkbd3pIOdD9105NDRouk4Z+xuKMkn5+oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tv+DX5xE; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57cf8880f95so6541402a12.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 00:15:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721114108; x=1721718908; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ahW7EzcmZwslEiOBlqfnNZ57dNnTSeqDC5XpmJB3xEo=;
-        b=Tv+DX5xEdifiBhclArxsMKFWwh+w+HAtm7AmBxvcH8rVOG0+6aQOUG/J4iNm5KiRsE
-         Xoyspa2IRqTaJB9qLKZIwTu22gso3N/XgHpfoh83MuNa+WdonAotHU4mhRUKPCZ5WKD4
-         Hmi+LAGpPvjUWoWmCjB1hUeubUR7Zkq6eLKGmdcRlQPbVmouN4JLq2YsZYAH2QW6jAZf
-         Mlx4ofm90i51XbpMmG/KGiKMSDnB/f1F7/yWlcDcb2Y0S+AweESCD6R6WKg9e094RSfc
-         t9t7tQioz7hHLN8Gcjjb/YFsCOIZ+lJRoepGhhlOOcajp90nlgP26Tmo2wzadLPwu7YJ
-         YeWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721114108; x=1721718908;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ahW7EzcmZwslEiOBlqfnNZ57dNnTSeqDC5XpmJB3xEo=;
-        b=cikIMfcVm3CuFt5vaTKZ2NJR6DoTLV8mYzPSXAHB2wyucdMUtnQfxoByyoGrxquBBa
-         G9bLCxN16+j5+ncOGc+iXyD388Kt0SG9QzABZVbDZpc2DebkpWj9bd7iT82+R3fR80dZ
-         6Gb68ssWpGgxzGtQQ2M46M8hZhe354JEcG4MN7mlAjsHRqE8ZuAoLYAR0DzkWDHcqeL0
-         LWwA6a9/DXKW2kbWUVUTE4yBxiu7F8nU/B+W2aB5LSQkDSZxOLWtqiRI8zNqmU2/zCC6
-         8kH+x3rsUTzH1pHtFBE9xlxDt2SN4L2fNEiUlno3NMQw1sWfViLbcME2tufjTNnhbj+c
-         NJ2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUjq5RgbVWL5o2wRhds2xSuHSnEuRf4kBxToTPAWvbE4NmP8jCe0lbo3iy0IUSwlDW26GDM9+A/zXAgxob3qU+6KMh09WPB
-X-Gm-Message-State: AOJu0Yxpb9U3+LzxNs7/tW3rGVhzO9ry8PVBFeWw8BqVo8sgHM9ezmYQ
-	dplK4ZsRV/sHB9u7Z7ZtdqE2UsNfjH7i1YJub7HuKeVR5OlQJJDeQAsu/yNtIfKMJvn1HN3w/4l
-	tdc6qqURsEzQ7K9RDjn4OlTRPYCA=
-X-Google-Smtp-Source: AGHT+IEs94Fq00UYMg5Sicrz9SjuKUPAKAWeXPjab4RT2ycFW7toSuS7B8hYNkIbGhpyAPnAQa8FJQmDvu6wMPQ2NaQ=
-X-Received: by 2002:a05:6402:35ca:b0:57c:db99:a131 with SMTP id
- 4fb4d7f45d1cf-59eefebec56mr853800a12.29.1721114107949; Tue, 16 Jul 2024
- 00:15:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0044C74;
+	Tue, 16 Jul 2024 07:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721114171; cv=fail; b=qRDYhBvxi7YoHc6oMynb1t6rSr9NYJxi5mvRa0KTG/O7M01qBPbWWdU3wZh7+dSZxGWrZXO9WcuzITJ2sZ40xJWyT0IvoSmRQEZfjvyb0cBZ5bgCvhwEMl3LDq7+dgeu6icYC11J5mgIQCe19EefJ3Ri7gb+hmzPOsMFUjNgKfU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721114171; c=relaxed/simple;
+	bh=Fo2iVo2q7iKMWWWDdFAXM20T/Rclo0LHxZKJ3FaDnqw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QCJW05oqg3gVvdesyqLhsgfpv3EaPy3IzOjHziTuORq+cpsGhSlPHVhwN3CZj1Ss22UCnmsW/qEnI8mlkLv5hQ8XDqnvAoRF4UHDMOJjW5g8R3BlZTs5U67+2cWXF2SzJeb3qF6Z0SK6ItfGpEvu4jcSqBXcpoLQwNMTq14lKSo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bXdhLx7a; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721114169; x=1752650169;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Fo2iVo2q7iKMWWWDdFAXM20T/Rclo0LHxZKJ3FaDnqw=;
+  b=bXdhLx7aOUzszGGBTaQ2hSlDQ/ab4FMcTpQGYhtRRFOpHDt0/E+MCKz7
+   KEanOLdPgcj0Svc4dcvxj+IaJ8Ux22k/KtyK/IpPhkLgfewL8J22GUPg0
+   VLr0Tx/Sa88hGLxa/hcw3wmcDs5ivReaOQRky4Brm6RMVTWbDpBlgRII1
+   6iJT5yTQHJpfpsiHWt3cr2aPomvipI24RSihbLAyqRYiscMJjbUWNo11V
+   RRloGvQeZkoiG85ggaipFI+wFjyfLZDZLDAp0IKtrC2JCxiuApX+FLUWo
+   0wYcKQJySaOLBvvOf70vmBc/Wx/UZKgUvqIfkXqSiE5GEWFtOn/h0F7oQ
+   w==;
+X-CSE-ConnectionGUID: TmHbJDnsT0i2+qxJG+ln0g==
+X-CSE-MsgGUID: 0BDpUCxFR5WYfwnMRfUjwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="22342771"
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="22342771"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 00:16:08 -0700
+X-CSE-ConnectionGUID: z6FZMx1xTGu6wGlEWF06SA==
+X-CSE-MsgGUID: xBNKTlrISUuB0Fep3oqDBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="49752651"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Jul 2024 00:16:08 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 16 Jul 2024 00:16:07 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 16 Jul 2024 00:16:07 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 16 Jul 2024 00:16:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dF3iV9rtIh1ZrJfCRcY7mMBvZNYsVzxkTUHvcqsldgIsiHfyUUV4QoA7ydJ8e+I367IG3agpeTXvPj5Qpn0usLpvNpJWJJ5nUSfsDH6MCFFZTE20+ULWErAo9iVPHhaI3c7IKZnHx4JEvArf0S3U6jyEqbwL9BBUtITSDuZOD+L05k8mNYhyXzgNeEF6AnleKaKeSBGKrk8NAIU1HZMQ01yQc/2Ut5EhfIA4jNKhg4bil40k1ZTN+oQpwjFNX6KpjM4Yf+TDyIA84hoajFqzujft52jBjq1m2+GIoAuOX1Ptgsqxv45RdRMnzmR5WpkMNpykuR+Vopcia5mNh15NOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cNQ27ziyQoIeVDV0AzGbQkXB03wdwqWCza0pV78+xZg=;
+ b=dY+rSX74cBVJt7wo8AOF4Lu9CcbgrM6p9DrSzctGblG7R+RolIRT/8s/EkRcjizWN3Y9i4duXUl7orlA/nzneLiO4jV2WCo0Et3mFPkDZbDpm0pcELrU/8WdThisvUFEeyCqHiDyZNBOxxghpqDVPdQXUwJm3GYjYV3jDrzrzW4Jb8nYVVQrkOqMORYheJ6cNFO9TIR6E5nsWy8GBP+aJazv+fXXBcqwq8ITLqJGjO3oAdfvL+oVqQzY/9P+dpu4GMu4YM/9ut/vxVU/w9VAW01LpGPnQaiDapAYVB2OERh61+/XLUOC3TM3ufuVtsaKbjjdX8MqqwnWKlPNr7B4ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7200.namprd11.prod.outlook.com (2603:10b6:208:42f::11)
+ by DM4PR11MB6432.namprd11.prod.outlook.com (2603:10b6:8:ba::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7762.20; Tue, 16 Jul 2024 07:16:05 +0000
+Received: from IA1PR11MB7200.namprd11.prod.outlook.com
+ ([fe80::8f47:b4ca:ec7f:d2c0]) by IA1PR11MB7200.namprd11.prod.outlook.com
+ ([fe80::8f47:b4ca:ec7f:d2c0%5]) with mapi id 15.20.7762.027; Tue, 16 Jul 2024
+ 07:16:05 +0000
+Message-ID: <1f082012-1ad6-4b12-8eb4-96bcc61704a0@intel.com>
+Date: Tue, 16 Jul 2024 15:14:41 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 11/15] cxl: make region type based on endpoint type
+To: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
+	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<richard.hughes@amd.com>
+CC: Alejandro Lucero <alucerop@amd.com>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-12-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: "Li, Ming4" <ming4.li@intel.com>
+In-Reply-To: <20240715172835.24757-12-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR01CA0198.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::7) To IA1PR11MB7200.namprd11.prod.outlook.com
+ (2603:10b6:208:42f::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240715033118.32322-1-kerneljasonxing@gmail.com>
- <CANn89iLXgGT2NL5kg7LQrzCFT_n7GJzb9FExdOD3fRNFEc1z0A@mail.gmail.com>
- <CAL+tcoA38fXgnJtdDz8NBm=F0-=oGp=oEySnWEhNB16dqzG9eQ@mail.gmail.com> <CANn89iK7hDCGQsGiX5rD6S29u1u8k5za-SOBaxY59S=C+BgaKA@mail.gmail.com>
-In-Reply-To: <CANn89iK7hDCGQsGiX5rD6S29u1u8k5za-SOBaxY59S=C+BgaKA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 16 Jul 2024 15:14:30 +0800
-Message-ID: <CAL+tcoAuQFHf_NPNF6ogK8dTZu0V0kts=KyNqfWHJxHWShc3Hw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: introduce rto_max_us sysctl knob
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	dsahern@kernel.org, ncardwell@google.com, corbet@lwn.net, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7200:EE_|DM4PR11MB6432:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b2bb5f6-93d0-4dad-403a-08dca567281e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?eVRaRGdTWXBkQ1lSb3VuLzFacUZVMjA5YVg1cGVlbjduWWRxc1lBKzNaMFBE?=
+ =?utf-8?B?YzNpcktnQWcyK1RkNmY4cVA3eXRUUVYzZjh3TUtaeHQ5MHpTc1V3MGFuSFF1?=
+ =?utf-8?B?R3k1dHpkUmNmVE9nZnExR1hlQndzWE1tdTRnR0orRVlERzh4WTJPb2ZFbFA4?=
+ =?utf-8?B?alduK0FGRzU1RVNWWDZncC9PeWUySUxGdTNvU05tNitua1FOdjd0bTJ2Znh2?=
+ =?utf-8?B?VnpzQXFKWG53L2xra1E5Y3Z0MXdJbUNqMTBDbWZ5enpyaWV5YmlXT0tUSjd4?=
+ =?utf-8?B?dzlyM3IwdzIvelcxV0dNKzU5aDg2cmZYT0w2d1V0OG55OGZRN3Y5c21IOUow?=
+ =?utf-8?B?MlAxMm83SG9RUG1kaWRmK25manlYZDJOb25iNzR6QTFlOHc4anpWakZIV25R?=
+ =?utf-8?B?dkREdnluTmIzeXMyNTRFVGRJL2FqeGpLU3BjUGYzY3ZyVnFCU2RGcWdVR1JJ?=
+ =?utf-8?B?VStvbjRaN1N4NlRCQWxhSlpNUGhybXVjY2JId2lRUFpUY2czYUlvdXJuTEdI?=
+ =?utf-8?B?SEY5bXZsQVJoOUorOW81VkFScTYwNEhOQXFXc3h4Z2dWWno0RXhWdG03aS9p?=
+ =?utf-8?B?T0U1ZG5HY3hsaVRVbEdIcDh3V1dDakc3V1RwVU5XRWYweTBlbGxzYTJiTldj?=
+ =?utf-8?B?Rlc3c1FJazZlSjF6NnBYY3FVSHJHdTA3TmtZTHdlU2ZRL0xNdlBBMkJ6dy9i?=
+ =?utf-8?B?Yi9COVk5aGhuMnFscFVjTG9Vd2ZzS3lCcldyWHVhNGVEcmw2dWlsQTNnL3pt?=
+ =?utf-8?B?QzZJWVBzVmRiTUtsQ0xPdVFPcHErdDhOOHpQS2pIR2tjK0JsMzBxdUlCK3Qx?=
+ =?utf-8?B?WFdaejNwNDh6S2VqMHVIOGFBNXVhU1dCUlhBc2U2Z2trTjdMdEhmMStjaHZO?=
+ =?utf-8?B?YTkzcG9pU0NZLzQxdUZoQ3JtUUROQnZuMXNDVEM3TGZRMUdYSHVEUzl2anJ2?=
+ =?utf-8?B?UWdWTUh1QzR6YnI2NHdZaXAxS3hsV0FyazJvMUoxWUZ2K2l2MmFBQjdBeGI5?=
+ =?utf-8?B?UkhiVThqUlFBNmFoMGZSdVp2QkJwMzFBd0orSHRubDlRbFdGWW1QUCsyRG1x?=
+ =?utf-8?B?cy9UTk1sWXhyb1c2YUQ2WnQxd3R1ZkhhSGlER0ZmWjlwdHFBbmNmWGlKOUtL?=
+ =?utf-8?B?SGE1Q05aNmJtQjYxMVdMTmNQOHBOcUR5L1BRa2U4UDYwRFlyQWpOdmE4Mmha?=
+ =?utf-8?B?amQxK3pjRnBpZU1Lc2NJVXJMb3QrbnVSVXN5MWFSakR1K3dzZ0tjcXlueDVP?=
+ =?utf-8?B?bVhkaU5FY0JpNlFXbWk0SnlPTndSZVVoRG9lM3pTcUI1cTdwQlFxRTIwQWRJ?=
+ =?utf-8?B?TmxHTDk0MUw3by9uSXZBSHlZcTUrSHQyUUZVMXErVWY4MTVjT1p4Y0Y5aHl2?=
+ =?utf-8?B?N2JiWU0yb3JhTWQxRUVLcGI4OVVTRGZKWGNabm50MDBpeU44ZUk4RnFSWHVI?=
+ =?utf-8?B?OWdQS1NaVHNtTEM2Y0lmQ3lrczlPMFJ0N2tBejFZcFQ5ZW9qakdWd2llRkxI?=
+ =?utf-8?B?LzdyQlYwZ1dEbGYzN21SeEtSZ1h2REJaYy9rK1RiV1I3Qlc4S1dlQnBtWk9p?=
+ =?utf-8?B?T0dTcm01OUxScGw2MEpkSEphWmdWdDdGRjBOa3p3Q3l2MTB5ZU44WGRYa2l4?=
+ =?utf-8?B?KzhadUlwVkF3bGpWWmo5RXExb1Y4L3V2eHR3VXZJbHRlRG9VYkJ0ampkVTNp?=
+ =?utf-8?B?MmIvbTlmY05QaVkvajBySFBqNFFnMmRGS0FJQTlrempzc0RCVEJYWnBoQm5M?=
+ =?utf-8?B?SU9MRFBxSitXY2M0aWJMUFFqY3NDaXlmMTF2Mzk5dVFZN1dRZnpvQ0ltM1RM?=
+ =?utf-8?B?Y1duZThSdXJMOHlMRzdIcC9vL1JPR2hjUDhpcTN0dzVnQ3RBL2s0WURZbkhs?=
+ =?utf-8?Q?tmNyP95BWjwCZ?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7200.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUZJamlYZmswOHhjYk9TMmhIeGxzTHkrdHV0YVpsaTZWaDhNVHdRNGc4aVFW?=
+ =?utf-8?B?Skc5Z2lHQkJ3THJUWm4ralFLSTBPRmk3NTBjYjF0YmdUdVY4am9HRjNTcThT?=
+ =?utf-8?B?VmI0V3BDWXNaK0Yvb01RdzViK1BzcG1hRXN5djNRdUpaRThtN05BV1MwZzh2?=
+ =?utf-8?B?QWRFSHRobG9NLzBSeXpIYzRIOXcxcHpZRG1vNTY2emlQeXlQdG1uWHoxNzJT?=
+ =?utf-8?B?UW5kTWc3bHdabXZzY3B3eE92NHREeXZMSTJTemVsa3YxRGZQdGt1bkxBVjlw?=
+ =?utf-8?B?aGJEU3FDZlZwMVJNcjBwTzlQV2FjTTlSdkZGZTl1UzlvVlF1ZUtSMmtWU2JJ?=
+ =?utf-8?B?eEdDTG9vQkNDcUZHNkc3ajk3UXR0aEJsTmZGMjFKQW0wenQxaE1CNWVMVVBE?=
+ =?utf-8?B?SFJxTU9lRnBWNlhvd1cxVEc1TitSVklFbk51OWxtbitna1FaU0JrR2NBcVlG?=
+ =?utf-8?B?NmJSN2cvS2JMNHBhMUo5K2daTnVBL3BYOEhSWk93cXI0RENDaCtuOTkwSXYw?=
+ =?utf-8?B?R2l1S0RyQjdFZnNKVHVDSkJzY3hwYkt6cFk5NCttR2RYNUlZRFVWc3BsZmxB?=
+ =?utf-8?B?b1lGejRvNWRRMVJKYVluU1lleW5PZDQ1MVZodHROaUQzQWVPRFpzUmVsdE9k?=
+ =?utf-8?B?UWR0QW1Ebzh3Qzh3MVFpYzF4R2NmbXIvSndlQ3B1bXNObFNmdnZWSjRzVStj?=
+ =?utf-8?B?aTllVzRrbVJOUkNXMUJrWjh5SVc4RnBBN2R5b0VPRzZEeXFKaGw0bmRBVzZw?=
+ =?utf-8?B?dXdqOHBrRElkK2I4aFRFNzdjMnIyb01DL011Z0VHdm1BcjV2MHh4ZFN5QVcz?=
+ =?utf-8?B?dTFGcWZQanZya0N1N0FkUVAwMGdhWGVNVU90ZnFmMGx1UTBidFNEQ1UzSjhj?=
+ =?utf-8?B?b1dtTmVkZlF3WW9mSHJJL2RubWNtWTIxMUE4U055dThqZDJ6Tk5XV1hDZzFq?=
+ =?utf-8?B?MHc2Nnc5RFZhVGUxckM5aHZhVGxjZWNZa2NiR2ZGb01MeVJTNTBweFVUaEp4?=
+ =?utf-8?B?RVBUcTJjbDNiR1cyanlCZ0hOZHdvM04zRUpZYXkydGZrK1ZLYVc0L1pObjQ5?=
+ =?utf-8?B?cmgvOHBLRm1zbkZZQkFDR2twMnNzcW9XeExSK1R5RWNqd0w3dUsrWkNNSVAv?=
+ =?utf-8?B?MlpPQWV2ME55a2t5RGdIKzJJWFlQUWVaaVZHdS9QWnpiMlpkeFRMM3N6Mmpa?=
+ =?utf-8?B?QVVyNzAvOW1HeHVtNjhrYVdNTlZkcjBSQVhraGlwVGZBUmpIeDdQQVR0VXJt?=
+ =?utf-8?B?Qk00TDBKcU05QmRSS29xZ1hDcGJjZEZUQ2ZPbEZ2VlBDZDdEUjUvOWtoRTVV?=
+ =?utf-8?B?Mm1pQXNqVVF2cmEyMFo2M0JoNmJWV21pbmtINFBtb0U4eGVDbEVOQlNHUjlh?=
+ =?utf-8?B?MHNJQzcvbzlTUWNUbkpKVlFUdVRHTXgwOVhtSEpwNlBkNDAzeVBUbnBmbEJt?=
+ =?utf-8?B?RUd4TmZhTGFJUWd1WEpZdEtvcWpYSUFmMS82Ui94SWwvc293cUtkRWZYRzNY?=
+ =?utf-8?B?bEUzMnl1dzFCNlRIL29jY2JwSXNKYjY3RWw2M3pWUWUyczUvZkdJcDIrNDJG?=
+ =?utf-8?B?SGs3b1p2R1NOYWdEbU9HUjFVaTJDeGlOMzhmbnd3UEpYOVhwNHo2UWxLZzFx?=
+ =?utf-8?B?a2t4cnM1Q2dRWnBaTW5JbUIrU2lQR09oOERkYWFTaUdGZjVQNUZIT28xN1cx?=
+ =?utf-8?B?elk1ai92UnRHYWtQWHlHWFAyNTY0WEoxWkpteEo0TzBQNlFzZkN0dkluRE5B?=
+ =?utf-8?B?M0hoQ2JaeHgwK0dSb3haUEYxTURGV29YampWSjY4eVBWTitFTjR6NWkrY3dR?=
+ =?utf-8?B?K3RpOW9xN1I3d08zbFpZYURJNVlaaWdJS2VobTgxYjV1S1hBZ253VEpzdW40?=
+ =?utf-8?B?MFNWUXFscUM0UitvNkhTN1gwZXMyN2E0SVJ1YXNXamdhYkdiUmZyK2ZCSHRC?=
+ =?utf-8?B?dmpxWSt0VXU2MXdLRlZBVE9yWDd3bm93MTQ1SnBYalgwYTBEZkE5U2kzR2I1?=
+ =?utf-8?B?ZU0rYWdlOHdkZEd6UWxDSXhXQy9yOWtubDRUNnFSbmdBamR5eU9yMDAvTGdQ?=
+ =?utf-8?B?TDZ6c2hDODR0YU5qOVNWRXVTeTA2bk5VTGdJTlNvbXkwK2krb2hzT3RSd3FE?=
+ =?utf-8?Q?D6CF1+24CyowuE54Ph0NV1aWi?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b2bb5f6-93d0-4dad-403a-08dca567281e
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7200.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 07:16:05.6392
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a2VrUTsEhlSB3KGnZSwOalVR4SKQMVJgyXNRxGf7imRVfvuUUl52rglAlkTdJTIqcEuIWyqZto1KazGxjCGG4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6432
+X-OriginatorOrg: intel.com
 
-On Tue, Jul 16, 2024 at 2:57=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On 7/16/2024 1:28 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 >
-> On Mon, Jul 15, 2024 at 11:42=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >
-> > Hello Eric,
-> >
-> > On Mon, Jul 15, 2024 at 10:40=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > On Sun, Jul 14, 2024 at 8:31=E2=80=AFPM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> > > >
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > As we all know, the algorithm of rto is exponential backoff as RFC
-> > > > defined long time ago.
-> > >
-> > > This is weak sentence. Please provide RFC numbers instead.
-> >
-> > RFC 6298. I will update it.
-> >
-> > >
-> > > > After several rounds of repeatedly transmitting
-> > > > a lost skb, the expiry of rto timer could reach above 1 second with=
-in
-> > > > the upper bound (120s).
-> > >
-> > > This is confusing. What do you mean exactly ?
-> >
-> > I will rewrite this part. What I was trying to say is that waiting
-> > more than 1 second is not very friendly to some applications,
-> > especially the expiry time can reach 120 seconds which is too long.
+> Current code is expecting Type3 or CXL_DECODER_HOSTONLYMEM devices only.
+> Suport for Type2 implies region type needs to be based on the endpoint
+> type instead.
 >
-> Says who ? I think this needs IETF approval.
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/region.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index ca464bfef77b..5cc71b8868bc 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2645,7 +2645,8 @@ static ssize_t create_ram_region_show(struct device *dev,
+>  }
+>  
+>  static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
+> -					  enum cxl_decoder_mode mode, int id)
+> +					  enum cxl_decoder_mode mode, int id,
+> +					  enum cxl_decoder_type target_type)
+>  {
+>  	int rc;
+>  
+> @@ -2667,7 +2668,7 @@ static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
+>  		return ERR_PTR(-EBUSY);
+>  	}
+>  
+> -	return devm_cxl_add_region(cxlrd, id, mode, CXL_DECODER_HOSTONLYMEM);
+> +	return devm_cxl_add_region(cxlrd, id, mode, target_type);
+>  }
+>  
+>  static ssize_t create_pmem_region_store(struct device *dev,
+> @@ -2682,7 +2683,8 @@ static ssize_t create_pmem_region_store(struct device *dev,
+>  	if (rc != 1)
+>  		return -EINVAL;
+>  
+> -	cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id);
+> +	cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id,
+> +			       CXL_DECODER_HOSTONLYMEM);
+>  	if (IS_ERR(cxlr))
+>  		return PTR_ERR(cxlr);
+>  
+> @@ -2702,7 +2704,8 @@ static ssize_t create_ram_region_store(struct device *dev,
+>  	if (rc != 1)
+>  		return -EINVAL;
+>  
+> -	cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id);
+> +	cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id,
+> +			       CXL_DECODER_HOSTONLYMEM);
+>  	if (IS_ERR(cxlr))
+>  		return PTR_ERR(cxlr);
+>  
+> @@ -3364,7 +3367,8 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+>  
+>  	do {
+>  		cxlr = __create_region(cxlrd, cxled->mode,
+> -				       atomic_read(&cxlrd->region_id));
+> +				       atomic_read(&cxlrd->region_id),
+> +				       cxled->cxld.target_type);
+>  	} while (IS_ERR(cxlr) && PTR_ERR(cxlr) == -EBUSY);
+>  
+>  	if (IS_ERR(cxlr)) {
 
-Did you get me wrong? I mean this rto_max is the same as rto_min_us,
-which can be tuned by users.
+I think that one more check between the type of root decoder and endpoint decoder is necessary in this case. Currently, root decoder type is hard coded to CXL_DECODER_HOSTONLYMEM, but it should be CXL_DECODER_DEVMEM or CXL_DECODER_HOSTONLYMEM based on cfmws->restrictions.
 
->
-> >
-> > >
-> > > >
-> > > > Waiting more than one second to retransmit for some latency-sensiti=
-ve
-> > > > application is a little bit unacceptable nowadays, so I decided to
-> > > > introduce a sysctl knob to allow users to tune it. Still, the maxim=
-um
-> > > > value is 120 seconds.
-> > >
-> > > I do not think this sysctl needs usec resolution.
-> >
-> > Are you suggesting using jiffies is enough? But I have two reasons:
-> > 1) Keep the consistency with rto_min_us
-> > 2) If rto_min_us can be set to a very small value, why not rto_max?
->
-> rto_max is usually 3 order of magnitude higher than rto_min
->
-> For HZ=3D100, using jiffies for rto_min would not allow rto_min < 10 ms.
-> Some of us use 5 msec rto_min.
->
-> jiffies is plain enough for rto_max.
 
-I got it. Thanks.
 
->
->
-> >
-> > What do you think?
->
-> I think you missed many many details really.
->
-> Look at all TCP_RTO_MAX instances in net/ipv4/tcp_timer.c and ask
-> yourself how many things
-> will break if we allow a sysctl value with 1 second for rto_max.
-
-I'm not modifying the TCP_RTO_MAX value which is tooooo complicated.
-Instead, I'm trying to control the maximum expiry time in the
-ICSK_TIME_RETRANS timer. So it's only involved in three cases:
-1) syn retrans
-2) synack retrans
-3) data retrans
-
-Thanks,
-Jason
 
