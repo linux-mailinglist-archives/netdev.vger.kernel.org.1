@@ -1,144 +1,176 @@
-Return-Path: <netdev+bounces-111782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2898932990
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:46:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA7C932996
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:46:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EAD1B21798
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:46:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9684B1C209FE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD8119F468;
-	Tue, 16 Jul 2024 14:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B0619D090;
+	Tue, 16 Jul 2024 14:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kTllUNj9"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="KrQ+Yfl5";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hoW7cth5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from flow6-smtp.messagingengine.com (flow6-smtp.messagingengine.com [103.168.172.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2214F19B3D6;
-	Tue, 16 Jul 2024 14:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB38919CD0F;
+	Tue, 16 Jul 2024 14:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721140876; cv=none; b=NRpYYWjfWd9aLDvgExSijffbGgqi8AhHJrGx77TxUMjB0xypv+5oobL6IJXDKDnA2mDSDdeVN7W+TXq4pxsOH91NvFCcD+gWjdM9xmQnEUtb5QegezyJKDJLqAnG92shcVM8icBseUks6UmCLo9kRMxsYgkBWz+nFSxCa0YOk84=
+	t=1721141077; cv=none; b=EcOxxVwZX9AdTSN1WzUGnnlFmVL38vZppAOJ/E4oGqdSiEV1J9OqYI426E+WJg2kppVdgd66N42rNv5+ov91xK+ZpA0rAI1gkDkliZyCCF5yTHIF+gJSZjqjAbcQoLogB3yItOayxhXF85+Fammc131IGpMb/MyKNa8DoCQY2Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721140876; c=relaxed/simple;
-	bh=anaUBK+dep9/rBEfBe2oKEYQuVt/IGTEAa2GVzdz6HA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=oqagY7jcEs9ahnB20tOLXKZSUbCMg8NtZACvmZd3EvBnkfRvvvlelV6GL6xUreTZDwDoOHO5grCehp5QIG7bh5kpIPUZ/Khc8/iRmv/wrHVsvxE4j+oKmYJbDwZlokmVi2X1gJ5CBrTlaVFnmWyZe6HkpTWIH4159OmqGRPEfcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kTllUNj9; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46GDR4Y7021550;
-	Tue, 16 Jul 2024 14:41:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	z+ZiobYmNSqYGyNF4Jfh80LXbvHZvZQKCWqa2am9DI4=; b=kTllUNj93P/HRCOx
-	ipWFjO0DpNseMuVr2nWXZKDi/YlDssq6DYIvHGmWJkL21HzAV451yi8rSz2mJ1eF
-	XNRXpTIDBtBAkY7b693TK0n4XIp2e1xZZ594Djbgkrab/XF6WOeKeN/pW/we98vz
-	a+hj5DlNBmNrmNDUcmC1CZje5R9IAe8s7b4eY1QJamDDHsrBTdsoXJ7IA9mjmWiz
-	o+qNbKxymhoNLIhB1LiBUvq53w2D0J7Vzk5llJUPZf7+M6lnvYPmr2XdjY/yWAVc
-	FlsiuNvz+1hoUMI+QgyC9InoAsyHs1vlxeGKfhJO1R50cQLLgjCqI6RIHYIM2A88
-	jeeo/w==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bgk6qbvf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jul 2024 14:41:00 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46GEex7E011074
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jul 2024 14:40:59 GMT
-Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 16 Jul
- 2024 07:40:57 -0700
-Message-ID: <69825f6e-c981-4f02-b10f-27e0799804e1@quicinc.com>
-Date: Tue, 16 Jul 2024 07:40:57 -0700
+	s=arc-20240116; t=1721141077; c=relaxed/simple;
+	bh=mmtDwPVL52S1ppeyOGcnNXo9IJrhAWZKJS7aQ6gfkYw=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=Tdf32y2mx8S9P7o77QR6OG7AkQAmR7MLbVSWElQQdywZdmW7WNc5yj86OJsc2p9EAfBG7ilRRQyc3PaqkobqgxKclOZqqq0ZZLEB/Qm4FTx1ZO4D93MLurz+qLDx2Pr/dbu/UWn1qxYp1oPPoeBoiXR3A3lzq4FZYZswo5gInsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=KrQ+Yfl5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hoW7cth5; arc=none smtp.client-ip=103.168.172.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailflow.nyi.internal (Postfix) with ESMTP id C3416200EC4;
+	Tue, 16 Jul 2024 10:44:34 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 16 Jul 2024 10:44:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1721141074;
+	 x=1721148274; bh=HdJd8R2v0UjEhqZCfsPDGAEjh3MgAu1qHR6wGuu4iUc=; b=
+	KrQ+Yfl5XPrmhmvBUQ4viYOZ5BU/9t0cJnJKfn8BzZOV7J86Dc27qIzbbyRqmZkN
+	L+RIF+FYOYSlA9jzGLh0YACdteyqUPbTWf9bhfOoBLC0IKbem2Y746umkeJYhKO1
+	USpO3R7/KM1Wn2fyqJ+PdyaVweaCMbG3cg1BWFtXYswGobw0QF1w5cXK1lFrfVCL
+	epgUay9MYSblfwLMYArlaz3dDnUSHBJBEZjVSObVyw1Ia/vi93VsmBqTnsPDPHag
+	X48V1hTibYmOFiSNVL8LG1ruAqTy1hNeTfL87eAwqTxlXqaIHQXOT9vz+ojWX8b5
+	koXReCi+2dgp1vgChQ7PmA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1721141074; x=
+	1721148274; bh=HdJd8R2v0UjEhqZCfsPDGAEjh3MgAu1qHR6wGuu4iUc=; b=h
+	oW7cth5YO/ae5/c6V4w0yozDre/5a5M2vpdkW4jmES5p+r7bMWgWijNxf6QCEgkY
+	+orQ7LceDdtdadru66WV0LDdiGUFhuMR9cwR1xXsuX+qWEUbiqvcib5Fuuc1cdQB
+	wFtLMZYDjgUFrpD16fAfTeDvShFoJn5y/czLAJl7qglL02WVe7DCyjzVztlH4pGF
+	2SA7oPuno3JGV//uaX0SF/7bJmIMI8PScam2x1TXXqZkZ8IUC6IB1BC/o2uUDHjy
+	kg101OgHbfAm2gyi9YYXQkVDtgwxhwDj2X99XzouZvFD2fTyXPMDC3Bwfx68wG7i
+	MpJWTiBA7vxwW04Hy2DRA==
+X-ME-Sender: <xms:UYeWZgOlzLVK6pPrE3NrPY78YiwTPVCb84BmEKwi9A8K1M6Mq7pLGQ>
+    <xme:UYeWZm8QHUVGMAHXRL0vdH6hlTv32lXQFgfUJ-22spbA51y-f533cjst5JMMx9NDD
+    icg581UmNi3x-mHCVc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrgeeggdejlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepgeefjeehvdelvdffieejieejiedvvdfhleeivdelveehjeelteegudektdfg
+    jeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:UYeWZnQR2OnTiBxDMja5WmiWQIWwkoYDv7cvsWUbfM-dGS7Q4W3jIw>
+    <xmx:UYeWZosSgaQfnvpklvQAR7hZgOKSA_p44n9zCcSK7SOyHIkfcW8few>
+    <xmx:UYeWZoeLBeC2WKu0TGio3_kbWuP1suwlEVoxl62TCsHZz7Tei0V9oA>
+    <xmx:UYeWZs1OEpFYJkwzomTzgENZWRrJy_yFywvoeYb9UKks-NVwhwDuPA>
+    <xmx:UoeWZvm5iwGDrgAAEN8i-IU9wGdWRNFAEeonKyUof9iwl06HMnKOPR0k>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id B26ACB6008D; Tue, 16 Jul 2024 10:44:33 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-568-g843fbadbe-fm-20240701.003-g843fbadb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] wifi: ath12k: fix build vs old compiler
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
-        "Baochen Qiang" <quic_bqiang@quicinc.com>,
-        <linux-wireless@vger.kernel.org>, <ath12k@lists.infradead.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>
-References: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: D0U0g0cqZEMhSIbmynx_k5R8aMzOjk27
-X-Proofpoint-ORIG-GUID: D0U0g0cqZEMhSIbmynx_k5R8aMzOjk27
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-15_19,2024-07-16_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 mlxlogscore=752 suspectscore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 phishscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407160109
+Message-Id: <7289bb54-99f2-4630-a437-21997a9e2b1f@app.fastmail.com>
+In-Reply-To: <20240715141229.506bfff7@bootlin.com>
+References: <20240627091137.370572-1-herve.codina@bootlin.com>
+ <20240627091137.370572-7-herve.codina@bootlin.com>
+ <20240711152952.GL501857@google.com> <20240711184438.65446cc3@bootlin.com>
+ <2024071113-motocross-escalator-e034@gregkh>
+ <CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
+ <20240712151122.67a17a94@bootlin.com>
+ <83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com>
+ <20240715141229.506bfff7@bootlin.com>
+Date: Tue, 16 Jul 2024 16:44:12 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Herve Codina" <herve.codina@bootlin.com>
+Cc: "Rob Herring" <robh@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Conor Dooley" <conor@kernel.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Lee Jones" <lee@kernel.org>,
+ "Andy Shevchenko" <andy.shevchenko@gmail.com>,
+ "Simon Horman" <horms@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>, UNGLinuxDriver@microchip.com,
+ "Saravana Kannan" <saravanak@google.com>,
+ "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>,
+ "Lars Povlsen" <lars.povlsen@microchip.com>,
+ "Steen Hegelund" <Steen.Hegelund@microchip.com>,
+ "Daniel Machon" <daniel.machon@microchip.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ "Allan Nielsen" <allan.nielsen@microchip.com>,
+ "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 7/16/2024 4:06 AM, Paolo Abeni wrote:
-> gcc 11.4.1-3 warns about memcpy() with overlapping pointers:
-> 
-> drivers/net/wireless/ath/ath12k/wow.c: In function ‘ath12k_wow_convert_8023_to_80211.constprop’:
-> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551611 or more bytes at offsets 0 and 0 overlaps 9223372036854775799 bytes at offset -9223372036854775804 [-Werror=restrict]
->   114 | #define __underlying_memcpy     __builtin_memcpy
->       |                                 ^
-> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
->   637 |         __underlying_##op(p, q, __fortify_size);                        \
->       |         ^~~~~~~~~~~~~
-> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
->   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->       |                          ^~~~~~~~~~~~~~~~~~~~
-> drivers/net/wireless/ath/ath12k/wow.c:190:25: note: in expansion of macro ‘memcpy’
->   190 |                         memcpy(pat, eth_pat, eth_pat_len);
->       |                         ^~~~~~
-> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551605 or more bytes at offsets 0 and 0 overlaps 9223372036854775787 bytes at offset -9223372036854775798 [-Werror=restrict]
->   114 | #define __underlying_memcpy     __builtin_memcpy
->       |                                 ^
-> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
->   637 |         __underlying_##op(p, q, __fortify_size);                        \
->       |         ^~~~~~~~~~~~~
-> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
->   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->       |                          ^~~~~~~~~~~~~~~~~~~~
-> drivers/net/wireless/ath/ath12k/wow.c:232:25: note: in expansion of macro ‘memcpy’
->   232 |                         memcpy(pat, eth_pat, eth_pat_len);
->       |                         ^~~~~~
-> 
-> The sum of size_t operands can overflow SIZE_MAX, triggering the
-> warning.
-> Address the issue using the suitable helper.
-> 
-> Fixes: 4a3c212eee0e ("wifi: ath12k: add basic WoW functionalities")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> Only built tested. Sending directly to net to reduce the RTT, but no
-> objections to go through the WiFi tree first
+On Mon, Jul 15, 2024, at 14:12, Herve Codina wrote:
+> Hi Arnd,
+>
+> On Fri, 12 Jul 2024 16:14:31 +0200
+> "Arnd Bergmann" <arnd@arndb.de> wrote:
+>
+>> On Fri, Jul 12, 2024, at 15:11, Herve Codina wrote:
+>> > On Thu, 11 Jul 2024 14:33:26 -0600 Rob Herring <robh@kernel.org> wr=
+ote: =20
+>> >> On Thu, Jul 11, 2024 at 1:08=E2=80=AFPM Greg Kroah-Hartman <gregkh=
+@linuxfoundation.org> wrote: =20
+>>=20
+>> >> > >
+>> >> > > This PCI driver purpose is to instanciate many other drivers u=
+sing a DT
+>> >> > > overlay. I think MFD is the right subsystem.   =20
+>> >>=20
+>> >> It is a Multi-function Device, but it doesn't appear to use any of=
+ the
+>> >> MFD subsystem. So maybe drivers/soc/? Another dumping ground, but =
+it
+>> >> is a driver for an SoC exposed as a PCI device.
+>> >>  =20
+>> >
+>> > In drivers/soc, drivers/soc/microchip/ could be the right place.
+>> >
+>> > Conor, are you open to have the PCI LAN966x device driver in
+>> > drivers/soc/microchip/ ? =20
+>>=20
+>> That sounds like a much worse fit than drivers/mfd: the code
+>> here does not actually run on the lan966x soc, it instead runs
+>> on whatever other machine you happen to plug it into as a
+>> PCI device.
+>
+> Maybe drivers/misc ?
 
-Since Kalle is on holiday please go ahead and take this via net.
-This looks nicer than Kalle's version :)
+That's probably a little better, and there is already
+drivers/misc/mchp_pci1xxxx in there, which also has some
+aux devices.
 
-Acked-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+Maybe we need a new place and then move both of these
+and some of the similar devices from drivers/mfd to that, but
+we don't really have to pick one now.
 
-
-
+   Arnd
 
