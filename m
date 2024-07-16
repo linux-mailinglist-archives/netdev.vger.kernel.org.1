@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-111800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2D9932D46
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:03:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9235A932C96
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8960328131F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:03:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C362C1C20C63
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7C319EEAA;
-	Tue, 16 Jul 2024 16:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991BD19F477;
+	Tue, 16 Jul 2024 15:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IBon/fQq"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LUsl08wZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F2519EEA2;
-	Tue, 16 Jul 2024 16:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6664B19AD59;
+	Tue, 16 Jul 2024 15:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145785; cv=none; b=aBwmxkg5y9KEnlxmRMdFeQ+A8D/VXrYKMi5x6NGKyVjN/K362IfEfqgUEBPlq9NpC5J51miGlkWbPgAo/0XNCbAULr2THOP+PlE2LlPn+vcRhUZxZBCd8m8T4AH+Jy5IVy5EM/y/z5ejFeHisseCq/NX63d7hkpD+xFheqc0oVk=
+	t=1721145381; cv=none; b=kVjeBc9WVSx6TwXzKo8ioz4A9HBrYJQ0xR5+zU5DsGg4+/ILipgRkhHqo8eISw7n4fk+Dy3CBWGx7/jb+qvlvUkC2HdRz08V7P+mPl6PPJdIPqHLrvqf+kXSAU2Rczz0Gv5kR8u930E2ncCM0uy4Fo9xIG1fCH+mHpEQZ6MY+lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145785; c=relaxed/simple;
-	bh=e/x/T71qazPYlnTzBjN8NZGUrE/Cj3b0/v0gAslDIDY=;
+	s=arc-20240116; t=1721145381; c=relaxed/simple;
+	bh=R6ULpI4OweR8CsFb1rfR4oxT0jSSifXID8epGske/LA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kEs2pR6no1C1vsZXXBjmLSGU5Oxzf+MTifKNtQWeZjA4zBbKDVC2ZxwSRfTq+Nktfrp5TNrai6EhPk2zcMyIEJ8TFA0Qu3jhQwgEyixxkNQISvobB0Nj7Mf+n7CRd/dtc7lt0sobPygZprxljxuYH/qO7jSEOZug2QxTbomZyjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IBon/fQq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FC08C4AF15;
-	Tue, 16 Jul 2024 16:03:04 +0000 (UTC)
+	 MIME-Version; b=obbP8iaCcyXiKAWaMHhXFAYQHYVtO3HBV+OIbBbipofNlaFAkF8I4tsjKnxx9gn7l9a0BbRzLGv7lFANy+XlD4dOCtZJwJfUKbJL9Keu9gQyjamEEZ5BTiAi1FO2VHpVgqXGTc2e1he95CMqzbASgbkAymrcWcyvHFg3/QiD58Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LUsl08wZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2EE7C4AF0B;
+	Tue, 16 Jul 2024 15:56:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721145785;
-	bh=e/x/T71qazPYlnTzBjN8NZGUrE/Cj3b0/v0gAslDIDY=;
+	s=korg; t=1721145381;
+	bh=R6ULpI4OweR8CsFb1rfR4oxT0jSSifXID8epGske/LA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IBon/fQqTZMS+FD+zvRgig0RebU8EhA35JZKYDVhtngG13BSCspDAB7xKbmz09avB
-	 5q+thBhzS/TdGIfK3DgcEyWRtpFLFCZkapIaUlf2ZDxI8EJofBvUU8L+W9SZOJlecZ
-	 LRLUGXG+QR5x3UkJnd9o7bWAn7kQGvHKUtFrIngU=
+	b=LUsl08wZPwO5y0pKzOMhk6zFYXHKnJHSej0K4Pwvu4Uiab+U1zGUZMz4iYhu4sOJk
+	 LKXeYqjLDryjppNYxOzR+p5oUTD+bmSPBIGeLzBeC2oQ3FecmZy7Yf6aXMO9Nxm5ZJ
+	 tK7otJ+rtBwZ/yc/KIvKCAAG5VaJxZgsnyy0xAP0=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -48,14 +48,13 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 6.6 056/121] net: ks8851: Fix potential TX stall after interface reopen
-Date: Tue, 16 Jul 2024 17:31:58 +0200
-Message-ID: <20240716152753.480501816@linuxfoundation.org>
+	Ronald Wahl <ronald.wahl@raritan.com>
+Subject: [PATCH 6.1 48/96] net: ks8851: Fix deadlock with the SPI chip variant
+Date: Tue, 16 Jul 2024 17:31:59 +0200
+Message-ID: <20240716152748.353244648@linuxfoundation.org>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240716152751.312512071@linuxfoundation.org>
-References: <20240716152751.312512071@linuxfoundation.org>
+In-Reply-To: <20240716152746.516194097@linuxfoundation.org>
+References: <20240716152746.516194097@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -67,30 +66,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: Ronald Wahl <ronald.wahl@raritan.com>
 
-commit 7a99afef17af66c276c1d6e6f4dbcac223eaf6ac upstream.
+commit 0913ec336a6c0c4a2b296bd9f74f8e41c4c83c8c upstream.
 
-The amount of TX space in the hardware buffer is tracked in the tx_space
-variable. The initial value is currently only set during driver probing.
+When SMP is enabled and spinlocks are actually functional then there is
+a deadlock with the 'statelock' spinlock between ks8851_start_xmit_spi
+and ks8851_irq:
 
-After closing the interface and reopening it the tx_space variable has
-the last value it had before close. If it is smaller than the size of
-the first send packet after reopeing the interface the queue will be
-stopped. The queue is woken up after receiving a TX interrupt but this
-will never happen since we did not send anything.
+    watchdog: BUG: soft lockup - CPU#0 stuck for 27s!
+    call trace:
+      queued_spin_lock_slowpath+0x100/0x284
+      do_raw_spin_lock+0x34/0x44
+      ks8851_start_xmit_spi+0x30/0xb8
+      ks8851_start_xmit+0x14/0x20
+      netdev_start_xmit+0x40/0x6c
+      dev_hard_start_xmit+0x6c/0xbc
+      sch_direct_xmit+0xa4/0x22c
+      __qdisc_run+0x138/0x3fc
+      qdisc_run+0x24/0x3c
+      net_tx_action+0xf8/0x130
+      handle_softirqs+0x1ac/0x1f0
+      __do_softirq+0x14/0x20
+      ____do_softirq+0x10/0x1c
+      call_on_irq_stack+0x3c/0x58
+      do_softirq_own_stack+0x1c/0x28
+      __irq_exit_rcu+0x54/0x9c
+      irq_exit_rcu+0x10/0x1c
+      el1_interrupt+0x38/0x50
+      el1h_64_irq_handler+0x18/0x24
+      el1h_64_irq+0x64/0x68
+      __netif_schedule+0x6c/0x80
+      netif_tx_wake_queue+0x38/0x48
+      ks8851_irq+0xb8/0x2c8
+      irq_thread_fn+0x2c/0x74
+      irq_thread+0x10c/0x1b0
+      kthread+0xc8/0xd8
+      ret_from_fork+0x10/0x20
 
-This commit moves the initialization of the tx_space variable to the
-ks8851_net_open function right before starting the TX queue. Also query
-the value from the hardware instead of using a hard coded value.
+This issue has not been identified earlier because tests were done on
+a device with SMP disabled and so spinlocks were actually NOPs.
 
-Only the SPI chip variant is affected by this issue because only this
-driver variant actually depends on the tx_space variable in the xmit
-function.
+Now use spin_(un)lock_bh for TX queue related locking to avoid execution
+of softirq work synchronously that would lead to a deadlock.
 
 Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -101,32 +123,63 @@ Cc: Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org
 Cc: stable@vger.kernel.org # 5.10+
 Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://patch.msgid.link/20240709195845.9089-1-rwahl@gmx.de
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20240706101337.854474-1-rwahl@gmx.de
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/net/ethernet/micrel/ks8851_common.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/micrel/ks8851_common.c |    8 ++++----
+ drivers/net/ethernet/micrel/ks8851_spi.c    |    4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 --- a/drivers/net/ethernet/micrel/ks8851_common.c
 +++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -482,6 +482,7 @@ static int ks8851_net_open(struct net_de
- 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
+@@ -352,11 +352,11 @@ static irqreturn_t ks8851_irq(int irq, v
+ 		netif_dbg(ks, intr, ks->netdev,
+ 			  "%s: txspace %d\n", __func__, tx_space);
  
- 	ks->queued_len = 0;
-+	ks->tx_space = ks8851_rdreg16(ks, KS_TXMIR);
- 	netif_start_queue(ks->netdev);
+-		spin_lock(&ks->statelock);
++		spin_lock_bh(&ks->statelock);
+ 		ks->tx_space = tx_space;
+ 		if (netif_queue_stopped(ks->netdev))
+ 			netif_wake_queue(ks->netdev);
+-		spin_unlock(&ks->statelock);
++		spin_unlock_bh(&ks->statelock);
+ 	}
  
- 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
-@@ -1101,7 +1102,6 @@ int ks8851_probe_common(struct net_devic
- 	int ret;
+ 	if (status & IRQ_SPIBEI) {
+@@ -635,14 +635,14 @@ static void ks8851_set_rx_mode(struct ne
  
- 	ks->netdev = netdev;
--	ks->tx_space = 6144;
+ 	/* schedule work to do the actual set of the data if needed */
  
- 	ks->gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
- 	ret = PTR_ERR_OR_ZERO(ks->gpio);
+-	spin_lock(&ks->statelock);
++	spin_lock_bh(&ks->statelock);
+ 
+ 	if (memcmp(&rxctrl, &ks->rxctrl, sizeof(rxctrl)) != 0) {
+ 		memcpy(&ks->rxctrl, &rxctrl, sizeof(ks->rxctrl));
+ 		schedule_work(&ks->rxctrl_work);
+ 	}
+ 
+-	spin_unlock(&ks->statelock);
++	spin_unlock_bh(&ks->statelock);
+ }
+ 
+ static int ks8851_set_mac_address(struct net_device *dev, void *addr)
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -340,10 +340,10 @@ static void ks8851_tx_work(struct work_s
+ 
+ 	tx_space = ks8851_rdreg16_spi(ks, KS_TXMIR);
+ 
+-	spin_lock(&ks->statelock);
++	spin_lock_bh(&ks->statelock);
+ 	ks->queued_len -= dequeued_len;
+ 	ks->tx_space = tx_space;
+-	spin_unlock(&ks->statelock);
++	spin_unlock_bh(&ks->statelock);
+ 
+ 	ks8851_unlock_spi(ks, &flags);
+ }
 
 
 
