@@ -1,144 +1,162 @@
-Return-Path: <netdev+bounces-111798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE653932CDE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:59:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DDDB932F65
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 19:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC451C22114
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:59:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4B8CB22F25
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A1519FA75;
-	Tue, 16 Jul 2024 15:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f5WUxMue"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAD219FA94;
+	Tue, 16 Jul 2024 17:51:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888BE19FA99;
-	Tue, 16 Jul 2024 15:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63B31A00FF
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 17:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145513; cv=none; b=h4dmr00aE326tCaqP8D3k8hu7sqE0QudcixCXPv1xG/3Ky5ohn/bqbuGfFEKzcQQQGYlLk1HlSO1iDyohXM7VEKdYdFFu0pQ1gtTpr5QS2zdI8pch5CZ90yeHMKaWOZtkqe3yGLnw+HXBx7RIf1o8JDCFPEPnf2bUfmRy/eeJyg=
+	t=1721152265; cv=none; b=Mg7SbEMW0SYxggUHXOhmie46yK1vE35Bq2ZmuSrcC6g1l6BAV/MiIjw0T3NtJgK43CWxNtTz3fKQha3yYxqnmyBOyIb5tqg/8+3dAKlIy+U/DYyev2YlVZPmsm+3ZW1Mr7A5ku71EoytUD/xDc1vf5tWtpdQcx3nWJZ/mJx6+T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145513; c=relaxed/simple;
-	bh=NDRLYyT8pN/HFDs6K/Dfs1m0KHkA5QT/h/5XhCFwghE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZmqWHx4vv+wKebDsPnFU0RSRvZUxFtHSLNNScHzz/kuOj3yHN2NU5XUKM9m7P2sqYI5bftC2ro3DPmt/z6MDguLPSEUvE3tkTgd4rbLs4z40ygxZ/ANPnZImPXfEQPf6rM8RHii5wzr9Zm9KHtpicyKof08smRjs1yjg3s6xmlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f5WUxMue; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BEAA81C0006;
-	Tue, 16 Jul 2024 15:58:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1721145503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/6fyfU7hh9xia4CKde5/FfdqWurIEu+oueFw1Yyue2o=;
-	b=f5WUxMuemYRLVJeAA6sWlmzDtzBkqz+hbBTE5MQ0kHlOXdG6MUR0c8BtaEs+EqnSCI3Ila
-	oWQ7hQ1r4xxK56Gmh+RY5r0HAgbmte0NZFR2vK51PpC9WmuJ/qjiPYGOT91n7b/wmAvwQp
-	AARSmzwvBd3AaTQqEiU4c/eNwjxx6JXYEtgDlRT+bI0GkZgmiM4QPzIB8k+kFbXNo+dtNP
-	1SjaHNhg6AUvxBYJq9luF1KHnqww9r9kj2tCfM9rbGp0vB4vRmq7N1rQF1xSSxdUBp7MZU
-	CCweZyaBh2wC4Xd+/EE6L01nAU2Rf5ke/xhu79Ld/dvkiLfpjzSnInlHCk2qjg==
-Date: Tue, 16 Jul 2024 17:58:18 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Rob Herring" <robh@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Conor Dooley" <conor@kernel.org>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Lee Jones" <lee@kernel.org>, "Andy
- Shevchenko" <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>, UNGLinuxDriver@microchip.com,
- "Saravana Kannan" <saravanak@google.com>, "Bjorn Helgaas"
- <bhelgaas@google.com>, "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, "Steen Hegelund"
- <Steen.Hegelund@microchip.com>, "Daniel Machon"
- <daniel.machon@microchip.com>, "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Horatiu Vultur"
- <horatiu.vultur@microchip.com>, "Andrew Lunn" <andrew@lunn.ch>,
- devicetree@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
- Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
- <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 6/7] mfd: Add support for LAN966x PCI device
-Message-ID: <20240716175818.2ef948d9@bootlin.com>
-In-Reply-To: <7289bb54-99f2-4630-a437-21997a9e2b1f@app.fastmail.com>
-References: <20240627091137.370572-1-herve.codina@bootlin.com>
-	<20240627091137.370572-7-herve.codina@bootlin.com>
-	<20240711152952.GL501857@google.com>
-	<20240711184438.65446cc3@bootlin.com>
-	<2024071113-motocross-escalator-e034@gregkh>
-	<CAL_Jsq+1r3SSaXupdNAcXO-4rcV-_3_hwh0XJaBsB9fuX5nBCQ@mail.gmail.com>
-	<20240712151122.67a17a94@bootlin.com>
-	<83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com>
-	<20240715141229.506bfff7@bootlin.com>
-	<7289bb54-99f2-4630-a437-21997a9e2b1f@app.fastmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1721152265; c=relaxed/simple;
+	bh=ic2sbABp4tHp3UGGNyn+mzu/e840S3TaNk0qjVFGVfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PDk9t1090MSvSUcnZe9wjd7+R+H3IynnkxZY1cKxRpYFpZKpnHpY2E69TCEOOlWL4BzgvJfv+5VcLIKbQnCddhsySECxRPRfSGu7cwHUnsXsvEne1OElVEdOAeJcWpammDizJpdb4vttlner9GKDTko8j7yRFaOUIg4qFuMgUHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sTmJy-0000eT-4W; Tue, 16 Jul 2024 19:50:38 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sTmJv-0001tg-EK; Tue, 16 Jul 2024 19:50:35 +0200
+Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 26D7D305380;
+	Tue, 16 Jul 2024 14:45:36 +0000 (UTC)
+Date: Tue, 16 Jul 2024 16:45:33 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com
+Subject: Re: [PATCH v2 4/4] can: flexcan: add wakeup support for imx95
+Message-ID: <20240716-chowchow-of-massive-joviality-77e833-mkl@pengutronix.de>
+References: <20240715-flexcan-v2-0-2873014c595a@nxp.com>
+ <20240715-flexcan-v2-4-2873014c595a@nxp.com>
+ <20240716-curious-scorpion-of-glory-8265aa-mkl@pengutronix.de>
+ <ZpaF4Wc70VuV4Cti@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="l2syr324jbfki6hb"
+Content-Disposition: inline
+In-Reply-To: <ZpaF4Wc70VuV4Cti@lizhi-Precision-Tower-5810>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, 16 Jul 2024 16:44:12 +0200
-"Arnd Bergmann" <arnd@arndb.de> wrote:
 
-> On Mon, Jul 15, 2024, at 14:12, Herve Codina wrote:
-> > Hi Arnd,
-> >
-> > On Fri, 12 Jul 2024 16:14:31 +0200
-> > "Arnd Bergmann" <arnd@arndb.de> wrote:
-> >  
-> >> On Fri, Jul 12, 2024, at 15:11, Herve Codina wrote:  
-> >> > On Thu, 11 Jul 2024 14:33:26 -0600 Rob Herring <robh@kernel.org> wrote:    
-> >> >> On Thu, Jul 11, 2024 at 1:08 PM Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:    
-> >>   
-> >> >> > >
-> >> >> > > This PCI driver purpose is to instanciate many other drivers using a DT
-> >> >> > > overlay. I think MFD is the right subsystem.      
-> >> >> 
-> >> >> It is a Multi-function Device, but it doesn't appear to use any of the
-> >> >> MFD subsystem. So maybe drivers/soc/? Another dumping ground, but it
-> >> >> is a driver for an SoC exposed as a PCI device.
-> >> >>     
-> >> >
-> >> > In drivers/soc, drivers/soc/microchip/ could be the right place.
-> >> >
-> >> > Conor, are you open to have the PCI LAN966x device driver in
-> >> > drivers/soc/microchip/ ?    
-> >> 
-> >> That sounds like a much worse fit than drivers/mfd: the code
-> >> here does not actually run on the lan966x soc, it instead runs
-> >> on whatever other machine you happen to plug it into as a
-> >> PCI device.  
-> >
-> > Maybe drivers/misc ?  
-> 
-> That's probably a little better, and there is already
-> drivers/misc/mchp_pci1xxxx in there, which also has some
-> aux devices.
-> 
-> Maybe we need a new place and then move both of these
-> and some of the similar devices from drivers/mfd to that, but
-> we don't really have to pick one now.
-> 
+--l2syr324jbfki6hb
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In the next iteration, I plan to move the lan966x pci driver in
-drivers/misc/
+On 16.07.2024 10:40:31, Frank Li wrote:
+> > > @@ -2330,9 +2366,12 @@ static int __maybe_unused flexcan_noirq_resume=
+(struct device *device)
+> > >  	if (netif_running(dev)) {
+> > >  		int err;
+> > > =20
+> > > -		err =3D pm_runtime_force_resume(device);
+> > > -		if (err)
+> > > -			return err;
+> > > +		if (!(device_may_wakeup(device) &&
+> >                       ^^^^^^^^^^^^^^^^^^^^^^^^
+> >=20
+> > Where does this come from?
+>=20
+> include/linux/pm_wakeup.h
+>=20
+> static inline bool device_may_wakeup(struct device *dev)                 =
+                          =20
+> {                                                                        =
+                          =20
+>         return dev->power.can_wakeup && !!dev->power.wakeup;             =
+                          =20
+> }
 
-Not sure that it needs to be in a subdir.
+Sorry for the confusion. I wanted to point out, that the original driver
+doesn't have the check to device_may_wakeup(). Why was this added?
 
-Best regards
-Hervé
+> >=20
+> > > +		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SC=
+MI)) {
+> > > +			err =3D pm_runtime_force_resume(device);
+> > > +			if (err)
+> > > +				return err;
+> > > +		}
+> > > =20
+> > >  		if (device_may_wakeup(device))
+> > >  			flexcan_enable_wakeup_irq(priv, false);
+> > > diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flex=
+can/flexcan.h
+> > > index 025c3417031f4..4933d8c7439e6 100644
+> > > --- a/drivers/net/can/flexcan/flexcan.h
+> > > +++ b/drivers/net/can/flexcan/flexcan.h
+> > > @@ -68,6 +68,8 @@
+> > >  #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
+> > >  /* Device supports RX via FIFO */
+> > >  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
+> > > +/* Setup stop mode with ATF SCMI protocol to support wakeup */
+> > > +#define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
+> > > =20
+> > >  struct flexcan_devtype_data {
+> > >  	u32 quirks;		/* quirks needed for different IP cores */
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--l2syr324jbfki6hb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaWh4sACgkQKDiiPnot
+vG9pnwf+JoS4BGqt9+eauMHhwkSi1Z1OupbzhlhGwMBtIeQWPmhjM0f0/N0XDNyA
+vFmZZs6HIj9lcXNADBVtKvB92MJFV4UbvGyPSqs4cU8r/cZdPr+I5j0gVHHCmtiq
+RZcPzP+Jm6U6NV4C8Oj6RZxhPVCKKlNfckBW9pcjjhKg4XmEFksYC5J9G4ldofBz
+DHivW/RXq2mcals9q7N2JTkgH6Zmw7wxnOWIUdFItj7Jt1XFDWQSO7ha4UC1ntmK
+FgdCfR0anEHNOucDeLCyXw63FOBro/pD3iQ6xdIBCR/IVnhSIgkAjkIjFV6K5d+G
+nvSKa9wCyX8iqQJuRZNp6HBTEvex/Q==
+=Vri0
+-----END PGP SIGNATURE-----
+
+--l2syr324jbfki6hb--
 
