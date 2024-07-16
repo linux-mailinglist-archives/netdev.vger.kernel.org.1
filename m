@@ -1,129 +1,197 @@
-Return-Path: <netdev+bounces-111809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E62FB932FC1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 20:11:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7479D933094
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 20:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 234FE1C22005
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:11:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0CC1B20F42
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297CE1A01B3;
-	Tue, 16 Jul 2024 18:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412AA1A38DC;
+	Tue, 16 Jul 2024 18:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QujV4/Oe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGXix5eR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714E119B587
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 18:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690D01A0720;
+	Tue, 16 Jul 2024 18:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721153499; cv=none; b=RVN2OjFxMM7gbxEUn3u93N7JECvoD/6hSrNLeG2uQxXJx2QeID9BwTJNL7bBeBZxCactOEA1tZ1DvoD2EFfm8/UBXGo5D08Du3S+Gm6Aaa3a9fpFbaPqb32I+1UTBwDQznARGPy5nOhhVeMrfLptXSQ56zw78lqJ13+eIsY4k78=
+	t=1721155097; cv=none; b=mMt2xHxmLaGYYIfkTheJkh9JwPV2lVOZq1FiT6T8W/60iG150Q4by8g3jsuZQHd/nvOEDkCO3ZalbxiVayZKaZ4YdpZpoLND6K+KGI+/KZCo5JgsH5oSM1fhoOVNh3qpObJvBwYSitjS4Y/GZJgSD3GlOPB2mp5EfN4+wm989Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721153499; c=relaxed/simple;
-	bh=bikN/RuZjvbf9tFWiqRF9s31aXIKoMoeOvEsrIbDkJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V/jX90XZVbnzuGyd56nImukj7KhdCxRwS1bZsXagT3ChGUPSG1V1OTjICBogYHUnLtefctLv46Sw/5W+IHDFyEuTnCjMzMeiBP4ZCaCBoc896z/Or8wF1/lx4lvKqf5oMFEG1Ucmv7tpqoj3r/IdYKKUKn6KdMA1QIl8OHbVAPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QujV4/Oe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721153496;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s/KJbSvYczm8IBPIU0yUQmJj8mpbQtOKhuPcIFJ/hSU=;
-	b=QujV4/Oe0vwBKPs7ZHt6lCJAHexrGHgnhg5LGx746roPxBOIQ6fQz2T4ZjFtayn2ltloDF
-	1v4Pl8ap9JOsRwrIB5kRoXLmJ+j3HE7wyEEWuQhKEQBhD0oJi+pGmv+iYAQ6QceBtrXycD
-	kI2CDkM9Q+/gtRk1mPjaJzxAGP8l/6A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-84-7uNG2hMJMQq5vHBbkYyFQQ-1; Tue, 16 Jul 2024 14:11:34 -0400
-X-MC-Unique: 7uNG2hMJMQq5vHBbkYyFQQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-426703ac975so98625e9.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 11:11:34 -0700 (PDT)
+	s=arc-20240116; t=1721155097; c=relaxed/simple;
+	bh=bhIWzgmFY3aeKFrE6cUAq/sjmY8KoRONFtyh21jnxEg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HmlKOS+kZT+n6Lg1arHcoSgVlLw4d5qBzib0ubkTo+kkIkiryld8g90pfFzWW95Q9cvX7zKqLbcu/vUwgIdJBiLY+KxLyCRz1Dr41EacyXd2gL+DMQu7bEHJ1OBtiUfxB5FeqcgbOvm+k0xO1CPT2aJ4xpvCEoOBXHaaispoao8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGXix5eR; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58b966b41fbso7422424a12.1;
+        Tue, 16 Jul 2024 11:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721155093; x=1721759893; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2QpPFCXFSzwXuk5Smpy2Q+ucAYxfBE33tkpjc80+O0=;
+        b=TGXix5eRY5rtFunR/5pZdaCkHLpvELzo4eAXiudW45ALvOXmHANlSTmuDG4b+LMP86
+         DwggqUvltmbqUxzraPnCnN4WSv5R70HR3tHr/c5bbuViA8SnAwozml49EUh/FNUbkCEH
+         wLSB4MeZqbs9hLcdmySqK05FdIVXtuM0glWnCoK27Xgk+KFan3V/kmtShxhkndFMJleL
+         XHC4r/TxQlc00bDjXHtzbSu66wLvTovvcvcGmBIciYdxa7TLJiEu60qlxOVeSENnYg8C
+         0i6ZChmZcWCp235DGU9+DZTaWTwGVfO34VX5qKd0Ms3uYdCu+6v7FDiPKbPDk8X45gbB
+         vUzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721153494; x=1721758294;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s/KJbSvYczm8IBPIU0yUQmJj8mpbQtOKhuPcIFJ/hSU=;
-        b=tjcdLTWoGd2lgWnPb8REayPagj3DxRcyu61a46bOYRmVXnc9PPn+PucSlFfsEIEHzA
-         eVwSbf492O0SLnSD32VU3DUnYTdGLr5FfC8R/0432AoTQiNnPKdWXMDqRWPSGvGr+9i3
-         aSVP2otpPnJyP1koeYgXPG+SENhwOWjqQ7jJqF0cgsHc5q7bdLNGve/tLKw128oFeBQo
-         No6n0iYQ4mo8w5DLPgunoxoLs2tFK1vzkLtSwWta+ZGRY59Oe+R92oS6oE1+aRnvarAx
-         viPAAitq/xs53MoM8RKkoeZOAxtbPHT5on3FePR/RAYnl5m7HW3H3Wxaey2sBN5gTNmg
-         6e8Q==
-X-Gm-Message-State: AOJu0YyN9O708RHBA5m7hpt7AOlga5q/JvADJ6Sm2TlzJG6TZW94BSwl
-	KhCgb+b+5jMczy4VMUlRvYS964B+dXvhCr2kpc+etV4KbZfJHyOL2zyiSUs5zpd3o/8sX1cQPI7
-	ca26OBnxQLvb1qm/jZI4lomxZEgUqgmoJ9ZEpXCcUsIZ+CdrgLOpS4w==
-X-Received: by 2002:a05:600c:3b89:b0:426:686f:7ad with SMTP id 5b1f17b1804b1-427bb6d35bdmr22326135e9.10.1721153493785;
-        Tue, 16 Jul 2024 11:11:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFH85ma9p7lMegI6gqqGWceRUX0+O6xKzznwHixGOoSyGeT+XxQY/2vPLhonidTaJ2UCovWQQ==
-X-Received: by 2002:a05:600c:3b89:b0:426:686f:7ad with SMTP id 5b1f17b1804b1-427bb6d35bdmr22325915e9.10.1721153493181;
-        Tue, 16 Jul 2024 11:11:33 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427a5ef550asm137639795e9.46.2024.07.16.11.11.32
+        d=1e100.net; s=20230601; t=1721155093; x=1721759893;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y2QpPFCXFSzwXuk5Smpy2Q+ucAYxfBE33tkpjc80+O0=;
+        b=VU44waH8BLCVYd3dXFMkc5mEqgD9ctOe5bvoOrX1538Qy7yEW3AwEkAgxyNb4wnK3G
+         6N4Waw+QVpeu092U4TwMbi2pf4HOQxBiDH1/7IN3kxniKMY/JFAkM1Qz6AkHEGcetZc2
+         MkgMMs7aU6PKl4ouhXppJ10QHR3vb7uMCWC/4g/hFFiaYnGgBgTtVB57kte2OoYnIHim
+         Vm5dn7WJz6T2KYMndPyKobQZ1Pf5cwqh5i2UeKlvs5st07wyibIOMH6N5pv/FTa5Oq1r
+         96nKTDylfdI/BP13l4Z8zNr5N2ProwwP+Jfs3Nvk6E3lHcPoIE+AoR1Rlv+/xqra0/6r
+         jMUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWg3UFKD+v0hMF2nH91K+/sOrpj5i9N1a+lsPlC4tKEe0Zdpb3QibSg6ojvxZhySu7xH1zpewuPG9FkXN+eQROusq/Fy2b452juAYVpxB1/IR78Vt2/YnuwtJtDJDyb0XfuwE+2AsdrWQ==
+X-Gm-Message-State: AOJu0YzxTTaQ+vGIvaoKtlv3qLU0kkkLLXDAcw2jn0ZTPjkq1ONvkZX4
+	TTu/yyosq17RTMGTHHjnLWRKt+JM3SO410hFwFNQG+Sc74fcJHyFl4w1hit0
+X-Google-Smtp-Source: AGHT+IG0+8sJk4vnch/lSp8v1ukZvC8dyq5Z0AzM0HJxIe8NnKCTXm5Ja4RKUb3uO0OQT4puwhQSeg==
+X-Received: by 2002:a17:906:e05:b0:a6f:27e6:8892 with SMTP id a640c23a62f3a-a79eaa5b6f1mr187899866b.60.1721155093080;
+        Tue, 16 Jul 2024 11:38:13 -0700 (PDT)
+Received: from WBEC325.dom.lan ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc820eb3sm341852366b.207.2024.07.16.11.38.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 11:11:32 -0700 (PDT)
-Date: Tue, 16 Jul 2024 20:11:30 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	roopa@cumulusnetworks.com
-Subject: Re: [PATCH net 2/2] ipv4: Fix incorrect TOS in fibmatch route get
- reply
-Message-ID: <Zpa30mhAqoG5FP1X@debian>
-References: <20240715142354.3697987-1-idosch@nvidia.com>
- <20240715142354.3697987-3-idosch@nvidia.com>
+        Tue, 16 Jul 2024 11:38:12 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/2] net: dsa: vsc73xx: make RGMII delays configurable
+Date: Tue, 16 Jul 2024 20:37:34 +0200
+Message-Id: <20240716183735.1169323-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240715142354.3697987-3-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 15, 2024 at 05:23:54PM +0300, Ido Schimmel wrote:
-> The TOS value that is returned to user space in the route get reply is
-> the one with which the lookup was performed ('fl4->flowi4_tos'). This is
-> fine when the matched route is configured with a TOS as it would not
-> match if its TOS value did not match the one with which the lookup was
-> performed.
-> 
-> However, matching on TOS is only performed when the route's TOS is not
-> zero. It is therefore possible to have the kernel incorrectly return a
-> non-zero TOS:
-> 
->  # ip link add name dummy1 up type dummy
->  # ip address add 192.0.2.1/24 dev dummy1
->  # ip route get fibmatch 192.0.2.2 tos 0xfc
->  192.0.2.0/24 tos 0x1c dev dummy1 proto kernel scope link src 192.0.2.1
-> 
-> Fix by instead returning the DSCP field from the FIB result structure
-> which was populated during the route lookup.
-> 
-> Output after the patch:
-> 
->  # ip link add name dummy1 up type dummy
->  # ip address add 192.0.2.1/24 dev dummy1
->  # ip route get fibmatch 192.0.2.2 tos 0xfc
->  192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
-> 
-> Extend the existing selftests to not only verify that the correct route
-> is returned, but that it is also returned with correct "tos" value (or
-> without it).
+This patch switches hardcoded RGMII transmit/receive delay to
+a configurable value. Delay values are taken from the properties of
+the CPU port: 'tx-internal-delay-ps' and 'rx-internal-delay-ps'.
 
-Good catch!
+The default value is configured to 2.0 ns to maintain backward
+compatibility with existing code.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+---
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 68 ++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+index d9d3e30fd47a..7d3c8176dff7 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx-core.c
++++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+@@ -684,6 +684,67 @@ vsc73xx_update_vlan_table(struct vsc73xx *vsc, int port, u16 vid, bool set)
+ 	return vsc73xx_write_vlan_table_entry(vsc, vid, portmap);
+ }
+ 
++static void vsc73xx_configure_rgmii_port_delay(struct dsa_switch *ds)
++{
++	/* Keep 2.0 ns delay for backward complatibility */
++	u32 tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS;
++	u32 rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS;
++	struct dsa_port *dp = dsa_to_port(ds, CPU_PORT);
++	struct device_node *port_dn = dp->dn;
++	struct vsc73xx *vsc = ds->priv;
++	u32 delay;
++
++	if (!of_property_read_u32(port_dn, "tx-internal-delay-ps", &delay)) {
++		switch (delay) {
++		case 0:
++			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_NONE;
++			break;
++		case 1400:
++			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_1_4_NS;
++			break;
++		case 1700:
++			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_1_7_NS;
++			break;
++		case 2000:
++			break;
++		default:
++			dev_warn(vsc->dev,
++				 "Unsupported RGMII Transmit Clock Delay, set to 2.0 ns\n");
++			break;
++		}
++	} else {
++		dev_info(vsc->dev,
++			 "RGMII Transmit Clock Delay isn't configured, set to 2.0 ns\n");
++	}
++
++	if (!of_property_read_u32(port_dn, "rx-internal-delay-ps", &delay)) {
++		switch (delay) {
++		case 0:
++			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_NONE;
++			break;
++		case 1400:
++			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_1_4_NS;
++			break;
++		case 1700:
++			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_1_7_NS;
++			break;
++		case 2000:
++			break;
++		default:
++			dev_warn(vsc->dev,
++				 "Unsupported RGMII Receive Clock Delay value, set to 2.0 ns\n");
++			break;
++		}
++	} else {
++		dev_info(vsc->dev,
++			 "RGMII Receive Clock Delay isn't configured, set to 2.0 ns\n");
++	}
++
++	/* MII delay, set both GTX and RX delay */
++	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
++		      tx_delay | rx_delay);
++}
++
+ static int vsc73xx_setup(struct dsa_switch *ds)
+ {
+ 	struct vsc73xx *vsc = ds->priv;
+@@ -746,10 +807,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+ 			      VSC73XX_MAC_CFG, VSC73XX_MAC_CFG_RESET);
+ 	}
+ 
+-	/* MII delay, set both GTX and RX delay to 2 ns */
+-	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
+-		      VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS |
+-		      VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS);
++	/* Configure RGMII delay */
++	vsc73xx_configure_rgmii_port_delay(ds);
++
+ 	/* Ingess VLAN reception mask (table 145) */
+ 	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANMASK,
+ 		      0xff);
+-- 
+2.34.1
 
 
