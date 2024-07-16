@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-111810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7479D933094
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 20:44:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2000933098
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 20:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0CC1B20F42
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:44:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E4E41F21433
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412AA1A38DC;
-	Tue, 16 Jul 2024 18:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6241A38FA;
+	Tue, 16 Jul 2024 18:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGXix5eR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lyuJSLS0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690D01A0720;
-	Tue, 16 Jul 2024 18:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F0C1A0723;
+	Tue, 16 Jul 2024 18:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721155097; cv=none; b=mMt2xHxmLaGYYIfkTheJkh9JwPV2lVOZq1FiT6T8W/60iG150Q4by8g3jsuZQHd/nvOEDkCO3ZalbxiVayZKaZ4YdpZpoLND6K+KGI+/KZCo5JgsH5oSM1fhoOVNh3qpObJvBwYSitjS4Y/GZJgSD3GlOPB2mp5EfN4+wm989Ng=
+	t=1721155098; cv=none; b=N3Mn/H7p7DxRsEbUjw/WT8lQcWTe0y7fUqtBwKOE5wpdjYws6lV+JAEVo8AidBd2Oww3ahfKH4tQFuc1HI3IoTY3HNpwdKIrThvdZbFgxSB4Xssgk6QbXPY3r8V31a9vgp8vnh8/GsIwXRNkEQ+rK2Bu3GVB8iAtdhXKa6+YdPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721155097; c=relaxed/simple;
-	bh=bhIWzgmFY3aeKFrE6cUAq/sjmY8KoRONFtyh21jnxEg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HmlKOS+kZT+n6Lg1arHcoSgVlLw4d5qBzib0ubkTo+kkIkiryld8g90pfFzWW95Q9cvX7zKqLbcu/vUwgIdJBiLY+KxLyCRz1Dr41EacyXd2gL+DMQu7bEHJ1OBtiUfxB5FeqcgbOvm+k0xO1CPT2aJ4xpvCEoOBXHaaispoao8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGXix5eR; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1721155098; c=relaxed/simple;
+	bh=qn9kHVW1OzJtikyFcO2q7jFY1NsKEwFVI6LTAGD6xnM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=grkrlJnJY2fpZgEub4exuoeC+8rqQfEwTewUGORCZSwj9PoYACf+YjsHsIDRQZdxtWMFMuaOrnr6wpAQx3V+qaQjak+xqu/0WiULXXmkssMack/MN9Kc04lb0rf6/rvYQ1lDwZf5JEY9m4VRqvFMEXQ661sDID7z3N9xvLV3wu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lyuJSLS0; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58b966b41fbso7422424a12.1;
-        Tue, 16 Jul 2024 11:38:15 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-58ef19aa69dso6648751a12.3;
+        Tue, 16 Jul 2024 11:38:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721155093; x=1721759893; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2QpPFCXFSzwXuk5Smpy2Q+ucAYxfBE33tkpjc80+O0=;
-        b=TGXix5eRY5rtFunR/5pZdaCkHLpvELzo4eAXiudW45ALvOXmHANlSTmuDG4b+LMP86
-         DwggqUvltmbqUxzraPnCnN4WSv5R70HR3tHr/c5bbuViA8SnAwozml49EUh/FNUbkCEH
-         wLSB4MeZqbs9hLcdmySqK05FdIVXtuM0glWnCoK27Xgk+KFan3V/kmtShxhkndFMJleL
-         XHC4r/TxQlc00bDjXHtzbSu66wLvTovvcvcGmBIciYdxa7TLJiEu60qlxOVeSENnYg8C
-         0i6ZChmZcWCp235DGU9+DZTaWTwGVfO34VX5qKd0Ms3uYdCu+6v7FDiPKbPDk8X45gbB
-         vUzA==
+        d=gmail.com; s=20230601; t=1721155095; x=1721759895; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qlJmJ78XAskSwGh3WsL7y33RtbTE4NmXymqpFlK54ts=;
+        b=lyuJSLS0Qlg7pERNBTF80HCpTYFM3VQrN9Dr3LI7j0fyv7MXemC5Et1O92s5thStwd
+         vdfeHyY2JTWkBT6v19lLSVe0Fa5fWIBWzNh/2RgKdNvPwMnnhs+et/m8Z8qfLZCx+U2w
+         ybUUQ+FYzgLHmm6u48kJTf4XXhyzMJeciCOrgdMKkStZg/KpoVpZJzo6N26RtzMbHLtj
+         5RLXsGi2FIWj+mkXBRa1bWu88TK3EjHTcscS73k8QEQxzCNIhJGIEOycke1XWdTsJ6b9
+         64I9phYxfUNV2d6hS8b6GSHzMbOR3jXnksJECzEFZarimsRxUxtF6WUIWT15h50xnfKv
+         HtPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721155093; x=1721759893;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y2QpPFCXFSzwXuk5Smpy2Q+ucAYxfBE33tkpjc80+O0=;
-        b=VU44waH8BLCVYd3dXFMkc5mEqgD9ctOe5bvoOrX1538Qy7yEW3AwEkAgxyNb4wnK3G
-         6N4Waw+QVpeu092U4TwMbi2pf4HOQxBiDH1/7IN3kxniKMY/JFAkM1Qz6AkHEGcetZc2
-         MkgMMs7aU6PKl4ouhXppJ10QHR3vb7uMCWC/4g/hFFiaYnGgBgTtVB57kte2OoYnIHim
-         Vm5dn7WJz6T2KYMndPyKobQZ1Pf5cwqh5i2UeKlvs5st07wyibIOMH6N5pv/FTa5Oq1r
-         96nKTDylfdI/BP13l4Z8zNr5N2ProwwP+Jfs3Nvk6E3lHcPoIE+AoR1Rlv+/xqra0/6r
-         jMUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWg3UFKD+v0hMF2nH91K+/sOrpj5i9N1a+lsPlC4tKEe0Zdpb3QibSg6ojvxZhySu7xH1zpewuPG9FkXN+eQROusq/Fy2b452juAYVpxB1/IR78Vt2/YnuwtJtDJDyb0XfuwE+2AsdrWQ==
-X-Gm-Message-State: AOJu0YzxTTaQ+vGIvaoKtlv3qLU0kkkLLXDAcw2jn0ZTPjkq1ONvkZX4
-	TTu/yyosq17RTMGTHHjnLWRKt+JM3SO410hFwFNQG+Sc74fcJHyFl4w1hit0
-X-Google-Smtp-Source: AGHT+IG0+8sJk4vnch/lSp8v1ukZvC8dyq5Z0AzM0HJxIe8NnKCTXm5Ja4RKUb3uO0OQT4puwhQSeg==
-X-Received: by 2002:a17:906:e05:b0:a6f:27e6:8892 with SMTP id a640c23a62f3a-a79eaa5b6f1mr187899866b.60.1721155093080;
-        Tue, 16 Jul 2024 11:38:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721155095; x=1721759895;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qlJmJ78XAskSwGh3WsL7y33RtbTE4NmXymqpFlK54ts=;
+        b=eeEskKHBZSpVzFwIrewr3EcEh2RTiZCUD8nkP4PKh3NydpJDDSaF/D0KO/QPpNyhI7
+         OVukCyJCB41UFfYFRmf7aSfQk10cX/4es33rFb/JpNG2tULqihTWj5jX5yIzpgOht236
+         qwn51KzMEX94PCjlbodsBfXdu7oiy7Ab22ihuD5RPKCWcD6FTMeWyIf+WddFs62CBLQ0
+         x6NRKbKa+Ai6vW5GuLK0xupPJWuqHAQO1Yn5xBHL0qUkSGQsa2CxltVDqeIFNLGSt4so
+         bTOhFnTsPxwCu7HYbSF8L3zBQwOKICZl33Ei3Pimu2SJ1zZTW6lb6biiF6kryAS5h4op
+         7m9g==
+X-Forwarded-Encrypted: i=1; AJvYcCXv1pzS9EuWMvJzPUTDowtLmHP3R5Frcvc/+T9j8q/9hrOGI6K7uguuu2n5KVtMVzILFfisCWjftZUbEIYNCOG7YWvkB+WvwoJcdBMPBXEK+6zgxEbp1/mMf8/8GCKQ01D1jHczkxMHKg==
+X-Gm-Message-State: AOJu0YzMLgw5p3uIAebQBfQCW4HRTHj68mDK+aWI+GCZB9eitjKtRQrk
+	cTcDlEoDeoN8Vljbzr1JPJnDcDz2so3lmMMjY+FrF6ceTeaJasOWWF2Pr06Z
+X-Google-Smtp-Source: AGHT+IEDWRigWcf2uMuJzT5AZqhjIH9Dq+g7rHkhQ8vC9ZJJssxZ8d/Z4Ule0uxigZLhHUPgXrqZoA==
+X-Received: by 2002:a17:906:1292:b0:a6f:f7c:5c7a with SMTP id a640c23a62f3a-a79eaa61812mr213097066b.67.1721155094718;
+        Tue, 16 Jul 2024 11:38:14 -0700 (PDT)
 Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc820eb3sm341852366b.207.2024.07.16.11.38.11
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc820eb3sm341852366b.207.2024.07.16.11.38.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 11:38:12 -0700 (PDT)
+        Tue, 16 Jul 2024 11:38:14 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Pawel Dembicki <paweldembicki@gmail.com>,
@@ -81,10 +83,12 @@ Cc: Pawel Dembicki <paweldembicki@gmail.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/2] net: dsa: vsc73xx: make RGMII delays configurable
-Date: Tue, 16 Jul 2024 20:37:34 +0200
-Message-Id: <20240716183735.1169323-1-paweldembicki@gmail.com>
+Subject: [PATCH net-next 2/2] dt-bindings: net: dsa: vsc73xx: add {rx,tx}-internal-delay-ps
+Date: Tue, 16 Jul 2024 20:37:35 +0200
+Message-Id: <20240716183735.1169323-2-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240716183735.1169323-1-paweldembicki@gmail.com>
+References: <20240716183735.1169323-1-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,104 +97,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch switches hardcoded RGMII transmit/receive delay to
-a configurable value. Delay values are taken from the properties of
-the CPU port: 'tx-internal-delay-ps' and 'rx-internal-delay-ps'.
-
-The default value is configured to 2.0 ns to maintain backward
-compatibility with existing code.
+Add a schema validator to vitesse,vsc73xx.yaml for MAC-level RGMII delays
+in the CPU port. Additionally, valid values for VSC73XX were defined,
+and a common definition for the RX and TX valid range was created.
 
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 68 ++++++++++++++++++++++++--
- 1 file changed, 64 insertions(+), 4 deletions(-)
+ .../bindings/net/dsa/vitesse,vsc73xx.yaml     | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index d9d3e30fd47a..7d3c8176dff7 100644
---- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-+++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -684,6 +684,67 @@ vsc73xx_update_vlan_table(struct vsc73xx *vsc, int port, u16 vid, bool set)
- 	return vsc73xx_write_vlan_table_entry(vsc, vid, portmap);
- }
+diff --git a/Documentation/devicetree/bindings/net/dsa/vitesse,vsc73xx.yaml b/Documentation/devicetree/bindings/net/dsa/vitesse,vsc73xx.yaml
+index b99d7a694b70..f0fb31ad5d60 100644
+--- a/Documentation/devicetree/bindings/net/dsa/vitesse,vsc73xx.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/vitesse,vsc73xx.yaml
+@@ -52,6 +52,25 @@ properties:
+ allOf:
+   - $ref: dsa.yaml#/$defs/ethernet-ports
  
-+static void vsc73xx_configure_rgmii_port_delay(struct dsa_switch *ds)
-+{
-+	/* Keep 2.0 ns delay for backward complatibility */
-+	u32 tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS;
-+	u32 rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS;
-+	struct dsa_port *dp = dsa_to_port(ds, CPU_PORT);
-+	struct device_node *port_dn = dp->dn;
-+	struct vsc73xx *vsc = ds->priv;
-+	u32 delay;
++patternProperties:
++  "^(ethernet-)?ports$":
++    additionalProperties: true
++    patternProperties:
++      "^(ethernet-)?port@6$":
++        allOf:
++          - if:
++              properties:
++                phy-mode:
++                  contains:
++                    enum:
++                      - rgmii
++            then:
++              properties:
++                rx-internal-delay-ps:
++                  $ref: "#/$defs/internal-delay-ps"
++                tx-internal-delay-ps:
++                  $ref: "#/$defs/internal-delay-ps"
 +
-+	if (!of_property_read_u32(port_dn, "tx-internal-delay-ps", &delay)) {
-+		switch (delay) {
-+		case 0:
-+			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_NONE;
-+			break;
-+		case 1400:
-+			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_1_4_NS;
-+			break;
-+		case 1700:
-+			tx_delay = VSC73XX_GMIIDELAY_GMII0_GTXDELAY_1_7_NS;
-+			break;
-+		case 2000:
-+			break;
-+		default:
-+			dev_warn(vsc->dev,
-+				 "Unsupported RGMII Transmit Clock Delay, set to 2.0 ns\n");
-+			break;
-+		}
-+	} else {
-+		dev_info(vsc->dev,
-+			 "RGMII Transmit Clock Delay isn't configured, set to 2.0 ns\n");
-+	}
-+
-+	if (!of_property_read_u32(port_dn, "rx-internal-delay-ps", &delay)) {
-+		switch (delay) {
-+		case 0:
-+			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_NONE;
-+			break;
-+		case 1400:
-+			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_1_4_NS;
-+			break;
-+		case 1700:
-+			rx_delay = VSC73XX_GMIIDELAY_GMII0_RXDELAY_1_7_NS;
-+			break;
-+		case 2000:
-+			break;
-+		default:
-+			dev_warn(vsc->dev,
-+				 "Unsupported RGMII Receive Clock Delay value, set to 2.0 ns\n");
-+			break;
-+		}
-+	} else {
-+		dev_info(vsc->dev,
-+			 "RGMII Receive Clock Delay isn't configured, set to 2.0 ns\n");
-+	}
-+
-+	/* MII delay, set both GTX and RX delay */
-+	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
-+		      tx_delay | rx_delay);
-+}
-+
- static int vsc73xx_setup(struct dsa_switch *ds)
- {
- 	struct vsc73xx *vsc = ds->priv;
-@@ -746,10 +807,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
- 			      VSC73XX_MAC_CFG, VSC73XX_MAC_CFG_RESET);
- 	}
+ # This checks if reg is a chipselect so the device is on an SPI
+ # bus, the if-clause will fail if reg is a tuple such as for a
+ # platform device.
+@@ -67,6 +86,14 @@ required:
+   - compatible
+   - reg
  
--	/* MII delay, set both GTX and RX delay to 2 ns */
--	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
--		      VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS |
--		      VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS);
-+	/* Configure RGMII delay */
-+	vsc73xx_configure_rgmii_port_delay(ds);
++$defs:
++  internal-delay-ps:
++    description:
++      Disable tunable delay lines using 0 ps, or enable them and select
++      the phase between 1400 ps and 2000 ps in increments of 300 ps.
++    enum:
++      [0, 1400, 1700, 2000]
 +
- 	/* Ingess VLAN reception mask (table 145) */
- 	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANMASK,
- 		      0xff);
+ unevaluatedProperties: false
+ 
+ examples:
+@@ -108,6 +135,8 @@ examples:
+             reg = <6>;
+             ethernet = <&gmac1>;
+             phy-mode = "rgmii";
++            rx-internal-delay-ps = <0>;
++            tx-internal-delay-ps = <0>;
+             fixed-link {
+               speed = <1000>;
+               full-duplex;
+@@ -150,6 +179,8 @@ examples:
+           ethernet-port@6 {
+             reg = <6>;
+             ethernet = <&enet0>;
++            rx-internal-delay-ps = <0>;
++            tx-internal-delay-ps = <0>;
+             phy-mode = "rgmii";
+             fixed-link {
+               speed = <1000>;
 -- 
 2.34.1
 
