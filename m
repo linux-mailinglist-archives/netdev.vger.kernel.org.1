@@ -1,134 +1,126 @@
-Return-Path: <netdev+bounces-111739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DC8932699
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:32:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842139326B9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E8041C222BD
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:32:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3975D1F22FFB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE94B19A87E;
-	Tue, 16 Jul 2024 12:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272CF19AA58;
+	Tue, 16 Jul 2024 12:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HUhFCbCx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwV6h0sP"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652D71991D4;
-	Tue, 16 Jul 2024 12:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B3E4D8A3
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 12:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721133166; cv=none; b=kUHdXD8DXCFSZCJ2qxbu1ru0zAJ0FwAhhSV+SSeoa5Ud7OrcyHjfQE4w/kmJLZy0b5ynQGqOUD/Em7YSYFq3RP8UMYzqFvCET3nqcm1bT4N9LXfl1aiusf0tLNgGlrfz4R5IxcC/bLz8IZvm0Vn/M4vWHImUoO5VWL8iDhUxrqs=
+	t=1721133683; cv=none; b=N4hRSM6V1h7us7bPC4ixvuSwyUXieh2wzLITpS6zl5K93mgE8iyymkBgbA6tyUshDxmhsUTT1abK+njL6aql9nOwa6F7/LpWDqaxUblNwBoungccUH9Zgj96a8Rs4GcW8uZAtDgeQdORL1IrzCP1H5nwqdaxmjtSpALE/dTdThI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721133166; c=relaxed/simple;
-	bh=pIaGDgIPn1RkSG3S4gNRvlKDZuOR2m7qNGyMbFeFaBw=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=HRHHey0mRYBGQBMaGG4QLZQrngcsmpnqVG+x+YzSRMWl1enmqi1aCnxgO5QVGMQ2AFIAHFAAb2uMysx5gHSbC0HzK7t0ygEbUfoTPXGzfXeQJOPQJZ+XS75gOCENihoqRye7AbBAI3KKCyT7PXYvAigcCD/CyuPKIWfLxD0S9UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HUhFCbCx; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=pIaGDgIPn1RkSG3S4gNRvlKDZuOR2m7qNGyMbFeFaBw=; b=HUhFCbCxxO2O7trQKKBZU716z5
-	aR2jjJdEcONiiwl2owyirfMJPyFi2oyoP4SGPANW+ddVi57IkYviI0BIqrMOWOdVbHU7lWwHso4+y
-	Qy0VwdVg22UdQ7MsBfyRRNQXLJ5lnib7a/zEOWn8xnYIsOCwJqzxshAF8l/HlKqfmO+Tc0TraQgtF
-	ytML3yO5HpNe/A8j6ovesLNBYW1BnnMxj8mDF3B7PXCOvdpYwEcZLnbN3+XSF6pRVsMHGB88TVCR1
-	9JtEQJNUCCiTWwmEZq+1rtPt2HGwupqlFoNipkuGbRvXeH5JRbKDVrEV3JTPk0/bQb9eNenFTCVeu
-	rcHF+c7A==;
-Received: from [2a00:23ee:2468:1b84:edcd:8de9:5f89:1a4a] (helo=[IPv6:::1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sThM7-000000022Mx-1So8;
-	Tue, 16 Jul 2024 12:32:34 +0000
-Date: Tue, 16 Jul 2024 13:32:23 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>
-CC: "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [RFC PATCH v4] ptp: Add vDSO-style vmclock support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <9f132922-2bf7-4749-b8c7-4c57445f9cde@opensynergy.com>
-References: <20240708092924.1473461-1-dwmw2@infradead.org> <060f392c-7ba9-4ff6-be82-c64f542abaa1@opensynergy.com> <98b20feebf4e7a11870dca725c03ee4e411b1aa3.camel@infradead.org> <1c24e450-5180-46c2-8892-b10709a881e5@opensynergy.com> <1ca48fb47723ed16f860611ac230ded7a1ca07f1.camel@infradead.org> <9f132922-2bf7-4749-b8c7-4c57445f9cde@opensynergy.com>
-Message-ID: <DD886A0D-B8E2-4749-AB21-7B26A4B70374@infradead.org>
+	s=arc-20240116; t=1721133683; c=relaxed/simple;
+	bh=g/4Akut5VXNatHaPEmlQvnIpv9zI/MvKV96Vz/5Uz74=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nhiu/myH3mtsliYQ9t16GXzIvMEcwTJ/Vq8EeK3+nJU0j09wwNO2t5NALtudDOPfEENT7/bD5MLJp28+I2XM7i6AUhxEPvFHZ5GNnyVMxGcOrpatbMGfHmpojIcaZffvYJ++tuH9yUO0ojckvpGehuq0bE7T9sOwoFxS4pgr2wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UwV6h0sP; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5957040e32aso3578776a12.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 05:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721133680; x=1721738480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=40FsxvUJ1AT1p9/HLeH/DEoxUCK7clmkGVHWoNGVLkw=;
+        b=UwV6h0sPkUsXJf431PVVRN69gB8v9h26CVWSXptHGKDSkuGPK1uZR4JvUQXQ7v8qcq
+         QEdk02rXDXbevMwp5LcnnkO1lwoqsUzSiwDDkjv5axBu0da0/cZp73yO9eyOqdk566++
+         hreH+m9aA+zBvoUqR2bmLctdyLA61/SBRDVKxXw9yY8BJFP7vSTyU9uke/J/lOX+g1lC
+         +RO1mJv7uYeNL7aiFCPrmrHV011Ud1mLSzcfijfjp5MPMn/blttqxurocNAkd0xqNXEc
+         6iZiCYQzBj38xQFsK1WiJ9as//Go3ESm2urwklHQCyAnBd0fKALR4eNpojuKuE/JQted
+         zgQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721133680; x=1721738480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=40FsxvUJ1AT1p9/HLeH/DEoxUCK7clmkGVHWoNGVLkw=;
+        b=KYXYDwBB5DTgoD3jepkkdqt8/SMOE6gONbGjga/nFtTPg6g7uepyu8s1ZzKusPtdqS
+         KHAlwXNIK9ukJEOXkvESak/UnUpcI3rBNh/R2F9tKLuZ457/52cS//878LZLsRbsczcr
+         vxAlr0Iox36ezOzVXMHWsXdBwDjo2/YwjpX0tkTXkJJ9PwDHoAHxA25dYKfvE77Nqphv
+         4avT0Gw092+TVXYl/1qvUFroDUpAPfmSnGkDWyNptz2EIQIa1xmK9Fxlb0RrDSGmBVPu
+         YYavT0p4dib+5pGGNd90PxQZRlGcbDT+/0hfVgHQU+Bvd4PN9ejbMxHVQflbBoVenBsl
+         dhvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEnHAvybMOOe6Qtcp4kGowGmO4UKLZQmQzZ2S2tP3WdrXN3+Xdhbx2R9W5Ycf+n8D1Zo/y+gC7xsyZEdivNQDST+Yv7uCz
+X-Gm-Message-State: AOJu0YzljhumromAYhdP9yknBUYkUvVhrOrRXhOQsmX+1N2Bbe4sWn4K
+	fuxQHLwszTebkRZUPZiFLnHcLEWqM38WzhYiqI8B3olVHMEkXMcA+BJwsR73MlSnUGQAkBHpOnN
+	Bq/jo8FpvDMLYrORPIGolPsXEEMY=
+X-Google-Smtp-Source: AGHT+IFWdb2GwTR8EDTLDplbii5gjk3NNX4+iMYFyhzigv0NFP9VhRVg0It+UIqcU2XUEHJ3hWupszP3MIC2JjYF9gQ=
+X-Received: by 2002:a50:9f8f:0:b0:57d:f84:11aa with SMTP id
+ 4fb4d7f45d1cf-59eef9a5455mr1433684a12.31.1721133679425; Tue, 16 Jul 2024
+ 05:41:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20240716015401.2365503-5-edumazet@google.com> <20240716111012.143748-1-ojeda@kernel.org>
+In-Reply-To: <20240716111012.143748-1-ojeda@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 16 Jul 2024 20:40:40 +0800
+Message-ID: <CAL+tcoDVJK_J+ZGs=b94=A+3ci0uD4foZ4JQRmVa8+44udeUxA@mail.gmail.com>
+Subject: Re: [PATCH stable-5.4 4/4] tcp: avoid too many retransmit packets
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: gregkh@linuxfoundation.org, edumazet@google.com, davem@davemloft.net, 
+	eric.dumazet@gmail.com, jmaxwell37@gmail.com, kuba@kernel.org, 
+	kuniyu@amazon.com, ncardwell@google.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On 16 July 2024 12:54:52 BST, Peter Hilber <peter=2Ehilber@opensynergy=2Eco=
-m> wrote:
->On 11=2E07=2E24 09:50, David Woodhouse wrote:
->> On Thu, 2024-07-11 at 09:25 +0200, Peter Hilber wrote:
->>>
->>> IMHO this phrasing is better, since it directly refers to the state of=
- the
->>> structure=2E
->>=20
->> Thanks=2E I'll update it=2E
->>=20
->>> AFAIU if there would be abnormal delays in store buffers, causing some
->>> driver to still see the old clock for some time, the monotonicity coul=
-d be
->>> violated:
->>>
->>> 1=2E device writes new, much slower clock to store buffer
->>> 2=2E some time passes
->>> 3=2E driver reads old, much faster clock
->>> 4=2E device writes store buffer to cache
->>> 5=2E driver reads new, much slower clock
->>>
->>> But I hope such delays do not occur=2E
->>=20
->> For the case of the hypervisor=E2=86=90=E2=86=92guest interface this sh=
-ould be handled
->> by the use of memory barriers and the seqcount lock=2E
->>=20
->> The guest driver reads the seqcount, performs a read memory barrier,
->> then reads the contents of the structure=2E Then performs *another* rea=
-d
->> memory barrier, and checks the seqcount hasn't changed:
->> https://git=2Einfradead=2Eorg/?p=3Dusers/dwmw2/linux=2Egit;a=3Dblob;f=
-=3Ddrivers/ptp/ptp_vmclock=2Ec;hb=3Dvmclock#l351
->>=20
->> The converse happens with write barriers on the hypervisor side:
->> https://git=2Einfradead=2Eorg/?p=3Dusers/dwmw2/qemu=2Egit;a=3Dblob;f=3D=
-hw/acpi/vmclock=2Ec;hb=3Dvmclock#l68
+On Tue, Jul 16, 2024 at 7:10=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wro=
+te:
 >
->My point is that, looking at the above steps 1=2E - 5=2E:
+> Hi Greg, Eric, all,
 >
->3=2E read HW counter, smp_rmb, read seqcount
->4=2E store seqcount, smp_wmb, stores, smp_wmb, store seqcount become effe=
-ctive
->5=2E read seqcount, smp_rmb, read HW counter
+> I noticed this in stable-rc/queue and stable-rc/linux- for 6.1 and 6.6:
 >
->AFAIU this would still be a theoretical problem suggesting the use of
->stronger barriers=2E
+>     net/ipv4/tcp_timer.c:472:7: error: variable 'rtx_delta' is uninitiali=
+zed when used here [-Werror,-Wuninitialized]
+>                     if (rtx_delta > user_timeout)
+>                         ^~~~~~~~~
+>     net/ipv4/tcp_timer.c:464:15: note: initialize the variable 'rtx_delta=
+' to silence this warning
+>             u32 rtx_delta;
+>                         ^
+>                         =3D 0
+>
+> I hope that helps!
 
-This seems like a bug on the guest side=2E The HW counter needs to be read=
- *within* the (paired, matching) seqcount reads, not before or after=2E
+Thanks for the report!
 
+I think it missed one small snippet of code from [1] compared to the
+latest kernel. We can init this part before using it, something like
+this:
 
++       rtx_delta =3D (u32)msecs_to_jiffies(tcp_time_stamp(tp) -
++                       (tp->retrans_stamp ?: tcp_skb_timestamp(skb)));
+
+Note: fully untested.
+
+Since Eric is very busy, I decided to check and provide some useful
+information here.
+
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/com=
+mit/?id=3D614e8316aa4cafba3e204cb8ee48bd12b92f3d93
+>
+> Cheers,
+> Miguel
 
