@@ -1,122 +1,114 @@
-Return-Path: <netdev+bounces-111651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E00931EFE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 04:49:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A81C5931F13
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 05:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC0F02813FF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 02:49:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52C3B1F223EC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31336AC0;
-	Tue, 16 Jul 2024 02:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEDAB641;
+	Tue, 16 Jul 2024 03:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsVIk3I6"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="pNhi+IHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A90D17BAF
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 02:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DB13224;
+	Tue, 16 Jul 2024 03:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721098162; cv=none; b=OZ0KYg9axXkQoWszC4sGbaFjcsn+m95UUEQUACho3Uo4qcWlQjfuu9sxyGzUE2B/1oaqKlBT6OwV3Ke46rAR9qNaRClXvRCrS2bveNW6DpS/LzJQF3RYktZs3GcSRapnfl7vfY/fCpadQXdDYwULQyigalmixxWG6x9JgHJaFGk=
+	t=1721098948; cv=none; b=oMt0Og14ZRjiVSr/RTn2e5xKIzf+7q8hXhowj0alcuKoK6zLikDzl25gY1TbmEF02UQfBxm5bPaZpkeSEeED9X6TWkLu3+0P88MaIDkttplY2JCSPrzKiHHy1tw6lUvqpx6OokdWxSiaF+92HAF/8RDGQ+gSD6z9yXjaBcKGrrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721098162; c=relaxed/simple;
-	bh=D5xmb7PyIcSPj66edI9owo+MndntFQuu8kNpgT2Yfxs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gzEtbdmrw3v3/G0fAlcCD48GduidZoaHe7CCz7PzMAGzqYh+00ARjdoOlmnAevnKuwgxLbUvp8IF1C6U+4ez6oAkygLUHqGmroFdVmDdWQ3wKd5zb7AQJGPydsWqW0CoH/fLbnNTo5AIjZ+0bAQPP+9co/cBWrzZITH3lZDou0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsVIk3I6; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-38713b03039so18744945ab.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 19:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721098160; x=1721702960; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=POQeuwFqxPs3c9WInVyLeovx7yI2dSQuf14N8K8wNFs=;
-        b=nsVIk3I6GCtYpINYb0tgfYtM7faVd71zycOkMj3eJ8mF4V+AXvxmis6WRGjw7QfLEi
-         fWBguLCB2CoIo31HkY7472KxW6gUuxcaC2KIEoPrvF7045K2cJzxx0VTz7IuLtZLLXhg
-         mBC7AR6XL0LULfrPUlhNN/cA3oQL74bYyLwi4mudIghqKwAWq3LQXjONuvgbPky3Gpfm
-         uO55VDObmNIAmZraDO9cb2SESJQPSXCRaCx7jMxMuM+ooyhH/tgu7HwscscLid7xuanv
-         2sOTyHLCPBeTrqsObcsVYtGmDlr8e1TfBqBUKyAgv6QEQdIdec58zN/lRPvHo2+U0yJN
-         q/GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721098160; x=1721702960;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=POQeuwFqxPs3c9WInVyLeovx7yI2dSQuf14N8K8wNFs=;
-        b=bgg4fK92qjHA8OhSxMl6j3bvKFqLR+X8p7qxq48LjymMpSFPj8kz7/KfziNgkHSGrw
-         XwuXekWJTuaxIer6anB8QILVtoaHs/DqwJut3dYLC1IeWCyTqeFPkCvfW4XSm2rg/mxr
-         5Za5iUVduhP4sAEoZaBeBbYpwKslEeEi8LUlUxhcFLKCkHGhOBNj+VkodSIfqYoL64vW
-         mWoHyElsddbn8NgYh2vCPdYyQynVyoEXT2hRkfFwlE5t93doZ91W8PyTB+Es9I9y7Voo
-         AuWZMiwUWvEEESB6hikNC+CH4xGKnnFr0Rxp0UDLomNixfXqp/u1VZtAcdsvzS/VeXlv
-         wdJg==
-X-Gm-Message-State: AOJu0YzqYhVKLkEn23EGi3mN8+Ab/KG67Y2V2HU6Q9XjetIf6BrJK6bJ
-	C+z6lpETiOPBf18chl19TZnNBoyD+iU1Z4+7Q4K67ikDIJBfgq9npSpOlNwei3g=
-X-Google-Smtp-Source: AGHT+IEjyb2mtrY+P1BKzg6tpcnIJiYfWOfgztUKFB9E4H8vnox3uKWlhBvsBEdFsXQlUyfoLpunmw==
-X-Received: by 2002:a05:6e02:1c49:b0:383:71d5:347 with SMTP id e9e14a558f8ab-393d0e2461bmr12484475ab.6.1721098160143;
-        Mon, 15 Jul 2024 19:49:20 -0700 (PDT)
-Received: from localhost ([2402:7500:577:906:e634:edb:c059:7bd2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7ecc948asm5092078b3a.197.2024.07.15.19.49.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 19:49:19 -0700 (PDT)
-From: wojackbb@gmail.com
-To: netdev@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	Jack Wu <wojackbb@gmail.com>
-Subject: [PATCH] [net,v3] net: wwan: t7xx: add support for Dell DW5933e
-Date: Tue, 16 Jul 2024 10:49:02 +0800
-Message-Id: <20240716024902.16054-1-wojackbb@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1721098948; c=relaxed/simple;
+	bh=3pNgEHFGTvAI+GEAp/ruHV8Mn3DiUl+0KhvdRdpKuHA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PhrH+S1/Uv2XPSwvJrlJ630zuLrtNtK+bJl7wrgdj0oUE2IhAuKAa+zvdN01eMf8DlSxQ4oH6gdOKrLp5p7DzViAcUHdywYGOcLfxBV9l1yNTrji07SOn52/n13TN9LXiHrNMsX1ebv7VgZ5KnK68XKkWydCx/waqkIYQ+REwP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=pNhi+IHp; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46G31oNQ2366112, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1721098910; bh=3pNgEHFGTvAI+GEAp/ruHV8Mn3DiUl+0KhvdRdpKuHA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=pNhi+IHp/VrDUh43JMginECavVYk5Y9kug/oftPBkkZwa7k56oHsMbTU9o2e3qfne
+	 YdvBlQMqNetoj64w8EbvuggddtIT0hquVbyvmLNsGAUK421/l3K3Hfz4jSjx2g8Dvk
+	 tgLG3U6bw+8KXNih4Jsn6XDQ+Hr1X5rbphkxIgZw1lf1mBkHhOFPbDUwBAzbu26u43
+	 p33oECdGjcoeLe06JYVBtCIwYrO7JDUg3McqUbUOhyd6qfglXiLcoyiGgvi1Xs0tTE
+	 uxKasxZZl2vYYUpTRvFLFg2IT6dyZ6eBWmw7qXKQsAHGzHtZyadf2Nf20j1w3Ac5u3
+	 njEj4Y/Ygx3vg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46G31oNQ2366112
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Jul 2024 11:01:50 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 16 Jul 2024 11:01:50 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 16 Jul 2024 11:01:49 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Tue, 16 Jul 2024 11:01:49 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        "jdamato@fastly.com" <jdamato@fastly.com>,
+        Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v24 00/13] Add Realtek automotive PCIe driver
+Thread-Topic: [PATCH net-next v24 00/13] Add Realtek automotive PCIe driver
+Thread-Index: AQHa1oZMG7/rZMIDUEmvFL30FgTtirH3QEEAgAFqSWA=
+Date: Tue, 16 Jul 2024 03:01:49 +0000
+Message-ID: <91a34dd8e23843459ccaa7f48171caf9@realtek.com>
+References: <20240715071158.110384-1-justinlai0215@realtek.com>
+ <20240715062006.7d640a30@kernel.org>
+In-Reply-To: <20240715062006.7d640a30@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Jack Wu <wojackbb@gmail.com>
+> On Mon, 15 Jul 2024 15:11:45 +0800 Justin Lai wrote:
+> > This series includes adding realtek automotive ethernet driver and
+> > adding rtase ethernet driver entry in MAINTAINERS file.
+> >
+> > This ethernet device driver for the PCIe interface of Realtek
+> > Automotive Ethernet Switch,applicable to RTL9054, RTL9068, RTL9072,
+> > RTL9075, RTL9068, RTL9071.
+>=20
+> Sorry, net-next is closed already for v6.11:
+>=20
+> https://lore.kernel.org/all/20240714204612.738afb58@kernel.org/
 
-add support for Dell DW5933e (0x14c0, 0x4d75)
+Hi Jakub,
 
-Signed-off-by: Jack Wu <wojackbb@gmail.com>
----
- drivers/net/wwan/t7xx/t7xx_pci.c | 1 +
- 1 file changed, 1 insertion(+)
+Thank you for providing this information. I will repost my patch when
+net-next reopens next time.
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-index e0b1e7a616ca..10a8c1080b10 100644
---- a/drivers/net/wwan/t7xx/t7xx_pci.c
-+++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-@@ -852,6 +852,7 @@ static void t7xx_pci_remove(struct pci_dev *pdev)
- 
- static const struct pci_device_id t7xx_pci_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x4d75) },
-+	{ PCI_DEVICE(0x14c0, 0x4d75) }, // Dell DW5933e
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, t7xx_pci_table);
--- 
-2.34.1
-
+Thanks
+Justin
 
