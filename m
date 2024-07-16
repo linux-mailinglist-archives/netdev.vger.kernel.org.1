@@ -1,107 +1,163 @@
-Return-Path: <netdev+bounces-111745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F342A9326FA
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:56:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170A89326FD
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C50EB21406
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:56:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F6B8B2138D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A0B19AA74;
-	Tue, 16 Jul 2024 12:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lN+fBl6n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DD119AD46;
+	Tue, 16 Jul 2024 12:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAA9145345
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 12:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC74197A7D;
+	Tue, 16 Jul 2024 12:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721134591; cv=none; b=XTe6Y5c/WeQNKoYdfDlD+bpQrjyxbIki2XwzraDWrHf27y/0HIBq8rK1RaPFeSX7TORdTwIh6EvVv29q5MgIooUVIBX+7Ai2vfQHMMXJxate8D/0bkWcGd/oEA0GY8O2tscXS15M0NDba4YF9NBG07V9vb5NEgPUHfgQQmwknUs=
+	t=1721134692; cv=none; b=qT5+AqoU6NKa6YQN2OZdLAocQ5HBl8lSVcOhe7TxYwCHve0meLR1lVl8hheCwkg5ZMptmfurNcGM0/sIcvhMmynvGaQ+Sf44Zg30eaBlNSdIKj+WamGULRzT1tGxLuI8a3F8CJRGplayBut9HH4hvNTzQjqF1zpQh8iIblZP9kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721134591; c=relaxed/simple;
-	bh=nHktMIxdgWNr8Pf1mbX/KbgGE2oVFb4MmvfTJPjlKDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ay+ehvKdw5vqSta74UHBJ3ukOQzzbrSwRoC8kCTX8cdXaoV/n1KLt34sTM8ynajBLDFRworYloOftSrcmGq66rig6zN87nZj+R2dVrJOL14aPk8B9dQX1AaAFNhTWzr9TgTEICi6zeW1cZ6dmFz/5L80KnlxzYDjZEyTaG89BRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lN+fBl6n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89FD9C116B1;
-	Tue, 16 Jul 2024 12:56:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721134591;
-	bh=nHktMIxdgWNr8Pf1mbX/KbgGE2oVFb4MmvfTJPjlKDc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lN+fBl6nxmFBH30YmAF5nZCNd+tt88Pvv2/viAduV7zwSH26EcBCSjF+CYT7J6nvf
-	 sHZ9atl47mCDQy5P63VyQT2Wy23/2gEwYijKENhDrEagwsxYktzj9RIZmknO6q+MTj
-	 upGx6qjkGw7F3haUSYkkXcDmUm674NcUrj1WozIs=
-Date: Tue, 16 Jul 2024 14:56:28 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, edumazet@google.com,
-	davem@davemloft.net, eric.dumazet@gmail.com, jmaxwell37@gmail.com,
-	kuba@kernel.org, kuniyu@amazon.com, ncardwell@google.com,
-	netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH stable-5.4 4/4] tcp: avoid too many retransmit packets
-Message-ID: <2024071610-rebalance-deserve-ca41@gregkh>
-References: <20240716015401.2365503-5-edumazet@google.com>
- <20240716111012.143748-1-ojeda@kernel.org>
- <CAL+tcoDVJK_J+ZGs=b94=A+3ci0uD4foZ4JQRmVa8+44udeUxA@mail.gmail.com>
- <2024071651-resonate-decompose-b1ab@gregkh>
+	s=arc-20240116; t=1721134692; c=relaxed/simple;
+	bh=kz0CicEUTeN4A8dfwF0ec3vvlKnAWa8ICTwjgHDQoiw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SeLvSmvxNwiofynXZzWnby150La24MMcZXKp1qMTHYZ53MtibEILGPkm0r3SqJTYaPLLPQsbHfYBYanBeyg1PTG/5V6+XMPqqY0hV0qi7+PZsq1QnPXERn3wk05CA9rndR4BnkKsY0GjXberWy2AJsgPgv4mXAMBzP/Zmto1dis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WNfCB0gg4zQlZY;
+	Tue, 16 Jul 2024 20:53:58 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 97B7F1403D1;
+	Tue, 16 Jul 2024 20:58:00 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 16 Jul 2024 20:58:00 +0800
+Message-ID: <5a3b39b7-c183-4c73-bd9b-184db8b24f6a@huawei.com>
+Date: Tue, 16 Jul 2024 20:58:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 06/13] mm: page_frag: reuse existing space for
+ 'size' and 'pfmemalloc'
+To: Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin
+	<yunshenglin0825@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240625135216.47007-1-linyunsheng@huawei.com>
+ <20240625135216.47007-7-linyunsheng@huawei.com>
+ <12a8b9ddbcb2da8431f77c5ec952ccfb2a77b7ec.camel@gmail.com>
+ <808be796-6333-c116-6ecb-95a39f7ad76e@huawei.com>
+ <a026c32218cabc7b6dc579ced1306aefd7029b10.camel@gmail.com>
+ <f4ff5a42-9371-bc54-8523-b11d8511c39a@huawei.com>
+ <96b04ebb7f46d73482d5f71213bd800c8195f00d.camel@gmail.com>
+ <5daed410-063b-4d86-b544-d1a85bd86375@huawei.com>
+ <CAKgT0UdJPcnfOJ=-1ZzXbiFiA=8a0z_oVBgQC-itKB1HWBU+yA@mail.gmail.com>
+ <df38c0fb-64a9-48da-95d7-d6729cc6cf34@huawei.com>
+ <CAKgT0UdSjmJoaQvTOz3STjBi2PazQ=piWY5wqFsYFBFLcPrLjQ@mail.gmail.com>
+ <29e8ac53-f7da-4896-8121-2abc25ec2c95@gmail.com>
+ <CAKgT0Udmr8q8V7x6ZqHQVxFbCnwB-6Ttybx_PP_3Xr9X-DgjKA@mail.gmail.com>
+ <12ff13d9-1f3d-4c1b-a972-2efb6f247e31@gmail.com>
+ <CAKgT0Uea-BrGRy-gfjdLWxp=0aQKQZa3dZW4euq5oGr1pTQVAA@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0Uea-BrGRy-gfjdLWxp=0aQKQZa3dZW4euq5oGr1pTQVAA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2024071651-resonate-decompose-b1ab@gregkh>
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Tue, Jul 16, 2024 at 02:53:12PM +0200, Greg KH wrote:
-> On Tue, Jul 16, 2024 at 08:40:40PM +0800, Jason Xing wrote:
-> > On Tue, Jul 16, 2024 at 7:10 PM Miguel Ojeda <ojeda@kernel.org> wrote:
-> > >
-> > > Hi Greg, Eric, all,
-> > >
-> > > I noticed this in stable-rc/queue and stable-rc/linux- for 6.1 and 6.6:
-> > >
-> > >     net/ipv4/tcp_timer.c:472:7: error: variable 'rtx_delta' is uninitialized when used here [-Werror,-Wuninitialized]
-> > >                     if (rtx_delta > user_timeout)
-> > >                         ^~~~~~~~~
-> > >     net/ipv4/tcp_timer.c:464:15: note: initialize the variable 'rtx_delta' to silence this warning
-> > >             u32 rtx_delta;
-> > >                         ^
-> > >                         = 0
-> > >
-> > > I hope that helps!
-> > 
-> > Thanks for the report!
-> > 
-> > I think it missed one small snippet of code from [1] compared to the
-> > latest kernel. We can init this part before using it, something like
-> > this:
-> > 
-> > +       rtx_delta = (u32)msecs_to_jiffies(tcp_time_stamp(tp) -
-> > +                       (tp->retrans_stamp ?: tcp_skb_timestamp(skb)));
-> > 
-> > Note: fully untested.
-> > 
-> > Since Eric is very busy, I decided to check and provide some useful
-> > information here.
+On 2024/7/16 1:55, Alexander Duyck wrote:
+> On Sat, Jul 13, 2024 at 9:52 PM Yunsheng Lin <yunshenglin0825@gmail.com> wrote:
+
+...
+
+>>
+>> If the option 1 is not what you have in mind, it would be better to be
+>> more specific about what you have in mind.
 > 
-> Thanks all, this was probably due to my manual backporting here, let me
-> go check what went wrong...
+> Option 1 was more or less what I had in mind.
+> 
+>> If the option 1 is what you have in mind, it seems both option 1 and
+>> option 2 have the same semantics as my understanding, right? The
+>> question here seems to be what is your perfer option and why?
+>>
+>> I implemented both of them, and the option 1 seems to have a
+>> bigger generated asm size as below:
+>> ./scripts/bloat-o-meter vmlinux_non_neg vmlinux
+>> add/remove: 0/0 grow/shrink: 1/0 up/down: 37/0 (37)
+>> Function                                     old     new   delta
+>> __page_frag_alloc_va_align                   414     451     +37
+> 
+> My big complaint is that it seems option 2 is harder for people to
+> understand and more likely to not be done correctly. In some cases if
+> the performance difference is negligible it is better to go with the
+> more maintainable solution.
 
-Yeah, this is my fault, due to 614e8316aa4c ("tcp: add support for usec
-resolution in TCP TS values") not being in the tree, let me go rework
-things...
+Option 1 assuming nc->remaining as a negative value does not seems to
+make it a more maintainable solution than option 2. How about something
+like below if using a negative value to enable some optimization like LEA
+does not have a noticeable performance difference?
 
-thanks,
+struct page_frag_cache {
+        /* encoded_va consists of the virtual address, pfmemalloc bit and order
+         * of a page.
+         */
+        unsigned long encoded_va;
 
-greg k-h
+#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE) && (BITS_PER_LONG <= 32)
+        __u16 remaining;
+        __u16 pagecnt_bias;
+#else
+        __u32 remaining;
+        __u32 pagecnt_bias;
+#endif
+};
+
+void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
+                                 unsigned int fragsz, gfp_t gfp_mask,
+                                 unsigned int align_mask)
+{
+        unsigned int size = page_frag_cache_page_size(nc->encoded_va);
+        unsigned int remaining;
+
+        remaining = nc->remaining & align_mask;
+        if (unlikely(remaining < fragsz)) {
+                if (unlikely(fragsz > PAGE_SIZE)) {
+                        /*
+                         * The caller is trying to allocate a fragment
+                         * with fragsz > PAGE_SIZE but the cache isn't big
+                         * enough to satisfy the request, this may
+                         * happen in low memory conditions.
+                         * We don't release the cache page because
+                         * it could make memory pressure worse
+                         * so we simply return NULL here.
+                         */
+                        return NULL;
+                }
+
+                if (!__page_frag_cache_refill(nc, gfp_mask))
+                        return NULL;
+
+                size = page_frag_cache_page_size(nc->encoded_va);
+                remaining = size;
+        }
+
+        nc->pagecnt_bias--;
+        nc->remaining = remaining - fragsz;
+
+        return encoded_page_address(nc->encoded_va) + (size - remaining);
+}
+
 
