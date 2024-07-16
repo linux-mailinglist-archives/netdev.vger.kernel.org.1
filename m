@@ -1,162 +1,132 @@
-Return-Path: <netdev+bounces-111807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DDDB932F65
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 19:51:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55DB7932DEF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 18:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4B8CB22F25
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:51:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A6421F216A1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAD219FA94;
-	Tue, 16 Jul 2024 17:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E1317CA0E;
+	Tue, 16 Jul 2024 16:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="iQ4qdtHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63B31A00FF
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 17:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382171DDCE;
+	Tue, 16 Jul 2024 16:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721152265; cv=none; b=Mg7SbEMW0SYxggUHXOhmie46yK1vE35Bq2ZmuSrcC6g1l6BAV/MiIjw0T3NtJgK43CWxNtTz3fKQha3yYxqnmyBOyIb5tqg/8+3dAKlIy+U/DYyev2YlVZPmsm+3ZW1Mr7A5ku71EoytUD/xDc1vf5tWtpdQcx3nWJZ/mJx6+T0=
+	t=1721146250; cv=none; b=Ps6AR0AkkMlQFJjVatcTFKp/u4E3zhdSxzQaUK1wgPMfxscV385bmfy7C+QxFVP71S+kH4lqIhRNBOCF9/6SOHqxqGNLLvp7jJr2rHN+AKj2KpCwfObUYGb/4W/FyVwOVbKI+SvLwsVlbto6g/jkTavWUWONi9AxZH/1fpF7wMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721152265; c=relaxed/simple;
-	bh=ic2sbABp4tHp3UGGNyn+mzu/e840S3TaNk0qjVFGVfk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PDk9t1090MSvSUcnZe9wjd7+R+H3IynnkxZY1cKxRpYFpZKpnHpY2E69TCEOOlWL4BzgvJfv+5VcLIKbQnCddhsySECxRPRfSGu7cwHUnsXsvEne1OElVEdOAeJcWpammDizJpdb4vttlner9GKDTko8j7yRFaOUIg4qFuMgUHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTmJy-0000eT-4W; Tue, 16 Jul 2024 19:50:38 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTmJv-0001tg-EK; Tue, 16 Jul 2024 19:50:35 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 26D7D305380;
-	Tue, 16 Jul 2024 14:45:36 +0000 (UTC)
-Date: Tue, 16 Jul 2024 16:45:33 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com
-Subject: Re: [PATCH v2 4/4] can: flexcan: add wakeup support for imx95
-Message-ID: <20240716-chowchow-of-massive-joviality-77e833-mkl@pengutronix.de>
-References: <20240715-flexcan-v2-0-2873014c595a@nxp.com>
- <20240715-flexcan-v2-4-2873014c595a@nxp.com>
- <20240716-curious-scorpion-of-glory-8265aa-mkl@pengutronix.de>
- <ZpaF4Wc70VuV4Cti@lizhi-Precision-Tower-5810>
+	s=arc-20240116; t=1721146250; c=relaxed/simple;
+	bh=CLOjNLCy/35CEXGr1XyBdr1OLU32FsA7ckNzQEfBaYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UoN3TAX6iTFeOCCZKVHR9U5eT/XLfd7rfgKBPA5SwYddx+Efd6P1TvQ3IUO3kXyi6cyc8F+tF+dzAEybA8cmRzs3QCjWXsp+fANJTyUXKjQQB1OtGxxpIzWwd4s+qmfggr43bw19gwUDBM5QVUgmZ5/umJ1UJoogwFzr7unt9vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=iQ4qdtHp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B488CC116B1;
+	Tue, 16 Jul 2024 16:10:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1721146250;
+	bh=CLOjNLCy/35CEXGr1XyBdr1OLU32FsA7ckNzQEfBaYU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iQ4qdtHpGOGRz3wRsxnjkytGmSCW9FYoCBDjzFhJBgkdc1f0YRO9abMsj1AE4QVig
+	 HvzpeLYguNAZB4hvwZelSpd+wKZCK5l89vtRDbtQYBrRDWqQhSW/rZcqic+gnZs/bD
+	 dYnoYPWiX+rXXCV66o09NZjjxqlRWqXcjrzufsb4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH 5.15 106/144] net: ks8851: Fix potential TX stall after interface reopen
+Date: Tue, 16 Jul 2024 17:32:55 +0200
+Message-ID: <20240716152756.607200675@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240716152752.524497140@linuxfoundation.org>
+References: <20240716152752.524497140@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="l2syr324jbfki6hb"
-Content-Disposition: inline
-In-Reply-To: <ZpaF4Wc70VuV4Cti@lizhi-Precision-Tower-5810>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+
+5.15-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Ronald Wahl <ronald.wahl@raritan.com>
+
+commit 7a99afef17af66c276c1d6e6f4dbcac223eaf6ac upstream.
+
+The amount of TX space in the hardware buffer is tracked in the tx_space
+variable. The initial value is currently only set during driver probing.
+
+After closing the interface and reopening it the tx_space variable has
+the last value it had before close. If it is smaller than the size of
+the first send packet after reopeing the interface the queue will be
+stopped. The queue is woken up after receiving a TX interrupt but this
+will never happen since we did not send anything.
+
+This commit moves the initialization of the tx_space variable to the
+ks8851_net_open function right before starting the TX queue. Also query
+the value from the hardware instead of using a hard coded value.
+
+Only the SPI chip variant is affected by this issue because only this
+driver variant actually depends on the tx_space variable in the xmit
+function.
+
+Fixes: 3dc5d4454545 ("net: ks8851: Fix TX stall caused by TX buffer overrun")
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org # 5.10+
+Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Link: https://patch.msgid.link/20240709195845.9089-1-rwahl@gmx.de
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/net/ethernet/micrel/ks8851_common.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/net/ethernet/micrel/ks8851_common.c
++++ b/drivers/net/ethernet/micrel/ks8851_common.c
+@@ -499,6 +499,7 @@ static int ks8851_net_open(struct net_de
+ 	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
+ 
+ 	ks->queued_len = 0;
++	ks->tx_space = ks8851_rdreg16(ks, KS_TXMIR);
+ 	netif_start_queue(ks->netdev);
+ 
+ 	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
+@@ -1119,7 +1120,6 @@ int ks8851_probe_common(struct net_devic
+ 	int ret;
+ 
+ 	ks->netdev = netdev;
+-	ks->tx_space = 6144;
+ 
+ 	gpio = of_get_named_gpio_flags(dev->of_node, "reset-gpios", 0, NULL);
+ 	if (gpio == -EPROBE_DEFER)
 
 
---l2syr324jbfki6hb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 16.07.2024 10:40:31, Frank Li wrote:
-> > > @@ -2330,9 +2366,12 @@ static int __maybe_unused flexcan_noirq_resume=
-(struct device *device)
-> > >  	if (netif_running(dev)) {
-> > >  		int err;
-> > > =20
-> > > -		err =3D pm_runtime_force_resume(device);
-> > > -		if (err)
-> > > -			return err;
-> > > +		if (!(device_may_wakeup(device) &&
-> >                       ^^^^^^^^^^^^^^^^^^^^^^^^
-> >=20
-> > Where does this come from?
->=20
-> include/linux/pm_wakeup.h
->=20
-> static inline bool device_may_wakeup(struct device *dev)                 =
-                          =20
-> {                                                                        =
-                          =20
->         return dev->power.can_wakeup && !!dev->power.wakeup;             =
-                          =20
-> }
-
-Sorry for the confusion. I wanted to point out, that the original driver
-doesn't have the check to device_may_wakeup(). Why was this added?
-
-> >=20
-> > > +		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SC=
-MI)) {
-> > > +			err =3D pm_runtime_force_resume(device);
-> > > +			if (err)
-> > > +				return err;
-> > > +		}
-> > > =20
-> > >  		if (device_may_wakeup(device))
-> > >  			flexcan_enable_wakeup_irq(priv, false);
-> > > diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flex=
-can/flexcan.h
-> > > index 025c3417031f4..4933d8c7439e6 100644
-> > > --- a/drivers/net/can/flexcan/flexcan.h
-> > > +++ b/drivers/net/can/flexcan/flexcan.h
-> > > @@ -68,6 +68,8 @@
-> > >  #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
-> > >  /* Device supports RX via FIFO */
-> > >  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
-> > > +/* Setup stop mode with ATF SCMI protocol to support wakeup */
-> > > +#define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
-> > > =20
-> > >  struct flexcan_devtype_data {
-> > >  	u32 quirks;		/* quirks needed for different IP cores */
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---l2syr324jbfki6hb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaWh4sACgkQKDiiPnot
-vG9pnwf+JoS4BGqt9+eauMHhwkSi1Z1OupbzhlhGwMBtIeQWPmhjM0f0/N0XDNyA
-vFmZZs6HIj9lcXNADBVtKvB92MJFV4UbvGyPSqs4cU8r/cZdPr+I5j0gVHHCmtiq
-RZcPzP+Jm6U6NV4C8Oj6RZxhPVCKKlNfckBW9pcjjhKg4XmEFksYC5J9G4ldofBz
-DHivW/RXq2mcals9q7N2JTkgH6Zmw7wxnOWIUdFItj7Jt1XFDWQSO7ha4UC1ntmK
-FgdCfR0anEHNOucDeLCyXw63FOBro/pD3iQ6xdIBCR/IVnhSIgkAjkIjFV6K5d+G
-nvSKa9wCyX8iqQJuRZNp6HBTEvex/Q==
-=Vri0
------END PGP SIGNATURE-----
-
---l2syr324jbfki6hb--
 
