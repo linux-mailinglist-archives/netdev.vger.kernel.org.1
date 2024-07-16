@@ -1,236 +1,103 @@
-Return-Path: <netdev+bounces-111637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72EA931E73
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:23:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69697931E94
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2369CB22702
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:23:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D2DD1C213EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CF64A2F;
-	Tue, 16 Jul 2024 01:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733B64405;
+	Tue, 16 Jul 2024 01:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yX6/uUIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252274C74
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F010C17F7
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721093002; cv=none; b=SPgPebHWXRICQXzZbm1AUxY7EB8pHXDMX2B7VsC3bkRtQxFelnDtElBeWX55YHfmsbVZOoYWoMYY/cZD1kg6d7kpGYHwzX4iBfoMmBBUUGIKaZhaeu9UMsRN2Ko/XAO9+VGRO3nZFS8gOCLlMHN2/OhScpHgjJrvYwZO6b+nq28=
+	t=1721094846; cv=none; b=WE6asrLGxFjp/AFQ7nPkZlK2b+esw0d2i/qATTAhEj4SbKldf1rIhLSPZCvIqg+vCTZm3PLk4yXeXTIgvlhwuBofGs+9SdDLzvUznPUjatrUGqH0NJqDEVyYbha9/X0Urv4vI8dWd2uzULrlYR4EbAMrj2TnaAWFbzgpaNmBziI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721093002; c=relaxed/simple;
-	bh=ZZMrXW//datlgTk9/AxilYaBdsktv+cJT4ZHKJ7/2fo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KkkTpJL1ym8dhLFSyG7GaxRHfDG82ozheRsvrspO2+rZelxMtpLj427A/+HS7cB3Ujw1LgNdL3AUxrgNONiKeg8bOxdp+MPi43kzvn/fCY3JZ/vTjexLw39RKsDV8hDZClINbv6RG/tEUnTz6snNURUTV51fNI7LKqnu2aCMmFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7f682b4694aso547224639f.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 18:23:20 -0700 (PDT)
+	s=arc-20240116; t=1721094846; c=relaxed/simple;
+	bh=SncrzRZjPZCZ9x/5XFL1S1uqt60ntRdt5c2cNIchP+4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jyF0LgE/60xM902rlVxPp3XZMORtJ8JQgWI/Lg48in8rYibPdNDHGZW2kHZAc60JaslMTksCDx9yQ1pHLe5ZXKQJYeIocOj3Ud68a0N1EB2FJpxxWKoTZtBvcsOQureup9cUb8kfNa8jPkEWBS574USHmAqk4Hx01tzyeUKAg1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yX6/uUIa; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03654427f6so8963067276.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 18:54:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721094844; x=1721699644; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4Te/n5It39XLqm9k5ldwUJRy74Mz2CXcdjzZuskMlAA=;
+        b=yX6/uUIaLM1wnyAqH7yMCvGkOiDIgDKYCOOdWNzoMYgHPZzprxIFoJRzZ5mBfvhWEr
+         0uMyVVRYMFb7j/C2rvqDdCXcXk1ig/vMdJ4xql8EeYHIRrqeW6cwFo+pJxLau841FNA5
+         LQR4ufTZCT/g9qlwfZvlFkbhzdbBp34FVeL/j+HPR/ZLitmDKL7ngktPib1qqQMla3C+
+         bDpyl4re56/nBiQQ4D01lJVjKoZ/ON9OW/EsjP8GpsM7jPNT8dU9yL9+zYjdaKuNGVTH
+         HtH+DkjXshcNF9FEVnGnCzyIgKrwpjVTAWYD8pgFvp5QSUF22EJBBsAvBRw21VzCHzaA
+         oyFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721093000; x=1721697800;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1721094844; x=1721699644;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=NrTY4E9dwMaOsFfSFijC10L9Vx6+2nYaCItEw+V4XCE=;
-        b=d+JiV9ZG/7uGN8JwupLyWqxlovbFSZjRBHC9mCzVyU4rcyzjSXGbc3zWtNaJB26ZRA
-         nhB0sGPF6G8D9UijMCYQ7xaMt1nzzOT8lKPZZGxa2hGkBI0XtcOu9QyulDiJW8STYoi2
-         s2J+lRZDNNjLlYnf/hYMcQoTv+LBUWRccZAtqW7ySp3eF8ZyCmmTvHyp9v1trsrvOFZP
-         bYrCSEgpqCOxdZutQwIH/0urEXh/8oSXJhpFZaGzyDW8ACHiraIvXviFwj2FOZfKJJ2Q
-         MhDuFWtCvzOvRXiy43UN5NvGH0/puLIu7p/ThNxUu6i/OzP0/0kA3RAKu+DaTobLd3EM
-         cR4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXT57F4Q/ueGJ8QvkqFGNy9sYT2sG2iwjsxc8b1mTcNcrd4F2741H1oOkGEfouUaIudIIE/Dl0TzD5KzDbFsCzs4iGkKHXu
-X-Gm-Message-State: AOJu0Yy42Cl9QJKDAYA86ElfsxDVM7sIr8N8Z/dYwzb/dbLzB5mTACL2
-	aEYYiRaJf+ER9wURDwNeKDAkWwke/iVaym33upRc29jGxO+f3FEXskDVtVONO5iop3jxvFIm4PU
-	sKW853Q/ETTcZ4fgCUzYP/px9wWH0e4g9WErxPztw7w6XGpT1MX6/IHA=
-X-Google-Smtp-Source: AGHT+IFGxH153aE/8usxwyP9BT7oG/12wXoV7aedxCjgHSoq3sBUSvjz1NXDAaGaDQwujP8sBwSS+p/J8bLtx4T0vN+LyxUj1tGU
+        bh=4Te/n5It39XLqm9k5ldwUJRy74Mz2CXcdjzZuskMlAA=;
+        b=ppVK4HR5GUbEZtkzyJ/nKuqTbq+UckKaYuftuCGJoiZCZv2EkKy7tN5ycv296Rjgm3
+         749QEVCm3IpsZu8g1d5cmma6ZMEJJJANToK2YPEuJw1xm26UAdxaMB8zEMCXVmdS28zP
+         qgvHXcrYY9j0IUFQwx0x8euRAjzQsB+hbPOMCD4Z+r+zwRtVcsRKFl2GPUASchJMNwoL
+         9Eh7u2DpTh6YxoiB3HwqIZHGi3h4vc/Cxi/3h96UYOQ7WggOQ3lq5fcw6bG+2FqAVt47
+         2nlZM8Od9TsrwOGizR1FU71qHDZ0GUpX0nn5fC1iEDnS+p5Q/ZKRnMYhk7DjT17KCbQF
+         0mQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfj/GQiqBBQ9WdQDXuTQX8ynItURNw5HID87Z1p5bPvFneoYq92Xvv5XSzlLWsy/ImbH/tKYXue/IP5J+gGdVVVkhtw6A2
+X-Gm-Message-State: AOJu0YxXEJ2SBWjkn4TfolbrzzsUdxOSBLNGtru88mNnbOHx6sRfUghn
+	/VD56H+wxvBsF0q4FgmwmAw9Fu2YnQd0iB/O3pnGSNFVwWNMLBVMgTw9YR1bVKB6E+G6NUD8f5r
+	2nhPbW0PCDw==
+X-Google-Smtp-Source: AGHT+IHQVIFw7C1m8aigxPJMX6NDr4lTG27kubZY5BLuKyFmwWgOqOS2mqIRXrSK/k81s2Db7pG1BbW+ofOOuA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:e0a:b0:e03:554e:f396 with SMTP
+ id 3f1490d57ef6-e05d568836amr52365276.6.1721094843640; Mon, 15 Jul 2024
+ 18:54:03 -0700 (PDT)
+Date: Tue, 16 Jul 2024 01:53:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2721:b0:4b9:6637:4909 with SMTP id
- 8926c6da1cb9f-4c2048d9527mr43214173.6.1721093000326; Mon, 15 Jul 2024
- 18:23:20 -0700 (PDT)
-Date: Mon, 15 Jul 2024 18:23:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e8fcab061d53308f@google.com>
-Subject: [syzbot] [bpf?] [net?] general protection fault in __xsk_map_flush
-From: syzbot <syzbot+61a1cfc2b6632363d319@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bigeasy@linutronix.de, bjorn@kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	eddyz87@gmail.com, edumazet@google.com, haoluo@google.com, hawk@kernel.org, 
-	jasowang@redhat.com, jiri@resnulli.us, john.fastabend@gmail.com, 
-	jolsa@kernel.org, jonathan.lemon@gmail.com, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com, 
-	magnus.karlsson@intel.com, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, willemdebruijn.kernel@gmail.com, 
-	yonghong.song@linux.dev
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240716015401.2365503-1-edumazet@google.com>
+Subject: [PATCH stable-5.4 0/4] tcp: stable backports for CVE-2024-41007
+From: Eric Dumazet <edumazet@google.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Neal Cardwell <ncardwell@google.com>, Jason Xing <kerneljasonxing@gmail.com>, 
+	Jon Maxwell <jmaxwell37@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+For linux-5.4 stable, we have to bring four patches.
 
-syzbot found the following issue on:
+(Compared to linux-5.10 where only the last two patches are needed.)
 
-HEAD commit:    3fe121b62282 Add linux-next specific files for 20240712
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16085221980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98dd8c4bab5cdce
-dashboard link: https://syzkaller.appspot.com/bug?extid=61a1cfc2b6632363d319
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a2a5e1980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12dd6479980000
+Eric Dumazet (3):
+  tcp: refactor tcp_retransmit_timer()
+  tcp: use signed arithmetic in tcp_rtx_probe0_timed_out()
+  tcp: avoid too many retransmit packets
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8c6fbf69718d/disk-3fe121b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/39fc7e43dfc1/vmlinux-3fe121b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a78e70e4b4e/bzImage-3fe121b6.xz
+Menglong Dong (1):
+  net: tcp: fix unexcepted socket die when snd_wnd is 0
 
-The issue was bisected to:
+ net/ipv4/tcp_timer.c | 45 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
-commit fecef4cd42c689a200bdd39e6fffa71475904bc1
-Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Date:   Thu Jul 4 14:48:15 2024 +0000
+-- 
+2.45.2.993.g49e7a77208-goog
 
-    tun: Assign missing bpf_net_context.
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=119d4b6e980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=139d4b6e980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=159d4b6e980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+61a1cfc2b6632363d319@syzkaller.appspotmail.com
-Fixes: fecef4cd42c6 ("tun: Assign missing bpf_net_context.")
-
-Oops: general protection fault, probably for non-canonical address 0xe000140493916901: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: maybe wild-memory-access in range [0x0000c0249c8b4808-0x0000c0249c8b480f]
-CPU: 1 UID: 0 PID: 5098 Comm: syz-executor400 Not tainted 6.10.0-rc7-next-20240712-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-RIP: 0010:xskq_prod_submit net/xdp/xsk_queue.h:436 [inline]
-RIP: 0010:xsk_flush net/xdp/xsk.c:331 [inline]
-RIP: 0010:__xsk_map_flush+0x95/0x2b0 net/xdp/xsk.c:393
-Code: 24 10 49 8d 5f e8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 d9 ea 81 f6 48 8b 1b 48 8d 7b 08 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 72 01 00 00 8b 6b 08 48 83 c3 10 48 89
-RSP: 0018:ffffc90000a18ae8 EFLAGS: 00010202
-RAX: 0000180493916901 RBX: 0000c0249c8b4800 RCX: ffff888029608000
-RDX: 0000000080000101 RSI: 0000000000000010 RDI: 0000c0249c8b4808
-RBP: dffffc0000000000 R08: ffffffff896d0c9a R09: 1ffffffff1f5ffad
-R10: dffffc0000000000 R11: fffffbfff1f5ffae R12: 0000000000000000
-R13: dffffc0000000000 R14: 0000000000000010 R15: ffffffff8173aee3
-FS:  000055557b0fb380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055557b0fbca8 CR3: 000000007eb32000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- xdp_do_check_flushed+0x18e/0x240 net/core/filter.c:4308
- __napi_poll+0xe4/0x490 net/core/dev.c:6774
- napi_poll net/core/dev.c:6840 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6962
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:console_flush_all+0x9f7/0xf50 kernel/printk/printk.c:3103
-Code: 20 00 90 0f 0b 90 e9 f3 f9 ff ff e8 c3 1b 20 00 e8 7e 56 20 0a 4d 85 f6 74 c0 e8 b4 1b 20 00 fb 49 bd 00 00 00 00 00 fc ff df <43> 80 3c 2f 00 48 8b 5c 24 30 74 08 48 89 df e8 d5 a1 87 00 4c 8b
-RSP: 0018:ffffc90003527880 EFLAGS: 00000293
-RAX: ffffffff8173af3c RBX: 0000000000000000 RCX: ffff888029608000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc90003527a10 R08: ffffffff8173aee3 R09: 1ffffffff1f5ffad
-R10: dffffc0000000000 R11: fffffbfff1f5ffae R12: ffffffff8eb30c00
-R13: dffffc0000000000 R14: 0000000000000200 R15: 1ffffffff1d6618b
- console_unlock+0x13b/0x4d0 kernel/printk/printk.c:3173
- vprintk_emit+0x7a1/0x900 kernel/printk/printk.c:2423
- _printk+0xd5/0x120 kernel/printk/printk.c:2450
- show_opcodes+0x148/0x170 arch/x86/kernel/dumpstack.c:123
- show_signal_msg arch/x86/mm/fault.c:775 [inline]
- __bad_area_nosemaphore+0x5f2/0x770 arch/x86/mm/fault.c:818
- handle_page_fault arch/x86/mm/fault.c:1481 [inline]
- exc_page_fault+0x61d/0x8c0 arch/x86/mm/fault.c:1539
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0033:0x7f9fe69c315e
-Code: fd d7 c9 0f bc d1 c5 fe 7f 27 c5 fe 7f 6f 20 c5 fe 7f 77 40 c5 fe 7f 7f 60 49 83 c0 1f 49 29 d0 48 8d 7c 17 61 e9 d2 04 00 00 <c5> fe 6f 1e c5 fe 6f 56 20 c5 fd 74 cb c5 fd d7 d1 49 83 f8 21 0f
-RSP: 002b:00007ffce01d48e8 EFLAGS: 00010287
-RAX: 00007ffce01d4900 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 00000000000003ff RSI: 0000000000000000 RDI: 00007ffce01d4900
-RBP: 00007ffce01d4900 R08: 00000000000003ff R09: 00007ffce01d4e48
-R10: 00007ffce01d4e48 R11: 0000000000000246 R12: 6666666666666667
-R13: 0000000000000000 R14: 00007ffce01d4d50 R15: 00007ffce01d4d40
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:xskq_prod_submit net/xdp/xsk_queue.h:436 [inline]
-RIP: 0010:xsk_flush net/xdp/xsk.c:331 [inline]
-RIP: 0010:__xsk_map_flush+0x95/0x2b0 net/xdp/xsk.c:393
-Code: 24 10 49 8d 5f e8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 d9 ea 81 f6 48 8b 1b 48 8d 7b 08 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 72 01 00 00 8b 6b 08 48 83 c3 10 48 89
-RSP: 0018:ffffc90000a18ae8 EFLAGS: 00010202
-RAX: 0000180493916901 RBX: 0000c0249c8b4800 RCX: ffff888029608000
-RDX: 0000000080000101 RSI: 0000000000000010 RDI: 0000c0249c8b4808
-RBP: dffffc0000000000 R08: ffffffff896d0c9a R09: 1ffffffff1f5ffad
-R10: dffffc0000000000 R11: fffffbfff1f5ffae R12: 0000000000000000
-R13: dffffc0000000000 R14: 0000000000000010 R15: ffffffff8173aee3
-FS:  000055557b0fb380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055557b0fbca8 CR3: 000000007eb32000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	24 10                	and    $0x10,%al
-   2:	49 8d 5f e8          	lea    -0x18(%r15),%rbx
-   6:	48 89 d8             	mov    %rbx,%rax
-   9:	48 c1 e8 03          	shr    $0x3,%rax
-   d:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  12:	74 08                	je     0x1c
-  14:	48 89 df             	mov    %rbx,%rdi
-  17:	e8 d9 ea 81 f6       	call   0xf681eaf5
-  1c:	48 8b 1b             	mov    (%rbx),%rbx
-  1f:	48 8d 7b 08          	lea    0x8(%rbx),%rdi
-  23:	48 89 f8             	mov    %rdi,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 0f b6 04 28       	movzbl (%rax,%r13,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 72 01 00 00    	jne    0x1a9
-  37:	8b 6b 08             	mov    0x8(%rbx),%ebp
-  3a:	48 83 c3 10          	add    $0x10,%rbx
-  3e:	48                   	rex.W
-  3f:	89                   	.byte 0x89
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
