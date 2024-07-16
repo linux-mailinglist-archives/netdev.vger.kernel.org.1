@@ -1,307 +1,302 @@
-Return-Path: <netdev+bounces-111687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 561009320E0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:05:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE0B9320F4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00655284CDC
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:05:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 437AE1C2171E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04454208BA;
-	Tue, 16 Jul 2024 07:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12872C87C;
+	Tue, 16 Jul 2024 07:06:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB6D1D68F;
-	Tue, 16 Jul 2024 07:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3642071
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 07:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721113527; cv=none; b=Rbujgz6cQe7KJqEuAkyBeUMqClmxt/foHgTOdwKGtVyzkOtaplgW0YYGfc4Cu7CSL0r8BBFoi+6Q6Dh2bSFkAEBRvfgDmnqJv/pXDBNDPKX2JIdyU2Ezu6Sb9aloCsnYWtA9NkkjMA1LG6rR3mGOilqYzak29cy8eOcA8PDCyjI=
+	t=1721113613; cv=none; b=tEIMNpB0OpPg9lxe1IgX37XS/Pxo3LVuAUK1BMR/Hj0HtgPLWi1HCMdGEiMN0/rAr8K+O7GdGx4YRNy0R8ZCz7fdx+Z3fJnpbdUZbxsWYfS3btcRoj4f5s+O4eL2QEt+GhQaAft21fbui7p6qZZ1ArWQJBB87tiF7pey8Ov9teo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721113527; c=relaxed/simple;
-	bh=23q6PfsYT5ZP0HjZM9tdtTlVLLdS13Xt8ckf5CH06wM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WozRJ3XsBDSrHi/g9v3XJThu3yy26Q0+hBP52m1GbhH8GGiobqoN6g/0yoEUmFRpgNdE9n+64B+5LH4+inuzQTmZNoxmuGTFNt8DRhOzGyoLESTXH8IcBuFSUD4HlNDx5TDBog5t4wr+xIRUsRorNueUhjnXarBuOHuAh8i5PJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WNVSg02fqz4f3jZ8;
-	Tue, 16 Jul 2024 15:05:07 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id E62481A0568;
-	Tue, 16 Jul 2024 15:05:14 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP3 (Coremail) with SMTP id _Ch0CgDX5VCnG5ZmewgPAQ--.64133S2;
-	Tue, 16 Jul 2024 15:05:12 +0800 (CST)
-Message-ID: <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
-Date: Tue, 16 Jul 2024 15:05:11 +0800
+	s=arc-20240116; t=1721113613; c=relaxed/simple;
+	bh=vXOwryw8xFilYtSz3kn5Q6Fzz0ZLgIL7zHdOIhDwPk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZqtpxsPU+UHdsc1DXTw5ySRUnuSWIo4psa/UzFxjqTStt0ZIVwMLaHMzjO096Ewr6z4di8rW0fQFpo9q8rcxCUjRM8o8iMsHfBW20NQezKNRVvU2EwmlL+mv8LeHAeMFoUOptnCvAy2hU2Cjwi58fAme90yW35/jVfdsbAB6OU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sTcGO-0005NF-D9; Tue, 16 Jul 2024 09:06:16 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sTcGN-0004bT-IL; Tue, 16 Jul 2024 09:06:15 +0200
+Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 21FA9304E11;
+	Tue, 16 Jul 2024 07:06:15 +0000 (UTC)
+Date: Tue, 16 Jul 2024 09:06:14 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com
+Subject: Re: [PATCH v2 4/4] can: flexcan: add wakeup support for imx95
+Message-ID: <20240716-curious-scorpion-of-glory-8265aa-mkl@pengutronix.de>
+References: <20240715-flexcan-v2-0-2873014c595a@nxp.com>
+ <20240715-flexcan-v2-4-2873014c595a@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v4 16/20] bpf: Add a special case for bitwise AND
- on range [-1, 0]
-Content-Language: en-US
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>, Eduard Zingerman <eddyz87@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>,
- Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Harishankar Vishwanathan <harishankar.vishwanathan@gmail.com>,
- Santosh Nagarakatte <santosh.nagarakatte@rutgers.edu>,
- Srinivas Narayana <srinivas.narayana@rutgers.edu>,
- Matan Shachnai <m.shachnai@rutgers.edu>
-References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
- <20240711113828.3818398-4-xukuohai@huaweicloud.com>
- <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-In-Reply-To: <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgDX5VCnG5ZmewgPAQ--.64133S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3JryrKF1xtFWxurW3WrWUXFb_yoWfWrWkpr
-	Z5WFnIkF4kuay8uas2vw1DJFZ2qF18Aw48JryDAry0vr1agFyFyr17Gr45AasxCr4kXr4I
-	qFs2g3yUCF4jkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wmxdadf3ku3zl7ae"
+Content-Disposition: inline
+In-Reply-To: <20240715-flexcan-v2-4-2873014c595a@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 7/15/2024 11:29 PM, Shung-Hsi Yu wrote:
-> Cc Harishankar Vishwanathan, Prof. Srinivas Narayana and Prof. Santosh
-> Nagarakatte, and Matan Shachnai, whom have recently work on
-> scalar*_min_max_and(); also dropping LSM/FS related mails from Cc since
-> it's a bit long and I'm not sure whether the mailing list will reject
-> due to too many email in Cc.
-> 
-> On Thu, Jul 11, 2024 at 07:38:24PM GMT, Xu Kuohai wrote:
->> With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_id_opts
->> is rejected by the verifier, and the log says:
->>
->> 0: R1=ctx() R10=fp0
->> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->> 0: (b7) r0 = 0                        ; R0_w=0
->> 1: (79) r2 = *(u64 *)(r1 +0)
->> func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
->> 2: R1=ctx() R2_w=trusted_ptr_bpf_map()
->> ; if (map != (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_id_opts.c:29
->> 2: (18) r3 = 0xffff9742c0951a00       ; R3_w=map_ptr(map=data_input,ks=4,vs=4)
->> 4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
->> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->> 5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
->> ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
->> 6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
->> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->> ;  @ test_libbpf_get_fd_by_id_opts.c:0
->> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
->> 9: (95) exit
->>
->> And here is the C code of the prog.
->>
->> SEC("lsm/bpf_map")
->> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
->> {
->>      if (map != (struct bpf_map *)&data_input)
->> 	    return 0;
->>
->>      if (fmode & FMODE_WRITE)
->> 	    return -EACCES;
->>
->>      return 0;
->> }
->>
->> It is clear that the prog can only return either 0 or -EACCESS, and both
->> values are legal.
->>
->> So why is it rejected by the verifier?
->>
->> The verifier log shows that the second if and return value setting
->> statements in the prog is optimized to bitwise operations "r0 s>>= 63"
->> and "r0 &= -13". The verifier correctly deduces that the value of
->> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
->> But when the verifier proceeds to verify instruction "r0 &= -13", it
->> fails to deduce the correct value range of r0.
->>
->> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
->> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
->>
->> So why the verifier fails to deduce the result of 'r0 &= -13'?
->>
->> The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
->> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
->> "r0 &= -13", the verifier erroneously deduces the result from
->> "[0, -1ULL] AND -13", which is out of the expected return range
->> [-4095, 0].
->>
->> As explained by Eduard in [0], the clang transformation that generates this
->> pattern is located in DAGCombiner::SimplifySelectCC() method (see [1]).
-> ...
->> As suggested by Eduard and Andrii, this patch makes a special case
->> for source or destination register of '&=' operation being in
->> range [-1, 0].
-> ...
-> 
-> Been wonder whether it possible for a more general approach ever since I
-> saw the discussion back in April. I think I've finally got something.
-> 
-> The problem we face here is that the tightest bound for the [-1, 0] case
-> was tracked with signed ranges, yet the BPF verifier looses knowledge of
-> them all too quickly in scalar*_min_max_and(); knowledge of previous
-> signed ranges were not used at all to derive the outcome of signed
-> ranges after BPF_AND.
-> 
-> 	static void scalar_min_max_and(...) {
-> 		...
-> 		if ((s64)dst_reg->umin_value <= (s64)dst_reg->umax_value) {
-> 			dst_reg->smin_value = dst_reg->umin_value;
-> 			dst_reg->smax_value = dst_reg->umax_value;
-> 		} else {
-> 			dst_reg->smin_value = S64_MIN;
-> 			dst_reg->smax_value = S64_MAX;
-> 		}
-> 		...
-> 	}
->
 
-This is indeed the root cause.
+--wmxdadf3ku3zl7ae
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> So looks like its time to be nobody[1] and try to teach BPF verifier how
-> track signed ranges when ANDing two (possibly) negative numbers. Luckily
-> bitwise AND is comparatively easier to do than other bitwise operations:
-> non-negative range & non-negative range is always non-negative,
-> non-negative range & negative range is still always non-negative, and
-> negative range & negative range is always negative.
->
-
-Right, only bitwise ANDing two negatives yields to a negative result.
-
-> smax_value is straight forwards, we can just do
-> 
-> 	max(dst_reg->smax_value, src_reg->smax_value)
-> 
-> which works across all sign combinations. Technically for non-negative &
-> non-negative we can use min() instead of max(), but the non-negative &
-> non-negative case should be handled pretty well by the unsigned ranges
-> already; it seems simpler to let such knowledge flows from unsigned
-> ranges to signed ranges during reg_bounds_sync(). Plus we are not wrong
-> for non-negative & non-negative by using max(), just imprecise, so no
-> correctness/soundness issue here.
->
-
-I think this is correct, since in two's complement, more '1' bits means
-more large, regardless of sign, and bitwise AND never generates more '1'
-bits.
-
-> smin_value is the tricker one, but doable with
-> 
-> 	masked_negative(min(dst_reg->smin_value, src_reg->smin_value))
-> 
-> where masked_negative(v) basically just clear all bits after the most
-> significant unset bit, effectively rounding a negative value down to a
-> negative power-of-2 value, and returning 0 for non-negative values. E.g.
-> for some 8-bit, negative value
-> 
-> 	masked_negative(0b11101001) == 0b11100000
->
-
-Ah, it's really tricky. Seems it's the longest high '1' bits sequence
-in both operands. This '1' bits should remain unchanged by the bitwise
-AND operation. So this sequence must be in the result, making it the
-minimum possible value.
-
-> This can be done with a tweaked version of "Round up to the next highest
-> power of 2"[2],
-> 
-> 	/* Invert the bits so the first unset bit can be propagated with |= */
-> 	v = ~v;
-> 	/* Now propagate the first (previously unset, now set) bit to the
-> 	 * trailing positions */
-> 	v |= v >> 1;
-> 	v |= v >> 2;
-> 	v |= v >> 4;
-> 	...
-> 	v |= v >> 32; /* Assuming 64-bit */
-> 	/* Propagation done, now invert again */
-> 	v = ~v;
->
-> Again, we technically can do better if we take sign bit into account,
-> but deriving smin_value this way should still be correct/sound across
-> different sign combinations, and overall should help us derived [-16, 0]
-> from "[-1, 0] AND -13", thus preventing BPF verifier from rejecting the
-> program.
->
+On 15.07.2024 17:27:23, Frank Li wrote:
+> From: Haibo Chen <haibo.chen@nxp.com>
+>=20
+> iMX95 defines a bit in GPR that sets/unsets the IPG_STOP signal to the
+> FlexCAN module, controlling its entry into STOP mode. Wakeup should work
+> even if FlexCAN is in STOP mode.
+>=20
+> Due to iMX95 architecture design, the A-Core cannot access GPR; only the
+> system manager (SM) can configure GPR. To support the wakeup feature,
+> follow these steps:
+>=20
+> - For suspend:
+>   1) During Linux suspend, when CAN suspends, do nothing for GPR and keep
+>      CAN-related clocks on.
+>   2) In ATF, check whether CAN needs to support wakeup; if yes, send a
+>      request to SM through the SCMI protocol.
+>   3) In SM, configure the GPR and unset IPG_STOP.
+>   4) A-Core suspends.
+>=20
+> - For wakeup and resume:
+>   1) A-Core wakeup event arrives.
+>   2) In SM, deassert IPG_STOP.
+>   3) Linux resumes.
+>=20
+> Add a new fsl_imx95_devtype_data and FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI to
+> reflect this.
+>=20
+> Reviewed-by: Han Xu <han.xu@nxp.com>
+> Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+> Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 > ---
-> 
-> Alternatively we can employ a range-splitting trick (think I saw this in
-> [3]) that allow us to take advantage of existing tnum_and() by splitting
-> the signed ranges into two if the range crosses the sign boundary (i.e.
-> contains both non-negative and negative values), one range will be
-> [smin, U64_MAX], the other will be [0, smax]. This way we get around
-> tnum's weakness of representing [-1, 0] as [0, U64_MAX].
-> 
-> 	if (src_reg->smin_value < 0 && src_reg->smax_value >= 0) {
-> 		src_lower = tnum_range(src_reg->smin_value, U64_MAX);
-> 		src_higher = tnum_range(0, src_reg->smax_value);
-> 	} else {
-> 		src_lower = tnum_range(src_reg->smin_value, src_reg->smax_value);
-> 		src_higher = tnum_range(src_reg->smin_value, src_reg->smax_value);
-> 	}
-> 
-> 	if (dst_reg->smin_value < 0 && dst_reg->smax_value >= 0) {
-> 		dst_lower = tnum_range(dst_reg->smin_value, U64_MAX);
-> 		dst_higher = tnum_range(0, dst_reg->smax_value);
-> 	} else {
-> 		dst_lower = tnum_range(dst_reg->smin_value, dst_reg->smax_value);
-> 		dst_higher = tnum_range(dst_reg->smin_value, dst_reg->smax_value);
-> 	}
-> 
-> 	lower = tnum_and(src_lower, dst_lower);
-> 	higher = tnum_and(src_higher, dst_higher);
-> 	dst->smin_value = lower.value;
-> 	dst->smax_value = higher.value | higher.mask;
->
+>  drivers/net/can/flexcan/flexcan-core.c | 49 ++++++++++++++++++++++++++++=
+++----
+>  drivers/net/can/flexcan/flexcan.h      |  2 ++
+>  2 files changed, 46 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
+xcan/flexcan-core.c
+> index f6e609c388d55..fe972d5b8fbe0 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -354,6 +354,14 @@ static struct flexcan_devtype_data fsl_imx93_devtype=
+_data =3D {
+>  		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
+>  };
+> =20
+> +static const struct flexcan_devtype_data fsl_imx95_devtype_data =3D {
+> +	.quirks =3D FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS=
+ |
+> +		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
+> +		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI |
+> +		FLEXCAN_QUIRK_SUPPORT_FD | FLEXCAN_QUIRK_SUPPORT_ECC |
+> +		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
+> +		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
 
-This looks even more tricky...
+Please keep the flags sorted by their value.
 
-> ---
-> 
-> Personally I like the first method better as it is simpler yet still
-> does the job well enough. I'll work on that in the next few days and see
-> if it actually works.
-> 
+> +};
 
-This really sounds great. Thank you for the excellent work!
+Please add a newline here.
 
-> 
-> 1: https://github.com/torvalds/linux/blob/dac045fc9fa6/kernel/bpf/verifier.c#L13338
-> 2: https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-> 3: https://dl.acm.org/doi/10.1145/2651360
-> 
-> ...
+>  static const struct flexcan_devtype_data fsl_vf610_devtype_data =3D {
+>  	.quirks =3D FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS=
+ |
+>  		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
+> @@ -548,6 +556,13 @@ static inline int flexcan_enter_stop_mode(struct fle=
+xcan_priv *priv)
+>  	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GP=
+R) {
+>  		regmap_update_bits(priv->stm.gpr, priv->stm.req_gpr,
+>  				   1 << priv->stm.req_bit, 1 << priv->stm.req_bit);
+> +	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SC=
+MI) {
+> +		/* For the SCMI mode, driver do nothing, ATF will send request to
+> +		 * SM(system manager, M33 core) through SCMI protocol after linux
+> +		 * suspend. Once SM get this request, it will send IPG_STOP signal
+> +		 * to Flex_CAN, let CAN in STOP mode.
+> +		 */
+> +		return 0;
+>  	}
+> =20
+>  	return flexcan_low_power_enter_ack(priv);
+> @@ -559,7 +574,11 @@ static inline int flexcan_exit_stop_mode(struct flex=
+can_priv *priv)
+>  	u32 reg_mcr;
+>  	int ret;
+> =20
+> -	/* remove stop request */
+> +	/* Remove stop request, for FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI,
+> +	 * do nothing here, because ATF already send request to SM before
+> +	 * linux resume. Once SM get this request, it will deassert the
+> +	 * IPG_STOP signal to Flex_CAN.
+> +	 */
+>  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCFW) {
+>  		ret =3D flexcan_stop_mode_enable_scfw(priv, false);
+>  		if (ret < 0)
+> @@ -1987,6 +2006,9 @@ static int flexcan_setup_stop_mode(struct platform_=
+device *pdev)
+>  		ret =3D flexcan_setup_stop_mode_scfw(pdev);
+>  	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR)
+>  		ret =3D flexcan_setup_stop_mode_gpr(pdev);
+> +	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)
+> +		/* ATF will handle all STOP_IPG related work */
+> +		ret =3D 0;
+>  	else
+>  		/* return 0 directly if doesn't support stop mode feature */
+>  		return 0;
+> @@ -2013,6 +2035,7 @@ static const struct of_device_id flexcan_of_match[]=
+ =3D {
+>  	{ .compatible =3D "fsl,imx8qm-flexcan", .data =3D &fsl_imx8qm_devtype_d=
+ata, },
+>  	{ .compatible =3D "fsl,imx8mp-flexcan", .data =3D &fsl_imx8mp_devtype_d=
+ata, },
+>  	{ .compatible =3D "fsl,imx93-flexcan", .data =3D &fsl_imx93_devtype_dat=
+a, },
+> +	{ .compatible =3D "fsl,imx95-flexcan", .data =3D &fsl_imx95_devtype_dat=
+a, },
+>  	{ .compatible =3D "fsl,imx6q-flexcan", .data =3D &fsl_imx6q_devtype_dat=
+a, },
+>  	{ .compatible =3D "fsl,imx28-flexcan", .data =3D &fsl_imx28_devtype_dat=
+a, },
+>  	{ .compatible =3D "fsl,imx53-flexcan", .data =3D &fsl_imx25_devtype_dat=
+a, },
+> @@ -2311,9 +2334,22 @@ static int __maybe_unused flexcan_noirq_suspend(st=
+ruct device *device)
+>  	if (netif_running(dev)) {
+>  		int err;
+> =20
+> -		if (device_may_wakeup(device))
+> +		if (device_may_wakeup(device)) {
+>  			flexcan_enable_wakeup_irq(priv, true);
+> =20
+> +			/* For FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI, it need
+                                                                      needs
+> +			 * ATF to send request to SM through SCMI protocol,
+> +			 * SM will assert the IPG_STOP signal. But all this
+> +			 * works need the CAN clocks keep on.
+> +			 * After the CAN module get the IPG_STOP mode, and
+                                                gets
+> +			 * switch to STOP mode, whether still keep the CAN
+                           switches
+> +			 * clocks on or gate them off depend on the Hardware
+> +			 * design.
+> +			 */
+> +			if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)
+> +				return 0;
+> +		}
+> +
+>  		err =3D pm_runtime_force_suspend(device);
+>  		if (err)
+>  			return err;
+> @@ -2330,9 +2366,12 @@ static int __maybe_unused flexcan_noirq_resume(str=
+uct device *device)
+>  	if (netif_running(dev)) {
+>  		int err;
+> =20
+> -		err =3D pm_runtime_force_resume(device);
+> -		if (err)
+> -			return err;
+> +		if (!(device_may_wakeup(device) &&
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
 
+Where does this come from?
+
+> +		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI))=
+ {
+> +			err =3D pm_runtime_force_resume(device);
+> +			if (err)
+> +				return err;
+> +		}
+> =20
+>  		if (device_may_wakeup(device))
+>  			flexcan_enable_wakeup_irq(priv, false);
+> diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/=
+flexcan.h
+> index 025c3417031f4..4933d8c7439e6 100644
+> --- a/drivers/net/can/flexcan/flexcan.h
+> +++ b/drivers/net/can/flexcan/flexcan.h
+> @@ -68,6 +68,8 @@
+>  #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
+>  /* Device supports RX via FIFO */
+>  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
+> +/* Setup stop mode with ATF SCMI protocol to support wakeup */
+> +#define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
+> =20
+>  struct flexcan_devtype_data {
+>  	u32 quirks;		/* quirks needed for different IP cores */
+>=20
+> --=20
+> 2.34.1
+>=20
+>=20
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--wmxdadf3ku3zl7ae
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaWG+QACgkQKDiiPnot
+vG/hgAgAnxXnqQEsWJcE8q1cfm4Zhwb71ljBgIGlUXzUDlWT21EwarfgDf+/IBf8
+xwgpDBaU/CuA9qwuuHXDkKJMIcTdsOhxkQs+jcQ2EKDAF9tLCJbjx9ceJdfHUF2c
+MYECj51MHZ9qyMrxMuxlhN266gDMsD9sIeEGcZmCSy2RTDayan7NLSnXIIJGcTK1
+QQn++HXrKBzTOi53qnyf20K0lCIS/yLQfbsgxigSuHTeS8SlpTYeOl/NBbqnfyLL
+bhMcmSuFWKYGMpTIy9rnZo7aKZEyAK40Jjg6gKx8qFoJS44Ye9lhPDPBoIQRfkQo
+JmhoFgMXnDsQptl0ppxMIbI1WsBIGQ==
+=p1co
+-----END PGP SIGNATURE-----
+
+--wmxdadf3ku3zl7ae--
 
