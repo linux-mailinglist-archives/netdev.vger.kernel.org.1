@@ -1,132 +1,124 @@
-Return-Path: <netdev+bounces-111728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BB09325AB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:32:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A34F19325CE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC067B20955
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F79C282636
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E631991A3;
-	Tue, 16 Jul 2024 11:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85929198E60;
+	Tue, 16 Jul 2024 11:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R285MnxX"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="VeHkyn7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA271799D
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 11:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F03B15491;
+	Tue, 16 Jul 2024 11:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721129523; cv=none; b=BQBDaPvxKZ2AvQZaQ/mtmWbajZRBGrQM2Ad+m5M4s0HU5q8XkV5yO0wNjua9p/j4BPu7hVb2VpGs9ylUV/KzC1r02nptNi4a6QrJPVAvuBspnBLLSvbelRyhopEc6uaCAcHBYu09I5qyRzhQUuGFo8RccaK9LcNg2OSaMtCXjTk=
+	t=1721129850; cv=none; b=hsKIls+v9AJoZPWOr6/81jP4BOE5iRGGIzIPmWsbnbsUo0/0iDu7DVO8dKoLMmwAeQ2ZTLEKMlqHYFZ8AGy0hsV+4kim0bZ4ksNzXke98GmrIokTMkHyy0UcdVynskl93C7ClgX7u42QWbOOku7mkrF2At721t6q4xtd7IjdMkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721129523; c=relaxed/simple;
-	bh=rlo30+owHu5Rt2jo2hgUO++4+6OM0lijE05ELQk0XLc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n7fgs8rj5yNgwPi1rLZp23YcIbYxrbVN6P87Jf+PU/NV+kDUzBkxXorSIywcRW7yi74ztSFbQXLwe8lArAP5CJMNHtO0Qh/SySHMqiPobkMgKRGkjHlUweF9aJaXQBpnH/Yqsomwi1Nv0eX+paGlnox5P/J7S43n7V8hOilG89k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R285MnxX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721129520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wS8IhieGZEGOs6So34MinArqLEMTFaAJheWRiSUC3Ws=;
-	b=R285MnxXziYg/NB4vNabpTJRmZvfRpC1J/+CUNB7rZ+gaaRMnI/NUdUWnTVWLZBrALr7e1
-	uO2xBEzsIAQN+pZ9Xq53HXaQfZIxTCL2zxwtj39DYLBkBzxrj5eQ518CNxwNCDKqyLi9Gr
-	C7XobAytnVKYchZwVUQ4TrUsyZcTkGc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-m92ucJByP9O9bR_eCpUs0A-1; Tue, 16 Jul 2024 07:31:59 -0400
-X-MC-Unique: m92ucJByP9O9bR_eCpUs0A-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4211239ed3dso10098895e9.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 04:31:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721129518; x=1721734318;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wS8IhieGZEGOs6So34MinArqLEMTFaAJheWRiSUC3Ws=;
-        b=Cch3YzBBnmB6/hIN3RXZML/GbVLSr8Qo0Cc/sJ2lheU7mLC2/cCAFGxVrCMASSpP/E
-         Myb7boWbLQfbh3JnuDKver/v3mnvs9A+0TscNWF/9uTukN5qFA+pYGJIZNDKwPzwCb4h
-         zmC0KDe1OcYAKUKB3oH2ylwOfsV/SVIqSnmGbmrOsM5ZUGR1x3dxtJ38rvQC5Nimw93a
-         9WwoHNAFM2TmuArZOvTx6+k+PSN+CyLsTJjK9uInRtpyvFwfJ8m6yI1Hn0dACRDmF7j7
-         F3DkvnLi/9gL3txYm13RShmzxIf4kztUbyNqQtYXZz0ZmhQEpacMAyiniAVfbv+E0c3U
-         ABIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVnkMuTLzW7mEP0gkZ4uiKSgGqNKUCS/VObA6d5Ly6233IEjAtNU2Fyg5PvJ07nBmyRVR8jvGrPBBZkOdK0V2kObLYxs+Kz
-X-Gm-Message-State: AOJu0YyaRjqpcyZrNBAjp5i15PtxUUjYB48Ty156vRYc8jQXeU3yxgss
-	gN+pH9mijIBKqa/d7X3IPg9rZ5qO1mTG70fAuZqjTxwA82GocQHQSldIv0P3cJWAEe6HljHhriN
-	n2G1JzRjvgbD40ERN6aRb1Va01FxxY5OOKOrZE+ri71Jl0qKeZEccqQ==
-X-Received: by 2002:a5d:64c5:0:b0:367:9505:73ed with SMTP id ffacd0b85a97d-368240c50b6mr1250932f8f.7.1721129517979;
-        Tue, 16 Jul 2024 04:31:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHw4mlz5Eqf83dMPSKFCXM5jNJw+x1Bc4/Vh0VpL7NnFMTMQckuVWIERpgMS5Em6aSzgUuVmg==
-X-Received: by 2002:a5d:64c5:0:b0:367:9505:73ed with SMTP id ffacd0b85a97d-368240c50b6mr1250920f8f.7.1721129517598;
-        Tue, 16 Jul 2024 04:31:57 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3? ([2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680dab3d4dsm8793172f8f.23.2024.07.16.04.31.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jul 2024 04:31:57 -0700 (PDT)
-Message-ID: <6d1a441d-31f9-4bc3-8856-be18620e4401@redhat.com>
-Date: Tue, 16 Jul 2024 13:31:53 +0200
+	s=arc-20240116; t=1721129850; c=relaxed/simple;
+	bh=TGWgCjG/5BoPGM3gimHC4b/HxuCchSOPMuLNRzJfd+A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e47xdz9gPgnHMRxn2X1FgXZoP0LBkgw5WcEtmMcjVbnLyEazoWIRM69Tdpx474fB8JJK0HwAHDHmrVJlyqeg3Ht70qoYKN541aiYPapeKo/OL0d0ZOli5WPe3ZhTk3EyK98CtQYvIVfrkOfwieedb0D8MHm8gCCkJ+pz/VFH0+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=VeHkyn7f; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1721129848; x=1752665848;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TGWgCjG/5BoPGM3gimHC4b/HxuCchSOPMuLNRzJfd+A=;
+  b=VeHkyn7fP/dsOf4pszbz0xRkIz1YyY1wpxqpgxfeuv8Be8zZoD9oVhSN
+   +GJFREaEX/7xGVkb5kiBdoLJA5ROxGGreKdDNb7oTHl/UVofVTJ37ZOyj
+   8CWsA0/nP5Ln+39jWa3reXDxiTHsGT8vVWuMCbkIDKCIeajM1ZWjZIsWb
+   D7Mi206R97G2R4SL1BE8Of/kB12VIluOrXVYNdnULMB3z78KW7Kxz30jV
+   yf96UAo6ujYFHuQm4QxocDOe8yN2+XvqoSmFcDpl67fqBWGxdtcMShvn7
+   czWpzydBrm4ZXv2NQojv42zQQs4+gholVgI6HZ7zF6Daj5FIKYaYlWBXF
+   A==;
+X-CSE-ConnectionGUID: wiqq30pxTLCqYtWfMI+eUQ==
+X-CSE-MsgGUID: GOwTssgcSxCfQ1NZAT7NdA==
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="196701708"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jul 2024 04:37:26 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 16 Jul 2024 04:37:15 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 16 Jul 2024 04:37:11 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <andrew@lunn.ch>,
+	<horms@kernel.org>, <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
+	<rdunlap@infradead.org>, <linux@armlinux.org.uk>,
+	<bryan.whitehead@microchip.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next V2 0/4] Add support to PHYLINK for LAN743x/PCI11x1x chips
+Date: Tue, 16 Jul 2024 17:03:45 +0530
+Message-ID: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/ipv4/tcp_cong: Replace strncpy() with strscpy()
-To: Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>,
- Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20240714041111.it.918-kees@kernel.org>
- <20240715094107.GM8432@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240715094107.GM8432@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 7/15/24 11:41, Simon Horman wrote:
-> On Sat, Jul 13, 2024 at 09:11:15PM -0700, Kees Cook wrote:
->> Replace the deprecated[1] uses of strncpy() in tcp_ca_get_name_by_key()
->> and tcp_get_default_congestion_control(). The callers use the results as
->> standard C strings (via nla_put_string() and proc handlers respectively),
->> so trailing padding is not needed.
->>
->> Since passing the destination buffer arguments decays it to a pointer,
->> the size can't be trivially determined by the compiler. ca->name is
->> the same length in both cases, so strscpy() won't fail (when ca->name
->> is NUL-terminated). Include the length explicitly instead of using the
->> 2-argument strscpy().
->>
->> Link: https://github.com/KSPP/linux/issues/90 [1]
->> Signed-off-by: Kees Cook <kees@kernel.org>
-> 
-> nit: Looking at git history, the subject prefix should probably be 'tcp'.
->       And it would be best to explicitly target the patch against net-next.
-> 
->       Subject: [PATCH net-next v2] tcp: ...
-> 
-> That notwithstanding, this looks good to me.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+This is the follow-up patch series of
+https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
 
-@Eric: I can fix the prefix when applying the patch. Please LMK if you 
-prefer otherwise.
+Divide the PHYLINK adaptation and SFP modifications into two separate patch
+series.
 
-Thanks,
+The current patch series focuses on transitioning the LAN743x driver's PHY
+support from phylib to phylink.
 
-Paolo
+Tested on chip PCI11010 Rev-B with Bridgeport Evaluation board Rev-1
+
+Change List:
+============
+V1 ->V2:
+  - Fix the Russell King's comments i.e. remove the speed, duplex update in 
+    lan743x_phylink_mac_config( )
+  - pre-March 2020 legacy support has been removed
+
+V0 -> V1:
+  - Integrate with Synopsys DesignWare XPCS drivers
+  - Based on external review comments,
+  - Changes made to SGMII interface support only 1G/100M/10M bps speed
+  - Changes made to 2500Base-X interface support only 2.5Gbps speed
+  - Add check for not is_sgmii_en with is_sfp_support_en support
+  - Change the "pci11x1x_strap_get_status" function return type from void to
+    int
+  - Add ethtool phylink wol, eee, pause get/set functions
+
+
+Raju Lakkaraju (4):
+  net: lan743x: Create separate PCS power reset function
+  net: lan743x: Create separate Link Speed Duplex state function
+  net: lan743x: Migrate phylib to phylink
+  net: lan743x: Add support to ethtool phylink get and set settings
+
+ drivers/net/ethernet/microchip/Kconfig        |   5 +-
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 118 +---
+ drivers/net/ethernet/microchip/lan743x_main.c | 657 +++++++++++-------
+ drivers/net/ethernet/microchip/lan743x_main.h |   7 +
+ 4 files changed, 460 insertions(+), 327 deletions(-)
+
+-- 
+2.34.1
 
 
