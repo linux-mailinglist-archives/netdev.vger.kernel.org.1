@@ -1,218 +1,231 @@
-Return-Path: <netdev+bounces-111643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 232FB931E99
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:56:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A264931E9B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94A791F222E2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:56:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C6B2B216B9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948364A24;
-	Tue, 16 Jul 2024 01:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB044C98;
+	Tue, 16 Jul 2024 01:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IDa62IKk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fIBKteLS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892733C0B
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034EA4405;
+	Tue, 16 Jul 2024 01:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721095006; cv=none; b=c8qPDU+9X0DFQeKfPTUY5xLoBAPSiNTWalr1zFAyavpeQzxFfexM0jjs4yFCaypyjnl+KaHdQo6J+v1SnyEMtt5QNs24s/HHrJweVUB4d9QXV/ArzXz7HCb1vHsR3q53FuFBRyn9+BjBpRtqlxjinDrn4vswEWAeyDsG3MxOKN8=
+	t=1721095044; cv=none; b=lV0OUHyJHnkn3N3UrL82O+Y8y2goFbwgA7OlfR+S2DP+ZFWIZGeA7EWlmj5p471LKSUEENvOgS7xyKW7q5pmHXmGdDDLiTAhxAIWirvRab0lDgh3SdbE/O/f9BAO51/a2xI3zFVH2joNzGWL3IV2VadRGCVDFT6X3EttJk5sg0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721095006; c=relaxed/simple;
-	bh=mSa19N44q6gToAG51j/DW88NsG7/vNwA9Xumh+dh5GM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eKiW9Bq82Ty/8PQszuXtuCwVgLngYM+MOpYeyPCGnUL71uwI9132U2FymcsTp5On44XmHBrNfuXizPpf6jtV3fNqwmDS9oDlQxattrsGqb/oiIN1bPq1T7iSVYPW+4z9yVDsiMfc6DTUTeEJdmFtUCqAj+iJm7FdswK4om1dr08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IDa62IKk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721095003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aJ9uRaA/pgUTohQkTocotLavEjg0G3cgh1Hl90+UeSE=;
-	b=IDa62IKkzWHmX7lJhMfJBeM7wbZ7JA0pKKBQoxIzFXcu991XRgB60KfS1dY6kSrKFNMagG
-	SdEj7V8jRCmrNuWfSp0F6PpF784EgvzfInx3XaOi4cdX9l705AjwanAIQHNdPqmrs0Keil
-	muK0vvlHNRrkPxv9QQJEyai8NegIkbQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-c32EAQt2MqGw9UEqQjV_Og-1; Mon, 15 Jul 2024 21:56:41 -0400
-X-MC-Unique: c32EAQt2MqGw9UEqQjV_Og-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a797c5b4f47so336177366b.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 18:56:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721095000; x=1721699800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aJ9uRaA/pgUTohQkTocotLavEjg0G3cgh1Hl90+UeSE=;
-        b=Y+ws+XqsDshI/2P94YInDu2vS1JAoW4+k/KCagnNzRdsVmaRk7uHOdquMyAuafdMw+
-         uF5Qiy+g5WO79pfXDcN43d9uhZ5HRCiIp1XdPyFxjC6jzIsWejNHZqySGrbf4QB82SjU
-         g7wWtMBmdtiME0+5xdSlPpEfICF+ID1ZEECyYd8wRcnDqGaBq7QoCoWevYyhZd7XE0cQ
-         ZWwNk5uzTvbWGMRaesjB9ObWUUQ5WHHfOxYVX57P3Ov3pYPgCm3kescUirNyrZaHwikv
-         NQA1AkMbACYrUpA0G6/j/JxjGMt+pRmm3rZKaxj2AKrUvI00PELHR/u4rtnJY0v0tKMe
-         43uw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/rVHGWuQHHyPxyZWK/EUn5Jw+IvQRKvgutxB5+xUf5BgNfx6OcvqEX6vIvY58hX8Be66LZgZH0+U1ZJGFB3YWEfEfzMQU
-X-Gm-Message-State: AOJu0YywdaKwABjeUdZUs5Wq6pagxx2eD2bF7hkBm1aDRrI7VIro4xB0
-	Dz0W//ozT8E1wWLgRV1WCDfdf2mzudhOEnY/bD7NclOJYV7NG3k0ekN5LH7UHJQsDIQ2Im2se+Y
-	YIvDnzi5Uh2OPBfSrUsMHYz6PeX84kBVvrRiHY1hn/Vk3joUPYZpmyTdqdwaqb2Il1nUcAArXs3
-	UrzLvG9axiLOrR0sNu2S5gzW8fLD4/
-X-Received: by 2002:a17:906:c251:b0:a77:d52c:c431 with SMTP id a640c23a62f3a-a79ea437a59mr29231966b.22.1721095000338;
-        Mon, 15 Jul 2024 18:56:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIlY9QdoGy1wvXGDzqvzgSlrEtvYJuX9YNa/bprVSKTIgkcYrp0DjzVKUwrkNd96+xSC0OHOUCNG9hJd/6q1c=
-X-Received: by 2002:a17:906:c251:b0:a77:d52c:c431 with SMTP id
- a640c23a62f3a-a79ea437a59mr29231666b.22.1721094999978; Mon, 15 Jul 2024
- 18:56:39 -0700 (PDT)
+	s=arc-20240116; t=1721095044; c=relaxed/simple;
+	bh=t0XlaqT1tDT/nsM6KCVFb/nb2016vFMXOdVznDehQak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=psc6+ZOwVUWrVm2JaCod93ER6+KWd8sQgR+HXFjwtH6/TFSFh644kca+Tj5XkpKm8Wka+ivk7NvQBpSSs8dxTGn6TTlmNOTI3kiRbaiIExmTILxnObkImwMF1qg/bxxfiZDWPBgNF1O/qy05mFUJBR3ptrfa1/KqpiXD1VZ2eVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fIBKteLS; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721095043; x=1752631043;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=t0XlaqT1tDT/nsM6KCVFb/nb2016vFMXOdVznDehQak=;
+  b=fIBKteLSPhZWakjlGU2celfaXfB845tbzVF7DeSc9j4Sr0PSgQcX2AZY
+   AXAatQ4++rRQNLDQoggDj+V/7yYXbWTLUYktD6b3sn9vwH7dVjSHTa9rX
+   ULA0ty7kDlhwH7YfF5rfg8S7E+ZiPuYx1MFh4i+dfpFsGljgSRLr3KSjd
+   yCZEEAJ8TGV/S+4KN6+TleoA+SCtHdkAKcNYGY0dUwmS5XYeY+tphP/dY
+   oR1QHRFMPTdr7ZLm3oVl4oRO4gHGED6iRYqbh4Hujhgz/E0zQDVHssjQy
+   7JNaVfraSN0tGNtoPeQFtqw1KG/F2IhMJyOQfR2VH4GDvKIHGYqkkQVZR
+   Q==;
+X-CSE-ConnectionGUID: 5iIT0A0ESpeXem4HXfqw7A==
+X-CSE-MsgGUID: PezEruGHQRW2iKoyWFw/Hg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="18377043"
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="18377043"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 18:57:22 -0700
+X-CSE-ConnectionGUID: Sy4ZL5sRSuSVdTh3priDpA==
+X-CSE-MsgGUID: vtkZ1LHFRvePulM3uhH8xA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
+   d="scan'208";a="80509954"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 15 Jul 2024 18:57:19 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sTXRM-000ekw-0M;
+	Tue, 16 Jul 2024 01:57:16 +0000
+Date: Tue, 16 Jul 2024 09:57:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dan.j.williams@intel.com,
+	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	richard.hughes@amd.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v2 01/15] cxl: add type2 device basic support
+Message-ID: <202407160957.L4mIOUtI-lkp@intel.com>
+References: <20240715172835.24757-2-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240716011349.821777-1-lulu@redhat.com>
-In-Reply-To: <20240716011349.821777-1-lulu@redhat.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 16 Jul 2024 09:56:03 +0800
-Message-ID: <CAPpAL=xKRjtAYPW9+sVfqnKR=ZOiThh+=XVEQb_aokD1WGKgAA@mail.gmail.com>
-Subject: Re: [RFC v2] virtio-net: check the mac address for vdpa device
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
-	netdev@vger.kernel.org, qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240715172835.24757-2-alejandro.lucero-palau@amd.com>
 
-Hi Cindy
+Hi,
 
-If needed, QE can help test this MR before merging into the master branch.
+kernel test robot noticed the following build warnings:
 
-Best Regards
-Lei
+[auto build test WARNING on linus/master]
+[also build test WARNING on cxl/pending v6.10 next-20240715]
+[cannot apply to cxl/next horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20240716-015920
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20240715172835.24757-2-alejandro.lucero-palau%40amd.com
+patch subject: [PATCH v2 01/15] cxl: add type2 device basic support
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20240716/202407160957.L4mIOUtI-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project a0c6b8aef853eedaa0980f07c0a502a5a8a9740e)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240716/202407160957.L4mIOUtI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407160957.L4mIOUtI-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/sfc/efx.c:8:
+   In file included from include/linux/filter.h:9:
+   In file included from include/linux/bpf.h:20:
+   In file included from include/linux/module.h:19:
+   In file included from include/linux/elf.h:6:
+   In file included from arch/s390/include/asm/elf.h:173:
+   In file included from arch/s390/include/asm/mmu_context.h:11:
+   In file included from arch/s390/include/asm/pgalloc.h:18:
+   In file included from include/linux/mm.h:2258:
+   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     501 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     508 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     520 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     529 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   In file included from drivers/net/ethernet/sfc/efx.c:8:
+   In file included from include/linux/filter.h:12:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
+     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
+         |                                                      ^
+   In file included from drivers/net/ethernet/sfc/efx.c:8:
+   In file included from include/linux/filter.h:12:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
+     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
+         |                                                      ^
+   In file included from drivers/net/ethernet/sfc/efx.c:8:
+   In file included from include/linux/filter.h:12:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:693:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     693 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:701:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     701 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:709:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     709 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:718:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     718 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:727:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     727 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:736:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     736 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   In file included from drivers/net/ethernet/sfc/efx.c:36:
+>> drivers/net/ethernet/sfc/efx_cxl.h:11:9: warning: 'EFX_CXL_H' is used as a header guard here, followed by #define of a different macro [-Wheader-guard]
+      11 | #ifndef EFX_CXL_H
+         |         ^~~~~~~~~
+   drivers/net/ethernet/sfc/efx_cxl.h:12:9: note: 'EFX_CLX_H' is defined here; did you mean 'EFX_CXL_H'?
+      12 | #define EFX_CLX_H
+         |         ^~~~~~~~~
+         |         EFX_CXL_H
+   18 warnings generated.
 
 
-On Tue, Jul 16, 2024 at 9:14=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
->
-> When using a VDPA device, it is important to ensure that the MAC address
-> in the hardware matches the MAC address from the QEMU command line.
->
-> There are only two acceptable situations:
-> 1. The hardware MAC address is the same as the MAC address specified in t=
-he QEMU
-> command line, and both MAC addresses are not 0.
-> 2. The hardware MAC address is not 0, and the MAC address in the QEMU com=
-mand line is 0.
-> In this situation, the hardware MAC address will overwrite the QEMU comma=
-nd line address.
->
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  hw/net/virtio-net.c | 43 +++++++++++++++++++++++++++++++++++++------
->  1 file changed, 37 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 9c7e85caea..8f79785f59 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -178,8 +178,8 @@ static void virtio_net_get_config(VirtIODevice *vdev,=
- uint8_t *config)
->           * correctly elsewhere - just not reported by the device.
->           */
->          if (memcmp(&netcfg.mac, &zero, sizeof(zero)) =3D=3D 0) {
-> -            info_report("Zero hardware mac address detected. Ignoring.")=
-;
-> -            memcpy(netcfg.mac, n->mac, ETH_ALEN);
-> +          error_report("Zero hardware mac address detected in vdpa devic=
-e. "
-> +                       "please check the vdpa device!");
->          }
->
->          netcfg.status |=3D virtio_tswap16(vdev,
-> @@ -3579,12 +3579,42 @@ static bool failover_hide_primary_device(DeviceLi=
-stener *listener,
->      /* failover_primary_hidden is set during feature negotiation */
->      return qatomic_read(&n->failover_primary_hidden);
->  }
-> +static bool virtio_net_check_vdpa_mac(NetClientState *nc, VirtIONet *n,
-> +                                      MACAddr *cmdline_mac, Error **errp=
-) {
-> +  struct virtio_net_config hwcfg =3D {};
-> +  static const MACAddr zero =3D {.a =3D {0, 0, 0, 0, 0, 0}};
->
-> +  vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&hwcfg, ETH_A=
-LEN);
-> +
-> +  /* For VDPA device: Only two situations are acceptable:
-> +   * 1.The hardware MAC address is the same as the QEMU command line MAC
-> +   *   address, and both of them are not 0.
-> +   * 2.The hardware MAC address is NOT 0, and the QEMU command line MAC =
-address
-> +   *   is 0. In this situation, the hardware MAC address will overwrite =
-the QEMU
-> +   *   command line address.
-> +   */
-> +
-> +  if (memcmp(&hwcfg.mac, &zero, sizeof(MACAddr)) !=3D 0) {
-> +    if ((memcmp(&hwcfg.mac, cmdline_mac, sizeof(MACAddr)) =3D=3D 0) ||
-> +        (memcmp(cmdline_mac, &zero, sizeof(MACAddr)) =3D=3D 0)) {
-> +      /* overwrite the mac address with hardware address*/
-> +      memcpy(&n->mac[0], &hwcfg.mac, sizeof(n->mac));
-> +      memcpy(&n->nic_conf.macaddr, &hwcfg.mac, sizeof(n->mac));
-> +
-> +      return true;
-> +    }
-> +  }
-> +  error_setg(errp, "vdpa hardware mac !=3D the mac address from "
-> +                   "qemu cmdline, please check the the vdpa device's set=
-ting.");
-> +
-> +  return false;
-> +}
->  static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
->      VirtIONet *n =3D VIRTIO_NET(dev);
->      NetClientState *nc;
-> +    MACAddr macaddr_cmdline;
->      int i;
->
->      if (n->net_conf.mtu) {
-> @@ -3692,6 +3722,7 @@ static void virtio_net_device_realize(DeviceState *=
-dev, Error **errp)
->      virtio_net_add_queue(n, 0);
->
->      n->ctrl_vq =3D virtio_add_queue(vdev, 64, virtio_net_handle_ctrl);
-> +    memcpy(&macaddr_cmdline, &n->nic_conf.macaddr, sizeof(n->mac));
->      qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
->      memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
->      n->status =3D VIRTIO_NET_S_LINK_UP;
-> @@ -3739,10 +3770,10 @@ static void virtio_net_device_realize(DeviceState=
- *dev, Error **errp)
->      nc->rxfilter_notify_enabled =3D 1;
->
->     if (nc->peer && nc->peer->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_V=
-DPA) {
-> -        struct virtio_net_config netcfg =3D {};
-> -        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
-> -        vhost_net_set_config(get_vhost_net(nc->peer),
-> -            (uint8_t *)&netcfg, 0, ETH_ALEN, VHOST_SET_CONFIG_TYPE_FRONT=
-END);
-> +     if (!virtio_net_check_vdpa_mac(nc, n, &macaddr_cmdline, errp)) {
-> +       virtio_cleanup(vdev);
-> +       return;
-> +     }
->      }
->      QTAILQ_INIT(&n->rsc_chains);
->      n->qdev =3D dev;
-> --
-> 2.45.0
->
->
+vim +/EFX_CXL_H +11 drivers/net/ethernet/sfc/efx_cxl.h
 
+  > 11	#ifndef EFX_CXL_H
+    12	#define EFX_CLX_H
+    13	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
