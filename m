@@ -1,225 +1,175 @@
-Return-Path: <netdev+bounces-111634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B96931E31
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 02:54:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F01931E55
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3110B21EB8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 00:54:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC74A283616
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 01:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A35D17F7;
-	Tue, 16 Jul 2024 00:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055CA17C2;
+	Tue, 16 Jul 2024 01:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fcLeNty4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vv5nPbQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB3A4A32;
-	Tue, 16 Jul 2024 00:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE4EAD24
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721091262; cv=none; b=Q3wrV7PqAX2GCk1+76+SoT+lc+4Vwd0oSfos1Ly60YG3RFQXJ60XMatYJS6HRzNYN9UuTeTbZVaBdW1H2pLt5CAM/lTZQ2YHlhY3D1ql257sLs4AH5+i3CFGYoSIit1lOf5hcWSwwXCfoqWmVvG5724qXSueP/lICy4yH7kLxyk=
+	t=1721092444; cv=none; b=eGWnOXR0eqh8wLY69mP2Rl0px86p8Yr1PO4ZCU9a+1bnh7Es0cC75LF7dEq/hMbftczSvAOCGsRJqehkgfQmuc4rR9XXyZMOgSJLgY4TgatxT5qRmrPhm1lOjl9QNkIrQus1/yurGr1QFTUU+BevL/6ZJMQuMn6+Hfv9Db0Fl4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721091262; c=relaxed/simple;
-	bh=AlcLkl3ZckSTetDqtkbewgaIlrmC0fd1HpPyOnPIDOY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jpVPqVe7iCrlh3YDbvHd+bLgmVEf4hB12qktHNbyUuKaW84O8qkrtS2XxQc3lNXXD6lGoHczOXpfXQYaA+8RXP7kXNgD7OF0hppQnA81Kxbt3A/noe5yJA/BK+8SABhGxi7yOwgoYdIaU7X1dsusI2iXMv4AZd26EKZmHlz3m+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fcLeNty4; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721091261; x=1752627261;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AlcLkl3ZckSTetDqtkbewgaIlrmC0fd1HpPyOnPIDOY=;
-  b=fcLeNty4gachm/QAf+C34YoA5aWRnQEdXL9M65DlntQxphUR0+uwE+S7
-   GBJrFHw6b5W0cYoH7Q8ElXPyUdJmFR8Z10QXaK6M6emWUa0OF7Hv9R86n
-   griNzwxMIyQsODnStNbF/KWeR/tzJQVhe16KL3pfcxagRCHZZ82o5o6SJ
-   detH0otubmzxRLnTsIG+mcbUg6PaEcILdh7XcoRxGokcPzT4HoXQ4/bxe
-   7ctPnTcwIgT/CmndfJ99SE2HfI361EPZxLt2URHyYoB3N36ogWcPPJsxf
-   6uKMZvPYcdO2Bn/6T+9UyQkRFTVNkDDL7GOBh/UZBy6hcW/fZiYLiUX1+
-   A==;
-X-CSE-ConnectionGUID: 93vqPGZLQkyK+1RI9tBqrQ==
-X-CSE-MsgGUID: 3Lq3RKmsSFmeiZZqV2jmHA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="18642260"
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="18642260"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 17:54:20 -0700
-X-CSE-ConnectionGUID: lF6M1kDsQcupE5CgB6cnNw==
-X-CSE-MsgGUID: EmctZzIbRMavmTAEQvtPpQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="49900247"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 15 Jul 2024 17:54:16 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sTWSM-000eiJ-1i;
-	Tue, 16 Jul 2024 00:54:14 +0000
-Date: Tue, 16 Jul 2024 08:53:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	richard.hughes@amd.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v2 09/15] cxl: define a driver interface for HPA free
- space enumaration
-Message-ID: <202407160818.7GrterxM-lkp@intel.com>
-References: <20240715172835.24757-10-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1721092444; c=relaxed/simple;
+	bh=XAhDF83vqJsPZMASvYCb/PJ0ckPj92m1HBGXftr3NW0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HN5GLFWC0Jc09jE5mw4QhFx0duaVQ2NWkuTOLVBqu4plvlNvr1Z+Erw9AbMuww+E2+Fgk0CniRwD11N6GEMuFh9CZc0CEmjhv1kG5jM4UU1P18Oq8U7wskAFiEXMeU6l0baIednFOpQKqagq4DLkvlwYV3Zx4mXtcga+Sy7O0kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vv5nPbQY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721092441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SHlgMgT9UBt4PrV/SgTuYZQey7Svi/OASjw1leV6MUM=;
+	b=Vv5nPbQYKZQrvCMCWHprzlqZVza37ArdFOj1GA3Ib3NdzJCIFLCLqzJ0n+XTMMahVYjBla
+	RQLnYoHTwHZa5zjClP5D1ZMCqIIZlzOoCMTJoGJxMwV8tqIwDkHoKjKzd1LfxGU7nLKV5g
+	tb8NWdiP9Q4ZRtVC1auoGH//XvrjjZ8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-587-iVi_21hKO0ersLd0W02VyA-1; Mon,
+ 15 Jul 2024 21:13:59 -0400
+X-MC-Unique: iVi_21hKO0ersLd0W02VyA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 343171955D42;
+	Tue, 16 Jul 2024 01:13:58 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.9])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E45219560B2;
+	Tue, 16 Jul 2024 01:13:53 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	dtatulea@nvidia.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	parav@nvidia.com,
+	netdev@vger.kernel.org,
+	qemu-devel@nongnu.org
+Subject: [RFC v2] virtio-net: check the mac address for vdpa device
+Date: Tue, 16 Jul 2024 09:13:49 +0800
+Message-ID: <20240716011349.821777-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240715172835.24757-10-alejandro.lucero-palau@amd.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi,
+When using a VDPA device, it is important to ensure that the MAC address
+in the hardware matches the MAC address from the QEMU command line.
 
-kernel test robot noticed the following build warnings:
+There are only two acceptable situations:
+1. The hardware MAC address is the same as the MAC address specified in the QEMU
+command line, and both MAC addresses are not 0.
+2. The hardware MAC address is not 0, and the MAC address in the QEMU command line is 0.
+In this situation, the hardware MAC address will overwrite the QEMU command line address.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.10 next-20240715]
-[cannot apply to cxl/next cxl/pending horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ hw/net/virtio-net.c | 43 +++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 37 insertions(+), 6 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20240716-015920
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20240715172835.24757-10-alejandro.lucero-palau%40amd.com
-patch subject: [PATCH v2 09/15] cxl: define a driver interface for HPA free space enumaration
-config: i386-buildonly-randconfig-004-20240716 (https://download.01.org/0day-ci/archive/20240716/202407160818.7GrterxM-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240716/202407160818.7GrterxM-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407160818.7GrterxM-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/sfc/efx_cxl.c:17:
-   drivers/net/ethernet/sfc/efx_cxl.h:11:9: warning: 'EFX_CXL_H' is used as a header guard here, followed by #define of a different macro [-Wheader-guard]
-      11 | #ifndef EFX_CXL_H
-         |         ^~~~~~~~~
-   drivers/net/ethernet/sfc/efx_cxl.h:12:9: note: 'EFX_CLX_H' is defined here; did you mean 'EFX_CXL_H'?
-      12 | #define EFX_CLX_H
-         |         ^~~~~~~~~
-         |         EFX_CXL_H
->> drivers/net/ethernet/sfc/efx_cxl.c:89:7: warning: format specifies type 'unsigned long long' but the argument has type 'resource_size_t' (aka 'unsigned int') [-Wformat]
-      88 |                 pci_info(pci_dev, "CXL accel not enough free HPA space %llu < %u\n",
-         |                                                                        ~~~~
-         |                                                                        %u
-      89 |                                   max, EFX_CTPIO_BUFFER_SIZE);
-         |                                   ^~~
-   include/linux/pci.h:2683:67: note: expanded from macro 'pci_info'
-    2683 | #define pci_info(pdev, fmt, arg...)     dev_info(&(pdev)->dev, fmt, ##arg)
-         |                                                                ~~~    ^~~
-   include/linux/dev_printk.h:160:67: note: expanded from macro 'dev_info'
-     160 |         dev_printk_index_wrap(_dev_info, KERN_INFO, dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                                                  ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:110:23: note: expanded from macro 'dev_printk_index_wrap'
-     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
-         |                              ~~~    ^~~~~~~~~~~
-   2 warnings generated.
-
-
-vim +89 drivers/net/ethernet/sfc/efx_cxl.c
-
-    15	
-    16	#include "net_driver.h"
-  > 17	#include "efx_cxl.h"
-    18	
-    19	#define EFX_CTPIO_BUFFER_SIZE	(1024*1024*256)
-    20	
-    21	void efx_cxl_init(struct efx_nic *efx)
-    22	{
-    23		struct pci_dev *pci_dev = efx->pci_dev;
-    24		struct efx_cxl *cxl = efx->cxl;
-    25		resource_size_t max = 0;
-    26		struct resource res;
-    27		u16 dvsec;
-    28	
-    29		dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
-    30						  CXL_DVSEC_PCIE_DEVICE);
-    31	
-    32		if (!dvsec)
-    33			return;
-    34	
-    35		pci_info(pci_dev, "CXL CXL_DVSEC_PCIE_DEVICE capability found");
-    36	
-    37		cxl->cxlds = cxl_accel_state_create(&pci_dev->dev,
-    38						    CXL_ACCEL_DRIVER_CAP_HDM);
-    39		if (IS_ERR(cxl->cxlds)) {
-    40			pci_info(pci_dev, "CXL accel device state failed");
-    41			return;
-    42		}
-    43	
-    44		cxl_accel_set_dvsec(cxl->cxlds, dvsec);
-    45		cxl_accel_set_serial(cxl->cxlds, pci_dev->dev.id);
-    46	
-    47		res = DEFINE_RES_MEM(0, EFX_CTPIO_BUFFER_SIZE);
-    48		cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_DPA);
-    49	
-    50		res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
-    51		cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_RAM);
-    52	
-    53		if (cxl_pci_accel_setup_regs(pci_dev, cxl->cxlds)) {
-    54			pci_info(pci_dev, "CXL accel setup regs failed");
-    55			return;
-    56		}
-    57	
-    58		if (cxl_accel_request_resource(cxl->cxlds, true))
-    59			pci_info(pci_dev, "CXL accel resource request failed");
-    60	
-    61		if (!cxl_await_media_ready(cxl->cxlds)) {
-    62			cxl_accel_set_media_ready(cxl->cxlds);
-    63		} else {
-    64			pci_info(pci_dev, "CXL accel media not active");
-    65			return;
-    66		}
-    67	
-    68		cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
-    69		if (IS_ERR(cxl->cxlmd)) {
-    70			pci_info(pci_dev, "CXL accel memdev creation failed");
-    71			return;
-    72		}
-    73	
-    74		cxl->endpoint = cxl_acquire_endpoint(cxl->cxlmd);
-    75		if (IS_ERR(cxl->endpoint))
-    76			pci_info(pci_dev, "CXL accel acquire endpoint failed");
-    77	
-    78		cxl->cxlrd = cxl_get_hpa_freespace(cxl->endpoint, 1,
-    79						    CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
-    80						    &max);
-    81	
-    82		if (IS_ERR(cxl->cxlrd)) {
-    83			pci_info(pci_dev, "CXL accel get HPA failed");
-    84			goto out;
-    85		}
-    86	
-    87		if (max < EFX_CTPIO_BUFFER_SIZE)
-    88			pci_info(pci_dev, "CXL accel not enough free HPA space %llu < %u\n",
-  > 89					  max, EFX_CTPIO_BUFFER_SIZE);
-    90	out:
-    91		cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
-    92	}
-    93	
-
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 9c7e85caea..8f79785f59 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -178,8 +178,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
+          * correctly elsewhere - just not reported by the device.
+          */
+         if (memcmp(&netcfg.mac, &zero, sizeof(zero)) == 0) {
+-            info_report("Zero hardware mac address detected. Ignoring.");
+-            memcpy(netcfg.mac, n->mac, ETH_ALEN);
++          error_report("Zero hardware mac address detected in vdpa device. "
++                       "please check the vdpa device!");
+         }
+ 
+         netcfg.status |= virtio_tswap16(vdev,
+@@ -3579,12 +3579,42 @@ static bool failover_hide_primary_device(DeviceListener *listener,
+     /* failover_primary_hidden is set during feature negotiation */
+     return qatomic_read(&n->failover_primary_hidden);
+ }
++static bool virtio_net_check_vdpa_mac(NetClientState *nc, VirtIONet *n,
++                                      MACAddr *cmdline_mac, Error **errp) {
++  struct virtio_net_config hwcfg = {};
++  static const MACAddr zero = {.a = {0, 0, 0, 0, 0, 0}};
+ 
++  vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&hwcfg, ETH_ALEN);
++
++  /* For VDPA device: Only two situations are acceptable:
++   * 1.The hardware MAC address is the same as the QEMU command line MAC
++   *   address, and both of them are not 0.
++   * 2.The hardware MAC address is NOT 0, and the QEMU command line MAC address
++   *   is 0. In this situation, the hardware MAC address will overwrite the QEMU
++   *   command line address.
++   */
++
++  if (memcmp(&hwcfg.mac, &zero, sizeof(MACAddr)) != 0) {
++    if ((memcmp(&hwcfg.mac, cmdline_mac, sizeof(MACAddr)) == 0) ||
++        (memcmp(cmdline_mac, &zero, sizeof(MACAddr)) == 0)) {
++      /* overwrite the mac address with hardware address*/
++      memcpy(&n->mac[0], &hwcfg.mac, sizeof(n->mac));
++      memcpy(&n->nic_conf.macaddr, &hwcfg.mac, sizeof(n->mac));
++
++      return true;
++    }
++  }
++  error_setg(errp, "vdpa hardware mac != the mac address from "
++                   "qemu cmdline, please check the the vdpa device's setting.");
++
++  return false;
++}
+ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIONet *n = VIRTIO_NET(dev);
+     NetClientState *nc;
++    MACAddr macaddr_cmdline;
+     int i;
+ 
+     if (n->net_conf.mtu) {
+@@ -3692,6 +3722,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     virtio_net_add_queue(n, 0);
+ 
+     n->ctrl_vq = virtio_add_queue(vdev, 64, virtio_net_handle_ctrl);
++    memcpy(&macaddr_cmdline, &n->nic_conf.macaddr, sizeof(n->mac));
+     qemu_macaddr_default_if_unset(&n->nic_conf.macaddr);
+     memcpy(&n->mac[0], &n->nic_conf.macaddr, sizeof(n->mac));
+     n->status = VIRTIO_NET_S_LINK_UP;
+@@ -3739,10 +3770,10 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     nc->rxfilter_notify_enabled = 1;
+ 
+    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
+-        struct virtio_net_config netcfg = {};
+-        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
+-        vhost_net_set_config(get_vhost_net(nc->peer),
+-            (uint8_t *)&netcfg, 0, ETH_ALEN, VHOST_SET_CONFIG_TYPE_FRONTEND);
++     if (!virtio_net_check_vdpa_mac(nc, n, &macaddr_cmdline, errp)) {
++       virtio_cleanup(vdev);
++       return;
++     }
+     }
+     QTAILQ_INIT(&n->rsc_chains);
+     n->qdev = dev;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.45.0
+
 
