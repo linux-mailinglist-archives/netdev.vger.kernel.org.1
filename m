@@ -1,149 +1,186 @@
-Return-Path: <netdev+bounces-111685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0A09320CE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 08:57:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6846E9320CD
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 08:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D9141C219CD
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 06:57:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 931451C21A40
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 06:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454B61CD32;
-	Tue, 16 Jul 2024 06:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8EE20DCB;
+	Tue, 16 Jul 2024 06:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XPJa2SUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F34225761
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 06:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482E11CD32
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 06:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721113058; cv=none; b=MdzRNV2d4DQ9zOzZKIACnwznJnQTODz9Qm0G/0iyiCa+f35ICJu/HOiqXYvY5rZirYv+igAJmLB93q8M0h8R9XR3pVQSPLOT2ApKnJkTcMBiJzkywyO++ddqRXzenuIhIlUOJMO1IkefX3MFE2LfcaHS3n+pdlZlBcKw8ZRhhQE=
+	t=1721113055; cv=none; b=iuFCt9WjYs8IUUkveJEyJsuidcfHHhmwkgzRj9o+ge4Nwyy4wLlzi3Cafnpa1L5ea15rLhSNvkueq7RxMajzroBVbrpgXZIA+H7Kdj3/U4T/GfJoWALrfH6165XYcCWLzsnIvhPNbYnU4G6oTYvqJc/owNq6JdtNgWpBAzGnYAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721113058; c=relaxed/simple;
-	bh=8qlscJasTrwwPLY1nNciHNwhUNUtFNdBxH9NWwcXmjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyrrYqkAS9len2iu4WCGhowUNhEC3LrsKBgW2r2x1WebtkS6DSrg+MxmnZG+nF+7g0D7r/ldfBtu5vIdKN8sHdFnSsbGm0vmps+DU/B6arRBppbgz7QA7PUu/zInQm75soCkqcFOx4YIKtluhdRIsekrw4rk9ApMv6JDOoD4FjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTc74-0004f5-9S; Tue, 16 Jul 2024 08:56:38 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTc71-0004NX-ML; Tue, 16 Jul 2024 08:56:35 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 4C5A2304DE4;
-	Tue, 16 Jul 2024 06:56:35 +0000 (UTC)
-Date: Tue, 16 Jul 2024 08:56:34 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com, 
-	Chircu-Mare Bogdan-Petru <Bogdan.Chircu@freescale.com>, Dan Nica <dan.nica@nxp.com>, 
-	Stefan-Gabriel Mirea <stefan-gabriel.mirea@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
-	Joakim Zhang <qiangqing.zhang@nxp.com>, Leonard Crestez <cdleonard@gmail.com>
-Subject: Re: [PATCH v2 2/4] can: flexcan: Add S32V234 support to FlexCAN
- driver
-Message-ID: <20240716-magnificent-imported-ammonite-06274a-mkl@pengutronix.de>
-References: <20240715-flexcan-v2-0-2873014c595a@nxp.com>
- <20240715-flexcan-v2-2-2873014c595a@nxp.com>
+	s=arc-20240116; t=1721113055; c=relaxed/simple;
+	bh=JB9Pv2h1psRdzQ/YW4887hnS91Q24NPBG1tUu6X+V4Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SQrHohLKjKQ4TFWt5JwyJ+46AK6xd23cM7X1sIFSvdV3RH1ifDlF7vy4pBF87P9k2OvK0HlMebIQhIuocjCPNAXZ6oJjYJA8gJ6JD6DSMgDHGc/QK3D0KvGkaW6QvTzThpgrjyXVpY/9Z5q6FnDCqdc3+jE0zVQOQ6AOV8+3n5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XPJa2SUv; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-58c0abd6b35so11283a12.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jul 2024 23:57:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721113050; x=1721717850; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JB9Pv2h1psRdzQ/YW4887hnS91Q24NPBG1tUu6X+V4Q=;
+        b=XPJa2SUve+0A1PUBIgmdIl+Et/lIDvnR+i4MeBU+RAY+1nCLSRWsmh2FL6DkfTrU/M
+         +xk0a/JT8QfEAhTJa8Xtp8f5ZiDqvr1si315Ns08n0S2RfhG7JjYK/EQ9djiFMTTJbPi
+         0wMfE+DZ0LsZaawVGUbpA+XhcQxvMMNXWD3veQVFPId0tDP5NJ365xDvmHrAtAa/gMLA
+         pGrQg678/rYMdFTBLEixTN+Mp0Uoilew4wYXAyrFwo6UVVIneneUYpQwBNbMJcjKSOS3
+         pKVxx5C3KozlDgANevUL5tEqXZ0/ilEVbcLL3p5H3mTxF+/WvHWL5qkX5MVPWwRJy6av
+         NPYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721113050; x=1721717850;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JB9Pv2h1psRdzQ/YW4887hnS91Q24NPBG1tUu6X+V4Q=;
+        b=pKKYqJlW6A8INLALoe6FKy6or4W+T2Z4/ogSL5DzIPNyyWxy0E4MEbnI39VzFKpYRV
+         4ID+QGs58CkFk3kOV/HXro6OGL8ZSKm5TZpn3TYYD7kUYN+tuVY2wrwRPk/1JW8/Lc+d
+         dBJ/ZTOkZZJmlrY48ZADHZOwJZKkDt+L0Iz1iy7oxx2M/SUb0fDe/N3OuJIaCvjvl9Dd
+         +izi4m48iT+hKw7UyNLgmFSmsr7Vb9bPZHChnf2fwyAC+KAVVFGE74+LK5WJgk+eAd8d
+         6DDB+Z1uqKeeYMPoyKYCIqODj7rrZFYYy9tHSZTgUVq+Z8SX3kq8bphYemBNhFnr12ou
+         qOFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPxnFk0s7FVaIaJN+/rVZu14wB7KBVKbZl8PnSptoPAsRg0nBBN/TTUXbGGHOm7A2yPccxI6GLFxh1hpZL3HqVMPlCVblf
+X-Gm-Message-State: AOJu0YzCtT8DX/V2zaPmrJBBTL5wWFHV+SUrT07Z0ZAjjGRCElvIn21W
+	IZdwS+9CTEJ3pUSPXngoJlxrPBg2BkwzORNdvvm23N04ecGzh0aLuWRpLCPzS25ePWJCiL5KHJN
+	sjbyWJXSek6Vg2bvvZcgPoBT186hg24btCxWx
+X-Google-Smtp-Source: AGHT+IF24QVyffBOqoZd93yJUI88r1sq9n2dD0oy22z8EHISv8yLzDwTl7WmIzMu1W4WD9gPpjuqvi7GL8RoNLv9Vjc=
+X-Received: by 2002:a05:6402:4304:b0:58b:e3b:c5d8 with SMTP id
+ 4fb4d7f45d1cf-59ec2942b3dmr189268a12.0.1721113050118; Mon, 15 Jul 2024
+ 23:57:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7czg2i2w4wkjgew7"
-Content-Disposition: inline
-In-Reply-To: <20240715-flexcan-v2-2-2873014c595a@nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---7czg2i2w4wkjgew7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20240715033118.32322-1-kerneljasonxing@gmail.com>
+ <CANn89iLXgGT2NL5kg7LQrzCFT_n7GJzb9FExdOD3fRNFEc1z0A@mail.gmail.com> <CAL+tcoA38fXgnJtdDz8NBm=F0-=oGp=oEySnWEhNB16dqzG9eQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoA38fXgnJtdDz8NBm=F0-=oGp=oEySnWEhNB16dqzG9eQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 15 Jul 2024 23:57:15 -0700
+Message-ID: <CANn89iK7hDCGQsGiX5rD6S29u1u8k5za-SOBaxY59S=C+BgaKA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: introduce rto_max_us sysctl knob
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	dsahern@kernel.org, ncardwell@google.com, corbet@lwn.net, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 15.07.2024 17:27:21, Frank Li wrote:
-> From: Chircu-Mare Bogdan-Petru <Bogdan.Chircu@freescale.com>
->=20
-> Add flexcan support for S32V234.
->=20
-> Signed-off-by: Chircu-Mare Bogdan-Petru <Bogdan.Chircu@freescale.com>
-> Signed-off-by: Dan Nica <dan.nica@nxp.com>
-> Signed-off-by: Stefan-Gabriel Mirea <stefan-gabriel.mirea@nxp.com>
-> Reviewed-by: Li Yang <leoyang.li@nxp.com>
-> Reviewed-by: Joakim Zhang <qiangqing.zhang@nxp.com>
-> Reviewed-by: Leonard Crestez <leonard.crestez@nxp.com>
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  drivers/net/can/flexcan/flexcan-core.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
-xcan/flexcan-core.c
-> index 8ea7f2795551b..f6e609c388d55 100644
-> --- a/drivers/net/can/flexcan/flexcan-core.c
-> +++ b/drivers/net/can/flexcan/flexcan-core.c
-> @@ -378,6 +378,10 @@ static const struct flexcan_devtype_data fsl_lx2160a=
-_r1_devtype_data =3D {
->  		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
->  };
-> =20
-> +static struct flexcan_devtype_data fsl_s32v234_devtype_data =3D {
-> +	.quirks =3D FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_DISABLE_MECR,
-> +};
+On Mon, Jul 15, 2024 at 11:42=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> Hello Eric,
+>
+> On Mon, Jul 15, 2024 at 10:40=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Sun, Jul 14, 2024 at 8:31=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > As we all know, the algorithm of rto is exponential backoff as RFC
+> > > defined long time ago.
+> >
+> > This is weak sentence. Please provide RFC numbers instead.
+>
+> RFC 6298. I will update it.
+>
+> >
+> > > After several rounds of repeatedly transmitting
+> > > a lost skb, the expiry of rto timer could reach above 1 second within
+> > > the upper bound (120s).
+> >
+> > This is confusing. What do you mean exactly ?
+>
+> I will rewrite this part. What I was trying to say is that waiting
+> more than 1 second is not very friendly to some applications,
+> especially the expiry time can reach 120 seconds which is too long.
 
-- Does the core support CAN-FD?
-- Does the core generate an error interrupt when going from error warning
-  to error passive?
-- Are you sure, you don't need to enable FLEXCAN_QUIRK_ENABLE_EACEN_RRS?
-- You probably want to use the mailboxes instead of the FIFO for the
-  RX-path.
+Says who ? I think this needs IETF approval.
 
-regards,
-Marc
+>
+> >
+> > >
+> > > Waiting more than one second to retransmit for some latency-sensitive
+> > > application is a little bit unacceptable nowadays, so I decided to
+> > > introduce a sysctl knob to allow users to tune it. Still, the maximum
+> > > value is 120 seconds.
+> >
+> > I do not think this sysctl needs usec resolution.
+>
+> Are you suggesting using jiffies is enough? But I have two reasons:
+> 1) Keep the consistency with rto_min_us
+> 2) If rto_min_us can be set to a very small value, why not rto_max?
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+rto_max is usually 3 order of magnitude higher than rto_min
 
---7czg2i2w4wkjgew7
-Content-Type: application/pgp-signature; name="signature.asc"
+For HZ=3D100, using jiffies for rto_min would not allow rto_min < 10 ms.
+Some of us use 5 msec rto_min.
 
------BEGIN PGP SIGNATURE-----
+jiffies is plain enough for rto_max.
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaWGaAACgkQKDiiPnot
-vG/7sQgAgoy9kUcei84qu1gP/cmLa39WpufEkj5qo0h9LC6ryRNtHYJJVHdpthTt
-SxG5murRrAfL7yeoaG09mOH8ROFWIdoXrVULxUGYF7sumeLW1AQXnatEdzgUgAEn
-4SkwIr8lsFKMAWoV1JB/UPEBhAMaJ1eHrvVEtzXZMacVKlw/uEj6V7K8vfN2nhdh
-uL8P8ERJln6grTXv5ydB+kpSuGw8/xLMYko5qrk29Kek+Fd9FeybZdu9nYf3Ea68
-96EBM6f6E+/T7c16p7NeYZiwkc0id21xbQDLbOYRsOkehUklskz0WrY9fMPFONRP
-+urFyd+I6wA0roHQBfuSy4ibb+JkdA==
-=sBBU
------END PGP SIGNATURE-----
 
---7czg2i2w4wkjgew7--
+>
+> What do you think?
+
+I think you missed many many details really.
+
+Look at all TCP_RTO_MAX instances in net/ipv4/tcp_timer.c and ask
+yourself how many things
+will break if we allow a sysctl value with 1 second for rto_max.
+
+>
+> >
+> > Also storing this sysctl once, and converting it millions of times per
+> > second to jiffies is not good.
+> > I suggest you use proc_dointvec_jiffies() instead in the sysctl handler=
+.
+> >
+> > Minimal value of one jiffies makes also no sense. We can not predict
+> > if some distros/users
+> > might (ab)use this sysctl.
+>
+> Okay. If the final solution is using jiffies, I will accordingly adjust i=
+t.
+>
+> >
+> > You forgot to update
+> > Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+>
+> Oh sorry, I forgot.
+>
+> > This means the location you chose for the new sysctl is pretty much
+> > random and not reflcting
+> > this is used in one fast path.
+>
+> I will investigate its proper location...
+>
+> >
+> > I suggest you wait for net-next being reopened, we are all busy
+> > attending netdev 0x18 conference.
+>
+> Roger that. Thanks for your suggestions.
+>
+> Thanks,
+> Jason
 
