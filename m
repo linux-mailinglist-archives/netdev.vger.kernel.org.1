@@ -1,75 +1,80 @@
-Return-Path: <netdev+bounces-111714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0F1932376
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:56:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0CC5932389
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 12:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A8ED1F23A29
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:56:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66CA3282FFE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 10:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E79198A15;
-	Tue, 16 Jul 2024 09:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA482D7B8;
+	Tue, 16 Jul 2024 10:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tjwpr15a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZH8spW8h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409A8197A6C
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 09:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2721535DC
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 10:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721123760; cv=none; b=UpGWhmo0LmOc5N0ZFI04szg3nwPRqjuabyaibq0RoS5TOqMnL7V2sm0DcF/bAHRO9sUlXDSOZrR1wMeSoRfSsg6U8vJVLRPOsI4aTnH6Mcx1vqZHl8dV4l5EFC8Rc2jEPrjvcax8BqRVU7brzGvoTywankV10q5TQt7+6+YdIVc=
+	t=1721124253; cv=none; b=OedzCBnpIDaVoeFV7hdkSXnyRzGMmTuv5PQO2fbT8V58i+FRqSs3pobkxtHpPY6SG9W0Ur3d95wz1Y8ErHylCHfo5Bvv6vWszqv9xKKF/M8Z199BUGTxjZw9x3QOK+Gprl0OzRgEUStmSZxQWxOlzrIxSP65FlUFG5mg1WppFwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721123760; c=relaxed/simple;
-	bh=IKDf3UkdBuH38DCvAMMD13kRXL5GatuQLI8hucyLu1E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kBP+bo8HZfyyUlqVcaqKgpqAt48Zj5aBo1B/PqPZdoO6xcojNZJ0CqbXAmgIRhprKV3MGasCkEuCPSWDUUETJQ+dkdBv3fbflrLcaHX4rP0VAXMBQ4M9SjEAGw5rC37aUJrqWBl/L9Jo/sHWZNzNBrjelj4ZsMJysf0HCRzUm+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Tjwpr15a; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4266fcb311cso37156205e9.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 02:55:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721123755; x=1721728555; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=G/olg4pPYowonDS6iIauF1CvyhTPcwwFOxr3z5IbHdQ=;
-        b=Tjwpr15aqA/BPW5EsRRH1WyLWFVW3t1BaebucYxjqNgKHS9oan1m53JtjgbE9u65I8
-         D8VESrgKYfxATFEngmUH3xyPCOKHm9DgmyK4yi5z7kCE2dKlXSlhC/u/yJNfFSyWSelv
-         72kLaODb4+yhNoDIQLqDSNgfpZSqgrwlBu+5ED2weyapFkSG2/w3vJN7UjYyQ7Xks1Fj
-         nRcCG9igAIYWOzGY04OpPF4R0gY4Gly72rH4z1IwGjJFX8wedK5xuA6NRoXkWKfllIbO
-         MRZJMZkXfzQ/aT+M5ptbyUiwk76Eb5MtaC3L0TYUqmYwOTy/1v7ZNEvi+BFcrP/Ysqqi
-         LSLA==
+	s=arc-20240116; t=1721124253; c=relaxed/simple;
+	bh=MUFuR2pXNxUKKtiasIUfiYjF2PsXeIixjzGA7sGDhIc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:References:
+	 In-Reply-To:Content-Type; b=gPWX1+yBDbUw5Y8nGcXNjB1mfeZjKR8eL0kLV5vT2qaDVL4VmU41fOfHiNyNDbUs8Kd2u8LnkIiLc5OXf+vuF5+q8ZALl4EmumlM4+CvpcrFdCac3BcE9yWFuVc/i2wCJH619eheHETsTmVcFkDfnues7mWNABqwDW293xLdZZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZH8spW8h; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721124249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nifFBz3CcmH0KE26JlPLMWxX8zry3tjdLhy6RuGs/+w=;
+	b=ZH8spW8h1uLQ23KyieQR1ngY/0yxf56+q0HYfUobbPjB/KjHcjLqIlJgXXPL/M6gCc2O8F
+	1WQp/zkagag/29nNslQoicvBjIinuNXox+42Ld/FFyuJrpmdwxx30FOYMotdmfVFlpMSdj
+	j10PeStxrQ6K3P9EoT2GvAjUbSgCLZ8=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-647-_Lq5oMLbOIeTY-N6BIv-iw-1; Tue, 16 Jul 2024 06:04:08 -0400
+X-MC-Unique: _Lq5oMLbOIeTY-N6BIv-iw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52e954dd0deso227703e87.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 03:04:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721123755; x=1721728555;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G/olg4pPYowonDS6iIauF1CvyhTPcwwFOxr3z5IbHdQ=;
-        b=V0sNQATtWyajFhmFDQe9GzLHPKeNNW2q2dTKDC2MrktI4VWRmmBM9mfjkNlMcMCNrX
-         RjBOs7YMUYrojfwZFVyVsj1z/+Uo2E3Q3Uo10ErpejbgS3e7JYS1QbKHeO5UmMNer/ap
-         kKBhr7RFzjw8J0kQktFPa+Y0BnV1dECsPX3C+dHtXeX5YnilIQaT28flCYm5xC19PCV/
-         22aIs7cF2jHYjP6vmJ98TUGNb6S1QnKm/1zr6KtIhR6WOUcGzhaw6zy8aCjrmtbohwAE
-         KiGR+l3cJXQqEh5tCKr9jxInOIDvgTu3r76CqX7DQ6nRZvve/K7ikB9cYAZvdtUVMe8W
-         NbEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVf5TDXVbO5lpKHJ3thZvAH5op14nJVe9SWsyGztXAOohWr4gv//lZ5CDosGkOhyJcDQGIK49Br9Y0TPafHE96M+qcNDmZ2
-X-Gm-Message-State: AOJu0Yz5lVeDN/ONThtqVQtScd9rPOxRPi8Otwlp3WqmYCeVRO57V+sw
-	BjBkqHlj741vNWNW2KIlDoyNCtU2oY3Ntw6XvCS+SxHiEuaqHPNOafchM3NEPPk=
-X-Google-Smtp-Source: AGHT+IECqv+IwV2EF4YBefvX50x3d6wJMth6y3D794pvAsND2gF8a9+T8Ehd1tNE3M+gP+6dLAKEDg==
-X-Received: by 2002:a5d:5f4d:0:b0:367:991d:8b76 with SMTP id ffacd0b85a97d-3682609e9a7mr1188873f8f.15.1721123755574;
-        Tue, 16 Jul 2024 02:55:55 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680dafbf29sm8570878f8f.70.2024.07.16.02.55.54
+        d=1e100.net; s=20230601; t=1721124245; x=1721729045;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nifFBz3CcmH0KE26JlPLMWxX8zry3tjdLhy6RuGs/+w=;
+        b=MHq85aVNLGVQMSK01DStWPgOAgZR9TsEp6RjYA5NJTkj7ZaoK6g3iJYn/KhJDZzErY
+         kZJvfMCUmK/CNY0QHml3PoDGen4+fsIB2gpphCETdM9YsmMlKV3I6MToJItutAwvUWui
+         VuLfccSUV9yiC7/l8RD5APqfo5hd6Su42Cibz+TPkoeWa8dRhfnsH4ol5y+uZVfE1QMY
+         KskMe5XDAgcWSxCVa9YTDFhMq+Gv4UkLVfokDUQitODIxlZV4qzYzff60mUzUI7CzKHm
+         lJMfiCApUS16FEUM1Hzn6x5RhUjc0wBrO8rFegUpFVPbj3uatR0xJTaOcsQ/OwWEIcsY
+         mtsg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVY+v6b3ZTERkcQO81q8R4rdFyd8a68pkPL213YIZxQcXUDejiy6BA2i0n2EtNemTGE2CTOZo3RCaaF6TfFIZI9apEADGh
+X-Gm-Message-State: AOJu0Yx5gJAB6vd2zQAEd+OEkZASmz9cded4jf8R+4vSPRKUkDLjEO4E
+	wa0tUogCfGS0kkEMBnccLMXJOYJYSYqEc4PgeWdqSQLb9mFrKnt9Plwn1xVGMFojcytNJZk7ehF
+	27oHdxSy5Svi5xQ0h9wzUGlvy1rehSvtLZ5gdXUOIx5Nvej06OcqJmfbrcdE3kQ==
+X-Received: by 2002:a2e:bc03:0:b0:2ec:16c4:ead5 with SMTP id 38308e7fff4ca-2eef2d784d8mr13074361fa.2.1721124245370;
+        Tue, 16 Jul 2024 03:04:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEtM5cREuYKllv0xLM4vxnYGWZSnPcGKe7O6hxVUR6E6z5n02k3K8VGFZ360MPT9Us8phm49A==
+X-Received: by 2002:a2e:bc03:0:b0:2ec:16c4:ead5 with SMTP id 38308e7fff4ca-2eef2d784d8mr13074161fa.2.1721124244858;
+        Tue, 16 Jul 2024 03:04:04 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3? ([2a0d:3344:1738:5210:e05b:d4c9:1ad4:1bd3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680daccad8sm8558606f8f.60.2024.07.16.03.04.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jul 2024 02:55:55 -0700 (PDT)
-Message-ID: <60b0de98-e3c9-467b-98fb-ba7da7208be8@linaro.org>
-Date: Tue, 16 Jul 2024 11:55:53 +0200
+        Tue, 16 Jul 2024 03:04:04 -0700 (PDT)
+Message-ID: <5e4905d7-32e1-4359-9720-a32330aec424@redhat.com>
+Date: Tue, 16 Jul 2024 12:04:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,114 +82,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: wireless: add ath12k pcie bindings
-To: Patrick Wildt <patrick@blueri.se>, Kalle Valo <kvalo@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Andy Gross <agross@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>,
- Steev Klimaszewski <steev@kali.org>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Johan Hovold <johan+linaro@kernel.org>
-References: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
- <ZpV7B9uGVpeTSCzp@windev.fritz.box>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [syzbot] [net?] WARNING in skb_warn_bad_offload (5)
+To: syzbot <syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com>,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ jakub@cloudflare.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, soheil@google.com, syzkaller-bugs@googlegroups.com,
+ willemb@google.com
+References: <000000000000e1609a061d5330ce@google.com>
 Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <ZpV7B9uGVpeTSCzp@windev.fritz.box>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <000000000000e1609a061d5330ce@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 15/07/2024 21:39, Patrick Wildt wrote:
-> Add devicetree bindings for Qualcomm ath12k PCIe devices such as WCN7850
-> for which the calibration data variant may need to be described.
+On 7/16/24 03:23, syzbot wrote:
+> syzbot found the following issue on:
 > 
-> Signed-off-by: Patrick Wildt <patrick@blueri.se>
-> ---
->  .../net/wireless/qcom,ath12k-pci.yaml         | 59 +++++++++++++++++++
->  1 file changed, 59 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+> HEAD commit:    80ab5445da62 Merge tag 'wireless-next-2024-07-11' of git:/..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=175fb821980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=2dbcdd8641c4638f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e15b7e15b8a751a91d9a
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=172bf566980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12fff535980000
 > 
-> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
-> new file mode 100644
-> index 000000000000..8f18868ee726
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
-> @@ -0,0 +1,59 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright (c) 2024 Linaro Limited
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
-> +
-> +maintainers:
-> +  - Kalle Valo <kvalo@kernel.org>
-> +  - Jeff Johnson <jjohnson@kernel.org>
-> +
-> +description: |
-> +  Qualcomm Technologies IEEE 802.11ax PCIe devices
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - pci17cb,1107  # WCN7850
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/184da3869c30/disk-80ab5445.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/85bfe9b60f21/vmlinux-80ab5445.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/06064623a948/bzImage-80ab5445.xz
+> 
+> The issue was bisected to:
+> 
+> commit 10154dbded6d6a2fecaebdfda206609de0f121a9
+> Author: Jakub Sitnicki <jakub@cloudflare.com>
+> Date:   Wed Jun 26 17:51:26 2024 +0000
+> 
+>      udp: Allow GSO transmit from devices with no checksum offload
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=142ccbed980000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=162ccbed980000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=122ccbed980000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+> 
+> skb frag:     00000080: 62 3f 77 e4 0e 82 0d 2f 85 cc 44 ea 25 5a 99 76
+> skb frag:     00000090: f2 53
+> ------------[ cut here ]------------
+> ip6tnl0: caps=(0x00000006401d7869, 0x00000006401d7869)
+> WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+> Modules linked in:
+> CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzkaller-01603-g80ab5445da62 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+> RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+> Code: e8 5f 94 a3 f8 49 8b 04 24 48 8d 88 a0 03 00 00 48 85 c0 48 0f 44 cd 48 c7 c7 00 cc c5 8c 4c 89 f6 48 89 da e8 fb 92 ff f7 90 <0f> 0b 90 90 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 44 89 f9
+> RSP: 0018:ffffc900034bedc8 EFLAGS: 00010246
+> RAX: 7d287cad4185da00 RBX: ffff888040cdc0b8 RCX: ffff888023d1bc00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: ffffffff8cc5cbc0 R08: ffffffff815857b2 R09: fffffbfff1c39994
+> R10: dffffc0000000000 R11: fffffbfff1c39994 R12: ffff888022880518
+> R13: dffffc0000000000 R14: ffff888040cdc130 R15: ffff888040cdc130
+> FS:  000055556e9e9380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020001180 CR3: 000000007c876000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
+>   skb_gso_segment include/net/gso.h:83 [inline]
+>   validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
+>   __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
+>   neigh_output include/net/neighbour.h:542 [inline]
+>   ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
+>   ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
+>   ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
+>   udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
+>   udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
+>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>   __sock_sendmsg+0xef/0x270 net/socket.c:745
+>   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+>   ___sys_sendmsg net/socket.c:2639 [inline]
+>   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
+>   __do_sys_sendmmsg net/socket.c:2754 [inline]
+>   __se_sys_sendmmsg net/socket.c:2751 [inline]
+>   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f04f688fe89
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffeebc526e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f04f688fe89
+> RDX: 0000000000000001 RSI: 0000000020003cc0 RDI: 0000000000000003
+> RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffeebc52740
+> R13: 00007f04f68dd406 R14: 0000000000000003 R15: 00007ffeebc52720
+>   </TASK>
 
-That's a duplicate of:
-https://lore.kernel.org/all/20240605122106.23818-1-brgl@bgdev.pl/
+Looking at the console log, the the relevant GSO packet is an UFO one 
+with CSUM_NONE. commit 10154dbded6d6a2fecaebdfda206609de0f121a9 only 
+adjust the skb csum for USO packets. @Jakub S. could you please have a look?
 
-AFAIK, this was already merged. I don't get why after ~1 month it is not
-in the linux-next.
+Thanks!
 
-Best regards,
-Krzysztof
+Paolo
 
 
