@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-111704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D916932243
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 10:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270F293224C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 10:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 967CBB20BB0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 08:55:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57A221C21885
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 08:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE55A17D36C;
-	Tue, 16 Jul 2024 08:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292D319580A;
+	Tue, 16 Jul 2024 08:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PUJ9oacj"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EJhp2gdq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C9941A8E
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 08:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60283196C7B
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 08:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721120099; cv=none; b=IaWQriHTH2H4AqoLvPgErOJ18AXKFGNSAPQASvENrqm+uBzTAweudeb9b2TfpszvggeZ7Bnb107CBcQQGZUCu71yudMoqhuQ4jONCEDbJo/rZwGdbwztFhdHuoa7f4g1uIF9ua/mbRKgN/QOpv0Sp+SnCSv/YMJ3t00aOVaH4qY=
+	t=1721120209; cv=none; b=GmI1ZeBo4JsfxYMBJgjLuhEPJPjjHA4XfkvAVxLbZ+gvbQUrd8S+SDvc3NLeZAC6RqeQyev+hbFXJzRG6EtZD82iYyGv+fh+lP/IgYwazza56tex0W3Xxyf77psKvi89GK26shcf/g+9aYwE4z+G8+kQZciLnAokYRWukzMK7VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721120099; c=relaxed/simple;
-	bh=SJen/1QT5j9lBSLAkF5vcsbT2VObhXZGBhF55aYD4dA=;
+	s=arc-20240116; t=1721120209; c=relaxed/simple;
+	bh=kiF3sV5Dm9ZnV4HVp8NFD24MI8K4flPgVeGxlGDhwEc=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=IWLj0Jo4VTSAOVvm/Cjd8OnXP0GtbTPniMirnIhEikhFvwpUBl1df3fqjObbaV0GJdr2S/Ayl56RFLmQeBVd1Kopd791YTqmmOK4E50iR2OycctjbOBiTsNjVPz9RZTPyytwjA96CvqidySoptNKk/g0Eby8pZ3/Vl5PZxemE9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PUJ9oacj; arc=none smtp.client-ip=209.85.208.53
+	 MIME-Version:Content-Type; b=cMjNUmIU0IueFTOacOu806SQAc9wJJMk5poJFZRa/ig274Vb1ZHiypKU+5+UN1gW1urY/4YVRhR8+sKgo6HzrGzdC/MSfouvWf5acCbcHSJYS7w11fyf+8NYBfvkX7kHRtAffkjfNdKa6IEcKNxGhhG2i3CrJZGf52u9qKF8/zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EJhp2gdq; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-58b966b41fbso6582712a12.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:54:57 -0700 (PDT)
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso55251351fa.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 01:56:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1721120096; x=1721724896; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1721120205; x=1721725005; darn=vger.kernel.org;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJen/1QT5j9lBSLAkF5vcsbT2VObhXZGBhF55aYD4dA=;
-        b=PUJ9oacjkJTrKs/+0gGAmB99AJwLGtXY7gl0Vp8YpiFY3VwBnj4p1M6ojKDuN3EX1T
-         1VjE3SvGzWvZ4m+oRav+eI+kDOLnJ6x0uOhibsogXZYku6dhav8EHJhNFPUMBOOfpMYN
-         j+QK55ddOJVPEIOY7qAm0t0XJEU1KhWdUt0CHPm1UVbLShTu5ReoaqyTrRgJonRVabqU
-         rEkehN0tZDYkFgRKCKvtpkTalZyRe4eV83qP7IMUW7Juvrsior1B+eK48YvhjfTGMPHP
-         W7Xf+DXHinsmKnrsuhlK4PCsDxFLL15vOo0a33/PYyK39mycdJ+2ZG4SBVsUB059krlk
-         x8Vg==
+        bh=kiF3sV5Dm9ZnV4HVp8NFD24MI8K4flPgVeGxlGDhwEc=;
+        b=EJhp2gdqx5PUKDkQqxc57/r7xxwH+S6ehlHCgg2OlAqxQ52rzgJEJaMFrjY+V+SB40
+         od5YATii6XRnUCkQ/EjtL9ybehzw4fEVjEnFaJuOWBvM/e1nDubE2Okse54aTOzPJQjr
+         JSPF1edtnBBTt9r3070uoFROw5RfY//kP2lv6nZr5uwp59e1mkb+MwVIOgqRcgwvg+r8
+         KWHKONGLdItnoJOxuVJojR1TguTUdadZ9uck8EiY9kXFz3Kf5IdItTrPoy4rObBeWGeN
+         JE5lgOcgjFa8AGO27wRgoKDTVAex3/wM4z2RiEAzcfyxQ0iy25oCVUau4qEedcNglxID
+         a7kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721120096; x=1721724896;
+        d=1e100.net; s=20230601; t=1721120205; x=1721725005;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SJen/1QT5j9lBSLAkF5vcsbT2VObhXZGBhF55aYD4dA=;
-        b=sx1t2q3RTBwoLGezRI6RP6sFL+9oKeTIsHymcA0WgyiSR5SdTf5vydCZ3ctODc7d6U
-         G87tSNVaTlBDM8AWo/mAXK0c7QolKcwAygJVwnrk+uykghmKmxFBnVK/e3agFDwRC7MR
-         wSyz03MG4ipRzolQ5oxnAGvp2vKNU/giz4VK6jBN173DpWkQKmYIfyL3qrKoRE4JFVnZ
-         F0v/fO6leaRPKdDHwndkcJG+eaB8yHr5R4RfDi69uXk/7AmV46zb+HIPK4wUrT17kjyQ
-         tseuh56QJbjOUgt9VEqfcilIygDEBjllZToqdpvCbs8YuEhzQM2YVQyj5l0N8UiT6Spn
-         2CNQ==
-X-Gm-Message-State: AOJu0YzDYrjoJ3jTsxGoKgkDtz65kzabZ4HZ/eHAQrFl4NcCSRmGsfEX
-	4XEqT/gVq7TYRYTadRXdulTEAGLo7GczaXHhH5GpJA1jbf7rMrle69LLtgllqKk=
-X-Google-Smtp-Source: AGHT+IHEX3XLbWwFTmlBuVFSbqHwHwV/VNG7yL5ANvbtlfCyppiI9BxcfUOkzXt2VUfh+FC0HMhcjw==
-X-Received: by 2002:a50:9b55:0:b0:57c:4875:10a9 with SMTP id 4fb4d7f45d1cf-59eef66c611mr766098a12.24.1721120096477;
-        Tue, 16 Jul 2024 01:54:56 -0700 (PDT)
+        bh=kiF3sV5Dm9ZnV4HVp8NFD24MI8K4flPgVeGxlGDhwEc=;
+        b=Ou/vzIm/Wjo/eMQ0A/UXJauCR5PoJoHchGUZmN2f0O9eGqrzTelYZnciz29zRgYkKc
+         yhQT6H1X2GyXr7NrN343oRIMf5eVB/KtqNSYcKpTQWwrsOiIbEc/YbLQCmG66XoUZB0x
+         LnTuOZxVf/I/SGz8kwL6S+KkmmK+M0geYaNUZ7/HtdgViRqBqdOocBH98w4H5eeSnUq2
+         pKXgvsyKQsQEwWN4cUNkpII+hteMNUOgRlxEMpk/g1jXJ4vbR32Fvdsra1ugK6F6J/8j
+         aeyWI9XeXmD0VY+RCfFV2/X3Iad6ANqjoI+DgfJpiIeemx3e6lyWXNo0duskV5oc1ezN
+         LHyA==
+X-Gm-Message-State: AOJu0Yyq/ynQwjg8dIubUv2KtNzmOB45r2vE87qFQeUtMwS+DzxqB0Bq
+	Ft5l31byZAVKOtPGOTIbuhrY+gFREGb0WmM8j2YkcbRfYkzmpUKx591fBPWSUYc=
+X-Google-Smtp-Source: AGHT+IEQdvfuDxnJ8etOegtPB4r50Dk6zmxNfwinuC9zKCkA005c6mFjsFKbn8ppT0aJYq1zUboTcg==
+X-Received: by 2002:a2e:93c9:0:b0:2ee:7a3a:9969 with SMTP id 38308e7fff4ca-2eef415b577mr10062401fa.5.1721120205470;
+        Tue, 16 Jul 2024 01:56:45 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:77])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59b268a2705sm4495027a12.60.2024.07.16.01.54.55
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-59b268a2760sm4510302a12.64.2024.07.16.01.56.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 01:54:55 -0700 (PDT)
+        Tue, 16 Jul 2024 01:56:44 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
   edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
   john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
   cong.wang@bytedance.com
-Subject: Re: [PATCH bpf v4 0/4] af_unix: MSG_OOB handling fix & selftest
-In-Reply-To: <cc71d3c5-41f9-4e6a-98d2-7822877b6214@rbox.co> (Michal Luczaj's
-	message of "Sat, 13 Jul 2024 22:14:16 +0200")
+Subject: Re: [PATCH bpf v4 3/4] selftest/bpf: Parametrize AF_UNIX redir
+ functions to accept send() flags
+In-Reply-To: <20240713200218.2140950-4-mhal@rbox.co> (Michal Luczaj's message
+	of "Sat, 13 Jul 2024 21:41:40 +0200")
 References: <20240713200218.2140950-1-mhal@rbox.co>
-	<cc71d3c5-41f9-4e6a-98d2-7822877b6214@rbox.co>
+	<20240713200218.2140950-4-mhal@rbox.co>
 User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Tue, 16 Jul 2024 10:54:54 +0200
-Message-ID: <87jzhl90o1.fsf@cloudflare.com>
+Date: Tue, 16 Jul 2024 10:56:43 +0200
+Message-ID: <87frs990l0.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,10 +88,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-On Sat, Jul 13, 2024 at 10:14 PM +02, Michal Luczaj wrote:
-> Arrgh, forgot the changelog:
+On Sat, Jul 13, 2024 at 09:41 PM +02, Michal Luczaj wrote:
+> Extend pairs_redir_to_connected() and unix_inet_redir_to_connected() with a
+> send_flags parameter. Replace write() with send() allowing packets to be
+> sent as MSG_OOB.
+>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
 
-Take a look at b4 for managing patch set the cover letter and changelog:
-
-https://b4.docs.kernel.org/en/latest/
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
