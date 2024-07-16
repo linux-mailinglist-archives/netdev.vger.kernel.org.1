@@ -1,169 +1,130 @@
-Return-Path: <netdev+bounces-111692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C7D932165
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:45:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79A493216C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F079B211B0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:45:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D2881F21D66
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252813A28B;
-	Tue, 16 Jul 2024 07:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5D82EAEA;
+	Tue, 16 Jul 2024 07:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ks+5ixS7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LsLf3Ekv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A398D364A4;
-	Tue, 16 Jul 2024 07:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1207F37143
+	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 07:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721115901; cv=none; b=uRO7OzaEnPfosw+eJKEKqX4PsI5DlcMcuRCKzadyFFSGIB/bgI+I9Z+9bElYfs5s38zwzKjgy9MN7JIsbmwUa6Z8dBYNQ2JtEdfGbzhmg68re0xAwszpO5YaTKpFnbK9DrYxOhlR4KgDiVhq7a2FdEpAYaYuO1kJh8276AJLjBU=
+	t=1721115947; cv=none; b=l/GmKyIcRI7PWWT6EeA5DnEPXLFnDoXDImwTByebyTbXp9poF1aTr9/KpxFenI216t+8Js/Zcjj95YsGC8u7sapYAZSzlCmbKRCUfGFGDkeWV3Qk8M3xqRM+uHPEIYOhMb3sX8IbJq/g4nX1IWlE3aO8JlV9g/4wBdyHA7pUjxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721115901; c=relaxed/simple;
-	bh=LhvDWCz+qUg7uLWIVZVAd05xhIPqDLC5aQEUa5TAj/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lKLfISJUucSdnYMkdyBetrgOCWGezqzFyyIyMmGv4MArvEAbSL5mZ4SQYrFYG65Rj96+pWMo4XbhT7UBeW2sZmebeMtzdSOKIwJpxIRNyEOiqJBgkAxrTxJdXESX60mSgoLfA6eePjQNtmOg6EH9UtIeTvG1ErfjDnIsYcmDXEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ks+5ixS7; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-79110d8e459so1171964a12.0;
-        Tue, 16 Jul 2024 00:44:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721115899; x=1721720699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DbCWXGRuvzHfZO2VrOM/qCgFYRHsmheQfUlw+5FY2Pc=;
-        b=ks+5ixS7YShCohAwbHfLUL/AzfzwU0C25etVnqZ4X2m/wkQ8PSex+SlGYLnKaW3HXp
-         wqcn2oWvIl2z4QKZ+HZrMluQ4HRqrE/vFRf7GBApPjEk+6bcELnZsNmxSGnxLZV1WSsH
-         Wp7I43471Jus6WvBiVVwNpQwcnVg/Pzwm+n7RmwClVFrqpkxa3EJ4yQbCLlh9l9IFB5h
-         xC+p/SL4McMxUt2HOCe9VfTy9sZ/EbbS3bTgcXhiUSvnay+f1hoUb0gtQUGmTOea6l++
-         G86n8gmyWUgnIoHF1G3SYefIRqmzPDvvc4SzCzNMD0pcr2b5yoVQf/6M6lN1S2nuZ9OC
-         nggQ==
+	s=arc-20240116; t=1721115947; c=relaxed/simple;
+	bh=86MUwza1xWsJAaFKgS4rDz0o1jK2RJQSPKS8NDzal6g=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LlD8Y3KQxQQOxvDa5Y0uto3+lxOiUvsFTQinhZsVOjpyn5Wp9emcI/oyi13KMCjO8Sck1MRQ07oFPpnvgD3rHQhTZtf6OKiO9qVqdLbvN0K6WsX1SwQdcxrZTCrpl8Wj3a4BstkfwDOEBXmCOg98PKPz9IfaKG0lJkGroMW5yFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LsLf3Ekv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721115945;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z+V++ss0Y+nF3bHAtu1rHuXiHCzOFsrcCTkSe7rWi5E=;
+	b=LsLf3EkvpO4oDAyyhzmwRDSCRzw1uYZIYpT1c1EEH5/NNN25COufRVPVp96BHRqtgNxy9q
+	jwQGRWeVqhGtPi829/CVn62zvovAdxy2zsB6klLoI8QveESQmgh7ulCfgDShe7rU8TIXnH
+	13JLJYERLdm3HS93A0iYZBiaxj5uXhU=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-296-NtbMywcBMIqk4dSwkoZQzQ-1; Tue, 16 Jul 2024 03:45:42 -0400
+X-MC-Unique: NtbMywcBMIqk4dSwkoZQzQ-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-79efed0e796so959221485a.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 00:45:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721115899; x=1721720699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DbCWXGRuvzHfZO2VrOM/qCgFYRHsmheQfUlw+5FY2Pc=;
-        b=okF4Nk1TNRI13K6VFZNYWFX0jI4UiDWgNS4rbdl7bbvpQFGEjdNACWPw+2o3VO2HUz
-         bNfSMEDSfSI2hvHJ1m3XglpVo04anD+gxNoYN42eAo6XDu9PLtN4aUJj8QIhmLEtsSae
-         EPp4h9ZU271pJq+lwbd+6ZDtHA3PFcSUcgjYnpaqJf2hhKjTZSbt5oFT/er0OPC9/noU
-         zV6i63mrRZXrmIz/FogPSkLkO9Fh2jjWdCJ1uUiTatMbIB4ZlTa0g5lqup5j5is5uv1e
-         7ZgZVQucfmGJlwpy3Ntat4+iG5jhIVu1lMmYmY1LLPpykckU84rFaqsNgKKa7wcyh9F6
-         +k9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVf0pOqWcPoUFb7uiIEEeqL9ZcNipmN9eC2DGYI0QMJvT437B0DuN1h5LMS5VO7lcT2Xl4RHSQbcNhkvX/QbeXN/R8JnXeCic5OaWwwroGxYCWMLOsCW27G0rSqgPMxI+gjKCjKrDgFbylIdCKyLE45TAsV9yTpTTxiajnI71ACiFccoxe+ZvHQNh4RQejNwgL+roUxVtjH1KwEmq0F90WS0i8xFHs=
-X-Gm-Message-State: AOJu0YxN+RN1Mk7N9KUe42m7rsyP39tPB1esDGsIUo1fwjxqKwMSlpTg
-	2LVWFrzTKn4wAzHgQrEizXUxfYsRMFI0X642dqK2juDRAFElpoLFRUj417ehlfPYsrvTnFeMlbN
-	uXK5BI9XSefMxOAEnGbqUlbBWUV4=
-X-Google-Smtp-Source: AGHT+IHKJ4A/6L2tAH7elOzCsqesMbEdr+mBHlIAhQKeuGXL0JGbvM+BD5UNGVOtYhJwy9ZQIVoEqnE6Pzw8x3iWzrA=
-X-Received: by 2002:a05:6a20:72a2:b0:1c0:f5be:a3ca with SMTP id
- adf61e73a8af0-1c3f124b1bdmr1554068637.30.1721115898766; Tue, 16 Jul 2024
- 00:44:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721115942; x=1721720742;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z+V++ss0Y+nF3bHAtu1rHuXiHCzOFsrcCTkSe7rWi5E=;
+        b=euYX94IHQVa0yb/XBFcrlCNIf3616dtXVcLAQHDnhX/5PXgs64ObhOFF318G6V0xsr
+         zQvNT5IdJGSRodpoxZd8NAhHH9i7XftIG5HkT6r4HebWgu9He7jAHYk7l5ZBC1BKo3Ns
+         UyZZaK5I2b1wuQig1rxvXHjhZUAqCDyXAab9wUqMUBZbH1bBIZ1kPzw10gYME0guXCqy
+         vTHNzKmh/tG7QawXRGfTWGsir5l8BhG8nlznpO29guId4dV62FZnxIz3marwod7N5c3D
+         S6og8sZyErzvOE/gc9X3s7ZqblpJzYlzcd7X4j1kP0jTtgQIFihaG9Nddh7kMAhgNLCM
+         KncA==
+X-Forwarded-Encrypted: i=1; AJvYcCWG0aBO0KlMrhTYkw4WzwNTSb6R+AjX8D9aDsJ7crEuuMGmGQhOxsj/Yk57TL/KcfqqWqmFnQmS8cWfThdjTDzg2tRd8nNM
+X-Gm-Message-State: AOJu0YwmNTV5VR93SnXdMbGLp4t81dBJBeoVEyJaVF+YPh5tQGYH01px
+	hstybTxdEiindTGl6RW4pF3CGPcUCSlCmVtfKAW+dKEAersW77SxlZxIoBRHwB5MghtKj38r5st
+	1uCLcyf8HkKTA5+MvRG+VSpr3ix7kcXAmJsXdavrysIz0JedLAnPlEA==
+X-Received: by 2002:a05:620a:2987:b0:79e:ff18:a510 with SMTP id af79cd13be357-7a17ca0990bmr122367485a.2.1721115942386;
+        Tue, 16 Jul 2024 00:45:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHja7LIrw3Q4bZ6oSnFrulhGf/6KoTTkPi7QV9BQCaqrfjnWFBtckwybN/MOQzLHKDVIObrtA==
+X-Received: by 2002:a05:620a:2987:b0:79e:ff18:a510 with SMTP id af79cd13be357-7a17ca0990bmr122365585a.2.1721115942034;
+        Tue, 16 Jul 2024 00:45:42 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:523b:c871:32d4:ccd0])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160bdd7fesm270250585a.65.2024.07.16.00.45.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jul 2024 00:45:41 -0700 (PDT)
+Date: Tue, 16 Jul 2024 16:45:35 +0900 (JST)
+Message-Id: <20240716.164535.1952205982608398288.syoshida@redhat.com>
+To: tung.q.nguyen@endava.com
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] tipc: Return non-zero value from
+ tipc_udp_addr2str() on error
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <AS5PR06MB8752BF82AFB1C174C074547DDBA22@AS5PR06MB8752.eurprd06.prod.outlook.com>
+References: <20240716020905.291388-1-syoshida@redhat.com>
+	<AS5PR06MB8752BF82AFB1C174C074547DDBA22@AS5PR06MB8752.eurprd06.prod.outlook.com>
+X-Mailer: Mew version 6.9 on Emacs 29.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240714160238.238708-1-vadorovsky@gmail.com> <CANiq72=kchSt5XjAJRVgNWG-iNXbc2E64ojwsQYnB2pshULK1Q@mail.gmail.com>
- <52676577-372c-4a7f-aace-4cf100f93bfb@gmail.com>
-In-Reply-To: <52676577-372c-4a7f-aace-4cf100f93bfb@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 16 Jul 2024 09:44:46 +0200
-Message-ID: <CANiq72nbbtNp4vGGHkXVSgSW+WU=5Z9uGRO_LLg7+ezTqrZ_tQ@mail.gmail.com>
-Subject: Re: [PATCH] rust: str: Use `core::CStr`, remove the custom `CStr` implementation
-To: Michal Rostecki <vadorovsky@gmail.com>, Benno Lossin <benno.lossin@proton.me>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl <aliceryhl@google.com>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Trevor Gross <tmgross@umich.edu>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Martin Rodriguez Reboredo <yakoyoku@gmail.com>, 
-	Finn Behrens <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>, 
-	Valentin Obst <kernel@valentinobst.de>, Laine Taffin Altman <alexanderaltman@me.com>, 
-	Danilo Krummrich <dakr@redhat.com>, Yutaro Ohno <yutaro.ono.418@gmail.com>, 
-	Tiago Lam <tiagolam@gmail.com>, Charalampos Mitrodimas <charmitro@posteo.net>, 
-	Ben Gooding <ben.gooding.dev@gmail.com>, Roland Xu <mu001999@outlook.com>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 15, 2024 at 6:12=E2=80=AFPM Michal Rostecki <vadorovsky@gmail.c=
-om> wrote:
->
-> @@ -71,11 +75,11 @@ macro_rules! kunit_assert {
->                   //
->                   // This mimics KUnit's failed assertion format.
->                   $crate::kunit::err(format_args!(
-> -                    "    # {}: ASSERTION FAILED at {FILE}:{LINE}\n",
-> +                    "    # {:?}: ASSERTION FAILED at {FILE:?}:{LINE:?}\n=
-",
->                       $name
->                   ));
->                   $crate::kunit::err(format_args!(
-> -                    "    Expected {CONDITION} to be true, but is false\n=
-"
-> +                    "    Expected {CONDITION:?} to be true, but is false=
-\n"
->                   ));
->
-> The only practical difference in switching from `Display` to `Debug`
-> here is that the fallback kunit error messages are going to include
-> quotation marks around conditions, files and lines.
+Hi Tung,
 
-That is a fairly important difference -- the messages are intended to
-match the C KUnit ones.
+On Tue, 16 Jul 2024 07:35:50 +0000, Tung Nguyen wrote:
+>>tipc_udp_addr2str() should return non-zero value if the UDP media address is invalid. Otherwise, a buffer overflow access can occur in
+>>tipc_media_addr_printf(). Fix this by returning 1 on an invalid UDP media address.
+>>
+>>Fixes: d0f91938bede ("tipc: add ip/udp media type")
+>>Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+>>---
+>> net/tipc/udp_media.c | 5 ++++-
+>> 1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>>diff --git a/net/tipc/udp_media.c b/net/tipc/udp_media.c index b849a3d133a0..439f75539977 100644
+>>--- a/net/tipc/udp_media.c
+>>+++ b/net/tipc/udp_media.c
+>>@@ -135,8 +135,11 @@ static int tipc_udp_addr2str(struct tipc_media_addr *a, char *buf, int size)
+>>                snprintf(buf, size, "%pI4:%u", &ua->ipv4, ntohs(ua->port));
+>>        else if (ntohs(ua->proto) == ETH_P_IPV6)
+>>                snprintf(buf, size, "%pI6:%u", &ua->ipv6, ntohs(ua->port));
+>>-       else
+>>+       else {
+>>                pr_err("Invalid UDP media address\n");
+>>+               return 1;
+> Please use -EINVAL instead.
 
-Especially the file:line notation -- I don't think a user would expect
-to have quotes there (regardless of KUnit).
+Other addr2str functions like tipc_eth_addr2str() use 1, so I followed
+convention. But -EINVAL is more appropriate, as you say.
 
-In general, even if we didn't need it right now, I think it is
-something we will need sooner or later.
+Thanks,
+Shigeru
 
-> wording. My general point is that I've never seen `&mut str` being
-> exposed in any core/std API to the external user, mutation usually
-> implies usage of an owned String.
-
-Not sure what you mean by exposed, but even if `&mut str`'s methods do
-not count (used via `String`), there is also
-`from_utf8_unchecked_mut()` that returns one, which is essentially the
-same idea as what we had here.
-
-So I am not sure about the "The rule of Rust std" part in the new
-commit messages. And, to be clear, while the Rust standard library is
-a good reference to look into, sometimes we want/need to do things
-differently anyway (which is not really the case here given
-`from_utf8_unchecked_mut()`, I would say).
-
-In this case, regardless of the standard library, personally I would
-have preferred to have a non-public function, but still have it (and
-properly documented), rather than open code the `unsafe` block with
-the casts.
-
-> I think the best solution would be leaving `c_str` macro for that. The
-> reason why I removed it is that the GitHub issue[0] mentions its
-> removal. But for that case, I think it makes sense to leave it. What do
-> you think?
-
-Perhaps the issue was only taking into account the C string literal
-case? Benno may know more.
-
-Generally speaking, replacing a clean line with a bigger `unsafe`
-block is something to be avoided.
-
-Maybe a `c_stringify!` is what we need :)
-
-Cheers,
-Miguel
 
