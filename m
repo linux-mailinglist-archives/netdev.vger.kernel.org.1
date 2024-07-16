@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-111795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BBC932BF1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:50:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E285C932B68
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 17:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 314DA1C22EF2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F410280F64
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 15:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EB419DFB3;
-	Tue, 16 Jul 2024 15:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2251E1DDF5;
+	Tue, 16 Jul 2024 15:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BECP8C33"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="py/hJmzx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DD527733;
-	Tue, 16 Jul 2024 15:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF83F9E8;
+	Tue, 16 Jul 2024 15:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145007; cv=none; b=FizQajWXDeZovJyKvte8Lyg1uSrHytqt13dhIzNJf5oaw2oRmLoX8Wc7ZlO343AejOn0eqWtHtsKDwJ5R/FEnoQHPaO6vUi9SfGua4bJxqHTiI1EIA/hoz5QU+vroEtdG7gl9rrkilGWcKisP8bN1NNm3xiyb1dgoUrwiLT7Mug=
+	t=1721144690; cv=none; b=ZXf+dA2hUl2uGzlSSoD7H06ip97FVO0dAv4jbYAls9npPMjsBZXHtCQ23i87T+L3I2dj68NiMlBA7TXvX5sr/dknarO4jwEp9qPnU8T4wpxFgjx35xuBVu2WzPc7oRyPLq1Fc/mSot2SPZj8lUKCnuHLDGt6P2c/ILGvFt7mDXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145007; c=relaxed/simple;
-	bh=njuW7f0YnixF7X0+N2TvmOmUd7VHAjjlw2aw7RYGRcs=;
+	s=arc-20240116; t=1721144690; c=relaxed/simple;
+	bh=jdsI6Wdo5+l5A3yBROlrF7lIwXr7xBl3rVT4xeaUn8A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bt0yextngFV4Oe955S/cvmSbnIly5lgACOaDt14+ZDHvJ1KpkNr6kL5lCmUjkUhzOf7PHxmU/5JPuswF7+7OOdajKHQJ/2JMaA7MYdUgy0lBM0JJUhjz1JnWoqrRfkhelArBSYHiRwA7zXsmITXQpMP/lXlMacITKOAkG/xLJv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BECP8C33; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E76C116B1;
-	Tue, 16 Jul 2024 15:50:06 +0000 (UTC)
+	 MIME-Version; b=As1gYGg6Ribm5juNI8YsesWLqwLb5vno6bbpg/+JW6OySKEyNLITnu2no+XBh1feP3G6iLBBew+iV17gYAQRKKoeQaLYc/bzbkpdUKxhv/5F3E3MshMdOc0mIr1BBs2ZVNqOXvAlEBdfMBZE26Do0/zlTeq2v/q9/bWlbN+19+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=py/hJmzx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7295FC116B1;
+	Tue, 16 Jul 2024 15:44:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721145007;
-	bh=njuW7f0YnixF7X0+N2TvmOmUd7VHAjjlw2aw7RYGRcs=;
+	s=korg; t=1721144689;
+	bh=jdsI6Wdo5+l5A3yBROlrF7lIwXr7xBl3rVT4xeaUn8A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BECP8C33F5uhwK56MA0M3/raXk1sMAMrBEP2aKaHgxR3BuNVPRqbY5Uzebp4eY4OH
-	 nbR8P0uMVCU3NIiu/5SWqpNRX/PYXzz99g2teVn7dCxdOd+EGJNAK6ADeZ8n0vf/el
-	 gJ8j/pihV5U73EKfxQ57IuMmdu14AjWgT121chjg=
+	b=py/hJmzxJ7uyr91bU1gtE+TNEmJYgFT0G9OQoyJLIHS8FcTIZK9FWaoW/1Dxa2rvX
+	 vO2anjZT4QvJW82j2x2KnijB973Se1hL/mRoVwaFjVcqxKSL2ZoM3xnVz801yFkwwy
+	 y3WAbbYvXc2FcOG0IsFNyplu2VnQ9jCCdAmy2d0o=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -50,12 +50,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	netdev@vger.kernel.org,
 	Ronald Wahl <ronald.wahl@raritan.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH 6.9 068/143] net: ks8851: Fix potential TX stall after interface reopen
-Date: Tue, 16 Jul 2024 17:31:04 +0200
-Message-ID: <20240716152758.594309082@linuxfoundation.org>
+Subject: [PATCH 5.10 075/108] net: ks8851: Fix potential TX stall after interface reopen
+Date: Tue, 16 Jul 2024 17:31:30 +0200
+Message-ID: <20240716152748.861230746@linuxfoundation.org>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240716152755.980289992@linuxfoundation.org>
-References: <20240716152755.980289992@linuxfoundation.org>
+In-Reply-To: <20240716152745.988603303@linuxfoundation.org>
+References: <20240716152745.988603303@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.9-stable review patch.  If anyone has any objections, please let me know.
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -111,7 +111,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/drivers/net/ethernet/micrel/ks8851_common.c
 +++ b/drivers/net/ethernet/micrel/ks8851_common.c
-@@ -482,6 +482,7 @@ static int ks8851_net_open(struct net_de
+@@ -501,6 +501,7 @@ static int ks8851_net_open(struct net_de
  	ks8851_wrreg16(ks, KS_IER, ks->rc_ier);
  
  	ks->queued_len = 0;
@@ -119,14 +119,14 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	netif_start_queue(ks->netdev);
  
  	netif_dbg(ks, ifup, ks->netdev, "network device up\n");
-@@ -1101,7 +1102,6 @@ int ks8851_probe_common(struct net_devic
+@@ -1057,7 +1058,6 @@ int ks8851_probe_common(struct net_devic
  	int ret;
  
  	ks->netdev = netdev;
 -	ks->tx_space = 6144;
  
- 	ks->gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
- 	ret = PTR_ERR_OR_ZERO(ks->gpio);
+ 	gpio = of_get_named_gpio_flags(dev->of_node, "reset-gpios", 0, NULL);
+ 	if (gpio == -EPROBE_DEFER)
 
 
 
