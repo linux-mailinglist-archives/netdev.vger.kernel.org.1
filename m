@@ -1,165 +1,165 @@
-Return-Path: <netdev+bounces-111766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEA69327F1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:01:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212C99327F3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 16:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266E71F23AB5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:01:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92D5282DBB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 14:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B3D198E98;
-	Tue, 16 Jul 2024 14:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C2F19B3E4;
+	Tue, 16 Jul 2024 14:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kBUPy7Bk"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WlCbj9X/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1D5152E02
-	for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 14:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F3C152E02;
+	Tue, 16 Jul 2024 14:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721138461; cv=none; b=NP5EtAQip1+V26PkaLxqBzoIsP6iTf0cKCgSllD1RdQyUq+r1mv9XUw7TzY28Wc2TNmTta6QqNWLcEW7ybOI7yPPfW0MJD7ILAmmcLZuxJFL3mo2l/vH3Mp6hix1PiOq7eXmLmcMkhYHpYetdvIdSzQ9yYuQLhKs8PaCKrkToD4=
+	t=1721138466; cv=none; b=auAosYTF9C0MwXV4hBXLr0tH3osahZNGzS348YGbfWgKSlNViBUshZutJ3Nug2497iki3Pj8kGhp7oAGY7QuMlgcwIeGBWBAxUYgitAfi752ZPVHwG1v3D/Hj8El3ahfaFSA9CtQMDx9aPBpNTvLzjwGXsn3n7zwCgUpRSeDKmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721138461; c=relaxed/simple;
-	bh=czNvutpG6PPjyDQStpbBq48lutxp6eM7GmFhS+Nes/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N8vTZYay5P4dAe+NZdQtTDPRulRY6owuDQrpwkIh4+P7uHZ5uRaBXinrWCc+73C4S1eqoNXObIb4jZSFD99tMdwQ9+2/sss3w/+XRQg0EGLBKY6x88g3AESAaEo4HzXKWPIk2usP0rDvd6H8miYq2n2QgbHyXhXXE4T0DJ9TKpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kBUPy7Bk; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721138459; x=1752674459;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=czNvutpG6PPjyDQStpbBq48lutxp6eM7GmFhS+Nes/Q=;
-  b=kBUPy7BkbfWYZ4jgbyDyuVVcySHwFYRXfHK4Eb88Ppvp0DC0lYbbGqFl
-   P2rw+Ml1qjf14NhvTIoTj5EsNmf+D5FdUWnM+xsiSUTIuCZ4vIIH9EJMr
-   cLYepxcV5VsuZeIqcz9Eh2ED/lhK9iAJ0ltX+e9FhPDJI0jsAA/OuVOcY
-   YuBWAbpsBO4PYzz7u0FCVX2qBxFz3/IVk7SBPymkrldNSAKkKQkSkUSku
-   deIFJJKEkI8SutqLZHQB3Iw4jAV2DOBmEfdmAwaxo+pb3k4X3tcJzsh+D
-   GgigmOH5Xhel+Xg5hLberAyerWJl6Y4eeMsI4LLjBwTqLlHto+WTXPdYr
-   Q==;
-X-CSE-ConnectionGUID: IjLdc4ymT3aKg2JHCoRr8w==
-X-CSE-MsgGUID: dxbiu4odQgmVnbaLZQsHvQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="22439598"
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="22439598"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 07:00:59 -0700
-X-CSE-ConnectionGUID: Qrr2rGirRP+KF/xcveC19g==
-X-CSE-MsgGUID: YzG3ubOpSXea9IPkdDJxBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="54871942"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 16 Jul 2024 07:00:57 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sTijf-000fHe-0d;
-	Tue, 16 Jul 2024 14:00:55 +0000
-Date: Tue, 16 Jul 2024 22:00:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@chopps.org>
-Subject: Re: [PATCH ipsec-next v5 09/17] xfrm: iptfs: add user packet (tunnel
- ingress) handling
-Message-ID: <202407162110.8Xuwy6GR-lkp@intel.com>
-References: <20240714202246.1573817-10-chopps@chopps.org>
+	s=arc-20240116; t=1721138466; c=relaxed/simple;
+	bh=VQwTSIUDAGEJADPLLK8V5LN5pXkh+arA0z+AJ5zqXR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=eYW+lnu75uZjF3SGqhM4kunNjL++8P8UBgB18wMlhhdYlmC5ryipONu4lNsGx5H0OX6xHbPDSiZx3IYztwtGub0ubs1GBypM/XyF1D2LYf0QAqGDdzTR0ZXM+mji82LOYFB3trYCCYB6JKp7vkBIds80yJvGmQU/8NV6CdAVryI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WlCbj9X/; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46GDgMpH006921;
+	Tue, 16 Jul 2024 14:00:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	OUcto7EFJnJbd3Vlf+1/ygQaFeJzw/melNmMoRsS8P0=; b=WlCbj9X/fv89LO7N
+	P0+XgyFv4seKkTIEjaLTCbzDu5kib++lgknhV8YABhe29yyGN2DnCgeYb6Y0o/5t
+	tCVm4S3tRnTjmvHhHVDP9XgwE8ZXiSeQjsqkNjHx+sCjxr4wy5iqSi61R9QVROBE
+	0I8aAOhGYNS3aZn+QUfKiN1WuBfrBsdLLYEI41aQgTqeTpF1gcDB2kVaPBX6EW3V
+	fVkwB73VQbMbTijZ3sBozhMhKCCJYB98cLLN5tsRci5NIjV5XWAFxCm3xCyGo3lb
+	lcJ63kcCD1YUguiC5LZazM4sX8WJAAedenoJcs5ZSQf4aIqFRTwlwsmLmH+/QbKt
+	EhDHoQ==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bjv8q55t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jul 2024 14:00:46 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46GE0kg5015060
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jul 2024 14:00:46 GMT
+Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 16 Jul
+ 2024 07:00:45 -0700
+Message-ID: <a7950e7b-2275-4b6d-b8e1-4f50d0bc28e6@quicinc.com>
+Date: Tue, 16 Jul 2024 07:00:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240714202246.1573817-10-chopps@chopps.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] wifi: ath12k: fix build vs old compiler
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+        "Baochen Qiang" <quic_bqiang@quicinc.com>,
+        <linux-wireless@vger.kernel.org>, <ath12k@lists.infradead.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>
+References: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <3175f87d7227e395b330fd88fb840c1645084ea7.1721127979.git.pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 6Q3KmPlUQYOvDOqg88Z0B9mftQCV-To6
+X-Proofpoint-GUID: 6Q3KmPlUQYOvDOqg88Z0B9mftQCV-To6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-15_19,2024-07-16_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
+ phishscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ mlxlogscore=896 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407160104
 
-Hi Christian,
+On 7/16/2024 4:06 AM, Paolo Abeni wrote:
+> gcc 11.4.1-3 warns about memcpy() with overlapping pointers:
+> 
+> drivers/net/wireless/ath/ath12k/wow.c: In function ‘ath12k_wow_convert_8023_to_80211.constprop’:
+> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551611 or more bytes at offsets 0 and 0 overlaps 9223372036854775799 bytes at offset -9223372036854775804 [-Werror=restrict]
+>   114 | #define __underlying_memcpy     __builtin_memcpy
+>       |                                 ^
+> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
+>   637 |         __underlying_##op(p, q, __fortify_size);                        \
+>       |         ^~~~~~~~~~~~~
+> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>       |                          ^~~~~~~~~~~~~~~~~~~~
+> drivers/net/wireless/ath/ath12k/wow.c:190:25: note: in expansion of macro ‘memcpy’
+>   190 |                         memcpy(pat, eth_pat, eth_pat_len);
+>       |                         ^~~~~~
+> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ accessing 18446744073709551605 or more bytes at offsets 0 and 0 overlaps 9223372036854775787 bytes at offset -9223372036854775798 [-Werror=restrict]
+>   114 | #define __underlying_memcpy     __builtin_memcpy
+>       |                                 ^
+> ./include/linux/fortify-string.h:637:9: note: in expansion of macro ‘__underlying_memcpy’
+>   637 |         __underlying_##op(p, q, __fortify_size);                        \
+>       |         ^~~~~~~~~~~~~
+> ./include/linux/fortify-string.h:682:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+>   682 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>       |                          ^~~~~~~~~~~~~~~~~~~~
+> drivers/net/wireless/ath/ath12k/wow.c:232:25: note: in expansion of macro ‘memcpy’
+>   232 |                         memcpy(pat, eth_pat, eth_pat_len);
+>       |                         ^~~~~~
+> 
+> The sum of size_t operands can overflow SIZE_MAX, triggering the
+> warning.
+> Address the issue using the suitable helper.
+> 
+> Fixes: 4a3c212eee0e ("wifi: ath12k: add basic WoW functionalities")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> Only built tested. Sending directly to net to reduce the RTT, but no
+> objections to go through the WiFi tree first
+> ---
+>  drivers/net/wireless/ath/ath12k/wow.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/ath/ath12k/wow.c b/drivers/net/wireless/ath/ath12k/wow.c
+> index c5cba825a84a..bead19db2c9a 100644
+> --- a/drivers/net/wireless/ath/ath12k/wow.c
+> +++ b/drivers/net/wireless/ath/ath12k/wow.c
+> @@ -186,7 +186,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
+>  	if (eth_pkt_ofs < ETH_ALEN) {
+>  		pkt_ofs = eth_pkt_ofs + a1_ofs;
+>  
+> -		if (eth_pkt_ofs + eth_pat_len < ETH_ALEN) {
+> +		if (size_add(eth_pkt_ofs, eth_pat_len) < ETH_ALEN) {
+>  			memcpy(pat, eth_pat, eth_pat_len);
+>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
+>  
+> @@ -228,7 +228,7 @@ ath12k_wow_convert_8023_to_80211(struct ath12k *ar,
+>  	} else if (eth_pkt_ofs < prot_ofs) {
+>  		pkt_ofs = eth_pkt_ofs - ETH_ALEN + a3_ofs;
+>  
+> -		if (eth_pkt_ofs + eth_pat_len < prot_ofs) {
+> +		if (size_add(eth_pkt_ofs, eth_pat_len) < prot_ofs) {
+>  			memcpy(pat, eth_pat, eth_pat_len);
+>  			memcpy(bytemask, eth_bytemask, eth_pat_len);
+>  
 
-kernel test robot noticed the following build errors:
+Duplicate of https://msgid.link/20240704144341.207317-1-kvalo@kernel.org ??
 
-[auto build test ERROR on klassert-ipsec-next/master]
-[also build test ERROR on next-20240716]
-[cannot apply to klassert-ipsec/master netfilter-nf/main linus/master nf-next/master v6.10]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/xfrm-config-add-CONFIG_XFRM_IPTFS/20240715-042948
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20240714202246.1573817-10-chopps%40chopps.org
-patch subject: [PATCH ipsec-next v5 09/17] xfrm: iptfs: add user packet (tunnel ingress) handling
-config: i386-randconfig-061-20240716 (https://download.01.org/0day-ci/archive/20240716/202407162110.8Xuwy6GR-lkp@intel.com/config)
-compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240716/202407162110.8Xuwy6GR-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407162110.8Xuwy6GR-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: net/xfrm/xfrm_iptfs.o: in function `iptfs_user_init':
->> net/xfrm/xfrm_iptfs.c:586:(.text+0x2a0): undefined reference to `__udivdi3'
-
-
-vim +586 net/xfrm/xfrm_iptfs.c
-
-   547	
-   548	/**
-   549	 * iptfs_user_init() - initialize the SA with IPTFS options from netlink.
-   550	 * @net: the net data
-   551	 * @x: xfrm state
-   552	 * @attrs: netlink attributes
-   553	 * @extack: extack return data
-   554	 */
-   555	static int iptfs_user_init(struct net *net, struct xfrm_state *x,
-   556				   struct nlattr **attrs,
-   557				   struct netlink_ext_ack *extack)
-   558	{
-   559		struct xfrm_iptfs_data *xtfs = x->mode_data;
-   560		struct xfrm_iptfs_config *xc;
-   561	
-   562		xc = &xtfs->cfg;
-   563		xc->max_queue_size = net->xfrm.sysctl_iptfs_max_qsize;
-   564		xtfs->init_delay_ns =
-   565			(u64)net->xfrm.sysctl_iptfs_init_delay * NSECS_IN_USEC;
-   566	
-   567		if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
-   568			xc->pkt_size = nla_get_u32(attrs[XFRMA_IPTFS_PKT_SIZE]);
-   569			if (!xc->pkt_size) {
-   570				xtfs->payload_mtu = 0;
-   571			} else if (xc->pkt_size > x->props.header_len) {
-   572				xtfs->payload_mtu = xc->pkt_size - x->props.header_len;
-   573			} else {
-   574				NL_SET_ERR_MSG(extack,
-   575					       "Packet size must be 0 or greater than IPTFS/ESP header length");
-   576				return -EINVAL;
-   577			}
-   578		}
-   579		if (attrs[XFRMA_IPTFS_MAX_QSIZE])
-   580			xc->max_queue_size = nla_get_u32(attrs[XFRMA_IPTFS_MAX_QSIZE]);
-   581		if (attrs[XFRMA_IPTFS_INIT_DELAY])
-   582			xtfs->init_delay_ns =
-   583				(u64)nla_get_u32(attrs[XFRMA_IPTFS_INIT_DELAY]) *
-   584				NSECS_IN_USEC;
-   585	
- > 586		xtfs->ecn_queue_size = (u64)xc->max_queue_size * 95 / 100;
-   587	
-   588		return 0;
-   589	}
-   590	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
