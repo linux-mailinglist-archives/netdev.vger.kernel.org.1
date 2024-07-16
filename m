@@ -1,216 +1,307 @@
-Return-Path: <netdev+bounces-111686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F419320D4
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 561009320E0
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 09:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42D301F21BC2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:00:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00655284CDC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F0F1CF9A;
-	Tue, 16 Jul 2024 07:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="FTJ79lCA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04454208BA;
+	Tue, 16 Jul 2024 07:05:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2135.outbound.protection.outlook.com [40.107.215.135])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1EC196;
-	Tue, 16 Jul 2024 07:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.135
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721113224; cv=fail; b=ibFr++Gt/Irna9CC0V5goreCT3Psg60OEfnkHO3dxIq/EnSuVb3Cp61w13e7XUd4hJ1Ru1WdlfEqafXCE/nBhqTfTDpJeYvwiuGziKRfCH0txt33TEy7yfNEyWgBClFeaUSo/CAgXmgpg3JmWYAhdfSa7F4+uq7bYX55dYrRR3E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721113224; c=relaxed/simple;
-	bh=RNUEmOaoXHWw0erqTMa4JO0uXQCw3XbwC/mnCOwPink=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rzQRT8YIc8pzphn067avVJzBP3CrG/AREqe+uLY2z8HTob/YoOwF3LoRnO4qwrL2Wk63QTXv+eulrR8kgng5dmGjMqfa4wF/plUJJCPcyAvLS4T3QWlpQp/fVzkh2x8Kh77Kctd+LFPOsihjn0oH+rdBXqJfzQmPEv2uLLT3ZLE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=FTJ79lCA; arc=fail smtp.client-ip=40.107.215.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=H3hOQLFw5xEx9p4HfZsSi2cXHKjZ23BqKOrdMCnRCYDKSXbs9hsikSy2OKOTFTgS3TclCcorikklzl1ho87TD2KXd77/R6v3wrTP6sP5N1svxyEl3aYN0nTHX/U+KXH4qaJnnuA0YkBmugI3AgZ0HuvXQKDU/bA/k99qWji/IfH/sFEfmtYe+eYPo/aI7FqxP9NMrbYTOFRRQsKAbFQ9CMwi1FqxHV6uYG13I6l50zEb32vr0fHiX0R4Yt5DQIo8hLGyohRuWSrWnKAOOQFeYuh7YQyc/tQPsDIg1ceMqbJjyLn1BSw/gdpAaJiZRP68YJCYfLPmk60nNGu/BlKdIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sqHTJV9kSan5nnod1NtAj4qztebsTWujOfIQ3Iojxw0=;
- b=S95tmcI/hTuw8vuMpZIaSDWS0UMoKrjWSvH0wK/AEf8/BciGakf/q0xw0vpIhYrXxa/sONKnNz/UZjZDB3pT7vkTNx8w3VOVpXRHLDWSrujnQKK6HhmhIh0AKM8zzl3preHrS29PQekzssou117N/HSeHLwL8cQ6C/IMRixpxTNf7GCP62UtfWtXPIQZuLZ9d1hF+76RXZsuoGD+66Hf1jOXvXjGgpwudXWGPoFSoDcQkI0Iq2ysC0gBrvYRd21x/xt/mkSvVWSKR9/LSBg8zJNrTQT7ovCyGKmuuR6XTH5LQ6QetjN5EG2QMQVA2eGGmt0HeBotv7PXYYtfMC1gKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sqHTJV9kSan5nnod1NtAj4qztebsTWujOfIQ3Iojxw0=;
- b=FTJ79lCAqd/wN32yRZOhSQDJPF0NVLgtIexgK7aPe1pkzIRM4wMU/oYc8oahXt9sRsFo/tYnXd+rvm1N5DJH3EkDtYCYauKdjXi5svRJnSN8tUrO1cvTLJ0Q3rdXOWGRxHKMnjWO1NLwgSorMMs44lg+s7FCyVUcGJ80k+DRv1MZAKWEBRGNGMS4b0/QoeyEFtkppM7ewncXTff1iOZewXuM6Ky4zw2BkP7UBEKQ8hupEH6bcJ4fUcEsgZVcsIquEbzDFQ0ApS9VbfNamkf0bZKLbs9xFC9rPG9Ev36gAYAfnZ44cU+/AYS8QiL0hUza8EJsj3sql1rIjsIEEfHChA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
- by SEZPR03MB6443.apcprd03.prod.outlook.com (2603:1096:101:4a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.24; Tue, 16 Jul
- 2024 07:00:17 +0000
-Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
- ([fe80::4128:9446:1a0f:11fd%6]) with mapi id 15.20.7741.033; Tue, 16 Jul 2024
- 07:00:16 +0000
-Message-ID: <db340e82-aba0-4ec6-8ab9-622073c43226@amlogic.com>
-Date: Tue, 16 Jul 2024 14:59:50 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] Add support for Amlogic HCI UART
-To: Kelvin Zhang <kelvin.zhang@amlogic.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20240716064346.3538994-1-yang.li@amlogic.com>
-From: Yang Li <yang.li@amlogic.com>
-In-Reply-To: <20240716064346.3538994-1-yang.li@amlogic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR04CA0017.apcprd04.prod.outlook.com
- (2603:1096:4:197::15) To JH0PR03MB7468.apcprd03.prod.outlook.com
- (2603:1096:990:16::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB6D1D68F;
+	Tue, 16 Jul 2024 07:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721113527; cv=none; b=Rbujgz6cQe7KJqEuAkyBeUMqClmxt/foHgTOdwKGtVyzkOtaplgW0YYGfc4Cu7CSL0r8BBFoi+6Q6Dh2bSFkAEBRvfgDmnqJv/pXDBNDPKX2JIdyU2Ezu6Sb9aloCsnYWtA9NkkjMA1LG6rR3mGOilqYzak29cy8eOcA8PDCyjI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721113527; c=relaxed/simple;
+	bh=23q6PfsYT5ZP0HjZM9tdtTlVLLdS13Xt8ckf5CH06wM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WozRJ3XsBDSrHi/g9v3XJThu3yy26Q0+hBP52m1GbhH8GGiobqoN6g/0yoEUmFRpgNdE9n+64B+5LH4+inuzQTmZNoxmuGTFNt8DRhOzGyoLESTXH8IcBuFSUD4HlNDx5TDBog5t4wr+xIRUsRorNueUhjnXarBuOHuAh8i5PJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WNVSg02fqz4f3jZ8;
+	Tue, 16 Jul 2024 15:05:07 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id E62481A0568;
+	Tue, 16 Jul 2024 15:05:14 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP3 (Coremail) with SMTP id _Ch0CgDX5VCnG5ZmewgPAQ--.64133S2;
+	Tue, 16 Jul 2024 15:05:12 +0800 (CST)
+Message-ID: <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
+Date: Tue, 16 Jul 2024 15:05:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|SEZPR03MB6443:EE_
-X-MS-Office365-Filtering-Correlation-Id: af9d264e-3d39-442d-6a09-08dca564f20a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S01yQmkvNTY5RXVpaTF2SzFINlNnc3I4c3NoaVU2YjhKclc4K3V1ZG9Ubis3?=
- =?utf-8?B?UkNha2M1ck42Y0RMQ2hIOVB0eE1aRzVNZ20xdE1nZ1c5SFZZYjgrRDNOVWZO?=
- =?utf-8?B?WGxzUDFOUmFLdUp3c2NLMnVlNmVVaVZJWG90NElMMStZenJQbEk0bzEvNHNV?=
- =?utf-8?B?OGppb1lZR2xoVXV4WVNJUUdGM0NnQzNUVng1RHQzdWFEN2ZvdVM5cGl3TDU4?=
- =?utf-8?B?SHVkRWhDaWo4d0VIKzdncW10bmNCclJMRjM2WFVZazVhZkp2QTVlQldmVm9S?=
- =?utf-8?B?YkNBZHRHNEs0VUhTRDQ1cjhNRW54L0VHMnE1Nml4NkhKbm02aGg3bjBOYUo3?=
- =?utf-8?B?eDBqN2YrdzZSdDBhS2M5cDRma3Y3VkMyRlV3MTZJcHdHT1pHdnVHTGIrcmJm?=
- =?utf-8?B?Z3BVRkY1bFVzK1E2UzRvQzRBakV1eVR2WWlWMm1oNllWVjFNU0JyaUtCQm8z?=
- =?utf-8?B?K1ZmQVJtK201REZJVGtsZ3oxajJBamtEajRmY3FOclZNcGxjOG5JMnYvQ0k4?=
- =?utf-8?B?SWpaMUFnZWhtb2FLZXV6WS9vbGF5SDhidnE2UnpGUGxFVDVQQWc2dUtENDBu?=
- =?utf-8?B?dktsSlh2STB0NTNrTnRoYmdhTm5MSkVxd1Awd1dHdjhxMjlZYWZWSVUzaWNZ?=
- =?utf-8?B?ZEdITUU2eU56OFJvRjJLcUNBM1dQMzdLOUk3bkJuNEdyZjdBWHowaXB1L0xD?=
- =?utf-8?B?N1h6YTBmcFQxMlBuZ2U0Q3VEUjJqQlNQWDJFRys1TndQaGRhcjFMMmIxRFYz?=
- =?utf-8?B?UGtwdERHOUZVWThWOFFxQWhOOUczNjRmdjgxWVdmc0x1RjFtOU1iMkljVlhs?=
- =?utf-8?B?eCtRb2FidzZLcjRoL2lkMVo2ZTlZbHJ1QWRwY2xpOCtCZ1RiZThTYlp2QXRG?=
- =?utf-8?B?bVVHVyt5UzlxM05FSnppZDd4eUlGd2VMc2k3OUtVcjlQclJQazlJUHN1VVky?=
- =?utf-8?B?R00zUU5zUHVwM1FKUWx5T0xDMmFzcHdYemt0a2tHSnZRbHRUZEpBSWRnajVH?=
- =?utf-8?B?T1E1VnBNem5FZ1NINmF0WVFVYkNXeWI2T0dTZkllMitVVUhVRDhPSXJ1ODJP?=
- =?utf-8?B?azZzNmozeThLbzlaVVRWa0U5YjFEZGJpKzlKYTVHeFA0dTUvWUk3VTI2K3Z5?=
- =?utf-8?B?bnBkaHlWUXhjdFovdE5PTXpjcG5NM2QxSWtXbGU2R2JCR2dnaDRmQ09EMVQw?=
- =?utf-8?B?aTFURTVETnpqTVVITTN2cTdTZnFWRU1yOW5FbURlNTFtN3dMTk0xcm9pMnNr?=
- =?utf-8?B?WDg0QWtldm1lQk80bnd4UGpoamlaWnlCQWpCUjgxTE0wWlc0eCs4TW1naTZX?=
- =?utf-8?B?Y0hCWXhuemtSdk9vem5QU2t2RFhHbWdVL0p3REFCKzd2dkNOZnMyN0hNaWUx?=
- =?utf-8?B?T3ZVQzFyQVFxOEpGUG1rdjJreWVZSUdOWEpQT0Z1MmVkRmFTZTk3M0E3TCt1?=
- =?utf-8?B?Y2l4WjcweWxWSDlWVm1FbHVnanlYNlZIUkFNNjNxSFFWQzh6dG8yeWlmbHkw?=
- =?utf-8?B?VW5BbC85NlhiSW1OZDFaUDhZK0xLckJGQXBQSG1sS2Z3VjRzMnNoUExVZzZ0?=
- =?utf-8?B?VGNnNmg0MS83bzd3MFdBQ3BMNUNlU25HWjV5LzJ4Y20vOUUxVWNMemFHUWxy?=
- =?utf-8?B?eDNaUmhXWE1GcE9TOHFjeWlDTEFhNEd2RjUrVFhXTktqeE9XMmpSZTFGMmFP?=
- =?utf-8?B?SkdKY1lneXVrWkp4OWs2ZzJKZy80NE1IMWhKUWo1WHgya3hlQW1oZGNBL2dS?=
- =?utf-8?Q?eqrh6UDMui/7PydrsY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RnBXeFhBSk5HY2JHUm1hNEl3bnJyZnFDZUNWT2FHLytMMW9hTzdySDhzb2t5?=
- =?utf-8?B?UXRUYzBCdmtjalJNSlkzc29nRVk3K3loQ3MwNENwdm1jTFlyc0dBVGZJbUZh?=
- =?utf-8?B?WVY4S3pHKzNZWXBwaTBhZDM3eC9iQkhsU1ExZkUwT20xNFN1WmoxOFVKODBl?=
- =?utf-8?B?NUd2L2NSVlBWZ3gvN0pXNUNSSGhXMFpXRnN6dUJKaDRvZXRteWVFcEVlTWND?=
- =?utf-8?B?WktvSGRYRXhWZDJJN0FOb1FxM21ycTNpOG0vWEwxYzMzcEQyazJwaWM2M25s?=
- =?utf-8?B?SGhmQUtzazFBWnRNSlFDWGdJdzJaVDFIL1c4RW1KclZwMkhaMmw1SzdFUVlC?=
- =?utf-8?B?OVJkVWtndld1RFZyUW5IYWQ5elVPSHhXSjY2TzJxRVUrRnI4cnpIUWlyc1ZD?=
- =?utf-8?B?Vklka2JRTVhNeGExVEJjQ1dyN1dtN1Flcy9HYXltK1hLb2FkaUt4Ri9lRDY2?=
- =?utf-8?B?NzUyYUoxcnRYOWJzZ2lXbnNlZ3QvQjFIZHJwUVp2N0lUV0xZMUc5ekVkQXNu?=
- =?utf-8?B?bGZyL3N6QWNpZUxESHpHZlpJb3BWU1lTcldYSUJ4c1Arc1JFNGQxWGhobjNz?=
- =?utf-8?B?UDUyeGltRWg2TkoyOFpDdEVGRXNvMlZMUnR1OStFUnZFV1lmWUpPR05xV3ZZ?=
- =?utf-8?B?R0YvVEFXeTE5c2hVWk9vRFVoUUJyTWt0YXk2a2FCYmRpQWh1RjZXWXBEalVK?=
- =?utf-8?B?U0U2NStHanNoQy9VME9kQStIS0lsV21YL01ZeE1KZ3NHeEhOVjV6ME4xR3JQ?=
- =?utf-8?B?bHAxREQ3WklOaHRpVGYvd3Z1R2ZMN2tvWXE3TnB5OEJqNjBBblNOY0c4M3RR?=
- =?utf-8?B?R1d4MHEvMnh4SVYybTkwWVU1elNVM1V2cmxCcW9RTStOVVdZWnFiN3R4ZnNY?=
- =?utf-8?B?QUtQeVlmUjZ1U3M1eDAwcDBNWDNVQWpxU0V5MVFROUJuOWpXV29Gc3FiQmpH?=
- =?utf-8?B?elZ2UDlsakxLZjlLVkg4bDE4d2FhSHRva2FqTERIVkRRZDRJajBhOUZSU05r?=
- =?utf-8?B?RlJCVHozQm81OHo4UTNETDZYZlFiN3ZhYTR3bTNQRytuL2s0SjZWa01RR1lz?=
- =?utf-8?B?L3NhL3FLNGhrbnRCVURmMjNxVFI3Sm1WeGJmdk5UeUNZelBkV0drem9nZkVw?=
- =?utf-8?B?MWhTRnVhR3ZMNkVHK2lyQXJHVWFCS004NE00dWdHOHl5YXk3eTJNNTh6MGlV?=
- =?utf-8?B?c1dKeHpzaWxDS2hMVzR1aWtrOXV2dy9Qc0E3QlpKaEpGQUs0V3hJQkhMbE44?=
- =?utf-8?B?Wkt2WlR5SWpUdG9HVzNjbUJITFNDd2J2YlM0ZXNTbUFGNmNmRWVzYWpoOEpG?=
- =?utf-8?B?eTI1bUI5bVJGTHJEaVdUR3h5NnI4RjFxVXppYTVhQTg2NlBVY0NPV1ZiZ1hQ?=
- =?utf-8?B?bFcycXJsb0pPTlZhZytqSWlIaVFXejkyOXpQNEx1M29DKzM3UjVvdWI0a1hB?=
- =?utf-8?B?MHNrWkJCUEttWjQ3cXpJQ1ZZWEFrcWZhYkZjd0ExK3IzM215eTVSeHJJbDdQ?=
- =?utf-8?B?eHBESXBIR1FPYU9LRjkyYlJvWlp0N1k4RDZqMC9ucWNiMGFsZkdJUjV6T2FP?=
- =?utf-8?B?Q1M3RTYwVW1iUkswRnVSRDFSL2s5NjN0bTYvbEFKR1RQL2VLZmR6MSthM09q?=
- =?utf-8?B?bzQ1Qm1UU3ZnM3dLbnRPZnNBYTM0NDhYSDBIMnNvSThFcEl6eHRwMFlYY2lW?=
- =?utf-8?B?a0h3Umg3SjBpK3Uybkp3ck1ZMHh3dVVsV3kyOFBodFU2WC9sYUw0L3RWZTlr?=
- =?utf-8?B?aUFFZzFEdUlnYzhSOXNBa1pXeDhOc0ZZMldVMVVuZEQzUWQzMytPeFNScFpP?=
- =?utf-8?B?dmZoSmliMTBFdHIyK1pkTWxMcVFuT2JSZkIvdEZzVmdadGthTjBIUzN4QTRQ?=
- =?utf-8?B?M2ZsSTNlVGZ3WjUxR0RkNWswM2FaVncveHZYVjM0aTdNM2VNYUFEYlFHaUpF?=
- =?utf-8?B?Q0x5Tkl5cVU3QUYwcGswc0NlandzU29yZWNNdGxnTGVtOVNreEFuTm1QQzZN?=
- =?utf-8?B?U1N3bTJreVY3YVF3UVlXQXVDSjBGSUtEV0c4K3ZqUTNmK1RVSjFKZjhpZk82?=
- =?utf-8?B?anBpSFE2dnB4K3BpblIvN1A0YklIbDFwTmY2cGxTKzVNZWF1WFlTYzQ4ajFy?=
- =?utf-8?Q?AVObjXR0AcC/YLLAKSroVGHtN?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af9d264e-3d39-442d-6a09-08dca564f20a
-X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 07:00:16.1118
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bi+7qp5HBeNxHrgGtTCS/e9d+liicTqie60noq4HJlQuGOqwmj1cdi3rpHvoIVH8pv3ZTaHJRpANDajwBiwI4g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR03MB6443
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v4 16/20] bpf: Add a special case for bitwise AND
+ on range [-1, 0]
+Content-Language: en-US
+To: Shung-Hsi Yu <shung-hsi.yu@suse.com>, Eduard Zingerman <eddyz87@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>,
+ Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Harishankar Vishwanathan <harishankar.vishwanathan@gmail.com>,
+ Santosh Nagarakatte <santosh.nagarakatte@rutgers.edu>,
+ Srinivas Narayana <srinivas.narayana@rutgers.edu>,
+ Matan Shachnai <m.shachnai@rutgers.edu>
+References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
+ <20240711113828.3818398-4-xukuohai@huaweicloud.com>
+ <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+In-Reply-To: <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_Ch0CgDX5VCnG5ZmewgPAQ--.64133S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3JryrKF1xtFWxurW3WrWUXFb_yoWfWrWkpr
+	Z5WFnIkF4kuay8uas2vw1DJFZ2qF18Aw48JryDAry0vr1agFyFyr17Gr45AasxCr4kXr4I
+	qFs2g3yUCF4jkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
+	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
+	s2-5UUUUU==
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-Dear all
-
-I am very sorry for my mistake, please ignore this email.
-
-On 2024/7/16 14:43, Yang Li wrote:
-> Add support for Amlogic HCI UART, including dt-binding,
-> and Amlogic Bluetooth driver.
+On 7/15/2024 11:29 PM, Shung-Hsi Yu wrote:
+> Cc Harishankar Vishwanathan, Prof. Srinivas Narayana and Prof. Santosh
+> Nagarakatte, and Matan Shachnai, whom have recently work on
+> scalar*_min_max_and(); also dropping LSM/FS related mails from Cc since
+> it's a bit long and I'm not sure whether the mailing list will reject
+> due to too many email in Cc.
+> 
+> On Thu, Jul 11, 2024 at 07:38:24PM GMT, Xu Kuohai wrote:
+>> With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_id_opts
+>> is rejected by the verifier, and the log says:
+>>
+>> 0: R1=ctx() R10=fp0
+>> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>> 0: (b7) r0 = 0                        ; R0_w=0
+>> 1: (79) r2 = *(u64 *)(r1 +0)
+>> func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
+>> 2: R1=ctx() R2_w=trusted_ptr_bpf_map()
+>> ; if (map != (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_id_opts.c:29
+>> 2: (18) r3 = 0xffff9742c0951a00       ; R3_w=map_ptr(map=data_input,ks=4,vs=4)
+>> 4: (5d) if r2 != r3 goto pc+4         ; R2_w=trusted_ptr_bpf_map() R3_w=map_ptr(map=data_input,ks=4,vs=4)
+>> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>> 5: (79) r0 = *(u64 *)(r1 +8)          ; R0_w=scalar() R1=ctx()
+>> ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
+>> 6: (67) r0 <<= 62                     ; R0_w=scalar(smax=0x4000000000000000,umax=0xc000000000000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xc000000000000000))
+>> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
+>> ;  @ test_libbpf_get_fd_by_id_opts.c:0
+>> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
+>> ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test_libbpf_get_fd_by_id_opts.c:27
+>> 9: (95) exit
+>>
+>> And here is the C code of the prog.
+>>
+>> SEC("lsm/bpf_map")
+>> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
+>> {
+>>      if (map != (struct bpf_map *)&data_input)
+>> 	    return 0;
+>>
+>>      if (fmode & FMODE_WRITE)
+>> 	    return -EACCES;
+>>
+>>      return 0;
+>> }
+>>
+>> It is clear that the prog can only return either 0 or -EACCESS, and both
+>> values are legal.
+>>
+>> So why is it rejected by the verifier?
+>>
+>> The verifier log shows that the second if and return value setting
+>> statements in the prog is optimized to bitwise operations "r0 s>>= 63"
+>> and "r0 &= -13". The verifier correctly deduces that the value of
+>> r0 is in the range [-1, 0] after verifing instruction "r0 s>>= 63".
+>> But when the verifier proceeds to verify instruction "r0 &= -13", it
+>> fails to deduce the correct value range of r0.
+>>
+>> 7: (c7) r0 s>>= 63                    ; R0_w=scalar(smin=smin32=-1,smax=smax32=0)
+>> 8: (57) r0 &= -13                     ; R0_w=scalar(smax=0x7ffffffffffffff3,umax=0xfffffffffffffff3,smax32=0x7ffffff3,umax32=0xfffffff3,var_off=(0x0; 0xfffffffffffffff3))
+>>
+>> So why the verifier fails to deduce the result of 'r0 &= -13'?
+>>
+>> The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
+>> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
+>> "r0 &= -13", the verifier erroneously deduces the result from
+>> "[0, -1ULL] AND -13", which is out of the expected return range
+>> [-4095, 0].
+>>
+>> As explained by Eduard in [0], the clang transformation that generates this
+>> pattern is located in DAGCombiner::SimplifySelectCC() method (see [1]).
+> ...
+>> As suggested by Eduard and Andrii, this patch makes a special case
+>> for source or destination register of '&=' operation being in
+>> range [-1, 0].
+> ...
+> 
+> Been wonder whether it possible for a more general approach ever since I
+> saw the discussion back in April. I think I've finally got something.
+> 
+> The problem we face here is that the tightest bound for the [-1, 0] case
+> was tracked with signed ranges, yet the BPF verifier looses knowledge of
+> them all too quickly in scalar*_min_max_and(); knowledge of previous
+> signed ranges were not used at all to derive the outcome of signed
+> ranges after BPF_AND.
+> 
+> 	static void scalar_min_max_and(...) {
+> 		...
+> 		if ((s64)dst_reg->umin_value <= (s64)dst_reg->umax_value) {
+> 			dst_reg->smin_value = dst_reg->umin_value;
+> 			dst_reg->smax_value = dst_reg->umax_value;
+> 		} else {
+> 			dst_reg->smin_value = S64_MIN;
+> 			dst_reg->smax_value = S64_MAX;
+> 		}
+> 		...
+> 	}
 >
-> To: Marcel Holtmann <marcel@holtmann.org>
-> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> To: David S. Miller <davem@davemloft.net>
-> To: Eric Dumazet <edumazet@google.com>
-> To: Jakub Kicinski <kuba@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: Rob Herring <robh@kernel.org>
-> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> To: Conor Dooley <conor+dt@kernel.org>
-> To: Catalin Marinas <catalin.marinas@arm.com>
-> To: Will Deacon <will@kernel.org>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+
+This is indeed the root cause.
+
+> So looks like its time to be nobody[1] and try to teach BPF verifier how
+> track signed ranges when ANDing two (possibly) negative numbers. Luckily
+> bitwise AND is comparatively easier to do than other bitwise operations:
+> non-negative range & non-negative range is always non-negative,
+> non-negative range & negative range is still always non-negative, and
+> negative range & negative range is always negative.
+>
+
+Right, only bitwise ANDing two negatives yields to a negative result.
+
+> smax_value is straight forwards, we can just do
+> 
+> 	max(dst_reg->smax_value, src_reg->smax_value)
+> 
+> which works across all sign combinations. Technically for non-negative &
+> non-negative we can use min() instead of max(), but the non-negative &
+> non-negative case should be handled pretty well by the unsigned ranges
+> already; it seems simpler to let such knowledge flows from unsigned
+> ranges to signed ranges during reg_bounds_sync(). Plus we are not wrong
+> for non-negative & non-negative by using max(), just imprecise, so no
+> correctness/soundness issue here.
+>
+
+I think this is correct, since in two's complement, more '1' bits means
+more large, regardless of sign, and bitwise AND never generates more '1'
+bits.
+
+> smin_value is the tricker one, but doable with
+> 
+> 	masked_negative(min(dst_reg->smin_value, src_reg->smin_value))
+> 
+> where masked_negative(v) basically just clear all bits after the most
+> significant unset bit, effectively rounding a negative value down to a
+> negative power-of-2 value, and returning 0 for non-negative values. E.g.
+> for some 8-bit, negative value
+> 
+> 	masked_negative(0b11101001) == 0b11100000
+>
+
+Ah, it's really tricky. Seems it's the longest high '1' bits sequence
+in both operands. This '1' bits should remain unchanged by the bitwise
+AND operation. So this sequence must be in the result, making it the
+minimum possible value.
+
+> This can be done with a tweaked version of "Round up to the next highest
+> power of 2"[2],
+> 
+> 	/* Invert the bits so the first unset bit can be propagated with |= */
+> 	v = ~v;
+> 	/* Now propagate the first (previously unset, now set) bit to the
+> 	 * trailing positions */
+> 	v |= v >> 1;
+> 	v |= v >> 2;
+> 	v |= v >> 4;
+> 	...
+> 	v |= v >> 32; /* Assuming 64-bit */
+> 	/* Propagation done, now invert again */
+> 	v = ~v;
+>
+> Again, we technically can do better if we take sign bit into account,
+> but deriving smin_value this way should still be correct/sound across
+> different sign combinations, and overall should help us derived [-16, 0]
+> from "[-1, 0] AND -13", thus preventing BPF verifier from rejecting the
+> program.
 >
 > ---
-> Changes in v2:
-> - Employ a regulator for powering up the Bluetooth chip, bypassing the need for power sequencing.
-> - Utilize the GPIO Consumer API to manipulate the GPIO pins.
-> - Link to v1: https://lore.kernel.org/r/20240705-btaml-v1-0-7f1538f98cef@amlogic.com
+> 
+> Alternatively we can employ a range-splitting trick (think I saw this in
+> [3]) that allow us to take advantage of existing tnum_and() by splitting
+> the signed ranges into two if the range crosses the sign boundary (i.e.
+> contains both non-negative and negative values), one range will be
+> [smin, U64_MAX], the other will be [0, smax]. This way we get around
+> tnum's weakness of representing [-1, 0] as [0, U64_MAX].
+> 
+> 	if (src_reg->smin_value < 0 && src_reg->smax_value >= 0) {
+> 		src_lower = tnum_range(src_reg->smin_value, U64_MAX);
+> 		src_higher = tnum_range(0, src_reg->smax_value);
+> 	} else {
+> 		src_lower = tnum_range(src_reg->smin_value, src_reg->smax_value);
+> 		src_higher = tnum_range(src_reg->smin_value, src_reg->smax_value);
+> 	}
+> 
+> 	if (dst_reg->smin_value < 0 && dst_reg->smax_value >= 0) {
+> 		dst_lower = tnum_range(dst_reg->smin_value, U64_MAX);
+> 		dst_higher = tnum_range(0, dst_reg->smax_value);
+> 	} else {
+> 		dst_lower = tnum_range(dst_reg->smin_value, dst_reg->smax_value);
+> 		dst_higher = tnum_range(dst_reg->smin_value, dst_reg->smax_value);
+> 	}
+> 
+> 	lower = tnum_and(src_lower, dst_lower);
+> 	higher = tnum_and(src_higher, dst_higher);
+> 	dst->smin_value = lower.value;
+> 	dst->smax_value = higher.value | higher.mask;
 >
-> --- b4-submit-tracking ---
-> {
->    "series": {
->      "revision": 2,
->      "change-id": "20240418-btaml-f9d7b19724ab",
->      "prefixes": [],
->      "history": {
->        "v1": [
->          "20240705-btaml-v1-0-7f1538f98cef@amlogic.com"
->        ]
->      }
->    }
-> }
+
+This looks even more tricky...
+
+> ---
+> 
+> Personally I like the first method better as it is simpler yet still
+> does the job well enough. I'll work on that in the next few days and see
+> if it actually works.
+> 
+
+This really sounds great. Thank you for the excellent work!
+
+> 
+> 1: https://github.com/torvalds/linux/blob/dac045fc9fa6/kernel/bpf/verifier.c#L13338
+> 2: https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+> 3: https://dl.acm.org/doi/10.1145/2651360
+> 
+> ...
+
 
