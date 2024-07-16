@@ -1,201 +1,121 @@
-Return-Path: <netdev+bounces-111654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E839A931F4A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 05:32:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1627931FC8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 07:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 176C71C20DBD
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 03:32:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17FB1B216E3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 05:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A86D2FA;
-	Tue, 16 Jul 2024 03:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4770A15491;
+	Tue, 16 Jul 2024 05:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mmht6lpg"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vweVPmr9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8921218633;
-	Tue, 16 Jul 2024 03:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC97A196;
+	Tue, 16 Jul 2024 05:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721100750; cv=none; b=rJ9xwPGMhXj622etkbdbrElbUEZ2CSeYFhMYJiMmIyjZ0a8v6yZlKcuwSEaYY7kAiB+ecfftAjOOB8TifmbUdn4B/PYHm1l6And4z1hwnl0EFXPvcEbjmNkMe4gpbHoz4JUFqdGc11mpc2EIr+Lwg8/NsDNkimlHCHbqCgULI/k=
+	t=1721106021; cv=none; b=AVUmZzkY84jgeFUkVdZjtyGDaSW6S35mtsA+wx4bp2ztypqtehm+nDPDCBnhHdbgKzPVVW7CPDheGowz00sJh8gi3C2MpdTT2p1/aNWgNpCBsHdhCPuSi0RV1edGSs2S3bI94V+tT8LtseWvsmk2or0z7y5B83qiJ/gsH4QFGNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721100750; c=relaxed/simple;
-	bh=GY/1zz50NBZ5rMHvmCnJe4c5+oCSLR2igpJJdQM9su0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jqyWetfIdjpaWqlJ8yBbPzCo7BOMedWP1dHhmfqzTyemHG4qDfqpb6xhTUNp2aEvGczWrhXYbb9DCZlKQaffyx8Iwb3wbCRaB6I04lprOnREb5F/nn/kN6VFXGbtI0T16FjYlPvrJuF5bJGvTPnR+ChbO0pF3lcP6JQBVDrTi5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mmht6lpg; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1721106021; c=relaxed/simple;
+	bh=pTwIjEIFp01nFL8bVmeWIWztWDImcVA5oCWrlzaWhS0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PPTXLUtgaSt3lDfqEkuLfzkTH221TmIjB9F7LOocbCpF79SgeCRlIzgs3N0SMW9wUdNXeBnUpNzgFKVUobg+RvMc0MoPBcfr4QH97dIV/swzMe0JTkyQO6ot346l2UqzC7CAdoYudl6dPIjU/zdEGfDm/f6MmuzjRrMnpdxQA7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vweVPmr9; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721100748; x=1752636748;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GY/1zz50NBZ5rMHvmCnJe4c5+oCSLR2igpJJdQM9su0=;
-  b=Mmht6lpg7SHxkVrodfYoG8hRF0g5QuhPTmEM8YrEqTHyXjnOqOF6R0mf
-   RDJnUZfBnaj9fay/0gulaZYoaZgiwWrhOMCDVVKnXo24tCMycpItmDRRG
-   9keF6DDKW9g9++aW9jga8AjM13oBWWMAR8hk3CvlepchJ5iY77nj3m4xh
-   ey2dK5HKRldOIKikirltrd7bNvfrIeW773KnXBAC/gHC3fgLTfsaKmnZu
-   PdtwQcutk9m8NtQVe66imOgj1dxqM8YGMMwNbgzH+JW4A6vUJDkkUOW7C
-   7dSt817aIeKD9Kyw1DeFEeX17lqnYuefBc6dyid3UfOoCH5xWXTbEuAhE
-   Q==;
-X-CSE-ConnectionGUID: 4mw17WovQU+TyEwh4i7BFQ==
-X-CSE-MsgGUID: KPGB6VfrRtCkPwX9SKMgmw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11134"; a="18646216"
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1721106019; x=1752642019;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pTwIjEIFp01nFL8bVmeWIWztWDImcVA5oCWrlzaWhS0=;
+  b=vweVPmr9eBT8fmYY9pT+yeDsxvroddzezhZWOUTMUIFi7dMPaGfKewDr
+   GLXUU2qL3I4ymgIqHIsjq+k7cOxTKYDNfhgwV/hfzxHJUf7PH969EzPyl
+   CzP0ILGOLtowo8RwcN4CS5wzlpzoD+7BeUqDTe1gVdedFf88Obi551WyE
+   BCLOsxv5kUsQ5V1+I6FDe3AaO0+Sd0abeHmBIMoyva+xqGdC187cy4Z5c
+   jjgVUrRz4i9FHsJLZABLn13belp77At7m3GV+JVrHOgaG9fPZqra6qBhT
+   L6pFvmJT4Z0mm2WMgKmoWrt6X2M3B23JS++Xp5ajDc4s0go+svhSFaiAJ
+   A==;
+X-CSE-ConnectionGUID: 62SW0KjwQPSwDAhBVTpKjw==
+X-CSE-MsgGUID: yDkkPmEITvGB3gm55T04eg==
 X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="18646216"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 20:32:28 -0700
-X-CSE-ConnectionGUID: DyVHE1PWQhCwnPJdTEGnnA==
-X-CSE-MsgGUID: sodaZD6uRwSgia+JRpf+oA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="50482525"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 15 Jul 2024 20:32:24 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sTYvO-000ery-05;
-	Tue, 16 Jul 2024 03:32:22 +0000
-Date: Tue, 16 Jul 2024 11:32:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
-	netdev@vger.kernel.org, dan.j.williams@intel.com,
-	martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	richard.hughes@amd.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v2 10/15] cxl: define a driver interface for DPA
- allocation
-Message-ID: <202407161159.KA2METLk-lkp@intel.com>
-References: <20240715172835.24757-11-alejandro.lucero-palau@amd.com>
+   d="scan'208";a="29927473"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jul 2024 22:00:17 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Jul 2024 22:00:15 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 15 Jul 2024 22:00:12 -0700
+From: Rengarajan S <rengarajan.s@microchip.com>
+To: <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <rengarajan.s@microchip.com>
+Subject: [PATCH v1 net-next] lan78xx: Refactor interrupt handling and redundant messages
+Date: Tue, 16 Jul 2024 10:28:18 +0530
+Message-ID: <20240716045818.1257906-1-rengarajan.s@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240715172835.24757-11-alejandro.lucero-palau@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi,
+The MAC and PHY interrupt are not synchronized. When multiple phy
+interrupt occur while the MAC interrupt is cleared, the phy handle
+will not be called which causes the PHY interrupt to remain set
+throughout. This is avoided by not clearing the MAC interrupt each
+time. When the PHY interrupt is set, the MAC calls the PHY handle
+and after processing the timestamp the PHY interrupt is cleared.
+Also, avoided repetitive debug messages by replacing netdev_err
+with netif_dbg.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Rengarajan S <rengarajan.s@microchip.com>
+---
+ drivers/net/usb/lan78xx.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.10 next-20240715]
-[cannot apply to cxl/next cxl/pending horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/cxl-add-type2-device-basic-support/20240716-015920
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20240715172835.24757-11-alejandro.lucero-palau%40amd.com
-patch subject: [PATCH v2 10/15] cxl: define a driver interface for DPA allocation
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20240716/202407161159.KA2METLk-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project a0c6b8aef853eedaa0980f07c0a502a5a8a9740e)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240716/202407161159.KA2METLk-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407161159.KA2METLk-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/cxl/core/hdm.c:612: warning: Function parameter or struct member 'is_ram' not described in 'cxl_request_dpa'
->> drivers/cxl/core/hdm.c:612: warning: Excess function parameter 'mode' description in 'cxl_request_dpa'
-
-
-vim +612 drivers/cxl/core/hdm.c
-
-   589	
-   590	/**
-   591	 * cxl_request_dpa - search and reserve DPA given input constraints
-   592	 * @endpoint: an endpoint port with available decoders
-   593	 * @mode: DPA operation mode (ram vs pmem)
-   594	 * @min: the minimum amount of capacity the call needs
-   595	 * @max: extra capacity to allocate after min is satisfied
-   596	 *
-   597	 * Given that a region needs to allocate from limited HPA capacity it
-   598	 * may be the case that a device has more mappable DPA capacity than
-   599	 * available HPA. So, the expectation is that @min is a driver known
-   600	 * value for how much capacity is needed, and @max is based the limit of
-   601	 * how much HPA space is available for a new region.
-   602	 *
-   603	 * Returns a pinned cxl_decoder with at least @min bytes of capacity
-   604	 * reserved, or an error pointer. The caller is also expected to own the
-   605	 * lifetime of the memdev registration associated with the endpoint to
-   606	 * pin the decoder registered as well.
-   607	 */
-   608	struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_port *endpoint,
-   609						     bool is_ram,
-   610						     resource_size_t min,
-   611						     resource_size_t max)
- > 612	{
-   613		struct cxl_endpoint_decoder *cxled;
-   614		enum cxl_decoder_mode mode;
-   615		struct device *cxled_dev;
-   616		resource_size_t alloc;
-   617		int rc;
-   618	
-   619		if (!IS_ALIGNED(min | max, SZ_256M))
-   620			return ERR_PTR(-EINVAL);
-   621	
-   622		down_read(&cxl_dpa_rwsem);
-   623	
-   624		cxled_dev = device_find_child(&endpoint->dev, NULL, find_free_decoder);
-   625		if (!cxled_dev)
-   626			cxled = ERR_PTR(-ENXIO);
-   627		else
-   628			cxled = to_cxl_endpoint_decoder(cxled_dev);
-   629	
-   630		up_read(&cxl_dpa_rwsem);
-   631	
-   632		if (IS_ERR(cxled))
-   633			return cxled;
-   634	
-   635		if (is_ram)
-   636			mode = CXL_DECODER_RAM;
-   637		else
-   638			mode = CXL_DECODER_PMEM;
-   639	
-   640		rc = cxl_dpa_set_mode(cxled, mode);
-   641		if (rc)
-   642			goto err;
-   643	
-   644		down_read(&cxl_dpa_rwsem);
-   645		alloc = cxl_dpa_freespace(cxled, NULL, NULL);
-   646		up_read(&cxl_dpa_rwsem);
-   647	
-   648		if (max)
-   649			alloc = min(max, alloc);
-   650		if (alloc < min) {
-   651			rc = -ENOMEM;
-   652			goto err;
-   653		}
-   654	
-   655		rc = cxl_dpa_alloc(cxled, alloc);
-   656		if (rc)
-   657			goto err;
-   658	
-   659		return cxled;
-   660	err:
-   661		put_device(cxled_dev);
-   662		return ERR_PTR(rc);
-   663	}
-   664	EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, CXL);
-   665	
-
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 62dbfff8dad4..5f4e167ceeb0 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -1421,11 +1421,6 @@ static int lan78xx_link_reset(struct lan78xx_net *dev)
+ 	int ladv, radv, ret, link;
+ 	u32 buf;
+ 
+-	/* clear LAN78xx interrupt status */
+-	ret = lan78xx_write_reg(dev, INT_STS, INT_STS_PHY_INT_);
+-	if (unlikely(ret < 0))
+-		return ret;
+-
+ 	mutex_lock(&phydev->lock);
+ 	phy_read_status(phydev);
+ 	link = phydev->link;
+@@ -1518,7 +1513,7 @@ static void lan78xx_defer_kevent(struct lan78xx_net *dev, int work)
+ {
+ 	set_bit(work, &dev->flags);
+ 	if (!schedule_delayed_work(&dev->wq, 0))
+-		netdev_err(dev->net, "kevent %d may have been dropped\n", work);
++		netif_dbg(dev, intr, dev->net, "kevent %d may have been dropped\n", work);
+ }
+ 
+ static void lan78xx_status(struct lan78xx_net *dev, struct urb *urb)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
