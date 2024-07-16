@@ -1,351 +1,227 @@
-Return-Path: <netdev+bounces-111732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F29F9325D4
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:38:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2B99325DE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 13:43:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9261E1C2255D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:38:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34541B20AF4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jul 2024 11:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAC21993A3;
-	Tue, 16 Jul 2024 11:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB2E1991A0;
+	Tue, 16 Jul 2024 11:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="GZlVBzWs"
+	dkim=pass (2048-bit key) header.d=endava.com header.i=@endava.com header.b="qF58atBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2130.outbound.protection.outlook.com [40.107.104.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5060B198857;
-	Tue, 16 Jul 2024 11:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721129878; cv=none; b=dIKoqJ3yA74UDQQIc+1WMvksVzSmN4gwoOM52CgWNHDUFMiGkqorxJqIOySxG3AoCRJAJag/R5KdIgHXeWmyI/Ie8pQYWd4/QiL3AVQHwMaBeVd290U76Mht8ZF6y76r7UMKsD/CI8B8NQ54KjZLDwBYAq6bB1bie+Y5ax2S1Wk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721129878; c=relaxed/simple;
-	bh=xUnUMlUWDf1KmmCsMCJr89D3W9fr3ciE/oq41kkHucg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mRdLu/sY1RYe+SZDox0Xahjjo+fQouOexBXsqG1x8NNP7ng1ZdQ8tlheiLBYlGi29AZaB5LE/BS3fsIK5lLxQKx7C21GMS6Ayr2WKICsasBiJFz7xcXwo/PJDFsjqvSp/cK1LGA+ljN4YMuR2Eew2NsJynLDlSeDcx0+ZdIPPJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=GZlVBzWs; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721129876; x=1752665876;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xUnUMlUWDf1KmmCsMCJr89D3W9fr3ciE/oq41kkHucg=;
-  b=GZlVBzWseHxSK8vDKDtFTRRS0qmJ8/SL1wfGAaLcQWaO7yEIpt5o07vx
-   EfXWUI6iMuO1K5uIhgdLE/KuiXVNrvkruTzKyJHYvjgCAypR/b/i/tEpB
-   en9RDdB5oQaF6rDy4CMlV78+cIFdPtkc2ty4xwwimzA6+ws/01kIdVUKG
-   I7+AXwo4WEr5LX5q8ue7SY8lLx/+JNRO2dDCTwTsSehro+x0rwbbgQy9+
-   C9KG7f+BiEzYNSWrboyTLFK4wNU3P66tBivSTBQUX4BudUgirK7JAqBO6
-   Cam781c+Rm481PYrpG5rkbFDOuouDnsBLc8akC52+LDBGfkztEVYl2cft
-   w==;
-X-CSE-ConnectionGUID: cfaeIL7IRUGLMl9e3xGUlQ==
-X-CSE-MsgGUID: 4LSU1cQjSF+hLYLVjjPdkg==
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="32002847"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jul 2024 04:37:54 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 16 Jul 2024 04:37:36 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 16 Jul 2024 04:37:31 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <andrew@lunn.ch>,
-	<horms@kernel.org>, <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
-	<rdunlap@infradead.org>, <linux@armlinux.org.uk>,
-	<bryan.whitehead@microchip.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net-next V2 4/4] net: lan743x: Add support to ethtool phylink get and set settings
-Date: Tue, 16 Jul 2024 17:03:49 +0530
-Message-ID: <20240716113349.25527-5-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
-References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6194022309;
+	Tue, 16 Jul 2024 11:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.130
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721130225; cv=fail; b=HHWuP8NyVi9Enpimr8Wz6S9qpBBxU7SZVbiSJV4lBRB7p+pRFNLy9rubJJ5mq4Kk6U3r/edIPUp9wWFsyOeyGDCLUeibnxKC44RzYfn0i7CEvcS9F/lSfMAy+2+146NI9+z/tUO8Wlp7ojLyGxG9U6y/yTAo0OP/tBG1r7xG5oQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721130225; c=relaxed/simple;
+	bh=iQ1+tEvmkcqeM8aXc8zpllxgCSkd8dT3Ej7Qq1eBgmo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ASt5JPHpTOqw5wXzDRGx3xob0mWXJ2u31gOY/Udw00Gqg1dGoduscgvt/j3WGtTvLHSf55IlN3RXrJ0ytzoWXdVVGuSih5mUhDThZPW2QF7rIXCkUwHq0sFTVrs9/S6ukXOS3VWlqZP0UYlVpH/f3zFt0WDbV7M0jBXfuiFYFoE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=endava.com; spf=pass smtp.mailfrom=endava.com; dkim=pass (2048-bit key) header.d=endava.com header.i=@endava.com header.b=qF58atBW; arc=fail smtp.client-ip=40.107.104.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=endava.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=endava.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W3vw5pr+H3UoBEL03IFslu+J9NTBQ0jb5R7lxtsMEnP1lmiEtVUSy/bft5eFQEPQPXyCXzh+mZ/zXdCx+maNh09bxJtMBgA0UzZDx4nrDuuePHC+AzUt60yXlFwhxVlE4Jjyc6vbcfE0FkniEBQMjK0BQa/TT7Md2sfmTTcogbpapyBdO4zVDH1waw02praKEKRWuW6ELLzSz4clHK9CfgWB1nVLHsEHTH1BdUmiYmhJaf+jIS+RJWiKp6gXuAvYLk/3l/9Sa99RR9jUmp+inHVMeM6lEvR94BDAImRCBQEodpcnAcQLYFfKgwgopig7LmBnuPl5LmojvrljErKSZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iQ1+tEvmkcqeM8aXc8zpllxgCSkd8dT3Ej7Qq1eBgmo=;
+ b=AJhWpdcSHyWpDh5KazB1QDY9NWDd6LsDxOJePfCnyIcG4GAEkvWAzpQ7u34FTxmgvDgf6uasRUq6b5Z8DkcRsnTGojb08sZaVf8XoY5ae9AkHZ0RMWA0q6jDm7aiOKPEq1mFx0Tkti8cZgRTGuqq+Ef/mgzi/g257usT51aBpV1HnTNVHIpYxdtQXAqy2S76U7/VOFOUFrUnwYv3pARqttLI4r/N12ZZGCCHNswtoIjYlEx0cPBubg378zeNDm/hkMe2wMrWgXHDbcsuJ/1wPaK/DIhhZNS3U//NeHCuvLk1QTg0t1kybK3ifja/g6045X5ik+7zNTiU2/68h/jILg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=endava.com; dmarc=pass action=none header.from=endava.com;
+ dkim=pass header.d=endava.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=endava.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iQ1+tEvmkcqeM8aXc8zpllxgCSkd8dT3Ej7Qq1eBgmo=;
+ b=qF58atBWD1d4btvHBb+AG2LWcYiNG3d07XupyvTQQ8sxilpZ1HIvZDlo9ZGSKep7FcZQMjjege62X3/Q5mmPd10G9CU06DQyWPyf8CWSo4+bfq7X69jtnJnageEBgrvwjn/KdoeOJ2eGlJKfhjQeeoHmsvDIQEnL8g8OsoTmOO1eo19oZ5CmxPGh14SchPc87QBdTT21NVtAcNVXjeDVBfgPda/dxF7GHgX82B1WTo9Fp/62v9rcWiIH9Wd59lg9GEMneX5CTDT9e2WK0uUY1dMTq7OKBBwy7mEM5+M/RwIkZkhMO6pe0xqgrMFkSNa9+iQV/yI0FWRJdbZ+CBtHRw==
+Received: from AS5PR06MB8752.eurprd06.prod.outlook.com (2603:10a6:20b:67d::20)
+ by VI1PR06MB6544.eurprd06.prod.outlook.com (2603:10a6:800:129::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Tue, 16 Jul
+ 2024 11:43:40 +0000
+Received: from AS5PR06MB8752.eurprd06.prod.outlook.com
+ ([fe80::72f2:c654:1827:9c41]) by AS5PR06MB8752.eurprd06.prod.outlook.com
+ ([fe80::72f2:c654:1827:9c41%3]) with mapi id 15.20.7784.013; Tue, 16 Jul 2024
+ 11:43:40 +0000
+From: Tung Nguyen <tung.q.nguyen@endava.com>
+To: Paolo Abeni <pabeni@redhat.com>, Shigeru Yoshida <syoshida@redhat.com>
+CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "ying.xue@windriver.com"
+	<ying.xue@windriver.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net] tipc: Return non-zero value from tipc_udp_addr2str()
+ on error
+Thread-Topic: [PATCH net] tipc: Return non-zero value from tipc_udp_addr2str()
+ on error
+Thread-Index: AQHa1yUvQPqLAGQ2A0GB9aoYG5W6f7H49WZwgAAEmICAAD0xAIAAA3+w
+Date: Tue, 16 Jul 2024 11:43:40 +0000
+Message-ID:
+ <AS5PR06MB875264DC53F4C10ACA87D227DBA22@AS5PR06MB8752.eurprd06.prod.outlook.com>
+References: <20240716020905.291388-1-syoshida@redhat.com>
+ <AS5PR06MB8752BF82AFB1C174C074547DDBA22@AS5PR06MB8752.eurprd06.prod.outlook.com>
+ <20240716.164535.1952205982608398288.syoshida@redhat.com>
+ <596fd758-11ad-46c0-b6f1-2c04aeba5e06@redhat.com>
+In-Reply-To: <596fd758-11ad-46c0-b6f1-2c04aeba5e06@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=endava.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS5PR06MB8752:EE_|VI1PR06MB6544:EE_
+x-ms-office365-filtering-correlation-id: 7876cae3-c34c-4478-45dc-08dca58c8991
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?YS9IbUlDZC9ScHZpWk8vOUJ3QTRuTEJ0eTJkMVkvbElNTTVCV1hCeXNMMHdw?=
+ =?utf-8?B?Q3hiTGc5d0ltMjBaUFJGZ25qZmtjcjd0YnNiUDY4RnBYNEszWXdsUGZRY29J?=
+ =?utf-8?B?QS9XQmRmd0t0WDRKajZEVkpta0d2M215WWVMc2F4UllSeCtnVzVLbzRDcExO?=
+ =?utf-8?B?bWFnRjlFdDdVa0c4UHAwRnBXNFBHZEVod3V3YVY5c3pKMGVZb0I1TUhTT1h5?=
+ =?utf-8?B?OExuMVQ2VXJkVW9Ya1hJRWJDODNNWmUzQWlVUzBXdkk5cmxOZ2tpOFBnQ01B?=
+ =?utf-8?B?ajRHdUZOTmM1dWRXTk56TnlnVERjUU1UVENWV1ZtTUNEazUwaExhVEthTmFU?=
+ =?utf-8?B?TUx1WnhRSnFDd1E4WEFOajRHOFlaRWJ0OXhsbjlMWWdtNVFjUVNqZW1OdEJh?=
+ =?utf-8?B?RnJWQmg0UW9aY0JjbVV4a24xK1FOVWFPbmE0MlpVa1VVaVdpSTF4SEh0aEF5?=
+ =?utf-8?B?VGlhNnB1TmdXdzFZWFdteUdQb3BtbmNIRkcyb21SaG1yQmNQaDF4RndJeW56?=
+ =?utf-8?B?SVh2WDdCMUxtM2wvVmFIbUZHcC9kYzF0ODByNTJxcnBibnptOVgvbzJKZGZK?=
+ =?utf-8?B?WlgvcFpWOXdzMGltaVFDZi9BS1dwZVJIeU9DN24zV0pPcUg5Vmd4R0xsdm9P?=
+ =?utf-8?B?MHc1NzVpR1ozRm5wMXl1cmgxaVd6dnJKR0VxYTZtTndCUm1YbGUyd3U4R1lI?=
+ =?utf-8?B?R0IwY3U2MzZlZVBrNEJjVStiZlZkTFpKaXlYMmFXNVFtc3VFVndHM3hFTzJl?=
+ =?utf-8?B?QUh3KzJrM2ZMdHZvQmxaT0xOUGxGaTNUbHVYaE1GVkVDSlM5RFpqcDVTL2tr?=
+ =?utf-8?B?eTFDY1RJTGdCQ3hrY0tReHAxZUdIeXBhbkVvNXN5T01CdkVHNmludTh4Ums5?=
+ =?utf-8?B?RWt2WWhtZE1lbTZ0T2xjS1FuRkpzNXU1Qm9aU2IrbVQvTFF1c2I3TEdSR1J4?=
+ =?utf-8?B?bXpnRGtFNEUvQ29WNG01cUtST25HUGZKQldWVWlNejRIeXVrc1JxNXpNdHJl?=
+ =?utf-8?B?OWRYRGRsSHh6TUMwUGxaMk1WVks4VjVFZnExZEJDVnJ4VW5VaDI5bXk1OUdI?=
+ =?utf-8?B?R2YwZjRsM3BCSTBYN1MzUk9kbjFmRDc3YWxlZGZPS1JoencwNnBYTG5XS3Uw?=
+ =?utf-8?B?OC9tTXVaa0lMZlExOEJKb2VaNVJDcWs4aVdxQjBISHdBNWh1ckRtTVp0T3d1?=
+ =?utf-8?B?T0svSkxYLzdzYWVmc0F5WG1XMER1amcxbUJkQUFyUmVTUkF1TjlzVmE3dEMz?=
+ =?utf-8?B?cFdJTGx6b0hQWHNsaGE1NXlrcmJHb3dsSzlPV21kdUZnMnlmOFRxMWMwRkJh?=
+ =?utf-8?B?VWUxT3IxblZUWElMQkY5VDZHK0RXNjFzemlIVDRQTkpsSWlOeGYzN1d2cFF0?=
+ =?utf-8?B?bi9xYUNLSkJzQXdDcmdENU5wMDdkRnVGY3ZORlhQTzdDWUswRjRuWVhDb0FR?=
+ =?utf-8?B?WndyaitVNlg0VFdNUVgybUZ2TWNtTzROTTRTK3AzT1ZuY1BxRHJlRVgyYWQz?=
+ =?utf-8?B?cjJGN1hua1ExbnF5d1ltRjJrSFlEckNGL2w5VmFCV2s3NkU0LzlIL1JqbDYz?=
+ =?utf-8?B?ZFNRTTRDRklqQnhVTHlnWHF4eGduR09peTg3YWJJOHZqdVhadFhldXJqM01M?=
+ =?utf-8?B?b3pRR05lb29uU3lsTVJKNDhBQmh5RUtNbjBkKytwWkt5NUhxYnRnd2lmZ2RR?=
+ =?utf-8?B?OWRkZW9GZ3pUcHBWMS9POER0dE5BS2hwcHY1L3Nwd0c1QzhjVzZQUEtPVTc3?=
+ =?utf-8?B?TmRlSE82b2M1VVNWSUxwSzFHYWJrYWRWczgwNmdEcEpUeU5PTnVhRnM1RFhO?=
+ =?utf-8?B?eHVxTkFSK01qSTQrbjEvWXQ2Q1h6eGRTQzhJQ21WMlU4NWhqSiszMDdKdnNa?=
+ =?utf-8?B?UUdkbXlOUDVKUWVwbjdySUxtSyttVW5GQnNpbDVHazF6WlE9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS5PR06MB8752.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?M2FHY1R3WGYyaE55MDdUS2JjUkRkZ29Da2N3UnRqYkRZUUFsTUNSYmNPc29G?=
+ =?utf-8?B?Um9pcUg1VEJkdkV4TTlLMFVEZXhDaXI0Z0x2dFFlaWNPQStIang2b2VCUVBa?=
+ =?utf-8?B?cXhlL0dDU0Q2UWlUWEZnbHArbkhEeG5wb2JmOXNnK3doK1E0R3BaV3lnck9x?=
+ =?utf-8?B?cEQyblVJd3Y3UXlQK05wWmtjbVVqbzhmVFpCWHp3K0JRT1RxSFNYbWducTNO?=
+ =?utf-8?B?SnRTb1BBM0lRTmhLUWY1WEt2OTFwZ0FNdkJ3bjNJdGIyakJpdERBanNCRjJB?=
+ =?utf-8?B?REt4bFBTa3lJVk0wVjhQUVVBa0tUL2FtLy9pb0s3RTAxTUNKelhMQi9uU285?=
+ =?utf-8?B?Z3l1c2VhaXppOHdUcUxoc1pqUW1XY1hwbUNwOTVxYXlSeFNqbkJJQlZoeElk?=
+ =?utf-8?B?aFRzeVZOd1VFTXA4NmtPNkVyQnYrQjhuNDNwcXM3dm5yMTVabGZiY056bGp0?=
+ =?utf-8?B?UlFaNzNNUUtSQWdRM1AzNEwwRVBIQUthalJqUzNNM25lSUhWcWZXVFdsQzR0?=
+ =?utf-8?B?Qkd0LzY4eGNpNzhXWHlYWTNzNG82c1VBWmpmQTB2TmtYcXFvLzZ3VFB6cmQr?=
+ =?utf-8?B?Y1hLS0h5NkpLVnZkdURhWEozaWV5czB5SU1iUUIwWXhmb3U4T3Fsd0RBRy9V?=
+ =?utf-8?B?aVFJOWpENlhNS3lDUDJYY0I0R24zTzFGS3FwN3grcUJ6bTMvaHhUZ3VDOFlH?=
+ =?utf-8?B?b3h2MzI0LzgxdnpFZTZFa2pvTDUwdGZRaEgydE1aRkJwL0paNjBYcWpSZ0Jh?=
+ =?utf-8?B?QnN4SEduQ2JPajgydlo2L1IvY1Y3OWFXbDRuL2RXQ09oc3lrOXFuMjQrT2oy?=
+ =?utf-8?B?ZE1CS0VqblFKZzNMbFoyQm9JeUdBSy9IeGdYNU9HYmVQRC9QbmQyZ1RDc1Rq?=
+ =?utf-8?B?YUU5c2pwY1hoUTJkbmQwY0hjWXNTVDUzR2d3UXRESE9DMzg3SGlXbGlxbXBD?=
+ =?utf-8?B?cm55RWtsSWJNdTRlc3VPZ3g5VVJtK00rSTRVUE83VU5PdlJHN3dXY04zQjBu?=
+ =?utf-8?B?QVcva1ZjZVRHT2hpbzdjclVieEhYOXR3MWs0U2l1YWQ4T2tZeEZSUDhCbmU5?=
+ =?utf-8?B?R1JhNHFXdmVScjNYNGZMakFtMHJ2TWdVajZYalA5NGZqeHpBTjE3LzlhSUl4?=
+ =?utf-8?B?b1g3NnZ4WU9PU1FHTFp6ZjlKR2JvVzVtL3JOMGQ5TE4yd2NoZzlIK0UrM0h3?=
+ =?utf-8?B?RjFDa3hqcEtGU0lUalNwM2FmWExQbnF6aDJ6RU5PK05Za3JCbFF6dHhQdXM2?=
+ =?utf-8?B?QXR6TkVjR2dWMUdxZlh1cjdxaVlpMHZMclhWSGlpNVBRRUNmSE5CcWlEU2pL?=
+ =?utf-8?B?cEF3a2pNcVQ2UDI4eFhTdm0wc3BreldmMEFqek9CZlJHbFN6eDBVeTgwRFIz?=
+ =?utf-8?B?YmhSTnlrc3BRNHNrWW0zYmM1eXNPQ3c3cHhFRW12TzlwdWZYYngrNzlGT1g3?=
+ =?utf-8?B?bENOM1plTHovLzJZUDQrSmtJQmJSU1ZWTHV1UVVNQmhrYU90MDQ0anNXb1FD?=
+ =?utf-8?B?M2o0YW5nZGNXWWJhNXhnZGV0WTl5YmxTcDh1VTNxSGpaMVNMb1JFS1k3OTlG?=
+ =?utf-8?B?WGVNbm9SNVZSWlNjOTA2OG94Qi8xSUxXVWdGOS95K1lTNUhlUXZ2bGExMGpU?=
+ =?utf-8?B?RlRZZlZBMkJNTFJTSUdaelJxUGdQVVdRdHJaVEZFeFhYcFR3eWR5bEZkM3k0?=
+ =?utf-8?B?VU1jRGM0NVB4QlBFUzdsTDN5TkJCRm5rRVAwdWtwVGFnZ0NRTXo5M3J5QTBm?=
+ =?utf-8?B?YVN4OVJRUCtNQnRWcy9NVFdTYzFCSkI5RnVHSk5GY21OZEtHU3JmUnZyMktD?=
+ =?utf-8?B?TEhpYmI0dFd6TnFPMDhkeEVmeStLV3l3SHU5aXJpWU9HRE50aHZLQ1dDYldi?=
+ =?utf-8?B?eXk1M3hTMkVhblRWMkdkcXF3SE4rS1AyaXhuYWx1ckk3QXBISFNVeWgzMkJk?=
+ =?utf-8?B?K1pxMUF5WHA2ZHdpMTA3Zk95V2FHbVpiTVlXZmtJbVcrVnJRd1Y1Ynk4am9u?=
+ =?utf-8?B?L2krNS9QR0hDV0pOYW13TXhCV0hNNURSQmtncUZWcXpabkFWMlh2NW42OC9Y?=
+ =?utf-8?B?VWVYem8zcDJySVNBMUFYK1hjclpnbUFralMrQURtQnprblNJQWlwdlZidmNu?=
+ =?utf-8?Q?3zWyECXQkhQOfQl2XYokv634P?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-OriginatorOrg: endava.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS5PR06MB8752.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7876cae3-c34c-4478-45dc-08dca58c8991
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2024 11:43:40.1350
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0b3fc178-b730-4e8b-9843-e81259237b77
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iIt3erNAV+5aATovilNw6i7jKg8wzEQHzaaeJLZLy4B7MiHGpJSqGoUaJYAoGt7pA4mKokeNJMcfGRJIXvuzAQsNxDs9FpuuCZw8HaBNCrw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR06MB6544
 
-Add support to ethtool phylink functions:
-  - get/set settings like speed, duplex etc
-  - get/set the wake-on-lan (WOL)
-  - get/set the energy-efficient ethernet (EEE)
-  - get/set the pause
-
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
-Change List:                                                                    
-============                                                                    
-V1 -> V2:                                                                       
-  - Fix the phylink changes                                                                  
- 
- .../net/ethernet/microchip/lan743x_ethtool.c  | 118 ++++++------------
- drivers/net/ethernet/microchip/lan743x_main.c |  25 ++++
- drivers/net/ethernet/microchip/lan743x_main.h |   4 +
- 3 files changed, 67 insertions(+), 80 deletions(-)
-
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 3a63ec091413..a649ea7442a4 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1058,61 +1058,48 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
- 				   struct ethtool_keee *eee)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
--	struct phy_device *phydev = netdev->phydev;
--	u32 buf;
--	int ret;
--
--	if (!phydev)
--		return -EIO;
--	if (!phydev->drv) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "Missing PHY Driver\n");
--		return -EIO;
--	}
- 
--	ret = phy_ethtool_get_eee(phydev, eee);
--	if (ret < 0)
--		return ret;
--
--	buf = lan743x_csr_read(adapter, MAC_CR);
--	if (buf & MAC_CR_EEE_EN_) {
--		/* EEE_TX_LPI_REQ_DLY & tx_lpi_timer are same uSec unit */
--		buf = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
--		eee->tx_lpi_timer = buf;
--	} else {
--		eee->tx_lpi_timer = 0;
--	}
-+	eee->tx_lpi_timer = lan743x_csr_read(adapter,
-+					     MAC_EEE_TX_LPI_REQ_DLY_CNT);
-+	eee->eee_enabled = adapter->eee_enabled;
-+	eee->eee_active = adapter->eee_active;
-+	eee->tx_lpi_enabled = adapter->tx_lpi_enabled;
- 
--	return 0;
-+	return phylink_ethtool_get_eee(adapter->phylink, eee);
- }
- 
- static int lan743x_ethtool_set_eee(struct net_device *netdev,
- 				   struct ethtool_keee *eee)
- {
--	struct lan743x_adapter *adapter;
--	struct phy_device *phydev;
--	u32 buf = 0;
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
- 
--	if (!netdev)
--		return -EINVAL;
--	adapter = netdev_priv(netdev);
--	if (!adapter)
--		return -EINVAL;
--	phydev = netdev->phydev;
--	if (!phydev)
--		return -EIO;
--	if (!phydev->drv) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "Missing PHY Driver\n");
--		return -EIO;
--	}
-+	if (eee->tx_lpi_enabled)
-+		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT,
-+				  eee->tx_lpi_timer);
-+	else
-+		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, 0);
- 
--	if (eee->eee_enabled) {
--		buf = (u32)eee->tx_lpi_timer;
--		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, buf);
--	}
-+	adapter->eee_enabled = eee->eee_enabled;
-+	adapter->tx_lpi_enabled = eee->tx_lpi_enabled;
-+	lan743x_set_eee(adapter, eee->tx_lpi_enabled && eee->eee_enabled);
- 
--	return phy_ethtool_set_eee(phydev, eee);
-+	return phylink_ethtool_set_eee(adapter->phylink, eee);
-+}
-+
-+static int lan743x_ethtool_set_link_ksettings(struct net_device *netdev,
-+					      const struct ethtool_link_ksettings *cmd)
-+{
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
-+	return phylink_ethtool_ksettings_set(adapter->phylink, cmd);
-+}
-+
-+static int lan743x_ethtool_get_link_ksettings(struct net_device *netdev,
-+					      struct ethtool_link_ksettings *cmd)
-+{
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
-+	return phylink_ethtool_ksettings_get(adapter->phylink, cmd);
- }
- 
- #ifdef CONFIG_PM
-@@ -1124,8 +1111,7 @@ static void lan743x_ethtool_get_wol(struct net_device *netdev,
- 	wol->supported = 0;
- 	wol->wolopts = 0;
- 
--	if (netdev->phydev)
--		phy_ethtool_get_wol(netdev->phydev, wol);
-+	phylink_ethtool_get_wol(adapter->phylink, wol);
- 
- 	if (wol->supported != adapter->phy_wol_supported)
- 		netif_warn(adapter, drv, adapter->netdev,
-@@ -1166,7 +1152,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
- 		    !(adapter->phy_wol_supported & WAKE_MAGICSECURE))
- 			phy_wol.wolopts &= ~WAKE_MAGIC;
- 
--		ret = phy_ethtool_set_wol(netdev->phydev, &phy_wol);
-+		ret = phylink_ethtool_set_wol(adapter->phylink, wol);
- 		if (ret && (ret != -EOPNOTSUPP))
- 			return ret;
- 
-@@ -1355,44 +1341,16 @@ static void lan743x_get_pauseparam(struct net_device *dev,
- 				   struct ethtool_pauseparam *pause)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(dev);
--	struct lan743x_phy *phy = &adapter->phy;
- 
--	if (phy->fc_request_control & FLOW_CTRL_TX)
--		pause->tx_pause = 1;
--	if (phy->fc_request_control & FLOW_CTRL_RX)
--		pause->rx_pause = 1;
--	pause->autoneg = phy->fc_autoneg;
-+	phylink_ethtool_get_pauseparam(adapter->phylink, pause);
- }
- 
- static int lan743x_set_pauseparam(struct net_device *dev,
- 				  struct ethtool_pauseparam *pause)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(dev);
--	struct phy_device *phydev = dev->phydev;
--	struct lan743x_phy *phy = &adapter->phy;
- 
--	if (!phydev)
--		return -ENODEV;
--
--	if (!phy_validate_pause(phydev, pause))
--		return -EINVAL;
--
--	phy->fc_request_control = 0;
--	if (pause->rx_pause)
--		phy->fc_request_control |= FLOW_CTRL_RX;
--
--	if (pause->tx_pause)
--		phy->fc_request_control |= FLOW_CTRL_TX;
--
--	phy->fc_autoneg = pause->autoneg;
--
--	if (pause->autoneg == AUTONEG_DISABLE)
--		lan743x_mac_flow_ctrl_set_enables(adapter, pause->tx_pause,
--						  pause->rx_pause);
--	else
--		phy_set_asym_pause(phydev, pause->rx_pause,  pause->tx_pause);
--
--	return 0;
-+	return phylink_ethtool_set_pauseparam(adapter->phylink, pause);
- }
- 
- const struct ethtool_ops lan743x_ethtool_ops = {
-@@ -1417,8 +1375,8 @@ const struct ethtool_ops lan743x_ethtool_ops = {
- 	.get_ts_info = lan743x_ethtool_get_ts_info,
- 	.get_eee = lan743x_ethtool_get_eee,
- 	.set_eee = lan743x_ethtool_set_eee,
--	.get_link_ksettings = phy_ethtool_get_link_ksettings,
--	.set_link_ksettings = phy_ethtool_set_link_ksettings,
-+	.get_link_ksettings = lan743x_ethtool_get_link_ksettings,
-+	.set_link_ksettings = lan743x_ethtool_set_link_ksettings,
- 	.get_regs_len = lan743x_get_regs_len,
- 	.get_regs = lan743x_get_regs,
- 	.get_pauseparam = lan743x_get_pauseparam,
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 9f958fb27bd8..40ef64fa7e5f 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -2966,6 +2966,18 @@ static int lan743x_phylink_2500basex_config(struct lan743x_adapter *adapter)
- 	return lan743x_pcs_power_reset(adapter);
- }
- 
-+void lan743x_set_eee(struct lan743x_adapter *adapter, bool enable)
-+{
-+	u32 lpi_ctl1;
-+
-+	lpi_ctl1 = lan743x_csr_read(adapter, MAC_CR);
-+	if (enable)
-+		lpi_ctl1 |= MAC_CR_EEE_EN_;
-+	else
-+		lpi_ctl1 &= ~MAC_CR_EEE_EN_;
-+	lan743x_csr_write(adapter, MAC_CR, lpi_ctl1);
-+}
-+
- static void lan743x_phylink_mac_config(struct phylink_config *config,
- 				       unsigned int link_an_mode,
- 				       const struct phylink_link_state *state)
-@@ -3013,7 +3025,12 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
- 					  unsigned int link_an_mode,
- 					  phy_interface_t interface)
- {
-+	struct net_device *netdev = to_net_dev(config->dev);
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
- 	netif_tx_stop_all_queues(to_net_dev(config->dev));
-+	adapter->eee_active = false;
-+	lan743x_set_eee(adapter, false);
- }
- 
- static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-@@ -3056,6 +3073,14 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
- 					  cap & FLOW_CTRL_RX);
- 
- 	netif_tx_wake_all_queues(to_net_dev(config->dev));
-+
-+	if (phydev && adapter->eee_enabled) {
-+		bool enable;
-+
-+		adapter->eee_active = phy_init_eee(phydev, false) >= 0;
-+		enable = adapter->eee_active && adapter->tx_lpi_enabled;
-+		lan743x_set_eee(adapter, enable);
-+	}
- }
- 
- static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 7f73d66854be..79f21789eb32 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -1086,6 +1086,9 @@ struct lan743x_adapter {
- 	phy_interface_t		phy_interface;
- 	struct phylink		*phylink;
- 	struct phylink_config	phylink_config;
-+	bool eee_enabled;
-+	bool eee_active;
-+	bool tx_lpi_enabled;
- };
- 
- #define LAN743X_COMPONENT_FLAG_RX(channel)  BIT(20 + (channel))
-@@ -1206,5 +1209,6 @@ void lan743x_hs_syslock_release(struct lan743x_adapter *adapter);
- void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
- 				       bool tx_enable, bool rx_enable);
- int lan743x_sgmii_read(struct lan743x_adapter *adapter, u8 mmd, u16 addr);
-+void lan743x_set_eee(struct lan743x_adapter *adapter, bool enable);
- 
- #endif /* _LAN743X_H */
--- 
-2.34.1
-
+DQo+SSB0aGluayB0aGF0IGNvbnNpc3RlbmN5IHdpdGggb3RoZXIgdGlwYyBoZWxwZXJzIGhlcmUg
+d291bGQgYmUgbW9yZQ0KPmFwcHJvcHJpYXRlOiBJTUhPIG5vIG5lZWQgdG8gc2VuZCBhIHYyLg0K
+Pg0KSSBkbyBub3QgdGhpbmsgc28uIElmIHlvdSBsb29rIGF0IG90aGVyIGhlbHBlciBmdW5jdGlv
+bnMgZm9yIHVkcCBtZWRpYSwgdGhleSB1c2UgcHJlZGVmaW5lZCBlcnJvciBjb2RlcywgZm9yIGV4
+YW1wbGU6DQp0aXBjX3VkcF9tc2cyYWRkcigpDQp7DQogLi4uDQpyZXR1cm4gLUVJTlZBTDsNCiAu
+Li4NCn0NCg0KSGVscGVyIGZ1bmN0aW9ucyBmb3IgZXRoZXJuZXQgbWVkaWEgc2hvdWxkIHVzZSBw
+cmVkZWZpbmVkIG1hY3JvcyBhcyB3ZWxsLiBTbywgdGhleSByZWFsbHkgbmVlZCBhICJjbGVhbi11
+cCIgcGF0Y2ggbGF0ZXIgZm9yIG5ldC1uZXh0Lg0KDQo+QFR1bmc6IHBsZWFzZSB0cmltIHlvdXIg
+cmVwbGllcyB0byBvbmx5IGluY2x1ZGUgdGhlIHJlbGV2YW50IHF1b3RlZCB0ZXh0IGFuZCBmaXgg
+eW91ciBjb25maWd1cmF0aW9uIHRvIGF2b2lkIGluc2VydGluZyB0aGUgbG9uZyB0cmFpbGVyLA0K
+PnF1aXRlIHVuc3VpdGFibGUgZm9yIG1lc3NhZ2VzIHNlbnQgdG8gYSBwdWJsaWMgTUwuDQo+DQpJ
+IGFtIGF3YXJlIG9mIHRoYXQgYW5kIHRyaWVkIHRvIGZpeCBidXQgaXQgc2VlbXMgb3V0IG9mIG15
+IGNvbnRyb2wgZm9yIG5vdy4gUGxlYXNlIGdpdmUgbWUgc29tZSBtb3JlIHRpbWUgdG8gdW5kZXJz
+dGFuZCB3aGF0J3Mgd3Jvbmcgd2l0aCB0aGUgbmV3IG1haWwgc2VydmVyLiAoSXQgd2FzIG5vIGlz
+c3VlIHdpdGggbXkgb2xkIGVtYWlsIGRla3RlY2guY29tLmF1KQ0KDQpUaGUgaW5mb3JtYXRpb24g
+aW4gdGhpcyBlbWFpbCBpcyBjb25maWRlbnRpYWwgYW5kIG1heSBiZSBsZWdhbGx5IHByaXZpbGVn
+ZWQuIEl0IGlzIGludGVuZGVkIHNvbGVseSBmb3IgdGhlIGFkZHJlc3NlZS4gQW55IG9waW5pb25z
+IGV4cHJlc3NlZCBhcmUgbWluZSBhbmQgZG8gbm90IG5lY2Vzc2FyaWx5IHJlcHJlc2VudCB0aGUg
+b3BpbmlvbnMgb2YgdGhlIENvbXBhbnkuIEVtYWlscyBhcmUgc3VzY2VwdGlibGUgdG8gaW50ZXJm
+ZXJlbmNlLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBhbnkgZGlzY2xv
+c3VyZSwgY29weWluZywgZGlzdHJpYnV0aW9uIG9yIGFueSBhY3Rpb24gdGFrZW4gb3Igb21pdHRl
+ZCB0byBiZSB0YWtlbiBpbiByZWxpYW5jZSBvbiBpdCwgaXMgc3RyaWN0bHkgcHJvaGliaXRlZCBh
+bmQgbWF5IGJlIHVubGF3ZnVsLiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIG1lc3NhZ2UgaW4g
+ZXJyb3IsIGRvIG5vdCBvcGVuIGFueSBhdHRhY2htZW50cyBidXQgcGxlYXNlIG5vdGlmeSB0aGUg
+RW5kYXZhIFNlcnZpY2UgRGVzayBvbiAoKzQ0ICgwKTg3MCA0MjMgMDE4NyksIGFuZCBkZWxldGUg
+dGhpcyBtZXNzYWdlIGZyb20geW91ciBzeXN0ZW0uIFRoZSBzZW5kZXIgYWNjZXB0cyBubyByZXNw
+b25zaWJpbGl0eSBmb3IgaW5mb3JtYXRpb24sIGVycm9ycyBvciBvbWlzc2lvbnMgaW4gdGhpcyBl
+bWFpbCwgb3IgZm9yIGl0cyB1c2Ugb3IgbWlzdXNlLCBvciBmb3IgYW55IGFjdCBjb21taXR0ZWQg
+b3Igb21pdHRlZCBpbiBjb25uZWN0aW9uIHdpdGggdGhpcyBjb21tdW5pY2F0aW9uLiBJZiBpbiBk
+b3VidCwgcGxlYXNlIHZlcmlmeSB0aGUgYXV0aGVudGljaXR5IG9mIHRoZSBjb250ZW50cyB3aXRo
+IHRoZSBzZW5kZXIuIFBsZWFzZSByZWx5IG9uIHlvdXIgb3duIHZpcnVzIGNoZWNrZXJzIGFzIG5v
+IHJlc3BvbnNpYmlsaXR5IGlzIHRha2VuIGJ5IHRoZSBzZW5kZXIgZm9yIGFueSBkYW1hZ2Ugcmlz
+aW5nIG91dCBvZiBhbnkgYnVnIG9yIHZpcnVzIGluZmVjdGlvbi4NCg0KRW5kYXZhIHBsYyBpcyBh
+IGNvbXBhbnkgcmVnaXN0ZXJlZCBpbiBFbmdsYW5kIHVuZGVyIGNvbXBhbnkgbnVtYmVyIDU3MjI2
+Njkgd2hvc2UgcmVnaXN0ZXJlZCBvZmZpY2UgaXMgYXQgMTI1IE9sZCBCcm9hZCBTdHJlZXQsIExv
+bmRvbiwgRUMyTiAxQVIsIFVuaXRlZCBLaW5nZG9tLiBFbmRhdmEgcGxjIGlzIHRoZSBFbmRhdmEg
+Z3JvdXAgaG9sZGluZyBjb21wYW55IGFuZCBkb2VzIG5vdCBwcm92aWRlIGFueSBzZXJ2aWNlcyB0
+byBjbGllbnRzLiBFYWNoIG9mIEVuZGF2YSBwbGMgYW5kIGl0cyBzdWJzaWRpYXJpZXMgaXMgYSBz
+ZXBhcmF0ZSBsZWdhbCBlbnRpdHkgYW5kIGhhcyBubyBsaWFiaWxpdHkgZm9yIGFub3RoZXIgc3Vj
+aCBlbnRpdHkncyBhY3RzIG9yIG9taXNzaW9ucy4NCg==
 
