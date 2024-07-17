@@ -1,254 +1,159 @@
-Return-Path: <netdev+bounces-111948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0DB9343A8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 23:10:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C90629343BE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 23:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F4FCB21EC0
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 21:10:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674311F22533
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 21:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E75B3A29F;
-	Wed, 17 Jul 2024 21:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NegKewE+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E4E184124;
+	Wed, 17 Jul 2024 21:19:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70A82262B;
-	Wed, 17 Jul 2024 21:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C631CD26
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 21:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721250644; cv=none; b=ESXj8rcqRRysSTlM5miMCpo/NK0ch/CTP9bb+T74EAoJvIWDyVWnHPJ90V2QQcBIcBkyulAl/1B8zzyvmffOI3tUE8PEnNFY/f7QcpnwGG3xRaP7ExLu5zSW/j0xfn+BlwMdeVNnnOv2iqhI4RKDtDWplDoNsQV+qlE6z/GWfs8=
+	t=1721251175; cv=none; b=L9xFkTh5kBcjplwzewWL7yaF9uFtdc9VgzqW8YBqRTzQnzigzdkFxLE7UIiqLr030UHRwV4nDduyYBdwKuYZudktT2GGWK24Hk5+ReL0CmpXFhrz0GIbzHTVG+dszQ5+oFlyXVt4LRpBrhxQU2qODene8CD1qPxw1NF8k+OdBMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721250644; c=relaxed/simple;
-	bh=7tQLJ3SnvNr6fvJQrl9SraDKPihByP2d1Vz5fBfWkwQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lTHa6omMw7VgGGMH/XHAYaVu0W7K0ry3BRX5aqWNn1cGO86cxqkP6qnaA6VykbIFDD1wYVJUixHebhun4amZVTDnYYC+4GOscsKNRLD/WAervj+JZ1Ks4beQdT2efJeQUqOEHQeliqX44JF06ZDxfTErPebQvnY5AbMiRtsHm5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NegKewE+; arc=none smtp.client-ip=209.85.161.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1721251175; c=relaxed/simple;
+	bh=pUN3nKoYA3md5TzyWx376WYFHr3VCEnbeW3txshK1rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QfKQVkFGm772vulTmmunCYFDYNIE5k04CVWQJa4uZwgEcQusSD672zhhiGdzOlhd2JLDVPIZui/m+YkV9WNhjnlr+YgmPv91783uvRTA6yaBAJpAdIZZg5nIKbojHkexddQI0SzACmAwgbWGjoCroAcDuiYFbkQyz8ulOynuUCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5c697fc4aa2so34875eaf.2;
-        Wed, 17 Jul 2024 14:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721250642; x=1721855442; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3L6bVz8sLrVXeSGyDXS7cltHthZHygLETgH0CtOzY2M=;
-        b=NegKewE+1vKkKeQbasDhV4nduDh/m+nMbmzYhgG/XWXjIAqZuu8xorTfPFLWt4AWzE
-         D/fwV81ORoAK/X1MHpcqTtCup8hPbmYoR1QIpkEi7hOZMUulakKQws1MgnZ58mFt8CYg
-         2toIbQUUvdBNhCi0UrkTkLEdYc1Yh4FwR5OMGRMsjEeKGKwkFXFuPfecva+N3BEMp1eK
-         viLAIW9y1iIVZHokVV3Z6trsY/vhZ2FDbyzOX/dEPS6sB90RGAhipuIOzf2YPTMEWd6v
-         jCpmvKIBjCdpbFpKCu7o8vYHykzw/volgbUO4ALvWkyo++2254Xa2somDvet1BrEt+Fz
-         OS6A==
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-426659ff58bso100325e9.2
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 14:19:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721250642; x=1721855442;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3L6bVz8sLrVXeSGyDXS7cltHthZHygLETgH0CtOzY2M=;
-        b=o9MnzFhOAw5BRB6fjWSgA3yUML0E69rHdsc8a0YIawPehN5MtOy8EWVfw6Q301u3E2
-         YWyt/VqBVrQWQdr8QVTbsj0TanoOR+wckGphNNvFzzF07UGiS7wdXV9B0ZzlHlJGvQCu
-         jsIrTZ1B10ZtJ5Z2+UWt2I9yrTAnrSdBTzY8nFKh0OVMcAiQBBgOLOo06F7lGd+3S+8o
-         rz1rXOdJpAqo5m0mdWw3DqmXWHvBE02lQaSrm/7iOx+5e3pIVYGgYNsvEcv/HVJWzajc
-         WtospOiMX5n55K2gxdmj/URTGkt7tI3lnadD8YDGRWHXrCsq4Z/6vDTNNUysi2rJM2kV
-         2gSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrguRx4mpkGSIzvDROLyUSJL2Of9j6xtZ6cnD3fVnBM8QUz9zXPgZ8jFAB4P5ycDpCpdFNsthKjD1Z5+TZDZ2NuVwDiFm4
-X-Gm-Message-State: AOJu0Ywhok+2y+nLj9Dcy23e/yJpl1RJvwLATrktritFyN7qd/UJTSBR
-	OIKG3vYmUriO/YdClaQwFsF6U8xM4E7CJeCUV08D2rMCOrnQ6c/W
-X-Google-Smtp-Source: AGHT+IHn+fXfkwU9w6UQtC/X8ZGF1y/mCIg36J7iSyWQw6E/NtL72D5pq3zGZpOIoaPqV5DPQJ3KUg==
-X-Received: by 2002:a05:6870:7b49:b0:25e:86b:59ec with SMTP id 586e51a60fabf-260ee123126mr763793fac.0.1721250641757;
-        Wed, 17 Jul 2024 14:10:41 -0700 (PDT)
-Received: from [192.168.0.31] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7ec7d963sm8577756b3a.130.2024.07.17.14.10.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 14:10:41 -0700 (PDT)
-Message-ID: <be239a5581e5b7d5c6f310c2a4c11282aa5896b5.camel@gmail.com>
-Subject: Re: [RFC bpf-next] bpf, verifier: improve signed ranges inference
- for BPF_AND
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>, Xu Kuohai
- <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>,  Roberto Sassu <roberto.sassu@huawei.com>, Edward Cree
- <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Harishankar Vishwanathan
- <harishankar.vishwanathan@gmail.com>, Santosh Nagarakatte
- <santosh.nagarakatte@rutgers.edu>,  Srinivas Narayana
- <srinivas.narayana@rutgers.edu>, Matan Shachnai <m.shachnai@rutgers.edu>
-Date: Wed, 17 Jul 2024 14:10:35 -0700
-In-Reply-To: <ykuhustu7vt2ilwhl32kj655xfdgdlm2xkl5rff6tw2ycksovp@ss2n4gpjysnw>
-References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
-	 <20240711113828.3818398-4-xukuohai@huaweicloud.com>
-	 <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
-	 <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
-	 <ykuhustu7vt2ilwhl32kj655xfdgdlm2xkl5rff6tw2ycksovp@ss2n4gpjysnw>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        d=1e100.net; s=20230601; t=1721251172; x=1721855972;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LVmOD3PzaV2I7aZUPK+aeE5lGzA2HAjY+dmcoGXY1q0=;
+        b=jYVV/Vhmgx2jJp+9ZeBZX5qcFwY9aWk+sobBalS3Xfbw0TVOkQHwNQ3eYikg+3uBGN
+         w+k2AqPzK+yEyqwXYlPwp0Vtvjj99FjOoNJUP5H5g1mPg7Qwig3qTO3I5PerjhyTNEx9
+         ojmuh8AqwHisF65tM1scaay5gEu5rRDCkpoHkMw4DU7LGVianBJD7j/g0j5ambH5DJjo
+         7KYOd7cyzR5izgBuLhX+oAexwcBSNH5WuxSzjjEPalF0mElwpViA862btrN/PhgnCjX6
+         3Ao3PQULIZapvht35uRLIB/9cF6JYdLH3sng8UhF5B5odwoc4vItIK8JH7PWeQXD37KS
+         JC3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUH/pi+hW6DUKdfAY73t5JejOzUVSVRbp4/Mt2nblRrnig1Dw6rS6ZWUYT+YvwLne1OhAMGVvSyttjvoO+0xlDpLOlWSw6h
+X-Gm-Message-State: AOJu0YyrRc1gOk1tZ5YZFBrNfEirAYGz4R1BLBVPihZLOshDXGSXTgsb
+	cbO+fbH6Fl3ZZvj35BVwGofKhYgYYZ3ztSrWvxyt1RTycY40WBEz7GBvSw==
+X-Google-Smtp-Source: AGHT+IFWlVCU0sNu8zdrx75sjTk2lonC9SCGflpxGKwDKTyKRA5khCz98MGqDjxfJPMpLF6KD/UupA==
+X-Received: by 2002:a05:600c:314f:b0:427:9f71:16ba with SMTP id 5b1f17b1804b1-427c2d2003dmr12909895e9.5.1721251171670;
+        Wed, 17 Jul 2024 14:19:31 -0700 (PDT)
+Received: from [10.100.102.74] (85.65.198.251.dynamic.barak-online.net. [85.65.198.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3684d3c6940sm343564f8f.70.2024.07.17.14.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jul 2024 14:19:31 -0700 (PDT)
+Message-ID: <9b8b57ca-83ae-43a4-84c6-33017dc81a32@grimberg.me>
+Date: Thu, 18 Jul 2024 00:19:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-On Tue, 2024-07-16 at 22:52 +0800, Shung-Hsi Yu wrote:
-
-[...]
-
-> To allow verification of such instruction pattern, update
-> scalar*_min_max_and() to infer signed ranges directly from signed ranges
-> of the operands. With BPF_AND, the resulting value always gains more
-> unset '0' bit, thus it only move towards 0x0000000000000000. The
-> difficulty lies with how to deal with signs. While non-negative
-> (positive and zero) value simply grows smaller, a negative number can
-> grows smaller, but may also underflow and become a larger value.
->=20
-> To better address this situation we split the signed ranges into
-> negative range and non-negative range cases, ignoring the mixed sign
-> cases for now; and only consider how to calculate smax_value.
->=20
-> Since negative range & negative range preserve the sign bit, so we know
-> the result is still a negative value, thus it only move towards S64_MIN,
-> but never underflow, thus a save bet is to use a value in ranges that is
-> closet to 0, thus "max(dst_reg->smax_value, src->smax_value)". For
-> negative range & positive range the sign bit is always cleared, thus we
-> know the resulting is a non-negative, and only moves towards 0, so a
-> safe bet is to use smax_value of the non-negative range. Last but not
-> least, non-negative range & non-negative range is still a non-negative
-> value, and only moves towards 0; however same as the unsigned range
-> case, the maximum is actually capped by the lesser of the two, and thus
-> min(dst_reg->smax_value, src_reg->smax_value);
->=20
-> Listing out the above reasoning as a table (dst_reg abbreviated as dst,
-> src_reg abbreviated as src, smax_value abbrivated as smax) we get:
->=20
->                         |                         src_reg
->        smax =3D ?         +---------------------------+------------------=
----------
->                         |        negative           |       non-negative
-> ---------+--------------+---------------------------+--------------------=
--------
->          | negative     | max(dst->smax, src->smax) |         src->smax
-> dst_reg  +--------------+---------------------------+--------------------=
--------
->          | non-negative |         dst->smax         | min(dst->smax, src-=
->smax)
->=20
-> However this is quite complicated, luckily it can be simplified given
-> the following observations
->=20
->     max(dst_reg->smax_value, src_reg->smax_value) >=3D src_reg->smax_valu=
-e
->     max(dst_reg->smax_value, src_reg->smax_value) >=3D dst_reg->smax_valu=
-e
->     max(dst_reg->smax_value, src_reg->smax_value) >=3D min(dst_reg->smax_=
-value, src_reg->smax_value)
->=20
-> So we could substitute the cells in the table above all with max(...),
-> and arrive at:
->=20
->                         |                         src_reg
->       smax' =3D ?         +---------------------------+------------------=
----------
->                         |        negative           |       non-negative
-> ---------+--------------+---------------------------+--------------------=
--------
->          | negative     | max(dst->smax, src->smax) | max(dst->smax, src-=
->smax)
-> dst_reg  +--------------+---------------------------+--------------------=
--------
->          | non-negative | max(dst->smax, src->smax) | max(dst->smax, src-=
->smax)
->=20
-> Meaning that simply using
->=20
->   max(dst_reg->smax_value, src_reg->smax_value)
->=20
-> to calculate the resulting smax_value would work across all sign combinat=
-ions.
->=20
->=20
-> For smin_value, we know that both non-negative range & non-negative
-> range and negative range & non-negative range both result in a
-> non-negative value, so an easy guess is to use the minimum non-negative
-> value, thus 0.
->=20
->                         |                         src_reg
->        smin =3D ?         +----------------------------+-----------------=
-----------
->                         |          negative          |       non-negative
-> ---------+--------------+----------------------------+-------------------=
---------
->          | negative     |             ?              |             0
-> dst_reg  +--------------+----------------------------+-------------------=
---------
->          | non-negative |             0              |             0
->=20
-> This leave the negative range & negative range case to be considered. We
-> know that negative range & negative range always yield a negative value,
-> so a preliminary guess would be S64_MIN. However, that guess is too
-> imprecise to help with the r0 <<=3D 62, r0 s>>=3D 63, r0 &=3D -13 pattern
-> we're trying to deal with here.
->=20
-> This can be further improve with the observation that for negative range
-> & negative range, the smallest possible value must be one that has
-> longest _common_ most-significant set '1' bits sequence, thus we can use
-> min(dst_reg->smin_value, src->smin_value) as the starting point, as the
-> smaller value will be the one with the shorter most-significant set '1'
-> bits sequence. But that alone is not enough, as we do not know whether
-> rest of the bits would be set, so the safest guess would be one that
-> clear alls bits after the most-significant set '1' bits sequence,
-> something akin to bit_floor(), but for rounding to a negative power-of-2
-> instead.
->=20
->     negative_bit_floor(0xffff000000000003) =3D=3D 0xffff000000000000
->     negative_bit_floor(0xf0ff0000ffff0000) =3D=3D 0xf000000000000000
->     negative_bit_floor(0xfffffb0000000000) =3D=3D 0xfffff80000000000
->=20
-> With negative range & negative range solve, we now have:
->=20
->                         |                         src_reg
->        smin =3D ?         +----------------------------+-----------------=
-----------
->                         |        negative            |       non-negative
-> ---------+--------------+----------------------------+-------------------=
---------
->          |   negative   |negative_bit_floor(         |             0
->          |              |  min(dst->smin, src->smin))|
-> dst_reg  +--------------+----------------------------+-------------------=
---------
->          | non-negative |           0                |             0
->=20
-> This can be further simplied since min(dst->smin, src->smin) < 0 when bot=
-h
-> dst_reg and src_reg have a negative range. Which means using
->=20
->     negative_bit_floor(min(dst_reg->smin_value, src_reg->smin_value)
->=20
-> to calculate the resulting smin_value would work across all sign combinat=
-ions.
->=20
-> Together these allows us to infer the signed range of the result of BPF_A=
-ND
-> operation using the signed range from its operands.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/8] nvme-tcp: reduce callback lock contention
+To: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ netdev@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+ Hannes Reinecke <hare@suse.de>
+References: <20240716073616.84417-1-hare@kernel.org>
+ <20240716073616.84417-7-hare@kernel.org>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240716073616.84417-7-hare@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-Hi Shung-Hsi,
 
-This seems quite elegant.
-As an additional check, I did a simple brute-force for all possible
-ranges of 6-bit integers and bounds are computed safely.
+On 16/07/2024 10:36, Hannes Reinecke wrote:
+> From: Hannes Reinecke <hare@suse.de>
+>
+> We have heavily queued tx and rx flows, so callbacks might happen
+> at the same time. As the callbacks influence the state machine we
+> really should remove contention here to not impact I/O performance.
+>
+> Signed-off-by: Hannes Reinecke <hare@kernel.org>
+> ---
+>   drivers/nvme/host/tcp.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index a758fbb3f9bb..9634c16d7bc0 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -1153,28 +1153,28 @@ static void nvme_tcp_data_ready(struct sock *sk)
+>   
+>   	trace_sk_data_ready(sk);
+>   
+> -	read_lock_bh(&sk->sk_callback_lock);
+> -	queue = sk->sk_user_data;
+> +	rcu_read_lock();
+> +	queue = rcu_dereference_sk_user_data(sk);
+>   	if (likely(queue && queue->rd_enabled) &&
+>   	    !test_bit(NVME_TCP_Q_POLLING, &queue->flags)) {
+>   		queue_work_on(queue->io_cpu, nvme_tcp_wq, &queue->io_work);
+>   		queue->data_ready_cnt++;
+>   	}
+> -	read_unlock_bh(&sk->sk_callback_lock);
+> +	rcu_read_unlock();
 
-[...]
+Umm, this looks dangerous...
+
+Please give a concrete (numeric) justification for this change, and 
+preferably a big fat comment
+on why it is safe to do (for either .data_ready or .write_space).
+
+Is there any precedence of another tcp ulp that does this? I'd like to 
+have the netdev folks
+review this change. CC'ing netdev.
+
+>   }
+>   
+>   static void nvme_tcp_write_space(struct sock *sk)
+>   {
+>   	struct nvme_tcp_queue *queue;
+>   
+> -	read_lock_bh(&sk->sk_callback_lock);
+> -	queue = sk->sk_user_data;
+> +	rcu_read_lock();
+> +	queue = rcu_dereference_sk_user_data(sk);
+>   	if (likely(queue && sk_stream_is_writeable(sk))) {
+>   		clear_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+>   		queue_work_on(queue->io_cpu, nvme_tcp_wq, &queue->io_work);
+>   		queue->write_space_cnt++;
+>   	}
+> -	read_unlock_bh(&sk->sk_callback_lock);
+> +	rcu_read_unlock();
+>   }
+>   
+>   static void nvme_tcp_state_change(struct sock *sk)
+> @@ -2076,6 +2076,7 @@ static void nvme_tcp_restore_sock_ops(struct nvme_tcp_queue *queue)
+>   	sock->sk->sk_state_change = queue->state_change;
+>   	sock->sk->sk_write_space  = queue->write_space;
+>   	write_unlock_bh(&sock->sk->sk_callback_lock);
+> +	synchronize_rcu();
+>   }
+>   
+>   static void __nvme_tcp_stop_queue(struct nvme_tcp_queue *queue)
+> @@ -2115,6 +2116,7 @@ static void nvme_tcp_setup_sock_ops(struct nvme_tcp_queue *queue)
+>   	queue->sock->sk->sk_ll_usec = 1;
+>   #endif
+>   	write_unlock_bh(&queue->sock->sk->sk_callback_lock);
+> +	synchronize_rcu();
+>   }
+>   
+>   static int nvme_tcp_start_queue(struct nvme_ctrl *nctrl, int idx)
+
 
