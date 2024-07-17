@@ -1,351 +1,188 @@
-Return-Path: <netdev+bounces-111837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A4C5933681
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 08:00:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF75B9336A2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 08:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45A531C22206
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 06:00:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64F18283E9D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 06:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BAA10A3D;
-	Wed, 17 Jul 2024 06:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D255E125C9;
+	Wed, 17 Jul 2024 06:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmM6Ltjj"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gNB20wsy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF77BA4B
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 06:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1068C11720
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 06:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721196039; cv=none; b=Bggpbya+GTmvq4B9wkEHCdwDGUDCeEdkQZ3DuZ2w1lDesF7h+pvirk7EiLqXjeAeBWFY0a4vfcDvZ6sP21Kn5WNlGp70ELsLre9PJnkpOcBQpwDorhMnGHkG+2pUh3xJTI4xNcNVcVg/LnyQbD/6OinzbWy1cm/gXRCiOBS8ONo=
+	t=1721196431; cv=none; b=OnEAL+vbTLZk0Q8FQz9DwDa2Ire2iMEaQfmGLdt1Qstx0IB1QeUwyA+FGt+YnzI13eqskii+6jWNskTzr0W9euIQcmZFN9KhKqYJikLu04nr/gehPBKwnu2aZ2UUKgWu+jCzp+ktHT37Eubi/Ehf3jt9oC9duQmB4QVH3gWFdCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721196039; c=relaxed/simple;
-	bh=KW09d8Wc1ZGpgPYZhIZDAhgbHjFTyW7HLNLNM0Z4R5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DPJZ+WTm0H/or+ruc2yuEw36wHwCVWJ50yX4pCTFKIWnUxgpKMHVVMusQn0/wkDLgHS5s9a7glnLdJ8xABmlmcshvyrkeGN+7MYkHHMWvXECa+mIHwZ8PUI2AQwakmUGgmQqxW0s1WChbvJZdFiR1dWUNGf4tXNZ9kxSQmhWfJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LmM6Ltjj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721196036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DLSwQGWDiUaXmNejs9TGNFb6eo7q0Jz5uryzJxXFuEw=;
-	b=LmM6LtjjJMPWmxmjgazOySBsLhL3SKF6DDsU60CffJx7mRYEglzt7BHhkcBF4LzYhz+5vV
-	wbPGCGuI7BTKOMQQH+r4Gu4nOenFJtdkk8tskQ/ZYGjAhIULHxeObb0uvGiYrcB2mjFgvv
-	fvYbzrPf2V/dJoQpIRkkrNYn90mPayk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-41-_OVQ6JF3OJS6vfQNO-OpTg-1; Wed, 17 Jul 2024 02:00:34 -0400
-X-MC-Unique: _OVQ6JF3OJS6vfQNO-OpTg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4279418eb2bso42047375e9.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 23:00:34 -0700 (PDT)
+	s=arc-20240116; t=1721196431; c=relaxed/simple;
+	bh=u9zrIbLNt6r+NLL75A/B9GGqKSc26Gfkc/E56cEIndM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=KJ1IVX0Ds1xdOP5lHky+MgPc+oLrQ0FDVMsJCzOfbulbL9qOURPM9piONB4ihPlTLCyWZPCpxZ6HvTTSesANxAfI8Ki7d4xqI7af1i9NwM/NlpWkNWVAezeMyP4SFWxjg3UR/yLUTWL4yM097s4YGIIpKTfVrrjMQGuSSrobQfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gNB20wsy; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1fbfb7cdb54so34335385ad.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jul 2024 23:07:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1721196429; x=1721801229; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jgUrGmqmMWtCBhPSlUAoCHAQGr50bG3mluKGn6yRCac=;
+        b=gNB20wsy1m9PaTDDhKCi0mzHXHJuj6qfWfy2hudno/yp2NZP9WUKzqr1UMzDCZu0sH
+         oaoP4Gf6w4Gq07BahmBvXM+eF8YdlO+RVbq06NJHliANVjNx6GYOvM7/m46u6n71qNY5
+         cepQawwdqoSb9qM0dhvatlGme/tJX1sJpnREs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721196032; x=1721800832;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLSwQGWDiUaXmNejs9TGNFb6eo7q0Jz5uryzJxXFuEw=;
-        b=eQtdNPxX/4+hrl3CZF6j6iB7CEQ4J0zODeCBbMPLsuj/mg9Bt0OOTyI4n3N+eN7/wm
-         ApLdWjt/SZa2/lY2kWmV9FOyhYPCfS+Ix2VZciBbrRusAlKjMDeTPlYoACHDhsTpMzAU
-         YKx2Pm8Rq0mQ26DzRVier51zXo0B6nUd2HDAuHouGVniX8wVYcfeTr4/xcNvM2xKk07Y
-         y+QmKj0b3MrmznOAdDqDb8c9+VvxJQjUazGzW/vcvZ4zhILlXZFWmbmOEZRHaFh7tq6D
-         8gCwribt6pmCqN3fXHZDbLSDHw+GQhZSgsjlEbzIDRZev3HmAGo9uUa/VSboqmsblHU5
-         OElg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4J/YJtzsMqOGNP0xytYe2tpeB81yye427/aCM0VQNTVQ+vkIy4rJvyT9X+PsIUiCxqSpAP8Gjb3UCbSgpS3RBtHNfrNF8
-X-Gm-Message-State: AOJu0Yxb6IBZ0tGKG+oXbcKVsjNNjWjckvkcZudz/8K79+Yt+XwJokis
-	RptkhPMP6XzCNfJNWgKWuqrTIAGdcLbH3QUEz0JZ9fh1c8T24LXXmnx6gu18wKgM6kZyQHql7dI
-	oHGOLjeSrGq8Uvc/jHPwIy7v1S0aqhVsfxAIP9gt/LTvYTYVuWxetPA==
-X-Received: by 2002:a05:600c:5026:b0:426:6114:7328 with SMTP id 5b1f17b1804b1-427c3285f65mr3883985e9.38.1721196031713;
-        Tue, 16 Jul 2024 23:00:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHgsxme7Ix3OPYUWIk/ZQeBCSMa0m0FQ9Fn23uTw768M4puzQBnKYjB36kEMD4l4mZZDFUIGg==
-X-Received: by 2002:a05:600c:5026:b0:426:6114:7328 with SMTP id 5b1f17b1804b1-427c3285f65mr3883675e9.38.1721196031020;
-        Tue, 16 Jul 2024 23:00:31 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f6:360d:da73:bbf7:ba86:37fb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427a5edb478sm157439305e9.33.2024.07.16.23.00.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jul 2024 23:00:30 -0700 (PDT)
-Date: Wed, 17 Jul 2024 02:00:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
-	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
-Subject: Re: [PATCH net-next v3 3/3] virtio-net: synchronize operstate with
- admin state on up/down
-Message-ID: <20240717015904-mutt-send-email-mst@kernel.org>
-References: <20240709080214.9790-1-jasowang@redhat.com>
- <20240709080214.9790-4-jasowang@redhat.com>
- <20240709090743-mutt-send-email-mst@kernel.org>
- <CACGkMEv4CVK4YdOvHEbMY3dLc3cxF_tPN8H4YO=0rvFLaK-Upw@mail.gmail.com>
- <CACGkMEvDiQHfLaBRoaFtpYJHKTqicqbrpeZWzat43YveTa9Wyg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1721196429; x=1721801229;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jgUrGmqmMWtCBhPSlUAoCHAQGr50bG3mluKGn6yRCac=;
+        b=LLUZhaQ3hLztZucvcX/YxjvdEM3tcmNwhU/Qa4/ELM2JWq/WboUXEK5yMaMIVSuTGj
+         ESCvm9+ltaCk6LSOusyHkFc3cOU42xxQsEAFTIcd9dV9NGQmDzdGvAEFLS8Mz1xgxZjU
+         8uZXonHcSaY8/IIWNWXi8f6ZICpeYq5RDhAQst4zZiXQ1io/aZUu3aYCJ/IpANA2Lld3
+         XQ+FxN7U59MJr7/8PtkX0KfOJfc3FCbr5r+5AKWlGV+zNHkSJZzKuO4r2Vo12rKRmJih
+         bSqvanLbqJRdFgGaOVHZm83616TppiYqj+6qv9TOp/VHW8eDy84AcKYeO6c0hGovrr7g
+         hW2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXQcayorcDig+UGkFlhXQnxvNgjvyImeic+3/xxiDCug/RYqjX8aBpFKeLilSYxg8ITQFcMrpxCHkLgAC3cFYfLxMpq+cUh
+X-Gm-Message-State: AOJu0Yw4ta5xf39s3ON04p0+65gFYl1R41cZbJHEHX3MzDeTgjSk6A6R
+	lz3Op8DyOYeVnBZx9ymu2vmg0TOwmSFDeL2lgcwwwl4zVLBkKlVVwC361yKS2w==
+X-Google-Smtp-Source: AGHT+IHGsBfXVa8Ok1WZsxnr1r3Yw1BDvsbj6UT2V0KW+QeJjtQtCrbGTkBd6Ej1yD/yJgDmZMhF7Q==
+X-Received: by 2002:a17:902:e5c8:b0:1fc:52d9:1047 with SMTP id d9443c01a7336-1fc52d9192amr2223855ad.42.1721196429287;
+        Tue, 16 Jul 2024 23:07:09 -0700 (PDT)
+Received: from kashwindayan-virtual-machine.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bba6f9asm67829645ad.86.2024.07.16.23.07.07
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 16 Jul 2024 23:07:09 -0700 (PDT)
+From: Ashwin Kamat <ashwin.kamat@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	tapas.kundu@broadcom.com,
+	ashwin.kamat@broadcom.com,
+	Jason Xing <kernelxing@tencent.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH v5.10] bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue
+Date: Wed, 17 Jul 2024 11:36:56 +0530
+Message-Id: <1721196416-13046-1-git-send-email-ashwin.kamat@broadcom.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEvDiQHfLaBRoaFtpYJHKTqicqbrpeZWzat43YveTa9Wyg@mail.gmail.com>
 
-On Wed, Jul 17, 2024 at 09:19:02AM +0800, Jason Wang wrote:
-> On Wed, Jul 10, 2024 at 11:03 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Tue, Jul 9, 2024 at 9:28 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Tue, Jul 09, 2024 at 04:02:14PM +0800, Jason Wang wrote:
-> > > > This patch synchronize operstate with admin state per RFC2863.
-> > > >
-> > > > This is done by trying to toggle the carrier upon open/close and
-> > > > synchronize with the config change work. This allows propagate status
-> > > > correctly to stacked devices like:
-> > > >
-> > > > ip link add link enp0s3 macvlan0 type macvlan
-> > > > ip link set link enp0s3 down
-> > > > ip link show
-> > > >
-> > > > Before this patch:
-> > > >
-> > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
-> > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > ......
-> > > > 5: macvlan0@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-> > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > > >
-> > > > After this patch:
-> > > >
-> > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
-> > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > ...
-> > > > 5: macvlan0@enp0s3: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
-> > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > >
-> > > I think that the commit log is confusing. It seems to say that
-> > > the issue fixed is synchronizing state with hardware
-> > > config change.
-> > > But your example does not show any
-> > > hardware change. Isn't this example really just
-> > > a side effect of setting carrier off on close?
-> >
-> > The main goal for this patch is to make virtio-net follow RFC2863. The
-> > main thing that is missed is to synchronize the operstate with admin
-> > state, if we do this, we get several good results, one of the obvious
-> > one is to allow virtio-net to propagate status to the upper layer, for
-> > example if the admin state of the lower virtio-net is down it should
-> > be propagated to the macvlan on top, so I give the example of using a
-> > stacked device. I'm not we had others but the commit log is probably
-> > too small to say all of it.
-> 
-> Michael, any more comments on this?
-> 
-> Thans
+From: Jason Xing <kernelxing@tencent.com>
 
+[ Upstream commit 6648e613226e18897231ab5e42ffc29e63fa3365 ]
 
-Still don't get it, sorry.
-> > > > This is done by trying to toggle the carrier upon open/close and
-> > > > synchronize with the config change work.
-What does this sentence mean? What is not synchronized with config
-change that needs to be?
+Fix NULL pointer data-races in sk_psock_skb_ingress_enqueue() which
+syzbot reported [1].
 
-> >
-> > >
-> > >
-> > > > Cc: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
-> > > > Cc: Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
-> > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > >
-> > > Yes but this just forces lots of re-reads of config on each
-> > > open/close for no good reason.
-> >
-> > Does it really harm? Technically the link status could be changed
-> > several times when the admin state is down as well.
-> >
-> > > Config interrupt is handled in core, you can read once
-> > > on probe and then handle config changes.
-> >
-> > Per RFC2863, the code tries to avoid dealing with any operstate change
-> > via config space read when the admin state is down.
-> >
-> > >
-> > >
-> > >
-> > >
-> > >
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 64 ++++++++++++++++++++++++----------------
-> > > >  1 file changed, 38 insertions(+), 26 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 0b4747e81464..e6626ba25b29 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -2476,6 +2476,25 @@ static void virtnet_cancel_dim(struct virtnet_info *vi, struct dim *dim)
-> > > >       net_dim_work_cancel(dim);
-> > > >  }
-> > > >
-> > > > +static void virtnet_update_settings(struct virtnet_info *vi)
-> > > > +{
-> > > > +     u32 speed;
-> > > > +     u8 duplex;
-> > > > +
-> > > > +     if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX))
-> > > > +             return;
-> > > > +
-> > > > +     virtio_cread_le(vi->vdev, struct virtio_net_config, speed, &speed);
-> > > > +
-> > > > +     if (ethtool_validate_speed(speed))
-> > > > +             vi->speed = speed;
-> > > > +
-> > > > +     virtio_cread_le(vi->vdev, struct virtio_net_config, duplex, &duplex);
-> > > > +
-> > > > +     if (ethtool_validate_duplex(duplex))
-> > > > +             vi->duplex = duplex;
-> > > > +}
-> > > > +
-> > > >  static int virtnet_open(struct net_device *dev)
-> > > >  {
-> > > >       struct virtnet_info *vi = netdev_priv(dev);
-> > > > @@ -2494,6 +2513,18 @@ static int virtnet_open(struct net_device *dev)
-> > > >                       goto err_enable_qp;
-> > > >       }
-> > > >
-> > > > +     if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-> > > > +             virtio_config_driver_enable(vi->vdev);
-> > > > +             /* Do not schedule the config change work as the
-> > > > +              * config change notification might have been disabled
-> > > > +              * by the virtio core. */
-> > >
-> > > I don't get why you need this.
-> > > If the notification was disabled it will just trigger later.
-> > > This is exactly why using core is a good idea.
-> >
-> > So we need a read here (this seems to be not rare for most modern
-> > hardware NICs) because we don't know if the link status is changed or
-> > not and it is not guaranteed by virtio_config_driver_enable() since it
-> > only works when there's a pending config change. Another thing is that
-> > the device is being freezed, so the virtio core may prevent the device
-> > from accessing the device.
-> >
-> > So using virtio_config_changed() will guaranteed that:
-> >
-> > 1) if the device is not being freezed, it will read the config space soon
-> > 2) if the device is being freezed, the read of the config space will
-> > be delayed to resume
-> >
-> > >
-> > >
-> > > > +             virtio_config_changed(vi->vdev);
-> > > > +     } else {
-> > > > +             vi->status = VIRTIO_NET_S_LINK_UP;
-> > > > +             virtnet_update_settings(vi);
-> > >
-> > >
-> > > And why do we need this here I don't get at all.
-> >
-> > See above, because doing this on a probe is racy and buggy: The
-> > opersate is up even if the adminstate is not, this is conflict with
-> > RFC2863:
-> >
-> > "
-> > If ifAdminStatus is down(2) then ifOperStatus
-> >             should be down(2)
-> > "
-> >
-> > >
-> > > > +             netif_carrier_on(dev);
-> > > > +     }
-> > >
-> > >
-> > >
-> > > > +
-> > > >       return 0;
-> > > >
-> > > >  err_enable_qp:
-> > > > @@ -2936,12 +2967,19 @@ static int virtnet_close(struct net_device *dev)
-> > > >       disable_delayed_refill(vi);
-> > > >       /* Make sure refill_work doesn't re-enable napi! */
-> > > >       cancel_delayed_work_sync(&vi->refill);
-> > > > +     /* Make sure config notification doesn't schedule config work */
-> > > > +     virtio_config_driver_disable(vi->vdev);
-> > > > +     /* Make sure status updating is cancelled */
-> > > > +     cancel_work_sync(&vi->config_work);
-> > > >
-> > > >       for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > >               virtnet_disable_queue_pair(vi, i);
-> > > >               virtnet_cancel_dim(vi, &vi->rq[i].dim);
-> > > >       }
-> > > >
-> > > > +     vi->status &= ~VIRTIO_NET_S_LINK_UP;
-> > > > +     netif_carrier_off(dev);
-> > > > +
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > > @@ -4640,25 +4678,6 @@ static void virtnet_init_settings(struct net_device *dev)
-> > > >       vi->duplex = DUPLEX_UNKNOWN;
-> > > >  }
-> > > >
-> > > > -static void virtnet_update_settings(struct virtnet_info *vi)
-> > > > -{
-> > > > -     u32 speed;
-> > > > -     u8 duplex;
-> > > > -
-> > > > -     if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX))
-> > > > -             return;
-> > > > -
-> > > > -     virtio_cread_le(vi->vdev, struct virtio_net_config, speed, &speed);
-> > > > -
-> > > > -     if (ethtool_validate_speed(speed))
-> > > > -             vi->speed = speed;
-> > > > -
-> > > > -     virtio_cread_le(vi->vdev, struct virtio_net_config, duplex, &duplex);
-> > > > -
-> > > > -     if (ethtool_validate_duplex(duplex))
-> > > > -             vi->duplex = duplex;
-> > > > -}
-> > > > -
-> > > >  static u32 virtnet_get_rxfh_key_size(struct net_device *dev)
-> > > >  {
-> > > >       return ((struct virtnet_info *)netdev_priv(dev))->rss_key_size;
-> > > > @@ -6000,13 +6019,6 @@ static int virtnet_probe(struct virtio_device *vdev)
-> > > >       /* Assume link up if device can't report link status,
-> > > >          otherwise get link status from config. */
-> > > >       netif_carrier_off(dev);
-> > > > -     if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-> > > > -             schedule_work(&vi->config_work);
-> > > > -     } else {
-> > > > -             vi->status = VIRTIO_NET_S_LINK_UP;
-> > > > -             virtnet_update_settings(vi);
-> > > > -             netif_carrier_on(dev);
-> > > > -     }
-> > >
-> > >
-> > > Here it all made sense - we were reading config for the 1st time.
-> >
-> > See above.
-> >
-> > Thanks
-> >
-> > >
-> > >
-> > > >       for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
-> > > >               if (virtio_has_feature(vi->vdev, guest_offloads[i]))
-> > > > --
-> > > > 2.31.1
-> > >
-> > >
+[1]
+BUG: KCSAN: data-race in sk_psock_drop / sk_psock_skb_ingress_enqueue
+
+write to 0xffff88814b3278b8 of 8 bytes by task 10724 on cpu 1:
+ sk_psock_stop_verdict net/core/skmsg.c:1257 [inline]
+ sk_psock_drop+0x13e/0x1f0 net/core/skmsg.c:843
+ sk_psock_put include/linux/skmsg.h:459 [inline]
+ sock_map_close+0x1a7/0x260 net/core/sock_map.c:1648
+ unix_release+0x4b/0x80 net/unix/af_unix.c:1048
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0x68/0x150 net/socket.c:1421
+ __fput+0x2c1/0x660 fs/file_table.c:422
+ __fput_sync+0x44/0x60 fs/file_table.c:507
+ __do_sys_close fs/open.c:1556 [inline]
+ __se_sys_close+0x101/0x1b0 fs/open.c:1541
+ __x64_sys_close+0x1f/0x30 fs/open.c:1541
+ do_syscall_64+0xd3/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+read to 0xffff88814b3278b8 of 8 bytes by task 10713 on cpu 0:
+ sk_psock_data_ready include/linux/skmsg.h:464 [inline]
+ sk_psock_skb_ingress_enqueue+0x32d/0x390 net/core/skmsg.c:555
+ sk_psock_skb_ingress_self+0x185/0x1e0 net/core/skmsg.c:606
+ sk_psock_verdict_apply net/core/skmsg.c:1008 [inline]
+ sk_psock_verdict_recv+0x3e4/0x4a0 net/core/skmsg.c:1202
+ unix_read_skb net/unix/af_unix.c:2546 [inline]
+ unix_stream_read_skb+0x9e/0xf0 net/unix/af_unix.c:2682
+ sk_psock_verdict_data_ready+0x77/0x220 net/core/skmsg.c:1223
+ unix_stream_sendmsg+0x527/0x860 net/unix/af_unix.c:2339
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x140/0x180 net/socket.c:745
+ ____sys_sendmsg+0x312/0x410 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x1e9/0x280 net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
+ do_syscall_64+0xd3/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+value changed: 0xffffffff83d7feb0 -> 0x0000000000000000
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 10713 Comm: syz-executor.4 Tainted: G        W          6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+
+Prior to this, commit 4cd12c6065df ("bpf, sockmap: Fix NULL pointer
+dereference in sk_psock_verdict_data_ready()") fixed one NULL pointer
+similarly due to no protection of saved_data_ready. Here is another
+different caller causing the same issue because of the same reason. So
+we should protect it with sk_callback_lock read lock because the writer
+side in the sk_psock_drop() uses "write_lock_bh(&sk->sk_callback_lock);".
+
+To avoid errors that could happen in future, I move those two pairs of
+lock into the sk_psock_data_ready(), which is suggested by John Fastabend.
+
+Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+Reported-by: syzbot+aa8c8ec2538929f18f2d@syzkaller.appspotmail.com
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=aa8c8ec2538929f18f2d
+Link: https://lore.kernel.org/all/20240329134037.92124-1-kerneljasonxing@gmail.com
+Link: https://lore.kernel.org/bpf/20240404021001.94815-1-kerneljasonxing@gmail.com
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Ashwin: Regenerated the patch for v5.10]
+Signed-off-by: Ashwin Dayanand Kamat <ashwin.kamat@broadcom.com>
+---
+ include/linux/skmsg.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+index 1138dd3071db..a197c9a49e97 100644
+--- a/include/linux/skmsg.h
++++ b/include/linux/skmsg.h
+@@ -406,10 +406,12 @@ static inline void sk_psock_put(struct sock *sk, struct sk_psock *psock)
+ 
+ static inline void sk_psock_data_ready(struct sock *sk, struct sk_psock *psock)
+ {
++	read_lock_bh(&sk->sk_callback_lock);
+ 	if (psock->parser.enabled)
+ 		psock->parser.saved_data_ready(sk);
+ 	else
+ 		sk->sk_data_ready(sk);
++	read_unlock_bh(&sk->sk_callback_lock);
+ }
+ 
+ static inline void psock_set_prog(struct bpf_prog **pprog,
+-- 
+2.45.1
 
 
