@@ -1,79 +1,77 @@
-Return-Path: <netdev+bounces-111833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4987893359D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 05:18:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468579335CD
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 05:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04D7F284FA6
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 03:18:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF8001F241FC
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 03:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D0146BF;
-	Wed, 17 Jul 2024 03:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555E14685;
+	Wed, 17 Jul 2024 03:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYeqepLi"
+	dkim=pass (1024-bit key) header.d=ayaya.dev header.i=@ayaya.dev header.b="l/zypqJX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818997470;
-	Wed, 17 Jul 2024 03:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AFA566A
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 03:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721186305; cv=none; b=VkCx0cA6GzvOhljB9yuuLVpbtj9diaMY0cl7egcIInR662fXH6BG0lS/yTb7UbEQNUUomU0PmLRBwd5NIx7NfHy4tq64B2ee8N3L1HRnq0jFV5+TcvKb7/jRR6OjxPqTsfPwzz4RNynDm6hklIP9JxmOuCkOMa3lG1ZhWl+rOpQ=
+	t=1721187979; cv=none; b=MG5CWaJaXnR21ogeaWRnf7jHu0IquGM5tQzXGc4vZ6coZRs/QyBLnreAfL48xhzf51t/dxQ/Lz1icLmZWOfv2aNP5mfRSFJWvgbTlcBLlSs72984bD6bR6cksV6jSzJeIQ4lfNqdZ8/rk4J8QvJDd1te0PS+embc/3RqkQ5kUWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721186305; c=relaxed/simple;
-	bh=I8CQ0U3NqahQXeHjkloDUQhgs39lVV2fDrovWgcivWI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Eaq7nX4qqwu1dD+M+VeZe2lNCbwza2vQ/p/fWtDjyjdSPeh3P4ievOnW8d6gcWBNOIVpI6KkJTZWmIi3XpGkhPK0DD1z1EPH5B971PHgQdUti4jNmEhLg0z09NsTx1UYInpSwmn+6awBM/yIMPPIpnriZQVYaFdt71q7paywbOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYeqepLi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5AF1EC116B1;
-	Wed, 17 Jul 2024 03:18:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721186305;
-	bh=I8CQ0U3NqahQXeHjkloDUQhgs39lVV2fDrovWgcivWI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=lYeqepLiQCgNez8J/Hm2mNsNEmZEzQdzK+ztVNo/O0RLyf79ZLypTz+ZxhQC5s1jj
-	 YCIqL62ypgoeyZwOtFNh0bWYmrTbZMRJ4nj57XEZ3h6KNXvzOLhVx540EzEtLhF6jr
-	 xMv8a3QibC8ZJj7hBWFYB4gusdzVr/Qk0Q/1bGxuzjWWEGQ3QEtn91MHTPF8jEVjyv
-	 en6B5GBgv0CRw3jWE/OGBsw2veYvm60VujKtyEOFzZyW53Eawg01cdXv/lQ1lT2CzL
-	 GSLlz47Nmo8U/Xf409c4JIjI9+TVNl7qoRkWIdMztmVDtAQ2UXrbsaygfp79Z6cRnt
-	 YLTqy8QUjGVIg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5058BC43445;
-	Wed, 17 Jul 2024 03:18:25 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.11
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240716152031.1288409-1-kuba@kernel.org>
-References: <20240716152031.1288409-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240716152031.1288409-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.11
-X-PR-Tracked-Commit-Id: 77ae5e5b00720372af2860efdc4bc652ac682696
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 51835949dda3783d4639cfa74ce13a3c9829de00
-Message-Id: <172118630531.26472.14995872094367271844.pr-tracker-bot@kernel.org>
-Date: Wed, 17 Jul 2024 03:18:25 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1721187979; c=relaxed/simple;
+	bh=bST+xxFcijOrBD69lZmfNCbRSgagZWWhRdwmajXKqCQ=;
+	h=Message-Id:To:From:Date:Subject; b=u1/Y0lSdUk14LLzy3hrzZK6y9+VeKnh4DYAgwaloM8Kl1w1nCqQeQ+qiC6n6DljsfVFUSPBNpI4c/FwvuEX96JeUaKVBmid994NL2Ca+vhlAMlDyzHGHDjMXVp1iHpUiFG8rvN7DETpTRqXj8wE6jWDzTOOxy2PIsAgNCNSeCF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ayaya.dev; spf=pass smtp.mailfrom=ayaya.dev; dkim=pass (1024-bit key) header.d=ayaya.dev header.i=@ayaya.dev header.b=l/zypqJX; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ayaya.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ayaya.dev
+X-Envelope-To: netdev@vger.kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ayaya.dev; s=key1;
+	t=1721187974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc; bh=zersvC+L3E4SApUB683mmrYO3rRig8jeDUQYxKRKD+8=;
+	b=l/zypqJXZC+ve6ZUhavHx/Hs+JRY88+2EGPCeI+oNfH6/fVRFtmbKSeFxVWi0QIcoQFS8p
+	GdgnQJdZ/ANNDht0wnAZHRvMxLNf9MAnVS/Yz4gu6+INAVWdTCVwIhHJpcQBGrLxLwKzJY
+	61ZkkHsNY7mh/r0ZmR1NsvidhLR7m6A=
+Message-Id: <D2RI7Q8MEQEJ.3KAN74XCKVF8B@ayaya.dev>
+To: <netdev@vger.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "psykose" <alice@ayaya.dev>
+Date: Wed, 17 Jul 2024 05:44:43 +0200
+Subject: [PATCH] libnetlink: include endian.h for htobe64
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-The pull request you sent on Tue, 16 Jul 2024 08:20:31 -0700:
+fixes build against musl libc which is more strict about header namespaces.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.11
+Signed-off-by: psykose <alice@ayaya.dev>
+---
+ include/libnetlink.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/51835949dda3783d4639cfa74ce13a3c9829de00
+diff --git a/include/libnetlink.h b/include/libnetlink.h
+index 30f0c2d2..0139efa0 100644
+--- a/include/libnetlink.h
++++ b/include/libnetlink.h
+@@ -2,6 +2,7 @@
+ #ifndef __LIBNETLINK_H__
+ #define __LIBNETLINK_H__ 1
+ 
++#include <endian.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <asm/types.h>
 
-Thank you!
-
+base-commit: af9559b23367b01d0f1184c75cdf0cab9c6930ac
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.45.2
 
