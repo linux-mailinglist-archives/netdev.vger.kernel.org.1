@@ -1,140 +1,145 @@
-Return-Path: <netdev+bounces-111874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3192D933D94
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 15:26:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CEAB933D99
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 15:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5297282257
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 13:26:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C0671F23462
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 13:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654771802B2;
-	Wed, 17 Jul 2024 13:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 937BC180A98;
+	Wed, 17 Jul 2024 13:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TtPjIMXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6721217E907
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 13:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7773A1802CD
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 13:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721222799; cv=none; b=ZHl8vxD60WJ5o+QTlUKrZ8CQJ97J16tsM5hKtgsxLbH7qR0MqDbwqKMyh6EQH3bDvyyCHqzIeN+AP7aRnJKK6FlCHh3gt123Oc/MadAcrfLZygXDoqqHTOOyj+d4bGafjs4+Ki07DKqZ6IVP3irT/NqdRVcYzk1LiqHOBYau13E=
+	t=1721222903; cv=none; b=IoUbnwiegSQIg2VJ6+gBlcI2HkWBKaxbQiuW9WwSK5gNSCoxS21LLbPU/3vb+NYID24M6eW2GcnBwXHdFnL5Zvz/gsMFs7Zk03mBuPKW882W8TWHfO2mOZeiIZmII2fs62WIU4Lfmy1xg7WrOWWcAgTAXp4pJIjpNKWGCZUH0Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721222799; c=relaxed/simple;
-	bh=5LCwPiKc6zNy+mcQ/5LraEI8W/UsHGqguoqNdwJpXaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=aBNm9kQTUKN4iKVznaXaj1pEFUOQjwkL1L19NJRbEYEcSB5ADHdgBoKP0YnuE46UU+wIgWpdBcRo5OUjbq8ImbbLdWrX40ufRvS+dM8tbnGS9chHivo3CYI7cbIMMR2i8WXoJ5RZiLiZxcYtGYER/Ijf6pflaVkzHoCGowZWm6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-38-zT2pYzR7PgmLFd4LAFaZ0Q-1; Wed,
- 17 Jul 2024 09:26:32 -0400
-X-MC-Unique: zT2pYzR7PgmLFd4LAFaZ0Q-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 529761955D5A;
-	Wed, 17 Jul 2024 13:26:30 +0000 (UTC)
-Received: from hog (unknown [10.39.192.3])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 686B519560B2;
-	Wed, 17 Jul 2024 13:26:26 +0000 (UTC)
-Date: Wed, 17 Jul 2024 15:26:24 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
-	pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
-Subject: Re: [PATCH net-next v5 22/25] ovpn: kill key and notify userspace in
- case of IV exhaustion
-Message-ID: <ZpfGgHOqgSc9vOnx@hog>
-References: <20240627130843.21042-1-antonio@openvpn.net>
- <20240627130843.21042-23-antonio@openvpn.net>
- <ZpegDb1F4-uBMwpe@hog>
- <b631abf1-b390-45fb-b463-ac49fec0fdfe@openvpn.net>
+	s=arc-20240116; t=1721222903; c=relaxed/simple;
+	bh=i5fDdDHEtX7vNR12mFEKIETqZ0WT4Yxwoz5sgAv+nGc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OqrDQiuD2Cx71cEUsV78p7p+yU91GoqFDEtDySm/CqBnfpiIHX0y4ebi2/Szwnin/ik23Y2RzpMPGRIcn5wpCzoBR2etPLHxbfqXIm60L9l4Nu9U/91FqY5SuiQvzGwfC+qjA2tDil6PpTWKPqL6cVVWDwxwsWxdRo7ElxZtdR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TtPjIMXf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721222898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ItohwBK9euwv/uwdzmdFu/crsWLVAK5HqaVyEtkiNe8=;
+	b=TtPjIMXfPyHqLY1XFxRcVeUz3fQ6+jmkEZ3byhnATOYbpumN1x5SZIFNIPmMhD6ZqQX3E9
+	8gjp5DtQtmbCTl/xuw6PCovp8CrXHygnUPSKKJkEFATbl41Ng3qmd5u+CYl7BDHiSouklf
+	qFnklcLI+0shXONx+HgMMQeD6kBBI2U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-3mzbL4OmOjmWQjUIMSOW7w-1; Wed, 17 Jul 2024 09:28:14 -0400
+X-MC-Unique: 3mzbL4OmOjmWQjUIMSOW7w-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-426d316a96cso49116535e9.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 06:28:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721222892; x=1721827692;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ItohwBK9euwv/uwdzmdFu/crsWLVAK5HqaVyEtkiNe8=;
+        b=MI6xtYKP/Fc8penLAkEJ5XX5dfPFCNi3oNlZzWU9OveBYyb8LCLntsHlnsv+ZvB465
+         lPWNqCSeOEfCCkVefj/j0uCDKIJU5Qdn2eS+rnSc+/LAbgnltO9rGqfb/4Rg31eRaUtw
+         QoKpW3qgqp4MmGxBnDMKr/ide7JjtwGuDyZsivAk1RSgTgjUn4gM+UId+fzYIAlDCQts
+         UcsM9QaiUeQ64t1AKXAj7HdAag7//dmWSNlr5z1zF25ig79N/GMH03jrnjgsXZv1sHYz
+         7ocqxLmkp7AU2IKpM8zaetxjBh8V1G3F/VpMY9ycDHS/FdRqdL+mAK3rWHePLXashcls
+         vUqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXYDKFo7H+oumyKh+9a/WJynPJjM0FgFP0g2p0Kw4MntpsqLKePp8y4M1XZANS3cDfrFfJCEAD/LXZAq8OJLYkstytlLOtT
+X-Gm-Message-State: AOJu0YyXLHhBvxEbKst3ezqaqLDk/OG6+MLa5qFiSPntqw1Cye53SfUp
+	LjngfwaTF0H10rWSMNDXkaMIpLF3GUFbs/wANYzH+wKtbV4FyQRNtZt/HVSLJzdQL2tGHHdKG8U
+	3c8bMUOgNY0sZGtREfSE2EUs02NsQFGBIpaimQA1Bu364eK3WkPYZdw==
+X-Received: by 2002:a05:6000:d90:b0:368:3194:8a85 with SMTP id ffacd0b85a97d-36831948efamr1354440f8f.7.1721222892505;
+        Wed, 17 Jul 2024 06:28:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpTaAUfRVNU5Xu+qR1JE/9Bc1YiuNYvppU3YdvKcMCaYdPaRWowG53BU48+Swh1yPrb+brsQ==
+X-Received: by 2002:a05:6000:d90:b0:368:3194:8a85 with SMTP id ffacd0b85a97d-36831948efamr1354427f8f.7.1721222892139;
+        Wed, 17 Jul 2024 06:28:12 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680db04731sm11642192f8f.112.2024.07.17.06.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 06:28:11 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 42675145D491; Wed, 17 Jul 2024 15:28:11 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, Michal Switala
+ <michal.switala@infogain.com>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, revest@google.com,
+ syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com,
+ alexei.starovoitov@gmail.com
+Subject: Re: [PATCH] bpf: Ensure BPF programs testing skb context
+ initialization
+In-Reply-To: <250854fc-ce22-4866-95f9-d61f6653af64@linux.dev>
+References: <CAADnVQJPzya3VkAajv02yMEnQLWtXKsHuzjZ1vQ6R19N_BZkTQ@mail.gmail.com>
+ <20240715181339.2489649-1-michal.switala@infogain.com>
+ <250854fc-ce22-4866-95f9-d61f6653af64@linux.dev>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 17 Jul 2024 15:28:11 +0200
+Message-ID: <87y160407o.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b631abf1-b390-45fb-b463-ac49fec0fdfe@openvpn.net>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-2024-07-17, 13:03:11 +0200, Antonio Quartulli wrote:
-> On 17/07/2024 12:42, Sabrina Dubroca wrote:
-> > I don't see any way for userspace to know the current IV state (no
-> > notification for when the packetid gets past some threshold, and
-> > pid_xmit isn't getting dumped via netlink), so no chance for userspace
-> > to swap keys early and avoid running out of IVs. And then, since we
-> > don't have a usable primary key anymore, we will have to drop packets
-> > until userspace tells the kernel to swap the keys (or possibly install
-> > a secondary).
-> >=20
-> > Am I missing something in the kernel/userspace interaction?
->=20
-> There are two events triggering userspace to generate a new key:
-> 1) time based
-> 2) packet count based
->=20
-> 1) is easy: after X seconds/minutes generate a new key and send it to the
-> kernel. It's obviously based on guestimate and normally our default works
-> well.
->=20
-> 2) after X packets/bytes generate a new key. Here userspace keeps track o=
-f
-> the amount of traffic by periodically polling GET_PEER and fetching the
-> VPN/LINK stats.
+Martin KaFai Lau <martin.lau@linux.dev> writes:
 
-Oh right, that's what I was missing. TX packet count should be
-equivalent to packetid. Thanks.
+> On 7/15/24 11:13 AM, Michal Switala wrote:
+>
+>  >> Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
+>  >> Closes: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+>  >> Link: https://lore.kernel.org/all/000000000000b95d41061cbf302a@google.com/
+>  >
+>  > Something doesn't add up.
+>  > This syzbot report is about:
+>  >
+>  > dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+>  > __xdp_do_redirect_frame net/core/filter.c:4397 [inline]
+>  > bpf_prog_test_run_xdp
+>  >
+>  > why you're fixing bpf_prog_test_run_skb ?
+>
+>
+> [ Please keep the relevant email context in the reply ]
+>
+>
+>> The reproducer calls the methods bpf_prog_test_run_xdp and
+>> bpf_prog_test_run_skb. Both lead to the invocation of dev_map_enqueue, in the
+>
+> The syzbot report is triggering from the bpf_prog_test_run_xdp. I agree with 
+> Alexei that fixing the bpf_prog_test_run_skb does not make sense. At least I 
+> don't see how dev_map_enqueue can be used from bpf_prog_test_run_skb.
 
+Me neither.
 
-> A future improvement could be to have ovpn proactively notifying userspac=
-e
-> after reaching a certain threshold, but for now this mechanism does not
-> exist.
+> It looks very similar to 
+> https://lore.kernel.org/bpf/000000000000f6531b061494e696@google.com/. It has 
+> been fixed in commit 5bcf0dcbf906 ("xdp: use flags field to disambiguate 
+> broadcast redirect")
+>
+> I tried the C repro. I can reproduce in the bpf tree also which should have the 
+> fix. I cannot reproduce in the bpf-next though.
+>
+> Cc Toke who knows more details here.
 
-If it's not there from the start, you won't be able to rely on it
-(because the userspace client may run on a kernel that does not
-provide the notification), so you would still have to fetch the stats,
-unless you have a way to poll for the threshold notification feature
-being present.
+Hmm, yeah, it does look kinda similar. Do you mean that the C repro from
+this new report triggers the crash for you on the current -bpf tree?
 
-
-> I hope it helps.
-
-Yup, thanks. Can you add this explanation to the commit message for
-this patch in the next version? Documenting a bit the expectations of
-the kernel/userspace interactions would be helpful, also for the
-sequencing of key installation/key swap operations. I'm guessing it
-goes something like this:
-
- 1. client sets up a primary key (key#1) and uses it
- 2. at some point, it sets up a secondary key (key#2)
- 3. later, keys are swapped (key#2 is now primary)
- 4. after some more time, the secondary (key#1) is removed and a new
-    secondary (key#3) is installed
- [steps 3 and 4 keep repeating]
-
-And from reading patch 21, both the TX and RX key seem to be changed
-together (swap and delete operate on the whole keyslot, and set
-requires both the ENCRYPT_DIR and DECRYPT_DIR attributes).
-
-A rough description of the overall life of a client (opening sockets
-and setting up the ovpn device/peers) could also be useful alongside
-the code.
-
---=20
-Sabrina
+-Toke
 
 
