@@ -1,130 +1,168 @@
-Return-Path: <netdev+bounces-111901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 501FE93406A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 18:28:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95ED593407B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 18:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0D761F21AF3
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 16:28:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21DDFB231C9
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 16:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048AB181BBF;
-	Wed, 17 Jul 2024 16:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4C01822E2;
+	Wed, 17 Jul 2024 16:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CC5bSFjQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ttkm+dh5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EED5B05E;
-	Wed, 17 Jul 2024 16:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843AB6FB9;
+	Wed, 17 Jul 2024 16:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721233726; cv=none; b=rthlfNk9YKrGb4IIuqOax2l9q49wXfr6E7Al/Bdk+yG7OuV3DG+2nIH5ArwSsd9+pSMuvyRzJ7pkQdsn2utWIuNhNFP5hF9zT+RDihtUd5NzPGrn1XQGmon0/vdhVbMGEBH0JBSBvjVxRFMeB4BcLUMUPETo7JG5ai0yWoDXyD8=
+	t=1721233932; cv=none; b=tMTC4d3TnpLUoGQUBq2QI6GKd35eT0AkBPfoxHkLdAwUF32SogGyLvnXq7qEandoj8dofIziEHmAPJYACPpPu7H1VrXyfr2jSqeu6CHbOyerQHOY5eXFhtMCuUA6eOf0utmPONKMaAUfghGWcqCY/BWMZBYGwEg1EM7mpZK05Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721233726; c=relaxed/simple;
-	bh=kyPhzTGtGDNL9biDJoif92+wviaphqfQaaifLhJuCiY=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=lbLLrB4jUrFRR8N+Fo9Wxm48NVbs8yTGlmDMZ7JhnPwk34SYVnw8eBE4I/enAaCKRAzPpwTsUPjRTDUlwxsTttEjGp3QYCOit1m0V9aeNINwqOkTb7m5wP08dLyQnaDBPCJMx1ChxXzQdA8S+p2gLu93x7UtRAxyXvnHI94TV7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CC5bSFjQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B6FCC4AF0D;
-	Wed, 17 Jul 2024 16:28:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721233726;
-	bh=kyPhzTGtGDNL9biDJoif92+wviaphqfQaaifLhJuCiY=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=CC5bSFjQbhTweghK6PGptJBHlyIoAbxCjQY5ac5vlvR1ObQmyOcQiwWUdUgYvqywU
-	 V/8f2Ja6GHOfXdg1ZzIRad/NjjmCSUhLzF0YzjhewJ+JKfkWBtOAYbYpPclb5NyqFM
-	 2MvDpRRRrtT/de4e5Y6ctIjkH9PshhUO00M3GdBoa3Kmtmop/C1cc/rhULx7YxnULA
-	 7j4+bhjh7U8IbTGR+mEw2z96y5IzPXgnu6fvPs/BSL42412pUW6kl5UvMSEvHsYJix
-	 Rx0yF7Jn12WJO73oPBzdkEAdc1JwdcBLOWsi+lJXvq3c6ZcLbLvtw+ELBdmUJL9ye6
-	 PnucQAoEiEyXw==
-Date: Wed, 17 Jul 2024 10:28:43 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1721233932; c=relaxed/simple;
+	bh=3fUCNNaJXzS7JuiTOKDc4frw9Riwja6uOzB2OgTupcs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pk5cO9vEp3qciwHTH5h1pRfM6XGsK0MttQk63Arqfyh5y1Q+s2+2+IxVJRL0DUYeovQnRTHxdar13wGMhlriszsJF57z+2oXyN/+Q3pA0yWe7N0E9CCBHyj+pLu9EfldfnUgBpW3Sdo2fmVI0fvcfi1CT98Nxz6JR+WYTnp3PZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ttkm+dh5; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a05b4fa525so84084085a.1;
+        Wed, 17 Jul 2024 09:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721233929; x=1721838729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tmMW3QotAs6Her4vmCKKRFApsHyxNhbddH+wP64vdF4=;
+        b=Ttkm+dh576N/85bgOm2jVXyfwDlfZBslSU5CAq0ha6plNDdcAlG9M+nOdeN+yAIeJt
+         xnBbdiEHKRHBXu6ECk+3+0u3Dmm7On8joa9FwdYiY/CWfXDVCvfk06aHh06e94kNo5km
+         Lwy5ljz3Eyka+R9Gxm0AVMGqCdZ/D1rX8yS5+hoKESvhBtYwc4fYHunWrndswuzFPt08
+         E61sEFVGJ5dI+j6Y9jrLQvz8O8pHByoFo56M4wC8mzk6dvq+KXW83QyeufPh2xw3UgeS
+         CK2mg97jI7GHhualOCoSEwSCd+nx9vdTT5YuCysfWTDsjuHcgfFW2eTiXCZdlEjhwmIe
+         TAEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721233929; x=1721838729;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tmMW3QotAs6Her4vmCKKRFApsHyxNhbddH+wP64vdF4=;
+        b=Wqq8BcZe+RS8TojqOyuiK+ZziSI0BYLuNwoHM8ICz08aFTO6jj9V+5MtILhild21Hs
+         +V0EC7okyR6TSWDhPio/ofmWK+xqSasQ5JBKaFSSUrl8QmJrSUaMeRC86eWsPvxjvuWs
+         r4wvL8C17Y2vTmgVGIWcF3cola7IDYjrD7HUsULojFf2iq7u67Lfwv45j1DpuRwtHn9N
+         5ybqoIA7mGDA3+7noi3Jg1maR+JxvOU1UjpcIe34ArouEK1lrizoSctxGF0VAjP+BC/H
+         tYU3WPLI6Php7mR+4T4W6tTUtCWeitzKfouQ/rfkqH4MeYaYDJ4FeYnoMRH9KFoa+Yti
+         DqWw==
+X-Forwarded-Encrypted: i=1; AJvYcCX2Cw1OFBTCUk8f6XMRjeXQ+BbPUI10dB9ht2FbaSqOSGW3olzrKPQjusEcLxti7QtiKuUFHs8SHwppPATbptNSgg0KFSVTvBDtQAmPcsRBQDmDP1T7m4x6oVeARxB9j3TDgFev
+X-Gm-Message-State: AOJu0Yy5wpex+sysxykUXdPR+LZ9KBtCQYOW0c3//lLrPQX4G5Pfkar5
+	VvZfaEXT0Q9x6lLSocRsrBV+AHvBtGn8/g184dl0vMmlIt4QmVxV
+X-Google-Smtp-Source: AGHT+IEWVMngP8w6cNex5dWAr9Yp33iJOatF0vo2y029Lbb3iYHvJwJf5hFjDKhq5B+bjXSSb99uWw==
+X-Received: by 2002:a05:620a:858:b0:79d:554d:731f with SMTP id af79cd13be357-7a18dc06099mr26838685a.29.1721233929273;
+        Wed, 17 Jul 2024 09:32:09 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a160b9c31dsm418156485a.20.2024.07.17.09.32.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 09:32:08 -0700 (PDT)
+Date: Wed, 17 Jul 2024 12:32:08 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Fred Li <dracodingfly@gmail.com>, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ herbert@gondor.apana.org.au
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ Fred Li <dracodingfly@gmail.com>
+Message-ID: <6697f20876b11_34277329417@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240717053540.2438-1-dracodingfly@gmail.com>
+References: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
+ <20240717053540.2438-1-dracodingfly@gmail.com>
+Subject: Re: [PATCH v3] net: linearizing skb when downgrade gso_size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Rayyan Ansari <rayyan.ansari@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, linux-arm-msm@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, 
- devicetree@vger.kernel.org, Timur Tabi <timur@kernel.org>
-In-Reply-To: <20240717090931.13563-1-rayyan.ansari@linaro.org>
-References: <20240717090931.13563-1-rayyan.ansari@linaro.org>
-Message-Id: <172123372353.179030.4294895894656071334.robh@kernel.org>
-Subject: Re: [PATCH] dt-bindings: net: qcom,emac: convert to dtschema
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
+Fred Li wrote:
+> Linearizing skb when downgrade gso_size because it may
+> trigger the BUG_ON when segment skb as described in [1].
+> 
+> v3 changes:
+>   linearize skb if having frag_list as Willem de Bruijn suggested[2].
+> 
+> [1] https://lore.kernel.org/all/20240626065555.35460-2-dracodingfly@gmail.com/
+> [2] https://lore.kernel.org/all/668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch/
+> 
+> Signed-off-by: Fred Li <dracodingfly@gmail.com>
 
-On Wed, 17 Jul 2024 10:09:27 +0100, Rayyan Ansari wrote:
-> Convert the bindings for the Qualcomm EMAC Ethernet Controller from the
-> old text format to yaml.
-> 
-> Also move the phy node of the controller to be within an mdio block so
-> we can use mdio.yaml.
-> 
-> Signed-off-by: Rayyan Ansari <rayyan.ansari@linaro.org>
+A fix needs a Fixed tag.
+
+This might be the original commit that introduced gso_size adjustment,
+commit 6578171a7ff0c ("bpf: add bpf_skb_change_proto helper")
+
+Unless support for frag_list came later.
+
 > ---
->  .../devicetree/bindings/net/qcom,emac.yaml    |  98 ++++++++++++++++
->  .../devicetree/bindings/net/qcom-emac.txt     | 111 ------------------
->  2 files changed, 98 insertions(+), 111 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/qcom,emac.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/qcom-emac.txt
+>  net/core/filter.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index df4578219e82..70919b532d68 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3525,13 +3525,21 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+>  	if (skb_is_gso(skb)) {
+>  		struct skb_shared_info *shinfo = skb_shinfo(skb);
+>  
+> -		/* Due to header grow, MSS needs to be downgraded. */
+> -		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+> -			skb_decrease_gso_size(shinfo, len_diff);
+> -
+>  		/* Header must be checked, and gso_segs recomputed. */
+>  		shinfo->gso_type |= gso_type;
+>  		shinfo->gso_segs = 0;
+> +
+> +		/* Due to header grow, MSS needs to be downgraded.
+> +		 * There is BUG_ON When segment the frag_list with
+> +		 * head_frag true so linearize skb after downgrade
+> +		 * the MSS.
+> +		 */
+
+Super tiny nit: no capitalization of When in the middle of a sentence.
+
+> +		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO)) {
+> +			skb_decrease_gso_size(shinfo, len_diff);
+> +			if (shinfo->frag_list)
+> +				return skb_linearize(skb);
+
+I previously asked whether it was safe to call pskb_expand_head from
+within a BPF external function. There are actually plenty of existing
+examples of this, so this is fine.
+
+> +		}
+> +
+>  	}
+>  
+>  	return 0;
+> -- 
+> 2.33.0
 > 
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,emac.example.dtb: ethernet@feb20000: compatible: 'oneOf' conditional failed, one must be fixed:
-	'qcom,fsm9900-emac' does not match '^qcom,(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+(pro)?-.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,(sa|sc)8[0-9]+[a-z][a-z]?-.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,[ak]pss-wdt-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,gcc-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,mmcc-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,pcie-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,rpm-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac' does not match '^qcom,scm-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+.*$'
-	'qcom,fsm9900-emac' is not one of ['qcom,dsi-ctrl-6g-qcm2290', 'qcom,gpucc-sdm630', 'qcom,gpucc-sdm660', 'qcom,lcc-apq8064', 'qcom,lcc-ipq8064', 'qcom,lcc-mdm9615', 'qcom,lcc-msm8960', 'qcom,lpass-cpu-apq8016', 'qcom,usb-ss-ipq4019-phy', 'qcom,usb-hs-ipq4019-phy', 'qcom,vqmmc-ipq4019-regulator']
-	'qcom,fsm9900-emac' is not one of ['qcom,ipq806x-gmac', 'qcom,ipq806x-nand', 'qcom,ipq806x-sata-phy', 'qcom,ipq806x-usb-phy-ss', 'qcom,ipq806x-usb-phy-hs']
-	from schema $id: http://devicetree.org/schemas/arm/qcom-soc.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,emac.example.dtb: ethernet@feb38000: compatible: 'oneOf' conditional failed, one must be fixed:
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+(pro)?-.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,(sa|sc)8[0-9]+[a-z][a-z]?-.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,[ak]pss-wdt-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,gcc-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,mmcc-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,pcie-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,rpm-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' does not match '^qcom,scm-(apq|ipq|mdm|msm|qcm|qcs|q[dr]u|sa|sc|sd[amx]|sm|x1e)[0-9]+.*$'
-	'qcom,fsm9900-emac-sgmii' is not one of ['qcom,dsi-ctrl-6g-qcm2290', 'qcom,gpucc-sdm630', 'qcom,gpucc-sdm660', 'qcom,lcc-apq8064', 'qcom,lcc-ipq8064', 'qcom,lcc-mdm9615', 'qcom,lcc-msm8960', 'qcom,lpass-cpu-apq8016', 'qcom,usb-ss-ipq4019-phy', 'qcom,usb-hs-ipq4019-phy', 'qcom,vqmmc-ipq4019-regulator']
-	'qcom,fsm9900-emac-sgmii' is not one of ['qcom,ipq806x-gmac', 'qcom,ipq806x-nand', 'qcom,ipq806x-sata-phy', 'qcom,ipq806x-usb-phy-ss', 'qcom,ipq806x-usb-phy-hs']
-	from schema $id: http://devicetree.org/schemas/arm/qcom-soc.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240717090931.13563-1-rayyan.ansari@linaro.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
 
 
