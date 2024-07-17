@@ -1,125 +1,158 @@
-Return-Path: <netdev+bounces-111896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9E11933FE2
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 17:46:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 517F4934023
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 18:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9351C2812CF
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 15:46:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BFA22835C4
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 16:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9761EA6F;
-	Wed, 17 Jul 2024 15:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE5E17E914;
+	Wed, 17 Jul 2024 16:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e7xsKrXD"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="tkI1eoqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5121E526
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 15:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6E61EA8F
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 16:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721231159; cv=none; b=UquG61MJDyzfQGLsGkEdeH5SDDEd7mxz8wO0N9pzlOMSMoAu98sIpyquyfQHcqK7BL+4P/z97Pm8dDamD9iqCg2l1BNI17b5dLwshMgvytalB9QQpwhmLBa5Ndh7otOBbG1lS5mG5KRE845+89zFKa/pprXK9FoUTBdPVvKShKk=
+	t=1721232366; cv=none; b=SG0skWPb4lNv1J3mUf288vpesWT86nJYxtpYjFPqdez0IMbAfInucFvtosTT9osCvSweMj/sawXVLLA0iO+TfA0kYoksMlwq8myuAYCOk8V5uxw8aWvjTqlqAYVtVdvnF+Pl57LVTYAc6I8oVzko2AxVboZ1tY/0mg7go6IuoN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721231159; c=relaxed/simple;
-	bh=WU97PRvcw1eCZAzclkACUNm7StQBMAO7YMKsIIIFmvY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=mjK8KbFoZvE0JdDKNMfWLaNJAdjKAgMgnXV8P5NZXRy847o8ZRu0EImeFUSxYfVMOUnNC2jTMv0FGiHx8o0ivp9qFMLmWPT2y9x+9Ey+22k5BkkPfZASR7uCv3+mAL9Jz4hlQ8FQSzuSo5WvRShlEI66jdqex5MLgOZ20bOpuMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=e7xsKrXD; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-36796a9b636so4124840f8f.2
-        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 08:45:57 -0700 (PDT)
+	s=arc-20240116; t=1721232366; c=relaxed/simple;
+	bh=5WNVAqNMFxM/zy4rkculYcl8ohjxqtfGGOqIQd0dr6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=D+DfbdIO2qbtXTAAQT7P4JTsqxcmzL5IT1y/NrN/uTUMeZe69902B0xIz+52OIcqsrJot3Dlhw/195YF7oNNKJxN9x4zVmd6rvMUxZICbN/CzW0TCkBH1b/6q4wv2qmJdaw6irdGnD0op5tnC6gjdNaoABQx/oaljEcite6LEzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=tkI1eoqo; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc569440e1so3725935ad.3
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 09:06:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721231156; x=1721835956; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eiEOaR61kkdbq7vgFCTihZFmUQNkXULWvAld/7S3/Ks=;
-        b=e7xsKrXDvEija/eqKgwU6m2unzSjD1y+65rXzrf18uVw8exVBaQ7Apr0QRKp8MhT0v
-         cA9XwtUYbNqpL9qbV90+7BHjeBCJrRSQ7pxn52/2iojJ+kjcKUxp48J8aRxzVg8coz2o
-         bdZ1huD+LO6TZFJKfkii88p9Yq4P4dXgZJAW+wBKFhAnZFqzj1K2m2SkxdNd27yxEHmp
-         ZTB8SOH35z3YIwCax1WNBhudgL5/KcpvrenMttuOkGJhIi/Lg5KTCgG6mxl8F4kdR1Dj
-         mgYM3k2yiEUdk3ZRMP92Kfg0ylnfjAzGZ2zpWq8mzaz89tddd6TulqytsBCf4xtcgIc9
-         CYEQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1721232363; x=1721837163; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vU/1F6PCjN5SAnAX7DJSp4+AmuY2sHdq1Zhto+CAjnw=;
+        b=tkI1eoqoUr9CowjQosBwHwOaYF8Vt87Wv7u4LxUS5UCEQ9RISFzzyM482opaWsZ8Bs
+         498vzItQHMsbNhLemIcqkX7x/1YFxZPqLGUOxAaLzOV+fobAX09lEM0r5k0gXANaeJcq
+         k2DyejOjiBPPicNYIuCfTHih6dK5QfDJ0HwdZQhEeyk+0psOZjLM9N3SJmYGJyu5Rb7S
+         Bcrvh5/D4xaUGPYQq5vGyaDxdTtjC9POl3MCXLJGR+whtFnP+lilSJDM/dM/5+pdEG5+
+         ZytuvauiEdq7B7UmgHOohCkA9qRBXEmEnsrQFExWsE1dojM6r3TEdlMiolZMs1L10Q7Q
+         uyDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721231156; x=1721835956;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eiEOaR61kkdbq7vgFCTihZFmUQNkXULWvAld/7S3/Ks=;
-        b=PkTFBVLCY4NRzLaXUjafwrISmh8/ehMp5Sx73uFnFzPuXhcS+wi3txjAlOgDEaFTO5
-         T7yCsILGW6Ib3pqqDruX8g0BGBm/Vthzgm65zt+yBPqYFSGYsKtfK5HVaGAcdlErVtrP
-         IgLeagqcDQuHJSxSzl3TAJhhx1FN91fsICOC6O0d70VYSxX8c7ayxhmau+N/85SxMD/X
-         1aRDCwOS28ElkzMWg1S3g1SbswMIlWLJgG9cMjSsd2mkl+2mzKJNiI/OPBPpIrwlaIXt
-         BznWYjwbzVgWyEaVE2UEnmwQ8LOSCY9v/vQ1T8JzscMeCGwkr5/1abR1nOI+q1cnwpJc
-         DdRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWr4mjN04eaKTRDnoFj7su5N0u7lmdMHMfwFnD6aA6QwVxXfGxret1I6a5Yt21zkcGMuGlCFqNJmMpyWlRNQJXjz6PgpoiS
-X-Gm-Message-State: AOJu0YxGqkSK+zDJ2O2iFrsT6IitrJEZTA4ibf8nc3XLNS0z/2zrjrep
-	BmQIdUZSn5Ca2FRWYwwmnb7+VAy/PKxhpFWgeBSbo8CVr7C77E290wQPT1ajgvM=
-X-Google-Smtp-Source: AGHT+IFDX6trSWMwNc9ZLwe51D1SqBXvpQm9yC8pL4HhfVT3XAQTnv269XbWOLdNNNAKfTxT+SEvmg==
-X-Received: by 2002:adf:9d91:0:b0:367:94a7:12cb with SMTP id ffacd0b85a97d-3683171fea1mr1486166f8f.43.1721231156022;
-        Wed, 17 Jul 2024 08:45:56 -0700 (PDT)
-Received: from localhost ([2a0a:ef40:ee7:2401:197d:e048:a80f:bc44])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680dab3d37sm12127636f8f.14.2024.07.17.08.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jul 2024 08:45:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721232363; x=1721837163;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vU/1F6PCjN5SAnAX7DJSp4+AmuY2sHdq1Zhto+CAjnw=;
+        b=g0kSL5DvrbGdBbdQoEOf4tSKjL5XVYS6L88ViTGF4ZZvG66wtrfc1GjvHM8IcvJfC6
+         soszeJiXZ2C6cl44u/U1lJjHmsXoZD4aJ1FI7fMjng0WSYGbZpKaW6A9wuVEnhpo75KU
+         ORyGmbZZGgUlDVUM2bhlFThM4gW2wc8Wc2YeUbdYqYsjMNJKz29GioggCi3hqZ3YhWan
+         NJ/pO1P32D7q0upEsLzrOm3FzRwYH+CpPSGBWEbJLz0+VEGAC/9Kx7wQP3EUkzuZ8bsX
+         ZTikEHIfid7SM2Jr5+oR9GS0O++dIyAxx8zofafSxXNRbfJGd/+sLO66bk+6rLBr0D4i
+         0L+w==
+X-Gm-Message-State: AOJu0Yy4rGwOSsY5dXltulIeis37ki4hbPT4tmujLLDN8/5bf0oBfnNt
+	bEKl8CWv3C21GedvVqeSuaAFVNWQQ1eku3PTZ/94qxyyf5XsaWi304Vy3wJDHUy1S87yTWyKeom
+	t/ZQ=
+X-Google-Smtp-Source: AGHT+IHqYYXB/YOGnwEYHW9FtNt3TvkHTRNKbz9LTCb9Jdm4o5KOLLESyBrbr/WBKQtL7KLH8XXtIQ==
+X-Received: by 2002:a17:902:d507:b0:1fc:568d:5ecb with SMTP id d9443c01a7336-1fc568d6554mr9535065ad.55.1721232363491;
+        Wed, 17 Jul 2024 09:06:03 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc0bc509d2sm76961025ad.281.2024.07.17.09.06.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 09:06:03 -0700 (PDT)
+Date: Wed, 17 Jul 2024 09:06:01 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: lwn@lwn.net
+Subject: [ANNOUNCE] iproute 6.10.0 release
+Message-ID: <20240717090601.20b2871f@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 17 Jul 2024 16:45:55 +0100
-Message-Id: <D2RXISKUMBWA.ZQDKI0F03EI0@linaro.org>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: <devicetree@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Timur Tabi" <timur@kernel.org>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] dt-bindings: net: qcom,emac: convert to dtschema
-From: "Rayyan Ansari" <rayyan.ansari@linaro.org>
-X-Mailer: aerc 0.17.0-0-g6ea74eb30457
-References: <20240717090931.13563-1-rayyan.ansari@linaro.org>
- <cecaa6c3-adeb-489f-a9d2-0f43d089dd1d@lunn.ch>
-In-Reply-To: <cecaa6c3-adeb-489f-a9d2-0f43d089dd1d@lunn.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed Jul 17, 2024 at 4:20 PM BST, Andrew Lunn wrote:
-> On Wed, Jul 17, 2024 at 10:09:27AM +0100, Rayyan Ansari wrote:
-> > Convert the bindings for the Qualcomm EMAC Ethernet Controller from the
-> > old text format to yaml.
-> >=20
-> > Also move the phy node of the controller to be within an mdio block so
-> > we can use mdio.yaml.
->
-> Does the MAC driver already support this?
->
-> When i look at the emacs-phy.c there is
->
-> 	struct device_node *np =3D pdev->dev.of_node;
->
->                 ret =3D of_mdiobus_register(mii_bus, np);
->
-> I don't see anything looking for the mdio node in the tree.
->
-> 	Andrew
+This is regular release of iproute2 corresponding to the 6.10 kernel.
+Release is smaller than usual due to less activity in kernel development.
 
-Hi Andrew,
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.10.0.tar.gz
 
-Yes, from my understanding an mdio node is not explicitly needed as it
-just uses "phy-handle".
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
 
-However, I think it makes more sense to place the phy within an mdio
-node instead of directly under the controller node. This is based off
-of 5ecd39d1bc4b ("dt-bindings: net: convert emac_rockchip.txt to YAML"),
-in which the same decision was made ("Add mdio sub node"), also during a
-text -> yaml conversion.
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+
+Contributions:
+
+Chiara Meiohas (2):
+      rdma: update uapi header
+      rdma: Add an option to display driver-specific QPs in the rdma tool
+
+David Ahern (3):
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+
+Gabi Falk (1):
+      bridge/vlan.c: bridge/vlan.c: fix build with gcc 14 on musl systems
+
+Geliang Tang (1):
+      ss: mptcp: print out last time counters
+
+Ismael Luceno (1):
+      Fix usage of poll.h header
+
+Lukasz Majewski (1):
+      ip link: hsr: Add support for passing information about INTERLINK device
+
+Michal Swiatkowski (1):
+      f_flower: implement pfcp opts
+
+Parav Pandit (2):
+      devlink: Support setting max_io_eqs
+      devlink: Fix setting max_io_eqs as the sole attribute
+
+Petr Machata (4):
+      libnetlink: Add rta_getattr_uint()
+      ip: ipnexthop: Support dumping next hop group stats
+      ip: ipnexthop: Support dumping next hop group HW stats
+      ip: ipnexthop: Allow toggling collection of nexthop group HW statistics
+
+Przemek Kitszel (1):
+      man: devlink-resource: add missing words in the example
+
+Stephen Hemminger (9):
+      tc/u32: remove FILE argument
+      tc/util: remove unused argument from print_tm
+      tc/util: remove unused argument from print_action_control
+      tc/police: remove unused argument to tc_print_police
+      tc/util: remove unused argument from print_tcstats2_attr
+      uapi: update to pre 6.10-rc1 headers
+      ss: fix format string warnings
+      route: filter by interface on multipath routes
+      v6.10.0
+
+William Tu (1):
+      devlink: trivial: fix err format on max_io_eqs
+
+Wojciech Drewek (1):
+      ip: PFCP device support
+
+Yedaya Katsman (1):
+      rtmon: Align usage with ip help
+
+renmingshuai (1):
+      ip: Support filter links with no VF info
 
 
