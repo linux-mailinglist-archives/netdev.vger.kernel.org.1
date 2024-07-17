@@ -1,102 +1,143 @@
-Return-Path: <netdev+bounces-111908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D88A934157
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 19:18:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72D6393415E
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 19:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09176281697
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 17:18:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A990C1C21232
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 17:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C248A183066;
-	Wed, 17 Jul 2024 17:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F0C181B9A;
+	Wed, 17 Jul 2024 17:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d3g9MyML"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7D717F39B
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 17:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AC61E4A6
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 17:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721236695; cv=none; b=AhsGsoEODgryj6G64AUxNOIwCduWkzQZ2BX6p6IHSTvP+OV1eEGyiNJowsqTtijvKWxcW/seFpQupoX04hA5gylGzNUbOe7OwZ1WWC6VCAdpy0mKKML1ueGGLTZtgoIVE7iubTDuNVb1lrNWDS11X98QOki1P3plONZMquXB/qU=
+	t=1721236900; cv=none; b=KD4EQwv8dDMRSFrK8PYQ9Lcv903T+k20AXG6obGsZpGSueB6wGoL9onpekpCO/nK9fd6RL4OGonn8bxEzi1IjO4HAQopTxhZC4D1vSZGX+LhG97WyznpnU/AO4VAvbiFdTtcKlc4xxWe8ROVCdu2r/tUbrBCWqcP7r4IMHEi/Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721236695; c=relaxed/simple;
-	bh=lCJojwSi328ESn1dgIwJgLWa3DbetbhKJIZdiwhEw88=;
+	s=arc-20240116; t=1721236900; c=relaxed/simple;
+	bh=8Pb2z5ybh+q+/+t+W8q24RGbCjJ9IPbqOhDGpQfX0dk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=ulfJtdHy4GzQ9R3wjbZblHKaOiSN66PYEFk5cLC9+M60GsrNbTHNPIqMEniaZiOKkG4bQZQ8cGpXVf9a0SWtBRN0Ekik9kvai2lZM05CjaZkDH8189y8uTex8I9GlueHTruz7jzRLr2PvNRalwwpduMMu/jTorQY+WbzFy0f+qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-324-2YLqD4WtPu6wX5vZdR4-8g-1; Wed,
- 17 Jul 2024 13:18:08 -0400
-X-MC-Unique: 2YLqD4WtPu6wX5vZdR4-8g-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EE6D11892A62;
-	Wed, 17 Jul 2024 17:17:57 +0000 (UTC)
-Received: from hog (unknown [10.39.192.3])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1997F1955F3B;
-	Wed, 17 Jul 2024 17:17:33 +0000 (UTC)
-Date: Wed, 17 Jul 2024 19:17:31 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
-	pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
-Subject: Re: [PATCH net-next v5 21/25] ovpn: implement key add/del/swap via
- netlink
-Message-ID: <Zpf8q731wtyXMpkd@hog>
-References: <20240627130843.21042-1-antonio@openvpn.net>
- <20240627130843.21042-22-antonio@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B6abAChiOFI+MtRSlZSpwdmCajGz/JLJEh6OxtpFIOhEZTmzqelJrRx4oM2wcbiHa3eZL7gvJ6eJ8jjfaMkDjL9m7HtITLmCxbJops4ZTJ6h+c0De6w9beCoKUTnh4rq8KVuvBDQ4V9GVSsVybPUNPm9JqzvEJOR3urFkXBvprA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d3g9MyML; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721236898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YX1GRcU9sKy/uXFsIBsY6ZH3nyOB2unYC6GpQ2d0URw=;
+	b=d3g9MyMLcc0a60vchDBCVVrSLTnJ2tyL+K6NEJ7zQrG/odWqPlY8hk5SiYhQICrNai0mql
+	XGsKnoJ+XFBhBnZPhYvwJFfEasjpAy2nw5tCs5SKgSbka6C7INKgk81k8AmqFEnUtWzFw+
+	dneG9znOX1L5ahU5rzJNJLNby1hyVE0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-155-VS3qAQyfOgucT6umwKzpSg-1; Wed, 17 Jul 2024 13:21:35 -0400
+X-MC-Unique: VS3qAQyfOgucT6umwKzpSg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3678ff75122so4683043f8f.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 10:21:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721236894; x=1721841694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YX1GRcU9sKy/uXFsIBsY6ZH3nyOB2unYC6GpQ2d0URw=;
+        b=AASRsowtzd0fgXXrH0Mi/yIruCi7aETlkgAODNq30bKVaMLIK3dgsuoYDlGUobZ/90
+         GSi+v/rNOTmJbxlneVqFxci0ek/uFbbLobobv0B/SoNyMQs3rX6o7j0hosmLxjwbtgqm
+         oEUhBHEzJsPMp+H2sy1s2pSZmXfGOAZDEZAlobLv8Kaextmf3m1wu2iEIMiH8wUV2nqT
+         0LieaZ6eBIIAtJSzfXFots/4ZCu9snaB/BDv05FFt9W7PSgPo0/p1TgCBv4ICzBbLdU+
+         VCtq2q4sG9PbmeskpsOZMaciY+eDwmcXiyAgkR0w5qbUNsrFOECvinrlqTGPy7L0Kpft
+         NpZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfMgzYNuJVGxWX22AG5xnm4kNwrlrIpdkbotNh6ksaK0Z0Yu4vfIxJxW6rjX8XeiF7l8ts/GxisNwVPOGruaWKvZ5qGiav
+X-Gm-Message-State: AOJu0Ywr4W1qrMncroG/JlKhBTyMkVFuAKA36hEE11xplJyalXVfm6cA
+	9jbCWlPsXC6LH20cnaYNzErMt15rUbVXcRqrEQtbfxHWVlRgc5ZJg2Uu31QxVmeI1+hqDVnimSx
+	T2emhgCSPn3XhLg6PizsfadZV3tWZhTiDFucWDtrlnuftbXjw5R6BdA==
+X-Received: by 2002:a5d:4286:0:b0:367:4dce:1ff7 with SMTP id ffacd0b85a97d-3683160059bmr1877251f8f.6.1721236894370;
+        Wed, 17 Jul 2024 10:21:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF5E3r5zlokJ2Ycf6jSWV7gx0NfBkAUw6wHxsNqleFmRN6IhQHbH2ohVveywytV2g8FctyoiQ==
+X-Received: by 2002:a5d:4286:0:b0:367:4dce:1ff7 with SMTP id ffacd0b85a97d-3683160059bmr1877211f8f.6.1721236893407;
+        Wed, 17 Jul 2024 10:21:33 -0700 (PDT)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-368467a34dcsm441474f8f.109.2024.07.17.10.21.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 10:21:32 -0700 (PDT)
+Date: Wed, 17 Jul 2024 19:21:30 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinfz@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH] f_flower: Remove always zero checks
+Message-ID: <Zpf9mlUXHZfgV+74@debian>
+References: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
+ <20240710161139.578d20dc@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240627130843.21042-22-antonio@openvpn.net>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240710161139.578d20dc@hermes.local>
 
-2024-06-27, 15:08:39 +0200, Antonio Quartulli wrote:
-> This change introduces the netlink commands needed to add, delete and
-> swap keys for a specific peer.
->=20
-> Userspace is expected to use these commands to create, destroy and
-> rotate session keys for a specific peer.
->=20
-> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> ---
->  Documentation/netlink/specs/ovpn.yaml |   2 +-
->  drivers/net/ovpn/netlink-gen.c        |   2 +-
->  drivers/net/ovpn/netlink.c            | 199 +++++++++++++++++++++++++-
->  3 files changed, 198 insertions(+), 5 deletions(-)
->=20
-> diff --git a/Documentation/netlink/specs/ovpn.yaml b/Documentation/netlin=
-k/specs/ovpn.yaml
-> index 68ed88d03732..21c89f0bdcbb 100644
-> --- a/Documentation/netlink/specs/ovpn.yaml
-> +++ b/Documentation/netlink/specs/ovpn.yaml
-> @@ -153,7 +153,7 @@ attribute-sets:
->            decryption
->          type: u32
->          checks:
-> -          max: 2
-> +          max: 7
+On Wed, Jul 10, 2024 at 04:11:39PM -0700, Stephen Hemminger wrote:
+> On Sun,  7 Jul 2024 20:27:41 +0300
+> Maks Mishin <maks.mishinfz@gmail.com> wrote:
+> 
+> > Expression 'ttl & ~(255 >> 0)' is always zero, because right operand
+> > has 8 trailing zero bits, which is greater or equal than the size
+> > of the left operand == 8 bits.
+> > 
+> > Found by RASU JSC.
+> > 
+> > Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+> > ---
+> >  tc/f_flower.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/tc/f_flower.c b/tc/f_flower.c
+> > index 08c1001a..244f0f7e 100644
+> > --- a/tc/f_flower.c
+> > +++ b/tc/f_flower.c
+> > @@ -1523,7 +1523,7 @@ static int flower_parse_mpls_lse(int *argc_p, char ***argv_p,
+> >  
+> >  			NEXT_ARG();
+> >  			ret = get_u8(&ttl, *argv, 10);
+> > -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> > +			if (ret < 0) {
+> >  				fprintf(stderr, "Illegal \"ttl\"\n");
+> >  				return -1;
+> >  			}
+> > @@ -1936,7 +1936,7 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
+> >  			}
+> >  			mpls_format_old = true;
+> >  			ret = get_u8(&ttl, *argv, 10);
+> > -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> > +			if (ret < 0) {
+> >  				fprintf(stderr, "Illegal \"mpls_ttl\"\n");
+> >  				return -1;
+> >  			}
+> 
+> That is correct mathematically, but perhaps the original author had different idea.
+> Could we have review from someone familiar with MPLS support please.
 
-Looks like this got squashed into the wrong patch.
+The MPLS TTL field is an 8 bits value. Therefore any successful return
+of get_u8() should be valid and this test is indeed not needed.
 
---=20
-Sabrina
+I guess the original intent was to keep consistency with how the other
+MPLS parameters are validated. But TTL is indeed a special case as it's
+the only parameter with a "common" length.
+
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
