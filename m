@@ -1,129 +1,121 @@
-Return-Path: <netdev+bounces-111920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5CE934232
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 20:20:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F5AC93423F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 20:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68E6E2849D0
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 18:20:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1A1AB22831
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 18:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37BD183066;
-	Wed, 17 Jul 2024 18:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24871836C2;
+	Wed, 17 Jul 2024 18:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lRJ1uDXn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVl/M2+i"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1AA12E75;
-	Wed, 17 Jul 2024 18:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED9718308C
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 18:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721240399; cv=none; b=er1oHqyTzq3zVjVKB9o/JX+aUX95h0VK8MELLQs2g7CoVPdXDdC5TMTbj03PtL61+rHJIdtHUf5pFBV4wQ7xUUZ580CLL1jBvWIuN5GtPmgEBrlkSjK3j/yWBXssr6QBXZLIzDladEGU+o4PDZVC8BYxMVamuIfwb27OGVl+t68=
+	t=1721240856; cv=none; b=XakMUiOyg8JQTYEA+4KJMvcxfedEbwXgCiRARnM8n4a+U7HnTlX4zto4CYnHOnfIbraspUB21ilOhvrAKYBbbHIAMDh0ioGe/fmROWcfaoxEd0tF4lYSXyPlXaTiq0UdFgCCeEY9hDmMMALGnw0cd2KIEgRv74jMash1lO24/b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721240399; c=relaxed/simple;
-	bh=8icS3I5fyutbM346XBkOUW3AxYb3LWPuaYdcM7QeK5s=;
+	s=arc-20240116; t=1721240856; c=relaxed/simple;
+	bh=Q0nJMMK7X0JPtgckgj4aaNBlvpWb9ozojMF+tfWk2Eg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SmOTj9ZPDWNUD+B3FqKggMUdUjdICq64hetUJxnGthx25KbMqTWAimSIR/lBRoXOgZwp7T6D0D24uaJ2sx6VJ1GDaJ9Oc90OpPAWpKmGVQvtJ2sEHdScfpCi5hiBSqHBdUdFX5hJzoxJ5mRWWPEpp2XVqthJxIEyp8teFZ7GK60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lRJ1uDXn; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=wZm6SNFUjdixQ8MFhwCOTFsWlwrJ2qo19PWx5tk7Qzs=; b=lR
-	J1uDXnY/gXzVm5H6rPK31AMEifEF9kNgBrRazajQJrliANeNtDEVlS6Zht2oMO9gfi6pYTk3X85ke
-	xv8lh0ocHxvPiAS66fIvxlGJgB85mL53FYPAAXqn9wt+7y+j1gD2EV8XhPONhBKG7lN4L7L2Sx6YF
-	HDkfRDuOZsLxqxs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sU9Fk-002jAB-Ec; Wed, 17 Jul 2024 20:19:48 +0200
-Date: Wed, 17 Jul 2024 20:19:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rayyan Ansari <rayyan.ansari@linaro.org>
-Cc: devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Timur Tabi <timur@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: qcom,emac: convert to dtschema
-Message-ID: <a6a0c244-f8da-4736-bb63-429a508d6993@lunn.ch>
-References: <20240717090931.13563-1-rayyan.ansari@linaro.org>
- <cecaa6c3-adeb-489f-a9d2-0f43d089dd1d@lunn.ch>
- <D2RXISKUMBWA.ZQDKI0F03EI0@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FKvi6OFW63DfZW9aNSnaAT3ddw4R+d0tNc0ZXKq7v42WOIkhkOWIdcEOvgCTPGw+5MTBWTsjRXY/F3zrPGA2hA0EQLgfij8AwK8/kG5IWIBg8rzaKlk2KCqtGc5CaXvOlbgA7UkHF2WSlHyk8Syobo54fv1RhX0zdIPA7LMT87E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVl/M2+i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E34C32782;
+	Wed, 17 Jul 2024 18:27:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721240856;
+	bh=Q0nJMMK7X0JPtgckgj4aaNBlvpWb9ozojMF+tfWk2Eg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pVl/M2+iugkAqjp3Lt221oVhGOR8wTX7LeFBiZQzHh/JMqcSOUcN8XjVze5b1DFo7
+	 1JZJKtxb14aGTbGMzL+hv33TLeUBYtPm+tbE3KlYNRvOJXcLeF7UuDnpglnRdKcHcm
+	 CPPKy3nYCFKkmBVpxg054iIfeIuM9dIcFolYFGhCkqeEebeRMwfetF7BAYPQ8y1LEV
+	 cIUer2O+T/oSVCICxsPInsOvT1UbbE8IqEsF30nVkjntuPqLHHG1n6Fs0uzQdVEwOi
+	 6OwnZ62agfDE10RXvFhANE1IrZOAuI2adJ2hfqjNXz7Eld0u67Roa9Ukfoab4ixZAA
+	 ypIDMNl/VoTUw==
+Date: Wed, 17 Jul 2024 19:27:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Maks Mishin <maks.mishinfz@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH] f_flower: Remove always zero checks
+Message-ID: <20240717182733.GQ249423@kernel.org>
+References: <20240707172741.30618-1-maks.mishinFZ@gmail.com>
+ <20240710161139.578d20dc@hermes.local>
+ <Zpf9mlUXHZfgV+74@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <D2RXISKUMBWA.ZQDKI0F03EI0@linaro.org>
+In-Reply-To: <Zpf9mlUXHZfgV+74@debian>
 
-On Wed, Jul 17, 2024 at 04:45:55PM +0100, Rayyan Ansari wrote:
-> On Wed Jul 17, 2024 at 4:20 PM BST, Andrew Lunn wrote:
-> > On Wed, Jul 17, 2024 at 10:09:27AM +0100, Rayyan Ansari wrote:
-> > > Convert the bindings for the Qualcomm EMAC Ethernet Controller from the
-> > > old text format to yaml.
+On Wed, Jul 17, 2024 at 07:21:30PM +0200, Guillaume Nault wrote:
+> On Wed, Jul 10, 2024 at 04:11:39PM -0700, Stephen Hemminger wrote:
+> > On Sun,  7 Jul 2024 20:27:41 +0300
+> > Maks Mishin <maks.mishinfz@gmail.com> wrote:
+> > 
+> > > Expression 'ttl & ~(255 >> 0)' is always zero, because right operand
+> > > has 8 trailing zero bits, which is greater or equal than the size
+> > > of the left operand == 8 bits.
 > > > 
-> > > Also move the phy node of the controller to be within an mdio block so
-> > > we can use mdio.yaml.
-> >
-> > Does the MAC driver already support this?
-> >
-> > When i look at the emacs-phy.c there is
-> >
-> > 	struct device_node *np = pdev->dev.of_node;
-> >
-> >                 ret = of_mdiobus_register(mii_bus, np);
-> >
-> > I don't see anything looking for the mdio node in the tree.
-> >
-> > 	Andrew
+> > > Found by RASU JSC.
+> > > 
+> > > Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+> > > ---
+> > >  tc/f_flower.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/tc/f_flower.c b/tc/f_flower.c
+> > > index 08c1001a..244f0f7e 100644
+> > > --- a/tc/f_flower.c
+> > > +++ b/tc/f_flower.c
+> > > @@ -1523,7 +1523,7 @@ static int flower_parse_mpls_lse(int *argc_p, char ***argv_p,
+> > >  
+> > >  			NEXT_ARG();
+> > >  			ret = get_u8(&ttl, *argv, 10);
+> > > -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> > > +			if (ret < 0) {
+> > >  				fprintf(stderr, "Illegal \"ttl\"\n");
+> > >  				return -1;
+> > >  			}
+> > > @@ -1936,7 +1936,7 @@ static int flower_parse_opt(const struct filter_util *qu, char *handle,
+> > >  			}
+> > >  			mpls_format_old = true;
+> > >  			ret = get_u8(&ttl, *argv, 10);
+> > > -			if (ret < 0 || ttl & ~(MPLS_LS_TTL_MASK >> MPLS_LS_TTL_SHIFT)) {
+> > > +			if (ret < 0) {
+> > >  				fprintf(stderr, "Illegal \"mpls_ttl\"\n");
+> > >  				return -1;
+> > >  			}
+> > 
+> > That is correct mathematically, but perhaps the original author had different idea.
+> > Could we have review from someone familiar with MPLS support please.
 > 
-> Hi Andrew,
+> The MPLS TTL field is an 8 bits value. Therefore any successful return
+> of get_u8() should be valid and this test is indeed not needed.
 > 
-> Yes, from my understanding an mdio node is not explicitly needed as it
-> just uses "phy-handle".
+> I guess the original intent was to keep consistency with how the other
+> MPLS parameters are validated. But TTL is indeed a special case as it's
+> the only parameter with a "common" length.
 > 
-> However, I think it makes more sense to place the phy within an mdio
-> node instead of directly under the controller node. This is based off
-> of 5ecd39d1bc4b ("dt-bindings: net: convert emac_rockchip.txt to YAML"),
-> in which the same decision was made ("Add mdio sub node"), also during a
-> text -> yaml conversion.
- 
-Using an MDIO node is preferred, and is the modern way of doing
-it. Placing the PHY directly in the MAC node is valid, but it is the
-old way of doing it.
+> Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
-It is up to the driver to decide where it looks for the PHY nodes when
-it registers the MDIO bus. The np in of_mdiobus_register(mii_bus, np);
-points to the MAC node. So when you move the PHYs into the new MDIO
-node, they will not be found when the MDIO bus is probed.
+Thanks Guillaume,
 
-Take a look at:
+Yes, I agree that was very likely the intent.
 
-commit 2c60c4c008d4b05b9b65bf88f784556208029333
-Author: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Date:   Mon Mar 25 16:34:51 2024 +0100
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-    ravb: Add support for an optional MDIO mode
-
-as an example where support for such an MDIO node was added to a
-driver.
-
-    Andrew
-
----
-pw-bot: cr
 
