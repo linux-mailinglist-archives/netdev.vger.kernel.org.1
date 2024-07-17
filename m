@@ -1,105 +1,115 @@
-Return-Path: <netdev+bounces-111857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC301933A76
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 11:56:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B03D933B02
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 12:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 618C81F21E6E
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 09:56:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1050B1F213A3
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 10:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E6717E8F5;
-	Wed, 17 Jul 2024 09:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1598817E8F6;
+	Wed, 17 Jul 2024 10:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzUWJ1P8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCE917E8F0
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 09:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630705FBBA;
+	Wed, 17 Jul 2024 10:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721210162; cv=none; b=Nj6Rn2ioZeWW6NShlpaypX3PJ+eoXpMUG+ApVmUxQTX1Kgfh+4A0Ll/4JlVPF1rMg0RRzQDBiQnsf0ZlWUZQQPpuFG1bjE0Q1KURY83FhKHeN6VzE6yhASIdmWvR4crx4Vd+XOA9hyHKU7lpPMm5Ij3BNr05RmzwIV5KDz4jW6s=
+	t=1721211236; cv=none; b=U+Utg0jzYPkSNfT0/7ZmHf6+gtT1sQ45Y7KO+eubI+GXszqwuXZ9OJlap8z8DoqwDfSk9QQumNA/nLdkKz0tN8vjBUphEm5/OW3tgnzmsVPDBOUHMBPxZj5JcyCDmM9hiAEz2bl0kzRnDhD/SZ/qDbgn855KklpQ2VhPI2tMm98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721210162; c=relaxed/simple;
-	bh=6Jl2PVqq+Uw9J4DbyezliVHP5oxVJ+VxUcIZQRdi0Ao=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dBIbnepCpXf3RPXz9U0lzNjvY7UKUSfeDNbc8s0Nse7kJnFXrq7r7NHFmY8b5DZizGLmXpXODvcKHTvoeH4M1wUp8mRzq/iYflz56ImcM9jgp4lJzC4/Ocj1WoKjYqcudZIF3p74pRHYzzBCwSQC0BxWK/+UfesglIVoxhpI88I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aec2c.dynamic.kabel-deutschland.de [95.90.236.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F317F61E5FE06;
-	Wed, 17 Jul 2024 11:55:13 +0200 (CEST)
-Message-ID: <b86c8136-56cc-4a88-9ca4-3c0d7e849bd0@molgen.mpg.de>
-Date: Wed, 17 Jul 2024 11:55:13 +0200
+	s=arc-20240116; t=1721211236; c=relaxed/simple;
+	bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=FXS0mZIn/D0w3wrlaeXwWnRyh3roB4a3x8BApnW0q9P9ogE1/KRVRybnz3qcU95CZssIK2oqreqOwh49MdfAmQK9JQSs4Nhv8SS6TQmpZThhzjlX4lQIG0tWjjhUc/90HA+pZiWYFAPDGwNkX9lH4DBWFIZd/4+qBoQOVLHDLB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzUWJ1P8; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52ea1a69624so7039295e87.1;
+        Wed, 17 Jul 2024 03:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721211232; x=1721816032; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
+        b=EzUWJ1P8NWZSYYDQjqkEiQXPaY86uwQI/G+x37Dvdi0a80CwWLU10A4L318F2JellU
+         9voJZ+7nzXR0kiexe7qURA5LSoROK4ZYbWrJx9jndCJ1Cvixipev6omSJInLfBuFXqmn
+         vs7NjHrK5YDUYKLqXoaRNFu6STAuZw6SsK6Wf3/orOCfSF4S3S4JUIeo76MbXbZ2PIjU
+         bd2wPrC1H6CqWLN1KRONGN2mTHCdwXGde6KlMZnoPE573xtZn1wW7tGDiB+frnPyEGEM
+         Cug9kg7kXRLE3CPTUxirHI6b+hemOAxWtFN1TzeqraYVaYP03PExFMjbkx+Y1zkniUyw
+         7glw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721211232; x=1721816032;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
+        b=mvjvMtAeyzB1fZKIRreJTsZ2c1hDloezd9vh8IcVbYjOnZ9zqekU8CKJ+74jzPHEzM
+         xI9LYjq4zSIVAhs9+r2U631InIA6ImnM/asaIVjWeqpDg/20Y5J42nZIwyrXKYqGo7lU
+         8d8ODZNjB5B/tYLZNZ5Dvvwbwj91MrcX8NIDkS6myvvI/e7tnpIjg+6rKM20lOUv9EMz
+         g+5bp3DKflE3wQ+yOjD5zlT+qpEcJm68C9mA3cF6VDQ1nXU6lBlUDcIAGP6zhKIy6mLS
+         3buB711d7jHsD+4LMlgJEXrZU9w4Vo2oP4Kn8p7SWBlcn2fsyjYRuXUJ/GS9RvRe6vaZ
+         RF1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWdcq7X6KaA3EzuYsvMKAsHws1henwI8mUNWEW3O7DHrP4bLP57+qzrLOScYI/+CJILiYpai0qtkh3da3pPT+zUpC9a
+X-Gm-Message-State: AOJu0Yyz1Cwz3eIJNr+9nTCpLJ8w+6uq0lEmQzfhSXPqiCAOWsQRe7B+
+	FWukuGK2DK2iq6IKV9r/Slljh7TKTppc16sgX83g20JmdkhKYUYm
+X-Google-Smtp-Source: AGHT+IHBUSIMWDccM70ipVpLwyXAI32LQU6YXGnanCbfMPOdjmovc33HCYqT0uDUdODiqDmaKk5LIA==
+X-Received: by 2002:a05:6512:4004:b0:52c:fd46:bf07 with SMTP id 2adb3069b0e04-52ee5426fa0mr797165e87.49.1721211232127;
+        Wed, 17 Jul 2024 03:13:52 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:a446:8596:96cf:681b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f25b946sm196580425e9.19.2024.07.17.03.13.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 03:13:51 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  yangpeihao@sjtu.edu.cn,
+  daniel@iogearbox.net,  andrii@kernel.org,  alexei.starovoitov@gmail.com,
+  martin.lau@kernel.org,  sinquersw@gmail.com,  toke@redhat.com,
+  jhs@mojatatu.com,  jiri@resnulli.us,  sdf@google.com,
+  xiyou.wangcong@gmail.com,  yepeilin.cs@gmail.com
+Subject: Re: [RFC PATCH v9 00/11] bpf qdisc
+In-Reply-To: <20240714175130.4051012-1-amery.hung@bytedance.com> (Amery Hung's
+	message of "Sun, 14 Jul 2024 17:51:19 +0000")
+Date: Wed, 17 Jul 2024 11:13:45 +0100
+Message-ID: <m2bk2wz5pi.fsf@gmail.com>
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 10/13] ice: add method to
- disable FDIR SWAP option
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: Junfeng Guo <junfeng.guo@intel.com>, netdev@vger.kernel.org,
- anthony.l.nguyen@intel.com, Marcin Szycik <marcin.szycik@linux.intel.com>,
- intel-wired-lan@lists.osuosl.org, horms@kernel.org
-References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-11-ahmed.zaki@intel.com>
- <b0a70c97-2a25-4dca-9db1-aca64206a53c@molgen.mpg.de>
- <e829371c-3e19-40a9-8a35-ea903f912294@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <e829371c-3e19-40a9-8a35-ea903f912294@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Dear Ahmed,
+Amery Hung <ameryhung@gmail.com> writes:
 
+> Hi all,
+>
+> This patchset aims to support implementing qdisc using bpf struct_ops.
+> This version takes a step back and only implements the minimum support
+> for bpf qdisc. 1) support of adding skb to bpf_list and bpf_rbtree
+> directly and 2) classful qdisc are deferred to future patchsets.
 
-Thank you for your reply.
+How do you build with this patchset?
 
+I had to build with the following to get the selftests to build:
 
-Am 15.07.24 um 16:23 schrieb Ahmed Zaki:
+CONFIG_NET_SCH_NETEM=y
+CONFIG_NET_FOU=y
 
-> On 2024-07-10 10:59 p.m., Paul Menzel wrote:
+> * Miscellaneous notes *
+>
+> The bpf qdiscs in selftest requires support of exchanging kptr into
+> allocated objects (local kptr), which Dave Marchevsky developed and
+> kindly sent me as off-list patchset.
 
->> Am 10.07.24 um 22:40 schrieb Ahmed Zaki:
->>> From: Junfeng Guo <junfeng.guo@intel.com>
->>>
->>> The SWAP Flag in the FDIR Programming Descriptor doesn't work properly,
->>> it is always set and cannot be unset (hardware bug).
->>
->> Please document the datasheet/errata.
-> 
-> Unfortunately, I don't think this is in any docs or errata.
-
-Oh. How did you find out?
-
->>> Thus, add a method to effectively disable the FDIR SWAP option by
->>> setting the FDSWAP instead of FDINSET registers.
->>
->> Please paste the new debug messages.
-> 
-> What debug messages? If you mean the ones logged by ice_debug() in this 
-> patch, please note fvw_num = 48 for the parser. So that's 96 lines of:
-> 
-> swap wr(%d, %d): 0x%x = 0x%08x
-> inset wr(%d, %d): 0x%x = 0x%08x
-
-Personally, I’d prefer an example line, but I know that it’s not common.
-
-[…]
-
-
-Kind regards,
-
-Paul
+It's impossible to try out this patchset without the kptr patches. Can
+you include those patches here?
 
