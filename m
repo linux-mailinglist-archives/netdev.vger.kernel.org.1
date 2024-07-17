@@ -1,235 +1,146 @@
-Return-Path: <netdev+bounces-111888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF29933F4D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 17:10:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC872933F4B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 17:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F56284C03
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 15:10:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6784AB23B72
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 15:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FFE181CF9;
-	Wed, 17 Jul 2024 15:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5F4181BBC;
+	Wed, 17 Jul 2024 15:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o43QFE8v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzaWsiRN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f65.google.com (mail-qv1-f65.google.com [209.85.219.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81548181CEE;
-	Wed, 17 Jul 2024 15:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65720181BB5;
+	Wed, 17 Jul 2024 15:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721229012; cv=none; b=pAuple5TMhnfY/vE/gPpCMLFN7U/r46YkEp0PDhuT45Mp3N6YLd1+7jzsj9liEtACnb8oyRZf5hjtk3R0xv8vsXhS4LKWEv7LhDpplOy2GOrYAQeEs/gNyGdceJgwgHFMZAt7iZjt7AQ1tv2qw9Sz17j9yMKjZhz6c5hLJ5uu/A=
+	t=1721229011; cv=none; b=EzDvGv6qPsmPrXpMTdYPxVE93yXpkemJ4CaEAqAJyQqqZKveEjaMJciysq0wYCxs5oaRM0SiMjNJV/FxEDmP3UJMCqLpLySittWT6R80TizWCpaCpFV/KTu6sNFD/n3FTrBLOAtzl9HFAu4wl8PAbKyDZQONSC+5uZbgfc8ilxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721229012; c=relaxed/simple;
-	bh=zQiRJOqalHUnatNyl71T2glIefnb7xlR1qihZel3g3U=;
+	s=arc-20240116; t=1721229011; c=relaxed/simple;
+	bh=9AeB1Cld1cJEMg5GVGQ0RSv/VK08VTbFq5Y6/MY8Fvo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hXt5zIO2M+eYFGkAhsh3uiOqz6cdZLtxRdtWpVXWoTlvaR17nYUbdDVAOw/XqxD+XMleI+ULlHQHpz5wnQU/urBQ/esBgzmn7aEDR8w5yTdDZTabkV/qg7Wx6d0ly0YvR9Po/nbOVQNCQEchAIJIJWYgmHJYUqyyoe8fhTzsuC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o43QFE8v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A74C4AF0B;
-	Wed, 17 Jul 2024 15:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721229012;
-	bh=zQiRJOqalHUnatNyl71T2glIefnb7xlR1qihZel3g3U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o43QFE8vVgEQ3sQayaBMwsmYEo+yTxpThLWajQQysalzEbY82XM9zyj2UVLWcy0DI
-	 sDWNcU6Pev2zLkwGq4SyN/XIkyWJOBW6Bojgxykm24qVPd7s11pLUxcBOfrZqIiu4g
-	 9iroMDIh1QDwVJY2IwvB1+hpRj05jz5Hrz87Mtt//S14JDiX1ESR/sg26cPMnz+6OC
-	 I72kaO8kMlfD9H/OsGPKiLxVIqeA/ee9PyF48JlBXUbJ8NkQmtor8nT0O7CPkC7RmY
-	 GRXeiUnO5rHuG6cyAJsQ5XcggNJXYYSao5mziJ8RwOnk0zFniTHPWuFsuHIFram92a
-	 5uA9Ny5KWJxUQ==
-Message-ID: <310de142-e263-4bcd-b499-69e0640de51e@kernel.org>
-Date: Wed, 17 Jul 2024 17:09:58 +0200
+	 In-Reply-To:Content-Type; b=CXRkqrJP/Vz2tRYMD2pdsImAk7NhKFYqdna1670NvrONPsXVv2Hp/AcY6gN4OfaznkQHpyHPWYgwc/OdN+Mqj6DJrcbfLh3g8kG7ZQQcFOwE1cTBbZadGIOI03DrK1/JwJljQ6/g/InW2W1hqlxRDpF4n/GrnxHEMcbbYk7Gx5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XzaWsiRN; arc=none smtp.client-ip=209.85.219.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f65.google.com with SMTP id 6a1803df08f44-6b5daf5ea91so38555456d6.1;
+        Wed, 17 Jul 2024 08:10:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721229008; x=1721833808; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yimWTa4m4zoMnZ3DEB5KnSaVlkJzZMUAmC/Q4ehMeE4=;
+        b=XzaWsiRNOg1jrI6eMMaclNMnfUQ3UlxfuklS0khB/8YDmwNMHJPcRI6dfEb0t8N/G9
+         wfYXeGPypBxb6Sni5XUWBzaUYFhU/5B4Z8SiDP3LNoS9nYGtHnUTziiEwl+JVs6kvOBT
+         H3WmCI2tHEAAAy3rSd5HkcCCx2YlySrA1mwDXCIQ+j3wiSDmWj5KW1TxEDqileyXqxmC
+         Fk4W1AekBzbEPSfv83Qz0iSjY/qZE9CjrK6yqiUJC1QMcIwqE4ReOSoHT2SRqwv+OuI7
+         h1K0R6QST6nwX6LqtAEYug9RfvThXMz45+nVLQuaRP1jS4xmWQ4xN9drxXGce4j6w6m6
+         4QGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721229008; x=1721833808;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yimWTa4m4zoMnZ3DEB5KnSaVlkJzZMUAmC/Q4ehMeE4=;
+        b=tlIVO/BWZ+irTJoettVa95rQO40gBBRLGf2sHw4yLEqNyGgivjzc66GVvaaUtUSPS1
+         tPPTp+4wi1E4YL0ir8oQEmhGdNJjr0MEHqg+zQzsTjWYRi6ZxRR0iH0YDEzATJIPNWQo
+         MaNc7n5ddir+JP759VRhiliRLCXPASHe7+PMqrzNEl5N6Z72/3GJfztyRVaBrPMihRnL
+         Ld1XkNyfw3BNcA58oc4cNi6tr/WIMMWU+dsZzWf3PTqa4u5ZdogWub3Ff+/l1/DHpVHc
+         yhz2yxBpJ1pytOcD6vVKFwyVHiEjLXCR0G3QieKw/HtlMQ7nvdlMUZBZbxIMK2IzlPLy
+         Uq+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUmP7k3FjIV1CxPH7+YQuId4dK5BgbUisViA5jyswvnUxNXMOzNRxp86OH4s75xIEAFZ8oPXChQDT/C9ZB2iBCPJ4/01B2ZWE2ecOBVQuXqutNq/p8U6EGh4m177HgYrZKaOtaoc0InhwgxoAsjT3cfok1vnj0n1uDye4yMtWEH9KDkivoP8mfF4BN1/bM2FtRRevHLgwmL4bloppPVzRYEFHdhyPE=
+X-Gm-Message-State: AOJu0YxPskJtEy1aq/lFrR26K53IJenj0bII56H1Vv0NZDCP/M41Dy8m
+	nb39/SlUgghZbKNB6Gf1I3usLPmJa/dovmGO4rqaBjCzFfF9RjVo
+X-Google-Smtp-Source: AGHT+IExgG9Z3pY5PUuoW3p5dU/ApHsjWPWX01eIx0K5DEQCTwWudRCZqlY3wTag1iQr78dEqgcDRg==
+X-Received: by 2002:a05:6214:1cc8:b0:6b5:e3b7:46f5 with SMTP id 6a1803df08f44-6b78ca624c7mr26524626d6.20.1721229008237;
+        Wed, 17 Jul 2024 08:10:08 -0700 (PDT)
+Received: from [192.168.158.7] ([207.35.255.94])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b76199f60csm42590336d6.66.2024.07.17.08.10.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jul 2024 08:10:07 -0700 (PDT)
+Message-ID: <0a4dd531-f075-4cce-9c15-30dfa1d0876d@gmail.com>
+Date: Wed, 17 Jul 2024 17:10:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] tcp: process the 3rd ACK with sk_socket for for
- TFO/MPTCP
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240716-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v1-1-4e61d0b79233@kernel.org>
- <CANn89iKrHnzuHpRn0fi6+2WB_wxi5r-HpZ2jrkhrZEPyhBe0HQ@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iKrHnzuHpRn0fi6+2WB_wxi5r-HpZ2jrkhrZEPyhBe0HQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] rust: str: Use `core::CStr`, remove the custom `CStr`
+ implementation
+To: Trevor Gross <tmgross@umich.edu>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng
+ <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>,
+ Andreas Hindborg <a.hindborg@samsung.com>, Alice Ryhl
+ <aliceryhl@google.com>, Brendan Higgins <brendan.higgins@linux.dev>,
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+ FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Martin Rodriguez Reboredo <yakoyoku@gmail.com>,
+ Manmohan Shukla <manmshuk@gmail.com>, Valentin Obst
+ <kernel@valentinobst.de>, Asahi Lina <lina@asahilina.net>,
+ Yutaro Ohno <yutaro.ono.418@gmail.com>, Danilo Krummrich <dakr@redhat.com>,
+ Charalampos Mitrodimas <charmitro@posteo.net>,
+ Ben Gooding <ben.gooding.dev@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Roland Xu <mu001999@outlook.com>, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, netdev@vger.kernel.org, llvm@lists.linux.dev
+References: <20240715221126.487345-2-vadorovsky@gmail.com>
+ <CALNs47t=YQX+UP_ekq_Ue=BrA4JscDbU1qNDoKFar3yUbOSZ5g@mail.gmail.com>
+Content-Language: en-US
+From: Michal Rostecki <vadorovsky@gmail.com>
+Autocrypt: addr=vadorovsky@gmail.com; keydata=
+ xsBNBGYJcUEBCAD3ciAzHQ8NElYQtsiPZ9NjsR7ttfihe0FM+PDT+6cChjFLQ8qO/1zEL5mh
+ YaLbkjitrIYARhmo3lRDq3+G4L5+gRVExm9Rd98PcQy2P9F8shxI/msC50i1Fb9N4D0pP8Hx
+ hhZ/or+2mbokZh8Qc9RdjynXRXAezhOFN4+0L2jkN7fjTO1IArl+TirXx+cvhQUbwKyyJlGL
+ Kldvue2EqU4maZ+KIUs5di3kZgDPLILzvBqX9TLtwEMAkNY1uMCKK+C2aihap19OjoK0qOYj
+ IahVHjqGL+Mb/Ga7jxMGr2TFeQEcwIgvdRiVVLtu+uiaRKqULGokBL3l9gprtBZWdLq7ABEB
+ AAHNJk1pY2hhbCBSb3N0ZWNraSA8dmFkb3JvdnNreUBnbWFpbC5jb20+wsCXBBMBCABBFiEE
+ 3RZt3oLrB5kpFLy14qU49yah1xEFAmYJdCQCGwMFCQHhM4AFCwkIBwICIgIGFQoJCAsCBBYC
+ AwECHgcCF4AACgkQ4qU49yah1xFuDQf+NE2Oy6zF+uVh3vtidkfacCSMnu1QxojJHB8C1/Ep
+ g4JU5hPcG9hC+HrMs5/Hqs7DOike9bZjhpEmnW4DIeI7Wy3t1Qf7A8EOzS0nrMgbX8TnkEon
+ zMBBqiNp3VVVcltRJtc58xMP8K3yu6Ty2Q8e6GWdL5bqDr9gshb+vWu8inh5CullsGRJFJl0
+ BfSdDKAbpH3NdEoWnL4JvFphpouh2vhd/ScvfNAQcuyBn3cbCyQdjNTgRVBkBNDEYCaWLVqP
+ r4IU0JNjgk+cTLbyFmgn2++bWoIICGrAeWGruSpl7UGJ2PdJokWI9zp5UqSCezejDS53yhkU
+ GsCrF7LrTceB6c7ATQRmCXFBAQgA2yrqjTKvL7VJKi/NNcpQ7EvAEm6omO+O4wQltdpybaxe
+ mbLT0vZTH6rjZba28ixZmFHtwOjzNNtabmb4uK+nxs0BkVBpRvJNJ0LM1ydGYZQ46Sbvr1dE
+ 7yWDkkG1CjmXYGd5I2iqx+ATbdrtzDGWLsvDXd/yEaO9dxAR+LqGOg1HdgE9Hhmuv8BRYSCL
+ vnXaMA7Orq9oAmu+Q5q9TT3aZGMdBFdcoUNSVPX82uIYXjDaXj0Del8tluAHLf3oV7ZXEgOx
+ c6OpRY3+8Pr9//UtfoaHNOjoKFNyPaIUf5U1+E9J0UoDm8m1usrwnghg6yRyPhczhCOvbYNL
+ hQ6TiImvowARAQABwsB8BBgBCAAmFiEE3RZt3oLrB5kpFLy14qU49yah1xEFAmYJcUECGwwF
+ CQHhM4AACgkQ4qU49yah1xHetgf9FpI4Y+okwFRIqRa6WJ8jhz6us+oYKedftr313NwerUB5
+ 8nnhK0YWkZWZMuu5B4LCMiv71Ugqlc7ahBy5sQx/acRPe+NiYpwiN/pWrv7njaA6evDieXL8
+ jc3j+xy4fsi861BWJXaurWQtLMXyHBUmdJ+StU7tscYTPe4fN1fdkBh0SreZxLfvp/+SMRQk
+ g9PmXb1BMZdw8gWghPAbYg5bfCzXF9iZp4bmjuCENfwG4zmnYJzR6uTI0reqECo6Ee7NjOQ7
+ qKy29wW+kVnEjX481iCEUmqKHEaQB08Ueb45If09fThw1baHLAk6bFk5cabMtD3JbWEifa6M
+ RS+eXZNwwQ==
+In-Reply-To: <CALNs47t=YQX+UP_ekq_Ue=BrA4JscDbU1qNDoKFar3yUbOSZ5g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
+On 16.07.24 02:45, Trevor Gross wrote:
+> (also, v2 and v3 are appearing in different threads on lore (as they
+> should), but they're in the same thread as v1 in my email client - any
+> idea if there is a reason for this?)
 
-On 17/07/2024 16:57, Eric Dumazet wrote:
-> On Tue, Jul 16, 2024 at 12:43 PM Matthieu Baerts (NGI0)
-> <matttbe@kernel.org> wrote:
->>
->> The 'Fixes' commit recently changed the behaviour of TCP by skipping the
->> processing of the 3rd ACK when a sk->sk_socket is set. The goal was to
->> skip tcp_ack_snd_check() in tcp_rcv_state_process() not to send an
->> unnecessary ACK in case of simultaneous connect(). Unfortunately, that
->> had an impact on TFO and MPTCP.
->>
->> I started to look at the impact on MPTCP, because the MPTCP CI found
->> some issues with the MPTCP Packetdrill tests [1]. Then Paolo suggested
->> me to look at the impact on TFO with "plain" TCP.
->>
->> For MPTCP, when receiving the 3rd ACK of a request adding a new path
->> (MP_JOIN), sk->sk_socket will be set, and point to the MPTCP sock that
->> has been created when the MPTCP connection got established before with
->> the first path. The newly added 'goto' will then skip the processing of
->> the segment text (step 7) and not go through tcp_data_queue() where the
->> MPTCP options are validated, and some actions are triggered, e.g.
->> sending the MPJ 4th ACK [2] as demonstrated by the new errors when
->> running a packetdrill test [3] establishing a second subflow.
->>
->> This doesn't fully break MPTCP, mainly the 4th MPJ ACK that will be
->> delayed. Still, we don't want to have this behaviour as it delays the
->> switch to the fully established mode, and invalid MPTCP options in this
->> 3rd ACK will not be caught any more. This modification also affects the
->> MPTCP + TFO feature as well, and being the reason why the selftests
->> started to be unstable the last few days [4].
->>
->> For TFO, the existing 'basic-cookie-not-reqd' test [5] was no longer
->> passing: if the 3rd ACK contains data, these data would no longer be
->> processed, and thus not ACKed.
->>
->> Note that for MPTCP, in case of simultaneous connect(), a fallback to
->> TCP will be done, which seems fine:
->>
->>   `../common/defaults.sh`
->>
->>    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_MPTCP) = 3
->>   +0 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
->>
->>   +0 > S  0:0(0)                 <mss 1460, sackOK, TS val 100 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
->>   +0 < S  0:0(0) win 1000        <mss 1460, sackOK, TS val 407 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
->>   +0 > S. 0:0(0) ack 1           <mss 1460, sackOK, TS val 330 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
->>   +0 < S. 0:0(0) ack 1 win 65535 <mss 1460, sackOK, TS val 700 ecr 100, nop, wscale 8, mpcapable v1 flags[flag_h] key[skey=2]>
->>
->>   +0 write(3, ..., 100) = 100
->>   +0 >  . 1:1(0)     ack 1 <nop, nop, TS val 845707014 ecr 700, nop, nop, sack 0:1>
->>   +0 > P. 1:101(100) ack 1 <nop, nop, TS val 845958933 ecr 700>
->>
->> Link: https://github.com/multipath-tcp/mptcp_net-next/actions/runs/9936227696 [1]
->> Link: https://datatracker.ietf.org/doc/html/rfc8684#fig_tokens [2]
->> Link: https://github.com/multipath-tcp/packetdrill/blob/mptcp-net-next/gtests/net/mptcp/syscalls/accept.pkt#L28 [3]
->> Link: https://netdev.bots.linux.dev/contest.html?executor=vmksft-mptcp-dbg&test=mptcp-connect-sh [4]
->> Link: https://github.com/google/packetdrill/blob/master/gtests/net/tcp/fastopen/server/basic-cookie-not-reqd.pkt#L21 [5]
->> Fixes: 23e89e8ee7be ("tcp: Don't drop SYN+ACK for simultaneous connect().")
->> Suggested-by: Paolo Abeni <pabeni@redhat.com>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->> ---
->> Notes:
->>  - We could also drop this 'goto consume', and send the unnecessary ACK
->>    in this simultaneous connect case, which doesn't seem to be a "real"
->>    case, more something for fuzzers.
->>  - When sending this patch, the 'Fixes' commit is only in net-next, this
->>    patch is then on top of net-next. But because net-next will be merged
->>    into -net soon -- judging by the PR that has been sent to Linus a few
->>    hours ago -- the 'net' prefix is then used.
->> ---
->>  net/ipv4/tcp_input.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
->> index ff9ab3d01ced..a89b3ee57d8c 100644
->> --- a/net/ipv4/tcp_input.c
->> +++ b/net/ipv4/tcp_input.c
->> @@ -6820,7 +6820,13 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
->>                 if (sk->sk_shutdown & SEND_SHUTDOWN)
->>                         tcp_shutdown(sk, SEND_SHUTDOWN);
->>
->> -               if (sk->sk_socket)
->> +               /* In simult-connect cases, sk_socket will be assigned. But also
->> +                * with TFO and MPTCP (MPJ) while they required further
->> +                * processing later in tcp_data_queue().
->> +                */
->> +               if (sk->sk_socket &&
->> +                   TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq &&
->> +                   !sk_is_mptcp(sk))
->>                         goto consume;
->>                 break;
->>
-> 
-> Hi Matthieu
-> 
-> I had no time yet to run all our packetdrill tests with Kuniyuki patch
-> because of the ongoing netdev conference.
-> 
-> Is it ok for you if we hold your patch for about 5 days ?
+No idea, I've sent both patches with:
 
-Sure, no problem, take your time!
-
-> I would like to make sure we did not miss anything else.
-
-I understand!
-
-> I am CCing Neal, perhaps he can help to expedite the testing part
-> while I am busy.
-
-Thank you, no urgency here.
-
-If it's OK with you, I can send a v2 using Kuniyuki's suggestion --
-simply limiting the bypass to SYN+ACK only -- because it is simpler and
-ready to be sent, but also to please the CI because my v1 was rejected
-by the CI because I sent it just before the sync with Linus tree. We can
-choose later to pick the v2, the previous one, or a future one.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+git send-email --cc-cmd='./scripts/get_maintainer.pl --norolestats' 
+-v${VERSION} -1
 
