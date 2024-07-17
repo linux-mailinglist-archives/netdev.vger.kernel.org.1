@@ -1,98 +1,202 @@
-Return-Path: <netdev+bounces-111957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26FA93443E
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 23:52:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB49934487
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 00:04:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E0AAB21257
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 21:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EDEC1C20FE5
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 22:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF71C187868;
-	Wed, 17 Jul 2024 21:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6714D8BC;
+	Wed, 17 Jul 2024 22:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O5qQKDpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26B617F4F6;
-	Wed, 17 Jul 2024 21:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BF93BBFB;
+	Wed, 17 Jul 2024 22:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721253150; cv=none; b=RzcT236iGIpAeLn0Ximwmhi0ezb+yBiU4hZbv8+MirWgN91dVHBOcd5wZN4dvtMycHcqF2PKgICIT6smrecfQHb09xur3zsGrwOm+EChZGpzHorDRzBjFfH2in9aU/RMIeS9RLM6AH8j1VUw5vdRPkmsLN7cr2spcsCbeLpwWpI=
+	t=1721253795; cv=none; b=sTRvFzP5+xmli3zYMyhtDymb9WKQ7ORHocV64omnn8A7bdickzwi1BAnd6QuZ7khm7SQIonyIYcTiMw5J8nf9D+PzoCDBV9qCzWPo2d1Iop5jO8ddouIrF830UjK6cU7Rtb9irUFe/de3fH+tkO7ATbe70aINXIVlYCd1ECy9HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721253150; c=relaxed/simple;
-	bh=vB4cRmjZA1tFdZYOEO/2WZkvusVgM9xolRK2K1uiqPI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u5lzJ3tFY+HMT9g4rjBsV0YJ0INqPiixfaEN/vawDaAUF2tfDCYqwyxqs02LOi/xtjmuFnPN8oCsYQpvlK+Z8lZt+cpUDRejYGSpb1s58FRZMlHQFzGeDDNaNPkaydx9KvFNVy/le/7rsGYdlcgshn0SQbMrtwZyVsElnUNAH+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 4/4] ipvs: properly dereference pe in ip_vs_add_service
-Date: Wed, 17 Jul 2024 23:52:14 +0200
-Message-Id: <20240717215214.225394-5-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240717215214.225394-1-pablo@netfilter.org>
-References: <20240717215214.225394-1-pablo@netfilter.org>
+	s=arc-20240116; t=1721253795; c=relaxed/simple;
+	bh=xvMqdi9WDEg+JNQMrlEj2e0h/3nai7MYNzN4vR/RJH4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c4Zk8JNkEDYLsdw3/JesWHCMSwtd2g+pedUM1xGeK7wdaXZgfnWyJOdEEAnFiaydgho005+TC+m/YnDujyU8dG5vWFKyh6phaaBqkTx5LRqoR2/Tz8WBBNkgUfEZdtCT1HCuC+zV0r833iVZFnAIiokXwlwJndnUXApUg+9bPD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O5qQKDpR; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721253792; x=1752789792;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=xvMqdi9WDEg+JNQMrlEj2e0h/3nai7MYNzN4vR/RJH4=;
+  b=O5qQKDpRpwbPmwywpAV3qs7jOihQhrd8VAhZ51s0ztGJVYiam+KGK8Dw
+   r8xi1bb2RwQve3hl5m7kN0j88tVU5Kr7wXHtPMrKDyQuySjQbMUDgirxM
+   Yg6qL42XoWhG5jUYNW3HKg3dkCBiC0heiBYqUR9nh37h9ru4tF6acOMC9
+   H+nj2lxwl2ilSWGYhZYYjk/IhoFlMD09TPNqTjeSXbTZIOe841lgkTT6W
+   p6Nlw9itYESu5W6FOYxbb5A2OMBBaP6JwxSKblt9Dhz9ZrqGyKsHUJGcZ
+   ZmG+dsLw3i/Hw0NhPUtciBI5ShPhp6SslIM10CT+zwiWoKxFE5Kw7C69r
+   Q==;
+X-CSE-ConnectionGUID: 1vZM+4zJTnSqao0q6P45JQ==
+X-CSE-MsgGUID: c22wgT9sQy25wapps95UVg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11136"; a="22599209"
+X-IronPort-AV: E=Sophos;i="6.09,215,1716274800"; 
+   d="scan'208";a="22599209"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 15:03:10 -0700
+X-CSE-ConnectionGUID: 8BjlIPCbTHaXuAZrNJ+4KQ==
+X-CSE-MsgGUID: fUCh/j56S5qsRaHwnHJXuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,215,1716274800"; 
+   d="scan'208";a="88014343"
+Received: from vcostago-mobl3.jf.intel.com (HELO vcostago-mobl3) ([10.241.225.92])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 15:03:11 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse
+ Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>, Richard
+ Cochran <richardcochran@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>,
+ Sasha
+ Neftin <sasha.neftin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH iwl-net v2 2/3] igc: Fix reset adapter logics when tx
+ mode change
+In-Reply-To: <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
+References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
+ <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
+ <87o774u807.fsf@intel.com>
+ <6bb1ba4a-41ba-4bc1-9c4b-abfb27944891@linux.intel.com>
+ <87le27ssu4.fsf@intel.com>
+ <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
+Date: Wed, 17 Jul 2024 15:03:10 -0700
+Message-ID: <87msmf3cdd.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+Hi,
 
-Use pe directly to resolve sparse warning:
+"Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
 
-  net/netfilter/ipvs/ip_vs_ctl.c:1471:27: warning: dereference of noderef expression
+> On 12/7/2024 1:10 am, Vinicius Costa Gomes wrote:
+>> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
+>> 
+>>> Hi Vinicius,
+>>>
+>>> On 11/7/2024 6:44 am, Vinicius Costa Gomes wrote:
+>>>> Faizal Rahim <faizal.abdul.rahim@linux.intel.com> writes:
+>>>>
+>>>>> Following the "igc: Fix TX Hang issue when QBV Gate is close" changes,
+>>>>> remaining issues with the reset adapter logic in igc_tsn_offload_apply()
+>>>>> have been observed:
+>>>>>
+>>>>> 1. The reset adapter logics for i225 and i226 differ, although they should
+>>>>>      be the same according to the guidelines in I225/6 HW Design Section
+>>>>>      7.5.2.1 on software initialization during tx mode changes.
+>>>>> 2. The i225 resets adapter every time, even though tx mode doesn't change.
+>>>>>      This occurs solely based on the condition  igc_is_device_id_i225() when
+>>>>>      calling schedule_work().
+>>>>> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It only
+>>>>>      resets adapter for legacy->tsn tx mode transitions.
+>>>>> 4. qbv_count introduced in the patch is actually not needed; in this
+>>>>>      context, a non-zero value of qbv_count is used to indicate if tx mode
+>>>>>      was unconditionally set to tsn in igc_tsn_enable_offload(). This could
+>>>>>      be replaced by checking the existing register
+>>>>>      IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
+>>>>>
+>>>>> This patch resolves all issues and enters schedule_work() to reset the
+>>>>> adapter only when changing tx mode. It also removes reliance on qbv_count.
+>>>>>
+>>>>> qbv_count field will be removed in a future patch.
+>>>>>
+>>>>> Test ran:
+>>>>>
+>>>>> 1. Verify reset adapter behaviour in i225/6:
+>>>>>      a) Enrol a new GCL
+>>>>>         Reset adapter observed (tx mode change legacy->tsn)
+>>>>>      b) Enrol a new GCL without deleting qdisc
+>>>>>         No reset adapter observed (tx mode remain tsn->tsn)
+>>>>>      c) Delete qdisc
+>>>>>         Reset adapter observed (tx mode change tsn->legacy)
+>>>>>
+>>>>> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is closed"
+>>>>>      to confirm it remains resolved.
+>>>>>
+>>>>> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is closed")
+>>>>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+>>>>> Reviewed-by: Simon Horman <horms@kernel.org>
+>>>>> ---
+>>>>
+>>>> There were a quite a few bugs, some of them my fault, on this part of
+>>>> the code, changing between the modes in the hardware.
+>>>>
+>>>> So I would like some confirmation that ETF offloading/LaunchTime was
+>>>> also tested with this change. Just to be sure.
+>>>>
+>>>> But code-wise, looks good:
+>>>>
+>>>> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>>>>
+>>>>
+>>>> Cheers,
+>>>
+>>>
+>>> Tested etf with offload, looks like working correctly.
+>>>
+>>> 1. mqprio
+>>> tc qdisc add dev enp1s0 handle 100: parent root mqprio num_tc 3 \
+>>> map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
+>>> queues 1@0 1@1 2@2 \
+>>> hw 0
+>>>
+>>> No reset adapter observed.
+>>>
+>>> 2. etf with offload
+>>> tc qdisc replace dev enp1s0 parent 100:1 etf \
+>>> clockid CLOCK_TAI delta 300000 offload
+>>>
+>>> Reset adapter observed (tx mode legacy -> tsn).
+>>>
+>>> 3. delete qdisc
+>>> tc qdisc delete dev enp1s0 parent root handle 100
+>>>
+>>> Reset adapter observed (tx mode tsn -> legacy).
+>>>
+>> 
+>> That no unexpected resets are happening, is good.
+>> 
+>> But what I had in mind was some functional tests that ETF is working. I
+>> guess that's the only way of knowing that it's still working. Sorry that
+>> I wasn't clear about that.
+>> 
+>> 
+>> Cheers,
+>
+> My bad.
+>
+> Just tested ETF functionality and it is working.
+>
 
-Fixes: 39b972231536 ("ipvs: handle connections started by real-servers")
-Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-Acked-by: Julian Anastasov <ja@ssi.bg>
-Acked-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/ipvs/ip_vs_ctl.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Awesome. Thanks for the confirmation:
 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 78a1cc72dc38..706c2b52a1ac 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -1459,18 +1459,18 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
- 	if (ret < 0)
- 		goto out_err;
- 
--	/* Bind the ct retriever */
--	RCU_INIT_POINTER(svc->pe, pe);
--	pe = NULL;
--
- 	/* Update the virtual service counters */
- 	if (svc->port == FTPPORT)
- 		atomic_inc(&ipvs->ftpsvc_counter);
- 	else if (svc->port == 0)
- 		atomic_inc(&ipvs->nullsvc_counter);
--	if (svc->pe && svc->pe->conn_out)
-+	if (pe && pe->conn_out)
- 		atomic_inc(&ipvs->conn_out_counter);
- 
-+	/* Bind the ct retriever */
-+	RCU_INIT_POINTER(svc->pe, pe);
-+	pe = NULL;
-+
- 	/* Count only IPv4 services for old get/setsockopt interface */
- 	if (svc->af == AF_INET)
- 		ipvs->num_services++;
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+
+
+Cheers,
 -- 
-2.30.2
-
+Vinicius
 
