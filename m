@@ -1,115 +1,79 @@
-Return-Path: <netdev+bounces-111858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B03D933B02
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 12:13:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A870933B2B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 12:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1050B1F213A3
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 10:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDFEC2838C0
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 10:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1598817E8F6;
-	Wed, 17 Jul 2024 10:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746E114036F;
+	Wed, 17 Jul 2024 10:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzUWJ1P8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4WyBy4E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630705FBBA;
-	Wed, 17 Jul 2024 10:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA38374C2
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 10:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721211236; cv=none; b=U+Utg0jzYPkSNfT0/7ZmHf6+gtT1sQ45Y7KO+eubI+GXszqwuXZ9OJlap8z8DoqwDfSk9QQumNA/nLdkKz0tN8vjBUphEm5/OW3tgnzmsVPDBOUHMBPxZj5JcyCDmM9hiAEz2bl0kzRnDhD/SZ/qDbgn855KklpQ2VhPI2tMm98=
+	t=1721212474; cv=none; b=hhAsBsRUXkDZB8MHHl9IcW7y9/LW/wQo9JcyyGU+t3IazhdiCDMNZJwe1Q5waMcanDkkvZT6RZjWqQ9/pR6ojdO7ZhOJDfEVytQNoBOEZVRuahdwcHddTfJT0BBUMZvreQZE9NKh0gL4Yxl2MRyNgyWSmtNJ2Pja56zt2q/TSvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721211236; c=relaxed/simple;
-	bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=FXS0mZIn/D0w3wrlaeXwWnRyh3roB4a3x8BApnW0q9P9ogE1/KRVRybnz3qcU95CZssIK2oqreqOwh49MdfAmQK9JQSs4Nhv8SS6TQmpZThhzjlX4lQIG0tWjjhUc/90HA+pZiWYFAPDGwNkX9lH4DBWFIZd/4+qBoQOVLHDLB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzUWJ1P8; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52ea1a69624so7039295e87.1;
-        Wed, 17 Jul 2024 03:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721211232; x=1721816032; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
-        b=EzUWJ1P8NWZSYYDQjqkEiQXPaY86uwQI/G+x37Dvdi0a80CwWLU10A4L318F2JellU
-         9voJZ+7nzXR0kiexe7qURA5LSoROK4ZYbWrJx9jndCJ1Cvixipev6omSJInLfBuFXqmn
-         vs7NjHrK5YDUYKLqXoaRNFu6STAuZw6SsK6Wf3/orOCfSF4S3S4JUIeo76MbXbZ2PIjU
-         bd2wPrC1H6CqWLN1KRONGN2mTHCdwXGde6KlMZnoPE573xtZn1wW7tGDiB+frnPyEGEM
-         Cug9kg7kXRLE3CPTUxirHI6b+hemOAxWtFN1TzeqraYVaYP03PExFMjbkx+Y1zkniUyw
-         7glw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721211232; x=1721816032;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bZohqumUnxUx23tVhFFqBMk5mHhNjzB1zQETaMF7J+g=;
-        b=mvjvMtAeyzB1fZKIRreJTsZ2c1hDloezd9vh8IcVbYjOnZ9zqekU8CKJ+74jzPHEzM
-         xI9LYjq4zSIVAhs9+r2U631InIA6ImnM/asaIVjWeqpDg/20Y5J42nZIwyrXKYqGo7lU
-         8d8ODZNjB5B/tYLZNZ5Dvvwbwj91MrcX8NIDkS6myvvI/e7tnpIjg+6rKM20lOUv9EMz
-         g+5bp3DKflE3wQ+yOjD5zlT+qpEcJm68C9mA3cF6VDQ1nXU6lBlUDcIAGP6zhKIy6mLS
-         3buB711d7jHsD+4LMlgJEXrZU9w4Vo2oP4Kn8p7SWBlcn2fsyjYRuXUJ/GS9RvRe6vaZ
-         RF1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWdcq7X6KaA3EzuYsvMKAsHws1henwI8mUNWEW3O7DHrP4bLP57+qzrLOScYI/+CJILiYpai0qtkh3da3pPT+zUpC9a
-X-Gm-Message-State: AOJu0Yyz1Cwz3eIJNr+9nTCpLJ8w+6uq0lEmQzfhSXPqiCAOWsQRe7B+
-	FWukuGK2DK2iq6IKV9r/Slljh7TKTppc16sgX83g20JmdkhKYUYm
-X-Google-Smtp-Source: AGHT+IHBUSIMWDccM70ipVpLwyXAI32LQU6YXGnanCbfMPOdjmovc33HCYqT0uDUdODiqDmaKk5LIA==
-X-Received: by 2002:a05:6512:4004:b0:52c:fd46:bf07 with SMTP id 2adb3069b0e04-52ee5426fa0mr797165e87.49.1721211232127;
-        Wed, 17 Jul 2024 03:13:52 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:a446:8596:96cf:681b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f25b946sm196580425e9.19.2024.07.17.03.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 03:13:51 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  yangpeihao@sjtu.edu.cn,
-  daniel@iogearbox.net,  andrii@kernel.org,  alexei.starovoitov@gmail.com,
-  martin.lau@kernel.org,  sinquersw@gmail.com,  toke@redhat.com,
-  jhs@mojatatu.com,  jiri@resnulli.us,  sdf@google.com,
-  xiyou.wangcong@gmail.com,  yepeilin.cs@gmail.com
-Subject: Re: [RFC PATCH v9 00/11] bpf qdisc
-In-Reply-To: <20240714175130.4051012-1-amery.hung@bytedance.com> (Amery Hung's
-	message of "Sun, 14 Jul 2024 17:51:19 +0000")
-Date: Wed, 17 Jul 2024 11:13:45 +0100
-Message-ID: <m2bk2wz5pi.fsf@gmail.com>
-References: <20240714175130.4051012-1-amery.hung@bytedance.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1721212474; c=relaxed/simple;
+	bh=BWONjJuPYbLkbk6R0VzOxPRnfY+qcY63hLYiP/w8M6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q0qijadKukerM6Fq13ROALbkdEYzsv0750XgVbVklYx3GyqIunj21WzQNA9a3y3e2MiY66IOuw8qeGf0vOhNXTtvYXHNod0Y6cdGWYHRGOnSfkhqjqCRh12mpLjfq769Nw28s8bStPi2kRrckdwY6VK02xVt4Zx/ip2nh8HUo4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4WyBy4E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 608C5C32782;
+	Wed, 17 Jul 2024 10:34:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721212473;
+	bh=BWONjJuPYbLkbk6R0VzOxPRnfY+qcY63hLYiP/w8M6I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k4WyBy4Ei/gt5vJUhiOfkKUqqE6KaUmmaRt49Qiz1wJcL8fyGpY4ibC/4PHwZC+2A
+	 Rr2CBUmytHY6l4x8DAET5agBFWbJDRBivxvrQFjjWZ9b+r0kjjk4UISrhiQDj8aBcP
+	 N3TCNcydVxNzq0RkcrdwQqfQ986/W7YvldWa+kBtyq1cHysIl9+rIs6ahVZ4YlPgzi
+	 HME9wODGrS/7yneg4GF/OkZ3uBhgAxWKqsKhcGLMwnDYgtPfmYjkwsHT//GKMoHMTl
+	 vBEUiLnZESZgvVsrptXQ8NEl38LmTXalnykU37LmZk+HzymIAbeTz6ugHpbf5MMfga
+	 x9Jhi37ZhhyjA==
+Date: Wed, 17 Jul 2024 11:34:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	lorenzo.bianconi83@gmail.com
+Subject: Re: [PATCH net] net: airoha: fix error branch in airoha_dev_xmit and
+ airoha_set_gdm_ports
+Message-ID: <20240717103429.GI249423@kernel.org>
+References: <b628871bc8ae4861b5e2ab4db90aaf373cbb7cee.1721203880.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b628871bc8ae4861b5e2ab4db90aaf373cbb7cee.1721203880.git.lorenzo@kernel.org>
 
-Amery Hung <ameryhung@gmail.com> writes:
+On Wed, Jul 17, 2024 at 10:15:46AM +0200, Lorenzo Bianconi wrote:
+> Fix error case management in airoha_dev_xmit routine since we need to
+> DMA unmap pending buffers starting from q->head.
+> Moreover fix a typo in error case branch in airoha_set_gdm_ports
+> routine.
+> 
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-> Hi all,
->
-> This patchset aims to support implementing qdisc using bpf struct_ops.
-> This version takes a step back and only implements the minimum support
-> for bpf qdisc. 1) support of adding skb to bpf_list and bpf_rbtree
-> directly and 2) classful qdisc are deferred to future patchsets.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-How do you build with this patchset?
-
-I had to build with the following to get the selftests to build:
-
-CONFIG_NET_SCH_NETEM=y
-CONFIG_NET_FOU=y
-
-> * Miscellaneous notes *
->
-> The bpf qdiscs in selftest requires support of exchanging kptr into
-> allocated objects (local kptr), which Dave Marchevsky developed and
-> kindly sent me as off-list patchset.
-
-It's impossible to try out this patchset without the kptr patches. Can
-you include those patches here?
 
