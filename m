@@ -1,156 +1,109 @@
-Return-Path: <netdev+bounces-111965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156659344F0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 00:52:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FFC4934516
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 01:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A79280F97
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 22:52:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B211C215E2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 23:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097C34EB2B;
-	Wed, 17 Jul 2024 22:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBB16EB7D;
+	Wed, 17 Jul 2024 23:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qp5NDi5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AABC33CC4;
-	Wed, 17 Jul 2024 22:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5797A1878
+	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 23:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721256716; cv=none; b=aEjApBl9IeIZC/XKXF2FesXAd3pTgMYbzGlAr1q2TYAzpUu0b8NWZXjMoELT9qC1lB3z67kYsT6sYKlHErIY7Za6j/sZ5RoeT7Kdom7W1E1VDQcgSPQWfILqy+SaSOysGc/9EubagYyijbyMOym8zL1oGVBUf9LOanAjnesy2dI=
+	t=1721259702; cv=none; b=dd5k399e/iCNLpBvqLYWgBZ9o8JQeEnMSHcqKDJeNKgky/7OCjpV6KoOj+CB1mgTBSYMUIdIzsHDQloNF3MyuXR8fsw4OumxtpIVkYQvoNuZPj54Y4xniAfn4PZDDZmM9GmiVQE/zCyHKq/yM2jbwA07A4riRCcBIXTjY8esFEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721256716; c=relaxed/simple;
-	bh=Kta5pGFKsCj1QggM9fckGxDAdIXSyAuSr3K5rkaZJSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LpPkDhQnoo0b1uX80t8WgZfaDfK1WC+c3JoY4bB5f2Lv14z82RS9fOHsS/5G2TcvE8F3bkN0yKrrLzElMabcWY+G2ny1gxRjeS50sqf7fvk+32Fr2PvrAoC5wKh+fGSdTTrVYRlKUxz/bDrVW3DtrA0n5zJqXADp939bh9P6oIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4265f823147so291375e9.3;
-        Wed, 17 Jul 2024 15:51:55 -0700 (PDT)
+	s=arc-20240116; t=1721259702; c=relaxed/simple;
+	bh=OePmnBNxXcqQ8hkL4Opt+Ze5aDkg/NsMFsvb1a/5MZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TRopNo1VGRUp1T3W+KpE2nxXqa5zPZXWXoPCznBxLwf/umnrcvSKC3lRo2O+pEMb8Ou6IJW+a3EgwG5ZhPqdU6I3g7Bu7h3rwNRmSMKChvwxOvreSNsjtYLE1dIKVn8VDwAhU/V93vQYM9I87kax1id5/stqXWCj5zVGlnH5vt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qp5NDi5y; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-64789495923so2113787b3.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 16:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1721259696; x=1721864496; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OePmnBNxXcqQ8hkL4Opt+Ze5aDkg/NsMFsvb1a/5MZw=;
+        b=qp5NDi5y2zIOcH9AXZL8LA0LDxn1mI6Wn8o/aUOnjeivzxkcY1/8jWtS6avr/mNea2
+         zivbb+OnlVWx3ga+G3eqXpY4ek7V97mCB62hFJ70u5RohGikDlITZQMTa6Pe1JGV5bfi
+         NB/MXt7HNT7zHyvJziQ4ttJEcc8wbMxD5oePo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721256714; x=1721861514;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1721259696; x=1721864496;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s0M64jRxdtrIITpN4HFOHIiK/TKB1YJndYfAL1oKmq0=;
-        b=t2EGmnFRbKrFDhcGajEpl3+2l6YFCp5WMq9r5GvJazy9u3dw7SeQM+H4IOgMOEvVLp
-         buRBfGkbmSBj+BSwZar/5iTJCDMH7uOgM9Rh/7/zY3LcXHxKEf7MIG7jMsYCvD7639qp
-         bWriy1xGGs+IaM5djMMaDtFoUegeZRabmhJhweksr7f6fuOrjzrVM20WW19daphg2dNy
-         oORVcR3nmHO1xxw+6/xZ7oQKECjJBmT2hLHe68h4F5yc8/Q+JaWaPmup934v+1o0E6yN
-         F56ubIrQ9O9HD44BPkbjD7oZp+z/pZAvJciHnlNsIiqooMHTrLX27Hu7bYvmrGH+7WGE
-         37nA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3YPVuR8uGR+S4QKuImRJcRwCS5/Looi4jWHznz3cibUTTNYJSfCX8PFofz9cpNst7QWtaciWv@vger.kernel.org, AJvYcCWwnFzp/XQX0+0xGW8LYKWecrS2QlboVKSHVrrmamGXyv1iJKlgI05uPX8rOtkdkeVDqoRQLo4/Vc6F@vger.kernel.org, AJvYcCXSkEJ7You+GVwFW/SZgmq1G0VGFuJ8D9TOmRmRqKWVZwJanFLWluB3Ts/G7jEx5lEhjkuEOgXKZsHnbrs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyC9SFMu/JWTqFUb/LN69WhZVVN/Fps5mncdfOMji3Cb82Vcc4
-	CV8DnIBA9bQerMDMZhhpHCPqEZpqhipHak5yO3+q/9KIL/+9XfBn
-X-Google-Smtp-Source: AGHT+IGjse9ynxNLLxkSLaOFMZvanW6vy86VI1WLzh8tqLRb+7IQ7INQFlIBWZ7Hb1LYbkNNUkxvHA==
-X-Received: by 2002:a05:600c:5101:b0:427:9f6f:9c00 with SMTP id 5b1f17b1804b1-427c2d52195mr14721745e9.6.1721256713451;
-        Wed, 17 Jul 2024 15:51:53 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.198.251.dynamic.barak-online.net. [85.65.198.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427c7857eadsm12107835e9.40.2024.07.17.15.51.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jul 2024 15:51:53 -0700 (PDT)
-Message-ID: <3f675a0f-45c1-41bd-887a-fe6e6d793ecf@grimberg.me>
-Date: Thu, 18 Jul 2024 01:51:50 +0300
+        bh=OePmnBNxXcqQ8hkL4Opt+Ze5aDkg/NsMFsvb1a/5MZw=;
+        b=g149ZhzhPaPn0E+zFeGVh107xC1s60B+FsRCzDalksvsXn7yZttMiq6xN4WFj6Afis
+         NjZxnaquEphnH6Ctotb95h7LJGseoG1L5ghhVqOhnyX9JkGkgJ7aXKWufFeM5AwaKaea
+         NdeklD9SeebnaBnffKB85mJiUzffWIXkHzcVyg5Cmnm7pDlDQ8LAriCmpsa4zj4B5e+Z
+         DvCzgEjqjMUlooLNTe3+AzzfDJQtukN2J9UPZpMMdchfoPBEEMF4hYaAS5SckSvD4ko5
+         g8E8g8xVZ5kJCeZIVOHxMy3xgj84w2MYi7fBYnwv3Srsrbx9mEm02aVjcf9weToN7r5F
+         dxNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXc0aY2HhoqeWm1+DMiZYZUG55dx9NXG7jaNDgc9LNKuuhsNQK9g8f8iitXUL3ANktgqDSLNLtHappJpDDxP8VM2ay77Wx0
+X-Gm-Message-State: AOJu0YzGq8PwGb91hLohGNp6wzMZlqsZ24Ofu/ouCFHhi9kz3Q49CF+Y
+	18GGrHqM026PIHgErGQue2ZjvVDU0iYt1nYyaKBmjA7F20uC3EINIrnG4KR0/K8=
+X-Google-Smtp-Source: AGHT+IG06EEyyEmG++GQzdMvsD/Q2ymdzca3Nl7yHImDDfUblOJ5Ej+W6vy3FASnQs2XXt0uDqmTAQ==
+X-Received: by 2002:a05:690c:2712:b0:64b:a3f0:5eee with SMTP id 00721157ae682-66601dc3816mr11547417b3.17.1721259696404;
+        Wed, 17 Jul 2024 16:41:36 -0700 (PDT)
+Received: from LQ3V64L9R2 ([2600:381:1f09:7c46:a087:d053:b69a:b5a9])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-666043b97f0sm1152897b3.142.2024.07.17.16.41.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 16:41:35 -0700 (PDT)
+Date: Wed, 17 Jul 2024 16:41:32 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: James Tucker <jftucker@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: uapi: add TCPI_OPT_NODELAY to tcp_info
+Message-ID: <ZphWrG0H3TR0vg7R@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	James Tucker <jftucker@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20240717-nagle-tcpinfo-v1-1-83e149ef9953@gmail.com>
+ <ZphI8Z89iLe3ksVP@LQ3V64L9R2>
+ <ZphJyabJV2wDrKzi@LQ3V64L9R2>
+ <CABGa_T9HJdFiO8gSn72_YP6rp3t+RhSEtYXtgqxp2GUzQJiBmg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/4] libceph: use sendpages_ok() instead of
- sendpage_ok()
-To: Ilya Dryomov <idryomov@gmail.com>, Ofir Gal <ofir.gal@volumez.com>
-Cc: davem@davemloft.net, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
- pabeni@redhat.com, kbusch@kernel.org, xiubli@redhat.com
-References: <20240611063618.106485-1-ofir.gal@volumez.com>
- <20240611063618.106485-5-ofir.gal@volumez.com>
- <2695367b-8c67-47ab-aa2c-3529b50b1a83@volumez.com>
- <CAOi1vP96JtsP02hpsZpeknKN_dh3JdnQomO8aTbuH6Bz247rxA@mail.gmail.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <CAOi1vP96JtsP02hpsZpeknKN_dh3JdnQomO8aTbuH6Bz247rxA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABGa_T9HJdFiO8gSn72_YP6rp3t+RhSEtYXtgqxp2GUzQJiBmg@mail.gmail.com>
 
+On Wed, Jul 17, 2024 at 03:53:07PM -0700, James Tucker wrote:
+> I'm using b4, as gmail SMTP is not suitable. b4 crashed after sending the
+> email, failing to create it's own tracking metadata.
 
+Not sure what you mean exactly, but I presume this is why you are
+top posting? In the future, please reply in line.
 
-On 17/07/2024 23:26, Ilya Dryomov wrote:
-> On Tue, Jul 16, 2024 at 2:46 PM Ofir Gal <ofir.gal@volumez.com> wrote:
->> Xiubo/Ilya please take a look
->>
->> On 6/11/24 09:36, Ofir Gal wrote:
->>> Currently ceph_tcp_sendpage() and do_try_sendpage() use sendpage_ok() in
->>> order to enable MSG_SPLICE_PAGES, it check the first page of the
->>> iterator, the iterator may represent contiguous pages.
->>>
->>> MSG_SPLICE_PAGES enables skb_splice_from_iter() which checks all the
->>> pages it sends with sendpage_ok().
->>>
->>> When ceph_tcp_sendpage() or do_try_sendpage() send an iterator that the
->>> first page is sendable, but one of the other pages isn't
->>> skb_splice_from_iter() warns and aborts the data transfer.
->>>
->>> Using the new helper sendpages_ok() in order to enable MSG_SPLICE_PAGES
->>> solves the issue.
->>>
->>> Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
->>> ---
->>>   net/ceph/messenger_v1.c | 2 +-
->>>   net/ceph/messenger_v2.c | 2 +-
->>>   2 files changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
->>> index 0cb61c76b9b8..a6788f284cd7 100644
->>> --- a/net/ceph/messenger_v1.c
->>> +++ b/net/ceph/messenger_v1.c
->>> @@ -94,7 +94,7 @@ static int ceph_tcp_sendpage(struct socket *sock, struct page *page,
->>>         * coalescing neighboring slab objects into a single frag which
->>>         * triggers one of hardened usercopy checks.
->>>         */
->>> -     if (sendpage_ok(page))
->>> +     if (sendpages_ok(page, size, offset))
->>>                msg.msg_flags |= MSG_SPLICE_PAGES;
->>>
->>>        bvec_set_page(&bvec, page, size, offset);
->>> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
->>> index bd608ffa0627..27f8f6c8eb60 100644
->>> --- a/net/ceph/messenger_v2.c
->>> +++ b/net/ceph/messenger_v2.c
->>> @@ -165,7 +165,7 @@ static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
->>>                 * coalescing neighboring slab objects into a single frag
->>>                 * which triggers one of hardened usercopy checks.
->>>                 */
->>> -             if (sendpage_ok(bv.bv_page))
->>> +             if (sendpages_ok(bv.bv_page, bv.bv_len, bv.bv_offset))
->>>                        msg.msg_flags |= MSG_SPLICE_PAGES;
->>>                else
->>>                        msg.msg_flags &= ~MSG_SPLICE_PAGES;
-> Hi Ofir,
->
-> Ceph should be fine as is -- there is an internal "cursor" abstraction
-> that that is limited to PAGE_SIZE chunks, using bvec_iter_bvec() instead
-> of mp_bvec_iter_bvec(), etc.  This means that both do_try_sendpage() and
-> ceph_tcp_sendpage() should be called only with
->
->    page_off + len <= PAGE_SIZE
->
-> being true even if the page is contiguous (and that we lose out on the
-> potential performance benefit, of course...).
->
-> That said, if the plan is to remove sendpage_ok() so that it doesn't
-> accidentally grow new users who are unaware of this pitfall, consider
-> this
->
-> Acked-by: Ilya Dryomov <idryomov@gmail.com>
+> Should I create a new thread in two weeks with the updates you suggest?
 
- From which tree should this go from? we can take it via the nvme tree, 
-unless
-someone else wants to queue it up...
+Yes - or you can create an RFC in the meantime to get feedback from
+others.
 
