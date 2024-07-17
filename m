@@ -1,202 +1,128 @@
-Return-Path: <netdev+bounces-111960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB49934487
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 00:04:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB3093448C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 00:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EDEC1C20FE5
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 22:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA9C01F21B6F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 22:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6714D8BC;
-	Wed, 17 Jul 2024 22:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012C839AEB;
+	Wed, 17 Jul 2024 22:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O5qQKDpR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DryeXZdu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BF93BBFB;
-	Wed, 17 Jul 2024 22:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0E54D8AF;
+	Wed, 17 Jul 2024 22:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721253795; cv=none; b=sTRvFzP5+xmli3zYMyhtDymb9WKQ7ORHocV64omnn8A7bdickzwi1BAnd6QuZ7khm7SQIonyIYcTiMw5J8nf9D+PzoCDBV9qCzWPo2d1Iop5jO8ddouIrF830UjK6cU7Rtb9irUFe/de3fH+tkO7ATbe70aINXIVlYCd1ECy9HE=
+	t=1721253888; cv=none; b=i9MdThDJwn33FfmSB5daXe+hslmU13oFDKFFQUPdjmWtmIXT5dKeLwl02Wfy+wPp/heFnDFxeevvRY60qLC/MI7ZXn353f11/p0i3xlfEgIi46fSkLC7YNb0e/eeMgg63GToKGo6bXDE0BUZBguhqERdZ+x/ibuKOMhsPr2re98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721253795; c=relaxed/simple;
-	bh=xvMqdi9WDEg+JNQMrlEj2e0h/3nai7MYNzN4vR/RJH4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=c4Zk8JNkEDYLsdw3/JesWHCMSwtd2g+pedUM1xGeK7wdaXZgfnWyJOdEEAnFiaydgho005+TC+m/YnDujyU8dG5vWFKyh6phaaBqkTx5LRqoR2/Tz8WBBNkgUfEZdtCT1HCuC+zV0r833iVZFnAIiokXwlwJndnUXApUg+9bPD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O5qQKDpR; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721253792; x=1752789792;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=xvMqdi9WDEg+JNQMrlEj2e0h/3nai7MYNzN4vR/RJH4=;
-  b=O5qQKDpRpwbPmwywpAV3qs7jOihQhrd8VAhZ51s0ztGJVYiam+KGK8Dw
-   r8xi1bb2RwQve3hl5m7kN0j88tVU5Kr7wXHtPMrKDyQuySjQbMUDgirxM
-   Yg6qL42XoWhG5jUYNW3HKg3dkCBiC0heiBYqUR9nh37h9ru4tF6acOMC9
-   H+nj2lxwl2ilSWGYhZYYjk/IhoFlMD09TPNqTjeSXbTZIOe841lgkTT6W
-   p6Nlw9itYESu5W6FOYxbb5A2OMBBaP6JwxSKblt9Dhz9ZrqGyKsHUJGcZ
-   ZmG+dsLw3i/Hw0NhPUtciBI5ShPhp6SslIM10CT+zwiWoKxFE5Kw7C69r
-   Q==;
-X-CSE-ConnectionGUID: 1vZM+4zJTnSqao0q6P45JQ==
-X-CSE-MsgGUID: c22wgT9sQy25wapps95UVg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11136"; a="22599209"
-X-IronPort-AV: E=Sophos;i="6.09,215,1716274800"; 
-   d="scan'208";a="22599209"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 15:03:10 -0700
-X-CSE-ConnectionGUID: 8BjlIPCbTHaXuAZrNJ+4KQ==
-X-CSE-MsgGUID: fUCh/j56S5qsRaHwnHJXuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,215,1716274800"; 
-   d="scan'208";a="88014343"
-Received: from vcostago-mobl3.jf.intel.com (HELO vcostago-mobl3) ([10.241.225.92])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 15:03:11 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse
- Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>, Richard
- Cochran <richardcochran@gmail.com>, Paul Menzel <pmenzel@molgen.mpg.de>,
- Sasha
- Neftin <sasha.neftin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH iwl-net v2 2/3] igc: Fix reset adapter logics when tx
- mode change
-In-Reply-To: <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
-References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
- <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
- <87o774u807.fsf@intel.com>
- <6bb1ba4a-41ba-4bc1-9c4b-abfb27944891@linux.intel.com>
- <87le27ssu4.fsf@intel.com>
- <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
-Date: Wed, 17 Jul 2024 15:03:10 -0700
-Message-ID: <87msmf3cdd.fsf@intel.com>
+	s=arc-20240116; t=1721253888; c=relaxed/simple;
+	bh=j+4hWmewnH7hGdnNXnkTDCzUqai2SHYQ5ldqvkbVLc4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TOAJpXFI1HbcKvXvETBXNdEdpHNBnMa0iT/ZCera/CrJaCD0PkG0yPhi5WCpN7SVGykhhZqJ5ff6qgXQqUVOagFO3KsLhhkhS1HbaMLnEn0YKIHzurcEAxHSIbzCYgwyP9wvpS8ZMdAq3JYC+gt9rDM938lcD8PbypNjX7qcOQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DryeXZdu; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e05d48cf642so180026276.2;
+        Wed, 17 Jul 2024 15:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721253886; x=1721858686; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j+4hWmewnH7hGdnNXnkTDCzUqai2SHYQ5ldqvkbVLc4=;
+        b=DryeXZduIKZi/u0/wl7PfZHNwxdz1W5NfeT7ZswLSEhSgLBLAOwG0SgOR2+170oS+f
+         80BSgE2BcTsryBWuE7hCGD3O/FHrZ8hW64ZvQV7pkr/Cv4fWijcllT2CkX61OkyywVoE
+         29Y/9Nld7wA9eiXf5oqA+/YM0X9B6r0Leo/lT2B0Qto75GmA0rm0gg8iEJiyLLf12kAw
+         xWWW3XmQGU2TqXKnvihPLvMdUBq0emLD7h/ADoXpcohWU+qFAniH8T3krhONsrtCaEQg
+         D0Xadg91/y7QSn2EeHvyRS1/dHRZSdfGQlGgh+AzLOZOZzTq/RiX1ShQzKnQ/G+BTFLh
+         9OJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721253886; x=1721858686;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j+4hWmewnH7hGdnNXnkTDCzUqai2SHYQ5ldqvkbVLc4=;
+        b=d0gQL5+gYONCEb7uaU+Ox9tmGxJ0mZNELIbZtefnjWTyF2rQ7kSRi2QtTt9s1odsBP
+         Y4p+dnlgrr9x7ve+SBUK3HeIR0gyK9vNwlSimMEbsWF3aAJjSwvEaW1sxhF/MU0rqRtB
+         VMa0JK4Vqh8A8xScrCbAL9CKyM6Krwxfu5PVM8TnJ0oOm8HgIRHEXl+wQEjQbblUD7mT
+         GLB8U8bRaSmWasmZCwjGOQNe0bamuHznwE9OiotPHrEtWB84bdScuvNN20jHLxqfEaRp
+         UNOR9GTc/fO7A8MHPrDteq6USwi2S8CyWxxNiVVOhRhZ3eaPG5bkDxwK339OH8NLpfB5
+         YlDg==
+X-Forwarded-Encrypted: i=1; AJvYcCV40QBC6o+VKwxdhfmgCCVLnapG2A6lPcZlVBWwmonIVR6IKb18BxyyMRYxj9XG9i7ZcOxftEv6qFFF3zZ4qj2oBgwP
+X-Gm-Message-State: AOJu0Yx+vyi09Gz+Aq0grmFWEUg6RO3O2NRtTGH6PAoC4n7oQ6bHixb9
+	RTiWADqvTZfcHymU2TVj8JeA/fXsDOv0en0pbcjd0V4QS/seWYxnZxL3Z4daEzRel5981X9II0W
+	tE5NHTvV0XOPrbnU9BNeh15hZGFE=
+X-Google-Smtp-Source: AGHT+IGQRwmNx5NqP+1e+umgCisxCGZr/EFMSS0JwkN7tjvl68jCCLyZW1k67gBT6wO7SIA45BNRMhs2aC1cM3tuJT8=
+X-Received: by 2002:a05:6902:f8a:b0:dff:3055:3c26 with SMTP id
+ 3f1490d57ef6-e05ed7e7d62mr3137048276.40.1721253886523; Wed, 17 Jul 2024
+ 15:04:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240714175130.4051012-1-amery.hung@bytedance.com> <m2bk2wz5pi.fsf@gmail.com>
+In-Reply-To: <m2bk2wz5pi.fsf@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 17 Jul 2024 15:04:35 -0700
+Message-ID: <CAMB2axOguJd=2b3wjnvahE=OxZcU-6Th3kkmuJb=_coT=GjiBg@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 00/11] bpf qdisc
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com, 
+	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, sdf@google.com, xiyou.wangcong@gmail.com, 
+	yepeilin.cs@gmail.com, Dave Marchevsky <davemarchevsky@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-"Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
-
-> On 12/7/2024 1:10 am, Vinicius Costa Gomes wrote:
->> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
->> 
->>> Hi Vinicius,
->>>
->>> On 11/7/2024 6:44 am, Vinicius Costa Gomes wrote:
->>>> Faizal Rahim <faizal.abdul.rahim@linux.intel.com> writes:
->>>>
->>>>> Following the "igc: Fix TX Hang issue when QBV Gate is close" changes,
->>>>> remaining issues with the reset adapter logic in igc_tsn_offload_apply()
->>>>> have been observed:
->>>>>
->>>>> 1. The reset adapter logics for i225 and i226 differ, although they should
->>>>>      be the same according to the guidelines in I225/6 HW Design Section
->>>>>      7.5.2.1 on software initialization during tx mode changes.
->>>>> 2. The i225 resets adapter every time, even though tx mode doesn't change.
->>>>>      This occurs solely based on the condition  igc_is_device_id_i225() when
->>>>>      calling schedule_work().
->>>>> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It only
->>>>>      resets adapter for legacy->tsn tx mode transitions.
->>>>> 4. qbv_count introduced in the patch is actually not needed; in this
->>>>>      context, a non-zero value of qbv_count is used to indicate if tx mode
->>>>>      was unconditionally set to tsn in igc_tsn_enable_offload(). This could
->>>>>      be replaced by checking the existing register
->>>>>      IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
->>>>>
->>>>> This patch resolves all issues and enters schedule_work() to reset the
->>>>> adapter only when changing tx mode. It also removes reliance on qbv_count.
->>>>>
->>>>> qbv_count field will be removed in a future patch.
->>>>>
->>>>> Test ran:
->>>>>
->>>>> 1. Verify reset adapter behaviour in i225/6:
->>>>>      a) Enrol a new GCL
->>>>>         Reset adapter observed (tx mode change legacy->tsn)
->>>>>      b) Enrol a new GCL without deleting qdisc
->>>>>         No reset adapter observed (tx mode remain tsn->tsn)
->>>>>      c) Delete qdisc
->>>>>         Reset adapter observed (tx mode change tsn->legacy)
->>>>>
->>>>> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is closed"
->>>>>      to confirm it remains resolved.
->>>>>
->>>>> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is closed")
->>>>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
->>>>> Reviewed-by: Simon Horman <horms@kernel.org>
->>>>> ---
->>>>
->>>> There were a quite a few bugs, some of them my fault, on this part of
->>>> the code, changing between the modes in the hardware.
->>>>
->>>> So I would like some confirmation that ETF offloading/LaunchTime was
->>>> also tested with this change. Just to be sure.
->>>>
->>>> But code-wise, looks good:
->>>>
->>>> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->>>>
->>>>
->>>> Cheers,
->>>
->>>
->>> Tested etf with offload, looks like working correctly.
->>>
->>> 1. mqprio
->>> tc qdisc add dev enp1s0 handle 100: parent root mqprio num_tc 3 \
->>> map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
->>> queues 1@0 1@1 2@2 \
->>> hw 0
->>>
->>> No reset adapter observed.
->>>
->>> 2. etf with offload
->>> tc qdisc replace dev enp1s0 parent 100:1 etf \
->>> clockid CLOCK_TAI delta 300000 offload
->>>
->>> Reset adapter observed (tx mode legacy -> tsn).
->>>
->>> 3. delete qdisc
->>> tc qdisc delete dev enp1s0 parent root handle 100
->>>
->>> Reset adapter observed (tx mode tsn -> legacy).
->>>
->> 
->> That no unexpected resets are happening, is good.
->> 
->> But what I had in mind was some functional tests that ETF is working. I
->> guess that's the only way of knowing that it's still working. Sorry that
->> I wasn't clear about that.
->> 
->> 
->> Cheers,
+On Wed, Jul 17, 2024 at 3:13=E2=80=AFAM Donald Hunter <donald.hunter@gmail.=
+com> wrote:
 >
-> My bad.
+> Amery Hung <ameryhung@gmail.com> writes:
 >
-> Just tested ETF functionality and it is working.
+> > Hi all,
+> >
+> > This patchset aims to support implementing qdisc using bpf struct_ops.
+> > This version takes a step back and only implements the minimum support
+> > for bpf qdisc. 1) support of adding skb to bpf_list and bpf_rbtree
+> > directly and 2) classful qdisc are deferred to future patchsets.
+>
+> How do you build with this patchset?
+>
+> I had to build with the following to get the selftests to build:
+>
+> CONFIG_NET_SCH_NETEM=3Dy
+> CONFIG_NET_FOU=3Dy
 >
 
-Awesome. Thanks for the confirmation:
+There are config issues in my code. bpf qdisc depends on
+CONFIG_NET_SCHED. Therefore, I will create a config entry,
+CONFIG_NET_SCH_BPF, for bpf qdisc and make it under CONFIG_NET_SCHED
+in Kconfig. The selftests will then require CONFIG_NET_SCH_BPF to
+build.
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+I will send the fixed patches in reply to the problematic patches.
+Sorry for the inconvenience.
 
+> > * Miscellaneous notes *
+> >
+> > The bpf qdiscs in selftest requires support of exchanging kptr into
+> > allocated objects (local kptr), which Dave Marchevsky developed and
+> > kindly sent me as off-list patchset.
+>
+> It's impossible to try out this patchset without the kptr patches. Can
+> you include those patches here?
 
-Cheers,
--- 
-Vinicius
+Will do.
 
