@@ -1,157 +1,145 @@
-Return-Path: <netdev+bounces-111842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF9959337BA
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 09:21:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 484CF933816
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 09:36:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C6391C2261B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 07:21:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A309EB20CF7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jul 2024 07:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F68C1B28A;
-	Wed, 17 Jul 2024 07:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BE11BDD0;
+	Wed, 17 Jul 2024 07:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t2iTlWay"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA18E1CD1F
-	for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 07:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565CD17BDC;
+	Wed, 17 Jul 2024 07:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721200900; cv=none; b=Fx3s31qygiBWqVCDzOR5nSChTwIZybevsF1+W20HJJAdSaIArStYuPGWb4dT24g3tyXHjWH4+DGad9JxuYeyWULzyLWmffZBNG913IbIMvaox9Pus90Zu5PKFRT7jhUis4n6+V8Y95POdzlh+rvApwusPvuwBcduUjm6zPHs338=
+	t=1721201773; cv=none; b=ceMkwPGo7BBbPr0ATn2JGTtvkZyhMZS23OCSv1cEePLHZXLgk9+gocdnSgM0sKBG1CD8F1VWd7dlVD5V0ta9Y5G8ff8UbqvyATcFPon7tTvluXYLz+vK1gnKXfnVsPI2vJCYA8ALj+hrjRlY4OOz2YJMvBP72Y/0PsyrAF4I7pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721200900; c=relaxed/simple;
-	bh=7dyhTQjy+22B7GIQfMe+2jE4/DTU5dL5I/JauqWJc+Q=;
+	s=arc-20240116; t=1721201773; c=relaxed/simple;
+	bh=DDscfeFdgVitL5WGsurjRFhEaiQNw6wovwBI8OWQiyM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KpkruPNIO0kFBDjT5CDklpSXPL0FzQB971dcWRI6GBOMZKi/rjpdAiiM5ddIS2RWbp5S42DT+aoLQJG+1rH2X9NpfdA86X/0UbV/99ufjyzwamcvsLyX7JZBqIx0JDqMHjzsK6prKSkxGKnq+hak3E+MikCiQeKuNcC9vYN1CIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTyyQ-0006wr-Ga; Wed, 17 Jul 2024 09:21:14 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sTyyO-000A17-Cx; Wed, 17 Jul 2024 09:21:12 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 524B830595B;
-	Wed, 17 Jul 2024 07:20:46 +0000 (UTC)
-Date: Wed, 17 Jul 2024 09:20:45 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Bough Chen <haibo.chen@nxp.com>
-Cc: Frank Li <frank.li@nxp.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, Han Xu <han.xu@nxp.com>
-Subject: Re: RE: [PATCH v2 4/4] can: flexcan: add wakeup support for imx95
-Message-ID: <20240717-porpoise-of-imminent-inspiration-ef2fc6-mkl@pengutronix.de>
-References: <20240715-flexcan-v2-0-2873014c595a@nxp.com>
- <20240715-flexcan-v2-4-2873014c595a@nxp.com>
- <20240716-curious-scorpion-of-glory-8265aa-mkl@pengutronix.de>
- <ZpaF4Wc70VuV4Cti@lizhi-Precision-Tower-5810>
- <20240716-chowchow-of-massive-joviality-77e833-mkl@pengutronix.de>
- <DU0PR04MB9496C653249E66016A43F97790A32@DU0PR04MB9496.eurprd04.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SZX9ahmKwtMPGAUeCxlQth+WzDAAl+D/199y4RGJhenTmqNO/WYJQSuM1xGgUoWPoQPAc4bOBcNV3e1oqXo6jq7Ms6CfmxkWwoCQ1Gz88ecu+lvG48Bs7mt8Cf/vw4m/9bgd5bgz7eJltfWhCoXin6q41TFRtwWFbzFmFaugAic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t2iTlWay; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09BD5C32782;
+	Wed, 17 Jul 2024 07:36:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721201772;
+	bh=DDscfeFdgVitL5WGsurjRFhEaiQNw6wovwBI8OWQiyM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t2iTlWayEv7uaa8ulrsaBTC3XdATDPEITl8I1CWhBPW3HqnYdwQB6h0UR1D/F6BxS
+	 YEf37O6bwlCDaVlrXZRYqGlcVk7JeeIcwaT76HgDx1D/7mfuN1sVpDTOsv+C82Ng6g
+	 AV9ZAvoXG6r0sEqCnwOYqotLoijzlmyWpH3nQLh4bEC4kEckLelc4XgHu3VJQfbaIO
+	 FP36m4RZvdYfo2xBcuj+5qwl8d5GaPckOktQhi6Yo0iBB66T0xCXRlBoVtTzOLRuFz
+	 8n03KzVjW3cwk2z1N8At5bdgec9JY7Ps20O/inY4M8Xi+l4rPXTmAmwb6gNWTcu2gM
+	 EX9eL1imU7Wug==
+Date: Wed, 17 Jul 2024 10:36:07 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Omer Shpigelman <oshpigelman@habana.ai>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	Zvika Yehudai <zyehudai@habana.ai>
+Subject: Re: [PATCH 11/15] RDMA/hbl: add habanalabs RDMA driver
+Message-ID: <20240717073607.GF5630@unreal>
+References: <20240617190429.GB4025@unreal>
+ <461bf44e-fd2f-4c8b-bc41-48d48e5a7fcb@habana.ai>
+ <20240618125842.GG4025@unreal>
+ <b4bda963-7026-4037-83e6-de74728569bd@habana.ai>
+ <20240619105219.GO4025@unreal>
+ <a5554266-55b7-4e96-b226-b686b8a6af89@habana.ai>
+ <20240712130856.GB14050@ziepe.ca>
+ <2c767517-e24c-416b-9083-d3a220ffc14c@habana.ai>
+ <20240716134013.GF14050@ziepe.ca>
+ <ca6c3901-c0c5-4f35-934b-2b4c9f1a61dc@habana.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lyoxbz5qrcbtajuw"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DU0PR04MB9496C653249E66016A43F97790A32@DU0PR04MB9496.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <ca6c3901-c0c5-4f35-934b-2b4c9f1a61dc@habana.ai>
 
+On Wed, Jul 17, 2024 at 07:08:59AM +0000, Omer Shpigelman wrote:
+> On 7/16/24 16:40, Jason Gunthorpe wrote:
+> > On Sun, Jul 14, 2024 at 10:18:12AM +0000, Omer Shpigelman wrote:
+> >> On 7/12/24 16:08, Jason Gunthorpe wrote:
+> >>> [You don't often get email from jgg@ziepe.ca. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> >>>
+> >>> On Fri, Jun 28, 2024 at 10:24:32AM +0000, Omer Shpigelman wrote:
+> >>>
+> >>>> We need the core driver to access the IB driver (and to the ETH driver as
+> >>>> well). As you wrote, we can't use exported symbols from our IB driver nor
+> >>>> rely on function pointers, but what about providing the core driver an ops
+> >>>> structure? meaning exporting a register function from the core driver that
+> >>>> should be called by the IB driver during auxiliary device probe.
+> >>>> Something like:
+> >>>>
+> >>>> int hbl_cn_register_ib_aux_dev(struct auxiliary_device *adev,
+> >>>>                              struct hbl_ib_ops *ops)
+> >>>> {
+> >>>> ...
+> >>>> }
+> >>>> EXPORT_SYMBOL(hbl_cn_register_ib_aux_dev);
+> >>>
+> >>> Definately do not do some kind of double-register like this.
+> >>>
+> >>> The auxiliary_device scheme can already be extended to provide ops for
+> >>> each sub device.
+> >>>
+> >>> Like
+> >>>
+> >>> struct habana_driver {
+> >>>    struct auxiliary_driver base;
+> >>>    const struct habana_ops *ops;
+> >>> };
+> >>>
+> >>> If the ops are justified or not is a different question.
+> >>>
+> >>
+> >> Well, I suggested this double-register option because I got a comment that
+> >> the design pattern of embedded ops structure shouldn't be used.
+> >> So I'm confused now...
+> > 
+> > Yeah, don't stick ops in random places, but the device_driver is the
+> > right place.
+> > 
+> 
+> Sorry, let me explain again. My original code has an ops structure
+> exactly like you are suggesting now (see struct hbl_aux_dev in the first
+> patch of the series). But I was instructed not to use this ops structure
+> and to rely on exported symbols for inter-driver communication.
+> I'll be happy to use this ops structure like in your example rather than
+> converting my code to use exported symbols.
+> Leon - am I missing anything? what's the verdict here?
 
---lyoxbz5qrcbtajuw
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You are missing the main sentence from Jason's response:  "don't stick ops in random places".
 
-On 17.07.2024 02:03:35, Bough Chen wrote:
-> > On 16.07.2024 10:40:31, Frank Li wrote:
-> > > > > @@ -2330,9 +2366,12 @@ static int __maybe_unused
-> > flexcan_noirq_resume(struct device *device)
-> > > > >  	if (netif_running(dev)) {
-> > > > >  		int err;
-> > > > >
-> > > > > -		err =3D pm_runtime_force_resume(device);
-> > > > > -		if (err)
-> > > > > -			return err;
-> > > > > +		if (!(device_may_wakeup(device) &&
-> > > >                       ^^^^^^^^^^^^^^^^^^^^^^^^
-> > > >
-> > > > Where does this come from?
-> > >
-> > > include/linux/pm_wakeup.h
-> > >
-> > > static inline bool device_may_wakeup(struct device *dev)
-> > > {
-> > >         return dev->power.can_wakeup && !!dev->power.wakeup;
-> > > }
-> >=20
-> > Sorry for the confusion. I wanted to point out, that the original drive=
-r doesn't
-> > have the check to device_may_wakeup(). Why was this added?
->=20
-> Here add this to make sure for CAN with flag
-> FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI and really used as wakeup source,
-> do not need to call pm_runtime_force_resume(), keep it align with what
-> we do in flexcan_noirq_suspend.
+It is fine to have ops in device driver, so the core driver can call them. However, in your
+original code, you added ops everywhere. It caused to the need to implement module reference
+counting and crazy stuff like calls to lock and unlock functions from the aux driver to the core.
 
-> As the comment in flexcan_noirq_suspend, CAN with flag
-> FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI, when used as wakeup source, need
-> to keep CAN clock on when system suspend, let ATF part logic works,
-> detail steps please refer to this patch commit log. Whether gate off
-> the CAN clock or not depends on the Hardware design. So for this case,
-> in flexcan_noirq_suspend, directly return0, do not call the
-> pm_runtime_force_suspend(), then in flexcan_noirq_resume(), use the
-> same logic to skip the pm_runtime_force_resume().
+Verdict is still the same. Core driver should provide EXPORT_SYMBOLs, so the aux driver can call
+them directly and enjoy from proper module loading and unloading.
 
-Please change the control flow, so that flexcan_noirq_suspend() and
-flexcan_noirq_resume() look symmetrical.
+The aux driver can have ops in the device driver, so the core driver can call them to perform something
+specific for that aux driver.
 
-regards,
-Marc
+Calls between aux drivers should be done via the core driver.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---lyoxbz5qrcbtajuw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaXcMoACgkQKDiiPnot
-vG+oPQf/YPWUrvcT++JZ07FcseBQUWKsH7dE6a2zvUJix3NiJbujU/7ZWRis8Bhl
-CGbvtpAmEkpcNuKWucYwTYt2eB8y4d0h3qCHeSi1B6Jsg+SGccThY+3/WxfCmwUu
-pMcw4nfvza024LNjyeZLBtys3O81K/GIg3iJ2NULzgQNeKfM8oalPvoEhrMVHEVn
-J+GyKB4zCaZAGfbndeG7OBQleiFSTQ4oi7OEq8rr8lsnjcCfPYDKDfLZQIpFZtqa
-VRiFq7hTayk/qYyVsZhRf8089C4wsp6zhLDoe9Dweu/J8sQ03klMIOUvpKuRD5jC
-FbL9ybQfk28QbWIANcLZnko0sBa6RA==
-=3SL7
------END PGP SIGNATURE-----
-
---lyoxbz5qrcbtajuw--
+Thanks
 
