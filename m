@@ -1,122 +1,252 @@
-Return-Path: <netdev+bounces-112128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE3F2935246
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:54:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10A393524A
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B0EF283820
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 19:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D6111F217A4
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 19:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F177F1459FA;
-	Thu, 18 Jul 2024 19:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8672144D28;
+	Thu, 18 Jul 2024 19:58:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from shelob.surriel.com (shelob.surriel.com [96.67.55.147])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9001343172;
-	Thu, 18 Jul 2024 19:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.67.55.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DE743172
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721332448; cv=none; b=KJrPJswt7UBEx5DdqTK2RGM0BH4Lgdx8Kbk139j9El6YFqIbzKuz4nugnlWJLC3cDKTFLLbiIlsy58WM0O5pCXbDZ9k6DqmsVhF19f2mDEvWnllm2a9UhXtWcJxRAXqpSIT0zGbOududWZiBASSTy42uQg8V7h2C5MxHFJzi4Z8=
+	t=1721332719; cv=none; b=jvEoVv0mnwC/tWWriTNMzJEfbDr/sLWGfcKInhQ/CbEjQ2SDnXXgy0xjz50dU/EZNilDy4oLmwYazptdpENyleODhDJ//6NhTRjVID7ILxXEKPN4/j1qYFF4gQzOO/KOnvbMCQfaHrq0M/QKXsE2Q5Cp4yJsM57Fq7mPupggB7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721332448; c=relaxed/simple;
-	bh=O23ygQLxGQTzVrgon/8V03VQV8n2XPv4x+9//GGBvL0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=q2jogPFQ8QR+g2gkvu0Y7WmbtTlsrT0666uRhSg6OP8Ql4zlyck4KS9ifvj8Ay7raigik9Ci0mYi99lLvZdgVfPbc017D1SyiW08+fT7sbbTN3gLNQOUG0KFD3k3OYE1kzKkpA5ypn2rYEEipHKZ8dmFosHd1L0pA/mL3DFu2MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surriel.com; spf=pass smtp.mailfrom=shelob.surriel.com; arc=none smtp.client-ip=96.67.55.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=surriel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shelob.surriel.com
-Received: from [2601:18c:9101:a8b6:6e0b:84ff:fee2:98bb] (helo=imladris.surriel.com)
-	by shelob.surriel.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <riel@shelob.surriel.com>)
-	id 1sUXCN-000000000Jf-07Zq;
-	Thu, 18 Jul 2024 15:53:55 -0400
-Message-ID: <5145c46c47d98d917c8ef1401cdac15fc5f8b638.camel@surriel.com>
-Subject: Re: [RFC PATCH 2/2] netconsole: Defer netpoll cleanup to avoid lock
- release during list traversal
-From: Rik van Riel <riel@surriel.com>
-To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com
-Cc: thepacketgeek@gmail.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, paulmck@kernel.org, davej@codemonkey.org.uk
-Date: Thu, 18 Jul 2024 15:53:54 -0400
-In-Reply-To: <20240718184311.3950526-3-leitao@debian.org>
-References: <20240718184311.3950526-1-leitao@debian.org>
-	 <20240718184311.3950526-3-leitao@debian.org>
-Autocrypt: addr=riel@surriel.com; prefer-encrypt=mutual;
- keydata=mQENBFIt3aUBCADCK0LicyCYyMa0E1lodCDUBf6G+6C5UXKG1jEYwQu49cc/gUBTTk33Aeo2hjn4JinVaPF3zfZprnKMEGGv4dHvEOCPWiNhlz5RtqH3SKJllq2dpeMS9RqbMvDA36rlJIIo47Z/nl6IA8MDhSqyqdnTY8z7LnQHqq16jAqwo7Ll9qALXz4yG1ZdSCmo80VPetBZZPw7WMjo+1hByv/lvdFnLfiQ52tayuuC1r9x2qZ/SYWd2M4p/f5CLmvG9UcnkbYFsKWz8bwOBWKg1PQcaYHLx06sHGdYdIDaeVvkIfMFwAprSo5EFU+aes2VB2ZjugOTbkkW2aPSWTRsBhPHhV6dABEBAAG0HlJpayB2YW4gUmllbCA8cmllbEByZWRoYXQuY29tPokBHwQwAQIACQUCW5LcVgIdIAAKCRDOed6ShMTeg05SB/986ogEgdq4byrtaBQKFg5LWfd8e+h+QzLOg/T8mSS3dJzFXe5JBOfvYg7Bj47xXi9I5sM+I9Lu9+1XVb/r2rGJrU1DwA09TnmyFtK76bgMF0sBEh1ECILYNQTEIemzNFwOWLZZlEhZFRJsZyX+mtEp/WQIygHVWjwuP69VJw+fPQvLOGn4j8W9QXuvhha7u1QJ7mYx4dLGHrZlHdwDsqpvWsW+3rsIqs1BBe5/Itz9o6y9gLNtQzwmSDioV8KhF85VmYInslhv5tUtMEppfdTLyX4SUKh8ftNIVmH9mXyRCZclSoa6IMd635Jq1Pj2/Lp64tOzSvN5Y9zaiCc5FucXtB9SaWsgdmFuIFJpZWwgPHJpZWxAc3VycmllbC5jb20+iQE+BBMBAgAoBQJSLd2lAhsjBQkSzAMABgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRDOed6ShMTeg4PpB/0ZivKYFt0LaB22ssWUrBoeNWCP1NY/lkq2QbPhR3agLB7ZXI97PF2z/5QD9Fuy/FD/j
-	ddPxKRTvFCtHcEzTOcFjBmf52uqgt3U40H9GM++0IM0yHusd9EzlaWsbp09vsAV2DwdqS69x9RPbvE/NefO5subhocH76okcF/aQiQ+oj2j6LJZGBJBVigOHg+4zyzdDgKM+jp0bvDI51KQ4XfxV593OhvkS3z3FPx0CE7l62WhWrieHyBblqvkTYgJ6dq4bsYpqxxGJOkQ47WpEUx6onH+rImWmPJbSYGhwBzTo0MmG1Nb1qGPG+mTrSmJjDRxrwf1zjmYqQreWVSFEt26tBpSaWsgdmFuIFJpZWwgPHJpZWxAZmIuY29tPokBPgQTAQIAKAUCW5LbiAIbIwUJEswDAAYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQznnekoTE3oOUEQgAsrGxjTC1bGtZyuvyQPcXclap11Ogib6rQywGYu6/Mnkbd6hbyY3wpdyQii/cas2S44NcQj8HkGv91JLVE24/Wt0gITPCH3rLVJJDGQxprHTVDs1t1RAbsbp0XTksZPCNWDGYIBo2aHDwErhIomYQ0Xluo1WBtH/UmHgirHvclsou1Ks9jyTxiPyUKRfae7GNOFiX99+ZlB27P3t8CjtSO831Ij0IpQrfooZ21YVlUKw0Wy6Ll8EyefyrEYSh8KTm8dQj4O7xxvdg865TLeLpho5PwDRF+/mR3qi8CdGbkEc4pYZQO8UDXUN4S+pe0aTeTqlYw8rRHWF9TnvtpcNzZw==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1721332719; c=relaxed/simple;
+	bh=uJN5VKG/3El0xeF3kZknK7Wfi/ntTPGeaNaA/KBCOGo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fO9avlBlzilm6RpGA3PiqzZHGJOGmbr3c5Js6mbbBw5duoW+NUi3hsezWbLZBN6mVHhC7UrQevo0PnmgmsBvN0q7xLXXJ9DQNv1UPomxZfuV9eQrH9tMXK84YjOdq+zZz8FKjtc6anG0ev2wsrtOJX0U4Lmx1DDWtAhPk+HCa8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af546.dynamic.kabel-deutschland.de [95.90.245.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A313961E5FE01;
+	Thu, 18 Jul 2024 21:57:44 +0200 (CEST)
+Message-ID: <09299d30-50d6-4132-871b-2ed4b3fe5c68@molgen.mpg.de>
+Date: Thu, 18 Jul 2024 21:57:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Sender: riel@surriel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] i40e: Add support for fw
+ health report
+To: Kamal Heib <kheib@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, Ivan Vecera <ivecera@redhat.com>,
+ netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>
+References: <20240718181319.145884-1-kheib@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240718181319.145884-1-kheib@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-07-18 at 11:43 -0700, Breno Leitao wrote:
->=20
-> +/* Clean up every target in the cleanup_list and move the clean
-> targets back to the
-> + * main target_list.
-> + */
-> +static void netconsole_process_cleanups_core(void)
+Dear Kamal,
+
+
+Thank you for your patch.
+
+Am 18.07.24 um 20:13 schrieb Kamal Heib:
+> Add support for reporting fw status via the devlink health report.
+
+I do not know the interface. So, the driver already has some way to 
+communicate with the firmware, and you only need to hook it up to devlink?
+
+> Example:
+>   # devlink health show pci/0000:02:00.0 reporter fw
+>   pci/0000:02:00.0:
+>     reporter fw
+>       state healthy error 0 recover 0
+>   # devlink health diagnose pci/0000:02:00.0 reporter fw
+>   Mode: normal
+
+Any way to force it into recovery mode to also check it?
+
+> Signed-off-by: Kamal Heib <kheib@redhat.com>
+> ---
+> v2:
+> - Address comments from Jiri.
+> - Move the creation of the health report.
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+>   .../net/ethernet/intel/i40e/i40e_devlink.c    | 57 +++++++++++++++++++
+>   .../net/ethernet/intel/i40e/i40e_devlink.h    |  2 +
+>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 14 +++++
+>   4 files changed, 74 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+> index d546567e0286..f94671b6e7c6 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> @@ -465,6 +465,7 @@ static inline const u8 *i40e_channel_mac(struct i40e_channel *ch)
+>   struct i40e_pf {
+>   	struct pci_dev *pdev;
+>   	struct devlink_port devlink_port;
+> +	struct devlink_health_reporter *fw_health_report;
+>   	struct i40e_hw hw;
+>   	DECLARE_BITMAP(state, __I40E_STATE_SIZE__);
+>   	struct msix_entry *msix_entries;
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> index cc4e9e2addb7..8fe64284e8d3 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> @@ -122,6 +122,25 @@ static int i40e_devlink_info_get(struct devlink *dl,
+>   	return err;
+>   }
+>   
+> +static int i40e_fw_reporter_diagnose(struct devlink_health_reporter *reporter,
+> +				     struct devlink_fmsg *fmsg,
+> +				     struct netlink_ext_ack *extack)
 > +{
-> +	struct netconsole_target *nt, *tmp;
-> +	unsigned long flags;
+> +	struct i40e_pf *pf = devlink_health_reporter_priv(reporter);
 > +
-> +	/* The cleanup needs RTNL locked */
-> +	ASSERT_RTNL();
+> +	if (test_bit(__I40E_RECOVERY_MODE, pf->state))
+> +		devlink_fmsg_string_pair_put(fmsg, "Mode", "recovery");
+> +	else
+> +		devlink_fmsg_string_pair_put(fmsg, "Mode", "normal");
+
+I’d use ternary operator.
+
 > +
-> +	mutex_lock(&target_cleanup_list_lock);
-> +	list_for_each_entry_safe(nt, tmp, &target_cleanup_list,
-> list) {
-> +		/* all entries in the cleanup_list needs to be
-> disabled */
-> +		WARN_ON_ONCE(nt->enabled);
-> +		do_netpoll_cleanup(&nt->np);
-> +		/* moved the cleaned target to target_list. Need to
-> hold both locks */
-> +		spin_lock_irqsave(&target_list_lock, flags);
-> +		list_move(&nt->list, &target_list);
-> +		spin_unlock_irqrestore(&target_list_lock, flags);
+> +	return 0;
+> +}
+> +
+> +static const struct devlink_health_reporter_ops i40e_fw_reporter_ops = {
+> +	.name = "fw",
+> +	.diagnose = i40e_fw_reporter_diagnose,
+> +};
+> +
+>   static const struct devlink_ops i40e_devlink_ops = {
+>   	.info_get = i40e_devlink_info_get,
+>   };
+> @@ -233,3 +252,41 @@ void i40e_devlink_destroy_port(struct i40e_pf *pf)
+>   {
+>   	devlink_port_unregister(&pf->devlink_port);
+>   }
+> +
+> +/**
+> + * i40e_devlink_create_health_reporter - Create the health reporter for this PF
+> + * @pf: the PF to create reporter for
+> + *
+> + * Create health reporter for this PF.
+> + *
+> + * Return: zero on success or an error code on failure.
+
+No dot/period at the end.
+
+> + **/
+> +int i40e_devlink_create_health_reporter(struct i40e_pf *pf)
+> +{
+> +	struct devlink *devlink = priv_to_devlink(pf);
+> +	struct device *dev = &pf->pdev->dev;
+> +	int rc = 0;
+> +
+> +	devl_lock(devlink);
+> +	pf->fw_health_report =
+> +		devl_health_reporter_create(devlink, &i40e_fw_reporter_ops, 0, pf);
+> +	if (IS_ERR(pf->fw_health_report)) {
+> +		rc = PTR_ERR(pf->fw_health_report);
+> +		dev_err(dev, "Failed to create fw reporter, err = %d\n", rc);
 > +	}
-> +	WARN_ON_ONCE(!list_empty(&target_cleanup_list));
-> +	mutex_unlock(&target_cleanup_list_lock);
+> +	devl_unlock(devlink);
+> +
+> +	return rc;
 > +}
 > +
-> +/* Do the list cleanup with the rtnl lock hold */
-> +static void netconsole_process_cleanups(void)
+> +/**
+> + * i40e_devlink_destroy_health_reporter - Destroy the health reporter
+> + * @pf: the PF to cleanup
+
+The verb is spelled with a space: clean up.
+
+> + *
+> + * Destroy the health reporter
+> + **/
+> +void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf)
 > +{
-> +	rtnl_lock();
-> +	netconsole_process_cleanups_core();
-> +	rtnl_unlock();
+> +	if (!IS_ERR_OR_NULL(pf->fw_health_report))
+> +		devlink_health_reporter_destroy(pf->fw_health_report);
 > +}
->=20
-I've got what may be a dumb question.
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.h b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
+> index 469fb3d2ee25..018679094bb5 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
+> @@ -14,5 +14,7 @@ void i40e_devlink_register(struct i40e_pf *pf);
+>   void i40e_devlink_unregister(struct i40e_pf *pf);
+>   int i40e_devlink_create_port(struct i40e_pf *pf);
+>   void i40e_devlink_destroy_port(struct i40e_pf *pf);
+> +int i40e_devlink_create_health_reporter(struct i40e_pf *pf);
+> +void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf);
+>   
+>   #endif /* _I40E_DEVLINK_H_ */
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index cbcfada7b357..b6b3ae299b28 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -15370,6 +15370,9 @@ static bool i40e_check_recovery_mode(struct i40e_pf *pf)
+>   		dev_crit(&pf->pdev->dev, "Firmware recovery mode detected. Limiting functionality.\n");
+>   		dev_crit(&pf->pdev->dev, "Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode.\n");
+>   		set_bit(__I40E_RECOVERY_MODE, pf->state);
+> +		if (pf->fw_health_report)
+> +			devlink_health_report(pf->fw_health_report,
+> +					      "recovery mode detected", pf);
+>   
+>   		return true;
+>   	}
+> @@ -15810,6 +15813,13 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   	if (test_bit(__I40E_RECOVERY_MODE, pf->state))
+>   		return i40e_init_recovery_mode(pf, hw);
+>   
+> +	err = i40e_devlink_create_health_reporter(pf);
+> +	if (err) {
+> +		dev_err(&pdev->dev,
+> +			"Failed to create health reporter %d\n", err);
+> +		goto err_health_reporter;
+> +	}
+> +
+>   	err = i40e_init_lan_hmc(hw, hw->func_caps.num_tx_qp,
+>   				hw->func_caps.num_rx_qp, 0, 0);
+>   	if (err) {
+> @@ -16175,6 +16185,8 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   	(void)i40e_shutdown_lan_hmc(hw);
+>   err_init_lan_hmc:
+>   	kfree(pf->qp_pile);
+> +	i40e_devlink_destroy_health_reporter(pf);
+> +err_health_reporter:
+>   err_sw_init:
+>   err_adminq_setup:
+>   err_pf_reset:
+> @@ -16209,6 +16221,8 @@ static void i40e_remove(struct pci_dev *pdev)
+>   
+>   	i40e_devlink_unregister(pf);
+>   
+> +	i40e_devlink_destroy_health_reporter(pf);
+> +
+>   	i40e_dbg_pf_exit(pf);
+>   
+>   	i40e_ptp_stop(pf);
 
-If the traversal of the target_cleanup_list happens under
-the rtnl_lock, why do you need a new lock, and why is there
-a wrapper function that only takes this one lock, and then
-calls the other function?
 
-Are you planning a user of netconsole_process_cleanups_core()
-that already holds the rtnl_lock and should not use this
-wrapper?
+Kind regards,
 
-Also, the comment does not explain why the rtnl_lock is held.
-We can see that it grabs it, but not why. It would be nice to
-have that in the comment.
-
-
-
---=20
-All Rights Reversed.
+Paul
 
