@@ -1,107 +1,132 @@
-Return-Path: <netdev+bounces-112106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99579934FF2
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33828935023
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8C4C1C20E4A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:33:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658D21C20D39
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F1913B7A3;
-	Thu, 18 Jul 2024 15:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D66144D12;
+	Thu, 18 Jul 2024 15:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EjQ4RNL+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G74C37e+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9CA4D8B7
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 15:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B561448F4;
+	Thu, 18 Jul 2024 15:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721316824; cv=none; b=F0GepKZNGZykFdSRln1Q6+X+KkCQiZF+M0eMt6q+VMCfCGEdc0J01e3jw6M3+UnHJvFUdX3hM0RoWCGk5UWju/D0hF5rDh43nFiX3dUx6rhwW+mhWg2VFvM5X273irCdVfBgTVGP86jboDVbVgkhpsuIAI0YA1oVGXCFG/iIyfw=
+	t=1721317635; cv=none; b=K5RPDK/3Izw+v9jVKsKlXdtQh1jlawHHUy6WOvT7ry74k6XoJmN9N3Ex65YzSgvKiSXZgDiDcVs1XvLFPz4iMnYRh7WPxBEbDCK76EGwmeGtldWDjLdy3EzcDC9yemSgB3QalSErn0k0cKMNAr9iJ/9PNdLDGID+VPfoeJQQ+ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721316824; c=relaxed/simple;
-	bh=19LO8/u+/HGuLxme/jBOI+Lmh9mVJxrDT7aVjpfMv3Q=;
+	s=arc-20240116; t=1721317635; c=relaxed/simple;
+	bh=EtSWcsZopK16D9DPDPs9MnpIDDRj7ilh3qtdU3kWjLc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dBbEnESs1TwCNfHyUfQhXeWwlvpQX+JUGIXDTQk0mrYLYW9SAnIrtSfBA1oC/OyLJUuxfmTO7rQbKTLZqTDQ3/r5rjvHZXX4Fl9+4fWGR4OCsNh8fnOg0WQxlOs/P5xy6KkwKCYp0RSoZ+9mlcJsXF/lz31PQV64uXWRp+dDUOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EjQ4RNL+; arc=none smtp.client-ip=209.85.166.169
+	 To:Cc:Content-Type; b=tYEwBg60KM1KNGxurchyaDYlfmIf/xoVoyvwuM6gLGB+acGDgT31w/nKeiTTQbBb2YD6X+5V7ib2BsaJr07ASR9BlRsb4aDd62T8lVGzlBdileQjv3JWViHrJ0u2jRtgYQGCIh7a8sp8SM4jUKh8trFyD9Hy2JJHSZIALDCUxHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G74C37e+; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-396e2d21812so2584595ab.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 08:33:42 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-58d24201934so1568416a12.0;
+        Thu, 18 Jul 2024 08:47:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721316822; x=1721921622; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721317632; x=1721922432; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=34ydbdQ+AXjDoopLQpbombMCzUo2nCYLDIGgHzMj7qs=;
-        b=EjQ4RNL+dBLrwo/8MZqDM0DFLXMqM8prmYD9ahLK6GddI0uqcJDr+TXMw6QrEvcK3G
-         9mPawCjcZPBiJX2gzv6/2uAsYubsLro4MhGmSqoUc0xYhcDEkeXkRFJgozDMwPm/XdIj
-         bPMKnHGJyXFZ666kHTMNqWjj7TlTNqnnDOciKrqJr4lBTouoSt8SDDm8QCB9Cfyq6jm7
-         eIaIBvC5t/oAVg4VrquJ6fcRANvxqLNv6PKQvrs6w0rDvEB5c6yxR3K7ocpp/4DrQcDx
-         evebQz8oHBLqaIQmhfMDnfUrY+Xi+Jb3oVxe0fjxdG9831u/1vDhZn50PSAOBpsefU3g
-         AzXQ==
+        bh=0O5FpF2UiLkbwb7WiFk7nvfeS7BUMqQ4dHZRhUE0Ug4=;
+        b=G74C37e+Ue7rFUmlIqyaX5aikBtExMRCyEtlREb4z21l8jdlDNurBOs26uvetI5euU
+         ap/cCupUnNfyOu2H+20ANsmhUVI0/M/sjy2hkfO7wJy3rpLucgY77PUUvqPYK+ZTEo4a
+         Na4+B3ODXKWMi0dFu1CVjHMdku9ulZWBH6YnTcQkrD2Zg2yHt1yyJ9a2EwaZOXFQh+6d
+         fEcgRZ0M9hEvYSAASbJ7FoW8SG4CC3GbTIwn0cYE+gWJpfVk5W3T3lT8h1z7ZUKScrn6
+         Sm86pmBYrAITl/GBS8hOXzBFU0S1+YBPTa/bymPXeT2WxJEYw3/oJr70d3yvZyb9F1ge
+         7yoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721316822; x=1721921622;
+        d=1e100.net; s=20230601; t=1721317632; x=1721922432;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=34ydbdQ+AXjDoopLQpbombMCzUo2nCYLDIGgHzMj7qs=;
-        b=LDu+JVSEbbD/HOIFZ7xTJToSuFHlVD6NdM/h0vrX0mEO+TTytDE9JltdVXTIjexyeQ
-         3CVwVaHgvBiJFQqFwsMxtlYNoDk7TDNRdqtY2LbSSRrFtoc4PHIfyyGvJ++BFkuRQIiy
-         COcQHAy+Zz5iHFHrNKfPH5a4y+K9Vw5LqJjaX9jReKyOaGakGQxvUKp02NEKtHqNlSK0
-         nbYw9mw7yImBD23goco3cp9y/igJzZTfPSoK4EOkArnD+n0ZFlPA0UdIcaHZsFEcMCef
-         EvHv5eh8ZZXwBSxP4N4A60ot12Eu0Rn5/nKqO1JN4lEwQtmJAvJlIafRfmv+nANWgMrQ
-         ih7w==
-X-Gm-Message-State: AOJu0YxVvZgH1Qh/oq1bqtQWI4iRRwfGEeihMxDxTvslQseyxcm5zCab
-	SnhArlhGTrJbIoI77y4qI3P8Gr+Sa7NAkM7wPKFo57UHlcAzmkdRjoBGRcWwxTqk8oWE+wcXk2g
-	O++4G0yfUT5UOdqzQ2tw+fZRkcwQ=
-X-Google-Smtp-Source: AGHT+IFISSpmKGr8UYGmzFsA1KbIRxi0BIdzKgOeKtAHJaqQ0MTSb3JsJgvZbga9qAokVEw+EKkPgE5Bc216+hhLDl4=
-X-Received: by 2002:a05:6e02:12c8:b0:382:325c:f7ae with SMTP id
- e9e14a558f8ab-39555333179mr68044305ab.2.1721316822021; Thu, 18 Jul 2024
- 08:33:42 -0700 (PDT)
+        bh=0O5FpF2UiLkbwb7WiFk7nvfeS7BUMqQ4dHZRhUE0Ug4=;
+        b=mweFCT8bW7SETynqdXXmBgdJNslypmAcIy71VqR2EzyJVbnG1flsV4G2Wwc0E0HDU9
+         loUfN4fwZc4D8q+qVv/EBOjtFQN/siteZBokbzyTdyX/2uQaLOgj+kRYwpc1yDDmGLeN
+         h53ErQ/XnR8wZmVMA4tjmPnwzRTUmsBB8o2CbPo85EQgEV4Of5X+nYh/35sXdSQyAk+K
+         60uAQrgQRJDE0klWOyUEwd0ya4eRVBtD4va2zGNr2vpAVxP/tBn7nmBeart+NkZ7U8Ev
+         qFBAYjWz6hyV0PAbn3hKPNYcWyQ7CaZ6C6pSyf1c/vqAmW1b98RdWW5NAXlioHZ2dom9
+         KdRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIU6CCvU2wsMWWbk6s1oByaSpBxrDsgTX8tDVLPBCvCi54Xx9eVi/7IoxIiNArDV91WWiMy1mr22fdM9Axr/oGt45luveFxCZm6rvY5/pjo+j7S+nSFmFywYelgP7SmamgYxY9oHO5vQdBtV5blHYhY5opeNf2b4D0VnGKNKBC9tZm3GF9J3+6mHAr6uiryC+TB7p8YXeXwj/xjBSu+phRFjwkDbZOQ/I7gDtLG57qVaKwXMdmkdZrmb//EEsm2Q==
+X-Gm-Message-State: AOJu0Ywa7x06eIhwzPpyPONgGpA1mdGBZLC4gwbmekOtg2iB4aPbfMkv
+	3Iu0ru+6sejO6V3KYXNWFGJae6AM2m7n9ZYuUY4OcBVF10soHarw6+PDrknKi/1JYPXjFgprN7A
+	RGXbB9N8HApnkFT9kWUBFynp17Dc=
+X-Google-Smtp-Source: AGHT+IGEkor275ooaElET2xkJh/wMWi5qM0YgC30wYo3hNF5WVOBm2FQ5tOFtC6x8JZXY6EiJPFxP7zqRjzBcUYOtfE=
+X-Received: by 2002:a50:c308:0:b0:5a0:edfa:e5a9 with SMTP id
+ 4fb4d7f45d1cf-5a15617ff0amr3053656a12.12.1721317632011; Thu, 18 Jul 2024
+ 08:47:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cb6cfbcbdd576ce4f3b74be080b939a9398d21c7.1721268615.git.lucien.xin@gmail.com>
- <20240718062749.2bcea253@kernel.org>
-In-Reply-To: <20240718062749.2bcea253@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 18 Jul 2024 11:33:30 -0400
-Message-ID: <CADvbK_f5d+R7X7L=jMMtW+REjVM2v+A83QWpYBoKiQiobw33fQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] openvswitch: switch to per-action label counting
- in conntrack
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: network dev <netdev@vger.kernel.org>, dev@openvswitch.org, ovs-dev@openvswitch.org, 
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Pravin B Shelar <pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>, Aaron Conole <aconole@redhat.com>, 
-	Florian Westphal <fw@strlen.de>
+References: <ZpV6o8JUJWg9lZFE@windev.fritz.box> <d44fdc0b-b4a7-4f36-9961-c5c042ed43df@quicinc.com>
+In-Reply-To: <d44fdc0b-b4a7-4f36-9961-c5c042ed43df@quicinc.com>
+From: Rob Clark <robdclark@gmail.com>
+Date: Thu, 18 Jul 2024 08:47:00 -0700
+Message-ID: <CAF6AEGtL7gphh7sY0do6i71JC_kfFm1cNopBQfkzzwAPx=QB-Q@mail.gmail.com>
+Subject: Re: [PATCH 0/2] arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Patrick Wildt <patrick@blueri.se>, Kalle Valo <kvalo@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Steev Klimaszewski <steev@kali.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>, 
+	"ath12k@lists.infradead.org" <ath12k@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 18, 2024 at 9:27=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Thu, Jul 18, 2024 at 7:40=E2=80=AFAM Jeff Johnson <quic_jjohnson@quicinc=
+.com> wrote:
 >
-> On Wed, 17 Jul 2024 22:10:15 -0400 Xin Long wrote:
-> > @@ -2026,7 +2023,4 @@ void ovs_ct_exit(struct net *net)
-> >  #if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >       ovs_ct_limit_exit(net, ovs_net);
-> >  #endif
-> > -
-> > -     if (ovs_net->xt_label)
-> > -             nf_connlabels_put(net);
-> >  }
+> On 7/15/2024 12:38 PM, Patrick Wildt wrote:
+> > This series adds the missing calibration variant devicetree property
+> > which is needed to load the calibration data and use the ath12k wifi
+> > on the Lenovo Yoga Slim 7x.
+> >
+> > Patrick Wildt (2):
+> >   dt-bindings: net: wireless: add ath12k pcie bindings
+> >   arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
+> >
+> >  .../net/wireless/qcom,ath12k-pci.yaml         | 59 +++++++++++++++++++
+> >  .../dts/qcom/x1e80100-lenovo-yoga-slim7x.dts  |  9 +++
+> >  arch/arm64/boot/dts/qcom/x1e80100.dtsi        | 10 ++++
+> >  3 files changed, 78 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom=
+,ath12k-pci.yaml
+> >
 >
-> In addition to net-next being closed please note there is a warning
-> about ovs_net being unused if NETFILTER_CONNCOUNT=3Dn.
-Copy, will move it into #if    IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT).
+> +ath12k mailing list.
+>
+> Qualcomm expects, on x86 and Qualcomm-based ARM devices, that this inform=
+ation
+> come from ACPI.
 
-Thanks!
+That is fine for acpi boot.  But it never prevented adding needed
+information in dt.
+
+BR,
+-R
+
+> That support is currently under review:
+> https://lore.kernel.org/all/20240717111023.78798-1-quic_lingbok@quicinc.c=
+om/
+>
+> /jeff
+>
 
