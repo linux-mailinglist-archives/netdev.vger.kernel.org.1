@@ -1,226 +1,128 @@
-Return-Path: <netdev+bounces-112093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C6A934E92
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE4E934E73
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ED77282427
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9CC1C2133F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220E113C687;
-	Thu, 18 Jul 2024 13:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B6213B7BE;
+	Thu, 18 Jul 2024 13:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="zPdp3I/z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnNPY5A3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF939457
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 13:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065341B86FB;
+	Thu, 18 Jul 2024 13:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721310743; cv=none; b=Mtmnz625zChqqnFy3/+iqipjyMsJTqsMh5HX2Y/aTk7Z1QgYubgQ6eV5kwjX4hWf6Pf1ICshmUsKnyGPRNPHUtl8foE45MGnH/l+CBEMxZVk7ib9s0+tueu0RvfSnEiE9o6D88NVblYvBGLPHuWTU8xTU3C1e67b5mAa84bO7lE=
+	t=1721310328; cv=none; b=bmYmpNRAooOC5235JsMBIHljDKSmQhiaqMsMhG5SRYK6X7DsmTOLiMbS73CFFyrvbViCTzatnWeNTaodM0rf9Xq8B1N6Uhj4DoSuj8vEWsG0C7L3HD/JNCxNZz+ZNhM/E99yyWtShvR2cZBTb5sjbFNTKBVfJHhM8TpwTC9WJmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721310743; c=relaxed/simple;
-	bh=KyafeX6Zj0O7ykGwQOPEE7L+gVDCNoouBR3aL6Zr7Iw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o+VFPMEGaxI1eufmaBEGhSht4MR2WsWm80txpq38uOFQvdYqcwttC97/nHjvkMc7TuLViZIJ+9SI+f/27BDbCA6RZ8gJNEV7Hr5n+GrUc/9ypxQGFqYfVBNDRMfn0r8VJP5AoB7bAV4uKoWp7pCYh2lwhnIFqatG7VFpE7PUpX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=zPdp3I/z; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:5998:706d:17c6:d75a])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 592957DA4E;
-	Thu, 18 Jul 2024 14:43:48 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1721310228; bh=KyafeX6Zj0O7ykGwQOPEE7L+gVDCNoouBR3aL6Zr7Iw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09tpa
-	 rkin@katalix.com,=0D=0A=09samuel.thibault@ens-lyon.org,=0D=0A=09th
-	 orsten.blum@toblux.com|Subject:=20[PATCH=20net]=20l2tp:=20make=20s
-	 ession=20IDR=20and=20tunnel=20session=20list=20coherent|Date:=20Th
-	 u,=2018=20Jul=202024=2014:43:48=20+0100|Message-Id:=20<20240718134
-	 348.289865-1-jchapman@katalix.com>|MIME-Version:=201.0;
-	b=zPdp3I/zPqTe8hR+AbtGZAkdndzN1y6LmBtAwOCD8s9JzbWIdP8wl/LW1Wx8WXfg3
-	 +LogKgWNom7PRGypEWAik94lbB0zcM3ZvwHXU8fjZhLk+MLvgWj9+0lUsNUMRIhr4G
-	 3hhMGsre4KwV1PFiX+ddCFsZaakb8wUsoC1cqA2i2/I3s4j3ionL2Q50KzWUrl8o+T
-	 /wwYRmhTDeuOQkRmyx357wE6HJD9MSrqxMLy1vXJT7idLC0Bgq6+N+d5OWiyS9f4I6
-	 tlN+LTZIZJyPWsUn3pSUzbqXFooAsjGgYyfIcHHburPyCQniQzlxDt7WhREqwS/MBT
-	 mbtWXrv3An/Hg==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	tparkin@katalix.com,
-	samuel.thibault@ens-lyon.org,
-	thorsten.blum@toblux.com
-Subject: [PATCH net] l2tp: make session IDR and tunnel session list coherent
-Date: Thu, 18 Jul 2024 14:43:48 +0100
-Message-Id: <20240718134348.289865-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1721310328; c=relaxed/simple;
+	bh=3rIIjfrMsL9HBG0ZUjtncQtFefTFzeSIFo/bC/TSwtU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AF85Fe7JcN4I/pYfuIibOFLZG8BL8WjBi3IC0BmMi8AQWuMR3S9HAvTb60qku8LlKAC6KgystDZHxYpqPmJfYvYbwH50alZe2Og1J6l8d1qewhqiyVVVwR5g7ZwgE8l7CiXpl/ywI5iKUBeTiOHku8MQyZlhk3IsVm4TVj7XH9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnNPY5A3; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-70847d0cb1fso457773a34.3;
+        Thu, 18 Jul 2024 06:45:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721310326; x=1721915126; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xGc8MKfbN3L/GKWoSL/Ioh6AMpLNqJHz7Tn8tmGdobw=;
+        b=EnNPY5A3EEIispgdrimm/F6dR4r5NYuqnbFgBQH6lUVnGxuv7M2/smloFkcVSoTids
+         nnMnYxYyYgW5r3YLTjwCKEDPcyAI25qKr9zjVdP4/ll7+BXvkC34dEkBdBP2uS3dmIqY
+         OTWs4RRTirvfGR5v0SO3kFkM0owIMWX1PkPko9juCT1di6wb5Z2k34/iq44/4vq1UgSj
+         6Jrx6Gp7AIulkjwyMRuljoP4abGykDk1FnsJNA2TAUcxLEPXzF8fScNhNW46LRUW5kHM
+         u9Dbc8ipXoqXwBurIrLiFCBBWoCNMnrUzJFdLCnWtjddDsquu9M4iv6jCSw+kSFz9VfX
+         QvYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721310326; x=1721915126;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xGc8MKfbN3L/GKWoSL/Ioh6AMpLNqJHz7Tn8tmGdobw=;
+        b=ncRr7kARvcnjhswtosK+jDtvO+D6ND0ax4czC+G2eASYLa4ANHBiW1cRhFUZSwGMXk
+         oS7b/5Ea+MYLJkIm2NHRCMf+tjgXNmiQK0MbfW/A9IdLyctOoGs7ezPb/pVW4dUXxP5t
+         ialCmm08F40wqG3LXZp6IzXVuk5sVK1z5Zv3sV4fCXaZLEjfWkRE4tMYBVyVyjcISLo+
+         TaVoIWlA1Ks/IlV8+FQKaLdTGVbIycRi/hZjv0KzU9NEhvbH+kHm8kV4kkTIaxteR2R2
+         HL4mNW4k0yIHHtFX3F+7upk1foOnRDuzEupPIWHzeL+DlTGRfpOoDUos/byY3wLT+of/
+         p9KA==
+X-Forwarded-Encrypted: i=1; AJvYcCWw8bMJ1sQbpg2BYwy0PdnuLYMkTWR2P/IyPt4lhLER72N8IiUdSW+w0INzG/XCMedLt9Jop9Kwv0qFjqHWD4qi4c3S1tis
+X-Gm-Message-State: AOJu0YypwVaJOs6TYRBKZRxAFZ85geLJ9ahHSyDvsgxSW36jxiJevMhZ
+	sQNRKH0WohiCMDqdwd8z121atwilcILm/hEFBZzSqvi/8uyvHi7XroVbFUPVqTk9MFzto1VnlvX
+	a75x2G3+kvU4icn9sDaL3ea7NU+PKUsx5
+X-Google-Smtp-Source: AGHT+IGgnX83WsAuYeTRJZ6jCVqxvuk9XgYhgjEbvF8lZL1NdcZyJw/KnZhBD/PkpSqYRFxshr6Gy0N9ChoVpa+GPto=
+X-Received: by 2002:a05:6870:d8d0:b0:250:171d:5c74 with SMTP id
+ 586e51a60fabf-260ee841d15mr2085163fac.26.1721310326096; Thu, 18 Jul 2024
+ 06:45:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240717193725.469192-1-vtpieter@gmail.com> <20240717193725.469192-2-vtpieter@gmail.com>
+ <20240717193725.469192-3-vtpieter@gmail.com> <20240717193725.469192-4-vtpieter@gmail.com>
+ <e6285fd7-91fd-411c-bea9-ddcb62b90550@lunn.ch>
+In-Reply-To: <e6285fd7-91fd-411c-bea9-ddcb62b90550@lunn.ch>
+From: Pieter <vtpieter@gmail.com>
+Date: Thu, 18 Jul 2024 15:45:13 +0200
+Message-ID: <CAHvy4ArmWx78aP=2O1a2F=GXqro2N6GxjdYO+AGs32petpL4+Q@mail.gmail.com>
+Subject: Re: [PATCH 3/4] net: dsa: microchip: check erratum workaround through
+ indirect register read
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com, 
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Content-Type: text/plain; charset="UTF-8"
 
-Modify l2tp_session_register and l2tp_session_unhash so that the
-session IDR and tunnel session lists remain coherent. To do so, hold
-the session IDR lock and the tunnel's session list lock when making
-any changes to either list.
+On Thu, Jul 18, 2024 at 04:24, Andrew Lunn <andrew@lunn.ch> wrote :
+> On Wed, Jul 17, 2024 at 09:37:24PM +0200, vtpieter@gmail.com wrote:
+> > From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+> >
+> > Check the erratum workaround application which ensures in addition
+> > that indirect register write and read work as expected.
+> >
+> > Commit b7fb7729c94f ("net: dsa: microchip: fix register write order in
+> > ksz8_ind_write8()") would have been found faster like this.
+> >
+> > Also fix the register naming as in the datasheet.
+>
+> We are in the merge window at the moment, so net-next is closed at the
+> moment. Please repost in two weeks.
 
-Without this change, a rare race condition could hit the WARN_ON_ONCE
-in l2tp_session_unhash if a thread replaced the IDR entry while
-another thread was registering the same ID.
+Right sorry I only realize this now. I did some reading up on netdev
+patches; will make sure to rebase on net-next tree as well when I
+submit the v2 in 2 weeks.
 
- [ 7126.151795][T17511] WARNING: CPU: 3 PID: 17511 at net/l2tp/l2tp_core.c:1282 l2tp_session_delete.part.0+0x87e/0xbc0
- [ 7126.163754][T17511]  ? show_regs+0x93/0xa0
- [ 7126.164157][T17511]  ? __warn+0xe5/0x3c0
- [ 7126.164536][T17511]  ? l2tp_session_delete.part.0+0x87e/0xbc0
- [ 7126.165070][T17511]  ? report_bug+0x2e1/0x500
- [ 7126.165486][T17511]  ? l2tp_session_delete.part.0+0x87e/0xbc0
- [ 7126.166013][T17511]  ? handle_bug+0x99/0x130
- [ 7126.166428][T17511]  ? exc_invalid_op+0x35/0x80
- [ 7126.166890][T17511]  ? asm_exc_invalid_op+0x1a/0x20
- [ 7126.167372][T17511]  ? l2tp_session_delete.part.0+0x87d/0xbc0
- [ 7126.167900][T17511]  ? l2tp_session_delete.part.0+0x87e/0xbc0
- [ 7126.168429][T17511]  ? __local_bh_enable_ip+0xa4/0x120
- [ 7126.168917][T17511]  l2tp_session_delete+0x40/0x50
- [ 7126.169369][T17511]  pppol2tp_release+0x1a1/0x3f0
- [ 7126.169817][T17511]  __sock_release+0xb3/0x270
- [ 7126.170247][T17511]  ? __pfx_sock_close+0x10/0x10
- [ 7126.170697][T17511]  sock_close+0x1c/0x30
- [ 7126.171087][T17511]  __fput+0x40b/0xb90
- [ 7126.171470][T17511]  task_work_run+0x16c/0x260
- [ 7126.171897][T17511]  ? __pfx_task_work_run+0x10/0x10
- [ 7126.172362][T17511]  ? srso_alias_return_thunk+0x5/0xfbef5
- [ 7126.172863][T17511]  ? do_raw_spin_unlock+0x174/0x230
- [ 7126.173348][T17511]  do_exit+0xaae/0x2b40
- [ 7126.173730][T17511]  ? srso_alias_return_thunk+0x5/0xfbef5
- [ 7126.174235][T17511]  ? __pfx_lock_release+0x10/0x10
- [ 7126.174690][T17511]  ? srso_alias_return_thunk+0x5/0xfbef5
- [ 7126.175190][T17511]  ? do_raw_spin_lock+0x12c/0x2b0
- [ 7126.175650][T17511]  ? __pfx_do_exit+0x10/0x10
- [ 7126.176072][T17511]  ? _raw_spin_unlock_irq+0x23/0x50
- [ 7126.176543][T17511]  do_group_exit+0xd3/0x2a0
- [ 7126.176990][T17511]  __x64_sys_exit_group+0x3e/0x50
- [ 7126.177456][T17511]  x64_sys_call+0x1821/0x1830
- [ 7126.177895][T17511]  do_syscall_64+0xcb/0x250
- [ 7126.178317][T17511]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> >       /* KSZ87xx Errata DS80000687C.
+> >        * Module 2: Link drops with some EEE link partners.
+> > @@ -1981,8 +1982,13 @@ static int ksz8_handle_global_errata(struct dsa_switch *ds)
+> >        *   KSZ879x/KSZ877x/KSZ876x and some EEE link partners may result in
+> >        *   the link dropping.
+> >        */
+> > -     if (dev->info->ksz87xx_eee_link_erratum)
+> > -             ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_HI, 0);
+> > +     if (dev->info->ksz87xx_eee_link_erratum) {
+> > +             ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, 0);
+> > +             if (!ret)
+> > +                     ret = ksz8_ind_read8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, &data);
+> > +             if (!ret && data)
+> > +                     dev_err(dev->dev, "failed to disable EEE next page exchange (erratum)\n");
+>
+> If data is not 0, should it be considered fatal? Maybe return -EIO ?
 
-Fixes: aa5e17e1f5ec ("l2tp: store l2tpv3 sessions in per-net IDR")
-Signed-off-by: James Chapman <jchapman@katalix.com>
-Signed-off-by: Tom Parkin <tparkin@katalix.com>
----
- net/l2tp/l2tp_core.c | 32 ++++++++++++++------------------
- 1 file changed, 14 insertions(+), 18 deletions(-)
+Indeed that would make more sense; will return -EIO for v2.
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 1c1decce7f06..c80ab3f26084 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -441,14 +441,15 @@ int l2tp_session_register(struct l2tp_session *session,
- 	int err;
- 
- 	spin_lock_bh(&tunnel->list_lock);
-+	spin_lock_bh(&pn->l2tp_session_idr_lock);
-+
- 	if (!tunnel->acpt_newsess) {
- 		err = -ENODEV;
--		goto err_tlock;
-+		goto out;
- 	}
- 
- 	if (tunnel->version == L2TP_HDR_VER_3) {
- 		session_key = session->session_id;
--		spin_lock_bh(&pn->l2tp_session_idr_lock);
- 		err = idr_alloc_u32(&pn->l2tp_v3_session_idr, NULL,
- 				    &session_key, session_key, GFP_ATOMIC);
- 		/* IP encap expects session IDs to be globally unique, while
-@@ -462,43 +463,36 @@ int l2tp_session_register(struct l2tp_session *session,
- 			err = l2tp_session_collision_add(pn, session,
- 							 other_session);
- 		}
--		spin_unlock_bh(&pn->l2tp_session_idr_lock);
- 	} else {
- 		session_key = l2tp_v2_session_key(tunnel->tunnel_id,
- 						  session->session_id);
--		spin_lock_bh(&pn->l2tp_session_idr_lock);
- 		err = idr_alloc_u32(&pn->l2tp_v2_session_idr, NULL,
- 				    &session_key, session_key, GFP_ATOMIC);
--		spin_unlock_bh(&pn->l2tp_session_idr_lock);
- 	}
- 
- 	if (err) {
- 		if (err == -ENOSPC)
- 			err = -EEXIST;
--		goto err_tlock;
-+		goto out;
- 	}
- 
- 	l2tp_tunnel_inc_refcount(tunnel);
--
- 	list_add(&session->list, &tunnel->session_list);
--	spin_unlock_bh(&tunnel->list_lock);
- 
--	spin_lock_bh(&pn->l2tp_session_idr_lock);
- 	if (tunnel->version == L2TP_HDR_VER_3) {
- 		if (!other_session)
- 			idr_replace(&pn->l2tp_v3_session_idr, session, session_key);
- 	} else {
- 		idr_replace(&pn->l2tp_v2_session_idr, session, session_key);
- 	}
--	spin_unlock_bh(&pn->l2tp_session_idr_lock);
--
--	trace_register_session(session);
- 
--	return 0;
--
--err_tlock:
-+out:
-+	spin_unlock_bh(&pn->l2tp_session_idr_lock);
- 	spin_unlock_bh(&tunnel->list_lock);
- 
-+	if (!err)
-+		trace_register_session(session);
-+
- 	return err;
- }
- EXPORT_SYMBOL_GPL(l2tp_session_register);
-@@ -1260,13 +1254,13 @@ static void l2tp_session_unhash(struct l2tp_session *session)
- 		struct l2tp_net *pn = l2tp_pernet(tunnel->l2tp_net);
- 		struct l2tp_session *removed = session;
- 
--		/* Remove from the per-tunnel list */
- 		spin_lock_bh(&tunnel->list_lock);
-+		spin_lock_bh(&pn->l2tp_session_idr_lock);
-+
-+		/* Remove from the per-tunnel list */
- 		list_del_init(&session->list);
--		spin_unlock_bh(&tunnel->list_lock);
- 
- 		/* Remove from per-net IDR */
--		spin_lock_bh(&pn->l2tp_session_idr_lock);
- 		if (tunnel->version == L2TP_HDR_VER_3) {
- 			if (hash_hashed(&session->hlist))
- 				l2tp_session_collision_del(pn, session);
-@@ -1280,7 +1274,9 @@ static void l2tp_session_unhash(struct l2tp_session *session)
- 					     session_key);
- 		}
- 		WARN_ON_ONCE(removed && removed != session);
-+
- 		spin_unlock_bh(&pn->l2tp_session_idr_lock);
-+		spin_unlock_bh(&tunnel->list_lock);
- 
- 		synchronize_rcu();
- 	}
--- 
-2.34.1
-
+Thanks, Pieter
 
