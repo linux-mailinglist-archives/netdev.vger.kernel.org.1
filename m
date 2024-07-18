@@ -1,232 +1,446 @@
-Return-Path: <netdev+bounces-112134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8599370FA
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 01:07:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6FE7937106
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 01:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26C381C20897
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 23:07:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA26F1C21734
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 23:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A7B14532A;
-	Thu, 18 Jul 2024 23:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3971146598;
+	Thu, 18 Jul 2024 23:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZVpCKEI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="icQuaz3/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C377F2C;
-	Thu, 18 Jul 2024 23:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D04145A1C;
+	Thu, 18 Jul 2024 23:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721344070; cv=none; b=gafTRQOWHrPu+LNKRPLd/fIgJ6vM0z2Yhbx30vHn7dRfXFXwOB8r1S0u/20qJ6HPqZJ0mxVxoFp9+7tDxMHoQosd+dFI0jEXIhN8KEpEB9aKOrKZcPquuZTf9m5/dGXXpsv7HqxPO/HJ8eoYmZVCVVXdBG9iWV6uqUKzds0IRrY=
+	t=1721344352; cv=none; b=a/30WU9BfE8kIXxQk6V2kB5fL/UqpSC368p7g4Lv8NY8R+NIVgUE1o0oT5lhPxzHkeggN0i8pe7r/AvxCwtKm6h15MwJzPeHV546UPq6GoepENSP3WaM8RgnbZ2q9fOgBWnPqSj/0xmiCcW26SR+yoDX/pHjgGnYla4PduVuxrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721344070; c=relaxed/simple;
-	bh=gPNJI135KSMGR9LcMGzqjiRNwasxQqERFFQXkFteG/0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=O+NWwM/p0OUNeWyYv2hsLwQX8/Qkaow6Mz+q1VdmqzMnxJSZ8nVOQqn8zS2gWvusfouQRiUuZqZEN4D0Dr7vuASPnnLiW6eF5E+KkUxPmWm1ANhRKWthNxQzo4eFFTA+pj0Kga/GDAKlJTNfjbrBLS7OxpmCqA2Dw8TsCMhV08s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZVpCKEI; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-79f0c08aa45so54263085a.0;
-        Thu, 18 Jul 2024 16:07:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721344068; x=1721948868; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FltS2dAB/qLasUrVJjG5fa1PWnsM794LnAQsql21PwY=;
-        b=iZVpCKEI9pJoS5cq0eXQ2hAll2WeGZn3jHnLatJsgEgNNIDz1RZxBbj/tgIOLjMtH6
-         OeGrDfR4PMjTve4AaXUq/SKwrLvsyfnfV0zndXHqZK/pWM+J4XYBjTHm0+ZsumJM7hfi
-         uLhPdlbRGqRVSa0ZQQmp1GgsCb+tCVLbxqxjxWOu7Ep0+f39r0C9xtXddert1kgF8/4b
-         5N0n7Tes/oHI4vjkiStsVsIZxG+1wkfWu8MoTUY5IHWNgqFsK2eqJ90f9uWkPTm9RZv+
-         Ba/AcHUIBdHTPgGdEvVfBhf/uWH166VP41nMkgAv29i2OUiipljjF1u1hR7A8u1exiin
-         +9yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721344068; x=1721948868;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FltS2dAB/qLasUrVJjG5fa1PWnsM794LnAQsql21PwY=;
-        b=cFD+SYPicSjMoyLi3e0I4dDpA4HBQ+wJZqHfznxUy2wXHny6xXHh9M+nRIpMG3k2Y2
-         6DJiqyBof16JOFEwmNpzSJu2/J1w0FrqEON6l3SwOCRf81uMhDDf8oaiRbspmf8jKOOn
-         cPBpK1jcHj2uBCQes82rbOe1+Z1AzUL2gxa/3rAta+H/VSCEkg0aBGptNcYZqCl8YHzL
-         5SU0BPcbc/UP4I8mABqcuCl/T06XKb+V/LRASS70yP8UlaU3UUmhDIfJoHfZtZGNukAX
-         q+YZ6hwuvWgC+3WLnev+szUEfP38tvMyrnw+uAUi9H64rVCnTSvhFpm4HlOEaWPJhOHn
-         hqog==
-X-Forwarded-Encrypted: i=1; AJvYcCX/N/a23OAd2ntNxlv9l6lRiiTI1QFUT4CH1IguH+jMOIhgaWfx09kzr0zIPk0JQuwpqThinVCU+7i6/vRiM+PL9Xy2XdC450m3oJc1mON4Qe5BBpcZ6/T52pA400ix
-X-Gm-Message-State: AOJu0Ywd8HL0CxCEoTpeCCKInAiaJdseDzO9sy5HF2o3oOVCeV3GaYNG
-	k6rI0MNdKKiCMbSLB4vTgy2/HQbKcxFFowuCW6lYhNeyuLYED2RAiABHZg==
-X-Google-Smtp-Source: AGHT+IE6D4XcmnYNxavWv7T4X4fWUNkWjIX3smq3RfRvJuuxhPlLHz+DpBBcfNYdT/Haqnlm69jAXQ==
-X-Received: by 2002:a05:620a:28cd:b0:79f:12e9:1e71 with SMTP id af79cd13be357-7a1937ad55emr306707585a.0.1721344067882;
-        Thu, 18 Jul 2024 16:07:47 -0700 (PDT)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a198ffe9d4sm10774985a.63.2024.07.18.16.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 16:07:47 -0700 (PDT)
-Date: Thu, 18 Jul 2024 19:07:46 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Praveen Kaligineedi <pkaligineedi@google.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com, 
- shailend@google.com, 
- hramamurthy@google.com, 
- csully@google.com, 
- jfraker@google.com, 
- stable@vger.kernel.org, 
- Bailey Forrest <bcf@google.com>, 
- Praveen Kaligineedi <pkaligineedi@google.com>, 
- Jeroen de Borst <jeroendb@google.com>
-Message-ID: <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240718190221.2219835-1-pkaligineedi@google.com>
-References: <20240718190221.2219835-1-pkaligineedi@google.com>
-Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
+	s=arc-20240116; t=1721344352; c=relaxed/simple;
+	bh=vW1p0Rkqd6tUlF+S/3y/oWhnFBHM8+eaOf6HiZXXmCE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oFzhbend6GKgp/wnvjOU8bKAQU/FJMVpt7OjYWzZTKLGy9CbKtpgqzsK7DtEI+JTksK18YqIBb+ayJFMBe9KerB2+4aDOQx3VAQcicHNU/iW33lIKG55NDdfJ0/3mYC0yWc2O6AaDNlxD8C0hHVyCuXmxo5cNUP6oUXS5d3BKUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=icQuaz3/; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721344350; x=1752880350;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vW1p0Rkqd6tUlF+S/3y/oWhnFBHM8+eaOf6HiZXXmCE=;
+  b=icQuaz3/zC5Z3dDNu6AYeWpXcc+Z2derkplPm5QfrK1eKK/5qW/6eDSf
+   KOnm9zqwBc/ASbmYS8KdL6M9WIUgI9SzpPVPFjhOxom+IFVH9AWhP02K/
+   ULbbnGZjDIofkYo3IiTjpjmI0U7sXc8ox9wAYbeNXc/W5rvZlSVBCb+xA
+   h4hcmvl6X92tKGHqDDfCRzwn/msR2mPxa1kPydkiLQk5gc74p/CffICVH
+   b2Vj3q2OUgEzUa5cwO28J/0MXmdmwgULMoFrQVDTPPs29RaUtYaWH6jxv
+   Efzyv6hyukT7FYlknmpufT1BqyeOpxJ2mG3AzdlIG9UYYzQpzhVprl8Vu
+   Q==;
+X-CSE-ConnectionGUID: oL7+gE76SceOHKZPyfhR/Q==
+X-CSE-MsgGUID: fK4p23+YSQK6lHmlziV7Ew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11137"; a="41467618"
+X-IronPort-AV: E=Sophos;i="6.09,219,1716274800"; 
+   d="scan'208";a="41467618"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2024 16:12:30 -0700
+X-CSE-ConnectionGUID: zPFmW2snSpyKYG2kXfhp9g==
+X-CSE-MsgGUID: qKjTw1cJSlaJX5vLN9WzuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,219,1716274800"; 
+   d="scan'208";a="81557677"
+Received: from djiang5-mobl3.amr.corp.intel.com (HELO [10.125.108.184]) ([10.125.108.184])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2024 16:12:29 -0700
+Message-ID: <936eecad-2e98-4336-b775-d28fa1d87d76@intel.com>
+Date: Thu, 18 Jul 2024 16:12:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/15] cxl: add type2 device basic support
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, richard.hughes@amd.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-2-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20240715172835.24757-2-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Praveen Kaligineedi wrote:
-> From: Bailey Forrest <bcf@google.com>
-> 
-> The NIC requires each TSO segment to not span more than 10
-> descriptors. gve_can_send_tso() performs this check. However,
-> the current code misses an edge case when a TSO skb has a large
-> frag that needs to be split into multiple descriptors
 
-because each descriptor may not exceed 16KB (GVE_TX_MAX_BUF_SIZE_DQO)
 
->, causing
-> the 10 descriptor limit per TSO-segment to be exceeded. This
-> change fixes the edge case.
+On 7/15/24 10:28 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Fixes: a57e5de476be ("gve: DQO: Add TX path")
-> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Signed-off-by: Bailey Forrest <bcf@google.com>
-> Reviewed-by: Jeroen de Borst <jeroendb@google.com>
+> Differientiate Type3, aka memory expanders, from Type2, aka device
+> accelerators, with a new function for initializing cxl_dev_state.
+> 
+> Create opaque struct to be used by accelerators relying on new access
+> functions in following patches.
+> 
+> Add SFC ethernet network driver as the client.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m52543f85d0e41ff7b3063fdb9caa7e845b446d0e
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
 > ---
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 22 +++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
+>  drivers/cxl/core/memdev.c             | 52 ++++++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/Makefile     |  2 +-
+>  drivers/net/ethernet/sfc/efx.c        |  4 ++
+>  drivers/net/ethernet/sfc/efx_cxl.c    | 53 +++++++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/efx_cxl.h    | 29 +++++++++++++++
+>  drivers/net/ethernet/sfc/net_driver.h |  4 ++
+>  include/linux/cxl_accel_mem.h         | 22 +++++++++++
+>  include/linux/cxl_accel_pci.h         | 23 ++++++++++++
+
+Maybe create an include/linux/cxl and then we can put headers in there.
+
+>  8 files changed, 188 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+>  create mode 100644 include/linux/cxl_accel_mem.h
+>  create mode 100644 include/linux/cxl_accel_pci.h
 > 
-> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> index 0b3cca3fc792..dc39dc481f21 100644
-> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> @@ -866,22 +866,42 @@ static bool gve_can_send_tso(const struct sk_buff *skb)
->  	const int header_len = skb_tcp_all_headers(skb);
->  	const int gso_size = shinfo->gso_size;
->  	int cur_seg_num_bufs;
-> +	int last_frag_size;
-
-nit: last_frag can be interpreted as frags[nr_frags - 1], perhaps prev_frag.
-
->  	int cur_seg_size;
->  	int i;
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index 0277726afd04..61b5d35b49e7 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/idr.h>
+>  #include <linux/pci.h>
+>  #include <cxlmem.h>
+> +#include <linux/cxl_accel_mem.h>
+>  #include "trace.h"
+>  #include "core.h"
 >  
->  	cur_seg_size = skb_headlen(skb) - header_len;
-> +	last_frag_size = skb_headlen(skb);
->  	cur_seg_num_bufs = cur_seg_size > 0;
+> @@ -615,6 +616,25 @@ static void detach_memdev(struct work_struct *work)
 >  
->  	for (i = 0; i < shinfo->nr_frags; i++) {
->  		if (cur_seg_size >= gso_size) {
->  			cur_seg_size %= gso_size;
->  			cur_seg_num_bufs = cur_seg_size > 0;
+>  static struct lock_class_key cxl_memdev_key;
+>  
+> +struct cxl_dev_state *cxl_accel_state_create(struct device *dev)
+> +{
+> +	struct cxl_dev_state *cxlds;
 > +
-> +			/* If the last buffer is split in the middle of a TSO
+> +	cxlds = devm_kzalloc(dev, sizeof(*cxlds), GFP_KERNEL);
 
-s/buffer/frag?
+Naked cxlds. Do you think you'll need an accel_dev_state to wrap around cxl_dev_state similar to cxl_memdev_state in order to store accel related information? I also wonder if 'struct cxl_dev_state' should be a public definition. Need to look at the rest of the patchset to circle back. 
 
-> +			 * segment, then it will count as two descriptors.
-> +			 */
-> +			if (last_frag_size > GVE_TX_MAX_BUF_SIZE_DQO) {
-> +				int last_frag_remain = last_frag_size %
-> +					GVE_TX_MAX_BUF_SIZE_DQO;
+> +	if (!cxlds)
+> +		return ERR_PTR(-ENOMEM);
 > +
-> +				/* If the last frag was evenly divisible by
-> +				 * GVE_TX_MAX_BUF_SIZE_DQO, then it will not be
-> +				 * split in the current segment.
+> +	cxlds->dev = dev;
+> +	cxlds->type = CXL_DEVTYPE_DEVMEM;
+> +
+> +	cxlds->dpa_res = DEFINE_RES_MEM_NAMED(0, 0, "dpa");
+> +	cxlds->ram_res = DEFINE_RES_MEM_NAMED(0, 0, "ram");
+> +	cxlds->pmem_res = DEFINE_RES_MEM_NAMED(0, 0, "pmem");
+> +
+> +	return cxlds;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_accel_state_create, CXL);
 
-Is this true even if the segment did not start at the start of the frag?
-
-Overall, it's not trivial to follow. Probably because the goal is to
-count max descriptors per segment, but that is not what is being
-looped over.
-
-Intuitive (perhaps buggy, a quick sketch), this is what is intended,
-right?
-
-static bool gve_can_send_tso(const struct sk_buff *skb)
-{
-        int frag_size = skb_headlen(skb) - header_len;
-        int gso_size_left;
-        int frag_idx = 0;
-        int num_desc;
-        int desc_len;
-        int off = 0;
-
-        while (off < skb->len) {
-                gso_size_left = shinfo->gso_size;
-                num_desc = 0;
-
-                while (gso_size_left) {
-                        desc_len = min(gso_size_left, frag_size);
-                        gso_size_left -= desc_len;
-                        frag_size -= desc_len;
-                        num_desc++;
-
-                        if (num_desc > max_descs_per_seg)
-                                return false;
-
-                        if (!frag_size)
-                                frag_size = skb_frag_size(&shinfo->frags[frag_idx++]);
-                }
-        }
-
-        return true;
-}
-
-This however loops skb->len / gso_size. While the above modulo
-operation skips many segments that span a frag. Not sure if the more
-intuitive approach could be as performant.
-
-Else, I'll stare some more at the suggested patch to convince myself
-that it is correct and complete..
-
-> +                              */
+I do wonder if we should have a common device state init helper function to init all the common bits:
+int cxlds_init(struct *dev, enum cxl_devtype devtype)
 
 
-> +				 */
-> +				if (last_frag_remain &&
-> +				    cur_seg_size > last_frag_remain) {
-> +					cur_seg_num_bufs++;
-> +				}
-> +			}
->  		}
+> +
+>  static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
+>  					   const struct file_operations *fops)
+>  {
+> @@ -692,6 +712,38 @@ static int cxl_memdev_open(struct inode *inode, struct file *file)
+>  	return 0;
+>  }
 >  
->  		if (unlikely(++cur_seg_num_bufs > max_bufs_per_seg))
->  			return false;
->  
-> -		cur_seg_size += skb_frag_size(&shinfo->frags[i]);
-> +		last_frag_size = skb_frag_size(&shinfo->frags[i]);
-> +		cur_seg_size += last_frag_size;
->  	}
->  
->  	return true;
-> -- 
-> 2.45.2.993.g49e7a77208-goog
-> 
+> +
+> +void cxl_accel_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec)
+> +{
+> +	cxlds->cxl_dvsec = dvsec;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_accel_set_dvsec, CXL);
+> +
+> +void cxl_accel_set_serial(struct cxl_dev_state *cxlds, u64 serial)
+> +{
+> +	cxlds->serial= serial;
 
+Missing space before '='
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_accel_set_serial, CXL);
+> +
+> +void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+> +			    enum accel_resource type)
+> +{
+> +	switch (type) {
+> +	case CXL_ACCEL_RES_DPA:
+> +		cxlds->dpa_res = res;
+> +		return;
+> +	case CXL_ACCEL_RES_RAM:
+> +		cxlds->ram_res = res;
+> +		return;
+> +	case CXL_ACCEL_RES_PMEM:
+> +		cxlds->pmem_res = res;
+> +		return;
+> +	default:
+> +		dev_err(cxlds->dev, "unkown resource type (%u)\n", type);
+> +	}
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_accel_set_resource, CXL);
+> +
+>  static int cxl_memdev_release_file(struct inode *inode, struct file *file)
+>  {
+>  	struct cxl_memdev *cxlmd =
+> diff --git a/drivers/net/ethernet/sfc/Makefile b/drivers/net/ethernet/sfc/Makefile
+> index 8f446b9bd5ee..e80c713c3b0c 100644
+> --- a/drivers/net/ethernet/sfc/Makefile
+> +++ b/drivers/net/ethernet/sfc/Makefile
+> @@ -7,7 +7,7 @@ sfc-y			+= efx.o efx_common.o efx_channels.o nic.o \
+>  			   mcdi_functions.o mcdi_filters.o mcdi_mon.o \
+>  			   ef100.o ef100_nic.o ef100_netdev.o \
+>  			   ef100_ethtool.o ef100_rx.o ef100_tx.o \
+> -			   efx_devlink.o
+> +			   efx_devlink.o efx_cxl.o
+>  sfc-$(CONFIG_SFC_MTD)	+= mtd.o
+>  sfc-$(CONFIG_SFC_SRIOV)	+= sriov.o ef10_sriov.o ef100_sriov.o ef100_rep.o \
+>                             mae.o tc.o tc_bindings.o tc_counters.o \
+> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+> index e9d9de8e648a..cb3f74d30852 100644
+> --- a/drivers/net/ethernet/sfc/efx.c
+> +++ b/drivers/net/ethernet/sfc/efx.c
+> @@ -33,6 +33,7 @@
+>  #include "selftest.h"
+>  #include "sriov.h"
+>  #include "efx_devlink.h"
+> +#include "efx_cxl.h"
+>  
+>  #include "mcdi_port_common.h"
+>  #include "mcdi_pcol.h"
+> @@ -899,6 +900,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
+>  	efx_pci_remove_main(efx);
+>  
+>  	efx_fini_io(efx);
+> +
 
+stray blank line
+
+>  	pci_dbg(efx->pci_dev, "shutdown successful\n");
+>  
+>  	efx_fini_devlink_and_unlock(efx);
+> @@ -1109,6 +1111,8 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
+>  	if (rc)
+>  		goto fail2;
+>  
+> +	efx_cxl_init(efx);
+
+No error checks? Does the device expect to work whether CXL is setup or not?
+
+> +
+>  	rc = efx_pci_probe_post_io(efx);
+>  	if (rc) {
+>  		/* On failure, retry once immediately.
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> new file mode 100644
+> index 000000000000..4554dd7cca76
+> --- /dev/null
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -0,0 +1,53 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/****************************************************************************
+> + * Driver for AMD network controllers and boards
+> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2 as published
+> + * by the Free Software Foundation, incorporated herein by reference.
+> + */
+> +
+> +
+> +#include <linux/pci.h>
+> +#include <linux/cxl_accel_mem.h>
+> +#include <linux/cxl_accel_pci.h>
+> +
+> +#include "net_driver.h"
+> +#include "efx_cxl.h"
+> +
+> +#define EFX_CTPIO_BUFFER_SIZE	(1024*1024*256)
+> +
+> +void efx_cxl_init(struct efx_nic *efx)
+> +{
+> +	struct pci_dev *pci_dev = efx->pci_dev;
+> +	struct efx_cxl *cxl = efx->cxl;
+> +	struct resource res;
+> +	u16 dvsec;
+> +
+> +	dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
+> +					  CXL_DVSEC_PCIE_DEVICE);
+> +
+> +	if (!dvsec)
+> +		return;
+> +
+> +	pci_info(pci_dev, "CXL CXL_DVSEC_PCIE_DEVICE capability found");
+
+Seem like unnecessary kern log emission
+
+> +
+> +	cxl->cxlds = cxl_accel_state_create(&pci_dev->dev);
+> +	if (IS_ERR(cxl->cxlds)) {
+> +		pci_info(pci_dev, "CXL accel device state failed");
+
+pci_err()? or maybe pci_warn() given it's ignoring error returns. 
+> +		return;
+> +	}
+> +
+> +	cxl_accel_set_dvsec(cxl->cxlds, dvsec);
+> +	cxl_accel_set_serial(cxl->cxlds, pci_dev->dev.id);
+> +
+> +	res = DEFINE_RES_MEM(0, EFX_CTPIO_BUFFER_SIZE);
+> +	cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_DPA);
+> +
+> +	res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
+> +	cxl_accel_set_resource(cxl->cxlds, res, CXL_ACCEL_RES_RAM);
+> +}
+> +
+> +
+> +MODULE_IMPORT_NS(CXL);
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
+> new file mode 100644
+> index 000000000000..76c6794c20d8
+> --- /dev/null
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
+> @@ -0,0 +1,29 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/****************************************************************************
+> + * Driver for AMD network controllers and boards
+> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2 as published
+> + * by the Free Software Foundation, incorporated herein by reference.
+> + */
+> +
+> +#ifndef EFX_CXL_H
+> +#define EFX_CLX_H
+> +
+> +#include <linux/cxl_accel_mem.h>
+> +
+> +struct efx_nic;
+> +
+> +struct efx_cxl {
+> +	cxl_accel_state *cxlds;
+> +	struct cxl_memdev *cxlmd;
+> +	struct cxl_root_decoder *cxlrd;
+> +	struct cxl_port *endpoint;
+> +	struct cxl_endpoint_decoder *cxled;
+> +	struct cxl_region *efx_region;
+> +	void __iomem *ctpio_cxl;
+> +};
+> +
+> +void efx_cxl_init(struct efx_nic *efx);
+> +#endif
+> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+> index f2dd7feb0e0c..58b7517afea4 100644
+> --- a/drivers/net/ethernet/sfc/net_driver.h
+> +++ b/drivers/net/ethernet/sfc/net_driver.h
+> @@ -814,6 +814,8 @@ enum efx_xdp_tx_queues_mode {
+>  
+>  struct efx_mae;
+>  
+> +struct efx_cxl;
+> +
+>  /**
+>   * struct efx_nic - an Efx NIC
+>   * @name: Device name (net device name or bus id before net device registered)
+> @@ -962,6 +964,7 @@ struct efx_mae;
+>   * @tc: state for TC offload (EF100).
+>   * @devlink: reference to devlink structure owned by this device
+>   * @dl_port: devlink port associated with the PF
+> + * @cxl: details of related cxl objects
+>   * @mem_bar: The BAR that is mapped into membase.
+>   * @reg_base: Offset from the start of the bar to the function control window.
+>   * @monitor_work: Hardware monitor workitem
+> @@ -1148,6 +1151,7 @@ struct efx_nic {
+>  
+>  	struct devlink *devlink;
+>  	struct devlink_port *dl_port;
+> +	struct efx_cxl *cxl;
+>  	unsigned int mem_bar;
+>  	u32 reg_base;
+>  
+> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
+> new file mode 100644
+> index 000000000000..daf46d41f59c
+> --- /dev/null
+> +++ b/include/linux/cxl_accel_mem.h
+> @@ -0,0 +1,22 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2024 Advanced Micro Devices, Inc. */
+> +
+> +#include <linux/cdev.h>
+
+Don't think this header is needed?
+
+> +
+> +#ifndef __CXL_ACCEL_MEM_H
+> +#define __CXL_ACCEL_MEM_H
+> +
+> +enum accel_resource{
+> +	CXL_ACCEL_RES_DPA,
+> +	CXL_ACCEL_RES_RAM,
+> +	CXL_ACCEL_RES_PMEM,
+> +};
+> +
+> +typedef struct cxl_dev_state cxl_accel_state;
+Please use 'struct cxl_dev_state' directly. There's no good reason to hide the type.
+
+> +cxl_accel_state *cxl_accel_state_create(struct device *dev);
+> +
+> +void cxl_accel_set_dvsec(cxl_accel_state *cxlds, u16 dvsec);
+> +void cxl_accel_set_serial(cxl_accel_state *cxlds, u64 serial);
+> +void cxl_accel_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+> +			    enum accel_resource);
+> +#endif
+> diff --git a/include/linux/cxl_accel_pci.h b/include/linux/cxl_accel_pci.h
+> new file mode 100644
+> index 000000000000..c337ae8797e6
+> --- /dev/null
+> +++ b/include/linux/cxl_accel_pci.h
+> @@ -0,0 +1,23 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2024 Advanced Micro Devices, Inc. */
+> +
+> +#ifndef __CXL_ACCEL_PCI_H
+> +#define __CXL_ACCEL_PCI_H
+> +
+> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
+> +#define CXL_DVSEC_PCIE_DEVICE					0
+> +#define   CXL_DVSEC_CAP_OFFSET		0xA
+> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
+> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
+> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
+> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
+> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + (i * 0x10))
+> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + (i * 0x10))
+> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
+> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
+> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
+> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + (i * 0x10))
+> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + (i * 0x10))
+> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
+
+This looks like a copy/paste of drivers/cxl/cxlpci.h definition. I suggest create a include/linux/cxl/pci.h and stick it in there and delete the copy in cxlpci.h. Also update the CXL spec version to latest (3.1) if you don't mind if we are going to move it. 
+> +
+> +#endif
 
