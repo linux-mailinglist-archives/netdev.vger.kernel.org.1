@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-112044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F38934B80
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:11:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC2C934B8D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:14:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0362428362C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:11:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 296CB1C21B64
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DF381720;
-	Thu, 18 Jul 2024 10:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F2881720;
+	Thu, 18 Jul 2024 10:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="IP+UVJ6p"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="dzA1xiOC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B918C06
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 10:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FEE8C06
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 10:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721297502; cv=none; b=CUfib1GafPG+Strauakca3LorzZDuhHNZpk33fwYOwsEikl2lJPrhYS8zVpx9x5NpJkyM+etxpbpz84OWSgewHI00JaTW0rg4kNkvGK0VTq/S8lGNr0RXHqOdGaWCxED+jOJuIDU2m5ICiwxMebCf7q1mRmZmex3kIoqY+Er4f0=
+	t=1721297654; cv=none; b=iMegWry7OhisCP50MrVcbafBPYMZX8KKgWMbS33mto/aZK3U5sGTGlwOZMUEKHwh6E6GCKSsN6E3r96QjoREXokECSkQ52bzjR90GwcQ07WgvBcZfGa4YJdqDeVxFu7tcSlBQAyRtugNHV8sns/Ow1anpuOcnIAvxbh59kjKE20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721297502; c=relaxed/simple;
-	bh=qSQoh2sbPEQRz2m4VpHoQFcyPQkea1pPhHbyvxJnDos=;
+	s=arc-20240116; t=1721297654; c=relaxed/simple;
+	bh=jxAM+SA0YAuKpHKisBUsTYoV8Na9dbZWkNUzYC4qSQc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N6PgTBAt6eKuRpgYQbfdCtUD/X7Q/GBimDaht3QVxfDHgntQ1u3gIjMwvcn8BwtrVgw/b31xHSQbqlhhZ12+bno+6aA7zUA1ICemNPmVdME7sUDkMbLrgSA2A7JSp1P8dhaVFPWdPk127lKPS2PTd+R27aNOtiFU0Ym/vqkOIis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=IP+UVJ6p; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=Zfw1VkYFgMMvschhU37vAxyyOsJW25WUK656KebQ0b6vWhlQDMhdLYwmLbym++tMHqQf50a3pNfnH6osTUk4gJztiOAx6z2oQ9VyFXXspyZ+dKgRhXpP4V5z1W02vWbLjEmT6YAv0G3KOooQENfSTxWovG/hCapBLFgIDS47B00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=dzA1xiOC; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-427b9dcbb09so1081095e9.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 03:11:40 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-427d2cc1c4eso709175e9.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 03:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1721297499; x=1721902299; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1721297650; x=1721902450; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zSBkHmNnBYgRR+3IDJsLbc40jCdTKvMPx7DVu2kSa6Y=;
-        b=IP+UVJ6pF4UW2sEPBqYi72ZgeFmJRovnV6/RC9Tnu2sPUniSd5jALTsTNaihdCjgtW
-         XBZ5tcq4Tcoq/NWKB8IDf7l5M0FEgySsDIfysD5sUTpYvvXGq+THUTOXmjJ2f7nVU2aq
-         a0mjsisPz+qVNggVgLNlhAge7kWJisDk9uUA0NeLyCVDW0zpu1/DgI9WWJpRXeHMMseX
-         7fGlcplSHjSRSSBlgOK2azGbPxV+7SEtPYoGEOl6urhQroVosQ1+7cg5AyZ2douuuTnH
-         56Kx/1apHRVe1V184HwJWCe9pdxuVgExDmZt7VBOAaWh40/pTxjrjesIeeMcZkMwZR+o
-         RLbg==
+        bh=ZvL7nGHnEn57gsrqHSh6JrJ7binZ09WqUem8VKtV3Eo=;
+        b=dzA1xiOCwYIN/2SPgqoTuvczz3UopgLl/xV+fBYog8Mn1FhsXGqHWYmyQLX6EbCjzL
+         o01N1O1jtq0eaVw4hZK4s5ZgqKcaBS2GWTfmYB1qlSIy0QHH4kL2qt1K7sU5U+7fkAQO
+         GMvlFiDJ/mXa8tf6kmwPDefSr13CHj9J/3TKmyhaK2y4Tm7Kk40ms/DaahjLjkZV/y5D
+         HvBqhtcoLGk3SO+IcDAMltehtlp3WY01SM4rsa3GtxlPKHyP9bPGCZTlWjfRzAr9B/Yj
+         YLcJgwOtK2AqE9vutpX0AAwWeajbjFsTC3y7GNVr/TvfHjKLLSEYjWe3zGtgKRFYPw55
+         Kllw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721297499; x=1721902299;
+        d=1e100.net; s=20230601; t=1721297650; x=1721902450;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zSBkHmNnBYgRR+3IDJsLbc40jCdTKvMPx7DVu2kSa6Y=;
-        b=Vt86fX5V7MKUizae2GaQF0yGzeJiVo73o/H0gAiVhgo1RBVjVM6EN10VhEELd/Ip36
-         UnXkdxk3a8bipCo1dCYXfs2J4jnH0wcx1FjxmsCWwYngcYv8IMEnmgJXJsnZ9tQKW9HR
-         OBsjHLFScbSvSyA0nOmTWCGDnz9lXK7WCefz4OQjE7q+5e9wjzzxHsbhuA43tL8ppa2x
-         xQxnvc8wvkbeSvZO5FWA+M9tDQrHh4haZXCgok23UUu7LQO16xpyvzMAEIQy9VF/IqLB
-         51bjabYeArW52P7EQwpgb0yt7YDgZmoO1vE3EmworJVkZK67UiHG7O7vxgLHBR8mDJCB
-         jX5g==
-X-Gm-Message-State: AOJu0YwMP3xLPtnCU9dbPoy3z/VCFzvLcReAWa7NQ53HdxwqcRxu96uu
-	L0ykR6tfBylhLZF4hZCkXQ5/gtYvRATyaVfqyFspgslO8FwXyv5wmnjB9UGem9s=
-X-Google-Smtp-Source: AGHT+IH8j5af49TjTr+kgOQEeFb93tKXWmhHrqnx8QNKPGY71ZdUlkpELZm+o2oeiXmPs8EN64WF5g==
-X-Received: by 2002:a05:600c:3501:b0:426:5269:1a50 with SMTP id 5b1f17b1804b1-427c2cc3774mr29309295e9.11.1721297498610;
-        Thu, 18 Jul 2024 03:11:38 -0700 (PDT)
+        bh=ZvL7nGHnEn57gsrqHSh6JrJ7binZ09WqUem8VKtV3Eo=;
+        b=amo6dal4D+rwajDrtK3DUG7iCx5kiknP6RMpT9j3UC3ex5w8t0gVPARUHymdW0fLzk
+         PAwWvMwMBBDWqnLzbNE6gvUxvug0OCI2c1/N78z4zSmrrB6xnSwBqiV6IsbOEQ16etaD
+         Z5m0xJvtveN+PtM0/1zGC2eUZPq6gWHJHxQjqoyuRGvnOycrjI+1JWu/dnrgwfvTjifv
+         cfrmJD31f+0+16U8vnjwjtTJCDwiIas74giQFogiy65B6Hxqsp0cLCUvx/ewgLnR72eX
+         PdyAp7c1mHb6+YihtaWFKseEGIy8m47eYe2yJuTdwsw2n/RiveeMDXhqeO9eePDVIFqy
+         GBOg==
+X-Gm-Message-State: AOJu0YxBKPl6RRKKT4Kymyw0tsb4eQgGLJkI2m8wkfVmOV0KkRMgaLE4
+	JEcQrTA1fFej/pqVfORgSGqsJtJViNOLdDb9SiV4FsEIYy1q4v07TXRpIYWfmJk=
+X-Google-Smtp-Source: AGHT+IGJ1hUlu0wmrD2MyXah5xqKGk+ZUg26pj6frcIH/tsAz2GZID6VVuUMrfSzfOYrFhGKB3eXrw==
+X-Received: by 2002:a05:600c:4f82:b0:426:61b4:a2eb with SMTP id 5b1f17b1804b1-427c2cc0eb3mr32473785e9.19.1721297650097;
+        Thu, 18 Jul 2024 03:14:10 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:1:14d5:6a6d:7aec:1e83? ([2001:67c:2fbc:1:14d5:6a6d:7aec:1e83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2b1e67esm5220305e9.28.2024.07.18.03.11.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2b18298sm4857365e9.14.2024.07.18.03.14.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jul 2024 03:11:38 -0700 (PDT)
-Message-ID: <8c6d237f-dde7-4922-b92d-6a638fc7376e@openvpn.net>
-Date: Thu, 18 Jul 2024 12:13:38 +0200
+        Thu, 18 Jul 2024 03:14:09 -0700 (PDT)
+Message-ID: <9b49004d-709a-4ce0-86f6-99ba1e782533@openvpn.net>
+Date: Thu, 18 Jul 2024 12:16:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,12 +76,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 14/25] ovpn: implement TCP transport
+Subject: Re: [PATCH net-next v5 10/25] ovpn: implement basic TX path (UDP)
 To: Sabrina Dubroca <sd@queasysnail.net>
 Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
  pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
 References: <20240627130843.21042-1-antonio@openvpn.net>
- <20240627130843.21042-15-antonio@openvpn.net> <ZpTy860ss-JwT_2W@hog>
+ <20240627130843.21042-11-antonio@openvpn.net> <ZpjpaxKtiYG0AXFa@hog>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -124,253 +124,52 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <ZpTy860ss-JwT_2W@hog>
+In-Reply-To: <ZpjpaxKtiYG0AXFa@hog>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 15/07/2024 11:59, Sabrina Dubroca wrote:
-> 2024-06-27, 15:08:32 +0200, Antonio Quartulli wrote:
->> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
->> index 0475440642dd..764b3df996bc 100644
->> --- a/drivers/net/ovpn/io.c
->> +++ b/drivers/net/ovpn/io.c
->> @@ -21,6 +21,7 @@
->>   #include "netlink.h"
->>   #include "proto.h"
->>   #include "socket.h"
->> +#include "tcp.h"
->>   #include "udp.h"
->>   #include "skb.h"
->>   
->> @@ -84,8 +85,11 @@ void ovpn_decrypt_post(struct sk_buff *skb, int ret)
->>   	/* PID sits after the op */
->>   	pid = (__force __be32 *)(skb->data + OVPN_OP_SIZE_V2);
->>   	ret = ovpn_pktid_recv(&ks->pid_recv, ntohl(*pid), 0);
->> -	if (unlikely(ret < 0))
->> +	if (unlikely(ret < 0)) {
->> +		net_err_ratelimited("%s: PKT ID RX error: %d\n",
->> +				    peer->ovpn->dev->name, ret);
-> 
-> nit: this should be part of the "packet processing" patch?
-
-Yap, makes sense.
-
-> 
-> 
->> diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
->> index dd4d91dfabb5..86d4696b1529 100644
->> --- a/drivers/net/ovpn/peer.h
->> +++ b/drivers/net/ovpn/peer.h
->> @@ -10,8 +10,8 @@
->>   #ifndef _NET_OVPN_OVPNPEER_H_
->>   #define _NET_OVPN_OVPNPEER_H_
->>   
->> -#include <linux/ptr_ring.h>
-> 
-> nit: I think you don't need it at all in this version and forgot to
-> drop it in a previous patch? (I didn't notice when it was introduced)
-
-Ouch, you are correct
-
-> 
-> 
-> 
->> +static int ovpn_tcp_to_userspace(struct ovpn_socket *sock, struct sk_buff *skb)
+On 18/07/2024 12:07, Sabrina Dubroca wrote:
+> 2024-06-27, 15:08:28 +0200, Antonio Quartulli wrote:
+>> +static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
 >> +{
->> +	struct sock *sk = sock->sock->sk;
+>> +	ovpn_skb_cb(skb)->peer = peer;
 >> +
->> +	skb_set_owner_r(skb, sk);
->> +	memset(skb->cb, 0, sizeof(skb->cb));
-> 
-> nit: this was just done in ovpn_tcp_rcv
-
-right!
-
-> 
->> +	skb_queue_tail(&sock->peer->tcp.user_queue, skb);
->> +	sock->peer->tcp.sk_cb.sk_data_ready(sk);
->> +
->> +	return 0;
->> +}
->> +
->> +static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
->> +{
-> [...]
->> +	/* DATA_V2 packets are handled in kernel, the rest goes to user space */
->> +	if (likely(ovpn_opcode_from_skb(skb, 0) == OVPN_DATA_V2)) {
->> +		/* hold reference to peer as required by ovpn_recv().
->> +		 *
->> +		 * NOTE: in this context we should already be holding a
->> +		 * reference to this peer, therefore ovpn_peer_hold() is
->> +		 * not expected to fail
->> +		 */
->> +		WARN_ON(!ovpn_peer_hold(peer));
-> 
-> drop the packet if this fails? otherwise I suspect we'll crash later on.
-
-yeah, jumping to "err" and dropping everything makes sense.
-
-> 
->> +		ovpn_recv(peer, skb);
->> +	} else {
->> +		/* The packet size header must be there when sending the packet
->> +		 * to userspace, therefore we put it back
->> +		 */
->> +		skb_push(skb, 2);
->> +		memset(skb->cb, 0, sizeof(skb->cb));
->> +		if (ovpn_tcp_to_userspace(peer->sock, skb) < 0) {
->> +			net_warn_ratelimited("%s: cannot send skb to userspace\n",
->> +					     peer->ovpn->dev->name);
->> +			goto err;
->> +		}
->> +	}
-> [...]
-> 
-> 
->> +void ovpn_tcp_socket_detach(struct socket *sock)
->> +{
->> +	struct ovpn_socket *ovpn_sock;
->> +	struct ovpn_peer *peer;
->> +
->> +	if (!sock)
->> +		return;
->> +
->> +	rcu_read_lock();
->> +	ovpn_sock = rcu_dereference_sk_user_data(sock->sk);
->> +
-> [...]
->> +	/* cancel any ongoing work. Done after removing the CBs so that these
->> +	 * workers cannot be re-armed
+>> +	/* take a reference to the peer because the crypto code may run async.
+>> +	 * ovpn_encrypt_post() will release it upon completion
 >> +	 */
->> +	cancel_work_sync(&peer->tcp.tx_work);
+>> +	DEBUG_NET_WARN_ON_ONCE(!ovpn_peer_hold(peer));
 > 
-> I don't think that's ok to call under rcu_read_lock, it seems it can
-> sleep.
-> 
->> +	strp_done(&peer->tcp.strp);
-> 
-> And same here, since strp_done also calls cancel_work_sync.
+> Shouldn't we abort if this fails? This should not really happen, but
+> if it did, we would proceed (possibly with async crypto) without a ref
+> on the peer.
 
-hm you're right. I'll see how to re-arrange this part..I expect this to 
-be tricky.
+Yap, better bail out.
 
 
 > 
->> +	rcu_read_unlock();
+>> +	ovpn_encrypt_post(skb, 0);
+>> +	return true;
 >> +}
 >> +
->> +static void ovpn_tcp_send_sock(struct ovpn_peer *peer)
->> +{
->> +	struct sk_buff *skb = peer->tcp.out_msg.skb;
->> +
->> +	if (!skb)
->> +		return;
->> +
->> +	if (peer->tcp.tx_in_progress)
->> +		return;
->> +
->> +	peer->tcp.tx_in_progress = true;
-> 
-> I'm not convinced this is safe. ovpn_tcp_send_sock could run
-> concurrently for the same peer (lock_sock doesn't exclude bh_lock_sock
-> after the short "grab ownership" phase), so I think both sides could
-> see tx_in_progress = false and then proceed.
-
-I may be missing something here.
-I was under the impression that ovpn_tcp_send_sock() is always invoked 
-with lock_sock() held. Shouldn't that be enough to prevent concurrent 
-executions for the same peer/sock?
-
-> 
-> 
->> +	do {
->> +		int ret = skb_send_sock_locked(peer->sock->sock->sk, skb,
->> +					       peer->tcp.out_msg.offset,
->> +					       peer->tcp.out_msg.len);
->> +		if (unlikely(ret < 0)) {
->> +			if (ret == -EAGAIN)
->> +				goto out;
-> 
-> This will silently drop the message? And then in case of a userspace
-> message, ovpn_tcp_sendmsg will lie to the user (the openvpn client),
-> claiming that the control message was sent (ret = size just above the
-> unlock)?
-
-why do you think the message will be dropped?
-
-By jumping to 'out' we are keeping the skb in peer->tcp.out_msg.skb, 
-with peer->tcp.out_msg.offset and peer->tcp.out_msg.len left untouched 
-and ready for the next attempt triggered by ovpn_tcp_write_space().
-
-> 
->> +
->> +			net_warn_ratelimited("%s: TCP error to peer %u: %d\n",
->> +					     peer->ovpn->dev->name, peer->id,
->> +					     ret);
->> +
->> +			/* in case of TCP error we can't recover the VPN
->> +			 * stream therefore we abort the connection
->> +			 */
->> +			ovpn_peer_del(peer,
->> +				      OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
->> +			break;
->> +		}
->> +
->> +		peer->tcp.out_msg.len -= ret;
->> +		peer->tcp.out_msg.offset += ret;
->> +	} while (peer->tcp.out_msg.len > 0);
-> 
-> Another thing that worries me: assume the receiver is a bit slow, the
-> underlying TCP socket gets stuck. skb_send_sock_locked manages to push
-> some data down the TCP socket, but not everything. We advance by that
-> amount, and restart this loop. The socket is still stuck, so
-> skb_send_sock_locked returns -EAGAIN. We have only pushed a partial
-> message down to the TCP socket, but we drop the rest? Now the stream
-> is broken, and the next call to ovpn_tcp_send_sock will happily send
-> its message.
-
-I think this is answered above, where I say that we are actually keeping 
-the skb (not dropping it) ready for the next sending attempt.
-
-> 
-> ovpn_tcp_send_sock with msg_len = 1000
-> iteration 1
->    skb_send_sock_locked returns 100
->    advance
-> iteration 2
->    skb_send_sock_locked returns -EAGAIN
->    goto out
-> 
-> 
-> So you'd have to keep that partially-sent message around until you can
-> finish pushing it out on the socket.
-
-yap, see above.
-
-> 
 > 
 > [...]
->> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->> +{
->> +	struct ovpn_socket *sock;
->> +	int ret, linear = PAGE_SIZE;
->> +	struct ovpn_peer *peer;
->> +	struct sk_buff *skb;
->> +
->> +	rcu_read_lock();
->> +	sock = rcu_dereference_sk_user_data(sk);
->> +	peer = sock->peer;
->> +	rcu_read_unlock();
+>> diff --git a/drivers/net/ovpn/io.h b/drivers/net/ovpn/io.h
+>> index aa259be66441..95568671d5ae 100644
+>> --- a/drivers/net/ovpn/io.h
+>> +++ b/drivers/net/ovpn/io.h
+>> @@ -12,4 +12,6 @@
+>>   
+>>   netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev);
+>>   
+>> +void ovpn_encrypt_work(struct work_struct *work);
 > 
-> What's stopping the peer being freed here?
+> leftover from the old implementation I think?
 
-I assumed that while we are in our own sk_cb it should not be possible 
-for a peer to have refcnt reaching 0.
+ops, you're right.
 
-But after double checking I don't think there is any protection about 
-this. I Will add a call to ovpn_peer_hold() and abort if that call fails.
+Thanks
+
+> 
 
 -- 
 Antonio Quartulli
