@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-112114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0A29351D4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 20:44:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA99A9351D9
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 20:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B5FC1F218A1
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 18:44:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20511F21B39
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 18:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE40F14535F;
-	Thu, 18 Jul 2024 18:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF34145A19;
+	Thu, 18 Jul 2024 18:43:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF2142045;
-	Thu, 18 Jul 2024 18:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE3E145A1A;
+	Thu, 18 Jul 2024 18:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721328205; cv=none; b=b3ct02GbmHlPEWvZywtvKaqwkkg6zl8hZcLzdADrga8TPVEf9IOVdeCkIIhsOCXAMBOZnTb2AOLafntr6FZDmoIQtcC8EJDHxQ+mrf6jii+1SgEZ0suN+Y7TDI1kvQ+KQOmAZd1PVXcY3H0x+AArgiQ0kpiJYivNWTGVToB0nms=
+	t=1721328211; cv=none; b=QF6A5CYgwLqbpxa3a4R1Yg+ve5qHmvXAIX5cKsylfOGp4quLy8tH9a9il7BHyD2zmEj7LBq9y/R/pQFPlZ4iF41eGIaHqGLGyKJFY5GaJF6Ekf9N/DHNFvSF/VXwztpJqxc76Q8l6J4hEMISlHw7GdjvYMp9XhvK7TvA5thL6fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721328205; c=relaxed/simple;
-	bh=1Re9CUu3Zgl6HOcJ0eBT7+tO+vZjwrWPLNQ3FHEOgXM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DHhQBKayQXo4zzOQGGC6GAHgCWioTpVzgFRTNlnZ27Uqj/Y7M8r4vso10KpEtERkiDqSogLQuVhV5M9zxJ77RwmdoSnXpvbRLgtM7lF03jFjDjNTm/AnU1SNnoza5mrIuJIHWe0B3sVZTKLrt0wti/wDGXzRqpLMQYVwU6qPZsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1721328211; c=relaxed/simple;
+	bh=Sm07o6Ufp8do35ESzkLqvQJpM2dkBIWWSAhOTGIZwDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hzgreR1ons2ajNByD01loneUV7BKmejv1X3RlGTcg5lvUCsM5nRNZb9hOYinQ0Foq2Nb9J6u0WIjW1fi0hY110zYQgdbuYedVHhJlzzS+PKm9LNV8F7WXL6+3icoUMB6K7f2XYd0Gj6Mfv6SI41OLi7sUa7kOjS2S8guaJXRI6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5a156556fb4so155831a12.3;
-        Thu, 18 Jul 2024 11:43:23 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52e97e5a84bso1014391e87.2;
+        Thu, 18 Jul 2024 11:43:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721328202; x=1721933002;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7ntRMJH4jqT8CtnIxoH8FmM7SbCkrJsPjFbgTogdVKM=;
-        b=ndx1MAhYxkFIMqrgMsNOFlEtsxY3uAQ7H82qNTAAdCN4hIkodkmSsnXWK25mnNPOhs
-         GkNLcfbEJNV13HdJMTlnwkDH6aD3KNXaUAP5dFNX8llKC/JciqCHOioFD7bK1J+wF+M0
-         Yo5GC1+ihavtqlnAOZu0PTm5cAgoJxXz9O0IzQ28D8NISbUj2dLEgaWZ0DqNHVhhMFYE
-         hVQ6lpj2sBWgt1OYLWZisVl7PR47DM/lRXazILXed5poMDbyLlEJcb8wqXKlqfhhQPao
-         bCQUUkgzRuReE36YNyOAJ0haGZnxdHz5CFl9X5gxLqsPYlEPNEHeeRrEdhbIpqi3yVgF
-         mLAA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZlKb+SJ6Vbgv1ENAD0ypACYLh9bwGk62mLEy1t939H1Umn9LdC78KFNaJqyNW+xYwnhufq/RB/iKzMEFbsu8ApTCI0Pa8T9v49XlDYd9CUBEMUEq3TxbEJbBBr2tDJ3aoK92b
-X-Gm-Message-State: AOJu0Yxvr0SOV7H6eB1cuPjHbVmbkrd09ZUDRigmsWqYH7HnkrJV5vKt
-	erfVt53Lgu180rcOFOLMeSm5RyLzYkckgOsbGtK1xLOks4cXptv4
-X-Google-Smtp-Source: AGHT+IGc4SzT/c9z3l4E3IjIJFx+jKUyu9eorrV8iHfVJrN/70JY3gkk6Eg4hdVz3tCAlO0W5nGKUw==
-X-Received: by 2002:a17:906:1756:b0:a79:c011:e0d0 with SMTP id a640c23a62f3a-a7a011ad77fmr365305066b.35.1721328202019;
-        Thu, 18 Jul 2024 11:43:22 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc7f1d29sm589055466b.105.2024.07.18.11.43.21
+        d=1e100.net; s=20230601; t=1721328207; x=1721933007;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+V4xx6aRhiInn14syAhPQsREkEPC+V+Yp/bBmaUNJu4=;
+        b=LZsFnJc2akTFIyxZHsTOAG8f/luy8CktNm21r0FaZqDJUF449uAGfpCyus84f2YnXa
+         e2dmeisjyJhr2f/zIc7PGVD1BOgvKgO0rss7Dqg2cAUr6x10TNqc3hX8ehDyL6sNSAO3
+         81cz1bRfQLUa8ho7Df17l/l8MdDxzFQnQc0RQ4mtzJMynwomZ9pW8SLwu+NZdt0M35i4
+         zRWXFiGB+SM3B9pZOlyhloHqdRMgDfiUfYmL7LIcN/UCLVCMfmubzNUBcWKi1OF7wOye
+         4oLyj+/qx5utltjXtaI7RkOLKn/8Hj9mNZ+Jr1VQZbkPiJLFpE3jhjA7G6/eIV9w4yNR
+         lJOA==
+X-Forwarded-Encrypted: i=1; AJvYcCW10kKGCbU/xtJlXp24exiFCDzgpnfCBAleupsz5DatlznPJoN/DikZbKpfEjOH+Oapo2KqBzyTjdZNHs7r1W/3ceXROzOK/mRkQ33A3m/JO1EYpFEc8N2aQWaRfDSeYybzo3Ui
+X-Gm-Message-State: AOJu0YwOibiR/xSnzK5hY+M9i+K5Ovh+Sf0IUgc75Fq5lgp/jGgxZJJE
+	xM77tQHPWC6jgDNf4LHhE90K4tGDNM5GavN4j4jerOtl0VYb0DLm
+X-Google-Smtp-Source: AGHT+IF3SlY6/dSViasbUcmZZxIDT7kaR/U3VYe5G2G02PeFA+1s2nqaXGYJ7IR/grLZCIrDolNIhg==
+X-Received: by 2002:ac2:4c41:0:b0:52e:9cc7:4462 with SMTP id 2adb3069b0e04-52ee53a7234mr5530432e87.11.1721328207121;
+        Thu, 18 Jul 2024 11:43:27 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc80112fsm592386466b.183.2024.07.18.11.43.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 11:43:21 -0700 (PDT)
+        Thu, 18 Jul 2024 11:43:26 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -64,10 +65,12 @@ Cc: thepacketgeek@gmail.com,
 	linux-kernel@vger.kernel.org,
 	paulmck@kernel.org,
 	davej@codemonkey.org.uk
-Subject: [RFC PATCH 0/2] netconsole: Fix netconsole unsafe locking
-Date: Thu, 18 Jul 2024 11:43:04 -0700
-Message-ID: <20240718184311.3950526-1-leitao@debian.org>
+Subject: [RFC PATCH 1/2] netpoll: extract core of netpoll_cleanup
+Date: Thu, 18 Jul 2024 11:43:05 -0700
+Message-ID: <20240718184311.3950526-2-leitao@debian.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240718184311.3950526-1-leitao@debian.org>
+References: <20240718184311.3950526-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,114 +79,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Problem:
-=======
+Extract the core part of netpoll_cleanup(), so, it could be called from
+a caller that has the rtnl lock already.
 
-The current locking mechanism in netconsole is unsafe and suboptimal due to the
-following issues:
+Netconsole uses this in a weird way right now:
 
-1) Lock Release and Reacquisition Mid-Loop:
+	__netpoll_cleanup(&nt->np);
+	spin_lock_irqsave(&target_list_lock, flags);
+	netdev_put(nt->np.dev, &nt->np.dev_tracker);
+	nt->np.dev = NULL;
+	nt->enabled = false;
 
-In netconsole_netdev_event(), the target_list_lock is released and reacquired within a loop, potentially causing collisions and cleaning up targets that are being enabled.
+This will be replaced by do_netpoll_cleanup() as the locking situation
+is overhauled.
 
-	int netconsole_netdev_event()
-	{
-	...
-		spin_lock_irqsave(&target_list_lock, flags);
-		list_for_each_entry(nt, &target_list, list) {
-			spin_unlock_irqrestore(&target_list_lock, flags);
-			__netpoll_cleanup(&nt->np);
-			spin_lock_irqsave(&target_list_lock, flags);
-		}
-		spin_lock_irqsave(&target_list_lock, flags);
-	...
-	}
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ include/linux/netpoll.h |  1 +
+ net/core/netpoll.c      | 12 +++++++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-2) Non-Atomic Cleanup Operations:
-
-In enabled_store(), the cleanup of structures is not atomic, risking cleanup of structures that are in the process of being enabled.
-
-	size_t enabled_store()
-	{
-	...
-		spin_lock_irqsave(&target_list_lock, flags);
-		nt->enabled = false;
-		spin_unlock_irqrestore(&target_list_lock, flags);
-		netpoll_cleanup(&nt->np);
-	...
-	}
-
-
-These issues stem from the following limitations in netconsole's locking design:
-
-1) write_{ext_}msg() functions:
-
-	a) Cannot sleep
-	b) Must iterate through targets and send messages to all enabled entries.
-	c) List iteration is protected by target_list_lock spinlock.
-
-2) Network event handling in netconsole_netdev_event():
-
-	a) Needs to sleep
-	a) Requires iteration over the target list (holding target_list_lock spinlock).
-	b) Some events necessitate netpoll struct cleanup, which *needs* to sleep.
-
-The target_list_lock needs to be used by non-sleepable functions while also protecting operations that may sleep, leading to the current unsafe design.
-
-
-Proposed Solution:
-==================
-
-1) Dual Locking Mechanism:
-	- Retain current target_list_lock for non-sleepable use cases.
-	- Introduce target_cleanup_list_lock (mutex) for sleepable operations.
-
-
-2) Deferred Cleanup:
-	- Implement atomic, deferred cleanup of structures using the new mutex (target_cleanup_list_lock).
-	- Avoid the `goto` in the middle of the list_for_each_entry
-
-3) Separate Cleanup List:
-	- Create target_cleanup_list for deferred cleanup, protected by target_cleanup_list_lock.
-	- This allows cleanup() to sleep without affecting message transmission.
-	- When iterating over targets, move devices needing cleanup to target_cleanup_list.
-	- Handle cleanup under the target_cleanup_list_lock mutex.
-
-4) Make a clear locking hiearchy
-
-	- The target_cleanup_list_lock takes precedence over target_list_lock.
-
-	- Major Workflow Locking Sequences:
-		a) Network Event Affecting Netpoll (netconsole_netdev_event):
-			rtnl -> target_cleanup_list_lock -> target_list_lock
-
-		b) Message Writing (write_msg()):
-			console_lock -> target_list_lock
-
-		c) Configfs Target Enable/Disable (enabled_store()):
-			dynamic_netconsole_mutex -> target_cleanup_list_lock -> target_list_lock
-
-
-This hierarchy ensures consistent lock acquisition order across different
-operations, preventing deadlocks and maintaining proper synchronization. The
-target_cleanup_list_lock's higher priority allows for safe deferred cleanup
-operations without interfering with regular message transmission protected by
-target_list_lock.  Each workflow follows a specific locking sequence, ensuring
-that operations like network event handling, message writing, and target
-management are properly synchronized and do not conflict with each other.
-
-Tested wostly with https://github.com/leitao/netcons/blob/main/basic_test.sh
-
-Breno Leitao (2):
-  netpoll: extract core of netpoll_cleanup
-  netconsole: Defer netpoll cleanup to avoid lock release during list
-    traversal
-
- drivers/net/netconsole.c | 77 +++++++++++++++++++++++++++++++---------
- include/linux/netpoll.h  |  1 +
- net/core/netpoll.c       | 12 +++++--
- 3 files changed, 71 insertions(+), 19 deletions(-)
-
+diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
+index bd19c4b91e31..cd4e28db0cbd 100644
+--- a/include/linux/netpoll.h
++++ b/include/linux/netpoll.h
+@@ -64,6 +64,7 @@ int netpoll_setup(struct netpoll *np);
+ void __netpoll_cleanup(struct netpoll *np);
+ void __netpoll_free(struct netpoll *np);
+ void netpoll_cleanup(struct netpoll *np);
++void do_netpoll_cleanup(struct netpoll *np);
+ netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb);
+ 
+ #ifdef CONFIG_NETPOLL
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 55bcacf67df3..a58ea724790c 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -853,14 +853,20 @@ void __netpoll_free(struct netpoll *np)
+ }
+ EXPORT_SYMBOL_GPL(__netpoll_free);
+ 
++void do_netpoll_cleanup(struct netpoll *np)
++{
++	__netpoll_cleanup(np);
++	netdev_put(np->dev, &np->dev_tracker);
++	np->dev = NULL;
++}
++EXPORT_SYMBOL(do_netpoll_cleanup);
++
+ void netpoll_cleanup(struct netpoll *np)
+ {
+ 	rtnl_lock();
+ 	if (!np->dev)
+ 		goto out;
+-	__netpoll_cleanup(np);
+-	netdev_put(np->dev, &np->dev_tracker);
+-	np->dev = NULL;
++	do_netpoll_cleanup(np);
+ out:
+ 	rtnl_unlock();
+ }
 -- 
 2.43.0
 
