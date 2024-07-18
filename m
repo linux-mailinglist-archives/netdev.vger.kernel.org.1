@@ -1,100 +1,223 @@
-Return-Path: <netdev+bounces-112065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2CB934CAA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:40:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274EC934CAD
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:41:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44D401C21013
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 11:40:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69B8BB20E31
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 11:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF2C139579;
-	Thu, 18 Jul 2024 11:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C978D139CE5;
+	Thu, 18 Jul 2024 11:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmoGx5h2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwMexBtI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269731386B4;
-	Thu, 18 Jul 2024 11:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B8412D745;
+	Thu, 18 Jul 2024 11:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721302836; cv=none; b=L7mM8wSGiF7lDRAHAQPYAVDCqd0yFVv92VfEDR6IKSUardFW/EvEkRAeZFRk6XT+7XoqVHGEru0a0XQGVBv48htKsf53kwNAJLdSKWY1a4ABEDM28aFQMlSWrdhfYzxLbSQ3KGcAb/guMzuE6Jak43SLXg+D4NK7seLz2WEhWyU=
+	t=1721302867; cv=none; b=oRArKdbMp31YxLrff2tP13csTRIoGW3im8yBnhq3QzyBcb4ROZH69ho56etPzrYtaqVz9yTupcZVXFRBvmEZj6XR/8f3gZy9ky+zPeoaR7f+p9K6DdXn9AZFQ4EiJkxctORvzrDHRV3EI5DyGmY6swsKu2YO156OUDZh/CEfoKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721302836; c=relaxed/simple;
-	bh=Fiq8mpT79ZcKdgSfyau1kQ/5oPMpIDXwJSEouLosKHk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FwoXypI02X+Wn5o9ck7w1ZaXobUmsunk+dSLghJHrHN6tjQeHKcl++05tsBF7+kXCR61YRvdkX0QQHz1Nyn72Q/VGN4FyIwtUg/pk4xiHIgOFADvqTlEb8XliNYEaQ/+7qO+MeublTMRMXr12HzPng3/1LcOns08thqGEnBqiPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmoGx5h2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A72CDC4AF0B;
-	Thu, 18 Jul 2024 11:40:35 +0000 (UTC)
+	s=arc-20240116; t=1721302867; c=relaxed/simple;
+	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ePBQkmuqZvYbC/VMs0fRLm31xBouD0leu00PSdsPz+lfYTnzN7TziZjeW/h/vugUr/SPpQRTqd4heYcQHmKKBfqn3SP8HIcmzYhlGAXciQUrmzbrIdqEG6+iBn6fcQRfzfWMmXUDeoHnRn7Ef/yOd0GxbgktawzA1S4ipgfZeyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwMexBtI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E425DC116B1;
+	Thu, 18 Jul 2024 11:41:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721302835;
-	bh=Fiq8mpT79ZcKdgSfyau1kQ/5oPMpIDXwJSEouLosKHk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pmoGx5h2r1gVdJCnbgJOMvCQ8cjT+sa0gJ0qKDAu9oObhnMUXWdajlnfrlZo+6LL6
-	 UYU2XrP6v7yxFK61nvnQqLQJSilWaHfWwO5HvjSAI5rW5cSz4rKdv6KPOt9hyqVu1G
-	 xKONxjq7v0zUZJGetKzzLIG1gRnaF0eEDSuml6eon85RRfWASUds2+YmpOZERqcAOP
-	 CXlnhdpxO7RcrpV9PSYRmkOlnkl+q+1yCsZ2OQZyCeCy3nAnX1ThiDHgkaL3WGjxfP
-	 TGZMlLz3p9w6/6IJJeheNpH50/BSTxGrTzTKXliO6OMn0jXHEdAkTUBYzzxa4tA9KM
-	 3+ZTLMWfFVymw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 913C4C4333D;
-	Thu, 18 Jul 2024 11:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1721302867;
+	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MwMexBtI4sSqlgF86D9iVOE+SvzC9XrPo3oAFgSUuu37Wagh9ba6YjNElyhuxgwaA
+	 DZewPR00gKFOWaCAq0/Ak54Lt58q+Ix4de1GSYTfo5E+cmGL/oNInRPF6TcVZslpBJ
+	 TeXh9vR/xW5zKkg279eclHMYR8x1qkjkjbnBTZ8+qrXK+R6LTKKexFy0m3VJNBUjI+
+	 fH44jCxYGuvnixlZrxwThK9BV6hiRE8K1/i3IIev/zAnW0URAriJlSdxUP9efWmay7
+	 cw7UBW+Ux6ju5k0/7yg7IQbVHH/6A992BCuKeYX0/U7wQ80i/+gBEhmV35EY4JTDZ3
+	 L8faX8rUqwBGA==
+Message-ID: <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
+Date: Thu, 18 Jul 2024 13:40:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/4] netfilter: ctnetlink: use helper function to
- calculate expect ID
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172130283558.6088.1082454972873953114.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Jul 2024 11:40:35 +0000
-References: <20240717215214.225394-2-pablo@netfilter.org>
-In-Reply-To: <20240717215214.225394-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
+ Amlogic Bluetooth
+To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
+ <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Wed, 17 Jul 2024 23:52:11 +0200 you wrote:
-> Delete expectation path is missing a call to the nf_expect_get_id()
-> helper function to calculate the expectation ID, otherwise LSB of the
-> expectation object address is leaked to userspace.
+On 18/07/2024 09:42, Yang Li via B4 Relay wrote:
+> From: Yang Li <yang.li@amlogic.com>
 > 
-> Fixes: 3c79107631db ("netfilter: ctnetlink: don't use conntrack/expect object addresses as id")
-> Reported-by: zdi-disclosures@trendmicro.com
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> Add binding document for Amlogic Bluetooth chipsets attached over UART.
 > 
-> [...]
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 66 ++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+> new file mode 100644
+> index 000000000000..2e433d5692ff
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+> @@ -0,0 +1,66 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Amlogic Bluetooth chips
+> +
+> +description:
+> +  This binding describes UART-attached Amlogic bluetooth chips.
 
-Here is the summary with links:
-  - [net,1/4] netfilter: ctnetlink: use helper function to calculate expect ID
-    https://git.kernel.org/netdev/net/c/782161895eb4
-  - [net,2/4] netfilter: nf_set_pipapo: fix initial map fill
-    https://git.kernel.org/netdev/net/c/791a615b7ad2
-  - [net,3/4] selftests: netfilter: add test case for recent mismatch bug
-    https://git.kernel.org/netdev/net/c/0935ee6032df
-  - [net,4/4] ipvs: properly dereference pe in ip_vs_add_service
-    https://git.kernel.org/netdev/net/c/cbd070a4ae62
+<form letter>
+This is a friendly reminder during the review process.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It seems my or other reviewer's previous comments were not fully
+addressed. Maybe the feedback got lost between the quotes, maybe you
+just forgot to apply it. Please go back to the previous discussion and
+either implement all requested changes or keep discussing them.
 
+Thank you.
+</form letter>
+
+
+> +
+> +maintainers:
+> +  - Yang Li <yang.li@amlogic.com>
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - const: amlogic,w155s2-bt
+> +      - items:
+> +          - enum:
+> +              - amlogic,w265s1-bt
+> +              - amlogic,w265p1-bt
+> +              - amlogic,w265s2-bt
+> +          - const: amlogic,w155s2-bt
+> +
+> +  bt-enable-gpios:
+
+enable-gpios
+
+> +    maxItems: 1
+> +    description: gpio specifier used to enable BT
+
+Drop, redundant.
+
+> +
+> +  bt-supply:
+
+It's called "bt" in schematics or datasheet? Feels unusual. Please list
+all the pins if you claim that's a real name.
+
+
+
+> +    description: bluetooth chip 3.3V supply regulator handle
+> +
+> +  clocks:
+> +    maxItems: 1
+> +    description: clock provided to the controller (32.768KHz)
+> +
+> +  antenna-number:
+> +    default: 1
+> +    description: device supports up to two antennas
+
+Keep it consistent - either descriptions are the last property or
+somewhere else. Usually the last.
+
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+
+And what does it mean? What happens if BT uses antenna number 2, not 1?
+What is connected to the other antenna? It really feels useless to say
+which antenna is connected to hardware.
+
+> +
+> +  firmware-name:
+> +    description: specify the path of firmware bin to load
+
+Missing maxItems
+
+> +    $ref: /schemas/types.yaml#/definitions/string-array
+
+That's redundant, drop.
+
+> +
+
+
+Best regards,
+Krzysztof
 
 
