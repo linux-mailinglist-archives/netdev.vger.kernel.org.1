@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-112021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B637D9349B4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:18:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BAEE9349B6
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 917861F23538
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 08:18:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36894284DA8
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 08:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DE76F2FE;
-	Thu, 18 Jul 2024 08:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF69855886;
+	Thu, 18 Jul 2024 08:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="VNbwKDmN"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ED23/0Gh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD06259C
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 08:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20581EA8F
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 08:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721290711; cv=none; b=h6KKyVBn8jsxNGsu5aKK66eD94ZqvfbmyXfG/jWP9gjZzGrMJ8zKFRc562txqvcN+ckn3Ac4aidgMtVgbD3HfMN9FTAMCyA+u+oWsloW4XIyM+FbfwaLjKCh03rTiusQccdo2LP0uKMWG3ldUzrSkOxz4KceLeFEXsz8Wg24eDw=
+	t=1721290814; cv=none; b=IswwjkwLkQnJ9YPWAn4AIOp2ypbRaDjUIuLq0PSAS/NuiW2adTWTjTaj9RsF3s3MLb9VxzPNbLVwBxFCPN9f+U8BSt7mkTSgPvSJyq2iryhX7k6u1oVGRoaIOf8ls93dp3nSDo+u2Ox4hDONYzraWtF5EMkW3F09HFfIDrh9GRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721290711; c=relaxed/simple;
-	bh=c0EdNXhF/mHADTm/wW2vUlH5osdZUZdjebbxJ4IcuJ0=;
+	s=arc-20240116; t=1721290814; c=relaxed/simple;
+	bh=cPcl/gr8imPmwFy66iW5C1s+37VDrGCKywXFlFUCcbU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YPp7DqZzzF/Z2zgar9KqAF/NJiAwtw8poY4QxsOgvdk83UsWEvJesPwWZxvihDkCjW3yhGlGJ5AqI1hXvjim8U7qPQYVn8GuE4apLVJ6Em25VN7VWYRdgaaa/AV02czQRrHKGJdNZ+5dHhnt8Y3k01hsupDUbmapKHhZ3fNM2Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VNbwKDmN; arc=none smtp.client-ip=209.85.208.172
+	 In-Reply-To:Content-Type; b=Oek9aVsEG48RGbRhjEf+iuNBkFBPcecFKRvFOw9ZeYaqYtHO1NRQKUXDyQ4GMK09IZohnsFY2UZWyNgfQH9/Xik4Scq4x4TtBdIy7zM/ALcZIWzsDPJciX3A2s1kDloWWKgrmn+kWqJ2TuAeTxVSP/p51JjmWCHb4Ajjk51bb/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ED23/0Gh; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eede876fbfso7861561fa.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 01:18:29 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4266ea6a488so364745e9.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 01:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1721290708; x=1721895508; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1721290811; x=1721895611; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Q08I7A36j9GTa0xUy5+vGoZ3L97gJAXKemYWBCEJwE=;
-        b=VNbwKDmNnmHSeUudiq9fUFXMn695M63Ruv3ndFVlr1rMlSkDVTa5Gf9nGGTPh9y/n1
-         3GJj3HPIckP7asdxNQO3a0JlZ9fNfFG3ttxNQrI2Gkvkt/JUEVcscUvkLQCAI6gAgkhL
-         bbKnggLWFwMWjzlt2RqtMk9+D/Un4vYyoS60NSvkhsO/24kHW0JECS4GUoknKDZ+3UT2
-         efdsrdhziQD8FRruNKHitIqJm0B24NVKYiJFaCYv/MwcGYUpuRowC+4rqJAnsV0O5yJx
-         bLksRVyVueBQc02v/XL4v30R0oYeIbDQ4A58cBR77vTbazGGkl9BxSJd+IXzUkDhufPQ
-         2dSg==
+        bh=q+PlyT7pC7mg0Ii9BCRl59hN4ArVVPVTuTQKpbg1vbA=;
+        b=ED23/0GhzVEom2blJNre58DeCVbzqkDQ5/EyLlfeTza2wy3SoNrUc2MJAJDAcqzfry
+         Lc3jFOuqP4NkSzUyo9QFlzXRr1ShDWYk4ZoEeExWQZznlhfgIZQXdeubgrEW/UKLXQyD
+         AF/hcOVuCnyVw4JOXFc/mEExuqqdZ5/eCKtPnPFMkz7s3siBiDs3IZtdxKo7az/ETMnM
+         2SFOa/rKj+Sg0mPLi78gvUOPkhH83Jirr0qq1eJrFvWCtgrtxzt42O2SmazLYf76/yrI
+         oKH5780jHbR6oLw6li+NBRveth5s1fvdusy5imZ5pvtSeqxmzDNVbOLOWAqeF/PRVbkK
+         VapA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721290708; x=1721895508;
+        d=1e100.net; s=20230601; t=1721290811; x=1721895611;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5Q08I7A36j9GTa0xUy5+vGoZ3L97gJAXKemYWBCEJwE=;
-        b=mi4/8+qTcBbIHolKvq03Bob8XhTOFBA9mCSlmfMOcSDKumMsOy5/zcsYNcHA1KjBKz
-         zOJgUXoCcgoaIGALfCdrCjZlxbFs4m2ZywZwT6onoh+nD4JQVSAT8gr3xcKSfjTr+FVF
-         8dKoZQ8+ZeFQUKHfqp0YxcZAbzP84mepYEgzq5IkXxrzjdUofQtUC9jda7Nv6PRXdzXU
-         hVoflr3pFc3mMk0tqhpM8MZ/ID5NN+A7qsaSKzgwr5t4T38pAWeMd97Xvv2WfGiwVe3H
-         NXXxovEgmxUrOJUT/cxDyBzmDmkQlOjj3IlAIXnUCR+t8TRvLcUviLTnGhbve1Qq5AA3
-         jajQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQkIrEDtOZuQ9s2uK3Y/MYGOt6BS6popbTobTgAQGncT6yShm3wrVj5BgDzt1YOJCVaTYOQ/haQJezlS7nDJpbJGEXdYWF
-X-Gm-Message-State: AOJu0Yy/IqM8JYS3A0OGBTtUvHNyyQAz5VEkcl5mb5biZDmkAmmjZsio
-	lPsCuGVCA81NM5uKslGouXIjrLrRu+6PYER9Ul7V3UZljvZvWRhcw3oUGT2VqvI=
-X-Google-Smtp-Source: AGHT+IF/i2QIw7bcKapihjOyD4JdeOC4Fd87wTsIFGY0GUNr17V4WhDQqeRF8vfa7RNCKM/ubd8+rQ==
-X-Received: by 2002:a2e:88c1:0:b0:2ec:5172:dbb8 with SMTP id 38308e7fff4ca-2ef05c57aaemr11013081fa.7.1721290707666;
-        Thu, 18 Jul 2024 01:18:27 -0700 (PDT)
+        bh=q+PlyT7pC7mg0Ii9BCRl59hN4ArVVPVTuTQKpbg1vbA=;
+        b=s935SeMisZYJ2TVOlUj202mlfI4xO2dDcV5/hbvh/2bphPiBb0YqQNvb9SuiCBG8iH
+         RUowHqHGAeaQwtkDRIP12e6FBOXVi5a6TxD7qFJ2A9rk5ANc2aw7+iFmEKryXGrp9DRb
+         PBfVjzWx7TGkO/WVKdxuU9Rd1XZvJFuFgE0aeyQ3fsJV++KPVjtogGuQ7nhkWOmAFi56
+         bO8nsq9unJqRUu2+CpsXebhqr9CxE9oUbK0XlFu3HZOV08SmBrWvjKomWDO9hJfyW22R
+         +RfdFpX5b+LuW3AC8u+vVfNYK2xpqgtdpsDE0lFnMZJmpMgdfezg2/ESb8gDHVEYKKlJ
+         VwRg==
+X-Gm-Message-State: AOJu0YyJnDWSnyF+A/xPouzWiovyuEHboA+cDN5gIx2YWSANvp7oXWwV
+	AZ9kVWGDpnWg2pI1WlLfUtpB/LSyCef3ZfqRHc/Ru30NIqA4dpZKYaMP7bU9dpE=
+X-Google-Smtp-Source: AGHT+IEeiZRYDCmhxo3U6y5NSR7YUMNH1Vz2kWULEhvZSrsPI/tw8mGOtvAswV/Ml76ITZl6rjNQ8g==
+X-Received: by 2002:a05:600c:3b15:b0:426:59d3:8cae with SMTP id 5b1f17b1804b1-427c2cb87d6mr39121875e9.13.1721290810988;
+        Thu, 18 Jul 2024 01:20:10 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:1:14d5:6a6d:7aec:1e83? ([2001:67c:2fbc:1:14d5:6a6d:7aec:1e83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2b1336asm689785e9.3.2024.07.18.01.18.26
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2a8d988sm1613605e9.34.2024.07.18.01.20.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jul 2024 01:18:27 -0700 (PDT)
-Message-ID: <a6b2a432-e955-4e2a-a1e1-1ed0a4d14b3e@openvpn.net>
-Date: Thu, 18 Jul 2024 10:20:27 +0200
+        Thu, 18 Jul 2024 01:20:10 -0700 (PDT)
+Message-ID: <1554a7e8-026c-42cf-8938-1de38171b048@openvpn.net>
+Date: Thu, 18 Jul 2024 10:22:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,14 +77,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next v5 17/25] ovpn: implement keepalive mechanism
-To: Eyal Birger <eyal.birger@gmail.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
- kuba@kernel.org, ryazanov.s.a@gmail.com, pabeni@redhat.com,
- edumazet@google.com, andrew@lunn.ch
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, ryazanov.s.a@gmail.com,
+ pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch
 References: <20240627130843.21042-1-antonio@openvpn.net>
  <20240627130843.21042-18-antonio@openvpn.net> <ZpU15_ZNAV5ysnCC@hog>
- <73a305c5-57c1-40d9-825e-9e8390e093db@openvpn.net>
- <CAHsH6Gu56r75v9JuSKYWWNhPTc0bjN9CoGQ+kN-G5oJwaqYWmQ@mail.gmail.com>
+ <73a305c5-57c1-40d9-825e-9e8390e093db@openvpn.net> <ZpgsVYT3wR8HgPZ7@hog>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -128,56 +125,57 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <CAHsH6Gu56r75v9JuSKYWWNhPTc0bjN9CoGQ+kN-G5oJwaqYWmQ@mail.gmail.com>
+In-Reply-To: <ZpgsVYT3wR8HgPZ7@hog>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Eyal,
-
-thanks a lot for chiming in.
-
-On 17/07/2024 18:19, Eyal Birger wrote:
-> Hi,
-> 
-> On Wed, Jul 17, 2024 at 8:29 AM Antonio Quartulli <antonio@openvpn.net> wrote:
->>
->> On 15/07/2024 16:44, Sabrina Dubroca wrote:
-> 
+On 17/07/2024 22:40, Sabrina Dubroca wrote:
+>>>> +/**
+>>>> + * ovpn_peer_keepalive_recv_reset - reset keepalive timeout
+>>>> + * @peer: peer for which the timeout should be reset
+>>>> + *
+>>>> + * To be invoked upon reception of an authenticated packet from peer in order
+>>>> + * to report valid activity and thus reset the keepalive timeout
+>>>> + */
+>>>> +static inline void ovpn_peer_keepalive_recv_reset(struct ovpn_peer *peer)
+>>>> +{
+>>>> +	u32 delta = msecs_to_jiffies(peer->keepalive_timeout * MSEC_PER_SEC);
+>>>> +
+>>>> +	if (unlikely(!delta))
+>>>> +		return;
+>>>> +
+>>>> +	mod_timer(&peer->keepalive_recv, jiffies + delta);
+>>>
 >>> This (and ovpn_peer_keepalive_xmit_reset) is going to be called for
 >>> each packet. I wonder how well the timer subsystem deals with one
 >>> timer getting updated possibly thousands of time per second.
 >>>
 >>
 >> May it even introduce some performance penalty?
->>
->> Maybe we should get rid of the timer object and introduce a periodic
->> (1s) worker which checks some last_recv timestamp on every known peer?
+> 
+> That's what I was worried about, yes.
+> 
+> I asked Paolo, he suggested checking that we're actually doing any
+> change to the timer:
+> 
+>     if (new_timeout_time != old_timeout_time)
+>         mod_timer(...)
+> 
+> This would reduce the update frequency to one per jiffy, which should
+> be acceptable.
+> 
+>> Maybe we should get rid of the timer object and introduce a periodic (1s)
+>> worker which checks some last_recv timestamp on every known peer?
 >> What do you think?
 > 
-> FWIW In NATT keepalive for IPsec the first RFC was using timers and
-> the workqueue
-> approach was suggested [1], and later implemented [2].
-> The code is currently in net-next.
-> 
-> Eyal.
-> 
-> [1] https://linux-ipsec.org/pipermail/devel/2023/000283.html
-> [2] https://patchwork.kernel.org/project/netdevbpf/patch/20240528032914.2551267-1-eyal.birger@gmail.com/
+> That should work, or the workqueue like Eyal is saying.
 
-Thanks for these pointers.
-
-Basically this is pretty much what I had in mind, but rather than 
-running the worker every second, the next run is scheduled based on the 
-closest expiration time.
-
-I like it!
-
-Since this worker has no other housekeeping to do, I will go with this 
-approach as well.
+I will go with Eyal's approach.
+This way we also eliminate any timer related operation from the fast path.
 
 
-Thanks!
-Regards,
+Cheers!
+
 
 
 -- 
