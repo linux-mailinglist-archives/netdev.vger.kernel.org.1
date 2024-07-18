@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-111988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DFCA934660
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 04:25:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D4C9346B4
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 05:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4AF1C21AC5
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 02:25:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABF31C2286F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 03:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB27A358A7;
-	Thu, 18 Jul 2024 02:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F09F2C69B;
+	Thu, 18 Jul 2024 03:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6cSfuiec"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uBCAIHLH"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FF315C9;
-	Thu, 18 Jul 2024 02:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC183A1C9;
+	Thu, 18 Jul 2024 03:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721269480; cv=none; b=M9RYdm0outSI/6gUqUmMcu9w/f4Arqw19kUQQJyzzaH8BRSKjXn4FCuCwJTpMRgR+Bp8BEgjV5ELX/KcKyejdEp5SmOf/kTcMs2rkeF63pYSmNY4xaiZCLmyOM1Ak6onzY7PlwhTJwHGEPidkl7VaeCjsvuI68cdM7Zxq0demNk=
+	t=1721273274; cv=none; b=flreLWVY/IbIyZQ9gwYR6AKxzjk5IUmxSWKl58FiUBGNJmAAjC6Yvjx8pzKJYgU27YPtjWccav9kvx2ghZ270qJERRhRFzOB5gGRxveYC9bfA4YJ3cd8/gz/CxpsnWGFnpgFjxbaN98MWsJZgELUGNWJv4ZfYLMstfuiT/+fN+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721269480; c=relaxed/simple;
-	bh=acUxYiwvNbR5WEmoBtEcy5LUMGpl1V6pDAJlxr5ua6w=;
+	s=arc-20240116; t=1721273274; c=relaxed/simple;
+	bh=eHEXBDVXes3j+b2zzF7l4IGppaODD6pBuy62e5c1l+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jwa3/UB3W51ksgBNaZf6znAiDGIEtFhsCFIWVb/ur9hL33iUa6o4AvNmGr4w+leVmJoDm8N4bqMZlQtoT2CyH9kyRy/Npffg1aiTrD3u3dxN6iXT/+2MunPRlZoeG/DNpqhmfAQvaLJh5ZIOTqlHnDcHd3FE9MR8KMOOrFmC/EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6cSfuiec; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ehNv/o6Zrl7/+nF+KZaLMMCwYb0/RRo3tzvw6arjCD7hYfJo+BxtYI0HlzRALZ/4iwxXoxhO9Tzngss0y+SnD+2gpbC70/AViaoqBh5laa/VpbKx7p7WkB3LFBmwQvGmjF1sKGQ9oFI3ka1oskTaTb9jdRRvEHMMLS2g5ilW1UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uBCAIHLH; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0vk8fef/oz3YdgiNmk3ULxUwdiIR7F4J+UJ0/Uf9pnE=; b=6cSfuiecrWilzJ7nH+o56SBaUG
-	EjBLFPLBBgOrA0R3/xATbgXZ4YzIabz5PHDHgfhGZ7nxC8FtRgi8lv+KC2uqrhpK0NjssR/S9sbp2
-	fuOvfGGFvTMpotywVvGjtU6oyDSq3OFOy2NGoQ5MBuJgde2MjeWcPxab9uDHTQ28zlPw=;
+	bh=wOrai0BMpdrYPq65MuItW3Znh746Zw3Nq7jGyyHGcNc=; b=uBCAIHLHMXdc1pwpXxmPxJAM1v
+	NLnl9/Tqls/Wmv2pIcnwkBvXub4ZaqFONWCuAk2Bw0MJfIMoc79Pz0qPrunjIXVLe5B9heW9jD9xW
+	3W0aw8MCS3p+OrwoYC7aVKs1sIPzu+93ylM5d8U0a5ybS97LvMPQ20F7LfLF2il5WIaU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sUGos-002kdR-G6; Thu, 18 Jul 2024 04:24:34 +0200
-Date: Thu, 18 Jul 2024 04:24:34 +0200
+	id 1sUHnr-002klu-EZ; Thu, 18 Jul 2024 05:27:35 +0200
+Date: Thu, 18 Jul 2024 05:27:35 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: vtpieter@gmail.com
-Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	o.rempel@pengutronix.de,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: Re: [PATCH 3/4] net: dsa: microchip: check erratum workaround
- through indirect register read
-Message-ID: <e6285fd7-91fd-411c-bea9-ddcb62b90550@lunn.ch>
-References: <20240717193725.469192-1-vtpieter@gmail.com>
- <20240717193725.469192-2-vtpieter@gmail.com>
- <20240717193725.469192-3-vtpieter@gmail.com>
- <20240717193725.469192-4-vtpieter@gmail.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	horms@kernel.org, hkallweit1@gmail.com, richardcochran@gmail.com,
+	rdunlap@infradead.org, linux@armlinux.org.uk,
+	bryan.whitehead@microchip.com, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next V2 0/4] Add support to PHYLINK for
+ LAN743x/PCI11x1x chips
+Message-ID: <2d8d38c2-0781-47ff-bff8-aec57d68ef05@lunn.ch>
+References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,48 +63,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240717193725.469192-4-vtpieter@gmail.com>
+In-Reply-To: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
 
-On Wed, Jul 17, 2024 at 09:37:24PM +0200, vtpieter@gmail.com wrote:
-> From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+On Tue, Jul 16, 2024 at 05:03:45PM +0530, Raju Lakkaraju wrote:
+> This is the follow-up patch series of
+> https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
 > 
-> Check the erratum workaround application which ensures in addition
-> that indirect register write and read work as expected.
-> 
-> Commit b7fb7729c94f ("net: dsa: microchip: fix register write order in
-> ksz8_ind_write8()") would have been found faster like this.
-> 
-> Also fix the register naming as in the datasheet.
+> Divide the PHYLINK adaptation and SFP modifications into two separate patch
+> series.
 
-We are in the merge window at the moment, so net-next is closed at the
-moment. Please repost in two weeks.
-
-> 
-> @@ -1974,6 +1974,7 @@ static int ksz8_handle_global_errata(struct dsa_switch *ds)
->  {
->  	struct ksz_device *dev = ds->priv;
->  	int ret = 0;
-> +	u8 data = 0xff;
-
-Reverse Christmas tree please.
-
->  
->  	/* KSZ87xx Errata DS80000687C.
->  	 * Module 2: Link drops with some EEE link partners.
-> @@ -1981,8 +1982,13 @@ static int ksz8_handle_global_errata(struct dsa_switch *ds)
->  	 *   KSZ879x/KSZ877x/KSZ876x and some EEE link partners may result in
->  	 *   the link dropping.
->  	 */
-> -	if (dev->info->ksz87xx_eee_link_erratum)
-> -		ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_HI, 0);
-> +	if (dev->info->ksz87xx_eee_link_erratum) {
-> +		ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, 0);
-> +		if (!ret)
-> +			ret = ksz8_ind_read8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, &data);
-> +		if (!ret && data)
-> +			dev_err(dev->dev, "failed to disable EEE next page exchange (erratum)\n");
-
-If data is not 0, should it be considered fatal? Maybe return -EIO ?
+You appear to be missing the PHYLINK maintainer in your Cc: list.
 
 	Andrew
 
