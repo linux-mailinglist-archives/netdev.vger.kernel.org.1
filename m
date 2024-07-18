@@ -1,87 +1,84 @@
-Return-Path: <netdev+bounces-111986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73277934606
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 04:10:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3ACE934608
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 04:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E50F282038
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 02:09:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34F11B2124D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 02:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B0E15C9;
-	Thu, 18 Jul 2024 02:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F224F1B86F1;
+	Thu, 18 Jul 2024 02:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDuYYcdf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SbLlqrpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B456211717;
-	Thu, 18 Jul 2024 02:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549EE186A
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 02:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721268589; cv=none; b=N7LiOnMxSF7zh05R+kEemABObSGf9ufGZo8bxiFkOEt9AmMiIj7hDCRbw3yuw60HAREfa+DYMM/k8afgvqeHvieP7xCSRtkNpYwchsqRB++O2eaTG0K6e4opfbto3lkvJ1a2FIBl4GM+Azftorf4BwI0b9XXWLw3Pzg0BzKD5zc=
+	t=1721268619; cv=none; b=NMaRtQBGZZl98fjio4UP3e8trYYhLDz0okXIvh8M/FF8sJIy11yZDxYjiwXLze8XovQRugcOFC+XjkQBoKQ3ENHXEiykrWRXxxyin64eN/e8j1kekIh+FuhdKbJXSY8ySij7XSEyjwV5e9GZJB8TLIQ33849NGapoTUdwNxdUX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721268589; c=relaxed/simple;
-	bh=ulv1tXiSd72eJq66dbBvV1+i3DdlZ3K/rCLvFN2wq6I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JEdqjm+lHuPid0e3ucmJCrQz4eJVHkym9/XOy0Ri+GZc9klC+v2Qh4rTuDBV3JBPVg1KqVhBSTTXm1qeHDkUPuD+8q0YAoqB3ABO5rBQo7yfXNrP8kdpJ50Med1GfuqE5R1Wr2vwOg3By13lCz4gnvXeZ0Szzc0hc+tGwRrKMG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDuYYcdf; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1721268619; c=relaxed/simple;
+	bh=bhRUiSYnZXoAUKdUlnk3UHcFX8A5f01bnWJPVEi+aq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A5V7PEjNFesIJT9ihwgb94V9+AxUw1gz/OG84QcR9fQzTVulUIG0dZsa1HvLDjDWMap4+81MTCaQWi1RB6rtwyjs4kvnwRRAeFsMFd4QAmShp95OlB2o15rlGCrV6ruxW7qFjs4Ny8xIy0WjjokNTSFjyGfVB6sZychhg7DqERo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SbLlqrpy; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-79ef82c6391so11242085a.3;
-        Wed, 17 Jul 2024 19:09:47 -0700 (PDT)
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4494d41090bso1495911cf.3
+        for <netdev@vger.kernel.org>; Wed, 17 Jul 2024 19:10:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721268586; x=1721873386; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721268617; x=1721873417; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIjoFDgLWia6GhzZOLluZd+9MD5Wkl/yCGIWN6hDfXo=;
-        b=iDuYYcdfGsWtdYalKb40Rwu2L8W9EipczzGhkWs4P0yBIvYwfYQf/9j8GjvJtZvvUW
-         EjhWaXFX+YGjnNZt0XWpORRjUjzmMNZZzHSoQ4U+lNOIg7W/+MS8R5SSm+FHqg56/eoh
-         CrW9IK0MudJnHJmW3lDy3JazCxXYz4bIu4DED8ACvVghOWqDRJ6DF3nnxpgOay9n2R3f
-         Vegr1UNH48zbJmDZmJNdZwuZAxuPfNAb89IX9qjs/U/lr/UkS3ERSkAtSjcS907kVHab
-         C7+4Zn6oJkcujSCLx+4v0wuOTmO4ENNuemZ4L9d2EFNe0RRzBaToNwXTKfCz+oWmVD15
-         fOig==
+        bh=FUVeC7uEabBIHrV8Zthpwwrh/3SAngLdiEUX16thuiU=;
+        b=SbLlqrpyBeGHV9aU2prsgets76828E2qO558nJA0CoXIpMeMiH/vtvusMrkFW7ICh+
+         hsLXwbzUKvKqAbJNoT25jIZkKMnSQHSCCdHk3t1fAuEDIIpTPvaFNNBKzSZN1R5THORt
+         EC0BHc9nE/kd7PSY1PyKGLtr9vRzR9lBVSm9XU/ahgmUhcuX/6baT0XXJeVyPvggrBU6
+         Q2/xMQo3v7ostREMFwdm3pLRFpxCXuY1nO39Lpvczs4H+nVRUWS6DNTQ9NsKkfG/Zngk
+         aGNKQkQ3S7sNA1vHYN+/SrVReh1ZYIEZHauymM2yVMCeAkSG4+UJM7FoXBJKrWtS0HAK
+         XCtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721268586; x=1721873386;
+        d=1e100.net; s=20230601; t=1721268617; x=1721873417;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HIjoFDgLWia6GhzZOLluZd+9MD5Wkl/yCGIWN6hDfXo=;
-        b=f50MJIbY7q4FcvUL+pAWgZ2bvFNcElYnmlo5OKwLc9xErvIOCn4zK9A1FzGZBsNfeZ
-         aShaIsRNCWQf2xwEC9qZj9LiAi26zpp62TqgWtoHVYcikE6VCHIniWpJVaADxgl8uE5Y
-         K21MTzd4FmXhIDXntpofyGZhw5w3ieT4CUn2VqmTuDS9vHp23z9s5UYmifB+/kfJ+hE3
-         kcMWyOQ6IAyjwA3UxfdJE0PMsp6eug/l5MK7LB3I6KG0zp3GkciOxPceT50aJ8L0EWvc
-         RWNxHMs6gqd6Xt1QCloVAJ44PYqXV9xI7QqmhNwYLbaXDnhHjtZaYmxanF3e2Qe2sjS0
-         eLOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV188aXyNs8j4eLGBIRR6/kIafKi8Q8AOVTz9NWFzE1Zht8sd8MtsSkYtZBDLo9iAs8QHrQPzPcd0szL3IdxsKK13CihjT0
-X-Gm-Message-State: AOJu0YzBq4b1iuYWkx9yP5b4X8XcLpOZyM0x2azliDEBuvv57S8HfLsP
-	dkQBd5YlN1ZsEFjMM5/4lzOCg6OPQNs66R0y1Zbny7Lar0efGxCveFycjQ==
-X-Google-Smtp-Source: AGHT+IFrR0BhqA7+VbjsO6Av0aPL9qFq4JFg4BmEJkL1FNLB8Wc0/Hz2g0uV13PPQorM5Tzn+Gjjhg==
-X-Received: by 2002:a05:6214:234d:b0:6b0:48fb:138e with SMTP id 6a1803df08f44-6b78ca22e8amr31417956d6.14.1721268586078;
-        Wed, 17 Jul 2024 19:09:46 -0700 (PDT)
+        bh=FUVeC7uEabBIHrV8Zthpwwrh/3SAngLdiEUX16thuiU=;
+        b=Bk9eDeZ0scwJYHEb8ULSgHetTbPAf/pfBqoGUuf9yVY/6kX+j3rTMuEe+28O/krnTh
+         vWeSy7oP7q2/n0tVl0/lQ42Vdxltd7/RswDHNMdtFrMrW0y0TNCEncv9XocVujeeZeuT
+         8Y8200C23ERwSAnz9YUQyThK8Tg2GERzt+R66YvWjB1Lub6bn8De30Tdyy6phgHMkXDA
+         XLc5cPZp6XAjEG1dVUwI9DPpUW/ecghB0Fpcena6mW5617HjVGpzo4ANfALKgocjQVKy
+         Viqj2Pae2VxjVyOtC/0wQjOn4c1mRcAEP8tHI3sEgekch6u2IMMsa39AxOTGxloymFhR
+         /zGw==
+X-Gm-Message-State: AOJu0YwBwD07RtYEwpFQhxXSj0KEn0/o83TDUly6+WvP8qst/lmaCza+
+	iXDs5aV79n51GsVLaoCiMOOyc3CK49TFSG0sKVZQNMyQUqPGc4lwx2Otir7I
+X-Google-Smtp-Source: AGHT+IF8753bPoowzXSJU4Co0P6CmGmDWHJE8KdpXiP4yq8lSfHC32MzVf/gsmy+0ym0ohn1/28FDg==
+X-Received: by 2002:a05:622a:1482:b0:447:ea03:453e with SMTP id d75a77b69052e-44f86194c04mr34393231cf.20.1721268616763;
+        Wed, 17 Jul 2024 19:10:16 -0700 (PDT)
 Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c67b642sm3843296d6.146.2024.07.17.19.09.45
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f5b7f9b4asm54980551cf.54.2024.07.17.19.10.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 19:09:45 -0700 (PDT)
+        Wed, 17 Jul 2024 19:10:16 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
-To: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	network dev <netdev@vger.kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	davem@davemloft.net,
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org,
+	ovs-dev@openvswitch.org
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Pravin B Shelar <pshelar@ovn.org>,
 	Ilya Maximets <i.maximets@ovn.org>,
-	Aaron Conole <aconole@redhat.com>
-Subject: [PATCH nf-next] netfilter: move nf_ct_netns_get out of nf_conncount_init
-Date: Wed, 17 Jul 2024 22:09:44 -0400
-Message-ID: <7380c37e2d58a93164b7f2212c90cd23f9d910f8.1721268584.git.lucien.xin@gmail.com>
+	Aaron Conole <aconole@redhat.com>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net-next] openvswitch: switch to per-action label counting in conntrack
+Date: Wed, 17 Jul 2024 22:10:15 -0400
+Message-ID: <cb6cfbcbdd576ce4f3b74be080b939a9398d21c7.1721268615.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -91,149 +88,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch is to move nf_ct_netns_get() out of nf_conncount_init()
-and let the consumers of nf_conncount decide if they want to turn
-on netfilter conntrack.
+Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-action
+label counting"), we should also switch to per-action label counting
+in openvswitch conntrack, as Florian suggested.
 
-It makes nf_conncount more flexible to be used in other places and
-avoids netfilter conntrack turned on when using it in openvswitch
-conntrack.
+The difference is that nf_connlabels_get() is called unconditionally
+when creating an ct action in ovs_ct_copy_action(). As with these
+flows:
+
+  table=0,ip,actions=ct(commit,table=1)
+  table=1,ip,actions=ct(commit,exec(set_field:0xac->ct_label),table=2)
+
+it needs to make sure the label ext is created in the 1st flow before
+the ct is committed in ovs_ct_commit(). Otherwise, the warning in
+nf_ct_ext_add() when creating the label ext in the 2nd flow will
+be triggered:
+
+   WARN_ON(nf_ct_is_confirmed(ct));
 
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
- include/net/netfilter/nf_conntrack_count.h |  6 ++----
- net/netfilter/nf_conncount.c               | 15 +++------------
- net/netfilter/xt_connlimit.c               | 15 +++++++++++++--
- net/openvswitch/conntrack.c                |  5 ++---
- 4 files changed, 20 insertions(+), 21 deletions(-)
+ net/openvswitch/conntrack.c | 28 +++++++++++-----------------
+ net/openvswitch/datapath.h  |  3 ---
+ 2 files changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/include/net/netfilter/nf_conntrack_count.h b/include/net/netfilter/nf_conntrack_count.h
-index e227d997fc71..1b58b5b91ff6 100644
---- a/include/net/netfilter/nf_conntrack_count.h
-+++ b/include/net/netfilter/nf_conntrack_count.h
-@@ -15,10 +15,8 @@ struct nf_conncount_list {
- 	unsigned int count;	/* length of list */
- };
- 
--struct nf_conncount_data *nf_conncount_init(struct net *net, unsigned int family,
--					    unsigned int keylen);
--void nf_conncount_destroy(struct net *net, unsigned int family,
--			  struct nf_conncount_data *data);
-+struct nf_conncount_data *nf_conncount_init(struct net *net, unsigned int keylen);
-+void nf_conncount_destroy(struct net *net, struct nf_conncount_data *data);
- 
- unsigned int nf_conncount_count(struct net *net,
- 				struct nf_conncount_data *data,
-diff --git a/net/netfilter/nf_conncount.c b/net/netfilter/nf_conncount.c
-index 34ba14e59e95..4890af4dc263 100644
---- a/net/netfilter/nf_conncount.c
-+++ b/net/netfilter/nf_conncount.c
-@@ -522,11 +522,10 @@ unsigned int nf_conncount_count(struct net *net,
- }
- EXPORT_SYMBOL_GPL(nf_conncount_count);
- 
--struct nf_conncount_data *nf_conncount_init(struct net *net, unsigned int family,
--					    unsigned int keylen)
-+struct nf_conncount_data *nf_conncount_init(struct net *net, unsigned int keylen)
- {
- 	struct nf_conncount_data *data;
--	int ret, i;
-+	int i;
- 
- 	if (keylen % sizeof(u32) ||
- 	    keylen / sizeof(u32) > MAX_KEYLEN ||
-@@ -539,12 +538,6 @@ struct nf_conncount_data *nf_conncount_init(struct net *net, unsigned int family
- 	if (!data)
- 		return ERR_PTR(-ENOMEM);
- 
--	ret = nf_ct_netns_get(net, family);
--	if (ret < 0) {
--		kfree(data);
--		return ERR_PTR(ret);
--	}
--
- 	for (i = 0; i < ARRAY_SIZE(data->root); ++i)
- 		data->root[i] = RB_ROOT;
- 
-@@ -581,13 +574,11 @@ static void destroy_tree(struct rb_root *r)
- 	}
- }
- 
--void nf_conncount_destroy(struct net *net, unsigned int family,
--			  struct nf_conncount_data *data)
-+void nf_conncount_destroy(struct net *net, struct nf_conncount_data *data)
- {
- 	unsigned int i;
- 
- 	cancel_work_sync(&data->gc_work);
--	nf_ct_netns_put(net, family);
- 
- 	for (i = 0; i < ARRAY_SIZE(data->root); ++i)
- 		destroy_tree(&data->root[i]);
-diff --git a/net/netfilter/xt_connlimit.c b/net/netfilter/xt_connlimit.c
-index 5d04ef80a61d..0e762277bcf8 100644
---- a/net/netfilter/xt_connlimit.c
-+++ b/net/netfilter/xt_connlimit.c
-@@ -86,6 +86,7 @@ static int connlimit_mt_check(const struct xt_mtchk_param *par)
- {
- 	struct xt_connlimit_info *info = par->matchinfo;
- 	unsigned int keylen;
-+	int ret;
- 
- 	keylen = sizeof(u32);
- 	if (par->family == NFPROTO_IPV6)
-@@ -93,8 +94,17 @@ static int connlimit_mt_check(const struct xt_mtchk_param *par)
- 	else
- 		keylen += sizeof(struct in_addr);
- 
-+	ret = nf_ct_netns_get(par->net, par->family);
-+	if (ret < 0) {
-+		pr_info_ratelimited("cannot load conntrack support for proto=%u\n",
-+				    par->family);
-+		return ret;
-+	}
-+
- 	/* init private data */
--	info->data = nf_conncount_init(par->net, par->family, keylen);
-+	info->data = nf_conncount_init(par->net, keylen);
-+	if (IS_ERR(info->data))
-+		nf_ct_netns_put(par->net, par->family);
- 
- 	return PTR_ERR_OR_ZERO(info->data);
- }
-@@ -103,7 +113,8 @@ static void connlimit_mt_destroy(const struct xt_mtdtor_param *par)
- {
- 	const struct xt_connlimit_info *info = par->matchinfo;
- 
--	nf_conncount_destroy(par->net, par->family, info->data);
-+	nf_conncount_destroy(par->net, info->data);
-+	nf_ct_netns_put(par->net, par->family);
- }
- 
- static struct xt_match connlimit_mt_reg __read_mostly = {
 diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-index 3b980bf2770b..056f6120ee36 100644
+index 8eb1d644b741..2cc38faab682 100644
 --- a/net/openvswitch/conntrack.c
 +++ b/net/openvswitch/conntrack.c
-@@ -1576,8 +1576,7 @@ static int ovs_ct_limit_init(struct net *net, struct ovs_net *ovs_net)
- 	for (i = 0; i < CT_LIMIT_HASH_BUCKETS; i++)
- 		INIT_HLIST_HEAD(&ovs_net->ct_limit_info->limits[i]);
+@@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_attr attr)
+ 	    attr == OVS_KEY_ATTR_CT_MARK)
+ 		return true;
+ 	if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+-	    attr == OVS_KEY_ATTR_CT_LABELS) {
+-		struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+-
+-		return ovs_net->xt_label;
+-	}
++	    attr == OVS_KEY_ATTR_CT_LABELS)
++		return true;
  
--	ovs_net->ct_limit_info->data =
--		nf_conncount_init(net, NFPROTO_INET, sizeof(u32));
-+	ovs_net->ct_limit_info->data = nf_conncount_init(net, sizeof(u32));
+ 	return false;
+ }
+@@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		       const struct sw_flow_key *key,
+ 		       struct sw_flow_actions **sfa,  bool log)
+ {
++	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+ 	struct ovs_conntrack_info ct_info;
+ 	const char *helper = NULL;
+ 	u16 family;
+@@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		return -ENOMEM;
+ 	}
  
- 	if (IS_ERR(ovs_net->ct_limit_info->data)) {
- 		err = PTR_ERR(ovs_net->ct_limit_info->data);
-@@ -1594,7 +1593,7 @@ static void ovs_ct_limit_exit(struct net *net, struct ovs_net *ovs_net)
- 	const struct ovs_ct_limit_info *info = ovs_net->ct_limit_info;
- 	int i;
++	if (nf_connlabels_get(net, n_bits - 1)) {
++		nf_ct_tmpl_free(ct_info.ct);
++		OVS_NLERR(log, "Failed to set connlabel length");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (ct_info.timeout[0]) {
+ 		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+ 				      ct_info.timeout))
+@@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ovs_conntrack_info *ct_info)
+ 	if (ct_info->ct) {
+ 		if (ct_info->timeout[0])
+ 			nf_ct_destroy_timeout(ct_info->ct);
++		nf_connlabels_put(nf_ct_net(ct_info->ct));
+ 		nf_ct_tmpl_free(ct_info->ct);
+ 	}
+ }
+@@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_family __ro_after_init = {
  
--	nf_conncount_destroy(net, NFPROTO_INET, info->data);
-+	nf_conncount_destroy(net, info->data);
- 	for (i = 0; i < CT_LIMIT_HASH_BUCKETS; ++i) {
- 		struct hlist_head *head = &info->limits[i];
- 		struct ovs_ct_limit *ct_limit;
+ int ovs_ct_init(struct net *net)
+ {
+-	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
++#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+ 
+-	if (nf_connlabels_get(net, n_bits - 1)) {
+-		ovs_net->xt_label = false;
+-		OVS_NLERR(true, "Failed to set connlabel length");
+-	} else {
+-		ovs_net->xt_label = true;
+-	}
+-
+-#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	return ovs_ct_limit_init(net, ovs_net);
+ #else
+ 	return 0;
+@@ -2026,7 +2023,4 @@ void ovs_ct_exit(struct net *net)
+ #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	ovs_ct_limit_exit(net, ovs_net);
+ #endif
+-
+-	if (ovs_net->xt_label)
+-		nf_connlabels_put(net);
+ }
+diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+index 9ca6231ea647..365b9bb7f546 100644
+--- a/net/openvswitch/datapath.h
++++ b/net/openvswitch/datapath.h
+@@ -160,9 +160,6 @@ struct ovs_net {
+ #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_ct_limit_info *ct_limit_info;
+ #endif
+-
+-	/* Module reference for configuring conntrack. */
+-	bool xt_label;
+ };
+ 
+ /**
 -- 
 2.43.0
 
