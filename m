@@ -1,157 +1,174 @@
-Return-Path: <netdev+bounces-112088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A87AF934E2C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:30:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A17934E33
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5734B282224
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:30:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E6D41F23092
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627C313D61D;
-	Thu, 18 Jul 2024 13:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC2E81745;
+	Thu, 18 Jul 2024 13:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="S8Bifhxd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jeNOlSAM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE5284DF5
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 13:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516889457
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 13:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721309413; cv=none; b=GQDB22SJqgYvpJB1tBJoQuexmtQJ2MDVmqLcKuNw/q51+pFM1PbiiqhNnTyhCHsS5jiNZIi/mtQIrP9hSjTtFW81Xx5vZLgGOwFwusE+7e+NgJJo7rLrFq9+vYppUSHneyvM2O5A7D9mIVz9VWkT7ADWIUqn36zXw2GKTaCLBA8=
+	t=1721309556; cv=none; b=gykN9kF09cAfMCovdiCGUMYkOgkxRB8MfF39kevnXR4uCiHB2EvB+0PQch7HqkDQ3bsoxMU6vL3KFPhM9HMqASN0b7nI+J3ye/Xmck+5huGUrsrFwTommeXB6fB6AdI/eKL63u81hlcqVCju4f42dMrQ4cyTQSbljUFiNE0XqXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721309413; c=relaxed/simple;
-	bh=6g2JocoVjYFSu+FazwfDkrN2qhaXz++L7gwGS37uF74=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eULOOwZLhwsJ/dPHFdVCIyhYLOXlPdIG3HnsGhRxuLNZLkkAJ8QMdlAoOZ262ew4lSS0QThZwi5Or6wapMR2oN4opk0FKOxTCDfsAH8kGAqbEAdlLyTQ89ByeSfKsk5hWhf0hoMs8dGGAJD5wQFs90Z6IawnP+Mje3Va64ojP38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=S8Bifhxd; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2eefeab807dso10787721fa.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 06:30:11 -0700 (PDT)
+	s=arc-20240116; t=1721309556; c=relaxed/simple;
+	bh=TlXh6zu51WNDK35DukFYv3tjsZbNqkovFNQhn1wYY+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=go7695O10KMYCsjwAMtJqBpMpahScexHGs3ZS8rYKUUCWvg69fVudfddseoOSlo2WEYQSqhs4LdFtcy7Rywuq5znfrIAzM6iEBtXfarhjRw9E0tOber/ZP8ihfE+XkEQ5L6LpUrQYwCc81V5KR4n5QoEPbbCd3VleBfla/j72NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jeNOlSAM; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-78006198aeeso514167a12.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 06:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1721309410; x=1721914210; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YT1la3hOSgpRfRsWHpzvZruTBiRkfm0GB/f007d38Pc=;
-        b=S8BifhxdTrOJBqtoJOjAEJS9nRWvQXIHP+Rahvw+x3ign9n8WEeiBtU4A7RPyAvpKi
-         vuDVqKjWiWLMMu/gH/ko8OgFDFdFbQ5NcuDMCpydSNESqjypHDYu5Nlfa6fMT6/8Q71f
-         MA3OdHkBYdSHh8KuBpD8hr/rspRsiAUP3vjuzgruV4T5eaMNEr72ip6rorqvUTj8WmwS
-         U+TmoDCcxnmhO3CowEtxD0aGFs4ubupkv0P2PVGwj9Dkvwthks99lwBuzXWAJuf4fcFc
-         ZQ/gpSWimk7GwuIr2pAdyc64nt1Z34q4Jo1/5aZmGTYoQ0m2bGDIj5Y/exM3UIl4wAdC
-         2D6w==
+        d=gmail.com; s=20230601; t=1721309554; x=1721914354; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4/F/SyyENrss0icGM7H5RMWboHG6zgq4Ni62GWxWydc=;
+        b=jeNOlSAMtRmff2+ntjFvQqqZjaDIgBXFoEFWPsoWkjIICmO+m+A53TqahpSgBmU2Y1
+         uT57eJi10vvY6LG0dCpitw38W4dYEGF8TxB/F0rEKWG9Or86JH+UYGNYqd/VJmh+htgH
+         jYmlxhQMhkTrPDKTRkRzXqJIT012Gz6MbUMT3JLJcyjLLUW5JJ73DJQ2GEvYXGeoO9dr
+         RAxiYDgWelfS4vZqxXy/V/QzmaeHQmh0zGiYRlEJ6M+1UTt4xiw/lFBjrwWmHY/q/hTS
+         C0YkB57s4KVCaiZfFFpv1MXMLJQocRCDsjiW8RGJRr5BZzfRXVdb7efRCTqEeLnXDjH3
+         8w2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721309410; x=1721914210;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YT1la3hOSgpRfRsWHpzvZruTBiRkfm0GB/f007d38Pc=;
-        b=jXgovpDGUr6o1VFlFGZFDFTDPPpHdhjeZZmiB2aRsjyTuSqDhI70bOCUSE5KSCp5Se
-         7rhwToiIv5iTi2hg5v9fl+B5DnmQoG9udb4Z9dv8swrg5qytqvGt6KM3kCFDE+x+dlwM
-         k7/uiEpZJQT5moyrqvoBH3A4aWfjn2uBWnPa4/GLDeve0+/yRnh6sRBLxHCA/1glmNHH
-         dMVhHYhc+6DHB2iKZCa0dWR+06V8J4q7b/IV4gp1KR8jc5/AWZA3p2rivbhq5weZ5rLq
-         1dA+iiTrzsAbo6xGzOxKxXqC5Ka8S8/8v9qTCYdCULCXeYKnGPHvIoTwO1CmaZgOooRH
-         0bxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUdGxYgPh47z1aMt0GZ3fwdklG43f4UrWYQQesMn0A0mh1jUYvelIEcOkiVCfFuiTTKX08oph8VjqVSk56BE8w7mlI4w37
-X-Gm-Message-State: AOJu0YzgxHXZ1xRr+5RtWvtfek4Q9K4DSPB5Nw+87rZT7lnv1FdY6Cy4
-	xNq55owSKIcyGd+PhGIB41esHwI0p47j2gKG7lxedEIf/J/eSneoQsAcbfmzeen3fowpONObqp0
-	3tarzkDpI9LPFd1aQ8NdR43dXjbKLWMXjipjLdQ==
-X-Google-Smtp-Source: AGHT+IFlZwGom4Cm6D/yzMCO68xfKb+hvi2jTDlVGTvtty+HgV5mjKDUlfhjUX/StKdrcO0SHS8dY7nKIHi377iDFF8=
-X-Received: by 2002:a2e:a16e:0:b0:2ec:1ce8:9a7d with SMTP id
- 38308e7fff4ca-2ef05c5736cmr16130801fa.4.1721309410027; Thu, 18 Jul 2024
- 06:30:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721309554; x=1721914354;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4/F/SyyENrss0icGM7H5RMWboHG6zgq4Ni62GWxWydc=;
+        b=na7KyvdlKD+Vm3h/2rj21t3pdInj8C2ZeNTGzICS2Djf33zuzieE9DcKfAveHQUuUC
+         kb8c4ZJ9DuBXSoCI5CBItiFOENWRWUOBhvz55AvaRcpNGBUkvQKLlubQliK0Wz/2n6K/
+         DDVuwTd35Hfbc+DHgw3CU2XLDg6HUTtyKTUytgDprNdx7sqv4yIo6G3MOBgXTTKjoNuR
+         etUyunjrPxHcMLrGsOfLN1kRl45/EaS0kpcXOf9p2HsttSa6YcJQCQHal6Mil/McWfRk
+         pibshwvx38NwMZ43jTmALTE++5xk9yeHzpf8v7DV6aPZKSimJ9hXhaPuE+O5FVfvJw2X
+         BQcA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5yPqtsSTJZecpjM1xItZfMQ6z96YQneK3DhrijjkGbA00x5CUWrLlC6cHuvfHMTa4LaZj5PRDXAubWDnzbAeeTVGux4ma
+X-Gm-Message-State: AOJu0YxQ5CBdy7+aM/dmjAd7bVVlDRs5KCHFDHHIA4XcLSDWX4w1edPj
+	5zSGcrXuLEd/64mw6+Oa8PJm6N51xfK47ooOWN+pLZnmw0H5gdKy
+X-Google-Smtp-Source: AGHT+IE0UwTx4ZD02TrRliHgNEXC7eM+gcYslXCJ1tZU1F3A0eSZOF76JzaYQlJVdRzfJP3TV57i8g==
+X-Received: by 2002:a05:6a20:918e:b0:1c2:9598:7578 with SMTP id adf61e73a8af0-1c407888b7dmr4568744637.22.1721309554515;
+        Thu, 18 Jul 2024 06:32:34 -0700 (PDT)
+Received: from mobilestation ([176.15.243.150])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b7ebb6749sm9960742b3a.58.2024.07.18.06.32.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 06:32:34 -0700 (PDT)
+Date: Thu, 18 Jul 2024 16:32:24 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v14 00/14] stmmac: Add Loongson platform support
+Message-ID: <roq3jfend2i4omuobjzafzaxx5umqntsp3h5kxxuisluozxkc5@iriervsbuq3v>
+References: <cover.1720512634.git.siyanteng@loongson.cn>
+ <xebiag2qjzaxgmtl4o5fn4zaon75gjl4akzxgb56ngxeahm2eu@si4our7feved>
+ <84d5db29-5da4-440c-82a4-e223e3afc977@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708075023.14893-1-brgl@bgdev.pl> <20240708075023.14893-4-brgl@bgdev.pl>
- <7c0140be-4325-4005-9068-7e0fc5ff344d@nvidia.com> <CAMRc=McF93F6YsQ+eT9oOe+c=2ZCQ3rBdj+-3Ruy8iO1B-syjw@mail.gmail.com>
-In-Reply-To: <CAMRc=McF93F6YsQ+eT9oOe+c=2ZCQ3rBdj+-3Ruy8iO1B-syjw@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 18 Jul 2024 15:29:59 +0200
-Message-ID: <CAMRc=Mc=8Sa76TOZujMMZcaF2Dc8OL_HKo=gXuj-YALaH4zKHg@mail.gmail.com>
-Subject: Re: [RESEND PATCH net-next v3 3/4] net: phy: aquantia: wait for the
- GLOBAL_CFG to start returning real values
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, Brad Griffis <bgriffis@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <84d5db29-5da4-440c-82a4-e223e3afc977@loongson.cn>
 
-On Thu, Jul 18, 2024 at 3:04=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
->
-> On Thu, Jul 18, 2024 at 2:23=E2=80=AFPM Jon Hunter <jonathanh@nvidia.com>=
- wrote:
-> >
-> >
-> > With the current -next and mainline we are seeing the following issue o=
-n
-> > our Tegra234 Jetson AGX Orin platform ...
-> >
-> >   Aquantia AQR113C stmmac-0:00: aqr107_fill_interface_modes failed: -11=
-0
-> >   tegra-mgbe 6800000.ethernet eth0: __stmmac_open: Cannot attach to PHY=
- (error: -110)
-> >
-> >
-> > We have tracked it down to this change and looks like our PHY does not
-> > support 10M ...
-> >
-> > $ ethtool eth0
-> > Settings for eth0:
-> >          Supported ports: [  ]
-> >          Supported link modes:   100baseT/Full
-> >                                  1000baseT/Full
-> >                                  10000baseT/Full
-> >                                  1000baseKX/Full
-> >                                  10000baseKX4/Full
-> >                                  10000baseKR/Full
-> >                                  2500baseT/Full
-> >                                  5000baseT/Full
-> >
-> > The following fixes this for this platform ...
-> >
-> > diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy=
-/aquantia/aquantia_main.c
-> > index d12e35374231..0b2db486d8bd 100644
-> > --- a/drivers/net/phy/aquantia/aquantia_main.c
-> > +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> > @@ -656,7 +656,7 @@ static int aqr107_fill_interface_modes(struct phy_d=
-evice *phydev)
-> >          int i, val, ret;
-> >
-> >          ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-> > -                                       VEND1_GLOBAL_CFG_10M, val, val =
-!=3D 0,
-> > +                                       VEND1_GLOBAL_CFG_100M, val, val=
- !=3D 0,
-> >                                          1000, 100000, false);
-> >          if (ret)
-> >                  return ret;
-> >
-> >
-> > However, I am not sure if this is guaranteed to work for all?
->
-> Ah cr*p. No, I don't think it is. We should take the first supported
-> mode for a given PHY I think.
->
+Hi Yanteng
 
-TBH I only observed the issue on AQR115C. I don't have any other model
-to test with. Is it fine to fix it by implementing
-aqr115_fill_interface_modes() that would first wait for this register
-to return non-0 and then call aqr107_fill_interface_modes()?
+On Mon, Jul 15, 2024 at 07:35:04PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/7/11 23:35, Serge Semin 写道:
+> > Hi Yanteng
+> > 
+> > On Tue, Jul 09, 2024 at 05:34:07PM +0800, Yanteng Si wrote:
+> > > v14:
+> > > 
+> > > Because Loongson GMAC can be also found with the 8-channels AV feature
+> > > enabled, we'll need to reconsider the patches logic and thus the
+> > > commit logs too. As Serge's comments and Russell's comments:
+> > > [PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+> > > [PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
+> > > [PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
+> > > [PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
+> > > [PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+> > > [PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
+> > > [PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+> > > +-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+> > >      in the loongson_gmac_data() method.
+> > > [PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+> > > [PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+> > > [PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
+> > > +-> Make sure the setup() method is called after the pci_enable_device()
+> > >      invocation.
+> > > [PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+> > > +-> Introduce the loongson_dwmac_dt_config() method here instead of
+> > >      doing that in a separate patch.
+> > > +-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
+> > >      the pdev->irq field and make sure it is valid.
+> > > [PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
+> > > +-> Drop the patch as Russell's comments, At the same time, he provided another
+> > >      better repair suggestion, and I decided to send it separately after the
+> > >      patch set was merged. See:
+> > >      <https://lore.kernel.org/netdev/ZoW1fNqV3PxEobFx@shell.armlinux.org.uk/>
+> > > [PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+> > > +-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
+> > >      support" patch, but which adds the support of the Loongson GMAC with the
+> > >      8-channels AV-feature available.
+> > > +-> loongson_dwmac_intx_config() shall be dropped due to the
+> > >      loongson_dwmac_acpi_config() method added in the PATCH 11/15.
+> > > +-> Make sure loongson_data::loongson_id  is initialized before the
+> > >      stmmac_pci_info::setup()  is called.
+> > > +-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
+> > >      fields initialization to the loongson_gmac_data() method.
+> > > +-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
+> > >      Loongson MAC has been detected.
+> > > +-> Move everything GNET-specific to the next patch.
+> > > [PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
+> > > +-> Everything Loonsgson GNET-specific is supposed to be added in the
+> > >      framework of this patch:
+> > >      + PCI_DEVICE_ID_LOONGSON_GNET macro
+> > >      + loongson_gnet_fix_speed() method
+> > >      + loongson_gnet_data() method
+> > >      + loongson_gnet_pci_info data
+> > >      + The GNET-specific part of the loongson_dwmac_setup() method.
+> > >      + ...
+> > > [PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
+> > > 
+> > > Other's:
+> > > Pick Serge's Reviewed-by tag.
+> > Thanks for submitting an update. I've briefly looked at it and spotted a
+> > few places left to improve. I'll send my comments on the next week.
+> 
+> Okay, thank you for spending a lot of time and effort reviewing our patch.
 
-Bartosz
+In case if you are willing to resubmit the series anytime soon, please
+note that 6.11 merge window was opened two days ago. So the series
+either need to be submitted as RFC v15 or you need to hold on with
+posting the patch set for the next two weeks.
+
+-Serge(y)
+
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
