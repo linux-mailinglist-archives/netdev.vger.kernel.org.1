@@ -1,197 +1,232 @@
-Return-Path: <netdev+bounces-112133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD3B93701F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 23:31:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8599370FA
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 01:07:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EEE51C21C7B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26C381C20897
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 23:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DBB7F484;
-	Thu, 18 Jul 2024 21:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A7B14532A;
+	Thu, 18 Jul 2024 23:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZVpCKEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887F67C6DF
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 21:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C377F2C;
+	Thu, 18 Jul 2024 23:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721338288; cv=none; b=pMpRszlEEEyPpYJuZ4NFN0poDeQRLjY5ro3AYph5Vny0bdgnub8wdX2aotIF1qug3Niq9ATkWQl/nLt4iIZ5n5UW3etzFMx0hQX2O+8izHBJqd3agBRC07vPqbzZhQWEiqHUlObOkcZQj45jCeye+QObP+8LphkpLafA+ypuLr4=
+	t=1721344070; cv=none; b=gafTRQOWHrPu+LNKRPLd/fIgJ6vM0z2Yhbx30vHn7dRfXFXwOB8r1S0u/20qJ6HPqZJ0mxVxoFp9+7tDxMHoQosd+dFI0jEXIhN8KEpEB9aKOrKZcPquuZTf9m5/dGXXpsv7HqxPO/HJ8eoYmZVCVVXdBG9iWV6uqUKzds0IRrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721338288; c=relaxed/simple;
-	bh=lfgnB7p+ysbWfx48oICHCv0nScYSUWQBPp4pTHY9XWw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZZpOAg2YKgDQ78WiGBdoRZ3Jei+M7nWKM+ypuZd+HfT6KXyZPMiORI9/NLtVAMY1YF1jgcY7pryqhtpSW9pTYv7WhUaOzuJ9T2QRPO+xB1bR0bgEl8Xouuo3QO3TeIES1Vxe4vzql1TLkuNTDlnTJ6s7jwMauZYxSFhAv7GqR3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7fb15d52c5cso201847939f.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 14:31:26 -0700 (PDT)
+	s=arc-20240116; t=1721344070; c=relaxed/simple;
+	bh=gPNJI135KSMGR9LcMGzqjiRNwasxQqERFFQXkFteG/0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=O+NWwM/p0OUNeWyYv2hsLwQX8/Qkaow6Mz+q1VdmqzMnxJSZ8nVOQqn8zS2gWvusfouQRiUuZqZEN4D0Dr7vuASPnnLiW6eF5E+KkUxPmWm1ANhRKWthNxQzo4eFFTA+pj0Kga/GDAKlJTNfjbrBLS7OxpmCqA2Dw8TsCMhV08s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZVpCKEI; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-79f0c08aa45so54263085a.0;
+        Thu, 18 Jul 2024 16:07:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721344068; x=1721948868; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FltS2dAB/qLasUrVJjG5fa1PWnsM794LnAQsql21PwY=;
+        b=iZVpCKEI9pJoS5cq0eXQ2hAll2WeGZn3jHnLatJsgEgNNIDz1RZxBbj/tgIOLjMtH6
+         OeGrDfR4PMjTve4AaXUq/SKwrLvsyfnfV0zndXHqZK/pWM+J4XYBjTHm0+ZsumJM7hfi
+         uLhPdlbRGqRVSa0ZQQmp1GgsCb+tCVLbxqxjxWOu7Ep0+f39r0C9xtXddert1kgF8/4b
+         5N0n7Tes/oHI4vjkiStsVsIZxG+1wkfWu8MoTUY5IHWNgqFsK2eqJ90f9uWkPTm9RZv+
+         Ba/AcHUIBdHTPgGdEvVfBhf/uWH166VP41nMkgAv29i2OUiipljjF1u1hR7A8u1exiin
+         +9yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721338286; x=1721943086;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zo8QTXSrAqLno8qBT/oINWD+/xnlnXeqHF+x0BlH0+E=;
-        b=wvsuCcWlfUnKzcuryk0A+NoyiL4iHWQVkVqC/+6gMipZw/Z0SLuifeavEcxIQ72nhz
-         JewCcnrFsG6xppPB/zvtd72+AZV0m8z8B31EHDCbVz/IZ+dlOSYCx4xBRmTmko9QocXQ
-         WtL0tq+sLEcsEzAmIA2nVOwNmEFu+jxklJLkLcBmnqYz/tsEcCJuN1jDjsrTlTX9Cvnz
-         jbry+dFcCFfnvLnYrC18Buw6Tn3G9dgSwuRxu6BzcmEKmNtbc1ayqq9ZslBvqrJ9zLvu
-         NhALekwzjWioCMsh/iq4su3cr5XXwutG8z3GLNo/+4JLwoj1vx8A/ZeLxIy6vXOpiFFK
-         57JA==
-X-Forwarded-Encrypted: i=1; AJvYcCWg+kfPTSnfA7PJ68ovu4Fr9f4YhntK2uO3Wj+7US0cxRCJ+tV49f3gegTHiXpIX5tw3HpQfK5nCEBg8+YaAE6HUuzYDr1h
-X-Gm-Message-State: AOJu0Yzi1jt3pdPxSEhzYtFQJqgND89PD7BYh2Pp3veHYZ+2+is484bH
-	NV9aOdk+ACFbxDfu8FQ8sHpQN7q6eJbvz76KhKfpewLyiHaKAJuGpr5O+47uBi2sPUByYU6j8xg
-	ChTAAr+5BLiy02oerQF0VVvmRG5WrGc/sT/Rjbe5T6doT2BS4saw9IiU=
-X-Google-Smtp-Source: AGHT+IE9+2/J1akDUbiOUSxXwIAe+jIv2sOE1Mt4LTNngmAtcQ3J1uVr1ADYNv6FQZuUtqsdW7/lENRiojigPrTXCSiflzrpCyzW
+        d=1e100.net; s=20230601; t=1721344068; x=1721948868;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FltS2dAB/qLasUrVJjG5fa1PWnsM794LnAQsql21PwY=;
+        b=cFD+SYPicSjMoyLi3e0I4dDpA4HBQ+wJZqHfznxUy2wXHny6xXHh9M+nRIpMG3k2Y2
+         6DJiqyBof16JOFEwmNpzSJu2/J1w0FrqEON6l3SwOCRf81uMhDDf8oaiRbspmf8jKOOn
+         cPBpK1jcHj2uBCQes82rbOe1+Z1AzUL2gxa/3rAta+H/VSCEkg0aBGptNcYZqCl8YHzL
+         5SU0BPcbc/UP4I8mABqcuCl/T06XKb+V/LRASS70yP8UlaU3UUmhDIfJoHfZtZGNukAX
+         q+YZ6hwuvWgC+3WLnev+szUEfP38tvMyrnw+uAUi9H64rVCnTSvhFpm4HlOEaWPJhOHn
+         hqog==
+X-Forwarded-Encrypted: i=1; AJvYcCX/N/a23OAd2ntNxlv9l6lRiiTI1QFUT4CH1IguH+jMOIhgaWfx09kzr0zIPk0JQuwpqThinVCU+7i6/vRiM+PL9Xy2XdC450m3oJc1mON4Qe5BBpcZ6/T52pA400ix
+X-Gm-Message-State: AOJu0Ywd8HL0CxCEoTpeCCKInAiaJdseDzO9sy5HF2o3oOVCeV3GaYNG
+	k6rI0MNdKKiCMbSLB4vTgy2/HQbKcxFFowuCW6lYhNeyuLYED2RAiABHZg==
+X-Google-Smtp-Source: AGHT+IE6D4XcmnYNxavWv7T4X4fWUNkWjIX3smq3RfRvJuuxhPlLHz+DpBBcfNYdT/Haqnlm69jAXQ==
+X-Received: by 2002:a05:620a:28cd:b0:79f:12e9:1e71 with SMTP id af79cd13be357-7a1937ad55emr306707585a.0.1721344067882;
+        Thu, 18 Jul 2024 16:07:47 -0700 (PDT)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a198ffe9d4sm10774985a.63.2024.07.18.16.07.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 16:07:47 -0700 (PDT)
+Date: Thu, 18 Jul 2024 19:07:46 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ shailend@google.com, 
+ hramamurthy@google.com, 
+ csully@google.com, 
+ jfraker@google.com, 
+ stable@vger.kernel.org, 
+ Bailey Forrest <bcf@google.com>, 
+ Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Jeroen de Borst <jeroendb@google.com>
+Message-ID: <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240718190221.2219835-1-pkaligineedi@google.com>
+References: <20240718190221.2219835-1-pkaligineedi@google.com>
+Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b24:b0:381:c14:70cf with SMTP id
- e9e14a558f8ab-3955523dd99mr5539615ab.1.1721338285734; Thu, 18 Jul 2024
- 14:31:25 -0700 (PDT)
-Date: Thu, 18 Jul 2024 14:31:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000f50a4061d8c4d3c@google.com>
-Subject: [syzbot] [bpf?] [net?] general protection fault in __cpu_map_flush
-From: syzbot <syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Praveen Kaligineedi wrote:
+> From: Bailey Forrest <bcf@google.com>
+> 
+> The NIC requires each TSO segment to not span more than 10
+> descriptors. gve_can_send_tso() performs this check. However,
+> the current code misses an edge case when a TSO skb has a large
+> frag that needs to be split into multiple descriptors
 
-syzbot found the following issue on:
+because each descriptor may not exceed 16KB (GVE_TX_MAX_BUF_SIZE_DQO)
 
-HEAD commit:    b1bc554e009e Merge tag 'media/v6.11-1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=165f372d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=65e004fdd6e65e46
-dashboard link: https://syzkaller.appspot.com/bug?extid=c226757eb784a9da3e8b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>, causing
+> the 10 descriptor limit per TSO-segment to be exceeded. This
+> change fixes the edge case.
+> 
+> Fixes: a57e5de476be ("gve: DQO: Add TX path")
+> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Signed-off-by: Bailey Forrest <bcf@google.com>
+> Reviewed-by: Jeroen de Borst <jeroendb@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 22 +++++++++++++++++++-
+>  1 file changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> index 0b3cca3fc792..dc39dc481f21 100644
+> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> @@ -866,22 +866,42 @@ static bool gve_can_send_tso(const struct sk_buff *skb)
+>  	const int header_len = skb_tcp_all_headers(skb);
+>  	const int gso_size = shinfo->gso_size;
+>  	int cur_seg_num_bufs;
+> +	int last_frag_size;
 
-Unfortunately, I don't have any reproducer for this issue yet.
+nit: last_frag can be interpreted as frags[nr_frags - 1], perhaps prev_frag.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/eba440b3a1dc/disk-b1bc554e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7ef97684b39f/vmlinux-b1bc554e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c465a94c9348/bzImage-b1bc554e.xz
+>  	int cur_seg_size;
+>  	int i;
+>  
+>  	cur_seg_size = skb_headlen(skb) - header_len;
+> +	last_frag_size = skb_headlen(skb);
+>  	cur_seg_num_bufs = cur_seg_size > 0;
+>  
+>  	for (i = 0; i < shinfo->nr_frags; i++) {
+>  		if (cur_seg_size >= gso_size) {
+>  			cur_seg_size %= gso_size;
+>  			cur_seg_num_bufs = cur_seg_size > 0;
+> +
+> +			/* If the last buffer is split in the middle of a TSO
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com
+s/buffer/frag?
 
-Oops: general protection fault, probably for non-canonical address 0xe3fffb240028e7c8: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: maybe wild-memory-access in range [0x1ffff92001473e40-0x1ffff92001473e47]
-CPU: 0 PID: 5818 Comm: syz.2.162 Not tainted 6.10.0-syzkaller-05505-gb1bc554e009e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:__cpu_map_flush+0x42/0xd0
-Code: e8 e3 d9 d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 8d c7 39 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 6f c7 39 00 4c 8b 23 48 8d 7b c0
-RSP: 0018:ffffc90000007bb0 EFLAGS: 00010203
-RAX: 03ffff240028e7c8 RBX: 1ffff92001473e44 RCX: ffff888027121e00
-RDX: 0000000080000101 RSI: 0000000000000000 RDI: ffffc9000a39f1a0
-RBP: dffffc0000000000 R08: ffffffff895d4e8a R09: 1ffffffff1f5a8c5
-R10: dffffc0000000000 R11: fffffbfff1f5a8c6 R12: ffffc9000a39f1a0
-R13: ffffc9000a39f160 R14: ffffc9000a39f1a0 R15: dffffc0000000000
-FS:  00007feb6f7916c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c343cd0 CR3: 000000001ec24000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- xdp_do_check_flushed+0x136/0x240 net/core/filter.c:4304
- __napi_poll+0xe4/0x490 net/core/dev.c:6774
- napi_poll net/core/dev.c:6840 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6962
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- tun_rx_batched+0x732/0x8f0
- tun_get_user+0x2f84/0x4720 drivers/net/tun.c:2006
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2052
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7feb6e9746df
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 8c 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 7c 8c 02 00 48
-RSP: 002b:00007feb6f791010 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007feb6eb03f60 RCX: 00007feb6e9746df
-RDX: 0000000000000036 RSI: 0000000020000240 RDI: 00000000000000c8
-RBP: 00007feb6e9e4e5d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000036 R11: 0000000000000293 R12: 0000000000000000
-R13: 000000000000000b R14: 00007feb6eb03f60 R15: 00007ffcc6c5e298
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__cpu_map_flush+0x42/0xd0
-Code: e8 e3 d9 d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 8d c7 39 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 6f c7 39 00 4c 8b 23 48 8d 7b c0
-RSP: 0018:ffffc90000007bb0 EFLAGS: 00010203
-RAX: 03ffff240028e7c8 RBX: 1ffff92001473e44 RCX: ffff888027121e00
-RDX: 0000000080000101 RSI: 0000000000000000 RDI: ffffc9000a39f1a0
-RBP: dffffc0000000000 R08: ffffffff895d4e8a R09: 1ffffffff1f5a8c5
-R10: dffffc0000000000 R11: fffffbfff1f5a8c6 R12: ffffc9000a39f1a0
-R13: ffffc9000a39f160 R14: ffffc9000a39f1a0 R15: dffffc0000000000
-FS:  00007feb6f7916c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c343cd0 CR3: 000000001ec24000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	e8 e3 d9 d6 ff       	call   0xffd6d9e8
-   5:	4c 89 f0             	mov    %r14,%rax
-   8:	48 c1 e8 03          	shr    $0x3,%rax
-   c:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
-  11:	74 08                	je     0x1b
-  13:	4c 89 f7             	mov    %r14,%rdi
-  16:	e8 8d c7 39 00       	call   0x39c7a8
-  1b:	49 8b 1e             	mov    (%r14),%rbx
-  1e:	4c 39 f3             	cmp    %r14,%rbx
-  21:	74 77                	je     0x9a
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 6f c7 39 00       	call   0x39c7a8
-  39:	4c 8b 23             	mov    (%rbx),%r12
-  3c:	48 8d 7b c0          	lea    -0x40(%rbx),%rdi
+> +			 * segment, then it will count as two descriptors.
+> +			 */
+> +			if (last_frag_size > GVE_TX_MAX_BUF_SIZE_DQO) {
+> +				int last_frag_remain = last_frag_size %
+> +					GVE_TX_MAX_BUF_SIZE_DQO;
+> +
+> +				/* If the last frag was evenly divisible by
+> +				 * GVE_TX_MAX_BUF_SIZE_DQO, then it will not be
+> +				 * split in the current segment.
+
+Is this true even if the segment did not start at the start of the frag?
+
+Overall, it's not trivial to follow. Probably because the goal is to
+count max descriptors per segment, but that is not what is being
+looped over.
+
+Intuitive (perhaps buggy, a quick sketch), this is what is intended,
+right?
+
+static bool gve_can_send_tso(const struct sk_buff *skb)
+{
+        int frag_size = skb_headlen(skb) - header_len;
+        int gso_size_left;
+        int frag_idx = 0;
+        int num_desc;
+        int desc_len;
+        int off = 0;
+
+        while (off < skb->len) {
+                gso_size_left = shinfo->gso_size;
+                num_desc = 0;
+
+                while (gso_size_left) {
+                        desc_len = min(gso_size_left, frag_size);
+                        gso_size_left -= desc_len;
+                        frag_size -= desc_len;
+                        num_desc++;
+
+                        if (num_desc > max_descs_per_seg)
+                                return false;
+
+                        if (!frag_size)
+                                frag_size = skb_frag_size(&shinfo->frags[frag_idx++]);
+                }
+        }
+
+        return true;
+}
+
+This however loops skb->len / gso_size. While the above modulo
+operation skips many segments that span a frag. Not sure if the more
+intuitive approach could be as performant.
+
+Else, I'll stare some more at the suggested patch to convince myself
+that it is correct and complete..
+
+> +                              */
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> +				 */
+> +				if (last_frag_remain &&
+> +				    cur_seg_size > last_frag_remain) {
+> +					cur_seg_num_bufs++;
+> +				}
+> +			}
+>  		}
+>  
+>  		if (unlikely(++cur_seg_num_bufs > max_bufs_per_seg))
+>  			return false;
+>  
+> -		cur_seg_size += skb_frag_size(&shinfo->frags[i]);
+> +		last_frag_size = skb_frag_size(&shinfo->frags[i]);
+> +		cur_seg_size += last_frag_size;
+>  	}
+>  
+>  	return true;
+> -- 
+> 2.45.2.993.g49e7a77208-goog
+> 
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
