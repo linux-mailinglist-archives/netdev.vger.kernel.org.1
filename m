@@ -1,110 +1,105 @@
-Return-Path: <netdev+bounces-112121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D56893520B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:12:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110FA935215
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0319A281528
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 19:12:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DEC01C2169B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 19:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2A364A98;
-	Thu, 18 Jul 2024 19:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7789D145348;
+	Thu, 18 Jul 2024 19:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="barPSbsd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E074D8C06
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C26144D3B
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721329968; cv=none; b=F5g6R/FvD+kzblt2HGqDnEtaeKgi/tBYptoF1781uzZKoiWlFzR5in4NjxUe62AbusHFhByjDg/Irp23j4S3Gd++t+WywMy9baD7BsIB0kXx6Fb7CU4HRn3EtK0fMQ0jwG717dauGgz099VlJrMQrzYBBFpBx7p+Epwb0po5kZY=
+	t=1721330434; cv=none; b=YfLNR4zSOdQfrEY2ce+czefqIW/9uQ0Cy6yhbEqBJY0jFuTViBsl69SZZx0U4oVxjQZJHcR2ElkRwne2BTUahY01L++xxUIzWoS6m3qPvB3FE5h5PxPTL23C+p/VzfremkyO6uvhqwlRVpfNmL+wZN6N267R6cbQ2R6sRxIe+DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721329968; c=relaxed/simple;
-	bh=BupNy/PDFraDwEeROVjCxk0ipGImbcyOVNmjL88SN94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F29jrzZssWLMDj9PHY/4dPP6R3X/Pltb6M1SBUFOeHRrM6nw47ZSMiTFXD3spNsfcTjDVRV1zElmrJJkLzKmn7cS8gDK6uq4vOhINzvqb2sAUgsvSIyg19jzQe7SrJZpH+/726PSSCWeXa16t0Wt7WpztDFn3CegAgzcChpNeS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2eefe705510so13780471fa.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 12:12:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721329965; x=1721934765;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0vT4HPcA/4dNNBAsVvPHu3KPmNWVE10YHz7F8Le8fhs=;
-        b=enKyEM9zZtpA6Q8h0HwprEpin4iA+rG5a8Hvgmyp+5+cUD6nASJySLl1xoqIesnGhc
-         JVTuEo1p0LhrUWbOJpNRrT2owGaCorccQ1VgoohP3zf4O4gqCiSlETnjbSnvUuP5c3Cl
-         fJrA1WIHaoo24O67j4UTpFCsf3R6+pWDJcMlfLJVMAWqSvwd0NBkaAbiZ1023jX98UWZ
-         LSCzjHIRUa+/M7a0tEIQSxoBtWmS6qdNm3dnAqEdp7tCws6d1Q3JcNLndG/PFbZGUez2
-         y+E5f54NKuNdEBeXH7kSO6lor+TLsmhvZaXJL5w2oisaV9UIEvF4T6bqJcJxlIbp5ImM
-         8RgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaVB8MQBAsgVXcmF9fLJBJgRfxwUnbIn4qJ3RbFAe311/INZ63CTh99ce4ZaNPRXYd1JXNa9NyABKXFu09L4a8K6V+VL2i
-X-Gm-Message-State: AOJu0YwaGWpp5QjfAYjwCxKNnEjEjXHSzRwvqorVkqX1OMBgNdG5cAP3
-	BPlAy8rG2CkVkGnaW35aCmP45ZoW6HmP239V5bsmA2vtpDTgbeSHrvOysg==
-X-Google-Smtp-Source: AGHT+IHwL5lpFOWIAP+9TH1uYgKnDNHAggMMHAjFhc1vL9wDv1o76q8zNJJpIBEosg82vyUv0aqFxQ==
-X-Received: by 2002:a2e:a545:0:b0:2ee:d8db:5bcc with SMTP id 38308e7fff4ca-2ef05c9afabmr28510631fa.29.1721329964736;
-        Thu, 18 Jul 2024 12:12:44 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a2b6d358besm207180a12.34.2024.07.18.12.12.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 12:12:44 -0700 (PDT)
-Date: Thu, 18 Jul 2024 12:12:42 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: mlx5e warnings on 6.10
-Message-ID: <ZplpKq8FKi3vwfxv@gmail.com>
-References: <Zpet0KnLyqgoPsJ4@gmail.com>
- <dad86bed4c22fcedbd280b4a5a5ad8e8298419a5.camel@nvidia.com>
+	s=arc-20240116; t=1721330434; c=relaxed/simple;
+	bh=FHg5jkF0WmpAMwAZ7Zp4f2g86gaKY2iBhFAZ3r54W5Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S9LM+ORkQUURbeuvEDNQfdk3BGxb62WLCmiRjUiNKAsyj8a3Xvu/f3I7QG2tj4JyhsABXxAUpD9fWak29jrqvxIPmopZUKJoX04CAYUfQQ9ohCV+EJolFe/Izq2yL8BUKEAcoIQXKx0fvkcExzKku00USu9HRHbI6pHu+5pcTu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=barPSbsd; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=43rn6dlHtU7x5UlCAY2hiDYDE4/LG/qewXYFMSF9APU=; t=1721330432; x=1722540032; 
+	b=barPSbsdu2DVPmD1ahEJitAacxmLrCHz84WV/e58PVQgjvZGGfAxbdV8sXm/GQP0Eyl23GDulZv
+	caXlAY2euEcc6IvCXHucN5sM/e0bUHFz4THThuFF3PTqSfYRD+sAeVVi/3/gqVRrD7OwR5qcn9V8C
+	WryLVQxl1mBwmNs1QKwr/bZYh9SlQElfN0iLF0GfLB4U7mm0B62dkTV7WjBD2zlQETMRNA0CaU4CE
+	UUSv4AfYRlJ0huZNtFHhr2MaOSeYt4iXdsXWtGb7kkxhgDmXm3T5rXcTQGVoNeA6qPTMU4AmPAddY
+	5ewZ1qqJS8lUhxjkkmR6gE3nI0WsAVJo19Kw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1sUWfx-00000001wv4-3LfF;
+	Thu, 18 Jul 2024 21:20:26 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Johannes Berg <johannes.berg@intel.com>
+Subject: [RFC PATCH 1/2] net: bonding: correctly annotate RCU in bond_should_notify_peers()
+Date: Thu, 18 Jul 2024 12:20:16 -0700
+Message-ID: <20240718122017.b1051af4e7f7.I68eb9c0f02545b364b79a59f2110f2cf5682a8e2@changeid>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dad86bed4c22fcedbd280b4a5a5ad8e8298419a5.camel@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 18, 2024 at 11:00:00AM +0000, Dragos Tatulea wrote:
-> Hi Breno,
-> 
-> On Wed, 2024-07-17 at 04:41 -0700, Breno Leitao wrote:
+From: Johannes Berg <johannes.berg@intel.com>
 
-> > Sharing in case you find it useful.
+RCU use in bond_should_notify_peers() looks wrong, since it does
+rcu_dereference(), leaves the critical section, and uses the
+pointer after that.
 
-> Thanks for the report. The output, it is very useful. The problem seems to be
-> that mlx5e_tx_reporter_timeout_recover() should take a state lock and doesn't.
+Luckily, it's called either inside a nested RCU critical section
+or with the RTNL held.
 
-Right. I've looked at other cases where mlx5e_safe_reopen_channels() is
-called, and priv->state_lock is, in fact, hold before calling it.
+Annotate it with rcu_dereference_rtnl() instead, and remove the
+inner RCU critical section.
 
-So, independent if this fix the problem or not, it seems the right thing
-to do.
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ drivers/net/bonding/bond_main.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Feel free to add a "Reviewed-by: Breno Leitao <leitao@debian.org>" when
-you send it.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index d19aabf5d4fb..2ed0da068490 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1121,13 +1121,10 @@ static struct slave *bond_find_best_slave(struct bonding *bond)
+ 	return bestslave;
+ }
+ 
++/* must be called in RCU critical section or with RTNL held */
+ static bool bond_should_notify_peers(struct bonding *bond)
+ {
+-	struct slave *slave;
+-
+-	rcu_read_lock();
+-	slave = rcu_dereference(bond->curr_active_slave);
+-	rcu_read_unlock();
++	struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
+ 
+ 	if (!slave || !bond->send_peer_notif ||
+ 	    bond->send_peer_notif %
+-- 
+2.45.2
 
-> I wonder why this happened only in 6.10. There were no relevant changes in 6.10.
-> Or is it maybe that until now you didn't run into the tx queue timeout issue?
-
-I don't have a reproducer for it, so, i just got it in 6.10. Maybe just
-a coincidence?
-
-> Would you have the possibility and willingness to test the below fix?
-
-Sure. I have two hosts running with your patch, but, it is hard to make
-them timeout.
-
-Let me know if you have any trick I can explore and force the card to
-time out.
-
-Thanks for the quick reply!
---breno
 
