@@ -1,128 +1,183 @@
-Return-Path: <netdev+bounces-112091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE4E934E73
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:45:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B4A934E75
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9CC1C2133F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:45:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4109F1F22A11
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 13:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B6213B7BE;
-	Thu, 18 Jul 2024 13:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnNPY5A3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED63513C699;
+	Thu, 18 Jul 2024 13:46:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065341B86FB;
-	Thu, 18 Jul 2024 13:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A4F13C3D2
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 13:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721310328; cv=none; b=bmYmpNRAooOC5235JsMBIHljDKSmQhiaqMsMhG5SRYK6X7DsmTOLiMbS73CFFyrvbViCTzatnWeNTaodM0rf9Xq8B1N6Uhj4DoSuj8vEWsG0C7L3HD/JNCxNZz+ZNhM/E99yyWtShvR2cZBTb5sjbFNTKBVfJHhM8TpwTC9WJmw=
+	t=1721310366; cv=none; b=Q/jzmvlnZmVlLbTXQAQ2OVS0CIThqAPIJFCmwJr8Odqvv5+aMsD2n7Jk8k38m97jljOJ7jf9HjC3XYOYTIyMm5CqTjbGZBgyp4iQsBsIxRttTklAwKuOOov4BszLdTF/ebx+4Qzv5yST+hrU7dVI9haX+SpQGvXIp78EcvyTkqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721310328; c=relaxed/simple;
-	bh=3rIIjfrMsL9HBG0ZUjtncQtFefTFzeSIFo/bC/TSwtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AF85Fe7JcN4I/pYfuIibOFLZG8BL8WjBi3IC0BmMi8AQWuMR3S9HAvTb60qku8LlKAC6KgystDZHxYpqPmJfYvYbwH50alZe2Og1J6l8d1qewhqiyVVVwR5g7ZwgE8l7CiXpl/ywI5iKUBeTiOHku8MQyZlhk3IsVm4TVj7XH9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnNPY5A3; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-70847d0cb1fso457773a34.3;
-        Thu, 18 Jul 2024 06:45:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721310326; x=1721915126; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xGc8MKfbN3L/GKWoSL/Ioh6AMpLNqJHz7Tn8tmGdobw=;
-        b=EnNPY5A3EEIispgdrimm/F6dR4r5NYuqnbFgBQH6lUVnGxuv7M2/smloFkcVSoTids
-         nnMnYxYyYgW5r3YLTjwCKEDPcyAI25qKr9zjVdP4/ll7+BXvkC34dEkBdBP2uS3dmIqY
-         OTWs4RRTirvfGR5v0SO3kFkM0owIMWX1PkPko9juCT1di6wb5Z2k34/iq44/4vq1UgSj
-         6Jrx6Gp7AIulkjwyMRuljoP4abGykDk1FnsJNA2TAUcxLEPXzF8fScNhNW46LRUW5kHM
-         u9Dbc8ipXoqXwBurIrLiFCBBWoCNMnrUzJFdLCnWtjddDsquu9M4iv6jCSw+kSFz9VfX
-         QvYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721310326; x=1721915126;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xGc8MKfbN3L/GKWoSL/Ioh6AMpLNqJHz7Tn8tmGdobw=;
-        b=ncRr7kARvcnjhswtosK+jDtvO+D6ND0ax4czC+G2eASYLa4ANHBiW1cRhFUZSwGMXk
-         oS7b/5Ea+MYLJkIm2NHRCMf+tjgXNmiQK0MbfW/A9IdLyctOoGs7ezPb/pVW4dUXxP5t
-         ialCmm08F40wqG3LXZp6IzXVuk5sVK1z5Zv3sV4fCXaZLEjfWkRE4tMYBVyVyjcISLo+
-         TaVoIWlA1Ks/IlV8+FQKaLdTGVbIycRi/hZjv0KzU9NEhvbH+kHm8kV4kkTIaxteR2R2
-         HL4mNW4k0yIHHtFX3F+7upk1foOnRDuzEupPIWHzeL+DlTGRfpOoDUos/byY3wLT+of/
-         p9KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWw8bMJ1sQbpg2BYwy0PdnuLYMkTWR2P/IyPt4lhLER72N8IiUdSW+w0INzG/XCMedLt9Jop9Kwv0qFjqHWD4qi4c3S1tis
-X-Gm-Message-State: AOJu0YypwVaJOs6TYRBKZRxAFZ85geLJ9ahHSyDvsgxSW36jxiJevMhZ
-	sQNRKH0WohiCMDqdwd8z121atwilcILm/hEFBZzSqvi/8uyvHi7XroVbFUPVqTk9MFzto1VnlvX
-	a75x2G3+kvU4icn9sDaL3ea7NU+PKUsx5
-X-Google-Smtp-Source: AGHT+IGgnX83WsAuYeTRJZ6jCVqxvuk9XgYhgjEbvF8lZL1NdcZyJw/KnZhBD/PkpSqYRFxshr6Gy0N9ChoVpa+GPto=
-X-Received: by 2002:a05:6870:d8d0:b0:250:171d:5c74 with SMTP id
- 586e51a60fabf-260ee841d15mr2085163fac.26.1721310326096; Thu, 18 Jul 2024
- 06:45:26 -0700 (PDT)
+	s=arc-20240116; t=1721310366; c=relaxed/simple;
+	bh=zU61HzKaLha5ui5qv1RruW5tjJNRwYsvf4eJ+U1kgkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=qHtSoGror3J/ppA8niYotHjMV49sHZXb4b8qeX7hPyDVW/vg2x02UAMrd86odElSmtzZ2dWgvCm0Wd2gfEIr3/qmGlwgd2Blh1nppiyQY5Szt811rEhqZ3XMKzyH616dFe+4yiCYYQkPjbiotzx8INbBZQ0tum8+4WpOv5Fz1dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-515-5k7p9JraOBuuZ2V_Oa4LCw-1; Thu,
+ 18 Jul 2024 09:45:59 -0400
+X-MC-Unique: 5k7p9JraOBuuZ2V_Oa4LCw-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0B4A61955D44;
+	Thu, 18 Jul 2024 13:45:57 +0000 (UTC)
+Received: from hog (unknown [10.39.192.3])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B05F1955F40;
+	Thu, 18 Jul 2024 13:45:54 +0000 (UTC)
+Date: Thu, 18 Jul 2024 15:45:52 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v5 05/17] xfrm: netlink: add config (netlink)
+ options
+Message-ID: <ZpkckAyjSjC--i6M@hog>
+References: <20240714202246.1573817-1-chopps@chopps.org>
+ <20240714202246.1573817-6-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240717193725.469192-1-vtpieter@gmail.com> <20240717193725.469192-2-vtpieter@gmail.com>
- <20240717193725.469192-3-vtpieter@gmail.com> <20240717193725.469192-4-vtpieter@gmail.com>
- <e6285fd7-91fd-411c-bea9-ddcb62b90550@lunn.ch>
-In-Reply-To: <e6285fd7-91fd-411c-bea9-ddcb62b90550@lunn.ch>
-From: Pieter <vtpieter@gmail.com>
-Date: Thu, 18 Jul 2024 15:45:13 +0200
-Message-ID: <CAHvy4ArmWx78aP=2O1a2F=GXqro2N6GxjdYO+AGs32petpL4+Q@mail.gmail.com>
-Subject: Re: [PATCH 3/4] net: dsa: microchip: check erratum workaround through
- indirect register read
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com, 
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240714202246.1573817-6-chopps@chopps.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 18, 2024 at 04:24, Andrew Lunn <andrew@lunn.ch> wrote :
-> On Wed, Jul 17, 2024 at 09:37:24PM +0200, vtpieter@gmail.com wrote:
-> > From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
-> >
-> > Check the erratum workaround application which ensures in addition
-> > that indirect register write and read work as expected.
-> >
-> > Commit b7fb7729c94f ("net: dsa: microchip: fix register write order in
-> > ksz8_ind_write8()") would have been found faster like this.
-> >
-> > Also fix the register naming as in the datasheet.
->
-> We are in the merge window at the moment, so net-next is closed at the
-> moment. Please repost in two weeks.
+2024-07-14, 16:22:33 -0400, Christian Hopps wrote:
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index a552cfa623ea..d42805314a2a 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -297,6 +297,16 @@ static int verify_newsa_info(struct xfrm_usersa_info=
+ *p,
+>  =09=09=09NL_SET_ERR_MSG(extack, "TFC padding can only be used in tunnel =
+mode");
+>  =09=09=09goto out;
+>  =09=09}
+> +=09=09if ((attrs[XFRMA_IPTFS_DROP_TIME] ||
+> +=09=09     attrs[XFRMA_IPTFS_REORDER_WINDOW] ||
+> +=09=09     attrs[XFRMA_IPTFS_DONT_FRAG] ||
+> +=09=09     attrs[XFRMA_IPTFS_INIT_DELAY] ||
+> +=09=09     attrs[XFRMA_IPTFS_MAX_QSIZE] ||
+> +=09=09     attrs[XFRMA_IPTFS_PKT_SIZE]) &&
+> +=09=09    p->mode !=3D XFRM_MODE_IPTFS) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "IP-TFS options can only be used in IP-T=
+FS mode");
 
-Right sorry I only realize this now. I did some reading up on netdev
-patches; will make sure to rebase on net-next tree as well when I
-submit the v2 in 2 weeks.
+AFAICT this only excludes the IPTFS options from ESP with a non-IPTFS
+mode, but not from AH, IPcomp, etc.
 
-> >
-> >       /* KSZ87xx Errata DS80000687C.
-> >        * Module 2: Link drops with some EEE link partners.
-> > @@ -1981,8 +1982,13 @@ static int ksz8_handle_global_errata(struct dsa_switch *ds)
-> >        *   KSZ879x/KSZ877x/KSZ876x and some EEE link partners may result in
-> >        *   the link dropping.
-> >        */
-> > -     if (dev->info->ksz87xx_eee_link_erratum)
-> > -             ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_HI, 0);
-> > +     if (dev->info->ksz87xx_eee_link_erratum) {
-> > +             ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, 0);
-> > +             if (!ret)
-> > +                     ret = ksz8_ind_read8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_LO, &data);
-> > +             if (!ret && data)
-> > +                     dev_err(dev->dev, "failed to disable EEE next page exchange (erratum)\n");
->
-> If data is not 0, should it be considered fatal? Maybe return -EIO ?
+> +=09=09=09goto out;
+> +=09=09}
+>  =09=09break;
+> =20
+>  =09case IPPROTO_COMP:
+> @@ -417,6 +427,18 @@ static int verify_newsa_info(struct xfrm_usersa_info=
+ *p,
+>  =09=09=09goto out;
+>  =09=09}
+> =20
+> +=09=09if (attrs[XFRMA_IPTFS_DROP_TIME]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Drop time should not be set for output =
+SA");
 
-Indeed that would make more sense; will return -EIO for v2.
+Maybe add "IPTFS" to all those error messages, to help narrow down the
+bogus attribute.
 
-Thanks, Pieter
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_IPTFS_REORDER_WINDOW]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Reorder window should not be set for ou=
+tput SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+>  =09=09if (attrs[XFRMA_REPLAY_VAL]) {
+>  =09=09=09struct xfrm_replay_state *replay;
+> =20
+> @@ -454,6 +476,30 @@ static int verify_newsa_info(struct xfrm_usersa_info=
+ *p,
+>  =09=09=09}
+> =20
+>  =09=09}
+> +
+> +=09=09if (attrs[XFRMA_IPTFS_DONT_FRAG]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Don't fragment should not be set for in=
+put SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_IPTFS_INIT_DELAY]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Initial delay should not be set for inp=
+ut SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_IPTFS_MAX_QSIZE]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Max queue size should not be set for in=
+put SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+> +
+> +=09=09if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
+> +=09=09=09NL_SET_ERR_MSG(extack, "Packet size should not be set for input=
+ SA");
+> +=09=09=09err =3D -EINVAL;
+> +=09=09=09goto out;
+> +=09=09}
+>  =09}
+> =20
+>  out:
+> @@ -3177,6 +3223,12 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] =
+=3D {
+>  =09[XFRMA_MTIMER_THRESH]   =3D { .type =3D NLA_U32 },
+>  =09[XFRMA_SA_DIR]          =3D NLA_POLICY_RANGE(NLA_U8, XFRM_SA_DIR_IN, =
+XFRM_SA_DIR_OUT),
+>  =09[XFRMA_NAT_KEEPALIVE_INTERVAL] =3D { .type =3D NLA_U32 },
+> +=09[XFRMA_IPTFS_DROP_TIME]=09=09=3D { .type =3D NLA_U32 },
+> +=09[XFRMA_IPTFS_REORDER_WINDOW]=09=3D { .type =3D NLA_U16 },
+
+The corresponding sysctl is a u32, should this be NLA_U32?
+
+> +=09[XFRMA_IPTFS_DONT_FRAG]=09=09=3D { .type =3D NLA_FLAG },
+> +=09[XFRMA_IPTFS_INIT_DELAY]=09=3D { .type =3D NLA_U32 },
+> +=09[XFRMA_IPTFS_MAX_QSIZE]=09=09=3D { .type =3D NLA_U32 },
+> +=09[XFRMA_IPTFS_PKT_SIZE]=09=3D { .type =3D NLA_U32 },
+>  };
+>  EXPORT_SYMBOL_GPL(xfrma_policy);
+
+--=20
+Sabrina
+
 
