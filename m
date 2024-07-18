@@ -1,122 +1,116 @@
-Return-Path: <netdev+bounces-112046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF7C934B9E
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:26:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC843934BBC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEDEE1C21B69
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:26:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78944284B7C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 10:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AA512E1C4;
-	Thu, 18 Jul 2024 10:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB7B12C470;
+	Thu, 18 Jul 2024 10:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFaQ9bQ6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tkk5yYEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4684C1EA74
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 10:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F20781737;
+	Thu, 18 Jul 2024 10:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721298401; cv=none; b=kOHhTuvaxiEf/4OaTux8jvdGrvFVN2mzDn4ssikAKzojRkubgdqnpmdKQOahHo+h6cGKsBY5TNJssbl1J6Xk4669CA7sRtAQNJsnVe16B9J3ona8knIjYRN4RCLMzaHtbeD/I6Gh+nLYSpA7NcJzCYO/ZVkD08hUGpkrnp61OH8=
+	t=1721298859; cv=none; b=NqHVCSBRfdogf8djOvB48PZn+Za5OLgXSGWz9/2HtI9oaX2Typ1QVLBED/l5NdDuSAHMQ5zmJxdKrbVk28efFxIAMMEm2W461djNGdiaB51wQYZIyhluGo1q/aysvjoZ8lEw60fJvari0+DQjUuNzaWBOxFcCYf51TFC84Vb5Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721298401; c=relaxed/simple;
-	bh=f9NK3pcNldZyGO0AvxCCKOmkTuD3DOyCdryA06ySy6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y5ocIsd/OndqE0JUhcUOvdWu2+CB2Q1FXkFZM67JJtFh04/svDbV8rWPn0EVnooKxnVmwzo3Ott3GQ/GBVyxDYUgi+J3ve5rGaj9t6ONo17rU7vKAoYZqibLx+UCS0NdrYI4arGrGhjd2O3bw1YpWKVEojR1h1bQBwzqiUHiYOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PFaQ9bQ6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721298397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uh/bzG1PC5tDGqcltdbZCQ7StmpqIUdkI5gshOOPTZE=;
-	b=PFaQ9bQ6IQ90hkID4GegKC9mqjgNjMtajEzdi7bbFXTfL3uFOlO4zBBhMRrrhR66t6XJJT
-	DaC149Iq76tJkuafUSgQbgWd16FM2qXBJXTsU1386MwLvpW3aSW5aWGUw7ECBuL2tGbPNf
-	SaQXNwbwlNmx27m0K9b6ZpubtBtu5/0=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-601-bPbsR1PCOHySFDMyZ4Ddmw-1; Thu, 18 Jul 2024 06:26:35 -0400
-X-MC-Unique: bPbsR1PCOHySFDMyZ4Ddmw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ee9c929758so734371fa.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 03:26:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721298394; x=1721903194;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uh/bzG1PC5tDGqcltdbZCQ7StmpqIUdkI5gshOOPTZE=;
-        b=FDXtWgu28OODMWXQjS+CrWJoOPvpKD1Ww++1IY/wg4nfCAcP6q59i/c5xiL8yCVenp
-         XNAslpl/SSg5lzd9ThMlDHyE+Dq3JZfWRr0f6EpVt3IKZ+5rYbS9qGFWK27Eg4Pd6Gc/
-         V8rLLjYVHgxXTOOTXJb9xZ7jApC2HloruPXjJRnP35fYReZ6ENKYQbfa9fhNF+3NMXda
-         7pTkW2SdA/vqSEojNGFhfVtQ6Cn0lvAQPUKifYKRvqMji6HpyEFchEUjPiu4XXs3wYEq
-         +KPia6NVe1u69Kkm9Ot/mIm7n6R3lgwWBpSByN97NajxEmVME4dgJ1pmW3kOCbVfMLNa
-         GqBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUqV5Ir/2D1Z2QSjeLdNJw40s+3BgzBYEDXXQhhHAgBYqxxD+eRXjCH41M+hgnV0F30LuC7fLjQ9K5WqBWOhheYpZRgIHt1
-X-Gm-Message-State: AOJu0Yx8nMImWMUG+Owiian1eFiMTEZUrCbQkrpBqkIVv/6D3/Jyw8P2
-	Bh3Fj+s62DX9up21LGwkN/bUnZZGCm/EeD+vFXHxIM6/dNRecsvkPSOxFcmcq/fUQa0OFznzoTp
-	klCxdpym/oe7u/ASKAfe+RvjIfp3RUwucXgKDEcYnrwAVh9R/D4usJw==
-X-Received: by 2002:a05:6512:3c9f:b0:52c:dae5:af2f with SMTP id 2adb3069b0e04-52ef000d1e2mr235612e87.0.1721298394087;
-        Thu, 18 Jul 2024 03:26:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHHOk1/oIRkFnzMMYGTQCmQL072G5eWo9tYrROD6I/tWxlW00eAyIj8ZEtQ+LvvewGwTBm4pw==
-X-Received: by 2002:a05:6512:3c9f:b0:52c:dae5:af2f with SMTP id 2adb3069b0e04-52ef000d1e2mr235594e87.0.1721298393694;
-        Thu, 18 Jul 2024 03:26:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b08b:7710:c7b:f018:3ba3:eb24? ([2a0d:3341:b08b:7710:c7b:f018:3ba3:eb24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2b1825asm5429695e9.15.2024.07.18.03.26.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jul 2024 03:26:33 -0700 (PDT)
-Message-ID: <69e8f371-89da-4188-be3e-51d7fb7f89af@redhat.com>
-Date: Thu, 18 Jul 2024 12:26:31 +0200
+	s=arc-20240116; t=1721298859; c=relaxed/simple;
+	bh=nIki4zem//5SAhME0Gc430iDZM6F78ONm09AnzKFdaU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JwICuhwxG2gbq3PC6OpR73R8j7eQFkuivY8Gr8sIsVWml6+oGOZXe3EYbwekaKwNRj6nYxFtKuzbSTSOxdRZkWWv1SaQYuMp0G+gHpjW2UGVLuhw1vo8da8C4nvSkufw9s9HPKIxZ/q0bFZ7aSwsOFyDXpOjD8X6qQ9cb6t5S0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tkk5yYEN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73D2C116B1;
+	Thu, 18 Jul 2024 10:34:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721298859;
+	bh=nIki4zem//5SAhME0Gc430iDZM6F78ONm09AnzKFdaU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Tkk5yYEN1r0nlhyqXQCC2lR4mrBQEtv8Mpv0OyMNARqppLA0VUwyah3SxxEy1Sa7n
+	 YFEu+c9DHJ0Eq2njdle9C2tJU1Max8b8FwWgOIZxZob2OwM7BKxSNpHFmHQZJ/3/wp
+	 xkFyMv3kh9thM3X5my9F/zTFl1mnJPWWOspC7C7I/VvJdYF4aY5HAvGM7tC/ofPbzB
+	 SI9Y6l4sfkCdN8uQObRd/XzEslOsjqavo2rFUqFCcdTfhYmiKlrzEAqJQM0XmoPoyh
+	 WeM8zWeeggdRO3zQ0t/yxiJI3bnSWveYa7IQEVfg8C2uLNEWrLoBympNe7JYRwU9A7
+	 KrpoyGrRQuKsQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net v2 0/2] tcp: restrict crossed SYN specific actions to
+ SYN-ACK
+Date: Thu, 18 Jul 2024 12:33:55 +0200
+Message-Id: <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-0-d653f85639f6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/ipv6/ndisc: Fix typo in a comment line
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>
-References: <2c153a0f-87aa-4f4a-83cc-c17798f0795b@web.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <2c153a0f-87aa-4f4a-83cc-c17798f0795b@web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJPvmGYC/6VOSwqDMBS8SnnrvpLEH3bVexQpmjw1pCaSRLGId
+ 29w0Qt0MYv5MDM7BPKaAtwvO3haddDOJiKuF5BjawdCrRIHwUTOKl7iMofoqZ3QUkzYIv6sKGf
+ MvMJWGpTOhmUiDOYVnDQpy2SneFH3sugYpPrZU6+3c/oJqQyaJI46ROc/552Vn9b/yytHjjmVX
+ LGuqkWWPQx5S++b8wM0x3F8AdFG9EcGAQAA
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Jerry Chu <hkchu@google.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1097; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=nIki4zem//5SAhME0Gc430iDZM6F78ONm09AnzKFdaU=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmmO+ofFHTXSohnyPEVxxy9Z/ALp9haBU194jaK
+ NdPPWYp9MqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZpjvqAAKCRD2t4JPQmmg
+ c6NEEAC5gTnPiRMwLKXLQtMyy+olLfYWmCm6vSpGKRCWoRrId93qyYXinSpUH2TwX8GLmRxWVQk
+ Ocum97Yd4cFKo4dzwkzRezob5sHQmZStG2cJZ4tX8R3XDrYLE8jrwdVhH9q71kn9nPnOAXoyioh
+ orYA5mCmB+YE3vZ5INd5yrKhvJ5geqIa9ytzY+nSYH2un5bR91d/6feKyGY74sx1U5UpBBxEcWF
+ NfF2K5BYNGpEq7J9ISZeVBeRkm8khzKSvhNMVDq971X4W7fuFCeKs9WY9X0mWZzaW49FkIvktKv
+ vvcWywSkM/bK9FzL3jTCo+lkJIbthJ7ZN9t1EZ7J6Sv+IbFY2WRAmZ00WgpMaZzc3DWxbnn7oHO
+ 5xePAxGJzuIJs51OH+dSXFSZe29L9lErUdRKVnF/z4jZxg8THLIa/12AygSfxPtpfVYk9akIU1/
+ VHmyf52lXRKosazzXR299UtiemBJilqDpISnyRL9yrq52DX4L+mojaLrbGhd1THbhUTF3Vveh0w
+ AozgjdehdHfotonjLMRS6Rt97IE7gq6vc8hUK4X/1Ar/Ywx02MCX27gZwiCB/tH+v1Gv5VKS1YL
+ 9dvJzB0/jYOgJAljvT/qyhrFuyLuFJTxYkOQf6guUr7QFd5bmV46IsmLybeljDMRMbChrF4JX5m
+ M8PCkquAZ7ubOAA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
+A recent commit in TCP affects TFO and MPTCP in some cases. The first
+patch fixes that.
 
+The second one applies the same fix to another crossed SYN specific
+action just before.
 
-On 7/16/24 10:36, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Tue, 16 Jul 2024 10:28:37 +0200
-> 
-> Adjust this description for a condition check.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+These two fixes simply restrict what should be done only for crossed SYN
+cases to packets with SYN-ACK flags.
 
-## Form letter - net-next-closed
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v2:
+- Patch 1/2 has a simpler and generic check (Kuniyuki), and an updated
+  comment.
+- New patch 2/2: a related fix
+- Link to v1: https://lore.kernel.org/r/20240716-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v1-1-4e61d0b79233@kernel.org
 
-The merge window for v6.11 and therefore net-next is closed for new
-drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
+---
+Matthieu Baerts (NGI0) (2):
+      tcp: process the 3rd ACK with sk_socket for TFO/MPTCP
+      tcp: limit wake-up for crossed SYN cases to SYN-ACK
 
-Please repost when net-next reopens after July 29th.
+ net/ipv4/tcp_input.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+---
+base-commit: 120f1c857a73e52132e473dee89b340440cb692b
+change-id: 20240716-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-0cbd159fc5b0
 
-RFC patches sent for review only are obviously welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+Best regards,
 -- 
-pw-bot: defer
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
