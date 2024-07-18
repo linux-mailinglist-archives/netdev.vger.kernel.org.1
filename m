@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-112104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220E1934F9A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:04:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE0A934FAA
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52FEB1C20DB7
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:04:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5A301F22CDF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B331420DF;
-	Thu, 18 Jul 2024 15:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74859143757;
+	Thu, 18 Jul 2024 15:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="awpV3Pqq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GrHFtX7h"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388342A8FE;
-	Thu, 18 Jul 2024 15:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9726314372D;
+	Thu, 18 Jul 2024 15:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721315054; cv=none; b=nO5WO5GzIaXR/sBm+H/T974geBB4kjGOxrrcRI/O4Ys7NgQmxll8lSRHsDMrKBypSYpjx2Csf7AWrok1MGj0/N8/A0BBDYUH1DRNYD3yiSKHiVHLLEZhWfSFU1eFMlGAUhnaZoU86DTQL/vtVGNKN2qSE6tkWBIYvLq4FMQKeHU=
+	t=1721315367; cv=none; b=RfgKlZ7mywjuMatWa+k9qFJ5yshB1JTh6ii2GjjCzloyIKEu1WdmQlM7nY8XumxaUi0RULOpNa2j1BilCxW5SlAH+DMs8cGiG+3lX0gudfnItGd4Bs+Wgz0YdV5j7G26sUJCZ8reb8Oaxq1Doz5qjIjXQWq6WL6mlZOTEOSqzAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721315054; c=relaxed/simple;
-	bh=DKIRJ+uVyLmKItiAAdCRDUEQLKEAzYDyl8geLmBl4To=;
+	s=arc-20240116; t=1721315367; c=relaxed/simple;
+	bh=aHgvN8DcpuIMoFz4mUzr/XhbxyJQPLiT8wsxrox6SmQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ct/hUfd0PSLf3stmLhbiy0HyGEcjDyJGu0098GsDpP+SqqQU1cyOHZsJeLDohJxCGNK8iYECK0lajjFi8L/H0HwaPMS7K+aWPlVsYlgtplPorReILIBP4T6+44m58ZQK+1F4y/PE5bSIHCT0kxHfkYzZcQH1DEV2p9wYOdB9Gdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=awpV3Pqq; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bZfBDtStrbGZ8UzA6LuSf+3cLQKWU56EOsbeQq6HQsCXK1NcHoWFDXNetp2fL+At8V+2lb2dqSeY2WMGN2boHLRC2ycvyhObEQ0fWkK75Gy8KSgRGMBXNMX9CXRbyWkQseA25ERrZtRS/ylM2Lq+cLKN61bUR9v+Ao54ZmdsSRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GrHFtX7h; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2a3LyJklb3hSAEAV0myCl1XCbj1OfA1wXLuXzezg57o=; b=awpV3Pqq0yz/Ou6C7ce/lOFH03
-	wVyI80kOgWYixBd7VWX0aCxmvP7h42bY4J7ZX0awVlPKejEsQh0fTANYG+E8HTJCMqbJyWd/dq8HS
-	ntgiEB1G70cw7dsKL8bib1mQTy9DT4GDctqJUUPr4HkSwbRa6vZLMGbS+p2iqBEbqLA8=;
+	bh=eahymJIWKeg6EuH2i+xe4KUuT0MlHFjbKV/EeHLuHQE=; b=GrHFtX7htOxaLDg469rq62ASgl
+	b/nWhWpwoaiaDVdPWKAvn2PTM9JgzBQ9wPxKHFmV5hw49bYA1KR7WMShKYa4S0NqflQtvoUeTisu/
+	PgC596VEbs4D05V0dSA7tx4B0H96Jbeok5ciQf7osdYiPpBL+/QqRjYdZI6a7DM/gf4Y=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sUSfq-002mzQ-Df; Thu, 18 Jul 2024 17:04:02 +0200
-Date: Thu, 18 Jul 2024 17:04:02 +0200
+	id 1sUSkt-002n1J-SE; Thu, 18 Jul 2024 17:09:15 +0200
+Date: Thu, 18 Jul 2024 17:09:15 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
-	pabeni@redhat.com, horatiu.vultur@microchip.com,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net] net: phy: micrel: Fix the KSZ9131 MDI-X status issue
-Message-ID: <fe873fde-7a41-4a4a-ba9f-41c2ba0ddc02@lunn.ch>
-References: <20240712111648.282897-1-Raju.Lakkaraju@microchip.com>
+	horms@kernel.org, hkallweit1@gmail.com, richardcochran@gmail.com,
+	rdunlap@infradead.org, linux@armlinux.org.uk,
+	bryan.whitehead@microchip.com, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next V2 0/4] Add support to PHYLINK for
+ LAN743x/PCI11x1x chips
+Message-ID: <336a5726-8654-441b-b5be-ef68888406c0@lunn.ch>
+References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
+ <2d8d38c2-0781-47ff-bff8-aec57d68ef05@lunn.ch>
+ <ZpijZH4pwymNbefz@HYD-DK-UNGSW21.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,62 +65,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240712111648.282897-1-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <ZpijZH4pwymNbefz@HYD-DK-UNGSW21.microchip.com>
 
-On Fri, Jul 12, 2024 at 04:46:48PM +0530, Raju Lakkaraju wrote:
-> Access information about Auto mdix completion and pair selection from the
-> KSZ9131's Auto/MDI/MDI-X status register
-
-Please explain what the broken behaviour is. How would i know i need
-this patch?
-
-You have not included a Cc: stable tag. Does that mean this does not
-bother anybody and so does not need backporting?
-
-> Fixes: b64e6a8794d9 ("net: phy: micrel: Add PHY Auto/MDI/MDI-X set driver for KSZ9131")
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/phy/micrel.c | 23 ++++++++++++++++++-----
->  1 file changed, 18 insertions(+), 5 deletions(-)
+On Thu, Jul 18, 2024 at 10:38:52AM +0530, Raju Lakkaraju wrote:
+> Hi Andrew,
 > 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index ebafedde0ab7..fddc1b91ba7f 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -1438,6 +1438,9 @@ static int ksz9131_config_init(struct phy_device *phydev)
->  #define MII_KSZ9131_AUTO_MDIX		0x1C
->  #define MII_KSZ9131_AUTO_MDI_SET	BIT(7)
->  #define MII_KSZ9131_AUTO_MDIX_SWAP_OFF	BIT(6)
-> +#define MII_KSZ9131_DIG_AXAN_STS	0x14
-> +#define MII_KSZ9131_DIG_AXAN_STS_LINK_DET	BIT(14)
-> +#define MII_KSZ9131_DIG_AXAN_STS_A_SELECT	BIT(12)
->  
->  static int ksz9131_mdix_update(struct phy_device *phydev)
->  {
-> @@ -1452,14 +1455,24 @@ static int ksz9131_mdix_update(struct phy_device *phydev)
->  			phydev->mdix_ctrl = ETH_TP_MDI;
->  		else
->  			phydev->mdix_ctrl = ETH_TP_MDI_X;
-> +
-> +		phydev->mdix = phydev->mdix_ctrl;
+> Thank you for review the patches.
+> 
+> The 07/18/2024 05:27, Andrew Lunn wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> > 
+> > On Tue, Jul 16, 2024 at 05:03:45PM +0530, Raju Lakkaraju wrote:
+> > > This is the follow-up patch series of
+> > > https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
+> > >
+> > > Divide the PHYLINK adaptation and SFP modifications into two separate patch
+> > > series.
+> > 
+> > You appear to be missing the PHYLINK maintainer in your Cc: list.
+> > 
+> I add all PHYLINK maintainers email id's in cc
+> 
+> i.e.
+> $ ./scripts/get_maintainer.pl drivers/net/phy/phylink.c
+> Russell King <linux@armlinux.org.uk> (maintainer:SFF/SFP/SFP+ MODULE SUPPORT)
 
-This seems a bit odd. phydev->mdix_ctrl is what the user wants to
-happen. This is generally ETH_TP_MDI_AUTO, meaning the PHY should
-figure it out. It can be ETH_TP_MDI_X, or ETH_TP_MDI which forces the
-configuration. phydev->mdix is what it has ended up using.
+Yes, sorry, Russell is on the list. My error.
 
-So the code above first seems to change what the user asked for. This
-is likely to replace ETH_TP_MDI_AUTO with one of the fixed modes,
-which will then break when the user replaces a crossed cable with a
-straight cable, and the forced mode is then wrong.
+richardcochran@gmail.com is a bit odd, is PTP involved here?
 
-Setting mdix to mdix_ctrl then seems wrong. In most cases, you are
-going to get ETH_TP_MDI_AUTO, when in fact you should be returning
-what the PHY has decided on, ETH_TP_MDI_X, ETH_TP_MDI, or
-ETH_TP_MDI_INVALID because the link is down.
-
-Maybe genphy_c45_read_mdix() will help you. It simply reads a PHY
-status register, sets phydev->mdix and it is done.
-
-       Andrew
+	Andrew
 
