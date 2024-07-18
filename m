@@ -1,85 +1,57 @@
-Return-Path: <netdev+bounces-112103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FDA934F97
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 220E1934F9A
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 17:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4691B1C208BC
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:03:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52FEB1C20DB7
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 15:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF3057CB1;
-	Thu, 18 Jul 2024 15:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B331420DF;
+	Thu, 18 Jul 2024 15:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPS7xyNh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="awpV3Pqq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C45C2A8FE
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 15:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388342A8FE;
+	Thu, 18 Jul 2024 15:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721314977; cv=none; b=H8eNdNFvJev4HE6mHa+UN4d3xRS/6z1MeylCfw/aI5nYYqtScAS0HQ8M8K02mCV4g7mo0PO3YYlQN9gbYTDWLGjkPhQyWKbr8JLF2KI8eHYDzCV/UYT2VQnT7vb9detNwujf6urZizlFOofdLouaNMKoxMEcCB/LA0U02YAu0ww=
+	t=1721315054; cv=none; b=nO5WO5GzIaXR/sBm+H/T974geBB4kjGOxrrcRI/O4Ys7NgQmxll8lSRHsDMrKBypSYpjx2Csf7AWrok1MGj0/N8/A0BBDYUH1DRNYD3yiSKHiVHLLEZhWfSFU1eFMlGAUhnaZoU86DTQL/vtVGNKN2qSE6tkWBIYvLq4FMQKeHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721314977; c=relaxed/simple;
-	bh=w7OwxjJ/EkT3DkmLgCPAgB/bcbN4P38BpNy5FWvpcJw=;
+	s=arc-20240116; t=1721315054; c=relaxed/simple;
+	bh=DKIRJ+uVyLmKItiAAdCRDUEQLKEAzYDyl8geLmBl4To=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C8atURgTdoqhB8pAW06XB/ecKYXr/P/kRz7p/4hBPvsYTtR9vy5faPLY3eRKN7WCZFsnqO8OxBgYDcfR1vKylCqTARx6nAoZiChCFT3guaTXhA2zg8CWb9f3HjtRxQ9sW0UL1bqFJmVa7+RRrT1tMPz4k4yO6GpBv5X+q4iDsxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SPS7xyNh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721314975;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EV9CHO83gu/NySiTRVl0vMnIcjDBOfPI560plc1pVkw=;
-	b=SPS7xyNhTr90hLhlvNMlCQoEtfU5p51DRndOZmvqp/A4Mh1mX85HIKGDYIXkPKg2r7slvm
-	NfF+0DVu8vaHgSSk9abeGJihr1OkB/LW6TAXerkoAjvMbNrh80AwwOTqwy2v4MVu+AASvI
-	S4q8Yu8I8fSD6nRb2xVYvxVpY2BeGRg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636--0zyl8bSNsWRxRmhV4Nykg-1; Thu, 18 Jul 2024 11:02:33 -0400
-X-MC-Unique: -0zyl8bSNsWRxRmhV4Nykg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3686d709f6dso94694f8f.0
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 08:02:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721314951; x=1721919751;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EV9CHO83gu/NySiTRVl0vMnIcjDBOfPI560plc1pVkw=;
-        b=aovfuXe8Qilv1xg30uIS60peImxeIKiUrs5IJQ5DJcS/boZNugZUtX6EeYClP61Yz8
-         LVRRSHeTV1IB0skyjtDV0XQWIaITwDqj/2H5/e2AobwotfC2bM1v+KksErq2as/Rnnho
-         lRK6hfnMJH09ipcJcuxEJWiq5a22HZxfhdAz0pdnL6UZR6yZO3Y/yXT5Iv3WkhLtX/7V
-         Kodztl8veQHXELLLd31cMjtZd5Ff7zUQR2fwdgZVwloEhE0k3Y9E81nYmcxn7SnR1tAk
-         1/rcoxYEN1M1MKr91Z3qq5XqAHxlXvu0CRxdRhQc8iHHfZnNxzDl5OnvohTlPlh3fFU3
-         aMnA==
-X-Gm-Message-State: AOJu0Yyv50TY80wc7CTWUilK/gkUMoxZ9sECEz4Emap1fZJZQAcdF08i
-	bTMGpJ6pEkrbTFolx1pQiqvCaW2pxoSwi8PSAk3dFoIGCsXc3SgvLMTw4slbD02a8aUrlIgTyCj
-	mPWjFHUjtIdkT+AN6h+TaKaKrhFU1FuCQmNwA77OzFc3C2W2cuacChtuJV8c7AQ==
-X-Received: by 2002:adf:f344:0:b0:367:992e:acc with SMTP id ffacd0b85a97d-368315fb74fmr3159223f8f.18.1721314951515;
-        Thu, 18 Jul 2024 08:02:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF5Bl5RKqi2PcCjLbODeOlborLyQn4eSozQYqbobAE4OCc4GvAuH3Uo4qBvgWkM9Uj0M6XahQ==
-X-Received: by 2002:adf:f344:0:b0:367:992e:acc with SMTP id ffacd0b85a97d-368315fb74fmr3159183f8f.18.1721314950798;
-        Thu, 18 Jul 2024 08:02:30 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3683f0accb5sm3660262f8f.68.2024.07.18.08.02.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 08:02:29 -0700 (PDT)
-Date: Thu, 18 Jul 2024 17:02:26 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ct/hUfd0PSLf3stmLhbiy0HyGEcjDyJGu0098GsDpP+SqqQU1cyOHZsJeLDohJxCGNK8iYECK0lajjFi8L/H0HwaPMS7K+aWPlVsYlgtplPorReILIBP4T6+44m58ZQK+1F4y/PE5bSIHCT0kxHfkYzZcQH1DEV2p9wYOdB9Gdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=awpV3Pqq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2a3LyJklb3hSAEAV0myCl1XCbj1OfA1wXLuXzezg57o=; b=awpV3Pqq0yz/Ou6C7ce/lOFH03
+	wVyI80kOgWYixBd7VWX0aCxmvP7h42bY4J7ZX0awVlPKejEsQh0fTANYG+E8HTJCMqbJyWd/dq8HS
+	ntgiEB1G70cw7dsKL8bib1mQTy9DT4GDctqJUUPr4HkSwbRa6vZLMGbS+p2iqBEbqLA8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sUSfq-002mzQ-Df; Thu, 18 Jul 2024 17:04:02 +0200
+Date: Thu, 18 Jul 2024 17:04:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org
-Subject: Re: [PATCH net] ipv4: Fix incorrect source address in Record Route
- option
-Message-ID: <ZpkugkU/HQ4QUPfU@debian>
-References: <20240718123407.434778-1-idosch@nvidia.com>
+	hkallweit1@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
+	pabeni@redhat.com, horatiu.vultur@microchip.com,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net] net: phy: micrel: Fix the KSZ9131 MDI-X status issue
+Message-ID: <fe873fde-7a41-4a4a-ba9f-41c2ba0ddc02@lunn.ch>
+References: <20240712111648.282897-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,23 +60,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240718123407.434778-1-idosch@nvidia.com>
+In-Reply-To: <20240712111648.282897-1-Raju.Lakkaraju@microchip.com>
 
-On Thu, Jul 18, 2024 at 03:34:07PM +0300, Ido Schimmel wrote:
-> The Record Route IP option records the addresses of the routers that
-> routed the packet. In the case of forwarded packets, the kernel performs
-> a route lookup via fib_lookup() and fills in the preferred source
-> address of the matched route.
+On Fri, Jul 12, 2024 at 04:46:48PM +0530, Raju Lakkaraju wrote:
+> Access information about Auto mdix completion and pair selection from the
+> KSZ9131's Auto/MDI/MDI-X status register
+
+Please explain what the broken behaviour is. How would i know i need
+this patch?
+
+You have not included a Cc: stable tag. Does that mean this does not
+bother anybody and so does not need backporting?
+
+> Fixes: b64e6a8794d9 ("net: phy: micrel: Add PHY Auto/MDI/MDI-X set driver for KSZ9131")
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> ---
+>  drivers/net/phy/micrel.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
 > 
-> The lookup is performed with the DS field of the forwarded packet, but
-> using the RT_TOS() macro which only masks one of the two ECN bits. If
-> the packet is ECT(0) or CE, the matched route might be different than
-> the route via which the packet was forwarded as the input path masks
-> both of the ECN bits, resulting in the wrong address being filled in the
-> Record Route option.
-> 
-> Fix by masking both of the ECN bits.
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index ebafedde0ab7..fddc1b91ba7f 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -1438,6 +1438,9 @@ static int ksz9131_config_init(struct phy_device *phydev)
+>  #define MII_KSZ9131_AUTO_MDIX		0x1C
+>  #define MII_KSZ9131_AUTO_MDI_SET	BIT(7)
+>  #define MII_KSZ9131_AUTO_MDIX_SWAP_OFF	BIT(6)
+> +#define MII_KSZ9131_DIG_AXAN_STS	0x14
+> +#define MII_KSZ9131_DIG_AXAN_STS_LINK_DET	BIT(14)
+> +#define MII_KSZ9131_DIG_AXAN_STS_A_SELECT	BIT(12)
+>  
+>  static int ksz9131_mdix_update(struct phy_device *phydev)
+>  {
+> @@ -1452,14 +1455,24 @@ static int ksz9131_mdix_update(struct phy_device *phydev)
+>  			phydev->mdix_ctrl = ETH_TP_MDI;
+>  		else
+>  			phydev->mdix_ctrl = ETH_TP_MDI_X;
+> +
+> +		phydev->mdix = phydev->mdix_ctrl;
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+This seems a bit odd. phydev->mdix_ctrl is what the user wants to
+happen. This is generally ETH_TP_MDI_AUTO, meaning the PHY should
+figure it out. It can be ETH_TP_MDI_X, or ETH_TP_MDI which forces the
+configuration. phydev->mdix is what it has ended up using.
 
+So the code above first seems to change what the user asked for. This
+is likely to replace ETH_TP_MDI_AUTO with one of the fixed modes,
+which will then break when the user replaces a crossed cable with a
+straight cable, and the forced mode is then wrong.
+
+Setting mdix to mdix_ctrl then seems wrong. In most cases, you are
+going to get ETH_TP_MDI_AUTO, when in fact you should be returning
+what the PHY has decided on, ETH_TP_MDI_X, ETH_TP_MDI, or
+ETH_TP_MDI_INVALID because the link is down.
+
+Maybe genphy_c45_read_mdix() will help you. It simply reads a PHY
+status register, sets phydev->mdix and it is done.
+
+       Andrew
 
