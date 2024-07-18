@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-112001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D39C9347A0
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6A9A9347A1
 	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 07:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A55FB21488
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 05:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D866A1C215EC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 05:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AB21E515;
-	Thu, 18 Jul 2024 05:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F2044C7C;
+	Thu, 18 Jul 2024 05:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uw8tiJiy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1CXisFb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8024B1B86FE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FCD3C08A
 	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 05:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721280632; cv=none; b=aO0bkBPaPZFAqUSDXfdVIcwa7VZLFGD9B6P3U3G/fy8mjwTA+d9bmydSnQ9Aki5UH6ZtyjtY2RYaXHp6NvPN62WwixxVbkkuVdUSULKljIheI6SygZARctQLyqkRg9UopxERLRDan9bfpjYdoBpZCFR/ikpLWhOVrR/0/fOlOhM=
+	t=1721280632; cv=none; b=bdZYlGqFixHIh+8I8QSz4UuxLmiE8nZM6xREvM5jBFWZAnpU8HIax5cImK98F+KCgPWE00IG3alsJcgmkjHC5fkc9RuY5bOocXnXskKSZRDGQ9e/ODEjqXG5mt6hXMAqzdfvNJpQiQeNOy18pG2pS/gO9YqrlqHJE71zbGLAF7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721280632; c=relaxed/simple;
-	bh=9lUEuqjJcgmh3O/FvyN+BOkfzdonfVAsHWRIedYwAFw=;
+	bh=dJIPwqlL/N82JHszX417sGKv6W+koheLRSFLxgzWMYY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dbsyJk2RExjmDVP++vhaC4Boeetm5jHn/xwecfn2Vyjhs19NOCFkOKFyPp7eJPLV/AmM94yCd1ysnxTENAgCp/clUOuIH7Bs1IcJzm/TsfGvk8rveLD2On/dmwR5s4u3Hph6Xntsh+ss6g0CzUg/NgVqEC1mN9F94Bep+fsPEAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uw8tiJiy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4BA79C4AF0B;
+	 In-Reply-To:To:Cc; b=edgIsv7fAX/QL09RoFqqWWSAUtSVtxwlkiB9PNpGDw0kLi3eL75usvejlWJjXnkcjYH7tIHGZzrMphIF8JAyRmu0kCdv07fuy+p0fwRtdnx8tBw7I63QpgEoGwTjO/QNNWy4yFV3IXtyq23Eb4fCVHkIro8JY8nTOeUpYIJF+QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1CXisFb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 71C4AC4AF12;
 	Thu, 18 Jul 2024 05:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1721280632;
-	bh=9lUEuqjJcgmh3O/FvyN+BOkfzdonfVAsHWRIedYwAFw=;
+	bh=dJIPwqlL/N82JHszX417sGKv6W+koheLRSFLxgzWMYY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uw8tiJiyAja6E7cdJLHDPZZr+JcQHikw9iqWz8yKg9WUp+5ziaGu7YlgKvg1cCc+c
-	 lJPPlu618UL4huCAVrN0BN4SJenLsrH6EjuS+AJ9zb9tStsjAbqddhz45i9eTSrtq8
-	 XP6Dbc7jqO5hrCxfYV3ao7YcdvsxHOAhTFyj7WgFGgCmDFCHSk+mvH/vN79zmORd4T
-	 TWqS3wHO6tVd5gHDoPdIOGgkaNlYDikgLJU0S9IkFUcEVbEPeAYDmd2d6IAf+pfGAX
-	 hpqI2/zWW/VneN1Iz38iFxQdtbpyN9/cgCZDC10+2rJWM6Xfksgq5OHjrIjSAMB/BI
-	 JzSEOma4F+pXw==
+	b=E1CXisFbpnBi8gyQLCwlcxlQ5yb2JkNH57/Fv/bmWEAxcCq+0jmWa/pk4bbII5/wP
+	 0YVLm7N3ShY6EGNj4wgHC23C6Tv87N6kfhfmZmIcAvuNdt/r6syENpiW6LDHdJdgjz
+	 Fln6921ZXT1OEfQXXznhQtcPRAD4BhclinqirzzoHxAbd7zK6qJlKds/jJ8AuTalyU
+	 72ujzbdppisQ8/UM9oUChtoohwqFUt48HnpijByJa/Yki8g1eKN/CP7Ii3BjLUTodx
+	 qnL3nyYGLmZi0mCKJBsPmnUJTL30SrGDiomE7V3uixn4oX9cYRO4Ge5qCh+bUvoFaT
+	 huk5d5uiIqcgQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36397C4333C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4EF1EC43613;
 	Thu, 18 Jul 2024 05:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: airoha: fix error branch in airoha_dev_xmit and
- airoha_set_gdm_ports
+Subject: Re: [PATCH net] gve: Fix XDP TX completion handling when counters
+ overflow
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172128063221.29494.11281555068921208480.git-patchwork-notify@kernel.org>
+ <172128063231.29494.5815351155130581713.git-patchwork-notify@kernel.org>
 Date: Thu, 18 Jul 2024 05:30:32 +0000
-References: <b628871bc8ae4861b5e2ab4db90aaf373cbb7cee.1721203880.git.lorenzo@kernel.org>
-In-Reply-To: <b628871bc8ae4861b5e2ab4db90aaf373cbb7cee.1721203880.git.lorenzo@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
- Mark-MC.Lee@mediatek.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, angelogioacchino.delregno@collabora.com,
- lorenzo.bianconi83@gmail.com
+References: <20240716171041.1561142-1-pkaligineedi@google.com>
+In-Reply-To: <20240716171041.1561142-1-pkaligineedi@google.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+Cc: netdev@vger.kernel.org, stable@kernel.org, hramamurthy@google.com,
+ jfraker@google.com, jeroendb@google.com, shailend@google.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, ziweixiao@google.com, willemb@google.com,
+ joshwash@google.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 17 Jul 2024 10:15:46 +0200 you wrote:
-> Fix error case management in airoha_dev_xmit routine since we need to
-> DMA unmap pending buffers starting from q->head.
-> Moreover fix a typo in error case branch in airoha_set_gdm_ports
-> routine.
+On Tue, 16 Jul 2024 10:10:41 -0700 you wrote:
+> From: Joshua Washington <joshwash@google.com>
 > 
-> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> In gve_clean_xdp_done, the driver processes the TX completions based on
+> a 32-bit NIC counter and a 32-bit completion counter stored in the tx
+> queue.
+> 
+> Fix the for loop so that the counter wraparound is handled correctly.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: airoha: fix error branch in airoha_dev_xmit and airoha_set_gdm_ports
-    https://git.kernel.org/netdev/net/c/1f038d5897fe
+  - [net] gve: Fix XDP TX completion handling when counters overflow
+    https://git.kernel.org/netdev/net/c/03b54bad26f3
 
 You are awesome, thank you!
 -- 
