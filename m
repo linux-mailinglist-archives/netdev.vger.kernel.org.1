@@ -1,187 +1,188 @@
-Return-Path: <netdev+bounces-112096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B216934EF6
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 16:14:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2F9934EF3
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 16:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB86CB236BC
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 14:14:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 131E71F2103A
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 14:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF114037F;
-	Thu, 18 Jul 2024 14:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E8384DF5;
+	Thu, 18 Jul 2024 14:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="i62v8n27"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XWX+M6ba"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4A280BFC
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 14:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CF280BFC
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 14:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721312053; cv=none; b=erjFCWi2eqWeXtfYCZuaDul7+Qbqm+CL5Zf0qwrvrf2Ru4cXoM7cwshVV3iEsnNZYIc5ao+0stnCWguCgZKKizcKAIEj0vMpUZbv+/vGA67flUVC0I1oCm2OUcReEDMTGu0bDXdVjp4unHL6ZPu85vDAwMEvylWv5YjMUFnYsLQ=
+	t=1721311988; cv=none; b=skf905v3cP5r4kVHUjiZJXMtnIKV5zZUGjHeNJkrlg1/2L5Zxl5/0vVQ+9UQkWDhf4nGYY6x8TZuCp+J0erNLb+JIXGUePB857z6MXLliwUgN/4T8Ul60UnuxoggGq44cW8dAl16Lhr/LtQnWtENH8RBZK86EcN+WpomIT4kbtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721312053; c=relaxed/simple;
-	bh=rYwpk6s2aA8ZaW64DEjhw3d8KkxHYtZFWh2w7miHsMM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jij0wUWJ7P3G8ez2T33wgh9QqW2YlS3agqx0Do3I7NjtGkJhRRzUAyCtFZnzsvDkKxNUoPqdIDka+gp6ePSF46hrQwtwOCT6RxaxZSxn8+ilLXdzI+UubR5CpgAM9eJrBKjm4bf5rBObEiyhY17fQbKWCTGDzSeK/uz/7aX6cdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=i62v8n27; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ee91d9cb71so10043941fa.0
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 07:14:11 -0700 (PDT)
+	s=arc-20240116; t=1721311988; c=relaxed/simple;
+	bh=kda55T5p6sR1XrXr0l9y8AqtLlGfdhZx4P0bc+DHbso=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LKsSBDUTj9YuiIuP3MqXRG5crj4Dw0Wip/hzjDz1C3NmSSDyPdyGAKA51afzyuBOVvPX2mlQdXCAZ2Pzy7kXEnFbnc5iSnZ3ngK0nnJLh2vNBYFVVv0KsyoAs946XZMfHuTABnosPUSEToH2PsEa1PBrkfECJwCUooK0UKVCdcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XWX+M6ba; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ee920b0781so11142781fa.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 07:13:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1721312050; x=1721916850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rwa/FUqGTiwfCXFjYhMYhkkWQN1Udk6UTjtKmVq4fKU=;
-        b=i62v8n27rHqSgdenH9Ii5Hd9FaVDBMIBAbVf9t1kUGs8w5xEqwlJ+lqIUnEiQPuO0e
-         bWDt7kG4VQKSTgX3gl2RSpfDezRSrbvq2hm58VbxAO+Fx8zChkv7Si8k/qzLXdVQ/Lem
-         8Xgtniuaoclpg/j98jWreRsd7X9KUGJS9AacX9dJCB5EOGET4Ew4BF63QQVY1c/ZuThX
-         NYZSMmFMU3aqKLDmLwWVgSkl+hRk7BSCb89WsfI0e+6xwRKekc6xJC4+/ymZ+MZqEu3y
-         pQpCiwKB4cazLx4VvnlyCHuTwJZxwMyNk29UqTLInTdz5NltbVNZ7irr46XDQtAv9ds5
-         tP3g==
+        d=openvpn.net; s=google; t=1721311984; x=1721916784; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ac9q+rKHkywIBVov0WJ1nP1+L4Xb/lrh3Shrgq2vRC4=;
+        b=XWX+M6baJbvivPQhIfhjyHF3KwLeupgTzVoeWLS9MSC8lY+6Z5vL03ifSsCmxPbU1i
+         Gco3mKfyXmltA/2HyrAEWjnsuErg9y+kMRXgL/AgvT5EvFKniJKBtotamygfqoY6QvWF
+         i1PsKl6SxiNTUKSceCjJIVoyQClVB+PPOTl8wpoRU5iUwJpsOXEjSWV1nOKjPQBSUZV5
+         SjZIM01dxA6/8qop789to81QL4g4ATqxZnfZddC/TtS2g2WCDRNnLJ78o7EuXyYUByEU
+         hCB0a4S70XUiXyozRsRHecJtWgA1MIBediYMh6ySBJJ9p2hUBi701y84MfVQWJfmRLS9
+         TjoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721312050; x=1721916850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rwa/FUqGTiwfCXFjYhMYhkkWQN1Udk6UTjtKmVq4fKU=;
-        b=dMx+T+8Yb1YvaG7ONs3AIiT7bXNxLtXDPd35vMgkhTFmpHqz8bx7IymqYT2EOhK8DS
-         Nu+vbwNBx0EU/jwy2YBBjnzwPKITzkQf8aoJjnexOArkc2Uj6jtoH5YwTFQlUSaPqe73
-         p9ik4EFI4VYQw4rqF0agMKofvfmnfx6PeQN2JUPewyN5hBCUA9TEzCMxhrE2u+M+dxj/
-         PL/cz47Sjga8i7CePIOmqKELWtEhLGMwzUdPBCctpnEDz0JhPXBYNpXfME3We+maYy8e
-         KoE/4ZiN7pY3khgDRyn1W3u1ENtqYJW8fItl585+9dvqS3dfqwcQa+/uYbv86iaz7cZo
-         fVwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSyPyOu/L3e323uUyzPyU8p1peu8oslt2QR6tF7HHDuZzyhc75rQPkeugPeEGK1pparlUJxQ4H5siFDS0adsqomc5Z74/N
-X-Gm-Message-State: AOJu0Yy7PHiS6Vipqg0KIKQtCDZqFvJr91zjMyB3hQELfeBAy03gwp+2
-	AKgEuEbp4CUdmVMVhafR3kgWV/lzrR+y+b5VkpGdVMgmncqTpfdNFM+gg+3BkRa8MptVq8I59xI
-	EiwHlX0v2tNInMhOGeP9h07fZHSe4biJj/GOUoA==
-X-Google-Smtp-Source: AGHT+IFVNqh/Ic+HGgiTUP80uh/xt5qB6Maa3HQuATJzOmnrapkD+TnATl8wZg505uKzpIjbkG0XUm3KWjSHRIG+r7I=
-X-Received: by 2002:a05:651c:153:b0:2ee:88d8:e807 with SMTP id
- 38308e7fff4ca-2ef05c78c57mr16981821fa.16.1721312049997; Thu, 18 Jul 2024
- 07:14:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721311984; x=1721916784;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ac9q+rKHkywIBVov0WJ1nP1+L4Xb/lrh3Shrgq2vRC4=;
+        b=cnaACWVtnt/xG6a8LshJEos+062NWglO9gfGsUEX+N3oGPMYnz/6eiB5HW1irDA8OV
+         MkRFMch0uRcrLUT5SjStk1NIPsnlzB0Tabizvoo+npzVx3irgIrBnzoegdyUQhGm3O56
+         EFjTQR8jemYnSCQAoVGOVogeZ0jZ5RU9EbLmcpJFyAIe+gY5pYVe1YGEBiVuOhOiiOG6
+         zohFtXrOLpD1svkYs1llOKW0dVnM2IUlFXxG0fB3k3oDD1sI8DAPsajuzuVEmFo0+Nad
+         yM2HfuiC4HnQr+cT/ISnwBK2FUG6I/BL8Q9qa5rtcaas+af5WInWE32hwud4/MFEu0w7
+         /Zxg==
+X-Gm-Message-State: AOJu0YyfLuPMuRDOEwuYmJ6IzgwvKKSHxig1eAbhIByOTjjSP1rf5mXY
+	lND3sGXaMp8mK6aI4nglyq4pYCKtBDwxPQhNMGhmy2qtUiaYnICcGAZ/wVeVQoY=
+X-Google-Smtp-Source: AGHT+IHpqr82NTgTIMtXhXgDkksVPLWU5Lyh7uwke82doFK4LtW/PJrayeBLmZUCFAFxeOjxgvIRdg==
+X-Received: by 2002:a05:6512:a8d:b0:52c:e192:5f5f with SMTP id 2adb3069b0e04-52ee53df0bfmr3763569e87.19.1721311984455;
+        Thu, 18 Jul 2024 07:13:04 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:14d5:6a6d:7aec:1e83? ([2001:67c:2fbc:1:14d5:6a6d:7aec:1e83])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc820ebesm563844366b.197.2024.07.18.07.13.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jul 2024 07:13:04 -0700 (PDT)
+Message-ID: <dd606a17-5fe1-4c04-b07c-e67b3c2e8223@openvpn.net>
+Date: Thu, 18 Jul 2024 16:15:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708075023.14893-1-brgl@bgdev.pl> <20240708075023.14893-4-brgl@bgdev.pl>
- <7c0140be-4325-4005-9068-7e0fc5ff344d@nvidia.com> <CAMRc=McF93F6YsQ+eT9oOe+c=2ZCQ3rBdj+-3Ruy8iO1B-syjw@mail.gmail.com>
- <CAMRc=Mc=8Sa76TOZujMMZcaF2Dc8OL_HKo=gXuj-YALaH4zKHg@mail.gmail.com> <6e12f5a5-8007-4ddc-a5ad-be556656af71@nvidia.com>
-In-Reply-To: <6e12f5a5-8007-4ddc-a5ad-be556656af71@nvidia.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 18 Jul 2024 16:13:58 +0200
-Message-ID: <CAMRc=MdvsKeYEEvf2w3RxPiR=yLFXDwesiQ75JHTU-YEpkF-ZA@mail.gmail.com>
-Subject: Re: [RESEND PATCH net-next v3 3/4] net: phy: aquantia: wait for the
- GLOBAL_CFG to start returning real values
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>, Brad Griffis <bgriffis@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 10/24] ovpn: implement basic RX path (UDP)
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ Esben Haabendal <esben@geanix.com>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-11-antonio@openvpn.net> <Zj4k9g1hV1eHQ4Ox@hog>
+ <eb9558b3-cd7e-4da6-a496-adca6132a601@openvpn.net> <Zpjyg-nO42rA3W_0@hog>
+ <10c01ca1-c79a-41ab-b99b-deab81adb552@openvpn.net> <ZpkUfMtdrsXc-p6k@hog>
+ <80351026-0d15-460a-8002-4b24b893fefa@openvpn.net> <ZpkbWoW4FlzDDuyp@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZpkbWoW4FlzDDuyp@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 18, 2024 at 4:08=E2=80=AFPM Jon Hunter <jonathanh@nvidia.com> w=
-rote:
->
->
-> On 18/07/2024 14:29, Bartosz Golaszewski wrote:
-> > On Thu, Jul 18, 2024 at 3:04=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev=
-.pl> wrote:
-> >>
-> >> On Thu, Jul 18, 2024 at 2:23=E2=80=AFPM Jon Hunter <jonathanh@nvidia.c=
-om> wrote:
-> >>>
-> >>>
-> >>> With the current -next and mainline we are seeing the following issue=
- on
-> >>> our Tegra234 Jetson AGX Orin platform ...
-> >>>
-> >>>    Aquantia AQR113C stmmac-0:00: aqr107_fill_interface_modes failed: =
--110
-> >>>    tegra-mgbe 6800000.ethernet eth0: __stmmac_open: Cannot attach to =
-PHY (error: -110)
-> >>>
-> >>>
-> >>> We have tracked it down to this change and looks like our PHY does no=
-t
-> >>> support 10M ...
-> >>>
-> >>> $ ethtool eth0
-> >>> Settings for eth0:
-> >>>           Supported ports: [  ]
-> >>>           Supported link modes:   100baseT/Full
-> >>>                                   1000baseT/Full
-> >>>                                   10000baseT/Full
-> >>>                                   1000baseKX/Full
-> >>>                                   10000baseKX4/Full
-> >>>                                   10000baseKR/Full
-> >>>                                   2500baseT/Full
-> >>>                                   5000baseT/Full
-> >>>
-> >>> The following fixes this for this platform ...
-> >>>
-> >>> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/p=
-hy/aquantia/aquantia_main.c
-> >>> index d12e35374231..0b2db486d8bd 100644
-> >>> --- a/drivers/net/phy/aquantia/aquantia_main.c
-> >>> +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> >>> @@ -656,7 +656,7 @@ static int aqr107_fill_interface_modes(struct phy=
-_device *phydev)
-> >>>           int i, val, ret;
-> >>>
-> >>>           ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-> >>> -                                       VEND1_GLOBAL_CFG_10M, val, va=
-l !=3D 0,
-> >>> +                                       VEND1_GLOBAL_CFG_100M, val, v=
-al !=3D 0,
-> >>>                                           1000, 100000, false);
-> >>>           if (ret)
-> >>>                   return ret;
-> >>>
-> >>>
-> >>> However, I am not sure if this is guaranteed to work for all?
-> >>
-> >> Ah cr*p. No, I don't think it is. We should take the first supported
-> >> mode for a given PHY I think.
-> >>
-> >
-> > TBH I only observed the issue on AQR115C. I don't have any other model
-> > to test with. Is it fine to fix it by implementing
-> > aqr115_fill_interface_modes() that would first wait for this register
-> > to return non-0 and then call aqr107_fill_interface_modes()?
->
-> I am doing a bit more testing. We have seen a few issues with this PHY
-> driver and so I am wondering if we also need something similar for the
-> AQR113C variant too.
->
-> Interestingly, the product brief for these PHYs [0] do show that both
-> the AQR113C and AQR115C both support 10M. So I wonder if it is our
-> ethernet controller that is not supporting 10M? I will check on this too.
->
+On 18/07/2024 15:40, Sabrina Dubroca wrote:
+> 2024-07-18, 15:27:42 +0200, Antonio Quartulli wrote:
+>> On 18/07/2024 15:11, Sabrina Dubroca wrote:
+>>>> basically the idea is: with our encapsulation we can guarantee that what
+>>>> entered the tunnel is also exiting the tunnel, without corruption.
+>>>> Therefore we claim that checksums are all correct.
+>>>
+>>> Can you be sure that they were correct when they went into the tunnel?
+>>> If not, I think you have to set CHECKSUM_NONE.
+>>
+>> I can't be sure, because on the sender side we don't validate checksums
+>> before encapsulation.
+>>
+>> If we assume that outgoing packets are always well formed and they can only
+>> be damaged while traveling on the link, then the current code should be ok.
+>>
+>> If we cannot make this assumption, then we need the receiver to verify all
+>> checksums before moving forward (which is what you are suggesting).
+>>
+>> Is it truly possible for the kernel to hand ovpn a packet with invalid
+>> checksums on the TX path?
+> 
+> The networking stack shouldn't generate packets with broken checksums,
+> but it could happen. On a VPN server that's giving access to an
+> internal network, I think the packet could get corrupted on the
+> internal network and may be pushed without verification into the
+> tunnel.
 
-Oh you have an 113c? I didn't get this. Yeah, weird, all docs say it
-should support 10M. In fact all AQR PHYs should hence my initial
-change.
+Right.
 
-Bart
+In these cases the receiver would have a chance to detect and discard 
+this packet.
 
-> Jon
->
-> [0]
-> https://www.marvell.com/content/dam/marvell/en/public-collateral/transcei=
-vers/marvell-phys-transceivers-aqrate-gen4-product-brief.pdf
->
->
-> --
-> nvpublic
+With the current ovpn code, instead, we are saying "everything is good, 
+don't check" and the packet would be delivered to the upper layer.
+
+Ok, I think it makes sense to switch to CHECKSUM_NONE.
+
+(I wonder what the wireguard guys think about it :-))
+
+> 
+> It's also possible to inject them with packet sockets for
+> testing. Using scapy to send packets over your ovpn device should
+> allow you to do that.
+
+Thanks for the hint!
+
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
