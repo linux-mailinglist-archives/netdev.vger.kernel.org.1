@@ -1,252 +1,103 @@
-Return-Path: <netdev+bounces-112129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B10A393524A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 21:58:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6129493524C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 22:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D6111F217A4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 19:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0D61C20BBB
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 20:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8672144D28;
-	Thu, 18 Jul 2024 19:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73833745CB;
+	Thu, 18 Jul 2024 20:02:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DE743172
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49CC69D31
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 20:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721332719; cv=none; b=jvEoVv0mnwC/tWWriTNMzJEfbDr/sLWGfcKInhQ/CbEjQ2SDnXXgy0xjz50dU/EZNilDy4oLmwYazptdpENyleODhDJ//6NhTRjVID7ILxXEKPN4/j1qYFF4gQzOO/KOnvbMCQfaHrq0M/QKXsE2Q5Cp4yJsM57Fq7mPupggB7w=
+	t=1721332953; cv=none; b=Fo9bXg5rK9yu2IkZ5bRQ6uqlY58JuMDybXUpCNJtyGaVUc1mxmP0mqEUf2zDK19dHRHgRvPOgjqrerND/I2hO+7gjeA5Zj24vDrG21w/1bEFt9HqBJM/czss09h19Ze4K9F5n5wIUzFrsVM7ZGH1z5t0TWTmHOmdGa8UEy7SunI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721332719; c=relaxed/simple;
-	bh=uJN5VKG/3El0xeF3kZknK7Wfi/ntTPGeaNaA/KBCOGo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fO9avlBlzilm6RpGA3PiqzZHGJOGmbr3c5Js6mbbBw5duoW+NUi3hsezWbLZBN6mVHhC7UrQevo0PnmgmsBvN0q7xLXXJ9DQNv1UPomxZfuV9eQrH9tMXK84YjOdq+zZz8FKjtc6anG0ev2wsrtOJX0U4Lmx1DDWtAhPk+HCa8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af546.dynamic.kabel-deutschland.de [95.90.245.70])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A313961E5FE01;
-	Thu, 18 Jul 2024 21:57:44 +0200 (CEST)
-Message-ID: <09299d30-50d6-4132-871b-2ed4b3fe5c68@molgen.mpg.de>
-Date: Thu, 18 Jul 2024 21:57:43 +0200
+	s=arc-20240116; t=1721332953; c=relaxed/simple;
+	bh=7JCZwAJ4XEtVVJSel4LDYPjxDmRXoGQ+/zskSBsbTt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edyVp1ulTej65byiEQ/7tVpZ85rULWt25N9c4nlyms2XO3LY8lrf6LjktcQYpPiDINOHzO9DES9NRTzzOE881SFEqfImET1UarFlwsOPRV/rkkVWvFVckuRPEowT5kFLgM+Ou4+7Nh8H1RkTTZ0ONfub7T283qfwaLUe+TmSAgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eefe705510so14311091fa.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 13:02:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721332950; x=1721937750;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MV3E255lhFXFGo9mt53fS35RfMVjcwBwH1TjGSTkwNk=;
+        b=euR1FUligvWrLlfe/VgaYqcIaQf+jVj0eXGupgYv3BD6pjdTBOZ9eRkEpah1mjQKeN
+         x3r+93YdJyA99jgoNa+jEM19XjOSBYeJlqTZde9uRTuo5nOND770M6pjQ8kDAZjG/1ZN
+         QLAdTpP/buhhmsJdZSlAS2NFgnIv5EupIR7YQuuRbiyuSqRBU/mULvtfKPo+YmQVOeKg
+         B+K5l4FjRlYbcqM9dO67W0YEHekTVSbO+8hwe37zA8z54YysKkxT6MLkLKgGZhuouItf
+         bjavwy1OmD3/DEBuRgTtMHdD70SUfsyeYEXtAuqXoihPat1wJoA19ydFkGj/OqS/9paK
+         6Uqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWstOpq6weI8alEc2BtZHLN1Ldmr5/pQo+uK1lsZ3JrPdM/3OtMDMic1dun+4z78Ab3uLCvqC9534N8tcuX9gIdJqGAf2iC
+X-Gm-Message-State: AOJu0Ywc4EvThS0ARvrQyDwItHXW0bhkD+ORU8kVKaH9JWZuoJSHm999
+	AozjP8HRBWXXghS4tK1k4CMFZ46wBgSq/b7sNspkc8G4NDJhz01u
+X-Google-Smtp-Source: AGHT+IHpTF7lxwahqGtImAuokLPoqjbwpKmdjke1GDRTU+b9U777emdC8kw/yI67ie8D2yFxI9YAQg==
+X-Received: by 2002:a2e:3c0a:0:b0:2ec:56d1:f28 with SMTP id 38308e7fff4ca-2ef05c9ac73mr22818301fa.26.1721332949940;
+        Thu, 18 Jul 2024 13:02:29 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a2b866a0d8sm258166a12.82.2024.07.18.13.02.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 13:02:29 -0700 (PDT)
+Date: Thu, 18 Jul 2024 13:02:27 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Ken Milmore <ken.milmore@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: r8169: Crash with TX segmentation offload on RTL8125
+Message-ID: <Zpl004GjvJw3A3Af@gmail.com>
+References: <b18ea747-252a-44ad-b746-033be1784114@gmail.com>
+ <75df2de0-9e32-475d-886c-0e65d7cfba1e@gmail.com>
+ <20240522065550.32d37359@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] i40e: Add support for fw
- health report
-To: Kamal Heib <kheib@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, Ivan Vecera <ivecera@redhat.com>,
- netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S . Miller" <davem@davemloft.net>
-References: <20240718181319.145884-1-kheib@redhat.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240718181319.145884-1-kheib@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240522065550.32d37359@kernel.org>
 
-Dear Kamal,
+Hello Jakub,
 
-
-Thank you for your patch.
-
-Am 18.07.24 um 20:13 schrieb Kamal Heib:
-> Add support for reporting fw status via the devlink health report.
-
-I do not know the interface. So, the driver already has some way to 
-communicate with the firmware, and you only need to hook it up to devlink?
-
-> Example:
->   # devlink health show pci/0000:02:00.0 reporter fw
->   pci/0000:02:00.0:
->     reporter fw
->       state healthy error 0 recover 0
->   # devlink health diagnose pci/0000:02:00.0 reporter fw
->   Mode: normal
-
-Any way to force it into recovery mode to also check it?
-
-> Signed-off-by: Kamal Heib <kheib@redhat.com>
-> ---
-> v2:
-> - Address comments from Jiri.
-> - Move the creation of the health report.
-> ---
->   drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
->   .../net/ethernet/intel/i40e/i40e_devlink.c    | 57 +++++++++++++++++++
->   .../net/ethernet/intel/i40e/i40e_devlink.h    |  2 +
->   drivers/net/ethernet/intel/i40e/i40e_main.c   | 14 +++++
->   4 files changed, 74 insertions(+)
+On Wed, May 22, 2024 at 06:55:50AM -0700, Jakub Kicinski wrote:
+> On Fri, 17 May 2024 15:21:00 -0700 Florian Fainelli wrote:
+> > > The patch below fixes the problem, by simply reading nr_frags a bit later, after the checksum stage.  
+> > 
+> > Yeah, that's an excellent catch and one that is bitten us before, too:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=20d1f2d1b024f6be199a3bedf1578a1d21592bc5
+> > 
+> > unclear what we would do in skb_shinfo() to help driver writers, rather 
+> > than rely upon code inspection to find such bugs.
 > 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-> index d546567e0286..f94671b6e7c6 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -465,6 +465,7 @@ static inline const u8 *i40e_channel_mac(struct i40e_channel *ch)
->   struct i40e_pf {
->   	struct pci_dev *pdev;
->   	struct devlink_port devlink_port;
-> +	struct devlink_health_reporter *fw_health_report;
->   	struct i40e_hw hw;
->   	DECLARE_BITMAP(state, __I40E_STATE_SIZE__);
->   	struct msix_entry *msix_entries;
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> index cc4e9e2addb7..8fe64284e8d3 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> @@ -122,6 +122,25 @@ static int i40e_devlink_info_get(struct devlink *dl,
->   	return err;
->   }
->   
-> +static int i40e_fw_reporter_diagnose(struct devlink_health_reporter *reporter,
-> +				     struct devlink_fmsg *fmsg,
-> +				     struct netlink_ext_ack *extack)
-> +{
-> +	struct i40e_pf *pf = devlink_health_reporter_priv(reporter);
-> +
-> +	if (test_bit(__I40E_RECOVERY_MODE, pf->state))
-> +		devlink_fmsg_string_pair_put(fmsg, "Mode", "recovery");
-> +	else
-> +		devlink_fmsg_string_pair_put(fmsg, "Mode", "normal");
+> I wonder if we should add a "error injection" hook under DEBUG_NET
+> to force re-allocation of skbs in any helper which may cause it?
 
-I’d use ternary operator.
+Would you mind detailing a bit more how would see see it implemented?
 
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct devlink_health_reporter_ops i40e_fw_reporter_ops = {
-> +	.name = "fw",
-> +	.diagnose = i40e_fw_reporter_diagnose,
-> +};
-> +
->   static const struct devlink_ops i40e_devlink_ops = {
->   	.info_get = i40e_devlink_info_get,
->   };
-> @@ -233,3 +252,41 @@ void i40e_devlink_destroy_port(struct i40e_pf *pf)
->   {
->   	devlink_port_unregister(&pf->devlink_port);
->   }
-> +
-> +/**
-> + * i40e_devlink_create_health_reporter - Create the health reporter for this PF
-> + * @pf: the PF to create reporter for
-> + *
-> + * Create health reporter for this PF.
-> + *
-> + * Return: zero on success or an error code on failure.
+Are you talking about something as the Fault-injection framework
+(CONFIG_FAULT_INJECTION) ?
 
-No dot/period at the end.
-
-> + **/
-> +int i40e_devlink_create_health_reporter(struct i40e_pf *pf)
-> +{
-> +	struct devlink *devlink = priv_to_devlink(pf);
-> +	struct device *dev = &pf->pdev->dev;
-> +	int rc = 0;
-> +
-> +	devl_lock(devlink);
-> +	pf->fw_health_report =
-> +		devl_health_reporter_create(devlink, &i40e_fw_reporter_ops, 0, pf);
-> +	if (IS_ERR(pf->fw_health_report)) {
-> +		rc = PTR_ERR(pf->fw_health_report);
-> +		dev_err(dev, "Failed to create fw reporter, err = %d\n", rc);
-> +	}
-> +	devl_unlock(devlink);
-> +
-> +	return rc;
-> +}
-> +
-> +/**
-> + * i40e_devlink_destroy_health_reporter - Destroy the health reporter
-> + * @pf: the PF to cleanup
-
-The verb is spelled with a space: clean up.
-
-> + *
-> + * Destroy the health reporter
-> + **/
-> +void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf)
-> +{
-> +	if (!IS_ERR_OR_NULL(pf->fw_health_report))
-> +		devlink_health_reporter_destroy(pf->fw_health_report);
-> +}
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.h b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-> index 469fb3d2ee25..018679094bb5 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.h
-> @@ -14,5 +14,7 @@ void i40e_devlink_register(struct i40e_pf *pf);
->   void i40e_devlink_unregister(struct i40e_pf *pf);
->   int i40e_devlink_create_port(struct i40e_pf *pf);
->   void i40e_devlink_destroy_port(struct i40e_pf *pf);
-> +int i40e_devlink_create_health_reporter(struct i40e_pf *pf);
-> +void i40e_devlink_destroy_health_reporter(struct i40e_pf *pf);
->   
->   #endif /* _I40E_DEVLINK_H_ */
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index cbcfada7b357..b6b3ae299b28 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -15370,6 +15370,9 @@ static bool i40e_check_recovery_mode(struct i40e_pf *pf)
->   		dev_crit(&pf->pdev->dev, "Firmware recovery mode detected. Limiting functionality.\n");
->   		dev_crit(&pf->pdev->dev, "Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode.\n");
->   		set_bit(__I40E_RECOVERY_MODE, pf->state);
-> +		if (pf->fw_health_report)
-> +			devlink_health_report(pf->fw_health_report,
-> +					      "recovery mode detected", pf);
->   
->   		return true;
->   	}
-> @@ -15810,6 +15813,13 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->   	if (test_bit(__I40E_RECOVERY_MODE, pf->state))
->   		return i40e_init_recovery_mode(pf, hw);
->   
-> +	err = i40e_devlink_create_health_reporter(pf);
-> +	if (err) {
-> +		dev_err(&pdev->dev,
-> +			"Failed to create health reporter %d\n", err);
-> +		goto err_health_reporter;
-> +	}
-> +
->   	err = i40e_init_lan_hmc(hw, hw->func_caps.num_tx_qp,
->   				hw->func_caps.num_rx_qp, 0, 0);
->   	if (err) {
-> @@ -16175,6 +16185,8 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->   	(void)i40e_shutdown_lan_hmc(hw);
->   err_init_lan_hmc:
->   	kfree(pf->qp_pile);
-> +	i40e_devlink_destroy_health_reporter(pf);
-> +err_health_reporter:
->   err_sw_init:
->   err_adminq_setup:
->   err_pf_reset:
-> @@ -16209,6 +16221,8 @@ static void i40e_remove(struct pci_dev *pdev)
->   
->   	i40e_devlink_unregister(pf);
->   
-> +	i40e_devlink_destroy_health_reporter(pf);
-> +
->   	i40e_dbg_pf_exit(pf);
->   
->   	i40e_ptp_stop(pf);
-
-
-Kind regards,
-
-Paul
+Thanks
+--breno
 
