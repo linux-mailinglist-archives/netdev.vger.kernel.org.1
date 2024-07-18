@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-111990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10939346BD
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 05:30:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904389346C3
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 05:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA771C212CE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 03:30:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D01DE282588
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 03:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC842C69B;
-	Thu, 18 Jul 2024 03:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198763611E;
+	Thu, 18 Jul 2024 03:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Zn3PFBPs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rMxsgPFq"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AD93611E;
-	Thu, 18 Jul 2024 03:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587281B86CE;
+	Thu, 18 Jul 2024 03:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721273433; cv=none; b=bI9hbtHwNASN1OHJtMUaHnRk6dlQlxw+4CBIu+FC2aQ70zz1tTXdAaikT5p2dh62FofAo0CFMe4SgbCFMfr7RKLwO7/AOnhanZXosoRoMPndLCp5TjzRDTF97jWg6BU90/LNHePS2uvaFP2jhA1ygO1mB++fMA7/vGfAknHB+L4=
+	t=1721273629; cv=none; b=CF+bYwFbHaZk8REs1Y1POxKRzTITS20scbdflfUtLuqm9Zz0yL6BsHfUtCYoKqm5/X1vrgKAieLiA43cQye/tYWtD9q8YDd8UslPre1TevLrtcwLKnTGDJ+pNnp3YYw3bbXd1hl4/zjn3+3H2N6345gTjOpQLEtUKoeORJ++6sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721273433; c=relaxed/simple;
-	bh=7+zu5L9uvyhFaZGTSGbANYzDfAfi7Y31CYoNzB3YQ40=;
+	s=arc-20240116; t=1721273629; c=relaxed/simple;
+	bh=lUccWAKrS0z2vZkPel2uSe2kUAeaIFsraO45VVpjJjQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tyNvUiFfp5ScxQ/o1LFbJkrCir8h6VXqKfhcT609fCK5iAqHW0vJRcG+PgXE4Y2No/l8tPEGm1T82QQmxBm9uEcQKkBXpkz9zY7Gjjr/XB6Bx4XTrGJNxmRbb6VG3pzm17g8oa7eFrKULT2AMLl/1r5NVMwy8cmSvo38stHEnKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Zn3PFBPs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUmTY0IuqcyDijX4wuBPOtQkQ5mSw6KD0RGMGLjyTt4ubLByw3Ay5SjeCOrl/B4uXYwqWk0Zraky2P4xcvZcCKgYFgR0/oduNMTcsgSV2fPjieudgo0ogAujUL0dGElaPqGfOPytwWR0Rqjayc4lkv6bt+uIyThOSqQ9F6KlEvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rMxsgPFq; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2exnLrrRrPmk9Z8Xfze5jArJw5qXx4jp1s+I7j+j12c=; b=Zn3PFBPsZfbbLoRqMRfmZjAl57
-	SXWLMPY9DcqXElROqJP5JY+Ev/eqQqTEfuO1xr4r1zCJpUgpFkRo2UAqSVayfazn/Tp4NVN71aVhy
-	VcOUuCUf4DwlolmCAJytxOyKVfiPL79tqLn0G9IA6GNWL+SwXdDazgEQcdeluUkRijJA=;
+	bh=SbxIg29mlP0SoQkD+qF3vxVxlSVquA5slH6jrg92+GQ=; b=rMxsgPFq4XpChbK56selyqs5FG
+	Ia0rp/40X0LzvQFDOF7Vw7SlQtzt++ayGcVppcR2Cz4djO1852UED7JEvWPMYhd0ZBJeZr5Dxq1IV
+	BApMx0u5G0GzjGTUSz/c8gE78TISzhrZdTuKN2m2PviH6vB0Nyy7jEflnefVR+UbECbc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sUHqZ-002kn6-Ck; Thu, 18 Jul 2024 05:30:23 +0200
-Date: Thu, 18 Jul 2024 05:30:23 +0200
+	id 1sUHth-002koq-Ed; Thu, 18 Jul 2024 05:33:37 +0200
+Date: Thu, 18 Jul 2024 05:33:37 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
@@ -51,11 +51,11 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
 	bryan.whitehead@microchip.com, edumazet@google.com,
 	pabeni@redhat.com, linux-kernel@vger.kernel.org,
 	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V2 1/4] net: lan743x: Create separate PCS power
- reset function
-Message-ID: <933de7d6-87ee-4b7c-997f-69c1560a4e83@lunn.ch>
+Subject: Re: [PATCH net-next V2 2/4] net: lan743x: Create separate Link Speed
+ Duplex state function
+Message-ID: <57198c26-7585-4829-b267-059d0e7e548c@lunn.ch>
 References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
- <20240716113349.25527-2-Raju.Lakkaraju@microchip.com>
+ <20240716113349.25527-3-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,11 +64,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240716113349.25527-2-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <20240716113349.25527-3-Raju.Lakkaraju@microchip.com>
 
-On Tue, Jul 16, 2024 at 05:03:46PM +0530, Raju Lakkaraju wrote:
-> Create separate PCS power reset function from lan743x_sgmii_config () to use
-> as subroutine.
+On Tue, Jul 16, 2024 at 05:03:47PM +0530, Raju Lakkaraju wrote:
+> Create separate Link Speed Duplex (LSD) update state function from
+> lan743x_sgmii_config () to use as subroutine.
 > 
 > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 
